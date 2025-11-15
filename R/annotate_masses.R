@@ -425,7 +425,28 @@ annotate_masses <-
 
     rm(clusters_table)
 
-    # TODO add safety if no monocharged?
+    # Validate that we have monocharged adducts/clusters to work with
+    if (nrow(add_clu_table) == 0L) {
+      logger::log_error(
+        "No valid monocharged adducts or clusters found for mode '",
+        ms_mode,
+        "'. ",
+        "Cannot proceed with mass annotation. ",
+        "Please check your adducts and clusters configuration."
+      )
+      stop(
+        "No monocharged adducts/clusters available for annotation.\n",
+        "Check that your adducts_list and clusters_list contain valid entries for mode '",
+        ms_mode,
+        "'."
+      )
+    }
+
+    logger::log_debug(
+      "Found ",
+      nrow(add_clu_table),
+      " monocharged adducts/clusters for processing"
+    )
 
     # logger::log_trace(
     #  "Calculating delta mz for single charge adducts and clusters"

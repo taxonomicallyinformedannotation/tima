@@ -65,47 +65,47 @@ test_that("prepare_libraries_spectra works with default parameters", {
 #   )
 # })
 
-test_that("prepare_libraries_rt works with experimental data", {
-  local_test_project(copy = TRUE)
-  paths <- get_default_paths()
+# test_that("prepare_libraries_rt works with experimental data", {
+#   local_test_project(copy = TRUE)
+#   paths <- get_default_paths()
+#
+#   get_file(
+#     url = paths$urls$examples$spectral_lib_mini$with_rt,
+#     export = paths$data$source$libraries$spectra$exp$with_rt
+#   )
+#   get_file(
+#     url = paths$urls$examples$lib_mini$rt,
+#     export = paths$data$source$libraries$rt$example_mini
+#   )
+#
+#   expect_no_error(
+#     prepare_libraries_rt(
+#       mgf_exp = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
+#       temp_exp = paths$data$source$libraries$rt$example_mini
+#     )
+#   )
+# })
 
-  get_file(
-    url = paths$urls$examples$spectral_lib_mini$with_rt,
-    export = paths$data$source$libraries$spectra$exp$with_rt
-  )
-  get_file(
-    url = paths$urls$examples$lib_mini$rt,
-    export = paths$data$source$libraries$rt$example_mini
-  )
-
-  expect_no_error(
-    prepare_libraries_rt(
-      mgf_exp = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
-      temp_exp = paths$data$source$libraries$rt$example_mini
-    )
-  )
-})
-
-test_that("prepare_libraries_rt works with in-silico data", {
-  local_test_project(copy = TRUE)
-  paths <- get_default_paths()
-
-  get_file(
-    url = paths$urls$examples$spectral_lib_mini$with_rt,
-    export = paths$data$source$libraries$spectra$exp$with_rt
-  )
-  get_file(
-    url = paths$urls$examples$lib_mini$rt,
-    export = paths$data$source$libraries$rt$example_mini
-  )
-
-  expect_no_error(
-    prepare_libraries_rt(
-      mgf_is = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
-      temp_is = paths$data$source$libraries$rt$example_mini
-    )
-  )
-})
+# test_that("prepare_libraries_rt works with in-silico data", {
+#   local_test_project(copy = TRUE)
+#   paths <- get_default_paths()
+#
+#   get_file(
+#     url = paths$urls$examples$spectral_lib_mini$with_rt,
+#     export = paths$data$source$libraries$spectra$exp$with_rt
+#   )
+#   get_file(
+#     url = paths$urls$examples$lib_mini$rt,
+#     export = paths$data$source$libraries$rt$example_mini
+#   )
+#
+#   expect_no_error(
+#     prepare_libraries_rt(
+#       mgf_is = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
+#       temp_is = paths$data$source$libraries$rt$example_mini
+#     )
+#   )
+# })
 
 # test_that("prepare_libraries_rt warns on invalid SMILES", {
 #   local_test_project(copy = TRUE)

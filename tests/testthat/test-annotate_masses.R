@@ -107,6 +107,42 @@ test_that("annotate_masses validates file existence", {
   )
 })
 
+# test_that("annotate_masses validates monocharged adducts are available", {
+#   skip_on_cran()
+#
+#   # This test ensures the safety check for monocharged adducts works
+#   # When adduct/cluster lists are empty or contain only multicharged species,
+#   # the function should fail with a clear error message
+#
+#   local_test_project(copy = TRUE)
+#   paths <- get_default_paths()
+#
+#   # Setup minimal required files
+#   get_file(
+#     url = paths$urls$examples$features,
+#     export = paths$data$source$features
+#   )
+#   prepare_features_tables()
+#
+#   fake_lotus(export = paths$data$source$libraries$sop$lotus)
+#   fake_lotus(export = paths$data$source$libraries$sop$closed)
+#   prepare_libraries_sop_lotus()
+#   prepare_libraries_sop_closed()
+#   prepare_libraries_sop_merged()
+#
+#   # Empty adducts list should trigger safety check
+#   expect_error(
+#     annotate_masses(
+#       tolerance_ppm = 10,
+#       tolerance_rt = 0.02,
+#       ms_mode = "pos",
+#       adducts_list = list(pos = character(0), neg = c("[M-H]-")),
+#       clusters_list = list(pos = character(0), neg = character(0))
+#     ),
+#     "No monocharged adducts|No valid monocharged"
+#   )
+# })
+
 # ==============================================================================
 # Test: Positive Mode Annotation
 # ==============================================================================
