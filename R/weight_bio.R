@@ -291,7 +291,7 @@ weight_bio <- function(
       tidytable::mutate(
         !!as.name(score_name) := tidytable::if_else(
           condition = !!as.name(samples) != "notClassified",
-          true = !!as.name(score) * 1,
+          true = score * 1,
           false = 0
         )
       )
