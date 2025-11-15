@@ -23,7 +23,14 @@ test_that("clean_chemo processes minimal chemical class columns", {
     candidate_score_pseudo_initial = c(0.8, 0.7),
     score_weighted_chemo = c(0.8, 0.7),
     score_biological = c(0.5, 0.6),
-    score_chemical = c(0.5, 0.6)
+    score_chemical = c(0.5, 0.6),
+    feature_pred_tax_npc_01pat_val = c("Alkaloids", "Flavonoids"),
+    feature_pred_tax_npc_02sup_val = c("Terpenoids", "Phenolics"),
+    feature_pred_tax_npc_03cla_val = c("Class1", "Class2"),
+    feature_pred_tax_cla_01kin_val = c("Kingdom1", "Kingdom2"),
+    feature_pred_tax_cla_02sup_val = c("Superclass1", "Superclass2"),
+    feature_pred_tax_cla_03cla_val = c("Class3", "Class4"),
+    feature_pred_tax_cla_04dirpar_val = c("Parent1", "Parent2")
   )
   features_table <- tidytable::tidytable(feature_id = c("F1", "F2"))
   components_table <- tidytable::tidytable(
@@ -107,7 +114,14 @@ test_that("clean_chemo filters MS1 annotations with OR condition", {
     candidate_score_pseudo_initial = c(0.5, 0.5),
     score_biological = c(0.9, 0.1),
     score_chemical = c(0.1, 0.9),
-    score_weighted_chemo = c(0.5, 0.5)
+    score_weighted_chemo = c(0.5, 0.5),
+    feature_pred_tax_npc_01pat_val = c("Alkaloids", "Flavonoids"),
+    feature_pred_tax_npc_02sup_val = c("Terpenoids", "Phenolics"),
+    feature_pred_tax_npc_03cla_val = c("Class1", "Class2"),
+    feature_pred_tax_cla_01kin_val = c("Kingdom1", "Kingdom2"),
+    feature_pred_tax_cla_02sup_val = c("Superclass1", "Superclass2"),
+    feature_pred_tax_cla_03cla_val = c("Class3", "Class4"),
+    feature_pred_tax_cla_04dirpar_val = c("Parent1", "Parent2")
   )
   features_table <- tidytable::tidytable(feature_id = c("F1", "F2"))
   components_table <- tidytable::tidytable(
@@ -154,7 +168,14 @@ test_that("clean_chemo filters MS1 annotations with AND condition", {
     candidate_score_pseudo_initial = c(0.875, 0.65),
     score_biological = c(0.9, 0.7),
     score_chemical = c(0.85, 0.6),
-    score_weighted_chemo = c(0.875, 0.65)
+    score_weighted_chemo = c(0.875, 0.65),
+    feature_pred_tax_npc_01pat_val = c("Alkaloids", "Flavonoids"),
+    feature_pred_tax_npc_02sup_val = c("Terpenoids", "Phenolics"),
+    feature_pred_tax_npc_03cla_val = c("Class1", "Class2"),
+    feature_pred_tax_cla_01kin_val = c("Kingdom1", "Kingdom2"),
+    feature_pred_tax_cla_02sup_val = c("Superclass1", "Superclass2"),
+    feature_pred_tax_cla_03cla_val = c("Class3", "Class4"),
+    feature_pred_tax_cla_04dirpar_val = c("Parent1", "Parent2")
   )
   features_table <- tidytable::tidytable(feature_id = c("F1", "F2"))
   components_table <- tidytable::tidytable(

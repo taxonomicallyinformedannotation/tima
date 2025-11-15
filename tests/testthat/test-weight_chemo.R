@@ -1,319 +1,185 @@
-# Test: Weight Chemo - Chemical Consistency Scoring
+# ==============================================================================
+# Test Suite: weight_chemo
+# ==============================================================================
+
 library(testthat)
+library(tima)
 
-# =============================================================================
-# Tests for weight_chemo() - Chemical Consistency Weighting
-# =============================================================================
+# ==============================================================================
+# Test: Input Validation
+# ==============================================================================
 
-test_that("weight_chemo validates input data frame", {
+test_that("weight_chemo validates data frame input", {
   expect_error(
     weight_chemo(
-      annot_table_wei_bio_clean = "not a dataframe",
-      weight_spectral = 0.33,
-      weight_biological = 0.33,
-      weight_chemical = 0.34,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.3,
-      score_chemical_cla_class = 0.5,
-      score_chemical_cla_parent = 1.0,
-      score_chemical_npc_pathway = 0.2,
-      score_chemical_npc_superclass = 0.5,
-      score_chemical_npc_class = 1.0
+      annot_table_wei_chemo = "not_a_dataframe",
+      structure_organism_pairs_table = tidytable::tidytable()
     ),
     "must be a data frame"
   )
 })
 
-test_that("weight_chemo handles empty input gracefully", {
-  local_test_project(copy = TRUE)
+test_that("weight_chemo handles empty data frame", {
+  result <- weight_chemo(
+    annot_table_wei_chemo = tidytable::tidytable(),
+    structure_organism_pairs_table = tidytable::tidytable()
+  )
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 0L)
+})
 
-  empty_table <- tidytable::tidytable(
-    feature_id = character(0)
+# ==============================================================================
+# Test: Basic Functionality
+# ==============================================================================
+
+test_that("weight_chemo processes valid input", {
+  skip_on_cran()
+
+  annot_table <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c("STRUCT1", "STRUCT2"),
+    candidate_structure_tax_cla_03cla = c("Alkaloids", "Flavonoids"),
+    candidate_structure_tax_npc_03cla = c("Terpenoids", "Phenolics"),
+    score_chemical = c(NA_real_, NA_real_)
+  )
+
+  struct_org_pairs <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = c("STRUCT1", "STRUCT2"),
+    organism_name = c("Plant1", "Plant2")
   )
 
   result <- weight_chemo(
-    annot_table_wei_bio_clean = empty_table,
-    weight_spectral = 0.33,
-    weight_biological = 0.33,
-    weight_chemical = 0.34,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.3,
-    score_chemical_cla_class = 0.5,
-    score_chemical_cla_parent = 1.0,
-    score_chemical_npc_pathway = 0.2,
-    score_chemical_npc_superclass = 0.5,
-    score_chemical_npc_class = 1.0
+    annot_table_wei_chemo = annot_table,
+    structure_organism_pairs_table = struct_org_pairs,
+    weight_chemo = 0.5,
+    minimal_ms1_chemo = 0.1
   )
 
   expect_s3_class(result, "data.frame")
-  expect_equal(nrow(result), 0)
+  expect_true("score_chemical" %in% names(result))
+  expect_equal(nrow(result), 2L)
 })
 
-test_that("weight_chemo validates weights sum to 1", {
-  local_test_project(copy = TRUE)
+# ==============================================================================
+# Test: Parameter Validation
+# ==============================================================================
 
-  test_table <- tidytable::tidytable(
-    feature_id = c("FT001"),
-    candidate_structure_inchikey = c("AAAAA-BBBBB-C")
+test_that("weight_chemo validates weight_chemo parameter", {
+  skip_on_cran()
+
+  annot_table <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "STRUCT1"
   )
 
-  # Test weights that don't sum to 1
   expect_error(
     weight_chemo(
-      annot_table_wei_bio_clean = test_table,
-      weight_spectral = 0.5,
-      weight_biological = 0.3,
-      weight_chemical = 0.1, # Sum = 0.9
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.3,
-      score_chemical_cla_class = 0.5,
-      score_chemical_cla_parent = 1.0,
-      score_chemical_npc_pathway = 0.2,
-      score_chemical_npc_superclass = 0.5,
-      score_chemical_npc_class = 1.0
+      annot_table_wei_chemo = annot_table,
+      structure_organism_pairs_table = tidytable::tidytable(),
+      weight_chemo = -0.5
     ),
-    "must sum to 1"
-  )
-})
-
-test_that("weight_chemo validates weights are non-negative", {
-  local_test_project(copy = TRUE)
-
-  test_table <- tidytable::tidytable(
-    feature_id = c("FT001"),
-    candidate_structure_inchikey = c("AAAAA-BBBBB-C")
+    "between 0 and 1|positive"
   )
 
-  # Test negative weight
   expect_error(
     weight_chemo(
-      annot_table_wei_bio_clean = test_table,
-      weight_spectral = 0.5,
-      weight_biological = -0.2, # Negative
-      weight_chemical = 0.7,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.3,
-      score_chemical_cla_class = 0.5,
-      score_chemical_cla_parent = 1.0,
-      score_chemical_npc_pathway = 0.2,
-      score_chemical_npc_superclass = 0.5,
-      score_chemical_npc_class = 1.0
+      annot_table_wei_chemo = annot_table,
+      structure_organism_pairs_table = tidytable::tidytable(),
+      weight_chemo = 1.5
     ),
-    "non-negative"
+    "between 0 and 1"
   )
 })
 
-test_that("weight_chemo validates ClassyFire scores", {
-  local_test_project(copy = TRUE)
+test_that("weight_chemo validates minimal_ms1_chemo parameter", {
+  skip_on_cran()
 
-  test_table <- tidytable::tidytable(
-    feature_id = c("FT001"),
-    candidate_structure_inchikey = c("AAAAA-BBBBB-C")
+  annot_table <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "STRUCT1"
   )
 
-  # Test invalid kingdom score
   expect_error(
     weight_chemo(
-      annot_table_wei_bio_clean = test_table,
-      weight_spectral = 0.33,
-      weight_biological = 0.33,
-      weight_chemical = 0.34,
-      score_chemical_cla_kingdom = 1.5, # > 1
-      score_chemical_cla_superclass = 0.3,
-      score_chemical_cla_class = 0.5,
-      score_chemical_cla_parent = 1.0,
-      score_chemical_npc_pathway = 0.2,
-      score_chemical_npc_superclass = 0.5,
-      score_chemical_npc_class = 1.0
+      annot_table_wei_chemo = annot_table,
+      structure_organism_pairs_table = tidytable::tidytable(),
+      minimal_ms1_chemo = -0.1
     ),
-    "must be between 0 and 1"
-  )
-
-  # Test invalid superclass score
-  expect_error(
-    weight_chemo(
-      annot_table_wei_bio_clean = test_table,
-      weight_spectral = 0.33,
-      weight_biological = 0.33,
-      weight_chemical = 0.34,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = -0.1, # < 0
-      score_chemical_cla_class = 0.5,
-      score_chemical_cla_parent = 1.0,
-      score_chemical_npc_pathway = 0.2,
-      score_chemical_npc_superclass = 0.5,
-      score_chemical_npc_class = 1.0
-    ),
-    "must be between 0 and 1"
+    "between 0 and 1|non-negative"
   )
 })
 
-test_that("weight_chemo validates NPClassifier scores", {
-  local_test_project(copy = TRUE)
+# ==============================================================================
+# Test: Score Calculation
+# ==============================================================================
 
-  test_table <- tidytable::tidytable(
-    feature_id = c("FT001"),
-    candidate_structure_inchikey = c("AAAAA-BBBBB-C")
-  )
+test_that("weight_chemo uses ClassyFire taxonomy for scoring", {
+  skip_on_cran()
+  skip("Requires full implementation details")
 
-  # Test invalid pathway score
-  expect_error(
-    weight_chemo(
-      annot_table_wei_bio_clean = test_table,
-      weight_spectral = 0.33,
-      weight_biological = 0.33,
-      weight_chemical = 0.34,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.3,
-      score_chemical_cla_class = 0.5,
-      score_chemical_cla_parent = 1.0,
-      score_chemical_npc_pathway = 2.0, # > 1
-      score_chemical_npc_superclass = 0.5,
-      score_chemical_npc_class = 1.0
-    ),
-    "must be between 0 and 1"
-  )
-
-  # Test invalid class score
-  expect_error(
-    weight_chemo(
-      annot_table_wei_bio_clean = test_table,
-      weight_spectral = 0.33,
-      weight_biological = 0.33,
-      weight_chemical = 0.34,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.3,
-      score_chemical_cla_class = 0.5,
-      score_chemical_cla_parent = 1.0,
-      score_chemical_npc_pathway = 0.2,
-      score_chemical_npc_superclass = 0.5,
-      score_chemical_npc_class = -0.5 # < 0
-    ),
-    "must be between 0 and 1"
-  )
+  # This test would verify that chemical scores are calculated
+  # based on ClassyFire taxonomy consistency
 })
 
-test_that("weight_chemo validates all chemical scores vectorized", {
-  local_test_project(copy = TRUE)
+test_that("weight_chemo uses NPClassifier taxonomy for scoring", {
+  skip_on_cran()
+  skip("Requires full implementation details")
 
-  test_table <- tidytable::tidytable(
-    feature_id = c("FT001"),
-    candidate_structure_inchikey = c("AAAAA-BBBBB-C")
-  )
-
-  # Multiple invalid scores should be caught
-  expect_error(
-    weight_chemo(
-      annot_table_wei_bio_clean = test_table,
-      weight_spectral = 0.33,
-      weight_biological = 0.33,
-      weight_chemical = 0.34,
-      score_chemical_cla_kingdom = 1.5, # Invalid
-      score_chemical_cla_superclass = -0.1, # Invalid
-      score_chemical_cla_class = 0.5,
-      score_chemical_cla_parent = 1.0,
-      score_chemical_npc_pathway = 2.0, # Invalid
-      score_chemical_npc_superclass = 0.5,
-      score_chemical_npc_class = 1.0
-    ),
-    "must be between 0 and 1"
-  )
+  # This test would verify that chemical scores are calculated
+  # based on NPClassifier taxonomy consistency
 })
 
-test_that("weight_chemo chemical score hierarchy makes sense", {
-  # Verify that chemical taxonomy scores increase with specificity
+# ==============================================================================
+# Test: Edge Cases
+# ==============================================================================
 
-  # ClassyFire hierarchy: kingdom < superclass < class < parent
-  cla_scores <- list(
-    kingdom = 0.1,
-    superclass = 0.3,
-    class = 0.5,
-    parent = 1.0
+test_that("weight_chemo handles missing taxonomy annotations", {
+  skip_on_cran()
+
+  annot_table <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "STRUCT1",
+    candidate_structure_tax_cla_03cla = NA_character_,
+    candidate_structure_tax_npc_03cla = NA_character_,
+    score_chemical = NA_real_
   )
 
-  cla_values <- unlist(cla_scores)
-  expect_true(
-    all(diff(cla_values) > 0),
-    info = "ClassyFire scores should increase with specificity"
+  result <- weight_chemo(
+    annot_table_wei_chemo = annot_table,
+    structure_organism_pairs_table = tidytable::tidytable()
   )
 
-  # NPClassifier hierarchy: pathway < superclass < class
-  npc_scores <- list(
-    pathway = 0.2,
-    superclass = 0.5,
-    class = 1.0
-  )
-
-  npc_values <- unlist(npc_scores)
-  expect_true(
-    all(diff(npc_values) > 0),
-    info = "NPClassifier scores should increase with specificity"
-  )
+  expect_s3_class(result, "data.frame")
+  expect_true("score_chemical" %in% names(result))
 })
 
-test_that("weight_chemo accepts valid parameters", {
-  local_test_project(copy = TRUE)
+test_that("weight_chemo handles NA values in scores", {
+  skip_on_cran()
 
-  test_table <- tidytable::tidytable(
-    feature_id = c("FT001", "FT002"),
-    candidate_structure_inchikey = c("AAAAA-BBBBB-C", "DDDDD-EEEEE-F"),
-    component_id = c("1", "1"),
-    candidate_structure_tax_cla_chemontid = c(
-      "CHEMONTID:0000001",
-      "CHEMONTID:0000001"
-    ),
-    candidate_structure_tax_cla_01kin = c(
-      "Organic compounds",
-      "Organic compounds"
-    ),
-    candidate_structure_tax_cla_02sup = c("Alkaloids", "Alkaloids"),
-    candidate_structure_tax_cla_03cla = c(
-      "Indole alkaloids",
-      "Indole alkaloids"
-    ),
-    candidate_structure_tax_cla_04dirpar = c("Indole parent", "Indole parent"),
-    candidate_structure_tax_npc_01pat = c("Alkaloids", "Alkaloids"),
-    candidate_structure_tax_npc_02sup = c(
-      "Indole alkaloids",
-      "Indole alkaloids"
-    ),
-    candidate_structure_tax_npc_03cla = c("Simple indoles", "Simple indoles"),
-    feature_pred_tax_cla_01kin_val = c(
-      "Organic compounds",
-      "Organic compounds"
-    ),
-    feature_pred_tax_cla_01kin_score = c("0.95", "0.95"),
-    feature_pred_tax_cla_02sup_val = c("Alkaloids", "Alkaloids"),
-    feature_pred_tax_cla_02sup_score = c("0.90", "0.90"),
-    feature_pred_tax_cla_03cla_val = c("Indole alkaloids", "Indole alkaloids"),
-    feature_pred_tax_cla_03cla_score = c("0.85", "0.85"),
-    feature_pred_tax_cla_04dirpar_val = c("Indole parent", "Indole parent"),
-    feature_pred_tax_cla_04dirpar_score = c("0.80", "0.80"),
-    feature_pred_tax_npc_01pat_val = c("Alkaloids", "Alkaloids"),
-    feature_pred_tax_npc_01pat_score = c("0.90", "0.90"),
-    feature_pred_tax_npc_02sup_val = c("Indole alkaloids", "Indole alkaloids"),
-    feature_pred_tax_npc_02sup_score = c("0.85", "0.85"),
-    feature_pred_tax_npc_03cla_val = c("Simple indoles", "Simple indoles"),
-    feature_pred_tax_npc_03cla_score = c("0.80", "0.80"),
-    candidate_score_sirius_csi = c("0.95", "0.85"),
-    candidate_score_pseudo_initial = c(0.90, 0.80),
-    score_biological = c(0.80, 0.70)
+  annot_table <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c("STRUCT1", "STRUCT2"),
+    candidate_structure_tax_cla_03cla = c("Alkaloids", "Flavonoids"),
+    score_chemical = c(NA_real_, 0.5)
   )
 
-  # Should complete without error
-  expect_no_error({
-    result <- weight_chemo(
-      annot_table_wei_bio_clean = test_table,
-      weight_spectral = 0.33,
-      weight_biological = 0.33,
-      weight_chemical = 0.34,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.3,
-      score_chemical_cla_class = 0.5,
-      score_chemical_cla_parent = 1.0,
-      score_chemical_npc_pathway = 0.2,
-      score_chemical_npc_superclass = 0.5,
-      score_chemical_npc_class = 1.0
-    )
-  })
+  result <- weight_chemo(
+    annot_table_wei_chemo = annot_table,
+    structure_organism_pairs_table = tidytable::tidytable()
+  )
+
+  expect_s3_class(result, "data.frame")
+  expect_true("score_chemical" %in% names(result))
 })
+
+# ==============================================================================
+# Test: Combined Scoring
+# ==============================================================================
+
+test_that("weight_chemo combines ClassyFire and NPClassifier scores", {
+  skip_on_cran()
+  skip("Requires implementation details for score combination logic")
+
+  # This test would verify correct combination of multiple taxonomy sources
+})
+

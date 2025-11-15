@@ -1,0 +1,5 @@
+structure_inchikey_connectivity_layer,structure_smiles_no_stereo,structure_exact_mass,structure_xlogp,structure_molecular_formula
+AAAAAAAAAAAAAA,CC(C)C,58.078,1.5,C4H10
+BBBBBBBBBBBBBB,C1CCCCC1,84.094,2.1,C6H12
+CCCCCCCCCCCCCC,C1=CC=CC=C1,78.046,2.0,C6H6
+
