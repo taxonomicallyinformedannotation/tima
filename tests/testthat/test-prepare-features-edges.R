@@ -59,8 +59,8 @@ test_that("prepare_features_edges validates output parameter", {
     "must be a single character string"
   )
 
-# unlink(temp_ms1)
-# unlink(temp_spectral)
+  # unlink(temp_ms1)
+  # unlink(temp_spectral)
 })
 
 test_that("prepare_features_edges validates column name parameters", {
@@ -91,8 +91,8 @@ test_that("prepare_features_edges validates column name parameters", {
     "must be a single character string"
   )
 
-# unlink(temp_ms1)
-# unlink(temp_spectral)
+  # unlink(temp_ms1)
+  # unlink(temp_spectral)
 })
 
 test_that("prepare_features_edges checks file existence", {
@@ -120,7 +120,7 @@ test_that("prepare_features_edges checks file existence", {
     "not found"
   )
 
-# unlink(temp_ms1)
+  # unlink(temp_ms1)
 })
 
 test_that("prepare_features_edges combines ms1 and spectral edges", {
@@ -172,9 +172,9 @@ test_that("prepare_features_edges combines ms1 and spectral edges", {
   expect_true("feature_source" %in% colnames(output_data))
   expect_true("feature_target" %in% colnames(output_data))
 
-# unlink(temp_ms1)
-# unlink(temp_spectral)
-# unlink(temp_output)
+  # unlink(temp_ms1)
+  # unlink(temp_spectral)
+  # unlink(temp_output)
 })
 
 test_that("prepare_features_edges extracts entropy information", {
@@ -221,9 +221,9 @@ test_that("prepare_features_edges extracts entropy information", {
   expect_true("feature_spectrum_entropy" %in% colnames(output_data))
   expect_true("feature_spectrum_peaks" %in% colnames(output_data))
 
-# unlink(temp_ms1)
-# unlink(temp_spectral)
-# unlink(temp_output)
+  # unlink(temp_ms1)
+  # unlink(temp_spectral)
+  # unlink(temp_output)
 })
 
 test_that("prepare_features_edges standardizes column names", {
@@ -270,9 +270,9 @@ test_that("prepare_features_edges standardizes column names", {
   expect_false("SourceID" %in% colnames(output_data))
   expect_false("TargetID" %in% colnames(output_data))
 
-# unlink(temp_ms1)
-# unlink(temp_spectral)
-# unlink(temp_output)
+  # unlink(temp_ms1)
+  # unlink(temp_spectral)
+  # unlink(temp_output)
 })
 
 test_that("prepare_features_edges handles empty input files", {
@@ -314,9 +314,9 @@ test_that("prepare_features_edges handles empty input files", {
   expect_equal(result, temp_output)
   expect_true(file.exists(temp_output))
 
-# unlink(temp_ms1)
-# unlink(temp_spectral)
-# unlink(temp_output)
+  # unlink(temp_ms1)
+  # unlink(temp_spectral)
+  # unlink(temp_output)
 })
 
 test_that("prepare_features_edges fills missing target with source", {
@@ -356,7 +356,7 @@ test_that("prepare_features_edges fills missing target with source", {
   output_data <- tidytable::fread(temp_output, na.strings = c("", "NA"))
   expect_true(all(!is.na(output_data$feature_target)))
 
-# unlink(temp_ms1)
-# unlink(temp_spectral)
-# unlink(temp_output)
+  # unlink(temp_ms1)
+  # unlink(temp_spectral)
+  # unlink(temp_output)
 })
