@@ -174,8 +174,11 @@ test_that("minimize_results adds candidate count columns", {
     best_percentile = 0.9
   )
 
-  expect_true("candidates_evaluated" %in% names(result) ||
-              "candidates_best" %in% names(result))
+  expect_true(
+    "candidates_evaluated" %in%
+      names(result) ||
+      "candidates_best" %in% names(result)
+  )
 })
 
 # ==============================================================================
@@ -234,4 +237,3 @@ test_that("minimize_results handles NA scores", {
 
   expect_s3_class(result, "data.frame")
 })
-

@@ -174,4 +174,3 @@ test_that("weight_bio handles NA values in scores", {
   expect_s3_class(result, "data.frame")
   expect_true("score_biological" %in% names(result))
 })
-

@@ -576,7 +576,9 @@ test_that("parse_adduct handles complex sugar loss with slash in comment", {
 
 test_that("parse_adduct distinguishes between slash in comment vs slash as delimiter", {
   # Test that slash INSIDE parentheses is not a delimiter
-  result_comment <- parse_adduct("[M-C6H10O4 (methylpentose/desoxyhexose-H2O)+H]+")
+  result_comment <- parse_adduct(
+    "[M-C6H10O4 (methylpentose/desoxyhexose-H2O)+H]+"
+  )
   expect_false(is_parse_failed(result_comment))
 
   # Test that slash OUTSIDE parentheses IS a delimiter (alternative adducts)
@@ -586,4 +588,3 @@ test_that("parse_adduct distinguishes between slash in comment vs slash as delim
   expect_equal(unname(result_alternatives["n_mer"]), 1)
   expect_equal(unname(result_alternatives["charge"]), 1)
 })
-
