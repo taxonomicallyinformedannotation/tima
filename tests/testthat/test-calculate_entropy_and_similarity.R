@@ -1,3 +1,7 @@
+# ==============================================================================
+# Test Suite: calculate_entropy_and_similarity
+# ==============================================================================
+
 # Test: Spectral Similarity and Annotation
 library(testthat)
 
