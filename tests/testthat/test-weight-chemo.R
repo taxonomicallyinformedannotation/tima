@@ -25,7 +25,7 @@ test_that("weight_chemo validates input data frame", {
 })
 
 test_that("weight_chemo handles empty input gracefully", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   empty_table <- tidytable::tidytable(
     feature_id = character(0)
@@ -47,12 +47,10 @@ test_that("weight_chemo handles empty input gracefully", {
 
   expect_s3_class(result, "data.frame")
   expect_equal(nrow(result), 0)
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("weight_chemo validates weights sum to 1", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   test_table <- tidytable::tidytable(
     feature_id = c("FT001"),
@@ -76,12 +74,10 @@ test_that("weight_chemo validates weights sum to 1", {
     ),
     "must sum to 1"
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("weight_chemo validates weights are non-negative", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   test_table <- tidytable::tidytable(
     feature_id = c("FT001"),
@@ -105,12 +101,10 @@ test_that("weight_chemo validates weights are non-negative", {
     ),
     "non-negative"
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("weight_chemo validates ClassyFire scores", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   test_table <- tidytable::tidytable(
     feature_id = c("FT001"),
@@ -152,12 +146,10 @@ test_that("weight_chemo validates ClassyFire scores", {
     ),
     "must be between 0 and 1"
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("weight_chemo validates NPClassifier scores", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   test_table <- tidytable::tidytable(
     feature_id = c("FT001"),
@@ -199,12 +191,10 @@ test_that("weight_chemo validates NPClassifier scores", {
     ),
     "must be between 0 and 1"
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("weight_chemo validates all chemical scores vectorized", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   test_table <- tidytable::tidytable(
     feature_id = c("FT001"),
@@ -228,8 +218,6 @@ test_that("weight_chemo validates all chemical scores vectorized", {
     ),
     "must be between 0 and 1"
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("weight_chemo chemical score hierarchy makes sense", {
@@ -264,7 +252,7 @@ test_that("weight_chemo chemical score hierarchy makes sense", {
 })
 
 test_that("weight_chemo accepts valid parameters", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   test_table <- tidytable::tidytable(
     feature_id = c("FT001", "FT002"),
@@ -328,6 +316,4 @@ test_that("weight_chemo accepts valid parameters", {
       score_chemical_npc_class = 1.0
     )
   })
-
-  unlink("data", recursive = TRUE)
 })

@@ -10,7 +10,7 @@ library(testthat)
 #
 #   # Use isolated test environment with automatic cleanup
 #   withr::local_tempdir()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Create empty edges file
@@ -33,7 +33,7 @@ library(testthat)
 #
 #   # Use isolated test environment with automatic cleanup
 #   withr::local_tempdir()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Create minimal edges

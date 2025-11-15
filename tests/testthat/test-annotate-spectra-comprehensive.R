@@ -11,7 +11,7 @@ library(tima)
 test_that("annotate_spectra validates polarity parameter", {
   skip_on_cran()
 
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -40,14 +40,12 @@ test_that("annotate_spectra validates polarity parameter", {
     ),
     "pos.*neg"
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("annotate_spectra validates numeric parameters", {
   skip_on_cran()
 
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -111,14 +109,12 @@ test_that("annotate_spectra validates numeric parameters", {
     ),
     "non-negative"
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("annotate_spectra validates file existence", {
   skip_on_cran()
 
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # Missing input file
   expect_error(
@@ -143,14 +139,12 @@ test_that("annotate_spectra validates file existence", {
     ),
     "not found"
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 # test_that("annotate_spectra requires at least one library", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #
 #   get_file(
 #     url = get_default_paths()$urls$examples$spectra_mini,
@@ -166,7 +160,7 @@ test_that("annotate_spectra validates file existence", {
 #     "at least one library"
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # ==============================================================================
@@ -176,7 +170,7 @@ test_that("annotate_spectra validates file existence", {
 # test_that("annotate_spectra works with single MGF library", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -198,13 +192,13 @@ test_that("annotate_spectra validates file existence", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 test_that("annotate_spectra works in negative mode", {
   skip_on_cran()
 
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -225,14 +219,12 @@ test_that("annotate_spectra works in negative mode", {
       dalton = 0.01
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 # test_that("annotate_spectra works with multiple libraries", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -265,7 +257,7 @@ test_that("annotate_spectra works in negative mode", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # ==============================================================================
@@ -275,7 +267,7 @@ test_that("annotate_spectra works in negative mode", {
 # test_that("annotate_spectra works with cosine similarity", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -298,13 +290,13 @@ test_that("annotate_spectra works in negative mode", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("annotate_spectra works with entropy similarity", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -327,7 +319,7 @@ test_that("annotate_spectra works in negative mode", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # ==============================================================================
@@ -337,7 +329,7 @@ test_that("annotate_spectra works in negative mode", {
 # test_that("annotate_spectra respects similarity threshold", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -372,7 +364,7 @@ test_that("annotate_spectra works in negative mode", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # ==============================================================================
@@ -382,7 +374,7 @@ test_that("annotate_spectra works in negative mode", {
 # test_that("annotate_spectra accepts different tolerance settings", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -415,7 +407,7 @@ test_that("annotate_spectra works in negative mode", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # ==============================================================================
@@ -425,7 +417,7 @@ test_that("annotate_spectra works in negative mode", {
 # test_that("annotate_spectra works with approx mode enabled", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -448,13 +440,13 @@ test_that("annotate_spectra works in negative mode", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("annotate_spectra works with approx mode disabled", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -477,7 +469,7 @@ test_that("annotate_spectra works in negative mode", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # ==============================================================================
@@ -487,7 +479,7 @@ test_that("annotate_spectra works in negative mode", {
 # test_that("annotate_spectra respects intensity cutoff", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -522,7 +514,7 @@ test_that("annotate_spectra works in negative mode", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # ==============================================================================
@@ -532,7 +524,7 @@ test_that("annotate_spectra works in negative mode", {
 # test_that("annotate_spectra produces valid output file", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -562,7 +554,7 @@ test_that("annotate_spectra works in negative mode", {
 #     expect_s3_class(result, "data.frame")
 #   }
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # ==============================================================================
@@ -573,13 +565,11 @@ test_that("annotate_spectra handles empty input gracefully", {
   skip_on_cran()
   skip("Requires empty MGF file creation")
 
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   # Would need to create an empty but valid MGF file
   # This is complex, so skip for now
-
-  unlink("data", recursive = TRUE)
 })
 
 # ==============================================================================
@@ -590,7 +580,7 @@ test_that("annotate_spectra completes in reasonable time", {
   skip_on_cran()
   skip("Performance test - run manually")
 
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -616,6 +606,4 @@ test_that("annotate_spectra completes in reasonable time", {
 
   # Should complete reasonably fast
   expect_true(elapsed < 120, info = paste("Took", elapsed, "seconds"))
-
-  unlink("data", recursive = TRUE)
 })

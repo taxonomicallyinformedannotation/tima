@@ -2,27 +2,22 @@
 library(testthat)
 
 test_that("prepare_params works with default parameters", {
-  copy_backbone(cache_dir = ".")
-  paths <- get_default_paths()
+  paths <- local_test_project(copy = TRUE)
   params <- get_params(step = "prepare_params")
 
   expect_no_error(prepare_params(params_small = params))
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_params works with custom taxon", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   params <- get_params(step = "prepare_params")
 
   params$organisms$taxon <- "Gentiana lutea"
   expect_no_error(prepare_params(params_small = params))
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_params works for all workflow steps", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   steps <- c(
     "annotate_masses",
@@ -52,12 +47,10 @@ test_that("prepare_params works for all workflow steps", {
       prepare_params(step = step),
     )
   }
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_params works with existing parameters", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # First create params
   params <- get_params(step = "prepare_params")
@@ -65,16 +58,13 @@ test_that("prepare_params works with existing parameters", {
 
   # Then try to prepare again (should use existing)
   expect_no_error(prepare_params())
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("get_params retrieves advanced parameters", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   params <- get_params(step = "prepare_params_advanced")
   expect_type(params, "list")
   expect_true(length(params) > 0)
-
-  unlink("data", recursive = TRUE)
 })
+

@@ -2,7 +2,7 @@
 library(testthat)
 
 # test_that("prepare_annotations_gnps handles missing input", {
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #
 #   expect_no_error(
 #     prepare_annotations_gnps(input = "fileDoesNotExist")
@@ -11,12 +11,12 @@ library(testthat)
 #     prepare_annotations_gnps(input = NULL)
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("prepare_annotations_gnps works with default parameters", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Setup GNPS data
@@ -40,21 +40,21 @@ library(testthat)
 #
 #   expect_no_error(prepare_annotations_gnps())
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("prepare_annotations_sirius handles NULL input", {
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #
 #   expect_no_error(
 #     prepare_annotations_sirius(input_directory = NULL)
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("prepare_annotations_sirius handles non-existent directory", {
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #
 #   expect_no_error(
 #     prepare_annotations_sirius(input_directory = "randomDirThatDoesNotExist")
@@ -65,12 +65,12 @@ library(testthat)
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("prepare_annotations_sirius works with version 5", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #
 #   get_example_sirius()
 #
@@ -81,23 +81,23 @@ library(testthat)
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("prepare_annotations_sirius works with default parameters", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #
 #   get_example_sirius()
 #
 #   expect_no_error(prepare_annotations_sirius())
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("prepare_annotations_spectra works", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Setup spectral library and structures
@@ -131,5 +131,5 @@ library(testthat)
 #
 #   expect_no_error(prepare_annotations_spectra())
 #
-#   unlink("data", recursive = TRUE)
+#
 # })

@@ -6,7 +6,7 @@ library(testthat)
 # =============================================================================
 
 test_that("clean_bio returns early with empty annotation table", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   empty_annotations <- tidytable::tidytable(
     feature_id = character(0),
@@ -26,12 +26,10 @@ test_that("clean_bio returns early with empty annotation table", {
 
   expect_s3_class(result, "data.frame")
   expect_equal(nrow(result), 0)
-
-  unlink("data", recursive = TRUE)
 })
 
 # test_that("clean_bio returns early with empty edges table", {
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #
 #   annotations <- tidytable::tidytable(
 #     feature_id = c("FT001", "FT002"),
@@ -62,11 +60,11 @@ test_that("clean_bio returns early with empty annotation table", {
 #   expect_true("feature_pred_tax_cla_01kin_val" %in% colnames(result))
 #   expect_true(all(result$feature_pred_tax_cla_01kin_val == "empty"))
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("clean_bio adds required columns when no valid edges", {
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #
 #   annotations <- tidytable::tidytable(
 #     feature_id = c("FT001"),
@@ -99,7 +97,7 @@ test_that("clean_bio returns early with empty annotation table", {
 #   expect_true("consistency_structure_cla_kin" %in% colnames(result))
 #   expect_true("feature_pred_tax_cla_01kin_score" %in% colnames(result))
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # =============================================================================
@@ -107,7 +105,7 @@ test_that("clean_bio returns early with empty annotation table", {
 # =============================================================================
 
 # test_that("clean_chemo returns early with empty annotation table", {
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #
 #   empty_annotations <- tidytable::tidytable(
 #     feature_id = character(0),
@@ -129,12 +127,12 @@ test_that("clean_bio returns early with empty annotation table", {
 #   expect_s3_class(result, "data.frame")
 #   expect_equal(nrow(result), 0)
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("clean_chemo filters candidates correctly", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #
 #   annotations <- tidytable::tidytable(
 #     feature_id = c("FT001", "FT001", "FT001"),
@@ -164,7 +162,7 @@ test_that("clean_bio returns early with empty annotation table", {
 #   expect_s3_class(result, "data.frame")
 #   expect_true(nrow(result) <= 2) # Should keep top 2 candidates
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # =============================================================================

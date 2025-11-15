@@ -35,8 +35,8 @@ test_that("prepare_features_edges validates input structure", {
 })
 
 test_that("prepare_features_edges validates output parameter", {
-  temp_ms1 <- tempfile(fileext = ".tsv")
-  temp_spectral <- tempfile(fileext = ".tsv")
+  temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
+  temp_spectral <- withr::local_tempfile(fileext = ".tsv")
 
   writeLines("ID1\tID2\n1\t2", temp_ms1)
   writeLines("ID1\tID2\n1\t2", temp_spectral)
@@ -59,13 +59,13 @@ test_that("prepare_features_edges validates output parameter", {
     "must be a single character string"
   )
 
-  unlink(temp_ms1)
-  unlink(temp_spectral)
+# unlink(temp_ms1)
+# unlink(temp_spectral)
 })
 
 test_that("prepare_features_edges validates column name parameters", {
-  temp_ms1 <- tempfile(fileext = ".tsv")
-  temp_spectral <- tempfile(fileext = ".tsv")
+  temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
+  temp_spectral <- withr::local_tempfile(fileext = ".tsv")
 
   writeLines("ID1\tID2\n1\t2", temp_ms1)
   writeLines("ID1\tID2\n1\t2", temp_spectral)
@@ -91,8 +91,8 @@ test_that("prepare_features_edges validates column name parameters", {
     "must be a single character string"
   )
 
-  unlink(temp_ms1)
-  unlink(temp_spectral)
+# unlink(temp_ms1)
+# unlink(temp_spectral)
 })
 
 test_that("prepare_features_edges checks file existence", {
@@ -109,7 +109,7 @@ test_that("prepare_features_edges checks file existence", {
   )
 
   # Test one existing, one missing
-  temp_ms1 <- tempfile(fileext = ".tsv")
+  temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
   writeLines("ID1\tID2\n1\t2", temp_ms1)
 
   expect_error(
@@ -120,14 +120,14 @@ test_that("prepare_features_edges checks file existence", {
     "not found"
   )
 
-  unlink(temp_ms1)
+# unlink(temp_ms1)
 })
 
 test_that("prepare_features_edges combines ms1 and spectral edges", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # Create MS1 edges file
-  temp_ms1 <- tempfile(fileext = ".tsv")
+  temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
   ms1_data <- data.frame(
     ID1 = c("FT001", "FT002"),
     ID2 = c("FT003", "FT004"),
@@ -137,7 +137,7 @@ test_that("prepare_features_edges combines ms1 and spectral edges", {
   write.table(ms1_data, temp_ms1, sep = "\t", row.names = FALSE, quote = FALSE)
 
   # Create spectral edges file
-  temp_spectral <- tempfile(fileext = ".tsv")
+  temp_spectral <- withr::local_tempfile(fileext = ".tsv")
   spectral_data <- data.frame(
     ID1 = c("FT001", "FT005"),
     ID2 = c("FT002", "FT006"),
@@ -154,7 +154,7 @@ test_that("prepare_features_edges combines ms1 and spectral edges", {
     quote = FALSE
   )
 
-  temp_output <- tempfile(fileext = ".tsv")
+  temp_output <- withr::local_tempfile(fileext = ".tsv")
 
   result <- prepare_features_edges(
     input = list("ms1" = temp_ms1, "spectral" = temp_spectral),
@@ -172,17 +172,16 @@ test_that("prepare_features_edges combines ms1 and spectral edges", {
   expect_true("feature_source" %in% colnames(output_data))
   expect_true("feature_target" %in% colnames(output_data))
 
-  unlink(temp_ms1)
-  unlink(temp_spectral)
-  unlink(temp_output)
-  unlink("data", recursive = TRUE)
+# unlink(temp_ms1)
+# unlink(temp_spectral)
+# unlink(temp_output)
 })
 
 test_that("prepare_features_edges extracts entropy information", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # Create MS1 edges file (minimal)
-  temp_ms1 <- tempfile(fileext = ".tsv")
+  temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
   ms1_data <- data.frame(
     ID1 = c("FT001"),
     ID2 = c("FT002"),
@@ -191,7 +190,7 @@ test_that("prepare_features_edges extracts entropy information", {
   write.table(ms1_data, temp_ms1, sep = "\t", row.names = FALSE, quote = FALSE)
 
   # Create spectral edges with entropy info
-  temp_spectral <- tempfile(fileext = ".tsv")
+  temp_spectral <- withr::local_tempfile(fileext = ".tsv")
   spectral_data <- data.frame(
     ID1 = c("FT001", "FT003"),
     ID2 = c("FT002", "FT004"),
@@ -208,7 +207,7 @@ test_that("prepare_features_edges extracts entropy information", {
     quote = FALSE
   )
 
-  temp_output <- tempfile(fileext = ".tsv")
+  temp_output <- withr::local_tempfile(fileext = ".tsv")
 
   result <- prepare_features_edges(
     input = list("ms1" = temp_ms1, "spectral" = temp_spectral),
@@ -222,17 +221,16 @@ test_that("prepare_features_edges extracts entropy information", {
   expect_true("feature_spectrum_entropy" %in% colnames(output_data))
   expect_true("feature_spectrum_peaks" %in% colnames(output_data))
 
-  unlink(temp_ms1)
-  unlink(temp_spectral)
-  unlink(temp_output)
-  unlink("data", recursive = TRUE)
+# unlink(temp_ms1)
+# unlink(temp_spectral)
+# unlink(temp_output)
 })
 
 test_that("prepare_features_edges standardizes column names", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
-  temp_ms1 <- tempfile(fileext = ".tsv")
-  temp_spectral <- tempfile(fileext = ".tsv")
+  temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
+  temp_spectral <- withr::local_tempfile(fileext = ".tsv")
 
   ms1_data <- data.frame(
     SourceID = c("FT001"),
@@ -256,7 +254,7 @@ test_that("prepare_features_edges standardizes column names", {
     quote = FALSE
   )
 
-  temp_output <- tempfile(fileext = ".tsv")
+  temp_output <- withr::local_tempfile(fileext = ".tsv")
 
   result <- prepare_features_edges(
     input = list("ms1" = temp_ms1, "spectral" = temp_spectral),
@@ -272,17 +270,16 @@ test_that("prepare_features_edges standardizes column names", {
   expect_false("SourceID" %in% colnames(output_data))
   expect_false("TargetID" %in% colnames(output_data))
 
-  unlink(temp_ms1)
-  unlink(temp_spectral)
-  unlink(temp_output)
-  unlink("data", recursive = TRUE)
+# unlink(temp_ms1)
+# unlink(temp_spectral)
+# unlink(temp_output)
 })
 
 test_that("prepare_features_edges handles empty input files", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # Create empty MS1 edges
-  temp_ms1 <- tempfile(fileext = ".tsv")
+  temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
   ms1_empty <- data.frame(
     ID1 = character(0),
     ID2 = character(0)
@@ -290,7 +287,7 @@ test_that("prepare_features_edges handles empty input files", {
   write.table(ms1_empty, temp_ms1, sep = "\t", row.names = FALSE, quote = FALSE)
 
   # Create empty spectral edges
-  temp_spectral <- tempfile(fileext = ".tsv")
+  temp_spectral <- withr::local_tempfile(fileext = ".tsv")
   spectral_empty <- data.frame(
     ID1 = character(0),
     ID2 = character(0),
@@ -305,7 +302,7 @@ test_that("prepare_features_edges handles empty input files", {
     quote = FALSE
   )
 
-  temp_output <- tempfile(fileext = ".tsv")
+  temp_output <- withr::local_tempfile(fileext = ".tsv")
 
   result <- prepare_features_edges(
     input = list("ms1" = temp_ms1, "spectral" = temp_spectral),
@@ -317,17 +314,16 @@ test_that("prepare_features_edges handles empty input files", {
   expect_equal(result, temp_output)
   expect_true(file.exists(temp_output))
 
-  unlink(temp_ms1)
-  unlink(temp_spectral)
-  unlink(temp_output)
-  unlink("data", recursive = TRUE)
+# unlink(temp_ms1)
+# unlink(temp_spectral)
+# unlink(temp_output)
 })
 
 test_that("prepare_features_edges fills missing target with source", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
-  temp_ms1 <- tempfile(fileext = ".tsv")
-  temp_spectral <- tempfile(fileext = ".tsv")
+  temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
+  temp_spectral <- withr::local_tempfile(fileext = ".tsv")
 
   # MS1 file with some missing targets
   writeLines("ID1\tID2\nFT001\t\nFT003\tFT004", temp_ms1)
@@ -347,7 +343,7 @@ test_that("prepare_features_edges fills missing target with source", {
     quote = FALSE
   )
 
-  temp_output <- tempfile(fileext = ".tsv")
+  temp_output <- withr::local_tempfile(fileext = ".tsv")
 
   result <- prepare_features_edges(
     input = list("ms1" = temp_ms1, "spectral" = temp_spectral),
@@ -360,8 +356,7 @@ test_that("prepare_features_edges fills missing target with source", {
   output_data <- tidytable::fread(temp_output, na.strings = c("", "NA"))
   expect_true(all(!is.na(output_data$feature_target)))
 
-  unlink(temp_ms1)
-  unlink(temp_spectral)
-  unlink(temp_output)
-  unlink("data", recursive = TRUE)
+# unlink(temp_ms1)
+# unlink(temp_spectral)
+# unlink(temp_output)
 })

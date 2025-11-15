@@ -2,7 +2,7 @@
 library(testthat)
 
 # test_that("prepare_features_tables handles missing RT column", {
-  #copy_backbone(cache_dir = ".")
+  #local_test_project(copy = TRUE)
 #
   #tidytable::tidytable(
     #"row ID" = 1,
@@ -18,12 +18,12 @@ library(testthat)
    # )
   #)
 #
-  #unlink("data", recursive = TRUE)
+  #
 #})
 
 test_that("prepare_features_tables works with default parameters", {
   skip_on_cran()
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -32,13 +32,11 @@ test_that("prepare_features_tables works with default parameters", {
   )
 
   expect_no_error(prepare_features_tables())
-
-  unlink("data", recursive = TRUE)
 })
 
 # test_that("prepare_features_edges works", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Need to create edges first
@@ -54,12 +52,12 @@ test_that("prepare_features_tables works with default parameters", {
 #
 #   expect_no_error(prepare_features_edges())
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("create_components works", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Need edges first
@@ -76,12 +74,12 @@ test_that("prepare_features_tables works with default parameters", {
 #
 #   expect_no_error(create_components())
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("prepare_features_components works", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Need components first
@@ -99,5 +97,5 @@ test_that("prepare_features_tables works with default parameters", {
 #
 #   expect_no_error(prepare_features_components())
 #
-#   unlink("data", recursive = TRUE)
+#
 # })

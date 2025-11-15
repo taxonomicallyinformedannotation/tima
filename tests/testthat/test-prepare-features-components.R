@@ -86,7 +86,7 @@ test_that("prepare_features_components checks file existence", {
 })
 
 test_that("prepare_features_components handles single valid file", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # Create valid component file
   temp_input <- tempfile(fileext = ".tsv")
@@ -121,11 +121,10 @@ test_that("prepare_features_components handles single valid file", {
 
   unlink(temp_input)
   unlink(temp_output)
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_features_components handles multiple input files", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # Create multiple component files
   temp_input1 <- tempfile(fileext = ".tsv")
@@ -175,11 +174,10 @@ test_that("prepare_features_components handles multiple input files", {
   unlink(temp_input1)
   unlink(temp_input2)
   unlink(temp_output)
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_features_components handles empty input file", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # Create empty component file
   temp_input <- tempfile(fileext = ".tsv")
@@ -214,11 +212,10 @@ test_that("prepare_features_components handles empty input file", {
 
   unlink(temp_input)
   unlink(temp_output)
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_features_components removes duplicates", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # Create component file with duplicates
   temp_input <- tempfile(fileext = ".tsv")
@@ -248,11 +245,10 @@ test_that("prepare_features_components removes duplicates", {
 
   unlink(temp_input)
   unlink(temp_output)
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_features_components handles NA values correctly", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # Create component file with NA values
   temp_input <- tempfile(fileext = ".tsv")
@@ -273,11 +269,10 @@ test_that("prepare_features_components handles NA values correctly", {
 
   unlink(temp_input)
   unlink(temp_output)
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_features_components standardizes column names", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # Create component file with original column names
   temp_input <- tempfile(fileext = ".tsv")
@@ -310,5 +305,4 @@ test_that("prepare_features_components standardizes column names", {
 
   unlink(temp_input)
   unlink(temp_output)
-  unlink("data", recursive = TRUE)
 })

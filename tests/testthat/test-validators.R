@@ -9,9 +9,9 @@ library(tima)
 # Test validate_file_existence ----
 
 test_that("validate_file_existence accepts valid files", {
-  # Create temporary files
-  temp_file1 <- tempfile()
-  temp_file2 <- tempfile()
+  # Create temporary files using withr
+  temp_file1 <- withr::local_tempfile()
+  temp_file2 <- withr::local_tempfile()
   file.create(temp_file1)
   file.create(temp_file2)
 
@@ -22,9 +22,6 @@ test_that("validate_file_existence accepts valid files", {
       file2 = temp_file2
     ))
   )
-
-  # Clean up
-  unlink(c(temp_file1, temp_file2))
 })
 
 test_that("validate_file_existence rejects missing files", {
@@ -63,15 +60,13 @@ test_that("validate_file_existence validates input types", {
   )
 
   # Non-character file path
-  temp_file <- tempfile()
+  temp_file <- withr::local_tempfile()
   file.create(temp_file)
 
   expect_error(
     validate_file_existence(list(bad = 123)),
     "must be a single character string"
   )
-
-  unlink(temp_file)
 })
 
 test_that("validate_file_existence provides detailed error messages", {

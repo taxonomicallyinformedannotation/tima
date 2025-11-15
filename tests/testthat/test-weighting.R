@@ -13,7 +13,7 @@ test_that("process_smiles works without cache", {
 
 # test_that("filter_annotations works without RT library", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Setup basic data
@@ -35,12 +35,12 @@ test_that("process_smiles works without cache", {
 #
 #   expect_no_error(filter_annotations(rts = list()))
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("filter_annotations works with default parameters", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Full setup
@@ -67,12 +67,12 @@ test_that("process_smiles works without cache", {
 #
 #   expect_no_error(filter_annotations())
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("weight_annotations works with default parameters", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Full pipeline setup
@@ -116,12 +116,12 @@ test_that("process_smiles works without cache", {
 #     weight_annotations(candidates_final = 1, minimal_ms1_bio = 0.8)
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("weight_annotations works with MS1 only mode", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Setup
@@ -174,5 +174,5 @@ test_that("process_smiles works without cache", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
