@@ -175,7 +175,7 @@ test_that("complement_metadata_structures collapses multiple names with separato
   )
   expect_true("structure_name" %in% names(result))
   if (!is.na(result$structure_name)) {
-    expect_true(grepl(" \$ ", result$structure_name))
+    expect_true(grepl(" $ ", result$structure_name, fixed = TRUE))
   }
 })
 
