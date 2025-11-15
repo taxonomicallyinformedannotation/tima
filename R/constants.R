@@ -199,6 +199,24 @@ DEFAULT_MINIMAL_MS1_BIO <- 0.0
 #' @export
 DEFAULT_MINIMAL_MS1_CHEMO <- 0.0
 
+# High-Confidence Filtering Defaults ----
+
+#' Default minimum biological score threshold for high-confidence filter
+#' @export
+DEFAULT_HC_SCORE_BIO_MIN <- 0.85
+
+#' Default minimum initial (pseudo) score threshold for high-confidence filter
+#' @export
+DEFAULT_HC_SCORE_INITIAL_MIN <- 0.95
+
+#' Default minimum final (weighted chemical) score threshold for high-confidence filter
+#' @export
+DEFAULT_HC_SCORE_FINAL_MIN <- 0.75
+
+#' Default maximum allowed retention time error (minutes) for high-confidence filter
+#' @export
+DEFAULT_HC_MAX_RT_ERROR_MIN <- 0.10
+
 # Helper Functions ----
 
 #' Get a constant value by name with validation

@@ -10,6 +10,8 @@
 #' @param score_ini_min Numeric minimum initial score threshold (default: 0.95)
 #' @param score_final_min Numeric minimum final (chemical) score threshold (default: 0.75)
 #' @param error_rt_max Numeric maximum retention time error in minutes (default: 0.1)
+#' @param confidence_sirius_min Numeric minimum SIRIUS confidence score threshold (optional)
+#' @param similarity_spectral_min Numeric minimum spectral similarity threshold (optional)
 #'
 #' @return Data frame containing only high-confidence annotations that meet
 #'     at least one score threshold and pass RT error filtering
@@ -17,10 +19,12 @@
 #' @examples NULL
 filter_high_confidence_only <- function(
   df,
-  score_bio_min = 0.85,
-  score_ini_min = 0.95,
-  score_final_min = 0.75,
-  error_rt_max = 0.1
+  score_bio_min = DEFAULT_HC_SCORE_BIO_MIN,
+  score_ini_min = DEFAULT_HC_SCORE_INITIAL_MIN,
+  score_final_min = DEFAULT_HC_SCORE_FINAL_MIN,
+  error_rt_max = DEFAULT_HC_MAX_RT_ERROR_MIN,
+  confidence_sirius_min = NULL,
+  similarity_spectral_min = NULL
 ) {
   # Validate inputs
   if (!is.data.frame(df) && !inherits(df, "tbl")) {
@@ -46,21 +50,51 @@ filter_high_confidence_only <- function(
     stop("RT error threshold must be positive")
   }
 
+  if (!is.null(confidence_sirius_min) && (confidence_sirius_min < 0 || confidence_min > 1)) {
+    stop("confidence_sirius_min must be between 0 and 1")
+  }
+  if (!is.null(similarity_spectral_min) && (similarity_spectral_min < 0 || similarity_min > 1)) {
+    stop("similarity_spectral_min must be between 0 and 1")
+  }
+
   # logger::log_trace("Filtering for high-confidence candidates")
 
   n_before <- nrow(df)
 
   # Filter by score thresholds (at least one must be met)
   # TODO: This is basic filtering. Future improvements could add:
-  # - SIRIUS confidence scores
+  # - SIRIUS confidence scores (NULL by default)
   # - Internal library match quality
-  # - Spectral similarity thresholds
+  # - Spectral similarity thresholds (NULL by default)
   df_filtered <- df |>
     tidytable::filter(
       score_biological >= score_bio_min |
         candidate_score_pseudo_initial >= score_ini_min |
         score_weighted_chemo >= score_final_min
     )
+
+  # Optional: SIRIUS confidence filter if column present and threshold provided
+  if (!is.null(confidence_min)) {
+    conf_col <- tidytable::coalesce(
+      tidyselect::vars_select(
+        names(df_filtered),
+        tidyselect::any_of("candidate_score_sirius_confidence")
+      ),
+      character(0)
+    )
+    if (length(conf_col) == 1 && conf_col %in% names(df_filtered)) {
+      df_filtered <- df_filtered |>
+        tidytable::filter(.data[[conf_col]] >= confidence_sirius_min)
+    }
+  }
+
+  # Optional: spectral similarity filter if column present and threshold provided
+  if (
+    !is.null(similarity_spectral_min) && "candidate_similarity" %in% names(df_filtered)
+  ) {
+    df_filtered <- df_filtered |>
+      tidytable::filter(candidate_similarity >= similarity_spectral_min)
+  }
 
   # Apply RT error filter if column exists
   if ("candidate_structure_error_rt" %in% colnames(df_filtered)) {
