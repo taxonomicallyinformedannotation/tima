@@ -2,9 +2,11 @@
 library(testthat)
 
 test_that("import_spectra handles MGF files correctly", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
-  # Create test MGF
+  # Create test MGF in a temp file
+  temp_mgf <- withr::local_tempfile(fileext = ".mgf")
+
   data.frame(
     FEATURE_ID = c("FT001", "FT002", "FT003"),
     mz = c(list(123.4567, 234.5678, 345.6789)),
@@ -16,14 +18,11 @@ test_that("import_spectra handles MGF files correctly", {
     Spectra::Spectra() |>
     MsBackendMgf::export(
       backend = MsBackendMgf::MsBackendMgf(),
-      file = "test.mgf"
+      file = temp_mgf
     )
 
-  result <- import_spectra("test.mgf")
+  result <- import_spectra(temp_mgf)
   expect_s4_class(result, "Spectra")
-
-  unlink("test.mgf")
-  unlink("data", recursive = TRUE)
 })
 
 test_that("import_spectra handles MSP files with failures", {

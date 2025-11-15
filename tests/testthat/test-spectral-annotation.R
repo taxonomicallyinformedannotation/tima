@@ -111,7 +111,7 @@ test_that("calculate_entropy_and_similarity fails with invalid method", {
 
 test_that("annotate_spectra works in negative mode", {
   skip_on_cran()
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   # Setup data
@@ -137,8 +137,6 @@ test_that("annotate_spectra works in negative mode", {
       polarity = "neg"
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 # test_that("annotate_spectra handles empty library", {
@@ -155,7 +153,7 @@ test_that("annotate_spectra works in negative mode", {
 
 test_that("annotate_spectra works with approximation", {
   skip_on_cran()
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -180,8 +178,6 @@ test_that("annotate_spectra works with approximation", {
       threshold = 1.0
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("create_edges works with edge cases", {
@@ -207,7 +203,7 @@ test_that("create_edges works with edge cases", {
 
 test_that("create_edges_spectra works with entropy method", {
   skip_on_cran()
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -222,12 +218,10 @@ test_that("create_edges_spectra works with entropy method", {
       method = "entropy"
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("create_edges_spectra handles MS1 only data", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -247,6 +241,4 @@ test_that("create_edges_spectra handles MS1 only data", {
       dalton = 0.001
     )
   )
-
-  unlink("data", recursive = TRUE)
 })

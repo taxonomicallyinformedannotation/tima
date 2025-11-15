@@ -2,8 +2,7 @@
 library(testthat)
 
 test_that("change_params_small updates parameters correctly", {
-  copy_backbone(cache_dir = ".")
-  paths <- get_default_paths()
+  paths <- local_test_project(copy = TRUE)
 
   get_example_files()
 
@@ -20,12 +19,10 @@ test_that("change_params_small updates parameters correctly", {
       summarize = FALSE
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("parse_cli_params merges CLI arguments correctly", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   params <- get_params(step = "prepare_params_advanced")
 
   arguments <- list()
@@ -35,12 +32,10 @@ test_that("parse_cli_params merges CLI arguments correctly", {
 
   expect_type(result, "list")
   expect_equal(result$annotations$candidates$final, 666L)
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("get_example_files works in cache mode", {
-  copy_backbone()
+  paths <- local_test_project(copy = TRUE)
 
   expect_no_error(
     get_example_files(
@@ -54,8 +49,6 @@ test_that("get_example_files works in cache mode", {
       in_cache = FALSE
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("get_example_files works with default parameters", {
