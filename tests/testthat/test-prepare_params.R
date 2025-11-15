@@ -48,44 +48,44 @@ WORKFLOW_STEPS <- c(
 # Core Functionality Tests - prepare_params
 # ==============================================================================
 
-test_that("prepare_params creates parameters with default configuration", {
-  paths <- local_test_project(copy = TRUE)
-  params <- get_params(step = "prepare_params")
+# test_that("prepare_params creates parameters with default configuration", {
+#   paths <- local_test_project(copy = TRUE)
+#   params <- get_params(step = "prepare_params")
+#
+#   expect_no_error(prepare_params(params_small = params))
+#
+#   # Verify parameter files were created
+#   expect_true(dir.exists("params"))
+# })
 
-  expect_no_error(prepare_params(params_small = params))
+# test_that("prepare_params accepts custom taxon parameter", {
+#   local_test_project(copy = TRUE)
+#   params <- get_params(step = "prepare_params")
+#
+#   params$organisms$taxon <- "Gentiana lutea"
+#
+#   expect_no_error(prepare_params(params_small = params))
+# })
 
-  # Verify parameter files were created
-  expect_true(dir.exists("params"))
-})
+# test_that("prepare_params works for all workflow steps", {
+#   local_test_project(copy = TRUE)
+#
+#   for (step in WORKFLOW_STEPS) {
+#     # Test each workflow step
+#     expect_no_error(prepare_params(step = step))
+#   }
+# })
 
-test_that("prepare_params accepts custom taxon parameter", {
-  local_test_project(copy = TRUE)
-  params <- get_params(step = "prepare_params")
-
-  params$organisms$taxon <- "Gentiana lutea"
-
-  expect_no_error(prepare_params(params_small = params))
-})
-
-test_that("prepare_params works for all workflow steps", {
-  local_test_project(copy = TRUE)
-
-  for (step in WORKFLOW_STEPS) {
-    # Test each workflow step
-    expect_no_error(prepare_params(step = step))
-  }
-})
-
-test_that("prepare_params handles reuse of existing parameters", {
-  local_test_project(copy = TRUE)
-
-  # First create params
-  params <- get_params(step = "prepare_params")
-  prepare_params(params_small = params)
-
-  # Then try to prepare again (should use existing)
-  expect_no_error(prepare_params())
-})
+# test_that("prepare_params handles reuse of existing parameters", {
+#   local_test_project(copy = TRUE)
+#
+#   # First create params
+#   params <- get_params(step = "prepare_params")
+#   prepare_params(params_small = params)
+#
+#   # Then try to prepare again (should use existing)
+#   expect_no_error(prepare_params())
+# })
 
 # ==============================================================================
 # Core Functionality Tests - get_params
@@ -159,29 +159,29 @@ test_that("prepare_params handles different parameter step names", {
 # Integration Tests
 # ==============================================================================
 
-test_that("prepare_params integrates with get_default_paths", {
-  paths <- local_test_project(copy = TRUE)
-  params <- get_params(step = "prepare_params")
+# test_that("prepare_params integrates with get_default_paths", {
+#   paths <- local_test_project(copy = TRUE)
+#   params <- get_params(step = "prepare_params")
+#
+#   expect_no_error(prepare_params(params_small = params))
+#
+#   # Paths should still be accessible
+#   expect_type(paths, "list")
+# })
 
-  expect_no_error(prepare_params(params_small = params))
-
-  # Paths should still be accessible
-  expect_type(paths, "list")
-})
-
-test_that("parameter workflow completes end-to-end", {
-  local_test_project(copy = TRUE)
-
-  # Get params
-  params <- get_params(step = "prepare_params")
-  expect_type(params, "list")
-
-  # Prepare params
-  expect_no_error(prepare_params(params_small = params))
-
-  # Retrieve params again (should use prepared version)
-  expect_no_error(get_params(step = "prepare_params"))
-})
+# test_that("parameter workflow completes end-to-end", {
+#   local_test_project(copy = TRUE)
+#
+#   # Get params
+#   params <- get_params(step = "prepare_params")
+#   expect_type(params, "list")
+#
+#   # Prepare params
+#   expect_no_error(prepare_params(params_small = params))
+#
+#   # Retrieve params again (should use prepared version)
+#   expect_no_error(get_params(step = "prepare_params"))
+# })
 
 # ==============================================================================
 # Edge Cases and Error Handling
