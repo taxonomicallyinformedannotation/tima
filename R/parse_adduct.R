@@ -64,10 +64,17 @@ parse_adduct <- function(
     return(failed_parse)
   }
 
+  # Remove comments in parentheses before checking for alternative notations
+  # This prevents splitting on '/' or '|' inside comments
+  # e.g., "[M-C6H10O4 (methylpentose/desoxyhexose-H2O)+H]+"
+  adduct_no_comments <- remove_comments(adduct_string)
+
   # Handle alternative adduct notations (e.g., "[M+CH3COO]-/[M-CH3]-")
   # These are common in databases where multiple adduct possibilities exist
-  if (grepl("[/|]", adduct_string)) {
-    alternatives <- strsplit(adduct_string, "[/|]")[[1L]]
+  # Note: We check the string WITH comments removed to avoid splitting on
+  # delimiters inside parenthetical comments
+  if (grepl("[/|]", adduct_no_comments)) {
+    alternatives <- strsplit(adduct_no_comments, "[/|]")[[1L]]
     alternatives <- trimws(alternatives)
 
     # Try each alternative until one parses successfully
@@ -97,6 +104,8 @@ parse_adduct <- function(
   }
 
   # Standard single adduct parsing
+  # Use original string to preserve any comments for logging, but they will
+  # be removed during modification processing
   parse_single_adduct(adduct_string, regex, failed_parse)
 }
 
