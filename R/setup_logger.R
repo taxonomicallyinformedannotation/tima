@@ -48,3 +48,44 @@ setup_logger <- function(filename = "tima.log", threshold = logger::TRACE) {
 
   invisible(NULL)
 }
+
+#' @title Initialize logging from environment
+#'
+#' @description Convenience wrapper to configure logging based on environment
+#'     variables. Safe to call multiple times.
+#'
+#' @details
+#' Environment variables:
+#' - TIMA_LOG_FILE: Path to log file (default: "tima.log")
+#' - TIMA_LOG_LEVEL: TRACE|DEBUG|INFO|WARN|ERROR (default: DEFAULT_LOG_LEVEL)
+#'
+#' @return NULL (invisibly)
+#' @keywords internal
+init_logging <- function() {
+  # Read env with sane defaults
+  log_file <- Sys.getenv("TIMA_LOG_FILE", unset = "tima.log")
+  level_env <- toupper(Sys.getenv("TIMA_LOG_LEVEL", unset = DEFAULT_LOG_LEVEL))
+
+  # Map level string to logger constant
+  level_map <- list(
+    TRACE = logger::TRACE,
+    DEBUG = logger::DEBUG,
+    INFO  = logger::INFO,
+    WARN  = logger::WARN,
+    ERROR = logger::ERROR
+  )
+
+  threshold <- level_map[[level_env]]
+  if (is.null(threshold)) {
+    warning(
+      sprintf(
+        "Unknown TIMA_LOG_LEVEL '%s'. Falling back to %s.",
+        level_env, DEFAULT_LOG_LEVEL
+      ),
+      call. = FALSE
+    )
+    threshold <- level_map[[DEFAULT_LOG_LEVEL]]
+  }
+
+  setup_logger(filename = log_file, threshold = threshold)
+}
