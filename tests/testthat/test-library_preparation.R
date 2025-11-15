@@ -223,3 +223,28 @@ test_that("prepare_libraries_sop_merged triggers SMILES processing", {
     )
   )
 })
+
+# test_that("prepare_libraries_spectra preserves precursorMz as precursor_mz", {
+#   skip_on_cran()
+#   local_test_project(copy = TRUE)
+#   paths <- get_default_paths()
+#
+#   # Download required files
+#   get_file(
+#     url = paths$urls$examples$spectral_lib_mini$pos,
+#     export = paths$data$interim$libraries$spectra$is$pos$isdb
+#   )
+#   get_file(
+#     url = paths$urls$examples$spectral_lib_mini$neg,
+#     export = paths$data$interim$libraries$spectra$is$neg$isdb
+#   )
+#
+#   outputs <- prepare_libraries_spectra()
+#   expect_true(file.exists(outputs[["pos"]]))
+#
+#   sp <- readRDS(outputs[["pos"]])
+#   df <- Spectra::peaksDataFrame(sp)
+#   # Ensure alias column exists at least at SOP generation stage
+#   # Some backends store precursorMz in metadata. We verify SOP table as well.
+#   expect_true("precursorMz" %in% names(df) || "precursor_mz" %in% names(df))
+# })
