@@ -232,8 +232,18 @@ complement_metadata_structures <- function(
   placeholder_candidate_cols <- c(
     "candidate_structure_molecular_formula",
     "candidate_structure_exact_mass",
+    "candidate_structure_xlogp",
+    "candidate_structure_name",
     "candidate_structure_inchikey_connectivity_layer",
-    "candidate_structure_smiles_no_stereo"
+    "candidate_structure_smiles_no_stereo",
+    "candidate_structure_tax_npc_01pat",
+    "candidate_structure_tax_npc_02sup",
+    "candidate_structure_tax_npc_03cla",
+    "candidate_structure_tax_cla_chemontid",
+    "candidate_structure_tax_cla_01kin",
+    "candidate_structure_tax_cla_02sup",
+    "candidate_structure_tax_cla_03cla",
+    "candidate_structure_tax_cla_04dirpar"
   )
   for (col in placeholder_candidate_cols) {
     if (!col %in% names(df)) df[[col]] <- NA_character_
@@ -241,6 +251,8 @@ complement_metadata_structures <- function(
   placeholder_structure_cols <- c(
     "structure_molecular_formula",
     "structure_exact_mass",
+    "structure_xlogp",
+    "structure_name",
     "structure_inchikey_connectivity_layer",
     "structure_smiles_no_stereo"
   )

@@ -40,7 +40,8 @@ calculate_entropy_and_similarity <- function(
     stop(
       "Similarity method must be one of: ",
       paste(VALID_SIMILARITY_METHODS, collapse = ", "),
-      "; got: ", method
+      "; got: ",
+      method
     )
   }
 

@@ -15,15 +15,52 @@ test_that("clean_chemo handles empty data frame", {
 })
 
 test_that("clean_chemo processes minimal chemical class columns", {
-  df <- tidytable::tidytable(
+  annot_table_wei_chemo <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c("A", "B"),
+    candidate_score_similarity = c(0.8, 0.7),
+    candidate_score_sirius_csi = NA_real_,
+    candidate_score_pseudo_initial = c(0.8, 0.7),
+    score_weighted_chemo = c(0.8, 0.7),
+    score_biological = c(0.5, 0.6),
+    score_chemical = c(0.5, 0.6)
+  )
+  features_table <- tidytable::tidytable(feature_id = c("F1", "F2"))
+  components_table <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    component_id = c(1, 1)
+  )
+  structure_organism_pairs_table <- tidytable::tidytable(
     structure_inchikey_connectivity_layer = c("A", "B"),
-    structure_classyfire_class = c("Alkaloids", "Flavonoids")
+    organism_name = c("Plant1", "Plant2")
   )
-  candidates_final <- tidytable::tidytable(
-    candidate_structure_inchikey_connectivity_layer = c("A", "B")
+  candidates_final <- 1
+  best_percentile <- 0.9
+  minimal_ms1_bio <- 0.0
+  minimal_ms1_chemo <- 0.0
+  minimal_ms1_condition <- "OR"
+  compounds_names <- FALSE
+  high_confidence <- FALSE
+  remove_ties <- FALSE
+  summarize <- FALSE
+
+  result <- clean_chemo(
+    annot_table_wei_chemo = annot_table_wei_chemo,
+    features_table = features_table,
+    components_table = components_table,
+    structure_organism_pairs_table = structure_organism_pairs_table,
+    candidates_final = candidates_final,
+    best_percentile = best_percentile,
+    minimal_ms1_bio = minimal_ms1_bio,
+    minimal_ms1_chemo = minimal_ms1_chemo,
+    minimal_ms1_condition = minimal_ms1_condition,
+    compounds_names = compounds_names,
+    high_confidence = high_confidence,
+    remove_ties = remove_ties,
+    summarize = summarize
   )
-  result <- clean_chemo(df)
-  expect_true("structure_inchikey_connectivity_layer" %in% names(result))
+  expect_type(result, "list")
+  expect_true(all(c("full", "filtered", "mini") %in% names(result)))
 })
 
 test_that("clean_chemo validates minimal_ms1_condition", {
@@ -67,8 +104,19 @@ test_that("clean_chemo filters MS1 annotations with OR condition", {
     candidate_structure_inchikey_connectivity_layer = c("A", "B"),
     candidate_score_similarity = NA_real_,
     candidate_score_sirius_csi = NA_real_,
+    candidate_score_pseudo_initial = c(0.5, 0.5),
     score_biological = c(0.9, 0.1),
-    score_chemical = c(0.1, 0.9)
+    score_chemical = c(0.1, 0.9),
+    score_weighted_chemo = c(0.5, 0.5)
+  )
+  features_table <- tidytable::tidytable(feature_id = c("F1", "F2"))
+  components_table <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    component_id = c(1, 1)
+  )
+  structure_organism_pairs_table <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = c("A", "B"),
+    organism_name = c("Plant1", "Plant2")
   )
   candidates_final <- 2
   best_percentile <- 1
@@ -81,6 +129,9 @@ test_that("clean_chemo filters MS1 annotations with OR condition", {
   summarize <- FALSE
   result <- clean_chemo(
     annot_table_wei_chemo = annot_table_wei_chemo,
+    features_table = features_table,
+    components_table = components_table,
+    structure_organism_pairs_table = structure_organism_pairs_table,
     candidates_final = candidates_final,
     best_percentile = best_percentile,
     minimal_ms1_bio = minimal_ms1_bio,
@@ -91,7 +142,7 @@ test_that("clean_chemo filters MS1 annotations with OR condition", {
     remove_ties = remove_ties,
     summarize = summarize
   )
-  expect_lte(nrow(result), 2L)
+  expect_type(result, "list")
 })
 
 test_that("clean_chemo filters MS1 annotations with AND condition", {
@@ -100,8 +151,19 @@ test_that("clean_chemo filters MS1 annotations with AND condition", {
     candidate_structure_inchikey_connectivity_layer = c("A", "B"),
     candidate_score_similarity = NA_real_,
     candidate_score_sirius_csi = NA_real_,
+    candidate_score_pseudo_initial = c(0.875, 0.65),
     score_biological = c(0.9, 0.7),
-    score_chemical = c(0.85, 0.6)
+    score_chemical = c(0.85, 0.6),
+    score_weighted_chemo = c(0.875, 0.65)
+  )
+  features_table <- tidytable::tidytable(feature_id = c("F1", "F2"))
+  components_table <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    component_id = c(1, 1)
+  )
+  structure_organism_pairs_table <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = c("A", "B"),
+    organism_name = c("Plant1", "Plant2")
   )
   candidates_final <- 2
   best_percentile <- 1
@@ -114,6 +176,9 @@ test_that("clean_chemo filters MS1 annotations with AND condition", {
   summarize <- FALSE
   result <- clean_chemo(
     annot_table_wei_chemo = annot_table_wei_chemo,
+    features_table = features_table,
+    components_table = components_table,
+    structure_organism_pairs_table = structure_organism_pairs_table,
     candidates_final = candidates_final,
     best_percentile = best_percentile,
     minimal_ms1_bio = minimal_ms1_bio,
@@ -125,5 +190,6 @@ test_that("clean_chemo filters MS1 annotations with AND condition", {
     summarize = summarize
   )
   # Only F1 should pass both thresholds
-  expect_true(all(result$feature_id %in% c("F1", "F2")))
+  expect_type(result, "list")
+  expect_true(all(c("full", "filtered", "mini") %in% names(result)))
 })
