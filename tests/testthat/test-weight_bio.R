@@ -1,4 +1,6 @@
-# Test Suite for weight_bio()
+# ==============================================================================
+# Test Suite: weight_bio
+# ==============================================================================
 # Tests the biological source weighting function for metabolite annotations
 
 library(testthat)
