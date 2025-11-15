@@ -228,6 +228,26 @@ complement_metadata_structures <- function(
   rm(nam_2d)
   # logger::log_trace("Names done")
 
+  # Inject placeholder columns early if missing in input df to satisfy downstream selects
+  placeholder_candidate_cols <- c(
+    "candidate_structure_molecular_formula",
+    "candidate_structure_exact_mass",
+    "candidate_structure_inchikey_connectivity_layer",
+    "candidate_structure_smiles_no_stereo"
+  )
+  for (col in placeholder_candidate_cols) {
+    if (!col %in% names(df)) df[[col]] <- NA_character_
+  }
+  placeholder_structure_cols <- c(
+    "structure_molecular_formula",
+    "structure_exact_mass",
+    "structure_inchikey_connectivity_layer",
+    "structure_smiles_no_stereo"
+  )
+  for (col in placeholder_structure_cols) {
+    if (!col %in% names(df)) df[[col]] <- NA_character_
+  }
+
   ## Always returning preferentially internal values
   ## (smiles > inchikey > external)
   table_final <- df |>
@@ -353,9 +373,6 @@ complement_metadata_structures <- function(
     tax_cla,
     tax_npc
   )
-
-  ## ISSUE see #19
-  # if (quickmode == FALSE){...}
 
   return(table_final)
 }

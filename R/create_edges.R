@@ -29,6 +29,13 @@ create_edges <- function(
   threshold,
   matched_peaks
 ) {
+  if (!method %in% VALID_SIMILARITY_METHODS) {
+    stop(
+      "Similarity method must be one of: ",
+      paste(VALID_SIMILARITY_METHODS, collapse = ", "),
+      "; got: ", method
+    )
+  }
   # ============================================================================
   # Input Validation
   # ============================================================================
