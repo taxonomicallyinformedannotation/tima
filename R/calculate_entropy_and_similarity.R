@@ -35,6 +35,15 @@ calculate_entropy_and_similarity <- function(
   threshold,
   approx
 ) {
+  # Validate method against constants
+  if (!method %in% VALID_SIMILARITY_METHODS) {
+    stop(
+      "Similarity method must be one of: ",
+      paste(VALID_SIMILARITY_METHODS, collapse = ", "),
+      "; got: ", method
+    )
+  }
+
   # Validate inputs
   if (
     length(lib_ids) != length(lib_spectra) ||

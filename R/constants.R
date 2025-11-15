@@ -106,6 +106,12 @@ ADDUCT_MASSES <- list(
 #' @export
 VALID_MS_MODES <- c("pos", "neg")
 
+# Similarity Methods ----
+
+#' Valid similarity method values
+#' @export
+VALID_SIMILARITY_METHODS <- c("entropy", "cosine", "gnps")
+
 # Logging Configuration ----
 
 #' Default log level for package operations
