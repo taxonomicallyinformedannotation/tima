@@ -67,7 +67,7 @@ create_dir <- function(export) {
     )
 
     if (created) {
-      logger::log_debug("Created directory: {dirname_path}")
+      # logger::log_debug("Created directory: {dirname_path}")
     } else {
       stop("Could not create directory: ", dirname_path)
     }
