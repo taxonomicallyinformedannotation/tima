@@ -85,7 +85,12 @@ create_test_annotation_data <- function() {
     ),
     organism_taxonomy_07tribe = c("Gentianeae", "Gentianeae", "NA", "NA"),
     organism_taxonomy_08genus = c("Gentiana", "Gentiana", "NA", "NA"),
-    organism_taxonomy_09species = c("Gentiana lutea", "Gentiana verna", "NA", "NA"),
+    organism_taxonomy_09species = c(
+      "Gentiana lutea",
+      "Gentiana verna",
+      "NA",
+      "NA"
+    ),
     organism_taxonomy_10varietas = rep(NA_character_, 4),
     organism_taxonomy_ottid = c(1, 2, 3, 4)
   )
@@ -470,7 +475,7 @@ test_that("weight_bio handles missing organism info", {
     feature_id = "FT001",
     candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
     candidate_score_similarity = 0.9,
-    candidate_score_sirius_csi = NA_real_,  # Add missing column
+    candidate_score_sirius_csi = NA_real_, # Add missing column
     sample_organism_name = NA_character_,
     sample_organism_01_domain = NA_character_,
     sample_organism_02_kingdom = NA_character_,

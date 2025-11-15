@@ -104,7 +104,10 @@ test_that("copy_backbone creates cache directory when it doesn't exist", {
   temp_dir <- withr::local_tempdir()
   cache_path <- file.path(temp_dir, "new_cache")
 
-  expect_false(dir.exists(cache_path), info = "Cache path should not exist initially")
+  expect_false(
+    dir.exists(cache_path),
+    info = "Cache path should not exist initially"
+  )
 
   copy_backbone(cache_dir = cache_path)
 

@@ -14,7 +14,11 @@ create_test_spectrum <- function(n_peaks = 5, mz_range = c(100, 500)) {
   matrix(c(mz, intensity), ncol = 2, dimnames = list(NULL, c("mz", "int")))
 }
 
-create_similar_spectra <- function(base_spectrum, n_similar = 3, noise_level = 0.1) {
+create_similar_spectra <- function(
+  base_spectrum,
+  n_similar = 3,
+  noise_level = 0.1
+) {
   lapply(seq_len(n_similar), function(i) {
     # Add small random noise to create similar but not identical spectra
     noise <- matrix(
@@ -183,8 +187,16 @@ test_that("create_edges works with entropy similarity", {
 test_that("create_edges filters by similarity threshold", {
   # Create very different spectra (low similarity expected)
   frags <- list(
-    matrix(c(100, 1000, 200, 500), ncol = 2, dimnames = list(NULL, c("mz", "int"))),
-    matrix(c(400, 1000, 500, 500), ncol = 2, dimnames = list(NULL, c("mz", "int")))
+    matrix(
+      c(100, 1000, 200, 500),
+      ncol = 2,
+      dimnames = list(NULL, c("mz", "int"))
+    ),
+    matrix(
+      c(400, 1000, 500, 500),
+      ncol = 2,
+      dimnames = list(NULL, c("mz", "int"))
+    )
   )
   precs <- c(200, 500)
 

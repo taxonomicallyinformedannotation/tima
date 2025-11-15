@@ -7,7 +7,7 @@ library(tima)
 test_that("go_to_cache validates directory name", {
   expect_error(go_to_cache(dir = NULL), "non-empty")
   expect_error(go_to_cache(dir = ""), "non-empty")
-  expect_error(go_to_cache(dir = c("a","b")), "non-empty")
+  expect_error(go_to_cache(dir = c("a", "b")), "non-empty")
 })
 
 test_that("go_to_cache creates and switches directory", {
@@ -19,4 +19,3 @@ test_that("go_to_cache creates and switches directory", {
   wd <- getwd()
   expect_true(grepl(".tima_test_cache$", wd))
 })
-
