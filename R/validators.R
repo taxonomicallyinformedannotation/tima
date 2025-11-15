@@ -288,6 +288,27 @@ validate_adduct_list <- function(
   invisible(TRUE)
 }
 
+#' Format a standardized error message
+#'
+#' @description Helper to format consistent error messages containing
+#'     what went wrong, why, and how to fix.
+#'
+#' @param what Short description of what went wrong
+#' @param why  Optional explanation of why it is a problem
+#' @param how  Optional guidance on how to fix
+#'
+#' @keywords internal
+format_error <- function(what, why = NULL, how = NULL) {
+  parts <- c(what, why, how)
+  paste(stats::na.omit(parts), collapse = "\n")
+}
+
+#' Stop with standardized error formatting
+#' @keywords internal
+stopf <- function(what, why = NULL, how = NULL) {
+  stop(format_error(what, why, how))
+}
+
 #' Validate numeric range
 #'
 #' @description Generic validator for numeric values within a range
@@ -310,32 +331,41 @@ validate_numeric_range <- function(
 ) {
   if (is.null(value)) {
     if (!allow_null) {
-      stop(param_name, " cannot be NULL")
+      stopf(
+        what = paste0(param_name, " cannot be NULL"),
+        how = "Provide a numeric value."
+      )
     }
     return(invisible(TRUE))
   }
 
   if (!is.numeric(value) || length(value) != 1L) {
-    stop(
-      param_name,
-      " must be a single numeric value, got: ",
-      class(value)[1L]
+    stopf(
+      what = paste0(
+        param_name,
+        " must be a single numeric value, got: ",
+        class(value)[1L]
+      ),
+      how = "Provide a length-1 numeric value."
     )
   }
 
   if (is.na(value)) {
-    stop(param_name, " cannot be NA")
+    stopf(what = paste0(param_name, " cannot be NA"))
   }
 
   if (value < min_value || value > max_value) {
-    stop(
-      param_name,
-      " (",
-      value,
-      ") must be between ",
-      min_value,
-      " and ",
-      max_value
+    stopf(
+      what = paste0(
+        param_name,
+        " (",
+        value,
+        ") must be between ",
+        min_value,
+        " and ",
+        max_value
+      ),
+      how = paste0("Use a value within [", min_value, ", ", max_value, "].")
     )
   }
 
@@ -364,30 +394,42 @@ validate_character <- function(
 ) {
   if (is.null(value)) {
     if (!allow_null) {
-      stop(param_name, " cannot be NULL")
+      stopf(
+        what = paste0(param_name, " cannot be NULL"),
+        how = "Provide a non-NULL character string."
+      )
     }
     return(invisible(TRUE))
   }
 
   if (!is.character(value) || length(value) != 1L) {
-    stop(
-      param_name,
-      " must be a single character string, got: ",
-      class(value)[1L]
+    stopf(
+      what = paste0(
+        param_name,
+        " must be a single character string, got: ",
+        class(value)[1L]
+      ),
+      how = "Ensure the parameter is a length-1 character value."
     )
   }
 
   if (!allow_empty && nchar(value) == 0L) {
-    stop(param_name, " cannot be an empty string")
+    stopf(
+      what = paste0(param_name, " cannot be an empty string"),
+      how = "Provide a non-empty string."
+    )
   }
 
   if (!is.null(allowed_values) && !value %in% allowed_values) {
-    stop(
-      param_name,
-      " (",
-      value,
-      ") must be one of: ",
-      paste(allowed_values, collapse = ", ")
+    stopf(
+      what = paste0(
+        param_name,
+        " (",
+        value,
+        ") must be one of: ",
+        paste(allowed_values, collapse = ", ")
+      ),
+      how = paste0("Choose one of: ", paste(allowed_values, collapse = ", "))
     )
   }
 

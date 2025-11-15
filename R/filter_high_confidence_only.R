@@ -50,10 +50,16 @@ filter_high_confidence_only <- function(
     stop("RT error threshold must be positive")
   }
 
-  if (!is.null(confidence_sirius_min) && (confidence_sirius_min < 0 || confidence_min > 1)) {
+  if (
+    !is.null(confidence_sirius_min) &&
+      (confidence_sirius_min < 0 || confidence_min > 1)
+  ) {
     stop("confidence_sirius_min must be between 0 and 1")
   }
-  if (!is.null(similarity_spectral_min) && (similarity_spectral_min < 0 || similarity_min > 1)) {
+  if (
+    !is.null(similarity_spectral_min) &&
+      (similarity_spectral_min < 0 || similarity_min > 1)
+  ) {
     stop("similarity_spectral_min must be between 0 and 1")
   }
 
@@ -90,7 +96,8 @@ filter_high_confidence_only <- function(
 
   # Optional: spectral similarity filter if column present and threshold provided
   if (
-    !is.null(similarity_spectral_min) && "candidate_similarity" %in% names(df_filtered)
+    !is.null(similarity_spectral_min) &&
+      "candidate_similarity" %in% names(df_filtered)
   ) {
     df_filtered <- df_filtered |>
       tidytable::filter(candidate_similarity >= similarity_spectral_min)

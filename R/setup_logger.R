@@ -70,8 +70,8 @@ init_logging <- function() {
   level_map <- list(
     TRACE = logger::TRACE,
     DEBUG = logger::DEBUG,
-    INFO  = logger::INFO,
-    WARN  = logger::WARN,
+    INFO = logger::INFO,
+    WARN = logger::WARN,
     ERROR = logger::ERROR
   )
 
@@ -80,7 +80,8 @@ init_logging <- function() {
     warning(
       sprintf(
         "Unknown TIMA_LOG_LEVEL '%s'. Falling back to %s.",
-        level_env, DEFAULT_LOG_LEVEL
+        level_env,
+        DEFAULT_LOG_LEVEL
       ),
       call. = FALSE
     )
