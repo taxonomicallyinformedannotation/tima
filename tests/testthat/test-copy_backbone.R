@@ -1,62 +1,89 @@
-# Test Suite for copy_backbone()
-# Tests the package backbone copying functionality
+# ==============================================================================
+# Test Suite: copy_backbone
+# ==============================================================================
+#
+# @description
+# Unit tests for the copy_backbone function, which copies the package directory
+# structure to a cache location for project initialization.
+#
+# @coverage
+# - Input validation (cache_dir, package parameters)
+# - Directory creation and handling
+# - Content verification
+# - Integration with get_default_paths
+# - Error handling
+# - Return value behavior
 
 library(testthat)
 library(tima)
 
 # ==============================================================================
-# Test: Input Validation
+# Input Validation Tests
 # ==============================================================================
 
-test_that("copy_backbone validates cache_dir parameter", {
-  # NULL cache_dir
+test_that("copy_backbone validates cache_dir must be non-NULL character", {
   expect_error(
     copy_backbone(cache_dir = NULL),
-    "Cache directory path must be"
+    "Cache directory path must be",
+    info = "NULL cache_dir should error"
   )
+})
 
-  # Empty cache_dir
+test_that("copy_backbone validates cache_dir must be non-empty", {
   expect_error(
     copy_backbone(cache_dir = ""),
-    "Cache directory path must be"
+    "Cache directory path must be",
+    info = "Empty cache_dir should error"
   )
+})
 
-  # Non-character cache_dir
+test_that("copy_backbone validates cache_dir must be character type", {
   expect_error(
     copy_backbone(cache_dir = 123),
-    "Cache directory path must be"
+    "Cache directory path must be",
+    info = "Non-character cache_dir should error"
   )
+})
 
-  # Multiple values
+test_that("copy_backbone validates cache_dir must be scalar", {
   expect_error(
     copy_backbone(cache_dir = c("dir1", "dir2")),
-    "Cache directory path must be"
+    "Cache directory path must be",
+    info = "Multiple values for cache_dir should error"
   )
 })
 
-test_that("copy_backbone validates package parameter", {
+test_that("copy_backbone validates package must be non-NULL character", {
   temp_dir <- withr::local_tempdir()
 
-  # NULL package
   expect_error(
     copy_backbone(cache_dir = temp_dir, package = NULL),
-    "Package name must be"
-  )
-
-  # Empty package
-  expect_error(
-    copy_backbone(cache_dir = temp_dir, package = ""),
-    "Package name must be"
-  )
-
-  # Non-character package
-  expect_error(
-    copy_backbone(cache_dir = temp_dir, package = 123),
-    "Package name must be"
+    "Package name must be",
+    info = "NULL package should error"
   )
 })
 
-test_that("copy_backbone fails for non-existent package", {
+test_that("copy_backbone validates package must be non-empty", {
+  temp_dir <- withr::local_tempdir()
+
+  expect_error(
+    copy_backbone(cache_dir = temp_dir, package = ""),
+    "Package name must be",
+    info = "Empty package should error"
+  )
+})
+
+test_that("copy_backbone validates package must be character type", {
+  temp_dir <- withr::local_tempdir()
+
+  expect_error(
+    copy_backbone(cache_dir = temp_dir, package = 123),
+    "Package name must be",
+    info = "Non-character package should error"
+  )
+})
+
+test_that("copy_backbone rejects non-existent package names", {
   temp_dir <- withr::local_tempdir()
 
   expect_error(
@@ -64,26 +91,27 @@ test_that("copy_backbone fails for non-existent package", {
       cache_dir = temp_dir,
       package = "NonExistentPackage123456"
     ),
-    "Package.*not found"
+    "Package.*not found",
+    info = "Non-existent package should error"
   )
 })
 
 # ==============================================================================
-# Test: Directory Creation
+# Directory Creation Tests
 # ==============================================================================
 
-test_that("copy_backbone creates cache directory", {
+test_that("copy_backbone creates cache directory when it doesn't exist", {
   temp_dir <- withr::local_tempdir()
   cache_path <- file.path(temp_dir, "new_cache")
 
-  expect_false(dir.exists(cache_path))
+  expect_false(dir.exists(cache_path), info = "Cache path should not exist initially")
 
   copy_backbone(cache_dir = cache_path)
 
-  expect_true(dir.exists(cache_path))
+  expect_true(dir.exists(cache_path), info = "Cache path should be created")
 })
 
-test_that("copy_backbone handles existing directories", {
+test_that("copy_backbone handles existing cache directory gracefully", {
   temp_dir <- withr::local_tempdir()
 
   # First copy
@@ -94,69 +122,51 @@ test_that("copy_backbone handles existing directories", {
 })
 
 # ==============================================================================
-# Test: Content Verification
+# Content Verification Tests
 # ==============================================================================
 
-test_that("copy_backbone copies package structure", {
+test_that("copy_backbone copies package structure to cache directory", {
   temp_dir <- withr::local_tempdir()
 
   copy_backbone(cache_dir = temp_dir)
 
-  # Check that cache directory was created and populated
-  expect_true(dir.exists(temp_dir))
+  # Verify cache directory was created and populated
+  expect_true(dir.exists(temp_dir), info = "Cache directory should exist")
 
-  # The structure depends on package installation
-  # At minimum, the backbone should copy something
+  # Verify files were copied
   files_copied <- list.files(temp_dir, recursive = TRUE)
-  expect_true(length(files_copied) > 0)
+  expect_true(
+    length(files_copied) > 0,
+    info = "At least some files should be copied"
+  )
 })
 
-test_that("copy_backbone copies parameter files", {
+test_that("copy_backbone creates expected directory structure", {
   temp_dir <- withr::local_tempdir()
 
   copy_backbone(cache_dir = temp_dir)
 
-  # Check that files were copied (structure may vary)
-  all_files <- list.files(temp_dir, recursive = TRUE)
-  expect_true(length(all_files) > 0)
+  # Check for common expected directories (may vary by package structure)
+  all_items <- list.files(temp_dir, recursive = FALSE, all.files = TRUE)
+  expect_true(
+    length(all_items) > 0,
+    info = "Should create directory structure"
+  )
 })
 
 # ==============================================================================
-# Test: Error Handling
+# Path Handling Tests
 # ==============================================================================
-
-test_that("copy_backbone handles permission errors gracefully", {
-  skip_on_os("windows") # Different permissions model
-
-  # This test is tricky - would need a read-only directory
-  # Skip for now as it's OS-dependent
-  skip("Permission error testing requires OS-specific setup")
-})
-
-# ==============================================================================
-# Test: Integration
-# ==============================================================================
-
-test_that("copy_backbone integrates with get_default_paths", {
-  temp_dir <- withr::local_tempdir()
-  withr::local_dir(temp_dir)
-
-  local_test_project(copy = TRUE)
-
-  # Should be able to get paths after copying backbone
-  expect_no_error(paths <- get_default_paths())
-})
 
 test_that("copy_backbone works with relative paths", {
   temp_dir <- withr::local_tempdir()
   withr::local_dir(temp_dir)
 
   # Copy to current directory
-  copy_backbone(cache_dir = ".")
+  expect_no_error(copy_backbone(cache_dir = "."))
 
-  # Check that the copy operation completed without error
-  # The actual structure copied depends on how the package is installed
-  expect_true(TRUE)  # If we got here, the function didn't error
+  # Verify operation completed
+  expect_true(TRUE)
 })
 
 test_that("copy_backbone works with absolute paths", {
@@ -165,11 +175,35 @@ test_that("copy_backbone works with absolute paths", {
 
   expect_no_error(copy_backbone(cache_dir = cache_path))
 
-  expect_true(dir.exists(cache_path))
+  expect_true(
+    dir.exists(cache_path),
+    info = "Cache directory should be created"
+  )
 })
 
 # ==============================================================================
-# Test: Return Value
+# Integration Tests
+# ==============================================================================
+
+test_that("copy_backbone integrates with get_default_paths after copying", {
+  temp_dir <- withr::local_tempdir()
+  withr::local_dir(temp_dir)
+
+  copy_backbone(cache_dir = ".")
+
+  # Should be able to get paths after copying backbone
+  expect_no_error(paths <- get_default_paths())
+})
+
+test_that("copy_backbone supports local_test_project workflow", {
+  # This tests the integration used throughout the test suite
+  expect_no_error(paths <- local_test_project(copy = TRUE))
+
+  expect_type(paths, "list")
+})
+
+# ==============================================================================
+# Return Value Tests
 # ==============================================================================
 
 test_that("copy_backbone returns invisibly", {
@@ -177,6 +211,35 @@ test_that("copy_backbone returns invisibly", {
 
   result <- withVisible(copy_backbone(cache_dir = temp_dir))
 
-  expect_null(result$value)
-  expect_false(result$visible)
+  expect_null(result$value, info = "Return value should be NULL")
+  expect_false(result$visible, info = "Return should be invisible")
+})
+
+# ==============================================================================
+# Edge Cases and Special Scenarios
+# ==============================================================================
+
+test_that("copy_backbone handles nested cache directory paths", {
+  temp_dir <- withr::local_tempdir()
+  nested_path <- file.path(temp_dir, "level1", "level2", "cache")
+
+  expect_no_error(copy_backbone(cache_dir = nested_path))
+
+  expect_true(
+    dir.exists(nested_path),
+    info = "Nested path should be created"
+  )
+})
+
+test_that("copy_backbone can be called multiple times with different paths", {
+  temp_dir <- withr::local_tempdir()
+
+  cache1 <- file.path(temp_dir, "cache1")
+  cache2 <- file.path(temp_dir, "cache2")
+
+  expect_no_error(copy_backbone(cache_dir = cache1))
+  expect_no_error(copy_backbone(cache_dir = cache2))
+
+  expect_true(dir.exists(cache1), info = "First cache should exist")
+  expect_true(dir.exists(cache2), info = "Second cache should exist")
 })
