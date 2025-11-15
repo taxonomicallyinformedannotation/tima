@@ -48,7 +48,7 @@ test_that("weight_annotations validates minimal_ms1_condition", {
 # =============================================================================
 
 test_that("weight_annotations accepts valid default parameters", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # This should not error with default parameters structure
   expect_no_error({
@@ -81,8 +81,6 @@ test_that("weight_annotations accepts valid default parameters", {
       expect_true(params[[name]] >= 0 && params[[name]] <= 1)
     }
   })
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("weight_annotations hierarchical scores are properly ordered", {

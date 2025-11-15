@@ -2,7 +2,7 @@
 library(testthat)
 
 test_that("prepare_libraries_spectra handles non-existent input", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   expect_no_error(
     prepare_libraries_spectra(
@@ -10,12 +10,10 @@ test_that("prepare_libraries_spectra handles non-existent input", {
       nam_lib = "nope"
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_libraries_spectra handles NULL input", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   expect_no_error(
     prepare_libraries_spectra(
@@ -23,13 +21,11 @@ test_that("prepare_libraries_spectra handles NULL input", {
       nam_lib = "null"
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_libraries_spectra works with default parameters", {
   skip_on_cran()
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   # Download required files
@@ -43,8 +39,6 @@ test_that("prepare_libraries_spectra works with default parameters", {
   )
 
   expect_no_error(prepare_libraries_spectra())
-
-  unlink("data", recursive = TRUE)
 })
 
 # test_that("prepare_libraries_spectra warns when library already exists", {
@@ -69,12 +63,10 @@ test_that("prepare_libraries_spectra works with default parameters", {
 #     prepare_libraries_spectra(),
 #     regexp = "already"
 #   )
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 test_that("prepare_libraries_rt works with experimental data", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -92,12 +84,10 @@ test_that("prepare_libraries_rt works with experimental data", {
       temp_exp = paths$data$source$libraries$rt$example_mini
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_libraries_rt works with in-silico data", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -115,8 +105,6 @@ test_that("prepare_libraries_rt works with in-silico data", {
       temp_is = paths$data$source$libraries$rt$example_mini
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 # test_that("prepare_libraries_rt warns on invalid SMILES", {
@@ -134,12 +122,10 @@ test_that("prepare_libraries_rt works with in-silico data", {
 #       temp_exp = "data/source/libraries/rt/example_bad.tsv"
 #     )
 #   )
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 test_that("prepare_libraries_sop_closed works with and without input", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   # Try with some input (will fail gracefully)
@@ -151,12 +137,10 @@ test_that("prepare_libraries_sop_closed works with and without input", {
   expect_no_error(
     prepare_libraries_sop_closed()
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_libraries_sop_ecmdb handles missing input", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   expect_no_error(
     prepare_libraries_sop_ecmdb(input = "randomNonExistingFile")
@@ -164,12 +148,10 @@ test_that("prepare_libraries_sop_ecmdb handles missing input", {
   expect_no_error(
     prepare_libraries_sop_ecmdb()
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_libraries_sop_hmdb handles missing input", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   expect_no_error(
     prepare_libraries_sop_hmdb(input = "randomNonExistingFile")
@@ -177,12 +159,10 @@ test_that("prepare_libraries_sop_hmdb handles missing input", {
   expect_no_error(
     prepare_libraries_sop_hmdb()
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("prepare_libraries_sop_lotus handles missing input", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   expect_no_error(
     prepare_libraries_sop_lotus(input = "randomNonExistingFile")
@@ -190,8 +170,6 @@ test_that("prepare_libraries_sop_lotus handles missing input", {
   expect_no_error(
     prepare_libraries_sop_lotus()
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 # test_that("prepare_libraries_sop_merged works with filtering", {
@@ -214,13 +192,11 @@ test_that("prepare_libraries_sop_lotus handles missing input", {
 #       output_key = "data/interim/libraries/sop/merged/bitter.tsv.gz"
 #     )
 #   )
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 test_that("prepare_libraries_sop_merged triggers SMILES processing", {
   skip_on_cran()
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   # Create fake data
@@ -246,6 +222,4 @@ test_that("prepare_libraries_sop_merged triggers SMILES processing", {
       )
     )
   )
-
-  unlink("data", recursive = TRUE)
 })

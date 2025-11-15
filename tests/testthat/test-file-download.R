@@ -62,7 +62,7 @@ test_that("get_file fails gracefully with invalid URL", {
 })
 
 test_that("get_gnps_tables works with valid GNPS job ID", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
   params <- get_params(step = "prepare_params_advanced")
 
@@ -85,12 +85,10 @@ test_that("get_gnps_tables works with valid GNPS job ID", {
       gnps_job_id = params$gnps$id
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("get_gnps_tables handles missing metadata", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -107,12 +105,10 @@ test_that("get_gnps_tables handles missing metadata", {
       gnps_job_id = paths$gnps$example2
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("get_gnps_tables works with example GNPS ID", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -132,12 +128,10 @@ test_that("get_gnps_tables works with example GNPS ID", {
       gnps_job_id = get_default_paths()$gnps$example
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("get_gnps_tables handles NULL GNPS job ID", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -154,12 +148,10 @@ test_that("get_gnps_tables handles NULL GNPS job ID", {
       gnps_job_id = NULL
     )
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 test_that("get_gnps_tables handles empty GNPS job ID", {
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -176,6 +168,4 @@ test_that("get_gnps_tables handles empty GNPS job ID", {
       gnps_job_id = ""
     )
   )
-
-  unlink("data", recursive = TRUE)
 })

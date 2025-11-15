@@ -45,8 +45,6 @@ library(tima)
 #     ),
 #     "pos.*neg"
 #   )
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 # test_that("annotate_masses validates tolerance parameters", {
@@ -86,14 +84,12 @@ library(tima)
 #     ),
 #     "positive"
 #   )
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 test_that("annotate_masses validates file existence", {
   skip_on_cran()
 
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
 
   # Missing features file should error
   expect_error(
@@ -105,8 +101,6 @@ test_that("annotate_masses validates file existence", {
     ),
     "not found|does not exist"
   )
-
-  unlink("data", recursive = TRUE)
 })
 
 # ==============================================================================
@@ -143,8 +137,6 @@ test_that("annotate_masses validates file existence", {
 #
 #   # Output files should exist
 #   expect_true(file.exists("data/interim/annotations/example_features_ms1.tsv.gz"))
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 # ==============================================================================
@@ -176,8 +168,6 @@ test_that("annotate_masses validates file existence", {
 #       ms_mode = "neg"
 #     )
 #   )
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 # ==============================================================================
@@ -210,8 +200,6 @@ test_that("annotate_masses validates file existence", {
 #       ms_mode = "pos"
 #     )
 #   )
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 # test_that("annotate_masses accepts high but valid tolerances", {
@@ -240,8 +228,6 @@ test_that("annotate_masses validates file existence", {
 #       ms_mode = "pos"
 #     )
 #   )
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 # ==============================================================================
@@ -282,8 +268,6 @@ test_that("annotate_masses validates file existence", {
 #       ms_mode = "pos"
 #     )
 #   )
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 # test_that("annotate_masses handles features without RT", {
@@ -319,8 +303,6 @@ test_that("annotate_masses validates file existence", {
 #       ms_mode = "pos"
 #     )
 #   )
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 # ==============================================================================
@@ -359,8 +341,6 @@ test_that("annotate_masses validates file existence", {
 #       adducts_list = custom_adducts
 #     )
 #   )
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 # ==============================================================================
@@ -410,8 +390,6 @@ test_that("annotate_masses validates file existence", {
 #       info = paste("Missing column:", col)
 #     )
 #   }
-#
-#   unlink("data", recursive = TRUE)
 # })
 
 # ==============================================================================
@@ -422,7 +400,7 @@ test_that("annotate_masses completes in reasonable time", {
   skip_on_cran()
   skip("Performance test - run manually")
 
-  copy_backbone(cache_dir = ".")
+  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -449,6 +427,4 @@ test_that("annotate_masses completes in reasonable time", {
 
   # Should complete reasonably fast for example data
   expect_true(elapsed < 60, info = paste("Took", elapsed, "seconds"))
-
-  unlink("data", recursive = TRUE)
 })
