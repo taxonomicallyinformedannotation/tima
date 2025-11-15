@@ -523,3 +523,67 @@ test_that("parse_adduct handles CO2 loss [M-CO2+H]+", {
   # H - CO2 should be negative (net loss of ~43 Da)
   expect_true(unname(result["los_add_clu"]) < 0)
 })
+
+# ==============================================================================
+# Comments with Special Characters Tests
+# ==============================================================================
+
+test_that("parse_adduct handles comments with slash inside parentheses", {
+  # This tests the fix for slash inside parenthetical comments
+  # which should NOT be treated as alternative adduct delimiter
+  result_with_slash_comment <- parse_adduct(
+    "[M-C6H10O4 (methylpentose/desoxyhexose-H2O)+H]+"
+  )
+  result_without_comment <- parse_adduct("[M-C6H10O4+H]+")
+
+  expect_valid_parse_result(result_with_slash_comment)
+  # Should successfully parse (not all zeros)
+  expect_false(
+    is_parse_failed(result_with_slash_comment),
+    info = "Should parse adduct with slash in comment"
+  )
+  # Should have same mass change as version without comment
+  expect_equal(
+    unname(result_with_slash_comment["los_add_clu"]),
+    unname(result_without_comment["los_add_clu"]),
+    tolerance = 1e-6,
+    info = "Comments should be ignored in mass calculation"
+  )
+  # Should be in positive mode with 1 charge
+  expect_equal(unname(result_with_slash_comment["charge"]), 1)
+  expect_equal(unname(result_with_slash_comment["n_charges"]), 1)
+})
+
+test_that("parse_adduct handles complex sugar loss with slash in comment", {
+  # Another real-world example from the codebase
+  result <- parse_adduct(
+    "[M-C12H20O8 (2xmethylpentose/desoxyhexose-H2O)+H]+"
+  )
+
+  expect_valid_parse_result(result)
+  expect_false(
+    is_parse_failed(result),
+    info = "Should parse adduct with slash in comment"
+  )
+  expect_equal(unname(result["n_mer"]), 1)
+  expect_equal(unname(result["charge"]), 1)
+  # Loss of C12H20O8 plus gain of H should be net negative
+  expect_true(
+    unname(result["los_add_clu"]) < 0,
+    info = "Large sugar loss should result in negative mass change"
+  )
+})
+
+test_that("parse_adduct distinguishes between slash in comment vs slash as delimiter", {
+  # Test that slash INSIDE parentheses is not a delimiter
+  result_comment <- parse_adduct("[M-C6H10O4 (methylpentose/desoxyhexose-H2O)+H]+")
+  expect_false(is_parse_failed(result_comment))
+
+  # Test that slash OUTSIDE parentheses IS a delimiter (alternative adducts)
+  result_alternatives <- parse_adduct("[M+H]+/[M+Na]+")
+  expect_false(is_parse_failed(result_alternatives))
+  # Should parse the first alternative [M+H]+
+  expect_equal(unname(result_alternatives["n_mer"]), 1)
+  expect_equal(unname(result_alternatives["charge"]), 1)
+})
+
