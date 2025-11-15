@@ -62,99 +62,76 @@ annotate_spectra <- function(
   qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
   approx = get_params(step = "annotate_spectra")$annotations$ms2approx
 ) {
+  # Helper: normalize input (vector or list) to character vector
+  normalize_input_files <- function(x, label) {
+    if (is.list(x)) {
+      v <- unlist(x, use.names = FALSE)
+    } else {
+      v <- x
+    }
+    if (length(v) == 0L) {
+      return(character(0))
+    }
+    if (!is.character(v)) {
+      stop(label, " elements must be character strings")
+    }
+    v
+  }
   # ============================================================================
   # Input Validation
   # ============================================================================
-
-  # Validate polarity first (cheapest check)
-  if (!polarity %in% c("pos", "neg")) {
+  if (!polarity %in% VALID_MS_MODES) {
     stop("Polarity must be 'pos' or 'neg', got: ", polarity)
   }
-
-  # Validate logical parameters early
+  if (!method %in% VALID_SIMILARITY_METHODS) {
+    stop(
+      "Similarity method must be one of: ",
+      paste(VALID_SIMILARITY_METHODS, collapse = ", "),
+      "; got: ",
+      method
+    )
+  }
   if (!is.logical(approx)) {
     stop("approx must be logical (TRUE/FALSE)")
   }
-
-  # Validate numeric parameters (combined checks for efficiency)
   if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
     stop("Threshold must be between 0 and 1, got: ", threshold)
   }
-
   if (!is.numeric(ppm) || ppm <= 0) {
     stop("PPM tolerance must be positive, got: ", ppm)
   }
-
   if (!is.numeric(dalton) || dalton <= 0) {
     stop("Dalton tolerance must be positive, got: ", dalton)
   }
-
   if (!is.numeric(qutoff) || qutoff < 0) {
     stop("Intensity cutoff must be non-negative, got: ", qutoff)
   }
-
-  # Validate input files
-  if (is.list(input)) {
-    input_vec <- unlist(input)
-    if (!is.character(input_vec)) {
-      stop("All input elements must be character strings")
-    }
-
-    missing_files <- input_vec[!file.exists(input_vec)]
-    if (length(missing_files) > 0L) {
-      stop(
-        "Input file(s) not found: ",
-        paste(missing_files, collapse = ", ")
-      )
-    }
-  } else {
-    if (!is.character(input) || length(input) != 1L) {
-      stop(
-        "input must be a single character string or a list of character strings"
-      )
-    }
-    if (!file.exists(input)) {
-      stop("Input file not found: ", input)
-    }
+  input_vec <- normalize_input_files(input, "Input")
+  if (length(input_vec) == 0L) {
+    stop("Input must contain at least one file path")
   }
-
-  # Validate libraries
-  if (length(libraries) == 0L) {
+  missing_in <- input_vec[!file.exists(input_vec)]
+  if (length(missing_in) > 0L) {
+    stop("Input file(s) not found: ", paste(missing_in, collapse = ", "))
+  }
+  libraries_vec <- normalize_input_files(libraries, "Library")
+  if (length(libraries_vec) == 0L) {
     stop("At least one library must be provided")
   }
-
-  if (is.list(libraries)) {
-    # Flatten and check all library files at once
-    lib_vec <- unlist(libraries)
-    if (!is.character(lib_vec)) {
-      stop("All library elements must be character strings")
-    }
-
-    missing_libs <- lib_vec[!file.exists(lib_vec)]
-    if (length(missing_libs) > 0L) {
-      stop(
-        "Library file(s) not found: ",
-        paste(missing_libs, collapse = ", ")
-      )
-    }
-  } else {
-    missing_libs <- libraries[!file.exists(libraries)]
-    if (length(missing_libs) > 0L) {
-      stop("Library file(s) not found: ", paste(missing_libs, collapse = ", "))
-    }
+  missing_libs <- libraries_vec[!file.exists(libraries_vec)]
+  if (length(missing_libs) > 0L) {
+    stop("Library file(s) not found: ", paste(missing_libs, collapse = ", "))
   }
-
   # ============================================================================
   # Processing
   # ============================================================================
-
   logger::log_info("Starting spectral annotation in {polarity} mode")
   logger::log_debug(
     "Method: {method}, Threshold: {threshold}, PPM: {ppm}, Dalton: {dalton}"
   )
-  logger::log_debug("Processing {length(libraries)} spectral library/libraries")
-
-  # Pre-define empty result structure for early exits
+  logger::log_debug(
+    "Processing {length(libraries_vec)} spectral library/libraries"
+  )
   df_empty <- data.frame(
     feature_id = NA,
     candidate_spectrum_entropy = NA,
@@ -171,61 +148,80 @@ annotate_spectra <- function(
     candidate_score_similarity = NA,
     candidate_count_similarity_peaks_matched = NA
   )
-
-  # Filter libraries by polarity if multiple provided
-  if (length(libraries) > 1) {
-    original_count <- length(libraries)
-    libraries <- libraries[grepl(polarity, libraries, fixed = TRUE)]
+  if (length(libraries_vec) > 1L) {
+    original_count <- length(libraries_vec)
+    libraries_vec <- libraries_vec[grepl(polarity, libraries_vec, fixed = TRUE)]
     logger::log_debug(
-      "Filtered libraries by polarity: {original_count} -> {length(libraries)}"
+      "Filtered libraries by polarity: {original_count} -> {length(libraries_vec)}"
     )
-
-    if (length(libraries) == 0L) {
+    if (length(libraries_vec) == 0L) {
       logger::log_warn(
         "No library matched the given polarity, returning an empty dataframe"
       )
-      df_final <- df_empty
+      export_params(
+        parameters = get_params(step = "annotate_spectra"),
+        step = "annotate_spectra"
+      )
+      export_output(x = df_empty, file = output[[1]])
+      return(output[[1]])
     }
   }
-
-  logger::log_debug("Loading query spectra from: {input}")
-  spectra <- input |>
+  logger::log_debug(
+    "Loading query spectra from: {paste(head(input_vec,3), collapse=', ')}"
+  )
+  spectra <- input_vec |>
     import_spectra(
       cutoff = qutoff,
       dalton = dalton,
       polarity = polarity,
       ppm = ppm
     )
-
-  if (length(spectra) > 0) {
-    logger::log_debug("Loading spectral libraries")
-    spectral_library <- unlist(libraries) |>
-      purrr::map(
-        .f = import_spectra,
-        cutoff = 0,
-        dalton = dalton,
-        polarity = polarity,
-        ppm = ppm,
-        sanitize = FALSE,
-        combine = FALSE
-      ) |>
-      purrr::map(
-        .f = Spectra::applyProcessing,
-        BPPARAM = BiocParallel::SerialParam()
-      )
-    spectral_library <- spectral_library |>
-      purrr::map(.f = function(spectra) {
-        spectra <- spectra[
-          !spectra@backend@peaksData |>
-            purrr::map(.f = is.null) |>
-            purrr::map(.f = any) |>
-            as.character() |>
-            as.logical()
-        ]
-      }) |>
-      Spectra::concatenateSpectra()
-
-    logger::log_info("Annotating using following libraries")
+  if (length(spectra) == 0L) {
+    logger::log_warn("No query spectra loaded; returning empty dataframe")
+    export_params(
+      parameters = get_params(step = "annotate_spectra"),
+      step = "annotate_spectra"
+    )
+    export_output(x = df_empty, file = output[[1]])
+    return(output[[1]])
+  }
+  spectral_library <- libraries_vec |>
+    purrr::map(
+      .f = import_spectra,
+      cutoff = 0,
+      dalton = dalton,
+      polarity = polarity,
+      ppm = ppm,
+      sanitize = FALSE,
+      combine = FALSE
+    ) |>
+    purrr::map(
+      .f = Spectra::applyProcessing,
+      BPPARAM = BiocParallel::SerialParam()
+    ) |>
+    purrr::map(.f = function(spectra_lib) {
+      spectra_lib[
+        !spectra_lib@backend@peaksData |>
+          purrr::map(is.null) |>
+          purrr::map(any) |>
+          as.character() |>
+          as.logical()
+      ]
+    }) |>
+    Spectra::concatenateSpectra()
+  if (length(spectral_library) == 0L) {
+    logger::log_warn(
+      "No spectra left in the library after cleaning; returning empty dataframe"
+    )
+    export_params(
+      parameters = get_params(step = "annotate_spectra"),
+      step = "annotate_spectra"
+    )
+    export_output(x = df_empty, file = output[[1]])
+    return(output[[1]])
+  }
+  # Library statistics (informational)
+  if ("library" %in% names(Spectra::spectraData(spectral_library))) {
     library_stats <- spectral_library |>
       Spectra::spectraData() |>
       data.frame() |>
@@ -520,13 +516,11 @@ annotate_spectra <- function(
     )
     df_final <- df_empty
   }
-
   export_params(
     parameters = get_params(step = "annotate_spectra"),
     step = "annotate_spectra"
   )
   export_output(x = df_final, file = output[[1]])
   rm(df_final)
-
   return(output[[1]])
 }

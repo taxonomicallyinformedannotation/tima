@@ -38,7 +38,13 @@ test_that("annotate_spectra validates polarity parameter", {
   )
 
   # Replace remote library download with minimal mgf
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
 
   # Invalid polarity
@@ -71,7 +77,13 @@ test_that("annotate_spectra validates numeric parameters", {
   )
 
   # Replace remote library download with minimal mgf
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
 
   # Threshold must be 0-1
@@ -181,8 +193,17 @@ test_that("annotate_spectra works with single MGF library", {
   skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
-  get_file(url = paths$urls$examples$spectra_mini, export = paths$data$source$spectra)
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
   expect_no_error(
     annotate_spectra(
@@ -204,7 +225,13 @@ test_that("annotate_spectra works in negative mode", {
     url = paths$urls$examples$spectra_mini,
     export = paths$data$source$spectra
   )
-  lib_path_neg <- file.path("data","interim","libraries","spectra","test_lib_neg.mgf")
+  lib_path_neg <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_neg.mgf"
+  )
   write_minimal_mgf(lib_path_neg, charge = "1-", pepmass = 120)
 
   expect_no_error(
@@ -221,10 +248,25 @@ test_that("annotate_spectra works with multiple libraries", {
   skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
-  get_file(url = paths$urls$examples$spectra_mini, export = paths$data$source$spectra)
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
-  lib_path2 <- file.path("data","interim","libraries","spectra","test_lib_pos2.mgf")
+  lib_path2 <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos2.mgf"
+  )
   write_minimal_mgf(lib_path2, pepmass = 110)
   libs <- list(pos = lib_path, pos2 = lib_path2)
   expect_no_error(
@@ -245,8 +287,17 @@ test_that("annotate_spectra works with cosine similarity", {
   skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
-  get_file(url = paths$urls$examples$spectra_mini, export = paths$data$source$spectra)
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
   expect_no_error(
     annotate_spectra(
@@ -263,8 +314,17 @@ test_that("annotate_spectra works with entropy similarity", {
   skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
-  get_file(url = paths$urls$examples$spectra_mini, export = paths$data$source$spectra)
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
   expect_no_error(
     annotate_spectra(
@@ -285,8 +345,17 @@ test_that("annotate_spectra respects similarity threshold", {
   skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
-  get_file(url = paths$urls$examples$spectra_mini, export = paths$data$source$spectra)
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
   expect_no_error(
     annotate_spectra(
@@ -316,8 +385,17 @@ test_that("annotate_spectra accepts different tolerance settings", {
   skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
-  get_file(url = paths$urls$examples$spectra_mini, export = paths$data$source$spectra)
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
   expect_no_error(
     annotate_spectra(
@@ -345,8 +423,17 @@ test_that("annotate_spectra works with approx mode enabled", {
   skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
-  get_file(url = paths$urls$examples$spectra_mini, export = paths$data$source$spectra)
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
   expect_no_error(
     annotate_spectra(
@@ -363,8 +450,17 @@ test_that("annotate_spectra works with approx mode disabled", {
   skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
-  get_file(url = paths$urls$examples$spectra_mini, export = paths$data$source$spectra)
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
   expect_no_error(
     annotate_spectra(
@@ -385,8 +481,17 @@ test_that("annotate_spectra respects intensity cutoff", {
   skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
-  get_file(url = paths$urls$examples$spectra_mini, export = paths$data$source$spectra)
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
   expect_no_error(
     annotate_spectra(
@@ -416,8 +521,17 @@ test_that("annotate_spectra produces valid output file", {
   skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
-  get_file(url = paths$urls$examples$spectra_mini, export = paths$data$source$spectra)
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
   annotate_spectra(
     libraries = list(pos = lib_path),
@@ -425,7 +539,9 @@ test_that("annotate_spectra produces valid output file", {
     ppm = 10,
     dalton = 0.01
   )
-  output_file <- get_params(step = "annotate_spectra")$files$annotations$raw$spectral$spectral
+  output_file <- get_params(
+    step = "annotate_spectra"
+  )$files$annotations$raw$spectral$spectral
   expect_true(file.exists(output_file))
   if (file.exists(output_file) && file.size(output_file) > 0) {
     result <- tidytable::fread(output_file)
@@ -465,7 +581,13 @@ test_that("annotate_spectra completes in reasonable time", {
   )
 
   # Replace remote library download with minimal mgf
-  lib_path <- file.path("data","interim","libraries","spectra","test_lib_pos.mgf")
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "test_lib_pos.mgf"
+  )
   write_minimal_mgf(lib_path)
 
   start_time <- Sys.time()

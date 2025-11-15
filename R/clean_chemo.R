@@ -221,7 +221,8 @@ clean_chemo <- function(
   df1_filtered <- df1 |>
     tidytable::group_by(feature_id) |>
     tidytable::filter(
-      score_weighted_chemo >= best_percentile * max(score_weighted_chemo, na.rm = TRUE)
+      score_weighted_chemo >=
+        best_percentile * max(score_weighted_chemo, na.rm = TRUE)
     ) |>
     tidytable::ungroup() |>
     tidytable::filter(rank_final <= candidates_final)
