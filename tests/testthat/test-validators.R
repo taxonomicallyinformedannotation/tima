@@ -1,12 +1,26 @@
-#' @title Enhanced Test Suite for Validators
-#'
-#' @description Comprehensive tests for all validation utilities in validators.R
-#'     to maximize code coverage and ensure robust error handling.
+# ==============================================================================
+# Test Suite: Validators
+# ==============================================================================
+#
+# @description
+# Comprehensive tests for all validation utilities in validators.R to maximize
+# code coverage and ensure robust error handling.
+#
+# @coverage
+# - validate_file_existence - File path validation
+# - validate_ms_mode - MS polarity validation
+# - validate_tolerances - Tolerance parameter validation
+# - validate_adduct_list - Adduct list validation
+# - validate_numeric_range - Numeric range validation
+# - validate_character - Character string validation
+# - validate_logical - Boolean validation
 
 library(testthat)
 library(tima)
 
-# Test validate_file_existence ----
+# ==============================================================================
+# Tests: validate_file_existence
+# ==============================================================================
 
 test_that("validate_file_existence accepts valid files", {
   # Create temporary files using withr
@@ -79,7 +93,9 @@ test_that("validate_file_existence provides detailed error messages", {
   )
 })
 
-# Test validate_ms_mode ----
+# ==============================================================================
+# Tests: validate_ms_mode
+# ==============================================================================
 
 # test_that("validate_ms_mode accepts valid modes", {
 #   expect_silent(validate_ms_mode("pos"))
@@ -107,7 +123,8 @@ test_that("validate_ms_mode provides helpful error messages", {
   )
 })
 
-# Test validate_tolerances ----
+# ==============================================================================
+# Tests: validate_tolerances ----
 
 # test_that("validate_tolerances accepts valid values", {
 #   expect_silent(validate_tolerances(tolerance_ppm = 10, tolerance_rt = 0.05))
@@ -161,7 +178,8 @@ test_that("validate_tolerances handles custom limits", {
   )
 })
 
-# Test validate_adduct_list ----
+# ==============================================================================
+# Tests: validate_adduct_list ----
 
 # test_that("validate_adduct_list accepts valid lists", {
 #   adducts <- list(
@@ -197,7 +215,8 @@ test_that("validate_adduct_list warns about empty lists", {
   )
 })
 
-# Test validate_numeric_range ----
+# ==============================================================================
+# Tests: validate_numeric_range ----
 
 test_that("validate_numeric_range accepts values in range", {
   expect_silent(validate_numeric_range(5, min_value = 0, max_value = 10))
@@ -259,7 +278,8 @@ test_that("validate_numeric_range uses custom parameter names", {
   )
 })
 
-# Test validate_character ----
+# ==============================================================================
+# Tests: validate_character ----
 
 test_that("validate_character accepts valid strings", {
   expect_silent(validate_character("test"))
@@ -289,7 +309,8 @@ test_that("validate_character validates types", {
   expect_error(validate_character(c("a", "b")), "single")
 })
 
-# Test validate_logical ----
+# ==============================================================================
+# Tests: validate_logical ----
 
 test_that("validate_logical accepts valid booleans", {
   expect_silent(validate_logical(TRUE))
@@ -308,7 +329,8 @@ test_that("validate_logical allows NULL when specified", {
   expect_silent(validate_logical(NULL, allow_null = TRUE))
 })
 
-# Test validate_list_or_vector ----
+# ==============================================================================
+# Tests: validate_list_or_vector ----
 
 test_that("validate_list_or_vector accepts lists and vectors", {
   expect_silent(validate_list_or_vector(list(a = 1, b = 2)))
@@ -342,7 +364,8 @@ test_that("validate_list_or_vector handles NULL", {
 #   )
 # })
 
-# Test validate_data_frame ----
+# ==============================================================================
+# Tests: validate_data_frame ----
 
 test_that("validate_data_frame accepts valid data frames", {
   df <- data.frame(a = 1:3, b = 4:6, c = 7:9)
