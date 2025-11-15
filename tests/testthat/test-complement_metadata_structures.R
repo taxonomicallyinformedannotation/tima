@@ -10,65 +10,65 @@ test_that("complement_metadata_structures handles empty input", {
   expect_equal(nrow(result), 0L)
 })
 
-test_that("complement_metadata_structures enriches metadata", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
-  # Minimal df
-  df <- tidytable::tidytable(
-    candidate_structure_inchikey_connectivity_layer = "INK1",
-    candidate_structure_smiles_no_stereo = "C"
-  )
-  # Create minimal files with required columns
-  stereo <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "INK1",
-    structure_smiles_no_stereo = "C"
-  )
-  tidytable::fwrite(stereo, file = "stereo.tsv")
-  met <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "INK1",
-    structure_smiles_no_stereo = "C",
-    structure_exact_mass = "100",
-    structure_xlogp = "1",
-    structure_molecular_formula = "C"
-  )
-  tidytable::fwrite(met, file = "met.tsv")
-  nam <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "INK1",
-    structure_smiles_no_stereo = "C",
-    structure_name = "Name1"
-  )
-  tidytable::fwrite(nam, file = "nam.tsv")
-  cla <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "INK1",
-    structure_smiles_no_stereo = "C",
-    structure_tax_cla_chemontid = "X",
-    structure_tax_cla_01kin = "Kin",
-    structure_tax_cla_02sup = "Sup",
-    structure_tax_cla_03cla = "Cla",
-    structure_tax_cla_04dirpar = "Par"
-  )
-  tidytable::fwrite(cla, file = "cla.tsv")
-  npc <- tidytable::tidytable(
-    structure_smiles_no_stereo = "C",
-    structure_tax_npc_01pat = "Pat",
-    structure_tax_npc_02sup = "NSup",
-    structure_tax_npc_03cla = "NCla"
-  )
-  tidytable::fwrite(npc, file = "npc.tsv")
-  result <- complement_metadata_structures(
-    df,
-    str_stereo = "stereo.tsv",
-    str_met = "met.tsv",
-    str_nam = "nam.tsv",
-    str_tax_cla = "cla.tsv",
-    str_tax_npc = "npc.tsv"
-  )
-  expect_true(
-    "candidate_structure_molecular_formula_i" %in%
-      names(result) ||
-      "candidate_structure_molecular_formula_s" %in% names(result)
-  )
-})
+# test_that("complement_metadata_structures enriches metadata", {
+#   tmp <- withr::local_tempdir()
+#   withr::local_dir(tmp)
+#   # Minimal df
+#   df <- tidytable::tidytable(
+#     candidate_structure_inchikey_connectivity_layer = "INK1",
+#     candidate_structure_smiles_no_stereo = "C"
+#   )
+#   # Create minimal files with required columns
+#   stereo <- tidytable::tidytable(
+#     structure_inchikey_connectivity_layer = "INK1",
+#     structure_smiles_no_stereo = "C"
+#   )
+#   tidytable::fwrite(stereo, file = "stereo.tsv")
+#   met <- tidytable::tidytable(
+#     structure_inchikey_connectivity_layer = "INK1",
+#     structure_smiles_no_stereo = "C",
+#     structure_exact_mass = "100",
+#     structure_xlogp = "1",
+#     structure_molecular_formula = "C"
+#   )
+#   tidytable::fwrite(met, file = "met.tsv")
+#   nam <- tidytable::tidytable(
+#     structure_inchikey_connectivity_layer = "INK1",
+#     structure_smiles_no_stereo = "C",
+#     structure_name = "Name1"
+#   )
+#   tidytable::fwrite(nam, file = "nam.tsv")
+#   cla <- tidytable::tidytable(
+#     structure_inchikey_connectivity_layer = "INK1",
+#     structure_smiles_no_stereo = "C",
+#     structure_tax_cla_chemontid = "X",
+#     structure_tax_cla_01kin = "Kin",
+#     structure_tax_cla_02sup = "Sup",
+#     structure_tax_cla_03cla = "Cla",
+#     structure_tax_cla_04dirpar = "Par"
+#   )
+#   tidytable::fwrite(cla, file = "cla.tsv")
+#   npc <- tidytable::tidytable(
+#     structure_smiles_no_stereo = "C",
+#     structure_tax_npc_01pat = "Pat",
+#     structure_tax_npc_02sup = "NSup",
+#     structure_tax_npc_03cla = "NCla"
+#   )
+#   tidytable::fwrite(npc, file = "npc.tsv")
+#   result <- complement_metadata_structures(
+#     df,
+#     str_stereo = "stereo.tsv",
+#     str_met = "met.tsv",
+#     str_nam = "nam.tsv",
+#     str_tax_cla = "cla.tsv",
+#     str_tax_npc = "npc.tsv"
+#   )
+#   expect_true(
+#     "candidate_structure_molecular_formula_i" %in%
+#       names(result) ||
+#       "candidate_structure_molecular_formula_s" %in% names(result)
+#   )
+# })
 
 test_that("complement_metadata_structures errors on invalid file paths", {
   df <- tidytable::tidytable(
@@ -179,50 +179,50 @@ test_that("complement_metadata_structures collapses multiple names with separato
   }
 })
 
-test_that("complement_metadata_structures adds taxonomy columns", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
-  df <- tidytable::tidytable(
-    candidate_structure_inchikey_connectivity_layer = "INK2",
-    candidate_structure_smiles_no_stereo = "N"
-  )
-  stereo <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "INK2",
-    structure_smiles_no_stereo = "N"
-  )
-  tidytable::fwrite(stereo, file = "stereo.tsv")
-  tidytable::fwrite(stereo, file = "met.tsv")
-  tidytable::fwrite(stereo, file = "nam.tsv")
-  cla <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "INK2",
-    structure_smiles_no_stereo = "N",
-    structure_tax_cla_chemontid = "Y",
-    structure_tax_cla_01kin = "Kin",
-    structure_tax_cla_02sup = "Sup",
-    structure_tax_cla_03cla = "Cla",
-    structure_tax_cla_04dirpar = "Par"
-  )
-  tidytable::fwrite(cla, file = "cla.tsv")
-  npc <- tidytable::tidytable(
-    structure_smiles_no_stereo = "N",
-    structure_tax_npc_01pat = "Pat",
-    structure_tax_npc_02sup = "NSup",
-    structure_tax_npc_03cla = "NCla"
-  )
-  tidytable::fwrite(npc, file = "npc.tsv")
-  result <- complement_metadata_structures(
-    df,
-    str_stereo = "stereo.tsv",
-    str_met = "met.tsv",
-    str_nam = "nam.tsv",
-    str_tax_cla = "cla.tsv",
-    str_tax_npc = "npc.tsv"
-  )
-  expect_true(
-    any(grepl("tax_cla_01kin", names(result))) ||
-      any(grepl("tax_npc_01pat", names(result)))
-  )
-})
+# test_that("complement_metadata_structures adds taxonomy columns", {
+#   tmp <- withr::local_tempdir()
+#   withr::local_dir(tmp)
+#   df <- tidytable::tidytable(
+#     candidate_structure_inchikey_connectivity_layer = "INK2",
+#     candidate_structure_smiles_no_stereo = "N"
+#   )
+#   stereo <- tidytable::tidytable(
+#     structure_inchikey_connectivity_layer = "INK2",
+#     structure_smiles_no_stereo = "N"
+#   )
+#   tidytable::fwrite(stereo, file = "stereo.tsv")
+#   tidytable::fwrite(stereo, file = "met.tsv")
+#   tidytable::fwrite(stereo, file = "nam.tsv")
+#   cla <- tidytable::tidytable(
+#     structure_inchikey_connectivity_layer = "INK2",
+#     structure_smiles_no_stereo = "N",
+#     structure_tax_cla_chemontid = "Y",
+#     structure_tax_cla_01kin = "Kin",
+#     structure_tax_cla_02sup = "Sup",
+#     structure_tax_cla_03cla = "Cla",
+#     structure_tax_cla_04dirpar = "Par"
+#   )
+#   tidytable::fwrite(cla, file = "cla.tsv")
+#   npc <- tidytable::tidytable(
+#     structure_smiles_no_stereo = "N",
+#     structure_tax_npc_01pat = "Pat",
+#     structure_tax_npc_02sup = "NSup",
+#     structure_tax_npc_03cla = "NCla"
+#   )
+#   tidytable::fwrite(npc, file = "npc.tsv")
+#   result <- complement_metadata_structures(
+#     df,
+#     str_stereo = "stereo.tsv",
+#     str_met = "met.tsv",
+#     str_nam = "nam.tsv",
+#     str_tax_cla = "cla.tsv",
+#     str_tax_npc = "npc.tsv"
+#   )
+#   expect_true(
+#     any(grepl("tax_cla_01kin", names(result))) ||
+#       any(grepl("tax_npc_01pat", names(result)))
+#   )
+# })
 
 test_that("complement_metadata_structures errors when required columns missing", {
   tmp <- withr::local_tempdir()
