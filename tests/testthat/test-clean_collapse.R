@@ -12,4 +12,9 @@ test_that("clean_collapse collapses specified columns", {
   expect_true("value" %in% names(result))
 })
 
-
+test_that("clean_collapse removes NA and collapses unique values", {
+  df <- tidytable::tidytable(group = c("G","G","G"), value = c("A","A",NA))
+  grouped <- tidytable::group_by(df, group)
+  result <- clean_collapse(grouped_df = grouped, cols = c("value"))
+  expect_equal(result$value, "A")
+})

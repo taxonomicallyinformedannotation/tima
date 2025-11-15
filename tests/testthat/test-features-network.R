@@ -2,24 +2,24 @@
 library(testthat)
 
 # test_that("prepare_features_tables handles missing RT column", {
-  #local_test_project(copy = TRUE)
+# local_test_project(copy = TRUE)
 #
-  #tidytable::tidytable(
-    #"row ID" = 1,
-    #"row m/z" = 123.4567,
-    #"sample.mzML Peak area" = 98765.43
-  #) |>
-    #tidytable::fwrite("data/source/example_features_no_rt.csv")
+# tidytable::tidytable(
+# "row ID" = 1,
+# "row m/z" = 123.4567,
+# "sample.mzML Peak area" = 98765.43
+# ) |>
+# tidytable::fwrite("data/source/example_features_no_rt.csv")
 #
-  #expect_no_error(
-    #prepare_features_tables(
-      #features = "data/source/example_features_no_rt.csv",
-      #output = "data/interim/features/example_features_no_rt.tsv.gz"
-   # )
-  #)
+# expect_no_error(
+# prepare_features_tables(
+# features = "data/source/example_features_no_rt.csv",
+# output = "data/interim/features/example_features_no_rt.tsv.gz"
+# )
+# )
 #
-  #
-#})
+#
+# })
 
 test_that("prepare_features_tables works with default parameters", {
   skip_on_cran()
