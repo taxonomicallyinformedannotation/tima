@@ -106,7 +106,10 @@ test_that("get_params retrieves advanced parameters", {
   params <- get_params(step = "prepare_params_advanced")
 
   expect_type(params, "list")
-  expect_true(length(params) > 0, info = "Advanced parameters should not be empty")
+  expect_true(
+    length(params) > 0,
+    info = "Advanced parameters should not be empty"
+  )
 })
 
 test_that("get_params returns consistent structure for same step", {
@@ -115,7 +118,11 @@ test_that("get_params returns consistent structure for same step", {
   params1 <- get_params(step = "prepare_params")
   params2 <- get_params(step = "prepare_params")
 
-  expect_identical(params1, params2, info = "Same step should return identical params")
+  expect_identical(
+    params1,
+    params2,
+    info = "Same step should return identical params"
+  )
 })
 
 # ==============================================================================
@@ -193,4 +200,3 @@ test_that("get_params handles unknown step gracefully", {
   # Should either error or return a list
   expect_true(inherits(result, "list") || inherits(result, "error"))
 })
-

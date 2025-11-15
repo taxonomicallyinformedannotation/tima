@@ -82,7 +82,11 @@ test_that("parse_cli_params handles empty arguments list", {
   result <- parse_cli_params(arguments = list(), parameters = params)
 
   expect_type(result, "list")
-  expect_identical(result, params, info = "Empty args should return original params")
+  expect_identical(
+    result,
+    params,
+    info = "Empty args should return original params"
+  )
 })
 
 test_that("parse_cli_params preserves unmodified parameters", {

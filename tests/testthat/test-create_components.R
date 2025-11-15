@@ -35,7 +35,10 @@ test_that("create_components handles empty edge table", {
   expect_no_error(result <- create_components())
   expect_s3_class(result, "data.frame")
   # Should be empty or have placeholder structure
-  expect_true(nrow(result) == 0L || all(c("feature_id","component_id") %in% names(result)))
+  expect_true(
+    nrow(result) == 0L ||
+      all(c("feature_id", "component_id") %in% names(result))
+  )
 })
 
 test_that("create_components builds components from minimal cyclic edges", {
@@ -43,14 +46,16 @@ test_that("create_components builds components from minimal cyclic edges", {
   paths <- local_test_project(copy = TRUE)
 
   edges <- tidytable::tidytable(
-    feature_source = c("FT001","FT002","FT003"),
-    feature_target = c("FT002","FT003","FT001"),
-    similarity = c(0.8,0.9,0.7)
+    feature_source = c("FT001", "FT002", "FT003"),
+    feature_target = c("FT002", "FT003", "FT001"),
+    similarity = c(0.8, 0.9, 0.7)
   )
   write_edges_table(edges, paths)
 
   result <- create_components()
   expect_s3_class(result, "data.frame")
-  expect_true(any(grepl("component", names(result))) || any(grepl("feature_id", names(result))))
+  expect_true(
+    any(grepl("component", names(result))) ||
+      any(grepl("feature_id", names(result)))
+  )
 })
-

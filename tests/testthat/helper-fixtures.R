@@ -84,9 +84,10 @@ local_quiet_logging <- function(threshold = "WARN") {
 #' @examples
 #' spectrum <- create_test_spectrum(n_peaks = 10)
 create_test_spectrum <- function(
-    n_peaks = 5L,
-    mz_range = c(100, 500),
-    intensity_range = c(100, 1000)) {
+  n_peaks = 5L,
+  mz_range = c(100, 500),
+  intensity_range = c(100, 1000)
+) {
   stopifnot(
     is.numeric(n_peaks),
     n_peaks >= 0,
@@ -124,9 +125,10 @@ create_test_spectrum <- function(
 #' base <- create_test_spectrum()
 #' similar <- create_similar_spectra(base, n_similar = 5)
 create_similar_spectra <- function(
-    base_spectrum,
-    n_similar = 3L,
-    noise_level = 0.1) {
+  base_spectrum,
+  n_similar = 3L,
+  noise_level = 0.1
+) {
   stopifnot(
     is.matrix(base_spectrum),
     ncol(base_spectrum) == 2,
@@ -162,9 +164,10 @@ create_similar_spectra <- function(
 #' @examples
 #' features <- create_test_features(n_features = 100)
 create_test_features <- function(
-    n_features = 10L,
-    mz_range = c(100, 500),
-    rt_range = c(0, 10)) {
+  n_features = 10L,
+  mz_range = c(100, 500),
+  rt_range = c(0, 10)
+) {
   data.frame(
     feature_id = sprintf("FT%04d", seq_len(n_features)),
     mz = runif(n_features, mz_range[1], mz_range[2]),
@@ -186,8 +189,9 @@ create_test_features <- function(
 #' @examples
 #' annotations <- create_test_annotations(n_annotations = 50)
 create_test_annotations <- function(
-    n_annotations = 20L,
-    n_features = 5L) {
+  n_annotations = 20L,
+  n_features = 5L
+) {
   stopifnot(n_annotations >= n_features)
 
   data.frame(
@@ -197,15 +201,24 @@ create_test_annotations <- function(
       replace = TRUE
     ),
     candidate_structure_inchikey = paste0(
-      replicate(n_annotations, paste(sample(LETTERS, 14, replace = TRUE), collapse = "")),
+      replicate(
+        n_annotations,
+        paste(sample(LETTERS, 14, replace = TRUE), collapse = "")
+      ),
       "-",
-      replicate(n_annotations, paste(sample(LETTERS, 10, replace = TRUE), collapse = "")),
+      replicate(
+        n_annotations,
+        paste(sample(LETTERS, 10, replace = TRUE), collapse = "")
+      ),
       "-",
       replicate(n_annotations, paste(sample(LETTERS, 1), collapse = ""))
     ),
     candidate_structure_smiles = replicate(
       n_annotations,
-      paste(sample(c("C", "O", "N", "=", "-", "(", ")"), 10, replace = TRUE), collapse = "")
+      paste(
+        sample(c("C", "O", "N", "=", "-", "(", ")"), 10, replace = TRUE),
+        collapse = ""
+      )
     ),
     candidate_score_similarity = runif(n_annotations, 0, 1),
     candidate_mass_error_ppm = runif(n_annotations, -10, 10),
@@ -236,8 +249,16 @@ create_test_taxonomy <- function(n_taxa = 5L) {
     organism_taxonomy_ottid = sample(100000:999999, n_taxa),
     organism_taxonomy_01domain = "Eukaryota",
     organism_taxonomy_02kingdom = "Plantae",
-    organism_taxonomy_03phylum = sample(c("Tracheophyta", "Chlorophyta"), n_taxa, replace = TRUE),
-    organism_taxonomy_06family = sample(c("Gentianaceae", "Brassicaceae", "Solanaceae"), n_taxa, replace = TRUE),
+    organism_taxonomy_03phylum = sample(
+      c("Tracheophyta", "Chlorophyta"),
+      n_taxa,
+      replace = TRUE
+    ),
+    organism_taxonomy_06family = sample(
+      c("Gentianaceae", "Brassicaceae", "Solanaceae"),
+      n_taxa,
+      replace = TRUE
+    ),
     stringsAsFactors = FALSE
   )
 }
@@ -320,4 +341,3 @@ expect_required_columns <- function(df, required_cols) {
     )
   )
 }
-

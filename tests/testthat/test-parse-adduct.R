@@ -135,8 +135,15 @@ test_that("parse_adduct works for all common positive adducts", {
     result <- parse_adduct(adduct)
 
     expect_valid_parse_result(result)
-    expect_equal(unname(result["charge"]), 1, info = paste(adduct, "- positive mode"))
-    expect_true(unname(result["n_mer"]) >= 1, info = paste(adduct, "- has monomers"))
+    expect_equal(
+      unname(result["charge"]),
+      1,
+      info = paste(adduct, "- positive mode")
+    )
+    expect_true(
+      unname(result["n_mer"]) >= 1,
+      info = paste(adduct, "- has monomers")
+    )
   }
 })
 
@@ -146,8 +153,15 @@ test_that("parse_adduct works for all common negative adducts", {
     result <- parse_adduct(adduct)
 
     expect_valid_parse_result(result)
-    expect_equal(unname(result["charge"]), -1, info = paste(adduct, "- negative mode"))
-    expect_true(unname(result["n_mer"]) >= 1, info = paste(adduct, "- has monomers"))
+    expect_equal(
+      unname(result["charge"]),
+      -1,
+      info = paste(adduct, "- negative mode")
+    )
+    expect_true(
+      unname(result["n_mer"]) >= 1,
+      info = paste(adduct, "- has monomers")
+    )
   }
 })
 
@@ -177,7 +191,11 @@ test_that("parse_adduct handles higher-order multimers correctly", {
     result <- parse_adduct(adduct)
 
     expect_valid_parse_result(result)
-    expect_equal(unname(result["n_mer"]), n, info = paste(adduct, "multimer count"))
+    expect_equal(
+      unname(result["n_mer"]),
+      n,
+      info = paste(adduct, "multimer count")
+    )
   }
 })
 
@@ -250,7 +268,11 @@ test_that("parse_adduct handles doubly negative charge [M-2H]2-", {
 test_that("parse_adduct defaults to single charge when not specified", {
   result <- parse_adduct("[M+H]+")
 
-  expect_equal(unname(result["n_charges"]), 1, info = "Default charge count is 1")
+  expect_equal(
+    unname(result["n_charges"]),
+    1,
+    info = "Default charge count is 1"
+  )
 })
 
 # ==============================================================================
@@ -264,7 +286,10 @@ test_that("parse_adduct calculates mass change for water loss [M+H-H2O]+", {
   expect_equal(unname(result["n_mer"]), 1)
   expect_equal(unname(result["n_charges"]), 1)
   # H minus H2O should be negative overall (net loss of ~17 Da)
-  expect_true(unname(result["los_add_clu"]) < 1, info = "Water loss reduces mass")
+  expect_true(
+    unname(result["los_add_clu"]) < 1,
+    info = "Water loss reduces mass"
+  )
 })
 
 test_that("parse_adduct calculates mass change for ammonia loss [M+H-NH3]+", {
@@ -273,7 +298,10 @@ test_that("parse_adduct calculates mass change for ammonia loss [M+H-NH3]+", {
   expect_valid_parse_result(result)
   expect_equal(unname(result["n_mer"]), 1)
   # H minus NH3 should be negative (net loss of ~16 Da)
-  expect_true(unname(result["los_add_clu"]) < 0, info = "Ammonia loss reduces mass")
+  expect_true(
+    unname(result["los_add_clu"]) < 0,
+    info = "Ammonia loss reduces mass"
+  )
 })
 
 test_that("parse_adduct calculates mass change for multiple additions [M+Na+K]+", {
@@ -352,14 +380,20 @@ test_that("parse_adduct handles alternative adduct notations with slash", {
 
   expect_valid_parse_result(result)
   # Should successfully parse at least one alternative
-  expect_true(unname(result["n_mer"]) > 0, info = "Should parse first alternative")
+  expect_true(
+    unname(result["n_mer"]) > 0,
+    info = "Should parse first alternative"
+  )
 })
 
 test_that("parse_adduct handles alternative adduct notations with pipe", {
   result <- parse_adduct("[M+H]+|[M+K]+")
 
   expect_valid_parse_result(result)
-  expect_true(unname(result["n_mer"]) > 0, info = "Should parse first alternative")
+  expect_true(
+    unname(result["n_mer"]) > 0,
+    info = "Should parse first alternative"
+  )
 })
 
 # ==============================================================================

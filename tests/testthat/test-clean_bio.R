@@ -16,18 +16,35 @@ edges_table <- tidytable::tidytable(feature_id = c("Gentiana lutea"))
 
 test_that("clean_bio removes duplicate taxonomy rows", {
   df <- tidytable::tidytable(
-    organism_name = c("Gentiana lutea","Gentiana lutea"),
-    organism_taxonomy_01domain = c("Eukaryota","Eukaryota")
+    organism_name = c("Gentiana lutea", "Gentiana lutea"),
+    organism_taxonomy_01domain = c("Eukaryota", "Eukaryota")
   )
   result <- clean_bio(df)
   expect_lte(nrow(result), 2L)
 })
 
 test_that("clean_bio validates minimal_consistency range", {
-  edges_table <- tidytable::tidytable(feature_source=character(), feature_target=character())
+  edges_table <- tidytable::tidytable(
+    feature_source = character(),
+    feature_target = character()
+  )
   annot_table_wei_bio <- tidytable::tidytable()
-  expect_error(clean_bio(annot_table_wei_bio=annot_table_wei_bio, edges_table=edges_table, minimal_consistency=-0.1), "between 0 and 1")
-  expect_error(clean_bio(annot_table_wei_bio=annot_table_wei_bio, edges_table=edges_table, minimal_consistency=1.1), "between 0 and 1")
+  expect_error(
+    clean_bio(
+      annot_table_wei_bio = annot_table_wei_bio,
+      edges_table = edges_table,
+      minimal_consistency = -0.1
+    ),
+    "between 0 and 1"
+  )
+  expect_error(
+    clean_bio(
+      annot_table_wei_bio = annot_table_wei_bio,
+      edges_table = edges_table,
+      minimal_consistency = 1.1
+    ),
+    "between 0 and 1"
+  )
 })
 
 test_that("clean_bio adds default columns when no valid edges", {
@@ -50,7 +67,11 @@ test_that("clean_bio adds default columns when no valid edges", {
     feature_spectrum_entropy = 0,
     label = NA
   )
-  result <- clean_bio(annot_table_wei_bio=annot_table_wei_bio, edges_table=edges_table, minimal_consistency=0.5)
+  result <- clean_bio(
+    annot_table_wei_bio = annot_table_wei_bio,
+    edges_table = edges_table,
+    minimal_consistency = 0.5
+  )
   expect_true("feature_pred_tax_cla_01kin_val" %in% names(result))
   expect_equal(result$feature_pred_tax_cla_01kin_val, "empty")
 })
