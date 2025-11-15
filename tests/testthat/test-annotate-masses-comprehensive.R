@@ -11,7 +11,7 @@ library(tima)
 # test_that("annotate_masses validates MS mode", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Setup minimal required files
@@ -50,7 +50,7 @@ library(tima)
 # test_that("annotate_masses validates tolerance parameters", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -110,7 +110,7 @@ test_that("annotate_masses validates file existence", {
 # test_that("annotate_masses works in positive mode", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Setup complete workflow
@@ -146,7 +146,7 @@ test_that("annotate_masses validates file existence", {
 # test_that("annotate_masses works in negative mode", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -177,7 +177,7 @@ test_that("annotate_masses validates file existence", {
 # test_that("annotate_masses accepts strict tolerances", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -205,7 +205,7 @@ test_that("annotate_masses validates file existence", {
 # test_that("annotate_masses accepts high but valid tolerances", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -237,7 +237,7 @@ test_that("annotate_masses validates file existence", {
 # test_that("annotate_masses handles empty features table", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Create empty features file
@@ -273,7 +273,7 @@ test_that("annotate_masses validates file existence", {
 # test_that("annotate_masses handles features without RT", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Create features without RT column
@@ -312,7 +312,7 @@ test_that("annotate_masses validates file existence", {
 # test_that("annotate_masses accepts custom adduct lists", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -350,7 +350,7 @@ test_that("annotate_masses validates file existence", {
 # test_that("annotate_masses produces valid output structure", {
 #   skip_on_cran()
 #
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(

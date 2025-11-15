@@ -140,7 +140,7 @@ test_that("annotate_spectra works in negative mode", {
 })
 
 # test_that("annotate_spectra handles empty library", {
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #
 #   expect_no_error(
 #     annotate_spectra(
@@ -148,7 +148,7 @@ test_that("annotate_spectra works in negative mode", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 test_that("annotate_spectra works with approximation", {

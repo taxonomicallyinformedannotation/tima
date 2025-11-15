@@ -28,7 +28,7 @@ test_that("replace_id handles different input combinations", {
 })
 
 # test_that("get_file downloads and handles existing files", {
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # First download
@@ -49,7 +49,7 @@ test_that("replace_id handles different input combinations", {
 #     regexp = "already exists"
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 test_that("get_file fails gracefully with invalid URL", {

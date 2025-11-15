@@ -78,7 +78,7 @@ test_that("calculate_mass_of_m handles NULL input", {
 
 # test_that("annotate_masses works in negative mode without RT", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Create features without RT
@@ -108,12 +108,12 @@ test_that("calculate_mass_of_m handles NULL input", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("annotate_masses works in positive mode", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Download and prepare data
@@ -135,11 +135,11 @@ test_that("calculate_mass_of_m handles NULL input", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 # test_that("annotate_masses handles pre-assigned adducts", {
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   tidytable::tidytable(
@@ -161,7 +161,7 @@ test_that("calculate_mass_of_m handles NULL input", {
 #     )
 #   )
 #
-#   unlink("data", recursive = TRUE)
+#
 # })
 
 test_that("parse_adduct handles invalid input gracefully", {

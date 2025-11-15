@@ -43,7 +43,7 @@ test_that("prepare_libraries_spectra works with default parameters", {
 
 # test_that("prepare_libraries_spectra warns when library already exists", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   get_file(
@@ -108,7 +108,7 @@ test_that("prepare_libraries_rt works with in-silico data", {
 })
 
 # test_that("prepare_libraries_rt warns on invalid SMILES", {
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #
 #   tidytable::tidytable(
 #     "rt" = 0.1,
@@ -174,7 +174,7 @@ test_that("prepare_libraries_sop_lotus handles missing input", {
 
 # test_that("prepare_libraries_sop_merged works with filtering", {
 #   skip_on_cran()
-#   copy_backbone(cache_dir = ".")
+#   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
 #   # Need LOTUS data
