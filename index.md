@@ -176,7 +176,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 |:---|:---|:---|
 | archive | 1.1.12 | Hester and Csárdi (2025) |
 | base | 4.5.2 | R Core Team (2025) |
-| BiocManager | 1.30.26 | Morgan and Ramos (2025) |
+| BiocManager | 1.30.27 | Morgan and Ramos (2025) |
 | BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
 | docopt | 0.7.2 | de Jonge (2025) |
@@ -193,6 +193,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
 | MsCoreUtils | 1.21.0 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
+| R.utils | 2.13.0 | Bengtsson (2025) |
 | reticulate | 1.44.0 | Ushey, Allaire, and Tang (2025) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
 | rotl | 3.1.0 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
@@ -213,6 +214,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
 | tima | 2.12.0 | Rutz et al. (2019); Rutz and Allard (2025) |
 | visNetwork | 2.1.4 | Almende B.V. and Contributors and Thieurmel (2025) |
+| withr | 3.0.2 | Hester et al. (2024) |
 | yaml | 2.3.10 | Garbett et al. (2024) |
 
 <div id="refs" class="references csl-bib-body hanging-indent"
@@ -251,6 +253,13 @@ arXiv:2311.10260*. <https://doi.org/10.48550/arXiv.2311.10260>.
 Attali, Dean. 2021. *<span class="nocase">shinyjs</span>: Easily Improve
 the User Experience of Your Shiny Apps in Seconds*.
 <https://doi.org/10.32614/CRAN.package.shinyjs>.
+
+</div>
+
+<div id="ref-Rutils" class="csl-entry">
+
+Bengtsson, Henrik. 2025. *<span class="nocase">R.utils</span>: Various
+Programming Utilities*. <https://doi.org/10.32614/CRAN.package.R.utils>.
 
 </div>
 
@@ -342,6 +351,15 @@ Henry, Lionel, and Hadley Wickham. 2024.
 Hester, Jim, and Gábor Csárdi. 2025.
 *<span class="nocase">archive</span>: Multi-Format Archive and
 Compression Support*. <https://doi.org/10.32614/CRAN.package.archive>.
+
+</div>
+
+<div id="ref-withr" class="csl-entry">
+
+Hester, Jim, Lionel Henry, Kirill Müller, Kevin Ushey, Hadley Wickham,
+and Winston Chang. 2024. *<span class="nocase">withr</span>: Run Code
+“With” Temporarily Modified Global State*.
+<https://doi.org/10.32614/CRAN.package.withr>.
 
 </div>
 
