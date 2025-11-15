@@ -194,7 +194,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | MsCoreUtils | 1.21.0 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
 | R.utils | 2.13.0 | Bengtsson (2025) |
-| reticulate | 1.44.0 | Ushey, Allaire, and Tang (2025) |
+| reticulate | 1.44.1 | Ushey, Allaire, and Tang (2025) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
 | rotl | 3.1.0 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
 | shiny | 1.11.1 | Chang et al. (2025) |
