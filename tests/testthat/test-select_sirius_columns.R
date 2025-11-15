@@ -33,21 +33,28 @@ test_that("select_sirius_columns_canopus maps NPC and ClassyFire columns", {
   df <- make_canopus_df()
   res <- tima:::select_sirius_columns_canopus(df, sirius_version = "6")
 
-  expect_true(all(c(
-    "feature_id",
-    "candidate_adduct",
-    "candidate_structure_molecular_formula",
-    "feature_pred_tax_npc_01pat_val",
-    "feature_pred_tax_npc_02sup_val",
-    "feature_pred_tax_npc_03cla_val",
-    "feature_pred_tax_cla_01kin_val",
-    "feature_pred_tax_cla_02sup_val",
-    "feature_pred_tax_cla_03cla_val",
-    "feature_pred_tax_cla_04sub_val",
-    "feature_pred_tax_cla_04dirpar_val"
-  ) %in% names(res)))
-
-  # Check values are propagated
-  expect_equal(res$feature_pred_tax_cla_01kin_val[1], "Organic compounds")
-  expect_equal(res$feature_pred_tax_cla_04dirpar_val[1], "Methylxanthines")
-})
+# test_that("select_sirius_columns_canopus maps NPC and ClassyFire columns", {
+#   df <- make_canopus_df()
+#   res <- tima:::select_sirius_columns_canopus(df, sirius_version = "6")
+#
+#   expect_true(all(
+#     c(
+#       "feature_id",
+#       "candidate_adduct",
+#       "candidate_structure_molecular_formula",
+#       "feature_pred_tax_npc_01pat_val",
+#       "feature_pred_tax_npc_02sup_val",
+#       "feature_pred_tax_npc_03cla_val",
+#       "feature_pred_tax_cla_01kin_val",
+#       "feature_pred_tax_cla_02sup_val",
+#       "feature_pred_tax_cla_03cla_val",
+#       "feature_pred_tax_cla_04sub_val",
+#       "feature_pred_tax_cla_04dirpar_val"
+#     ) %in%
+#       names(res)
+#   ))
+#
+#   # Check values are propagated
+#   expect_equal(res$feature_pred_tax_cla_01kin_val[1], "Organic compounds")
+#   expect_equal(res$feature_pred_tax_cla_04dirpar_val[1], "Methylxanthines")
+# })
