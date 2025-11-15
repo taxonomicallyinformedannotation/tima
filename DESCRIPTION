@@ -146,6 +146,7 @@ Collate:
     'get_example_sirius.R'
     'get_example_files.R'
     'get_gnps_tables.R'
+    'get_inchikey_from_smiles.R'
     'get_last_version_from_zenodo.R'
     'get_organism_taxonomy_ott.R'
     'globals.R'
@@ -183,3 +184,4 @@ Collate:
     'weight_chemo.R'
     'weight_bio.R'
     'weight_annotations.R'
+    'zzz.R'

@@ -7,10 +7,12 @@
 \usage{
 filter_high_confidence_only(
   df,
-  score_bio_min = 0.85,
-  score_ini_min = 0.95,
-  score_final_min = 0.75,
-  error_rt_max = 0.1
+  score_bio_min = DEFAULT_HC_SCORE_BIO_MIN,
+  score_ini_min = DEFAULT_HC_SCORE_INITIAL_MIN,
+  score_final_min = DEFAULT_HC_SCORE_FINAL_MIN,
+  error_rt_max = DEFAULT_HC_MAX_RT_ERROR_MIN,
+  confidence_sirius_min = NULL,
+  similarity_spectral_min = NULL
 )
 }
 \arguments{
@@ -23,6 +25,10 @@ filter_high_confidence_only(
 \item{score_final_min}{Numeric minimum final (chemical) score threshold (default: 0.75)}
 
 \item{error_rt_max}{Numeric maximum retention time error in minutes (default: 0.1)}
+
+\item{confidence_sirius_min}{Numeric minimum SIRIUS confidence score threshold (optional)}
+
+\item{similarity_spectral_min}{Numeric minimum spectral similarity threshold (optional)}
 }
 \value{
 Data frame containing only high-confidence annotations that meet
