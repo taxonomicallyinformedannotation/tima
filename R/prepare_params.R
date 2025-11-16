@@ -656,17 +656,17 @@ prepare_params <- function(
   yamls_params$weight_annotations$weights$chemical$cla$kingdom <-
     wei_che_11
   yamls_params$weight_annotations$weights$chemical$npc$pathway <-
-    wei_che_12
-  yamls_params$weight_annotations$weights$chemical$cla$superclass <-
-    wei_che_13
-  yamls_params$weight_annotations$weights$chemical$npc$superclass <-
-    wei_che_14
-  yamls_params$weight_annotations$weights$chemical$cla$class <-
     wei_che_21
-  yamls_params$weight_annotations$weights$chemical$npc$class <-
+  yamls_params$weight_annotations$weights$chemical$cla$superclass <-
+    wei_che_12
+  yamls_params$weight_annotations$weights$chemical$npc$superclass <-
     wei_che_22
-  yamls_params$weight_annotations$weights$chemical$cla$parent <-
+  yamls_params$weight_annotations$weights$chemical$cla$class <-
+    wei_che_13
+  yamls_params$weight_annotations$weights$chemical$npc$class <-
     wei_che_23
+  yamls_params$weight_annotations$weights$chemical$cla$parent <-
+    wei_che_14
   yamls_params$weight_annotations$options$compounds_names <-
     opt_cpd_nam
   yamls_params$weight_annotations$options$force <-
