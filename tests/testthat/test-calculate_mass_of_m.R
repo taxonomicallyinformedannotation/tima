@@ -264,12 +264,12 @@ test_that("calculate_mass_of_m handles very large masses", {
 
 # Test: Logging ----
 
-# test_that("calculate_mass_of_m logs warnings appropriately", {
-#   expect_warning(
-#     calculate_mass_of_m(mz = 100, adduct_string = "bad"),
-#     "Failed to parse"
-#   )
-# })
+test_that("calculate_mass_of_m logs warnings appropriately", {
+  expect_warning(
+    calculate_mass_of_m(mz = 100, adduct_string = "bad"),
+    "Failed to parse"
+  )
+})
 
 # Test: Real-world metabolites ----
 

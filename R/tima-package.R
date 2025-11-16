@@ -10,7 +10,12 @@ NULL
 
 .onLoad <- function(libname, pkgname) {
   # Initialize logging from environment (safe to call multiple times)
-  try({ init_logging() }, silent = TRUE)
+  try(
+    {
+      init_logging()
+    },
+    silent = TRUE
+  )
 
   # Hints/operators to appease R CMD check and lazy loading quirks
   DT::`%>%`
@@ -20,7 +25,12 @@ NULL
   visNetwork::`%>%`
 
   # Ensure RDKit availability for Python-based features (no-op if unavailable)
-  try({ reticulate::py_require(packages = "rdkit") }, silent = TRUE)
+  try(
+    {
+      reticulate::py_require(packages = "rdkit")
+    },
+    silent = TRUE
+  )
 
   invisible()
 }
