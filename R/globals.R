@@ -3,6 +3,7 @@ utils::globalVariables(
     "_tima_gnps",
     "_tima_join_gnps",
     ".",
+    ".data",
     ".N",
     ":=",
     "!!",
