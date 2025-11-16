@@ -13,24 +13,24 @@ make_fake_struct_files <- function(root = tempdir()) {
     cla = file.path(root, "classyfire.tsv"),
     npc = file.path(root, "npclassifier.tsv")
   )
-  data.table::fwrite(
-    data.table::data.table(structure_inchikey_connectivity_layer = NA),
+  tidytable::fwrite(
+    tidytable::tidytable(structure_inchikey_connectivity_layer = NA),
     paths$stereo
   )
-  data.table::fwrite(
-    data.table::data.table(structure_inchikey_connectivity_layer = NA),
+  tidytable::fwrite(
+    tidytable::tidytable(structure_inchikey_connectivity_layer = NA),
     paths$met
   )
-  data.table::fwrite(
-    data.table::data.table(structure_inchikey_connectivity_layer = NA),
+  tidytable::fwrite(
+    tidytable::tidytable(structure_inchikey_connectivity_layer = NA),
     paths$nam
   )
-  data.table::fwrite(
-    data.table::data.table(structure_inchikey_connectivity_layer = NA),
+  tidytable::fwrite(
+    tidytable::tidytable(structure_inchikey_connectivity_layer = NA),
     paths$cla
   )
-  data.table::fwrite(
-    data.table::data.table(structure_inchikey_connectivity_layer = NA),
+  tidytable::fwrite(
+    tidytable::tidytable(structure_inchikey_connectivity_layer = NA),
     paths$npc
   )
   paths
