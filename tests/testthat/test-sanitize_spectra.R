@@ -17,16 +17,16 @@ test_that("sanitize_spectra validates input type", {
   expect_error(sanitize_spectra(spectra = list()), "Spectra object")
 })
 
-# test_that("sanitize_spectra handles empty object", {
-#   empty <- Spectra::Spectra(data.frame())
-#   res <- sanitize_spectra(empty)
-#   expect_s3_class(res, "Spectra")
-#   expect_equal(length(res), 0L)
-# })
+test_that("sanitize_spectra handles empty object", {
+  empty <- Spectra::Spectra(data.frame())
+  res <- sanitize_spectra(empty)
+  expect_s4_class(res, "Spectra")
+  expect_equal(length(res), 0L)
+})
 
-# test_that("sanitize_spectra processes simple spectra", {
-#   sp <- make_spectra()
-#   res <- sanitize_spectra(sp, cutoff = 0, dalton = 0.01, ppm = 10)
-#   expect_s3_class(res, "Spectra")
-#   expect_true(length(res) <= length(sp))
-# })
+test_that("sanitize_spectra processes simple spectra", {
+  sp <- make_spectra()
+  res <- sanitize_spectra(sp, cutoff = 0, dalton = 0.01, ppm = 10)
+  expect_s4_class(res, "Spectra")
+  expect_true(length(res) <= length(sp))
+})
