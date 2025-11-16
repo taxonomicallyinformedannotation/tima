@@ -368,7 +368,8 @@ remove_comments <- function(modification_string) {
   gsub(
     pattern = " \\(.*?\\)",
     replacement = "",
-    x = modification_string
+    x = modification_string,
+    fixed = FALSE
   )
 }
 
