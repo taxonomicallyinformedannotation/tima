@@ -19,7 +19,7 @@ library(tima)
 #   ))
 #
 #   expect_true(file.exists(outputs[["structural"]]))
-#   df <- data.table::fread(outputs[["structural"]])
+#   df <- tidytable::fread(outputs[["structural"]])
 #
 #   # Similarity columns may be NA if spectral_matches file absent, but column should exist
 #   expect_true("candidate_score_similarity" %in% names(df))
