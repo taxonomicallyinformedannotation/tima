@@ -52,7 +52,7 @@ filter_high_confidence_only <- function(
 
   if (
     !is.null(confidence_sirius_min) &&
-      (confidence_sirius_min < 0 || confidence_min > 1)
+      (confidence_sirius_min < 0 || confidence_sirius_min > 1)
   ) {
     stop("confidence_sirius_min must be between 0 and 1")
   }
@@ -80,7 +80,7 @@ filter_high_confidence_only <- function(
     )
 
   # Optional: SIRIUS confidence filter if column present and threshold provided
-  if (!is.null(confidence_min)) {
+  if (!is.null(confidence_sirius_min)) {
     conf_col <- tidytable::coalesce(
       tidyselect::vars_select(
         names(df_filtered),

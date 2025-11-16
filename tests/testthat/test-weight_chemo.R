@@ -10,22 +10,111 @@ library(tima)
 # ==============================================================================
 
 # test_that("weight_chemo validates data frame input", {
+#   # Use fixture utilities
+#   empty_table <- create_empty_table("annotation")
+#
 #   expect_error(
 #     weight_chemo(
 #       annot_table_wei_chemo = "not_a_dataframe",
-#       structure_organism_pairs_table = tidytable::tidytable()
+#       structure_organism_pairs_table = empty_table,
+#       weight_spectral = 0.5,
+#       weight_chemical = 0.5,
+#       score_chemical_cla_kingdom = 0.1,
+#       score_chemical_cla_superclass = 0.2,
+#       score_chemical_cla_class = 0.3,
+#       score_chemical_cla_parent = 0.4,
+#       score_chemical_npc_pathway = 0.5,
+#       score_chemical_npc_superclass = 0.6,
+#       score_chemical_npc_class = 0.7
 #     ),
-#     "must be a data frame"
+#     "data frame"
 #   )
 # })
 
 # test_that("weight_chemo handles empty data frame", {
+#   # Use fixture utilities
+#   empty_annot <- create_empty_table("annotation")
+#   empty_sop <- create_empty_table("sop")
+#
 #   result <- weight_chemo(
-#     annot_table_wei_chemo = tidytable::tidytable(),
-#     structure_organism_pairs_table = tidytable::tidytable()
+#     annot_table_wei_chemo = empty_annot,
+#     structure_organism_pairs_table = empty_sop,
+#     weight_spectral = 0.5,
+#     weight_chemical = 0.5,
+#     score_chemical_cla_kingdom = 0.1,
+#     score_chemical_cla_superclass = 0.2,
+#     score_chemical_cla_class = 0.3,
+#     score_chemical_cla_parent = 0.4,
+#     score_chemical_npc_pathway = 0.5,
+#     score_chemical_npc_superclass = 0.6,
+#     score_chemical_npc_class = 0.7
 #   )
+#
 #   expect_s3_class(result, "data.frame")
 #   expect_equal(nrow(result), 0L)
+# })
+
+# test_that("weight_chemo validates weight ranges", {
+#   # Use fixture utilities
+#   empty_annot <- create_empty_table("annotation")
+#   empty_sop <- create_empty_table("sop")
+#
+#   expect_error(
+#     weight_chemo(
+#       annot_table_wei_chemo = empty_annot,
+#       structure_organism_pairs_table = empty_sop,
+#       weight_spectral = -0.1,
+#       weight_chemical = 0.5,
+#       score_chemical_cla_kingdom = 0.1,
+#       score_chemical_cla_superclass = 0.2,
+#       score_chemical_cla_class = 0.3,
+#       score_chemical_cla_parent = 0.4,
+#       score_chemical_npc_pathway = 0.5,
+#       score_chemical_npc_superclass = 0.6,
+#       score_chemical_npc_class = 0.7
+#     ),
+#     "between 0 and 1"
+#   )
+#
+#   expect_error(
+#     weight_chemo(
+#       annot_table_wei_chemo = empty_annot,
+#       structure_organism_pairs_table = empty_sop,
+#       weight_spectral = 0.5,
+#       weight_chemical = 1.5,
+#       score_chemical_cla_kingdom = 0.1,
+#       score_chemical_cla_superclass = 0.2,
+#       score_chemical_cla_class = 0.3,
+#       score_chemical_cla_parent = 0.4,
+#       score_chemical_npc_pathway = 0.5,
+#       score_chemical_npc_superclass = 0.6,
+#       score_chemical_npc_class = 0.7
+#     ),
+#     "between 0 and 1"
+#   )
+# })
+
+# test_that("weight_chemo validates score ranges", {
+#   # Use fixture utilities
+#   empty_annot <- create_empty_table("annotation")
+#   empty_sop <- create_empty_table("sop")
+#
+#   expect_error(
+#     weight_chemo(
+#       annot_table_wei_chemo = empty_annot,
+#       structure_organism_pairs_table = empty_sop,
+#       weight_spectral = 0.5,
+#       weight_chemical = 0.5,
+#       score_chemical_cla_kingdom = -0.1,
+#       score_chemical_cla_superclass = 0.2,
+#       score_chemical_cla_class = 0.3,
+#       score_chemical_cla_parent = 0.4,
+#       score_chemical_npc_pathway = 0.5,
+#       score_chemical_npc_superclass = 0.6,
+#       score_chemical_npc_class = 0.7
+#     ),
+#     "between 0 and 1"
+#   )
 # })
 
 # ==============================================================================
