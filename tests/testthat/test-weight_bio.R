@@ -99,7 +99,6 @@ test_that("weight_bio handles empty data frame", {
 #   )
 # })
 
-
 # test_that("weight_bio validates biological scores range", {
 #   annot_table <- tidytable::tidytable(
 #     candidate_structure_inchikey_connectivity_layer = character(0),
