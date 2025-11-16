@@ -97,10 +97,10 @@ test_that("validate_file_existence provides detailed error messages", {
 # Tests: validate_ms_mode
 # ==============================================================================
 
-# test_that("validate_ms_mode accepts valid modes", {
-#   expect_silent(validate_ms_mode("pos"))
-#   expect_silent(validate_ms_mode("neg"))
-# })
+test_that("validate_ms_mode accepts valid modes", {
+  expect_silent(validate_ms_mode("pos"))
+  expect_silent(validate_ms_mode("neg"))
+})
 
 test_that("validate_ms_mode rejects invalid modes", {
   expect_error(validate_ms_mode("positive"), "Invalid ms_mode")
@@ -124,17 +124,18 @@ test_that("validate_ms_mode provides helpful error messages", {
 })
 
 # ==============================================================================
-# Tests: validate_tolerances ----
+# Tests: validate_tolerances
+# ==============================================================================
 
-# test_that("validate_tolerances accepts valid values", {
-#   expect_silent(validate_tolerances(tolerance_ppm = 10, tolerance_rt = 0.05))
-#   expect_silent(validate_tolerances(tolerance_ppm = 5, tolerance_rt = 0.02))
-#   expect_silent(validate_tolerances(tolerance_ppm = 1, tolerance_rt = 0.01))
-#
-#   # NULL values when not required
-#   expect_silent(validate_tolerances(tolerance_ppm = 10, tolerance_rt = NULL))
-#   expect_silent(validate_tolerances(tolerance_ppm = NULL, tolerance_rt = 0.05))
-# })
+test_that("validate_tolerances accepts valid values", {
+  expect_silent(validate_tolerances(tolerance_ppm = 10, tolerance_rt = 0.05))
+  expect_silent(validate_tolerances(tolerance_ppm = 5, tolerance_rt = 0.02))
+  expect_silent(validate_tolerances(tolerance_ppm = 1, tolerance_rt = 0.01))
+
+  # NULL values when not required
+  expect_silent(validate_tolerances(tolerance_ppm = 10, tolerance_rt = NULL))
+  expect_silent(validate_tolerances(tolerance_ppm = NULL, tolerance_rt = 0.05))
+})
 
 test_that("validate_tolerances warns about high values", {
   expect_warning(
@@ -179,17 +180,18 @@ test_that("validate_tolerances handles custom limits", {
 })
 
 # ==============================================================================
-# Tests: validate_adduct_list ----
+# Tests: validate_adduct_list
+# ==============================================================================
 
-# test_that("validate_adduct_list accepts valid lists", {
-#   adducts <- list(
-#     pos = c("[M+H]+", "[M+Na]+"),
-#     neg = c("[M-H]-", "[M+Cl]-")
-#   )
-#
-#   expect_silent(validate_adduct_list(adducts, "pos"))
-#   expect_silent(validate_adduct_list(adducts, "neg"))
-# })
+test_that("validate_adduct_list accepts valid lists", {
+  adducts <- list(
+    pos = c("[M+H]+", "[M+Na]+"),
+    neg = c("[M-H]-", "[M+Cl]-")
+  )
+
+  expect_silent(validate_adduct_list(adducts, "pos"))
+  expect_silent(validate_adduct_list(adducts, "neg"))
+})
 
 test_that("validate_adduct_list rejects invalid lists", {
   # Not a list
@@ -421,12 +423,29 @@ test_that("validate_data_frame uses custom parameter names", {
 # Integration tests ----
 
 # test_that("validators work together in realistic scenarios", {
-#   # Create test files
-#   temp_features <- tempfile()
-#   temp_library <- tempfile()
-#   file.create(temp_features)
-#   file.create(temp_library)
+#   tmp <- withr::local_tempdir()
+#   withr::local_dir(tmp)
 #
+#   # Create test files
+#   temp_features <- "features.tsv"
+#   temp_library <- "library.tsv"
+#   writeLines("", temp_features)
+#   writeLines("", temp_library)
+#
+#   # Test file validators
+#   expect_silent(validate_file_path(temp_features))
+#   expect_silent(validate_file_path(temp_library))
+#
+#   # Test combined validation scenario
+#   ms_mode <- "pos"
+#   tolerance_ppm <- 10
+#   tolerance_rt <- 0.05
+#   adducts <- list(pos = c("[M+H]+", "[M+Na]+"), neg = c("[M-H]-"))
+#
+#   expect_silent(validate_ms_mode(ms_mode))
+#   expect_silent(validate_tolerances(tolerance_ppm, tolerance_rt))
+#   expect_silent(validate_adduct_list(adducts, ms_mode))
+# })
 #   # Validate all inputs for an annotation function
 #   expect_silent({
 #     validate_file_existence(list(

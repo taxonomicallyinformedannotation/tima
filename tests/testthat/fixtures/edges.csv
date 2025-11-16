@@ -1,0 +1,7 @@
+feature_source,feature_target,cosine_similarity
+FT0001,FT0002,0.85
+FT0002,FT0003,0.92
+FT0003,FT0004,0.78
+FT0001,FT0003,0.65
+FT0004,FT0005,0.88
+
