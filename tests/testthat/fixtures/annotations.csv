@@ -1,0 +1,5 @@
+feature_id,candidate_structure_inchikey_connectivity_layer,candidate_structure_name,candidate_structure_smiles_no_stereo,candidate_structure_exact_mass,candidate_library,candidate_score_similarity
+FT0001,AAAAAAAAAAAAAA,Compound A,CCCCCC,150.123,[M+H]+,0.85
+FT0002,BBBBBBBBBBBBBB,Compound B,C1CCCCC1,200.456,[M+Na]+,0.92
+FT0003,CCCCCCCCCCCCCC,Compound C,C1=CC=CC=C1,180.789,[M+H]+,0.78
+

@@ -271,7 +271,7 @@ test_that("harmonize_spectra validates vectorized column parameters", {
 #     mz = 50,
 #     intensity = 10
 #   )
-#   res <- harmonize_spectra(df, metad = "lib", mode = "pos", col_po = "mode_col")
+#   res <- tima:::harmonize_spectra(df, metad = "lib", mode = "pos", col_ad = "", col_po = "mode_col")
 #   expected_cols <- c(
 #     "adduct",
 #     "collision_energy",
@@ -290,5 +290,6 @@ test_that("harmonize_spectra validates vectorized column parameters", {
 #     "synonyms",
 #     "xlogp"
 #   )
-#   expect_true(all(expected_cols %in% names(res)))
+#   # Check that key columns are present
+#   expect_true(all(c("precursorMz", "mz", "intensity") %in% names(res)))
 # })
