@@ -703,10 +703,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <pre><code class="language-R">filter_high_confidence_only(
   df,
-  score_bio_min = 0.85,
-  score_ini_min = 0.95,
-  score_final_min = 0.75,
-  error_rt_max = 0.1
+  score_bio_min = DEFAULT_HC_SCORE_BIO_MIN,
+  score_ini_min = DEFAULT_HC_SCORE_INITIAL_MIN,
+  score_final_min = DEFAULT_HC_SCORE_FINAL_MIN,
+  error_rt_max = DEFAULT_HC_MAX_RT_ERROR_MIN,
+  confidence_sirius_min = NULL,
+  similarity_spectral_min = NULL
 )
 </code></pre>
 </section>
@@ -751,6 +753,22 @@ Numeric minimum final (chemical) score threshold (default: 0.75)
 </td>
 <td>
 Numeric maximum retention time error in minutes (default: 0.1)
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="confidence_sirius_min">confidence_sirius_min</code>
+</td>
+<td>
+Numeric minimum SIRIUS confidence score threshold (optional)
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="similarity_spectral_min">similarity_spectral_min</code>
+</td>
+<td>
+Numeric minimum spectral similarity threshold (optional)
 </td>
 </tr>
 </tbody></table>
