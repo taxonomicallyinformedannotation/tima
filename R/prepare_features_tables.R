@@ -142,6 +142,15 @@ prepare_features_tables <- function(
     tidytable::select(-tidyselect::matches("quant_peaktable"))
   rm(features_table_0)
 
+  # Normalize RT column to minutes (auto-detect if possible)
+  if (name_rt %in% colnames(features_table)) {
+    features_table[[name_rt]] <- normalize_rt_to_minutes(
+      features_table[[name_rt]],
+      unit = "auto",
+      quiet = FALSE
+    )
+  }
+
   # Standardize column names (batch replacements for efficiency)
   # logger::log_trace("Standardizing column names")
 

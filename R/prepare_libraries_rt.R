@@ -177,10 +177,12 @@ prepare_libraries_rt <- function(
       tidytable::filter(!is.na(smiles)) |>
       tidytable::distinct()
 
-    # Scalar unit-based conversion
-    if (identical(unit, "seconds")) {
-      df_tmp <- df_tmp |> tidytable::mutate(rt = rt / 60)
-    }
+    # Normalize RT to minutes using centralized utility
+    df_tmp <- df_tmp |>
+      tidytable::mutate(
+        rt = normalize_rt_to_minutes(rt, unit = unit, quiet = TRUE)
+      )
+
     df_tmp
   }
 

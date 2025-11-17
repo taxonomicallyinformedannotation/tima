@@ -176,6 +176,7 @@ Collate:
     'prepare_params.R'
     'prepare_taxa.R'
     'replace_id.R'
+    'rt_utils.R'
     'run_app.R'
     'setup_logger.R'
     'tima-package.R'
