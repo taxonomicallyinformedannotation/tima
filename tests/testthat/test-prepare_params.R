@@ -1,110 +1,117 @@
-# ==============================================================================
-# Test Suite: prepare_params and get_params
-# ==============================================================================
-#
-# @description
-# Comprehensive unit tests for parameter preparation and retrieval functions
-# used throughout the TIMA workflow.
-#
-# @coverage
-# - prepare_params with default parameters
-# - prepare_params with custom configuration
-# - prepare_params for all workflow steps
-# - get_params parameter retrieval
-# - Parameter persistence and reuse
+# ============================================================================
+# Test Suite: prepare_params & get_params (fixture-based)
+# ============================================================================
 
-# ==============================================================================
-# Test Fixtures
-# ==============================================================================
+library(testthat)
 
-# All workflow steps that should have parameter configurations
-WORKFLOW_STEPS <- c(
-  "annotate_masses",
-  "annotate_spectra",
-  "create_components",
-  "create_edges_spectra",
-  "filter_annotations",
-  "prepare_annotations_gnps",
-  "prepare_annotations_sirius",
-  "prepare_annotations_spectra",
-  "prepare_features_components",
-  "prepare_features_edges",
-  "prepare_features_tables",
-  "prepare_libraries_rt",
-  "prepare_libraries_sop_closed",
-  "prepare_libraries_sop_ecmdb",
-  "prepare_libraries_sop_hmdb",
-  "prepare_libraries_sop_lotus",
-  "prepare_libraries_sop_merged",
-  "prepare_libraries_spectra",
-  "prepare_taxa",
-  "weight_annotations"
-)
+# Ensure param fixtures are available (loaded via setup sourcing fixtures/*.R)
 
-# ==============================================================================
-# Core Functionality Tests - prepare_params
-# ==============================================================================
+# Helper to build small & advanced param fixtures with an ID
+fixture_small <- function(id = "TID") create_fixture_params_small(id)
+fixture_adv <- function(id = "TID") create_fixture_params_advanced(id)
+fixture_yamls <- function(id = "TID") create_fixture_yamls_params(id)
 
-test_that("prepare_params creates parameters with default configuration", {
-  skip("Requires full package installation with YAML files")
+# ----------------------------------------------------------------------------
+# Test: prepare_params combines small & advanced and performs id replacement
+# ----------------------------------------------------------------------------
+
+test_that("prepare_params merges fixtures and replaces {id}", {
+  options(tima_id = "ABC001")
+  testthat::local_mocked_bindings(
+    load_yaml_files = function() fixture_yamls("ABC001"),
+    get_params = function(step) {
+      if (step == "prepare_params") {
+        return(fixture_small("ABC001"))
+      }
+      if (step == "prepare_params_advanced") {
+        return(fixture_adv("ABC001"))
+      }
+      stop("unexpected step")
+    },
+    export_params = function(...) character(),
+    create_dir = function(export) invisible(NULL)
+  )
+  paths <- prepare_params()
+  expect_type(paths, "character")
+  # Check replacement for one propagated structural path template
+  tmpl <- fixture_yamls("ABC001")$yamls_params$annotate_masses$files$features$prepared$tsv
+  replaced <- sub("{id}", getOption("tima_id"), tmpl, fixed = TRUE)
+  expect_match(replaced, "ABC001")
 })
 
-test_that("prepare_params accepts custom taxon parameter", {
-  skip("Requires full package installation with YAML files")
+# ----------------------------------------------------------------------------
+# Test: prepare_params handles empty taxon gracefully
+# ----------------------------------------------------------------------------
+
+test_that("prepare_params handles empty taxon (removes raw metadata) without error", {
+  small <- fixture_small("AXX")
+  small$organisms$taxon <- "" # triggers org_tax NULL logic
+  testthat::local_mocked_bindings(
+    load_yaml_files = function() fixture_yamls("AXX"),
+    get_params = function(step) {
+      if (step == "prepare_params") {
+        return(small)
+      }
+      if (step == "prepare_params_advanced") {
+        return(fixture_adv("AXX"))
+      }
+    },
+    export_params = function(...) character(),
+    create_dir = function(export) invisible(NULL)
+  )
+  expect_silent(prepare_params())
 })
 
-test_that("prepare_params works for all workflow steps", {
-  skip("Requires full package installation with YAML files")
+# ----------------------------------------------------------------------------
+# Test: input validation errors
+# ----------------------------------------------------------------------------
+
+test_that("prepare_params validates list inputs", {
+  expect_error(prepare_params(params_small = "bad"), "list")
+  expect_error(prepare_params(params_advanced = "bad"), "list")
 })
 
-test_that("prepare_params handles reuse of existing parameters", {
-  skip("Requires full package installation with YAML files")
+# ----------------------------------------------------------------------------
+# get_params: invalid step value handling
+# ----------------------------------------------------------------------------
+
+test_that("get_params rejects missing or invalid step values", {
+  expect_error(get_params(NULL), "must be provided")
+  expect_error(get_params(""), "must be provided")
+  expect_error(get_params(NA_character_), "does not exist")
+  # Length >1 should error; capture error containing length diagnostic
+  expect_error(get_params(c("a","b")), "length = 2")
 })
 
-# ==============================================================================
-# Core Functionality Tests - get_params
-# ==============================================================================
+# ----------------------------------------------------------------------------
+# get_params: unknown step
+# ----------------------------------------------------------------------------
 
-test_that("get_params retrieves standard parameters", {
-  skip("Requires full package installation with YAML files")
+test_that("get_params errors for unknown step", {
+  # Create a temp script directory mimicking docopt scripts
+  tmp_scripts <- withr::local_tempdir()
+  writeLines("Usage: prepare_params", file.path(tmp_scripts, "prepare_params.txt"))
+  writeLines("Usage: annotate_masses", file.path(tmp_scripts, "annotate_masses.txt"))
+
+  testthat::local_mocked_bindings(
+    get_default_paths = function() list(params = list(default = list(path = "params/default"), prepare_params = "params/prepare_params.yaml")),
+    system.file = function(subdir = NULL, package = NULL) tmp_scripts,
+    parse_cli_params = function(...) list(),
+    parse_yaml_params = function(...) list(parameters = list())
+  )
+
+  expect_error(get_params("unknown"), "does not exist")
 })
 
-test_that("get_params retrieves advanced parameters", {
-  skip("Requires full package installation with YAML files")
-})
+# ----------------------------------------------------------------------------
+# prepare_params manual param injection
+# ----------------------------------------------------------------------------
 
-test_that("get_params returns consistent structure for same step", {
-  skip("Requires full package installation with YAML files")
-})
-
-# ==============================================================================
-# Parameter Structure Tests
-# ==============================================================================
-
-test_that("get_params returns parameters with expected top-level structure", {
-  skip("Requires full package installation with YAML files")
-})
-
-test_that("prepare_params handles different parameter step names", {
-  skip("Requires full package installation with YAML files")
-})
-
-# ==============================================================================
-# Integration Tests (kept minimal)
-# ==============================================================================
-
-test_that("prepare_params integrates with get_default_paths", {
-  skip("Requires full package installation with YAML files")
-})
-
-test_that("parameter workflow completes end-to-end", {
-  skip("Requires full package installation with YAML files")
-})
-
-# ==============================================================================
-# Edge Cases and Error Handling
-# ==============================================================================
-
-test_that("get_params handles unknown step gracefully", {
-  skip("Requires full package installation with YAML files")
+test_that("prepare_params accepts explicit fixture lists", {
+  testthat::local_mocked_bindings(
+    load_yaml_files = function() fixture_yamls("MANUAL"),
+    export_params = function(...) character(),
+    create_dir = function(export) invisible(NULL)
+  )
+  expect_silent(prepare_params(params_small = fixture_small("MANUAL"), params_advanced = fixture_adv("MANUAL")))
 })
