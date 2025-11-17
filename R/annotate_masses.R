@@ -107,8 +107,30 @@ annotate_masses <-
     # ============================================================================
 
     # Validate MS mode first (cheapest check)
+    # Handle NULL or missing ms_mode
+    if (is.null(ms_mode) || length(ms_mode) == 0L) {
+      stop(
+        "ms_mode is required but was NULL or empty. ",
+        "Please check your configuration file (params) for ms$polarity setting."
+      )
+    }
+
+    if (!is.character(ms_mode) || length(ms_mode) != 1L) {
+      stop(
+        "ms_mode must be a single character string, got: ",
+        class(ms_mode)[1],
+        " of length ",
+        length(ms_mode)
+      )
+    }
+
     if (!ms_mode %in% c("pos", "neg")) {
-      stop("ms_mode must be either 'pos' or 'neg', got: ", ms_mode)
+      stop(
+        "ms_mode must be either 'pos' or 'neg', got: '",
+        ms_mode,
+        "'. ",
+        "Please check your configuration file (params) for ms$polarity setting."
+      )
     }
 
     # Validate tolerances (numeric checks)
