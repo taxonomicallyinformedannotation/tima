@@ -179,7 +179,11 @@ test_that("weight_bio handles empty annotation table", {
   # Create non-empty structure-organism pairs
   sop_table <- tidytable::tidytable(
     structure_inchikey_connectivity_layer = generate_fake_inchikey(3, seed = 1),
-    organism_name = c("Gentiana lutea", "Arabidopsis thaliana", "Coffea arabica"),
+    organism_name = c(
+      "Gentiana lutea",
+      "Arabidopsis thaliana",
+      "Coffea arabica"
+    ),
     organism_taxonomy_ottid = c("123456", "234567", "345678"),
     organism_taxonomy_01domain = rep("Eukaryota", 3),
     organism_taxonomy_02kingdom = rep("Plantae", 3),
@@ -189,7 +193,11 @@ test_that("weight_bio handles empty annotation table", {
     organism_taxonomy_06family = c("Gentianaceae", "Brassicaceae", "Rubiaceae"),
     organism_taxonomy_07tribe = c(NA, NA, "Coffeeae"),
     organism_taxonomy_08genus = c("Gentiana", "Arabidopsis", "Coffea"),
-    organism_taxonomy_09species = c("Gentiana lutea", "Arabidopsis thaliana", "Coffea arabica"),
+    organism_taxonomy_09species = c(
+      "Gentiana lutea",
+      "Arabidopsis thaliana",
+      "Coffea arabica"
+    ),
     organism_taxonomy_10varietas = c(NA, NA, NA)
   )
 
@@ -490,7 +498,9 @@ test_that("weight_bio returns expected columns", {
 
   # Should preserve input columns
   expect_true("feature_id" %in% colnames(result))
-  expect_true("candidate_structure_inchikey_connectivity_layer" %in% colnames(result))
+  expect_true(
+    "candidate_structure_inchikey_connectivity_layer" %in% colnames(result)
+  )
 
   # May contain candidate_organism_name when there's a match
   # (not guaranteed, depends on whether structures match organism pairs)
@@ -521,8 +531,11 @@ test_that("weight_bio handles moderate-scale data efficiently", {
     structure_inchikey_connectivity_layer = rep(inchikeys, each = 50),
     organism_name = rep(
       c(
-        "Gentiana lutea", "Gentiana acaulis", "Arabidopsis thaliana",
-        "Coffea arabica", "Swertia perennis"
+        "Gentiana lutea",
+        "Gentiana acaulis",
+        "Arabidopsis thaliana",
+        "Coffea arabica",
+        "Swertia perennis"
       ),
       times = n_structures * 10
     )[1:(n_structures * 50)],
@@ -573,9 +586,13 @@ test_that("weight_bio handles moderate-scale data efficiently", {
 
   elapsed_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
 
-  expect_true(elapsed_time < 5, info = sprintf(
-    "Processing took %.2f seconds (expected < 5s)", elapsed_time
-  ))
+  expect_true(
+    elapsed_time < 5,
+    info = sprintf(
+      "Processing took %.2f seconds (expected < 5s)",
+      elapsed_time
+    )
+  )
 
   expect_true(nrow(result) > 0)
   expect_s3_class(result, "data.frame")
