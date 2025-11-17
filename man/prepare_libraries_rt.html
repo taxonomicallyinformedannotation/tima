@@ -711,9 +711,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   output_rt = get_params(step = "prepare_libraries_rt")\$files\$libraries\$temporal\$prepared,
   output_sop = get_params(step = "prepare_libraries_rt")\$files\$libraries\$sop\$prepared\$rt,
   col_ik = get_params(step = "prepare_libraries_rt")\$names\$mgf\$inchikey,
+  col_na = get_params(step = "prepare_libraries_rt")\$names\$mgf\$name,
   col_rt = get_params(step = "prepare_libraries_rt")\$names\$mgf\$retention_time,
   col_sm = get_params(step = "prepare_libraries_rt")\$names\$mgf\$smiles,
   name_inchikey = get_params(step = "prepare_libraries_rt")\$names\$inchikey,
+  name_name = get_params(step = "prepare_libraries_rt")\$names\$compound_name,
   name_rt = get_params(step = "prepare_libraries_rt")\$names\$rt\$library,
   name_smiles = get_params(step = "prepare_libraries_rt")\$names\$smiles,
   unit_rt = get_params(step = "prepare_libraries_rt")\$units\$rt
@@ -781,6 +783,14 @@ Character string name of InChIKey column in MGF
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="col_na">col_na</code>
+</td>
+<td>
+Character string name of chompound name column in MGF
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
 <code id="col_rt">col_rt</code>
 </td>
 <td>
@@ -801,6 +811,14 @@ Character string name of SMILES column in MGF
 </td>
 <td>
 Character string name of InChIKey column in CSV
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="name_name">name_name</code>
+</td>
+<td>
+Character string name of compound name column in CSV
 </td>
 </tr>
 <tr>
