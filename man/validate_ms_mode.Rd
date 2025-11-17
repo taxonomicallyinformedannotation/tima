@@ -17,8 +17,8 @@ Ensures the MS mode is valid ('pos' or 'neg')
 }
 \examples{
 \dontrun{
-validate_ms_mode("pos")  # OK
-validate_ms_mode("neg")  # OK
+validate_ms_mode("pos") # OK
+validate_ms_mode("neg") # OK
 validate_ms_mode("both") # Error
 }
 }
