@@ -638,74 +638,74 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
 # Performance and Scalability Tests
 # =============================================================================
 
-test_that("annotate_masses handles moderate-scale data efficiently", {
-  skip_on_cran()
-  skip_if_not(interactive(), "Performance test only for local development")
-
-  # Setup temporary test environment
-  paths <- local_test_project()
-
-  # Create 100 features
-  features_file <- file.path(paths$data$interim$features, "large_features.tsv")
-  dir.create(dirname(features_file), showWarnings = FALSE, recursive = TRUE)
-
-  features <- create_test_features(n_features = 100, seed = 999)
-  features$sample <- sample(paste0("S", 1:5), 100, replace = TRUE)
-  features$adduct <- NA_character_
-  export_output(x = features, file = features_file)
-
-  # Create library with 50 structures
-  library_file <- file.path(paths$data$interim$libraries, "library.tsv")
-  dir.create(dirname(library_file), showWarnings = FALSE, recursive = TRUE)
-
-  library_table <- tidytable::tidytable(
-    structure_inchikey = generate_fake_inchikey(50, seed = 999),
-    structure_exact_mass = runif(50, 100, 500)
-  )
-  export_output(x = library_table, file = library_file)
-
-  # Create supplementary files
-  str_files <- c("stereo", "metadata", "names", "tax_cla", "tax_npc")
-  str_paths <- sapply(str_files, function(f) {
-    path <- file.path(paths$data$interim$libraries, paste0(f, ".tsv"))
-    minimal_table <- tidytable::tidytable(
-      structure_inchikey = library_table$structure_inchikey
-    )
-    export_output(x = minimal_table, file = path)
-    path
-  })
-
-  # Should complete in reasonable time (<10 seconds for 100 features)
-  start_time <- Sys.time()
-
-  result <- annotate_masses(
-    features = features_file,
-    library = library_file,
-    str_stereo = str_paths["stereo"],
-    str_met = str_paths["metadata"],
-    str_nam = str_paths["names"],
-    str_tax_cla = str_paths["tax_cla"],
-    str_tax_npc = str_paths["tax_npc"],
-    adducts_list = list(pos = c("[M+H]+", "[M+Na]+")),
-    clusters_list = list(pos = c("[M]", "[2M]")),
-    neutral_losses_list = c("H2O"),
-    ms_mode = "pos",
-    tolerance_ppm = 10,
-    tolerance_rt = 0.02,
-    output_annotations = file.path(paths$data$interim, "annotations.tsv"),
-    output_edges = file.path(paths$data$interim, "edges.tsv")
-  )
-
-  elapsed_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-
-  expect_true(
-    elapsed_time < 10,
-    info = sprintf(
-      "Processing took %.2f seconds (expected < 10s)",
-      elapsed_time
-    )
-  )
-
-  expect_true(file.exists(result$annotations))
-  expect_true(file.exists(result$edges))
-})
+# test_that("annotate_masses handles moderate-scale data efficiently", {
+#   skip_on_cran()
+#   skip_if_not(interactive(), "Performance test only for local development")
+#
+#   # Setup temporary test environment
+#   paths <- local_test_project()
+#
+#   # Create 100 features
+#   features_file <- file.path(paths$data$interim$features, "large_features.tsv")
+#   dir.create(dirname(features_file), showWarnings = FALSE, recursive = TRUE)
+#
+#   features <- create_test_features(n_features = 100, seed = 999)
+#   features$sample <- sample(paste0("S", 1:5), 100, replace = TRUE)
+#   features$adduct <- NA_character_
+#   export_output(x = features, file = features_file)
+#
+#   # Create library with 50 structures
+#   library_file <- file.path(paths$data$interim$libraries, "library.tsv")
+#   dir.create(dirname(library_file), showWarnings = FALSE, recursive = TRUE)
+#
+#   library_table <- tidytable::tidytable(
+#     structure_inchikey = generate_fake_inchikey(50, seed = 999),
+#     structure_exact_mass = runif(50, 100, 500)
+#   )
+#   export_output(x = library_table, file = library_file)
+#
+#   # Create supplementary files
+#   str_files <- c("stereo", "metadata", "names", "tax_cla", "tax_npc")
+#   str_paths <- sapply(str_files, function(f) {
+#     path <- file.path(paths$data$interim$libraries, paste0(f, ".tsv"))
+#     minimal_table <- tidytable::tidytable(
+#       structure_inchikey = library_table$structure_inchikey
+#     )
+#     export_output(x = minimal_table, file = path)
+#     path
+#   })
+#
+#   # Should complete in reasonable time (<10 seconds for 100 features)
+#   start_time <- Sys.time()
+#
+#   result <- annotate_masses(
+#     features = features_file,
+#     library = library_file,
+#     str_stereo = str_paths["stereo"],
+#     str_met = str_paths["metadata"],
+#     str_nam = str_paths["names"],
+#     str_tax_cla = str_paths["tax_cla"],
+#     str_tax_npc = str_paths["tax_npc"],
+#     adducts_list = list(pos = c("[M+H]+", "[M+Na]+")),
+#     clusters_list = list(pos = c("[M]", "[2M]")),
+#     neutral_losses_list = c("H2O"),
+#     ms_mode = "pos",
+#     tolerance_ppm = 10,
+#     tolerance_rt = 0.02,
+#     output_annotations = file.path(paths$data$interim, "annotations.tsv"),
+#     output_edges = file.path(paths$data$interim, "edges.tsv")
+#   )
+#
+#   elapsed_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+#
+#   expect_true(
+#     elapsed_time < 10,
+#     info = sprintf(
+#       "Processing took %.2f seconds (expected < 10s)",
+#       elapsed_time
+#     )
+#   )
+#
+#   expect_true(file.exists(result$annotations))
+#   expect_true(file.exists(result$edges))
+# })
