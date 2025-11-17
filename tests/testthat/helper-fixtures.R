@@ -11,18 +11,15 @@
 # Deterministic random helper ----
 .with_seed <- function(seed, expr) {
   if (!is.null(seed)) {
-    # Ensure RNG is initialized before accessing .Random.seed
-    if (!exists(".Random.seed", envir = .GlobalEnv)) {
-      set.seed(NULL) # Initialize RNG
-    }
-    old <- .Random.seed
+    # Initialize RNG deterministically without relying on existing .Random.seed
+    set.seed(seed)
     on.exit(
       {
-        if (exists("old", inherits = FALSE)) .Random.seed <<- old
+        # Restore a random state (not strictly needed for tests) by reseeding with current time
+        set.seed(as.integer(Sys.time()) %% .Machine$integer.max)
       },
       add = TRUE
     )
-    set.seed(seed)
   }
   force(expr)
 }
