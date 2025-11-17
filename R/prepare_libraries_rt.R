@@ -61,167 +61,127 @@ prepare_libraries_rt <- function(
   name_smiles = get_params(step = "prepare_libraries_rt")$names$smiles,
   unit_rt = get_params(step = "prepare_libraries_rt")$units$rt
 ) {
+  # ============================================================================
+  # Validate core arguments and normalize outputs
+  # ============================================================================
   # Validate RT unit
   if (!unit_rt %in% c("seconds", "minutes")) {
     stop("unit_rt must be 'seconds' or 'minutes', got: ", unit_rt)
   }
 
-  # Validate output paths
-  if (!is.character(output_rt) || length(output_rt) != 1L) {
-    stop("output_rt must be a single character string")
+  # Helper to validate a single output path and ensure its directory exists
+  .validate_output_path <- function(path, arg_name) {
+    if (
+      !is.character(path) || length(path) != 1L || is.na(path) || !nzchar(path)
+    ) {
+      stop(arg_name, " must be a single character string")
+    }
+    dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+    path
   }
 
-  if (!is.character(output_sop) || length(output_sop) != 1L) {
-    stop("output_sop must be a single character string")
-  }
+  # Validate output paths (also ensures parent dir exists)
+  output_rt <- .validate_output_path(output_rt, "output_rt")
+  output_sop <- .validate_output_path(output_sop, "output_sop")
 
   logger::log_info("Preparing retention time libraries")
   logger::log_debug("RT unit: {unit_rt}")
 
-  ## default transforms from `Spectra`
-  if (!is.na(col_rt) && col_rt == "RTINSECONDS") {
+  # Default transforms from `Spectra`
+  if (!is.na(col_rt) && identical(col_rt, "RTINSECONDS")) {
     col_rt <- "rtime"
   }
-  if (!is.na(col_sm) && col_sm == "SMILES") {
+  if (!is.na(col_sm) && identical(col_sm, "SMILES")) {
     col_sm <- "smiles"
   }
 
-  full_or_null <- function(x) {
-    if (length(x) == 0) {
-      NULL
-    } else {
-      x
+  # ============================================================================
+  # Normalize input vectors
+  # ============================================================================
+  .normalize_input_vec <- function(x) {
+    # Accept NULL or character vectors, return NULL if empty/NA/blank
+    if (is.null(x)) {
+      return(NULL)
     }
-  }
-  mgf_exp <- mgf_exp |>
-    purrr::map(.f = full_or_null)
-  mgf_exp <- mgf_exp[
-    mgf_exp |>
-      purrr::map(
-        .f = function(x) {
-          !is.null(x)
-        }
-      ) |>
-      unlist()
-  ]
-  mgf_is <- mgf_is |>
-    purrr::map(.f = full_or_null)
-  mgf_is <- mgf_is[
-    mgf_is |>
-      purrr::map(
-        .f = function(x) {
-          !is.null(x)
-        }
-      ) |>
-      unlist()
-  ]
-  mgf_exp <- mgf_exp |>
-    purrr::map(.f = full_or_null)
-  temp_exp <- temp_exp[
-    temp_exp |>
-      purrr::map(
-        .f = function(x) {
-          !is.null(x)
-        }
-      ) |>
-      unlist()
-  ]
-  mgf_is <- mgf_is |>
-    purrr::map(.f = full_or_null)
-  temp_is <- temp_is[
-    temp_is |>
-      purrr::map(
-        .f = function(x) {
-          !is.null(x)
-        }
-      ) |>
-      unlist()
-  ]
-  if (length(mgf_exp) == 0) {
-    mgf_exp <- NULL
-  }
-  if (length(mgf_is) == 0) {
-    mgf_is <- NULL
-  }
-  if (length(temp_exp) == 0) {
-    temp_exp <- NULL
-  }
-  if (length(temp_is) == 0) {
-    temp_is <- NULL
+    x <- as.character(x)
+    x <- x[!is.na(x) & nzchar(trimws(x))]
+    if (length(x) == 0L) NULL else x
   }
 
-  rts_from_mgf <-
-    function(mgf) {
-      # logger::log_trace("Importing spectra")
-      spectra <- mgf |>
-        purrr::map(.f = import_spectra)
-      # logger::log_trace("Extracting retention times")
-      rts <- spectra |>
-        purrr::map(.f = function(x) {
-          x@backend@spectraData |>
-            data.frame() |>
-            tidytable::as_tidytable()
-        }) |>
-        tidytable::bind_rows() |>
-        tidytable::select(tidyselect::any_of(c(
-          rt = col_rt,
-          inchikey = col_ik,
-          smiles = col_sm
-        )))
-      return(rts)
-    }
+  mgf_exp <- .normalize_input_vec(mgf_exp)
+  mgf_is <- .normalize_input_vec(mgf_is)
+  temp_exp <- .normalize_input_vec(temp_exp)
+  temp_is <- .normalize_input_vec(temp_is)
 
-  rts_from_tab <-
-    function(tab) {
-      # logger::log_trace("Importing file")
-      rts <- tab |>
-        purrr::map(.f = tidytable::fread) |>
-        tidytable::bind_rows() |>
-        tidytable::select(tidyselect::any_of(
-          c(
-            rt = name_rt,
-            inchikey = name_inchikey,
-            smiles = name_smiles
-          )
-        ))
-      return(rts)
-    }
+  # ============================================================================
+  # Readers
+  # ============================================================================
+  rts_from_mgf <- function(mgf) {
+    # logger::log_trace("Importing spectra")
+    spectra <- mgf |> purrr::map(.f = import_spectra)
+    # logger::log_trace("Extracting retention times")
+    rts <- spectra |>
+      purrr::map(.f = function(x) {
+        x@backend@spectraData |> data.frame() |> tidytable::as_tidytable()
+      }) |>
+      tidytable::bind_rows() |>
+      tidytable::select(tidyselect::any_of(c(
+        rt = col_rt,
+        inchikey = col_ik,
+        smiles = col_sm
+      )))
+    rts
+  }
 
-  polish_df <-
-    function(df, type = "experimental", unit = unit_rt) {
-      df_polished <- df |>
-        data.frame() |>
-        tidytable::mutate(type = type) |>
-        tidytable::rowwise() |>
-        tidytable::mutate(
-          rt = tidytable::if_else(
-            condition = unit == "seconds",
-            true = as.numeric(rt) / 60L,
-            false = as.numeric(rt)
-          )
-        ) |>
-        tidytable::bind_rows(data.frame(
-          inchikey = NA_character_,
-          smiles = NA_character_
-        )) |>
-        tidytable::filter(!is.na(rt)) |>
-        tidytable::filter(!is.na(smiles)) |>
-        tidytable::distinct()
-      return(df_polished)
+  rts_from_tab <- function(tab) {
+    # logger::log_trace("Importing file")
+    tab |>
+      purrr::map(.f = tidytable::fread) |>
+      tidytable::bind_rows() |>
+      tidytable::select(tidyselect::any_of(c(
+        rt = name_rt,
+        inchikey = name_inchikey,
+        smiles = name_smiles
+      )))
+  }
+
+  # ============================================================================
+  # Polishing utilities
+  # ============================================================================
+  polish_df <- function(df, type = "experimental", unit = unit_rt) {
+    df_tmp <- df |>
+      data.frame() |>
+      tidytable::mutate(type = type) |>
+      tidytable::mutate(rt = as.numeric(rt)) |>
+      # Ensure columns exist even if missing from sources
+      tidytable::bind_rows(data.frame(
+        inchikey = NA_character_,
+        smiles = NA_character_
+      )) |>
+      tidytable::filter(!is.na(rt)) |>
+      tidytable::filter(!is.na(smiles)) |>
+      tidytable::distinct()
+    # Scalar unit-based conversion
+    if (identical(unit, "seconds")) {
+      df_tmp <- df_tmp |> tidytable::mutate(rt = rt / 60)
     }
+    df_tmp
+  }
 
   complete_df <- function(df) {
-    df_full <- df |>
-      tidytable::filter(!is.na(inchikey))
-    df_missing <- df |>
-      tidytable::filter(is.na(inchikey))
-    logger::log_warn(
-      "There are ",
-      nrow(df_missing),
-      " entries without InChIKey.",
-      " We would recommend you adding them but will try completing.",
-      " We will query them on the fly, this might take some time."
-    )
+    df_full <- df |> tidytable::filter(!is.na(inchikey))
+    df_missing <- df |> tidytable::filter(is.na(inchikey))
+
+    if (nrow(df_missing) > 0L) {
+      logger::log_warn(
+        "There are ",
+        nrow(df_missing),
+        " entries without InChIKey.",
+        " We would recommend you adding them but will try completing.",
+        " We will query them on the fly, this might take some time."
+      )
+    }
+
     smiles <- unique(df_missing$smiles)
 
     ## TODO replace with process_smiles
@@ -232,31 +192,22 @@ prepare_libraries_rt <- function(
         "&toolkit=",
         toolkit
       )
-      tryCatch(
-        expr = jsonlite::fromJSON(txt = url),
-        error = function(e) {
-          return(NA_character_)
-        }
-      )
+      tryCatch(expr = jsonlite::fromJSON(txt = url), error = function(e) {
+        NA_character_
+      })
     }
 
-    inchikey <- purrr::map(.x = smiles, .f = get_inchikey) |>
-      as.character()
+    inchikey <- purrr::map(.x = smiles, .f = get_inchikey) |> as.character()
     df_missing <- df_missing |>
       tidytable::select(-inchikey) |>
       tidytable::left_join(tidytable::tidytable(smiles, inchikey))
-    rm(smiles)
 
     df_completed <- df_full |>
       tidytable::bind_rows(df_missing) |>
       tidytable::mutate(tidytable::across(
         .cols = tidyselect::where(is.character),
-        .fns = function(x) {
-          tidytable::na_if(x, "NA")
-        }
-      ))
-    rm(df_full, df_missing)
-    df_completed <- df_completed |>
+        .fns = function(x) tidytable::na_if(x, "NA")
+      )) |>
       tidytable::select(
         rt,
         structure_smiles = smiles,
@@ -264,17 +215,13 @@ prepare_libraries_rt <- function(
         type
       ) |>
       tidytable::distinct()
+
     logger::log_warn(
       "There were still ",
-      nrow(
-        df_completed |>
-          tidytable::filter(is.na(
-            structure_inchikey
-          ))
-      ),
+      nrow(df_completed |> tidytable::filter(is.na(structure_inchikey))),
       " entries for which no InChIKey could not be found in the end."
     )
-    return(df_completed)
+    df_completed
   }
 
   empty_df <- tidytable::tidytable(
@@ -284,45 +231,38 @@ prepare_libraries_rt <- function(
     type = NA_character_
   )
 
-  ## from mgf
-  if (!is.null(mgf_exp)) {
-    rts_exp_1 <- mgf_exp |>
-      rts_from_mgf() |>
-      polish_df() |>
-      complete_df()
+  # ============================================================================
+  # Build RT tables from sources
+  # ============================================================================
+  # from mgf
+  rts_exp_1 <- if (!is.null(mgf_exp)) {
+    mgf_exp |> rts_from_mgf() |> polish_df() |> complete_df()
   } else {
-    rts_exp_1 <- empty_df
+    empty_df
   }
-  if (!is.null(mgf_is)) {
-    rts_is_1 <- mgf_is |>
-      rts_from_mgf() |>
-      polish_df(type = "predicted") |>
-      complete_df()
+  rts_is_1 <- if (!is.null(mgf_is)) {
+    mgf_is |> rts_from_mgf() |> polish_df(type = "predicted") |> complete_df()
   } else {
-    rts_is_1 <- empty_df
+    empty_df
   }
 
-  ## from csv
-  if (!is.null(temp_exp)) {
-    rts_exp_2 <- temp_exp |>
-      rts_from_tab() |>
-      polish_df() |>
-      complete_df()
+  # from csv
+  rts_exp_2 <- if (!is.null(temp_exp)) {
+    temp_exp |> rts_from_tab() |> polish_df() |> complete_df()
   } else {
-    rts_exp_2 <- empty_df
+    empty_df
   }
-  if (!is.null(temp_is)) {
-    rts_is_2 <- temp_is |>
-      rts_from_tab() |>
-      polish_df(type = "predicted") |>
-      complete_df()
+  rts_is_2 <- if (!is.null(temp_is)) {
+    temp_is |> rts_from_tab() |> polish_df(type = "predicted") |> complete_df()
   } else {
-    rts_is_2 <- empty_df
+    empty_df
   }
 
   df_rts <- tidytable::bind_rows(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2) |>
     tidytable::filter(!is.na(as.numeric(rt))) |>
     tidytable::filter(!is.na((structure_inchikey)))
+
+  # Free memory
   rm(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2)
 
   sop <- df_rts |>
@@ -354,6 +294,7 @@ prepare_libraries_rt <- function(
       candidate_structure_inchikey_connectivity_layer,
       type
     )
+
   rm(df_rts)
 
   if (nrow(rts) == 0) {
@@ -384,7 +325,12 @@ prepare_libraries_rt <- function(
     step = "prepare_libraries_rt"
   )
   export_output(x = rts, file = output_rt)
-  export_output(x = sop, file = output_sop)
+  # Write SOP with organism_name encoded as 'NA' to roundtrip to NA on read
+  sop_to_write <- sop |>
+    tidytable::mutate(
+      organism_name = ifelse(is.na(organism_name), "NA", organism_name)
+    )
+  export_output(x = sop_to_write, file = output_sop)
   rm(rts, sop)
   return(c("rt" = output_rt, "sop" = output_sop))
 }
