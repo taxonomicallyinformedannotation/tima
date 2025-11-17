@@ -15,9 +15,6 @@
 # - Complex modifications (losses, multiple additions)
 # - Edge cases and error handling
 
-library(testthat)
-library(tima)
-
 # ==============================================================================
 # Test Fixtures
 # ==============================================================================

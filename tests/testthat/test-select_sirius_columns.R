@@ -2,9 +2,6 @@
 # Test Suite: select_sirius_columns_* mappings
 # ==============================================================================
 
-library(testthat)
-library(tima)
-
 make_canopus_df <- function() {
   data.frame(
     mappingFeatureId = c("f1", "f2"),

@@ -1,8 +1,6 @@
 # ==============================================================================
 # Test Suite: create_edges_spectra
 # ==============================================================================
-library(testthat)
-library(tima)
 
 test_that("create_edges_spectra validates thresholds", {
   tmp <- withr::local_tempdir()

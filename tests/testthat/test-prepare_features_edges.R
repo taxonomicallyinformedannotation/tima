@@ -1,5 +1,4 @@
 # Test: Prepare Features Edges
-library(testthat)
 
 # =============================================================================
 # Tests for prepare_features_edges() - Network Edge Processing

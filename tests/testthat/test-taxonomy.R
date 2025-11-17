@@ -1,5 +1,4 @@
 # Test: Taxonomy Functions
-library(testthat)
 
 # test_that("prepare_taxa works with forced organism", {
 #   skip_on_cran()

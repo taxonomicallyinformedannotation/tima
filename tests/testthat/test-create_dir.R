@@ -1,8 +1,6 @@
 # ==============================================================================
 # Test Suite: create_dir
 # ==============================================================================
-library(testthat)
-library(tima)
 
 test_that("create_dir creates directory for file path", {
   tmp <- withr::local_tempdir()

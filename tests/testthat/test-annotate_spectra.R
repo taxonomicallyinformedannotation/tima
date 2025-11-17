@@ -2,12 +2,6 @@
 # Test Suite: annotate_spectra
 # ==============================================================================
 
-# Comprehensive Test Suite for annotate_spectra
-# Generated: 2025-11-14
-
-library(testthat)
-library(tima)
-
 write_minimal_mgf <- function(path, pepmass = 100, charge = "1+") {
   dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
   lines <- c(

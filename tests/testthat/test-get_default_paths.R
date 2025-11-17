@@ -1,8 +1,6 @@
 # ==============================================================================
 # Test Suite: get_default_paths
 # ==============================================================================
-library(testthat)
-library(tima)
 
 test_that("get_default_paths returns named list", {
   paths <- get_default_paths()

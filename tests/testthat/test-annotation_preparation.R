@@ -1,5 +1,4 @@
 # Test: Annotation Preparation Functions
-library(testthat)
 
 # test_that("prepare_annotations_gnps handles missing input", {
 #   local_test_project(copy = TRUE)

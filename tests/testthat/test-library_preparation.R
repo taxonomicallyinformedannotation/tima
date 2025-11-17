@@ -1,6 +1,4 @@
 # Test: Library Preparation Functions
-library(testthat)
-library(tima)
 
 test_that("prepare_libraries_spectra handles non-existent input", {
   skip("Integration test - requires package structure")

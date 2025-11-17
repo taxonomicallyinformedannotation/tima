@@ -2,9 +2,6 @@
 # Test Suite: prepare_annotations_sirius integration (v6 spectral matches)
 # ==============================================================================
 
-library(testthat)
-library(tima)
-
 # test_that("prepare_annotations_sirius integrates spectral matches for v6", {
 #   skip_on_cran()
 #   local_test_project(copy = TRUE)

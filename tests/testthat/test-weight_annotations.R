@@ -1,6 +1,4 @@
 # Test: Weight Annotations - Full Integration Function
-library(testthat)
-library(tima)
 
 # =============================================================================
 # Fast validation tests for weight_annotations() - avoid heavy I/O

@@ -13,9 +13,6 @@
 # - get_params parameter retrieval
 # - Parameter persistence and reuse
 
-library(testthat)
-library(tima)
-
 # ==============================================================================
 # Test Fixtures
 # ==============================================================================

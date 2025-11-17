@@ -15,9 +15,6 @@
 # This file tests multiple utility functions. Consider splitting into separate
 # test files as the codebase grows.
 
-library(testthat)
-library(tima)
-
 # ==============================================================================
 # Tests: change_params_small
 # ==============================================================================

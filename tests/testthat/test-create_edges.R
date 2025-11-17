@@ -1,9 +1,6 @@
 # Test Suite for create_edges()
 # Tests the spectral similarity network edge creation function
 
-library(testthat)
-library(tima)
-
 # ==============================================================================
 # Helper: Create Test Spectra
 # ==============================================================================

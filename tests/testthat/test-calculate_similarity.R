@@ -1,8 +1,6 @@
 # ==============================================================================
 # Test Suite: calculate_similarity
 # ==============================================================================
-library(testthat)
-library(tima)
 
 make_spec <- function(mz, int) {
   matrix(c(mz, int), ncol = 2, dimnames = list(NULL, c("mz", "int")))
