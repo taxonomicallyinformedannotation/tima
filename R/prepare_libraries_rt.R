@@ -16,9 +16,11 @@
 #' @param output_rt Character string path for prepared RT library output
 #' @param output_sop Character string path for pseudo SOP output
 #' @param col_ik Character string name of InChIKey column in MGF
+#' @param col_na Character string name of chompound name column in MGF
 #' @param col_rt Character string name of retention time column in MGF
 #' @param col_sm Character string name of SMILES column in MGF
 #' @param name_inchikey Character string name of InChIKey column in CSV
+#' @param name_name Character string name of compound name column in CSV
 #' @param name_rt Character string name of retention time column in CSV
 #' @param name_smiles Character string name of SMILES column in CSV
 #' @param unit_rt Character string RT unit: "seconds" or "minutes"
@@ -54,9 +56,11 @@ prepare_libraries_rt <- function(
     step = "prepare_libraries_rt"
   )$files$libraries$sop$prepared$rt,
   col_ik = get_params(step = "prepare_libraries_rt")$names$mgf$inchikey,
+  col_na = get_params(step = "prepare_libraries_rt")$names$mgf$name,
   col_rt = get_params(step = "prepare_libraries_rt")$names$mgf$retention_time,
   col_sm = get_params(step = "prepare_libraries_rt")$names$mgf$smiles,
   name_inchikey = get_params(step = "prepare_libraries_rt")$names$inchikey,
+  name_name = get_params(step = "prepare_libraries_rt")$names$compound_name,
   name_rt = get_params(step = "prepare_libraries_rt")$names$rt$library,
   name_smiles = get_params(step = "prepare_libraries_rt")$names$smiles,
   unit_rt = get_params(step = "prepare_libraries_rt")$units$rt
@@ -123,13 +127,16 @@ prepare_libraries_rt <- function(
     # logger::log_trace("Extracting retention times")
     rts <- spectra |>
       purrr::map(.f = function(x) {
-        x@backend@spectraData |> data.frame() |> tidytable::as_tidytable()
+        x@backend@spectraData |>
+          data.frame() |>
+          tidytable::as_tidytable()
       }) |>
       tidytable::bind_rows() |>
       tidytable::select(tidyselect::any_of(c(
         rt = col_rt,
         inchikey = col_ik,
-        smiles = col_sm
+        smiles = col_sm,
+        structure_name = col_na
       )))
     rts
   }
@@ -142,7 +149,8 @@ prepare_libraries_rt <- function(
       tidytable::select(tidyselect::any_of(c(
         rt = name_rt,
         inchikey = name_inchikey,
-        smiles = name_smiles
+        smiles = name_smiles,
+        structure_name = name_name
       )))
   }
 
@@ -157,7 +165,8 @@ prepare_libraries_rt <- function(
       # Ensure columns exist even if missing from sources
       tidytable::bind_rows(data.frame(
         inchikey = NA_character_,
-        smiles = NA_character_
+        smiles = NA_character_,
+        structure_name = NA_character_
       )) |>
       tidytable::filter(!is.na(rt)) |>
       tidytable::filter(!is.na(smiles)) |>
@@ -213,6 +222,7 @@ prepare_libraries_rt <- function(
         rt,
         structure_smiles = smiles,
         structure_inchikey = inchikey,
+        structure_name,
         type
       ) |>
       tidytable::distinct()
@@ -229,6 +239,7 @@ prepare_libraries_rt <- function(
     rt = NA_real_,
     structure_smiles = NA_character_,
     structure_inchikey = NA_character_,
+    structure_name = NA_character_,
     type = NA_character_
   )
 
@@ -237,24 +248,36 @@ prepare_libraries_rt <- function(
   # ============================================================================
   # from mgf
   rts_exp_1 <- if (!is.null(mgf_exp)) {
-    mgf_exp |> rts_from_mgf() |> polish_df() |> complete_df()
+    mgf_exp |>
+      rts_from_mgf() |>
+      polish_df() |>
+      complete_df()
   } else {
     empty_df
   }
   rts_is_1 <- if (!is.null(mgf_is)) {
-    mgf_is |> rts_from_mgf() |> polish_df(type = "predicted") |> complete_df()
+    mgf_is |>
+      rts_from_mgf() |>
+      polish_df(type = "predicted") |>
+      complete_df()
   } else {
     empty_df
   }
 
   # from csv
   rts_exp_2 <- if (!is.null(temp_exp)) {
-    temp_exp |> rts_from_tab() |> polish_df() |> complete_df()
+    temp_exp |>
+      rts_from_tab() |>
+      polish_df() |>
+      complete_df()
   } else {
     empty_df
   }
   rts_is_2 <- if (!is.null(temp_is)) {
-    temp_is |> rts_from_tab() |> polish_df(type = "predicted") |> complete_df()
+    temp_is |>
+      rts_from_tab() |>
+      polish_df(type = "predicted") |>
+      complete_df()
   } else {
     empty_df
   }
@@ -267,7 +290,7 @@ prepare_libraries_rt <- function(
   rm(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2)
 
   sop <- df_rts |>
-    tidytable::select(structure_smiles, structure_inchikey) |>
+    tidytable::select(structure_smiles, structure_inchikey, structure_name) |>
     tidytable::distinct() |>
     tidytable::mutate(
       structure_inchikey_connectivity_layer = stringi::stri_sub(
@@ -300,19 +323,14 @@ prepare_libraries_rt <- function(
 
   if (nrow(rts) == 0) {
     logger::log_warn(
-      "No retention time library found, returning empty sop table."
+      "No retention time library found, returning empty retention time and sop tables."
     )
     sop <- tidytable::tidytable(
+      structure_name = NA_character_,
       structure_smiles = NA_character_,
       structure_inchikey = NA_character_,
       structure_inchikey_connectivity_layer = NA_character_,
       organism_name = NA_character_
-    )
-  }
-
-  if (nrow(rts) == 0) {
-    logger::log_warn(
-      "No retention time library found, returning empty retention time table."
     )
     rts <- tidytable::tidytable(
       rt = NA_real_,

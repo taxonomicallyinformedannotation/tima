@@ -5,6 +5,7 @@
 * Added a minimal output
 * Added a parameter to limit the numbers of neighbors used for chemical consistency calculation (#193)
 * Added MERLIN spectral libraries (#190)
+* Added optional compound name from RT libraries
 * Added `RDKit`-based structures processing through `reticulate` (#19)
 * Breaking Change: `.RDS` spectra are now stored more efficiently. To avoid errors, delete any `.RDS` files created before version `2.12.0`
 * Externalized spectral libraries preparation to [SpectRalLibRaRies](https://github.com/Adafede/SpectRalLibRaRies)

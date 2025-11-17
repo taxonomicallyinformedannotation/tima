@@ -12,9 +12,11 @@ prepare_libraries_rt(
   output_rt = get_params(step = "prepare_libraries_rt")$files$libraries$temporal$prepared,
   output_sop = get_params(step = "prepare_libraries_rt")$files$libraries$sop$prepared$rt,
   col_ik = get_params(step = "prepare_libraries_rt")$names$mgf$inchikey,
+  col_na = get_params(step = "prepare_libraries_rt")$names$mgf$name,
   col_rt = get_params(step = "prepare_libraries_rt")$names$mgf$retention_time,
   col_sm = get_params(step = "prepare_libraries_rt")$names$mgf$smiles,
   name_inchikey = get_params(step = "prepare_libraries_rt")$names$inchikey,
+  name_name = get_params(step = "prepare_libraries_rt")$names$compound_name,
   name_rt = get_params(step = "prepare_libraries_rt")$names$rt$library,
   name_smiles = get_params(step = "prepare_libraries_rt")$names$smiles,
   unit_rt = get_params(step = "prepare_libraries_rt")$units$rt
@@ -35,11 +37,15 @@ prepare_libraries_rt(
 
 \item{col_ik}{Character string name of InChIKey column in MGF}
 
+\item{col_na}{Character string name of chompound name column in MGF}
+
 \item{col_rt}{Character string name of retention time column in MGF}
 
 \item{col_sm}{Character string name of SMILES column in MGF}
 
 \item{name_inchikey}{Character string name of InChIKey column in CSV}
+
+\item{name_name}{Character string name of compound name column in CSV}
 
 \item{name_rt}{Character string name of retention time column in CSV}
 

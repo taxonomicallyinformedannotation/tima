@@ -134,6 +134,7 @@ prepare_params <- function(
   ms_tol_mas_dal_ms2 <- params_advanced$ms$tolerances$mass$dalton$ms2
   ms_tol_rt_add <- params_advanced$ms$tolerances$rt$adducts
   ms_tol_rt_lib <- params_advanced$ms$tolerances$rt$library
+  names_compound_name <- params_advanced$names$compound_name
   names_extension <- params_advanced$names$extension
   names_features <- params_advanced$names$features
   names_filename <- params_advanced$names$filename
@@ -453,6 +454,8 @@ prepare_params <- function(
     fil_lib_tem_is_mgf_pos
   yamls_params$prepare_libraries_rt$files$libraries$temporal$prepared <-
     fil_lib_tem_pre
+  yamls_params$prepare_libraries_rt$names$compound_name <-
+    names_compound_name
   yamls_params$prepare_libraries_rt$names$inchikey <-
     names_inchikey
   yamls_params$prepare_libraries_rt$names$mgf$inchikey <-

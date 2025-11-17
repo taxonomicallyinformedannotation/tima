@@ -213,9 +213,17 @@ DEFAULT_HC_SCORE_INITIAL_MIN <- 0.95
 #' @export
 DEFAULT_HC_SCORE_FINAL_MIN <- 0.75
 
+#' Default minimum SIRIUS confidence score threshold for high-confidence filter
+#' @export
+DEFAULT_HC_SCORE_SIRIUS_MIN <- NULL
+
+#' Default minimum SIRIUS confidence score threshold for high-confidence filter
+#' @export
+DEFAULT_HC_SCORE_SPECTRAL_MIN <- NULL
+
 #' Default maximum allowed retention time error (minutes) for high-confidence filter
 #' @export
-DEFAULT_HC_MAX_RT_ERROR_MIN <- 0.10
+DEFAULT_HC_MAX_RT_ERROR_MIN <- 0.05
 
 # Helper Functions ----
 

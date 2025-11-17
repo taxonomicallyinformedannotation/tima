@@ -20,7 +20,7 @@ files:
         #' RT prepared structure organism pairs library. STRING
         rt: data/interim/libraries/sop/rt_prepared.tsv.gz
         #' Massbank spectral prepared structure organism pairs library. STRING
-        massbank: data/interim/libraries/sop/massbank_202411_prepared.tsv.gz
+        massbank: data/interim/libraries/sop/massbank_2025051_prepared.tsv.gz
         #' Merlin spectral prepared structure organism pairs library. STRING
         merlin: data/interim/libraries/sop/merlin_13911806_prepared.tsv.gz
         #' Wikidata spectral prepared structure organism pairs library. STRING
