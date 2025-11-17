@@ -1,5 +1,10 @@
-feature_id,candidate_structure_inchikey_connectivity_layer,candidate_structure_name,candidate_structure_smiles_no_stereo,candidate_structure_exact_mass,candidate_library,candidate_score_similarity
-FT0001,AAAAAAAAAAAAAA,Compound A,CCCCCC,150.123,[M+H]+,0.85
-FT0002,BBBBBBBBBBBBBB,Compound B,C1CCCCC1,200.456,[M+Na]+,0.92
-FT0003,CCCCCCCCCCCCCC,Compound C,C1=CC=CC=C1,180.789,[M+H]+,0.78
+feature_id,candidate_structure_inchikey_connectivity_layer,candidate_structure_inchikey,candidate_structure_name,candidate_structure_smiles_no_stereo,candidate_structure_exact_mass,candidate_library,candidate_score_similarity,candidate_score_sirius_csi,candidate_score_sirius_zodiac,candidate_structure_tax_cla_01kin,candidate_structure_tax_npc_01pat,candidate_structure_tax_cla_02sup,candidate_structure_tax_npc_02sup,candidate_structure_tax_cla_03cla,candidate_structure_tax_npc_03cla
+FT0001,LFQSCWFLJHTTHZ,LFQSCWFLJHTTHZ-UHFFFAOYSA-N,Caffeine,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,194.080376,[M+H]+,0.85,0.78,0.82,Alkaloids,Alkaloids,Purine alkaloids,Purine alkaloids,Xanthines,Xanthines
+FT0001,RYYVLZVUVIJVGH,RYYVLZVUVIJVGH-UHFFFAOYSA-N,Theobromine,CN1C=NC2=C1C(=O)NC(=O)N2C,180.064726,[M+H]+,0.72,0.65,0.70,Alkaloids,Alkaloids,Purine alkaloids,Purine alkaloids,Xanthines,Xanthines
+FT0002,ODKSFYDXXFIFQN,ODKSFYDXXFIFQN-UHFFFAOYSA-N,Arginine,C(CC(C(=O)O)N)CN=C(N)N,174.111676,[M+Na]+,0.92,0.88,0.90,Amino acids and derivatives,Amino acids,Proteinogenic amino acids,Amino acids,Arginine,Arginine
+FT0003,SHGAZHPCJJPHSC,SHGAZHPCJJPHSC-UHFFFAOYSA-N,Quercetin,C1=CC(=C(C=C1C2=C(C(=O)C3=C(C=C(C=C3O2)O)O)O)O)O,302.042259,[M+H]+,0.78,0.80,0.75,Phenylpropanoids and polyketides,Flavonoids,Flavonoids,Flavonoids,Flavonols,Flavonols
+FT0003,OVSQVDMCBVZWGM,OVSQVDMCBVZWGM-UHFFFAOYSA-N,Kaempferol,C1=CC(=CC=C1C2=C(C(=O)C3=C(C=C(C=C3O2)O)O)O)O,286.047738,[M+H]+,0.68,0.70,0.65,Phenylpropanoids and polyketides,Flavonoids,Flavonoids,Flavonoids,Flavonols,Flavonols
+FT0004,COLNVLDHVKWLRT,COLNVLDHVKWLRT-UHFFFAOYSA-N,Phenylalanine,C1=CC=C(C=C1)CC(C(=O)O)N,165.078979,[M+H]+,0.88,0.85,0.87,Amino acids and derivatives,Amino acids,Proteinogenic amino acids,Amino acids,Phenylalanine,Phenylalanine
+FT0005,QIQXTHQIDYTFRH,QIQXTHQIDYTFRH-UHFFFAOYSA-N,Tyrosine,C1=CC(=CC=C1CC(C(=O)O)N)O,181.073893,[M+H]+,0.80,0.82,0.79,Amino acids and derivatives,Amino acids,Proteinogenic amino acids,Amino acids,Tyrosine,Tyrosine
+FT0005,OUYCCCASQSFEME,OUYCCCASQSFEME-UHFFFAOYSA-N,Tryptophan,C1=CC=C2C(=C1)C(=CN2)CC(C(=O)O)N,204.089878,[M+H]+,0.65,0.60,0.63,Amino acids and derivatives,Amino acids,Proteinogenic amino acids,Amino acids,Tryptophan,Tryptophan
 

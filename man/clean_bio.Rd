@@ -4,11 +4,7 @@
 \alias{clean_bio}
 \title{Clean bio}
 \usage{
-clean_bio(
-  annot_table_wei_bio = get("annot_table_wei_bio", envir = parent.frame()),
-  edges_table = get("edges_table", envir = parent.frame()),
-  minimal_consistency = get("minimal_consistency", envir = parent.frame())
-)
+clean_bio(annot_table_wei_bio, edges_table, minimal_consistency)
 }
 \arguments{
 \item{annot_table_wei_bio}{Data frame containing biologically weighted annotations}

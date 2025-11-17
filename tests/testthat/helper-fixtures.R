@@ -401,6 +401,189 @@ expect_required_columns <- function(df, required_cols) {
 # CSV Fixture Loaders
 # ==============================================================================
 
+#' Load a test fixture from CSV
+#'
+#' @description
+#' Centralized loader for CSV fixtures in tests/testthat/fixtures/ directory.
+#' Provides caching and validation for consistent test data loading.
+#'
+#' @param fixture_name Character. Name of the fixture file (without .csv extension).
+#'   Available: "annotations", "features", "edges", "components", "metadata",
+#'   "names", "stereo", "structure_organism_pairs", "taxonomy_classyfire",
+#'   "taxonomy_npc"
+#' @param cache Logical. Whether to cache loaded fixtures for faster re-loading.
+#'   Default: TRUE
+#'
+#' @return tidytable containing the fixture data
+#'
+#' @examples
+#' annotations <- load_fixture("annotations")
+#' features <- load_fixture("features")
+load_fixture <- function(fixture_name, cache = TRUE) {
+  # Get package root - works in testthat context
+  pkg_root <- find_package_root()
+  fixture_path <- file.path(
+    pkg_root,
+    "tests",
+    "testthat",
+    "fixtures",
+    paste0(fixture_name, ".csv")
+  )
+
+  if (!file.exists(fixture_path)) {
+    stop(
+      "Fixture '",
+      fixture_name,
+      "' not found at: ",
+      fixture_path,
+      "\nAvailable fixtures: annotations, features, edges, components, ",
+      "metadata, names, stereo, structure_organism_pairs, ",
+      "taxonomy_classyfire, taxonomy_npc"
+    )
+  }
+
+  # Use a simple caching mechanism
+  cache_env <- get_fixture_cache()
+
+  if (cache && exists(fixture_name, envir = cache_env)) {
+    return(get(fixture_name, envir = cache_env))
+  }
+
+  # Load the fixture
+  fixture_data <- tidytable::fread(
+    fixture_path,
+    na.strings = c("", "NA"),
+    encoding = "UTF-8"
+  )
+
+  # Cache it
+  if (cache) {
+    assign(fixture_name, fixture_data, envir = cache_env)
+  }
+
+  fixture_data
+}
+
+#' Get or create the fixture cache environment
+#'
+#' @keywords internal
+get_fixture_cache <- function() {
+  if (!exists(".fixture_cache", envir = .GlobalEnv)) {
+    assign(".fixture_cache", new.env(parent = emptyenv()), envir = .GlobalEnv)
+  }
+  get(".fixture_cache", envir = .GlobalEnv)
+}
+
+#' Find package root directory
+#'
+#' @description
+#' Finds the package root by looking for DESCRIPTION file
+#'
+#' @keywords internal
+find_package_root <- function() {
+  # Start from current directory
+  current_dir <- getwd()
+
+  # Walk up the directory tree
+  while (TRUE) {
+    if (file.exists(file.path(current_dir, "DESCRIPTION"))) {
+      return(current_dir)
+    }
+
+    parent_dir <- dirname(current_dir)
+    if (parent_dir == current_dir) {
+      # Reached root without finding DESCRIPTION
+      stop("Could not find package root (DESCRIPTION file)")
+    }
+    current_dir <- parent_dir
+  }
+}
+
+#' Load all available fixtures
+#'
+#' @description
+#' Loads all CSV fixtures into a named list for convenient access.
+#'
+#' @return Named list of fixtures
+#'
+#' @examples
+#' fixtures <- load_all_fixtures()
+#' features <- fixtures$features
+#' annotations <- fixtures$annotations
+load_all_fixtures <- function() {
+  fixture_names <- c(
+    "annotations",
+    "features",
+    "edges",
+    "components",
+    "metadata",
+    "names",
+    "stereo",
+    "structure_organism_pairs",
+    "taxonomy_classyfire",
+    "taxonomy_npc"
+  )
+
+  fixtures <- lapply(
+    stats::setNames(fixture_names, fixture_names),
+    load_fixture
+  )
+
+  fixtures
+}
+
+#' Create a test features table with edge connections
+#'
+#' @description
+#' Creates features and edges tables that are consistent with each other.
+#' Ensures edges reference existing features.
+#'
+#' @param n_features Integer. Number of features to create. Default: 10
+#' @param edge_density Numeric. Proportion of possible edges to create (0-1).
+#'   Default: 0.3
+#' @param seed Integer. Random seed. Default: NULL
+#'
+#' @return List with 'features' and 'edges' data frames
+#'
+#' @examples
+#' data <- create_features_with_edges(n_features = 20, edge_density = 0.2)
+#' features <- data$features
+#' edges <- data$edges
+create_features_with_edges <- function(
+  n_features = 10L,
+  edge_density = 0.3,
+  seed = NULL
+) {
+  .with_seed(seed, {
+    # Create features
+    features <- create_test_features(n_features = n_features, seed = seed)
+
+    # Create edges between features
+    feature_ids <- features$feature_id
+    n_possible_edges <- n_features * (n_features - 1) / 2
+    n_edges <- max(1L, round(n_possible_edges * edge_density))
+
+    # Generate unique pairs
+    pairs <- combn(feature_ids, 2, simplify = FALSE)
+    selected_pairs <- sample(pairs, min(n_edges, length(pairs)))
+
+    edges <- tidytable::tidytable(
+      feature_source = vapply(selected_pairs, `[`, character(1), 1),
+      feature_target = vapply(selected_pairs, `[`, character(1), 2),
+      feature_spectrum_entropy = runif(length(selected_pairs), 0.5, 1.0),
+      cosine_similarity = runif(length(selected_pairs), 0.6, 0.99)
+    )
+
+    list(
+      features = features,
+      edges = edges
+    )
+  })
+}
+
+# ==============================================================================
+# ==============================================================================
+
 #' Load fixture CSV file
 #'
 #' @param filename Name of CSV file in fixtures/ directory
