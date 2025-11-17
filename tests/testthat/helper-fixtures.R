@@ -681,29 +681,6 @@ create_annotation_table_taxed <- function(n_rows = 0) {
 
 # Test Data Generators ----
 
-#' Create minimal valid feature table for testing
-#'
-#' @param n_features Number of features to generate
-#' @param include_rt Include retention time column
-#' @param include_adduct Include adduct column
-#' @return tidytable with feature data
-#' @keywords internal
-create_test_features <- function(
-  n_features = 10,
-  include_rt = TRUE,
-  include_adduct = FALSE,
-  seed = NULL
-) {
-  .Deprecated("create_test_features in helper-fixtures.R")
-  helper-fixtures::create_test_features(
-    n_features = n_features,
-    include_rt = include_rt,
-    include_intensity = TRUE,
-    include_adduct = include_adduct,
-    seed = seed
-  )
-}
-
 #' Create minimal spectral library for testing
 #'
 #' @param n_compounds Number of compounds to generate
@@ -749,27 +726,6 @@ create_test_library <- function(n_compounds = 20, ms_mode = "pos") {
     ),
     "organism_taxonomy_ottid" = sample(1000000:9999999, n_compounds)
   )
-}
-
-#' Create minimal test spectra
-#'
-#' @param n_spectra Number of spectra to generate
-#' @param n_peaks_range Range of peaks per spectrum
-#' @return List of spectral matrices
-#' @keywords internal
-create_test_spectra <- function(n_spectra = 5, n_peaks_range = c(5, 20), seed = NULL) {
-  .Deprecated("create_test_spectrum + lapply in helper-fixtures.R")
-  lapply(seq_len(n_spectra), function(i) {
-    n_peaks <- sample(n_peaks_range[1]:n_peaks_range[2], 1)
-    mz_values <- sort(runif(n_peaks, 50, 500))
-    int_values <- runif(n_peaks, 100, 10000)
-
-    matrix(
-      c(mz_values, int_values),
-      ncol = 2,
-      dimnames = list(NULL, c("mz", "int"))
-    )
-  })
 }
 
 # Test Environment Setup ----
