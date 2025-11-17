@@ -18,17 +18,17 @@ filter_high_confidence_only(
 \arguments{
 \item{df}{Data frame containing annotation results with score columns}
 
-\item{score_bio_min}{Numeric minimum biological score threshold (default: 0.85)}
+\item{score_bio_min}{Numeric minimum biological score threshold (default: 0.85). Range: 0-1}
 
-\item{score_ini_min}{Numeric minimum initial score threshold (default: 0.95)}
+\item{score_ini_min}{Numeric minimum initial score threshold (default: 0.95). Range: 0-1}
 
-\item{score_final_min}{Numeric minimum final (chemical) score threshold (default: 0.75)}
+\item{score_final_min}{Numeric minimum final (chemical) score threshold (default: 0.75). Range: 0-1}
 
-\item{error_rt_max}{Numeric maximum retention time error in minutes (default: 0.1)}
+\item{error_rt_max}{Numeric maximum retention time error in minutes (default: 0.05). Must be > 0}
 
-\item{confidence_sirius_min}{Numeric minimum SIRIUS confidence score threshold (optional)}
+\item{confidence_sirius_min}{Numeric minimum SIRIUS confidence score threshold (optional). Range: 0-1}
 
-\item{similarity_spectral_min}{Numeric minimum spectral similarity threshold (optional)}
+\item{similarity_spectral_min}{Numeric minimum spectral similarity threshold (optional). Range: 0-1}
 }
 \value{
 Data frame containing only high-confidence annotations that meet
@@ -38,6 +38,21 @@ at least one score threshold and pass RT error filtering
 This function filters annotation results to retain only
 high-confidence candidates based on multiple scoring criteria
 (biological, initial, chemical) and retention time accuracy.
+}
+\details{
+Columns used when present:
+\itemize{
+\item score_biological
+\item candidate_score_pseudo_initial
+\item score_weighted_chemo
+\item candidate_structure_error_rt (assumed in minutes; NA means unknown and is allowed)
+\item candidate_score_sirius_confidence (optional)
+\item candidate_similarity (optional)
+}
+
+Missing score columns are treated as absent for that criterion and do not
+cause errors; at least one of the three primary scores must satisfy its
+threshold for a row to be retained.
 }
 \examples{
 NULL
