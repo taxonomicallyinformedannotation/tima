@@ -67,6 +67,6 @@ test_that("decorate_chemo warns on missing columns", {
       score_chemical_npc_superclass = 0.6,
       score_chemical_npc_class = 0.7
     ),
-    NA # Should log warning but not throw error
+    NA
   )
 })

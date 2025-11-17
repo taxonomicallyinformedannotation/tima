@@ -6,7 +6,6 @@
 #'
 #' @description Individual focused tests for summarize_results function.
 
-
 # Helper function to create test data ----
 
 create_test_annotation_data <- function(n_features = 5, n_candidates = 3) {
