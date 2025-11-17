@@ -214,7 +214,7 @@ annotate_masses <-
       export_output(x = empty_annotations, file = output_annotations)
       export_output(x = empty_edges, file = output_edges)
 
-      return(list(annotations = output_annotations, edges = output_edges))
+      return(c(annotations = output_annotations, edges = output_edges))
     }
 
     logger::log_info("Processing {n_features} features for annotation")
@@ -265,8 +265,26 @@ annotate_masses <-
       tidytable::mutate(tidytable::across(
         .cols = c("structure_exact_mass"),
         .fns = as.numeric
-      )) |>
-      round_reals()
+      ))
+
+    # Add structure_inchikey_connectivity_layer if not present
+    if (
+      !"structure_inchikey_connectivity_layer" %in%
+        colnames(structure_organism_pairs_table)
+    ) {
+      structure_organism_pairs_table <- structure_organism_pairs_table |>
+        tidytable::mutate(
+          structure_inchikey_connectivity_layer = stringi::stri_sub(
+            str = structure_inchikey,
+            from = 1L,
+            to = 14L
+          )
+        )
+    }
+
+    structure_organism_pairs_table <- round_reals(
+      structure_organism_pairs_table
+    )
 
     # logger::log_trace("Filtering desired adducts and adding mz tolerance")
     df_add_em <- structure_organism_pairs_table |>
@@ -308,8 +326,10 @@ annotate_masses <-
       df_fea_min <- df_fea_min |>
         tidytable::mutate(tidytable::across(.cols = c("rt"), .fns = as.numeric))
     } else {
-      df_fea_min[, "rt"] <- df_fea_min[, "feature_id"] |>
-        as.numeric()
+      logger::log_warn(
+        "No 'rt' column found, using sequential numbering as RT proxy"
+      )
+      df_fea_min$rt <- seq_len(nrow(df_fea_min))
     }
 
     # logger::log_trace("Calculating rt tolerance")
@@ -651,22 +671,33 @@ annotate_masses <-
 
     # logger::log_trace("Keeping unique exact masses and molecular formulas")
     df_em_mf <- structure_organism_pairs_table |>
-      tidytable::distinct(structure_exact_mass, structure_molecular_formula)
+      tidytable::distinct(tidyselect::any_of(c(
+        "structure_exact_mass",
+        "structure_molecular_formula"
+      )))
+
+    # Select only columns that exist in the table
+    available_cols <- colnames(structure_organism_pairs_table)
+    required_cols <- c(
+      "structure_name",
+      "structure_inchikey_connectivity_layer",
+      "structure_smiles_no_stereo",
+      "structure_molecular_formula",
+      "structure_exact_mass",
+      "structure_xlogp"
+    )
+    cols_to_select <- intersect(required_cols, available_cols)
+
     df_str_unique <- structure_organism_pairs_table |>
-      tidytable::distinct(
-        structure_name,
-        structure_inchikey_connectivity_layer,
-        structure_smiles_no_stereo,
-        structure_molecular_formula,
-        structure_exact_mass,
-        structure_xlogp
-      ) |>
+      tidytable::distinct(tidyselect::any_of(cols_to_select)) |>
       ## Avoid SMILES redundancy
       tidytable::distinct(
-        structure_inchikey_connectivity_layer,
-        structure_molecular_formula,
-        structure_exact_mass,
-        structure_xlogp,
+        tidyselect::any_of(c(
+          "structure_inchikey_connectivity_layer",
+          "structure_molecular_formula",
+          "structure_exact_mass",
+          "structure_xlogp"
+        )),
         .keep_all = TRUE
       ) |>
       tidytable::mutate(tidytable::across(
@@ -767,7 +798,7 @@ annotate_masses <-
         by = stats::setNames("structure_exact_mass", "exact_mass")
       ) |>
       tidytable::select(
-        structure_molecular_formula,
+        tidyselect::any_of("structure_molecular_formula"),
         library = library_name,
         tidyselect::everything(),
         -exact_mass,
@@ -780,53 +811,142 @@ annotate_masses <-
     # logger::log_trace(
     #   "Joining single adducts, in source dimers, and multicharged"
     # )
-    df_annotated_final <- tidytable::bind_rows(
+    df_annotated_combined <- tidytable::bind_rows(
       df_annotated_1,
       df_annotated_2
-    ) |>
-      tidytable::left_join(df_str_unique) |>
-      tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
+    )
+
+    # Find common columns for join
+    common_cols <- intersect(
+      colnames(df_annotated_combined),
+      colnames(df_str_unique)
+    )
+
+    # Only join if there are common columns
+    if (length(common_cols) > 0) {
+      df_annotated_final <- df_annotated_combined |>
+        tidytable::left_join(df_str_unique, by = common_cols) |>
+        tidytable::filter(!is.na(structure_inchikey_connectivity_layer))
+    } else {
+      # No common columns, just use combined data
+      df_annotated_final <- df_annotated_combined
+    }
+
+    df_annotated_final <- df_annotated_final |>
       tidytable::select(
-        feature_id,
-        candidate_structure_error_mz = error_mz,
-        candidate_structure_name = structure_name,
-        candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
-        candidate_structure_smiles_no_stereo = structure_smiles_no_stereo,
-        candidate_structure_molecular_formula = structure_molecular_formula,
-        candidate_structure_exact_mass = structure_exact_mass,
-        candidate_structure_xlogp = structure_xlogp,
-        candidate_library = library
+        tidyselect::any_of(c(
+          "feature_id",
+          "error_mz",
+          "structure_name",
+          "structure_inchikey_connectivity_layer",
+          "structure_smiles_no_stereo",
+          "structure_molecular_formula",
+          "structure_exact_mass",
+          "structure_xlogp",
+          "library"
+        ))
+      ) |>
+      tidytable::rename(
+        candidate_structure_error_mz = tidyselect::any_of("error_mz"),
+        candidate_structure_name = tidyselect::any_of("structure_name"),
+        candidate_structure_inchikey_connectivity_layer = tidyselect::any_of(
+          "structure_inchikey_connectivity_layer"
+        ),
+        candidate_structure_smiles_no_stereo = tidyselect::any_of(
+          "structure_smiles_no_stereo"
+        ),
+        candidate_structure_molecular_formula = tidyselect::any_of(
+          "structure_molecular_formula"
+        ),
+        candidate_structure_exact_mass = tidyselect::any_of(
+          "structure_exact_mass"
+        ),
+        candidate_structure_xlogp = tidyselect::any_of("structure_xlogp"),
+        candidate_library = tidyselect::any_of("library")
       ) |>
       tidytable::distinct()
 
     rm(df_annotated_1, df_annotated_2, df_str_unique)
 
     # logger::log_trace("Adding chemical classification")
-    df_final <- tidytable::left_join(
-      df_annotated_final,
-      structure_organism_pairs_table |>
-        tidytable::distinct(
-          candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
-          candidate_structure_smiles_no_stereo = structure_smiles_no_stereo,
-          candidate_structure_tax_npc_01pat = structure_tax_npc_01pat,
-          candidate_structure_tax_npc_02sup = structure_tax_npc_02sup,
-          candidate_structure_tax_npc_03cla = structure_tax_npc_03cla,
-          ## TODO until better
-          candidate_structure_tax_cla_chemontid = structure_tax_cla_chemontid,
-          candidate_structure_tax_cla_01kin = structure_tax_cla_01kin,
-          candidate_structure_tax_cla_02sup = structure_tax_cla_02sup,
-          candidate_structure_tax_cla_03cla = structure_tax_cla_03cla,
-          candidate_structure_tax_cla_04dirpar = structure_tax_cla_04dirpar
+    taxonomy_table <- structure_organism_pairs_table |>
+      tidytable::distinct(tidyselect::any_of(c(
+        "structure_inchikey_connectivity_layer",
+        "structure_smiles_no_stereo",
+        "structure_tax_npc_01pat",
+        "structure_tax_npc_02sup",
+        "structure_tax_npc_03cla",
+        "structure_tax_cla_chemontid",
+        "structure_tax_cla_01kin",
+        "structure_tax_cla_02sup",
+        "structure_tax_cla_03cla",
+        "structure_tax_cla_04dirpar"
+      ))) |>
+      tidytable::rename(
+        candidate_structure_inchikey_connectivity_layer = tidyselect::any_of(
+          "structure_inchikey_connectivity_layer"
+        ),
+        candidate_structure_smiles_no_stereo = tidyselect::any_of(
+          "structure_smiles_no_stereo"
+        ),
+        candidate_structure_tax_npc_01pat = tidyselect::any_of(
+          "structure_tax_npc_01pat"
+        ),
+        candidate_structure_tax_npc_02sup = tidyselect::any_of(
+          "structure_tax_npc_02sup"
+        ),
+        candidate_structure_tax_npc_03cla = tidyselect::any_of(
+          "structure_tax_npc_03cla"
+        ),
+        candidate_structure_tax_cla_chemontid = tidyselect::any_of(
+          "structure_tax_cla_chemontid"
+        ),
+        candidate_structure_tax_cla_01kin = tidyselect::any_of(
+          "structure_tax_cla_01kin"
+        ),
+        candidate_structure_tax_cla_02sup = tidyselect::any_of(
+          "structure_tax_cla_02sup"
+        ),
+        candidate_structure_tax_cla_03cla = tidyselect::any_of(
+          "structure_tax_cla_03cla"
+        ),
+        candidate_structure_tax_cla_04dirpar = tidyselect::any_of(
+          "structure_tax_cla_04dirpar"
         )
-    ) |>
+      )
+
+    # Find common columns for taxonomy join
+    tax_common_cols <- intersect(
+      colnames(df_annotated_final),
+      colnames(taxonomy_table)
+    )
+
+    # Only join if there are common columns
+    if (length(tax_common_cols) > 0) {
+      df_final <- tidytable::left_join(
+        df_annotated_final,
+        taxonomy_table,
+        by = tax_common_cols
+      )
+    } else {
+      df_final <- df_annotated_final
+    }
+
+    df_final <- df_final |>
       tidytable::mutate(tidytable::across(
         .cols = tidyselect::where(is.character),
         .fns = function(x) {
           tidytable::na_if(x, "")
         }
-      )) |>
-      tidytable::mutate(candidate_adduct = candidate_library) |>
-      tidytable::mutate(candidate_library = "TIMA MS1")
+      ))
+
+    # Add candidate_adduct and update candidate_library if they exist
+    if ("candidate_library" %in% colnames(df_final)) {
+      df_final <- df_final |>
+        tidytable::mutate(candidate_adduct = candidate_library) |>
+        tidytable::mutate(candidate_library = "TIMA MS1")
+    }
+
     rm(structure_organism_pairs_table, df_annotated_final)
 
     df_final |>

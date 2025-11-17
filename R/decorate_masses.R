@@ -17,6 +17,19 @@ decorate_masses <- function(
   # Filter Valid Annotations
   # ============================================================================
 
+  # Check if required column exists
+  if (
+    !"candidate_structure_inchikey_connectivity_layer" %in%
+      colnames(annotation_table_ms1)
+  ) {
+    logger::log_warn(
+      "MS1 annotation table does not contain ",
+      "candidate_structure_inchikey_connectivity_layer column. ",
+      "Skipping annotation summary."
+    )
+    return(annotation_table_ms1)
+  }
+
   # Filter for valid annotations (not NA and not "notAnnotated")
   valid_annotations <- annotation_table_ms1 |>
     tidytable::filter(
