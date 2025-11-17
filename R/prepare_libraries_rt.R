@@ -158,19 +158,25 @@ prepare_libraries_rt <- function(
   # Polishing utilities
   # ============================================================================
   polish_df <- function(df, type = "experimental", unit = unit_rt) {
+    # Ensure columns exist even if missing from sources
+    if (!"inchikey" %in% colnames(df)) {
+      df$inchikey <- NA_character_
+    }
+    if (!"smiles" %in% colnames(df)) {
+      df$smiles <- NA_character_
+    }
+    if (!"structure_name" %in% colnames(df)) {
+      df$structure_name <- NA_character_
+    }
+
     df_tmp <- df |>
       data.frame() |>
       tidytable::mutate(type = type) |>
       tidytable::mutate(rt = as.numeric(rt)) |>
-      # Ensure columns exist even if missing from sources
-      tidytable::bind_rows(data.frame(
-        inchikey = NA_character_,
-        smiles = NA_character_,
-        structure_name = NA_character_
-      )) |>
       tidytable::filter(!is.na(rt)) |>
       tidytable::filter(!is.na(smiles)) |>
       tidytable::distinct()
+
     # Scalar unit-based conversion
     if (identical(unit, "seconds")) {
       df_tmp <- df_tmp |> tidytable::mutate(rt = rt / 60)
@@ -233,15 +239,16 @@ prepare_libraries_rt <- function(
     missing_n2 <- df_completed |>
       tidytable::filter(is.na(structure_inchikey)) |>
       nrow()
-    df_completed
+
     if (missing_n2 > 0L) {
       logger::log_warn(
         "There were still ",
         missing_n2,
         " entries for which no InChIKey could not be found in the end."
       )
-      df_completed
     }
+
+    df_completed
   }
 
   empty_df <- tidytable::tidytable(

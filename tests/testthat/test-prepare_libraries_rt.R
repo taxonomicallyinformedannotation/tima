@@ -488,8 +488,8 @@ test_that("prepare_libraries_rt handles duplicate InChIKeys", {
   )
   export_output(x = exp_data, file = csv_exp)
 
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
+  file_rt <- file.path(tempdir(), "rt_library.tsv")
+  file_sop <- file.path(tempdir(), "sop.tsv")
 
   result <- prepare_libraries_rt(
     mgf_exp = NULL,
@@ -501,13 +501,12 @@ test_that("prepare_libraries_rt handles duplicate InChIKeys", {
     name_inchikey = "inchikey",
     name_name = "structure_name",
     name_smiles = "smiles",
-    output_rt = output_rt,
-    output_sop = output_sop
+    output_rt = file_rt,
+    output_sop = file_sop
   )
 
   # RT library can have multiple RTs per structure
-  rt_table <- tidytable::fread(result["rt"], colClasses = "character") |>
-    filter(!is.na(output_rt))
+  rt_table <- tidytable::fread(result["rt"], colClasses = "character")
   expect_true(nrow(rt_table) >= 2)
 
   # SOP table should have unique structures
