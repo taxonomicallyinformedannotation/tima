@@ -7,7 +7,7 @@ extern SEXP gnps(SEXP, SEXP);
 
 static const R_CallMethodDef callMethods[] = {
     {"join_gnps", (DL_FUNC) &join_gnps, 6},
-    {"gnps", (DL_FUNC) &gnps, 2},
+    {"gnps",      (DL_FUNC) &gnps,      2},
     {NULL, NULL, 0}
 };
 
