@@ -53,9 +53,36 @@ clean_bio <- function(
     return(annot_table_wei_bio)
   }
 
+  add_default_pred_cols <- function(df) {
+    df |>
+      tidytable::mutate(
+        feature_pred_tax_cla_01kin_val = "empty",
+        consistency_structure_cla_kin = 1,
+        feature_pred_tax_cla_01kin_score = 0,
+        feature_pred_tax_npc_01pat_val = "empty",
+        consistency_structure_npc_pat = 1,
+        feature_pred_tax_npc_01pat_score = 0,
+        feature_pred_tax_cla_02sup_val = "empty",
+        consistency_structure_cla_sup = 1,
+        feature_pred_tax_cla_02sup_score = 0,
+        feature_pred_tax_npc_02sup_val = "empty",
+        consistency_structure_npc_sup = 1,
+        feature_pred_tax_npc_02sup_score = 0,
+        feature_pred_tax_cla_03cla_val = "empty",
+        consistency_structure_cla_cla = 1,
+        feature_pred_tax_cla_03cla_score = 0,
+        feature_pred_tax_npc_03cla_val = "empty",
+        consistency_structure_npc_cla = 1,
+        feature_pred_tax_npc_03cla_score = 0,
+        feature_pred_tax_cla_04dirpar_val = "empty",
+        consistency_structure_cla_par = 1,
+        feature_pred_tax_cla_04dirpar_score = 0
+      )
+  }
+
   if (nrow(edges_table) == 0L) {
     logger::log_warn("Empty edges table provided, cannot calculate consistency")
-    return(annot_table_wei_bio)
+    return(add_default_pred_cols(annot_table_wei_bio))
   }
 
   # ============================================================================
@@ -94,8 +121,15 @@ clean_bio <- function(
   # - Similarity score minimums
   # - Consider edge filtering during edge creation step
   edges_filtered <- edges_table |>
-    tidytable::filter(feature_source != feature_target) |>
-    tidytable::filter(feature_spectrum_entropy > 0 | !is.na(label)) |>
+    tidytable::filter(feature_source != feature_target)
+  if ("label" %in% colnames(edges_filtered)) {
+    edges_filtered <- edges_filtered |>
+      tidytable::filter(feature_spectrum_entropy > 0 | !is.na(label))
+  } else {
+    edges_filtered <- edges_filtered |>
+      tidytable::filter(feature_spectrum_entropy > 0)
+  }
+  edges_filtered <- edges_filtered |>
     tidytable::distinct(feature_source, feature_target) |>
     tidytable::group_by(feature_source) |>
     tidytable::add_count() |>
@@ -115,41 +149,7 @@ clean_bio <- function(
     logger::log_debug(
       "Adding default feature_pred_tax columns (all features marked as 'empty')"
     )
-
-    # Add required columns with default values
-    annot_table_wei_bio <- annot_table_wei_bio |>
-      tidytable::mutate(
-        # Classyfire kingdom
-        feature_pred_tax_cla_01kin_val = "empty",
-        consistency_structure_cla_kin = 1,
-        feature_pred_tax_cla_01kin_score = 0,
-        # NPC pathway
-        feature_pred_tax_npc_01pat_val = "empty",
-        consistency_structure_npc_pat = 1,
-        feature_pred_tax_npc_01pat_score = 0,
-        # Classyfire superclass
-        feature_pred_tax_cla_02sup_val = "empty",
-        consistency_structure_cla_sup = 1,
-        feature_pred_tax_cla_02sup_score = 0,
-        # NPC superclass
-        feature_pred_tax_npc_02sup_val = "empty",
-        consistency_structure_npc_sup = 1,
-        feature_pred_tax_npc_02sup_score = 0,
-        # Classyfire class
-        feature_pred_tax_cla_03cla_val = "empty",
-        consistency_structure_cla_cla = 1,
-        feature_pred_tax_cla_03cla_score = 0,
-        # NPC class
-        feature_pred_tax_npc_03cla_val = "empty",
-        consistency_structure_npc_cla = 1,
-        feature_pred_tax_npc_03cla_score = 0,
-        # Classyfire parent
-        feature_pred_tax_cla_04dirpar_val = "empty",
-        consistency_structure_cla_par = 1,
-        feature_pred_tax_cla_04dirpar_score = 0
-      )
-
-    return(annot_table_wei_bio)
+    return(add_default_pred_cols(annot_table_wei_bio))
   }
 
   # ============================================================================
@@ -291,16 +291,22 @@ clean_bio <- function(
   rm(df3)
 
   # logger::log_trace("Splitting already computed predictions")
-  df1 <- annotations_distinct |>
-    tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
+  if ("feature_pred_tax_cla_02sup_val" %in% colnames(annotations_distinct)) {
+    df1 <- annotations_distinct |>
+      tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
 
-  df1b <- df1 |>
-    tidytable::select(-tidyselect::contains("feature_pred_tax"))
+    df1b <- df1 |>
+      tidytable::select(-tidyselect::contains("feature_pred_tax"))
 
-  df2 <- annotations_distinct |>
-    tidytable::select(-tidyselect::contains("feature_pred_tax")) |>
-    tidytable::anti_join(df1) |>
-    tidytable::bind_rows(df1b)
+    df2 <- annotations_distinct |>
+      tidytable::select(-tidyselect::contains("feature_pred_tax")) |>
+      tidytable::anti_join(df1) |>
+      tidytable::bind_rows(df1b)
+  } else {
+    df1 <- tidytable::tidytable()
+    df1b <- tidytable::tidytable()
+    df2 <- annotations_distinct
+  }
   rm(annotations_distinct)
 
   # logger::log_trace("Joining all except -1 together")
@@ -335,102 +341,49 @@ clean_bio <- function(
     }
   ) |>
     tidytable::select(feature_id, tidyselect::everything()) |>
-    ## In case there are no consensus at all because no network
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.logical),
       .fns = as.character
-    )) |>
-    tidytable::mutate(
-      feature_pred_tax_cla_01kin_val = tidytable::coalesce(
-        feature_pred_tax_cla_01kin_val,
-        "empty"
-      ),
-      consistency_structure_cla_kin = tidytable::coalesce(
-        consistency_structure_cla_kin,
-        1
-      ),
-      feature_pred_tax_cla_01kin_score = tidytable::coalesce(
-        feature_pred_tax_cla_01kin_score,
-        0
-      ),
-      feature_pred_tax_npc_01pat_val = tidytable::coalesce(
-        feature_pred_tax_npc_01pat_val,
-        "empty"
-      ),
-      consistency_structure_npc_pat = tidytable::coalesce(
-        consistency_structure_npc_pat,
-        1
-      ),
-      feature_pred_tax_npc_01pat_score = tidytable::coalesce(
-        feature_pred_tax_npc_01pat_score,
-        0
-      ),
-      feature_pred_tax_cla_02sup_val = tidytable::coalesce(
-        feature_pred_tax_cla_02sup_val,
-        "empty"
-      ),
-      consistency_structure_cla_sup = tidytable::coalesce(
-        consistency_structure_cla_sup,
-        1
-      ),
-      feature_pred_tax_cla_02sup_score = tidytable::coalesce(
-        feature_pred_tax_cla_02sup_score,
-        0
-      ),
-      feature_pred_tax_npc_02sup_val = tidytable::coalesce(
-        feature_pred_tax_npc_02sup_val,
-        "empty"
-      ),
-      consistency_structure_npc_sup = tidytable::coalesce(
-        consistency_structure_npc_sup,
-        1
-      ),
-      feature_pred_tax_npc_02sup_score = tidytable::coalesce(
-        feature_pred_tax_npc_02sup_score,
-        0
-      ),
-      feature_pred_tax_cla_03cla_val = tidytable::coalesce(
-        feature_pred_tax_cla_03cla_val,
-        "empty"
-      ),
-      consistency_structure_cla_cla = tidytable::coalesce(
-        consistency_structure_cla_cla,
-        1
-      ),
-      feature_pred_tax_cla_03cla_score = tidytable::coalesce(
-        feature_pred_tax_cla_03cla_score,
-        0
-      ),
-      feature_pred_tax_npc_03cla_val = tidytable::coalesce(
-        feature_pred_tax_npc_03cla_val,
-        "empty"
-      ),
-      consistency_structure_npc_cla = tidytable::coalesce(
-        consistency_structure_npc_cla,
-        1
-      ),
-      feature_pred_tax_npc_03cla_score = tidytable::coalesce(
-        feature_pred_tax_npc_03cla_score,
-        0
-      ),
-      feature_pred_tax_cla_04dirpar_val = tidytable::coalesce(
-        feature_pred_tax_cla_04dirpar_val,
-        "empty"
-      ),
-      consistency_structure_cla_par = tidytable::coalesce(
-        consistency_structure_cla_par,
-        1
-      ),
-      feature_pred_tax_cla_04dirpar_score = tidytable::coalesce(
-        feature_pred_tax_cla_04dirpar_score,
-        0
-      )
-    )
+    ))
+  # Conditional coalescing
+  coalesce_if_present <- function(df, col, default) {
+    if (col %in% colnames(df)) {
+      df[[col]] <- tidytable::coalesce(df[[col]], default)
+    } else {
+      df[[col]] <- default
+    }
+    df
+  }
+  annot_table_wei_bio_preclean <- annot_table_wei_bio_preclean |>
+    coalesce_if_present("feature_pred_tax_cla_01kin_val", "empty") |>
+    coalesce_if_present("consistency_structure_cla_kin", 1) |>
+    coalesce_if_present("feature_pred_tax_cla_01kin_score", 0) |>
+    coalesce_if_present("feature_pred_tax_npc_01pat_val", "empty") |>
+    coalesce_if_present("consistency_structure_npc_pat", 1) |>
+    coalesce_if_present("feature_pred_tax_npc_01pat_score", 0) |>
+    coalesce_if_present("feature_pred_tax_cla_02sup_val", "empty") |>
+    coalesce_if_present("consistency_structure_cla_sup", 1) |>
+    coalesce_if_present("feature_pred_tax_cla_02sup_score", 0) |>
+    coalesce_if_present("feature_pred_tax_npc_02sup_val", "empty") |>
+    coalesce_if_present("consistency_structure_npc_sup", 1) |>
+    coalesce_if_present("feature_pred_tax_npc_02sup_score", 0) |>
+    coalesce_if_present("feature_pred_tax_cla_03cla_val", "empty") |>
+    coalesce_if_present("consistency_structure_cla_cla", 1) |>
+    coalesce_if_present("feature_pred_tax_cla_03cla_score", 0) |>
+    coalesce_if_present("feature_pred_tax_npc_03cla_val", "empty") |>
+    coalesce_if_present("consistency_structure_npc_cla", 1) |>
+    coalesce_if_present("feature_pred_tax_npc_03cla_score", 0) |>
+    coalesce_if_present("feature_pred_tax_cla_04dirpar_val", "empty") |>
+    coalesce_if_present("consistency_structure_cla_par", 1) |>
+    coalesce_if_present("feature_pred_tax_cla_04dirpar_score", 0)
   rm(df2, supp_tables)
 
   # logger::log_trace("Adding already computed predictions back")
+  if (nrow(df1b) == 0L) {
+    return(annot_table_wei_bio_preclean)
+  }
   annot_table_wei_bio_clean <- annot_table_wei_bio_preclean |>
-    tidytable::anti_join(df1b) |>
+    tidytable::anti_join(df1b, by = "feature_id") |>
     tidytable::bind_rows(df1)
 
   rm(
