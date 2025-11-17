@@ -15,13 +15,13 @@ validate_numeric_range(
 \arguments{
 \item{value}{Numeric value to validate}
 
+\item{min_value}{Minimum allowed value (inclusive)}
+
+\item{max_value}{Maximum allowed value (inclusive)}
+
+\item{param_name}{Name of the parameter (for error messages)}
+
 \item{allow_null}{Whether NULL values are allowed}
-
-\item{name}{Name of the parameter (for error messages)}
-
-\item{min}{Minimum allowed value (inclusive)}
-
-\item{max}{Maximum allowed value (inclusive)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise
