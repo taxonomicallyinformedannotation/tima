@@ -680,6 +680,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
@@ -728,7 +729,7 @@ Data frame containing annotation results with score columns
 <code id="score_bio_min">score_bio_min</code>
 </td>
 <td>
-Numeric minimum biological score threshold (default: 0.85)
+Numeric minimum biological score threshold (default: 0.85). Range: 0-1
 </td>
 </tr>
 <tr>
@@ -736,7 +737,7 @@ Numeric minimum biological score threshold (default: 0.85)
 <code id="score_ini_min">score_ini_min</code>
 </td>
 <td>
-Numeric minimum initial score threshold (default: 0.95)
+Numeric minimum initial score threshold (default: 0.95). Range: 0-1
 </td>
 </tr>
 <tr>
@@ -744,7 +745,7 @@ Numeric minimum initial score threshold (default: 0.95)
 <code id="score_final_min">score_final_min</code>
 </td>
 <td>
-Numeric minimum final (chemical) score threshold (default: 0.75)
+Numeric minimum final (chemical) score threshold (default: 0.75). Range: 0-1
 </td>
 </tr>
 <tr>
@@ -752,7 +753,7 @@ Numeric minimum final (chemical) score threshold (default: 0.75)
 <code id="error_rt_max">error_rt_max</code>
 </td>
 <td>
-Numeric maximum retention time error in minutes (default: 0.1)
+Numeric maximum retention time error in minutes (default: 0.05). Must be &gt; 0
 </td>
 </tr>
 <tr>
@@ -760,7 +761,7 @@ Numeric maximum retention time error in minutes (default: 0.1)
 <code id="confidence_sirius_min">confidence_sirius_min</code>
 </td>
 <td>
-Numeric minimum SIRIUS confidence score threshold (optional)
+Numeric minimum SIRIUS confidence score threshold (optional). Range: 0-1
 </td>
 </tr>
 <tr>
@@ -768,10 +769,35 @@ Numeric minimum SIRIUS confidence score threshold (optional)
 <code id="similarity_spectral_min">similarity_spectral_min</code>
 </td>
 <td>
-Numeric minimum spectral similarity threshold (optional)
+Numeric minimum spectral similarity threshold (optional). Range: 0-1
 </td>
 </tr>
 </tbody></table>
+</section>
+<section id="details" class="level3">
+<h3 class="anchored" data-anchor-id="details">Details</h3>
+<p>Columns used when present:</p>
+<ul>
+<li>
+<p>score_biological</p>
+</li>
+<li>
+<p>candidate_score_pseudo_initial</p>
+</li>
+<li>
+<p>score_weighted_chemo</p>
+</li>
+<li>
+<p>candidate_structure_error_rt (assumed in minutes; NA means unknown and is allowed)</p>
+</li>
+<li>
+<p>candidate_score_sirius_confidence (optional)</p>
+</li>
+<li>
+<p>candidate_similarity (optional)</p>
+</li>
+</ul>
+<p>Missing score columns are treated as absent for that criterion and do not cause errors; at least one of the three primary scores must satisfy its threshold for a row to be retained.</p>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
