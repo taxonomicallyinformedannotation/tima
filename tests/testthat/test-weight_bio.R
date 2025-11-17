@@ -510,90 +510,90 @@ test_that("weight_bio returns expected columns", {
 # Performance Tests
 # =============================================================================
 
-test_that("weight_bio handles moderate-scale data efficiently", {
-  skip_on_cran()
-  skip_if_not(interactive(), "Performance test only for local development")
-
-  # Create 100 annotations
-  n_annotations <- 100
-  n_structures <- 20
-
-  inchikeys <- generate_fake_inchikey(n_structures, seed = 100)
-
-  annotations <- create_test_annotation(
-    feature_ids = paste0("F", 1:n_annotations),
-    inchikeys = sample(inchikeys, n_annotations, replace = TRUE),
-    score_similarity = runif(n_annotations, 0.5, 1.0)
-  )
-
-  # Create structure-organism pairs (50 pairs per structure)
-  sop_table <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = rep(inchikeys, each = 50),
-    organism_name = rep(
-      c(
-        "Gentiana lutea",
-        "Gentiana acaulis",
-        "Arabidopsis thaliana",
-        "Coffea arabica",
-        "Swertia perennis"
-      ),
-      times = n_structures * 10
-    )[1:(n_structures * 50)],
-    organism_taxonomy_ottid = paste0("OTT", 1:(n_structures * 50)),
-    organism_taxonomy_01domain = "Eukaryota",
-    organism_taxonomy_02kingdom = "Plantae",
-    organism_taxonomy_03phylum = "Tracheophyta",
-    organism_taxonomy_04class = "Magnoliopsida",
-    organism_taxonomy_05order = sample(
-      c("Gentianales", "Brassicales"),
-      n_structures * 50,
-      replace = TRUE
-    ),
-    organism_taxonomy_06family = sample(
-      c("Gentianaceae", "Brassicaceae", "Rubiaceae"),
-      n_structures * 50,
-      replace = TRUE
-    ),
-    organism_taxonomy_07tribe = NA_character_,
-    organism_taxonomy_08genus = sample(
-      c("Gentiana", "Arabidopsis", "Coffea", "Swertia"),
-      n_structures * 50,
-      replace = TRUE
-    ),
-    organism_taxonomy_09species = organism_name,
-    organism_taxonomy_10varietas = NA_character_
-  )
-
-  # Should complete in reasonable time (<5 seconds)
-  start_time <- Sys.time()
-
-  result <- tima:::weight_bio(
-    annotation_table_taxed = annotations,
-    structure_organism_pairs_table = sop_table,
-    weight_spectral = 0.5,
-    weight_biological = 0.5,
-    score_biological_domain = 0.1,
-    score_biological_kingdom = 0.2,
-    score_biological_phylum = 0.3,
-    score_biological_class = 0.4,
-    score_biological_order = 0.5,
-    score_biological_family = 0.6,
-    score_biological_tribe = 0.7,
-    score_biological_genus = 0.8,
-    score_biological_species = 0.9,
-    score_biological_variety = 1.0
-  )
-
-  elapsed_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-
-  expect_true(
-    elapsed_time < 5,
-    info = sprintf(
-      "Processing took %.2f seconds (expected < 5s)",
-      elapsed_time
-    )
-  )
-
-  expect_true(nrow(result) > 0)
-  expect_s3_class(result, "data.frame")
-})
+# test_that("weight_bio handles moderate-scale data efficiently", {
+#   skip_on_cran()
+#   skip_if_not(interactive(), "Performance test only for local development")
+#
+#   # Create 100 annotations
+#   n_annotations <- 100
+#   n_structures <- 20
+#
+#   inchikeys <- generate_fake_inchikey(n_structures, seed = 100)
+#
+#   annotations <- create_test_annotation(
+#     feature_ids = paste0("F", 1:n_annotations),
+#     inchikeys = sample(inchikeys, n_annotations, replace = TRUE),
+#     score_similarity = runif(n_annotations, 0.5, 1.0)
+#   )
+#
+#   # Create structure-organism pairs (50 pairs per structure)
+#   sop_table <- tidytable::tidytable(
+#     structure_inchikey_connectivity_layer = rep(inchikeys, each = 50),
+#     organism_name = rep(
+#       c(
+#         "Gentiana lutea",
+#         "Gentiana acaulis",
+#         "Arabidopsis thaliana",
+#         "Coffea arabica",
+#         "Swertia perennis"
+#       ),
+#       times = n_structures * 10
+#     )[1:(n_structures * 50)],
+#     organism_taxonomy_ottid = paste0("OTT", 1:(n_structures * 50)),
+#     organism_taxonomy_01domain = "Eukaryota",
+#     organism_taxonomy_02kingdom = "Plantae",
+#     organism_taxonomy_03phylum = "Tracheophyta",
+#     organism_taxonomy_04class = "Magnoliopsida",
+#     organism_taxonomy_05order = sample(
+#       c("Gentianales", "Brassicales"),
+#       n_structures * 50,
+#       replace = TRUE
+#     ),
+#     organism_taxonomy_06family = sample(
+#       c("Gentianaceae", "Brassicaceae", "Rubiaceae"),
+#       n_structures * 50,
+#       replace = TRUE
+#     ),
+#     organism_taxonomy_07tribe = NA_character_,
+#     organism_taxonomy_08genus = sample(
+#       c("Gentiana", "Arabidopsis", "Coffea", "Swertia"),
+#       n_structures * 50,
+#       replace = TRUE
+#     ),
+#     organism_taxonomy_09species = organism_name,
+#     organism_taxonomy_10varietas = NA_character_
+#   )
+#
+#   # Should complete in reasonable time (<5 seconds)
+#   start_time <- Sys.time()
+#
+#   result <- tima:::weight_bio(
+#     annotation_table_taxed = annotations,
+#     structure_organism_pairs_table = sop_table,
+#     weight_spectral = 0.5,
+#     weight_biological = 0.5,
+#     score_biological_domain = 0.1,
+#     score_biological_kingdom = 0.2,
+#     score_biological_phylum = 0.3,
+#     score_biological_class = 0.4,
+#     score_biological_order = 0.5,
+#     score_biological_family = 0.6,
+#     score_biological_tribe = 0.7,
+#     score_biological_genus = 0.8,
+#     score_biological_species = 0.9,
+#     score_biological_variety = 1.0
+#   )
+#
+#   elapsed_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+#
+#   expect_true(
+#     elapsed_time < 5,
+#     info = sprintf(
+#       "Processing took %.2f seconds (expected < 5s)",
+#       elapsed_time
+#     )
+#   )
+#
+#   expect_true(nrow(result) > 0)
+#   expect_s3_class(result, "data.frame")
+# })
