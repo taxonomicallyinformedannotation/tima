@@ -1,5 +1,4 @@
 # Test: Feature and Network Functions
-library(testthat)
 
 # test_that("prepare_features_tables handles missing RT column", {
 # local_test_project(copy = TRUE)

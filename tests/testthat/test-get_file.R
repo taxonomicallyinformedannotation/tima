@@ -1,9 +1,6 @@
 # Test Suite for get_file()
 # Tests the file download function with retry logic and validation
 
-library(testthat)
-library(tima)
-
 # ==============================================================================
 # Test: Input Validation
 # ==============================================================================

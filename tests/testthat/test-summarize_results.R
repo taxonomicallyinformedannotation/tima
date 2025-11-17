@@ -6,8 +6,6 @@
 #'
 #' @description Individual focused tests for summarize_results function.
 
-library(testthat)
-library(tima)
 
 # Helper function to create test data ----
 

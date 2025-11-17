@@ -1,8 +1,6 @@
 # ==============================================================================
 # Test Suite: clean_chemo
 # ==============================================================================
-library(testthat)
-library(tima)
 
 candidates_final <- tidytable::tidytable(
   candidate_structure_inchikey_connectivity_layer = character()

@@ -1,8 +1,6 @@
 # ==============================================================================
 # Test Suite: clean_bio
 # ==============================================================================
-library(testthat)
-library(tima)
 
 edges_table <- tidytable::tidytable(feature_id = character())
 

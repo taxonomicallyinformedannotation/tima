@@ -2,9 +2,6 @@
 # Test Suite: export_output
 # ==============================================================================
 
-library(testthat)
-library(tima)
-
 # Validation tests
 test_that("export_output validates file path", {
   expect_error(export_output(x = data.frame(a = 1), file = NULL), "non-empty")

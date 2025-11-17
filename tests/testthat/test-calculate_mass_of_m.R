@@ -2,9 +2,6 @@
 #'
 #' @description Individual focused tests for calculate_mass_of_m function.
 
-library(testthat)
-library(tima)
-
 # Test: Basic mass calculation ----
 
 test_that("calculate_mass_of_m calculates mass from [M+H]+", {

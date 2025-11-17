@@ -2,9 +2,6 @@
 # Test Suite: get_constant / validate_against_constant
 # ==============================================================================
 
-library(testthat)
-library(tima)
-
 test_that("get_constant returns existing constant", {
   val <- tima:::get_constant("DEFAULT_HC_SCORE_BIO_MIN")
   expect_equal(val, 0.85)

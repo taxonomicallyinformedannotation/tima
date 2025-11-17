@@ -1,8 +1,6 @@
 # ==============================================================================
 # Test Suite: read_mgf_opti
 # ==============================================================================
-library(testthat)
-library(tima)
 
 test_that("read_mgf_opti validates file path", {
   expect_error(read_mgf_opti(f = "missing.mgf"), "not found")

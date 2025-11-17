@@ -2,9 +2,6 @@
 #'
 #' @description Individual focused tests for round_reals function.
 
-library(testthat)
-library(tima)
-
 # Test: Basic rounding functionality ----
 
 test_that("round_reals rounds numeric columns by default", {

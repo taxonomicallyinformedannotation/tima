@@ -1,8 +1,6 @@
 # ==============================================================================
 # Test Suite: clean_collapse
 # ==============================================================================
-library(testthat)
-library(tima)
 
 test_that("clean_collapse collapses specified columns", {
   df <- tidytable::tidytable(

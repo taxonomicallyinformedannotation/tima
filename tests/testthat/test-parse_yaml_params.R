@@ -1,8 +1,6 @@
 # ==============================================================================
 # Test Suite: parse_yaml_params
 # ==============================================================================
-library(testthat)
-library(tima)
 
 test_that("parse_yaml_params errors if default file missing", {
   tmp <- withr::local_tempdir()

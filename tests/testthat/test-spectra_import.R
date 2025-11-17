@@ -1,5 +1,4 @@
 # Test: Spectra Import and Processing
-library(testthat)
 
 test_that("import_spectra handles MGF files correctly", {
   local_test_project(copy = TRUE)

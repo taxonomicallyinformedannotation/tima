@@ -13,9 +13,6 @@
 # - Missing column handling
 # - Edge cases and error handling
 
-library(testthat)
-library(tima)
-
 # ==============================================================================
 # Input Validation Tests
 # ==============================================================================

@@ -1,5 +1,4 @@
 # Test: Prepare Features Components
-library(testthat)
 
 # =============================================================================
 # Tests for prepare_features_components() - Network Component Processing

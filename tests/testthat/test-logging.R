@@ -2,9 +2,6 @@
 # Test Suite: Logging configuration
 # ==============================================================================
 
-library(testthat)
-library(tima)
-
 with_temp_env <- function(vars, code) {
   old <- lapply(names(vars), Sys.getenv)
   on.exit(

@@ -11,9 +11,6 @@
 # - Minimal cyclic edge set
 # - Integration with prepare_features_edges
 
-library(testthat)
-library(tima)
-
 # Helper to write edges table
 write_edges_table <- function(df, paths) {
   export_output(

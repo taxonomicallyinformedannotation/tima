@@ -15,9 +15,6 @@
 # - validate_character - Character string validation
 # - validate_logical - Boolean validation
 
-library(testthat)
-library(tima)
-
 # ==============================================================================
 # Tests: validate_file_existence
 # ==============================================================================

@@ -2,9 +2,6 @@
 # Test Suite: select_annotations_columns
 # ==============================================================================
 
-library(testthat)
-library(tima)
-
 make_fake_struct_files <- function(root = tempdir()) {
   paths <- list(
     stereo = file.path(root, "stereo.tsv"),

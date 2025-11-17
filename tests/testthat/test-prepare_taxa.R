@@ -1,5 +1,4 @@
 # Test: Prepare Taxa - Taxonomic Assignment
-library(testthat)
 
 # =============================================================================
 # Tests for prepare_taxa() - Feature Taxonomic Assignment

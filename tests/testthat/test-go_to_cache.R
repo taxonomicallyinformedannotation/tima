@@ -1,8 +1,6 @@
 # ==============================================================================
 # Test Suite: go_to_cache
 # ==============================================================================
-library(testthat)
-library(tima)
 
 test_that("go_to_cache validates directory name", {
   expect_error(go_to_cache(dir = NULL), "non-empty")

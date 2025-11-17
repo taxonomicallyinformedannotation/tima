@@ -3,9 +3,6 @@
 #' @description Individual tests for the inverse mass-to-mz calculation
 #'     and round-trip accuracy verification.
 
-library(testthat)
-library(tima)
-
 # Test: Basic mz calculation ----
 
 test_that("calculate_mz_from_mass calculates mz for [M+H]+", {

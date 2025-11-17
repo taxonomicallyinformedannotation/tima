@@ -1,9 +1,6 @@
 # Test Suite for prepare_features_tables()
 # Tests the feature table preparation and standardization function
 
-library(testthat)
-library(tima)
-
 # ==============================================================================
 # Test: Input Validation
 # ==============================================================================

@@ -1,5 +1,4 @@
 # Test: File Download and GNPS Functions
-library(testthat)
 
 test_that("replace_id handles different input combinations", {
   # Empty GNPS ID

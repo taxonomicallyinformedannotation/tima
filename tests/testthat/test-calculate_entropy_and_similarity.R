@@ -2,9 +2,6 @@
 # Test Suite: calculate_entropy_and_similarity
 # ==============================================================================
 
-# Test: Spectral Similarity and Annotation
-library(testthat)
-
 test_that("calculate_entropy_and_similarity works with small spectra", {
   # Small test spectra
   x_small <- cbind(
