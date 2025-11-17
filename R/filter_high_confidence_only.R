@@ -6,15 +6,28 @@
 #'     (biological, initial, chemical) and retention time accuracy.
 #'
 #' @param df Data frame containing annotation results with score columns
-#' @param score_bio_min Numeric minimum biological score threshold (default: 0.85)
-#' @param score_ini_min Numeric minimum initial score threshold (default: 0.95)
-#' @param score_final_min Numeric minimum final (chemical) score threshold (default: 0.75)
-#' @param error_rt_max Numeric maximum retention time error in minutes (default: 0.1)
-#' @param confidence_sirius_min Numeric minimum SIRIUS confidence score threshold (optional)
-#' @param similarity_spectral_min Numeric minimum spectral similarity threshold (optional)
+#' @param score_bio_min Numeric minimum biological score threshold (default: 0.85). Range: 0-1
+#' @param score_ini_min Numeric minimum initial score threshold (default: 0.95). Range: 0-1
+#' @param score_final_min Numeric minimum final (chemical) score threshold (default: 0.75). Range: 0-1
+#' @param error_rt_max Numeric maximum retention time error in minutes (default: 0.05). Must be > 0
+#' @param confidence_sirius_min Numeric minimum SIRIUS confidence score threshold (optional). Range: 0-1
+#' @param similarity_spectral_min Numeric minimum spectral similarity threshold (optional). Range: 0-1
 #'
 #' @return Data frame containing only high-confidence annotations that meet
 #'     at least one score threshold and pass RT error filtering
+#'
+#' @details
+#' Columns used when present:
+#' - score_biological
+#' - candidate_score_pseudo_initial
+#' - score_weighted_chemo
+#' - candidate_structure_error_rt (assumed in minutes; NA means unknown and is allowed)
+#' - candidate_score_sirius_confidence (optional)
+#' - candidate_similarity (optional)
+#'
+#' Missing score columns are treated as absent for that criterion and do not
+#' cause errors; at least one of the three primary scores must satisfy its
+#' threshold for a row to be retained.
 #'
 #' @examples NULL
 filter_high_confidence_only <- function(
@@ -26,91 +39,128 @@ filter_high_confidence_only <- function(
   confidence_sirius_min = DEFAULT_HC_SCORE_SIRIUS_MIN,
   similarity_spectral_min = DEFAULT_HC_SCORE_SPECTRAL_MIN
 ) {
-  # Validate inputs
-  if (!is.data.frame(df) && !inherits(df, "tbl")) {
-    stop("Input 'df' must be a data frame or tibble")
-  }
+  # ============================================================================
+  # Validation
+  # ============================================================================
+  validate_dataframe(df, name = "df", allow_empty = TRUE)
 
   if (nrow(df) == 0L) {
     logger::log_warn("Empty data frame provided to filter")
     return(df)
   }
 
-  # Validate score thresholds are in valid range
+  validate_numeric_range(
+    score_bio_min,
+    param_name = "score_bio_min",
+    min_value = 0,
+    max_value = 1
+  )
+  validate_numeric_range(
+    score_ini_min,
+    param_name = "score_ini_min",
+    min_value = 0,
+    max_value = 1
+  )
+  validate_numeric_range(
+    score_final_min,
+    param_name = "score_final_min",
+    min_value = 0,
+    max_value = 1
+  )
+
   if (
-    any(
-      c(score_bio_min, score_ini_min, score_final_min) < 0 |
-        c(score_bio_min, score_ini_min, score_final_min) > 1
-    )
+    !is.numeric(error_rt_max) ||
+      length(error_rt_max) != 1L ||
+      is.na(error_rt_max) ||
+      error_rt_max <= 0
   ) {
-    stop("Score thresholds must be between 0 and 1")
+    stop("RT error threshold must be positive (minutes)")
   }
 
-  if (error_rt_max <= 0) {
-    stop("RT error threshold must be positive")
+  if (!is.null(confidence_sirius_min)) {
+    validate_numeric_range(
+      confidence_sirius_min,
+      param_name = "confidence_sirius_min",
+      min_value = 0,
+      max_value = 1
+    )
+  }
+  if (!is.null(similarity_spectral_min)) {
+    validate_numeric_range(
+      similarity_spectral_min,
+      param_name = "similarity_spectral_min",
+      min_value = 0,
+      max_value = 1
+    )
   }
 
+  # ============================================================================
+  # Prepare safe columns (handle missing gracefully)
+  # ============================================================================
+  rt_err_vec <- if ("candidate_structure_error_rt" %in% names(df)) {
+    df[["candidate_structure_error_rt"]]
+  } else {
+    rep(NA_real_, nrow(df))
+  }
+
+  df_work <- df |>
+    tidytable::mutate(
+      .score_bio = tidytable::coalesce(.data[["score_biological"]], -Inf),
+      .score_ini = tidytable::coalesce(
+        .data[["candidate_score_pseudo_initial"]],
+        -Inf
+      ),
+      .score_final = tidytable::coalesce(.data[["score_weighted_chemo"]], -Inf),
+      .rt_err_min = rt_err_vec
+    )
+
+  n_before <- nrow(df_work)
+
+  # ============================================================================
+  # Core filtering
+  # ============================================================================
+  # At least one of the three score thresholds must be satisfied
+  df_filtered <- df_work |>
+    tidytable::filter(
+      (.score_bio >= score_bio_min) |
+        (.score_ini >= score_ini_min) |
+        (.score_final >= score_final_min)
+    )
+
+  # RT error filter (minutes). Allow NA (unknown) values
+  if ("candidate_structure_error_rt" %in% names(df_filtered)) {
+    df_filtered <- df_filtered |>
+      tidytable::filter(is.na(.rt_err_min) | .rt_err_min <= error_rt_max)
+  }
+
+  # Optional SIRIUS confidence
   if (
     !is.null(confidence_sirius_min) &&
-      (confidence_sirius_min < 0 || confidence_sirius_min > 1)
+      "candidate_score_sirius_confidence" %in% names(df_filtered)
   ) {
-    stop("confidence_sirius_min must be between 0 and 1")
-  }
-  if (
-    !is.null(similarity_spectral_min) &&
-      (similarity_spectral_min < 0 || similarity_min > 1)
-  ) {
-    stop("similarity_spectral_min must be between 0 and 1")
+    df_filtered <- df_filtered |>
+      tidytable::filter(
+        .data[["candidate_score_sirius_confidence"]] >= confidence_sirius_min
+      )
   }
 
-  # logger::log_trace("Filtering for high-confidence candidates")
-
-  n_before <- nrow(df)
-
-  # Filter by score thresholds (at least one must be met)
-  # TODO: This is basic filtering. Future improvements could add:
-  # - Internal library match quality
-  df_filtered <- df |>
-    tidytable::filter(
-      score_biological >= score_bio_min |
-        candidate_score_pseudo_initial >= score_ini_min |
-        score_weighted_chemo >= score_final_min |
-        candidate_structure_error_rt <= error_rt_max
-    )
-
-  # Optional: SIRIUS confidence filter if column present and threshold provided
-  if (!is.null(confidence_sirius_min)) {
-    conf_col <- tidytable::coalesce(
-      tidyselect::vars_select(
-        names(df_filtered),
-        tidyselect::any_of("candidate_score_sirius_confidence")
-      ),
-      character(0)
-    )
-    if (length(conf_col) == 1 && conf_col %in% names(df_filtered)) {
-      df_filtered <- df_filtered |>
-        tidytable::filter(.data[[conf_col]] >= confidence_sirius_min)
-    }
-  }
-
-  # Optional: spectral similarity filter if column present and threshold provided
+  # Optional spectral similarity
   if (
     !is.null(similarity_spectral_min) &&
       "candidate_similarity" %in% names(df_filtered)
   ) {
     df_filtered <- df_filtered |>
-      tidytable::filter(candidate_similarity >= similarity_spectral_min)
-  }
-
-  # Apply RT error filter if column exists
-  if ("candidate_structure_error_rt" %in% colnames(df_filtered)) {
-    # logger::log_trace("Applying RT error filter (max: {error_rt_max} min)")
-    df_filtered <- df_filtered |>
       tidytable::filter(
-        is.na(candidate_structure_error_rt) |
-          candidate_structure_error_rt < error_rt_max
+        .data[["candidate_similarity"]] >= similarity_spectral_min
       )
   }
+
+  # Drop helper columns
+  df_filtered <- df_filtered |>
+    tidytable::select(
+      -tidyselect::starts_with(".score_"),
+      -tidyselect::starts_with(".rt_err_")
+    )
 
   n_after <- nrow(df_filtered)
   n_removed <- n_before - n_after
@@ -132,5 +182,5 @@ filter_high_confidence_only <- function(
     "%)"
   )
 
-  return(df_filtered)
+  df_filtered
 }
