@@ -73,7 +73,7 @@ local_test_project <- function(copy = TRUE) {
   local_quiet_logging()
 
   if (isTRUE(copy)) {
-    copy_backbone(cache_dir = ".")
+    tima:::copy_backbone(cache_dir = ".")
   }
 
   get_default_paths()
