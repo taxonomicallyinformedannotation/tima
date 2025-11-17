@@ -1,30 +1,8 @@
-# Test Suite for create_edges()
-# Tests the spectral similarity network edge creation function
-
 # ==============================================================================
-# Helper: Create Test Spectra
+# Test Suite: create_edges()
 # ==============================================================================
-
-create_test_spectrum <- function(n_peaks = 5, mz_range = c(100, 500)) {
-  mz <- sort(runif(n_peaks, mz_range[1], mz_range[2]))
-  intensity <- runif(n_peaks, 100, 1000)
-  matrix(c(mz, intensity), ncol = 2, dimnames = list(NULL, c("mz", "int")))
-}
-
-create_similar_spectra <- function(
-  base_spectrum,
-  n_similar = 3,
-  noise_level = 0.1
-) {
-  lapply(seq_len(n_similar), function(i) {
-    # Add small random noise to create similar but not identical spectra
-    noise <- matrix(
-      rnorm(length(base_spectrum), 0, noise_level),
-      ncol = 2
-    )
-    pmax(base_spectrum + noise, 0) # Ensure non-negative values
-  })
-}
+# Tests the spectral similarity network edge creation function.
+# Uses test fixtures from helper-fixtures.R (create_test_spectrum, create_similar_spectra).
 
 # ==============================================================================
 # Test: Input Validation

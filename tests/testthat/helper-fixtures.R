@@ -6,6 +6,44 @@
 # boilerplate code and improve test maintainability.
 
 # ==============================================================================
+# Internal Utility Helpers (defined first for use throughout)
+# ==============================================================================
+
+# Deterministic random helper ----
+.with_seed <- function(seed, expr) {
+  if (!is.null(seed)) {
+    old <- .Random.seed
+    on.exit(
+      {
+        if (exists("old", inherits = FALSE)) .Random.seed <<- old
+      },
+      add = TRUE
+    )
+    set.seed(seed)
+  }
+  force(expr)
+}
+
+# Pseudo InChIKey generator (format only, not chemically valid) ----
+generate_fake_inchikey <- function(n = 1L, seed = NULL) {
+  .with_seed(seed, {
+    vapply(
+      seq_len(n),
+      function(i) {
+        paste0(
+          paste(sample(LETTERS, 14, TRUE), collapse = ""),
+          "-",
+          paste(sample(LETTERS, 10, TRUE), collapse = ""),
+          "-",
+          sample(LETTERS, 1)
+        )
+      },
+      character(1)
+    )
+  })
+}
+
+# ==============================================================================
 # Environment Setup Fixtures
 # ==============================================================================
 
@@ -92,11 +130,17 @@ create_test_spectrum <- function(
 ) {
   .with_seed(seed, {
     stopifnot(
-      is.numeric(n_peaks), n_peaks >= 0,
-      length(mz_range) == 2, length(intensity_range) == 2
+      is.numeric(n_peaks),
+      n_peaks >= 0,
+      length(mz_range) == 2,
+      length(intensity_range) == 2
     )
     if (n_peaks == 0) {
-      return(matrix(numeric(0), ncol = 2, dimnames = list(NULL, c("mz", "int"))))
+      return(matrix(
+        numeric(0),
+        ncol = 2,
+        dimnames = list(NULL, c("mz", "int"))
+      ))
     }
     mz <- sort(runif(n_peaks, mz_range[1], mz_range[2]))
     intensity <- runif(n_peaks, intensity_range[1], intensity_range[2])
@@ -126,7 +170,12 @@ create_similar_spectra <- function(
   noise_level = 0.1,
   seed = NULL
 ) {
-  stopifnot(is.matrix(base_spectrum), ncol(base_spectrum) == 2, n_similar > 0, noise_level >= 0)
+  stopifnot(
+    is.matrix(base_spectrum),
+    ncol(base_spectrum) == 2,
+    n_similar > 0,
+    noise_level >= 0
+  )
   .with_seed(seed, {
     lapply(seq_len(n_similar), function(i) {
       noise <- matrix(rnorm(length(base_spectrum), 0, noise_level), ncol = 2)
@@ -206,11 +255,18 @@ create_test_annotations <- function(
   stopifnot(n_annotations >= n_features)
   .with_seed(seed, {
     tidytable::tidytable(
-      feature_id = sample(sprintf("FT%04d", seq_len(n_features)), n_annotations, TRUE),
+      feature_id = sample(
+        sprintf("FT%04d", seq_len(n_features)),
+        n_annotations,
+        TRUE
+      ),
       candidate_structure_inchikey = generate_fake_inchikey(n_annotations),
       candidate_structure_smiles = replicate(
         n_annotations,
-        paste(sample(c("C", "O", "N", "=", "-", "(", ")"), 10, TRUE), collapse = "")
+        paste(
+          sample(c("C", "O", "N", "=", "-", "(", ")"), 10, TRUE),
+          collapse = ""
+        )
       ),
       candidate_score_similarity = runif(n_annotations, 0, 1),
       candidate_mass_error_ppm = runif(n_annotations, -10, 10)
@@ -235,12 +291,23 @@ create_test_taxonomy <- function(n_taxa = 5L, seed = NULL) {
     genera <- c("Gentiana", "Arabidopsis", "Solanum", "Coffea", "Nicotiana")
     species <- c("lutea", "thaliana", "tuberosum", "arabica", "tabacum")
     tidytable::tidytable(
-      organism_name = paste(sample(genera, n_taxa, TRUE), sample(species, n_taxa, TRUE)),
+      organism_name = paste(
+        sample(genera, n_taxa, TRUE),
+        sample(species, n_taxa, TRUE)
+      ),
       organism_taxonomy_ottid = sample(100000:999999, n_taxa),
       organism_taxonomy_01domain = "Eukaryota",
       organism_taxonomy_02kingdom = "Plantae",
-      organism_taxonomy_03phylum = sample(c("Tracheophyta", "Chlorophyta"), n_taxa, TRUE),
-      organism_taxonomy_06family = sample(c("Gentianaceae", "Brassicaceae", "Solanaceae"), n_taxa, TRUE)
+      organism_taxonomy_03phylum = sample(
+        c("Tracheophyta", "Chlorophyta"),
+        n_taxa,
+        TRUE
+      ),
+      organism_taxonomy_06family = sample(
+        c("Gentianaceae", "Brassicaceae", "Solanaceae"),
+        n_taxa,
+        TRUE
+      )
     )
   })
 }
@@ -627,254 +694,9 @@ create_structure_organism_pairs <- function(n_rows = 0) {
     ),
     organism_taxonomy_10varietas = rep(NA_character_, n_rows)
   )
-
   result
 }
 
-#' Create annotation table with taxonomy (for weight_bio tests)
-#'
-#' @param n_rows Number of rows
-#' @return tidytable with annotation and taxonomy
-#' @export
-#' @keywords internal
-create_annotation_table_taxed <- function(n_rows = 0) {
-  base <- create_minimal_data("annotation", n_rows)
-
-  if (n_rows == 0) {
-    # Return empty structure with taxonomy columns
-    taxonomy_cols <- c(
-      "sample_organism_01_domain",
-      "sample_organism_02_kingdom",
-      "sample_organism_03_phylum",
-      "sample_organism_04_class",
-      "sample_organism_05_order",
-      "sample_organism_06_family",
-      "sample_organism_07_tribe",
-      "sample_organism_08_genus",
-      "sample_organism_09_species",
-      "sample_organism_10_varietas"
-    )
-    for (col in taxonomy_cols) {
-      base[[col]] <- character(0)
-    }
-    return(base)
-  }
-
-  # Add taxonomy for sample data
-  base$sample_organism_01_domain <- "Eukaryota"
-  base$sample_organism_02_kingdom <- "Plantae"
-  base$sample_organism_03_phylum <- "Tracheophyta"
-  base$sample_organism_04_class <- "Magnoliopsida"
-  base$sample_organism_05_order <- "Gentianales"
-  base$sample_organism_06_family <- "Gentianaceae"
-  base$sample_organism_07_tribe <- "Gentianeae"
-  base$sample_organism_08_genus <- "Gentiana"
-  base$sample_organism_09_species <- "lutea"
-  base$sample_organism_10_varietas <- NA_character_
-
-  base
-}
-#' Test Fixtures and Helpers for TIMA Tests
-#'
-#' This file provides reusable test fixtures, mock data generators,
-#' and helper functions to improve test reliability and reduce duplication.
-
-# Test Data Generators ----
-
-#' Create minimal spectral library for testing
-#'
-#' @param n_compounds Number of compounds to generate
-#' @param ms_mode Ionization mode ("pos" or "neg")
-#' @return tidytable with spectral library data
-#' @keywords internal
-create_test_library <- function(n_compounds = 20, ms_mode = "pos") {
-  adducts <- if (ms_mode == "pos") {
-    c("[M+H]+", "[M+Na]+", "[M+K]+", "[M+NH4]+")
-  } else {
-    c("[M-H]-", "[M+Cl]-", "[M+FA-H]-")
-  }
-
-  tidytable::tidytable(
-    "structure_inchikey" = paste0(
-      "FAKE",
-      sprintf("%015d", seq_len(n_compounds))
-    ),
-    "structure_smiles" = replicate(
-      n_compounds,
-      paste0(
-        "C",
-        paste0(sample(c("C", "O", "N"), 10, replace = TRUE), collapse = "")
-      )
-    ),
-    "structure_exact_mass" = runif(n_compounds, 100, 600),
-    "structure_molecular_formula" = replicate(
-      n_compounds,
-      paste0(
-        "C",
-        sample(10:30, 1),
-        "H",
-        sample(10:50, 1),
-        "O",
-        sample(1:10, 1)
-      )
-    ),
-    "adduct" = sample(adducts, n_compounds, replace = TRUE),
-    "organism_name" = sample(
-      c("Arabidopsis thaliana", "Solanum lycopersicum", "Oryza sativa"),
-      n_compounds,
-      replace = TRUE
-    ),
-    "organism_taxonomy_ottid" = sample(1000000:9999999, n_compounds)
-  )
-}
-
-# Test Environment Setup ----
-
-#' Setup isolated test environment with temp directory
-#'
-#' @param test_name Name of test (for directory naming)
-#' @return Path to temporary test directory
-#' @keywords internal
-setup_test_env <- function(test_name = "test") {
-  # Create unique temp directory
-  temp_dir <- file.path(
-    tempdir(),
-    paste0("tima_test_", test_name, "_", Sys.getpid())
-  )
-  dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
-
-  # Set as working directory
-  old_wd <- getwd()
-  setwd(temp_dir)
-
-  # Store cleanup info
-  withr::defer(
-  {
-    setwd(old_wd)
-    unlink(temp_dir, recursive = TRUE)
-  },
-    envir = parent.frame()
-  )
-
-  temp_dir
-}
-
-#' Setup minimal TIMA directory structure for testing
-#'
-#' @param base_path Base directory path
-#' @keywords internal
-setup_tima_structure <- function(base_path = ".") {
-  dirs <- c(
-    file.path(base_path, "data/source"),
-    file.path(base_path, "data/interim/features"),
-    file.path(base_path, "data/interim/annotations"),
-    file.path(base_path, "data/interim/libraries/sop"),
-    file.path(base_path, "data/interim/libraries/spectra"),
-    file.path(base_path, "data/processed")
-  )
-
-  lapply(dirs, function(d) {
-    dir.create(d, recursive = TRUE, showWarnings = FALSE)
-  })
-
-  invisible(TRUE)
-}
-
-# Validation Helpers ----
-
-#' Check if numeric values are within expected range
-#'
-#' @param values Numeric vector to check
-#' @param min_val Minimum expected value
-#' @param max_val Maximum expected value
-#' @param value_name Name of values (for error messages)
-#' @keywords internal
-expect_values_in_range <- function(
-  values,
-  min_val,
-  max_val,
-  value_name = "values"
-) {
-  testthat::expect_true(
-    all(values >= min_val & values <= max_val, na.rm = TRUE),
-    info = paste0(
-      value_name,
-      " should be between ",
-      min_val,
-      " and ",
-      max_val,
-      ". Found range: ",
-      min(values, na.rm = TRUE),
-      " to ",
-      max(values, na.rm = TRUE)
-    )
-  )
-}
-
-# Mock Data Writers ----
-
-#' Write minimal feature file for testing
-#'
-#' @param path Output file path
-#' @param n_features Number of features
-#' @param ... Additional arguments passed to create_test_features
-#' @keywords internal
-write_test_features <- function(path, n_features = 10, ...) {
-  features <- create_test_features(n_features = n_features, ...)
-
-  # Ensure directory exists
-  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
-
-  # Write based on file extension
-  if (grepl("\\.gz$", path)) {
-    tidytable::fwrite(features, gsub("\\.gz$", "", path))
-    R.utils::gzip(gsub("\\.gz$", "", path), destname = path, remove = TRUE)
-  } else {
-    tidytable::fwrite(features, path)
-  }
-
-  invisible(path)
-}
-
-#' Write minimal library file for testing
-#'
-#' @param path Output file path
-#' @param n_compounds Number of compounds
-#' @param ... Additional arguments passed to create_test_library
-#' @keywords internal
-write_test_library <- function(path, n_compounds = 20, ...) {
-  library_data <- create_test_library(n_compounds = n_compounds, ...)
-
-  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
-
-  if (grepl("\\.gz$", path)) {
-    tidytable::fwrite(library_data, gsub("\\.gz$", "", path))
-    R.utils::gzip(gsub("\\.gz$", "", path), destname = path, remove = TRUE)
-  } else {
-    tidytable::fwrite(library_data, path)
-  }
-
-  invisible(path)
-}
-
-# Cleanup Helpers ----
-
-#' Clean up test files and directories
-#'
-#' @param paths Character vector of paths to remove
-#' @keywords internal
-cleanup_test_files <- function(paths) {
-  for (path in paths) {
-    if (file.exists(path)) {
-      if (dir.exists(path)) {
-        unlink(path, recursive = TRUE)
-      } else {
-        file.remove(path)
-      }
-    }
-  }
-  invisible(TRUE)
-}
 
 # Param fixtures for prepare_params / get_params tests
 # These mimic the structure expected by internal functions but are lightweight.
@@ -899,7 +721,13 @@ create_fixture_params_advanced <- function(id = "TESTID") {
     files = list(
       pattern = "{id}",
       annotations = list(
-        raw = list(spectral = list(gnps = sprintf("gnps_raw_%s.mgf", id), spectral = sprintf("spectral_raw_%s.mgf", id)), sirius = sprintf("sirius_raw_%s", id)),
+        raw = list(
+          spectral = list(
+            gnps = sprintf("gnps_raw_%s.mgf", id),
+            spectral = sprintf("spectral_raw_%s.mgf", id)
+          ),
+          sirius = sprintf("sirius_raw_%s", id)
+        ),
         prepared = list(
           canopus = sprintf("canopus_pre_%s.tsv", id),
           formula = sprintf("formula_pre_%s.tsv", id),
@@ -912,14 +740,53 @@ create_fixture_params_advanced <- function(id = "TESTID") {
         filtered = sprintf("annotations_filtered_%s.tsv", id),
         processed = sprintf("annotations_processed_%s.tsv", id)
       ),
-      features = list(raw = sprintf("features_raw_%s.tsv", id), prepared = list(tsv = sprintf("features_pre_%s.tsv", id))),
-      metadata = list(raw = sprintf("metadata_raw_%s.tsv", id), prepared = list(tsv = sprintf("metadata_pre_%s.tsv", id))),
+      features = list(
+        raw = sprintf("features_raw_%s.tsv", id),
+        prepared = list(tsv = sprintf("features_pre_%s.tsv", id))
+      ),
+      metadata = list(
+        raw = sprintf("metadata_raw_%s.tsv", id),
+        prepared = list(tsv = sprintf("metadata_pre_%s.tsv", id))
+      ),
       spectral = list(raw = sprintf("spectral_raw_%s.mgf", id)),
-      libraries = list(sop = list(merged = list(keys = sprintf("keys_%s.tsv", id))), spectral = list(pos = sprintf("lib_pos_%s.mgf", id), neg = sprintf("lib_neg_%s.mgf", id))), networks = list(spectral = list(edges = list(prepared = sprintf("edges_pre_%s.tsv", id)), components = list(prepared = sprintf("components_pre_%s.tsv", id))))
+      libraries = list(
+        sop = list(merged = list(keys = sprintf("keys_%s.tsv", id))),
+        spectral = list(
+          pos = sprintf("lib_pos_%s.mgf", id),
+          neg = sprintf("lib_neg_%s.mgf", id)
+        )
+      ),
+      networks = list(
+        spectral = list(
+          edges = list(prepared = sprintf("edges_pre_%s.tsv", id)),
+          components = list(prepared = sprintf("components_pre_%s.tsv", id))
+        )
+      )
     ),
-    ms = list(adducts = list(pos = c("[M+H]+"), neg = c("[M-H]-")), tolerances = list(mass = list(ppm = list(ms1 = 5, ms2 = 10))), neutral_losses = c("H2O")),
-    annotations = list(candidates = list(best_percentile = 0.9, final = 5L, neighbors = 20L, samples = 3L), ms1only = FALSE, ms2approx = TRUE, thresholds = list(consistency = 0.5, ms1 = list(biological = 0.1, chemical = 0.2, condition = "OR"))),
-    names = list(source = "feature_source", target = "feature_target", features = "feature_id"),
+    ms = list(
+      adducts = list(pos = c("[M+H]+"), neg = c("[M-H]-")),
+      tolerances = list(mass = list(ppm = list(ms1 = 5, ms2 = 10))),
+      neutral_losses = c("H2O")
+    ),
+    annotations = list(
+      candidates = list(
+        best_percentile = 0.9,
+        final = 5L,
+        neighbors = 20L,
+        samples = 3L
+      ),
+      ms1only = FALSE,
+      ms2approx = TRUE,
+      thresholds = list(
+        consistency = 0.5,
+        ms1 = list(biological = 0.1, chemical = 0.2, condition = "OR")
+      )
+    ),
+    names = list(
+      source = "feature_source",
+      target = "feature_target",
+      features = "feature_id"
+    ),
     options = list(compounds_names = FALSE, force = TRUE, remove_ties = FALSE)
   )
 }
@@ -928,58 +795,45 @@ create_fixture_yamls_params <- function(id = "TESTID") {
   list(
     yamls_params = list(
       prepare_params_advanced = create_fixture_params_advanced(id = id),
-      annotate_masses = list(files = list(features = list(prepared = list(tsv = sprintf("feat_pre_%s.tsv", id))), annotations = list(prepared = list(structural = list(tsv = sprintf("struct_pre_%s.tsv", id)))))),
-      weight_annotations = list(annotations = list(candidates = list(best_percentile = 0.9, final = 5L, neighbors = 20L), thresholds = list(consistency = 0.5, ms1 = list(biological = 0.1, chemical = 0.2, condition = "OR"))), files = list(pattern = "{id}"))
+      annotate_masses = list(
+        files = list(
+          features = list(
+            prepared = list(tsv = sprintf("feat_pre_%s.tsv", id))
+          ),
+          annotations = list(
+            prepared = list(
+              structural = list(tsv = sprintf("struct_pre_%s.tsv", id))
+            )
+          )
+        )
+      ),
+      weight_annotations = list(
+        annotations = list(
+          candidates = list(best_percentile = 0.9, final = 5L, neighbors = 20L),
+          thresholds = list(
+            consistency = 0.5,
+            ms1 = list(biological = 0.1, chemical = 0.2, condition = "OR")
+          )
+        ),
+        files = list(pattern = "{id}")
+      )
     )
   )
 }
 
-
 # ==============================================================================
 # Usage Guide
 # ==============================================================================
-
-# Use CSV fixtures when:
-# - You need realistic reference data
-# - Multiple tests use the same data
-# - Data is static and doesn't need to vary
-# Example: metadata <- load_fixture_metadata()
-
 # Use create_empty_table() when:
 # - Testing input validation
 # - Need proper column structure but no data
 # Example: empty_annot <- create_empty_table("annotation")
-
 # Use create_minimal_data() when:
 # - Need 2-3 rows for simple logic tests
 # - Testing basic functionality
 # Example: features <- create_minimal_data("features", n_rows = 3)
-
-# Use create_*() functions when:
-# - Need programmatically generated data
+# Use create_test_*() functions when:
+# - Need programmatically generated data with optional deterministic seeding
 # - Testing with varying sizes/scenarios
-# - Need specific test conditions
-# Example: sop <- create_structure_organism_pairs(n_rows = 10)
-
-# Internal deterministic helpers placed early so available to later fixtures ----
-.with_seed <- function(seed, expr) {
-  if (!is.null(seed)) {
-    old <- .Random.seed
-    on.exit({ if (exists("old", inherits = FALSE)) .Random.seed <<- old }, add = TRUE)
-    set.seed(seed)
-  }
-  force(expr)
-}
-
-generate_fake_inchikey <- function(n = 1L, seed = NULL) {
-  .with_seed(seed, {
-    vapply(seq_len(n), function(i) {
-      paste0(
-        paste(sample(LETTERS, 14, TRUE), collapse = ""), "-",
-        paste(sample(LETTERS, 10, TRUE), collapse = ""), "-",
-        sample(LETTERS, 1)
-      )
-    }, character(1))
-  })
-}
-
+# Example: features <- create_test_features(n_features = 100, seed = 123)
+# Example: spectrum <- create_test_spectrum(n_peaks = 20, seed = 456)
