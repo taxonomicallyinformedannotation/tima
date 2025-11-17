@@ -193,7 +193,6 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
 | MsCoreUtils | 1.21.0 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
-| R.utils | 2.13.0 | Bengtsson (2025) |
 | reticulate | 1.44.1 | Ushey, Allaire, and Tang (2025) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
 | rotl | 3.1.0 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
@@ -253,13 +252,6 @@ arXiv:2311.10260*. <https://doi.org/10.48550/arXiv.2311.10260>.
 Attali, Dean. 2021. *<span class="nocase">shinyjs</span>: Easily Improve
 the User Experience of Your Shiny Apps in Seconds*.
 <https://doi.org/10.32614/CRAN.package.shinyjs>.
-
-</div>
-
-<div id="ref-Rutils" class="csl-entry">
-
-Bengtsson, Henrik. 2025. *<span class="nocase">R.utils</span>: Various
-Programming Utilities*. <https://doi.org/10.32614/CRAN.package.R.utils>.
 
 </div>
 
