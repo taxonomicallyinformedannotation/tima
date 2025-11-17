@@ -48,8 +48,17 @@ parse_adduct <- function(
   failed_parse <- create_failed_parse_result()
 
   # Early return for NULL or missing input (guard clause pattern)
-  if (missing(adduct_string) || is.null(adduct_string)) {
+  if (
+    missing(adduct_string) ||
+      is.null(adduct_string) ||
+      length(adduct_string) == 0L
+  ) {
     # logger::log_trace("Adduct string is NULL or missing, returning zero values")
+    return(failed_parse)
+  }
+
+  # Handle NA values
+  if (length(adduct_string) == 1L && is.na(adduct_string)) {
     return(failed_parse)
   }
 
@@ -57,7 +66,11 @@ parse_adduct <- function(
   validation_result <- validate_adduct_string(adduct_string)
   if (!validation_result$valid) {
     # Suppress warnings for empty strings (common edge case)
-    if (!is.na(adduct_string) && nchar(adduct_string) > 0L) {
+    if (
+      length(adduct_string) == 1L &&
+        !is.na(adduct_string) &&
+        nchar(adduct_string) > 0L
+    ) {
       warning(validation_result$message, call. = FALSE)
       logger::log_warn(validation_result$message)
     }
