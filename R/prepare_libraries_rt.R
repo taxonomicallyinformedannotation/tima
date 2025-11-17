@@ -179,13 +179,16 @@ prepare_libraries_rt <- function(
   }
 
   complete_df <- function(df) {
-    df_full <- df |> tidytable::filter(!is.na(inchikey))
-    df_missing <- df |> tidytable::filter(is.na(inchikey))
+    df_full <- df |>
+      tidytable::filter(!is.na(inchikey) & inchikey != "")
+    df_missing <- df |>
+      tidytable::filter(is.na(inchikey) | inchikey == "")
+    missing_n <- nrow(df_missing)
 
-    if (nrow(df_missing) > 0L) {
+    if (missing_n > 0L) {
       logger::log_warn(
         "There are ",
-        nrow(df_missing),
+        missing_n,
         " entries without InChIKey.",
         " We would recommend you adding them but will try completing.",
         " We will query them on the fly, this might take some time."
@@ -227,12 +230,18 @@ prepare_libraries_rt <- function(
       ) |>
       tidytable::distinct()
 
-    logger::log_warn(
-      "There were still ",
-      nrow(df_completed |> tidytable::filter(is.na(structure_inchikey))),
-      " entries for which no InChIKey could not be found in the end."
-    )
+    missing_n2 <- df_completed |>
+      tidytable::filter(is.na(structure_inchikey)) |>
+      nrow()
     df_completed
+    if (missing_n2 > 0L) {
+      logger::log_warn(
+        "There were still ",
+        missing_n2,
+        " entries for which no InChIKey could not be found in the end."
+      )
+      df_completed
+    }
   }
 
   empty_df <- tidytable::tidytable(
