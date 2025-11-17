@@ -100,8 +100,8 @@ validate_file_existence <- function(file_list, allow_null = FALSE) {
 #'
 #' @examples
 #' \dontrun{
-#' validate_ms_mode("pos")  # OK
-#' validate_ms_mode("neg")  # OK
+#' validate_ms_mode("pos") # OK
+#' validate_ms_mode("neg") # OK
 #' validate_ms_mode("both") # Error
 #' }
 validate_ms_mode <- function(ms_mode) {
@@ -279,11 +279,11 @@ validate_adduct_list <- function(
   # logger::log_trace(
   #  list_name,
   # " validated: ",
-  #length(adducts_list[[ms_mode]]),
-  #" entries for ",
-  #ms_mode,
-  #" mode"
-  #)
+  # length(adducts_list[[ms_mode]]),
+  # " entries for ",
+  # ms_mode,
+  # " mode"
+  # )
 
   invisible(TRUE)
 }
@@ -363,9 +363,9 @@ validate_dataframe <- function(
 #' @description Validates that a numeric value is within a specified range
 #'
 #' @param value Numeric value to validate
-#' @param name Name of the parameter (for error messages)
-#' @param min Minimum allowed value (inclusive)
-#' @param max Maximum allowed value (inclusive)
+#' @param min_value Minimum allowed value (inclusive)
+#' @param max_value Maximum allowed value (inclusive)
+#' @param param_name Name of the parameter (for error messages)
 #' @param allow_null Whether NULL values are allowed
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
