@@ -8,6 +8,13 @@
 #include <omp.h>
 #endif
 
+/* Prefetch portability macro */
+#if defined(__GNUC__) || defined(__clang__)
+  #define PREFETCH(addr) __builtin_prefetch((addr), 0, 0)
+#else
+  #define PREFETCH(addr) ((void)0)
+#endif
+
 /* --- Safe Memory Allocation Functions --- */
 static inline void *safe_malloc(size_t size) {
     void *ptr = malloc(size);
@@ -18,8 +25,8 @@ static inline void *safe_malloc(size_t size) {
 
 /* --- Helper: Compare doubles for qsort --- */
 static inline int compare_doubles(const void *a, const void *b) {
-    double da = *(const double*)a;
-    double db = *(const double*)b;
+    const double da = *(const double*)a;
+    const double db = *(const double*)b;
     return (da < db) ? -1 : (da > db) ? 1 : 0;
 }
 
@@ -28,7 +35,7 @@ static const double *global_mz = NULL;
 static int cmp_indices(const void *a, const void *b) {
     const int ia = *(const int*)a;
     const int ib = *(const int*)b;
-    double diff = global_mz[ia] - global_mz[ib];
+    const double diff = global_mz[ia] - global_mz[ib];
     if(diff < 0) return -1;
     else if(diff > 0) return 1;
     else return (ia - ib);
@@ -39,7 +46,7 @@ static int cmp_indices(const void *a, const void *b) {
      computes the sum of intensities for the first occurrence of each unique m/z.
 */
 static double compute_unique_intensity_sum(const double *mz, const double *intensity, int n) {
-    int *indices = (int*) safe_malloc(n * sizeof(int));
+    int *indices = (int*) safe_malloc((size_t)n * sizeof(int));
     int count = 0;
     for (int i = 0; i < n; i++) {
         if (!ISNA(mz[i]) && !ISNA(intensity[i]))
@@ -50,7 +57,7 @@ static double compute_unique_intensity_sum(const double *mz, const double *inten
         return 0.0;
     }
     global_mz = mz;
-    qsort(indices, count, sizeof(int), cmp_indices);
+    qsort(indices, (size_t)count, sizeof(int), cmp_indices);
     double sum = intensity[indices[0]];
     for (int i = 1; i < count; i++) {
         if (mz[indices[i]] != mz[indices[i-1]])
@@ -61,7 +68,7 @@ static double compute_unique_intensity_sum(const double *mz, const double *inten
 }
 
 /* --- Helper to return score=0.0 and matches=0 --- */
-static SEXP return_zero_result() {
+static SEXP return_zero_result(void) {
     SEXP result = PROTECT(allocVector(VECSXP, 2));
     SET_VECTOR_ELT(result, 0, ScalarReal(0.0));
     SET_VECTOR_ELT(result, 1, ScalarInteger(0));
@@ -90,9 +97,9 @@ static inline int binary_search_double(const double* arr, int n, double val) {
     int left = 0, right = n - 1;
     while (left <= right) {
         int mid = left + ((right - left) >> 1);
-        double mid_val = arr[mid];
+        const double mid_val = arr[mid];
         if (mid + 16 < n)
-            __builtin_prefetch(&arr[mid + 16], 0, 0);
+            PREFETCH(&arr[mid + 16]);
         if (mid_val == val)
             return mid;
         else if (mid_val < val)
@@ -108,13 +115,15 @@ static inline int binary_search_double(const double* arr, int n, double val) {
      by copying the values, sorting and uniquifying them, then binary searching.
 */
 static inline int* generate_factor_indices(const double* data, const int* keep_idx, int n) {
-    double *temp = (double*) safe_malloc(n * sizeof(double));
+    double *temp = (double*) safe_malloc((size_t)n * sizeof(double));
     /* Parallelize copying; each iteration is independent. */
+    #ifdef _OPENMP
     #pragma omp parallel for
+    #endif
     for (int i = 0; i < n; i++)
         temp[i] = data[keep_idx[i]];
 
-    qsort(temp, n, sizeof(double), compare_doubles);
+    qsort(temp, (size_t)n, sizeof(double), compare_doubles);
 
     int unique_count = 0;
     for (int i = 0; i < n; i++) {
@@ -122,12 +131,14 @@ static inline int* generate_factor_indices(const double* data, const int* keep_i
             temp[unique_count++] = temp[i];
     }
 
-    int *factors = (int*) safe_malloc(n * sizeof(int));
+    int *factors = (int*) safe_malloc((size_t)n * sizeof(int));
     /* Parallelize computing factor indices. */
+    #ifdef _OPENMP
     #pragma omp parallel for
+    #endif
     for (int i = 0; i < n; i++) {
-        double val = data[keep_idx[i]];
-        int pos = binary_search_double(temp, unique_count, val);
+        const double val = data[keep_idx[i]];
+        const int pos = binary_search_double(temp, unique_count, val);
         factors[i] = pos + 1;
     }
     free(temp);
@@ -141,16 +152,16 @@ static inline int* generate_factor_indices(const double* data, const int* keep_i
      with 1-indexed column assignments for each row.
 */
 static int* solve_assignment_auction(int n, const double *score) {
-    double *price = (double*) safe_malloc(n * sizeof(double));
-    int *assignment = (int*) safe_malloc(n * sizeof(int));
-    int *unassigned = (int*) safe_malloc(n * sizeof(int));
-    memset(price, 0, n * sizeof(double));
+    double *price = (double*) safe_malloc((size_t)n * sizeof(double));
+    int *assignment = (int*) safe_malloc((size_t)n * sizeof(int));
+    int *unassigned = (int*) safe_malloc((size_t)n * sizeof(int));
+    memset(price, 0, (size_t)n * sizeof(double));
     for (int i = 0; i < n; i++) {
          assignment[i] = -1;
          unassigned[i] = i;
     }
     int unassigned_count = n;
-    double epsilon = 1e-6;
+    const double epsilon = 1e-6;
     while (unassigned_count > 0) {
          int i = unassigned[unassigned_count - 1];
          unassigned_count--;
@@ -158,10 +169,10 @@ static int* solve_assignment_auction(int n, const double *score) {
          int best_j = -1;
          int j;
          for (j = 0; j <= n - 4; j += 4) {
-              double v0 = score[i * n + j] - price[j];
-              double v1 = score[i * n + j + 1] - price[j + 1];
-              double v2 = score[i * n + j + 2] - price[j + 2];
-              double v3 = score[i * n + j + 3] - price[j + 3];
+              const double v0 = score[i * n + j] - price[j];
+              const double v1 = score[i * n + j + 1] - price[j + 1];
+              const double v2 = score[i * n + j + 2] - price[j + 2];
+              const double v3 = score[i * n + j + 3] - price[j + 3];
               if (v0 > best_val) { second_val = best_val; best_val = v0; best_j = j; }
               else if (v0 > second_val) { second_val = v0; }
               if (v1 > best_val) { second_val = best_val; best_val = v1; best_j = j + 1; }
@@ -172,11 +183,11 @@ static int* solve_assignment_auction(int n, const double *score) {
               else if (v3 > second_val) { second_val = v3; }
          }
          for (; j < n; j++){
-              double v = score[i * n + j] - price[j];
+              const double v = score[i * n + j] - price[j];
               if (v > best_val) { second_val = best_val; best_val = v; best_j = j; }
               else if (v > second_val) { second_val = v; }
          }
-         double bid = best_val - second_val + epsilon;
+         const double bid = best_val - second_val + epsilon;
          price[best_j] += bid;
          int previous = -1;
          for (int k = 0; k < n; k++) {
@@ -224,7 +235,7 @@ SEXP gnps(SEXP x, SEXP y) {
     if (x_sum == 0.0 || y_sum == 0.0)
         return return_zero_result();
 
-    int *keep_idx = (int*) safe_malloc(n * sizeof(int));
+    int *keep_idx = (int*) safe_malloc((size_t)n * sizeof(int));
     int l = 0;
     for (int i = 0; i < n; i++) {
         if (!ISNA(x_data[i]) && !ISNA(y_data[i]))
@@ -235,11 +246,13 @@ SEXP gnps(SEXP x, SEXP y) {
         return return_zero_result();
     }
 
-    double *scores = (double*) safe_malloc(l * sizeof(double));
+    double *scores = (double*) safe_malloc((size_t)l * sizeof(double));
     // Parallelize score computation. Each iteration is independent.
+    #ifdef _OPENMP
     #pragma omp parallel for
+    #endif
     for (int i = 0; i < l; i++) {
-        int idx = keep_idx[i];
+        const int idx = keep_idx[i];
         scores[i] = (sqrt(x_data[idx + n]) / sqrt(x_sum)) *
                     (sqrt(y_data[idx + n]) / sqrt(y_sum));
     }
@@ -256,14 +269,16 @@ SEXP gnps(SEXP x, SEXP y) {
 
     int max_x = 0, max_y = 0;
     /* Parallel reduction to find maximum factor values */
+    #ifdef _OPENMP
     #pragma omp parallel for reduction(max:max_x) reduction(max:max_y)
+    #endif
     for (int i = 0; i < l; i++) {
         if (x_idx[i] > max_x) max_x = x_idx[i];
         if (y_idx[i] > max_y) max_y = y_idx[i];
     }
     int m = (max_x > max_y) ? max_x : max_y;
 
-    double *score_mat = (double*) calloc(m * m, sizeof(double));
+    double *score_mat = (double*) calloc((size_t)m * (size_t)m, sizeof(double));
     if (!score_mat) {
         free(keep_idx);
         free(scores);
@@ -272,10 +287,12 @@ SEXP gnps(SEXP x, SEXP y) {
         error("Memory allocation failed.");
     }
     /* Parallelize filling the score matrix. */
+    #ifdef _OPENMP
     #pragma omp parallel for
+    #endif
     for (int i = 0; i < l; i++) {
-        int row = y_idx[i] - 1;
-        int col = x_idx[i] - 1;
+        const int row = y_idx[i] - 1;
+        const int col = x_idx[i] - 1;
         score_mat[row * m + col] = scores[i];
     }
 
@@ -292,11 +309,13 @@ SEXP gnps(SEXP x, SEXP y) {
     double total_score = 0.0;
     int matched_peaks = 0;
     /* Use OpenMP reduction to safely sum the total score in parallel */
+    #ifdef _OPENMP
     #pragma omp parallel for reduction(+:total_score, matched_peaks)
+    #endif
     for (int i = 0; i < m; i++) {
-        int j = assignment[i] - 1;
+        const int j = assignment[i] - 1;
         if (j >= 0 && j < m) {
-            double val = score_mat[i * m + j];
+            const double val = score_mat[i * m + j];
             if (val > 0.0) {
                 total_score += val;
                 matched_peaks += 1;
