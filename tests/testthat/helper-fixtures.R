@@ -78,6 +78,7 @@ local_quiet_logging <- function(threshold = "WARN") {
 #' @param n_peaks Integer. Number of peaks in the spectrum. Default: 5
 #' @param mz_range Numeric vector of length 2. m/z range for peaks. Default: c(100, 500)
 #' @param intensity_range Numeric vector of length 2. Intensity range. Default: c(100, 1000)
+#' @param seed Integer. Random seed for reproducibility. Default: NULL
 #'
 #' @return Matrix with two columns (mz, int) and n_peaks rows
 #'
@@ -86,27 +87,21 @@ local_quiet_logging <- function(threshold = "WARN") {
 create_test_spectrum <- function(
   n_peaks = 5L,
   mz_range = c(100, 500),
-  intensity_range = c(100, 1000)
+  intensity_range = c(100, 1000),
+  seed = NULL
 ) {
-  stopifnot(
-    is.numeric(n_peaks),
-    n_peaks >= 0,
-    length(mz_range) == 2,
-    length(intensity_range) == 2
-  )
-
-  if (n_peaks == 0) {
-    return(matrix(numeric(0), ncol = 2, dimnames = list(NULL, c("mz", "int"))))
-  }
-
-  mz <- sort(runif(n_peaks, mz_range[1], mz_range[2]))
-  intensity <- runif(n_peaks, intensity_range[1], intensity_range[2])
-
-  matrix(
-    c(mz, intensity),
-    ncol = 2,
-    dimnames = list(NULL, c("mz", "int"))
-  )
+  .with_seed(seed, {
+    stopifnot(
+      is.numeric(n_peaks), n_peaks >= 0,
+      length(mz_range) == 2, length(intensity_range) == 2
+    )
+    if (n_peaks == 0) {
+      return(matrix(numeric(0), ncol = 2, dimnames = list(NULL, c("mz", "int"))))
+    }
+    mz <- sort(runif(n_peaks, mz_range[1], mz_range[2]))
+    intensity <- runif(n_peaks, intensity_range[1], intensity_range[2])
+    matrix(c(mz, intensity), ncol = 2, dimnames = list(NULL, c("mz", "int")))
+  })
 }
 
 #' Create similar spectra for similarity testing
@@ -118,6 +113,7 @@ create_test_spectrum <- function(
 #' @param base_spectrum Matrix. Base spectrum to create variations from
 #' @param n_similar Integer. Number of similar spectra to generate. Default: 3
 #' @param noise_level Numeric. Standard deviation of noise to add. Default: 0.1
+#' @param seed Integer. Random seed for reproducibility. Default: NULL
 #'
 #' @return List of n_similar spectrum matrices
 #'
@@ -127,22 +123,15 @@ create_test_spectrum <- function(
 create_similar_spectra <- function(
   base_spectrum,
   n_similar = 3L,
-  noise_level = 0.1
+  noise_level = 0.1,
+  seed = NULL
 ) {
-  stopifnot(
-    is.matrix(base_spectrum),
-    ncol(base_spectrum) == 2,
-    n_similar > 0,
-    noise_level >= 0
-  )
-
-  lapply(seq_len(n_similar), function(i) {
-    noise <- matrix(
-      rnorm(length(base_spectrum), 0, noise_level),
-      ncol = 2
-    )
-    # Ensure non-negative values
-    pmax(base_spectrum + noise, 0)
+  stopifnot(is.matrix(base_spectrum), ncol(base_spectrum) == 2, n_similar > 0, noise_level >= 0)
+  .with_seed(seed, {
+    lapply(seq_len(n_similar), function(i) {
+      noise <- matrix(rnorm(length(base_spectrum), 0, noise_level), ncol = 2)
+      pmax(base_spectrum + noise, 0)
+    })
   })
 }
 
@@ -158,6 +147,12 @@ create_similar_spectra <- function(
 #' @param n_features Integer. Number of features. Default: 10
 #' @param mz_range Numeric vector of length 2. m/z range. Default: c(100, 500)
 #' @param rt_range Numeric vector of length 2. RT range in minutes. Default: c(0, 10)
+#' @param include_rt Logical. If TRUE, includes a rt column with retention times.
+#'   Default: TRUE
+#' @param include_intensity Logical. If TRUE, includes an intensity column with random
+#'   intensity values. Default: TRUE
+#' @param include_adduct Logical. If TRUE, includes a column for adducts. Default: FALSE
+#' @param seed Integer. Random seed for reproducibility. Default: NULL
 #'
 #' @return data.frame with feature_id, mz, rt columns
 #'
@@ -166,14 +161,28 @@ create_similar_spectra <- function(
 create_test_features <- function(
   n_features = 10L,
   mz_range = c(100, 500),
-  rt_range = c(0, 10)
+  rt_range = c(0, 10),
+  include_rt = TRUE,
+  include_intensity = TRUE,
+  include_adduct = FALSE,
+  seed = NULL
 ) {
-  data.frame(
-    feature_id = sprintf("FT%04d", seq_len(n_features)),
-    mz = runif(n_features, mz_range[1], mz_range[2]),
-    rt = runif(n_features, rt_range[1], rt_range[2]),
-    stringsAsFactors = FALSE
-  )
+  .with_seed(seed, {
+    df <- tidytable::tidytable(
+      feature_id = sprintf("FT%04d", seq_len(n_features)),
+      mz = runif(n_features, mz_range[1], mz_range[2])
+    )
+    if (include_rt) {
+      df$rt <- runif(n_features, rt_range[1], rt_range[2])
+    }
+    if (include_intensity) {
+      df$intensity <- runif(n_features, 1e3, 1e5)
+    }
+    if (include_adduct) {
+      df$adduct <- sample(c("[M+H]+", "[M+Na]+", "[M-H]-"), n_features, TRUE)
+    }
+    df
+  })
 }
 
 #' Create minimal annotations table for testing
@@ -183,6 +192,7 @@ create_test_features <- function(
 #'
 #' @param n_annotations Integer. Number of annotation rows. Default: 20
 #' @param n_features Integer. Number of unique features. Default: 5
+#' @param seed Integer. Random seed for reproducibility. Default: NULL
 #'
 #' @return data.frame with annotation columns
 #'
@@ -190,40 +200,22 @@ create_test_features <- function(
 #' annotations <- create_test_annotations(n_annotations = 50)
 create_test_annotations <- function(
   n_annotations = 20L,
-  n_features = 5L
+  n_features = 5L,
+  seed = NULL
 ) {
   stopifnot(n_annotations >= n_features)
-
-  data.frame(
-    feature_id = sample(
-      sprintf("FT%04d", seq_len(n_features)),
-      n_annotations,
-      replace = TRUE
-    ),
-    candidate_structure_inchikey = paste0(
-      replicate(
+  .with_seed(seed, {
+    tidytable::tidytable(
+      feature_id = sample(sprintf("FT%04d", seq_len(n_features)), n_annotations, TRUE),
+      candidate_structure_inchikey = generate_fake_inchikey(n_annotations),
+      candidate_structure_smiles = replicate(
         n_annotations,
-        paste(sample(LETTERS, 14, replace = TRUE), collapse = "")
+        paste(sample(c("C", "O", "N", "=", "-", "(", ")"), 10, TRUE), collapse = "")
       ),
-      "-",
-      replicate(
-        n_annotations,
-        paste(sample(LETTERS, 10, replace = TRUE), collapse = "")
-      ),
-      "-",
-      replicate(n_annotations, paste(sample(LETTERS, 1), collapse = ""))
-    ),
-    candidate_structure_smiles = replicate(
-      n_annotations,
-      paste(
-        sample(c("C", "O", "N", "=", "-", "(", ")"), 10, replace = TRUE),
-        collapse = ""
-      )
-    ),
-    candidate_score_similarity = runif(n_annotations, 0, 1),
-    candidate_mass_error_ppm = runif(n_annotations, -10, 10),
-    stringsAsFactors = FALSE
-  )
+      candidate_score_similarity = runif(n_annotations, 0, 1),
+      candidate_mass_error_ppm = runif(n_annotations, -10, 10)
+    )
+  })
 }
 
 #' Create minimal taxonomy table for testing
@@ -232,35 +224,25 @@ create_test_annotations <- function(
 #' Generates a simple taxonomy table for testing biological annotations.
 #'
 #' @param n_taxa Integer. Number of taxa. Default: 5
+#' @param seed Integer. Random seed for reproducibility. Default: NULL
 #'
 #' @return data.frame with organism and taxonomy columns
 #'
 #' @examples
 #' taxonomy <- create_test_taxonomy(n_taxa = 10)
-create_test_taxonomy <- function(n_taxa = 5L) {
-  genera <- c("Gentiana", "Arabidopsis", "Solanum", "Coffea", "Nicotiana")
-  species <- c("lutea", "thaliana", "tuberosum", "arabica", "tabacum")
-
-  data.frame(
-    organism_name = paste(
-      sample(genera, n_taxa, replace = TRUE),
-      sample(species, n_taxa, replace = TRUE)
-    ),
-    organism_taxonomy_ottid = sample(100000:999999, n_taxa),
-    organism_taxonomy_01domain = "Eukaryota",
-    organism_taxonomy_02kingdom = "Plantae",
-    organism_taxonomy_03phylum = sample(
-      c("Tracheophyta", "Chlorophyta"),
-      n_taxa,
-      replace = TRUE
-    ),
-    organism_taxonomy_06family = sample(
-      c("Gentianaceae", "Brassicaceae", "Solanaceae"),
-      n_taxa,
-      replace = TRUE
-    ),
-    stringsAsFactors = FALSE
-  )
+create_test_taxonomy <- function(n_taxa = 5L, seed = NULL) {
+  .with_seed(seed, {
+    genera <- c("Gentiana", "Arabidopsis", "Solanum", "Coffea", "Nicotiana")
+    species <- c("lutea", "thaliana", "tuberosum", "arabica", "tabacum")
+    tidytable::tidytable(
+      organism_name = paste(sample(genera, n_taxa, TRUE), sample(species, n_taxa, TRUE)),
+      organism_taxonomy_ottid = sample(100000:999999, n_taxa),
+      organism_taxonomy_01domain = "Eukaryota",
+      organism_taxonomy_02kingdom = "Plantae",
+      organism_taxonomy_03phylum = sample(c("Tracheophyta", "Chlorophyta"), n_taxa, TRUE),
+      organism_taxonomy_06family = sample(c("Gentianaceae", "Brassicaceae", "Solanaceae"), n_taxa, TRUE)
+    )
+  })
 }
 
 # ==============================================================================
@@ -692,6 +674,310 @@ create_annotation_table_taxed <- function(n_rows = 0) {
 
   base
 }
+#' Test Fixtures and Helpers for TIMA Tests
+#'
+#' This file provides reusable test fixtures, mock data generators,
+#' and helper functions to improve test reliability and reduce duplication.
+
+# Test Data Generators ----
+
+#' Create minimal valid feature table for testing
+#'
+#' @param n_features Number of features to generate
+#' @param include_rt Include retention time column
+#' @param include_adduct Include adduct column
+#' @return tidytable with feature data
+#' @keywords internal
+create_test_features <- function(
+  n_features = 10,
+  include_rt = TRUE,
+  include_adduct = FALSE,
+  seed = NULL
+) {
+  .Deprecated("create_test_features in helper-fixtures.R")
+  helper-fixtures::create_test_features(
+    n_features = n_features,
+    include_rt = include_rt,
+    include_intensity = TRUE,
+    include_adduct = include_adduct,
+    seed = seed
+  )
+}
+
+#' Create minimal spectral library for testing
+#'
+#' @param n_compounds Number of compounds to generate
+#' @param ms_mode Ionization mode ("pos" or "neg")
+#' @return tidytable with spectral library data
+#' @keywords internal
+create_test_library <- function(n_compounds = 20, ms_mode = "pos") {
+  adducts <- if (ms_mode == "pos") {
+    c("[M+H]+", "[M+Na]+", "[M+K]+", "[M+NH4]+")
+  } else {
+    c("[M-H]-", "[M+Cl]-", "[M+FA-H]-")
+  }
+
+  tidytable::tidytable(
+    "structure_inchikey" = paste0(
+      "FAKE",
+      sprintf("%015d", seq_len(n_compounds))
+    ),
+    "structure_smiles" = replicate(
+      n_compounds,
+      paste0(
+        "C",
+        paste0(sample(c("C", "O", "N"), 10, replace = TRUE), collapse = "")
+      )
+    ),
+    "structure_exact_mass" = runif(n_compounds, 100, 600),
+    "structure_molecular_formula" = replicate(
+      n_compounds,
+      paste0(
+        "C",
+        sample(10:30, 1),
+        "H",
+        sample(10:50, 1),
+        "O",
+        sample(1:10, 1)
+      )
+    ),
+    "adduct" = sample(adducts, n_compounds, replace = TRUE),
+    "organism_name" = sample(
+      c("Arabidopsis thaliana", "Solanum lycopersicum", "Oryza sativa"),
+      n_compounds,
+      replace = TRUE
+    ),
+    "organism_taxonomy_ottid" = sample(1000000:9999999, n_compounds)
+  )
+}
+
+#' Create minimal test spectra
+#'
+#' @param n_spectra Number of spectra to generate
+#' @param n_peaks_range Range of peaks per spectrum
+#' @return List of spectral matrices
+#' @keywords internal
+create_test_spectra <- function(n_spectra = 5, n_peaks_range = c(5, 20), seed = NULL) {
+  .Deprecated("create_test_spectrum + lapply in helper-fixtures.R")
+  lapply(seq_len(n_spectra), function(i) {
+    n_peaks <- sample(n_peaks_range[1]:n_peaks_range[2], 1)
+    mz_values <- sort(runif(n_peaks, 50, 500))
+    int_values <- runif(n_peaks, 100, 10000)
+
+    matrix(
+      c(mz_values, int_values),
+      ncol = 2,
+      dimnames = list(NULL, c("mz", "int"))
+    )
+  })
+}
+
+# Test Environment Setup ----
+
+#' Setup isolated test environment with temp directory
+#'
+#' @param test_name Name of test (for directory naming)
+#' @return Path to temporary test directory
+#' @keywords internal
+setup_test_env <- function(test_name = "test") {
+  # Create unique temp directory
+  temp_dir <- file.path(
+    tempdir(),
+    paste0("tima_test_", test_name, "_", Sys.getpid())
+  )
+  dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
+
+  # Set as working directory
+  old_wd <- getwd()
+  setwd(temp_dir)
+
+  # Store cleanup info
+  withr::defer(
+  {
+    setwd(old_wd)
+    unlink(temp_dir, recursive = TRUE)
+  },
+    envir = parent.frame()
+  )
+
+  temp_dir
+}
+
+#' Setup minimal TIMA directory structure for testing
+#'
+#' @param base_path Base directory path
+#' @keywords internal
+setup_tima_structure <- function(base_path = ".") {
+  dirs <- c(
+    file.path(base_path, "data/source"),
+    file.path(base_path, "data/interim/features"),
+    file.path(base_path, "data/interim/annotations"),
+    file.path(base_path, "data/interim/libraries/sop"),
+    file.path(base_path, "data/interim/libraries/spectra"),
+    file.path(base_path, "data/processed")
+  )
+
+  lapply(dirs, function(d) {
+    dir.create(d, recursive = TRUE, showWarnings = FALSE)
+  })
+
+  invisible(TRUE)
+}
+
+# Validation Helpers ----
+
+#' Check if numeric values are within expected range
+#'
+#' @param values Numeric vector to check
+#' @param min_val Minimum expected value
+#' @param max_val Maximum expected value
+#' @param value_name Name of values (for error messages)
+#' @keywords internal
+expect_values_in_range <- function(
+  values,
+  min_val,
+  max_val,
+  value_name = "values"
+) {
+  testthat::expect_true(
+    all(values >= min_val & values <= max_val, na.rm = TRUE),
+    info = paste0(
+      value_name,
+      " should be between ",
+      min_val,
+      " and ",
+      max_val,
+      ". Found range: ",
+      min(values, na.rm = TRUE),
+      " to ",
+      max(values, na.rm = TRUE)
+    )
+  )
+}
+
+# Mock Data Writers ----
+
+#' Write minimal feature file for testing
+#'
+#' @param path Output file path
+#' @param n_features Number of features
+#' @param ... Additional arguments passed to create_test_features
+#' @keywords internal
+write_test_features <- function(path, n_features = 10, ...) {
+  features <- create_test_features(n_features = n_features, ...)
+
+  # Ensure directory exists
+  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+
+  # Write based on file extension
+  if (grepl("\\.gz$", path)) {
+    tidytable::fwrite(features, gsub("\\.gz$", "", path))
+    R.utils::gzip(gsub("\\.gz$", "", path), destname = path, remove = TRUE)
+  } else {
+    tidytable::fwrite(features, path)
+  }
+
+  invisible(path)
+}
+
+#' Write minimal library file for testing
+#'
+#' @param path Output file path
+#' @param n_compounds Number of compounds
+#' @param ... Additional arguments passed to create_test_library
+#' @keywords internal
+write_test_library <- function(path, n_compounds = 20, ...) {
+  library_data <- create_test_library(n_compounds = n_compounds, ...)
+
+  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+
+  if (grepl("\\.gz$", path)) {
+    tidytable::fwrite(library_data, gsub("\\.gz$", "", path))
+    R.utils::gzip(gsub("\\.gz$", "", path), destname = path, remove = TRUE)
+  } else {
+    tidytable::fwrite(library_data, path)
+  }
+
+  invisible(path)
+}
+
+# Cleanup Helpers ----
+
+#' Clean up test files and directories
+#'
+#' @param paths Character vector of paths to remove
+#' @keywords internal
+cleanup_test_files <- function(paths) {
+  for (path in paths) {
+    if (file.exists(path)) {
+      if (dir.exists(path)) {
+        unlink(path, recursive = TRUE)
+      } else {
+        file.remove(path)
+      }
+    }
+  }
+  invisible(TRUE)
+}
+
+# Param fixtures for prepare_params / get_params tests
+# These mimic the structure expected by internal functions but are lightweight.
+
+create_fixture_params_small <- function(id = "TESTID") {
+  list(
+    files = list(
+      pattern = "{id}",
+      features = list(raw = sprintf("features_raw_%s.tsv", id)),
+      metadata = list(raw = sprintf("metadata_raw_%s.tsv", id)),
+      spectral = list(raw = sprintf("spectral_raw_%s.mgf", id)),
+      annotations = list(raw = list(sirius = sprintf("sirius_raw_%s", id)))
+    ),
+    ms = list(polarity = "pos"),
+    organisms = list(taxon = "Gentiana lutea"),
+    options = list(high_confidence = TRUE, summarize = FALSE)
+  )
+}
+
+create_fixture_params_advanced <- function(id = "TESTID") {
+  list(
+    files = list(
+      pattern = "{id}",
+      annotations = list(
+        raw = list(spectral = list(gnps = sprintf("gnps_raw_%s.mgf", id), spectral = sprintf("spectral_raw_%s.mgf", id)), sirius = sprintf("sirius_raw_%s", id)),
+        prepared = list(
+          canopus = sprintf("canopus_pre_%s.tsv", id),
+          formula = sprintf("formula_pre_%s.tsv", id),
+          structural = list(
+            gnps = sprintf("struct_gnps_pre_%s.tsv", id),
+            sirius = sprintf("struct_sirius_pre_%s.tsv", id),
+            spectral = sprintf("struct_spectral_pre_%s.tsv", id)
+          )
+        ),
+        filtered = sprintf("annotations_filtered_%s.tsv", id),
+        processed = sprintf("annotations_processed_%s.tsv", id)
+      ),
+      features = list(raw = sprintf("features_raw_%s.tsv", id), prepared = list(tsv = sprintf("features_pre_%s.tsv", id))),
+      metadata = list(raw = sprintf("metadata_raw_%s.tsv", id), prepared = list(tsv = sprintf("metadata_pre_%s.tsv", id))),
+      spectral = list(raw = sprintf("spectral_raw_%s.mgf", id)),
+      libraries = list(sop = list(merged = list(keys = sprintf("keys_%s.tsv", id))), spectral = list(pos = sprintf("lib_pos_%s.mgf", id), neg = sprintf("lib_neg_%s.mgf", id))), networks = list(spectral = list(edges = list(prepared = sprintf("edges_pre_%s.tsv", id)), components = list(prepared = sprintf("components_pre_%s.tsv", id))))
+    ),
+    ms = list(adducts = list(pos = c("[M+H]+"), neg = c("[M-H]-")), tolerances = list(mass = list(ppm = list(ms1 = 5, ms2 = 10))), neutral_losses = c("H2O")),
+    annotations = list(candidates = list(best_percentile = 0.9, final = 5L, neighbors = 20L, samples = 3L), ms1only = FALSE, ms2approx = TRUE, thresholds = list(consistency = 0.5, ms1 = list(biological = 0.1, chemical = 0.2, condition = "OR"))),
+    names = list(source = "feature_source", target = "feature_target", features = "feature_id"),
+    options = list(compounds_names = FALSE, force = TRUE, remove_ties = FALSE)
+  )
+}
+
+create_fixture_yamls_params <- function(id = "TESTID") {
+  list(
+    yamls_params = list(
+      prepare_params_advanced = create_fixture_params_advanced(id = id),
+      annotate_masses = list(files = list(features = list(prepared = list(tsv = sprintf("feat_pre_%s.tsv", id))), annotations = list(prepared = list(structural = list(tsv = sprintf("struct_pre_%s.tsv", id)))))),
+      weight_annotations = list(annotations = list(candidates = list(best_percentile = 0.9, final = 5L, neighbors = 20L), thresholds = list(consistency = 0.5, ms1 = list(biological = 0.1, chemical = 0.2, condition = "OR"))), files = list(pattern = "{id}"))
+    )
+  )
+}
+
 
 # ==============================================================================
 # Usage Guide
@@ -718,3 +1004,26 @@ create_annotation_table_taxed <- function(n_rows = 0) {
 # - Testing with varying sizes/scenarios
 # - Need specific test conditions
 # Example: sop <- create_structure_organism_pairs(n_rows = 10)
+
+# Internal deterministic helpers placed early so available to later fixtures ----
+.with_seed <- function(seed, expr) {
+  if (!is.null(seed)) {
+    old <- .Random.seed
+    on.exit({ if (exists("old", inherits = FALSE)) .Random.seed <<- old }, add = TRUE)
+    set.seed(seed)
+  }
+  force(expr)
+}
+
+generate_fake_inchikey <- function(n = 1L, seed = NULL) {
+  .with_seed(seed, {
+    vapply(seq_len(n), function(i) {
+      paste0(
+        paste(sample(LETTERS, 14, TRUE), collapse = ""), "-",
+        paste(sample(LETTERS, 10, TRUE), collapse = ""), "-",
+        sample(LETTERS, 1)
+      )
+    }, character(1))
+  })
+}
+
