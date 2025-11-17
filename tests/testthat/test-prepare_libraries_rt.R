@@ -200,6 +200,7 @@ test_that("prepare_libraries_rt processes CSV with experimental RT", {
     name_rt = "rt",
     name_inchikey = "inchikey",
     name_smiles = "smiles",
+    name_name = "structure_name",
     output_rt = output_rt,
     output_sop = output_sop
   )
@@ -255,6 +256,7 @@ test_that("prepare_libraries_rt processes CSV with predicted RT", {
     name_rt = "rt",
     name_inchikey = "inchikey",
     name_smiles = "smiles",
+    name_name = "structure_name",
     output_rt = output_rt,
     output_sop = output_sop
   )
@@ -295,6 +297,7 @@ test_that("prepare_libraries_rt converts seconds to minutes", {
     name_rt = "rt",
     name_inchikey = "inchikey",
     name_smiles = "smiles",
+    name_name = "structure_name",
     output_rt = output_rt,
     output_sop = output_sop
   )
@@ -343,6 +346,7 @@ test_that("prepare_libraries_rt handles missing InChIKeys", {
         name_rt = "rt",
         name_inchikey = "inchikey",
         name_smiles = "smiles",
+        name_name = "structure_name",
         output_rt = output_rt,
         output_sop = output_sop
       )
@@ -385,6 +389,7 @@ test_that("prepare_libraries_rt filters out invalid entries", {
     name_rt = "rt",
     name_inchikey = "inchikey",
     name_smiles = "smiles",
+    name_name = "structure_name",
     output_rt = output_rt,
     output_sop = output_sop
   )
@@ -447,6 +452,7 @@ test_that("prepare_libraries_rt combines experimental and predicted data", {
     name_rt = "rt",
     name_inchikey = "inchikey",
     name_smiles = "smiles",
+    name_name = "structure_name",
     output_rt = output_rt,
     output_sop = output_sop
   )
@@ -493,13 +499,15 @@ test_that("prepare_libraries_rt handles duplicate InChIKeys", {
     unit_rt = "minutes",
     name_rt = "rt",
     name_inchikey = "inchikey",
+    name_name = "structure_name",
     name_smiles = "smiles",
     output_rt = output_rt,
     output_sop = output_sop
   )
 
   # RT library can have multiple RTs per structure
-  rt_table <- tidytable::fread(result["rt"], colClasses = "character")
+  rt_table <- tidytable::fread(result["rt"], colClasses = "character") |>
+    filter(!is.na(output_rt))
   expect_true(nrow(rt_table) >= 2)
 
   # SOP table should have unique structures
@@ -538,6 +546,7 @@ test_that("prepare_libraries_rt creates correct output structure", {
     name_rt = "rt",
     name_inchikey = "inchikey",
     name_smiles = "smiles",
+    name_name = "structure_name",
     output_rt = output_rt,
     output_sop = output_sop
   )
@@ -608,6 +617,7 @@ test_that("prepare_libraries_rt handles moderate-scale data efficiently", {
     name_rt = "rt",
     name_inchikey = "inchikey",
     name_smiles = "smiles",
+    name_name = "structure_name",
     output_rt = output_rt,
     output_sop = output_sop
   )
