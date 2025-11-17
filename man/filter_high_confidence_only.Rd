@@ -11,8 +11,8 @@ filter_high_confidence_only(
   score_ini_min = DEFAULT_HC_SCORE_INITIAL_MIN,
   score_final_min = DEFAULT_HC_SCORE_FINAL_MIN,
   error_rt_max = DEFAULT_HC_MAX_RT_ERROR_MIN,
-  confidence_sirius_min = NULL,
-  similarity_spectral_min = NULL
+  confidence_sirius_min = DEFAULT_HC_SCORE_SIRIUS_MIN,
+  similarity_spectral_min = DEFAULT_HC_SCORE_SPECTRAL_MIN
 )
 }
 \arguments{
