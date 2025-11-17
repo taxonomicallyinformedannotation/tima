@@ -139,8 +139,9 @@ prepare_libraries_sop_merged <- function(
       stop("value must be a single character string")
     }
   }
-
-  logger::log_info("Filtering by {level}: {value}")
+  if (filter) {
+    logger::log_info("Filtering by {level}: {value}")
+  }
 
   # logger::log_trace("Loading and concatenating prepared libraries")
   libraries <- files |>
