@@ -230,6 +230,10 @@ parse_cli_params <- function(arguments, parameters) {
       type = as.numeric
     ),
     names_adduct = list(path = c("names", "adduct"), type = as.character),
+    names_compound_name = list(
+      path = c("names", "compound_name"),
+      type = as.character
+    ),
     names_extension = list(path = c("names", "extension"), type = as.character),
     names_features = list(path = c("names", "features"), type = as.character),
     names_filename = list(path = c("names", "filename"), type = as.character),

@@ -23,8 +23,8 @@ filter_high_confidence_only <- function(
   score_ini_min = DEFAULT_HC_SCORE_INITIAL_MIN,
   score_final_min = DEFAULT_HC_SCORE_FINAL_MIN,
   error_rt_max = DEFAULT_HC_MAX_RT_ERROR_MIN,
-  confidence_sirius_min = NULL,
-  similarity_spectral_min = NULL
+  confidence_sirius_min = DEFAULT_HC_SCORE_SIRIUS_MIN,
+  similarity_spectral_min = DEFAULT_HC_SCORE_SPECTRAL_MIN
 ) {
   # Validate inputs
   if (!is.data.frame(df) && !inherits(df, "tbl")) {
@@ -69,14 +69,13 @@ filter_high_confidence_only <- function(
 
   # Filter by score thresholds (at least one must be met)
   # TODO: This is basic filtering. Future improvements could add:
-  # - SIRIUS confidence scores (NULL by default)
   # - Internal library match quality
-  # - Spectral similarity thresholds (NULL by default)
   df_filtered <- df |>
     tidytable::filter(
       score_biological >= score_bio_min |
         candidate_score_pseudo_initial >= score_ini_min |
-        score_weighted_chemo >= score_final_min
+        score_weighted_chemo >= score_final_min |
+        candidate_structure_error_rt <= error_rt_max
     )
 
   # Optional: SIRIUS confidence filter if column present and threshold provided

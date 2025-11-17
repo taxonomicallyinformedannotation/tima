@@ -931,6 +931,15 @@ ui <- shiny::fluidPage(
               )
             ),
           shiny::textInput(
+            inputId = "names_compound_name",
+            label = "Name of `compound name` variable in the input",
+            value = NULL
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = c("Name of the `inchikey` column in your file.")
+            ),
+          shiny::textInput(
             inputId = "names_inchikey",
             label = "Name of `inchikey` variable in the input",
             value = "inchikey"
@@ -2161,6 +2170,8 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$ms_tol_rt_lib)
   yaml_advanced$names$adduct <-
     shiny::isolate(input$names_adduct)
+  yaml_advanced$names$compound_name <-
+    shiny::isolate(input$names_compound_name)
   yaml_advanced$names$extension <-
     shiny::isolate(input$names_extension)
   yaml_advanced$names$features <-

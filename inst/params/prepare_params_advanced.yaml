@@ -473,6 +473,9 @@ names:
   #' Name of "adduct" variable in the feature table. STRING
   adduct: best ion
 
+  #' Name of the "chemical compound name" in the input. STRING
+  compound_name: structure_name
+
   #' The file(s) extension is present in the sample name. BOOLEAN
   extension: true
 
