@@ -69,29 +69,25 @@ prepare_libraries_rt <- function(
     stop("unit_rt must be 'seconds' or 'minutes', got: ", unit_rt)
   }
 
-  # Helper to validate a single output path and ensure its directory exists
-  .validate_output_path <- function(path, arg_name) {
-    if (
-      !is.character(path) || length(path) != 1L || is.na(path) || !nzchar(path)
-    ) {
-      stop(arg_name, " must be a single character string")
-    }
-    dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
-    path
+  # Validate output paths and create directories
+  if (!is.character(output_rt) || length(output_rt) != 1L) {
+    stop("output_rt must be a single character string")
   }
+  dir.create(dirname(output_rt), showWarnings = FALSE, recursive = TRUE)
 
-  # Validate output paths (also ensures parent dir exists)
-  output_rt <- .validate_output_path(output_rt, "output_rt")
-  output_sop <- .validate_output_path(output_sop, "output_sop")
+  if (!is.character(output_sop) || length(output_sop) != 1L) {
+    stop("output_sop must be a single character string")
+  }
+  dir.create(dirname(output_sop), showWarnings = FALSE, recursive = TRUE)
 
   logger::log_info("Preparing retention time libraries")
   logger::log_debug("RT unit: {unit_rt}")
 
-  # Default transforms from `Spectra`
-  if (!is.na(col_rt) && identical(col_rt, "RTINSECONDS")) {
+  ## default transforms from `Spectra`
+  if (!is.na(col_rt) && col_rt == "RTINSECONDS") {
     col_rt <- "rtime"
   }
-  if (!is.na(col_sm) && identical(col_sm, "SMILES")) {
+  if (!is.na(col_sm) && col_sm == "SMILES") {
     col_sm <- "smiles"
   }
 
@@ -100,8 +96,13 @@ prepare_libraries_rt <- function(
   # ============================================================================
   .normalize_input_vec <- function(x) {
     # Accept NULL or character vectors, return NULL if empty/NA/blank
-    if (is.null(x)) {
+    # Handle list() from YAML params (when fields are empty)
+    if (is.null(x) || (is.list(x) && length(x) == 0L)) {
       return(NULL)
+    }
+    # If it's a list with elements, try to unlist
+    if (is.list(x)) {
+      x <- unlist(x, use.names = FALSE)
     }
     x <- as.character(x)
     x <- x[!is.na(x) & nzchar(trimws(x))]
