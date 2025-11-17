@@ -60,7 +60,7 @@ test_that("clean_bio validates minimal_consistency parameter", {
       edges_table = data.frame(),
       minimal_consistency = "0.5"
     ),
-    "minimal_consistency must be between 0 and 1"
+    "minimal_consistency must be a single numeric value, got: character"
   )
 })
 
@@ -97,25 +97,14 @@ test_that("clean_bio handles empty annotation table", {
 })
 
 test_that("clean_bio handles empty edges table", {
-  # Create non-empty annotation table
-  annotations <- tidytable::tidytable(
-    feature_id = c("F1", "F2"),
-    candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
-      2,
-      seed = 1
-    ),
-    candidate_structure_tax_cla_01kin = c(
-      "Organic compounds",
-      "Organic compounds"
-    ),
-    candidate_structure_tax_npc_01pat = c("Alkaloids", "Terpenoids"),
-    candidate_structure_tax_cla_02sup = c("Phenylpropanoids", "Isoprenoids"),
-    candidate_structure_tax_npc_02sup = c("Alkaloids", "Terpenoids"),
-    candidate_structure_tax_cla_03cla = c("Flavonoids", "Monoterpenoids"),
-    candidate_structure_tax_npc_03cla = c("Benzylisoquinoline", "Iridoids"),
-    candidate_structure_tax_cla_04dirpar = c("Flavones", "Monoterpenoids"),
-    score_weighted_bio = c(0.8, 0.75)
-  )
+  # Load annotation fixture and add required bio columns
+  annotations <- load_fixture("annotations") |>
+    tidytable::mutate(
+      score_weighted_bio = runif(tidytable::n(), 0.6, 0.9),
+      candidate_structure_tax_cla_02sup = "Phenylpropanoids",
+      candidate_structure_tax_npc_02sup = "Alkaloids",
+      candidate_structure_tax_cla_04dirpar = "Flavones"
+    )
 
   # Create empty edges table
   empty_edges <- tidytable::tidytable(
@@ -143,51 +132,20 @@ test_that("clean_bio handles empty edges table", {
 })
 
 test_that("clean_bio handles features with only 1 neighbor", {
-  # Create annotation table
-  annotations <- tidytable::tidytable(
-    feature_id = c("F1", "F2", "F3"),
-    candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
-      3,
-      seed = 2
-    ),
-    candidate_structure_tax_cla_01kin = rep("Organic compounds", 3),
-    candidate_structure_tax_npc_01pat = c(
-      "Alkaloids",
-      "Alkaloids",
-      "Terpenoids"
-    ),
-    candidate_structure_tax_cla_02sup = c(
-      "Phenylpropanoids",
-      "Phenylpropanoids",
-      "Isoprenoids"
-    ),
-    candidate_structure_tax_npc_02sup = c(
-      "Alkaloids",
-      "Alkaloids",
-      "Terpenoids"
-    ),
-    candidate_structure_tax_cla_03cla = c(
-      "Flavonoids",
-      "Flavonoids",
-      "Monoterpenoids"
-    ),
-    candidate_structure_tax_npc_03cla = c(
-      "Benzylisoquinoline",
-      "Benzylisoquinoline",
-      "Iridoids"
-    ),
-    candidate_structure_tax_cla_04dirpar = c(
-      "Flavones",
-      "Flavones",
-      "Monoterpenoids"
-    ),
-    score_weighted_bio = c(0.8, 0.75, 0.7)
-  )
+  # Load and prepare annotation fixture
+  annotations <- load_fixture("annotations") |>
+    tidytable::slice(1:3) |>
+    tidytable::mutate(
+      score_weighted_bio = c(0.8, 0.75, 0.7),
+      candidate_structure_tax_cla_02sup = "Phenylpropanoids",
+      candidate_structure_tax_npc_02sup = "Alkaloids",
+      candidate_structure_tax_cla_04dirpar = "Flavones"
+    )
 
-  # Create edges with F1 having only 1 neighbor (should be filtered out)
+  # Create edges with FT0001 having only 1 neighbor (should be filtered out)
   edges <- tidytable::tidytable(
-    feature_source = c("F1", "F2", "F2"),
-    feature_target = c("F2", "F3", "F4"),
+    feature_source = c("FT0001", "FT0002", "FT0002"),
+    feature_target = c("FT0002", "FT0003", "FT0004"),
     feature_spectrum_entropy = c(0.5, 0.6, 0.7)
   )
 

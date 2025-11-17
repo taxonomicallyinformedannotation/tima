@@ -597,7 +597,10 @@ weight_annotations <- function(
   annot_table_wei_bio |>
     decorate_bio()
   annot_table_wei_bio_clean <- annot_table_wei_bio |>
-    clean_bio()
+    clean_bio(
+      edges_table = edges_table,
+      minimal_consistency = minimal_consistency
+    )
   rm(annot_table_wei_bio)
   annot_table_wei_chemo <- annot_table_wei_bio_clean |>
     weight_chemo()

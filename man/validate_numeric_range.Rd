@@ -15,18 +15,23 @@ validate_numeric_range(
 \arguments{
 \item{value}{Numeric value to validate}
 
-\item{min_value}{Minimum allowed value (inclusive)}
+\item{allow_null}{Whether NULL values are allowed}
 
-\item{max_value}{Maximum allowed value (inclusive)}
+\item{name}{Name of the parameter (for error messages)}
 
-\item{param_name}{Name of the parameter (for error messages)}
+\item{min}{Minimum allowed value (inclusive)}
 
-\item{allow_null}{Allow NULL values (default: FALSE)}
+\item{max}{Maximum allowed value (inclusive)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise
 }
 \description{
-Generic validator for numeric values within a range
+Validates that a numeric value is within a specified range
+}
+\examples{
+\dontrun{
+validate_numeric_range(0.5, min_value = 0, max_value = 1, param_name = "threshold")
+}
 }
 \keyword{internal}

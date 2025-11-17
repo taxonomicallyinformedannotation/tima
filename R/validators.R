@@ -288,6 +288,227 @@ validate_adduct_list <- function(
   invisible(TRUE)
 }
 
+#' Validate data frame structure
+#'
+#' @description Validates that input is a data frame and optionally checks
+#'     for required columns and minimum row count
+#'
+#' @param df Input to validate
+#' @param name Name of the parameter (for error messages)
+#' @param required_cols Character vector of required column names
+#' @param min_rows Minimum number of rows required (default: 0)
+#' @param allow_empty Logical, whether empty data frames are allowed
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' validate_dataframe(df, "features", required_cols = c("feature_id", "mz"))
+#' }
+validate_dataframe <- function(
+  df,
+  name = "input",
+  required_cols = NULL,
+  min_rows = 0L,
+  allow_empty = TRUE
+) {
+  # Check if data frame or tibble
+  if (!is.data.frame(df) && !inherits(df, "tbl")) {
+    stop(
+      name,
+      " must be a data frame or tibble, got: ",
+      paste(class(df), collapse = ", ")
+    )
+  }
+
+  # Check row count
+  n_rows <- nrow(df)
+
+  if (!allow_empty && n_rows == 0L) {
+    stop(name, " cannot be empty")
+  }
+
+  if (n_rows < min_rows) {
+    stop(
+      name,
+      " must have at least ",
+      min_rows,
+      " row(s), got: ",
+      n_rows
+    )
+  }
+
+  # Check required columns
+  if (!is.null(required_cols)) {
+    missing_cols <- setdiff(required_cols, colnames(df))
+
+    if (length(missing_cols) > 0L) {
+      stop(
+        name,
+        " is missing required column(s): ",
+        paste(missing_cols, collapse = ", "),
+        "\nAvailable columns: ",
+        paste(colnames(df), collapse = ", ")
+      )
+    }
+  }
+
+  invisible(TRUE)
+}
+
+#' Validate numeric range
+#'
+#' @description Validates that a numeric value is within a specified range
+#'
+#' @param value Numeric value to validate
+#' @param name Name of the parameter (for error messages)
+#' @param min Minimum allowed value (inclusive)
+#' @param max Maximum allowed value (inclusive)
+#' @param allow_null Whether NULL values are allowed
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' validate_numeric_range(0.5, min_value = 0, max_value = 1, param_name = "threshold")
+#' }
+validate_numeric_range <- function(
+  value,
+  min_value = -Inf,
+  max_value = Inf,
+  param_name = "value",
+  allow_null = FALSE
+) {
+  if (is.null(value)) {
+    if (!allow_null) {
+      stop(param_name, " cannot be NULL")
+    }
+    return(invisible(TRUE))
+  }
+
+  if (!is.numeric(value) || length(value) != 1L) {
+    stop(
+      param_name,
+      " must be a single numeric value, got: ",
+      if (is.numeric(value)) {
+        paste0("vector of length ", length(value))
+      } else {
+        class(value)[1L]
+      }
+    )
+  }
+
+  if (is.na(value)) {
+    stop(param_name, " cannot be NA")
+  }
+
+  if (value < min_value || value > max_value) {
+    stop(
+      param_name,
+      " must be between ",
+      min_value,
+      " and ",
+      max_value,
+      ", got: ",
+      value
+    )
+  }
+
+  invisible(TRUE)
+}
+
+#' Validate weights sum to 1
+#'
+#' @description Validates that a set of weights are non-negative and sum to 1
+#'
+#' @param weights Named list or vector of weights
+#' @param tolerance Numeric tolerance for sum check (default: 1e-6)
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' validate_weights(list(spectral = 0.5, chemical = 0.3, biological = 0.2))
+#' }
+validate_weights <- function(weights, tolerance = 1e-6) {
+  if (!is.numeric(weights)) {
+    stop("Weights must be numeric, got: ", class(weights)[1L])
+  }
+
+  # Check for negative weights
+  if (any(weights < 0, na.rm = TRUE)) {
+    negative_weights <- which(weights < 0)
+    stop(
+      "All weights must be non-negative. Negative weight(s) at position(s): ",
+      paste(negative_weights, collapse = ", ")
+    )
+  }
+
+  # Check for NA values
+  if (any(is.na(weights))) {
+    stop("Weights cannot contain NA values")
+  }
+
+  # Check sum
+  weight_sum <- sum(weights)
+
+  if (abs(weight_sum - 1.0) > tolerance) {
+    stop(
+      "Weights must sum to 1.0, got: ",
+      round(weight_sum, 6),
+      "\nWeights: ",
+      paste(names(weights), "=", round(weights, 3), collapse = ", ")
+    )
+  }
+
+  invisible(TRUE)
+}
+
+#' Validate choice parameter
+#'
+#' @description Validates that a value is one of a set of allowed choices
+#'
+#' @param value Value to validate
+#' @param choices Character vector of allowed choices
+#' @param name Name of the parameter (for error messages)
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' validate_choice("OR", c("OR", "AND"), "condition")
+#' }
+validate_choice <- function(value, choices, name = "value") {
+  if (!is.character(value) || length(value) != 1L) {
+    stop(
+      name,
+      " must be a single character string, got: ",
+      class(value)[1L]
+    )
+  }
+
+  if (!value %in% choices) {
+    stop(
+      name,
+      " must be one of: ",
+      paste(choices, collapse = ", "),
+      "\nGot: '",
+      value,
+      "'"
+    )
+  }
+
+  invisible(TRUE)
+}
+
 #' Format a standardized error message
 #'
 #' @description Helper to format consistent error messages containing
@@ -307,69 +528,6 @@ format_error <- function(what, why = NULL, how = NULL) {
 #' @keywords internal
 stopf <- function(what, why = NULL, how = NULL) {
   stop(format_error(what, why, how))
-}
-
-#' Validate numeric range
-#'
-#' @description Generic validator for numeric values within a range
-#'
-#' @param value Numeric value to validate
-#' @param min_value Minimum allowed value (inclusive)
-#' @param max_value Maximum allowed value (inclusive)
-#' @param param_name Name of the parameter (for error messages)
-#' @param allow_null Allow NULL values (default: FALSE)
-#'
-#' @return Invisible TRUE if valid, stops with error otherwise
-#'
-#' @keywords internal
-validate_numeric_range <- function(
-  value,
-  min_value = -Inf,
-  max_value = Inf,
-  param_name = "value",
-  allow_null = FALSE
-) {
-  if (is.null(value)) {
-    if (!allow_null) {
-      stopf(
-        what = paste0(param_name, " cannot be NULL"),
-        how = "Provide a numeric value."
-      )
-    }
-    return(invisible(TRUE))
-  }
-
-  if (!is.numeric(value) || length(value) != 1L) {
-    stopf(
-      what = paste0(
-        param_name,
-        " must be a single numeric value, got: ",
-        class(value)[1L]
-      ),
-      how = "Provide a length-1 numeric value."
-    )
-  }
-
-  if (is.na(value)) {
-    stopf(what = paste0(param_name, " cannot be NA"))
-  }
-
-  if (value < min_value || value > max_value) {
-    stopf(
-      what = paste0(
-        param_name,
-        " (",
-        value,
-        ") must be between ",
-        min_value,
-        " and ",
-        max_value
-      ),
-      how = paste0("Use a value within [", min_value, ", ", max_value, "].")
-    )
-  }
-
-  invisible(TRUE)
 }
 
 #' Validate character parameter

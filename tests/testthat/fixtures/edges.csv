@@ -1,7 +1,10 @@
-feature_source,feature_target,cosine_similarity
-FT0001,FT0002,0.85
-FT0002,FT0003,0.92
-FT0003,FT0004,0.78
-FT0001,FT0003,0.65
-FT0004,FT0005,0.88
+feature_source,feature_target,cosine_similarity,feature_spectrum_entropy,label
+FT0001,FT0002,0.85,0.75,
+FT0002,FT0003,0.92,0.82,
+FT0003,FT0004,0.78,0.68,
+FT0001,FT0003,0.65,0.70,
+FT0004,FT0005,0.88,0.80,
+FT0002,FT0005,0.72,0.65,
+FT0001,FT0005,0.55,0.60,
+FT0003,FT0005,0.82,0.77,
 
