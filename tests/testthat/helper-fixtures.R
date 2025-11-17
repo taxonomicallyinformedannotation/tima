@@ -4,7 +4,6 @@
 #
 # This file contains reusable test fixtures and helper functions to reduce
 # boilerplate code and improve test maintainability.
-
 # ==============================================================================
 # Internal Utility Helpers (defined first for use throughout)
 # ==============================================================================
@@ -12,6 +11,10 @@
 # Deterministic random helper ----
 .with_seed <- function(seed, expr) {
   if (!is.null(seed)) {
+    # Ensure RNG is initialized before accessing .Random.seed
+    if (!exists(".Random.seed", envir = .GlobalEnv)) {
+      set.seed(NULL) # Initialize RNG
+    }
     old <- .Random.seed
     on.exit(
       {
