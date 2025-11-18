@@ -160,17 +160,23 @@ test_that("get_file fails gracefully with invalid URL", {
 
   paths <- local_test_project(copy = TRUE)
 
+  # Ensure clean state - remove any existing file
+  test_file <- "data/source/test.txt"
+  if (file.exists(test_file)) {
+    unlink(test_file, force = TRUE)
+  }
+
   expect_error(
     get_file(
       url = "https://thissitedoesnotexist123456789.com/file.txt",
-      export = "data/source/test.txt",
+      export = test_file,
       limit = 5
     ),
     "Failed to download"
   )
 
   # Partial file should be cleaned up
-  expect_false(file.exists("data/source/test.txt"))
+  expect_false(file.exists(test_file))
 })
 
 test_that("get_file handles 404 errors", {
@@ -179,10 +185,16 @@ test_that("get_file handles 404 errors", {
 
   paths <- local_test_project(copy = TRUE)
 
+  # Ensure clean state - remove any existing file
+  test_file <- "data/source/test.txt"
+  if (file.exists(test_file)) {
+    unlink(test_file, force = TRUE)
+  }
+
   expect_error(
     get_file(
       url = "https://github.com/nonexistent/repo/raw/main/missing.txt",
-      export = "data/source/test.txt",
+      export = test_file,
       limit = 10
     ),
     "Failed to download"
