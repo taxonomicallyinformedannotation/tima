@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#clean-chemo" id="toc-clean-chemo" class="nav-link active" data-scroll-target="#clean-chemo">Clean chemo</a>
+  <li><a href="#clean-chemical-annotations" id="toc-clean-chemical-annotations" class="nav-link active" data-scroll-target="#clean-chemical-annotations">Clean Chemical Annotations</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -694,11 +694,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="clean-chemo" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="clean-chemo">Clean chemo</h2>
+<section id="clean-chemical-annotations" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="clean-chemical-annotations">Clean Chemical Annotations</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function cleans chemically weighted annotation results by filtering to top candidates, optionally removing MS1-only annotations below score thresholds, and preparing final results for export. Can include compound names and apply high-confidence filters.</p>
+<p>Cleans and filters chemically weighted annotation results through a multi-tier pipeline. Applies MS1 score thresholds, percentile filtering, ranking, and optional high-confidence filtering. Returns three-tier output: full (comprehensive), filtered (top candidates), and mini (one row per feature).</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -728,7 +728,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="annot_table_wei_chemo">annot_table_wei_chemo</code>
 </td>
 <td>
-Data frame with chemically weighted annotations
+Data frame with chemically weighted annotations. Required columns: feature_id, candidate_structure_inchikey_connectivity_layer, score_weighted_chemo, score_biological, score_chemical, candidate_score_pseudo_initial
 </td>
 </tr>
 <tr>
@@ -736,7 +736,7 @@ Data frame with chemically weighted annotations
 <code id="components_table">components_table</code>
 </td>
 <td>
-Data frame with molecular network components
+Data frame with molecular network component assignments. Required columns: feature_id, component_id
 </td>
 </tr>
 <tr>
@@ -744,7 +744,7 @@ Data frame with molecular network components
 <code id="features_table">features_table</code>
 </td>
 <td>
-Data frame with feature metadata
+Data frame with feature metadata (RT, m/z, etc.). Required columns: feature_id
 </td>
 </tr>
 <tr>
@@ -752,7 +752,7 @@ Data frame with feature metadata
 <code id="structure_organism_pairs_table">structure_organism_pairs_table</code>
 </td>
 <td>
-Data frame with structure-organism pairs
+Data frame linking structures to organisms. Required columns: structure_inchikey_connectivity_layer
 </td>
 </tr>
 <tr>
@@ -760,7 +760,7 @@ Data frame with structure-organism pairs
 <code id="candidates_final">candidates_final</code>
 </td>
 <td>
-Integer number of final candidates to keep per feature
+Integer, number of top candidates to retain per feature (&gt;= 1)
 </td>
 </tr>
 <tr>
@@ -768,7 +768,7 @@ Integer number of final candidates to keep per feature
 <code id="best_percentile">best_percentile</code>
 </td>
 <td>
-Numeric percentile threshold (0-1) for selecting top candidates within each feature (default: 0.9, keeps candidates with scores &gt;= 90% of the maximum score for that feature). Used for both filtered and mini outputs to ensure consistent row counts.
+Numeric (0-1), percentile threshold for score filtering. Candidates with scores &gt;= percentile * max_score are kept. Default: 0.9 (90th percentile)
 </td>
 </tr>
 <tr>
@@ -776,7 +776,7 @@ Numeric percentile threshold (0-1) for selecting top candidates within each feat
 <code id="minimal_ms1_bio">minimal_ms1_bio</code>
 </td>
 <td>
-Numeric minimal biological score for MS1 annotations (0-1)
+Numeric (0-1), minimum biological score for MS1-only annotations
 </td>
 </tr>
 <tr>
@@ -784,7 +784,7 @@ Numeric minimal biological score for MS1 annotations (0-1)
 <code id="minimal_ms1_chemo">minimal_ms1_chemo</code>
 </td>
 <td>
-Numeric minimal chemical score for MS1 annotations (0-1)
+Numeric (0-1), minimum chemical score for MS1-only annotations
 </td>
 </tr>
 <tr>
@@ -792,7 +792,7 @@ Numeric minimal chemical score for MS1 annotations (0-1)
 <code id="minimal_ms1_condition">minimal_ms1_condition</code>
 </td>
 <td>
-Character condition: "OR" or "AND" for MS1 filtering
+Character, logical operator for MS1 filtering: "OR" or "AND". "OR" = keep if bio &gt;= threshold OR chem &gt;= threshold. "AND" = keep if bio &gt;= threshold AND chem &gt;= threshold
 </td>
 </tr>
 <tr>
@@ -800,7 +800,7 @@ Character condition: "OR" or "AND" for MS1 filtering
 <code id="compounds_names">compounds_names</code>
 </td>
 <td>
-Logical whether to include compound names (can be large)
+Logical, include compound names in output (may increase size)
 </td>
 </tr>
 <tr>
@@ -808,7 +808,7 @@ Logical whether to include compound names (can be large)
 <code id="high_confidence">high_confidence</code>
 </td>
 <td>
-Logical whether to filter for high confidence only
+Logical, apply strict high-confidence filters
 </td>
 </tr>
 <tr>
@@ -816,7 +816,7 @@ Logical whether to filter for high confidence only
 <code id="remove_ties">remove_ties</code>
 </td>
 <td>
-Logical whether to remove tied scores
+Logical, remove tied scores (keep only highest-ranked)
 </td>
 </tr>
 <tr>
@@ -824,28 +824,59 @@ Logical whether to remove tied scores
 <code id="summarize">summarize</code>
 </td>
 <td>
-Logical whether to summarize to 1 row per feature
+Logical, collapse results to one row per feature
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Data frame with cleaned, filtered chemically weighted annotations</p>
+<p>Named list with three data frames:</p>
+<dl>
+<dt>
+full
+</dt>
+<dd>
+All annotations (optionally high-confidence filtered)
+</dd>
+<dt>
+filtered
+</dt>
+<dd>
+Top candidates meeting percentile + rank thresholds
+</dd>
+<dt>
+mini
+</dt>
+<dd>
+One row per feature with best compound/taxonomy
+</dd>
+</dl>
 </section>
 <section id="see-also" class="level3">
 <h3 class="anchored" data-anchor-id="see-also">See Also</h3>
-<p>weight_chemo</p>
+<p><code>weight_chemo</code>, <code>filter_high_confidence_only</code>, <code>summarize_results</code></p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">clean_chemo</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">annot_table_wei_chemo =</span> annotations,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">features_table =</span> features,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">components_table =</span> components,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">structure_organism_pairs_table =</span> sop_table,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">candidates_final =</span> <span class="dv">10</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">best_percentile =</span> <span class="fl">0.9</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">minimal_ms1_bio =</span> <span class="fl">0.5</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">minimal_ms1_chemo =</span> <span class="fl">0.5</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">minimal_ms1_condition =</span> <span class="st">"OR"</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">compounds_names =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">high_confidence =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">remove_ties =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">summarize =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
