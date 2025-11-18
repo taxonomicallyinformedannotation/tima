@@ -1,3 +1,170 @@
+#' Validate Inputs for filter_annotations
+#'
+#' @description Internal helper to validate all input parameters.
+#'
+#' @param annotations Character vector or list of annotation file paths
+#' @param features Character path to features file
+#' @param rts Character vector of RT library paths (optional)
+#' @param output Character path for output
+#' @param tolerance_rt Numeric RT tolerance
+#'
+#' @return NULL (stops execution if validation fails)
+#' @keywords internal
+validate_filter_annotations_inputs <- function(
+  annotations,
+  features,
+  rts,
+  output,
+  tolerance_rt
+) {
+  # Validate tolerance first (cheapest check)
+  if (!is.numeric(tolerance_rt) || tolerance_rt <= 0) {
+    stop("tolerance_rt must be a positive number, got: ", tolerance_rt, call. = FALSE)
+  }
+
+  # Validate output path
+  if (!is.character(output) || length(output) != 1L) {
+    stop("output must be a single character string", call. = FALSE)
+  }
+
+  # Validate features
+  if (!is.character(features) || length(features) != 1L) {
+    stop("features must be a single character string", call. = FALSE)
+  }
+
+  if (!file.exists(features)) {
+    stop("Features file not found: ", features, call. = FALSE)
+  }
+
+  # Validate annotations (handle both list and character vector)
+  if (is.list(annotations)) {
+    if (length(annotations) == 0L) {
+      stop("annotations must be a non-empty list or character vector", call. = FALSE)
+    }
+
+    ann_vec <- unlist(annotations)
+    if (!is.character(ann_vec)) {
+      stop("All annotation elements must be character strings", call. = FALSE)
+    }
+
+    missing_annotations <- ann_vec[!file.exists(ann_vec)]
+    if (length(missing_annotations) > 0L) {
+      stop(
+        "Annotation file(s) not found: ",
+        paste(missing_annotations, collapse = ", "),
+        call. = FALSE
+      )
+    }
+  } else {
+    if (!is.character(annotations) || length(annotations) == 0L) {
+      stop("annotations must be a non-empty character vector or list", call. = FALSE)
+    }
+
+    missing_annotations <- annotations[!file.exists(annotations)]
+    if (length(missing_annotations) > 0L) {
+      stop(
+        "Annotation file(s) not found: ",
+        paste(missing_annotations, collapse = ", "),
+        call. = FALSE
+      )
+    }
+  }
+
+  # Validate RT files
+  if (length(rts) > 0) {
+    rts_exist <- purrr::map_lgl(rts, file.exists)
+    if (!all(rts_exist)) {
+      stop(
+        "Retention time file(s) not found: ",
+        paste(rts[!rts_exist], collapse = ", "),
+        call. = FALSE
+      )
+    }
+  }
+
+  invisible(NULL)
+}
+
+#' Filter MS1 Annotations
+#'
+#' @description Internal helper to remove MS1 annotations that have spectral matches.
+#'
+#' @param annotation_tables_list Named list of annotation tables
+#'
+#' @return Data frame with filtered annotations
+#' @keywords internal
+filter_ms1_redundancy <- function(annotation_tables_list) {
+  if (!"ms1" %in% names(annotation_tables_list)) {
+    logger::log_debug("No MS1 annotations to filter, combining all annotations")
+    return(tidytable::bind_rows(annotation_tables_list))
+  }
+
+  logger::log_info("Removing MS1 annotations superseded by spectral matches")
+
+  # Extract spectral annotations (all non-MS1)
+  spectral_names <- names(annotation_tables_list)[
+    names(annotation_tables_list) != "ms1"
+  ]
+  annotations_tables_spectral <- annotation_tables_list[spectral_names] |>
+    tidytable::bind_rows()
+
+  n_spectral <- nrow(annotations_tables_spectral)
+  logger::log_debug("Found {n_spectral} spectral annotations")
+
+  # Create key for anti-join
+  spectral_keys <- annotations_tables_spectral |>
+    tidytable::distinct(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer
+    )
+
+  n_ms1_before <- nrow(annotation_tables_list[["ms1"]])
+
+  # Remove redundant MS1 and combine
+  annotation_table <- annotation_tables_list[["ms1"]] |>
+    tidytable::anti_join(spectral_keys, by = c(
+      "feature_id",
+      "candidate_structure_inchikey_connectivity_layer"
+    )) |>
+    tidytable::bind_rows(annotations_tables_spectral)
+
+  n_ms1_removed <- n_ms1_before - (nrow(annotation_table) - n_spectral)
+  logger::log_info("Removed {n_ms1_removed} redundant MS1 annotations")
+
+  annotation_table
+}
+
+#' Apply RT Filtering
+#'
+#' @description Internal helper to filter annotations by RT tolerance.
+#'
+#' @param features_annotated_table Data frame with features and annotations
+#' @param rt_table Data frame with RT standards
+#' @param tolerance_rt Numeric RT tolerance in minutes
+#'
+#' @return Filtered data frame
+#' @keywords internal
+apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
+  logger::log_info("Filtering annotations outside {tolerance_rt} min RT tolerance")
+
+  features_annotated_table |>
+    tidytable::left_join(rt_table, by = "candidate_structure_inchikey_connectivity_layer") |>
+    tidytable::mutate(
+      candidate_structure_error_rt = as.numeric(rt) - as.numeric(rt_target)
+    ) |>
+    tidytable::arrange(abs(candidate_structure_error_rt)) |>
+    tidytable::distinct(
+      -candidate_structure_error_rt,
+      -rt_target,
+      .keep_all = TRUE
+    ) |>
+    tidytable::filter(
+      abs(candidate_structure_error_rt) <= abs(tolerance_rt) |
+        is.na(candidate_structure_error_rt)
+    ) |>
+    tidytable::select(-tidyselect::any_of(c("rt_target", "type")))
+}
+
 #' @title Filter annotations
 #'
 #' @description This function filters initial annotations by removing MS1-only
@@ -56,69 +223,16 @@ filter_annotations <- function(
   # Input Validation
   # ============================================================================
 
-  # Validate tolerance first (cheapest check)
-  if (!is.numeric(tolerance_rt) || tolerance_rt <= 0) {
-    stop("tolerance_rt must be a positive number, got: ", tolerance_rt)
-  }
+  validate_filter_annotations_inputs(
+    annotations = annotations,
+    features = features,
+    rts = rts,
+    output = output,
+    tolerance_rt = tolerance_rt
+  )
 
-  # Validate output path
-  if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string")
-  }
-
-  # Validate features
-  if (!is.character(features) || length(features) != 1L) {
-    stop("features must be a single character string")
-  }
-
-  if (!file.exists(features)) {
-    stop("Features file not found: ", features)
-  }
-
-  # Validate annotations (handle both list and character vector)
-  if (is.list(annotations)) {
-    if (length(annotations) == 0L) {
-      stop("annotations must be a non-empty list or character vector")
-    }
-
-    # Validation for list elements
-    ann_vec <- unlist(annotations)
-    if (!is.character(ann_vec)) {
-      stop("All annotation elements must be character strings")
-    }
-
-    missing_annotations <- ann_vec[!file.exists(ann_vec)]
-    if (length(missing_annotations) > 0L) {
-      stop(
-        "Annotation file(s) not found: ",
-        paste(missing_annotations, collapse = ", ")
-      )
-    }
-  } else {
-    # Character vector
-    if (!is.character(annotations) || length(annotations) == 0L) {
-      stop("annotations must be a non-empty character vector or list")
-    }
-
-    missing_annotations <- annotations[!file.exists(annotations)]
-    if (length(missing_annotations) > 0L) {
-      stop(
-        "Annotation file(s) not found: ",
-        paste(missing_annotations, collapse = ", ")
-      )
-    }
-  }
-
-  # Validate RT files
-  if (length(rts) > 0) {
-    rts_exist <- purrr::map_lgl(rts, file.exists)
-    if (!all(rts_exist)) {
-      stop(
-        "Retention time file(s) not found: ",
-        paste(rts[!rts_exist], collapse = ", ")
-      )
-    }
-  } else {
+  # Normalize RT input
+  if (length(rts) == 0) {
     rts <- NULL
   }
 
@@ -129,22 +243,15 @@ filter_annotations <- function(
   logger::log_info("Filtering annotations")
   logger::log_debug("RT tolerance: {tolerance_rt} minutes")
 
-  # logger::log_trace("Loading features table")
   features_table <- tidytable::fread(
     file = features,
     colClasses = "character",
     na.strings = c("", "NA")
   ) |>
-    tidytable::distinct(
-      feature_id,
-      rt,
-      mz
-    )
+    tidytable::distinct(feature_id, rt, mz)
 
   n_features <- nrow(features_table)
-  logger::log_info(
-    "Processing {n_features} unique features for annotation filtering"
-  )
+  logger::log_info("Processing {n_features} unique features for annotation filtering")
 
   # ============================================================================
   # Load and Merge Annotations
@@ -158,58 +265,21 @@ filter_annotations <- function(
     colClasses = "character"
   )
 
-  # Filter MS1 annotations when spectral matches exist
-  if ("ms1" %in% names(annotation_tables_list)) {
-    logger::log_info(
-      "Removing MS1 annotations superseded by spectral matches"
-    )
-
-    # Extract spectral annotations (all non-MS1)
-    spectral_names <- names(annotation_tables_list)[
-      names(annotation_tables_list) != "ms1"
-    ]
-    annotations_tables_spectral <- annotation_tables_list[spectral_names] |>
-      tidytable::bind_rows()
-
-    n_spectral <- nrow(annotations_tables_spectral)
-    logger::log_debug("Found {n_spectral} spectral annotations")
-
-    # Create key for anti-join
-    spectral_keys <- annotations_tables_spectral |>
-      tidytable::distinct(
-        feature_id,
-        ## Comment not taking into account because of inconsistencies among tools
-        # candidate_adduct,
-        candidate_structure_inchikey_connectivity_layer
-      )
-
-    n_ms1_before <- nrow(annotation_tables_list[["ms1"]])
-
-    # Remove redundant MS1 and combine
-    annotation_table <- annotation_tables_list[["ms1"]] |>
-      tidytable::anti_join(spectral_keys) |>
-      tidytable::bind_rows(annotations_tables_spectral)
-
-    n_ms1_removed <- n_ms1_before - (nrow(annotation_table) - n_spectral)
-    logger::log_info("Removed {n_ms1_removed} redundant MS1 annotations")
-
-    # Clean up intermediate objects
-    rm(annotations_tables_spectral, spectral_keys, spectral_names)
-  } else {
-    logger::log_debug("No MS1 annotations to filter, combining all annotations")
-    annotation_table <- annotation_tables_list |>
-      tidytable::bind_rows()
-  }
-
-  n_total_annotations <- nrow(annotation_table)
-  logger::log_info(
-    "Total annotations before RT filtering: {n_total_annotations}"
-  )
-
-  # Clean up
+  # Filter MS1 redundancy
+  annotation_table <- filter_ms1_redundancy(annotation_tables_list)
   rm(annotation_tables_list)
 
-  # logger::log_trace("Loading retention time library")
+  n_total_annotations <- nrow(annotation_table)
+  logger::log_info("Total annotations before RT filtering: {n_total_annotations}")
+
+  # ============================================================================
+  # Apply RT Filtering if Library Available
+  # ============================================================================
+
+  features_annotated_table_1 <- features_table |>
+    tidytable::left_join(annotation_table, by = "feature_id")
+  rm(annotation_table)
+
   if (!is.null(rts)) {
     rt_table <- purrr::map(
       .x = rts,
@@ -222,33 +292,12 @@ filter_annotations <- function(
 
     n_rt_standards <- nrow(rt_table)
     logger::log_debug("Loaded {n_rt_standards} retention time standards")
-  }
 
-  features_annotated_table_1 <- features_table |>
-    tidytable::left_join(annotation_table)
-  rm(annotation_table)
-
-  if (!is.null(rts)) {
-    logger::log_info(
-      "Filtering annotations outside {tolerance_rt} min RT tolerance"
+    features_annotated_table_2 <- apply_rt_filter(
+      features_annotated_table_1,
+      rt_table,
+      tolerance_rt
     )
-    features_annotated_table_2 <- features_annotated_table_1 |>
-      tidytable::left_join(rt_table) |>
-      tidytable::mutate(
-        candidate_structure_error_rt = as.numeric(rt) -
-          as.numeric(rt_target)
-      ) |>
-      tidytable::arrange(abs(candidate_structure_error_rt)) |>
-      tidytable::distinct(
-        -candidate_structure_error_rt,
-        -rt_target,
-        .keep_all = TRUE
-      ) |>
-      tidytable::filter(
-        abs(candidate_structure_error_rt) <= abs(tolerance_rt) |
-          is.na(candidate_structure_error_rt)
-      ) |>
-      tidytable::select(-tidyselect::any_of(c("rt_target", "type")))
   } else {
     logger::log_debug("No RT library provided, skipping RT filtering")
     features_annotated_table_2 <- features_annotated_table_1 |>

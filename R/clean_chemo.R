@@ -1,36 +1,412 @@
-#' @title Clean chemo
+#' Validate Inputs for clean_chemo
 #'
-#' @description This function cleans chemically weighted annotation results by
-#'     filtering to top candidates, optionally removing MS1-only annotations
-#'     below score thresholds, and preparing final results for export. Can
-#'     include compound names and apply high-confidence filters.
+#' @description Internal helper to validate all input parameters for clean_chemo.
+#'     Checks data types, ranges, and logical consistency.
+#'
+#' @param annot_table_wei_chemo Data frame with annotations
+#' @param candidates_final Integer >= 1
+#' @param best_percentile Numeric (0-1)
+#' @param minimal_ms1_bio Numeric (0-1)
+#' @param minimal_ms1_chemo Numeric (0-1)
+#' @param minimal_ms1_condition Character: "OR" or "AND"
+#' @param compounds_names Logical
+#' @param high_confidence Logical
+#' @param remove_ties Logical
+#' @param summarize Logical
+#'
+#' @return NULL (stops execution if validation fails)
+#' @keywords internal
+validate_clean_chemo_inputs <- function(
+  annot_table_wei_chemo,
+  candidates_final,
+  best_percentile,
+  minimal_ms1_bio,
+  minimal_ms1_chemo,
+  minimal_ms1_condition,
+  compounds_names,
+  high_confidence,
+  remove_ties,
+  summarize
+) {
+  # Validate data frame
+  if (!is.data.frame(annot_table_wei_chemo)) {
+    stop("annot_table_wei_chemo must be a data frame", call. = FALSE)
+  }
+
+  # Validate numeric parameters (combined checks)
+  if (!is.numeric(candidates_final) || candidates_final < 1) {
+    stop(
+      "candidates_final must be a positive integer, got: ",
+      candidates_final,
+      call. = FALSE
+    )
+  }
+
+  if (!is.numeric(best_percentile) || best_percentile < 0 || best_percentile > 1) {
+    stop(
+      "best_percentile must be between 0 and 1, got: ",
+      best_percentile,
+      call. = FALSE
+    )
+  }
+
+  if (!is.numeric(minimal_ms1_bio) || minimal_ms1_bio < 0 || minimal_ms1_bio > 1) {
+    stop(
+      "minimal_ms1_bio must be between 0 and 1, got: ",
+      minimal_ms1_bio,
+      call. = FALSE
+    )
+  }
+
+  if (
+    !is.numeric(minimal_ms1_chemo) ||
+      minimal_ms1_chemo < 0 ||
+      minimal_ms1_chemo > 1
+  ) {
+    stop(
+      "minimal_ms1_chemo must be between 0 and 1, got: ",
+      minimal_ms1_chemo,
+      call. = FALSE
+    )
+  }
+
+  # Validate condition
+  if (!minimal_ms1_condition %in% c("OR", "AND")) {
+    stop(
+      "minimal_ms1_condition must be 'OR' or 'AND', got: ",
+      minimal_ms1_condition,
+      call. = FALSE
+    )
+  }
+
+  # Validate logical parameters
+  logical_params <- list(
+    compounds_names = compounds_names,
+    high_confidence = high_confidence,
+    remove_ties = remove_ties,
+    summarize = summarize
+  )
+
+  is_valid_logical <- vapply(logical_params, is.logical, logical(1))
+  if (!all(is_valid_logical)) {
+    invalid_params <- names(logical_params)[!is_valid_logical]
+    stop(
+      "Parameter(s) must be logical (TRUE/FALSE): ",
+      paste(invalid_params, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  invisible(NULL)
+}
+
+#' Filter MS1 Annotations by Score Thresholds
+#'
+#' @description Internal helper to filter MS1-only annotations based on
+#'     biological and chemical score thresholds with OR/AND logic.
+#'
+#' @param annot_table_wei_chemo Data frame with annotations
+#' @param minimal_ms1_bio Numeric minimum biological score
+#' @param minimal_ms1_chemo Numeric minimum chemical score
+#' @param minimal_ms1_condition Character "OR" or "AND"
+#'
+#' @return Filtered data frame
+#' @keywords internal
+filter_ms1_annotations <- function(
+  annot_table_wei_chemo,
+  minimal_ms1_bio,
+  minimal_ms1_chemo,
+  minimal_ms1_condition
+) {
+  # Keep annotations with MS2 data OR MS1 meeting score thresholds
+  has_ms2 <- quote(
+    !is.na(candidate_score_similarity) | !is.na(candidate_score_sirius_csi)
+  )
+
+  if (minimal_ms1_condition == "OR") {
+    ms1_condition <- quote(
+      score_biological >= minimal_ms1_bio | score_chemical >= minimal_ms1_chemo
+    )
+  } else {
+    # "AND"
+    ms1_condition <- quote(
+      score_biological >= minimal_ms1_bio & score_chemical >= minimal_ms1_chemo
+    )
+  }
+
+  annot_table_wei_chemo |>
+    tidytable::filter(!!has_ms2 | !!ms1_condition)
+}
+
+#' Rank and Deduplicate Annotations
+#'
+#' @description Internal helper to rank candidates and keep the best
+#'     structure per feature.
+#'
+#' @param df Data frame with filtered annotations
+#'
+#' @return Data frame with ranking columns added
+#' @keywords internal
+rank_and_deduplicate <- function(df) {
+  df |>
+    tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
+    tidytable::distinct(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer,
+      .keep_all = TRUE
+    ) |>
+    tidytable::mutate(
+      rank_initial = tidytable::dense_rank(-candidate_score_pseudo_initial),
+      rank_final = tidytable::dense_rank(-score_weighted_chemo),
+      .by = feature_id
+    )
+}
+
+#' Apply Percentile Filter
+#'
+#' @description Internal helper to filter candidates by percentile threshold
+#'     within each feature.
+#'
+#' @param df Data frame with ranked annotations
+#' @param best_percentile Numeric percentile threshold (0-1)
+#'
+#' @return Filtered data frame
+#' @keywords internal
+apply_percentile_filter <- function(df, best_percentile) {
+  df |>
+    tidytable::group_by(feature_id) |>
+    tidytable::filter(
+      score_weighted_chemo >=
+        best_percentile * max(score_weighted_chemo, na.rm = TRUE)
+    ) |>
+    tidytable::ungroup()
+}
+
+#' Count Evaluated and Best Candidates
+#'
+#' @description Internal helper to count candidates before and after
+#'     percentile filtering.
+#'
+#' @param df_ranked Data frame with all ranked candidates
+#' @param df_percentile Data frame with percentile-filtered candidates
+#'
+#' @return Data frame with feature_id, candidates_evaluated, candidates_best
+#' @keywords internal
+count_candidates <- function(df_ranked, df_percentile) {
+  candidates_evaluated <- df_ranked |>
+    tidytable::group_by(feature_id) |>
+    tidytable::add_count(name = "candidates_evaluated") |>
+    tidytable::ungroup() |>
+    tidytable::distinct(feature_id, candidates_evaluated)
+
+  candidates_best <- df_percentile |>
+    tidytable::group_by(feature_id) |>
+    tidytable::add_count(name = "candidates_best") |>
+    tidytable::ungroup() |>
+    tidytable::distinct(feature_id, candidates_best)
+
+  tidytable::left_join(
+    candidates_evaluated,
+    candidates_best,
+    by = "feature_id"
+  )
+}
+
+#' Extract Weighted Taxonomy Scores
+#'
+#' @description Internal helper to extract level weights from parent environment
+#'     (matching weight_chemo parameters).
+#'
+#' @return Named list of weights
+#' @keywords internal
+get_taxonomy_weights <- function() {
+  list(
+    w_cla_kin = get("score_chemical_cla_kingdom", envir = parent.frame(n = 2)),
+    w_cla_sup = get("score_chemical_cla_superclass", envir = parent.frame(n = 2)),
+    w_cla_cla = get("score_chemical_cla_class", envir = parent.frame(n = 2)),
+    w_cla_par = get("score_chemical_cla_parent", envir = parent.frame(n = 2)),
+    w_npc_pat = get("score_chemical_npc_pathway", envir = parent.frame(n = 2)),
+    w_npc_sup = get("score_chemical_npc_superclass", envir = parent.frame(n = 2)),
+    w_npc_cla = get("score_chemical_npc_class", envir = parent.frame(n = 2))
+  )
+}
+
+#' Compute Weighted ClassyFire Taxonomy
+#'
+#' @description Internal helper to compute weighted scores for all ClassyFire
+#'     levels and select the best one.
+#'
+#' @param df_pred_tax Data frame with predicted taxonomy scores
+#' @param weights List of taxonomy weights
+#'
+#' @return Data frame with selected ClassyFire label and score
+#' @keywords internal
+compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
+  df_pred_tax |>
+    tidytable::mutate(
+      # Compute weighted score for each level
+      ws_kin = as.numeric(feature_pred_tax_cla_01kin_score) * weights$w_cla_kin,
+      ws_sup = as.numeric(feature_pred_tax_cla_02sup_score) * weights$w_cla_sup,
+      ws_cla = as.numeric(feature_pred_tax_cla_03cla_score) * weights$w_cla_cla,
+      ws_par = as.numeric(feature_pred_tax_cla_04dirpar_score) * weights$w_cla_par,
+      # Find which level has max weighted score
+      max_ws = pmax(ws_kin, ws_sup, ws_cla, ws_par, na.rm = TRUE),
+      # Pick label and score from that level
+      label_classyfire_predicted = tidytable::case_when(
+        !is.na(ws_par) & ws_par == max_ws ~ feature_pred_tax_cla_04dirpar_val,
+        !is.na(ws_cla) & ws_cla == max_ws ~ feature_pred_tax_cla_03cla_val,
+        !is.na(ws_sup) & ws_sup == max_ws ~ feature_pred_tax_cla_02sup_val,
+        !is.na(ws_kin) & ws_kin == max_ws ~ feature_pred_tax_cla_01kin_val,
+        TRUE ~ NA_character_
+      ),
+      score_classyfire = tidytable::case_when(
+        !is.na(ws_par) & ws_par == max_ws ~
+          as.numeric(feature_pred_tax_cla_04dirpar_score),
+        !is.na(ws_cla) & ws_cla == max_ws ~
+          as.numeric(feature_pred_tax_cla_03cla_score),
+        !is.na(ws_sup) & ws_sup == max_ws ~
+          as.numeric(feature_pred_tax_cla_02sup_score),
+        !is.na(ws_kin) & ws_kin == max_ws ~
+          as.numeric(feature_pred_tax_cla_01kin_score),
+        TRUE ~ NA_real_
+      )
+    ) |>
+    tidytable::filter(label_classyfire_predicted != "empty") |>
+    tidytable::select(
+      feature_id,
+      label_classyfire_predicted,
+      score_classyfire
+    ) |>
+    tidytable::distinct()
+}
+
+#' Compute Weighted NPClassifier Taxonomy
+#'
+#' @description Internal helper to compute weighted scores for all NPClassifier
+#'     levels and select the best one.
+#'
+#' @param df_pred_tax Data frame with predicted taxonomy scores
+#' @param weights List of taxonomy weights
+#'
+#' @return Data frame with selected NPClassifier label and score
+#' @keywords internal
+compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
+  df_pred_tax |>
+    tidytable::mutate(
+      # Compute weighted score for each level
+      ws_pat = as.numeric(feature_pred_tax_npc_01pat_score) * weights$w_npc_pat,
+      ws_sup = as.numeric(feature_pred_tax_npc_02sup_score) * weights$w_npc_sup,
+      ws_cla = as.numeric(feature_pred_tax_npc_03cla_score) * weights$w_npc_cla,
+      # Find which level has max weighted score
+      max_ws = pmax(ws_pat, ws_sup, ws_cla, na.rm = TRUE),
+      # Pick label and score from that level
+      label_npclassifier_predicted = tidytable::case_when(
+        !is.na(ws_cla) & ws_cla == max_ws ~ feature_pred_tax_npc_03cla_val,
+        !is.na(ws_sup) & ws_sup == max_ws ~ feature_pred_tax_npc_02sup_val,
+        !is.na(ws_pat) & ws_pat == max_ws ~ feature_pred_tax_npc_01pat_val,
+        TRUE ~ NA_character_
+      ),
+      score_npclassifier = tidytable::case_when(
+        !is.na(ws_cla) & ws_cla == max_ws ~
+          as.numeric(feature_pred_tax_npc_03cla_score),
+        !is.na(ws_sup) & ws_sup == max_ws ~
+          as.numeric(feature_pred_tax_npc_02sup_score),
+        !is.na(ws_pat) & ws_pat == max_ws ~
+          as.numeric(feature_pred_tax_npc_01pat_score),
+        TRUE ~ NA_real_
+      )
+    ) |>
+    tidytable::filter(label_npclassifier_predicted != "empty") |>
+    tidytable::select(
+      feature_id,
+      label_npclassifier_predicted,
+      score_npclassifier
+    ) |>
+    tidytable::distinct()
+}
+
+#' Remove Compound Names from Results
+#'
+#' @description Internal helper to optionally remove compound names from
+#'     all result tiers.
+#'
+#' @param results_list Named list with full, filtered, mini data frames
+#' @param compounds_names Logical, if FALSE remove names
+#'
+#' @return Modified results list
+#' @keywords internal
+remove_compound_names <- function(results_list, compounds_names) {
+  if (!compounds_names) {
+    results_list$mini <- results_list$mini |>
+      tidytable::select(-tidyselect::any_of("candidate_structure_name"))
+    results_list$filtered <- results_list$filtered |>
+      tidytable::select(-tidyselect::any_of("candidate_structure_name"))
+    results_list$full <- results_list$full |>
+      tidytable::select(-tidyselect::any_of("candidate_structure_name"))
+  }
+  results_list
+}
+
+#' @title Clean Chemical Annotations
+#'
+#' @description Cleans and filters chemically weighted annotation results through
+#'     a multi-tier pipeline. Applies MS1 score thresholds, percentile filtering,
+#'     ranking, and optional high-confidence filtering. Returns three-tier output:
+#'     full (comprehensive), filtered (top candidates), and mini (one row per feature).
 #'
 #' @include filter_high_confidence_only.R
-#' @include minimize_results.R
 #' @include summarize_results.R
 #'
-#' @param annot_table_wei_chemo Data frame with chemically weighted annotations
-#' @param components_table Data frame with molecular network components
-#' @param features_table Data frame with feature metadata
-#' @param structure_organism_pairs_table Data frame with structure-organism pairs
-#' @param candidates_final Integer number of final candidates to keep per feature
-#' @param best_percentile Numeric percentile threshold (0-1) for selecting top
-#'     candidates within each feature (default: 0.9, keeps candidates with scores
-#'     >= 90% of the maximum score for that feature). Used for both filtered and
-#'     mini outputs to ensure consistent row counts.
-#' @param minimal_ms1_bio Numeric minimal biological score for MS1 annotations (0-1)
-#' @param minimal_ms1_chemo Numeric minimal chemical score for MS1 annotations (0-1)
-#' @param minimal_ms1_condition Character condition: "OR" or "AND" for MS1 filtering
-#' @param compounds_names Logical whether to include compound names (can be large)
-#' @param high_confidence Logical whether to filter for high confidence only
-#' @param remove_ties Logical whether to remove tied scores
-#' @param summarize Logical whether to summarize to 1 row per feature
+#' @param annot_table_wei_chemo Data frame with chemically weighted annotations.
+#'     Required columns: feature_id, candidate_structure_inchikey_connectivity_layer,
+#'     score_weighted_chemo, score_biological, score_chemical, candidate_score_pseudo_initial
+#' @param components_table Data frame with molecular network component assignments.
+#'     Required columns: feature_id, component_id
+#' @param features_table Data frame with feature metadata (RT, m/z, etc.).
+#'     Required columns: feature_id
+#' @param structure_organism_pairs_table Data frame linking structures to organisms.
+#'     Required columns: structure_inchikey_connectivity_layer
+#' @param candidates_final Integer, number of top candidates to retain per feature (>= 1)
+#' @param best_percentile Numeric (0-1), percentile threshold for score filtering.
+#'     Candidates with scores >= percentile * max_score are kept. Default: 0.9 (90th percentile)
+#' @param minimal_ms1_bio Numeric (0-1), minimum biological score for MS1-only annotations
+#' @param minimal_ms1_chemo Numeric (0-1), minimum chemical score for MS1-only annotations
+#' @param minimal_ms1_condition Character, logical operator for MS1 filtering: "OR" or "AND".
+#'     "OR" = keep if bio >= threshold OR chem >= threshold.
+#'     "AND" = keep if bio >= threshold AND chem >= threshold
+#' @param compounds_names Logical, include compound names in output (may increase size)
+#' @param high_confidence Logical, apply strict high-confidence filters
+#' @param remove_ties Logical, remove tied scores (keep only highest-ranked)
+#' @param summarize Logical, collapse results to one row per feature
 #'
-#' @return Data frame with cleaned, filtered chemically weighted annotations
+#' @return Named list with three data frames:
+#'   \describe{
+#'     \item{full}{All annotations (optionally high-confidence filtered)}
+#'     \item{filtered}{Top candidates meeting percentile + rank thresholds}
+#'     \item{mini}{One row per feature with best compound/taxonomy}
+#'   }
 #'
-#' @seealso weight_chemo
+#' @seealso \code{\link{weight_chemo}}, \code{\link{filter_high_confidence_only}},
+#'     \code{\link{summarize_results}}
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' results <- clean_chemo(
+#'   annot_table_wei_chemo = annotations,
+#'   features_table = features,
+#'   components_table = components,
+#'   structure_organism_pairs_table = sop_table,
+#'   candidates_final = 10,
+#'   best_percentile = 0.9,
+#'   minimal_ms1_bio = 0.5,
+#'   minimal_ms1_chemo = 0.5,
+#'   minimal_ms1_condition = "OR",
+#'   compounds_names = TRUE,
+#'   high_confidence = FALSE,
+#'   remove_ties = FALSE,
+#'   summarize = FALSE
+#' )
+#' }
 clean_chemo <- function(
   annot_table_wei_chemo = get(
     "annot_table_wei_chemo",
@@ -59,65 +435,23 @@ clean_chemo <- function(
   # Input Validation
   # ============================================================================
 
-  # Validate data frame
-  if (!is.data.frame(annot_table_wei_chemo)) {
-    stop("annot_table_wei_chemo must be a data frame")
-  }
-
-  # Early exit for empty input
-  if (nrow(annot_table_wei_chemo) == 0L) {
-    logger::log_warn("Empty annotation table provided")
-    return(annot_table_wei_chemo)
-  }
-
-  # Validate numeric parameters (combined checks)
-  if (!is.numeric(candidates_final) || candidates_final < 1) {
-    stop("candidates_final must be a positive integer, got: ", candidates_final)
-  }
-
-  if (
-    !is.numeric(best_percentile) || best_percentile < 0 || best_percentile > 1
-  ) {
-    stop("best_percentile must be between 0 and 1, got: ", best_percentile)
-  }
-
-  if (
-    !is.numeric(minimal_ms1_bio) || minimal_ms1_bio < 0 || minimal_ms1_bio > 1
-  ) {
-    stop("minimal_ms1_bio must be between 0 and 1, got: ", minimal_ms1_bio)
-  }
-
-  if (
-    !is.numeric(minimal_ms1_chemo) ||
-      minimal_ms1_chemo < 0 ||
-      minimal_ms1_chemo > 1
-  ) {
-    stop("minimal_ms1_chemo must be between 0 and 1, got: ", minimal_ms1_chemo)
-  }
-
-  # Validate condition
-  if (!minimal_ms1_condition %in% c("OR", "AND")) {
-    stop(
-      "minimal_ms1_condition must be 'OR' or 'AND', got: ",
-      minimal_ms1_condition
-    )
-  }
-
-  # Validate logical parameters
-  logical_params <- list(
+  validate_clean_chemo_inputs(
+    annot_table_wei_chemo = annot_table_wei_chemo,
+    candidates_final = candidates_final,
+    best_percentile = best_percentile,
+    minimal_ms1_bio = minimal_ms1_bio,
+    minimal_ms1_chemo = minimal_ms1_chemo,
+    minimal_ms1_condition = minimal_ms1_condition,
     compounds_names = compounds_names,
     high_confidence = high_confidence,
     remove_ties = remove_ties,
     summarize = summarize
   )
 
-  is_valid_logical <- sapply(logical_params, is.logical)
-  if (!all(is_valid_logical)) {
-    invalid_params <- names(logical_params)[!is_valid_logical]
-    stop(
-      "Parameter(s) must be logical (TRUE/FALSE): ",
-      paste(invalid_params, collapse = ", ")
-    )
+  # Early exit for empty input
+  if (nrow(annot_table_wei_chemo) == 0L) {
+    logger::log_warn("Empty annotation table provided")
+    return(annot_table_wei_chemo)
   }
 
   # ============================================================================
@@ -144,39 +478,15 @@ clean_chemo <- function(
   # ============================================================================
 
   # Step 1: Filter MS1 annotations based on score thresholds
-  # Keep MS1 only if good biological OR/AND chemical consistency score obtained
-  df_base <- if (minimal_ms1_condition == "OR") {
-    annot_table_wei_chemo |>
-      tidytable::filter(
-        (!is.na(candidate_score_similarity) |
-          !is.na(candidate_score_sirius_csi)) |
-          (score_biological >= minimal_ms1_bio |
-            score_chemical >= minimal_ms1_chemo)
-      )
-  } else {
-    # minimal_ms1_condition == "AND"
-    annot_table_wei_chemo |>
-      tidytable::filter(
-        (!is.na(candidate_score_similarity) |
-          !is.na(candidate_score_sirius_csi)) |
-          (score_biological >= minimal_ms1_bio &
-            score_chemical >= minimal_ms1_chemo)
-      )
-  }
+  df_base <- filter_ms1_annotations(
+    annot_table_wei_chemo = annot_table_wei_chemo,
+    minimal_ms1_bio = minimal_ms1_bio,
+    minimal_ms1_chemo = minimal_ms1_chemo,
+    minimal_ms1_condition = minimal_ms1_condition
+  )
 
   # Step 2: Rank and deduplicate - keep best structure per feature
-  df_ranked <- df_base |>
-    tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
-    tidytable::distinct(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      .keep_all = TRUE
-    ) |>
-    tidytable::mutate(
-      rank_initial = tidytable::dense_rank(-candidate_score_pseudo_initial),
-      rank_final = tidytable::dense_rank(-score_weighted_chemo),
-      .by = feature_id
-    )
+  df_ranked <- rank_and_deduplicate(df_base)
 
   # ============================================================================
   # Apply Percentile Filter - Centralized in clean_chemo
@@ -184,14 +494,7 @@ clean_chemo <- function(
 
   # Apply percentile filtering HERE (not in minimize_results)
   # This is done BEFORE high-confidence filter to get accurate counts
-  ## COMMENT: Actually not sure it is the best idea
-  df_percentile <- df_ranked |>
-    tidytable::group_by(feature_id) |>
-    tidytable::filter(
-      score_weighted_chemo >=
-        best_percentile * max(score_weighted_chemo, na.rm = TRUE)
-    ) |>
-    tidytable::ungroup()
+  df_percentile <- apply_percentile_filter(df_ranked, best_percentile)
 
   # ============================================================================
   # Count Candidates BEFORE High-Confidence Filter
@@ -199,19 +502,7 @@ clean_chemo <- function(
 
   # Count evaluated candidates (all in df_ranked)
   # Count best candidates (those passing percentile in df_percentile)
-  results_candidates <- df_ranked |>
-    tidytable::group_by(feature_id) |>
-    tidytable::add_count(name = "candidates_evaluated") |>
-    tidytable::ungroup() |>
-    tidytable::distinct(feature_id, candidates_evaluated) |>
-    tidytable::left_join(
-      df_percentile |>
-        tidytable::group_by(feature_id) |>
-        tidytable::add_count(name = "candidates_best") |>
-        tidytable::ungroup() |>
-        tidytable::distinct(feature_id, candidates_best),
-      by = "feature_id"
-    )
+  results_candidates <- count_candidates(df_ranked, df_percentile)
 
   # ============================================================================
   # Three-Tier Output Generation
@@ -311,85 +602,13 @@ clean_chemo <- function(
 
   if (nrow(df_pred_tax) > 0L) {
     # Bring level weights from parent env (same as weight_chemo parameters)
-    w_cla_kin <- get("score_chemical_cla_kingdom", envir = parent.frame())
-    w_cla_sup <- get("score_chemical_cla_superclass", envir = parent.frame())
-    w_cla_cla <- get("score_chemical_cla_class", envir = parent.frame())
-    w_cla_par <- get("score_chemical_cla_parent", envir = parent.frame())
-    w_npc_pat <- get("score_chemical_npc_pathway", envir = parent.frame())
-    w_npc_sup <- get("score_chemical_npc_superclass", envir = parent.frame())
-    w_npc_cla <- get("score_chemical_npc_class", envir = parent.frame())
+    weights <- get_taxonomy_weights()
 
     # For ClassyFire: compute weighted scores for ALL levels, pick single best
-    df_cla <- df_pred_tax |>
-      tidytable::mutate(
-        # Compute weighted score for each level
-        ws_kin = as.numeric(feature_pred_tax_cla_01kin_score) * w_cla_kin,
-        ws_sup = as.numeric(feature_pred_tax_cla_02sup_score) * w_cla_sup,
-        ws_cla = as.numeric(feature_pred_tax_cla_03cla_score) * w_cla_cla,
-        ws_par = as.numeric(feature_pred_tax_cla_04dirpar_score) * w_cla_par,
-        # Find which level has max weighted score
-        max_ws = pmax(ws_kin, ws_sup, ws_cla, ws_par, na.rm = TRUE),
-        # Pick label and score from that level
-        label_classyfire_predicted = tidytable::case_when(
-          !is.na(ws_par) & ws_par == max_ws ~ feature_pred_tax_cla_04dirpar_val,
-          !is.na(ws_cla) & ws_cla == max_ws ~ feature_pred_tax_cla_03cla_val,
-          !is.na(ws_sup) & ws_sup == max_ws ~ feature_pred_tax_cla_02sup_val,
-          !is.na(ws_kin) & ws_kin == max_ws ~ feature_pred_tax_cla_01kin_val,
-          TRUE ~ NA_character_
-        ),
-        score_classyfire = tidytable::case_when(
-          !is.na(ws_par) & ws_par == max_ws ~
-            as.numeric(feature_pred_tax_cla_04dirpar_score),
-          !is.na(ws_cla) & ws_cla == max_ws ~
-            as.numeric(feature_pred_tax_cla_03cla_score),
-          !is.na(ws_sup) & ws_sup == max_ws ~
-            as.numeric(feature_pred_tax_cla_02sup_score),
-          !is.na(ws_kin) & ws_kin == max_ws ~
-            as.numeric(feature_pred_tax_cla_01kin_score),
-          TRUE ~ NA_real_
-        )
-      ) |>
-      tidytable::filter(label_classyfire_predicted != "empty") |>
-      tidytable::select(
-        feature_id,
-        label_classyfire_predicted,
-        score_classyfire
-      ) |>
-      tidytable::distinct()
+    df_cla <- compute_classyfire_taxonomy(df_pred_tax, weights)
 
     # For NPClassifier: compute weighted scores for ALL levels, pick single best
-    df_npc <- df_pred_tax |>
-      tidytable::mutate(
-        # Compute weighted score for each level
-        ws_pat = as.numeric(feature_pred_tax_npc_01pat_score) * w_npc_pat,
-        ws_sup = as.numeric(feature_pred_tax_npc_02sup_score) * w_npc_sup,
-        ws_cla = as.numeric(feature_pred_tax_npc_03cla_score) * w_npc_cla,
-        # Find which level has max weighted score
-        max_ws = pmax(ws_pat, ws_sup, ws_cla, na.rm = TRUE),
-        # Pick label and score from that level
-        label_npclassifier_predicted = tidytable::case_when(
-          !is.na(ws_cla) & ws_cla == max_ws ~ feature_pred_tax_npc_03cla_val,
-          !is.na(ws_sup) & ws_sup == max_ws ~ feature_pred_tax_npc_02sup_val,
-          !is.na(ws_pat) & ws_pat == max_ws ~ feature_pred_tax_npc_01pat_val,
-          TRUE ~ NA_character_
-        ),
-        score_npclassifier = tidytable::case_when(
-          !is.na(ws_cla) & ws_cla == max_ws ~
-            as.numeric(feature_pred_tax_npc_03cla_score),
-          !is.na(ws_sup) & ws_sup == max_ws ~
-            as.numeric(feature_pred_tax_npc_02sup_score),
-          !is.na(ws_pat) & ws_pat == max_ws ~
-            as.numeric(feature_pred_tax_npc_01pat_score),
-          TRUE ~ NA_real_
-        )
-      ) |>
-      tidytable::filter(label_npclassifier_predicted != "empty") |>
-      tidytable::select(
-        feature_id,
-        label_npclassifier_predicted,
-        score_npclassifier
-      ) |>
-      tidytable::distinct()
+    df_npc <- compute_npclassifier_taxonomy(df_pred_tax, weights)
 
     # Combine ClassyFire and NPClassifier
     df_pred_tax <- df_cla |>
@@ -561,16 +780,15 @@ clean_chemo <- function(
   # Optionally Remove Compound Names (After All Processing)
   # ============================================================================
 
+  # Build results list
+  results_list <- list(
+    full = results_full,
+    filtered = results_filtered,
+    mini = results_mini
+  )
+
   # Remove compound names from outputs if requested
-  # Done AFTER all processing to avoid "column doesn't exist" errors
-  if (!compounds_names) {
-    results_mini <- results_mini |>
-      tidytable::select(-tidyselect::any_of("candidate_structure_name"))
-    results_filtered <- results_filtered |>
-      tidytable::select(-tidyselect::any_of("candidate_structure_name"))
-    results_full <- results_full |>
-      tidytable::select(-tidyselect::any_of("candidate_structure_name"))
-  }
+  results_list <- remove_compound_names(results_list, compounds_names)
 
   # Clean up intermediate objects
   rm(
@@ -586,11 +804,5 @@ clean_chemo <- function(
     structure_organism_pairs_table
   )
 
-  return(
-    list(
-      "full" = results_full,
-      "filtered" = results_filtered,
-      "mini" = results_mini
-    )
-  )
+  return(results_list)
 }
