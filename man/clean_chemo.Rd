@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_chemo.R
 \name{clean_chemo}
 \alias{clean_chemo}
-\title{Clean chemo}
+\title{Clean Chemical Annotations}
 \usage{
 clean_chemo(
   annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
@@ -22,47 +22,74 @@ clean_chemo(
 )
 }
 \arguments{
-\item{annot_table_wei_chemo}{Data frame with chemically weighted annotations}
+\item{annot_table_wei_chemo}{Data frame with chemically weighted annotations.
+Required columns: feature_id, candidate_structure_inchikey_connectivity_layer,
+score_weighted_chemo, score_biological, score_chemical, candidate_score_pseudo_initial}
 
-\item{components_table}{Data frame with molecular network components}
+\item{components_table}{Data frame with molecular network component assignments.
+Required columns: feature_id, component_id}
 
-\item{features_table}{Data frame with feature metadata}
+\item{features_table}{Data frame with feature metadata (RT, m/z, etc.).
+Required columns: feature_id}
 
-\item{structure_organism_pairs_table}{Data frame with structure-organism pairs}
+\item{structure_organism_pairs_table}{Data frame linking structures to organisms.
+Required columns: structure_inchikey_connectivity_layer}
 
-\item{candidates_final}{Integer number of final candidates to keep per feature}
+\item{candidates_final}{Integer, number of top candidates to retain per feature (>= 1)}
 
-\item{best_percentile}{Numeric percentile threshold (0-1) for selecting top
-candidates within each feature (default: 0.9, keeps candidates with scores
->= 90\% of the maximum score for that feature). Used for both filtered and
-mini outputs to ensure consistent row counts.}
+\item{best_percentile}{Numeric (0-1), percentile threshold for score filtering.
+Candidates with scores >= percentile * max_score are kept. Default: 0.9 (90th percentile)}
 
-\item{minimal_ms1_bio}{Numeric minimal biological score for MS1 annotations (0-1)}
+\item{minimal_ms1_bio}{Numeric (0-1), minimum biological score for MS1-only annotations}
 
-\item{minimal_ms1_chemo}{Numeric minimal chemical score for MS1 annotations (0-1)}
+\item{minimal_ms1_chemo}{Numeric (0-1), minimum chemical score for MS1-only annotations}
 
-\item{minimal_ms1_condition}{Character condition: "OR" or "AND" for MS1 filtering}
+\item{minimal_ms1_condition}{Character, logical operator for MS1 filtering: "OR" or "AND".
+"OR" = keep if bio >= threshold OR chem >= threshold.
+"AND" = keep if bio >= threshold AND chem >= threshold}
 
-\item{compounds_names}{Logical whether to include compound names (can be large)}
+\item{compounds_names}{Logical, include compound names in output (may increase size)}
 
-\item{high_confidence}{Logical whether to filter for high confidence only}
+\item{high_confidence}{Logical, apply strict high-confidence filters}
 
-\item{remove_ties}{Logical whether to remove tied scores}
+\item{remove_ties}{Logical, remove tied scores (keep only highest-ranked)}
 
-\item{summarize}{Logical whether to summarize to 1 row per feature}
+\item{summarize}{Logical, collapse results to one row per feature}
 }
 \value{
-Data frame with cleaned, filtered chemically weighted annotations
+Named list with three data frames:
+\describe{
+\item{full}{All annotations (optionally high-confidence filtered)}
+\item{filtered}{Top candidates meeting percentile + rank thresholds}
+\item{mini}{One row per feature with best compound/taxonomy}
+}
 }
 \description{
-This function cleans chemically weighted annotation results by
-filtering to top candidates, optionally removing MS1-only annotations
-below score thresholds, and preparing final results for export. Can
-include compound names and apply high-confidence filters.
+Cleans and filters chemically weighted annotation results through
+a multi-tier pipeline. Applies MS1 score thresholds, percentile filtering,
+ranking, and optional high-confidence filtering. Returns three-tier output:
+full (comprehensive), filtered (top candidates), and mini (one row per feature).
 }
 \examples{
-NULL
+\dontrun{
+results <- clean_chemo(
+  annot_table_wei_chemo = annotations,
+  features_table = features,
+  components_table = components,
+  structure_organism_pairs_table = sop_table,
+  candidates_final = 10,
+  best_percentile = 0.9,
+  minimal_ms1_bio = 0.5,
+  minimal_ms1_chemo = 0.5,
+  minimal_ms1_condition = "OR",
+  compounds_names = TRUE,
+  high_confidence = FALSE,
+  remove_ties = FALSE,
+  summarize = FALSE
+)
+}
 }
 \seealso{
-weight_chemo
+\code{\link{weight_chemo}}, \code{\link{filter_high_confidence_only}},
+\code{\link{summarize_results}}
 }
