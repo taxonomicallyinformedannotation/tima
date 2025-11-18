@@ -1,3 +1,155 @@
+#' Create Fake GNPS Output Files
+#'
+#' @description Internal helper to create empty GNPS files for testing.
+#'
+#' @keywords internal
+create_fake_gnps_files <- function(
+  filename,
+  path_features,
+  path_metadata,
+  path_spectra,
+  path_interim_a,
+  path_interim_f
+) {
+  logger::log_info(
+    "No GNPS job ID provided, creating fake GNPS outputs for tests"
+  )
+
+  # Normalize metadata path
+  if (is.list(path_metadata)) {
+    path_metadata <- unlist(path_metadata)
+  }
+  if (
+    is.null(path_metadata) ||
+      length(path_metadata) == 0 ||
+      !nzchar(path_metadata)
+  ) {
+    path_metadata <- file.path("data", "source", "metadata.tsv")
+  }
+
+  # Create empty data frames
+  fake_annotations <- data.frame(
+    `#Scan#` = integer(0),
+    MassDiff = numeric(0),
+    MZErrorPPM = numeric(0),
+    Precursor_MZ = numeric(0),
+    LibraryName = character(0),
+    Compound_Name = character(0),
+    INCHI = character(0),
+    InChIKey = character(0),
+    `InChIKey-Planar` = character(0),
+    ExactMass = numeric(0),
+    MQScore = numeric(0),
+    SharedPeaks = integer(0),
+    npclassifier_pathway = character(0),
+    npclassifier_superclass = character(0),
+    npclassifier_class = character(0),
+    superclass = character(0),
+    class = character(0),
+    subclass = character(0),
+    check.names = FALSE
+  )
+  fake_components <- data.frame(
+    `cluster index` = integer(0),
+    componentindex = integer(0),
+    check.names = FALSE
+  )
+  fake_edges <- data.frame(CLUSTERID1 = integer(0), CLUSTERID2 = integer(0))
+  fake_metadata <- data.frame(
+    filename = character(0),
+    ATTRIBUTE_species = character(0)
+  )
+
+  # Define file paths
+  ann_file <- file.path(path_interim_a, paste0(filename, "_gnps.tsv"))
+  comp_file <- file.path(path_interim_f, paste0(filename, "_components.tsv"))
+  edges_file <- file.path(
+    path_interim_f,
+    paste0(filename, "_edges_spectra.tsv")
+  )
+
+  # Write files with error handling
+  safe_write <- function(data, file) {
+    tryCatch(
+      export_output(x = data, file = file),
+      error = function(e) {
+        logger::log_warn(
+          "Writing {file} failed, using fallback: {conditionMessage(e)}"
+        )
+        utils::write.table(data, file = file, sep = "\t", row.names = FALSE)
+      }
+    )
+  }
+
+  safe_write(fake_annotations, ann_file)
+  safe_write(fake_components, comp_file)
+  safe_write(fake_edges, edges_file)
+  safe_write(fake_metadata, path_metadata)
+
+  # Create minimal placeholder files for features and spectra if paths are provided
+  if (!is.null(path_features) && nzchar(path_features)) {
+    # Ensure directory exists
+    create_dir(export = path_features)
+    # Write a minimal TSV header to avoid empty file warnings
+    writeLines("feature_id\n", con = path_features)
+  }
+  if (!is.null(path_spectra) && nzchar(path_spectra)) {
+    # Ensure directory exists
+    create_dir(export = path_spectra)
+    # Write a minimal valid MGF block
+    mgf_stub <- c("BEGIN IONS", "TITLE=placeholder", "END IONS")
+    writeLines(mgf_stub, con = path_spectra)
+  }
+
+  c(
+    "features" = path_features,
+    "metadata" = path_metadata,
+    "spectra" = path_spectra,
+    "annotations" = ann_file,
+    "components" = comp_file,
+    "edges" = edges_file
+  )
+}
+
+#' Validate GNPS Job ID
+#'
+#' @description Internal helper to validate GNPS job ID format.
+#'
+#' @keywords internal
+validate_gnps_job_id <- function(gnps_job_id, gnps_job_example) {
+  if (!identical(gnps_job_id, gnps_job_example) && nchar(gnps_job_id) != 32L) {
+    stop(
+      "Invalid GNPS job ID: '",
+      gnps_job_id,
+      "' - GNPS job IDs must be exactly 32 characters long unless it's the bundled example ID.",
+      call. = FALSE
+    )
+  }
+  invisible(NULL)
+}
+
+#' Download GNPS File
+#'
+#' @description Internal helper to download a single GNPS file.
+#'
+#' @keywords internal
+download_gnps_file <- function(url, file_path, file_type) {
+  if (!file.exists(file_path)) {
+    tryCatch(
+      {
+        get_file(url = url, export = file_path)
+        logger::log_debug("Downloaded {file_type}: {file_path}")
+      },
+      error = function(e) {
+        logger::log_warn(
+          "Failed to download {file_type}: {conditionMessage(e)}"
+        )
+      }
+    )
+  }
+  invisible(NULL)
+}
+
 #' @title Get GNPS Tables
 #'
 #' @description This function downloads and retrieves GNPS (Global Natural Products
@@ -42,157 +194,33 @@ get_gnps_tables <- function(
     gnps_job_id <- NULL
   }
 
-  # If no job ID provided, create small fake outputs and return
+  # If no job ID provided, create fake outputs and return
   if (is.null(gnps_job_id)) {
-    logger::log_info(
-      "No GNPS job ID provided, creating fake GNPS outputs for tests"
-    )
-
-    # Ensure metadata path handling similar to previous behaviour
-    if (is.list(path_metadata)) {
-      path_metadata <- unlist(path_metadata)
-    }
-    if (
-      is.null(path_metadata) ||
-        length(path_metadata) == 0 ||
-        !nzchar(path_metadata)
-    ) {
-      path_metadata <- file.path("data", "source", "metadata.tsv")
-    }
-
-    # Create fake files used by downstream code/tests
-    fake_annotations <- data.frame(
-      `#Scan#` = integer(0),
-      MassDiff = numeric(0),
-      MZErrorPPM = numeric(0),
-      Precursor_MZ = numeric(0),
-      LibraryName = character(0),
-      Compound_Name = character(0),
-      INCHI = character(0),
-      InChIKey = character(0),
-      `InChIKey-Planar` = character(0),
-      ExactMass = numeric(0),
-      MQScore = numeric(0),
-      SharedPeaks = integer(0),
-      npclassifier_pathway = character(0),
-      npclassifier_superclass = character(0),
-      npclassifier_class = character(0),
-      superclass = character(0),
-      class = character(0),
-      subclass = character(0),
-      check.names = FALSE
-    )
-    fake_components <- data.frame(
-      `cluster index` = integer(0),
-      componentindex = integer(0),
-      check.names = FALSE
-    )
-    fake_edges <- data.frame(CLUSTERID1 = integer(0), CLUSTERID2 = integer(0))
-    fake_metadata <- data.frame(
-      filename = character(0),
-      ATTRIBUTE_species = character(0)
-    )
-
-    # Write fake outputs using export_output if available, otherwise write simple files
-    ann_file <- file.path(path_interim_a, paste0(filename, "_gnps.tsv"))
-    comp_file <- file.path(path_interim_f, paste0(filename, "_components.tsv"))
-    edges_file <- file.path(
-      path_interim_f,
-      paste0(filename, "_edges_spectra.tsv")
-    )
-
-    tryCatch(
-      export_output(x = fake_annotations, file = ann_file),
-      error = function(e) {
-        logger::log_warn(
-          "Writing fake annotations failed with error: %s",
-          conditionMessage(e)
-        )
-        utils::write.table(
-          fake_annotations,
-          file = ann_file,
-          sep = "\t",
-          row.names = FALSE
-        )
-      }
-    )
-    tryCatch(
-      export_output(x = fake_components, file = comp_file),
-      error = function(e) {
-        logger::log_warn(
-          "Writing fake components failed with error: %s",
-          conditionMessage(e)
-        )
-        utils::write.table(
-          fake_components,
-          file = comp_file,
-          sep = "\t",
-          row.names = FALSE
-        )
-      }
-    )
-    tryCatch(
-      export_output(x = fake_edges, file = edges_file),
-      error = function(e) {
-        logger::log_warn(
-          "Writing fake edges failed with error: %s",
-          conditionMessage(e)
-        )
-        utils::write.table(
-          fake_edges,
-          file = edges_file,
-          sep = "\t",
-          row.names = FALSE
-        )
-      }
-    )
-    tryCatch(
-      export_output(x = fake_metadata, file = path_metadata),
-      error = function(e) {
-        logger::log_warn(
-          "Writing fake metadata failed with error: %s",
-          conditionMessage(e)
-        )
-        utils::write.table(
-          fake_metadata,
-          file = path_metadata,
-          sep = "\t",
-          row.names = FALSE
-        )
-      }
-    )
-
-    return(
-      c(
-        "features" = path_features,
-        "metadata" = path_metadata,
-        "spectra" = path_spectra,
-        "annotations" = ann_file,
-        "components" = comp_file,
-        "edges" = edges_file
-      )
-    )
+    return(create_fake_gnps_files(
+      filename,
+      path_features,
+      path_metadata,
+      path_spectra,
+      path_interim_a,
+      path_interim_f
+    ))
   }
 
-  # At this point we have a job ID. Allow example job ID to bypass strict length check.
-  if (!identical(gnps_job_id, gnps_job_example) && nchar(gnps_job_id) != 32L) {
-    stop(
-      "Invalid GNPS job ID: '",
-      gnps_job_id,
-      "' - GNPS job IDs must be exactly 32 characters long unless it's the bundled example ID."
-    )
-  }
+  # Validate job ID and workflow
+  validate_gnps_job_id(gnps_job_id, gnps_job_example)
 
   if (!workflow %in% c("fbmn", "classical")) {
     stop(
       "Unsupported workflow: '",
       workflow,
-      "' - supported: 'fbmn' or 'classical'"
+      "' - supported: 'fbmn' or 'classical'",
+      call. = FALSE
     )
   }
 
-  logger::log_info("Downloading GNPS tables for job: ", gnps_job_id)
+  logger::log_info("Downloading GNPS tables for job: {gnps_job_id}")
 
+  # Construct URLs
   gnps_base_url <- "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task="
   gnps_block_param <- "&block=main&file="
 
@@ -202,9 +230,15 @@ get_gnps_tables <- function(
     gnps_job_id
   }
 
-  # Prepare destination file paths
+  # Prepare file paths
   features_file <- path_features
-  metadata_file <- path_metadata
+  metadata_file <- if (is.list(path_metadata)) {
+    unlist(path_metadata)
+  } else if (is.null(path_metadata) || length(path_metadata) == 0) {
+    file.path(path_source, paste0(job_label, "_metadata.tsv"))
+  } else {
+    path_metadata
+  }
   spectra_file <- path_spectra
   annotations_file <- file.path(path_interim_a, paste0(job_label, "_gnps.tsv"))
   components_file <- file.path(
@@ -216,198 +250,73 @@ get_gnps_tables <- function(
     paste0(job_label, "_edges_spectra.tsv")
   )
 
-  # Download features if not present
-  if (!file.exists(features_file)) {
-    features_url <- paste0(
+  # Download files
+  download_gnps_file(
+    paste0(
       gnps_base_url,
       gnps_job_id,
       gnps_block_param,
       "quantification_table_reformatted/"
-    )
-    tryCatch(
-      get_file(url = features_url, export = features_file),
-      error = function(e) {
-        logger::log_warn("Failed to download features: %s", conditionMessage(e))
-      }
-    )
-  } else {
-    # logger::log_trace(
-    #   "Features file already exists, skipping download: %s",
-    #  features_file
-    #)
-  }
+    ),
+    features_file,
+    "features"
+  )
 
-  # Attempt to download metadata if path provided and file not present
-  if (is.list(metadata_file)) {
-    metadata_file <- unlist(metadata_file)
-  }
-  if (is.null(metadata_file) || length(metadata_file) == 0) {
-    metadata_file <- file.path(path_source, paste0(job_label, "_metadata.tsv"))
-  }
+  download_gnps_file(
+    paste0(gnps_base_url, gnps_job_id, gnps_block_param, "metadata_table/"),
+    metadata_file,
+    "metadata"
+  )
 
-  if (!file.exists(metadata_file)) {
-    metadata_url <- paste0(
-      gnps_base_url,
-      gnps_job_id,
-      gnps_block_param,
-      "metadata_table/"
-    )
-    # check availability
-    ok <- tryCatch(
-      {
-        resp <- httr2::request(metadata_url) |>
-          httr2::req_method("GET") |>
-          httr2::req_perform()
-        httr2::resp_status(resp) == 200
-      },
-      error = function(e) {
-        logger::log_warn(
-          "Metadata availability check failed: %s",
-          conditionMessage(e)
-        )
-        FALSE
-      }
-    )
+  download_gnps_file(
+    paste0(gnps_base_url, gnps_job_id, gnps_block_param, "spectra/"),
+    spectra_file,
+    "spectra"
+  )
 
-    if (isTRUE(ok)) {
-      tryCatch(
-        get_file(url = metadata_url, export = metadata_file),
-        error = function(e) {
-          logger::log_warn(
-            "Failed to download metadata: %s",
-            conditionMessage(e)
-          )
-        }
-      )
-    } else {
-      logger::log_warn(
-        "The given GNPS job ID has no metadata - writing a small fake metadata file"
-      )
-      fake_metadata <- data.frame(
-        filename = character(0),
-        ATTRIBUTE_species = character(0)
-      )
-      tryCatch(
-        export_output(x = fake_metadata, file = metadata_file),
-        error = function(e) {
-          logger::log_warn(
-            "Writing fake metadata failed with error: %s",
-            conditionMessage(e)
-          )
-          utils::write.table(
-            fake_metadata,
-            file = metadata_file,
-            sep = "\t",
-            row.names = FALSE
-          )
-        }
-      )
-    }
-  } else {
-    # logger::log_trace(
-    #  "Metadata file already exists, skipping download: %s",
-    #  metadata_file
-    #)
-  }
+  # Download annotations
+  ann_path <- switch(
+    workflow,
+    "fbmn" = "DB_result/",
+    "classical" = "result_specnets_DB/"
+  )
+  download_gnps_file(
+    paste0(gnps_base_url, gnps_job_id, gnps_block_param, ann_path),
+    annotations_file,
+    "annotations"
+  )
 
-  # Spectra
-  if (!file.exists(spectra_file)) {
-    spectra_url <- paste0(
-      gnps_base_url,
-      gnps_job_id,
-      gnps_block_param,
-      "spectra/"
-    )
-    tryCatch(
-      get_file(url = spectra_url, export = spectra_file),
-      error = function(e) {
-        logger::log_warn("Failed to download spectra: %s", conditionMessage(e))
-      }
-    )
-  } else {
-    # logger::log_trace(
-    #  "Spectra file already exists, skipping download: %s",
-    #  spectra_file
-    #)
-  }
+  # Download components
+  comp_path <- switch(
+    workflow,
+    "fbmn" = "clusterinfo_summary/",
+    "classical" = "clusterinfosummarygroup_attributes_withIDs_withcomponentID/"
+  )
+  download_gnps_file(
+    paste0(gnps_base_url, gnps_job_id, gnps_block_param, comp_path),
+    components_file,
+    "components"
+  )
 
-  # Annotations
-  if (!file.exists(annotations_file)) {
-    ann_path <- switch(
-      workflow,
-      "fbmn" = "DB_result/",
-      "classical" = "result_specnets_DB/"
-    )
-    ann_url <- paste0(gnps_base_url, gnps_job_id, gnps_block_param, ann_path)
-    tryCatch(
-      get_file(url = ann_url, export = annotations_file),
-      error = function(e) {
-        logger::log_warn(
-          "Failed to download annotations: %s",
-          conditionMessage(e)
-        )
-      }
-    )
-  } else {
-    # logger::log_trace(
-    #  "Annotations file already exists, skipping download: %s",
-    #  annotations_file
-    #)
-  }
-
-  # Components
-  if (!file.exists(components_file)) {
-    comp_path <- switch(
-      workflow,
-      "fbmn" = "clusterinfo_summary/",
-      "classical" = "clusterinfosummarygroup_attributes_withIDs_withcomponentID/"
-    )
-    comp_url <- paste0(gnps_base_url, gnps_job_id, gnps_block_param, comp_path)
-    tryCatch(
-      get_file(url = comp_url, export = components_file),
-      error = function(e) {
-        logger::log_warn(
-          "Failed to download components: %s",
-          conditionMessage(e)
-        )
-      }
-    )
-  } else {
-    # logger::log_trace(
-    # "Components file already exists, skipping download: %s",
-    # components_file
-    #)
-  }
-
-  # Edges
-  if (!file.exists(edges_file)) {
-    edges_url <- paste0(
+  # Download edges
+  download_gnps_file(
+    paste0(
       gnps_base_url,
       gnps_job_id,
       gnps_block_param,
       "networkedges_selfloop/"
-    )
-    tryCatch(
-      get_file(url = edges_url, export = edges_file),
-      error = function(e) {
-        logger::log_warn("Failed to download edges: %s", conditionMessage(e))
-      }
-    )
-  } else {
-    # logger::log_trace(
-    #  "Edges file already exists, skipping download: %s",
-    #  edges_file
-    #)
-  }
+    ),
+    edges_file,
+    "edges"
+  )
 
-  return(
-    c(
-      "features" = features_file,
-      "metadata" = metadata_file,
-      "spectra" = spectra_file,
-      "annotations" = annotations_file,
-      "components" = components_file,
-      "edges" = edges_file
-    )
+  # Return paths
+  c(
+    "features" = features_file,
+    "metadata" = metadata_file,
+    "spectra" = spectra_file,
+    "annotations" = annotations_file,
+    "components" = components_file,
+    "edges" = edges_file
   )
 }

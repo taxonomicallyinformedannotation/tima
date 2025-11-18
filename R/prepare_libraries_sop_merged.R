@@ -1,3 +1,225 @@
+#' Validate Inputs for prepare_libraries_sop_merged
+#'
+#' @description Internal helper to validate all input parameters.
+#'
+#' @keywords internal
+validate_sop_merged_inputs <- function(
+  files,
+  filter,
+  level,
+  value,
+  output_key,
+  output_org_tax_ott,
+  output_str_stereo,
+  output_str_met,
+  output_str_nam,
+  output_str_tax_cla,
+  output_str_tax_npc
+) {
+  # Validate filter parameter
+  if (!is.logical(filter) || length(filter) != 1L) {
+    stop("filter must be a single logical value (TRUE/FALSE)", call. = FALSE)
+  }
+
+  # Validate output paths
+  output_paths <- list(
+    output_key = output_key,
+    output_org_tax_ott = output_org_tax_ott,
+    output_str_stereo = output_str_stereo,
+    output_str_met = output_str_met,
+    output_str_nam = output_str_nam,
+    output_str_tax_cla = output_str_tax_cla,
+    output_str_tax_npc = output_str_tax_npc
+  )
+
+  for (param_name in names(output_paths)) {
+    param_value <- output_paths[[param_name]]
+    if (!is.character(param_value) || length(param_value) != 1L) {
+      stop(param_name, " must be a single character string", call. = FALSE)
+    }
+  }
+
+  # Validate taxonomic filter parameters if filtering
+  if (isTRUE(filter)) {
+    valid_levels <- c(
+      "domain",
+      "kingdom",
+      "phylum",
+      "class",
+      "order",
+      "family",
+      "tribe",
+      "genus",
+      "species",
+      "varietas"
+    )
+
+    if (!level %in% valid_levels) {
+      stop(
+        "level must be one of: ",
+        paste(valid_levels, collapse = ", "),
+        ". Got: ",
+        level,
+        call. = FALSE
+      )
+    }
+
+    if (!is.character(value) || length(value) != 1L) {
+      stop("value must be a single character string", call. = FALSE)
+    }
+  }
+
+  invisible(NULL)
+}
+
+#' Load and Merge Library Files
+#'
+#' @description Internal helper to load and combine library files.
+#'
+#' @keywords internal
+load_and_merge_libraries <- function(files, cache) {
+  libraries <- files |>
+    purrr::map(
+      .f = tidytable::fread,
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    )
+
+  libraries |>
+    tidytable::bind_rows() |>
+    split_tables_sop(cache = cache)
+}
+
+#' Complete Organism Taxonomy
+#'
+#' @description Internal helper to fill missing organism taxonomy.
+#'
+#' @keywords internal
+complete_organism_taxonomy <- function(table_keys, table_org_tax_ott) {
+  table_org_tax_ott_2 <- table_keys |>
+    tidytable::anti_join(table_org_tax_ott, by = "organism_name") |>
+    tidytable::distinct(organism = organism_name) |>
+    data.frame()
+
+  if (nrow(table_org_tax_ott_2) == 0) {
+    return(table_org_tax_ott)
+  }
+
+  table_org_tax_ott_full <- table_org_tax_ott_2 |>
+    get_organism_taxonomy_ott(retry = FALSE)
+
+  table_org_tax_ott |>
+    tidytable::bind_rows(
+      table_org_tax_ott_full |>
+        tidytable::as_tidytable() |>
+        tidytable::mutate(tidytable::across(
+          .cols = tidyselect::where(is.numeric),
+          .fns = as.character
+        )) |>
+        tidytable::mutate(tidytable::across(
+          .cols = tidyselect::where(is.list),
+          .fns = as.character
+        )) |>
+        tidytable::mutate(tidytable::across(
+          .cols = tidyselect::where(is.logical),
+          .fns = as.character
+        ))
+    )
+}
+
+#' Apply Taxonomic Filter
+#'
+#' @description Internal helper to filter library by taxonomic criteria.
+#'
+#' @keywords internal
+apply_taxonomic_filter <- function(
+  table_keys,
+  table_org_tax_ott,
+  level,
+  value
+) {
+  table_keys_filtered <- table_keys |>
+    tidytable::left_join(table_org_tax_ott, by = "organism_name")
+
+  # Find column matching the taxonomic level
+  level_col <- colnames(table_keys_filtered)[grepl(
+    pattern = level,
+    x = colnames(table_keys_filtered),
+    perl = TRUE
+  )]
+
+  if (length(level_col) == 0) {
+    stop("No column found matching level: ", level, call. = FALSE)
+  }
+
+  table_keys_filtered <- table_keys_filtered |>
+    tidytable::filter(grepl(
+      x = !!as.name(level_col),
+      pattern = value,
+      perl = TRUE
+    )) |>
+    tidytable::select(
+      structure_inchikey,
+      structure_smiles_no_stereo,
+      organism_name,
+      reference_doi
+    ) |>
+    tidytable::distinct()
+
+  if (nrow(table_keys_filtered) == 0) {
+    stop(
+      "Filter led to no entries. Level: ",
+      level,
+      ", Value: ",
+      value,
+      ". Try different criteria.",
+      call. = FALSE
+    )
+  }
+
+  table_keys_filtered
+}
+
+#' Export All Library Tables
+#'
+#' @description Internal helper to export all library tables.
+#'
+#' @keywords internal
+export_library_tables <- function(
+  table_keys,
+  table_org_tax_ott,
+  table_structures_stereo,
+  table_structures_metadata,
+  table_structures_names,
+  table_structures_taxonomy_cla,
+  table_structures_taxonomy_npc,
+  output_key,
+  output_org_tax_ott,
+  output_str_stereo,
+  output_str_met,
+  output_str_nam,
+  output_str_tax_cla,
+  output_str_tax_npc
+) {
+  export_output(x = table_keys, file = output_key)
+  export_output(x = table_org_tax_ott, file = output_org_tax_ott)
+  export_output(x = table_structures_stereo, file = output_str_stereo)
+  export_output(x = table_structures_metadata, file = output_str_met)
+  export_output(x = table_structures_names, file = output_str_nam)
+  export_output(x = table_structures_taxonomy_cla, file = output_str_tax_cla)
+  export_output(x = table_structures_taxonomy_npc, file = output_str_tax_npc)
+
+  c(
+    "key" = output_key,
+    "org_tax_ott" = output_org_tax_ott,
+    "str_stereo" = output_str_stereo,
+    "str_met" = output_str_met,
+    "str_name" = output_str_nam,
+    "str_tax_cla" = output_str_tax_cla,
+    "str_tax_npc" = output_str_tax_npc
+  )
+}
+
 #' @title Prepare merged structure organism pairs libraries
 #'
 #' @description This function merges all structure-organism pair libraries
@@ -85,13 +307,15 @@ prepare_libraries_sop_merged <- function(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$structures$taxonomies$npc
 ) {
-  # Validate filter parameter
-  if (!is.logical(filter) || length(filter) != 1L) {
-    stop("filter must be a single logical value (TRUE/FALSE)")
-  }
+  # ============================================================================
+  # Input Validation
+  # ============================================================================
 
-  # Validate output paths
-  output_paths <- list(
+  validate_sop_merged_inputs(
+    files = files,
+    filter = filter,
+    level = level,
+    value = value,
     output_key = output_key,
     output_org_tax_ott = output_org_tax_ott,
     output_str_stereo = output_str_stereo,
@@ -101,153 +325,71 @@ prepare_libraries_sop_merged <- function(
     output_str_tax_npc = output_str_tax_npc
   )
 
-  for (param_name in names(output_paths)) {
-    param_value <- output_paths[[param_name]]
-    if (!is.character(param_value) || length(param_value) != 1L) {
-      stop(param_name, " must be a single character string")
-    }
-  }
-
   logger::log_info("Preparing merged structure-organism pairs library")
   logger::log_debug("Filter mode: {filter}")
-
-  if (isTRUE(filter)) {
-    # Validate taxonomic filter parameters
-    valid_levels <- c(
-      "domain",
-      "kingdom",
-      "phylum",
-      "class",
-      "order",
-      "family",
-      "tribe",
-      "genus",
-      "species",
-      "varietas"
-    )
-
-    if (!level %in% valid_levels) {
-      stop(
-        "level must be one of: ",
-        paste(valid_levels, collapse = ", "),
-        ". Got: ",
-        level
-      )
-    }
-
-    if (!is.character(value) || length(value) != 1L) {
-      stop("value must be a single character string")
-    }
-  }
   if (filter) {
     logger::log_info("Filtering by {level}: {value}")
   }
 
-  # logger::log_trace("Loading and concatenating prepared libraries")
-  libraries <- files |>
-    purrr::map(
-      .f = tidytable::fread,
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    )
+  # ============================================================================
+  # Load and Process Libraries
+  # ============================================================================
 
-  tables <- libraries |>
-    tidytable::bind_rows() |>
-    split_tables_sop(cache = cache)
+  tables <- load_and_merge_libraries(files, cache)
 
-  # logger::log_trace("Keeping keys")
-  table_keys <- tables$key |>
-    data.frame()
-
-  # logger::log_trace("Keeping organisms")
+  table_keys <- tables$key |> data.frame()
   table_org_tax_ott <- tables$org_tax_ott
 
-  # logger::log_trace("Completing organisms taxonomy")
-  table_org_tax_ott_2 <- table_keys |>
-    tidytable::anti_join(table_org_tax_ott) |>
-    tidytable::distinct(organism = organism_name) |>
-    data.frame()
+  # Complete organism taxonomy
+  table_org_tax_ott <- complete_organism_taxonomy(table_keys, table_org_tax_ott)
 
-  if (nrow(table_org_tax_ott_2) != 0) {
-    table_org_tax_ott_full <-
-      table_org_tax_ott_2 |>
-      get_organism_taxonomy_ott(retry = FALSE)
-
-    table_org_tax_ott <-
-      table_org_tax_ott |>
-      tidytable::bind_rows(
-        table_org_tax_ott_full |>
-          tidytable::as_tidytable() |>
-          tidytable::mutate(tidytable::across(
-            .cols = tidyselect::where(is.numeric),
-            .fns = as.character
-          )) |>
-          tidytable::mutate(tidytable::across(
-            .cols = tidyselect::where(is.list),
-            .fns = as.character
-          )) |>
-          tidytable::mutate(tidytable::across(
-            .cols = tidyselect::where(is.logical),
-            .fns = as.character
-          ))
-      )
-  }
-
-  # logger::log_trace("Keeping structures")
+  # Extract structure tables
   table_structures_stereo <- tables$str_stereo
   table_structures_metadata <- tables$str_met
   table_structures_names <- tables$str_nam
   table_structures_taxonomy_cla <- tables$str_tax_cla
   table_structures_taxonomy_npc <- tables$str_tax_npc
 
-  ## ISSUE see #19
-  # logger::log_trace("Completing structures names")
-  # logger::log_trace("Completing structures taxonomy (classyfire)")
-  # logger::log_trace("Completing structures taxonomy (NPC)")
+  # ============================================================================
+  # Apply Taxonomic Filter (if enabled)
+  # ============================================================================
 
-  ## If filter is TRUE,
-  ## filter the library based on the specified level and value
-  if (filter == TRUE) {
-    # logger::log_trace("Filtering library")
-    table_keys <- table_keys |>
-      tidytable::left_join(table_org_tax_ott)
-
-    table_keys <- table_keys |>
-      tidytable::filter(grepl(
-        x = !!as.name(colnames(table_keys)[grepl(
-          pattern = level,
-          x = colnames(table_keys),
-          perl = TRUE
-        )]),
-        pattern = value,
-        perl = TRUE
-      )) |>
-      tidytable::select(
-        structure_inchikey,
-        structure_smiles_no_stereo,
-        organism_name,
-        reference_doi
-      ) |>
-      tidytable::distinct()
-
-    stopifnot(
-      "Your filter led to no entries,
-        try to change it." = nrow(table_keys) != 0
+  if (filter) {
+    table_keys <- apply_taxonomic_filter(
+      table_keys,
+      table_org_tax_ott,
+      level,
+      value
     )
   }
+
+  # ============================================================================
+  # Export Results
+  # ============================================================================
 
   export_params(
     parameters = get_params(step = "prepare_libraries_sop_merged"),
     step = "prepare_libraries_sop_merged"
   )
-  export_output(x = table_keys, file = output_key)
-  export_output(x = table_org_tax_ott, file = output_org_tax_ott)
-  export_output(x = table_structures_stereo, file = output_str_stereo)
-  export_output(x = table_structures_metadata, file = output_str_met)
-  export_output(x = table_structures_names, file = output_str_nam)
-  export_output(x = table_structures_taxonomy_cla, file = output_str_tax_cla)
-  export_output(x = table_structures_taxonomy_npc, file = output_str_tax_npc)
 
+  result <- export_library_tables(
+    table_keys = table_keys,
+    table_org_tax_ott = table_org_tax_ott,
+    table_structures_stereo = table_structures_stereo,
+    table_structures_metadata = table_structures_metadata,
+    table_structures_names = table_structures_names,
+    table_structures_taxonomy_cla = table_structures_taxonomy_cla,
+    table_structures_taxonomy_npc = table_structures_taxonomy_npc,
+    output_key = output_key,
+    output_org_tax_ott = output_org_tax_ott,
+    output_str_stereo = output_str_stereo,
+    output_str_met = output_str_met,
+    output_str_nam = output_str_nam,
+    output_str_tax_cla = output_str_tax_cla,
+    output_str_tax_npc = output_str_tax_npc
+  )
+
+  # Clean up
   rm(
     table_keys,
     table_org_tax_ott,
@@ -255,17 +397,9 @@ prepare_libraries_sop_merged <- function(
     table_structures_metadata,
     table_structures_names,
     table_structures_taxonomy_cla,
-    table_structures_taxonomy_npc
+    table_structures_taxonomy_npc,
+    tables
   )
-  return(
-    c(
-      "key" = output_key,
-      "org_tax_ott" = output_org_tax_ott,
-      "str_stereo" = output_str_stereo,
-      "str_met" = output_str_met,
-      "str_name" = output_str_nam,
-      "str_tax_cla" = output_str_tax_cla,
-      "str_tax_npc" = output_str_tax_npc
-    )
-  )
+
+  return(result)
 }

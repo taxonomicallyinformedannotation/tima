@@ -446,4 +446,3 @@ test_that("load_edges_table handles features with fewer neighbors than requested
 
   expect_equal(nrow(result), 1)
 })
-

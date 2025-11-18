@@ -42,7 +42,9 @@ validate_clean_chemo_inputs <- function(
     )
   }
 
-  if (!is.numeric(best_percentile) || best_percentile < 0 || best_percentile > 1) {
+  if (
+    !is.numeric(best_percentile) || best_percentile < 0 || best_percentile > 1
+  ) {
     stop(
       "best_percentile must be between 0 and 1, got: ",
       best_percentile,
@@ -50,7 +52,9 @@ validate_clean_chemo_inputs <- function(
     )
   }
 
-  if (!is.numeric(minimal_ms1_bio) || minimal_ms1_bio < 0 || minimal_ms1_bio > 1) {
+  if (
+    !is.numeric(minimal_ms1_bio) || minimal_ms1_bio < 0 || minimal_ms1_bio > 1
+  ) {
     stop(
       "minimal_ms1_bio must be between 0 and 1, got: ",
       minimal_ms1_bio,
@@ -222,11 +226,17 @@ count_candidates <- function(df_ranked, df_percentile) {
 get_taxonomy_weights <- function() {
   list(
     w_cla_kin = get("score_chemical_cla_kingdom", envir = parent.frame(n = 2)),
-    w_cla_sup = get("score_chemical_cla_superclass", envir = parent.frame(n = 2)),
+    w_cla_sup = get(
+      "score_chemical_cla_superclass",
+      envir = parent.frame(n = 2)
+    ),
     w_cla_cla = get("score_chemical_cla_class", envir = parent.frame(n = 2)),
     w_cla_par = get("score_chemical_cla_parent", envir = parent.frame(n = 2)),
     w_npc_pat = get("score_chemical_npc_pathway", envir = parent.frame(n = 2)),
-    w_npc_sup = get("score_chemical_npc_superclass", envir = parent.frame(n = 2)),
+    w_npc_sup = get(
+      "score_chemical_npc_superclass",
+      envir = parent.frame(n = 2)
+    ),
     w_npc_cla = get("score_chemical_npc_class", envir = parent.frame(n = 2))
   )
 }
@@ -248,7 +258,8 @@ compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
       ws_kin = as.numeric(feature_pred_tax_cla_01kin_score) * weights$w_cla_kin,
       ws_sup = as.numeric(feature_pred_tax_cla_02sup_score) * weights$w_cla_sup,
       ws_cla = as.numeric(feature_pred_tax_cla_03cla_score) * weights$w_cla_cla,
-      ws_par = as.numeric(feature_pred_tax_cla_04dirpar_score) * weights$w_cla_par,
+      ws_par = as.numeric(feature_pred_tax_cla_04dirpar_score) *
+        weights$w_cla_par,
       # Find which level has max weighted score
       max_ws = pmax(ws_kin, ws_sup, ws_cla, ws_par, na.rm = TRUE),
       # Pick label and score from that level
