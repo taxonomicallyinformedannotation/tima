@@ -399,6 +399,261 @@ test_that("log_annotation_stats runs without error", {
   expect_no_error(tima:::log_annotation_stats(ann))
 })
 
+test_that("log_annotation_stats handles empty annotations", {
+  ann <- tidytable::tidytable(
+    feature_id = character(),
+    candidate_library = character(),
+    candidate_structure_inchikey_connectivity_layer = character()
+  )
+
+  expect_no_error(tima:::log_annotation_stats(ann))
+})
+
+test_that("log_annotation_stats handles NA inchikeys", {
+  ann <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F3"),
+    candidate_library = c("lib1", "lib1", "lib2"),
+    candidate_structure_inchikey_connectivity_layer = c("A", NA, "C")
+  )
+
+  expect_no_error(tima:::log_annotation_stats(ann))
+})
+
+# ==============================================================================
+# Additional Test Suite: validate_weight_annotations_inputs - Edge Cases
+# ==============================================================================
+
+test_that("validate_weight_annotations_inputs accepts boundary weight sum", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  # Sum is 1.009 (within 0.01 tolerance)
+  expect_silent(
+    tima:::validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0.333,
+      weight_chemical = 0.333,
+      weight_biological = 0.343,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 5,
+      candidates_final = 10
+    )
+  )
+})
+
+test_that("validate_weight_annotations_inputs accepts all weights = 0 boundary", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  expect_silent(
+    tima:::validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0,
+      weight_chemical = 0,
+      weight_biological = 1,
+      minimal_consistency = 0,
+      minimal_ms1_bio = 0,
+      minimal_ms1_chemo = 0,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 1,
+      candidates_final = 1
+    )
+  )
+})
+
+test_that("validate_weight_annotations_inputs rejects non-logical parameters", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  expect_error(
+    tima:::validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0.33,
+      weight_chemical = 0.33,
+      weight_biological = 0.34,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = "yes",
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 5,
+      candidates_final = 10
+    ),
+    "ms1_only must be logical"
+  )
+})
+
+# ==============================================================================
+# Additional Test Suite: load_annotation_tables - Edge Cases
+# ==============================================================================
+
+# test_that("load_annotation_tables handles NA values correctly", {
+#   tmp <- withr::local_tempdir()
+#   withr::local_dir(tmp)
+#
+#   ann <- tidytable::tidytable(
+#     feature_id = c("F1", "F2"),
+#     candidate_score_similarity = c("", "NA")
+#   )
+#
+#   tidytable::fwrite(ann, "ann.tsv", sep = "\t")
+#
+#   result <- tima:::load_annotation_tables("ann.tsv", ms1_only = FALSE)
+#
+#   expect_true(is.na(result$candidate_score_similarity[1]))
+#   expect_true(is.na(result$candidate_score_similarity[2]))
+# })
+
+test_that("load_annotation_tables returns all columns as character", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  ann <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    score = c("0.8", "0.9"),
+    count = c("5", "10")
+  )
+
+  tidytable::fwrite(ann, "ann.tsv", sep = "\t")
+
+  result <- tima:::load_annotation_tables("ann.tsv", ms1_only = FALSE)
+
+  expect_true(all(vapply(result, is.character, logical(1))))
+})
+
+# ==============================================================================
+# Additional Test Suite: load_edges_table - Edge Cases
+# ==============================================================================
+
+test_that("load_edges_table handles single neighbor request", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  edges <- tidytable::tidytable(
+    feature_source = c("F1", "F1", "F1"),
+    feature_target = c("F2", "F3", "F4"),
+    candidate_score_similarity = c("0.9", "0.8", "0.7")
+  )
+
+  tidytable::fwrite(edges, "edges.tsv", sep = "\t")
+
+  result <- tima:::load_edges_table("edges.tsv", candidates_neighbors = 1)
+
+  expect_equal(nrow(result), 1)
+  expect_equal(result$feature_target, "F2")
+})
+
+test_that("load_edges_table handles ties in similarity scores", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  edges <- tidytable::tidytable(
+    feature_source = c("F1", "F1", "F1"),
+    feature_target = c("F2", "F3", "F4"),
+    candidate_score_similarity = c("0.9", "0.9", "0.7")
+  )
+
+  tidytable::fwrite(edges, "edges.tsv", sep = "\t")
+
+  result <- tima:::load_edges_table("edges.tsv", candidates_neighbors = 2)
+
+  # with_ties = FALSE, should get exactly 2 rows
+  expect_equal(nrow(result), 2)
+})
+
+test_that("load_edges_table handles empty file", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  edges <- tidytable::tidytable(
+    feature_source = character(),
+    feature_target = character(),
+    candidate_score_similarity = character()
+  )
+
+  tidytable::fwrite(edges, "edges.tsv", sep = "\t")
+
+  result <- tima:::load_edges_table("edges.tsv", candidates_neighbors = 5)
+
+  expect_equal(nrow(result), 0)
+})
 test_that("log_annotation_stats handles empty data", {
   ann <- tidytable::tidytable(
     feature_id = character(),

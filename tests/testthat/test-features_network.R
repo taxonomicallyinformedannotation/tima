@@ -25,6 +25,9 @@ test_that("prepare_features_tables works with default parameters", {
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
+  if (file.exists(paths$data$source$features)) {
+    unlink(paths$data$source$features, force = TRUE)
+  }
   get_file(
     url = paths$urls$examples$features,
     export = paths$data$source$features
