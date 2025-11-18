@@ -133,7 +133,7 @@ filter_high_confidence_only <- function(
   # RT error filter (minutes). Allow NA (unknown) values
   if ("candidate_structure_error_rt" %in% names(df_filtered)) {
     df_filtered <- df_filtered |>
-      tidytable::filter(is.na(.rt_err_min) | .rt_err_min <= error_rt_max)
+      tidytable::filter(is.na(.rt_err_min) | abs(.rt_err_min) <= error_rt_max)
   }
 
   # Optional SIRIUS confidence
