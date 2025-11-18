@@ -5,7 +5,7 @@ utils::globalVariables(
     ".",
     ".data",
     ".pred_avg",
-    ".pred_denom", 
+    ".pred_denom",
     ".pred_sum",
     ".rt_err_min",
     ".score_bio",

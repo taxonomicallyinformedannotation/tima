@@ -19,7 +19,11 @@ validate_filter_annotations_inputs <- function(
 ) {
   # Validate tolerance first (cheapest check)
   if (!is.numeric(tolerance_rt) || tolerance_rt <= 0) {
-    stop("tolerance_rt must be a positive number, got: ", tolerance_rt, call. = FALSE)
+    stop(
+      "tolerance_rt must be a positive number, got: ",
+      tolerance_rt,
+      call. = FALSE
+    )
   }
 
   # Validate output path
@@ -39,7 +43,10 @@ validate_filter_annotations_inputs <- function(
   # Validate annotations (handle both list and character vector)
   if (is.list(annotations)) {
     if (length(annotations) == 0L) {
-      stop("annotations must be a non-empty list or character vector", call. = FALSE)
+      stop(
+        "annotations must be a non-empty list or character vector",
+        call. = FALSE
+      )
     }
 
     ann_vec <- unlist(annotations)
@@ -57,7 +64,10 @@ validate_filter_annotations_inputs <- function(
     }
   } else {
     if (!is.character(annotations) || length(annotations) == 0L) {
-      stop("annotations must be a non-empty character vector or list", call. = FALSE)
+      stop(
+        "annotations must be a non-empty character vector or list",
+        call. = FALSE
+      )
     }
 
     missing_annotations <- annotations[!file.exists(annotations)]
@@ -122,10 +132,13 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
 
   # Remove redundant MS1 and combine
   annotation_table <- annotation_tables_list[["ms1"]] |>
-    tidytable::anti_join(spectral_keys, by = c(
-      "feature_id",
-      "candidate_structure_inchikey_connectivity_layer"
-    )) |>
+    tidytable::anti_join(
+      spectral_keys,
+      by = c(
+        "feature_id",
+        "candidate_structure_inchikey_connectivity_layer"
+      )
+    ) |>
     tidytable::bind_rows(annotations_tables_spectral)
 
   n_ms1_removed <- n_ms1_before - (nrow(annotation_table) - n_spectral)
@@ -145,10 +158,15 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
 #' @return Filtered data frame
 #' @keywords internal
 apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
-  logger::log_info("Filtering annotations outside {tolerance_rt} min RT tolerance")
+  logger::log_info(
+    "Filtering annotations outside {tolerance_rt} min RT tolerance"
+  )
 
   features_annotated_table |>
-    tidytable::left_join(rt_table, by = "candidate_structure_inchikey_connectivity_layer") |>
+    tidytable::left_join(
+      rt_table,
+      by = "candidate_structure_inchikey_connectivity_layer"
+    ) |>
     tidytable::mutate(
       candidate_structure_error_rt = as.numeric(rt) - as.numeric(rt_target)
     ) |>
@@ -251,7 +269,9 @@ filter_annotations <- function(
     tidytable::distinct(feature_id, rt, mz)
 
   n_features <- nrow(features_table)
-  logger::log_info("Processing {n_features} unique features for annotation filtering")
+  logger::log_info(
+    "Processing {n_features} unique features for annotation filtering"
+  )
 
   # ============================================================================
   # Load and Merge Annotations
@@ -270,7 +290,9 @@ filter_annotations <- function(
   rm(annotation_tables_list)
 
   n_total_annotations <- nrow(annotation_table)
-  logger::log_info("Total annotations before RT filtering: {n_total_annotations}")
+  logger::log_info(
+    "Total annotations before RT filtering: {n_total_annotations}"
+  )
 
   # ============================================================================
   # Apply RT Filtering if Library Available

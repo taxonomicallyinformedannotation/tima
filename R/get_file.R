@@ -74,12 +74,20 @@ get_file <- function(url, export, limit = 3600L) {
     for (attempt in seq_len(max_attempts)) {
       success <- tryCatch(
         {
-          # logger::log_debug("Download attempt {attempt}/{max_attempts}")
-
           # Perform download with progress bar
-          httr2::request(url) |>
+          resp <- httr2::request(url) |>
             httr2::req_progress() |>
             httr2::req_perform(path = destfile)
+
+          # Verify HTTP status is 2xx
+          status <- httr2::resp_status(resp)
+          if (status < 200L || status >= 300L) {
+            # Clean up and signal failure
+            if (file.exists(destfile)) {
+              unlink(destfile, force = TRUE)
+            }
+            stop(sprintf("HTTP status %s for URL: %s", status, url))
+          }
 
           # Validate downloaded file
           if (file.exists(destfile) && file.size(destfile) > 0L) {
@@ -97,7 +105,10 @@ get_file <- function(url, export, limit = 3600L) {
           logger::log_warn(
             "Download attempt {attempt} failed: {conditionMessage(e)}"
           )
-
+          # Ensure no partial file remains
+          if (file.exists(destfile)) {
+            unlink(destfile, force = TRUE)
+          }
           # Wait before retry with exponential backoff
           if (attempt < max_attempts) {
             wait_time <- 2L^attempt
@@ -125,6 +136,30 @@ get_file <- function(url, export, limit = 3600L) {
     }
     logger::log_error("Failed to download file after multiple attempts")
     stop("Failed to download file after multiple attempts from: ", url)
+  }
+
+  # Additional validation: ensure non-empty file and not an HTML error page
+  finfo <- tryCatch(file.info(export), error = function(e) NULL)
+  if (is.null(finfo) || is.na(finfo$size) || finfo$size <= 0L) {
+    if (file.exists(export)) {
+      unlink(export, force = TRUE)
+    }
+    stop("Downloaded file is empty or inaccessible: ", export)
+  }
+
+  # Optional read of first bytes to detect HTML error pages (basic heuristic)
+  con <- file(export, open = "rb")
+  header <- tryCatch(
+    rawToChar(readBin(con, what = "raw", n = 256L)),
+    finally = close(con)
+  )
+  if (grepl("^[[:space:]]*<", header)) {
+    # Looks like HTML; treat as error (likely an error page)
+    unlink(export, force = TRUE)
+    stop(
+      "Downloaded content appears to be HTML (likely an error page) from: ",
+      url
+    )
   }
 
   return(export)

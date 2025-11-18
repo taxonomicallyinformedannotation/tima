@@ -126,7 +126,10 @@ test_that("filter_ms1_annotations keeps MS2 annotations", {
   )
 
   result <- tima:::filter_ms1_annotations(
-    df, minimal_ms1_bio = 0.5, minimal_ms1_chemo = 0.5, minimal_ms1_condition = "OR"
+    df,
+    minimal_ms1_bio = 0.5,
+    minimal_ms1_chemo = 0.5,
+    minimal_ms1_condition = "OR"
   )
 
   # F1 and F2 have MS2, F3 has high scores - all should pass
@@ -144,7 +147,10 @@ test_that("filter_ms1_annotations applies OR condition correctly", {
   )
 
   result <- tima:::filter_ms1_annotations(
-    df, minimal_ms1_bio = 0.5, minimal_ms1_chemo = 0.5, minimal_ms1_condition = "OR"
+    df,
+    minimal_ms1_bio = 0.5,
+    minimal_ms1_chemo = 0.5,
+    minimal_ms1_condition = "OR"
   )
 
   # F1 (bio >= 0.5), F2 (chem >= 0.5), F3 (bio >= 0.5) pass; F4 fails
@@ -162,7 +168,10 @@ test_that("filter_ms1_annotations applies AND condition correctly", {
   )
 
   result <- tima:::filter_ms1_annotations(
-    df, minimal_ms1_bio = 0.5, minimal_ms1_chemo = 0.5, minimal_ms1_condition = "AND"
+    df,
+    minimal_ms1_bio = 0.5,
+    minimal_ms1_chemo = 0.5,
+    minimal_ms1_condition = "AND"
   )
 
   # Only F1 passes both thresholds
@@ -200,8 +209,18 @@ test_that("rank_and_deduplicate ranks correctly", {
   result <- tima:::rank_and_deduplicate(df)
 
   # Highest scores should have rank 1
-  expect_equal(result$rank_final[result$candidate_structure_inchikey_connectivity_layer == "A"], 1)
-  expect_equal(result$rank_initial[result$candidate_structure_inchikey_connectivity_layer == "A"], 1)
+  expect_equal(
+    result$rank_final[
+      result$candidate_structure_inchikey_connectivity_layer == "A"
+    ],
+    1
+  )
+  expect_equal(
+    result$rank_initial[
+      result$candidate_structure_inchikey_connectivity_layer == "A"
+    ],
+    1
+  )
 })
 
 # ==============================================================================
@@ -274,7 +293,10 @@ test_that("compute_classyfire_taxonomy selects highest weighted level", {
   )
 
   weights <- list(
-    w_cla_kin = 1.0, w_cla_sup = 1.0, w_cla_cla = 1.0, w_cla_par = 1.0
+    w_cla_kin = 1.0,
+    w_cla_sup = 1.0,
+    w_cla_cla = 1.0,
+    w_cla_par = 1.0
   )
 
   result <- tima:::compute_classyfire_taxonomy(df, weights)
@@ -298,7 +320,10 @@ test_that("compute_classyfire_taxonomy filters empty labels", {
   )
 
   weights <- list(
-    w_cla_kin = 1.0, w_cla_sup = 1.0, w_cla_cla = 1.0, w_cla_par = 1.0
+    w_cla_kin = 1.0,
+    w_cla_sup = 1.0,
+    w_cla_cla = 1.0,
+    w_cla_par = 1.0
   )
 
   result <- tima:::compute_classyfire_taxonomy(df, weights)
@@ -323,7 +348,9 @@ test_that("compute_npclassifier_taxonomy selects highest weighted level", {
   )
 
   weights <- list(
-    w_npc_pat = 1.0, w_npc_sup = 1.0, w_npc_cla = 1.0
+    w_npc_pat = 1.0,
+    w_npc_sup = 1.0,
+    w_npc_cla = 1.0
   )
 
   result <- tima:::compute_npclassifier_taxonomy(df, weights)
@@ -442,7 +469,10 @@ test_that("filter_ms1_annotations handles all NA scores", {
   )
 
   result <- tima:::filter_ms1_annotations(
-    df, minimal_ms1_bio = 0.5, minimal_ms1_chemo = 0.5, minimal_ms1_condition = "OR"
+    df,
+    minimal_ms1_bio = 0.5,
+    minimal_ms1_chemo = 0.5,
+    minimal_ms1_condition = "OR"
   )
 
   # Should filter out NA scores

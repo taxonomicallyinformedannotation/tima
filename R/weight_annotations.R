@@ -67,7 +67,13 @@ validate_weight_annotations_inputs <- function(
   for (file_name in names(required_files)) {
     file_path <- required_files[[file_name]]
     if (!file.exists(file_path)) {
-      stop("Required file not found: ", file_name, " at ", file_path, call. = FALSE)
+      stop(
+        "Required file not found: ",
+        file_name,
+        " at ",
+        file_path,
+        call. = FALSE
+      )
     }
   }
 
@@ -778,7 +784,9 @@ weight_annotations <- function(
   edges_table <- load_edges_table(edges, candidates_neighbors)
 
   structure_organism_pairs_table <- load_structure_organism_pairs(
-    library, str_stereo, org_tax_ott
+    library,
+    str_stereo,
+    org_tax_ott
   )
 
   canopus_table <- tidytable::fread(
