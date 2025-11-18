@@ -61,7 +61,8 @@ test_that("weight_chemo validates weight ranges and sum", {
   annot_table <- tidytable::tidytable(
     feature_id = "F1",
     candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
-    score_biological = 0.5
+    score_biological = 0.5,
+    candidate_score_pseudo_initial = 0
   )
 
   # Negative weight
@@ -106,7 +107,8 @@ test_that("weight_chemo validates score ranges", {
   annot_table <- tidytable::tidytable(
     feature_id = "F1",
     candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
-    score_biological = 0.5
+    score_biological = 0.5,
+    candidate_score_pseudo_initial = 0
   )
 
   # Negative score
@@ -147,148 +149,63 @@ test_that("weight_chemo validates score ranges", {
 })
 
 # ==============================================================================
-# Test: Basic Functionality
+# Test: Functional scoring
 # ==============================================================================
 
-# test_that("weight_chemo processes valid input", {
-#   skip_on_cran()
-#
-#   annot_table <- tidytable::tidytable(
-#     feature_id = c("F1", "F2"),
-#     candidate_structure_inchikey_connectivity_layer = c("STRUCT1", "STRUCT2"),
-#     candidate_structure_tax_cla_03cla = c("Alkaloids", "Flavonoids"),
-#     candidate_structure_tax_npc_03cla = c("Terpenoids", "Phenolics"),
-#     score_chemical = c(NA_real_, NA_real_)
-#   )
-#
-#   struct_org_pairs <- tidytable::tidytable(
-#     structure_inchikey_connectivity_layer = c("STRUCT1", "STRUCT2"),
-#     organism_name = c("Plant1", "Plant2")
-#   )
-#
-#   result <- weight_chemo(
-#     annot_table_wei_chemo = annot_table,
-#     structure_organism_pairs_table = struct_org_pairs,
-#     weight_chemo = 0.5,
-#     minimal_ms1_chemo = 0.1
-#   )
-#
-#   expect_s3_class(result, "data.frame")
-#   expect_true("score_chemical" %in% names(result))
-#   expect_equal(nrow(result), 2L)
-# })
+test_that("weight_chemo assigns chemical scores from taxonomy matches", {
+  # One row where candidate class matches predicted class; others NA
+  annot_table <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
+    # candidate taxonomy
+    candidate_structure_tax_cla_01kin = NA_character_,
+    candidate_structure_tax_cla_02sup = NA_character_,
+    candidate_structure_tax_cla_03cla = "Flavonols",
+    candidate_structure_tax_cla_04dirpar = NA_character_,
+    candidate_structure_tax_npc_01pat = NA_character_,
+    candidate_structure_tax_npc_02sup = NA_character_,
+    candidate_structure_tax_npc_03cla = NA_character_,
+    # feature predicted taxonomy values
+    feature_pred_tax_cla_01kin_val = NA_character_,
+    feature_pred_tax_cla_01kin_score = NA_character_,
+    feature_pred_tax_cla_02sup_val = NA_character_,
+    feature_pred_tax_cla_02sup_score = NA_character_,
+    feature_pred_tax_cla_03cla_val = "Flavonols",
+    feature_pred_tax_cla_03cla_score = "0.9",
+    feature_pred_tax_cla_04dirpar_val = NA_character_,
+    feature_pred_tax_cla_04dirpar_score = NA_character_,
+    feature_pred_tax_npc_01pat_val = NA_character_,
+    feature_pred_tax_npc_01pat_score = NA_character_,
+    feature_pred_tax_npc_02sup_val = NA_character_,
+    feature_pred_tax_npc_02sup_score = NA_character_,
+    feature_pred_tax_npc_03cla_val = NA_character_,
+    feature_pred_tax_npc_03cla_score = NA_character_,
+    # other required fields
+    candidate_score_pseudo_initial = 0,
+    score_biological = 0
+  )
 
-# ==============================================================================
-# Test: Parameter Validation
-# ==============================================================================
+  res <- weight_chemo(
+    annot_table_wei_bio_clean = annot_table,
+    weight_spectral = 0,
+    weight_biological = 0,
+    weight_chemical = 1,
+    score_chemical_cla_kingdom = 0.1,
+    score_chemical_cla_superclass = 0.2,
+    score_chemical_cla_class = 0.7,
+    score_chemical_cla_parent = 0.9,
+    score_chemical_npc_pathway = 0.15,
+    score_chemical_npc_superclass = 0.25,
+    score_chemical_npc_class = 0.35
+  )
 
-# test_that("weight_chemo validates weight_chemo parameter", {
-#   skip_on_cran()
-#
-#   annot_table <- tidytable::tidytable(
-#     feature_id = "F1",
-#     candidate_structure_inchikey_connectivity_layer = "STRUCT1"
-#   )
-#
-#   expect_error(
-#     weight_chemo(
-#       annot_table_wei_chemo = annot_table,
-#       structure_organism_pairs_table = tidytable::tidytable(),
-#       weight_chemo = -0.5
-#     ),
-#     "between 0 and 1|positive"
-#   )
-#
-#   expect_error(
-#     weight_chemo(
-#       annot_table_wei_chemo = annot_table,
-#       structure_organism_pairs_table = tidytable::tidytable(),
-#       weight_chemo = 1.5
-#     ),
-#     "between 0 and 1"
-#   )
-# })
-
-# test_that("weight_chemo validates minimal_ms1_chemo parameter", {
-#   skip_on_cran()
-#
-#   annot_table <- tidytable::tidytable(
-#     feature_id = "F1",
-#     candidate_structure_inchikey_connectivity_layer = "STRUCT1"
-#   )
-#
-#   expect_error(
-#     weight_chemo(
-#       annot_table_wei_chemo = annot_table,
-#       structure_organism_pairs_table = tidytable::tidytable(),
-#       minimal_ms1_chemo = -0.1
-#     ),
-#     "between 0 and 1|non-negative"
-#   )
-# })
-
-# ==============================================================================
-# Test: Score Calculation
-# ==============================================================================
-
-test_that("weight_chemo uses ClassyFire taxonomy for scoring", {
-  skip_on_cran()
-  skip("Requires full implementation details")
-
-  # This test would verify that chemical scores are calculated
-  # based on ClassyFire taxonomy consistency
+  expect_s3_class(res, "data.frame")
+  # chemical score should come from class level match (0.7)
+  expect_true("score_chemical" %in% names(res))
+  expect_equal(res$score_chemical, 0.7)
+  # weighted chemo equals chemical when other weights are zero
+  expect_equal(res$score_weighted_chemo, 0.7)
 })
-
-test_that("weight_chemo uses NPClassifier taxonomy for scoring", {
-  skip_on_cran()
-  skip("Requires full implementation details")
-
-  # This test would verify that chemical scores are calculated
-  # based on NPClassifier taxonomy consistency
-})
-
-# ==============================================================================
-# Test: Edge Cases
-# ==============================================================================
-
-# test_that("weight_chemo handles missing taxonomy annotations", {
-#   skip_on_cran()
-#
-#   annot_table <- tidytable::tidytable(
-#     feature_id = "F1",
-#     candidate_structure_inchikey_connectivity_layer = "STRUCT1",
-#     candidate_structure_tax_cla_03cla = NA_character_,
-#     candidate_structure_tax_npc_03cla = NA_character_,
-#     score_chemical = NA_real_
-#   )
-#
-#   result <- weight_chemo(
-#     annot_table_wei_chemo = annot_table,
-#     structure_organism_pairs_table = tidytable::tidytable()
-#   )
-#
-#   expect_s3_class(result, "data.frame")
-#   expect_true("score_chemical" %in% names(result))
-# })
-
-# test_that("weight_chemo handles NA values in scores", {
-#   skip_on_cran()
-#
-#   annot_table <- tidytable::tidytable(
-#     feature_id = c("F1", "F2"),
-#     candidate_structure_inchikey_connectivity_layer = c("STRUCT1", "STRUCT2"),
-#     candidate_structure_tax_cla_03cla = c("Alkaloids", "Flavonoids"),
-#     score_chemical = c(NA_real_, 0.5)
-#   )
-#
-#   result <- weight_chemo(
-#     annot_table_wei_chemo = annot_table,
-#     structure_organism_pairs_table = tidytable::tidytable()
-#   )
-#
-#   expect_s3_class(result, "data.frame")
-#   expect_true("score_chemical" %in% names(result))
-# })
 
 # ==============================================================================
 # Test: Combined Scoring

@@ -31,6 +31,6 @@ organisms:
   taxon: null
 options:
   #' Filter high confidence candidates only. BOOLEAN
-  high_confidence: true
+  high_confidence: false
   #' Summarize all candidates per feature to a single row. BOOLEAN
   summarize: false

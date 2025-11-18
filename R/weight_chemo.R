@@ -104,9 +104,6 @@ weight_chemo <- function(
     "Weighting {n_annotations} annotations by chemical consistency"
   )
   logger::log_debug(
-    "Weights - spectral: {weight_spectral}, biological: {weight_biological}, chemical: {weight_chemical}"
-  )
-  logger::log_debug(
     "Weights - Spectral: ",
     weight_spectral,
     ", Biological: ",
@@ -114,6 +111,8 @@ weight_chemo <- function(
     ", Chemical: ",
     weight_chemical
   )
+
+  # Reduce to unique candidate/feature taxonomy combinations to score per-level
   df2 <- annot_table_wei_bio_clean |>
     tidytable::distinct(
       candidate_structure_tax_cla_01kin,
@@ -139,93 +138,95 @@ weight_chemo <- function(
       feature_pred_tax_cla_04dirpar_score
     )
 
-  # logger::log_trace("Calculating chemical score at all levels ...")
-  score_per_level_chemo <-
-    function(
-      df,
-      candidates,
-      features_val,
-      features_score,
-      score,
-      score_name
-    ) {
-      score <- df |>
-        tidytable::distinct(
-          !!as.name(candidates),
-          !!as.name(features_val),
-          !!as.name(features_score)
-        ) |>
-        tidytable::filter(stringi::stri_detect_regex(
-          pattern = !!as.name(candidates),
-          str = !!as.name(features_val)
-        )) |>
-        tidytable::mutate(!!as.name(score_name) := !!as.name(score) * 1)
-    }
-  # logger::log_trace("... (classyfire) kingdom")
+  # Helper: compute per-level chemical score when candidate taxonomy matches
+  score_per_level_chemo <- function(
+    df,
+    candidates,
+    features_val,
+    features_score,
+    level_weight,
+    score_name
+  ) {
+    cand_sym <- rlang::sym(candidates)
+    fval_sym <- rlang::sym(features_val)
+    fsc_sym <- rlang::sym(features_score)
+
+    df |>
+      tidytable::distinct(!!cand_sym, !!fval_sym, !!fsc_sym) |>
+      tidytable::filter(
+        !is.na(!!cand_sym),
+        !is.na(!!fval_sym)
+      ) |>
+      # candidate label appears in feature predicted label path
+      tidytable::filter(stringi::stri_detect_regex(
+        str = !!fval_sym,
+        pattern = !!cand_sym
+      )) |>
+      # assign the configured per-level weight when matched
+      tidytable::mutate(!!rlang::sym(score_name) := as.numeric(level_weight)) |>
+      tidytable::select(!!cand_sym, !!rlang::sym(score_name)) |>
+      tidytable::distinct()
+  }
+
+  # Compute per-level matches for ClassyFire and NPClassifier
   step_cla_kin <- df2 |>
     score_per_level_chemo(
       candidates = "candidate_structure_tax_cla_01kin",
       features_val = "feature_pred_tax_cla_01kin_val",
       features_score = "feature_pred_tax_cla_01kin_score",
-      score = "score_chemical_cla_kingdom",
+      level_weight = score_chemical_cla_kingdom,
       score_name = "score_chemical_1"
     )
-  # logger::log_trace("... (NPC) pathway")
   step_npc_pat <- df2 |>
     score_per_level_chemo(
       candidates = "candidate_structure_tax_npc_01pat",
       features_val = "feature_pred_tax_npc_01pat_val",
       features_score = "feature_pred_tax_npc_01pat_score",
-      score = "score_chemical_npc_pathway",
+      level_weight = score_chemical_npc_pathway,
       score_name = "score_chemical_2"
     )
-  # logger::log_trace("... (classyfire) superclass")
   step_cla_sup <- df2 |>
     score_per_level_chemo(
       candidates = "candidate_structure_tax_cla_02sup",
       features_val = "feature_pred_tax_cla_02sup_val",
       features_score = "feature_pred_tax_cla_02sup_score",
-      score = "score_chemical_cla_superclass",
+      level_weight = score_chemical_cla_superclass,
       score_name = "score_chemical_3"
     )
-  # logger::log_trace("... (NPC) superclass")
   step_npc_sup <- df2 |>
     score_per_level_chemo(
       candidates = "candidate_structure_tax_npc_02sup",
       features_val = "feature_pred_tax_npc_02sup_val",
       features_score = "feature_pred_tax_npc_02sup_score",
-      score = "score_chemical_npc_superclass",
+      level_weight = score_chemical_npc_superclass,
       score_name = "score_chemical_4"
     )
-  # logger::log_trace("... (classyfire) class")
   step_cla_cla <- df2 |>
     score_per_level_chemo(
       candidates = "candidate_structure_tax_cla_03cla",
       features_val = "feature_pred_tax_cla_03cla_val",
       features_score = "feature_pred_tax_cla_03cla_score",
-      score = "score_chemical_cla_class",
+      level_weight = score_chemical_cla_class,
       score_name = "score_chemical_5"
     )
-  # logger::log_trace("... (NPC) class")
   step_npc_cla <- df2 |>
     score_per_level_chemo(
       candidates = "candidate_structure_tax_npc_03cla",
       features_val = "feature_pred_tax_npc_03cla_val",
       features_score = "feature_pred_tax_npc_03cla_score",
-      score = "score_chemical_npc_class",
+      level_weight = score_chemical_npc_class,
       score_name = "score_chemical_6"
     )
-  # logger::log_trace("... (classyfire) parent")
   step_cla_par <- df2 |>
     score_per_level_chemo(
       candidates = "candidate_structure_tax_cla_04dirpar",
       features_val = "feature_pred_tax_cla_04dirpar_val",
       features_score = "feature_pred_tax_cla_04dirpar_score",
-      score = "score_chemical_cla_parent",
+      level_weight = score_chemical_cla_parent,
       score_name = "score_chemical_7"
     )
 
-  # logger::log_trace("... keeping best chemical score")
+  # Merge scores and keep the best chemical score across levels
   supp_tables <- list(
     step_cla_kin,
     step_npc_pat,

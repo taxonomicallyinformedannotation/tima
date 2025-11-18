@@ -102,15 +102,14 @@ prepare_taxa <- function(
       stop("Metadata file not found: ", metadata)
     }
   }
-  logger::log_info("Using metadata for organism assignments")
-  if (!is.null(taxon)) {
-    if (taxon == "") {
-      taxon <- NULL
-    }
+
+  # Handle empty taxon string as NULL
+  if (!is.null(taxon) && taxon == "") {
+    taxon <- NULL
   }
+
   if (is.null(taxon)) {
-    stopifnot("Your metadata file does not exist" = file.exists(metadata))
-    stopifnot("Your input file does not exist" = file.exists(input))
+    logger::log_info("Using metadata for organism assignments")
   }
 
   # logger::log_trace("Loading feature table")

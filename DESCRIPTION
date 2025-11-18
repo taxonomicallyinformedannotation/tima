@@ -123,7 +123,6 @@ Collate:
     'columns_model.R'
     'clean_collapse.R'
     'summarize_results.R'
-    'minimize_results.R'
     'filter_high_confidence_only.R'
     'clean_chemo.R'
     'complement_metadata_structures.R'

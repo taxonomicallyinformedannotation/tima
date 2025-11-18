@@ -22,7 +22,11 @@
 #' @examples NULL
 split_tables_sop <- function(table, cache) {
   # Validate inputs
-  if (!is.data.frame(table) && !inherits(table, "tbl")) {
+  if (
+    !(is.data.frame(table) ||
+      inherits(table, "tbl") ||
+      inherits(table, "data.table"))
+  ) {
     stop("Input 'table' must be a data frame or tibble")
   }
 
@@ -50,9 +54,7 @@ split_tables_sop <- function(table, cache) {
     )
   table_structural_initial <- table |>
     tidytable::select(
-      tidyselect::all_of(
-        tidyselect::contains("structure")
-      )
+      tidyselect::contains("structure")
     ) |>
     tidytable::distinct()
 
@@ -116,7 +118,6 @@ split_tables_sop <- function(table, cache) {
         !is.na(structure_smiles_no_stereo)
     ) |>
     tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
-    tidytable::filter() |>
     tidytable::select(
       structure_inchikey,
       structure_smiles,
