@@ -7,22 +7,22 @@ on:
       - main
   workflow_dispatch: null
 env:
-  DOCKER_SERVICE: tima-full
   REGISTRY_IMAGE: adafede/tima-r
 jobs:
   build-amd64:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore Buildx cache
         uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-      - name: Prepare
-        run: |
-          echo PLATFORM_PAIR=linux-amd64 >> "$GITHUB_ENV"
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -41,11 +41,11 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
+          context: .
           file: inst/Dockerfile
           platforms: linux/amd64
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ env.REGISTRY_IMAGE
-            }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache-amd64
           cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache-amd64,mode=max
       - name: Export digest
@@ -58,21 +58,21 @@ jobs:
         with:
           name: digests-linux-amd64
           path: /tmp/digests/*
-          if-no-files-found: error
           retention-days: 1
   build-arm64:
     runs-on: warp-ubuntu-latest-arm64-2x
     steps:
       - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore Buildx cache
         uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-      - name: Prepare
-        run: |
-          echo PLATFORM_PAIR=linux-arm64 >> "$GITHUB_ENV"
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -91,11 +91,11 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
+          context: .
           file: inst/Dockerfile
           platforms: linux/arm64
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ env.REGISTRY_IMAGE
-            }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache-arm64
           cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache-arm64,mode=max
       - name: Export digest
@@ -108,7 +108,6 @@ jobs:
         with:
           name: digests-linux-arm64
           path: /tmp/digests/*
-          if-no-files-found: error
           retention-days: 1
   merge:
     runs-on: ubuntu-latest
@@ -136,21 +135,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Create manifest list and push
         working-directory: /tmp/digests
-        run: >
-          # Add the 'latest' tag
-
+        run: |
           docker buildx imagetools create \
-
-          -t ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }} \
-
-          -t ${{ env.REGISTRY_IMAGE }}:latest \
-
-          $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-
-          $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
-      - name: Inspect image
-        run: >
-          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{
-          steps.meta.outputs.version }}
-
+            -t ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }} \
+            -t ${{ env.REGISTRY_IMAGE }}:latest \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
+      - name: Inspect images
+        run: |
+          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}
           docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:latest
