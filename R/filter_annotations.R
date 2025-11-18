@@ -248,7 +248,7 @@ filter_annotations <- function(
         abs(candidate_structure_error_rt) <= abs(tolerance_rt) |
           is.na(candidate_structure_error_rt)
       ) |>
-      tidytable::select(-rt_target, -type)
+      tidytable::select(-tidyselect::any_of(c("rt_target", "type")))
   } else {
     logger::log_debug("No RT library provided, skipping RT filtering")
     features_annotated_table_2 <- features_annotated_table_1 |>

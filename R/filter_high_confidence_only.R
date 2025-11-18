@@ -12,6 +12,8 @@
 #' @param error_rt_max Numeric maximum retention time error in minutes (default: 0.05). Must be > 0
 #' @param confidence_sirius_min Numeric minimum SIRIUS confidence score threshold (optional). Range: 0-1
 #' @param similarity_spectral_min Numeric minimum spectral similarity threshold (optional). Range: 0-1
+#' @param context Optional character string to tag logs with a stage label (e.g.,
+#'     "mini+filtered" or "full"). Defaults to NULL (no tag).
 #'
 #' @return Data frame containing only high-confidence annotations that meet
 #'     at least one score threshold and pass RT error filtering
@@ -37,7 +39,8 @@ filter_high_confidence_only <- function(
   score_final_min = DEFAULT_HC_SCORE_FINAL_MIN,
   error_rt_max = DEFAULT_HC_MAX_RT_ERROR_MIN,
   confidence_sirius_min = DEFAULT_HC_SCORE_SIRIUS_MIN,
-  similarity_spectral_min = DEFAULT_HC_SCORE_SPECTRAL_MIN
+  similarity_spectral_min = DEFAULT_HC_SCORE_SPECTRAL_MIN,
+  context = NULL
 ) {
   # ============================================================================
   # Validation
@@ -166,7 +169,15 @@ filter_high_confidence_only <- function(
   n_removed <- n_before - n_after
   percent_removed <- round(100 * n_removed / n_before, 1)
 
+  # Build a tag for log lines if context is provided
+  tag <- if (!is.null(context) && nzchar(context)) {
+    paste0("[", context, "] ")
+  } else {
+    ""
+  }
+
   logger::log_info(
+    tag,
     "Removed ",
     n_removed,
     " low-confidence candidates (",
@@ -176,6 +187,7 @@ filter_high_confidence_only <- function(
     " total)"
   )
   logger::log_info(
+    tag,
     n_after,
     " high-confidence candidates remaining (",
     round(100 * n_after / n_before, 1),

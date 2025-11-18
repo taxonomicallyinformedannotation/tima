@@ -752,7 +752,7 @@ options:
   force: false
 
   #' Filter high confidence candidates only. BOOLEAN
-  high_confidence: true
+  high_confidence: false
 
   #' Remove ties. BOOLEAN
   remove_ties: false

@@ -310,6 +310,28 @@ weight_annotations <- function(
     }
   }
 
+  # Validate optional structure library files if provided
+  optional_files <- list(
+    str_stereo = str_stereo,
+    org_tax_ott = org_tax_ott
+  )
+
+  for (file_name in names(optional_files)) {
+    file_path <- optional_files[[file_name]]
+    if (!is.null(file_path) && !file.exists(file_path)) {
+      logger::log_warn("Optional file not found: {file_name} at {file_path}")
+    }
+  }
+
+  # Validate canopus and formula files if provided
+  if (!is.null(canopus) && !file.exists(canopus)) {
+    logger::log_warn("CANOPUS file not found: {canopus}")
+  }
+
+  if (!is.null(formula) && !file.exists(formula)) {
+    logger::log_warn("Formula file not found: {formula}")
+  }
+
   # Validate annotations (can be multiple files)
   missing_annotations <- annotations[!file.exists(annotations)]
   if (length(missing_annotations) > 0L) {

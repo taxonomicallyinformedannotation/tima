@@ -170,6 +170,74 @@ test_that("weight_annotations validates candidate counts", {
 
 # Keep integration tests skipped for heavy I/O
 
+test_that("weight_annotations validates required files exist", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  # Missing required file should error
+  expect_error(
+    weight_annotations(
+      library = "data/interim/libraries/sop/merged/nonexistent.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv"
+    ),
+    "Required file not found"
+  )
+})
+
+test_that("weight_annotations handles multiple annotation files", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann1.tsv")
+  writeLines("", "data/interim/annotations/ann2.tsv")
+
+  # One missing annotation file should error
+  expect_error(
+    weight_annotations(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = c(
+        "data/interim/annotations/ann1.tsv",
+        "data/interim/annotations/missing.tsv"
+      )
+    ),
+    "Annotation file\\(s\\) not found"
+  )
+})
+
 test_that("weight_annotations integration placeholder", {
   skip("Integration test - requires full file structure setup")
 })

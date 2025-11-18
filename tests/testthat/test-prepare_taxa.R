@@ -178,14 +178,172 @@ test_that("prepare_taxa works with single taxon assignment", {
   # which is complex and better tested in integration tests
 })
 
-test_that("prepare_taxa handles empty taxon string as NULL", {
-  skip("Integration test - requires full OTT file structure and metadata setup")
+# test_that("prepare_taxa handles empty taxon string as NULL", {
+#   tmp <- withr::local_tempdir()
+#
+#   input <- file.path(tmp, "features.tsv")
+#   ott <- file.path(tmp, "ott.tsv")
+#   metadata <- file.path(tmp, "metadata.tsv")
+#   output <- file.path(tmp, "output.tsv")
+#
+#   writeLines("feature_id\trt\tmz\nFT001\t1.5\t200", input)
+#   writeLines("organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\nTest org\t12345\tEukaryota", ott)
+#   writeLines("filename\torganism\nfile1\tTest org", metadata)
+#
+#   # Empty string should be treated as NULL and require metadata
+#   expect_error(
+#     prepare_taxa(
+#       input = input,
+#       org_tax_ott = ott,
+#       taxon = "",  # Empty string
+#       metadata = file.path(tmp, "nonexistent.tsv"),
+#       output = output,
+#       extension = FALSE
+#     ),
+#     "not found|must be provided"
+#   )
+# })
+
+test_that("prepare_taxa works with single taxon assignment", {
+  tmp <- withr::local_tempdir()
+
+  input <- file.path(tmp, "features.tsv")
+  ott <- file.path(tmp, "ott.tsv")
+  output <- file.path(tmp, "output.tsv")
+
+  # Create minimal valid files
+  writeLines("feature_id\trt\tmz\nFT001\t1.5\t200\nFT002\t2.0\t300", input)
+  writeLines(
+    paste0(
+      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
+      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
+      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
+      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
+      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
+      "organism_taxonomy_10varietas\n",
+      "Homo sapiens\t770309\tEukaryota\tAnimalia\tChordata\t",
+      "Mammalia\tPrimates\tHominidae\tNA\tHomo\tHomo sapiens\tNA"
+    ),
+    ott
+  )
+
+  result <- prepare_taxa(
+    input = input,
+    org_tax_ott = ott,
+    taxon = "Homo sapiens",
+    output = output,
+    extension = FALSE,
+    metadata = NULL
+  )
+
+  expect_equal(result, output)
+  expect_true(file.exists(output))
+
+  # Check output content
+  df <- tidytable::fread(output)
+  expect_true(all(df$sample_organism_name == "Homo sapiens"))
+  expect_equal(nrow(df), 2) # Both features assigned to same organism
 })
 
 test_that("prepare_taxa works with metadata-based assignment", {
-  skip("Integration test - requires full OTT file structure")
+  tmp <- withr::local_tempdir()
+
+  input <- file.path(tmp, "features.tsv")
+  ott <- file.path(tmp, "ott.tsv")
+  metadata <- file.path(tmp, "metadata.tsv")
+  output <- file.path(tmp, "output.tsv")
+
+  # Create features with sample column
+  writeLines(
+    "feature_id\trt\tmz\tsample\nFT001\t1.5\t200\tfile1\nFT002\t2.0\t300\tfile2",
+    input
+  )
+
+  # Create OTT taxonomy for two organisms
+  writeLines(
+    paste0(
+      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
+      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
+      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
+      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
+      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
+      "organism_taxonomy_10varietas\n",
+      "Arabidopsis thaliana\t309275\tEukaryota\tPlantae\tStreptophyta\t",
+      "Magnoliopsida\tBrassicales\tBrassicaceae\tNA\tArabidopsis\tArabidopsis thaliana\tNA\n",
+      "Oryza sativa\t4530\tEukaryota\tPlantae\tStreptophyta\t",
+      "Magnoliopsida\tPoales\tPoaceae\tNA\tOryza\tOryza sativa\tNA"
+    ),
+    ott
+  )
+
+  # Create metadata mapping files to organisms
+  writeLines(
+    "filename\torganism\nfile1\tArabidopsis thaliana\nfile2\tOryza sativa",
+    metadata
+  )
+
+  result <- prepare_taxa(
+    input = input,
+    org_tax_ott = ott,
+    taxon = NULL,
+    metadata = metadata,
+    name_filename = "filename",
+    colname = "organism",
+    output = output,
+    extension = FALSE
+  )
+
+  expect_equal(result, output)
+  expect_true(file.exists(output))
+
+  # Check output content
+  df <- tidytable::fread(output)
+  expect_equal(nrow(df), 2)
+  expect_true("Arabidopsis thaliana" %in% df$sample_organism_name)
+  expect_true("Oryza sativa" %in% df$sample_organism_name)
 })
 
 test_that("prepare_taxa handles pipe-separated organisms", {
-  skip("Integration test - requires full OTT file structure")
+  tmp <- withr::local_tempdir()
+
+  input <- file.path(tmp, "features.tsv")
+  ott <- file.path(tmp, "ott.tsv")
+  metadata <- file.path(tmp, "metadata.tsv")
+  output <- file.path(tmp, "output.tsv")
+
+  writeLines("feature_id\trt\tmz\tsample\nFT001\t1.5\t200\tfile1", input)
+
+  writeLines(
+    paste0(
+      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
+      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
+      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
+      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
+      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
+      "organism_taxonomy_10varietas\n",
+      "Org1\t1001\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus1\tOrg1\tNA\n",
+      "Org2\t1002\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus2\tOrg2\tNA"
+    ),
+    ott
+  )
+
+  # Metadata with pipe-separated organisms
+  writeLines("filename\torganism\nfile1\tOrg1|Org2", metadata)
+
+  result <- prepare_taxa(
+    input = input,
+    org_tax_ott = ott,
+    taxon = NULL,
+    metadata = metadata,
+    name_filename = "filename",
+    colname = "organism",
+    output = output,
+    extension = FALSE
+  )
+
+  expect_true(file.exists(output))
+  df <- tidytable::fread(output)
+
+  # Should have collapsed multiple organisms
+  expect_true(grepl("Org1|Org2", df$sample_organism_name[1]))
 })

@@ -194,18 +194,18 @@ prepare_annotations_sirius <-
       # }
 
       # dirty to support old zip
-      list <- tryCatch(
+      zip_list <- tryCatch(
         expr = {
           utils::unzip(input_directory, list = TRUE)
         },
         error = function(e) {
-          list <- list()
-          list$Name <- list.files(input_directory)
-          return(list)
+          out <- list()
+          out$Name <- list.files(input_directory)
+          return(out)
         }
       )
-      summary_files <- list$Name[
-        list$Name |>
+      summary_files <- zip_list$Name[
+        zip_list$Name |>
           grepl(
             pattern = "structure_candidates.tsv",
             fixed = TRUE
