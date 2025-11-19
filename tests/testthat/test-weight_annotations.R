@@ -701,3 +701,506 @@ test_that("load_edges_table handles features with fewer neighbors than requested
 
   expect_equal(nrow(result), 1)
 })
+
+# ==============================================================================
+# Test Group: validate_weight_annotations_inputs - Additional edge cases
+# ==============================================================================
+
+test_that("test-validate_weight_annotations_inputs accepts boundary weight values", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  # All weight on spectral
+  expect_silent(
+    validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      minimal_ms1_condition = "OR",
+      weight_spectral = 1.0,
+      weight_chemical = 0.0,
+      weight_biological = 0.0,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 5,
+      candidates_final = 10
+    )
+  )
+})
+
+test_that("test-validate_weight_annotations_inputs accepts boundary score values", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  # Min and max score values
+  expect_silent(
+    validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      minimal_ms1_condition = "AND",
+      weight_spectral = 0.33,
+      weight_chemical = 0.33,
+      weight_biological = 0.34,
+      minimal_consistency = 0.0,
+      minimal_ms1_bio = 1.0,
+      minimal_ms1_chemo = 0.0,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 1,
+      candidates_final = 1
+    )
+  )
+})
+
+test_that("test-validate_weight_annotations_inputs handles multiple annotation files", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann1.tsv")
+  writeLines("", "data/interim/annotations/ann2.tsv")
+
+  expect_silent(
+    validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = c(
+        "data/interim/annotations/ann1.tsv",
+        "data/interim/annotations/ann2.tsv"
+      ),
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0.33,
+      weight_chemical = 0.33,
+      weight_biological = 0.34,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 5,
+      candidates_final = 10
+    )
+  )
+})
+
+test_that("test-validate_weight_annotations_inputs rejects when one annotation file missing", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann1.tsv")
+
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = c(
+        "data/interim/annotations/ann1.tsv",
+        "data/interim/annotations/missing.tsv"
+      ),
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0.33,
+      weight_chemical = 0.33,
+      weight_biological = 0.34,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 5,
+      candidates_final = 10
+    ),
+    "Annotation file.*not found"
+  )
+})
+
+test_that("test-validate_weight_annotations_inputs handles optional files gracefully", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  # Should warn for missing optional files but not error
+  expect_no_error(
+    validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      str_stereo = "nonexistent.tsv",
+      org_tax_ott = "nonexistent2.tsv",
+      canopus = "nonexistent3.tsv",
+      formula = "nonexistent4.tsv",
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0.33,
+      weight_chemical = 0.33,
+      weight_biological = 0.34,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 5,
+      candidates_final = 10
+    )
+  )
+})
+
+test_that("test-validate_weight_annotations_inputs rejects invalid logical parameters", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0.33,
+      weight_chemical = 0.33,
+      weight_biological = 0.34,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = "yes",  # Invalid - should be logical
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 5,
+      candidates_final = 10
+    ),
+    "must be logical"
+  )
+})
+
+test_that("test-validate_weight_annotations_inputs accepts all logical parameter combinations", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  # Test with all TRUE
+  expect_silent(
+    validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0.33,
+      weight_chemical = 0.33,
+      weight_biological = 0.34,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = TRUE,
+      compounds_names = TRUE,
+      high_confidence = TRUE,
+      remove_ties = TRUE,
+      summarize = TRUE,
+      force = TRUE,
+      candidates_neighbors = 5,
+      candidates_final = 10
+    )
+  )
+
+  # Test with all FALSE
+  expect_silent(
+    validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0.33,
+      weight_chemical = 0.33,
+      weight_biological = 0.34,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = FALSE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 5,
+      candidates_final = 10
+    )
+  )
+})
+
+test_that("test-validate_weight_annotations_inputs rejects zero candidates", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0.33,
+      weight_chemical = 0.33,
+      weight_biological = 0.34,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 0,
+      candidates_final = 10
+    ),
+    "must be.*positive integer"
+  )
+})
+
+test_that("test-validate_weight_annotations_inputs rejects negative scores", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0.33,
+      weight_chemical = 0.33,
+      weight_biological = 0.34,
+      minimal_consistency = -0.1,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 5,
+      candidates_final = 10
+    ),
+    "must be between 0 and 1"
+  )
+})
+
+test_that("test-validate_weight_annotations_inputs rejects scores > 1", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0.33,
+      weight_chemical = 0.33,
+      weight_biological = 0.34,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 1.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 5,
+      candidates_final = 10
+    ),
+    "must be between 0 and 1"
+  )
+})
+
+test_that("test-validate_weight_annotations_inputs accepts weight sum within tolerance", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+
+  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
+
+  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
+  writeLines("", "data/interim/features/components.tsv")
+  writeLines("", "data/interim/features/edges.tsv")
+  writeLines("", "data/interim/metadata/taxa.tsv")
+  writeLines("", "data/interim/annotations/ann.tsv")
+
+  # Sum slightly off due to floating point (0.33 + 0.33 + 0.34 = 1.0)
+  expect_silent(
+    validate_weight_annotations_inputs(
+      library = "data/interim/libraries/sop/merged/keys.tsv",
+      components = "data/interim/features/components.tsv",
+      edges = "data/interim/features/edges.tsv",
+      taxa = "data/interim/metadata/taxa.tsv",
+      annotations = "data/interim/annotations/ann.tsv",
+      minimal_ms1_condition = "OR",
+      weight_spectral = 1/3,
+      weight_chemical = 1/3,
+      weight_biological = 1/3,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 5,
+      candidates_final = 10
+    )
+  )
+})
+
