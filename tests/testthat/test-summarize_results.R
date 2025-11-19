@@ -168,6 +168,9 @@ test_that("summarize_results handles empty input gracefully", {
 
 # Basic functionality tests ----
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("summarize_results returns a data frame", {
 #   test_data <- create_test_annotation_data()
 #
@@ -185,6 +188,9 @@ test_that("summarize_results handles empty input gracefully", {
 #   expect_true(nrow(result) > 0)
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("summarize_results adds feature metadata", {
 #   test_data <- create_test_annotation_data()
 #
@@ -203,6 +209,9 @@ test_that("summarize_results handles empty input gracefully", {
 #   expect_true("feature_mz" %in% names(result) || "mz" %in% names(result))
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("summarize_results adds component information", {
 #   test_data <- create_test_annotation_data()
 #
@@ -280,6 +289,9 @@ test_that("remove_ties keeps only one entry per feature-rank combination", {
 
 # Summarize functionality ----
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("summarize_results collapses to one row per feature when summarize=TRUE", {
 #   test_data <- create_test_annotation_data(n_features = 3, n_candidates = 4)
 #
@@ -315,6 +327,9 @@ test_that("remove_ties keeps only one entry per feature-rank combination", {
 #   }
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("summarize concatenates candidate information with pipes", {
 #   skip_if_not_installed("tidytable")
 #
@@ -347,6 +362,9 @@ test_that("remove_ties keeps only one entry per feature-rank combination", {
 
 # Organism occurrence tests ----
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("summarize_results adds organism occurrence information", {
 #   test_data <- create_test_annotation_data()
 #
@@ -370,6 +388,9 @@ test_that("remove_ties keeps only one entry per feature-rank combination", {
 
 # Column selection and renaming ----
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("summarize_results renames score columns appropriately", {
 #   test_data <- create_test_annotation_data()
 #
@@ -397,6 +418,9 @@ test_that("remove_ties keeps only one entry per feature-rank combination", {
 #   expect_true(length(present_scores) > 0)
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("summarize_results renames RT and m/z columns", {
 #   test_data <- create_test_annotation_data()
 #
@@ -593,6 +617,9 @@ test_that("summarize_results completes in reasonable time", {
 
 # Robustness tests ----
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("summarize_results handles missing organism data", {
 #   test_data <- create_test_annotation_data()
 #
@@ -612,6 +639,9 @@ test_that("summarize_results completes in reasonable time", {
 #   expect_s3_class(result, "data.frame")
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("summarize_results handles NA values appropriately", {
 #   test_data <- create_test_annotation_data()
 #

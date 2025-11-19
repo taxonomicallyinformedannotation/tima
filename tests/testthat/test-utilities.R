@@ -172,14 +172,3 @@ test_that("change_params_small validates MS polarity parameter", {
   # Either errors or accepts - document which
   expect_true(inherits(result, "NULL") || inherits(result, "error"))
 })
-
-# ==============================================================================
-# Future Tests (Currently Commented Out)
-# ==============================================================================
-
-# test_that("install function works in test mode", {
-#   expect_no_error(install(test = TRUE))
-# })
-#
-# Reason for skipping: install() may require specific environment setup
-# or have side effects unsuitable for automated testing

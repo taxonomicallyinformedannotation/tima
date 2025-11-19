@@ -149,6 +149,9 @@ test_that("prepare_taxa checks OTT file existence", {
   unlink(temp_input)
 })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_taxa requires metadata if taxon not specified", {
 #   temp_input <- tempfile(fileext = ".tsv")
 #   temp_ott <- tempfile(fileext = ".tsv")
@@ -178,6 +181,9 @@ test_that("prepare_taxa works with single taxon assignment", {
   # which is complex and better tested in integration tests
 })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_taxa handles empty taxon string as NULL", {
 #   tmp <- withr::local_tempdir()
 #

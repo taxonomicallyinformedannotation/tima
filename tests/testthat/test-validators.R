@@ -356,6 +356,9 @@ test_that("validate_list_or_vector handles NULL", {
   expect_silent(validate_list_or_vector(NULL, allow_null = TRUE))
 })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("validate_list_or_vector rejects wrong types", {
 #   expect_error(
 #     validate_list_or_vector(data.frame(a = 1)),
@@ -419,6 +422,9 @@ test_that("validate_data_frame uses custom parameter names", {
 
 # Integration tests ----
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("validators work together in realistic scenarios", {
 #   tmp <- withr::local_tempdir()
 #   withr::local_dir(tmp)

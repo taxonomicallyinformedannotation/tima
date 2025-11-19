@@ -1,8 +1,6 @@
-# Test: Prepare Features Edges
+# Test Suite: prepare_features_edges ----
 
-# =============================================================================
-# Tests for prepare_features_edges() - Network Edge Processing
-# =============================================================================
+library(testthat)
 
 test_that("prepare_features_edges validates input structure", {
   # Test input without required elements

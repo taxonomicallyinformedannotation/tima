@@ -1,9 +1,8 @@
-# Test Suite for prepare_features_tables()
-# Tests the feature table preparation and standardization function
+# Test Suite: prepare_features_tables ----
 
-# ==============================================================================
-# Test: Input Validation
-# ==============================================================================
+library(testthat)
+
+## Input Validation ----
 
 test_that("prepare_features_tables validates features parameter", {
   # Non-character features
@@ -84,6 +83,9 @@ test_that("prepare_features_tables validates candidates parameter", {
   )
 })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_features_tables validates column name parameters", {
 #   paths <- local_test_project(copy = TRUE)
 #
@@ -110,9 +112,7 @@ test_that("prepare_features_tables validates candidates parameter", {
 #   )
 # })
 
-# ==============================================================================
-# Test: Format Detection and Standardization
-# ==============================================================================
+## Format Detection and Standardization ----
 
 test_that("prepare_features_tables handles MZmine format (Peak area)", {
   paths <- local_test_project(copy = TRUE)
@@ -146,6 +146,9 @@ test_that("prepare_features_tables handles MZmine format (Peak area)", {
   expect_true("mz" %in% colnames(prepared))
 })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_features_tables handles SLAW format (quant_)", {
 #   paths <- local_test_project(copy = TRUE)
 #
@@ -197,9 +200,7 @@ test_that("prepare_features_tables handles missing RT column", {
   )
 })
 
-# ==============================================================================
-# Test: Sample Selection
-# ==============================================================================
+## Sample Selection ----
 
 test_that("prepare_features_tables retains top intensity samples", {
   paths <- local_test_project(copy = TRUE)
@@ -240,9 +241,7 @@ test_that("prepare_features_tables retains top intensity samples", {
   expect_lte(length(sample_cols), n_samples)
 })
 
-# ==============================================================================
-# Test: Edge Cases
-# ==============================================================================
+## Edge Cases ----
 
 test_that("prepare_features_tables handles empty file", {
   paths <- local_test_project(copy = TRUE)
@@ -263,6 +262,9 @@ test_that("prepare_features_tables handles empty file", {
   )
 })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_features_tables handles single feature", {
 #   paths <- local_test_project(copy = TRUE)
 #
@@ -315,10 +317,11 @@ test_that("prepare_features_tables handles large feature tables", {
   expect_lt(elapsed, 30)
 })
 
-# ==============================================================================
-# Test: Output Verification
-# ==============================================================================
+## Output Verification ----
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_features_tables creates valid output file", {
 #   paths <- local_test_project(copy = TRUE)
 #
@@ -348,6 +351,9 @@ test_that("prepare_features_tables handles large feature tables", {
 #   expect_gt(nrow(prepared), 0L)
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_features_tables preserves feature IDs", {
 #   paths <- local_test_project(copy = TRUE)
 #
@@ -374,10 +380,11 @@ test_that("prepare_features_tables handles large feature tables", {
 #   expect_setequal(prepared$feature_id, c("FT001", "FT002", "FT003"))
 # })
 
-# ==============================================================================
-# Test: Integration with Downstream Functions
-# ==============================================================================
+## Integration with Downstream Functions ----
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_features_tables output works with annotate_masses", {
 #   skip_on_cran()
 #   skip_if_offline()

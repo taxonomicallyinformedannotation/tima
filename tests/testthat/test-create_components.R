@@ -16,7 +16,6 @@ write_edges_table <- function(df, paths) {
 test_that(
   skip("Not implemented")
 )
-
 # test_that("create_components handles empty edge table", {
 #   skip_on_cran()
 #   paths <- local_test_project(copy = TRUE)
@@ -36,6 +35,9 @@ test_that(
 #   )
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("create_components builds components from minimal cyclic edges", {
 #   skip_on_cran()
 #   paths <- local_test_project(copy = TRUE)

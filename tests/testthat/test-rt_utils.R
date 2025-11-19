@@ -26,6 +26,9 @@ test_that("normalize_rt_to_minutes respects explicit 'minutes' unit", {
   expect_equal(mins_out, mins_in)
 })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_features_tables auto-converts seconds to minutes", {
 #   tmp <- withr::local_tempfile(fileext = ".csv")
 #   df <- tidytable::tidytable(
