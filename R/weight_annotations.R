@@ -840,7 +840,8 @@ weight_annotations <- function(
   annot_table_wei_bio <- weight_bio()
   rm(annotation_table_taxed)
 
-  annot_table_wei_bio |> decorate_bio()
+  annot_table_wei_bio |>
+    decorate_bio()
 
   annot_table_wei_bio_clean <- annot_table_wei_bio |>
     clean_bio(
@@ -849,12 +850,15 @@ weight_annotations <- function(
     )
   rm(annot_table_wei_bio)
 
-  annot_table_wei_chemo <- annot_table_wei_bio_clean |> weight_chemo()
+  annot_table_wei_chemo <- annot_table_wei_bio_clean |>
+    weight_chemo()
   rm(annot_table_wei_bio_clean)
 
-  annot_table_wei_chemo |> decorate_chemo()
+  annot_table_wei_chemo |>
+    decorate_chemo()
 
-  results_list <- annot_table_wei_chemo |> clean_chemo()
+  results_list <- annot_table_wei_chemo |>
+    clean_chemo()
   rm(annot_table_wei_chemo)
 
   # ============================================================================

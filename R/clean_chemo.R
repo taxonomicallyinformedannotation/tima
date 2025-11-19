@@ -122,6 +122,13 @@ filter_ms1_annotations <- function(
   minimal_ms1_chemo,
   minimal_ms1_condition
 ) {
+  # Ensure score columns are numeric
+  annot_table_wei_chemo <- annot_table_wei_chemo |>
+    tidytable::mutate(
+      score_biological = as.numeric(score_biological),
+      score_chemical = as.numeric(score_chemical)
+    )
+
   # Keep annotations with MS2 data OR MS1 meeting score thresholds
   has_ms2 <- quote(
     !is.na(candidate_score_similarity) | !is.na(candidate_score_sirius_csi)
@@ -153,6 +160,12 @@ filter_ms1_annotations <- function(
 #' @keywords internal
 rank_and_deduplicate <- function(df) {
   df |>
+    tidytable::mutate(
+      score_weighted_chemo = as.numeric(score_weighted_chemo),
+      candidate_score_pseudo_initial = as.numeric(
+        candidate_score_pseudo_initial
+      )
+    ) |>
     tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
     tidytable::distinct(
       feature_id,
@@ -178,6 +191,9 @@ rank_and_deduplicate <- function(df) {
 #' @keywords internal
 apply_percentile_filter <- function(df, best_percentile) {
   df |>
+    tidytable::mutate(
+      score_weighted_chemo = as.numeric(score_weighted_chemo)
+    ) |>
     tidytable::group_by(feature_id) |>
     tidytable::filter(
       score_weighted_chemo >=
@@ -463,6 +479,27 @@ clean_chemo <- function(
   if (nrow(annot_table_wei_chemo) == 0L) {
     logger::log_warn("Empty annotation table provided")
     return(annot_table_wei_chemo)
+  }
+
+  # ============================================================================
+  # Ensure Score Columns are Numeric
+  # ============================================================================
+
+  # Convert score columns to numeric to prevent "non-numeric argument" errors
+  # These columns may be character if loaded from TSV files
+  score_columns <- c(
+    "score_biological",
+    "score_chemical",
+    "score_weighted_chemo",
+    "candidate_score_pseudo_initial",
+    "candidate_score_similarity",
+    "candidate_score_sirius_csi"
+  )
+
+  for (col in score_columns) {
+    if (col %in% names(annot_table_wei_chemo)) {
+      annot_table_wei_chemo[[col]] <- as.numeric(annot_table_wei_chemo[[col]])
+    }
   }
 
   # ============================================================================
