@@ -309,8 +309,17 @@ filter_annotations <- function(
       na.strings = c("", "NA"),
       colClasses = "character"
     ) |>
-      tidytable::bind_rows() |>
-      tidytable::rename(rt_target = rt)
+      tidytable::bind_rows()
+
+    # Robust rename: support either 'rt' or pre-renamed 'rt_target'
+    if ("rt" %in% names(rt_table)) {
+      rt_table <- rt_table |> tidytable::rename(rt_target = rt)
+    } else if (!"rt_target" %in% names(rt_table)) {
+      stop(
+        "Retention time library must contain column 'rt' or 'rt_target'",
+        call. = FALSE
+      )
+    }
 
     n_rt_standards <- nrow(rt_table)
     logger::log_debug("Loaded {n_rt_standards} retention time standards")

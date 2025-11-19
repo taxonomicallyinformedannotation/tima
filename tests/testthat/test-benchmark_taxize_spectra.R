@@ -151,3 +151,119 @@ test_that("test-benchmark_taxize_spectra handles features without organisms", {
   result <- tidytable::fread(output)
   expect_equal(nrow(result), 1)
 })
+
+## Fixture-based behavior tests ----
+
+test_that("test-benchmark_taxize_spectra basic successful run with helpers", {
+  tmp <- withr::local_tempdir()
+  fx <- create_bench_full_set(
+    dir = tmp,
+    feature_ids = c("F1", "F2"),
+    inchikey_layers = c("AAAAAAAAAAAAAA", "BBBBBBBBBBBBBB"),
+    structure_inchikeys = c("AAAAAAAAAAAAAA-XXXX-XX", "CCCCCCCCCCCCCC-YYYY-YY"),
+    organisms = c("OrgA", "OrgB")
+  )
+  res <- benchmark_taxize_spectra(
+    input = fx$features,
+    keys = fx$keys,
+    org_tax_ott = fx$taxonomy,
+    output = fx$output
+  )
+  expect_equal(res, fx$output)
+  out <- read_bench_output(res)
+  expect_true("feature_id" %in% names(out))
+  expect_equal(nrow(out), 2)
+})
+
+test_that("test-benchmark_taxize_spectra handles missing taxonomy levels gracefully", {
+  tmp <- withr::local_tempdir()
+  fx <- create_bench_full_set(
+    dir = tmp,
+    feature_ids = c("F1"),
+    inchikey_layers = c("AAAAAAAAAAAAAA"),
+    structure_inchikeys = c("AAAAAAAAAAAAAA-ZZZ-ZZ"),
+    organisms = c("OrgA"),
+    with_missing_tax = TRUE
+  )
+  res <- benchmark_taxize_spectra(
+    input = fx$features,
+    keys = fx$keys,
+    org_tax_ott = fx$taxonomy,
+    output = fx$output
+  )
+  out <- read_bench_output(res)
+  expect_true("sample_organism_01_domain" %in% names(out))
+  expect_true(any(is.na(out$sample_organism_01_domain)))
+})
+
+test_that("test-benchmark_taxize_spectra samples one organism per feature when multiple available", {
+  tmp <- withr::local_tempdir()
+  # Same feature mapped to two organisms via duplicated inchikey connectivity layer
+  feature_ids <- c("F1", "F2")
+  inchikey_layers <- c("AAAAAAAAAAAAAA", "CCCCCCCCCCCCCC")
+  features_path <- create_bench_features(tmp, feature_ids, inchikey_layers)
+  keys_path <- create_bench_keys(
+    tmp,
+    structure_inchikeys = c("AAAAAAAAAAAAAA-AAAA-AA", "AAAAAAAAAAAAAA-BBBB-BB"),
+    organisms = c("OrgA", "OrgB")
+  )
+  tax_path <- create_bench_taxonomy(tmp, organisms = c("OrgA", "OrgB"))
+  output <- file.path(tmp, "out.tsv")
+  res <- benchmark_taxize_spectra(
+    input = features_path,
+    keys = keys_path,
+    org_tax_ott = tax_path,
+    output = output
+  )
+  out <- read_bench_output(res)
+  # Only one row for F1 should be present (sampled) plus F2 with no organism
+  expect_true(nrow(out) <= length(feature_ids))
+})
+
+test_that("test-benchmark_taxize_spectra retains features without organism match", {
+  tmp <- withr::local_tempdir()
+  fx <- create_bench_full_set(
+    dir = tmp,
+    feature_ids = c("F1", "F2"),
+    inchikey_layers = c("AAAAAAAAAAAAAA", "BBBBBBBBBBBBBB"),
+    structure_inchikeys = c("AAAAAAAAAAAAAA-ZZZ-ZZ"),
+    organisms = c("OrgA")
+  )
+  # Modify keys to only match first feature
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey = "AAAAAAAAAAAAAA-ZZZ-ZZ",
+      organism_name = "OrgA"
+    ),
+    fx$keys,
+    sep = "\t"
+  )
+  res <- benchmark_taxize_spectra(
+    input = fx$features,
+    keys = fx$keys,
+    org_tax_ott = fx$taxonomy,
+    output = fx$output
+  )
+  out <- read_bench_output(res)
+  expect_equal(length(unique(out$feature_id)), 2)
+})
+
+test_that("test-benchmark_taxize_spectra supports repeated taxonomy entries", {
+  tmp <- withr::local_tempdir()
+  fx <- create_bench_full_set(
+    dir = tmp,
+    feature_ids = c("F1"),
+    inchikey_layers = c("AAAAAAAAAAAAAA"),
+    structure_inchikeys = c("AAAAAAAAAAAAAA-AAAA-AA", "AAAAAAAAAAAAAA-BBBB-BB"),
+    organisms = c("OrgA", "OrgA")
+  )
+  res <- benchmark_taxize_spectra(
+    input = fx$features,
+    keys = fx$keys,
+    org_tax_ott = fx$taxonomy,
+    output = fx$output
+  )
+  out <- read_bench_output(res)
+  expect_equal(length(unique(out$feature_id)), 1)
+  expect_equal(nrow(out), 1)
+})
