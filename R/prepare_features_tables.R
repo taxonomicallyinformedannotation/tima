@@ -156,23 +156,26 @@ prepare_features_tables <- function(
 
   # Define replacements (pattern -> replacement)
   replacements <- list(
-    c(" Peak area", ""),
-    c(":area", ""),
-    c("datafile:", ""),
-    c("quant_", ""),
-    c(" Peak height", "")
+    " Peak area" = "",
+    ":area" = "",
+    "datafile:" = "",
+    "quant_" = "",
+    " Peak height" = ""
   )
 
   # Apply all replacements to column names
-  col_names_std <- colnames(features_table)
-  for (replacement in replacements) {
-    col_names_std <- stringi::stri_replace_all_fixed(
-      col_names_std,
-      pattern = replacement[1],
-      replacement = replacement[2],
-      vectorize_all = FALSE
-    )
-  }
+  col_names_std <- Reduce(
+    f = function(x, pattern_replacement) {
+      stringi::stri_replace_all_fixed(
+        x,
+        pattern = pattern_replacement[1],
+        replacement = pattern_replacement[2],
+        vectorize_all = FALSE
+      )
+    },
+    x = Map(c, names(replacements), replacements),
+    init = colnames(features_table)
+  )
   colnames(features_table) <- col_names_std
 
   # ============================================================================
