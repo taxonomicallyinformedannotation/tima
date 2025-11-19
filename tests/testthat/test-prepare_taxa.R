@@ -1,8 +1,6 @@
-# Test: Prepare Taxa - Taxonomic Assignment
+# Test Suite: prepare_taxa ----
 
-# =============================================================================
-# Tests for prepare_taxa() - Feature Taxonomic Assignment
-# =============================================================================
+library(testthat)
 
 test_that("prepare_taxa validates input parameter", {
   # Test non-character input

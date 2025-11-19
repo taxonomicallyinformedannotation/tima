@@ -1,10 +1,8 @@
-# ==============================================================================
-# Test Suite: weight_annotations
-# ==============================================================================
+# Test Suite: weight_annotations ----
 
-# ==============================================================================
-# Test Suite: validate_weight_annotations_inputs
-# ==============================================================================
+library(testthat)
+
+## validate_weight_annotations_inputs ----
 
 test_that("validate_weight_annotations_inputs accepts valid inputs", {
   tmp <- withr::local_tempdir()
@@ -310,9 +308,7 @@ test_that("validate_weight_annotations_inputs rejects invalid candidates paramet
   )
 })
 
-# ==============================================================================
-# Test Suite: load_annotation_tables
-# ==============================================================================
+## load_annotation_tables ----
 
 test_that("load_annotation_tables loads and combines files", {
   tmp <- withr::local_tempdir()
@@ -359,9 +355,7 @@ test_that("load_annotation_tables filters MS1 only when requested", {
   expect_equal(result$feature_id, "F1")
 })
 
-# ==============================================================================
-# Test Suite: load_edges_table
-# ==============================================================================
+## load_edges_tables ----
 
 test_that("load_edges_table loads and filters top neighbors", {
   tmp <- withr::local_tempdir()
@@ -385,9 +379,7 @@ test_that("load_edges_table loads and filters top neighbors", {
   expect_true(all(f1_edges$feature_target %in% c("F2", "F3")))
 })
 
-# ==============================================================================
-# Test Suite: log_annotation_stats
-# ==============================================================================
+## log_annotation_stats ----
 
 test_that("log_annotation_stats runs without error", {
   ann <- tidytable::tidytable(
@@ -419,9 +411,7 @@ test_that("log_annotation_stats handles NA inchikeys", {
   expect_no_error(log_annotation_stats(ann))
 })
 
-# ==============================================================================
-# Additional Test Suite: validate_weight_annotations_inputs - Edge Cases
-# ==============================================================================
+## validate_weight_annotations_inputs - Edge Cases ----
 
 test_that("validate_weight_annotations_inputs accepts boundary weight sum", {
   tmp <- withr::local_tempdir()
@@ -560,9 +550,7 @@ test_that("validate_weight_annotations_inputs rejects non-logical parameters", {
   )
 })
 
-# ==============================================================================
-# Additional Test Suite: load_annotation_tables - Edge Cases
-# ==============================================================================
+## load_annotation_tables - Edge Cases ----
 
 test_that("load_annotation_tables returns all columns as character", {
   tmp <- withr::local_tempdir()
@@ -581,9 +569,7 @@ test_that("load_annotation_tables returns all columns as character", {
   expect_true(all(vapply(result, is.character, logical(1))))
 })
 
-# ==============================================================================
-# Additional Test Suite: load_edges_table - Edge Cases
-# ==============================================================================
+## load_edges_table - Edge Cases ----
 
 test_that("load_edges_table handles single neighbor request", {
   tmp <- withr::local_tempdir()
@@ -647,9 +633,7 @@ test_that("log_annotation_stats handles empty data", {
   expect_no_error(log_annotation_stats(ann))
 })
 
-# ==============================================================================
-# Test Suite: Edge Cases
-# ==============================================================================
+## Edge Cases ----
 
 test_that("load_annotation_tables handles single file", {
   tmp <- withr::local_tempdir()
@@ -685,9 +669,7 @@ test_that("load_edges_table handles features with fewer neighbors than requested
   expect_equal(nrow(result), 1)
 })
 
-# ==============================================================================
-# Test Group: validate_weight_annotations_inputs - Additional edge cases
-# ==============================================================================
+## validate_weight_annotations_inputs - Additional edge cases ----
 
 test_that("test-validate_weight_annotations_inputs accepts boundary weight values", {
   tmp <- withr::local_tempdir()

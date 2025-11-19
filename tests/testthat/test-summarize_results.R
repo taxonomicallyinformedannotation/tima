@@ -1,10 +1,6 @@
-# ==============================================================================
-# Test Suite: summarize_results
-# ==============================================================================
+# Test Suite: summarize_results ----
 
-#' @title Test Suite for summarize_results
-#'
-#' @description Individual focused tests for summarize_results function.
+library(testthat)
 
 # Helper function to create test data ----
 

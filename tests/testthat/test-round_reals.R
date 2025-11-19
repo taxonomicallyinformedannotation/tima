@@ -1,8 +1,8 @@
-#' @title Test Suite for round_reals
-#'
-#' @description Individual focused tests for round_reals function.
+# Test Suite: round_reals ----
 
-# Test: Basic rounding functionality ----
+library(testthat)
+
+## Basic rounding functionality ----
 
 test_that("round_reals rounds numeric columns by default", {
   df <- data.frame(
@@ -45,7 +45,7 @@ test_that("round_reals rounds only specified columns", {
   expect_equal(result$other_numeric[1], 987.654321) # Unchanged
 })
 
-# Test: Input validation ----
+## Input validation ----
 
 test_that("round_reals requires data frame input", {
   expect_error(
@@ -62,7 +62,7 @@ test_that("round_reals validates dig parameter", {
   expect_error(round_reals(df, dig = 2.5), "non-negative integer")
 })
 
-# Test: Column matching ----
+## Column matching ----
 
 test_that("round_reals finds columns with partial matches", {
   df <- data.frame(
@@ -95,7 +95,7 @@ test_that("round_reals handles empty column list", {
   expect_equal(result$structure_exact_mass[1], 123.456789) # Unchanged
 })
 
-# Test: Edge cases ----
+## Edge cases ----
 
 test_that("round_reals handles empty data frame", {
   df <- data.frame()
@@ -154,7 +154,7 @@ test_that("round_reals handles very small numbers", {
   expect_true(abs(result$structure_exact_mass[1] - 1e-10) < 1e-14)
 })
 
-# Test: Multiple columns ----
+## Multiple columns ----
 
 test_that("round_reals handles multiple matching columns", {
   df <- data.frame(
@@ -172,7 +172,7 @@ test_that("round_reals handles multiple matching columns", {
   expect_equal(result$other[1], 999.999999) # Not matched
 })
 
-# Test: Custom column patterns ----
+## Custom column patterns ----
 
 test_that("round_reals works with custom column patterns", {
   df <- data.frame(
@@ -188,7 +188,7 @@ test_that("round_reals works with custom column patterns", {
   expect_equal(result$other_column[1], 999.999999)
 })
 
-# Test: Preserve data frame structure ----
+## Preserve data frame structure ----
 
 test_that("round_reals preserves data frame structure", {
   df <- data.frame(
@@ -207,7 +207,7 @@ test_that("round_reals preserves data frame structure", {
   expect_s3_class(result$factor_col, "factor")
 })
 
-# Test: Non-numeric columns with matching names ----
+## Non-numeric columns with matching names ----
 
 test_that("round_reals skips non-numeric columns even if name matches", {
   df <- data.frame(
@@ -220,7 +220,7 @@ test_that("round_reals skips non-numeric columns even if name matches", {
   expect_equal(result$structure_exact_mass[1], 123.456789)
 })
 
-# Test: Performance ----
+## Performance ----
 
 test_that("round_reals is fast for large data frames", {
   skip_on_cran()
@@ -238,7 +238,7 @@ test_that("round_reals is fast for large data frames", {
   expect_equal(nrow(result), 10000)
 })
 
-# Test: Logging behavior ----
+## Logging behavior ----
 
 test_that("round_reals handles no matching columns gracefully", {
   df <- data.frame(unrelated = c(123.456))

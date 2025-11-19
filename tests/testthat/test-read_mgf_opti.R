@@ -1,9 +1,15 @@
-# ==============================================================================
-# Test Suite: read_mgf_opti
-# ==============================================================================
+# Test Suite: read_mgf_opti ----
+
+library(testthat)
 
 test_that("read_mgf_opti validates file path", {
   expect_error(read_mgf_opti(f = "missing.mgf"), "not found")
+})
+
+test_that("read_mgf_opti fails with multiple files", {
+  expect_error(
+    read_mgf_opti(f = c("foo", "bar"))
+  )
 })
 
 test_that(

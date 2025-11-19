@@ -1,15 +1,6 @@
-# ==============================================================================
-# Test Suite: process_smiles
-# ==============================================================================
-#
-# @description
-# Unit tests for process_smiles which normalizes and augments SMILES strings.
-#
-# @coverage
-# - Basic processing
-# - Column creation
-# - Handling of stereochemistry removal
-# - Edge cases (empty, NA)
+# Test Suite: process_smiles ----
+
+library(testthat)
 
 TEST_SMILES <- "C[C@@H]1C=C(C(=O)[C@]2([C@H]1C[C@@H]3[C@@]4([C@@H]2C(=O)C(=C([C@@H]4CC(=O)O3)C)OC)C)C)OC"
 

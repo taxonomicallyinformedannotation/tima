@@ -1,4 +1,6 @@
-# Test: Spectra Import and Processing
+# Test Suite: import_spectra ----
+
+library(testthat)
 
 test_that("import_spectra handles MGF files correctly", {
   local_test_project(copy = TRUE)
@@ -38,34 +40,4 @@ test_that("import_spectra handles MSP files with failures", {
   } else {
     skip("MSP test file not found")
   }
-})
-
-test_that("sanitize_spectra handles FEATURE_ID column", {
-  df <- data.frame(
-    FEATURE_ID = c("FT001", "FT002", "FT003"),
-    mz = c(list(123.4567, 234.5678, 345.6789))
-  ) |>
-    Spectra::Spectra() |>
-    sanitize_spectra()
-
-  expect_s4_class(df, "Spectra")
-  expect_true("FEATURE_ID" %in% colnames(df@backend@spectraData))
-})
-
-test_that("sanitize_spectra handles SLAW_ID column", {
-  df <- data.frame(
-    SLAW_ID = c("FT001", "FT002", "FT003"),
-    mz = c(list(123.4567, 234.5678, 345.6789))
-  ) |>
-    Spectra::Spectra() |>
-    sanitize_spectra()
-
-  expect_s4_class(df, "Spectra")
-  expect_true("SLAW_ID" %in% colnames(df@backend@spectraData))
-})
-
-test_that("read_mgf_opti fails with multiple files", {
-  expect_error(
-    read_mgf_opti(f = c("foo", "bar"))
-  )
 })

@@ -1,6 +1,6 @@
-# ==============================================================================
-# Test Suite: select_sirius_columns_structures
-# ==============================================================================
+# Test Suite: select_sirius_columns_structures ----
+
+library(testthat)
 
 test_that("select_sirius_columns_structures selects expected structure columns", {
   df <- tidytable::tidytable(

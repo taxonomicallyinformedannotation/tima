@@ -1,6 +1,6 @@
-# ==============================================================================
-# Test Suite: select_annotations_columns
-# ==============================================================================
+# Test Suite: select_annotations_columns ----
+
+library(testthat)
 
 make_fake_struct_files <- function(root = tempdir()) {
   paths <- list(

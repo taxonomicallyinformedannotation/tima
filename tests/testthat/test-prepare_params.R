@@ -1,19 +1,16 @@
-# ============================================================================
-# Test Suite: prepare_params & get_params (fixture-based)
-# ============================================================================
+# Test Suite: prepare_params & get_params ----
 
 library(testthat)
 
 # Ensure param fixtures are available (loaded via setup sourcing fixtures/*.R)
 
-# Helper to build small & advanced param fixtures with an ID
+## Internal Utility Helpers ----
+
 fixture_small <- function(id = "TID") create_fixture_params_small(id)
 fixture_adv <- function(id = "TID") create_fixture_params_advanced(id)
 fixture_yamls <- function(id = "TID") create_fixture_yamls_params(id)
 
-# ----------------------------------------------------------------------------
-# Test: prepare_params combines small & advanced and performs id replacement
-# ----------------------------------------------------------------------------
+## prepare_params combines small & advanced and performs id replacement ----
 
 test_that("prepare_params merges fixtures and replaces {id}", {
   options(tima_id = "ABC001")
@@ -41,9 +38,7 @@ test_that("prepare_params merges fixtures and replaces {id}", {
   expect_match(replaced, "ABC001")
 })
 
-# ----------------------------------------------------------------------------
-# Test: prepare_params handles empty taxon gracefully
-# ----------------------------------------------------------------------------
+## prepare_params handles empty taxon gracefully ----
 
 test_that("prepare_params handles empty taxon (removes raw metadata) without error", {
   small <- fixture_small("AXX")
@@ -64,18 +59,14 @@ test_that("prepare_params handles empty taxon (removes raw metadata) without err
   expect_silent(prepare_params())
 })
 
-# ----------------------------------------------------------------------------
-# Test: input validation errors
-# ----------------------------------------------------------------------------
+## input validation errors ----
 
 test_that("prepare_params validates list inputs", {
   expect_error(prepare_params(params_small = "bad"), "list")
   expect_error(prepare_params(params_advanced = "bad"), "list")
 })
 
-# ----------------------------------------------------------------------------
-# get_params: invalid step value handling
-# ----------------------------------------------------------------------------
+## get_params: invalid step value handling ----
 
 test_that("get_params rejects missing or invalid step values", {
   expect_error(get_params(NULL), "must be provided")
@@ -85,9 +76,7 @@ test_that("get_params rejects missing or invalid step values", {
   expect_error(get_params(c("a", "b")), "length = 2")
 })
 
-# ----------------------------------------------------------------------------
-# prepare_params manual param injection
-# ----------------------------------------------------------------------------
+## prepare_params manual param injection ----
 
 test_that("prepare_params accepts explicit fixture lists", {
   local_mocked_bindings(
@@ -111,9 +100,8 @@ test_that("prepare_params accepts explicit fixture lists", {
   ))
 })
 
-# ----------------------------------------------------------------------------
-# get_params: unknown step
-# ----------------------------------------------------------------------------
+
+## get_params: unknown step ----
 
 test_that(
   skip("Not implemented")
