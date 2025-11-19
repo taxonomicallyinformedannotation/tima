@@ -1,6 +1,8 @@
-# ==============================================================================
-# Test Suite: get_constant / validate_against_constant
-# ==============================================================================
+# Test Suite: get_constant ----
+
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
 
 test_that("get_constant returns existing constant", {
   val <- get_constant("DEFAULT_HC_SCORE_BIO_MIN")
