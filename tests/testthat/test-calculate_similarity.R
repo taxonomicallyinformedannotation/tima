@@ -1,6 +1,10 @@
-# ==============================================================================
-# Test Suite: calculate_similarity
-# ==============================================================================
+# Test Suite: calculate_similarity ----
+
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
+
+## Internal Utility Helpers ----
 
 make_spec <- function(mz, int) {
   matrix(c(mz, int), ncol = 2, dimnames = list(NULL, c("mz", "int")))
@@ -9,7 +13,7 @@ make_spec <- function(mz, int) {
 TEST_QUERY <- make_spec(c(100, 150, 200, 250), c(10, 200, 500, 50))
 TEST_TARGET <- make_spec(c(100, 151, 199, 300), c(12, 180, 520, 40))
 
-# Basic method tests -----------------------------------------------------------
+## Basic method tests ----
 
 test_that("calculate_similarity works with entropy method", {
   score <- calculate_similarity(
@@ -53,7 +57,7 @@ test_that("calculate_similarity works with cosine method", {
   expect_type(score, "double")
 })
 
-# Validation tests -------------------------------------------------------------
+## Validation tests ----
 
 test_that("calculate_similarity validates method", {
   expect_error(

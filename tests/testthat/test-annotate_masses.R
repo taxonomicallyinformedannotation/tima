@@ -1,12 +1,10 @@
-# =============================================================================
-# Tests for annotate_masses()
-# =============================================================================
-# This file provides comprehensive test coverage for the annotate_masses
-# function, including input validation, edge cases, and integration scenarios.
+# Test Suite: annotate_masses ----
 
-# =============================================================================
-# Input Validation Tests
-# =============================================================================
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
+
+## Input Validation ----
 
 test_that("annotate_masses validates ms_mode correctly", {
   # Invalid mode should error
@@ -178,9 +176,8 @@ test_that("annotate_masses validates file existence", {
   )
 })
 
-# =============================================================================
-# Edge Cases and Empty Input Tests
-# =============================================================================
+
+## Edge Cases and Empty Input Tests ----
 
 test_that("annotate_masses handles empty features table", {
   # Setup temporary test environment with local directory
@@ -406,9 +403,7 @@ test_that("annotate_masses handles no valid monocharged adducts", {
   )
 })
 
-# =============================================================================
-# Functional Tests with Real Data
-# =============================================================================
+## Functional Tests with Real Data ----
 
 test_that("annotate_masses produces expected output structure", {
   # Setup temporary test environment
@@ -634,9 +629,7 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
   expect_true(nrow(annotations_tight) <= 1)
 })
 
-# =============================================================================
-# Performance and Scalability Tests
-# =============================================================================
+## Performance and Scalability Tests ----
 
 # test_that("annotate_masses handles moderate-scale data efficiently", {
 #   skip_on_cran()

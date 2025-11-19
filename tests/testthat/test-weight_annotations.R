@@ -27,7 +27,7 @@ test_that("validate_weight_annotations_inputs accepts valid inputs", {
   writeLines("", "data/interim/annotations/ann.tsv")
 
   expect_silent(
-    tima:::validate_weight_annotations_inputs(
+    validate_weight_annotations_inputs(
       library = "data/interim/libraries/sop/merged/keys.tsv",
       components = "data/interim/features/components.tsv",
       edges = "data/interim/features/edges.tsv",
@@ -54,7 +54,7 @@ test_that("validate_weight_annotations_inputs accepts valid inputs", {
 
 test_that("validate_weight_annotations_inputs rejects missing required files", {
   expect_error(
-    tima:::validate_weight_annotations_inputs(
+    validate_weight_annotations_inputs(
       library = "nonexistent.tsv",
       components = "components.tsv",
       edges = "edges.tsv",
@@ -100,7 +100,7 @@ test_that("validate_weight_annotations_inputs rejects invalid minimal_ms1_condit
   writeLines("", "data/interim/annotations/ann.tsv")
 
   expect_error(
-    tima:::validate_weight_annotations_inputs(
+    validate_weight_annotations_inputs(
       library = "data/interim/libraries/sop/merged/keys.tsv",
       components = "data/interim/features/components.tsv",
       edges = "data/interim/features/edges.tsv",
@@ -146,7 +146,7 @@ test_that("validate_weight_annotations_inputs rejects weights not summing to 1",
   writeLines("", "data/interim/annotations/ann.tsv")
 
   expect_error(
-    tima:::validate_weight_annotations_inputs(
+    validate_weight_annotations_inputs(
       library = "data/interim/libraries/sop/merged/keys.tsv",
       components = "data/interim/features/components.tsv",
       edges = "data/interim/features/edges.tsv",
@@ -192,7 +192,7 @@ test_that("validate_weight_annotations_inputs rejects negative weights", {
   writeLines("", "data/interim/annotations/ann.tsv")
 
   expect_error(
-    tima:::validate_weight_annotations_inputs(
+    validate_weight_annotations_inputs(
       library = "data/interim/libraries/sop/merged/keys.tsv",
       components = "data/interim/features/components.tsv",
       edges = "data/interim/features/edges.tsv",
@@ -238,7 +238,7 @@ test_that("validate_weight_annotations_inputs rejects invalid score parameters",
   writeLines("", "data/interim/annotations/ann.tsv")
 
   expect_error(
-    tima:::validate_weight_annotations_inputs(
+    validate_weight_annotations_inputs(
       library = "data/interim/libraries/sop/merged/keys.tsv",
       components = "data/interim/features/components.tsv",
       edges = "data/interim/features/edges.tsv",
@@ -284,7 +284,7 @@ test_that("validate_weight_annotations_inputs rejects invalid candidates paramet
   writeLines("", "data/interim/annotations/ann.tsv")
 
   expect_error(
-    tima:::validate_weight_annotations_inputs(
+    validate_weight_annotations_inputs(
       library = "data/interim/libraries/sop/merged/keys.tsv",
       components = "data/interim/features/components.tsv",
       edges = "data/interim/features/edges.tsv",
@@ -331,7 +331,7 @@ test_that("load_annotation_tables loads and combines files", {
   tidytable::fwrite(ann1, "ann1.tsv", sep = "\t")
   tidytable::fwrite(ann2, "ann2.tsv", sep = "\t")
 
-  result <- tima:::load_annotation_tables(
+  result <- load_annotation_tables(
     c("ann1.tsv", "ann2.tsv"),
     ms1_only = FALSE
   )
@@ -352,7 +352,7 @@ test_that("load_annotation_tables filters MS1 only when requested", {
 
   tidytable::fwrite(ann, "ann.tsv", sep = "\t")
 
-  result <- tima:::load_annotation_tables("ann.tsv", ms1_only = TRUE)
+  result <- load_annotation_tables("ann.tsv", ms1_only = TRUE)
 
   # Should keep only F1 (both scores are NA)
   expect_equal(nrow(result), 1)
@@ -375,7 +375,7 @@ test_that("load_edges_table loads and filters top neighbors", {
 
   tidytable::fwrite(edges, "edges.tsv", sep = "\t")
 
-  result <- tima:::load_edges_table("edges.tsv", candidates_neighbors = 2)
+  result <- load_edges_table("edges.tsv", candidates_neighbors = 2)
 
   # Should keep top 2 neighbors per source feature
   expect_equal(nrow(result), 4)
@@ -396,7 +396,7 @@ test_that("log_annotation_stats runs without error", {
     candidate_structure_inchikey_connectivity_layer = c("A", "B", "C")
   )
 
-  expect_no_error(tima:::log_annotation_stats(ann))
+  expect_no_error(log_annotation_stats(ann))
 })
 
 test_that("log_annotation_stats handles empty annotations", {
@@ -406,7 +406,7 @@ test_that("log_annotation_stats handles empty annotations", {
     candidate_structure_inchikey_connectivity_layer = character()
   )
 
-  expect_no_error(tima:::log_annotation_stats(ann))
+  expect_no_error(log_annotation_stats(ann))
 })
 
 test_that("log_annotation_stats handles NA inchikeys", {
@@ -416,7 +416,7 @@ test_that("log_annotation_stats handles NA inchikeys", {
     candidate_structure_inchikey_connectivity_layer = c("A", NA, "C")
   )
 
-  expect_no_error(tima:::log_annotation_stats(ann))
+  expect_no_error(log_annotation_stats(ann))
 })
 
 # ==============================================================================
@@ -444,7 +444,7 @@ test_that("validate_weight_annotations_inputs accepts boundary weight sum", {
 
   # Sum is 1.009 (within 0.01 tolerance)
   expect_silent(
-    tima:::validate_weight_annotations_inputs(
+    validate_weight_annotations_inputs(
       library = "data/interim/libraries/sop/merged/keys.tsv",
       components = "data/interim/features/components.tsv",
       edges = "data/interim/features/edges.tsv",
@@ -489,7 +489,7 @@ test_that("validate_weight_annotations_inputs accepts all weights = 0 boundary",
   writeLines("", "data/interim/annotations/ann.tsv")
 
   expect_silent(
-    tima:::validate_weight_annotations_inputs(
+    validate_weight_annotations_inputs(
       library = "data/interim/libraries/sop/merged/keys.tsv",
       components = "data/interim/features/components.tsv",
       edges = "data/interim/features/edges.tsv",
@@ -534,7 +534,7 @@ test_that("validate_weight_annotations_inputs rejects non-logical parameters", {
   writeLines("", "data/interim/annotations/ann.tsv")
 
   expect_error(
-    tima:::validate_weight_annotations_inputs(
+    validate_weight_annotations_inputs(
       library = "data/interim/libraries/sop/merged/keys.tsv",
       components = "data/interim/features/components.tsv",
       edges = "data/interim/features/edges.tsv",
@@ -575,7 +575,7 @@ test_that("validate_weight_annotations_inputs rejects non-logical parameters", {
 #
 #   tidytable::fwrite(ann, "ann.tsv", sep = "\t")
 #
-#   result <- tima:::load_annotation_tables("ann.tsv", ms1_only = FALSE)
+#   result <- load_annotation_tables("ann.tsv", ms1_only = FALSE)
 #
 #   expect_true(is.na(result$candidate_score_similarity[1]))
 #   expect_true(is.na(result$candidate_score_similarity[2]))
@@ -593,7 +593,7 @@ test_that("load_annotation_tables returns all columns as character", {
 
   tidytable::fwrite(ann, "ann.tsv", sep = "\t")
 
-  result <- tima:::load_annotation_tables("ann.tsv", ms1_only = FALSE)
+  result <- load_annotation_tables("ann.tsv", ms1_only = FALSE)
 
   expect_true(all(vapply(result, is.character, logical(1))))
 })
@@ -614,7 +614,7 @@ test_that("load_edges_table handles single neighbor request", {
 
   tidytable::fwrite(edges, "edges.tsv", sep = "\t")
 
-  result <- tima:::load_edges_table("edges.tsv", candidates_neighbors = 1)
+  result <- load_edges_table("edges.tsv", candidates_neighbors = 1)
 
   expect_equal(nrow(result), 1)
   expect_equal(result$feature_target, "F2")
@@ -632,7 +632,7 @@ test_that("load_edges_table handles ties in similarity scores", {
 
   tidytable::fwrite(edges, "edges.tsv", sep = "\t")
 
-  result <- tima:::load_edges_table("edges.tsv", candidates_neighbors = 2)
+  result <- load_edges_table("edges.tsv", candidates_neighbors = 2)
 
   # with_ties = FALSE, should get exactly 2 rows
   expect_equal(nrow(result), 2)
@@ -650,7 +650,7 @@ test_that("load_edges_table handles empty file", {
 
   tidytable::fwrite(edges, "edges.tsv", sep = "\t")
 
-  result <- tima:::load_edges_table("edges.tsv", candidates_neighbors = 5)
+  result <- load_edges_table("edges.tsv", candidates_neighbors = 5)
 
   expect_equal(nrow(result), 0)
 })
@@ -661,7 +661,7 @@ test_that("log_annotation_stats handles empty data", {
     candidate_structure_inchikey_connectivity_layer = character()
   )
 
-  expect_no_error(tima:::log_annotation_stats(ann))
+  expect_no_error(log_annotation_stats(ann))
 })
 
 # ==============================================================================
@@ -679,7 +679,7 @@ test_that("load_annotation_tables handles single file", {
 
   tidytable::fwrite(ann, "ann.tsv", sep = "\t")
 
-  result <- tima:::load_annotation_tables("ann.tsv", ms1_only = FALSE)
+  result <- load_annotation_tables("ann.tsv", ms1_only = FALSE)
 
   expect_equal(nrow(result), 1)
 })
@@ -697,7 +697,7 @@ test_that("load_edges_table handles features with fewer neighbors than requested
   tidytable::fwrite(edges, "edges.tsv", sep = "\t")
 
   # Request 5 neighbors but only 1 available
-  result <- tima:::load_edges_table("edges.tsv", candidates_neighbors = 5)
+  result <- load_edges_table("edges.tsv", candidates_neighbors = 5)
 
   expect_equal(nrow(result), 1)
 })

@@ -268,7 +268,7 @@ test_that("harmonize_spectra validates vectorized column parameters", {
 #     mz = 50,
 #     intensity = 10
 #   )
-#   res <- tima:::harmonize_spectra(df, metad = "lib", mode = "pos", col_ad = "", col_po = "mode_col")
+#   res <- harmonize_spectra(df, metad = "lib", mode = "pos", col_ad = "", col_po = "mode_col")
 #   expected_cols <- c(
 #     "adduct",
 #     "collision_energy",

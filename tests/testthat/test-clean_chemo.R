@@ -1,13 +1,12 @@
-# ==============================================================================
-# Test Suite: clean_chemo
-# ==============================================================================
+# Test Suite: clean_chemo ----
 
-# Test Suite: validate_clean_chemo_inputs
-# ==============================================================================
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
 
 test_that("validate_clean_chemo_inputs accepts valid inputs", {
   expect_silent(
-    tima:::validate_clean_chemo_inputs(
+    validate_clean_chemo_inputs(
       annot_table_wei_chemo = tidytable::tidytable(x = 1),
       candidates_final = 10,
       best_percentile = 0.9,
@@ -24,7 +23,7 @@ test_that("validate_clean_chemo_inputs accepts valid inputs", {
 
 test_that("validate_clean_chemo_inputs rejects non-data.frame", {
   expect_error(
-    tima:::validate_clean_chemo_inputs(
+    validate_clean_chemo_inputs(
       annot_table_wei_chemo = "not_a_df",
       candidates_final = 10,
       best_percentile = 0.9,
@@ -42,7 +41,7 @@ test_that("validate_clean_chemo_inputs rejects non-data.frame", {
 
 test_that("validate_clean_chemo_inputs rejects invalid candidates_final", {
   expect_error(
-    tima:::validate_clean_chemo_inputs(
+    validate_clean_chemo_inputs(
       annot_table_wei_chemo = tidytable::tidytable(),
       candidates_final = 0,
       best_percentile = 0.9,
@@ -60,7 +59,7 @@ test_that("validate_clean_chemo_inputs rejects invalid candidates_final", {
 
 test_that("validate_clean_chemo_inputs rejects best_percentile out of range", {
   expect_error(
-    tima:::validate_clean_chemo_inputs(
+    validate_clean_chemo_inputs(
       annot_table_wei_chemo = tidytable::tidytable(),
       candidates_final = 10,
       best_percentile = 1.5,
@@ -78,7 +77,7 @@ test_that("validate_clean_chemo_inputs rejects best_percentile out of range", {
 
 test_that("validate_clean_chemo_inputs rejects invalid minimal_ms1_condition", {
   expect_error(
-    tima:::validate_clean_chemo_inputs(
+    validate_clean_chemo_inputs(
       annot_table_wei_chemo = tidytable::tidytable(),
       candidates_final = 10,
       best_percentile = 0.9,
@@ -96,7 +95,7 @@ test_that("validate_clean_chemo_inputs rejects invalid minimal_ms1_condition", {
 
 test_that("validate_clean_chemo_inputs rejects non-logical parameters", {
   expect_error(
-    tima:::validate_clean_chemo_inputs(
+    validate_clean_chemo_inputs(
       annot_table_wei_chemo = tidytable::tidytable(),
       candidates_final = 10,
       best_percentile = 0.9,
@@ -112,9 +111,7 @@ test_that("validate_clean_chemo_inputs rejects non-logical parameters", {
   )
 })
 
-# ==============================================================================
-# Test Suite: filter_ms1_annotations
-# ==============================================================================
+## Filter_ms1_annotations ----
 
 test_that("filter_ms1_annotations keeps MS2 annotations", {
   df <- tidytable::tidytable(
@@ -125,7 +122,7 @@ test_that("filter_ms1_annotations keeps MS2 annotations", {
     score_chemical = c(0.3, 0.3, 0.9)
   )
 
-  result <- tima:::filter_ms1_annotations(
+  result <- filter_ms1_annotations(
     df,
     minimal_ms1_bio = 0.5,
     minimal_ms1_chemo = 0.5,
@@ -146,7 +143,7 @@ test_that("filter_ms1_annotations applies OR condition correctly", {
     score_chemical = c(0.4, 0.6, 0.4, 0.4)
   )
 
-  result <- tima:::filter_ms1_annotations(
+  result <- filter_ms1_annotations(
     df,
     minimal_ms1_bio = 0.5,
     minimal_ms1_chemo = 0.5,
@@ -167,7 +164,7 @@ test_that("filter_ms1_annotations applies AND condition correctly", {
     score_chemical = c(0.6, 0.6, 0.4)
   )
 
-  result <- tima:::filter_ms1_annotations(
+  result <- filter_ms1_annotations(
     df,
     minimal_ms1_bio = 0.5,
     minimal_ms1_chemo = 0.5,
@@ -179,9 +176,7 @@ test_that("filter_ms1_annotations applies AND condition correctly", {
   expect_equal(result$feature_id, "F1")
 })
 
-# ==============================================================================
-# Test Suite: rank_and_deduplicate
-# ==============================================================================
+## rank_and_deduplicate ----
 
 test_that("rank_and_deduplicate keeps best structure per feature", {
   df <- tidytable::tidytable(
@@ -191,7 +186,7 @@ test_that("rank_and_deduplicate keeps best structure per feature", {
     candidate_score_pseudo_initial = c(0.95, 0.85, 0.75)
   )
 
-  result <- tima:::rank_and_deduplicate(df)
+  result <- rank_and_deduplicate(df)
 
   # Should keep only unique feature+inchikey combinations
   expect_equal(nrow(result), 2)
@@ -206,7 +201,7 @@ test_that("rank_and_deduplicate ranks correctly", {
     candidate_score_pseudo_initial = c(0.95, 0.85, 0.75)
   )
 
-  result <- tima:::rank_and_deduplicate(df)
+  result <- rank_and_deduplicate(df)
 
   # Highest scores should have rank 1
   expect_equal(
@@ -223,9 +218,7 @@ test_that("rank_and_deduplicate ranks correctly", {
   )
 })
 
-# ==============================================================================
-# Test Suite: apply_percentile_filter
-# ==============================================================================
+## apply_percentile_filter ----
 
 test_that("apply_percentile_filter keeps top candidates", {
   df <- tidytable::tidytable(
@@ -233,7 +226,7 @@ test_that("apply_percentile_filter keeps top candidates", {
     score_weighted_chemo = c(1.0, 0.9, 0.5)
   )
 
-  result <- tima:::apply_percentile_filter(df, best_percentile = 0.9)
+  result <- apply_percentile_filter(df, best_percentile = 0.9)
 
   # Only scores >= 0.9 * max(1.0) = 0.9 should pass
   expect_equal(nrow(result), 2)
@@ -246,16 +239,14 @@ test_that("apply_percentile_filter works per feature", {
     score_weighted_chemo = c(1.0, 0.5, 0.8, 0.4)
   )
 
-  result <- tima:::apply_percentile_filter(df, best_percentile = 0.9)
+  result <- apply_percentile_filter(df, best_percentile = 0.9)
 
   # F1: max=1.0, keep >= 0.9 (only first)
   # F2: max=0.8, keep >= 0.72 (only first)
   expect_equal(nrow(result), 2)
 })
 
-# ==============================================================================
-# Test Suite: count_candidates
-# ==============================================================================
+## count_candidates ----
 
 test_that("count_candidates returns correct counts", {
   df_ranked <- tidytable::tidytable(
@@ -266,7 +257,7 @@ test_that("count_candidates returns correct counts", {
     feature_id = c("F1", "F1", "F2")
   )
 
-  result <- tima:::count_candidates(df_ranked, df_percentile)
+  result <- count_candidates(df_ranked, df_percentile)
 
   expect_equal(nrow(result), 2)
   expect_equal(result$candidates_evaluated[result$feature_id == "F1"], 3)
@@ -275,9 +266,7 @@ test_that("count_candidates returns correct counts", {
   expect_equal(result$candidates_best[result$feature_id == "F2"], 1)
 })
 
-# ==============================================================================
-# Test Suite: compute_classyfire_taxonomy
-# ==============================================================================
+## compute_classyfire_taxonomy ----
 
 test_that("compute_classyfire_taxonomy selects highest weighted level", {
   df <- tidytable::tidytable(
@@ -299,7 +288,7 @@ test_that("compute_classyfire_taxonomy selects highest weighted level", {
     w_cla_par = 1.0
   )
 
-  result <- tima:::compute_classyfire_taxonomy(df, weights)
+  result <- compute_classyfire_taxonomy(df, weights)
 
   # Highest score (0.8) should be selected
   expect_equal(result$label_classyfire_predicted, "Parent1")
@@ -326,15 +315,13 @@ test_that("compute_classyfire_taxonomy filters empty labels", {
     w_cla_par = 1.0
   )
 
-  result <- tima:::compute_classyfire_taxonomy(df, weights)
+  result <- compute_classyfire_taxonomy(df, weights)
 
   # Should filter out empty labels
   expect_equal(nrow(result), 0)
 })
 
-# ==============================================================================
-# Test Suite: compute_npclassifier_taxonomy
-# ==============================================================================
+## compute_npclassifier_taxonomy ----
 
 test_that("compute_npclassifier_taxonomy selects highest weighted level", {
   df <- tidytable::tidytable(
@@ -353,16 +340,14 @@ test_that("compute_npclassifier_taxonomy selects highest weighted level", {
     w_npc_cla = 1.0
   )
 
-  result <- tima:::compute_npclassifier_taxonomy(df, weights)
+  result <- compute_npclassifier_taxonomy(df, weights)
 
   # Highest score (0.7) should be selected
   expect_equal(result$label_npclassifier_predicted, "Class1")
   expect_equal(result$score_npclassifier, 0.7)
 })
 
-# ==============================================================================
-# Test Suite: remove_compound_names
-# ==============================================================================
+## remove_compound_names ----
 
 test_that("remove_compound_names removes names when compounds_names is FALSE", {
   results_list <- list(
@@ -380,7 +365,7 @@ test_that("remove_compound_names removes names when compounds_names is FALSE", {
     )
   )
 
-  result <- tima:::remove_compound_names(results_list, compounds_names = FALSE)
+  result <- remove_compound_names(results_list, compounds_names = FALSE)
 
   expect_false("candidate_structure_name" %in% names(result$full))
   expect_false("candidate_structure_name" %in% names(result$filtered))
@@ -403,16 +388,14 @@ test_that("remove_compound_names keeps names when compounds_names is TRUE", {
     )
   )
 
-  result <- tima:::remove_compound_names(results_list, compounds_names = TRUE)
+  result <- remove_compound_names(results_list, compounds_names = TRUE)
 
   expect_true("candidate_structure_name" %in% names(result$full))
   expect_true("candidate_structure_name" %in% names(result$filtered))
   expect_true("candidate_structure_name" %in% names(result$mini))
 })
 
-# ==============================================================================
-# Test Suite: clean_chemo - Integration Tests
-# ==============================================================================
+## Integration Tests ----
 
 test_that("clean_chemo handles empty data frame", {
   result <- clean_chemo(
@@ -435,9 +418,6 @@ test_that("clean_chemo handles empty data frame", {
 })
 
 test_that("clean_chemo returns list with correct structure", {
-  # Skip if dependencies not available
-  skip_if_not_installed("tidytable")
-
   # Create minimal test data
   annot_table_wei_chemo <- tidytable::tidytable(
     feature_id = c("F1", "F2"),
@@ -455,9 +435,7 @@ test_that("clean_chemo returns list with correct structure", {
   expect_true(TRUE)
 })
 
-# ==============================================================================
-# Test Suite: Edge Cases
-# ==============================================================================
+## Edge Cases ----
 
 test_that("filter_ms1_annotations handles all NA scores", {
   df <- tidytable::tidytable(
@@ -468,7 +446,7 @@ test_that("filter_ms1_annotations handles all NA scores", {
     score_chemical = c(NA_real_)
   )
 
-  result <- tima:::filter_ms1_annotations(
+  result <- filter_ms1_annotations(
     df,
     minimal_ms1_bio = 0.5,
     minimal_ms1_chemo = 0.5,
@@ -485,7 +463,7 @@ test_that("apply_percentile_filter handles single row per feature", {
     score_weighted_chemo = c(0.8)
   )
 
-  result <- tima:::apply_percentile_filter(df, best_percentile = 0.9)
+  result <- apply_percentile_filter(df, best_percentile = 0.9)
 
   # Single row should always pass (score >= 0.9 * score)
   expect_equal(nrow(result), 1)
@@ -499,7 +477,7 @@ test_that("rank_and_deduplicate handles empty data frame", {
     candidate_score_pseudo_initial = numeric()
   )
 
-  result <- tima:::rank_and_deduplicate(df)
+  result <- rank_and_deduplicate(df)
 
   expect_equal(nrow(result), 0)
   expect_true("rank_final" %in% names(result))
@@ -515,15 +493,13 @@ test_that("count_candidates handles features in ranked but not in percentile", {
     feature_id = c("F1")
   )
 
-  result <- tima:::count_candidates(df_ranked, df_percentile)
+  result <- count_candidates(df_ranked, df_percentile)
 
   expect_equal(nrow(result), 2)
   expect_true(is.na(result$candidates_best[result$feature_id == "F2"]))
 })
 
-# ==============================================================================
-# Additional Test Suite: filter_ms1_annotations - Comprehensive Edge Cases
-# ==============================================================================
+## filter_ms1_annotations - Comprehensive Edge Cases ----
 
 test_that("filter_ms1_annotations keeps annotations with SIRIUS CSI scores", {
   df <- tidytable::tidytable(
@@ -534,7 +510,7 @@ test_that("filter_ms1_annotations keeps annotations with SIRIUS CSI scores", {
     score_chemical = c(0.1, 0.1, 0.1)
   )
 
-  result <- tima:::filter_ms1_annotations(
+  result <- filter_ms1_annotations(
     df,
     minimal_ms1_bio = 0.5,
     minimal_ms1_chemo = 0.5,
@@ -555,7 +531,7 @@ test_that("filter_ms1_annotations handles mixed AND condition", {
     score_chemical = c(0.4, 0.6, 0.6, 0.6)
   )
 
-  result <- tima:::filter_ms1_annotations(
+  result <- filter_ms1_annotations(
     df,
     minimal_ms1_bio = 0.5,
     minimal_ms1_chemo = 0.5,
@@ -567,9 +543,7 @@ test_that("filter_ms1_annotations handles mixed AND condition", {
   expect_true(all(c("F2", "F4") %in% result$feature_id))
 })
 
-# ==============================================================================
-# Additional Test Suite: rank_and_deduplicate - Comprehensive Tests
-# ==============================================================================
+## rank_and_deduplicate - Comprehensive Tests ----
 
 test_that("rank_and_deduplicate handles multiple features with ties", {
   df <- tidytable::tidytable(
@@ -585,7 +559,7 @@ test_that("rank_and_deduplicate handles multiple features with ties", {
     candidate_score_pseudo_initial = c(0.95, 0.95, 0.75, 0.85, 0.65)
   )
 
-  result <- tima:::rank_and_deduplicate(df)
+  result <- rank_and_deduplicate(df)
 
   # Should have 5 rows (all unique feature+inchikey combinations)
   expect_equal(nrow(result), 5)
@@ -609,16 +583,14 @@ test_that("rank_and_deduplicate sorts by score correctly", {
     candidate_score_pseudo_initial = c(0.5, 0.9, 0.7, 0.3, 0.8)
   )
 
-  result <- tima:::rank_and_deduplicate(df)
+  result <- rank_and_deduplicate(df)
 
   # First row should have highest score
   expect_equal(result$score_weighted_chemo[1], 0.9)
   expect_equal(result$rank_final[1], 1)
 })
 
-# ==============================================================================
-# Additional Test Suite: apply_percentile_filter - Edge Cases
-# ==============================================================================
+## apply_percentile_filter - Edge Cases ----
 
 test_that("apply_percentile_filter with 0.0 percentile keeps all", {
   df <- tidytable::tidytable(
@@ -626,7 +598,7 @@ test_that("apply_percentile_filter with 0.0 percentile keeps all", {
     score_weighted_chemo = c(1.0, 0.5, 0.1)
   )
 
-  result <- tima:::apply_percentile_filter(df, best_percentile = 0.0)
+  result <- apply_percentile_filter(df, best_percentile = 0.0)
 
   # All scores >= 0.0 * max should pass
   expect_equal(nrow(result), 3)
@@ -638,7 +610,7 @@ test_that("apply_percentile_filter with 1.0 percentile keeps only max", {
     score_weighted_chemo = c(1.0, 0.99, 0.9)
   )
 
-  result <- tima:::apply_percentile_filter(df, best_percentile = 1.0)
+  result <- apply_percentile_filter(df, best_percentile = 1.0)
 
   # Only score >= 1.0 * max (i.e., max itself)
   expect_equal(nrow(result), 1)
@@ -651,15 +623,13 @@ test_that("apply_percentile_filter handles zero scores", {
     score_weighted_chemo = c(0.0, 0.0)
   )
 
-  result <- tima:::apply_percentile_filter(df, best_percentile = 0.9)
+  result <- apply_percentile_filter(df, best_percentile = 0.9)
 
   # 0 >= 0.9 * 0 = 0, both should pass
   expect_equal(nrow(result), 2)
 })
 
-# ==============================================================================
-# Additional Test Suite: compute_classyfire_taxonomy - Comprehensive
-# ==============================================================================
+## compute_classyfire_taxonomy - Comprehensive ----
 
 test_that("compute_classyfire_taxonomy handles all NA scores", {
   df <- tidytable::tidytable(
@@ -681,7 +651,7 @@ test_that("compute_classyfire_taxonomy handles all NA scores", {
     w_cla_par = 1.0
   )
 
-  result <- tima:::compute_classyfire_taxonomy(df, weights)
+  result <- compute_classyfire_taxonomy(df, weights)
 
   # Should handle NA scores gracefully
   expect_equal(nrow(result), 0)
@@ -708,7 +678,7 @@ test_that("compute_classyfire_taxonomy respects weights", {
     w_cla_par = 10.0
   )
 
-  result <- tima:::compute_classyfire_taxonomy(df, weights)
+  result <- compute_classyfire_taxonomy(df, weights)
 
   # Parent should win due to weight (0.2 * 10.0 = 2.0 > others)
   expect_equal(result$label_classyfire_predicted, "Parent1")
@@ -734,15 +704,13 @@ test_that("compute_classyfire_taxonomy handles missing middle levels", {
     w_cla_par = 1.0
   )
 
-  result <- tima:::compute_classyfire_taxonomy(df, weights)
+  result <- compute_classyfire_taxonomy(df, weights)
 
   # Should select parent (highest score)
   expect_equal(result$label_classyfire_predicted, "Parent1")
 })
 
-# ==============================================================================
-# Additional Test Suite: compute_npclassifier_taxonomy - Comprehensive
-# ==============================================================================
+## compute_npclassifier_taxonomy - Comprehensive ----
 
 test_that("compute_npclassifier_taxonomy handles all NA scores", {
   df <- tidytable::tidytable(
@@ -761,7 +729,7 @@ test_that("compute_npclassifier_taxonomy handles all NA scores", {
     w_npc_cla = 1.0
   )
 
-  result <- tima:::compute_npclassifier_taxonomy(df, weights)
+  result <- compute_npclassifier_taxonomy(df, weights)
 
   # Should filter out when all are empty/NA
   expect_equal(nrow(result), 0)
@@ -785,7 +753,7 @@ test_that("compute_npclassifier_taxonomy respects weights", {
     w_npc_cla = 0.1
   )
 
-  result <- tima:::compute_npclassifier_taxonomy(df, weights)
+  result <- compute_npclassifier_taxonomy(df, weights)
 
   # Pathway should win due to weight (0.3 * 10.0 = 3.0 > others)
   expect_equal(result$label_npclassifier_predicted, "Pathway1")
@@ -808,20 +776,18 @@ test_that("compute_npclassifier_taxonomy filters empty labels", {
     w_npc_cla = 1.0
   )
 
-  result <- tima:::compute_npclassifier_taxonomy(df, weights)
+  result <- compute_npclassifier_taxonomy(df, weights)
 
   # Only F2 should remain (has non-empty label)
   expect_equal(nrow(result), 1)
   expect_equal(result$feature_id, "F2")
 })
 
-# ==============================================================================
-# Additional Test Suite: Validation - Boundary Values
-# ==============================================================================
+## Validation - Boundary Values ----
 
 test_that("validate_clean_chemo_inputs accepts boundary values", {
   expect_silent(
-    tima:::validate_clean_chemo_inputs(
+    validate_clean_chemo_inputs(
       annot_table_wei_chemo = tidytable::tidytable(x = 1),
       candidates_final = 1, # minimum
       best_percentile = 0, # minimum
@@ -838,7 +804,7 @@ test_that("validate_clean_chemo_inputs accepts boundary values", {
 
 test_that("validate_clean_chemo_inputs rejects candidates_final = 0.5", {
   expect_error(
-    tima:::validate_clean_chemo_inputs(
+    validate_clean_chemo_inputs(
       annot_table_wei_chemo = tidytable::tidytable(),
       candidates_final = 0.5,
       best_percentile = 0.9,
@@ -856,7 +822,7 @@ test_that("validate_clean_chemo_inputs rejects candidates_final = 0.5", {
 
 test_that("validate_clean_chemo_inputs rejects multiple invalid logical params", {
   expect_error(
-    tima:::validate_clean_chemo_inputs(
+    validate_clean_chemo_inputs(
       annot_table_wei_chemo = tidytable::tidytable(),
       candidates_final = 10,
       best_percentile = 0.9,

@@ -4,7 +4,7 @@
 
 test_that("validate_sop_merged_inputs accepts valid inputs", {
   expect_silent(
-    tima:::validate_sop_merged_inputs(
+    validate_sop_merged_inputs(
       files = c("file1.tsv"),
       filter = FALSE,
       level = "family",
@@ -22,7 +22,7 @@ test_that("validate_sop_merged_inputs accepts valid inputs", {
 
 test_that("validate_sop_merged_inputs rejects invalid filter", {
   expect_error(
-    tima:::validate_sop_merged_inputs(
+    validate_sop_merged_inputs(
       files = c("file1.tsv"),
       filter = "yes",
       level = "family",
@@ -41,7 +41,7 @@ test_that("validate_sop_merged_inputs rejects invalid filter", {
 
 test_that("validate_sop_merged_inputs rejects invalid level", {
   expect_error(
-    tima:::validate_sop_merged_inputs(
+    validate_sop_merged_inputs(
       files = c("file1.tsv"),
       filter = TRUE,
       level = "invalid_level",
@@ -68,7 +68,7 @@ test_that("complete_organism_taxonomy handles empty missing data", {
     kingdom = c("Plantae", "Plantae")
   )
 
-  result <- tima:::complete_organism_taxonomy(table_keys, table_org_tax_ott)
+  result <- complete_organism_taxonomy(table_keys, table_org_tax_ott)
 
   expect_equal(nrow(result), 2)
 })
@@ -86,7 +86,7 @@ test_that("apply_taxonomic_filter filters correctly", {
     organism_taxonomy_ottol_family = c("Fam1", "Fam2", "Fam1")
   )
 
-  result <- tima:::apply_taxonomic_filter(
+  result <- apply_taxonomic_filter(
     table_keys,
     table_org_tax_ott,
     level = "family",
@@ -111,7 +111,7 @@ test_that("apply_taxonomic_filter errors on no matches", {
   )
 
   expect_error(
-    tima:::apply_taxonomic_filter(
+    apply_taxonomic_filter(
       table_keys,
       table_org_tax_ott,
       level = "family",

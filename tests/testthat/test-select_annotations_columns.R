@@ -35,7 +35,7 @@ make_fake_struct_files <- function(root = tempdir()) {
 
 test_that("select_annotations_columns handles empty input", {
   df <- tidytable::tidytable()
-  result <- tima:::select_annotations_columns(df)
+  result <- select_annotations_columns(df)
   expect_equal(nrow(result), 0)
 })
 
@@ -52,7 +52,7 @@ test_that("select_annotations_columns handles empty input", {
 #     candidate_structure_error_rt = c(0.01, 0.02)
 #   )
 #
-#   result <- tima:::select_annotations_columns(
+#   result <- select_annotations_columns(
 #     df = df,
 #     str_stereo = paths$stereo,
 #     str_met = paths$met,
@@ -76,7 +76,7 @@ test_that("select_annotations_columns handles empty input", {
 #     candidate_score_sirius_intensity = 100,
 #     candidate_structure_error_rt = 0.01
 #   )
-#   result <- tima:::select_annotations_columns(
+#   result <- select_annotations_columns(
 #     df = df,
 #     str_stereo = paths$stereo,
 #     str_met = paths$met,
@@ -94,7 +94,7 @@ test_that("select_annotations_columns handles empty input", {
 #     feature_id = c("F1", "F2"),
 #     feature_spectrum_entropy = c(0.5, 0.9)
 #   )
-#   result <- tima:::select_annotations_columns(
+#   result <- select_annotations_columns(
 #     df = df,
 #     str_stereo = paths$stereo,
 #     str_met = paths$met,

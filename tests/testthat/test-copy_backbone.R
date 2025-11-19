@@ -1,22 +1,10 @@
-# ==============================================================================
-# Test Suite: copy_backbone
-# ==============================================================================
-#
-# @description
-# Unit tests for the copy_backbone function, which copies the package directory
-# structure to a cache location for project initialization.
-#
-# @coverage
-# - Input validation (cache_dir, package parameters)
-# - Directory creation and handling
-# - Content verification
-# - Integration with get_default_paths
-# - Error handling
-# - Return value behavior
+# Test Suite: copy_backbone ----
 
-# ==============================================================================
-# Input Validation Tests
-# ==============================================================================
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
+
+## Input Validation ----
 
 test_that("copy_backbone validates cache_dir must be non-NULL character", {
   expect_error(
@@ -93,9 +81,7 @@ test_that("copy_backbone rejects non-existent package names", {
   )
 })
 
-# ==============================================================================
-# Directory Creation Tests
-# ==============================================================================
+## Directory Creation ----
 
 test_that("copy_backbone creates cache directory when it doesn't exist", {
   temp_dir <- withr::local_tempdir()
@@ -121,9 +107,7 @@ test_that("copy_backbone handles existing cache directory gracefully", {
   expect_no_error(copy_backbone(cache_dir = temp_dir))
 })
 
-# ==============================================================================
-# Content Verification Tests
-# ==============================================================================
+## Content Verification ----
 
 test_that("copy_backbone copies package structure to cache directory", {
   temp_dir <- withr::local_tempdir()
@@ -154,9 +138,7 @@ test_that("copy_backbone creates expected directory structure", {
   )
 })
 
-# ==============================================================================
-# Path Handling Tests
-# ==============================================================================
+## Path Handling ----
 
 test_that("copy_backbone works with relative paths", {
   temp_dir <- withr::local_tempdir()
@@ -181,9 +163,7 @@ test_that("copy_backbone works with absolute paths", {
   )
 })
 
-# ==============================================================================
-# Integration Tests
-# ==============================================================================
+# Integration ----
 
 test_that("copy_backbone integrates with get_default_paths after copying", {
   temp_dir <- withr::local_tempdir()
@@ -202,9 +182,7 @@ test_that("copy_backbone supports local_test_project workflow", {
   expect_type(paths, "list")
 })
 
-# ==============================================================================
-# Return Value Tests
-# ==============================================================================
+## Return Value ----
 
 test_that("copy_backbone returns invisibly", {
   temp_dir <- withr::local_tempdir()
@@ -215,9 +193,7 @@ test_that("copy_backbone returns invisibly", {
   expect_false(result$visible, info = "Return should be invisible")
 })
 
-# ==============================================================================
-# Edge Cases and Special Scenarios
-# ==============================================================================
+## Edge Cases and Special Scenarios ----
 
 test_that("copy_backbone handles nested cache directory paths", {
   temp_dir <- withr::local_tempdir()

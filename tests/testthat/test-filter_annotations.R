@@ -10,7 +10,7 @@ test_that("validate_filter_annotations_inputs accepts valid inputs", {
   writeLines("", "ann.tsv")
 
   expect_silent(
-    tima:::validate_filter_annotations_inputs(
+    validate_filter_annotations_inputs(
       annotations = "ann.tsv",
       features = "features.tsv",
       rts = character(0),
@@ -28,7 +28,7 @@ test_that("validate_filter_annotations_inputs rejects invalid tolerance_rt", {
   writeLines("", "ann.tsv")
 
   expect_error(
-    tima:::validate_filter_annotations_inputs(
+    validate_filter_annotations_inputs(
       annotations = "ann.tsv",
       features = "features.tsv",
       rts = character(0),
@@ -46,7 +46,7 @@ test_that("validate_filter_annotations_inputs rejects missing files", {
   writeLines("", "features.tsv")
 
   expect_error(
-    tima:::validate_filter_annotations_inputs(
+    validate_filter_annotations_inputs(
       annotations = "nonexistent.tsv",
       features = "features.tsv",
       rts = character(0),
@@ -70,7 +70,7 @@ test_that("filter_ms1_redundancy removes MS1 when spectral exists", {
 
   annotation_list <- list(ms1 = ms1, spectral = spectral)
 
-  result <- tima:::filter_ms1_redundancy(annotation_list)
+  result <- filter_ms1_redundancy(annotation_list)
 
   # Should keep: F2 from MS1 (no spectral match) + F1 from spectral
   expect_equal(nrow(result), 2)
@@ -86,7 +86,7 @@ test_that("filter_ms1_redundancy handles no MS1 annotations", {
 
   annotation_list <- list(spectral = spectral)
 
-  result <- tima:::filter_ms1_redundancy(annotation_list)
+  result <- filter_ms1_redundancy(annotation_list)
 
   expect_equal(nrow(result), 2)
 })
@@ -103,7 +103,7 @@ test_that("apply_rt_filter filters by tolerance", {
     rt_target = c("1.48", "2.2", "3.0")
   )
 
-  result <- tima:::apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
+  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
 
   # F1: |1.5 - 1.48| = 0.02 ≤ 0.1 ✓
   # F2: |2.0 - 2.2| = 0.2 > 0.1 ✗
@@ -124,7 +124,7 @@ test_that("apply_rt_filter keeps annotations without RT standards", {
     rt_target = c("1.48")
   )
 
-  result <- tima:::apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
+  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
 
   # F1: within tolerance
   # F2: no RT standard, should be kept (NA handling)
@@ -144,7 +144,7 @@ test_that("validate_filter_annotations_inputs accepts list of annotations", {
   writeLines("", "ann2.tsv")
 
   expect_silent(
-    tima:::validate_filter_annotations_inputs(
+    validate_filter_annotations_inputs(
       annotations = list("ann1.tsv", "ann2.tsv"),
       features = "features.tsv",
       rts = character(0),
@@ -161,7 +161,7 @@ test_that("validate_filter_annotations_inputs rejects empty annotations", {
   writeLines("", "features.tsv")
 
   expect_error(
-    tima:::validate_filter_annotations_inputs(
+    validate_filter_annotations_inputs(
       annotations = character(0),
       features = "features.tsv",
       rts = character(0),
@@ -180,7 +180,7 @@ test_that("validate_filter_annotations_inputs rejects non-character output", {
   writeLines("", "ann.tsv")
 
   expect_error(
-    tima:::validate_filter_annotations_inputs(
+    validate_filter_annotations_inputs(
       annotations = "ann.tsv",
       features = "features.tsv",
       rts = character(0),
@@ -199,7 +199,7 @@ test_that("validate_filter_annotations_inputs rejects zero tolerance", {
   writeLines("", "ann.tsv")
 
   expect_error(
-    tima:::validate_filter_annotations_inputs(
+    validate_filter_annotations_inputs(
       annotations = "ann.tsv",
       features = "features.tsv",
       rts = character(0),
@@ -219,7 +219,7 @@ test_that("validate_filter_annotations_inputs rejects missing RT files", {
   writeLines("", "rt1.tsv")
 
   expect_error(
-    tima:::validate_filter_annotations_inputs(
+    validate_filter_annotations_inputs(
       annotations = "ann.tsv",
       features = "features.tsv",
       rts = c("rt1.tsv", "rt2.tsv"),
@@ -247,7 +247,7 @@ test_that("filter_ms1_redundancy handles only spectral annotations", {
 
   annotation_list <- list(spectral1 = spectral1, spectral2 = spectral2)
 
-  result <- tima:::filter_ms1_redundancy(annotation_list)
+  result <- filter_ms1_redundancy(annotation_list)
 
   expect_equal(nrow(result), 3)
 })
@@ -265,7 +265,7 @@ test_that("filter_ms1_redundancy removes all MS1 when all have spectral matches"
 
   annotation_list <- list(ms1 = ms1, spectral = spectral)
 
-  result <- tima:::filter_ms1_redundancy(annotation_list)
+  result <- filter_ms1_redundancy(annotation_list)
 
   # All MS1 removed, only spectral kept
   expect_equal(nrow(result), 2)
@@ -284,7 +284,7 @@ test_that("filter_ms1_redundancy keeps MS1 with different inchikeys", {
 
   annotation_list <- list(ms1 = ms1, spectral = spectral)
 
-  result <- tima:::filter_ms1_redundancy(annotation_list)
+  result <- filter_ms1_redundancy(annotation_list)
 
   # F1-A removed from MS1, F1-B kept, plus F1-A from spectral = 2 rows
   expect_equal(nrow(result), 2)
@@ -304,7 +304,7 @@ test_that("filter_ms1_redundancy handles empty MS1 table", {
 
   annotation_list <- list(ms1 = ms1, spectral = spectral)
 
-  result <- tima:::filter_ms1_redundancy(annotation_list)
+  result <- filter_ms1_redundancy(annotation_list)
 
   expect_equal(nrow(result), 1)
 })
@@ -331,7 +331,7 @@ test_that("filter_ms1_redundancy handles multiple spectral sources", {
     spectral2 = spectral2
   )
 
-  result <- tima:::filter_ms1_redundancy(annotation_list)
+  result <- filter_ms1_redundancy(annotation_list)
 
   # F1 and F2 removed from MS1, F3 kept from MS1, F1 and F2 from spectral
   expect_equal(nrow(result), 3)
@@ -354,7 +354,7 @@ test_that("apply_rt_filter handles exact RT match", {
     rt_target = c("1.5")
   )
 
-  result <- tima:::apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.01)
+  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.01)
 
   expect_equal(nrow(result), 1)
 })
@@ -390,7 +390,7 @@ test_that("apply_rt_filter removes duplicates keeping closest RT", {
     rt_target = c("1.5")
   )
 
-  result <- tima:::apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.05)
+  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.05)
 
   # Should keep only one F1-A, the one with closest RT (1.5)
   expect_equal(nrow(result), 1)
@@ -409,7 +409,7 @@ test_that("apply_rt_filter handles all annotations outside tolerance", {
     rt_target = c("2.0", "3.5")
   )
 
-  result <- tima:::apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
+  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
 
   # F1: |1.5 - 2.0| = 0.5 > 0.1 ✗
   # F2: |2.0 - 3.5| = 1.5 > 0.1 ✗
@@ -428,7 +428,7 @@ test_that("apply_rt_filter handles empty RT table", {
     rt_target = character()
   )
 
-  result <- tima:::apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
+  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
 
   # All should be kept (no RT standards to compare against)
   expect_equal(nrow(result), 2)
@@ -446,7 +446,7 @@ test_that("apply_rt_filter calculates error correctly", {
     rt_target = c("1.8")
   )
 
-  result <- tima:::apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.3)
+  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.3)
 
   # Both within tolerance, but distinct keeps closest:
   # F2: |1.5 - 1.8| = 0.3 (passes, but farther)
@@ -469,7 +469,7 @@ test_that("apply_rt_filter removes optional columns", {
     type = c("standard")
   )
 
-  result <- tima:::apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
+  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
 
   # Should not have rt_target or type columns in result
   expect_false("rt_target" %in% names(result))
