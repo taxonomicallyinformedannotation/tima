@@ -1,21 +1,8 @@
-# ==============================================================================
-# Test Suite: harmonize_spectra - Spectral Library Harmonization
-# ==============================================================================
-#
-# @description
-# Comprehensive unit tests for the harmonize_spectra function, which standardizes
-# spectral library data from various sources into a common format.
-#
-# @coverage
-# - Input validation (data frame, mode, column parameters)
-# - Polarity filtering
-# - Column name standardization
-# - Missing column handling
-# - Edge cases and error handling
+# Test Suite: harmonize_spectra ----
 
-# ==============================================================================
-# Input Validation Tests
-# ==============================================================================
+library(testthat)
+
+## Input Validation ----
 
 test_that("harmonize_spectra validates input is a data frame", {
   expect_error(
@@ -246,9 +233,7 @@ test_that("harmonize_spectra validates vectorized column parameters", {
   )
 })
 
-# ==============================================================================
-# Functional Tests
-# ==============================================================================
+## Functional Tests ----
 
 # test_that("harmonize_spectra filters by polarity", {
 #   df <- data.frame(
