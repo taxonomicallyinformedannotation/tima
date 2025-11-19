@@ -353,28 +353,6 @@ test_that("apply_rt_filter handles exact RT match", {
   expect_equal(nrow(result), 1)
 })
 
-test_that(
-  skip("Not implemented")
-)
-# test_that("apply_rt_filter handles boundary tolerance", {
-#   features_ann <- tidytable::tidytable(
-#     feature_id = c("F1", "F2"),
-#     rt = c("1.5", "1.6"),
-#     candidate_structure_inchikey_connectivity_layer = c("A", "A")
-#   )
-#
-#   rt_table <- tidytable::tidytable(
-#     candidate_structure_inchikey_connectivity_layer = c("A"),
-#     rt_target = c("1.5")
-#   )
-#
-#   result <- apply_rt_filter(features_annotated_table = features_ann, rt_table = rt_table, tolerance_rt = 0.1)
-#
-#   # F1: 0.0 ≤ 0.1 ✓
-#   # F2: 0.1 ≤ 0.1 ✓ (boundary)
-#   expect_equal(nrow(result), 2)
-# })
-
 test_that("apply_rt_filter removes duplicates keeping closest RT", {
   features_ann <- tidytable::tidytable(
     feature_id = c("F1", "F1"),
@@ -471,6 +449,103 @@ test_that("apply_rt_filter removes optional columns", {
   # Should not have rt_target or type columns in result
   expect_false("rt_target" %in% names(result))
   expect_false("type" %in% names(result))
+})
+
+## filter_ms1_redundancy - Additional edge cases ----
+
+test_that("test-filter_ms1_redundancy preserves all MS1 when no spectral overlap", {
+  ms1 <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c("A", "B")
+  )
+
+  spectral <- tidytable::tidytable(
+    feature_id = c("F3", "F4"),
+    candidate_structure_inchikey_connectivity_layer = c("C", "D")
+  )
+
+  annotation_list <- list(ms1 = ms1, spectral = spectral)
+  result <- filter_ms1_redundancy(annotation_list)
+
+  # All 4 annotations should be kept (no overlap)
+  expect_equal(nrow(result), 4)
+})
+
+test_that("test-filter_ms1_redundancy handles empty MS1 table", {
+  ms1 <- tidytable::tidytable(
+    feature_id = character(),
+    candidate_structure_inchikey_connectivity_layer = character()
+  )
+
+  spectral <- tidytable::tidytable(
+    feature_id = c("F1"),
+    candidate_structure_inchikey_connectivity_layer = c("A")
+  )
+
+  annotation_list <- list(ms1 = ms1, spectral = spectral)
+  result <- filter_ms1_redundancy(annotation_list)
+
+  expect_equal(nrow(result), 1)
+  expect_equal(result$feature_id[1], "F1")
+})
+
+## apply_rt_filter - Additional edge cases ----
+
+test_that("test-apply_rt_filter handles features with no RT value", {
+  features_ann <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    rt = c(NA_character_, "2.0"),
+    candidate_structure_inchikey_connectivity_layer = c("A", "B")
+  )
+
+  rt_table <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = c("A", "B"),
+    rt_target = c("1.5", "2.0")
+  )
+
+  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
+
+  # F2 should pass (exact match)
+  # F1 has NA rt, behavior depends on implementation
+  expect_true("F2" %in% result$feature_id)
+})
+
+test_that("test-apply_rt_filter handles empty RT table", {
+  features_ann <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    rt = c("1.5", "2.0"),
+    candidate_structure_inchikey_connectivity_layer = c("A", "B")
+  )
+
+  rt_table <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = character(),
+    rt_target = character()
+  )
+
+  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
+
+  # All features should pass (no RT constraints)
+  expect_equal(nrow(result), 2)
+})
+
+test_that("test-apply_rt_filter calculates RT error correctly", {
+  features_ann <- tidytable::tidytable(
+    feature_id = c("F1"),
+    rt = c("5.0"),
+    candidate_structure_inchikey_connectivity_layer = c("A")
+  )
+
+  rt_table <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = c("A"),
+    rt_target = c("4.5")
+  )
+
+  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 1.0)
+
+  # Error = 5.0 - 4.5 = 0.5, within 1.0 tolerance
+  expect_equal(nrow(result), 1)
+  expect_true("candidate_structure_error_rt" %in% names(result))
+  expect_equal(result$candidate_structure_error_rt[1], 0.5)
 })
 
 ## Integration ----
@@ -605,43 +680,27 @@ test_that(
 #   expect_equal(result, output_file)
 # })
 
-## filter_ms1_redundancy - Additional edge cases ----
-
-test_that("test-filter_ms1_redundancy preserves all MS1 when no spectral overlap", {
-  ms1 <- tidytable::tidytable(
-    feature_id = c("F1", "F2"),
-    candidate_structure_inchikey_connectivity_layer = c("A", "B")
-  )
-
-  spectral <- tidytable::tidytable(
-    feature_id = c("F3", "F4"),
-    candidate_structure_inchikey_connectivity_layer = c("C", "D")
-  )
-
-  annotation_list <- list(ms1 = ms1, spectral = spectral)
-  result <- filter_ms1_redundancy(annotation_list)
-
-  # All 4 annotations should be kept (no overlap)
-  expect_equal(nrow(result), 4)
-})
-
-test_that("test-filter_ms1_redundancy handles empty MS1 table", {
-  ms1 <- tidytable::tidytable(
-    feature_id = character(),
-    candidate_structure_inchikey_connectivity_layer = character()
-  )
-
-  spectral <- tidytable::tidytable(
-    feature_id = c("F1"),
-    candidate_structure_inchikey_connectivity_layer = c("A")
-  )
-
-  annotation_list <- list(ms1 = ms1, spectral = spectral)
-  result <- filter_ms1_redundancy(annotation_list)
-
-  expect_equal(nrow(result), 1)
-  expect_equal(result$feature_id[1], "F1")
-})
+test_that(
+  skip("Not implemented")
+)
+# test_that("apply_rt_filter handles boundary tolerance", {
+#   features_ann <- tidytable::tidytable(
+#     feature_id = c("F1", "F2"),
+#     rt = c("1.5", "1.6"),
+#     candidate_structure_inchikey_connectivity_layer = c("A", "A")
+#   )
+#
+#   rt_table <- tidytable::tidytable(
+#     candidate_structure_inchikey_connectivity_layer = c("A"),
+#     rt_target = c("1.5")
+#   )
+#
+#   result <- apply_rt_filter(features_annotated_table = features_ann, rt_table = rt_table, tolerance_rt = 0.1)
+#
+#   # F1: 0.0 ≤ 0.1 ✓
+#   # F2: 0.1 ≤ 0.1 ✓ (boundary)
+#   expect_equal(nrow(result), 2)
+# })
 
 test_that(
   skip("Not implemented")
@@ -673,62 +732,3 @@ test_that(
 #   expect_equal(nrow(result), 2)
 #   expect_true(all(c("gnps", "sirius") %in% result$source))
 # })
-
-## apply_rt_filter - Additional edge cases ----
-
-test_that("test-apply_rt_filter handles features with no RT value", {
-  features_ann <- tidytable::tidytable(
-    feature_id = c("F1", "F2"),
-    rt = c(NA_character_, "2.0"),
-    candidate_structure_inchikey_connectivity_layer = c("A", "B")
-  )
-
-  rt_table <- tidytable::tidytable(
-    candidate_structure_inchikey_connectivity_layer = c("A", "B"),
-    rt_target = c("1.5", "2.0")
-  )
-
-  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
-
-  # F2 should pass (exact match)
-  # F1 has NA rt, behavior depends on implementation
-  expect_true("F2" %in% result$feature_id)
-})
-
-test_that("test-apply_rt_filter handles empty RT table", {
-  features_ann <- tidytable::tidytable(
-    feature_id = c("F1", "F2"),
-    rt = c("1.5", "2.0"),
-    candidate_structure_inchikey_connectivity_layer = c("A", "B")
-  )
-
-  rt_table <- tidytable::tidytable(
-    candidate_structure_inchikey_connectivity_layer = character(),
-    rt_target = character()
-  )
-
-  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 0.1)
-
-  # All features should pass (no RT constraints)
-  expect_equal(nrow(result), 2)
-})
-
-test_that("test-apply_rt_filter calculates RT error correctly", {
-  features_ann <- tidytable::tidytable(
-    feature_id = c("F1"),
-    rt = c("5.0"),
-    candidate_structure_inchikey_connectivity_layer = c("A")
-  )
-
-  rt_table <- tidytable::tidytable(
-    candidate_structure_inchikey_connectivity_layer = c("A"),
-    rt_target = c("4.5")
-  )
-
-  result <- apply_rt_filter(features_ann, rt_table, tolerance_rt = 1.0)
-
-  # Error = 5.0 - 4.5 = 0.5, within 1.0 tolerance
-  expect_equal(nrow(result), 1)
-  expect_true("candidate_structure_error_rt" %in% names(result))
-  expect_equal(result$candidate_structure_error_rt[1], 0.5)
-})

@@ -86,6 +86,32 @@ test_that("get_params rejects missing or invalid step values", {
 })
 
 # ----------------------------------------------------------------------------
+# prepare_params manual param injection
+# ----------------------------------------------------------------------------
+
+test_that("prepare_params accepts explicit fixture lists", {
+  local_mocked_bindings(
+    load_yaml_files = function() fixture_yamls("MANUAL"),
+    get_params = function(step) {
+      # Mock get_params to handle internal call from replace_id
+      if (step == "prepare_params") {
+        return(fixture_small("MANUAL"))
+      }
+      if (step == "prepare_params_advanced") {
+        return(fixture_adv("MANUAL"))
+      }
+      stop("Unexpected step in test: ", step)
+    },
+    export_params = function(...) character(),
+    create_dir = function(export) invisible(NULL)
+  )
+  expect_silent(prepare_params(
+    params_small = fixture_small("MANUAL"),
+    params_advanced = fixture_adv("MANUAL")
+  ))
+})
+
+# ----------------------------------------------------------------------------
 # get_params: unknown step
 # ----------------------------------------------------------------------------
 
@@ -121,29 +147,3 @@ test_that(
 #
 #   expect_error(get_params("unknown"), "does not exist")
 # })
-
-# ----------------------------------------------------------------------------
-# prepare_params manual param injection
-# ----------------------------------------------------------------------------
-
-test_that("prepare_params accepts explicit fixture lists", {
-  local_mocked_bindings(
-    load_yaml_files = function() fixture_yamls("MANUAL"),
-    get_params = function(step) {
-      # Mock get_params to handle internal call from replace_id
-      if (step == "prepare_params") {
-        return(fixture_small("MANUAL"))
-      }
-      if (step == "prepare_params_advanced") {
-        return(fixture_adv("MANUAL"))
-      }
-      stop("Unexpected step in test: ", step)
-    },
-    export_params = function(...) character(),
-    create_dir = function(export) invisible(NULL)
-  )
-  expect_silent(prepare_params(
-    params_small = fixture_small("MANUAL"),
-    params_advanced = fixture_adv("MANUAL")
-  ))
-})

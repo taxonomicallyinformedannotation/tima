@@ -83,35 +83,6 @@ test_that("prepare_features_tables validates candidates parameter", {
   )
 })
 
-test_that(
-  skip("Not implemented")
-)
-# test_that("prepare_features_tables validates column name parameters", {
-#   paths <- local_test_project(copy = TRUE)
-#
-#   test_features <- file.path("data", "source", "test_features.csv")
-#   tidytable::tidytable(
-#     "row ID" = 1,
-#     "row m/z" = 123.456
-#   ) |>
-#     tidytable::fwrite(test_features)
-#
-#   # Non-character name_features
-#   expect_error(
-#     prepare_features_tables(features = test_features, name_features = 123),
-#     "must be single character string"
-#   )
-#
-#   # Multiple values
-#   expect_error(
-#     prepare_features_tables(
-#       features = test_features,
-#       name_features = c("id1", "id2")
-#     ),
-#     "must be single character string"
-#   )
-# })
-
 ## Format Detection and Standardization ----
 
 test_that("prepare_features_tables handles MZmine format (Peak area)", {
@@ -145,36 +116,6 @@ test_that("prepare_features_tables handles MZmine format (Peak area)", {
   expect_true("feature_id" %in% colnames(prepared))
   expect_true("mz" %in% colnames(prepared))
 })
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("prepare_features_tables handles SLAW format (quant_)", {
-#   paths <- local_test_project(copy = TRUE)
-#
-#   slaw_features <- tidytable::tidytable(
-#     "feature_id" = c("FT001", "FT002"),
-#     "mz" = c(123.456, 234.567),
-#     "rt" = c(1.5, 2.0),
-#     "quant_sample1" = c(1000, 2000),
-#     "quant_sample2" = c(1500, 2500)
-#   )
-#
-#   test_file <- file.path("data", "source", "slaw_features.csv")
-#   tidytable::fwrite(slaw_features, test_file)
-#
-#   output_file <- file.path("data", "interim", "features", "prepared.tsv.gz")
-#
-#   expect_no_error(
-#     prepare_features_tables(
-#       features = test_file,
-#       output = output_file,
-#       candidates = 5
-#     )
-#   )
-#
-#   expect_true(file.exists(output_file))
-# })
 
 test_that("prepare_features_tables handles missing RT column", {
   paths <- local_test_project(copy = TRUE)
@@ -262,6 +203,93 @@ test_that("prepare_features_tables handles empty file", {
   )
 })
 
+test_that("prepare_features_tables handles large feature tables", {
+  skip_on_cran()
+  skip("Large data test - run manually")
+
+  paths <- local_test_project(copy = TRUE)
+
+  # Create large feature table
+  n_features <- 10000
+  large_features <- tidytable::tidytable(
+    "row ID" = seq_len(n_features),
+    "row m/z" = runif(n_features, 100, 1000),
+    "row retention time" = runif(n_features, 0, 30),
+    "sample.mzML Peak area" = runif(n_features, 100, 10000)
+  )
+
+  test_file <- file.path("data", "source", "large.csv")
+  tidytable::fwrite(large_features, test_file)
+
+  start_time <- Sys.time()
+  prepare_features_tables(features = test_file)
+  elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+
+  # Should complete in reasonable time
+  expect_lt(elapsed, 30)
+})
+
+## Output Verification ----
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("prepare_features_tables validates column name parameters", {
+#   paths <- local_test_project(copy = TRUE)
+#
+#   test_features <- file.path("data", "source", "test_features.csv")
+#   tidytable::tidytable(
+#     "row ID" = 1,
+#     "row m/z" = 123.456
+#   ) |>
+#     tidytable::fwrite(test_features)
+#
+#   # Non-character name_features
+#   expect_error(
+#     prepare_features_tables(features = test_features, name_features = 123),
+#     "must be single character string"
+#   )
+#
+#   # Multiple values
+#   expect_error(
+#     prepare_features_tables(
+#       features = test_features,
+#       name_features = c("id1", "id2")
+#     ),
+#     "must be single character string"
+#   )
+# })
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("prepare_features_tables handles SLAW format (quant_)", {
+#   paths <- local_test_project(copy = TRUE)
+#
+#   slaw_features <- tidytable::tidytable(
+#     "feature_id" = c("FT001", "FT002"),
+#     "mz" = c(123.456, 234.567),
+#     "rt" = c(1.5, 2.0),
+#     "quant_sample1" = c(1000, 2000),
+#     "quant_sample2" = c(1500, 2500)
+#   )
+#
+#   test_file <- file.path("data", "source", "slaw_features.csv")
+#   tidytable::fwrite(slaw_features, test_file)
+#
+#   output_file <- file.path("data", "interim", "features", "prepared.tsv.gz")
+#
+#   expect_no_error(
+#     prepare_features_tables(
+#       features = test_file,
+#       output = output_file,
+#       candidates = 5
+#     )
+#   )
+#
+#   expect_true(file.exists(output_file))
+# })
+
 test_that(
   skip("Not implemented")
 )
@@ -290,34 +318,6 @@ test_that(
 #   prepared <- tidytable::fread(output_file)
 #   expect_equal(nrow(prepared), 1L)
 # })
-
-test_that("prepare_features_tables handles large feature tables", {
-  skip_on_cran()
-  skip("Large data test - run manually")
-
-  paths <- local_test_project(copy = TRUE)
-
-  # Create large feature table
-  n_features <- 10000
-  large_features <- tidytable::tidytable(
-    "row ID" = seq_len(n_features),
-    "row m/z" = runif(n_features, 100, 1000),
-    "row retention time" = runif(n_features, 0, 30),
-    "sample.mzML Peak area" = runif(n_features, 100, 10000)
-  )
-
-  test_file <- file.path("data", "source", "large.csv")
-  tidytable::fwrite(large_features, test_file)
-
-  start_time <- Sys.time()
-  prepare_features_tables(features = test_file)
-  elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-
-  # Should complete in reasonable time
-  expect_lt(elapsed, 30)
-})
-
-## Output Verification ----
 
 test_that(
   skip("Not implemented")
