@@ -223,57 +223,6 @@ test_that("weight_bio handles empty annotation table", {
   expect_s3_class(result, "data.frame")
 })
 
-test_that("weight_bio handles annotations without matching organisms", {
-  skip("Known issue: weight_bio has type mismatch bug when no organisms match")
-
-  # Annotations with structures not in organism pairs
-  annotations <- create_test_annotation(
-    feature_ids = c("F1", "F2"),
-    inchikeys = generate_fake_inchikey(2, seed = 99)
-  )
-
-  # Structure-organism pairs with DIFFERENT structures
-  sop_table <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = generate_fake_inchikey(2, seed = 1),
-    organism_name = c("Arabidopsis thaliana", "Coffea arabica"),
-    organism_taxonomy_ottid = c("234567", "345678"),
-    organism_taxonomy_01domain = rep("Eukaryota", 2),
-    organism_taxonomy_02kingdom = rep("Plantae", 2),
-    organism_taxonomy_03phylum = rep("Tracheophyta", 2),
-    organism_taxonomy_04class = rep("Magnoliopsida", 2),
-    organism_taxonomy_05order = c("Brassicales", "Gentianales"),
-    organism_taxonomy_06family = c("Brassicaceae", "Rubiaceae"),
-    organism_taxonomy_07tribe = c(NA, "Coffeeae"),
-    organism_taxonomy_08genus = c("Arabidopsis", "Coffea"),
-    organism_taxonomy_09species = c("Arabidopsis thaliana", "Coffea arabica"),
-    organism_taxonomy_10varietas = c(NA, NA)
-  )
-
-  result <- weight_bio(
-    annotation_table_taxed = annotations,
-    structure_organism_pairs_table = sop_table,
-    weight_spectral = 0.5,
-    weight_biological = 0.5,
-    score_biological_domain = 0.1,
-    score_biological_kingdom = 0.2,
-    score_biological_phylum = 0.3,
-    score_biological_class = 0.4,
-    score_biological_order = 0.5,
-    score_biological_family = 0.6,
-    score_biological_tribe = 0.7,
-    score_biological_genus = 0.8,
-    score_biological_species = 0.9,
-    score_biological_variety = 1.0
-  )
-
-  # Should return results (structures don't match, so bio score = 0)
-  expect_true(nrow(result) > 0)
-  expect_s3_class(result, "data.frame")
-
-  # Should have score_weighted_bio column
-  expect_true("score_weighted_bio" %in% colnames(result))
-})
-
 # =============================================================================
 # Functional Tests - Taxonomic Scoring
 # =============================================================================
@@ -509,6 +458,57 @@ test_that("weight_bio returns expected columns", {
 # =============================================================================
 # Performance Tests
 # =============================================================================
+
+test_that("weight_bio handles annotations without matching organisms", {
+  skip("Known issue: weight_bio has type mismatch bug when no organisms match")
+
+  # Annotations with structures not in organism pairs
+  annotations <- create_test_annotation(
+    feature_ids = c("F1", "F2"),
+    inchikeys = generate_fake_inchikey(2, seed = 99)
+  )
+
+  # Structure-organism pairs with DIFFERENT structures
+  sop_table <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = generate_fake_inchikey(2, seed = 1),
+    organism_name = c("Arabidopsis thaliana", "Coffea arabica"),
+    organism_taxonomy_ottid = c("234567", "345678"),
+    organism_taxonomy_01domain = rep("Eukaryota", 2),
+    organism_taxonomy_02kingdom = rep("Plantae", 2),
+    organism_taxonomy_03phylum = rep("Tracheophyta", 2),
+    organism_taxonomy_04class = rep("Magnoliopsida", 2),
+    organism_taxonomy_05order = c("Brassicales", "Gentianales"),
+    organism_taxonomy_06family = c("Brassicaceae", "Rubiaceae"),
+    organism_taxonomy_07tribe = c(NA, "Coffeeae"),
+    organism_taxonomy_08genus = c("Arabidopsis", "Coffea"),
+    organism_taxonomy_09species = c("Arabidopsis thaliana", "Coffea arabica"),
+    organism_taxonomy_10varietas = c(NA, NA)
+  )
+
+  result <- weight_bio(
+    annotation_table_taxed = annotations,
+    structure_organism_pairs_table = sop_table,
+    weight_spectral = 0.5,
+    weight_biological = 0.5,
+    score_biological_domain = 0.1,
+    score_biological_kingdom = 0.2,
+    score_biological_phylum = 0.3,
+    score_biological_class = 0.4,
+    score_biological_order = 0.5,
+    score_biological_family = 0.6,
+    score_biological_tribe = 0.7,
+    score_biological_genus = 0.8,
+    score_biological_species = 0.9,
+    score_biological_variety = 1.0
+  )
+
+  # Should return results (structures don't match, so bio score = 0)
+  expect_true(nrow(result) > 0)
+  expect_s3_class(result, "data.frame")
+
+  # Should have score_weighted_bio column
+  expect_true("score_weighted_bio" %in% colnames(result))
+})
 
 test_that(
   skip("Not implemented")
