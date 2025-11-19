@@ -1,6 +1,6 @@
-# ==============================================================================
-# Test Suite: filter_annotations
-# ==============================================================================
+# Test Suite: filter_annotations ----
+
+library(testthat)
 
 test_that("validate_filter_annotations_inputs accepts valid inputs", {
   tmp <- withr::local_tempdir()
@@ -131,9 +131,7 @@ test_that("apply_rt_filter keeps annotations without RT standards", {
   expect_equal(nrow(result), 2)
 })
 
-# ==============================================================================
-# Additional Test Suite: validate_filter_annotations_inputs - Edge Cases
-# ==============================================================================
+## validate_filter_annotations_inputs - Edge Cases ----
 
 test_that("validate_filter_annotations_inputs accepts list of annotations", {
   tmp <- withr::local_tempdir()
@@ -230,9 +228,7 @@ test_that("validate_filter_annotations_inputs rejects missing RT files", {
   )
 })
 
-# ==============================================================================
-# Additional Test Suite: filter_ms1_redundancy - Comprehensive
-# ==============================================================================
+## filter_ms1_redundancy -----
 
 test_that("filter_ms1_redundancy handles only spectral annotations", {
   spectral1 <- tidytable::tidytable(
@@ -338,9 +334,7 @@ test_that("filter_ms1_redundancy handles multiple spectral sources", {
   expect_true("C" %in% result$candidate_structure_inchikey_connectivity_layer)
 })
 
-# ==============================================================================
-# Additional Test Suite: apply_rt_filter - Comprehensive
-# ==============================================================================
+## apply_rt_filter ----
 
 test_that("apply_rt_filter handles exact RT match", {
   features_ann <- tidytable::tidytable(
@@ -476,10 +470,7 @@ test_that("apply_rt_filter removes optional columns", {
   expect_false("type" %in% names(result))
 })
 
-# ==============================================================================
-# Test Group: filter_annotations - Integration tests
-# Purpose: Test full filter_annotations workflow
-# ==============================================================================
+## Integration ----
 
 # test_that("test-filter_annotations processes annotations successfully", {
 #   tmp <- withr::local_tempdir()
@@ -602,9 +593,7 @@ test_that("apply_rt_filter removes optional columns", {
 #   expect_equal(result, output_file)
 # })
 
-# ==============================================================================
-# Test Group: filter_ms1_redundancy - Additional edge cases
-# ==============================================================================
+## filter_ms1_redundancy - Additional edge cases ----
 
 test_that("test-filter_ms1_redundancy preserves all MS1 when no spectral overlap", {
   ms1 <- tidytable::tidytable(
@@ -670,9 +659,7 @@ test_that("test-filter_ms1_redundancy handles empty MS1 table", {
 #   expect_true(all(c("gnps", "sirius") %in% result$source))
 # })
 
-# ==============================================================================
-# Test Group: apply_rt_filter - Additional edge cases
-# ==============================================================================
+## apply_rt_filter - Additional edge cases ----
 
 test_that("test-apply_rt_filter handles features with no RT value", {
   features_ann <- tidytable::tidytable(

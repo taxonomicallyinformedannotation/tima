@@ -1,6 +1,8 @@
-# ==============================================================================
-# Test Suite: Logging configuration
-# ==============================================================================
+# Test Suite: init_logging ----
+
+library(testthat)
+
+## Internal Utility Helpers ----
 
 with_temp_env <- function(vars, code) {
   old <- lapply(names(vars), Sys.getenv)
@@ -15,6 +17,12 @@ with_temp_env <- function(vars, code) {
   do.call(Sys.setenv, as.list(vars))
   force(code)
 }
+
+## TODO ----
+
+test_that(
+  skip("Not implemented")
+)
 
 # test_that("init_logging respects TIMA_LOG_FILE env var", {
 #   tmp <- tempfile("tima-log-", fileext = ".log")

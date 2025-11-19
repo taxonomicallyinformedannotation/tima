@@ -1,6 +1,12 @@
-# ==============================================================================
-# Test Suite: load_yaml_files
-# ==============================================================================
+# Test Suite: load_yaml_files ----
+
+library(testthat)
+
+## TODO ----
+
+test_that(
+  skip("Not implemented")
+)
 
 # test_that("load_yaml_files returns list", {
 #   result <- load_yaml_files()

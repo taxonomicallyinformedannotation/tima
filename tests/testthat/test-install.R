@@ -1,12 +1,8 @@
-# ==============================================================================
-# Test Suite: install - Complete test coverage
-# File: test-install.R
-# ==============================================================================
+# Test Suite: install ----
 
-# ==============================================================================
-# Test Group: install input validation
-# Purpose: Validate input parameter checking for install function
-# ==============================================================================
+library(testthat)
+
+## Input validation ----
 
 test_that("test-install validates package parameter", {
   # Non-character package
@@ -88,10 +84,7 @@ test_that("test-install validates test parameter", {
   )
 })
 
-# ==============================================================================
-# Test Group: install system detection
-# Purpose: Test operating system detection and messaging
-# ==============================================================================
+## System detection ----
 
 test_that("test-install detects operating system", {
   skip_on_cran()
@@ -113,10 +106,7 @@ test_that("test-install provides Linux-specific guidance", {
   skip("System-specific test")
 })
 
-# ==============================================================================
-# Test Group: install Python environment setup
-# Purpose: Test Python detection and virtual environment creation
-# ==============================================================================
+## Python environment ----
 
 test_that("test-install detects system Python", {
   skip_on_cran()
@@ -133,10 +123,7 @@ test_that("test-install installs RDKit in virtualenv", {
   skip("Modifies system - test in isolated environment only")
 })
 
-# ==============================================================================
-# Test Group: install package installation
-# Purpose: Test TIMA package installation
-# ==============================================================================
+## install package installation ----
 
 test_that("test-install installs from r-universe", {
   skip_on_cran()
@@ -153,10 +140,7 @@ test_that("test-install respects dependencies parameter", {
   skip("Modifies system - test in isolated environment only")
 })
 
-# ==============================================================================
-# Test Group: install integration
-# Purpose: Test full installation workflow
-# ==============================================================================
+## install integration ----
 
 test_that("test-install completes full workflow in test mode", {
   skip_on_cran()
@@ -184,10 +168,7 @@ test_that("test-install is idempotent", {
   # expect_no_error(install(package = "tima", test = TRUE))
 })
 
-# ==============================================================================
-# Test Group: install error handling
-# Purpose: Test error recovery and fallback mechanisms
-# ==============================================================================
+## install error handling ----
 
 test_that("test-install handles Miniconda installation on Python failure", {
   skip_on_cran()

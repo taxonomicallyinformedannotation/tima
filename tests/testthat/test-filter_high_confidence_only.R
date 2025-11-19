@@ -1,6 +1,6 @@
-# ==============================================================================
-# Test Suite: filter_high_confidence_only
-# ==============================================================================
+# Test Suite: filter_high_confidence_only ----
+
+library(testthat)
 
 test_that("filter_high_confidence_only handles empty input", {
   empty <- tidytable::tidytable()
