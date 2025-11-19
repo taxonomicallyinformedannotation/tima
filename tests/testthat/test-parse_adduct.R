@@ -1,23 +1,8 @@
-# ==============================================================================
-# Test Suite: parse_adduct
-# ==============================================================================
-#
-# @description
-# Comprehensive unit tests for the parse_adduct function, which parses mass
-# spectrometry adduct notation strings into their components.
-#
-# @coverage
-# - Input validation (NULL, empty, invalid formats)
-# - Basic adduct parsing (positive/negative, simple adducts)
-# - Multimer parsing (dimers, trimers, higher-order)
-# - Isotope parsing (M+1, M+2, M+3)
-# - Multiple charge states (doubly/triply charged)
-# - Complex modifications (losses, multiple additions)
-# - Edge cases and error handling
+# Test Suite: parse_adduct ----
 
-# ==============================================================================
-# Test Fixtures
-# ==============================================================================
+library(testthat)
+
+## Fixtures ----
 
 # Expected return structure for all valid parses
 EXPECTED_NAMES <- c("n_mer", "n_iso", "los_add_clu", "n_charges", "charge")
@@ -35,6 +20,8 @@ COMMON_NEGATIVE_ADDUCTS <- c(
   "[M+Cl]-",
   "[M+HCOO]-"
 )
+
+## Internal Utility Helpers ----
 
 #' Helper: Validate parse_adduct result structure
 #'
@@ -54,9 +41,7 @@ is_parse_failed <- function(result) {
   all(result == 0)
 }
 
-# ==============================================================================
-# Input Validation Tests
-# ==============================================================================
+## Input Validation ----
 
 test_that("parse_adduct handles NULL input gracefully", {
   result <- parse_adduct(NULL)
@@ -89,9 +74,7 @@ test_that("parse_adduct handles malformed brackets", {
   expect_equal(unname(result["n_mer"]), 0)
 })
 
-# ==============================================================================
-# Basic Adduct Parsing Tests
-# ==============================================================================
+## Basic Adduct Parsing ----
 
 test_that("parse_adduct extracts components from simple positive adduct [M+H]+", {
   result <- parse_adduct("[M+H]+")
@@ -162,9 +145,7 @@ test_that("parse_adduct works for all common negative adducts", {
   }
 })
 
-# ==============================================================================
-# Multimer Parsing Tests
-# ==============================================================================
+## Multimer Parsing ----
 
 test_that("parse_adduct extracts multimer count from dimer notation [2M+H]+", {
   result <- parse_adduct("[2M+H]+")
@@ -202,9 +183,7 @@ test_that("parse_adduct defaults to monomer when multimer not specified", {
   expect_equal(unname(result["n_mer"]), 1, info = "Default multimer is 1")
 })
 
-# ==============================================================================
-# Isotope Parsing Tests
-# ==============================================================================
+## Isotope Parsing ----
 
 test_that("parse_adduct extracts isotope shift from M+1 isotopologue", {
   result <- parse_adduct("[M1+H]+")
@@ -234,9 +213,7 @@ test_that("parse_adduct defaults to zero isotope shift when not specified", {
   expect_equal(unname(result["n_iso"]), 0, info = "Default isotope shift is 0")
 })
 
-# ==============================================================================
-# Multiple Charge State Tests
-# ==============================================================================
+## Multiple Charge State ----
 
 test_that("parse_adduct extracts doubly charged state from [M+2H]2+", {
   result <- parse_adduct("[M+2H]2+")
@@ -272,9 +249,7 @@ test_that("parse_adduct defaults to single charge when not specified", {
   )
 })
 
-# ==============================================================================
-# Complex Modification Tests
-# ==============================================================================
+## Complex Modification ----
 
 test_that("parse_adduct calculates mass change for water loss [M+H-H2O]+", {
   result <- parse_adduct("[M+H-H2O]+")
@@ -325,9 +300,7 @@ test_that("parse_adduct ignores comments in parentheses", {
   )
 })
 
-# ==============================================================================
-# Combined Complex Pattern Tests
-# ==============================================================================
+## Combined Complex Pattern ----
 
 test_that("parse_adduct handles dimer with isotope [2M1+H]+", {
   result <- parse_adduct("[2M1+H]+")
@@ -367,9 +340,7 @@ test_that("parse_adduct handles chloride adduct in negative mode", {
   expect_true(unname(result["los_add_clu"]) < 40, info = "Cl adds ~35 Da")
 })
 
-# ==============================================================================
-# Edge Cases and Special Formats
-# ==============================================================================
+## Edge Cases and Special Formats ----
 
 test_that("parse_adduct handles alternative adduct notations with slash", {
   # Some databases use slash to indicate alternative adducts
@@ -393,9 +364,7 @@ test_that("parse_adduct handles alternative adduct notations with pipe", {
   )
 })
 
-# ==============================================================================
-# Performance and Consistency Tests
-# ==============================================================================
+## Performance and Consistency ----
 
 test_that("parse_adduct returns consistent results for same input", {
   adduct <- "[M+H]+"
@@ -434,9 +403,7 @@ test_that("parse_adduct handles acetate adduct in negative mode", {
   expect_true(unname(result["los_add_clu"]) > 50, info = "Acetate adds ~59 Da")
 })
 
-# ==============================================================================
-# Consistency and Return Value Tests
-# ==============================================================================
+## Consistency and Return Value ----
 
 test_that("parse_adduct gives consistent results for equivalent notations", {
   result_implicit <- parse_adduct("[M+H]+")
@@ -457,9 +424,7 @@ test_that("parse_adduct always returns named numeric vector of length 5", {
   expect_type(result, "double")
 })
 
-# ==============================================================================
-# Logging and Error Behavior Tests
-# ==============================================================================
+# Logging and Error Behavior ----
 
 test_that("parse_adduct returns failed result for invalid input", {
   result <- parse_adduct("bad_format")
@@ -472,9 +437,7 @@ test_that("parse_adduct handles successful parse without error", {
   expect_no_error(parse_adduct("[M+H]+"))
 })
 
-# ==============================================================================
-# Performance Tests
-# ==============================================================================
+## Performance ----
 
 test_that("parse_adduct is fast enough for batch processing", {
   skip_on_cran()
@@ -489,9 +452,7 @@ test_that("parse_adduct is fast enough for batch processing", {
   expect_equal(length(results), 1000, info = "Should process all inputs")
 })
 
-# ==============================================================================
-# Additional Coverage: Uncommon but Valid Adducts
-# ==============================================================================
+## Additional Coverage: Uncommon but Valid Adducts ----
 
 test_that("parse_adduct handles ammonium adduct [M+NH4]+", {
   result <- parse_adduct("[M+NH4]+")
@@ -521,9 +482,7 @@ test_that("parse_adduct handles CO2 loss [M-CO2+H]+", {
   expect_true(unname(result["los_add_clu"]) < 0)
 })
 
-# ==============================================================================
-# Comments with Special Characters Tests
-# ==============================================================================
+## Comments with Special Characters ----
 
 test_that("parse_adduct handles comments with slash inside parentheses", {
   # This tests the fix for slash inside parenthetical comments
