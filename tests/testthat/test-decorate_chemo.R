@@ -1,8 +1,6 @@
 # Test Suite: decorate_chemo ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 # test_that("decorate_chemo handles empty input", {
 #   # Use fixture utilities

@@ -1,8 +1,6 @@
 # Test Suite: clean_bio ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 set.seed(NULL)
 
 ## Input Validation ----

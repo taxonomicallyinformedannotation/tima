@@ -1,8 +1,6 @@
 # Test Suite: decorate_bio ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 test_that("decorate_bio handles empty input", {
   # Use fixture utilities for empty structure

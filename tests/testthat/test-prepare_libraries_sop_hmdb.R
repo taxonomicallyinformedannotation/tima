@@ -175,7 +175,7 @@ test_that("test-prepare_libraries_sop_hmdb parses minimal mock SDF", {
   # Zip it
   zip_file <- file.path(tmp, "test_hmdb.zip")
   withr::with_dir(tmp, {
-    zip::zip(zipfile = basename(zip_file), files = basename(sdf_file))
+    utils::zip(zipfile = basename(zip_file), files = basename(sdf_file))
   })
 
   output_file <- file.path(tmp, "hmdb_output.tsv")
@@ -228,7 +228,7 @@ test_that("test-prepare_libraries_sop_hmdb handles SDF with missing fields", {
 
   zip_file <- file.path(tmp, "test_hmdb_incomplete.zip")
   withr::with_dir(tmp, {
-    zip::zip(zipfile = basename(zip_file), files = basename(sdf_file))
+    utils::zip(zipfile = basename(zip_file), files = basename(sdf_file))
   })
 
   output_file <- file.path(tmp, "hmdb_incomplete_output.tsv")
@@ -308,7 +308,7 @@ test_that("test-prepare_libraries_sop_hmdb handles multiple compounds in SDF", {
 
   zip_file <- file.path(tmp, "test_hmdb_multi.zip")
   withr::with_dir(tmp, {
-    zip::zip(zipfile = basename(zip_file), files = basename(sdf_file))
+    utils::zip(zipfile = basename(zip_file), files = basename(sdf_file))
   })
 
   output_file <- file.path(tmp, "hmdb_multi_output.tsv")
@@ -361,7 +361,7 @@ test_that("test-prepare_libraries_sop_hmdb sets correct organism taxonomy", {
 
   zip_file <- file.path(tmp, "test_taxonomy.zip")
   withr::with_dir(tmp, {
-    zip::zip(zipfile = basename(zip_file), files = basename(sdf_file))
+    utils::zip(zipfile = basename(zip_file), files = basename(sdf_file))
   })
 
   output_file <- file.path(tmp, "taxonomy_output.tsv")

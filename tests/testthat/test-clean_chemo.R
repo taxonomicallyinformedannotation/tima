@@ -1,8 +1,6 @@
 # Test Suite: clean_chemo ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 test_that("validate_clean_chemo_inputs accepts valid inputs", {
   expect_silent(

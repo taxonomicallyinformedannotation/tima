@@ -1,8 +1,6 @@
 # Test Suite: create_components ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 ## Internal Utility Helpers ----
 

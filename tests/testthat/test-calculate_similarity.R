@@ -1,8 +1,6 @@
 # Test Suite: calculate_similarity ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 ## Internal Utility Helpers ----
 

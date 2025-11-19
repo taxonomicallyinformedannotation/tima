@@ -1,8 +1,6 @@
 # Test Suite: get_gnps_tables ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 test_that("get_gnps_tables works with valid GNPS job ID", {
   local_test_project(copy = TRUE)
