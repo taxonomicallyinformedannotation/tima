@@ -62,45 +62,20 @@ calculate_similarity <- function(
   return_matched_peaks = FALSE,
   ...
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
-
-  # Validate method first (cheapest check)
-  valid_methods <- c("cosine", "entropy", "gnps")
-  if (!method %in% valid_methods) {
-    stop(
-      "Invalid method '",
-      method,
-      "'. Must be one of: ",
-      paste(valid_methods, collapse = ", ")
-    )
-  }
-
-  # Early exit for empty spectra (before expensive type checks)
-  if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
-    # logger::log_trace("Empty spectrum encountered, returning 0.0 similarity")
-    return(
-      if (return_matched_peaks) {
-        list(score = 0.0, matches = 0L)
-      } else {
-        0.0
-      }
-    )
-  }
-
-  # Validate spectrum inputs
+  # ---- Input Validation (centralized helpers) ----
+  assert_choice(method, VALID_SIMILARITY_METHODS, "method")
   if (!is.matrix(query_spectrum) || !is.matrix(target_spectrum)) {
-    stop("Spectra must be matrices")
+    stop("Spectra must be matrices", call. = FALSE)
   }
-
   if (ncol(query_spectrum) < 2L || ncol(target_spectrum) < 2L) {
-    stop("Spectra must have at least 2 columns (mz, intensity)")
+    stop("Spectra must have at least 2 columns (mz, intensity)", call. = FALSE)
   }
-
-  # Validate numeric parameters (combine checks for efficiency)
-  if (!is.numeric(dalton) || dalton < 0 || !is.numeric(ppm) || ppm < 0) {
-    stop("Dalton and PPM tolerances must be non-negative numbers")
+  assert_scalar_numeric(dalton, "dalton", min = 0)
+  assert_scalar_numeric(ppm, "ppm", min = 0)
+  assert_flag(return_matched_peaks, "return_matched_peaks")
+  # Early exit for empty spectra
+  if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
+    return(if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0)
   }
 
   # ============================================================================

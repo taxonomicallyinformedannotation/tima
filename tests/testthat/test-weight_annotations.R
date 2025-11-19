@@ -166,7 +166,7 @@ test_that("validate_weight_annotations_inputs rejects weights not summing to 1",
       candidates_neighbors = 5,
       candidates_final = 10
     ),
-    "Weights must sum to 1.0"
+    "Weights must sum to 1"
   )
 })
 

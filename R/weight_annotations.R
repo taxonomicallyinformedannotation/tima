@@ -111,26 +111,30 @@ validate_weight_annotations_inputs <- function(
     )
   }
 
-  # Validate weights sum to 1
-  weight_sum <- weight_spectral + weight_chemical + weight_biological
-  if (abs(weight_sum - 1.0) > 0.01) {
+  # ---- Weights ----
+  weights <- c(
+    spectral = weight_spectral,
+    chemical = weight_chemical,
+    biological = weight_biological
+  )
+  if (!all(is.numeric(weights)) || any(is.na(weights))) {
+    stop("All weights must be numeric and non-NA", call. = FALSE)
+  }
+  if (any(weights < 0)) {
+    stop("All weights must be non-negative", call. = FALSE)
+  }
+  weight_sum <- sum(weights)
+  if (abs(weight_sum - 1) > WEIGHT_SUM_TOLERANCE) {
     stop(
-      "Weights must sum to 1.0, got: ",
-      round(weight_sum, 4),
-      " (spectral: ",
-      weight_spectral,
-      ", chemical: ",
-      weight_chemical,
-      ", biological: ",
-      weight_biological,
+      "Weights must sum to 1 (tolerance ",
+      WEIGHT_SUM_TOLERANCE,
+      "), got: ",
+      signif(weight_sum, 6),
+      " (",
+      paste(names(weights), weights, sep = ":", collapse = ", "),
       ")",
       call. = FALSE
     )
-  }
-
-  # Validate all weights are non-negative
-  if (weight_spectral < 0 || weight_chemical < 0 || weight_biological < 0) {
-    stop("All weights must be non-negative", call. = FALSE)
   }
 
   # Validate score parameters
@@ -162,28 +166,11 @@ validate_weight_annotations_inputs <- function(
     force = force
   )
 
-  for (param_name in names(logical_params)) {
-    if (!is.logical(logical_params[[param_name]])) {
-      stop(param_name, " must be logical (TRUE/FALSE)", call. = FALSE)
-    }
-  }
+  purrr::iwalk(logical_params, function(val, nm) assert_flag(val, nm))
 
   # Validate candidates parameters
-  if (!is.numeric(candidates_neighbors) || candidates_neighbors < 1) {
-    stop(
-      "candidates_neighbors must be a positive integer, got: ",
-      candidates_neighbors,
-      call. = FALSE
-    )
-  }
-
-  if (!is.numeric(candidates_final) || candidates_final < 1) {
-    stop(
-      "candidates_final must be a positive integer, got: ",
-      candidates_final,
-      call. = FALSE
-    )
-  }
+  assert_positive_integer(candidates_neighbors, "candidates_neighbors")
+  assert_positive_integer(candidates_final, "candidates_final")
 
   invisible(NULL)
 }

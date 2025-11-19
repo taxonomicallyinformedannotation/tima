@@ -736,3 +736,67 @@ validate_data_frame <- function(
 
   invisible(TRUE)
 }
+
+# Generic assertion helpers (centralized) ----
+assert_choice <- function(value, choices, param_name = "value") {
+  if (length(value) != 1L || !is.character(value)) {
+    stop(param_name, " must be a single character string", call. = FALSE)
+  }
+  if (!value %in% choices) {
+    stop(
+      "Invalid ",
+      param_name,
+      ": '",
+      value,
+      "'. Must be one of: ",
+      paste(choices, collapse = ", "),
+      call. = FALSE
+    )
+  }
+  invisible(TRUE)
+}
+
+assert_flag <- function(x, param_name) {
+  if (!is.logical(x) || length(x) != 1L || is.na(x)) {
+    stop(param_name, " must be logical (TRUE/FALSE)", call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
+assert_scalar_numeric <- function(
+  x,
+  param_name,
+  min = -Inf,
+  max = Inf,
+  allow_na = FALSE
+) {
+  if (!is.numeric(x) || length(x) != 1L) {
+    stop(param_name, " must be a single numeric value", call. = FALSE)
+  }
+  if (is.na(x) && !allow_na) {
+    stop(param_name, " cannot be NA", call. = FALSE)
+  }
+  if (!is.na(x) && (x < min || x > max)) {
+    stop(
+      param_name,
+      " must be between ",
+      min,
+      " and ",
+      max,
+      ", got: ",
+      x,
+      call. = FALSE
+    )
+  }
+  invisible(TRUE)
+}
+
+assert_positive_integer <- function(x, param_name) {
+  if (!is.numeric(x) || length(x) != 1L || is.na(x) || x < 1 || (x %% 1) != 0) {
+    stop(param_name, " must be a positive integer (>=1)", call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
+# Weight tolerance constant moved here ----
+WEIGHT_SUM_TOLERANCE <- 0.01

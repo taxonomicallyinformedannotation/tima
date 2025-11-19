@@ -40,16 +40,10 @@ transform_score_sirius_csi <- function(csi_score = NULL, K = 50, scale = 10) {
 
   # Validate inputs
   if (!is.numeric(csi_score)) {
-    stop("csi_score must be numeric, NA, or NULL")
+    stop("csi_score must be numeric, NA, or NULL", call. = FALSE)
   }
-
-  if (!is.numeric(K) || length(K) != 1L) {
-    stop("K must be a single numeric value")
-  }
-
-  if (!is.numeric(scale) || length(scale) != 1L || scale <= 0) {
-    stop("scale parameter must be a single positive numeric value")
-  }
+  assert_scalar_numeric(K, "K")
+  assert_scalar_numeric(scale, "scale", min = .Machine$double.eps)
 
   # Apply sigmoid transformation: sigmoid((score + K) / scale)
   # This maps the shifted and scaled score to (0, 1)
