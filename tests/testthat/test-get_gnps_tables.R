@@ -1,64 +1,8 @@
-# Test: File Download and GNPS Functions
+# Test Suite: get_gnps_tables ----
 
-test_that("replace_id handles different input combinations", {
-  # Empty GNPS ID
-  result1 <- replace_id(
-    x = "example/123456_features.tsv",
-    user_gnps = "",
-    user_filename = "Foo"
-  )
-  expect_type(result1, "character")
-
-  # Non-empty GNPS ID
-  result2 <- replace_id(
-    x = "example/123456_features.tsv",
-    user_gnps = "Foo",
-    user_filename = "Foo"
-  )
-  expect_type(result2, "character")
-
-  # Default example GNPS ID
-  result3 <- replace_id(
-    x = "example/123456_features.tsv",
-    user_gnps = get_default_paths()$gnps$example,
-    user_filename = "Foo"
-  )
-  expect_type(result3, "character")
-})
-
-# test_that("get_file downloads and handles existing files", {
-#   local_test_project(copy = TRUE)
-#   paths <- get_default_paths()
-#
-#   # First download
-#   expect_no_error(
-#     get_file(
-#       url = paths$urls$examples$features,
-#       export = paths$data$source$features
-#     )
-#   )
-#   expect_true(file.exists(paths$data$source$features))
-#
-#   # Second download (should skip)
-#   expect_message(
-#     get_file(
-#       url = paths$urls$examples$features,
-#       export = paths$data$source$features
-#     ),
-#     regexp = "already exists"
-#   )
-#
-#
-# })
-
-test_that("get_file fails gracefully with invalid URL", {
-  expect_error(
-    get_file(
-      url = "InVaLiDUrL",
-      export = "InValidFile.txt"
-    )
-  )
-})
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
 
 test_that("get_gnps_tables works with valid GNPS job ID", {
   local_test_project(copy = TRUE)

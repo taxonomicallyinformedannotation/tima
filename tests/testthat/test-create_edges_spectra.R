@@ -1,6 +1,8 @@
-# ==============================================================================
-# Test Suite: create_edges_spectra
-# ==============================================================================
+# Test Suite: create_edges_spectra ----
+
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
 
 test_that("create_edges_spectra validates thresholds", {
   tmp <- withr::local_tempdir()

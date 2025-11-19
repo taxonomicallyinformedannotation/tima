@@ -1,9 +1,10 @@
-# Test Suite for get_file()
-# Tests the file download function with retry logic and validation
+# Test Suite: get_file ----
 
-# ==============================================================================
-# Test: Input Validation
-# ==============================================================================
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
+
+## Input Validation ----
 
 test_that("get_file validates URL parameter", {
   # Missing URL
@@ -73,9 +74,7 @@ test_that("get_file validates timeout limit", {
   )
 })
 
-# ==============================================================================
-# Test: File Existence Check (Early Exit)
-# ==============================================================================
+## File Existence Check ----
 
 test_that("get_file skips download if file already exists", {
   paths <- local_test_project(copy = TRUE)
@@ -99,9 +98,7 @@ test_that("get_file skips download if file already exists", {
   expect_equal(content, "test content")
 })
 
-# ==============================================================================
-# Test: Directory Creation
-# ==============================================================================
+## Directory Creation ----
 
 test_that("get_file creates output directory if needed", {
   skip_on_cran()
@@ -125,9 +122,7 @@ test_that("get_file creates output directory if needed", {
   expect_true(dir.exists(dirname(nested_path)))
 })
 
-# ==============================================================================
-# Test: Download Success
-# ==============================================================================
+## Download Success ----
 
 test_that("get_file downloads file successfully", {
   skip_on_cran()
@@ -151,9 +146,7 @@ test_that("get_file downloads file successfully", {
   expect_gt(file.size(output_file), 0)
 })
 
-# ==============================================================================
-# Test: Download Failure Handling
-# ==============================================================================
+## Download Failure Handling ----
 
 test_that("get_file fails gracefully with invalid URL", {
   skip_on_cran()
@@ -201,9 +194,7 @@ test_that("get_file handles 404 errors", {
   )
 })
 
-# ==============================================================================
-# Test: Retry Logic
-# ==============================================================================
+## Retry Logic ----
 
 test_that("get_file retries on failure", {
   skip("Manual test - requires network manipulation")
@@ -212,9 +203,7 @@ test_that("get_file retries on failure", {
   # or using a test server that can simulate retries
 })
 
-# ==============================================================================
-# Test: Integration with get_example_files
-# ==============================================================================
+## Integration with get_example_files ----
 
 test_that("get_file works with real package example files", {
   skip_on_cran()

@@ -1,6 +1,8 @@
-# ==============================================================================
-# Test Suite: create_dir
-# ==============================================================================
+# Test Suite: create_dir ----
+
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
 
 test_that("create_dir creates directory for file path", {
   tmp <- withr::local_tempdir()

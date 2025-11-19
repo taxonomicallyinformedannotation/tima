@@ -1,7 +1,8 @@
-# =============================================================================
-# Tests for decorate_masses()
-# =============================================================================
+# Test Suite: decorate_masses ----
 
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
 test_that("decorate_masses handles empty input", {
   empty_df <- tidytable::tidytable(
     feature_id = character(0),

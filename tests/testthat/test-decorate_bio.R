@@ -1,6 +1,8 @@
-# =============================================================================
-# Tests for decorate_bio()
-# =============================================================================
+# Test Suite: decorate_bio ----
+
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
 
 test_that("decorate_bio handles empty input", {
   # Use fixture utilities for empty structure
@@ -69,9 +71,7 @@ test_that("decorate_bio warns on missing columns", {
   )
 })
 
-# =============================================================================
-# Vectorization/Performance sanity
-# =============================================================================
+## Performance ----
 
 test_that("decoration functions use vectorized operations", {
   # Create moderately-sized test data

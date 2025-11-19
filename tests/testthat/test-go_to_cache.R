@@ -1,6 +1,8 @@
-# ==============================================================================
-# Test Suite: go_to_cache
-# ==============================================================================
+# Test Suite: go_to_cache ----
+
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
 
 test_that("go_to_cache validates directory name", {
   expect_error(go_to_cache(dir = NULL), "non-empty")
