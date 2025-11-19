@@ -166,71 +166,6 @@ test_that("summarize_results handles empty input gracefully", {
   expect_equal(nrow(result), 0)
 })
 
-# Basic functionality tests ----
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("summarize_results returns a data frame", {
-#   test_data <- create_test_annotation_data()
-#
-#   expect_result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   expect_s3_class(result, "data.frame")
-#   expect_true(nrow(result) > 0)
-# })
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("summarize_results adds feature metadata", {
-#   test_data <- create_test_annotation_data()
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   # Should have feature RT and m/z columns
-#   expect_true("feature_rt" %in% names(result) || "rt" %in% names(result))
-#   expect_true("feature_mz" %in% names(result) || "mz" %in% names(result))
-# })
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("summarize_results adds component information", {
-#   test_data <- create_test_annotation_data()
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   # Should have component_id column if present in components_table
-#   if ("component_id" %in% names(test_data$components_table)) {
-#     expect_true("component_id" %in% names(result))
-#   }
-# })
-
 # Remove ties functionality ----
 
 test_that("summarize_results removes ties when requested", {
@@ -286,161 +221,6 @@ test_that("remove_ties keeps only one entry per feature-rank combination", {
     expect_equal(length(combinations), length(unique(combinations)))
   }
 })
-
-# Summarize functionality ----
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("summarize_results collapses to one row per feature when summarize=TRUE", {
-#   test_data <- create_test_annotation_data(n_features = 3, n_candidates = 4)
-#
-#   result_full <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   result_summarized <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = TRUE
-#   )
-#
-#   # Summarized should have fewer rows (one per feature)
-#   expect_true(nrow(result_summarized) <= nrow(result_full))
-#
-#   # Should have unique feature_ids in summarized version
-#   if ("feature_id" %in% names(result_summarized)) {
-#     expect_equal(
-#       nrow(result_summarized),
-#       length(unique(result_summarized$feature_id))
-#     )
-#   }
-# })
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("summarize concatenates candidate information with pipes", {
-#   skip_if_not_installed("tidytable")
-#
-#   test_data <- create_test_annotation_data(n_features = 1, n_candidates = 3)
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = TRUE
-#   )
-#
-#   # Candidate columns should contain pipe-separated values
-#   candidate_cols <- grep("^candidate", names(result), value = TRUE)
-#
-#   if (length(candidate_cols) > 0) {
-#     # At least one should have pipes if multiple candidates
-#     has_pipes <- any(sapply(result[candidate_cols], function(x) {
-#       any(grepl("\\|", x, fixed = TRUE), na.rm = TRUE)
-#     }))
-#
-#     if (nrow(test_data$df) > 1) {
-#       expect_true(has_pipes)
-#     }
-#   }
-# })
-
-# Organism occurrence tests ----
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("summarize_results adds organism occurrence information", {
-#   test_data <- create_test_annotation_data()
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   # Should potentially have organism occurrence columns
-#   # (depends on data and joins)
-#   occurrence_cols <- grep("organism_occurrence", names(result), value = TRUE)
-#
-#   # If organism data exists, should add occurrence info
-#   expect_true(length(occurrence_cols) >= 0) # May be 0 if no matches
-# })
-
-# Column selection and renaming ----
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("summarize_results renames score columns appropriately", {
-#   test_data <- create_test_annotation_data()
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   # Check for renamed score columns
-#   expected_score_cols <- c(
-#     "score_initial",
-#     "score_biological",
-#     "score_interim",
-#     "score_chemical",
-#     "score_final"
-#   )
-#
-#   # At least some should be present
-#   present_scores <- expected_score_cols[expected_score_cols %in% names(result)]
-#   expect_true(length(present_scores) > 0)
-# })
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("summarize_results renames RT and m/z columns", {
-#   test_data <- create_test_annotation_data()
-#
-#   result <- summarize_results(
-#     df = test_data$df,
-#     features_table = test_data$features_table,
-#     components_table = test_data$components_table,
-#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-#     remove_ties = FALSE,
-#     summarize = FALSE
-#   )
-#
-#   # Should have feature_rt and feature_mz (or rt/mz)
-#   has_rt <- "feature_rt" %in% names(result) || "rt" %in% names(result)
-#   has_mz <- "feature_mz" %in% names(result) || "mz" %in% names(result)
-#
-#   expect_true(has_rt)
-#   expect_true(has_mz)
-# })
 
 # Data cleaning tests ----
 
@@ -614,6 +394,227 @@ test_that("summarize_results completes in reasonable time", {
   # Should complete in under 5 seconds for moderate data
   expect_true(elapsed < 5)
 })
+
+
+# Basic functionality tests ----
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("summarize_results returns a data frame", {
+#   test_data <- create_test_annotation_data()
+#
+#   expect_result <- summarize_results(
+#     df = test_data$df,
+#     features_table = test_data$features_table,
+#     components_table = test_data$components_table,
+#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+#     remove_ties = FALSE,
+#     summarize = FALSE
+#   )
+#
+#   expect_s3_class(result, "data.frame")
+#   expect_true(nrow(result) > 0)
+# })
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("summarize_results adds feature metadata", {
+#   test_data <- create_test_annotation_data()
+#
+#   result <- summarize_results(
+#     df = test_data$df,
+#     features_table = test_data$features_table,
+#     components_table = test_data$components_table,
+#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+#     remove_ties = FALSE,
+#     summarize = FALSE
+#   )
+#
+#   # Should have feature RT and m/z columns
+#   expect_true("feature_rt" %in% names(result) || "rt" %in% names(result))
+#   expect_true("feature_mz" %in% names(result) || "mz" %in% names(result))
+# })
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("summarize_results adds component information", {
+#   test_data <- create_test_annotation_data()
+#
+#   result <- summarize_results(
+#     df = test_data$df,
+#     features_table = test_data$features_table,
+#     components_table = test_data$components_table,
+#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+#     remove_ties = FALSE,
+#     summarize = FALSE
+#   )
+#
+#   # Should have component_id column if present in components_table
+#   if ("component_id" %in% names(test_data$components_table)) {
+#     expect_true("component_id" %in% names(result))
+#   }
+# })
+
+# Summarize functionality ----
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("summarize_results collapses to one row per feature when summarize=TRUE", {
+#   test_data <- create_test_annotation_data(n_features = 3, n_candidates = 4)
+#
+#   result_full <- summarize_results(
+#     df = test_data$df,
+#     features_table = test_data$features_table,
+#     components_table = test_data$components_table,
+#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+#     remove_ties = FALSE,
+#     summarize = FALSE
+#   )
+#
+#   result_summarized <- summarize_results(
+#     df = test_data$df,
+#     features_table = test_data$features_table,
+#     components_table = test_data$components_table,
+#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+#     remove_ties = FALSE,
+#     summarize = TRUE
+#   )
+#
+#   # Summarized should have fewer rows (one per feature)
+#   expect_true(nrow(result_summarized) <= nrow(result_full))
+#
+#   # Should have unique feature_ids in summarized version
+#   if ("feature_id" %in% names(result_summarized)) {
+#     expect_equal(
+#       nrow(result_summarized),
+#       length(unique(result_summarized$feature_id))
+#     )
+#   }
+# })
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("summarize concatenates candidate information with pipes", {
+#   skip_if_not_installed("tidytable")
+#
+#   test_data <- create_test_annotation_data(n_features = 1, n_candidates = 3)
+#
+#   result <- summarize_results(
+#     df = test_data$df,
+#     features_table = test_data$features_table,
+#     components_table = test_data$components_table,
+#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+#     remove_ties = FALSE,
+#     summarize = TRUE
+#   )
+#
+#   # Candidate columns should contain pipe-separated values
+#   candidate_cols <- grep("^candidate", names(result), value = TRUE)
+#
+#   if (length(candidate_cols) > 0) {
+#     # At least one should have pipes if multiple candidates
+#     has_pipes <- any(sapply(result[candidate_cols], function(x) {
+#       any(grepl("\\|", x, fixed = TRUE), na.rm = TRUE)
+#     }))
+#
+#     if (nrow(test_data$df) > 1) {
+#       expect_true(has_pipes)
+#     }
+#   }
+# })
+
+# Organism occurrence tests ----
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("summarize_results adds organism occurrence information", {
+#   test_data <- create_test_annotation_data()
+#
+#   result <- summarize_results(
+#     df = test_data$df,
+#     features_table = test_data$features_table,
+#     components_table = test_data$components_table,
+#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+#     remove_ties = FALSE,
+#     summarize = FALSE
+#   )
+#
+#   # Should potentially have organism occurrence columns
+#   # (depends on data and joins)
+#   occurrence_cols <- grep("organism_occurrence", names(result), value = TRUE)
+#
+#   # If organism data exists, should add occurrence info
+#   expect_true(length(occurrence_cols) >= 0) # May be 0 if no matches
+# })
+
+# Column selection and renaming ----
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("summarize_results renames score columns appropriately", {
+#   test_data <- create_test_annotation_data()
+#
+#   result <- summarize_results(
+#     df = test_data$df,
+#     features_table = test_data$features_table,
+#     components_table = test_data$components_table,
+#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+#     remove_ties = FALSE,
+#     summarize = FALSE
+#   )
+#
+#   # Check for renamed score columns
+#   expected_score_cols <- c(
+#     "score_initial",
+#     "score_biological",
+#     "score_interim",
+#     "score_chemical",
+#     "score_final"
+#   )
+#
+#   # At least some should be present
+#   present_scores <- expected_score_cols[expected_score_cols %in% names(result)]
+#   expect_true(length(present_scores) > 0)
+# })
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("summarize_results renames RT and m/z columns", {
+#   test_data <- create_test_annotation_data()
+#
+#   result <- summarize_results(
+#     df = test_data$df,
+#     features_table = test_data$features_table,
+#     components_table = test_data$components_table,
+#     structure_organism_pairs_table = test_data$structure_organism_pairs_table,
+#     annot_table_wei_chemo = test_data$annot_table_wei_chemo,
+#     remove_ties = FALSE,
+#     summarize = FALSE
+#   )
+#
+#   # Should have feature_rt and feature_mz (or rt/mz)
+#   has_rt <- "feature_rt" %in% names(result) || "rt" %in% names(result)
+#   has_mz <- "feature_mz" %in% names(result) || "mz" %in% names(result)
+#
+#   expect_true(has_rt)
+#   expect_true(has_mz)
+# })
 
 # Robustness tests ----
 

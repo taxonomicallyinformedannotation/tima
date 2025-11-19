@@ -838,6 +838,72 @@ test_that("validate_clean_chemo_inputs rejects multiple invalid logical params",
 
 ## clean_chemo - Integration and edge cases ----
 
+test_that("filter_ms1_annotations handles edge case with zero thresholds", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_score_similarity = c(NA, NA),
+    candidate_score_sirius_csi = c(NA, NA),
+    score_biological = c(0.0, 0.1),
+    score_chemical = c(0.1, 0.0)
+  )
+
+  result <- filter_ms1_annotations(
+    df,
+    minimal_ms1_bio = 0.0,
+    minimal_ms1_chemo = 0.0,
+    minimal_ms1_condition = "OR"
+  )
+
+  # With 0 thresholds and OR condition, all should pass
+  expect_equal(nrow(result), 2)
+})
+
+test_that("rank_and_deduplicate handles duplicate inchikeys", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F1"),
+    candidate_structure_inchikey_connectivity_layer = c("INK1", "INK1", "INK2"),
+    score_weighted_chemo = c("0.9", "0.8", "0.7"),
+    candidate_score_pseudo_initial = c("0.95", "0.85", "0.75")
+  )
+
+  result <- rank_and_deduplicate(df)
+
+  # Should keep only one INK1 (the one with highest score)
+  expect_equal(nrow(result), 2)
+  expect_equal(
+    sum(result$candidate_structure_inchikey_connectivity_layer == "INK1"),
+    1
+  )
+})
+
+test_that("apply_percentile_filter handles single candidate", {
+  df <- tidytable::tidytable(
+    feature_id = "F1",
+    score_weighted_chemo = "0.5"
+  )
+
+  result <- apply_percentile_filter(df, best_percentile = 0.9)
+
+  # Single candidate should always pass
+  expect_equal(nrow(result), 1)
+})
+
+test_that("count_candidates handles mismatched features", {
+  df_ranked <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2")
+  )
+
+  df_percentile <- tidytable::tidytable(
+    feature_id = c("F1") # F2 was filtered out
+  )
+
+  result <- count_candidates(df_ranked, df_percentile)
+
+  expect_equal(nrow(result), 2) # Both F1 and F2
+  expect_true("candidates_evaluated" %in% names(result))
+  expect_true("candidates_best" %in% names(result))
+})
+
 test_that(
   skip("Not implemented")
 )
@@ -1190,69 +1256,3 @@ test_that(
 #   # Lower percentile should keep more candidates
 #   expect_true(nrow(result_50) >= nrow(result_90))
 # })
-
-test_that("filter_ms1_annotations handles edge case with zero thresholds", {
-  df <- tidytable::tidytable(
-    feature_id = c("F1", "F2"),
-    candidate_score_similarity = c(NA, NA),
-    candidate_score_sirius_csi = c(NA, NA),
-    score_biological = c(0.0, 0.1),
-    score_chemical = c(0.1, 0.0)
-  )
-
-  result <- filter_ms1_annotations(
-    df,
-    minimal_ms1_bio = 0.0,
-    minimal_ms1_chemo = 0.0,
-    minimal_ms1_condition = "OR"
-  )
-
-  # With 0 thresholds and OR condition, all should pass
-  expect_equal(nrow(result), 2)
-})
-
-test_that("rank_and_deduplicate handles duplicate inchikeys", {
-  df <- tidytable::tidytable(
-    feature_id = c("F1", "F1", "F1"),
-    candidate_structure_inchikey_connectivity_layer = c("INK1", "INK1", "INK2"),
-    score_weighted_chemo = c("0.9", "0.8", "0.7"),
-    candidate_score_pseudo_initial = c("0.95", "0.85", "0.75")
-  )
-
-  result <- rank_and_deduplicate(df)
-
-  # Should keep only one INK1 (the one with highest score)
-  expect_equal(nrow(result), 2)
-  expect_equal(
-    sum(result$candidate_structure_inchikey_connectivity_layer == "INK1"),
-    1
-  )
-})
-
-test_that("apply_percentile_filter handles single candidate", {
-  df <- tidytable::tidytable(
-    feature_id = "F1",
-    score_weighted_chemo = "0.5"
-  )
-
-  result <- apply_percentile_filter(df, best_percentile = 0.9)
-
-  # Single candidate should always pass
-  expect_equal(nrow(result), 1)
-})
-
-test_that("count_candidates handles mismatched features", {
-  df_ranked <- tidytable::tidytable(
-    feature_id = c("F1", "F1", "F2")
-  )
-
-  df_percentile <- tidytable::tidytable(
-    feature_id = c("F1") # F2 was filtered out
-  )
-
-  result <- count_candidates(df_ranked, df_percentile)
-
-  expect_equal(nrow(result), 2) # Both F1 and F2
-  expect_true("candidates_evaluated" %in% names(result))
-  expect_true("candidates_best" %in% names(result))
-})

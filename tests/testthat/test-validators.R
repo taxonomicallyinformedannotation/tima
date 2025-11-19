@@ -356,16 +356,6 @@ test_that("validate_list_or_vector handles NULL", {
   expect_silent(validate_list_or_vector(NULL, allow_null = TRUE))
 })
 
-test_that(
-  skip("Not implemented")
-)
-# test_that("validate_list_or_vector rejects wrong types", {
-#   expect_error(
-#     validate_list_or_vector(data.frame(a = 1)),
-#     "must be a list or vector"
-#   )
-# })
-
 # ==============================================================================
 # Tests: validate_data_frame ----
 
@@ -421,47 +411,6 @@ test_that("validate_data_frame uses custom parameter names", {
 })
 
 # Integration tests ----
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("validators work together in realistic scenarios", {
-#   tmp <- withr::local_tempdir()
-#   withr::local_dir(tmp)
-#
-#   # Create test files
-#   temp_features <- "features.tsv"
-#   temp_library <- "library.tsv"
-#   writeLines("", temp_features)
-#   writeLines("", temp_library)
-#
-#   # Test file validators
-#   expect_silent(validate_file_path(temp_features))
-#   expect_silent(validate_file_path(temp_library))
-#
-#   # Test combined validation scenario
-#   ms_mode <- "pos"
-#   tolerance_ppm <- 10
-#   tolerance_rt <- 0.05
-#   adducts <- list(pos = c("[M+H]+", "[M+Na]+"), neg = c("[M-H]-"))
-#
-#   expect_silent(validate_ms_mode(ms_mode))
-#   expect_silent(validate_tolerances(tolerance_ppm, tolerance_rt))
-#   expect_silent(validate_adduct_list(adducts, ms_mode))
-# })
-#   # Validate all inputs for an annotation function
-#   expect_silent({
-#     validate_file_existence(list(
-#       features = temp_features,
-#       library = temp_library
-#     ))
-#     validate_ms_mode("pos")
-#     validate_tolerances(tolerance_ppm = 10, tolerance_rt = 0.05)
-#   })
-#
-#   # Clean up
-#   unlink(c(temp_features, temp_library))
-# })
 
 test_that("validators provide consistent error message format", {
   # All error messages should include parameter name and guidance
@@ -521,3 +470,54 @@ test_that("validators are thread-safe", {
 
   expect_true(all(unlist(results)))
 })
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("validate_list_or_vector rejects wrong types", {
+#   expect_error(
+#     validate_list_or_vector(data.frame(a = 1)),
+#     "must be a list or vector"
+#   )
+# })
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("validators work together in realistic scenarios", {
+#   tmp <- withr::local_tempdir()
+#   withr::local_dir(tmp)
+#
+#   # Create test files
+#   temp_features <- "features.tsv"
+#   temp_library <- "library.tsv"
+#   writeLines("", temp_features)
+#   writeLines("", temp_library)
+#
+#   # Test file validators
+#   expect_silent(validate_file_path(temp_features))
+#   expect_silent(validate_file_path(temp_library))
+#
+#   # Test combined validation scenario
+#   ms_mode <- "pos"
+#   tolerance_ppm <- 10
+#   tolerance_rt <- 0.05
+#   adducts <- list(pos = c("[M+H]+", "[M+Na]+"), neg = c("[M-H]-"))
+#
+#   expect_silent(validate_ms_mode(ms_mode))
+#   expect_silent(validate_tolerances(tolerance_ppm, tolerance_rt))
+#   expect_silent(validate_adduct_list(adducts, ms_mode))
+# })
+#   # Validate all inputs for an annotation function
+#   expect_silent({
+#     validate_file_existence(list(
+#       features = temp_features,
+#       library = temp_library
+#     ))
+#     validate_ms_mode("pos")
+#     validate_tolerances(tolerance_ppm = 10, tolerance_rt = 0.05)
+#   })
+#
+#   # Clean up
+#   unlink(c(temp_features, temp_library))
+# })

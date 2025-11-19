@@ -564,26 +564,6 @@ test_that("validate_weight_annotations_inputs rejects non-logical parameters", {
 # Additional Test Suite: load_annotation_tables - Edge Cases
 # ==============================================================================
 
-test_that(
-  skip("Not implemented")
-)
-# test_that("load_annotation_tables handles NA values correctly", {
-#   tmp <- withr::local_tempdir()
-#   withr::local_dir(tmp)
-#
-#   ann <- tidytable::tidytable(
-#     feature_id = c("F1", "F2"),
-#     candidate_score_similarity = c("", "NA")
-#   )
-#
-#   tidytable::fwrite(ann, "ann.tsv", sep = "\t")
-#
-#   result <- load_annotation_tables("ann.tsv", ms1_only = FALSE)
-#
-#   expect_true(is.na(result$candidate_score_similarity[1]))
-#   expect_true(is.na(result$candidate_score_similarity[2]))
-# })
-
 test_that("load_annotation_tables returns all columns as character", {
   tmp <- withr::local_tempdir()
   withr::local_dir(tmp)
@@ -1250,3 +1230,23 @@ test_that("test-validate_weight_annotations_inputs accepts weight sum within tol
     )
   )
 })
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("load_annotation_tables handles NA values correctly", {
+#   tmp <- withr::local_tempdir()
+#   withr::local_dir(tmp)
+#
+#   ann <- tidytable::tidytable(
+#     feature_id = c("F1", "F2"),
+#     candidate_score_similarity = c("", "NA")
+#   )
+#
+#   tidytable::fwrite(ann, "ann.tsv", sep = "\t")
+#
+#   result <- load_annotation_tables("ann.tsv", ms1_only = FALSE)
+#
+#   expect_true(is.na(result$candidate_score_similarity[1]))
+#   expect_true(is.na(result$candidate_score_similarity[2]))
+# })

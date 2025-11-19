@@ -121,64 +121,6 @@ test_that("apply_taxonomic_filter errors on no matches", {
   )
 })
 
-test_that(
-  skip("Not implemented")
-)
-# test_that("prepare_libraries_sop_merged works with filtering", {
-#   skip_on_cran()
-#   local_test_project(copy = TRUE)
-#   paths <- get_default_paths()
-#
-#   # Need LOTUS data
-#   fake_lotus(export = paths$data$source$libraries$sop$lotus)
-#   prepare_libraries_sop_lotus()
-#
-#   expect_no_error(
-#     prepare_libraries_sop_merged(
-#       files = get_params(
-#         step = "prepare_libraries_sop_merged"
-#       )$files$libraries$sop$prepared$lotus,
-#       filter = TRUE,
-#       level = "family",
-#       value = "Simaroubaceae|Gentianaceae",
-#       output_key = "data/interim/libraries/sop/merged/bitter.tsv.gz"
-#     )
-#   )
-# })
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("prepare_libraries_sop_merged triggers SMILES processing", {
-#   skip_on_cran()
-#   local_test_project(copy = TRUE)
-#   paths <- get_default_paths()
-#
-#   # Create fake data
-#   fake_ecmdb(export = paths$data$source$libraries$sop$ecmdb)
-#   fake_lotus(export = paths$data$source$libraries$sop$lotus)
-#
-#   prepare_libraries_sop_ecmdb()
-#   prepare_libraries_sop_lotus()
-#   prepare_libraries_sop_closed()
-#
-#   expect_no_error(
-#     prepare_libraries_sop_merged(
-#       files = c(
-#         get_params(
-#           step = "prepare_libraries_sop_merged"
-#         )$files$libraries$sop$prepared$closed,
-#         get_params(
-#           step = "prepare_libraries_sop_merged"
-#         )$files$libraries$sop$prepared$ecmdb,
-#         get_params(
-#           step = "prepare_libraries_sop_merged"
-#         )$files$libraries$sop$prepared$lotus
-#       )
-#     )
-#   )
-# })
-
 # ==============================================================================
 # Test Group: validate_sop_merged_inputs - Additional edge cases
 # ==============================================================================
@@ -724,3 +666,61 @@ test_that("test-apply_taxonomic_filter preserves core columns", {
   expect_true("organism_name" %in% names(result))
   expect_true("structure_smiles_no_stereo" %in% names(result))
 })
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("prepare_libraries_sop_merged works with filtering", {
+#   skip_on_cran()
+#   local_test_project(copy = TRUE)
+#   paths <- get_default_paths()
+#
+#   # Need LOTUS data
+#   fake_lotus(export = paths$data$source$libraries$sop$lotus)
+#   prepare_libraries_sop_lotus()
+#
+#   expect_no_error(
+#     prepare_libraries_sop_merged(
+#       files = get_params(
+#         step = "prepare_libraries_sop_merged"
+#       )$files$libraries$sop$prepared$lotus,
+#       filter = TRUE,
+#       level = "family",
+#       value = "Simaroubaceae|Gentianaceae",
+#       output_key = "data/interim/libraries/sop/merged/bitter.tsv.gz"
+#     )
+#   )
+# })
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("prepare_libraries_sop_merged triggers SMILES processing", {
+#   skip_on_cran()
+#   local_test_project(copy = TRUE)
+#   paths <- get_default_paths()
+#
+#   # Create fake data
+#   fake_ecmdb(export = paths$data$source$libraries$sop$ecmdb)
+#   fake_lotus(export = paths$data$source$libraries$sop$lotus)
+#
+#   prepare_libraries_sop_ecmdb()
+#   prepare_libraries_sop_lotus()
+#   prepare_libraries_sop_closed()
+#
+#   expect_no_error(
+#     prepare_libraries_sop_merged(
+#       files = c(
+#         get_params(
+#           step = "prepare_libraries_sop_merged"
+#         )$files$libraries$sop$prepared$closed,
+#         get_params(
+#           step = "prepare_libraries_sop_merged"
+#         )$files$libraries$sop$prepared$ecmdb,
+#         get_params(
+#           step = "prepare_libraries_sop_merged"
+#         )$files$libraries$sop$prepared$lotus
+#       )
+#     )
+#   )
+# })

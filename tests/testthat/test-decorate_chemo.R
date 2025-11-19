@@ -2,29 +2,6 @@
 
 library(testthat)
 
-test_that(
-  skip("Not implemented")
-)
-# test_that("decorate_chemo handles empty input", {
-#   # Use fixture utilities
-#   empty_df <- create_empty_table("annotation")
-#   empty_df$score_chemical <- numeric(0)
-#
-#   result <- decorate_chemo(
-#     annot_table_wei_chemo = empty_df,
-#     score_chemical_cla_kingdom = 0.1,
-#     score_chemical_cla_superclass = 0.2,
-#     score_chemical_cla_class = 0.3,
-#     score_chemical_cla_parent = 0.4,
-#     score_chemical_npc_pathway = 0.5,
-#     score_chemical_npc_superclass = 0.6,
-#     score_chemical_npc_class = 0.7
-#   )
-#
-#   expect_s3_class(result, "data.frame")
-#   expect_equal(nrow(result), 0)
-# })
-
 test_that("decorate_chemo returns input unchanged", {
   test_df <- tidytable::tidytable(
     feature_id = c("FT001", "FT002"),
@@ -73,3 +50,26 @@ test_that("decorate_chemo warns on missing columns", {
     NA
   )
 })
+
+test_that(
+  skip("Not implemented")
+)
+# test_that("decorate_chemo handles empty input", {
+#   # Use fixture utilities
+#   empty_df <- create_empty_table("annotation")
+#   empty_df$score_chemical <- numeric(0)
+#
+#   result <- decorate_chemo(
+#     annot_table_wei_chemo = empty_df,
+#     score_chemical_cla_kingdom = 0.1,
+#     score_chemical_cla_superclass = 0.2,
+#     score_chemical_cla_class = 0.3,
+#     score_chemical_cla_parent = 0.4,
+#     score_chemical_npc_pathway = 0.5,
+#     score_chemical_npc_superclass = 0.6,
+#     score_chemical_npc_class = 0.7
+#   )
+#
+#   expect_s3_class(result, "data.frame")
+#   expect_equal(nrow(result), 0)
+# })
