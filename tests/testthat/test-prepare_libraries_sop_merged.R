@@ -1,6 +1,8 @@
-# ==============================================================================
-# Test Suite: prepare_libraries_sop_merged
-# ==============================================================================
+# Test Suite: prepare_libraries_sop_merged ----
+
+library(testthat)
+
+## Validation ----
 
 test_that("validate_sop_merged_inputs accepts valid inputs", {
   expect_silent(
@@ -121,9 +123,7 @@ test_that("apply_taxonomic_filter errors on no matches", {
   )
 })
 
-# ==============================================================================
-# Test Group: validate_sop_merged_inputs - Additional edge cases
-# ==============================================================================
+## validate_sop_merged_inputs - Additional edge cases ----
 
 test_that("test-validate_sop_merged_inputs accepts all valid taxonomic levels", {
   valid_levels <- c(
@@ -290,9 +290,7 @@ test_that("test-validate_sop_merged_inputs validates all output parameters", {
   }
 })
 
-# ==============================================================================
-# Test Group: load_and_merge_libraries
-# ==============================================================================
+## load_and_merge_libraries ----
 
 test_that("test-load_and_merge_libraries combines multiple files", {
   skip("Requires complex setup with split_tables_sop function")
@@ -307,9 +305,7 @@ test_that("test-load_and_merge_libraries handles NA strings correctly", {
   skip("Requires complex setup with split_tables_sop function")
 })
 
-# ==============================================================================
-# Test Group: complete_organism_taxonomy
-# ==============================================================================
+## complete_organism_taxonomy ----
 
 test_that("test-complete_organism_taxonomy returns original when all organisms present", {
   table_keys <- tidytable::tidytable(
@@ -377,9 +373,7 @@ test_that("test-complete_organism_taxonomy preserves existing data", {
   expect_equal(result$organism_taxonomy_ottol_family, c("Fam1", "Fam2"))
 })
 
-# ==============================================================================
-# Test Group: apply_taxonomic_filter - Comprehensive
-# ==============================================================================
+## apply_taxonomic_filter ----
 
 test_that("test-apply_taxonomic_filter filters by kingdom", {
   table_keys <- tidytable::tidytable(
@@ -579,9 +573,7 @@ test_that("test-apply_taxonomic_filter handles missing taxonomy column", {
   )
 })
 
-# ==============================================================================
-# Test Group: Integration tests for prepare_libraries_sop_merged
-# ==============================================================================
+## Integration ----
 
 test_that("test-prepare_libraries_sop_merged validates inputs before processing", {
   # Test that validation happens first
@@ -603,9 +595,7 @@ test_that("test-prepare_libraries_sop_merged validates inputs before processing"
   )
 })
 
-# ==============================================================================
-# Test Group: Edge cases and boundary conditions
-# ==============================================================================
+## Edge cases and boundary conditions ----
 
 test_that("test-validate_sop_merged_inputs accepts empty value when filter=FALSE", {
   expect_silent(
