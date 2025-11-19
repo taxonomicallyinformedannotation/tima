@@ -315,48 +315,6 @@ test_that("prepare_libraries_rt converts seconds to minutes", {
   expect_true(any(abs(rt_values - 5.2) < 0.1))
 })
 
-test_that("prepare_libraries_rt handles missing InChIKeys", {
-  skip_on_cran()
-  skip("API-dependent test - requires naturalproducts.net")
-
-  withr::local_tempdir()
-  # Setup temporary test environment
-
-  # Create CSV with SMILES but no InChIKey
-  csv_exp <- file.path(tempdir(), "exp_no_ik.csv")
-
-  exp_data <- tidytable::tidytable(
-    rt = c(5.2, 7.8),
-    smiles = c("CC(C)C", "CCO")
-  )
-  export_output(x = exp_data, file = csv_exp)
-
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
-
-  # Should warn about missing InChIKeys
-  expect_warning(
-    {
-      result <- prepare_libraries_rt(
-        mgf_exp = NULL,
-        mgf_is = NULL,
-        temp_exp = csv_exp,
-        temp_is = NULL,
-        unit_rt = "minutes",
-        name_rt = "rt",
-        name_inchikey = "inchikey",
-        name_smiles = "smiles",
-        name_name = "structure_name",
-        output_rt = output_rt,
-        output_sop = output_sop
-      )
-    },
-    "entries without InChIKey"
-  )
-
-  expect_type(result, "character")
-})
-
 test_that("prepare_libraries_rt filters out invalid entries", {
   withr::local_tempdir()
   # Setup temporary test environment
@@ -647,6 +605,48 @@ test_that("prepare_libraries_rt validates RT unit and outputs", {
   # Output paths must be single strings
   expect_error(prepare_libraries_rt(output_rt = c("a", "b")), "single")
   expect_error(prepare_libraries_rt(output_sop = c("a", "b")), "single")
+})
+
+test_that("prepare_libraries_rt handles missing InChIKeys", {
+  skip_on_cran()
+  skip("API-dependent test - requires naturalproducts.net")
+
+  withr::local_tempdir()
+  # Setup temporary test environment
+
+  # Create CSV with SMILES but no InChIKey
+  csv_exp <- file.path(tempdir(), "exp_no_ik.csv")
+
+  exp_data <- tidytable::tidytable(
+    rt = c(5.2, 7.8),
+    smiles = c("CC(C)C", "CCO")
+  )
+  export_output(x = exp_data, file = csv_exp)
+
+  output_rt <- file.path(tempdir(), "rt_library.tsv")
+  output_sop <- file.path(tempdir(), "sop.tsv")
+
+  # Should warn about missing InChIKeys
+  expect_warning(
+    {
+      result <- prepare_libraries_rt(
+        mgf_exp = NULL,
+        mgf_is = NULL,
+        temp_exp = csv_exp,
+        temp_is = NULL,
+        unit_rt = "minutes",
+        name_rt = "rt",
+        name_inchikey = "inchikey",
+        name_smiles = "smiles",
+        name_name = "structure_name",
+        output_rt = output_rt,
+        output_sop = output_sop
+      )
+    },
+    "entries without InChIKey"
+  )
+
+  expect_type(result, "character")
 })
 
 test_that(

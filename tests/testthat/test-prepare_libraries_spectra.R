@@ -2,14 +2,6 @@
 
 library(testthat)
 
-test_that("prepare_libraries_spectra handles non-existent input", {
-  skip("Integration test - requires package structure")
-})
-
-test_that("prepare_libraries_spectra handles NULL input", {
-  skip("Integration test - requires package structure")
-})
-
 test_that("prepare_libraries_spectra works with default parameters", {
   skip_on_cran()
   local_test_project(copy = TRUE)
@@ -26,6 +18,14 @@ test_that("prepare_libraries_spectra works with default parameters", {
   )
 
   expect_no_error(prepare_libraries_spectra())
+})
+
+test_that("prepare_libraries_spectra handles non-existent input", {
+  skip("Not implemented")
+})
+
+test_that("prepare_libraries_spectra handles NULL input", {
+  skip("Not implemented")
 })
 
 test_that(
