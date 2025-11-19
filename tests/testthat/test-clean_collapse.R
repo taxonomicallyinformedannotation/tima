@@ -1,8 +1,6 @@
 # Test Suite: clean_collapse ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 test_that("clean_collapse collapses specified columns", {
   df <- tidytable::tidytable(

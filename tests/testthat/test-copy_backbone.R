@@ -1,8 +1,6 @@
 # Test Suite: copy_backbone ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 ## Input Validation ----
 

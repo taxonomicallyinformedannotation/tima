@@ -1,8 +1,6 @@
 # Test Suite: constants ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 ## Physical constants ----
 

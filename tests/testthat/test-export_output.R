@@ -1,8 +1,6 @@
 # Test Suite: export_output ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 # Validation tests
 test_that("export_output validates file path", {

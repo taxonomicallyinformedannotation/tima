@@ -1,8 +1,6 @@
 # Test Suite: complement_metadata_structures ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 test_that("complement_metadata_structures handles empty input", {
   result <- complement_metadata_structures(tidytable::tidytable())

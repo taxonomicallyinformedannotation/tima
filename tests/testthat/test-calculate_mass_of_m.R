@@ -1,8 +1,6 @@
 # Test Suite: calculate_mass_of_m ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 ## Basic mass calculation ----
 

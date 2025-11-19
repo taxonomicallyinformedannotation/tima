@@ -1,8 +1,6 @@
 # Test Suite: get_file ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 ## Input Validation ----
 

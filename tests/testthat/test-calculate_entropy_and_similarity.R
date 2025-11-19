@@ -1,8 +1,6 @@
 # Test Suite: calculate_entropy_and_similarity ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 test_that("calculate_entropy_and_similarity works with small spectra", {
   # Small test spectra

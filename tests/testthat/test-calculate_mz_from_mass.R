@@ -1,8 +1,6 @@
 # Test Suite: calculate_mz_from_mass ----
 
 library(testthat)
-pkgload::load_all(quiet = TRUE) |>
-  suppressMessages()
 
 ## Basic mz calculation ----
 
