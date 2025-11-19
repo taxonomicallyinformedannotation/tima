@@ -697,11 +697,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="clean-collapse">Clean collapse</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function collapses a grouped dataframe and trims it. It removes NA values, collapses unique values with " $ " separator, trims whitespace, and converts empty strings to NA.</p>
+<p>This function collapses a grouped dataframe and trims it. It removes NA values, collapses unique values with a separator, trims whitespace, and converts empty strings to NA.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">clean_collapse(grouped_df, cols = NULL)
+<pre><code class="language-R">clean_collapse(grouped_df, cols = NULL, separator = " \$ ")
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -721,6 +721,14 @@ Grouped dataframe to be collapsed
 </td>
 <td>
 Character vector of column name(s) to apply collapse to. If NULL (default), applies to all columns.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="separator">separator</code>
+</td>
+<td>
+Character string used to separate collapsed values. Default: " $ "
 </td>
 </tr>
 </tbody></table>
