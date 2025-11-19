@@ -1,12 +1,8 @@
-# ==============================================================================
-# Test Suite: prepare_libraries_sop_hmdb - Complete test coverage
-# File: test-prepare_libraries_sop_hmdb.R
-# ==============================================================================
+# Test Suite: prepare_libraries_sop_hmdb ----
 
-# ==============================================================================
-# Test Group: prepare_libraries_sop_hmdb input validation
-# Purpose: Validate input parameter checking
-# ==============================================================================
+library(testthat)
+
+## Validation ----
 
 test_that("test-prepare_libraries_sop_hmdb validates input path", {
   # Non-character input
@@ -57,10 +53,7 @@ test_that("test-prepare_libraries_sop_hmdb validates output path", {
   )
 })
 
-# ==============================================================================
-# Test Group: prepare_libraries_sop_hmdb functional behavior
-# Purpose: Test actual functionality
-# ==============================================================================
+## Behavior ----
 
 test_that("test-prepare_libraries_sop_hmdb handles missing input file", {
   tmp <- withr::local_tempdir()
@@ -129,10 +122,7 @@ test_that("test-prepare_libraries_sop_hmdb regenerates small output files", {
   expect_true(file.exists(output_file))
 })
 
-# ==============================================================================
-# Test Group: prepare_libraries_sop_hmdb HMDB parsing
-# Purpose: Test HMDB SDF parsing logic (when file exists)
-# ==============================================================================
+## Parsing ----
 
 test_that("test-prepare_libraries_sop_hmdb parses minimal mock SDF", {
   tmp <- withr::local_tempdir()

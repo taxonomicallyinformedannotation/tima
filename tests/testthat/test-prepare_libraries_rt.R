@@ -1,12 +1,8 @@
-# =============================================================================
-# Tests for prepare_libraries_rt()
-# =============================================================================
-# Comprehensive test coverage for retention time library preparation from
-# experimental and in silico sources.
+# Test Suite: prepare_libraries_rt ----
 
-# =============================================================================
-# Input Validation Tests
-# =============================================================================
+library(testthat)
+
+## Input Validation ----
 
 test_that("prepare_libraries_rt validates unit_rt parameter", {
   withr::local_tempdir()
@@ -87,9 +83,7 @@ test_that("prepare_libraries_rt validates output_sop parameter", {
   )
 })
 
-# =============================================================================
-# Edge Cases and Empty Input Tests
-# =============================================================================
+## Edge Cases and Empty Input ----
 
 test_that("prepare_libraries_rt handles all NULL inputs", {
   withr::local_tempdir()
@@ -168,9 +162,7 @@ test_that("prepare_libraries_rt handles NA in input vectors", {
   expect_true(file.exists(result["rt"]))
 })
 
-# =============================================================================
-# Functional Tests - CSV Input
-# =============================================================================
+# Functional Tests - CSV Input ----
 
 test_that("prepare_libraries_rt processes CSV with experimental RT", {
   withr::local_tempdir()
@@ -365,9 +357,7 @@ test_that("prepare_libraries_rt filters out invalid entries", {
   ))
 })
 
-# =============================================================================
-# Functional Tests - Combined Sources
-# =============================================================================
+# Functional Tests - Combined Sources ----
 
 test_that("prepare_libraries_rt combines experimental and predicted data", {
   withr::local_tempdir()
@@ -473,9 +463,7 @@ test_that("prepare_libraries_rt handles duplicate InChIKeys", {
   expect_equal(length(unique_structures), nrow(sop_table))
 })
 
-# =============================================================================
-# Output Structure Tests
-# =============================================================================
+# Output Structure ----
 
 test_that("prepare_libraries_rt creates correct output structure", {
   withr::local_tempdir()
@@ -531,9 +519,7 @@ test_that("prepare_libraries_rt creates correct output structure", {
   expect_true(all(is.na(sop_table$organism_name)))
 })
 
-# =============================================================================
-# Performance Tests
-# =============================================================================
+# Performance ----
 
 test_that("prepare_libraries_rt handles moderate-scale data efficiently", {
   skip_on_cran()

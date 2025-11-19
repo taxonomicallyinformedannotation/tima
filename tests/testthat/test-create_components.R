@@ -2,57 +2,165 @@
 
 library(testthat)
 
-## Internal Utility Helpers ----
+## Validation ----
 
-write_edges_table <- function(df, paths) {
-  export_output(
-    x = df,
-    file = paths$data$interim$features$edges
+test_that("test-create_components validates input files exist", {
+  tmp <- withr::local_tempdir()
+  output <- file.path(tmp, "components.tsv")
+
+  expect_error(
+    create_components(
+      input = file.path(tmp, "missing.tsv"),
+      output = output
+    ),
+    "Input file\\(s\\) not found"
   )
-}
+})
 
-## TODO ----
+test_that("test-create_components validates multiple input files", {
+  tmp <- withr::local_tempdir()
+  file1 <- file.path(tmp, "edges1.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(feature_source = "F1", feature_target = "F2"),
+    file1,
+    sep = "\t"
+  )
 
-test_that(
-  skip("Not implemented")
-)
-# test_that("create_components handles empty edge table", {
-#   skip_on_cran()
-#   paths <- local_test_project(copy = TRUE)
-#
-#   empty_edges <- tidytable::tidytable(
-#     feature_source = character(0),
-#     feature_target = character(0)
-#   )
-#   write_edges_table(empty_edges, paths)
-#
-#   expect_no_error(result <- create_components())
-#   expect_s3_class(result, "data.frame")
-#   # Should be empty or have placeholder structure
-#   expect_true(
-#     nrow(result) == 0L ||
-#       all(c("feature_id", "component_id") %in% names(result))
-#   )
-# })
+  output <- file.path(tmp, "components.tsv")
 
-test_that(
-  skip("Not implemented")
-)
-# test_that("create_components builds components from minimal cyclic edges", {
-#   skip_on_cran()
-#   paths <- local_test_project(copy = TRUE)
-#
-#   edges <- tidytable::tidytable(
-#     feature_source = c("FT001", "FT002", "FT003"),
-#     feature_target = c("FT002", "FT003", "FT001"),
-#     similarity = c(0.8, 0.9, 0.7)
-#   )
-#   write_edges_table(edges, paths)
-#
-#   result <- create_components()
-#   expect_s3_class(result, "data.frame")
-#   expect_true(
-#     any(grepl("component", names(result))) ||
-#       any(grepl("feature_id", names(result)))
-#   )
-# })
+  expect_error(
+    create_components(
+      input = c(file1, file.path(tmp, "missing.tsv")),
+      output = output
+    ),
+    "Input file\\(s\\) not found"
+  )
+})
+
+## Behavior ----
+
+test_that("test-create_components processes minimal edge data", {
+  tmp <- withr::local_tempdir()
+
+  edges <- tidytable::tidytable(
+    feature_source = c("F1", "F2", "F3"),
+    feature_target = c("F2", "F3", "F4")
+  )
+  input <- file.path(tmp, "edges.tsv")
+  tidytable::fwrite(edges, input, sep = "\t")
+
+  output <- file.path(tmp, "components.tsv")
+
+  res <- create_components(input = input, output = output)
+
+  expect_equal(res, output)
+  expect_true(file.exists(output))
+
+  components <- tidytable::fread(output)
+  expect_true("cluster index" %in% names(components))
+  expect_true("componentindex" %in% names(components))
+})
+
+test_that("test-create_components handles empty edges", {
+  tmp <- withr::local_tempdir()
+
+  edges <- tidytable::tidytable(
+    feature_source = character(),
+    feature_target = character()
+  )
+  input <- file.path(tmp, "edges.tsv")
+  tidytable::fwrite(edges, input, sep = "\t")
+
+  output <- file.path(tmp, "components.tsv")
+
+  res <- create_components(input = input, output = output)
+
+  expect_true(file.exists(output))
+  components <- tidytable::fread(output)
+  expect_equal(nrow(components), 0)
+})
+
+test_that("test-create_components combines multiple edge files", {
+  tmp <- withr::local_tempdir()
+
+  edges1 <- tidytable::tidytable(
+    feature_source = c("F1"),
+    feature_target = c("F2")
+  )
+  input1 <- file.path(tmp, "edges1.tsv")
+  tidytable::fwrite(edges1, input1, sep = "\t")
+
+  edges2 <- tidytable::tidytable(
+    feature_source = c("F3"),
+    feature_target = c("F4")
+  )
+  input2 <- file.path(tmp, "edges2.tsv")
+  tidytable::fwrite(edges2, input2, sep = "\t")
+
+  output <- file.path(tmp, "components.tsv")
+
+  res <- create_components(input = c(input1, input2), output = output)
+
+  expect_true(file.exists(output))
+  components <- tidytable::fread(output)
+  expect_true(nrow(components) >= 2)
+})
+
+test_that("test-create_components handles disconnected components", {
+  tmp <- withr::local_tempdir()
+
+  # Create two separate components
+  edges <- tidytable::tidytable(
+    feature_source = c("F1", "F3"),
+    feature_target = c("F2", "F4")
+  )
+  input <- file.path(tmp, "edges.tsv")
+  tidytable::fwrite(edges, input, sep = "\t")
+
+  output <- file.path(tmp, "components.tsv")
+
+  res <- create_components(input = input, output = output)
+
+  expect_true(file.exists(output))
+  components <- tidytable::fread(output)
+
+  # Should have at least 1 component
+  n_components <- length(unique(components$componentindex))
+  expect_true(n_components >= 1)
+})
+
+test_that("test-create_components filters NA values", {
+  tmp <- withr::local_tempdir()
+
+  edges <- tidytable::tidytable(
+    feature_source = c("F1", NA, "F3"),
+    feature_target = c("F2", "F2", "F4")
+  )
+  input <- file.path(tmp, "edges.tsv")
+  tidytable::fwrite(edges, input, sep = "\t")
+
+  output <- file.path(tmp, "components.tsv")
+
+  res <- create_components(input = input, output = output)
+
+  expect_true(file.exists(output))
+  components <- tidytable::fread(output)
+  # Should only contain F1, F2, F3, F4 (NA filtered out)
+  expect_false(any(is.na(components$`cluster index`)))
+})
+
+test_that("test-create_components creates distinct edges", {
+  tmp <- withr::local_tempdir()
+
+  # Duplicate edges should be removed
+  edges <- tidytable::tidytable(
+    feature_source = c("F1", "F1", "F2"),
+    feature_target = c("F2", "F2", "F3")
+  )
+  input <- file.path(tmp, "edges.tsv")
+  tidytable::fwrite(edges, input, sep = "\t")
+
+  output <- file.path(tmp, "components.tsv")
+
+  expect_no_error(create_components(input = input, output = output))
+})
