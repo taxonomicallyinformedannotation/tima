@@ -510,6 +510,9 @@ test_that("weight_bio returns expected columns", {
 # Performance Tests
 # =============================================================================
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("weight_bio handles moderate-scale data efficiently", {
 #   skip_on_cran()
 #   skip_if_not(interactive(), "Performance test only for local development")

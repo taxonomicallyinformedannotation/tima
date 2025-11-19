@@ -23,7 +23,6 @@ with_temp_env <- function(vars, code) {
 test_that(
   skip("Not implemented")
 )
-
 # test_that("init_logging respects TIMA_LOG_FILE env var", {
 #   tmp <- tempfile("tima-log-", fileext = ".log")
 #   unlink(tmp)

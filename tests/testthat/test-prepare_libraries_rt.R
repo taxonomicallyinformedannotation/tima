@@ -649,6 +649,9 @@ test_that("prepare_libraries_rt validates RT unit and outputs", {
   expect_error(prepare_libraries_rt(output_sop = c("a", "b")), "single")
 })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_libraries_rt works with experimental data", {
 #   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
@@ -670,6 +673,9 @@ test_that("prepare_libraries_rt validates RT unit and outputs", {
 #   )
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_libraries_rt works with in-silico data", {
 #   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
@@ -691,6 +697,9 @@ test_that("prepare_libraries_rt validates RT unit and outputs", {
 #   )
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_libraries_rt warns on invalid SMILES", {
 #   local_test_project(copy = TRUE)
 #

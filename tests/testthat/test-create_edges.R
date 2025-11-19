@@ -1,12 +1,8 @@
-# ==============================================================================
-# Test Suite: create_edges()
-# ==============================================================================
-# Tests the spectral similarity network edge creation function.
-# Uses test fixtures from helper-fixtures.R (create_test_spectrum, create_similar_spectra).
+# Test Suite: create_edges ----
 
-# ==============================================================================
-# Test: Input Validation
-# ==============================================================================
+library(testthat)
+
+## Input Validation ----
 
 test_that("create_edges validates input consistency", {
   frags <- list(create_test_spectrum(), create_test_spectrum())
@@ -75,9 +71,7 @@ test_that("create_edges handles insufficient spectra", {
   expect_equal(nrow(result), 1L)
 })
 
-# ==============================================================================
-# Test: Similarity Methods
-# ==============================================================================
+## Similarity Methods ----
 
 test_that("create_edges works with cosine similarity", {
   # Create similar spectra that should match
@@ -155,9 +149,7 @@ test_that("create_edges works with entropy similarity", {
   expect_true("score" %in% colnames(result))
 })
 
-# ==============================================================================
-# Test: Threshold Filtering
-# ==============================================================================
+## Threshold Filtering ----
 
 test_that("create_edges filters by similarity threshold", {
   # Create very different spectra (low similarity expected)
@@ -220,9 +212,7 @@ test_that("create_edges filters by matched peaks", {
   }
 })
 
-# ==============================================================================
-# Test: Edge Cases
-# ==============================================================================
+## Edge Cases ----
 
 test_that("create_edges handles single-peak spectra", {
   frags <- list(
@@ -266,9 +256,7 @@ test_that("create_edges handles empty spectra", {
   )
 })
 
-# ==============================================================================
-# Test: Performance & Scalability
-# ==============================================================================
+## Performance & Scalability ----
 
 test_that("create_edges handles many spectra efficiently", {
   skip_on_cran()
@@ -296,9 +284,7 @@ test_that("create_edges handles many spectra efficiently", {
   expect_lt(elapsed, 30) # Should complete in reasonable time
 })
 
-# ==============================================================================
-# Test: Output Structure
-# ==============================================================================
+## Output Structure ----
 
 test_that("create_edges returns correct column structure", {
   frags <- list(
@@ -358,9 +344,7 @@ test_that("create_edges ensures feature_id < target_id", {
   }
 })
 
-# ==============================================================================
-# Test: Integration with create_edges_spectra
-# ==============================================================================
+## Integration with create_edges_spectra ----
 
 test_that("create_edges integrates with extract_spectra output", {
   skip_on_cran()

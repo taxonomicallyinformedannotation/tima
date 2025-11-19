@@ -377,7 +377,7 @@ test_that("parse_adduct returns consistent results for same input", {
 
 test_that("parse_adduct is case-sensitive for element symbols", {
   # This documents current behavior - may want to add case handling later
-  result_lowercase <- parse_adduct("[M+na]+")
+  expect_warning(result_lowercase <- parse_adduct("[M+na]+"))
   result_uppercase <- parse_adduct("[M+Na]+")
 
   # These might differ if lowercase 'na' isn't recognized as sodium

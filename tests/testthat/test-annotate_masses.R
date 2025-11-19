@@ -379,25 +379,28 @@ test_that("annotate_masses handles no valid monocharged adducts", {
   output_edges <- "data/interim/edges.tsv"
 
   # Use only multicharged adducts (should fail)
-  expect_error(
-    annotate_masses(
-      features = features_file,
-      library = library_file,
-      str_stereo = str_stereo,
-      str_met = str_met,
-      str_nam = str_nam,
-      str_tax_cla = str_tax_cla,
-      str_tax_npc = str_tax_npc,
-      adducts_list = list(pos = c("[M+2H]2+")), # Only multicharged
-      clusters_list = list(pos = character(0)), # No clusters
-      neutral_losses_list = c("H2O"),
-      ms_mode = "pos",
-      tolerance_ppm = 10,
-      tolerance_rt = 0.02,
-      output_annotations = output_annotations,
-      output_edges = output_edges
-    ),
-    "No monocharged adducts/clusters available for annotation"
+  # COMMENT: Both error and warning
+  expect_warning(
+    expect_error(
+      annotate_masses(
+        features = features_file,
+        library = library_file,
+        str_stereo = str_stereo,
+        str_met = str_met,
+        str_nam = str_nam,
+        str_tax_cla = str_tax_cla,
+        str_tax_npc = str_tax_npc,
+        adducts_list = list(pos = c("[M+2H]2+")), # Only multicharged
+        clusters_list = list(pos = character(0)), # No clusters
+        neutral_losses_list = c("H2O"),
+        ms_mode = "pos",
+        tolerance_ppm = 10,
+        tolerance_rt = 0.02,
+        output_annotations = output_annotations,
+        output_edges = output_edges
+      ),
+      "No monocharged adducts/clusters available for annotation"
+    )
   )
 })
 
@@ -628,6 +631,10 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
 })
 
 ## Performance and Scalability Tests ----
+
+test_that(
+  skip("Not implemented")
+)
 
 # test_that("annotate_masses handles moderate-scale data efficiently", {
 #   skip_on_cran()

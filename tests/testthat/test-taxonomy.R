@@ -1,5 +1,8 @@
 # Test: Taxonomy Functions
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_taxa works with forced organism", {
 #   skip_on_cran()
 #   local_test_project(copy = TRUE)
@@ -22,6 +25,9 @@
 #
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_taxa handles empty taxon", {
 #   skip_on_cran()
 #   local_test_project(copy = TRUE)
@@ -44,6 +50,9 @@
 #
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_taxa works without file extension", {
 #   skip_on_cran()
 #   local_test_project(copy = TRUE)
@@ -66,6 +75,9 @@
 #
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_taxa handles unrecognized taxa", {
 #   skip_on_cran()
 #   local_test_project(copy = TRUE)
@@ -105,6 +117,9 @@
 #
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("prepare_taxa works with intensity-based attribution", {
 #   skip_on_cran()
 #   local_test_project(copy = TRUE)
@@ -150,6 +165,9 @@ test_that("get_organism_taxonomy_ott handles API failures", {
   expect_s3_class(result$taxonomy, "data.frame")
 })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("benchmark_taxize_spectra works", {
 #   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()

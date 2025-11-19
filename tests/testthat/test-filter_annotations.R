@@ -353,6 +353,9 @@ test_that("apply_rt_filter handles exact RT match", {
   expect_equal(nrow(result), 1)
 })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("apply_rt_filter handles boundary tolerance", {
 #   features_ann <- tidytable::tidytable(
 #     feature_id = c("F1", "F2"),
@@ -472,6 +475,9 @@ test_that("apply_rt_filter removes optional columns", {
 
 ## Integration ----
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("test-filter_annotations processes annotations successfully", {
 #   tmp <- withr::local_tempdir()
 #
@@ -520,6 +526,9 @@ test_that("apply_rt_filter removes optional columns", {
 #   expect_true("feature_id" %in% names(filtered))
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("test-filter_annotations handles RT filtering when library provided", {
 #   tmp <- withr::local_tempdir()
 #
@@ -565,6 +574,9 @@ test_that("apply_rt_filter removes optional columns", {
 #   expect_true("F1" %in% filtered$feature_id)
 # })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("test-filter_annotations returns output path", {
 #   tmp <- withr::local_tempdir()
 #
@@ -631,6 +643,9 @@ test_that("test-filter_ms1_redundancy handles empty MS1 table", {
   expect_equal(result$feature_id[1], "F1")
 })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("test-filter_ms1_redundancy combines multiple spectral sources", {
 #   ms1 <- tidytable::tidytable(
 #     feature_id = c("F1"),

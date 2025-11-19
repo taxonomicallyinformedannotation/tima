@@ -88,6 +88,9 @@ test_that("calculate_similarity returns 0 for empty spectra", {
   expect_equal(res$matches, 0L)
 })
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("calculate_similarity rejects non-matrix input", {
 #   expect_error(
 #     calculate_similarity(

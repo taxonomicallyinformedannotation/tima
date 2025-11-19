@@ -1,8 +1,6 @@
-# Test: Prepare Features Components
+# Test Suite: prepare_features_components ----
 
-# =============================================================================
-# Tests for prepare_features_components() - Network Component Processing
-# =============================================================================
+library(testthat)
 
 test_that("prepare_features_components validates input parameter", {
   # Test non-character input

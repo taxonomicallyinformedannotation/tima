@@ -564,6 +564,9 @@ test_that("validate_weight_annotations_inputs rejects non-logical parameters", {
 # Additional Test Suite: load_annotation_tables - Edge Cases
 # ==============================================================================
 
+test_that(
+  skip("Not implemented")
+)
 # test_that("load_annotation_tables handles NA values correctly", {
 #   tmp <- withr::local_tempdir()
 #   withr::local_dir(tmp)
@@ -712,7 +715,11 @@ test_that("test-validate_weight_annotations_inputs accepts boundary weight value
 
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
   dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
 
   writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
@@ -754,7 +761,11 @@ test_that("test-validate_weight_annotations_inputs accepts boundary score values
 
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
   dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
 
   writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
@@ -796,7 +807,11 @@ test_that("test-validate_weight_annotations_inputs handles multiple annotation f
 
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
   dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
 
   writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
@@ -841,7 +856,11 @@ test_that("test-validate_weight_annotations_inputs rejects when one annotation f
 
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
   dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
 
   writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
@@ -886,7 +905,11 @@ test_that("test-validate_weight_annotations_inputs handles optional files gracef
 
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
   dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
 
   writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
@@ -932,7 +955,11 @@ test_that("test-validate_weight_annotations_inputs rejects invalid logical param
 
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
   dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
 
   writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
@@ -955,7 +982,7 @@ test_that("test-validate_weight_annotations_inputs rejects invalid logical param
       minimal_consistency = 0.5,
       minimal_ms1_bio = 0.5,
       minimal_ms1_chemo = 0.5,
-      ms1_only = "yes",  # Invalid - should be logical
+      ms1_only = "yes", # Invalid - should be logical
       compounds_names = TRUE,
       high_confidence = FALSE,
       remove_ties = FALSE,
@@ -974,7 +1001,11 @@ test_that("test-validate_weight_annotations_inputs accepts all logical parameter
 
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
   dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
 
   writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
@@ -1042,7 +1073,11 @@ test_that("test-validate_weight_annotations_inputs rejects zero candidates", {
 
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
   dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
 
   writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
@@ -1084,7 +1119,11 @@ test_that("test-validate_weight_annotations_inputs rejects negative scores", {
 
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
   dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
 
   writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
@@ -1126,7 +1165,11 @@ test_that("test-validate_weight_annotations_inputs rejects scores > 1", {
 
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
   dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
 
   writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
@@ -1168,7 +1211,11 @@ test_that("test-validate_weight_annotations_inputs accepts weight sum within tol
 
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/libraries/sop/merged", recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    "data/interim/libraries/sop/merged",
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
   dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
 
   writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
@@ -1186,9 +1233,9 @@ test_that("test-validate_weight_annotations_inputs accepts weight sum within tol
       taxa = "data/interim/metadata/taxa.tsv",
       annotations = "data/interim/annotations/ann.tsv",
       minimal_ms1_condition = "OR",
-      weight_spectral = 1/3,
-      weight_chemical = 1/3,
-      weight_biological = 1/3,
+      weight_spectral = 1 / 3,
+      weight_chemical = 1 / 3,
+      weight_biological = 1 / 3,
       minimal_consistency = 0.5,
       minimal_ms1_bio = 0.5,
       minimal_ms1_chemo = 0.5,
@@ -1203,4 +1250,3 @@ test_that("test-validate_weight_annotations_inputs accepts weight sum within tol
     )
   )
 })
-
