@@ -1,14 +1,8 @@
-# ==============================================================================
-# Test Fixtures and Helpers
-# ==============================================================================
-#
-# This file contains reusable test fixtures and helper functions to reduce
-# boilerplate code and improve test maintainability.
-# ==============================================================================
-# Internal Utility Helpers (defined first for use throughout)
-# ==============================================================================
+# Test Fixtures and Helpers ----
 
-# Deterministic random helper ----
+## Internal Utility Helpers ----
+
+### Deterministic random helper ----
 .with_seed <- function(seed, expr) {
   if (!is.null(seed)) {
     # Initialize RNG deterministically without relying on existing .Random.seed
@@ -24,7 +18,7 @@
   force(expr)
 }
 
-# Pseudo InChIKey generator (format only, not chemically valid) ----
+### Pseudo InChIKey generator (format only, not chemically valid) ----
 generate_fake_inchikey <- function(n = 1L, seed = NULL) {
   .with_seed(seed, {
     vapply(
@@ -43,9 +37,7 @@ generate_fake_inchikey <- function(n = 1L, seed = NULL) {
   })
 }
 
-# ==============================================================================
-# Environment Setup Fixtures
-# ==============================================================================
+## Environment Setup Fixtures ----
 
 #' Setup an isolated temporary project directory for filesystem tests
 #'
@@ -70,7 +62,7 @@ local_test_project <- function(copy = TRUE) {
   local_quiet_logging()
 
   if (isTRUE(copy)) {
-    tima:::copy_backbone(cache_dir = ".")
+    copy_backbone(cache_dir = ".")
   }
 
   get_default_paths()
@@ -104,9 +96,9 @@ local_quiet_logging <- function(threshold = "WARN") {
   invisible(NULL)
 }
 
-# ==============================================================================
-# Test Data Fixtures - Spectral Data
-# ==============================================================================
+## Data Fixtures ----
+
+### Spectral ----
 
 #' Create a minimal test spectrum
 #'
@@ -184,9 +176,7 @@ create_similar_spectra <- function(
   })
 }
 
-# ==============================================================================
-# Test Data Fixtures - Features and Annotations
-# ==============================================================================
+### Features and Annotations ----
 
 #' Create minimal features table for testing
 #'
@@ -312,9 +302,7 @@ create_test_taxonomy <- function(n_taxa = 5L, seed = NULL) {
   })
 }
 
-# ==============================================================================
-# Test Data Fixtures - Integration Test Setup
-# ==============================================================================
+### Integration Test Setup ----
 
 #' Setup complete test workflow with features, libraries, and metadata
 #'
@@ -353,9 +341,8 @@ setup_integration_workflow <- function(paths, download_examples = FALSE) {
   invisible(NULL)
 }
 
-# ==============================================================================
-# Assertion Helpers
-# ==============================================================================
+
+## Assertion Helpers ----
 
 #' Expect a valid InChIKey format
 #'
@@ -391,15 +378,7 @@ expect_required_columns <- function(df, required_cols) {
   )
 }
 
-#' Fixture Utilities
-#'
-#' @description
-#' Utilities for loading CSV fixtures and creating minimal test data structures.
-#' This file provides both CSV loaders and programmatic fixture generators.
-
-# ==============================================================================
-# CSV Fixture Loaders
-# ==============================================================================
+## CSV Fixture Loaders ----
 
 #' Load a test fixture from CSV
 #'
@@ -581,9 +560,6 @@ create_features_with_edges <- function(
   })
 }
 
-# ==============================================================================
-# ==============================================================================
-
 #' Load fixture CSV file
 #'
 #' @param filename Name of CSV file in fixtures/ directory
@@ -687,9 +663,7 @@ load_fixture_sop <- function() {
   load_fixture_csv("structure_organism_pairs.csv")
 }
 
-# ==============================================================================
-# Empty Structure Generators (for validation tests)
-# ==============================================================================
+## Empty Structure Generators ----
 
 #' Create empty table with required columns (for validation tests)
 #'
@@ -762,9 +736,7 @@ create_empty_table <- function(template = "annotation") {
   templates[[template]]
 }
 
-# ==============================================================================
-# Minimal Data Generators (for simple tests)
-# ==============================================================================
+## Minimal Data Generators ----
 
 #' Create minimal sample data for testing
 #'
@@ -809,9 +781,7 @@ create_minimal_data <- function(template = "annotation", n_rows = 2) {
   empty
 }
 
-# ==============================================================================
-# Extended Fixtures (programmatic generation)
-# ==============================================================================
+## Extended Fixtures ----
 
 #' Create structure-organism pairs with full taxonomy
 #'
@@ -1004,9 +974,8 @@ create_fixture_yamls_params <- function(id = "TESTID") {
   )
 }
 
-# ==============================================================================
-# Usage Guide
-# ==============================================================================
+##  Usage Guide ----
+
 # Use create_empty_table() when:
 # - Testing input validation
 # - Need proper column structure but no data

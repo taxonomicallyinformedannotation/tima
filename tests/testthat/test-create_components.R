@@ -1,23 +1,23 @@
-# ==============================================================================
-# Test Suite: create_components
-# ==============================================================================
-#
-# @description
-# Tests for create_components which assigns connected spectral/feature graph
-# components based on precomputed edges.
-#
-# @coverage
-# - Empty edges
-# - Minimal cyclic edge set
-# - Integration with prepare_features_edges
+# Test Suite: create_components ----
 
-# Helper to write edges table
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
+
+## Internal Utility Helpers ----
+
 write_edges_table <- function(df, paths) {
   export_output(
     x = df,
     file = paths$data$interim$features$edges
   )
 }
+
+## TODO ----
+
+test_that(
+  skip("Not implemented")
+)
 
 # test_that("create_components handles empty edge table", {
 #   skip_on_cran()

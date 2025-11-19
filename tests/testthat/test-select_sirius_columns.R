@@ -28,7 +28,7 @@ make_canopus_df <- function() {
 
 # test_that("select_sirius_columns_canopus maps NPC and ClassyFire columns", {
 #   df <- make_canopus_df()
-#   res <- tima:::select_sirius_columns_canopus(df, sirius_version = "6")
+#   res <- select_sirius_columns_canopus(df, sirius_version = "6")
 #
 #   expect_true(all(
 #     c(

@@ -1,9 +1,10 @@
-#' @title Test Suite for calculate_mz_from_mass (Inverse Function)
-#'
-#' @description Individual tests for the inverse mass-to-mz calculation
-#'     and round-trip accuracy verification.
+# Test Suite: calculate_mz_from_mass ----
 
-# Test: Basic mz calculation ----
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
+
+## Basic mz calculation ----
 
 test_that("calculate_mz_from_mass calculates mz for [M+H]+", {
   neutral_mass <- 200.0
@@ -28,7 +29,7 @@ test_that("calculate_mz_from_mass calculates mz for [M-H]-", {
   expect_true(abs(mz - 199) < 1) # H subtracts ~1 Da
 })
 
-# Test: Parameter validation ----
+## Parameter validation ----
 
 test_that("calculate_mz_from_mass requires neutral_mass", {
   expect_error(
@@ -55,7 +56,7 @@ test_that("calculate_mz_from_mass validates neutral_mass range", {
   expect_silent(calculate_mz_from_mass(10000, "[M+H]+"))
 })
 
-# Test: Invalid adduct handling ----
+## Invalid adduct handling ----
 
 test_that("calculate_mz_from_mass handles invalid adduct gracefully", {
   # Invalid adducts should return 0 with a warning
@@ -74,7 +75,7 @@ test_that("calculate_mz_from_mass handles empty adduct", {
   expect_equal(mz, 0)
 })
 
-# Test: Multimers ----
+## Multimers ----
 
 test_that("calculate_mz_from_mass handles dimer", {
   neutral_mass <- 100.0
@@ -91,7 +92,7 @@ test_that("calculate_mz_from_mass handles trimer", {
   expect_true(abs(mz - 301) < 1)
 })
 
-# Test: Multiple charges ----
+## Multiple charges ----
 
 test_that("calculate_mz_from_mass handles doubly charged", {
   neutral_mass <- 1000.0
@@ -114,7 +115,7 @@ test_that("calculate_mz_from_mass handles triply charged", {
 })
 
 
-# Test: Round-trip accuracy ----
+## Round-trip accuracy ----
 
 test_that("mass -> mz -> mass round-trip is accurate for [M+H]+", {
   neutral_mass <- 250.0
@@ -179,7 +180,7 @@ test_that("mass -> mz -> mass round-trip works with water loss", {
   expect_equal(mass_back, neutral_mass, tolerance = 1e-4)
 })
 
-# Test: Round-trip with multiple adducts ----
+## Round-trip with multiple adducts ----
 
 test_that("round-trip works for all common positive adducts", {
   neutral_mass <- 150.5
@@ -205,7 +206,7 @@ test_that("round-trip works for all common negative adducts", {
   }
 })
 
-# Test: High precision round-trip ----
+## High precision round-trip ----
 
 test_that("round-trip maintains high precision", {
   neutral_mass <- 194.080375570 # High precision caffeine
@@ -217,7 +218,7 @@ test_that("round-trip maintains high precision", {
   expect_equal(mass_back, neutral_mass, tolerance = 1e-9)
 })
 
-# Test: Multiple round-trips ----
+## Multiple round-trips ----
 
 test_that("multiple round-trips don't accumulate error", {
   neutral_mass <- 250.0
@@ -231,7 +232,7 @@ test_that("multiple round-trips don't accumulate error", {
   expect_equal(mass, neutral_mass, tolerance = 1e-6)
 })
 
-# Test: Round-trip with different mass ranges ----
+## Round-trip with different mass ranges ----
 
 test_that("round-trip works for small molecules", {
   masses <- c(50, 100, 200)
@@ -265,7 +266,7 @@ test_that("round-trip works for large molecules", {
   }
 })
 
-# Test: Round-trip matrix (mass × adduct) ----
+## Round-trip matrix (mass × adduct) ----
 
 test_that("round-trip works for matrix of masses and adducts", {
   masses <- c(100, 200, 500)
@@ -286,14 +287,14 @@ test_that("round-trip works for matrix of masses and adducts", {
   }
 })
 
-# Test: Logging ----
+## Logging ----
 
 test_that("calculate_mz_from_mass completes without error", {
   # Should complete successfully for valid input
   expect_silent(calculate_mz_from_mass(100, "[M+H]+"))
 })
 
-# Test: Performance ----
+## Performance ----
 
 test_that("calculate_mz_from_mass is fast for batch processing", {
   skip_on_cran()

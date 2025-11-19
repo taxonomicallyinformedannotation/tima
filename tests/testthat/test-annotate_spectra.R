@@ -1,6 +1,10 @@
-# ==============================================================================
-# Test Suite: annotate_spectra
-# ==============================================================================
+# Test Suite: annotate_spectra ----
+
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
+
+## Internal Utility Helpers ----
 
 write_minimal_mgf <- function(path, pepmass = 100, charge = "1+") {
   dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
@@ -16,9 +20,7 @@ write_minimal_mgf <- function(path, pepmass = 100, charge = "1+") {
   writeLines(lines, path)
 }
 
-# ==============================================================================
-# Test: Input Validation
-# ==============================================================================
+## Input Validation ----
 
 test_that("annotate_spectra validates polarity parameter", {
   skip_on_cran()
@@ -179,9 +181,7 @@ test_that("annotate_spectra requires at least one library", {
   )
 })
 
-# ==============================================================================
-# Test: Basic Functionality
-# ==============================================================================
+## Basic Functionality ----
 
 test_that("annotate_spectra works with single MGF library", {
   skip_on_cran()
@@ -273,9 +273,7 @@ test_that("annotate_spectra works with multiple libraries", {
   )
 })
 
-# ==============================================================================
-# Test: Different Similarity Methods
-# ==============================================================================
+## Different Similarity Methods ----
 
 test_that("annotate_spectra works with cosine similarity", {
   skip_on_cran()
@@ -331,9 +329,7 @@ test_that("annotate_spectra works with entropy similarity", {
   )
 })
 
-# ==============================================================================
-# Test: Threshold Settings
-# ==============================================================================
+## Threshold Settings ----
 
 test_that("annotate_spectra respects similarity threshold", {
   skip_on_cran()
@@ -371,9 +367,7 @@ test_that("annotate_spectra respects similarity threshold", {
   )
 })
 
-# ==============================================================================
-# Test: Tolerance Settings
-# ==============================================================================
+## Tolerance Settings ----
 
 test_that("annotate_spectra accepts different tolerance settings", {
   skip_on_cran()
@@ -409,9 +403,7 @@ test_that("annotate_spectra accepts different tolerance settings", {
   )
 })
 
-# ==============================================================================
-# Test: Approx Mode (Precursor-Free Matching)
-# ==============================================================================
+## Approx Mode (Precursor-Free Matching)
 
 test_that("annotate_spectra works with approx mode enabled", {
   skip_on_cran()
@@ -467,9 +459,7 @@ test_that("annotate_spectra works with approx mode disabled", {
   )
 })
 
-# ==============================================================================
-# Test: Intensity Cutoff
-# ==============================================================================
+## Intensity Cutoff ----
 
 test_that("annotate_spectra respects intensity cutoff", {
   skip_on_cran()
@@ -507,9 +497,7 @@ test_that("annotate_spectra respects intensity cutoff", {
   )
 })
 
-# ==============================================================================
-# Test: Output Validation
-# ==============================================================================
+## Output Validation ----
 
 test_that("annotate_spectra produces valid output file", {
   skip_on_cran()
@@ -543,9 +531,7 @@ test_that("annotate_spectra produces valid output file", {
   }
 })
 
-# ==============================================================================
-# Test: Empty/Edge Cases
-# ==============================================================================
+## Empty/Edge Cases ----
 
 test_that("annotate_spectra handles empty input gracefully", {
   skip_on_cran()
@@ -558,9 +544,7 @@ test_that("annotate_spectra handles empty input gracefully", {
   # This is complex, so skip for now
 })
 
-# ==============================================================================
-# Test: Performance
-# ==============================================================================
+## Performance ----
 
 test_that("annotate_spectra completes in reasonable time", {
   skip_on_cran()

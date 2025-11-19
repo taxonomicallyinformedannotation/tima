@@ -21,7 +21,7 @@ with_temp_env <- function(vars, code) {
 #   unlink(tmp)
 #
 #   with_temp_env(c(TIMA_LOG_FILE = tmp, TIMA_LOG_LEVEL = "INFO"), {
-#     tima:::init_logging()
+#     init_logging()
 #     logger::log_info("test message")
 #   })
 #
@@ -37,7 +37,7 @@ with_temp_env <- function(vars, code) {
 #
 #   expect_warning(
 #     with_temp_env(c(TIMA_LOG_FILE = tmp, TIMA_LOG_LEVEL = "NOPE"), {
-#       tima:::init_logging()
+#       init_logging()
 #       logger::log_info("hello")
 #     }),
 #     "Unknown TIMA_LOG_LEVEL"

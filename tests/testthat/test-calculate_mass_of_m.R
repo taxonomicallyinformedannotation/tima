@@ -1,8 +1,10 @@
-#' @title Test Suite for calculate_mass_of_m
-#'
-#' @description Individual focused tests for calculate_mass_of_m function.
+# Test Suite: calculate_mass_of_m ----
 
-# Test: Basic mass calculation ----
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
+
+## Basic mass calculation ----
 
 test_that("calculate_mass_of_m calculates mass from [M+H]+", {
   mz <- 195.0877 # Caffeine [M+H]+
@@ -28,7 +30,7 @@ test_that("calculate_mass_of_m calculates mass from [M+Na]+", {
   expect_true(abs(mass - 200) < 1)
 })
 
-# Test: Required parameters validation ----
+## Required parameters validation ----
 
 test_that("calculate_mass_of_m requires mz parameter", {
   expect_error(
@@ -44,7 +46,7 @@ test_that("calculate_mass_of_m requires adduct_string parameter", {
   )
 })
 
-# Test: mz validation ----
+## mz validation ----
 
 test_that("calculate_mass_of_m rejects negative m/z", {
   expect_error(
@@ -95,7 +97,7 @@ test_that("calculate_mass_of_m warns about very high m/z", {
   )
 })
 
-# Test: Invalid adduct handling ----
+## Invalid adduct handling ----
 
 test_that("calculate_mass_of_m returns 0 for invalid adduct with warning", {
   expect_warning(
@@ -113,7 +115,7 @@ test_that("calculate_mass_of_m returns 0 for empty adduct", {
   expect_equal(result, 0)
 })
 
-# Test: Division by zero protection ----
+## Division by zero protection ----
 
 test_that("calculate_mass_of_m handles zero multimer count", {
   # This would require a malformed adduct that parse_adduct returns n_mer=0
@@ -126,7 +128,7 @@ test_that("calculate_mass_of_m handles zero charges", {
   expect_warning(parse_adduct("[M]"), NA) # May or may not warn
 })
 
-# Test: Electron mass validation ----
+## Electron mass validation ----
 
 test_that("calculate_mass_of_m accepts custom electron mass", {
   mass <- calculate_mass_of_m(
@@ -167,7 +169,7 @@ test_that("calculate_mass_of_m warns about non-standard electron mass", {
   )
 })
 
-# Test: Multimer handling ----
+## Multimer handling ----
 
 test_that("calculate_mass_of_m handles dimer correctly", {
   neutral_mass <- 100.0
@@ -185,7 +187,7 @@ test_that("calculate_mass_of_m handles trimer correctly", {
   expect_true(abs(mass - neutral_mass) < 1)
 })
 
-# Test: Multiple charges ----
+## Multiple charges ----
 
 test_that("calculate_mass_of_m handles doubly charged ions", {
   neutral_mass <- 500.0
@@ -204,7 +206,7 @@ test_that("calculate_mass_of_m handles triply charged ions", {
   expect_true(abs(mass - neutral_mass) < 1)
 })
 
-# Test: Isotopologues ----
+## Isotopologues ----
 
 # test_that("calculate_mass_of_m handles M+1 isotopologue", {
 #   neutral_mass <- 200.0
@@ -222,7 +224,7 @@ test_that("calculate_mass_of_m handles triply charged ions", {
 #   expect_true(abs(mass - neutral_mass) < 1)
 # })
 
-# Test: Complex modifications ----
+## Complex modifications ----
 
 test_that("calculate_mass_of_m handles water loss", {
   neutral_mass <- 180.0634 # Glucose
@@ -241,7 +243,7 @@ test_that("calculate_mass_of_m handles ammonia loss", {
   expect_true(abs(mass - neutral_mass) < 0.1)
 })
 
-# Test: Edge cases ----
+## Edge cases ----
 
 test_that("calculate_mass_of_m handles very small masses", {
   neutral_mass <- 1.0
@@ -259,7 +261,7 @@ test_that("calculate_mass_of_m handles very large masses", {
   expect_true(abs(mass - neutral_mass) < 0.1)
 })
 
-# Test: Logging ----
+## Logging ----
 
 test_that("calculate_mass_of_m logs warnings appropriately", {
   expect_warning(
@@ -268,7 +270,7 @@ test_that("calculate_mass_of_m logs warnings appropriately", {
   )
 })
 
-# Test: Real-world metabolites ----
+## Real-world metabolites ----
 
 test_that("calculate_mass_of_m works with glucose", {
   glucose_mass <- 180.0634
@@ -294,7 +296,7 @@ test_that("calculate_mass_of_m works with cholesterol", {
   expect_true(abs(mass - cholesterol_mass) < 0.01)
 })
 
-# Test: Performance ----
+## Performance ----
 
 test_that("calculate_mass_of_m is fast for batch processing", {
   skip_on_cran()

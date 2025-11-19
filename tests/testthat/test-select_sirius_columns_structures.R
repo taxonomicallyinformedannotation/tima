@@ -14,7 +14,7 @@ test_that("select_sirius_columns_structures selects expected structure columns",
     `CSI.FingerIDScore` = c("0.80"),
     ModelScore = c("0.75")
   )
-  res <- tima:::select_sirius_columns_structures(df, sirius_version = "5")
+  res <- select_sirius_columns_structures(df, sirius_version = "5")
   expect_true("candidate_structure_name" %in% names(res))
   expect_true("candidate_score_sirius_confidence" %in% names(res))
   expect_true("candidate_score_sirius_csi" %in% names(res))

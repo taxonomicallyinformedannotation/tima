@@ -1,14 +1,11 @@
-# =============================================================================
-# Tests for clean_bio()
-# =============================================================================
+# Test Suite: clean_bio ----
+
+library(testthat)
+pkgload::load_all(quiet = TRUE) |>
+  suppressMessages()
 set.seed(NULL)
 
-# Comprehensive test coverage for cleaning biologically weighted annotations
-# by calculating chemical consistency scores across network neighbors.
-
-# =============================================================================
-# Input Validation Tests
-# =============================================================================
+## Input Validation ----
 
 test_that("clean_bio validates data frame inputs", {
   # Non-data frame annot_table_wei_bio should error
@@ -64,9 +61,7 @@ test_that("clean_bio validates minimal_consistency parameter", {
   )
 })
 
-# =============================================================================
-# Edge Cases and Empty Input Tests
-# =============================================================================
+## Edge Cases and Empty Input ----
 
 test_that("clean_bio handles empty annotation table", {
   # Create empty annotation table
@@ -225,9 +220,7 @@ test_that("clean_bio handles features with zero entropy", {
   expect_equal(nrow(result), nrow(annotations))
 })
 
-# =============================================================================
-# Functional Tests - Consistency Calculation
-# =============================================================================
+## Functional Tests - Consistency Calculation ----
 
 test_that("clean_bio calculates consistency correctly for perfect agreement", {
   # Create annotation table where all neighbors agree on classification
@@ -455,9 +448,7 @@ test_that("clean_bio filters out classifications below minimal_consistency", {
   }
 })
 
-# =============================================================================
-# Output Structure Tests
-# =============================================================================
+## Output Structure ----
 
 test_that("clean_bio returns expected columns", {
   # Create simple annotation table
@@ -571,9 +562,7 @@ test_that("clean_bio preserves already computed predictions", {
   }
 })
 
-# =============================================================================
-# Performance Tests
-# =============================================================================
+## Performance Tests ----
 
 test_that("clean_bio handles moderate-scale data efficiently", {
   skip_on_cran()

@@ -4,7 +4,7 @@
 # Comprehensive test coverage for biological weighting of MS annotations
 # based on taxonomic similarity between candidate structures and samples.
 
-# Note: weight_bio is an internal function, accessed via tima:::weight_bio()
+# Note: weight_bio is an internal function, accessed via weight_bio()
 
 # =============================================================================
 # Helper Functions
@@ -57,7 +57,7 @@ create_test_annotation <- function(
 test_that("weight_bio validates data frame inputs", {
   # Non-data frame annotation_table_taxed should error
   expect_error(
-    tima:::weight_bio(
+    weight_bio(
       annotation_table_taxed = "not a dataframe",
       structure_organism_pairs_table = data.frame(),
       weight_spectral = 0.5,
@@ -78,7 +78,7 @@ test_that("weight_bio validates data frame inputs", {
 
   # Non-data frame structure_organism_pairs_table should error
   expect_error(
-    tima:::weight_bio(
+    weight_bio(
       annotation_table_taxed = data.frame(),
       structure_organism_pairs_table = list(),
       weight_spectral = 0.5,
@@ -101,7 +101,7 @@ test_that("weight_bio validates data frame inputs", {
 test_that("weight_bio validates weight parameters", {
   # Invalid spectral weight (negative)
   expect_error(
-    tima:::weight_bio(
+    weight_bio(
       annotation_table_taxed = data.frame(feature_id = "F1"),
       structure_organism_pairs_table = data.frame(),
       weight_spectral = -0.1,
@@ -122,7 +122,7 @@ test_that("weight_bio validates weight parameters", {
 
   # Invalid biological weight
   expect_error(
-    tima:::weight_bio(
+    weight_bio(
       annotation_table_taxed = data.frame(feature_id = "F1"),
       structure_organism_pairs_table = data.frame(),
       weight_spectral = 0.5,
@@ -145,7 +145,7 @@ test_that("weight_bio validates weight parameters", {
 test_that("weight_bio validates biological score parameters", {
   # Invalid score (negative)
   expect_error(
-    tima:::weight_bio(
+    weight_bio(
       annotation_table_taxed = data.frame(feature_id = "F1"),
       structure_organism_pairs_table = data.frame(),
       weight_spectral = 0.5,
@@ -201,7 +201,7 @@ test_that("weight_bio handles empty annotation table", {
     organism_taxonomy_10varietas = c(NA, NA, NA)
   )
 
-  result <- tima:::weight_bio(
+  result <- weight_bio(
     annotation_table_taxed = empty_annotations,
     structure_organism_pairs_table = sop_table,
     weight_spectral = 0.5,
@@ -249,7 +249,7 @@ test_that("weight_bio handles annotations without matching organisms", {
     organism_taxonomy_10varietas = c(NA, NA)
   )
 
-  result <- tima:::weight_bio(
+  result <- weight_bio(
     annotation_table_taxed = annotations,
     structure_organism_pairs_table = sop_table,
     weight_spectral = 0.5,
@@ -307,7 +307,7 @@ test_that("weight_bio assigns highest score to exact species match", {
     organism_taxonomy_10varietas = NA_character_
   )
 
-  result <- tima:::weight_bio(
+  result <- weight_bio(
     annotation_table_taxed = annotations,
     structure_organism_pairs_table = sop_table,
     weight_spectral = 0.5,
@@ -362,7 +362,7 @@ test_that("weight_bio assigns correct score to genus-level match", {
     organism_taxonomy_10varietas = NA_character_
   )
 
-  result <- tima:::weight_bio(
+  result <- weight_bio(
     annotation_table_taxed = annotations,
     structure_organism_pairs_table = sop_table,
     weight_spectral = 0.5,
@@ -418,7 +418,7 @@ test_that("weight_bio assigns correct score to family-level match", {
     organism_taxonomy_10varietas = NA_character_
   )
 
-  result <- tima:::weight_bio(
+  result <- weight_bio(
     annotation_table_taxed = annotations,
     structure_organism_pairs_table = sop_table,
     weight_spectral = 0.5,
@@ -473,7 +473,7 @@ test_that("weight_bio returns expected columns", {
     organism_taxonomy_10varietas = NA_character_
   )
 
-  result <- tima:::weight_bio(
+  result <- weight_bio(
     annotation_table_taxed = annotations,
     structure_organism_pairs_table = sop_table,
     weight_spectral = 0.5,
@@ -567,7 +567,7 @@ test_that("weight_bio returns expected columns", {
 #   # Should complete in reasonable time (<5 seconds)
 #   start_time <- Sys.time()
 #
-#   result <- tima:::weight_bio(
+#   result <- weight_bio(
 #     annotation_table_taxed = annotations,
 #     structure_organism_pairs_table = sop_table,
 #     weight_spectral = 0.5,
