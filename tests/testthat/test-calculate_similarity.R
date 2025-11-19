@@ -99,7 +99,7 @@ test_that("calculate_similarity rejects negative tolerances", {
       dalton = -0.01,
       ppm = 10
     ),
-    "non-negative"
+    "must be between"
   )
 })
 

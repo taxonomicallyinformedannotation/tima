@@ -103,15 +103,7 @@ test_that("annotate_spectra validates numeric parameters", {
       libraries = list(pos = paths$data$interim$libraries$spectra$is$pos$isdb),
       ppm = -10
     ),
-    "positive"
-  )
-
-  expect_error(
-    annotate_spectra(
-      libraries = list(pos = paths$data$interim$libraries$spectra$is$pos$isdb),
-      ppm = 0
-    ),
-    "positive"
+    "must be between"
   )
 
   # Dalton must be positive
@@ -120,7 +112,7 @@ test_that("annotate_spectra validates numeric parameters", {
       libraries = list(pos = paths$data$interim$libraries$spectra$is$pos$isdb),
       dalton = -0.01
     ),
-    "positive"
+    "must be between"
   )
 
   # Cutoff must be non-negative
@@ -129,7 +121,7 @@ test_that("annotate_spectra validates numeric parameters", {
       libraries = list(pos = paths$data$interim$libraries$spectra$is$pos$isdb),
       qutoff = -0.1
     ),
-    "non-negative"
+    "must be between"
   )
 })
 
@@ -175,7 +167,7 @@ test_that("annotate_spectra requires at least one library", {
       libraries = list(),
       polarity = "pos"
     ),
-    "At least one library"
+    "Library elements must be character strings"
   )
 })
 

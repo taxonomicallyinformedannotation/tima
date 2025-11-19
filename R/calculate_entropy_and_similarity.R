@@ -35,48 +35,29 @@ calculate_entropy_and_similarity <- function(
   threshold,
   approx
 ) {
-  # Validate method against constants
-  if (!method %in% VALID_SIMILARITY_METHODS) {
-    stop(
-      "Similarity method must be one of: ",
-      paste(VALID_SIMILARITY_METHODS, collapse = ", "),
-      "; got: ",
-      method
-    )
-  }
-
-  # Validate inputs
+  assert_choice(method, VALID_SIMILARITY_METHODS, "method")
   if (
     length(lib_ids) != length(lib_spectra) ||
       length(lib_ids) != length(lib_precursors)
   ) {
-    stop("lib_ids, lib_precursors, and lib_spectra must have the same length")
+    stop(
+      "lib_ids, lib_precursors, and lib_spectra must have the same length",
+      call. = FALSE
+    )
   }
-
   if (
     length(query_ids) != length(query_spectra) ||
       length(query_ids) != length(query_precursors)
   ) {
     stop(
-      "query_ids, query_precursors, and query_spectra must have the same length"
+      "query_ids, query_precursors, and query_spectra must have the same length",
+      call. = FALSE
     )
   }
-
-  if (!is.numeric(dalton) || dalton <= 0) {
-    stop("dalton must be a positive number")
-  }
-
-  if (!is.numeric(ppm) || ppm <= 0) {
-    stop("ppm must be a positive number")
-  }
-
-  if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
-    stop("threshold must be between 0 and 1")
-  }
-
-  if (!is.logical(approx)) {
-    stop("approx must be logical (TRUE/FALSE)")
-  }
+  assert_scalar_numeric(dalton, "dalton", min = 0, max = Inf)
+  assert_scalar_numeric(ppm, "ppm", min = 0, max = Inf)
+  assert_scalar_numeric(threshold, "threshold", min = 0, max = 1)
+  assert_flag(approx, "approx")
 
   logger::log_info(
     "Calculating entropy and similarity for {length(query_spectra)} spectra"

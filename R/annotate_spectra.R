@@ -65,62 +65,40 @@ annotate_spectra <- function(
   # Helper: normalize input (vector or list) to character vector
   normalize_input_files <- function(x, label) {
     if (is.list(x)) {
-      v <- unlist(x, use.names = FALSE)
-    } else {
-      v <- x
+      x <- unlist(x, use.names = FALSE)
     }
-    if (length(v) == 0L) {
-      return(character(0))
+    if (!is.character(x)) {
+      stop(label, " elements must be character strings", call. = FALSE)
     }
-    if (!is.character(v)) {
-      stop(label, " elements must be character strings")
-    }
-    v
+    x
   }
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
-  if (!polarity %in% VALID_MS_MODES) {
-    stop("Polarity must be 'pos' or 'neg', got: ", polarity)
-  }
-  if (!method %in% VALID_SIMILARITY_METHODS) {
+  # ---- Validation using centralized helpers ----
+  assert_choice(polarity, VALID_MS_MODES, "polarity")
+  assert_choice(method, VALID_SIMILARITY_METHODS, "method")
+  assert_flag(approx, "approx")
+  assert_scalar_numeric(threshold, "threshold", min = 0, max = 1)
+  assert_scalar_numeric(ppm, "ppm", min = 0)
+  assert_scalar_numeric(dalton, "dalton", min = 0)
+  assert_scalar_numeric(qutoff, "qutoff", min = 0)
+  input_vec <- normalize_input_files(input, "Input")
+  libraries_vec <- normalize_input_files(libraries, "Library")
+  validate_file_existence(list(input = input_vec[1]), allow_null = FALSE) # minimal check
+  if (any(!file.exists(input_vec))) {
     stop(
-      "Similarity method must be one of: ",
-      paste(VALID_SIMILARITY_METHODS, collapse = ", "),
-      "; got: ",
-      method
+      "Input file(s) not found: ",
+      paste(input_vec[!file.exists(input_vec)], collapse = ", "),
+      call. = FALSE
     )
   }
-  if (!is.logical(approx)) {
-    stop("approx must be logical (TRUE/FALSE)")
-  }
-  if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
-    stop("Threshold must be between 0 and 1, got: ", threshold)
-  }
-  if (!is.numeric(ppm) || ppm <= 0) {
-    stop("PPM tolerance must be positive, got: ", ppm)
-  }
-  if (!is.numeric(dalton) || dalton <= 0) {
-    stop("Dalton tolerance must be positive, got: ", dalton)
-  }
-  if (!is.numeric(qutoff) || qutoff < 0) {
-    stop("Intensity cutoff must be non-negative, got: ", qutoff)
-  }
-  input_vec <- normalize_input_files(input, "Input")
-  if (length(input_vec) == 0L) {
-    stop("Input must contain at least one file path")
-  }
-  missing_in <- input_vec[!file.exists(input_vec)]
-  if (length(missing_in) > 0L) {
-    stop("Input file(s) not found: ", paste(missing_in, collapse = ", "))
-  }
-  libraries_vec <- normalize_input_files(libraries, "Library")
   if (length(libraries_vec) == 0L) {
     stop("At least one library must be provided")
   }
-  missing_libs <- libraries_vec[!file.exists(libraries_vec)]
-  if (length(missing_libs) > 0L) {
-    stop("Library file(s) not found: ", paste(missing_libs, collapse = ", "))
+  if (any(!file.exists(libraries_vec))) {
+    stop(
+      "Library file(s) not found: ",
+      paste(libraries_vec[!file.exists(libraries_vec)], collapse = ", "),
+      call. = FALSE
+    )
   }
   # ============================================================================
   # Processing
