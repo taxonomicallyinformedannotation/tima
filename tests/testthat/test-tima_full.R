@@ -1,6 +1,6 @@
-# ==============================================================================
-# Test Suite: tima_full (smoke)
-# ==============================================================================
+# Test Suite: tima_full ----
+
+library(testthat)
 
 test_that("tima_full runs workflow entry point (skipped heavy)", {
   skip_on_cran()

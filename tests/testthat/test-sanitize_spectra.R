@@ -1,6 +1,6 @@
-# ==============================================================================
-# Test Suite: sanitize_spectra
-# ==============================================================================
+# Test Suite: sanitize_spectra ----
+
+library(testthat)
 
 make_spectra <- function() {
   df <- data.frame(
@@ -27,4 +27,28 @@ test_that("sanitize_spectra processes simple spectra", {
   res <- sanitize_spectra(sp, cutoff = 0, dalton = 0.01, ppm = 10)
   expect_s4_class(res, "Spectra")
   expect_true(length(res) <= length(sp))
+})
+
+test_that("sanitize_spectra handles FEATURE_ID column", {
+  df <- data.frame(
+    FEATURE_ID = c("FT001", "FT002", "FT003"),
+    mz = c(list(123.4567, 234.5678, 345.6789))
+  ) |>
+    Spectra::Spectra() |>
+    sanitize_spectra()
+
+  expect_s4_class(df, "Spectra")
+  expect_true("FEATURE_ID" %in% colnames(df@backend@spectraData))
+})
+
+test_that("sanitize_spectra handles SLAW_ID column", {
+  df <- data.frame(
+    SLAW_ID = c("FT001", "FT002", "FT003"),
+    mz = c(list(123.4567, 234.5678, 345.6789))
+  ) |>
+    Spectra::Spectra() |>
+    sanitize_spectra()
+
+  expect_s4_class(df, "Spectra")
+  expect_true("SLAW_ID" %in% colnames(df@backend@spectraData))
 })

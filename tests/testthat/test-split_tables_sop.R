@@ -1,14 +1,43 @@
-# ==============================================================================
-# Tests for split_tables_sop()
-# ==============================================================================
+# Test Suite: split_tables_sop ----
+
+library(testthat)
 set.seed(NULL)
 
-# Comprehensive test coverage for splitting structure-organism pairs tables
-# into normalized component tables.
+## Internal Utility Helpers ----
 
-# ==============================================================================
-# Input Validation Tests
-# ==============================================================================
+# Create a minimal SOP table with processed SMILES data
+# (simulates what process_smiles would return)
+create_processed_sop_table <- function(n = 2) {
+  tidytable::tidytable(
+    structure_inchikey_connectivity_layer = generate_fake_inchikey(
+      n,
+      seed = 42
+    )[1:n] |>
+      stringi::stri_sub(1, 14),
+    structure_inchikey = generate_fake_inchikey(n, seed = 42),
+    structure_smiles = c("CCO", "CCC")[1:n],
+    structure_smiles_no_stereo = c("CCO", "CCC")[1:n],
+    structure_name = c("Ethanol", "Propane")[1:n],
+    structure_molecular_formula = c("C2H6O", "C3H8")[1:n],
+    structure_exact_mass = c(46.041865, 44.062600)[1:n],
+    structure_xlogp = c(-0.18, 1.09)[1:n],
+    organism_name = c("Homo sapiens", "Mus musculus")[1:n],
+    organism_taxonomy_01domain = rep("Eukaryota", n),
+    organism_taxonomy_02kingdom = rep("Animalia", n),
+    organism_taxonomy_03phylum = rep("Chordata", n),
+    organism_taxonomy_04class = rep("Mammalia", n),
+    organism_taxonomy_05order = c("Primates", "Rodentia")[1:n],
+    organism_taxonomy_06family = c("Hominidae", "Muridae")[1:n],
+    organism_taxonomy_07tribe = rep(NA_character_, n),
+    organism_taxonomy_08genus = c("Homo", "Mus")[1:n],
+    organism_taxonomy_09species = c("Homo sapiens", "Mus musculus")[1:n],
+    organism_taxonomy_10varietas = rep(NA_character_, n),
+    organism_taxonomy_ottid = as.character(123456 + seq_len(n) - 1),
+    reference_doi = paste0("10.1234/test", seq_len(n))
+  )
+}
+
+## Input validation ----
 
 test_that("split_tables_sop validates data frame input", {
   # Non-data frame should error
@@ -47,45 +76,7 @@ test_that("split_tables_sop handles empty table gracefully", {
   expect_equal(nrow(result$table_structural), 0)
 })
 
-# ==============================================================================
-# Helper Functions
-# ==============================================================================
-
-# Create a minimal SOP table with processed SMILES data
-# (simulates what process_smiles would return)
-create_processed_sop_table <- function(n = 2) {
-  tidytable::tidytable(
-    structure_inchikey_connectivity_layer = generate_fake_inchikey(
-      n,
-      seed = 42
-    )[1:n] |>
-      stringi::stri_sub(1, 14),
-    structure_inchikey = generate_fake_inchikey(n, seed = 42),
-    structure_smiles = c("CCO", "CCC")[1:n],
-    structure_smiles_no_stereo = c("CCO", "CCC")[1:n],
-    structure_name = c("Ethanol", "Propane")[1:n],
-    structure_molecular_formula = c("C2H6O", "C3H8")[1:n],
-    structure_exact_mass = c(46.041865, 44.062600)[1:n],
-    structure_xlogp = c(-0.18, 1.09)[1:n],
-    organism_name = c("Homo sapiens", "Mus musculus")[1:n],
-    organism_taxonomy_01domain = rep("Eukaryota", n),
-    organism_taxonomy_02kingdom = rep("Animalia", n),
-    organism_taxonomy_03phylum = rep("Chordata", n),
-    organism_taxonomy_04class = rep("Mammalia", n),
-    organism_taxonomy_05order = c("Primates", "Rodentia")[1:n],
-    organism_taxonomy_06family = c("Hominidae", "Muridae")[1:n],
-    organism_taxonomy_07tribe = rep(NA_character_, n),
-    organism_taxonomy_08genus = c("Homo", "Mus")[1:n],
-    organism_taxonomy_09species = c("Homo sapiens", "Mus musculus")[1:n],
-    organism_taxonomy_10varietas = rep(NA_character_, n),
-    organism_taxonomy_ottid = as.character(123456 + seq_len(n) - 1),
-    reference_doi = paste0("10.1234/test", seq_len(n))
-  )
-}
-
-# ==============================================================================
-# Functional Tests
-# ==============================================================================
+## Functional Tests ----
 
 test_that("split_tables_sop splits table into components", {
   # Create pre-processed table (simulating process_smiles output)
@@ -347,9 +338,7 @@ test_that("split_tables_sop handles cache parameter", {
   expect_type(result_with_cache, "list")
 })
 
-# ==============================================================================
-# Edge Cases
-# ==============================================================================
+## Edge Cases ----
 
 test_that("split_tables_sop handles special characters in organism names", {
   skip_on_cran()

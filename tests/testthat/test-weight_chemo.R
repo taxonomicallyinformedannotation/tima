@@ -1,10 +1,8 @@
-# ==============================================================================
-# Test Suite: weight_chemo
-# ==============================================================================
+# Test Suite: weight_chemo ----
 
-# ==============================================================================
-# Test: Input Validation
-# ==============================================================================
+library(testthat)
+
+## Input Validation ----
 
 test_that("weight_chemo validates data frame input", {
   # Use fixture utilities
@@ -148,9 +146,7 @@ test_that("weight_chemo validates score ranges", {
   )
 })
 
-# ==============================================================================
-# Test: Functional scoring
-# ==============================================================================
+## Functional scoring ----
 
 test_that("weight_chemo assigns chemical scores from taxonomy matches", {
   # One row where candidate class matches predicted class; others NA
@@ -207,9 +203,7 @@ test_that("weight_chemo assigns chemical scores from taxonomy matches", {
   expect_equal(res$score_weighted_chemo, 0.7)
 })
 
-# ==============================================================================
-# Test: Combined Scoring
-# ==============================================================================
+# Combined Scoring ----
 
 test_that("weight_chemo combines ClassyFire and NPClassifier scores", {
   skip_on_cran()

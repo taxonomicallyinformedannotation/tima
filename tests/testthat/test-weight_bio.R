@@ -1,14 +1,9 @@
-# =============================================================================
-# Tests for weight_bio() - REVISED AND FIXED
-# =============================================================================
-# Comprehensive test coverage for biological weighting of MS annotations
-# based on taxonomic similarity between candidate structures and samples.
+# Test Suite: weight_bio ----
 
-# Note: weight_bio is an internal function, accessed via weight_bio()
+library(testthat)
 
-# =============================================================================
-# Helper Functions
-# =============================================================================
+
+## Internal Utility Helpers ----
 
 # Create a complete annotation table with all required columns
 create_test_annotation <- function(
@@ -50,9 +45,7 @@ create_test_annotation <- function(
   )
 }
 
-# =============================================================================
-# Input Validation Tests
-# =============================================================================
+## Input Validation ----
 
 test_that("weight_bio validates data frame inputs", {
   # Non-data frame annotation_table_taxed should error
@@ -165,9 +158,7 @@ test_that("weight_bio validates biological score parameters", {
   )
 })
 
-# =============================================================================
-# Edge Cases and Empty Input Tests
-# =============================================================================
+## Edge Cases and Empty Input ----
 
 test_that("weight_bio handles empty annotation table", {
   # Create empty annotation table with proper structure
@@ -223,9 +214,7 @@ test_that("weight_bio handles empty annotation table", {
   expect_s3_class(result, "data.frame")
 })
 
-# =============================================================================
-# Functional Tests - Taxonomic Scoring
-# =============================================================================
+## Functional Tests - Taxonomic Scoring ----
 
 test_that("weight_bio assigns highest score to exact species match", {
   # Create annotation with sample organism
@@ -393,9 +382,7 @@ test_that("weight_bio assigns correct score to family-level match", {
   }
 })
 
-# =============================================================================
-# Output Structure Tests
-# =============================================================================
+## Output Structure ----
 
 test_that("weight_bio returns expected columns", {
   inchikey <- generate_fake_inchikey(1, seed = 50)[1]
@@ -455,9 +442,7 @@ test_that("weight_bio returns expected columns", {
   # (not guaranteed, depends on whether structures match organism pairs)
 })
 
-# =============================================================================
-# Performance Tests
-# =============================================================================
+## Performance ----
 
 test_that("weight_bio handles annotations without matching organisms", {
   skip("Known issue: weight_bio has type mismatch bug when no organisms match")

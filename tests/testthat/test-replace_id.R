@@ -1,6 +1,6 @@
-# ==============================================================================
-# Test Suite: read_mgf_opti
-# ==============================================================================
+# Test Suite: replace_id ----
+
+library(testthat)
 
 test_that("replace_id handles different input combinations", {
   # Empty GNPS ID
