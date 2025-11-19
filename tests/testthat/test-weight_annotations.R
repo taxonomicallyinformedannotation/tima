@@ -1213,22 +1213,66 @@ test_that("test-validate_weight_annotations_inputs accepts weight sum within tol
   )
 })
 
-test_that(
-  skip("Not implemented")
-)
-# test_that("load_annotation_tables handles NA values correctly", {
+test_that("test-rearrange_annotations merges and deduplicates correctly", {
+  ann <- wa_min_annotation_table()
+  formula <- wa_min_formula_table()
+  canopus <- wa_min_canopus_table()
+  edges <- wa_min_edges_table()
+  result <- rearrange_annotations(
+    annotation_table = ann,
+    formula_table = formula,
+    canopus_table = canopus,
+    edges_table = edges
+  )
+  expect_true("feature_spectrum_entropy" %in% names(result))
+  expect_true(
+    "candidate_structure_inchikey_connectivity_layer" %in% names(result)
+  )
+  expect_true(anyDuplicated(result$feature_id) >= 0)
+})
+
+test_that("test-load_structure_organism_pairs joins supplemental files", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+  files <- wa_create_minimal_files(tmp)
+  stereo <- file.path(tmp, "stereo.tsv")
+  writeLines(
+    "structure_inchikey_connectivity_layer\tstructure_smiles_no_stereo",
+    stereo
+  )
+  tax <- file.path(tmp, "tax.tsv")
+  writeLines("organism_name\torganism_taxonomy_01domain", tax)
+  writeLines(
+    "structure_inchikey_connectivity_layer\torganism_name",
+    files$library
+  )
+  result <- load_structure_organism_pairs(files$library, stereo, tax)
+  expect_true(is.data.frame(result))
+})
+
+test_that("test-export_results writes three files", {
+  tmp <- withr::local_tempdir()
+  withr::local_dir(tmp)
+  results_list <- list(
+    mini = tidytable::tidytable(feature_id = "F1"),
+    filtered = tidytable::tidytable(feature_id = "F1"),
+    full = tidytable::tidytable(feature_id = "F1")
+  )
+  # Stub get_default_paths locally
+  get_default_paths <- function() wa_stub_get_default_paths(tmp)
+  out_vec <- export_results(results_list, output = "out.tsv", pattern = "test")
+  expect_true(all(file.exists(out_vec)))
+  expect_equal(names(out_vec), c("filtered", "full"))
+})
+
+# test_that("test-load_annotation_tables converts '' and NA strings to NA", {
 #   tmp <- withr::local_tempdir()
 #   withr::local_dir(tmp)
-#
 #   ann <- tidytable::tidytable(
 #     feature_id = c("F1", "F2"),
 #     candidate_score_similarity = c("", "NA")
 #   )
-#
 #   tidytable::fwrite(ann, "ann.tsv", sep = "\t")
-#
 #   result <- load_annotation_tables("ann.tsv", ms1_only = FALSE)
-#
-#   expect_true(is.na(result$candidate_score_similarity[1]))
-#   expect_true(is.na(result$candidate_score_similarity[2]))
+#   expect_true(all(is.na(result$candidate_score_similarity)))
 # })

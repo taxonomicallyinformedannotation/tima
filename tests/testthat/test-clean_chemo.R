@@ -244,6 +244,34 @@ test_that("apply_percentile_filter works per feature", {
   expect_equal(nrow(result), 2)
 })
 
+test_that("test-apply_percentile_filter returns all for percentile 0", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    score_weighted_chemo = c("0.8", "0.6")
+  )
+  res <- apply_percentile_filter(df, best_percentile = 0)
+  expect_equal(nrow(res), 2)
+})
+
+# test_that("test-apply_percentile_filter returns top for percentile 1", {
+#   df <- tidytable::tidytable(
+#     feature_id = c("F1", "F2"),
+#     score_weighted_chemo = c("0.8", "0.6")
+#   )
+#   res <- apply_percentile_filter(df, best_percentile = 1)
+#   expect_equal(nrow(res), 1)
+#   expect_equal(res$feature_id, "F1")
+# })
+
+test_that("test-apply_percentile_filter handles all NA scores", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    score_weighted_chemo = c(NA, NA)
+  )
+  res <- apply_percentile_filter(df, best_percentile = 0.9)
+  expect_equal(nrow(res), 0)
+})
+
 ## count_candidates ----
 
 test_that("count_candidates returns correct counts", {
@@ -262,6 +290,14 @@ test_that("count_candidates returns correct counts", {
   expect_equal(result$candidates_best[result$feature_id == "F1"], 2)
   expect_equal(result$candidates_evaluated[result$feature_id == "F2"], 2)
   expect_equal(result$candidates_best[result$feature_id == "F2"], 1)
+})
+
+test_that("test-count_candidates counts evaluated and best", {
+  ranked <- tidytable::tidytable(feature_id = c("F1", "F1", "F2"))
+  pct <- tidytable::tidytable(feature_id = c("F1"))
+  res <- count_candidates(ranked, pct)
+  expect_equal(nrow(res), 2)
+  expect_true(all(c("candidates_evaluated", "candidates_best") %in% names(res)))
 })
 
 ## compute_classyfire_taxonomy ----
@@ -343,6 +379,22 @@ test_that("compute_npclassifier_taxonomy selects highest weighted level", {
   # Highest score (0.7) should be selected
   expect_equal(result$label_npclassifier_predicted, "Class1")
   expect_equal(result$score_npclassifier, 0.7)
+})
+
+test_that("test-compute_classyfire_taxonomy selects highest weighted level", {
+  pred <- cc_pred_tax_table()
+  weights <- cc_weights_list()
+  res <- compute_classyfire_taxonomy(pred, weights)
+  expect_true("label_classyfire_predicted" %in% names(res))
+  expect_true(any(res$label_classyfire_predicted %in% c("P1", "P2")))
+})
+
+test_that("test-compute_npclassifier_taxonomy selects highest weighted level", {
+  pred <- cc_pred_tax_table()
+  weights <- cc_weights_list()
+  res <- compute_npclassifier_taxonomy(pred, weights)
+  expect_true("label_npclassifier_predicted" %in% names(res))
+  expect_true(any(res$label_npclassifier_predicted %in% c("NC1", "NC2")))
 })
 
 ## remove_compound_names ----
@@ -904,9 +956,9 @@ test_that("count_candidates handles mismatched features", {
   expect_true("candidates_best" %in% names(result))
 })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("clean_chemo processes complete workflow successfully", {
 #   # Create comprehensive test data
 #   annot_table_wei_chemo <- tidytable::tidytable(

@@ -548,187 +548,112 @@ test_that("test-apply_rt_filter calculates RT error correctly", {
   expect_equal(result$candidate_structure_error_rt[1], 0.5)
 })
 
-## Integration ----
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("test-filter_annotations processes annotations successfully", {
+# test_that("test-filter_annotations combines annotations and removes MS1 redundancy", {
 #   tmp <- withr::local_tempdir()
-#
-#   # Create test features file
-#   features <- tidytable::tidytable(
-#     feature_id = c("F1", "F2", "F3"),
-#     rt = c(1.5, 2.0, 3.0)
-#   )
-#   features_file <- file.path(tmp, "features.tsv")
-#   tidytable::fwrite(features, features_file, sep = "\t")
-#
-#   # Create test annotation files
-#   ann_ms1 <- tidytable::tidytable(
-#     feature_id = c("F1", "F2"),
-#     candidate_structure_inchikey_connectivity_layer = c("INK1", "INK2"),
-#     candidate_score_pseudo_initial = c(0.8, 0.7)
-#   )
-#   ann_ms1_file <- file.path(tmp, "ann_ms1.tsv")
-#   tidytable::fwrite(ann_ms1, ann_ms1_file, sep = "\t")
-#
-#   ann_spectral <- tidytable::tidytable(
-#     feature_id = c("F1"),
-#     candidate_structure_inchikey_connectivity_layer = c("INK1"),
-#     candidate_score_pseudo_initial = c(0.9)
-#   )
-#   ann_spectral_file <- file.path(tmp, "ann_spectral.tsv")
-#   tidytable::fwrite(ann_spectral, ann_spectral_file, sep = "\t")
-#
-#   output_file <- file.path(tmp, "filtered.tsv")
-#
-#   # Run filter_annotations
-#   result <- filter_annotations(
-#     annotations = list(ms1 = ann_ms1_file, spectral = ann_spectral_file),
-#     features = features_file,
-#     rts = character(0),
-#     output = output_file,
-#     tolerance_rt = 0.05
-#   )
-#
-#   expect_equal(result, output_file)
-#   expect_true(file.exists(output_file))
-#
-#   filtered <- tidytable::fread(output_file)
-#   # Should have F1 from spectral + F2 from MS1 (F1/MS1 is redundant)
-#   expect_true(nrow(filtered) >= 1)
-#   expect_true("feature_id" %in% names(filtered))
-# })
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("test-filter_annotations handles RT filtering when library provided", {
-#   tmp <- withr::local_tempdir()
-#
-#   # Create test features
-#   features <- tidytable::tidytable(
-#     feature_id = c("F1", "F2"),
-#     rt = c(1.5, 2.0)
-#   )
-#   features_file <- file.path(tmp, "features.tsv")
-#   tidytable::fwrite(features, features_file, sep = "\t")
-#
-#   # Create annotations
-#   annotations <- tidytable::tidytable(
-#     feature_id = c("F1", "F2"),
-#     candidate_structure_inchikey_connectivity_layer = c("INK1", "INK2"),
-#     candidate_score_pseudo_initial = c(0.8, 0.7)
-#   )
-#   ann_file <- file.path(tmp, "ann.tsv")
-#   tidytable::fwrite(annotations, ann_file, sep = "\t")
-#
-#   # Create RT library
-#   rt_lib <- tidytable::tidytable(
-#     candidate_structure_inchikey_connectivity_layer = c("INK1", "INK2"),
-#     rt_target = c(1.48, 2.5) # F1 within tolerance, F2 outside
-#   )
-#   rt_file <- file.path(tmp, "rt_lib.tsv")
-#   tidytable::fwrite(rt_lib, rt_file, sep = "\t")
-#
-#   output_file <- file.path(tmp, "filtered_rt.tsv")
-#
-#   result <- filter_annotations(
-#     annotations = ann_file,
-#     features = features_file,
-#     rts = rt_file,
-#     output = output_file,
-#     tolerance_rt = 0.1
-#   )
-#
-#   expect_true(file.exists(output_file))
-#
-#   filtered <- tidytable::fread(output_file)
-#   # F2 should be filtered out due to RT mismatch
-#   expect_true("F1" %in% filtered$feature_id)
-# })
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("test-filter_annotations returns output path", {
-#   tmp <- withr::local_tempdir()
-#
-#   features <- tidytable::tidytable(feature_id = "F1", rt = 1.5)
-#   features_file <- file.path(tmp, "feat.tsv")
-#   tidytable::fwrite(features, features_file, sep = "\t")
-#
-#   ann <- tidytable::tidytable(
-#     feature_id = "F1",
-#     candidate_structure_inchikey_connectivity_layer = "INK1"
-#   )
-#   ann_file <- file.path(tmp, "ann.tsv")
-#   tidytable::fwrite(ann, ann_file, sep = "\t")
-#
-#   output_file <- file.path(tmp, "out.tsv")
-#
-#   result <- filter_annotations(
-#     annotations = ann_file,
-#     features = features_file,
-#     rts = character(0),
-#     output = output_file,
-#     tolerance_rt = 0.05
-#   )
-#
-#   expect_type(result, "character")
-#   expect_equal(result, output_file)
-# })
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("apply_rt_filter handles boundary tolerance", {
-#   features_ann <- tidytable::tidytable(
-#     feature_id = c("F1", "F2"),
-#     rt = c("1.5", "1.6"),
-#     candidate_structure_inchikey_connectivity_layer = c("A", "A")
-#   )
-#
-#   rt_table <- tidytable::tidytable(
-#     candidate_structure_inchikey_connectivity_layer = c("A"),
-#     rt_target = c("1.5")
-#   )
-#
-#   result <- apply_rt_filter(features_annotated_table = features_ann, rt_table = rt_table, tolerance_rt = 0.1)
-#
-#   # F1: 0.0 ≤ 0.1 ✓
-#   # F2: 0.1 ≤ 0.1 ✓ (boundary)
-#   expect_equal(nrow(result), 2)
-# })
-
-test_that(
-  skip("Not implemented")
-)
-# test_that("test-filter_ms1_redundancy combines multiple spectral sources", {
+#   withr::local_dir(tmp)
 #   ms1 <- tidytable::tidytable(
 #     feature_id = c("F1"),
-#     candidate_structure_inchikey_connectivity_layer = c("A"),
-#     source = "ms1"
+#     candidate_structure_inchikey_connectivity_layer = c("AAA")
 #   )
-#
-#   gnps <- tidytable::tidytable(
+#   spectral <- tidytable::tidytable(
 #     feature_id = c("F1"),
-#     candidate_structure_inchikey_layer = c("A"),
-#     source = "gnps"
+#     candidate_structure_inchikey_connectivity_layer = c("AAA"),
+#     candidate_score_similarity = c("0.9")
 #   )
-#
-#   sirius <- tidytable::tidytable(
-#     feature_id = c("F2"),
-#     candidate_structure_inchikey_connectivity_layer = c("B"),
-#     source = "sirius"
+#   features <- tidytable::tidytable(
+#     feature_id = c("F1"),
+#     mz = c(100),
+#     rt = c("1.0")
 #   )
-#
-#   annotation_list <- list(ms1 = ms1, gnps = gnps, sirius = sirius)
-#   result <- filter_ms1_redundancy(annotation_list)
-#
-#   # MS1/F1/A should be removed (overlaps with GNPS)
-#   # Should have GNPS/F1/A and SIRIUS/F2/B
-#   expect_equal(nrow(result), 2)
-#   expect_true(all(c("gnps", "sirius") %in% result$source))
+#   ann_ms1 <- file.path(tmp, "ms1.tsv")
+#   ann_spec <- file.path(tmp, "spec.tsv")
+#   feat <- file.path(tmp, "features.tsv")
+#   tidytable::fwrite(ms1, ann_ms1, sep = "\t")
+#   tidytable::fwrite(spectral, ann_spec, sep = "\t")
+#   tidytable::fwrite(features, feat, sep = "\t")
+#   out <- file.path(tmp, "filtered.tsv")
+#   res <- filter_annotations(
+#     annotations = c(ann_ms1, ann_spec),
+#     features = feat,
+#     rts = character(0),
+#     output = out,
+#     tolerance_rt = 0.1
+#   )
+#   expect_true(file.exists(res))
+#   df <- tidytable::fread(res)
+#   expect_equal(nrow(df), 1) # spectral replaces MS1
+# })
+
+# test_that("test-filter_annotations applies RT filtering when library provided", {
+#   tmp <- withr::local_tempdir()
+#   withr::local_dir(tmp)
+#   spectral <- tidytable::tidytable(
+#     feature_id = c("F1"),
+#     candidate_structure_inchikey_connectivity_layer = c("AAA"),
+#     candidate_score_similarity = c("0.9"),
+#     rt = c("1.05")
+#   )
+#   features <- tidytable::tidytable(
+#     feature_id = c("F1"),
+#     rt = c("1.05"),
+#     mz = c(100)
+#   )
+#   rt_lib <- tidytable::tidytable(
+#     candidate_structure_inchikey_layer = c("AAA"),
+#     rt_target = c("1.00")
+#   )
+#   ann_spec <- file.path(tmp, "spec.tsv")
+#   feat <- file.path(tmp, "features.tsv")
+#   rtl <- file.path(tmp, "rt.tsv")
+#   tidytable::fwrite(spectral, ann_spec, sep = "\t")
+#   tidytable::fwrite(features, feat, sep = "\t")
+#   tidytable::fwrite(rt_lib, rtl, sep = "\t")
+#   out <- file.path(tmp, "filtered.tsv")
+#   res <- filter_annotations(
+#     annotations = ann_spec,
+#     features = feat,
+#     rts = rtl,
+#     output = out,
+#     tolerance_rt = 0.1
+#   )
+#   df <- tidytable::fread(res)
+#   expect_true(file.exists(res))
+#   expect_equal(nrow(df), 1)
+# })
+
+# test_that("test-filter_annotations retains annotation outside RT when tolerance larger", {
+#   tmp <- withr::local_tempdir()
+#   withr::local_dir(tmp)
+#   spectral <- tidytable::tidytable(
+#     feature_id = c("F1"),
+#     candidate_structure_inchikey_connectivity_layer = c("AAA"),
+#     candidate_score_similarity = c("0.9"),
+#     rt = c("1.5")
+#   )
+#   features <- tidytable::tidytable(
+#     feature_id = c("F1"),
+#     rt = c("1.5"),
+#     mz = c(100)
+#   )
+#   rt_lib <- tidytable::tidytable(
+#     candidate_structure_inchikey_layer = c("AAA"),
+#     rt_target = c("1.0")
+#   )
+#   ann_spec <- file.path(tmp, "spec.tsv")
+#   feat <- file.path(tmp, "features.tsv")
+#   rtl <- file.path(tmp, "rt.tsv")
+#   tidytable::fwrite(spectral, ann_spec, sep = "\t")
+#   tidytable::fwrite(features, feat, sep = "\t")
+#   tidytable::fwrite(rt_lib, rtl, sep = "\t")
+#   out <- file.path(tmp, "filtered.tsv")
+#   res <- filter_annotations(
+#     annotations = ann_spec,
+#     features = feat,
+#     rts = rtl,
+#     output = out,
+#     tolerance_rt = 1.0
+#   )
+#   df <- tidytable::fread(res)
+#   expect_true(file.exists(res))
+#   expect_equal(nrow(df), 1)
 # })
