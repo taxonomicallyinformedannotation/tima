@@ -5,7 +5,8 @@ library(testthat)
 ## Input Validation ----
 
 test_that("prepare_libraries_rt validates unit_rt parameter", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Invalid unit should error
   expect_error(
     prepare_libraries_rt(
@@ -36,7 +37,8 @@ test_that("prepare_libraries_rt validates unit_rt parameter", {
 })
 
 test_that("prepare_libraries_rt validates output_rt parameter", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Non-character should error
   expect_error(
     prepare_libraries_rt(
@@ -67,7 +69,8 @@ test_that("prepare_libraries_rt validates output_rt parameter", {
 })
 
 test_that("prepare_libraries_rt validates output_sop parameter", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Non-character should error
   expect_error(
     prepare_libraries_rt(
@@ -86,7 +89,8 @@ test_that("prepare_libraries_rt validates output_sop parameter", {
 ## Edge Cases and Empty Input ----
 
 test_that("prepare_libraries_rt handles all NULL inputs", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   output_rt <- file.path(tempdir(), "rt_library.tsv")
   output_sop <- file.path(tempdir(), "sop.tsv")
 
@@ -122,7 +126,8 @@ test_that("prepare_libraries_rt handles all NULL inputs", {
 })
 
 test_that("prepare_libraries_rt handles empty character vectors", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   output_rt <- file.path(tempdir(), "rt_library.tsv")
   output_sop <- file.path(tempdir(), "sop.tsv")
 
@@ -143,7 +148,8 @@ test_that("prepare_libraries_rt handles empty character vectors", {
 })
 
 test_that("prepare_libraries_rt handles NA in input vectors", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   output_rt <- file.path(tempdir(), "rt_library.tsv")
   output_sop <- file.path(tempdir(), "sop.tsv")
 
@@ -165,7 +171,8 @@ test_that("prepare_libraries_rt handles NA in input vectors", {
 # Functional Tests - CSV Input ----
 
 test_that("prepare_libraries_rt processes CSV with experimental RT", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Create experimental CSV with RT data
   csv_exp <- file.path(tempdir(), "exp_rt.csv")
 
@@ -221,7 +228,8 @@ test_that("prepare_libraries_rt processes CSV with experimental RT", {
 })
 
 test_that("prepare_libraries_rt processes CSV with predicted RT", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Create predicted CSV with RT data
   csv_is <- file.path(tempdir(), "predicted_rt.csv")
 
@@ -262,7 +270,8 @@ test_that("prepare_libraries_rt processes CSV with predicted RT", {
 })
 
 test_that("prepare_libraries_rt converts seconds to minutes", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Create CSV with RT in seconds
   csv_exp <- file.path(tempdir(), "exp_rt_seconds.csv")
 
@@ -308,7 +317,8 @@ test_that("prepare_libraries_rt converts seconds to minutes", {
 })
 
 test_that("prepare_libraries_rt filters out invalid entries", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Setup temporary test environment
 
   # Create CSV with some invalid entries
@@ -360,7 +370,8 @@ test_that("prepare_libraries_rt filters out invalid entries", {
 # Functional Tests - Combined Sources ----
 
 test_that("prepare_libraries_rt combines experimental and predicted data", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Setup temporary test environment
 
   # Create experimental CSV
@@ -419,7 +430,8 @@ test_that("prepare_libraries_rt combines experimental and predicted data", {
 })
 
 test_that("prepare_libraries_rt handles duplicate InChIKeys", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Setup temporary test environment
 
   # Create CSV with duplicate structures but different RTs
@@ -466,7 +478,8 @@ test_that("prepare_libraries_rt handles duplicate InChIKeys", {
 # Output Structure ----
 
 test_that("prepare_libraries_rt creates correct output structure", {
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Setup temporary test environment
 
   # Create simple CSV
@@ -525,7 +538,8 @@ test_that("prepare_libraries_rt handles moderate-scale data efficiently", {
   skip_on_cran()
   skip_if_not(interactive(), "Performance test only for local development")
 
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Setup temporary test environment
 
   # Create CSV with 500 RT entries
@@ -597,7 +611,8 @@ test_that("prepare_libraries_rt handles missing InChIKeys", {
   skip_on_cran()
   skip("API-dependent test - requires naturalproducts.net")
 
-  withr::local_tempdir(.local_envir = parent.frame())
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Setup temporary test environment
 
   # Create CSV with SMILES but no InChIKey

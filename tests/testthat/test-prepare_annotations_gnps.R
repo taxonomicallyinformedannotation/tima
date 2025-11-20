@@ -110,6 +110,7 @@ test_that("test-prepare_annotations_gnps validates structure file paths", {
 
 test_that("test-prepare_annotations_gnps handles missing input files by creating empty output", {
   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   s <- make_min_struct_files(tmp)
   out <- file.path(tmp, "gnps.tsv")
   res <- prepare_annotations_gnps(
@@ -129,6 +130,7 @@ test_that("test-prepare_annotations_gnps handles missing input files by creating
 
 test_that("test-prepare_annotations_gnps processes minimal valid GNPS file", {
   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   s <- make_min_struct_files(tmp)
   out <- file.path(tmp, "gnps.tsv")
 
