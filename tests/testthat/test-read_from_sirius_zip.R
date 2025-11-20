@@ -66,7 +66,7 @@ test_that("read_from_sirius_zip reads file from zip archive", {
   writeLines("col1\tcol2\nval1\tval2", test_file)
 
   temp_zip <- tempfile(fileext = ".zip")
-  zip::zip(
+  utils::zip(
     zipfile = temp_zip,
     files = basename(test_file),
     root = temp_dir,
@@ -97,7 +97,7 @@ test_that("read_from_sirius_zip filters out underscore-prefixed files", {
   writeLines("col1\tcol2\nval1\tval2", valid_file)
 
   temp_zip <- tempfile(fileext = ".zip")
-  zip::zip(
+  utils::zip(
     zipfile = temp_zip,
     files = c(basename(skip_file), basename(valid_file)),
     root = temp_dir,
@@ -122,7 +122,7 @@ test_that("read_from_sirius_zip handles no matching files", {
   writeLines("col1\tcol2\nval1\tval2", test_file)
 
   temp_zip <- tempfile(fileext = ".zip")
-  zip::zip(
+  utils::zip(
     zipfile = temp_zip,
     files = basename(test_file),
     root = temp_dir,
@@ -150,7 +150,7 @@ test_that("read_from_sirius_zip takes first match when multiple files match", {
   writeLines("col1\nsecond", file2)
 
   temp_zip <- tempfile(fileext = ".zip")
-  zip::zip(
+  utils::zip(
     zipfile = temp_zip,
     files = c(basename(file1), basename(file2)),
     root = temp_dir,
@@ -174,7 +174,7 @@ test_that("read_from_sirius_zip parses tab-delimited data correctly", {
   writeLines("name\tvalue\tcount\nitem1\t123\t5\nitem2\t456\t10", test_file)
 
   temp_zip <- tempfile(fileext = ".zip")
-  zip::zip(
+  utils::zip(
     zipfile = temp_zip,
     files = basename(test_file),
     root = temp_dir,
@@ -199,7 +199,7 @@ test_that("read_from_sirius_zip handles NA strings correctly", {
   writeLines("col1\tcol2\nval1\tNA\n\tval2", test_file)
 
   temp_zip <- tempfile(fileext = ".zip")
-  zip::zip(
+  utils::zip(
     zipfile = temp_zip,
     files = basename(test_file),
     root = temp_dir,
