@@ -5,7 +5,11 @@ library(testthat)
 .make_annot_table <- function(n = 5) {
   tidytable::tidytable(
     feature_id = sprintf("F%03d", rep(1:ceiling(n / 2), length.out = n)),
-    candidate_structure_inchikey_connectivity_layer = sample(c("AAAAAA", "BBBBBB", NA), n, TRUE),
+    candidate_structure_inchikey_connectivity_layer = sample(
+      c("AAAAAA", "BBBBBB", NA),
+      n,
+      TRUE
+    ),
     score_weighted_chemo = runif(n, 0, 1),
     score_biological = runif(n, 0, 1),
     score_chemical = runif(n, 0, 1),
@@ -33,8 +37,16 @@ library(testthat)
 .make_sop <- function(inchikeys) {
   tidytable::tidytable(
     structure_inchikey_connectivity_layer = inchikeys,
-    organism_taxonomy_06family = sample(c("Gentianaceae", "Brassicaceae"), length(inchikeys), TRUE),
-    reference_doi = sample(c("10.1/abc", "10.2/def", "10.3/ghi"), length(inchikeys), TRUE)
+    organism_taxonomy_06family = sample(
+      c("Gentianaceae", "Brassicaceae"),
+      length(inchikeys),
+      TRUE
+    ),
+    reference_doi = sample(
+      c("10.1/abc", "10.2/def", "10.3/ghi"),
+      length(inchikeys),
+      TRUE
+    )
   )
 }
 
@@ -42,17 +54,31 @@ test_that("clean_chemo validates inputs", {
   expect_error(clean_chemo(annot_table_wei_chemo = 123), "data frame")
   expect_error(
     clean_chemo(
-      annot_table_wei_chemo = data.frame(), candidates_final = 0, best_percentile = 0.9,
-      minimal_ms1_bio = 0.1, minimal_ms1_chemo = 0.1, minimal_ms1_condition = "OR",
-      compounds_names = TRUE, high_confidence = FALSE, remove_ties = FALSE, summarize = FALSE
+      annot_table_wei_chemo = data.frame(),
+      candidates_final = 0,
+      best_percentile = 0.9,
+      minimal_ms1_bio = 0.1,
+      minimal_ms1_chemo = 0.1,
+      minimal_ms1_condition = "OR",
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE
     ),
     "candidates_final"
   )
   expect_error(
     clean_chemo(
-      annot_table_wei_chemo = data.frame(), candidates_final = 1, best_percentile = 2,
-      minimal_ms1_bio = 0.1, minimal_ms1_chemo = 0.1, minimal_ms1_condition = "OR",
-      compounds_names = TRUE, high_confidence = FALSE, remove_ties = FALSE, summarize = FALSE
+      annot_table_wei_chemo = data.frame(),
+      candidates_final = 1,
+      best_percentile = 2,
+      minimal_ms1_bio = 0.1,
+      minimal_ms1_chemo = 0.1,
+      minimal_ms1_condition = "OR",
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE
     ),
     "best_percentile"
   )
