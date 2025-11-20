@@ -41,6 +41,7 @@ test_that("test-create_components validates multiple input files", {
 
 test_that("test-create_components processes minimal edge data", {
   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   edges <- tidytable::tidytable(
     feature_source = c("F1", "F2", "F3"),
@@ -63,6 +64,7 @@ test_that("test-create_components processes minimal edge data", {
 
 test_that("test-create_components handles empty edges", {
   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   edges <- tidytable::tidytable(
     feature_source = character(),
@@ -82,6 +84,7 @@ test_that("test-create_components handles empty edges", {
 
 test_that("test-create_components combines multiple edge files", {
   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   edges1 <- tidytable::tidytable(
     feature_source = c("F1"),
@@ -108,6 +111,7 @@ test_that("test-create_components combines multiple edge files", {
 
 test_that("test-create_components handles disconnected components", {
   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   # Create two separate components
   edges <- tidytable::tidytable(
@@ -131,6 +135,7 @@ test_that("test-create_components handles disconnected components", {
 
 test_that("test-create_components filters NA values", {
   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   edges <- tidytable::tidytable(
     feature_source = c("F1", NA, "F3"),
@@ -151,6 +156,7 @@ test_that("test-create_components filters NA values", {
 
 test_that("test-create_components creates distinct edges", {
   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   # Duplicate edges should be removed
   edges <- tidytable::tidytable(

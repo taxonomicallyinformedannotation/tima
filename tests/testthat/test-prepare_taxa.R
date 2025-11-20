@@ -149,6 +149,7 @@ test_that("prepare_taxa checks OTT file existence", {
 
 test_that("prepare_taxa works with single taxon assignment", {
   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   input <- file.path(tmp, "features.tsv")
   ott <- file.path(tmp, "ott.tsv")
@@ -190,6 +191,7 @@ test_that("prepare_taxa works with single taxon assignment", {
 
 test_that("prepare_taxa works with metadata-based assignment", {
   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   input <- file.path(tmp, "features.tsv")
   ott <- file.path(tmp, "ott.tsv")
@@ -248,6 +250,7 @@ test_that("prepare_taxa works with metadata-based assignment", {
 
 test_that("prepare_taxa handles pipe-separated organisms", {
   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   input <- file.path(tmp, "features.tsv")
   ott <- file.path(tmp, "ott.tsv")
@@ -328,6 +331,7 @@ test_that(
 )
 # test_that("prepare_taxa handles empty taxon string as NULL", {
 #   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+withr::local_dir(tmp, .local_envir = parent.frame())
 #
 #   input <- file.path(tmp, "features.tsv")
 #   ott <- file.path(tmp, "ott.tsv")
