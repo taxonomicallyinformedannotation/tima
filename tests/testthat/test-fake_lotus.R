@@ -5,7 +5,8 @@ library(testthat)
 test_that("fake_lotus creates file with correct structure", {
   skip_on_cran()
 
-  temp_file <- tempfile(fileext = ".tsv.gz")
+  withr::local_tempdir()
+  temp_file <- withr::local_tempfile(fileext = ".tsv.gz")
 
   result <- fake_lotus(export = temp_file)
 
@@ -92,10 +93,10 @@ test_that("fake_lotus validates input parameters", {
 test_that("fake_lotus creates directory if needed", {
   skip_on_cran()
 
-  temp_dir <- tempfile()
+  temp_dir <- withr::local_tempdir()
   temp_file <- file.path(temp_dir, "subfolder", "lotus.tsv.gz")
 
-  expect_false(dir.exists(temp_dir))
+  expect_false(dir.exists(dirname(temp_file)))
 
   fake_lotus(export = temp_file)
 
@@ -106,7 +107,8 @@ test_that("fake_lotus creates directory if needed", {
 test_that("fake_lotus overwrites existing file", {
   skip_on_cran()
 
-  temp_file <- tempfile(fileext = ".tsv.gz")
+  withr::local_tempdir()
+  temp_file <- withr::local_tempfile(fileext = ".tsv.gz")
 
   # Create first version
   fake_lotus(export = temp_file)
