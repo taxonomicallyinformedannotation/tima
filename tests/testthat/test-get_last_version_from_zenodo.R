@@ -22,6 +22,15 @@ test_that("test-get_last_version_from_zenodo validates doi parameter", {
     ),
     "doi must be a single character string"
   )
+
+  expect_error(
+    get_last_version_from_zenodo(
+      doi = NULL,
+      pattern = "file.txt",
+      path = "output.txt"
+    ),
+    "doi must be a single character string"
+  )
 })
 
 test_that("test-get_last_version_from_zenodo validates pattern parameter", {
@@ -38,6 +47,15 @@ test_that("test-get_last_version_from_zenodo validates pattern parameter", {
     get_last_version_from_zenodo(
       doi = "10.5281/zenodo.123",
       pattern = 123,
+      path = "output.txt"
+    ),
+    "pattern must be a single character string"
+  )
+
+  expect_error(
+    get_last_version_from_zenodo(
+      doi = "10.5281/zenodo.123",
+      pattern = NULL,
       path = "output.txt"
     ),
     "pattern must be a single character string"
@@ -59,6 +77,15 @@ test_that("test-get_last_version_from_zenodo validates path parameter", {
       doi = "10.5281/zenodo.123",
       pattern = "file.txt",
       path = 123
+    ),
+    "path must be a single character string"
+  )
+
+  expect_error(
+    get_last_version_from_zenodo(
+      doi = "10.5281/zenodo.123",
+      pattern = "file.txt",
+      path = NULL
     ),
     "path must be a single character string"
   )
@@ -93,7 +120,10 @@ test_that("test-get_last_version_from_zenodo requires all parameters", {
 ## Behavior ----
 
 test_that("test-get_last_version_from_zenodo handles invalid DOI gracefully", {
-  output <- file.path("output.txt")
+  skip_on_cran()
+  skip_if_offline()
+
+  output <- tempfile(fileext = ".txt")
 
   expect_error(
     get_last_version_from_zenodo(
@@ -104,3 +134,40 @@ test_that("test-get_last_version_from_zenodo handles invalid DOI gracefully", {
     "Failed to retrieve Zenodo record"
   )
 })
+
+test_that("test-get_last_version_from_zenodo handles malformed DOI", {
+  output <- tempfile(fileext = ".txt")
+
+  expect_error(
+    get_last_version_from_zenodo(
+      doi = "not-a-valid-doi",
+      pattern = "*.txt",
+      path = output
+    ),
+    "Failed to retrieve Zenodo record"
+  )
+})
+
+# test_that("test-get_last_version_from_zenodo validates empty pattern", {
+#   output <- tempfile(fileext = ".txt")
+#
+#   expect_error(
+#     get_last_version_from_zenodo(
+#       doi = "10.5281/zenodo.123",
+#       pattern = "",
+#       path = output
+#     ),
+#     "pattern must be a single character string"
+#   )
+# })
+
+# test_that("test-get_last_version_from_zenodo validates empty path", {
+#   expect_error(
+#     get_last_version_from_zenodo(
+#       doi = "10.5281/zenodo.123",
+#       pattern = "file.txt",
+#       path = ""
+#     ),
+#     "path must be a single character string"
+#   )
+# })
