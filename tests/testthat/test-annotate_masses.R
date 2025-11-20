@@ -405,8 +405,6 @@ test_that("annotate_masses handles no valid monocharged adducts", {
 
 test_that("annotate_masses produces expected output structure", {
   # Setup temporary test environment
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
 
   # Create realistic features
   features_file <- file.path(tempdir(), "features.tsv")
@@ -531,8 +529,6 @@ test_that("annotate_masses produces expected output structure", {
 
 test_that("annotate_masses respects tolerance_ppm correctly", {
   # Setup temporary test environment
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
 
   # Create features with known m/z values
   features_file <- file.path(tempdir(), "features.tsv")
@@ -635,7 +631,6 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
 #   skip("Not implemented")
 # )
 # test_that("annotate_masses handles moderate-scale data efficiently", {
-#   skip_on_cran()
 #   skip_if_not(interactive(), "Performance test only for local development")
 #
 #   # Setup temporary test environment

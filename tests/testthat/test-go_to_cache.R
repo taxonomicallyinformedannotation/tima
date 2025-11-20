@@ -9,7 +9,6 @@ test_that("go_to_cache validates directory name", {
 })
 
 test_that("go_to_cache creates and switches directory", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   # Use temp dir name inside home path simulation: create subdir then change
   # We cannot alter HOME easily; just call function with custom dirname
   expect_no_error(go_to_cache(dir = ".tima_test_cache"))

@@ -297,8 +297,6 @@ test_that("calculate_mass_of_m works with cholesterol", {
 ## Performance ----
 
 test_that("calculate_mass_of_m is fast for batch processing", {
-  skip_on_cran()
-
   mz_values <- runif(1000, 100, 1000)
 
   start_time <- Sys.time()

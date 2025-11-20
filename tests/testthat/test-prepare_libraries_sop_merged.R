@@ -661,7 +661,6 @@ test_that("test-apply_taxonomic_filter preserves core columns", {
 #   skip("Not implemented")
 # )
 # test_that("prepare_libraries_sop_merged works with filtering", {
-#   skip_on_cran()
 #   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
@@ -686,7 +685,6 @@ test_that("test-apply_taxonomic_filter preserves core columns", {
 #   skip("Not implemented")
 # )
 # test_that("prepare_libraries_sop_merged triggers SMILES processing", {
-#   skip_on_cran()
 #   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #

@@ -2,11 +2,10 @@
 
 library(testthat)
 
-test_that("fake_lotus creates file with correct structure", {
-  skip_on_cran()
+.test_path <- function(...) file.path(temp_dir, ...)
 
-  withr::local_tempdir(.local_envir = parent.frame())
-  temp_file <- withr::local_tempfile(fileext = ".tsv.gz")
+test_that("fake_lotus creates file with correct structure", {
+  temp_file <- tempfile(fileext = ".tsv.gz")
 
   result <- fake_lotus(export = temp_file)
 
@@ -66,8 +65,6 @@ test_that("fake_lotus creates file with correct structure", {
 })
 
 test_that("fake_lotus validates input parameters", {
-  skip_on_cran()
-
   # Missing export parameter
   expect_error(fake_lotus(), "export path must be a single character string")
 
@@ -91,10 +88,7 @@ test_that("fake_lotus validates input parameters", {
 })
 
 test_that("fake_lotus creates directory if needed", {
-  skip_on_cran()
-
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-  temp_file <- file.path(temp_dir, "subfolder", "lotus.tsv.gz")
+  temp_file <- .test_path("subfolder", "lotus.tsv.gz")
 
   expect_false(dir.exists(dirname(temp_file)))
 
@@ -105,10 +99,7 @@ test_that("fake_lotus creates directory if needed", {
 })
 
 test_that("fake_lotus overwrites existing file", {
-  skip_on_cran()
-
-  withr::local_tempdir(.local_envir = parent.frame())
-  temp_file <- withr::local_tempfile(fileext = ".tsv.gz")
+  temp_file <- tempfile(fileext = ".tsv.gz")
 
   # Create first version
   fake_lotus(export = temp_file)

@@ -440,8 +440,6 @@ test_that("parse_adduct handles successful parse without error", {
 ## Performance ----
 
 test_that("parse_adduct is fast enough for batch processing", {
-  skip_on_cran()
-
   adducts <- rep("[M+H]+", 1000)
 
   start_time <- Sys.time()

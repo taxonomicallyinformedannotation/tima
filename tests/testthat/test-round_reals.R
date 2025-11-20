@@ -223,8 +223,6 @@ test_that("round_reals skips non-numeric columns even if name matches", {
 ## Performance ----
 
 test_that("round_reals is fast for large data frames", {
-  skip_on_cran()
-
   df <- data.frame(
     structure_exact_mass = runif(10000, 100, 1000),
     structure_xlogp = runif(10000, -5, 5)
