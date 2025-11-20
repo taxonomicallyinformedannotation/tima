@@ -224,13 +224,9 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
   supp_files <- list(str_stereo, org_tax_ott)
   supp_tables <- purrr::map(
     .x = supp_files,
-    .f = function(file.path) {
-      tidytable::fread(
-        file = file.path,
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )
-    }
+    .f = tidytable::fread,
+    na.strings = c("", "NA"),
+    colClasses = "character"
   )
 
   purrr::reduce(
@@ -355,9 +351,7 @@ rearrange_annotations <- function(
 
   annotation_table_merged <- purrr::reduce(
     .x = tables_full,
-    .f = function(x, y) {
-      tidytable::full_join(x, y)
-    }
+    .f = tidytable::full_join
   )
 
   annotation_table_merged |>
@@ -718,9 +712,7 @@ weight_annotations <- function(
   pattern = get_params(step = "weight_annotations")$files$pattern,
   force = get_params(step = "weight_annotations")$options$force
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   validate_weight_annotations_inputs(
     library = library,
@@ -758,9 +750,7 @@ weight_annotations <- function(
     "Candidates - Neighbors: {candidates_neighbors}, Final: {candidates_final}"
   )
 
-  # ============================================================================
-  # Load Input Data
-  # ============================================================================
+  # Load Input Data ----
 
   components_table <- tidytable::fread(
     file = components,
@@ -796,9 +786,7 @@ weight_annotations <- function(
   features_table <- annotation_table |>
     tidytable::distinct(feature_id, rt, mz)
 
-  # ============================================================================
-  # Rearrange and Merge Annotations
-  # ============================================================================
+  # Rearrange and Merge Annotations ----
 
   annotation_table <- rearrange_annotations(
     annotation_table,
@@ -810,9 +798,7 @@ weight_annotations <- function(
   # Clean up intermediate objects
   rm(formula_table, canopus_table)
 
-  # ============================================================================
-  # Add Biological Metadata and Perform Scoring
-  # ============================================================================
+  # Add Biological Metadata and Perform Scoring ----
 
   annotation_table_taxed <- annotation_table |>
     tidytable::left_join(tidytable::fread(
@@ -848,9 +834,7 @@ weight_annotations <- function(
     clean_chemo()
   rm(annot_table_wei_chemo)
 
-  # ============================================================================
-  # Export Results
-  # ============================================================================
+  # Export Results ----
 
   output_paths <- export_results(results_list, output, pattern)
   rm(results_list)

@@ -177,6 +177,7 @@ summarize_results <- function(
           x = colnames(df3),
           perl = TRUE
         )],
+        # TODO
         .fns = function(x) {
           gsub(
             pattern = "\\bNA\\b",
@@ -212,9 +213,7 @@ summarize_results <- function(
     )) |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
-      .fns = function(x) {
-        tidytable::na_if(x, "")
-      }
+      .fns = ~ tidytable::na_if(.x, "")
     )) |>
     tidytable::select(tidyselect::any_of(
       c(

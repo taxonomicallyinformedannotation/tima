@@ -43,9 +43,7 @@ prepare_features_edges <- function(
   name_source = get_params(step = "prepare_features_edges")$names$source,
   name_target = get_params(step = "prepare_features_edges")$names$target
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Validate input structure (must have ms1 and spectral)
   input_names <- names(input)
@@ -77,9 +75,7 @@ prepare_features_edges <- function(
     stop("Input file(s) not found: ", paste(missing_files, collapse = ", "))
   }
 
-  # ============================================================================
-  # Load Edge Tables
-  # ============================================================================
+  # Load Edge Tables ----
 
   logger::log_info("Preparing molecular network edges")
   logger::log_debug("MS1 edges: {input[['ms1']]}")
@@ -108,9 +104,7 @@ prepare_features_edges <- function(
   logger::log_debug("MS1 edges: {nrow(edges_ms1)} rows")
   logger::log_debug("Spectral edges: {nrow(edges_ms2)} rows")
 
-  # ============================================================================
-  # Extract Entropy Information
-  # ============================================================================
+  # Extract Entropy Information ----
 
   # Extract entropy information from spectral edges
   features_entropy <- edges_ms2 |>
@@ -123,11 +117,9 @@ prepare_features_edges <- function(
 
   # logger::log_trace(
   # "Extracted entropy for {nrow(features_entropy)} features"
-  #)
+  # )
 
-  # ============================================================================
-  # Combine and Format Edges
-  # ============================================================================
+  # Combine and Format Edges ----
 
   # Combine and format edges table
   # logger::log_trace("Combining and formatting edge tables")
@@ -147,9 +139,7 @@ prepare_features_edges <- function(
   # Explicit memory cleanup
   rm(edges_ms1, edges_ms2, features_entropy)
 
-  # ============================================================================
-  # Export Results
-  # ============================================================================
+  # Export Results ----
 
   # Export parameters and results
   export_params(

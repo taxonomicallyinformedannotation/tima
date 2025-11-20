@@ -35,9 +35,7 @@ prepare_features_components <- function(
     step = "prepare_features_components"
   )$files$networks$spectral$components$prepared
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Validate inputs
   if (!is.character(input) || length(input) == 0L) {
@@ -54,9 +52,7 @@ prepare_features_components <- function(
     stop("Input file(s) not found: ", paste(missing_files, collapse = ", "))
   }
 
-  # ============================================================================
-  # Load Component Data
-  # ============================================================================
+  # Load Component Data ----
 
   logger::log_info(
     "Preparing molecular network components from {length(input)} file(s)"
@@ -79,9 +75,7 @@ prepare_features_components <- function(
     }
   )
 
-  # ============================================================================
-  # Process Component Assignments
-  # ============================================================================
+  # Process Component Assignments ----
 
   # Early exit for empty data
   if (nrow(table) == 0L) {

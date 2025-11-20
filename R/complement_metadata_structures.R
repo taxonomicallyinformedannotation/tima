@@ -371,10 +371,7 @@ complement_metadata_structures <- function(
     ) |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
-      # TODO
-      .fns = function(x) {
-        tidytable::na_if(x, "")
-      }
+      .fns = ~ tidytable::na_if(.x, "")
     ))
   rm(
     met_i,

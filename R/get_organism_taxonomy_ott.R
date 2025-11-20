@@ -1,3 +1,113 @@
+# Internal Helper Functions ----
+
+#' Create batches from a vector
+#' @description Splits a vector into batches of specified size
+#' @param items Character vector to batch
+#' @param batch_size Integer size of each batch
+#' @return List of character vectors (batches)
+#' @keywords internal
+.create_batches <- function(items, batch_size) {
+  purrr::map(
+    .x = seq(1L, length(items), batch_size),
+    # TODO
+    .f = function(i) {
+      end_idx <- min(i + batch_size - 1L, length(items))
+      items[i:end_idx][!is.na(items[i:end_idx])]
+    }
+  )
+}
+
+#' Query OTT API for a single batch
+#' @description Queries the Open Tree of Life API for taxonomic names
+#' @param batch Character vector of organism names
+#' @return Data frame with taxonomy matches
+#' @keywords internal
+.query_ott_batch <- function(batch) {
+  # SSL verification disabled due to rotl package issue #147
+  # See: https://github.com/ropensci/rotl/issues/147
+  httr::with_config(
+    httr::config(ssl_verifypeer = FALSE),
+    rotl::tnrs_match_names(
+      names = batch,
+      do_approximate_matching = FALSE,
+      include_suppressed = FALSE
+    )
+  )
+}
+
+#' Extract genus name from organism name
+#' @description Extracts the first word (genus) from binomial/trinomial names
+#' @param organism_names Character vector of organism names
+#' @return Character vector of genus names
+#' @keywords internal
+.extract_genus_names <- function(organism_names) {
+  stringi::stri_replace_all_regex(
+    str = organism_names,
+    pattern = " .*",
+    replacement = "",
+    vectorize_all = FALSE
+  )
+}
+
+#' Build taxonomy lineage data frame
+#' @description Constructs taxonomy lineage from OTT taxon info
+#' @param taxon_info List of taxonomy information from rotl
+#' @param taxon_lineage List of lineage information from rotl
+#' @param ott_ids Integer vector of OTT IDs
+#' @return Data frame with complete taxonomy lineage
+#' @keywords internal
+.build_taxonomy_lineage <- function(taxon_info, taxon_lineage, ott_ids) {
+  list_df <- seq_along(taxon_lineage) |>
+    purrr::map(
+      # TODO
+      .f = function(x) {
+        tidytable::bind_rows(
+          data.frame(
+            id = ott_ids[x],
+            rank = taxon_info[[x]]$rank,
+            name = taxon_info[[x]]$name,
+            unique_name = taxon_info[[x]]$unique_name,
+            ott_id = as.character(taxon_info[[x]]$ott_id)
+          ),
+          data.frame(id = ott_ids[x], taxon_lineage[[x]])
+        )
+      }
+    )
+
+  tidytable::bind_rows(list_df) |>
+    tidytable::mutate(ott_id = as.integer(ott_id)) |>
+    # Sort by reverse row number for proper hierarchy
+    tidytable::mutate(n = tidytable::row_number()) |>
+    tidytable::arrange(tidytable::desc(n)) |>
+    tidytable::select(-n)
+}
+
+#' Create empty taxonomy template
+#' @description Returns empty data frames for when API is unavailable
+#' @return Named list with empty matches and taxonomy data frames
+#' @keywords internal
+.create_empty_taxonomy_template <- function() {
+  empty_matches <- data.frame(
+    search_string = NA_character_,
+    ott_id = NA_integer_,
+    unique_name = NA_character_,
+    stringsAsFactors = FALSE
+  )
+
+  empty_taxonomy <- data.frame(
+    id = NA_integer_,
+    rank = NA_character_,
+    name = NA_character_,
+    unique_name = NA_character_,
+    ott_id = NA_integer_,
+    stringsAsFactors = FALSE
+  )
+
+  list(matches = empty_matches, taxonomy = empty_taxonomy)
+}
+
+# Main Function ----
+
 #' @title Get organism taxonomy (Open Tree of Life Taxonomy)
 #'
 #' @description This function retrieves taxonomic information from the Open Tree
@@ -105,57 +215,20 @@ get_organism_taxonomy_ott <- function(
     logger::log_warn(
       "Returning empty taxonomy template due to API unavailability"
     )
-
-    empty_matches <- data.frame(
-      search_string = NA_character_,
-      ott_id = NA_integer_,
-      unique_name = NA_character_,
-      stringsAsFactors = FALSE
-    )
-
-    empty_taxonomy <- data.frame(
-      id = NA_integer_,
-      rank = NA_character_,
-      name = NA_character_,
-      unique_name = NA_character_,
-      ott_id = NA_integer_,
-      stringsAsFactors = FALSE
-    )
-
-    return(list(matches = empty_matches, taxonomy = empty_taxonomy))
+    return(.create_empty_taxonomy_template())
   }
 
   logger::log_debug("OTT API is available, proceeding with taxonomy queries")
 
   # Split into smaller batches to avoid API limits
   batch_size <- 100L
-  organism_batches <- purrr::map(
-    .x = seq(1L, length(organisms), batch_size),
-    # TODO
-    .f = function(i) {
-      end_idx <- min(i + batch_size - 1L, length(organisms))
-      organisms[i:end_idx][!is.na(organisms[i:end_idx])]
-    }
-  )
+  organism_batches <- .create_batches(organisms, batch_size)
 
   logger::log_info("Querying OTT API in {length(organism_batches)} batches")
 
   # Query OTT API for each batch
   taxonomy_matches <- organism_batches |>
-    purrr::map(
-      # TODO
-      .f = function(batch) {
-        # See https://github.com/ropensci/rotl/issues/147
-        httr::with_config(
-          httr::config(ssl_verifypeer = FALSE),
-          rotl::tnrs_match_names(
-            names = batch,
-            do_approximate_matching = FALSE,
-            include_suppressed = FALSE
-          )
-        )
-      }
-    )
+    purrr::map(.f = .query_ott_batch)
 
   logger::log_debug("Initial taxonomy queries completed")
 
@@ -171,140 +244,97 @@ get_organism_taxonomy_ott <- function(
     tidytable::filter(!is.na(ott_id)) |>
     tidytable::distinct(ott_id)
 
-  if (
-    nrow(new_matched_otl_exact) != nrow(new_ott_id) &&
-      retry == TRUE
-  ) {
-    ## keep obtained results
-    pretable <- new_matched_otl_exact |>
+  # Retry failed queries with genus-only names if requested
+  if (nrow(new_matched_otl_exact) != nrow(new_ott_id) && retry == TRUE) {
+    logger::log_info("Retrying failed queries using genus names only")
+
+    # Keep successfully matched results
+    successful_matches <- new_matched_otl_exact |>
       tidytable::filter(!is.na(ott_id))
 
-    new_ott_id_1 <- pretable |>
+    successful_ott_ids <- successful_matches |>
       tidytable::distinct(ott_id)
 
-    organism_table_2 <- organism_table |>
-      tidytable::as_tidytable() |>
-      tidytable::filter(
-        !organism_table$search_string %in% pretable$search_string
-      )
+    # Identify failed organism names
+    failed_organisms <- organism_table |>
+      tidytable::filter(!search_string %in% successful_matches$search_string) |>
+      tidytable::mutate(search_string = .extract_genus_names(search_string))
 
-    organism_table_2$search_string <-
-      stringi::stri_replace_all_regex(
-        str = organism_table_2$search_string,
-        pattern = " .*",
-        replacement = "",
-        vectorize_all = FALSE
-      )
-    organisms <- unique(organism_table_2$search_string)
-    organisms_new <-
-      stringi::stri_replace_all_regex(
-        str = organisms,
-        pattern = " .*",
-        replacement = "",
-        vectorize_all = FALSE
-      )
-    cut <- 100
-    organisms_new_split <-
-      purrr::map(
-        .x = seq(1, length(organisms_new), cut),
-        # TODO
-        .f = function(i) {
-          organisms_new[i:(i + cut - 1)][
-            !is.na(organisms_new[i:(i + cut - 1)])
-          ]
-        }
-      )
-    logger::log_info("Retrying with {paste(organisms_new, collapse = ', ')}")
-    new_matched_otl_exact_list_2 <- organisms_new_split |>
-      purrr::map(
-        # TODO
-        .f = function(x) {
-          # See https://github.com/ropensci/rotl/issues/147
-          httr::with_config(
-            httr::config(ssl_verifypeer = FALSE),
-            rotl::tnrs_match_names(
-              names = x,
-              do_approximate_matching = FALSE,
-              include_suppressed = FALSE
-            )
-          )
-        }
-      )
+    # Extract unique genus names from failures
+    genus_names <- unique(failed_organisms$search_string)
 
-    new_matched_otl_exact_2 <- new_matched_otl_exact_list_2 |>
+    logger::log_info(
+      "Retrying with {length(genus_names)} genus names: ",
+      "{paste(head(genus_names, 5), collapse = ', ')}",
+      "{ifelse(length(genus_names) > 5, '...', '')}"
+    )
+
+    # Query OTT API with genus names only
+    batch_size <- 100L
+    genus_batches <- .create_batches(genus_names, batch_size)
+
+    retry_matches <- genus_batches |>
+      purrr::map(.f = .query_ott_batch) |>
       tidytable::bind_rows() |>
       tidytable::filter(!is.na(ott_id)) |>
       tidytable::mutate(tidytable::across(
         .cols = tidyselect::where(is.logical),
         .fns = as.character
       ))
-    new_ott_id_2 <- new_matched_otl_exact_2 |>
+
+    retry_ott_ids <- retry_matches |>
       tidytable::distinct(ott_id)
 
-    new_ott_id <- tidytable::bind_rows(new_ott_id_1, new_ott_id_2)
-    new_matched_otl_exact <-
-      tidytable::bind_rows(new_matched_otl_exact, new_matched_otl_exact_2)
+    # Combine original and retry results
+    new_ott_id <- tidytable::bind_rows(successful_ott_ids, retry_ott_ids)
+    new_matched_otl_exact <- tidytable::bind_rows(
+      new_matched_otl_exact,
+      retry_matches
+    )
+
+    logger::log_debug(
+      "Retry complete: {nrow(retry_ott_ids)} additional matches found"
+    )
   }
 
+  # Retrieve detailed taxonomy information
   if (nrow(new_ott_id) != 0) {
-    otts <- new_ott_id$ott_id
+    ott_ids <- new_ott_id$ott_id
 
-    logger::log_debug("Getting taxonomy")
-    # See https://github.com/ropensci/rotl/issues/147
-    taxon_info <-
-      httr::with_config(
-        httr::config(ssl_verifypeer = FALSE),
-        rotl::taxonomy_taxon_info(
-          ott_ids = otts,
-          include_lineage = TRUE,
-          include_terminal_descendants = TRUE
-        )
+    logger::log_info(
+      "Retrieving detailed taxonomy for {length(ott_ids)} unique OTT IDs"
+    )
+
+    # Query OTT API for detailed taxonomic information
+    # SSL verification disabled due to rotl package issue #147
+    taxon_info <- httr::with_config(
+      httr::config(ssl_verifypeer = FALSE),
+      rotl::taxonomy_taxon_info(
+        ott_ids = ott_ids,
+        include_lineage = TRUE,
+        include_terminal_descendants = TRUE
       )
-    logger::log_info("Taxonomy retrieved!")
+    )
 
+    logger::log_debug("Taxonomy information retrieved successfully")
+
+    # Extract lineage information
     taxon_lineage <- taxon_info |>
       rotl::tax_lineage()
 
-    list_df <- seq_along(taxon_lineage) |>
-      purrr::map(
-        # TODO
-        .f = function(x) {
-          tidytable::bind_rows(
-            data.frame(
-              id = otts[x],
-              rank = taxon_info[[x]]$rank,
-              name = taxon_info[[x]]$name,
-              unique_name = taxon_info[[x]]$unique_name,
-              ott_id = as.character(taxon_info[[x]]$ott_id)
-            ),
-            data.frame(id = otts[x], taxon_lineage[[x]])
-          )
-        }
-      )
-
-    otl <- tidytable::bind_rows(list_df) |>
-      tidytable::mutate(ott_id = as.integer(ott_id)) |>
-      ## feeling it is better that way
-      tidytable::mutate(n = tidytable::row_number()) |>
-      tidytable::arrange(
-        n |>
-          tidytable::desc()
-      ) |>
-      tidytable::select(-n)
+    # Build complete taxonomy lineage data frame
+    otl <- .build_taxonomy_lineage(taxon_info, taxon_lineage, ott_ids)
   } else {
-    logger::log_warn("Nothing found, returning empty dataframe")
-    otl <-
-      tidytable::tidytable(
-        id = NA_integer_,
-        rank = NA_character_,
-        name = NA_character_,
-        unique_name = NA_character_,
-        ott_id = NA_integer_
-      )
+    logger::log_warn("No OTT IDs found, returning empty dataframe")
+    empty_template <- .create_empty_taxonomy_template()
+    otl <- empty_template$taxonomy
   }
 
-  biological_metadata <-
-    tidytable::left_join(organism_table, new_matched_otl_exact) |>
+  # Join organism names with taxonomy data
+  biological_metadata <- tidytable::left_join(
+    organism_table,
+    new_matched_otl_exact
+  ) |>
     tidytable::left_join(
       otl |>
         tidytable::rename(unique_name.y = unique_name, ott_id.y = ott_id),

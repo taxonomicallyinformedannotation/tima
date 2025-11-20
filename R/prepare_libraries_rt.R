@@ -65,9 +65,7 @@ prepare_libraries_rt <- function(
   name_smiles = get_params(step = "prepare_libraries_rt")$names$smiles,
   unit_rt = get_params(step = "prepare_libraries_rt")$units$rt
 ) {
-  # ============================================================================
-  # Validate core arguments and normalize outputs
-  # ============================================================================
+  # Validate core arguments and normalize outputs ----
   # Validate RT unit
   if (!unit_rt %in% c("seconds", "minutes")) {
     stop("unit_rt must be 'seconds' or 'minutes', got: ", unit_rt)
@@ -95,9 +93,7 @@ prepare_libraries_rt <- function(
     col_sm <- "smiles"
   }
 
-  # ============================================================================
-  # Normalize input vectors
-  # ============================================================================
+  # Normalize input vectors ----
   .normalize_input_vec <- function(x) {
     # Accept NULL or character vectors, return NULL if empty/NA/blank
     # Handle list() from YAML params (when fields are empty)
@@ -118,14 +114,13 @@ prepare_libraries_rt <- function(
   temp_exp <- .normalize_input_vec(temp_exp)
   temp_is <- .normalize_input_vec(temp_is)
 
-  # ============================================================================
-  # Readers
-  # ============================================================================
+  # Readers ----
   rts_from_mgf <- function(mgf) {
     # logger::log_trace("Importing spectra")
     spectra <- mgf |> purrr::map(.f = import_spectra)
     # logger::log_trace("Extracting retention times")
     rts <- spectra |>
+      # TODO
       purrr::map(.f = function(x) {
         x@backend@spectraData |>
           data.frame() |>
@@ -154,9 +149,7 @@ prepare_libraries_rt <- function(
       )))
   }
 
-  # ============================================================================
-  # Polishing utilities
-  # ============================================================================
+  # Polishing utilities ----
   polish_df <- function(df, type = "experimental", unit = unit_rt) {
     # Ensure columns exist even if missing from sources
     if (!"inchikey" %in% colnames(df)) {
@@ -261,9 +254,7 @@ prepare_libraries_rt <- function(
     type = NA_character_
   )
 
-  # ============================================================================
-  # Build RT tables from sources
-  # ============================================================================
+  # Build RT tables from sources ----
   # from mgf
   rts_exp_1 <- if (!is.null(mgf_exp)) {
     mgf_exp |>

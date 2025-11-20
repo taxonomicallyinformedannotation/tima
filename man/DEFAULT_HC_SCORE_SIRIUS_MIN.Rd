@@ -3,14 +3,20 @@
 \docType{data}
 \name{DEFAULT_HC_SCORE_SIRIUS_MIN}
 \alias{DEFAULT_HC_SCORE_SIRIUS_MIN}
-\title{Default minimum SIRIUS confidence score threshold for high-confidence filter}
+\title{Minimum SIRIUS CSI score for high confidence annotations}
 \format{
+An object of class \code{NULL} of length 0.
+
 An object of class \code{NULL} of length 0.
 }
 \usage{
 DEFAULT_HC_SCORE_SIRIUS_MIN
+
+DEFAULT_HC_SCORE_SIRIUS_MIN
 }
 \description{
+Minimum SIRIUS CSI score for high confidence annotations
+
 Default minimum SIRIUS confidence score threshold for high-confidence filter
 }
 \keyword{datasets}

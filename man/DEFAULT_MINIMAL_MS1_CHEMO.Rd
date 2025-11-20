@@ -3,14 +3,20 @@
 \docType{data}
 \name{DEFAULT_MINIMAL_MS1_CHEMO}
 \alias{DEFAULT_MINIMAL_MS1_CHEMO}
-\title{Minimum MS1 chemical score threshold}
+\title{Default minimum MS1 score threshold for chemical scoring}
 \format{
+An object of class \code{numeric} of length 1.
+
 An object of class \code{numeric} of length 1.
 }
 \usage{
 DEFAULT_MINIMAL_MS1_CHEMO
+
+DEFAULT_MINIMAL_MS1_CHEMO
 }
 \description{
+Default minimum MS1 score threshold for chemical scoring
+
 Minimum MS1 chemical score threshold
 }
 \keyword{datasets}

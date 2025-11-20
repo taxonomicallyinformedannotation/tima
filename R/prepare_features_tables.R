@@ -44,9 +44,7 @@ prepare_features_tables <- function(
   name_rt = get_params(step = "prepare_features_tables")$names$rt$features,
   name_mz = get_params(step = "prepare_features_tables")$names$precursor
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Validate file paths first
   if (!is.character(features) || length(features) != 1L) {
@@ -90,9 +88,7 @@ prepare_features_tables <- function(
     )
   }
 
-  # ============================================================================
-  # Load and Process Features
-  # ============================================================================
+  # Load and Process Features ----
 
   logger::log_info("Preparing features table from: {features}")
   logger::log_debug(
@@ -121,15 +117,13 @@ prepare_features_tables <- function(
 
   logger::log_debug("Loaded {nrow(features_table_0)} features")
 
-  # ============================================================================
-  # Format Feature Table (detect format and standardize)
-  # ============================================================================
+  # Format Feature Table (detect format and standardize) ----
 
   # logger::log_trace("Formatting feature table")
   # logger::log_trace(
   #  "Detecting format: MZmine ('Peak area' or ':area'), ",
   #  "SLAW ('quant_'), or SIRIUS ('Peak height')"
-  #)
+  # )
 
   features_table <- features_table_0 |>
     tidytable::select(
@@ -165,6 +159,7 @@ prepare_features_tables <- function(
 
   # Apply all replacements to column names
   col_names_std <- Reduce(
+    # TODO
     f = function(x, pattern_replacement) {
       stringi::stri_replace_all_fixed(
         x,
@@ -178,13 +173,11 @@ prepare_features_tables <- function(
   )
   colnames(features_table) <- col_names_std
 
-  # ============================================================================
-  # Filter to Top Intensity Samples
-  # ============================================================================
+  # Filter to Top Intensity Samples ----
 
   # logger::log_trace(
   #  "Filtering to top {candidates} intensity samples per feature"
-  #)
+  # )
 
   features_prepared <- features_table |>
     tidytable::pivot_longer(

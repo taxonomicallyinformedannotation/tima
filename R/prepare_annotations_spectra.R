@@ -65,9 +65,7 @@ prepare_annotations_spectra <- function(
     step = "prepare_annotations_spectra"
   )$files$libraries$sop$merged$structures$taxonomies$npc
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Validate input files
   if (!is.character(input) || length(input) == 0L) {
@@ -117,9 +115,7 @@ prepare_annotations_spectra <- function(
     )
   }
 
-  # ============================================================================
-  # Load and Process Spectral Annotations
-  # ============================================================================
+  # Load and Process Spectral Annotations ----
 
   logger::log_info(
     "Preparing spectral matching annotations from {length(input)} file(s)"
