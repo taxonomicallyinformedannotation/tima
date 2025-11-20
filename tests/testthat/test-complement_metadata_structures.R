@@ -117,9 +117,9 @@ test_that("complement_metadata_structures collapses multiple names with separato
   }
 })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("complement_metadata_structures adds taxonomy columns", {
 #   tmp <- withr::local_tempdir(.local_envir = parent.frame())
 #   withr::local_dir(tmp, .local_envir = parent.frame())
@@ -199,9 +199,9 @@ test_that("complement_metadata_structures errors when required columns missing",
   )
 })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("complement_metadata_structures enriches metadata", {
 #   tmp <- withr::local_tempdir(.local_envir = parent.frame())
 #   withr::local_dir(tmp, .local_envir = parent.frame())

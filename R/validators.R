@@ -738,6 +738,7 @@ validate_data_frame <- function(
 }
 
 # Generic assertion helpers (centralized) ----
+
 assert_choice <- function(value, choices, param_name = "value") {
   if (length(value) != 1L || !is.character(value)) {
     stop(param_name, " must be a single character string", call. = FALSE)

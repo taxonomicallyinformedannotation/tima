@@ -445,9 +445,9 @@ test_that("validators are thread-safe", {
   expect_true(all(unlist(results)))
 })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("validate_list_or_vector rejects wrong types", {
 #   expect_error(
 #     validate_list_or_vector(data.frame(a = 1)),
@@ -455,9 +455,9 @@ test_that(
 #   )
 # })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("validators work together in realistic scenarios", {
 #   tmp <- withr::local_tempdir(.local_envir = parent.frame())
 #   withr::local_dir(tmp, .local_envir = parent.frame())

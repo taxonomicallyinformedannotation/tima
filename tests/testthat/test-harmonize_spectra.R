@@ -235,9 +235,9 @@ test_that("harmonize_spectra validates vectorized column parameters", {
 
 ## Functional Tests ----
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("harmonize_spectra filters by polarity", {
 #   df <- data.frame(
 #     mode_col = c("POS", "NEG"),
@@ -249,9 +249,9 @@ test_that(
 #   expect_true(nrow(res) == 1)
 # })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("harmonize_spectra adds missing columns", {
 #   df <- data.frame(
 #     mode_col = c("POS"),

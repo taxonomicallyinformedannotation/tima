@@ -631,10 +631,9 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
 
 ## Performance and Scalability Tests ----
 
-test_that(
-  skip("Not implemented")
-)
-
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("annotate_masses handles moderate-scale data efficiently", {
 #   skip_on_cran()
 #   skip_if_not(interactive(), "Performance test only for local development")

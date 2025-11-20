@@ -294,9 +294,9 @@ test_that("prepare_taxa handles pipe-separated organisms", {
   expect_true(grepl("Org1|Org2", df$sample_organism_name[1]))
 })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_taxa requires metadata if taxon not specified", {
 #   temp_input <- tempfile(fileext = ".tsv")
 #   temp_ott <- tempfile(fileext = ".tsv")
@@ -326,12 +326,12 @@ test_that("prepare_taxa works with single taxon assignment", {
   # which is complex and better tested in integration tests
 })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_taxa handles empty taxon string as NULL", {
 #   tmp <- withr::local_tempdir(.local_envir = parent.frame())
-withr::local_dir(tmp, .local_envir = parent.frame())
+# withr::local_dir(tmp, .local_envir = parent.frame())
 #
 #   input <- file.path(tmp, "features.tsv")
 #   ott <- file.path(tmp, "ott.tsv")

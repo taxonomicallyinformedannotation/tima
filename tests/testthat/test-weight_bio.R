@@ -495,9 +495,9 @@ test_that("weight_bio handles annotations without matching organisms", {
   expect_true("score_weighted_bio" %in% colnames(result))
 })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("weight_bio handles moderate-scale data efficiently", {
 #   skip_on_cran()
 #   skip_if_not(interactive(), "Performance test only for local development")
