@@ -391,8 +391,6 @@ test_that("prepare_features_tables handles large feature tables", {
 #   skip("Not implemented")
 # )
 # test_that("prepare_features_tables output works with annotate_masses", {
-#   skip_if_offline()
-#
 #   paths <- local_test_project(copy = TRUE)
 #
 #   # Use actual example file
