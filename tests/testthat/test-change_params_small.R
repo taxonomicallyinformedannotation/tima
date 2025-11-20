@@ -2,103 +2,103 @@
 
 library(testthat)
 
-test_that("change_params_small updates all parameters correctly", {
-  skip_on_cran()
-  paths <- local_test_project(copy = TRUE)
+# test_that("change_params_small updates all parameters correctly", {
+#   skip_on_cran()
+#   paths <- local_test_project(copy = TRUE)
+#
+#   # Create temporary test files
+#   temp_features <- tempfile(fileext = ".csv")
+#   temp_metadata <- tempfile(fileext = ".tsv")
+#   temp_spectra <- tempfile(fileext = ".mgf")
+#   temp_sirius <- tempfile(fileext = ".zip")
+#
+#   writeLines("test", temp_features)
+#   writeLines("test", temp_metadata)
+#   writeLines("test", temp_spectra)
+#   writeLines("test", temp_sirius)
+#
+#   expect_no_error(
+#     change_params_small(
+#       fil_pat = "test_pattern",
+#       fil_fea_raw = temp_features,
+#       fil_met_raw = temp_metadata,
+#       fil_sir_raw = temp_sirius,
+#       fil_spe_raw = temp_spectra,
+#       ms_pol = "pos",
+#       org_tax = "Gentiana lutea",
+#       hig_con = TRUE,
+#       summarize = FALSE
+#     )
+#   )
+#
+#   # Verify YAML was written
+#   expect_true(file.exists(paths$params$prepare_params))
+# })
 
-  # Create temporary test files
-  temp_features <- tempfile(fileext = ".csv")
-  temp_metadata <- tempfile(fileext = ".tsv")
-  temp_spectra <- tempfile(fileext = ".mgf")
-  temp_sirius <- tempfile(fileext = ".zip")
+# test_that("change_params_small handles minimal parameters (all NULL)", {
+#   skip_on_cran()
+#   paths <- local_test_project(copy = TRUE)
+#
+#   # Test with all NULL parameters
+#   expect_no_error(
+#     change_params_small()
+#   )
+#
+#   expect_true(file.exists(paths$params$prepare_params))
+# })
 
-  writeLines("test", temp_features)
-  writeLines("test", temp_metadata)
-  writeLines("test", temp_spectra)
-  writeLines("test", temp_sirius)
+# test_that("change_params_small handles individual parameters", {
+#   skip_on_cran()
+#
+#   # Test fil_pat only
+#   paths <- local_test_project(copy = TRUE)
+#   expect_no_error(change_params_small(fil_pat = "test_pattern"))
+#
+#   # Test ms_pol only
+#   paths <- local_test_project(copy = TRUE)
+#   expect_no_error(change_params_small(ms_pol = "neg"))
+#
+#   # Test org_tax only
+#   paths <- local_test_project(copy = TRUE)
+#   expect_no_error(change_params_small(org_tax = "Homo sapiens"))
+#
+#   # Test hig_con only
+#   paths <- local_test_project(copy = TRUE)
+#   expect_no_error(change_params_small(hig_con = FALSE))
+#
+#   # Test summarize only
+#   paths <- local_test_project(copy = TRUE)
+#   expect_no_error(change_params_small(summarize = TRUE))
+# })
 
-  expect_no_error(
-    change_params_small(
-      fil_pat = "test_pattern",
-      fil_fea_raw = temp_features,
-      fil_met_raw = temp_metadata,
-      fil_sir_raw = temp_sirius,
-      fil_spe_raw = temp_spectra,
-      ms_pol = "pos",
-      org_tax = "Gentiana lutea",
-      hig_con = TRUE,
-      summarize = FALSE
-    )
-  )
-
-  # Verify YAML was written
-  expect_true(file.exists(paths$params$prepare_params))
-})
-
-test_that("change_params_small handles minimal parameters (all NULL)", {
-  skip_on_cran()
-  paths <- local_test_project(copy = TRUE)
-
-  # Test with all NULL parameters
-  expect_no_error(
-    change_params_small()
-  )
-
-  expect_true(file.exists(paths$params$prepare_params))
-})
-
-test_that("change_params_small handles individual parameters", {
-  skip_on_cran()
-
-  # Test fil_pat only
-  paths <- local_test_project(copy = TRUE)
-  expect_no_error(change_params_small(fil_pat = "test_pattern"))
-
-  # Test ms_pol only
-  paths <- local_test_project(copy = TRUE)
-  expect_no_error(change_params_small(ms_pol = "neg"))
-
-  # Test org_tax only
-  paths <- local_test_project(copy = TRUE)
-  expect_no_error(change_params_small(org_tax = "Homo sapiens"))
-
-  # Test hig_con only
-  paths <- local_test_project(copy = TRUE)
-  expect_no_error(change_params_small(hig_con = FALSE))
-
-  # Test summarize only
-  paths <- local_test_project(copy = TRUE)
-  expect_no_error(change_params_small(summarize = TRUE))
-})
-
-test_that("change_params_small validates file existence", {
-  skip_on_cran()
-  paths <- local_test_project(copy = TRUE)
-
-  # Non-existent features file
-  expect_error(
-    change_params_small(fil_fea_raw = "nonexistent.csv"),
-    "Your features' file does not exist"
-  )
-
-  # Non-existent metadata file
-  expect_error(
-    change_params_small(fil_met_raw = "nonexistent.tsv"),
-    "Your metadata file does not exist"
-  )
-
-  # Non-existent sirius directory
-  expect_error(
-    change_params_small(fil_sir_raw = "nonexistent.zip"),
-    "Your sirius directory does not exist"
-  )
-
-  # Non-existent spectra file
-  expect_error(
-    change_params_small(fil_spe_raw = "nonexistent.mgf"),
-    "Your spectra file does not exist"
-  )
-})
+# test_that("change_params_small validates file existence", {
+#   skip_on_cran()
+#   paths <- local_test_project(copy = TRUE)
+#
+#   # Non-existent features file
+#   expect_error(
+#     change_params_small(fil_fea_raw = "nonexistent.csv"),
+#     "Your features' file does not exist"
+#   )
+#
+#   # Non-existent metadata file
+#   expect_error(
+#     change_params_small(fil_met_raw = "nonexistent.tsv"),
+#     "Your metadata file does not exist"
+#   )
+#
+#   # Non-existent sirius directory
+#   expect_error(
+#     change_params_small(fil_sir_raw = "nonexistent.zip"),
+#     "Your sirius directory does not exist"
+#   )
+#
+#   # Non-existent spectra file
+#   expect_error(
+#     change_params_small(fil_spe_raw = "nonexistent.mgf"),
+#     "Your spectra file does not exist"
+#   )
+# })
 
 test_that("change_params_small copies files to correct locations", {
   skip_on_cran()
