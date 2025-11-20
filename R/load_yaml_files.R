@@ -13,9 +13,7 @@
 #'
 #' @examples NULL
 load_yaml_files <- function() {
-  # ============================================================================
-  # Get Paths and List Files
-  # ============================================================================
+  # Get Paths and List Files ----
 
   # logger::log_trace("Loading YAML parameter files")
 
@@ -38,9 +36,7 @@ load_yaml_files <- function() {
     full.names = TRUE
   )
 
-  # ============================================================================
-  # Determine Which Parameter Set to Use
-  # ============================================================================
+  # Determine Which Parameter Set to Use ----
 
   # Use user params if available and at least as complete as defaults
   use_user <- length(user_files) >= length(default_files)
@@ -53,9 +49,7 @@ load_yaml_files <- function() {
     default_files
   }
 
-  # ============================================================================
-  # Combine with Prepare Params Files
-  # ============================================================================
+  # Combine with Prepare Params Files ----
 
   # Combine with prepare_params files (also need to resolve these paths)
   yaml_files <- c(
@@ -73,9 +67,7 @@ load_yaml_files <- function() {
       vectorize_all = FALSE
     )
 
-  # ============================================================================
-  # Load All YAML Files
-  # ============================================================================
+  # Load All YAML Files ----
 
   # Load all YAML files with error handling
   yamls_parsed <- tryCatch(

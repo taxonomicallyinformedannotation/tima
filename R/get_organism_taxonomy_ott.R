@@ -131,6 +131,7 @@ get_organism_taxonomy_ott <- function(
   batch_size <- 100L
   organism_batches <- purrr::map(
     .x = seq(1L, length(organisms), batch_size),
+    # TODO
     .f = function(i) {
       end_idx <- min(i + batch_size - 1L, length(organisms))
       organisms[i:end_idx][!is.na(organisms[i:end_idx])]
@@ -142,6 +143,7 @@ get_organism_taxonomy_ott <- function(
   # Query OTT API for each batch
   taxonomy_matches <- organism_batches |>
     purrr::map(
+      # TODO
       .f = function(batch) {
         # See https://github.com/ropensci/rotl/issues/147
         httr::with_config(
@@ -205,6 +207,7 @@ get_organism_taxonomy_ott <- function(
     organisms_new_split <-
       purrr::map(
         .x = seq(1, length(organisms_new), cut),
+        # TODO
         .f = function(i) {
           organisms_new[i:(i + cut - 1)][
             !is.na(organisms_new[i:(i + cut - 1)])
@@ -214,6 +217,7 @@ get_organism_taxonomy_ott <- function(
     logger::log_info("Retrying with {paste(organisms_new, collapse = ', ')}")
     new_matched_otl_exact_list_2 <- organisms_new_split |>
       purrr::map(
+        # TODO
         .f = function(x) {
           # See https://github.com/ropensci/rotl/issues/147
           httr::with_config(
@@ -263,6 +267,7 @@ get_organism_taxonomy_ott <- function(
 
     list_df <- seq_along(taxon_lineage) |>
       purrr::map(
+        # TODO
         .f = function(x) {
           tidytable::bind_rows(
             data.frame(

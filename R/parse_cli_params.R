@@ -483,6 +483,7 @@ parse_cli_params <- function(arguments, parameters) {
 
   parameters <- names(mappings) |>
     purrr::reduce(
+      # TODO
       .f = function(parameters, arg_name) {
         if (!is.null(arguments[[arg_name]])) {
           parameters |>

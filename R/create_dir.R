@@ -17,9 +17,7 @@
 #' create_dir(export = "path/to/file.txt")
 #' }
 create_dir <- function(export) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   if (missing(export) || is.null(export) || !nzchar(export)) {
     stop("Export path must be specified and non-empty")
@@ -29,9 +27,7 @@ create_dir <- function(export) {
     stop("Export path must be a single character string, got: ", class(export))
   }
 
-  # ============================================================================
-  # Determine Directory Path
-  # ============================================================================
+  # Determine Directory Path ----
 
   # Determine if this is a file path or directory path
   # Check for file extension (contains dot in basename)
@@ -47,9 +43,7 @@ create_dir <- function(export) {
     export
   }
 
-  # ============================================================================
-  # Create Directory
-  # ============================================================================
+  # Create Directory ----
 
   # Create the directory if it doesn't exist
   if (!dir.exists(dirname_path)) {
@@ -73,9 +67,7 @@ create_dir <- function(export) {
     }
   }
 
-  # ============================================================================
-  # Verify Directory is Writable
-  # ============================================================================
+  # Verify Directory is Writable ----
 
   # Verify directory is writable (important for Docker environments)
   if (dir.exists(dirname_path)) {

@@ -102,9 +102,7 @@ annotate_masses <-
       step = "annotate_masses"
     )$ms$tolerances$rt$adducts
   ) {
-    # ============================================================================
-    # Input Validation
-    # ============================================================================
+    # Input Validation ----
 
     # Validate MS mode first (cheapest check)
     # Handle NULL or missing ms_mode
@@ -184,9 +182,7 @@ annotate_masses <-
     logger::log_info("Starting mass-based annotation in {ms_mode} mode")
     logger::log_debug("Tolerances: {tolerance_ppm} ppm, {tolerance_rt} min RT")
 
-    # ============================================================================
-    # Load and Validate Features
-    # ============================================================================
+    ## Load and Validate Features ----
 
     # logger::log_trace("Loading features table from: {features}")
     features_table <- tidytable::fread(
@@ -241,17 +237,13 @@ annotate_masses <-
 
     logger::log_info("Processing {n_features} features for annotation")
 
-    # ============================================================================
-    # Select Mode-Specific Adducts and Clusters
-    # ============================================================================
+    # Select Mode-Specific Adducts and Clusters ----
 
     # Direct assignment is faster than conditional blocks
     adducts <- adducts_list[[ms_mode]]
     clusters <- clusters_list[[ms_mode]]
 
-    # ============================================================================
-    # Load and Join Library Tables
-    # ============================================================================
+    # Load and Join Library Tables ----
 
     # logger::log_trace("Loading library and supplementary data")
 
@@ -265,20 +257,17 @@ annotate_masses <-
     # Load all supplementary files
     supp_files <- list(str_stereo, str_met, str_nam, str_tax_cla, str_tax_npc)
 
-    supp_tables <- purrr::map(.x = supp_files, .f = function(file_path) {
-      tidytable::fread(
-        file = file_path,
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )
-    })
+    supp_tables <- purrr::map(
+      .x = supp_files,
+      .f = tidytable::fread,
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    )
 
     # Single reduce operation for all joins
     joined_table <- purrr::reduce(
       .x = c(list(library_table), supp_tables),
-      .f = function(x, y) {
-        tidytable::left_join(x, y)
-      }
+      .f = tidytable::left_join
     )
 
     # Filter and prepare structure-organism pairs
@@ -492,7 +481,7 @@ annotate_masses <-
 
     # logger::log_trace(
     #  "Calculating delta mz for single charge adducts and clusters"
-    #)
+    # )
     differences <-
       dist_groups(
         d = stats::dist(add_clu_table$adduct_mass),
@@ -530,7 +519,7 @@ annotate_masses <-
 
     # logger::log_trace(
     #  "Joining within given delta mz tolerance (neutral losses)"
-    #)
+    # )
     df_nl <- df_couples_diff |>
       dplyr::inner_join(
         neutral_losses,

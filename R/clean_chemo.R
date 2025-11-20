@@ -458,9 +458,7 @@ clean_chemo <- function(
   remove_ties = get("remove_ties", envir = parent.frame()),
   summarize = get("summarize", envir = parent.frame())
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   validate_clean_chemo_inputs(
     annot_table_wei_chemo = annot_table_wei_chemo,
@@ -481,9 +479,7 @@ clean_chemo <- function(
     return(annot_table_wei_chemo)
   }
 
-  # ============================================================================
-  # Ensure Score Columns are Numeric
-  # ============================================================================
+  # Ensure Score Columns are Numeric ----
 
   # Convert score columns to numeric to prevent "non-numeric argument" errors
   # These columns may be character if loaded from TSV files
@@ -502,9 +498,7 @@ clean_chemo <- function(
     }
   }
 
-  # ============================================================================
-  # Log Processing Parameters
-  # ============================================================================
+  # Log Processing Parameters ----
 
   logger::log_info("Cleaning chemically weighted annotations")
   logger::log_debug("Keeping top {candidates_final} candidates per feature")
@@ -521,9 +515,7 @@ clean_chemo <- function(
     "{minimal_ms1_condition} {minimal_ms1_chemo} chemical score"
   )
 
-  # ============================================================================
-  # Core Filtering Pipeline - Single Source of Truth
-  # ============================================================================
+  # Core Filtering Pipeline ----
 
   # Step 1: Filter MS1 annotations based on score thresholds
   df_base <- filter_ms1_annotations(
@@ -536,29 +528,21 @@ clean_chemo <- function(
   # Step 2: Rank and deduplicate - keep best structure per feature
   df_ranked <- rank_and_deduplicate(df_base)
 
-  # ============================================================================
-  # Apply Percentile Filter - Centralized in clean_chemo
-  # ============================================================================
+  # Apply Percentile Filter -----
 
   # Apply percentile filtering HERE (not in minimize_results)
   # This is done BEFORE high-confidence filter to get accurate counts
   df_percentile <- apply_percentile_filter(df_ranked, best_percentile)
 
-  # ============================================================================
-  # Count Candidates BEFORE High-Confidence Filter
-  # ============================================================================
+  # Count Candidates BEFORE High-Confidence Filter ----
 
   # Count evaluated candidates (all in df_ranked)
   # Count best candidates (those passing percentile in df_percentile)
   results_candidates <- count_candidates(df_ranked, df_percentile)
 
-  # ============================================================================
-  # Three-Tier Output Generation
-  # ============================================================================
+  # Three-Tier Output Generation ----
 
-  # ============================================================================
-  # Apply High-Confidence Filter for Filtered and Full Tiers
-  # ============================================================================
+  # Apply High-Confidence Filter for Filtered and Full Tiers ----
 
   # Apply filter_high_confidence_only for filtered tier
   df_filtered <- df_percentile |>
@@ -824,9 +808,7 @@ clean_chemo <- function(
       )
     )
 
-  # ============================================================================
-  # Optionally Remove Compound Names (After All Processing)
-  # ============================================================================
+  # Optionally Remove Compound Names (After All Processing) ----
 
   # Build results list
   results_list <- list(

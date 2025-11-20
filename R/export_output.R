@@ -18,9 +18,7 @@
 #' unlink("output", recursive = TRUE)
 #' }
 export_output <- function(x, file) {
-  # ============================================================================
-  # Input Validation (fast checks first)
-  # ============================================================================
+  # Input Validation (fast checks first) ----
 
   # Validate file path first (cheapest check)
   if (
@@ -37,9 +35,7 @@ export_output <- function(x, file) {
     stop("Input 'x' must be a data frame or tibble")
   }
 
-  # ============================================================================
-  # Prepare Export
-  # ============================================================================
+  # Prepare Export ----
 
   # Create the output directory if it doesn't exist
   create_dir(export = file)
@@ -63,9 +59,7 @@ export_output <- function(x, file) {
     )
   }
 
-  # ============================================================================
-  # Write Data
-  # ============================================================================
+  # Write Data ----
 
   # Write the data frame to a tab-delimited file with error handling
   tryCatch(

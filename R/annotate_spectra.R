@@ -100,9 +100,7 @@ annotate_spectra <- function(
       call. = FALSE
     )
   }
-  # ============================================================================
-  # Processing
-  # ============================================================================
+  # Processing ----
   logger::log_info("Starting spectral annotation in {polarity} mode")
   logger::log_debug(
     "Method: {method}, Threshold: {threshold}, PPM: {ppm}, Dalton: {dalton}"
@@ -177,6 +175,7 @@ annotate_spectra <- function(
       .f = Spectra::applyProcessing,
       BPPARAM = BiocParallel::SerialParam()
     ) |>
+    # TODO
     purrr::map(.f = function(spectra_lib) {
       spectra_lib[
         !spectra_lib@backend@peaksData |>

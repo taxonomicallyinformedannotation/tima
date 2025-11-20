@@ -14,9 +14,7 @@
 #'
 #' @examples NULL
 dist_get <- function(d, idx1, idx2) {
-  # ============================================================================
-  # Input Validation and Conversion
-  # ============================================================================
+  # Input Validation and Conversion ----
 
   # Convert input to distance object if needed
   if (!inherits(d, "dist")) {
@@ -36,9 +34,7 @@ dist_get <- function(d, idx1, idx2) {
     )
   }
 
-  # ============================================================================
-  # Calculate Distance
-  # ============================================================================
+  # Calculate Distance ----
 
   # Calculate linear index into lower triangle of distance matrix
   i <- pmin(idx1, idx2)
@@ -76,9 +72,7 @@ dist_get <- function(d, idx1, idx2) {
 #'
 #' @examples NULL
 dist_groups <- function(d, g) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Convert d to a dist object
   d <- stats::as.dist(d)
@@ -98,9 +92,7 @@ dist_groups <- function(d, g) {
     )
   }
 
-  # ============================================================================
-  # Generate Pairwise Combinations
-  # ============================================================================
+  # Generate Pairwise Combinations ----
 
   # Get all pairwise combinations of observation indices
   idx_pairs <- utils::combn(n_obs, 2L)
@@ -111,9 +103,7 @@ dist_groups <- function(d, g) {
   group1 <- g[idx1]
   group2 <- g[idx2]
 
-  # ============================================================================
-  # Create Comparison Labels
-  # ============================================================================
+  # Create Comparison Labels ----
 
   # Create descriptive labels for within/between group comparisons
   level1 <- levels(g)[pmin(as.numeric(group1), as.numeric(group2))]
@@ -125,9 +115,7 @@ dist_groups <- function(d, g) {
     paste("Between", level1, "and", level2)
   )
 
-  # ============================================================================
-  # Build Result Data Frame
-  # ============================================================================
+  # Build Result Data Frame ----
 
   # Build result data frame with all distance information
   data.frame(

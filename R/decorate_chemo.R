@@ -49,9 +49,7 @@ decorate_chemo <- function(
     envir = parent.frame()
   )
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   required_cols <- c(
     "score_chemical",
@@ -66,9 +64,7 @@ decorate_chemo <- function(
     return(annot_table_wei_chemo)
   }
 
-  # ============================================================================
-  # Helper Function
-  # ============================================================================
+  # Helper Function ----
 
   # Filter for valid annotations at a specific level
   filter_valid_level <- function(df, score_threshold, col_name) {
@@ -89,9 +85,7 @@ decorate_chemo <- function(
     )
   }
 
-  # ============================================================================
-  # Classyfire Hierarchy (cascading filters)
-  # ============================================================================
+  # Classyfire Hierarchy (cascading filters) ----
 
   df_cla_kingdom <- filter_valid_level(
     annot_table_wei_chemo,
@@ -117,9 +111,7 @@ decorate_chemo <- function(
     "feature_pred_tax_cla_04dirpar_val"
   )
 
-  # ============================================================================
-  # NPClassifier Hierarchy (cascading filters, independent of Classyfire)
-  # ============================================================================
+  # NPClassifier Hierarchy (cascading filters, independent of Classyfire) ----
 
   df_npc_pathway <- filter_valid_level(
     annot_table_wei_chemo,
@@ -139,9 +131,7 @@ decorate_chemo <- function(
     "feature_pred_tax_npc_03cla_val"
   )
 
-  # ============================================================================
-  # Count Unique Structures
-  # ============================================================================
+  # Count Unique Structures ----
 
   # Classyfire counts
   cla_dataframes <- list(
@@ -174,9 +164,7 @@ decorate_chemo <- function(
   )
   names(npc_counts) <- names(npc_dataframes)
 
-  # ============================================================================
-  # Log Summary Statistics
-  # ============================================================================
+  # Log Summary Statistics ----
 
   logger::log_info(
     "Chemically informed metabolite annotation reranked:\n",

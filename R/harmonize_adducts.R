@@ -18,9 +18,7 @@ harmonize_adducts <- function(
   adducts_colname = "adduct",
   adducts_translations
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Validate dataframe
   if (!is.data.frame(df) && !inherits(df, "tbl")) {
@@ -48,9 +46,7 @@ harmonize_adducts <- function(
     stop("adducts_translations must be a named character vector")
   }
 
-  # ============================================================================
-  # Harmonize Adducts
-  # ============================================================================
+  # Harmonize Adducts ----
 
   # Perform string replacement
   n_before <- length(unique(df[[adducts_colname]]))
@@ -67,7 +63,7 @@ harmonize_adducts <- function(
   if (n_before != n_after) {
     # logger::log_trace(
     #  "Harmonized adducts: {n_before} unique forms -> {n_after} unique forms"
-    #)
+    # )
   }
 
   df

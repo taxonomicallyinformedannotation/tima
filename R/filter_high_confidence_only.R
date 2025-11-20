@@ -42,9 +42,7 @@ filter_high_confidence_only <- function(
   similarity_spectral_min = DEFAULT_HC_SCORE_SPECTRAL_MIN,
   context = NULL
 ) {
-  # ============================================================================
-  # Validation
-  # ============================================================================
+  # Validation ----
   validate_dataframe(df, name = "df", allow_empty = TRUE)
 
   if (nrow(df) == 0L) {
@@ -97,9 +95,7 @@ filter_high_confidence_only <- function(
     )
   }
 
-  # ============================================================================
-  # Prepare safe columns (handle missing gracefully)
-  # ============================================================================
+  # Prepare safe columns ----
   rt_err_vec <- if ("candidate_structure_error_rt" %in% names(df)) {
     df[["candidate_structure_error_rt"]]
   } else {
@@ -119,9 +115,8 @@ filter_high_confidence_only <- function(
 
   n_before <- nrow(df_work)
 
-  # ============================================================================
-  # Core filtering
-  # ============================================================================
+  # Core filtering ----
+
   # At least one of the three score thresholds must be satisfied
   df_filtered <- df_work |>
     tidytable::filter(

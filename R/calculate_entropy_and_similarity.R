@@ -110,6 +110,7 @@ calculate_entropy_and_similarity <- function(
   results <- purrr::map(
     .progress = show_progress,
     .x = seq_along(query_spectra),
+    # TODO
     .f = function(spectrum_idx) {
       current_spectrum <- query_spectra[[spectrum_idx]]
       current_precursor <- query_precursors[spectrum_idx]
@@ -140,6 +141,7 @@ calculate_entropy_and_similarity <- function(
       if (length(lib_ids_sub) != 0) {
         similarities <- vapply(
           X = seq_along(lib_spectra_sub),
+          # TODO
           FUN = function(lib_idx) {
             lib_spectrum <- lib_spectra_sub[[lib_idx]]
             score <- calculate_similarity(

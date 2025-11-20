@@ -56,7 +56,7 @@ complement_metadata_structures <- function(
 
   # logger::log_trace(
   #  "Complementing structural metadata from reference libraries"
-  #)
+  # )
   logger::log_debug("Input: ", nrow(df), " rows")
 
   # Load stereochemistry data
@@ -371,6 +371,7 @@ complement_metadata_structures <- function(
     ) |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
+      # TODO
       .fns = function(x) {
         tidytable::na_if(x, "")
       }

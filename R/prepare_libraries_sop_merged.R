@@ -363,9 +363,7 @@ prepare_libraries_sop_merged <- function(
     )
   }
 
-  # ============================================================================
-  # Export Results
-  # ============================================================================
+  # Export Results ----
 
   export_params(
     parameters = get_params(step = "prepare_libraries_sop_merged"),
