@@ -631,7 +631,6 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
 #   skip("Not implemented")
 # )
 # test_that("annotate_masses handles moderate-scale data efficiently", {
-#   skip_if_not(interactive(), "Performance test only for local development")
 #
 #   # Setup temporary test environment
 #   paths <- local_test_project()

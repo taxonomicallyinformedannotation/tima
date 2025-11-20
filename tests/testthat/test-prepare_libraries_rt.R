@@ -509,10 +509,6 @@ test_that("prepare_libraries_rt creates correct output structure", {
 # Performance ----
 
 test_that("prepare_libraries_rt handles moderate-scale data efficiently", {
-  skip_if_not(interactive(), "Performance test only for local development")
-
-  # Setup temporary test environment
-
   # Create CSV with 500 RT entries
   csv_exp <- file.path(tempdir(), "large_rt.csv")
 

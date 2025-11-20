@@ -499,8 +499,6 @@ test_that("weight_bio handles annotations without matching organisms", {
 #   skip("Not implemented")
 # )
 # test_that("weight_bio handles moderate-scale data efficiently", {
-#   skip_if_not(interactive(), "Performance test only for local development")
-#
 #   # Create 100 annotations
 #   n_annotations <- 100
 #   n_structures <- 20

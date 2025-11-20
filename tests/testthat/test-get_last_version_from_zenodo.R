@@ -93,8 +93,6 @@ test_that("test-get_last_version_from_zenodo requires all parameters", {
 ## Behavior ----
 
 test_that("test-get_last_version_from_zenodo handles invalid DOI gracefully", {
-  skip_if_offline()
-
   output <- file.path("output.txt")
 
   expect_error(

@@ -495,9 +495,7 @@ test_that("summarize_results completes in reasonable time", {
 # test_that(
 #   skip("Not implemented")
 # )
-# test_that("summarize concatenates candidate information with pipes", {
-#   skip_if_not_installed("tidytable")
-#
+# test_that("summarize concatenates candidate information with pipes", { #
 #   test_data <- create_test_annotation_data(n_features = 1, n_candidates = 3)
 #
 #   result <- summarize_results(
