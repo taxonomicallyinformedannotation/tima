@@ -78,9 +78,7 @@ calculate_similarity <- function(
     return(if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0)
   }
 
-  # ============================================================================
-  # Method: Entropy (no peak matching required)
-  # ============================================================================
+  # Method: Entropy (no peak matching required) ----
 
   if (method == "entropy") {
     # if (return_matched_peaks) {
@@ -115,9 +113,7 @@ calculate_similarity <- function(
     return(result)
   }
 
-  # ============================================================================
-  # Methods: GNPS or Cosine (require peak matching)
-  # ============================================================================
+  # Methods: GNPS or Cosine (require peak matching) ----
 
   # Extract masses efficiently (direct column access)
   query_masses <- query_spectrum[, 1L]

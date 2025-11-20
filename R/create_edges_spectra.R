@@ -65,9 +65,7 @@ create_edges_spectra <- function(
     )
   }
 
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Validate numeric parameters first (cheap checks)
   if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
@@ -120,9 +118,7 @@ create_edges_spectra <- function(
     }
   }
 
-  # ============================================================================
-  # Import and Process Spectra
-  # ============================================================================
+  # Import and Process Spectra ----
 
   logger::log_info("Creating spectral similarity network edges")
   logger::log_debug("Parameters - Threshold: {threshold}, Method: {method}")
@@ -153,16 +149,14 @@ create_edges_spectra <- function(
     return(output)
   }
 
-  # ============================================================================
-  # Compute Spectral Similarities
-  # ============================================================================
+  # Compute Spectral Similarities ----
 
   # logger::log_trace(
   #  "Performing spectral comparison on {length(spectra)} spectra"
-  #)
+  # )
   # logger::log_trace(
   #  "As the precursors delta is not limited, expect a long processing time."
-  #)
+  # )
   logger::log_with_separator("Take yourself a break, you deserve it.")
 
   # Extract data (cache for reuse)

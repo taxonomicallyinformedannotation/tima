@@ -51,9 +51,7 @@ harmonize_spectra <- function(
   col_sy = get("col_sy", envir = parent.frame()),
   col_xl = get("col_xl", envir = parent.frame())
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Validate mode first (cheapest check)
   if (!grepl("pos|neg", mode, ignore.case = TRUE)) {
@@ -99,9 +97,7 @@ harmonize_spectra <- function(
     )
   }
 
-  # ============================================================================
-  # Harmonize Column Names
-  # ============================================================================
+  # Harmonize Column Names ----
 
   # logger::log_trace("Harmonizing spectra headers for mode: {mode}")
 

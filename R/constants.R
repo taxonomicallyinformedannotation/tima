@@ -100,6 +100,79 @@ ADDUCT_MASSES <- list(
   CF3COO = 112.9855944 # Trifluoroacetate
 )
 
+# Statistical Thresholds ----
+
+#' Tolerance for floating point weight sum comparisons
+#' Used when validating that weights sum to 1.0
+#' @export
+WEIGHT_SUM_TOLERANCE <- 1e-10
+
+#' Default minimum consistency score for taxonomic predictions
+#' Features below this threshold are filtered out
+#' @export
+DEFAULT_MINIMAL_CONSISTENCY <- 0.5
+
+#' Default best candidate percentile threshold
+#' Only candidates above this percentile are retained
+#' @export
+DEFAULT_BEST_PERCENTILE <- 0.9
+
+# Scoring Defaults ----
+
+#' Default number of top candidates to consider from neighbors
+#' @export
+DEFAULT_CANDIDATES_NEIGHBORS <- 10
+
+#' Default number of final candidates to report per feature
+#' @export
+DEFAULT_CANDIDATES_FINAL <- 5
+
+# MS1 Filtering Thresholds ----
+
+#' Default minimum MS1 score threshold for biological scoring
+#' @export
+DEFAULT_MINIMAL_MS1_BIO <- 0.5
+
+#' Default minimum MS1 score threshold for chemical scoring
+#' @export
+DEFAULT_MINIMAL_MS1_CHEMO <- 0.5
+
+#' Default MS1 score combination logic
+#' Either "OR" (at least one threshold met) or "AND" (both thresholds met)
+#' @export
+DEFAULT_MINIMAL_MS1_CONDITION <- "OR"
+
+# High Confidence Filter Defaults ----
+
+#' Minimum biological score for high confidence annotations
+#' @export
+DEFAULT_HC_SCORE_BIO_MIN <- 0.8
+
+#' Minimum chemical score for high confidence annotations
+#' @export
+DEFAULT_HC_SCORE_CHEM_MIN <- 0.8
+
+#' Minimum combined score for high confidence annotations
+#' @export
+DEFAULT_HC_SCORE_FINAL_MIN <- 0.8
+
+#' Minimum spectral score for high confidence annotations
+#' @export
+DEFAULT_HC_SCORE_SPECTRAL_MIN <- 0.5
+
+#' Minimum SIRIUS CSI score for high confidence annotations
+#' @export
+DEFAULT_HC_SCORE_SIRIUS_MIN <- 0.5
+
+#' Minimum initial (MS1) score for high confidence annotations
+#' @export
+DEFAULT_HC_SCORE_INITIAL_MIN <- 0.3
+
+#' Maximum retention time error (minutes) for high confidence annotations
+#' @export
+DEFAULT_HC_MAX_RT_ERROR_MIN <- 0.5
+
+
 # Ionization Modes ----
 
 #' Valid ionization mode values

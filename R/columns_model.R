@@ -18,10 +18,10 @@
 #'
 #' @examples NULL
 columns_model <- function() {
-  # Basic feature identifiers
+  # Basic feature identifiers ----
   features_columns <- c("feature_id", "feature_mz", "feature_rt")
 
-  # Calculated feature-level properties
+  # Calculated feature-level properties ----
   features_calculated_columns <- c(
     "feature_spectrum_entropy",
     "feature_spectrum_peaks",
@@ -41,10 +41,10 @@ columns_model <- function() {
     "feature_pred_tax_npc_03cla_score"
   )
 
-  # Calculated candidate-level properties
+  # Calculated candidate-level properties ----
   candidates_calculated_columns <- c("candidate_spectrum_entropy")
 
-  # SIRIUS formula-level columns
+  # SIRIUS formula-level columns ----
   candidates_sirius_for_columns <- c(
     "candidate_structure_molecular_formula",
     "candidate_count_sirius_peaks_explained",
@@ -55,14 +55,14 @@ columns_model <- function() {
     "candidate_score_sirius_zodiac"
   )
 
-  # SIRIUS structure-level scores
+  # SIRIUS structure-level scores ----
   candidates_sirius_str_columns <- c(
     "candidate_score_sirius_confidence",
     "candidate_score_sirius_csi",
     "candidate_score_sirius_msnovelist"
   )
 
-  # Spectral library matching columns
+  # Spectral library matching columns ----
   candidates_spectra_columns <- c(
     "candidate_library",
     "candidate_spectrum_id",
@@ -71,7 +71,7 @@ columns_model <- function() {
     "candidate_score_similarity"
   )
 
-  # Chemical structure metadata and taxonomy
+  # Chemical structure metadata and taxonomy ----
   candidates_structures_columns <- c(
     "candidate_structure_name",
     "candidate_structure_exact_mass",
@@ -95,13 +95,13 @@ columns_model <- function() {
     "candidate_structure_error_rt"
   )
 
-  # Component identification
+  # Component identification ----
   components_columns <- c("component_id")
 
-  # Ranking columns
+  # Ranking columns ----
   rank_columns <- c("rank_initial", "rank_final")
 
-  # Scoring columns
+  # Scoring columns ----
   score_columns <- c(
     "score_initial",
     "score_biological",

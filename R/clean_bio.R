@@ -22,9 +22,7 @@ clean_bio <- function(
   edges_table,
   minimal_consistency
 ) {
-  # ============================================================================
-  # Input Validation (using centralized validators)
-  # ============================================================================
+  # Input Validation (using centralized validators) ----
 
   validate_dataframe(
     annot_table_wei_bio,
@@ -56,16 +54,12 @@ clean_bio <- function(
     return(.add_default_prediction_columns(annot_table_wei_bio))
   }
 
-  # ============================================================================
-  # Extract Distinct Structure-Taxonomy Pairs
-  # ============================================================================
+  # Extract Distinct Structure-Taxonomy Pairs ----
 
   # Extract unique structure-taxonomy combinations
   annotations_distinct <- .extract_distinct_taxonomy_pairs(annot_table_wei_bio)
 
-  # ============================================================================
-  # Filter Edges for Consistency Calculation
-  # ============================================================================
+  # Filter Edges for Consistency Calculation ----
 
   edges_filtered <- .filter_edges_for_consistency(edges_table)
 
@@ -84,9 +78,7 @@ clean_bio <- function(
     return(.add_default_prediction_columns(annot_table_wei_bio))
   }
 
-  # ============================================================================
-  # Join Edges with Annotations
-  # ============================================================================
+  # Join Edges with Annotations ----
 
   # Join edges with annotations
   df3 <- tidytable::right_join(
@@ -109,9 +101,7 @@ clean_bio <- function(
 
   # logger::log_trace("Calculating consistency scores across network edges")
 
-  # ============================================================================
-  # Calculate Consistency Scores
-  # ============================================================================
+  # Calculate Consistency Scores ----
 
   # Calculate consistency scores for each taxonomic level
   consistency_results <- .calculate_consistency_all_levels(
@@ -144,13 +134,8 @@ clean_bio <- function(
   annot_table_wei_bio_preclean <- purrr::reduce(
     .x = supp_tables,
     .init = df2,
-    .f = function(x, y) {
-      tidytable::left_join(
-        x,
-        y,
-        by = stats::setNames("feature_source", "feature_id")
-      )
-    }
+    .f = tidytable::left_join,
+    by = stats::setNames("feature_source", "feature_id")
   ) |>
     tidytable::select(feature_id, tidyselect::everything()) |>
     tidytable::mutate(tidytable::across(
@@ -207,9 +192,7 @@ clean_bio <- function(
   return(annot_table_wei_bio_clean)
 }
 
-# ==============================================================================
-# Internal Helper Functions
-# ==============================================================================
+# Internal Helper Functions ----
 
 #' Add default prediction columns to annotation table
 #'

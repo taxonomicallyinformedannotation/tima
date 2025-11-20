@@ -58,9 +58,7 @@ decorate_bio <- function(
     envir = parent.frame()
   )
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   required_cols <- c(
     "score_biological",
@@ -75,9 +73,7 @@ decorate_bio <- function(
     return(annot_table_wei_bio)
   }
 
-  # ============================================================================
-  # Helper Function (DRY principle)
-  # ============================================================================
+  # Helper Function ----
 
   # Count unique structures at a given score threshold
   count_structures_at_level <- function(df, min_score) {
@@ -91,9 +87,7 @@ decorate_bio <- function(
       nrow()
   }
 
-  # ============================================================================
-  # Calculate Counts for Each Taxonomic Level
-  # ============================================================================
+  # Calculate Counts for Each Taxonomic Level ----
 
   # Create score list for efficient processing
   levels <- list(
@@ -118,9 +112,7 @@ decorate_bio <- function(
 
   names(counts) <- names(levels)
 
-  # ============================================================================
-  # Log Summary Statistics
-  # ============================================================================
+  # Log Summary Statistics ----
 
   logger::log_info(
     "Taxonomically informed metabolite annotation reranked:\n",

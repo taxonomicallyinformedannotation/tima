@@ -11,18 +11,14 @@
 #'
 #' @examples NULL
 extract_spectra <- function(object) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Validate input
   if (!inherits(object, "Spectra")) {
     stop("Input must be a Spectra object from the Spectra package")
   }
 
-  # ============================================================================
-  # Define Harmonization Mappings
-  # ============================================================================
+  # Define Harmonization Mappings ----
 
   # Define column name mappings for harmonization
   # These handle inconsistencies across different data sources
@@ -37,9 +33,7 @@ extract_spectra <- function(object) {
   incoherent_integer <- c("spectrum_id")
   incoherent_numeric <- c("PrecursorMZ")
 
-  # ============================================================================
-  # Extract Spectra Metadata
-  # ============================================================================
+  # Extract Spectra Metadata ----
 
   # Extract spectra metadata
   # logger::log_trace("Extracting spectra metadata")
@@ -47,14 +41,13 @@ extract_spectra <- function(object) {
     data.frame() |>
     tidytable::as_tidytable()
 
-  # ============================================================================
-  # Extract Peak Data
-  # ============================================================================
+  # Extract Peak Data ----
 
   # Extract peak data (mz and intensity) efficiently
   # logger::log_trace("Extracting peak data (mz and intensity)")
   spectra$mz <- lapply(
     X = object@backend@peaksData,
+    # TODO
     FUN = function(peakData) {
       if (is.matrix(peakData) && ncol(peakData) >= 1L) {
         peakData[, 1L]
@@ -66,6 +59,7 @@ extract_spectra <- function(object) {
 
   spectra$intensity <- lapply(
     X = object@backend@peaksData,
+    # TODO
     FUN = function(peakData) {
       if (is.matrix(peakData) && ncol(peakData) >= 2L) {
         peakData[, 2L]
@@ -84,9 +78,7 @@ extract_spectra <- function(object) {
   # )) |>
   # tidytable::ungroup()
 
-  # ============================================================================
-  # Harmonize Column Types
-  # ============================================================================
+  # Harmonize Column Types ----
 
   # Harmonize column types
   # logger::log_trace("Harmonizing column types")
@@ -104,9 +96,7 @@ extract_spectra <- function(object) {
       .fns = as.numeric
     ))
 
-  # ============================================================================
-  # Harmonize Column Names
-  # ============================================================================
+  # Harmonize Column Names ----
 
   # Harmonize column names: remove old names and add standardized names
   # Only process columns that actually exist in the data
@@ -117,7 +107,7 @@ extract_spectra <- function(object) {
   if (length(columns_to_harmonize) > 0L) {
     # logger::log_trace(
     #  "Harmonizing {length(columns_to_harmonize)} column names"
-    #)
+    # )
     spectra <- spectra |>
       tidytable::select(-tidyselect::any_of(names(columns_to_harmonize))) |>
       tidytable::rename(tidyselect::any_of(columns_to_harmonize))

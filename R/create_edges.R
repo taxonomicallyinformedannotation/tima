@@ -37,9 +37,7 @@ create_edges <- function(
       method
     )
   }
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Early exit for insufficient spectra
   if (nspecs < 2L) {
@@ -66,9 +64,7 @@ create_edges <- function(
     )
   }
 
-  # ============================================================================
-  # Calculate Pairwise Similarities
-  # ============================================================================
+  # Calculate Pairwise Similarities ----
 
   # Create all pairwise comparisons
   indices <- seq_len(nspecs - 1L)
@@ -82,6 +78,7 @@ create_edges <- function(
   edges <- purrr::map(
     .progress = show_progress,
     .x = indices,
+    # TODO
     .f = function(index) {
       target_indices <- (index + 1L):nspecs
       query_spectrum <- frags[[index]]
@@ -90,6 +87,7 @@ create_edges <- function(
       # Calculate similarities for all targets
       results <- purrr::map(
         .x = target_indices,
+        # TODO
         .f = function(target_idx) {
           target_spectrum <- frags[[target_idx]]
           target_precursor <- precs[[target_idx]]
@@ -152,9 +150,7 @@ create_edges <- function(
     }
   )
 
-  # ============================================================================
-  # Combine and Return Results
-  # ============================================================================
+  # Combine and Return Results ----
 
   # Remove NULL entries and combine
   edges <- edges[!vapply(edges, is.null, logical(1L), USE.NAMES = FALSE)]

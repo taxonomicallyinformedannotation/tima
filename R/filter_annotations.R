@@ -237,9 +237,7 @@ filter_annotations <- function(
     step = "filter_annotations"
   )$ms$tolerances$rt$library
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   validate_filter_annotations_inputs(
     annotations = annotations,
@@ -254,9 +252,7 @@ filter_annotations <- function(
     rts <- NULL
   }
 
-  # ============================================================================
-  # Load and Process Data
-  # ============================================================================
+  # Load and Process Data ----
 
   logger::log_info("Filtering annotations")
   logger::log_debug("RT tolerance: {tolerance_rt} minutes")
@@ -273,9 +269,7 @@ filter_annotations <- function(
     "Processing {n_features} unique features for annotation filtering"
   )
 
-  # ============================================================================
-  # Load and Merge Annotations
-  # ============================================================================
+  # Load and Merge Annotations ----
 
   logger::log_debug("Loading {length(annotations)} annotation file(s)")
   annotation_tables_list <- purrr::map(
@@ -294,9 +288,7 @@ filter_annotations <- function(
     "Total annotations before RT filtering: {n_total_annotations}"
   )
 
-  # ============================================================================
-  # Apply RT Filtering if Library Available
-  # ============================================================================
+  # Apply RT Filtering if Library Available ----
 
   features_annotated_table_1 <- features_table |>
     tidytable::left_join(annotation_table, by = "feature_id")

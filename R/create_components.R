@@ -38,9 +38,7 @@ create_components <- function(
     step = "create_components"
   )$files$networks$spectral$components$raw
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # File existence check
   input_exists <- vapply(input, file.exists, logical(1L), USE.NAMES = FALSE)
@@ -53,9 +51,7 @@ create_components <- function(
     )
   }
 
-  # ============================================================================
-  # Load Edge Data
-  # ============================================================================
+  # Load Edge Data ----
 
   logger::log_info("Creating components from {length(input)} edge file(s)")
 
@@ -94,9 +90,7 @@ create_components <- function(
     return(output)
   }
 
-  # ============================================================================
-  # Build Graph and Find Components
-  # ============================================================================
+  # Build Graph and Find Components ----
 
   # Create undirected graph from edges
   # logger::log_trace("Building graph structure")
@@ -112,9 +106,7 @@ create_components <- function(
 
   logger::log_info("Found {length(features_by_component)} components")
 
-  # ============================================================================
-  # Format Component Assignments
-  # ============================================================================
+  # Format Component Assignments ----
 
   # Convert to tidy format
   # logger::log_trace("Formatting component assignments")
@@ -142,11 +134,8 @@ create_components <- function(
     "Mean: {round(mean(component_sizes), 1)}"
   )
 
-  # ============================================================================
-  # Export Results
-  # ============================================================================
+  # Export Results ----
 
-  # Export parameters and results
   export_params(
     parameters = get_params(step = "create_components"),
     step = "create_components"

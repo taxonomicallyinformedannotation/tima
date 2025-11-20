@@ -23,9 +23,7 @@
 #' params <- get_params("prepare_params")
 #' }
 get_params <- function(step) {
-  # ============================================================================
-  # Input Validation (early check)
-  # ============================================================================
+  # Input Validation (early check) ----
 
   if (missing(step) || is.null(step) || !nzchar(step)) {
     stop("Step name must be provided and non-empty")
@@ -35,9 +33,7 @@ get_params <- function(step) {
     stop("Step must be a single character string, got: ", class(step))
   }
 
-  # ============================================================================
-  # Get Default Paths and Available Steps
-  # ============================================================================
+  # Get Default Paths and Available Steps ----
 
   # Get default paths (cached for potential reuse)
   paths <- get_default_paths()
@@ -71,9 +67,7 @@ get_params <- function(step) {
     )
   }
 
-  # ============================================================================
-  # Determine Parameter File Paths
-  # ============================================================================
+  # Determine Parameter File Paths ----
 
   # Determine default parameter file path based on step type
   default_param_path <- if (step == "prepare_params") {
@@ -103,9 +97,7 @@ get_params <- function(step) {
     )
   }
 
-  # ============================================================================
-  # Load Docopt Documentation
-  # ============================================================================
+  # Load Docopt Documentation ----
 
   # Get docopt documentation path
   docopt_path <- file.path(
@@ -134,9 +126,7 @@ get_params <- function(step) {
     }
   )
 
-  # ============================================================================
-  # Load and Merge YAML Parameters
-  # ============================================================================
+  # Load and Merge YAML Parameters ----
 
   # Check for user-specified parameters
   user_param_path <- file.path(
@@ -168,9 +158,7 @@ get_params <- function(step) {
     stop("Failed to load parameters for step '", step, "'")
   }
 
-  # ============================================================================
-  # Parse and Merge CLI Arguments
-  # ============================================================================
+  # Parse and Merge CLI Arguments ----
 
   # Parse CLI arguments with error handling
   cli_args <- tryCatch(

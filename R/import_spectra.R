@@ -41,9 +41,7 @@ import_spectra <- function(
   sanitize = TRUE,
   combine = TRUE
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Validate numeric parameters first (cheapest checks)
   if (!is.numeric(cutoff) || cutoff < 0) {
@@ -75,9 +73,7 @@ import_spectra <- function(
     stop("Spectra file not found: ", file)
   }
 
-  # ============================================================================
-  # Import Spectra
-  # ============================================================================
+  # Import Spectra ----
 
   logger::log_info("Importing spectra from: {file}")
   logger::log_debug(
@@ -141,9 +137,7 @@ import_spectra <- function(
     return(spectra)
   }
 
-  # ============================================================================
-  # Harmonize Metadata Fields
-  # ============================================================================
+  # Harmonize Metadata Fields ----
 
   # Validate precursor charges
   if (0L %in% spectra@backend@spectraData$precursorCharge) {
@@ -174,9 +168,7 @@ import_spectra <- function(
     spectra$spectrum_id <- as.character(spectra$spectrum_id)
   }
 
-  # ============================================================================
-  # Filter Spectra
-  # ============================================================================
+  # Filter Spectra ----
 
   # Filter to MS2 spectra only
   if ("msLevel" %in% spec_cols) {
@@ -245,7 +237,7 @@ import_spectra <- function(
     } else {
       # logger::log_trace(
       #  "No replicate grouping field found, skipping combination"
-      #)
+      # )
     }
   }
 

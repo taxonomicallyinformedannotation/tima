@@ -106,11 +106,8 @@ prepare_features_components <- function(
     )
   }
 
-  # ============================================================================
-  # Export Results
-  # ============================================================================
+  # Export Results ----
 
-  # Export parameters and results
   export_params(
     parameters = get_params(step = "prepare_features_components"),
     step = "prepare_features_components"
