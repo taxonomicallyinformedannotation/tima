@@ -149,6 +149,7 @@ prepare_libraries_spectra <-
           col_xl = col_xl
         ) |>
           purrr::map(
+            # TODO
             .f = function(x) {
               x <- x |>
                 ## TODO report the issue as otherwise precursorMz is lost
@@ -193,6 +194,7 @@ prepare_libraries_spectra <-
           col_xl = col_xl
         ) |>
           purrr::map(
+            # TODO
             .f = function(x) {
               x <- x |>
                 ## TODO report the issue as otherwise precursorMz is lost

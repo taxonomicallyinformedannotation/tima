@@ -77,21 +77,15 @@ select_annotations_columns <- function(
     # Clean various NULL/NA representations
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
-      .fns = function(x) {
-        tidytable::na_if(x, "N/A")
-      }
+      .fns = ~ tidytable::na_if(.x, "N/A")
     )) |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
-      .fns = function(x) {
-        tidytable::na_if(x, "null")
-      }
+      .fns = ~ tidytable::na_if(.x, "null")
     )) |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
-      .fns = function(x) {
-        tidytable::na_if(x, "")
-      }
+      .fns = ~ tidytable::na_if(.x, "")
     )) |>
     # Round numeric values
     round_reals() |>

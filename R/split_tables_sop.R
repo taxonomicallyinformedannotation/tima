@@ -211,9 +211,7 @@ split_tables_sop <- function(table, cache) {
     ) |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
-      .fns = function(x) {
-        tidytable::replace_na(x, "notClassified")
-      }
+      .fns = ~ tidytable::replace_na(.x, "notClassified")
     ))
 
   table_structures_taxonomy_cla <- table_structural |>
@@ -240,9 +238,7 @@ split_tables_sop <- function(table, cache) {
     ) |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
-      .fns = function(x) {
-        tidytable::replace_na(x, "notClassified")
-      }
+      .fns = ~ tidytable::replace_na(.x, "notClassified")
     ))
 
   table_organisms_names <- table_organisms |>
@@ -261,9 +257,7 @@ split_tables_sop <- function(table, cache) {
     tidytable::distinct() |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
-      .fns = function(x) {
-        tidytable::replace_na(x, "notClassified")
-      }
+      .fns = ~ tidytable::replace_na(.x, "notClassified")
     ))
   rm(table_organisms)
 

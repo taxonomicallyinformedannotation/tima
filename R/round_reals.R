@@ -18,9 +18,7 @@ round_reals <- function(
   dig = 5L,
   cols = c("structure_exact_mass", "structure_xlogp")
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Validate dataframe first
   if (!is.data.frame(df) && !inherits(df, "tbl")) {
@@ -38,9 +36,7 @@ round_reals <- function(
     stop("Number of digits 'dig' must be a non-negative integer, got: ", dig)
   }
 
-  # ============================================================================
-  # Find Matching Columns
-  # ============================================================================
+  # Find Matching Columns ----
 
   # Get column names once
   df_names <- names(df)
@@ -60,17 +56,15 @@ round_reals <- function(
   if (length(matching_cols) == 0L) {
     # logger::log_trace(
     #  "No matching columns found for rounding patterns: {paste(cols, collapse = ', ')}"
-    #)
+    # )
     return(df)
   }
 
   # logger::log_trace(
   # "Rounding {length(matching_cols)} columns to {dig} decimal places: {paste(matching_cols, collapse = ', ')}"
-  #)
+  # )
 
-  # ============================================================================
-  # Apply Rounding
-  # ============================================================================
+  # Apply Rounding ----
 
   # Only process columns that exist
   df |>

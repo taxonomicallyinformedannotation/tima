@@ -285,9 +285,7 @@ prepare_annotations_sirius <-
       table <- purrr::reduce(
         .x = supp_tables,
         .init = structures_prepared,
-        .f = function(x, y) {
-          tidytable::left_join(x, y)
-        }
+        .f = tidytable::left_join
       )
       # logger::log_trace("Everything joined together")
       table <- table |>

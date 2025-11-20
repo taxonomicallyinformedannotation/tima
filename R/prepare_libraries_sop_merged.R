@@ -307,9 +307,7 @@ prepare_libraries_sop_merged <- function(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$structures$taxonomies$npc
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   validate_sop_merged_inputs(
     files = files,
@@ -331,9 +329,7 @@ prepare_libraries_sop_merged <- function(
     logger::log_info("Filtering by {level}: {value}")
   }
 
-  # ============================================================================
-  # Load and Process Libraries
-  # ============================================================================
+  # Load and Process Libraries ----
 
   tables <- load_and_merge_libraries(files, cache)
 
@@ -350,9 +346,7 @@ prepare_libraries_sop_merged <- function(
   table_structures_taxonomy_cla <- tables$str_tax_cla
   table_structures_taxonomy_npc <- tables$str_tax_npc
 
-  # ============================================================================
-  # Apply Taxonomic Filter (if enabled)
-  # ============================================================================
+  # Apply Taxonomic Filter (if enabled) ----
 
   if (filter) {
     table_keys <- apply_taxonomic_filter(

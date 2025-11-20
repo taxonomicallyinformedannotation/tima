@@ -3,14 +3,20 @@
 \docType{data}
 \name{DEFAULT_HC_SCORE_SPECTRAL_MIN}
 \alias{DEFAULT_HC_SCORE_SPECTRAL_MIN}
-\title{Default minimum SIRIUS confidence score threshold for high-confidence filter}
+\title{Minimum spectral score for high confidence annotations}
 \format{
+An object of class \code{NULL} of length 0.
+
 An object of class \code{NULL} of length 0.
 }
 \usage{
 DEFAULT_HC_SCORE_SPECTRAL_MIN
+
+DEFAULT_HC_SCORE_SPECTRAL_MIN
 }
 \description{
+Minimum spectral score for high confidence annotations
+
 Default minimum SIRIUS confidence score threshold for high-confidence filter
 }
 \keyword{datasets}

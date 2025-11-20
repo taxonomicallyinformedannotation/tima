@@ -143,7 +143,7 @@ prepare_taxa <- function(
 
   # logger::log_trace(
   #  "Retrieving already computed Open Tree of Life Taxonomy"
-  #)
+  # )
   organism_table_filled <- organism_table |>
     tidytable::left_join(
       tidytable::fread(
@@ -267,9 +267,7 @@ prepare_taxa <- function(
     ) |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
-      .fns = function(x) {
-        tidytable::replace_na(x, "ND")
-      }
+      .fns = ~ tidytable::replace_na(.x, "ND")
     ))
   rm(biological_metadata, metadata_table_joined)
 

@@ -29,9 +29,7 @@ sanitize_spectra <- function(
   dalton = 0.01,
   ppm = 10
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Validate spectra object first
   if (!inherits(spectra, "Spectra")) {
@@ -63,9 +61,7 @@ sanitize_spectra <- function(
 
   logger::log_info("Sanitizing {n_initial} spectra (cutoff: {cutoff})")
 
-  # ============================================================================
-  # Apply Sanitization Steps
-  # ============================================================================
+  # Apply Sanitization Steps ----
 
   # Apply sequential sanitization steps with detailed logging
   # logger::log_trace("Applying sanitization pipeline...")
@@ -83,9 +79,7 @@ sanitize_spectra <- function(
     Spectra::combinePeaks(tolerance = dalton, ppm = ppm) |>
     Spectra::scalePeaks()
 
-  # ============================================================================
-  # Post-Processing Filters
-  # ============================================================================
+  # Post-Processing Filters ----
 
   # Filter spectra with fewer than 3 peaks
   n_before <- length(spectra)
@@ -130,9 +124,7 @@ sanitize_spectra <- function(
     )
   }
 
-  # ============================================================================
-  # Final Summary
-  # ============================================================================
+  # Final Summary ----
 
   n_final <- length(spectra)
   n_total_removed <- n_initial - n_final

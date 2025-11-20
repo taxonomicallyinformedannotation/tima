@@ -249,9 +249,7 @@ weight_chemo <- function(
   annot_table_wei_chemo_init <- purrr::reduce(
     .x = supp_tables,
     .init = df2,
-    .f = function(x, y) {
-      tidytable::left_join(x, y)
-    }
+    .f = tidytable::left_join
   ) |>
     tidytable::mutate(
       score_chemical = pmax(

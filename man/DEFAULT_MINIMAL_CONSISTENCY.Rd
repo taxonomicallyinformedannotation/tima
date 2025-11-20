@@ -3,14 +3,22 @@
 \docType{data}
 \name{DEFAULT_MINIMAL_CONSISTENCY}
 \alias{DEFAULT_MINIMAL_CONSISTENCY}
-\title{Minimum consistency score threshold}
+\title{Default minimum consistency score for taxonomic predictions
+Features below this threshold are filtered out}
 \format{
+An object of class \code{numeric} of length 1.
+
 An object of class \code{numeric} of length 1.
 }
 \usage{
 DEFAULT_MINIMAL_CONSISTENCY
+
+DEFAULT_MINIMAL_CONSISTENCY
 }
 \description{
+Default minimum consistency score for taxonomic predictions
+Features below this threshold are filtered out
+
 Minimum consistency score threshold
 }
 \keyword{datasets}

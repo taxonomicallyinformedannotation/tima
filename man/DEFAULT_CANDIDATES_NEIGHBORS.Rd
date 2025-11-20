@@ -3,14 +3,20 @@
 \docType{data}
 \name{DEFAULT_CANDIDATES_NEIGHBORS}
 \alias{DEFAULT_CANDIDATES_NEIGHBORS}
-\title{Default number of neighboring candidates to retain}
+\title{Default number of top candidates to consider from neighbors}
 \format{
+An object of class \code{numeric} of length 1.
+
 An object of class \code{numeric} of length 1.
 }
 \usage{
 DEFAULT_CANDIDATES_NEIGHBORS
+
+DEFAULT_CANDIDATES_NEIGHBORS
 }
 \description{
+Default number of top candidates to consider from neighbors
+
 Default number of neighboring candidates to retain
 }
 \keyword{datasets}

@@ -80,9 +80,7 @@ weight_bio <- function(
     envir = parent.frame()
   )
 ) {
-  # ============================================================================
-  # Input Validation
-  # ============================================================================
+  # Input Validation ----
 
   # Validate data frames
   if (!is.data.frame(annotation_table_taxed)) {
@@ -146,18 +144,14 @@ weight_bio <- function(
     )
   }
 
-  # ============================================================================
-  # Log Processing Information
-  # ============================================================================
+  # Log Processing Information ----
 
   logger::log_info("Weighting {n_annotations} annotations by biological source")
   logger::log_debug(
     "Weights - Spectral: {weight_spectral}, Biological: {weight_biological}"
   )
 
-  # ============================================================================
-  # Filter Structure-Organism Pairs
-  # ============================================================================
+  # Filter Structure-Organism Pairs ----
 
   # logger::log_trace("Filtering structure-organism pairs")
   df0 <- structure_organism_pairs_table |>
@@ -188,9 +182,7 @@ weight_bio <- function(
     tidytable::distinct() |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(is.character),
-      .fns = function(x) {
-        tidytable::na_if(x, "")
-      }
+      .fns = ~ tidytable::na_if(.x, "")
     ))
 
   logger::log_debug("Filtered to {nrow(df0)} structure-organism pairs")
@@ -271,9 +263,7 @@ weight_bio <- function(
     )
   rm(df0)
 
-  # ============================================================================
-  # Helper Function for Taxonomic Level Scoring
-  # ============================================================================
+  # Helper Function for Taxonomic Level Scoring ----
 
   score_per_level_bio <- function(df, candidates, samples, score, score_name) {
     df |>
@@ -297,9 +287,7 @@ weight_bio <- function(
       )
   }
 
-  # ============================================================================
-  # Calculate Biological Scores at All Taxonomic Levels
-  # ============================================================================
+  # Calculate Biological Scores at All Taxonomic Levels ----
 
   # logger::log_trace("Calculating biological score at all levels ...")
 
@@ -395,9 +383,7 @@ weight_bio <- function(
   annot_table_wei_bio_init <- purrr::reduce(
     .x = supp_tables,
     .init = df2,
-    .f = function(x, y) {
-      tidytable::left_join(x, y)
-    }
+    .f = tidytable::left_join
   ) |>
     tidytable::select(
       sample_organism_name,
@@ -511,9 +497,7 @@ weight_bio <- function(
   annot_table_wei_bio <- annot_table_wei_bio_big |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::matches("candidate_structure_tax"),
-      .fns = function(x) {
-        tidytable::replace_na(x, "notClassified")
-      }
+      .fns = ~ tidytable::replace_na(.x, "notClassified")
     )) |>
     tidytable::mutate(
       candidate_score_sirius_csi_tmp = transform_score_sirius_csi(

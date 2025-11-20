@@ -3,14 +3,20 @@
 \docType{data}
 \name{DEFAULT_MINIMAL_MS1_BIO}
 \alias{DEFAULT_MINIMAL_MS1_BIO}
-\title{Minimum MS1 biological score threshold}
+\title{Default minimum MS1 score threshold for biological scoring}
 \format{
+An object of class \code{numeric} of length 1.
+
 An object of class \code{numeric} of length 1.
 }
 \usage{
 DEFAULT_MINIMAL_MS1_BIO
+
+DEFAULT_MINIMAL_MS1_BIO
 }
 \description{
+Default minimum MS1 score threshold for biological scoring
+
 Minimum MS1 biological score threshold
 }
 \keyword{datasets}
