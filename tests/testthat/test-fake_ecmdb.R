@@ -6,7 +6,8 @@ test_that("fake_ecmdb creates zip file with JSON content", {
   skip_on_cran()
   skip_on_os("windows") # zip command may not be available
 
-  temp_file <- tempfile(fileext = ".json.zip")
+  withr::local_tempdir()
+  temp_file <- withr::local_tempfile(fileext = ".json.zip")
 
   result <- fake_ecmdb(export = temp_file)
 
@@ -59,8 +60,8 @@ test_that("fake_ecmdb handles zip creation failures gracefully", {
   skip_on_cran()
   skip_on_os("windows")
 
-  # This should still succeed using utils::zip as fallback
-  temp_file <- tempfile(fileext = ".json.zip")
+  withr::local_tempdir()
+  temp_file <- withr::local_tempfile(fileext = ".json.zip")
 
   expect_no_error(fake_ecmdb(export = temp_file))
   expect_true(file.exists(temp_file))

@@ -6,7 +6,8 @@ test_that("fake_hmdb creates zip file with SDF content", {
   skip_on_cran()
   skip_on_os("windows") # zip command may not be available
 
-  temp_file <- tempfile(fileext = ".sdf.zip")
+  withr::local_tempdir()
+  temp_file <- withr::local_tempfile(fileext = ".sdf.zip")
 
   result <- fake_hmdb(export = temp_file)
 
@@ -60,8 +61,8 @@ test_that("fake_hmdb handles zip creation failures gracefully", {
   skip_on_cran()
   skip_on_os("windows")
 
-  # This should still succeed using utils::zip as fallback
-  temp_file <- tempfile(fileext = ".sdf.zip")
+  withr::local_tempdir()
+  temp_file <- withr::local_tempfile(fileext = ".sdf.zip")
 
   expect_no_error(fake_hmdb(export = temp_file))
   expect_true(file.exists(temp_file))
