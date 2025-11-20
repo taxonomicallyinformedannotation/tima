@@ -650,9 +650,9 @@ test_that("prepare_libraries_rt handles missing InChIKeys", {
   expect_type(result, "character")
 })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_libraries_rt works with experimental data", {
 #   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
@@ -674,9 +674,9 @@ test_that(
 #   )
 # })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_libraries_rt works with in-silico data", {
 #   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
@@ -698,9 +698,9 @@ test_that(
 #   )
 # })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_libraries_rt warns on invalid SMILES", {
 #   local_test_project(copy = TRUE)
 #

@@ -657,9 +657,9 @@ test_that("test-apply_taxonomic_filter preserves core columns", {
   expect_true("structure_smiles_no_stereo" %in% names(result))
 })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_libraries_sop_merged works with filtering", {
 #   skip_on_cran()
 #   local_test_project(copy = TRUE)
@@ -682,9 +682,9 @@ test_that(
 #   )
 # })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_libraries_sop_merged triggers SMILES processing", {
 #   skip_on_cran()
 #   local_test_project(copy = TRUE)

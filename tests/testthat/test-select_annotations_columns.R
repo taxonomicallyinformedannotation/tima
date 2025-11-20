@@ -39,9 +39,9 @@ test_that("select_annotations_columns handles empty input", {
   expect_equal(nrow(result), 0)
 })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("select_annotations_columns selects and cleans columns", {
 #   paths <- make_fake_struct_files()
 #   df <- tidytable::tidytable(
@@ -91,9 +91,9 @@ test_that(
 #   expect_type(result$feature_spectrum_entropy, "character")
 # })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("select_annotations_columns preserves row count after cleaning", {
 #   paths <- make_fake_struct_files()
 #   df <- tidytable::tidytable(

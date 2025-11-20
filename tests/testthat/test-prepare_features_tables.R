@@ -237,9 +237,9 @@ test_that("prepare_features_tables handles large feature tables", {
 
 ## Output Verification ----
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_features_tables validates column name parameters", {
 #   paths <- local_test_project(copy = TRUE)
 #
@@ -266,9 +266,9 @@ test_that(
 #   )
 # })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_features_tables handles SLAW format (quant_)", {
 #   paths <- local_test_project(copy = TRUE)
 #
@@ -296,9 +296,9 @@ test_that(
 #   expect_true(file.exists(output_file))
 # })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_features_tables handles single feature", {
 #   paths <- local_test_project(copy = TRUE)
 #
@@ -325,9 +325,9 @@ test_that(
 #   expect_equal(nrow(prepared), 1L)
 # })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_features_tables creates valid output file", {
 #   paths <- local_test_project(copy = TRUE)
 #
@@ -357,9 +357,9 @@ test_that(
 #   expect_gt(nrow(prepared), 0L)
 # })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_features_tables preserves feature IDs", {
 #   paths <- local_test_project(copy = TRUE)
 #
@@ -388,9 +388,9 @@ test_that(
 
 ## Integration with Downstream Functions ----
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("prepare_features_tables output works with annotate_masses", {
 #   skip_on_cran()
 #   skip_if_offline()

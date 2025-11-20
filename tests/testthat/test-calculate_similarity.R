@@ -103,9 +103,9 @@ test_that("calculate_similarity rejects negative tolerances", {
   )
 })
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("calculate_similarity rejects non-matrix input", {
 #   expect_error(
 #     calculate_similarity(

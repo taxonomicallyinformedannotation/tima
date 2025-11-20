@@ -100,12 +100,11 @@ test_that("prepare_params accepts explicit fixture lists", {
   ))
 })
 
-
 ## get_params: unknown step ----
 
-test_that(
-  skip("Not implemented")
-)
+# test_that(
+#   skip("Not implemented")
+# )
 # test_that("get_params errors for unknown step", {
 #   # Create a temp script directory mimicking docopt scripts
 #   tmp_scripts <- withr::local_tempdir(.local_envir = parent.frame())
