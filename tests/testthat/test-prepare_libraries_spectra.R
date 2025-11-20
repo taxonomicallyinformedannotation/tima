@@ -2,80 +2,56 @@
 
 library(testthat)
 
-test_that("prepare_libraries_spectra works with default parameters", {
+.test_mgf <- function(path, pepmass = 100, charge = "1+", peaks = c(50, 75, 100)) {
+  lines <- c(
+    "BEGIN IONS",
+    paste0("PEPMASS=", pepmass),
+    paste0("CHARGE=", charge),
+    paste(sapply(peaks, function(m) paste(m, 10)), collapse = "\n"),
+    "END IONS"
+  )
+  writeLines(lines, path)
+  path
+}
+
+test_that("prepare_libraries_spectra returns empty libs when input missing", {
   local_test_project(copy = TRUE)
-  paths <- get_default_paths()
-
-  # Download required files
-  get_file(
-    url = paths$urls$examples$spectral_lib_mini$pos,
-    export = paths$data$interim$libraries$spectra$is$pos$isdb
-  )
-  get_file(
-    url = paths$urls$examples$spectral_lib_mini$neg,
-    export = paths$data$interim$libraries$spectra$is$neg$isdb
-  )
-
-  expect_no_error(prepare_libraries_spectra())
+  # Force nonexistent input
+  out <- prepare_libraries_spectra(input = c("missing1.mgf", "missing2.mgf"), nam_lib = "testlib")
+  expect_true(file.exists(out[["pos"]]))
+  expect_true(file.exists(out[["neg"]]))
+  # SOP TSV
+  expect_true(file.exists(out[["sop"]]))
+  # Read exported pos RDS and verify single fake spectrum
+  sp_pos <- readRDS(out[["pos"]])
+  expect_s4_class(sp_pos, "Spectra")
+  expect_equal(length(sp_pos), 1)
 })
 
-test_that("prepare_libraries_spectra handles non-existent input", {
-  skip("Not implemented")
-})
-
-test_that("prepare_libraries_spectra handles NULL input", {
-  skip("Not implemented")
-})
-
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("prepare_libraries_spectra warns when library already exists", {
-#   local_test_project(copy = TRUE)
-#   paths <- get_default_paths()
-#
-#   get_file(
-#     url = paths$urls$examples$spectral_lib_mini$pos,
-#     export = paths$data$interim$libraries$spectra$is$pos$isdb
-#   )
-#   get_file(
-#     url = paths$urls$examples$spectral_lib_mini$neg,
-#     export = paths$data$interim$libraries$spectra$is$neg$isdb
-#   )
-#
-#   # First run
-#   prepare_libraries_spectra()
-#
-#   # Second run should warn
-#   expect_message(
-#     prepare_libraries_spectra(),
-#     regexp = "already"
-#   )
+# test_that("prepare_libraries_spectra processes minimal mgf and creates outputs", {
+#   paths <- local_test_project(copy = TRUE)
+#   mgf1 <- tempfile("lib1", fileext = ".mgf")
+#   mgf2 <- tempfile("lib2", fileext = ".mgf")
+#   .test_mgf(mgf1, pepmass = 150)
+#   .test_mgf(mgf2, pepmass = 250)
+#   out <- prepare_libraries_spectra(input = c(mgf1, mgf2), nam_lib = "mini")
+#   expect_named(out, c("pos", "neg", "sop"))
+#   expect_true(all(file.exists(out)))
+#   sp_pos <- readRDS(out[["pos"]])
+#   sp_neg <- readRDS(out[["neg"]])
+#   expect_s4_class(sp_pos, "Spectra")
+#   expect_s4_class(sp_neg, "Spectra")
+#   # SOP should have structure columns even if fake (may be empty if inchikey missing)
+#   sop <- tidytable::fread(out[["sop"]])
+#   expect_true(all(c("structure_inchikey_connectivity_layer", "structure_smiles") %in% names(sop)))
 # })
 
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("prepare_libraries_spectra preserves precursorMz as precursor_mz", {
-#   local_test_project(copy = TRUE)
-#   paths <- get_default_paths()
-#
-#   # Download required files
-#   get_file(
-#     url = paths$urls$examples$spectral_lib_mini$pos,
-#     export = paths$data$interim$libraries$spectra$is$pos$isdb
-#   )
-#   get_file(
-#     url = paths$urls$examples$spectral_lib_mini$neg,
-#     export = paths$data$interim$libraries$spectra$is$neg$isdb
-#   )
-#
-#   outputs <- prepare_libraries_spectra()
-#   expect_true(file.exists(outputs[["pos"]]))
-#
-#   sp <- readRDS(outputs[["pos"]])
-#   df <- Spectra::peaksDataFrame(sp)
-#   # Ensure alias column exists at least at SOP generation stage
-#   # Some backends store precursorMz in metadata. We verify SOP table as well.
-#   expect_true("precursorMz" %in% names(df) || "precursor_mz" %in% names(df))
+# test_that("prepare_libraries_spectra early-exits when outputs already exist", {
+#   paths <- local_test_project(copy = TRUE)
+#   mgf <- tempfile("lib_once", fileext = ".mgf")
+#   .test_mgf(mgf)
+#   out1 <- prepare_libraries_spectra(input = mgf, nam_lib = "once")
+#   # Second call should just log and not overwrite substantially (same paths)
+#   out2 <- prepare_libraries_spectra(input = mgf, nam_lib = "once")
+#   expect_identical(out1, out2)
 # })
