@@ -2,7 +2,12 @@
 
 library(testthat)
 
-.test_mgf <- function(path, pepmass = 100, charge = "1+", peaks = c(50, 75, 100)) {
+.test_mgf <- function(
+  path,
+  pepmass = 100,
+  charge = "1+",
+  peaks = c(50, 75, 100)
+) {
   lines <- c(
     "BEGIN IONS",
     paste0("PEPMASS=", pepmass),
@@ -17,7 +22,10 @@ library(testthat)
 test_that("prepare_libraries_spectra returns empty libs when input missing", {
   local_test_project(copy = TRUE)
   # Force nonexistent input
-  out <- prepare_libraries_spectra(input = c("missing1.mgf", "missing2.mgf"), nam_lib = "testlib")
+  out <- prepare_libraries_spectra(
+    input = c("missing1.mgf", "missing2.mgf"),
+    nam_lib = "testlib"
+  )
   expect_true(file.exists(out[["pos"]]))
   expect_true(file.exists(out[["neg"]]))
   # SOP TSV

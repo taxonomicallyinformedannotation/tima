@@ -559,7 +559,10 @@ test_that("annotate_spectra completes in reasonable time", {
     "BEGIN IONS",
     paste0("PEPMASS=", pepmass),
     "CHARGE=1+",
-    paste(sapply(seq_along(peaks), function(i) paste(peaks[i], 10 * i)), collapse = "\n"),
+    paste(
+      sapply(seq_along(peaks), function(i) paste(peaks[i], 10 * i)),
+      collapse = "\n"
+    ),
     "END IONS"
   )
   writeLines(lines, path)
@@ -572,8 +575,14 @@ test_that("annotate_spectra validates polarity and method choices", {
   .make_mgf(q)
   lib <- make_tmp_file("lib", fileext = ".mgf")
   .make_mgf(lib)
-  expect_error(annotate_spectra(input = q, libraries = lib, polarity = "invalid"), "polarity")
-  expect_error(annotate_spectra(input = q, libraries = lib, method = "unknown"), "method")
+  expect_error(
+    annotate_spectra(input = q, libraries = lib, polarity = "invalid"),
+    "polarity"
+  )
+  expect_error(
+    annotate_spectra(input = q, libraries = lib, method = "unknown"),
+    "method"
+  )
 })
 
 test_that("annotate_spectra returns empty file when no libraries match polarity", {
@@ -584,7 +593,12 @@ test_that("annotate_spectra returns empty file when no libraries match polarity"
   .make_mgf(lib_pos)
   # Provide two libs with non-matching naming pattern forcing filter to drop them (simulate)
   out <- make_tmp_file("annotations", fileext = ".tsv")
-  res <- annotate_spectra(input = q, libraries = c(lib_pos, lib_pos), polarity = "neg", output = out)
+  res <- annotate_spectra(
+    input = q,
+    libraries = c(lib_pos, lib_pos),
+    polarity = "neg",
+    output = out
+  )
   expect_true(file.exists(res))
   df <- tidytable::fread(res)
   expect_true(nrow(df) <= 1) # may be empty or NA row
@@ -597,7 +611,12 @@ test_that("annotate_spectra produces annotations for simple query vs library", {
   lib <- make_tmp_file("lib_real", fileext = ".mgf")
   .make_mgf(lib, pepmass = 150)
   out <- make_tmp_file("ann", fileext = ".tsv")
-  res <- annotate_spectra(input = q, libraries = lib, output = out, threshold = 0.0)
+  res <- annotate_spectra(
+    input = q,
+    libraries = lib,
+    output = out,
+    threshold = 0.0
+  )
   expect_true(file.exists(res))
   df <- tidytable::fread(res)
   expect_true("feature_id" %in% names(df))
