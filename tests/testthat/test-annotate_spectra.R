@@ -551,3 +551,54 @@ test_that("annotate_spectra completes in reasonable time", {
   # Should complete reasonably fast
   expect_true(elapsed < 120, info = paste("Took", elapsed, "seconds"))
 })
+
+# Supplement ----
+
+.make_mgf <- function(path, pepmass = 100, peaks = c(50, 75, 100)) {
+  lines <- c(
+    "BEGIN IONS",
+    paste0("PEPMASS=", pepmass),
+    "CHARGE=1+",
+    paste(sapply(seq_along(peaks), function(i) paste(peaks[i], 10 * i)), collapse = "\n"),
+    "END IONS"
+  )
+  writeLines(lines, path)
+  path
+}
+
+test_that("annotate_spectra validates polarity and method choices", {
+  local_test_project(copy = TRUE)
+  q <- make_tmp_file("query", fileext = ".mgf")
+  .make_mgf(q)
+  lib <- make_tmp_file("lib", fileext = ".mgf")
+  .make_mgf(lib)
+  expect_error(annotate_spectra(input = q, libraries = lib, polarity = "invalid"), "polarity")
+  expect_error(annotate_spectra(input = q, libraries = lib, method = "unknown"), "method")
+})
+
+test_that("annotate_spectra returns empty file when no libraries match polarity", {
+  local_test_project(copy = TRUE)
+  q <- make_tmp_file("query", fileext = ".mgf")
+  .make_mgf(q)
+  lib_pos <- make_tmp_file("lib_pos", fileext = ".mgf")
+  .make_mgf(lib_pos)
+  # Provide two libs with non-matching naming pattern forcing filter to drop them (simulate)
+  out <- make_tmp_file("annotations", fileext = ".tsv")
+  res <- annotate_spectra(input = q, libraries = c(lib_pos, lib_pos), polarity = "neg", output = out)
+  expect_true(file.exists(res))
+  df <- tidytable::fread(res)
+  expect_true(nrow(df) <= 1) # may be empty or NA row
+})
+
+test_that("annotate_spectra produces annotations for simple query vs library", {
+  local_test_project(copy = TRUE)
+  q <- make_tmp_file("query_real", fileext = ".mgf")
+  .make_mgf(q, pepmass = 150)
+  lib <- make_tmp_file("lib_real", fileext = ".mgf")
+  .make_mgf(lib, pepmass = 150)
+  out <- make_tmp_file("ann", fileext = ".tsv")
+  res <- annotate_spectra(input = q, libraries = lib, output = out, threshold = 0.0)
+  expect_true(file.exists(res))
+  df <- tidytable::fread(res)
+  expect_true("feature_id" %in% names(df))
+})

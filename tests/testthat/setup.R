@@ -21,14 +21,20 @@ make_tmp_dir <- function(subdir = NULL) {
   dir_name
 }
 
-# Helper to create isolated temp files in the temp dirs
-make_tmp_file <- function(name = NULL, fileext = "", subdir = NULL) {
-  dir_name <- make_tmp_dir(subdir)
-  if (is.null(name)) {
-    file.path(dir_name, paste0(tempfile("", tmpdir = NULL), fileext))
-  } else {
-    file.path(dir_name, paste0(name, fileext))
+# Helper to create temp files with specific extension in tmp
+make_tmp_file <- function(name = NULL, fileext = "") {
+  # Fallback if tmp was not initialized for some reason
+  if (!exists("tmp", inherits = FALSE) || is.null(tmp)) {
+    tmp <<- file.path(tempdir(), sprintf("tima-fallback-%s", Sys.getpid()))
+    dir.create(tmp, recursive = TRUE, showWarnings = FALSE)
   }
+  if (is.null(name)) {
+    f <- tempfile(tmpdir = tmp, fileext = fileext)
+  } else {
+    f <- file.path(tmp, paste0(name, fileext))
+  }
+  dir.create(dirname(f), recursive = TRUE, showWarnings = FALSE)
+  f
 }
 
 # Optionally create a common tmp dir for convenience (legacy compatibility)
