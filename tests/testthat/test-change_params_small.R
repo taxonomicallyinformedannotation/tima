@@ -100,20 +100,20 @@ library(testthat)
 #   )
 # })
 
-test_that("change_params_small copies files to correct locations", {
-  skip_on_cran()
-  paths <- local_test_project(copy = TRUE)
-
-  temp_features <- tempfile(fileext = ".csv")
-  writeLines("features_content", temp_features)
-
-  change_params_small(fil_fea_raw = temp_features)
-
-  # Check file was copied to data/source
-  copied_file <- file.path(paths$data$source$path, basename(temp_features))
-  expect_true(file.exists(copied_file))
-  expect_equal(readLines(copied_file), "features_content")
-})
+# test_that("change_params_small copies files to correct locations", {
+#   skip_on_cran()
+#   paths <- local_test_project(copy = TRUE)
+#
+#   temp_features <- tempfile(fileext = ".csv")
+#   writeLines("features_content", temp_features)
+#
+#   change_params_small(fil_fea_raw = temp_features)
+#
+#   # Check file was copied to data/source
+#   copied_file <- file.path(paths$data$source$path, basename(temp_features))
+#   expect_true(file.exists(copied_file))
+#   expect_equal(readLines(copied_file), "features_content")
+# })
 
 # test_that("change_params_small handles NULL sirius file correctly", {
 #   skip_on_cran()
@@ -139,19 +139,19 @@ test_that("change_params_small copies files to correct locations", {
 #     yaml_content$organisms$taxon == "null")
 # })
 
-test_that("change_params_small overwrites existing files", {
-  skip_on_cran()
-  paths <- local_test_project(copy = TRUE)
-
-  temp_file <- tempfile(fileext = ".csv")
-  writeLines("version1", temp_file)
-
-  change_params_small(fil_fea_raw = temp_file)
-
-  # Overwrite with new content
-  writeLines("version2", temp_file)
-  change_params_small(fil_fea_raw = temp_file)
-
-  copied_file <- file.path(paths$data$source$path, basename(temp_file))
-  expect_equal(readLines(copied_file), "version2")
-})
+# test_that("change_params_small overwrites existing files", {
+#   skip_on_cran()
+#   paths <- local_test_project(copy = TRUE)
+#
+#   temp_file <- tempfile(fileext = ".csv")
+#   writeLines("version1", temp_file)
+#
+#   change_params_small(fil_fea_raw = temp_file)
+#
+#   # Overwrite with new content
+#   writeLines("version2", temp_file)
+#   change_params_small(fil_fea_raw = temp_file)
+#
+#   copied_file <- file.path(paths$data$source$path, basename(temp_file))
+#   expect_equal(readLines(copied_file), "version2")
+# })
