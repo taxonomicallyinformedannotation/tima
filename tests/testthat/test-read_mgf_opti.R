@@ -16,8 +16,8 @@ test_that(
   skip("Not implemented")
 )
 # test_that("read_mgf_opti reads minimal mgf", {
-#   tmp <- withr::local_tempdir()
-#   withr::local_dir(tmp)
+#   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+#   withr::local_dir(tmp, .local_envir = parent.frame())
 #   mgf <- c(
 #     "BEGIN IONS",
 #     "TITLE=Spec1",

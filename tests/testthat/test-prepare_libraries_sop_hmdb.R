@@ -56,7 +56,7 @@ test_that("test-prepare_libraries_sop_hmdb validates output path", {
 ## Behavior ----
 
 test_that("test-prepare_libraries_sop_hmdb handles missing input file", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   output_file <- file.path(tmp, "hmdb_output.tsv")
 
   result <- prepare_libraries_sop_hmdb(
@@ -76,7 +76,7 @@ test_that("test-prepare_libraries_sop_hmdb handles missing input file", {
 })
 
 test_that("test-prepare_libraries_sop_hmdb uses existing output when valid", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   output_file <- file.path(tmp, "hmdb_output.tsv")
 
   # Create a valid existing output file (> 100000 bytes)
@@ -102,7 +102,7 @@ test_that("test-prepare_libraries_sop_hmdb uses existing output when valid", {
 })
 
 test_that("test-prepare_libraries_sop_hmdb regenerates small output files", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   output_file <- file.path(tmp, "hmdb_output.tsv")
 
   # Create a small existing output file (< 100000 bytes)
@@ -125,7 +125,7 @@ test_that("test-prepare_libraries_sop_hmdb regenerates small output files", {
 ## Parsing ----
 
 test_that("test-prepare_libraries_sop_hmdb parses minimal mock SDF", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
 
   # Create minimal mock HMDB SDF file
   sdf_content <- c(
@@ -188,7 +188,7 @@ test_that("test-prepare_libraries_sop_hmdb parses minimal mock SDF", {
 })
 
 test_that("test-prepare_libraries_sop_hmdb handles SDF with missing fields", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
 
   # Create SDF with some missing fields
   sdf_content <- c(
@@ -235,7 +235,7 @@ test_that("test-prepare_libraries_sop_hmdb handles SDF with missing fields", {
 })
 
 test_that("test-prepare_libraries_sop_hmdb handles multiple compounds in SDF", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
 
   # Create SDF with multiple compounds
   sdf_content <- c(
@@ -315,7 +315,7 @@ test_that("test-prepare_libraries_sop_hmdb handles multiple compounds in SDF", {
 })
 
 test_that("test-prepare_libraries_sop_hmdb sets correct organism taxonomy", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
 
   # Create complete SDF with all required fields
   sdf_content <- c(
@@ -375,7 +375,7 @@ test_that("test-prepare_libraries_sop_hmdb sets correct organism taxonomy", {
 })
 
 test_that("test-prepare_libraries_sop_hmdb handles errors gracefully and creates empty output", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
 
   # Use non-existent file path
   missing_zip <- file.path(tmp, "does_not_exist.zip")

@@ -5,7 +5,7 @@ library(testthat)
 ## Validation ----
 
 test_that("test-benchmark_taxize_spectra validates input file exists", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   expect_error(
     benchmark_taxize_spectra(
       input = file.path(tmp, "missing.tsv"),
@@ -18,7 +18,7 @@ test_that("test-benchmark_taxize_spectra validates input file exists", {
 })
 
 test_that("test-benchmark_taxize_spectra validates keys file exists", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   input <- file.path(tmp, "input.tsv")
   writeLines("feature_id", input)
 
@@ -34,7 +34,7 @@ test_that("test-benchmark_taxize_spectra validates keys file exists", {
 })
 
 test_that("test-benchmark_taxize_spectra validates taxonomy file exists", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   input <- file.path(tmp, "input.tsv")
   keys <- file.path(tmp, "keys.tsv")
   writeLines("feature_id", input)
@@ -54,7 +54,7 @@ test_that("test-benchmark_taxize_spectra validates taxonomy file exists", {
 ## Behavior ----
 
 test_that("test-benchmark_taxize_spectra processes minimal valid input", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
 
   # Create minimal features file
   features <- tidytable::tidytable(
@@ -105,7 +105,7 @@ test_that("test-benchmark_taxize_spectra processes minimal valid input", {
 })
 
 test_that("test-benchmark_taxize_spectra handles features without organisms", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
 
   features <- tidytable::tidytable(
     feature_id = c("F1"),
@@ -155,7 +155,7 @@ test_that("test-benchmark_taxize_spectra handles features without organisms", {
 ## Fixture-based behavior tests ----
 
 test_that("test-benchmark_taxize_spectra basic successful run with helpers", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   fx <- create_bench_full_set(
     dir = tmp,
     feature_ids = c("F1", "F2"),
@@ -176,7 +176,7 @@ test_that("test-benchmark_taxize_spectra basic successful run with helpers", {
 })
 
 test_that("test-benchmark_taxize_spectra handles missing taxonomy levels gracefully", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   fx <- create_bench_full_set(
     dir = tmp,
     feature_ids = c("F1"),
@@ -197,7 +197,7 @@ test_that("test-benchmark_taxize_spectra handles missing taxonomy levels gracefu
 })
 
 test_that("test-benchmark_taxize_spectra samples one organism per feature when multiple available", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   # Same feature mapped to two organisms via duplicated inchikey connectivity layer
   feature_ids <- c("F1", "F2")
   inchikey_layers <- c("AAAAAAAAAAAAAA", "CCCCCCCCCCCCCC")
@@ -221,7 +221,7 @@ test_that("test-benchmark_taxize_spectra samples one organism per feature when m
 })
 
 test_that("test-benchmark_taxize_spectra retains features without organism match", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   fx <- create_bench_full_set(
     dir = tmp,
     feature_ids = c("F1", "F2"),
@@ -249,7 +249,7 @@ test_that("test-benchmark_taxize_spectra retains features without organism match
 })
 
 test_that("test-benchmark_taxize_spectra supports repeated taxonomy entries", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   fx <- create_bench_full_set(
     dir = tmp,
     feature_ids = c("F1"),

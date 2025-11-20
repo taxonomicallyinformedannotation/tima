@@ -3,8 +3,8 @@
 library(testthat)
 
 test_that("validate_filter_annotations_inputs accepts valid inputs", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   writeLines("", "features.tsv")
   writeLines("", "ann.tsv")
@@ -21,8 +21,8 @@ test_that("validate_filter_annotations_inputs accepts valid inputs", {
 })
 
 test_that("validate_filter_annotations_inputs rejects invalid tolerance_rt", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   writeLines("", "features.tsv")
   writeLines("", "ann.tsv")
@@ -40,8 +40,8 @@ test_that("validate_filter_annotations_inputs rejects invalid tolerance_rt", {
 })
 
 test_that("validate_filter_annotations_inputs rejects missing files", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   writeLines("", "features.tsv")
 
@@ -134,8 +134,8 @@ test_that("apply_rt_filter keeps annotations without RT standards", {
 ## validate_filter_annotations_inputs - Edge Cases ----
 
 test_that("validate_filter_annotations_inputs accepts list of annotations", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   writeLines("", "features.tsv")
   writeLines("", "ann1.tsv")
@@ -153,8 +153,8 @@ test_that("validate_filter_annotations_inputs accepts list of annotations", {
 })
 
 test_that("validate_filter_annotations_inputs rejects empty annotations", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   writeLines("", "features.tsv")
 
@@ -171,8 +171,8 @@ test_that("validate_filter_annotations_inputs rejects empty annotations", {
 })
 
 test_that("validate_filter_annotations_inputs rejects non-character output", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   writeLines("", "features.tsv")
   writeLines("", "ann.tsv")
@@ -190,8 +190,8 @@ test_that("validate_filter_annotations_inputs rejects non-character output", {
 })
 
 test_that("validate_filter_annotations_inputs rejects zero tolerance", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   writeLines("", "features.tsv")
   writeLines("", "ann.tsv")
@@ -209,8 +209,8 @@ test_that("validate_filter_annotations_inputs rejects zero tolerance", {
 })
 
 test_that("validate_filter_annotations_inputs rejects missing RT files", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   writeLines("", "features.tsv")
   writeLines("", "ann.tsv")
@@ -549,8 +549,8 @@ test_that("test-apply_rt_filter calculates RT error correctly", {
 })
 
 # test_that("test-filter_annotations combines annotations and removes MS1 redundancy", {
-#   tmp <- withr::local_tempdir()
-#   withr::local_dir(tmp)
+#   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+#   withr::local_dir(tmp, .local_envir = parent.frame())
 #   ms1 <- tidytable::tidytable(
 #     feature_id = c("F1"),
 #     candidate_structure_inchikey_connectivity_layer = c("AAA")
@@ -585,8 +585,8 @@ test_that("test-apply_rt_filter calculates RT error correctly", {
 # })
 
 # test_that("test-filter_annotations applies RT filtering when library provided", {
-#   tmp <- withr::local_tempdir()
-#   withr::local_dir(tmp)
+#   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+#   withr::local_dir(tmp, .local_envir = parent.frame())
 #   spectral <- tidytable::tidytable(
 #     feature_id = c("F1"),
 #     candidate_structure_inchikey_connectivity_layer = c("AAA"),
@@ -622,8 +622,8 @@ test_that("test-apply_rt_filter calculates RT error correctly", {
 # })
 
 # test_that("test-filter_annotations retains annotation outside RT when tolerance larger", {
-#   tmp <- withr::local_tempdir()
-#   withr::local_dir(tmp)
+#   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+#   withr::local_dir(tmp, .local_envir = parent.frame())
 #   spectral <- tidytable::tidytable(
 #     feature_id = c("F1"),
 #     candidate_structure_inchikey_connectivity_layer = c("AAA"),

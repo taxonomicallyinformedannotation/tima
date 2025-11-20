@@ -3,8 +3,8 @@
 library(testthat)
 
 test_that("create_dir creates directory for file path", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   target <- file.path(tmp, "sub/dir/out.tsv")
   create_dir(export = target)
   expect_true(dir.exists(file.path(tmp, "sub/dir")))
