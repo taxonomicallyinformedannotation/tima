@@ -563,7 +563,6 @@ test_that("clean_bio preserves already computed predictions", {
 ## Performance Tests ----
 
 test_that("clean_bio handles moderate-scale data efficiently", {
-  skip_on_cran()
   skip_if_not(interactive(), "Performance test only for local development")
 
   # Create 100 features with annotations

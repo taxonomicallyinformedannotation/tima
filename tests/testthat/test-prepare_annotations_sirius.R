@@ -6,15 +6,15 @@ library(testthat)
 
 .make_structs <- function(tmp) {
   dir.create(
-    file.path(tmp, "structures", "taxonomies"),
+    file.path("structures", "taxonomies"),
     recursive = TRUE,
     showWarnings = FALSE
   )
-  stereo <- file.path(tmp, "structures", "stereo.tsv")
-  met <- file.path(tmp, "structures", "metadata.tsv")
-  nam <- file.path(tmp, "structures", "names.tsv")
-  cla <- file.path(tmp, "structures", "taxonomies", "classyfire.tsv")
-  npc <- file.path(tmp, "structures", "taxonomies", "npc.tsv")
+  stereo <- file.path("structures", "stereo.tsv")
+  met <- file.path("structures", "metadata.tsv")
+  nam <- file.path("structures", "names.tsv")
+  cla <- file.path("structures", "taxonomies", "classyfire.tsv")
+  npc <- file.path("structures", "taxonomies", "npc.tsv")
   writeLines("", stereo)
   writeLines("", met)
   writeLines("", nam)
@@ -26,15 +26,13 @@ library(testthat)
 ## Validation ----
 
 test_that("test-prepare_annotations_sirius validates sirius_version", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
   s <- .make_structs(tmp)
-  out_ann <- file.path(tmp, "ann.tsv")
-  out_can <- file.path(tmp, "can.tsv")
-  out_for <- file.path(tmp, "for.tsv")
+  out_ann <- file.path("ann.tsv")
+  out_can <- file.path("can.tsv")
+  out_for <- file.path("for.tsv")
   expect_error(
     prepare_annotations_sirius(
-      input_directory = file.path(tmp, "missing.zip"),
+      input_directory = file.path("missing.zip"),
       output_ann = out_ann,
       output_can = out_can,
       output_for = out_for,
@@ -50,12 +48,10 @@ test_that("test-prepare_annotations_sirius validates sirius_version", {
 })
 
 test_that("test-prepare_annotations_sirius validates output parameters and structure files", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
   s <- .make_structs(tmp)
   expect_error(
     prepare_annotations_sirius(
-      input_directory = file.path(tmp, "missing.zip"),
+      input_directory = file.path("missing.zip"),
       output_ann = c("a", "b"),
       output_can = "can.tsv",
       output_for = "for.tsv",
@@ -71,12 +67,12 @@ test_that("test-prepare_annotations_sirius validates output parameters and struc
   )
   expect_error(
     prepare_annotations_sirius(
-      input_directory = file.path(tmp, "missing.zip"),
+      input_directory = file.path("missing.zip"),
       output_ann = "ann.tsv",
       output_can = "can.tsv",
       output_for = "for.tsv",
       sirius_version = "5",
-      str_stereo = file.path(tmp, "missing.tsv"),
+      str_stereo = file.path("missing.tsv"),
       str_met = s$met,
       str_nam = s$nam,
       str_tax_cla = s$cla,
@@ -90,14 +86,12 @@ test_that("test-prepare_annotations_sirius validates output parameters and struc
 ## Behavior ----
 
 test_that("test-prepare_annotations_sirius handles missing input by producing empty outputs", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
   s <- .make_structs(tmp)
-  out_can <- file.path(tmp, "can.tsv")
-  out_for <- file.path(tmp, "for.tsv")
-  out_ann <- file.path(tmp, "ann.tsv")
+  out_can <- file.path("can.tsv")
+  out_for <- file.path("for.tsv")
+  out_ann <- file.path("ann.tsv")
   res <- prepare_annotations_sirius(
-    input_directory = file.path(tmp, "not_there.zip"),
+    input_directory = file.path("not_there.zip"),
     output_ann = out_ann,
     output_can = out_can,
     output_for = out_for,

@@ -99,7 +99,6 @@ test_that("get_file skips download if file already exists", {
 ## Directory Creation ----
 
 test_that("get_file creates output directory if needed", {
-  skip_on_cran()
   skip_if_offline()
 
   paths <- local_test_project(copy = TRUE)
@@ -123,7 +122,6 @@ test_that("get_file creates output directory if needed", {
 ## Download Success ----
 
 test_that("get_file downloads file successfully", {
-  skip_on_cran()
   skip_if_offline()
 
   paths <- local_test_project(copy = TRUE)
@@ -147,8 +145,6 @@ test_that("get_file downloads file successfully", {
 ## Download Failure Handling ----
 
 test_that("get_file fails gracefully with invalid URL", {
-  skip_on_cran()
-
   paths <- local_test_project(copy = TRUE)
 
   # Ensure clean state - remove any existing file
@@ -171,7 +167,6 @@ test_that("get_file fails gracefully with invalid URL", {
 })
 
 test_that("get_file handles 404 errors", {
-  skip_on_cran()
   skip_if_offline()
 
   paths <- local_test_project(copy = TRUE)
@@ -204,7 +199,6 @@ test_that("get_file retries on failure", {
 ## Integration with get_example_files ----
 
 test_that("get_file works with real package example files", {
-  skip_on_cran()
   skip_if_offline()
 
   paths <- local_test_project(copy = TRUE)

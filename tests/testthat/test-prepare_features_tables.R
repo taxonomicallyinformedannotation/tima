@@ -210,7 +210,6 @@ test_that("prepare_features_tables handles empty file", {
 })
 
 test_that("prepare_features_tables handles large feature tables", {
-  skip_on_cran()
   skip("Large data test - run manually")
 
   paths <- local_test_project(copy = TRUE)
@@ -392,7 +391,6 @@ test_that("prepare_features_tables handles large feature tables", {
 #   skip("Not implemented")
 # )
 # test_that("prepare_features_tables output works with annotate_masses", {
-#   skip_on_cran()
 #   skip_if_offline()
 #
 #   paths <- local_test_project(copy = TRUE)

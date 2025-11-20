@@ -259,8 +259,6 @@ test_that("create_edges handles empty spectra", {
 ## Performance & Scalability ----
 
 test_that("create_edges handles many spectra efficiently", {
-  skip_on_cran()
-
   n_spectra <- 50
   frags <- replicate(n_spectra, create_test_spectrum(), simplify = FALSE)
   precs <- runif(n_spectra, 100, 500)
@@ -347,7 +345,6 @@ test_that("create_edges ensures feature_id < target_id", {
 ## Integration with create_edges_spectra ----
 
 test_that("create_edges integrates with extract_spectra output", {
-  skip_on_cran()
   skip_if_offline()
 
   paths <- local_test_project(copy = TRUE)

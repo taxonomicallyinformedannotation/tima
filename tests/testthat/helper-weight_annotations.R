@@ -101,7 +101,7 @@ wa_min_edges_table <- function() {
 wa_stub_get_default_paths <- function(tmp) {
   list(
     data = list(
-      processed = list(path = file.path(tmp, "data/processed"))
+      processed = list(path = file.path("data/processed"))
     )
   )
 }

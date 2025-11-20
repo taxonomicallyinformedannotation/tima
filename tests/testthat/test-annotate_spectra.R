@@ -21,8 +21,6 @@ write_minimal_mgf <- function(path, pepmass = 100, charge = "1+") {
 ## Input Validation ----
 
 test_that("annotate_spectra validates polarity parameter", {
-  skip_on_cran()
-
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
@@ -60,8 +58,6 @@ test_that("annotate_spectra validates polarity parameter", {
 })
 
 test_that("annotate_spectra validates numeric parameters", {
-  skip_on_cran()
-
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
@@ -126,8 +122,6 @@ test_that("annotate_spectra validates numeric parameters", {
 })
 
 test_that("annotate_spectra validates file existence", {
-  skip_on_cran()
-
   local_test_project(copy = TRUE)
 
   # Missing input file
@@ -156,7 +150,6 @@ test_that("annotate_spectra validates file existence", {
 })
 
 test_that("annotate_spectra requires at least one library", {
-  skip_on_cran()
   local_test_project(copy = TRUE)
   get_file(
     url = get_default_paths()$urls$examples$spectra_mini,
@@ -174,7 +167,6 @@ test_that("annotate_spectra requires at least one library", {
 ## Basic Functionality ----
 
 test_that("annotate_spectra works with single MGF library", {
-  skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -200,8 +192,6 @@ test_that("annotate_spectra works with single MGF library", {
 })
 
 test_that("annotate_spectra works in negative mode", {
-  skip_on_cran()
-
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
@@ -229,7 +219,6 @@ test_that("annotate_spectra works in negative mode", {
 })
 
 test_that("annotate_spectra works with multiple libraries", {
-  skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -266,7 +255,6 @@ test_that("annotate_spectra works with multiple libraries", {
 ## Different Similarity Methods ----
 
 test_that("annotate_spectra works with cosine similarity", {
-  skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -293,7 +281,6 @@ test_that("annotate_spectra works with cosine similarity", {
 })
 
 test_that("annotate_spectra works with entropy similarity", {
-  skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -322,7 +309,6 @@ test_that("annotate_spectra works with entropy similarity", {
 ## Threshold Settings ----
 
 test_that("annotate_spectra respects similarity threshold", {
-  skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -360,7 +346,6 @@ test_that("annotate_spectra respects similarity threshold", {
 ## Tolerance Settings ----
 
 test_that("annotate_spectra accepts different tolerance settings", {
-  skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -396,7 +381,6 @@ test_that("annotate_spectra accepts different tolerance settings", {
 ## Approx Mode (Precursor-Free Matching)
 
 test_that("annotate_spectra works with approx mode enabled", {
-  skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -423,7 +407,6 @@ test_that("annotate_spectra works with approx mode enabled", {
 })
 
 test_that("annotate_spectra works with approx mode disabled", {
-  skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -452,7 +435,6 @@ test_that("annotate_spectra works with approx mode disabled", {
 ## Intensity Cutoff ----
 
 test_that("annotate_spectra respects intensity cutoff", {
-  skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -490,7 +472,6 @@ test_that("annotate_spectra respects intensity cutoff", {
 ## Output Validation ----
 
 test_that("annotate_spectra produces valid output file", {
-  skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -524,7 +505,6 @@ test_that("annotate_spectra produces valid output file", {
 ## Empty/Edge Cases ----
 
 test_that("annotate_spectra handles empty input gracefully", {
-  skip_on_cran()
   skip("Requires empty MGF file creation")
 
   local_test_project(copy = TRUE)
@@ -537,7 +517,6 @@ test_that("annotate_spectra handles empty input gracefully", {
 ## Performance ----
 
 test_that("annotate_spectra completes in reasonable time", {
-  skip_on_cran()
   skip("Performance test - run manually")
 
   local_test_project(copy = TRUE)

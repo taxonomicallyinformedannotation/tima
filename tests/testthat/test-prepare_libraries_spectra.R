@@ -3,7 +3,6 @@
 library(testthat)
 
 test_that("prepare_libraries_spectra works with default parameters", {
-  skip_on_cran()
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
@@ -32,7 +31,6 @@ test_that("prepare_libraries_spectra handles NULL input", {
 #   skip("Not implemented")
 # )
 # test_that("prepare_libraries_spectra warns when library already exists", {
-#   skip_on_cran()
 #   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #
@@ -59,7 +57,6 @@ test_that("prepare_libraries_spectra handles NULL input", {
 #   skip("Not implemented")
 # )
 # test_that("prepare_libraries_spectra preserves precursorMz as precursor_mz", {
-#   skip_on_cran()
 #   local_test_project(copy = TRUE)
 #   paths <- get_default_paths()
 #

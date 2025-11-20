@@ -5,9 +5,6 @@ library(testthat)
 ## validate_weight_annotations_inputs ----
 
 test_that("validate_weight_annotations_inputs accepts valid inputs", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   # Create test files
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
@@ -79,9 +76,6 @@ test_that("validate_weight_annotations_inputs rejects missing required files", {
 })
 
 test_that("validate_weight_annotations_inputs rejects invalid minimal_ms1_condition", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -125,9 +119,6 @@ test_that("validate_weight_annotations_inputs rejects invalid minimal_ms1_condit
 })
 
 test_that("validate_weight_annotations_inputs rejects weights not summing to 1", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -171,9 +162,6 @@ test_that("validate_weight_annotations_inputs rejects weights not summing to 1",
 })
 
 test_that("validate_weight_annotations_inputs rejects negative weights", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -217,9 +205,6 @@ test_that("validate_weight_annotations_inputs rejects negative weights", {
 })
 
 test_that("validate_weight_annotations_inputs rejects invalid score parameters", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -263,9 +248,6 @@ test_that("validate_weight_annotations_inputs rejects invalid score parameters",
 })
 
 test_that("validate_weight_annotations_inputs rejects invalid candidates parameters", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -311,9 +293,6 @@ test_that("validate_weight_annotations_inputs rejects invalid candidates paramet
 ## load_annotation_tables ----
 
 test_that("load_annotation_tables loads and combines files", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   # Create test annotation files
   ann1 <- tidytable::tidytable(
     feature_id = c("F1", "F2"),
@@ -337,9 +316,6 @@ test_that("load_annotation_tables loads and combines files", {
 })
 
 test_that("load_annotation_tables filters MS1 only when requested", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   ann <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3"),
     candidate_score_similarity = c(NA, "0.8", NA),
@@ -358,9 +334,6 @@ test_that("load_annotation_tables filters MS1 only when requested", {
 ## load_edges_tables ----
 
 test_that("load_edges_table loads and filters top neighbors", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   edges <- tidytable::tidytable(
     feature_source = c("F1", "F1", "F1", "F2", "F2"),
     feature_target = c("F2", "F3", "F4", "F3", "F4"),
@@ -414,9 +387,6 @@ test_that("log_annotation_stats handles NA inchikeys", {
 ## validate_weight_annotations_inputs - Edge Cases ----
 
 test_that("validate_weight_annotations_inputs accepts boundary weight sum", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -460,9 +430,6 @@ test_that("validate_weight_annotations_inputs accepts boundary weight sum", {
 })
 
 test_that("validate_weight_annotations_inputs accepts all weights = 0 boundary", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -505,9 +472,6 @@ test_that("validate_weight_annotations_inputs accepts all weights = 0 boundary",
 })
 
 test_that("validate_weight_annotations_inputs rejects non-logical parameters", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -553,9 +517,6 @@ test_that("validate_weight_annotations_inputs rejects non-logical parameters", {
 ## load_annotation_tables - Edge Cases ----
 
 test_that("load_annotation_tables returns all columns as character", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   ann <- tidytable::tidytable(
     feature_id = c("F1", "F2"),
     score = c("0.8", "0.9"),
@@ -572,9 +533,6 @@ test_that("load_annotation_tables returns all columns as character", {
 ## load_edges_table - Edge Cases ----
 
 test_that("load_edges_table handles single neighbor request", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   edges <- tidytable::tidytable(
     feature_source = c("F1", "F1", "F1"),
     feature_target = c("F2", "F3", "F4"),
@@ -590,9 +548,6 @@ test_that("load_edges_table handles single neighbor request", {
 })
 
 test_that("load_edges_table handles ties in similarity scores", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   edges <- tidytable::tidytable(
     feature_source = c("F1", "F1", "F1"),
     feature_target = c("F2", "F3", "F4"),
@@ -608,9 +563,6 @@ test_that("load_edges_table handles ties in similarity scores", {
 })
 
 test_that("load_edges_table handles empty file", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   edges <- tidytable::tidytable(
     feature_source = character(),
     feature_target = character(),
@@ -636,9 +588,6 @@ test_that("log_annotation_stats handles empty data", {
 ## Edge Cases ----
 
 test_that("load_annotation_tables handles single file", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   ann <- tidytable::tidytable(
     feature_id = c("F1"),
     candidate_score_similarity = c("0.8")
@@ -652,9 +601,6 @@ test_that("load_annotation_tables handles single file", {
 })
 
 test_that("load_edges_table handles features with fewer neighbors than requested", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   edges <- tidytable::tidytable(
     feature_source = c("F1"),
     feature_target = c("F2"),
@@ -672,9 +618,6 @@ test_that("load_edges_table handles features with fewer neighbors than requested
 ## validate_weight_annotations_inputs - Additional edge cases ----
 
 test_that("test-validate_weight_annotations_inputs accepts boundary weight values", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -718,9 +661,6 @@ test_that("test-validate_weight_annotations_inputs accepts boundary weight value
 })
 
 test_that("test-validate_weight_annotations_inputs accepts boundary score values", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -764,9 +704,6 @@ test_that("test-validate_weight_annotations_inputs accepts boundary score values
 })
 
 test_that("test-validate_weight_annotations_inputs handles multiple annotation files", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -813,9 +750,6 @@ test_that("test-validate_weight_annotations_inputs handles multiple annotation f
 })
 
 test_that("test-validate_weight_annotations_inputs rejects when one annotation file missing", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -862,9 +796,6 @@ test_that("test-validate_weight_annotations_inputs rejects when one annotation f
 })
 
 test_that("test-validate_weight_annotations_inputs handles optional files gracefully", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -912,9 +843,6 @@ test_that("test-validate_weight_annotations_inputs handles optional files gracef
 })
 
 test_that("test-validate_weight_annotations_inputs rejects invalid logical parameters", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -958,9 +886,6 @@ test_that("test-validate_weight_annotations_inputs rejects invalid logical param
 })
 
 test_that("test-validate_weight_annotations_inputs accepts all logical parameter combinations", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -1030,9 +955,6 @@ test_that("test-validate_weight_annotations_inputs accepts all logical parameter
 })
 
 test_that("test-validate_weight_annotations_inputs rejects zero candidates", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -1076,9 +998,6 @@ test_that("test-validate_weight_annotations_inputs rejects zero candidates", {
 })
 
 test_that("test-validate_weight_annotations_inputs rejects negative scores", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -1122,9 +1041,6 @@ test_that("test-validate_weight_annotations_inputs rejects negative scores", {
 })
 
 test_that("test-validate_weight_annotations_inputs rejects scores > 1", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -1168,9 +1084,6 @@ test_that("test-validate_weight_annotations_inputs rejects scores > 1", {
 })
 
 test_that("test-validate_weight_annotations_inputs accepts weight sum within tolerance", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
   dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
   dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
   dir.create(
@@ -1232,15 +1145,13 @@ test_that("test-rearrange_annotations merges and deduplicates correctly", {
 })
 
 test_that("test-load_structure_organism_pairs joins supplemental files", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
   files <- wa_create_minimal_files(tmp)
-  stereo <- file.path(tmp, "stereo.tsv")
+  stereo <- file.path("stereo.tsv")
   writeLines(
     "structure_inchikey_connectivity_layer\tstructure_smiles_no_stereo",
     stereo
   )
-  tax <- file.path(tmp, "tax.tsv")
+  tax <- file.path("tax.tsv")
   writeLines("organism_name\torganism_taxonomy_01domain", tax)
   writeLines(
     "structure_inchikey_connectivity_layer\torganism_name",
@@ -1251,8 +1162,6 @@ test_that("test-load_structure_organism_pairs joins supplemental files", {
 })
 
 test_that("test-export_results writes three files", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
   results_list <- list(
     mini = tidytable::tidytable(feature_id = "F1"),
     filtered = tidytable::tidytable(feature_id = "F1"),
@@ -1266,8 +1175,8 @@ test_that("test-export_results writes three files", {
 })
 
 # test_that("test-load_annotation_tables converts '' and NA strings to NA", {
-#   tmp <- withr::local_tempdir(.local_envir = parent.frame())
-#   withr::local_dir(tmp, .local_envir = parent.frame())
+#
+#
 #   ann <- tidytable::tidytable(
 #     feature_id = c("F1", "F2"),
 #     candidate_score_similarity = c("", "NA")

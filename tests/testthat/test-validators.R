@@ -433,7 +433,6 @@ test_that("validators handle edge cases gracefully", {
 
 test_that("validators are thread-safe", {
   # Multiple simultaneous validations should work
-  skip_on_cran()
   skip("Thread safety testing requires parallel package setup")
 
   results <- lapply(1:10, function(i) {
@@ -459,8 +458,8 @@ test_that("validators are thread-safe", {
 #   skip("Not implemented")
 # )
 # test_that("validators work together in realistic scenarios", {
-#   tmp <- withr::local_tempdir(.local_envir = parent.frame())
-#   withr::local_dir(tmp, .local_envir = parent.frame())
+#
+#
 #
 #   # Create test files
 #   temp_features <- "features.tsv"

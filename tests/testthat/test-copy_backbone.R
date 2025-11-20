@@ -37,41 +37,33 @@ test_that("copy_backbone validates cache_dir must be scalar", {
 })
 
 test_that("copy_backbone validates package must be non-NULL character", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-
   expect_error(
-    copy_backbone(cache_dir = temp_dir, package = NULL),
+    copy_backbone(cache_dir = tmp_dir, package = NULL),
     "Package name must be",
     info = "NULL package should error"
   )
 })
 
 test_that("copy_backbone validates package must be non-empty", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-
   expect_error(
-    copy_backbone(cache_dir = temp_dir, package = ""),
+    copy_backbone(cache_dir = tmp_dir, package = ""),
     "Package name must be",
     info = "Empty package should error"
   )
 })
 
 test_that("copy_backbone validates package must be character type", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-
   expect_error(
-    copy_backbone(cache_dir = temp_dir, package = 123),
+    copy_backbone(cache_dir = tmp_dir, package = 123),
     "Package name must be",
     info = "Non-character package should error"
   )
 })
 
 test_that("copy_backbone rejects non-existent package names", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-
   expect_error(
     copy_backbone(
-      cache_dir = temp_dir,
+      cache_dir = tmp_dir,
       package = "NonExistentPackage123456"
     ),
     "Package.*not found",
@@ -82,8 +74,7 @@ test_that("copy_backbone rejects non-existent package names", {
 ## Directory Creation ----
 
 test_that("copy_backbone creates cache directory when it doesn't exist", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-  cache_path <- file.path(temp_dir, "new_cache")
+  cache_path <- file.path(tmp_dir, "new_cache")
 
   expect_false(
     dir.exists(cache_path),
@@ -96,27 +87,23 @@ test_that("copy_backbone creates cache directory when it doesn't exist", {
 })
 
 test_that("copy_backbone handles existing cache directory gracefully", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-
   # First copy
-  expect_no_error(copy_backbone(cache_dir = temp_dir))
+  expect_no_error(copy_backbone(cache_dir = tmp_dir))
 
   # Second copy (overwrite)
-  expect_no_error(copy_backbone(cache_dir = temp_dir))
+  expect_no_error(copy_backbone(cache_dir = tmp_dir))
 })
 
 ## Content Verification ----
 
 test_that("copy_backbone copies package structure to cache directory", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-
-  copy_backbone(cache_dir = temp_dir)
+  copy_backbone(cache_dir = tmp_dir)
 
   # Verify cache directory was created and populated
-  expect_true(dir.exists(temp_dir), info = "Cache directory should exist")
+  expect_true(dir.exists(tmp_dir), info = "Cache directory should exist")
 
   # Verify files were copied
-  files_copied <- list.files(temp_dir, recursive = TRUE)
+  files_copied <- list.files(tmp_dir, recursive = TRUE)
   expect_true(
     length(files_copied) > 0,
     info = "At least some files should be copied"
@@ -124,12 +111,10 @@ test_that("copy_backbone copies package structure to cache directory", {
 })
 
 test_that("copy_backbone creates expected directory structure", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-
-  copy_backbone(cache_dir = temp_dir)
+  copy_backbone(cache_dir = tmp_dir)
 
   # Check for common expected directories (may vary by package structure)
-  all_items <- list.files(temp_dir, recursive = FALSE, all.files = TRUE)
+  all_items <- list.files(tmp_dir, recursive = FALSE, all.files = TRUE)
   expect_true(
     length(all_items) > 0,
     info = "Should create directory structure"
@@ -139,9 +124,6 @@ test_that("copy_backbone creates expected directory structure", {
 ## Path Handling ----
 
 test_that("copy_backbone works with relative paths", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(temp_dir, .local_envir = parent.frame())
-
   # Copy to current directory
   expect_no_error(copy_backbone(cache_dir = "."))
 
@@ -150,8 +132,7 @@ test_that("copy_backbone works with relative paths", {
 })
 
 test_that("copy_backbone works with absolute paths", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-  cache_path <- file.path(temp_dir, "absolute_cache")
+  cache_path <- file.path(tmp_dir, "absolute_cache")
 
   expect_no_error(copy_backbone(cache_dir = cache_path))
 
@@ -164,9 +145,6 @@ test_that("copy_backbone works with absolute paths", {
 # Integration ----
 
 test_that("copy_backbone integrates with get_default_paths after copying", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(temp_dir, .local_envir = parent.frame())
-
   copy_backbone(cache_dir = ".")
 
   # Should be able to get paths after copying backbone
@@ -183,9 +161,7 @@ test_that("copy_backbone supports local_test_project workflow", {
 ## Return Value ----
 
 test_that("copy_backbone returns invisibly", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-
-  result <- withVisible(copy_backbone(cache_dir = temp_dir))
+  result <- withVisible(copy_backbone(cache_dir = tmp_dir))
 
   expect_null(result$value, info = "Return value should be NULL")
   expect_false(result$visible, info = "Return should be invisible")
@@ -194,8 +170,7 @@ test_that("copy_backbone returns invisibly", {
 ## Edge Cases and Special Scenarios ----
 
 test_that("copy_backbone handles nested cache directory paths", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-  nested_path <- file.path(temp_dir, "level1", "level2", "cache")
+  nested_path <- file.path(tmp_dir, "level1", "level2", "cache")
 
   expect_no_error(copy_backbone(cache_dir = nested_path))
 
@@ -206,10 +181,8 @@ test_that("copy_backbone handles nested cache directory paths", {
 })
 
 test_that("copy_backbone can be called multiple times with different paths", {
-  temp_dir <- withr::local_tempdir(.local_envir = parent.frame())
-
-  cache1 <- file.path(temp_dir, "cache1")
-  cache2 <- file.path(temp_dir, "cache2")
+  cache1 <- file.path(tmp_dir, "cache1")
+  cache2 <- file.path(tmp_dir, "cache2")
 
   expect_no_error(copy_backbone(cache_dir = cache1))
   expect_no_error(copy_backbone(cache_dir = cache2))

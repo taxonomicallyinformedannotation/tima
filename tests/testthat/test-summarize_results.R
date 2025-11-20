@@ -321,8 +321,6 @@ test_that("summarize_results handles single candidate", {
 })
 
 test_that("summarize_results handles many features", {
-  skip_on_cran()
-
   test_data <- create_test_annotation_data(n_features = 100, n_candidates = 5)
 
   result <- summarize_results(
@@ -368,8 +366,6 @@ test_that("summarize_results works with both remove_ties=TRUE and summarize=TRUE
 # Performance tests ----
 
 test_that("summarize_results completes in reasonable time", {
-  skip_on_cran()
-
   test_data <- create_test_annotation_data(n_features = 50, n_candidates = 10)
 
   start_time <- Sys.time()

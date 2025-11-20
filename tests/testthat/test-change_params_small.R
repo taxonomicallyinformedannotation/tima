@@ -3,7 +3,6 @@
 library(testthat)
 
 # test_that("change_params_small updates all parameters correctly", {
-#   skip_on_cran()
 #   paths <- local_test_project(copy = TRUE)
 #
 #   # Create temporary test files
@@ -36,7 +35,6 @@ library(testthat)
 # })
 
 # test_that("change_params_small handles minimal parameters (all NULL)", {
-#   skip_on_cran()
 #   paths <- local_test_project(copy = TRUE)
 #
 #   # Test with all NULL parameters
@@ -48,7 +46,6 @@ library(testthat)
 # })
 
 # test_that("change_params_small handles individual parameters", {
-#   skip_on_cran()
 #
 #   # Test fil_pat only
 #   paths <- local_test_project(copy = TRUE)
@@ -72,7 +69,6 @@ library(testthat)
 # })
 
 # test_that("change_params_small validates file existence", {
-#   skip_on_cran()
 #   paths <- local_test_project(copy = TRUE)
 #
 #   # Non-existent features file
@@ -101,7 +97,6 @@ library(testthat)
 # })
 
 # test_that("change_params_small copies files to correct locations", {
-#   skip_on_cran()
 #   paths <- local_test_project(copy = TRUE)
 #
 #   temp_features <- tempfile(fileext = ".csv")
@@ -116,7 +111,6 @@ library(testthat)
 # })
 
 # test_that("change_params_small handles NULL sirius file correctly", {
-#   skip_on_cran()
 #   paths <- local_test_project(copy = TRUE)
 #
 #   # When fil_sir_raw is NULL, it should be set to NA in YAML
@@ -128,7 +122,6 @@ library(testthat)
 # })
 
 # test_that("change_params_small handles NULL org_tax correctly", {
-#   skip_on_cran()
 #   paths <- local_test_project(copy = TRUE)
 #
 #   # When org_tax is NULL, it should be set to NA in YAML
@@ -140,7 +133,6 @@ library(testthat)
 # })
 
 # test_that("change_params_small overwrites existing files", {
-#   skip_on_cran()
 #   paths <- local_test_project(copy = TRUE)
 #
 #   temp_file <- tempfile(fileext = ".csv")

@@ -6,15 +6,15 @@ library(testthat)
 
 make_min_struct_files_spectra <- function(tmp) {
   dir.create(
-    file.path(tmp, "structures", "taxonomies"),
+    file.path("structures", "taxonomies"),
     recursive = TRUE,
     showWarnings = FALSE
   )
-  stereo <- file.path(tmp, "structures", "stereo.tsv")
-  met <- file.path(tmp, "structures", "metadata.tsv")
-  nam <- file.path(tmp, "structures", "names.tsv")
-  cla <- file.path(tmp, "structures", "taxonomies", "classyfire.tsv")
-  npc <- file.path(tmp, "structures", "taxonomies", "npc.tsv")
+  stereo <- file.path("structures", "stereo.tsv")
+  met <- file.path("structures", "metadata.tsv")
+  nam <- file.path("structures", "names.tsv")
+  cla <- file.path("structures", "taxonomies", "classyfire.tsv")
+  npc <- file.path("structures", "taxonomies", "npc.tsv")
 
   tidytable::fwrite(
     tidytable::tidytable(
@@ -72,10 +72,8 @@ make_min_struct_files_spectra <- function(tmp) {
 ## Validation ----
 
 test_that("test-prepare_annotations_spectra validates input vector and files", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
   s <- make_min_struct_files_spectra(tmp)
-  out <- file.path(tmp, "spectra.tsv")
+  out <- file.path("spectra.tsv")
   expect_error(
     prepare_annotations_spectra(
       input = 123,
@@ -89,7 +87,7 @@ test_that("test-prepare_annotations_spectra validates input vector and files", {
     "non-empty character"
   )
   expect_error(prepare_annotations_spectra(
-    input = c(file.path(tmp, "missing.tsv")),
+    input = c(file.path("missing.tsv")),
     output = out,
     str_stereo = s$stereo,
     str_met = s$met,
@@ -100,20 +98,18 @@ test_that("test-prepare_annotations_spectra validates input vector and files", {
 })
 
 test_that("test-prepare_annotations_spectra validates structure files", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-  ann <- file.path(tmp, "ann.tsv")
+  ann <- file.path("ann.tsv")
   tidytable::fwrite(tidytable::tidytable(feature_id = "F1"), ann, sep = "\t")
-  out <- file.path(tmp, "spectra.tsv")
+  out <- file.path("spectra.tsv")
   expect_error(
     prepare_annotations_spectra(
       input = ann,
       output = out,
-      str_stereo = file.path(tmp, "missing.tsv"),
-      str_met = file.path(tmp, "missing.tsv"),
-      str_nam = file.path(tmp, "missing.tsv"),
-      str_tax_cla = file.path(tmp, "missing.tsv"),
-      str_tax_npc = file.path(tmp, "missing.tsv")
+      str_stereo = file.path("missing.tsv"),
+      str_met = file.path("missing.tsv"),
+      str_nam = file.path("missing.tsv"),
+      str_tax_cla = file.path("missing.tsv"),
+      str_tax_npc = file.path("missing.tsv")
     ),
     "Structure file\\(s\\) not found"
   )
@@ -122,10 +118,8 @@ test_that("test-prepare_annotations_spectra validates structure files", {
 ## Behavior ----
 
 test_that("test-prepare_annotations_spectra processes minimal formatted input", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
   s <- make_min_struct_files_spectra(tmp)
-  out <- file.path(tmp, "spectra.tsv")
+  out <- file.path("spectra.tsv")
 
   tbl <- tidytable::tidytable(
     feature_id = c("F1"),
@@ -143,7 +137,7 @@ test_that("test-prepare_annotations_spectra processes minimal formatted input", 
     candidate_score_similarity = c("0.9"),
     candidate_count_similarity_peaks_matched = c("10")
   )
-  ann1 <- file.path(tmp, "ann1.tsv")
+  ann1 <- file.path("ann1.tsv")
   tidytable::fwrite(tbl, ann1, sep = "\t")
 
   res <- prepare_annotations_spectra(

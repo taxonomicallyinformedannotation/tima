@@ -295,8 +295,6 @@ test_that("calculate_mz_from_mass completes without error", {
 ## Performance ----
 
 test_that("calculate_mz_from_mass is fast for batch processing", {
-  skip_on_cran()
-
   masses <- runif(1000, 100, 1000)
 
   start_time <- Sys.time()
@@ -310,8 +308,6 @@ test_that("calculate_mz_from_mass is fast for batch processing", {
 })
 
 test_that("round-trip calculation is fast", {
-  skip_on_cran()
-
   masses <- runif(100, 100, 500)
 
   start_time <- Sys.time()

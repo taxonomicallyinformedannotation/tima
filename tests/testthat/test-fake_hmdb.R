@@ -3,10 +3,8 @@
 library(testthat)
 
 test_that("fake_hmdb creates zip file with SDF content", {
-  skip_on_cran()
   skip_on_os("windows") # zip command may not be available
 
-  withr::local_tempdir(.local_envir = parent.frame())
   temp_file <- withr::local_tempfile(fileext = ".sdf.zip")
 
   result <- fake_hmdb(export = temp_file)
@@ -33,8 +31,6 @@ test_that("fake_hmdb creates zip file with SDF content", {
 })
 
 test_that("fake_hmdb validates input parameters", {
-  skip_on_cran()
-
   # Missing export parameter
   expect_error(fake_hmdb(), "export path must be a single character string")
 
@@ -58,10 +54,8 @@ test_that("fake_hmdb validates input parameters", {
 })
 
 test_that("fake_hmdb handles zip creation failures gracefully", {
-  skip_on_cran()
   skip_on_os("windows")
 
-  withr::local_tempdir(.local_envir = parent.frame())
   temp_file <- withr::local_tempfile(fileext = ".sdf.zip")
 
   expect_no_error(fake_hmdb(export = temp_file))

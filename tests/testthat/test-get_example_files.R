@@ -20,8 +20,6 @@ test_that("get_example_files retrieves specific example files", {
 })
 
 test_that("get_example_files works with default parameters", {
-  skip_on_cran()
-
   expect_no_error(get_example_files())
 })
 
@@ -46,8 +44,6 @@ test_that("get_example_files handles cache mode correctly", {
 })
 
 test_that("get_example_files handles single example file", {
-  skip_on_cran()
-
   expect_no_error(
     get_example_files(example = "features")
   )

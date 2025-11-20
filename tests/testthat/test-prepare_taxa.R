@@ -148,12 +148,9 @@ test_that("prepare_taxa checks OTT file existence", {
 })
 
 test_that("prepare_taxa works with single taxon assignment", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
-  input <- file.path(tmp, "features.tsv")
-  ott <- file.path(tmp, "ott.tsv")
-  output <- file.path(tmp, "output.tsv")
+  input <- file.path("features.tsv")
+  ott <- file.path("ott.tsv")
+  output <- file.path("output.tsv")
 
   # Create minimal valid files
   writeLines("feature_id\trt\tmz\nFT001\t1.5\t200\nFT002\t2.0\t300", input)
@@ -190,13 +187,10 @@ test_that("prepare_taxa works with single taxon assignment", {
 })
 
 test_that("prepare_taxa works with metadata-based assignment", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
-  input <- file.path(tmp, "features.tsv")
-  ott <- file.path(tmp, "ott.tsv")
-  metadata <- file.path(tmp, "metadata.tsv")
-  output <- file.path(tmp, "output.tsv")
+  input <- file.path("features.tsv")
+  ott <- file.path("ott.tsv")
+  metadata <- file.path("metadata.tsv")
+  output <- file.path("output.tsv")
 
   # Create features with sample column
   writeLines(
@@ -249,13 +243,10 @@ test_that("prepare_taxa works with metadata-based assignment", {
 })
 
 test_that("prepare_taxa handles pipe-separated organisms", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-
-  input <- file.path(tmp, "features.tsv")
-  ott <- file.path(tmp, "ott.tsv")
-  metadata <- file.path(tmp, "metadata.tsv")
-  output <- file.path(tmp, "output.tsv")
+  input <- file.path("features.tsv")
+  ott <- file.path("ott.tsv")
+  metadata <- file.path("metadata.tsv")
+  output <- file.path("output.tsv")
 
   writeLines("feature_id\trt\tmz\tsample\nFT001\t1.5\t200\tfile1", input)
 
@@ -330,13 +321,13 @@ test_that("prepare_taxa works with single taxon assignment", {
 #   skip("Not implemented")
 # )
 # test_that("prepare_taxa handles empty taxon string as NULL", {
-#   tmp <- withr::local_tempdir(.local_envir = parent.frame())
-# withr::local_dir(tmp, .local_envir = parent.frame())
 #
-#   input <- file.path(tmp, "features.tsv")
-#   ott <- file.path(tmp, "ott.tsv")
-#   metadata <- file.path(tmp, "metadata.tsv")
-#   output <- file.path(tmp, "output.tsv")
+#
+#
+#   input <- file.path( "features.tsv")
+#   ott <- file.path( "ott.tsv")
+#   metadata <- file.path( "metadata.tsv")
+#   output <- file.path( "output.tsv")
 #
 #   writeLines("feature_id\trt\tmz\nFT001\t1.5\t200", input)
 #   writeLines("organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\nTest org\t12345\tEukaryota", ott)
@@ -348,7 +339,7 @@ test_that("prepare_taxa works with single taxon assignment", {
 #       input = input,
 #       org_tax_ott = ott,
 #       taxon = "",  # Empty string
-#       metadata = file.path(tmp, "nonexistent.tsv"),
+#       metadata = file.path( "nonexistent.tsv"),
 #       output = output,
 #       extension = FALSE
 #     ),

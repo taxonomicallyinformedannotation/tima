@@ -2,37 +2,41 @@
 
 library(testthat)
 
-test_that("validate_filter_annotations_inputs accepts valid inputs", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
+.test_path <- function(name) file.path(tmp, name)
 
-  writeLines("", "features.tsv")
-  writeLines("", "ann.tsv")
+test_that("validate_filter_annotations_inputs accepts valid inputs", {
+  features <- .test_path("features.tsv")
+  ann <- .test_path("ann.tsv")
+  out <- .test_path("output.tsv")
+
+  writeLines("", features)
+  writeLines("", ann)
 
   expect_silent(
     validate_filter_annotations_inputs(
-      annotations = "ann.tsv",
-      features = "features.tsv",
+      annotations = ann,
+      features = features,
       rts = character(0),
-      output = "output.tsv",
+      output = out,
       tolerance_rt = 0.05
     )
   )
 })
 
 test_that("validate_filter_annotations_inputs rejects invalid tolerance_rt", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
+  features <- .test_path("features.tsv")
+  ann <- .test_path("ann.tsv")
+  out <- .test_path("output.tsv")
 
-  writeLines("", "features.tsv")
-  writeLines("", "ann.tsv")
+  writeLines("", features)
+  writeLines("", ann)
 
   expect_error(
     validate_filter_annotations_inputs(
-      annotations = "ann.tsv",
-      features = "features.tsv",
+      annotations = ann,
+      features = features,
       rts = character(0),
-      output = "output.tsv",
+      output = out,
       tolerance_rt = -1
     ),
     "tolerance_rt must be a positive number"
@@ -40,17 +44,17 @@ test_that("validate_filter_annotations_inputs rejects invalid tolerance_rt", {
 })
 
 test_that("validate_filter_annotations_inputs rejects missing files", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
+  features <- .test_path("features.tsv")
+  out <- .test_path("output.tsv")
 
-  writeLines("", "features.tsv")
+  writeLines("", features)
 
   expect_error(
     validate_filter_annotations_inputs(
-      annotations = "nonexistent.tsv",
-      features = "features.tsv",
+      annotations = .test_path("nonexistent.tsv"),
+      features = features,
       rts = character(0),
-      output = "output.tsv",
+      output = out,
       tolerance_rt = 0.05
     ),
     "Annotation file.*not found"
@@ -134,36 +138,38 @@ test_that("apply_rt_filter keeps annotations without RT standards", {
 ## validate_filter_annotations_inputs - Edge Cases ----
 
 test_that("validate_filter_annotations_inputs accepts list of annotations", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
+  features <- .test_path("features.tsv")
+  ann1 <- .test_path("ann1.tsv")
+  ann2 <- .test_path("ann2.tsv")
+  out <- .test_path("output.tsv")
 
-  writeLines("", "features.tsv")
-  writeLines("", "ann1.tsv")
-  writeLines("", "ann2.tsv")
+  writeLines("", features)
+  writeLines("", ann1)
+  writeLines("", ann2)
 
   expect_silent(
     validate_filter_annotations_inputs(
-      annotations = list("ann1.tsv", "ann2.tsv"),
-      features = "features.tsv",
+      annotations = list(ann1, ann2),
+      features = features,
       rts = character(0),
-      output = "output.tsv",
+      output = out,
       tolerance_rt = 0.05
     )
   )
 })
 
 test_that("validate_filter_annotations_inputs rejects empty annotations", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
+  features <- .test_path("features.tsv")
+  out <- .test_path("output.tsv")
 
-  writeLines("", "features.tsv")
+  writeLines("", features)
 
   expect_error(
     validate_filter_annotations_inputs(
       annotations = character(0),
-      features = "features.tsv",
+      features = features,
       rts = character(0),
-      output = "output.tsv",
+      output = out,
       tolerance_rt = 0.05
     ),
     "must be a non-empty"
@@ -171,16 +177,17 @@ test_that("validate_filter_annotations_inputs rejects empty annotations", {
 })
 
 test_that("validate_filter_annotations_inputs rejects non-character output", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
+  features <- .test_path("features.tsv")
+  ann <- .test_path("ann.tsv")
+  out <- .test_path("output.tsv")
 
-  writeLines("", "features.tsv")
-  writeLines("", "ann.tsv")
+  writeLines("", features)
+  writeLines("", ann)
 
   expect_error(
     validate_filter_annotations_inputs(
-      annotations = "ann.tsv",
-      features = "features.tsv",
+      annotations = ann,
+      features = features,
       rts = character(0),
       output = c("out1.tsv", "out2.tsv"),
       tolerance_rt = 0.05
@@ -190,18 +197,19 @@ test_that("validate_filter_annotations_inputs rejects non-character output", {
 })
 
 test_that("validate_filter_annotations_inputs rejects zero tolerance", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
+  features <- .test_path("features.tsv")
+  ann <- .test_path("ann.tsv")
+  out <- .test_path("output.tsv")
 
-  writeLines("", "features.tsv")
-  writeLines("", "ann.tsv")
+  writeLines("", features)
+  writeLines("", ann)
 
   expect_error(
     validate_filter_annotations_inputs(
-      annotations = "ann.tsv",
-      features = "features.tsv",
+      annotations = ann,
+      features = features,
       rts = character(0),
-      output = "output.tsv",
+      output = out,
       tolerance_rt = 0
     ),
     "tolerance_rt must be a positive number"
@@ -209,19 +217,21 @@ test_that("validate_filter_annotations_inputs rejects zero tolerance", {
 })
 
 test_that("validate_filter_annotations_inputs rejects missing RT files", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
+  features <- .test_path("features.tsv")
+  ann <- .test_path("ann.tsv")
+  out <- .test_path("output.tsv")
+  rt1 <- .test_path("rt1.tsv")
 
-  writeLines("", "features.tsv")
-  writeLines("", "ann.tsv")
-  writeLines("", "rt1.tsv")
+  writeLines("", features)
+  writeLines("", ann)
+  writeLines("", rt1)
 
   expect_error(
     validate_filter_annotations_inputs(
-      annotations = "ann.tsv",
-      features = "features.tsv",
-      rts = c("rt1.tsv", "rt2.tsv"),
-      output = "output.tsv",
+      annotations = ann,
+      features = features,
+      rts = c(rt1, "rt2.tsv"),
+      output = out,
       tolerance_rt = 0.05
     ),
     "Retention time file.*not found"

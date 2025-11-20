@@ -5,17 +5,14 @@ library(testthat)
 ## Internal Utility Helpers ----
 
 .create_ecmdb_zip <- function(zip_path, inner_name = "ecmdb") {
-  tmpdir <- tempfile(pattern = "ecmdbjson")
-  dir.create(tmpdir)
-  json_path <- file.path(tmpdir, inner_name)
+  # Minimal example data
   lines <- c(
     '{"name":"MetA","moldb_inchikey":"AAAAAAAAAAAAAA-BBBBBBBBBB-C","moldb_smiles":"C","moldb_formula":"CH4","moldb_mono_mass":16.0313,"moldb_logp":0.1}',
     '{"name":"MetB","moldb_inchikey":"CCCCCCCCCCCCCC-DDDDDDDDDD-E","moldb_smiles":"CC","moldb_formula":"C2H6","moldb_mono_mass":30.07,"moldb_logp":0.2}'
   )
-  writeLines(lines, json_path)
-  withr::with_dir(tmpdir, {
-      utils::zip(zipfile = zip_path, files = inner_name)
-    })
+  writeLines(lines, inner_name)
+
+  utils::zip(zipfile = zip_path, files = inner_name)
 }
 
 ## Validation ----
@@ -34,11 +31,9 @@ test_that("test-prepare_libraries_sop_ecmdb validates input and output types", {
 ## Behavior ----
 
 test_that("test-prepare_libraries_sop_ecmdb handles missing input by creating empty library", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-  out <- file.path(tmp, "ecmdb.tsv")
+  out <- file.path("ecmdb.tsv")
   res <- prepare_libraries_sop_ecmdb(
-    input = file.path(tmp, "missing.zip"),
+    input = file.path("missing.zip"),
     output = out
   )
   expect_equal(res, out)
@@ -48,11 +43,9 @@ test_that("test-prepare_libraries_sop_ecmdb handles missing input by creating em
 })
 
 test_that("test-prepare_libraries_sop_ecmdb parses minimal valid zip", {
-  tmp <- withr::local_tempdir(.local_envir = parent.frame())
-  withr::local_dir(tmp, .local_envir = parent.frame())
-  inzip <- file.path(tmp, "ecmdb.zip")
+  inzip <- file.path("ecmdb.zip")
   .create_ecmdb_zip(inzip, inner_name = "ecmdb")
-  out <- file.path(tmp, "ecmdb.tsv")
+  out <- file.path("ecmdb.tsv")
   res <- prepare_libraries_sop_ecmdb(input = inzip, output = out)
   expect_equal(res, out)
   expect_true(file.exists(out))

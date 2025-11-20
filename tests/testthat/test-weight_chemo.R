@@ -206,7 +206,6 @@ test_that("weight_chemo assigns chemical scores from taxonomy matches", {
 # Combined Scoring ----
 
 test_that("weight_chemo combines ClassyFire and NPClassifier scores", {
-  skip_on_cran()
   skip("Not implemented")
 
   # This test would verify correct combination of multiple taxonomy sources

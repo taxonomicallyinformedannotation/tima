@@ -300,7 +300,6 @@ test_that("split_tables_sop preserves unique organisms", {
 })
 
 test_that("split_tables_sop handles cache parameter", {
-  skip_on_cran()
   skip("Requires RDKit/Python - process_smiles dependency")
 
   sop_table <- tidytable::tidytable(
@@ -332,7 +331,6 @@ test_that("split_tables_sop handles cache parameter", {
   expect_type(result_no_cache, "list")
 
   # With cache path (file doesn't need to exist)
-  withr::local_tempdir(.local_envir = parent.frame())
   cache_file <- file.path(tempdir(), "test_cache.tsv")
   result_with_cache <- split_tables_sop(table = sop_table, cache = cache_file)
   expect_type(result_with_cache, "list")
@@ -341,7 +339,6 @@ test_that("split_tables_sop handles cache parameter", {
 ## Edge Cases ----
 
 test_that("split_tables_sop handles special characters in organism names", {
-  skip_on_cran()
   skip("Requires RDKit/Python - process_smiles dependency")
 
   sop_table <- tidytable::tidytable(
@@ -375,7 +372,6 @@ test_that("split_tables_sop handles special characters in organism names", {
 })
 
 test_that("split_tables_sop handles missing taxonomy fields", {
-  skip_on_cran()
   skip("Requires RDKit/Python - process_smiles dependency")
 
   sop_table <- tidytable::tidytable(
