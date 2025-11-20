@@ -13,10 +13,9 @@ library(testthat)
     '{"name":"MetB","moldb_inchikey":"CCCCCCCCCCCCCC-DDDDDDDDDD-E","moldb_smiles":"CC","moldb_formula":"C2H6","moldb_mono_mass":30.07,"moldb_logp":0.2}'
   )
   writeLines(lines, json_path)
-  old <- getwd()
-  on.exit(setwd(old), add = TRUE)
-  setwd(tmpdir)
-  utils::zip(zipfile = zip_path, files = inner_name)
+  withr::with_dir(tmpdir, {
+      utils::zip(zipfile = zip_path, files = inner_name)
+    })
 }
 
 ## Validation ----
