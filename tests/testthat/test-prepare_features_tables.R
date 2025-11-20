@@ -28,6 +28,7 @@ test_that("prepare_features_tables validates output parameter", {
   paths <- local_test_project(copy = TRUE)
 
   # Create minimal features file
+  dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_features <- file.path("data", "source", "test_features.csv")
   tidytable::tidytable(
     "row ID" = 1,
@@ -56,6 +57,7 @@ test_that("prepare_features_tables validates output parameter", {
 test_that("prepare_features_tables validates candidates parameter", {
   paths <- local_test_project(copy = TRUE)
 
+  dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_features <- file.path("data", "source", "test_features.csv")
   tidytable::tidytable(
     "row ID" = 1,
@@ -97,6 +99,7 @@ test_that("prepare_features_tables handles MZmine format (Peak area)", {
     "sample2.mzML Peak area" = c(1500, 2500, 3500)
   )
 
+  dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_file <- file.path("data", "source", "mzmine_features.csv")
   tidytable::fwrite(mzmine_features, test_file)
 
@@ -127,6 +130,7 @@ test_that("prepare_features_tables handles missing RT column", {
     "sample.mzML Peak area" = c(1000, 2000)
   )
 
+  dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_file <- file.path("data", "source", "no_rt.csv")
   tidytable::fwrite(no_rt_features, test_file)
 
@@ -160,6 +164,7 @@ test_that("prepare_features_tables retains top intensity samples", {
     features_data[[col_name]] <- i * 100 # Increasing intensities
   }
 
+  dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_file <- file.path("data", "source", "many_samples.csv")
   tidytable::fwrite(features_data, test_file)
 
@@ -188,6 +193,7 @@ test_that("prepare_features_tables handles empty file", {
   paths <- local_test_project(copy = TRUE)
 
   # Create empty file
+  dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_file <- file.path("data", "source", "empty.csv")
   tidytable::fwrite(
     tidytable::tidytable(

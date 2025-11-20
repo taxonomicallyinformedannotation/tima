@@ -332,7 +332,7 @@ test_that("split_tables_sop handles cache parameter", {
   expect_type(result_no_cache, "list")
 
   # With cache path (file doesn't need to exist)
-  withr::local_tempdir()
+  withr::local_tempdir(.local_envir = parent.frame())
   cache_file <- file.path(tempdir(), "test_cache.tsv")
   result_with_cache <- split_tables_sop(table = sop_table, cache = cache_file)
   expect_type(result_with_cache, "list")

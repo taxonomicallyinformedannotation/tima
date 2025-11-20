@@ -459,8 +459,8 @@ test_that(
   skip("Not implemented")
 )
 # test_that("validators work together in realistic scenarios", {
-#   tmp <- withr::local_tempdir()
-#   withr::local_dir(tmp)
+#   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+#   withr::local_dir(tmp, .local_envir = parent.frame())
 #
 #   # Create test files
 #   temp_features <- "features.tsv"

@@ -31,8 +31,8 @@ test_that("complement_metadata_structures validates single character path inputs
     candidate_structure_inchikey_connectivity_layer = "INKY",
     candidate_structure_smiles_no_stereo = "CC"
   )
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Create minimal valid files
   minimal <- tidytable::tidytable(
     structure_inchikey_connectivity_layer = "INKY",
@@ -61,8 +61,8 @@ test_that("complement_metadata_structures validates single character path inputs
 })
 
 test_that("complement_metadata_structures collapses multiple names with separator", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   df <- tidytable::tidytable(
     candidate_structure_inchikey_connectivity_layer = "INK1",
     candidate_structure_smiles_no_stereo = "C"
@@ -121,8 +121,8 @@ test_that(
   skip("Not implemented")
 )
 # test_that("complement_metadata_structures adds taxonomy columns", {
-#   tmp <- withr::local_tempdir()
-#   withr::local_dir(tmp)
+#   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+#   withr::local_dir(tmp, .local_envir = parent.frame())
 #   df <- tidytable::tidytable(
 #     candidate_structure_inchikey_connectivity_layer = "INK2",
 #     candidate_structure_smiles_no_stereo = "N"
@@ -166,8 +166,8 @@ test_that(
 # })
 
 test_that("complement_metadata_structures errors when required columns missing", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   df <- tidytable::tidytable(
     candidate_structure_inchikey_connectivity_layer = "INK3",
     candidate_structure_smiles_no_stereo = "O"
@@ -203,8 +203,8 @@ test_that(
   skip("Not implemented")
 )
 # test_that("complement_metadata_structures enriches metadata", {
-#   tmp <- withr::local_tempdir()
-#   withr::local_dir(tmp)
+#   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+#   withr::local_dir(tmp, .local_envir = parent.frame())
 #   # Minimal df
 #   df <- tidytable::tidytable(
 #     candidate_structure_inchikey_connectivity_layer = "INK1",

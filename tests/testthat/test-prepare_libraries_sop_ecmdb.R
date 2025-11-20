@@ -35,7 +35,7 @@ test_that("test-prepare_libraries_sop_ecmdb validates input and output types", {
 ## Behavior ----
 
 test_that("test-prepare_libraries_sop_ecmdb handles missing input by creating empty library", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   out <- file.path(tmp, "ecmdb.tsv")
   res <- prepare_libraries_sop_ecmdb(
     input = file.path(tmp, "missing.zip"),
@@ -48,7 +48,7 @@ test_that("test-prepare_libraries_sop_ecmdb handles missing input by creating em
 })
 
 test_that("test-prepare_libraries_sop_ecmdb parses minimal valid zip", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   inzip <- file.path(tmp, "ecmdb.zip")
   .create_ecmdb_zip(inzip, inner_name = "ecmdb")
   out <- file.path(tmp, "ecmdb.tsv")

@@ -26,7 +26,7 @@ library(testthat)
 ## Validation ----
 
 test_that("test-prepare_annotations_sirius validates sirius_version", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   s <- .make_structs(tmp)
   out_ann <- file.path(tmp, "ann.tsv")
   out_can <- file.path(tmp, "can.tsv")
@@ -49,7 +49,7 @@ test_that("test-prepare_annotations_sirius validates sirius_version", {
 })
 
 test_that("test-prepare_annotations_sirius validates output parameters and structure files", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   s <- .make_structs(tmp)
   expect_error(
     prepare_annotations_sirius(
@@ -88,7 +88,7 @@ test_that("test-prepare_annotations_sirius validates output parameters and struc
 ## Behavior ----
 
 test_that("test-prepare_annotations_sirius handles missing input by producing empty outputs", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   s <- .make_structs(tmp)
   out_can <- file.path(tmp, "can.tsv")
   out_for <- file.path(tmp, "for.tsv")

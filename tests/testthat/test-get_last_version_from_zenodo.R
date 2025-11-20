@@ -96,7 +96,7 @@ test_that("test-get_last_version_from_zenodo handles invalid DOI gracefully", {
   skip_on_cran()
   skip_if_offline()
 
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   output <- file.path(tmp, "output.txt")
 
   expect_error(

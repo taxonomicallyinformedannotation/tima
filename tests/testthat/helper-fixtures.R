@@ -55,8 +55,8 @@ generate_fake_inchikey <- function(n = 1L, seed = NULL) {
 #'   # Test code here
 #' })
 local_test_project <- function(copy = TRUE) {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   # Suppress logs during tests for cleaner output
   local_quiet_logging()

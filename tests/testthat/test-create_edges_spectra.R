@@ -3,8 +3,8 @@
 library(testthat)
 
 test_that("create_edges_spectra validates thresholds", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   # Create dummy mgf file with minimal content
   mgf <- c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS")
   writeLines(mgf, "spec.mgf")
@@ -23,8 +23,8 @@ test_that(
   skip("Not implemented")
 )
 # test_that("create_edges_spectra handles single spectrum early exit", {
-#   tmp <- withr::local_tempdir()
-#   withr::local_dir(tmp)
+#   tmp <- withr::local_tempdir(.local_envir = parent.frame())
+#   withr::local_dir(tmp, .local_envir = parent.frame())
 #   mgf <- c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS")
 #   writeLines(mgf, "spec.mgf")
 #   out <- create_edges_spectra(

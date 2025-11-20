@@ -108,7 +108,7 @@ test_that(
 )
 # test_that("get_params errors for unknown step", {
 #   # Create a temp script directory mimicking docopt scripts
-#   tmp_scripts <- withr::local_tempdir()
+#   tmp_scripts <- withr::local_tempdir(.local_envir = parent.frame())
 #   writeLines(
 #     "Usage: prepare_params",
 #     file.path(tmp_scripts, "prepare_params.txt")

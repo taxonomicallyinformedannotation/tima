@@ -72,7 +72,7 @@ make_min_struct_files_spectra <- function(tmp) {
 ## Validation ----
 
 test_that("test-prepare_annotations_spectra validates input vector and files", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   s <- make_min_struct_files_spectra(tmp)
   out <- file.path(tmp, "spectra.tsv")
   expect_error(
@@ -99,7 +99,7 @@ test_that("test-prepare_annotations_spectra validates input vector and files", {
 })
 
 test_that("test-prepare_annotations_spectra validates structure files", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   ann <- file.path(tmp, "ann.tsv")
   tidytable::fwrite(tidytable::tidytable(feature_id = "F1"), ann, sep = "\t")
   out <- file.path(tmp, "spectra.tsv")
@@ -120,7 +120,7 @@ test_that("test-prepare_annotations_spectra validates structure files", {
 ## Behavior ----
 
 test_that("test-prepare_annotations_spectra processes minimal formatted input", {
-  tmp <- withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
   s <- make_min_struct_files_spectra(tmp)
   out <- file.path(tmp, "spectra.tsv")
 

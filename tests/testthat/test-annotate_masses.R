@@ -179,7 +179,6 @@ test_that("annotate_masses validates file existence", {
 
 test_that("annotate_masses handles empty features table", {
   # Setup temporary test environment with local directory
-  withr::local_tempdir()
   paths <- local_test_project()
 
   # Create directories
@@ -264,7 +263,6 @@ test_that("annotate_masses handles empty features table", {
 
 test_that("annotate_masses handles features without RT column", {
   # Setup temporary test environment
-  withr::local_tempdir()
   paths <- local_test_project()
 
   # Create directories
@@ -337,7 +335,6 @@ test_that("annotate_masses handles features without RT column", {
 
 test_that("annotate_masses handles no valid monocharged adducts", {
   # Setup temporary test environment
-  withr::local_tempdir()
   paths <- local_test_project()
 
   # Create directories
@@ -408,7 +405,8 @@ test_that("annotate_masses handles no valid monocharged adducts", {
 
 test_that("annotate_masses produces expected output structure", {
   # Setup temporary test environment
-  withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   # Create realistic features
   features_file <- file.path(tempdir(), "features.tsv")
@@ -533,7 +531,8 @@ test_that("annotate_masses produces expected output structure", {
 
 test_that("annotate_masses respects tolerance_ppm correctly", {
   # Setup temporary test environment
-  withr::local_tempdir()
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
 
   # Create features with known m/z values
   features_file <- file.path(tempdir(), "features.tsv")

@@ -3,14 +3,14 @@
 library(testthat)
 
 test_that("parse_yaml_params errors if default file missing", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   expect_error(parse_yaml_params(def = "missing.yaml", usr = NULL), "not found")
 })
 
 test_that("parse_yaml_params loads default YAML", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   writeLines("a: 1", "def.yaml")
   params <- parse_yaml_params(def = "def.yaml", usr = NULL)
   expect_type(params, "list")
@@ -18,8 +18,8 @@ test_that("parse_yaml_params loads default YAML", {
 })
 
 test_that("parse_yaml_params merges user YAML overriding defaults", {
-  tmp <- withr::local_tempdir()
-  withr::local_dir(tmp)
+  tmp <- withr::local_tempdir(.local_envir = parent.frame())
+  withr::local_dir(tmp, .local_envir = parent.frame())
   writeLines("a: 1\nb: 2", "def.yaml")
   writeLines("b: 3\nc: 4", "usr.yaml")
   params <- parse_yaml_params(def = "def.yaml", usr = "usr.yaml")
