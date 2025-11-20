@@ -74,7 +74,7 @@ test_that("dist_get works with larger matrices", {
   # Create 5x5 distance matrix
   set.seed(123)
   x <- matrix(runif(25), nrow = 5)
-  x <- (x + t(x)) / 2  # Make symmetric
+  x <- (x + t(x)) / 2 # Make symmetric
   diag(x) <- 0
   d <- as.dist(x)
 
@@ -218,4 +218,3 @@ test_that("dist_groups includes group information", {
   expect_s3_class(result$Group1, "factor")
   expect_s3_class(result$Group2, "factor")
 })
-
