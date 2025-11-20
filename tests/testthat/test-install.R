@@ -143,9 +143,6 @@ test_that("test-install respects dependencies parameter", {
 ## install integration ----
 
 test_that("test-install completes full workflow in test mode", {
-  skip_on_cran()
-  skip("Long-running integration test")
-
   # Test mode should complete without errors but not actually install
   expect_no_error(
     install(
@@ -157,15 +154,12 @@ test_that("test-install completes full workflow in test mode", {
 })
 
 test_that("test-install is idempotent", {
-  skip_on_cran()
-  skip("Long-running integration test")
-
   # Running install twice should be safe
   # First run
-  # install(package = "tima", test = TRUE)
+  install(package = "tima", test = TRUE)
 
   # Second run should not error
-  # expect_no_error(install(package = "tima", test = TRUE))
+  expect_no_error(install(package = "tima", test = TRUE))
 })
 
 ## install error handling ----
