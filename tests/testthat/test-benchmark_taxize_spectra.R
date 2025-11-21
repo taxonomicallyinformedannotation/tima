@@ -149,7 +149,7 @@ test_that("test-benchmark_taxize_spectra handles features without organisms", {
 
 test_that("test-benchmark_taxize_spectra basic successful run with helpers", {
   fx <- create_bench_full_set(
-    dir = tmp,
+    dir = tempdir(),
     feature_ids = c("F1", "F2"),
     inchikey_layers = c("AAAAAAAAAAAAAA", "BBBBBBBBBBBBBB"),
     structure_inchikeys = c("AAAAAAAAAAAAAA-XXXX-XX", "CCCCCCCCCCCCCC-YYYY-YY"),
@@ -169,7 +169,7 @@ test_that("test-benchmark_taxize_spectra basic successful run with helpers", {
 
 test_that("test-benchmark_taxize_spectra handles missing taxonomy levels gracefully", {
   fx <- create_bench_full_set(
-    dir = tmp,
+    dir = tempdir(),
     feature_ids = c("F1"),
     inchikey_layers = c("AAAAAAAAAAAAAA"),
     structure_inchikeys = c("AAAAAAAAAAAAAA-ZZZ-ZZ"),
@@ -191,13 +191,13 @@ test_that("test-benchmark_taxize_spectra samples one organism per feature when m
   # Same feature mapped to two organisms via duplicated inchikey connectivity layer
   feature_ids <- c("F1", "F2")
   inchikey_layers <- c("AAAAAAAAAAAAAA", "CCCCCCCCCCCCCC")
-  features_path <- create_bench_features(tmp, feature_ids, inchikey_layers)
+  features_path <- create_bench_features(tempdir(), feature_ids, inchikey_layers)
   keys_path <- create_bench_keys(
-    tmp,
+    dir = tempdir(),
     structure_inchikeys = c("AAAAAAAAAAAAAA-AAAA-AA", "AAAAAAAAAAAAAA-BBBB-BB"),
     organisms = c("OrgA", "OrgB")
   )
-  tax_path <- create_bench_taxonomy(tmp, organisms = c("OrgA", "OrgB"))
+  tax_path <- create_bench_taxonomy(tempdir(), organisms = c("OrgA", "OrgB"))
   output <- file.path("out.tsv")
   res <- benchmark_taxize_spectra(
     input = features_path,
@@ -212,7 +212,7 @@ test_that("test-benchmark_taxize_spectra samples one organism per feature when m
 
 test_that("test-benchmark_taxize_spectra retains features without organism match", {
   fx <- create_bench_full_set(
-    dir = tmp,
+    dir = tempdir(),
     feature_ids = c("F1", "F2"),
     inchikey_layers = c("AAAAAAAAAAAAAA", "BBBBBBBBBBBBBB"),
     structure_inchikeys = c("AAAAAAAAAAAAAA-ZZZ-ZZ"),
@@ -239,7 +239,7 @@ test_that("test-benchmark_taxize_spectra retains features without organism match
 
 test_that("test-benchmark_taxize_spectra supports repeated taxonomy entries", {
   fx <- create_bench_full_set(
-    dir = tmp,
+    dir = tempdir(),
     feature_ids = c("F1"),
     inchikey_layers = c("AAAAAAAAAAAAAA"),
     structure_inchikeys = c("AAAAAAAAAAAAAA-AAAA-AA", "AAAAAAAAAAAAAA-BBBB-BB"),
