@@ -178,7 +178,8 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
       .keep_all = TRUE
     ) |>
     tidytable::filter(
-      abs(candidate_structure_error_rt) <= abs(tolerance_rt) |
+      abs(candidate_structure_error_rt) <=
+        abs(tolerance_rt) + .Machine$double.eps |
         is.na(candidate_structure_error_rt)
     ) |>
     tidytable::select(-tidyselect::any_of(x = c("rt_target", "type")))
