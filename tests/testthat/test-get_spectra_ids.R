@@ -10,7 +10,7 @@ test_that("get_spectra_ids extracts IDs from SLAW_ID field", {
     msLevel = rep(2L, 3)
   )
 
-  spectra <- Spectra::Spectra(sp_data)
+  spectra <- Spectra::Spectra(object = sp_data)
 
   ids <- get_spectra_ids(spectra)
 
@@ -25,7 +25,7 @@ test_that("get_spectra_ids extracts IDs from FEATURE_ID field", {
     msLevel = rep(2L, 3)
   )
 
-  spectra <- Spectra::Spectra(sp_data)
+  spectra <- Spectra::Spectra(object = sp_data)
 
   ids <- get_spectra_ids(spectra)
 
@@ -40,7 +40,7 @@ test_that("get_spectra_ids extracts IDs from acquisitionNum field", {
     msLevel = rep(2L, 3)
   )
 
-  spectra <- Spectra::Spectra(sp_data)
+  spectra <- Spectra::Spectra(object = sp_data)
 
   ids <- get_spectra_ids(spectra)
 
@@ -55,7 +55,7 @@ test_that("get_spectra_ids extracts IDs from spectrum_id field", {
     msLevel = rep(2L, 3)
   )
 
-  spectra <- Spectra::Spectra(sp_data)
+  spectra <- Spectra::Spectra(object = sp_data)
 
   ids <- get_spectra_ids(spectra)
 
@@ -72,7 +72,7 @@ test_that("get_spectra_ids prioritizes SLAW_ID over other fields", {
     msLevel = rep(2L, 2)
   )
 
-  spectra <- Spectra::Spectra(sp_data)
+  spectra <- Spectra::Spectra(object = sp_data)
 
   ids <- get_spectra_ids(spectra)
 
@@ -87,7 +87,7 @@ test_that("get_spectra_ids returns NULL when no ID field found", {
     msLevel = rep(2L, 3)
   )
 
-  spectra <- Spectra::Spectra(sp_data)
+  spectra <- Spectra::Spectra(object = sp_data)
 
   ids <- get_spectra_ids(spectra)
 

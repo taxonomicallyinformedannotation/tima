@@ -37,10 +37,10 @@ test_that("complement_metadata_structures validates single character path inputs
     structure_inchikey_connectivity_layer = "INKY",
     structure_smiles_no_stereo = "CC"
   )
-  tidytable::fwrite(minimal, file = "st.tsv")
-  tidytable::fwrite(minimal, file = "met.tsv")
-  tidytable::fwrite(minimal, file = "nam.tsv")
-  tidytable::fwrite(minimal, file = "cla.tsv")
+  tidytable::fwrite(x = minimal, file = "st.tsv")
+  tidytable::fwrite(x = minimal, file = "met.tsv")
+  tidytable::fwrite(x = minimal, file = "nam.tsv")
+  tidytable::fwrite(x = minimal, file = "cla.tsv")
   tidytable::fwrite(
     tidytable::tidytable(structure_smiles_no_stereo = "CC"),
     file = "npc.tsv"
@@ -68,7 +68,7 @@ test_that("complement_metadata_structures collapses multiple names with separato
     structure_inchikey_connectivity_layer = "INK1",
     structure_smiles_no_stereo = "C"
   )
-  tidytable::fwrite(stereo, file = "stereo.tsv")
+  tidytable::fwrite(x = stereo, file = "stereo.tsv")
   met <- tidytable::tidytable(
     structure_inchikey_connectivity_layer = "INK1",
     structure_smiles_no_stereo = "C",
@@ -76,13 +76,13 @@ test_that("complement_metadata_structures collapses multiple names with separato
     structure_xlogp = "1",
     structure_molecular_formula = "C"
   )
-  tidytable::fwrite(met, file = "met.tsv")
+  tidytable::fwrite(x = met, file = "met.tsv")
   nam <- tidytable::tidytable(
     structure_inchikey_connectivity_layer = c("INK1", "INK1"),
     structure_smiles_no_stereo = c("C", "C"),
     structure_name = c("Name1", "Name2")
   )
-  tidytable::fwrite(nam, file = "nam.tsv")
+  tidytable::fwrite(x = nam, file = "nam.tsv")
   cla <- tidytable::tidytable(
     structure_inchikey_connectivity_layer = "INK1",
     structure_smiles_no_stereo = "C",
@@ -92,14 +92,14 @@ test_that("complement_metadata_structures collapses multiple names with separato
     structure_tax_cla_03cla = "Cla",
     structure_tax_cla_04dirpar = "Par"
   )
-  tidytable::fwrite(cla, file = "cla.tsv")
+  tidytable::fwrite(x = cla, file = "cla.tsv")
   npc <- tidytable::tidytable(
     structure_smiles_no_stereo = "C",
     structure_tax_npc_01pat = "Pat",
     structure_tax_npc_02sup = "NSup",
     structure_tax_npc_03cla = "NCla"
   )
-  tidytable::fwrite(npc, file = "npc.tsv")
+  tidytable::fwrite(x = npc, file = "npc.tsv")
   result <- complement_metadata_structures(
     df,
     str_stereo = "stereo.tsv",
@@ -169,14 +169,14 @@ test_that("complement_metadata_structures errors when required columns missing",
   )
   # Stereo missing structure_smiles_no_stereo column
   stereo <- tidytable::tidytable(structure_inchikey_connectivity_layer = "INK3")
-  tidytable::fwrite(stereo, file = "stereo.tsv")
+  tidytable::fwrite(x = stereo, file = "stereo.tsv")
   minimal <- tidytable::tidytable(
     structure_inchikey_connectivity_layer = "INK3",
     structure_smiles_no_stereo = "O"
   )
-  tidytable::fwrite(minimal, file = "met.tsv")
-  tidytable::fwrite(minimal, file = "nam.tsv")
-  tidytable::fwrite(minimal, file = "cla.tsv")
+  tidytable::fwrite(x = minimal, file = "met.tsv")
+  tidytable::fwrite(x = minimal, file = "nam.tsv")
+  tidytable::fwrite(x = minimal, file = "cla.tsv")
   tidytable::fwrite(
     tidytable::tidytable(structure_smiles_no_stereo = "O"),
     file = "npc.tsv"

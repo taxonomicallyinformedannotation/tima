@@ -84,7 +84,7 @@ test_that("test-prepare_libraries_sop_hmdb uses existing output when valid", {
     organism_name = rep("Homo sapiens", 10000),
     reference_doi = rep("10.1093/nar/gkx1089", 10000)
   )
-  tidytable::fwrite(mock_data, output_file, sep = "\t")
+  tidytable::fwrite(x = mock_data, file = output_file, sep = "\t")
 
   initial_size <- file.size(output_file)
 
@@ -290,7 +290,7 @@ test_that("test-prepare_libraries_sop_hmdb handles multiple compounds in SDF", {
   writeLines(sdf_content, sdf_file)
 
   zip_file <- file.path("test_hmdb_multi.zip")
-  withr::with_dir(dirname(zip_file), {
+  withr::with_dir(new = dirname(zip_file), code = {
     utils::zip(zipfile = basename(zip_file), files = basename(sdf_file))
   })
 
@@ -341,7 +341,7 @@ test_that("test-prepare_libraries_sop_hmdb sets correct organism taxonomy", {
   writeLines(sdf_content, sdf_file)
 
   zip_file <- file.path("test_taxonomy.zip")
-  withr::with_dir(dirname(zip_file), {
+  withr::with_dir(new = dirname(zip_file), code = {
     utils::zip(zipfile = basename(zip_file), files = basename(sdf_file))
   })
 

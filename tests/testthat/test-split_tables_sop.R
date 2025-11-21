@@ -13,7 +13,7 @@ create_processed_sop_table <- function(n = 2) {
       n,
       seed = 42
     )[1:n] |>
-      stringi::stri_sub(1, 14),
+      stringi::stri_sub(from = 1, to = 14),
     structure_inchikey = generate_fake_inchikey(n, seed = 42),
     structure_smiles = c("CCO", "CCC")[1:n],
     structure_smiles_no_stereo = c("CCO", "CCC")[1:n],
@@ -127,15 +127,17 @@ test_that("split_tables_sop splits table into components", {
       table |>
         tidytable::select(
           structure_smiles_initial,
-          tidyselect::any_of(c(
-            "structure_inchikey",
-            "structure_inchikey_connectivity_layer",
-            "structure_smiles",
-            "structure_smiles_no_stereo",
-            "structure_molecular_formula",
-            "structure_exact_mass",
-            "structure_xlogp"
-          ))
+          tidyselect::any_of(
+            x = c(
+              "structure_inchikey",
+              "structure_inchikey_connectivity_layer",
+              "structure_smiles",
+              "structure_smiles_no_stereo",
+              "structure_molecular_formula",
+              "structure_exact_mass",
+              "structure_xlogp"
+            )
+          )
         ) |>
         tidytable::distinct()
     },
@@ -213,15 +215,17 @@ test_that("split_tables_sop handles missing SMILES gracefully", {
       table |>
         tidytable::select(
           structure_smiles_initial,
-          tidyselect::any_of(c(
-            "structure_inchikey",
-            "structure_inchikey_connectivity_layer",
-            "structure_smiles",
-            "structure_smiles_no_stereo",
-            "structure_molecular_formula",
-            "structure_exact_mass",
-            "structure_xlogp"
-          ))
+          tidyselect::any_of(
+            x = c(
+              "structure_inchikey",
+              "structure_inchikey_connectivity_layer",
+              "structure_smiles",
+              "structure_smiles_no_stereo",
+              "structure_molecular_formula",
+              "structure_exact_mass",
+              "structure_xlogp"
+            )
+          )
         )
     },
     {
@@ -273,15 +277,17 @@ test_that("split_tables_sop preserves unique organisms", {
       table |>
         tidytable::select(
           structure_smiles_initial,
-          tidyselect::any_of(c(
-            "structure_inchikey",
-            "structure_inchikey_connectivity_layer",
-            "structure_smiles",
-            "structure_smiles_no_stereo",
-            "structure_molecular_formula",
-            "structure_exact_mass",
-            "structure_xlogp"
-          ))
+          tidyselect::any_of(
+            x = c(
+              "structure_inchikey",
+              "structure_inchikey_connectivity_layer",
+              "structure_smiles",
+              "structure_smiles_no_stereo",
+              "structure_molecular_formula",
+              "structure_exact_mass",
+              "structure_xlogp"
+            )
+          )
         )
     },
     {

@@ -303,8 +303,8 @@ test_that("load_annotation_tables loads and combines files", {
     candidate_score_similarity = c("0.6", "0.5")
   )
 
-  tidytable::fwrite(ann1, "ann1.tsv", sep = "\t")
-  tidytable::fwrite(ann2, "ann2.tsv", sep = "\t")
+  tidytable::fwrite(x = ann1, file = "ann1.tsv", sep = "\t")
+  tidytable::fwrite(x = ann2, file = "ann2.tsv", sep = "\t")
 
   result <- load_annotation_tables(
     c("ann1.tsv", "ann2.tsv"),
@@ -322,7 +322,7 @@ test_that("load_annotation_tables filters MS1 only when requested", {
     candidate_score_sirius_csi = c(NA, NA, "0.7")
   )
 
-  tidytable::fwrite(ann, "ann.tsv", sep = "\t")
+  tidytable::fwrite(x = ann, file = "ann.tsv", sep = "\t")
 
   result <- load_annotation_tables("ann.tsv", ms1_only = TRUE)
 
@@ -340,14 +340,15 @@ test_that("load_edges_table loads and filters top neighbors", {
     candidate_score_similarity = c("0.9", "0.8", "0.7", "0.6", "0.5")
   )
 
-  tidytable::fwrite(edges, "edges.tsv", sep = "\t")
+  tidytable::fwrite(x = edges, file = "edges.tsv", sep = "\t")
 
   result <- load_edges_table("edges.tsv", candidates_neighbors = 2)
 
   # Should keep top 2 neighbors per source feature
   expect_equal(nrow(result), 4)
 
-  f1_edges <- result |> tidytable::filter(feature_source == "F1")
+  f1_edges <- result |>
+    tidytable::filter(feature_source == "F1")
   expect_equal(nrow(f1_edges), 2)
   expect_true(all(f1_edges$feature_target %in% c("F2", "F3")))
 })
@@ -523,7 +524,7 @@ test_that("load_annotation_tables returns all columns as character", {
     count = c("5", "10")
   )
 
-  tidytable::fwrite(ann, "ann.tsv", sep = "\t")
+  tidytable::fwrite(x = ann, file = "ann.tsv", sep = "\t")
 
   result <- load_annotation_tables("ann.tsv", ms1_only = FALSE)
 
@@ -539,7 +540,7 @@ test_that("load_edges_table handles single neighbor request", {
     candidate_score_similarity = c("0.9", "0.8", "0.7")
   )
 
-  tidytable::fwrite(edges, "edges.tsv", sep = "\t")
+  tidytable::fwrite(x = edges, file = "edges.tsv", sep = "\t")
 
   result <- load_edges_table("edges.tsv", candidates_neighbors = 1)
 
@@ -554,7 +555,7 @@ test_that("load_edges_table handles ties in similarity scores", {
     candidate_score_similarity = c("0.9", "0.9", "0.7")
   )
 
-  tidytable::fwrite(edges, "edges.tsv", sep = "\t")
+  tidytable::fwrite(x = edges, file = "edges.tsv", sep = "\t")
 
   result <- load_edges_table("edges.tsv", candidates_neighbors = 2)
 
@@ -569,7 +570,7 @@ test_that("load_edges_table handles empty file", {
     candidate_score_similarity = character()
   )
 
-  tidytable::fwrite(edges, "edges.tsv", sep = "\t")
+  tidytable::fwrite(x = edges, file = "edges.tsv", sep = "\t")
 
   result <- load_edges_table("edges.tsv", candidates_neighbors = 5)
 
@@ -593,7 +594,7 @@ test_that("load_annotation_tables handles single file", {
     candidate_score_similarity = c("0.8")
   )
 
-  tidytable::fwrite(ann, "ann.tsv", sep = "\t")
+  tidytable::fwrite(x = ann, file = "ann.tsv", sep = "\t")
 
   result <- load_annotation_tables("ann.tsv", ms1_only = FALSE)
 
@@ -607,7 +608,7 @@ test_that("load_edges_table handles features with fewer neighbors than requested
     candidate_score_similarity = c("0.9")
   )
 
-  tidytable::fwrite(edges, "edges.tsv", sep = "\t")
+  tidytable::fwrite(x = edges, file = "edges.tsv", sep = "\t")
 
   # Request 5 neighbors but only 1 available
   result <- load_edges_table("edges.tsv", candidates_neighbors = 5)

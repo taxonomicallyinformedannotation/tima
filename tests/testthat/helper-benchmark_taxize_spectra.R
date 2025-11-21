@@ -67,7 +67,7 @@ create_bench_taxonomy <- function(dir, organisms, with_missing = FALSE) {
       organism_taxonomy_10varietas = NA_character_
     )
   }
-  tidytable::fwrite(tax, path, sep = "\t")
+  tidytable::fwrite(x = tax, file = path, sep = "\t")
   path
 }
 

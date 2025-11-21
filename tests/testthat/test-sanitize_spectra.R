@@ -8,7 +8,7 @@ make_spectra <- function() {
     mz = I(list(c(100, 150, 200), c(110, 160, 210))),
     intensity = I(list(c(10, 200, 500), c(5, 180, 450)))
   )
-  Spectra::Spectra(df)
+  Spectra::Spectra(object = df)
 }
 
 test_that("sanitize_spectra validates input type", {
@@ -16,7 +16,7 @@ test_that("sanitize_spectra validates input type", {
 })
 
 test_that("sanitize_spectra handles empty object", {
-  empty <- Spectra::Spectra(data.frame())
+  empty <- Spectra::Spectra(object = data.frame())
   res <- sanitize_spectra(empty)
   expect_s4_class(res, "Spectra")
   expect_equal(length(res), 0L)
