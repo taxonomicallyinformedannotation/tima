@@ -278,11 +278,13 @@ test_that("load_annotation_tables loads and combines files", {
     candidate_score_similarity = c("0.6", "0.5")
   )
 
-  tidytable::fwrite(x = ann1, file = "ann1.tsv", sep = "\t")
-  tidytable::fwrite(x = ann2, file = "ann2.tsv", sep = "\t")
+  ann1_file <- temp_test_path("ann1.tsv")
+  ann2_file <- temp_test_path("ann2.tsv")
+  tidytable::fwrite(x = ann1, file = ann1_file, sep = "\t")
+  tidytable::fwrite(x = ann2, file = ann2_file, sep = "\t")
 
   result <- load_annotation_tables(
-    c("ann1.tsv", "ann2.tsv"),
+    c(ann1_file, ann2_file),
     ms1_only = FALSE
   )
 
@@ -297,9 +299,10 @@ test_that("load_annotation_tables filters MS1 only when requested", {
     candidate_score_sirius_csi = c(NA, NA, "0.7")
   )
 
-  tidytable::fwrite(x = ann, file = "ann.tsv", sep = "\t")
+  ann_file <- temp_test_path("ann.tsv")
+  tidytable::fwrite(x = ann, file = ann_file, sep = "\t")
 
-  result <- load_annotation_tables("ann.tsv", ms1_only = TRUE)
+  result <- load_annotation_tables(ann_file, ms1_only = TRUE)
 
   # Should keep only F1 (both scores are NA)
   expect_equal(nrow(result), 1)
@@ -315,9 +318,10 @@ test_that("load_edges_table loads and filters top neighbors", {
     candidate_score_similarity = c("0.9", "0.8", "0.7", "0.6", "0.5")
   )
 
-  tidytable::fwrite(x = edges, file = "edges.tsv", sep = "\t")
+  edges_file <- temp_test_path("edges.tsv")
+  tidytable::fwrite(x = edges, file = edges_file, sep = "\t")
 
-  result <- load_edges_table("edges.tsv", candidates_neighbors = 2)
+  result <- load_edges_table(edges_file, candidates_neighbors = 2)
 
   # Should keep top 2 neighbors per source feature
   expect_equal(nrow(result), 4)
@@ -680,32 +684,16 @@ test_that("test-validate_weight_annotations_inputs accepts boundary score values
 })
 
 test_that("test-validate_weight_annotations_inputs handles multiple annotation files", {
-  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create(
-    "data/interim/libraries/sop/merged",
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
-
-  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
-  writeLines("", "data/interim/features/components.tsv")
-  writeLines("", "data/interim/features/edges.tsv")
-  writeLines("", "data/interim/metadata/taxa.tsv")
-  writeLines("", "data/interim/annotations/ann1.tsv")
-  writeLines("", "data/interim/annotations/ann2.tsv")
+  # Create test files using helper
+  files <- wa_create_minimal_files()
 
   expect_silent(
     validate_weight_annotations_inputs(
-      library = "data/interim/libraries/sop/merged/keys.tsv",
-      components = "data/interim/features/components.tsv",
-      edges = "data/interim/features/edges.tsv",
-      taxa = "data/interim/metadata/taxa.tsv",
-      annotations = c(
-        "data/interim/annotations/ann1.tsv",
-        "data/interim/annotations/ann2.tsv"
-      ),
+      library = files$library,
+      components = files$components,
+      edges = files$edges,
+      taxa = files$taxa,
+      annotations = c(files$ann, files$ann2),
       minimal_ms1_condition = "OR",
       weight_spectral = 0.33,
       weight_chemical = 0.33,
@@ -726,31 +714,16 @@ test_that("test-validate_weight_annotations_inputs handles multiple annotation f
 })
 
 test_that("test-validate_weight_annotations_inputs rejects when one annotation file missing", {
-  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create(
-    "data/interim/libraries/sop/merged",
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
-
-  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
-  writeLines("", "data/interim/features/components.tsv")
-  writeLines("", "data/interim/features/edges.tsv")
-  writeLines("", "data/interim/metadata/taxa.tsv")
-  writeLines("", "data/interim/annotations/ann1.tsv")
+  # Create test files using helper
+  files <- wa_create_minimal_files()
 
   expect_error(
     validate_weight_annotations_inputs(
-      library = "data/interim/libraries/sop/merged/keys.tsv",
-      components = "data/interim/features/components.tsv",
-      edges = "data/interim/features/edges.tsv",
-      taxa = "data/interim/metadata/taxa.tsv",
-      annotations = c(
-        "data/interim/annotations/ann1.tsv",
-        "data/interim/annotations/missing.tsv"
-      ),
+      library = files$library,
+      components = files$components,
+      edges = files$edges,
+      taxa = files$taxa,
+      annotations = c(files$ann, temp_test_path("missing.tsv")),
       minimal_ms1_condition = "OR",
       weight_spectral = 0.33,
       weight_chemical = 0.33,
@@ -772,33 +745,21 @@ test_that("test-validate_weight_annotations_inputs rejects when one annotation f
 })
 
 test_that("test-validate_weight_annotations_inputs handles optional files gracefully", {
-  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create(
-    "data/interim/libraries/sop/merged",
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
-
-  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
-  writeLines("", "data/interim/features/components.tsv")
-  writeLines("", "data/interim/features/edges.tsv")
-  writeLines("", "data/interim/metadata/taxa.tsv")
-  writeLines("", "data/interim/annotations/ann.tsv")
+  # Create test files using helper
+  files <- wa_create_minimal_files()
 
   # Should warn for missing optional files but not error
   expect_no_error(
     validate_weight_annotations_inputs(
-      library = "data/interim/libraries/sop/merged/keys.tsv",
-      components = "data/interim/features/components.tsv",
-      edges = "data/interim/features/edges.tsv",
-      taxa = "data/interim/metadata/taxa.tsv",
-      annotations = "data/interim/annotations/ann.tsv",
-      str_stereo = "nonexistent.tsv",
-      org_tax_ott = "nonexistent2.tsv",
-      canopus = "nonexistent3.tsv",
-      formula = "nonexistent4.tsv",
+      library = files$library,
+      components = files$components,
+      edges = files$edges,
+      taxa = files$taxa,
+      annotations = files$ann,
+      str_stereo = temp_test_path("nonexistent.tsv"),
+      org_tax_ott = temp_test_path("nonexistent2.tsv"),
+      canopus = temp_test_path("nonexistent3.tsv"),
+      formula = temp_test_path("nonexistent4.tsv"),
       minimal_ms1_condition = "OR",
       weight_spectral = 0.33,
       weight_chemical = 0.33,
@@ -819,20 +780,8 @@ test_that("test-validate_weight_annotations_inputs handles optional files gracef
 })
 
 test_that("test-validate_weight_annotations_inputs rejects invalid logical parameters", {
-  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create(
-    "data/interim/libraries/sop/merged",
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
-
-  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
-  writeLines("", "data/interim/features/components.tsv")
-  writeLines("", "data/interim/features/edges.tsv")
-  writeLines("", "data/interim/metadata/taxa.tsv")
-  writeLines("", "data/interim/annotations/ann.tsv")
+  # Create test files using helper
+  files <- wa_create_minimal_files()
 
   expect_error(
     validate_weight_annotations_inputs(
