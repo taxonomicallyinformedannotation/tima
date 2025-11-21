@@ -19,14 +19,14 @@ test_that("export_output validates data frame", {
 })
 
 test_that("export_output writes uncompressed file", {
-  file_path <- file.path("out.tsv")
+  file_path <- temp_test_path("out.tsv")
   returned <- export_output(x = data.frame(a = 1, b = "x"), file = file_path)
   expect_equal(returned, file_path)
   expect_true(file.exists(file_path))
 })
 
 test_that("export_output writes compressed file", {
-  file_path <- file.path("out.tsv.gz")
+  file_path <- temp_test_path("out.tsv.gz")
   export_output(x = data.frame(a = 1:3), file = file_path)
   expect_true(file.exists(file_path))
 })

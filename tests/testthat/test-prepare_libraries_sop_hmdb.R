@@ -56,10 +56,10 @@ test_that("test-prepare_libraries_sop_hmdb validates output path", {
 ## Behavior ----
 
 test_that("test-prepare_libraries_sop_hmdb handles missing input file", {
-  output_file <- file.path("hmdb_output.tsv")
+  output_file <- temp_test_path("hmdb_output.tsv")
 
   result <- prepare_libraries_sop_hmdb(
-    input = file.path("nonexistent.zip"),
+    input = temp_test_path("nonexistent.zip"),
     output = output_file
   )
 
@@ -75,7 +75,7 @@ test_that("test-prepare_libraries_sop_hmdb handles missing input file", {
 })
 
 test_that("test-prepare_libraries_sop_hmdb uses existing output when valid", {
-  output_file <- file.path("hmdb_output.tsv")
+  output_file <- temp_test_path("hmdb_output.tsv")
 
   # Create a valid existing output file (> 100000 bytes)
   mock_data <- tidytable::tidytable(
@@ -90,7 +90,7 @@ test_that("test-prepare_libraries_sop_hmdb uses existing output when valid", {
 
   # Run function
   result <- prepare_libraries_sop_hmdb(
-    input = file.path("nonexistent.zip"),
+    input = temp_test_path("nonexistent.zip"),
     output = output_file
   )
 
@@ -100,7 +100,7 @@ test_that("test-prepare_libraries_sop_hmdb uses existing output when valid", {
 })
 
 test_that("test-prepare_libraries_sop_hmdb regenerates small output files", {
-  output_file <- file.path("hmdb_output.tsv")
+  output_file <- temp_test_path("hmdb_output.tsv")
 
   # Create a small existing output file (< 100000 bytes)
   writeLines("header\ndata", output_file)
@@ -110,7 +110,7 @@ test_that("test-prepare_libraries_sop_hmdb regenerates small output files", {
 
   # Run function - should regenerate
   result <- prepare_libraries_sop_hmdb(
-    input = file.path("nonexistent.zip"),
+    input = temp_test_path("nonexistent.zip"),
     output = output_file
   )
 
@@ -154,17 +154,17 @@ test_that("test-prepare_libraries_sop_hmdb parses minimal mock SDF", {
     "$$$$"
   )
 
-  sdf_file <- file.path("test_hmdb.sdf")
+  sdf_file <- temp_test_path("test_hmdb.sdf")
   writeLines(sdf_content, sdf_file)
 
   # Zip it
-  zip_file <- file.path("test_hmdb.zip")
+  zip_file <- temp_test_path("test_hmdb.zip")
   withr::with_dir(
     dirname(zip_file),
     utils::zip(zipfile = basename(zip_file), files = basename(sdf_file))
   )
 
-  output_file <- file.path("hmdb_output.tsv")
+  output_file <- temp_test_path("hmdb_output.tsv")
 
   # Run function
   result <- prepare_libraries_sop_hmdb(
@@ -207,16 +207,16 @@ test_that("test-prepare_libraries_sop_hmdb handles SDF with missing fields", {
     "$$$$"
   )
 
-  sdf_file <- file.path("test_hmdb_incomplete.sdf")
+  sdf_file <- temp_test_path("test_hmdb_incomplete.sdf")
   writeLines(sdf_content, sdf_file)
 
-  zip_file <- file.path("test_hmdb_incomplete.zip")
+  zip_file <- temp_test_path("test_hmdb_incomplete.zip")
   withr::with_dir(
     dirname(zip_file),
     utils::zip(zipfile = basename(zip_file), files = basename(sdf_file))
   )
 
-  output_file <- file.path("hmdb_incomplete_output.tsv")
+  output_file <- temp_test_path("hmdb_incomplete_output.tsv")
 
   result <- prepare_libraries_sop_hmdb(
     input = zip_file,
@@ -286,15 +286,15 @@ test_that("test-prepare_libraries_sop_hmdb handles multiple compounds in SDF", {
     "$$$$"
   )
 
-  sdf_file <- file.path("test_hmdb_multi.sdf")
+  sdf_file <- temp_test_path("test_hmdb_multi.sdf")
   writeLines(sdf_content, sdf_file)
 
-  zip_file <- file.path("test_hmdb_multi.zip")
+  zip_file <- temp_test_path("test_hmdb_multi.zip")
   withr::with_dir(new = dirname(zip_file), code = {
     utils::zip(zipfile = basename(zip_file), files = basename(sdf_file))
   })
 
-  output_file <- file.path("hmdb_multi_output.tsv")
+  output_file <- temp_test_path("hmdb_multi_output.tsv")
 
   result <- prepare_libraries_sop_hmdb(
     input = zip_file,
@@ -337,15 +337,15 @@ test_that("test-prepare_libraries_sop_hmdb sets correct organism taxonomy", {
     "$$$$"
   )
 
-  sdf_file <- file.path("test_taxonomy.sdf")
+  sdf_file <- temp_test_path("test_taxonomy.sdf")
   writeLines(sdf_content, sdf_file)
 
-  zip_file <- file.path("test_taxonomy.zip")
+  zip_file <- temp_test_path("test_taxonomy.zip")
   withr::with_dir(new = dirname(zip_file), code = {
     utils::zip(zipfile = basename(zip_file), files = basename(sdf_file))
   })
 
-  output_file <- file.path("taxonomy_output.tsv")
+  output_file <- temp_test_path("taxonomy_output.tsv")
 
   prepare_libraries_sop_hmdb(
     input = zip_file,
@@ -367,8 +367,8 @@ test_that("test-prepare_libraries_sop_hmdb sets correct organism taxonomy", {
 
 test_that("test-prepare_libraries_sop_hmdb handles errors gracefully and creates empty output", {
   # Use non-existent file path
-  missing_zip <- file.path("does_not_exist.zip")
-  output_file <- file.path("error_output.tsv")
+  missing_zip <- temp_test_path("does_not_exist.zip")
+  output_file <- temp_test_path("error_output.tsv")
 
   # Should handle missing file and create empty output
   result <- prepare_libraries_sop_hmdb(

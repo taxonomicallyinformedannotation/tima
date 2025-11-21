@@ -93,6 +93,69 @@ local_quiet_logging <- function(threshold = "WARN") {
   invisible(NULL)
 }
 
+#' Create a temporary file path for test outputs
+#'
+#' @description
+#' Creates a file path in the test temp directory to avoid polluting
+#' the tests/testthat directory. Files created with this helper are
+#' automatically cleaned up after tests complete.
+#'
+#' @param filename Character. Name of the file (e.g., "output.tsv")
+#' @param subdir Character. Optional subdirectory within temp dir
+#'
+#' @return Character path to temporary file location
+#'
+#' @examples
+#' test_that("writes to temp", {
+#'   output_file <- temp_test_path("output.tsv")
+#'   # Use output_file for writing
+#' })
+temp_test_path <- function(filename, subdir = NULL) {
+  if (!exists(".test_root", envir = .GlobalEnv)) {
+    # Fallback if .test_root not set
+    base_dir <- file.path(tempdir(), sprintf("tima-tests-%s", Sys.getpid()))
+  } else {
+    base_dir <- get(".test_root", envir = .GlobalEnv)
+  }
+
+  dir.create(base_dir, recursive = TRUE, showWarnings = FALSE)
+
+  if (!is.null(subdir)) {
+    full_dir <- file.path(base_dir, subdir)
+    dir.create(full_dir, recursive = TRUE, showWarnings = FALSE)
+    return(file.path(full_dir, filename))
+  }
+
+  file.path(base_dir, filename)
+}
+
+#' Create a temporary directory for test outputs
+#'
+#' @description
+#' Creates a directory in the test temp directory for organizing multiple
+#' test files. Automatically cleaned up after tests complete.
+#'
+#' @param dirname Character. Name of the directory
+#'
+#' @return Character path to temporary directory
+#'
+#' @examples
+#' test_that("creates temp dir", {
+#'   temp_dir <- temp_test_dir("my_test_data")
+#'   # Use temp_dir for creating files
+#' })
+temp_test_dir <- function(dirname) {
+  if (!exists(".test_root", envir = .GlobalEnv)) {
+    base_dir <- file.path(tempdir(), sprintf("tima-tests-%s", Sys.getpid()))
+  } else {
+    base_dir <- get(".test_root", envir = .GlobalEnv)
+  }
+
+  full_path <- file.path(base_dir, dirname)
+  dir.create(full_path, recursive = TRUE, showWarnings = FALSE)
+  full_path
+}
+
 ## Data Fixtures ----
 
 ### Spectral ----

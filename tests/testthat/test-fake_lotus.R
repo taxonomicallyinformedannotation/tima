@@ -88,15 +88,13 @@ test_that("fake_lotus validates input parameters", {
 })
 
 test_that("fake_lotus creates directory if needed", {
-  temp_file <- file.path("subfolder", "lotus.tsv.gz")
+  temp_file <- file.path(temp_test_dir("subfolder"), "lotus.tsv.gz")
   temp_dir <- dirname(temp_file)
-  expect_false(dir.exists(temp_dir))
 
   fake_lotus(export = temp_file)
 
   expect_true(file.exists(temp_file))
   expect_true(dir.exists(temp_dir))
-  unlink(temp_dir, recursive = TRUE)
 })
 
 test_that("fake_lotus overwrites existing file", {

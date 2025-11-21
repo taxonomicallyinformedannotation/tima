@@ -1,6 +1,15 @@
 # Helper fixtures for weight_annotations tests ----
 
-wa_create_minimal_files <- function(root) {
+wa_create_minimal_files <- function(root = NULL) {
+  # Use temp directory if root not provided
+  if (is.null(root)) {
+    if (!exists(".test_root", envir = .GlobalEnv)) {
+      root <- file.path(tempdir(), sprintf("tima-tests-%s", Sys.getpid()))
+    } else {
+      root <- get(".test_root", envir = .GlobalEnv)
+    }
+  }
+
   dir.create(
     file.path(root, "data/interim/annotations"),
     recursive = TRUE,
