@@ -215,6 +215,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | visNetwork | 2.1.4 | Almende B.V. and Contributors and Thieurmel (2025) |
 | withr | 3.0.2 | Hester et al. (2024) |
 | yaml | 2.3.10 | Garbett et al. (2024) |
+| zip | 2.3.3 | (**zip?**) |
 
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">
