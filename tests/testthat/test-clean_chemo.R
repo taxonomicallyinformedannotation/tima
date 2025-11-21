@@ -8,7 +8,10 @@ library(testthat)
 #' @keywords internal
 create_test_annotation_table <- function(n_features = 3, n_per_feature = 5) {
   tidytable::tidytable(
-    feature_id = rep(sprintf("F%03d", seq_len(n_features)), each = n_per_feature),
+    feature_id = rep(
+      sprintf("F%03d", seq_len(n_features)),
+      each = n_per_feature
+    ),
     candidate_structure_inchikey_connectivity_layer = replicate(
       n_features * n_per_feature,
       paste(sample(LETTERS, 14, TRUE), collapse = "")
@@ -22,7 +25,10 @@ create_test_annotation_table <- function(n_features = 3, n_per_feature = 5) {
       rep(NA, n_features * 2)
     ), # Some with MS2
     candidate_score_sirius_csi = NA_real_,
-    candidate_structure_name = paste("Compound", seq_len(n_features * n_per_feature))
+    candidate_structure_name = paste(
+      "Compound",
+      seq_len(n_features * n_per_feature)
+    )
   )
 }
 
@@ -254,7 +260,9 @@ test_that("rank_and_deduplicate removes duplicate structures", {
 
   # Should keep only best scoring instance of "A" and "B"
   expect_equal(nrow(result), 2)
-  expect_true(all(c("A", "B") %in% result$candidate_structure_inchikey_connectivity_layer))
+  expect_true(all(
+    c("A", "B") %in% result$candidate_structure_inchikey_connectivity_layer
+  ))
 })
 
 test_that("apply_percentile_filter keeps top percentile", {
@@ -283,7 +291,10 @@ test_that("count_candidates counts correctly", {
   result <- count_candidates(df_ranked, df_percentile)
 
   expect_equal(nrow(result), 2)
-  expect_true(all(c("feature_id", "candidates_evaluated", "candidates_best") %in% names(result)))
+  expect_true(all(
+    c("feature_id", "candidates_evaluated", "candidates_best") %in%
+      names(result)
+  ))
 
   f1 <- result[result$feature_id == "F1", ]
   expect_equal(f1$candidates_evaluated, 3)
