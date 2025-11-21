@@ -2,7 +2,7 @@
 % Please edit documentation in R/install.R
 \name{install}
 \alias{install}
-\title{Install}
+\title{Install TIMA Package and Dependencies}
 \usage{
 install(
   package = "tima",
@@ -26,13 +26,34 @@ NULL (invisibly). Installs packages and sets up Python environment as
 side effects.
 }
 \description{
-This function installs the TIMA package and its dependencies,
-including setting up a Python virtual environment with RDKit for
-chemical structure processing. It handles different operating systems
-and provides fallback installation methods if needed.
+Installs the TIMA package and its dependencies, including setting
+up a Python virtual environment with RDKit for chemical structure processing.
+This function handles different operating systems and provides fallback
+installation methods if needed.
+}
+\details{
+The installation process:
+\itemize{
+\item Validates all input parameters
+\item Detects the operating system and shows relevant instructions
+\item Checks for Python or installs Miniconda as fallback
+\item Creates a Python virtual environment (tima-env)
+\item Installs RDKit in the virtual environment
+\item Attempts to install the R package from binary
+\item Falls back to source installation if binary fails
+\item Copies the TIMA backbone files
+\item Cleans up any existing targets pipeline
+}
 }
 \examples{
 \dontrun{
+# Standard installation
 install()
+
+# Install with custom repositories
+install(repos = c("https://cloud.r-project.org"))
+
+# Install without dependencies (not recommended)
+install(dependencies = FALSE)
 }
 }

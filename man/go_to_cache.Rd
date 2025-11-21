@@ -2,28 +2,47 @@
 % Please edit documentation in R/go_to_cache.R
 \name{go_to_cache}
 \alias{go_to_cache}
-\title{Go to cache}
+\title{Go to Cache Directory}
 \usage{
 go_to_cache(dir = ".tima")
 }
 \arguments{
 \item{dir}{Character string name of the cache directory (default: ".tima").
-Will be created in the user's home directory.}
+Will be created in the user's home directory. Must be non-empty.}
 }
 \value{
-NULL (invisibly). Changes working directory as side effect.
+Character string path to the cache directory (invisibly).
+Changes working directory as side effect.
 }
 \description{
-This function creates a cache directory in the user's home
-directory (if it doesn't exist) and changes the working directory to it.
-Useful for storing temporary files and intermediate results.
+Creates a cache directory in the user's home directory (if it
+doesn't already exist) and changes the working directory to it. This is
+useful for storing temporary files, intermediate results, and downloaded
+data in a consistent location across sessions.
+}
+\details{
+The function performs the following operations:
+\itemize{
+\item Validates the cache directory name
+\item Constructs the full path in the user's home directory
+\item Creates the directory if it doesn't exist
+\item Changes the working directory to the cache location
+\item Logs all operations for debugging
+}
+
+The cache directory is created with appropriate permissions and will persist
+across R sessions until explicitly deleted.
 }
 \examples{
 \dontrun{
-# Create and navigate to cache directory
+# Create and navigate to default cache directory (~/.tima)
 go_to_cache()
 
 # Use custom cache directory name
-go_to_cache(dir = ".my_cache")
+go_to_cache(dir = ".my_project_cache")
+
+# Store the cache path for reference
+cache_path <- go_to_cache()
+print(cache_path)
 }
 }
