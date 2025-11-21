@@ -2,7 +2,7 @@
 
 library(testthat)
 
-.test_path <- function(name) file.path(tmp, name)
+.test_path <- function(name) file.path(tempdir(), name)
 
 test_that("validate_filter_annotations_inputs accepts valid inputs", {
   features <- .test_path("features.tsv")
