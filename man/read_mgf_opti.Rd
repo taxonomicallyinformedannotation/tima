@@ -7,7 +7,7 @@
 read_mgf_opti(
   f,
   msLevel = 2L,
-  mapping = Spectra::spectraVariableMapping(MsBackendMgf::MsBackendMgf())
+  mapping = Spectra::spectraVariableMapping(object = MsBackendMgf::MsBackendMgf())
 )
 }
 \arguments{
