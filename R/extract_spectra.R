@@ -71,7 +71,7 @@ extract_spectra <- function(object) {
 
   ## Synonyms issue
   # spectra <- spectra |>
-  # tidytable::group_by(c(-tidyselect::any_of("synonym"))) |>
+  # tidytable::group_by(c(-tidyselect::any_of(x="synonym"))) |>
   # tidytable::reframe(tidytable::across(
   # .cols = tidyselect::where(is.list),
   # .fns = as.character

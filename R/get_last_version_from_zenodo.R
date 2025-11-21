@@ -58,7 +58,9 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
   logger::log_debug("Fetching metadata from Zenodo API")
   record_new <- tryCatch(
     {
-      httr2::request(base_url = paste0(base_url, record, "/latest")) |>
+      httr2::request(
+        base_url = paste0(base_url, record, "/latest")
+      ) |>
         httr2::req_perform()
     },
     error = function(e) {

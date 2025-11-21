@@ -69,7 +69,7 @@ round_reals <- function(
   # Only process columns that exist
   df |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::any_of(matching_cols),
+      .cols = tidyselect::any_of(x = matching_cols),
       .fns = ~ round(as.numeric(.x), digits = dig)
     ))
 }

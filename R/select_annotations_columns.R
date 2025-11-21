@@ -63,35 +63,37 @@ select_annotations_columns <- function(
 
   # Select relevant columns
   df <- df |>
-    tidytable::select(tidyselect::any_of(
-      c(
-        "feature_id",
-        model$features_calculated_columns,
-        model$candidates_calculated_columns,
-        model$candidates_sirius_for_columns,
-        model$candidates_sirius_str_columns,
-        model$candidates_spectra_columns,
-        model$candidates_structures_columns
+    tidytable::select(
+      tidyselect::any_of(
+        x = c(
+          "feature_id",
+          model$features_calculated_columns,
+          model$candidates_calculated_columns,
+          model$candidates_sirius_for_columns,
+          model$candidates_sirius_str_columns,
+          model$candidates_spectra_columns,
+          model$candidates_structures_columns
+        )
       )
-    )) |>
+    ) |>
     # Clean various NULL/NA representations
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.character),
-      .fns = ~ tidytable::na_if(.x, "N/A")
+      .cols = tidyselect::where(fn = is.character),
+      .fns = ~ tidytable::na_if(x = .x, y = "N/A")
     )) |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.character),
-      .fns = ~ tidytable::na_if(.x, "null")
+      .cols = tidyselect::where(fn = is.character),
+      .fns = ~ tidytable::na_if(x = .x, y = "null")
     )) |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.character),
-      .fns = ~ tidytable::na_if(.x, "")
+      .cols = tidyselect::where(fn = is.character),
+      .fns = ~ tidytable::na_if(x = .x, y = "")
     )) |>
     # Round numeric values
     round_reals() |>
     # Convert all numeric to character for consistency
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.numeric),
+      .cols = tidyselect::where(fn = is.numeric),
       .fns = as.character
     )) |>
     # Complement with structure metadata

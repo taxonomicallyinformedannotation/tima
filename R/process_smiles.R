@@ -102,7 +102,7 @@ process_smiles <- function(
 
   # Identify SMILES not yet in cache
   table_smiles_to_process <- table_smiles |>
-    tidytable::anti_join(table_processed_1)
+    tidytable::anti_join(y = table_processed_1)
 
   n_to_process <- nrow(table_smiles_to_process)
 
@@ -132,7 +132,10 @@ process_smiles <- function(
   )
 
   # Write SMILES to temporary file
-  tidytable::fwrite(x = table_smiles_to_process, file = input_smi_file)
+  tidytable::fwrite(
+    x = table_smiles_to_process,
+    file = input_smi_file
+  )
 
   # Process SMILES using Python/RDKit
   tryCatch(
@@ -146,7 +149,9 @@ process_smiles <- function(
 
   # Read processed results
   table_processed_2 <- tidytable::fread(output_csv_file) |>
-    tidytable::rename(!!as.name(smiles_colname) := "structure_smiles_initial")
+    tidytable::rename(
+      !!as.name(smiles_colname) := "structure_smiles_initial"
+    )
 
   logger::log_info(
     "Successfully processed ",

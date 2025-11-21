@@ -89,13 +89,16 @@ install <- function(
   setup_virtualenv <- function(envname = "tima-env") {
     python <- check_or_install_python()
 
-    if (!reticulate::virtualenv_exists(envname)) {
+    if (!reticulate::virtualenv_exists(envname = envname)) {
       logger::log_info("Creating Python virtualenv: {envname}")
       # Rescue version for fallback if default Python doesn't work
       rescue_python_version <- "3.13"
       tryCatch(
         expr = {
-          reticulate::virtualenv_create(envname = envname, python = python)
+          reticulate::virtualenv_create(
+            envname = envname,
+            python = python
+          )
         },
         error = function(e) {
           logger::log_error(
@@ -107,7 +110,9 @@ install <- function(
             rescue_python_version,
             ")"
           )
-          python <- reticulate::install_python(version = rescue_python_version)
+          python <- reticulate::install_python(
+            version = rescue_python_version
+          )
           reticulate::virtualenv_create(
             envname = envname,
             python = python

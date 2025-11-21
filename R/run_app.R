@@ -63,7 +63,7 @@ run_app <- function(host = "127.0.0.1", port = 3838, browser = TRUE) {
   }
 
   shiny::runApp(
-    appDir = shiny::shinyAppFile(app_path),
+    appDir = shiny::shinyAppFile(appFile = app_path),
     port = port,
     host = host,
     launch.browser = browser

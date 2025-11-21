@@ -90,7 +90,9 @@
 read_mgf_opti <- function(
   f,
   msLevel = 2L,
-  mapping = Spectra::spectraVariableMapping(MsBackendMgf::MsBackendMgf())
+  mapping = Spectra::spectraVariableMapping(
+    object = MsBackendMgf::MsBackendMgf()
+  )
 ) {
   # Validate inputs
   if (missing(f) || is.null(f) || length(f) == 0L) {
@@ -205,13 +207,13 @@ read_mgf_opti <- function(
     # Check if column name matches any core spectra variable
     col_match <- match(col_names[i], spv_names, nomatch = 0L)
     if (col_match > 0L) {
-      res[[i]] <- methods::as(res[[i]], spv[col_match])
+      res[[i]] <- methods::as(object = res[[i]], Class = spv[col_match])
     }
   }
 
   # Convert to DataFrame and set up peak lists
   # logger::log_trace("Finalizing DataFrame structure")
-  res <- methods::as(res, "DataFrame")
+  res <- methods::as(object = res, Class = "DataFrame")
   res$mz <- IRanges::NumericList(res$mz, compress = FALSE)
   res$dataOrigin <- f
 

@@ -38,7 +38,7 @@ normalize_rt_to_minutes <- function(
 
   decided_unit <- unit
   if (unit == "auto") {
-    q95 <- stats::quantile(rts_non_na, probs = 0.95, na.rm = TRUE, type = 7)
+    q95 <- stats::quantile(x = rts_non_na, probs = 0.95, na.rm = TRUE, type = 7)
     min_val <- min(rts_non_na, na.rm = TRUE)
     max_val <- max(rts_non_na, na.rm = TRUE)
     # Heuristic: treat as seconds if all RT > 2 OR 95th percentile > 45 OR max > 180

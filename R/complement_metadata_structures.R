@@ -72,7 +72,10 @@ complement_metadata_structures <- function(
       candidate_structure_smiles_no_stereo = structure_smiles_no_stereo
     ) |>
     tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
-    tidytable::distinct(candidate_structure_smiles_no_stereo, .keep_all = TRUE)
+    tidytable::distinct(
+      candidate_structure_smiles_no_stereo,
+      .keep_all = TRUE
+    )
 
   stereo_i <- stereo |>
     tidytable::select(
@@ -93,7 +96,7 @@ complement_metadata_structures <- function(
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
-    tidytable::left_join(stereo) |>
+    tidytable::left_join(y = stereo) |>
     tidytable::distinct(
       structure_inchikey_connectivity_layer,
       structure_smiles_no_stereo,
@@ -118,7 +121,7 @@ complement_metadata_structures <- function(
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
-    tidytable::left_join(stereo) |>
+    tidytable::left_join(y = stereo) |>
     tidytable::filter(
       !is.na(structure_inchikey_connectivity_layer) |
         !is.na(structure_smiles_no_stereo)
@@ -175,7 +178,10 @@ complement_metadata_structures <- function(
       candidate_structure_tax_npc_03cla_s = structure_tax_npc_03cla,
     ) |>
     tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
-    tidytable::distinct(candidate_structure_smiles_no_stereo, .keep_all = TRUE)
+    tidytable::distinct(
+      candidate_structure_smiles_no_stereo,
+      .keep_all = TRUE
+    )
   # logger::log_trace("NPClassifier done")
 
   met_i <- met_2d |>
@@ -201,7 +207,10 @@ complement_metadata_structures <- function(
       candidate_structure_xlogp_s = structure_xlogp
     ) |>
     tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
-    tidytable::distinct(candidate_structure_smiles_no_stereo, .keep_all = TRUE)
+    tidytable::distinct(
+      candidate_structure_smiles_no_stereo,
+      .keep_all = TRUE
+    )
   rm(met_2d)
   # logger::log_trace("Metadata done")
 
@@ -224,7 +233,10 @@ complement_metadata_structures <- function(
       candidate_structure_name_s = structure_name
     ) |>
     tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
-    tidytable::distinct(candidate_structure_smiles_no_stereo, .keep_all = TRUE)
+    tidytable::distinct(
+      candidate_structure_smiles_no_stereo,
+      .keep_all = TRUE
+    )
   rm(nam_2d)
   # logger::log_trace("Names done")
 
@@ -263,8 +275,8 @@ complement_metadata_structures <- function(
   ## Always returning preferentially internal values
   ## (smiles > inchikey > external)
   table_final <- df |>
-    tidytable::left_join(stereo_i) |>
-    tidytable::left_join(stereo_s) |>
+    tidytable::left_join(y = stereo_i) |>
+    tidytable::left_join(y = stereo_s) |>
     tidytable::mutate(
       candidate_structure_smiles_no_stereo = tidytable::coalesce(
         candidate_structure_smiles_no_stereo_i,
@@ -279,8 +291,8 @@ complement_metadata_structures <- function(
       -candidate_structure_smiles_no_stereo_i,
       -candidate_structure_inchikey_connectivity_layer_s
     ) |>
-    tidytable::left_join(met_i) |>
-    tidytable::left_join(met_s) |>
+    tidytable::left_join(y = met_i) |>
+    tidytable::left_join(y = met_s) |>
     tidytable::mutate(
       candidate_structure_molecular_formula = tidytable::coalesce(
         candidate_structure_molecular_formula_s,
@@ -306,8 +318,8 @@ complement_metadata_structures <- function(
       -candidate_structure_xlogp_s,
       -candidate_structure_xlogp_i
     ) |>
-    tidytable::left_join(nam_i) |>
-    tidytable::left_join(nam_s) |>
+    tidytable::left_join(y = nam_i) |>
+    tidytable::left_join(y = nam_s) |>
     tidytable::mutate(
       candidate_structure_name = tidytable::coalesce(
         candidate_structure_name_s,
@@ -319,7 +331,7 @@ complement_metadata_structures <- function(
       -candidate_structure_name_s,
       -candidate_structure_name_i
     ) |>
-    tidytable::left_join(tax_npc) |>
+    tidytable::left_join(y = tax_npc) |>
     tidytable::mutate(
       candidate_structure_tax_npc_01pat = tidytable::coalesce(
         candidate_structure_tax_npc_01pat_s,
@@ -339,7 +351,7 @@ complement_metadata_structures <- function(
       -candidate_structure_tax_npc_02sup_s,
       -candidate_structure_tax_npc_03cla_s
     ) |>
-    tidytable::left_join(tax_cla) |>
+    tidytable::left_join(y = tax_cla) |>
     tidytable::mutate(
       candidate_structure_tax_cla_chemontid = tidytable::coalesce(
         candidate_structure_tax_cla_chemontid_i,
@@ -370,8 +382,8 @@ complement_metadata_structures <- function(
       -candidate_structure_tax_cla_04dirpar_i
     ) |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.character),
-      .fns = ~ tidytable::na_if(.x, "")
+      .cols = tidyselect::where(fn = is.character),
+      .fns = ~ tidytable::na_if(x = .x, y = "")
     ))
   rm(
     met_i,

@@ -451,7 +451,7 @@ parse_modification_components <- function(modifications_clean) {
 calculate_modification_masses <- function(elements, signs, multiplicities) {
   mod_masses <- tryCatch(
     {
-      MetaboCoreUtils::calculateMass(elements)
+      MetaboCoreUtils::calculateMass(x = elements)
     },
     error = function(e) {
       logger::log_debug(

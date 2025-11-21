@@ -43,7 +43,7 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     ) |>
     tidytable::pull(Name) |>
     # Take first match (handles structures and denovo sharing names)
-    utils::head(1L)
+    utils::head(n = 1L)
 
   if (length(matching_file) == 0L) {
     stop(
@@ -57,7 +57,7 @@ read_from_sirius_zip <- function(sirius_zip, file) {
   logger::log_debug("Extracting file: {matching_file}")
 
   # Read and parse the file from archive
-  result <- archive::archive_read(sirius_zip, matching_file) |>
+  result <- archive::archive_read(archive = sirius_zip, file = matching_file) |>
     utils::read.delim(
       quote = "",
       na.strings = c("", "NA"),
