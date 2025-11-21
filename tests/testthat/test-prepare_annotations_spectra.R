@@ -23,27 +23,27 @@ make_min_struct_files_spectra <- function(tmp) {
 
   # Use fixtures instead of creating inline
   tidytable::fwrite(
-    load_fixture("spectra_structures_stereo"),
+    load_fixture("structures_stereo"),
     stereo,
     sep = "\t"
   )
   tidytable::fwrite(
-    load_fixture("spectra_structures_metadata"),
+    load_fixture("structures_metadata"),
     met,
     sep = "\t"
   )
   tidytable::fwrite(
-    load_fixture("spectra_structures_names"),
+    load_fixture("structures_names"),
     nam,
     sep = "\t"
   )
   tidytable::fwrite(
-    load_fixture("spectra_structures_taxonomy_cla"),
+    load_fixture("structures_taxonomy_cla"),
     cla,
     sep = "\t"
   )
   tidytable::fwrite(
-    load_fixture("spectra_structures_taxonomy_npc"),
+    load_fixture("structures_taxonomy_npc"),
     npc,
     sep = "\t"
   )

@@ -79,7 +79,6 @@ test_that("prepare_features_components checks file existence", {
 })
 
 test_that("prepare_features_components handles single valid file", {
-
   # Create valid component file
   temp_input <- tempfile(fileext = ".tsv")
   component_data <- data.frame(
@@ -116,7 +115,6 @@ test_that("prepare_features_components handles single valid file", {
 })
 
 test_that("prepare_features_components handles multiple input files", {
-
   # Create multiple component files
   temp_input1 <- tempfile(fileext = ".tsv")
   temp_input2 <- tempfile(fileext = ".tsv")
@@ -168,7 +166,6 @@ test_that("prepare_features_components handles multiple input files", {
 })
 
 test_that("prepare_features_components handles empty input file", {
-
   # Create empty component file
   temp_input <- tempfile(fileext = ".tsv")
   empty_data <- data.frame(
@@ -205,7 +202,6 @@ test_that("prepare_features_components handles empty input file", {
 })
 
 test_that("prepare_features_components removes duplicates", {
-
   # Create component file with duplicates
   temp_input <- tempfile(fileext = ".tsv")
   component_data <- data.frame(
@@ -237,7 +233,6 @@ test_that("prepare_features_components removes duplicates", {
 })
 
 test_that("prepare_features_components handles NA values correctly", {
-
   # Create component file with NA values
   temp_input <- tempfile(fileext = ".tsv")
   writeLines(
@@ -260,7 +255,6 @@ test_that("prepare_features_components handles NA values correctly", {
 })
 
 test_that("prepare_features_components standardizes column names", {
-
   # Create component file with original column names
   temp_input <- tempfile(fileext = ".tsv")
   component_data <- data.frame(

@@ -4,12 +4,18 @@ library(testthat)
 
 test_that("prepare_libraries_sop_closed validates input parameter", {
   expect_error(
-    prepare_libraries_sop_closed(input = NULL, output = temp_test_path("out.tsv")),
+    prepare_libraries_sop_closed(
+      input = NULL,
+      output = temp_test_path("out.tsv")
+    ),
     "input must be a single character string"
   )
 
   expect_error(
-    prepare_libraries_sop_closed(input = 123, output = temp_test_path("out.tsv")),
+    prepare_libraries_sop_closed(
+      input = 123,
+      output = temp_test_path("out.tsv")
+    ),
     "input must be a single character string"
   )
 
@@ -75,7 +81,7 @@ test_that("prepare_libraries_sop_closed handles empty input file", {
 test_that("prepare_libraries_sop_closed processes fixture closed data", {
   temp_input <- file.path(tempfile(), "closed_test.csv")
   file.copy(
-    testthat::test_path("fixtures", "closed_minimal.csv"),
+    testthat::test_path("fixtures", "closed.csv"),
     temp_input,
     overwrite = TRUE
   )
@@ -98,7 +104,7 @@ test_that("prepare_libraries_sop_closed processes fixture closed data", {
 test_that("prepare_libraries_sop_closed extracts 2D InChIKey from fixture", {
   temp_input <- file.path(tempfile(), "closed_inchikey.csv")
   file.copy(
-    testthat::test_path("fixtures", "closed_minimal.csv"),
+    testthat::test_path("fixtures", "closed.csv"),
     temp_input,
     overwrite = TRUE
   )
@@ -118,7 +124,7 @@ test_that("prepare_libraries_sop_closed extracts 2D InChIKey from fixture", {
 test_that("prepare_libraries_sop_closed renames structure_nameTraditional", {
   temp_input <- file.path(tempfile(), "closed_rename.csv")
   file.copy(
-    testthat::test_path("fixtures", "closed_minimal.csv"),
+    testthat::test_path("fixtures", "closed.csv"),
     temp_input,
     overwrite = TRUE
   )
@@ -137,7 +143,7 @@ test_that("prepare_libraries_sop_closed renames structure_nameTraditional", {
 
 # test_that("prepare_libraries_sop_closed removes duplicates from fixture", {
 #   # Create fixture with duplicates
-#   closed_dup <- load_fixture("closed_minimal")
+#   closed_dup <- load_fixture("closed")
 #   closed_dup <- tidytable::bind_rows(closed_dup, closed_dup, closed_dup)
 #
 #   temp_input <- tempfile(fileext = ".csv")
@@ -152,6 +158,6 @@ test_that("prepare_libraries_sop_closed renames structure_nameTraditional", {
 #   df <- tidytable::fread(temp_output)
 #
 #   # Duplicates should be removed
-#   original_rows <- nrow(load_fixture("closed_minimal"))
+#   original_rows <- nrow(load_fixture("closed"))
 #   expect_equal(nrow(df), original_rows)
 # })

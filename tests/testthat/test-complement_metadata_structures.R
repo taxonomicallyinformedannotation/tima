@@ -40,11 +40,19 @@ test_that("complement_metadata_structures validates single character path inputs
   npc_file <- temp_test_path("npc.tsv")
 
   # Copy fixtures to temp location
-  tidytable::fwrite(load_fixture("spectra_structures_stereo"), st_file, sep = "\t")
-  tidytable::fwrite(load_fixture("spectra_structures_metadata"), met_file, sep = "\t")
-  tidytable::fwrite(load_fixture("spectra_structures_names"), nam_file, sep = "\t")
-  tidytable::fwrite(load_fixture("spectra_structures_taxonomy_cla"), cla_file, sep = "\t")
-  tidytable::fwrite(load_fixture("spectra_structures_taxonomy_npc"), npc_file, sep = "\t")
+  tidytable::fwrite(load_fixture("structures_stereo"), st_file, sep = "\t")
+  tidytable::fwrite(load_fixture("structures_metadata"), met_file, sep = "\t")
+  tidytable::fwrite(load_fixture("structures_names"), nam_file, sep = "\t")
+  tidytable::fwrite(
+    load_fixture("structures_taxonomy_cla"),
+    cla_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    load_fixture("structures_taxonomy_npc"),
+    npc_file,
+    sep = "\t"
+  )
 
   # Pass a vector for one path
   expect_error(
@@ -74,11 +82,19 @@ test_that("complement_metadata_structures collapses multiple names with separato
   npc_file <- temp_test_path("npc.tsv")
 
   # Use fixtures
-  tidytable::fwrite(load_fixture("spectra_structures_stereo"), st_file, sep = "\t")
-  tidytable::fwrite(load_fixture("spectra_structures_metadata"), met_file, sep = "\t")
-  tidytable::fwrite(load_fixture("spectra_structures_names"), nam_file, sep = "\t")
-  tidytable::fwrite(load_fixture("spectra_structures_taxonomy_cla"), cla_file, sep = "\t")
-  tidytable::fwrite(load_fixture("spectra_structures_taxonomy_npc"), npc_file, sep = "\t")
+  tidytable::fwrite(load_fixture("structures_stereo"), st_file, sep = "\t")
+  tidytable::fwrite(load_fixture("structures_metadata"), met_file, sep = "\t")
+  tidytable::fwrite(load_fixture("structures_names"), nam_file, sep = "\t")
+  tidytable::fwrite(
+    load_fixture("structures_taxonomy_cla"),
+    cla_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    load_fixture("structures_taxonomy_npc"),
+    npc_file,
+    sep = "\t"
+  )
 
   result <- complement_metadata_structures(
     df,
@@ -160,10 +176,18 @@ test_that("complement_metadata_structures errors when required columns missing",
   tidytable::fwrite(x = stereo, file = st_file, sep = "\t")
 
   # Use fixtures for the others
-  tidytable::fwrite(load_fixture("spectra_structures_metadata"), met_file, sep = "\t")
-  tidytable::fwrite(load_fixture("spectra_structures_names"), nam_file, sep = "\t")
-  tidytable::fwrite(load_fixture("spectra_structures_taxonomy_cla"), cla_file, sep = "\t")
-  tidytable::fwrite(load_fixture("spectra_structures_taxonomy_npc"), npc_file, sep = "\t")
+  tidytable::fwrite(load_fixture("structures_metadata"), met_file, sep = "\t")
+  tidytable::fwrite(load_fixture("structures_names"), nam_file, sep = "\t")
+  tidytable::fwrite(
+    load_fixture("structures_taxonomy_cla"),
+    cla_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    load_fixture("structures_taxonomy_npc"),
+    npc_file,
+    sep = "\t"
+  )
 
   # Expect error due to missing column usage inside joins/select
   expect_error(

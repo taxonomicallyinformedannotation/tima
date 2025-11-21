@@ -452,8 +452,8 @@ expect_required_columns <- function(df, required_cols) {
 #'
 #' @param fixture_name Character. Name of the fixture file (without .csv extension).
 #'   Available: "annotations", "features", "edges", "components", "metadata",
-#'   "names", "stereo", "structure_organism_pairs", "taxonomy_classyfire",
-#'   "taxonomy_npc", "lotus_minimal", "closed_minimal"
+#'   "names", "stereo", "structure_organism_pairs", "structure_taxonomy_cla",
+#'   "structure_taxonomy_npc", "lotus", "closed"
 #' @param cache Logical. Whether to cache loaded fixtures for faster re-loading.
 #'   Default: TRUE
 #'
@@ -462,7 +462,7 @@ expect_required_columns <- function(df, required_cols) {
 #' @examples
 #' annotations <- load_fixture("annotations")
 #' features <- load_fixture("features")
-#' lotus <- load_fixture("lotus_minimal")
+#' lotus <- load_fixture("lotus")
 load_fixture <- function(fixture_name, cache = TRUE) {
   fixture_path <- testthat::test_path("fixtures", paste0(fixture_name, ".csv"))
 
@@ -474,7 +474,7 @@ load_fixture <- function(fixture_name, cache = TRUE) {
       fixture_path,
       "\nAvailable fixtures: annotations, features, edges, components, ",
       "metadata, names, stereo, structure_organism_pairs, ",
-      "taxonomy_classyfire, taxonomy_npc, lotus_minimal, closed_minimal"
+      "taxonomy_classyfire, taxonomy_npc, lotus, closed"
     )
   }
 
@@ -621,8 +621,8 @@ load_all_fixtures <- function() {
     "names",
     "stereo",
     "structure_organism_pairs",
-    "taxonomy_classyfire",
-    "taxonomy_npc"
+    "structure_taxonomy_cla",
+    "structure_taxonomy_npc"
   )
 
   fixtures <- lapply(
@@ -701,7 +701,7 @@ load_fixture_csv <- function(filename) {
 #' @export
 #' @keywords internal
 load_fixture_metadata <- function() {
-  load_fixture_csv("metadata.csv")
+  load_fixture_csv("structures_metadata.csv")
 }
 
 #' Load structure stereochemistry fixture
@@ -710,7 +710,7 @@ load_fixture_metadata <- function() {
 #' @export
 #' @keywords internal
 load_fixture_stereo <- function() {
-  load_fixture_csv("stereo.csv")
+  load_fixture_csv("structures_stereo.csv")
 }
 
 #' Load structure names fixture
@@ -719,7 +719,7 @@ load_fixture_stereo <- function() {
 #' @export
 #' @keywords internal
 load_fixture_names <- function() {
-  load_fixture_csv("names.csv")
+  load_fixture_csv("structures_names.csv")
 }
 
 #' Load Classyfire taxonomy fixture
@@ -737,7 +737,7 @@ load_fixture_taxonomy_classyfire <- function() {
 #' @export
 #' @keywords internal
 load_fixture_taxonomy_npc <- function() {
-  load_fixture_csv("taxonomy_npc.csv")
+  load_fixture_csv("structure_taxonomy_npc.csv")
 }
 
 #' Load features fixture
