@@ -2,35 +2,52 @@
 % Please edit documentation in R/get_last_version_from_zenodo.R
 \name{get_last_version_from_zenodo}
 \alias{get_last_version_from_zenodo}
-\title{Get last version from Zenodo}
+\title{Get Latest Version from Zenodo}
 \usage{
 get_last_version_from_zenodo(doi, pattern, path)
 }
 \arguments{
-\item{doi}{Character string DOI of the Zenodo record (e.g., "10.5281/zenodo.5794106")}
+\item{doi}{Character. Zenodo DOI (e.g., "10.5281/zenodo.5794106")}
 
-\item{pattern}{Character string pattern to identify the specific file to download}
+\item{pattern}{Character. Pattern to identify the specific file to download}
 
-\item{path}{Character string local path where the file should be saved}
+\item{path}{Character. Local path where the file should be saved}
 }
 \value{
-Character string path to the downloaded file
+Character path to the downloaded (or existing) file
 }
 \description{
-This function retrieves the latest version of a file from a
-Zenodo repository record. It checks the file size and only downloads
-if the local file is missing or differs from the remote version.
+Retrieves the latest version of a file from a Zenodo repository record.
+This function checks the file size and only downloads if the local file is missing
+or differs from the remote version. Implements robust error handling and retry logic.
 }
 \details{
 Credit goes partially to https://inbo.github.io/inborutils/
-This function handles the new Zenodo API format and file structure.
+
+This function:
+\itemize{
+\item Validates DOI format and input parameters
+\item Fetches the latest version metadata from Zenodo API
+\item Finds files matching the specified pattern
+\item Compares local and remote file sizes to avoid unnecessary downloads
+\item Downloads only if needed, with retry logic
+\item Creates necessary directories automatically
+}
 }
 \examples{
 \dontrun{
+# Download LOTUS database from Zenodo
 get_last_version_from_zenodo(
   doi = "10.5281/zenodo.5794106",
-  pattern = "frozen.csv.gz",
-  path = "data/frozen.csv.gz"
+  pattern = "lotus.csv.gz",
+  path = "data/source/libraries/sop/lotus.csv.gz"
+)
+
+# The function will skip download if file exists with correct size
+get_last_version_from_zenodo(
+  doi = "10.5281/zenodo.5794106",
+  pattern = "lotus.csv.gz",
+  path = "data/source/libraries/sop/lotus.csv.gz"
 )
 }
 }

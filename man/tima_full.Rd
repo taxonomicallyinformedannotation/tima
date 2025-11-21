@@ -2,22 +2,51 @@
 % Please edit documentation in R/tima_full.R
 \name{tima_full}
 \alias{tima_full}
-\title{Tima Full}
+\title{Run Complete TIMA Workflow}
 \usage{
-tima_full()
+tima_full(
+  target_pattern = "^ann_pre$",
+  log_file = "tima.log",
+  clean_old_logs = TRUE
+)
+}
+\arguments{
+\item{target_pattern}{Character. Regex pattern for target selection.
+Default: "^ann_pre$" (annotation preparation target)}
+
+\item{log_file}{Character. Path to log file. Default: "tima.log"}
+
+\item{clean_old_logs}{Logical. Remove old log file before starting.
+Default: TRUE}
 }
 \value{
-NULL (invisibly). Runs complete workflow as side effect and saves
-timestamped log files.
+Invisible NULL. Executes workflow as side effect and creates
+timestamped log files in data/processed/
 }
 \description{
-This function runs the complete TIMA annotation workflow from
-start to finish, including all preparation, library loading, annotation,
-weighting, and output steps. Executes the full targets pipeline and
-saves logs with timestamps.
+Executes the full Taxonomically Informed Metabolite Annotation (TIMA)
+workflow from start to finish. This includes data preparation, library loading,
+annotation, weighting, and output generation. The function runs the targets
+pipeline and archives logs with timestamps for reproducibility.
+}
+\details{
+The workflow performs the following steps:
+\itemize{
+\item Initializes logging and timing
+\item Navigates to cache directory
+\item Executes the targets pipeline (annotation preparation)
+\item Archives timestamped logs to data/processed/
+}
 }
 \examples{
 \dontrun{
+# Run full workflow with defaults
 tima_full()
+
+# Run with custom target pattern
+tima_full(target_pattern = "^prepare_")
+
+# Preserve existing logs
+tima_full(clean_old_logs = FALSE)
 }
 }
