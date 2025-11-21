@@ -272,7 +272,7 @@ annotate_masses <-
 
     # Filter and prepare structure-organism pairs
     structure_organism_pairs_table <- joined_table |>
-      tidytable::filter(.df = !is.na(structure_exact_mass)) |>
+      tidytable::filter(!is.na(structure_exact_mass)) |>
       tidytable::mutate(tidytable::across(
         .cols = c("structure_exact_mass"),
         .fns = as.numeric
