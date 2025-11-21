@@ -73,7 +73,7 @@ make_min_struct_files_spectra <- function(tmp) {
 
 test_that("test-prepare_annotations_spectra validates input vector and files", {
   s <- make_min_struct_files_spectra(tmp)
-  out <- file.path("spectra.tsv")
+  out <- temp_test_path("spectra.tsv")
   expect_error(
     prepare_annotations_spectra(
       input = 123,
@@ -87,7 +87,7 @@ test_that("test-prepare_annotations_spectra validates input vector and files", {
     "non-empty character"
   )
   expect_error(prepare_annotations_spectra(
-    input = c(file.path("missing.tsv")),
+    input = c(temp_test_path("missing.tsv")),
     output = out,
     str_stereo = s$stereo,
     str_met = s$met,
@@ -98,22 +98,22 @@ test_that("test-prepare_annotations_spectra validates input vector and files", {
 })
 
 test_that("test-prepare_annotations_spectra validates structure files", {
-  ann <- file.path("ann.tsv")
+  ann <- temp_test_path("ann.tsv")
   tidytable::fwrite(
     x = tidytable::tidytable(feature_id = "F1"),
     file = ann,
     sep = "\t"
   )
-  out <- file.path("spectra.tsv")
+  out <- temp_test_path("spectra.tsv")
   expect_error(
     prepare_annotations_spectra(
       input = ann,
       output = out,
-      str_stereo = file.path("missing.tsv"),
-      str_met = file.path("missing.tsv"),
-      str_nam = file.path("missing.tsv"),
-      str_tax_cla = file.path("missing.tsv"),
-      str_tax_npc = file.path("missing.tsv")
+      str_stereo = temp_test_path("missing.tsv"),
+      str_met = temp_test_path("missing.tsv"),
+      str_nam = temp_test_path("missing.tsv"),
+      str_tax_cla = temp_test_path("missing.tsv"),
+      str_tax_npc = temp_test_path("missing.tsv")
     ),
     "Structure file\\(s\\) not found"
   )
@@ -123,7 +123,7 @@ test_that("test-prepare_annotations_spectra validates structure files", {
 
 test_that("test-prepare_annotations_spectra processes minimal formatted input", {
   s <- make_min_struct_files_spectra(tmp)
-  out <- file.path("spectra.tsv")
+  out <- temp_test_path("spectra.tsv")
 
   tbl <- tidytable::tidytable(
     feature_id = c("F1"),
@@ -141,7 +141,7 @@ test_that("test-prepare_annotations_spectra processes minimal formatted input", 
     candidate_score_similarity = c("0.9"),
     candidate_count_similarity_peaks_matched = c("10")
   )
-  ann1 <- file.path("ann1.tsv")
+  ann1 <- temp_test_path("ann1.tsv")
   tidytable::fwrite(x = tbl, file = ann1, sep = "\t")
 
   res <- prepare_annotations_spectra(

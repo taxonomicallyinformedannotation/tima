@@ -7,7 +7,7 @@ test_that("prepare_features_components validates input parameter", {
   expect_error(
     prepare_features_components(
       input = 123,
-      output = "output.tsv"
+      output = temp_test_path("output.tsv")
     ),
     "must be a non-empty character vector"
   )
@@ -16,7 +16,7 @@ test_that("prepare_features_components validates input parameter", {
   expect_error(
     prepare_features_components(
       input = character(0),
-      output = "output.tsv"
+      output = temp_test_path("output.tsv")
     ),
     "must be a non-empty character vector"
   )
@@ -25,7 +25,7 @@ test_that("prepare_features_components validates input parameter", {
   expect_error(
     prepare_features_components(
       input = NULL,
-      output = "output.tsv"
+      output = temp_test_path("output.tsv")
     ),
     "must be a non-empty character vector"
   )
@@ -33,7 +33,7 @@ test_that("prepare_features_components validates input parameter", {
 
 test_that("prepare_features_components validates output parameter", {
   # Create temp file for testing
-  temp_input <- tempfile(fileext = ".tsv")
+  temp_input <- temp_test_path("input.tsv")
   writeLines("cluster index\tcomponentindex\n1\t1", temp_input)
 
   # Test non-character output
@@ -53,33 +53,29 @@ test_that("prepare_features_components validates output parameter", {
     ),
     "must be a single character string"
   )
-
-  unlink(temp_input)
 })
 
 test_that("prepare_features_components checks file existence", {
   # Test non-existent file
   expect_error(
     prepare_features_components(
-      input = "nonexistent_file.tsv",
-      output = "output.tsv"
+      input = temp_test_path("nonexistent_file.tsv"),
+      output = temp_test_path("output.tsv")
     ),
     "not found"
   )
 
   # Test multiple files, some missing
-  temp_file1 <- tempfile(fileext = ".tsv")
+  temp_file1 <- temp_test_path("input1.tsv")
   writeLines("cluster index\tcomponentindex\n1\t1", temp_file1)
 
   expect_error(
     prepare_features_components(
-      input = c(temp_file1, "missing_file.tsv"),
-      output = "output.tsv"
+      input = c(temp_file1, temp_test_path("missing_file.tsv")),
+      output = temp_test_path("output.tsv")
     ),
     "not found"
   )
-
-  unlink(temp_file1)
 })
 
 test_that("prepare_features_components handles single valid file", {

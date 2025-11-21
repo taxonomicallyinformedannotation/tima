@@ -148,9 +148,9 @@ test_that("prepare_taxa checks OTT file existence", {
 })
 
 test_that("prepare_taxa works with single taxon assignment", {
-  input <- file.path("features.tsv")
-  ott <- file.path("ott.tsv")
-  output <- file.path("output.tsv")
+  input <- temp_test_path("features.tsv")
+  ott <- temp_test_path("ott.tsv")
+  output <- temp_test_path("output.tsv")
 
   # Create minimal valid files
   writeLines("feature_id\trt\tmz\nFT001\t1.5\t200\nFT002\t2.0\t300", input)
@@ -187,10 +187,10 @@ test_that("prepare_taxa works with single taxon assignment", {
 })
 
 test_that("prepare_taxa works with metadata-based assignment", {
-  input <- file.path("features.tsv")
-  ott <- file.path("ott.tsv")
-  metadata <- file.path("metadata.tsv")
-  output <- file.path("output.tsv")
+  input <- temp_test_path("features.tsv")
+  ott <- temp_test_path("ott.tsv")
+  metadata <- temp_test_path("metadata.tsv")
+  output <- temp_test_path("output.tsv")
 
   # Create features with sample column
   writeLines(
@@ -243,10 +243,10 @@ test_that("prepare_taxa works with metadata-based assignment", {
 })
 
 test_that("prepare_taxa handles pipe-separated organisms", {
-  input <- file.path("features.tsv")
-  ott <- file.path("ott.tsv")
-  metadata <- file.path("metadata.tsv")
-  output <- file.path("output.tsv")
+  input <- temp_test_path("features.tsv")
+  ott <- temp_test_path("ott.tsv")
+  metadata <- temp_test_path("metadata.tsv")
+  output <- temp_test_path("output.tsv")
 
   writeLines("feature_id\trt\tmz\tsample\nFT001\t1.5\t200\tfile1", input)
 

@@ -5,29 +5,16 @@ library(testthat)
 ## validate_weight_annotations_inputs ----
 
 test_that("validate_weight_annotations_inputs accepts valid inputs", {
-  # Create test files
-  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create(
-    "data/interim/libraries/sop/merged",
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
-
-  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
-  writeLines("", "data/interim/features/components.tsv")
-  writeLines("", "data/interim/features/edges.tsv")
-  writeLines("", "data/interim/metadata/taxa.tsv")
-  writeLines("", "data/interim/annotations/ann.tsv")
+  # Create test files using helper
+  files <- wa_create_minimal_files()
 
   expect_silent(
     validate_weight_annotations_inputs(
-      library = "data/interim/libraries/sop/merged/keys.tsv",
-      components = "data/interim/features/components.tsv",
-      edges = "data/interim/features/edges.tsv",
-      taxa = "data/interim/metadata/taxa.tsv",
-      annotations = "data/interim/annotations/ann.tsv",
+      library = files$library,
+      components = files$components,
+      edges = files$edges,
+      taxa = files$taxa,
+      annotations = files$ann,
       minimal_ms1_condition = "OR",
       weight_spectral = 0.33,
       weight_chemical = 0.33,
@@ -50,11 +37,11 @@ test_that("validate_weight_annotations_inputs accepts valid inputs", {
 test_that("validate_weight_annotations_inputs rejects missing required files", {
   expect_error(
     validate_weight_annotations_inputs(
-      library = "nonexistent.tsv",
-      components = "components.tsv",
-      edges = "edges.tsv",
-      taxa = "taxa.tsv",
-      annotations = "ann.tsv",
+      library = temp_test_path("nonexistent.tsv"),
+      components = temp_test_path("components.tsv"),
+      edges = temp_test_path("edges.tsv"),
+      taxa = temp_test_path("taxa.tsv"),
+      annotations = temp_test_path("ann.tsv"),
       minimal_ms1_condition = "OR",
       weight_spectral = 0.33,
       weight_chemical = 0.33,
@@ -76,28 +63,16 @@ test_that("validate_weight_annotations_inputs rejects missing required files", {
 })
 
 test_that("validate_weight_annotations_inputs rejects invalid minimal_ms1_condition", {
-  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create(
-    "data/interim/libraries/sop/merged",
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
-
-  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
-  writeLines("", "data/interim/features/components.tsv")
-  writeLines("", "data/interim/features/edges.tsv")
-  writeLines("", "data/interim/metadata/taxa.tsv")
-  writeLines("", "data/interim/annotations/ann.tsv")
+  # Create test files using helper
+  files <- wa_create_minimal_files()
 
   expect_error(
     validate_weight_annotations_inputs(
-      library = "data/interim/libraries/sop/merged/keys.tsv",
-      components = "data/interim/features/components.tsv",
-      edges = "data/interim/features/edges.tsv",
-      taxa = "data/interim/metadata/taxa.tsv",
-      annotations = "data/interim/annotations/ann.tsv",
+      library = files$library,
+      components = files$components,
+      edges = files$edges,
+      taxa = files$taxa,
+      annotations = files$ann,
       minimal_ms1_condition = "XOR",
       weight_spectral = 0.33,
       weight_chemical = 0.33,
@@ -1146,7 +1121,7 @@ test_that("test-rearrange_annotations merges and deduplicates correctly", {
 })
 
 test_that("test-load_structure_organism_pairs joins supplemental files", {
-  files <- wa_create_minimal_files(tmp)
+  files <- wa_create_minimal_files(tempdir())
   stereo <- file.path("stereo.tsv")
   writeLines(
     "structure_inchikey_connectivity_layer\tstructure_smiles_no_stereo",

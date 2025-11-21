@@ -90,16 +90,16 @@ test_that("test-prepare_annotations_gnps validates output path", {
 })
 
 test_that("test-prepare_annotations_gnps validates structure file paths", {
-  out <- file.path("gnps.tsv")
+  out <- temp_test_path("gnps.tsv")
   expect_error(
     prepare_annotations_gnps(
       input = character(0),
       output = out,
-      str_stereo = file.path("missing.tsv"),
-      str_met = file.path("missing.tsv"),
-      str_nam = file.path("missing.tsv"),
-      str_tax_cla = file.path("missing.tsv"),
-      str_tax_npc = file.path("missing.tsv")
+      str_stereo = temp_test_path("missing.tsv"),
+      str_met = temp_test_path("missing.tsv"),
+      str_nam = temp_test_path("missing.tsv"),
+      str_tax_cla = temp_test_path("missing.tsv"),
+      str_tax_npc = temp_test_path("missing.tsv")
     ),
     "file not found"
   )
@@ -109,9 +109,9 @@ test_that("test-prepare_annotations_gnps validates structure file paths", {
 
 test_that("test-prepare_annotations_gnps handles missing input files by creating empty output", {
   s <- make_min_struct_files()
-  out <- file.path("gnps.tsv")
+  out <- temp_test_path("gnps.tsv")
   res <- prepare_annotations_gnps(
-    input = file.path("does_not_exist.tsv"),
+    input = temp_test_path("does_not_exist.tsv"),
     output = out,
     str_stereo = s$stereo,
     str_met = s$met,
@@ -127,7 +127,7 @@ test_that("test-prepare_annotations_gnps handles missing input files by creating
 
 test_that("test-prepare_annotations_gnps processes minimal valid GNPS file", {
   s <- make_min_struct_files()
-  out <- file.path("gnps.tsv")
+  out <- temp_test_path("gnps.tsv")
 
   # Minimal GNPS file with required columns
   gnps <- tidytable::tidytable(
@@ -151,7 +151,7 @@ test_that("test-prepare_annotations_gnps processes minimal valid GNPS file", {
     Precursor_MZ = c("100.0"),
     MZErrorPPM = c("0")
   )
-  gnps_path <- file.path("gnps_in.tsv")
+  gnps_path <- temp_test_path("gnps_in.tsv")
   tidytable::fwrite(x = gnps, file = gnps_path, sep = "\t")
 
   res <- prepare_annotations_gnps(

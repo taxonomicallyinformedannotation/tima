@@ -7,33 +7,33 @@ library(testthat)
 test_that("test-benchmark_taxize_spectra validates input file exists", {
   expect_error(
     benchmark_taxize_spectra(
-      input = file.path("missing.tsv"),
-      keys = file.path("keys.tsv"),
-      org_tax_ott = file.path("tax.tsv"),
-      output = file.path("out.tsv")
+      input = temp_test_path("missing.tsv"),
+      keys = temp_test_path("keys.tsv"),
+      org_tax_ott = temp_test_path("tax.tsv"),
+      output = temp_test_path("out.tsv")
     ),
     "Input features file not found"
   )
 })
 
 test_that("test-benchmark_taxize_spectra validates keys file exists", {
-  input <- file.path("input.tsv")
+  input <- temp_test_path("input.tsv")
   writeLines("feature_id", input)
 
   expect_error(
     benchmark_taxize_spectra(
       input = input,
-      keys = file.path("missing.tsv"),
-      org_tax_ott = file.path("tax.tsv"),
-      output = file.path("out.tsv")
+      keys = temp_test_path("missing.tsv"),
+      org_tax_ott = temp_test_path("tax.tsv"),
+      output = temp_test_path("out.tsv")
     ),
     "Keys file not found"
   )
 })
 
 test_that("test-benchmark_taxize_spectra validates taxonomy file exists", {
-  input <- file.path("input.tsv")
-  keys <- file.path("keys.tsv")
+  input <- temp_test_path("input.tsv")
+  keys <- temp_test_path("keys.tsv")
   writeLines("feature_id", input)
   writeLines("structure_inchikey", keys)
 
@@ -41,8 +41,8 @@ test_that("test-benchmark_taxize_spectra validates taxonomy file exists", {
     benchmark_taxize_spectra(
       input = input,
       keys = keys,
-      org_tax_ott = file.path("missing.tsv"),
-      output = file.path("out.tsv")
+      org_tax_ott = temp_test_path("missing.tsv"),
+      output = temp_test_path("out.tsv")
     ),
     "Taxonomy file not found"
   )
@@ -56,7 +56,7 @@ test_that("test-benchmark_taxize_spectra processes minimal valid input", {
     feature_id = c("F1", "F2"),
     inchikey_connectivity_layer = c("AAAAAAAAAAAAAA", "BBBBBBBBBBBBBB")
   )
-  input <- file.path("features.tsv")
+  input <- temp_test_path("features.tsv")
   tidytable::fwrite(x = features, file = input, sep = "\t")
 
   # Create minimal SOP keys
@@ -64,7 +64,7 @@ test_that("test-benchmark_taxize_spectra processes minimal valid input", {
     structure_inchikey = c("AAAAAAAAAAAAAA-XXXXXXXX-X"),
     organism_name = c("Test organism")
   )
-  keys <- file.path("keys.tsv")
+  keys <- temp_test_path("keys.tsv")
   tidytable::fwrite(x = sop, file = keys, sep = "\t")
 
   # Create minimal taxonomy with all required columns
@@ -81,10 +81,10 @@ test_that("test-benchmark_taxize_spectra processes minimal valid input", {
     organism_taxonomy_09species = c("Test organism"),
     organism_taxonomy_10varietas = c(NA_character_)
   )
-  org_tax_ott <- file.path("tax.tsv")
+  org_tax_ott <- temp_test_path("tax.tsv")
   tidytable::fwrite(x = tax, file = org_tax_ott, sep = "\t")
 
-  output <- file.path("output.tsv")
+  output <- temp_test_path("output.tsv")
 
   res <- benchmark_taxize_spectra(
     input = input,
@@ -104,7 +104,7 @@ test_that("test-benchmark_taxize_spectra handles features without organisms", {
     feature_id = c("F1"),
     inchikey_connectivity_layer = c("ZZZZZZZZZZZZZZ")
   )
-  input <- file.path("features.tsv")
+  input <- temp_test_path("features.tsv")
   tidytable::fwrite(x = features, file = input, sep = "\t")
 
   # Empty keys
@@ -112,7 +112,7 @@ test_that("test-benchmark_taxize_spectra handles features without organisms", {
     structure_inchikey = character(),
     organism_name = character()
   )
-  keys <- file.path("keys.tsv")
+  keys <- temp_test_path("keys.tsv")
   tidytable::fwrite(x = sop, file = keys, sep = "\t")
 
   tax <- tidytable::tidytable(
@@ -128,10 +128,10 @@ test_that("test-benchmark_taxize_spectra handles features without organisms", {
     organism_taxonomy_09species = character(),
     organism_taxonomy_10varietas = character()
   )
-  org_tax_ott <- file.path("tax.tsv")
+  org_tax_ott <- temp_test_path("tax.tsv")
   tidytable::fwrite(x = tax, file = org_tax_ott, sep = "\t")
 
-  output <- file.path("output.tsv")
+  output <- temp_test_path("output.tsv")
 
   res <- benchmark_taxize_spectra(
     input = input,
