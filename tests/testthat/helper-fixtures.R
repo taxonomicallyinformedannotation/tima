@@ -386,7 +386,7 @@ expect_required_columns <- function(df, required_cols) {
 #' @param fixture_name Character. Name of the fixture file (without .csv extension).
 #'   Available: "annotations", "features", "edges", "components", "metadata",
 #'   "names", "stereo", "structure_organism_pairs", "taxonomy_classyfire",
-#'   "taxonomy_npc"
+#'   "taxonomy_npc", "lotus_minimal", "closed_minimal"
 #' @param cache Logical. Whether to cache loaded fixtures for faster re-loading.
 #'   Default: TRUE
 #'
@@ -395,16 +395,9 @@ expect_required_columns <- function(df, required_cols) {
 #' @examples
 #' annotations <- load_fixture("annotations")
 #' features <- load_fixture("features")
+#' lotus <- load_fixture("lotus_minimal")
 load_fixture <- function(fixture_name, cache = TRUE) {
-  # Get package root - works in testthat context
-  pkg_root <- find_package_root()
-  fixture_path <- file.path(
-    pkg_root,
-    "tests",
-    "testthat",
-    "fixtures",
-    paste0(fixture_name, ".csv")
-  )
+  fixture_path <- testthat::test_path("fixtures", paste0(fixture_name, ".csv"))
 
   if (!file.exists(fixture_path)) {
     stop(
@@ -414,7 +407,7 @@ load_fixture <- function(fixture_name, cache = TRUE) {
       fixture_path,
       "\nAvailable fixtures: annotations, features, edges, components, ",
       "metadata, names, stereo, structure_organism_pairs, ",
-      "taxonomy_classyfire, taxonomy_npc"
+      "taxonomy_classyfire, taxonomy_npc, lotus_minimal, closed_minimal"
     )
   }
 
@@ -439,6 +432,71 @@ load_fixture <- function(fixture_name, cache = TRUE) {
 
   fixture_data
 }
+
+#' Load MGF fixture
+#'
+#' @description
+#' Load a test MGF file from fixtures directory.
+#'
+#' @param fixture_name Character. Name of MGF file (with or without .mgf extension).
+#'   Available: "spectra_query.mgf", "spectra_library.mgf"
+#'
+#' @return Character path to the fixture file (read-only)
+#'
+#' @examples
+#' query_mgf <- load_mgf_fixture("spectra_query.mgf")
+#' lib_mgf <- load_mgf_fixture("spectra_library")
+load_mgf_fixture <- function(fixture_name) {
+  if (!grepl("\\.mgf$", fixture_name)) {
+    fixture_name <- paste0(fixture_name, ".mgf")
+  }
+
+  fixture_path <- testthat::test_path("fixtures", fixture_name)
+
+  if (!file.exists(fixture_path)) {
+    stop(
+      "MGF fixture '",
+      fixture_name,
+      "' not found at: ",
+      fixture_path,
+      "\nAvailable MGF fixtures: spectra_query.mgf, spectra_library.mgf"
+    )
+  }
+
+  fixture_path
+}
+
+#' Copy MGF fixture to temp location for modification
+#'
+#' @description
+#' Copies an MGF fixture to a temporary location where it can be modified
+#' during tests without affecting the original fixture.
+#'
+#' @param fixture_name Character. Name of MGF file
+#' @param dest_name Character. Optional destination name. Default: same as source
+#'
+#' @return Character path to the copied file in temp directory
+#'
+#' @examples
+#' temp_mgf <- copy_mgf_fixture("spectra_query.mgf")
+copy_mgf_fixture <- function(fixture_name, dest_name = NULL) {
+  if (!grepl("\\.mgf$", fixture_name)) {
+    fixture_name <- paste0(fixture_name, ".mgf")
+  }
+
+  src <- load_mgf_fixture(fixture_name)
+
+  if (is.null(dest_name)) {
+    dest_name <- basename(fixture_name)
+  }
+
+  dest <- file.path(tempfile(), dest_name)
+  dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
+  file.copy(src, dest, overwrite = TRUE)
+  dest
+}
+
+## CSV Fixture Loaders (Continued) ----
 
 #' Get or create the fixture cache environment
 #'

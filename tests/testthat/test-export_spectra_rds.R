@@ -128,7 +128,7 @@ test_that("export_spectra_rds filters out NA compound_id entries", {
 })
 
 test_that("export_spectra_rds creates output directory if needed", {
-  temp_dir <- file.path(tmp, "nested", "dir", "structure")
+  temp_dir <- file.path(tempfile(), "nested", "dir", "structure")
   temp_file <- file.path(temp_dir, "spectra.rds")
 
   expect_false(dir.exists(temp_dir))

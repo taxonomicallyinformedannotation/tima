@@ -109,7 +109,7 @@
 # test_that("change_params_small copies and updates feature file", {
 #   paths <- local_test_project(copy = TRUE)
 #
-#   temp_features <- make_tmp_file("features", fileext = ".csv")
+#   temp_features <- tempfile("features", fileext = ".csv")
 #   writeLines("test_features", temp_features)
 #
 #   change_params_small(fil_fea_raw = temp_features)
@@ -124,7 +124,7 @@
 # test_that("change_params_small copies and updates metadata file", {
 #   paths <- local_test_project(copy = TRUE)
 #
-#   temp_metadata <- make_tmp_file("metadata", fileext = ".tsv")
+#   temp_metadata <- tempfile("metadata", fileext = ".tsv")
 #   writeLines("test_metadata", temp_metadata)
 #
 #   change_params_small(fil_met_raw = temp_metadata)
@@ -138,7 +138,7 @@
 # test_that("change_params_small copies and updates spectra file", {
 #   paths <- local_test_project(copy = TRUE)
 #
-#   temp_spectra <- make_tmp_file("spectra", fileext = ".mgf")
+#   temp_spectra <- tempfile("spectra", fileext = ".mgf")
 #   writeLines("test_spectra", temp_spectra)
 #
 #   change_params_small(fil_spe_raw = temp_spectra)
@@ -152,7 +152,7 @@
 # test_that("change_params_small copies and updates sirius directory", {
 #   paths <- local_test_project(copy = TRUE)
 #
-#   temp_sirius <- make_tmp_file("sirius", fileext = ".zip")
+#   temp_sirius <- tempfile("sirius", fileext = ".zip")
 #   writeLines("test_sirius", temp_sirius)
 #
 #   change_params_small(fil_sir_raw = temp_sirius)
@@ -180,10 +180,10 @@
 #   paths <- local_test_project(copy = TRUE)
 #
 #   # Create temporary test files
-#   temp_features <- make_tmp_file("features", fileext = ".csv")
-#   temp_metadata <- make_tmp_file("metadata", fileext = ".tsv")
-#   temp_spectra <- make_tmp_file("spectra", fileext = ".mgf")
-#   temp_sirius <- make_tmp_file("sirius", fileext = ".zip")
+#   temp_features <- tempfile("features", fileext = ".csv")
+#   temp_metadata <- tempfile("metadata", fileext = ".tsv")
+#   temp_spectra <- tempfile("spectra", fileext = ".mgf")
+#   temp_sirius <- tempfile("sirius", fileext = ".zip")
 #
 #   writeLines("test", temp_features)
 #   writeLines("test", temp_metadata)
