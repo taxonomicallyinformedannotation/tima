@@ -1,134 +1,333 @@
-#' @title Get last version from Zenodo
+#' Validate Zenodo Function Inputs
 #'
-#' @description This function retrieves the latest version of a file from a
-#'     Zenodo repository record. It checks the file size and only downloads
-#'     if the local file is missing or differs from the remote version.
+#' @description Internal helper to validate all input parameters for Zenodo operations.
+#'     Implements Single Responsibility Principle by separating validation logic.
 #'
-#' @details Credit goes partially to https://inbo.github.io/inborutils/
-#'     This function handles the new Zenodo API format and file structure.
+#' @param doi Character DOI string
+#' @param pattern Character pattern string
+#' @param path Character path string
 #'
-#' @include create_dir.R
-#' @include get_file.R
-#'
-#' @param doi Character string DOI of the Zenodo record (e.g., "10.5281/zenodo.5794106")
-#' @param pattern Character string pattern to identify the specific file to download
-#' @param path Character string local path where the file should be saved
-#'
-#' @return Character string path to the downloaded file
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' get_last_version_from_zenodo(
-#'   doi = "10.5281/zenodo.5794106",
-#'   pattern = "frozen.csv.gz",
-#'   path = "data/frozen.csv.gz"
-#' )
-#' }
-get_last_version_from_zenodo <- function(doi, pattern, path) {
-  # Validate inputs
-  if (missing(doi) || !is.character(doi) || length(doi) != 1L) {
-    stop("doi must be a single character string")
+#' @return NULL (stops on validation error)
+#' @keywords internal
+validate_zenodo_inputs <- function(doi, pattern, path) {
+  if (
+    missing(doi) || !is.character(doi) || length(doi) != 1L || nchar(doi) == 0L
+  ) {
+    stop("doi must be a single non-empty character string", call. = FALSE)
   }
 
-  if (missing(pattern) || !is.character(pattern) || length(pattern) != 1L) {
-    stop("pattern must be a single character string")
+  if (
+    missing(pattern) ||
+      !is.character(pattern) ||
+      length(pattern) != 1L ||
+      nchar(pattern) == 0L
+  ) {
+    stop("pattern must be a single non-empty character string", call. = FALSE)
   }
 
-  if (missing(path) || !is.character(path) || length(path) != 1L) {
-    stop("path must be a single character string")
+  if (
+    missing(path) ||
+      !is.character(path) ||
+      length(path) != 1L ||
+      nchar(path) == 0L
+  ) {
+    stop("path must be a single non-empty character string", call. = FALSE)
   }
 
-  logger::log_info("Retrieving latest version from Zenodo: {doi}")
+  # Validate DOI format
+  if (!grepl("^10\\.[0-9]+/zenodo\\.[0-9]+$", doi, perl = TRUE)) {
+    stop(
+      "Invalid Zenodo DOI format. Expected format: '10.5281/zenodo.XXXXXX', got: '",
+      doi,
+      "'",
+      call. = FALSE
+    )
+  }
 
-  # Extract record number from DOI
-  record <- stringi::stri_replace_all_fixed(
+  invisible(NULL)
+}
+
+#' Extract Zenodo Record ID from DOI
+#'
+#' @description Internal helper to extract the record number from a Zenodo DOI.
+#'     Implements Single Responsibility Principle.
+#'
+#' @param doi Character DOI string
+#'
+#' @return Character record ID
+#' @keywords internal
+extract_zenodo_record_id <- function(doi) {
+  stringi::stri_replace_all_fixed(
     str = doi,
     pattern = "10.5281/zenodo.",
     replacement = "",
     case_insensitive = TRUE
   )
+}
 
-  # Construct Zenodo API URLs
+#' Fetch Zenodo Record Metadata
+#'
+#' @description Internal helper to retrieve record metadata from Zenodo API.
+#'     Implements Single Responsibility Principle with proper error handling.
+#'
+#' @param record Character record ID
+#' @param doi Character DOI (for error messages)
+#'
+#' @return httr2 response object
+#' @keywords internal
+fetch_zenodo_record <- function(record, doi) {
   base_url <- "https://zenodo.org/records/"
-  base_url_api <- "https://zenodo.org/api/records/"
+  url <- paste0(base_url, record, "/latest")
 
-  # Retrieve latest record information
-  logger::log_debug("Fetching metadata from Zenodo API")
-  record_new <- tryCatch(
+  logger::log_debug("Fetching metadata from: {url}")
+
+  tryCatch(
     {
-      httr2::request(
-        base_url = paste0(base_url, record, "/latest")
-      ) |>
+      httr2::request(base_url = url) |>
+        httr2::req_timeout(30) |>
+        httr2::req_retry(max_tries = 3) |>
         httr2::req_perform()
     },
+    httr2_http_404 = function(e) {
+      stop(
+        "Zenodo record not found: ",
+        doi,
+        ". Please verify the DOI is correct.",
+        call. = FALSE
+      )
+    },
+    httr2_http = function(e) {
+      stop(
+        "HTTP error retrieving Zenodo record: ",
+        conditionMessage(e),
+        call. = FALSE
+      )
+    },
     error = function(e) {
-      stop("Failed to retrieve Zenodo record: ", conditionMessage(e))
+      stop(
+        "Failed to retrieve Zenodo record: ",
+        conditionMessage(e),
+        call. = FALSE
+      )
     }
   )
+}
 
-  # Parse JSON content
-  api_url <- paste0(
-    base_url_api,
-    gsub(
-      pattern = ".*/",
-      replacement = "",
-      x = record_new$url,
-      perl = TRUE
-    )
-  )
+#' Parse Zenodo API Response
+#'
+#' @description Internal helper to parse JSON content from Zenodo API.
+#'     Implements Single Responsibility Principle with error handling.
+#'
+#' @param api_url Character URL to Zenodo API endpoint
+#'
+#' @return List with parsed JSON content
+#' @keywords internal
+parse_zenodo_content <- function(api_url) {
+  logger::log_debug("Parsing API response from: {api_url}")
 
-  content <- tryCatch(
+  tryCatch(
     {
       jsonlite::fromJSON(txt = api_url)
     },
     error = function(e) {
-      stop("Failed to parse Zenodo API response: ", conditionMessage(e))
+      stop(
+        "Failed to parse Zenodo API response. ",
+        "The API format may have changed. Error: ",
+        conditionMessage(e),
+        call. = FALSE
+      )
     }
   )
+}
 
-  # Extract file information
-  filenames <- content$files$key
-
+#' Find Matching File in Zenodo Record
+#'
+#' @description Internal helper to find a file matching the pattern in Zenodo record.
+#'     Implements Single Responsibility Principle.
+#'
+#' @param filenames Character vector of filenames
+#' @param pattern Character pattern to match
+#' @param doi Character DOI (for error messages)
+#'
+#' @return Integer index of first matching file
+#' @keywords internal
+find_matching_file <- function(filenames, pattern, doi) {
   if (length(filenames) == 0L) {
-    stop("No files found in Zenodo record: ", doi)
+    stop(
+      "No files found in Zenodo record: ",
+      doi,
+      ". The record may be empty or inaccessible.",
+      call. = FALSE
+    )
   }
 
-  # Find matching file
   indices <- grepl(pattern = pattern, x = filenames, fixed = TRUE)
 
   if (!any(indices)) {
     stop(
       "No files matching pattern '",
       pattern,
-      "' found in record. ",
-      "Available files: ",
-      paste(filenames, collapse = ", ")
+      "' found in record ",
+      doi,
+      ". Available files: ",
+      paste(filenames, collapse = ", "),
+      call. = FALSE
     )
   }
 
-  filename <- filenames[indices][1L] # Take first match
-  file_url <- paste0(record_new$url, "/files/", filename)
+  which(indices)[1L] # Return first match index
+}
 
-  # Check if download is needed by comparing file sizes
-  zenodo_size <- content$files$size[indices][1L]
+#' Check if File Download is Needed
+#'
+#' @description Internal helper to determine if download is required by comparing sizes.
+#'     Implements Single Responsibility Principle.
+#'
+#' @param path Character local file path
+#' @param zenodo_size Numeric size in bytes from Zenodo
+#'
+#' @return Logical TRUE if download needed, FALSE otherwise
+#' @keywords internal
+is_download_needed <- function(path, zenodo_size) {
+  if (!file.exists(path)) {
+    logger::log_debug("File does not exist locally, download needed")
+    return(TRUE)
+  }
+
   local_size <- file.size(path)
 
-  if (is.na(local_size) || zenodo_size != local_size) {
-    file.remove(path)
-    logger::log_info(
-      "Downloading {filename} from https://doi.org/{doi} ({content$metadata$title})"
-    )
-    logger::log_debug("Size: {zenodo_size} bytes")
+  if (is.na(local_size)) {
+    logger::log_debug("Cannot determine local file size, download needed")
+    return(TRUE)
+  }
 
+  if (local_size != zenodo_size) {
+    logger::log_debug(
+      "File size mismatch (local: {local_size}, remote: {zenodo_size}), download needed"
+    )
+    return(TRUE)
+  }
+
+  logger::log_debug("File exists with correct size, skipping download")
+  return(FALSE)
+}
+
+#' @title Get Latest Version from Zenodo
+#'
+#' @description Retrieves the latest version of a file from a Zenodo repository record.
+#'     This function checks the file size and only downloads if the local file is missing
+#'     or differs from the remote version. Implements robust error handling and retry logic.
+#'
+#' @details
+#' Credit goes partially to https://inbo.github.io/inborutils/
+#'
+#' This function:
+#' \itemize{
+#'   \item Validates DOI format and input parameters
+#'   \item Fetches the latest version metadata from Zenodo API
+#'   \item Finds files matching the specified pattern
+#'   \item Compares local and remote file sizes to avoid unnecessary downloads
+#'   \item Downloads only if needed, with retry logic
+#'   \item Creates necessary directories automatically
+#' }
+#'
+#' @include create_dir.R
+#' @include get_file.R
+#'
+#' @param doi Character. Zenodo DOI (e.g., "10.5281/zenodo.5794106")
+#' @param pattern Character. Pattern to identify the specific file to download
+#' @param path Character. Local path where the file should be saved
+#'
+#' @return Character path to the downloaded (or existing) file
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Download LOTUS database from Zenodo
+#' get_last_version_from_zenodo(
+#'   doi = "10.5281/zenodo.5794106",
+#'   pattern = "lotus.csv.gz",
+#'   path = "data/source/libraries/sop/lotus.csv.gz"
+#' )
+#'
+#' # The function will skip download if file exists with correct size
+#' get_last_version_from_zenodo(
+#'   doi = "10.5281/zenodo.5794106",
+#'   pattern = "lotus.csv.gz",
+#'   path = "data/source/libraries/sop/lotus.csv.gz"
+#' )
+#' }
+get_last_version_from_zenodo <- function(doi, pattern, path) {
+  # Input Validation ----
+  validate_zenodo_inputs(doi = doi, pattern = pattern, path = path)
+
+  logger::log_info("Retrieving latest version from Zenodo: {doi}")
+
+  # Extract Record ID ----
+  record <- extract_zenodo_record_id(doi)
+  logger::log_debug("Record ID: {record}")
+
+  # Fetch Record Metadata ----
+  record_response <- fetch_zenodo_record(record = record, doi = doi)
+
+  # Construct API URL ----
+  base_url_api <- "https://zenodo.org/api/records/"
+  record_id <- gsub(
+    pattern = ".*/",
+    replacement = "",
+    x = record_response$url,
+    perl = TRUE
+  )
+  api_url <- paste0(base_url_api, record_id)
+
+  # Parse API Response ----
+  content <- parse_zenodo_content(api_url)
+
+  # Find Matching File ----
+  filenames <- content$files$key
+  match_idx <- find_matching_file(
+    filenames = filenames,
+    pattern = pattern,
+    doi = doi
+  )
+
+  filename <- filenames[match_idx]
+  file_url <- paste0(record_response$url, "/files/", filename)
+  zenodo_size <- content$files$size[match_idx]
+
+  logger::log_debug("Found file: {filename} ({zenodo_size} bytes)")
+
+  # Download if Needed ----
+  if (is_download_needed(path = path, zenodo_size = zenodo_size)) {
+    # Remove existing file if present (may be corrupted or wrong size)
+    if (file.exists(path)) {
+      logger::log_debug("Removing existing file: {path}")
+      file.remove(path)
+    }
+
+    logger::log_info(
+      "Downloading {filename} from https://doi.org/{doi}"
+    )
+
+    if (!is.null(content$metadata$title)) {
+      logger::log_debug("Record title: {content$metadata$title}")
+    }
+
+    logger::log_debug(
+      "File size: {zenodo_size} bytes ({round(zenodo_size / 1024^2, 2)} MB)"
+    )
+
+    # Create directory and download
     create_dir(export = path)
     get_file(url = file_url, export = path)
+
+    logger::log_success("Download completed: {path}")
   } else {
     logger::log_info(
       "File already present with correct size. Skipping download."
     )
   }
 
-  return(path)
+  return(invisible(path))
 }

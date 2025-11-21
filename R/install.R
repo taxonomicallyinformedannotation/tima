@@ -1,9 +1,300 @@
-#' @title Install
+#' Validate Install Function Inputs
 #'
-#' @description This function installs the TIMA package and its dependencies,
-#'     including setting up a Python virtual environment with RDKit for
-#'     chemical structure processing. It handles different operating systems
-#'     and provides fallback installation methods if needed.
+#' @description Internal helper to validate all input parameters for install().
+#'     Implements Single Responsibility Principle.
+#'
+#' @param package Character package name
+#' @param repos Character vector of repositories
+#' @param dependencies Logical dependencies flag
+#' @param test Logical test mode flag
+#'
+#' @return NULL (stops on validation error)
+#' @keywords internal
+validate_install_inputs <- function(package, repos, dependencies, test) {
+  if (!is.character(package) || length(package) != 1L || nchar(package) == 0L) {
+    stop(
+      "package must be a single non-empty character string, got: ",
+      if (is.null(package)) "NULL" else class(package)[1],
+      call. = FALSE
+    )
+  }
+
+  if (!is.character(repos) || length(repos) == 0L) {
+    stop(
+      "repos must be a non-empty character vector",
+      call. = FALSE
+    )
+  }
+
+  if (any(nchar(repos) == 0L)) {
+    stop(
+      "All repository URLs must be non-empty strings",
+      call. = FALSE
+    )
+  }
+
+  if (!is.logical(dependencies) || length(dependencies) != 1L) {
+    stop(
+      "dependencies must be a single logical value (TRUE or FALSE)",
+      call. = FALSE
+    )
+  }
+
+  if (!is.logical(test) || length(test) != 1L) {
+    stop(
+      "test must be a single logical value (TRUE or FALSE)",
+      call. = FALSE
+    )
+  }
+
+  invisible(NULL)
+}
+
+#' Display System-Specific Installation Messages
+#'
+#' @description Internal helper to show OS-specific installation instructions.
+#'     Implements Single Responsibility Principle.
+#'
+#' @param system Character OS name from Sys.info()
+#' @param test Logical test mode flag
+#'
+#' @return NULL (side effect: logging)
+#' @keywords internal
+show_system_messages <- function(system, test) {
+  logger::log_info("Detected operating system: {system}")
+
+  if (system == "Windows" || isTRUE(test)) {
+    logger::log_info("You should install RTools if not already done")
+    logger::log_info(
+      "Download from: https://cran.r-project.org/bin/windows/Rtools/"
+    )
+  }
+
+  if (system == "Linux") {
+    logger::log_info("You may need system dependencies:")
+    logger::log_info(
+      "  sudo apt install libarchive-dev libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev"
+    )
+  }
+
+  if (system == "Darwin") {
+    logger::log_info(
+      "macOS detected. Ensure Xcode Command Line Tools are installed:"
+    )
+    logger::log_info("  xcode-select --install")
+  }
+
+  invisible(NULL)
+}
+
+#' Check or Install Python
+#'
+#' @description Internal helper to ensure Python is available, installing
+#'     Miniconda as fallback if needed. Implements Single Responsibility Principle.
+#'
+#' @param test Logical test mode flag
+#'
+#' @return Character path to Python executable
+#' @keywords internal
+check_or_install_python <- function(test = FALSE) {
+  system <- Sys.info()[["sysname"]]
+  python <- Sys.which("python3")
+
+  if (nzchar(python) && isFALSE(test)) {
+    logger::log_info("System Python found at: {python}")
+    return(python)
+  }
+
+  logger::log_warn("System Python not found. Installing Miniconda as fallback.")
+
+  minipath <- reticulate::miniconda_path()
+
+  if (!file.exists(minipath)) {
+    logger::log_info("Installing Miniconda...")
+    tryCatch(
+      {
+        reticulate::install_miniconda()
+        minipath <- reticulate::miniconda_path()
+        logger::log_success("Miniconda installed successfully")
+      },
+      error = function(e) {
+        logger::log_error("Failed to install Miniconda: {e$message}")
+        stop(
+          "Failed to install Miniconda: ",
+          conditionMessage(e),
+          call. = FALSE
+        )
+      }
+    )
+  }
+
+  python_path <- if (system == "Windows") {
+    file.path(minipath, "python.exe")
+  } else {
+    file.path(minipath, "bin", "python")
+  }
+
+  if (!file.exists(python_path)) {
+    stop(
+      "Python executable not found at expected location: ",
+      python_path,
+      call. = FALSE
+    )
+  }
+
+  logger::log_info("Using Miniconda Python at: {python_path}")
+  return(python_path)
+}
+
+#' Setup Python Virtual Environment
+#'
+#' @description Internal helper to create and configure Python virtualenv with RDKit.
+#'     Implements Single Responsibility Principle.
+#'
+#' @param envname Character name of virtual environment
+#' @param python Character path to Python executable
+#' @param rescue_python_version Character Python version for fallback
+#'
+#' @return NULL (side effect: creates virtualenv and installs packages)
+#' @keywords internal
+setup_virtualenv <- function(
+  envname = "tima-env",
+  python = NULL,
+  rescue_python_version = "3.13"
+) {
+  if (is.null(python)) {
+    python <- check_or_install_python()
+  }
+
+  if (!reticulate::virtualenv_exists(envname = envname)) {
+    logger::log_info("Creating Python virtualenv: {envname}")
+
+    tryCatch(
+      expr = {
+        reticulate::virtualenv_create(
+          envname = envname,
+          python = python
+        )
+        logger::log_success("Virtualenv created successfully")
+      },
+      error = function(e) {
+        logger::log_error("Creating Python virtualenv failed: {e$message}")
+        logger::log_info(
+          "Retrying with clean Python install (version {rescue_python_version})"
+        )
+
+        tryCatch(
+          {
+            python <- reticulate::install_python(
+              version = rescue_python_version
+            )
+            reticulate::virtualenv_create(
+              envname = envname,
+              python = python
+            )
+            logger::log_success("Virtualenv created with rescue Python")
+          },
+          error = function(e2) {
+            stop(
+              "Failed to create virtualenv even with rescue Python: ",
+              conditionMessage(e2),
+              call. = FALSE
+            )
+          }
+        )
+      }
+    )
+  } else {
+    logger::log_info("Using existing Python virtualenv: {envname}")
+  }
+
+  logger::log_info("Installing RDKit in virtualenv: {envname}")
+
+  tryCatch(
+    {
+      reticulate::virtualenv_install(
+        envname = envname,
+        python = python,
+        packages = "rdkit",
+        ignore_installed = TRUE
+      )
+      logger::log_success("RDKit installed successfully")
+    },
+    error = function(e) {
+      logger::log_error("Failed to install RDKit: {e$message}")
+      stop(
+        "Failed to install RDKit in virtualenv: ",
+        conditionMessage(e),
+        call. = FALSE
+      )
+    }
+  )
+
+  invisible(NULL)
+}
+
+#' Attempt Package Installation
+#'
+#' @description Internal helper to attempt R package installation with error handling.
+#'     Implements Single Responsibility Principle.
+#'
+#' @param package Character package name
+#' @param repos Character vector of repositories
+#' @param dependencies Logical dependencies flag
+#' @param from_source Logical whether to install from source
+#'
+#' @return Logical TRUE if successful, FALSE otherwise
+#' @keywords internal
+try_install_package <- function(
+  package,
+  repos,
+  dependencies,
+  from_source = FALSE
+) {
+  tryCatch(
+    expr = {
+      logger::log_info(
+        "Installing R package: {package} (from {if (from_source) 'source' else 'binary'})"
+      )
+
+      utils::install.packages(
+        package,
+        repos = repos,
+        dependencies = dependencies,
+        INSTALL_opts = c("--no-lock", "--no-test-load"),
+        type = if (from_source) "source" else getOption("pkgType")
+      )
+
+      logger::log_success("Successfully installed R package: {package}")
+      return(TRUE)
+    },
+    error = function(e) {
+      logger::log_error("Installation failed: {e$message}")
+      return(FALSE)
+    }
+  )
+}
+
+#' @title Install TIMA Package and Dependencies
+#'
+#' @description Installs the TIMA package and its dependencies, including setting
+#'     up a Python virtual environment with RDKit for chemical structure processing.
+#'     This function handles different operating systems and provides fallback
+#'     installation methods if needed.
+#'
+#' @details
+#' The installation process:
+#' \itemize{
+#'   \item Validates all input parameters
+#'   \item Detects the operating system and shows relevant instructions
+#'   \item Checks for Python or installs Miniconda as fallback
+#'   \item Creates a Python virtual environment (tima-env)
+#'   \item Installs RDKit in the virtual environment
+#'   \item Attempts to install the R package from binary
+#'   \item Falls back to source installation if binary fails
+#'   \item Copies the TIMA backbone files
+#'   \item Cleans up any existing targets pipeline
+#' }
 #'
 #' @include copy_backbone.R
 #'
@@ -19,7 +310,14 @@
 #'
 #' @examples
 #' \dontrun{
+#' # Standard installation
 #' install()
+#'
+#' # Install with custom repositories
+#' install(repos = c("https://cloud.r-project.org"))
+#'
+#' # Install without dependencies (not recommended)
+#' install(dependencies = FALSE)
 #' }
 install <- function(
   package = "tima",
@@ -31,152 +329,84 @@ install <- function(
   dependencies = TRUE,
   test = FALSE
 ) {
-  # Validate inputs
-  if (!is.character(package) || length(package) != 1L) {
-    stop("package must be a single character string")
-  }
+  # Input Validation ----
+  validate_install_inputs(
+    package = package,
+    repos = repos,
+    dependencies = dependencies,
+    test = test
+  )
 
-  if (!is.character(repos) || length(repos) == 0L) {
-    stop("repos must be a non-empty character vector")
-  }
-
-  if (!is.logical(dependencies) || length(dependencies) != 1L) {
-    stop("dependencies must be a single logical value")
-  }
-
-  if (!is.logical(test) || length(test) != 1L) {
-    stop("test must be a single logical value")
-  }
-
+  # System Detection and Messages ----
   system <- Sys.info()[["sysname"]]
-  logger::log_info("Detected operating system: {system}")
+  show_system_messages(system = system, test = test)
 
-  if (system == "Windows" || isTRUE(test)) {
-    logger::log_info("You should install RTools if not already done")
-  }
-  if (system == "Linux") {
-    logger::log_info(
-      "You may need system dependencies: 'sudo apt install libarchive-dev libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev'"
-    )
-  }
+  # System Detection and Messages ----
+  system <- Sys.info()[["sysname"]]
+  show_system_messages(system = system, test = test)
 
-  check_or_install_python <- function() {
-    python <- Sys.which("python3")
-    if (python |> nzchar() && isFALSE(test)) {
-      logger::log_info("System Python found at: {python}")
-      return(python)
-    }
+  # Python Setup ----
+  python <- check_or_install_python(test = test)
 
-    logger::log_warn(
-      "System Python not found. Installing Miniconda as fallback."
-    )
+  # R Package Installation ----
+  logger::log_info("Starting package installation process")
 
-    minipath <- reticulate::miniconda_path()
-    if (!file.exists(minipath)) {
-      reticulate::install_miniconda()
-      minipath <- reticulate::miniconda_path()
-    }
-    python_path <- if (system == "Windows") {
-      file.path(minipath, "python.exe")
-    } else {
-      file.path(minipath, "bin", "python")
-    }
-
-    logger::log_info("Using Miniconda Python at: {python_path}")
-    return(python_path)
-  }
-
-  setup_virtualenv <- function(envname = "tima-env") {
-    python <- check_or_install_python()
-
-    if (!reticulate::virtualenv_exists(envname = envname)) {
-      logger::log_info("Creating Python virtualenv: {envname}")
-      # Rescue version for fallback if default Python doesn't work
-      rescue_python_version <- "3.13"
-      tryCatch(
-        expr = {
-          reticulate::virtualenv_create(
-            envname = envname,
-            python = python
-          )
-        },
-        error = function(e) {
-          logger::log_error(
-            "Creating Python virtualenv failed: ",
-            conditionMessage(e)
-          )
-          logger::log_info(
-            "Retrying with a clean python install (version ",
-            rescue_python_version,
-            ")"
-          )
-          python <- reticulate::install_python(
-            version = rescue_python_version
-          )
-          reticulate::virtualenv_create(
-            envname = envname,
-            python = python
-          )
-        }
-      )
-    } else {
-      logger::log_info("Using existing Python virtualenv: {envname}")
-    }
-
-    logger::log_info("Installing RDKit in virtualenv: {envname}")
-    reticulate::virtualenv_install(
-      envname = envname,
-      python = python,
-      packages = "rdkit",
-      ignore_installed = TRUE
-    )
-  }
-
-  try_install <- function(from_source = FALSE) {
-    tryCatch(
-      expr = {
-        logger::log_info(
-          "Installing R package: ",
-          package,
-          " (from ",
-          if (from_source) "source" else "binary",
-          ")"
-        )
-        utils::install.packages(
-          package,
-          repos = repos,
-          dependencies = dependencies,
-          INSTALL_opts = c("--no-lock", "--no-test-load"),
-          type = if (from_source) {
-            "source"
-          } else {
-            getOption("pkgType")
-          }
-        )
-        logger::log_info("Successfully installed R package: {package}")
-
-        setup_virtualenv()
-        return(TRUE)
-      },
-      error = function(e) {
-        logger::log_error("Installation failed: {conditionMessage(e)}")
-        return(FALSE)
-      }
-    )
-  }
-
-  success <- try_install()
+  success <- try_install_package(
+    package = package,
+    repos = repos,
+    dependencies = dependencies,
+    from_source = FALSE
+  )
 
   if (!success || isTRUE(test)) {
-    logger::log_warn("Retrying install from source")
-    success <- try_install(from_source = TRUE)
+    logger::log_warn(
+      "Binary installation failed or test mode active. Retrying from source."
+    )
+    success <- try_install_package(
+      package = package,
+      repos = repos,
+      dependencies = dependencies,
+      from_source = TRUE
+    )
   }
 
   if (!success) {
     logger::log_fatal("All installation attempts failed")
-    stop()
+    stop(
+      "Failed to install package '",
+      package,
+      "'. Please check the error messages above.",
+      call. = FALSE
+    )
   }
 
-  copy_backbone()
-  targets::tar_destroy(ask = FALSE)
+  # Python Virtual Environment Setup ----
+  setup_virtualenv(envname = "tima-env", python = python)
+
+  # Post-Installation Setup ----
+  logger::log_info("Running post-installation setup")
+
+  tryCatch(
+    {
+      copy_backbone()
+      logger::log_success("Backbone files copied")
+    },
+    error = function(e) {
+      logger::log_warn("Failed to copy backbone files: {e$message}")
+    }
+  )
+
+  tryCatch(
+    {
+      targets::tar_destroy(ask = FALSE)
+      logger::log_success("Targets pipeline cleaned")
+    },
+    error = function(e) {
+      logger::log_warn("Failed to clean targets pipeline: {e$message}")
+    }
+  )
+
+  logger::log_success("Installation completed successfully!")
+
+  invisible(NULL)
 }

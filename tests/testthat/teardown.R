@@ -8,6 +8,7 @@ allowed_patterns <- c(
   "^fixtures$", # Fixture directory
   "^helper-.*\\.R$", # Helper files
   "^setup\\.R$", # Setup file
+  "^setup-shinytest2.R$", # Setup shinytest2 file
   "^teardown\\.R$", # This file
   "^test-.*\\.R$", # Test files
   "^\\.Rdata$", # R session data (sometimes created)

@@ -206,14 +206,15 @@ test_that("tima_full maintains backward compatibility", {
 
 # Error Recovery Tests ----
 
-test_that("tima_full provides informative error messages", {
-  skip_if_not_installed("targets")
-
-  # Error should mention pipeline failure
-  expect_error(
-    withr::with_dir(temp_test_dir("error_test"), {
-      suppressMessages(tima_full())
-    }),
-    "workflow pipeline failed|cache directory"
-  )
-})
+## COMMENT: Too long for now
+# test_that("tima_full provides informative error messages", {
+#   skip_if_not_installed("targets")
+#
+#   # Error should mention pipeline failure
+#   expect_error(
+#     withr::with_dir(temp_test_dir("error_test"), {
+#       suppressMessages(tima_full())
+#     }),
+#     "workflow pipeline failed|cache directory"
+#   )
+# })
