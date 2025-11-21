@@ -147,9 +147,9 @@ weight_chemo <- function(
     level_weight,
     score_name
   ) {
-    cand_sym <- rlang::sym(candidates)
-    fval_sym <- rlang::sym(features_val)
-    fsc_sym <- rlang::sym(features_score)
+    cand_sym <- rlang::sym(x = candidates)
+    fval_sym <- rlang::sym(x = features_val)
+    fsc_sym <- rlang::sym(x = features_score)
 
     df |>
       tidytable::distinct(!!cand_sym, !!fval_sym, !!fsc_sym) |>
@@ -163,8 +163,8 @@ weight_chemo <- function(
         pattern = !!cand_sym
       )) |>
       # assign the configured per-level weight when matched
-      tidytable::mutate(!!rlang::sym(score_name) := as.numeric(level_weight)) |>
-      tidytable::select(!!cand_sym, !!rlang::sym(score_name)) |>
+      tidytable::mutate(!!rlang::sym(x = score_name) := as.numeric(level_weight)) |>
+      tidytable::select(!!cand_sym, !!rlang::sym(x = score_name)) |>
       tidytable::distinct()
   }
 
@@ -264,11 +264,11 @@ weight_chemo <- function(
         na.rm = TRUE
       )
     ) |>
-    tidytable::select(-tidyselect::contains("score_chemical_"))
+    tidytable::select(-tidyselect::contains(match = "score_chemical_"))
   rm(df2, supp_tables)
 
   annot_table_wei_chemo_interim <- annot_table_wei_chemo_init |>
-    tidytable::right_join(annot_table_wei_bio_clean)
+    tidytable::right_join(y = annot_table_wei_bio_clean)
   rm(annot_table_wei_chemo_init, annot_table_wei_bio_clean)
 
   annot_table_wei_chemo <- annot_table_wei_chemo_interim |>

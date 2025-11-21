@@ -181,8 +181,8 @@ weight_bio <- function(
     ) |>
     tidytable::distinct() |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.character),
-      .fns = ~ tidytable::na_if(.x, "")
+      .cols = tidyselect::where(fn = is.character),
+      .fns = ~ tidytable::na_if(x = .x, y = "")
     ))
 
   logger::log_debug("Filtered to {nrow(df0)} structure-organism pairs")
@@ -226,7 +226,7 @@ weight_bio <- function(
         ) |>
         tidytable::distinct()
     ) |>
-    tidytable::inner_join(df0) |>
+    tidytable::inner_join(y = df0) |>
     tidytable::distinct(
       sample_organism_name,
       sample_organism_01_domain,
@@ -387,9 +387,9 @@ weight_bio <- function(
   ) |>
     tidytable::select(
       sample_organism_name,
-      -tidyselect::contains("sample_organism_0"),
-      tidyselect::contains("candidate_organism"),
-      tidyselect::contains("score")
+      -tidyselect::contains(match = "sample_organism_0"),
+      tidyselect::contains(match = "candidate_organism"),
+      tidyselect::contains(match = "score")
     )
   rm(supp_tables, df2)
 
@@ -415,7 +415,7 @@ weight_bio <- function(
         na.rm = TRUE
       )
     ) |>
-    tidytable::select(-tidyselect::contains("score_biological_")) |>
+    tidytable::select(-tidyselect::contains(match = "score_biological_")) |>
     tidytable::mutate(
       candidate_structure_organism_occurrence_closest = tidytable::case_when(
         score_biological == score_biological_domain ~
@@ -462,7 +462,7 @@ weight_bio <- function(
     ) |>
     tidytable::distinct()
   annot_table_wei_bio_init <- annot_table_wei_bio_init |>
-    tidytable::right_join(df1) |>
+    tidytable::right_join(y = df1) |>
     tidytable::mutate(
       score_biological = tidytable::if_else(
         condition = is.na(score_biological),
@@ -484,10 +484,10 @@ weight_bio <- function(
     )
 
   annot_table_wei_bio_big <- annot_table_wei_bio_init |>
-    tidytable::inner_join(annotation_table_taxed) |>
+    tidytable::inner_join(y = annotation_table_taxed) |>
     tidytable::select(
-      -tidyselect::contains("candidate_organism"),
-      -tidyselect::contains("sample_organism")
+      -tidyselect::contains(match = "candidate_organism"),
+      -tidyselect::contains(match = "sample_organism")
     )
   rm(
     annot_table_wei_bio_init,
@@ -496,8 +496,8 @@ weight_bio <- function(
 
   annot_table_wei_bio <- annot_table_wei_bio_big |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::matches("candidate_structure_tax"),
-      .fns = ~ tidytable::replace_na(.x, "notClassified")
+      .cols = tidyselect::matches(match = "candidate_structure_tax"),
+      .fns = ~ tidytable::replace_na(.x = .x, replace = "notClassified")
     )) |>
     tidytable::mutate(
       candidate_score_sirius_csi_tmp = transform_score_sirius_csi(
