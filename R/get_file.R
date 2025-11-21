@@ -70,7 +70,7 @@ get_file <- function(url, export, limit = 3600L) {
   logger::log_info("Downloading file from: {url}")
 
   resp <- tryCatch(
-    httr2::request(url) |>
+    httr2::request(base_url = url) |>
       httr2::req_progress() |>
       httr2::req_perform(path = export),
     error = function(e) {
@@ -81,7 +81,7 @@ get_file <- function(url, export, limit = 3600L) {
     }
   )
 
-  status <- httr2::resp_status(resp)
+  status <- httr2::resp_status(resp = resp)
   if (status < 200L) {
     if (file.exists(export)) {
       unlink(export, force = TRUE)

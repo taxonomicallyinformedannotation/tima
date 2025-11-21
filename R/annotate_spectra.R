@@ -243,7 +243,7 @@ annotate_spectra <- function(
       tidytable::transmute(
         precursor = tidytable::coalesce(tidytable::across(
           .cols = tidyselect::any_of(
-            c("precursorMz", "precursor_mz")
+            x = c("precursorMz", "precursor_mz")
           )
         ))
       ) |>
@@ -274,7 +274,7 @@ annotate_spectra <- function(
         tidytable::transmute(
           precursor = tidytable::coalesce(tidytable::across(
             .cols = tidyselect::any_of(
-              c("precursorMz", "precursor_mz")
+              x = c("precursorMz", "precursor_mz")
             )
           ))
         ) |>
@@ -426,7 +426,7 @@ annotate_spectra <- function(
         ) |>
         tidytable::select(
           tidyselect::any_of(
-            c(
+            x = c(
               "feature_id",
               "candidate_adduct" = "target_adduct",
               "candidate_library" = "target_library",

@@ -181,10 +181,10 @@ harmonize_spectra <- function(
         )
     ) |>
     tidytable::select(
-      tidyselect::any_of(c(columns_full)),
-      tidyselect::any_of(c("precursorCharge")),
+      tidyselect::any_of(x = c(columns_full)),
+      tidyselect::any_of(x = c("precursorCharge")),
       precursorMz,
-      tidyselect::any_of(c("rtime")),
+      tidyselect::any_of(x = c("rtime")),
       mz,
       intensity
     ) |>
@@ -201,30 +201,34 @@ harmonize_spectra <- function(
     )
 
   spectra_harmonized <- spectra_filtered |>
-    tidytable::full_join(spectra_missing) |>
-    tidytable::select(tidyselect::any_of(c(
-      "adduct",
-      "collision_energy",
-      "compound_id",
-      "exactmass",
-      "formula",
-      "inchi",
-      "inchi_no_stereo",
-      "inchikey",
-      "inchikey_connectivity_layer",
-      "name",
-      "precursorMz",
-      "precursorCharge",
-      "smiles",
-      "smiles_no_stereo",
-      "spectrum_id",
-      "splash",
-      "synonyms",
-      "xlogp",
-      "rtime",
-      "mz",
-      "intensity"
-    ))) |>
+    tidytable::full_join(y = spectra_missing) |>
+    tidytable::select(
+      tidyselect::any_of(
+        x = c(
+          "adduct",
+          "collision_energy",
+          "compound_id",
+          "exactmass",
+          "formula",
+          "inchi",
+          "inchi_no_stereo",
+          "inchikey",
+          "inchikey_connectivity_layer",
+          "name",
+          "precursorMz",
+          "precursorCharge",
+          "smiles",
+          "smiles_no_stereo",
+          "spectrum_id",
+          "splash",
+          "synonyms",
+          "xlogp",
+          "rtime",
+          "mz",
+          "intensity"
+        )
+      )
+    ) |>
     tidytable::mutate(
       library = metad,
       exactmass = as.numeric(exactmass),

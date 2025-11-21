@@ -309,7 +309,7 @@ rearrange_annotations <- function(
 
   annotation_table_1 <- annotation_table |>
     tidytable::select(tidyselect::any_of(
-      c(
+      x = c(
         model$features_columns,
         model$candidates_calculated_columns,
         model$candidates_spectra_columns,
@@ -330,7 +330,7 @@ rearrange_annotations <- function(
   annotation_table_2 <- annotation_table |>
     tidytable::select(
       tidyselect::any_of(
-        c(
+        x = c(
           model$features_columns,
           model$candidates_sirius_str_columns,
           model$candidates_structures_columns

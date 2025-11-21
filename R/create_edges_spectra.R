@@ -229,7 +229,7 @@ create_edges_spectra <- function(
   edges <- edges |>
     tidytable::select(
       tidyselect::any_of(
-        c(
+        x = c(
           name_source,
           name_target,
           "candidate_score_similarity" = "score",

@@ -29,7 +29,7 @@ setup_logger <- function(filename = "tima.log", threshold = logger::TRACE) {
   }
 
   # Configure logger threshold
-  logger::log_threshold(threshold)
+  logger::log_threshold(level = threshold)
 
   # Set up consistent log format with timestamp and level
   # Use POSIX formatting to force 3-digit milliseconds ("%OS3").

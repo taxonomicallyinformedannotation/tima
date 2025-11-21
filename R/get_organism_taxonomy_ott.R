@@ -78,7 +78,7 @@
     tidytable::mutate(ott_id = as.integer(ott_id)) |>
     # Sort by reverse row number for proper hierarchy
     tidytable::mutate(n = tidytable::row_number()) |>
-    tidytable::arrange(tidytable::desc(n)) |>
+    tidytable::arrange(tidytable::desc(x = n)) |>
     tidytable::select(-n)
 }
 
@@ -196,7 +196,7 @@ get_organism_taxonomy_ott <- function(
         httr2::request() |>
         # See https://github.com/ropensci/rotl/issues/147
         httr2::req_options(ssl_verifypeer = FALSE) |>
-        httr2::req_method("POST") |>
+        httr2::req_method(method = "POST") |>
         httr2::req_error(is_error = function(resp) FALSE) |>
         httr2::req_perform() |>
         httr2::resp_status_desc()
@@ -236,7 +236,7 @@ get_organism_taxonomy_ott <- function(
   new_matched_otl_exact <- taxonomy_matches |>
     tidytable::bind_rows() |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.logical),
+      .cols = tidyselect::where(fn = is.logical),
       .fns = as.character
     ))
 
@@ -257,8 +257,12 @@ get_organism_taxonomy_ott <- function(
 
     # Identify failed organism names
     failed_organisms <- organism_table |>
-      tidytable::filter(!search_string %in% successful_matches$search_string) |>
-      tidytable::mutate(search_string = .extract_genus_names(search_string))
+      tidytable::filter(
+        !search_string %in% successful_matches$search_string
+      ) |>
+      tidytable::mutate(
+        search_string = .extract_genus_names(search_string)
+      )
 
     # Extract unique genus names from failures
     genus_names <- unique(failed_organisms$search_string)
@@ -278,7 +282,7 @@ get_organism_taxonomy_ott <- function(
       tidytable::bind_rows() |>
       tidytable::filter(!is.na(ott_id)) |>
       tidytable::mutate(tidytable::across(
-        .cols = tidyselect::where(is.logical),
+        .cols = tidyselect::where(fn = is.logical),
         .fns = as.character
       ))
 
@@ -373,16 +377,22 @@ get_organism_taxonomy_ott <- function(
       tidytable::select(
         organism_name = canonical_name,
         organism_taxonomy_ottid = ott_id,
-        organism_taxonomy_01domain = tidyselect::matches("name_domain"),
-        organism_taxonomy_02kingdom = tidyselect::matches("name_kingdom"),
-        organism_taxonomy_03phylum = tidyselect::matches("name_phylum"),
-        organism_taxonomy_04class = tidyselect::matches("name_class"),
-        organism_taxonomy_05order = tidyselect::matches("name_order"),
-        organism_taxonomy_06family = tidyselect::matches("name_family"),
-        organism_taxonomy_07tribe = tidyselect::matches("name_tribe"),
-        organism_taxonomy_08genus = tidyselect::matches("name_genus"),
-        organism_taxonomy_09species = tidyselect::matches("name_species"),
-        organism_taxonomy_10varietas = tidyselect::matches("name_varietas")
+        organism_taxonomy_01domain = tidyselect::matches(match = "name_domain"),
+        organism_taxonomy_02kingdom = tidyselect::matches(
+          match = "name_kingdom"
+        ),
+        organism_taxonomy_03phylum = tidyselect::matches(match = "name_phylum"),
+        organism_taxonomy_04class = tidyselect::matches(match = "name_class"),
+        organism_taxonomy_05order = tidyselect::matches(match = "name_order"),
+        organism_taxonomy_06family = tidyselect::matches(match = "name_family"),
+        organism_taxonomy_07tribe = tidyselect::matches(match = "name_tribe"),
+        organism_taxonomy_08genus = tidyselect::matches(match = "name_genus"),
+        organism_taxonomy_09species = tidyselect::matches(
+          match = "name_species"
+        ),
+        organism_taxonomy_10varietas = tidyselect::matches(
+          match = "name_varietas"
+        )
       )
 
     cols_to_set <- c(
@@ -403,8 +413,13 @@ get_organism_taxonomy_ott <- function(
     new_cols <- setdiff(cols_to_set, colnames(biological_metadata))
     # Add new columns if they don't exist
     if (length(new_cols) > 0) {
-      tidyfst::setDT(biological_metadata)
-      tidyfst::set(biological_metadata, NULL, new_cols, NA_character_)
+      tidyfst::setDT(x = biological_metadata)
+      tidyfst::set(
+        x = biological_metadata,
+        i = NULL,
+        j = new_cols,
+        value = NA_character_
+      )
       biological_metadata |>
         tidytable::as_tidytable()
     }

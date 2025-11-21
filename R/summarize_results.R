@@ -76,8 +76,8 @@ summarize_results <- function(
   model <- columns_model()
 
   df3 <- features_table |>
-    tidytable::left_join(df) |>
-    tidytable::left_join(components_table) |>
+    tidytable::left_join(y = df) |>
+    tidytable::left_join(y = components_table) |>
     # tidytable::mutate(
     #   candidate_structure_tax_cla = paste(
     #     structure_tax_cla_01kin,
@@ -93,26 +93,28 @@ summarize_results <- function(
     #     sep = "\u00a7"
     #   )
     # ) |>
-    tidytable::select(tidyselect::any_of(
-      c(
-        "feature_id",
-        "feature_rt" = "rt",
-        "feature_mz" = "mz",
-        model$features_calculated_columns,
-        model$components_columns,
-        model$candidates_calculated_columns,
-        model$candidates_sirius_for_columns,
-        model$candidates_sirius_str_columns,
-        model$candidates_spectra_columns,
-        model$candidates_structures_columns,
-        model$rank_columns,
-        "score_initial" = "candidate_score_pseudo_initial",
-        "score_biological",
-        "score_interim" = "score_weighted_bio",
-        "score_chemical",
-        "score_final" = "score_weighted_chemo"
+    tidytable::select(
+      tidyselect::any_of(
+        x = c(
+          "feature_id",
+          "feature_rt" = "rt",
+          "feature_mz" = "mz",
+          model$features_calculated_columns,
+          model$components_columns,
+          model$candidates_calculated_columns,
+          model$candidates_sirius_for_columns,
+          model$candidates_sirius_str_columns,
+          model$candidates_spectra_columns,
+          model$candidates_structures_columns,
+          model$rank_columns,
+          "score_initial" = "candidate_score_pseudo_initial",
+          "score_biological",
+          "score_interim" = "score_weighted_bio",
+          "score_chemical",
+          "score_final" = "score_weighted_chemo"
+        )
       )
-    )) |>
+    ) |>
     tidytable::distinct() |>
     tidytable::left_join(
       structure_organism_pairs_table |>
@@ -120,13 +122,15 @@ summarize_results <- function(
           candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
           reference_doi,
           organism_name,
-          tidyselect::contains("organism_taxonomy_"),
+          tidyselect::contains(match = "organism_taxonomy_"),
           -organism_taxonomy_ottid
         ) |>
         tidytable::distinct() |>
-        tidytable::pivot_longer(tidyselect::contains(
-          "organism_taxonomy_"
-        )) |>
+        tidytable::pivot_longer(
+          tidyselect::contains(
+            match = "organism_taxonomy_"
+          )
+        ) |>
         tidytable::filter(!is.na(value)) |>
         tidytable::filter(value != "notClassified") |>
         tidytable::distinct(
@@ -135,26 +139,30 @@ summarize_results <- function(
           candidate_structure_organism_occurrence_reference = reference_doi
         )
     ) |>
-    tidytable::group_by(c(
-      -candidate_structure_organism_occurrence_reference
-    )) |>
+    tidytable::group_by(
+      c(
+        -candidate_structure_organism_occurrence_reference
+      )
+    ) |>
     clean_collapse(
       cols = c("candidate_structure_organism_occurrence_reference")
     ) |>
-    tidytable::select(tidyselect::any_of(
-      c(
-        model$features_columns,
-        model$features_calculated_columns,
-        model$components_columns,
-        model$candidates_calculated_columns,
-        model$candidates_sirius_for_columns,
-        model$candidates_sirius_str_columns,
-        model$candidates_spectra_columns,
-        model$candidates_structures_columns,
-        model$rank_columns,
-        model$score_columns
+    tidytable::select(
+      tidyselect::any_of(
+        x = c(
+          model$features_columns,
+          model$features_calculated_columns,
+          model$components_columns,
+          model$candidates_calculated_columns,
+          model$candidates_sirius_for_columns,
+          model$candidates_sirius_str_columns,
+          model$candidates_spectra_columns,
+          model$candidates_structures_columns,
+          model$rank_columns,
+          model$score_columns
+        )
       )
-    )) |>
+    ) |>
     tidytable::arrange(rank_final) |>
     tidytable::ungroup()
   rm(df)
@@ -208,27 +216,29 @@ summarize_results <- function(
       .fns = as.character
     )) |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.character),
+      .cols = tidyselect::where(fn = is.character),
       .fns = trimws
     )) |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.character),
-      .fns = ~ tidytable::na_if(.x, "")
+      .cols = tidyselect::where(fn = is.character),
+      .fns = ~ tidytable::na_if(x = .x, y = "")
     )) |>
-    tidytable::select(tidyselect::any_of(
-      c(
-        model$features_columns,
-        model$features_calculated_columns,
-        model$components_columns,
-        model$candidates_calculated_columns,
-        model$candidates_sirius_for_columns,
-        model$candidates_sirius_str_columns,
-        model$candidates_spectra_columns,
-        model$candidates_structures_columns,
-        model$rank_columns,
-        model$score_columns
+    tidytable::select(
+      tidyselect::any_of(
+        x = c(
+          model$features_columns,
+          model$features_calculated_columns,
+          model$components_columns,
+          model$candidates_calculated_columns,
+          model$candidates_sirius_for_columns,
+          model$candidates_sirius_str_columns,
+          model$candidates_spectra_columns,
+          model$candidates_structures_columns,
+          model$rank_columns,
+          model$score_columns
+        )
       )
-    ))
+    )
   rm(df5)
 
   # logger::log_trace("Adding consensus again to droped candidates")
@@ -241,9 +251,11 @@ summarize_results <- function(
       ),
     tidytable::left_join(
       df6 |>
-        tidytable::filter(is.na(
-          candidate_structure_inchikey_connectivity_layer
-        )) |>
+        tidytable::filter(
+          is.na(
+            candidate_structure_inchikey_connectivity_layer
+          )
+        ) |>
         tidytable::distinct(model$features_columns),
       annot_table_wei_chemo |>
         tidytable::mutate(tidytable::across(
@@ -251,17 +263,19 @@ summarize_results <- function(
           .fns = as.character
         ))
     ) |>
-      tidytable::select(tidyselect::any_of(
-        c(
-          model$features_columns,
-          model$features_calculated_columns,
-          model$components_columns
+      tidytable::select(
+        tidyselect::any_of(
+          x = c(
+            model$features_columns,
+            model$features_calculated_columns,
+            model$components_columns
+          )
         )
-      )) |>
+      ) |>
       tidytable::distinct()
   ) |>
     tidytable::arrange(as.numeric(feature_id)) |>
-    tidytable::select(tidyselect::where(~ any(!is.na(.))))
+    tidytable::select(tidyselect::where(fn = ~ any(!is.na(.))))
 
   return(results)
 }

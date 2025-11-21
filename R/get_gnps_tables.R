@@ -76,7 +76,12 @@ create_fake_gnps_files <- function(
         logger::log_warn(
           "Writing {file} failed, using fallback: {conditionMessage(e)}"
         )
-        utils::write.table(data, file = file, sep = "\t", row.names = FALSE)
+        utils::write.table(
+          x = data,
+          file = file,
+          sep = "\t",
+          row.names = FALSE
+        )
       }
     )
   }

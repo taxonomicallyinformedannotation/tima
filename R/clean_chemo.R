@@ -758,7 +758,7 @@ clean_chemo <- function(
     ) |>
     tidytable::select(
       tidytable::any_of(
-        c(
+        x = c(
           "feature_id",
           "rt",
           "mz",

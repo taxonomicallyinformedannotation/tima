@@ -36,7 +36,7 @@ go_to_cache <- function(dir = ".tima") {
   if (!dir.exists(cache)) {
     tryCatch(
       {
-        fs::dir_create(cache)
+        fs::dir_create(path = cache)
       },
       error = function(e) {
         logger::log_error("Failed to create cache directory: {e$message}")

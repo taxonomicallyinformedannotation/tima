@@ -72,7 +72,7 @@ load_yaml_files <- function() {
   # Load all YAML files with error handling
   yamls_parsed <- tryCatch(
     {
-      purrr::map(yaml_files, yaml::read_yaml)
+      purrr::map(.x = yaml_files, .f = yaml::read_yaml)
     },
     error = function(e) {
       stop("Failed to parse YAML files: ", conditionMessage(e))

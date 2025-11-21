@@ -62,7 +62,7 @@ get_params <- function(step) {
       "Step '",
       step,
       "' does not exist. Available steps: ",
-      paste(utils::head(available_steps, 10), collapse = ", "),
+      paste(utils::head(x = available_steps, 10), collapse = ", "),
       if (length(available_steps) > 10) "..." else ""
     )
   }

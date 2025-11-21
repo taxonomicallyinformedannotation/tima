@@ -173,7 +173,7 @@ import_spectra <- function(
   # Filter to MS2 spectra only
   if ("msLevel" %in% spec_cols) {
     n_before <- length(spectra)
-    spectra <- Spectra::filterMsLevel(spectra, 2L)
+    spectra <- Spectra::filterMsLevel(object = spectra, msLevel. = 2L)
     n_after <- length(spectra)
     n_removed <- n_before - n_after
     if (n_removed > 0L) {
@@ -202,7 +202,10 @@ import_spectra <- function(
       c(0L, -1L, -2L, -3L)
     }
 
-    spectra <- Spectra::filterPrecursorCharge(spectra, z = charge_values)
+    spectra <- Spectra::filterPrecursorCharge(
+      object = spectra,
+      z = charge_values
+    )
     n_after <- length(spectra)
     logger::log_debug(
       "Filtered to {polarity} polarity: {n_before} -> {n_after} spectra"

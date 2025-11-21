@@ -882,16 +882,16 @@ annotate_masses <-
         candidate_structure_error_mz = tidyselect::any_of(x = "error_mz"),
         candidate_structure_name = tidyselect::any_of(x = "structure_name"),
         candidate_structure_inchikey_connectivity_layer = tidyselect::any_of(
-          "structure_inchikey_connectivity_layer"
+          x = "structure_inchikey_connectivity_layer"
         ),
         candidate_structure_smiles_no_stereo = tidyselect::any_of(
-          "structure_smiles_no_stereo"
+          x = "structure_smiles_no_stereo"
         ),
         candidate_structure_molecular_formula = tidyselect::any_of(
-          "structure_molecular_formula"
+          x = "structure_molecular_formula"
         ),
         candidate_structure_exact_mass = tidyselect::any_of(
-          "structure_exact_mass"
+          x = "structure_exact_mass"
         ),
         candidate_structure_xlogp = tidyselect::any_of(x = "structure_xlogp"),
         candidate_library = tidyselect::any_of(x = "library")
@@ -920,34 +920,34 @@ annotate_masses <-
       ) |>
       tidytable::rename(
         candidate_structure_inchikey_connectivity_layer = tidyselect::any_of(
-          "structure_inchikey_connectivity_layer"
+          x = "structure_inchikey_connectivity_layer"
         ),
         candidate_structure_smiles_no_stereo = tidyselect::any_of(
-          "structure_smiles_no_stereo"
+          x = "structure_smiles_no_stereo"
         ),
         candidate_structure_tax_npc_01pat = tidyselect::any_of(
-          "structure_tax_npc_01pat"
+          x = "structure_tax_npc_01pat"
         ),
         candidate_structure_tax_npc_02sup = tidyselect::any_of(
-          "structure_tax_npc_02sup"
+          x = "structure_tax_npc_02sup"
         ),
         candidate_structure_tax_npc_03cla = tidyselect::any_of(
-          "structure_tax_npc_03cla"
+          x = "structure_tax_npc_03cla"
         ),
         candidate_structure_tax_cla_chemontid = tidyselect::any_of(
-          "structure_tax_cla_chemontid"
+          x = "structure_tax_cla_chemontid"
         ),
         candidate_structure_tax_cla_01kin = tidyselect::any_of(
-          "structure_tax_cla_01kin"
+          x = "structure_tax_cla_01kin"
         ),
         candidate_structure_tax_cla_02sup = tidyselect::any_of(
-          "structure_tax_cla_02sup"
+          x = "structure_tax_cla_02sup"
         ),
         candidate_structure_tax_cla_03cla = tidyselect::any_of(
-          "structure_tax_cla_03cla"
+          x = "structure_tax_cla_03cla"
         ),
         candidate_structure_tax_cla_04dirpar = tidyselect::any_of(
-          "structure_tax_cla_04dirpar"
+          x = "structure_tax_cla_04dirpar"
         )
       )
 
