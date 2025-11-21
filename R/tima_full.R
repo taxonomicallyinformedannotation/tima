@@ -35,7 +35,7 @@ tima_full <- function() {
   logger::log_info("Executing targets pipeline...")
   tryCatch(
     {
-      targets::tar_make(names = tidyselect::matches("^ann_pre$"))
+      targets::tar_make(names = tidyselect::matches(match = "^ann_pre$"))
     },
     error = function(e) {
       logger::log_error("Pipeline failed: {conditionMessage(e)}")

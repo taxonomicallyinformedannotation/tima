@@ -521,7 +521,7 @@ validate_choice <- function(value, choices, name = "value") {
 #' @keywords internal
 format_error <- function(what, why = NULL, how = NULL) {
   parts <- c(what, why, how)
-  paste(stats::na.omit(parts), collapse = "\n")
+  paste(stats::na.omit(object = parts), collapse = "\n")
 }
 
 #' Stop with standardized error formatting

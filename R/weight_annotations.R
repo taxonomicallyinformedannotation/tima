@@ -166,7 +166,7 @@ validate_weight_annotations_inputs <- function(
     force = force
   )
 
-  purrr::iwalk(logical_params, function(val, nm) assert_flag(val, nm))
+  purrr::iwalk(.x = logical_params, .f = function(val, nm) assert_flag(val, nm))
 
   # Validate candidates parameters
   assert_positive_integer(candidates_neighbors, "candidates_neighbors")
@@ -279,7 +279,7 @@ log_annotation_stats <- function(annotation_table) {
     ) |>
     tidytable::group_by(candidate_library) |>
     tidytable::count() |>
-    tidytable::arrange(tidytable::desc(n))
+    tidytable::arrange(tidytable::desc(x = n))
 
   logger::log_info(
     "\n{paste(capture.output(print.data.frame(annotation_stats, row.names = FALSE)), collapse = '\n')}"
@@ -319,7 +319,7 @@ rearrange_annotations <- function(
     tidytable::mutate(
       candidate_score_similarity = as.numeric(candidate_score_similarity)
     ) |>
-    tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
+    tidytable::arrange(tidytable::desc(x = candidate_score_similarity)) |>
     tidytable::distinct(
       feature_id,
       candidate_structure_inchikey_connectivity_layer,
