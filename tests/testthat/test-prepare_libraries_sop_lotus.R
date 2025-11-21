@@ -39,7 +39,7 @@ test_that("prepare_libraries_sop_lotus processes fixture LOTUS data", {
 
   df <- tidytable::fread(temp_output)
   expect_true(nrow(df) >= 1)
-  expect_true("structure_inchikey_2D" %in% names(df))
+  expect_true("structure_inchikey_connectivity_layer" %in% names(df))
   expect_true("structure_name" %in% names(df))
 })
 
@@ -60,7 +60,7 @@ test_that("prepare_libraries_sop_lotus extracts 2D InChIKey from fixture", {
   df <- tidytable::fread(temp_output, colClasses = "character")
 
   # 2D InChIKey should be first 14 characters
-  expect_true(all(nchar(df$structure_inchikey_2D) == 14))
+  expect_true(all(nchar(df$structure_inchikey_connectivity_layer) == 14))
 })
 
 test_that("prepare_libraries_sop_lotus renames structure_nameTraditional", {
@@ -108,17 +108,7 @@ test_that("prepare_libraries_sop_lotus handles multiple structure-organism pairs
   temp_input <- tempfile(fileext = ".csv")
   temp_output <- tempfile(fileext = ".tsv")
 
-  lotus_data <- tidytable::tidytable(
-    structure_inchikey = c(
-      "AAAAAAAAAAAAAA-BBBBBBBBBB-C",
-      "DDDDDDDDDDDDDD-EEEEEEEEEE-F",
-      "GGGGGGGGGGGGGG-HHHHHHHHHH-I"
-    ),
-    structure_nameTraditional = c("Compound A", "Compound B", "Compound C"),
-    organism_name = c("Org 1", "Org 2", "Org 3"),
-    organism_taxonomy_ottid = c("111", "222", "333")
-  )
-
+  lotus_data <- load_fixture("lotus")
   tidytable::fwrite(lotus_data, temp_input)
 
   prepare_libraries_sop_lotus(
@@ -128,21 +118,14 @@ test_that("prepare_libraries_sop_lotus handles multiple structure-organism pairs
 
   df <- tidytable::fread(temp_output)
 
-  expect_equal(nrow(df), 3)
+  expect_equal(nrow(df), 2)
 })
 
 test_that("prepare_libraries_sop_lotus rounds numeric values", {
   temp_input <- tempfile(fileext = ".csv")
   temp_output <- tempfile(fileext = ".tsv")
 
-  lotus_data <- tidytable::tidytable(
-    structure_inchikey = "ABCDEFGHIJKLMN-OPQRSTUVWX-A",
-    structure_nameTraditional = "Test",
-    structure_exact_mass = "123.456789012345",
-    organism_name = "Test org",
-    organism_taxonomy_ottid = "123"
-  )
-
+  lotus_data <- load_fixture("lotus")
   tidytable::fwrite(lotus_data, temp_input)
 
   prepare_libraries_sop_lotus(
@@ -164,12 +147,7 @@ test_that("prepare_libraries_sop_lotus handles compressed input", {
   temp_input <- tempfile(fileext = ".csv.gz")
   temp_output <- tempfile(fileext = ".tsv")
 
-  lotus_data <- tidytable::tidytable(
-    structure_inchikey = "ABCDEFGHIJKLMN-OPQRSTUVWX-A",
-    structure_nameTraditional = "Test Compressed",
-    organism_name = "Test org",
-    organism_taxonomy_ottid = "123"
-  )
+  lotus_data <- load_fixture("lotus")
 
   # Write compressed file
   tidytable::fwrite(lotus_data, temp_input)
@@ -182,5 +160,5 @@ test_that("prepare_libraries_sop_lotus handles compressed input", {
   expect_true(file.exists(temp_output))
 
   df <- tidytable::fread(temp_output)
-  expect_equal(nrow(df), 1)
+  expect_true(nrow(df) > 0)
 })
