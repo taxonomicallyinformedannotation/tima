@@ -127,13 +127,13 @@ prepare_features_tables <- function(
 
   features_table <- features_table_0 |>
     tidytable::select(
-      tidyselect::any_of(c(name_features, name_rt, name_mz, name_adduct)),
-      tidyselect::matches(" Peak area"),
-      tidyselect::matches(":area"),
-      tidyselect::matches("quant_"),
-      tidyselect::matches(" Peak height")
+      tidyselect::any_of(x = c(name_features, name_rt, name_mz, name_adduct)),
+      tidyselect::matches(match = " Peak area"),
+      tidyselect::matches(match = ":area"),
+      tidyselect::matches(match = "quant_"),
+      tidyselect::matches(match = " Peak height")
     ) |>
-    tidytable::select(-tidyselect::matches("quant_peaktable"))
+    tidytable::select(-tidyselect::matches(match = "quant_peaktable"))
   rm(features_table_0)
 
   # Normalize RT column to minutes (auto-detect if possible)
@@ -181,29 +181,33 @@ prepare_features_tables <- function(
 
   features_prepared <- features_table |>
     tidytable::pivot_longer(
-      cols = !tidyselect::any_of(c(
-        name_features,
-        name_rt,
-        name_mz,
-        name_adduct
-      )),
+      cols = !tidyselect::any_of(
+        x = c(
+          name_features,
+          name_rt,
+          name_mz,
+          name_adduct
+        )
+      ),
       names_to = "sample"
     ) |>
     tidytable::filter(value != 0) |>
     tidytable::mutate(
       rank = rank(-as.numeric(value)),
-      .by = tidyselect::all_of(c(name_features))
+      .by = tidyselect::all_of(x = c(name_features))
     ) |>
     tidytable::filter(rank <= candidates) |>
-    tidytable::select(tidyselect::any_of(
-      c(
-        feature_id = name_features,
-        rt = name_rt,
-        mz = name_mz,
-        adduct = name_adduct,
-        "sample"
+    tidytable::select(
+      tidyselect::any_of(
+        x = c(
+          feature_id = name_features,
+          rt = name_rt,
+          mz = name_mz,
+          adduct = name_adduct,
+          "sample"
+        )
       )
-    )) |>
+    ) |>
     tidytable::arrange(
       feature_id |>
         as.numeric()

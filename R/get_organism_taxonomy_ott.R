@@ -336,11 +336,11 @@ get_organism_taxonomy_ott <- function(
 
   # Join organism names with taxonomy data
   biological_metadata <- tidytable::left_join(
-    organism_table,
-    new_matched_otl_exact
+    x = organism_table,
+    y = new_matched_otl_exact
   ) |>
     tidytable::left_join(
-      otl |>
+      y = otl |>
         tidytable::rename(unique_name.y = unique_name, ott_id.y = ott_id),
       by = c("ott_id" = "id")
     ) |>

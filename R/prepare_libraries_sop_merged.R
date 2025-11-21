@@ -97,7 +97,7 @@ load_and_merge_libraries <- function(files, cache) {
 #' @keywords internal
 complete_organism_taxonomy <- function(table_keys, table_org_tax_ott) {
   table_org_tax_ott_2 <- table_keys |>
-    tidytable::anti_join(table_org_tax_ott, by = "organism_name") |>
+    tidytable::anti_join(y = table_org_tax_ott, by = "organism_name") |>
     tidytable::distinct(organism = organism_name) |>
     data.frame()
 
@@ -113,15 +113,15 @@ complete_organism_taxonomy <- function(table_keys, table_org_tax_ott) {
       table_org_tax_ott_full |>
         tidytable::as_tidytable() |>
         tidytable::mutate(tidytable::across(
-          .cols = tidyselect::where(is.numeric),
+          .cols = tidyselect::where(fn = is.numeric),
           .fns = as.character
         )) |>
         tidytable::mutate(tidytable::across(
-          .cols = tidyselect::where(is.list),
+          .cols = tidyselect::where(fn = is.list),
           .fns = as.character
         )) |>
         tidytable::mutate(tidytable::across(
-          .cols = tidyselect::where(is.logical),
+          .cols = tidyselect::where(fn = is.logical),
           .fns = as.character
         ))
     )
@@ -139,7 +139,7 @@ apply_taxonomic_filter <- function(
   value
 ) {
   table_keys_filtered <- table_keys |>
-    tidytable::left_join(table_org_tax_ott, by = "organism_name")
+    tidytable::left_join(y = table_org_tax_ott, by = "organism_name")
 
   # Find column matching the taxonomic level
   level_col <- colnames(table_keys_filtered)[grepl(

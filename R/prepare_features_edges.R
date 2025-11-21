@@ -109,7 +109,7 @@ prepare_features_edges <- function(
   # Extract entropy information from spectral edges
   features_entropy <- edges_ms2 |>
     tidytable::select(
-      tidyselect::all_of(c(name_source)),
+      tidyselect::all_of(x = c(name_source)),
       feature_spectrum_entropy,
       feature_spectrum_peaks
     ) |>
@@ -124,8 +124,8 @@ prepare_features_edges <- function(
   # Combine and format edges table
   # logger::log_trace("Combining and formatting edge tables")
   edges_table_treated <- edges_ms1 |>
-    tidytable::full_join(features_entropy) |>
-    tidytable::full_join(edges_ms2) |>
+    tidytable::full_join(y = features_entropy) |>
+    tidytable::full_join(y = edges_ms2) |>
     tidytable::rename(
       feature_source = !!as.name(name_source),
       feature_target = !!as.name(name_target)

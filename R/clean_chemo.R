@@ -226,8 +226,8 @@ count_candidates <- function(df_ranked, df_percentile) {
     tidytable::distinct(feature_id, candidates_best)
 
   tidytable::left_join(
-    candidates_evaluated,
-    candidates_best,
+    x = candidates_evaluated,
+    y = candidates_best,
     by = "feature_id"
   )
 }
@@ -712,7 +712,7 @@ clean_chemo <- function(
     tidytable::left_join(y = df_classes_mini, by = "feature_id") |>
     tidytable::left_join(y = results_candidates, by = "feature_id") |>
     tidytable::left_join(
-      df_filtered |>
+      y = df_filtered |>
         tidytable::select(
           feature_id,
           label_compound = candidate_structure_name,

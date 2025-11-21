@@ -195,7 +195,7 @@ weight_bio <- function(
     ) |>
     tidytable::distinct() |>
     tidytable::left_join(
-      df0 |>
+      y = df0 |>
         tidytable::select(
           candidate_structure_inchikey_connectivity_layer,
           candidate_organism_name
@@ -205,7 +205,7 @@ weight_bio <- function(
 
   df2 <- df1 |>
     tidytable::inner_join(
-      annotation_table_taxed |>
+      y = annotation_table_taxed |>
         tidytable::select(
           sample_organism_name,
           sample_organism_01_domain,

@@ -53,7 +53,10 @@ prepare_libraries_sop_hmdb <- function(
       # logger::log_trace("Unzipping HMDB")
       hmdb_prepared <- tryCatch(
         expr = {
-          utils::unzip(zipfile = input, exdir = dirname(input))
+          utils::unzip(
+            zipfile = input,
+            exdir = dirname(input)
+          )
           hmdb_structures <- input |>
             gsub(
               pattern = ".zip",
@@ -86,7 +89,10 @@ prepare_libraries_sop_hmdb <- function(
           )
 
           hmdb_list <- patterns |>
-            purrr::map(.f = find_fixed_pattern_line_in_file, file = sdf_data)
+            purrr::map(
+              .f = find_fixed_pattern_line_in_file,
+              file = sdf_data
+            )
 
           # Function to realign vectors with missing values
           realign_vectors <- function(vec1, vec2) {
