@@ -1,0 +1,12 @@
+feature_source,feature_target,candidate_score_similarity,feature_spectrum_entropy,feature_spectrum_peaks
+F1,F2,0.90,1.5,150
+F1,F3,0.85,1.4,145
+F1,F4,0.80,1.6,160
+F1,F5,0.75,1.3,140
+F1,F6,0.70,1.7,170
+F2,F7,0.88,1.2,120
+F2,F8,0.82,1.8,180
+F2,F9,0.76,1.1,110
+F2,F10,0.68,1.9,190
+F2,F11,0.60,1.0,100
+

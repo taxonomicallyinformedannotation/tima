@@ -4,19 +4,19 @@ library(testthat)
 
 test_that("prepare_libraries_sop_closed validates input parameter", {
   expect_error(
-    prepare_libraries_sop_closed(input = NULL, output = "out.tsv"),
+    prepare_libraries_sop_closed(input = NULL, output = temp_test_path("out.tsv")),
     "input must be a single character string"
   )
 
   expect_error(
-    prepare_libraries_sop_closed(input = 123, output = "out.tsv"),
+    prepare_libraries_sop_closed(input = 123, output = temp_test_path("out.tsv")),
     "input must be a single character string"
   )
 
   expect_error(
     prepare_libraries_sop_closed(
       input = c("file1", "file2"),
-      output = "out.tsv"
+      output = temp_test_path("out.tsv")
     ),
     "input must be a single character string"
   )

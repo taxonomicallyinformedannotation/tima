@@ -519,9 +519,10 @@ test_that("load_edges_table handles single neighbor request", {
     candidate_score_similarity = c("0.9", "0.8", "0.7")
   )
 
-  tidytable::fwrite(x = edges, file = "edges.tsv", sep = "\t")
+  edges_file <- temp_test_path("edges.tsv")
+  tidytable::fwrite(x = edges, file = edges_file, sep = "\t")
 
-  result <- load_edges_table("edges.tsv", candidates_neighbors = 1)
+  result <- load_edges_table(edges_file, candidates_neighbors = 1)
 
   expect_equal(nrow(result), 1)
   expect_equal(result$feature_target, "F2")
@@ -534,9 +535,10 @@ test_that("load_edges_table handles ties in similarity scores", {
     candidate_score_similarity = c("0.9", "0.9", "0.7")
   )
 
-  tidytable::fwrite(x = edges, file = "edges.tsv", sep = "\t")
+  edges_file <- temp_test_path("edges.tsv")
+  tidytable::fwrite(x = edges, file = edges_file, sep = "\t")
 
-  result <- load_edges_table("edges.tsv", candidates_neighbors = 2)
+  result <- load_edges_table(edges_file, candidates_neighbors = 2)
 
   # with_ties = FALSE, should get exactly 2 rows
   expect_equal(nrow(result), 2)
@@ -549,9 +551,10 @@ test_that("load_edges_table handles empty file", {
     candidate_score_similarity = character()
   )
 
-  tidytable::fwrite(x = edges, file = "edges.tsv", sep = "\t")
+  edges_file <- temp_test_path("edges.tsv")
+  tidytable::fwrite(x = edges, file = edges_file, sep = "\t")
 
-  result <- load_edges_table("edges.tsv", candidates_neighbors = 5)
+  result <- load_edges_table(edges_file, candidates_neighbors = 5)
 
   expect_equal(nrow(result), 0)
 })
@@ -573,9 +576,10 @@ test_that("load_annotation_tables handles single file", {
     candidate_score_similarity = c("0.8")
   )
 
-  tidytable::fwrite(x = ann, file = "ann.tsv", sep = "\t")
+  ann_file <- temp_test_path("ann.tsv")
+  tidytable::fwrite(x = ann, file = ann_file, sep = "\t")
 
-  result <- load_annotation_tables("ann.tsv", ms1_only = FALSE)
+  result <- load_annotation_tables(ann_file, ms1_only = FALSE)
 
   expect_equal(nrow(result), 1)
 })
@@ -587,10 +591,11 @@ test_that("load_edges_table handles features with fewer neighbors than requested
     candidate_score_similarity = c("0.9")
   )
 
-  tidytable::fwrite(x = edges, file = "edges.tsv", sep = "\t")
+  edges_file <- temp_test_path("edges.tsv")
+  tidytable::fwrite(x = edges, file = edges_file, sep = "\t")
 
   # Request 5 neighbors but only 1 available
-  result <- load_edges_table("edges.tsv", candidates_neighbors = 5)
+  result <- load_edges_table(edges_file, candidates_neighbors = 5)
 
   expect_equal(nrow(result), 1)
 })
@@ -598,29 +603,17 @@ test_that("load_edges_table handles features with fewer neighbors than requested
 ## validate_weight_annotations_inputs - Additional edge cases ----
 
 test_that("test-validate_weight_annotations_inputs accepts boundary weight values", {
-  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create(
-    "data/interim/libraries/sop/merged",
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
-
-  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
-  writeLines("", "data/interim/features/components.tsv")
-  writeLines("", "data/interim/features/edges.tsv")
-  writeLines("", "data/interim/metadata/taxa.tsv")
-  writeLines("", "data/interim/annotations/ann.tsv")
+  # Create test files using helper
+  files <- wa_create_minimal_files()
 
   # All weight on spectral
   expect_silent(
     validate_weight_annotations_inputs(
-      library = "data/interim/libraries/sop/merged/keys.tsv",
-      components = "data/interim/features/components.tsv",
-      edges = "data/interim/features/edges.tsv",
-      taxa = "data/interim/metadata/taxa.tsv",
-      annotations = "data/interim/annotations/ann.tsv",
+      library = files$library,
+      components = files$components,
+      edges = files$edges,
+      taxa = files$taxa,
+      annotations = files$ann,
       minimal_ms1_condition = "OR",
       weight_spectral = 1.0,
       weight_chemical = 0.0,
@@ -641,29 +634,17 @@ test_that("test-validate_weight_annotations_inputs accepts boundary weight value
 })
 
 test_that("test-validate_weight_annotations_inputs accepts boundary score values", {
-  dir.create("data/interim/annotations", recursive = TRUE, showWarnings = FALSE)
-  dir.create("data/interim/features", recursive = TRUE, showWarnings = FALSE)
-  dir.create(
-    "data/interim/libraries/sop/merged",
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-  dir.create("data/interim/metadata", recursive = TRUE, showWarnings = FALSE)
-
-  writeLines("", "data/interim/libraries/sop/merged/keys.tsv")
-  writeLines("", "data/interim/features/components.tsv")
-  writeLines("", "data/interim/features/edges.tsv")
-  writeLines("", "data/interim/metadata/taxa.tsv")
-  writeLines("", "data/interim/annotations/ann.tsv")
+  # Create test files using helper
+  files <- wa_create_minimal_files()
 
   # Min and max score values
   expect_silent(
     validate_weight_annotations_inputs(
-      library = "data/interim/libraries/sop/merged/keys.tsv",
-      components = "data/interim/features/components.tsv",
-      edges = "data/interim/features/edges.tsv",
-      taxa = "data/interim/metadata/taxa.tsv",
-      annotations = "data/interim/annotations/ann.tsv",
+      library = files$library,
+      components = files$components,
+      edges = files$edges,
+      taxa = files$taxa,
+      annotations = files$ann,
       minimal_ms1_condition = "AND",
       weight_spectral = 0.33,
       weight_chemical = 0.33,
@@ -1094,7 +1075,7 @@ test_that("test-export_results writes three files", {
   )
   # Stub get_default_paths locally
   get_default_paths <- function() wa_stub_get_default_paths(tmp)
-  out_vec <- export_results(results_list, output = "out.tsv", pattern = "test")
+  out_vec <- export_results(results_list, output = temp_test_path("out.tsv"), pattern = "test")
   expect_true(all(file.exists(out_vec)))
   expect_equal(names(out_vec), c("filtered", "full"))
 })

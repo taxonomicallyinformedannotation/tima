@@ -72,7 +72,7 @@ local_test_project <- function(copy = TRUE) {
 #' and errors.
 #'
 #' @param threshold Character or logger level. Minimum log level to display.
-#'   Default: "WARN"
+#'   Default: "ERROR"
 #'
 #' @return Invisible NULL
 #'
@@ -81,7 +81,7 @@ local_test_project <- function(copy = TRUE) {
 #'   local_quiet_logging("ERROR")
 #'   # Only errors will be logged
 #' })
-local_quiet_logging <- function(threshold = "WARN") {
+local_quiet_logging <- function(threshold = "ERROR") {
   if (requireNamespace("logger", quietly = TRUE)) {
     # Convert character to logger level if needed
     lvl <- tryCatch(
