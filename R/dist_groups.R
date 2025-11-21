@@ -18,7 +18,7 @@ dist_get <- function(d, idx1, idx2) {
 
   # Convert input to distance object if needed
   if (!inherits(d, "dist")) {
-    d <- stats::as.dist(d)
+    d <- stats::as.dist(m = d)
   }
 
   # Get size of distance matrix
@@ -75,7 +75,7 @@ dist_groups <- function(d, g) {
   # Input Validation ----
 
   # Convert d to a dist object
-  d <- stats::as.dist(d)
+  d <- stats::as.dist(m = d)
 
   # Convert g to a factor
   g <- as.factor(g)
@@ -95,7 +95,7 @@ dist_groups <- function(d, g) {
   # Generate Pairwise Combinations ----
 
   # Get all pairwise combinations of observation indices
-  idx_pairs <- utils::combn(n_obs, 2L)
+  idx_pairs <- utils::combn(x = n_obs, m = 2L)
   idx1 <- idx_pairs[1L, ]
   idx2 <- idx_pairs[2L, ]
 

@@ -72,7 +72,7 @@ fake_lotus <- function(export) {
 
   # Write to file
   create_dir(export = export)
-  tidytable::fwrite(fake_data, export)
+  tidytable::fwrite(x = fake_data, file = export)
 
   logger::log_debug("Created fake LOTUS file at: {export}")
   return(export)

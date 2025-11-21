@@ -48,17 +48,17 @@ clean_collapse <- function(grouped_df, cols = NULL, separator = " $ ") {
   # Pipeline for collapsing and cleaning
   clean_collapse_df <- grouped_df |>
     tidytable::reframe(tidytable::across(
-      .cols = tidyselect::all_of(cols),
+      .cols = tidyselect::all_of(x = cols),
       .fns = collapse_unique
     )) |>
     tidytable::ungroup() |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.list),
+      .cols = tidyselect::where(fn = is.list),
       .fns = as.character
     )) |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.character),
-      .fns = \(x) tidytable::na_if(trimws(x), "")
+      .cols = tidyselect::where(fn = is.character),
+      .fns = \(x) tidytable::na_if(x = trimws(x), y = "")
     ))
 
   return(clean_collapse_df)

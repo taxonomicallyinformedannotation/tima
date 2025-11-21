@@ -84,15 +84,15 @@ extract_spectra <- function(object) {
   # logger::log_trace("Harmonizing column types")
   spectra <- spectra |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::any_of(incoherent_logical),
+      .cols = tidyselect::any_of(x = incoherent_logical),
       .fns = as.logical
     )) |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::any_of(incoherent_integer),
+      .cols = tidyselect::any_of(x = incoherent_integer),
       .fns = as.integer
     )) |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::any_of(incoherent_numeric),
+      .cols = tidyselect::any_of(x = incoherent_numeric),
       .fns = as.numeric
     ))
 
@@ -109,8 +109,10 @@ extract_spectra <- function(object) {
     #  "Harmonizing {length(columns_to_harmonize)} column names"
     # )
     spectra <- spectra |>
-      tidytable::select(-tidyselect::any_of(names(columns_to_harmonize))) |>
-      tidytable::rename(tidyselect::any_of(columns_to_harmonize))
+      tidytable::select(
+        -tidyselect::any_of(x = names(columns_to_harmonize))
+      ) |>
+      tidytable::rename(tidyselect::any_of(x = columns_to_harmonize))
   }
 
   logger::log_debug("Extracted {nrow(spectra)} spectra")

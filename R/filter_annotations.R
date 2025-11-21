@@ -82,7 +82,7 @@ validate_filter_annotations_inputs <- function(
 
   # Validate RT files
   if (length(rts) > 0) {
-    rts_exist <- purrr::map_lgl(rts, file.exists)
+    rts_exist <- purrr::map_lgl(.x = rts, .f = file.exists)
     if (!all(rts_exist)) {
       stop(
         "Retention time file(s) not found: ",
@@ -168,7 +168,8 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
       by = "candidate_structure_inchikey_connectivity_layer"
     ) |>
     tidytable::mutate(
-      candidate_structure_error_rt = as.numeric(rt) - as.numeric(rt_target)
+      candidate_structure_error_rt = as.numeric(rt) -
+        as.numeric(rt_target)
     ) |>
     tidytable::arrange(abs(candidate_structure_error_rt)) |>
     tidytable::distinct(
@@ -180,7 +181,7 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
       abs(candidate_structure_error_rt) <= abs(tolerance_rt) |
         is.na(candidate_structure_error_rt)
     ) |>
-    tidytable::select(-tidyselect::any_of(c("rt_target", "type")))
+    tidytable::select(-tidyselect::any_of(x = c("rt_target", "type")))
 }
 
 #' @title Filter annotations
@@ -291,7 +292,7 @@ filter_annotations <- function(
   # Apply RT Filtering if Library Available ----
 
   features_annotated_table_1 <- features_table |>
-    tidytable::left_join(annotation_table, by = "feature_id")
+    tidytable::left_join(y = annotation_table, by = "feature_id")
   rm(annotation_table)
 
   if (!is.null(rts)) {
@@ -305,7 +306,8 @@ filter_annotations <- function(
 
     # Robust rename: support either 'rt' or pre-renamed 'rt_target'
     if ("rt" %in% names(rt_table)) {
-      rt_table <- rt_table |> tidytable::rename(rt_target = rt)
+      rt_table <- rt_table |>
+        tidytable::rename(rt_target = rt)
     } else if (!"rt_target" %in% names(rt_table)) {
       stop(
         "Retention time library must contain column 'rt' or 'rt_target'",
@@ -336,7 +338,7 @@ filter_annotations <- function(
 
   ## in case some features had a single filtered annotation
   final_table <- features_table |>
-    tidytable::left_join(features_annotated_table_2)
+    tidytable::left_join(y = features_annotated_table_2)
 
   rm(
     features_table,

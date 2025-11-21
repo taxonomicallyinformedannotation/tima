@@ -208,7 +208,9 @@ create_edges_spectra <- function(
       name_target = idz[name_target]
     )
   entropy_df <- tidytable::tidytable(entropy) |>
-    tidytable::mutate(!!as.name(name_source) := tidytable::row_number()) |>
+    tidytable::mutate(
+      !!as.name(name_source) := tidytable::row_number()
+    ) |>
     tidytable::mutate(
       name_source = idz[name_source],
       feature_spectrum_entropy = as.character(entropy),
@@ -225,20 +227,22 @@ create_edges_spectra <- function(
   rm(entropy, npeaks, idz)
 
   edges <- edges |>
-    tidytable::select(tidyselect::any_of(
-      c(
-        name_source,
-        name_target,
-        "candidate_score_similarity" = "score",
-        "candidate_count_similarity_peaks_matched" = "matched_peaks"
+    tidytable::select(
+      tidyselect::any_of(
+        c(
+          name_source,
+          name_target,
+          "candidate_score_similarity" = "score",
+          "candidate_count_similarity_peaks_matched" = "matched_peaks"
+        )
       )
-    ))
+    )
 
   edges <- edges |>
     tidytable::filter(candidate_score_similarity >= threshold)
 
   edges <- edges |>
-    tidytable::full_join(entropy_df) |>
+    tidytable::full_join(y = entropy_df) |>
     tidytable::mutate(
       !!as.name(name_target) := tidytable::coalesce(
         !!as.name(name_target),

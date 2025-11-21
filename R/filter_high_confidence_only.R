@@ -163,8 +163,8 @@ filter_high_confidence_only <- function(
   # Drop helper columns
   df_filtered <- df_filtered |>
     tidytable::select(
-      -tidyselect::starts_with(".score_"),
-      -tidyselect::starts_with(".rt_err_")
+      -tidyselect::starts_with(match = ".score_"),
+      -tidyselect::starts_with(match = ".rt_err_")
     )
 
   n_after <- nrow(df_filtered)

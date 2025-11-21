@@ -95,7 +95,7 @@ clean_bio <- function(
         candidate_structure_tax_cla_04dirpar,
         score_weighted_bio
       ),
-    by = stats::setNames("feature_id", "feature_target")
+    by = stats::setNames(object = "feature_id", nm = "feature_target")
   ) |>
     tidytable::filter(!is.na(feature_source))
 
@@ -115,11 +115,13 @@ clean_bio <- function(
       tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
 
     df1b <- df1 |>
-      tidytable::select(-tidyselect::contains("feature_pred_tax"))
+      tidytable::select(-tidyselect::contains(match = "feature_pred_tax"))
 
     df2 <- annotations_distinct |>
-      tidytable::select(-tidyselect::contains("feature_pred_tax")) |>
-      tidytable::anti_join(df1) |>
+      tidytable::select(
+        -tidyselect::contains(match = "feature_pred_tax")
+      ) |>
+      tidytable::anti_join(y = df1) |>
       tidytable::bind_rows(df1b)
   } else {
     df1 <- tidytable::tidytable()
@@ -135,11 +137,11 @@ clean_bio <- function(
     .x = supp_tables,
     .init = df2,
     .f = tidytable::left_join,
-    by = stats::setNames("feature_source", "feature_id")
+    by = stats::setNames(object = "feature_source", nm = "feature_id")
   ) |>
     tidytable::select(feature_id, tidyselect::everything()) |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.logical),
+      .cols = tidyselect::where(fn = is.logical),
       .fns = as.character
     ))
   # Conditional coalescing
@@ -180,7 +182,7 @@ clean_bio <- function(
     return(annot_table_wei_bio_preclean)
   }
   annot_table_wei_bio_clean <- annot_table_wei_bio_preclean |>
-    tidytable::anti_join(df1b, by = "feature_id") |>
+    tidytable::anti_join(y = df1b, by = "feature_id") |>
     tidytable::bind_rows(df1)
 
   rm(
@@ -291,7 +293,9 @@ clean_bio <- function(
   # Filter by entropy or label presence
   if ("label" %in% colnames(edges_filtered)) {
     edges_filtered <- edges_filtered |>
-      tidytable::filter(feature_spectrum_entropy > min_entropy | !is.na(label))
+      tidytable::filter(
+        feature_spectrum_entropy > min_entropy | !is.na(label)
+      )
   } else {
     edges_filtered <- edges_filtered |>
       tidytable::filter(feature_spectrum_entropy > min_entropy)
