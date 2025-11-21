@@ -84,7 +84,10 @@ test_that("read_from_sirius_zip validates sirius_zip parameter", {
   )
 
   expect_error(
-    read_from_sirius_zip(sirius_zip = c("file1.zip", "file2.zip"), file = "test"),
+    read_from_sirius_zip(
+      sirius_zip = c("file1.zip", "file2.zip"),
+      file = "test"
+    ),
     "sirius_zip must be a single character string"
   )
 
@@ -220,7 +223,9 @@ test_that("read_from_sirius_zip parses tab-delimited data correctly", {
   expect_equal(nrow(result), 2)
 
   # Should have correct columns
-  expect_true(all(c("rank", "name", "molecularFormula", "adduct") %in% names(result)))
+  expect_true(all(
+    c("rank", "name", "molecularFormula", "adduct") %in% names(result)
+  ))
 })
 
 test_that("read_from_sirius_zip handles NA values correctly", {
