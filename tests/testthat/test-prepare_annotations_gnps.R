@@ -4,17 +4,18 @@ library(testthat)
 
 ## Internal Utility Helpers ----
 
-make_min_struct_files <- function(tmp) {
+make_min_struct_files <- function() {
+  tmp <- tempdir()
   dir.create(
-    file.path("structures", "taxonomies"),
+    file.path(tmp, "structures", "taxonomies"),
     recursive = TRUE,
     showWarnings = FALSE
   )
-  stereo <- file.path("structures", "stereo.tsv")
-  met <- file.path("structures", "metadata.tsv")
-  nam <- file.path("structures", "names.tsv")
-  cla <- file.path("structures", "taxonomies", "classyfire.tsv")
-  npc <- file.path("structures", "taxonomies", "npc.tsv")
+  stereo <- file.path(tmp, "structures", "stereo.tsv")
+  met <- file.path(tmp, "structures", "metadata.tsv")
+  nam <- file.path(tmp, "structures", "names.tsv")
+  cla <- file.path(tmp, "structures", "taxonomies", "classyfire.tsv")
+  npc <- file.path(tmp, "structures", "taxonomies", "npc.tsv")
 
   # Write minimal valid content (headers + one row) for each file
   tidytable::fwrite(
@@ -73,7 +74,7 @@ make_min_struct_files <- function(tmp) {
 ## Validation ----
 
 test_that("test-prepare_annotations_gnps validates output path", {
-  s <- make_min_struct_files(tmp)
+  s <- make_min_struct_files()
   expect_error(
     prepare_annotations_gnps(
       input = character(0),
@@ -107,7 +108,7 @@ test_that("test-prepare_annotations_gnps validates structure file paths", {
 # Behavior ----
 
 test_that("test-prepare_annotations_gnps handles missing input files by creating empty output", {
-  s <- make_min_struct_files(tmp)
+  s <- make_min_struct_files()
   out <- file.path("gnps.tsv")
   res <- prepare_annotations_gnps(
     input = file.path("does_not_exist.tsv"),
@@ -125,7 +126,7 @@ test_that("test-prepare_annotations_gnps handles missing input files by creating
 })
 
 test_that("test-prepare_annotations_gnps processes minimal valid GNPS file", {
-  s <- make_min_struct_files(tmp)
+  s <- make_min_struct_files()
   out <- file.path("gnps.tsv")
 
   # Minimal GNPS file with required columns

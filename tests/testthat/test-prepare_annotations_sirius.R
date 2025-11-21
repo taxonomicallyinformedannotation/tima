@@ -4,17 +4,18 @@ library(testthat)
 
 ## Internal Utility Helpers ----
 
-.make_structs <- function(tmp) {
+.make_structs <- function() {
+  tmp <- tempdir()
   dir.create(
-    file.path("structures", "taxonomies"),
+    file.path(tmp, "structures", "taxonomies"),
     recursive = TRUE,
     showWarnings = FALSE
   )
-  stereo <- file.path("structures", "stereo.tsv")
-  met <- file.path("structures", "metadata.tsv")
-  nam <- file.path("structures", "names.tsv")
-  cla <- file.path("structures", "taxonomies", "classyfire.tsv")
-  npc <- file.path("structures", "taxonomies", "npc.tsv")
+  stereo <- file.path(tmp, "structures", "stereo.tsv")
+  met <- file.path(tmp, "structures", "metadata.tsv")
+  nam <- file.path(tmp, "structures", "names.tsv")
+  cla <- file.path(tmp, "structures", "taxonomies", "classyfire.tsv")
+  npc <- file.path(tmp, "structures", "taxonomies", "npc.tsv")
   writeLines("", stereo)
   writeLines("", met)
   writeLines("", nam)
@@ -26,10 +27,11 @@ library(testthat)
 ## Validation ----
 
 test_that("test-prepare_annotations_sirius validates sirius_version", {
-  s <- .make_structs(tmp)
-  out_ann <- file.path("ann.tsv")
-  out_can <- file.path("can.tsv")
-  out_for <- file.path("for.tsv")
+  s <- .make_structs()
+  tmp <- tempdir()
+  out_ann <- file.path(tmp, "ann.tsv")
+  out_can <- file.path(tmp, "can.tsv")
+  out_for <- file.path(tmp, "for.tsv")
   expect_error(
     prepare_annotations_sirius(
       input_directory = file.path("missing.zip"),
@@ -48,7 +50,7 @@ test_that("test-prepare_annotations_sirius validates sirius_version", {
 })
 
 test_that("test-prepare_annotations_sirius validates output parameters and structure files", {
-  s <- .make_structs(tmp)
+  s <- .make_structs()
   expect_error(
     prepare_annotations_sirius(
       input_directory = file.path("missing.zip"),
@@ -86,10 +88,11 @@ test_that("test-prepare_annotations_sirius validates output parameters and struc
 ## Behavior ----
 
 test_that("test-prepare_annotations_sirius handles missing input by producing empty outputs", {
-  s <- .make_structs(tmp)
-  out_can <- file.path("can.tsv")
-  out_for <- file.path("for.tsv")
-  out_ann <- file.path("ann.tsv")
+  s <- .make_structs()
+  tmp <- tempdir()
+  out_ann <- file.path(tmp, "ann.tsv")
+  out_can <- file.path(tmp, "can.tsv")
+  out_for <- file.path(tmp, "for.tsv")
   res <- prepare_annotations_sirius(
     input_directory = file.path("not_there.zip"),
     output_ann = out_ann,
