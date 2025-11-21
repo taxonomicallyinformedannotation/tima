@@ -3,7 +3,10 @@
 library(testthat)
 
 test_that("parse_yaml_params errors if default file missing", {
-  expect_error(parse_yaml_params(def = temp_test_path("missing.yaml"), usr = NULL), "not found")
+  expect_error(
+    parse_yaml_params(def = temp_test_path("missing.yaml"), usr = NULL),
+    "not found"
+  )
 })
 
 test_that("parse_yaml_params loads default YAML", {

@@ -191,7 +191,11 @@ test_that("test-benchmark_taxize_spectra samples one organism per feature when m
   # Same feature mapped to two organisms via duplicated inchikey connectivity layer
   feature_ids <- c("F1", "F2")
   inchikey_layers <- c("AAAAAAAAAAAAAA", "CCCCCCCCCCCCCC")
-  features_path <- create_bench_features(tempdir(), feature_ids, inchikey_layers)
+  features_path <- create_bench_features(
+    tempdir(),
+    feature_ids,
+    inchikey_layers
+  )
   keys_path <- create_bench_keys(
     dir = tempdir(),
     structure_inchikeys = c("AAAAAAAAAAAAAA-AAAA-AA", "AAAAAAAAAAAAAA-BBBB-BB"),

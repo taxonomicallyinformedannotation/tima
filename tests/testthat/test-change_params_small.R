@@ -45,4 +45,3 @@ test_that("change_params_small all parameters have NULL defaults", {
 # - Proper cache setup
 # - YAML file validation
 # These are better suited for integration tests rather than unit tests
-

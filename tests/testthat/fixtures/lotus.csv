@@ -1,0 +1,5 @@
+structure_inchikey,structure_nameTraditional,structure_exact_mass,structure_smiles,structure_smiles_2D,structure_molecular_formula,structure_xlogp,organism_name,organism_taxonomy_ottid,organism_taxonomy_01domain,organism_taxonomy_02kingdom,organism_taxonomy_03phylum,organism_taxonomy_04class,organism_taxonomy_05order,organism_taxonomy_06family,organism_taxonomy_07tribe,organism_taxonomy_08genus,organism_taxonomy_09species,organism_taxonomy_10varietas
+ABCDEFGHIJKLMN-OPQRSTUVWX-A,Test Compound A,150.0558,CCCC(=O)O,CCCC(=O)O,C4,1.0,Gentiana lutea,515698,Eukaryota,Plantae,Streptophyta,Magnoliopsida,Gentianales,Gentianaceae,NA,Gentiana,Gentiana lutea,NA
+BBBBBBBBBBBBBB-CCCCCCCCCC-D,Test Compound B,250.1234,C1=CC=CC=C1,C1=CC=CC=C1,C5,2.0,Arabidopsis thaliana,309275,Eukaryota,Plantae,Streptophyta,Magnoliopsida,Brassicales,Brassicaceae,NA,Arabidopsis,Arabidopsis thaliana,NA
+CCCCCCCCCCCCCC-DDDDDDDDDD-E,Test Compound C,200.0876,CC(C)CC(=O)O,CC(C)CC(=O)O,C6,3.0,Solanum tuberosum,4113,Eukaryota,Plantae,Streptophyta,Magnoliopsida,Solanales,Solanaceae,NA,Solanum,Solanum tuberosum,NA
+

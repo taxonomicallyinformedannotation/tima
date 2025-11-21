@@ -1075,7 +1075,11 @@ test_that("test-export_results writes three files", {
   )
   # Stub get_default_paths locally
   get_default_paths <- function() wa_stub_get_default_paths(tmp)
-  out_vec <- export_results(results_list, output = temp_test_path("out.tsv"), pattern = "test")
+  out_vec <- export_results(
+    results_list,
+    output = temp_test_path("out.tsv"),
+    pattern = "test"
+  )
   expect_true(all(file.exists(out_vec)))
   expect_equal(names(out_vec), c("filtered", "full"))
 })
