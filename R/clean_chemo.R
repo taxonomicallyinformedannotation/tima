@@ -166,15 +166,15 @@ rank_and_deduplicate <- function(df) {
         candidate_score_pseudo_initial
       )
     ) |>
-    tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
+    tidytable::arrange(tidytable::desc(x = score_weighted_chemo)) |>
     tidytable::distinct(
       feature_id,
       candidate_structure_inchikey_connectivity_layer,
       .keep_all = TRUE
     ) |>
     tidytable::mutate(
-      rank_initial = tidytable::dense_rank(-candidate_score_pseudo_initial),
-      rank_final = tidytable::dense_rank(-score_weighted_chemo),
+      rank_initial = tidytable::dense_rank(x = -candidate_score_pseudo_initial),
+      rank_final = tidytable::dense_rank(x = -score_weighted_chemo),
       .by = feature_id
     )
 }
@@ -365,11 +365,17 @@ compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
 remove_compound_names <- function(results_list, compounds_names) {
   if (!compounds_names) {
     results_list$mini <- results_list$mini |>
-      tidytable::select(-tidyselect::any_of("candidate_structure_name"))
+      tidytable::select(
+        -tidyselect::any_of(x = "candidate_structure_name")
+      )
     results_list$filtered <- results_list$filtered |>
-      tidytable::select(-tidyselect::any_of("candidate_structure_name"))
+      tidytable::select(
+        -tidyselect::any_of(x = "candidate_structure_name")
+      )
     results_list$full <- results_list$full |>
-      tidytable::select(-tidyselect::any_of("candidate_structure_name"))
+      tidytable::select(
+        -tidyselect::any_of(x = "candidate_structure_name")
+      )
   }
   results_list
 }
@@ -558,7 +564,7 @@ clean_chemo <- function(
       remove_ties = remove_ties,
       summarize = summarize
     ) |>
-    tidytable::left_join(results_candidates, by = "feature_id") |>
+    tidytable::left_join(y = results_candidates, by = "feature_id") |>
     tidytable::mutate(
       # Set candidates_best to NA when no inchikey
       candidates_best = tidytable::if_else(
@@ -573,7 +579,7 @@ clean_chemo <- function(
 
   # Extract best compound per feature
   df_compounds_mini <- df_percentile |>
-    tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
+    tidytable::arrange(tidytable::desc(x = score_weighted_chemo)) |>
     tidytable::distinct(
       feature_id,
       candidate_structure_inchikey_connectivity_layer,
@@ -597,8 +603,8 @@ clean_chemo <- function(
     tidytable::select(
       feature_id,
       candidate_structure_inchikey_connectivity_layer,
-      tidyselect::starts_with("candidate_structure_tax_cla"),
-      tidyselect::starts_with("candidate_structure_tax_npc")
+      tidyselect::starts_with(match = "candidate_structure_tax_cla"),
+      tidyselect::starts_with(match = "candidate_structure_tax_npc")
     ) |>
     tidytable::distinct(feature_id, .keep_all = TRUE) |>
     tidytable::mutate(
@@ -626,11 +632,15 @@ clean_chemo <- function(
 
   # Extract predicted taxonomy with scores (when NO inchikey - use predicted columns)
   df_pred_tax <- df_percentile |>
-    tidytable::select(tidytable::contains(c("feature_id", "feature_pred"))) |>
-    tidytable::mutate(tidytable::across(
-      tidytable::contains("score"),
-      as.numeric
-    ))
+    tidytable::select(
+      tidytable::contains(match = c("feature_id", "feature_pred"))
+    ) |>
+    tidytable::mutate(
+      tidytable::across(
+        tidytable::contains(match = "score"),
+        as.numeric
+      )
+    )
 
   if (nrow(df_pred_tax) > 0L) {
     # Bring level weights from parent env (same as weight_chemo parameters)
@@ -644,7 +654,7 @@ clean_chemo <- function(
 
     # Combine ClassyFire and NPClassifier
     df_pred_tax <- df_cla |>
-      tidytable::left_join(df_npc, by = "feature_id")
+      tidytable::left_join(y = df_npc, by = "feature_id")
   } else {
     df_pred_tax <- tidytable::tidytable(
       feature_id = character(0),
@@ -657,7 +667,7 @@ clean_chemo <- function(
 
   # Combine: use structure taxonomy when inchikey exists, predicted when not
   df_classes_mini <- df_structure_tax |>
-    tidytable::left_join(df_pred_tax, by = "feature_id") |>
+    tidytable::left_join(y = df_pred_tax, by = "feature_id") |>
     tidytable::mutate(
       label_classyfire = tidytable::if_else(
         has_inchikey,
@@ -699,8 +709,8 @@ clean_chemo <- function(
 
   # Combine mini results and adjust candidates_best based on inchikey presence
   results_mini <- features_table |>
-    tidytable::left_join(df_classes_mini, by = "feature_id") |>
-    tidytable::left_join(results_candidates, by = "feature_id") |>
+    tidytable::left_join(y = df_classes_mini, by = "feature_id") |>
+    tidytable::left_join(y = results_candidates, by = "feature_id") |>
     tidytable::left_join(
       df_filtered |>
         tidytable::select(
@@ -798,7 +808,7 @@ clean_chemo <- function(
       remove_ties = remove_ties,
       summarize = summarize
     ) |>
-    tidytable::left_join(results_candidates, by = "feature_id") |>
+    tidytable::left_join(y = results_candidates, by = "feature_id") |>
     tidytable::mutate(
       # Set candidates_best to NA when no inchikey
       candidates_best = tidytable::if_else(

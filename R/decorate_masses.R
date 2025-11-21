@@ -39,7 +39,9 @@ decorate_masses <- function(
 
   # Count unique structures
   n_unique_structures <- valid_annotations |>
-    tidytable::distinct(candidate_structure_inchikey_connectivity_layer) |>
+    tidytable::distinct(
+      candidate_structure_inchikey_connectivity_layer
+    ) |>
     nrow()
 
   # Count unique features

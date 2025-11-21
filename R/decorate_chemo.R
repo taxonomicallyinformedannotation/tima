@@ -81,7 +81,9 @@ decorate_chemo <- function(
   count_unique_structures <- function(df) {
     nrow(
       df |>
-        tidytable::distinct(candidate_structure_inchikey_connectivity_layer)
+        tidytable::distinct(
+          candidate_structure_inchikey_connectivity_layer
+        )
     )
   }
 

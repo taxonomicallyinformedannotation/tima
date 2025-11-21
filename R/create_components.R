@@ -94,12 +94,17 @@ create_components <- function(
 
   # Create undirected graph from edges
   # logger::log_trace("Building graph structure")
-  network_graph <- igraph::graph_from_data_frame(edges, directed = FALSE)
+  network_graph <- igraph::graph_from_data_frame(
+    d = edges,
+    directed = FALSE
+  )
 
   # Find connected components
   # logger::log_trace("Identifying connected components")
-  component_membership <- igraph::components(graph = network_graph)$membership
-  feature_names <- names(igraph::V(network_graph))
+  component_membership <- igraph::components(
+    graph = network_graph
+  )$membership
+  feature_names <- names(igraph::V(graph = network_graph))
 
   # Organize features by component
   features_by_component <- split(feature_names, component_membership)

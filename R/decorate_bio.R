@@ -83,7 +83,9 @@ decorate_bio <- function(
 
     df |>
       tidytable::filter(score_biological >= min_score) |>
-      tidytable::distinct(candidate_structure_inchikey_connectivity_layer) |>
+      tidytable::distinct(
+        candidate_structure_inchikey_connectivity_layer
+      ) |>
       nrow()
   }
 

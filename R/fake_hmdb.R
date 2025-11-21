@@ -66,7 +66,7 @@ fake_hmdb <- function(export) {
 
   if (zip_result != 0) {
     logger::log_warn("Failed to create zip file, trying alternative method")
-    utils::zip(basename(export), fake_export)
+    utils::zip(zipfile = basename(export), files = fake_export)
   }
 
   # Move to final location
