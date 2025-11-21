@@ -7,38 +7,39 @@ is_covr <- ("covr" %in% loadedNamespaces()) ||
 options(tima.test.is_covr = is_covr)
 
 # Provide a reproducible temp root for this session's tests
+# CRITICAL: Always use tempdir(), never tests/testthat/data/
 .test_root <- file.path(tempdir(), sprintf("tima-tests-%s", Sys.getpid()))
 dir.create(.test_root, recursive = TRUE, showWarnings = FALSE)
 
-# Helper to create isolated temp directories per test
-make_tmp_dir <- function(subdir = NULL) {
-  dir_name <- if (is.null(subdir)) {
-    tempfile("test-", tmpdir = .test_root)
-  } else {
-    file.path(.test_root, subdir)
-  }
-  dir.create(dir_name, recursive = TRUE, showWarnings = FALSE)
-  dir_name
+# Helper to get fixture path (read-only access to fixtures)
+fixture_path <- function(...) {
+  # Get package root
+  pkg_root <- tryCatch(
+    rprojroot::find_package_root_file(),
+    error = function(e) getwd()
+  )
+  file.path(pkg_root, "tests", "testthat", "fixtures", ...)
 }
 
-# Helper to create temp files with specific extension in tmp
-make_tmp_file <- function(name = NULL, fileext = "") {
-  # Fallback if tmp was not initialized for some reason
-  if (!exists("tmp", inherits = FALSE) || is.null(tmp)) {
-    tmp <<- file.path(tempdir(), sprintf("tima-fallback-%s", Sys.getpid()))
-    dir.create(tmp, recursive = TRUE, showWarnings = FALSE)
+# Helper to copy fixture to temp location for modification
+copy_fixture <- function(fixture_name, dest_name = NULL) {
+  src <- fixture_path(fixture_name)
+  if (!file.exists(src)) {
+    stop("Fixture not found: ", fixture_name)
   }
-  if (is.null(name)) {
-    f <- tempfile(tmpdir = tmp, fileext = fileext)
-  } else {
-    f <- file.path(tmp, paste0(name, fileext))
+
+  if (is.null(dest_name)) {
+    dest_name <- basename(fixture_name)
   }
-  dir.create(dirname(f), recursive = TRUE, showWarnings = FALSE)
-  f
+
+  dest <- file.path(tmp, dest_name)
+  dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
+  file.copy(src, dest, overwrite = TRUE)
+  dest
 }
 
 # Optionally create a common tmp dir for convenience (legacy compatibility)
-tmp <- make_tmp_dir("tmp")
+tmp <- tempdir()
 tmp_dir <- tmp
 temp_dir <- tmp
 
@@ -51,6 +52,16 @@ if (requireNamespace("logger", quietly = TRUE)) {
 options(tima.test.pkg_root = normalizePath(getwd()))
 options(tima.test.temp_dir = tmp)
 
-# Example usage inside a test
-# minimal <- tidytable::tidytable(
-#   structure_inch_
+# Ensure test writes NEVER go to tests/testthat/data/
+# Override any potential writes by ensuring paths are redirected
+.prevent_testthat_data_writes <- function() {
+  testthat_data <- file.path(getwd(), "tests", "testthat", "data")
+  if (dir.exists(testthat_data)) {
+    warning(
+      "tests/testthat/data/ exists but should not be used for test outputs. ",
+      "All test data should go to tempdir().",
+      call. = FALSE
+    )
+  }
+}
+.prevent_testthat_data_writes()

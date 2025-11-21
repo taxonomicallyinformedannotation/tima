@@ -1,0 +1,3 @@
+structure_smiles,structure_smiles_2D,structure_molecular_formula,structure_xlogp,structure_inchikey,structure_nameTraditional,structure_exact_mass,organism_name,organism_taxonomy_ottid,organism_taxonomy_01domain,organism_taxonomy_02kingdom,organism_taxonomy_03phylum,organism_taxonomy_06family
+CCC,CCC,C3,1.0,DDDDDDDDDDDDDD-EEEEEEEEEE-F,Closed Compound D,180.0634,Coffea arabica,1066728,Eukaryota,Plantae,Streptophyta,Rubiaceae
+CCC,CCC,C3,1.0,EEEEEEEEEEEEEE-FFFFFFFFFF-G,Closed Compound E,220.0998,Nicotiana tabacum,158484,Eukaryota,Plantae,Streptophyta,Solanaceae

@@ -3,10 +3,8 @@
 library(testthat)
 
 # test_that("prepare_libraries_sop_lotus returns empty template when file missing", {
-#   skip_on_cran()
-#
-#   nonexistent <- make_tmp_file("nonexistent_lotus.csv")
-#   output <- make_tmp_file(fileext = ".tsv")
+#   nonexistent <- file.path(tmp, "nonexistent_lotus.csv")
+#   output <- tempfile(fileext = ".tsv")
 #
 #   result <- prepare_libraries_sop_lotus(
 #     input = nonexistent,
@@ -20,27 +18,16 @@ library(testthat)
 #   df <- tidytable::fread(output)
 #   expect_equal(nrow(df), 0)
 # })
-#
-# test_that("prepare_libraries_sop_lotus processes valid LOTUS data", {
-#   skip_on_cran()
-#
-#   temp_input <- make_tmp_file(fileext = ".csv.gz")
-#   temp_output <- make_tmp_file(fileext = ".tsv")
-#
-#   # Create minimal valid LOTUS data
-#   lotus_data <- tidytable::tidytable(
-#     structure_inchikey = "ABCDEFGHIJKLMN-OPQRSTUVWX-A",
-#     structure_nameTraditional = "Test Compound",
-#     structure_exact_mass = "123.456",
-#     organism_name = "Test organism",
-#     organism_taxonomy_ottid = "12345",
-#     organism_taxonomy_01domain = "Eukaryota",
-#     organism_taxonomy_02kingdom = "Plantae",
-#     organism_taxonomy_03phylum = "Streptophyta",
-#     organism_taxonomy_06family = "Gentianaceae"
+
+# test_that("prepare_libraries_sop_lotus processes fixture LOTUS data", {
+#   # Copy fixture to temp location
+#   temp_input <- file.path(tmp, "lotus_test.csv")
+#   file.copy(
+#     testthat::test_path("fixtures", "lotus_minimal.csv"),
+#     temp_input,
+#     overwrite = TRUE
 #   )
-#
-#   tidytable::fwrite(lotus_data, temp_input)
+#   temp_output <- tempfile(fileext = ".tsv")
 #
 #   result <- prepare_libraries_sop_lotus(
 #     input = temp_input,
@@ -52,22 +39,18 @@ library(testthat)
 #
 #   df <- tidytable::fread(temp_output)
 #   expect_true(nrow(df) >= 1)
+#   expect_true("structure_inchikey_2D" %in% names(df))
+#   expect_true("structure_name" %in% names(df))
 # })
-#
-# test_that("prepare_libraries_sop_lotus extracts 2D InChIKey", {
-#   skip_on_cran()
-#
-#   temp_input <- make_tmp_file(fileext = ".csv")
-#   temp_output <- make_tmp_file(fileext = ".tsv")
-#
-#   lotus_data <- tidytable::tidytable(
-#     structure_inchikey = "XYZABCDEFGHIJK-LMNOPQRSTU-V",
-#     structure_nameTraditional = "Test",
-#     organism_name = "Test org",
-#     organism_taxonomy_ottid = "123"
+
+# test_that("prepare_libraries_sop_lotus extracts 2D InChIKey from fixture", {
+#   temp_input <- file.path(tmp, "lotus_inchikey.csv")
+#   file.copy(
+#     testthat::test_path("fixtures", "lotus_minimal.csv"),
+#     temp_input,
+#     overwrite = TRUE
 #   )
-#
-#   tidytable::fwrite(lotus_data, temp_input)
+#   temp_output <- tempfile(fileext = ".tsv")
 #
 #   prepare_libraries_sop_lotus(
 #     input = temp_input,
@@ -77,23 +60,17 @@ library(testthat)
 #   df <- tidytable::fread(temp_output, colClasses = "character")
 #
 #   # 2D InChIKey should be first 14 characters
-#   expect_equal(df$structure_inchikey_2D[1], "XYZABCDEFGHIJK")
+#   expect_true(all(nchar(df$structure_inchikey_2D) == 14))
 # })
 #
 # test_that("prepare_libraries_sop_lotus renames structure_nameTraditional", {
-#   skip_on_cran()
-#
-#   temp_input <- make_tmp_file(fileext = ".csv")
-#   temp_output <- make_tmp_file(fileext = ".tsv")
-#
-#   lotus_data <- tidytable::tidytable(
-#     structure_inchikey = "ABCDEFGHIJKLMN-OPQRSTUVWX-A",
-#     structure_nameTraditional = "Traditional Name",
-#     organism_name = "Test org",
-#     organism_taxonomy_ottid = "123"
+#   temp_input <- file.path(tmp, "lotus_rename.csv")
+#   file.copy(
+#     testthat::test_path("fixtures", "lotus_minimal.csv"),
+#     temp_input,
+#     overwrite = TRUE
 #   )
-#
-#   tidytable::fwrite(lotus_data, temp_input)
+#   temp_output <- tempfile(fileext = ".tsv")
 #
 #   prepare_libraries_sop_lotus(
 #     input = temp_input,
@@ -105,22 +82,15 @@ library(testthat)
 #   expect_true("structure_name" %in% names(df))
 #   expect_false("structure_nameTraditional" %in% names(df))
 # })
+
+# test_that("prepare_libraries_sop_lotus removes duplicates from fixture", {
+#   # Create fixture with duplicates
+#   lotus_dup <- load_fixture("lotus_minimal")
+#   lotus_dup <- tidytable::bind_rows(lotus_dup, lotus_dup, lotus_dup)
 #
-# test_that("prepare_libraries_sop_lotus removes duplicates", {
-#   skip_on_cran()
-#
-#   temp_input <- make_tmp_file(fileext = ".csv")
-#   temp_output <- make_tmp_file(fileext = ".tsv")
-#
-#   # Create LOTUS data with duplicates
-#   lotus_data <- tidytable::tidytable(
-#     structure_inchikey = rep("ABCDEFGHIJKLMN-OPQRSTUVWX-A", 5),
-#     structure_nameTraditional = rep("Test", 5),
-#     organism_name = rep("Test org", 5),
-#     organism_taxonomy_ottid = rep("123", 5)
-#   )
-#
-#   tidytable::fwrite(lotus_data, temp_input)
+#   temp_input <- tempfile(fileext = ".csv")
+#   tidytable::fwrite(lotus_dup, temp_input)
+#   temp_output <- tempfile(fileext = ".tsv")
 #
 #   prepare_libraries_sop_lotus(
 #     input = temp_input,
@@ -130,14 +100,13 @@ library(testthat)
 #   df <- tidytable::fread(temp_output)
 #
 #   # Duplicates should be removed
-#   expect_equal(nrow(df), 1)
+#   original_rows <- nrow(load_fixture("lotus_minimal"))
+#   expect_equal(nrow(df), original_rows)
 # })
-#
+
 # test_that("prepare_libraries_sop_lotus handles multiple structure-organism pairs", {
-#   skip_on_cran()
-#
-#   temp_input <- make_tmp_file(fileext = ".csv")
-#   temp_output <- make_tmp_file(fileext = ".tsv")
+#   temp_input <- tempfile(fileext = ".csv")
+#   temp_output <- tempfile(fileext = ".tsv")
 #
 #   lotus_data <- tidytable::tidytable(
 #     structure_inchikey = c(
@@ -161,12 +130,10 @@ library(testthat)
 #
 #   expect_equal(nrow(df), 3)
 # })
-#
+
 # test_that("prepare_libraries_sop_lotus rounds numeric values", {
-#   skip_on_cran()
-#
-#   temp_input <- make_tmp_file(fileext = ".csv")
-#   temp_output <- make_tmp_file(fileext = ".tsv")
+#   temp_input <- tempfile(fileext = ".csv")
+#   temp_output <- tempfile(fileext = ".tsv")
 #
 #   lotus_data <- tidytable::tidytable(
 #     structure_inchikey = "ABCDEFGHIJKLMN-OPQRSTUVWX-A",
@@ -192,12 +159,10 @@ library(testthat)
 #     expect_true(nchar(mass_str) < nchar("123.456789012345"))
 #   }
 # })
-#
+
 # test_that("prepare_libraries_sop_lotus handles compressed input", {
-#   skip_on_cran()
-#
-#   temp_input <- make_tmp_file(fileext = ".csv.gz")
-#   temp_output <- make_tmp_file(fileext = ".tsv")
+#   temp_input <- tempfile(fileext = ".csv.gz")
+#   temp_output <- tempfile(fileext = ".tsv")
 #
 #   lotus_data <- tidytable::tidytable(
 #     structure_inchikey = "ABCDEFGHIJKLMN-OPQRSTUVWX-A",
