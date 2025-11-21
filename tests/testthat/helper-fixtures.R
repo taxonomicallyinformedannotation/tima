@@ -88,7 +88,7 @@ local_quiet_logging <- function(threshold = "WARN") {
       get(threshold, envir = asNamespace("logger")),
       error = function(...) threshold
     )
-    logger::log_threshold(lvl)
+    logger::log_threshold(level = lvl)
   }
   invisible(NULL)
 }
@@ -352,7 +352,11 @@ setup_integration_workflow <- function(paths, download_examples = FALSE) {
 #' expect_valid_inchikey("LFQSCWFLJHTTHZ-UHFFFAOYSA-N")
 expect_valid_inchikey <- function(inchikey) {
   pattern <- "^[A-Z]{14}-[A-Z]{10}-[A-Z]$"
-  testthat::expect_match(inchikey, pattern, info = "Invalid InChIKey format")
+  testthat::expect_match(
+    object = inchikey,
+    regexp = pattern,
+    info = "Invalid InChIKey format"
+  )
 }
 
 #' Expect a data frame with required columns
@@ -559,7 +563,7 @@ load_all_fixtures <- function() {
   )
 
   fixtures <- lapply(
-    stats::setNames(fixture_names, fixture_names),
+    stats::setNames(object = fixture_names, nm = fixture_names),
     load_fixture
   )
 

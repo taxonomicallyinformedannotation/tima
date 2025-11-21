@@ -270,7 +270,8 @@ test_that("clean_bio calculates consistency correctly for perfect agreement", {
   )
 
   # F1 should have high consistency (all neighbors agree)
-  f1_results <- result |> tidytable::filter(feature_id == "F1")
+  f1_results <- result |>
+    tidytable::filter(feature_id == "F1")
 
   if ("consistency_structure_cla_kin" %in% colnames(f1_results)) {
     # Perfect agreement should give consistency = 1
@@ -352,7 +353,8 @@ test_that("clean_bio calculates consistency correctly for partial agreement", {
   )
 
   # F1 should have moderate consistency (2/3 agree on NPC pathway)
-  f1_results <- result |> tidytable::filter(feature_id == "F1")
+  f1_results <- result |>
+    tidytable::filter(feature_id == "F1")
 
   if ("consistency_structure_npc_pat" %in% colnames(f1_results)) {
     # 2 out of 3 neighbors have Alkaloids, so consistency ~ 0.67
@@ -435,7 +437,8 @@ test_that("clean_bio filters out classifications below minimal_consistency", {
   )
 
   # F1 should have "notConsistent" for NPC pathway (no consensus)
-  f1_results <- result |> tidytable::filter(feature_id == "F1")
+  f1_results <- result |>
+    tidytable::filter(feature_id == "F1")
 
   if ("feature_pred_tax_npc_01pat_val" %in% colnames(f1_results)) {
     # With high minimal_consistency and low agreement, should be notConsistent
@@ -549,7 +552,8 @@ test_that("clean_bio preserves already computed predictions", {
   )
 
   # F1's existing predictions should be preserved
-  f1_result <- result |> tidytable::filter(feature_id == "F1")
+  f1_result <- result |>
+    tidytable::filter(feature_id == "F1")
 
   if (nrow(f1_result) > 0) {
     expect_equal(

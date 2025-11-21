@@ -92,7 +92,7 @@ test_that("export_spectra_rds exports spectra with valid compound_id", {
     precursorMz = c(100.0, 200.0),
     compound_id = c("COMP001", "COMP002")
   )
-  spectra <- Spectra::Spectra(df)
+  spectra <- Spectra::Spectra(object = df)
 
   expect_silent(
     result <- export_spectra_rds(file = temp_file, spectra = spectra)
@@ -116,7 +116,7 @@ test_that("export_spectra_rds filters out NA compound_id entries", {
     precursorMz = c(100.0, 200.0, 300.0),
     compound_id = c("COMP001", NA_character_, "COMP003")
   )
-  spectra <- Spectra::Spectra(df)
+  spectra <- Spectra::Spectra(object = df)
 
   expect_silent(export_spectra_rds(file = temp_file, spectra = spectra))
   expect_true(file.exists(temp_file))
@@ -138,7 +138,7 @@ test_that("export_spectra_rds creates output directory if needed", {
     precursorMz = 100.0,
     compound_id = "COMP001"
   )
-  spectra <- Spectra::Spectra(df)
+  spectra <- Spectra::Spectra(object = df)
 
   expect_silent(export_spectra_rds(file = temp_file, spectra = spectra))
   expect_true(file.exists(temp_file))
@@ -154,7 +154,7 @@ test_that("export_spectra_rds overwrites existing file", {
     precursorMz = 100.0,
     compound_id = "COMP001"
   )
-  spectra1 <- Spectra::Spectra(df1)
+  spectra1 <- Spectra::Spectra(object = df1)
   export_spectra_rds(file = temp_file, spectra = spectra1)
 
   # Create second spectra with different data
@@ -163,7 +163,7 @@ test_that("export_spectra_rds overwrites existing file", {
     precursorMz = c(200.0, 300.0),
     compound_id = c("COMP002", "COMP003")
   )
-  spectra2 <- Spectra::Spectra(df2)
+  spectra2 <- Spectra::Spectra(object = df2)
   export_spectra_rds(file = temp_file, spectra = spectra2)
 
   # Verify file was overwritten

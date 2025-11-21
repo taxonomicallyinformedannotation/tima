@@ -152,7 +152,7 @@ test_that("test-prepare_annotations_gnps processes minimal valid GNPS file", {
     MZErrorPPM = c("0")
   )
   gnps_path <- file.path("gnps_in.tsv")
-  tidytable::fwrite(gnps, gnps_path, sep = "\t")
+  tidytable::fwrite(x = gnps, file = gnps_path, sep = "\t")
 
   res <- prepare_annotations_gnps(
     input = gnps_path,

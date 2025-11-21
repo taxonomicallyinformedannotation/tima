@@ -99,7 +99,11 @@ test_that("test-prepare_annotations_spectra validates input vector and files", {
 
 test_that("test-prepare_annotations_spectra validates structure files", {
   ann <- file.path("ann.tsv")
-  tidytable::fwrite(tidytable::tidytable(feature_id = "F1"), ann, sep = "\t")
+  tidytable::fwrite(
+    x = tidytable::tidytable(feature_id = "F1"),
+    file = ann,
+    sep = "\t"
+  )
   out <- file.path("spectra.tsv")
   expect_error(
     prepare_annotations_spectra(
@@ -138,7 +142,7 @@ test_that("test-prepare_annotations_spectra processes minimal formatted input", 
     candidate_count_similarity_peaks_matched = c("10")
   )
   ann1 <- file.path("ann1.tsv")
-  tidytable::fwrite(tbl, ann1, sep = "\t")
+  tidytable::fwrite(x = tbl, file = ann1, sep = "\t")
 
   res <- prepare_annotations_spectra(
     input = c(ann1),

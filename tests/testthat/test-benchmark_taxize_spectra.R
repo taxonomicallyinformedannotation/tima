@@ -57,7 +57,7 @@ test_that("test-benchmark_taxize_spectra processes minimal valid input", {
     inchikey_connectivity_layer = c("AAAAAAAAAAAAAA", "BBBBBBBBBBBBBB")
   )
   input <- file.path("features.tsv")
-  tidytable::fwrite(features, input, sep = "\t")
+  tidytable::fwrite(x = features, file = input, sep = "\t")
 
   # Create minimal SOP keys
   sop <- tidytable::tidytable(
@@ -65,7 +65,7 @@ test_that("test-benchmark_taxize_spectra processes minimal valid input", {
     organism_name = c("Test organism")
   )
   keys <- file.path("keys.tsv")
-  tidytable::fwrite(sop, keys, sep = "\t")
+  tidytable::fwrite(x = sop, file = keys, sep = "\t")
 
   # Create minimal taxonomy with all required columns
   tax <- tidytable::tidytable(
@@ -82,7 +82,7 @@ test_that("test-benchmark_taxize_spectra processes minimal valid input", {
     organism_taxonomy_10varietas = c(NA_character_)
   )
   org_tax_ott <- file.path("tax.tsv")
-  tidytable::fwrite(tax, org_tax_ott, sep = "\t")
+  tidytable::fwrite(x = tax, file = org_tax_ott, sep = "\t")
 
   output <- file.path("output.tsv")
 
@@ -105,7 +105,7 @@ test_that("test-benchmark_taxize_spectra handles features without organisms", {
     inchikey_connectivity_layer = c("ZZZZZZZZZZZZZZ")
   )
   input <- file.path("features.tsv")
-  tidytable::fwrite(features, input, sep = "\t")
+  tidytable::fwrite(x = features, file = input, sep = "\t")
 
   # Empty keys
   sop <- tidytable::tidytable(
@@ -113,7 +113,7 @@ test_that("test-benchmark_taxize_spectra handles features without organisms", {
     organism_name = character()
   )
   keys <- file.path("keys.tsv")
-  tidytable::fwrite(sop, keys, sep = "\t")
+  tidytable::fwrite(x = sop, file = keys, sep = "\t")
 
   tax <- tidytable::tidytable(
     organism_name = character(),
@@ -129,7 +129,7 @@ test_that("test-benchmark_taxize_spectra handles features without organisms", {
     organism_taxonomy_10varietas = character()
   )
   org_tax_ott <- file.path("tax.tsv")
-  tidytable::fwrite(tax, org_tax_ott, sep = "\t")
+  tidytable::fwrite(x = tax, file = org_tax_ott, sep = "\t")
 
   output <- file.path("output.tsv")
 

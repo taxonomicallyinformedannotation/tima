@@ -36,7 +36,7 @@ test_that("extract_spectra extracts basic spectra metadata", {
     precursorMz = c(100.0, 200.0),
     rtime = c(10.5, 20.3)
   )
-  spectra <- Spectra::Spectra(df)
+  spectra <- Spectra::Spectra(object = df)
 
   result <- extract_spectra(object = spectra)
 
@@ -57,7 +57,7 @@ test_that("extract_spectra extracts peak data (mz and intensity)", {
     matrix(c(50.0, 75.0, 100.0, 10, 20, 30), ncol = 2)
   )
 
-  spectra <- Spectra::Spectra(df)
+  spectra <- Spectra::Spectra(object = df)
   spectra@backend@peaksData <- peak_data
 
   result <- extract_spectra(object = spectra)
@@ -78,7 +78,7 @@ test_that("extract_spectra handles spectra with no peaks", {
     precursorMz = 100.0
   )
 
-  spectra <- Spectra::Spectra(df)
+  spectra <- Spectra::Spectra(object = df)
   # Empty peak data
   spectra@backend@peaksData <- list(matrix(numeric(0), ncol = 2))
 
@@ -95,7 +95,7 @@ test_that("extract_spectra harmonizes column names", {
     precursorIntensity = 1000.0
   )
 
-  spectra <- Spectra::Spectra(df)
+  spectra <- Spectra::Spectra(object = df)
   result <- extract_spectra(object = spectra)
 
   # Check harmonized names appear
@@ -112,7 +112,7 @@ test_that("extract_spectra converts column types correctly", {
     predicted = "TRUE" # Should be logical
   )
 
-  spectra <- Spectra::Spectra(df)
+  spectra <- Spectra::Spectra(object = df)
   result <- extract_spectra(object = spectra)
 
   # spectrum_id should be converted to integer
@@ -133,7 +133,7 @@ test_that("extract_spectra handles multiple spectra", {
     rtime = c(10, 20, 30)
   )
 
-  spectra <- Spectra::Spectra(df)
+  spectra <- Spectra::Spectra(object = df)
 
   # Add peak data for all spectra
   peak_data <- list(
@@ -156,7 +156,7 @@ test_that("extract_spectra handles malformed peak data gracefully", {
     precursorMz = 100.0
   )
 
-  spectra <- Spectra::Spectra(df)
+  spectra <- Spectra::Spectra(object = df)
 
   # Malformed peak data (not a matrix)
   spectra@backend@peaksData <- list(numeric(0))
@@ -176,7 +176,7 @@ test_that("extract_spectra preserves all original columns", {
     polarity = 1L
   )
 
-  spectra <- Spectra::Spectra(df)
+  spectra <- Spectra::Spectra(object = df)
   result <- extract_spectra(object = spectra)
 
   # All original columns should be present (possibly renamed)

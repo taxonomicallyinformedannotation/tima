@@ -43,7 +43,7 @@ test_that("test-create_components processes minimal edge data", {
     feature_target = c("F2", "F3", "F4")
   )
   input <- file.path("edges.tsv")
-  tidytable::fwrite(edges, input, sep = "\t")
+  tidytable::fwrite(x = edges, file = input, sep = "\t")
 
   output <- file.path("components.tsv")
 
@@ -63,7 +63,7 @@ test_that("test-create_components handles empty edges", {
     feature_target = character()
   )
   input <- file.path("edges.tsv")
-  tidytable::fwrite(edges, input, sep = "\t")
+  tidytable::fwrite(x = edges, file = input, sep = "\t")
 
   output <- file.path("components.tsv")
 
@@ -80,14 +80,14 @@ test_that("test-create_components combines multiple edge files", {
     feature_target = c("F2")
   )
   input1 <- file.path("edges1.tsv")
-  tidytable::fwrite(edges1, input1, sep = "\t")
+  tidytable::fwrite(x = edges1, file = input1, sep = "\t")
 
   edges2 <- tidytable::tidytable(
     feature_source = c("F3"),
     feature_target = c("F4")
   )
   input2 <- file.path("edges2.tsv")
-  tidytable::fwrite(edges2, input2, sep = "\t")
+  tidytable::fwrite(x = edges2, file = input2, sep = "\t")
 
   output <- file.path("components.tsv")
 
@@ -105,7 +105,7 @@ test_that("test-create_components handles disconnected components", {
     feature_target = c("F2", "F4")
   )
   input <- file.path("edges.tsv")
-  tidytable::fwrite(edges, input, sep = "\t")
+  tidytable::fwrite(x = edges, file = input, sep = "\t")
 
   output <- file.path("components.tsv")
 
@@ -125,7 +125,7 @@ test_that("test-create_components filters NA values", {
     feature_target = c("F2", "F2", "F4")
   )
   input <- file.path("edges.tsv")
-  tidytable::fwrite(edges, input, sep = "\t")
+  tidytable::fwrite(x = edges, file = input, sep = "\t")
 
   output <- file.path("components.tsv")
 
@@ -144,7 +144,7 @@ test_that("test-create_components creates distinct edges", {
     feature_target = c("F2", "F2", "F3")
   )
   input <- file.path("edges.tsv")
-  tidytable::fwrite(edges, input, sep = "\t")
+  tidytable::fwrite(x = edges, file = input, sep = "\t")
 
   output <- file.path("components.tsv")
 

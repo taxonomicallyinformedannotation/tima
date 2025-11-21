@@ -13,13 +13,13 @@ test_that("fake_ecmdb creates zip file with JSON content", {
   expect_true(file.exists(temp_file))
 
   # Verify it's a valid zip file
-  zip_list <- utils::unzip(temp_file, list = TRUE)
+  zip_list <- utils::unzip(zipfile = temp_file, list = TRUE)
   expect_s3_class(zip_list, "data.frame")
   expect_true(nrow(zip_list) > 0)
 
   # Extract and verify JSON content
   temp_dir <- tempdir()
-  utils::unzip(temp_file, exdir = temp_dir)
+  utils::unzip(zipfile = temp_file, exdir = temp_dir)
 
   json_files <- list.files(temp_dir, pattern = "\\.json$", full.names = TRUE)
   expect_true(length(json_files) > 0)

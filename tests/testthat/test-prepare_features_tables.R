@@ -36,7 +36,7 @@ test_that("prepare_features_tables validates output parameter", {
     "row retention time" = 1.5,
     "sample.mzML Peak area" = 1000
   ) |>
-    tidytable::fwrite(test_features)
+    tidytable::fwrite(file = test_features)
 
   # Non-character output
   expect_error(
@@ -64,7 +64,7 @@ test_that("prepare_features_tables validates candidates parameter", {
     "row m/z" = 123.456,
     "sample.mzML Peak area" = 1000
   ) |>
-    tidytable::fwrite(test_features)
+    tidytable::fwrite(file = test_features)
 
   # Too small
   expect_error(
@@ -101,7 +101,7 @@ test_that("prepare_features_tables handles MZmine format (Peak area)", {
 
   dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_file <- file.path("data", "source", "mzmine_features.csv")
-  tidytable::fwrite(mzmine_features, test_file)
+  tidytable::fwrite(x = mzmine_features, file = test_file)
 
   output_file <- file.path("data", "interim", "features", "prepared.tsv.gz")
 
@@ -132,7 +132,7 @@ test_that("prepare_features_tables handles missing RT column", {
 
   dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_file <- file.path("data", "source", "no_rt.csv")
-  tidytable::fwrite(no_rt_features, test_file)
+  tidytable::fwrite(x = no_rt_features, file = test_file)
 
   output_file <- file.path("data", "interim", "features", "prepared.tsv.gz")
 
@@ -166,7 +166,7 @@ test_that("prepare_features_tables retains top intensity samples", {
 
   dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_file <- file.path("data", "source", "many_samples.csv")
-  tidytable::fwrite(features_data, test_file)
+  tidytable::fwrite(x = features_data, file = test_file)
 
   output_file <- file.path("data", "interim", "features", "prepared.tsv.gz")
 
@@ -224,7 +224,7 @@ test_that("prepare_features_tables handles large feature tables", {
   )
 
   test_file <- file.path("data", "source", "large.csv")
-  tidytable::fwrite(large_features, test_file)
+  tidytable::fwrite(x = large_features, file = test_file)
 
   start_time <- Sys.time()
   prepare_features_tables(features = test_file)
