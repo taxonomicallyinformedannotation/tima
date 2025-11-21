@@ -272,7 +272,7 @@ annotate_masses <-
 
     # Filter and prepare structure-organism pairs
     structure_organism_pairs_table <- joined_table |>
-      tidytable::filter(!is.na(structure_exact_mass)) |>
+      tidytable::filter(.df = !is.na(structure_exact_mass)) |>
       tidytable::mutate(tidytable::across(
         .cols = c("structure_exact_mass"),
         .fns = as.numeric
@@ -300,7 +300,8 @@ annotate_masses <-
     # logger::log_trace("Filtering desired adducts and adding mz tolerance")
     df_add_em <- structure_organism_pairs_table |>
       tidytable::filter(!is.na(structure_exact_mass)) |>
-      tidytable::distinct(exact_mass = structure_exact_mass) |>
+      tidytable::rename(exact_mass = structure_exact_mass) |>
+      tidytable::distinct(exact_mass) |>
       tidytable::mutate(tidytable::across(
         .cols = c("exact_mass"),
         .fns = as.numeric
@@ -335,7 +336,10 @@ annotate_masses <-
 
     if (any(names(features_table) == "rt")) {
       df_fea_min <- df_fea_min |>
-        tidytable::mutate(tidytable::across(.cols = c("rt"), .fns = as.numeric))
+        tidytable::mutate(tidytable::across(
+          .cols = c("rt"),
+          .fns = as.numeric
+        ))
     } else {
       logger::log_warn(
         "No 'rt' column found, using sequential numbering as RT proxy"
@@ -484,7 +488,7 @@ annotate_masses <-
     # )
     differences <-
       dist_groups(
-        d = stats::dist(add_clu_table$adduct_mass),
+        d = stats::dist(x = add_clu_table$adduct_mass),
         g = add_clu_table$adduct
       ) |>
       tidytable::mutate(
@@ -501,12 +505,14 @@ annotate_masses <-
       tidytable::select(-Item1, -Item2, -Label) |>
       ## remove redundancy among clusters
       ## Keep proton first
-      tidytable::mutate(l = stringi::stri_length(Group1)) |>
+      tidytable::mutate(l = stringi::stri_length(str = Group1)) |>
       tidytable::arrange(l) |>
       tidytable::select(-l) |>
       tidytable::distinct(Distance, .keep_all = TRUE) |>
       ## Using max because ppm tolerance tends to be overconfident
-      tidytable::filter(Distance >= tolerance_ppm * 1E-6 * max(df_fea_min$mz))
+      tidytable::filter(
+        Distance >= tolerance_ppm * 1E-6 * max(df_fea_min$mz)
+      )
 
     neutral_losses <- neutral_losses_list |>
       tidytable::tidytable() |>
@@ -586,7 +592,7 @@ annotate_masses <-
     ## Always considering [M+H]+ and [M-H]- ions for unassigned features
     df_add_enforced <- df_fea_min |>
       tidytable::distinct(feature_id) |>
-      tidytable::anti_join(already_assigned) |>
+      tidytable::anti_join(y = already_assigned) |>
       tidytable::mutate(
         adduct = switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
       )
@@ -599,12 +605,12 @@ annotate_masses <-
     # logger::log_trace("Joining with initial results (adducts)")
     df_adducted <- df_fea_min |>
       tidytable::distinct(feature_id, rt, mz) |>
-      tidytable::left_join(df_add_full)
+      tidytable::left_join(y = df_add_full)
     rm(df_add_full)
 
     # logger::log_trace("Joining with initial results (neutral losses)")
     df_addlossed <- df_adducted |>
-      tidytable::left_join(df_nl_min) |>
+      tidytable::left_join(y = df_nl_min) |>
       tidytable::bind_rows(df_adducted) |>
       tidytable::filter(!is.na(adduct)) |>
       tidytable::distinct() |>
@@ -677,15 +683,26 @@ annotate_masses <-
       ) |>
       tidytable::mutate(error_mz = exact_mass - mass) |>
       tidytable::mutate(library = adduct) |>
-      tidytable::select(feature_id, rt, mz, library, error_mz, exact_mass) |>
+      tidytable::select(
+        feature_id,
+        rt,
+        mz,
+        library,
+        error_mz,
+        exact_mass
+      ) |>
       tidytable::distinct()
 
     # logger::log_trace("Keeping unique exact masses and molecular formulas")
     df_em_mf <- structure_organism_pairs_table |>
-      tidytable::distinct(tidyselect::any_of(c(
-        "structure_exact_mass",
-        "structure_molecular_formula"
-      )))
+      tidytable::distinct(
+        tidyselect::any_of(
+          x = c(
+            "structure_exact_mass",
+            "structure_molecular_formula"
+          )
+        )
+      )
 
     # Select only columns that exist in the table
     available_cols <- colnames(structure_organism_pairs_table)
@@ -700,19 +717,21 @@ annotate_masses <-
     cols_to_select <- intersect(required_cols, available_cols)
 
     df_str_unique <- structure_organism_pairs_table |>
-      tidytable::distinct(tidyselect::any_of(cols_to_select)) |>
+      tidytable::distinct(tidyselect::any_of(x = cols_to_select)) |>
       ## Avoid SMILES redundancy
       tidytable::distinct(
-        tidyselect::any_of(c(
-          "structure_inchikey_connectivity_layer",
-          "structure_molecular_formula",
-          "structure_exact_mass",
-          "structure_xlogp"
-        )),
+        tidyselect::any_of(
+          x = c(
+            "structure_inchikey_connectivity_layer",
+            "structure_molecular_formula",
+            "structure_exact_mass",
+            "structure_xlogp"
+          )
+        ),
         .keep_all = TRUE
       ) |>
       tidytable::mutate(tidytable::across(
-        .cols = tidyselect::where(is.numeric),
+        .cols = tidyselect::where(fn = is.numeric),
         .fns = as.character
       ))
 
@@ -721,7 +740,7 @@ annotate_masses <-
     df_annotated_1 <- tidytable::left_join(
       x = df_addlossed_em,
       y = df_em_mf,
-      by = stats::setNames("structure_exact_mass", "exact_mass")
+      by = stats::setNames(object = "structure_exact_mass", nm = "exact_mass")
     ) |>
       tidytable::filter(!(library %in% adducts_forbidden)) |>
       tidytable::distinct()
@@ -737,7 +756,7 @@ annotate_masses <-
       df_multi <- df_fea_min |>
         tidytable::select(-adduct) |>
         tidytable::mutate(join = "x") |>
-        tidytable::left_join(adducts_table_multi) |>
+        tidytable::left_join(y = adducts_table_multi) |>
         tidytable::mutate_rowwise(
           value = calculate_mass_of_m(adduct_string = adduct, mz = mz)
         ) |>
@@ -806,10 +825,10 @@ annotate_masses <-
       tidytable::left_join(
         df_multi_nl_em,
         df_em_mf,
-        by = stats::setNames("structure_exact_mass", "exact_mass")
+        by = stats::setNames(object = "structure_exact_mass", nm = "exact_mass")
       ) |>
       tidytable::select(
-        tidyselect::any_of("structure_molecular_formula"),
+        tidyselect::any_of(x = "structure_molecular_formula"),
         library = library_name,
         tidyselect::everything(),
         -exact_mass,
@@ -836,7 +855,7 @@ annotate_masses <-
     # Only join if there are common columns
     if (length(common_cols) > 0) {
       df_annotated_final <- df_annotated_combined |>
-        tidytable::left_join(df_str_unique, by = common_cols) |>
+        tidytable::left_join(y = df_str_unique, by = common_cols) |>
         tidytable::filter(!is.na(structure_inchikey_connectivity_layer))
     } else {
       # No common columns, just use combined data
@@ -845,21 +864,23 @@ annotate_masses <-
 
     df_annotated_final <- df_annotated_final |>
       tidytable::select(
-        tidyselect::any_of(c(
-          "feature_id",
-          "error_mz",
-          "structure_name",
-          "structure_inchikey_connectivity_layer",
-          "structure_smiles_no_stereo",
-          "structure_molecular_formula",
-          "structure_exact_mass",
-          "structure_xlogp",
-          "library"
-        ))
+        tidyselect::any_of(
+          x = c(
+            "feature_id",
+            "error_mz",
+            "structure_name",
+            "structure_inchikey_connectivity_layer",
+            "structure_smiles_no_stereo",
+            "structure_molecular_formula",
+            "structure_exact_mass",
+            "structure_xlogp",
+            "library"
+          )
+        )
       ) |>
       tidytable::rename(
-        candidate_structure_error_mz = tidyselect::any_of("error_mz"),
-        candidate_structure_name = tidyselect::any_of("structure_name"),
+        candidate_structure_error_mz = tidyselect::any_of(x = "error_mz"),
+        candidate_structure_name = tidyselect::any_of(x = "structure_name"),
         candidate_structure_inchikey_connectivity_layer = tidyselect::any_of(
           "structure_inchikey_connectivity_layer"
         ),
@@ -872,8 +893,8 @@ annotate_masses <-
         candidate_structure_exact_mass = tidyselect::any_of(
           "structure_exact_mass"
         ),
-        candidate_structure_xlogp = tidyselect::any_of("structure_xlogp"),
-        candidate_library = tidyselect::any_of("library")
+        candidate_structure_xlogp = tidyselect::any_of(x = "structure_xlogp"),
+        candidate_library = tidyselect::any_of(x = "library")
       ) |>
       tidytable::distinct()
 
@@ -881,18 +902,22 @@ annotate_masses <-
 
     # logger::log_trace("Adding chemical classification")
     taxonomy_table <- structure_organism_pairs_table |>
-      tidytable::distinct(tidyselect::any_of(c(
-        "structure_inchikey_connectivity_layer",
-        "structure_smiles_no_stereo",
-        "structure_tax_npc_01pat",
-        "structure_tax_npc_02sup",
-        "structure_tax_npc_03cla",
-        "structure_tax_cla_chemontid",
-        "structure_tax_cla_01kin",
-        "structure_tax_cla_02sup",
-        "structure_tax_cla_03cla",
-        "structure_tax_cla_04dirpar"
-      ))) |>
+      tidytable::distinct(
+        tidyselect::any_of(
+          x = c(
+            "structure_inchikey_connectivity_layer",
+            "structure_smiles_no_stereo",
+            "structure_tax_npc_01pat",
+            "structure_tax_npc_02sup",
+            "structure_tax_npc_03cla",
+            "structure_tax_cla_chemontid",
+            "structure_tax_cla_01kin",
+            "structure_tax_cla_02sup",
+            "structure_tax_cla_03cla",
+            "structure_tax_cla_04dirpar"
+          )
+        )
+      ) |>
       tidytable::rename(
         candidate_structure_inchikey_connectivity_layer = tidyselect::any_of(
           "structure_inchikey_connectivity_layer"
@@ -945,9 +970,9 @@ annotate_masses <-
 
     df_final <- df_final |>
       tidytable::mutate(tidytable::across(
-        .cols = tidyselect::where(is.character),
+        .cols = tidyselect::where(fn = is.character),
         .fns = function(x) {
-          tidytable::na_if(x, "")
+          tidytable::na_if(x = x, y = "")
         }
       ))
 

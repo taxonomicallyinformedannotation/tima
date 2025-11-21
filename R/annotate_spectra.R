@@ -176,15 +176,17 @@ annotate_spectra <- function(
       BPPARAM = BiocParallel::SerialParam()
     ) |>
     # TODO
-    purrr::map(.f = function(spectra_lib) {
-      spectra_lib[
-        !spectra_lib@backend@peaksData |>
-          purrr::map(is.null) |>
-          purrr::map(any) |>
-          as.character() |>
-          as.logical()
-      ]
-    }) |>
+    purrr::map(
+      .f = function(spectra_lib) {
+        spectra_lib[
+          !spectra_lib@backend@peaksData |>
+            purrr::map(.f = is.null) |>
+            purrr::map(.f = any) |>
+            as.character() |>
+            as.logical()
+        ]
+      }
+    ) |>
     Spectra::concatenateSpectra()
   if (length(spectral_library) == 0L) {
     logger::log_warn(
@@ -198,14 +200,17 @@ annotate_spectra <- function(
     return(output[[1]])
   }
   # Library statistics (informational)
-  if ("library" %in% names(Spectra::spectraData(spectral_library))) {
+  if ("library" %in% names(Spectra::spectraData(object = spectral_library))) {
     library_stats <- spectral_library |>
       Spectra::spectraData() |>
       data.frame() |>
       tidytable::filter(!is.na(library)) |>
       tidytable::group_by(library) |>
       tidytable::add_count(name = "spectra") |>
-      tidytable::distinct(inchikey_connectivity_layer, .keep_all = TRUE) |>
+      tidytable::distinct(
+        inchikey_connectivity_layer,
+        .keep_all = TRUE
+      ) |>
       tidytable::add_count(name = "unique_connectivities") |>
       tidytable::ungroup() |>
       tidytable::select(library, spectra, unique_connectivities) |>
@@ -236,9 +241,11 @@ annotate_spectra <- function(
     ## Fix needed
     lib_precursors <- spectral_library@backend@spectraData |>
       tidytable::transmute(
-        precursor = tidytable::coalesce(tidytable::across(tidyselect::any_of(
-          c("precursorMz", "precursor_mz")
-        )))
+        precursor = tidytable::coalesce(tidytable::across(
+          .cols = tidyselect::any_of(
+            c("precursorMz", "precursor_mz")
+          )
+        ))
       ) |>
       tidytable::pull()
     minimal <- pmin(
@@ -265,9 +272,11 @@ annotate_spectra <- function(
       ## Fix needed
       lib_precursors <- spectral_library@backend@spectraData |>
         tidytable::transmute(
-          precursor = tidytable::coalesce(tidytable::across(tidyselect::any_of(
-            c("precursorMz", "precursor_mz")
-          )))
+          precursor = tidytable::coalesce(tidytable::across(
+            .cols = tidyselect::any_of(
+              c("precursorMz", "precursor_mz")
+            )
+          ))
         ) |>
         tidytable::pull()
       minimal <- pmin(
@@ -283,7 +292,9 @@ annotate_spectra <- function(
 
     lib_ids <- seq_along(spectral_library)
     lib_spectra <- spectral_library@backend@peaksData
-    safety <- lib_spectra[purrr::map(.x = lib_spectra, .f = length) != 0]
+    safety <- lib_spectra[
+      purrr::map(.x = lib_spectra, .f = length) != 0
+    ]
     if (length(safety) != 0) {
       logger::log_debug(
         "Annotating {length(query_spectra)} spectra against {nrow(spectral_library@backend@spectraData)} references"
@@ -392,7 +403,7 @@ annotate_spectra <- function(
       )
 
       df_final <- df_final |>
-        tidytable::left_join(df_meta) |>
+        tidytable::left_join(y = df_meta) |>
         tidytable::select(-target_id)
 
       df_final <- df_final |>
@@ -413,24 +424,26 @@ annotate_spectra <- function(
             target_smiles
           )
         ) |>
-        tidytable::select(tidyselect::any_of(
-          c(
-            "feature_id",
-            "candidate_adduct" = "target_adduct",
-            "candidate_library" = "target_library",
-            "candidate_spectrum_id" = "target_spectrum_id",
-            "candidate_structure_error_mz",
-            "candidate_structure_name" = "target_name",
-            "candidate_structure_inchikey_connectivity_layer",
-            "candidate_structure_smiles_no_stereo",
-            "candidate_structure_molecular_formula" = "target_formula",
-            "candidate_structure_exact_mass" = "target_exactmass",
-            "candidate_structure_xlogp" = "target_xlogp",
-            "candidate_spectrum_entropy",
-            "candidate_score_similarity",
-            "candidate_count_similarity_peaks_matched"
+        tidytable::select(
+          tidyselect::any_of(
+            c(
+              "feature_id",
+              "candidate_adduct" = "target_adduct",
+              "candidate_library" = "target_library",
+              "candidate_spectrum_id" = "target_spectrum_id",
+              "candidate_structure_error_mz",
+              "candidate_structure_name" = "target_name",
+              "candidate_structure_inchikey_connectivity_layer",
+              "candidate_structure_smiles_no_stereo",
+              "candidate_structure_molecular_formula" = "target_formula",
+              "candidate_structure_exact_mass" = "target_exactmass",
+              "candidate_structure_xlogp" = "target_xlogp",
+              "candidate_spectrum_entropy",
+              "candidate_score_similarity",
+              "candidate_count_similarity_peaks_matched"
+            )
           )
-        ))
+        )
 
       ## COMMENT AR: Not doing it because of thresholding
       ## df_final[is.na(df_final)] <- 0

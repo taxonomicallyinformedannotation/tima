@@ -163,7 +163,9 @@ weight_chemo <- function(
         pattern = !!cand_sym
       )) |>
       # assign the configured per-level weight when matched
-      tidytable::mutate(!!rlang::sym(x = score_name) := as.numeric(level_weight)) |>
+      tidytable::mutate(
+        !!rlang::sym(x = score_name) := as.numeric(level_weight)
+      ) |>
       tidytable::select(!!cand_sym, !!rlang::sym(x = score_name)) |>
       tidytable::distinct()
   }
