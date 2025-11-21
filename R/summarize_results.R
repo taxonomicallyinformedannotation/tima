@@ -117,7 +117,7 @@ summarize_results <- function(
     ) |>
     tidytable::distinct() |>
     tidytable::left_join(
-      structure_organism_pairs_table |>
+      y = structure_organism_pairs_table |>
         tidytable::select(
           candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
           reference_doi,
@@ -199,7 +199,7 @@ summarize_results <- function(
 
     df5 <- df4 |>
       tidytable::left_join(
-        df3 |>
+        y = df3 |>
           tidytable::select("feature_id", !colnames(df4)) |>
           tidytable::distinct()
       )
@@ -250,14 +250,14 @@ summarize_results <- function(
         )
       ),
     tidytable::left_join(
-      df6 |>
+      x = df6 |>
         tidytable::filter(
           is.na(
             candidate_structure_inchikey_connectivity_layer
           )
         ) |>
         tidytable::distinct(model$features_columns),
-      annot_table_wei_chemo |>
+      y = annot_table_wei_chemo |>
         tidytable::mutate(tidytable::across(
           .cols = tidyselect::everything(),
           .fns = as.character

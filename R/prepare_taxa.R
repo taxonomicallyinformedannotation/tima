@@ -146,7 +146,7 @@ prepare_taxa <- function(
   # )
   organism_table_filled <- organism_table |>
     tidytable::left_join(
-      tidytable::fread(
+      y = tidytable::fread(
         org_tax_ott,
         na.strings = c("", "NA"),
         colClasses = "character"
@@ -201,9 +201,9 @@ prepare_taxa <- function(
   # logger::log_trace("Joining with metadata table")
   if (!is.null(taxon)) {
     metadata_table_joined <- tidytable::inner_join(
-      feature_table_0 |>
+      x = feature_table_0 |>
         tidytable::mutate(join = "x"),
-      biological_metadata |>
+      y = biological_metadata |>
         tidytable::select(organismOriginal = organism_name) |>
         tidytable::mutate(join = "x")
     ) |>
@@ -211,8 +211,8 @@ prepare_taxa <- function(
   } else {
     metadata_table_joined <-
       tidytable::left_join(
-        feature_table_0,
-        metadata_table,
+        x = feature_table_0,
+        y = metadata_table,
         by = c("sample" = name_filename)
       ) |>
       tidytable::select(
@@ -226,8 +226,8 @@ prepare_taxa <- function(
   # logger::log_trace("Joining with cleaned taxonomy table")
   taxed_features_table <-
     tidytable::left_join(
-      metadata_table_joined,
-      biological_metadata,
+      x = metadata_table_joined,
+      y = biological_metadata,
       by = c("organismOriginal" = "organism_name")
     ) |>
     tidytable::distinct() |>
@@ -266,8 +266,8 @@ prepare_taxa <- function(
       )
     ) |>
     tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.character),
-      .fns = ~ tidytable::replace_na(.x, "ND")
+      .cols = tidyselect::where(fn = is.character),
+      .fns = ~ tidytable::replace_na(.x = .x, replace = "ND")
     ))
   rm(biological_metadata, metadata_table_joined)
 

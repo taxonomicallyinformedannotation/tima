@@ -356,7 +356,7 @@ rearrange_annotations <- function(
 
   annotation_table_merged |>
     tidytable::left_join(
-      edges_table |>
+      y = edges_table |>
         tidytable::distinct(
           feature_id = feature_source,
           feature_spectrum_entropy,
@@ -801,11 +801,13 @@ weight_annotations <- function(
   # Add Biological Metadata and Perform Scoring ----
 
   annotation_table_taxed <- annotation_table |>
-    tidytable::left_join(tidytable::fread(
-      file = taxa,
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    ))
+    tidytable::left_join(
+      y = tidytable::fread(
+        file = taxa,
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
+    )
 
   rm(annotation_table)
 

@@ -98,28 +98,30 @@ prepare_annotations_gnps <- function(
           1E-6 *
           as.numeric(Precursor_MZ)
       ) |>
-      tidytable::select(tidyselect::any_of(
-        c(
-          "feature_id" = "#Scan#",
-          "candidate_adduct" = "Adduct",
-          "candidate_structure_error_mz" = "MassDiff",
-          "candidate_library" = "LibraryName",
-          "candidate_structure_name" = "Compound_Name",
-          "candidate_score_similarity" = "MQScore",
-          "candidate_count_similarity_peaks_matched" = "SharedPeaks",
-          "candidate_structure_inchi" = "INCHI",
-          "candidate_structure_inchikey" = "InChIKey",
-          "candidate_structure_inchikey_connectivity_layer" = "InChIKey-Planar",
-          "candidate_structure_tax_npc_01pat" = "npclassifier_pathway",
-          "candidate_structure_tax_npc_02sup" = "npclassifier_superclass",
-          "candidate_structure_tax_npc_03cla" = "npclassifier_class",
-          "candidate_structure_exact_mass" = "ExactMass",
-          ## Only partially present
-          "candidate_structure_tax_cla_02sup" = "superclass",
-          "candidate_structure_tax_cla_03cla" = "class",
-          "candidate_structure_tax_cla_04dirpar" = "subclass"
+      tidytable::select(
+        tidyselect::any_of(
+          x = c(
+            "feature_id" = "#Scan#",
+            "candidate_adduct" = "Adduct",
+            "candidate_structure_error_mz" = "MassDiff",
+            "candidate_library" = "LibraryName",
+            "candidate_structure_name" = "Compound_Name",
+            "candidate_score_similarity" = "MQScore",
+            "candidate_count_similarity_peaks_matched" = "SharedPeaks",
+            "candidate_structure_inchi" = "INCHI",
+            "candidate_structure_inchikey" = "InChIKey",
+            "candidate_structure_inchikey_connectivity_layer" = "InChIKey-Planar",
+            "candidate_structure_tax_npc_01pat" = "npclassifier_pathway",
+            "candidate_structure_tax_npc_02sup" = "npclassifier_superclass",
+            "candidate_structure_tax_npc_03cla" = "npclassifier_class",
+            "candidate_structure_exact_mass" = "ExactMass",
+            ## Only partially present
+            "candidate_structure_tax_cla_02sup" = "superclass",
+            "candidate_structure_tax_cla_03cla" = "class",
+            "candidate_structure_tax_cla_04dirpar" = "subclass"
+          )
         )
-      )) |>
+      ) |>
       tidytable::mutate(
         candidate_structure_smiles_no_stereo = NA,
         candidate_structure_molecular_formula = candidate_structure_inchi |>

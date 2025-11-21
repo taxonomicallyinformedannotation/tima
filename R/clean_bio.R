@@ -82,8 +82,8 @@ clean_bio <- function(
 
   # Join edges with annotations
   df3 <- tidytable::right_join(
-    edges_filtered,
-    annotations_distinct |>
+    x = edges_filtered,
+    y = annotations_distinct |>
       tidytable::distinct(
         feature_id,
         candidate_structure_tax_cla_01kin,

@@ -196,7 +196,7 @@ prepare_annotations_sirius <-
       # dirty to support old zip
       zip_list <- tryCatch(
         expr = {
-          utils::unzip(input_directory, list = TRUE)
+          utils::unzip(zipfile = input_directory, list = TRUE)
         },
         error = function(e) {
           out <- list()
@@ -233,7 +233,9 @@ prepare_annotations_sirius <-
         harmonize_names_sirius()
 
       structures_summary <-
-        structures_summary[purrr::map(.x = structures_summary, .f = nrow) > 0]
+        structures_summary[
+          purrr::map(.x = structures_summary, .f = nrow) > 0L
+        ]
 
       # Allow for summaries only
       if (length(structures_summary) != 0) {
@@ -341,9 +343,11 @@ prepare_annotations_sirius <-
     model <- columns_model()
 
     table_can <- table |>
-      tidytable::select(tidyselect::any_of(
-        c(model$features_columns, model$features_calculated_columns)
-      )) |>
+      tidytable::select(
+        tidyselect::any_of(
+          x = c(model$features_columns, model$features_calculated_columns)
+        )
+      ) |>
       tidytable::filter(
         !is.na(!!as.name(model$features_calculated_columns[5]))
       ) |>
@@ -351,12 +355,14 @@ prepare_annotations_sirius <-
       tidytable::distinct()
 
     table_for <- table |>
-      tidytable::select(tidyselect::any_of(
-        c(
-          model$features_columns,
-          model$candidates_sirius_for_columns
+      tidytable::select(
+        tidyselect::any_of(
+          x = c(
+            model$features_columns,
+            model$candidates_sirius_for_columns
+          )
         )
-      )) |>
+      ) |>
       tidytable::filter(
         !is.na(!!as.name(model$candidates_sirius_for_columns[2]))
       ) |>
@@ -364,14 +370,16 @@ prepare_annotations_sirius <-
       tidytable::distinct()
 
     table_str <- table |>
-      tidytable::select(tidyselect::any_of(
-        c(
-          model$features_columns,
-          model$candidates_structures_columns,
-          model$candidates_spectra_columns,
-          model$candidates_sirius_str_columns
+      tidytable::select(
+        tidyselect::any_of(
+          x = c(
+            model$features_columns,
+            model$candidates_structures_columns,
+            model$candidates_spectra_columns,
+            model$candidates_sirius_str_columns
+          )
         )
-      )) |>
+      ) |>
       tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
       tidytable::distinct()
     rm(table)

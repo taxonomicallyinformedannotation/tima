@@ -133,7 +133,7 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
   # Remove redundant MS1 and combine
   annotation_table <- annotation_tables_list[["ms1"]] |>
     tidytable::anti_join(
-      spectral_keys,
+      y = spectral_keys,
       by = c(
         "feature_id",
         "candidate_structure_inchikey_connectivity_layer"
@@ -164,7 +164,7 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
 
   features_annotated_table |>
     tidytable::left_join(
-      rt_table,
+      y = rt_table,
       by = "candidate_structure_inchikey_connectivity_layer"
     ) |>
     tidytable::mutate(

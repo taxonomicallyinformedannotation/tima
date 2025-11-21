@@ -300,8 +300,7 @@ annotate_masses <-
     # logger::log_trace("Filtering desired adducts and adding mz tolerance")
     df_add_em <- structure_organism_pairs_table |>
       tidytable::filter(!is.na(structure_exact_mass)) |>
-      tidytable::rename(exact_mass = structure_exact_mass) |>
-      tidytable::distinct(exact_mass) |>
+      tidytable::distinct(exact_mass = structure_exact_mass) |>
       tidytable::mutate(tidytable::across(
         .cols = c("exact_mass"),
         .fns = as.numeric
@@ -357,7 +356,7 @@ annotate_masses <-
     # logger::log_trace("Joining within given rt tolerance")
     df_couples_diff <- df_rt_tol |>
       dplyr::inner_join(
-        df_fea_min,
+        y = df_fea_min,
         by = dplyr::join_by(rt_min <= rt, rt_max >= rt, sample == sample)
       ) |>
       tidytable::distinct(
@@ -421,7 +420,7 @@ annotate_masses <-
     add_clu_table <- adducts_table |>
       tidytable::mutate(join = "x") |>
       tidytable::left_join(
-        clusters_table |>
+        y = clusters_table |>
           tidytable::mutate(join = "x")
       ) |>
       tidytable::bind_rows(adducts_table) |>
@@ -528,7 +527,7 @@ annotate_masses <-
     # )
     df_nl <- df_couples_diff |>
       dplyr::inner_join(
-        neutral_losses,
+        y = neutral_losses,
         by = dplyr::join_by(delta_min <= mass, delta_max >= mass)
       ) |>
       tidytable::filter(!is.na(loss)) |>
@@ -544,7 +543,7 @@ annotate_masses <-
     # logger::log_trace("Joining within given delta mz tolerance (adducts)")
     df_add <- df_couples_diff |>
       dplyr::inner_join(
-        differences,
+        y = differences,
         by = dplyr::join_by(delta_min <= Distance, delta_max >= Distance)
       ) |>
       tidytable::filter(!is.na(Group1)) |>
@@ -678,7 +677,7 @@ annotate_masses <-
     # logger::log_trace("Joining within given mz tol to exact mass library")
     df_addlossed_em <- df_addlossed_rdy |>
       dplyr::inner_join(
-        df_add_em,
+        y = df_add_em,
         by = dplyr::join_by(mass >= value_min, mass <= value_max)
       ) |>
       tidytable::mutate(error_mz = exact_mass - mass) |>
@@ -785,7 +784,7 @@ annotate_masses <-
     # logger::log_trace("Joining within given rt tolerance")
     df_multi_nl <- df_multi |>
       dplyr::inner_join(
-        df_addlossed_rdy,
+        y = df_addlossed_rdy,
         by = dplyr::join_by(
           rt_min <= rt,
           rt_max >= rt,
@@ -800,7 +799,7 @@ annotate_masses <-
     # )
     df_multi_nl_em <- df_multi_nl |>
       dplyr::inner_join(
-        df_add_em,
+        y = df_add_em,
         by = dplyr::join_by(mass >= value_min, mass <= value_max)
       ) |>
       tidytable::as_tidytable() |>
@@ -823,8 +822,8 @@ annotate_masses <-
 
     df_annotated_2 <-
       tidytable::left_join(
-        df_multi_nl_em,
-        df_em_mf,
+        x = df_multi_nl_em,
+        y = df_em_mf,
         by = stats::setNames(object = "structure_exact_mass", nm = "exact_mass")
       ) |>
       tidytable::select(
@@ -960,8 +959,8 @@ annotate_masses <-
     # Only join if there are common columns
     if (length(tax_common_cols) > 0) {
       df_final <- tidytable::left_join(
-        df_annotated_final,
-        taxonomy_table,
+        x = df_annotated_final,
+        y = taxonomy_table,
         by = tax_common_cols
       )
     } else {

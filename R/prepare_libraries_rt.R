@@ -117,22 +117,29 @@ prepare_libraries_rt <- function(
   # Readers ----
   rts_from_mgf <- function(mgf) {
     # logger::log_trace("Importing spectra")
-    spectra <- mgf |> purrr::map(.f = import_spectra)
+    spectra <- mgf |>
+      purrr::map(.f = import_spectra)
     # logger::log_trace("Extracting retention times")
     rts <- spectra |>
       # TODO
-      purrr::map(.f = function(x) {
-        x@backend@spectraData |>
-          data.frame() |>
-          tidytable::as_tidytable()
-      }) |>
+      purrr::map(
+        .f = function(x) {
+          x@backend@spectraData |>
+            data.frame() |>
+            tidytable::as_tidytable()
+        }
+      ) |>
       tidytable::bind_rows() |>
-      tidytable::select(tidyselect::any_of(c(
-        rt = col_rt,
-        inchikey = col_ik,
-        smiles = col_sm,
-        structure_name = col_na
-      )))
+      tidytable::select(
+        tidyselect::any_of(
+          x = c(
+            rt = col_rt,
+            inchikey = col_ik,
+            smiles = col_sm,
+            structure_name = col_na
+          )
+        )
+      )
     rts
   }
 
@@ -141,12 +148,16 @@ prepare_libraries_rt <- function(
     tab |>
       purrr::map(.f = tidytable::fread) |>
       tidytable::bind_rows() |>
-      tidytable::select(tidyselect::any_of(c(
-        rt = name_rt,
-        inchikey = name_inchikey,
-        smiles = name_smiles,
-        structure_name = name_name
-      )))
+      tidytable::select(
+        tidyselect::any_of(
+          x = c(
+            rt = name_rt,
+            inchikey = name_inchikey,
+            smiles = name_smiles,
+            structure_name = name_name
+          )
+        )
+      )
   }
 
   # Polishing utilities ----
@@ -202,7 +213,7 @@ prepare_libraries_rt <- function(
     get_inchikey <- function(smiles, toolkit = "rdkit") {
       url <- paste0(
         "https://api.naturalproducts.net/latest/convert/inchikey?smiles=",
-        utils::URLencode(smiles),
+        utils::URLencode(URL = smiles),
         "&toolkit=",
         toolkit
       )
@@ -211,16 +222,17 @@ prepare_libraries_rt <- function(
       })
     }
 
-    inchikey <- purrr::map(.x = smiles, .f = get_inchikey) |> as.character()
+    inchikey <- purrr::map(.x = smiles, .f = get_inchikey) |>
+      as.character()
     df_missing <- df_missing |>
       tidytable::select(-inchikey) |>
-      tidytable::left_join(tidytable::tidytable(smiles, inchikey))
+      tidytable::left_join(y = tidytable::tidytable(smiles, inchikey))
 
     df_completed <- df_full |>
       tidytable::bind_rows(df_missing) |>
       tidytable::mutate(tidytable::across(
-        .cols = tidyselect::where(is.character),
-        .fns = function(x) tidytable::na_if(x, "NA")
+        .cols = tidyselect::where(fn = is.character),
+        .fns = function(x) tidytable::na_if(x = x, y = "NA")
       )) |>
       tidytable::select(
         rt,
@@ -299,7 +311,11 @@ prepare_libraries_rt <- function(
   rm(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2)
 
   sop <- df_rts |>
-    tidytable::select(structure_smiles, structure_inchikey, structure_name) |>
+    tidytable::select(
+      structure_smiles,
+      structure_inchikey,
+      structure_name
+    ) |>
     tidytable::distinct() |>
     tidytable::mutate(
       structure_inchikey_connectivity_layer = stringi::stri_sub(
@@ -356,7 +372,11 @@ prepare_libraries_rt <- function(
   # Write SOP with organism_name encoded as 'NA' to roundtrip to NA on read
   sop_to_write <- sop |>
     tidytable::mutate(
-      organism_name = ifelse(is.na(organism_name), "NA", organism_name)
+      organism_name = tidytable::if_else(
+        condition = is.na(organism_name),
+        true = "NA",
+        false = organism_name
+      )
     )
   export_output(x = sop_to_write, file = output_sop)
   rm(rts, sop)

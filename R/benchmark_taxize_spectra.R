@@ -59,7 +59,7 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
   # Join features with organism names from SOP
   features_with_organisms <- features |>
     tidytable::left_join(
-      sop |>
+      y = sop |>
         tidytable::distinct(organism_name, inchikey_connectivity_layer)
     )
 
@@ -79,7 +79,7 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
   logger::log_debug("Adding full taxonomic hierarchy")
   features_taxed <- features_sampled |>
     tidytable::left_join(
-      taxo |>
+      y = taxo |>
         tidytable::distinct(organism_name, .keep_all = TRUE)
     ) |>
     tidytable::select(

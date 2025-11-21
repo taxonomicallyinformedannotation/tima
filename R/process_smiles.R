@@ -162,7 +162,7 @@ process_smiles <- function(
   # Combine cached and new results
   table_final <- table_smiles |>
     tidytable::inner_join(
-      table_processed_1 |>
+      y = table_processed_1 |>
         tidytable::bind_rows(table_processed_2) |>
         tidytable::filter(!is.na(!!as.name(smiles_colname)))
     ) |>

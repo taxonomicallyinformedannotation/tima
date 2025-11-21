@@ -260,8 +260,8 @@ annotate_spectra <- function(
     if (approx == FALSE) {
       # logger::log_trace("Reducing library size")
       df_3 <- dplyr::inner_join(
-        tidytable::tidytable(minimal, maximal, lib_precursors),
-        tidytable::tidytable(val = unique(query_precursors)),
+        x = tidytable::tidytable(minimal, maximal, lib_precursors),
+        y = tidytable::tidytable(val = unique(query_precursors)),
         by = dplyr::join_by(minimal <= val, maximal >= val)
       ) |>
         tidytable::distinct(minimal, .keep_all = TRUE)
