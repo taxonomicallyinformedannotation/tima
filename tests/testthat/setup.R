@@ -6,4 +6,4 @@ suppressPackageStartupMessages(library(tima))
 dir.create(path = .test_root, recursive = TRUE, showWarnings = FALSE)
 
 # Reduce log noise in tests
-logger::log_threshold(level = logger::WARN)
+logger::log_threshold(level = logger::ERROR)

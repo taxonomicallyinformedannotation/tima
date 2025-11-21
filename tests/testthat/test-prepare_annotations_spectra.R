@@ -5,64 +5,45 @@ library(testthat)
 ## Internal Utility Helpers ----
 
 make_min_struct_files_spectra <- function(tmp) {
+  # Use tmp directory or create temp path
+  if (is.null(tmp)) {
+    tmp <- temp_test_dir("spectra_test")
+  }
+
   dir.create(
-    file.path("structures", "taxonomies"),
+    file.path(tmp, "structures", "taxonomies"),
     recursive = TRUE,
     showWarnings = FALSE
   )
-  stereo <- file.path("structures", "stereo.tsv")
-  met <- file.path("structures", "metadata.tsv")
-  nam <- file.path("structures", "names.tsv")
-  cla <- file.path("structures", "taxonomies", "classyfire.tsv")
-  npc <- file.path("structures", "taxonomies", "npc.tsv")
+  stereo <- file.path(tmp, "structures", "stereo.tsv")
+  met <- file.path(tmp, "structures", "metadata.tsv")
+  nam <- file.path(tmp, "structures", "names.tsv")
+  cla <- file.path(tmp, "structures", "taxonomies", "classyfire.tsv")
+  npc <- file.path(tmp, "structures", "taxonomies", "npc.tsv")
 
+  # Use fixtures instead of creating inline
   tidytable::fwrite(
-    tidytable::tidytable(
-      structure_inchikey_connectivity_layer = "DUMMYINK-PLANAR",
-      structure_smiles_no_stereo = "C"
-    ),
+    load_fixture("spectra_structures_stereo"),
     stereo,
     sep = "\t"
   )
   tidytable::fwrite(
-    tidytable::tidytable(
-      structure_inchikey_connectivity_layer = "DUMMYINK-PLANAR",
-      structure_smiles_no_stereo = "C",
-      structure_exact_mass = "16.0313",
-      structure_xlogp = "0.1",
-      structure_molecular_formula = "CH4"
-    ),
+    load_fixture("spectra_structures_metadata"),
     met,
     sep = "\t"
   )
   tidytable::fwrite(
-    tidytable::tidytable(
-      structure_inchikey_connectivity_layer = "DUMMYINK-PLANAR",
-      structure_smiles_no_stereo = "C",
-      structure_name = "Dummy"
-    ),
+    load_fixture("spectra_structures_names"),
     nam,
     sep = "\t"
   )
   tidytable::fwrite(
-    tidytable::tidytable(
-      structure_inchikey_connectivity_layer = "DUMMYINK-PLANAR",
-      structure_tax_cla_chemontid = NA_character_,
-      structure_tax_cla_01kin = NA_character_,
-      structure_tax_cla_02sup = NA_character_,
-      structure_tax_cla_03cla = NA_character_,
-      structure_tax_cla_04dirpar = NA_character_
-    ),
+    load_fixture("spectra_structures_taxonomy_cla"),
     cla,
     sep = "\t"
   )
   tidytable::fwrite(
-    tidytable::tidytable(
-      structure_smiles_no_stereo = "C",
-      structure_tax_npc_01pat = NA_character_,
-      structure_tax_npc_02sup = NA_character_,
-      structure_tax_npc_03cla = NA_character_
-    ),
+    load_fixture("spectra_structures_taxonomy_npc"),
     npc,
     sep = "\t"
   )
@@ -72,7 +53,7 @@ make_min_struct_files_spectra <- function(tmp) {
 ## Validation ----
 
 test_that("test-prepare_annotations_spectra validates input vector and files", {
-  s <- make_min_struct_files_spectra(tmp)
+  s <- make_min_struct_files_spectra(NULL)
   out <- temp_test_path("spectra.tsv")
   expect_error(
     prepare_annotations_spectra(
@@ -122,7 +103,7 @@ test_that("test-prepare_annotations_spectra validates structure files", {
 ## Behavior ----
 
 test_that("test-prepare_annotations_spectra processes minimal formatted input", {
-  s <- make_min_struct_files_spectra(tmp)
+  s <- make_min_struct_files_spectra(NULL)
   out <- temp_test_path("spectra.tsv")
 
   tbl <- tidytable::tidytable(
