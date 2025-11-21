@@ -11,13 +11,13 @@ test_that("validate_sop_merged_inputs accepts valid inputs", {
       filter = FALSE,
       level = "family",
       value = "Test",
-      output_key = "key.tsv",
-      output_org_tax_ott = "org.tsv",
-      output_str_stereo = "stereo.tsv",
-      output_str_met = "met.tsv",
-      output_str_nam = "nam.tsv",
-      output_str_tax_cla = "cla.tsv",
-      output_str_tax_npc = "npc.tsv"
+      output_key = temp_test_path("key.tsv"),
+      output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_stereo = temp_test_path("stereo.tsv"),
+      output_str_met = temp_test_path("met.tsv"),
+      output_str_nam = temp_test_path("nam.tsv"),
+      output_str_tax_cla = temp_test_path("cla.tsv"),
+      output_str_tax_npc = temp_test_path("npc.tsv")
     )
   )
 })
@@ -29,13 +29,13 @@ test_that("validate_sop_merged_inputs rejects invalid filter", {
       filter = "yes",
       level = "family",
       value = "Test",
-      output_key = "key.tsv",
-      output_org_tax_ott = "org.tsv",
-      output_str_stereo = "stereo.tsv",
-      output_str_met = "met.tsv",
-      output_str_nam = "nam.tsv",
-      output_str_tax_cla = "cla.tsv",
-      output_str_tax_npc = "npc.tsv"
+      output_key = temp_test_path("key.tsv"),
+      output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_stereo = temp_test_path("stereo.tsv"),
+      output_str_met = temp_test_path("met.tsv"),
+      output_str_nam = temp_test_path("nam.tsv"),
+      output_str_tax_cla = temp_test_path("cla.tsv"),
+      output_str_tax_npc = temp_test_path("npc.tsv")
     ),
     "filter must be a single logical value"
   )
@@ -48,13 +48,13 @@ test_that("validate_sop_merged_inputs rejects invalid level", {
       filter = TRUE,
       level = "invalid_level",
       value = "Test",
-      output_key = "key.tsv",
-      output_org_tax_ott = "org.tsv",
-      output_str_stereo = "stereo.tsv",
-      output_str_met = "met.tsv",
-      output_str_nam = "nam.tsv",
-      output_str_tax_cla = "cla.tsv",
-      output_str_tax_npc = "npc.tsv"
+      output_key = temp_test_path("key.tsv"),
+      output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_stereo = temp_test_path("stereo.tsv"),
+      output_str_met = temp_test_path("met.tsv"),
+      output_str_nam = temp_test_path("nam.tsv"),
+      output_str_tax_cla = temp_test_path("cla.tsv"),
+      output_str_tax_npc = temp_test_path("npc.tsv")
     ),
     "level must be one of"
   )
@@ -146,13 +146,13 @@ test_that("test-validate_sop_merged_inputs accepts all valid taxonomic levels", 
         filter = TRUE,
         level = lvl,
         value = "TestValue",
-        output_key = "key.tsv",
-        output_org_tax_ott = "org.tsv",
-        output_str_stereo = "stereo.tsv",
-        output_str_met = "met.tsv",
-        output_str_nam = "nam.tsv",
-        output_str_tax_cla = "cla.tsv",
-        output_str_tax_npc = "npc.tsv"
+        output_key = temp_test_path("key.tsv"),
+        output_org_tax_ott = temp_test_path("org.tsv"),
+        output_str_stereo = temp_test_path("stereo.tsv"),
+        output_str_met = temp_test_path("met.tsv"),
+        output_str_nam = temp_test_path("nam.tsv"),
+        output_str_tax_cla = temp_test_path("cla.tsv"),
+        output_str_tax_npc = temp_test_path("npc.tsv")
       )
     )
   }
@@ -166,12 +166,12 @@ test_that("test-validate_sop_merged_inputs rejects non-character output paths", 
       level = "family",
       value = "Test",
       output_key = 123, # Invalid
-      output_org_tax_ott = "org.tsv",
-      output_str_stereo = "stereo.tsv",
-      output_str_met = "met.tsv",
-      output_str_nam = "nam.tsv",
-      output_str_tax_cla = "cla.tsv",
-      output_str_tax_npc = "npc.tsv"
+      output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_stereo = temp_test_path("stereo.tsv"),
+      output_str_met = temp_test_path("met.tsv"),
+      output_str_nam = temp_test_path("nam.tsv"),
+      output_str_tax_cla = temp_test_path("cla.tsv"),
+      output_str_tax_npc = temp_test_path("npc.tsv")
     ),
     "output_key must be a single character string"
   )
@@ -184,13 +184,13 @@ test_that("test-validate_sop_merged_inputs rejects vector output paths", {
       filter = FALSE,
       level = "family",
       value = "Test",
-      output_key = "key.tsv",
+      output_key = temp_test_path("key.tsv"),
       output_org_tax_ott = c("org1.tsv", "org2.tsv"), # Invalid - vector
-      output_str_stereo = "stereo.tsv",
-      output_str_met = "met.tsv",
-      output_str_nam = "nam.tsv",
-      output_str_tax_cla = "cla.tsv",
-      output_str_tax_npc = "npc.tsv"
+      output_str_stereo = temp_test_path("stereo.tsv"),
+      output_str_met = temp_test_path("met.tsv"),
+      output_str_nam = temp_test_path("nam.tsv"),
+      output_str_tax_cla = temp_test_path("cla.tsv"),
+      output_str_tax_npc = temp_test_path("npc.tsv")
     ),
     "output_org_tax_ott must be a single character string"
   )
@@ -203,13 +203,13 @@ test_that("test-validate_sop_merged_inputs requires value when filtering", {
       filter = TRUE,
       level = "family",
       value = 123, # Invalid - not character
-      output_key = "key.tsv",
-      output_org_tax_ott = "org.tsv",
-      output_str_stereo = "stereo.tsv",
-      output_str_met = "met.tsv",
-      output_str_nam = "nam.tsv",
-      output_str_tax_cla = "cla.tsv",
-      output_str_tax_npc = "npc.tsv"
+      output_key = temp_test_path("key.tsv"),
+      output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_stereo = temp_test_path("stereo.tsv"),
+      output_str_met = temp_test_path("met.tsv"),
+      output_str_nam = temp_test_path("nam.tsv"),
+      output_str_tax_cla = temp_test_path("cla.tsv"),
+      output_str_tax_npc = temp_test_path("npc.tsv")
     ),
     "value must be a single character string"
   )
@@ -223,13 +223,13 @@ test_that("test-validate_sop_merged_inputs accepts filter=FALSE without checking
       filter = FALSE,
       level = "invalid_level", # This should be ignored when filter=FALSE
       value = "Test",
-      output_key = "key.tsv",
-      output_org_tax_ott = "org.tsv",
-      output_str_stereo = "stereo.tsv",
-      output_str_met = "met.tsv",
-      output_str_nam = "nam.tsv",
-      output_str_tax_cla = "cla.tsv",
-      output_str_tax_npc = "npc.tsv"
+      output_key = temp_test_path("key.tsv"),
+      output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_stereo = temp_test_path("stereo.tsv"),
+      output_str_met = temp_test_path("met.tsv"),
+      output_str_nam = temp_test_path("nam.tsv"),
+      output_str_tax_cla = temp_test_path("cla.tsv"),
+      output_str_tax_npc = temp_test_path("npc.tsv")
     )
   )
 })
@@ -241,13 +241,13 @@ test_that("test-validate_sop_merged_inputs rejects NULL filter", {
       filter = NULL,
       level = "family",
       value = "Test",
-      output_key = "key.tsv",
-      output_org_tax_ott = "org.tsv",
-      output_str_stereo = "stereo.tsv",
-      output_str_met = "met.tsv",
-      output_str_nam = "nam.tsv",
-      output_str_tax_cla = "cla.tsv",
-      output_str_tax_npc = "npc.tsv"
+      output_key = temp_test_path("key.tsv"),
+      output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_stereo = temp_test_path("stereo.tsv"),
+      output_str_met = temp_test_path("met.tsv"),
+      output_str_nam = temp_test_path("nam.tsv"),
+      output_str_tax_cla = temp_test_path("cla.tsv"),
+      output_str_tax_npc = temp_test_path("npc.tsv")
     ),
     "filter must be a single logical value"
   )
@@ -271,13 +271,13 @@ test_that("test-validate_sop_merged_inputs validates all output parameters", {
       filter = FALSE,
       level = "family",
       value = "Test",
-      output_key = "key.tsv",
-      output_org_tax_ott = "org.tsv",
-      output_str_stereo = "stereo.tsv",
-      output_str_met = "met.tsv",
-      output_str_nam = "nam.tsv",
-      output_str_tax_cla = "cla.tsv",
-      output_str_tax_npc = "npc.tsv"
+      output_key = temp_test_path("key.tsv"),
+      output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_stereo = temp_test_path("stereo.tsv"),
+      output_str_met = temp_test_path("met.tsv"),
+      output_str_nam = temp_test_path("nam.tsv"),
+      output_str_tax_cla = temp_test_path("cla.tsv"),
+      output_str_tax_npc = temp_test_path("npc.tsv")
     )
 
     # Set the specific parameter to invalid value
@@ -585,11 +585,11 @@ test_that("test-prepare_libraries_sop_merged validates inputs before processing"
       value = "Test",
       output_key = "key.tsv",
       output_org_tax_ott = "org.tsv",
-      output_str_stereo = "stereo.tsv",
-      output_str_met = "met.tsv",
+      output_str_stereo = temp_test_path("stereo.tsv"),
+      output_str_met = temp_test_path("met.tsv"),
       output_str_nam = "nam.tsv",
-      output_str_tax_cla = "cla.tsv",
-      output_str_tax_npc = "npc.tsv"
+      output_str_tax_cla = temp_test_path("cla.tsv"),
+      output_str_tax_npc = temp_test_path("npc.tsv")
     ),
     "filter must be a single logical value"
   )
@@ -604,13 +604,13 @@ test_that("test-validate_sop_merged_inputs accepts empty value when filter=FALSE
       filter = FALSE,
       level = "family",
       value = "", # Empty string OK when not filtering
-      output_key = "key.tsv",
-      output_org_tax_ott = "org.tsv",
-      output_str_stereo = "stereo.tsv",
-      output_str_met = "met.tsv",
-      output_str_nam = "nam.tsv",
-      output_str_tax_cla = "cla.tsv",
-      output_str_tax_npc = "npc.tsv"
+      output_key = temp_test_path("key.tsv"),
+      output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_stereo = temp_test_path("stereo.tsv"),
+      output_str_met = temp_test_path("met.tsv"),
+      output_str_nam = temp_test_path("nam.tsv"),
+      output_str_tax_cla = temp_test_path("cla.tsv"),
+      output_str_tax_npc = temp_test_path("npc.tsv")
     )
   )
 })
