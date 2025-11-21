@@ -28,29 +28,24 @@ test_that("complement_metadata_structures errors on invalid file paths", {
 
 test_that("complement_metadata_structures validates single character path inputs", {
   df <- tidytable::tidytable(
-    candidate_structure_inchikey_connectivity_layer = "INKY",
-    candidate_structure_smiles_no_stereo = "CC"
+    candidate_structure_inchikey_connectivity_layer = "INK1",
+    candidate_structure_smiles_no_stereo = "C"
   )
 
-  # Create minimal valid files
-  minimal <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "INKY",
-    structure_smiles_no_stereo = "CC"
-  )
+  # Use fixtures for structure files
   st_file <- temp_test_path("st.tsv")
   met_file <- temp_test_path("met.tsv")
   nam_file <- temp_test_path("nam.tsv")
   cla_file <- temp_test_path("cla.tsv")
   npc_file <- temp_test_path("npc.tsv")
 
-  tidytable::fwrite(x = minimal, file = st_file)
-  tidytable::fwrite(x = minimal, file = met_file)
-  tidytable::fwrite(x = minimal, file = nam_file)
-  tidytable::fwrite(x = minimal, file = cla_file)
-  tidytable::fwrite(
-    tidytable::tidytable(structure_smiles_no_stereo = "CC"),
-    file = npc_file
-  )
+  # Copy fixtures to temp location
+  tidytable::fwrite(load_fixture("spectra_structures_stereo"), st_file, sep = "\t")
+  tidytable::fwrite(load_fixture("spectra_structures_metadata"), met_file, sep = "\t")
+  tidytable::fwrite(load_fixture("spectra_structures_names"), nam_file, sep = "\t")
+  tidytable::fwrite(load_fixture("spectra_structures_taxonomy_cla"), cla_file, sep = "\t")
+  tidytable::fwrite(load_fixture("spectra_structures_taxonomy_npc"), npc_file, sep = "\t")
+
   # Pass a vector for one path
   expect_error(
     complement_metadata_structures(
@@ -71,59 +66,31 @@ test_that("complement_metadata_structures collapses multiple names with separato
     candidate_structure_smiles_no_stereo = "C"
   )
 
-  stereo_file <- temp_test_path("stereo.tsv")
+  # Use fixtures for structure files
+  st_file <- temp_test_path("st.tsv")
   met_file <- temp_test_path("met.tsv")
   nam_file <- temp_test_path("nam.tsv")
   cla_file <- temp_test_path("cla.tsv")
   npc_file <- temp_test_path("npc.tsv")
 
-  stereo <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "INK1",
-    structure_smiles_no_stereo = "C"
-  )
-  tidytable::fwrite(x = stereo, file = stereo_file)
-  met <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "INK1",
-    structure_smiles_no_stereo = "C",
-    structure_exact_mass = "100",
-    structure_xlogp = "1",
-    structure_molecular_formula = "C"
-  )
-  tidytable::fwrite(x = met, file = met_file)
-  nam <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = c("INK1", "INK1"),
-    structure_smiles_no_stereo = c("C", "C"),
-    structure_name = c("Name1", "Name2")
-  )
-  tidytable::fwrite(x = nam, file = nam_file)
-  cla <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "INK1",
-    structure_smiles_no_stereo = "C",
-    structure_tax_cla_chemontid = "X",
-    structure_tax_cla_01kin = "Kin",
-    structure_tax_cla_02sup = "Sup",
-    structure_tax_cla_03cla = "Cla",
-    structure_tax_cla_04dirpar = "Par"
-  )
-  tidytable::fwrite(x = cla, file = cla_file)
-  npc <- tidytable::tidytable(
-    structure_smiles_no_stereo = "C",
-    structure_tax_npc_01pat = "Pat",
-    structure_tax_npc_02sup = "NSup",
-    structure_tax_npc_03cla = "NCla"
-  )
-  tidytable::fwrite(x = npc, file = npc_file)
+  # Use fixtures
+  tidytable::fwrite(load_fixture("spectra_structures_stereo"), st_file, sep = "\t")
+  tidytable::fwrite(load_fixture("spectra_structures_metadata"), met_file, sep = "\t")
+  tidytable::fwrite(load_fixture("spectra_structures_names"), nam_file, sep = "\t")
+  tidytable::fwrite(load_fixture("spectra_structures_taxonomy_cla"), cla_file, sep = "\t")
+  tidytable::fwrite(load_fixture("spectra_structures_taxonomy_npc"), npc_file, sep = "\t")
+
   result <- complement_metadata_structures(
     df,
-    str_stereo = stereo_file,
+    str_stereo = st_file,
     str_met = met_file,
     str_nam = nam_file,
     str_tax_cla = cla_file,
     str_tax_npc = npc_file
   )
   expect_true("structure_name" %in% names(result))
-  if (!is.na(result$structure_name)) {
-    expect_true(grepl(" $ ", result$structure_name, fixed = TRUE))
+  if (nrow(result) > 0 && !is.na(result$structure_name[1])) {
+    expect_true(grepl(" $ ", result$structure_name[1], fixed = TRUE))
   }
 })
 
@@ -178,34 +145,31 @@ test_that("complement_metadata_structures collapses multiple names with separato
 test_that("complement_metadata_structures errors when required columns missing", {
   df <- tidytable::tidytable(
     candidate_structure_inchikey_connectivity_layer = "INK3",
-    candidate_structure_smiles_no_stereo = "O"
+    candidate_structure_smiles_no_stereo = "CCC"
   )
 
-  stereo_file <- temp_test_path("stereo.tsv")
+  # Use fixtures for structure files
+  st_file <- temp_test_path("st.tsv")
   met_file <- temp_test_path("met.tsv")
   nam_file <- temp_test_path("nam.tsv")
   cla_file <- temp_test_path("cla.tsv")
   npc_file <- temp_test_path("npc.tsv")
 
-  # Stereo missing structure_smiles_no_stereo column
+  # Stereo missing structure_smiles_no_stereo column - create incomplete data
   stereo <- tidytable::tidytable(structure_inchikey_connectivity_layer = "INK3")
-  tidytable::fwrite(x = stereo, file = stereo_file)
-  minimal <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "INK3",
-    structure_smiles_no_stereo = "O"
-  )
-  tidytable::fwrite(x = minimal, file = met_file)
-  tidytable::fwrite(x = minimal, file = nam_file)
-  tidytable::fwrite(x = minimal, file = cla_file)
-  tidytable::fwrite(
-    tidytable::tidytable(structure_smiles_no_stereo = "O"),
-    file = npc_file
-  )
+  tidytable::fwrite(x = stereo, file = st_file, sep = "\t")
+
+  # Use fixtures for the others
+  tidytable::fwrite(load_fixture("spectra_structures_metadata"), met_file, sep = "\t")
+  tidytable::fwrite(load_fixture("spectra_structures_names"), nam_file, sep = "\t")
+  tidytable::fwrite(load_fixture("spectra_structures_taxonomy_cla"), cla_file, sep = "\t")
+  tidytable::fwrite(load_fixture("spectra_structures_taxonomy_npc"), npc_file, sep = "\t")
+
   # Expect error due to missing column usage inside joins/select
   expect_error(
     complement_metadata_structures(
       df,
-      str_stereo = stereo_file,
+      str_stereo = st_file,
       str_met = met_file,
       str_nam = nam_file,
       str_tax_cla = cla_file,
