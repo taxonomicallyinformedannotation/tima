@@ -13,6 +13,7 @@
 #' @param high_confidence Logical
 #' @param remove_ties Logical
 #' @param summarize Logical
+#' @param max_per_score Integer
 #'
 #' @return NULL (stops execution if validation fails)
 #' @keywords internal
@@ -26,7 +27,8 @@ validate_clean_chemo_inputs <- function(
   compounds_names,
   high_confidence,
   remove_ties,
-  summarize
+  summarize,
+  max_per_score = 7L
 ) {
   # Validate data frame
   if (!is.data.frame(annot_table_wei_chemo)) {
@@ -411,6 +413,8 @@ remove_compound_names <- function(results_list, compounds_names) {
 #' @param high_confidence Logical, apply strict high-confidence filters
 #' @param remove_ties Logical, remove tied scores (keep only highest-ranked)
 #' @param summarize Logical, collapse results to one row per feature
+#' @param max_per_score Integer, max candidates to keep per feature per score.
+#'   If more exist, they are randomly sampled and a note is added. Default 7.
 #'
 #' @return Named list with three data frames:
 #'   \describe{
@@ -462,7 +466,8 @@ clean_chemo <- function(
   compounds_names = get("compounds_names", envir = parent.frame()),
   high_confidence = get("high_confidence", envir = parent.frame()),
   remove_ties = get("remove_ties", envir = parent.frame()),
-  summarize = get("summarize", envir = parent.frame())
+  summarize = get("summarize", envir = parent.frame()),
+  max_per_score = 7L
 ) {
   # Input Validation ----
 
@@ -476,7 +481,8 @@ clean_chemo <- function(
     compounds_names = compounds_names,
     high_confidence = high_confidence,
     remove_ties = remove_ties,
-    summarize = summarize
+    summarize = summarize,
+    max_per_score = max_per_score
   )
 
   # Early exit for empty input
@@ -516,9 +522,10 @@ clean_chemo <- function(
     "Remove ties: {remove_ties}, Summarize: {summarize}"
   )
   logger::log_info(
-    "Filtering top {candidates_final} candidates and keeping only MS1 ",
-    "candidates with minimum {minimal_ms1_bio} biological score ",
-    "{minimal_ms1_condition} {minimal_ms1_chemo} chemical score"
+    "Filtering top {candidates_final} candidates and keeping only MS1 candidates with minimum {minimal_ms1_bio} biological score {minimal_ms1_condition} {minimal_ms1_chemo} chemical score"
+  )
+  logger::log_debug(
+    "Sampling max_per_score = {max_per_score} candidates per (feature_id, rank_final) after filters"
   )
 
   # Core Filtering Pipeline ----
@@ -531,19 +538,73 @@ clean_chemo <- function(
     minimal_ms1_condition = minimal_ms1_condition
   )
 
-  # Step 2: Rank and deduplicate - keep best structure per feature
+  # Step 2: Rank and deduplicate ----
   df_ranked <- rank_and_deduplicate(df_base)
 
-  # Apply Percentile Filter -----
+  ## Sampling ----
 
-  # Apply percentile filtering HERE (not in minimize_results)
+  ## Sampling with reproducible seed (tidytable) ----
+  df_ranked <- df_ranked |>
+    tidytable::mutate(
+      .n_per_group = tidytable::n(),
+      .by = c(feature_id, rank_final)
+    )
+
+  # Count features that need sampling
+  n_sampled_features <- df_ranked |>
+    tidytable::filter(.n_per_group > max_per_score) |>
+    tidytable::distinct(feature_id) |>
+    nrow()
+
+  if (n_sampled_features > 0L) {
+    logger::log_info(
+      "Sampling candidates for ",
+      n_sampled_features,
+      " features with more than ",
+      max_per_score,
+      " candidates per score"
+    )
+  }
+
+  # Add group sizes per (feature_id, rank_final)
+  df_ranked <- df_ranked |>
+    tidytable::mutate(
+      .n_per_group = tidytable::n(),
+      .by = c(feature_id, rank_final)
+    )
+
+  # Groups that do NOT need sampling
+  df_keep_all <- df_ranked |>
+    tidytable::filter(.n_per_group <= max_per_score)
+
+  # Groups that DO need sampling
+  set.seed(42)
+  df_sampled <- df_ranked |>
+    tidytable::filter(.n_per_group > max_per_score) |>
+    tidytable::slice_sample(
+      n = max_per_score,
+      by = c(feature_id, rank_final)
+    ) |>
+    tidytable::mutate(
+      annotation_note = paste0(
+        "Sampled ",
+        max_per_score,
+        " of ",
+        .n_per_group,
+        " candidates with same score"
+      )
+    )
+
+  # Combine back
+  df_ranked <- tidytable::bind_rows(df_keep_all, df_sampled) |>
+    tidytable::select(-.n_per_group)
+
+  # Apply Percentile Filter -----
   # This is done BEFORE high-confidence filter to get accurate counts
   df_percentile <- apply_percentile_filter(df_ranked, best_percentile)
 
   # Count Candidates BEFORE High-Confidence Filter ----
 
-  # Count evaluated candidates (all in df_ranked)
-  # Count best candidates (those passing percentile in df_percentile)
   results_candidates <- count_candidates(df_ranked, df_percentile)
 
   # Three-Tier Output Generation ----
@@ -710,7 +771,7 @@ clean_chemo <- function(
   # Combine mini results and adjust candidates_best based on inchikey presence
   results_mini <- features_table |>
     tidytable::left_join(y = df_classes_mini, by = "feature_id") |>
-    tidytable::left_join(y = results_candidates, by = "feature_id") |>
+    tidytable::left_join(y = results_filtered, by = "feature_id") |>
     tidytable::left_join(
       y = df_filtered |>
         tidytable::select(
@@ -774,7 +835,8 @@ clean_chemo <- function(
           "organism_closest",
           "score",
           "candidates_evaluated",
-          "candidates_best"
+          "candidates_best",
+          "note" = "annotation_note"
         )
       )
     ) |>
@@ -794,7 +856,8 @@ clean_chemo <- function(
 
   # Tier 3: FULL - Optionally apply high-confidence filter
   df_full <- if (high_confidence) {
-    df_ranked |> filter_high_confidence_only(context = "full")
+    df_ranked |>
+      filter_high_confidence_only(context = "full")
   } else {
     df_ranked
   }

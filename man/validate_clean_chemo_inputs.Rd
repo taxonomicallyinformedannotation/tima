@@ -14,7 +14,8 @@ validate_clean_chemo_inputs(
   compounds_names,
   high_confidence,
   remove_ties,
-  summarize
+  summarize,
+  max_per_score = 7L
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ validate_clean_chemo_inputs(
 \item{remove_ties}{Logical}
 
 \item{summarize}{Logical}
+
+\item{max_per_score}{Integer}
 }
 \value{
 NULL (stops execution if validation fails)
