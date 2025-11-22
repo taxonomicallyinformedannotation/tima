@@ -111,7 +111,9 @@ summarize_results <- function(
           "score_biological",
           "score_interim" = "score_weighted_bio",
           "score_chemical",
-          "score_final" = "score_weighted_chemo"
+          "score_final" = "score_weighted_chemo",
+          # TODO
+          "annotation_note"
         )
       )
     ) |>
@@ -159,7 +161,9 @@ summarize_results <- function(
           model$candidates_spectra_columns,
           model$candidates_structures_columns,
           model$rank_columns,
-          model$score_columns
+          model$score_columns,
+          # TODO
+          "annotation_note"
         )
       )
     ) |>
@@ -235,7 +239,9 @@ summarize_results <- function(
           model$candidates_spectra_columns,
           model$candidates_structures_columns,
           model$rank_columns,
-          model$score_columns
+          model$score_columns,
+          # TODO
+          "annotation_note"
         )
       )
     )
@@ -268,7 +274,9 @@ summarize_results <- function(
           x = c(
             model$features_columns,
             model$features_calculated_columns,
-            model$components_columns
+            model$components_columns,
+            # TODO
+            "annotation_note"
           )
         )
       ) |>

@@ -18,7 +18,8 @@ clean_chemo(
   compounds_names = get("compounds_names", envir = parent.frame()),
   high_confidence = get("high_confidence", envir = parent.frame()),
   remove_ties = get("remove_ties", envir = parent.frame()),
-  summarize = get("summarize", envir = parent.frame())
+  summarize = get("summarize", envir = parent.frame()),
+  max_per_score = 7L
 )
 }
 \arguments{
@@ -55,6 +56,9 @@ Candidates with scores >= percentile * max_score are kept. Default: 0.9 (90th pe
 \item{remove_ties}{Logical, remove tied scores (keep only highest-ranked)}
 
 \item{summarize}{Logical, collapse results to one row per feature}
+
+\item{max_per_score}{Integer, max candidates to keep per feature per score.
+If more exist, they are randomly sampled and a note is added. Default 7.}
 }
 \value{
 Named list with three data frames:
