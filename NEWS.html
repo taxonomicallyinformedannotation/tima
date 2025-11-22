@@ -699,6 +699,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Added <code>RDKit</code>-based structures processing through <code>reticulate</code> (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/19">#19</a>)</li>
 <li>Breaking Change: <code>.RDS</code> spectra are now stored more efficiently. To avoid errors, delete any <code>.RDS</code> files created before version <code>2.12.0</code></li>
 <li>Externalized spectral libraries preparation to <a href="https://github.com/Adafede/SpectRalLibRaRies">SpectRalLibRaRies</a></li>
+<li>Fix memory crashes in case of large number of ties, limiting to 7 with note (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/216">#216</a>)</li>
 <li>Introduced similarity method argument (entropy and GNPS for now)</li>
 <li>Implemented GNPS similarity method in C</li>
 <li>Improved high confidence filtering</li>

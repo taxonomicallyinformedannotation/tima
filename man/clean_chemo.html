@@ -716,7 +716,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   compounds_names = get("compounds_names", envir = parent.frame()),
   high_confidence = get("high_confidence", envir = parent.frame()),
   remove_ties = get("remove_ties", envir = parent.frame()),
-  summarize = get("summarize", envir = parent.frame())
+  summarize = get("summarize", envir = parent.frame()),
+  max_per_score = 7L
 )
 </code></pre>
 </section>
@@ -825,6 +826,14 @@ Logical, remove tied scores (keep only highest-ranked)
 </td>
 <td>
 Logical, collapse results to one row per feature
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="max_per_score">max_per_score</code>
+</td>
+<td>
+Integer, max candidates to keep per feature per score. If more exist, they are randomly sampled and a note is added. Default 7.
 </td>
 </tr>
 </tbody></table>

@@ -677,7 +677,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#get-last-version-from-zenodo" id="toc-get-last-version-from-zenodo" class="nav-link active" data-scroll-target="#get-last-version-from-zenodo">Get last version from Zenodo</a>
+  <li><a href="#get-latest-version-from-zenodo" id="toc-get-latest-version-from-zenodo" class="nav-link active" data-scroll-target="#get-latest-version-from-zenodo">Get Latest Version from Zenodo</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -696,11 +696,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="get-last-version-from-zenodo" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="get-last-version-from-zenodo">Get last version from Zenodo</h2>
+<section id="get-latest-version-from-zenodo" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="get-latest-version-from-zenodo">Get Latest Version from Zenodo</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function retrieves the latest version of a file from a Zenodo repository record. It checks the file size and only downloads if the local file is missing or differs from the remote version.</p>
+<p>Retrieves the latest version of a file from a Zenodo repository record. This function checks the file size and only downloads if the local file is missing or differs from the remote version. Implements robust error handling and retry logic.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -715,7 +715,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="doi">doi</code>
 </td>
 <td>
-Character string DOI of the Zenodo record (e.g., "10.5281/zenodo.5794106")
+Character. Zenodo DOI (e.g., "10.5281/zenodo.5794106")
 </td>
 </tr>
 <tr>
@@ -723,7 +723,7 @@ Character string DOI of the Zenodo record (e.g., "10.5281/zenodo.5794106")
 <code id="pattern">pattern</code>
 </td>
 <td>
-Character string pattern to identify the specific file to download
+Character. Pattern to identify the specific file to download
 </td>
 </tr>
 <tr>
@@ -731,29 +731,58 @@ Character string pattern to identify the specific file to download
 <code id="path">path</code>
 </td>
 <td>
-Character string local path where the file should be saved
+Character. Local path where the file should be saved
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>Credit goes partially to https://inbo.github.io/inborutils/ This function handles the new Zenodo API format and file structure.</p>
+<p>Credit goes partially to https://inbo.github.io/inborutils/</p>
+<p>This function:</p>
+<ul>
+<li>
+<p>Validates DOI format and input parameters</p>
+</li>
+<li>
+<p>Fetches the latest version metadata from Zenodo API</p>
+</li>
+<li>
+<p>Finds files matching the specified pattern</p>
+</li>
+<li>
+<p>Compares local and remote file sizes to avoid unnecessary downloads</p>
+</li>
+<li>
+<p>Downloads only if needed, with retry logic</p>
+</li>
+<li>
+<p>Creates necessary directories automatically</p>
+</li>
+</ul>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Character string path to the downloaded file</p>
+<p>Character path to the downloaded (or existing) file</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">get_last_version_from_zenodo</span>(</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">doi =</span> <span class="st">"10.5281/zenodo.5794106"</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">pattern =</span> <span class="st">"frozen.csv.gz"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> <span class="st">"data/frozen.csv.gz"</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Download LOTUS database from Zenodo</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">get_last_version_from_zenodo</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">doi =</span> <span class="st">"10.5281/zenodo.5794106"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">pattern =</span> <span class="st">"lotus.csv.gz"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> <span class="st">"data/source/libraries/sop/lotus.csv.gz"</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># The function will skip download if file exists with correct size</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">get_last_version_from_zenodo</span>(</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">doi =</span> <span class="st">"10.5281/zenodo.5794106"</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">pattern =</span> <span class="st">"lotus.csv.gz"</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> <span class="st">"data/source/libraries/sop/lotus.csv.gz"</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
