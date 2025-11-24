@@ -2,11 +2,17 @@
 % Please edit documentation in R/calculate_mass_of_m.R
 \name{validate_electron_mass}
 \alias{validate_electron_mass}
-\title{Validate electron mass}
+\title{Validate electron mass value}
 \usage{
 validate_electron_mass(electron_mass)
 }
+\arguments{
+\item{electron_mass}{Numeric electron mass in Daltons}
+}
+\value{
+Invisible TRUE if valid, stops with error otherwise
+}
 \description{
-Validate electron mass
+Validates electron mass parameter (should be close to CODATA value)
 }
 \keyword{internal}

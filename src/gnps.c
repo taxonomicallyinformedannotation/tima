@@ -1,3 +1,19 @@
+/**
+ * @file gnps.c
+ * @brief GNPS Spectral Similarity Computation with Auction Algorithm
+ *
+ * Implements the GNPS (Global Natural Products Social molecular networking)
+ * spectral similarity algorithm using an auction-based Linear Sum Assignment
+ * Problem (LSAP) solver. The code is optimized for performance with:
+ * - OpenMP parallelization for multi-core systems
+ * - Memory prefetching for better cache utilization
+ * - Loop unrolling in critical paths
+ * - Efficient sorting and binary search
+ *
+ * @author TIMA Development Team
+ * @license GPL-3+
+ */
+
 #include <R.h>
 #include <Rinternals.h>
 #include <math.h>

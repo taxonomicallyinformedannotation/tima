@@ -79,6 +79,20 @@ COMPRESSED_EXTENSIONS <- c(".gz", ".zip", ".bz2")
 #' @export
 TABLE_EXTENSIONS <- c(".tsv", ".csv", ".txt")
 
+#' Supported spectral data formats
+#' @export
+SPECTRAL_FORMATS <- c(".mgf", ".msp", ".mzML", ".mzXML")
+
+# File System Constants ----
+
+#' Temporary file prefix for write tests
+#' @keywords internal
+TEMP_FILE_PREFIX <- ".tima_write_test_"
+
+#' Maximum path length (OS-dependent, conservative estimate)
+#' @keywords internal
+MAX_PATH_LENGTH <- 260L
+
 # Chemical Formula Component Masses ----
 # Common adduct components and their exact masses
 
@@ -107,70 +121,12 @@ ADDUCT_MASSES <- list(
 #' @export
 WEIGHT_SUM_TOLERANCE <- 1e-10
 
-#' Default minimum consistency score for taxonomic predictions
-#' Features below this threshold are filtered out
-#' @export
-DEFAULT_MINIMAL_CONSISTENCY <- 0.5
+# MS1 Filtering Defaults ----
 
-#' Default best candidate percentile threshold
-#' Only candidates above this percentile are retained
-#' @export
-DEFAULT_BEST_PERCENTILE <- 0.9
-
-# Scoring Defaults ----
-
-#' Default number of top candidates to consider from neighbors
-#' @export
-DEFAULT_CANDIDATES_NEIGHBORS <- 10
-
-#' Default number of final candidates to report per feature
-#' @export
-DEFAULT_CANDIDATES_FINAL <- 5
-
-# MS1 Filtering Thresholds ----
-
-#' Default minimum MS1 score threshold for biological scoring
-#' @export
-DEFAULT_MINIMAL_MS1_BIO <- 0.5
-
-#' Default minimum MS1 score threshold for chemical scoring
-#' @export
-DEFAULT_MINIMAL_MS1_CHEMO <- 0.5
-
-#' Default MS1 score combination logic
+#' Default MS1 score combination logic for filtering
 #' Either "OR" (at least one threshold met) or "AND" (both thresholds met)
 #' @export
 DEFAULT_MINIMAL_MS1_CONDITION <- "OR"
-
-# High Confidence Filter Defaults ----
-
-#' Minimum biological score for high confidence annotations
-#' @export
-DEFAULT_HC_SCORE_BIO_MIN <- 0.8
-
-#' Minimum chemical score for high confidence annotations
-#' @export
-DEFAULT_HC_SCORE_CHEM_MIN <- 0.8
-
-#' Minimum combined score for high confidence annotations
-#' @export
-DEFAULT_HC_SCORE_FINAL_MIN <- 0.8
-
-#' Minimum spectral score for high confidence annotations
-#' @export
-DEFAULT_HC_SCORE_SPECTRAL_MIN <- 0.5
-
-#' Minimum SIRIUS CSI score for high confidence annotations
-#' @export
-DEFAULT_HC_SCORE_SIRIUS_MIN <- 0.5
-
-#' Minimum initial (MS1) score for high confidence annotations
-#' @export
-DEFAULT_HC_SCORE_INITIAL_MIN <- 0.3
-
-#' Maximum retention time error (minutes) for high confidence annotations
-#' @export
-DEFAULT_HC_MAX_RT_ERROR_MIN <- 0.5
 
 
 # Ionization Modes ----
@@ -248,19 +204,20 @@ DEFAULT_CHEM_SCORES <- list(
 
 # Annotation Filtering ----
 
-#' Default percentile for top candidate selection
+#' Default percentile threshold for top candidate selection
+#' Only candidates with scores above this percentile are retained
 #' @export
 DEFAULT_BEST_PERCENTILE <- 0.9
 
-#' Default number of neighboring candidates to retain
+#' Default number of neighboring candidates to retain during network annotation
 #' @export
 DEFAULT_CANDIDATES_NEIGHBORS <- 16
 
-#' Default number of final candidates to retain
+#' Default number of final candidates to report per feature
 #' @export
 DEFAULT_CANDIDATES_FINAL <- 1
 
-#' Minimum consistency score threshold
+#' Minimum consistency score threshold for taxonomic predictions
 #' @export
 DEFAULT_MINIMAL_CONSISTENCY <- 0.0
 
@@ -278,6 +235,10 @@ DEFAULT_MINIMAL_MS1_CHEMO <- 0.0
 #' @export
 DEFAULT_HC_SCORE_BIO_MIN <- 0.85
 
+#' Minimum chemical score for high confidence annotations
+#' @export
+DEFAULT_HC_SCORE_CHEM_MIN <- 0.8
+
 #' Default minimum initial (pseudo) score threshold for high-confidence filter
 #' @export
 DEFAULT_HC_SCORE_INITIAL_MIN <- 0.95
@@ -290,7 +251,7 @@ DEFAULT_HC_SCORE_FINAL_MIN <- 0.75
 #' @export
 DEFAULT_HC_SCORE_SIRIUS_MIN <- NULL
 
-#' Default minimum SIRIUS confidence score threshold for high-confidence filter
+#' Default minimum spectral similarity score threshold for high-confidence filter
 #' @export
 DEFAULT_HC_SCORE_SPECTRAL_MIN <- NULL
 

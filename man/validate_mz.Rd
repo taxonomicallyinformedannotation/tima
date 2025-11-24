@@ -6,7 +6,13 @@
 \usage{
 validate_mz(mz)
 }
+\arguments{
+\item{mz}{Numeric m/z value}
+}
+\value{
+Invisible TRUE if valid, stops with error otherwise
+}
 \description{
-Validate m/z value
+Validates mass-to-charge ratio input value
 }
 \keyword{internal}

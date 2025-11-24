@@ -189,98 +189,63 @@ calculate_mass_of_m <- function(
 # Implement Single Responsibility Principle
 
 #' Validate m/z value
+#'
+#' @description Validates mass-to-charge ratio input value
+#'
+#' @param mz Numeric m/z value
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
 #' @keywords internal
 validate_mz <- function(mz) {
-  if (!is.numeric(mz)) {
-    stop(
-      "mz must be numeric, got: ",
-      class(mz)[1L],
-      ".\n",
-      "Please provide a valid m/z value."
-    )
-  }
-
-  if (length(mz) != 1L) {
-    stop(
-      "mz must be a single value, got length: ",
-      length(mz),
-      ".\n",
-      "Please provide exactly one m/z value."
-    )
-  }
-
-  if (is.na(mz)) {
-    stop("mz cannot be NA")
-  }
-
-  if (!is.finite(mz)) {
-    stop(
-      "mz must be finite (not Inf or -Inf), got: ",
-      mz
-    )
-  }
-
-  if (mz < 0) {
-    stop(
-      "mz must be positive, got: ",
-      mz,
-      ".\n",
-      "Mass-to-charge ratios cannot be negative."
-    )
-  }
+  # Use centralized numeric validation
+  validate_numeric_range(
+    value = mz,
+    min_value = MIN_MASS_DALTONS,
+    max_value = Inf,
+    param_name = "mz"
+  )
 
   # Sanity check: warn if m/z is suspiciously high
   if (mz > MAX_MASS_DALTONS) {
-    msg <- paste0(
-      "m/z value (",
-      mz,
-      " Da) exceeds typical small molecule range (",
-      MAX_MASS_DALTONS,
-      " Da). Please verify this is correct."
+    logger::log_warn(
+      "m/z value ({mz} Da) exceeds typical small molecule range ",
+      "({MAX_MASS_DALTONS} Da). Please verify this is correct."
     )
-    warning(msg, call. = FALSE)
-    logger::log_warn(msg)
   }
 
   invisible(TRUE)
 }
 
-#' Validate electron mass
+#' Validate electron mass value
+#'
+#' @description Validates electron mass parameter (should be close to CODATA value)
+#'
+#' @param electron_mass Numeric electron mass in Daltons
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
 #' @keywords internal
 validate_electron_mass <- function(electron_mass) {
-  if (!is.numeric(electron_mass) || length(electron_mass) != 1L) {
-    stop(
-      "electron_mass must be a single numeric value, got: ",
-      class(electron_mass)[1L]
-    )
-  }
+  # Basic numeric validation
+  validate_numeric_range(
+    value = electron_mass,
+    min_value = 0,
+    max_value = 0.001, # Sanity check: electron mass should be ~5.486e-4
+    param_name = "electron_mass"
+  )
 
-  if (electron_mass <= 0) {
-    stop(
-      "electron_mass must be positive, got: ",
-      electron_mass
-    )
-  }
+  # Warn if significantly different from CODATA value
+  expected_value <- ELECTRON_MASS_DALTONS
+  relative_diff <- abs(electron_mass - expected_value) / expected_value
 
-  # Sanity check: warn if electron mass differs significantly from standard
-  expected_electron_mass <- ELECTRON_MASS_DALTONS
-  relative_difference <- abs(electron_mass - expected_electron_mass) /
-    expected_electron_mass
-
-  if (relative_difference > 0.01) {
-    # 1% tolerance
-    msg <- paste0(
-      "Provided electron_mass (",
-      electron_mass,
-      ") differs from ",
-      "standard value (",
-      expected_electron_mass,
-      ") by ",
-      round(relative_difference * 100, 2),
-      "%"
+  if (relative_diff > 0.01) {
+    # More than 1% difference
+    logger::log_warn(
+      "electron_mass ({electron_mass}) differs from CODATA 2018 value ",
+      "({expected_value}) by {round(relative_diff * 100, 2)}%. ",
+      "Please verify this is intentional."
     )
-    warning(msg, call. = FALSE)
-    logger::log_warn(msg)
   }
 
   invisible(TRUE)

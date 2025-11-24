@@ -3,7 +3,7 @@
 \docType{data}
 \name{DEFAULT_MINIMAL_MS1_CONDITION}
 \alias{DEFAULT_MINIMAL_MS1_CONDITION}
-\title{Default MS1 score combination logic
+\title{Default MS1 score combination logic for filtering
 Either "OR" (at least one threshold met) or "AND" (both thresholds met)}
 \format{
 An object of class \code{character} of length 1.
@@ -12,7 +12,7 @@ An object of class \code{character} of length 1.
 DEFAULT_MINIMAL_MS1_CONDITION
 }
 \description{
-Default MS1 score combination logic
+Default MS1 score combination logic for filtering
 Either "OR" (at least one threshold met) or "AND" (both thresholds met)
 }
 \keyword{datasets}
