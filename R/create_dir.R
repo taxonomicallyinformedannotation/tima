@@ -2,7 +2,8 @@
 #'
 #' @description This function creates a directory at the specified path
 #'     if it does not already exist. Handles both directory paths and
-#'     file paths (extracting the directory component).
+#'     file paths (extracting the directory component). Includes validation
+#'     for write permissions.
 #'
 #' @param export Character string path to the directory or file path
 #'     from which to extract and create the directory
@@ -13,94 +14,122 @@
 #'
 #' @examples
 #' \dontrun{
+#' # Create a directory
 #' create_dir(export = "path/to/directory")
+#'
+#' # Extract directory from file path and create
 #' create_dir(export = "path/to/file.txt")
 #' }
 create_dir <- function(export) {
   # Input Validation ----
+  validate_character(
+    value = export,
+    param_name = "export",
+    allow_null = FALSE,
+    allow_empty = FALSE
+  )
 
-  if (missing(export) || is.null(export) || !nzchar(export)) {
-    stop("Export path must be specified and non-empty")
+  # Path length sanity check
+  if (nchar(export) > MAX_PATH_LENGTH) {
+    logger::log_warn(
+      "Path length ({nchar(export)}) exceeds typical OS maximum ({MAX_PATH_LENGTH}). ",
+      "This may cause issues on some systems."
+    )
   }
 
-  if (!is.character(export) || length(export) != 1L) {
-    stop("Export path must be a single character string, got: ", class(export))
-  }
+  # Extract Directory Path ----
+  dirname_path <- extract_directory_path(export)
 
-  # Determine Directory Path ----
+  # Create Directory ----
+  ensure_directory_exists(dirname_path)
 
+  # Verify Write Permissions ----
+  verify_directory_writable(dirname_path)
+
+  invisible(NULL)
+}
+
+#' Extract directory path from file or directory path
+#' @keywords internal
+extract_directory_path <- function(path) {
   # Determine if this is a file path or directory path
   # Check for file extension (contains dot in basename)
-  basename_part <- basename(export)
-  has_extension <- grepl("\\.[^.]+$", basename_part) && !endsWith(export, "/")
+  basename_part <- basename(path)
+  has_extension <- grepl("\\.[^.]+$", basename_part) && !endsWith(path, "/")
 
-  # Extract directory path
-  dirname_path <- if (has_extension) {
-    dir_part <- dirname(export)
+  if (has_extension) {
+    dir_part <- dirname(path)
     # Normalize "." to current directory
     if (dir_part == ".") "." else dir_part
   } else {
-    export
+    path
+  }
+}
+
+#' Ensure directory exists, creating it if necessary
+#' @keywords internal
+ensure_directory_exists <- function(dir_path) {
+  if (dir.exists(dir_path)) {
+    return(invisible(TRUE))
   }
 
-  # Create Directory ----
-
-  # Create the directory if it doesn't exist
-  if (!dir.exists(dirname_path)) {
-    # Create with error handling
-    created <- tryCatch(
-      {
-        dir.create(dirname_path, recursive = TRUE, showWarnings = FALSE)
-        TRUE
-      },
-      error = function(e) {
-        logger::log_error("Failed to create directory: {dirname_path}")
-        logger::log_debug("Error: {conditionMessage(e)}")
-        FALSE
-      }
-    )
-
-    if (created) {
-      # logger::log_debug("Created directory: {dirname_path}")
-    } else {
-      stop("Could not create directory: ", dirname_path)
+  created <- tryCatch(
+    {
+      dir.create(dir_path, recursive = TRUE, showWarnings = FALSE)
+      logger::log_debug("Created directory: {dir_path}")
+      TRUE
+    },
+    error = function(e) {
+      logger::log_error("Failed to create directory: {dir_path}")
+      logger::log_debug("Error: {conditionMessage(e)}")
+      FALSE
     }
+  )
+
+  if (!created) {
+    stop(
+      "Could not create directory: ",
+      dir_path,
+      "\n",
+      "Please check permissions and ensure parent path exists.",
+      call. = FALSE
+    )
   }
 
-  # Verify Directory is Writable ----
+  invisible(TRUE)
+}
 
-  # Verify directory is writable (important for Docker environments)
-  if (dir.exists(dirname_path)) {
-    # Test write permission by trying to create a temp file
-    test_file <- file.path(
-      dirname_path,
-      paste0(".tima_write_test_", Sys.getpid())
+#' Verify that a directory is writable
+#' @keywords internal
+verify_directory_writable <- function(dir_path) {
+  if (!dir.exists(dir_path)) {
+    logger::log_warn(
+      "Directory does not exist for write verification: {dir_path}"
     )
+    return(invisible(FALSE))
+  }
 
-    write_ok <- tryCatch(
-      {
-        writeLines("test", test_file)
-        unlink(test_file, force = TRUE) # More reliable cleanup
-        TRUE
-      },
-      error = function(e) {
-        logger::log_warn(
-          "Directory exists but may not be writable: {dirname_path}"
-        )
-        logger::log_debug("Write test error: {conditionMessage(e)}")
-        FALSE
-      }
-    )
+  # Test write permission by trying to create a temp file
+  test_file <- file.path(
+    dir_path,
+    paste0(TEMP_FILE_PREFIX, Sys.getpid())
+  )
 
-    if (!write_ok) {
+  write_ok <- tryCatch(
+    {
+      writeLines("test", test_file)
+      unlink(test_file, force = TRUE)
+      TRUE
+    },
+    error = function(e) {
       logger::log_warn(
-        "Permission issue detected in: {dirname_path}. ",
+        "Directory exists but may not be writable: {dir_path}. ",
         "This may cause failures in Docker/restricted environments."
       )
+      logger::log_debug("Write test error: {conditionMessage(e)}")
+      FALSE
     }
-  } else {
-    logger::log_error("Directory does not exist after creation: {dirname_path}")
-  }
+  )
 
-  invisible(NULL)
+  invisible(write_ok)
 }

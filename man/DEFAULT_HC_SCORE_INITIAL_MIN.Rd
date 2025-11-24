@@ -3,20 +3,14 @@
 \docType{data}
 \name{DEFAULT_HC_SCORE_INITIAL_MIN}
 \alias{DEFAULT_HC_SCORE_INITIAL_MIN}
-\title{Minimum initial (MS1) score for high confidence annotations}
+\title{Default minimum initial (pseudo) score threshold for high-confidence filter}
 \format{
-An object of class \code{numeric} of length 1.
-
 An object of class \code{numeric} of length 1.
 }
 \usage{
 DEFAULT_HC_SCORE_INITIAL_MIN
-
-DEFAULT_HC_SCORE_INITIAL_MIN
 }
 \description{
-Minimum initial (MS1) score for high confidence annotations
-
 Default minimum initial (pseudo) score threshold for high-confidence filter
 }
 \keyword{datasets}

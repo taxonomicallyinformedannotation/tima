@@ -688,6 +688,86 @@ validate_list_or_vector <- function(
   invisible(TRUE)
 }
 
+#' Assert that a value is a valid logical flag
+#'
+#' @description Validates that a parameter is a single non-NA logical value.
+#'     This is a strict version of validate_logical.
+#'
+#' @param x Value to check
+#' @param arg_name Name of the argument (for error messages)
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+assert_flag <- function(x, arg_name = deparse(substitute(x))) {
+  if (!is.logical(x) || length(x) != 1L || is.na(x)) {
+    stop(
+      arg_name,
+      " must be a single TRUE or FALSE value, got: ",
+      if (!is.logical(x)) {
+        class(x)[1L]
+      } else if (length(x) != 1L) {
+        paste0("logical vector of length ", length(x))
+      } else {
+        "NA"
+      },
+      call. = FALSE
+    )
+  }
+  invisible(TRUE)
+}
+
+#' Assert that a value is a positive integer
+#'
+#' @description Validates that a parameter is a single positive integer.
+#'
+#' @param x Value to check
+#' @param arg_name Name of the argument (for error messages)
+#' @param allow_zero Whether zero is allowed (default: FALSE)
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
+assert_positive_integer <- function(
+  x,
+  arg_name = deparse(substitute(x)),
+  allow_zero = FALSE
+) {
+  if (!is.numeric(x) || length(x) != 1L || is.na(x)) {
+    stop(
+      arg_name,
+      " must be a single numeric value, got: ",
+      class(x)[1L],
+      call. = FALSE
+    )
+  }
+
+  # Check if it's a whole number
+  if (x != as.integer(x)) {
+    stop(
+      arg_name,
+      " must be an integer, got: ",
+      x,
+      call. = FALSE
+    )
+  }
+
+  min_val <- if (allow_zero) 0L else 1L
+
+  if (x < min_val) {
+    stop(
+      arg_name,
+      " must be ",
+      if (allow_zero) ">= 0" else "> 0",
+      ", got: ",
+      x,
+      call. = FALSE
+    )
+  }
+
+  invisible(TRUE)
+}
+
 #' Validate data frame parameter
 #'
 #' @description Validates data frame structure and required columns

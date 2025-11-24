@@ -3,20 +3,14 @@
 \docType{data}
 \name{DEFAULT_HC_MAX_RT_ERROR_MIN}
 \alias{DEFAULT_HC_MAX_RT_ERROR_MIN}
-\title{Maximum retention time error (minutes) for high confidence annotations}
+\title{Default maximum allowed retention time error (minutes) for high-confidence filter}
 \format{
-An object of class \code{numeric} of length 1.
-
 An object of class \code{numeric} of length 1.
 }
 \usage{
 DEFAULT_HC_MAX_RT_ERROR_MIN
-
-DEFAULT_HC_MAX_RT_ERROR_MIN
 }
 \description{
-Maximum retention time error (minutes) for high confidence annotations
-
 Default maximum allowed retention time error (minutes) for high-confidence filter
 }
 \keyword{datasets}

@@ -103,84 +103,40 @@ annotate_masses <-
     )$ms$tolerances$rt$adducts
   ) {
     # Input Validation ----
+    logger::log_info("Starting mass-based annotation")
 
-    # Validate MS mode first (cheapest check)
-    # Handle NULL or missing ms_mode
-    if (is.null(ms_mode) || length(ms_mode) == 0L) {
-      stop(
-        "ms_mode is required but was NULL or empty. ",
-        "Please check your configuration file (params) for ms$polarity setting."
-      )
-    }
+    # Validate MS mode (cheapest check first)
+    validate_ms_mode(ms_mode)
 
-    if (!is.character(ms_mode) || length(ms_mode) != 1L) {
-      stop(
-        "ms_mode must be a single character string, got: ",
-        class(ms_mode)[1],
-        " of length ",
-        length(ms_mode)
-      )
-    }
-
-    if (!ms_mode %in% c("pos", "neg")) {
-      stop(
-        "ms_mode must be either 'pos' or 'neg', got: '",
-        ms_mode,
-        "'. ",
-        "Please check your configuration file (params) for ms$polarity setting."
-      )
-    }
-
-    # Validate tolerances (numeric checks)
-    if (
-      !is.numeric(tolerance_ppm) || tolerance_ppm <= 0 || tolerance_ppm > 20
-    ) {
-      stop(
-        "tolerance_ppm must be a positive number <= 20, got: ",
-        tolerance_ppm
-      )
-    }
-
-    if (!is.numeric(tolerance_rt) || tolerance_rt <= 0 || tolerance_rt > 0.05) {
-      stop(
-        "tolerance_rt must be a positive number <= 0.05, got: ",
-        tolerance_rt
-      )
-    }
-
-    # Validate adducts, clusters, and neutral losses lists
-    if (!is.list(adducts_list) || is.null(adducts_list[[ms_mode]])) {
-      stop("adducts_list must contain '", ms_mode, "' mode adducts")
-    }
-
-    if (!is.list(clusters_list) || is.null(clusters_list[[ms_mode]])) {
-      stop("clusters_list must contain '", ms_mode, "' mode clusters")
-    }
-
-    # File existence check
-    required_files <- c(
-      features = features,
-      library = library,
-      str_stereo = str_stereo,
-      str_met = str_met,
-      str_nam = str_nam,
-      str_tax_cla = str_tax_cla,
-      str_tax_npc = str_tax_npc
+    # Validate tolerances
+    validate_tolerances(
+      tolerance_ppm = tolerance_ppm,
+      tolerance_rt = tolerance_rt,
+      max_ppm = 20,
+      max_rt = 0.05,
+      context = "mass annotation"
     )
 
-    file_exists_check <- file.exists(required_files)
-    if (!all(file_exists_check)) {
-      missing_files <- names(required_files)[!file_exists_check]
-      stop(
-        "Required file(s) not found: ",
-        paste(missing_files, collapse = ", "),
-        "\nPaths: ",
-        paste(required_files[!file_exists_check], collapse = ", ")
-      )
-    }
+    # Validate mode-specific lists
+    validate_adduct_list(adducts_list, ms_mode, "adducts_list")
+    validate_adduct_list(clusters_list, ms_mode, "clusters_list")
 
-    logger::log_info("Starting mass-based annotation in {ms_mode} mode")
-    logger::log_debug("Tolerances: {tolerance_ppm} ppm, {tolerance_rt} min RT")
+    # Validate file existence
+    validate_file_existence(
+      list(
+        features = features,
+        library = library,
+        str_stereo = str_stereo,
+        str_met = str_met,
+        str_nam = str_nam,
+        str_tax_cla = str_tax_cla,
+        str_tax_npc = str_tax_npc
+      )
+    )
+
+    logger::log_debug(
+      "Configuration: {ms_mode} mode, {tolerance_ppm} ppm, {tolerance_rt} min RT"
+    )
 
     ## Load and Validate Features ----
 

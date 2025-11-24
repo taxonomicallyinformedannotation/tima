@@ -431,66 +431,56 @@ test_that("validators handle edge cases gracefully", {
   expect_error(validate_data_frame(df, min_rows = 1), "must have at least")
 })
 
-test_that("validators are thread-safe", {
-  # Multiple simultaneous validations should work
-  skip("Thread safety testing requires parallel package setup")
-
-  results <- lapply(1:10, function(i) {
-    validate_ms_mode("pos")
-    validate_numeric_range(5, 0, 10)
-    TRUE
-  })
-
-  expect_true(all(unlist(results)))
+test_that("assert_flag validates logical flags", {
+  expect_silent(assert_flag(TRUE, "flag"))
+  expect_silent(assert_flag(FALSE, "flag"))
+  expect_error(assert_flag(NA, "flag"), "must be logical")
+  expect_error(assert_flag(c(TRUE, FALSE), "flag"), "must be logical")
+  expect_error(assert_flag("TRUE", "flag"), "must be logical")
 })
 
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("validate_list_or_vector rejects wrong types", {
-#   expect_error(
-#     validate_list_or_vector(data.frame(a = 1)),
-#     "must be a list or vector"
-#   )
-# })
+test_that("assert_positive_integer validates integers", {
+  expect_silent(assert_positive_integer(1, "n"))
+  expect_silent(assert_positive_integer(5, "n"))
+  expect_error(assert_positive_integer(0, "n"), "positive integer")
+  expect_error(assert_positive_integer(-1, "n"), "positive integer")
+  expect_error(assert_positive_integer(1.5, "n"), "positive integer")
+  expect_error(assert_positive_integer(c(1, 2), "n"), "positive integer")
+})
 
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("validators work together in realistic scenarios", {
-#
-#
-#
-#   # Create test files
-#   temp_features <- "features.tsv"
-#   temp_library <- "library.tsv"
-#   writeLines("", temp_features)
-#   writeLines("", temp_library)
-#
-#   # Test file validators
-#   expect_silent(validate_file_path(temp_features))
-#   expect_silent(validate_file_path(temp_library))
-#
-#   # Test combined validation scenario
-#   ms_mode <- "pos"
-#   tolerance_ppm <- 10
-#   tolerance_rt <- 0.05
-#   adducts <- list(pos = c("[M+H]+", "[M+Na]+"), neg = c("[M-H]-"))
-#
-#   expect_silent(validate_ms_mode(ms_mode))
-#   expect_silent(validate_tolerances(tolerance_ppm, tolerance_rt))
-#   expect_silent(validate_adduct_list(adducts, ms_mode))
-# })
-#   # Validate all inputs for an annotation function
-#   expect_silent({
-#     validate_file_existence(list(
-#       features = temp_features,
-#       library = temp_library
-#     ))
-#     validate_ms_mode("pos")
-#     validate_tolerances(tolerance_ppm = 10, tolerance_rt = 0.05)
-#   })
-#
-#   # Clean up
-#   unlink(c(temp_features, temp_library))
-# })
+test_that("validate_character basic behavior", {
+  expect_silent(validate_character("abc", param_name = "x"))
+  expect_error(validate_character(NULL, param_name = "x"), "x cannot be NULL")
+  expect_error(
+    validate_character("", param_name = "x"),
+    "x cannot be an empty string"
+  )
+  expect_error(
+    validate_character(c("a", "b"), param_name = "x"),
+    "single character string"
+  )
+})
+
+test_that("validate_character allowed_values behavior", {
+  expect_silent(validate_character(
+    "apple",
+    allowed_values = c("apple", "pear"),
+    param_name = "fruit"
+  ))
+  expect_error(
+    validate_character(
+      "orange",
+      allowed_values = c("apple", "pear"),
+      param_name = "fruit"
+    ),
+    "must be one of"
+  )
+})
+
+test_that("validate_choice works similarly", {
+  expect_silent(validate_choice("OR", c("OR", "AND"), name = "logic"))
+  expect_error(
+    validate_choice("X", c("OR", "AND"), name = "logic"),
+    "must be one of"
+  )
+})

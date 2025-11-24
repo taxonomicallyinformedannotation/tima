@@ -6,17 +6,11 @@
 \title{Default number of final candidates to report per feature}
 \format{
 An object of class \code{numeric} of length 1.
-
-An object of class \code{numeric} of length 1.
 }
 \usage{
-DEFAULT_CANDIDATES_FINAL
-
 DEFAULT_CANDIDATES_FINAL
 }
 \description{
 Default number of final candidates to report per feature
-
-Default number of final candidates to retain
 }
 \keyword{datasets}

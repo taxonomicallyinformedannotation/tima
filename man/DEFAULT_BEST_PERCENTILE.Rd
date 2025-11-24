@@ -3,22 +3,16 @@
 \docType{data}
 \name{DEFAULT_BEST_PERCENTILE}
 \alias{DEFAULT_BEST_PERCENTILE}
-\title{Default best candidate percentile threshold
-Only candidates above this percentile are retained}
+\title{Default percentile threshold for top candidate selection
+Only candidates with scores above this percentile are retained}
 \format{
-An object of class \code{numeric} of length 1.
-
 An object of class \code{numeric} of length 1.
 }
 \usage{
 DEFAULT_BEST_PERCENTILE
-
-DEFAULT_BEST_PERCENTILE
 }
 \description{
-Default best candidate percentile threshold
-Only candidates above this percentile are retained
-
-Default percentile for top candidate selection
+Default percentile threshold for top candidate selection
+Only candidates with scores above this percentile are retained
 }
 \keyword{datasets}

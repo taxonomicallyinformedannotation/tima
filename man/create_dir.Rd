@@ -16,11 +16,15 @@ NULL (invisibly). Creates directory as a side effect.
 \description{
 This function creates a directory at the specified path
 if it does not already exist. Handles both directory paths and
-file paths (extracting the directory component).
+file paths (extracting the directory component). Includes validation
+for write permissions.
 }
 \examples{
 \dontrun{
+# Create a directory
 create_dir(export = "path/to/directory")
+
+# Extract directory from file path and create
 create_dir(export = "path/to/file.txt")
 }
 }

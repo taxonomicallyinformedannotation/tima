@@ -3,20 +3,14 @@
 \docType{data}
 \name{DEFAULT_HC_SCORE_BIO_MIN}
 \alias{DEFAULT_HC_SCORE_BIO_MIN}
-\title{Minimum biological score for high confidence annotations}
+\title{Default minimum biological score threshold for high-confidence filter}
 \format{
-An object of class \code{numeric} of length 1.
-
 An object of class \code{numeric} of length 1.
 }
 \usage{
 DEFAULT_HC_SCORE_BIO_MIN
-
-DEFAULT_HC_SCORE_BIO_MIN
 }
 \description{
-Minimum biological score for high confidence annotations
-
 Default minimum biological score threshold for high-confidence filter
 }
 \keyword{datasets}

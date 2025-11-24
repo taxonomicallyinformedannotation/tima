@@ -3,20 +3,14 @@
 \docType{data}
 \name{DEFAULT_HC_SCORE_FINAL_MIN}
 \alias{DEFAULT_HC_SCORE_FINAL_MIN}
-\title{Minimum combined score for high confidence annotations}
+\title{Default minimum final (weighted chemical) score threshold for high-confidence filter}
 \format{
-An object of class \code{numeric} of length 1.
-
 An object of class \code{numeric} of length 1.
 }
 \usage{
 DEFAULT_HC_SCORE_FINAL_MIN
-
-DEFAULT_HC_SCORE_FINAL_MIN
 }
 \description{
-Minimum combined score for high confidence annotations
-
 Default minimum final (weighted chemical) score threshold for high-confidence filter
 }
 \keyword{datasets}
