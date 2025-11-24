@@ -1,21 +1,38 @@
 # Test Suite: annotate_spectra ----
 
 library(testthat)
+library(tidytable)
 
-## Internal Utility Helpers ----
+# Test Fixtures ----
 
-write_minimal_mgf <- function(path, pepmass = 100, charge = "1+") {
+#' Create minimal MGF file for testing
+#' @keywords internal
+write_minimal_mgf <- function(
+  path,
+  n_spectra = 1,
+  pepmass = 100,
+  charge = "1+"
+) {
   dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
-  lines <- c(
-    "BEGIN IONS",
-    paste0("PEPMASS=", pepmass),
-    paste0("CHARGE=", charge),
-    "50 100",
-    "75 200",
-    "100 300",
-    "END IONS"
-  )
+
+  lines <- c()
+  for (i in seq_len(n_spectra)) {
+    lines <- c(
+      lines,
+      "BEGIN IONS",
+      paste0("TITLE=Spectrum_", i),
+      paste0("PEPMASS=", pepmass + (i - 1) * 50),
+      paste0("CHARGE=", charge),
+      "50 100",
+      "75 200",
+      "100 300",
+      "END IONS",
+      ""
+    )
+  }
+
   writeLines(lines, path)
+  invisible(path)
 }
 
 ## Input Validation ----
@@ -550,144 +567,4 @@ test_that("annotate_spectra completes in reasonable time", {
 
   # Should complete reasonably fast
   expect_true(elapsed < 120, info = paste("Took", elapsed, "seconds"))
-})
-
-# Supplement ----
-
-.make_mgf <- function(path, pepmass = 100, peaks = c(50, 75, 100)) {
-  lines <- c(
-    "BEGIN IONS",
-    paste0("PEPMASS=", pepmass),
-    "CHARGE=1+",
-    paste(
-      sapply(seq_along(peaks), function(i) paste(peaks[i], 10 * i)),
-      collapse = "\n"
-    ),
-    "END IONS"
-  )
-  writeLines(lines, path)
-  path
-}
-
-test_that("annotate_spectra validates polarity and method choices", {
-  local_test_project(copy = TRUE)
-  q <- tempfile("query", fileext = ".mgf")
-  .make_mgf(q)
-  lib <- tempfile("lib", fileext = ".mgf")
-  .make_mgf(lib)
-  expect_error(
-    annotate_spectra(input = q, libraries = lib, polarity = "invalid"),
-    "polarity"
-  )
-  expect_error(
-    annotate_spectra(input = q, libraries = lib, method = "unknown"),
-    "method"
-  )
-})
-
-test_that("annotate_spectra returns empty file when no libraries match polarity", {
-  local_test_project(copy = TRUE)
-  q <- tempfile("query", fileext = ".mgf")
-  .make_mgf(q)
-  lib_pos <- tempfile("lib_pos", fileext = ".mgf")
-  .make_mgf(lib_pos)
-  # Provide two libs with non-matching naming pattern forcing filter to drop them (simulate)
-  out <- tempfile("annotations", fileext = ".tsv")
-  res <- annotate_spectra(
-    input = q,
-    libraries = c(lib_pos, lib_pos),
-    polarity = "neg",
-    output = out
-  )
-  expect_true(file.exists(res))
-  df <- tidytable::fread(res)
-  expect_true(nrow(df) <= 1) # may be empty or NA row
-})
-
-test_that("annotate_spectra produces annotations for simple query vs library", {
-  local_test_project(copy = TRUE)
-  q <- tempfile("query_real", fileext = ".mgf")
-  .make_mgf(q, pepmass = 150)
-  lib <- tempfile("lib_real", fileext = ".mgf")
-  .make_mgf(lib, pepmass = 150)
-  out <- tempfile("ann", fileext = ".tsv")
-  res <- annotate_spectra(
-    input = q,
-    libraries = lib,
-    output = out,
-    threshold = 0.0
-  )
-  expect_true(file.exists(res))
-  df <- tidytable::fread(res)
-  expect_true("feature_id" %in% names(df))
-})
-
-## Additional ----
-
-test_that("annotate_spectra validates input files exist", {
-  local_test_project(copy = TRUE)
-  expect_error(
-    annotate_spectra(
-      input = "missing_query.mgf",
-      libraries = "missing_lib.mgf"
-    ),
-    "Please verify file paths and ensure all required files are present."
-  )
-})
-
-test_that("annotate_spectra validates polarity and method choices", {
-  local_test_project(copy = TRUE)
-
-  q <- copy_mgf_fixture("spectra_query.mgf")
-  lib <- copy_mgf_fixture("spectra_library.mgf")
-
-  expect_error(
-    annotate_spectra(input = q, libraries = lib, polarity = "invalid"),
-    "polarity"
-  )
-  expect_error(
-    annotate_spectra(input = q, libraries = lib, method = "unknown"),
-    "method"
-  )
-})
-
-test_that("annotate_spectra returns empty file when no libraries match polarity", {
-  local_test_project(copy = TRUE)
-
-  q <- copy_mgf_fixture("spectra_query.mgf")
-  lib_pos <- copy_mgf_fixture("spectra_library.mgf", "lib_pos.mgf")
-
-  out <- tempfile("annotations", fileext = ".tsv")
-
-  # Provide two libs with non-matching naming pattern forcing filter to drop them
-  res <- annotate_spectra(
-    input = q,
-    libraries = c(lib_pos, lib_pos),
-    polarity = "neg",
-    output = out
-  )
-
-  expect_true(file.exists(res))
-  df <- tidytable::fread(res)
-  expect_true(nrow(df) <= 1) # may be empty or NA row
-})
-
-test_that("annotate_spectra produces annotations for query vs library", {
-  local_test_project(copy = TRUE)
-
-  q <- copy_mgf_fixture("spectra_query.mgf")
-  lib <- copy_mgf_fixture("spectra_library.mgf")
-
-  out <- tempfile("ann", fileext = ".tsv")
-
-  res <- annotate_spectra(
-    input = q,
-    libraries = lib,
-    output = out,
-    threshold = 0.0
-  )
-
-  expect_true(file.exists(res))
-  df <- tidytable::fread(res)
-  expect_true("feature_id" %in% names(df))
 })
