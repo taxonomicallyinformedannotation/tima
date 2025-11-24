@@ -4,6 +4,7 @@ utils::globalVariables(
     "_tima_join_gnps",
     ".",
     ".data",
+    ".n_per_group",
     ".pred_avg",
     ".pred_denom",
     ".pred_sum",
