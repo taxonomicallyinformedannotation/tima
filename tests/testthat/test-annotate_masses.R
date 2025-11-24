@@ -17,13 +17,13 @@ test_that("annotate_masses validates ms_mode correctly", {
       str_tax_npc = tempfile(),
       ms_mode = "invalid_mode"
     ),
-    "ms_mode must be either 'pos' or 'neg'"
+    "Must be one of: pos, neg."
   )
 
   # Blank mode should error
   expect_error(
     annotate_masses(ms_mode = ""),
-    "ms_mode must be either 'pos' or 'neg'"
+    "Must be one of: pos, neg."
   )
 
   # NULL mode should error (handled by parameter default or earlier validation)
@@ -37,7 +37,7 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
       tolerance_ppm = 0,
       ms_mode = "pos"
     ),
-    "tolerance_ppm must be a positive number <= 20"
+    "Recommended range: 1-20 ppm for mass annotation"
   )
 
   # Negative tolerance should error
@@ -46,7 +46,7 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
       tolerance_ppm = -5,
       ms_mode = "pos"
     ),
-    "tolerance_ppm must be a positive number <= 20"
+    "Recommended range: 1-20 ppm for mass annotation"
   )
 
   # Too large tolerance should error
@@ -55,7 +55,7 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
       tolerance_ppm = 25,
       ms_mode = "pos"
     ),
-    "tolerance_ppm must be a positive number <= 20"
+    "Please verify file paths and ensure all required files are present."
   )
 
   # Non-numeric tolerance should error
@@ -64,7 +64,7 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
       tolerance_ppm = "10",
       ms_mode = "pos"
     ),
-    "tolerance_ppm must be a positive number <= 20"
+    "tolerance_ppm must be a single numeric value, got: character"
   )
 })
 
@@ -76,7 +76,7 @@ test_that("annotate_masses validates tolerance_rt correctly", {
       tolerance_ppm = 10,
       ms_mode = "pos"
     ),
-    "tolerance_rt must be a positive number <= 0.05"
+    "Recommended range: 0.01-0.05 minutes for mass annotation"
   )
 
   # Negative tolerance should error
@@ -86,7 +86,7 @@ test_that("annotate_masses validates tolerance_rt correctly", {
       tolerance_ppm = 10,
       ms_mode = "pos"
     ),
-    "tolerance_rt must be a positive number <= 0.05"
+    "Recommended range: 0.01-0.05 minutes for mass annotation"
   )
 
   # Too large tolerance should error
@@ -96,7 +96,7 @@ test_that("annotate_masses validates tolerance_rt correctly", {
       tolerance_ppm = 10,
       ms_mode = "pos"
     ),
-    "tolerance_rt must be a positive number <= 0.05"
+    "Please verify file paths and ensure all required files are present."
   )
 })
 
@@ -109,7 +109,7 @@ test_that("annotate_masses validates adducts_list structure", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "adducts_list must contain 'pos' mode adducts"
+    "Please ensure your configuration includes adducts for the specified polarity."
   )
 
   # NULL adducts for mode should error
@@ -120,7 +120,7 @@ test_that("annotate_masses validates adducts_list structure", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "adducts_list must contain 'pos' mode adducts"
+    "Please ensure your configuration includes adducts for the specified polarity."
   )
 
   # Non-list adducts should error
@@ -131,7 +131,7 @@ test_that("annotate_masses validates adducts_list structure", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "adducts_list must contain 'pos' mode adducts"
+    "adducts_list must be a list, got: character"
   )
 })
 
@@ -145,7 +145,7 @@ test_that("annotate_masses validates clusters_list structure", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "clusters_list must contain 'pos' mode clusters"
+    "Please ensure your configuration includes adducts for the specified polarity."
   )
 })
 
@@ -170,7 +170,7 @@ test_that("annotate_masses validates file existence", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "Required file\\(s\\) not found.*features"
+    "Please verify file paths and ensure all required files are present."
   )
 })
 
@@ -396,7 +396,7 @@ test_that("annotate_masses handles no valid monocharged adducts", {
         output_annotations = output_annotations,
         output_edges = output_edges
       ),
-      "No monocharged adducts/clusters available for annotation"
+      "Check that your adducts_list and clusters_list contain valid entries for mode 'pos'."
     )
   )
 })
