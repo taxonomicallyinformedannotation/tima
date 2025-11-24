@@ -2,20 +2,28 @@
 
 library(testthat)
 
+# Test helpers ----
+
+#' Create temporary files for testing
+#' @param n Number of files to create
+#' @return Character vector of file paths
+create_temp_files <- function(n = 1) {
+  files <- replicate(n, withr::local_tempfile(), simplify = TRUE)
+  invisible(lapply(files, file.create))
+  files
+}
+
 ## validate_file_existence ----
 
 test_that("validate_file_existence accepts valid files", {
-  # Create temporary files using withr
-  temp_file1 <- withr::local_tempfile()
-  temp_file2 <- withr::local_tempfile()
-  file.create(temp_file1)
-  file.create(temp_file2)
+  # Create temporary files using helper
+  temp_files <- create_temp_files(2)
 
   # Should pass silently
   expect_silent(
     validate_file_existence(list(
-      file1 = temp_file1,
-      file2 = temp_file2
+      file1 = temp_files[1],
+      file2 = temp_files[2]
     ))
   )
 })
@@ -55,9 +63,8 @@ test_that("validate_file_existence validates input types", {
     "cannot be empty"
   )
 
-  # Non-character file path
-  temp_file <- withr::local_tempfile()
-  file.create(temp_file)
+  # Non-character file path - create temp file using helper
+  temp_file <- create_temp_files(1)[1]
 
   expect_error(
     validate_file_existence(list(bad = 123)),
@@ -387,33 +394,28 @@ test_that("validate_data_frame uses custom parameter names", {
 ## Integration ----
 
 test_that("validators provide consistent error message format", {
+  # Helper to capture error messages
+  capture_error_msg <- function(expr) {
+    tryCatch(expr, error = function(e) e$message)
+  }
+
   # All error messages should include parameter name and guidance
-  errors <- list()
-
-  tryCatch(
-    validate_ms_mode("invalid"),
-    error = function(e) errors[[1]] <<- e$message
+  errors <- c(
+    capture_error_msg(validate_ms_mode("invalid")),
+    capture_error_msg(validate_numeric_range(15, 0, 10, param_name = "test")),
+    capture_error_msg(validate_character("x", allowed_values = c("a", "b")))
   )
 
-  tryCatch(
-    validate_numeric_range(15, 0, 10, param_name = "test"),
-    error = function(e) errors[[2]] <<- e$message
-  )
-
-  tryCatch(
-    validate_character("x", allowed_values = c("a", "b")),
-    error = function(e) errors[[3]] <<- e$message
-  )
-
-  # All should contain helpful information
-  expect_true(all(sapply(errors, function(e) nchar(e) > 20)))
+  # All should contain helpful information (non-empty, informative messages)
+  expect_true(all(nchar(errors) > 20))
+  expect_true(all(!is.na(errors)))
 })
 
 ## Edge cases and stress tests ----
 
 test_that("validators handle edge cases gracefully", {
-  # Very long file paths
-  long_path <- paste0(rep("a", 1000), collapse = "")
+  # Very long file paths (using efficient strrep instead of paste0(rep()))
+  long_path <- strrep("a", 1000)
   expect_error(
     validate_file_existence(list(test = long_path)),
     "not found"
