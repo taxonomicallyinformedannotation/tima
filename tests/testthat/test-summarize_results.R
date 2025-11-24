@@ -34,6 +34,7 @@ create_test_annotation_data <- function(n_features = 5, n_candidates = 3) {
   )
 
   df$candidate_score_pseudo_initial <- runif(nrow(df), 0, 1)
+  df$candidate_structure_organism_occurrence_closest <- rep("Plantae", n_candidates)
   df$score_biological <- runif(nrow(df), 0, 100)
   df$score_weighted_bio <- runif(nrow(df), 0, 100)
   df$score_chemical <- runif(nrow(df), 0, 100)
@@ -47,6 +48,13 @@ create_test_annotation_data <- function(n_features = 5, n_candidates = 3) {
     organism_taxonomy_01domain = rep("Eukaryota", n_candidates),
     organism_taxonomy_02kingdom = rep("Plantae", n_candidates),
     organism_taxonomy_03phylum = rep("Streptophyta", n_candidates),
+    organism_taxonomy_04class = rep("Magnoliopsida", n_candidates),
+    organism_taxonomy_05order = rep("Lamiales", n_candidates),
+    organism_taxonomy_06family = rep("Lamiaceae", n_candidates),
+    organism_taxonomy_07tribe = rep("Mentheae", n_candidates),
+    organism_taxonomy_08genus = rep("Salvia", n_candidates),
+    organism_taxonomy_09species = rep("Salvia officinalis", n_candidates),
+    organism_taxonomy_10varietas = rep(NA_character_, n_candidates),
     organism_taxonomy_ottid = paste0("OTT_", 1:n_candidates),
     reference_doi = paste0("10.1234/ref", 1:n_candidates),
     stringsAsFactors = FALSE
