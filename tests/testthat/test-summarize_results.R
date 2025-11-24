@@ -34,7 +34,10 @@ create_test_annotation_data <- function(n_features = 5, n_candidates = 3) {
   )
 
   df$candidate_score_pseudo_initial <- runif(nrow(df), 0, 1)
-  df$candidate_structure_organism_occurrence_closest <- rep("Plantae", n_candidates)
+  df$candidate_structure_organism_occurrence_closest <- rep(
+    "Plantae",
+    n_candidates
+  )
   df$score_biological <- runif(nrow(df), 0, 100)
   df$score_weighted_bio <- runif(nrow(df), 0, 100)
   df$score_chemical <- runif(nrow(df), 0, 100)
