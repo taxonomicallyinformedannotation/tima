@@ -1,24 +1,37 @@
-#' @title Parse YAML parameters
+#' @title Parse YAML parameter files
 #'
-#' @description This function parses YAML parameter files, loading default
-#'     parameters and optionally overriding them with user-specified values.
+#' @description Parses YAML parameter files, loading default parameters and
+#'     optionally overriding them with user-specified values.
 #'
-#' @param def Character string path to the default YAML parameters file
-#' @param usr Character string path to the user-specified YAML parameters file
-#'     (optional). If it exists, it will override default values.
+#' @include validators.R
 #'
-#' @return A list containing the parameters specified in the YAML files
+#' @param def Path to the default YAML parameters file
+#' @param usr Path to the user-specified YAML parameters file (optional).
+#'     If it exists, it will override default values.
+#'
+#' @return List containing the parameters specified in the YAML files
 #'
 #' @export
 #'
-#' @examples NULL
-parse_yaml_params <- function(
-  def = get("default_path", envir = parent.frame()),
-  usr = get("user_path", envir = parent.frame())
-) {
+#' @examples
+#' \dontrun{
+#' # Load parameters
+#' params <- parse_yaml_params(
+#'   def = "params/default_params.yaml",
+#'   usr = "params/user_params.yaml"
+#' )
+#' }
+parse_yaml_params <- function(def, usr = NULL) {
+  # Input Validation ----
+  validate_character(def, param_name = "def", allow_empty = FALSE)
+
+  if (!is.null(usr)) {
+    validate_character(usr, param_name = "usr", allow_empty = TRUE)
+  }
+
   # Validate default file exists
   if (!file.exists(def)) {
-    stop("Default YAML file not found: ", def)
+    stop("Default YAML file not found: ", def, call. = FALSE)
   }
 
   # Read the default YAML file
