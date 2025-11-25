@@ -1,56 +1,98 @@
-#' @title Decorate chemo
+#' @title Decorate chemical annotation results with statistics
 #'
-#' @description This function logs summary statistics about chemically weighted
-#'     annotations, showing how many structures were reranked at each chemical
-#'     classification level. Uses cascading filters where each level builds on
-#'     the previous (higher specificity requires passing lower levels). The
-#'     function validates required columns and handles empty inputs gracefully.
+#' @description Logs summary statistics about chemically weighted annotations,
+#'     showing how many structures were reranked at each chemical classification
+#'     level. Uses cascading filters where each level builds on the previous.
 #'
-#' @param annot_table_wei_chemo Data frame containing chemically weighted annotations
-#' @param score_chemical_cla_kingdom Numeric minimum score for Classyfire kingdom
-#' @param score_chemical_cla_superclass Numeric minimum score for Classyfire superclass
-#' @param score_chemical_cla_class Numeric minimum score for Classyfire class
-#' @param score_chemical_cla_parent Numeric minimum score for Classyfire parent
-#' @param score_chemical_npc_pathway Numeric minimum score for NPClassifier pathway
-#' @param score_chemical_npc_superclass Numeric minimum score for NPClassifier superclass
-#' @param score_chemical_npc_class Numeric minimum score for NPClassifier class
+#' @include validators.R
 #'
-#' @return The input annotation table (unchanged), for use in pipelines
+#' @param annot_table_wei_chemo Data frame with chemically weighted annotations
+#' @param score_chemical_cla_kingdom Minimum score for Classyfire kingdom
+#' @param score_chemical_cla_superclass Minimum score for Classyfire superclass
+#' @param score_chemical_cla_class Minimum score for Classyfire class
+#' @param score_chemical_cla_parent Minimum score for Classyfire parent
+#' @param score_chemical_npc_pathway Minimum score for NPClassifier pathway
+#' @param score_chemical_npc_superclass Minimum score for NPClassifier superclass
+#' @param score_chemical_npc_class Minimum score for NPClassifier class
 #'
-#' @examples NULL
+#' @return The input annotation table (unchanged), for pipeline compatibility
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' weighted_chemo |>
+#'   decorate_chemo(
+#'     score_chemical_cla_kingdom = 0.1,
+#'     score_chemical_cla_superclass = 0.2,
+#'     score_chemical_cla_class = 0.3,
+#'     score_chemical_cla_parent = 0.4,
+#'     score_chemical_npc_pathway = 0.1,
+#'     score_chemical_npc_superclass = 0.2,
+#'     score_chemical_npc_class = 0.3
+#'   )
+#' }
 decorate_chemo <- function(
-  annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
-  score_chemical_cla_kingdom = get(
-    "score_chemical_cla_kingdom",
-    envir = parent.frame()
-  ),
-  score_chemical_cla_superclass = get(
-    "score_chemical_cla_superclass",
-    envir = parent.frame()
-  ),
-  score_chemical_cla_class = get(
-    "score_chemical_cla_class",
-    envir = parent.frame()
-  ),
-  score_chemical_cla_parent = get(
-    "score_chemical_cla_parent",
-    envir = parent.frame()
-  ),
-  score_chemical_npc_pathway = get(
-    "score_chemical_npc_pathway",
-    envir = parent.frame()
-  ),
-  score_chemical_npc_superclass = get(
-    "score_chemical_npc_superclass",
-    envir = parent.frame()
-  ),
-  score_chemical_npc_class = get(
-    "score_chemical_npc_class",
-    envir = parent.frame()
-  )
+  annot_table_wei_chemo,
+  score_chemical_cla_kingdom,
+  score_chemical_cla_superclass,
+  score_chemical_cla_class,
+  score_chemical_cla_parent,
+  score_chemical_npc_pathway,
+  score_chemical_npc_superclass,
+  score_chemical_npc_class
 ) {
   # Input Validation ----
+  validate_dataframe(
+    annot_table_wei_chemo,
+    param_name = "annot_table_wei_chemo"
+  )
 
+  # Validate all score parameters are numeric
+  validate_numeric_range(
+    score_chemical_cla_kingdom,
+    min_value = 0,
+    max_value = 1,
+    param_name = "score_chemical_cla_kingdom"
+  )
+  validate_numeric_range(
+    score_chemical_cla_superclass,
+    min_value = 0,
+    max_value = 1,
+    param_name = "score_chemical_cla_superclass"
+  )
+  validate_numeric_range(
+    score_chemical_cla_class,
+    min_value = 0,
+    max_value = 1,
+    param_name = "score_chemical_cla_class"
+  )
+  validate_numeric_range(
+    score_chemical_cla_parent,
+    min_value = 0,
+    max_value = 1,
+    param_name = "score_chemical_cla_parent"
+  )
+  validate_numeric_range(
+    score_chemical_npc_pathway,
+    min_value = 0,
+    max_value = 1,
+    param_name = "score_chemical_npc_pathway"
+  )
+  validate_numeric_range(
+    score_chemical_npc_superclass,
+    min_value = 0,
+    max_value = 1,
+    param_name = "score_chemical_npc_superclass"
+  )
+  validate_numeric_range(
+    score_chemical_npc_class,
+    min_value = 0,
+    max_value = 1,
+    param_name = "score_chemical_npc_class"
+  )
+
+  # Check Required Columns ----
   required_cols <- c(
     "score_chemical",
     "candidate_structure_inchikey_connectivity_layer"
@@ -59,14 +101,12 @@ decorate_chemo <- function(
 
   if (length(missing_cols) > 0) {
     logger::log_warn(
-      "decorate_chemo: missing expected columns: {paste(missing_cols, collapse = ', ')}"
+      "Missing expected columns: {paste(missing_cols, collapse = ', ')}"
     )
     return(annot_table_wei_chemo)
   }
 
-  # Helper Function ----
-
-  # Filter for valid annotations at a specific level
+  # Helper Functions ----
   filter_valid_level <- function(df, score_threshold, col_name) {
     df |>
       tidytable::filter(score_chemical >= score_threshold) |>
@@ -77,7 +117,6 @@ decorate_chemo <- function(
       )
   }
 
-  # Count unique structures
   count_unique_structures <- function(df) {
     nrow(
       df |>

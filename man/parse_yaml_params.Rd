@@ -2,26 +2,29 @@
 % Please edit documentation in R/parse_yaml_params.R
 \name{parse_yaml_params}
 \alias{parse_yaml_params}
-\title{Parse YAML parameters}
+\title{Parse YAML parameter files}
 \usage{
-parse_yaml_params(
-  def = get("default_path", envir = parent.frame()),
-  usr = get("user_path", envir = parent.frame())
-)
+parse_yaml_params(def, usr = NULL)
 }
 \arguments{
-\item{def}{Character string path to the default YAML parameters file}
+\item{def}{Path to the default YAML parameters file}
 
-\item{usr}{Character string path to the user-specified YAML parameters file
-(optional). If it exists, it will override default values.}
+\item{usr}{Path to the user-specified YAML parameters file (optional).
+If it exists, it will override default values.}
 }
 \value{
-A list containing the parameters specified in the YAML files
+List containing the parameters specified in the YAML files
 }
 \description{
-This function parses YAML parameter files, loading default
-parameters and optionally overriding them with user-specified values.
+Parses YAML parameter files, loading default parameters and
+optionally overriding them with user-specified values.
 }
 \examples{
-NULL
+\dontrun{
+# Load parameters
+params <- parse_yaml_params(
+  def = "params/default_params.yaml",
+  usr = "params/user_params.yaml"
+)
+}
 }

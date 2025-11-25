@@ -2,48 +2,55 @@
 % Please edit documentation in R/decorate_chemo.R
 \name{decorate_chemo}
 \alias{decorate_chemo}
-\title{Decorate chemo}
+\title{Decorate chemical annotation results with statistics}
 \usage{
 decorate_chemo(
-  annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
-  score_chemical_cla_kingdom = get("score_chemical_cla_kingdom", envir = parent.frame()),
-  score_chemical_cla_superclass = get("score_chemical_cla_superclass", envir =
-    parent.frame()),
-  score_chemical_cla_class = get("score_chemical_cla_class", envir = parent.frame()),
-  score_chemical_cla_parent = get("score_chemical_cla_parent", envir = parent.frame()),
-  score_chemical_npc_pathway = get("score_chemical_npc_pathway", envir = parent.frame()),
-  score_chemical_npc_superclass = get("score_chemical_npc_superclass", envir =
-    parent.frame()),
-  score_chemical_npc_class = get("score_chemical_npc_class", envir = parent.frame())
+  annot_table_wei_chemo,
+  score_chemical_cla_kingdom,
+  score_chemical_cla_superclass,
+  score_chemical_cla_class,
+  score_chemical_cla_parent,
+  score_chemical_npc_pathway,
+  score_chemical_npc_superclass,
+  score_chemical_npc_class
 )
 }
 \arguments{
-\item{annot_table_wei_chemo}{Data frame containing chemically weighted annotations}
+\item{annot_table_wei_chemo}{Data frame with chemically weighted annotations}
 
-\item{score_chemical_cla_kingdom}{Numeric minimum score for Classyfire kingdom}
+\item{score_chemical_cla_kingdom}{Minimum score for Classyfire kingdom}
 
-\item{score_chemical_cla_superclass}{Numeric minimum score for Classyfire superclass}
+\item{score_chemical_cla_superclass}{Minimum score for Classyfire superclass}
 
-\item{score_chemical_cla_class}{Numeric minimum score for Classyfire class}
+\item{score_chemical_cla_class}{Minimum score for Classyfire class}
 
-\item{score_chemical_cla_parent}{Numeric minimum score for Classyfire parent}
+\item{score_chemical_cla_parent}{Minimum score for Classyfire parent}
 
-\item{score_chemical_npc_pathway}{Numeric minimum score for NPClassifier pathway}
+\item{score_chemical_npc_pathway}{Minimum score for NPClassifier pathway}
 
-\item{score_chemical_npc_superclass}{Numeric minimum score for NPClassifier superclass}
+\item{score_chemical_npc_superclass}{Minimum score for NPClassifier superclass}
 
-\item{score_chemical_npc_class}{Numeric minimum score for NPClassifier class}
+\item{score_chemical_npc_class}{Minimum score for NPClassifier class}
 }
 \value{
-The input annotation table (unchanged), for use in pipelines
+The input annotation table (unchanged), for pipeline compatibility
 }
 \description{
-This function logs summary statistics about chemically weighted
-annotations, showing how many structures were reranked at each chemical
-classification level. Uses cascading filters where each level builds on
-the previous (higher specificity requires passing lower levels). The
-function validates required columns and handles empty inputs gracefully.
+Logs summary statistics about chemically weighted annotations,
+showing how many structures were reranked at each chemical classification
+level. Uses cascading filters where each level builds on the previous.
 }
 \examples{
-NULL
+\dontrun{
+weighted_chemo |>
+  decorate_chemo(
+    score_chemical_cla_kingdom = 0.1,
+    score_chemical_cla_superclass = 0.2,
+    score_chemical_cla_class = 0.3,
+    score_chemical_cla_parent = 0.4,
+    score_chemical_npc_pathway = 0.1,
+    score_chemical_npc_superclass = 0.2,
+    score_chemical_npc_class = 0.3
+  )
+}
 }

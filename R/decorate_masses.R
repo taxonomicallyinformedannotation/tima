@@ -1,60 +1,64 @@
-#' @title Decorate masses
+#' @title Decorate MS1 annotation results with statistics
 #'
-#' @description This function logs summary statistics about MS1-based
-#'     annotations, reporting the number of unique structures and features
-#'     annotated
+#' @description Logs summary statistics about MS1-based annotations,
+#'     reporting the number of unique structures and features annotated.
+#'
+#' @include validators.R
 #'
 #' @param annotation_table_ms1 Data frame containing MS1 annotation results
-#'     with columns for feature_id and candidate_structure_inchikey_connectivity_layer
+#'     with feature_id and candidate_structure_inchikey_connectivity_layer columns
 #'
-#' @return The input annotation table (unchanged), for use in pipelines
+#' @return The input annotation table (unchanged), for pipeline compatibility
 #'
-#' @examples NULL
-decorate_masses <- function(
-  annotation_table_ms1 = get("annotation_table_ms1", envir = parent.frame())
-) {
-  # Filter Valid Annotations ----
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Log statistics and pass through
+#' annotations_ms1 |>
+#'   decorate_masses()
+#' }
+decorate_masses <- function(annotation_table_ms1) {
+  # Input Validation ----
+  validate_dataframe(
+    annotation_table_ms1,
+    param_name = "annotation_table_ms1"
+  )
 
-  # Check if required column exists
+  # Check Required Column ----
   if (
     !"candidate_structure_inchikey_connectivity_layer" %in%
       colnames(annotation_table_ms1)
   ) {
     logger::log_warn(
-      "MS1 annotation table does not contain ",
+      "MS1 annotation table missing ",
       "candidate_structure_inchikey_connectivity_layer column. ",
       "Skipping annotation summary."
     )
     return(annotation_table_ms1)
   }
 
-  # Filter for valid annotations (not NA and not "notAnnotated")
+  # Filter Valid Annotations ----
   valid_annotations <- annotation_table_ms1 |>
     tidytable::filter(
       !is.na(candidate_structure_inchikey_connectivity_layer) &
         candidate_structure_inchikey_connectivity_layer != "notAnnotated"
     )
 
-  # Count Unique Structures and Features ----
-
-  # Count unique structures
+  # Count Statistics ----
   n_unique_structures <- valid_annotations |>
-    tidytable::distinct(
-      candidate_structure_inchikey_connectivity_layer
-    ) |>
+    tidytable::distinct(candidate_structure_inchikey_connectivity_layer) |>
     nrow()
 
-  # Count unique features
   n_unique_features <- valid_annotations |>
     tidytable::distinct(feature_id) |>
     nrow()
 
-  # Log Summary Statistics ----
-
+  # Log Summary ----
   logger::log_info(
-    "MS1 annotation results: {n_unique_structures} unique structures ",
-    "annotated across {n_unique_features} features"
+    "MS1 annotations: {n_unique_structures} unique structures ",
+    "across {n_unique_features} features"
   )
 
-  return(annotation_table_ms1)
+  annotation_table_ms1
 }

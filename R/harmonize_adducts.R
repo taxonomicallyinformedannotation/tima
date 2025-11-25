@@ -4,8 +4,8 @@
 #'     various forms with canonical representations. Uses a translation
 #'     table for efficient batch replacement.
 #'
-#' @details Common adduct variations like "M+H", "[M+H]", and "(M+H)+" are
-#'     standardized to a consistent format (e.g., "[M+H]+"). This ensures
+#' @details Common adduct variations like "M+H", "\[M+H\]", and "(M+H)+" are
+#'     standardized to a consistent format (e.g., "\[M+H\]+"). This ensures
 #'     compatibility across different MS tools and databases.
 #'
 #' @include validators.R

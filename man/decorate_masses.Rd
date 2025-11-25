@@ -2,24 +2,25 @@
 % Please edit documentation in R/decorate_masses.R
 \name{decorate_masses}
 \alias{decorate_masses}
-\title{Decorate masses}
+\title{Decorate MS1 annotation results with statistics}
 \usage{
-decorate_masses(
-  annotation_table_ms1 = get("annotation_table_ms1", envir = parent.frame())
-)
+decorate_masses(annotation_table_ms1)
 }
 \arguments{
 \item{annotation_table_ms1}{Data frame containing MS1 annotation results
-with columns for feature_id and candidate_structure_inchikey_connectivity_layer}
+with feature_id and candidate_structure_inchikey_connectivity_layer columns}
 }
 \value{
-The input annotation table (unchanged), for use in pipelines
+The input annotation table (unchanged), for pipeline compatibility
 }
 \description{
-This function logs summary statistics about MS1-based
-annotations, reporting the number of unique structures and features
-annotated
+Logs summary statistics about MS1-based annotations,
+reporting the number of unique structures and features annotated.
 }
 \examples{
-NULL
+\dontrun{
+# Log statistics and pass through
+annotations_ms1 |>
+  decorate_masses()
+}
 }

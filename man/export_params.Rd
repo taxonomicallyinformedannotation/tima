@@ -2,31 +2,36 @@
 % Please edit documentation in R/export_params.R
 \name{export_params}
 \alias{export_params}
-\title{Export parameters}
+\title{Export parameters to YAML file}
 \usage{
 export_params(
-  parameters = get("parameters", envir = parent.frame()),
-  directory = get_default_paths()$data$interim$params$path,
-  step
+  parameters,
+  step,
+  directory = get_default_paths()$data$interim$params$path
 )
 }
 \arguments{
-\item{parameters}{Named list of parameters to be exported}
+\item{parameters}{Named list of parameters to export}
 
-\item{directory}{Character string path to the directory where the YAML file
-will be saved (default: data/interim/params/)}
+\item{step}{Step identifier to include in the YAML filename (required)}
 
-\item{step}{Character string step identifier to be included in the YAML
-file name (required)}
+\item{directory}{Path to the directory where the YAML file will be saved
+(default: data/interim/params/)}
 }
 \value{
 NULL (invisibly). Creates YAML file as side effect.
 }
 \description{
-This function writes parameter configurations to a timestamped
-YAML file for reproducibility and tracking. Each export includes the
-step identifier and exact timestamp.
+Writes parameter configurations to a timestamped YAML file for
+reproducibility and tracking. Each export includes the step identifier
+and exact timestamp.
 }
 \examples{
-NULL
+\dontrun{
+# Export parameters for a specific step
+export_params(
+  parameters = list(threshold = 0.5, mode = "pos"),
+  step = "annotation"
+)
+}
 }
