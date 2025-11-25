@@ -2,51 +2,64 @@
 % Please edit documentation in R/decorate_bio.R
 \name{decorate_bio}
 \alias{decorate_bio}
-\title{Decorate bio}
+\title{Decorate biological annotation results with statistics}
 \usage{
 decorate_bio(
-  annot_table_wei_bio = get("annot_table_wei_bio", envir = parent.frame()),
-  score_biological_kingdom = get("score_biological_kingdom", envir = parent.frame()),
-  score_biological_phylum = get("score_biological_phylum", envir = parent.frame()),
-  score_biological_class = get("score_biological_class", envir = parent.frame()),
-  score_biological_order = get("score_biological_order", envir = parent.frame()),
-  score_biological_family = get("score_biological_family", envir = parent.frame()),
-  score_biological_tribe = get("score_biological_tribe", envir = parent.frame()),
-  score_biological_genus = get("score_biological_genus", envir = parent.frame()),
-  score_biological_species = get("score_biological_species", envir = parent.frame()),
-  score_biological_variety = get("score_biological_variety", envir = parent.frame())
+  annot_table_wei_bio,
+  score_biological_kingdom,
+  score_biological_phylum,
+  score_biological_class,
+  score_biological_order,
+  score_biological_family,
+  score_biological_tribe,
+  score_biological_genus,
+  score_biological_species,
+  score_biological_variety
 )
 }
 \arguments{
-\item{annot_table_wei_bio}{Data frame containing biologically weighted annotations}
+\item{annot_table_wei_bio}{Data frame with biologically weighted annotations}
 
-\item{score_biological_kingdom}{Numeric minimum score for kingdom-level matches}
+\item{score_biological_kingdom}{Minimum score for kingdom-level matches}
 
-\item{score_biological_phylum}{Numeric minimum score for phylum-level matches}
+\item{score_biological_phylum}{Minimum score for phylum-level matches}
 
-\item{score_biological_class}{Numeric minimum score for class-level matches}
+\item{score_biological_class}{Minimum score for class-level matches}
 
-\item{score_biological_order}{Numeric minimum score for order-level matches}
+\item{score_biological_order}{Minimum score for order-level matches}
 
-\item{score_biological_family}{Numeric minimum score for family-level matches}
+\item{score_biological_family}{Minimum score for family-level matches}
 
-\item{score_biological_tribe}{Numeric minimum score for tribe-level matches}
+\item{score_biological_tribe}{Minimum score for tribe-level matches}
 
-\item{score_biological_genus}{Numeric minimum score for genus-level matches}
+\item{score_biological_genus}{Minimum score for genus-level matches}
 
-\item{score_biological_species}{Numeric minimum score for species-level matches}
+\item{score_biological_species}{Minimum score for species-level matches}
 
-\item{score_biological_variety}{Numeric minimum score for variety-level matches}
+\item{score_biological_variety}{Minimum score for variety-level matches}
 }
 \value{
-The input annotation table (unchanged), for use in pipelines
+The input annotation table (unchanged), for pipeline compatibility
 }
 \description{
-This function logs summary statistics about biologically weighted
-annotations, showing how many structures were reranked at each taxonomic
-level based on organism occurrence data. The function validates that the
-required columns are present and handles empty inputs gracefully.
+Logs summary statistics about biologically weighted annotations,
+showing how many structures were reranked at each taxonomic level based
+on organism occurrence data. Validates required columns and handles
+empty inputs gracefully.
 }
 \examples{
-NULL
+\dontrun{
+weighted_bio |>
+  decorate_bio(
+    score_biological_kingdom = 0.1,
+    score_biological_phylum = 0.2,
+    score_biological_class = 0.3,
+    score_biological_order = 0.4,
+    score_biological_family = 0.5,
+    score_biological_tribe = 0.6,
+    score_biological_genus = 0.7,
+    score_biological_species = 0.8,
+    score_biological_variety = 0.9
+  )
+}
 }

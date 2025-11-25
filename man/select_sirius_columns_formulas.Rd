@@ -2,21 +2,28 @@
 % Please edit documentation in R/select_sirius_columns.R
 \name{select_sirius_columns_formulas}
 \alias{select_sirius_columns_formulas}
-\title{Select sirius columns (formulas)}
+\title{Select SIRIUS formula columns}
 \usage{
 select_sirius_columns_formulas(df, sirius_version)
 }
 \arguments{
-\item{df}{Dataframe}
+\item{df}{Data frame with SIRIUS formula results}
 
-\item{sirius_version}{Sirius version}
+\item{sirius_version}{SIRIUS version ("5" or "6")}
 }
 \value{
-The dataframe with selected sirius columns
+Data frame with standardized formula column names
 }
 \description{
-This function selects sirius columns (formulas)
+Selects and standardizes SIRIUS formula-level columns,
+extracting molecular formula candidates and their scores.
 }
 \examples{
-NULL
+\dontrun{
+# Standardize SIRIUS formula columns
+formulas <- select_sirius_columns_formulas(
+  df = sirius_formulas,
+  sirius_version = "6"
+)
+}
 }

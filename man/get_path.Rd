@@ -2,23 +2,27 @@
 % Please edit documentation in R/get_path.R
 \name{get_path}
 \alias{get_path}
-\title{Get path}
+\title{Resolve file path}
 \usage{
 get_path(base_path)
 }
 \arguments{
-\item{base_path}{Character string representing the base path to resolve.
-Can include "inst/" which will be handled appropriately.}
+\item{base_path}{Base path to resolve. Can include "inst/" which will be
+handled appropriately for installed vs development environments.}
 }
 \value{
 Character string of the resolved absolute path that exists
 }
 \description{
-This function resolves file paths by checking multiple locations,
-handling the difference between installed packages (where inst/ is removed)
-and development environments (where inst/ exists). It tries paths in order
+Resolves file paths by checking multiple locations, handling
+the difference between installed packages (where inst/ is removed) and
+development environments (where inst/ exists). Tries paths in order
 until one is found.
 }
 \examples{
-NULL
+\dontrun{
+# Resolve a path that may or may not include inst/
+resolved <- get_path("inst/params/default.yaml")
+# Returns correct path whether in dev or installed package
+}
 }

@@ -2,23 +2,29 @@
 % Please edit documentation in R/read_from_sirius_zip.R
 \name{read_from_sirius_zip}
 \alias{read_from_sirius_zip}
-\title{Read from SIRIUS zip}
+\title{Read file from SIRIUS zip archive}
 \usage{
 read_from_sirius_zip(sirius_zip, file)
 }
 \arguments{
-\item{sirius_zip}{Character string path to compressed SIRIUS workspace (.zip)}
+\item{sirius_zip}{Path to compressed SIRIUS workspace (.zip)}
 
-\item{file}{Character string pattern to match files within the archive}
+\item{file}{Pattern to match files within the archive}
 }
 \value{
 Data frame (tidytable) containing the parsed file contents
 }
 \description{
-This function reads specific files from a compressed SIRIUS
-workspace directory. It handles file selection, filtering empty files,
-and parsing tab-delimited data.
+Reads specific files from a compressed SIRIUS workspace
+directory. Handles file selection, filtering empty files, and
+parsing tab-delimited data.
 }
 \examples{
-NULL
+\dontrun{
+# Read formula candidates from SIRIUS workspace
+formulas <- read_from_sirius_zip(
+  sirius_zip = "path/to/sirius_workspace.zip",
+  file = "formula_candidates.tsv"
+)
+}
 }

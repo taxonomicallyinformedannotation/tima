@@ -34,5 +34,17 @@ and avoid loading the entire file into memory at once. It extracts all
 MGF fields and maps them to standard spectra variable names.
 }
 \examples{
-NULL
+\dontrun{
+# Read MGF file with memory-efficient approach
+library(Spectra)
+library(MsBackendMgf)
+
+spectra_data <- read_mgf_opti(
+  f = "path/to/spectra.mgf",
+  msLevel = 2L
+)
+
+# Create Spectra object from result
+sps <- Spectra(spectra_data)
+}
 }

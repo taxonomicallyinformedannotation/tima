@@ -2,24 +2,28 @@
 % Please edit documentation in R/validators.R
 \name{validate_weights}
 \alias{validate_weights}
-\title{Validate weights sum to 1}
+\title{Validate weights}
 \usage{
-validate_weights(weights, tolerance = 1e-06)
+validate_weights(weights, param_name = "weights")
 }
 \arguments{
 \item{weights}{Named list or vector of weights}
 
-\item{tolerance}{Numeric tolerance for sum check (default: 1e-6)}
+\item{param_name}{Name of the parameter (for error messages)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise
 }
 \description{
-Validates that a set of weights are non-negative and sum to 1
+Validates that a set of weights are non-negative and positive.
+Note: Weights do NOT need to sum to 1, as the weighting functions
+normalize them by dividing by their sum.
 }
 \examples{
 \dontrun{
-validate_weights(list(spectral = 0.5, chemical = 0.3, biological = 0.2))
+# Weights can be any positive numbers - they will be normalized
+validate_weights(list(spectral = 1, chemical = 2, biological = 3))
+validate_weights(list(spectral = 0.5, biological = 0.5))
 }
 }
 \keyword{internal}

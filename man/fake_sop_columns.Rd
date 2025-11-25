@@ -2,19 +2,28 @@
 % Please edit documentation in R/fake_sop_columns.R
 \name{fake_sop_columns}
 \alias{fake_sop_columns}
-\title{Fake SOP columns}
+\title{Create template SOP columns}
 \usage{
 fake_sop_columns()
 }
 \value{
-A single-row data frame with standard SOP columns filled with
-NA_character_ values
+Single-row data frame with standard SOP columns filled with
+NA values
 }
 \description{
-This function creates an empty structure-organism pair (SOP)
-dataframe template with all standard column names and NA values.
-Used as a placeholder when actual SOP data is unavailable.
+Creates an empty structure-organism pair (SOP) dataframe
+template with all standard column names and NA values. Used as a
+placeholder when actual SOP data is unavailable.
 }
 \examples{
-NULL
+\dontrun{
+# Create empty SOP template
+template <- fake_sop_columns()
+
+# Use as fallback when no SOP data available
+if (nrow(sop_data) == 0) {
+  sop_data <- fake_sop_columns()
 }
+}
+}
+\keyword{internal}

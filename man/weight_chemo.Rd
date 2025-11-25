@@ -2,57 +2,76 @@
 % Please edit documentation in R/weight_chemo.R
 \name{weight_chemo}
 \alias{weight_chemo}
-\title{Weight chemo}
+\title{Weight annotations by chemical consistency}
 \usage{
 weight_chemo(
-  annot_table_wei_bio_clean = get("annot_table_wei_bio_clean", envir = parent.frame()),
-  weight_spectral = get("weight_spectral", envir = parent.frame()),
-  weight_biological = get("weight_biological", envir = parent.frame()),
-  weight_chemical = get("weight_chemical", envir = parent.frame()),
-  score_chemical_cla_kingdom = get("score_chemical_cla_kingdom", envir = parent.frame()),
-  score_chemical_cla_superclass = get("score_chemical_cla_superclass", envir =
-    parent.frame()),
-  score_chemical_cla_class = get("score_chemical_cla_class", envir = parent.frame()),
-  score_chemical_cla_parent = get("score_chemical_cla_parent", envir = parent.frame()),
-  score_chemical_npc_pathway = get("score_chemical_npc_pathway", envir = parent.frame()),
-  score_chemical_npc_superclass = get("score_chemical_npc_superclass", envir =
-    parent.frame()),
-  score_chemical_npc_class = get("score_chemical_npc_class", envir = parent.frame())
+  annot_table_wei_bio_clean,
+  weight_spectral,
+  weight_biological,
+  weight_chemical,
+  score_chemical_cla_kingdom,
+  score_chemical_cla_superclass,
+  score_chemical_cla_class,
+  score_chemical_cla_parent,
+  score_chemical_npc_pathway,
+  score_chemical_npc_superclass,
+  score_chemical_npc_class
 )
 }
 \arguments{
 \item{annot_table_wei_bio_clean}{Data frame with cleaned biologically weighted annotations}
 
-\item{weight_spectral}{Numeric weight for spectral similarity score (0-1)}
+\item{weight_spectral}{Weight for spectral similarity score (any positive number)}
 
-\item{weight_biological}{Numeric weight for biological source score (0-1)}
+\item{weight_biological}{Weight for biological source score (any positive number)}
 
-\item{weight_chemical}{Numeric weight for chemical consistency score (0-1)}
+\item{weight_chemical}{Weight for chemical consistency score (any positive number)}
 
-\item{score_chemical_cla_kingdom}{Numeric score for ClassyFire kingdom match}
+\item{score_chemical_cla_kingdom}{Score for ClassyFire kingdom match (0-1)}
 
-\item{score_chemical_cla_superclass}{Numeric score for ClassyFire superclass match}
+\item{score_chemical_cla_superclass}{Score for ClassyFire superclass match (0-1)}
 
-\item{score_chemical_cla_class}{Numeric score for ClassyFire class match}
+\item{score_chemical_cla_class}{Score for ClassyFire class match (0-1)}
 
-\item{score_chemical_cla_parent}{Numeric score for ClassyFire parent match (highest)}
+\item{score_chemical_cla_parent}{Score for ClassyFire parent match (0-1, highest)}
 
-\item{score_chemical_npc_pathway}{Numeric score for NPC pathway match}
+\item{score_chemical_npc_pathway}{Score for NPC pathway match (0-1)}
 
-\item{score_chemical_npc_superclass}{Numeric score for NPC superclass match}
+\item{score_chemical_npc_superclass}{Score for NPC superclass match (0-1)}
 
-\item{score_chemical_npc_class}{Numeric score for NPC class match (highest)}
+\item{score_chemical_npc_class}{Score for NPC class match (0-1, highest)}
 }
 \value{
-Data frame containing chemically weighted annotations with
-chemical consistency scores and final weighted scores
+Data frame with chemically weighted annotations including chemical
+consistency scores and final weighted scores
 }
 \description{
-This function weights biologically weighted annotations according
-to their chemical consistency by comparing chemical taxonomy (ClassyFire,
+Weights biologically weighted annotations according to their
+chemical consistency by comparing chemical taxonomy (ClassyFire,
 NPClassifier) across molecular network neighbors. Higher chemical
 consistency within network components results in higher chemical scores.
 }
+\details{
+The weights are automatically normalized by dividing by their sum,
+so they do NOT need to sum to 1. For example, weights of (1, 1, 1)
+produce the same result as (0.33, 0.33, 0.33).
+}
 \examples{
-NULL
+\dontrun{
+# Weights are automatically normalized - these are equivalent:
+# (1, 1, 1) gives same result as (0.33, 0.33, 0.34)
+weighted <- weight_chemo(
+  annot_table_wei_bio_clean = bio_weighted,
+  weight_spectral = 1,      # Will be normalized to ~0.33
+  weight_biological = 1,    # Will be normalized to ~0.33
+  weight_chemical = 1,      # Will be normalized to ~0.33
+  score_chemical_cla_kingdom = 0.1,
+  score_chemical_cla_superclass = 0.2,
+  score_chemical_cla_class = 0.3,
+  score_chemical_cla_parent = 0.4,
+  score_chemical_npc_pathway = 0.1,
+  score_chemical_npc_superclass = 0.2,
+  score_chemical_npc_class = 0.3
+)
+}
 }

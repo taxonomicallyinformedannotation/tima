@@ -426,12 +426,14 @@ validate_numeric_range <- function(
   invisible(TRUE)
 }
 
-#' Validate weights sum to 1
+#' Validate weights
 #'
-#' @description Validates that a set of weights are non-negative and sum to 1
+#' @description Validates that a set of weights are non-negative and positive.
+#'     Note: Weights do NOT need to sum to 1, as the weighting functions
+#'     normalize them by dividing by their sum.
 #'
 #' @param weights Named list or vector of weights
-#' @param tolerance Numeric tolerance for sum check (default: 1e-6)
+#' @param param_name Name of the parameter (for error messages)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -439,37 +441,46 @@ validate_numeric_range <- function(
 #'
 #' @examples
 #' \dontrun{
-#' validate_weights(list(spectral = 0.5, chemical = 0.3, biological = 0.2))
+#' # Weights can be any positive numbers - they will be normalized
+#' validate_weights(list(spectral = 1, chemical = 2, biological = 3))
+#' validate_weights(list(spectral = 0.5, biological = 0.5))
 #' }
-validate_weights <- function(weights, tolerance = 1e-6) {
+validate_weights <- function(weights, param_name = "weights") {
   if (!is.numeric(weights)) {
-    stop("Weights must be numeric, got: ", class(weights)[1L], call. = FALSE)
-  }
-
-  # Check for negative weights
-  if (any(weights < 0, na.rm = TRUE)) {
-    negative_weights <- which(weights < 0)
     stop(
-      "All weights must be non-negative. Negative weight(s) at position(s): ",
-      paste(negative_weights, collapse = ", "),
+      param_name,
+      " must be numeric, got: ",
+      class(weights)[1L],
       call. = FALSE
     )
   }
 
   # Check for NA values
   if (any(is.na(weights))) {
-    stop("Weights cannot contain NA values", call. = FALSE)
+    stop(param_name, " cannot contain NA values", call. = FALSE)
   }
 
-  # Check sum
-  weight_sum <- sum(weights)
-
-  if (abs(weight_sum - 1.0) > tolerance) {
+  # Check for negative weights
+  if (any(weights < 0, na.rm = TRUE)) {
+    negative_idx <- which(weights < 0)
+    negative_names <- if (!is.null(names(weights))) {
+      names(weights)[negative_idx]
+    } else {
+      paste0("position ", negative_idx)
+    }
     stop(
-      "Weights must sum to 1.0, got: ",
-      round(weight_sum, 6),
-      "\nWeights: ",
-      paste(names(weights), "=", round(weights, 3), collapse = ", "),
+      param_name,
+      " must be non-negative. Negative weight(s): ",
+      paste(negative_names, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  # Check for all zeros (would cause division by zero)
+  if (sum(weights) == 0) {
+    stop(
+      param_name,
+      " cannot all be zero (would cause division by zero)",
       call. = FALSE
     )
   }

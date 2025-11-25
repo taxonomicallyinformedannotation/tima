@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_params.R
 \name{prepare_params}
 \alias{prepare_params}
-\title{Prepare params}
+\title{Prepare workflow parameters}
 \usage{
 prepare_params(
   params_small = get_params(step = "prepare_params"),
@@ -15,16 +15,25 @@ prepare_params(
 
 \item{params_advanced}{List of advanced parameters for the workflow}
 
-\item{step}{Character string specifying the workflow step (default: NA)}
+\item{step}{Workflow step identifier (default: NA)}
 }
 \value{
 Character vector of paths to YAML files containing prepared parameters
 }
 \description{
-This function prepares and validates main parameters for the
-TIMA workflow. It loads YAML configuration files, extracts all parameters,
-and sets up the parameter structure for downstream analysis steps.
+Prepares and validates main parameters for the TIMA workflow.
+Loads YAML configuration files, extracts all parameters, and sets up
+the parameter structure for downstream analysis steps.
 }
 \examples{
-NULL
+\dontrun{
+# Prepare parameters for TIMA workflow
+param_files <- prepare_params(
+  params_small = get_params(step = "prepare_params"),
+  params_advanced = get_params(step = "prepare_params_advanced")
+)
+
+# Parameters are exported to timestamped files
+# and can be loaded later for reproducibility
+}
 }

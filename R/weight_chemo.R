@@ -1,68 +1,124 @@
-#' @title Weight chemo
+#' @title Weight annotations by chemical consistency
 #'
-#' @description This function weights biologically weighted annotations according
-#'     to their chemical consistency by comparing chemical taxonomy (ClassyFire,
+#' @description Weights biologically weighted annotations according to their
+#'     chemical consistency by comparing chemical taxonomy (ClassyFire,
 #'     NPClassifier) across molecular network neighbors. Higher chemical
 #'     consistency within network components results in higher chemical scores.
 #'
+#' @details The weights are automatically normalized by dividing by their sum,
+#'     so they do NOT need to sum to 1. For example, weights of (1, 1, 1)
+#'     produce the same result as (0.33, 0.33, 0.33).
+#'
+#' @include validators.R
+#'
 #' @param annot_table_wei_bio_clean Data frame with cleaned biologically weighted annotations
-#' @param weight_spectral Numeric weight for spectral similarity score (0-1)
-#' @param weight_biological Numeric weight for biological source score (0-1)
-#' @param weight_chemical Numeric weight for chemical consistency score (0-1)
-#' @param score_chemical_cla_kingdom Numeric score for ClassyFire kingdom match
-#' @param score_chemical_cla_superclass Numeric score for ClassyFire superclass match
-#' @param score_chemical_cla_class Numeric score for ClassyFire class match
-#' @param score_chemical_cla_parent Numeric score for ClassyFire parent match (highest)
-#' @param score_chemical_npc_pathway Numeric score for NPC pathway match
-#' @param score_chemical_npc_superclass Numeric score for NPC superclass match
-#' @param score_chemical_npc_class Numeric score for NPC class match (highest)
+#' @param weight_spectral Weight for spectral similarity score (any positive number)
+#' @param weight_biological Weight for biological source score (any positive number)
+#' @param weight_chemical Weight for chemical consistency score (any positive number)
+#' @param score_chemical_cla_kingdom Score for ClassyFire kingdom match (0-1)
+#' @param score_chemical_cla_superclass Score for ClassyFire superclass match (0-1)
+#' @param score_chemical_cla_class Score for ClassyFire class match (0-1)
+#' @param score_chemical_cla_parent Score for ClassyFire parent match (0-1, highest)
+#' @param score_chemical_npc_pathway Score for NPC pathway match (0-1)
+#' @param score_chemical_npc_superclass Score for NPC superclass match (0-1)
+#' @param score_chemical_npc_class Score for NPC class match (0-1, highest)
 #'
-#' @return Data frame containing chemically weighted annotations with
-#'     chemical consistency scores and final weighted scores
+#' @return Data frame with chemically weighted annotations including chemical
+#'     consistency scores and final weighted scores
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Weights are automatically normalized - these are equivalent:
+#' # (1, 1, 1) gives same result as (0.33, 0.33, 0.34)
+#' weighted <- weight_chemo(
+#'   annot_table_wei_bio_clean = bio_weighted,
+#'   weight_spectral = 1,      # Will be normalized to ~0.33
+#'   weight_biological = 1,    # Will be normalized to ~0.33
+#'   weight_chemical = 1,      # Will be normalized to ~0.33
+#'   score_chemical_cla_kingdom = 0.1,
+#'   score_chemical_cla_superclass = 0.2,
+#'   score_chemical_cla_class = 0.3,
+#'   score_chemical_cla_parent = 0.4,
+#'   score_chemical_npc_pathway = 0.1,
+#'   score_chemical_npc_superclass = 0.2,
+#'   score_chemical_npc_class = 0.3
+#' )
+#' }
 weight_chemo <- function(
-  annot_table_wei_bio_clean = get(
-    "annot_table_wei_bio_clean",
-    envir = parent.frame()
-  ),
-  weight_spectral = get("weight_spectral", envir = parent.frame()),
-  weight_biological = get("weight_biological", envir = parent.frame()),
-  weight_chemical = get("weight_chemical", envir = parent.frame()),
-  score_chemical_cla_kingdom = get(
-    "score_chemical_cla_kingdom",
-    envir = parent.frame()
-  ),
-  score_chemical_cla_superclass = get(
-    "score_chemical_cla_superclass",
-    envir = parent.frame()
-  ),
-  score_chemical_cla_class = get(
-    "score_chemical_cla_class",
-    envir = parent.frame()
-  ),
-  score_chemical_cla_parent = get(
-    "score_chemical_cla_parent",
-    envir = parent.frame()
-  ),
-  score_chemical_npc_pathway = get(
-    "score_chemical_npc_pathway",
-    envir = parent.frame()
-  ),
-  score_chemical_npc_superclass = get(
-    "score_chemical_npc_superclass",
-    envir = parent.frame()
-  ),
-  score_chemical_npc_class = get(
-    "score_chemical_npc_class",
-    envir = parent.frame()
-  )
+  annot_table_wei_bio_clean,
+  weight_spectral,
+  weight_biological,
+  weight_chemical,
+  score_chemical_cla_kingdom,
+  score_chemical_cla_superclass,
+  score_chemical_cla_class,
+  score_chemical_cla_parent,
+  score_chemical_npc_pathway,
+  score_chemical_npc_superclass,
+  score_chemical_npc_class
 ) {
-  # Validate data frame
-  if (!is.data.frame(annot_table_wei_bio_clean)) {
-    stop("annot_table_wei_bio_clean must be a data frame")
-  }
+  # Input Validation ----
+  validate_dataframe(
+    annot_table_wei_bio_clean,
+    param_name = "annot_table_wei_bio_clean"
+  )
 
+  # Validate weights
+  validate_weights(
+    c(
+      weight_spectral,
+      weight_biological,
+      weight_chemical
+    )
+  )
+
+  # Validate all chemical score parameters (0-1 range)
+  validate_numeric_range(
+    score_chemical_cla_kingdom,
+    0,
+    1,
+    param_name = "score_chemical_cla_kingdom"
+  )
+  validate_numeric_range(
+    score_chemical_cla_superclass,
+    0,
+    1,
+    param_name = "score_chemical_cla_superclass"
+  )
+  validate_numeric_range(
+    score_chemical_cla_class,
+    0,
+    1,
+    param_name = "score_chemical_cla_class"
+  )
+  validate_numeric_range(
+    score_chemical_cla_parent,
+    0,
+    1,
+    param_name = "score_chemical_cla_parent"
+  )
+  validate_numeric_range(
+    score_chemical_npc_pathway,
+    0,
+    1,
+    param_name = "score_chemical_npc_pathway"
+  )
+  validate_numeric_range(
+    score_chemical_npc_superclass,
+    0,
+    1,
+    param_name = "score_chemical_npc_superclass"
+  )
+  validate_numeric_range(
+    score_chemical_npc_class,
+    0,
+    1,
+    param_name = "score_chemical_npc_class"
+  )
+
+  # Early Exit ----
   n_annotations <- nrow(annot_table_wei_bio_clean)
   if (n_annotations == 0L) {
     logger::log_warn(

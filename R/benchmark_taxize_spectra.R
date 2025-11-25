@@ -1,31 +1,41 @@
-#' @title Benchmark taxize spectra
+#' @title Add taxonomy to benchmark spectra
 #'
-#' @description This function adds taxonomic information to benchmark features
-#'     by linking them to structure-organism pairs and organism taxonomy data.
-#'     For features with multiple organism associations, one is randomly selected.
+#' @description Adds taxonomic information to benchmark features by linking
+#'     them to structure-organism pairs and organism taxonomy data. For
+#'     features with multiple organism associations, one is randomly selected.
 #'
-#' @details Benchmark data often lacks clean taxonomic assignments. This function
-#'     performs a controlled joining process with random sampling for ambiguous cases.
+#' @details Benchmark data often lacks clean taxonomic assignments. This
+#'     function performs a controlled joining process with random sampling
+#'     for ambiguous cases.
 #'
-#' @param input Character string path to the initial features file
-#' @param keys Character string path to the structure-organism pair (SOP) keys file
-#' @param org_tax_ott Character string path to the organism taxonomy (OTT) file
-#' @param output Character string path for the taxed benchmark output file
+#' @include validators.R
 #'
-#' @return Character string path to the taxed benchmark file
+#' @param input Path to the initial features file
+#' @param keys Path to the structure-organism pair (SOP) keys file
+#' @param org_tax_ott Path to the organism taxonomy (OTT) file
+#' @param output Path for the taxed benchmark output file
 #'
-#' @examples NULL
+#' @return Path to the taxed benchmark file
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Add taxonomy to benchmark data
+#' taxed_file <- benchmark_taxize_spectra(
+#'   input = "data/benchmark/features.tsv",
+#'   keys = "data/sop/keys.tsv",
+#'   org_tax_ott = "data/taxonomy/org_tax_ott.tsv",
+#'   output = "data/benchmark/features_taxed.tsv"
+#' )
+#' }
 benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
-  # Validate inputs
-  if (!file.exists(input)) {
-    stop("Input features file not found: ", input)
-  }
-  if (!file.exists(keys)) {
-    stop("Keys file not found: ", keys)
-  }
-  if (!file.exists(org_tax_ott)) {
-    stop("Taxonomy file not found: ", org_tax_ott)
-  }
+  # Input Validation ----
+  validate_file_existence(list(
+    input = input,
+    keys = keys,
+    org_tax_ott = org_tax_ott
+  ))
 
   logger::log_info("Loading benchmark features from: ", input)
   features <- tidytable::fread(

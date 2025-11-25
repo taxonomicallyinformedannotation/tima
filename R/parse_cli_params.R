@@ -1,26 +1,37 @@
-#' @title Parse CLI parameters
+#' @title Parse command-line interface parameters
 #'
-#' @description This function parses command-line interface (CLI) arguments and
-#'     merges them into the parameter configuration structure. It uses a mapping
-#'     system to translate CLI argument names to their corresponding nested paths
-#'     in the parameters list, applying appropriate type conversions.
+#' @description Parses command-line interface (CLI) arguments and merges them
+#'     into the parameter configuration structure. Uses a mapping system to
+#'     translate CLI argument names to their corresponding nested paths in the
+#'     parameters list, applying appropriate type conversions.
+#'
+#' @include validators.R
 #'
 #' @param arguments Named list of CLI arguments from docopt or similar parser
 #' @param parameters Nested list of default parameters to be updated with CLI values
 #'
-#' @return Updated parameters list with CLI arguments merged in, maintaining the
-#'     nested structure and applying type conversions as specified in the mappings
+#' @return Updated parameters list with CLI arguments merged in, maintaining
+#'     the nested structure and applying type conversions
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Parse CLI arguments into parameters
+#' library(docopt)
+#' cli_args <- docopt(doc)
+#' default_params <- load_yaml_files()$yamls_params
+#'
+#' # Merge CLI arguments with defaults
+#' final_params <- parse_cli_params(
+#'   arguments = cli_args,
+#'   parameters = default_params
+#' )
+#' }
 parse_cli_params <- function(arguments, parameters) {
-  # Validate inputs
-  if (!is.list(arguments)) {
-    stop("CLI arguments must be a list")
-  }
-
-  if (!is.list(parameters)) {
-    stop("Parameters must be a list")
-  }
+  # Input Validation ----
+  validate_list_or_vector(arguments, param_name = "arguments", min_length = 0)
+  validate_list_or_vector(parameters, param_name = "parameters", min_length = 0)
 
   # Define mappings from CLI argument names to parameter paths
   # Each mapping specifies: path (nested list location) and type (conversion function)

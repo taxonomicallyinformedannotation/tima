@@ -1,8 +1,8 @@
-#' @title Prepare params
+#' @title Prepare workflow parameters
 #'
-#' @description This function prepares and validates main parameters for the
-#'     TIMA workflow. It loads YAML configuration files, extracts all parameters,
-#'     and sets up the parameter structure for downstream analysis steps.
+#' @description Prepares and validates main parameters for the TIMA workflow.
+#'     Loads YAML configuration files, extracts all parameters, and sets up
+#'     the parameter structure for downstream analysis steps.
 #'
 #' @export
 #'
@@ -10,27 +10,41 @@
 #' @include export_params.R
 #' @include get_params.R
 #' @include load_yaml_files.R
+#' @include validators.R
 #'
 #' @param params_small List of basic parameters for the workflow
 #' @param params_advanced List of advanced parameters for the workflow
-#' @param step Character string specifying the workflow step (default: NA)
+#' @param step Workflow step identifier (default: NA)
 #'
 #' @return Character vector of paths to YAML files containing prepared parameters
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#' # Prepare parameters for TIMA workflow
+#' param_files <- prepare_params(
+#'   params_small = get_params(step = "prepare_params"),
+#'   params_advanced = get_params(step = "prepare_params_advanced")
+#' )
+#'
+#' # Parameters are exported to timestamped files
+#' # and can be loaded later for reproducibility
+#' }
 prepare_params <- function(
   params_small = get_params(step = "prepare_params"),
   params_advanced = get_params(step = "prepare_params_advanced"),
   step = NA
 ) {
-  # Validate inputs
-  if (!is.list(params_small)) {
-    stop("params_small must be a list")
-  }
-
-  if (!is.list(params_advanced)) {
-    stop("params_advanced must be a list")
-  }
+  # Input Validation ----
+  validate_list_or_vector(
+    params_small,
+    param_name = "params_small",
+    min_length = 1
+  )
+  validate_list_or_vector(
+    params_advanced,
+    param_name = "params_advanced",
+    min_length = 1
+  )
 
   # logger::log_info("Preparing TIMA workflow parameters")
 

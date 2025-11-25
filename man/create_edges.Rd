@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_edges.R
 \name{create_edges}
 \alias{create_edges}
-\title{Create edges}
+\title{Create spectral similarity network edges}
 \usage{
 create_edges(
   frags,
@@ -22,25 +22,37 @@ create_edges(
 
 \item{precs}{Numeric vector of precursor m/z values}
 
-\item{method}{Character string similarity method ("entropy", "gnps", or "cosine")}
+\item{method}{Similarity method ("entropy", "gnps", or "cosine")}
 
-\item{ms2_tolerance}{Numeric MS2 tolerance in Daltons}
+\item{ms2_tolerance}{MS2 tolerance in Daltons}
 
-\item{ppm_tolerance}{Numeric PPM tolerance}
+\item{ppm_tolerance}{PPM tolerance}
 
-\item{threshold}{Numeric minimum similarity score threshold}
+\item{threshold}{Minimum similarity score threshold}
 
-\item{matched_peaks}{Integer minimum number of matched peaks required}
+\item{matched_peaks}{Minimum number of matched peaks required}
 }
 \value{
-A data frame with columns: feature_id, target_id, score, matched_peaks.
+Data frame with columns: feature_id, target_id, score, matched_peaks.
 Returns empty data frame with NA values if no edges pass thresholds.
 }
 \description{
-This function calculates pairwise spectral similarity between
-all spectra to create a network edge list. Uses parallel processing
-via purrr for efficiency.
+Calculates pairwise spectral similarity between all spectra to
+create a network edge list. Uses parallel processing via purrr for
+efficiency.
 }
 \examples{
-NULL
+\dontrun{
+# Create network edges from spectra
+edges <- create_edges(
+  frags = fragment_list,
+  nspecs = length(fragment_list),
+  precs = precursor_mz,
+  method = "cosine",
+  ms2_tolerance = 0.02,
+  ppm_tolerance = 10,
+  threshold = 0.7,
+  matched_peaks = 6
+)
+}
 }

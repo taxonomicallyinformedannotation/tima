@@ -51,5 +51,18 @@ job ID is not provided or GNPS resources are missing, small fake files are
 written so downstream steps do not fail during testing.
 }
 \examples{
-NULL
+\dontrun{
+# Download GNPS FBMN results
+paths <- get_gnps_tables(
+  gnps_job_id = "1234567890abcdef",
+  workflow = "fbmn",
+  path_features = "data/interim/features/features.tsv",
+  path_metadata = "data/source/metadata.tsv",
+  path_spectra = "data/interim/annotations/spectra.mgf"
+)
+
+# Access downloaded files
+features <- read.delim(paths["features"])
+}
+
 }

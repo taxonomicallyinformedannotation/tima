@@ -51,5 +51,20 @@ by comparing query spectra against library spectra. Uses entropy-based
 similarity measures to match MS2 fragmentation patterns.
 }
 \examples{
-NULL
+\dontrun{
+# Calculate entropy-based similarity
+results <- calculate_entropy_and_similarity(
+  lib_ids = library_ids,
+  lib_precursors = library_mz,
+  lib_spectra = library_spectra_list,
+  query_ids = feature_ids,
+  query_precursors = feature_mz,
+  query_spectra = feature_spectra_list,
+  method = "entropy",
+  dalton = 0.01,
+  ppm = 10,
+  threshold = 0.7,
+  approx = FALSE
+)
+}
 }
