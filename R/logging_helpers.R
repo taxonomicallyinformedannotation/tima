@@ -86,31 +86,31 @@ format_bytes <- function(bytes) {
 #' @return Formatted string (e.g., "2.5s", "1m 30s")
 #' @keywords internal
 format_time <- function(seconds) {
-  if (is.na(seconds) || seconds < 0) {
-    return("unknown")
+  if (is.na(seconds) || seconds < 0) return("unknown")
+
+  if (seconds < 1) 
+    return(paste0(round(seconds * 1000), "ms"))
+
+  if (seconds < 60)
+    return(paste0(round(seconds, 1), "s"))
+
+  # one division block only
+  mins <- seconds %/% 60
+  secs <- seconds - mins * 60
+
+  if (seconds < 3600) {
+    secs <- round(secs)
+    if (secs == 0) return(paste0(mins, "m"))
+    return(paste0(mins, "m ", secs, "s"))
   }
 
-  if (seconds < 1) {
-    paste0(round(seconds * 1000), "ms")
-  } else if (seconds < 60) {
-    paste0(round(seconds, 1), "s")
-  } else if (seconds < 3600) {
-    mins <- floor(seconds / 60)
-    secs <- round(seconds %% 60)
-    if (secs == 0) {
-      paste0(mins, "m")
-    } else {
-      paste0(mins, "m ", secs, "s")
-    }
-  } else {
-    hours <- floor(seconds / 3600)
-    mins <- round((seconds %% 3600) / 60)
-    if (mins == 0) {
-      paste0(hours, "h")
-    } else {
-      paste0(hours, "h ", mins, "m")
-    }
-  }
+  # hours
+  hrs  <- mins %/% 60
+  mins <- mins - hrs * 60
+  mins <- round(mins)
+
+  if (mins == 0) return(paste0(hrs, "h"))
+  paste0(hrs, "h ", mins, "m")
 }
 
 #' Format percentage
