@@ -2,34 +2,31 @@
 % Please edit documentation in R/process_smiles.R
 \name{process_smiles}
 \alias{process_smiles}
-\title{Process SMILES}
+\title{Process SMILES strings}
 \usage{
 process_smiles(df, smiles_colname = "structure_smiles_initial", cache = NULL)
 }
 \arguments{
-\item{df}{Data frame containing SMILES strings to process}
+\item{df}{Data frame containing SMILES strings}
 
-\item{smiles_colname}{Character string name of the column containing SMILES
+\item{smiles_colname}{Column name containing SMILES
 (default: "structure_smiles_initial")}
 
-\item{cache}{Character string path to cached processed SMILES file, or NULL
-to skip caching (default: NULL)}
+\item{cache}{Path to cached processed SMILES file, or NULL to skip caching}
 }
 \value{
 Data frame with processed SMILES including InChIKey, molecular formula,
 exact mass, 2D SMILES, xLogP, and connectivity layer
 }
 \description{
-This function processes SMILES strings using RDKit (via Python)
-to standardize structures, generate InChIKeys, calculate molecular properties,
+Processes SMILES using RDKit (via Python) to standardize
+structures, generate InChIKeys, calculate molecular properties,
 and extract 2D representations. Results are cached to avoid reprocessing.
 }
 \examples{
 \dontrun{
 smiles <- "C=C[C@H]1[C@H](OC=C2C1=CCOC2=O)O[C@H]3[C@H]([C@H]([C@H]([C@H](O3)CO)O)O)O"
-data.frame(
-  "structure_smiles_initial" = smiles
-) |>
-  process_smiles()
+df <- data.frame(structure_smiles_initial = smiles)
+process_smiles(df)
 }
 }

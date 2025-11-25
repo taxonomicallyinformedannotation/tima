@@ -4,7 +4,11 @@
 \alias{assert_positive_integer}
 \title{Assert that a value is a positive integer}
 \usage{
-assert_positive_integer(x, param_name)
+assert_positive_integer(
+  x,
+  arg_name = deparse(substitute(x)),
+  allow_zero = FALSE
+)
 }
 \arguments{
 \item{x}{Value to check}

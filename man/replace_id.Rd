@@ -14,26 +14,34 @@ replace_id(
 \arguments{
 \item{x}{Character string containing the file path with default ID}
 
-\item{user_filename}{Character string for a custom filename pattern}
+\item{user_filename}{Character string for custom filename pattern
+(used if user_gnps is NULL)}
 
-\item{user_gnps}{Character string for a GNPS job ID (if NULL, uses user_filename)}
+\item{user_gnps}{Character string for GNPS job ID (takes precedence)}
 
-\item{example_gnps}{Character string for the example GNPS job ID to detect}
+\item{example_gnps}{Character string for example GNPS job ID to detect}
 }
 \value{
-Character string with the ID replaced according to user specifications
+Character string with ID replaced
 }
 \description{
-This function replaces the default ID in file paths with
-user-specified values. It handles both GNPS job IDs and custom
-filename patterns, with special handling for example files.
+Replaces the default ID prefix in file paths with user-specified
+values. Handles GNPS job IDs and custom filename patterns. Useful for
+processing multiple datasets with consistent naming conventions.
+}
+\details{
+The function extracts the ID portion (everything before the first
+underscore) and replaces it with either a GNPS job ID or custom pattern.
+Example files are automatically detected and normalized.
 }
 \examples{
 \dontrun{
-replace_id(
-  x = "example/123456_features.tsv",
-  user_gnps = NULL,
-  user_filename = "Foo"
-)
+# Replace with custom filename
+replace_id("123456_features.tsv", user_filename = "MyData")
+# Returns: "MyData_features.tsv"
+
+# Replace with GNPS ID
+replace_id("path/123456_features.tsv", user_gnps = "abc123")
+# Returns: "path/abc123_features.tsv"
 }
 }

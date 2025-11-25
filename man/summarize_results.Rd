@@ -2,7 +2,7 @@
 % Please edit documentation in R/summarize_results.R
 \name{summarize_results}
 \alias{summarize_results}
-\title{Summarize results}
+\title{Summarize annotation results}
 \usage{
 summarize_results(
   df,
@@ -19,7 +19,7 @@ summarize_results(
 
 \item{features_table}{Data frame with feature metadata (RT, m/z, etc.)}
 
-\item{components_table}{Data frame with molecular network component assignments}
+\item{components_table}{Data frame with network component assignments}
 
 \item{structure_organism_pairs_table}{Data frame with structure-organism pairs}
 
@@ -33,11 +33,20 @@ summarize_results(
 Data frame containing summarized annotation results
 }
 \description{
-This function summarizes annotation results by adding feature
-metadata, filtering/collapsing columns, and optionally removing tied
-scores or summarizing to one row per feature. Creates a final, simplified
-results table for downstream analysis or reporting.
+Summarizes annotation results by adding feature metadata,
+filtering/collapsing columns, and optionally removing tied scores or
+summarizing to one row per feature. Creates final results table.
 }
 \examples{
-NULL
+\dontrun{
+summary <- summarize_results(
+  df = annotations,
+  features_table = features,
+  components_table = components,
+  structure_organism_pairs_table = sop,
+  annot_table_wei_chemo = weighted_chemo,
+  remove_ties = TRUE,
+  summarize = TRUE
+)
+}
 }

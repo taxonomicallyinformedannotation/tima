@@ -2,21 +2,24 @@
 % Please edit documentation in R/select_sop_columns.R
 \name{select_sop_columns}
 \alias{select_sop_columns}
-\title{Select SOP columns}
+\title{Select structure-organism pair columns}
 \usage{
 select_sop_columns(df)
 }
 \arguments{
-\item{df}{Dataframe containing structure-organism pair data}
+\item{df}{Data frame containing structure-organism pair data}
 }
 \value{
-The dataframe with selected and renamed SOP columns in standardized format
+Data frame with standardized SOP columns
 }
 \description{
-This function selects and renames structure-organism pair (SOP)
-columns to a standardized format, including chemical structures,
-taxonomic classifications, and organism taxonomy
+Selects and renames structure-organism pair (SOP) columns to
+standardized format. Includes chemical structures, taxonomic
+classifications, and organism taxonomy.
 }
 \examples{
-NULL
+\dontrun{
+# Assuming 'sop_data' has the expected column structure
+standardized <- select_sop_columns(sop_data)
+}
 }

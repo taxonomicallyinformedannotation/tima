@@ -2,31 +2,41 @@
 % Please edit documentation in R/dist_groups.R
 \name{dist_groups}
 \alias{dist_groups}
-\title{Dist groups}
+\title{Calculate pairwise distances with group labels}
 \usage{
 dist_groups(d, g)
 }
 \arguments{
-\item{d}{A distance object or matrix}
+\item{d}{Distance object or matrix}
 
-\item{g}{A grouping vector for the observations in the distance object.
-Must have length equal to the number of observations.}
+\item{g}{Grouping vector for observations. Must have length equal to
+number of observations in distance matrix.}
 }
 \value{
-A data frame containing distance information between pairs of
-observations with columns:
+Data frame with columns:
 \item{Item1}{Index of first observation}
 \item{Item2}{Index of second observation}
 \item{Group1}{Group label of first observation}
 \item{Group2}{Group label of second observation}
-\item{Label}{Factor indicating if distance is within or between groups}
-\item{Distance}{Numeric distance value rounded to 5 digits}
+\item{Label}{Factor: "Within" or "Between" groups}
+\item{Distance}{Numeric distance (rounded to 5 decimals)}
 }
 \description{
-This function calculates pairwise distances between observations
-and annotates them with group membership information. Optimized for
-large distance matrices.
+Computes pairwise distances between observations and annotates
+them with group membership. Useful for analyzing within-group vs
+between-group distances.
 }
 \examples{
-NULL
+\dontrun{
+# Sample data with groups
+data <- matrix(rnorm(30), nrow = 10)
+groups <- rep(c("A", "B", "C"), c(3, 4, 3))
+d <- dist(data)
+
+# Calculate distances with group info
+result <- dist_groups(d, groups)
+
+# Analyze within vs between group distances
+aggregate(Distance ~ Label, data = result, FUN = mean)
+}
 }

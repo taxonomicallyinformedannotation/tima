@@ -92,6 +92,8 @@ X-schema.org-keywords: metaboliteAnnotation, chemotaxonomy, scoringSystem, natur
 Collate:
     'adducts_forbidden.R'
     'adducts_translations.R'
+    'constants.R'
+    'validators.R'
     'round_reals.R'
     'harmonize_adducts.R'
     'parse_yaml_params.R'
@@ -101,8 +103,6 @@ Collate:
     'get_params.R'
     'dist_groups.R'
     'decorate_masses.R'
-    'constants.R'
-    'validators.R'
     'parse_adduct.R'
     'calculate_mass_of_m.R'
     'annotate_masses.R'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/split_tables_sop.R
 \name{split_tables_sop}
 \alias{split_tables_sop}
-\title{Split Structure Organism Pairs table}
+\title{Split structure-organism pairs table}
 \usage{
 split_tables_sop(table, cache)
 }
@@ -10,22 +10,32 @@ split_tables_sop(table, cache)
 \item{table}{Data frame containing combined structure-organism pair data with
 columns for structures (SMILES, InChI, names), organisms, and references}
 
-\item{cache}{Character string path to cache file where previously processed
-SMILES are stored, or NULL to skip caching}
+\item{cache}{Path to cache file for previously processed SMILES, or NULL to
+skip caching}
 }
 \value{
-A list of normalized data frames:
+List of normalized data frames:
 \item{table_keys}{Structure-organism pairs with reference DOIs}
 \item{table_structures_stereo}{Structure stereochemistry information}
 \item{table_organisms}{Organism taxonomy information}
 \item{table_structural}{Processed and standardized structure data}
 }
 \description{
-This function splits a concatenated structure-organism pairs (SOP)
-table into separate standardized tables for structures, organisms, and their
-relationships. It processes SMILES strings, standardizes chemical structures,
-and creates normalized reference tables.
+Splits a concatenated structure-organism pairs (SOP) table into
+separate normalized tables for structures, organisms, and their
+relationships. Processes SMILES strings and creates standardized
+reference tables.
 }
 \examples{
-NULL
+\dontrun{
+# Split concatenated library
+result <- split_tables_sop(
+  table = combined_sop_data,
+  cache = "data/processed_smiles.tsv"
+)
+
+# Access individual tables
+structures <- result$table_structural
+organisms <- result$table_organisms
+}
 }

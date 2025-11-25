@@ -2,81 +2,90 @@
 % Please edit documentation in R/harmonize_spectra.R
 \name{harmonize_spectra}
 \alias{harmonize_spectra}
-\title{Harmonize spectra}
+\title{Harmonize spectra metadata}
 \usage{
 harmonize_spectra(
   spectra,
-  metad = get("metad", envir = parent.frame()),
+  metad,
   mode,
-  col_ad = get("col_ad", envir = parent.frame()),
-  col_ce = get("col_ce", envir = parent.frame()),
-  col_ci = get("col_ci", envir = parent.frame()),
-  col_em = get("col_em", envir = parent.frame()),
-  col_in = get("col_in", envir = parent.frame()),
-  col_io = get("col_io", envir = parent.frame()),
-  col_ik = get("col_ik", envir = parent.frame()),
-  col_il = get("col_il", envir = parent.frame()),
-  col_mf = get("col_mf", envir = parent.frame()),
-  col_na = get("col_na", envir = parent.frame()),
-  col_po = get("col_po", envir = parent.frame()),
-  col_sm = get("col_sm", envir = parent.frame()),
-  col_sn = get("col_sn", envir = parent.frame()),
-  col_si = get("col_si", envir = parent.frame()),
-  col_sp = get("col_sp", envir = parent.frame()),
-  col_sy = get("col_sy", envir = parent.frame()),
-  col_xl = get("col_xl", envir = parent.frame())
+  col_ad,
+  col_ce,
+  col_ci,
+  col_em,
+  col_in,
+  col_io,
+  col_ik,
+  col_il,
+  col_mf,
+  col_na,
+  col_po,
+  col_sm,
+  col_sn,
+  col_si,
+  col_sp,
+  col_sy,
+  col_xl
 )
 }
 \arguments{
-\item{spectra}{Data frame containing spectra data to be harmonized}
+\item{spectra}{Data frame containing spectra to harmonize}
 
-\item{metad}{Metadata to identify the library source}
+\item{metad}{Metadata identifying the library source}
 
-\item{mode}{MS ionization mode. Must contain 'pos' or 'neg'}
+\item{mode}{MS ionization mode (must contain 'pos' or 'neg')}
 
-\item{col_ad}{Name of the adduct field in the input spectra}
+\item{col_ad}{Adduct field name}
 
-\item{col_ce}{Name of the collision energy field}
+\item{col_ce}{Collision energy field name}
 
-\item{col_ci}{Name of the compound ID field}
+\item{col_ci}{Compound ID field name}
 
-\item{col_em}{Name of the exact mass field}
+\item{col_em}{Exact mass field name}
 
-\item{col_in}{Name of the InChI field}
+\item{col_in}{InChI field name}
 
-\item{col_io}{Name of the InChI without stereochemistry field}
+\item{col_io}{InChI without stereochemistry field name}
 
-\item{col_ik}{Name of the InChIKey field}
+\item{col_ik}{InChIKey field name}
 
-\item{col_il}{Name of the InChIKey connectivity layer field}
+\item{col_il}{InChIKey connectivity layer field name}
 
-\item{col_mf}{Name of the molecular formula field}
+\item{col_mf}{Molecular formula field name}
 
-\item{col_na}{Name of the compound name field}
+\item{col_na}{Compound name field name}
 
-\item{col_po}{Name of the polarity field}
+\item{col_po}{Polarity field name}
 
-\item{col_sm}{Name of the SMILES field}
+\item{col_sm}{SMILES field name}
 
-\item{col_sn}{Name of the SMILES without stereochemistry field}
+\item{col_sn}{SMILES without stereochemistry field name}
 
-\item{col_si}{Name of the spectrum ID field}
+\item{col_si}{Spectrum ID field name}
 
-\item{col_sp}{Name of the SPLASH field}
+\item{col_sp}{SPLASH field name}
 
-\item{col_sy}{Name of the synonyms field}
+\item{col_sy}{Synonyms field name}
 
-\item{col_xl}{Name of the xLogP field}
+\item{col_xl}{xLogP field name}
 }
 \value{
-A data frame with harmonized column names and standardized field names
+Data frame with harmonized column names and standardized fields
 }
 \description{
-This function harmonizes spectra header fields by mapping
-library-specific column names to standardized field names. It handles
-different naming conventions across spectral libraries and ensures
-consistent metadata structure.
+Harmonizes spectra header fields by mapping library-specific
+column names to standardized field names. Handles different naming
+conventions across spectral libraries.
 }
 \examples{
-NULL
+\dontrun{
+harmonized <- harmonize_spectra(
+  spectra = raw_spectra,
+  metad = "GNPS",
+  mode = "positive",
+  col_na = "Compound_Name",
+  col_sm = "SMILES",
+  col_ik = "InChIKey"
+  # ... other column mappings
+)
+}
 }

@@ -2,34 +2,30 @@
 % Please edit documentation in R/get_file.R
 \name{get_file}
 \alias{get_file}
-\title{Get file}
+\title{Download file from URL}
 \usage{
 get_file(url, export, limit = 3600L)
 }
 \arguments{
-\item{url}{Character string URL of the file to be downloaded}
+\item{url}{Character string URL of the file to download}
 
 \item{export}{Character string file path where the file should be saved}
 
-\item{limit}{Integer timeout limit in seconds (default: 3600)}
+\item{limit}{Integer timeout limit in seconds (default: 3600 = 1 hour)}
 }
 \value{
-The path to the downloaded file
+Path to the downloaded file (invisibly)
 }
 \description{
-This function downloads files from a URL with retry logic
-and exponential backoff.
+Downloads a file from a URL with robust error handling,
+retry logic, and validation. Automatically creates necessary directories
+and validates downloaded content. Skips download if file already exists.
 }
 \examples{
 \dontrun{
-git <- "https://github.com/"
-org <- "taxonomicallyinformedannotation"
-repo <- "tima-example-files"
-branch <- "main"
-file <- "example_metadata.tsv"
 get_file(
-  url = paste(git, org, repo, "raw", branch, file, sep = "/"),
-  export = "data/source/example_metadata.tsv"
+  url = "https://example.com/data.tsv",
+  export = "data/source/data.tsv"
 )
 }
 }

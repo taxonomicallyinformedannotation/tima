@@ -2,39 +2,47 @@
 % Please edit documentation in R/complement_metadata_structures.R
 \name{complement_metadata_structures}
 \alias{complement_metadata_structures}
-\title{Complement metadata of structures}
+\title{Complement structural metadata}
 \usage{
 complement_metadata_structures(
   df,
-  str_stereo = get("str_stereo", envir = parent.frame()),
-  str_met = get("str_met", envir = parent.frame()),
-  str_nam = get("str_nam", envir = parent.frame()),
-  str_tax_cla = get("str_tax_cla", envir = parent.frame()),
-  str_tax_npc = get("str_tax_npc", envir = parent.frame())
+  str_stereo,
+  str_met,
+  str_nam,
+  str_tax_cla,
+  str_tax_npc
 )
 }
 \arguments{
-\item{df}{Data frame with structural metadata to be complemented}
+\item{df}{Data frame with structural metadata to complement}
 
-\item{str_stereo}{Character string path to file with structure stereochemistry}
+\item{str_stereo}{Path to structure stereochemistry file}
 
-\item{str_met}{Character string path to file with structure metadata}
+\item{str_met}{Path to structure metadata file}
 
-\item{str_nam}{Character string path to file with structure names}
+\item{str_nam}{Path to structure names file}
 
-\item{str_tax_cla}{Character string path to file with ClassyFire taxonomy}
+\item{str_tax_cla}{Path to ClassyFire taxonomy file}
 
-\item{str_tax_npc}{Character string path to file with NPClassifier taxonomy}
+\item{str_tax_npc}{Path to NPClassifier taxonomy file}
 }
 \value{
 Data frame with enriched structural metadata
 }
 \description{
-This function complements structural metadata by joining
-stereochemistry, metadata, names, and chemical taxonomy information
-from reference libraries. Enriches annotation results with comprehensive
-structure information.
+Complements structural metadata by joining stereochemistry,
+metadata, names, and chemical taxonomy from reference libraries.
+Enriches annotation results with comprehensive structure information.
 }
 \examples{
-NULL
+\dontrun{
+enriched <- complement_metadata_structures(
+  df = annotations,
+  str_stereo = "data/str_stereo.tsv",
+  str_met = "data/str_metadata.tsv",
+  str_nam = "data/str_names.tsv",
+  str_tax_cla = "data/str_tax_classyfire.tsv",
+  str_tax_npc = "data/str_tax_npclassifier.tsv"
+)
+}
 }

@@ -6,7 +6,7 @@
 \usage{
 validate_dataframe(
   df,
-  name = "input",
+  param_name = "input",
   required_cols = NULL,
   min_rows = 0L,
   allow_empty = TRUE
@@ -15,7 +15,7 @@ validate_dataframe(
 \arguments{
 \item{df}{Input to validate}
 
-\item{name}{Name of the parameter (for error messages)}
+\item{param_name}{Name of the parameter (for error messages)}
 
 \item{required_cols}{Character vector of required column names}
 
@@ -32,7 +32,7 @@ for required columns and minimum row count
 }
 \examples{
 \dontrun{
-validate_dataframe(df, "features", required_cols = c("feature_id", "mz"))
+validate_dataframe(df, param_name = "features", required_cols = c("feature_id", "mz"))
 }
 }
 \keyword{internal}
