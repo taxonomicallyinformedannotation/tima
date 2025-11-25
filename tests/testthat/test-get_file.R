@@ -8,25 +8,25 @@ test_that("get_file validates URL parameter", {
   # Missing URL
   expect_error(
     get_file(export = "test.txt"),
-    "URL must be"
+    "argument \"url\" is missing, with no default"
   )
 
   # NULL URL
   expect_error(
     get_file(url = NULL, export = "test.txt"),
-    "URL must be"
+    "url cannot be NULL"
   )
 
   # Empty URL
   expect_error(
     get_file(url = "", export = "test.txt"),
-    "URL must be"
+    "Provide a non-empty string."
   )
 
   # Non-character URL
   expect_error(
     get_file(url = 123, export = "test.txt"),
-    "URL must be"
+    "Ensure the parameter is a length-1 character value."
   )
 })
 
@@ -34,19 +34,19 @@ test_that("get_file validates export parameter", {
   # Missing export
   expect_error(
     get_file(url = "https://example.com/file.txt"),
-    "Export path must be"
+    "argument \"export\" is missing, with no default"
   )
 
   # NULL export
   expect_error(
     get_file(url = "https://example.com/file.txt", export = NULL),
-    "Export path must be"
+    "Provide a non-NULL character string."
   )
 
   # Empty export
   expect_error(
     get_file(url = "https://example.com/file.txt", export = ""),
-    "Export path must be"
+    "Provide a non-empty string."
   )
 })
 
@@ -58,7 +58,7 @@ test_that("get_file validates timeout limit", {
       export = "test.txt",
       limit = -100
     ),
-    "must be a positive number"
+    "limit must be > 0, got: -100"
   )
 
   # Zero timeout
@@ -68,7 +68,7 @@ test_that("get_file validates timeout limit", {
       export = "test.txt",
       limit = 0
     ),
-    "must be a positive number"
+    "limit must be > 0, got: 0"
   )
 })
 

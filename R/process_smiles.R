@@ -1,14 +1,15 @@
-#' @title Process SMILES
+#' @title Process SMILES strings
 #'
-#' @description This function processes SMILES strings using RDKit (via Python)
-#'     to standardize structures, generate InChIKeys, calculate molecular properties,
+#' @description Processes SMILES using RDKit (via Python) to standardize
+#'     structures, generate InChIKeys, calculate molecular properties,
 #'     and extract 2D representations. Results are cached to avoid reprocessing.
 #'
-#' @param df Data frame containing SMILES strings to process
-#' @param smiles_colname Character string name of the column containing SMILES
+#' @include validators.R
+#'
+#' @param df Data frame containing SMILES strings
+#' @param smiles_colname Column name containing SMILES
 #'     (default: "structure_smiles_initial")
-#' @param cache Character string path to cached processed SMILES file, or NULL
-#'     to skip caching (default: NULL)
+#' @param cache Path to cached processed SMILES file, or NULL to skip caching
 #'
 #' @return Data frame with processed SMILES including InChIKey, molecular formula,
 #'     exact mass, 2D SMILES, xLogP, and connectivity layer
@@ -18,87 +19,49 @@
 #' @examples
 #' \dontrun{
 #' smiles <- "C=C[C@H]1[C@@H](OC=C2C1=CCOC2=O)O[C@H]3[C@@H]([C@H]([C@@H]([C@H](O3)CO)O)O)O"
-#' data.frame(
-#'   "structure_smiles_initial" = smiles
-#' ) |>
-#'   process_smiles()
+#' df <- data.frame(structure_smiles_initial = smiles)
+#' process_smiles(df)
 #' }
 process_smiles <- function(
   df,
   smiles_colname = "structure_smiles_initial",
   cache = NULL
 ) {
-  # Validate inputs
-  if (!is.data.frame(df) && !inherits(df, "tbl")) {
-    stop("Input 'df' must be a data frame or tibble")
-  }
-
-  if (!smiles_colname %in% names(df)) {
-    stop("Column '", smiles_colname, "' not found in data frame")
-  }
-
-  logger::log_info("Processing SMILES strings with RDKit")
-
-  # Load Python script for SMILES processing
-  tryCatch(
-    {
-      py_script <- system.file("python/process_smiles.py", package = "tima")
-      # logger::log_trace("Loading Python SMILES processor from: {py_script}")
-      reticulate::source_python(file = py_script)
-    },
-    error = function(e) {
-      logger::log_error("Failed to load Python SMILES processor: {e$message}")
-      stop("Failed to load Python SMILES processor: ", conditionMessage(e))
-    }
+  # Input Validation ----
+  validate_dataframe(df, param_name = "df")
+  validate_character(
+    smiles_colname,
+    param_name = "smiles_colname",
+    allow_empty = FALSE
   )
 
-  # Extract unique SMILES for processing
-  table_smiles <- df |>
-    tidytable::filter(!is.na(!!as.name(smiles_colname))) |>
-    tidytable::distinct(!!as.name(smiles_colname))
+  # Validate column exists
+  if (!smiles_colname %in% names(df)) {
+    stop(
+      "Column '",
+      smiles_colname,
+      "' not found in data frame",
+      call. = FALSE
+    )
+  }
 
-  n_unique <- nrow(table_smiles)
-  if (n_unique == 0L) {
-    logger::log_warn("No valid SMILES found to process")
+  logger::log_info("Processing SMILES with RDKit")
+
+  # Load Python Processor ----
+  load_python_smiles_processor()
+
+  # Extract Unique SMILES ----
+  table_smiles <- extract_unique_smiles(df, smiles_colname)
+
+  if (nrow(table_smiles) == 0L) {
+    logger::log_warn("No valid SMILES to process")
     return(df)
   }
-  logger::log_debug("Found {n_unique} unique SMILES strings to process")
 
-  # Load cached results if available
-  if (is.null(cache)) {
-    table_processed_1 <- tidytable::tidytable(
-      !!as.name(smiles_colname) := NA_character_,
-      structure_smiles = NA_character_,
-      structure_inchikey = NA_character_,
-      structure_molecular_formula = NA_character_,
-      structure_exact_mass = NA_real_,
-      structure_smiles_no_stereo = NA_character_,
-      structure_xlogp = NA_real_
-    )
-  } else {
-    tryCatch(
-      {
-        table_processed_1 <- tidytable::fread(cache)
-        logger::log_debug(
-          "Loaded {nrow(table_processed_1)} cached SMILES from cache"
-        )
-      },
-      error = function(e) {
-        logger::log_warn(
-          "Failed to load cache, will process all SMILES: {e$message}"
-        )
-        table_processed_1 <- tidytable::tidytable(
-          !!as.name(smiles_colname) := NA_character_,
-          structure_smiles = NA_character_,
-          structure_inchikey = NA_character_,
-          structure_molecular_formula = NA_character_,
-          structure_exact_mass = NA_real_,
-          structure_smiles_no_stereo = NA_character_,
-          structure_xlogp = NA_real_
-        )
-      }
-    )
-  }
+  logger::log_debug("Processing {nrow(table_smiles)} unique SMILES")
+
+  # Load or Initialize Cache ----
+  table_processed_1 <- load_smiles_cache(cache, smiles_colname)
 
   # Identify SMILES not yet in cache
   table_smiles_to_process <- table_smiles |>
@@ -175,4 +138,69 @@ process_smiles <- function(
     )
 
   return(table_final)
+}
+
+# Helper Functions ----
+
+#' Load Python SMILES processor
+#' @keywords internal
+load_python_smiles_processor <- function() {
+  tryCatch(
+    {
+      py_script <- system.file("python/process_smiles.py", package = "tima")
+      reticulate::source_python(file = py_script)
+    },
+    error = function(e) {
+      logger::log_error(
+        "Failed to load Python processor: {conditionMessage(e)}"
+      )
+      stop(
+        "Cannot load Python SMILES processor: ",
+        conditionMessage(e),
+        call. = FALSE
+      )
+    }
+  )
+}
+
+#' Extract unique SMILES from dataframe
+#' @keywords internal
+extract_unique_smiles <- function(df, smiles_colname) {
+  df |>
+    tidytable::filter(!is.na(!!as.name(smiles_colname))) |>
+    tidytable::distinct(!!as.name(smiles_colname))
+}
+
+#' Load SMILES cache or create empty template
+#' @keywords internal
+load_smiles_cache <- function(cache, smiles_colname) {
+  if (is.null(cache)) {
+    return(create_empty_smiles_template(smiles_colname))
+  }
+
+  tryCatch(
+    {
+      cached <- tidytable::fread(cache)
+      logger::log_debug("Loaded {nrow(cached)} cached SMILES")
+      cached
+    },
+    error = function(e) {
+      logger::log_warn("Cache load failed: {conditionMessage(e)}")
+      create_empty_smiles_template(smiles_colname)
+    }
+  )
+}
+
+#' Create empty SMILES result template
+#' @keywords internal
+create_empty_smiles_template <- function(smiles_colname) {
+  tidytable::tidytable(
+    !!as.name(smiles_colname) := NA_character_,
+    structure_smiles = NA_character_,
+    structure_inchikey = NA_character_,
+    structure_molecular_formula = NA_character_,
+    structure_exact_mass = NA_real_,
+    structure_smiles_no_stereo = NA_character_,
+    structure_xlogp = NA_real_
+  )
 }

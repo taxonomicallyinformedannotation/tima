@@ -261,7 +261,7 @@ test_that("validate_weight_annotations_inputs rejects invalid candidates paramet
       candidates_neighbors = 0,
       candidates_final = 10
     ),
-    "candidates_neighbors must be a positive integer"
+    "candidates_neighbors must be > 0, got: 0"
   )
 })
 
@@ -899,7 +899,7 @@ test_that("test-validate_weight_annotations_inputs rejects zero candidates", {
       candidates_neighbors = 0,
       candidates_final = 10
     ),
-    "must be.*positive integer"
+    "candidates_neighbors must be > 0, got: 0"
   )
 })
 

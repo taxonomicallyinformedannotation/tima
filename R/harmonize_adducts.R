@@ -1,56 +1,67 @@
-#' @title Harmonize adducts
+#' @title Harmonize adduct notations
 #'
-#' @description This function harmonizes adduct definitions by replacing
-#'     various adduct notations with standardized forms according to a
-#'     translation table.
+#' @description Standardizes adduct notations in a dataframe by replacing
+#'     various forms with canonical representations. Uses a translation
+#'     table for efficient batch replacement.
 #'
-#' @param df Dataframe containing adduct column to harmonize
+#' @details Common adduct variations like "M+H", "[M+H]", and "(M+H)+" are
+#'     standardized to a consistent format (e.g., "[M+H]+"). This ensures
+#'     compatibility across different MS tools and databases.
+#'
+#' @include validators.R
+#'
+#' @param df Data frame or tibble containing adduct column
 #' @param adducts_colname Character string name of the adduct column
 #'     (default: "adduct")
 #' @param adducts_translations Named character vector mapping original
-#'     adduct notations (names) to standardized forms (values)
+#'     adduct notations (names) to standardized forms (values).
+#'     If missing, returns dataframe unchanged.
 #'
-#' @return The dataframe with harmonized adduct column
+#' @return Data frame with harmonized adduct column
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' df <- data.frame(adduct = c("M+H", "[M+Na]+", "(M-H)-"))
+#' translations <- c("M+H" = "[M+H]+", "(M-H)-" = "[M-H]-")
+#' harmonize_adducts(df, adducts_translations = translations)
+#' }
 harmonize_adducts <- function(
   df,
   adducts_colname = "adduct",
   adducts_translations
 ) {
   # Input Validation ----
+  validate_dataframe(df, param_name = "df")
+  validate_character(
+    adducts_colname,
+    param_name = "adducts_colname",
+    allow_empty = FALSE
+  )
 
-  # Validate dataframe
-  if (!is.data.frame(df) && !inherits(df, "tbl")) {
-    stop("Input 'df' must be a data frame or tibble")
-  }
+  # Early Exits ----
 
-  # Early exit if column doesn't exist
+  # No column to harmonize
   if (!adducts_colname %in% names(df)) {
     logger::log_debug(
-      "Adduct column '{adducts_colname}' not found in dataframe, skipping harmonization"
+      "Column '{adducts_colname}' not found, skipping harmonization"
     )
     return(df)
   }
 
-  # Early exit if no translations provided
+  # No translations provided
   if (missing(adducts_translations) || length(adducts_translations) == 0L) {
-    # logger::log_trace("No adduct translations provided, skipping harmonization")
     return(df)
   }
 
-  # Validate translations are named character vector
-  if (
-    !is.character(adducts_translations) || is.null(names(adducts_translations))
-  ) {
-    stop("adducts_translations must be a named character vector")
-  }
+  # Validate translations
+  validate_adduct_translations(adducts_translations)
 
   # Harmonize Adducts ----
+  n_unique_before <- count_unique_values(df[[adducts_colname]])
 
-  # Perform string replacement
-  n_before <- length(unique(df[[adducts_colname]]))
-
+  # Vectorized replacement (faster than loop)
   df[[adducts_colname]] <- stringi::stri_replace_all_fixed(
     str = df[[adducts_colname]],
     pattern = names(adducts_translations),
@@ -58,13 +69,44 @@ harmonize_adducts <- function(
     vectorize_all = FALSE
   )
 
-  n_after <- length(unique(df[[adducts_colname]]))
+  n_unique_after <- count_unique_values(df[[adducts_colname]])
 
-  if (n_before != n_after) {
-    # logger::log_trace(
-    #  "Harmonized adducts: {n_before} unique forms -> {n_after} unique forms"
-    # )
+  # Log reduction in unique forms (indicates successful harmonization)
+  if (n_unique_before != n_unique_after) {
+    logger::log_debug(
+      "Harmonized: {n_unique_before} → {n_unique_after} unique adduct forms"
+    )
   }
 
   df
+}
+
+# Helper Functions ----
+
+#' Validate adduct translations structure
+#' @keywords internal
+validate_adduct_translations <- function(translations) {
+  if (!is.character(translations)) {
+    stop(
+      "adducts_translations must be a character vector, got: ",
+      class(translations)[1],
+      call. = FALSE
+    )
+  }
+
+  if (is.null(names(translations))) {
+    stop(
+      "adducts_translations must be a named vector ",
+      "(names = original, values = replacements)",
+      call. = FALSE
+    )
+  }
+
+  invisible(TRUE)
+}
+
+#' Count unique non-NA values
+#' @keywords internal
+count_unique_values <- function(x) {
+  length(unique(x[!is.na(x)]))
 }

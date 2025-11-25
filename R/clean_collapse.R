@@ -1,65 +1,104 @@
-#' @title Clean collapse
+#' @title Collapse and clean grouped data
 #'
-#' @description This function collapses a grouped dataframe and trims it.
-#'     It removes NA values, collapses unique values with a separator,
-#'     trims whitespace, and converts empty strings to NA.
+#' @description Collapses grouped dataframe by combining unique values per group.
+#'     Removes NA values, trims whitespace, and converts empty strings to NA.
+#'     Useful for aggregating annotations or metadata.
 #'
-#' @param grouped_df Grouped dataframe to be collapsed
-#' @param cols Character vector of column name(s) to apply collapse to.
+#' @include validators.R
+#'
+#' @param grouped_df Grouped data frame to collapse
+#' @param cols Character vector of column names to collapse.
 #'     If NULL (default), applies to all columns.
-#' @param separator Character string used to separate collapsed values.
-#'     Default: " $ "
+#' @param separator Character string separator for collapsed values
+#'     (default: " $ ")
 #'
-#' @return A cleaned and collapsed dataframe with unique values collapsed
-#'     per group
+#' @return Data frame with unique values collapsed per group
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' library(tidytable)
+#' df <- data.frame(
+#'   group = c("A", "A", "B", "B"),
+#'   value = c("x", "y", "x", "x")
+#' )
+#' grouped <- df |> group_by(group)
+#' clean_collapse(grouped, cols = "value")
+#' }
 clean_collapse <- function(grouped_df, cols = NULL, separator = " $ ") {
-  # Input validation
-  if (!is.data.frame(grouped_df)) {
-    stop("grouped_df must be a data frame")
+  # Input Validation ----
+  validate_dataframe(grouped_df, param_name = "grouped_df")
+  validate_character(
+    separator,
+    param_name = "separator",
+    allow_empty = FALSE
+  )
+
+  # Determine Columns to Process ----
+  cols <- determine_columns_to_process(grouped_df, cols)
+
+  # Collapse and Clean ----
+  collapse_fn <- create_collapse_function(separator)
+
+  grouped_df |>
+    tidytable::reframe(tidytable::across(
+      .cols = tidyselect::all_of(x = cols),
+      .fns = collapse_fn
+    )) |>
+    tidytable::ungroup() |>
+    convert_lists_to_characters() |>
+    clean_character_columns()
+}
+
+# Helper Functions ----
+
+#' Determine which columns to process
+#' @keywords internal
+determine_columns_to_process <- function(df, cols) {
+  if (is.null(cols)) {
+    return(names(df))
   }
 
-  if (!is.character(separator) || length(separator) != 1L) {
-    stop("separator must be a single character string")
-  }
-
-  # Determine columns to process
-  cols <- if (is.null(cols)) {
-    names(grouped_df)
-  } else {
-    as.character(cols)
-  }
+  cols <- as.character(cols)
 
   # Validate columns exist
-  missing_cols <- setdiff(cols, names(grouped_df))
+  missing_cols <- setdiff(cols, names(df))
   if (length(missing_cols) > 0L) {
     stop(
-      "Column(s) not found in grouped_df: ",
-      paste(missing_cols, collapse = ", ")
+      "Column(s) not found: ",
+      paste(missing_cols, collapse = ", "),
+      call. = FALSE
     )
   }
 
-  # Define collapse function once to avoid repeated function creation
-  collapse_unique <- function(x) {
+  cols
+}
+
+#' Create collapse function with separator
+#' @keywords internal
+create_collapse_function <- function(separator) {
+  function(x) {
     list(paste(unique(x[!is.na(x)]), collapse = separator))
   }
+}
 
-  # Pipeline for collapsing and cleaning
-  clean_collapse_df <- grouped_df |>
-    tidytable::reframe(tidytable::across(
-      .cols = tidyselect::all_of(x = cols),
-      .fns = collapse_unique
-    )) |>
-    tidytable::ungroup() |>
+#' Convert list columns to character
+#' @keywords internal
+convert_lists_to_characters <- function(df) {
+  df |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(fn = is.list),
       .fns = as.character
-    )) |>
+    ))
+}
+
+#' Clean character columns (trim and convert empty to NA)
+#' @keywords internal
+clean_character_columns <- function(df) {
+  df |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(fn = is.character),
       .fns = \(x) tidytable::na_if(x = trimws(x), y = "")
     ))
-
-  return(clean_collapse_df)
 }

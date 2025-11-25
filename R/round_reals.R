@@ -1,75 +1,93 @@
-#' @title Round reals
+#' @title Round numeric values in dataframe columns
 #'
-#' @description This function rounds numeric values in specified columns
-#'     of a dataframe. It only affects columns that contain the specified
-#'     patterns in their names.
+#' @description Rounds numeric values in columns matching specified patterns.
+#'     Useful for standardizing precision in mass spectrometry data where
+#'     exact mass and logP values need consistent decimal places.
 #'
-#' @param df Dataframe containing columns to round
-#' @param dig Integer number of decimal digits to round to (default: 5)
+#' @include validators.R
+#'
+#' @param df Data frame or tibble containing columns to round
+#' @param dig Integer number of decimal digits (default: 5). Must be >= 0.
+#'     Use 0 to round to whole numbers.
 #' @param cols Character vector of column name patterns to match
 #'     (default: c("structure_exact_mass", "structure_xlogp"))
+#'     Uses fixed string matching for performance.
 #'
-#' @return The dataframe with specified numeric columns rounded to the
-#'     specified number of digits
+#' @return Data frame with specified numeric columns rounded to dig decimal places
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' df <- data.frame(
+#'   structure_exact_mass = c(123.456789, 234.567890),
+#'   structure_xlogp = c(2.345678, 3.456789),
+#'   other_col = c(1, 2)
+#' )
+#'
+#' # Round to 3 decimal places
+#' round_reals(df, dig = 3)
+#'
+#' # Round to whole numbers
+#' round_reals(df, dig = 0)
+#' }
 round_reals <- function(
   df,
   dig = 5L,
   cols = c("structure_exact_mass", "structure_xlogp")
 ) {
   # Input Validation ----
+  validate_dataframe(df, param_name = "df")
+  validate_list_or_vector(cols, min_length = 0, param_name = "cols")
 
-  # Validate dataframe first
-  if (!is.data.frame(df) && !inherits(df, "tbl")) {
-    stop("Input 'df' must be a data frame or tibble")
+  # Validate dig is a non-negative integer (0 is valid for whole numbers)
+  if (
+    !is.numeric(dig) ||
+      length(dig) != 1L ||
+      is.na(dig) ||
+      dig < 0 ||
+      (dig %% 1) != 0
+  ) {
+    stop(
+      "dig must be a non-negative integer (>= 0), got: ",
+      dig,
+      call. = FALSE
+    )
   }
 
   # Early exit for empty patterns
   if (length(cols) == 0L) {
-    # logger::log_trace("No column patterns specified for rounding")
     return(df)
   }
 
-  # Validate digits parameter
-  if (!is.numeric(dig) || dig < 0L || dig != as.integer(dig)) {
-    stop("Number of digits 'dig' must be a non-negative integer, got: ", dig)
-  }
-
-  # Find Matching Columns ----
-
-  # Get column names once
-  df_names <- names(df)
-
-  # Vectorized pattern matching (faster than loop for many columns)
-  matching_cols <- character(0L)
-
-  for (pattern in cols) {
-    matches <- grep(pattern, df_names, fixed = TRUE, value = TRUE)
-    matching_cols <- c(matching_cols, matches)
-  }
-
-  # Remove duplicates efficiently
-  matching_cols <- unique(matching_cols)
+  # Find Matching Columns (Optimized) ----
+  # Use single vectorized operation instead of loop
+  matching_cols <- find_matching_columns(names(df), cols)
 
   # Early exit if no columns found
   if (length(matching_cols) == 0L) {
-    # logger::log_trace(
-    #  "No matching columns found for rounding patterns: {paste(cols, collapse = ', ')}"
-    # )
     return(df)
   }
 
-  # logger::log_trace(
-  # "Rounding {length(matching_cols)} columns to {dig} decimal places: {paste(matching_cols, collapse = ', ')}"
-  # )
-
   # Apply Rounding ----
-
-  # Only process columns that exist
   df |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::any_of(x = matching_cols),
       .fns = ~ round(as.numeric(.x), digits = dig)
     ))
+}
+
+#' Find columns matching any pattern
+#' @keywords internal
+find_matching_columns <- function(column_names, patterns) {
+  # Vectorized: create regex pattern from all search patterns
+  # This is faster than looping for many columns
+  all_matches <- unlist(
+    lapply(patterns, function(pattern) {
+      grep(pattern, column_names, fixed = TRUE, value = TRUE)
+    }),
+    use.names = FALSE
+  )
+
+  unique(all_matches)
 }

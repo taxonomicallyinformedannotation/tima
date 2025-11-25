@@ -338,55 +338,55 @@ test_that("validate_list_or_vector handles NULL", {
   expect_silent(validate_list_or_vector(NULL, allow_null = TRUE))
 })
 
-## validate_data_frame ----
+## validate_dataframe ----
 
-test_that("validate_data_frame accepts valid data frames", {
+test_that("validate_dataframe accepts valid data frames", {
   df <- data.frame(a = 1:3, b = 4:6, c = 7:9)
 
-  expect_silent(validate_data_frame(df))
-  expect_silent(validate_data_frame(df, required_columns = c("a", "b")))
-  expect_silent(validate_data_frame(df, min_rows = 3))
+  expect_silent(validate_dataframe(df))
+  expect_silent(validate_dataframe(df, required_cols = c("a", "b")))
+  expect_silent(validate_dataframe(df, min_rows = 3))
 })
 
-test_that("validate_data_frame detects missing columns", {
+test_that("validate_dataframe detects missing columns", {
   df <- data.frame(a = 1:3, b = 4:6)
 
   expect_error(
-    validate_data_frame(df, required_columns = c("a", "c")),
+    validate_dataframe(df, required_cols = c("a", "c")),
     "missing required column"
   )
 
   # Error message should show available columns
   expect_error(
-    validate_data_frame(df, required_columns = "missing"),
+    validate_dataframe(df, required_cols = "missing"),
     "Available columns"
   )
 })
 
-test_that("validate_data_frame validates row count", {
+test_that("validate_dataframe validates row count", {
   df <- data.frame(a = 1:3, b = 4:6)
 
   expect_error(
-    validate_data_frame(df, min_rows = 5),
+    validate_dataframe(df, min_rows = 5),
     "must have at least 5 row"
   )
 })
 
-test_that("validate_data_frame rejects non-data-frames", {
+test_that("validate_dataframe rejects non-data-frames", {
   expect_error(
-    validate_data_frame(list(a = 1, b = 2)),
+    validate_dataframe(list(a = 1, b = 2)),
     "must be a data frame"
   )
 
   expect_error(
-    validate_data_frame(matrix(1:9, nrow = 3)),
+    validate_dataframe(matrix(1:9, nrow = 3)),
     "must be a data frame"
   )
 })
 
-test_that("validate_data_frame uses custom parameter names", {
+test_that("validate_dataframe uses custom parameter names", {
   expect_error(
-    validate_data_frame(list(), param_name = "my_data"),
+    validate_dataframe(list(), param_name = "my_data"),
     "my_data must be a data frame"
   )
 })
@@ -430,7 +430,7 @@ test_that("validators handle edge cases gracefully", {
 
   # Empty data frame
   df <- data.frame()
-  expect_error(validate_data_frame(df, min_rows = 1), "must have at least")
+  expect_error(validate_dataframe(df, min_rows = 1), "must have at least")
 })
 
 test_that("assert_flag validates logical flags", {
@@ -444,10 +444,16 @@ test_that("assert_flag validates logical flags", {
 test_that("assert_positive_integer validates integers", {
   expect_silent(assert_positive_integer(1, "n"))
   expect_silent(assert_positive_integer(5, "n"))
-  expect_error(assert_positive_integer(0, "n"), "positive integer")
-  expect_error(assert_positive_integer(-1, "n"), "positive integer")
-  expect_error(assert_positive_integer(1.5, "n"), "positive integer")
-  expect_error(assert_positive_integer(c(1, 2), "n"), "positive integer")
+  expect_error(assert_positive_integer(0, "n"), "n must be > 0, got: 0")
+  expect_error(assert_positive_integer(-1, "n"), "n must be > 0, got: -1")
+  expect_error(
+    assert_positive_integer(1.5, "n"),
+    "n must be an integer, got: 1.5"
+  )
+  expect_error(
+    assert_positive_integer(c(1, 2), "n"),
+    "n must be a single numeric value, got: numeric"
+  )
 })
 
 test_that("validate_character basic behavior", {
@@ -480,9 +486,9 @@ test_that("validate_character allowed_values behavior", {
 })
 
 test_that("validate_choice works similarly", {
-  expect_silent(validate_choice("OR", c("OR", "AND"), name = "logic"))
+  expect_silent(validate_choice("OR", c("OR", "AND"), param_name = "logic"))
   expect_error(
-    validate_choice("X", c("OR", "AND"), name = "logic"),
+    validate_choice("X", c("OR", "AND"), param_name = "logic"),
     "must be one of"
   )
 })
