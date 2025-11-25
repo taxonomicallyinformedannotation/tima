@@ -54,7 +54,7 @@ log_file_op <- function(action, path, size_bytes = NULL, n_rows = NULL) {
 #' @return Formatted string
 #' @keywords internal
 format_count <- function(x) {
-  prettyNum(x, big.mark = ",", scientific = FALSE)
+  prettyNum(as.character(x), big.mark = ",")
 }
 
 #' Format file size in human-readable format
