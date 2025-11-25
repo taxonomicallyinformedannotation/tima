@@ -490,7 +490,7 @@ test_that("validate_weight_annotations_inputs rejects non-logical parameters", {
       candidates_neighbors = 5,
       candidates_final = 10
     ),
-    "ms1_only must be logical"
+    "ms1_only must be a single TRUE or FALSE value, got: character"
   )
 })
 
@@ -787,7 +787,7 @@ test_that("test-validate_weight_annotations_inputs rejects invalid logical param
       candidates_neighbors = 5,
       candidates_final = 10
     ),
-    "must be logical"
+    "ms1_only must be a single TRUE or FALSE value, got: character"
   )
 })
 

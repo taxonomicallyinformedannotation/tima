@@ -8,6 +8,7 @@
 #' @include clean_collapse.R
 #' @include process_smiles.R
 #' @include validators.R
+#' @include logging_helpers.R
 #'
 #' @param table Data frame containing combined structure-organism pair data with
 #'     columns for structures (SMILES, InChI, names), organisms, and references
@@ -109,9 +110,7 @@ split_tables_sop <- function(table, cache) {
     tidytable::filter(!is.na(reference_doi) | n == 1) |>
     tidytable::select(-n)
   rm(table)
-  logger::log_info(
-    "Led to {nrow(table_keys)} referenced structure-organism pairs"
-  )
+  log_with_count("Referenced structure-organism pairs", n = nrow(table_keys))
 
   table_structures_stereo <- table_structural |>
     tidytable::filter(!is.na(structure_inchikey)) |>
@@ -127,45 +126,27 @@ split_tables_sop <- function(table, cache) {
       structure_smiles_no_stereo
     ) |>
     tidytable::distinct()
-  logger::log_info(
-    "Corresponding to ",
-    nrow(
-      table_structures_stereo |>
-        tidytable::filter(
-          !grepl(
-            pattern = "-UHFFFAOYSA-",
-            x = structure_inchikey,
-            fixed = TRUE
-          )
-        ) |>
-        tidytable::distinct(structure_inchikey)
-    ),
-    " unique stereoisomers (excluding structures without stereochemistry)..."
+
+  # Calculate structure statistics
+  n_stereoisomers <- nrow(
+    table_structures_stereo |>
+      tidytable::filter(!grepl("-UHFFFAOYSA-", structure_inchikey, fixed = TRUE)) |>
+      tidytable::distinct(structure_inchikey)
+  )
+  n_no_stereo <- nrow(
+    table_structures_stereo |>
+      tidytable::filter(grepl("-UHFFFAOYSA-", structure_inchikey, fixed = TRUE)) |>
+      tidytable::distinct(structure_inchikey)
+  )
+  n_constitutional <- nrow(
+    table_structures_stereo |>
+      tidytable::distinct(structure_inchikey_connectivity_layer)
   )
 
   logger::log_info(
-    "... and ",
-    nrow(
-      table_structures_stereo |>
-        tidytable::filter(
-          grepl(
-            pattern = "-UHFFFAOYSA-",
-            x = structure_inchikey,
-            fixed = TRUE
-          )
-        ) |>
-        tidytable::distinct(structure_inchikey)
-    ),
-    " unique structures without stereochemistry..."
-  )
-
-  logger::log_info(
-    "... or ",
-    nrow(
-      table_structures_stereo |>
-        tidytable::distinct(structure_inchikey_connectivity_layer)
-    ),
-    " unique constitutional isomers (ignoring stereochemistry)"
+    "Structures: {format_count(n_stereoisomers)} stereoisomers, ",
+    "{format_count(n_no_stereo)} without stereochemistry, ",
+    "{format_count(n_constitutional)} constitutional isomers"
   )
 
   table_structures_metadata <- table_structural |>
@@ -248,11 +229,7 @@ split_tables_sop <- function(table, cache) {
     tidytable::select(organism_name) |>
     tidytable::distinct()
 
-  logger::log_info(
-    "... among ",
-    nrow(table_organisms_names),
-    " unique organisms"
-  )
+  log_with_count("Unique organisms", n = nrow(table_organisms_names))
 
   table_org_tax_ott <- table_organisms |>
     tidytable::filter(!is.na(organism_taxonomy_ottid)) |>

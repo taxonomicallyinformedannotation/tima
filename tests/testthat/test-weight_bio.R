@@ -131,7 +131,7 @@ test_that("weight_bio validates weight parameters", {
       score_biological_species = 0.9,
       score_biological_variety = 1.0
     ),
-    "Weights must sum to 1.0, got: 2.5"
+    "Weight(.*) must be between 0 and 1: biological"
   )
 })
 

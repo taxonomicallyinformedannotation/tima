@@ -812,13 +812,19 @@ assert_choice <- function(value, choices, param_name = "value") {
   invisible(TRUE)
 }
 
-assert_flag <- function(x, param_name) {
-  if (!is.logical(x) || length(x) != 1L || is.na(x)) {
-    stop(param_name, " must be logical (TRUE/FALSE)", call. = FALSE)
-  }
-  invisible(TRUE)
-}
-
+#' Assert scalar numeric value
+#'
+#' @description Validates that a parameter is a single numeric value within range
+#'
+#' @param x Value to validate
+#' @param param_name Name of the parameter (for error messages)
+#' @param min Minimum allowed value
+#' @param max Maximum allowed value
+#' @param allow_na Whether NA is allowed
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#'
+#' @keywords internal
 assert_scalar_numeric <- function(
   x,
   param_name,

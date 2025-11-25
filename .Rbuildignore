@@ -9,6 +9,8 @@
 ^LICENSE\.md$
 ^codecov\.yml$
 ^\.github$
+^\.idea$
+^\.quarto$
 ^README\.Rmd$
 ^README\.qmd$
 ^cran-comments\.md$

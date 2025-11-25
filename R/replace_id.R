@@ -108,6 +108,7 @@ reconstruct_path <- function(dir_path, filename) {
 
 #' Null-coalescing operator (like `??` in other languages)
 #' @keywords internal
+#' @noRd
 `%||%` <- function(a, b) {
   if (is.null(a)) b else a
 }

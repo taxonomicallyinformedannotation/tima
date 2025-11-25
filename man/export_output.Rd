@@ -24,7 +24,7 @@ logging for large datasets.
 \dontrun{
 df <- data.frame(id = 1:100, value = rnorm(100))
 export_output(df, "output/data.tsv")
-export_output(df, "output/data.tsv.gz")  # Compressed
+export_output(df, "output/data.tsv.gz") # Compressed
 unlink("output", recursive = TRUE)
 }
 }
