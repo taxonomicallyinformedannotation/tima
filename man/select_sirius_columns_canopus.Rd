@@ -2,23 +2,29 @@
 % Please edit documentation in R/select_sirius_columns.R
 \name{select_sirius_columns_canopus}
 \alias{select_sirius_columns_canopus}
-\title{Select sirius columns (canopus)}
+\title{Select SIRIUS CANOPUS columns}
 \usage{
 select_sirius_columns_canopus(df, sirius_version)
 }
 \arguments{
 \item{df}{Data frame with SIRIUS CANOPUS results}
 
-\item{sirius_version}{Character string SIRIUS version ("5" or "6")}
+\item{sirius_version}{SIRIUS version ("5" or "6")}
 }
 \value{
 Data frame with standardized CANOPUS column names
 }
 \description{
-This function selects and standardizes CANOPUS chemical
-classification columns from SIRIUS results, mapping SIRIUS-specific
-column names to TIMA standard names for downstream processing.
+Selects and standardizes CANOPUS chemical classification
+columns from SIRIUS results, mapping SIRIUS-specific column names
+to TIMA standard names for downstream processing.
 }
 \examples{
-NULL
+\dontrun{
+# Standardize CANOPUS columns from SIRIUS v6
+standardized <- select_sirius_columns_canopus(
+  df = canopus_results,
+  sirius_version = "6"
+)
+}
 }

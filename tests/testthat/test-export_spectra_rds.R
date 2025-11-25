@@ -6,13 +6,13 @@ test_that("export_spectra_rds validates file parameter", {
   # Missing file
   expect_error(
     export_spectra_rds(spectra = Spectra::Spectra()),
-    "file must be a single character string"
+    "argument \"file\" is missing, with no default"
   )
 
   # NULL file
   expect_error(
     export_spectra_rds(file = NULL, spectra = Spectra::Spectra()),
-    "file must be a single character string"
+    "Provide a non-NULL character string."
   )
 
   # Non-character file
@@ -37,7 +37,7 @@ test_that("export_spectra_rds validates spectra parameter", {
   # Missing spectra
   expect_error(
     export_spectra_rds(file = temp_file),
-    "spectra must be a Spectra object"
+    "argument \"spectra\" is missing, with no default"
   )
 
   # Non-Spectra object

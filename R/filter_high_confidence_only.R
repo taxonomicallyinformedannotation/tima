@@ -31,7 +31,27 @@
 #' cause errors; at least one of the three primary scores must satisfy its
 #' threshold for a row to be retained.
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Filter to high-confidence annotations only
+#' high_conf <- filter_high_confidence_only(
+#'   df = annotations,
+#'   score_bio_min = 0.85,
+#'   score_ini_min = 0.95,
+#'   score_final_min = 0.75,
+#'   error_rt_max = 0.05,
+#'   context = "final_filtered"
+#' )
+#'
+#' # With SIRIUS confidence threshold
+#' high_conf <- filter_high_confidence_only(
+#'   df = annotations,
+#'   confidence_sirius_min = 0.8,
+#'   similarity_spectral_min = 0.7
+#' )
+#' }
 filter_high_confidence_only <- function(
   df,
   score_bio_min = DEFAULT_HC_SCORE_BIO_MIN,

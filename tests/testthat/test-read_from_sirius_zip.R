@@ -75,7 +75,7 @@ create_test_sirius_zip <- function() {
 test_that("read_from_sirius_zip validates sirius_zip parameter", {
   expect_error(
     read_from_sirius_zip(),
-    "sirius_zip must be a single character string"
+    "argument \"sirius_zip\" is missing, with no default"
   )
 
   expect_error(
@@ -93,7 +93,7 @@ test_that("read_from_sirius_zip validates sirius_zip parameter", {
 
   expect_error(
     read_from_sirius_zip(sirius_zip = NULL, file = "test"),
-    "sirius_zip must be a single character string"
+    "Provide a non-NULL character string."
   )
 })
 
@@ -109,17 +109,17 @@ test_that("read_from_sirius_zip validates file pattern parameter", {
 
   expect_error(
     read_from_sirius_zip(sirius_zip = test_zip$zip_file),
-    "file pattern must be a single character string"
+    "argument \"file\" is missing, with no default"
   )
 
   expect_error(
     read_from_sirius_zip(sirius_zip = test_zip$zip_file, file = 123),
-    "file pattern must be a single character string"
+    "Ensure the parameter is a length-1 character value."
   )
 
   expect_error(
     read_from_sirius_zip(sirius_zip = test_zip$zip_file, file = c("a", "b")),
-    "file pattern must be a single character string"
+    "Ensure the parameter is a length-1 character value."
   )
 })
 

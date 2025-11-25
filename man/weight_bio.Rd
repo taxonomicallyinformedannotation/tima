@@ -2,67 +2,88 @@
 % Please edit documentation in R/weight_bio.R
 \name{weight_bio}
 \alias{weight_bio}
-\title{Weight bio}
+\title{Weight annotations by biological source}
 \usage{
 weight_bio(
-  annotation_table_taxed = get("annotation_table_taxed", envir = parent.frame()),
-  structure_organism_pairs_table = get("structure_organism_pairs_table", envir =
-    parent.frame()),
-  weight_spectral = get("weight_spectral", envir = parent.frame()),
-  weight_biological = get("weight_biological", envir = parent.frame()),
-  score_biological_domain = get("score_biological_domain", envir = parent.frame()),
-  score_biological_kingdom = get("score_biological_kingdom", envir = parent.frame()),
-  score_biological_phylum = get("score_biological_phylum", envir = parent.frame()),
-  score_biological_class = get("score_biological_class", envir = parent.frame()),
-  score_biological_order = get("score_biological_order", envir = parent.frame()),
-  score_biological_family = get("score_biological_family", envir = parent.frame()),
-  score_biological_tribe = get("score_biological_tribe", envir = parent.frame()),
-  score_biological_genus = get("score_biological_genus", envir = parent.frame()),
-  score_biological_species = get("score_biological_species", envir = parent.frame()),
-  score_biological_variety = get("score_biological_variety", envir = parent.frame())
+  annotation_table_taxed,
+  structure_organism_pairs_table,
+  weight_spectral,
+  weight_biological,
+  score_biological_domain,
+  score_biological_kingdom,
+  score_biological_phylum,
+  score_biological_class,
+  score_biological_order,
+  score_biological_family,
+  score_biological_tribe,
+  score_biological_genus,
+  score_biological_species,
+  score_biological_variety
 )
 }
 \arguments{
-\item{annotation_table_taxed}{Data frame containing initial annotations with
-sample taxonomy information}
+\item{annotation_table_taxed}{Data frame with initial annotations and sample taxonomy}
 
-\item{structure_organism_pairs_table}{Data frame containing structure-organism
-pairs with complete taxonomic hierarchies}
+\item{structure_organism_pairs_table}{Data frame with structure-organism pairs and taxonomies}
 
-\item{weight_spectral}{Numeric weight for spectral similarity score (0-1)}
+\item{weight_spectral}{Weight for spectral similarity score (any positive number)}
 
-\item{weight_biological}{Numeric weight for biological source score (0-1)}
+\item{weight_biological}{Weight for biological source score (any positive number)}
 
-\item{score_biological_domain}{Numeric score for domain-level taxonomic match}
+\item{score_biological_domain}{Score for domain-level taxonomic match (0-1)}
 
-\item{score_biological_kingdom}{Numeric score for kingdom-level match}
+\item{score_biological_kingdom}{Score for kingdom-level match (0-1)}
 
-\item{score_biological_phylum}{Numeric score for phylum-level match}
+\item{score_biological_phylum}{Score for phylum-level match (0-1)}
 
-\item{score_biological_class}{Numeric score for class-level match}
+\item{score_biological_class}{Score for class-level match (0-1)}
 
-\item{score_biological_order}{Numeric score for order-level match}
+\item{score_biological_order}{Score for order-level match (0-1)}
 
-\item{score_biological_family}{Numeric score for family-level match}
+\item{score_biological_family}{Score for family-level match (0-1)}
 
-\item{score_biological_tribe}{Numeric score for tribe-level match}
+\item{score_biological_tribe}{Score for tribe-level match (0-1)}
 
-\item{score_biological_genus}{Numeric score for genus-level match}
+\item{score_biological_genus}{Score for genus-level match (0-1)}
 
-\item{score_biological_species}{Numeric score for species-level match}
+\item{score_biological_species}{Score for species-level match (0-1)}
 
-\item{score_biological_variety}{Numeric score for variety-level match (highest)}
+\item{score_biological_variety}{Score for variety-level match (0-1, highest)}
 }
 \value{
-Data frame containing biologically weighted annotations with
-biological scores and combined weighted scores
+Data frame with biologically weighted annotations including biological
+scores and combined weighted scores
 }
 \description{
-This function weights MS annotations according to their biological
-source by comparing the taxonomic hierarchy of candidate structures'
-reported organisms with the sample's organism taxonomy. Higher taxonomic
+Weights MS annotations according to their biological source by
+comparing the taxonomic hierarchy of candidate structures' reported
+organisms with the sample's organism taxonomy. Higher taxonomic
 similarity results in higher biological scores.
 }
+\details{
+The weights are automatically normalized by dividing by their sum,
+so they do NOT need to sum to 1. For example, weights of (1, 1) produce
+the same result as (0.5, 0.5).
+}
 \examples{
-NULL
+\dontrun{
+# Weights are automatically normalized - these are equivalent:
+# (1, 1) gives same result as (0.5, 0.5)
+weighted <- weight_bio(
+  annotation_table_taxed = annotations,
+  structure_organism_pairs_table = sop_table,
+  weight_spectral = 1,      # Will be normalized to 0.5
+  weight_biological = 1,    # Will be normalized to 0.5
+  score_biological_domain = 0.01,
+  score_biological_kingdom = 0.02,
+  score_biological_phylum = 0.05,
+  score_biological_class = 0.1,
+  score_biological_order = 0.2,
+  score_biological_family = 0.3,
+  score_biological_tribe = 0.5,
+  score_biological_genus = 0.7,
+  score_biological_species = 0.9,
+  score_biological_variety = 1.0
+)
+}
 }

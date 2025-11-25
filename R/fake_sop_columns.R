@@ -1,13 +1,24 @@
-#' @title Fake SOP columns
+#' @title Create template SOP columns
 #'
-#' @description This function creates an empty structure-organism pair (SOP)
-#'     dataframe template with all standard column names and NA values.
-#'     Used as a placeholder when actual SOP data is unavailable.
+#' @description Creates an empty structure-organism pair (SOP) dataframe
+#'     template with all standard column names and NA values. Used as a
+#'     placeholder when actual SOP data is unavailable.
 #'
-#' @return A single-row data frame with standard SOP columns filled with
-#'     NA_character_ values
+#' @return Single-row data frame with standard SOP columns filled with
+#'     NA values
 #'
-#' @examples NULL
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' # Create empty SOP template
+#' template <- fake_sop_columns()
+#'
+#' # Use as fallback when no SOP data available
+#' if (nrow(sop_data) == 0) {
+#'   sop_data <- fake_sop_columns()
+#' }
+#' }
 fake_sop_columns <- function() {
   # Create template with all standard SOP columns as character type
   tidytable::tidytable(

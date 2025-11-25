@@ -1,33 +1,45 @@
-#' @title Select sirius columns (canopus)
+#' @title Select SIRIUS CANOPUS columns
 #'
-#' @description This function selects and standardizes CANOPUS chemical
-#'     classification columns from SIRIUS results, mapping SIRIUS-specific
-#'     column names to TIMA standard names for downstream processing.
+#' @description Selects and standardizes CANOPUS chemical classification
+#'     columns from SIRIUS results, mapping SIRIUS-specific column names
+#'     to TIMA standard names for downstream processing.
 #'
 #' @include harmonize_names_sirius.R
+#' @include validators.R
 #'
 #' @param df Data frame with SIRIUS CANOPUS results
-#' @param sirius_version Character string SIRIUS version ("5" or "6")
+#' @param sirius_version SIRIUS version ("5" or "6")
 #'
 #' @return Data frame with standardized CANOPUS column names
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Standardize CANOPUS columns from SIRIUS v6
+#' standardized <- select_sirius_columns_canopus(
+#'   df = canopus_results,
+#'   sirius_version = "6"
+#' )
+#' }
 select_sirius_columns_canopus <- function(df, sirius_version) {
-  # Validate inputs
-  if (!is.data.frame(df)) {
-    stop("df must be a data frame")
-  }
+  # Input Validation ----
+  validate_dataframe(df, param_name = "df")
 
+  # Early exit for empty data
   if (nrow(df) == 0L) {
     logger::log_warn("Empty CANOPUS data frame")
     return(df)
   }
 
+  # Validate SIRIUS version
   if (!sirius_version %in% c("5", "6", 5, 6)) {
-    stop("sirius_version must be '5' or '6', got: ", sirius_version)
+    stop(
+      "sirius_version must be '5' or '6', got: ",
+      sirius_version,
+      call. = FALSE
+    )
   }
-
-  # logger::log_trace("Selecting CANOPUS columns for SIRIUS v", sirius_version)
 
   df <- df |>
     tidytable::mutate(
@@ -90,18 +102,28 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
   return(df)
 }
 
-#' @title Select sirius columns (formulas)
+#' @title Select SIRIUS formula columns
 #'
-#' @description This function selects sirius columns (formulas)
+#' @description Selects and standardizes SIRIUS formula-level columns,
+#'     extracting molecular formula candidates and their scores.
 #'
 #' @include harmonize_names_sirius.R
 #'
-#' @param df Dataframe
-#' @param sirius_version Sirius version
+#' @param df Data frame with SIRIUS formula results
+#' @param sirius_version SIRIUS version ("5" or "6")
 #'
-#' @return The dataframe with selected sirius columns
+#' @return Data frame with standardized formula column names
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Standardize SIRIUS formula columns
+#' formulas <- select_sirius_columns_formulas(
+#'   df = sirius_formulas,
+#'   sirius_version = "6"
+#' )
+#' }
 select_sirius_columns_formulas <- function(df, sirius_version) {
   df <- df |>
     tidytable::mutate(
@@ -144,16 +166,26 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
   return(df)
 }
 
-#' @title Select sirius columns (structures)
+#' @title Select SIRIUS structure columns
 #'
-#' @description This function selects sirius columns (structures)
+#' @description Selects and standardizes SIRIUS structure-level columns,
+#'     extracting structure candidates and their CSI:FingerID scores.
 #'
-#' @param df Dataframe
-#' @param sirius_version Sirius version
+#' @param df Data frame with SIRIUS structure results
+#' @param sirius_version SIRIUS version ("5" or "6")
 #'
-#' @return The dataframe with selected structure columns
+#' @return Data frame with standardized structure column names
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Standardize SIRIUS structure columns
+#' structures <- select_sirius_columns_structures(
+#'   df = sirius_structures,
+#'   sirius_version = "6"
+#' )
+#' }
 select_sirius_columns_structures <- function(df, sirius_version) {
   df <- df |>
     tidytable::select(

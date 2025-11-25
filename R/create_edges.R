@@ -1,24 +1,41 @@
-#' @title Create edges
+#' @title Create spectral similarity network edges
 #'
-#' @description This function calculates pairwise spectral similarity between
-#'     all spectra to create a network edge list. Uses parallel processing
-#'     via purrr for efficiency.
+#' @description Calculates pairwise spectral similarity between all spectra to
+#'     create a network edge list. Uses parallel processing via purrr for
+#'     efficiency.
 #'
 #' @include calculate_similarity.R
+#' @include constants.R
+#' @include validators.R
 #'
 #' @param frags List of fragment spectra matrices
 #' @param nspecs Integer number of spectra
 #' @param precs Numeric vector of precursor m/z values
-#' @param method Character string similarity method ("entropy", "gnps", or "cosine")
-#' @param ms2_tolerance Numeric MS2 tolerance in Daltons
-#' @param ppm_tolerance Numeric PPM tolerance
-#' @param threshold Numeric minimum similarity score threshold
-#' @param matched_peaks Integer minimum number of matched peaks required
+#' @param method Similarity method ("entropy", "gnps", or "cosine")
+#' @param ms2_tolerance MS2 tolerance in Daltons
+#' @param ppm_tolerance PPM tolerance
+#' @param threshold Minimum similarity score threshold
+#' @param matched_peaks Minimum number of matched peaks required
 #'
-#' @return A data frame with columns: feature_id, target_id, score, matched_peaks.
+#' @return Data frame with columns: feature_id, target_id, score, matched_peaks.
 #'     Returns empty data frame with NA values if no edges pass thresholds.
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Create network edges from spectra
+#' edges <- create_edges(
+#'   frags = fragment_list,
+#'   nspecs = length(fragment_list),
+#'   precs = precursor_mz,
+#'   method = "cosine",
+#'   ms2_tolerance = 0.02,
+#'   ppm_tolerance = 10,
+#'   threshold = 0.7,
+#'   matched_peaks = 6
+#' )
+#' }
 create_edges <- function(
   frags,
   nspecs,
@@ -29,15 +46,8 @@ create_edges <- function(
   threshold,
   matched_peaks
 ) {
-  if (!method %in% VALID_SIMILARITY_METHODS) {
-    stop(
-      "Similarity method must be one of: ",
-      paste(VALID_SIMILARITY_METHODS, collapse = ", "),
-      "; got: ",
-      method
-    )
-  }
   # Input Validation ----
+  validate_choice(method, VALID_SIMILARITY_METHODS, param_name = "method")
 
   # Early exit for insufficient spectra
   if (nspecs < 2L) {

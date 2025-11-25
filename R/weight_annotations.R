@@ -812,11 +812,36 @@ weight_annotations <- function(
   rm(annotation_table)
 
   # Perform taxonomically informed scoring
-  annot_table_wei_bio <- weight_bio()
+  annot_table_wei_bio <- weight_bio(
+    annotation_table_taxed = annotation_table_taxed,
+    structure_organism_pairs_table = structure_organism_pairs_table,
+    weight_spectral = weight_spectral,
+    weight_biological = weight_biological,
+    score_biological_domain = score_biological_domain,
+    score_biological_kingdom = score_biological_kingdom,
+    score_biological_phylum = score_biological_phylum,
+    score_biological_class = score_biological_class,
+    score_biological_order = score_biological_order,
+    score_biological_family = score_biological_family,
+    score_biological_tribe = score_biological_tribe,
+    score_biological_genus = score_biological_genus,
+    score_biological_species = score_biological_species,
+    score_biological_variety = score_biological_variety
+  )
   rm(annotation_table_taxed)
 
   annot_table_wei_bio |>
-    decorate_bio()
+    decorate_bio(
+      score_biological_kingdom = score_biological_kingdom,
+      score_biological_phylum = score_biological_phylum,
+      score_biological_class = score_biological_class,
+      score_biological_order = score_biological_order,
+      score_biological_family = score_biological_family,
+      score_biological_tribe = score_biological_tribe,
+      score_biological_genus = score_biological_genus,
+      score_biological_species = score_biological_species,
+      score_biological_variety = score_biological_variety
+    )
 
   annot_table_wei_bio_clean <- annot_table_wei_bio |>
     clean_bio(
@@ -826,11 +851,30 @@ weight_annotations <- function(
   rm(annot_table_wei_bio)
 
   annot_table_wei_chemo <- annot_table_wei_bio_clean |>
-    weight_chemo()
+    weight_chemo(
+      weight_spectral = weight_spectral,
+      weight_biological = weight_biological,
+      weight_chemical = weight_chemical,
+      score_chemical_cla_kingdom = score_chemical_cla_kingdom,
+      score_chemical_cla_superclass = score_chemical_cla_superclass,
+      score_chemical_cla_class = score_chemical_cla_class,
+      score_chemical_cla_parent = score_chemical_cla_parent,
+      score_chemical_npc_pathway = score_chemical_npc_pathway,
+      score_chemical_npc_superclass = score_chemical_npc_superclass,
+      score_chemical_npc_class = score_chemical_npc_class
+    )
   rm(annot_table_wei_bio_clean)
 
   annot_table_wei_chemo |>
-    decorate_chemo()
+    decorate_chemo(
+      score_chemical_cla_kingdom = score_chemical_cla_kingdom,
+      score_chemical_cla_superclass = score_chemical_cla_superclass,
+      score_chemical_cla_class = score_chemical_cla_class,
+      score_chemical_cla_parent = score_chemical_cla_parent,
+      score_chemical_npc_pathway = score_chemical_npc_pathway,
+      score_chemical_npc_superclass = score_chemical_npc_superclass,
+      score_chemical_npc_class = score_chemical_npc_class
+    )
 
   results_list <- annot_table_wei_chemo |>
     clean_chemo()

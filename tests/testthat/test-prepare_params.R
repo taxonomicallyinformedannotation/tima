@@ -62,8 +62,8 @@ test_that("prepare_params handles empty taxon (removes raw metadata) without err
 ## input validation errors ----
 
 test_that("prepare_params validates list inputs", {
-  expect_error(prepare_params(params_small = "bad"), "list")
-  expect_error(prepare_params(params_advanced = "bad"), "list")
+  expect_error(prepare_params(params_small = "bad"), "In index: 1.")
+  expect_error(prepare_params(params_advanced = "bad"), "In index: 1.")
 })
 
 ## get_params: invalid step value handling ----

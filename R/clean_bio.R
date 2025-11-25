@@ -16,7 +16,17 @@
 #'
 #' @seealso weight_bio
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Clean biological annotations by network consistency
+#' cleaned <- clean_bio(
+#'   annot_table_wei_bio = bio_weighted_annotations,
+#'   edges_table = network_edges,
+#'   minimal_consistency = 0.5
+#' )
+#' }
 clean_bio <- function(
   annot_table_wei_bio,
   edges_table,

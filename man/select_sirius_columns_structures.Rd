@@ -2,21 +2,28 @@
 % Please edit documentation in R/select_sirius_columns.R
 \name{select_sirius_columns_structures}
 \alias{select_sirius_columns_structures}
-\title{Select sirius columns (structures)}
+\title{Select SIRIUS structure columns}
 \usage{
 select_sirius_columns_structures(df, sirius_version)
 }
 \arguments{
-\item{df}{Dataframe}
+\item{df}{Data frame with SIRIUS structure results}
 
-\item{sirius_version}{Sirius version}
+\item{sirius_version}{SIRIUS version ("5" or "6")}
 }
 \value{
-The dataframe with selected structure columns
+Data frame with standardized structure column names
 }
 \description{
-This function selects sirius columns (structures)
+Selects and standardizes SIRIUS structure-level columns,
+extracting structure candidates and their CSI:FingerID scores.
 }
 \examples{
-NULL
+\dontrun{
+# Standardize SIRIUS structure columns
+structures <- select_sirius_columns_structures(
+  df = sirius_structures,
+  sirius_version = "6"
+)
+}
 }

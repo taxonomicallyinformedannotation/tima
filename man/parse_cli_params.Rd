@@ -2,7 +2,7 @@
 % Please edit documentation in R/parse_cli_params.R
 \name{parse_cli_params}
 \alias{parse_cli_params}
-\title{Parse CLI parameters}
+\title{Parse command-line interface parameters}
 \usage{
 parse_cli_params(arguments, parameters)
 }
@@ -12,15 +12,26 @@ parse_cli_params(arguments, parameters)
 \item{parameters}{Nested list of default parameters to be updated with CLI values}
 }
 \value{
-Updated parameters list with CLI arguments merged in, maintaining the
-nested structure and applying type conversions as specified in the mappings
+Updated parameters list with CLI arguments merged in, maintaining
+the nested structure and applying type conversions
 }
 \description{
-This function parses command-line interface (CLI) arguments and
-merges them into the parameter configuration structure. It uses a mapping
-system to translate CLI argument names to their corresponding nested paths
-in the parameters list, applying appropriate type conversions.
+Parses command-line interface (CLI) arguments and merges them
+into the parameter configuration structure. Uses a mapping system to
+translate CLI argument names to their corresponding nested paths in the
+parameters list, applying appropriate type conversions.
 }
 \examples{
-NULL
+\dontrun{
+# Parse CLI arguments into parameters
+library(docopt)
+cli_args <- docopt(doc)
+default_params <- load_yaml_files()$yamls_params
+
+# Merge CLI arguments with defaults
+final_params <- parse_cli_params(
+  arguments = cli_args,
+  parameters = default_params
+)
+}
 }

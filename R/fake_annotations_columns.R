@@ -1,14 +1,25 @@
-#' @title Fake annotations columns
+#' @title Create template annotation columns
 #'
-#' @description This function creates a template data frame with all expected
-#'     annotation columns initialized to NA. Used as a fallback when no
-#'     annotations are available or to ensure consistent column structure.
+#' @description Creates a template data frame with all expected annotation
+#'     columns initialized to NA. Used as a fallback when no annotations are
+#'     available or to ensure consistent column structure.
 #'
 #' @return Data frame with one row and columns for all annotation fields,
 #'     with all values set to NA. Columns include feature IDs, structure
 #'     information, scores, and taxonomic classifications.
 #'
-#' @examples NULL
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' # Create empty annotation template
+#' template <- fake_annotations_columns()
+#'
+#' # Use as fallback when no annotations found
+#' if (nrow(annotations) == 0) {
+#'   annotations <- fake_annotations_columns()
+#' }
+#' }
 fake_annotations_columns <- function() {
   data.frame(
     feature_id = NA_character_,

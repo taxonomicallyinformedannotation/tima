@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_spectra.R
 \name{extract_spectra}
 \alias{extract_spectra}
-\title{Extract spectra from a Spectra object}
+\title{Extract spectra from Spectra object}
 \usage{
 extract_spectra(object)
 }
@@ -10,14 +10,22 @@ extract_spectra(object)
 \item{object}{Spectra object from the Spectra package}
 }
 \value{
-Data frame containing harmonized spectra metadata with additional
-mz and intensity list columns containing peak data
+Data frame containing harmonized spectra metadata with mz and
+intensity list columns containing peak data
 }
 \description{
-This function extracts and harmonizes spectra data from a
-Spectra object into a flat data frame format. It handles column name
-inconsistencies, type conversions, and extracts peak lists (mz/intensity).
+Extracts and harmonizes spectra data from a Spectra object into
+a flat data frame format. Handles column name inconsistencies, type
+conversions, and extracts peak lists (mz/intensity).
 }
 \examples{
-NULL
+\dontrun{
+# Extract spectra from a Spectra object
+library(Spectra)
+spectra_df <- extract_spectra(spectra_object)
+
+# Access metadata and peaks
+head(spectra_df)
+peaks <- spectra_df$mz[[1]]  # First spectrum peaks
+}
 }

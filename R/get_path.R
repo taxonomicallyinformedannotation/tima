@@ -1,30 +1,31 @@
-#' @title Get path
+#' @title Resolve file path
 #'
-#' @description This function resolves file paths by checking multiple locations,
-#'     handling the difference between installed packages (where inst/ is removed)
-#'     and development environments (where inst/ exists). It tries paths in order
+#' @description Resolves file paths by checking multiple locations, handling
+#'     the difference between installed packages (where inst/ is removed) and
+#'     development environments (where inst/ exists). Tries paths in order
 #'     until one is found.
 #'
 #' @include get_default_paths.R
 #' @include parse_cli_params.R
 #' @include parse_yaml_params.R
+#' @include validators.R
 #'
-#' @param base_path Character string representing the base path to resolve.
-#'     Can include "inst/" which will be handled appropriately.
+#' @param base_path Base path to resolve. Can include "inst/" which will be
+#'     handled appropriately for installed vs development environments.
 #'
 #' @return Character string of the resolved absolute path that exists
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Resolve a path that may or may not include inst/
+#' resolved <- get_path("inst/params/default.yaml")
+#' # Returns correct path whether in dev or installed package
+#' }
 get_path <- function(base_path) {
-  # Validate input
-  if (
-    is.null(base_path) ||
-      !is.character(base_path) ||
-      length(base_path) != 1L ||
-      nchar(base_path) == 0L
-  ) {
-    stop("Base path must be a non-empty character string")
-  }
+  # Input Validation ----
+  validate_character(base_path, param_name = "base_path", allow_empty = FALSE)
 
   # Try 1: Check if base path exists as-is
   if (file.exists(base_path)) {

@@ -1,32 +1,40 @@
-#' @title Read from SIRIUS zip
+#' @title Read file from SIRIUS zip archive
 #'
-#' @description This function reads specific files from a compressed SIRIUS
-#'     workspace directory. It handles file selection, filtering empty files,
-#'     and parsing tab-delimited data.
+#' @description Reads specific files from a compressed SIRIUS workspace
+#'     directory. Handles file selection, filtering empty files, and
+#'     parsing tab-delimited data.
 #'
-#' @param sirius_zip Character string path to compressed SIRIUS workspace (.zip)
-#' @param file Character string pattern to match files within the archive
+#' @include validators.R
+#'
+#' @param sirius_zip Path to compressed SIRIUS workspace (.zip)
+#' @param file Pattern to match files within the archive
 #'
 #' @return Data frame (tidytable) containing the parsed file contents
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Read formula candidates from SIRIUS workspace
+#' formulas <- read_from_sirius_zip(
+#'   sirius_zip = "path/to/sirius_workspace.zip",
+#'   file = "formula_candidates.tsv"
+#' )
+#' }
 read_from_sirius_zip <- function(sirius_zip, file) {
-  # Validate inputs
-  if (
-    missing(sirius_zip) || !is.character(sirius_zip) || length(sirius_zip) != 1L
-  ) {
-    stop("sirius_zip must be a single character string")
-  }
+  # Input Validation ----
+  validate_character(
+    sirius_zip,
+    param_name = "sirius_zip",
+    allow_empty = FALSE
+  )
 
+  validate_character(file, param_name = "file", allow_empty = FALSE)
+
+  # Validate file exists
   if (!file.exists(sirius_zip)) {
-    stop("SIRIUS zip file not found: ", sirius_zip)
+    stop("SIRIUS zip file not found: ", sirius_zip, call. = FALSE)
   }
-
-  if (missing(file) || !is.character(file) || length(file) != 1L) {
-    stop("file pattern must be a single character string")
-  }
-
-  # logger::log_trace("Reading '", file, "' from SIRIUS archive: ", sirius_zip)
 
   # List archive contents and filter
   matching_file <- sirius_zip |>

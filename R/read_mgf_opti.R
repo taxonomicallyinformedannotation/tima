@@ -85,8 +85,22 @@
 #' @return A DataFrame containing the parsed spectra data with standardized
 #'     variable names
 #'
-#' @examples NULL
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Read MGF file with memory-efficient approach
+#' library(Spectra)
+#' library(MsBackendMgf)
+#'
+#' spectra_data <- read_mgf_opti(
+#'   f = "path/to/spectra.mgf",
+#'   msLevel = 2L
+#' )
+#'
+#' # Create Spectra object from result
+#' sps <- Spectra(spectra_data)
+#' }
 read_mgf_opti <- function(
   f,
   msLevel = 2L,

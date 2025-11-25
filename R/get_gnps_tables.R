@@ -181,7 +181,23 @@ download_gnps_file <- function(url, file_path, file_type) {
 #'
 #' @return A named character vector with paths to the written/available files.
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Download GNPS FBMN results
+#' paths <- get_gnps_tables(
+#'   gnps_job_id = "1234567890abcdef",
+#'   workflow = "fbmn",
+#'   path_features = "data/interim/features/features.tsv",
+#'   path_metadata = "data/source/metadata.tsv",
+#'   path_spectra = "data/interim/annotations/spectra.mgf"
+#' )
+#'
+#' # Access downloaded files
+#' features <- read.delim(paths["features"])
+#' }
+#'
 get_gnps_tables <- function(
   gnps_job_id,
   gnps_job_example = get_default_paths()$gnps$example,

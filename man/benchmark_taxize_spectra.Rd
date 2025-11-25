@@ -2,31 +2,40 @@
 % Please edit documentation in R/benchmark_taxize_spectra.R
 \name{benchmark_taxize_spectra}
 \alias{benchmark_taxize_spectra}
-\title{Benchmark taxize spectra}
+\title{Add taxonomy to benchmark spectra}
 \usage{
 benchmark_taxize_spectra(input, keys, org_tax_ott, output)
 }
 \arguments{
-\item{input}{Character string path to the initial features file}
+\item{input}{Path to the initial features file}
 
-\item{keys}{Character string path to the structure-organism pair (SOP) keys file}
+\item{keys}{Path to the structure-organism pair (SOP) keys file}
 
-\item{org_tax_ott}{Character string path to the organism taxonomy (OTT) file}
+\item{org_tax_ott}{Path to the organism taxonomy (OTT) file}
 
-\item{output}{Character string path for the taxed benchmark output file}
+\item{output}{Path for the taxed benchmark output file}
 }
 \value{
-Character string path to the taxed benchmark file
+Path to the taxed benchmark file
 }
 \description{
-This function adds taxonomic information to benchmark features
-by linking them to structure-organism pairs and organism taxonomy data.
-For features with multiple organism associations, one is randomly selected.
+Adds taxonomic information to benchmark features by linking
+them to structure-organism pairs and organism taxonomy data. For
+features with multiple organism associations, one is randomly selected.
 }
 \details{
-Benchmark data often lacks clean taxonomic assignments. This function
-performs a controlled joining process with random sampling for ambiguous cases.
+Benchmark data often lacks clean taxonomic assignments. This
+function performs a controlled joining process with random sampling
+for ambiguous cases.
 }
 \examples{
-NULL
+\dontrun{
+# Add taxonomy to benchmark data
+taxed_file <- benchmark_taxize_spectra(
+  input = "data/benchmark/features.tsv",
+  keys = "data/sop/keys.tsv",
+  org_tax_ott = "data/taxonomy/org_tax_ott.tsv",
+  output = "data/benchmark/features_taxed.tsv"
+)
+}
 }

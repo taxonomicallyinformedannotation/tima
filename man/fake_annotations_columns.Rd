@@ -2,7 +2,7 @@
 % Please edit documentation in R/fake_annotations_columns.R
 \name{fake_annotations_columns}
 \alias{fake_annotations_columns}
-\title{Fake annotations columns}
+\title{Create template annotation columns}
 \usage{
 fake_annotations_columns()
 }
@@ -12,10 +12,19 @@ with all values set to NA. Columns include feature IDs, structure
 information, scores, and taxonomic classifications.
 }
 \description{
-This function creates a template data frame with all expected
-annotation columns initialized to NA. Used as a fallback when no
-annotations are available or to ensure consistent column structure.
+Creates a template data frame with all expected annotation
+columns initialized to NA. Used as a fallback when no annotations are
+available or to ensure consistent column structure.
 }
 \examples{
-NULL
+\dontrun{
+# Create empty annotation template
+template <- fake_annotations_columns()
+
+# Use as fallback when no annotations found
+if (nrow(annotations) == 0) {
+  annotations <- fake_annotations_columns()
 }
+}
+}
+\keyword{internal}

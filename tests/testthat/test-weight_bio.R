@@ -110,7 +110,7 @@ test_that("weight_bio validates weight parameters", {
       score_biological_species = 0.9,
       score_biological_variety = 1.0
     ),
-    "Weight\\(s\\) must be between 0 and 1.*spectral"
+    "weights must be non-negative. Negative weight(.*): position 1"
   )
 
   # Invalid biological weight
@@ -131,7 +131,7 @@ test_that("weight_bio validates weight parameters", {
       score_biological_species = 0.9,
       score_biological_variety = 1.0
     ),
-    "Weight\\(s\\) must be between 0 and 1.*biological"
+    "Weights must sum to 1.0, got: 2.5"
   )
 })
 
@@ -154,7 +154,7 @@ test_that("weight_bio validates biological score parameters", {
       score_biological_species = 0.9,
       score_biological_variety = 1.0
     ),
-    "Biological score\\(s\\) must be between 0 and 1"
+    "score_biological_domain must be between 0 and 1, got: -0.1"
   )
 })
 

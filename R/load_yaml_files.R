@@ -1,21 +1,30 @@
-#' @title Load yaml files
+#' @title Load YAML parameter files
 #'
-#' @description This function loads YAML parameter files, preferring user-specified
-#'     parameters over defaults when available. It combines default/user params
-#'     with prepare_params files.
+#' @description Loads YAML parameter files, preferring user-specified parameters
+#'     over defaults when available. Combines default/user params with
+#'     prepare_params files.
 #'
 #' @include get_default_paths.R
+#' @include get_path.R
 #'
-#' @return A list containing:
+#' @return List containing:
 #'   \item{yamls_params}{Named list of parsed YAML content}
 #'   \item{yaml_files}{Character vector of file paths}
 #'   \item{yaml_names}{Character vector of parameter names}
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Load all YAML parameter files
+#' params <- load_yaml_files()
+#'
+#' # Access parsed parameters
+#' param_values <- params$yamls_params
+#' param_names <- params$yaml_names
+#' }
 load_yaml_files <- function() {
   # Get Paths and List Files ----
-
-  # logger::log_trace("Loading YAML parameter files")
 
   paths <- get_default_paths()
 

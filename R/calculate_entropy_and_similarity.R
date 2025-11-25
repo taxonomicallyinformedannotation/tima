@@ -21,7 +21,25 @@
 #'
 #' @return Data frame with spectrum IDs, entropy scores, and similarity scores
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Calculate entropy-based similarity
+#' results <- calculate_entropy_and_similarity(
+#'   lib_ids = library_ids,
+#'   lib_precursors = library_mz,
+#'   lib_spectra = library_spectra_list,
+#'   query_ids = feature_ids,
+#'   query_precursors = feature_mz,
+#'   query_spectra = feature_spectra_list,
+#'   method = "entropy",
+#'   dalton = 0.01,
+#'   ppm = 10,
+#'   threshold = 0.7,
+#'   approx = FALSE
+#' )
+#' }
 calculate_entropy_and_similarity <- function(
   lib_ids,
   lib_precursors,

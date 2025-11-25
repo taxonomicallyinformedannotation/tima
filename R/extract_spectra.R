@@ -1,21 +1,33 @@
-#' @title Extract spectra from a Spectra object
+#' @title Extract spectra from Spectra object
 #'
-#' @description This function extracts and harmonizes spectra data from a
-#'     Spectra object into a flat data frame format. It handles column name
-#'     inconsistencies, type conversions, and extracts peak lists (mz/intensity).
+#' @description Extracts and harmonizes spectra data from a Spectra object into
+#'     a flat data frame format. Handles column name inconsistencies, type
+#'     conversions, and extracts peak lists (mz/intensity).
 #'
 #' @param object Spectra object from the Spectra package
 #'
-#' @return Data frame containing harmonized spectra metadata with additional
-#'     mz and intensity list columns containing peak data
+#' @return Data frame containing harmonized spectra metadata with mz and
+#'     intensity list columns containing peak data
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Extract spectra from a Spectra object
+#' library(Spectra)
+#' spectra_df <- extract_spectra(spectra_object)
+#'
+#' # Access metadata and peaks
+#' head(spectra_df)
+#' peaks <- spectra_df$mz[[1]]  # First spectrum peaks
+#' }
 extract_spectra <- function(object) {
   # Input Validation ----
-
-  # Validate input
   if (!inherits(object, "Spectra")) {
-    stop("Input must be a Spectra object from the Spectra package")
+    stop(
+      "Input must be a Spectra object from the Spectra package",
+      call. = FALSE
+    )
   }
 
   # Define Harmonization Mappings ----

@@ -1,22 +1,35 @@
-#' @title Columns model
+#' @title Get standardized column naming schema
 #'
-#' @description This function defines the standardized column naming schema
-#'     used throughout the TIMA package. It organizes columns into logical
-#'     groups for features, candidates, components, and scoring.
+#' @description Defines the standardized column naming schema used throughout
+#'     the TIMA package. Organizes columns into logical groups for features,
+#'     candidates, components, and scoring.
 #'
-#' @return A named list containing character vectors of column names organized by category:
+#' @return Named list containing character vectors of column names by category:
 #'   \item{features_columns}{Basic feature identifiers (ID, m/z, RT)}
-#'   \item{features_calculated_columns}{Calculated feature properties (entropy, taxonomy predictions)}
+#'   \item{features_calculated_columns}{Calculated feature properties}
 #'   \item{candidates_calculated_columns}{Calculated candidate properties}
-#'   \item{candidates_sirius_for_columns}{SIRIUS formula-level annotations}
-#'   \item{candidates_sirius_str_columns}{SIRIUS structure-level scores}
+#'   \item{candidates_sirius_for_columns}{SIRIUS formula annotations}
+#'   \item{candidates_sirius_str_columns}{SIRIUS structure scores}
 #'   \item{candidates_spectra_columns}{Spectral library matching results}
-#'   \item{candidates_structures_columns}{Chemical structure metadata and taxonomy}
+#'   \item{candidates_structures_columns}{Chemical structure metadata}
 #'   \item{components_columns}{Molecular network component IDs}
 #'   \item{rank_columns}{Candidate ranking columns}
 #'   \item{score_columns}{Candidate scoring columns}
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Get column schema
+#' model <- columns_model()
+#'
+#' # Access specific column groups
+#' feature_cols <- model$features_columns
+#' score_cols <- model$score_columns
+#'
+#' # Use in data frame selection
+#' selected <- df |> select(any_of(model$candidates_structures_columns))
+#' }
 columns_model <- function() {
   # Basic feature identifiers ----
   features_columns <- c("feature_id", "feature_mz", "feature_rt")

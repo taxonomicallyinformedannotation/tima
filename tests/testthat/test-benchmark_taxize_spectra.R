@@ -12,7 +12,7 @@ test_that("test-benchmark_taxize_spectra validates input file exists", {
       org_tax_ott = temp_test_path("tax.tsv"),
       output = temp_test_path("out.tsv")
     ),
-    "Input features file not found"
+    "Please verify file paths and ensure all required files are present."
   )
 })
 
@@ -27,7 +27,7 @@ test_that("test-benchmark_taxize_spectra validates keys file exists", {
       org_tax_ott = temp_test_path("tax.tsv"),
       output = temp_test_path("out.tsv")
     ),
-    "Keys file not found"
+    "Please verify file paths and ensure all required files are present."
   )
 })
 
@@ -44,7 +44,7 @@ test_that("test-benchmark_taxize_spectra validates taxonomy file exists", {
       org_tax_ott = temp_test_path("missing.tsv"),
       output = temp_test_path("out.tsv")
     ),
-    "Taxonomy file not found"
+    "Please verify file paths and ensure all required files are present."
   )
 })
 

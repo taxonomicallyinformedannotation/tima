@@ -1,25 +1,33 @@
-#' @title Export spectra RDS
+#' @title Export spectra to RDS file
 #'
-#' @description This function exports a Spectra object to an RDS file format
-#'     for efficient storage and later retrieval. Only exports spectra with
-#'     valid compound IDs.
+#' @description Exports a Spectra object to an RDS file format for efficient
+#'     storage and later retrieval. Only exports spectra with valid compound IDs.
 #'
 #' @include create_dir.R
+#' @include validators.R
 #'
-#' @param file Character string path where spectra will be exported as RDS file
+#' @param file Path where spectra will be exported as RDS file
 #' @param spectra Spectra object containing spectral data to export
 #'
 #' @return NULL (invisibly). Saves spectra to file as a side effect.
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Export spectra to RDS file
+#' library(Spectra)
+#' export_spectra_rds(
+#'   file = "data/processed/spectra.rds",
+#'   spectra = my_spectra_object
+#' )
+#' }
 export_spectra_rds <- function(file, spectra) {
-  # Validate inputs
-  if (missing(file) || !is.character(file) || length(file) != 1L) {
-    stop("file must be a single character string")
-  }
+  # Input Validation ----
+  validate_character(file, param_name = "file", allow_empty = FALSE)
 
-  if (missing(spectra) || !inherits(spectra, "Spectra")) {
-    stop("spectra must be a Spectra object")
+  if (!inherits(spectra, "Spectra")) {
+    stop("spectra must be a Spectra object", call. = FALSE)
   }
 
   # Filter to spectra with valid compound IDs

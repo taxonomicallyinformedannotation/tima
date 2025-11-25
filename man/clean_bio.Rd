@@ -24,7 +24,14 @@ annotation results by calculating chemical consistency scores across
 network neighbors. Only features with at least 2 neighbors are evaluated.
 }
 \examples{
-NULL
+\dontrun{
+# Clean biological annotations by network consistency
+cleaned <- clean_bio(
+  annot_table_wei_bio = bio_weighted_annotations,
+  edges_table = network_edges,
+  minimal_consistency = 0.5
+)
+}
 }
 \seealso{
 weight_bio

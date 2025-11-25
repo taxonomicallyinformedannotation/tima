@@ -2,12 +2,12 @@
 % Please edit documentation in R/export_spectra_rds.R
 \name{export_spectra_rds}
 \alias{export_spectra_rds}
-\title{Export spectra RDS}
+\title{Export spectra to RDS file}
 \usage{
 export_spectra_rds(file, spectra)
 }
 \arguments{
-\item{file}{Character string path where spectra will be exported as RDS file}
+\item{file}{Path where spectra will be exported as RDS file}
 
 \item{spectra}{Spectra object containing spectral data to export}
 }
@@ -15,10 +15,16 @@ export_spectra_rds(file, spectra)
 NULL (invisibly). Saves spectra to file as a side effect.
 }
 \description{
-This function exports a Spectra object to an RDS file format
-for efficient storage and later retrieval. Only exports spectra with
-valid compound IDs.
+Exports a Spectra object to an RDS file format for efficient
+storage and later retrieval. Only exports spectra with valid compound IDs.
 }
 \examples{
-NULL
+\dontrun{
+# Export spectra to RDS file
+library(Spectra)
+export_spectra_rds(
+  file = "data/processed/spectra.rds",
+  spectra = my_spectra_object
+)
+}
 }
