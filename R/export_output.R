@@ -35,7 +35,9 @@ export_output <- function(x, file) {
   nrows <- nrow(x)
   ncols <- ncol(x)
 
-  logger::log_debug("Exporting {format_count(nrows)} rows x {ncols} columns to: {basename(file)}")
+  logger::log_debug(
+    "Exporting {format_count(nrows)} rows x {ncols} columns to: {basename(file)}"
+  )
 
   # Determine compression
   compress_method <- if (grepl("\\.gz$", file, ignore.case = TRUE)) {

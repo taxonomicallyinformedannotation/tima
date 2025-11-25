@@ -259,6 +259,13 @@ DEFAULT_HC_SCORE_SPECTRAL_MIN <- NULL
 #' @export
 DEFAULT_HC_MAX_RT_ERROR_MIN <- 0.05
 
+# InChI Patterns ----
+
+#' InChI stereochemistry layer pattern indicating no stereochemistry
+#' Structures with "-UHFFFAOYSA-" in their InChIKey have no defined stereochemistry
+#' @export
+INCHI_NO_STEREO_PATTERN <- "-UHFFFAOYSA-"
+
 # Helper Functions ----
 
 #' Get a constant value by name with validation
