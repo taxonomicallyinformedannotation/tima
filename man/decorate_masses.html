@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#decorate-masses" id="toc-decorate-masses" class="nav-link active" data-scroll-target="#decorate-masses">Decorate masses</a>
+  <li><a href="#decorate-ms1-annotation-results-with-statistics" id="toc-decorate-ms1-annotation-results-with-statistics" class="nav-link active" data-scroll-target="#decorate-ms1-annotation-results-with-statistics">Decorate MS1 annotation results with statistics</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,17 +693,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="decorate-masses" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="decorate-masses">Decorate masses</h2>
+<section id="decorate-ms1-annotation-results-with-statistics" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="decorate-ms1-annotation-results-with-statistics">Decorate MS1 annotation results with statistics</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function logs summary statistics about MS1-based annotations, reporting the number of unique structures and features annotated</p>
+<p>Logs summary statistics about MS1-based annotations, reporting the number of unique structures and features annotated.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">decorate_masses(
-  annotation_table_ms1 = get("annotation_table_ms1", envir = parent.frame())
-)
+<pre><code class="language-R">decorate_masses(annotation_table_ms1)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -714,24 +712,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="annotation_table_ms1">annotation_table_ms1</code>
 </td>
 <td>
-Data frame containing MS1 annotation results with columns for feature_id and candidate_structure_inchikey_connectivity_layer
+Data frame containing MS1 annotation results with feature_id and candidate_structure_inchikey_connectivity_layer columns
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The input annotation table (unchanged), for use in pipelines</p>
+<p>The input annotation table (unchanged), for pipeline compatibility</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Log statistics and pass through</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>annotations_ms1 <span class="sc">|&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">decorate_masses</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

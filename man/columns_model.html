@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#columns-model" id="toc-columns-model" class="nav-link active" data-scroll-target="#columns-model">Columns model</a>
+  <li><a href="#get-standardized-column-naming-schema" id="toc-get-standardized-column-naming-schema" class="nav-link active" data-scroll-target="#get-standardized-column-naming-schema">Get standardized column naming schema</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -692,11 +692,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="columns-model" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="columns-model">Columns model</h2>
+<section id="get-standardized-column-naming-schema" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="get-standardized-column-naming-schema">Get standardized column naming schema</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function defines the standardized column naming schema used throughout the TIMA package. It organizes columns into logical groups for features, candidates, components, and scoring.</p>
+<p>Defines the standardized column naming schema used throughout the TIMA package. Organizes columns into logical groups for features, candidates, components, and scoring.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -705,7 +705,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A named list containing character vectors of column names organized by category:</p>
+<p>Named list containing character vectors of column names by category:</p>
 <table role="presentation">
 <tbody><tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
@@ -720,7 +720,7 @@ Basic feature identifiers (ID, m/z, RT)
 <code>features_calculated_columns</code>
 </td>
 <td>
-Calculated feature properties (entropy, taxonomy predictions)
+Calculated feature properties
 </td>
 </tr>
 <tr>
@@ -736,7 +736,7 @@ Calculated candidate properties
 <code>candidates_sirius_for_columns</code>
 </td>
 <td>
-SIRIUS formula-level annotations
+SIRIUS formula annotations
 </td>
 </tr>
 <tr>
@@ -744,7 +744,7 @@ SIRIUS formula-level annotations
 <code>candidates_sirius_str_columns</code>
 </td>
 <td>
-SIRIUS structure-level scores
+SIRIUS structure scores
 </td>
 </tr>
 <tr>
@@ -760,7 +760,7 @@ Spectral library matching results
 <code>candidates_structures_columns</code>
 </td>
 <td>
-Chemical structure metadata and taxonomy
+Chemical structure metadata
 </td>
 </tr>
 <tr>
@@ -794,10 +794,15 @@ Candidate scoring columns
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get column schema</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">columns_model</span>()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Access specific column groups</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>feature_cols <span class="ot">&lt;-</span> model<span class="sc">$</span>features_columns</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>score_cols <span class="ot">&lt;-</span> model<span class="sc">$</span>score_columns</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Use in data frame selection</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>selected <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="fu">any_of</span>(model<span class="sc">$</span>candidates_structures_columns))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

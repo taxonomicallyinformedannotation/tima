@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#split-structure-organism-pairs-table" id="toc-split-structure-organism-pairs-table" class="nav-link active" data-scroll-target="#split-structure-organism-pairs-table">Split Structure Organism Pairs table</a>
+  <li><a href="#split-structure-organism-pairs-table" id="toc-split-structure-organism-pairs-table" class="nav-link active" data-scroll-target="#split-structure-organism-pairs-table">Split structure-organism pairs table</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -694,10 +694,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <section id="split-structure-organism-pairs-table" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="split-structure-organism-pairs-table">Split Structure Organism Pairs table</h2>
+<h2 class="unnumbered anchored" data-anchor-id="split-structure-organism-pairs-table">Split structure-organism pairs table</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function splits a concatenated structure-organism pairs (SOP) table into separate standardized tables for structures, organisms, and their relationships. It processes SMILES strings, standardizes chemical structures, and creates normalized reference tables.</p>
+<p>Splits a concatenated structure-organism pairs (SOP) table into separate normalized tables for structures, organisms, and their relationships. Processes SMILES strings and creates standardized reference tables.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -720,14 +720,14 @@ Data frame containing combined structure-organism pair data with columns for str
 <code id="cache">cache</code>
 </td>
 <td>
-Character string path to cache file where previously processed SMILES are stored, or NULL to skip caching
+Path to cache file for previously processed SMILES, or NULL to skip caching
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A list of normalized data frames:</p>
+<p>List of normalized data frames:</p>
 <table role="presentation">
 <tbody><tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
@@ -768,10 +768,15 @@ Processed and standardized structure data
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Split concatenated library</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">split_tables_sop</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">table =</span> combined_sop_data,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cache =</span> <span class="st">"data/processed_smiles.tsv"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Access individual tables</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>structures <span class="ot">&lt;-</span> result<span class="sc">$</span>table_structural</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>organisms <span class="ot">&lt;-</span> result<span class="sc">$</span>table_organisms</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

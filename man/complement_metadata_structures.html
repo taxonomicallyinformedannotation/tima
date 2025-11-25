@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#complement-metadata-of-structures" id="toc-complement-metadata-of-structures" class="nav-link active" data-scroll-target="#complement-metadata-of-structures">Complement metadata of structures</a>
+  <li><a href="#complement-structural-metadata" id="toc-complement-structural-metadata" class="nav-link active" data-scroll-target="#complement-structural-metadata">Complement structural metadata</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,21 +693,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="complement-metadata-of-structures" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="complement-metadata-of-structures">Complement metadata of structures</h2>
+<section id="complement-structural-metadata" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="complement-structural-metadata">Complement structural metadata</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function complements structural metadata by joining stereochemistry, metadata, names, and chemical taxonomy information from reference libraries. Enriches annotation results with comprehensive structure information.</p>
+<p>Complements structural metadata by joining stereochemistry, metadata, names, and chemical taxonomy from reference libraries. Enriches annotation results with comprehensive structure information.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <pre><code class="language-R">complement_metadata_structures(
   df,
-  str_stereo = get("str_stereo", envir = parent.frame()),
-  str_met = get("str_met", envir = parent.frame()),
-  str_nam = get("str_nam", envir = parent.frame()),
-  str_tax_cla = get("str_tax_cla", envir = parent.frame()),
-  str_tax_npc = get("str_tax_npc", envir = parent.frame())
+  str_stereo,
+  str_met,
+  str_nam,
+  str_tax_cla,
+  str_tax_npc
 )
 </code></pre>
 </section>
@@ -719,7 +719,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Data frame with structural metadata to be complemented
+Data frame with structural metadata to complement
 </td>
 </tr>
 <tr>
@@ -727,7 +727,7 @@ Data frame with structural metadata to be complemented
 <code id="str_stereo">str_stereo</code>
 </td>
 <td>
-Character string path to file with structure stereochemistry
+Path to structure stereochemistry file
 </td>
 </tr>
 <tr>
@@ -735,7 +735,7 @@ Character string path to file with structure stereochemistry
 <code id="str_met">str_met</code>
 </td>
 <td>
-Character string path to file with structure metadata
+Path to structure metadata file
 </td>
 </tr>
 <tr>
@@ -743,7 +743,7 @@ Character string path to file with structure metadata
 <code id="str_nam">str_nam</code>
 </td>
 <td>
-Character string path to file with structure names
+Path to structure names file
 </td>
 </tr>
 <tr>
@@ -751,7 +751,7 @@ Character string path to file with structure names
 <code id="str_tax_cla">str_tax_cla</code>
 </td>
 <td>
-Character string path to file with ClassyFire taxonomy
+Path to ClassyFire taxonomy file
 </td>
 </tr>
 <tr>
@@ -759,7 +759,7 @@ Character string path to file with ClassyFire taxonomy
 <code id="str_tax_npc">str_tax_npc</code>
 </td>
 <td>
-Character string path to file with NPClassifier taxonomy
+Path to NPClassifier taxonomy file
 </td>
 </tr>
 </tbody></table>
@@ -773,10 +773,14 @@ Character string path to file with NPClassifier taxonomy
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>enriched <span class="ot">&lt;-</span> <span class="fu">complement_metadata_structures</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">df =</span> annotations,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_stereo =</span> <span class="st">"data/str_stereo.tsv"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_met =</span> <span class="st">"data/str_metadata.tsv"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_nam =</span> <span class="st">"data/str_names.tsv"</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_cla =</span> <span class="st">"data/str_tax_classyfire.tsv"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_npc =</span> <span class="st">"data/str_tax_npclassifier.tsv"</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

@@ -677,7 +677,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#process-smiles" id="toc-process-smiles" class="nav-link active" data-scroll-target="#process-smiles">Process SMILES</a>
+  <li><a href="#process-smiles-strings" id="toc-process-smiles-strings" class="nav-link active" data-scroll-target="#process-smiles-strings">Process SMILES strings</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -695,11 +695,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="process-smiles" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="process-smiles">Process SMILES</h2>
+<section id="process-smiles-strings" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="process-smiles-strings">Process SMILES strings</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function processes SMILES strings using RDKit (via Python) to standardize structures, generate InChIKeys, calculate molecular properties, and extract 2D representations. Results are cached to avoid reprocessing.</p>
+<p>Processes SMILES using RDKit (via Python) to standardize structures, generate InChIKeys, calculate molecular properties, and extract 2D representations. Results are cached to avoid reprocessing.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -714,7 +714,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Data frame containing SMILES strings to process
+Data frame containing SMILES strings
 </td>
 </tr>
 <tr>
@@ -722,7 +722,7 @@ Data frame containing SMILES strings to process
 <code id="smiles_colname">smiles_colname</code>
 </td>
 <td>
-Character string name of the column containing SMILES (default: "structure_smiles_initial")
+Column name containing SMILES (default: "structure_smiles_initial")
 </td>
 </tr>
 <tr>
@@ -730,7 +730,7 @@ Character string name of the column containing SMILES (default: "structure_smile
 <code id="cache">cache</code>
 </td>
 <td>
-Character string path to cached processed SMILES file, or NULL to skip caching (default: NULL)
+Path to cached processed SMILES file, or NULL to skip caching
 </td>
 </tr>
 </tbody></table>
@@ -745,10 +745,8 @@ Character string path to cached processed SMILES file, or NULL to skip caching (
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>smiles <span class="ot">&lt;-</span> <span class="st">"C=C[C@H]1[C@H](OC=C2C1=CCOC2=O)O[C@H]3[C@H]([C@H]([C@H]([C@H](O3)CO)O)O)O"</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"structure_smiles_initial"</span> <span class="ot">=</span> smiles</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">process_smiles</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">structure_smiles_initial =</span> smiles)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">process_smiles</span>(df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

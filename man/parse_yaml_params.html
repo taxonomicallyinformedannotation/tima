@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#parse-yaml-parameters" id="toc-parse-yaml-parameters" class="nav-link active" data-scroll-target="#parse-yaml-parameters">Parse YAML parameters</a>
+  <li><a href="#parse-yaml-parameter-files" id="toc-parse-yaml-parameter-files" class="nav-link active" data-scroll-target="#parse-yaml-parameter-files">Parse YAML parameter files</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,18 +693,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="parse-yaml-parameters" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="parse-yaml-parameters">Parse YAML parameters</h2>
+<section id="parse-yaml-parameter-files" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="parse-yaml-parameter-files">Parse YAML parameter files</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function parses YAML parameter files, loading default parameters and optionally overriding them with user-specified values.</p>
+<p>Parses YAML parameter files, loading default parameters and optionally overriding them with user-specified values.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">parse_yaml_params(
-  def = get("default_path", envir = parent.frame()),
-  usr = get("user_path", envir = parent.frame())
-)
+<pre><code class="language-R">parse_yaml_params(def, usr = NULL)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -715,7 +712,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="def">def</code>
 </td>
 <td>
-Character string path to the default YAML parameters file
+Path to the default YAML parameters file
 </td>
 </tr>
 <tr>
@@ -723,24 +720,25 @@ Character string path to the default YAML parameters file
 <code id="usr">usr</code>
 </td>
 <td>
-Character string path to the user-specified YAML parameters file (optional). If it exists, it will override default values.
+Path to the user-specified YAML parameters file (optional). If it exists, it will override default values.
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A list containing the parameters specified in the YAML files</p>
+<p>List containing the parameters specified in the YAML files</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load parameters</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>params <span class="ot">&lt;-</span> <span class="fu">parse_yaml_params</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">def =</span> <span class="st">"params/default_params.yaml"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">usr =</span> <span class="st">"params/user_params.yaml"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

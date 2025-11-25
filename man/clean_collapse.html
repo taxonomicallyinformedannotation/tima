@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#clean-collapse" id="toc-clean-collapse" class="nav-link active" data-scroll-target="#clean-collapse">Clean collapse</a>
+  <li><a href="#collapse-and-clean-grouped-data" id="toc-collapse-and-clean-grouped-data" class="nav-link active" data-scroll-target="#collapse-and-clean-grouped-data">Collapse and clean grouped data</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="clean-collapse" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="clean-collapse">Clean collapse</h2>
+<section id="collapse-and-clean-grouped-data" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="collapse-and-clean-grouped-data">Collapse and clean grouped data</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function collapses a grouped dataframe and trims it. It removes NA values, collapses unique values with a separator, trims whitespace, and converts empty strings to NA.</p>
+<p>Collapses grouped dataframe by combining unique values per group. Removes NA values, trims whitespace, and converts empty strings to NA. Useful for aggregating annotations or metadata.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -712,7 +712,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="grouped_df">grouped_df</code>
 </td>
 <td>
-Grouped dataframe to be collapsed
+Grouped data frame to collapse
 </td>
 </tr>
 <tr>
@@ -720,7 +720,7 @@ Grouped dataframe to be collapsed
 <code id="cols">cols</code>
 </td>
 <td>
-Character vector of column name(s) to apply collapse to. If NULL (default), applies to all columns.
+Character vector of column names to collapse. If NULL (default), applies to all columns.
 </td>
 </tr>
 <tr>
@@ -728,24 +728,27 @@ Character vector of column name(s) to apply collapse to. If NULL (default), appl
 <code id="separator">separator</code>
 </td>
 <td>
-Character string used to separate collapsed values. Default: " $ "
+Character string separator for collapsed values (default: " $ ")
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A cleaned and collapsed dataframe with unique values collapsed per group</p>
+<p>Data frame with unique values collapsed per group</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytable)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">group =</span> <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"B"</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"x"</span>, <span class="st">"x"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>grouped <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span> <span class="fu">group_by</span>(group)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">clean_collapse</span>(grouped, <span class="at">cols =</span> <span class="st">"value"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

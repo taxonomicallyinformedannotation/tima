@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#prepare-params" id="toc-prepare-params" class="nav-link active" data-scroll-target="#prepare-params">Prepare params</a>
+  <li><a href="#prepare-workflow-parameters" id="toc-prepare-workflow-parameters" class="nav-link active" data-scroll-target="#prepare-workflow-parameters">Prepare workflow parameters</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="prepare-params" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="prepare-params">Prepare params</h2>
+<section id="prepare-workflow-parameters" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="prepare-workflow-parameters">Prepare workflow parameters</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function prepares and validates main parameters for the TIMA workflow. It loads YAML configuration files, extracts all parameters, and sets up the parameter structure for downstream analysis steps.</p>
+<p>Prepares and validates main parameters for the TIMA workflow. Loads YAML configuration files, extracts all parameters, and sets up the parameter structure for downstream analysis steps.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -732,7 +732,7 @@ List of advanced parameters for the workflow
 <code id="step">step</code>
 </td>
 <td>
-Character string specifying the workflow step (default: NA)
+Workflow step identifier (default: NA)
 </td>
 </tr>
 </tbody></table>
@@ -746,10 +746,14 @@ Character string specifying the workflow step (default: NA)
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare parameters for TIMA workflow</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>param_files <span class="ot">&lt;-</span> <span class="fu">prepare_params</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">params_small =</span> <span class="fu">get_params</span>(<span class="at">step =</span> <span class="st">"prepare_params"</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">params_advanced =</span> <span class="fu">get_params</span>(<span class="at">step =</span> <span class="st">"prepare_params_advanced"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameters are exported to timestamped files</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># and can be loaded later for reproducibility</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

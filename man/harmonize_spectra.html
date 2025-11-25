@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#harmonize-spectra" id="toc-harmonize-spectra" class="nav-link active" data-scroll-target="#harmonize-spectra">Harmonize spectra</a>
+  <li><a href="#harmonize-spectra-metadata" id="toc-harmonize-spectra-metadata" class="nav-link active" data-scroll-target="#harmonize-spectra-metadata">Harmonize spectra metadata</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,35 +693,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="harmonize-spectra" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="harmonize-spectra">Harmonize spectra</h2>
+<section id="harmonize-spectra-metadata" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="harmonize-spectra-metadata">Harmonize spectra metadata</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function harmonizes spectra header fields by mapping library-specific column names to standardized field names. It handles different naming conventions across spectral libraries and ensures consistent metadata structure.</p>
+<p>Harmonizes spectra header fields by mapping library-specific column names to standardized field names. Handles different naming conventions across spectral libraries.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <pre><code class="language-R">harmonize_spectra(
   spectra,
-  metad = get("metad", envir = parent.frame()),
+  metad,
   mode,
-  col_ad = get("col_ad", envir = parent.frame()),
-  col_ce = get("col_ce", envir = parent.frame()),
-  col_ci = get("col_ci", envir = parent.frame()),
-  col_em = get("col_em", envir = parent.frame()),
-  col_in = get("col_in", envir = parent.frame()),
-  col_io = get("col_io", envir = parent.frame()),
-  col_ik = get("col_ik", envir = parent.frame()),
-  col_il = get("col_il", envir = parent.frame()),
-  col_mf = get("col_mf", envir = parent.frame()),
-  col_na = get("col_na", envir = parent.frame()),
-  col_po = get("col_po", envir = parent.frame()),
-  col_sm = get("col_sm", envir = parent.frame()),
-  col_sn = get("col_sn", envir = parent.frame()),
-  col_si = get("col_si", envir = parent.frame()),
-  col_sp = get("col_sp", envir = parent.frame()),
-  col_sy = get("col_sy", envir = parent.frame()),
-  col_xl = get("col_xl", envir = parent.frame())
+  col_ad,
+  col_ce,
+  col_ci,
+  col_em,
+  col_in,
+  col_io,
+  col_ik,
+  col_il,
+  col_mf,
+  col_na,
+  col_po,
+  col_sm,
+  col_sn,
+  col_si,
+  col_sp,
+  col_sy,
+  col_xl
 )
 </code></pre>
 </section>
@@ -733,7 +733,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="spectra">spectra</code>
 </td>
 <td>
-Data frame containing spectra data to be harmonized
+Data frame containing spectra to harmonize
 </td>
 </tr>
 <tr>
@@ -741,7 +741,7 @@ Data frame containing spectra data to be harmonized
 <code id="metad">metad</code>
 </td>
 <td>
-Metadata to identify the library source
+Metadata identifying the library source
 </td>
 </tr>
 <tr>
@@ -749,7 +749,7 @@ Metadata to identify the library source
 <code id="mode">mode</code>
 </td>
 <td>
-MS ionization mode. Must contain ‘pos’ or ‘neg’
+MS ionization mode (must contain ‘pos’ or ‘neg’)
 </td>
 </tr>
 <tr>
@@ -757,7 +757,7 @@ MS ionization mode. Must contain ‘pos’ or ‘neg’
 <code id="col_ad">col_ad</code>
 </td>
 <td>
-Name of the adduct field in the input spectra
+Adduct field name
 </td>
 </tr>
 <tr>
@@ -765,7 +765,7 @@ Name of the adduct field in the input spectra
 <code id="col_ce">col_ce</code>
 </td>
 <td>
-Name of the collision energy field
+Collision energy field name
 </td>
 </tr>
 <tr>
@@ -773,7 +773,7 @@ Name of the collision energy field
 <code id="col_ci">col_ci</code>
 </td>
 <td>
-Name of the compound ID field
+Compound ID field name
 </td>
 </tr>
 <tr>
@@ -781,7 +781,7 @@ Name of the compound ID field
 <code id="col_em">col_em</code>
 </td>
 <td>
-Name of the exact mass field
+Exact mass field name
 </td>
 </tr>
 <tr>
@@ -789,7 +789,7 @@ Name of the exact mass field
 <code id="col_in">col_in</code>
 </td>
 <td>
-Name of the InChI field
+InChI field name
 </td>
 </tr>
 <tr>
@@ -797,7 +797,7 @@ Name of the InChI field
 <code id="col_io">col_io</code>
 </td>
 <td>
-Name of the InChI without stereochemistry field
+InChI without stereochemistry field name
 </td>
 </tr>
 <tr>
@@ -805,7 +805,7 @@ Name of the InChI without stereochemistry field
 <code id="col_ik">col_ik</code>
 </td>
 <td>
-Name of the InChIKey field
+InChIKey field name
 </td>
 </tr>
 <tr>
@@ -813,7 +813,7 @@ Name of the InChIKey field
 <code id="col_il">col_il</code>
 </td>
 <td>
-Name of the InChIKey connectivity layer field
+InChIKey connectivity layer field name
 </td>
 </tr>
 <tr>
@@ -821,7 +821,7 @@ Name of the InChIKey connectivity layer field
 <code id="col_mf">col_mf</code>
 </td>
 <td>
-Name of the molecular formula field
+Molecular formula field name
 </td>
 </tr>
 <tr>
@@ -829,7 +829,7 @@ Name of the molecular formula field
 <code id="col_na">col_na</code>
 </td>
 <td>
-Name of the compound name field
+Compound name field name
 </td>
 </tr>
 <tr>
@@ -837,7 +837,7 @@ Name of the compound name field
 <code id="col_po">col_po</code>
 </td>
 <td>
-Name of the polarity field
+Polarity field name
 </td>
 </tr>
 <tr>
@@ -845,7 +845,7 @@ Name of the polarity field
 <code id="col_sm">col_sm</code>
 </td>
 <td>
-Name of the SMILES field
+SMILES field name
 </td>
 </tr>
 <tr>
@@ -853,7 +853,7 @@ Name of the SMILES field
 <code id="col_sn">col_sn</code>
 </td>
 <td>
-Name of the SMILES without stereochemistry field
+SMILES without stereochemistry field name
 </td>
 </tr>
 <tr>
@@ -861,7 +861,7 @@ Name of the SMILES without stereochemistry field
 <code id="col_si">col_si</code>
 </td>
 <td>
-Name of the spectrum ID field
+Spectrum ID field name
 </td>
 </tr>
 <tr>
@@ -869,7 +869,7 @@ Name of the spectrum ID field
 <code id="col_sp">col_sp</code>
 </td>
 <td>
-Name of the SPLASH field
+SPLASH field name
 </td>
 </tr>
 <tr>
@@ -877,7 +877,7 @@ Name of the SPLASH field
 <code id="col_sy">col_sy</code>
 </td>
 <td>
-Name of the synonyms field
+Synonyms field name
 </td>
 </tr>
 <tr>
@@ -885,24 +885,29 @@ Name of the synonyms field
 <code id="col_xl">col_xl</code>
 </td>
 <td>
-Name of the xLogP field
+xLogP field name
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A data frame with harmonized column names and standardized field names</p>
+<p>Data frame with harmonized column names and standardized fields</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>harmonized <span class="ot">&lt;-</span> <span class="fu">harmonize_spectra</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> raw_spectra,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">metad =</span> <span class="st">"GNPS"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mode =</span> <span class="st">"positive"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_na =</span> <span class="st">"Compound_Name"</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_sm =</span> <span class="st">"SMILES"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_ik =</span> <span class="st">"InChIKey"</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ... other column mappings</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#go-to-cache-directory" id="toc-go-to-cache-directory" class="nav-link active" data-scroll-target="#go-to-cache-directory">Go to Cache Directory</a>
+  <li><a href="#navigate-to-cache-directory" id="toc-navigate-to-cache-directory" class="nav-link active" data-scroll-target="#navigate-to-cache-directory">Navigate to cache directory</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -694,11 +694,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="go-to-cache-directory" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="go-to-cache-directory">Go to Cache Directory</h2>
+<section id="navigate-to-cache-directory" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="navigate-to-cache-directory">Navigate to cache directory</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>Creates a cache directory in the user’s home directory (if it doesn’t already exist) and changes the working directory to it. This is useful for storing temporary files, intermediate results, and downloaded data in a consistent location across sessions.</p>
+<p>Creates and navigates to a cache directory in the user’s home directory. Useful for storing temporary files, intermediate results, and downloaded data in a consistent location across sessions.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -713,51 +713,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="dir">dir</code>
 </td>
 <td>
-Character string name of the cache directory (default: ".tima"). Will be created in the user’s home directory. Must be non-empty.
+Character string name of cache directory (default: ".tima"). Created in user’s home directory. Must be non-empty.
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>The function performs the following operations:</p>
+<p>The function:</p>
 <ul>
 <li>
-<p>Validates the cache directory name</p>
+<p>Constructs full path in user’s home directory</p>
 </li>
 <li>
-<p>Constructs the full path in the user’s home directory</p>
+<p>Creates directory if it doesn’t exist</p>
 </li>
 <li>
-<p>Creates the directory if it doesn’t exist</p>
+<p>Changes working directory to cache location</p>
 </li>
 <li>
-<p>Changes the working directory to the cache location</p>
-</li>
-<li>
-<p>Logs all operations for debugging</p>
+<p>Logs all operations</p>
 </li>
 </ul>
-<p>The cache directory is created with appropriate permissions and will persist across R sessions until explicitly deleted.</p>
+<p>Cache directory persists across R sessions until explicitly deleted.</p>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Character string path to the cache directory (invisibly). Changes working directory as side effect.</p>
+<p>Path to cache directory (invisibly). Changes working directory as side effect.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create and navigate to default cache directory (~/.tima)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Default cache (~/.tima)</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">go_to_cache</span>()</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Use custom cache directory name</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">go_to_cache</span>(<span class="at">dir =</span> <span class="st">".my_project_cache"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom cache</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">go_to_cache</span>(<span class="at">dir =</span> <span class="st">".my_cache"</span>)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Store the cache path for reference</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>cache_path <span class="ot">&lt;-</span> <span class="fu">go_to_cache</span>()</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(cache_path)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Store path</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>cache_path <span class="ot">&lt;-</span> <span class="fu">go_to_cache</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

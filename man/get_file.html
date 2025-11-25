@@ -677,7 +677,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#get-file" id="toc-get-file" class="nav-link active" data-scroll-target="#get-file">Get file</a>
+  <li><a href="#download-file-from-url" id="toc-download-file-from-url" class="nav-link active" data-scroll-target="#download-file-from-url">Download file from URL</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -695,11 +695,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="get-file" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="get-file">Get file</h2>
+<section id="download-file-from-url" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="download-file-from-url">Download file from URL</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function downloads files from a URL with retry logic and exponential backoff.</p>
+<p>Downloads a file from a URL with robust error handling, retry logic, and validation. Automatically creates necessary directories and validates downloaded content. Skips download if file already exists.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -714,7 +714,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="url">url</code>
 </td>
 <td>
-Character string URL of the file to be downloaded
+Character string URL of the file to download
 </td>
 </tr>
 <tr>
@@ -730,29 +730,24 @@ Character string file path where the file should be saved
 <code id="limit">limit</code>
 </td>
 <td>
-Integer timeout limit in seconds (default: 3600)
+Integer timeout limit in seconds (default: 3600 = 1 hour)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the downloaded file</p>
+<p>Path to the downloaded file (invisibly)</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>git <span class="ot">&lt;-</span> <span class="st">"https://github.com/"</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>org <span class="ot">&lt;-</span> <span class="st">"taxonomicallyinformedannotation"</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>repo <span class="ot">&lt;-</span> <span class="st">"tima-example-files"</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>branch <span class="ot">&lt;-</span> <span class="st">"main"</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="st">"example_metadata.tsv"</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">url =</span> <span class="fu">paste</span>(git, org, repo, <span class="st">"raw"</span>, branch, file, <span class="at">sep =</span> <span class="st">"/"</span>),</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">export =</span> <span class="st">"data/source/example_metadata.tsv"</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">url =</span> <span class="st">"https://example.com/data.tsv"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">export =</span> <span class="st">"data/source/data.tsv"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

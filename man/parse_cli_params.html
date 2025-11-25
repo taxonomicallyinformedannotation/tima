@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#parse-cli-parameters" id="toc-parse-cli-parameters" class="nav-link active" data-scroll-target="#parse-cli-parameters">Parse CLI parameters</a>
+  <li><a href="#parse-command-line-interface-parameters" id="toc-parse-command-line-interface-parameters" class="nav-link active" data-scroll-target="#parse-command-line-interface-parameters">Parse command-line interface parameters</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="parse-cli-parameters" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="parse-cli-parameters">Parse CLI parameters</h2>
+<section id="parse-command-line-interface-parameters" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="parse-command-line-interface-parameters">Parse command-line interface parameters</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function parses command-line interface (CLI) arguments and merges them into the parameter configuration structure. It uses a mapping system to translate CLI argument names to their corresponding nested paths in the parameters list, applying appropriate type conversions.</p>
+<p>Parses command-line interface (CLI) arguments and merges them into the parameter configuration structure. Uses a mapping system to translate CLI argument names to their corresponding nested paths in the parameters list, applying appropriate type conversions.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -727,17 +727,23 @@ Nested list of default parameters to be updated with CLI values
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Updated parameters list with CLI arguments merged in, maintaining the nested structure and applying type conversions as specified in the mappings</p>
+<p>Updated parameters list with CLI arguments merged in, maintaining the nested structure and applying type conversions</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse CLI arguments into parameters</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(docopt)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>cli_args <span class="ot">&lt;-</span> <span class="fu">docopt</span>(doc)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>default_params <span class="ot">&lt;-</span> <span class="fu">load_yaml_files</span>()<span class="sc">$</span>yamls_params</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge CLI arguments with defaults</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>final_params <span class="ot">&lt;-</span> <span class="fu">parse_cli_params</span>(</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">arguments =</span> cli_args,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">parameters =</span> default_params</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

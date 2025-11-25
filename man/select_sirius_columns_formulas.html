@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#select-sirius-columns-formulas" id="toc-select-sirius-columns-formulas" class="nav-link active" data-scroll-target="#select-sirius-columns-formulas">Select sirius columns (formulas)</a>
+  <li><a href="#select-sirius-formula-columns" id="toc-select-sirius-formula-columns" class="nav-link active" data-scroll-target="#select-sirius-formula-columns">Select SIRIUS formula columns</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="select-sirius-columns-formulas" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="select-sirius-columns-formulas">Select sirius columns (formulas)</h2>
+<section id="select-sirius-formula-columns" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="select-sirius-formula-columns">Select SIRIUS formula columns</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function selects sirius columns (formulas)</p>
+<p>Selects and standardizes SIRIUS formula-level columns, extracting molecular formula candidates and their scores.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -712,7 +712,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Dataframe
+Data frame with SIRIUS formula results
 </td>
 </tr>
 <tr>
@@ -720,24 +720,25 @@ Dataframe
 <code id="sirius_version">sirius_version</code>
 </td>
 <td>
-Sirius version
+SIRIUS version ("5" or "6")
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The dataframe with selected sirius columns</p>
+<p>Data frame with standardized formula column names</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize SIRIUS formula columns</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">select_sirius_columns_formulas</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">df =</span> sirius_formulas,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius_version =</span> <span class="st">"6"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

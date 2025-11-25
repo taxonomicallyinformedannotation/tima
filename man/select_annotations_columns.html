@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#select-annotations-columns" id="toc-select-annotations-columns" class="nav-link active" data-scroll-target="#select-annotations-columns">Select annotations columns</a>
+  <li><a href="#select-and-standardize-annotation-columns" id="toc-select-and-standardize-annotation-columns" class="nav-link active" data-scroll-target="#select-and-standardize-annotation-columns">Select and standardize annotation columns</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,21 +693,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="select-annotations-columns" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="select-annotations-columns">Select annotations columns</h2>
+<section id="select-and-standardize-annotation-columns" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="select-and-standardize-annotation-columns">Select and standardize annotation columns</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function selects and standardizes annotation columns by filtering to relevant fields, cleaning NULL/NA values, rounding numeric values, and complementing with structure metadata. Used to prepare annotation results for downstream analysis.</p>
+<p>Selects and standardizes annotation columns by filtering to relevant fields, cleaning NULL/NA values, rounding numeric values, and complementing with structure metadata.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <pre><code class="language-R">select_annotations_columns(
   df,
-  str_stereo = get("str_stereo", envir = parent.frame()),
-  str_met = get("str_met", envir = parent.frame()),
-  str_nam = get("str_nam", envir = parent.frame()),
-  str_tax_cla = get("str_tax_cla", envir = parent.frame()),
-  str_tax_npc = get("str_tax_npc", envir = parent.frame())
+  str_stereo,
+  str_met,
+  str_nam,
+  str_tax_cla,
+  str_tax_npc
 )
 </code></pre>
 </section>
@@ -727,7 +727,7 @@ Data frame containing annotation results with structure and candidate informatio
 <code id="str_stereo">str_stereo</code>
 </td>
 <td>
-Character string path to file containing structure stereochemistry
+Path to structure stereochemistry file
 </td>
 </tr>
 <tr>
@@ -735,7 +735,7 @@ Character string path to file containing structure stereochemistry
 <code id="str_met">str_met</code>
 </td>
 <td>
-Character string path to file containing structure metadata
+Path to structure metadata file
 </td>
 </tr>
 <tr>
@@ -743,7 +743,7 @@ Character string path to file containing structure metadata
 <code id="str_nam">str_nam</code>
 </td>
 <td>
-Character string path to file containing structure names
+Path to structure names file
 </td>
 </tr>
 <tr>
@@ -751,7 +751,7 @@ Character string path to file containing structure names
 <code id="str_tax_cla">str_tax_cla</code>
 </td>
 <td>
-Character string path to file containing Classyfire taxonomy
+Path to ClassyFire taxonomy file
 </td>
 </tr>
 <tr>
@@ -759,7 +759,7 @@ Character string path to file containing Classyfire taxonomy
 <code id="str_tax_npc">str_tax_npc</code>
 </td>
 <td>
-Character string path to file containing NPClassifier taxonomy
+Path to NPClassifier taxonomy file
 </td>
 </tr>
 </tbody></table>
@@ -773,10 +773,14 @@ Character string path to file containing NPClassifier taxonomy
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">select_annotations_columns</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">df =</span> annotations,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_stereo =</span> <span class="st">"data/str_stereo.tsv"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_met =</span> <span class="st">"data/str_metadata.tsv"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_nam =</span> <span class="st">"data/str_names.tsv"</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_cla =</span> <span class="st">"data/str_tax_classyfire.tsv"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_npc =</span> <span class="st">"data/str_tax_npclassifier.tsv"</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

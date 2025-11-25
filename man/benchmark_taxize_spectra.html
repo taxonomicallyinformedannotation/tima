@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#benchmark-taxize-spectra" id="toc-benchmark-taxize-spectra" class="nav-link active" data-scroll-target="#benchmark-taxize-spectra">Benchmark taxize spectra</a>
+  <li><a href="#add-taxonomy-to-benchmark-spectra" id="toc-add-taxonomy-to-benchmark-spectra" class="nav-link active" data-scroll-target="#add-taxonomy-to-benchmark-spectra">Add taxonomy to benchmark spectra</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -694,11 +694,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="benchmark-taxize-spectra" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="benchmark-taxize-spectra">Benchmark taxize spectra</h2>
+<section id="add-taxonomy-to-benchmark-spectra" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="add-taxonomy-to-benchmark-spectra">Add taxonomy to benchmark spectra</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function adds taxonomic information to benchmark features by linking them to structure-organism pairs and organism taxonomy data. For features with multiple organism associations, one is randomly selected.</p>
+<p>Adds taxonomic information to benchmark features by linking them to structure-organism pairs and organism taxonomy data. For features with multiple organism associations, one is randomly selected.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -713,7 +713,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="input">input</code>
 </td>
 <td>
-Character string path to the initial features file
+Path to the initial features file
 </td>
 </tr>
 <tr>
@@ -721,7 +721,7 @@ Character string path to the initial features file
 <code id="keys">keys</code>
 </td>
 <td>
-Character string path to the structure-organism pair (SOP) keys file
+Path to the structure-organism pair (SOP) keys file
 </td>
 </tr>
 <tr>
@@ -729,7 +729,7 @@ Character string path to the structure-organism pair (SOP) keys file
 <code id="org_tax_ott">org_tax_ott</code>
 </td>
 <td>
-Character string path to the organism taxonomy (OTT) file
+Path to the organism taxonomy (OTT) file
 </td>
 </tr>
 <tr>
@@ -737,7 +737,7 @@ Character string path to the organism taxonomy (OTT) file
 <code id="output">output</code>
 </td>
 <td>
-Character string path for the taxed benchmark output file
+Path for the taxed benchmark output file
 </td>
 </tr>
 </tbody></table>
@@ -748,17 +748,20 @@ Character string path for the taxed benchmark output file
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Character string path to the taxed benchmark file</p>
+<p>Path to the taxed benchmark file</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Add taxonomy to benchmark data</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>taxed_file <span class="ot">&lt;-</span> <span class="fu">benchmark_taxize_spectra</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">input =</span> <span class="st">"data/benchmark/features.tsv"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">keys =</span> <span class="st">"data/sop/keys.tsv"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">org_tax_ott =</span> <span class="st">"data/taxonomy/org_tax_ott.tsv"</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">output =</span> <span class="st">"data/benchmark/features_taxed.tsv"</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

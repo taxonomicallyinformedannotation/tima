@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#read-from-sirius-zip" id="toc-read-from-sirius-zip" class="nav-link active" data-scroll-target="#read-from-sirius-zip">Read from SIRIUS zip</a>
+  <li><a href="#read-file-from-sirius-zip-archive" id="toc-read-file-from-sirius-zip-archive" class="nav-link active" data-scroll-target="#read-file-from-sirius-zip-archive">Read file from SIRIUS zip archive</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="read-from-sirius-zip" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="read-from-sirius-zip">Read from SIRIUS zip</h2>
+<section id="read-file-from-sirius-zip-archive" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="read-file-from-sirius-zip-archive">Read file from SIRIUS zip archive</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function reads specific files from a compressed SIRIUS workspace directory. It handles file selection, filtering empty files, and parsing tab-delimited data.</p>
+<p>Reads specific files from a compressed SIRIUS workspace directory. Handles file selection, filtering empty files, and parsing tab-delimited data.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -712,7 +712,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="sirius_zip">sirius_zip</code>
 </td>
 <td>
-Character string path to compressed SIRIUS workspace (.zip)
+Path to compressed SIRIUS workspace (.zip)
 </td>
 </tr>
 <tr>
@@ -720,7 +720,7 @@ Character string path to compressed SIRIUS workspace (.zip)
 <code id="file">file</code>
 </td>
 <td>
-Character string pattern to match files within the archive
+Pattern to match files within the archive
 </td>
 </tr>
 </tbody></table>
@@ -734,10 +734,11 @@ Character string pattern to match files within the archive
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Read formula candidates from SIRIUS workspace</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">read_from_sirius_zip</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius_zip =</span> <span class="st">"path/to/sirius_workspace.zip"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">"formula_candidates.tsv"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

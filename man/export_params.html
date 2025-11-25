@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#export-parameters" id="toc-export-parameters" class="nav-link active" data-scroll-target="#export-parameters">Export parameters</a>
+  <li><a href="#export-parameters-to-yaml-file" id="toc-export-parameters-to-yaml-file" class="nav-link active" data-scroll-target="#export-parameters-to-yaml-file">Export parameters to YAML file</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,18 +693,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="export-parameters" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="export-parameters">Export parameters</h2>
+<section id="export-parameters-to-yaml-file" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="export-parameters-to-yaml-file">Export parameters to YAML file</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function writes parameter configurations to a timestamped YAML file for reproducibility and tracking. Each export includes the step identifier and exact timestamp.</p>
+<p>Writes parameter configurations to a timestamped YAML file for reproducibility and tracking. Each export includes the step identifier and exact timestamp.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <pre><code class="language-R">export_params(
-  parameters = get("parameters", envir = parent.frame()),
-  directory = get_default_paths()\$data\$interim\$params\$path,
-  step
+  parameters,
+  step,
+  directory = get_default_paths()\$data\$interim\$params\$path
 )
 </code></pre>
 </section>
@@ -716,15 +716,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="parameters">parameters</code>
 </td>
 <td>
-Named list of parameters to be exported
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="directory">directory</code>
-</td>
-<td>
-Character string path to the directory where the YAML file will be saved (default: data/interim/params/)
+Named list of parameters to export
 </td>
 </tr>
 <tr>
@@ -732,7 +724,15 @@ Character string path to the directory where the YAML file will be saved (defaul
 <code id="step">step</code>
 </td>
 <td>
-Character string step identifier to be included in the YAML file name (required)
+Step identifier to include in the YAML filename (required)
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="directory">directory</code>
+</td>
+<td>
+Path to the directory where the YAML file will be saved (default: data/interim/params/)
 </td>
 </tr>
 </tbody></table>
@@ -746,10 +746,11 @@ Character string step identifier to be included in the YAML file name (required)
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Export parameters for a specific step</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">export_params</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">parameters =</span> <span class="fu">list</span>(<span class="at">threshold =</span> <span class="fl">0.5</span>, <span class="at">mode =</span> <span class="st">"pos"</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">step =</span> <span class="st">"annotation"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

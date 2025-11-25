@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#dist-groups" id="toc-dist-groups" class="nav-link active" data-scroll-target="#dist-groups">Dist groups</a>
+  <li><a href="#calculate-pairwise-distances-with-group-labels" id="toc-calculate-pairwise-distances-with-group-labels" class="nav-link active" data-scroll-target="#calculate-pairwise-distances-with-group-labels">Calculate pairwise distances with group labels</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="dist-groups" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="dist-groups">Dist groups</h2>
+<section id="calculate-pairwise-distances-with-group-labels" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="calculate-pairwise-distances-with-group-labels">Calculate pairwise distances with group labels</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function calculates pairwise distances between observations and annotates them with group membership information. Optimized for large distance matrices.</p>
+<p>Computes pairwise distances between observations and annotates them with group membership. Useful for analyzing within-group vs between-group distances.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -712,7 +712,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="d">d</code>
 </td>
 <td>
-A distance object or matrix
+Distance object or matrix
 </td>
 </tr>
 <tr>
@@ -720,14 +720,14 @@ A distance object or matrix
 <code id="g">g</code>
 </td>
 <td>
-A grouping vector for the observations in the distance object. Must have length equal to the number of observations.
+Grouping vector for observations. Must have length equal to number of observations in distance matrix.
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A data frame containing distance information between pairs of observations with columns:</p>
+<p>Data frame with columns:</p>
 <table role="presentation">
 <tbody><tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
@@ -766,7 +766,7 @@ Group label of second observation
 <code>Label</code>
 </td>
 <td>
-Factor indicating if distance is within or between groups
+Factor: "Within" or "Between" groups
 </td>
 </tr>
 <tr>
@@ -774,7 +774,7 @@ Factor indicating if distance is within or between groups
 <code>Distance</code>
 </td>
 <td>
-Numeric distance value rounded to 5 digits
+Numeric distance (rounded to 5 decimals)
 </td>
 </tr>
 </tbody></table>
@@ -784,10 +784,16 @@ Numeric distance value rounded to 5 digits
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample data with groups</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">30</span>), <span class="at">nrow =</span> <span class="dv">10</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>groups <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>), <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">3</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">dist</span>(data)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate distances with group info</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">dist_groups</span>(d, groups)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Analyze within vs between group distances</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(Distance <span class="sc">~</span> Label, <span class="at">data =</span> result, <span class="at">FUN =</span> mean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#summarize-results" id="toc-summarize-results" class="nav-link active" data-scroll-target="#summarize-results">Summarize results</a>
+  <li><a href="#summarize-annotation-results" id="toc-summarize-annotation-results" class="nav-link active" data-scroll-target="#summarize-annotation-results">Summarize annotation results</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="summarize-results" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="summarize-results">Summarize results</h2>
+<section id="summarize-annotation-results" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="summarize-annotation-results">Summarize annotation results</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function summarizes annotation results by adding feature metadata, filtering/collapsing columns, and optionally removing tied scores or summarizing to one row per feature. Creates a final, simplified results table for downstream analysis or reporting.</p>
+<p>Summarizes annotation results by adding feature metadata, filtering/collapsing columns, and optionally removing tied scores or summarizing to one row per feature. Creates final results table.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -736,7 +736,7 @@ Data frame with feature metadata (RT, m/z, etc.)
 <code id="components_table">components_table</code>
 </td>
 <td>
-Data frame with molecular network component assignments
+Data frame with network component assignments
 </td>
 </tr>
 <tr>
@@ -782,10 +782,15 @@ Logical whether to collapse to 1 row per feature
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>summary <span class="ot">&lt;-</span> <span class="fu">summarize_results</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">df =</span> annotations,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">features_table =</span> features,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">components_table =</span> components,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">structure_organism_pairs_table =</span> sop,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">annot_table_wei_chemo =</span> weighted_chemo,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">remove_ties =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">summarize =</span> <span class="cn">TRUE</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

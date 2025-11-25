@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#export-output" id="toc-export-output" class="nav-link active" data-scroll-target="#export-output">Export output</a>
+  <li><a href="#export-data-frame-to-file" id="toc-export-data-frame-to-file" class="nav-link active" data-scroll-target="#export-data-frame-to-file">Export data frame to file</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="export-output" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="export-output">Export output</h2>
+<section id="export-data-frame-to-file" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="export-data-frame-to-file">Export data frame to file</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function creates the output directory if it doesn’t exist and exports a data frame to a tab-delimited file.</p>
+<p>Exports a data frame to a tab-delimited file with automatic directory creation and optional gzip compression. Provides progress logging for large datasets.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -712,7 +712,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="x">x</code>
 </td>
 <td>
-Data frame to be exported
+Data frame or tibble to export
 </td>
 </tr>
 <tr>
@@ -720,22 +720,24 @@ Data frame to be exported
 <code id="file">file</code>
 </td>
 <td>
-Character string path to the output file
+Character string path to the output file. File extension determines compression (.gz for gzip compression).
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the exported file</p>
+<p>Character string path to the exported file (invisibly)</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">export_output</span>(<span class="at">x =</span> <span class="fu">data.frame</span>(), <span class="at">file =</span> <span class="st">"output/file.tsv"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"output"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="at">value =</span> <span class="fu">rnorm</span>(<span class="dv">100</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">export_output</span>(df, <span class="st">"output/data.tsv"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">export_output</span>(df, <span class="st">"output/data.tsv.gz"</span>)  <span class="co"># Compressed</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"output"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

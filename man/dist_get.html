@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#distance-between-two-elements-in-a-distance-matrix" id="toc-distance-between-two-elements-in-a-distance-matrix" class="nav-link active" data-scroll-target="#distance-between-two-elements-in-a-distance-matrix">Distance between two elements in a distance matrix</a>
+  <li><a href="#get-distance-between-two-elements" id="toc-get-distance-between-two-elements" class="nav-link active" data-scroll-target="#get-distance-between-two-elements">Get distance between two elements</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -694,11 +694,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="distance-between-two-elements-in-a-distance-matrix" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="distance-between-two-elements-in-a-distance-matrix">Distance between two elements in a distance matrix</h2>
+<section id="get-distance-between-two-elements" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="get-distance-between-two-elements">Get distance between two elements</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function calculates the distance between two elements in a distance matrix by their indices. Returns 0 for identical elements.</p>
+<p>Calculates the distance between two elements in a distance matrix by their indices. Optimized for repeated lookups.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -721,7 +721,7 @@ Distance matrix or dist object
 <code id="idx1">idx1</code>
 </td>
 <td>
-Integer index of the first element
+Integer index of the first element (1-based)
 </td>
 </tr>
 <tr>
@@ -729,28 +729,33 @@ Integer index of the first element
 <code id="idx2">idx2</code>
 </td>
 <td>
-Integer index of the second element
+Integer index of the second element (1-based)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>Credit goes to usedist package for the algorithm</p>
+<p>Credit: Algorithm adapted from usedist package</p>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Numeric distance between the two elements. Returns 0 if indices are identical, NA if indices are invalid.</p>
+<p>Numeric distance between the two elements. Returns 0 if indices are identical. Returns NA if indices are out of bounds (with warning).</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create distance matrix</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>data_mat <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">20</span>), <span class="at">nrow =</span> <span class="dv">5</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">dist</span>(data_mat)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get distance between elements 1 and 3</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">dist_get</span>(d, <span class="dv">1</span>, <span class="dv">3</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Distance to self is 0</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">dist_get</span>(d, <span class="dv">2</span>, <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#export-spectra-rds" id="toc-export-spectra-rds" class="nav-link active" data-scroll-target="#export-spectra-rds">Export spectra RDS</a>
+  <li><a href="#export-spectra-to-rds-file" id="toc-export-spectra-to-rds-file" class="nav-link active" data-scroll-target="#export-spectra-to-rds-file">Export spectra to RDS file</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="export-spectra-rds" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="export-spectra-rds">Export spectra RDS</h2>
+<section id="export-spectra-to-rds-file" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="export-spectra-to-rds-file">Export spectra to RDS file</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function exports a Spectra object to an RDS file format for efficient storage and later retrieval. Only exports spectra with valid compound IDs.</p>
+<p>Exports a Spectra object to an RDS file format for efficient storage and later retrieval. Only exports spectra with valid compound IDs.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -712,7 +712,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="file">file</code>
 </td>
 <td>
-Character string path where spectra will be exported as RDS file
+Path where spectra will be exported as RDS file
 </td>
 </tr>
 <tr>
@@ -734,10 +734,12 @@ Spectra object containing spectral data to export
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Export spectra to RDS file</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Spectra)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">export_spectra_rds</span>(</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">"data/processed/spectra.rds"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> my_spectra_object</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

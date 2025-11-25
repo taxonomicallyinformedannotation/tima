@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#select-sirius-columns-canopus" id="toc-select-sirius-columns-canopus" class="nav-link active" data-scroll-target="#select-sirius-columns-canopus">Select sirius columns (canopus)</a>
+  <li><a href="#select-sirius-canopus-columns" id="toc-select-sirius-canopus-columns" class="nav-link active" data-scroll-target="#select-sirius-canopus-columns">Select SIRIUS CANOPUS columns</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="select-sirius-columns-canopus" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="select-sirius-columns-canopus">Select sirius columns (canopus)</h2>
+<section id="select-sirius-canopus-columns" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="select-sirius-canopus-columns">Select SIRIUS CANOPUS columns</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function selects and standardizes CANOPUS chemical classification columns from SIRIUS results, mapping SIRIUS-specific column names to TIMA standard names for downstream processing.</p>
+<p>Selects and standardizes CANOPUS chemical classification columns from SIRIUS results, mapping SIRIUS-specific column names to TIMA standard names for downstream processing.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -720,7 +720,7 @@ Data frame with SIRIUS CANOPUS results
 <code id="sirius_version">sirius_version</code>
 </td>
 <td>
-Character string SIRIUS version ("5" or "6")
+SIRIUS version ("5" or "6")
 </td>
 </tr>
 </tbody></table>
@@ -734,10 +734,11 @@ Character string SIRIUS version ("5" or "6")
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize CANOPUS columns from SIRIUS v6</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>standardized <span class="ot">&lt;-</span> <span class="fu">select_sirius_columns_canopus</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">df =</span> canopus_results,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius_version =</span> <span class="st">"6"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

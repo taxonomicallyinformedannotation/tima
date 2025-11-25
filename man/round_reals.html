@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#round-reals" id="toc-round-reals" class="nav-link active" data-scroll-target="#round-reals">Round reals</a>
+  <li><a href="#round-numeric-values-in-dataframe-columns" id="toc-round-numeric-values-in-dataframe-columns" class="nav-link active" data-scroll-target="#round-numeric-values-in-dataframe-columns">Round numeric values in dataframe columns</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="round-reals" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="round-reals">Round reals</h2>
+<section id="round-numeric-values-in-dataframe-columns" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="round-numeric-values-in-dataframe-columns">Round numeric values in dataframe columns</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function rounds numeric values in specified columns of a dataframe. It only affects columns that contain the specified patterns in their names.</p>
+<p>Rounds numeric values in columns matching specified patterns. Useful for standardizing precision in mass spectrometry data where exact mass and logP values need consistent decimal places.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -712,7 +712,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Dataframe containing columns to round
+Data frame or tibble containing columns to round
 </td>
 </tr>
 <tr>
@@ -720,7 +720,7 @@ Dataframe containing columns to round
 <code id="dig">dig</code>
 </td>
 <td>
-Integer number of decimal digits to round to (default: 5)
+Integer number of decimal digits (default: 5). Must be &gt;= 0. Use 0 to round to whole numbers.
 </td>
 </tr>
 <tr>
@@ -728,24 +728,31 @@ Integer number of decimal digits to round to (default: 5)
 <code id="cols">cols</code>
 </td>
 <td>
-Character vector of column name patterns to match (default: c("structure_exact_mass", "structure_xlogp"))
+Character vector of column name patterns to match (default: c("structure_exact_mass", "structure_xlogp")) Uses fixed string matching for performance.
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The dataframe with specified numeric columns rounded to the specified number of digits</p>
+<p>Data frame with specified numeric columns rounded to dig decimal places</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">structure_exact_mass =</span> <span class="fu">c</span>(<span class="fl">123.456789</span>, <span class="fl">234.567890</span>),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">structure_xlogp =</span> <span class="fu">c</span>(<span class="fl">2.345678</span>, <span class="fl">3.456789</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">other_col =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Round to 3 decimal places</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">round_reals</span>(df, <span class="at">dig =</span> <span class="dv">3</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Round to whole numbers</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">round_reals</span>(df, <span class="at">dig =</span> <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

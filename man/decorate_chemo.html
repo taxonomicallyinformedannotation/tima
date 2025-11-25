@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#decorate-chemo" id="toc-decorate-chemo" class="nav-link active" data-scroll-target="#decorate-chemo">Decorate chemo</a>
+  <li><a href="#decorate-chemical-annotation-results-with-statistics" id="toc-decorate-chemical-annotation-results-with-statistics" class="nav-link active" data-scroll-target="#decorate-chemical-annotation-results-with-statistics">Decorate chemical annotation results with statistics</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,25 +693,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="decorate-chemo" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="decorate-chemo">Decorate chemo</h2>
+<section id="decorate-chemical-annotation-results-with-statistics" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="decorate-chemical-annotation-results-with-statistics">Decorate chemical annotation results with statistics</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function logs summary statistics about chemically weighted annotations, showing how many structures were reranked at each chemical classification level. Uses cascading filters where each level builds on the previous (higher specificity requires passing lower levels). The function validates required columns and handles empty inputs gracefully.</p>
+<p>Logs summary statistics about chemically weighted annotations, showing how many structures were reranked at each chemical classification level. Uses cascading filters where each level builds on the previous.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <pre><code class="language-R">decorate_chemo(
-  annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
-  score_chemical_cla_kingdom = get("score_chemical_cla_kingdom", envir = parent.frame()),
-  score_chemical_cla_superclass = get("score_chemical_cla_superclass", envir =
-    parent.frame()),
-  score_chemical_cla_class = get("score_chemical_cla_class", envir = parent.frame()),
-  score_chemical_cla_parent = get("score_chemical_cla_parent", envir = parent.frame()),
-  score_chemical_npc_pathway = get("score_chemical_npc_pathway", envir = parent.frame()),
-  score_chemical_npc_superclass = get("score_chemical_npc_superclass", envir =
-    parent.frame()),
-  score_chemical_npc_class = get("score_chemical_npc_class", envir = parent.frame())
+  annot_table_wei_chemo,
+  score_chemical_cla_kingdom,
+  score_chemical_cla_superclass,
+  score_chemical_cla_class,
+  score_chemical_cla_parent,
+  score_chemical_npc_pathway,
+  score_chemical_npc_superclass,
+  score_chemical_npc_class
 )
 </code></pre>
 </section>
@@ -723,7 +721,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="annot_table_wei_chemo">annot_table_wei_chemo</code>
 </td>
 <td>
-Data frame containing chemically weighted annotations
+Data frame with chemically weighted annotations
 </td>
 </tr>
 <tr>
@@ -731,7 +729,7 @@ Data frame containing chemically weighted annotations
 <code id="score_chemical_cla_kingdom">score_chemical_cla_kingdom</code>
 </td>
 <td>
-Numeric minimum score for Classyfire kingdom
+Minimum score for Classyfire kingdom
 </td>
 </tr>
 <tr>
@@ -739,7 +737,7 @@ Numeric minimum score for Classyfire kingdom
 <code id="score_chemical_cla_superclass">score_chemical_cla_superclass</code>
 </td>
 <td>
-Numeric minimum score for Classyfire superclass
+Minimum score for Classyfire superclass
 </td>
 </tr>
 <tr>
@@ -747,7 +745,7 @@ Numeric minimum score for Classyfire superclass
 <code id="score_chemical_cla_class">score_chemical_cla_class</code>
 </td>
 <td>
-Numeric minimum score for Classyfire class
+Minimum score for Classyfire class
 </td>
 </tr>
 <tr>
@@ -755,7 +753,7 @@ Numeric minimum score for Classyfire class
 <code id="score_chemical_cla_parent">score_chemical_cla_parent</code>
 </td>
 <td>
-Numeric minimum score for Classyfire parent
+Minimum score for Classyfire parent
 </td>
 </tr>
 <tr>
@@ -763,7 +761,7 @@ Numeric minimum score for Classyfire parent
 <code id="score_chemical_npc_pathway">score_chemical_npc_pathway</code>
 </td>
 <td>
-Numeric minimum score for NPClassifier pathway
+Minimum score for NPClassifier pathway
 </td>
 </tr>
 <tr>
@@ -771,7 +769,7 @@ Numeric minimum score for NPClassifier pathway
 <code id="score_chemical_npc_superclass">score_chemical_npc_superclass</code>
 </td>
 <td>
-Numeric minimum score for NPClassifier superclass
+Minimum score for NPClassifier superclass
 </td>
 </tr>
 <tr>
@@ -779,24 +777,30 @@ Numeric minimum score for NPClassifier superclass
 <code id="score_chemical_npc_class">score_chemical_npc_class</code>
 </td>
 <td>
-Numeric minimum score for NPClassifier class
+Minimum score for NPClassifier class
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The input annotation table (unchanged), for use in pipelines</p>
+<p>The input annotation table (unchanged), for pipeline compatibility</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>weighted_chemo <span class="sc">|&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">decorate_chemo</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">score_chemical_cla_kingdom =</span> <span class="fl">0.1</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">score_chemical_cla_superclass =</span> <span class="fl">0.2</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">score_chemical_cla_class =</span> <span class="fl">0.3</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">score_chemical_cla_parent =</span> <span class="fl">0.4</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">score_chemical_npc_pathway =</span> <span class="fl">0.1</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">score_chemical_npc_superclass =</span> <span class="fl">0.2</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">score_chemical_npc_class =</span> <span class="fl">0.3</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

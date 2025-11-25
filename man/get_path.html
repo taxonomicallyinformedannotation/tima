@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#get-path" id="toc-get-path" class="nav-link active" data-scroll-target="#get-path">Get path</a>
+  <li><a href="#resolve-file-path" id="toc-resolve-file-path" class="nav-link active" data-scroll-target="#resolve-file-path">Resolve file path</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="get-path" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="get-path">Get path</h2>
+<section id="resolve-file-path" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="resolve-file-path">Resolve file path</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function resolves file paths by checking multiple locations, handling the difference between installed packages (where inst/ is removed) and development environments (where inst/ exists). It tries paths in order until one is found.</p>
+<p>Resolves file paths by checking multiple locations, handling the difference between installed packages (where inst/ is removed) and development environments (where inst/ exists). Tries paths in order until one is found.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -712,7 +712,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="base_path">base_path</code>
 </td>
 <td>
-Character string representing the base path to resolve. Can include "inst/" which will be handled appropriately.
+Base path to resolve. Can include "inst/" which will be handled appropriately for installed vs development environments.
 </td>
 </tr>
 </tbody></table>
@@ -726,10 +726,9 @@ Character string representing the base path to resolve. Can include "inst/" whic
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Resolve a path that may or may not include inst/</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>resolved <span class="ot">&lt;-</span> <span class="fu">get_path</span>(<span class="st">"inst/params/default.yaml"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns correct path whether in dev or installed package</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

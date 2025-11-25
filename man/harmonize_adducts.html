@@ -675,11 +675,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#harmonize-adducts" id="toc-harmonize-adducts" class="nav-link active" data-scroll-target="#harmonize-adducts">Harmonize adducts</a>
+  <li><a href="#harmonize-adduct-notations" id="toc-harmonize-adduct-notations" class="nav-link active" data-scroll-target="#harmonize-adduct-notations">Harmonize adduct notations</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
@@ -693,11 +694,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="harmonize-adducts" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="harmonize-adducts">Harmonize adducts</h2>
+<section id="harmonize-adduct-notations" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="harmonize-adduct-notations">Harmonize adduct notations</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function harmonizes adduct definitions by replacing various adduct notations with standardized forms according to a translation table.</p>
+<p>Standardizes adduct notations in a dataframe by replacing various forms with canonical representations. Uses a translation table for efficient batch replacement.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -712,7 +713,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Dataframe containing adduct column to harmonize
+Data frame or tibble containing adduct column
 </td>
 </tr>
 <tr>
@@ -728,24 +729,27 @@ Character string name of the adduct column (default: "adduct")
 <code id="adducts_translations">adducts_translations</code>
 </td>
 <td>
-Named character vector mapping original adduct notations (names) to standardized forms (values)
+Named character vector mapping original adduct notations (names) to standardized forms (values). If missing, returns dataframe unchanged.
 </td>
 </tr>
 </tbody></table>
 </section>
+<section id="details" class="level3">
+<h3 class="anchored" data-anchor-id="details">Details</h3>
+<p>Common adduct variations like "M+H", "[M+H]", and "(M+H)+" are standardized to a consistent format (e.g., "[M+H]+"). This ensures compatibility across different MS tools and databases.</p>
+</section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The dataframe with harmonized adduct column</p>
+<p>Data frame with harmonized adduct column</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">adduct =</span> <span class="fu">c</span>(<span class="st">"M+H"</span>, <span class="st">"[M+Na]+"</span>, <span class="st">"(M-H)-"</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>translations <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"M+H"</span> <span class="ot">=</span> <span class="st">"[M+H]+"</span>, <span class="st">"(M-H)-"</span> <span class="ot">=</span> <span class="st">"[M-H]-"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">harmonize_adducts</span>(df, <span class="at">adducts_translations =</span> translations)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

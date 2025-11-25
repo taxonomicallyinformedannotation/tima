@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#create-edges" id="toc-create-edges" class="nav-link active" data-scroll-target="#create-edges">Create edges</a>
+  <li><a href="#create-spectral-similarity-network-edges" id="toc-create-spectral-similarity-network-edges" class="nav-link active" data-scroll-target="#create-spectral-similarity-network-edges">Create spectral similarity network edges</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -693,11 +693,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="create-edges" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="create-edges">Create edges</h2>
+<section id="create-spectral-similarity-network-edges" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="create-spectral-similarity-network-edges">Create spectral similarity network edges</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function calculates pairwise spectral similarity between all spectra to create a network edge list. Uses parallel processing via purrr for efficiency.</p>
+<p>Calculates pairwise spectral similarity between all spectra to create a network edge list. Uses parallel processing via purrr for efficiency.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -745,7 +745,7 @@ Numeric vector of precursor m/z values
 <code id="method">method</code>
 </td>
 <td>
-Character string similarity method ("entropy", "gnps", or "cosine")
+Similarity method ("entropy", "gnps", or "cosine")
 </td>
 </tr>
 <tr>
@@ -753,7 +753,7 @@ Character string similarity method ("entropy", "gnps", or "cosine")
 <code id="ms2_tolerance">ms2_tolerance</code>
 </td>
 <td>
-Numeric MS2 tolerance in Daltons
+MS2 tolerance in Daltons
 </td>
 </tr>
 <tr>
@@ -761,7 +761,7 @@ Numeric MS2 tolerance in Daltons
 <code id="ppm_tolerance">ppm_tolerance</code>
 </td>
 <td>
-Numeric PPM tolerance
+PPM tolerance
 </td>
 </tr>
 <tr>
@@ -769,7 +769,7 @@ Numeric PPM tolerance
 <code id="threshold">threshold</code>
 </td>
 <td>
-Numeric minimum similarity score threshold
+Minimum similarity score threshold
 </td>
 </tr>
 <tr>
@@ -777,24 +777,31 @@ Numeric minimum similarity score threshold
 <code id="matched_peaks">matched_peaks</code>
 </td>
 <td>
-Integer minimum number of matched peaks required
+Minimum number of matched peaks required
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>A data frame with columns: feature_id, target_id, score, matched_peaks. Returns empty data frame with NA values if no edges pass thresholds.</p>
+<p>Data frame with columns: feature_id, target_id, score, matched_peaks. Returns empty data frame with NA values if no edges pass thresholds.</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create network edges from spectra</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>edges <span class="ot">&lt;-</span> <span class="fu">create_edges</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">frags =</span> fragment_list,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">nspecs =</span> <span class="fu">length</span>(fragment_list),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">precs =</span> precursor_mz,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"cosine"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">ms2_tolerance =</span> <span class="fl">0.02</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">ppm_tolerance =</span> <span class="dv">10</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">threshold =</span> <span class="fl">0.7</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">matched_peaks =</span> <span class="dv">6</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
