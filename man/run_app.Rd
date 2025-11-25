@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_app.R
 \name{run_app}
 \alias{run_app}
-\title{Run app}
+\title{Run TIMA Shiny app}
 \usage{
 run_app(host = "127.0.0.1", port = 3838, browser = TRUE)
 }
@@ -10,7 +10,7 @@ run_app(host = "127.0.0.1", port = 3838, browser = TRUE)
 \item{host}{Character string specifying the host/IP address to listen on.
 Default: "127.0.0.1" (localhost). Use "0.0.0.0" to allow external connections.}
 
-\item{port}{Integer port number to listen on. Default: 3838}
+\item{port}{Integer port number to listen on. Default: 3838. Valid range: 1-65535.}
 
 \item{browser}{Logical whether to automatically launch a web browser when
 starting the app. Default: TRUE. Automatically set to FALSE in Docker.}
@@ -19,9 +19,9 @@ starting the app. Default: TRUE. Automatically set to FALSE in Docker.}
 NULL (invisibly). Launches the Shiny app as a side effect.
 }
 \description{
-This function launches the TIMA Shiny web application for
-interactive metabolite annotation. It automatically detects if running
-inside a Docker container and adjusts network settings accordingly.
+Launches the TIMA Shiny web application for interactive
+metabolite annotation. Automatically detects Docker containers and
+adjusts network settings accordingly.
 }
 \examples{
 \dontrun{
@@ -31,7 +31,7 @@ run_app()
 # Launch on custom port
 run_app(port = 8080)
 
-# Allow external connections
+# Allow external connections (useful in Docker)
 run_app(host = "0.0.0.0", port = 3838)
 }
 }

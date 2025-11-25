@@ -2,25 +2,29 @@
 % Please edit documentation in R/export_output.R
 \name{export_output}
 \alias{export_output}
-\title{Export output}
+\title{Export data frame to file}
 \usage{
 export_output(x, file)
 }
 \arguments{
-\item{x}{Data frame to be exported}
+\item{x}{Data frame or tibble to export}
 
-\item{file}{Character string path to the output file}
+\item{file}{Character string path to the output file. File extension
+determines compression (.gz for gzip compression).}
 }
 \value{
-The path to the exported file
+Character string path to the exported file (invisibly)
 }
 \description{
-This function creates the output directory if it doesn't exist
-and exports a data frame to a tab-delimited file.
+Exports a data frame to a tab-delimited file with automatic
+directory creation and optional gzip compression. Provides progress
+logging for large datasets.
 }
 \examples{
 \dontrun{
-export_output(x = data.frame(), file = "output/file.tsv")
+df <- data.frame(id = 1:100, value = rnorm(100))
+export_output(df, "output/data.tsv")
+export_output(df, "output/data.tsv.gz")  # Compressed
 unlink("output", recursive = TRUE)
 }
 }

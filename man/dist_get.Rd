@@ -2,28 +2,39 @@
 % Please edit documentation in R/dist_groups.R
 \name{dist_get}
 \alias{dist_get}
-\title{Distance between two elements in a distance matrix}
+\title{Get distance between two elements}
 \usage{
 dist_get(d, idx1, idx2)
 }
 \arguments{
 \item{d}{Distance matrix or dist object}
 
-\item{idx1}{Integer index of the first element}
+\item{idx1}{Integer index of the first element (1-based)}
 
-\item{idx2}{Integer index of the second element}
+\item{idx2}{Integer index of the second element (1-based)}
 }
 \value{
-Numeric distance between the two elements. Returns 0 if indices
-are identical, NA if indices are invalid.
+Numeric distance between the two elements.
+Returns 0 if indices are identical.
+Returns NA if indices are out of bounds (with warning).
 }
 \description{
-This function calculates the distance between two elements
-in a distance matrix by their indices. Returns 0 for identical elements.
+Calculates the distance between two elements in a distance
+matrix by their indices. Optimized for repeated lookups.
 }
 \details{
-Credit goes to usedist package for the algorithm
+Credit: Algorithm adapted from usedist package
 }
 \examples{
-NULL
+\dontrun{
+# Create distance matrix
+data_mat <- matrix(rnorm(20), nrow = 5)
+d <- dist(data_mat)
+
+# Get distance between elements 1 and 3
+dist_get(d, 1, 3)
+
+# Distance to self is 0
+dist_get(d, 2, 2)
+}
 }

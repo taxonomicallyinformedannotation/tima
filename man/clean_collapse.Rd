@@ -2,28 +2,35 @@
 % Please edit documentation in R/clean_collapse.R
 \name{clean_collapse}
 \alias{clean_collapse}
-\title{Clean collapse}
+\title{Collapse and clean grouped data}
 \usage{
 clean_collapse(grouped_df, cols = NULL, separator = " $ ")
 }
 \arguments{
-\item{grouped_df}{Grouped dataframe to be collapsed}
+\item{grouped_df}{Grouped data frame to collapse}
 
-\item{cols}{Character vector of column name(s) to apply collapse to.
+\item{cols}{Character vector of column names to collapse.
 If NULL (default), applies to all columns.}
 
-\item{separator}{Character string used to separate collapsed values.
-Default: " $ "}
+\item{separator}{Character string separator for collapsed values
+(default: " $ ")}
 }
 \value{
-A cleaned and collapsed dataframe with unique values collapsed
-per group
+Data frame with unique values collapsed per group
 }
 \description{
-This function collapses a grouped dataframe and trims it.
-It removes NA values, collapses unique values with a separator,
-trims whitespace, and converts empty strings to NA.
+Collapses grouped dataframe by combining unique values per group.
+Removes NA values, trims whitespace, and converts empty strings to NA.
+Useful for aggregating annotations or metadata.
 }
 \examples{
-NULL
+\dontrun{
+library(tidytable)
+df <- data.frame(
+  group = c("A", "A", "B", "B"),
+  value = c("x", "y", "x", "x")
+)
+grouped <- df |> group_by(group)
+clean_collapse(grouped, cols = "value")
+}
 }

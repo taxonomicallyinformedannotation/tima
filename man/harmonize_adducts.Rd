@@ -2,27 +2,37 @@
 % Please edit documentation in R/harmonize_adducts.R
 \name{harmonize_adducts}
 \alias{harmonize_adducts}
-\title{Harmonize adducts}
+\title{Harmonize adduct notations}
 \usage{
 harmonize_adducts(df, adducts_colname = "adduct", adducts_translations)
 }
 \arguments{
-\item{df}{Dataframe containing adduct column to harmonize}
+\item{df}{Data frame or tibble containing adduct column}
 
 \item{adducts_colname}{Character string name of the adduct column
 (default: "adduct")}
 
 \item{adducts_translations}{Named character vector mapping original
-adduct notations (names) to standardized forms (values)}
+adduct notations (names) to standardized forms (values).
+If missing, returns dataframe unchanged.}
 }
 \value{
-The dataframe with harmonized adduct column
+Data frame with harmonized adduct column
 }
 \description{
-This function harmonizes adduct definitions by replacing
-various adduct notations with standardized forms according to a
-translation table.
+Standardizes adduct notations in a dataframe by replacing
+various forms with canonical representations. Uses a translation
+table for efficient batch replacement.
+}
+\details{
+Common adduct variations like "M+H", "\link{M+H}", and "(M+H)+" are
+standardized to a consistent format (e.g., "\link{M+H}+"). This ensures
+compatibility across different MS tools and databases.
 }
 \examples{
-NULL
+\dontrun{
+df <- data.frame(adduct = c("M+H", "[M+Na]+", "(M-H)-"))
+translations <- c("M+H" = "[M+H]+", "(M-H)-" = "[M-H]-")
+harmonize_adducts(df, adducts_translations = translations)
+}
 }

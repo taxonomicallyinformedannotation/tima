@@ -2,47 +2,43 @@
 % Please edit documentation in R/go_to_cache.R
 \name{go_to_cache}
 \alias{go_to_cache}
-\title{Go to Cache Directory}
+\title{Navigate to cache directory}
 \usage{
 go_to_cache(dir = ".tima")
 }
 \arguments{
-\item{dir}{Character string name of the cache directory (default: ".tima").
-Will be created in the user's home directory. Must be non-empty.}
+\item{dir}{Character string name of cache directory (default: ".tima").
+Created in user's home directory. Must be non-empty.}
 }
 \value{
-Character string path to the cache directory (invisibly).
-Changes working directory as side effect.
+Path to cache directory (invisibly). Changes working directory
+as side effect.
 }
 \description{
-Creates a cache directory in the user's home directory (if it
-doesn't already exist) and changes the working directory to it. This is
-useful for storing temporary files, intermediate results, and downloaded
-data in a consistent location across sessions.
+Creates and navigates to a cache directory in the user's home
+directory. Useful for storing temporary files, intermediate results, and
+downloaded data in a consistent location across sessions.
 }
 \details{
-The function performs the following operations:
+The function:
 \itemize{
-\item Validates the cache directory name
-\item Constructs the full path in the user's home directory
-\item Creates the directory if it doesn't exist
-\item Changes the working directory to the cache location
-\item Logs all operations for debugging
+\item Constructs full path in user's home directory
+\item Creates directory if it doesn't exist
+\item Changes working directory to cache location
+\item Logs all operations
 }
 
-The cache directory is created with appropriate permissions and will persist
-across R sessions until explicitly deleted.
+Cache directory persists across R sessions until explicitly deleted.
 }
 \examples{
 \dontrun{
-# Create and navigate to default cache directory (~/.tima)
+# Default cache (~/.tima)
 go_to_cache()
 
-# Use custom cache directory name
-go_to_cache(dir = ".my_project_cache")
+# Custom cache
+go_to_cache(dir = ".my_cache")
 
-# Store the cache path for reference
+# Store path
 cache_path <- go_to_cache()
-print(cache_path)
 }
 }

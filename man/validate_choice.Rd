@@ -4,14 +4,14 @@
 \alias{validate_choice}
 \title{Validate choice parameter}
 \usage{
-validate_choice(value, choices, name = "value")
+validate_choice(value, choices, param_name = "value")
 }
 \arguments{
 \item{value}{Value to validate}
 
 \item{choices}{Character vector of allowed choices}
 
-\item{name}{Name of the parameter (for error messages)}
+\item{param_name}{Name of the parameter (for error messages)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise
@@ -21,7 +21,7 @@ Validates that a value is one of a set of allowed choices
 }
 \examples{
 \dontrun{
-validate_choice("OR", c("OR", "AND"), "condition")
+validate_choice("OR", c("OR", "AND"), param_name = "condition")
 }
 }
 \keyword{internal}

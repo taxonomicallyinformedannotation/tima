@@ -2,27 +2,40 @@
 % Please edit documentation in R/round_reals.R
 \name{round_reals}
 \alias{round_reals}
-\title{Round reals}
+\title{Round numeric values in dataframe columns}
 \usage{
 round_reals(df, dig = 5L, cols = c("structure_exact_mass", "structure_xlogp"))
 }
 \arguments{
-\item{df}{Dataframe containing columns to round}
+\item{df}{Data frame or tibble containing columns to round}
 
-\item{dig}{Integer number of decimal digits to round to (default: 5)}
+\item{dig}{Integer number of decimal digits (default: 5). Must be >= 0.
+Use 0 to round to whole numbers.}
 
 \item{cols}{Character vector of column name patterns to match
-(default: c("structure_exact_mass", "structure_xlogp"))}
+(default: c("structure_exact_mass", "structure_xlogp"))
+Uses fixed string matching for performance.}
 }
 \value{
-The dataframe with specified numeric columns rounded to the
-specified number of digits
+Data frame with specified numeric columns rounded to dig decimal places
 }
 \description{
-This function rounds numeric values in specified columns
-of a dataframe. It only affects columns that contain the specified
-patterns in their names.
+Rounds numeric values in columns matching specified patterns.
+Useful for standardizing precision in mass spectrometry data where
+exact mass and logP values need consistent decimal places.
 }
 \examples{
-NULL
+\dontrun{
+df <- data.frame(
+  structure_exact_mass = c(123.456789, 234.567890),
+  structure_xlogp = c(2.345678, 3.456789),
+  other_col = c(1, 2)
+)
+
+# Round to 3 decimal places
+round_reals(df, dig = 3)
+
+# Round to whole numbers
+round_reals(df, dig = 0)
+}
 }
