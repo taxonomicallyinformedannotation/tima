@@ -294,7 +294,7 @@ validate_adduct_list <- function(
 #'     for required columns and minimum row count
 #'
 #' @param df Input to validate
-#' @param name Name of the parameter (for error messages)
+#' @param param_name Name of the parameter (for error messages)
 #' @param required_cols Character vector of required column names
 #' @param min_rows Minimum number of rows required (default: 0)
 #' @param allow_empty Logical, whether empty data frames are allowed
@@ -305,11 +305,11 @@ validate_adduct_list <- function(
 #'
 #' @examples
 #' \dontrun{
-#' validate_dataframe(df, "features", required_cols = c("feature_id", "mz"))
+#' validate_dataframe(df, param_name = "features", required_cols = c("feature_id", "mz"))
 #' }
 validate_dataframe <- function(
   df,
-  name = "input",
+  param_name = "input",
   required_cols = NULL,
   min_rows = 0L,
   allow_empty = TRUE
@@ -317,9 +317,10 @@ validate_dataframe <- function(
   # Check if data frame or tibble
   if (!is.data.frame(df) && !inherits(df, "tbl")) {
     stop(
-      name,
+      param_name,
       " must be a data frame or tibble, got: ",
-      paste(class(df), collapse = ", ")
+      paste(class(df), collapse = ", "),
+      call. = FALSE
     )
   }
 
@@ -327,16 +328,17 @@ validate_dataframe <- function(
   n_rows <- nrow(df)
 
   if (!allow_empty && n_rows == 0L) {
-    stop(name, " cannot be empty")
+    stop(param_name, " cannot be empty", call. = FALSE)
   }
 
   if (n_rows < min_rows) {
     stop(
-      name,
+      param_name,
       " must have at least ",
       min_rows,
       " row(s), got: ",
-      n_rows
+      n_rows,
+      call. = FALSE
     )
   }
 
@@ -346,11 +348,12 @@ validate_dataframe <- function(
 
     if (length(missing_cols) > 0L) {
       stop(
-        name,
+        param_name,
         " is missing required column(s): ",
         paste(missing_cols, collapse = ", "),
         "\nAvailable columns: ",
-        paste(colnames(df), collapse = ", ")
+        paste(colnames(df), collapse = ", "),
+        call. = FALSE
       )
     }
   }
@@ -385,7 +388,7 @@ validate_numeric_range <- function(
 ) {
   if (is.null(value)) {
     if (!allow_null) {
-      stop(param_name, " cannot be NULL")
+      stop(param_name, " cannot be NULL", call. = FALSE)
     }
     return(invisible(TRUE))
   }
@@ -398,12 +401,13 @@ validate_numeric_range <- function(
         paste0("vector of length ", length(value))
       } else {
         class(value)[1L]
-      }
+      },
+      call. = FALSE
     )
   }
 
   if (is.na(value)) {
-    stop(param_name, " cannot be NA")
+    stop(param_name, " cannot be NA", call. = FALSE)
   }
 
   if (value < min_value || value > max_value) {
@@ -414,7 +418,8 @@ validate_numeric_range <- function(
       " and ",
       max_value,
       ", got: ",
-      value
+      value,
+      call. = FALSE
     )
   }
 
@@ -438,7 +443,7 @@ validate_numeric_range <- function(
 #' }
 validate_weights <- function(weights, tolerance = 1e-6) {
   if (!is.numeric(weights)) {
-    stop("Weights must be numeric, got: ", class(weights)[1L])
+    stop("Weights must be numeric, got: ", class(weights)[1L], call. = FALSE)
   }
 
   # Check for negative weights
@@ -446,13 +451,14 @@ validate_weights <- function(weights, tolerance = 1e-6) {
     negative_weights <- which(weights < 0)
     stop(
       "All weights must be non-negative. Negative weight(s) at position(s): ",
-      paste(negative_weights, collapse = ", ")
+      paste(negative_weights, collapse = ", "),
+      call. = FALSE
     )
   }
 
   # Check for NA values
   if (any(is.na(weights))) {
-    stop("Weights cannot contain NA values")
+    stop("Weights cannot contain NA values", call. = FALSE)
   }
 
   # Check sum
@@ -463,7 +469,8 @@ validate_weights <- function(weights, tolerance = 1e-6) {
       "Weights must sum to 1.0, got: ",
       round(weight_sum, 6),
       "\nWeights: ",
-      paste(names(weights), "=", round(weights, 3), collapse = ", ")
+      paste(names(weights), "=", round(weights, 3), collapse = ", "),
+      call. = FALSE
     )
   }
 
@@ -476,7 +483,7 @@ validate_weights <- function(weights, tolerance = 1e-6) {
 #'
 #' @param value Value to validate
 #' @param choices Character vector of allowed choices
-#' @param name Name of the parameter (for error messages)
+#' @param param_name Name of the parameter (for error messages)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -484,25 +491,27 @@ validate_weights <- function(weights, tolerance = 1e-6) {
 #'
 #' @examples
 #' \dontrun{
-#' validate_choice("OR", c("OR", "AND"), "condition")
+#' validate_choice("OR", c("OR", "AND"), param_name = "condition")
 #' }
-validate_choice <- function(value, choices, name = "value") {
+validate_choice <- function(value, choices, param_name = "value") {
   if (!is.character(value) || length(value) != 1L) {
     stop(
-      name,
+      param_name,
       " must be a single character string, got: ",
-      class(value)[1L]
+      class(value)[1L],
+      call. = FALSE
     )
   }
 
   if (!value %in% choices) {
     stop(
-      name,
+      param_name,
       " must be one of: ",
       paste(choices, collapse = ", "),
       "\nGot: '",
       value,
-      "'"
+      "'",
+      call. = FALSE
     )
   }
 
@@ -608,7 +617,7 @@ validate_character <- function(
 validate_logical <- function(value, param_name = "value", allow_null = FALSE) {
   if (is.null(value)) {
     if (!allow_null) {
-      stop(param_name, " cannot be NULL")
+      stop(param_name, " cannot be NULL", call. = FALSE)
     }
     return(invisible(TRUE))
   }
@@ -617,12 +626,13 @@ validate_logical <- function(value, param_name = "value", allow_null = FALSE) {
     stop(
       param_name,
       " must be a single logical value (TRUE/FALSE), got: ",
-      class(value)[1L]
+      class(value)[1L],
+      call. = FALSE
     )
   }
 
   if (is.na(value)) {
-    stop(param_name, " cannot be NA")
+    stop(param_name, " cannot be NA", call. = FALSE)
   }
 
   invisible(TRUE)
@@ -650,7 +660,7 @@ validate_list_or_vector <- function(
 ) {
   if (is.null(value)) {
     if (!allow_null) {
-      stop(param_name, " cannot be NULL")
+      stop(param_name, " cannot be NULL", call. = FALSE)
     }
     return(invisible(TRUE))
   }
@@ -659,7 +669,8 @@ validate_list_or_vector <- function(
     stop(
       param_name,
       " must be a list or vector, got: ",
-      class(value)[1L]
+      class(value)[1L],
+      call. = FALSE
     )
   }
 
@@ -671,7 +682,8 @@ validate_list_or_vector <- function(
       " must have at least ",
       min_length,
       " element(s), got: ",
-      value_length
+      value_length,
+      call. = FALSE
     )
   }
 
@@ -681,7 +693,8 @@ validate_list_or_vector <- function(
       " cannot have more than ",
       max_length,
       " element(s), got: ",
-      value_length
+      value_length,
+      call. = FALSE
     )
   }
 
@@ -768,55 +781,6 @@ assert_positive_integer <- function(
   invisible(TRUE)
 }
 
-#' Validate data frame parameter
-#'
-#' @description Validates data frame structure and required columns
-#'
-#' @param df Data frame to validate
-#' @param required_columns Character vector of required column names
-#' @param min_rows Minimum required number of rows
-#' @param param_name Name of the parameter (for error messages)
-#'
-#' @return Invisible TRUE if valid, stops with error otherwise
-#'
-#' @keywords internal
-validate_data_frame <- function(
-  df,
-  required_columns = NULL,
-  min_rows = 0L,
-  param_name = "data frame"
-) {
-  if (!is.data.frame(df)) {
-    stop(param_name, " must be a data frame, got: ", class(df)[1L])
-  }
-
-  if (nrow(df) < min_rows) {
-    stop(
-      param_name,
-      " must have at least ",
-      min_rows,
-      " row(s), got: ",
-      nrow(df)
-    )
-  }
-
-  if (!is.null(required_columns)) {
-    missing_cols <- setdiff(required_columns, names(df))
-    if (length(missing_cols) > 0L) {
-      stop(
-        param_name,
-        " is missing required column(s): ",
-        paste(missing_cols, collapse = ", "),
-        ".\n",
-        "Available columns: ",
-        paste(names(df), collapse = ", ")
-      )
-    }
-  }
-
-  invisible(TRUE)
-}
-
 # Generic assertion helpers (centralized) ----
 
 assert_choice <- function(value, choices, param_name = "value") {
@@ -868,13 +832,6 @@ assert_scalar_numeric <- function(
       x,
       call. = FALSE
     )
-  }
-  invisible(TRUE)
-}
-
-assert_positive_integer <- function(x, param_name) {
-  if (!is.numeric(x) || length(x) != 1L || is.na(x) || x < 1 || (x %% 1) != 0) {
-    stop(param_name, " must be a positive integer (>=1)", call. = FALSE)
   }
   invisible(TRUE)
 }

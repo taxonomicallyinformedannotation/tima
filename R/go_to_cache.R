@@ -1,93 +1,77 @@
-#' @title Go to Cache Directory
+#' @title Navigate to cache directory
 #'
-#' @description Creates a cache directory in the user's home directory (if it
-#'     doesn't already exist) and changes the working directory to it. This is
-#'     useful for storing temporary files, intermediate results, and downloaded
-#'     data in a consistent location across sessions.
+#' @description Creates and navigates to a cache directory in the user's home
+#'     directory. Useful for storing temporary files, intermediate results, and
+#'     downloaded data in a consistent location across sessions.
 #'
-#' @details
-#' The function performs the following operations:
+#' @details The function:
 #' \itemize{
-#'   \item Validates the cache directory name
-#'   \item Constructs the full path in the user's home directory
-#'   \item Creates the directory if it doesn't exist
-#'   \item Changes the working directory to the cache location
-#'   \item Logs all operations for debugging
+#'   \item Constructs full path in user's home directory
+#'   \item Creates directory if it doesn't exist
+#'   \item Changes working directory to cache location
+#'   \item Logs all operations
 #' }
 #'
-#' The cache directory is created with appropriate permissions and will persist
-#' across R sessions until explicitly deleted.
+#' Cache directory persists across R sessions until explicitly deleted.
 #'
-#' @param dir Character string name of the cache directory (default: ".tima").
-#'     Will be created in the user's home directory. Must be non-empty.
+#' @include validators.R
 #'
-#' @return Character string path to the cache directory (invisibly).
-#'     Changes working directory as side effect.
+#' @param dir Character string name of cache directory (default: ".tima").
+#'     Created in user's home directory. Must be non-empty.
+#'
+#' @return Path to cache directory (invisibly). Changes working directory
+#'     as side effect.
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # Create and navigate to default cache directory (~/.tima)
+#' # Default cache (~/.tima)
 #' go_to_cache()
 #'
-#' # Use custom cache directory name
-#' go_to_cache(dir = ".my_project_cache")
+#' # Custom cache
+#' go_to_cache(dir = ".my_cache")
 #'
-#' # Store the cache path for reference
+#' # Store path
 #' cache_path <- go_to_cache()
-#' print(cache_path)
 #' }
 go_to_cache <- function(dir = ".tima") {
   # Input Validation ----
-  if (
-    is.null(dir) || !is.character(dir) || length(dir) != 1L || nchar(dir) == 0L
-  ) {
-    stop(
-      "Cache directory name must be a non-empty character string, got: ",
-      if (is.null(dir)) "NULL" else class(dir)[1],
-      call. = FALSE
-    )
-  }
+  validate_character(dir, param_name = "dir", allow_empty = FALSE)
 
-  # Construct Cache Path ----
+  # Construct and Create Cache Path ----
   cache <- fs::path_home(dir)
-  logger::log_debug("Resolved cache directory: {cache}")
+  logger::log_debug("Cache directory: {cache}")
 
-  # Create Directory if Needed ----
-  if (!dir.exists(cache)) {
-    logger::log_info("Creating cache directory: {cache}")
-
-    tryCatch(
-      {
-        fs::dir_create(path = cache)
-        logger::log_success("Cache directory created successfully")
-      },
-      error = function(e) {
-        logger::log_error("Failed to create cache directory: {e$message}")
-        stop(
-          "Failed to create cache directory at '",
-          cache,
-          "': ",
-          conditionMessage(e),
-          call. = FALSE
-        )
-      }
-    )
-  } else {
-    logger::log_debug("Cache directory already exists")
-  }
+  ensure_cache_exists(cache)
 
   # Change Working Directory ----
+  change_to_cache(cache)
+
+  invisible(cache)
+}
+
+# Helper Functions ----
+
+#' Ensure cache directory exists
+#' @keywords internal
+ensure_cache_exists <- function(cache) {
+  if (dir.exists(cache)) {
+    logger::log_debug("Cache exists")
+    return(invisible(TRUE))
+  }
+
+  logger::log_info("Creating cache: {cache}")
+
   tryCatch(
     {
-      setwd(dir = cache)
-      logger::log_info("Working directory changed to: {cache}")
+      fs::dir_create(path = cache)
+      logger::log_debug("Cache created")
     },
     error = function(e) {
-      logger::log_error("Failed to change working directory: {e$message}")
+      logger::log_error("Failed to create cache: {conditionMessage(e)}")
       stop(
-        "Failed to change to cache directory '",
+        "Cannot create cache directory '",
         cache,
         "': ",
         conditionMessage(e),
@@ -95,6 +79,25 @@ go_to_cache <- function(dir = ".tima") {
       )
     }
   )
+}
 
-  invisible(cache)
+#' Change to cache directory
+#' @keywords internal
+change_to_cache <- function(cache) {
+  tryCatch(
+    {
+      setwd(dir = cache)
+      logger::log_info("Working directory: {cache}")
+    },
+    error = function(e) {
+      logger::log_error("Failed to change directory: {conditionMessage(e)}")
+      stop(
+        "Cannot change to cache directory '",
+        cache,
+        "': ",
+        conditionMessage(e),
+        call. = FALSE
+      )
+    }
+  )
 }

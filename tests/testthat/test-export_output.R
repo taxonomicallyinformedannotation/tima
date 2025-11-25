@@ -4,10 +4,13 @@ library(testthat)
 
 # Validation tests
 test_that("export_output validates file path", {
-  expect_error(export_output(x = data.frame(a = 1), file = NULL), "non-empty")
+  expect_error(
+    export_output(x = data.frame(a = 1), file = NULL),
+    "Provide a non-NULL character string."
+  )
   expect_error(
     export_output(x = data.frame(a = 1), file = c("a", "b")),
-    "non-empty"
+    "Ensure the parameter is a length-1 character value."
   )
 })
 

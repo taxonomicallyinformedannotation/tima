@@ -1,67 +1,58 @@
-#' @title Export output
+#' @title Export data frame to file
 #'
-#' @description This function creates the output directory if it doesn't exist
-#'     and exports a data frame to a tab-delimited file.
+#' @description Exports a data frame to a tab-delimited file with automatic
+#'     directory creation and optional gzip compression. Provides progress
+#'     logging for large datasets.
 #'
 #' @include create_dir.R
+#' @include validators.R
 #'
-#' @param x Data frame to be exported
-#' @param file Character string path to the output file
+#' @param x Data frame or tibble to export
+#' @param file Character string path to the output file. File extension
+#'     determines compression (.gz for gzip compression).
 #'
-#' @return The path to the exported file
+#' @return Character string path to the exported file (invisibly)
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' export_output(x = data.frame(), file = "output/file.tsv")
+#' df <- data.frame(id = 1:100, value = rnorm(100))
+#' export_output(df, "output/data.tsv")
+#' export_output(df, "output/data.tsv.gz")  # Compressed
 #' unlink("output", recursive = TRUE)
 #' }
 export_output <- function(x, file) {
-  # Input Validation (fast checks first) ----
-
-  # Validate file path first (cheapest check)
-  if (
-    is.null(file) ||
-      !is.character(file) ||
-      length(file) != 1L ||
-      nchar(file) == 0L
-  ) {
-    stop("Output file path must be a non-empty character string")
-  }
-
-  # Validate data frame (more expensive check)
-  if (!is.data.frame(x) && !inherits(x, "tbl")) {
-    stop("Input 'x' must be a data frame or tibble")
-  }
+  # Input Validation ----
+  validate_character(file, param_name = "file", allow_empty = FALSE)
+  validate_dataframe(x, param_name = "x")
 
   # Prepare Export ----
-
-  # Create the output directory if it doesn't exist
   create_dir(export = file)
 
-  # Get dimensions for logging (cache for reuse)
-  nrows <- nrow(x)
-  ncols <- ncol(x)
+  # Cache dimensions
+  dims <- dim(x)
+  nrows <- dims[1]
+  ncols <- dims[2]
 
   logger::log_info("Exporting data to: {file}")
-  logger::log_debug(
-    "Dimensions: {nrows} rows x {ncols} columns"
-  )
+  logger::log_debug("Dimensions: {nrows} rows × {ncols} columns")
 
-  # Determine compression method (once)
-  is_compressed <- grepl("\\.gz$", file, ignore.case = TRUE)
+  # Determine compression based on file extension
+  compress_method <- if (grepl("\\.gz$", file, ignore.case = TRUE)) {
+    "gzip"
+  } else {
+    "none"
+  }
 
   # Warn for large datasets
   if (nrows > 100000L) {
     logger::log_debug(
-      "Large dataset detected ({nrows} rows), export may take time..."
+      "Large dataset ({nrows} rows) - export may take time"
     )
   }
 
-  # Write Data ----
-
-  # Write the data frame to a tab-delimited file with error handling
+  # Write Data with Error Handling ----
   tryCatch(
     {
       tidytable::fwrite(
@@ -69,17 +60,22 @@ export_output <- function(x, file) {
         file = file,
         sep = "\t",
         na = "",
-        compress = if (is_compressed) "gzip" else "none",
+        compress = compress_method,
         showProgress = FALSE
       )
-      logger::log_info("Successfully exported {nrows} rows to {file}")
+      logger::log_info("Successfully exported {nrows} rows")
     },
     error = function(e) {
-      logger::log_error("Failed to export data: {conditionMessage(e)}")
-      stop("Failed to export data to ", file, ": ", conditionMessage(e))
+      logger::log_error("Export failed: {conditionMessage(e)}")
+      stop(
+        "Failed to export data to '",
+        file,
+        "': ",
+        conditionMessage(e),
+        call. = FALSE
+      )
     }
   )
 
-  # Return the file path for pipeline tracking
-  return(file)
+  invisible(file)
 }

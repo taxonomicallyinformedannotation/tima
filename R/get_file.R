@@ -1,158 +1,203 @@
-#' @title Get file
+#' @title Download file from URL
 #'
-#' @description This function downloads files from a URL with retry logic
-#'     and exponential backoff.
+#' @description Downloads a file from a URL with robust error handling,
+#'     retry logic, and validation. Automatically creates necessary directories
+#'     and validates downloaded content. Skips download if file already exists.
 #'
-#' @param url Character string URL of the file to be downloaded
+#' @include create_dir.R
+#' @include validators.R
+#' @include constants.R
+#'
+#' @param url Character string URL of the file to download
 #' @param export Character string file path where the file should be saved
-#' @param limit Integer timeout limit in seconds (default: 3600)
+#' @param limit Integer timeout limit in seconds (default: 3600 = 1 hour)
 #'
-#' @return The path to the downloaded file
+#' @return Path to the downloaded file (invisibly)
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' git <- "https://github.com/"
-#' org <- "taxonomicallyinformedannotation"
-#' repo <- "tima-example-files"
-#' branch <- "main"
-#' file <- "example_metadata.tsv"
 #' get_file(
-#'   url = paste(git, org, repo, "raw", branch, file, sep = "/"),
-#'   export = "data/source/example_metadata.tsv"
+#'   url = "https://example.com/data.tsv",
+#'   export = "data/source/data.tsv"
 #' )
 #' }
 get_file <- function(url, export, limit = 3600L) {
-  if (missing(url)) {
-    stop("URL must be provided")
-  }
-  if (missing(export)) {
-    stop("Export path must be provided")
-  }
+  # Input Validation ----
+  validate_character(url, param_name = "url", allow_empty = FALSE)
+  validate_character(export, param_name = "export", allow_empty = FALSE)
+  assert_positive_integer(limit, "limit")
 
-  if (!is.character(url)) {
-    stop("URL must be a non-empty character string")
-  }
-  if (!is.character(export)) {
-    stop("Export path must be a non-empty character string")
-  }
-  if (length(url) != 1L) {
-    stop("URL must be a non-empty character string")
-  }
-  if (length(export) != 1L) {
-    stop("Export path must be a non-empty character string")
-  }
-  if (!nzchar(url)) {
-    stop("URL must be a non-empty character string")
-  }
-  if (!nzchar(export)) {
-    stop("Export path must be a non-empty character string")
-  }
-
-  if (!is.numeric(limit)) {
-    stop("Timeout limit must be a positive number")
-  }
-  if (length(limit) != 1L) {
-    stop("Timeout limit must be a positive number")
-  }
-  if (limit <= 0) {
-    stop("Timeout limit must be a positive number")
-  }
-
+  # Check if file already exists
   if (file.exists(export)) {
     logger::log_info("File already exists, skipping download: {export}")
     return(invisible(export))
   }
 
+  # Prepare for Download ----
   create_dir(export = export)
   options(timeout = limit)
-  logger::log_info("Downloading file from: {url}")
+  logger::log_info("Downloading from: {url}")
 
-  resp <- tryCatch(
+  # Download File ----
+  resp <- download_with_error_handling(url, export)
+  validate_http_response(resp, url, export)
+
+  # Validate Downloaded File ----
+  validate_downloaded_file(export, url)
+
+  # Log Success ----
+  file_size_mb <- round(file.info(export)$size / 1024^2, 2)
+  logger::log_info("Downloaded {file_size_mb} MB to: {export}")
+
+  invisible(export)
+}
+
+# Helper Functions ----
+
+#' Download file with error handling
+#' @keywords internal
+download_with_error_handling <- function(url, export) {
+  tryCatch(
     httr2::request(base_url = url) |>
       httr2::req_progress() |>
       httr2::req_perform(path = export),
     error = function(e) {
-      if (file.exists(export)) {
-        unlink(export, force = TRUE)
-      }
-      stop(paste0("Failed to download (connection error) from: ", url))
+      cleanup_failed_download(export)
+      stop(
+        "Failed to download from ",
+        url,
+        ": ",
+        conditionMessage(e),
+        call. = FALSE
+      )
     }
   )
+}
 
-  status <- httr2::resp_status(resp = resp)
-  if (status < 200L) {
-    if (file.exists(export)) {
-      unlink(export, force = TRUE)
-    }
-    stop(paste0("Failed to download (HTTP ", status, ") from: ", url))
+#' Validate HTTP response status
+#' @keywords internal
+validate_http_response <- function(resp, url, export) {
+  status <- httr2::resp_status(resp)
+
+  if (status < 200L || status >= 300L) {
+    cleanup_failed_download(export)
+    stop(
+      "HTTP error ",
+      status,
+      " downloading from: ",
+      url,
+      call. = FALSE
+    )
   }
-  if (status >= 300L) {
-    if (file.exists(export)) {
-      unlink(export, force = TRUE)
-    }
-    stop(paste0("Failed to download (HTTP ", status, ") from: ", url))
+}
+
+#' Validate downloaded file exists and has content
+#' @keywords internal
+validate_downloaded_file <- function(export, url) {
+  # Check file exists
+  if (!file.exists(export)) {
+    stop(
+      "Download failed - file not created: ",
+      export,
+      call. = FALSE
+    )
   }
 
-  file_exists_check <- file.exists(export)
-  if (!file_exists_check) {
-    stop(paste0("Failed to download (file not created) from: ", url))
+  # Check file size
+  file_size <- file.size(export)
+  if (file_size <= 0L) {
+    cleanup_failed_download(export)
+    stop(
+      "Download failed - empty file from: ",
+      url,
+      call. = FALSE
+    )
   }
 
-  file_size_check <- file.size(export)
-  if (file_size_check <= 0L) {
-    unlink(export, force = TRUE)
-    stop(paste0("Failed to download (empty file) from: ", url))
+  # Validate file content (detect HTML error pages)
+  validate_file_content(export, url)
+}
+
+#' Validate file content is not an HTML error page
+#' @keywords internal
+validate_file_content <- function(export, url) {
+  # Read file header
+  header_raw <- read_file_header(export, n_bytes = 512L)
+
+  if (length(header_raw) == 0L) {
+    return(invisible(TRUE))
   }
 
-  header_raw <- tryCatch(
+  # Check for valid binary formats (zip, gzip)
+  if (is_valid_binary_format(header_raw)) {
+    return(invisible(TRUE))
+  }
+
+  # Check for HTML error page
+  if (is_html_content(header_raw)) {
+    cleanup_failed_download(export)
+    stop(
+      "Download failed - received HTML error page from: ",
+      url,
+      call. = FALSE
+    )
+  }
+
+  invisible(TRUE)
+}
+
+#' Read file header bytes
+#' @keywords internal
+read_file_header <- function(file_path, n_bytes = 512L) {
+  tryCatch(
     {
-      con <- file(export, open = "rb")
+      con <- file(file_path, open = "rb")
       on.exit(close(con), add = TRUE)
-      readBin(con, what = "raw", n = 512L)
+      readBin(con, what = "raw", n = n_bytes)
     },
     error = function(e) raw()
   )
+}
 
-  is_zip <- FALSE
-  if (length(header_raw) >= 2L) {
-    if (identical(header_raw[1:2], as.raw(c(0x50, 0x4b)))) {
-      is_zip <- TRUE
-    }
+#' Check if header indicates valid binary format
+#' @keywords internal
+is_valid_binary_format <- function(header_raw) {
+  if (length(header_raw) < 2L) {
+    return(FALSE)
   }
 
-  is_gzip <- FALSE
-  if (length(header_raw) >= 2L) {
-    if (identical(header_raw[1:2], as.raw(c(0x1f, 0x8b)))) {
-      is_gzip <- TRUE
-    }
+  # ZIP signature: 0x50 0x4B (PK)
+  is_zip <- identical(header_raw[1:2], as.raw(c(0x50, 0x4b)))
+
+  # GZIP signature: 0x1F 0x8B
+  is_gzip <- identical(header_raw[1:2], as.raw(c(0x1f, 0x8b)))
+
+  is_zip || is_gzip
+}
+
+#' Check if content is HTML
+#' @keywords internal
+is_html_content <- function(header_raw) {
+  header_txt <- tryCatch(
+    tolower(paste0(rawToChar(header_raw, multiple = TRUE), collapse = "")),
+    error = function(e) ""
+  )
+
+  header_trim <- sub("^[\t\r\n ]+", "", header_txt)
+
+  if (!nzchar(header_trim)) {
+    return(FALSE)
   }
 
-  if (!is_zip) {
-    if (!is_gzip) {
-      if (length(header_raw) > 0L) {
-        header_txt <- tryCatch(
-          tolower(paste0(
-            rawToChar(header_raw, multiple = TRUE),
-            collapse = ""
-          )),
-          error = function(e) ""
-        )
-        header_trim <- sub("^[\t\r\n ]+", "", header_txt)
-        if (nzchar(header_trim)) {
-          if (
-            grepl("^<!doctype html|^<html|^<head", header_trim, perl = TRUE)
-          ) {
-            unlink(export, force = TRUE)
-            stop(paste0("Failed to download (HTML error page) from: ", url))
-          }
-        }
-      }
-    }
-  }
+  grepl("^<!doctype html|^<html|^<head", header_trim, perl = TRUE)
+}
 
-  file_size_mb <- round(file.info(export)$size / 1024^2, 2)
-  logger::log_info("Successfully downloaded {file_size_mb} MB to: {export}")
-  invisible(export)
+#' Clean up failed download
+#' @keywords internal
+cleanup_failed_download <- function(export) {
+  if (file.exists(export)) {
+    unlink(export, force = TRUE)
+  }
 }

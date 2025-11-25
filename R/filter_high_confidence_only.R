@@ -43,7 +43,7 @@ filter_high_confidence_only <- function(
   context = NULL
 ) {
   # Validation ----
-  validate_dataframe(df, name = "df", allow_empty = TRUE)
+  validate_dataframe(df, param_name = "df", allow_empty = TRUE)
 
   if (nrow(df) == 0L) {
     logger::log_warn("Empty data frame provided to filter")

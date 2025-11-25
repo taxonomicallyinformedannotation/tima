@@ -26,13 +26,13 @@ clean_bio <- function(
 
   validate_dataframe(
     annot_table_wei_bio,
-    name = "annot_table_wei_bio",
+    param_name = "annot_table_wei_bio",
     allow_empty = TRUE
   )
 
   validate_dataframe(
     edges_table,
-    name = "edges_table",
+    param_name = "edges_table",
     allow_empty = TRUE
   )
 

@@ -1,100 +1,123 @@
-#' @title Distance between two elements in a distance matrix
+#' @title Get distance between two elements
 #'
-#' @description This function calculates the distance between two elements
-#'     in a distance matrix by their indices. Returns 0 for identical elements.
+#' @description Calculates the distance between two elements in a distance
+#'     matrix by their indices. Optimized for repeated lookups.
 #'
-#' @details Credit goes to usedist package for the algorithm
+#' @details Credit: Algorithm adapted from usedist package
+#'
+#' @include validators.R
 #'
 #' @param d Distance matrix or dist object
-#' @param idx1 Integer index of the first element
-#' @param idx2 Integer index of the second element
+#' @param idx1 Integer index of the first element (1-based)
+#' @param idx2 Integer index of the second element (1-based)
 #'
-#' @return Numeric distance between the two elements. Returns 0 if indices
-#'     are identical, NA if indices are invalid.
+#' @return Numeric distance between the two elements.
+#'     Returns 0 if indices are identical.
+#'     Returns NA if indices are out of bounds (with warning).
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Create distance matrix
+#' data_mat <- matrix(rnorm(20), nrow = 5)
+#' d <- dist(data_mat)
+#'
+#' # Get distance between elements 1 and 3
+#' dist_get(d, 1, 3)
+#'
+#' # Distance to self is 0
+#' dist_get(d, 2, 2)
+#' }
 dist_get <- function(d, idx1, idx2) {
   # Input Validation and Conversion ----
-
-  # Convert input to distance object if needed
   if (!inherits(d, "dist")) {
     d <- stats::as.dist(m = d)
   }
 
-  # Get size of distance matrix
   n <- attr(d, "Size")
 
-  # Validate indices
-  invalid_indices <- idx1 < 1L | idx1 > n | idx2 < 1L | idx2 > n
-  if (any(invalid_indices)) {
+  # Validate indices are within bounds
+  if (any(idx1 < 1L | idx1 > n | idx2 < 1L | idx2 > n)) {
     warning(
-      "Some indices are out of bounds (n=",
+      "Some indices out of bounds (n=",
       n,
-      "), returning NA for those"
+      "), returning NA",
+      call. = FALSE
     )
   }
 
-  # Calculate Distance ----
-
-  # Calculate linear index into lower triangle of distance matrix
+  # Calculate Distance (Vectorized) ----
+  # Map to lower triangle indices
   i <- pmin(idx1, idx2)
   j <- pmax(idx1, idx2)
 
-  # For identical indices, distance is 0; otherwise calculate position
+  # Linear index in packed distance matrix
   linear_idx <- ifelse(
     i == j,
     NA_integer_,
     n * (i - 1L) - i * (i - 1L) / 2L + j - i
   )
 
-  # Return distance (0 for identical indices, value from matrix otherwise)
+  # Return: 0 for diagonal, matrix value otherwise
   ifelse(i == j, 0, d[linear_idx])
 }
 
-#' @title Dist groups
+#' @title Calculate pairwise distances with group labels
 #'
-#' @description This function calculates pairwise distances between observations
-#'     and annotates them with group membership information. Optimized for
-#'     large distance matrices.
+#' @description Computes pairwise distances between observations and annotates
+#'     them with group membership. Useful for analyzing within-group vs
+#'     between-group distances.
 #'
-#' @param d A distance object or matrix
-#' @param g A grouping vector for the observations in the distance object.
-#'     Must have length equal to the number of observations.
+#' @include validators.R
 #'
-#' @return A data frame containing distance information between pairs of
-#'     observations with columns:
-#'     \item{Item1}{Index of first observation}
-#'     \item{Item2}{Index of second observation}
-#'     \item{Group1}{Group label of first observation}
-#'     \item{Group2}{Group label of second observation}
-#'     \item{Label}{Factor indicating if distance is within or between groups}
-#'     \item{Distance}{Numeric distance value rounded to 5 digits}
+#' @param d Distance object or matrix
+#' @param g Grouping vector for observations. Must have length equal to
+#'     number of observations in distance matrix.
 #'
-#' @examples NULL
+#' @return Data frame with columns:
+#'   \item{Item1}{Index of first observation}
+#'   \item{Item2}{Index of second observation}
+#'   \item{Group1}{Group label of first observation}
+#'   \item{Group2}{Group label of second observation}
+#'   \item{Label}{Factor: "Within" or "Between" groups}
+#'   \item{Distance}{Numeric distance (rounded to 5 decimals)}
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Sample data with groups
+#' data <- matrix(rnorm(30), nrow = 10)
+#' groups <- rep(c("A", "B", "C"), c(3, 4, 3))
+#' d <- dist(data)
+#'
+#' # Calculate distances with group info
+#' result <- dist_groups(d, groups)
+#'
+#' # Analyze within vs between group distances
+#' aggregate(Distance ~ Label, data = result, FUN = mean)
+#' }
 dist_groups <- function(d, g) {
   # Input Validation ----
-
-  # Convert d to a dist object
   d <- stats::as.dist(m = d)
-
-  # Convert g to a factor
   g <- as.factor(g)
 
-  # Validate that lengths match
   n_obs <- attr(d, "Size")
+
   if (length(g) != n_obs) {
     stop(
-      "Length of grouping vector (",
+      "Grouping vector length (",
       length(g),
-      ") does not match number of observations (",
+      ") must match ",
+      "number of observations (",
       n_obs,
-      ")"
+      ")",
+      call. = FALSE
     )
   }
 
   # Generate Pairwise Combinations ----
-
-  # Get all pairwise combinations of observation indices
   idx_pairs <- utils::combn(x = n_obs, m = 2L)
   idx1 <- idx_pairs[1L, ]
   idx2 <- idx_pairs[2L, ]
