@@ -54,7 +54,7 @@ log_file_op <- function(action, path, size_bytes = NULL, n_rows = NULL) {
 #' @return Formatted string
 #' @keywords internal
 format_count <- function(x) {
-  prettyNum(as.character(x), big.mark = ",", scientific = FALSE)
+  formatC(x = x, format = "fg", big.mark = ",", drop0trailing = TRUE)
 }
 
 #' Format file size in human-readable format
@@ -86,13 +86,17 @@ format_bytes <- function(bytes) {
 #' @return Formatted string (e.g., "2.5s", "1m 30s")
 #' @keywords internal
 format_time <- function(seconds) {
-  if (is.na(seconds) || seconds < 0) return("unknown")
+  if (is.na(seconds) || seconds < 0) {
+    return("unknown")
+  }
 
-  if (seconds < 1) 
+  if (seconds < 1) {
     return(paste0(round(seconds * 1000), "ms"))
+  }
 
-  if (seconds < 60)
+  if (seconds < 60) {
     return(paste0(round(seconds, 1), "s"))
+  }
 
   # one division block only
   mins <- seconds %/% 60
@@ -100,16 +104,20 @@ format_time <- function(seconds) {
 
   if (seconds < 3600) {
     secs <- round(secs)
-    if (secs == 0) return(paste0(mins, "m"))
+    if (secs == 0) {
+      return(paste0(mins, "m"))
+    }
     return(paste0(mins, "m ", secs, "s"))
   }
 
   # hours
-  hrs  <- mins %/% 60
+  hrs <- mins %/% 60
   mins <- mins - hrs * 60
   mins <- round(mins)
 
-  if (mins == 0) return(paste0(hrs, "h"))
+  if (mins == 0) {
+    return(paste0(hrs, "h"))
+  }
   paste0(hrs, "h ", mins, "m")
 }
 
