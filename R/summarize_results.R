@@ -1,24 +1,37 @@
-#' @title Summarize results
+#' @title Summarize annotation results
 #'
-#' @description This function summarizes annotation results by adding feature
-#'     metadata, filtering/collapsing columns, and optionally removing tied
-#'     scores or summarizing to one row per feature. Creates a final, simplified
-#'     results table for downstream analysis or reporting.
+#' @description Summarizes annotation results by adding feature metadata,
+#'     filtering/collapsing columns, and optionally removing tied scores or
+#'     summarizing to one row per feature. Creates final results table.
 #'
 #' @include clean_collapse.R
 #' @include columns_model.R
+#' @include validators.R
 #'
 #' @param df Data frame containing weighted annotation results
-#' @param annot_table_wei_chemo Data frame with chemically weighted annotations
-#' @param components_table Data frame with molecular network component assignments
 #' @param features_table Data frame with feature metadata (RT, m/z, etc.)
+#' @param components_table Data frame with network component assignments
 #' @param structure_organism_pairs_table Data frame with structure-organism pairs
+#' @param annot_table_wei_chemo Data frame with chemically weighted annotations
 #' @param remove_ties Logical whether to remove tied scores (keep only highest)
 #' @param summarize Logical whether to collapse to 1 row per feature
 #'
 #' @return Data frame containing summarized annotation results
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' summary <- summarize_results(
+#'   df = annotations,
+#'   features_table = features,
+#'   components_table = components,
+#'   structure_organism_pairs_table = sop,
+#'   annot_table_wei_chemo = weighted_chemo,
+#'   remove_ties = TRUE,
+#'   summarize = TRUE
+#' )
+#' }
 summarize_results <- function(
   df,
   features_table,
@@ -28,35 +41,22 @@ summarize_results <- function(
   remove_ties,
   summarize
 ) {
-  # Validate inputs
-  if (!is.data.frame(df)) {
-    stop("df must be a data frame")
-  }
+  # Input Validation ----
+  validate_dataframe(df, param_name = "df")
+  validate_dataframe(features_table, param_name = "features_table")
+  validate_dataframe(components_table, param_name = "components_table")
+  validate_dataframe(
+    structure_organism_pairs_table,
+    param_name = "structure_organism_pairs_table"
+  )
+  validate_dataframe(
+    annot_table_wei_chemo,
+    param_name = "annot_table_wei_chemo"
+  )
+  validate_logical(remove_ties, param_name = "remove_ties")
+  validate_logical(summarize, param_name = "summarize")
 
-  if (!is.data.frame(features_table)) {
-    stop("features_table must be a data frame")
-  }
-
-  if (!is.data.frame(components_table)) {
-    stop("components_table must be a data frame")
-  }
-
-  if (!is.data.frame(structure_organism_pairs_table)) {
-    stop("structure_organism_pairs_table must be a data frame")
-  }
-
-  if (!is.data.frame(annot_table_wei_chemo)) {
-    stop("annot_table_wei_chemo must be a data frame")
-  }
-
-  if (!is.logical(remove_ties)) {
-    stop("remove_ties must be logical (TRUE/FALSE)")
-  }
-
-  if (!is.logical(summarize)) {
-    stop("summarize must be logical (TRUE/FALSE)")
-  }
-
+  # Early exit for empty results
   if (nrow(df) == 0L) {
     msg <- "Empty results table provided"
     warning(msg, call. = FALSE)
@@ -65,12 +65,7 @@ summarize_results <- function(
   }
 
   logger::log_info("Summarizing annotation results")
-  logger::log_debug(
-    "Options - Remove ties: ",
-    remove_ties,
-    ", Summarize: ",
-    summarize
-  )
+  logger::log_debug("Remove ties: {remove_ties}, Summarize: {summarize}")
 
   model <- columns_model()
 

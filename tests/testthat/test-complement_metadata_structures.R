@@ -22,7 +22,7 @@ test_that("complement_metadata_structures errors on invalid file paths", {
       str_tax_cla = "missing_cla.tsv",
       str_tax_npc = "missing_npc.tsv"
     ),
-    "file not found"
+    "Please verify file paths and ensure all required files are present."
   )
 })
 

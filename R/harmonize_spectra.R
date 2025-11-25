@@ -1,70 +1,84 @@
-#' @title Harmonize spectra
+#' @title Harmonize spectra metadata
 #'
-#' @description This function harmonizes spectra header fields by mapping
-#'     library-specific column names to standardized field names. It handles
-#'     different naming conventions across spectral libraries and ensures
-#'     consistent metadata structure.
+#' @description Harmonizes spectra header fields by mapping library-specific
+#'     column names to standardized field names. Handles different naming
+#'     conventions across spectral libraries.
 #'
-#' @param spectra Data frame containing spectra data to be harmonized
-#' @param metad Metadata to identify the library source
-#' @param mode MS ionization mode. Must contain 'pos' or 'neg'
-#' @param col_ad Name of the adduct field in the input spectra
-#' @param col_ce Name of the collision energy field
-#' @param col_ci Name of the compound ID field
-#' @param col_em Name of the exact mass field
-#' @param col_in Name of the InChI field
-#' @param col_io Name of the InChI without stereochemistry field
-#' @param col_ik Name of the InChIKey field
-#' @param col_il Name of the InChIKey connectivity layer field
-#' @param col_mf Name of the molecular formula field
-#' @param col_na Name of the compound name field
-#' @param col_po Name of the polarity field
-#' @param col_sm Name of the SMILES field
-#' @param col_sn Name of the SMILES without stereochemistry field
-#' @param col_si Name of the spectrum ID field
-#' @param col_sp Name of the SPLASH field
-#' @param col_sy Name of the synonyms field
-#' @param col_xl Name of the xLogP field
+#' @include validators.R
 #'
-#' @return A data frame with harmonized column names and standardized field names
+#' @param spectra Data frame containing spectra to harmonize
+#' @param metad Metadata identifying the library source
+#' @param mode MS ionization mode (must contain 'pos' or 'neg')
+#' @param col_ad Adduct field name
+#' @param col_ce Collision energy field name
+#' @param col_ci Compound ID field name
+#' @param col_em Exact mass field name
+#' @param col_in InChI field name
+#' @param col_io InChI without stereochemistry field name
+#' @param col_ik InChIKey field name
+#' @param col_il InChIKey connectivity layer field name
+#' @param col_mf Molecular formula field name
+#' @param col_na Compound name field name
+#' @param col_po Polarity field name
+#' @param col_sm SMILES field name
+#' @param col_sn SMILES without stereochemistry field name
+#' @param col_si Spectrum ID field name
+#' @param col_sp SPLASH field name
+#' @param col_sy Synonyms field name
+#' @param col_xl xLogP field name
 #'
-#' @examples NULL
+#' @return Data frame with harmonized column names and standardized fields
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' harmonized <- harmonize_spectra(
+#'   spectra = raw_spectra,
+#'   metad = "GNPS",
+#'   mode = "positive",
+#'   col_na = "Compound_Name",
+#'   col_sm = "SMILES",
+#'   col_ik = "InChIKey"
+#'   # ... other column mappings
+#' )
+#' }
 harmonize_spectra <- function(
   spectra,
-  metad = get("metad", envir = parent.frame()),
+  metad,
   mode,
-  col_ad = get("col_ad", envir = parent.frame()),
-  col_ce = get("col_ce", envir = parent.frame()),
-  col_ci = get("col_ci", envir = parent.frame()),
-  col_em = get("col_em", envir = parent.frame()),
-  col_in = get("col_in", envir = parent.frame()),
-  col_io = get("col_io", envir = parent.frame()),
-  col_ik = get("col_ik", envir = parent.frame()),
-  col_il = get("col_il", envir = parent.frame()),
-  col_mf = get("col_mf", envir = parent.frame()),
-  col_na = get("col_na", envir = parent.frame()),
-  col_po = get("col_po", envir = parent.frame()),
-  col_sm = get("col_sm", envir = parent.frame()),
-  col_sn = get("col_sn", envir = parent.frame()),
-  col_si = get("col_si", envir = parent.frame()),
-  col_sp = get("col_sp", envir = parent.frame()),
-  col_sy = get("col_sy", envir = parent.frame()),
-  col_xl = get("col_xl", envir = parent.frame())
+  col_ad,
+  col_ce,
+  col_ci,
+  col_em,
+  col_in,
+  col_io,
+  col_ik,
+  col_il,
+  col_mf,
+  col_na,
+  col_po,
+  col_sm,
+  col_sn,
+  col_si,
+  col_sp,
+  col_sy,
+  col_xl
 ) {
   # Input Validation ----
+  validate_dataframe(spectra, param_name = "spectra")
 
-  # Validate mode first (cheapest check)
+  # Validate mode contains 'pos' or 'neg'
   if (!grepl("pos|neg", mode, ignore.case = TRUE)) {
-    stop("Mode must contain 'pos' or 'neg', got: ", mode)
+    stop(
+      "mode must contain 'pos' or 'neg', got: ",
+      mode,
+      call. = FALSE
+    )
   }
 
-  # Validate spectra is a data frame
-  if (!is.data.frame(spectra)) {
-    stop("Input 'spectra' must be a data frame")
-  }
-
-  # Validate all column name parameters
-  col_params <- list(
+  # Validate all column parameters are character strings or NULL
+  validate_column_mappings(list(
     col_ad = col_ad,
     col_ce = col_ce,
     col_ci = col_ci,
@@ -82,20 +96,7 @@ harmonize_spectra <- function(
     col_sp = col_sp,
     col_sy = col_sy,
     col_xl = col_xl
-  )
-
-  # Check all parameters are single character strings or NULL
-  is_valid <- sapply(col_params, function(param) {
-    is.null(param) || (is.character(param) && length(param) == 1L)
-  })
-
-  if (!all(is_valid)) {
-    invalid_params <- names(col_params)[!is_valid]
-    stop(
-      "Column name parameter(s) must be single character strings or NULL: ",
-      paste(invalid_params, collapse = ", ")
-    )
-  }
+  ))
 
   # Harmonize Column Names ----
 
@@ -250,4 +251,30 @@ harmonize_spectra <- function(
   rm(spectra_filtered)
 
   return(spectra_harmonized)
+}
+
+# Helper Functions ----
+
+#' Validate column mapping parameters
+#' @keywords internal
+validate_column_mappings <- function(col_params) {
+  # Check all parameters are single character strings or NULL
+  is_valid <- vapply(
+    col_params,
+    function(param) {
+      is.null(param) || (is.character(param) && length(param) == 1L)
+    },
+    logical(1)
+  )
+
+  if (!all(is_valid)) {
+    invalid_params <- names(col_params)[!is_valid]
+    stop(
+      "Column name parameter(s) must be single character strings or NULL: ",
+      paste(invalid_params, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  invisible(TRUE)
 }

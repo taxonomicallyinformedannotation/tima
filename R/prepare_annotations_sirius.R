@@ -297,7 +297,13 @@ prepare_annotations_sirius <-
           candidate_structure_tax_cla_01kin = NA
         )
       table <- table |>
-        select_annotations_columns()
+        select_annotations_columns(
+          str_stereo = str_stereo,
+          str_met = str_met,
+          str_nam = str_nam,
+          str_tax_cla = str_tax_cla,
+          str_tax_npc = str_tax_npc
+        )
       rm(
         structures_prepared,
         formulas_prepared,

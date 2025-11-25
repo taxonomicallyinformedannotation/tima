@@ -141,7 +141,13 @@ prepare_annotations_gnps <- function(
         candidate_structure_tax_cla_chemontid = NA,
         candidate_structure_tax_cla_01kin = NA
       ) |>
-      select_annotations_columns()
+      select_annotations_columns(
+        str_stereo = str_stereo,
+        str_met = str_met,
+        str_nam = str_nam,
+        str_tax_cla = str_tax_cla,
+        str_tax_npc = str_tax_npc
+      )
   } else {
     logger::log_warn(
       "No GNPS annotations found, returning an empty file instead"
