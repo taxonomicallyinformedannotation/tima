@@ -156,28 +156,15 @@ test_that("logging helpers are safe with edge cases", {
 
 test_that("formatters are fast", {
   skip_on_cran()
-
   # format_count should be fast
-  timing <- system.time(
-    for (i in 1:1000) {
-      format_count(12345)
-    }
-  )
+  timing <- system.time(format_count(rep(12345, 1000L)))
   expect_lt(timing["elapsed"], 0.1)
 
   # format_bytes should be fast
-  timing <- system.time(
-    for (i in 1:1000) {
-      format_bytes(1024^2)
-    }
-  )
+  timing <- system.time(format_bytes(rep(1024^2, 1000L)))
   expect_lt(timing["elapsed"], 0.1)
 
   # format_time should be fast
-  timing <- system.time(
-    for (i in 1:1000) {
-      format_time(65.5)
-    }
-  )
+  timing <- system.time(format_time(rep(65.5, 1000L)))
   expect_lt(timing["elapsed"], 0.1)
 })

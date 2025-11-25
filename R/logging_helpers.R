@@ -64,19 +64,33 @@ format_count <- function(x) {
 #' @return Formatted string (e.g., "1.5 MB")
 #' @keywords internal
 format_bytes <- function(bytes) {
-  if (is.na(bytes) || bytes < 0) {
-    return("unknown")
-  }
+  # Handle NA and negative
+  out <- character(length(bytes))
+  bad <- is.na(bytes) | bytes < 0
+  out[bad] <- "unknown"
 
-  if (bytes < 1024) {
-    paste0(bytes, " B")
-  } else if (bytes < 1024^2) {
-    paste0(round(bytes / 1024, 1), " KB")
-  } else if (bytes < 1024^3) {
-    paste0(round(bytes / 1024^2, 1), " MB")
-  } else {
-    paste0(round(bytes / 1024^3, 2), " GB")
-  }
+  # Safe default for good values
+  b <- bytes[!bad]
+
+  # Define thresholds
+  KB <- 1024
+  MB <- 1024^2
+  GB <- 1024^3
+
+  out[!bad] <- ifelse(
+    b < KB,
+    paste0(b, " B"),
+    ifelse(
+      b < MB,
+      paste0(round(b / KB, 1), " KB"),
+      ifelse(
+        b < GB,
+        paste0(round(b / MB, 1), " MB"),
+        paste0(round(b / GB, 2), " GB")
+      )
+    )
+  )
+  out
 }
 
 #' Format elapsed time in human-readable format
@@ -86,39 +100,48 @@ format_bytes <- function(bytes) {
 #' @return Formatted string (e.g., "2.5s", "1m 30s")
 #' @keywords internal
 format_time <- function(seconds) {
-  if (is.na(seconds) || seconds < 0) {
-    return("unknown")
+  out <- character(length(seconds))
+
+  # invalid inputs
+  bad <- is.na(seconds) | seconds < 0
+  out[bad] <- "unknown"
+
+  s <- seconds[!bad]
+
+  # < 1 second -> ms
+  idx <- s < 1
+  out[!bad][idx] <- paste0(round(s[idx] * 1000), "ms")
+
+  # < 60 seconds -> X.Xs
+  idx2 <- s >= 1 & s < 60
+  out[!bad][idx2] <- paste0(round(s[idx2], 1), "s")
+
+  # < 3600 seconds -> Xm Ys
+  idx3 <- s >= 60 & s < 3600
+  if (any(idx3)) {
+    m <- s[idx3] %/% 60
+    sec <- round(s[idx3] - m * 60)
+    out[!bad][idx3] <- ifelse(
+      sec == 0,
+      paste0(m, "m"),
+      paste0(m, "m ", sec, "s")
+    )
   }
 
-  if (seconds < 1) {
-    return(paste0(round(seconds * 1000), "ms"))
+  # >= 3600 seconds -> Xh Ym
+  idx4 <- s >= 3600
+  if (any(idx4)) {
+    total_m <- s[idx4] %/% 60
+    h <- total_m %/% 60
+    m <- round(total_m - h * 60)
+    out[!bad][idx4] <- ifelse(
+      m == 0,
+      paste0(h, "h"),
+      paste0(h, "h ", m, "m")
+    )
   }
 
-  if (seconds < 60) {
-    return(paste0(round(seconds, 1), "s"))
-  }
-
-  # one division block only
-  mins <- seconds %/% 60
-  secs <- seconds - mins * 60
-
-  if (seconds < 3600) {
-    secs <- round(secs)
-    if (secs == 0) {
-      return(paste0(mins, "m"))
-    }
-    return(paste0(mins, "m ", secs, "s"))
-  }
-
-  # hours
-  hrs <- mins %/% 60
-  mins <- mins - hrs * 60
-  mins <- round(mins)
-
-  if (mins == 0) {
-    return(paste0(hrs, "h"))
-  }
-  paste0(hrs, "h ", mins, "m")
+  out
 }
 
 #' Format percentage
