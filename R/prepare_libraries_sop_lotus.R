@@ -37,7 +37,9 @@ prepare_libraries_sop_lotus <- function(
   # Process LOTUS data if available
   if (file.exists(input)) {
     file_size <- file.info(input)$size
-    logger::log_info("Loading LOTUS database: {basename(input)} ({format_bytes(file_size)})")
+    logger::log_info(
+      "Loading LOTUS database: {basename(input)} ({format_bytes(file_size)})"
+    )
 
     lotus_prepared <- input |>
       tidytable::fread(
@@ -57,7 +59,10 @@ prepare_libraries_sop_lotus <- function(
       round_reals() |>
       tidytable::distinct()
 
-    log_with_count("Prepared unique structure-organism pairs from LOTUS", n = nrow(lotus_prepared))
+    log_with_count(
+      "Prepared unique structure-organism pairs from LOTUS",
+      n = nrow(lotus_prepared)
+    )
   } else {
     logger::log_warn(
       "LOTUS database not found at: {input}"

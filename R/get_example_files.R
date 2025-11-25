@@ -62,7 +62,9 @@ get_example_files <- function(
     stop("in_cache must be a single logical value (TRUE/FALSE)")
   }
 
-  logger::log_debug("Downloading {length(example)} example file(s): {paste(example, collapse = ', ')}")
+  logger::log_debug(
+    "Downloading {length(example)} example file(s): {paste(example, collapse = ', ')}"
+  )
 
   # Navigate to cache if requested
   if (in_cache) {

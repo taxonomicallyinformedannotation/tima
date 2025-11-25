@@ -32,7 +32,9 @@ get_file <- function(url, export, limit = 3600L) {
 
   # Check if file already exists
   if (file.exists(export)) {
-    logger::log_debug("File already exists, skipping download: {basename(export)}")
+    logger::log_debug(
+      "File already exists, skipping download: {basename(export)}"
+    )
     return(invisible(export))
   }
 

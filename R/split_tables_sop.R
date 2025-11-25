@@ -130,12 +130,18 @@ split_tables_sop <- function(table, cache) {
   # Calculate structure statistics
   n_stereoisomers <- nrow(
     table_structures_stereo |>
-      tidytable::filter(!grepl("-UHFFFAOYSA-", structure_inchikey, fixed = TRUE)) |>
+      tidytable::filter(
+        !grepl(INCHI_NO_STEREO_PATTERN, structure_inchikey, fixed = TRUE)
+      ) |>
       tidytable::distinct(structure_inchikey)
   )
   n_no_stereo <- nrow(
     table_structures_stereo |>
-      tidytable::filter(grepl("-UHFFFAOYSA-", structure_inchikey, fixed = TRUE)) |>
+      tidytable::filter(grepl(
+        INCHI_NO_STEREO_PATTERN,
+        structure_inchikey,
+        fixed = TRUE
+      )) |>
       tidytable::distinct(structure_inchikey)
   )
   n_constitutional <- nrow(

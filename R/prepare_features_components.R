@@ -54,7 +54,9 @@ prepare_features_components <- function(
   }
 
   # Load Component Data ----
-  logger::log_debug("Loading molecular network components from {length(input)} file(s)")
+  logger::log_debug(
+    "Loading molecular network components from {length(input)} file(s)"
+  )
 
   # Load and combine component tables
   # logger::log_trace("Loading component tables")
@@ -83,7 +85,9 @@ prepare_features_components <- function(
       component_id = character(0)
     )
   } else {
-    logger::log_debug("Loaded {format_count(nrow(table))} component assignments")
+    logger::log_debug(
+      "Loaded {format_count(nrow(table))} component assignments"
+    )
 
     # Standardize column names and select relevant columns
     table <- table |>
@@ -93,7 +97,10 @@ prepare_features_components <- function(
       ) |>
       tidytable::distinct()
 
-    log_with_count("Prepared unique feature-component assignments", n = nrow(table))
+    log_with_count(
+      "Prepared unique feature-component assignments",
+      n = nrow(table)
+    )
   }
 
   # Export Results ----
