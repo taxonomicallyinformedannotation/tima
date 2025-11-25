@@ -8,6 +8,7 @@
 #' @include get_example_sirius.R
 #' @include get_file.R
 #' @include go_to_cache.R
+#' @include logging_helpers.R
 #'
 #' @param example Character vector specifying which example files to download.
 #'     Valid options: "features", "metadata", "sirius", "spectra", "spectral_lib_with_rt"
@@ -61,7 +62,7 @@ get_example_files <- function(
     stop("in_cache must be a single logical value (TRUE/FALSE)")
   }
 
-  logger::log_info("Downloading ", length(example), " example file(s)")
+  logger::log_debug("Downloading {length(example)} example file(s): {paste(example, collapse = ', ')}")
 
   # Navigate to cache if requested
   if (in_cache) {
@@ -113,6 +114,6 @@ get_example_files <- function(
     )
   }
 
-  logger::log_info("Successfully downloaded example files")
+  logger::log_info("Downloaded {length(example)} example file(s)")
   invisible(NULL)
 }

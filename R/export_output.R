@@ -6,6 +6,7 @@
 #'
 #' @include create_dir.R
 #' @include validators.R
+#' @include logging_helpers.R
 #'
 #' @param x Data frame or tibble to export
 #' @param file Character string path to the output file. File extension
@@ -19,7 +20,7 @@
 #' \dontrun{
 #' df <- data.frame(id = 1:100, value = rnorm(100))
 #' export_output(df, "output/data.tsv")
-#' export_output(df, "output/data.tsv.gz")  # Compressed
+#' export_output(df, "output/data.tsv.gz") # Compressed
 #' unlink("output", recursive = TRUE)
 #' }
 export_output <- function(x, file) {
@@ -30,15 +31,13 @@ export_output <- function(x, file) {
   # Prepare Export ----
   create_dir(export = file)
 
-  # Cache dimensions
-  dims <- dim(x)
-  nrows <- dims[1]
-  ncols <- dims[2]
+  # Cache dimensions for logging
+  nrows <- nrow(x)
+  ncols <- ncol(x)
 
-  logger::log_info("Exporting data to: {file}")
-  logger::log_debug("Dimensions: {nrows} rows × {ncols} columns")
+  logger::log_debug("Exporting {format_count(nrows)} rows x {ncols} columns to: {basename(file)}")
 
-  # Determine compression based on file extension
+  # Determine compression
   compress_method <- if (grepl("\\.gz$", file, ignore.case = TRUE)) {
     "gzip"
   } else {
@@ -47,12 +46,12 @@ export_output <- function(x, file) {
 
   # Warn for large datasets
   if (nrows > 100000L) {
-    logger::log_debug(
-      "Large dataset ({nrows} rows) - export may take time"
-    )
+    logger::log_debug("Large dataset - export may take time")
   }
 
   # Write Data with Error Handling ----
+  start_time <- Sys.time()
+
   tryCatch(
     {
       tidytable::fwrite(
@@ -63,7 +62,12 @@ export_output <- function(x, file) {
         compress = compress_method,
         showProgress = FALSE
       )
-      logger::log_info("Successfully exported {nrows} rows")
+
+      # Log success with timing
+      elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+      file_size <- file.info(file)$size
+      log_file_op("Exported", file, size_bytes = file_size, n_rows = nrows)
+      logger::log_debug("Export completed in {format_time(elapsed)}")
     },
     error = function(e) {
       logger::log_error("Export failed: {conditionMessage(e)}")

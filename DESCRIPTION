@@ -132,6 +132,7 @@ Collate:
     'create_edges_spectra.R'
     'decorate_bio.R'
     'decorate_chemo.R'
+    'logging_helpers.R'
     'export_output.R'
     'export_params.R'
     'export_spectra_rds.R'

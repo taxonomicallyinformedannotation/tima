@@ -6,6 +6,7 @@
 #'
 #' @include create_dir.R
 #' @include validators.R
+#' @include logging_helpers.R
 #' @include constants.R
 #'
 #' @param url Character string URL of the file to download
@@ -31,16 +32,17 @@ get_file <- function(url, export, limit = 3600L) {
 
   # Check if file already exists
   if (file.exists(export)) {
-    logger::log_info("File already exists, skipping download: {export}")
+    logger::log_debug("File already exists, skipping download: {basename(export)}")
     return(invisible(export))
   }
 
   # Prepare for Download ----
   create_dir(export = export)
   options(timeout = limit)
-  logger::log_info("Downloading from: {url}")
+  logger::log_debug("Downloading from: {url}")
 
   # Download File ----
+  start_time <- Sys.time()
   resp <- download_with_error_handling(url, export)
   validate_http_response(resp, url, export)
 
@@ -48,8 +50,10 @@ get_file <- function(url, export, limit = 3600L) {
   validate_downloaded_file(export, url)
 
   # Log Success ----
-  file_size_mb <- round(file.info(export)$size / 1024^2, 2)
-  logger::log_info("Downloaded {file_size_mb} MB to: {export}")
+  elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+  file_size <- file.info(export)$size
+  log_file_op("Downloaded", export, size_bytes = file_size)
+  logger::log_debug("Download completed in {format_time(elapsed)}")
 
   invisible(export)
 }

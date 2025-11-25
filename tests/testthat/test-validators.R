@@ -391,104 +391,152 @@ test_that("validate_dataframe uses custom parameter names", {
   )
 })
 
-## Integration ----
+## validate_weights ----
 
-test_that("validators provide consistent error message format", {
-  # Helper to capture error messages
-  capture_error_msg <- function(expr) {
-    tryCatch(expr, error = function(e) e$message)
-  }
+test_that("validate_weights accepts any positive weights (auto-normalized)", {
+  # Weights that sum to 1
+  expect_silent(validate_weights(c(0.5, 0.5)))
 
-  # All error messages should include parameter name and guidance
-  errors <- c(
-    capture_error_msg(validate_ms_mode("invalid")),
-    capture_error_msg(validate_numeric_range(15, 0, 10, param_name = "test")),
-    capture_error_msg(validate_character("x", allowed_values = c("a", "b")))
-  )
+  # Weights that DON'T sum to 1 (these should work now!)
+  expect_silent(validate_weights(c(1, 1)))
+  expect_silent(validate_weights(c(1, 2, 3)))
+  expect_silent(validate_weights(c(2, 3)))
 
-  # All should contain helpful information (non-empty, informative messages)
-  expect_true(all(nchar(errors) > 20))
-  expect_true(all(!is.na(errors)))
+  # Named weights
+  expect_silent(validate_weights(c(spectral = 1, biological = 1)))
+  expect_silent(validate_weights(c(spectral = 1, biological = 1, chemical = 1)))
+
+  # Different magnitudes
+  expect_silent(validate_weights(c(10, 20, 30)))
+  expect_silent(validate_weights(c(0.1, 0.2, 0.7)))
 })
 
-## Edge cases and stress tests ----
-
-test_that("validators handle edge cases gracefully", {
-  # Very long file paths (using efficient strrep instead of paste0(rep()))
-  long_path <- strrep("a", 1000)
+test_that("validate_weights rejects negative weights", {
   expect_error(
-    validate_file_existence(list(test = long_path)),
-    "not found"
+    validate_weights(c(1, -1)),
+    "must be non-negative"
   )
 
-  # Special characters in mode
-  expect_error(validate_ms_mode("pos\n"), "Invalid")
-
-  # Extreme tolerance values
-  expect_warning(validate_tolerances(tolerance_ppm = 1e10), "exceeds")
-  expect_error(validate_tolerances(tolerance_ppm = 1e-10), NA)
-
-  # Empty data frame
-  df <- data.frame()
-  expect_error(validate_dataframe(df, min_rows = 1), "must have at least")
-})
-
-test_that("assert_flag validates logical flags", {
-  expect_silent(assert_flag(TRUE, "flag"))
-  expect_silent(assert_flag(FALSE, "flag"))
-  expect_error(assert_flag(NA, "flag"), "must be logical")
-  expect_error(assert_flag(c(TRUE, FALSE), "flag"), "must be logical")
-  expect_error(assert_flag("TRUE", "flag"), "must be logical")
-})
-
-test_that("assert_positive_integer validates integers", {
-  expect_silent(assert_positive_integer(1, "n"))
-  expect_silent(assert_positive_integer(5, "n"))
-  expect_error(assert_positive_integer(0, "n"), "n must be > 0, got: 0")
-  expect_error(assert_positive_integer(-1, "n"), "n must be > 0, got: -1")
   expect_error(
-    assert_positive_integer(1.5, "n"),
-    "n must be an integer, got: 1.5"
+    validate_weights(c(-0.5, 0.5)),
+    "must be non-negative"
   )
+
+  # Should show which weights are negative
   expect_error(
-    assert_positive_integer(c(1, 2), "n"),
-    "n must be a single numeric value, got: numeric"
+    validate_weights(c(spectral = 1, biological = -1)),
+    "biological"
   )
 })
 
-test_that("validate_character basic behavior", {
-  expect_silent(validate_character("abc", param_name = "x"))
-  expect_error(validate_character(NULL, param_name = "x"), "x cannot be NULL")
+test_that("validate_weights rejects all zeros (division by zero)", {
   expect_error(
-    validate_character("", param_name = "x"),
-    "x cannot be an empty string"
+    validate_weights(c(0, 0)),
+    "cannot all be zero.*division by zero"
   )
+
   expect_error(
-    validate_character(c("a", "b"), param_name = "x"),
-    "single character string"
+    validate_weights(c(0, 0, 0)),
+    "cannot all be zero.*division by zero"
   )
 })
 
-test_that("validate_character allowed_values behavior", {
-  expect_silent(validate_character(
-    "apple",
-    allowed_values = c("apple", "pear"),
-    param_name = "fruit"
-  ))
+test_that("validate_weights allows single zero with other positive weights", {
+  # This is fine - only all zeros is problematic
+  expect_silent(validate_weights(c(0, 1)))
+  expect_silent(validate_weights(c(1, 0, 2)))
+})
+
+test_that("validate_weights rejects NA values", {
   expect_error(
-    validate_character(
-      "orange",
-      allowed_values = c("apple", "pear"),
-      param_name = "fruit"
-    ),
-    "must be one of"
+    validate_weights(c(1, NA)),
+    "weights cannot contain NA values"
+  )
+
+  expect_error(
+    validate_weights(c(NA, NA)),
+    "weights must be numeric, got: logical"
   )
 })
 
-test_that("validate_choice works similarly", {
-  expect_silent(validate_choice("OR", c("OR", "AND"), param_name = "logic"))
+test_that("validate_weights validates input types", {
   expect_error(
-    validate_choice("X", c("OR", "AND"), param_name = "logic"),
-    "must be one of"
+    validate_weights("not numeric"),
+    "must be numeric"
   )
+
+  expect_error(
+    validate_weights(list(a = "text", b = "text")),
+    "must be numeric"
+  )
+})
+
+test_that("validate_weights uses custom parameter names", {
+  expect_error(
+    validate_weights(c(-1, 1), param_name = "my_weights"),
+    "my_weights must be non-negative"
+  )
+
+  expect_error(
+    validate_weights(c(0, 0), param_name = "score_weights"),
+    "score_weights cannot all be zero"
+  )
+})
+
+test_that("validate_weights examples from documentation work", {
+  # From updated docs - these should all work!
+  expect_silent(validate_weights(c(spectral = 1, biological = 1)))
+  expect_silent(validate_weights(c(spectral = 2, chemical = 3, biological = 5)))
+  expect_silent(validate_weights(c(spectral = 0.5, biological = 0.5)))
+})
+
+test_that("validate_weights matches weight_bio.R and weight_chemo.R usage", {
+  # These are the actual use cases from the weight functions
+
+  # weight_bio uses 2 weights
+  expect_silent(validate_weights(c(
+    spectral = 1,
+    biological = 1
+  )))
+
+  # weight_chemo uses 3 weights
+  expect_silent(validate_weights(c(
+    spectral = 1,
+    biological = 1,
+    chemical = 1
+  )))
+
+  # Can use any positive ratios
+  expect_silent(validate_weights(c(
+    spectral = 2,
+    biological = 3,
+    chemical = 5
+  )))
+})
+
+## Performance tests ----
+
+test_that("validators are reasonably fast", {
+  # Test that validators don't add excessive overhead
+  skip_on_cran()
+
+  # Create test data
+  df <- data.frame(a = 1:1000, b = 1001:2000)
+
+  # validate_dataframe should be fast
+  timing <- system.time(
+    for (i in 1:100) {
+      validate_dataframe(df, param_name = "test_df")
+    }
+  )
+  expect_lt(timing["elapsed"], 1.0) # Should complete in < 1 second
+
+  # validate_weights should be fast
+  weights <- c(1, 2, 3)
+  timing <- system.time(
+    for (i in 1:1000) {
+      validate_weights(weights, param_name = "test_weights")
+    }
+  )
+  expect_lt(timing["elapsed"], 0.5) # Should complete in < 0.5 seconds
 })

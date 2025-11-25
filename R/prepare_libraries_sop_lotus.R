@@ -9,6 +9,7 @@
 #' @include get_params.R
 #' @include round_reals.R
 #' @include select_sop_columns.R
+#' @include logging_helpers.R
 #'
 #' @param input Character string path to the raw LOTUS data file
 #' @param output Character string path for the prepared output file
@@ -35,10 +36,8 @@ prepare_libraries_sop_lotus <- function(
 ) {
   # Process LOTUS data if available
   if (file.exists(input)) {
-    logger::log_info("Loading LOTUS database from: {input}")
-
-    file_size_mb <- file.info(input)$size / 1024^2
-    logger::log_debug("File size: {round(file_size_mb, 2)} MB")
+    file_size <- file.info(input)$size
+    logger::log_info("Loading LOTUS database: {basename(input)} ({format_bytes(file_size)})")
 
     lotus_prepared <- input |>
       tidytable::fread(
@@ -58,10 +57,7 @@ prepare_libraries_sop_lotus <- function(
       round_reals() |>
       tidytable::distinct()
 
-    n_pairs <- nrow(lotus_prepared)
-    logger::log_info(
-      "Prepared {n_pairs} unique structure-organism pairs from LOTUS"
-    )
+    log_with_count("Prepared unique structure-organism pairs from LOTUS", n = nrow(lotus_prepared))
   } else {
     logger::log_warn(
       "LOTUS database not found at: {input}"

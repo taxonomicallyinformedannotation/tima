@@ -4,7 +4,7 @@
 \alias{assert_flag}
 \title{Assert that a value is a valid logical flag}
 \usage{
-assert_flag(x, param_name)
+assert_flag(x, arg_name = deparse(substitute(x)))
 }
 \arguments{
 \item{x}{Value to check}
