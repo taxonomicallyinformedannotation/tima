@@ -58,30 +58,33 @@ make_clean_chemo_fixture <- function(
     candidate_structure_error_rt = rep(NA_real_, n_features * n_candidates),
     candidate_score_sirius_csi = rep(NA_real_, n_features * n_candidates),
     candidate_structure_tax_cla_04dirpar = rep(
-      NA_real_,
+      "Par_",
       n_features * n_candidates
     ),
     candidate_structure_tax_cla_03cla = rep(
-      NA_real_,
+      "Cla_",
       n_features * n_candidates
     ),
     candidate_structure_tax_cla_02sup = rep(
-      NA_real_,
+      "Sup_",
       n_features * n_candidates
     ),
     candidate_structure_tax_cla_01kin = rep(
-      NA_real_,
+      "Kin_",
       n_features * n_candidates
     ),
     candidate_structure_tax_npc_03cla = rep(
-      NA_real_,
+      "Cla_",
       n_features * n_candidates
     ),
     candidate_structure_tax_npc_02sup = rep(
-      NA_real_,
+      "Sup_",
       n_features * n_candidates
     ),
-    candidate_structure_tax_npc_01pat = rep(NA_real_, n_features * n_candidates)
+    candidate_structure_tax_npc_01pat = rep(
+      "Pat_",
+      n_features * n_candidates
+    )
   )
 
   # Add taxonomy columns if requested
@@ -733,31 +736,37 @@ test_that("clean_chemo handles empty annotation table", {
   expect_equal(nrow(result), 0)
 })
 
-# TODO acces envir parent frame vars
-# test_that("clean_chemo works with valid data", {
-#   fixture <- make_clean_chemo_fixture(n_features = 2, n_candidates = 5)
-#
-#   result <- clean_chemo(
-#     annot_table_wei_chemo = fixture$annot_table_wei_chemo,
-#     components_table = fixture$components_table,
-#     features_table = fixture$features_table,
-#     structure_organism_pairs_table = fixture$structure_organism_pairs_table,
-#     candidates_final = 3,
-#     best_percentile = 0.9,
-#     minimal_ms1_bio = 0.1,
-#     minimal_ms1_chemo = 0.1,
-#     minimal_ms1_condition = "OR",
-#     compounds_names = TRUE,
-#     high_confidence = FALSE,
-#     remove_ties = FALSE,
-#     summarize = FALSE,
-#     max_per_score = 7L
-#   )
-#
-#   expect_s3_class(result, "data.frame")
-#   expect_true(nrow(result) > 0)
-#   expect_true("feature_id" %in% names(result))
-# })
+test_that("clean_chemo normal", {
+  fixture <- make_clean_chemo_fixture()
+  # Mock environment weights
+  score_chemical_cla_kingdom <- 0.1
+  score_chemical_cla_superclass <- 0.2
+  score_chemical_cla_class <- 0.3
+  score_chemical_cla_parent <- 0.4
+  score_chemical_npc_pathway <- 0.3
+  score_chemical_npc_superclass <- 0.2
+  score_chemical_npc_class <- 0.1
+
+  expect_warning(
+    clean_chemo(
+      annot_table_wei_chemo = fixture$annot_table_wei_chemo,
+      components_table = fixture$components_table,
+      features_table = fixture$features_table,
+      structure_organism_pairs_table = fixture$structure_organism_pairs_table,
+      candidates_final = 5,
+      best_percentile = 0.9,
+      minimal_ms1_bio = 0.1,
+      minimal_ms1_chemo = 0.1,
+      minimal_ms1_condition = "OR",
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      max_per_score = 7L
+    ),
+    "NAs introduced by coercion"
+  )
+})
 
 test_that("clean_chemo validates inputs through main function", {
   fixture <- make_clean_chemo_fixture()
