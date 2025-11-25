@@ -133,7 +133,7 @@ test_that("summarize_results validates input types", {
       remove_ties = "yes",
       summarize = FALSE
     ),
-    "remove_ties must be logical"
+    "remove_ties must be a single logical value (.*), got: character"
   )
 
   # summarize must be logical
@@ -147,7 +147,7 @@ test_that("summarize_results validates input types", {
       remove_ties = FALSE,
       summarize = 1
     ),
-    "summarize must be logical"
+    "summarize must be a single logical value (.*), got: numeric"
   )
 })
 

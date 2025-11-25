@@ -1,61 +1,64 @@
-#' @title Select annotations columns
+#' @title Select and standardize annotation columns
 #'
-#' @description This function selects and standardizes annotation columns by
-#'     filtering to relevant fields, cleaning NULL/NA values, rounding numeric
-#'     values, and complementing with structure metadata. Used to prepare
-#'     annotation results for downstream analysis.
+#' @description Selects and standardizes annotation columns by filtering to
+#'     relevant fields, cleaning NULL/NA values, rounding numeric values,
+#'     and complementing with structure metadata.
 #'
 #' @include columns_model.R
 #' @include complement_metadata_structures.R
 #' @include round_reals.R
+#' @include validators.R
 #'
 #' @param df Data frame containing annotation results with structure and
 #'     candidate information
-#' @param str_stereo Character string path to file containing structure stereochemistry
-#' @param str_met Character string path to file containing structure metadata
-#' @param str_nam Character string path to file containing structure names
-#' @param str_tax_cla Character string path to file containing Classyfire taxonomy
-#' @param str_tax_npc Character string path to file containing NPClassifier taxonomy
+#' @param str_stereo Path to structure stereochemistry file
+#' @param str_met Path to structure metadata file
+#' @param str_nam Path to structure names file
+#' @param str_tax_cla Path to ClassyFire taxonomy file
+#' @param str_tax_npc Path to NPClassifier taxonomy file
 #'
 #' @return Data frame with standardized annotation columns, cleaned values,
 #'     and complemented metadata
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' result <- select_annotations_columns(
+#'   df = annotations,
+#'   str_stereo = "data/str_stereo.tsv",
+#'   str_met = "data/str_metadata.tsv",
+#'   str_nam = "data/str_names.tsv",
+#'   str_tax_cla = "data/str_tax_classyfire.tsv",
+#'   str_tax_npc = "data/str_tax_npclassifier.tsv"
+#' )
+#' }
 select_annotations_columns <- function(
   df,
-  str_stereo = get("str_stereo", envir = parent.frame()),
-  str_met = get("str_met", envir = parent.frame()),
-  str_nam = get("str_nam", envir = parent.frame()),
-  str_tax_cla = get("str_tax_cla", envir = parent.frame()),
-  str_tax_npc = get("str_tax_npc", envir = parent.frame())
+  str_stereo,
+  str_met,
+  str_nam,
+  str_tax_cla,
+  str_tax_npc
 ) {
-  # Validate inputs
-  if (!is.data.frame(df) && !inherits(df, "tbl")) {
-    stop("df must be a data frame or tibble")
-  }
+  # Input Validation ----
+  validate_dataframe(df, param_name = "df")
 
+  # Early exit for empty input
   if (nrow(df) == 0L) {
-    logger::log_warn("Empty data frame provided to select_annotations_columns")
+    logger::log_warn("Empty data frame provided")
     return(df)
   }
 
-  # Validate file paths (these are passed to complement_metadata_structures)
-  file_params <- list(
+  # Validate file paths (will be passed to complement_metadata_structures)
+  validate_file_existence(list(
     str_stereo = str_stereo,
     str_met = str_met,
     str_nam = str_nam,
     str_tax_cla = str_tax_cla,
     str_tax_npc = str_tax_npc
-  )
+  ))
 
-  for (param_name in names(file_params)) {
-    param_value <- file_params[[param_name]]
-    if (!is.character(param_value) || length(param_value) != 1L) {
-      stop(param_name, " must be a single character string")
-    }
-  }
-
-  # logger::log_trace("Selecting and standardizing annotation columns")
   logger::log_debug("Input: {nrow(df)} rows, {ncol(df)} columns")
 
   # Get column model
@@ -97,7 +100,13 @@ select_annotations_columns <- function(
       .fns = as.character
     )) |>
     # Complement with structure metadata
-    complement_metadata_structures()
+    complement_metadata_structures(
+      str_stereo = str_stereo,
+      str_met = str_met,
+      str_nam = str_nam,
+      str_tax_cla = str_tax_cla,
+      str_tax_npc = str_tax_npc
+    )
 
   # logger::log_trace("Output: ", nrow(df), " rows, ", ncol(df), " columns")
 

@@ -1,49 +1,51 @@
-#' @title Split Structure Organism Pairs table
+#' @title Split structure-organism pairs table
 #'
-#' @description This function splits a concatenated structure-organism pairs (SOP)
-#'     table into separate standardized tables for structures, organisms, and their
-#'     relationships. It processes SMILES strings, standardizes chemical structures,
-#'     and creates normalized reference tables.
+#' @description Splits a concatenated structure-organism pairs (SOP) table into
+#'     separate normalized tables for structures, organisms, and their
+#'     relationships. Processes SMILES strings and creates standardized
+#'     reference tables.
 #'
 #' @include clean_collapse.R
 #' @include process_smiles.R
+#' @include validators.R
 #'
 #' @param table Data frame containing combined structure-organism pair data with
 #'     columns for structures (SMILES, InChI, names), organisms, and references
-#' @param cache Character string path to cache file where previously processed
-#'     SMILES are stored, or NULL to skip caching
+#' @param cache Path to cache file for previously processed SMILES, or NULL to
+#'     skip caching
 #'
-#' @return A list of normalized data frames:
+#' @return List of normalized data frames:
 #'   \item{table_keys}{Structure-organism pairs with reference DOIs}
 #'   \item{table_structures_stereo}{Structure stereochemistry information}
 #'   \item{table_organisms}{Organism taxonomy information}
 #'   \item{table_structural}{Processed and standardized structure data}
 #'
-#' @examples NULL
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Split concatenated library
+#' result <- split_tables_sop(
+#'   table = combined_sop_data,
+#'   cache = "data/processed_smiles.tsv"
+#' )
+#'
+#' # Access individual tables
+#' structures <- result$table_structural
+#' organisms <- result$table_organisms
+#' }
 split_tables_sop <- function(table, cache) {
-  # Validate inputs
-  if (
-    !(is.data.frame(table) ||
-      inherits(table, "tbl") ||
-      inherits(table, "data.table"))
-  ) {
-    stop("Input 'table' must be a data frame or tibble")
-  }
+  # Input Validation ----
+  validate_dataframe(table, param_name = "table")
 
+  # Early exit for empty input
   if (nrow(table) == 0L) {
-    logger::log_warn("Empty table provided to split_tables_sop")
-    return(list(
-      table_keys = tidytable::tidytable(),
-      table_structures_stereo = tidytable::tidytable(),
-      table_organisms = tidytable::tidytable(),
-      table_structural = tidytable::tidytable()
-    ))
+    logger::log_warn("Empty table provided")
+    return(create_empty_sop_tables())
   }
 
-  logger::log_info(
-    "Splitting concatenated SOP library into standardized components"
-  )
-  logger::log_debug("Input table has {nrow(table)} rows")
+  logger::log_info("Splitting SOP library into standardized components")
+  logger::log_debug("Input: {nrow(table)} rows")
 
   table <- table |>
     tidytable::mutate(
@@ -284,4 +286,17 @@ split_tables_sop <- function(table, cache) {
     table_structures_taxonomy_npc
   )
   return(tables)
+}
+
+# Helper Functions ----
+
+#' Create empty SOP tables structure
+#' @keywords internal
+create_empty_sop_tables <- function() {
+  list(
+    table_keys = tidytable::tidytable(),
+    table_structures_stereo = tidytable::tidytable(),
+    table_organisms = tidytable::tidytable(),
+    table_structural = tidytable::tidytable()
+  )
 }

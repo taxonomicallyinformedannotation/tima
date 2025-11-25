@@ -161,7 +161,13 @@ prepare_annotations_spectra <- function(
       candidate_structure_tax_cla_03cla = NA_character_,
       candidate_structure_tax_cla_04dirpar = NA_character_,
     ) |>
-    select_annotations_columns()
+    select_annotations_columns(
+      str_stereo = str_stereo,
+      str_met = str_met,
+      str_nam = str_nam,
+      str_tax_cla = str_tax_cla,
+      str_tax_npc = str_tax_npc
+    )
 
   export_params(
     parameters = get_params(step = "prepare_annotations_spectra"),
