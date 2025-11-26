@@ -15,7 +15,7 @@ import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import List, Optional, Tuple, Any
+from typing import List, Optional, Tuple, Any, Iterable
 
 from rdkit import RDLogger
 from rdkit.Chem import (
@@ -23,6 +23,7 @@ from rdkit.Chem import (
     MolToSmiles,
     MolToInchiKey,
     RemoveStereochemistry,
+    Mol,
 )
 from rdkit.Chem.Descriptors import ExactMolWt, MolLogP
 from rdkit.Chem.rdMolDescriptors import CalcMolFormula
@@ -34,9 +35,9 @@ from rdkit.Chem.rdMolDescriptors import CalcMolFormula
 
 DEFAULT_BATCH_SIZE = 1000
 DEFAULT_PROGRESS_INTERVAL = 10000
-DEFAULT_MAX_WORKERS = None  # Auto-detect
+DEFAULT_MAX_WORKERS: Optional[int] = None  # Auto-detect
 
-OUTPUT_COLUMNS = [
+OUTPUT_COLUMNS: List[str] = [
     "structure_smiles_initial",
     "structure_smiles",
     "structure_inchikey",
@@ -49,14 +50,34 @@ OUTPUT_COLUMNS = [
 DEFAULT_LOG_LEVEL = logging.INFO
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
-logger = logging.getLogger(__name__)
-logger.setLevel(DEFAULT_LOG_LEVEL)
-if not logger.handlers:
-    console_handler = logging.StreamHandler(sys.stderr)
-    console_handler.setFormatter(logging.Formatter(LOG_FORMAT))
-    console_handler.setLevel(DEFAULT_LOG_LEVEL)
-    logger.addHandler(console_handler)
+__all__ = [
+    "process_smiles",
+    "process_molecule",
+    "validate_input_file",
+    "validate_output_file",
+    "validate_processing_params",
+]
 
+
+def get_logger(name: str = __name__, level: int = DEFAULT_LOG_LEVEL) -> logging.Logger:
+    """Create or retrieve a configured logger.
+
+    This avoids global side effects and allows dependency injection for tests.
+    """
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    if not logger.handlers:
+        console_handler = logging.StreamHandler(sys.stderr)
+        console_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+        console_handler.setLevel(level)
+        logger.addHandler(console_handler)
+    return logger
+
+
+# Use module-level logger but allow injection into functions
+logger = get_logger()
+
+# Silence RDKit warnings (can be re-enabled by tests if needed)
 RDLogger.DisableLog("rdApp.warning")
 
 
@@ -80,7 +101,7 @@ class MoleculeProcessingError(SmilesProcessingError):
 # Validation Functions
 # =====================================================================================
 
-def validate_input_file(input_file: str) -> Path:
+def validate_input_file(input_file: str, *, _logger: Optional[logging.Logger] = None) -> Path:
     path = Path(input_file)
     if not path.exists():
         raise FileValidationError(f"Input SMILES file not found: {input_file}")
@@ -88,19 +109,19 @@ def validate_input_file(input_file: str) -> Path:
         raise FileValidationError(f"Input path is not a file: {input_file}")
     if not os.access(path, os.R_OK):
         raise FileValidationError(f"Input file not readable: {input_file}")
-    logger.info(f"Input file validated: {input_file}")
+    (_logger or logger).info(f"Input file validated: {input_file}")
     return path
 
 
-def validate_output_file(output_file: str) -> Path:
+def validate_output_file(output_file: str, *, _logger: Optional[logging.Logger] = None) -> Path:
     path = Path(output_file)
     out_dir = path.parent
     if not out_dir.exists():
         out_dir.mkdir(parents=True, exist_ok=True)
-        logger.info(f"Created output directory: {out_dir}")
+        (_logger or logger).info(f"Created output directory: {out_dir}")
     if not os.access(out_dir, os.W_OK):
         raise FileValidationError(f"Output directory not writable: {out_dir}")
-    logger.info(f"Output file validated: {output_file}")
+    (_logger or logger).info(f"Output file validated: {output_file}")
     return path
 
 
@@ -108,6 +129,8 @@ def validate_processing_params(
     num_workers: Optional[int],
     batch_size: int,
     progress_interval: int,
+    *,
+    _logger: Optional[logging.Logger] = None,
 ) -> Tuple[int, int, int]:
     if num_workers is None:
         num_workers = min(32, (os.cpu_count() or 1) * 2)
@@ -117,7 +140,7 @@ def validate_processing_params(
         raise ValueError("batch_size must be >= 1")
     if progress_interval < 1:
         raise ValueError("progress_interval must be >= 1")
-    logger.info(
+    (_logger or logger).info(
         f"Processing parameters: workers={num_workers}, batch_size={batch_size}, "
         f"progress_interval={progress_interval}"
     )
@@ -127,6 +150,16 @@ def validate_processing_params(
 # =====================================================================================
 # Core Molecule Processing
 # =====================================================================================
+
+def _copy_molecule(mol: Mol) -> Mol:
+    """Safely copy an RDKit molecule."""
+    # Mol() copy constructor performs a deep copy
+    try:
+        return Mol(mol)
+    except Exception:
+        # Fallback to __copy__ if necessary
+        return mol.__copy__()
+
 
 def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
     """
@@ -150,7 +183,7 @@ def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
         xlogp = MolLogP(mol)
 
         # Create a copy for stereochemistry removal to avoid modifying original
-        mol_no_stereo = mol.__copy__()
+        mol_no_stereo = _copy_molecule(mol)
         RemoveStereochemistry(mol_no_stereo)
         smiles_no_stereo = MolToSmiles(mol_no_stereo)
 
@@ -189,18 +222,20 @@ def open_output_file(output_file: Path):
 
 def process_batch(
     executor: ThreadPoolExecutor,
-    batch: List[Any],
-    original_smiles_list: List[str],
+    batch: Iterable[Any],
+    original_smiles_list: Iterable[str],
     writer: csv.writer,
     current_count: int,
     progress_interval: int,
+    *,
+    _logger: Optional[logging.Logger] = None,
 ) -> int:
     """
     Process a batch of molecules in parallel and write results.
 
     Args:
         executor: ThreadPoolExecutor for parallel processing
-        batch: List of RDKit Mol objects
+        batch: Iterable of RDKit Mol objects
         original_smiles_list: Corresponding original SMILES strings
         writer: CSV writer object
         current_count: Current count of processed molecules
@@ -209,6 +244,7 @@ def process_batch(
     Returns:
         Number of successfully processed molecules in this batch
     """
+    log = _logger or logger
     batch_processed = 0
     # Use map for efficient parallel processing with minimal overhead
     results = executor.map(process_molecule, batch, original_smiles_list)
@@ -219,7 +255,7 @@ def process_batch(
             batch_processed += 1
             total = current_count + batch_processed
             if total % progress_interval == 0:
-                logger.info(f"Processed {total} molecules")
+                log.info(f"Processed {total} molecules")
 
     return batch_processed
 
@@ -230,6 +266,8 @@ def process_smiles(
     num_workers: Optional[int] = DEFAULT_MAX_WORKERS,
     batch_size: int = DEFAULT_BATCH_SIZE,
     progress_interval: int = DEFAULT_PROGRESS_INTERVAL,
+    *,
+    _logger: Optional[logging.Logger] = None,
 ) -> int:
     """
     Process SMILES file to compute molecular properties.
@@ -243,6 +281,7 @@ def process_smiles(
         num_workers: Number of worker threads (None = auto-detect)
         batch_size: Number of molecules to process per batch
         progress_interval: Log progress every N molecules
+        _logger: Optional logger to use (defaults to module logger)
 
     Returns:
         Total number of successfully processed molecules
@@ -251,19 +290,20 @@ def process_smiles(
         FileValidationError: If input/output files are invalid
         SmilesProcessingError: If SMILES processing fails
     """
-    logger.info("Starting SMILES processing pipeline")
-    logger.info(f"Input: {input_smi_file}")
-    logger.info(f"Output: {output_csv_file}")
+    log = _logger or logger
+    log.info("Starting SMILES processing pipeline")
+    log.info(f"Input: {input_smi_file}")
+    log.info(f"Output: {output_csv_file}")
 
-    input_path = validate_input_file(input_smi_file)
-    output_path = validate_output_file(output_csv_file)
+    input_path = validate_input_file(input_smi_file, _logger=log)
+    output_path = validate_output_file(output_csv_file, _logger=log)
     num_workers, batch_size, progress_interval = validate_processing_params(
-        num_workers, batch_size, progress_interval
+        num_workers, batch_size, progress_interval, _logger=log
     )
 
     try:
         supplier = SmilesMolSupplier(str(input_path), nameColumn=-1)
-        logger.info("SMILES supplier initialized")
+        log.info("SMILES supplier initialized")
     except Exception as e:
         raise SmilesProcessingError(f"Failed to load SMILES file: {e}") from e
 
@@ -274,8 +314,8 @@ def process_smiles(
         writer.writerow(OUTPUT_COLUMNS)
 
         # Pre-allocate lists with capacity to reduce reallocation overhead
-        batch = []
-        originals = []
+        batch: List[Any] = []
+        originals: List[str] = []
 
         with ThreadPoolExecutor(max_workers=num_workers) as executor:
             for i, mol in enumerate(supplier):
@@ -287,7 +327,7 @@ def process_smiles(
                 if len(batch) >= batch_size:
                     molecules_processed += process_batch(
                         executor, batch, originals, writer,
-                        molecules_processed, progress_interval
+                        molecules_processed, progress_interval, _logger=log
                     )
                     # Clear lists efficiently
                     batch.clear()
@@ -297,10 +337,10 @@ def process_smiles(
             if batch:
                 molecules_processed += process_batch(
                     executor, batch, originals, writer,
-                    molecules_processed, progress_interval
+                    molecules_processed, progress_interval, _logger=log
                 )
 
-    logger.info(f"Processing complete. Total molecules processed: {molecules_processed}")
+    log.info(f"Processing complete. Total molecules processed: {molecules_processed}")
     return molecules_processed
 
 
@@ -308,8 +348,11 @@ def process_smiles(
 # Command-Line Interface (safe for reticulate)
 # =====================================================================================
 
-def main():
-    """CLI entry point."""
+def main(argv: Optional[List[str]] = None) -> int:
+    """CLI entry point.
+
+    Returns an exit code for easier testing.
+    """
     import argparse
     parser = argparse.ArgumentParser(
         description="Process SMILES file to compute molecular properties",
@@ -322,11 +365,12 @@ def main():
     parser.add_argument("-p", "--progress-interval", type=int, default=DEFAULT_PROGRESS_INTERVAL)
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.verbose:
-        logger.setLevel(logging.DEBUG)
-        for h in logger.handlers:
+        # Reconfigure logger at DEBUG level
+        dbg = get_logger(__name__, level=logging.DEBUG)
+        for h in dbg.handlers:
             h.setLevel(logging.DEBUG)
 
     try:
@@ -338,10 +382,10 @@ def main():
             progress_interval=args.progress_interval,
         )
         print(f"Success! Processed {count} molecules.")
-        sys.exit(0)
+        return 0
     except Exception as e:
-        logger.error(f"SMILES processing failed: {e}")
-        sys.exit(1)
+        get_logger().error(f"SMILES processing failed: {e}")
+        return 1
 
 
 # =====================================================================================
@@ -351,4 +395,4 @@ def main():
 # When imported by R or another Python module, `__name__` != "__main__" — this prevents argparse from running.
 # When executed directly from the command line, it behaves as a proper CLI.
 if __name__ == "__main__" and len(sys.argv) > 1:
-    main()
+    sys.exit(main())
