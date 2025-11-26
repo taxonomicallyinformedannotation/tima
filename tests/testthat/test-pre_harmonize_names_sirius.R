@@ -59,15 +59,24 @@ test_that("pre_harmonize_names_sirius handles trailing slash", {
 
 test_that("pre_harmonize_names_sirius handles typical SIRIUS patterns", {
   # Common SIRIUS column name patterns with metadata
-  expect_equal(pre_harmonize_names_sirius("molecularFormula/candidate"), "molecularFormula")
+  expect_equal(
+    pre_harmonize_names_sirius("molecularFormula/candidate"),
+    "molecularFormula"
+  )
   expect_equal(pre_harmonize_names_sirius("adduct/type"), "adduct")
-  expect_equal(pre_harmonize_names_sirius("SiriusScore/normalized"), "SiriusScore")
+  expect_equal(
+    pre_harmonize_names_sirius("SiriusScore/normalized"),
+    "SiriusScore"
+  )
   expect_equal(pre_harmonize_names_sirius("TreeScore/raw"), "TreeScore")
 })
 
 test_that("pre_harmonize_names_sirius preserves underscores", {
   expect_equal(pre_harmonize_names_sirius("column_name/suffix"), "column_name")
-  expect_equal(pre_harmonize_names_sirius("long_column_name/info"), "long_column_name")
+  expect_equal(
+    pre_harmonize_names_sirius("long_column_name/info"),
+    "long_column_name"
+  )
   expect_equal(pre_harmonize_names_sirius("a_b_c/d"), "a_b_c")
 })
 
@@ -236,14 +245,13 @@ test_that("pre_harmonize_names_sirius handles underscores differently", {
 test_that("pre_harmonize_names_sirius is reasonably fast", {
   skip_if_not_installed("bench")
 
-  timing <- bench::mark(
-    pre_harmonize_names_sirius("column_name/suffix"),
-    iterations = 1000,
-    check = FALSE
-  )
+  timing <- system.time(replicate(
+    n = 1000L,
+    expr = pre_harmonize_names_sirius("column_name/suffix")
+  ))
 
-  # Should be very fast (<0.1ms)
-  expect_lt(as.numeric(median(timing$median)), 0.0001)
+  # Should be very fast
+  expect_lt(timing["elapsed"], 0.01)
 })
 
 test_that("pre_harmonize_names_sirius handles large vectors efficiently", {

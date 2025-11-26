@@ -206,14 +206,13 @@ test_that("harmonize_names_sirius handles repeated calls", {
 test_that("harmonize_names_sirius is reasonably fast", {
   skip_if_not_installed("bench")
 
-  timing <- bench::mark(
-    harmonize_names_sirius("1_compound_name"),
-    iterations = 1000,
-    check = FALSE
-  )
+  timing <- system.time(replicate(
+    n = 1000L,
+    expr = harmonize_names_sirius("1_compound_name")
+  ))
 
-  # Should be very fast (<0.1ms)
-  expect_lt(as.numeric(median(timing$median)), 0.0001)
+  # Should be very fast
+  expect_lt(timing["elapsed"], 0.01)
 })
 
 test_that("harmonize_names_sirius scales linearly", {
@@ -224,17 +223,16 @@ test_that("harmonize_names_sirius scales linearly", {
   small <- replicate(10, paste0(sample(1:10, 1), "_name"))
   large <- replicate(100, paste0(sample(1:10, 1), "_name"))
 
-  time_small <- bench::mark(
-    sapply(small, harmonize_names_sirius, USE.NAMES = FALSE),
-    iterations = 50
-  )
-
-  time_large <- bench::mark(
-    sapply(large, harmonize_names_sirius, USE.NAMES = FALSE),
-    iterations = 50
-  )
+  time_small <- system.time(replicate(
+    n = 50L,
+    expr = sapply(small, harmonize_names_sirius, USE.NAMES = FALSE)
+  ))
+  time_large <- system.time(replicate(
+    n = 50L,
+    expr = sapply(large, harmonize_names_sirius, USE.NAMES = FALSE)
+  ))
 
   # Should scale roughly linearly (within 20x for 10x data)
-  ratio <- as.numeric(median(time_large$median)) / as.numeric(median(time_small$median))
+  ratio <- time_large["elapsed"] / time_small["elapsed"]
   expect_lt(ratio, 20)
 })
