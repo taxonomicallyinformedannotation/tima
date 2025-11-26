@@ -202,7 +202,7 @@ test_that("test-benchmark_taxize_spectra samples one organism per feature when m
     organisms = c("OrgA", "OrgB")
   )
   tax_path <- create_bench_taxonomy(tempdir(), organisms = c("OrgA", "OrgB"))
-  output <- file.path("out.tsv")
+  output <- temp_test_path("out.tsv")
   res <- benchmark_taxize_spectra(
     input = features_path,
     keys = keys_path,

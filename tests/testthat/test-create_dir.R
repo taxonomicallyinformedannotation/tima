@@ -3,9 +3,10 @@
 library(testthat)
 
 test_that("create_dir creates directory for file path", {
-  target <- file.path("sub/dir/out.tsv")
+  target <- temp_test_path("sub/dir/out.tsv")
   create_dir(export = target)
-  expect_true(dir.exists(file.path("sub/dir")))
+  expected_dir <- dirname(target)
+  expect_true(dir.exists(expected_dir))
 })
 
 # Updated validation error expectations (now using validate_character)
@@ -16,14 +17,14 @@ test_that("create_dir validates input", {
   expect_error(create_dir(export = c("a", "b")), "single character string")
 })
 
-test_that("create_dir handles pure directory path", {
-  dir_path <- file.path("subdir_only")
+test_that("create_dir creates directory when export path is a directory", {
+  dir_path <- temp_test_path("subdir_only")
   create_dir(export = dir_path)
   expect_true(dir.exists(dir_path))
 })
 
 test_that("create_dir is idempotent", {
-  dir_path <- file.path("idempotent_dir")
+  dir_path <- temp_test_path("idempotent_dir")
   create_dir(export = dir_path)
   expect_true(dir.exists(dir_path))
   # Call again should not error
@@ -31,9 +32,10 @@ test_that("create_dir is idempotent", {
 })
 
 test_that("create_dir works for deeply nested path", {
-  nested <- file.path("a/b/c/d/e/f/output.txt")
+  base_dir <- temp_test_path("a")
+  nested <- file.path(base_dir, "b/c/d/e/f/output.txt")
   create_dir(export = nested)
-  expect_true(dir.exists(file.path("a/b/c/d/e/f")))
+  expect_true(dir.exists(file.path(base_dir, "b/c/d/e/f")))
 })
 
 # test_that("create_dir warns on very long path (length heuristic)", {
