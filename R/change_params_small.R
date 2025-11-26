@@ -153,7 +153,7 @@ change_params_small <- function(
 
   # Load Current Configuration ----
   yaml_data <- load_yaml_files()
-  yaml_small <- yaml_data$yamls_params[["params/prepare_params"]]
+  yaml_small <- yaml_data$yamls_params$prepare_params
 
   # Update File Pattern ----
   if (!is.null(fil_pat)) {

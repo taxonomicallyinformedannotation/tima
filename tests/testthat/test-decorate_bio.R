@@ -71,7 +71,7 @@ test_that("decorate_bio warns on missing columns", {
 
 ## Performance ----
 
-test_that("decoration functions use vectorized operations", {
+test_that("decoration functions are fast", {
   # Create moderately-sized test data
   large_df <- tidytable::tidytable(
     feature_id = rep(paste0("FT", 1:100), each = 10),
@@ -82,7 +82,7 @@ test_that("decoration functions use vectorized operations", {
     )
   )
 
-  # Should complete quickly if vectorized
+  # Should complete quickly
   start_time <- Sys.time()
   result <- decorate_bio(
     annot_table_wei_bio = large_df,

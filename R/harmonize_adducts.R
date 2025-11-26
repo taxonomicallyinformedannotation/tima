@@ -58,15 +58,37 @@ harmonize_adducts <- function(
   # Validate translations
   validate_adduct_translations(adducts_translations)
 
+  # Sort them (important)
+  adducts_translations <- adducts_translations[order(
+    nchar(names(adducts_translations)),
+    decreasing = TRUE
+  )]
+
   # Harmonize Adducts ----
   n_unique_before <- count_unique_values(df[[adducts_colname]])
 
-  # Vectorized replacement (faster than loop)
-  df[[adducts_colname]] <- stringi::stri_replace_all_fixed(
-    str = df[[adducts_colname]],
-    pattern = names(adducts_translations),
-    replacement = adducts_translations,
-    vectorize_all = FALSE
+  .escape_regex <- function(x) {
+    stringi::stri_replace_all_regex(
+      x,
+      pattern = "([\\^$.|?*+()\\[\\]{}])",
+      replacement = "\\\\$1"
+    )
+  }
+  patterns <- names(adducts_translations)
+  patterns_escaped <- .escape_regex(patterns)
+  repls <- adducts_translations
+
+  df[[adducts_colname]] <- purrr::reduce(
+    .x = seq_along(patterns),
+    .init = df[[adducts_colname]],
+    .f = function(col, i) {
+      pat <- paste0("^", patterns_escaped[i], "$")
+      stringi::stri_replace_all_regex(
+        str = col,
+        pattern = pat,
+        replacement = repls[[i]]
+      )
+    }
   )
 
   n_unique_after <- count_unique_values(df[[adducts_colname]])

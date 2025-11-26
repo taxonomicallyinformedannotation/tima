@@ -200,7 +200,7 @@ test_that("harmonize_spectra validates column name parameters are strings or NUL
   )
 })
 
-test_that("harmonize_spectra validates vectorized column parameters", {
+test_that("harmonize_spectra validates column parameters", {
   test_spectra <- tidytable::tidytable(
     id = c(1, 2, 3)
   )
