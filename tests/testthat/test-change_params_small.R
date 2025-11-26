@@ -2,218 +2,400 @@
 
 library(testthat)
 
-# Test Fixtures ----
+## Setup ----
 
-#' Create minimal test files for change_params_small
-#' @keywords internal
-setup_param_test_files <- function() {
-  temp_dir <- temp_test_dir("change_params_test")
-
-  # Create minimal test input files
-  features_file <- file.path(temp_dir, "test_features.csv")
-  metadata_file <- file.path(temp_dir, "test_metadata.tsv")
-  sirius_file <- file.path(temp_dir, "test_sirius.zip")
-  spectra_file <- file.path(temp_dir, "test_spectra.mgf")
-
-  # Write minimal content
-  writeLines("feature_id,mz,rt\nF1,100.5,1.2", features_file)
-  writeLines("sample_id,organism\nS1,Test species", metadata_file)
-  writeLines("test", sirius_file)
-  writeLines("test", spectra_file)
-
-  list(
-    features = features_file,
-    metadata = metadata_file,
-    sirius = sirius_file,
-    spectra = spectra_file,
-    dir = temp_dir
+# Create temporary test files
+create_temp_test_files <- function(base_dir = tempdir()) {
+  files <- list(
+    features = file.path(base_dir, "features.csv"),
+    metadata = file.path(base_dir, "metadata.tsv"),
+    sirius = file.path(base_dir, "sirius.zip"),
+    spectra = file.path(base_dir, "spectra.mgf")
   )
+
+  # Create dummy files
+  write.csv(data.frame(a = 1:3), files$features, row.names = FALSE)
+  write.table(
+    data.frame(b = 4:6),
+    files$metadata,
+    sep = "\t",
+    row.names = FALSE
+  )
+  writeLines("dummy_sirius", files$sirius)
+  writeLines("dummy_mgf", files$spectra)
+
+  files
 }
 
-# Unit Tests: Helper Functions ----
+## Input Validation Tests ----
 
-test_that("validate_params_small_inputs accepts valid polarity", {
-  expect_silent(validate_params_small_inputs(ms_pol = "pos"))
-  expect_silent(validate_params_small_inputs(ms_pol = "neg"))
-  expect_silent(validate_params_small_inputs(ms_pol = NULL))
-})
-
-test_that("validate_params_small_inputs rejects invalid polarity", {
+test_that("change_params_small validates ms_pol parameter", {
   expect_error(
-    validate_params_small_inputs(ms_pol = "invalid"),
+    change_params_small(ms_pol = "invalid"),
     "must be either 'pos' or 'neg'"
   )
+
   expect_error(
-    validate_params_small_inputs(ms_pol = "positive"),
+    change_params_small(ms_pol = "positive"),
     "must be either 'pos' or 'neg'"
   )
+
   expect_error(
-    validate_params_small_inputs(ms_pol = 123),
+    change_params_small(ms_pol = 123),
     "must be either 'pos' or 'neg'"
   )
 })
 
-test_that("copy_file_to_target copies files correctly", {
-  test_files <- setup_param_test_files()
-  target_dir <- temp_test_dir("copy_target")
-
-  result <- copy_file_to_target(
-    file_path = test_files$features,
-    target_dir = target_dir,
-    file_description = "Test features"
+test_that("change_params_small handles NULL ms_pol", {
+  # Should not error with NULL
+  expect_no_error(
+    change_params_small(ms_pol = NULL)
   )
-
-  expect_true(file.exists(result))
-  expect_equal(basename(result), "test_features.csv")
-  expect_true(dir.exists(target_dir))
 })
 
-test_that("copy_file_to_target validates file existence", {
-  target_dir <- temp_test_dir("copy_target")
+## File Validation Tests ----
 
+test_that("change_params_small errors on missing features file", {
   expect_error(
-    copy_file_to_target(
-      file_path = "nonexistent_file.csv",
-      target_dir = target_dir,
-      file_description = "Nonexistent"
-    ),
-    "file does not exist"
+    change_params_small(fil_fea_raw = "nonexistent_features.csv"),
+    "Features file does not exist"
   )
 })
 
-# Integration Tests ----
+test_that("change_params_small errors on missing metadata file", {
+  expect_error(
+    change_params_small(fil_met_raw = "nonexistent_metadata.tsv"),
+    "Metadata file does not exist"
+  )
+})
 
-test_that("change_params_small function exists and has correct signature", {
-  expect_true(exists("change_params_small"))
-  expect_type(change_params_small, "closure")
+test_that("change_params_small errors on missing SIRIUS file", {
+  expect_error(
+    change_params_small(fil_sir_raw = "nonexistent_sirius.zip"),
+    "SIRIUS annotations file does not exist"
+  )
+})
 
-  params <- names(formals(change_params_small))
-  expected_params <- c(
-    "fil_pat",
-    "fil_fea_raw",
-    "fil_met_raw",
-    "fil_sir_raw",
-    "fil_spe_raw",
-    "ms_pol",
-    "org_tax",
-    "hig_con",
-    "summarize"
+test_that("change_params_small errors on missing spectra file", {
+  expect_error(
+    change_params_small(fil_spe_raw = "nonexistent_spectra.mgf"),
+    "Spectra file does not exist"
+  )
+})
+
+## Successful Update Tests ----
+
+test_that("change_params_small updates file pattern", {
+  # Setup
+  test_project <- local_test_project()
+
+  # Execute
+  change_params_small(fil_pat = "test_pattern")
+
+  # Verify
+  yaml_data <- load_yaml_files()
+  yaml_small <- yaml_data$yamls_params$prepare_params
+
+  expect_equal(yaml_small$files$pattern, "test_pattern")
+})
+
+test_that("change_params_small updates MS polarity", {
+  test_project <- local_test_project()
+
+  change_params_small(ms_pol = "pos")
+
+  yaml_data <- load_yaml_files()
+  yaml_small <- yaml_data$yamls_params$prepare_params
+
+  expect_equal(yaml_small$ms$polarity, "pos")
+})
+
+test_that("change_params_small handles both pos and neg polarity", {
+  test_project <- local_test_project()
+
+  # Test positive
+  change_params_small(ms_pol = "pos")
+  yaml_data <- load_yaml_files()
+  expect_equal(yaml_data$yamls_params$prepare_params$ms$polarity, "pos")
+
+  # Test negative
+  change_params_small(ms_pol = "neg")
+  yaml_data <- load_yaml_files()
+  expect_equal(yaml_data$yamls_params$prepare_params$ms$polarity, "neg")
+})
+
+test_that("change_params_small updates organism taxonomy", {
+  test_project <- local_test_project()
+
+  change_params_small(org_tax = "Gentiana lutea")
+
+  yaml_data <- load_yaml_files()
+  yaml_small <- yaml_data$yamls_params$prepare_params
+
+  expect_equal(yaml_small$organisms$taxon, "Gentiana lutea")
+})
+
+test_that("change_params_small updates high_confidence flag", {
+  test_project <- local_test_project()
+
+  change_params_small(hig_con = TRUE)
+
+  yaml_data <- load_yaml_files()
+  yaml_small <- yaml_data$yamls_params$prepare_params
+
+  expect_true(yaml_small$options$high_confidence)
+})
+
+test_that("change_params_small updates summarize flag", {
+  test_project <- local_test_project()
+
+  change_params_small(summarize = FALSE)
+
+  yaml_data <- load_yaml_files()
+  yaml_small <- yaml_data$yamls_params$prepare_params
+
+  expect_false(yaml_small$options$summarize)
+})
+
+## File Copy Tests ----
+
+test_that("change_params_small copies features file", {
+  skip_on_cran()
+
+  test_project <- local_test_project()
+  test_files <- create_temp_test_files()
+
+  change_params_small(fil_fea_raw = test_files$features)
+
+  # Check file was copied to source directory
+  paths <- get_default_paths()
+  target_file <- file.path(
+    paths$data$source$path,
+    basename(test_files$features)
   )
 
-  expect_true(all(expected_params %in% params))
+  expect_true(file.exists(target_file))
 })
 
-test_that("change_params_small all parameters default to NULL", {
-  params <- formals(change_params_small)
+test_that("change_params_small copies metadata file", {
+  skip_on_cran()
 
-  expect_null(params$fil_pat)
-  expect_null(params$fil_fea_raw)
-  expect_null(params$fil_met_raw)
-  expect_null(params$fil_sir_raw)
-  expect_null(params$fil_spe_raw)
-  expect_null(params$ms_pol)
-  expect_null(params$org_tax)
-  expect_null(params$hig_con)
-  expect_null(params$summarize)
-})
+  test_project <- local_test_project()
+  test_files <- create_temp_test_files()
 
-test_that("change_params_small validates polarity parameter", {
-  skip("Needs full project environment")
-  # Would test actual function call with invalid polarity
-})
+  change_params_small(fil_met_raw = test_files$metadata)
 
-test_that("copy_file_to_target works end-to-end", {
-  temp_dir <- tempdir()
-  source_file <- file.path(temp_dir, "test.txt")
-  target_dir <- file.path(temp_dir, "target")
-  dir.create(target_dir, showWarnings = FALSE)
-
-  writeLines("test content", source_file)
-
-  result <- tima:::copy_file_to_target(
-    file_path = source_file,
-    target_dir = target_dir,
-    file_description = "Test file"
+  paths <- get_default_paths()
+  target_file <- file.path(
+    paths$data$source$path,
+    basename(test_files$metadata)
   )
 
-  expect_true(file.exists(result))
-  expect_equal(readLines(result), "test content")
+  expect_true(file.exists(target_file))
+})
 
-  unlink(c(source_file, target_dir), recursive = TRUE)
+test_that("change_params_small copies spectra file", {
+  skip_on_cran()
+
+  test_project <- local_test_project()
+  test_files <- create_temp_test_files()
+
+  change_params_small(fil_spe_raw = test_files$spectra)
+
+  paths <- get_default_paths()
+  target_file <- file.path(paths$data$source$path, basename(test_files$spectra))
+
+  expect_true(file.exists(target_file))
+})
+
+test_that("change_params_small copies SIRIUS file to correct directory", {
+  skip_on_cran()
+
+  test_project <- local_test_project()
+  test_files <- create_temp_test_files()
+
+  change_params_small(fil_sir_raw = test_files$sirius)
+
+  paths <- get_default_paths()
+  target_file <- file.path(
+    paths$data$interim$annotations$path,
+    basename(test_files$sirius)
+  )
+
+  expect_true(file.exists(target_file))
+})
+
+## Multiple Parameters Tests ----
+
+test_that("change_params_small handles multiple parameters simultaneously", {
+  skip_on_cran()
+
+  test_project <- local_test_project()
+  test_files <- create_temp_test_files()
+
+  change_params_small(
+    fil_pat = "multi_test",
+    fil_fea_raw = test_files$features,
+    fil_met_raw = test_files$metadata,
+    ms_pol = "pos",
+    org_tax = "Arabidopsis thaliana",
+    hig_con = TRUE,
+    summarize = FALSE
+  )
+
+  yaml_data <- load_yaml_files()
+  yaml_small <- yaml_data$yamls_params$prepare_params
+
+  expect_equal(yaml_small$files$pattern, "multi_test")
+  expect_equal(yaml_small$ms$polarity, "pos")
+  expect_equal(yaml_small$organisms$taxon, "Arabidopsis thaliana")
+  expect_true(yaml_small$options$high_confidence)
+  expect_false(yaml_small$options$summarize)
+})
+
+## NA Handling Tests ----
+
+# test_that("change_params_small sets organism to NA when NULL", {
+#   test_project <- local_test_project()
+#
+#   change_params_small(org_tax = NULL)
+#
+#   yaml_data <- load_yaml_files()
+#   yaml_small <- yaml_data$yamls_params$prepare_params
+#
+#   expect_true(is.na(yaml_small$organisms$taxon))
+# })
+
+# test_that("change_params_small sets SIRIUS to NA when NULL", {
+#   test_project <- local_test_project()
+#
+#   change_params_small(fil_sir_raw = NULL)
+#
+#   yaml_data <- load_yaml_files()
+#   yaml_small <- yaml_data$yamls_params$prepare_params
+#
+#   expect_true(is.na(yaml_small$files$annotations$raw$sirius))
+# })
+
+## Return Value Tests ----
+
+test_that("change_params_small returns invisible NULL", {
+  test_project <- local_test_project()
+
+  result <- withVisible(change_params_small(fil_pat = "test"))
+
+  expect_null(result$value)
+  expect_false(result$visible)
+})
+
+## Integration Tests ----
+
+test_that("change_params_small creates directories if missing", {
+  skip_on_cran()
+
+  test_project <- local_test_project()
+
+  # Remove directories to ensure they're created
+  paths <- get_default_paths()
+  unlink(paths$data$source$path, recursive = TRUE)
+  unlink(paths$data$interim$annotations$path, recursive = TRUE)
+
+  test_files <- create_temp_test_files()
+
+  change_params_small(fil_fea_raw = test_files$features)
+
+  expect_true(dir.exists(paths$data$source$path))
+})
+
+test_that("change_params_small preserves existing YAML structure", {
+  test_project <- local_test_project()
+
+  # Load initial structure
+  yaml_before <- load_yaml_files()
+  initial_structure <- names(yaml_before$yamls_params$prepare_params)
+
+  # Make changes
+  change_params_small(fil_pat = "test", ms_pol = "pos")
+
+  # Load after changes
+  yaml_after <- load_yaml_files()
+  final_structure <- names(yaml_after$yamls_params$prepare_params)
+
+  # Structure should remain the same
+  expect_setequal(initial_structure, final_structure)
+})
+
+## Helper Function Tests ----
+
+test_that("validate_params_small_inputs works correctly", {
+  # Valid inputs
+  expect_silent(validate_params_small_inputs("pos"))
+  expect_silent(validate_params_small_inputs("neg"))
+  expect_silent(validate_params_small_inputs(NULL))
+
+  # Invalid inputs
+  expect_error(validate_params_small_inputs("invalid"), "must be either")
 })
 
 test_that("create_yaml_null_handler converts NA correctly", {
-  handler <- tima:::create_yaml_null_handler()
+  handler <- create_yaml_null_handler()
 
   # Test NA conversion
   result_na <- handler(NA)
-  expect_equal(as.character(result_na), "null")
   expect_s3_class(result_na, "verbatim")
+  expect_equal(as.character(result_na), "null")
 
-  # Test value preservation
-  expect_equal(handler(123), 123)
-  expect_equal(handler("test"), "test")
-  expect_equal(handler(TRUE), TRUE)
+  # Test non-NA pass-through
+  result_val <- handler("value")
+  expect_equal(result_val, "value")
+
+  result_num <- handler(123)
+  expect_equal(result_num, 123)
 })
 
-# Edge Cases and Error Handling ----
-
-test_that("change_params_small handles NULL SIRIUS file appropriately", {
-  skip_if_not(interactive(), "Requires cache setup")
-
-  # Should set SIRIUS to NA when not provided
-  # This is tested implicitly in the main function
-  expect_silent(validate_params_small_inputs(ms_pol = NULL))
-})
+## Edge Cases ----
 
 test_that("change_params_small handles all NULL parameters", {
-  skip_if_not(interactive(), "Requires cache setup")
+  test_project <- local_test_project()
 
-  # Calling with all NULLs should not error (just load/save YAML)
-  # Skip actual execution as it requires full cache setup
-  expect_type(change_params_small, "closure")
+  # Should complete without error
+  expect_no_error(
+    change_params_small(
+      fil_pat = NULL,
+      fil_fea_raw = NULL,
+      fil_met_raw = NULL,
+      fil_sir_raw = NULL,
+      fil_spe_raw = NULL,
+      ms_pol = NULL,
+      org_tax = NULL,
+      hig_con = NULL,
+      summarize = NULL
+    )
+  )
 })
 
-# Performance Tests ----
+test_that("change_params_small handles file overwriting", {
+  skip_on_cran()
 
-test_that("copy_file_to_target handles overwrite correctly", {
-  test_files <- setup_param_test_files()
-  target_dir <- temp_test_dir("overwrite_test")
+  test_project <- local_test_project()
+  test_files <- create_temp_test_files()
 
-  # Copy once
-  result1 <- copy_file_to_target(
-    file_path = test_files$features,
-    target_dir = target_dir,
-    file_description = "Test"
+  # Copy file twice
+  change_params_small(fil_fea_raw = test_files$features)
+
+  # Modify original
+  write.csv(data.frame(a = 10:13), test_files$features, row.names = FALSE)
+
+  # Copy again - should overwrite
+  change_params_small(fil_fea_raw = test_files$features)
+
+  paths <- get_default_paths()
+  target_file <- file.path(
+    paths$data$source$path,
+    basename(test_files$features)
   )
 
-  # Modify the target
-  writeLines("modified", result1)
-
-  # Copy again (should overwrite)
-  result2 <- copy_file_to_target(
-    file_path = test_files$features,
-    target_dir = target_dir,
-    file_description = "Test"
-  )
-
-  content <- readLines(result2, n = 1)
-  expect_equal(content, "feature_id,mz,rt")
-})
-
-# Regression Tests ----
-
-test_that("change_params_small maintains backward compatibility", {
-  # Ensure function signature hasn't changed unexpectedly
-  params <- names(formals(change_params_small))
-
-  # These parameters must exist for backward compatibility
-  critical_params <- c(
-    "fil_fea_raw",
-    "fil_spe_raw",
-    "ms_pol",
-    "org_tax"
-  )
-
-  expect_true(all(critical_params %in% params))
+  # Should contain updated data
+  copied_data <- read.csv(target_file)
+  expect_true(10 %in% copied_data$a)
 })

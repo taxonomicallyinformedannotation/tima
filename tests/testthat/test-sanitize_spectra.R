@@ -302,10 +302,9 @@ test_that("sanitize_spectra returns invisibly is false", {
 ## Performance Tests ----
 
 test_that("sanitize_spectra is reasonably fast", {
-  skip_if_not_installed("bench")
   skip_on_cran()
 
-  spectra <- create_test_spectra_object(n_spectra = 1000, n_peaks = 100L)
+  spectra <- create_test_spectra_object(n_spectra = 1000L, n_peaks = 100L)
   timing <- system.time(sanitize_spectra(spectra))
 
   # Should complete in reasonable time (<1 second for 10 spectra)

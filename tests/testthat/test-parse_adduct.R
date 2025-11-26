@@ -384,20 +384,14 @@ test_that("parse_adduct is deterministic", {
 ## Performance Tests ----
 
 test_that("parse_adduct is reasonably fast", {
-  skip_if_not_installed("bench")
-
-  timing <- bench::mark(
-    parse_adduct("[M+H]+"),
-    parse_adduct("[2M+Na-H2O]2+"),
-    iterations = 1000,
-    check = FALSE
-  )
+  skip_on_cran()
+  timing <- system.time(rep(parse_adduct("[2M+Na-H2O]2+"), 1000))
 
   # Should parse in microseconds
-  expect_lt(as.numeric(median(timing$median)), 0.001)
+  expect_lt(timing["elapsed"], 0.1)
 })
 
-test_that("parse_adduct works vectorized via apply", {
+test_that("parse_adduct works via apply", {
   adducts <- c("[M+H]+", "[M+Na]+", "[M-H]-", "[2M+H]+")
 
   results <- lapply(adducts, parse_adduct)

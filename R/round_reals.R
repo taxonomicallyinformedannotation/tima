@@ -60,8 +60,7 @@ round_reals <- function(
     return(df)
   }
 
-  # Find Matching Columns (Optimized) ----
-  # Use single vectorized operation instead of loop
+  # Find Matching Columns ----
   matching_cols <- find_matching_columns(names(df), cols)
 
   # Early exit if no columns found
