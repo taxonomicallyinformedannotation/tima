@@ -33,14 +33,34 @@ get_default_paths <- function(
   }
 
   # Load and parse YAML configuration
-  tryCatch(
+  paths_config <- tryCatch(
     {
-      paths_config <- yaml::read_yaml(file = yaml)
-      return(paths_config)
+      yaml::read_yaml(file = yaml)
     },
     error = function(e) {
       logger::log_error("Failed to parse paths YAML: {e$message}")
       stop("Failed to parse paths YAML file: ", conditionMessage(e))
     }
   )
+
+  # Test override: allow tests to redirect interim params path to a temp directory.
+  override_params <- getOption("tima.test.interim_params_dir", default = NULL)
+  if (
+    !is.null(override_params) &&
+      is.character(override_params) &&
+      length(override_params) == 1L
+  ) {
+    if (is.null(paths_config$data)) {
+      paths_config$data <- list()
+    }
+    if (is.null(paths_config$data$interim)) {
+      paths_config$data$interim <- list()
+    }
+    if (is.null(paths_config$data$interim$params)) {
+      paths_config$data$interim$params <- list()
+    }
+    paths_config$data$interim$params$path <- override_params
+  }
+
+  return(paths_config)
 }

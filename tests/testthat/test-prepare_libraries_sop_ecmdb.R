@@ -5,14 +5,21 @@ library(testthat)
 ## Internal Utility Helpers ----
 
 .create_ecmdb_zip <- function(zip_path, inner_name = "ecmdb") {
-  # Minimal example data
+  # Create temp file for inner content
+  temp_inner <- file.path(dirname(zip_path), inner_name)
   lines <- c(
     '{"name":"MetA","moldb_inchikey":"AAAAAAAAAAAAAA-BBBBBBBBBB-C","moldb_smiles":"C","moldb_formula":"CH4","moldb_mono_mass":16.0313,"moldb_logp":0.1}',
     '{"name":"MetB","moldb_inchikey":"CCCCCCCCCCCCCC-DDDDDDDDDD-E","moldb_smiles":"CC","moldb_formula":"C2H6","moldb_mono_mass":30.07,"moldb_logp":0.2}'
   )
-  writeLines(lines, inner_name)
+  writeLines(lines, temp_inner)
 
-  utils::zip(zipfile = zip_path, files = inner_name)
+  # Create zip in the directory of zip_path
+  withr::with_dir(dirname(zip_path), {
+    utils::zip(zipfile = basename(zip_path), files = inner_name)
+  })
+
+  # Clean up temp file
+  unlink(temp_inner)
 }
 
 ## Validation ----

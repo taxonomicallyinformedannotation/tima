@@ -3,20 +3,19 @@
 library(testthat)
 
 test_that("prepare_libraries_spectra returns empty libs when input missing", {
-  local_test_project(copy = TRUE)
-  # Force nonexistent input
-  out <- prepare_libraries_spectra(
-    input = c("missing1.mgf", "missing2.mgf"),
-    nam_lib = "testlib"
-  )
-  expect_true(file.exists(out[["pos"]]))
-  expect_true(file.exists(out[["neg"]]))
-  # SOP TSV
-  expect_true(file.exists(out[["sop"]]))
-  # Read exported pos RDS and verify single fake spectrum
-  sp_pos <- readRDS(out[["pos"]])
-  expect_s4_class(sp_pos, "Spectra")
-  expect_equal(length(sp_pos), 1)
+  withr::with_dir(temp_test_dir("prep_lib_spectra_missing"), {
+    local_test_project(copy = TRUE)
+    out <- prepare_libraries_spectra(
+      input = c("missing1.mgf", "missing2.mgf"),
+      nam_lib = "testlib"
+    )
+    expect_true(file.exists(out[["pos"]]))
+    expect_true(file.exists(out[["neg"]]))
+    expect_true(file.exists(out[["sop"]]))
+    sp_pos <- readRDS(out[["pos"]])
+    expect_s4_class(sp_pos, "Spectra")
+    expect_equal(length(sp_pos), 1)
+  })
 })
 
 # test_that("prepare_libraries_spectra processes MGF fixtures and creates outputs", {

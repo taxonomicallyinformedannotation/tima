@@ -135,20 +135,36 @@ test_that("test-prepare_annotations_gnps processes minimal valid GNPS file", {
     s <- make_min_struct_files()
     out <- temp_test_path("gnps.tsv")
     gnps <- tidytable::tidytable(
-      `#Scan#` = c("F1"), Adduct = c("[M+H]+"), MassDiff = c("0.0"),
-      LibraryName = c("GNPS"), Compound_Name = c("Cmpd"), MQScore = c("0.9"),
-      SharedPeaks = c("10"), INCHI = c("InChI=1S/C"), `InChIKey` = c("AAAAAAAAAAAAAA-BBBBBBBBBB-C"),
-      `InChIKey-Planar` = c("AAAAAAAAAAAAAA-BBBBBBBBBB"), npclassifier_pathway = c("Path"),
-      npclassifier_superclass = c("Sup"), npclassifier_class = c("Cla"), ExactMass = c("100.0"),
-      superclass = c("Super"), class = c("Class"), subclass = c("Subclass"),
-      Precursor_MZ = c("100.0"), MZErrorPPM = c("0")
+      `#Scan#` = c("F1"),
+      Adduct = c("[M+H]+"),
+      MassDiff = c("0.0"),
+      LibraryName = c("GNPS"),
+      Compound_Name = c("Cmpd"),
+      MQScore = c("0.9"),
+      SharedPeaks = c("10"),
+      INCHI = c("InChI=1S/C"),
+      `InChIKey` = c("AAAAAAAAAAAAAA-BBBBBBBBBB-C"),
+      `InChIKey-Planar` = c("AAAAAAAAAAAAAA-BBBBBBBBBB"),
+      npclassifier_pathway = c("Path"),
+      npclassifier_superclass = c("Sup"),
+      npclassifier_class = c("Cla"),
+      ExactMass = c("100.0"),
+      superclass = c("Super"),
+      class = c("Class"),
+      subclass = c("Subclass"),
+      Precursor_MZ = c("100.0"),
+      MZErrorPPM = c("0")
     )
     gnps_path <- temp_test_path("gnps_in.tsv")
     tidytable::fwrite(x = gnps, file = gnps_path, sep = "\t")
     res <- prepare_annotations_gnps(
-      input = gnps_path, output = out,
-      str_stereo = s$stereo, str_met = s$met, str_nam = s$nam,
-      str_tax_cla = s$cla, str_tax_npc = s$npc
+      input = gnps_path,
+      output = out,
+      str_stereo = s$stereo,
+      str_met = s$met,
+      str_nam = s$nam,
+      str_tax_cla = s$cla,
+      str_tax_npc = s$npc
     )
     expect_equal(res, out)
     expect_true(file.exists(out))

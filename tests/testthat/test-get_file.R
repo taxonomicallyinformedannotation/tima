@@ -141,7 +141,9 @@ test_that("get_file fails gracefully with invalid URL", {
   withr::with_dir(tmp, {
     paths <- local_test_project(copy = TRUE)
     test_file <- file.path("data", "source", "test.txt")
-    if (file.exists(test_file)) unlink(test_file, force = TRUE)
+    if (file.exists(test_file)) {
+      unlink(test_file, force = TRUE)
+    }
 
     expect_error(
       get_file(
@@ -160,7 +162,9 @@ test_that("get_file handles 404 errors", {
   withr::with_dir(tmp, {
     paths <- local_test_project(copy = TRUE)
     test_file <- file.path("data", "source", "test.txt")
-    if (file.exists(test_file)) unlink(test_file, force = TRUE)
+    if (file.exists(test_file)) {
+      unlink(test_file, force = TRUE)
+    }
 
     expect_error(
       get_file(
