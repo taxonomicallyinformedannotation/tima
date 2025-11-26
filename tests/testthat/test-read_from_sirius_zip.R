@@ -52,17 +52,16 @@ create_test_sirius_zip <- function() {
   # Create zip archive
   zip_file <- file.path(temp_dir, "test_sirius.zip")
 
-  withr::with_dir(temp_dir, {
-    utils::zip(
-      zipfile = basename(zip_file),
-      files = c(
-        file.path("feature_123", "structure.tsv"),
-        file.path("feature_123", "denovo_structure.tsv"),
-        "_empty.tsv"
-      ),
-      flags = "-q"
-    )
-  })
+  withr::local_dir(temp_dir)
+  utils::zip(
+    zipfile = basename(zip_file),
+    files = c(
+      file.path("feature_123", "structure.tsv"),
+      file.path("feature_123", "denovo_structure.tsv"),
+      "_empty.tsv"
+    ),
+    flags = "-q"
+  )
 
   list(
     zip_file = zip_file,
@@ -197,11 +196,10 @@ test_that("read_from_sirius_zip handles empty zip archive", {
   empty_zip <- file.path(temp_dir, "empty.zip")
 
   # Create empty zip
-  withr::with_dir(temp_dir, {
-    writeLines("", "temp.txt")
-    utils::zip(zipfile = basename(empty_zip), files = "temp.txt", flags = "-q")
-    file.remove("temp.txt")
-  })
+  withr::local_dir(temp_dir)
+  writeLines("", "temp.txt")
+  utils::zip(zipfile = basename(empty_zip), files = "temp.txt", flags = "-q")
+  file.remove("temp.txt")
 
   expect_error(
     read_from_sirius_zip(sirius_zip = empty_zip, file = "test"),

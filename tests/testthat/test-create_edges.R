@@ -345,35 +345,34 @@ test_that("create_edges ensures feature_id < target_id", {
 ## Integration with create_edges_spectra ----
 
 test_that("create_edges integrates with extract_spectra output", {
-  withr::with_dir(temp_test_dir("create_edges_integration"), {
-    paths <- local_test_project(copy = TRUE)
+  withr::local_dir(temp_test_dir("create_edges_integration"))
+  paths <- local_test_project(copy = TRUE)
 
-    # Ensure clean state - remove any existing spectra file
-    if (file.exists(paths$data$source$spectra)) {
-      unlink(paths$data$source$spectra, force = TRUE)
-    }
+  # Ensure clean state - remove any existing spectra file
+  if (file.exists(paths$data$source$spectra)) {
+    unlink(paths$data$source$spectra, force = TRUE)
+  }
 
-    # Download test spectra
-    get_file(
-      url = paths$urls$examples$spectra_mini,
-      export = paths$data$source$spectra
-    )
+  # Download test spectra
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
 
-    # Verify file was downloaded
-    expect_true(file.exists(paths$data$source$spectra))
-    expect_gt(file.size(paths$data$source$spectra), 0)
+  # Verify file was downloaded
+  expect_true(file.exists(paths$data$source$spectra))
+  expect_gt(file.size(paths$data$source$spectra), 0)
 
-    # Import spectra first, then extract
-    spectra_obj <- import_spectra(paths$data$source$spectra)
+  # Import spectra first, then extract
+  spectra_obj <- import_spectra(paths$data$source$spectra)
 
-    # Check we have spectra loaded
-    expect_gt(length(spectra_obj), 0)
+  # Check we have spectra loaded
+  expect_gt(length(spectra_obj), 0)
 
-    # Extract spectra data
-    spectra_data <- extract_spectra(object = spectra_obj)
+  # Extract spectra data
+  spectra_data <- extract_spectra(object = spectra_obj)
 
-    # Verify the extraction worked
-    expect_s3_class(spectra_data, "data.frame")
-    expect_true(nrow(spectra_data) > 0)
-  })
+  # Verify the extraction worked
+  expect_s3_class(spectra_data, "data.frame")
+  expect_true(nrow(spectra_data) > 0)
 })

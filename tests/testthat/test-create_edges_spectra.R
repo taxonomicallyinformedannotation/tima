@@ -76,66 +76,64 @@ test_that("create_edges_spectra checks input file exists", {
 })
 
 test_that("create_edges_spectra handles single spectrum", {
-  withr::with_dir(temp_test_dir("create_edges_spectra_single"), {
-    mgf_file <- tempfile(fileext = ".mgf")
-    mgf <- c(
-      "BEGIN IONS",
-      "TITLE=Spectrum1",
-      "PEPMASS=100.5",
-      "CHARGE=1+",
-      "100 10",
-      "101 20",
-      "END IONS"
-    )
-    writeLines(mgf, mgf_file)
+  withr::local_dir(temp_test_dir("create_edges_spectra_single"))
+  mgf_file <- tempfile(fileext = ".mgf")
+  mgf <- c(
+    "BEGIN IONS",
+    "TITLE=Spectrum1",
+    "PEPMASS=100.5",
+    "CHARGE=1+",
+    "100 10",
+    "101 20",
+    "END IONS"
+  )
+  writeLines(mgf, mgf_file)
 
-    output <- create_edges_spectra(
-      input = mgf_file,
-      threshold = 0.0,
-      matched_peaks = 1,
-      ppm = 10,
-      dalton = 0.01
-    )
+  output <- create_edges_spectra(
+    input = mgf_file,
+    threshold = 0.0,
+    matched_peaks = 1,
+    ppm = 10,
+    dalton = 0.01
+  )
 
-    expect_true(file.exists(output))
+  expect_true(file.exists(output))
 
-    df <- tidytable::fread(output)
-    # Single spectrum should produce empty edges or single NA row
-    expect_true(nrow(df) <= 1)
-  })
+  df <- tidytable::fread(output)
+  # Single spectrum should produce empty edges or single NA row
+  expect_true(nrow(df) <= 1)
 })
 
 test_that("create_edges_spectra creates output file", {
-  withr::with_dir(temp_test_dir("create_edges_spectra_output"), {
-    mgf_file <- tempfile(fileext = ".mgf")
-    mgf <- c(
-      "BEGIN IONS",
-      "TITLE=Spectrum1",
-      "PEPMASS=100",
-      "CHARGE=1+",
-      "50 10",
-      "75 20",
-      "100 30",
-      "END IONS",
-      "",
-      "BEGIN IONS",
-      "TITLE=Spectrum2",
-      "PEPMASS=200",
-      "CHARGE=1+",
-      "50 15",
-      "75 25",
-      "200 35",
-      "END IONS"
-    )
-    writeLines(mgf, mgf_file)
+  withr::local_dir(temp_test_dir("create_edges_spectra_output"))
+  mgf_file <- tempfile(fileext = ".mgf")
+  mgf <- c(
+    "BEGIN IONS",
+    "TITLE=Spectrum1",
+    "PEPMASS=100",
+    "CHARGE=1+",
+    "50 10",
+    "75 20",
+    "100 30",
+    "END IONS",
+    "",
+    "BEGIN IONS",
+    "TITLE=Spectrum2",
+    "PEPMASS=200",
+    "CHARGE=1+",
+    "50 15",
+    "75 25",
+    "200 35",
+    "END IONS"
+  )
+  writeLines(mgf, mgf_file)
 
-    output <- create_edges_spectra(
-      input = mgf_file,
-      threshold = 0.0,
-      matched_peaks = 1
-    )
+  output <- create_edges_spectra(
+    input = mgf_file,
+    threshold = 0.0,
+    matched_peaks = 1
+  )
 
-    expect_true(file.exists(output))
-    expect_match(output, "\\.tsv$")
-  })
+  expect_true(file.exists(output))
+  expect_match(output, "\\.tsv$")
 })

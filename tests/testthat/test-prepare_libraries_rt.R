@@ -563,17 +563,16 @@ test_that("prepare_libraries_rt handles moderate-scale data efficiently", {
 })
 
 test_that("prepare_libraries_rt validates RT unit and outputs", {
-  withr::with_dir(temp_test_dir("prep_lib_rt_validate"), {
-    # Invalid unit
-    expect_error(
-      prepare_libraries_rt(unit_rt = "hours"),
-      "must be 'seconds' or 'minutes'"
-    )
+  withr::local_dir(temp_test_dir("prep_lib_rt_validate"))
+  # Invalid unit
+  expect_error(
+    prepare_libraries_rt(unit_rt = "hours"),
+    "must be 'seconds' or 'minutes'"
+  )
 
-    # Output paths must be single strings
-    expect_error(prepare_libraries_rt(output_rt = c("a", "b")), "single")
-    expect_error(prepare_libraries_rt(output_sop = c("a", "b")), "single")
-  })
+  # Output paths must be single strings
+  expect_error(prepare_libraries_rt(output_rt = c("a", "b")), "single")
+  expect_error(prepare_libraries_rt(output_sop = c("a", "b")), "single")
 })
 
 test_that("prepare_libraries_rt handles missing InChIKeys", {
