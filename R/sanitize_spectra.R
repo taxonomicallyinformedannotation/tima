@@ -66,6 +66,8 @@ sanitize_spectra <- function(
   # Apply sequential sanitization steps with detailed logging
   # logger::log_trace("Applying sanitization pipeline...")
 
+  n_before <- length(spectra)
+
   spectra <- spectra |>
     Spectra::dropNaSpectraVariables() |>
     Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
@@ -77,13 +79,13 @@ sanitize_spectra <- function(
       mz = c(">=")
     ) |>
     Spectra::combinePeaks(tolerance = dalton, ppm = ppm) |>
-    Spectra::scalePeaks()
+    Spectra::scalePeaks() |>
+    Spectra::applyProcessing()
 
   # Post-Processing Filters ----
 
   # Filter spectra with fewer than 3 peaks
-  n_before <- length(spectra)
-  spectra <- spectra[lengths(spectra@backend@peaksData) > 2L]
+  spectra <- spectra[lengths(spectra@backend@peaksData) > 4L]
   n_removed_peaks <- n_before - length(spectra)
   if (n_removed_peaks > 0L) {
     pct_removed <- round(100 * n_removed_peaks / n_before, 1)
