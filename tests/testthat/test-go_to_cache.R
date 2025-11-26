@@ -260,7 +260,7 @@ test_that("go_to_cache is idempotent", {
 # })
 
 ## Helper Function Tests ----
-# Note: These test internal functions using tima::: to access them
+# Note: These test internal functions using  to access them
 
 test_that("ensure_cache_exists creates directory", {
   cache_path <- file.path(tempdir(), paste0("test_ensure_", Sys.getpid()))
@@ -269,7 +269,7 @@ test_that("ensure_cache_exists creates directory", {
     unlink(cache_path, recursive = TRUE)
   }
 
-  tima:::ensure_cache_exists(cache_path)
+  ensure_cache_exists(cache_path)
 
   expect_true(dir.exists(cache_path))
 
@@ -284,7 +284,7 @@ test_that("ensure_cache_exists handles existing directory", {
   dir.create(cache_path, showWarnings = FALSE)
 
   # Should not error
-  expect_silent(tima:::ensure_cache_exists(cache_path))
+  expect_silent(ensure_cache_exists(cache_path))
   expect_true(dir.exists(cache_path))
 
   # Cleanup
@@ -297,7 +297,7 @@ test_that("change_to_cache changes directory", {
     dir.create(test_dir, showWarnings = FALSE)
 
     old_wd <- getwd()
-    tima:::change_to_cache(test_dir)
+    change_to_cache(test_dir)
     new_wd <- getwd()
 
     expect_false(identical(old_wd, new_wd))
@@ -314,7 +314,7 @@ test_that("change_to_cache changes directory", {
 test_that("change_to_cache errors on invalid directory", {
   with_temp_wd({
     expect_error(
-      tima:::change_to_cache("/nonexistent/directory/path"),
+      change_to_cache("/nonexistent/directory/path"),
       "Cannot change"
     )
   })

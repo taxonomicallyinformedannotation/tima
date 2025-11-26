@@ -24,7 +24,7 @@ make_python_test_fixture <- function() {
 
 test_that("validate_install_inputs accepts valid inputs", {
   expect_silent(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = c("https://cloud.r-project.org"),
       dependencies = TRUE,
@@ -34,7 +34,7 @@ test_that("validate_install_inputs accepts valid inputs", {
 
   # Multiple repos
   expect_silent(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "dplyr",
       repos = c("https://cloud.r-project.org", "https://cran.rstudio.com"),
       dependencies = FALSE,
@@ -45,7 +45,7 @@ test_that("validate_install_inputs accepts valid inputs", {
 
 test_that("validate_install_inputs rejects invalid package - wrong type", {
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = 123,
       repos = c("https://cloud.r-project.org"),
       dependencies = TRUE,
@@ -55,7 +55,7 @@ test_that("validate_install_inputs rejects invalid package - wrong type", {
   )
 
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = list("tima"),
       repos = c("https://cloud.r-project.org"),
       dependencies = TRUE,
@@ -67,7 +67,7 @@ test_that("validate_install_inputs rejects invalid package - wrong type", {
 
 test_that("validate_install_inputs rejects invalid package - multiple values", {
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = c("pkg1", "pkg2"),
       repos = c("https://cloud.r-project.org"),
       dependencies = TRUE,
@@ -79,7 +79,7 @@ test_that("validate_install_inputs rejects invalid package - multiple values", {
 
 test_that("validate_install_inputs rejects invalid package - empty string", {
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "",
       repos = c("https://cloud.r-project.org"),
       dependencies = TRUE,
@@ -91,7 +91,7 @@ test_that("validate_install_inputs rejects invalid package - empty string", {
 
 test_that("validate_install_inputs rejects invalid package - NULL", {
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = NULL,
       repos = c("https://cloud.r-project.org"),
       dependencies = TRUE,
@@ -103,7 +103,7 @@ test_that("validate_install_inputs rejects invalid package - NULL", {
 
 test_that("validate_install_inputs rejects invalid repos - empty vector", {
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = character(0),
       dependencies = TRUE,
@@ -115,7 +115,7 @@ test_that("validate_install_inputs rejects invalid repos - empty vector", {
 
 test_that("validate_install_inputs rejects invalid repos - wrong type", {
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = 123,
       dependencies = TRUE,
@@ -125,7 +125,7 @@ test_that("validate_install_inputs rejects invalid repos - wrong type", {
   )
 
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = list("https://cloud.r-project.org"),
       dependencies = TRUE,
@@ -137,7 +137,7 @@ test_that("validate_install_inputs rejects invalid repos - wrong type", {
 
 test_that("validate_install_inputs rejects repos with empty strings", {
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = c("https://cloud.r-project.org", ""),
       dependencies = TRUE,
@@ -147,7 +147,7 @@ test_that("validate_install_inputs rejects repos with empty strings", {
   )
 
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = c("", "", ""),
       dependencies = TRUE,
@@ -159,7 +159,7 @@ test_that("validate_install_inputs rejects repos with empty strings", {
 
 test_that("validate_install_inputs rejects invalid dependencies - wrong type", {
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = c("https://cloud.r-project.org"),
       dependencies = "yes",
@@ -169,7 +169,7 @@ test_that("validate_install_inputs rejects invalid dependencies - wrong type", {
   )
 
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = c("https://cloud.r-project.org"),
       dependencies = 1,
@@ -181,7 +181,7 @@ test_that("validate_install_inputs rejects invalid dependencies - wrong type", {
 
 test_that("validate_install_inputs rejects invalid dependencies - multiple values", {
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = c("https://cloud.r-project.org"),
       dependencies = c(TRUE, FALSE),
@@ -193,7 +193,7 @@ test_that("validate_install_inputs rejects invalid dependencies - multiple value
 
 test_that("validate_install_inputs rejects invalid test flag - wrong type", {
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = c("https://cloud.r-project.org"),
       dependencies = TRUE,
@@ -203,7 +203,7 @@ test_that("validate_install_inputs rejects invalid test flag - wrong type", {
   )
 
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = c("https://cloud.r-project.org"),
       dependencies = TRUE,
@@ -215,7 +215,7 @@ test_that("validate_install_inputs rejects invalid test flag - wrong type", {
 
 test_that("validate_install_inputs rejects invalid test flag - multiple values", {
   expect_error(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = c("https://cloud.r-project.org"),
       dependencies = TRUE,
@@ -231,7 +231,7 @@ test_that("show_system_messages logs Windows messages correctly", {
   skip_if_not_installed("logger")
 
   expect_no_error({
-    tima:::show_system_messages(system = "Windows", test = FALSE)
+    show_system_messages(system = "Windows", test = FALSE)
   })
 })
 
@@ -239,7 +239,7 @@ test_that("show_system_messages logs Linux messages correctly", {
   skip_if_not_installed("logger")
 
   expect_no_error({
-    tima:::show_system_messages(system = "Linux", test = FALSE)
+    show_system_messages(system = "Linux", test = FALSE)
   })
 })
 
@@ -247,7 +247,7 @@ test_that("show_system_messages logs macOS messages correctly", {
   skip_if_not_installed("logger")
 
   expect_no_error({
-    tima:::show_system_messages(system = "Darwin", test = FALSE)
+    show_system_messages(system = "Darwin", test = FALSE)
   })
 })
 
@@ -256,7 +256,7 @@ test_that("show_system_messages handles test mode", {
 
   # Test mode should show RTools message regardless of system
   expect_no_error({
-    tima:::show_system_messages(system = "Linux", test = TRUE)
+    show_system_messages(system = "Linux", test = TRUE)
   })
 })
 
@@ -265,7 +265,7 @@ test_that("show_system_messages handles unknown system", {
 
   # Should not error on unknown system
   expect_no_error({
-    tima:::show_system_messages(system = "Unknown", test = FALSE)
+    show_system_messages(system = "Unknown", test = FALSE)
   })
 })
 
@@ -279,7 +279,7 @@ test_that("check_or_install_python detects system Python", {
   python_path <- Sys.which("python3")
 
   if (nzchar(python_path)) {
-    result <- tima:::check_or_install_python(test = FALSE)
+    result <- check_or_install_python(test = FALSE)
     expect_true(file.exists(result))
   }
 })
@@ -289,7 +289,7 @@ test_that("check_or_install_python handles test mode", {
 
   # Test mode should trigger fallback behavior
   expect_no_error({
-    result <- tima:::check_or_install_python(test = TRUE)
+    result <- check_or_install_python(test = TRUE)
   })
 })
 
@@ -305,7 +305,7 @@ test_that("check_or_install_python handles missing Python gracefully", {
 #   skip_if_not_installed("reticulate")
 #   skip_if(Sys.info()[["sysname"]] != "Windows", "Windows-only test")
 #
-#   result <- tima:::check_or_install_python(test = FALSE)
+#   result <- check_or_install_python(test = FALSE)
 #
 #   # Windows path should end with .exe
 #   if (grepl("miniconda", result, ignore.case = TRUE)) {
@@ -317,7 +317,7 @@ test_that("check_or_install_python handles missing Python gracefully", {
 #   skip_if_not_installed("reticulate")
 #   skip_if(Sys.info()[["sysname"]] == "Windows", "Unix-only test")
 #
-#   result <- tima:::check_or_install_python(test = FALSE)
+#   result <- check_or_install_python(test = FALSE)
 #
 #   # Unix path should be in bin/ directory for Miniconda
 #   if (grepl("miniconda", result, ignore.case = TRUE)) {
@@ -344,7 +344,7 @@ test_that("setup_virtualenv validates inputs", {
   # Should accept valid inputs
   expect_no_error({
     try(
-      tima:::setup_virtualenv(
+      setup_virtualenv(
         envname = fixture$envname,
         python = fixture$python_path,
         rescue_python_version = "3.13"
@@ -419,7 +419,7 @@ test_that("setup_virtualenv falls back to check_or_install_python when python=NU
 
 test_that("validate_install_inputs handles edge case: single-char package name", {
   expect_silent(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "R",
       repos = c("https://cloud.r-project.org"),
       dependencies = TRUE,
@@ -432,7 +432,7 @@ test_that("validate_install_inputs handles edge case: very long package name", {
   long_name <- paste(rep("a", 1000), collapse = "")
 
   expect_silent(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = long_name,
       repos = c("https://cloud.r-project.org"),
       dependencies = TRUE,
@@ -443,7 +443,7 @@ test_that("validate_install_inputs handles edge case: very long package name", {
 
 test_that("validate_install_inputs handles edge case: special characters in URL", {
   expect_silent(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = c(
         "https://cloud.r-project.org/",
@@ -459,7 +459,7 @@ test_that("validate_install_inputs handles edge case: many repositories", {
   many_repos <- paste0("https://repo", 1:100, ".example.com")
 
   expect_silent(
-    tima:::validate_install_inputs(
+    validate_install_inputs(
       package = "tima",
       repos = many_repos,
       dependencies = TRUE,
@@ -472,7 +472,7 @@ test_that("show_system_messages handles empty system string", {
   skip_if_not_installed("logger")
 
   expect_no_error({
-    tima:::show_system_messages(system = "", test = FALSE)
+    show_system_messages(system = "", test = FALSE)
   })
 })
 
@@ -481,11 +481,11 @@ test_that("show_system_messages handles case variations", {
 
   # Should handle case variations gracefully
   expect_no_error({
-    tima:::show_system_messages(system = "windows", test = FALSE)
+    show_system_messages(system = "windows", test = FALSE)
   })
 
   expect_no_error({
-    tima:::show_system_messages(system = "LINUX", test = FALSE)
+    show_system_messages(system = "LINUX", test = FALSE)
   })
 })
 
@@ -510,9 +510,9 @@ test_that("install validates inputs through main function", {
 })
 
 test_that("show_system_messages works for all OS types", {
-  expect_no_error(tima:::show_system_messages("Windows", FALSE))
-  expect_no_error(tima:::show_system_messages("Linux", FALSE))
-  expect_no_error(tima:::show_system_messages("Darwin", FALSE))
-  expect_no_error(tima:::show_system_messages("Unknown", FALSE))
-  expect_no_error(tima:::show_system_messages("Linux", TRUE))
+  expect_no_error(show_system_messages("Windows", FALSE))
+  expect_no_error(show_system_messages("Linux", FALSE))
+  expect_no_error(show_system_messages("Darwin", FALSE))
+  expect_no_error(show_system_messages("Unknown", FALSE))
+  expect_no_error(show_system_messages("Linux", TRUE))
 })

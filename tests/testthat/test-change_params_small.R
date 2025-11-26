@@ -358,20 +358,20 @@ test_that("change_params_small preserves existing YAML structure", {
 })
 
 ## Helper Function Tests ----
-# Note: These test internal functions using tima::: to access them
+# Note: These test internal functions using  to access them
 
 test_that("validate_params_small_inputs works correctly", {
   # Valid inputs
-  expect_silent(tima:::validate_params_small_inputs("pos"))
-  expect_silent(tima:::validate_params_small_inputs("neg"))
-  expect_silent(tima:::validate_params_small_inputs(NULL))
+  expect_silent(validate_params_small_inputs("pos"))
+  expect_silent(validate_params_small_inputs("neg"))
+  expect_silent(validate_params_small_inputs(NULL))
 
   # Invalid inputs
-  expect_error(tima:::validate_params_small_inputs("invalid"), "must be either")
+  expect_error(validate_params_small_inputs("invalid"), "must be either")
 })
 
 test_that("create_yaml_null_handler converts NA correctly", {
-  handler <- tima:::create_yaml_null_handler()
+  handler <- create_yaml_null_handler()
 
   # Test NA conversion
   result_na <- handler(NA)

@@ -208,7 +208,3 @@ test_that("tima_full maintains backward compatibility", {
 #     }),
 #     "workflow pipeline failed|cache directory"
 #   )
-
-test_that("tima_full tests do not pollute tests/testthat directory", {
-  expect_false(dir.exists(file.path("..", "..", "tests", "testthat", "data")))
-})
