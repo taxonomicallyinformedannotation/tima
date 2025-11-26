@@ -28,14 +28,39 @@ validate_clean_chemo_inputs <- function(
   high_confidence,
   remove_ties,
   summarize,
-  max_per_score = 7L
+  max_per_score,
+  score_chemical_cla_kingdom,
+  score_chemical_cla_superclass,
+  score_chemical_cla_class,
+  score_chemical_cla_parent,
+  score_chemical_npc_pathway,
+  score_chemical_npc_superclass,
+  score_chemical_npc_class
 ) {
   # Validate data frame
   if (!is.data.frame(annot_table_wei_chemo)) {
     stop("annot_table_wei_chemo must be a data frame", call. = FALSE)
   }
 
-  # Validate numeric parameters (combined checks)
+  # Basic required columns in annotation table
+  required_cols <- c(
+    "feature_id",
+    "candidate_structure_inchikey_connectivity_layer",
+    "score_biological",
+    "score_chemical",
+    "score_weighted_chemo",
+    "candidate_score_pseudo_initial"
+  )
+  missing_cols <- setdiff(required_cols, names(annot_table_wei_chemo))
+  if (length(missing_cols) > 0) {
+    stop(
+      "annot_table_wei_chemo missing required columns: ",
+      paste(missing_cols, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  # Validate numeric parameters
   if (!is.numeric(candidates_final) || candidates_final < 1) {
     stop(
       "candidates_final must be a positive integer, got: ",
@@ -101,6 +126,35 @@ validate_clean_chemo_inputs <- function(
       paste(invalid_params, collapse = ", "),
       call. = FALSE
     )
+  }
+
+  # Validate max_per_score
+  if (!is.numeric(max_per_score) || max_per_score < 1) {
+    stop(
+      "max_per_score must be a positive integer, got: ",
+      max_per_score,
+      call. = FALSE
+    )
+  }
+
+  # Validate taxonomy weights if provided
+  weights <- c(
+    score_chemical_cla_kingdom,
+    score_chemical_cla_superclass,
+    score_chemical_cla_class,
+    score_chemical_cla_parent,
+    score_chemical_npc_pathway,
+    score_chemical_npc_superclass,
+    score_chemical_npc_class
+  )
+  if (any(!vapply(weights, function(x) is.null(x) || is.numeric(x), logical(1)))) {
+    stop("taxonomy weight parameters must be numeric when provided", call. = FALSE)
+  }
+  weights_num <- weights[!vapply(weights, is.null, logical(1))]
+  if (length(weights_num) > 0) {
+    if (any(weights_num < 0 | weights_num > 1)) {
+      stop("taxonomy weights must be within [0,1]", call. = FALSE)
+    }
   }
 
   invisible(NULL)
@@ -231,31 +285,6 @@ count_candidates <- function(df_ranked, df_percentile) {
     x = candidates_evaluated,
     y = candidates_best,
     by = "feature_id"
-  )
-}
-
-#' Extract Weighted Taxonomy Scores
-#'
-#' @description Internal helper to extract level weights from parent environment
-#'     (matching weight_chemo parameters).
-#'
-#' @return Named list of weights
-#' @keywords internal
-get_taxonomy_weights <- function() {
-  list(
-    w_cla_kin = get("score_chemical_cla_kingdom", envir = parent.frame(n = 2)),
-    w_cla_sup = get(
-      "score_chemical_cla_superclass",
-      envir = parent.frame(n = 2)
-    ),
-    w_cla_cla = get("score_chemical_cla_class", envir = parent.frame(n = 2)),
-    w_cla_par = get("score_chemical_cla_parent", envir = parent.frame(n = 2)),
-    w_npc_pat = get("score_chemical_npc_pathway", envir = parent.frame(n = 2)),
-    w_npc_sup = get(
-      "score_chemical_npc_superclass",
-      envir = parent.frame(n = 2)
-    ),
-    w_npc_cla = get("score_chemical_npc_class", envir = parent.frame(n = 2))
   )
 }
 
@@ -415,6 +444,13 @@ remove_compound_names <- function(results_list, compounds_names) {
 #' @param summarize Logical, collapse results to one row per feature
 #' @param max_per_score Integer, max candidates to keep per feature per score.
 #'   If more exist, they are randomly sampled and a note is added. Default 7.
+#' @param score_chemical_cla_kingdom Numeric (0-1), score for ClassyFire kingdom level
+#' @param score_chemical_cla_superclass Numeric (0-1), score for ClassyFire superclass level
+#' @param score_chemical_cla_class Numeric (0-1), score for ClassyFire class level
+#' @param score_chemical_cla_parent Numeric (0-1), score for ClassyFire direct parent level
+#' @param score_chemical_npc_pathway Numeric (0-1), score for NPClassifier pathway level
+#' @param score_chemical_npc_superclass Numeric (0-1), score for NPClassifier superclass level
+#' @param score_chemical_npc_class Numeric (0-1), score for NPClassifier class level
 #'
 #' @return Named list with three data frames:
 #'   \describe{
@@ -445,28 +481,27 @@ remove_compound_names <- function(results_list, compounds_names) {
 #' )
 #' }
 clean_chemo <- function(
-  annot_table_wei_chemo = get(
-    "annot_table_wei_chemo",
-    envir = parent.frame()
-  ),
-  components_table = get("components_table", envir = parent.frame()),
-  features_table = get("features_table", envir = parent.frame()),
-  structure_organism_pairs_table = get(
-    "structure_organism_pairs_table",
-    envir = parent.frame()
-  ),
-  candidates_final = get("candidates_final", envir = parent.frame()),
-  best_percentile = get("best_percentile", envir = parent.frame()),
-  minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
-  minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
-  minimal_ms1_condition = get(
-    "minimal_ms1_condition",
-    envir = parent.frame()
-  ),
-  compounds_names = get("compounds_names", envir = parent.frame()),
-  high_confidence = get("high_confidence", envir = parent.frame()),
-  remove_ties = get("remove_ties", envir = parent.frame()),
-  summarize = get("summarize", envir = parent.frame()),
+  annot_table_wei_chemo,
+  components_table,
+  features_table,
+  structure_organism_pairs_table,
+  candidates_final,
+  best_percentile,
+  minimal_ms1_bio,
+  minimal_ms1_chemo,
+  minimal_ms1_condition,
+  compounds_names,
+  high_confidence,
+  remove_ties,
+  summarize,
+  # Explicit taxonomy weights (0-1)
+  score_chemical_cla_kingdom = 0.1,
+  score_chemical_cla_superclass = 0.2,
+  score_chemical_cla_class = 0.3,
+  score_chemical_cla_parent = 0.4,
+  score_chemical_npc_pathway = 0.3,
+  score_chemical_npc_superclass = 0.2,
+  score_chemical_npc_class = 0.1,
   max_per_score = 7L
 ) {
   # Input Validation ----
@@ -482,13 +517,33 @@ clean_chemo <- function(
     high_confidence = high_confidence,
     remove_ties = remove_ties,
     summarize = summarize,
-    max_per_score = max_per_score
+    max_per_score = max_per_score,
+    score_chemical_cla_kingdom = score_chemical_cla_kingdom,
+    score_chemical_cla_superclass = score_chemical_cla_superclass,
+    score_chemical_cla_class = score_chemical_cla_class,
+    score_chemical_cla_parent = score_chemical_cla_parent,
+    score_chemical_npc_pathway = score_chemical_npc_pathway,
+    score_chemical_npc_superclass = score_chemical_npc_superclass,
+    score_chemical_npc_class = score_chemical_npc_class
   )
 
   # Early exit for empty input
   if (nrow(annot_table_wei_chemo) == 0L) {
     logger::log_warn("Empty annotation table provided")
     return(annot_table_wei_chemo)
+  }
+
+  # Validate features and components schema minimally
+  for (tbl in list(features_table, components_table)) {
+    if (!is.data.frame(tbl)) {
+      stop("features_table and components_table must be data frames", call. = FALSE)
+    }
+    if (!"feature_id" %in% names(tbl)) {
+      stop("features_table/components_table must contain feature_id column", call. = FALSE)
+    }
+  }
+  if (!is.data.frame(structure_organism_pairs_table)) {
+    stop("structure_organism_pairs_table must be a data frame", call. = FALSE)
   }
 
   # Ensure Score Columns are Numeric ----
@@ -639,27 +694,7 @@ clean_chemo <- function(
   # This ensures we get predicted taxonomy for features without inchikey
 
   # Extract best compound per feature
-  df_compounds_mini <- df_percentile |>
-    tidytable::arrange(tidytable::desc(x = score_weighted_chemo)) |>
-    tidytable::distinct(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      .keep_all = TRUE
-    ) |>
-    tidytable::select(
-      feature_id,
-      label_compound = candidate_structure_name,
-      adduct = candidate_adduct,
-      smiles_no_stereo = candidate_structure_smiles_no_stereo,
-      inchikey_connectivity_layer = candidate_structure_inchikey_connectivity_layer,
-      library = candidate_library,
-      error_mz = candidate_structure_error_mz,
-      error_rt = candidate_structure_error_rt,
-      organism_closest = candidate_structure_organism_occurrence_closest,
-      score = score_weighted_chemo
-    )
-
-  # Extract structure-based taxonomy (when inchikey exists - use structure columns)
+  # (downstream mini assembly uses filtered tier instead)
   df_structure_tax <- df_percentile |>
     tidytable::select(
       feature_id,
@@ -704,8 +739,16 @@ clean_chemo <- function(
     )
 
   if (nrow(df_pred_tax) > 0L) {
-    # Bring level weights from parent env (same as weight_chemo parameters)
-    weights <- get_taxonomy_weights()
+    # Build weights list from explicit parameters
+    weights <- list(
+      w_cla_kin = score_chemical_cla_kingdom,
+      w_cla_sup = score_chemical_cla_superclass,
+      w_cla_cla = score_chemical_cla_class,
+      w_cla_par = score_chemical_cla_parent,
+      w_npc_pat = score_chemical_npc_pathway,
+      w_npc_sup = score_chemical_npc_superclass,
+      w_npc_cla = score_chemical_npc_class
+    )
 
     # For ClassyFire: compute weighted scores for ALL levels, pick single best
     df_cla <- compute_classyfire_taxonomy(df_pred_tax, weights)

@@ -5,20 +5,26 @@
 \title{Clean Chemical Annotations}
 \usage{
 clean_chemo(
-  annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
-  components_table = get("components_table", envir = parent.frame()),
-  features_table = get("features_table", envir = parent.frame()),
-  structure_organism_pairs_table = get("structure_organism_pairs_table", envir =
-    parent.frame()),
-  candidates_final = get("candidates_final", envir = parent.frame()),
-  best_percentile = get("best_percentile", envir = parent.frame()),
-  minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
-  minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
-  minimal_ms1_condition = get("minimal_ms1_condition", envir = parent.frame()),
-  compounds_names = get("compounds_names", envir = parent.frame()),
-  high_confidence = get("high_confidence", envir = parent.frame()),
-  remove_ties = get("remove_ties", envir = parent.frame()),
-  summarize = get("summarize", envir = parent.frame()),
+  annot_table_wei_chemo,
+  components_table,
+  features_table,
+  structure_organism_pairs_table,
+  candidates_final,
+  best_percentile,
+  minimal_ms1_bio,
+  minimal_ms1_chemo,
+  minimal_ms1_condition,
+  compounds_names,
+  high_confidence,
+  remove_ties,
+  summarize,
+  score_chemical_cla_kingdom = 0.1,
+  score_chemical_cla_superclass = 0.2,
+  score_chemical_cla_class = 0.3,
+  score_chemical_cla_parent = 0.4,
+  score_chemical_npc_pathway = 0.3,
+  score_chemical_npc_superclass = 0.2,
+  score_chemical_npc_class = 0.1,
   max_per_score = 7L
 )
 }
@@ -56,6 +62,20 @@ Candidates with scores >= percentile * max_score are kept. Default: 0.9 (90th pe
 \item{remove_ties}{Logical, remove tied scores (keep only highest-ranked)}
 
 \item{summarize}{Logical, collapse results to one row per feature}
+
+\item{score_chemical_cla_kingdom}{Numeric (0-1), score for ClassyFire kingdom level}
+
+\item{score_chemical_cla_superclass}{Numeric (0-1), score for ClassyFire superclass level}
+
+\item{score_chemical_cla_class}{Numeric (0-1), score for ClassyFire class level}
+
+\item{score_chemical_cla_parent}{Numeric (0-1), score for ClassyFire direct parent level}
+
+\item{score_chemical_npc_pathway}{Numeric (0-1), score for NPClassifier pathway level}
+
+\item{score_chemical_npc_superclass}{Numeric (0-1), score for NPClassifier superclass level}
+
+\item{score_chemical_npc_class}{Numeric (0-1), score for NPClassifier class level}
 
 \item{max_per_score}{Integer, max candidates to keep per feature per score.
 If more exist, they are randomly sampled and a note is added. Default 7.}

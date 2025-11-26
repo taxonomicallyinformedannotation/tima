@@ -877,7 +877,28 @@ weight_annotations <- function(
     )
 
   results_list <- annot_table_wei_chemo |>
-    clean_chemo()
+    clean_chemo(
+      components_table = components_table,
+      features_table = features_table,
+      structure_organism_pairs_table = structure_organism_pairs_table,
+      candidates_final = candidates_final,
+      best_percentile = best_percentile,
+      minimal_ms1_bio = minimal_ms1_bio,
+      minimal_ms1_chemo = minimal_ms1_chemo,
+      minimal_ms1_condition = minimal_ms1_condition,
+      compounds_names = compounds_names,
+      high_confidence = high_confidence,
+      remove_ties = remove_ties,
+      summarize = summarize,
+      score_chemical_cla_kingdom = score_chemical_cla_kingdom,
+      score_chemical_cla_superclass = score_chemical_cla_superclass,
+      score_chemical_cla_class = score_chemical_cla_class,
+      score_chemical_cla_parent = score_chemical_cla_parent,
+      score_chemical_npc_pathway = score_chemical_npc_pathway,
+      score_chemical_npc_superclass = score_chemical_npc_superclass,
+      score_chemical_npc_class = score_chemical_npc_class,
+      max_per_score = 7L
+    )
   rm(annot_table_wei_chemo)
 
   # Export Results ----
