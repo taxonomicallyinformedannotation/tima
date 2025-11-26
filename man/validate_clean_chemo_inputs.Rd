@@ -15,7 +15,14 @@ validate_clean_chemo_inputs(
   high_confidence,
   remove_ties,
   summarize,
-  max_per_score = 7L
+  max_per_score,
+  score_chemical_cla_kingdom,
+  score_chemical_cla_superclass,
+  score_chemical_cla_class,
+  score_chemical_cla_parent,
+  score_chemical_npc_pathway,
+  score_chemical_npc_superclass,
+  score_chemical_npc_class
 )
 }
 \arguments{

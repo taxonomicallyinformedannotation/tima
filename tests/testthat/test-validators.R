@@ -7,7 +7,11 @@ ns <- asNamespace("tima")
 
 # Helper: temporary files
 with_temp_files <- function(n = 2L, expr) {
-  paths <- vapply(seq_len(n), function(i) tempfile(pattern = paste0("tima-", i, "-")), character(1))
+  paths <- vapply(
+    seq_len(n),
+    function(i) tempfile(pattern = paste0("tima-", i, "-")),
+    character(1)
+  )
   file.create(paths)
   on.exit(unlink(paths), add = TRUE)
   force(expr(paths))
@@ -59,24 +63,46 @@ test_that("validate_tolerances validates ranges and warns when exceeding", {
   expect_invisible(validate_tolerances(tolerance_ppm = 10, tolerance_rt = 0.05))
   expect_error(validate_tolerances(tolerance_ppm = 0), "must be positive")
   expect_error(validate_tolerances(tolerance_rt = 0), "must be positive")
-  expect_warning(validate_tolerances(tolerance_ppm = MAX_TOLERANCE_PPM + 1), "exceeds recommended maximum")
-  expect_warning(validate_tolerances(tolerance_rt = MAX_TOLERANCE_RT_ADDUCTS + 1), "exceeds recommended maximum")
+  expect_warning(
+    validate_tolerances(tolerance_ppm = MAX_TOLERANCE_PPM + 1),
+    "exceeds recommended maximum"
+  )
+  expect_warning(
+    validate_tolerances(tolerance_rt = MAX_TOLERANCE_RT_ADDUCTS + 1),
+    "exceeds recommended maximum"
+  )
 })
 
 # validate_dataframe ----
 test_that("validate_dataframe checks type, emptiness, rows, and columns", {
   df <- data.frame(feature_id = 1:3, mz = c(100.1, 200.2, 300.3))
-  expect_invisible(validate_dataframe(df, param_name = "features", required_cols = c("feature_id", "mz")))
-  expect_error(validate_dataframe(list(), param_name = "features"), "must be a data frame")
-  expect_error(validate_dataframe(df[FALSE, ], allow_empty = FALSE), "cannot be empty")
+  expect_invisible(validate_dataframe(
+    df,
+    param_name = "features",
+    required_cols = c("feature_id", "mz")
+  ))
+  expect_error(
+    validate_dataframe(list(), param_name = "features"),
+    "must be a data frame"
+  )
+  expect_error(
+    validate_dataframe(df[FALSE, ], allow_empty = FALSE),
+    "cannot be empty"
+  )
   expect_error(validate_dataframe(df[1, ], min_rows = 2), "must have at least")
-  expect_error(validate_dataframe(df, required_cols = c("feature_id", "rt")), "missing required column")
+  expect_error(
+    validate_dataframe(df, required_cols = c("feature_id", "rt")),
+    "missing required column"
+  )
 })
 
 # validate_numeric_range ----
 test_that("validate_numeric_range checks bounds and type", {
   expect_invisible(validate_numeric_range(0.5, 0, 1, param_name = "threshold"))
-  expect_error(validate_numeric_range(NULL, 0, 1, allow_null = FALSE), "cannot be NULL")
+  expect_error(
+    validate_numeric_range(NULL, 0, 1, allow_null = FALSE),
+    "cannot be NULL"
+  )
   expect_invisible(validate_numeric_range(NULL, 0, 1, allow_null = TRUE))
   expect_error(validate_numeric_range("a", 0, 1), "single numeric")
   expect_error(validate_numeric_range(NA_real_, 0, 1), "cannot be NA")
@@ -93,33 +119,64 @@ test_that("validate_weights validates numeric, non-negative, non-zero-sum", {
 
 # validate_choice ----
 test_that("validate_choice enforces allowed set", {
-  expect_invisible(validate_choice("OR", c("OR", "AND"), param_name = "condition"))
-  expect_error(validate_choice("X", c("OR", "AND"), param_name = "condition"), "must be one of")
+  expect_invisible(validate_choice(
+    "OR",
+    c("OR", "AND"),
+    param_name = "condition"
+  ))
+  expect_error(
+    validate_choice("X", c("OR", "AND"), param_name = "condition"),
+    "must be one of"
+  )
 })
 
 # validate_character ----
 test_that("validate_character checks null, empty, and allowed values", {
-  expect_invisible(validate_character("value", allowed_values = c("value", "other"), param_name = "p"))
+  expect_invisible(validate_character(
+    "value",
+    allowed_values = c("value", "other"),
+    param_name = "p"
+  ))
   expect_error(validate_character(NULL, param_name = "p"), "cannot be NULL")
   expect_error(validate_character("", param_name = "p"), "cannot be an empty")
-  expect_error(validate_character("bad", allowed_values = c("value"), param_name = "p"), "must be one of")
+  expect_error(
+    validate_character("bad", allowed_values = c("value"), param_name = "p"),
+    "must be one of"
+  )
 })
 
 # validate_logical ----
 test_that("validate_logical checks type, length, and NA", {
   expect_invisible(validate_logical(TRUE, param_name = "flag"))
   expect_error(validate_logical(NULL, param_name = "flag"), "cannot be NULL")
-  expect_error(validate_logical(c(TRUE, FALSE), param_name = "flag"), "single logical")
+  expect_error(
+    validate_logical(c(TRUE, FALSE), param_name = "flag"),
+    "single logical"
+  )
   expect_error(validate_logical(NA, param_name = "flag"), "cannot be NA")
 })
 
 # validate_list_or_vector ----
 test_that("validate_list_or_vector enforces type and length bounds", {
-  expect_invisible(validate_list_or_vector(list(1, 2), min_length = 1, max_length = 3))
-  expect_invisible(validate_list_or_vector(c(1, 2, 3), min_length = 1, max_length = 3))
-  expect_error(validate_list_or_vector(NULL, allow_null = FALSE), "cannot be NULL")
+  expect_invisible(validate_list_or_vector(
+    list(1, 2),
+    min_length = 1,
+    max_length = 3
+  ))
+  expect_invisible(validate_list_or_vector(
+    c(1, 2, 3),
+    min_length = 1,
+    max_length = 3
+  ))
+  expect_error(
+    validate_list_or_vector(NULL, allow_null = FALSE),
+    "cannot be NULL"
+  )
   expect_error(validate_list_or_vector(1, min_length = 2), "at least")
-  expect_error(validate_list_or_vector(c(1, 2, 3, 4), max_length = 3), "cannot have more than")
+  expect_error(
+    validate_list_or_vector(c(1, 2, 3, 4), max_length = 3),
+    "cannot have more than"
+  )
 })
 
 # assert_flag ----
