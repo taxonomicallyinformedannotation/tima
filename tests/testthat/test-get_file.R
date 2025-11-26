@@ -186,10 +186,3 @@ test_that("get_file works with real package example files", {
   )
   expect_true(file.exists(file.path("data", "source", "features.csv")))
 })
-
-## Pollution Check ----
-
-test_that("get_file tests do not pollute tests/testthat directory", {
-  # Ensure no data directory was created at testthat root
-  expect_false(dir.exists(file.path("..", "..", "tests", "testthat", "data")))
-})

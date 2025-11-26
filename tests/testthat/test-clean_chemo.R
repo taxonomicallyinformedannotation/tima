@@ -237,7 +237,7 @@ test_that("validate_clean_chemo_inputs works", {
   fixture <- make_clean_chemo_fixture()
 
   expect_silent(
-    tima:::validate_clean_chemo_inputs(
+    validate_clean_chemo_inputs(
       annot_table_wei_chemo = fixture$annot_table_wei_chemo,
       candidates_final = 5,
       best_percentile = 0.9,
@@ -253,7 +253,7 @@ test_that("validate_clean_chemo_inputs works", {
   )
 
   expect_error(
-    tima:::validate_clean_chemo_inputs(
+    validate_clean_chemo_inputs(
       annot_table_wei_chemo = 123,
       candidates_final = 5,
       best_percentile = 0.9,
@@ -280,7 +280,7 @@ test_that("filter_ms1_annotations filters with OR condition", {
     candidate_score_sirius_csi = c(NA, NA, NA, NA)
   )
 
-  result <- tima:::filter_ms1_annotations(
+  result <- filter_ms1_annotations(
     annot_table_wei_chemo = ann,
     minimal_ms1_bio = 0.5,
     minimal_ms1_chemo = 0.5,
@@ -303,7 +303,7 @@ test_that("filter_ms1_annotations filters with AND condition", {
     candidate_score_sirius_csi = c(NA, NA, NA)
   )
 
-  result <- tima:::filter_ms1_annotations(
+  result <- filter_ms1_annotations(
     annot_table_wei_chemo = ann,
     minimal_ms1_bio = 0.5,
     minimal_ms1_chemo = 0.5,
@@ -326,7 +326,7 @@ test_that("filter_ms1_annotations keeps all MS2 annotations regardless of scores
     candidate_score_sirius_csi = c(NA, 0.7, NA)
   )
 
-  result <- tima:::filter_ms1_annotations(
+  result <- filter_ms1_annotations(
     annot_table_wei_chemo = ann,
     minimal_ms1_bio = 0.9,
     minimal_ms1_chemo = 0.9,
@@ -348,7 +348,7 @@ test_that("filter_ms1_annotations handles character scores correctly", {
     candidate_score_sirius_csi = c(NA, NA)
   )
 
-  result <- tima:::filter_ms1_annotations(
+  result <- filter_ms1_annotations(
     annot_table_wei_chemo = ann,
     minimal_ms1_bio = 0.5,
     minimal_ms1_chemo = 0.5,
@@ -367,7 +367,7 @@ test_that("rank_and_deduplicate ranks candidates correctly", {
     candidate_score_pseudo_initial = c("0.85", "0.75", "0.80")
   )
 
-  result <- tima:::rank_and_deduplicate(df)
+  result <- rank_and_deduplicate(df)
 
   expect_true("rank_initial" %in% names(result))
   expect_true("rank_final" %in% names(result))
@@ -402,7 +402,7 @@ test_that("rank_and_deduplicate removes duplicate structures", {
     candidate_score_pseudo_initial = c("0.85", "0.75", "0.80")
   )
 
-  result <- tima:::rank_and_deduplicate(df)
+  result <- rank_and_deduplicate(df)
 
   # Should keep only best scoring instance of "A" and "B"
   expect_equal(nrow(result), 2)
@@ -419,7 +419,7 @@ test_that("rank_and_deduplicate handles multiple features", {
     candidate_score_pseudo_initial = c("0.9", "0.8", "0.7", "0.6")
   )
 
-  result <- tima:::rank_and_deduplicate(df)
+  result <- rank_and_deduplicate(df)
 
   expect_equal(nrow(result), 4)
   # Each feature should have its own ranking starting from 1
@@ -434,7 +434,7 @@ test_that("apply_percentile_filter keeps top percentile", {
     score_weighted_chemo = c("1.0", "0.9", "0.5", "0.1")
   )
 
-  result <- tima:::apply_percentile_filter(df, best_percentile = 0.9)
+  result <- apply_percentile_filter(df, best_percentile = 0.9)
 
   # 0.9 * 1.0 = 0.9 threshold
   # Keep: 1.0, 0.9
@@ -448,7 +448,7 @@ test_that("apply_percentile_filter handles multiple features independently", {
     score_weighted_chemo = c("1.0", "0.5", "0.8", "0.4")
   )
 
-  result <- tima:::apply_percentile_filter(df, best_percentile = 0.9)
+  result <- apply_percentile_filter(df, best_percentile = 0.9)
 
   # F1: threshold = 0.9 * 1.0 = 0.9 → keep 1.0 only
   # F2: threshold = 0.9 * 0.8 = 0.72 → keep 0.8 only
@@ -471,7 +471,7 @@ test_that("apply_percentile_filter with percentile = 0.0 keeps all", {
     score_weighted_chemo = c("1.0", "0.5", "0.1")
   )
 
-  result <- tima:::apply_percentile_filter(df, best_percentile = 0.0)
+  result <- apply_percentile_filter(df, best_percentile = 0.0)
   expect_equal(nrow(result), 3)
 })
 
@@ -485,7 +485,7 @@ test_that("count_candidates counts correctly", {
     feature_id = c("F1", "F1", "F2")
   )
 
-  result <- tima:::count_candidates(df_ranked, df_percentile)
+  result <- count_candidates(df_ranked, df_percentile)
 
   expect_equal(nrow(result), 2)
   expect_true(all(
@@ -507,7 +507,7 @@ test_that("count_candidates handles features not in percentile table", {
     feature_id = c("F1", "F1")
   )
 
-  result <- tima:::count_candidates(df_ranked, df_percentile)
+  result <- count_candidates(df_ranked, df_percentile)
 
   expect_equal(nrow(result), 2)
   expect_true(is.na(result$candidates_best[result$feature_id == "F2"]))
@@ -534,7 +534,7 @@ test_that("compute_classyfire_taxonomy selects highest weighted level", {
     feature_pred_tax_cla_04dirpar_score = "0.95"
   )
 
-  result <- tima:::compute_classyfire_taxonomy(df_pred_tax, weights)
+  result <- compute_classyfire_taxonomy(df_pred_tax, weights)
 
   # Parent has highest weight (0.4) with score 0.95
   expect_equal(result$label_classyfire_predicted, "Parent1")
@@ -561,7 +561,7 @@ test_that("compute_classyfire_taxonomy handles NA values", {
     feature_pred_tax_cla_04dirpar_score = NA_character_
   )
 
-  result <- tima:::compute_classyfire_taxonomy(df_pred_tax, weights)
+  result <- compute_classyfire_taxonomy(df_pred_tax, weights)
 
   # Only kingdom available
   expect_equal(result$label_classyfire_predicted, "Kingdom1")
@@ -588,7 +588,7 @@ test_that("compute_classyfire_taxonomy filters empty labels", {
     feature_pred_tax_cla_04dirpar_score = c(NA, NA)
   )
 
-  result <- tima:::compute_classyfire_taxonomy(df_pred_tax, weights)
+  result <- compute_classyfire_taxonomy(df_pred_tax, weights)
 
   # Only F1 should remain (F2 has "empty" label)
   expect_equal(nrow(result), 1)
@@ -612,7 +612,7 @@ test_that("compute_npclassifier_taxonomy selects highest weighted level", {
     feature_pred_tax_npc_03cla_score = "0.7"
   )
 
-  result <- tima:::compute_npclassifier_taxonomy(df_pred_tax, weights)
+  result <- compute_npclassifier_taxonomy(df_pred_tax, weights)
 
   # Pathway has highest weight (0.3) with score 0.95
   expect_equal(result$label_npclassifier_predicted, "Pathway1")
@@ -636,7 +636,7 @@ test_that("compute_npclassifier_taxonomy handles NA values", {
     feature_pred_tax_npc_03cla_score = NA_character_
   )
 
-  result <- tima:::compute_npclassifier_taxonomy(df_pred_tax, weights)
+  result <- compute_npclassifier_taxonomy(df_pred_tax, weights)
 
   # Only superclass available
   expect_equal(result$label_npclassifier_predicted, "Super1")
@@ -661,7 +661,7 @@ test_that("remove_compound_names removes names when compounds_names=FALSE", {
     )
   )
 
-  result <- tima:::remove_compound_names(results_list, compounds_names = FALSE)
+  result <- remove_compound_names(results_list, compounds_names = FALSE)
 
   expect_false("candidate_structure_name" %in% names(result$full))
   expect_false("candidate_structure_name" %in% names(result$filtered))
@@ -684,7 +684,7 @@ test_that("remove_compound_names keeps names when compounds_names=TRUE", {
     )
   )
 
-  result <- tima:::remove_compound_names(results_list, compounds_names = TRUE)
+  result <- remove_compound_names(results_list, compounds_names = TRUE)
 
   expect_true("candidate_structure_name" %in% names(result$full))
   expect_true("candidate_structure_name" %in% names(result$filtered))
@@ -833,7 +833,7 @@ test_that("clean_chemo filters MS1-only annotations correctly with OR condition"
   score_chemical_npc_pathway <- 0.3
   score_chemical_npc_superclass <- 0.2
   score_chemical_npc_class <- 0.1
-  result_df <- tima:::filter_ms1_annotations(
+  result_df <- filter_ms1_annotations(
     annot_table_wei_chemo = fixture$annot_table_wei_chemo,
     minimal_ms1_bio = 0.5,
     minimal_ms1_chemo = 0.5,
@@ -852,13 +852,13 @@ test_that("clean_chemo sampling works when max_per_score is exceeded", {
       score_weighted_chemo = c(rep(0.9, 15), runif(5, 0.1, 0.8)),
       candidate_score_pseudo_initial = c(rep(0.9, 15), runif(5, 0.1, 0.8))
     )
-  df_base <- tima:::filter_ms1_annotations(
+  df_base <- filter_ms1_annotations(
     annot_table_wei_chemo = fixture$annot_table_wei_chemo,
     minimal_ms1_bio = 0.0,
     minimal_ms1_chemo = 0.0,
     minimal_ms1_condition = "OR"
   )
-  df_ranked <- tima:::rank_and_deduplicate(df_base)
+  df_ranked <- rank_and_deduplicate(df_base)
   # Add group sizes
   df_with_groups <- df_ranked |>
     mutate(.n_per_group = n(), .by = c(feature_id, rank_final))
@@ -899,7 +899,7 @@ test_that("clean_chemo handles character score columns", {
   score_chemical_npc_class <- 0.1
   # Should not error - function should convert to numeric internally
   expect_no_error({
-    result_df <- tima:::filter_ms1_annotations(
+    result_df <- filter_ms1_annotations(
       annot_table_wei_chemo = fixture$annot_table_wei_chemo,
       minimal_ms1_bio = 0.1,
       minimal_ms1_chemo = 0.1,
