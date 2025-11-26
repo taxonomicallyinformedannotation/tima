@@ -387,12 +387,11 @@ test_that("harmonize_adducts is reasonably fast", {
   df <- data.frame(adduct = rep(c("M+H", "M+Na", "M-H"), 100))
   trans <- SAMPLE_TRANSLATIONS
 
-  timing <- bench::mark(
-    harmonize_adducts(df, adducts_translations = trans),
-    iterations = 50,
-    check = FALSE
-  )
+  timing <- system.time(replicate(
+    n = 100L,
+    expr = harmonize_adducts(df, adducts_translations = trans)
+  ))
 
-  # Should complete quickly (<10ms for 300 rows)
-  expect_lt(as.numeric(median(timing$median)), 0.01)
+  # Should complete quickly
+  expect_lt(timing["elapsed"], 0.1)
 })

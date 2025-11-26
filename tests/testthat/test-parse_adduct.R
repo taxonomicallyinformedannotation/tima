@@ -385,7 +385,10 @@ test_that("parse_adduct is deterministic", {
 
 test_that("parse_adduct is reasonably fast", {
   skip_on_cran()
-  timing <- system.time(rep(parse_adduct("[2M+Na-H2O]2+"), 1000))
+  timing <- system.time(replicate(
+    n = 100L,
+    expr = parse_adduct("[2M+Na-H2O]2+")
+  ))
 
   # Should parse in microseconds
   expect_lt(timing["elapsed"], 0.1)

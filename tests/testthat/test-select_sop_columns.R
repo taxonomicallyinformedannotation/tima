@@ -373,14 +373,10 @@ test_that("select_sop_columns is reasonably fast", {
   skip_if_not_installed("bench")
   skip_on_cran()
 
-  df <- create_test_sop_data(n_rows = 100)
+  df <- create_test_sop_data(n_rows = 100L)
 
-  timing <- bench::mark(
-    select_sop_columns(df),
-    iterations = 50,
-    check = FALSE
-  )
+  timing <- system.time(replicate(n = 100L, expr = select_sop_columns(df)))
 
-  # Should be fast (<10ms for 100 rows)
-  expect_lt(as.numeric(median(timing$median)), 0.01)
+  # Should be fast
+  expect_lt(timing["elapsed"], 0.5)
 })
