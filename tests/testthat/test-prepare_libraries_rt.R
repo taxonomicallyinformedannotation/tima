@@ -563,15 +563,17 @@ test_that("prepare_libraries_rt handles moderate-scale data efficiently", {
 })
 
 test_that("prepare_libraries_rt validates RT unit and outputs", {
-  # Invalid unit
-  expect_error(
-    prepare_libraries_rt(unit_rt = "hours"),
-    "must be 'seconds' or 'minutes'"
-  )
+  withr::with_dir(temp_test_dir("prep_lib_rt_validate"), {
+    # Invalid unit
+    expect_error(
+      prepare_libraries_rt(unit_rt = "hours"),
+      "must be 'seconds' or 'minutes'"
+    )
 
-  # Output paths must be single strings
-  expect_error(prepare_libraries_rt(output_rt = c("a", "b")), "single")
-  expect_error(prepare_libraries_rt(output_sop = c("a", "b")), "single")
+    # Output paths must be single strings
+    expect_error(prepare_libraries_rt(output_rt = c("a", "b")), "single")
+    expect_error(prepare_libraries_rt(output_sop = c("a", "b")), "single")
+  })
 })
 
 test_that("prepare_libraries_rt handles missing InChIKeys", {
@@ -613,71 +615,3 @@ test_that("prepare_libraries_rt handles missing InChIKeys", {
 
   expect_type(result, "character")
 })
-
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("prepare_libraries_rt works with experimental data", {
-#   local_test_project(copy = TRUE)
-#   paths <- get_default_paths()
-#
-#   get_file(
-#     url = paths$urls$examples$spectral_lib_mini$with_rt,
-#     export = paths$data$source$libraries$spectra$exp$with_rt
-#   )
-#   get_file(
-#     url = paths$urls$examples$lib_mini$rt,
-#     export = paths$data$source$libraries$rt$example_mini
-#   )
-#
-#   expect_no_error(
-#     prepare_libraries_rt(
-#       mgf_exp = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
-#       temp_exp = paths$data$source$libraries$rt$example_mini
-#     )
-#   )
-# })
-
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("prepare_libraries_rt works with in-silico data", {
-#   local_test_project(copy = TRUE)
-#   paths <- get_default_paths()
-#
-#   get_file(
-#     url = paths$urls$examples$spectral_lib_mini$with_rt,
-#     export = paths$data$source$libraries$spectra$exp$with_rt
-#   )
-#   get_file(
-#     url = paths$urls$examples$lib_mini$rt,
-#     export = paths$data$source$libraries$rt$example_mini
-#   )
-#
-#   expect_no_error(
-#     prepare_libraries_rt(
-#       mgf_is = list(pos = paths$data$source$libraries$spectra$exp$with_rt),
-#       temp_is = paths$data$source$libraries$rt$example_mini
-#     )
-#   )
-# })
-
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("prepare_libraries_rt warns on invalid SMILES", {
-#   local_test_project(copy = TRUE)
-#
-#   tidytable::tidytable(
-#     "rt" = 0.1,
-#     "smiles" = "wrongSMILES",
-#     "inchikey" = NA
-#   ) |>
-#     tidytable::fwrite("data/source/libraries/rt/example_bad.tsv")
-#
-#   expect_warning(
-#     prepare_libraries_rt(
-#       temp_exp = "data/source/libraries/rt/example_bad.tsv"
-#     )
-#   )
-# })

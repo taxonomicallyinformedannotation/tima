@@ -191,18 +191,6 @@ test_that("validate_install_inputs rejects invalid dependencies - multiple value
   )
 })
 
-# test_that("validate_install_inputs rejects invalid dependencies - NA", {
-#   expect_error(
-#     tima:::validate_install_inputs(
-#       package = "tima",
-#       repos = c("https://cloud.r-project.org"),
-#       dependencies = NA,
-#       test = FALSE
-#     ),
-#     "dependencies must be a single logical value"
-#   )
-# })
-
 test_that("validate_install_inputs rejects invalid test flag - wrong type", {
   expect_error(
     tima:::validate_install_inputs(

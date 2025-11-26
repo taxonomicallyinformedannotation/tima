@@ -17,7 +17,11 @@ test_that("archive_log_file handles existing log file", {
     )
     expect_true(is.logical(result))
     # Archived file should exist in data/processed inside temp dir
-    archived <- list.files("data/processed", pattern = basename(log_file), full.names = TRUE)
+    archived <- list.files(
+      "data/processed",
+      pattern = basename(log_file),
+      full.names = TRUE
+    )
     expect_true(length(archived) >= 0) # Allow empty if archiving skipped
   })
 })
@@ -172,7 +176,11 @@ test_that("archive_log_file timestamp format is correct", {
     timestamp <- as.POSIXct("2024-01-15 14:30:45")
     archive_log_file(log_file = basename(log_file), timestamp = timestamp)
     if (dir.exists("data/processed")) {
-      files <- list.files("data/processed", pattern = "^20240115_143045_", full.names = TRUE)
+      files <- list.files(
+        "data/processed",
+        pattern = "^20240115_143045_",
+        full.names = TRUE
+      )
       expect_true(length(files) >= 0)
     }
   })
