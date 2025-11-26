@@ -305,16 +305,11 @@ test_that("sanitize_spectra is reasonably fast", {
   skip_if_not_installed("bench")
   skip_on_cran()
 
-  spectra <- create_test_spectra_object(n_spectra = 10, n_peaks = 50)
-
-  timing <- bench::mark(
-    sanitize_spectra(spectra),
-    iterations = 10,
-    check = FALSE
-  )
+  spectra <- create_test_spectra_object(n_spectra = 1000, n_peaks = 100L)
+  timing <- system.time(sanitize_spectra(spectra))
 
   # Should complete in reasonable time (<1 second for 10 spectra)
-  expect_lt(as.numeric(median(timing$median)), 1.0)
+  expect_lt(timing["elapsed"], 1.0)
 })
 
 ## Integration Tests ----
