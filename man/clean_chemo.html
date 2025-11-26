@@ -703,20 +703,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <pre><code class="language-R">clean_chemo(
-  annot_table_wei_chemo = get("annot_table_wei_chemo", envir = parent.frame()),
-  components_table = get("components_table", envir = parent.frame()),
-  features_table = get("features_table", envir = parent.frame()),
-  structure_organism_pairs_table = get("structure_organism_pairs_table", envir =
-    parent.frame()),
-  candidates_final = get("candidates_final", envir = parent.frame()),
-  best_percentile = get("best_percentile", envir = parent.frame()),
-  minimal_ms1_bio = get("minimal_ms1_bio", envir = parent.frame()),
-  minimal_ms1_chemo = get("minimal_ms1_chemo", envir = parent.frame()),
-  minimal_ms1_condition = get("minimal_ms1_condition", envir = parent.frame()),
-  compounds_names = get("compounds_names", envir = parent.frame()),
-  high_confidence = get("high_confidence", envir = parent.frame()),
-  remove_ties = get("remove_ties", envir = parent.frame()),
-  summarize = get("summarize", envir = parent.frame()),
+  annot_table_wei_chemo,
+  components_table,
+  features_table,
+  structure_organism_pairs_table,
+  candidates_final,
+  best_percentile,
+  minimal_ms1_bio,
+  minimal_ms1_chemo,
+  minimal_ms1_condition,
+  compounds_names,
+  high_confidence,
+  remove_ties,
+  summarize,
+  score_chemical_cla_kingdom = 0.1,
+  score_chemical_cla_superclass = 0.2,
+  score_chemical_cla_class = 0.3,
+  score_chemical_cla_parent = 0.4,
+  score_chemical_npc_pathway = 0.3,
+  score_chemical_npc_superclass = 0.2,
+  score_chemical_npc_class = 0.1,
   max_per_score = 7L
 )
 </code></pre>
@@ -826,6 +832,62 @@ Logical, remove tied scores (keep only highest-ranked)
 </td>
 <td>
 Logical, collapse results to one row per feature
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="score_chemical_cla_kingdom">score_chemical_cla_kingdom</code>
+</td>
+<td>
+Numeric (0-1), score for ClassyFire kingdom level
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="score_chemical_cla_superclass">score_chemical_cla_superclass</code>
+</td>
+<td>
+Numeric (0-1), score for ClassyFire superclass level
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="score_chemical_cla_class">score_chemical_cla_class</code>
+</td>
+<td>
+Numeric (0-1), score for ClassyFire class level
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="score_chemical_cla_parent">score_chemical_cla_parent</code>
+</td>
+<td>
+Numeric (0-1), score for ClassyFire direct parent level
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="score_chemical_npc_pathway">score_chemical_npc_pathway</code>
+</td>
+<td>
+Numeric (0-1), score for NPClassifier pathway level
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="score_chemical_npc_superclass">score_chemical_npc_superclass</code>
+</td>
+<td>
+Numeric (0-1), score for NPClassifier superclass level
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="score_chemical_npc_class">score_chemical_npc_class</code>
+</td>
+<td>
+Numeric (0-1), score for NPClassifier class level
 </td>
 </tr>
 <tr>
