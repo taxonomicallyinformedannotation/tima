@@ -836,7 +836,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   ms_pol = NULL,
   org_tax = NULL,
   hig_con = NULL,
-  summarize = NULL
+  summarize = NULL,
+  cache_dir = NULL
 )
 </code></pre>
 </section>
@@ -913,6 +914,14 @@ Logical. Filter for high confidence candidates only
 </td>
 <td>
 Logical. Summarize all candidates per feature to single row
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="cache_dir">cache_dir</code>
+</td>
+<td>
+Character. Cache directory path (for testing; uses go_to_cache() if NULL)
 </td>
 </tr>
 </tbody></table>
