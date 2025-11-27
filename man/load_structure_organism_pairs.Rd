@@ -7,16 +7,18 @@
 load_structure_organism_pairs(library, str_stereo, org_tax_ott)
 }
 \arguments{
-\item{library}{Character, path to library file}
+\item{library}{Character, path to main library file (required).}
 
-\item{str_stereo}{Character, path to stereo file (optional)}
+\item{str_stereo}{Character, path to stereo structures file (optional; NULL allowed).}
 
-\item{org_tax_ott}{Character, path to taxonomy file (optional)}
+\item{org_tax_ott}{Character, path to organism taxonomy file (optional; NULL allowed).}
 }
 \value{
-Data frame with structure-organism pairs
+Data frame with structure-organism pairs, including any joined metadata.
 }
 \description{
-Internal helper to load and join library tables.
+Internal helper to load the main library table and sequentially
+left-join optional supplemental tables (stereo structures, organism taxonomy).
+Returns a combined data frame suitable for biological scoring.
 }
 \keyword{internal}

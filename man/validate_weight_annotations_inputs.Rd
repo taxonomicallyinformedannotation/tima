@@ -32,59 +32,60 @@ validate_weight_annotations_inputs(
 )
 }
 \arguments{
-\item{library}{Character, path to library file}
+\item{library}{Character, path to library file (required).}
 
-\item{components}{Character, path to components file}
+\item{components}{Character, path to components file (required).}
 
-\item{edges}{Character, path to edges file}
+\item{edges}{Character, path to edges file (required).}
 
-\item{taxa}{Character, path to taxa file}
+\item{taxa}{Character, path to taxa file (required).}
 
-\item{annotations}{Character vector, paths to annotation files}
+\item{annotations}{Character vector, paths to annotation files (required).}
 
-\item{str_stereo}{Character, path to stereo structures file (optional)}
+\item{str_stereo}{Character, path to stereo structures file (optional).}
 
-\item{org_tax_ott}{Character, path to organism taxonomy file (optional)}
+\item{org_tax_ott}{Character, path to organism taxonomy file (optional).}
 
-\item{canopus}{Character, path to canopus file (optional)}
+\item{canopus}{Character, path to canopus file (optional).}
 
-\item{formula}{Character, path to formula file (optional)}
+\item{formula}{Character, path to formula file (optional).}
 
-\item{minimal_ms1_condition}{Character, "OR" or "AND"}
+\item{minimal_ms1_condition}{Character, "OR" or "AND".}
 
-\item{weight_spectral}{Numeric (0-1)}
+\item{weight_spectral}{Numeric (0-Inf), weight for spectral score.}
 
-\item{weight_chemical}{Numeric (0-1)}
+\item{weight_chemical}{Numeric (0-Inf), weight for chemical score.}
 
-\item{weight_biological}{Numeric (0-1)}
+\item{weight_biological}{Numeric (0-Inf), weight for biological score.}
 
-\item{minimal_consistency}{Numeric (0-1)}
+\item{minimal_consistency}{Numeric (0-1), min consistency threshold.}
 
-\item{minimal_ms1_bio}{Numeric (0-1)}
+\item{minimal_ms1_bio}{Numeric (0-1), min biological score for MS1.}
 
-\item{minimal_ms1_chemo}{Numeric (0-1)}
+\item{minimal_ms1_chemo}{Numeric (0-1), min chemical score for MS1.}
 
-\item{ms1_only}{Logical}
+\item{ms1_only}{Logical, filter for MS1-only annotations.}
 
-\item{compounds_names}{Logical}
+\item{compounds_names}{Logical, include compound names.}
 
-\item{high_confidence}{Logical}
+\item{high_confidence}{Logical, report high-confidence candidates only.}
 
-\item{remove_ties}{Logical}
+\item{remove_ties}{Logical, remove tied candidates.}
 
-\item{summarize}{Logical}
+\item{summarize}{Logical, summarize to one row per feature.}
 
-\item{force}{Logical}
+\item{force}{Logical, force execution (override warnings).}
 
-\item{candidates_neighbors}{Integer >= 1}
+\item{candidates_neighbors}{Integer >= 1, neighbors to keep.}
 
-\item{candidates_final}{Integer >= 1}
+\item{candidates_final}{Integer >= 1, final candidates to keep.}
 }
 \value{
-NULL (stops execution if validation fails)
+NULL (invisible). Stops execution if validation fails.
 }
 \description{
 Internal helper to validate all input parameters for weight_annotations.
-Checks file existence, data types, ranges, and logical consistency.
+Checks file existence, data types, ranges, and logical consistency of weights.
+Stops execution with informative messages if any condition is violated.
 }
 \keyword{internal}

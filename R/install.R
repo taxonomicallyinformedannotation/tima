@@ -277,29 +277,35 @@ try_install_package <- function(
 
 #' @title Install TIMA Package and Dependencies
 #'
-#' @description Installs the TIMA package and its dependencies, including setting
-#'     up a Python virtual environment with RDKit for chemical structure processing.
-#'     This function handles different operating systems and provides fallback
-#'     installation methods if needed.
+#' @description Installs or updates the TIMA package from r-universe and sets up
+#'     a Python virtual environment with RDKit for chemical structure processing.
+#'     This function always installs/updates the R package to ensure you have the
+#'     latest version, while the Python environment is only created if it doesn't
+#'     already exist (idempotent).
 #'
 #' @details
 #' The installation process:
 #' \itemize{
 #'   \item Validates all input parameters
 #'   \item Detects the operating system and shows relevant instructions
-#'   \item Checks for Python or installs Miniconda as fallback
-#'   \item Creates a Python virtual environment (tima-env)
-#'   \item Installs RDKit in the virtual environment
-#'   \item Attempts to install the R package from binary
+#'   \item **Always installs/updates the R package** from r-universe (to get latest updates)
 #'   \item Falls back to source installation if binary fails
+#'   \item Checks for Python or installs Miniconda as fallback
+#'   \item Creates a Python virtual environment (tima-env) **only if it doesn't exist**
+#'   \item Installs RDKit in the virtual environment (skipped if already present)
 #'   \item Copies the TIMA backbone files
 #'   \item Cleans up any existing targets pipeline
 #' }
 #'
+#' @section Idempotency:
+#' - **R package**: Always reinstalled/updated (ensures latest version from r-universe)
+#' - **Python environment**: Only created if missing (idempotent - safe to call multiple times)
+#'
 #' @include copy_backbone.R
 #'
 #' @param package Character string name of the package to install (default: "tima")
-#' @param repos Character vector of repository URLs for install.packages
+#' @param repos Character vector of repository URLs for install.packages.
+#'     Default includes r-universe, Bioconductor, and CRAN.
 #' @param dependencies Logical whether to install package dependencies (default: TRUE)
 #' @param test Logical whether to use fallback/test installation mode (default: FALSE)
 #'
@@ -310,7 +316,7 @@ try_install_package <- function(
 #'
 #' @examples
 #' \dontrun{
-#' # Standard installation
+#' # Standard installation (updates package, checks Python env)
 #' install()
 #'
 #' # Install with custom repositories
@@ -337,19 +343,19 @@ install <- function(
     test = test
   )
 
-  # System Detection and Messages ----
-  system <- Sys.info()[["sysname"]]
-  show_system_messages(system = system, test = test)
+  logger::log_info("Starting installation/update of '{package}'")
 
   # System Detection and Messages ----
   system <- Sys.info()[["sysname"]]
   show_system_messages(system = system, test = test)
 
   # Python Setup ----
+  logger::log_debug("Checking Python environment")
   python <- check_or_install_python(test = test)
 
-  # R Package Installation ----
-  logger::log_info("Starting package installation process")
+  # R Package Installation (Always Update) ----
+  logger::log_info("Installing/updating R package '{package}' from r-universe")
+  logger::log_debug("This ensures you have the latest version with all updates")
 
   success <- try_install_package(
     package = package,
@@ -380,7 +386,8 @@ install <- function(
     )
   }
 
-  # Python Virtual Environment Setup ----
+  # Python Virtual Environment Setup (Idempotent) ----
+  logger::log_info("Configuring Python virtual environment (idempotent)")
   setup_virtualenv(envname = "tima-env", python = python)
 
   # Post-Installation Setup ----
@@ -406,7 +413,7 @@ install <- function(
     }
   )
 
-  logger::log_success("Installation completed successfully!")
+  logger::log_success("Installation of '{package}' completed successfully!")
 
   invisible(NULL)
 }

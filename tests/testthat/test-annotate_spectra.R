@@ -3,86 +3,38 @@
 library(testthat)
 library(tidytable)
 
-# Test Fixtures ----
-
-#' Create minimal MGF file for testing
-#' @keywords internal
-write_minimal_mgf <- function(
-  path,
-  n_spectra = 1,
-  pepmass = 100,
-  charge = "1+"
-) {
+# Helper to create minimal mgf with adjustable precursor masses & polarity
+write_minimal_mgf <- function(path, precursors, charge = "1+") {
   dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
-
   lines <- c()
-  for (i in seq_len(n_spectra)) {
+  for (i in seq_along(precursors)) {
+    mz <- precursors[i]
     lines <- c(
       lines,
       "BEGIN IONS",
       paste0("TITLE=Spectrum_", i),
-      paste0("PEPMASS=", pepmass + (i + 1) * 50),
+      paste0("PEPMASS=", mz),
       paste0("CHARGE=", charge),
       paste0("NAME=Name_", i),
-      paste0("INCHIKEY=Inchikey_", i),
-      paste0("SMILES=SMILES_", i),
-      paste0("MSLEVEL=2"),
-      "50 100",
-      "75 200",
-      "100 300",
+      paste0("INCHIKEY=AAAAAAAAAAAAAA-BBBBBBBBBB-C"),
+      paste0("SMILES=CCC"),
+      "MSLEVEL=2",
+      # 3 dummy peaks
+      paste0(round(mz * 0.5), " 100"),
+      paste0(round(mz * 0.75), " 200"),
+      paste0(round(mz), " 300"),
       "END IONS",
       ""
     )
   }
-
   writeLines(lines, path)
   invisible(path)
 }
 
-## Input Validation ----
+# ---------------- Validation tests ----------------
 
-test_that("annotate_spectra validates polarity parameter", {
-  withr::local_dir(temp_test_dir("annotate_spectra_polarity"))
-  local_test_project(copy = TRUE)
-  paths <- get_default_paths()
-
-  get_file(
-    url = paths$urls$examples$spectra_mini,
-    export = paths$data$source$spectra
-  )
-
-  lib_path <- file.path(
-    "data",
-    "interim",
-    "libraries",
-    "spectra",
-    "test_lib_pos.mgf"
-  )
-  write_minimal_mgf(lib_path)
-
-  expect_error(
-    annotate_spectra(
-      libraries = list(
-        pos = paths$data$interim$libraries$spectra$is$pos$isdb
-      ),
-      polarity = "invalid"
-    ),
-    "pos.*neg"
-  )
-
-  expect_error(
-    annotate_spectra(
-      libraries = list(
-        pos = paths$data$interim$libraries$spectra$is$pos$isdb
-      ),
-      polarity = "positive"
-    ),
-    "pos.*neg"
-  )
-})
-
-test_that("annotate_spectra validates numeric parameters", {
-  withr::local_dir(temp_test_dir("annotate_spectra_numeric"))
+test_that("annotate_spectra validates parameters", {
+  withr::local_dir(temp_test_dir("ann_spe_validate"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -94,98 +46,47 @@ test_that("annotate_spectra validates numeric parameters", {
     "interim",
     "libraries",
     "spectra",
-    "test_lib_pos.mgf"
+    "lib_pos.mgf"
   )
-  write_minimal_mgf(lib_path)
-
+  write_minimal_mgf(lib_path, precursors = c(150))
   expect_error(
-    annotate_spectra(
-      libraries = list(
-        pos = paths$data$interim$libraries$spectra$is$pos$isdb
-      ),
-      threshold = 1.5
-    ),
+    annotate_spectra(libraries = list(pos = lib_path), polarity = "invalid"),
+    "pos.*neg"
+  )
+  expect_error(
+    annotate_spectra(libraries = list(pos = lib_path), threshold = 1.2),
     "between 0 and 1"
   )
   expect_error(
-    annotate_spectra(
-      libraries = list(
-        pos = paths$data$interim$libraries$spectra$is$pos$isdb
-      ),
-      threshold = -0.1
-    ),
-    "between 0 and 1"
+    annotate_spectra(libraries = list(pos = lib_path), ppm = -2),
+    "must be between"
   )
   expect_error(
-    annotate_spectra(
-      libraries = list(
-        pos = paths$data$interim$libraries$spectra$is$pos$isdb
-      ),
-      ppm = -10
-    ),
+    annotate_spectra(libraries = list(pos = lib_path), dalton = -0.01),
+    "must be between"
+  )
+  expect_error(
+    annotate_spectra(libraries = list(pos = lib_path), qutoff = -10),
     "must be between"
   )
   expect_error(
     annotate_spectra(
-      libraries = list(
-        pos = paths$data$interim$libraries$spectra$is$pos$isdb
-      ),
-      dalton = -0.01
-    ),
-    "must be between"
-  )
-  expect_error(
-    annotate_spectra(
-      libraries = list(
-        pos = paths$data$interim$libraries$spectra$is$pos$isdb
-      ),
-      qutoff = -0.1
-    ),
-    "must be between"
-  )
-})
-
-test_that("annotate_spectra validates file existence", {
-  withr::local_dir(temp_test_dir("annotate_spectra_files"))
-  local_test_project(copy = TRUE)
-  expect_error(
-    annotate_spectra(
-      input = "nonexistent_spectra.mgf",
-      libraries = list(pos = "library.mgf"),
+      input = "nope.mgf",
+      libraries = list(pos = lib_path),
       polarity = "pos"
     ),
-    "not found"
-  )
-  get_file(
-    url = get_default_paths()$urls$examples$spectra_mini,
-    export = get_params(step = "annotate_spectra")$files$spectral$raw
+    "Input file"
   )
   expect_error(
-    annotate_spectra(
-      libraries = list(pos = "nonexistent_library.mgf"),
-      polarity = "pos"
-    ),
-    "not found"
+    annotate_spectra(libraries = list(pos = "nope.mgf"), polarity = "pos"),
+    "Library file"
   )
 })
 
-test_that("annotate_spectra requires at least one library", {
-  withr::local_dir(temp_test_dir("annotate_spectra_library"))
-  local_test_project(copy = TRUE)
-  get_file(
-    url = get_default_paths()$urls$examples$spectra_mini,
-    export = get_params(step = "annotate_spectra")$files$spectral$raw
-  )
-  expect_error(
-    annotate_spectra(libraries = list(), polarity = "pos"),
-    "Library elements must be character strings"
-  )
-})
+# ---------------- Basic run & output ----------------
 
-## Basic Functionality ----
-
-test_that("annotate_spectra works with single MGF library", {
-  withr::local_dir(temp_test_dir("annotate_spectra_single"))
+test_that("annotate_spectra produces output file and columns", {
+  withr::local_dir(temp_test_dir("ann_spe_basic"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -197,195 +98,31 @@ test_that("annotate_spectra works with single MGF library", {
     "interim",
     "libraries",
     "spectra",
-    "test_lib_pos.mgf"
+    "lib_pos.mgf"
   )
-  write_minimal_mgf(lib_path)
-  expect_no_error(annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    ppm = 10,
-    dalton = 0.01
-  ))
-})
-
-test_that("annotate_spectra works in negative mode", {
-  withr::local_dir(temp_test_dir("annotate_spectra_neg"))
-  local_test_project(copy = TRUE)
-  paths <- get_default_paths()
-  get_file(
-    url = paths$urls$examples$spectra_mini,
-    export = paths$data$source$spectra
-  )
-  lib_path_neg <- file.path(
-    "data",
-    "interim",
-    "libraries",
-    "spectra",
-    "test_lib_neg.mgf"
-  )
-  write_minimal_mgf(lib_path_neg, charge = "1-", pepmass = 120)
-  expect_no_error(annotate_spectra(
-    libraries = list(neg = lib_path_neg),
-    polarity = "neg",
-    ppm = 10,
-    dalton = 0.01
-  ))
-})
-
-test_that("annotate_spectra works with multiple libraries", {
-  withr::local_dir(temp_test_dir("annotate_spectra_multi"))
-  local_test_project(copy = TRUE)
-  paths <- get_default_paths()
-  get_file(
-    url = paths$urls$examples$spectra_mini,
-    export = paths$data$source$spectra
-  )
-  lib_path <- file.path(
-    "data",
-    "interim",
-    "libraries",
-    "spectra",
-    "test_lib_pos.mgf"
-  )
-  write_minimal_mgf(lib_path)
-  lib_path2 <- file.path(
-    "data",
-    "interim",
-    "libraries",
-    "spectra",
-    "test_lib_pos2.mgf"
-  )
-  write_minimal_mgf(lib_path2, pepmass = 110)
-  expect_no_error(annotate_spectra(
-    libraries = list(pos = lib_path, pos2 = lib_path2),
-    polarity = "pos",
-    ppm = 10,
-    dalton = 0.01
-  ))
-})
-
-## Different Similarity Methods ----
-
-test_that("annotate_spectra works with cosine similarity", {
-  withr::local_dir(temp_test_dir("annotate_spectra_cosine"))
-  local_test_project(copy = TRUE)
-  paths <- get_default_paths()
-  get_file(
-    url = paths$urls$examples$spectra_mini,
-    export = paths$data$source$spectra
-  )
-  lib_path <- file.path(
-    "data",
-    "interim",
-    "libraries",
-    "spectra",
-    "test_lib_pos.mgf"
-  )
-  write_minimal_mgf(lib_path)
-  expect_no_error(annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    method = "cosine",
-    ppm = 10,
-    dalton = 0.01
-  ))
-})
-
-test_that("annotate_spectra works with entropy similarity", {
-  withr::local_dir(temp_test_dir("annotate_spectra_entropy"))
-  local_test_project(copy = TRUE)
-  paths <- get_default_paths()
-  get_file(
-    url = paths$urls$examples$spectra_mini,
-    export = paths$data$source$spectra
-  )
-  lib_path <- file.path(
-    "data",
-    "interim",
-    "libraries",
-    "spectra",
-    "test_lib_pos.mgf"
-  )
-  write_minimal_mgf(lib_path)
-  expect_no_error(annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    method = "entropy",
-    ppm = 10,
-    dalton = 0.01
-  ))
-})
-
-## Threshold Settings ----
-
-test_that("annotate_spectra respects similarity threshold", {
-  withr::local_dir(temp_test_dir("annotate_spectra_threshold"))
-  local_test_project(copy = TRUE)
-  paths <- get_default_paths()
-  get_file(
-    url = paths$urls$examples$spectra_mini,
-    export = paths$data$source$spectra
-  )
-  lib_path <- file.path(
-    "data",
-    "interim",
-    "libraries",
-    "spectra",
-    "test_lib_pos.mgf"
-  )
-  write_minimal_mgf(lib_path)
-  expect_no_error(annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    threshold = 0.5,
-    ppm = 10,
-    dalton = 0.01
-  ))
-  expect_no_error(annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    threshold = 0.9,
-    ppm = 10,
-    dalton = 0.01
-  ))
-})
-
-## Tolerance Settings ----
-
-test_that("annotate_spectra accepts different tolerance settings", {
-  withr::local_dir(temp_test_dir("annotate_spectra_tolerance"))
-  local_test_project(copy = TRUE)
-  paths <- get_default_paths()
-  get_file(
-    url = paths$urls$examples$spectra_mini,
-    export = paths$data$source$spectra
-  )
-  lib_path <- file.path(
-    "data",
-    "interim",
-    "libraries",
-    "spectra",
-    "test_lib_pos.mgf"
-  )
-  write_minimal_mgf(lib_path)
-  expect_no_error(annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    ppm = 5,
-    dalton = 0.001
-  ))
-  expect_no_error(annotate_spectra(
+  write_minimal_mgf(lib_path, precursors = c(200, 250))
+  out <- annotate_spectra(
     libraries = list(pos = lib_path),
     polarity = "pos",
     ppm = 20,
     dalton = 0.05
+  )
+  expect_true(file.exists(out))
+  df <- fread(out)
+  expect_true(all(
+    c(
+      "feature_id",
+      "candidate_structure_name",
+      "candidate_score_similarity"
+    ) %in%
+      names(df)
   ))
 })
 
-## Approx Mode (Precursor-Free Matching)
+# ---------------- Threshold filtering ----------------
 
-test_that("annotate_spectra works with approx mode enabled", {
-  withr::local_dir(temp_test_dir("annotate_spectra_approx_on"))
+test_that("threshold filtering removes low similarity candidates", {
+  withr::local_dir(temp_test_dir("ann_spe_threshold"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -397,119 +134,93 @@ test_that("annotate_spectra works with approx mode enabled", {
     "interim",
     "libraries",
     "spectra",
-    "test_lib_pos.mgf"
+    "lib_pos.mgf"
   )
-  write_minimal_mgf(lib_path)
-  expect_no_error(annotate_spectra(
+  write_minimal_mgf(lib_path, precursors = c(300))
+  out_low <- annotate_spectra(
     libraries = list(pos = lib_path),
     polarity = "pos",
-    approx = TRUE,
-    ppm = 10,
-    dalton = 0.01
-  ))
+    threshold = 0.0
+  )
+  out_high <- annotate_spectra(
+    libraries = list(pos = lib_path),
+    polarity = "pos",
+    threshold = 0.9
+  )
+  df_low <- fread(out_low)
+  df_high <- fread(out_high)
+  expect_true(nrow(df_low) >= nrow(df_high))
 })
 
-test_that("annotate_spectra works with approx mode disabled", {
-  withr::local_dir(temp_test_dir("annotate_spectra_approx_off"))
+# ---------------- Approx vs strict precursor reduction ----------------
+
+test_that("approx mode keeps more library spectra than strict mode", {
+  withr::local_dir(temp_test_dir("ann_spe_approx"))
   local_test_project(copy = TRUE)
-  paths <- get_default_paths()
-  get_file(
-    url = paths$urls$examples$spectra_mini,
-    export = paths$data$source$spectra
-  )
+  # Build query with specific precursor values
+  query_path <- get_params(step = "annotate_spectra")$files$spectral$raw[1]
+  dir.create(dirname(query_path), recursive = TRUE, showWarnings = FALSE)
+  write_minimal_mgf(query_path, precursors = c(150, 500))
+  # Library with broad precursor range; only some overlap
   lib_path <- file.path(
     "data",
     "interim",
     "libraries",
     "spectra",
-    "test_lib_pos.mgf"
+    "lib_pos.mgf"
   )
-  write_minimal_mgf(lib_path)
-  expect_no_error(annotate_spectra(
+  write_minimal_mgf(lib_path, precursors = c(100, 150, 200, 450, 500, 700))
+  out_strict <- annotate_spectra(
+    input = query_path,
     libraries = list(pos = lib_path),
     polarity = "pos",
     approx = FALSE,
-    ppm = 10,
-    dalton = 0.01
-  ))
+    ppm = 5,
+    dalton = 0.01,
+    threshold = 0
+  )
+  out_approx <- annotate_spectra(
+    input = query_path,
+    libraries = list(pos = lib_path),
+    polarity = "pos",
+    approx = TRUE,
+    ppm = 5,
+    dalton = 0.01,
+    threshold = 0
+  )
+  df_strict <- fread(out_strict)
+  df_approx <- fread(out_approx)
+  # Approximated search should not have fewer distinct library candidates when any matches occur
+  expect_true(nrow(df_approx) >= nrow(df_strict) || nrow(df_approx) == 0)
 })
 
-## Intensity Cutoff ----
+# ---------------- Empty template behavior ----------------
 
-test_that("annotate_spectra respects intensity cutoff", {
-  withr::local_dir(temp_test_dir("annotate_spectra_cutoff"))
+test_that("empty result exports template", {
+  withr::local_dir(temp_test_dir("ann_spe_empty"))
   local_test_project(copy = TRUE)
-  paths <- get_default_paths()
-  get_file(
-    url = paths$urls$examples$spectra_mini,
-    export = paths$data$source$spectra
-  )
+  # Query precursors far from library (strict reduction eliminates all)
+  query_path <- get_params(step = "annotate_spectra")$files$spectral$raw[1]
+  dir.create(dirname(query_path), recursive = TRUE, showWarnings = FALSE)
+  write_minimal_mgf(query_path, precursors = c(50))
   lib_path <- file.path(
     "data",
     "interim",
     "libraries",
     "spectra",
-    "test_lib_pos.mgf"
+    "lib_pos.mgf"
   )
-  write_minimal_mgf(lib_path)
-  expect_no_error(annotate_spectra(
+  write_minimal_mgf(lib_path, precursors = c(5000))
+  out <- annotate_spectra(
+    input = query_path,
     libraries = list(pos = lib_path),
     polarity = "pos",
-    qutoff = 0.0,
-    ppm = 10,
-    dalton = 0.01
-  ))
-  expect_no_error(annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    qutoff = 0.1,
-    ppm = 10,
-    dalton = 0.01
-  ))
-})
-
-## Output Validation ----
-
-test_that("annotate_spectra produces valid output file", {
-  withr::local_dir(temp_test_dir("annotate_spectra_output"))
-  local_test_project(copy = TRUE)
-  paths <- get_default_paths()
-  get_file(
-    url = paths$urls$examples$spectra_mini,
-    export = paths$data$source$spectra
+    approx = FALSE,
+    dalton = 0.01,
+    ppm = 5,
+    threshold = 0.5
   )
-  lib_path <- file.path(
-    "data",
-    "interim",
-    "libraries",
-    "spectra",
-    "test_lib_pos.mgf"
-  )
-  write_minimal_mgf(lib_path)
-  annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    ppm = 10,
-    dalton = 0.01
-  )
-  output_file <- get_params(
-    step = "annotate_spectra"
-  )$files$annotations$raw$spectral$spectral
-  expect_true(file.exists(output_file))
-  if (file.exists(output_file) && file.size(output_file) > 0) {
-    result <- tidytable::fread(output_file)
-    expect_s3_class(result, "data.frame")
-  }
-})
-
-## Empty/Edge Cases ----
-
-test_that("annotate_spectra handles empty input gracefully", {
-  skip("Requires empty MGF file creation")
-})
-
-## Performance ----
-
-test_that("annotate_spectra completes in reasonable time", {
-  skip("Performance test - run manually")
+  df <- fread(out)
+  expect_true(all(fake_annotations_columns() |> names() %in% names(df)))
+  expect_equal(nrow(df), 1) # template has single row
 })

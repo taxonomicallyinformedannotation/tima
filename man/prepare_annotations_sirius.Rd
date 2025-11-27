@@ -27,35 +27,49 @@ prepare_annotations_sirius(
 )
 }
 \arguments{
-\item{input_directory}{Character string path to directory or zip file
-containing SIRIUS results}
+\item{input_directory}{Character path to directory or zip file containing
+SIRIUS results.}
 
-\item{output_ann}{Character string path for prepared annotation results output}
+\item{output_ann}{Character path for prepared structure annotation output.}
 
-\item{output_can}{Character string path for prepared CANOPUS results output}
+\item{output_can}{Character path for prepared CANOPUS output.}
 
-\item{output_for}{Character string path for prepared formula results output}
+\item{output_for}{Character path for prepared formula output.}
 
-\item{sirius_version}{Character string SIRIUS version ("v5" or "v6")}
+\item{sirius_version}{Character SIRIUS version ("5" or "6").}
 
-\item{str_stereo}{Character string path to file with structure stereochemistry}
+\item{str_stereo}{Character path to structure stereochemistry file.}
 
-\item{str_met}{Character string path to file with structure metadata}
+\item{str_met}{Character path to structure metadata file.}
 
-\item{str_nam}{Character string path to file with structure names}
+\item{str_nam}{Character path to structure names file.}
 
-\item{str_tax_cla}{Character string path to file with ClassyFire taxonomy}
+\item{str_tax_cla}{Character path to ClassyFire taxonomy file.}
 
-\item{str_tax_npc}{Character string path to file with NPClassifier taxonomy}
+\item{str_tax_npc}{Character path to NPClassifier taxonomy file.}
 }
 \value{
-Character string path to the prepared SIRIUS annotations file
+Character path to the prepared SIRIUS annotations file (invisible).
 }
 \description{
-This function prepares SIRIUS annotation results (structure
-predictions, CANOPUS chemical classifications, and formula predictions)
-by harmonizing formats across SIRIUS versions (v5/v6), standardizing
-column names, and integrating with structure metadata.
+Prepares SIRIUS annotation results (structure predictions,
+CANOPUS chemical classifications, and formula predictions) by harmonizing
+formats across SIRIUS versions (v5/v6), standardizing column names, and
+integrating with structure metadata.
+}
+\details{
+This function:
+\itemize{
+\item Validates inputs (version, paths, file existence).
+\item Loads SIRIUS output files (CANOPUS, formulas, structures, denovo).
+\item Harmonizes column names across SIRIUS v5 and v6.
+\item Joins with structure metadata (stereochemistry, names, taxonomy).
+\item Splits results into three output files: annotations, CANOPUS, formulas.
+\item Exports parameters and results.
+}
+
+If the input directory does not exist, returns an empty template with expected
+columns to ensure downstream compatibility.
 }
 \examples{
 \dontrun{
