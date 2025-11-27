@@ -15,7 +15,8 @@ install(
 \arguments{
 \item{package}{Character string name of the package to install (default: "tima")}
 
-\item{repos}{Character vector of repository URLs for install.packages}
+\item{repos}{Character vector of repository URLs for install.packages.
+Default includes r-universe, Bioconductor, and CRAN.}
 
 \item{dependencies}{Logical whether to install package dependencies (default: TRUE)}
 
@@ -26,28 +27,37 @@ NULL (invisibly). Installs packages and sets up Python environment as
 side effects.
 }
 \description{
-Installs the TIMA package and its dependencies, including setting
-up a Python virtual environment with RDKit for chemical structure processing.
-This function handles different operating systems and provides fallback
-installation methods if needed.
+Installs or updates the TIMA package from r-universe and sets up
+a Python virtual environment with RDKit for chemical structure processing.
+This function always installs/updates the R package to ensure you have the
+latest version, while the Python environment is only created if it doesn't
+already exist (idempotent).
 }
 \details{
 The installation process:
 \itemize{
 \item Validates all input parameters
 \item Detects the operating system and shows relevant instructions
-\item Checks for Python or installs Miniconda as fallback
-\item Creates a Python virtual environment (tima-env)
-\item Installs RDKit in the virtual environment
-\item Attempts to install the R package from binary
+\item \strong{Always installs/updates the R package} from r-universe (to get latest updates)
 \item Falls back to source installation if binary fails
+\item Checks for Python or installs Miniconda as fallback
+\item Creates a Python virtual environment (tima-env) \strong{only if it doesn't exist}
+\item Installs RDKit in the virtual environment (skipped if already present)
 \item Copies the TIMA backbone files
 \item Cleans up any existing targets pipeline
 }
 }
+\section{Idempotency}{
+
+\itemize{
+\item \strong{R package}: Always reinstalled/updated (ensures latest version from r-universe)
+\item \strong{Python environment}: Only created if missing (idempotent - safe to call multiple times)
+}
+}
+
 \examples{
 \dontrun{
-# Standard installation
+# Standard installation (updates package, checks Python env)
 install()
 
 # Install with custom repositories

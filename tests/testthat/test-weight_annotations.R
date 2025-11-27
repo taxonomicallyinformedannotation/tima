@@ -58,7 +58,7 @@ test_that("validate_weight_annotations_inputs rejects missing required files", {
       candidates_neighbors = 5,
       candidates_final = 10
     ),
-    "Required file not found"
+    "Required file(.*) not found"
   )
 })
 
@@ -89,7 +89,7 @@ test_that("validate_weight_annotations_inputs rejects invalid minimal_ms1_condit
       candidates_neighbors = 5,
       candidates_final = 10
     ),
-    "must be 'OR' or 'AND'"
+    "Must be one of: OR, AND"
   )
 })
 

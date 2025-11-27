@@ -147,8 +147,13 @@ validate_clean_chemo_inputs <- function(
     score_chemical_npc_superclass,
     score_chemical_npc_class
   )
-  if (any(!vapply(weights, function(x) is.null(x) || is.numeric(x), logical(1)))) {
-    stop("taxonomy weight parameters must be numeric when provided", call. = FALSE)
+  if (
+    any(!vapply(weights, function(x) is.null(x) || is.numeric(x), logical(1)))
+  ) {
+    stop(
+      "taxonomy weight parameters must be numeric when provided",
+      call. = FALSE
+    )
   }
   weights_num <- weights[!vapply(weights, is.null, logical(1))]
   if (length(weights_num) > 0) {
@@ -536,10 +541,16 @@ clean_chemo <- function(
   # Validate features and components schema minimally
   for (tbl in list(features_table, components_table)) {
     if (!is.data.frame(tbl)) {
-      stop("features_table and components_table must be data frames", call. = FALSE)
+      stop(
+        "features_table and components_table must be data frames",
+        call. = FALSE
+      )
     }
     if (!"feature_id" %in% names(tbl)) {
-      stop("features_table/components_table must contain feature_id column", call. = FALSE)
+      stop(
+        "features_table/components_table must contain feature_id column",
+        call. = FALSE
+      )
     }
   }
   if (!is.data.frame(structure_organism_pairs_table)) {

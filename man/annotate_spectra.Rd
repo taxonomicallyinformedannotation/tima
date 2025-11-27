@@ -18,34 +18,73 @@ annotate_spectra(
 )
 }
 \arguments{
-\item{input}{Query file or list of files containing spectra. Currently '.mgf' file(s)}
+\item{input}{Character vector or list of query spectral file paths (.mgf).}
 
-\item{libraries}{Libraries containing spectra to match against.
-Can be '.mgf' or '.sqlite' (Spectra formatted). Accepts a vector or list of file paths.}
+\item{libraries}{Character vector or list of library spectral file paths
+(.mgf / Spectra-supported). Must contain at least one path.}
 
-\item{polarity}{MS polarity. Must be 'pos' or 'neg'.}
+\item{polarity}{MS polarity; one of \code{VALID_MS_MODES} ("pos", "neg").}
 
-\item{output}{Output file.}
+\item{output}{Output file path (the function writes a tabular file here).}
 
-\item{method}{Similarity method}
+\item{method}{Similarity method; one of \code{VALID_SIMILARITY_METHODS}.}
 
-\item{threshold}{Minimal similarity to report}
+\item{threshold}{Minimal similarity score to retain candidates (0-1).}
 
-\item{ppm}{Relative ppm tolerance to be used}
+\item{ppm}{Relative mass tolerance (ppm) for MS/MS matching.}
 
-\item{dalton}{Absolute Dalton tolerance to be used}
+\item{dalton}{Absolute mass tolerance (Daltons) for MS/MS matching.}
 
-\item{qutoff}{Intensity under which ms2 fragments will be removed.}
+\item{qutoff}{Intensity cutoff under which MS2 fragments are removed.
+(Parameter name kept for backwards compatibility; spelled "cutoff").}
 
-\item{approx}{Perform matching without precursor match}
+\item{approx}{Logical; if TRUE perform matching ignoring precursor masses
+(broader, slower); if FALSE restrict library to precursor-tolerant
+spectra first.}
+}
+\value{
+Character scalar: the output file path (invisible). Side effect:
+writes the annotations table to \code{output}.
 }
 \description{
-This function annotates spectra
+Annotates MS/MS query spectra against one or more spectral
+libraries, computing similarity scores and returning best candidate
+annotations above a similarity threshold.
 }
 \details{
-It takes two files as input.
-A query file that will be matched against a library file.
+This is an orchestration wrapper that performs:
+\enumerate{
+\item Input validation & normalization (query + libraries, numeric params).
+\item Query spectra import & light preprocessing (intensity cutoff).
+\item Library spectra import, cleaning of empty peak lists, optional polarity
+filtering, optional precursor-based library size reduction (when
+\code{approx = FALSE}).
+\item Similarity computation via \code{calculate_entropy_and_similarity()}.
+\item Candidate metadata extraction (formula, name, etc.).
+\item Result shaping: derive error (mz), select canonical output columns,
+threshold filtering, keep best per (feature_id, library,
+connectivity layer).
+\item Export of parameters & results to the configured output path.
 }
+
+If no annotations are produced (empty inputs or below threshold), a
+standardized empty template (see \code{fake_annotations_columns()}) is exported
+to ensure downstream code receives expected columns.
+}
+\section{Robustness}{
+
+The function performs strict validation and logs informative messages.
+File existence is checked early; similarity computation is wrapped in a
+\code{tryCatch} to surface errors without leaving partially allocated objects.
+}
+
+\section{Performance}{
+
+Library precursor reduction (when \code{approx = FALSE}) limits similarity
+computation to precursor-tolerant spectra, reducing complexity for large
+libraries. Repeated metadata extraction uses a single vectorized helper.
+}
+
 \examples{
 \dontrun{
 copy_backbone()

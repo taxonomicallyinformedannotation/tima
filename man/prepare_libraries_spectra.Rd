@@ -28,52 +28,62 @@ prepare_libraries_spectra(
 )
 }
 \arguments{
-\item{input}{File containing spectra}
+\item{input}{Character vector of file paths containing spectral data.}
 
-\item{nam_lib}{Metadata to identify the library}
+\item{nam_lib}{Character library name for metadata.}
 
-\item{col_ad}{Name of the adduct in mgf}
+\item{col_ad}{Name of the adduct column in MGF.}
 
-\item{col_ce}{Name of the collision energy in mgf}
+\item{col_ce}{Name of the collision energy column in MGF.}
 
-\item{col_ci}{Name of the compound id in mgf}
+\item{col_ci}{Name of the compound ID column in MGF.}
 
-\item{col_em}{Name of the exact mass in mgf}
+\item{col_em}{Name of the exact mass column in MGF.}
 
-\item{col_in}{Name of the InChI in mgf}
+\item{col_in}{Name of the InChI column in MGF.}
 
-\item{col_io}{Name of the InChI without stereo in mgf}
+\item{col_io}{Name of the InChI without stereo column in MGF.}
 
-\item{col_ik}{Name of the InChIKey in mgf}
+\item{col_ik}{Name of the InChIKey column in MGF.}
 
-\item{col_il}{Name of the InChIKey without stereo in mgf}
+\item{col_il}{Name of the InChIKey connectivity layer column in MGF.}
 
-\item{col_mf}{Name of the molecular formula in mgf}
+\item{col_mf}{Name of the molecular formula column in MGF.}
 
-\item{col_na}{Name of the name in mgf}
+\item{col_na}{Name of the name column in MGF.}
 
-\item{col_po}{Name of the polarity in mgf}
+\item{col_po}{Name of the polarity column in MGF.}
 
-\item{col_sm}{Name of the SMILES in mgf}
+\item{col_sm}{Name of the SMILES column in MGF.}
 
-\item{col_sn}{Name of the SMILES without stereo in mgf}
+\item{col_sn}{Name of the SMILES without stereo column in MGF.}
 
-\item{col_si}{Name of the spectrum id in mgf}
+\item{col_si}{Name of the spectrum ID column in MGF.}
 
-\item{col_sp}{Name of the SPLASH in mgf}
+\item{col_sp}{Name of the SPLASH column in MGF.}
 
-\item{col_sy}{Name of the synonyms in mgf}
+\item{col_sy}{Name of the synonyms column in MGF.}
 
-\item{col_xl}{Name of the xlogp in mgf}
-
-\item{polarity}{MS polarity}
+\item{col_xl}{Name of the xlogp column in MGF.}
 }
 \value{
-The path to the prepared spectral library
+Character vector with paths to prepared library files (invisible).
 }
 \description{
-This function prepares spectra
-to be used for spectral matching
+Prepares spectral libraries for matching by importing,
+harmonizing, and splitting spectra by polarity. Exports results as
+Spectra RDS files (pos/neg) and a structure-organism pair (SOP) table.
+}
+\details{
+This function:
+\itemize{
+\item Checks if output files already exist (idempotent).
+\item Imports spectral data from input files.
+\item Extracts and harmonizes spectra for positive and negative modes.
+\item Fixes precursor m/z and InChIKey connectivity layer issues.
+\item Exports polarity-specific Spectra objects and SOP table.
+\item Returns empty templates if input files are missing.
+}
 }
 \examples{
 \dontrun{

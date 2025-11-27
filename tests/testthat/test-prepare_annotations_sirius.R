@@ -80,7 +80,7 @@ test_that("test-prepare_annotations_sirius validates output parameters and struc
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "file not found",
+    "file(.*) not found",
     fixed = FALSE
   )
 })

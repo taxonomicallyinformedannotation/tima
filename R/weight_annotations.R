@@ -1,34 +1,35 @@
 #' Validate Inputs for weight_annotations
 #'
 #' @description Internal helper to validate all input parameters for weight_annotations.
-#'     Checks file existence, data types, ranges, and logical consistency.
+#'     Checks file existence, data types, ranges, and logical consistency of weights.
+#'     Stops execution with informative messages if any condition is violated.
 #'
-#' @param library Character, path to library file
-#' @param components Character, path to components file
-#' @param edges Character, path to edges file
-#' @param taxa Character, path to taxa file
-#' @param annotations Character vector, paths to annotation files
-#' @param str_stereo Character, path to stereo structures file (optional)
-#' @param org_tax_ott Character, path to organism taxonomy file (optional)
-#' @param canopus Character, path to canopus file (optional)
-#' @param formula Character, path to formula file (optional)
-#' @param minimal_ms1_condition Character, "OR" or "AND"
-#' @param weight_spectral Numeric (0-1)
-#' @param weight_chemical Numeric (0-1)
-#' @param weight_biological Numeric (0-1)
-#' @param minimal_consistency Numeric (0-1)
-#' @param minimal_ms1_bio Numeric (0-1)
-#' @param minimal_ms1_chemo Numeric (0-1)
-#' @param ms1_only Logical
-#' @param compounds_names Logical
-#' @param high_confidence Logical
-#' @param remove_ties Logical
-#' @param summarize Logical
-#' @param force Logical
-#' @param candidates_neighbors Integer >= 1
-#' @param candidates_final Integer >= 1
+#' @param library Character, path to library file (required).
+#' @param components Character, path to components file (required).
+#' @param edges Character, path to edges file (required).
+#' @param taxa Character, path to taxa file (required).
+#' @param annotations Character vector, paths to annotation files (required).
+#' @param str_stereo Character, path to stereo structures file (optional).
+#' @param org_tax_ott Character, path to organism taxonomy file (optional).
+#' @param canopus Character, path to canopus file (optional).
+#' @param formula Character, path to formula file (optional).
+#' @param minimal_ms1_condition Character, "OR" or "AND".
+#' @param weight_spectral Numeric (0-Inf), weight for spectral score.
+#' @param weight_chemical Numeric (0-Inf), weight for chemical score.
+#' @param weight_biological Numeric (0-Inf), weight for biological score.
+#' @param minimal_consistency Numeric (0-1), min consistency threshold.
+#' @param minimal_ms1_bio Numeric (0-1), min biological score for MS1.
+#' @param minimal_ms1_chemo Numeric (0-1), min chemical score for MS1.
+#' @param ms1_only Logical, filter for MS1-only annotations.
+#' @param compounds_names Logical, include compound names.
+#' @param high_confidence Logical, report high-confidence candidates only.
+#' @param remove_ties Logical, remove tied candidates.
+#' @param summarize Logical, summarize to one row per feature.
+#' @param force Logical, force execution (override warnings).
+#' @param candidates_neighbors Integer >= 1, neighbors to keep.
+#' @param candidates_final Integer >= 1, final candidates to keep.
 #'
-#' @return NULL (stops execution if validation fails)
+#' @return NULL (invisible). Stops execution if validation fails.
 #' @keywords internal
 validate_weight_annotations_inputs <- function(
   library,
@@ -56,25 +57,25 @@ validate_weight_annotations_inputs <- function(
   candidates_neighbors,
   candidates_final
 ) {
-  # Validate required file paths
+  # Validate required file existence
   required_files <- list(
     library = library,
     components = components,
     edges = edges,
     taxa = taxa
   )
-
-  for (file_name in names(required_files)) {
-    file_path <- required_files[[file_name]]
-    if (!file.exists(file_path)) {
-      stop(
-        "Required file not found: ",
-        file_name,
-        " at ",
-        file_path,
-        call. = FALSE
-      )
-    }
+  missing_required <- purrr::keep(required_files, ~ !file.exists(.x))
+  if (length(missing_required) > 0L) {
+    stop(
+      "Required file(s) not found: ",
+      paste(
+        names(missing_required),
+        missing_required,
+        sep = " at ",
+        collapse = "; "
+      ),
+      call. = FALSE
+    )
   }
 
   # Validate annotation files
@@ -87,88 +88,79 @@ validate_weight_annotations_inputs <- function(
     )
   }
 
-  # Validate optional files with warnings
+  # Validate optional files (log warnings only)
   optional_files <- list(
     str_stereo = str_stereo,
     org_tax_ott = org_tax_ott,
     canopus = canopus,
     formula = formula
   )
-
-  for (file_name in names(optional_files)) {
-    file_path <- optional_files[[file_name]]
-    if (!is.null(file_path) && !file.exists(file_path)) {
-      logger::log_warn("Optional file not found: {file_name} at {file_path}")
+  purrr::iwalk(optional_files, function(path, name) {
+    if (!is.null(path) && !file.exists(path)) {
+      logger::log_warn("Optional file '{name}' not found at: {path}")
     }
-  }
+  })
 
   # Validate minimal_ms1_condition
-  if (!minimal_ms1_condition %in% c("OR", "AND")) {
-    stop(
-      "minimal_ms1_condition must be 'OR' or 'AND', got: ",
-      minimal_ms1_condition,
-      call. = FALSE
-    )
-  }
+  assert_choice(minimal_ms1_condition, c("OR", "AND"), "minimal_ms1_condition")
 
-  # ---- Weights ----
+  # Validate weights: must be numeric, non-negative, sum to ~1
   weights <- c(
     spectral = weight_spectral,
     chemical = weight_chemical,
     biological = weight_biological
   )
   if (!all(is.numeric(weights)) || any(is.na(weights))) {
-    stop("All weights must be numeric and non-NA", call. = FALSE)
+    stop(
+      "All weights (spectral, chemical, biological) must be numeric and non-NA",
+      call. = FALSE
+    )
   }
   if (any(weights < 0)) {
-    stop("All weights must be non-negative", call. = FALSE)
+    stop(
+      "All weights must be non-negative, got: ",
+      paste(names(weights), "=", weights, collapse = ", "),
+      call. = FALSE
+    )
   }
   weight_sum <- sum(weights)
   if (abs(weight_sum - 1) > WEIGHT_SUM_TOLERANCE) {
     stop(
       "Weights must sum to 1 (tolerance ",
       WEIGHT_SUM_TOLERANCE,
-      "), got: ",
+      "), got sum = ",
       signif(weight_sum, 6),
       " (",
-      paste(names(weights), weights, sep = ":", collapse = ", "),
+      paste(names(weights), weights, sep = "=", collapse = ", "),
       ")",
       call. = FALSE
     )
   }
 
-  # Validate score parameters
-  score_params <- list(
-    minimal_consistency = minimal_consistency,
-    minimal_ms1_bio = minimal_ms1_bio,
-    minimal_ms1_chemo = minimal_ms1_chemo
+  # Validate score thresholds (0-1)
+  assert_scalar_numeric(
+    minimal_consistency,
+    "minimal_consistency",
+    min = 0,
+    max = 1
+  )
+  assert_scalar_numeric(minimal_ms1_bio, "minimal_ms1_bio", min = 0, max = 1)
+  assert_scalar_numeric(
+    minimal_ms1_chemo,
+    "minimal_ms1_chemo",
+    min = 0,
+    max = 1
   )
 
-  for (param_name in names(score_params)) {
-    param_value <- score_params[[param_name]]
-    if (!is.numeric(param_value) || param_value < 0 || param_value > 1) {
-      stop(
-        param_name,
-        " must be between 0 and 1, got: ",
-        param_value,
-        call. = FALSE
-      )
-    }
-  }
+  # Validate logical flags
+  assert_flag(ms1_only, "ms1_only")
+  assert_flag(compounds_names, "compounds_names")
+  assert_flag(high_confidence, "high_confidence")
+  assert_flag(remove_ties, "remove_ties")
+  assert_flag(summarize, "summarize")
+  assert_flag(force, "force")
 
-  # Validate logical parameters
-  logical_params <- list(
-    ms1_only = ms1_only,
-    compounds_names = compounds_names,
-    high_confidence = high_confidence,
-    remove_ties = remove_ties,
-    summarize = summarize,
-    force = force
-  )
-
-  purrr::iwalk(.x = logical_params, .f = function(val, nm) assert_flag(val, nm))
-
-  # Validate candidates parameters
+  # Validate candidate counts
   assert_positive_integer(candidates_neighbors, "candidates_neighbors")
   assert_positive_integer(candidates_final, "candidates_final")
 
@@ -178,27 +170,48 @@ validate_weight_annotations_inputs <- function(
 #' Load and Prepare Annotation Tables
 #'
 #' @description Internal helper to load, combine, and filter annotation tables.
+#'     Reads multiple annotation files, binds rows, and optionally filters to
+#'     retain only MS1-based annotations (those without MS2 similarity or SIRIUS CSI scores).
 #'
-#' @param annotations Character vector of file paths
-#' @param ms1_only Logical, keep only MS1 annotations
+#' @param annotations Character vector of file paths to annotation files.
+#' @param ms1_only Logical; if TRUE, keep only annotations where both
+#'     `candidate_score_similarity` and `candidate_score_sirius_csi` are NA.
 #'
-#' @return Data frame with combined annotations
+#' @return Data frame with combined (and optionally filtered) annotations.
 #' @keywords internal
 load_annotation_tables <- function(annotations, ms1_only) {
-  annotation_table <- purrr::map(
-    .x = annotations,
-    .f = tidytable::fread,
-    na.strings = c("", "NA"),
-    colClasses = "character"
-  ) |>
-    tidytable::bind_rows()
+  logger::log_debug("Loading {length(annotations)} annotation file(s)")
+  annotation_table <- tryCatch(
+    purrr::map(
+      .x = annotations,
+      .f = tidytable::fread,
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    ) |>
+      tidytable::bind_rows(),
+    error = function(e) {
+      stop(
+        "Failed to load annotation files: ",
+        conditionMessage(e),
+        call. = FALSE
+      )
+    }
+  )
 
   if (ms1_only) {
+    n_before <- nrow(annotation_table)
     annotation_table <- annotation_table |>
       tidytable::filter(
         is.na(candidate_score_similarity) &
           is.na(candidate_score_sirius_csi)
       )
+    logger::log_debug(
+      "MS1-only filter: {n_before} -> {nrow(annotation_table)} rows"
+    )
+  }
+
+  if (nrow(annotation_table) == 0L) {
+    logger::log_warn("No annotations remaining after loading/filtering")
   }
 
   annotation_table
@@ -206,57 +219,94 @@ load_annotation_tables <- function(annotations, ms1_only) {
 
 #' Load Structure-Organism Pairs
 #'
-#' @description Internal helper to load and join library tables.
+#' @description Internal helper to load the main library table and sequentially
+#'     left-join optional supplemental tables (stereo structures, organism taxonomy).
+#'     Returns a combined data frame suitable for biological scoring.
 #'
-#' @param library Character, path to library file
-#' @param str_stereo Character, path to stereo file (optional)
-#' @param org_tax_ott Character, path to taxonomy file (optional)
+#' @param library Character, path to main library file (required).
+#' @param str_stereo Character, path to stereo structures file (optional; NULL allowed).
+#' @param org_tax_ott Character, path to organism taxonomy file (optional; NULL allowed).
 #'
-#' @return Data frame with structure-organism pairs
+#' @return Data frame with structure-organism pairs, including any joined metadata.
 #' @keywords internal
 load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
-  library_table <- tidytable::fread(
-    file = library,
-    na.strings = c("", "NA"),
-    colClasses = "character"
+  logger::log_debug("Loading library from: {library}")
+  library_table <- tryCatch(
+    tidytable::fread(
+      file = library,
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    ),
+    error = function(e) {
+      stop("Failed to load library file: ", conditionMessage(e), call. = FALSE)
+    }
   )
 
   supp_files <- list(str_stereo, org_tax_ott)
   supp_tables <- purrr::map(
     .x = supp_files,
-    .f = tidytable::fread,
-    na.strings = c("", "NA"),
-    colClasses = "character"
+    .f = function(path) {
+      if (is.null(path) || !file.exists(path)) {
+        return(tidytable::tidytable())
+      }
+      tidytable::fread(
+        file = path,
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
+    }
   )
 
   purrr::reduce(
     .x = supp_tables,
     .init = library_table,
-    .f = tidytable::left_join
+    .f = function(acc, tbl) {
+      if (nrow(tbl) == 0L) {
+        return(acc)
+      }
+      tidytable::left_join(acc, tbl)
+    }
   )
 }
 
 #' Load Edges Table with Neighbor Filtering
 #'
-#' @description Internal helper to load edges and keep top neighbors.
+#' @description Internal helper to load the edges file and retain only the top N
+#'     neighbors (by similarity score) for each feature. This reduces complexity
+#'     for downstream annotation propagation and scoring.
 #'
-#' @param edges Character, path to edges file
-#' @param candidates_neighbors Integer, number of neighbors to keep
+#' @param edges Character, path to edges file.
+#' @param candidates_neighbors Integer, number of top neighbors to keep per feature.
 #'
-#' @return Data frame with filtered edges
+#' @return Data frame with filtered edges (top `candidates_neighbors` per `feature_source`).
 #' @keywords internal
 load_edges_table <- function(edges, candidates_neighbors) {
-  tidytable::fread(
-    file = edges,
-    na.strings = c("", "NA"),
-    colClasses = "character"
-  ) |>
+  logger::log_debug("Loading edges from: {edges}")
+  edges_table <- tryCatch(
+    tidytable::fread(
+      file = edges,
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    ),
+    error = function(e) {
+      stop("Failed to load edges file: ", conditionMessage(e), call. = FALSE)
+    }
+  )
+
+  n_before <- nrow(edges_table)
+  edges_table <- edges_table |>
     tidytable::group_by(feature_source) |>
     tidytable::slice_max(
       order_by = candidate_score_similarity,
       n = candidates_neighbors,
       with_ties = FALSE
-    )
+    ) |>
+    tidytable::ungroup()
+
+  logger::log_debug(
+    "Edges filtered to top {candidates_neighbors} neighbors/feature: {n_before} -> {nrow(edges_table)} rows"
+  )
+  edges_table
 }
 
 #' Log Annotation Statistics
@@ -743,14 +793,19 @@ weight_annotations <- function(
 
   logger::log_info("Starting annotation weighting and scoring")
   logger::log_debug(
-    "Weights - Spectral: {weight_spectral}, ",
-    "Chemical: {weight_chemical}, Biological: {weight_biological}"
+    "Weights - Spectral: {weight_spectral}, Chemical: {weight_chemical}, Biological: {weight_biological}"
   )
   logger::log_debug(
-    "Candidates - Neighbors: {candidates_neighbors}, Final: {candidates_final}"
+    "Candidates - Neighbors: {candidates_neighbors}, Final: {candidates_final}, Best percentile: {best_percentile}"
+  )
+  logger::log_debug(
+    "MS1-only mode: {ms1_only}, High confidence: {high_confidence}"
   )
 
+  start_time <- Sys.time()
+
   # Load Input Data ----
+  logger::log_debug("Loading input data tables")
 
   components_table <- tidytable::fread(
     file = components,
@@ -764,6 +819,9 @@ weight_annotations <- function(
     library,
     str_stereo,
     org_tax_ott
+  )
+  logger::log_debug(
+    "Loaded {nrow(structure_organism_pairs_table)} structure-organism pairs"
   )
 
   canopus_table <- tidytable::fread(
@@ -785,8 +843,12 @@ weight_annotations <- function(
 
   features_table <- annotation_table |>
     tidytable::distinct(feature_id, rt, mz)
+  logger::log_debug("Extracted {nrow(features_table)} unique features")
 
   # Rearrange and Merge Annotations ----
+  logger::log_debug(
+    "Merging annotation sources (spectra, SIRIUS, CANOPUS, formula)"
+  )
 
   annotation_table <- rearrange_annotations(
     annotation_table,
@@ -794,11 +856,13 @@ weight_annotations <- function(
     canopus_table,
     edges_table
   )
+  logger::log_debug("Merged annotation table: {nrow(annotation_table)} rows")
 
   # Clean up intermediate objects
   rm(formula_table, canopus_table)
 
   # Add Biological Metadata and Perform Scoring ----
+  logger::log_debug("Adding taxonomic metadata and computing biological scores")
 
   annotation_table_taxed <- annotation_table |>
     tidytable::left_join(
@@ -829,6 +893,9 @@ weight_annotations <- function(
     score_biological_variety = score_biological_variety
   )
   rm(annotation_table_taxed)
+  logger::log_debug(
+    "Biological scoring complete: {nrow(annot_table_wei_bio)} candidates"
+  )
 
   annot_table_wei_bio |>
     decorate_bio(
@@ -849,7 +916,11 @@ weight_annotations <- function(
       minimal_consistency = minimal_consistency
     )
   rm(annot_table_wei_bio)
+  logger::log_debug(
+    "Biological cleaning complete: {nrow(annot_table_wei_bio_clean)} candidates"
+  )
 
+  logger::log_debug("Computing chemical taxonomy scores")
   annot_table_wei_chemo <- annot_table_wei_bio_clean |>
     weight_chemo(
       weight_spectral = weight_spectral,
@@ -864,6 +935,9 @@ weight_annotations <- function(
       score_chemical_npc_class = score_chemical_npc_class
     )
   rm(annot_table_wei_bio_clean)
+  logger::log_debug(
+    "Chemical scoring complete: {nrow(annot_table_wei_chemo)} candidates"
+  )
 
   annot_table_wei_chemo |>
     decorate_chemo(
@@ -876,6 +950,7 @@ weight_annotations <- function(
       score_chemical_npc_class = score_chemical_npc_class
     )
 
+  logger::log_debug("Finalizing results (filtering, ranking, deduplication)")
   results_list <- annot_table_wei_chemo |>
     clean_chemo(
       components_table = components_table,
@@ -901,10 +976,15 @@ weight_annotations <- function(
     )
   rm(annot_table_wei_chemo)
 
+  elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+  logger::log_info("Annotation weighting complete in {round(elapsed, 1)}s")
+
   # Export Results ----
+  logger::log_debug("Exporting results to disk")
 
   output_paths <- export_results(results_list, output, pattern)
   rm(results_list)
 
+  logger::log_info("Results exported: {basename(output_paths['full'])}")
   return(output_paths)
 }
