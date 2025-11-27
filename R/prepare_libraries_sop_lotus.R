@@ -5,7 +5,7 @@
 #'     It standardizes columns, extracts 2D InChIKeys, rounds numeric values,
 #'     and removes duplicates.
 #'
-#' @include fake_sop_columns.R
+#' @include columns_utils.R
 #' @include get_params.R
 #' @include round_reals.R
 #' @include select_sop_columns.R

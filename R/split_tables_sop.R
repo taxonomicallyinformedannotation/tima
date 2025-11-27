@@ -5,7 +5,7 @@
 #'     relationships. Processes SMILES strings and creates standardized
 #'     reference tables.
 #'
-#' @include clean_collapse.R
+#' @include columns_utils.R
 #' @include process_smiles.R
 #' @include logs_utils.R
 #' @include validations_utils.R

@@ -11,7 +11,7 @@
 #'     - Attributes features to multiple organisms based on their relative
 #'       intensities across samples (using metadata)
 #'
-#' @include clean_collapse.R
+#' @include columns_utils.R
 #' @include get_params.R
 #' @include get_organism_taxonomy_ott.R
 #'

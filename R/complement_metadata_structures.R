@@ -4,7 +4,7 @@
 #'     metadata, names, and chemical taxonomy from reference libraries.
 #'     Enriches annotation results with comprehensive structure information.
 #'
-#' @include clean_collapse.R
+#' @include columns_utils.R
 #' @include validations_utils.R
 #'
 #' @param df Data frame with structural metadata to complement

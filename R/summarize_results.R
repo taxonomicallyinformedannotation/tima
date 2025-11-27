@@ -4,7 +4,6 @@
 #'     filtering/collapsing columns, and optionally removing tied scores or
 #'     summarizing to one row per feature. Creates final results table.
 #'
-#' @include clean_collapse.R
 #' @include columns_utils.R
 #' @include validations_utils.R
 #'
