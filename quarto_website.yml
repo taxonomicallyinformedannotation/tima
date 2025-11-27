@@ -55,14 +55,28 @@ website:
             contents:
               - text: calculate_mass_of_m
                 file: man/calculate_mass_of_m.qmd
+              - text: calculate_mz_from_mass
+                file: man/calculate_mz_from_mass.qmd
               - text: calculate_similarity
                 file: man/calculate_similarity.qmd
-          - text: change_params_small
-            file: man/change_params_small.qmd
-          - text: create_edges_spectra
-            file: man/create_edges_spectra.qmd
-          - text: filter_annotations
-            file: man/filter_annotations.qmd
+          - section: Change
+            contents:
+              - text: change_params_small
+                file: man/change_params_small.qmd
+          - section: Create
+            contents:
+              - text: create_components
+                file: man/create_components.qmd
+              - text: create_dir
+                file: man/create_dir.qmd
+              - text: create_edges
+                file: man/create_edges.qmd
+              - text: create_edges_spectra
+                file: man/create_edges_spectra.qmd
+          - section: Filter
+            contents:
+              - text: filter_annotations
+                file: man/filter_annotations.qmd
           - section: Get
             contents:
               - text: get_example_files
@@ -73,10 +87,18 @@ website:
                 file: man/get_last_version_from_zenodo.qmd
               - text: get_organism_taxonomy_ott
                 file: man/get_organism_taxonomy_ott.qmd
-          - text: import_spectra
-            file: man/import_spectra.qmd
-          - text: parse_adduct
-            file: man/parse_adduct.qmd
+          - section: Harmonize
+            contents:
+              - text: harmonize_adducts
+                file: man/harmonize_adducts.qmd
+          - section: Import
+            contents:
+              - text: import_spectra
+                file: man/import_spectra.qmd
+          - section: Parse
+            contents:
+              - text: parse_adduct
+                file: man/parse_adduct.qmd
           - section: Prepare
             contents:
               - section: Annotations
@@ -115,10 +137,10 @@ website:
                     file: man/prepare_libraries_spectra.qmd
               - text: prepare_taxa
                 file: man/prepare_taxa.qmd
-          - text: process_smiles
-            file: man/process_smiles.qmd
-          - text: sanitize_spectra
-            file: man/sanitize_spectra.qmd
+          - section: Process
+            contents:
+              - text: process_smiles
+                file: man/process_smiles.qmd
           - text: weight_annotations
             file: man/weight_annotations.qmd
           - text: run_app
