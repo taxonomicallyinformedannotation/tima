@@ -13,7 +13,8 @@ change_params_small(
   ms_pol = NULL,
   org_tax = NULL,
   hig_con = NULL,
-  summarize = NULL
+  summarize = NULL,
+  cache_dir = NULL
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ change_params_small(
 \item{hig_con}{Logical. Filter for high confidence candidates only}
 
 \item{summarize}{Logical. Summarize all candidates per feature to single row}
+
+\item{cache_dir}{Character. Cache directory path (for testing; uses go_to_cache() if NULL)}
 }
 \value{
 Invisible NULL. Modifies prepare_params YAML as side effect.

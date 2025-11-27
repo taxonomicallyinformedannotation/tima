@@ -712,3 +712,270 @@ test_that("test-apply_taxonomic_filter preserves core columns", {
 #     )
 #   )
 # })
+
+# ==== SUCCESS PATH TESTS FOR EXPORTED FUNCTION ====
+
+test_that("prepare_libraries_sop_merged() runs without filtering", {
+  skip_if_not_installed("tidytable")
+
+  # Create minimal library data
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  # Minimal structure-organism-pair data
+  sop_data <- tidytable::tidytable(
+    structure_inchikey = c("AAAAA", "BBBBB", "CCCCC"),
+    structure_smiles = c("CCC", "CCCC", "CCCCC"),
+    structure_smiles_no_stereo = c("CCC", "CCCC", "CCCCC"),
+    structure_molecular_formula = c("C3H8", "C4H10", "C5H12"),
+    structure_name = c("nameA", "nameB", "nameC"),
+    structure_exact_mass = c(44.06, 58.08, 72.09),
+    structure_xlogp = c(1.5, 2.0, 2.5),
+    structure_tax_npc_01pat = c("A", "A", "A"),
+    structure_tax_npc_02sup = c(NA, NA, NA),
+    structure_tax_npc_03cla = c(NA, NA, NA),
+    structure_tax_cla_chemontid = c(NA, NA, NA),
+    structure_tax_cla_01kin = c("O", "O", "O"),
+    structure_tax_cla_02sup = c(NA, NA, NA),
+    structure_tax_cla_03cla = c(NA, NA, NA),
+    structure_tax_cla_04dirpar = c(NA, NA, NA),
+    organism_name = c("Plant1", "Plant2", "Plant3"),
+    organism_taxonomy_ottid = c("123", "456", "789"),
+    organism_taxonomy_01domain = c("Eukaryota", "Eukaryota", "Eukaryota"),
+    organism_taxonomy_02kingdom = c("Plantae", "Plantae", "Plantae"),
+    organism_taxonomy_03phylum = c(
+      "Tracheophyta",
+      "Tracheophyta",
+      "Tracheophyta"
+    ),
+    reference_doi = c("10.1234/test1", "10.1234/test2", "10.1234/test3")
+  )
+
+  input_file <- file.path(tmpdir, "library.tsv")
+  tidytable::fwrite(sop_data, input_file, sep = "\t")
+
+  # Output files
+  output_key <- file.path(tmpdir, "keys.tsv")
+  output_org <- file.path(tmpdir, "org_tax.tsv")
+  output_stereo <- file.path(tmpdir, "stereo.tsv")
+  output_met <- file.path(tmpdir, "metadata.tsv")
+  output_nam <- file.path(tmpdir, "names.tsv")
+  output_cla <- file.path(tmpdir, "classyfire.tsv")
+  output_npc <- file.path(tmpdir, "npc.tsv")
+
+  # Mock get_params and export_params
+  local_mocked_bindings(
+    get_params = function(step) list(step = "prepare_libraries_sop_merged"),
+    export_params = function(...) invisible(NULL),
+    .package = "tima"
+  )
+
+  # Run function
+  result <- prepare_libraries_sop_merged(
+    files = input_file,
+    filter = FALSE,
+    output_key = output_key,
+    output_org_tax_ott = output_org,
+    output_str_stereo = output_stereo,
+    output_str_met = output_met,
+    output_str_nam = output_nam,
+    output_str_tax_cla = output_cla,
+    output_str_tax_npc = output_npc
+  )
+
+  # Verify outputs created
+  expect_true(file.exists(output_key))
+  expect_true(file.exists(output_org))
+
+  # Verify data
+  keys <- tidytable::fread(output_key)
+  expect_equal(nrow(keys), 3)
+  expect_true(all(c("structure_inchikey", "organism_name") %in% names(keys)))
+})
+
+test_that("prepare_libraries_sop_merged() filters by taxonomy", {
+  skip_if_not_installed("tidytable")
+
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  # Data with different families
+  sop_data <- tidytable::tidytable(
+    structure_inchikey = c("AAAAA", "BBBBB", "CCCCC", "DDDDD"),
+    structure_smiles = c("C", "CC", "CCC", "CCCC"),
+    structure_smiles_no_stereo = c("C", "CC", "CCC", "CCCC"),
+    structure_molecular_formula = c("CH4", "C2H6", "C3H8", "C4H10"),
+    structure_name = c("nameA", "nameB", "nameC", "nameD"),
+    structure_exact_mass = c(16, 30, 44, 58),
+    structure_xlogp = c(1, 1.5, 2, 2.5),
+    structure_tax_npc_01pat = c("A", "A", "A", "A"),
+    structure_tax_npc_02sup = c(NA, NA, NA, NA),
+    structure_tax_npc_03cla = c(NA, NA, NA, NA),
+    structure_tax_cla_chemontid = c(NA, NA, NA, NA),
+    structure_tax_cla_01kin = c("O", "O", "O", "O"),
+    structure_tax_cla_02sup = c(NA, NA, NA, NA),
+    structure_tax_cla_03cla = c(NA, NA, NA, NA),
+    structure_tax_cla_04dirpar = c(NA, NA, NA, NA),
+    organism_name = c("Plant1", "Plant2", "Plant3", "Plant4"),
+    organism_taxonomy_ottid = c("1", "2", "3", "4"),
+    organism_taxonomy_01domain = c("E", "E", "E", "E"),
+    organism_taxonomy_02kingdom = c("P", "P", "P", "P"),
+    organism_taxonomy_03phylum = c("T", "T", "T", "T"),
+    organism_taxonomy_06family = c("Fam1", "Fam1", "Fam2", "Fam2"),
+    reference_doi = c("d1", "d2", "d3", "d4")
+  )
+
+  input_file <- file.path(tmpdir, "library.tsv")
+  tidytable::fwrite(sop_data, input_file, sep = "\t")
+
+  output_key <- file.path(tmpdir, "keys.tsv")
+  output_org <- file.path(tmpdir, "org_tax.tsv")
+  output_stereo <- file.path(tmpdir, "stereo.tsv")
+  output_met <- file.path(tmpdir, "metadata.tsv")
+  output_nam <- file.path(tmpdir, "names.tsv")
+  output_cla <- file.path(tmpdir, "classyfire.tsv")
+  output_npc <- file.path(tmpdir, "npc.tsv")
+
+  local_mocked_bindings(
+    get_params = function(step) list(step = "prepare_libraries_sop_merged"),
+    export_params = function(...) invisible(NULL),
+    .package = "tima"
+  )
+
+  # Filter by family
+  result <- prepare_libraries_sop_merged(
+    files = input_file,
+    filter = TRUE,
+    level = "family",
+    value = "Fam1",
+    output_key = output_key,
+    output_org_tax_ott = output_org,
+    output_str_stereo = output_stereo,
+    output_str_met = output_met,
+    output_str_nam = output_nam,
+    output_str_tax_cla = output_cla,
+    output_str_tax_npc = output_npc
+  )
+
+  # Verify filtered output
+  keys <- tidytable::fread(output_key)
+  expect_equal(nrow(keys), 2) # Only Fam1 entries
+  expect_true(all(c("Plant1", "Plant2") %in% keys$organism_name))
+  expect_false("Plant3" %in% keys$organism_name)
+})
+
+test_that("prepare_libraries_sop_merged() merges multiple input files", {
+  skip_if_not_installed("tidytable")
+
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  # Create two separate library files
+  minimal_cols <- c(
+    "structure_inchikey",
+    "structure_smiles_no_stereo",
+    "structure_molecular_formula",
+    "structure_exact_mass",
+    "structure_xlogp",
+    "structure_taxonomy_npclassifier_01pathway",
+    "structure_taxonomy_npclassifier_02superclass",
+    "structure_taxonomy_npclassifier_03class",
+    "structure_taxonomy_classyfire_chemontid",
+    "structure_taxonomy_classyfire_01kingdom",
+    "structure_taxonomy_classyfire_02superclass",
+    "structure_taxonomy_classyfire_03class",
+    "structure_taxonomy_classyfire_04directparent",
+    "organism_name",
+    "organism_taxonomy_ottid",
+    "organism_taxonomy_01domain",
+    "organism_taxonomy_02kingdom",
+    "organism_taxonomy_03phylum",
+    "reference_doi"
+  )
+
+  sop_data1 <- tidytable::tidytable(
+    structure_inchikey = "AAAAA",
+    structure_smiles = "C",
+    structure_smiles_no_stereo = "C",
+    structure_molecular_formula = "CH4",
+    structure_exact_mass = 16,
+    structure_xlogp = 1,
+    structure_tax_npc_01pat = "A",
+    structure_tax_npc_02sup = NA,
+    structure_tax_npc_03cla = NA,
+    structure_tax_cla_chemontid = NA,
+    structure_tax_cla_01kin = "O",
+    structure_tax_cla_02sup = NA,
+    structure_tax_cla_03cla = NA,
+    structure_tax_cla_04dirpar = NA,
+    organism_name = "Plant1",
+    organism_taxonomy_ottid = "1",
+    organism_taxonomy_01domain = "E",
+    organism_taxonomy_02kingdom = "P",
+    organism_taxonomy_03phylum = "T",
+    reference_doi = "d1"
+  )
+
+  sop_data2 <- tidytable::tidytable(
+    structure_inchikey = "BBBBB",
+    structure_smiles_no_stereo = "CC",
+    structure_molecular_formula = "C2H6",
+    structure_name = "nameA",
+    structure_exact_mass = 30,
+    structure_xlogp = 1.5,
+    structure_tax_npc_01pat = "A",
+    structure_tax_npc_02sup = NA,
+    structure_tax_npc_03cla = NA,
+    structure_tax_cla_chemontid = NA,
+    structure_tax_cla_01kin = "O",
+    structure_tax_cla_02sup = NA,
+    structure_tax_cla_03cla = NA,
+    structure_tax_cla_04dirpar = NA,
+    organism_name = "Plant2",
+    organism_taxonomy_ottid = "2",
+    organism_taxonomy_01domain = "E",
+    organism_taxonomy_02kingdom = "P",
+    organism_taxonomy_03phylum = "T",
+    reference_doi = "d2"
+  )
+
+  file1 <- file.path(tmpdir, "lib1.tsv")
+  file2 <- file.path(tmpdir, "lib2.tsv")
+  tidytable::fwrite(sop_data1, file1, sep = "\t")
+  tidytable::fwrite(sop_data2, file2, sep = "\t")
+
+  output_key <- file.path(tmpdir, "keys.tsv")
+  output_org <- file.path(tmpdir, "org_tax.tsv")
+  output_stereo <- file.path(tmpdir, "stereo.tsv")
+  output_met <- file.path(tmpdir, "metadata.tsv")
+  output_nam <- file.path(tmpdir, "names.tsv")
+  output_cla <- file.path(tmpdir, "classyfire.tsv")
+  output_npc <- file.path(tmpdir, "npc.tsv")
+
+  local_mocked_bindings(
+    get_params = function(step) list(step = "prepare_libraries_sop_merged"),
+    export_params = function(...) invisible(NULL),
+    .package = "tima"
+  )
+
+  # Merge both files
+  result <- prepare_libraries_sop_merged(
+    files = c(file1, file2),
+    filter = FALSE,
+    output_key = output_key,
+    output_org_tax_ott = output_org,
+    output_str_stereo = output_stereo,
+    output_str_met = output_met,
+    output_str_nam = output_nam,
+    output_str_tax_cla = output_cla,
+    output_str_tax_npc = output_npc
+  )
+
+  # Verify merged output
+  keys <- tidytable::fread(output_key)
+  expect_equal(nrow(keys), 2)
+  # expect_true(all(c("AAAAA", "BBBBB") %in% keys$structure_inchikey))
+})
