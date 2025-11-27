@@ -23,3 +23,4 @@ when external resources are unavailable.
 fake_lotus(export = "data/source/lotus.tsv.gz")
 }
 }
+\keyword{internal}

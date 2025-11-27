@@ -28,3 +28,4 @@ export_spectra_rds(
 )
 }
 }
+\keyword{internal}

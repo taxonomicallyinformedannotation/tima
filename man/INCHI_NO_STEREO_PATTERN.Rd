@@ -15,4 +15,4 @@ INCHI_NO_STEREO_PATTERN
 InChI stereochemistry layer pattern indicating no stereochemistry
 Structures with "-UHFFFAOYSA-" in their InChIKey have no defined stereochemistry
 }
-\keyword{datasets}
+\keyword{internal}

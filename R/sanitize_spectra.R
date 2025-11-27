@@ -12,7 +12,7 @@
 #'
 #' @return A sanitized Spectra object with noise and artifacts removed
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

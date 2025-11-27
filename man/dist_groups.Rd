@@ -40,3 +40,4 @@ result <- dist_groups(d, groups)
 aggregate(Distance ~ Label, data = result, FUN = mean)
 }
 }
+\keyword{internal}

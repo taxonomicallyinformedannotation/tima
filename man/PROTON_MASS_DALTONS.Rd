@@ -13,4 +13,4 @@ PROTON_MASS_DALTONS
 \description{
 Proton mass in Daltons
 }
-\keyword{datasets}
+\keyword{internal}

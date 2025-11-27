@@ -28,3 +28,4 @@ params <- parse_yaml_params(
 )
 }
 }
+\keyword{internal}

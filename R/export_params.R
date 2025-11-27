@@ -14,7 +14,7 @@
 #'
 #' @return NULL (invisibly). Creates YAML file as side effect.
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

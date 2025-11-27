@@ -3,6 +3,7 @@
 #' @description Selects and standardizes CANOPUS chemical classification
 #'     columns from SIRIUS results, mapping SIRIUS-specific column names
 #'     to TIMA standard names for downstream processing.
+#'     Internal helper for prepare_annotations_sirius().
 #'
 #' @include harmonize_names_sirius.R
 #' @include validators.R
@@ -12,11 +13,11 @@
 #'
 #' @return Data frame with standardized CANOPUS column names
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
-#' # Standardize CANOPUS columns from SIRIUS v6
+#' # Internal use only - called by prepare_annotations_sirius()
 #' standardized <- select_sirius_columns_canopus(
 #'   df = canopus_results,
 #'   sirius_version = "6"
@@ -106,6 +107,7 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 #'
 #' @description Selects and standardizes SIRIUS formula-level columns,
 #'     extracting molecular formula candidates and their scores.
+#'     Internal helper for prepare_annotations_sirius().
 #'
 #' @include harmonize_names_sirius.R
 #'
@@ -114,11 +116,11 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 #'
 #' @return Data frame with standardized formula column names
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
-#' # Standardize SIRIUS formula columns
+#' # Internal use only - called by prepare_annotations_sirius()
 #' formulas <- select_sirius_columns_formulas(
 #'   df = sirius_formulas,
 #'   sirius_version = "6"
@@ -170,17 +172,18 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
 #'
 #' @description Selects and standardizes SIRIUS structure-level columns,
 #'     extracting structure candidates and their CSI:FingerID scores.
+#'     Internal helper for prepare_annotations_sirius().
 #'
 #' @param df Data frame with SIRIUS structure results
 #' @param sirius_version SIRIUS version ("5" or "6")
 #'
 #' @return Data frame with standardized structure column names
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
-#' # Standardize SIRIUS structure columns
+#' # Internal use only - called by prepare_annotations_sirius()
 #' structures <- select_sirius_columns_structures(
 #'   df = sirius_structures,
 #'   sirius_version = "6"

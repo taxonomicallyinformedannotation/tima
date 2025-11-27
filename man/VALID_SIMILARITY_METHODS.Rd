@@ -13,4 +13,4 @@ VALID_SIMILARITY_METHODS
 \description{
 Valid similarity method values
 }
-\keyword{datasets}
+\keyword{internal}

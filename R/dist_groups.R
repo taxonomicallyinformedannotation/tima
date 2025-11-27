@@ -15,7 +15,7 @@
 #'     Returns 0 if indices are identical.
 #'     Returns NA if indices are out of bounds (with warning).
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -83,7 +83,7 @@ dist_get <- function(d, idx1, idx2) {
 #'   \item{Label}{Factor: "Within" or "Between" groups}
 #'   \item{Distance}{Numeric distance (rounded to 5 decimals)}
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

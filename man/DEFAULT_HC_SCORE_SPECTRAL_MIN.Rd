@@ -13,4 +13,4 @@ DEFAULT_HC_SCORE_SPECTRAL_MIN
 \description{
 Default minimum spectral similarity score threshold for high-confidence filter
 }
-\keyword{datasets}
+\keyword{internal}

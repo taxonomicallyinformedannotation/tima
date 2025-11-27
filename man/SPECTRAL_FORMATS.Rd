@@ -13,4 +13,4 @@ SPECTRAL_FORMATS
 \description{
 Supported spectral data formats
 }
-\keyword{datasets}
+\keyword{internal}

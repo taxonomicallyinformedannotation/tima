@@ -17,13 +17,15 @@ Data frame with standardized structure column names
 \description{
 Selects and standardizes SIRIUS structure-level columns,
 extracting structure candidates and their CSI:FingerID scores.
+Internal helper for prepare_annotations_sirius().
 }
 \examples{
 \dontrun{
-# Standardize SIRIUS structure columns
+# Internal use only - called by prepare_annotations_sirius()
 structures <- select_sirius_columns_structures(
   df = sirius_structures,
   sirius_version = "6"
 )
 }
 }
+\keyword{internal}

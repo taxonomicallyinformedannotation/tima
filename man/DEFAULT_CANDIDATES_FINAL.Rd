@@ -13,4 +13,4 @@ DEFAULT_CANDIDATES_FINAL
 \description{
 Default number of final candidates to report per feature
 }
-\keyword{datasets}
+\keyword{internal}

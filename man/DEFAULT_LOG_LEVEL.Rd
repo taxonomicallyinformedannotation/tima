@@ -13,4 +13,4 @@ DEFAULT_LOG_LEVEL
 \description{
 Default log level for package operations
 }
-\keyword{datasets}
+\keyword{internal}

@@ -17,14 +17,15 @@ Data frame (tidytable) containing the parsed file contents
 \description{
 Reads specific files from a compressed SIRIUS workspace
 directory. Handles file selection, filtering empty files, and
-parsing tab-delimited data.
+parsing tab-delimited data. Internal helper for prepare_annotations_sirius().
 }
 \examples{
 \dontrun{
-# Read formula candidates from SIRIUS workspace
+# Internal use only - called by prepare_annotations_sirius()
 formulas <- read_from_sirius_zip(
   sirius_zip = "path/to/sirius_workspace.zip",
   file = "formula_candidates.tsv"
 )
 }
 }
+\keyword{internal}

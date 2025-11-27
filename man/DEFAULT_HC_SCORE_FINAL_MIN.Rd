@@ -13,4 +13,4 @@ DEFAULT_HC_SCORE_FINAL_MIN
 \description{
 Default minimum final (weighted chemical) score threshold for high-confidence filter
 }
-\keyword{datasets}
+\keyword{internal}

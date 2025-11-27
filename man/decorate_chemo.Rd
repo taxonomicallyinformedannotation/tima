@@ -39,9 +39,11 @@ The input annotation table (unchanged), for pipeline compatibility
 Logs summary statistics about chemically weighted annotations,
 showing how many structures were reranked at each chemical classification
 level. Uses cascading filters where each level builds on the previous.
+Internal logging helper for weight_annotations().
 }
 \examples{
 \dontrun{
+# Internal use only - called by weight_annotations() for logging
 weighted_chemo |>
   decorate_chemo(
     score_chemical_cla_kingdom = 0.1,
@@ -54,3 +56,4 @@ weighted_chemo |>
   )
 }
 }
+\keyword{internal}

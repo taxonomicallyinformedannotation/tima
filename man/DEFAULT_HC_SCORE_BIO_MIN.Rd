@@ -13,4 +13,4 @@ DEFAULT_HC_SCORE_BIO_MIN
 \description{
 Default minimum biological score threshold for high-confidence filter
 }
-\keyword{datasets}
+\keyword{internal}

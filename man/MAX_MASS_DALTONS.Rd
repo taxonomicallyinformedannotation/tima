@@ -15,4 +15,4 @@ MAX_MASS_DALTONS
 Maximum practical mass value (Da) for small molecules
 Used for sanity checking, not hard limit
 }
-\keyword{datasets}
+\keyword{internal}

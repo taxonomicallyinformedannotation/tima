@@ -15,4 +15,4 @@ DEFAULT_MINIMAL_MS1_CONDITION
 Default MS1 score combination logic for filtering
 Either "OR" (at least one threshold met) or "AND" (both thresholds met)
 }
-\keyword{datasets}
+\keyword{internal}

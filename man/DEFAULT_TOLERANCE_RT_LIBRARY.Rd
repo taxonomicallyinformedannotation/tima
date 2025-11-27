@@ -13,4 +13,4 @@ DEFAULT_TOLERANCE_RT_LIBRARY
 \description{
 Default retention time tolerance in minutes for library matching
 }
-\keyword{datasets}
+\keyword{internal}

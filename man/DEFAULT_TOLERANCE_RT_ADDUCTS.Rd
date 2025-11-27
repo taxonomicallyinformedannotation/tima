@@ -13,4 +13,4 @@ DEFAULT_TOLERANCE_RT_ADDUCTS
 \description{
 Default retention time tolerance in minutes for adduct grouping
 }
-\keyword{datasets}
+\keyword{internal}

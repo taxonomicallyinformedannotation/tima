@@ -13,4 +13,4 @@ DEFAULT_CHEM_SCORES
 \description{
 Default chemical taxonomy score weights
 }
-\keyword{datasets}
+\keyword{internal}

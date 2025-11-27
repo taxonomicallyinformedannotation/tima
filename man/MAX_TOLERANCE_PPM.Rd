@@ -15,4 +15,4 @@ MAX_TOLERANCE_PPM
 Maximum allowed mass tolerance in ppm
 Tolerances above this value may produce excessive false positives
 }
-\keyword{datasets}
+\keyword{internal}

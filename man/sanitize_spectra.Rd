@@ -34,3 +34,4 @@ data.frame(
   sanitize_spectra()
 }
 }
+\keyword{internal}

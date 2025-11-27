@@ -89,3 +89,4 @@ harmonized <- harmonize_spectra(
 )
 }
 }
+\keyword{internal}

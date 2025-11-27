@@ -13,4 +13,4 @@ DEFAULT_BATCH_SIZE
 \description{
 Default batch size for parallel processing
 }
-\keyword{datasets}
+\keyword{internal}

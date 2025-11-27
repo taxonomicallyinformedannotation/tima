@@ -15,7 +15,7 @@
 #'
 #' @return Data frame with specified numeric columns rounded to dig decimal places
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

@@ -14,7 +14,7 @@
 #'
 #' @return Character string path to the exported file (invisibly)
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

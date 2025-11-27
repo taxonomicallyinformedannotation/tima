@@ -13,4 +13,4 @@ MIN_MASS_DALTONS
 \description{
 Minimum mass value (Da) - used for validation
 }
-\keyword{datasets}
+\keyword{internal}

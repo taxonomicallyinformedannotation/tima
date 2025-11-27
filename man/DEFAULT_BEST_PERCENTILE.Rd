@@ -15,4 +15,4 @@ DEFAULT_BEST_PERCENTILE
 Default percentile threshold for top candidate selection
 Only candidates with scores above this percentile are retained
 }
-\keyword{datasets}
+\keyword{internal}

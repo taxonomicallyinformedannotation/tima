@@ -3,6 +3,7 @@
 #' @description Logs summary statistics about chemically weighted annotations,
 #'     showing how many structures were reranked at each chemical classification
 #'     level. Uses cascading filters where each level builds on the previous.
+#'     Internal logging helper for weight_annotations().
 #'
 #' @include validators.R
 #'
@@ -17,10 +18,11 @@
 #'
 #' @return The input annotation table (unchanged), for pipeline compatibility
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
+#' # Internal use only - called by weight_annotations() for logging
 #' weighted_chemo |>
 #'   decorate_chemo(
 #'     score_chemical_cla_kingdom = 0.1,

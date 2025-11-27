@@ -14,7 +14,7 @@
 #'
 #' @return Named list containing the merged parameters for the specified step
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

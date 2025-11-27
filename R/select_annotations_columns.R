@@ -20,7 +20,7 @@
 #' @return Data frame with standardized annotation columns, cleaned values,
 #'     and complemented metadata
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

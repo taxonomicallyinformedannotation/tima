@@ -13,4 +13,4 @@ VALID_MS_MODES
 \description{
 Valid ionization mode values
 }
-\keyword{datasets}
+\keyword{internal}

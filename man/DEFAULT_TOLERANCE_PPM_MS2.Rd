@@ -13,4 +13,4 @@ DEFAULT_TOLERANCE_PPM_MS2
 \description{
 Default mass tolerance in ppm for MS2
 }
-\keyword{datasets}
+\keyword{internal}

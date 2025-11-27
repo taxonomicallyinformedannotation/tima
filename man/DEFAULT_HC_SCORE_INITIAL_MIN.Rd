@@ -13,4 +13,4 @@ DEFAULT_HC_SCORE_INITIAL_MIN
 \description{
 Default minimum initial (pseudo) score threshold for high-confidence filter
 }
-\keyword{datasets}
+\keyword{internal}

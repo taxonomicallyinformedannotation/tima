@@ -27,3 +27,4 @@ acquisitionNum, spectrum_id. Returns the first valid field found.
 spec_ids <- get_spectra_ids(my_spectra)
 }
 }
+\keyword{internal}

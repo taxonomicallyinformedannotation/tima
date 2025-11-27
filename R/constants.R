@@ -10,49 +10,49 @@
 # Physical Constants ----
 
 #' Electron mass in Daltons (CODATA 2018 recommended value)
-#' @export
+#' @keywords internal
 ELECTRON_MASS_DALTONS <- 5.485799E-4
 
 #' Proton mass in Daltons
-#' @export
+#' @keywords internal
 PROTON_MASS_DALTONS <- 1.007276466812
 
 # Default Tolerance Values ----
 
 #' Default mass tolerance in parts per million (ppm) for MS1
-#' @export
+#' @keywords internal
 DEFAULT_TOLERANCE_PPM_MS1 <- 10
 
 #' Default mass tolerance in ppm for MS2
-#' @export
+#' @keywords internal
 DEFAULT_TOLERANCE_PPM_MS2 <- 10
 
 #' Default retention time tolerance in minutes for adduct grouping
-#' @export
+#' @keywords internal
 DEFAULT_TOLERANCE_RT_ADDUCTS <- 0.02
 
 #' Default retention time tolerance in minutes for library matching
-#' @export
+#' @keywords internal
 DEFAULT_TOLERANCE_RT_LIBRARY <- Inf
 
 # Validation Thresholds ----
 
 #' Maximum allowed mass tolerance in ppm
 #' Tolerances above this value may produce excessive false positives
-#' @export
+#' @keywords internal
 MAX_TOLERANCE_PPM <- 20
 
 #' Maximum allowed retention time tolerance for adduct grouping (minutes)
-#' @export
+#' @keywords internal
 MAX_TOLERANCE_RT_ADDUCTS <- 0.05
 
 #' Minimum mass value (Da) - used for validation
-#' @export
+#' @keywords internal
 MIN_MASS_DALTONS <- 0
 
 #' Maximum practical mass value (Da) for small molecules
 #' Used for sanity checking, not hard limit
-#' @export
+#' @keywords internal
 MAX_MASS_DALTONS <- 5000
 
 # Regular Expression Patterns ----
@@ -60,27 +60,27 @@ MAX_MASS_DALTONS <- 5000
 #' Regular expression pattern for parsing adduct notation
 #' Matches patterns like: \[M+H\]+, \[2M+Na\]+, \[M-H2O+H\]+, \[2M1+H\]2+
 #' Groups: (1) multimer, (2) isotope, (3) modifications, (4) charge count, (5) charge sign
-#' @export
+#' @keywords internal
 ADDUCT_REGEX_PATTERN <- "\\[(\\d*)M(?![a-z])(\\d*)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?"
 
 #' Regular expression for individual adduct modifications
 #' Matches: +H, -H2O, +Na, etc.
 #' Groups: (1) sign, (2) count, (3) element/formula
-#' @export
+#' @keywords internal
 MODIFICATION_REGEX_PATTERN <- "([+-])(\\d*)([A-Z][a-z]?\\d*(?:[A-Z][a-z]?\\d*)*)"
 
 # File Extension Patterns ----
 
 #' Supported compressed file extensions
-#' @export
+#' @keywords internal
 COMPRESSED_EXTENSIONS <- c(".gz", ".zip", ".bz2")
 
 #' Supported table file extensions
-#' @export
+#' @keywords internal
 TABLE_EXTENSIONS <- c(".tsv", ".csv", ".txt")
 
 #' Supported spectral data formats
-#' @export
+#' @keywords internal
 SPECTRAL_FORMATS <- c(".mgf", ".msp", ".mzML", ".mzXML")
 
 # File System Constants ----
@@ -97,7 +97,7 @@ MAX_PATH_LENGTH <- 260L
 # Common adduct components and their exact masses
 
 #' Exact masses of common adduct components (Daltons)
-#' @export
+#' @keywords internal
 ADDUCT_MASSES <- list(
   H = 1.007825032,
   Na = 22.98976928,
@@ -118,58 +118,58 @@ ADDUCT_MASSES <- list(
 
 #' Tolerance for floating point weight sum comparisons
 #' Used when validating that weights sum to 1.0
-#' @export
+#' @keywords internal
 WEIGHT_SUM_TOLERANCE <- 1e-10
 
 # MS1 Filtering Defaults ----
 
 #' Default MS1 score combination logic for filtering
 #' Either "OR" (at least one threshold met) or "AND" (both thresholds met)
-#' @export
+#' @keywords internal
 DEFAULT_MINIMAL_MS1_CONDITION <- "OR"
 
 
 # Ionization Modes ----
 
 #' Valid ionization mode values
-#' @export
+#' @keywords internal
 VALID_MS_MODES <- c("pos", "neg")
 
 # Similarity Methods ----
 
 #' Valid similarity method values
-#' @export
+#' @keywords internal
 VALID_SIMILARITY_METHODS <- c("entropy", "cosine", "gnps")
 
 # Logging Configuration ----
 
 #' Default log level for package operations
-#' @export
+#' @keywords internal
 DEFAULT_LOG_LEVEL <- "INFO"
 
 #' Log levels available (in order of severity)
-#' @export
+#' @keywords internal
 LOG_LEVELS <- c("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL")
 
 # Performance Settings ----
 
 #' Default batch size for parallel processing
-#' @export
+#' @keywords internal
 DEFAULT_BATCH_SIZE <- 1000
 
 #' Default progress reporting interval (number of items)
-#' @export
+#' @keywords internal
 DEFAULT_PROGRESS_INTERVAL <- 10000
 
 #' Default number of parallel workers (NULL = auto-detect)
-#' @export
+#' @keywords internal
 DEFAULT_NUM_WORKERS <- NULL
 
 # Scoring Defaults ----
 
 #' Default biological score weights by taxonomic rank
 #' Lower ranks (more specific) get higher scores
-#' @export
+#' @keywords internal
 DEFAULT_BIO_SCORES <- list(
   domain = 0.1,
   kingdom = 0.2,
@@ -189,7 +189,7 @@ DEFAULT_BIO_SCORES <- list(
 )
 
 #' Default chemical taxonomy score weights
-#' @export
+#' @keywords internal
 DEFAULT_CHEM_SCORES <- list(
   # ClassyFire
   cla_kingdom = 0.25,
@@ -206,64 +206,64 @@ DEFAULT_CHEM_SCORES <- list(
 
 #' Default percentile threshold for top candidate selection
 #' Only candidates with scores above this percentile are retained
-#' @export
+#' @keywords internal
 DEFAULT_BEST_PERCENTILE <- 0.9
 
 #' Default number of neighboring candidates to retain during network annotation
-#' @export
+#' @keywords internal
 DEFAULT_CANDIDATES_NEIGHBORS <- 16
 
 #' Default number of final candidates to report per feature
-#' @export
+#' @keywords internal
 DEFAULT_CANDIDATES_FINAL <- 1
 
 #' Minimum consistency score threshold for taxonomic predictions
-#' @export
+#' @keywords internal
 DEFAULT_MINIMAL_CONSISTENCY <- 0.0
 
 #' Minimum MS1 biological score threshold
-#' @export
+#' @keywords internal
 DEFAULT_MINIMAL_MS1_BIO <- 0.0
 
 #' Minimum MS1 chemical score threshold
-#' @export
+#' @keywords internal
 DEFAULT_MINIMAL_MS1_CHEMO <- 0.0
 
 # High-Confidence Filtering Defaults ----
 
 #' Default minimum biological score threshold for high-confidence filter
-#' @export
+#' @keywords internal
 DEFAULT_HC_SCORE_BIO_MIN <- 0.85
 
 #' Minimum chemical score for high confidence annotations
-#' @export
+#' @keywords internal
 DEFAULT_HC_SCORE_CHEM_MIN <- 0.8
 
 #' Default minimum initial (pseudo) score threshold for high-confidence filter
-#' @export
+#' @keywords internal
 DEFAULT_HC_SCORE_INITIAL_MIN <- 0.95
 
 #' Default minimum final (weighted chemical) score threshold for high-confidence filter
-#' @export
+#' @keywords internal
 DEFAULT_HC_SCORE_FINAL_MIN <- 0.75
 
 #' Default minimum SIRIUS confidence score threshold for high-confidence filter
-#' @export
+#' @keywords internal
 DEFAULT_HC_SCORE_SIRIUS_MIN <- NULL
 
 #' Default minimum spectral similarity score threshold for high-confidence filter
-#' @export
+#' @keywords internal
 DEFAULT_HC_SCORE_SPECTRAL_MIN <- NULL
 
 #' Default maximum allowed retention time error (minutes) for high-confidence filter
-#' @export
+#' @keywords internal
 DEFAULT_HC_MAX_RT_ERROR_MIN <- 0.05
 
 # InChI Patterns ----
 
 #' InChI stereochemistry layer pattern indicating no stereochemistry
 #' Structures with "-UHFFFAOYSA-" in their InChIKey have no defined stereochemistry
-#' @export
+#' @keywords internal
 INCHI_NO_STEREO_PATTERN <- "-UHFFFAOYSA-"
 
 # Helper Functions ----

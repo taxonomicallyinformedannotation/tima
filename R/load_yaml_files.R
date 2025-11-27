@@ -12,7 +12,7 @@
 #'   \item{yaml_files}{Character vector of file paths}
 #'   \item{yaml_names}{Character vector of parameter names}
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

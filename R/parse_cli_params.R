@@ -13,7 +13,7 @@
 #' @return Updated parameters list with CLI arguments merged in, maintaining
 #'     the nested structure and applying type conversions
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

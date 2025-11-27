@@ -16,7 +16,7 @@
 #'
 #' @return Data frame with enriched structural metadata
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

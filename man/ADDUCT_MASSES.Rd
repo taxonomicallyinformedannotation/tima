@@ -13,4 +13,4 @@ ADDUCT_MASSES
 \description{
 Exact masses of common adduct components (Daltons)
 }
-\keyword{datasets}
+\keyword{internal}

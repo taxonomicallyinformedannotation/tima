@@ -17,4 +17,4 @@ Regular expression for individual adduct modifications
 Matches: +H, -H2O, +Na, etc.
 Groups: (1) sign, (2) count, (3) element/formula
 }
-\keyword{datasets}
+\keyword{internal}

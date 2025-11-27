@@ -26,3 +26,4 @@ harmonize_names_sirius("2_feature_id") # Returns "id"
 harmonize_names_sirius("score") # Returns "score" (no underscore)
 }
 }
+\keyword{internal}

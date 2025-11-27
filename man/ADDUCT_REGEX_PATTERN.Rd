@@ -17,4 +17,4 @@ Regular expression pattern for parsing adduct notation
 Matches patterns like: [M+H]+, [2M+Na]+, [M-H2O+H]+, [2M1+H]2+
 Groups: (1) multimer, (2) isotope, (3) modifications, (4) charge count, (5) charge sign
 }
-\keyword{datasets}
+\keyword{internal}

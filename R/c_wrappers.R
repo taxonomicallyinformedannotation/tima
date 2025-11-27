@@ -46,7 +46,7 @@ gnps_wrapper <- function(x, y) {
 #'   \item{indices_x}{Indices of matched peaks in x}
 #'   \item{indices_y}{Indices of matched peaks in y}
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

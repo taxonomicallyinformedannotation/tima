@@ -26,3 +26,4 @@ pre_harmonize_names_sirius("simple_name") # Returns "simple_name"
 pre_harmonize_names_sirius("name/extra/info") # Returns "name"
 }
 }
+\keyword{internal}

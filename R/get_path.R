@@ -15,7 +15,7 @@
 #'
 #' @return Character string of the resolved absolute path that exists
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

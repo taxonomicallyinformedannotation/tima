@@ -11,6 +11,8 @@
 #'
 #' @return Character vector of spectrum IDs, or NULL if no valid ID field found
 #'
+#' @keywords internal
+#'
 #' @examples
 #' \dontrun{
 #' # Extract IDs from Spectra object

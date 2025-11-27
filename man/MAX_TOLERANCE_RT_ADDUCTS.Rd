@@ -13,4 +13,4 @@ MAX_TOLERANCE_RT_ADDUCTS
 \description{
 Maximum allowed retention time tolerance for adduct grouping (minutes)
 }
-\keyword{datasets}
+\keyword{internal}

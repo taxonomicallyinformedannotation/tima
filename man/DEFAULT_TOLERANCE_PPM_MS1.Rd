@@ -13,4 +13,4 @@ DEFAULT_TOLERANCE_PPM_MS1
 \description{
 Default mass tolerance in parts per million (ppm) for MS1
 }
-\keyword{datasets}
+\keyword{internal}

@@ -10,7 +10,7 @@
 #'
 #' @return Data frame with standardized SOP columns
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

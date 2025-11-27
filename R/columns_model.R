@@ -16,7 +16,7 @@
 #'   \item{rank_columns}{Candidate ranking columns}
 #'   \item{score_columns}{Candidate scoring columns}
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

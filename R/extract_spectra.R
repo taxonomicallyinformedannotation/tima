@@ -9,7 +9,7 @@
 #' @return Data frame containing harmonized spectra metadata with mz and
 #'     intensity list columns containing peak data
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -19,7 +19,7 @@
 #'
 #' # Access metadata and peaks
 #' head(spectra_df)
-#' peaks <- spectra_df$mz[[1]]  # First spectrum peaks
+#' peaks <- spectra_df$mz[[1]] # First spectrum peaks
 #' }
 extract_spectra <- function(object) {
   # Input Validation ----
