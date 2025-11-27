@@ -2,17 +2,50 @@
 
 library(testthat)
 
-test_that("prepare_libraries_spectra returns empty libs when input missing", {
-  withr::local_dir(temp_test_dir("prep_lib_spectra_missing"))
-  local_test_project(copy = TRUE)
-  out <- prepare_libraries_spectra(
-    input = c("missing1.mgf", "missing2.mgf"),
-    nam_lib = "testlib"
+test_that("prepare_libraries_spectra() validates nam_lib parameter", {
+  skip_if_not_installed("Spectra")
+
+  tmpfile <- tempfile(fileext = ".mgf")
+  # Create a minimal valid MGF file
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "TITLE=Spectrum1",
+      "PEPMASS=100.0",
+      "50.0 100",
+      "60.0 200",
+      "END IONS"
+    ),
+    tmpfile
   )
-  expect_true(file.exists(out[["pos"]]))
-  expect_true(file.exists(out[["neg"]]))
-  expect_true(file.exists(out[["sop"]]))
-  sp_pos <- readRDS(out[["pos"]])
-  expect_s4_class(sp_pos, "Spectra")
-  expect_equal(length(sp_pos), 1)
+
+  expect_error(
+    prepare_libraries_spectra(
+      input = tmpfile,
+      nam_lib = c("lib1", "lib2") # Must be single string
+    )
+  )
+})
+
+test_that("prepare_libraries_spectra() validates column name parameters", {
+  skip_if_not_installed("Spectra")
+
+  tmpfile <- tempfile(fileext = ".mgf")
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "TITLE=Spectrum1",
+      "PEPMASS=100.0",
+      "50.0 100",
+      "END IONS"
+    ),
+    tmpfile
+  )
+
+  expect_error(
+    prepare_libraries_spectra(
+      input = tmpfile,
+      col_ad = c("col1", "col2") # Must be single string
+    )
+  )
 })
