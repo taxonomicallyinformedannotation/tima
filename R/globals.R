@@ -256,6 +256,7 @@ utils::globalVariables(
     "similarity_min",
     "smiles",
     "smiles_no_stereo",
+    "spectra",
     "spectrum_id",
     "structure_exact_mass",
     "structure_inchikey",
