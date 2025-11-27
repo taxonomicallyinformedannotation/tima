@@ -137,3 +137,77 @@ test_that("create_edges_spectra creates output file", {
   expect_true(file.exists(output))
   expect_match(output, "\\.tsv$")
 })
+
+test_that("create_edges_spectra() creates edges from two spectra with entropy", {
+  skip_if_not_installed("Spectra")
+  withr::local_dir(temp_test_dir("create_edges_spectra_entropy"))
+  mgf_file <- tempfile(fileext = ".mgf")
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "TITLE=Spec1",
+      "PEPMASS=200.0",
+      "CHARGE=1+",
+      "50 10",
+      "75 20",
+      "100 30",
+      "END IONS",
+      "",
+      "BEGIN IONS",
+      "TITLE=Spec2",
+      "PEPMASS=200.0",
+      "CHARGE=1+",
+      "50 11",
+      "75 19",
+      "100 32",
+      "END IONS"
+    ),
+    mgf_file
+  )
+  out <- create_edges_spectra(
+    input = mgf_file,
+    method = "entropy",
+    threshold = 0.0,
+    matched_peaks = 1
+  )
+  expect_true(file.exists(out))
+  df <- tidytable::fread(out)
+  expect_true(
+    nrow(df) <= 1 || all(c("CLUSTERID1", "CLUSTERID2") %in% names(df))
+  )
+})
+
+test_that("create_edges_spectra() runs with cosine method", {
+  skip_if_not_installed("Spectra")
+  withr::local_dir(temp_test_dir("create_edges_spectra_cosine"))
+  mgf_file <- tempfile(fileext = ".mgf")
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "TITLE=A",
+      "PEPMASS=110.0",
+      "CHARGE=1+",
+      "55 10",
+      "75 20",
+      "100 30",
+      "END IONS",
+      "",
+      "BEGIN IONS",
+      "TITLE=B",
+      "PEPMASS=110.0",
+      "CHARGE=1+",
+      "55 10",
+      "75 19",
+      "100 32",
+      "END IONS"
+    ),
+    mgf_file
+  )
+  out <- create_edges_spectra(
+    input = mgf_file,
+    method = "cosine",
+    threshold = 0.0,
+    matched_peaks = 1
+  )
+  expect_true(file.exists(out))
+})

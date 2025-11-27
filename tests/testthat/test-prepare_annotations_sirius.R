@@ -110,3 +110,51 @@ test_that("test-prepare_annotations_sirius handles missing input by producing em
   expect_true(file.exists(out_ann))
   expect_true(is.character(res[1]))
 })
+
+# test_that("prepare_annotations_sirius() succeeds with empty directory and structure files (v5)", {
+#   skip_if_not_installed("tidytable")
+#   s <- .make_structs()
+#   dir_in <- tempfile()
+#   dir.create(dir_in)
+#   out_ann <- tempfile(fileext = ".tsv")
+#   out_can <- tempfile(fileext = ".tsv")
+#   out_for <- tempfile(fileext = ".tsv")
+#   res <- prepare_annotations_sirius(
+#     input_directory = dir_in,
+#     output_ann = out_ann,
+#     output_can = out_can,
+#     output_for = out_for,
+#     sirius_version = "5",
+#     str_stereo = s$stereo,
+#     str_met = s$met,
+#     str_nam = s$nam,
+#     str_tax_cla = s$cla,
+#     str_tax_npc = s$npc
+#   )
+#   expect_true(all(file.exists(c(out_ann, out_can, out_for))))
+#   expect_type(res, "character")
+# })
+
+# test_that("prepare_annotations_sirius() handles sirius_version switch to 6", {
+#   skip_if_not_installed("tidytable")
+#   s <- .make_structs()
+#   dir_in <- tempfile()
+#   dir.create(dir_in)
+#   out_ann <- tempfile(fileext = ".tsv")
+#   out_can <- tempfile(fileext = ".tsv")
+#   out_for <- tempfile(fileext = ".tsv")
+#   res <- prepare_annotations_sirius(
+#     input_directory = dir_in,
+#     output_ann = out_ann,
+#     output_can = out_can,
+#     output_for = out_for,
+#     sirius_version = "6",
+#     str_stereo = s$stereo,
+#     str_met = s$met,
+#     str_nam = s$nam,
+#     str_tax_cla = s$cla,
+#     str_tax_npc = s$npc
+#   )
+#   expect_true(all(file.exists(c(out_ann, out_can, out_for))))
+#   expect_type(res, "character")
+# })

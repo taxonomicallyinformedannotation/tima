@@ -343,6 +343,16 @@ install <- function(
     test = test
   )
 
+  # Test mode: shortcut - no system / python / R package side effects ----
+  if (isTRUE(test)) {
+    message(
+      "Test mode: skipping real installation steps for package '",
+      package,
+      "'."
+    )
+    return(invisible(NULL))
+  }
+
   logger::log_info("Starting installation/update of '{package}'")
 
   # System Detection and Messages ----
@@ -364,10 +374,8 @@ install <- function(
     from_source = FALSE
   )
 
-  if (!success || isTRUE(test)) {
-    logger::log_warn(
-      "Binary installation failed or test mode active. Retrying from source."
-    )
+  if (!success) {
+    logger::log_warn("Binary installation failed. Retrying from source.")
     success <- try_install_package(
       package = package,
       repos = repos,

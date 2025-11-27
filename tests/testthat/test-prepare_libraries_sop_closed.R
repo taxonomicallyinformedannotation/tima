@@ -141,23 +141,23 @@ test_that("prepare_libraries_sop_closed renames structure_nameTraditional", {
   expect_false("structure_nameTraditional" %in% names(df))
 })
 
-# test_that("prepare_libraries_sop_closed removes duplicates from fixture", {
-#   # Create fixture with duplicates
-#   closed_dup <- load_fixture("closed")
-#   closed_dup <- tidytable::bind_rows(closed_dup, closed_dup, closed_dup)
-#
-#   temp_input <- tempfile(fileext = ".csv")
-#   tidytable::fwrite(closed_dup, temp_input)
-#   temp_output <- tempfile(fileext = ".tsv")
-#
-#   prepare_libraries_sop_closed(
-#     input = temp_input,
-#     output = temp_output
-#   )
-#
-#   df <- tidytable::fread(temp_output)
-#
-#   # Duplicates should be removed
-#   original_rows <- nrow(load_fixture("closed"))
-#   expect_equal(nrow(df), original_rows)
-# })
+test_that("prepare_libraries_sop_closed removes duplicates from fixture", {
+  # Create fixture with duplicates
+  closed_dup <- load_fixture("closed")
+  closed_dup <- tidytable::bind_rows(closed_dup, closed_dup, closed_dup)
+
+  temp_input <- tempfile(fileext = ".csv")
+  tidytable::fwrite(closed_dup, temp_input)
+  temp_output <- tempfile(fileext = ".tsv")
+
+  prepare_libraries_sop_closed(
+    input = temp_input,
+    output = temp_output
+  )
+
+  df <- tidytable::fread(temp_output)
+
+  # Duplicates should be removed
+  original_rows <- nrow(load_fixture("closed"))
+  expect_equal(nrow(df), original_rows)
+})

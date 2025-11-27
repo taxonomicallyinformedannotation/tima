@@ -135,23 +135,6 @@ test_that("test-get_last_version_from_zenodo handles invalid DOI gracefully", {
   )
 })
 
-# test_that("test-get_last_version_from_zenodo handles malformed DOI", {
-#   output <- tempfile(fileext = ".txt")
-#
-#   expect_error(
-#     get_last_version_from_zenodo(
-#       doi = "not-a-valid-doi",
-#       pattern = "*.txt",
-#       path = output
-#     ),
-#     "Failed to retrieve Zenodo record"
-#   )
-# })
-
-# Test Suite: get_last_version_from_zenodo (Enhanced) ----
-
-library(testthat)
-
 # Integration Tests: Testing through main function ----
 
 test_that("get_last_version_from_zenodo validates all inputs", {
@@ -421,7 +404,7 @@ test_that("error messages are informative", {
   )
 })
 
-# Parameter Validation Order Tests ----
+# Parameter Validation Order ----
 
 test_that("get_last_version_from_zenodo validates parameters in correct order", {
   # DOI should be validated first
@@ -452,5 +435,26 @@ test_that("get_last_version_from_zenodo validates parameters in correct order", 
       path = 789
     ),
     "path must be"
+  )
+})
+
+# Real tests ----
+
+test_that("get_last_version_from_zenodo success", {
+  tmp <- temp_test_dir("get_file_dir_create")
+  withr::local_dir(tmp)
+  expect_no_error(
+    get_last_version_from_zenodo(
+      doi = "10.5281/zenodo.7534071",
+      pattern = "230106_frozen.csv.gz",
+      path = file.path(tmp, "230106_frozen.csv.gz")
+    )
+  )
+  expect_no_error(
+    get_last_version_from_zenodo(
+      doi = "10.5281/zenodo.7534071",
+      pattern = "230106_frozen.csv.gz",
+      path = file.path(tmp, "230106_frozen.csv.gz")
+    )
   )
 })
