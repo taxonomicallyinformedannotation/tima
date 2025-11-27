@@ -2,7 +2,6 @@
 
 export(annotate_masses)
 export(annotate_spectra)
-export(calculate_entropy_and_similarity)
 export(calculate_mass_of_m)
 export(calculate_mz_from_mass)
 export(calculate_similarity)

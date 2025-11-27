@@ -68,3 +68,4 @@ results <- calculate_entropy_and_similarity(
 )
 }
 }
+\keyword{internal}

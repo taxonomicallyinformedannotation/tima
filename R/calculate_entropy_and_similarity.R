@@ -21,7 +21,7 @@
 #'
 #' @return Data frame with spectrum IDs, entropy scores, and similarity scores
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
