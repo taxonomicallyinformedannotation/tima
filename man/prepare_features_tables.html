@@ -822,7 +822,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="prepare-features-table">Prepare features table</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function prepares LC-MS feature tables by standardizing column names, filtering to top intensity samples per feature, and formatting data for downstream analysis. Supports multiple input formats (MZmine, SLAW, SIRIUS).</p>
+<p>Prepares LC-MS feature tables by standardizing column names, filtering to top-intensity samples per feature, and formatting for downstream analysis. Supports multiple formats (MZmine, SLAW, SIRIUS).</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -845,7 +845,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="features">features</code>
 </td>
 <td>
-Character string path to raw features file
+character(1) Path to raw features file (CSV/TSV).
 </td>
 </tr>
 <tr>
@@ -853,7 +853,7 @@ Character string path to raw features file
 <code id="output">output</code>
 </td>
 <td>
-Character string path where prepared features should be saved
+character(1) Path where prepared features should be saved.
 </td>
 </tr>
 <tr>
@@ -861,7 +861,7 @@ Character string path where prepared features should be saved
 <code id="candidates">candidates</code>
 </td>
 <td>
-Integer number of top-intensity samples to retain per feature (recommended: ≤5 to reduce data size while keeping representative samples)
+integer(1) Number of top-intensity samples to retain per feature (default: from params; recommended ≤5 to balance data size and coverage).
 </td>
 </tr>
 <tr>
@@ -869,7 +869,7 @@ Integer number of top-intensity samples to retain per feature (recommended: ≤5
 <code id="name_adduct">name_adduct</code>
 </td>
 <td>
-Character string name of the adduct column in input
+character(1) Name of the adduct column in input.
 </td>
 </tr>
 <tr>
@@ -877,7 +877,7 @@ Character string name of the adduct column in input
 <code id="name_features">name_features</code>
 </td>
 <td>
-Character string name of the feature ID column in input
+character(1) Name of the feature ID column in input.
 </td>
 </tr>
 <tr>
@@ -885,7 +885,7 @@ Character string name of the feature ID column in input
 <code id="name_rt">name_rt</code>
 </td>
 <td>
-Character string name of the retention time column in input
+character(1) Name of the retention time column in input.
 </td>
 </tr>
 <tr>
@@ -893,14 +893,14 @@ Character string name of the retention time column in input
 <code id="name_mz">name_mz</code>
 </td>
 <td>
-Character string name of the m/z column in input
+character(1) Name of the m/z column in input.
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Character string path to the prepared feature table</p>
+<p>character(1) Path to the prepared feature table (invisibly).</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
