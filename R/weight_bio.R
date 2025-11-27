@@ -480,6 +480,13 @@ weight_bio <- function(
       )
     ) |>
     tidytable::select(-tidyselect::contains(match = "score_biological_")) |>
+    # Ensure all organism columns are character type (fixes NA type mismatch)
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidyselect::starts_with("candidate_organism_"),
+        .fns = as.character
+      )
+    ) |>
     tidytable::mutate(
       candidate_structure_organism_occurrence_closest = tidytable::case_when(
         score_biological == score_biological_domain ~

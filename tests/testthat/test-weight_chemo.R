@@ -206,7 +206,152 @@ test_that("weight_chemo assigns chemical scores from taxonomy matches", {
 # Combined Scoring ----
 
 test_that("weight_chemo combines ClassyFire and NPClassifier scores", {
-  skip("Not implemented")
+  # Create test data with both ClassyFire and NPClassifier predictions
+  annot <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "KEY1",
+      "KEY2",
+      "KEY1",
+      "KEY3"
+    ),
+    score_biological = c(0.5, 0.3, 0.6, 0.4),
+    score_weighted_bio = c(0.5, 0.3, 0.6, 0.4),
+    # ClassyFire predictions
+    feature_pred_tax_cla_01kin_val = c(
+      "Organic compounds",
+      "Organic compounds",
+      "Organic compounds",
+      "Organic compounds"
+    ),
+    feature_pred_tax_cla_02sup_val = c(
+      "Alkaloids",
+      "Alkaloids",
+      "Flavonoids",
+      "Flavonoids"
+    ),
+    feature_pred_tax_cla_03cla_val = c(
+      "Indole alkaloids",
+      "Indole alkaloids",
+      "Flavones",
+      "Flavones"
+    ),
+    feature_pred_tax_cla_04dirpar_val = c(
+      "Beta-carbolines",
+      "Beta-carbolines",
+      "Hydroxyflavones",
+      "Hydroxyflavones"
+    ),
+    # NPClassifier predictions
+    feature_pred_tax_npc_01pat_val = c(
+      "Terpenoids",
+      "Terpenoids",
+      "Shikimates",
+      "Shikimates"
+    ),
+    feature_pred_tax_npc_02sup_val = c(
+      "Monoterpenoids",
+      "Monoterpenoids",
+      "Phenylpropanoids",
+      "Phenylpropanoids"
+    ),
+    feature_pred_tax_npc_03cla_val = c(
+      "Iridoids",
+      "Iridoids",
+      "Flavonoids",
+      "Flavonoids"
+    ),
+    # Candidate taxonomy (for scoring)
+    candidate_structure_tax_cla_01kin = c(
+      "Organic compounds",
+      "Inorganic",
+      "Organic compounds",
+      "Organic compounds"
+    ),
+    candidate_structure_tax_cla_02sup = c(
+      "Alkaloids",
+      "Other",
+      "Flavonoids",
+      "Terpenoids"
+    ),
+    candidate_structure_tax_cla_03cla = c(
+      "Indole alkaloids",
+      "Other",
+      "Flavones",
+      "Other"
+    ),
+    candidate_structure_tax_cla_04dirpar = c(
+      "Beta-carbolines",
+      "Other",
+      "Hydroxyflavones",
+      "Other"
+    ),
+    candidate_structure_tax_npc_01pat = c(
+      "Terpenoids",
+      "Other",
+      "Shikimates",
+      "Polyketides"
+    ),
+    candidate_structure_tax_npc_02sup = c(
+      "Monoterpenoids",
+      "Other",
+      "Phenylpropanoids",
+      "Other"
+    ),
+    candidate_structure_tax_npc_03cla = c(
+      "Iridoids",
+      "Other",
+      "Flavonoids",
+      "Other"
+    ),
+    feature_pred_tax_cla_01kin_score = NA_real_,
+    feature_pred_tax_cla_02sup_score = NA_real_,
+    feature_pred_tax_cla_03cla_score = NA_real_,
+    feature_pred_tax_cla_04dirpar_score = NA_real_,
+    feature_pred_tax_npc_01pat_score = NA_real_,
+    feature_pred_tax_npc_02sup_score = NA_real_,
+    feature_pred_tax_npc_03cla_score = NA_real_,
+    candidate_score_pseudo_initial = NA_real_
+  )
 
-  # This test would verify correct combination of multiple taxonomy sources
+  edges <- tidytable::tidytable(
+    feature_source = character(0),
+    feature_target = character(0)
+  )
+
+  res <- weight_chemo(
+    annot_table_wei_bio_clean = annot,
+    weight_spectral = 0,
+    weight_biological = 0,
+    weight_chemical = 1,
+    score_chemical_cla_kingdom = 0.1,
+    score_chemical_cla_superclass = 0.2,
+    score_chemical_cla_class = 0.3,
+    score_chemical_cla_parent = 0.4,
+    score_chemical_npc_pathway = 0.1,
+    score_chemical_npc_superclass = 0.2,
+    score_chemical_npc_class = 0.3
+  )
+
+  # Check that chemical scores were calculated
+  expect_true("score_chemical" %in% names(res))
+  expect_true(all(!is.na(res$score_chemical)))
+
+  # First candidate matches perfectly on both ClassyFire and NPClassifier
+  # ClassyFire: 0.1 AND 0.2 AND 0.3 AND 0.4
+  # NPClassifier: 0.1 AND 0.2 AND 0.3
+  # Combined: 0.4
+  expect_equal(res$score_chemical[1], 0.4)
+
+  # Second candidate matches nothing (all "Other" or "Inorganic")
+  expect_equal(res$score_chemical[2], 0)
+
+  # Third candidate matches perfectly on ClassyFire and NPClassifier
+  expect_equal(res$score_chemical[3], 0.4)
+
+  # Fourth candidate: partial matches
+  # ClassyFire: 0.1 (kingdom match only)
+  # NPClassifier: 0 (no matches)
+  # Combined: 0.1
+  expect_equal(res$score_chemical[4], 0.1)
 })

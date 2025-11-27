@@ -15,8 +15,8 @@ logger::log_trace("Contributors: ...")
 ## (see https://twitter.com/Adafede/status/1592543895094788096)
 logger::log_trace("Downloading HMDB (might be long)")
 get_file(
-  url = get_default_paths()$urls$hmdb$spectra$predicted,
-  export = get_default_paths()$data$source$libraries$spectra$is$hmdb
+  url = tima:::get_default_paths()$urls$hmdb$spectra$predicted,
+  export = tima:::get_default_paths()$data$source$libraries$spectra$is$hmdb
 )
 
 logger::log_success("Script finished in ", format(end - start))

@@ -9,8 +9,8 @@ logger::log_trace("Authors: AR")
 logger::log_trace("Contributors: ...")
 
 get_file(
-  url = get_default_paths()$urls$examples$spectra,
-  export = get_default_paths()$data$source$spectra
+  url = tima:::get_default_paths()$urls$examples$spectra,
+  export = tima:::get_default_paths()$data$source$spectra
 )
 
 end <- Sys.time()

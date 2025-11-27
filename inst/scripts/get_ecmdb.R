@@ -2,7 +2,7 @@ start <- Sys.time()
 
 library(tima)
 
-paths <- get_default_paths()
+paths <- tima:::get_default_paths()
 
 logger::log_trace(
   "This script downloads E. coli metabolome database structures."

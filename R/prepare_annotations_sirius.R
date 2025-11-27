@@ -446,5 +446,9 @@ prepare_annotations_sirius <-
     export_output(x = splits$formula, file = output_for)
     export_output(x = splits$structures, file = output_ann[[1]])
     logger::log_success("SIRIUS annotations prepared successfully")
-    invisible(output_ann[[1]])
+    invisible(c(
+      "canopus" = output_can,
+      "formula" = output_for,
+      "structural" = output_ann[[1]]
+    ))
   }

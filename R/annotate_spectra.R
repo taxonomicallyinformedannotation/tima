@@ -222,7 +222,7 @@ annotate_spectra <- function(
       df_sim$candidate_count_similarity_peaks_matched
     )
     df_final <- df_sim |>
-      tidytable::left_join(meta, by = dplyr::join_by(target_id == target_id)) |>
+      tidytable::left_join(meta, by = "target_id") |>
       tidytable::select(-target_id) |>
       tidytable::mutate(
         candidate_structure_error_mz = target_precursorMz - precursorMz,
@@ -374,12 +374,18 @@ annotate_spectra <- function(
       Spectra::applyProcessing,
       BPPARAM = BiocParallel::SerialParam()
     ) |>
-    purrr::map(function(sp) {
-      # remove entries with NULL peak data
-      keep <- !purrr::map(sp@backend@peaksData, is.null) |>
-        purrr::map_lgl(~ !any(.x))
-      sp[keep]
-    })
+    # TODO
+    purrr::map(
+      .f = function(sp) {
+        sp[
+          !sp@backend@peaksData |>
+            purrr::map(.f = is.null) |>
+            purrr::map(.f = any) |>
+            as.character() |>
+            as.logical()
+        ]
+      }
+    )
   spectral_library <- Spectra::concatenateSpectra(lib_list)
   if (length(spectral_library) == 0L) {
     logger::log_warn("No spectra left in library after cleaning")
@@ -432,9 +438,9 @@ annotate_spectra <- function(
   lib_precursors <- get_precursors(spectral_library)
   meta <- build_library_metadata(spectral_library, lib_precursors)
   df_final <- finalize_results(
-    tidytable::as_tidytable(sim_raw),
-    meta,
-    threshold
+    df_sim = tidytable::as_tidytable(sim_raw),
+    meta = meta,
+    threshold = threshold
   )
   if (nrow(df_final) == 0L) {
     logger::log_warn(
