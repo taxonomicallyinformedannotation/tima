@@ -445,15 +445,13 @@ test_that("weight_bio returns expected columns", {
 ## Performance ----
 
 test_that("weight_bio handles annotations without matching organisms", {
-  skip("Known issue: weight_bio has type mismatch bug when no organisms match")
-
   # Annotations with structures not in organism pairs
   annotations <- create_test_annotation(
     feature_ids = c("F1", "F2"),
     inchikeys = generate_fake_inchikey(2, seed = 99)
   )
 
-  # Structure-organism pairs with DIFFERENT structures
+  # Structure-organism pairs with DIFFERENT structures (no matches)
   sop_table <- tidytable::tidytable(
     structure_inchikey_connectivity_layer = generate_fake_inchikey(2, seed = 1),
     organism_name = c("Arabidopsis thaliana", "Coffea arabica"),
@@ -487,12 +485,26 @@ test_that("weight_bio handles annotations without matching organisms", {
     score_biological_variety = 1.0
   )
 
-  # Should return results (structures don't match, so bio score = 0)
+  # Should return results
   expect_true(nrow(result) > 0)
-  expect_s3_class(result, "data.frame")
 
-  # Should have score_weighted_bio column
-  expect_true("score_weighted_bio" %in% colnames(result))
+  # When structures don't match organism pairs, biological score should be 0
+  expect_true("score_biological" %in% names(result))
+  expect_true(all(
+    result$score_biological == 0 | is.na(result$score_biological)
+  ))
+
+  # Weighted score should exist and be based only on spectral component
+  expect_true("score_weighted_bio" %in% names(result))
+
+  # With weight_spectral=0.5, weight_biological=0.5, and bio_score=0:
+  # weighted = (0.5 * spectral + 0.5 * 0) / (0.5 + 0.5) = spectral / 2
+  if ("candidate_score_similarity" %in% names(result)) {
+    spectral_scores <- result$candidate_score_similarity
+    spectral_scores[is.na(spectral_scores)] <- 0
+    expected_weighted <- spectral_scores / 2
+    expect_equal(result$score_weighted_bio, expected_weighted, tolerance = 0.01)
+  }
 })
 
 # test_that(

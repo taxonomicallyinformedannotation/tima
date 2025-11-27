@@ -45,7 +45,7 @@ list(
       tar_target(
         name = paths,
         command = {
-          paths <- get_default_paths(yaml = yaml_paths)
+          paths <- tima:::get_default_paths(yaml = yaml_paths)
         },
         format = "rds"
       )
