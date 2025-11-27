@@ -31,7 +31,7 @@ write_minimal_mgf <- function(path, precursors, charge = "1+") {
   invisible(path)
 }
 
-# ---------------- Validation tests ----------------
+# Validation tests ----
 
 test_that("annotate_spectra validates parameters", {
   withr::local_dir(temp_test_dir("ann_spe_validate"))
@@ -83,7 +83,7 @@ test_that("annotate_spectra validates parameters", {
   )
 })
 
-# ---------------- Basic run & output ----------------
+# Basic run & output ----
 
 test_that("annotate_spectra produces output file and columns", {
   withr::local_dir(temp_test_dir("ann_spe_basic"))
@@ -119,7 +119,7 @@ test_that("annotate_spectra produces output file and columns", {
   ))
 })
 
-# ---------------- Threshold filtering ----------------
+# Threshold filtering ----
 
 test_that("threshold filtering removes low similarity candidates", {
   withr::local_dir(temp_test_dir("ann_spe_threshold"))
@@ -152,7 +152,7 @@ test_that("threshold filtering removes low similarity candidates", {
   expect_true(nrow(df_low) >= nrow(df_high))
 })
 
-# ---------------- Approx vs strict precursor reduction ----------------
+# Approx vs strict precursor reduction ----
 
 test_that("approx mode keeps more library spectra than strict mode", {
   withr::local_dir(temp_test_dir("ann_spe_approx"))
@@ -194,7 +194,7 @@ test_that("approx mode keeps more library spectra than strict mode", {
   expect_true(nrow(df_approx) >= nrow(df_strict) || nrow(df_approx) == 0)
 })
 
-# ---------------- Empty template behavior ----------------
+# Empty template behavior ----
 
 test_that("empty result exports template", {
   withr::local_dir(temp_test_dir("ann_spe_empty"))
@@ -223,4 +223,134 @@ test_that("empty result exports template", {
   df <- fread(out)
   expect_true(all(fake_annotations_columns() |> names() %in% names(df)))
   expect_equal(nrow(df), 1) # template has single row
+})
+
+# Polarity-based library filtering ----
+
+test_that("polarity filtering drops non-matching libraries and handles none left", {
+  withr::local_dir(temp_test_dir("ann_spe_polarity_filter"))
+  local_test_project(copy = TRUE)
+  paths <- get_default_paths()
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  # Create two libs: one pos, one neg
+  lib_pos <- file.path("data", "interim", "libraries", "spectra", "lib_pos.mgf")
+  lib_neg <- file.path("data", "interim", "libraries", "spectra", "lib_neg.mgf")
+  write_minimal_mgf(lib_pos, precursors = c(150))
+  write_minimal_mgf(lib_neg, precursors = c(150), charge = "1-")
+  # When polarity is pos, neg library path should be filtered out
+  out <- annotate_spectra(libraries = c(lib_pos, lib_neg), polarity = "pos", threshold = 0)
+  expect_true(file.exists(out))
+  # When only neg libraries provided for pos polarity, expect empty template
+  out2 <- annotate_spectra(libraries = c(lib_neg), polarity = "pos", threshold = 0)
+  df2 <- fread(out2)
+  expect_equal(nrow(df2), 1)
+})
+
+# Empty peaks in library cleaning ----
+
+test_that("library spectra with empty peaks are removed before concatenation", {
+  withr::local_dir(temp_test_dir("ann_spe_empty_peaks"))
+  local_test_project(copy = TRUE)
+  paths <- get_default_paths()
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  # Create a normal library and an 'empty' one with MSLEVEL but no peaks
+  lib_ok <- file.path("data", "interim", "libraries", "spectra", "lib_ok_pos.mgf")
+  lib_empty <- file.path("data", "interim", "libraries", "spectra", "lib_empty_pos.mgf")
+  write_minimal_mgf(lib_ok, precursors = c(200))
+  dir.create(dirname(lib_empty), recursive = TRUE, showWarnings = FALSE)
+  writeLines(c(
+    "BEGIN IONS",
+    "TITLE=EmptySpectrum",
+    "PEPMASS=300",
+    "CHARGE=1+",
+    "MSLEVEL=2",
+    "END IONS",
+    ""
+  ), lib_empty)
+  out <- annotate_spectra(libraries = c(lib_ok, lib_empty), polarity = "pos", threshold = 0)
+  expect_true(file.exists(out))
+  df <- fread(out)
+  expect_true(nrow(df) >= 1)
+})
+
+# High intensity cutoff yields no query spectra ----
+
+test_that("high qutoff removes all query peaks leading to empty template", {
+  withr::local_dir(temp_test_dir("ann_spe_high_cutoff"))
+  local_test_project(copy = TRUE)
+  paths <- get_default_paths()
+  # Place query in expected path
+  query_path <- get_params(step = "annotate_spectra")$files$spectral$raw[1]
+  dir.create(dirname(query_path), recursive = TRUE, showWarnings = FALSE)
+  write_minimal_mgf(query_path, precursors = c(250))
+  lib_path <- file.path("data", "interim", "libraries", "spectra", "lib_pos.mgf")
+  write_minimal_mgf(lib_path, precursors = c(250))
+  # Use an extremely high cutoff to drop all peaks
+  out <- annotate_spectra(input = query_path, libraries = list(pos = lib_path), polarity = "pos", qutoff = 1e9, threshold = 0)
+  df <- fread(out)
+  expect_equal(nrow(df), 1)
+})
+
+# Duplicate candidate collapse by connectivity layer ----
+
+test_that("duplicate candidates collapsed by connectivity layer are unique", {
+  withr::local_dir(temp_test_dir("ann_spe_dedupe"))
+  local_test_project(copy = TRUE)
+  paths <- get_default_paths()
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  # Build two libraries with same connectivity layer but different spectrum IDs
+  lib1 <- file.path("data", "interim", "libraries", "spectra", "lib1_pos.mgf")
+  lib2 <- file.path("data", "interim", "libraries", "spectra", "lib2_pos.mgf")
+  write_minimal_mgf(lib1, precursors = c(300))
+  # For lib2, reuse same precursor; connectivity is fixed by write_minimal_mgf
+  write_minimal_mgf(lib2, precursors = c(300))
+  out <- annotate_spectra(libraries = c(lib1, lib2), polarity = "pos", threshold = 0)
+  df <- fread(out)
+  uniq <- tidytable::distinct(df, feature_id, candidate_structure_inchikey_connectivity_layer)
+  expect_equal(nrow(uniq), nrow(df))
+})
+
+# NA metadata fallback handling ----
+
+test_that("NA fallback for smiles and inchikey connectivity is applied", {
+  withr::local_dir(temp_test_dir("ann_spe_na_fallback"))
+  local_test_project(copy = TRUE)
+  paths <- get_default_paths()
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+  # Create a library entry missing SMILES_2D and INCHIKEY_2D to trigger fallbacks
+  lib_path <- file.path("data", "interim", "libraries", "spectra", "lib_pos_missing_meta.mgf")
+  dir.create(dirname(lib_path), recursive = TRUE, showWarnings = FALSE)
+  writeLines(c(
+    "BEGIN IONS",
+    "TITLE=MetaMissing",
+    "PEPMASS=320",
+    "CHARGE=1+",
+    "NAME=Example",
+    "INCHIKEY=QQQQQQQQQQQQQQ-RRRRRRRRRR-S",
+    "SMILES=CCO",
+    "MSLEVEL=2",
+    "160 100",
+    "240 200",
+    "320 300",
+    "END IONS",
+    ""
+  ), lib_path)
+  out <- annotate_spectra(libraries = list(pos = lib_path), polarity = "pos", threshold = 0)
+  df <- fread(out)
+  expect_true("candidate_structure_smiles_no_stereo" %in% names(df))
+  expect_true("candidate_structure_inchikey_connectivity_layer" %in% names(df))
+  # Fallback should derive connectivity layer from INCHIKEY if missing 2D field
+  expect_true(all(grepl("-", df$candidate_structure_inchikey_connectivity_layer) == FALSE))
 })
