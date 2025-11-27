@@ -34,7 +34,39 @@ harmonize_spectra_polarity(
 
 \item{metad}{Character library metadata name.}
 
-\item{col_*}{Character column name mappings (see parent function params).}
+\item{col_ad}{Adduct field name}
+
+\item{col_ce}{Collision energy field name}
+
+\item{col_ci}{Compound ID field name}
+
+\item{col_em}{Exact mass field name}
+
+\item{col_in}{InChI field name}
+
+\item{col_io}{InChI without stereochemistry field name}
+
+\item{col_ik}{InChIKey field name}
+
+\item{col_il}{InChIKey connectivity layer field name}
+
+\item{col_mf}{Molecular formula field name}
+
+\item{col_na}{Compound name field name}
+
+\item{col_po}{Polarity field name}
+
+\item{col_sm}{SMILES field name}
+
+\item{col_sn}{SMILES without stereochemistry field name}
+
+\item{col_si}{Spectrum ID field name}
+
+\item{col_sp}{SPLASH field name}
+
+\item{col_sy}{Synonyms field name}
+
+\item{col_xl}{xLogP field name}
 }
 \value{
 Data frame with harmonized spectra.

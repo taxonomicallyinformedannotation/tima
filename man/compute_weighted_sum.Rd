@@ -2,19 +2,23 @@
 % Please edit documentation in R/weights_utils.R
 \name{compute_weighted_sum}
 \alias{compute_weighted_sum}
-\title{Compute normalized weighted sum}
+\title{Compute normalized weighted sum (row-wise for data frames)}
 \usage{
-compute_weighted_sum(values, weights)
+compute_weighted_sum(..., weights)
 }
 \arguments{
-\item{values}{Numeric vector of component values.}
+\item{...}{Numeric columns/vectors of component values (passed as separate arguments).}
 
-\item{weights}{Numeric vector of non-negative weights.}
+\item{weights}{Numeric vector of non-negative weights (one per component).}
 }
 \value{
-Numeric scalar/vector: sum(weights/sum(weights) * values)
+Numeric vector: row-wise weighted sum with normalized weights.
 }
 \description{
-Compute normalized weighted sum
+Compute normalized weighted sum (row-wise for data frames)
+}
+\details{
+Original formula: (w1\emph{v1 + w2}v2 + ...) / (w1 + w2 + ...)
+where w are weights and v are value columns. Weights are normalized to sum to 1.
 }
 \keyword{internal}

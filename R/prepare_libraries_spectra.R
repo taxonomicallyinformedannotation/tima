@@ -6,7 +6,23 @@
 #' @param spectra_extracted List of extracted spectra data frames.
 #' @param mode Character "pos" or "neg".
 #' @param metad Character library metadata name.
-#' @param col_* Character column name mappings (see parent function params).
+#' @param col_ad Adduct field name
+#' @param col_ce Collision energy field name
+#' @param col_ci Compound ID field name
+#' @param col_em Exact mass field name
+#' @param col_in InChI field name
+#' @param col_io InChI without stereochemistry field name
+#' @param col_ik InChIKey field name
+#' @param col_il InChIKey connectivity layer field name
+#' @param col_mf Molecular formula field name
+#' @param col_na Compound name field name
+#' @param col_po Polarity field name
+#' @param col_sm SMILES field name
+#' @param col_sn SMILES without stereochemistry field name
+#' @param col_si Spectrum ID field name
+#' @param col_sp SPLASH field name
+#' @param col_sy Synonyms field name
+#' @param col_xl xLogP field name
 #'
 #' @return Data frame with harmonized spectra.
 #' @keywords internal
