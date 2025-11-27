@@ -242,7 +242,11 @@ prepare_libraries_spectra <-
         parameters = get_params(step = "prepare_libraries_spectra"),
         step = "prepare_libraries_spectra"
       )
-      return(invisible(c(output_pos, output_neg, output_sop)))
+      return(invisible(c(
+        "pos" = output_pos,
+        "neg" = output_neg,
+        "sop" = output_sop
+      )))
     }
     # Validate input ----
     if (is.null(input)) {
