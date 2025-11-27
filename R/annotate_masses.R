@@ -188,7 +188,10 @@ annotate_masses <-
       export_output(x = empty_annotations, file = output_annotations)
       export_output(x = empty_edges, file = output_edges)
 
-      return(c(annotations = output_annotations, edges = output_edges))
+      return(c(
+        "annotations" = output_annotations[[1]],
+        "edges" = output_edges[[1]]
+      ))
     }
 
     logger::log_info("Processing {n_features} features for annotation")

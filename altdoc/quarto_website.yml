@@ -141,10 +141,14 @@ website:
             contents:
               - text: process_smiles
                 file: man/process_smiles.qmd
-          - text: weight_annotations
-            file: man/weight_annotations.qmd
-          - text: run_app
-            file: man/run_app.qmd
+          - section: Run
+            contents:
+              - text: run_app
+                file: man/run_app.qmd
+          - section: Weight
+            contents:
+              - text: weight_annotations
+                file: man/weight_annotations.qmd
           - text: tima_full
             file: man/tima_full.qmd
 
