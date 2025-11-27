@@ -5,7 +5,7 @@
 #'     and formatting for TIMA annotation workflows. Handles human metabolite
 #'     data with structures and biofluid/tissue associations.
 #'
-#' @include fake_sop_columns.R
+#' @include columns_utils.R
 #' @include get_params.R
 #' @include round_reals.R
 #' @include select_sop_columns.R

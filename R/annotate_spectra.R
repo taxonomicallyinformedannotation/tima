@@ -32,6 +32,7 @@
 #'   libraries. Repeated metadata extraction uses a single vectorized helper.
 #'
 #' @include adducts_utils.R
+#' @include columns_utils.R
 #' @include validations_utils.R
 #'
 #' @param input Character vector or list of query spectral file paths (.mgf).

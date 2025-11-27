@@ -4,6 +4,7 @@
 #'     by standardizing column names, integrating structure metadata, and
 #'     formatting for downstream TIMA annotation workflows.
 #'
+#' @include columns_utils.R
 #' @include get_params.R
 #' @include select_annotations_columns.R
 #'

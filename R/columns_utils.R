@@ -136,3 +136,215 @@ columns_model <- function() {
     score_columns = score_columns
   ))
 }
+
+#' @title Collapse and clean grouped data
+#'
+#' @description Collapses grouped dataframe by combining unique values per group.
+#'     Removes NA values, trims whitespace, and converts empty strings to NA.
+#'     Useful for aggregating annotations or metadata.
+#'     Internal helper for cleaning and aggregation functions.
+#'
+#' @include validations_utils.R
+#'
+#' @param grouped_df Grouped data frame to collapse
+#' @param cols Character vector of column names to collapse.
+#'     If NULL (default), applies to all columns.
+#' @param separator Character string separator for collapsed values
+#'     (default: " $ ")
+#'
+#' @return Data frame with unique values collapsed per group
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' # Internal use only
+#' library(tidytable)
+#' df <- data.frame(
+#'   group = c("A", "A", "B", "B"),
+#'   value = c("x", "y", "x", "x")
+#' )
+#' grouped <- df |> group_by(group)
+#' clean_collapse(grouped, cols = "value")
+#' }
+clean_collapse <- function(grouped_df, cols = NULL, separator = " $ ") {
+  # Input Validation ----
+  validate_dataframe(grouped_df, param_name = "grouped_df")
+  validate_character(
+    separator,
+    param_name = "separator",
+    allow_empty = FALSE
+  )
+
+  # Determine Columns to Process ----
+  cols <- determine_columns_to_process(grouped_df, cols)
+
+  # Collapse and Clean ----
+  collapse_fn <- create_collapse_function(separator)
+
+  grouped_df |>
+    tidytable::reframe(tidytable::across(
+      .cols = tidyselect::all_of(x = cols),
+      .fns = collapse_fn
+    )) |>
+    tidytable::ungroup() |>
+    convert_lists_to_characters() |>
+    clean_character_columns()
+}
+
+# Helper Functions ----
+
+#' Determine which columns to process
+#' @keywords internal
+determine_columns_to_process <- function(df, cols) {
+  if (is.null(cols)) {
+    return(names(df))
+  }
+
+  cols <- as.character(cols)
+
+  # Validate columns exist
+  missing_cols <- setdiff(cols, names(df))
+  if (length(missing_cols) > 0L) {
+    stop(
+      "Column(s) not found: ",
+      paste(missing_cols, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  cols
+}
+
+#' Create collapse function with separator
+#' @keywords internal
+create_collapse_function <- function(separator) {
+  function(x) {
+    list(paste(unique(x[!is.na(x)]), collapse = separator))
+  }
+}
+
+#' Convert list columns to character
+#' @keywords internal
+convert_lists_to_characters <- function(df) {
+  df |>
+    tidytable::mutate(tidytable::across(
+      .cols = tidyselect::where(fn = is.list),
+      .fns = as.character
+    ))
+}
+
+#' Clean character columns (trim and convert empty to NA)
+#' @keywords internal
+clean_character_columns <- function(df) {
+  df |>
+    tidytable::mutate(tidytable::across(
+      .cols = tidyselect::where(fn = is.character),
+      .fns = \(x) tidytable::na_if(x = trimws(x), y = "")
+    ))
+}
+
+#' @title Create template annotation columns
+#'
+#' @description Creates a template data frame with all expected annotation
+#'     columns initialized to NA. Used as a fallback when no annotations are
+#'     available or to ensure consistent column structure.
+#'
+#' @return Data frame with one row and columns for all annotation fields,
+#'     with all values set to NA. Columns include feature IDs, structure
+#'     information, scores, and taxonomic classifications.
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' # Create empty annotation template
+#' template <- fake_annotations_columns()
+#'
+#' # Use as fallback when no annotations found
+#' if (nrow(annotations) == 0) {
+#'   annotations <- fake_annotations_columns()
+#' }
+#' }
+fake_annotations_columns <- function() {
+  data.frame(
+    feature_id = NA_character_,
+    candidate_structure_error_mz = NA_real_,
+    candidate_structure_error_rt = NA_real_,
+    candidate_structure_name = NA_character_,
+    candidate_structure_inchikey_connectivity_layer = NA_character_,
+    candidate_structure_smiles_no_stereo = NA_character_,
+    candidate_structure_molecular_formula = NA_character_,
+    candidate_structure_exact_mass = NA_real_,
+    candidate_structure_xlogp = NA_real_,
+    candidate_adduct = NA_character_,
+    candidate_library = NA_character_,
+    candidate_score_similarity = NA_real_,
+    candidate_count_similarity_peaks_matched = NA_integer_,
+    candidate_structure_tax_npc_01pat = NA_character_,
+    candidate_structure_tax_npc_02sup = NA_character_,
+    candidate_structure_tax_npc_03cla = NA_character_,
+    candidate_structure_tax_cla_chemontid = NA_character_,
+    candidate_structure_tax_cla_01kin = NA_character_,
+    candidate_structure_tax_cla_02sup = NA_character_,
+    candidate_structure_tax_cla_03cla = NA_character_,
+    candidate_structure_tax_cla_04dirpar = NA_character_,
+    stringsAsFactors = FALSE
+  )
+}
+
+#' @title Create template SOP columns
+#'
+#' @description Creates an empty structure-organism pair (SOP) dataframe
+#'     template with all standard column names and NA values. Used as a
+#'     placeholder when actual SOP data is unavailable.
+#'
+#' @return Single-row data frame with standard SOP columns filled with
+#'     NA values
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' # Create empty SOP template
+#' template <- fake_sop_columns()
+#'
+#' # Use as fallback when no SOP data available
+#' if (nrow(sop_data) == 0) {
+#'   sop_data <- fake_sop_columns()
+#' }
+#' }
+fake_sop_columns <- function() {
+  # Create template with all standard SOP columns as character type
+  tidytable::tidytable(
+    structure_name = NA_character_,
+    structure_inchikey = NA_character_,
+    structure_smiles = NA_character_,
+    structure_inchikey_connectivity_layer = NA_character_,
+    structure_smiles_no_stereo = NA_character_,
+    structure_molecular_formula = NA_character_,
+    structure_exact_mass = NA_real_,
+    structure_xlogp = NA_real_,
+    structure_tax_npc_01pat = NA_character_,
+    structure_tax_npc_02sup = NA_character_,
+    structure_tax_npc_03cla = NA_character_,
+    structure_tax_cla_chemontid = NA_character_,
+    structure_tax_cla_01kin = NA_character_,
+    structure_tax_cla_02sup = NA_character_,
+    structure_tax_cla_03cla = NA_character_,
+    structure_tax_cla_04dirpar = NA_character_,
+    organism_name = NA_character_,
+    organism_taxonomy_ottid = NA_character_,
+    organism_taxonomy_01domain = NA_character_,
+    organism_taxonomy_02kingdom = NA_character_,
+    organism_taxonomy_03phylum = NA_character_,
+    organism_taxonomy_04class = NA_character_,
+    organism_taxonomy_05order = NA_character_,
+    organism_taxonomy_06family = NA_character_,
+    organism_taxonomy_07tribe = NA_character_,
+    organism_taxonomy_08genus = NA_character_,
+    organism_taxonomy_09species = NA_character_,
+    organism_taxonomy_10varietas = NA_character_,
+    reference_doi = NA_character_
+  )
+}
