@@ -95,6 +95,7 @@ create_yaml_null_handler <- function() {
 #' @param org_tax Character. Scientific name for single-taxon experiments
 #' @param hig_con Logical. Filter for high confidence candidates only
 #' @param summarize Logical. Summarize all candidates per feature to single row
+#' @param cache_dir Character. Cache directory path (for testing; uses go_to_cache() if NULL)
 #'
 #' @details
 #' This function:
@@ -134,7 +135,8 @@ change_params_small <- function(
   ms_pol = NULL,
   org_tax = NULL,
   hig_con = NULL,
-  summarize = NULL
+  summarize = NULL,
+  cache_dir = NULL
 ) {
   # Input Validation ----
   validate_params_small_inputs(ms_pol = ms_pol)
@@ -142,7 +144,16 @@ change_params_small <- function(
   logger::log_info("Updating workflow parameters")
 
   # Setup Environment ----
-  go_to_cache()
+  # Use provided cache_dir or go to cache directory
+  if (is.null(cache_dir)) {
+    go_to_cache()
+    cache_dir <- getwd()
+  } else {
+    # Set working directory to cache_dir for the duration of this function
+    old_wd <- getwd()
+    on.exit(setwd(old_wd), add = TRUE)
+    setwd(cache_dir)
+  }
 
   paths <- get_default_paths()
   paths_data_source <- paths$data$source$path

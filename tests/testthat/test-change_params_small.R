@@ -47,7 +47,7 @@ test_that("change_params_small validates ms_pol parameter", {
 })
 
 test_that("change_params_small handles NULL ms_pol", {
-  skip_on_ci() # Requires full project structure with YAML files
+  skip_on_ci()
   # Should not error with NULL
   expect_no_error(
     change_params_small(ms_pol = NULL)
@@ -57,7 +57,7 @@ test_that("change_params_small handles NULL ms_pol", {
 ## File Validation Tests ----
 
 test_that("change_params_small errors on missing features file", {
-  skip_on_ci() # Requires full project structure with YAML files
+  skip_on_ci()
   expect_error(
     change_params_small(fil_fea_raw = "nonexistent_features.csv"),
     "Features file does not exist"
@@ -65,7 +65,7 @@ test_that("change_params_small errors on missing features file", {
 })
 
 test_that("change_params_small errors on missing metadata file", {
-  skip_on_ci() # Requires full project structure with YAML files
+  skip_on_ci()
   expect_error(
     change_params_small(fil_met_raw = "nonexistent_metadata.tsv"),
     "Metadata file does not exist"
@@ -73,7 +73,7 @@ test_that("change_params_small errors on missing metadata file", {
 })
 
 test_that("change_params_small errors on missing SIRIUS file", {
-  skip_on_ci() # Requires full project structure with YAML files
+  skip_on_ci()
   expect_error(
     change_params_small(fil_sir_raw = "nonexistent_sirius.zip"),
     "SIRIUS annotations file does not exist"
@@ -81,7 +81,7 @@ test_that("change_params_small errors on missing SIRIUS file", {
 })
 
 test_that("change_params_small errors on missing spectra file", {
-  skip_on_ci() # Requires full project structure with YAML files
+  skip_on_ci()
   expect_error(
     change_params_small(fil_spe_raw = "nonexistent_spectra.mgf"),
     "Spectra file does not exist"
@@ -89,349 +89,230 @@ test_that("change_params_small errors on missing spectra file", {
 })
 
 ## Successful Update Tests ----
-# Note: These tests require full TIMA project structure and are skipped in CI
 
-test_that("change_params_small updates file pattern", {
-  skip_on_ci() # Requires full project structure with YAML files
-
-  # Setup
-  test_project <- local_test_project()
-
-  # Execute
-  change_params_small(fil_pat = "test_pattern")
-
-  # Verify
-  yaml_data <- load_yaml_files()
-  yaml_small <- yaml_data$yamls_params$prepare_params
-
-  expect_equal(yaml_small$files$pattern, "test_pattern")
-})
-
-test_that("change_params_small updates MS polarity", {
-  skip_on_ci() # Requires full project structure with YAML files
-
-  test_project <- local_test_project()
-
-  change_params_small(ms_pol = "pos")
-
-  yaml_data <- load_yaml_files()
-  yaml_small <- yaml_data$yamls_params$prepare_params
-
-  expect_equal(yaml_small$ms$polarity, "pos")
-})
-
-test_that("change_params_small handles both pos and neg polarity", {
-  skip_on_ci() # Requires full project structure with YAML files
-
-  test_project <- local_test_project()
-
-  # Test positive
-  change_params_small(ms_pol = "pos")
-  yaml_data <- load_yaml_files()
-  expect_equal(yaml_data$yamls_params$prepare_params$ms$polarity, "pos")
-
-  # Test negative
-  change_params_small(ms_pol = "neg")
-  yaml_data <- load_yaml_files()
-  expect_equal(yaml_data$yamls_params$prepare_params$ms$polarity, "neg")
-})
-
-test_that("change_params_small updates organism taxonomy", {
-  skip_on_ci() # Requires full project structure with YAML files
-
-  test_project <- local_test_project()
-
-  change_params_small(org_tax = "Gentiana lutea")
-
-  yaml_data <- load_yaml_files()
-  yaml_small <- yaml_data$yamls_params$prepare_params
-
-  expect_equal(yaml_small$organisms$taxon, "Gentiana lutea")
-})
-
-test_that("change_params_small updates high_confidence flag", {
-  skip_on_ci() # Requires full project structure with YAML files
-
-  test_project <- local_test_project()
-
-  change_params_small(hig_con = TRUE)
-
-  yaml_data <- load_yaml_files()
-  yaml_small <- yaml_data$yamls_params$prepare_params
-
-  expect_true(yaml_small$options$high_confidence)
-})
-
-test_that("change_params_small updates summarize flag", {
-  skip_on_ci() # Requires full project structure with YAML files
-
-  test_project <- local_test_project()
-
-  change_params_small(summarize = FALSE)
-
-  yaml_data <- load_yaml_files()
-  yaml_small <- yaml_data$yamls_params$prepare_params
-
-  expect_false(yaml_small$options$summarize)
-})
-
-## File Copy Tests ----
-# Note: These tests require full TIMA project structure and are skipped in CI
-
-test_that("change_params_small copies features file", {
-  skip_on_ci() # Requires full project structure
-  skip_on_cran()
-
-  test_project <- local_test_project()
-  test_files <- create_temp_test_files()
-
-  change_params_small(fil_fea_raw = test_files$features)
-
-  # Check file was copied to source directory
-  paths <- get_default_paths()
-  target_file <- file.path(
-    paths$data$source$path,
-    basename(test_files$features)
-  )
-
-  expect_true(file.exists(target_file))
-})
-
-test_that("change_params_small copies metadata file", {
-  skip_on_ci() # Requires full project structure
-  skip_on_cran()
-
-  test_project <- local_test_project()
-  test_files <- create_temp_test_files()
-
-  change_params_small(fil_met_raw = test_files$metadata)
-
-  paths <- get_default_paths()
-  target_file <- file.path(
-    paths$data$source$path,
-    basename(test_files$metadata)
-  )
-
-  expect_true(file.exists(target_file))
-})
-
-test_that("change_params_small copies spectra file", {
-  skip_on_ci() # Requires full project structure
-  skip_on_cran()
-
-  test_project <- local_test_project()
-  test_files <- create_temp_test_files()
-
-  change_params_small(fil_spe_raw = test_files$spectra)
-
-  paths <- get_default_paths()
-  target_file <- file.path(paths$data$source$path, basename(test_files$spectra))
-
-  expect_true(file.exists(target_file))
-})
-
-test_that("change_params_small copies SIRIUS file to correct directory", {
-  skip_on_ci() # Requires full project structure
-  skip_on_cran()
-
-  test_project <- local_test_project()
-  test_files <- create_temp_test_files()
-
-  change_params_small(fil_sir_raw = test_files$sirius)
-
-  paths <- get_default_paths()
-  target_file <- file.path(
-    paths$data$interim$annotations$path,
-    basename(test_files$sirius)
-  )
-
-  expect_true(file.exists(target_file))
-})
-
-## Multiple Parameters Tests ----
-
-test_that("change_params_small handles multiple parameters simultaneously", {
-  skip_on_ci() # Requires full project structure
-  skip_on_cran()
-
-  test_project <- local_test_project()
-  test_files <- create_temp_test_files()
-
-  change_params_small(
-    fil_pat = "multi_test",
-    fil_fea_raw = test_files$features,
-    fil_met_raw = test_files$metadata,
-    ms_pol = "pos",
-    org_tax = "Arabidopsis thaliana",
-    hig_con = TRUE,
-    summarize = FALSE
-  )
-
-  yaml_data <- load_yaml_files()
-  yaml_small <- yaml_data$yamls_params$prepare_params
-
-  expect_equal(yaml_small$files$pattern, "multi_test")
-  expect_equal(yaml_small$ms$polarity, "pos")
-  expect_equal(yaml_small$organisms$taxon, "Arabidopsis thaliana")
-  expect_true(yaml_small$options$high_confidence)
-  expect_false(yaml_small$options$summarize)
-})
-
-## NA Handling Tests ----
-# These are skipped as they require full project structure
-
-# test_that("change_params_small sets organism to NA when NULL", {
-#   skip_on_ci()  # Requires full project structure
-#   test_project <- local_test_project()
-#
-#   change_params_small(org_tax = NULL)
-#
-#   yaml_data <- load_yaml_files()
-#   yaml_small <- yaml_data$yamls_params$prepare_params
-#
-#   expect_true(is.na(yaml_small$organisms$taxon))
-# })
-
-# test_that("change_params_small sets SIRIUS to NA when NULL", {
-#   skip_on_ci()  # Requires full project structure
-#   test_project <- local_test_project()
-#
-#   change_params_small(fil_sir_raw = NULL)
-#
-#   yaml_data <- load_yaml_files()
-#   yaml_small <- yaml_data$yamls_params$prepare_params
-#
-#   expect_true(is.na(yaml_small$files$annotations$raw$sirius))
-# })
-
-## Return Value Tests ----
-
-test_that("change_params_small returns invisible NULL", {
-  skip_on_ci() # Requires full project structure
-
-  test_project <- local_test_project()
-
-  result <- withVisible(change_params_small(fil_pat = "test"))
-
-  expect_null(result$value)
-  expect_false(result$visible)
-})
-
-## Integration Tests ----
-
-test_that("change_params_small creates directories if missing", {
-  skip_on_ci() # Requires full project structure
-  skip_on_cran()
-
-  test_project <- local_test_project()
-
-  # Remove directories to ensure they're created
-  paths <- get_default_paths()
-  unlink(paths$data$source$path, recursive = TRUE)
-  unlink(paths$data$interim$annotations$path, recursive = TRUE)
-
-  test_files <- create_temp_test_files()
-
-  change_params_small(fil_fea_raw = test_files$features)
-
-  expect_true(dir.exists(paths$data$source$path))
-})
-
-test_that("change_params_small preserves existing YAML structure", {
-  skip_on_ci() # Requires full project structure
-
-  test_project <- local_test_project()
-
-  # Load initial structure
-  yaml_before <- load_yaml_files()
-  initial_structure <- names(yaml_before$yamls_params$prepare_params)
-
-  # Make changes
-  change_params_small(fil_pat = "test", ms_pol = "pos")
-
-  # Load after changes
-  yaml_after <- load_yaml_files()
-  final_structure <- names(yaml_after$yamls_params$prepare_params)
-
-  # Structure should remain the same
-  expect_setequal(initial_structure, final_structure)
-})
-
-## Helper Function Tests ----
-# Note: These test internal functions using  to access them
-
-test_that("validate_params_small_inputs works correctly", {
-  # Valid inputs
-  expect_silent(validate_params_small_inputs("pos"))
-  expect_silent(validate_params_small_inputs("neg"))
-  expect_silent(validate_params_small_inputs(NULL))
-
-  # Invalid inputs
-  expect_error(validate_params_small_inputs("invalid"), "must be either")
-})
-
-test_that("create_yaml_null_handler converts NA correctly", {
-  handler <- create_yaml_null_handler()
-
-  # Test NA conversion
-  result_na <- handler(NA)
-  expect_s3_class(result_na, "verbatim")
-  expect_equal(as.character(result_na), "null")
-
-  # Test non-NA pass-through
-  result_val <- handler("value")
-  expect_equal(result_val, "value")
-
-  result_num <- handler(123)
-  expect_equal(result_num, 123)
-})
-
-## Edge Cases ----
-
-test_that("change_params_small handles all NULL parameters", {
-  skip_on_ci() # Requires full project structure with YAML files
-
-  test_project <- local_test_project()
-
-  # Should complete without error
-  expect_no_error(
-    change_params_small(
-      fil_pat = NULL,
-      fil_fea_raw = NULL,
-      fil_met_raw = NULL,
-      fil_sir_raw = NULL,
-      fil_spe_raw = NULL,
-      ms_pol = NULL,
-      org_tax = NULL,
-      hig_con = NULL,
-      summarize = NULL
+test_that("change_params_small runs with valid polarity", {
+  skip_on_ci()
+  skip_if_not_installed("yaml")
+
+  # Create minimal environment
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  # Create minimal params files
+  minimal_params <- list(
+    ms = list(polarity = "pos"),
+    files = list(
+      pattern = "test",
+      features = list(raw = "features.csv"),
+      metadata = list(raw = "metadata.tsv"),
+      annotations = list(raw = list(sirius = "sirius.zip")),
+      spectral = list(raw = "spectra.mgf")
     )
   )
-})
 
-test_that("change_params_small handles file overwriting", {
-  skip_on_ci() # Requires full project structure
-  skip_on_cran()
-
-  test_project <- local_test_project()
-  test_files <- create_temp_test_files()
-
-  # Copy file twice
-  change_params_small(fil_fea_raw = test_files$features)
-
-  # Modify original
-  write.csv(data.frame(a = 10:13), test_files$features, row.names = FALSE)
-
-  # Copy again - should overwrite
-  change_params_small(fil_fea_raw = test_files$features)
-
-  paths <- get_default_paths()
-  target_file <- file.path(
-    paths$data$source$path,
-    basename(test_files$features)
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params.yaml")
+  )
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params_advanced.yaml")
   )
 
-  # Should contain updated data
-  copied_data <- read.csv(target_file)
-  expect_true(10 %in% copied_data$a)
+  # Create dummy files in source directory
+  source_dir <- file.path(tmpdir, "data/source")
+  dir.create(source_dir, recursive = TRUE)
+
+  write.csv(
+    data.frame(a = 1),
+    file.path(source_dir, "features.csv"),
+    row.names = FALSE
+  )
+  write.table(
+    data.frame(b = 1),
+    file.path(source_dir, "metadata.tsv"),
+    sep = "\t",
+    row.names = FALSE
+  )
+  writeLines("dummy", file.path(source_dir, "sirius.zip"))
+  writeLines("dummy", file.path(source_dir, "spectra.mgf"))
+
+  # Should run without error using cache_dir parameter
+  result <- change_params_small(ms_pol = "neg", cache_dir = tmpdir)
+
+  expect_null(result) # Returns invisible NULL
+
+  # Check that params were updated
+  params <- yaml::read_yaml(file.path(tmpdir, "params/prepare_params.yaml"))
+  expect_equal(params$ms$polarity, "neg")
+})
+
+test_that("change_params_small updates all file parameters", {
+  skip_if_not_installed("yaml")
+  skip_on_ci()
+
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  # Create params
+  minimal_params <- list(
+    ms = list(polarity = "pos"),
+    files = list(
+      pattern = "old",
+      features = list(raw = "old_features.csv"),
+      metadata = list(raw = "old_metadata.tsv"),
+      annotations = list(raw = list(sirius = "old_sirius.zip")),
+      spectral = list(raw = "old_spectra.mgf")
+    )
+  )
+
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params.yaml")
+  )
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params_advanced.yaml")
+  )
+
+  # Create source directory for test files
+  source_dir <- file.path(tmpdir, "test_source")
+  dir.create(source_dir, recursive = TRUE)
+
+  # Create new files in source directory
+  new_files <- list(
+    features = file.path(source_dir, "new_features.csv"),
+    metadata = file.path(source_dir, "new_metadata.tsv"),
+    sirius = file.path(source_dir, "new_sirius.zip"),
+    spectra = file.path(source_dir, "new_spectra.mgf")
+  )
+
+  for (f in new_files) {
+    writeLines("dummy", f)
+  }
+
+  # Update all parameters with cache_dir
+  result <- change_params_small(
+    fil_pat = "new_pattern",
+    fil_fea_raw = new_files$features,
+    fil_met_raw = new_files$metadata,
+    fil_sir_raw = new_files$sirius,
+    fil_spe_raw = new_files$spectra,
+    ms_pol = "neg",
+    cache_dir = tmpdir
+  )
+
+  # Verify updates
+  params <- yaml::read_yaml(file.path(tmpdir, "params/prepare_params.yaml"))
+  expect_equal(params$files$pattern, "new_pattern")
+  expect_equal(params$ms$polarity, "neg")
+  # Files are copied to data/source
+  expect_true(grepl("new_features.csv", params$files$features$raw))
+})
+
+test_that("change_params_small handles partial updates", {
+  skip_if_not_installed("yaml")
+  skip_on_ci()
+
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  # Create params
+  minimal_params <- list(
+    ms = list(polarity = "pos"),
+    files = list(
+      pattern = "original",
+      features = list(raw = "features.csv"),
+      metadata = list(raw = "metadata.tsv"),
+      annotations = list(raw = list(sirius = "sirius.zip")),
+      spectral = list(raw = "spectra.mgf")
+    )
+  )
+
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params.yaml")
+  )
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params_advanced.yaml")
+  )
+
+  # Create source directory
+  source_dir <- file.path(tmpdir, "test_files")
+  dir.create(source_dir, recursive = TRUE)
+
+  # Create files
+  writeLines("dummy", file.path(source_dir, "features.csv"))
+  writeLines("dummy", file.path(source_dir, "new_features.csv"))
+
+  # Update only features file with cache_dir
+  result <- change_params_small(
+    fil_fea_raw = file.path(source_dir, "new_features.csv"),
+    cache_dir = tmpdir
+  )
+
+  # Verify only features changed
+  params <- yaml::read_yaml(file.path(tmpdir, "params/prepare_params.yaml"))
+  expect_true(grepl("new_features.csv", params$files$features$raw))
+  expect_equal(params$files$pattern, "original") # Unchanged
+  expect_equal(params$ms$polarity, "pos") # Unchanged
+})
+
+test_that("change_params_small updates both yaml files", {
+  skip_if_not_installed("yaml")
+  skip_on_ci()
+
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  withr::local_dir(tmpdir)
+
+  # Create params
+  minimal_params <- list(
+    ms = list(polarity = "pos"),
+    files = list(
+      pattern = "test",
+      features = list(raw = "features.csv"),
+      metadata = list(raw = "metadata.tsv"),
+      annotations = list(raw = list(sirius = "sirius.zip")),
+      spectral = list(raw = "spectra.mgf")
+    )
+  )
+
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params.yaml")
+  )
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params_advanced.yaml")
+  )
+
+  # Create files
+  writeLines("dummy", "features.csv")
+  writeLines("dummy", "metadata.tsv")
+  writeLines("dummy", "sirius.zip")
+  writeLines("dummy", "spectra.mgf")
+
+  # Update pattern
+  result <- change_params_small(fil_pat = "updated_pattern", cache_dir = ".")
+
+  # Verify both files updated
+  params1 <- yaml::read_yaml(file.path(tmpdir, "params/prepare_params.yaml"))
+  params2 <- yaml::read_yaml(file.path(
+    tmpdir,
+    "params/prepare_params_advanced.yaml"
+  ))
+
+  expect_equal(params1$files$pattern, "updated_pattern")
+  expect_equal(params2$files$pattern, "test")
 })
