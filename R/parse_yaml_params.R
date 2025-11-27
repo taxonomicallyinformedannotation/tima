@@ -11,7 +11,7 @@
 #'
 #' @return List containing the parameters specified in the YAML files
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

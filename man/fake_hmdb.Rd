@@ -22,3 +22,4 @@ during testing or when external resources are unavailable.
 fake_hmdb(export = "data/source/hmdb.sdf.zip")
 }
 }
+\keyword{internal}

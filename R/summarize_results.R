@@ -18,7 +18,7 @@
 #'
 #' @return Data frame containing summarized annotation results
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

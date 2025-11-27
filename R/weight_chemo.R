@@ -4,6 +4,7 @@
 #'     chemical consistency by comparing chemical taxonomy (ClassyFire,
 #'     NPClassifier) across molecular network neighbors. Higher chemical
 #'     consistency within network components results in higher chemical scores.
+#'     Internal helper for weight_annotations().
 #'
 #' @details The weights are automatically normalized by dividing by their sum,
 #'     so they do NOT need to sum to 1. For example, weights of (1, 1, 1)
@@ -26,17 +27,16 @@
 #' @return Data frame with chemically weighted annotations including chemical
 #'     consistency scores and final weighted scores
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
-#' # Weights are automatically normalized - these are equivalent:
-#' # (1, 1, 1) gives same result as (0.33, 0.33, 0.34)
+#' # Internal use only - called by weight_annotations()
 #' weighted <- weight_chemo(
 #'   annot_table_wei_bio_clean = bio_weighted,
-#'   weight_spectral = 1,      # Will be normalized to ~0.33
-#'   weight_biological = 1,    # Will be normalized to ~0.33
-#'   weight_chemical = 1,      # Will be normalized to ~0.33
+#'   weight_spectral = 1,
+#'   weight_biological = 1,
+#'   weight_chemical = 1,
 #'   score_chemical_cla_kingdom = 0.1,
 #'   score_chemical_cla_superclass = 0.2,
 #'   score_chemical_cla_class = 0.3,

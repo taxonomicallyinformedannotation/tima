@@ -37,3 +37,4 @@ score_cols <- model$score_columns
 selected <- df |> select(any_of(model$candidates_structures_columns))
 }
 }
+\keyword{internal}

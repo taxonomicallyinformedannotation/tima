@@ -13,4 +13,4 @@ DEFAULT_HC_MAX_RT_ERROR_MIN
 \description{
 Default maximum allowed retention time error (minutes) for high-confidence filter
 }
-\keyword{datasets}
+\keyword{internal}

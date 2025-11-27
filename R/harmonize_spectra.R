@@ -29,7 +29,7 @@
 #'
 #' @return Data frame with harmonized column names and standardized fields
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

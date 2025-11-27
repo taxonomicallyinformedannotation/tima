@@ -15,4 +15,4 @@ WEIGHT_SUM_TOLERANCE
 Tolerance for floating point weight sum comparisons
 Used when validating that weights sum to 1.0
 }
-\keyword{datasets}
+\keyword{internal}

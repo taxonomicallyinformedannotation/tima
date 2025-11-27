@@ -20,7 +20,7 @@
 #'
 #' @return Character string with ID replaced
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

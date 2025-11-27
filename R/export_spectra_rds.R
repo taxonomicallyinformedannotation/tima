@@ -11,7 +11,7 @@
 #'
 #' @return NULL (invisibly). Saves spectra to file as a side effect.
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

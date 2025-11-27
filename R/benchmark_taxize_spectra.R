@@ -17,7 +17,7 @@
 #'
 #' @return Path to the taxed benchmark file
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

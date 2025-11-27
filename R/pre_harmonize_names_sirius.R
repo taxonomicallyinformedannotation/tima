@@ -10,6 +10,8 @@
 #' @return Character string with everything from and including the first
 #'     forward slash (/) removed, leaving only the base column name
 #'
+#' @keywords internal
+#'
 #' @examples
 #' \dontrun{
 #' pre_harmonize_names_sirius("column_name/suffix") # Returns "column_name"

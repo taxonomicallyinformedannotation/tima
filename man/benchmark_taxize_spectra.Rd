@@ -39,3 +39,4 @@ taxed_file <- benchmark_taxize_spectra(
 )
 }
 }
+\keyword{internal}

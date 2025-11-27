@@ -8,7 +8,7 @@
 #'
 #' @return Character string path to the created fake file
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

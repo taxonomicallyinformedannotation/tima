@@ -13,4 +13,4 @@ DEFAULT_HC_SCORE_SIRIUS_MIN
 \description{
 Default minimum SIRIUS confidence score threshold for high-confidence filter
 }
-\keyword{datasets}
+\keyword{internal}

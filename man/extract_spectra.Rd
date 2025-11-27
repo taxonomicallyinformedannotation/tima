@@ -26,6 +26,7 @@ spectra_df <- extract_spectra(spectra_object)
 
 # Access metadata and peaks
 head(spectra_df)
-peaks <- spectra_df$mz[[1]]  # First spectrum peaks
+peaks <- spectra_df$mz[[1]] # First spectrum peaks
 }
 }
+\keyword{internal}

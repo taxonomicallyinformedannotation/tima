@@ -39,3 +39,4 @@ structures <- result$table_structural
 organisms <- result$table_organisms
 }
 }
+\keyword{internal}

@@ -59,6 +59,7 @@ Weights MS annotations according to their biological source by
 comparing the taxonomic hierarchy of candidate structures' reported
 organisms with the sample's organism taxonomy. Higher taxonomic
 similarity results in higher biological scores.
+Internal helper for weight_annotations().
 }
 \details{
 The weights are automatically normalized by dividing by their sum,
@@ -67,8 +68,7 @@ the same result as (0.5, 0.5).
 }
 \examples{
 \dontrun{
-# Weights are automatically normalized - these are equivalent:
-# (1, 1) gives same result as (0.5, 0.5)
+# Internal use only - called by weight_annotations()
 weighted <- weight_bio(
   annotation_table_taxed = annotations,
   structure_organism_pairs_table = sop_table,
@@ -87,3 +87,4 @@ weighted <- weight_bio(
 )
 }
 }
+\keyword{internal}

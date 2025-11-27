@@ -10,7 +10,7 @@
 #'
 #' @return The input annotation table (unchanged), for pipeline compatibility
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

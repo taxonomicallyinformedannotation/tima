@@ -13,4 +13,4 @@ DEFAULT_CANDIDATES_NEIGHBORS
 \description{
 Default number of neighboring candidates to retain during network annotation
 }
-\keyword{datasets}
+\keyword{internal}

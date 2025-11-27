@@ -22,3 +22,4 @@ during testing or when external resources are unavailable.
 fake_ecmdb(export = "data/source/ecmdb.json.zip")
 }
 }
+\keyword{internal}

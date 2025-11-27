@@ -3,6 +3,7 @@
 #' @description This function cleans and filters biologically weighted
 #'     annotation results by calculating chemical consistency scores across
 #'     network neighbors. Only features with at least 2 neighbors are evaluated.
+#'     Internal helper for weight_annotations().
 #'
 #' @include validators.R
 #'
@@ -16,11 +17,11 @@
 #'
 #' @seealso weight_bio
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
-#' # Clean biological annotations by network consistency
+#' # Internal use only - called by weight_annotations()
 #' cleaned <- clean_bio(
 #'   annot_table_wei_bio = bio_weighted_annotations,
 #'   edges_table = network_edges,

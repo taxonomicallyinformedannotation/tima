@@ -26,3 +26,4 @@ resolved <- get_path("inst/params/default.yaml")
 # Returns correct path whether in dev or installed package
 }
 }
+\keyword{internal}

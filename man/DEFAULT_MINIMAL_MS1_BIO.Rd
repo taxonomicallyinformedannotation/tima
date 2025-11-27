@@ -13,4 +13,4 @@ DEFAULT_MINIMAL_MS1_BIO
 \description{
 Minimum MS1 biological score threshold
 }
-\keyword{datasets}
+\keyword{internal}

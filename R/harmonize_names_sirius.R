@@ -10,6 +10,8 @@
 #' @return Character string with everything before and including the last
 #'     underscore removed, leaving only the meaningful column name portion
 #'
+#' @keywords internal
+#'
 #' @examples
 #' \dontrun{
 #' harmonize_names_sirius("1_compound_name") # Returns "name"

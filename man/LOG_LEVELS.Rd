@@ -13,4 +13,4 @@ LOG_LEVELS
 \description{
 Log levels available (in order of severity)
 }
-\keyword{datasets}
+\keyword{internal}

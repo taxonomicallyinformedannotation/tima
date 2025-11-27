@@ -3,7 +3,7 @@
 #' @description Logs summary statistics about biologically weighted annotations,
 #'     showing how many structures were reranked at each taxonomic level based
 #'     on organism occurrence data. Validates required columns and handles
-#'     empty inputs gracefully.
+#'     empty inputs gracefully. Internal logging helper for weight_annotations().
 #'
 #' @include validators.R
 #'
@@ -20,10 +20,11 @@
 #'
 #' @return The input annotation table (unchanged), for pipeline compatibility
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
+#' # Internal use only - called by weight_annotations() for logging
 #' weighted_bio |>
 #'   decorate_bio(
 #'     score_biological_kingdom = 0.1,

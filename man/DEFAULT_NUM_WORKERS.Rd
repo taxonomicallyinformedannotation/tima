@@ -13,4 +13,4 @@ DEFAULT_NUM_WORKERS
 \description{
 Default number of parallel workers (NULL = auto-detect)
 }
-\keyword{datasets}
+\keyword{internal}

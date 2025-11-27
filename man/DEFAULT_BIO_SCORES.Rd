@@ -15,4 +15,4 @@ DEFAULT_BIO_SCORES
 Default biological score weights by taxonomic rank
 Lower ranks (more specific) get higher scores
 }
-\keyword{datasets}
+\keyword{internal}

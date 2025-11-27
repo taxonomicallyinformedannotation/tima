@@ -3,6 +3,7 @@
 #' @description Collapses grouped dataframe by combining unique values per group.
 #'     Removes NA values, trims whitespace, and converts empty strings to NA.
 #'     Useful for aggregating annotations or metadata.
+#'     Internal helper for cleaning and aggregation functions.
 #'
 #' @include validators.R
 #'
@@ -14,10 +15,11 @@
 #'
 #' @return Data frame with unique values collapsed per group
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
+#' # Internal use only
 #' library(tidytable)
 #' df <- data.frame(
 #'   group = c("A", "A", "B", "B"),

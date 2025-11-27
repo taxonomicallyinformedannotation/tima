@@ -28,3 +28,4 @@ paths <- get_default_paths()
 data_path <- paths$data$source$path
 }
 }
+\keyword{internal}

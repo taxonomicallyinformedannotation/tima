@@ -13,4 +13,4 @@ DEFAULT_PROGRESS_INTERVAL
 \description{
 Default progress reporting interval (number of items)
 }
-\keyword{datasets}
+\keyword{internal}

@@ -13,4 +13,4 @@ DEFAULT_HC_SCORE_CHEM_MIN
 \description{
 Minimum chemical score for high confidence annotations
 }
-\keyword{datasets}
+\keyword{internal}

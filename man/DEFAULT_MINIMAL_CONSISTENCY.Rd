@@ -13,4 +13,4 @@ DEFAULT_MINIMAL_CONSISTENCY
 \description{
 Minimum consistency score threshold for taxonomic predictions
 }
-\keyword{datasets}
+\keyword{internal}

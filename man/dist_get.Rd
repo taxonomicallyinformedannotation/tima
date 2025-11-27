@@ -38,3 +38,4 @@ dist_get(d, 1, 3)
 dist_get(d, 2, 2)
 }
 }
+\keyword{internal}

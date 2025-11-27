@@ -39,3 +39,4 @@ round_reals(df, dig = 3)
 round_reals(df, dig = 0)
 }
 }
+\keyword{internal}

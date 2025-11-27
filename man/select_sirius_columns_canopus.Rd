@@ -18,13 +18,15 @@ Data frame with standardized CANOPUS column names
 Selects and standardizes CANOPUS chemical classification
 columns from SIRIUS results, mapping SIRIUS-specific column names
 to TIMA standard names for downstream processing.
+Internal helper for prepare_annotations_sirius().
 }
 \examples{
 \dontrun{
-# Standardize CANOPUS columns from SIRIUS v6
+# Internal use only - called by prepare_annotations_sirius()
 standardized <- select_sirius_columns_canopus(
   df = canopus_results,
   sirius_version = "6"
 )
 }
 }
+\keyword{internal}

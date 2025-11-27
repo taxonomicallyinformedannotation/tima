@@ -21,7 +21,7 @@
 #'   \item{table_organisms}{Organism taxonomy information}
 #'   \item{table_structural}{Processed and standardized structure data}
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

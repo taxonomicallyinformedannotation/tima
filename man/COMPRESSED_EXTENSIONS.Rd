@@ -13,4 +13,4 @@ COMPRESSED_EXTENSIONS
 \description{
 Supported compressed file extensions
 }
-\keyword{datasets}
+\keyword{internal}

@@ -13,4 +13,4 @@ DEFAULT_MINIMAL_MS1_CHEMO
 \description{
 Minimum MS1 chemical score threshold
 }
-\keyword{datasets}
+\keyword{internal}

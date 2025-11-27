@@ -17,13 +17,15 @@ Data frame with standardized formula column names
 \description{
 Selects and standardizes SIRIUS formula-level columns,
 extracting molecular formula candidates and their scores.
+Internal helper for prepare_annotations_sirius().
 }
 \examples{
 \dontrun{
-# Standardize SIRIUS formula columns
+# Internal use only - called by prepare_annotations_sirius()
 formulas <- select_sirius_columns_formulas(
   df = sirius_formulas,
   sirius_version = "6"
 )
 }
 }
+\keyword{internal}

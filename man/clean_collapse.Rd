@@ -22,9 +22,11 @@ Data frame with unique values collapsed per group
 Collapses grouped dataframe by combining unique values per group.
 Removes NA values, trims whitespace, and converts empty strings to NA.
 Useful for aggregating annotations or metadata.
+Internal helper for cleaning and aggregation functions.
 }
 \examples{
 \dontrun{
+# Internal use only
 library(tidytable)
 df <- data.frame(
   group = c("A", "A", "B", "B"),
@@ -34,3 +36,4 @@ grouped <- df |> group_by(group)
 clean_collapse(grouped, cols = "value")
 }
 }
+\keyword{internal}

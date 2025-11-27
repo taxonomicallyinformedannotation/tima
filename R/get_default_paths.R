@@ -10,7 +10,7 @@
 #' @return Named list containing all configured paths and settings. The structure
 #'     mirrors the YAML file hierarchy with nested lists for organized access.
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

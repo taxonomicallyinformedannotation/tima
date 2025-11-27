@@ -13,4 +13,4 @@ TABLE_EXTENSIONS
 \description{
 Supported table file extensions
 }
-\keyword{datasets}
+\keyword{internal}

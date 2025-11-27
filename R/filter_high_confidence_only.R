@@ -31,7 +31,7 @@
 #' cause errors; at least one of the three primary scores must satisfy its
 #' threshold for a row to be retained.
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
