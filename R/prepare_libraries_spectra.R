@@ -349,5 +349,9 @@ prepare_libraries_spectra <-
       step = "prepare_libraries_spectra"
     )
     logger::log_success("Spectral library '{nam_lib}' prepared successfully")
-    invisible(c(output_pos, output_neg, output_sop))
+    invisible(c(
+      "pos" = output_pos,
+      "neg" = output_neg,
+      "sop" = output_sop
+    ))
   }
