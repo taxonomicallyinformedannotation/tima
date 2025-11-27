@@ -15,29 +15,28 @@ prepare_features_tables(
 )
 }
 \arguments{
-\item{features}{Character string path to raw features file}
+\item{features}{character(1) Path to raw features file (CSV/TSV).}
 
-\item{output}{Character string path where prepared features should be saved}
+\item{output}{character(1) Path where prepared features should be saved.}
 
-\item{candidates}{Integer number of top-intensity samples to retain per feature
-(recommended: ≤5 to reduce data size while keeping representative samples)}
+\item{candidates}{integer(1) Number of top-intensity samples to retain per
+feature (default: from params; recommended ≤5 to balance data size and coverage).}
 
-\item{name_adduct}{Character string name of the adduct column in input}
+\item{name_adduct}{character(1) Name of the adduct column in input.}
 
-\item{name_features}{Character string name of the feature ID column in input}
+\item{name_features}{character(1) Name of the feature ID column in input.}
 
-\item{name_rt}{Character string name of the retention time column in input}
+\item{name_rt}{character(1) Name of the retention time column in input.}
 
-\item{name_mz}{Character string name of the m/z column in input}
+\item{name_mz}{character(1) Name of the m/z column in input.}
 }
 \value{
-Character string path to the prepared feature table
+character(1) Path to the prepared feature table (invisibly).
 }
 \description{
-This function prepares LC-MS feature tables by standardizing
-column names, filtering to top intensity samples per feature, and
-formatting data for downstream analysis. Supports multiple input formats
-(MZmine, SLAW, SIRIUS).
+Prepares LC-MS feature tables by standardizing column names,
+filtering to top-intensity samples per feature, and formatting for
+downstream analysis. Supports multiple formats (MZmine, SLAW, SIRIUS).
 }
 \examples{
 \dontrun{

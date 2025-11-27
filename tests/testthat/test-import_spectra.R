@@ -22,7 +22,7 @@ test_that("import_spectra handles MGF files correctly", {
       file = temp_mgf
     )
 
-  result <- import_spectra(temp_mgf)
+  result <- import_spectra(file = temp_mgf)
   expect_s4_class(result, "Spectra")
 })
 
@@ -35,7 +35,7 @@ test_that("import_spectra handles MSP files with failures", {
   )[8L]
 
   if (file.exists(msp_file)) {
-    result <- import_spectra(msp_file)
+    result <- import_spectra(file = msp_file)
     expect_s4_class(result, "Spectra")
   } else {
     skip("MSP test file not found")
