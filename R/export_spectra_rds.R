@@ -4,7 +4,7 @@
 #'     storage and later retrieval. Only exports spectra with valid compound IDs.
 #'
 #' @include create_dir.R
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param file Path where spectra will be exported as RDS file
 #' @param spectra Spectra object containing spectral data to export

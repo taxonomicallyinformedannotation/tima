@@ -5,7 +5,7 @@
 #'     on organism occurrence data. Validates required columns and handles
 #'     empty inputs gracefully. Internal logging helper for weight_annotations().
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param annot_table_wei_bio Data frame with biologically weighted annotations
 #' @param score_biological_kingdom Minimum score for kingdom-level matches

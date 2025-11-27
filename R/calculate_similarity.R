@@ -4,6 +4,7 @@
 #'     target spectra using either entropy, cosine, or GNPS methods.
 #'
 #' @include c_wrappers.R
+#' @include validations_utils.R
 #'
 #' @param method Character string specifying method: "entropy", "gnps", or "cosine"
 #' @param query_spectrum Numeric matrix with columns for mz and intensity

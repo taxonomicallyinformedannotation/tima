@@ -10,7 +10,7 @@
 #' @include export_params.R
 #' @include get_params.R
 #' @include load_yaml_files.R
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param params_small List of basic parameters for the workflow
 #' @param params_advanced List of advanced parameters for the workflow

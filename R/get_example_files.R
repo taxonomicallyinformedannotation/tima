@@ -8,7 +8,7 @@
 #' @include get_example_sirius.R
 #' @include get_file.R
 #' @include go_to_cache.R
-#' @include logging_helpers.R
+#' @include logs_utils.R
 #'
 #' @param example Character vector specifying which example files to download.
 #'     Valid options: "features", "metadata", "sirius", "spectra", "spectral_lib_with_rt"

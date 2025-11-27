@@ -8,6 +8,7 @@ NULL
 
 .datatable.aware <- TRUE
 
+#' @include logs_utils.R
 .onLoad <- function(libname, pkgname) {
   # Initialize logging from environment (safe to call multiple times)
   try(

@@ -6,7 +6,7 @@
 #'
 #' @include get_default_paths.R
 #' @include get_file.R
-#' @include logging_helpers.R
+#' @include logs_utils.R
 #'
 #' @param url List containing URLs for SIRIUS examples (must have $v5 and $v6 elements)
 #' @param export List containing export paths for SIRIUS examples (must have $v5 and $v6 elements)

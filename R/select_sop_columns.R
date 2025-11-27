@@ -1,14 +1,12 @@
 #' @title Select structure-organism pair columns
 #'
-#' @description Selects and renames structure-organism pair (SOP) columns to
-#'     standardized format. Includes chemical structures, taxonomic
-#'     classifications, and organism taxonomy.
+#' @description Standardize SOP columns: structures, taxonomy, organism fields.
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
-#' @param df Data frame containing structure-organism pair data
+#' @param df Data frame containing structure-organism pair data.
 #'
-#' @return Data frame with standardized SOP columns
+#' @return Data frame with standardized SOP columns.
 #'
 #' @keywords internal
 #'

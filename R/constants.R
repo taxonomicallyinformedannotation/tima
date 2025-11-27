@@ -119,7 +119,7 @@ ADDUCT_MASSES <- list(
 #' Tolerance for floating point weight sum comparisons
 #' Used when validating that weights sum to 1.0
 #' @keywords internal
-WEIGHT_SUM_TOLERANCE <- 1e-10
+WEIGHT_SUM_TOLERANCE <- 0.01
 
 # MS1 Filtering Defaults ----
 

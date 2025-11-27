@@ -5,7 +5,7 @@
 #'     network neighbors. Only features with at least 2 neighbors are evaluated.
 #'     Internal helper for weight_annotations().
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param annot_table_wei_bio Data frame containing biologically weighted annotations
 #' @param edges_table Data frame containing network edges between features

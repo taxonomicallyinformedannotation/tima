@@ -502,7 +502,7 @@ test_that("weight_bio handles annotations without matching organisms", {
   if ("candidate_score_similarity" %in% names(result)) {
     spectral_scores <- result$candidate_score_similarity
     spectral_scores[is.na(spectral_scores)] <- 0
-    expected_weighted <- spectral_scores / 2
+    expected_weighted <- spectral_scores / 2L
     expect_equal(result$score_weighted_bio, expected_weighted, tolerance = 0.01)
   }
 })

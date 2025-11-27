@@ -8,7 +8,8 @@
 #'     standardized to a consistent format (e.g., "\[M+H\]+"). This ensures
 #'     compatibility across different MS tools and databases.
 #'
-#' @include validators.R
+#' @include adducts_utils.R
+#' @include validations_utils.R
 #'
 #' @param df Data frame or tibble containing adduct column
 #' @param adducts_colname Character string name of the adduct column

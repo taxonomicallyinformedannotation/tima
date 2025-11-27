@@ -5,7 +5,7 @@
 #'     Useful for aggregating annotations or metadata.
 #'     Internal helper for cleaning and aggregation functions.
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param grouped_df Grouped data frame to collapse
 #' @param cols Character vector of column names to collapse.

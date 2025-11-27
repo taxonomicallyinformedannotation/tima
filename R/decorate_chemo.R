@@ -5,7 +5,7 @@
 #'     level. Uses cascading filters where each level builds on the previous.
 #'     Internal logging helper for weight_annotations().
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param annot_table_wei_chemo Data frame with chemically weighted annotations
 #' @param score_chemical_cla_kingdom Minimum score for Classyfire kingdom

@@ -5,8 +5,8 @@
 #'     logging for large datasets.
 #'
 #' @include create_dir.R
-#' @include validators.R
-#' @include logging_helpers.R
+#' @include logs_utils.R
+#' @include validations_utils.R
 #'
 #' @param x Data frame or tibble to export
 #' @param file Character string path to the output file. File extension

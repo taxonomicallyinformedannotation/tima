@@ -7,17 +7,15 @@
 select_sirius_columns_structures(df, sirius_version)
 }
 \arguments{
-\item{df}{Data frame with SIRIUS structure results}
+\item{df}{Data frame of SIRIUS structure results.}
 
-\item{sirius_version}{SIRIUS version ("5" or "6")}
+\item{sirius_version}{SIRIUS version ("5" or "6").}
 }
 \value{
-Data frame with standardized structure column names
+Data frame with standardized structure columns.
 }
 \description{
-Selects and standardizes SIRIUS structure-level columns,
-extracting structure candidates and their CSI:FingerID scores.
-Internal helper for prepare_annotations_sirius().
+Standardize SIRIUS structure-level columns.
 }
 \examples{
 \dontrun{

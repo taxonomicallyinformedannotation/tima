@@ -11,7 +11,8 @@
 #'     the same result as (0.5, 0.5).
 #'
 #' @include transform_score_sirius_csi.R
-#' @include validators.R
+#' @include validations_utils.R
+#' @include weights_utils.R
 #'
 #' @param annotation_table_taxed Data frame with initial annotations and sample taxonomy
 #' @param structure_organism_pairs_table Data frame with structure-organism pairs and taxonomies
@@ -590,12 +591,11 @@ weight_bio <- function(
     ) |>
     tidytable::select(-candidate_score_sirius_csi_tmp) |>
     tidytable::mutate(
-      score_weighted_bio = (1 / (weight_biological + weight_spectral)) *
-        weight_biological *
-        score_biological +
-        (1 / (weight_biological + weight_spectral)) *
-          weight_spectral *
-          candidate_score_pseudo_initial
+      score_weighted_bio = compute_weighted_sum(
+        score_biological,
+        candidate_score_pseudo_initial,
+        weights = c(weight_biological, weight_spectral)
+      )
     )
 
   rm(annot_table_wei_bio_big)

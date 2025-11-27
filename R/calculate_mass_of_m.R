@@ -17,8 +17,8 @@
 #'     - n_mer = multimer count
 #'
 #' @include constants.R
-#' @include validators.R
 #' @include parse_adduct.R
+#' @include validations_utils.R
 #'
 #' @param mz Numeric observed m/z value in Daltons. Must be positive.
 #' @param adduct_string Character string representing the adduct
@@ -191,6 +191,8 @@ calculate_mass_of_m <- function(
 #' Validate m/z value
 #'
 #' @description Validates mass-to-charge ratio input value
+#'
+#' @include validations_utils.R
 #'
 #' @param mz Numeric m/z value
 #'

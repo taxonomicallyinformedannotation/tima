@@ -4,7 +4,7 @@
 #'     column names to standardized field names. Handles different naming
 #'     conventions across spectral libraries.
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param spectra Data frame containing spectra to harmonize
 #' @param metad Metadata identifying the library source

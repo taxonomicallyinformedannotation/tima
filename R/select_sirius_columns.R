@@ -1,17 +1,13 @@
 #' @title Select SIRIUS CANOPUS columns
 #'
-#' @description Selects and standardizes CANOPUS chemical classification
-#'     columns from SIRIUS results, mapping SIRIUS-specific column names
-#'     to TIMA standard names for downstream processing.
-#'     Internal helper for prepare_annotations_sirius().
+#' @description Standardize CANOPUS chemical classification columns.
 #'
-#' @include harmonize_names_sirius.R
-#' @include validators.R
+#' @include validations_utils.R
 #'
-#' @param df Data frame with SIRIUS CANOPUS results
-#' @param sirius_version SIRIUS version ("5" or "6")
+#' @param df Data frame of SIRIUS CANOPUS results.
+#' @param sirius_version SIRIUS version ("5" or "6").
 #'
-#' @return Data frame with standardized CANOPUS column names
+#' @return Data frame with standardized CANOPUS columns.
 #'
 #' @keywords internal
 #'
@@ -35,17 +31,13 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 
   # Validate SIRIUS version
   if (!sirius_version %in% c("5", "6", 5, 6)) {
-    stop(
-      "sirius_version must be '5' or '6', got: ",
-      sirius_version,
-      call. = FALSE
-    )
+    stop("sirius_version must be '5' or '6'", call. = FALSE)
   }
 
   df <- df |>
     tidytable::mutate(
       feature_id = switch(
-        sirius_version,
+        as.character(sirius_version),
         "5" = harmonize_names_sirius(id),
         "6" = mappingFeatureId
       )
@@ -105,16 +97,12 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 
 #' @title Select SIRIUS formula columns
 #'
-#' @description Selects and standardizes SIRIUS formula-level columns,
-#'     extracting molecular formula candidates and their scores.
-#'     Internal helper for prepare_annotations_sirius().
+#' @description Standardize SIRIUS formula-level columns.
 #'
-#' @include harmonize_names_sirius.R
+#' @param df Data frame of SIRIUS formula results.
+#' @param sirius_version SIRIUS version ("5" or "6").
 #'
-#' @param df Data frame with SIRIUS formula results
-#' @param sirius_version SIRIUS version ("5" or "6")
-#'
-#' @return Data frame with standardized formula column names
+#' @return Data frame with standardized formula columns.
 #'
 #' @keywords internal
 #'
@@ -130,7 +118,7 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
   df <- df |>
     tidytable::mutate(
       feature_id = switch(
-        sirius_version,
+        as.character(sirius_version),
         "5" = harmonize_names_sirius(id),
         "6" = mappingFeatureId
       )
@@ -170,14 +158,12 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
 
 #' @title Select SIRIUS structure columns
 #'
-#' @description Selects and standardizes SIRIUS structure-level columns,
-#'     extracting structure candidates and their CSI:FingerID scores.
-#'     Internal helper for prepare_annotations_sirius().
+#' @description Standardize SIRIUS structure-level columns.
 #'
-#' @param df Data frame with SIRIUS structure results
-#' @param sirius_version SIRIUS version ("5" or "6")
+#' @param df Data frame of SIRIUS structure results.
+#' @param sirius_version SIRIUS version ("5" or "6").
 #'
-#' @return Data frame with standardized structure column names
+#' @return Data frame with standardized structure columns.
 #'
 #' @keywords internal
 #'
@@ -203,7 +189,7 @@ select_sirius_columns_structures <- function(df, sirius_version) {
           "candidate_structure_xlogp" = "xlogp",
           # ISSUE see #147
           "candidate_score_sirius_confidence" = switch(
-            sirius_version,
+            as.character(sirius_version),
             "5" = "ConfidenceScore",
             "6" = "ConfidenceScoreApproximate"
           ),

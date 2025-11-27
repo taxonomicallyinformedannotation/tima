@@ -5,7 +5,7 @@
 #'
 #' @details Credit: Algorithm adapted from usedist package
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param d Distance matrix or dist object
 #' @param idx1 Integer index of the first element (1-based)
@@ -69,7 +69,7 @@ dist_get <- function(d, idx1, idx2) {
 #'     them with group membership. Useful for analyzing within-group vs
 #'     between-group distances.
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param d Distance object or matrix
 #' @param g Grouping vector for observations. Must have length equal to

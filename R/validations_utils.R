@@ -1,15 +1,3 @@
-#' @title Input Validation Utilities
-#'
-#' @description This module provides reusable validation functions for
-#'     input parameters throughout the TIMA package. Centralizing validation
-#'     logic ensures consistency, reduces code duplication, and improves
-#'     error messages.
-#'
-#' @include constants.R
-#'
-#' @name validators
-#' @keywords internal
-
 #' Validate that files exist
 #'
 #' @description Checks that one or more file paths exist on the filesystem.
@@ -852,6 +840,3 @@ assert_scalar_numeric <- function(
   }
   invisible(TRUE)
 }
-
-# Weight tolerance constant moved here ----
-WEIGHT_SUM_TOLERANCE <- 0.01

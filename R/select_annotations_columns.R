@@ -4,10 +4,10 @@
 #'     relevant fields, cleaning NULL/NA values, rounding numeric values,
 #'     and complementing with structure metadata.
 #'
-#' @include columns_model.R
+#' @include columns_utils.R
 #' @include complement_metadata_structures.R
 #' @include round_reals.R
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param df Data frame containing annotation results with structure and
 #'     candidate information

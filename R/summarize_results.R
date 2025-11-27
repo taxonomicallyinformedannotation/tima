@@ -5,8 +5,8 @@
 #'     summarizing to one row per feature. Creates final results table.
 #'
 #' @include clean_collapse.R
-#' @include columns_model.R
-#' @include validators.R
+#' @include columns_utils.R
+#' @include validations_utils.R
 #'
 #' @param df Data frame containing weighted annotation results
 #' @param features_table Data frame with feature metadata (RT, m/z, etc.)

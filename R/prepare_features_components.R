@@ -6,7 +6,7 @@
 #'     the molecular network.
 #'
 #' @include get_params.R
-#' @include logging_helpers.R
+#' @include logs_utils.R
 #'
 #' @param input Character vector of paths to input component files. Can be
 #'     a single file or multiple files that will be combined.

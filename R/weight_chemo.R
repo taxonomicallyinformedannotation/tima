@@ -10,7 +10,8 @@
 #'     so they do NOT need to sum to 1. For example, weights of (1, 1, 1)
 #'     produce the same result as (0.33, 0.33, 0.33).
 #'
-#' @include validators.R
+#' @include validations_utils.R
+#' @include weights_utils.R
 #'
 #' @param annot_table_wei_bio_clean Data frame with cleaned biologically weighted annotations
 #' @param weight_spectral Weight for spectral similarity score (any positive number)
@@ -331,16 +332,12 @@ weight_chemo <- function(
 
   annot_table_wei_chemo <- annot_table_wei_chemo_interim |>
     tidytable::mutate(
-      score_weighted_chemo = (1 /
-        (weight_chemical + weight_biological + weight_spectral)) *
-        weight_chemical *
-        score_chemical +
-        (1 / (weight_chemical + weight_biological + weight_spectral)) *
-          weight_biological *
-          score_biological +
-        (1 / (weight_chemical + weight_biological + weight_spectral)) *
-          weight_spectral *
-          candidate_score_pseudo_initial
+      score_weighted_chemo = compute_weighted_sum(
+        score_chemical,
+        score_biological,
+        candidate_score_pseudo_initial,
+        weights = c(weight_chemical, weight_biological, weight_spectral)
+      )
     )
 
   rm(annot_table_wei_chemo_interim)
