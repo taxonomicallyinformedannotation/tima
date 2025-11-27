@@ -148,29 +148,24 @@ import_spectra <- function(
     )
   }
 
-  # Harmonize metadata field names across different data sources
-  # (batch check for efficiency)
+  # Harmonize legacy metadata fields to standard names
   spec_cols <- colnames(spectra@backend@spectraData)
-
   if ("MSLEVEL" %in% spec_cols) {
     spectra$msLevel <- as.integer(spectra$MSLEVEL)
   }
-
   if ("MS_LEVEL" %in% spec_cols) {
     spectra$msLevel <- as.integer(spectra$MS_LEVEL)
   }
-
   if ("PRECURSOR_MZ" %in% spec_cols) {
     spectra$precursorMz <- as.numeric(spectra$PRECURSOR_MZ)
   }
-
   if ("spectrum_id" %in% spec_cols) {
     spectra$spectrum_id <- as.character(spectra$spectrum_id)
   }
 
   # Filter Spectra ----
 
-  # Filter to MS2 spectra only
+  # Filter to MS2 spectra only if msLevel available
   if ("msLevel" %in% spec_cols) {
     n_before <- length(spectra)
     spectra <- Spectra::filterMsLevel(object = spectra, msLevel. = 2L)
@@ -183,7 +178,7 @@ import_spectra <- function(
     }
   }
 
-  # Handle MassBank-specific MS level field
+  # Handle MassBank-specific MS level field if present
   if ("Spectrum_type" %in% colnames(spectra@backend@spectraData)) {
     n_before <- length(spectra)
     spectra <- spectra[spectra@backend@spectraData$Spectrum_type == "MS2"]
@@ -193,15 +188,14 @@ import_spectra <- function(
     )
   }
 
-  # Filter by polarity if specified
+  # Filter by polarity if specified (fallback to precursorCharge only)
   if (!is.na(polarity)) {
     n_before <- length(spectra)
     charge_values <- if (polarity == "pos") {
-      c(0L, 1L, 2L, 3L) # Include 0 for broken MGFs
+      c(0L, 1L, 2L, 3L)
     } else {
       c(0L, -1L, -2L, -3L)
     }
-
     spectra <- Spectra::filterPrecursorCharge(
       object = spectra,
       z = charge_values
