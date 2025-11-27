@@ -5,6 +5,8 @@
 #'     high-confidence candidates based on multiple scoring criteria
 #'     (biological, initial, chemical) and retention time accuracy.
 #'
+#' @include validations_utils.R
+#'
 #' @param df Data frame containing annotation results with score columns
 #' @param score_bio_min Numeric minimum biological score threshold (default: 0.85). Range: 0-1
 #' @param score_ini_min Numeric minimum initial score threshold (default: 0.95). Range: 0-1

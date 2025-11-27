@@ -6,6 +6,7 @@
 #'     (MZmine, SLAW, SIRIUS).
 #'
 #' @include get_params.R
+#' @include rts_utils.R
 #'
 #' @param features Character string path to raw features file
 #' @param output Character string path where prepared features should be saved

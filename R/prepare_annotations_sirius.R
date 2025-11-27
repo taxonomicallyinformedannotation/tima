@@ -224,6 +224,8 @@ create_empty_sirius_annotations <- function() {
 #' @description Internal helper to split combined SIRIUS table into CANOPUS,
 #'     formula, and structure-specific tables based on column model.
 #'
+#' @include columns_utils.R
+#'
 #' @param table Data frame with combined SIRIUS results.
 #'
 #' @return Named list with keys: canopus, formula, structures.
@@ -292,7 +294,7 @@ split_sirius_results <- function(table) {
 #' If the input directory does not exist, returns an empty template with expected
 #' columns to ensure downstream compatibility.
 #'
-#' @include columns_model.R
+#' @include columns_utils.R
 #' @include get_params.R
 #' @include harmonize_names_sirius.R
 #' @include pre_harmonize_names_sirius.R

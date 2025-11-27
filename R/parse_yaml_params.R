@@ -3,7 +3,7 @@
 #' @description Parses YAML parameter files, loading default parameters and
 #'     optionally overriding them with user-specified values.
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param def Path to the default YAML parameters file
 #' @param usr Path to the user-specified YAML parameters file (optional).

@@ -31,6 +31,9 @@
 #'   computation to precursor-tolerant spectra, reducing complexity for large
 #'   libraries. Repeated metadata extraction uses a single vectorized helper.
 #'
+#' @include adducts_utils.R
+#' @include validations_utils.R
+#'
 #' @param input Character vector or list of query spectral file paths (.mgf).
 #' @param libraries Character vector or list of library spectral file paths
 #'   (.mgf / Spectra-supported). Must contain at least one path.

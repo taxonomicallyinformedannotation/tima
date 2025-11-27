@@ -4,7 +4,7 @@
 #'     Useful for standardizing precision in mass spectrometry data where
 #'     exact mass and logP values need consistent decimal places.
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param df Data frame or tibble containing columns to round
 #' @param dig Integer number of decimal digits (default: 5). Must be >= 0.

@@ -9,7 +9,7 @@
 #' @include get_params.R
 #' @include round_reals.R
 #' @include select_sop_columns.R
-#' @include logging_helpers.R
+#' @include logs_utils.R
 #'
 #' @param input Character string path to the raw LOTUS data file
 #' @param output Character string path for the prepared output file

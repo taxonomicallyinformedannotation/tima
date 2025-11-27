@@ -5,7 +5,7 @@
 #'     translate CLI argument names to their corresponding nested paths in the
 #'     parameters list, applying appropriate type conversions.
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param arguments Named list of CLI arguments from docopt or similar parser
 #' @param parameters Nested list of default parameters to be updated with CLI values

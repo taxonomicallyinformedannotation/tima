@@ -4,7 +4,7 @@
 #'     directory. Handles file selection, filtering empty files, and
 #'     parsing tab-delimited data. Internal helper for prepare_annotations_sirius().
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param sirius_zip Path to compressed SIRIUS workspace (.zip)
 #' @param file Pattern to match files within the archive

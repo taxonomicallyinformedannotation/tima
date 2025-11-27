@@ -7,6 +7,8 @@
 #' @details This is an experimental transformation not officially approved by
 #'     SIRIUS developers. The sigmoid function is: 1 / (1 + exp(-(score + K) / scale))
 #'
+#' @include validations_utils.R
+#'
 #' @param csi_score Numeric SIRIUS CSI score (can be negative, NA, NULL, or absent)
 #' @param K Numeric shift parameter to adjust the sigmoid center (default: 50)
 #' @param scale Numeric scale parameter controlling sigmoid steepness (default: 10)

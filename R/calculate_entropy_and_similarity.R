@@ -5,6 +5,7 @@
 #'     similarity measures to match MS2 fragmentation patterns.
 #'
 #' @include calculate_similarity.R
+#' @include validations_utils.R
 #'
 #' @param lib_ids Character vector of library spectrum IDs
 #' @param lib_precursors Numeric vector of library precursor m/z values

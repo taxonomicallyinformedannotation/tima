@@ -4,6 +4,9 @@
 #'     Checks file existence, data types, ranges, and logical consistency of weights.
 #'     Stops execution with informative messages if any condition is violated.
 #'
+#' @include constants.R
+#' @include validations_utils.R
+#'
 #' @param library Character, path to library file (required).
 #' @param components Character, path to components file (required).
 #' @param edges Character, path to edges file (required).
@@ -342,6 +345,8 @@ log_annotation_stats <- function(annotation_table) {
 #'
 #' @description Internal helper to reorganize and merge annotation tables.
 #'
+#' @include columns_utils.R
+#'
 #' @param annotation_table Data frame with annotations
 #' @param formula_table Data frame with formula data
 #' @param canopus_table Data frame with canopus data
@@ -471,7 +476,7 @@ export_results <- function(results_list, output, pattern) {
 #'
 #' @include clean_bio.R
 #' @include clean_chemo.R
-#' @include columns_model.R
+#' @include columns_utils.R
 #' @include decorate_bio.R
 #' @include decorate_chemo.R
 #' @include get_default_paths.R

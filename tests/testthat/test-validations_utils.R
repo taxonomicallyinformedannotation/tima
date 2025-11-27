@@ -1,4 +1,4 @@
-# Unit tests for validators.R
+# Unit tests for validate_utils.R
 
 library(testthat)
 library(tima)

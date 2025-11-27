@@ -6,7 +6,7 @@
 #'
 #' @include calculate_similarity.R
 #' @include constants.R
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param frags List of fragment spectra matrices
 #' @param nspecs Integer number of spectra

@@ -6,14 +6,14 @@
 #' or `neg` and retention time and mass tolerances should be given. The feature
 #' table is expected to be pre-formatted.
 #'
-#' @include adducts_forbidden.R
-#' @include adducts_translations.R
+#' @include adducts_utils.R
 #' @include calculate_mass_of_m.R
 #' @include decorate_masses.R
-#' @include dist_groups.R
+#' @include dists_utils.R
 #' @include get_params.R
 #' @include harmonize_adducts.R
 #' @include round_reals.R
+#' @include validations_utils.R
 #'
 #' @param features Table containing your previous annotation to complement
 #' @param output_annotations Output for mass based structural annotations

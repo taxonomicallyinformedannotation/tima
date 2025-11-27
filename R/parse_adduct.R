@@ -6,7 +6,7 @@
 #'     additions/losses.
 #'
 #' @include constants.R
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param adduct_string Character string representing the adduct in standard
 #'     notation (e.g., "\[M+H\]+", "\[2M+Na\]+", "\[M-H2O+H\]+")

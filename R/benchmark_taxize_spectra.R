@@ -8,7 +8,7 @@
 #'     function performs a controlled joining process with random sampling
 #'     for ambiguous cases.
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param input Path to the initial features file
 #' @param keys Path to the structure-organism pair (SOP) keys file

@@ -4,10 +4,10 @@
 #'     retry logic, and validation. Automatically creates necessary directories
 #'     and validates downloaded content. Skips download if file already exists.
 #'
-#' @include create_dir.R
-#' @include validators.R
-#' @include logging_helpers.R
 #' @include constants.R
+#' @include create_dir.R
+#' @include logs_utils.R
+#' @include validations_utils.R
 #'
 #' @param url Character string URL of the file to download
 #' @param export Character string file path where the file should be saved

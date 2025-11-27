@@ -4,7 +4,7 @@
 #'     structures, generate InChIKeys, calculate molecular properties,
 #'     and extract 2D representations. Results are cached to avoid reprocessing.
 #'
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param df Data frame containing SMILES strings
 #' @param smiles_colname Column name containing SMILES

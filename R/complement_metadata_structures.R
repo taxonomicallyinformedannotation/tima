@@ -5,7 +5,7 @@
 #'     Enriches annotation results with comprehensive structure information.
 #'
 #' @include clean_collapse.R
-#' @include validators.R
+#' @include validations_utils.R
 #'
 #' @param df Data frame with structural metadata to complement
 #' @param str_stereo Path to structure stereochemistry file

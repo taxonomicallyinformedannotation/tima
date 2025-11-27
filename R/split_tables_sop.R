@@ -7,8 +7,8 @@
 #'
 #' @include clean_collapse.R
 #' @include process_smiles.R
-#' @include validators.R
-#' @include logging_helpers.R
+#' @include logs_utils.R
+#' @include validations_utils.R
 #'
 #' @param table Data frame containing combined structure-organism pair data with
 #'     columns for structures (SMILES, InChI, names), organisms, and references

@@ -5,6 +5,8 @@
 #'     file paths (extracting the directory component). Includes validation
 #'     for write permissions.
 #'
+#' @include validations_utils.R
+#'
 #' @param export Character string path to the directory or file path
 #'     from which to extract and create the directory
 #'

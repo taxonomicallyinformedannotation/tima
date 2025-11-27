@@ -7,17 +7,15 @@
 select_sirius_columns_formulas(df, sirius_version)
 }
 \arguments{
-\item{df}{Data frame with SIRIUS formula results}
+\item{df}{Data frame of SIRIUS formula results.}
 
-\item{sirius_version}{SIRIUS version ("5" or "6")}
+\item{sirius_version}{SIRIUS version ("5" or "6").}
 }
 \value{
-Data frame with standardized formula column names
+Data frame with standardized formula columns.
 }
 \description{
-Selects and standardizes SIRIUS formula-level columns,
-extracting molecular formula candidates and their scores.
-Internal helper for prepare_annotations_sirius().
+Standardize SIRIUS formula-level columns.
 }
 \examples{
 \dontrun{
