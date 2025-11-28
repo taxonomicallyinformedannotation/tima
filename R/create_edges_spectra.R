@@ -158,9 +158,9 @@ create_edges_spectra <- function(
   # log_trace(
   #  "As the precursors delta is not limited, expect a long processing time."
   # )
-  log_info("========================================")
+  log_info("======================================")
   log_info("Take yourself a break, you deserve it.")
-  log_info("========================================")
+  log_info("======================================")
 
   # Extract data (cache for reuse)
   nspecz <- length(spectra)
