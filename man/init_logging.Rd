@@ -11,7 +11,7 @@ NULL (invisibly)
 }
 \description{
 Convenience wrapper to configure logging based on environment
-variables. Safe to call multiple times.
+variables. Safe to call multiple times (idempotent).
 }
 \details{
 Environment variables:
@@ -19,5 +19,9 @@ Environment variables:
 \item TIMA_LOG_FILE: Path to log file (default: "tima.log")
 \item TIMA_LOG_LEVEL: TRACE|DEBUG|INFO|WARN|ERROR (default: DEFAULT_LOG_LEVEL)
 }
+
+This function is automatically called on first use of any logging function,
+so explicit initialization is optional. However, you can call it explicitly
+to customize logging before any messages are logged.
 }
 \keyword{internal}

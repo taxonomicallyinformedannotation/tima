@@ -7,7 +7,8 @@
 tima_full(
   target_pattern = "^ann_pre$",
   log_file = "tima.log",
-  clean_old_logs = TRUE
+  clean_old_logs = TRUE,
+  log_level = "info"
 )
 }
 \arguments{
@@ -18,6 +19,11 @@ Default: "^ann_pre$" (annotation preparation target)}
 
 \item{clean_old_logs}{Logical. Remove old log file before starting.
 Default: TRUE}
+
+\item{log_level}{Character or numeric. Logging verbosity level.
+Can be one of: "trace", "debug", "info", "warn", "error", "fatal"
+or numeric values: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200, FATAL=100.
+Default: "info" (400). Use "debug" for detailed troubleshooting.}
 }
 \value{
 Invisible NULL. Executes workflow as side effect and creates
@@ -40,13 +46,26 @@ The workflow performs the following steps:
 }
 \examples{
 \dontrun{
-# Run full workflow with defaults
+# Run full workflow with defaults (INFO level)
 tima_full()
+
+# Run with debug logging for troubleshooting
+tima_full(log_level = "debug")
+
+# Run with minimal logging (warnings and errors only)
+tima_full(log_level = "warn")
 
 # Run with custom target pattern
 tima_full(target_pattern = "^prepare_")
 
 # Preserve existing logs
 tima_full(clean_old_logs = FALSE)
+
+# Combine multiple options
+tima_full(
+  target_pattern = "^ann_",
+  log_level = "debug",
+  clean_old_logs = FALSE
+)
 }
 }
