@@ -226,7 +226,7 @@ annotate_spectra <- function(
   lib_precursors <- get_precursors(spectral_library)
   meta <- build_library_metadata(spectral_library, lib_precursors)
   df_final <- finalize_results(
-    df_sim = tidytable::as_tidytable(sim_raw),
+    df_sim = tidytable::as_tidytable(x = sim_raw),
     meta = meta,
     threshold = threshold
   )
@@ -244,7 +244,7 @@ annotate_spectra <- function(
   }
 
   log_info(
-    "%d Candidates annotated on %d features (threshold >= %f2).",
+    "%d Candidates annotated on %d features (threshold >= %s).",
     nrow(
       df_final |>
         tidytable::distinct(
@@ -338,14 +338,14 @@ import_and_clean_library_collection <- function(paths, dalton, polarity, ppm) {
       Spectra::applyProcessing,
       BPPARAM = BiocParallel::SerialParam()
     ) |>
-    purrr::map(remove_empty_peak_spectra) |>
+    purrr::map(.f = remove_empty_peak_spectra) |>
     Spectra::concatenateSpectra()
 }
 
 remove_empty_peak_spectra <- function(sp) {
   empty_flags <- sp@backend@peaksData |>
-    purrr::map(is.null) |>
-    purrr::map_lgl(any)
+    purrr::map(.f = is.null) |>
+    purrr::map_lgl(.f = any)
   sp[!empty_flags]
 }
 
@@ -401,10 +401,14 @@ get_precursors <- function(sp) {
   sp@backend@spectraData |>
     tidytable::transmute(
       precursor = tidytable::coalesce(
-        tidytable::across(tidyselect::any_of(c(
-          "precursorMz",
-          "precursor_mz"
-        )))
+        tidytable::across(
+          .cols = tidyselect::any_of(
+            x = c(
+              "precursorMz",
+              "precursor_mz"
+            )
+          )
+        )
       )
     ) |>
     tidytable::pull()
@@ -477,7 +481,7 @@ finalize_results <- function(df_sim, meta, threshold) {
     df_sim$candidate_count_similarity_peaks_matched
   )
   df_final <- df_sim |>
-    tidytable::left_join(meta, by = "target_id") |>
+    tidytable::left_join(y = meta, by = "target_id") |>
     tidytable::select(-target_id) |>
     tidytable::mutate(
       candidate_structure_error_mz = target_precursorMz - precursorMz,
@@ -497,25 +501,27 @@ finalize_results <- function(df_sim, meta, threshold) {
       )
     ) |>
     tidytable::select(
-      tidyselect::any_of(c(
-        "feature_id",
-        "candidate_adduct" = "target_adduct",
-        "candidate_library" = "target_library",
-        "candidate_spectrum_id" = "target_spectrum_id",
-        "candidate_structure_error_mz",
-        "candidate_structure_name" = "target_name",
-        "candidate_structure_inchikey_connectivity_layer",
-        "candidate_structure_smiles_no_stereo",
-        "candidate_structure_molecular_formula" = "target_formula",
-        "candidate_structure_exact_mass" = "target_exactmass",
-        "candidate_structure_xlogp" = "target_xlogp",
-        "candidate_spectrum_entropy",
-        "candidate_score_similarity",
-        "candidate_count_similarity_peaks_matched"
-      ))
+      tidyselect::any_of(
+        x = c(
+          "feature_id",
+          "candidate_adduct" = "target_adduct",
+          "candidate_library" = "target_library",
+          "candidate_spectrum_id" = "target_spectrum_id",
+          "candidate_structure_error_mz",
+          "candidate_structure_name" = "target_name",
+          "candidate_structure_inchikey_connectivity_layer",
+          "candidate_structure_smiles_no_stereo",
+          "candidate_structure_molecular_formula" = "target_formula",
+          "candidate_structure_exact_mass" = "target_exactmass",
+          "candidate_structure_xlogp" = "target_xlogp",
+          "candidate_spectrum_entropy",
+          "candidate_score_similarity",
+          "candidate_count_similarity_peaks_matched"
+        )
+      )
     ) |>
     tidytable::filter(candidate_score_similarity >= threshold) |>
-    tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
+    tidytable::arrange(tidytable::desc(x = candidate_score_similarity)) |>
     tidytable::distinct(
       feature_id,
       candidate_library,
@@ -526,7 +532,7 @@ finalize_results <- function(df_sim, meta, threshold) {
 }
 
 log_library_stats <- function(lib_sp) {
-  sd <- Spectra::spectraData(lib_sp)
+  sd <- Spectra::spectraData(object = lib_sp)
   if (!"library" %in% names(sd)) {
     return(invisible(NULL))
   }
@@ -546,7 +552,7 @@ log_library_stats <- function(lib_sp) {
         TRUE ~ unique_connectivities
       )
     ) |>
-    tidytable::arrange(tidytable::desc(spectra))
+    tidytable::arrange(tidytable::desc(x = spectra))
   log_info(
     "\n%s",
     paste(

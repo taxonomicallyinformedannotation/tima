@@ -15,10 +15,10 @@ test_that("read_mgf_opti fails with multiple files", {
 
 
 test_that("read_mgf_opti reads minimal mgf", {
-  testthat::skip_if_not_installed("Spectra")
-  testthat::skip_if_not_installed("MsBackendMgf")
-  testthat::skip_if_not_installed("MsCoreUtils")
-  testthat::skip_if_not_installed("IRanges")
+  testthat::skip_if_not_installed(pkg = "Spectra")
+  testthat::skip_if_not_installed(pkg = "MsBackendMgf")
+  testthat::skip_if_not_installed(pkg = "MsCoreUtils")
+  testthat::skip_if_not_installed(pkg = "IRanges")
 
   mgf <- c(
     "BEGIN IONS",

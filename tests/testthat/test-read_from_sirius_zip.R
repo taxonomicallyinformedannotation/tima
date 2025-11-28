@@ -52,7 +52,7 @@ create_test_sirius_zip <- function() {
   # Create zip archive
   zip_file <- file.path(temp_dir, "test_sirius.zip")
 
-  withr::local_dir(temp_dir)
+  withr::local_dir(new = temp_dir)
   utils::zip(
     zipfile = basename(zip_file),
     files = c(
@@ -196,9 +196,13 @@ test_that("read_from_sirius_zip handles empty zip archive", {
   empty_zip <- file.path(temp_dir, "empty.zip")
 
   # Create empty zip
-  withr::local_dir(temp_dir)
+  withr::local_dir(new = temp_dir)
   writeLines("", "temp.txt")
-  utils::zip(zipfile = basename(empty_zip), files = "temp.txt", flags = "-q")
+  utils::zip(
+    zipfile = basename(empty_zip),
+    files = "temp.txt",
+    flags = "-q"
+  )
   file.remove("temp.txt")
 
   expect_error(

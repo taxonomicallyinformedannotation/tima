@@ -51,7 +51,7 @@ validate_sirius_inputs <- function(
     str_tax_cla = str_tax_cla,
     str_tax_npc = str_tax_npc
   )
-  missing <- purrr::keep(str_files, ~ !file.exists(.x))
+  missing <- purrr::keep(.x = str_files, .p = ~ !file.exists(.x))
   if (length(missing) > 0L) {
     stop(
       "Structure file(s) not found: ",
@@ -116,7 +116,7 @@ load_sirius_tables <- function(input_directory, version) {
   denovo <- tidytable::tidytable(mappingFeatureId = NA_character_)
   if (!is.null(fnames$denovo)) {
     files <- tryCatch(
-      utils::unzip(input_directory, list = TRUE),
+      utils::unzip(zipfile = input_directory, list = TRUE),
       error = function(e) list(Name = list.files(input_directory))
     )
     if (any(grepl(fnames$denovo, files$Name, fixed = TRUE))) {
@@ -177,7 +177,7 @@ load_sirius_summaries <- function(input_directory) {
   names(summaries) <- summary_files |>
     pre_harmonize_names_sirius() |>
     harmonize_names_sirius()
-  summaries <- summaries[purrr::map_int(summaries, nrow) > 0L]
+  summaries <- summaries[purrr::map_int(.x = summaries, .f = nrow) > 0L]
   if (length(summaries) == 0L) {
     return(tidytable::tidytable())
   }
@@ -238,10 +238,12 @@ split_sirius_results <- function(table) {
   model <- columns_model()
   canopus <- table |>
     tidytable::select(
-      tidyselect::any_of(c(
-        model$features_columns,
-        model$features_calculated_columns
-      ))
+      tidyselect::any_of(
+        x = c(
+          model$features_columns,
+          model$features_calculated_columns
+        )
+      )
     ) |>
     tidytable::filter(
       !is.na(!!as.name(model$features_calculated_columns[5]))
@@ -250,10 +252,12 @@ split_sirius_results <- function(table) {
     tidytable::distinct()
   formula <- table |>
     tidytable::select(
-      tidyselect::any_of(c(
-        model$features_columns,
-        model$candidates_sirius_for_columns
-      ))
+      tidyselect::any_of(
+        x = c(
+          model$features_columns,
+          model$candidates_sirius_for_columns
+        )
+      )
     ) |>
     tidytable::filter(
       !is.na(!!as.name(model$candidates_sirius_for_columns[2]))
@@ -262,12 +266,14 @@ split_sirius_results <- function(table) {
     tidytable::distinct()
   structures <- table |>
     tidytable::select(
-      tidyselect::any_of(c(
-        model$features_columns,
-        model$candidates_structures_columns,
-        model$candidates_spectra_columns,
-        model$candidates_sirius_str_columns
-      ))
+      tidyselect::any_of(
+        x = c(
+          model$features_columns,
+          model$candidates_structures_columns,
+          model$candidates_spectra_columns,
+          model$candidates_sirius_str_columns
+        )
+      )
     ) |>
     tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
     tidytable::distinct()

@@ -14,7 +14,7 @@ library(testthat)
   writeLines(lines, temp_inner)
 
   # Create zip in the directory of zip_path
-  withr::local_dir(dirname(zip_path))
+  withr::local_dir(new = dirname(zip_path))
   utils::zip(zipfile = basename(zip_path), files = inner_name)
 
   # Clean up temp file

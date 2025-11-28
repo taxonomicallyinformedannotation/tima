@@ -442,7 +442,7 @@ test_that("get_last_version_from_zenodo validates parameters in correct order", 
 
 test_that("get_last_version_from_zenodo success", {
   tmp <- temp_test_dir("get_file_dir_create")
-  withr::local_dir(tmp)
+  withr::local_dir(new = tmp)
   expect_no_error(
     get_last_version_from_zenodo(
       doi = "10.5281/zenodo.7534071",

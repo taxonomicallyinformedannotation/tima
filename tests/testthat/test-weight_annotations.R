@@ -369,7 +369,7 @@ test_that("weight_annotations() runs successfully with minimal inputs", {
   skip_if_not_installed("purrr")
 
   fixtures <- create_minimal_wa_data()
-  withr::local_dir(fixtures$tmpdir)
+  withr::local_dir(new = fixtures$tmpdir)
 
   # Mock get_default_paths to return our temp dir
   local_mocked_bindings(
@@ -448,7 +448,7 @@ test_that("weight_annotations() processes MS1-only annotations", {
   skip_if_not_installed("tidytable")
 
   fixtures <- create_minimal_wa_data()
-  withr::local_dir(fixtures$tmpdir)
+  withr::local_dir(new = fixtures$tmpdir)
 
   local_mocked_bindings(
     get_default_paths = function() {
@@ -522,7 +522,7 @@ test_that("weight_annotations() handles different weight combinations", {
   skip_if_not_installed("tidytable")
 
   fixtures <- create_minimal_wa_data()
-  withr::local_dir(fixtures$tmpdir)
+  withr::local_dir(new = fixtures$tmpdir)
 
   local_mocked_bindings(
     get_default_paths = function() {
@@ -597,7 +597,7 @@ test_that("weight_annotations() handles boolean flags", {
   skip_if_not_installed("tidytable")
 
   fixtures <- create_minimal_wa_data()
-  withr::local_dir(fixtures$tmpdir)
+  withr::local_dir(new = fixtures$tmpdir)
 
   local_mocked_bindings(
     get_default_paths = function() {

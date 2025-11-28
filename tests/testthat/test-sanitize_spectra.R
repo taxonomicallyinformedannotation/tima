@@ -25,7 +25,7 @@ create_test_spectra_object <- function(
     cbind(mz = mz, intensity = intensity)
   })
 
-  spectra <- Spectra::Spectra(spectra_data)
+  spectra <- Spectra::Spectra(object = spectra_data)
   spectra@backend@peaksData <- peaks_data
   return(spectra)
 }
@@ -103,12 +103,12 @@ test_that("sanitize_spectra applies intensity cutoff", {
     intensity = c(5.0, 50.0, 500.0, 5000.0, 50000.0) # First peak below cutoff
   )
 
-  spectra <- Spectra::Spectra(spectra_data)
+  spectra <- Spectra::Spectra(object = spectra_data)
   spectra@backend@peaksData <- list(peaks)
   result <- sanitize_spectra(spectra, cutoff = 10)
 
   # Should remove peak with intensity 5
-  result_peaks <- Spectra::peaksData(result)[[1]]
+  result_peaks <- Spectra::peaksData(object = result)[[1]]
   expect_true(all(result_peaks[, "mz"] >= 200))
 })
 
@@ -144,7 +144,7 @@ test_that("sanitize_spectra removes spectra with <= 2 peaks", {
     cbind(mz = c(100, 200, 300), intensity = c(100, 200, 300)) # 3 peaks - kept
   )
 
-  spectra <- Spectra::Spectra(spectra_data)
+  spectra <- Spectra::Spectra(object = spectra_data)
   spectra@backend@peaksData <- peaks_list
   result <- sanitize_spectra(spectra, cutoff = 0)
 
@@ -164,11 +164,11 @@ test_that("sanitize_spectra handles precursor peak removal", {
     intensity = c(100, 500, 300, 400)
   )
 
-  spectra <- Spectra::Spectra(spectra_data)
+  spectra <- Spectra::Spectra(object = spectra_data)
   spectra@backend@peaksData <- list(peaks)
   result <- sanitize_spectra(spectra, dalton = 0.01, ppm = 10)
 
-  result_peaks <- Spectra::peaksData(result)[[1]]
+  result_peaks <- Spectra::peaksData(object = result)[[1]]
 
   # Precursor peak should be removed or filtered
   expect_true(nrow(result_peaks) >= 3) # At least 3 non-precursor peaks remain
@@ -188,14 +188,14 @@ test_that("sanitize_spectra removes spectra with NaN values", {
     cbind(mz = c(100, 200, 300, 400), intensity = c(100, 200, 300, 400)) # Clean
   )
 
-  spectra <- Spectra::Spectra(spectra_data)
+  spectra <- Spectra::Spectra(object = spectra_data)
   spectra@backend@peaksData <- peaks_list
 
   result <- sanitize_spectra(spectra)
 
   # Spectrum with NaN should be removed
   expect_equal(length(result), 1)
-  expect_true(all(!is.nan(Spectra::peaksData(result)[[1]])))
+  expect_true(all(!is.nan(Spectra::peaksData(object = result)[[1]])))
 })
 
 test_that("sanitize_spectra handles NULL peaks gracefully", {
@@ -212,7 +212,7 @@ test_that("sanitize_spectra handles NULL peaks gracefully", {
     cbind(mz = c(100, 200, 300, 400), intensity = c(100, 200, 300, 400))
   )
 
-  spectra <- Spectra::Spectra(spectra_data)
+  spectra <- Spectra::Spectra(object = spectra_data)
   spectra@backend@peaksData <- peaks_list
 
   # Should not error and should remove NULL spectrum
@@ -235,12 +235,12 @@ test_that("sanitize_spectra combines similar peaks", {
     intensity = c(100, 50, 200, 300)
   )
 
-  spectra <- Spectra::Spectra(spectra_data)
+  spectra <- Spectra::Spectra(object = spectra_data)
   spectra@backend@peaksData <- list(peaks)
 
   result <- sanitize_spectra(spectra, dalton = 0.01, ppm = 100)
 
-  result_peaks <- Spectra::peaksData(result)[[1]]
+  result_peaks <- Spectra::peaksData(object = result)[[1]]
 
   # Peaks at 100.000 and 100.005 should be combined
   expect_lt(nrow(result_peaks), nrow(peaks))
@@ -250,7 +250,7 @@ test_that("sanitize_spectra scales peak intensities", {
   spectra <- create_test_spectra_object(n_spectra = 1, n_peaks = 5)
   result <- sanitize_spectra(spectra)
 
-  result_peaks <- Spectra::peaksData(result)[[1]]
+  result_peaks <- Spectra::peaksData(object = result)[[1]]
   max_intensity <- max(result_peaks[, "intensity"])
 
   # After scaling, max intensity should be normalized
@@ -328,7 +328,7 @@ test_that("sanitize_spectra works in a pipeline", {
     cbind(mz = mz, intensity = intensity)
   })
 
-  spectra <- Spectra::Spectra(spectra_data)
+  spectra <- Spectra::Spectra(object = spectra_data)
   spectra@backend@peaksData <- peaks_list
 
   # Apply sanitization with different parameters

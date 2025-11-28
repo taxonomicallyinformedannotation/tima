@@ -486,7 +486,7 @@ weight_bio <- function(
     # Ensure all organism columns are character type (fixes NA type mismatch)
     tidytable::mutate(
       tidytable::across(
-        .cols = tidyselect::starts_with("candidate_organism_"),
+        .cols = tidyselect::starts_with(match = "candidate_organism_"),
         .fns = as.character
       )
     ) |>
@@ -571,7 +571,10 @@ weight_bio <- function(
   annot_table_wei_bio <- annot_table_wei_bio_big |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::matches(match = "candidate_structure_tax"),
-      .fns = ~ tidytable::replace_na(.x = .x, replace = "notClassified")
+      .fns = ~ tidytable::replace_na(
+        .x = .x,
+        replace = "notClassified"
+      )
     )) |>
     tidytable::mutate(
       candidate_score_sirius_csi_tmp = transform_score_sirius_csi(

@@ -32,10 +32,10 @@ setup_yaml_test_env <- function() {
 
   # Create prepare_params files
   prepare_params <- file.path(test_dir, "prepare_params.yaml")
-  yaml::write_yaml(list(prepared = TRUE), prepare_params)
+  yaml::write_yaml(x = list(prepared = TRUE), file = prepare_params)
 
   prepare_params_advanced <- file.path(test_dir, "prepare_params_advanced.yaml")
-  yaml::write_yaml(list(advanced = TRUE), prepare_params_advanced)
+  yaml::write_yaml(x = list(advanced = TRUE), file = prepare_params_advanced)
 
   list(
     dir = test_dir,

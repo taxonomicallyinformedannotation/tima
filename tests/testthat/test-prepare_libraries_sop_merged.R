@@ -753,7 +753,7 @@ test_that("prepare_libraries_sop_merged() runs without filtering", {
   )
 
   input_file <- file.path(tmpdir, "library.tsv")
-  tidytable::fwrite(sop_data, input_file, sep = "\t")
+  tidytable::fwrite(x = sop_data, file = input_file, sep = "\t")
 
   # Output files
   output_key <- file.path(tmpdir, "keys.tsv")
@@ -828,7 +828,7 @@ test_that("prepare_libraries_sop_merged() filters by taxonomy", {
   )
 
   input_file <- file.path(tmpdir, "library.tsv")
-  tidytable::fwrite(sop_data, input_file, sep = "\t")
+  tidytable::fwrite(x = sop_data, file = input_file, sep = "\t")
 
   output_key <- file.path(tmpdir, "keys.tsv")
   output_org <- file.path(tmpdir, "org_tax.tsv")
@@ -944,8 +944,8 @@ test_that("prepare_libraries_sop_merged() merges multiple input files", {
 
   file1 <- file.path(tmpdir, "lib1.tsv")
   file2 <- file.path(tmpdir, "lib2.tsv")
-  tidytable::fwrite(sop_data1, file1, sep = "\t")
-  tidytable::fwrite(sop_data2, file2, sep = "\t")
+  tidytable::fwrite(x = sop_data1, file = file1, sep = "\t")
+  tidytable::fwrite(x = sop_data2, file = file2, sep = "\t")
 
   output_key <- file.path(tmpdir, "keys.tsv")
   output_org <- file.path(tmpdir, "org_tax.tsv")

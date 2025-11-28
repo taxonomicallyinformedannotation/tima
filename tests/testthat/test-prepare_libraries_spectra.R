@@ -54,7 +54,7 @@ test_that("prepare_libraries_spectra() validates column name parameters", {
 
 test_that("prepare_libraries_spectra() prepares a single library MGF successfully", {
   skip_if_not_installed("Spectra")
-  withr::local_dir(temp_test_dir("prepare_libraries_spectra_1"))
+  withr::local_dir(new = temp_test_dir("prepare_libraries_spectra_1"))
   mgf <- tempfile(fileext = ".mgf")
   writeLines(
     c(
@@ -82,7 +82,7 @@ test_that("prepare_libraries_spectra() prepares a single library MGF successfull
 
 test_that("prepare_libraries_spectra() handles multiple input files", {
   skip_if_not_installed("Spectra")
-  withr::local_dir(temp_test_dir("prepare_libraries_spectra_2"))
+  withr::local_dir(new = temp_test_dir("prepare_libraries_spectra_2"))
   mgf1 <- tempfile(fileext = ".mgf")
   mgf2 <- tempfile(fileext = ".mgf")
   writeLines(
@@ -131,7 +131,7 @@ test_that("prepare_libraries_spectra() handles multiple input files", {
 
 test_that("prepare_libraries_spectra() runs when optional columns are absent", {
   skip_if_not_installed("Spectra")
-  withr::local_dir(temp_test_dir("prepare_libraries_spectra_3"))
+  withr::local_dir(new = temp_test_dir("prepare_libraries_spectra_3"))
   mgf <- tempfile(fileext = ".mgf")
   writeLines(
     c(

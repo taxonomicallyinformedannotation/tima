@@ -25,7 +25,7 @@ test_that("prepare_features_tables validates features parameter", {
 })
 
 test_that("prepare_features_tables validates output parameter", {
-  withr::local_dir(temp_test_dir("prep_feat_tables_output"))
+  withr::local_dir(new = temp_test_dir("prep_feat_tables_output"))
   paths <- local_test_project(copy = TRUE)
 
   dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
@@ -53,7 +53,7 @@ test_that("prepare_features_tables validates output parameter", {
 })
 
 test_that("prepare_features_tables validates candidates parameter", {
-  withr::local_dir(temp_test_dir("prep_feat_tables_cand"))
+  withr::local_dir(new = temp_test_dir("prep_feat_tables_cand"))
   paths <- local_test_project(copy = TRUE)
 
   dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
@@ -84,7 +84,7 @@ test_that("prepare_features_tables validates candidates parameter", {
 ## Format Detection and Standardization ----
 
 test_that("prepare_features_tables handles MZmine format (Peak area)", {
-  withr::local_dir(temp_test_dir("prep_feat_tables_mzmine"))
+  withr::local_dir(new = temp_test_dir("prep_feat_tables_mzmine"))
   paths <- local_test_project(copy = TRUE)
 
   mzmine_features <- tidytable::tidytable(
@@ -116,7 +116,7 @@ test_that("prepare_features_tables handles MZmine format (Peak area)", {
 })
 
 test_that("prepare_features_tables handles missing RT column", {
-  withr::local_dir(temp_test_dir("prep_feat_tables_no_rt"))
+  withr::local_dir(new = temp_test_dir("prep_feat_tables_no_rt"))
   paths <- local_test_project(copy = TRUE)
 
   no_rt_features <- tidytable::tidytable(
@@ -142,7 +142,7 @@ test_that("prepare_features_tables handles missing RT column", {
 ## Sample Selection ----
 
 test_that("prepare_features_tables retains top intensity samples", {
-  withr::local_dir(temp_test_dir("prep_feat_tables_samples"))
+  withr::local_dir(new = temp_test_dir("prep_feat_tables_samples"))
   paths <- local_test_project(copy = TRUE)
 
   n_samples <- 10
@@ -177,7 +177,7 @@ test_that("prepare_features_tables retains top intensity samples", {
 ## Edge Cases ----
 
 test_that("prepare_features_tables handles empty file", {
-  withr::local_dir(temp_test_dir("prep_feat_tables_empty"))
+  withr::local_dir(new = temp_test_dir("prep_feat_tables_empty"))
   paths <- local_test_project(copy = TRUE)
 
   dir.create("data/source", recursive = TRUE, showWarnings = FALSE)

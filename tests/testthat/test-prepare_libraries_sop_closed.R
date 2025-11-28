@@ -147,7 +147,7 @@ test_that("prepare_libraries_sop_closed removes duplicates from fixture", {
   closed_dup <- tidytable::bind_rows(closed_dup, closed_dup, closed_dup)
 
   temp_input <- tempfile(fileext = ".csv")
-  tidytable::fwrite(closed_dup, temp_input)
+  tidytable::fwrite(x = closed_dup, file = temp_input)
   temp_output <- tempfile(fileext = ".tsv")
 
   prepare_libraries_sop_closed(

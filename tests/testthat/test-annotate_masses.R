@@ -178,7 +178,7 @@ test_that("annotate_masses validates file existence", {
 ## Edge Cases and Empty Input Tests ----
 
 test_that("annotate_masses handles empty features table", {
-  withr::local_dir(temp_test_dir("annotate_masses_empty"))
+  withr::local_dir(new = temp_test_dir("annotate_masses_empty"))
   # Setup temporary test environment with local directory
   paths <- local_test_project()
 
@@ -265,7 +265,7 @@ test_that("annotate_masses handles empty features table", {
 })
 
 test_that("annotate_masses handles features without RT column", {
-  withr::local_dir(temp_test_dir("annotate_masses_no_rt"))
+  withr::local_dir(new = temp_test_dir("annotate_masses_no_rt"))
   # Setup temporary test environment
   paths <- local_test_project()
 
@@ -338,7 +338,7 @@ test_that("annotate_masses handles features without RT column", {
 })
 
 test_that("annotate_masses handles no valid monocharged adducts", {
-  withr::local_dir(temp_test_dir("annotate_masses_no_adducts"))
+  withr::local_dir(new = temp_test_dir("annotate_masses_no_adducts"))
 
   # Setup temporary test environment
   paths <- local_test_project()
@@ -409,7 +409,7 @@ test_that("annotate_masses handles no valid monocharged adducts", {
 ## Functional Tests with Real Data ----
 
 test_that("annotate_masses produces expected output structure", {
-  withr::local_dir(temp_test_dir("annotate_masses_output"))
+  withr::local_dir(new = temp_test_dir("annotate_masses_output"))
   # Setup temporary test environment
 
   # Create realistic features
@@ -534,7 +534,7 @@ test_that("annotate_masses produces expected output structure", {
 })
 
 test_that("annotate_masses respects tolerance_ppm correctly", {
-  withr::local_dir(temp_test_dir("annotate_masses_tolerance"))
+  withr::local_dir(new = temp_test_dir("annotate_masses_tolerance"))
   # Setup temporary test environment
 
   # Create features with known m/z values

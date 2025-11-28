@@ -34,7 +34,7 @@ write_minimal_mgf <- function(path, precursors, charge = "1+") {
 # Validation tests ----
 
 test_that("annotate_spectra validates parameters", {
-  withr::local_dir(temp_test_dir("ann_spe_validate"))
+  withr::local_dir(new = temp_test_dir("ann_spe_validate"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -86,7 +86,7 @@ test_that("annotate_spectra validates parameters", {
 # Basic run & output ----
 
 test_that("annotate_spectra produces output file and columns", {
-  withr::local_dir(temp_test_dir("ann_spe_basic"))
+  withr::local_dir(new = temp_test_dir("ann_spe_basic"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -122,7 +122,7 @@ test_that("annotate_spectra produces output file and columns", {
 # Threshold filtering ----
 
 test_that("threshold filtering removes low similarity candidates", {
-  withr::local_dir(temp_test_dir("ann_spe_threshold"))
+  withr::local_dir(new = temp_test_dir("ann_spe_threshold"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -155,7 +155,7 @@ test_that("threshold filtering removes low similarity candidates", {
 # Approx vs strict precursor reduction ----
 
 test_that("approx mode keeps more library spectra than strict mode", {
-  withr::local_dir(temp_test_dir("ann_spe_approx"))
+  withr::local_dir(new = temp_test_dir("ann_spe_approx"))
   local_test_project(copy = TRUE)
   # Build query with specific precursor values
   query_path <- get_params(step = "annotate_spectra")$files$spectral$raw[1]
@@ -197,7 +197,7 @@ test_that("approx mode keeps more library spectra than strict mode", {
 # Empty template behavior ----
 
 test_that("empty result exports template", {
-  withr::local_dir(temp_test_dir("ann_spe_empty"))
+  withr::local_dir(new = temp_test_dir("ann_spe_empty"))
   local_test_project(copy = TRUE)
   # Query precursors far from library (strict reduction eliminates all)
   query_path <- get_params(step = "annotate_spectra")$files$spectral$raw[1]
@@ -228,7 +228,7 @@ test_that("empty result exports template", {
 # Polarity-based library filtering ----
 
 test_that("polarity filtering drops non-matching libraries and handles none left", {
-  withr::local_dir(temp_test_dir("ann_spe_polarity_filter"))
+  withr::local_dir(new = temp_test_dir("ann_spe_polarity_filter"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -260,7 +260,7 @@ test_that("polarity filtering drops non-matching libraries and handles none left
 # Empty peaks in library cleaning ----
 
 test_that("library spectra with empty peaks are removed before concatenation", {
-  withr::local_dir(temp_test_dir("ann_spe_empty_peaks"))
+  withr::local_dir(new = temp_test_dir("ann_spe_empty_peaks"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -309,7 +309,7 @@ test_that("library spectra with empty peaks are removed before concatenation", {
 # High intensity cutoff yields no query spectra ----
 
 test_that("high qutoff removes all query peaks leading to empty template", {
-  withr::local_dir(temp_test_dir("ann_spe_high_cutoff"))
+  withr::local_dir(new = temp_test_dir("ann_spe_high_cutoff"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   # Place query in expected path
@@ -339,7 +339,7 @@ test_that("high qutoff removes all query peaks leading to empty template", {
 # Duplicate candidate collapse by connectivity layer ----
 
 test_that("duplicate candidates collapsed by connectivity layer are unique", {
-  withr::local_dir(temp_test_dir("ann_spe_dedupe"))
+  withr::local_dir(new = temp_test_dir("ann_spe_dedupe"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
@@ -369,7 +369,7 @@ test_that("duplicate candidates collapsed by connectivity layer are unique", {
 # NA metadata fallback handling ----
 
 test_that("NA fallback for smiles and inchikey connectivity is applied", {
-  withr::local_dir(temp_test_dir("ann_spe_na_fallback"))
+  withr::local_dir(new = temp_test_dir("ann_spe_na_fallback"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(

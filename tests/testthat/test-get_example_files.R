@@ -3,7 +3,7 @@
 library(testthat)
 
 test_that("get_example_files retrieves specific example files", {
-  withr::local_dir(temp_test_dir("get_example_files_specific"))
+  withr::local_dir(new = temp_test_dir("get_example_files_specific"))
   paths <- local_test_project(copy = TRUE)
 
   expect_no_error(
@@ -21,12 +21,12 @@ test_that("get_example_files retrieves specific example files", {
 })
 
 test_that("get_example_files works with default parameters", {
-  withr::local_dir(temp_test_dir("get_example_files_default"))
+  withr::local_dir(new = temp_test_dir("get_example_files_default"))
   expect_no_error(get_example_files())
 })
 
 test_that("get_example_files handles cache mode correctly", {
-  withr::local_dir(temp_test_dir("get_example_files_cache"))
+  withr::local_dir(new = temp_test_dir("get_example_files_cache"))
   paths <- local_test_project(copy = TRUE)
 
   expect_no_error(
@@ -45,7 +45,7 @@ test_that("get_example_files handles cache mode correctly", {
 })
 
 test_that("get_example_files handles single example file", {
-  withr::local_dir(temp_test_dir("get_example_files_single"))
+  withr::local_dir(new = temp_test_dir("get_example_files_single"))
   expect_no_error(
     get_example_files(example = "features")
   )

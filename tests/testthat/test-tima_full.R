@@ -6,7 +6,7 @@ library(testthat)
 
 test_that("archive_log_file handles existing log file", {
   tmp <- temp_test_dir("tima_full_existing")
-  withr::local_dir(tmp)
+  withr::local_dir(new = tmp)
   log_file <- temp_test_path("test.log")
   writeLines("test log content", log_file)
   timestamp <- Sys.time()
@@ -36,7 +36,7 @@ test_that("archive_log_file handles missing log file", {
 
 test_that("archive_log_file creates output directory if needed", {
   temp_dir <- temp_test_dir("archive_log")
-  withr::local_dir(temp_dir)
+  withr::local_dir(new = temp_dir)
   log_file <- file.path(temp_dir, "test.log")
   writeLines("test log", log_file)
   archive_log_file(log_file = basename(log_file), timestamp = Sys.time())
@@ -47,7 +47,7 @@ test_that("execute_targets_pipeline handles errors gracefully", {
   skip_if_not_installed("targets")
 
   # This will fail because no _targets.R exists in temp directory
-  withr::local_dir(temp_test_dir("no_targets"))
+  withr::local_dir(new = temp_test_dir("no_targets"))
   expect_error(
     execute_targets_pipeline(target_pattern = "^test$"),
     "Pipeline execution failed|workflow pipeline failed"
@@ -167,7 +167,7 @@ test_that("tima_full preserves logs when clean_old_logs = FALSE", {
 
 test_that("archive_log_file timestamp format is correct", {
   temp_dir <- temp_test_dir("timestamp_test")
-  withr::local_dir(temp_dir)
+  withr::local_dir(new = temp_dir)
   log_file <- file.path(temp_dir, "timestamp_test.log")
   writeLines("test", log_file)
   timestamp <- as.POSIXct("2024-01-15 14:30:45")
