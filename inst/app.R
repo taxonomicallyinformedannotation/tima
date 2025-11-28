@@ -2670,11 +2670,11 @@ server <- function(input, output) {
     ## https://github.com/taxonomicallyinformedannotation/tima-shinylive/pull/7
     if (R.Version()$os != "emscripten") {
       targets::tar_make(
-        names = tidyselect::matches("^ann_pre$")
+        names = tidyselect::matches("^ann_wei$")
       )
     } else {
       targets::tar_make(
-        names = tidyselect::matches("^ann_pre$"),
+        names = tidyselect::matches("^ann_wei$"),
         callr_function = NULL
       )
     }

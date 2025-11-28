@@ -70,7 +70,7 @@ jobs:
         shell: Rscript {0}
       - name: Run pipeline
         run: |
-          tima::tima_full()
+          tima::run_tima()
           # Check if targets works correctly
-          tima::tima_full()
+          tima::run_tima()
         shell: Rscript {0}

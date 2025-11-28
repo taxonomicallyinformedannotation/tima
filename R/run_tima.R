@@ -58,7 +58,7 @@ archive_log_file <- function(log_file, timestamp) {
 #'
 #' @return Invisible NULL
 #' @keywords internal
-execute_targets_pipeline <- function(target_pattern = "^ann_pre$") {
+execute_targets_pipeline <- function(target_pattern = "^ann_wei$") {
   log_info("Executing targets pipeline (pattern: %s)...", target_pattern)
 
   tryCatch(
@@ -104,7 +104,7 @@ execute_targets_pipeline <- function(target_pattern = "^ann_pre$") {
 #' @include logs_utils.R
 #'
 #' @param target_pattern Character. Regex pattern for target selection.
-#'     Default: "^ann_pre$" (annotation preparation target)
+#'     Default: "^ann_wei$" (annotation preparation target)
 #' @param log_file Character. Path to log file. Default: "tima.log"
 #' @param clean_old_logs Logical. Remove old log file before starting.
 #'     Default: TRUE
@@ -121,29 +121,29 @@ execute_targets_pipeline <- function(target_pattern = "^ann_pre$") {
 #' @examples
 #' \dontrun{
 #' # Run full workflow with defaults (INFO level)
-#' tima_full()
+#' run_tima()
 #'
 #' # Run with debug logging for troubleshooting
-#' tima_full(log_level = "debug")
+#' run_tima(log_level = "debug")
 #'
 #' # Run with minimal logging (warnings and errors only)
-#' tima_full(log_level = "warn")
+#' run_tima(log_level = "warn")
 #'
 #' # Run with custom target pattern
-#' tima_full(target_pattern = "^prepare_")
+#' run_tima(target_pattern = "^prepare_")
 #'
 #' # Preserve existing logs
-#' tima_full(clean_old_logs = FALSE)
+#' run_tima(clean_old_logs = FALSE)
 #'
 #' # Combine multiple options
-#' tima_full(
+#' run_tima(
 #'   target_pattern = "^ann_",
 #'   log_level = "debug",
 #'   clean_old_logs = FALSE
 #' )
 #' }
-tima_full <- function(
-  target_pattern = "^ann_pre$",
+run_tima <- function(
+  target_pattern = "^ann_wei$",
   log_file = "tima.log",
   clean_old_logs = TRUE,
   log_level = "info"

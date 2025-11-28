@@ -348,3 +348,56 @@ test_that("init_logging is case-insensitive for log level", {
 
   expect_silent(init_logging())
 })
+
+test_that("lazy logging initialization works", {
+  # Test that logging functions are available
+  expect_true(exists("log_info", where = asNamespace("tima"), inherits = FALSE))
+  expect_true(exists("log_debug", where = asNamespace("tima"), inherits = FALSE))
+  expect_true(exists("log_warn", where = asNamespace("tima"), inherits = FALSE))
+  expect_true(exists("log_error", where = asNamespace("tima"), inherits = FALSE))
+
+  # Test that helper functions exist
+  expect_true(exists("ensure_logging_initialized",
+    where = asNamespace("tima"), inherits = FALSE
+  ))
+  expect_true(exists("is_logging_initialized",
+    where = asNamespace("tima"), inherits = FALSE
+  ))
+})
+
+test_that("logging does not create file on package load", {
+  # This test verifies that loading the package doesn't create tima.log
+  # In actual usage, we can't test this directly, but we can verify
+  # the .onLoad function doesn't call init_logging
+
+  # Get the .onLoad function
+  onLoad <- get(".onLoad", envir = asNamespace("tima"))
+
+  # Convert to character to check it doesn't contain init_logging call
+  onLoad_body <- deparse(body(onLoad))
+
+  # Should NOT contain init_logging() call
+  expect_false(any(grepl("init_logging\\(\\)", onLoad_body, fixed = FALSE)))
+})
+
+test_that("logging functions use sprintf-style formatting", {
+  # Test that our logging wrappers exist and work with sprintf format
+  ns <- asNamespace("tima")
+
+  # Test with temp log file
+  temp_log <- tempfile(fileext = ".log")
+  on.exit(unlink(temp_log), add = TRUE)
+
+  # Setup logger
+  tima:::setup_logger(temp_log, 400)
+
+  # Test sprintf-style logging
+  tima:::log_info("Test %d: %s", 1, "message")
+  tima:::log_warn("Warning %s", "test")
+
+  # Read log and verify format
+  log_content <- readLines(temp_log)
+  expect_true(length(log_content) >= 2)
+  expect_true(any(grepl("Test 1: message", log_content)))
+  expect_true(any(grepl("Warning test", log_content)))
+})
