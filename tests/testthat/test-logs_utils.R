@@ -352,16 +352,28 @@ test_that("init_logging is case-insensitive for log level", {
 test_that("lazy logging initialization works", {
   # Test that logging functions are available
   expect_true(exists("log_info", where = asNamespace("tima"), inherits = FALSE))
-  expect_true(exists("log_debug", where = asNamespace("tima"), inherits = FALSE))
+  expect_true(exists(
+    "log_debug",
+    where = asNamespace("tima"),
+    inherits = FALSE
+  ))
   expect_true(exists("log_warn", where = asNamespace("tima"), inherits = FALSE))
-  expect_true(exists("log_error", where = asNamespace("tima"), inherits = FALSE))
+  expect_true(exists(
+    "log_error",
+    where = asNamespace("tima"),
+    inherits = FALSE
+  ))
 
   # Test that helper functions exist
-  expect_true(exists("ensure_logging_initialized",
-    where = asNamespace("tima"), inherits = FALSE
+  expect_true(exists(
+    "ensure_logging_initialized",
+    where = asNamespace("tima"),
+    inherits = FALSE
   ))
-  expect_true(exists("is_logging_initialized",
-    where = asNamespace("tima"), inherits = FALSE
+  expect_true(exists(
+    "is_logging_initialized",
+    where = asNamespace("tima"),
+    inherits = FALSE
   ))
 })
 
