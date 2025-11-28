@@ -401,7 +401,7 @@ test_that("annotate_masses handles no valid monocharged adducts", {
         output_annotations = output_annotations,
         output_edges = output_edges
       ),
-      "Check that your adducts_list and clusters_list contain valid entries for mode 'pos'."
+      "Please check your adducts and clusters"
     )
   )
 })
