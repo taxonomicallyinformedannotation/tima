@@ -37,7 +37,8 @@ library("tima")
 if (dir.exists("../../inst")) {
   knitr::opts_knit$set(root.dir = "../../inst")
 }
-lgr::lgr(400)  # INFO level
+logger <- lgr::lgr
+logger$set_threshold(level = 400)
 ```
 
 This vignette describes the main steps of the annotation process.
