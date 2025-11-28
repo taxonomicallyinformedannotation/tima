@@ -39,8 +39,8 @@ if (dir.exists("../../inst")) {
   knitr::opts_knit$set(root.dir = "../../inst")
 }
 tima:::copy_backbone()
-lgr::lgr(400)  # INFO level
-tima::get_example_files()
+logger <- lgr::lgr
+logger$set_threshold(level = 400)
 ```
 
 This vignette describes how **T**axonomically **I**nformed **M**etabolite **A**nnotation is performed.
