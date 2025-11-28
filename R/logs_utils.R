@@ -206,11 +206,11 @@ setup_logger <- function(filename = "tima.log", threshold = 600) {
 
   # Set up appenders to write to both console and file
   lgr::lgr$add_appender(
-    lgr::AppenderConsole$new(layout = custom_layout),
+    appender = lgr::AppenderConsole$new(layout = custom_layout),
     name = "console"
   )
   lgr::lgr$add_appender(
-    lgr::AppenderFile$new(file = filename, layout = custom_layout),
+    appender = lgr::AppenderFile$new(file = filename, layout = custom_layout),
     name = "file"
   )
 
@@ -220,12 +220,16 @@ setup_logger <- function(filename = "tima.log", threshold = 600) {
 #' @title Initialize logging from environment
 #'
 #' @description Convenience wrapper to configure logging based on environment
-#'     variables. Safe to call multiple times.
+#'     variables. Safe to call multiple times (idempotent).
 #'
 #' @details
 #' Environment variables:
 #' - TIMA_LOG_FILE: Path to log file (default: "tima.log")
 #' - TIMA_LOG_LEVEL: TRACE|DEBUG|INFO|WARN|ERROR (default: DEFAULT_LOG_LEVEL)
+#'
+#' This function is automatically called on first use of any logging function,
+#' so explicit initialization is optional. However, you can call it explicitly
+#' to customize logging before any messages are logged.
 #'
 #' @return NULL (invisibly)
 #' @keywords internal
@@ -261,9 +265,49 @@ init_logging <- function() {
   setup_logger(filename = log_file, threshold = threshold)
 }
 
+#' Check if logging has been initialized
+#'
+#' @return Logical. TRUE if logger has file appender configured.
+#' @keywords internal
+#' @noRd
+is_logging_initialized <- function() {
+  # Check if lgr has a file appender configured
+  appenders <- lgr::lgr$appenders
+  if (length(appenders) == 0) {
+    return(FALSE)
+  }
+
+  # Check if any appender is a file appender
+  has_file <- any(vapply(
+    appenders,
+    function(x) inherits(x, "AppenderFile"),
+    logical(1)
+  ))
+
+  return(has_file)
+}
+
+#' Ensure logging is initialized (lazy initialization)
+#'
+#' @description Checks if logging is initialized and initializes it if not.
+#'     This allows logging to be set up only when first needed, avoiding
+#'     creation of empty log files when package is merely loaded.
+#'
+#' @return NULL (invisibly)
+#' @keywords internal
+#' @noRd
+ensure_logging_initialized <- function() {
+  if (!is_logging_initialized()) {
+    init_logging()
+  }
+  invisible(NULL)
+}
+
 #' @title Logging wrapper functions for lgr compatibility
 #'
-#' @description Simple logging wrappers that use sprintf-style formatting
+#' @description Simple logging wrappers that use sprintf-style formatting.
+#'     These functions automatically initialize logging on first use (lazy initialization),
+#'     so no empty log files are created when the package is merely loaded.
 #'
 #' @param msg Message template (use sprintf format: "Value: %s")
 #' @param ... Values to substitute into msg via sprintf
@@ -275,6 +319,7 @@ NULL
 
 #' @rdname logging_wrappers
 log_trace <- function(msg, ...) {
+  ensure_logging_initialized()
   if (...length() > 0) {
     msg <- sprintf(msg, ...)
   }
@@ -284,6 +329,7 @@ log_trace <- function(msg, ...) {
 
 #' @rdname logging_wrappers
 log_debug <- function(msg, ...) {
+  ensure_logging_initialized()
   if (...length() > 0) {
     msg <- sprintf(msg, ...)
   }
@@ -293,6 +339,7 @@ log_debug <- function(msg, ...) {
 
 #' @rdname logging_wrappers
 log_info <- function(msg, ...) {
+  ensure_logging_initialized()
   if (...length() > 0) {
     msg <- sprintf(msg, ...)
   }
@@ -302,6 +349,7 @@ log_info <- function(msg, ...) {
 
 #' @rdname logging_wrappers
 log_warn <- function(msg, ...) {
+  ensure_logging_initialized()
   if (...length() > 0) {
     msg <- sprintf(msg, ...)
   }
@@ -311,6 +359,7 @@ log_warn <- function(msg, ...) {
 
 #' @rdname logging_wrappers
 log_error <- function(msg, ...) {
+  ensure_logging_initialized()
   if (...length() > 0) {
     msg <- sprintf(msg, ...)
   }
@@ -320,6 +369,7 @@ log_error <- function(msg, ...) {
 
 #' @rdname logging_wrappers
 log_fatal <- function(msg, ...) {
+  ensure_logging_initialized()
   if (...length() > 0) {
     msg <- sprintf(msg, ...)
   }
@@ -329,6 +379,7 @@ log_fatal <- function(msg, ...) {
 
 #' @rdname logging_wrappers
 log_success <- function(msg, ...) {
+  ensure_logging_initialized()
   if (...length() > 0) {
     msg <- sprintf(msg, ...)
   }

@@ -1,5 +1,6 @@
 ^renv$
 ^renv\.lock$
+^tima\.iml$
 ^tima\.Rproj$
 ^\.Rproj\.user$
 ^_pkgdown\.yml$

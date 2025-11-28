@@ -8,15 +8,11 @@ NULL
 
 .datatable.aware <- TRUE
 
-#' @include logs_utils.R
 .onLoad <- function(libname, pkgname) {
-  # Initialize logging from environment (safe to call multiple times)
-  try(
-    {
-      init_logging()
-    },
-    silent = TRUE
-  )
+  # NOTE: Logging is NOT initialized here to avoid creating empty log files
+  # when the package is loaded. Instead, logging is initialized on-demand
+  # when functions that need logging are called (e.g., tima_full()).
+  # Users can still manually initialize logging with init_logging() if needed.
 
   # Hints/operators to appease R CMD check and lazy loading quirks
   DT::`%>%`

@@ -101,12 +101,17 @@ execute_targets_pipeline <- function(target_pattern = "^ann_pre$") {
 #' }
 #'
 #' @include go_to_cache.R
+#' @include logs_utils.R
 #'
 #' @param target_pattern Character. Regex pattern for target selection.
 #'     Default: "^ann_pre$" (annotation preparation target)
 #' @param log_file Character. Path to log file. Default: "tima.log"
 #' @param clean_old_logs Logical. Remove old log file before starting.
 #'     Default: TRUE
+#' @param log_level Character or numeric. Logging verbosity level.
+#'     Can be one of: "trace", "debug", "info", "warn", "error", "fatal"
+#'     or numeric values: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200, FATAL=100.
+#'     Default: "info" (400). Use "debug" for detailed troubleshooting.
 #'
 #' @return Invisible NULL. Executes workflow as side effect and creates
 #'     timestamped log files in data/processed/
@@ -115,19 +120,33 @@ execute_targets_pipeline <- function(target_pattern = "^ann_pre$") {
 #'
 #' @examples
 #' \dontrun{
-#' # Run full workflow with defaults
+#' # Run full workflow with defaults (INFO level)
 #' tima_full()
+#'
+#' # Run with debug logging for troubleshooting
+#' tima_full(log_level = "debug")
+#'
+#' # Run with minimal logging (warnings and errors only)
+#' tima_full(log_level = "warn")
 #'
 #' # Run with custom target pattern
 #' tima_full(target_pattern = "^prepare_")
 #'
 #' # Preserve existing logs
 #' tima_full(clean_old_logs = FALSE)
+#'
+#' # Combine multiple options
+#' tima_full(
+#'   target_pattern = "^ann_",
+#'   log_level = "debug",
+#'   clean_old_logs = FALSE
+#' )
 #' }
 tima_full <- function(
   target_pattern = "^ann_pre$",
   log_file = "tima.log",
-  clean_old_logs = TRUE
+  clean_old_logs = TRUE,
+  log_level = "info"
 ) {
   # Input Validation ----
   if (!is.character(target_pattern) || length(target_pattern) != 1L) {
@@ -142,8 +161,65 @@ tima_full <- function(
     stop("clean_old_logs must be a single logical value", call. = FALSE)
   }
 
+  # Validate and convert log_level
+  if (is.character(log_level)) {
+    if (length(log_level) != 1L) {
+      stop("log_level must be a single value", call. = FALSE)
+    }
+
+    valid_levels <- c("trace", "debug", "info", "warn", "error", "fatal")
+    log_level_lower <- tolower(log_level)
+
+    if (!log_level_lower %in% valid_levels) {
+      stop(
+        sprintf(
+          "log_level must be one of: %s (got '%s')",
+          paste(valid_levels, collapse = ", "),
+          log_level
+        ),
+        call. = FALSE
+      )
+    }
+
+    # Convert to numeric threshold for lgr
+    level_map <- list(
+      trace = 600,
+      debug = 500,
+      info = 400,
+      warn = 300,
+      error = 200,
+      fatal = 100
+    )
+    log_threshold <- level_map[[log_level_lower]]
+  } else if (is.numeric(log_level)) {
+    if (length(log_level) != 1L) {
+      stop("log_level must be a single value", call. = FALSE)
+    }
+
+    valid_numeric <- c(600, 500, 400, 300, 200, 100)
+    if (!log_level %in% valid_numeric) {
+      stop(
+        sprintf(
+          "log_level must be one of: %s (got %g)",
+          paste(valid_numeric, collapse = ", "),
+          log_level
+        ),
+        call. = FALSE
+      )
+    }
+    log_threshold <- as.integer(log_level)
+  } else {
+    stop(
+      "log_level must be character (e.g., 'info') or numeric (e.g., 400)",
+      call. = FALSE
+    )
+  }
+
   # Initialize ----
   start_time <- Sys.time()
+
+  # Setup logger with specified threshold
+  setup_logger(filename = log_file, threshold = log_threshold)
 
   # Clean up previous log file if requested
   if (isTRUE(clean_old_logs) && file.exists(log_file)) {
