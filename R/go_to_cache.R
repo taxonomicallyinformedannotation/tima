@@ -41,7 +41,7 @@ go_to_cache <- function(dir = ".tima") {
 
   # Construct and Create Cache Path ----
   cache <- fs::path_home(dir)
-  logger::log_debug("Cache directory: {cache}")
+  log_debug("Cache directory: {cache}")
 
   ensure_cache_exists(cache)
 
@@ -57,19 +57,19 @@ go_to_cache <- function(dir = ".tima") {
 #' @keywords internal
 ensure_cache_exists <- function(cache) {
   if (dir.exists(cache)) {
-    logger::log_debug("Cache exists")
+    log_debug("Cache exists")
     return(invisible(TRUE))
   }
 
-  logger::log_info("Creating cache: {cache}")
+  log_info("Creating cache: {cache}")
 
   tryCatch(
     {
       fs::dir_create(path = cache)
-      logger::log_debug("Cache created")
+      log_debug("Cache created")
     },
     error = function(e) {
-      logger::log_error("Failed to create cache: {conditionMessage(e)}")
+      log_error("Failed to create cache: {conditionMessage(e)}")
       stop(
         "Cannot create cache directory '",
         cache,
@@ -87,10 +87,10 @@ change_to_cache <- function(cache) {
   tryCatch(
     {
       setwd(dir = cache)
-      logger::log_info("Working directory: {cache}")
+      log_info("Working directory: {cache}")
     },
     error = function(e) {
-      logger::log_error("Failed to change directory: {conditionMessage(e)}")
+      log_error("Failed to change directory: {conditionMessage(e)}")
       stop(
         "Cannot change to cache directory '",
         cache,

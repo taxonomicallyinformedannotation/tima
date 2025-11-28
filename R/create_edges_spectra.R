@@ -120,9 +120,9 @@ create_edges_spectra <- function(
 
   # Import and Process Spectra ----
 
-  logger::log_info("Creating spectral similarity network edges")
-  logger::log_debug("Parameters - Threshold: {threshold}, Method: {method}")
-  logger::log_debug("Tolerances - PPM: {ppm}, Dalton: {dalton}")
+  log_info("Creating spectral similarity network edges")
+  log_debug("Parameters - Threshold: {threshold}, Method: {method}")
+  log_debug("Tolerances - PPM: {ppm}, Dalton: {dalton}")
 
   # Import spectra with specified parameters
   spectra <- input |>
@@ -134,7 +134,7 @@ create_edges_spectra <- function(
 
   # Early exit if only one or no spectra
   if (length(spectra) <= 1L) {
-    logger::log_warn(
+    log_warn(
       "Only {length(spectra)} spectrum found - need at least 2 for network edges"
     )
     edges <- tidytable::tidytable(
@@ -151,13 +151,15 @@ create_edges_spectra <- function(
 
   # Compute Spectral Similarities ----
 
-  # logger::log_trace(
+  # log_trace(
   #  "Performing spectral comparison on {length(spectra)} spectra"
   # )
-  # logger::log_trace(
+  # log_trace(
   #  "As the precursors delta is not limited, expect a long processing time."
   # )
-  logger::log_with_separator("Take yourself a break, you deserve it.")
+  log_info("========================================")
+  log_info("Take yourself a break, you deserve it.")
+  log_info("========================================")
 
   # Extract data (cache for reuse)
   nspecz <- length(spectra)
@@ -177,14 +179,14 @@ create_edges_spectra <- function(
   )
 
   # Calculate spectral entropy
-  # logger::log_trace("Calculating features' entropy")
+  # log_trace("Calculating features' entropy")
   entropy <- vapply(
     fragz,
     msentropy::calculate_spectral_entropy,
     FUN.VALUE = numeric(1),
     USE.NAMES = FALSE
   )
-  # logger::log_trace("Counting features' number of peaks")
+  # log_trace("Counting features' number of peaks")
   npeaks <- vapply(
     X = fragz,
     FUN = nrow,

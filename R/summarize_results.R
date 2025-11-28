@@ -59,12 +59,12 @@ summarize_results <- function(
   if (nrow(df) == 0L) {
     msg <- "Empty results table provided"
     warning(msg, call. = FALSE)
-    logger::log_warn(msg)
+    log_warn(msg)
     return(df)
   }
 
-  logger::log_info("Summarizing annotation results")
-  logger::log_debug("Remove ties: {remove_ties}, Summarize: {summarize}")
+  log_info("Summarizing annotation results")
+  log_debug("Remove ties: {remove_ties}, Summarize: {summarize}")
 
   model <- columns_model()
 
@@ -178,7 +178,7 @@ summarize_results <- function(
 
   # Remove ties if requested
   if (remove_ties == TRUE) {
-    logger::log_info("Removing ties")
+    log_info("Removing ties")
     df_joined <- df_joined |>
       tidytable::distinct(c(feature_id, rank_final), .keep_all = TRUE)
   }

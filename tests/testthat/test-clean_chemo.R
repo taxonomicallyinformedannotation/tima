@@ -698,7 +698,6 @@ test_that("remove_compound_names keeps names when compounds_names=TRUE", {
 })
 # Integration Tests ----
 # test_that("clean_chemo handles empty annotation table", {
-#   skip_if_not_installed("logger")
 #
 #   # Create proper fixture with empty tables that have the right structure
 #   components_table <- tidytable::tidytable(

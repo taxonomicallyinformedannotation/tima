@@ -45,7 +45,7 @@ harmonize_adducts <- function(
 
   # No column to harmonize
   if (!adducts_colname %in% names(df)) {
-    logger::log_debug(
+    log_debug(
       "Column '{adducts_colname}' not found, skipping harmonization"
     )
     return(df)
@@ -96,7 +96,7 @@ harmonize_adducts <- function(
 
   # Log reduction in unique forms (indicates successful harmonization)
   if (n_unique_before != n_unique_after) {
-    logger::log_error(
+    log_error(
       "Harmonized: {n_unique_before} -> {n_unique_after} unique adduct forms"
     )
   }

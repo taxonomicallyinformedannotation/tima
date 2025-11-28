@@ -41,10 +41,10 @@ prepare_libraries_sop_closed <- function(
     stop("output must be a single character string")
   }
 
-  logger::log_info("Preparing closed structure-organism pairs library")
+  log_info("Preparing closed structure-organism pairs library")
 
   if (file.exists(input)) {
-    logger::log_debug("Loading closed resource from: {input}")
+    log_debug("Loading closed resource from: {input}")
 
     closed <- tryCatch(
       {
@@ -60,10 +60,10 @@ prepare_libraries_sop_closed <- function(
     )
 
     if (nrow(closed) == 0L) {
-      logger::log_warn("Closed library file is empty")
+      log_warn("Closed library file is empty")
       closed_prepared <- fake_sop_columns()
     } else {
-      # logger::log_trace("Formatting closed resource (", nrow(closed), " rows)")
+      # log_trace("Formatting closed resource (", nrow(closed), " rows)")
 
       closed_prepared <- closed |>
         tidytable::mutate(
@@ -79,7 +79,7 @@ prepare_libraries_sop_closed <- function(
         round_reals() |>
         tidytable::distinct()
 
-      logger::log_info(
+      log_info(
         "Formatted ",
         nrow(closed_prepared),
         " unique structure-organism pairs"
@@ -87,7 +87,7 @@ prepare_libraries_sop_closed <- function(
       rm(closed)
     }
   } else {
-    logger::log_warn(
+    log_warn(
       "Closed resource not accessible at: ",
       input,
       ". Returning empty template instead."

@@ -146,10 +146,10 @@ get_params <- function(step) {
 
   # Load and merge YAML parameters
   params <- if (file.exists(user_param_path)) {
-    # logger::log_debug("Using user parameters: {user_param_path}")
+    # log_debug("Using user parameters: {user_param_path}")
     parse_yaml_params(def = default_param_path, usr = user_param_path)
   } else {
-    # logger::log_debug("Using default parameters: {default_param_path}")
+    # log_debug("Using default parameters: {default_param_path}")
     parse_yaml_params(def = default_param_path, usr = default_param_path)
   }
 
@@ -164,7 +164,7 @@ get_params <- function(step) {
   cli_args <- tryCatch(
     docopt::docopt(doc = docopt_text, version = paths$version),
     error = function(e) {
-      logger::log_debug(
+      log_debug(
         "No CLI arguments provided or parsing failed, using defaults: {e$message}"
       )
       list() # Return empty list to use defaults

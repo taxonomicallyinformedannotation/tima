@@ -62,7 +62,7 @@ get_example_files <- function(
     stop("in_cache must be a single logical value (TRUE/FALSE)")
   }
 
-  logger::log_debug(
+  log_debug(
     "Downloading {length(example)} example file(s): {paste(example, collapse = ', ')}"
   )
 
@@ -73,21 +73,21 @@ get_example_files <- function(
 
   # Download each requested example file
   if ("features" %in% example) {
-    logger::log_debug("Downloading features example")
+    log_debug("Downloading features example")
     get_file(
       url = get_default_paths()$urls$examples$features,
       export = get_default_paths()$data$source$features
     )
   }
   # if ("hmdb_is" %in% example) {
-  #   logger::log_trace("HMDB in silico")
+  #   log_trace("HMDB in silico")
   #   get_file(
   #     url = get_default_paths()$urls$hmdb$spectra$predicted,
   #     export = get_default_paths()$data$source$libraries$spectra$is$hmdb
   #   )
   # }
   if ("metadata" %in% example) {
-    logger::log_debug("Downloading metadata example")
+    log_debug("Downloading metadata example")
     get_file(
       url = get_default_paths()$urls$examples$metadata,
       export = get_default_paths()$data$source$metadata
@@ -95,12 +95,12 @@ get_example_files <- function(
   }
 
   if ("sirius" %in% example) {
-    logger::log_debug("Downloading SIRIUS examples")
+    log_debug("Downloading SIRIUS examples")
     get_example_sirius()
   }
 
   if ("spectra" %in% example) {
-    logger::log_debug("Downloading spectra example")
+    log_debug("Downloading spectra example")
     get_file(
       url = get_default_paths()$urls$examples$spectra,
       # url = get_default_paths()$urls$examples$spectra_mini,
@@ -109,13 +109,13 @@ get_example_files <- function(
   }
 
   if ("spectral_lib_with_rt" %in% example) {
-    logger::log_debug("Downloading spectral library with retention times")
+    log_debug("Downloading spectral library with retention times")
     get_file(
       url = get_default_paths()$urls$examples$spectral_lib_mini$with_rt,
       export = get_default_paths()$data$source$libraries$spectra$exp$with_rt
     )
   }
 
-  logger::log_info("Downloaded {length(example)} example file(s)")
+  log_info("Downloaded {length(example)} example file(s)")
   invisible(NULL)
 }

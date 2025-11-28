@@ -3,11 +3,7 @@
 wa_create_minimal_files <- function(root = NULL) {
   # Use temp directory if root not provided
   if (is.null(root)) {
-    if (!exists(".test_root", envir = .GlobalEnv)) {
-      root <- file.path(tempdir(), sprintf("tima-tests-%s", Sys.getpid()))
-    } else {
-      root <- get(".test_root", envir = .GlobalEnv)
-    }
+    root <- get_test_root()
   }
 
   dir.create(

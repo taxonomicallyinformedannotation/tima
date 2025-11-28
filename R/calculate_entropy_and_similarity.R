@@ -78,10 +78,10 @@ calculate_entropy_and_similarity <- function(
   assert_scalar_numeric(threshold, "threshold", min = 0, max = 1)
   assert_flag(approx, "approx")
 
-  logger::log_info(
+  log_info(
     "Calculating entropy and similarity for {length(query_spectra)} spectra"
   )
-  logger::log_debug(
+  log_debug(
     "Parameters - Method: {method}, Dalton: {dalton}, PPM: {ppm}"
   )
 

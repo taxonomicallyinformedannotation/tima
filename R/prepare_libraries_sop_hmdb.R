@@ -41,16 +41,16 @@ prepare_libraries_sop_hmdb <- function(
     stop("output must be a single character string")
   }
 
-  logger::log_info("Preparing HMDB structure-organism pairs")
+  log_info("Preparing HMDB structure-organism pairs")
 
   if (!file.exists(output) || file.size(output) < 100000) {
     if (!file.exists(input)) {
-      logger::log_warn("HMDB file not found: {input}")
-      logger::log_info("Creating empty HMDB library")
+      log_warn("HMDB file not found: {input}")
+      log_info("Creating empty HMDB library")
       hmdb_prepared <- fake_sop_columns()
     } else {
-      logger::log_debug("Processing HMDB from: {input}")
-      # logger::log_trace("Unzipping HMDB")
+      log_debug("Processing HMDB from: {input}")
+      # log_trace("Unzipping HMDB")
       hmdb_prepared <- tryCatch(
         expr = {
           utils::unzip(
@@ -63,7 +63,7 @@ prepare_libraries_sop_hmdb <- function(
               replacement = ".sdf",
               fixed = TRUE
             )
-          # logger::log_trace("Loading HMDB")
+          # log_trace("Loading HMDB")
           sdf_data <- readLines(con = hmdb_structures, warn = FALSE)
 
           find_fixed_pattern_line_in_file <- function(file, pattern) {
@@ -128,7 +128,7 @@ prepare_libraries_sop_hmdb <- function(
             name = hmdb_list$name
           )
 
-          # logger::log_trace("Formatting HMDB")
+          # log_trace("Formatting HMDB")
           hmdb_prepared <- hmdb_df |>
             tidytable::mutate(tidytable::across(
               .cols = tidyselect::everything(),
@@ -183,12 +183,12 @@ prepare_libraries_sop_hmdb <- function(
             round_reals() |>
             tidytable::distinct()
 
-          # logger::log_trace("Deleting unzipped file")
+          # log_trace("Deleting unzipped file")
           file.remove(hmdb_structures)
           hmdb_prepared
         },
         error = function(e) {
-          logger::log_error(
+          log_error(
             "Something went wrong with HMDB processing: ",
             conditionMessage(e)
           )
@@ -199,7 +199,7 @@ prepare_libraries_sop_hmdb <- function(
 
     export_output(x = hmdb_prepared, file = output)
   } else {
-    # logger::log_trace("HMDB library already exists and is valid")
+    # log_trace("HMDB library already exists and is valid")
   }
 
   return(output)

@@ -46,7 +46,7 @@ select_annotations_columns <- function(
 
   # Early exit for empty input
   if (nrow(df) == 0L) {
-    logger::log_warn("Empty data frame provided")
+    log_warn("Empty data frame provided")
     return(df)
   }
 
@@ -59,7 +59,7 @@ select_annotations_columns <- function(
     str_tax_npc = str_tax_npc
   ))
 
-  logger::log_debug("Input: {nrow(df)} rows, {ncol(df)} columns")
+  log_debug("Input: {nrow(df)} rows, {ncol(df)} columns")
 
   # Get column model
   model <- columns_model()
@@ -108,7 +108,7 @@ select_annotations_columns <- function(
       str_tax_npc = str_tax_npc
     )
 
-  # logger::log_trace("Output: ", nrow(df), " rows, ", ncol(df), " columns")
+  # log_trace("Output: ", nrow(df), " rows, ", ncol(df), " columns")
 
   return(df)
 }

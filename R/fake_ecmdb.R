@@ -20,7 +20,7 @@ fake_ecmdb <- function(export) {
     stop("export path must be a single character string")
   }
 
-  logger::log_warn("ECMDB download failed. Creating empty placeholder file.")
+  log_warn("ECMDB download failed. Creating empty placeholder file.")
 
   # Extract filename without path and .zip extension
   fake_export <- export |>
@@ -59,7 +59,7 @@ fake_ecmdb <- function(export) {
   )
 
   if (zip_result != 0) {
-    logger::log_warn("Failed to create zip file, trying alternative method")
+    log_warn("Failed to create zip file, trying alternative method")
     utils::zip(zipfile = basename(export), files = fake_export)
   }
 
@@ -71,6 +71,6 @@ fake_ecmdb <- function(export) {
   # Clean up temporary file
   unlink(fake_export)
 
-  logger::log_debug("Created fake ECMDB file at: ", export)
+  log_debug("Created fake ECMDB file at: ", export)
   return(export)
 }

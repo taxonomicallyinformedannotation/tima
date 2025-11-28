@@ -34,11 +34,11 @@ export_spectra_rds <- function(file, spectra) {
   valid_spectra <- spectra[!is.na(spectra$compound_id)]
 
   if (length(valid_spectra) == 0L) {
-    logger::log_warn("No spectra with valid compound IDs to export")
+    log_warn("No spectra with valid compound IDs to export")
     return(invisible(NULL))
   }
 
-  logger::log_debug("Exporting ", length(valid_spectra), " spectra to: ", file)
+  log_debug("Exporting ", length(valid_spectra), " spectra to: ", file)
 
   # Create output directory if needed
   create_dir(export = file)
@@ -46,6 +46,6 @@ export_spectra_rds <- function(file, spectra) {
   # Save spectra as RDS
   saveRDS(valid_spectra, file = file)
 
-  # logger::log_trace("Successfully exported spectra")
+  # log_trace("Successfully exported spectra")
   invisible(NULL)
 }

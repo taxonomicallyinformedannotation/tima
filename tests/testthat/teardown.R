@@ -49,10 +49,7 @@ if (length(unexpected) > 0) {
 }
 
 # Clean up session-level test temp directory if it exists
-if (exists(".test_root", envir = .GlobalEnv)) {
-  test_root <- get(".test_root", envir = .GlobalEnv)
-  if (dir.exists(test_root)) {
-    # This is in tempdir(), safe to remove
-    unlink(test_root, recursive = TRUE, force = TRUE)
-  }
+test_root <- getOption("tima.test_root")
+if (is.character(test_root) && dir.exists(test_root)) {
+  unlink(test_root, recursive = TRUE, force = TRUE)
 }

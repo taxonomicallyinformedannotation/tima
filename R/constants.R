@@ -281,7 +281,7 @@ get_constant <- function(name, default = NULL) {
     if (is.null(default)) {
       stop("Constant '", name, "' not found and no default provided")
     }
-    logger::log_warn(
+    log_warn(
       "Constant '",
       name,
       "' not found, using default: ",

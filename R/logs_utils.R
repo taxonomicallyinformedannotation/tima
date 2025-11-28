@@ -8,13 +8,18 @@
 #' @keywords internal
 log_with_count <- function(msg, n = NULL, elapsed = NULL) {
   if (!is.null(n) && !is.null(elapsed)) {
-    logger::log_info("{msg} ({format_count(n)} in {format_time(elapsed)})")
+    lgr::lgr$info(sprintf(
+      "%s (%s in %s)",
+      msg,
+      format_count(n),
+      format_time(elapsed)
+    ))
   } else if (!is.null(n)) {
-    logger::log_info("{msg} ({format_count(n)})")
+    lgr::lgr$info(sprintf("%s (%s)", msg, format_count(n)))
   } else if (!is.null(elapsed)) {
-    logger::log_info("{msg} ({format_time(elapsed)})")
+    lgr::lgr$info(sprintf("%s (%s)", msg, format_time(elapsed)))
   } else {
-    logger::log_info(msg)
+    lgr::lgr$info(msg)
   }
   invisible(NULL)
 }
@@ -43,7 +48,7 @@ log_file_op <- function(action, path, size_bytes = NULL, n_rows = NULL) {
     msg <- paste0(msg, " (", paste(details, collapse = ", "), ")")
   }
 
-  logger::log_info(msg)
+  lgr::lgr$info(msg)
   invisible(NULL)
 }
 
@@ -151,8 +156,9 @@ format_time <- function(seconds) {
 #'
 #' @param filename Character string specifying the log file name.
 #'     Default: "tima.log"
-#' @param threshold Character or integer log level threshold
-#'     (TRACE, DEBUG, INFO, WARN, ERROR). Default: logger::TRACE
+#' @param threshold Character or integer log level threshold.
+#'     Can be numeric (lgr levels) or logger constants for backwards compatibility.
+#'     Default: 600 (TRACE level)
 #'
 #' @return NULL (invisibly). Sets up logger as side effect.
 #'
@@ -161,9 +167,9 @@ format_time <- function(seconds) {
 #' @examples
 #' \dontrun{
 #' setup_logger("analysis.log")
-#' setup_logger("analysis.log", threshold = logger::INFO)
+#' setup_logger("analysis.log", threshold = 400)
 #' }
-setup_logger <- function(filename = "tima.log", threshold = logger::TRACE) {
+setup_logger <- function(filename = "tima.log", threshold = 600) {
   # Validate filename
   if (
     is.null(filename) ||
@@ -174,23 +180,39 @@ setup_logger <- function(filename = "tima.log", threshold = logger::TRACE) {
     stop("Log filename must be a non-empty character string")
   }
 
+  # Convert logger constants to lgr numeric levels if needed
+  # Both logger and lgr use: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200, FATAL=100
+  # lgr also accepts string names: "trace", "debug", "info", "warn", "error", "fatal"
+  # We'll keep the same numeric values for compatibility
+  lgr_threshold <- if (is.numeric(threshold)) {
+    as.integer(threshold)
+  } else if (is.character(threshold)) {
+    tolower(threshold)
+  } else {
+    stop("threshold must be numeric or character")
+  }
+
   # Configure logger threshold
-  logger::log_threshold(level = threshold)
+  lgr::lgr$set_threshold(lgr_threshold)
 
-  # Set up consistent log format with timestamp and level
-  # Use POSIX formatting to force 3-digit milliseconds ("%OS3").
-  # Also pad the level to a fixed width using sprintf so columns align.
-  logger::log_layout(logger::layout_glue_generator(
-    format = "[{format(time, \"%Y-%m-%d %H:%M:%OS3\")} ] [{sprintf(\"%-5s\", toupper(level))}] {msg}"
-  ))
-
-  # Set up appender to write to both console and file
-  logger::log_appender(
-    appender = logger::appender_tee(file = filename)
+  # Create a custom layout that matches the logger format
+  # Use LayoutGlue which supports glue-style formatting similar to logger
+  custom_layout <- lgr::LayoutGlue$new(
+    fmt = "[{format(timestamp, '%Y-%m-%d %H:%M:%OS3')}] [{pad_right(toupper(level_name), 5)}] {msg}"
   )
 
-  # logger::log_info("Logger initialized - output: console + file: {filename}")
-  # logger::log_debug("Log level threshold: {threshold}")
+  # Clear any existing appenders first (lgr has a console appender by default)
+  lgr::lgr$set_appenders(list())
+
+  # Set up appenders to write to both console and file
+  lgr::lgr$add_appender(
+    lgr::AppenderConsole$new(layout = custom_layout),
+    name = "console"
+  )
+  lgr::lgr$add_appender(
+    lgr::AppenderFile$new(file = filename, layout = custom_layout),
+    name = "file"
+  )
 
   invisible(NULL)
 }
@@ -212,13 +234,15 @@ init_logging <- function() {
   log_file <- Sys.getenv("TIMA_LOG_FILE", unset = "tima.log")
   level_env <- toupper(Sys.getenv("TIMA_LOG_LEVEL", unset = DEFAULT_LOG_LEVEL))
 
-  # Map level string to logger constant
+  # Map level string to lgr numeric levels (same as logger)
+  # TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200, FATAL=100
   level_map <- list(
-    TRACE = logger::TRACE,
-    DEBUG = logger::DEBUG,
-    INFO = logger::INFO,
-    WARN = logger::WARN,
-    ERROR = logger::ERROR
+    TRACE = 600,
+    DEBUG = 500,
+    INFO = 400,
+    WARN = 300,
+    ERROR = 200,
+    FATAL = 100
   )
 
   threshold <- level_map[[level_env]]
@@ -235,4 +259,103 @@ init_logging <- function() {
   }
 
   setup_logger(filename = log_file, threshold = threshold)
+}
+
+#' @keywords internal
+log_trace <- function(...) {
+  msg <- eval_glue_safely(...)
+  lgr::lgr$trace(msg)
+  invisible(NULL)
+}
+
+#' @keywords internal
+log_debug <- function(...) {
+  msg <- eval_glue_safely(...)
+  lgr::lgr$debug(msg)
+  invisible(NULL)
+}
+
+#' @keywords internal
+log_info <- function(...) {
+  msg <- eval_glue_safely(...)
+  lgr::lgr$info(msg)
+  invisible(NULL)
+}
+
+#' @keywords internal
+log_warn <- function(...) {
+  msg <- eval_glue_safely(...)
+  lgr::lgr$warn(msg)
+  invisible(NULL)
+}
+
+#' @keywords internal
+log_error <- function(...) {
+  msg <- eval_glue_safely(...)
+  lgr::lgr$error(msg)
+  invisible(NULL)
+}
+
+#' @keywords internal
+log_fatal <- function(...) {
+  msg <- eval_glue_safely(...)
+  lgr::lgr$fatal(msg)
+  invisible(NULL)
+}
+
+#' @keywords internal
+log_success <- function(...) {
+  msg <- eval_glue_safely(...)
+  lgr::lgr$info(msg)
+  invisible(NULL)
+}
+
+#' Evaluate glue-style formatting safely
+#'
+#' @param ... Message parts to combine
+#'
+#' @return Character string with glue-style interpolation applied
+#' @keywords internal
+eval_glue_safely <- function(...) {
+  # Collect all arguments
+  args <- list(...)
+
+  # If single character argument, process it for glue-style formatting
+  if (length(args) == 1 && is.character(args[[1]])) {
+    msg <- args[[1]]
+
+    # Check if message contains glue-style {variable} patterns
+    if (grepl("\\{.+?\\}", msg)) {
+      # Get parent environment for variable lookup
+      parent_env <- parent.frame(n = 2)
+
+      # Simple regex-based replacement for {var} patterns
+      # Extract all {var} patterns
+      matches <- gregexpr("\\{([^}]+)\\}", msg)
+      if (matches[[1]][1] != -1) {
+        # Process each match
+        match_data <- regmatches(msg, matches)[[1]]
+        for (match in match_data) {
+          # Extract variable name (remove { and })
+          var_expr <- gsub("^\\{|\\}$", "", match)
+
+          # Try to evaluate the expression in parent environment
+          tryCatch(
+            {
+              value <- eval(parse(text = var_expr), envir = parent_env)
+              # Replace {var} with value
+              msg <- sub(match, as.character(value), msg, fixed = TRUE)
+            },
+            error = function(e) {
+              # If evaluation fails, leave the pattern as-is
+            }
+          )
+        }
+      }
+    }
+    return(msg)
+  }
+
+  # Otherwise, just paste all arguments together
+  paste(..., sep = "", collapse = "")
 }

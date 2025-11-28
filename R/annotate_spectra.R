@@ -90,217 +90,9 @@ annotate_spectra <- function(
   qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
   approx = get_params(step = "annotate_spectra")$annotations$ms2approx
 ) {
-  # ---------------- Internal helpers (not exported) -----------------
-  normalize_input_files <- function(x, label) {
-    if (is.list(x)) {
-      x <- unlist(x, use.names = FALSE)
-    }
-    if (!is.character(x)) {
-      stop(label, " elements must be character strings", call. = FALSE)
-    }
-    x
-  }
-  return_empty <- function(path) {
-    logger::log_warn("Returning empty annotation template")
-    empty <- fake_annotations_columns()
-    export_output(x = empty, file = path)
-    invisible(path)
-  }
-  extract_vector <- function(obj, field, len, fill = NA) {
-    v <- obj@backend@spectraData[[field]]
-    if (is.null(v)) {
-      v <- rep(fill, len)
-    }
-    v
-  }
-  build_library_metadata <- function(lib_sp, lib_precursors) {
-    n <- length(lib_sp)
-    tidytable::tidytable(
-      target_id = seq_len(n),
-      target_adduct = extract_vector(lib_sp, "adduct", n, NA_character_),
-      target_spectrum_id = extract_vector(
-        lib_sp,
-        "spectrum_id",
-        n,
-        NA_character_
-      ),
-      target_inchikey = extract_vector(lib_sp, "inchikey", n, NA_character_),
-      target_inchikey_connectivity_layer = extract_vector(
-        lib_sp,
-        "inchikey_2D",
-        n,
-        NA_character_
-      ),
-      target_smiles = extract_vector(lib_sp, "smiles", n, NA_character_),
-      target_smiles_no_stereo = extract_vector(
-        lib_sp,
-        "smiles_2D",
-        n,
-        NA_character_
-      ),
-      target_library = extract_vector(lib_sp, "library", n, NA_character_),
-      target_formula = extract_vector(lib_sp, "formula", n, NA_character_),
-      target_exactmass = extract_vector(lib_sp, "exactmass", n, NA_real_),
-      target_name = extract_vector(lib_sp, "name", n, NA_character_),
-      target_xlogp = extract_vector(lib_sp, "xlogp", n, NA_real_),
-      target_precursorMz = lib_precursors
-    ) |>
-      harmonize_adducts(
-        adducts_colname = "target_adduct",
-        adducts_translations = adducts_translations
-      )
-  }
-  get_precursors <- function(sp) {
-    sp@backend@spectraData |>
-      tidytable::transmute(
-        precursor = tidytable::coalesce(
-          tidytable::across(tidyselect::any_of(c(
-            "precursorMz",
-            "precursor_mz"
-          )))
-        )
-      ) |>
-      tidytable::pull()
-  }
-  reduce_library_by_precursor <- function(
-    lib_sp,
-    query_precursors,
-    dalton,
-    ppm
-  ) {
-    lib_prec <- get_precursors(lib_sp)
-    minimal <- pmin(lib_prec - dalton, lib_prec * (1 - (1E-6 * ppm)))
-    maximal <- pmax(lib_prec + dalton, lib_prec * (1 + (1E-6 * ppm)))
-    df_idx <- dplyr::inner_join(
-      x = tidytable::tidytable(minimal, maximal, lib_precursors = lib_prec),
-      y = tidytable::tidytable(val = unique(query_precursors)),
-      by = dplyr::join_by(minimal <= val, maximal >= val)
-    ) |>
-      tidytable::distinct(lib_precursors, .keep_all = TRUE)
-    lib_sp[lib_prec %in% df_idx$lib_precursors]
-  }
-  compute_similarity_safe <- function(
-    lib_sp,
-    query_sp,
-    method,
-    dalton,
-    ppm,
-    threshold,
-    approx
-  ) {
-    query_prec <- query_sp@backend@spectraData$precursorMz
-    lib_prec <- get_precursors(lib_sp)
-    tryCatch(
-      calculate_entropy_and_similarity(
-        lib_ids = seq_along(lib_sp),
-        lib_precursors = lib_prec,
-        lib_spectra = lib_sp@backend@peaksData,
-        query_ids = get_spectra_ids(query_sp),
-        query_precursors = query_prec,
-        query_spectra = query_sp@backend@peaksData,
-        method = method,
-        dalton = dalton,
-        ppm = ppm,
-        threshold = threshold,
-        approx = approx
-      ),
-      error = function(e) {
-        logger::log_error(
-          "Similarity computation failed: {conditionMessage(e)}"
-        )
-        tidytable::tidytable()
-      }
-    )
-  }
-  finalize_results <- function(df_sim, meta, threshold) {
-    if (nrow(df_sim) == 0) {
-      return(tidytable::tidytable())
-    }
-    df_sim$candidate_spectrum_entropy <- as.numeric(
-      df_sim$candidate_spectrum_entropy
-    )
-    df_sim$candidate_score_similarity <- as.numeric(
-      df_sim$candidate_score_similarity
-    )
-    df_sim$candidate_count_similarity_peaks_matched <- as.integer(
-      df_sim$candidate_count_similarity_peaks_matched
-    )
-    df_final <- df_sim |>
-      tidytable::left_join(meta, by = "target_id") |>
-      tidytable::select(-target_id) |>
-      tidytable::mutate(
-        candidate_structure_error_mz = target_precursorMz - precursorMz,
-        candidate_structure_inchikey_connectivity_layer = tidytable::if_else(
-          is.na(target_inchikey_connectivity_layer),
-          gsub(
-            pattern = "-.*",
-            replacement = "",
-            x = target_inchikey,
-            perl = TRUE
-          ),
-          target_inchikey_connectivity_layer
-        ),
-        candidate_structure_smiles_no_stereo = tidytable::coalesce(
-          target_smiles_no_stereo,
-          target_smiles
-        )
-      ) |>
-      tidytable::select(
-        tidyselect::any_of(c(
-          "feature_id",
-          "candidate_adduct" = "target_adduct",
-          "candidate_library" = "target_library",
-          "candidate_spectrum_id" = "target_spectrum_id",
-          "candidate_structure_error_mz",
-          "candidate_structure_name" = "target_name",
-          "candidate_structure_inchikey_connectivity_layer",
-          "candidate_structure_smiles_no_stereo",
-          "candidate_structure_molecular_formula" = "target_formula",
-          "candidate_structure_exact_mass" = "target_exactmass",
-          "candidate_structure_xlogp" = "target_xlogp",
-          "candidate_spectrum_entropy",
-          "candidate_score_similarity",
-          "candidate_count_similarity_peaks_matched"
-        ))
-      ) |>
-      tidytable::filter(candidate_score_similarity >= threshold) |>
-      tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
-      tidytable::distinct(
-        feature_id,
-        candidate_library,
-        candidate_structure_inchikey_connectivity_layer,
-        .keep_all = TRUE
-      )
-    df_final
-  }
-  log_library_stats <- function(lib_sp) {
-    sd <- Spectra::spectraData(lib_sp)
-    if (!"library" %in% names(sd)) {
-      return(invisible(NULL))
-    }
-    stats <- sd |>
-      data.frame() |>
-      tidytable::filter(!is.na(library)) |>
-      tidytable::group_by(library) |>
-      tidytable::add_count(name = "spectra") |>
-      tidytable::distinct(inchikey_connectivity_layer, .keep_all = TRUE) |>
-      tidytable::add_count(name = "unique_connectivities") |>
-      tidytable::ungroup() |>
-      tidytable::select(library, spectra, unique_connectivities) |>
-      tidytable::distinct() |>
-      tidytable::mutate(
-        unique_connectivities = tidytable::case_when(
-          library == "ISDB - Wikidata" ~ spectra,
-          TRUE ~ unique_connectivities
-        )
-      ) |>
-      tidytable::arrange(tidytable::desc(spectra))
-    logger::log_info(
-      "\n{paste(capture.output(print.data.frame(stats, row.names = FALSE)), collapse = '\n')}"
-    )
-    invisible(NULL)
-  }
-  # ---------------- Validation -----------------
+  params <- get_params(step = "annotate_spectra")
+  output_path <- resolve_annotation_output(output)
+
   assert_choice(polarity, VALID_MS_MODES, "polarity")
   assert_choice(method, VALID_SIMILARITY_METHODS, "method")
   assert_flag(approx, "approx")
@@ -308,11 +100,13 @@ annotate_spectra <- function(
   assert_scalar_numeric(ppm, "ppm", min = 0)
   assert_scalar_numeric(dalton, "dalton", min = 0)
   assert_scalar_numeric(qutoff, "qutoff", min = 0)
+
   input_vec <- normalize_input_files(input, "Input")
   libs_vec <- normalize_input_files(libraries, "Library")
   if (length(libs_vec) == 0L) {
     stop("At least one library must be provided", call. = FALSE)
   }
+
   missing_in <- input_vec[!file.exists(input_vec)]
   if (length(missing_in)) {
     stop(
@@ -329,11 +123,12 @@ annotate_spectra <- function(
       call. = FALSE
     )
   }
-  logger::log_info("Starting spectral annotation in {polarity} mode")
-  logger::log_debug(
+
+  log_info("Starting spectral annotation in {polarity} mode")
+  log_debug(
     "Method: {method}, Threshold: {threshold}, PPM: {ppm}, Dalton: {dalton}"
   )
-  # ---------------- Load query spectra -----------------
+
   query_sp <- import_spectra(
     input_vec,
     cutoff = qutoff,
@@ -342,85 +137,67 @@ annotate_spectra <- function(
     ppm = ppm
   )
   if (length(query_sp) == 0L) {
-    logger::log_warn("No query spectra loaded")
-    export_params(
-      parameters = get_params(step = "annotate_spectra"),
-      step = "annotate_spectra"
-    )
-    return(return_empty(output[[1]]))
-  }
-  # ---------------- Load library spectra -----------------
-  if (length(libs_vec) > 1L) {
-    original <- length(libs_vec)
-    libs_vec <- libs_vec[grepl(polarity, libs_vec, fixed = TRUE)]
-    logger::log_debug(
-      "Filtered libraries by polarity: {original} -> {length(libs_vec)}"
-    )
-    if (length(libs_vec) == 0L) {
-      export_params(
-        parameters = get_params(step = "annotate_spectra"),
-        step = "annotate_spectra"
+    return(
+      annotate_spectra_handle_empty_result(
+        output_path,
+        params,
+        "No query spectra loaded"
       )
-      return(return_empty(output[[1]]))
-    }
+    )
   }
-  lib_list <- purrr::map(
-    .x = libs_vec,
-    .f = import_spectra,
-    cutoff = 0,
+
+  libs_vec <- filter_library_paths_by_polarity(libs_vec, polarity)
+  if (length(libs_vec) == 0L) {
+    return(
+      annotate_spectra_handle_empty_result(
+        output_path,
+        params,
+        "No libraries remain after polarity filtering"
+      )
+    )
+  }
+
+  spectral_library <- import_and_clean_library_collection(
+    libs_vec,
     dalton = dalton,
     polarity = polarity,
-    ppm = ppm,
-    sanitize = FALSE,
-    combine = FALSE
-  ) |>
-    purrr::map(
-      Spectra::applyProcessing,
-      BPPARAM = BiocParallel::SerialParam()
-    ) |>
-    # TODO
-    purrr::map(
-      .f = function(sp) {
-        sp[
-          !sp@backend@peaksData |>
-            purrr::map(.f = is.null) |>
-            purrr::map(.f = any) |>
-            as.character() |>
-            as.logical()
-        ]
-      }
-    )
-  spectral_library <- Spectra::concatenateSpectra(lib_list)
+    ppm = ppm
+  )
   if (length(spectral_library) == 0L) {
-    logger::log_warn("No spectra left in library after cleaning")
-    export_params(
-      parameters = get_params(step = "annotate_spectra"),
-      step = "annotate_spectra"
+    return(
+      annotate_spectra_handle_empty_result(
+        output_path,
+        params,
+        "No spectra left in library after cleaning"
+      )
     )
-    return(return_empty(output[[1]]))
   }
+
   log_library_stats(spectral_library)
-  # ---------------- Optional precursor reduction -----------------
+
+  query_precursors <- get_precursors(query_sp)
   if (!approx) {
     spectral_library <- reduce_library_by_precursor(
       lib_sp = spectral_library,
-      query_precursors = query_sp@backend@spectraData$precursorMz,
+      query_precursors = query_precursors,
       dalton = dalton,
       ppm = ppm
     )
     if (length(spectral_library) == 0L) {
-      logger::log_warn("No spectra remain after precursor-based reduction")
-      export_params(
-        parameters = get_params(step = "annotate_spectra"),
-        step = "annotate_spectra"
+      return(
+        annotate_spectra_handle_empty_result(
+          output_path,
+          params,
+          "No spectra remain after precursor-based reduction"
+        )
       )
-      return(return_empty(output[[1]]))
     }
   }
-  # ---------------- Similarity computation -----------------
-  logger::log_debug(
+
+  log_debug(
     "Annotating {length(query_sp@backend@peaksData)} query spectra against {length(spectral_library)} library references"
   )
+
   sim_raw <- compute_similarity_safe(
     lib_sp = spectral_library,
     query_sp = query_sp,
@@ -431,14 +208,15 @@ annotate_spectra <- function(
     approx = approx
   )
   if (nrow(sim_raw) == 0L) {
-    logger::log_warn("Similarity computation returned no candidates")
-    export_params(
-      parameters = get_params(step = "annotate_spectra"),
-      step = "annotate_spectra"
+    return(
+      annotate_spectra_handle_empty_result(
+        output_path,
+        params,
+        "Similarity computation returned no candidates"
+      )
     )
-    return(return_empty(output[[1]]))
   }
-  # ---------------- Metadata & final shaping -----------------
+
   lib_precursors <- get_precursors(spectral_library)
   meta <- build_library_metadata(spectral_library, lib_precursors)
   df_final <- finalize_results(
@@ -447,22 +225,313 @@ annotate_spectra <- function(
     threshold = threshold
   )
   if (nrow(df_final) == 0L) {
-    logger::log_warn(
-      "All candidates fell below threshold ({threshold}) or were duplicates"
+    return(
+      annotate_spectra_handle_empty_result(
+        output_path,
+        params,
+        sprintf(
+          "All candidates fell below threshold (%s) or were duplicates",
+          threshold
+        )
+      )
     )
-    export_params(
-      parameters = get_params(step = "annotate_spectra"),
-      step = "annotate_spectra"
-    )
-    return(return_empty(output[[1]]))
   }
-  logger::log_info(
+
+  log_info(
     "{nrow(df_final |> tidytable::distinct(candidate_structure_inchikey_connectivity_layer, candidate_structure_smiles_no_stereo))} Candidates annotated on {nrow(df_final |> tidytable::distinct(feature_id))} features (threshold >= {threshold})."
   )
-  export_params(
-    parameters = get_params(step = "annotate_spectra"),
-    step = "annotate_spectra"
+
+  persist_annotation_parameters(params)
+  export_output(x = df_final, file = output_path)
+  invisible(output_path)
+}
+
+#' @keywords internal
+resolve_annotation_output <- function(output) {
+  if (!is.character(output)) {
+    stop("Output path must be a character string", call. = FALSE)
+  }
+  if (length(output) == 0L) {
+    stop("Output must contain at least one file path", call. = FALSE)
+  }
+  output[[1]]
+}
+
+#' @keywords internal
+normalize_input_files <- function(x, label) {
+  if (is.list(x)) {
+    x <- unlist(x, use.names = FALSE)
+  }
+  if (!is.character(x)) {
+    stop(label, " elements must be character strings", call. = FALSE)
+  }
+  x
+}
+
+#' @keywords internal
+annotate_spectra_return_empty_template <- function(path) {
+  log_warn("Returning empty annotation template")
+  empty <- fake_annotations_columns()
+  export_output(x = empty, file = path)
+  invisible(path)
+}
+
+#' @keywords internal
+persist_annotation_parameters <- function(params) {
+  export_params(parameters = params, step = "annotate_spectra")
+  invisible(NULL)
+}
+
+#' @keywords internal
+annotate_spectra_handle_empty_result <- function(path, params, message = NULL) {
+  if (!is.null(message)) {
+    log_warn(message)
+  }
+  persist_annotation_parameters(params)
+  annotate_spectra_return_empty_template(path)
+}
+
+#' @keywords internal
+filter_library_paths_by_polarity <- function(paths, polarity) {
+  if (length(paths) <= 1L) {
+    return(paths)
+  }
+  filtered <- paths[grepl(polarity, paths, fixed = TRUE)]
+  if (length(filtered) < length(paths)) {
+    log_debug(
+      "Filtered libraries by polarity: {length(paths)} -> {length(filtered)}"
+    )
+  }
+  filtered
+}
+
+#' @keywords internal
+import_and_clean_library_collection <- function(paths, dalton, polarity, ppm) {
+  paths |>
+    purrr::map(
+      import_spectra,
+      cutoff = 0,
+      dalton = dalton,
+      polarity = polarity,
+      ppm = ppm,
+      sanitize = FALSE,
+      combine = FALSE
+    ) |>
+    purrr::map(
+      Spectra::applyProcessing,
+      BPPARAM = BiocParallel::SerialParam()
+    ) |>
+    purrr::map(remove_empty_peak_spectra) |>
+    Spectra::concatenateSpectra()
+}
+
+remove_empty_peak_spectra <- function(sp) {
+  empty_flags <- sp@backend@peaksData |>
+    purrr::map(is.null) |>
+    purrr::map_lgl(any)
+  sp[!empty_flags]
+}
+
+extract_vector <- function(obj, field, len, fill = NA) {
+  v <- obj@backend@spectraData[[field]]
+  if (is.null(v)) {
+    v <- rep(fill, len)
+  }
+  v
+}
+
+#' @keywords internal
+build_library_metadata <- function(lib_sp, lib_precursors) {
+  n <- length(lib_sp)
+  tidytable::tidytable(
+    target_id = seq_len(n),
+    target_adduct = extract_vector(lib_sp, "adduct", n, NA_character_),
+    target_spectrum_id = extract_vector(
+      lib_sp,
+      "spectrum_id",
+      n,
+      NA_character_
+    ),
+    target_inchikey = extract_vector(lib_sp, "inchikey", n, NA_character_),
+    target_inchikey_connectivity_layer = extract_vector(
+      lib_sp,
+      "inchikey_2D",
+      n,
+      NA_character_
+    ),
+    target_smiles = extract_vector(lib_sp, "smiles", n, NA_character_),
+    target_smiles_no_stereo = extract_vector(
+      lib_sp,
+      "smiles_2D",
+      n,
+      NA_character_
+    ),
+    target_library = extract_vector(lib_sp, "library", n, NA_character_),
+    target_formula = extract_vector(lib_sp, "formula", n, NA_character_),
+    target_exactmass = extract_vector(lib_sp, "exactmass", n, NA_real_),
+    target_name = extract_vector(lib_sp, "name", n, NA_character_),
+    target_xlogp = extract_vector(lib_sp, "xlogp", n, NA_real_),
+    target_precursorMz = lib_precursors
+  ) |>
+    harmonize_adducts(
+      adducts_colname = "target_adduct",
+      adducts_translations = adducts_translations
+    )
+}
+
+#' @keywords internal
+get_precursors <- function(sp) {
+  sp@backend@spectraData |>
+    tidytable::transmute(
+      precursor = tidytable::coalesce(
+        tidytable::across(tidyselect::any_of(c(
+          "precursorMz",
+          "precursor_mz"
+        )))
+      )
+    ) |>
+    tidytable::pull()
+}
+
+#' @keywords internal
+reduce_library_by_precursor <- function(
+  lib_sp,
+  query_precursors,
+  dalton,
+  ppm
+) {
+  lib_prec <- get_precursors(lib_sp)
+  minimal <- pmin(lib_prec - dalton, lib_prec * (1 - (1E-6 * ppm)))
+  maximal <- pmax(lib_prec + dalton, lib_prec * (1 + (1E-6 * ppm)))
+  df_idx <- dplyr::inner_join(
+    x = tidytable::tidytable(minimal, maximal, lib_precursors = lib_prec),
+    y = tidytable::tidytable(val = unique(query_precursors)),
+    by = dplyr::join_by(minimal <= val, maximal >= val)
+  ) |>
+    tidytable::distinct(lib_precursors, .keep_all = TRUE)
+  lib_sp[lib_prec %in% df_idx$lib_precursors]
+}
+
+#' @keywords internal
+compute_similarity_safe <- function(
+  lib_sp,
+  query_sp,
+  method,
+  dalton,
+  ppm,
+  threshold,
+  approx
+) {
+  query_prec <- query_sp@backend@spectraData$precursorMz
+  lib_prec <- get_precursors(lib_sp)
+  tryCatch(
+    calculate_entropy_and_similarity(
+      lib_ids = seq_along(lib_sp),
+      lib_precursors = lib_prec,
+      lib_spectra = lib_sp@backend@peaksData,
+      query_ids = get_spectra_ids(query_sp),
+      query_precursors = query_prec,
+      query_spectra = query_sp@backend@peaksData,
+      method = method,
+      dalton = dalton,
+      ppm = ppm,
+      threshold = threshold,
+      approx = approx
+    ),
+    error = function(e) {
+      log_error("Similarity computation failed: {conditionMessage(e)}")
+      tidytable::tidytable()
+    }
   )
-  export_output(x = df_final, file = output[[1]])
-  invisible(output[[1]])
+}
+
+#' @keywords internal
+finalize_results <- function(df_sim, meta, threshold) {
+  if (nrow(df_sim) == 0) {
+    return(tidytable::tidytable())
+  }
+  df_sim$candidate_spectrum_entropy <- as.numeric(
+    df_sim$candidate_spectrum_entropy
+  )
+  df_sim$candidate_score_similarity <- as.numeric(
+    df_sim$candidate_score_similarity
+  )
+  df_sim$candidate_count_similarity_peaks_matched <- as.integer(
+    df_sim$candidate_count_similarity_peaks_matched
+  )
+  df_final <- df_sim |>
+    tidytable::left_join(meta, by = "target_id") |>
+    tidytable::select(-target_id) |>
+    tidytable::mutate(
+      candidate_structure_error_mz = target_precursorMz - precursorMz,
+      candidate_structure_inchikey_connectivity_layer = tidytable::if_else(
+        is.na(target_inchikey_connectivity_layer),
+        gsub(
+          pattern = "-.*",
+          replacement = "",
+          x = target_inchikey,
+          perl = TRUE
+        ),
+        target_inchikey_connectivity_layer
+      ),
+      candidate_structure_smiles_no_stereo = tidytable::coalesce(
+        target_smiles_no_stereo,
+        target_smiles
+      )
+    ) |>
+    tidytable::select(
+      tidyselect::any_of(c(
+        "feature_id",
+        "candidate_adduct" = "target_adduct",
+        "candidate_library" = "target_library",
+        "candidate_spectrum_id" = "target_spectrum_id",
+        "candidate_structure_error_mz",
+        "candidate_structure_name" = "target_name",
+        "candidate_structure_inchikey_connectivity_layer",
+        "candidate_structure_smiles_no_stereo",
+        "candidate_structure_molecular_formula" = "target_formula",
+        "candidate_structure_exact_mass" = "target_exactmass",
+        "candidate_structure_xlogp" = "target_xlogp",
+        "candidate_spectrum_entropy",
+        "candidate_score_similarity",
+        "candidate_count_similarity_peaks_matched"
+      ))
+    ) |>
+    tidytable::filter(candidate_score_similarity >= threshold) |>
+    tidytable::arrange(tidytable::desc(candidate_score_similarity)) |>
+    tidytable::distinct(
+      feature_id,
+      candidate_library,
+      candidate_structure_inchikey_connectivity_layer,
+      .keep_all = TRUE
+    )
+  df_final
+}
+
+log_library_stats <- function(lib_sp) {
+  sd <- Spectra::spectraData(lib_sp)
+  if (!"library" %in% names(sd)) {
+    return(invisible(NULL))
+  }
+  stats <- sd |>
+    data.frame() |>
+    tidytable::filter(!is.na(library)) |>
+    tidytable::group_by(library) |>
+    tidytable::add_count(name = "spectra") |>
+    tidytable::distinct(inchikey_connectivity_layer, .keep_all = TRUE) |>
+    tidytable::add_count(name = "unique_connectivities") |>
+    tidytable::ungroup() |>
+    tidytable::select(library, spectra, unique_connectivities) |>
+    tidytable::distinct() |>
+    tidytable::mutate(
+      unique_connectivities = tidytable::case_when(
+        library == "ISDB - Wikidata" ~ spectra,
+        TRUE ~ unique_connectivities
+      )
+    ) |>
+    tidytable::arrange(tidytable::desc(spectra))
+  log_info(
+    "\n{paste(capture.output(print.data.frame(stats, row.names = FALSE)), collapse = '\n')}"
+  )
+  invisible(NULL)
 }

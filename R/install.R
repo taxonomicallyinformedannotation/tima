@@ -61,27 +61,27 @@ validate_install_inputs <- function(package, repos, dependencies, test) {
 #' @return NULL (side effect: logging)
 #' @keywords internal
 show_system_messages <- function(system, test) {
-  logger::log_info("Detected operating system: {system}")
+  log_info("Detected operating system: {system}")
 
   if (system == "Windows" || isTRUE(test)) {
-    logger::log_info("You should install RTools if not already done")
-    logger::log_info(
+    log_info("You should install RTools if not already done")
+    log_info(
       "Download from: https://cran.r-project.org/bin/windows/Rtools/"
     )
   }
 
   if (system == "Linux") {
-    logger::log_info("You may need system dependencies:")
-    logger::log_info(
+    log_info("You may need system dependencies:")
+    log_info(
       "  sudo apt install libarchive-dev libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev"
     )
   }
 
   if (system == "Darwin") {
-    logger::log_info(
+    log_info(
       "macOS detected. Ensure Xcode Command Line Tools are installed:"
     )
-    logger::log_info("  xcode-select --install")
+    log_info("  xcode-select --install")
   }
 
   invisible(NULL)
@@ -101,24 +101,24 @@ check_or_install_python <- function(test = FALSE) {
   python <- Sys.which("python3")
 
   if (nzchar(python) && isFALSE(test)) {
-    logger::log_info("System Python found at: {python}")
+    log_info("System Python found at: {python}")
     return(python)
   }
 
-  logger::log_warn("System Python not found. Installing Miniconda as fallback.")
+  log_warn("System Python not found. Installing Miniconda as fallback.")
 
   minipath <- reticulate::miniconda_path()
 
   if (!file.exists(minipath)) {
-    logger::log_info("Installing Miniconda...")
+    log_info("Installing Miniconda...")
     tryCatch(
       {
         reticulate::install_miniconda()
         minipath <- reticulate::miniconda_path()
-        logger::log_success("Miniconda installed successfully")
+        log_success("Miniconda installed successfully")
       },
       error = function(e) {
-        logger::log_error("Failed to install Miniconda: {e$message}")
+        log_error("Failed to install Miniconda: {e$message}")
         stop(
           "Failed to install Miniconda: ",
           conditionMessage(e),
@@ -142,7 +142,7 @@ check_or_install_python <- function(test = FALSE) {
     )
   }
 
-  logger::log_info("Using Miniconda Python at: {python_path}")
+  log_info("Using Miniconda Python at: {python_path}")
   return(python_path)
 }
 
@@ -167,7 +167,7 @@ setup_virtualenv <- function(
   }
 
   if (!reticulate::virtualenv_exists(envname = envname)) {
-    logger::log_info("Creating Python virtualenv: {envname}")
+    log_info("Creating Python virtualenv: {envname}")
 
     tryCatch(
       expr = {
@@ -175,11 +175,11 @@ setup_virtualenv <- function(
           envname = envname,
           python = python
         )
-        logger::log_success("Virtualenv created successfully")
+        log_success("Virtualenv created successfully")
       },
       error = function(e) {
-        logger::log_error("Creating Python virtualenv failed: {e$message}")
-        logger::log_info(
+        log_error("Creating Python virtualenv failed: {e$message}")
+        log_info(
           "Retrying with clean Python install (version {rescue_python_version})"
         )
 
@@ -192,7 +192,7 @@ setup_virtualenv <- function(
               envname = envname,
               python = python
             )
-            logger::log_success("Virtualenv created with rescue Python")
+            log_success("Virtualenv created with rescue Python")
           },
           error = function(e2) {
             stop(
@@ -205,10 +205,10 @@ setup_virtualenv <- function(
       }
     )
   } else {
-    logger::log_info("Using existing Python virtualenv: {envname}")
+    log_info("Using existing Python virtualenv: {envname}")
   }
 
-  logger::log_info("Installing RDKit in virtualenv: {envname}")
+  log_info("Installing RDKit in virtualenv: {envname}")
 
   tryCatch(
     {
@@ -218,10 +218,10 @@ setup_virtualenv <- function(
         packages = "rdkit",
         ignore_installed = TRUE
       )
-      logger::log_success("RDKit installed successfully")
+      log_success("RDKit installed successfully")
     },
     error = function(e) {
-      logger::log_error("Failed to install RDKit: {e$message}")
+      log_error("Failed to install RDKit: {e$message}")
       stop(
         "Failed to install RDKit in virtualenv: ",
         conditionMessage(e),
@@ -253,7 +253,7 @@ try_install_package <- function(
 ) {
   tryCatch(
     expr = {
-      logger::log_info(
+      log_info(
         "Installing R package: {package} (from {if (from_source) 'source' else 'binary'})"
       )
 
@@ -265,11 +265,11 @@ try_install_package <- function(
         type = if (from_source) "source" else getOption("pkgType")
       )
 
-      logger::log_success("Successfully installed R package: {package}")
+      log_success("Successfully installed R package: {package}")
       return(TRUE)
     },
     error = function(e) {
-      logger::log_error("Installation failed: {e$message}")
+      log_error("Installation failed: {e$message}")
       return(FALSE)
     }
   )
@@ -353,19 +353,19 @@ install <- function(
     return(invisible(NULL))
   }
 
-  logger::log_info("Starting installation/update of '{package}'")
+  log_info("Starting installation/update of '{package}'")
 
   # System Detection and Messages ----
   system <- Sys.info()[["sysname"]]
   show_system_messages(system = system, test = test)
 
   # Python Setup ----
-  logger::log_debug("Checking Python environment")
+  log_debug("Checking Python environment")
   python <- check_or_install_python(test = test)
 
   # R Package Installation (Always Update) ----
-  logger::log_info("Installing/updating R package '{package}' from r-universe")
-  logger::log_debug("This ensures you have the latest version with all updates")
+  log_info("Installing/updating R package '{package}' from r-universe")
+  log_debug("This ensures you have the latest version with all updates")
 
   success <- try_install_package(
     package = package,
@@ -375,7 +375,7 @@ install <- function(
   )
 
   if (!success) {
-    logger::log_warn("Binary installation failed. Retrying from source.")
+    log_warn("Binary installation failed. Retrying from source.")
     success <- try_install_package(
       package = package,
       repos = repos,
@@ -385,7 +385,7 @@ install <- function(
   }
 
   if (!success) {
-    logger::log_fatal("All installation attempts failed")
+    log_fatal("All installation attempts failed")
     stop(
       "Failed to install package '",
       package,
@@ -395,33 +395,33 @@ install <- function(
   }
 
   # Python Virtual Environment Setup (Idempotent) ----
-  logger::log_info("Configuring Python virtual environment (idempotent)")
+  log_info("Configuring Python virtual environment (idempotent)")
   setup_virtualenv(envname = "tima-env", python = python)
 
   # Post-Installation Setup ----
-  logger::log_info("Running post-installation setup")
+  log_info("Running post-installation setup")
 
   tryCatch(
     {
       copy_backbone()
-      logger::log_success("Backbone files copied")
+      log_success("Backbone files copied")
     },
     error = function(e) {
-      logger::log_warn("Failed to copy backbone files: {e$message}")
+      log_warn("Failed to copy backbone files: {e$message}")
     }
   )
 
   tryCatch(
     {
       targets::tar_destroy(ask = FALSE)
-      logger::log_success("Targets pipeline cleaned")
+      log_success("Targets pipeline cleaned")
     },
     error = function(e) {
-      logger::log_warn("Failed to clean targets pipeline: {e$message}")
+      log_warn("Failed to clean targets pipeline: {e$message}")
     }
   )
 
-  logger::log_success("Installation of '{package}' completed successfully!")
+  log_success("Installation of '{package}' completed successfully!")
 
   invisible(NULL)
 }

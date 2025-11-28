@@ -35,7 +35,7 @@ export_output <- function(x, file) {
   nrows <- nrow(x)
   ncols <- ncol(x)
 
-  logger::log_debug(
+  log_debug(
     "Exporting {format_count(nrows)} rows x {ncols} columns to: {basename(file)}"
   )
 
@@ -48,7 +48,7 @@ export_output <- function(x, file) {
 
   # Warn for large datasets
   if (nrows > 100000L) {
-    logger::log_debug("Large dataset - export may take time")
+    log_debug("Large dataset - export may take time")
   }
 
   # Write Data with Error Handling ----
@@ -69,10 +69,10 @@ export_output <- function(x, file) {
       elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
       file_size <- file.info(file)$size
       log_file_op("Exported", file, size_bytes = file_size, n_rows = nrows)
-      logger::log_debug("Export completed in {format_time(elapsed)}")
+      log_debug("Export completed in {format_time(elapsed)}")
     },
     error = function(e) {
-      logger::log_error("Export failed: {conditionMessage(e)}")
+      log_error("Export failed: {conditionMessage(e)}")
       stop(
         "Failed to export data to '",
         file,

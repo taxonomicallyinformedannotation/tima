@@ -151,7 +151,7 @@ get_organism_taxonomy_ott <- function(
   }
 
   n_organisms <- nrow(df)
-  logger::log_info(
+  log_info(
     "Processing {n_organisms} organism name(s) for OTT taxonomy lookup"
   )
 
@@ -185,10 +185,10 @@ get_organism_taxonomy_ott <- function(
   organisms <- organism_table$canonical_name
   n_unique <- length(organisms)
 
-  logger::log_debug("Cleaned to {n_unique} unique organism name(s)")
+  log_debug("Cleaned to {n_unique} unique organism name(s)")
 
   # Test OTT API availability
-  logger::log_debug("Testing Open Tree of Life API availability")
+  log_debug("Testing Open Tree of Life API availability")
 
   api_status <- tryCatch(
     {
@@ -202,35 +202,35 @@ get_organism_taxonomy_ott <- function(
         httr2::resp_status_desc()
     },
     error = function(e) {
-      logger::log_error("Failed to connect to OTT API: {conditionMessage(e)}")
+      log_error("Failed to connect to OTT API: {conditionMessage(e)}")
       "ERROR"
     }
   )
 
   # Handle API unavailability
   if (api_status != "OK") {
-    logger::log_error(
+    log_error(
       "Open Tree of Life API is unavailable (status: {api_status})"
     )
-    logger::log_warn(
+    log_warn(
       "Returning empty taxonomy template due to API unavailability"
     )
     return(.create_empty_taxonomy_template())
   }
 
-  logger::log_debug("OTT API is available, proceeding with taxonomy queries")
+  log_debug("OTT API is available, proceeding with taxonomy queries")
 
   # Split into smaller batches to avoid API limits
   batch_size <- 100L
   organism_batches <- .create_batches(organisms, batch_size)
 
-  logger::log_info("Querying OTT API in {length(organism_batches)} batches")
+  log_info("Querying OTT API in {length(organism_batches)} batches")
 
   # Query OTT API for each batch
   taxonomy_matches <- organism_batches |>
     purrr::map(.f = .query_ott_batch)
 
-  logger::log_debug("Initial taxonomy queries completed")
+  log_debug("Initial taxonomy queries completed")
 
   # Combine batch results
   new_matched_otl_exact <- taxonomy_matches |>
@@ -246,7 +246,7 @@ get_organism_taxonomy_ott <- function(
 
   # Retry failed queries with genus-only names if requested
   if (nrow(new_matched_otl_exact) != nrow(new_ott_id) && retry == TRUE) {
-    logger::log_info("Retrying failed queries using genus names only")
+    log_info("Retrying failed queries using genus names only")
 
     # Keep successfully matched results
     successful_matches <- new_matched_otl_exact |>
@@ -267,7 +267,7 @@ get_organism_taxonomy_ott <- function(
     # Extract unique genus names from failures
     genus_names <- unique(failed_organisms$search_string)
 
-    logger::log_info(
+    log_info(
       "Retrying with {length(genus_names)} genus names: ",
       "{paste(head(genus_names, 5), collapse = ', ')}",
       "{ifelse(length(genus_names) > 5, '...', '')}"
@@ -296,7 +296,7 @@ get_organism_taxonomy_ott <- function(
       retry_matches
     )
 
-    logger::log_debug(
+    log_debug(
       "Retry complete: {nrow(retry_ott_ids)} additional matches found"
     )
   }
@@ -305,7 +305,7 @@ get_organism_taxonomy_ott <- function(
   if (nrow(new_ott_id) != 0) {
     ott_ids <- new_ott_id$ott_id
 
-    logger::log_info(
+    log_info(
       "Retrieving detailed taxonomy for {length(ott_ids)} unique OTT IDs"
     )
 
@@ -320,7 +320,7 @@ get_organism_taxonomy_ott <- function(
       )
     )
 
-    logger::log_debug("Taxonomy information retrieved successfully")
+    log_debug("Taxonomy information retrieved successfully")
 
     # Extract lineage information
     taxon_lineage <- taxon_info |>
@@ -329,7 +329,7 @@ get_organism_taxonomy_ott <- function(
     # Build complete taxonomy lineage data frame
     otl <- .build_taxonomy_lineage(taxon_info, taxon_lineage, ott_ids)
   } else {
-    logger::log_warn("No OTT IDs found, returning empty dataframe")
+    log_warn("No OTT IDs found, returning empty dataframe")
     empty_template <- .create_empty_taxonomy_template()
     otl <- empty_template$taxonomy
   }
@@ -425,6 +425,6 @@ get_organism_taxonomy_ott <- function(
     }
   }
 
-  logger::log_info("Got OTTaxonomy!")
+  log_info("Got OTTaxonomy!")
   return(biological_metadata)
 }

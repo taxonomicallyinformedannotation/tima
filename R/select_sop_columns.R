@@ -21,7 +21,7 @@ select_sop_columns <- function(df) {
 
   # Early exit for empty data
   if (nrow(df) == 0L) {
-    logger::log_warn("Empty dataframe in select_sop_columns")
+    log_warn("Empty dataframe in select_sop_columns")
     return(df)
   }
 

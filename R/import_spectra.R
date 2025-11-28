@@ -75,8 +75,8 @@ import_spectra <- function(
 
   # Import Spectra ----
 
-  logger::log_info("Importing spectra from: {file}")
-  logger::log_debug(
+  log_info("Importing spectra from: {file}")
+  log_debug(
     "Parameters: cutoff={cutoff}, dalton={dalton}, ppm={ppm}, ",
     "polarity={ifelse(is.na(polarity), 'all', polarity)}"
   )
@@ -94,7 +94,7 @@ import_spectra <- function(
       vectorize_all = FALSE
     )
 
-  # logger::log_trace("Detected file format: {file_ext}")
+  # log_trace("Detected file format: {file_ext}")
 
   # Import spectra based on file format
   spectra <- tryCatch(
@@ -102,17 +102,17 @@ import_spectra <- function(
       switch(
         EXPR = file_ext,
         "mgf" = {
-          logger::log_debug("Reading MGF file...")
+          log_debug("Reading MGF file...")
           read_mgf_opti(f = file) |>
             Spectra::Spectra()
         },
         "msp" = {
-          logger::log_debug("Reading MSP file...")
+          log_debug("Reading MSP file...")
           MsBackendMsp::readMsp(f = file) |>
             Spectra::Spectra()
         },
         "rds" = {
-          logger::log_debug("Reading RDS file...")
+          log_debug("Reading RDS file...")
           readRDS(file = file)
         },
         stop(
@@ -123,17 +123,17 @@ import_spectra <- function(
       )
     },
     error = function(e) {
-      logger::log_error("Failed to import spectra: {conditionMessage(e)}")
+      log_error("Failed to import spectra: {conditionMessage(e)}")
       stop("Failed to import spectra from ", file, ": ", conditionMessage(e))
     }
   )
 
   n_initial <- length(spectra)
-  logger::log_info("Loaded {n_initial} spectra from file")
+  log_info("Loaded {n_initial} spectra from file")
 
   # Early exit for empty files
   if (n_initial == 0L) {
-    logger::log_warn("No spectra found in file")
+    log_warn("No spectra found in file")
     return(spectra)
   }
 
@@ -142,7 +142,7 @@ import_spectra <- function(
   # Validate precursor charges
   if (0L %in% spectra@backend@spectraData$precursorCharge) {
     n_unknown <- sum(spectra@backend@spectraData$precursorCharge == 0L)
-    logger::log_warn(
+    log_warn(
       "Found {n_unknown} spectra with precursorCharge = 0 ",
       "(unknown polarity - should be avoided in practice)"
     )
@@ -172,7 +172,7 @@ import_spectra <- function(
     n_after <- length(spectra)
     n_removed <- n_before - n_after
     if (n_removed > 0L) {
-      logger::log_debug(
+      log_debug(
         "Filtered to MS2 spectra: {n_before} -> {n_after} ({n_removed} removed)"
       )
     }
@@ -183,7 +183,7 @@ import_spectra <- function(
     n_before <- length(spectra)
     spectra <- spectra[spectra@backend@spectraData$Spectrum_type == "MS2"]
     n_after <- length(spectra)
-    logger::log_debug(
+    log_debug(
       "Filtered to MS2 spectra (MassBank): {n_before} -> {n_after} spectra"
     )
   }
@@ -201,7 +201,7 @@ import_spectra <- function(
       z = charge_values
     )
     n_after <- length(spectra)
-    logger::log_debug(
+    log_debug(
       "Filtered to {polarity} polarity: {n_before} -> {n_after} spectra"
     )
   }
@@ -210,7 +210,7 @@ import_spectra <- function(
   if (combine) {
     n_before <- length(spectra)
     if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_debug("Combining replicate spectra by FEATURE_ID")
+      log_debug("Combining replicate spectra by FEATURE_ID")
       spectra <- spectra |>
         Spectra::combineSpectra(
           f = spectra$FEATURE_ID,
@@ -219,9 +219,9 @@ import_spectra <- function(
         ) |>
         Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
       n_after <- length(spectra)
-      logger::log_debug("Combined replicates: {n_before} -> {n_after} spectra")
+      log_debug("Combined replicates: {n_before} -> {n_after} spectra")
     } else if ("SLAW_ID" %in% colnames(spectra@backend@spectraData)) {
-      logger::log_debug("Combining replicate spectra by SLAW_ID")
+      log_debug("Combining replicate spectra by SLAW_ID")
       spectra <- spectra |>
         Spectra::combineSpectra(
           f = spectra$SLAW_ID,
@@ -230,9 +230,9 @@ import_spectra <- function(
         ) |>
         Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
       n_after <- length(spectra)
-      logger::log_debug("Combined replicates: {n_before} -> {n_after} spectra")
+      log_debug("Combined replicates: {n_before} -> {n_after} spectra")
     } else {
-      # logger::log_trace(
+      # log_trace(
       #  "No replicate grouping field found, skipping combination"
       # )
     }
@@ -241,7 +241,7 @@ import_spectra <- function(
   # Sanitize spectra if requested
   if (sanitize) {
     n_before <- length(spectra)
-    logger::log_debug("Sanitizing spectra (cutoff={cutoff})")
+    log_debug("Sanitizing spectra (cutoff={cutoff})")
     spectra <- sanitize_spectra(
       spectra = spectra,
       cutoff = cutoff,
@@ -249,10 +249,10 @@ import_spectra <- function(
       ppm = ppm
     )
     n_after <- length(spectra)
-    logger::log_debug("Sanitization complete: {n_before} -> {n_after} spectra")
+    log_debug("Sanitization complete: {n_before} -> {n_after} spectra")
   }
 
-  logger::log_info(
+  log_info(
     "Import complete: {length(spectra)} spectra ready for analysis"
   )
 

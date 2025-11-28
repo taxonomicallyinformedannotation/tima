@@ -102,7 +102,7 @@ decorate_chemo <- function(
   missing_cols <- setdiff(required_cols, names(annot_table_wei_chemo))
 
   if (length(missing_cols) > 0) {
-    logger::log_warn(
+    log_warn(
       "Missing expected columns: {paste(missing_cols, collapse = ', ')}"
     )
     return(annot_table_wei_chemo)
@@ -209,7 +209,7 @@ decorate_chemo <- function(
 
   # Log Summary Statistics ----
 
-  logger::log_info(
+  log_info(
     "Chemically informed metabolite annotation reranked:\n",
     "  Classyfire:\n",
     "    Kingdom level:    {cla_counts['kingdom']} structures\n",

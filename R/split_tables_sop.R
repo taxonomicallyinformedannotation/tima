@@ -41,12 +41,12 @@ split_tables_sop <- function(table, cache) {
 
   # Early exit for empty input
   if (nrow(table) == 0L) {
-    logger::log_warn("Empty table provided")
+    log_warn("Empty table provided")
     return(create_empty_sop_tables())
   }
 
-  logger::log_info("Splitting SOP library into standardized components")
-  logger::log_debug("Input: {nrow(table)} rows")
+  log_info("Splitting SOP library into standardized components")
+  log_debug("Input: {nrow(table)} rows")
 
   table <- table |>
     tidytable::mutate(
@@ -68,7 +68,7 @@ split_tables_sop <- function(table, cache) {
     tidytable::filter(!is.na(organism_name)) |>
     tidytable::distinct()
 
-  # logger::log_trace("Sanitizing structures")
+  # log_trace("Sanitizing structures")
   table_structural_standardized <- table_structural_initial |>
     process_smiles(cache = cache)
 
@@ -149,7 +149,7 @@ split_tables_sop <- function(table, cache) {
       tidytable::distinct(structure_inchikey_connectivity_layer)
   )
 
-  logger::log_info(
+  log_info(
     "Structures: {format_count(n_stereoisomers)} stereoisomers, ",
     "{format_count(n_no_stereo)} without stereochemistry, ",
     "{format_count(n_constitutional)} constitutional isomers"

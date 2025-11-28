@@ -2,6 +2,52 @@
 
 ## Internal Utility Helpers ----
 
+.testthat_helper_state <- local({
+  new.env(parent = emptyenv())
+})
+
+log_helpers_path <- file.path("R", "logging_helpers.R")
+if (
+  file.exists(log_helpers_path) &&
+    !exists("log_info", envir = globalenv(), mode = "function")
+) {
+  sys.source(log_helpers_path, envir = globalenv())
+}
+
+get_test_root <- function() {
+  # Prefer option set during setup; fall back to cached value or tempdir()
+  root <- getOption("tima.test_root")
+  if (is.character(root) && length(root) == 1L) {
+    return(root)
+  }
+  if (exists("test_root", envir = .testthat_helper_state, inherits = FALSE)) {
+    return(get("test_root", envir = .testthat_helper_state, inherits = FALSE))
+  }
+  default_root <- file.path(tempdir(), sprintf("tima-tests-%s", Sys.getpid()))
+  assign("test_root", default_root, envir = .testthat_helper_state)
+  default_root
+}
+
+set_test_root <- function(path) {
+  stopifnot(is.character(path), length(path) == 1L)
+  assign("test_root", path, envir = .testthat_helper_state)
+  options(tima.test_root = path)
+  invisible(path)
+}
+
+get_fixture_cache_env <- function() {
+  if (
+    !exists("fixture_cache", envir = .testthat_helper_state, inherits = FALSE)
+  ) {
+    assign(
+      "fixture_cache",
+      new.env(parent = emptyenv()),
+      envir = .testthat_helper_state
+    )
+  }
+  get("fixture_cache", envir = .testthat_helper_state, inherits = FALSE)
+}
+
 ### Deterministic random helper ----
 .with_seed <- function(seed, expr) {
   if (!is.null(seed)) {
@@ -82,14 +128,21 @@ local_test_project <- function(copy = TRUE) {
 #'   # Only errors will be logged
 #' })
 local_quiet_logging <- function(threshold = "ERROR") {
-  if (requireNamespace("logger", quietly = TRUE)) {
-    # Convert character to logger level if needed
-    lvl <- tryCatch(
-      get(threshold, envir = asNamespace("logger")),
-      error = function(...) threshold
-    )
-    logger::log_threshold(level = lvl)
+  # Convert character to numeric level if needed
+  level_map <- list(
+    TRACE = 600,
+    DEBUG = 500,
+    INFO = 400,
+    WARN = 300,
+    ERROR = 200,
+    FATAL = 100
+  )
+  lvl <- if (is.character(threshold)) {
+    level_map[[toupper(threshold)]] %||% threshold
+  } else {
+    threshold
   }
+  lgr::lgr$set_threshold(level = lvl)
   invisible(NULL)
 }
 
@@ -111,12 +164,7 @@ local_quiet_logging <- function(threshold = "ERROR") {
 #'   # Use output_file for writing
 #' })
 temp_test_path <- function(filename, subdir = NULL) {
-  if (!exists(".test_root", envir = .GlobalEnv)) {
-    # Fallback if .test_root not set
-    base_dir <- file.path(tempdir(), sprintf("tima-tests-%s", Sys.getpid()))
-  } else {
-    base_dir <- get(".test_root", envir = .GlobalEnv)
-  }
+  base_dir <- get_test_root()
 
   dir.create(base_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -145,11 +193,7 @@ temp_test_path <- function(filename, subdir = NULL) {
 #'   # Use temp_dir for creating files
 #' })
 temp_test_dir <- function(dirname) {
-  if (!exists(".test_root", envir = .GlobalEnv)) {
-    base_dir <- file.path(tempdir(), sprintf("tima-tests-%s", Sys.getpid()))
-  } else {
-    base_dir <- get(".test_root", envir = .GlobalEnv)
-  }
+  base_dir <- get_test_root()
 
   full_path <- file.path(base_dir, dirname)
   dir.create(full_path, recursive = TRUE, showWarnings = FALSE)
@@ -479,10 +523,10 @@ load_fixture <- function(fixture_name, cache = TRUE) {
   }
 
   # Use a simple caching mechanism
-  cache_env <- get_fixture_cache()
+  cache_env <- get_fixture_cache_env()
 
-  if (cache && exists(fixture_name, envir = cache_env)) {
-    return(get(fixture_name, envir = cache_env))
+  if (cache && exists(fixture_name, envir = cache_env, inherits = FALSE)) {
+    return(get(fixture_name, envir = cache_env, inherits = FALSE))
   }
 
   # Load the fixture
@@ -564,16 +608,6 @@ copy_mgf_fixture <- function(fixture_name, dest_name = NULL) {
 }
 
 ## CSV Fixture Loaders (Continued) ----
-
-#' Get or create the fixture cache environment
-#'
-#' @keywords internal
-get_fixture_cache <- function() {
-  if (!exists(".fixture_cache", envir = .GlobalEnv)) {
-    assign(".fixture_cache", new.env(parent = emptyenv()), envir = .GlobalEnv)
-  }
-  get(".fixture_cache", envir = .GlobalEnv)
-}
 
 #' Find package root directory
 #'

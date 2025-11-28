@@ -51,10 +51,10 @@ load_yaml_files <- function() {
   use_user <- length(user_files) >= length(default_files)
 
   param_files <- if (use_user) {
-    # logger::log_debug("Using {length(user_files)} user-specified parameters")
+    # log_debug("Using {length(user_files)} user-specified parameters")
     user_files
   } else {
-    # logger::log_debug("Using {length(default_files)} default parameters")
+    # log_debug("Using {length(default_files)} default parameters")
     default_files
   }
 
@@ -90,7 +90,7 @@ load_yaml_files <- function() {
 
   names(yamls_parsed) <- yaml_names
 
-  # logger::log_trace("Loaded {length(yamls_parsed)} YAML parameter files")
+  # log_trace("Loaded {length(yamls_parsed)} YAML parameter files")
 
   return(list(
     yamls_params = yamls_parsed,

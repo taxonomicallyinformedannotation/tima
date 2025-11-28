@@ -34,7 +34,7 @@ Imports:
     igraph (>= 2.1.4),
     IRanges (>= 2.40.1),
     jsonlite (>= 2.0.0),
-    logger (>= 0.4.1),
+    lgr (>= 0.5.0),
     methods,
     MetaboCoreUtils (>= 1.14.0),
     MsBackendMgf (>= 1.14.0),

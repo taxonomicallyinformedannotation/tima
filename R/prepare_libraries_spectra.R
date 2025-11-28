@@ -236,7 +236,7 @@ prepare_libraries_spectra <-
     col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
     col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp
   ) {
-    logger::log_info("Preparing spectral library: {nam_lib}")
+    log_info("Preparing spectral library: {nam_lib}")
     # Define output paths ----
     output_pos <- file.path(
       get_default_paths()$data$interim$libraries$spectra$exp$path,
@@ -253,7 +253,7 @@ prepare_libraries_spectra <-
     # Check if already prepared (idempotency) ----
     outputs_exist <- all(file.exists(c(output_pos, output_neg, output_sop)))
     if (outputs_exist) {
-      logger::log_info("Library '{nam_lib}' already prepared; skipping")
+      log_info("Library '{nam_lib}' already prepared; skipping")
       export_params(
         parameters = get_params(step = "prepare_libraries_spectra"),
         step = "prepare_libraries_spectra"
@@ -270,7 +270,7 @@ prepare_libraries_spectra <-
     }
     inputs_exist <- all(file.exists(input))
     if (!inputs_exist) {
-      logger::log_warn(
+      log_warn(
         "Input file(s) not found; creating empty library template"
       )
       spectra_pos <- create_empty_spectral_library()
@@ -278,12 +278,12 @@ prepare_libraries_spectra <-
       sop <- create_empty_sop_library()
     } else {
       # Import and extract ----
-      logger::log_debug("Importing {length(input)} spectral file(s)")
+      log_debug("Importing {length(input)} spectral file(s)")
       spectra <- purrr::map(input, import_spectra, combine = FALSE)
-      logger::log_debug("Extracting spectra metadata")
+      log_debug("Extracting spectra metadata")
       spectra_extracted <- purrr::map(spectra, extract_spectra)
       # Harmonize for both polarities ----
-      logger::log_debug("Harmonizing spectra for positive mode")
+      log_debug("Harmonizing spectra for positive mode")
       spectra_harmonized_pos <- harmonize_spectra_polarity(
         spectra_extracted,
         mode = "pos",
@@ -307,7 +307,7 @@ prepare_libraries_spectra <-
         col_xl
       )
       spectra_pos <- Spectra::Spectra(spectra_harmonized_pos)
-      logger::log_debug("Harmonizing spectra for negative mode")
+      log_debug("Harmonizing spectra for negative mode")
       spectra_harmonized_neg <- harmonize_spectra_polarity(
         spectra_extracted,
         mode = "neg",
@@ -332,7 +332,7 @@ prepare_libraries_spectra <-
       )
       spectra_neg <- Spectra::Spectra(spectra_harmonized_neg)
       # Extract SOP table ----
-      logger::log_debug("Extracting structure-organism pairs for SOP library")
+      log_debug("Extracting structure-organism pairs for SOP library")
       sop <- tidytable::bind_rows(
         spectra_harmonized_pos,
         spectra_harmonized_neg
@@ -355,12 +355,12 @@ prepare_libraries_spectra <-
           .keep_all = TRUE
         ) |>
         tidytable::mutate(organism_name = NA_character_)
-      logger::log_debug(
+      log_debug(
         "SOP table: {nrow(sop)} unique structures (pos={nrow(spectra_harmonized_pos)}, neg={nrow(spectra_harmonized_neg)} spectra)"
       )
     }
     # Export ----
-    logger::log_info("Exporting spectral library files")
+    log_info("Exporting spectral library files")
     export_spectra_rds(file = output_pos, spectra = spectra_pos)
     export_spectra_rds(file = output_neg, spectra = spectra_neg)
     export_output(sop, file = output_sop)
@@ -368,7 +368,7 @@ prepare_libraries_spectra <-
       parameters = get_params(step = "prepare_libraries_spectra"),
       step = "prepare_libraries_spectra"
     )
-    logger::log_success("Spectral library '{nam_lib}' prepared successfully")
+    log_success("Spectral library '{nam_lib}' prepared successfully")
     invisible(c(
       "pos" = output_pos,
       "neg" = output_neg,

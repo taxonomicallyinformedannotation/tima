@@ -41,16 +41,16 @@ prepare_libraries_sop_ecmdb <- function(
     stop("output must be a single character string")
   }
 
-  logger::log_info("Preparing ECMDB structure-organism pairs")
+  log_info("Preparing ECMDB structure-organism pairs")
 
   if (!file.exists(output) || file.size(output) < 100000) {
     if (!file.exists(input)) {
-      logger::log_warn("ECMDB file not found: {input}")
-      logger::log_info("Creating empty ECMDB library")
+      log_warn("ECMDB file not found: {input}")
+      log_info("Creating empty ECMDB library")
       ecmdb_prepared <- fake_sop_columns()
     } else {
-      logger::log_debug("Processing ECMDB from: {input}")
-      # logger::log_trace("Loading ECMDB resources")
+      log_debug("Processing ECMDB from: {input}")
+      # log_trace("Loading ECMDB resources")
 
       file <- gsub(
         pattern = ".zip",
@@ -71,7 +71,7 @@ prepare_libraries_sop_ecmdb <- function(
         data.frame() |>
         tidytable::as_tidytable()
 
-      # logger::log_trace("Formatting ECMDB")
+      # log_trace("Formatting ECMDB")
       ecmdb_prepared <- ecmdb |>
         tidytable::mutate(
           structure_inchikey_2D = stringi::stri_sub(
@@ -127,7 +127,7 @@ prepare_libraries_sop_ecmdb <- function(
     export_output(x = ecmdb_prepared, file = output)
     rm(ecmdb_prepared)
   } else {
-    # logger::log_trace("ECMDB library already exists and is valid")
+    # log_trace("ECMDB library already exists and is valid")
   }
 
   return(output)

@@ -323,10 +323,10 @@ prepare_libraries_sop_merged <- function(
     output_str_tax_npc = output_str_tax_npc
   )
 
-  logger::log_info("Preparing merged structure-organism pairs library")
-  logger::log_debug("Filter mode: {filter}")
+  log_info("Preparing merged structure-organism pairs library")
+  log_debug("Filter mode: {filter}")
   if (filter) {
-    logger::log_info("Filtering by {level}: {value}")
+    log_info("Filtering by {level}: {value}")
   }
 
   # Load and Process Libraries ----

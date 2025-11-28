@@ -44,14 +44,14 @@ run_app <- function(host = "127.0.0.1", port = 3838, browser = TRUE) {
 
   # Detect Docker Environment ----
   if (file.exists("/.dockerenv")) {
-    logger::log_info("Docker environment detected - adjusting settings")
+    log_info("Docker environment detected - adjusting settings")
     browser <- FALSE
     host <- "0.0.0.0"
   } else {
-    logger::log_info("Running in standard environment")
+    log_info("Running in standard environment")
   }
 
-  logger::log_info("Starting TIMA Shiny app on {host}:{port}")
+  log_info("Starting TIMA Shiny app on {host}:{port}")
 
   # Ensure Dependencies ----
   install()

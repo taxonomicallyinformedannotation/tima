@@ -50,7 +50,7 @@ normalize_rt_to_minutes <- function(
   }
 
   if (!quiet) {
-    logger::log_debug(
+    log_debug(
       "Feature RT normalization: detected unit '{decided_unit}' (requested: '{unit}')"
     )
   }
@@ -58,7 +58,7 @@ normalize_rt_to_minutes <- function(
   if (decided_unit == "seconds") {
     rts <- rts / 60
     if (!quiet) {
-      logger::log_info(
+      log_info(
         "Converted feature retention times from seconds to minutes"
       )
     }
