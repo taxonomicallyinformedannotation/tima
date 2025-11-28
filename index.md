@@ -187,7 +187,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | igraph | 2.2.1 | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2025) |
 | IRanges | 2.44.0 | Lawrence et al. (2013) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
-| logger | 0.4.1 | Daróczi and Wickham (2025) |
+| lgr | 0.5.0 | Fleck (2025) |
 | MetaboCoreUtils | 1.18.0 | Rainer et al. (2022a) |
 | MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
 | MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
@@ -281,14 +281,6 @@ Visualization in r*. <https://doi.org/10.5281/zenodo.7682609>.
 
 </div>
 
-<div id="ref-logger" class="csl-entry">
-
-Daróczi, Gergely, and Hadley Wickham. 2025.
-*<span class="nocase">logger</span>: A Lightweight, Modern and Flexible
-Logging Utility*. <https://doi.org/10.32614/CRAN.package.logger>.
-
-</div>
-
 <div id="ref-docopt" class="csl-entry">
 
 de Jonge, Edwin. 2025. *<span class="nocase">docopt</span>: Command-Line
@@ -302,6 +294,13 @@ Interface Specification Language*.
 Fairbanks, Mark. 2024. *<span class="nocase">tidytable</span>: Tidy
 Interface to “<span class="nocase">data.table</span>”*.
 <https://doi.org/10.32614/CRAN.package.tidytable>.
+
+</div>
+
+<div id="ref-lgr" class="csl-entry">
+
+Fleck, Stefan. 2025. *<span class="nocase">lgr</span>: A Fully Featured
+Logging Framework*. <https://doi.org/10.32614/CRAN.package.lgr>.
 
 </div>
 
