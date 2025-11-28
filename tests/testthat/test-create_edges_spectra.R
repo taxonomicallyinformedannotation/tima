@@ -76,7 +76,7 @@ test_that("create_edges_spectra checks input file exists", {
 })
 
 test_that("create_edges_spectra handles single spectrum", {
-  withr::local_dir(temp_test_dir("create_edges_spectra_single"))
+  withr::local_dir(new = temp_test_dir("create_edges_spectra_single"))
   mgf_file <- tempfile(fileext = ".mgf")
   mgf <- c(
     "BEGIN IONS",
@@ -105,7 +105,7 @@ test_that("create_edges_spectra handles single spectrum", {
 })
 
 test_that("create_edges_spectra creates output file", {
-  withr::local_dir(temp_test_dir("create_edges_spectra_output"))
+  withr::local_dir(new = temp_test_dir("create_edges_spectra_output"))
   mgf_file <- tempfile(fileext = ".mgf")
   mgf <- c(
     "BEGIN IONS",
@@ -140,7 +140,7 @@ test_that("create_edges_spectra creates output file", {
 
 test_that("create_edges_spectra() creates edges from two spectra with entropy", {
   skip_if_not_installed("Spectra")
-  withr::local_dir(temp_test_dir("create_edges_spectra_entropy"))
+  withr::local_dir(new = temp_test_dir("create_edges_spectra_entropy"))
   mgf_file <- tempfile(fileext = ".mgf")
   writeLines(
     c(
@@ -179,7 +179,7 @@ test_that("create_edges_spectra() creates edges from two spectra with entropy", 
 
 test_that("create_edges_spectra() runs with cosine method", {
   skip_if_not_installed("Spectra")
-  withr::local_dir(temp_test_dir("create_edges_spectra_cosine"))
+  withr::local_dir(new = temp_test_dir("create_edges_spectra_cosine"))
   mgf_file <- tempfile(fileext = ".mgf")
   writeLines(
     c(

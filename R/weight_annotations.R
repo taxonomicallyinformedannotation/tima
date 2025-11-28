@@ -67,7 +67,7 @@ validate_weight_annotations_inputs <- function(
     edges = edges,
     taxa = taxa
   )
-  missing_required <- purrr::keep(required_files, ~ !file.exists(.x))
+  missing_required <- purrr::keep(.x = required_files, .p = ~ !file.exists(.x))
   if (length(missing_required) > 0L) {
     stop(
       "Required file(s) not found: ",
@@ -98,7 +98,7 @@ validate_weight_annotations_inputs <- function(
     canopus = canopus,
     formula = formula
   )
-  purrr::iwalk(optional_files, function(path, name) {
+  purrr::iwalk(.x = optional_files, .f = function(path, name) {
     if (!is.null(path) && !file.exists(path)) {
       log_warn("Optional file '%s' not found at: %s", name, path)
     }
@@ -269,7 +269,7 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
       if (nrow(tbl) == 0L) {
         return(acc)
       }
-      tidytable::left_join(acc, tbl)
+      tidytable::left_join(x = acc, y = tbl)
     }
   )
 }
@@ -868,7 +868,7 @@ weight_annotations <- function(
   log_annotation_stats(annotation_table)
 
   features_table <- annotation_table |>
-    tidytable::distinct(tidytable::any_of(c("feature_id", "rt", "mz")))
+    tidytable::distinct(tidytable::any_of(x = c("feature_id", "rt", "mz")))
   log_debug("Extracted %d unique features", nrow(features_table))
 
   # Rearrange and Merge Annotations ----
@@ -1006,7 +1006,7 @@ weight_annotations <- function(
   rm(annot_table_wei_chemo)
 
   elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-  log_info("Annotation weighting complete in %f2 s", round(elapsed, 1))
+  log_info("Annotation weighting complete in %s s", round(elapsed, 1))
 
   # Export Results ----
   log_debug("Exporting results to disk")

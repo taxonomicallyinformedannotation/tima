@@ -136,7 +136,7 @@ create_components <- function(
   # Calculate component size statistics
   component_sizes <- table(components_table$componentindex)
   log_info(
-    "Component sizes - Min: %d, Max: %d, Mean: %f2",
+    "Component sizes - Min: %d, Max: %d, Mean: %s",
     min(component_sizes),
     max(component_sizes),
     round(mean(component_sizes), 1)

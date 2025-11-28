@@ -279,9 +279,9 @@ prepare_libraries_spectra <-
     } else {
       # Import and extract ----
       log_debug("Importing %d spectral file(s)", length(input))
-      spectra <- purrr::map(input, import_spectra, combine = FALSE)
+      spectra <- purrr::map(.x = input, .f = import_spectra, combine = FALSE)
       log_debug("Extracting spectra metadata")
-      spectra_extracted <- purrr::map(spectra, extract_spectra)
+      spectra_extracted <- purrr::map(.x = spectra, .f = extract_spectra)
       # Harmonize for both polarities ----
       log_debug("Harmonizing spectra for positive mode")
       spectra_harmonized_pos <- harmonize_spectra_polarity(
@@ -306,7 +306,7 @@ prepare_libraries_spectra <-
         col_sy,
         col_xl
       )
-      spectra_pos <- Spectra::Spectra(spectra_harmonized_pos)
+      spectra_pos <- Spectra::Spectra(object = spectra_harmonized_pos)
       log_debug("Harmonizing spectra for negative mode")
       spectra_harmonized_neg <- harmonize_spectra_polarity(
         spectra_extracted,
@@ -330,7 +330,7 @@ prepare_libraries_spectra <-
         col_sy,
         col_xl
       )
-      spectra_neg <- Spectra::Spectra(spectra_harmonized_neg)
+      spectra_neg <- Spectra::Spectra(object = spectra_harmonized_neg)
       # Extract SOP table ----
       log_debug("Extracting structure-organism pairs for SOP library")
       sop <- tidytable::bind_rows(

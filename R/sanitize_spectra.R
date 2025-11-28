@@ -59,7 +59,7 @@ sanitize_spectra <- function(
     return(spectra)
   }
 
-  log_info("Sanitizing %d spectra (cutoff: %f2)", n_initial, cutoff)
+  log_info("Sanitizing %d spectra (cutoff: %s)", n_initial, cutoff)
 
   # Apply Sanitization Steps ----
 

@@ -40,9 +40,21 @@ test_that("complement_metadata_structures validates single character path inputs
   npc_file <- temp_test_path("npc.tsv")
 
   # Copy fixtures to temp location
-  tidytable::fwrite(load_fixture("structures_stereo"), st_file, sep = "\t")
-  tidytable::fwrite(load_fixture("structures_metadata"), met_file, sep = "\t")
-  tidytable::fwrite(load_fixture("structures_names"), nam_file, sep = "\t")
+  tidytable::fwrite(
+    x = load_fixture("structures_stereo"),
+    file = st_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    x = load_fixture("structures_metadata"),
+    file = met_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    x = load_fixture("structures_names"),
+    file = nam_file,
+    sep = "\t"
+  )
   tidytable::fwrite(
     load_fixture("structures_taxonomy_cla"),
     cla_file,
@@ -82,9 +94,21 @@ test_that("complement_metadata_structures collapses multiple names with separato
   npc_file <- temp_test_path("npc.tsv")
 
   # Use fixtures
-  tidytable::fwrite(load_fixture("structures_stereo"), st_file, sep = "\t")
-  tidytable::fwrite(load_fixture("structures_metadata"), met_file, sep = "\t")
-  tidytable::fwrite(load_fixture("structures_names"), nam_file, sep = "\t")
+  tidytable::fwrite(
+    x = load_fixture("structures_stereo"),
+    file = st_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    x = load_fixture("structures_metadata"),
+    file = met_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    x = load_fixture("structures_names"),
+    file = nam_file,
+    sep = "\t"
+  )
   tidytable::fwrite(
     load_fixture("structures_taxonomy_cla"),
     cla_file,
@@ -176,8 +200,16 @@ test_that("complement_metadata_structures errors when required columns missing",
   tidytable::fwrite(x = stereo, file = st_file, sep = "\t")
 
   # Use fixtures for the others
-  tidytable::fwrite(load_fixture("structures_metadata"), met_file, sep = "\t")
-  tidytable::fwrite(load_fixture("structures_names"), nam_file, sep = "\t")
+  tidytable::fwrite(
+    x = load_fixture("structures_metadata"),
+    file = met_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    x = load_fixture("structures_names"),
+    file = nam_file,
+    sep = "\t"
+  )
   tidytable::fwrite(
     load_fixture("structures_taxonomy_cla"),
     cla_file,

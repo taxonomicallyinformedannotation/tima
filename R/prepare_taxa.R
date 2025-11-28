@@ -217,7 +217,7 @@ prepare_taxa <- function(
       ) |>
       tidytable::select(
         feature_id,
-        organismOriginal = tidyselect::all_of(colname),
+        organismOriginal = tidyselect::all_of(x = colname),
         tidyselect::everything()
       )
   }

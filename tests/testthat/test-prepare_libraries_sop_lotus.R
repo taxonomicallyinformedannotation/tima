@@ -89,7 +89,7 @@ test_that("prepare_libraries_sop_lotus removes duplicates from fixture", {
   lotus_dup <- tidytable::bind_rows(lotus_dup, lotus_dup, lotus_dup)
 
   temp_input <- tempfile(fileext = ".csv")
-  tidytable::fwrite(lotus_dup, temp_input)
+  tidytable::fwrite(x = lotus_dup, file = temp_input)
   temp_output <- tempfile(fileext = ".tsv")
 
   prepare_libraries_sop_lotus(
@@ -109,7 +109,7 @@ test_that("prepare_libraries_sop_lotus handles multiple structure-organism pairs
   temp_output <- tempfile(fileext = ".tsv")
 
   lotus_data <- load_fixture("lotus")
-  tidytable::fwrite(lotus_data, temp_input)
+  tidytable::fwrite(x = lotus_data, file = temp_input)
 
   prepare_libraries_sop_lotus(
     input = temp_input,
@@ -126,7 +126,7 @@ test_that("prepare_libraries_sop_lotus rounds numeric values", {
   temp_output <- tempfile(fileext = ".tsv")
 
   lotus_data <- load_fixture("lotus")
-  tidytable::fwrite(lotus_data, temp_input)
+  tidytable::fwrite(x = lotus_data, file = temp_input)
 
   prepare_libraries_sop_lotus(
     input = temp_input,
@@ -150,7 +150,7 @@ test_that("prepare_libraries_sop_lotus handles compressed input", {
   lotus_data <- load_fixture("lotus")
 
   # Write compressed file
-  tidytable::fwrite(lotus_data, temp_input)
+  tidytable::fwrite(x = lotus_data, file = temp_input)
 
   result <- prepare_libraries_sop_lotus(
     input = temp_input,

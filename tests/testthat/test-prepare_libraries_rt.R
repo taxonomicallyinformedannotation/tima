@@ -563,7 +563,7 @@ test_that("prepare_libraries_rt handles moderate-scale data efficiently", {
 })
 
 test_that("prepare_libraries_rt validates RT unit and outputs", {
-  withr::local_dir(temp_test_dir("prep_lib_rt_validate"))
+  withr::local_dir(new = temp_test_dir("prep_lib_rt_validate"))
   # Invalid unit
   expect_error(
     prepare_libraries_rt(unit_rt = "hours"),

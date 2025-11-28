@@ -84,8 +84,8 @@ fetch_zenodo_record <- function(record, doi) {
   tryCatch(
     {
       httr2::request(base_url = url) |>
-        httr2::req_timeout(30) |>
-        httr2::req_retry(max_tries = 3) |>
+        httr2::req_timeout(seconds = 30) |>
+        httr2::req_retry(max_tries = 3L) |>
         httr2::req_perform()
     },
     httr2_http_404 = function(e) {

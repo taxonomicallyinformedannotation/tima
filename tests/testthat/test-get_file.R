@@ -76,7 +76,7 @@ test_that("get_file validates timeout limit", {
 
 test_that("get_file skips download if file already exists", {
   tmp <- temp_test_dir("get_file_exists")
-  withr::local_dir(tmp)
+  withr::local_dir(new = tmp)
   paths <- local_test_project(copy = TRUE)
   test_file <- file.path("data", "source", "existing_file.txt")
   dir.create(dirname(test_file), recursive = TRUE, showWarnings = FALSE)
@@ -96,7 +96,7 @@ test_that("get_file skips download if file already exists", {
 
 test_that("get_file creates output directory if needed", {
   tmp <- temp_test_dir("get_file_dir_create")
-  withr::local_dir(tmp)
+  withr::local_dir(new = tmp)
   paths <- local_test_project(copy = TRUE)
   test_url <- paste0(
     "https://raw.githubusercontent.com/",
@@ -115,7 +115,7 @@ test_that("get_file creates output directory if needed", {
 
 test_that("get_file downloads file successfully", {
   tmp <- temp_test_dir("get_file_download_success")
-  withr::local_dir(tmp)
+  withr::local_dir(new = tmp)
   paths <- local_test_project(copy = TRUE)
   test_url <- paste0(
     "https://raw.githubusercontent.com/",
@@ -135,7 +135,7 @@ test_that("get_file downloads file successfully", {
 
 test_that("get_file fails gracefully with invalid URL", {
   tmp <- temp_test_dir("get_file_invalid_url")
-  withr::local_dir(tmp)
+  withr::local_dir(new = tmp)
   paths <- local_test_project(copy = TRUE)
   test_file <- file.path("data", "source", "test.txt")
   if (file.exists(test_file)) {
@@ -155,7 +155,7 @@ test_that("get_file fails gracefully with invalid URL", {
 
 test_that("get_file handles 404 errors", {
   tmp <- temp_test_dir("get_file_404")
-  withr::local_dir(tmp)
+  withr::local_dir(new = tmp)
   paths <- local_test_project(copy = TRUE)
   test_file <- file.path("data", "source", "test.txt")
   if (file.exists(test_file)) {
@@ -176,7 +176,7 @@ test_that("get_file handles 404 errors", {
 
 test_that("get_file works with real package example files", {
   tmp <- temp_test_dir("get_file_examples")
-  withr::local_dir(tmp)
+  withr::local_dir(new = tmp)
   paths <- local_test_project(copy = TRUE)
   expect_no_error(
     get_file(

@@ -145,7 +145,9 @@ test_that("change_params_small runs with valid polarity", {
   expect_null(result) # Returns invisible NULL
 
   # Check that params were updated
-  params <- yaml::read_yaml(file.path(tmpdir, "params/prepare_params.yaml"))
+  params <- yaml::read_yaml(
+    file = file.path(tmpdir, "params/prepare_params.yaml")
+  )
   expect_equal(params$ms$polarity, "neg")
 })
 
@@ -207,7 +209,9 @@ test_that("change_params_small updates all file parameters", {
   )
 
   # Verify updates
-  params <- yaml::read_yaml(file.path(tmpdir, "params/prepare_params.yaml"))
+  params <- yaml::read_yaml(
+    file = file.path(tmpdir, "params/prepare_params.yaml")
+  )
   expect_equal(params$files$pattern, "new_pattern")
   expect_equal(params$ms$polarity, "neg")
   # Files are copied to data/source
@@ -259,7 +263,9 @@ test_that("change_params_small handles partial updates", {
   )
 
   # Verify only features changed
-  params <- yaml::read_yaml(file.path(tmpdir, "params/prepare_params.yaml"))
+  params <- yaml::read_yaml(
+    file = file.path(tmpdir, "params/prepare_params.yaml")
+  )
   expect_true(grepl("new_features.csv", params$files$features$raw))
   expect_equal(params$files$pattern, "original") # Unchanged
   expect_equal(params$ms$polarity, "pos") # Unchanged
@@ -274,7 +280,7 @@ test_that("change_params_small updates both yaml files", {
   dir.create(file.path(tmpdir, "params"), recursive = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE))
 
-  withr::local_dir(tmpdir)
+  withr::local_dir(new = tmpdir)
 
   # Create params
   minimal_params <- list(
@@ -307,11 +313,15 @@ test_that("change_params_small updates both yaml files", {
   result <- change_params_small(fil_pat = "updated_pattern", cache_dir = ".")
 
   # Verify both files updated
-  params1 <- yaml::read_yaml(file.path(tmpdir, "params/prepare_params.yaml"))
-  params2 <- yaml::read_yaml(file.path(
-    tmpdir,
-    "params/prepare_params_advanced.yaml"
-  ))
+  params1 <- yaml::read_yaml(
+    file = file.path(tmpdir, "params/prepare_params.yaml")
+  )
+  params2 <- yaml::read_yaml(
+    file = file.path(
+      tmpdir,
+      "params/prepare_params_advanced.yaml"
+    )
+  )
 
   expect_equal(params1$files$pattern, "updated_pattern")
   expect_equal(params2$files$pattern, "test")

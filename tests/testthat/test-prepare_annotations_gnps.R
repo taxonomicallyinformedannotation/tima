@@ -73,7 +73,7 @@ make_min_struct_files <- function(root = getwd()) {
 ## Validation ----
 
 test_that("test-prepare_annotations_gnps validates output path", {
-  withr::local_dir(temp_test_dir("prep_gnps_validate_output"))
+  withr::local_dir(new = temp_test_dir("prep_gnps_validate_output"))
   s <- make_min_struct_files()
   expect_error(
     prepare_annotations_gnps(
@@ -90,7 +90,7 @@ test_that("test-prepare_annotations_gnps validates output path", {
 })
 
 test_that("test-prepare_annotations_gnps validates structure file paths", {
-  withr::local_dir(temp_test_dir("prep_gnps_validate_struct"))
+  withr::local_dir(new = temp_test_dir("prep_gnps_validate_struct"))
   out <- temp_test_path("gnps.tsv")
   expect_error(
     prepare_annotations_gnps(
@@ -109,7 +109,7 @@ test_that("test-prepare_annotations_gnps validates structure file paths", {
 # Behavior ----
 
 test_that("test-prepare_annotations_gnps handles missing input files by creating empty output", {
-  withr::local_dir(temp_test_dir("prep_gnps_missing_input"))
+  withr::local_dir(new = temp_test_dir("prep_gnps_missing_input"))
   s <- make_min_struct_files()
   out <- temp_test_path("gnps.tsv")
   res <- prepare_annotations_gnps(
@@ -128,7 +128,7 @@ test_that("test-prepare_annotations_gnps handles missing input files by creating
 })
 
 test_that("test-prepare_annotations_gnps processes minimal valid GNPS file", {
-  withr::local_dir(temp_test_dir("prep_gnps_minimal"))
+  withr::local_dir(new = temp_test_dir("prep_gnps_minimal"))
   s <- make_min_struct_files()
   out <- temp_test_path("gnps.tsv")
   gnps <- tidytable::tidytable(

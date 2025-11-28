@@ -345,7 +345,7 @@ test_that("create_edges ensures feature_id < target_id", {
 ## Integration with create_edges_spectra ----
 
 test_that("create_edges integrates with extract_spectra output", {
-  withr::local_dir(temp_test_dir("create_edges_integration"))
+  withr::local_dir(new = temp_test_dir("create_edges_integration"))
   paths <- local_test_project(copy = TRUE)
 
   # Ensure clean state - remove any existing spectra file

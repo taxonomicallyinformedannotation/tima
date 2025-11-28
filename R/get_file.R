@@ -86,7 +86,7 @@ download_with_error_handling <- function(url, export) {
 #' Validate HTTP response status
 #' @keywords internal
 validate_http_response <- function(resp, url, export) {
-  status <- httr2::resp_status(resp)
+  status <- httr2::resp_status(resp = resp)
 
   if (status < 200L || status >= 300L) {
     cleanup_failed_download(export)

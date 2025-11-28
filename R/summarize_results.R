@@ -208,7 +208,7 @@ summarize_results <- function(
       tidytable::group_by(feature_id) |>
       tidytable::reframe(
         tidytable::across(
-          .cols = tidyselect::all_of(collapse_cols),
+          .cols = tidyselect::all_of(x = collapse_cols),
           .fns = collapse_fn
         )
       ) |>
@@ -225,7 +225,7 @@ summarize_results <- function(
         y = df_joined |>
           tidytable::select(c(
             "feature_id",
-            tidyselect::all_of(remaining_cols)
+            tidyselect::all_of(x = remaining_cols)
           )) |>
           tidytable::distinct()
       )
@@ -270,7 +270,7 @@ summarize_results <- function(
     # Features without structures - add consensus
     df_processed |>
       tidytable::filter(!has_structure) |>
-      tidytable::distinct(tidyselect::all_of(model$features_columns)) |>
+      tidytable::distinct(tidyselect::all_of(x = model$features_columns)) |>
       tidytable::left_join(
         y = annot_table_wei_chemo |>
           tidytable::mutate(
