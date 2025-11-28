@@ -100,7 +100,7 @@ validate_weight_annotations_inputs <- function(
   )
   purrr::iwalk(optional_files, function(path, name) {
     if (!is.null(path) && !file.exists(path)) {
-      log_warn("Optional file '{name}' not found at: {path}")
+      log_warn("Optional file '%s' not found at: %s", name, path)
     }
   })
 
@@ -183,7 +183,7 @@ validate_weight_annotations_inputs <- function(
 #' @return Data frame with combined (and optionally filtered) annotations.
 #' @keywords internal
 load_annotation_tables <- function(annotations, ms1_only) {
-  log_debug("Loading {length(annotations)} annotation file(s)")
+  log_debug("Loading %d annotation file(s)", length(annotations))
   annotation_table <- tryCatch(
     purrr::map(
       .x = annotations,
@@ -209,7 +209,9 @@ load_annotation_tables <- function(annotations, ms1_only) {
           is.na(candidate_score_sirius_csi)
       )
     log_debug(
-      "MS1-only filter: {n_before} -> {nrow(annotation_table)} rows"
+      "MS1-only filter: %d -> %d rows",
+      n_before,
+      nrow(annotation_table)
     )
   }
 
@@ -233,7 +235,7 @@ load_annotation_tables <- function(annotations, ms1_only) {
 #' @return Data frame with structure-organism pairs, including any joined metadata.
 #' @keywords internal
 load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
-  log_debug("Loading library from: {library}")
+  log_debug("Loading library from: %s", library)
   library_table <- tryCatch(
     tidytable::fread(
       file = library,
@@ -284,7 +286,7 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
 #' @return Data frame with filtered edges (top `candidates_neighbors` per `feature_source`).
 #' @keywords internal
 load_edges_table <- function(edges, candidates_neighbors) {
-  log_debug("Loading edges from: {edges}")
+  log_debug("Loading edges from: %s", edges)
   edges_table <- tryCatch(
     tidytable::fread(
       file = edges,
@@ -307,7 +309,10 @@ load_edges_table <- function(edges, candidates_neighbors) {
     tidytable::ungroup()
 
   log_debug(
-    "Edges filtered to top {candidates_neighbors} neighbors/feature: {n_before} -> {nrow(edges_table)} rows"
+    "Edges filtered to top %d neighbors/feature: %d -> %d rows",
+    candidates_neighbors,
+    n_before,
+    nrow(edges_table)
   )
   edges_table
 }
@@ -335,7 +340,11 @@ log_annotation_stats <- function(annotation_table) {
     tidytable::arrange(tidytable::desc(x = n))
 
   log_info(
-    "\n{paste(capture.output(print.data.frame(annotation_stats, row.names = FALSE)), collapse = '\n')}"
+    "\n%s",
+    paste(
+      capture.output(print.data.frame(annotation_stats, row.names = FALSE)),
+      collapse = "\n"
+    )
   )
 
   invisible(NULL)
@@ -798,13 +807,21 @@ weight_annotations <- function(
 
   log_info("Starting annotation weighting and scoring")
   log_debug(
-    "Weights - Spectral: {weight_spectral}, Chemical: {weight_chemical}, Biological: {weight_biological}"
+    "Weights - Spectral: %s, Chemical: %s, Biological: %s",
+    weight_spectral,
+    weight_chemical,
+    weight_biological
   )
   log_debug(
-    "Candidates - Neighbors: {candidates_neighbors}, Final: {candidates_final}, Best percentile: {best_percentile}"
+    "Candidates - Neighbors: %d, Final: %d, Best percentile: %s",
+    candidates_neighbors,
+    candidates_final,
+    best_percentile
   )
   log_debug(
-    "MS1-only mode: {ms1_only}, High confidence: {high_confidence}"
+    "MS1-only mode: %s, High confidence: %s",
+    ms1_only,
+    high_confidence
   )
 
   start_time <- Sys.time()
@@ -826,7 +843,8 @@ weight_annotations <- function(
     org_tax_ott
   )
   log_debug(
-    "Loaded {nrow(structure_organism_pairs_table)} structure-organism pairs"
+    "Loaded %d structure-organism pairs",
+    nrow(structure_organism_pairs_table)
   )
 
   canopus_table <- tidytable::fread(
@@ -848,7 +866,7 @@ weight_annotations <- function(
 
   features_table <- annotation_table |>
     tidytable::distinct(tidytable::any_of(c("feature_id", "rt", "mz")))
-  log_debug("Extracted {nrow(features_table)} unique features")
+  log_debug("Extracted %d unique features", nrow(features_table))
 
   # Rearrange and Merge Annotations ----
   log_debug(
@@ -861,7 +879,7 @@ weight_annotations <- function(
     canopus_table,
     edges_table
   )
-  log_debug("Merged annotation table: {nrow(annotation_table)} rows")
+  log_debug("Merged annotation table: %d rows", nrow(annotation_table))
 
   # Clean up intermediate objects
   rm(formula_table, canopus_table)
@@ -899,7 +917,8 @@ weight_annotations <- function(
   )
   rm(annotation_table_taxed)
   log_debug(
-    "Biological scoring complete: {nrow(annot_table_wei_bio)} candidates"
+    "Biological scoring complete: %d candidates",
+    nrow(annot_table_wei_bio)
   )
 
   annot_table_wei_bio |>
@@ -922,7 +941,8 @@ weight_annotations <- function(
     )
   rm(annot_table_wei_bio)
   log_debug(
-    "Biological cleaning complete: {nrow(annot_table_wei_bio_clean)} candidates"
+    "Biological cleaning complete: %d candidates",
+    nrow(annot_table_wei_bio_clean)
   )
 
   log_debug("Computing chemical taxonomy scores")
@@ -941,7 +961,8 @@ weight_annotations <- function(
     )
   rm(annot_table_wei_bio_clean)
   log_debug(
-    "Chemical scoring complete: {nrow(annot_table_wei_chemo)} candidates"
+    "Chemical scoring complete: %d candidates",
+    nrow(annot_table_wei_chemo)
   )
 
   annot_table_wei_chemo |>
@@ -982,7 +1003,7 @@ weight_annotations <- function(
   rm(annot_table_wei_chemo)
 
   elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-  log_info("Annotation weighting complete in {round(elapsed, 1)}s")
+  log_info("Annotation weighting complete in %fs", round(elapsed, 1))
 
   # Export Results ----
   log_debug("Exporting results to disk")
@@ -990,6 +1011,6 @@ weight_annotations <- function(
   output_paths <- export_results(results_list, output, pattern)
   rm(results_list)
 
-  log_info("Results exported: {basename(output_paths['full'])}")
+  log_info("Results exported: %s", basename(output_paths['full']))
   return(output_paths)
 }

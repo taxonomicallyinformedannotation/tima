@@ -59,7 +59,7 @@ select_annotations_columns <- function(
     str_tax_npc = str_tax_npc
   ))
 
-  log_debug("Input: {nrow(df)} rows, {ncol(df)} columns")
+  log_debug("Input: %d rows, %d columns", nrow(df), ncol(df))
 
   # Get column model
   model <- columns_model()

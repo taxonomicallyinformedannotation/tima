@@ -80,7 +80,7 @@ create_edges <- function(
   indices <- seq_len(nspecs - 1L)
   n_comparisons <- sum(indices)
 
-  log_debug("Calculating {n_comparisons} pairwise similarities")
+  log_debug("Calculating %d pairwise similarities", n_comparisons)
 
   # Disable progress bar in subprocess environments to prevent crashes
   show_progress <- interactive() && !isTRUE(getOption("knitr.in.progress"))
@@ -167,7 +167,7 @@ create_edges <- function(
 
   if (length(edges) > 0L) {
     result <- tidytable::bind_rows(edges)
-    log_info("Created {nrow(result)} edges passing thresholds")
+    log_info("Created %d edges passing thresholds", nrow(result))
     result
   } else {
     log_warn("No edges passed the specified thresholds")

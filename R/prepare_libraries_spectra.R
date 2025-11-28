@@ -236,7 +236,7 @@ prepare_libraries_spectra <-
     col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
     col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp
   ) {
-    log_info("Preparing spectral library: {nam_lib}")
+    log_info("Preparing spectral library: %s", nam_lib)
     # Define output paths ----
     output_pos <- file.path(
       get_default_paths()$data$interim$libraries$spectra$exp$path,
@@ -253,7 +253,7 @@ prepare_libraries_spectra <-
     # Check if already prepared (idempotency) ----
     outputs_exist <- all(file.exists(c(output_pos, output_neg, output_sop)))
     if (outputs_exist) {
-      log_info("Library '{nam_lib}' already prepared; skipping")
+      log_info("Library '%s' already prepared; skipping", nam_lib)
       export_params(
         parameters = get_params(step = "prepare_libraries_spectra"),
         step = "prepare_libraries_spectra"
@@ -278,7 +278,7 @@ prepare_libraries_spectra <-
       sop <- create_empty_sop_library()
     } else {
       # Import and extract ----
-      log_debug("Importing {length(input)} spectral file(s)")
+      log_debug("Importing %d spectral file(s)", length(input))
       spectra <- purrr::map(input, import_spectra, combine = FALSE)
       log_debug("Extracting spectra metadata")
       spectra_extracted <- purrr::map(spectra, extract_spectra)
@@ -356,7 +356,10 @@ prepare_libraries_spectra <-
         ) |>
         tidytable::mutate(organism_name = NA_character_)
       log_debug(
-        "SOP table: {nrow(sop)} unique structures (pos={nrow(spectra_harmonized_pos)}, neg={nrow(spectra_harmonized_neg)} spectra)"
+        "SOP table: %d unique structures (pos=%d, neg=%d spectra)",
+        nrow(sop),
+        nrow(spectra_harmonized_pos),
+        nrow(spectra_harmonized_neg)
       )
     }
     # Export ----
@@ -368,7 +371,7 @@ prepare_libraries_spectra <-
       parameters = get_params(step = "prepare_libraries_spectra"),
       step = "prepare_libraries_spectra"
     )
-    log_success("Spectral library '{nam_lib}' prepared successfully")
+    log_success("Spectral library '%s' prepared successfully", nam_lib)
     invisible(c(
       "pos" = output_pos,
       "neg" = output_neg,

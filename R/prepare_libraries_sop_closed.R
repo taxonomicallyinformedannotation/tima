@@ -44,7 +44,7 @@ prepare_libraries_sop_closed <- function(
   log_info("Preparing closed structure-organism pairs library")
 
   if (file.exists(input)) {
-    log_debug("Loading closed resource from: {input}")
+    log_debug("Loading closed resource from: %s", input)
 
     closed <- tryCatch(
       {
@@ -80,17 +80,15 @@ prepare_libraries_sop_closed <- function(
         tidytable::distinct()
 
       log_info(
-        "Formatted ",
-        nrow(closed_prepared),
-        " unique structure-organism pairs"
+        "Formatted %d unique structure-organism pairs",
+        nrow(closed_prepared)
       )
       rm(closed)
     }
   } else {
     log_warn(
-      "Closed resource not accessible at: ",
-      input,
-      ". Returning empty template instead."
+      "Closed resource not accessible at: %s. Returning empty template instead.",
+      input
     )
     closed_prepared <- fake_sop_columns()
   }

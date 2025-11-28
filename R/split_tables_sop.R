@@ -46,7 +46,7 @@ split_tables_sop <- function(table, cache) {
   }
 
   log_info("Splitting SOP library into standardized components")
-  log_debug("Input: {nrow(table)} rows")
+  log_debug("Input: %d rows", nrow(table))
 
   table <- table |>
     tidytable::mutate(
@@ -150,9 +150,10 @@ split_tables_sop <- function(table, cache) {
   )
 
   log_info(
-    "Structures: {format_count(n_stereoisomers)} stereoisomers, ",
-    "{format_count(n_no_stereo)} without stereochemistry, ",
-    "{format_count(n_constitutional)} constitutional isomers"
+    "Structures: %s stereoisomers, %s without stereochemistry, %s constitutional isomers",
+    format_count(n_stereoisomers),
+    format_count(n_no_stereo),
+    format_count(n_constitutional)
   )
 
   table_structures_metadata <- table_structural |>

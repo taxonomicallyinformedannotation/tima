@@ -119,7 +119,7 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
     tidytable::bind_rows()
 
   n_spectral <- nrow(annotations_tables_spectral)
-  log_debug("Found {n_spectral} spectral annotations")
+  log_debug("Found %d spectral annotations", n_spectral)
 
   # Create key for anti-join
   spectral_keys <- annotations_tables_spectral |>
@@ -142,7 +142,7 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
     tidytable::bind_rows(annotations_tables_spectral)
 
   n_ms1_removed <- n_ms1_before - (nrow(annotation_table) - n_spectral)
-  log_info("Removed {n_ms1_removed} redundant MS1 annotations")
+  log_info("Removed %d redundant MS1 annotations", n_ms1_removed)
 
   annotation_table
 }
@@ -257,7 +257,7 @@ filter_annotations <- function(
   # Load and Process Data ----
 
   log_info("Filtering annotations")
-  log_debug("RT tolerance: {tolerance_rt} minutes")
+  log_debug("RT tolerance: %f minutes", tolerance_rt)
 
   features_table <- tidytable::fread(
     file = features,
@@ -268,12 +268,13 @@ filter_annotations <- function(
 
   n_features <- nrow(features_table)
   log_info(
-    "Processing {n_features} unique features for annotation filtering"
+    "Processing %d unique features for annotation filtering",
+    n_features
   )
 
   # Load and Merge Annotations ----
 
-  log_debug("Loading {length(annotations)} annotation file(s)")
+  log_debug("Loading %d annotation file(s)", length(annotations))
   annotation_tables_list <- purrr::map(
     .x = annotations,
     .f = tidytable::fread,
@@ -287,7 +288,8 @@ filter_annotations <- function(
 
   n_total_annotations <- nrow(annotation_table)
   log_info(
-    "Total annotations before RT filtering: {n_total_annotations}"
+    "Total annotations before RT filtering: %d",
+    n_total_annotations
   )
 
   # Apply RT Filtering if Library Available ----
@@ -317,7 +319,7 @@ filter_annotations <- function(
     }
 
     n_rt_standards <- nrow(rt_table)
-    log_debug("Loaded {n_rt_standards} retention time standards")
+    log_debug("Loaded %d retention time standards", n_rt_standards)
 
     features_annotated_table_2 <- apply_rt_filter(
       features_annotated_table_1,
@@ -333,7 +335,8 @@ filter_annotations <- function(
   n_removed_rt <- nrow(features_annotated_table_1) -
     nrow(features_annotated_table_2)
   log_info(
-    "Removed {n_removed_rt} annotations based on retention time tolerance"
+    "Removed %d annotations based on retention time tolerance",
+    n_removed_rt
   )
   rm(features_annotated_table_1)
 

@@ -211,9 +211,11 @@ weight_bio <- function(
 
   # Log Processing Information ----
 
-  log_info("Weighting {n_annotations} annotations by biological source")
+  log_info("Weighting %d annotations by biological source", n_annotations)
   log_debug(
-    "Weights - Spectral: {weight_spectral}, Biological: {weight_biological}"
+    "Weights - Spectral: %f, Biological: %f",
+    weight_spectral,
+    weight_biological
   )
 
   # Filter Structure-Organism Pairs ----
@@ -250,7 +252,7 @@ weight_bio <- function(
       .fns = ~ tidytable::na_if(x = .x, y = "")
     ))
 
-  log_debug("Filtered to {nrow(df0)} structure-organism pairs")
+  log_debug("Filtered to %d structure-organism pairs", nrow(df0))
 
   # log_trace("Preparing annotation table")
   df1 <- annotation_table_taxed |>
@@ -432,7 +434,7 @@ weight_bio <- function(
 
   # Calculate scores for all levels
   supp_tables <- lapply(taxonomic_levels, function(tax_level) {
-    # log_trace("... {tax_level$level}")
+    # log_trace("... %s", tax_level$level)
 
     df2 |>
       score_per_level_bio(

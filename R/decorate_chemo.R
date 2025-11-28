@@ -103,7 +103,8 @@ decorate_chemo <- function(
 
   if (length(missing_cols) > 0) {
     log_warn(
-      "Missing expected columns: {paste(missing_cols, collapse = ', ')}"
+      "Missing expected columns: %s",
+      paste(missing_cols, collapse = ", ")
     )
     return(annot_table_wei_chemo)
   }
@@ -210,16 +211,23 @@ decorate_chemo <- function(
   # Log Summary Statistics ----
 
   log_info(
-    "Chemically informed metabolite annotation reranked:\n",
-    "  Classyfire:\n",
-    "    Kingdom level:    {cla_counts['kingdom']} structures\n",
-    "    Superclass level: {cla_counts['superclass']} structures\n",
-    "    Class level:      {cla_counts['class']} structures\n",
-    "    Parent level:     {cla_counts['parent']} structures\n",
-    "  NPClassifier:\n",
-    "    Pathway level:    {npc_counts['pathway']} structures\n",
-    "    Superclass level: {npc_counts['superclass']} structures\n",
-    "    Class level:      {npc_counts['class']} structures"
+    "Chemically informed metabolite annotation reranked:
+    Classyfire:
+    Kingdom level:    %d structures
+    Superclass level: %d structures
+    Class level:      %d structures
+    Parent level:     %d structures
+    NPClassifier:
+    Pathway level:    %d structures
+    Superclass level: %d structures
+    Class level:      %d structures",
+    cla_counts["kingdom"],
+    cla_counts["superclass"],
+    cla_counts["class"],
+    cla_counts["parent"],
+    npc_counts["pathway"],
+    npc_counts["superclass"],
+    npc_counts["class"]
   )
 
   return(annot_table_wei_chemo)

@@ -63,7 +63,9 @@ get_example_files <- function(
   }
 
   log_debug(
-    "Downloading {length(example)} example file(s): {paste(example, collapse = ', ')}"
+    "Downloading %d example file(s): %s",
+    length(example),
+    paste(example, collapse = ", ")
   )
 
   # Navigate to cache if requested
@@ -116,6 +118,6 @@ get_example_files <- function(
     )
   }
 
-  log_info("Downloaded {length(example)} example file(s)")
+  log_info("Downloaded %d example file(s)", length(example))
   invisible(NULL)
 }

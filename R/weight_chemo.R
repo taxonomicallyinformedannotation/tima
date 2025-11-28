@@ -158,14 +158,13 @@ weight_chemo <- function(
   }
 
   log_info(
-    "Weighting {n_annotations} annotations by chemical consistency"
+    "Weighting %d annotations by chemical consistency",
+    n_annotations
   )
   log_debug(
-    "Weights - Spectral: ",
+    "Weights - Spectral: %f, Biological: %f, Chemical: %f",
     weight_spectral,
-    ", Biological: ",
     weight_biological,
-    ", Chemical: ",
     weight_chemical
   )
 

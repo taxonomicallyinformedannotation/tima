@@ -140,7 +140,7 @@ annotate_masses <-
 
     ## Load and Validate Features ----
 
-    # log_trace("Loading features table from: {features}")
+    # log_trace("Loading features table from: %s", features)
     features_table <- tidytable::fread(
       file = features,
       na.strings = c("", "NA"),
@@ -194,7 +194,7 @@ annotate_masses <-
       ))
     }
 
-    log_info("Processing {n_features} features for annotation")
+    log_info("Processing %d features for annotation", n_features)
 
     # Select Mode-Specific Adducts and Clusters ----
 
@@ -357,7 +357,11 @@ annotate_masses <-
         "Here are the top 10 observed m/z differences inside the RT windows:"
       )
       log_info(
-        "\n{paste(capture.output(print.data.frame(bins, row.names = FALSE)), collapse = '\n')}"
+        "\n%s",
+        paste(
+          capture.output(print.data.frame(bins, row.names = FALSE)),
+          collapse = "\n"
+        )
       )
       log_info(
         "These differences may help identify potential preprocessing issues"
@@ -421,24 +425,22 @@ annotate_masses <-
     # Validate that we have monocharged adducts/clusters to work with
     if (nrow(add_clu_table) == 0L) {
       log_error(
-        "No valid monocharged adducts or clusters found for mode '",
-        ms_mode,
-        "'. ",
-        "Cannot proceed with mass annotation. ",
-        "Please check your adducts and clusters configuration."
+        "No valid monocharged adducts or clusters found for mode %s.
+        Cannot proceed with mass annotation.
+        Please check your adducts and clusters configuration.",
+        ms_mode
       )
       stop(
-        "No monocharged adducts/clusters available for annotation.\n",
-        "Check that your adducts_list and clusters_list contain valid entries for mode '",
-        ms_mode,
-        "'."
+        "No valid monocharged adducts or clusters found for mode %s.
+        Cannot proceed with mass annotation.
+        Please check your adducts and clusters configuration.",
+        ms_mode
       )
     }
 
     log_debug(
-      "Found ",
-      nrow(add_clu_table),
-      " monocharged adducts/clusters for processing"
+      "Found %d monocharged adducts/clusters for processing",
+      nrow(add_clu_table)
     )
 
     # log_trace(

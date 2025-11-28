@@ -579,19 +579,26 @@ clean_chemo <- function(
   # Log Processing Parameters ----
 
   log_info("Cleaning chemically weighted annotations")
-  log_debug("Keeping top {candidates_final} candidates per feature")
+  log_debug("Keeping top %d candidates per feature", candidates_final)
   log_debug(
     "Using best_percentile: {best_percentile} for consistent filtering"
   )
   log_debug(
-    "Options - High confidence: {high_confidence}, ",
-    "Remove ties: {remove_ties}, Summarize: {summarize}"
+    "Options - High confidence: %s, Remove ties: %s, Summarize: %s",
+    high_confidence,
+    remove_ties,
+    summarize
   )
   log_info(
-    "Filtering top {candidates_final} candidates and keeping only MS1 candidates with minimum {minimal_ms1_bio} biological score {minimal_ms1_condition} {minimal_ms1_chemo} chemical score"
+    "Filtering top %d candidates and keeping only MS1 candidates with minimum %f biological score %s %f chemical score",
+    candidates_final,
+    minimal_ms1_bio,
+    minimal_ms1_condition,
+    minimal_ms1_chemo
   )
   log_debug(
-    "Sampling max_per_score = {max_per_score} candidates per (feature_id, rank_final) after filters"
+    "Sampling max_per_score = %d candidates per (feature_id, rank_final) after filters",
+    max_per_score
   )
 
   # Core Filtering Pipeline ----

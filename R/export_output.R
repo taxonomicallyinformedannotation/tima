@@ -36,7 +36,10 @@ export_output <- function(x, file) {
   ncols <- ncol(x)
 
   log_debug(
-    "Exporting {format_count(nrows)} rows x {ncols} columns to: {basename(file)}"
+    "Exporting %s rows x %d columns to: %s",
+    format_count(nrows),
+    ncols,
+    basename(file)
   )
 
   # Determine compression
@@ -69,10 +72,10 @@ export_output <- function(x, file) {
       elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
       file_size <- file.info(file)$size
       log_file_op("Exported", file, size_bytes = file_size, n_rows = nrows)
-      log_debug("Export completed in {format_time(elapsed)}")
+      log_debug("Export completed in %s", format_time(elapsed))
     },
     error = function(e) {
-      log_error("Export failed: {conditionMessage(e)}")
+      log_error("Export failed: %s", conditionMessage(e))
       stop(
         "Failed to export data to '",
         file,

@@ -37,14 +37,14 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
     org_tax_ott = org_tax_ott
   ))
 
-  log_info("Loading benchmark features from: ", input)
+  log_info("Loading benchmark features from: %s", input)
   features <- tidytable::fread(
     input,
     na.strings = c("", "NA"),
     colClasses = "character"
   )
 
-  log_debug("Loading structure-organism pairs from: {keys}")
+  log_debug("Loading structure-organism pairs from: %s", keys)
   sop <- tidytable::fread(
     keys,
     na.strings = c("", "NA"),
@@ -59,7 +59,7 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
       )
     )
 
-  log_debug("Loading organism taxonomy from: {org_tax_ott}")
+  log_debug("Loading organism taxonomy from: %s", org_tax_ott)
   taxo <- tidytable::fread(
     org_tax_ott,
     na.strings = c("", "NA"),
@@ -107,9 +107,8 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
     )
 
   log_info(
-    "Added taxonomy to ",
-    nrow(features_taxed),
-    " benchmark features"
+    "Added taxonomy to %d benchmark features",
+    nrow(features_taxed)
   )
 
   export_output(x = features_taxed, file = output)

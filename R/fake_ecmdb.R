@@ -71,6 +71,6 @@ fake_ecmdb <- function(export) {
   # Clean up temporary file
   unlink(fake_export)
 
-  log_debug("Created fake ECMDB file at: ", export)
+  log_debug("Created fake ECMDB file at: %s", export)
   return(export)
 }

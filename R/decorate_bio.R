@@ -117,7 +117,8 @@ decorate_bio <- function(
 
   if (length(missing_cols) > 0) {
     log_warn(
-      "decorate_bio: missing expected columns: {paste(missing_cols, collapse = ', ')}"
+      "decorate_bio: missing expected columns: %s",
+      paste(missing_cols, collapse = ", ")
     )
     return(annot_table_wei_bio)
   }
@@ -166,16 +167,25 @@ decorate_bio <- function(
   # Log Summary Statistics ----
 
   log_info(
-    "Taxonomically informed metabolite annotation reranked:\n",
-    "  Kingdom level: {counts['kingdom']} structures\n",
-    "  Phylum level:  {counts['phylum']} structures\n",
-    "  Class level:   {counts['class']} structures\n",
-    "  Order level:   {counts['order']} structures\n",
-    "  Family level:  {counts['family']} structures\n",
-    "  Tribe level:   {counts['tribe']} structures\n",
-    "  Genus level:   {counts['genus']} structures\n",
-    "  Species level: {counts['species']} structures\n",
-    "  Variety level: {counts['variety']} structures"
+    "Taxonomically informed metabolite annotation reranked:
+    Kingdom level: %d structures
+    Phylum level:  %d structures
+    Class level:   %d structures
+    Order level:   %d structures
+    Family level:  %d structures
+    Tribe level:   %d structures
+    Genus level:   %d structures
+    Species level: %d structures
+    Variety level: %d structures",
+    counts["kingdom"],
+    counts["phylum"],
+    counts["class"],
+    counts["order"],
+    counts["family"],
+    counts["tribe"],
+    counts["genus"],
+    counts["species"],
+    counts["variety"]
   )
 
   return(annot_table_wei_bio)

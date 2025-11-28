@@ -124,9 +124,13 @@ annotate_spectra <- function(
     )
   }
 
-  log_info("Starting spectral annotation in {polarity} mode")
+  log_info("Starting spectral annotation in %s mode", polarity)
   log_debug(
-    "Method: {method}, Threshold: {threshold}, PPM: {ppm}, Dalton: {dalton}"
+    "Method: %s, Threshold: %f, PPM: %f, Dalton: %f",
+    method,
+    threshold,
+    ppm,
+    dalton
   )
 
   query_sp <- import_spectra(
@@ -195,7 +199,9 @@ annotate_spectra <- function(
   }
 
   log_debug(
-    "Annotating {length(query_sp@backend@peaksData)} query spectra against {length(spectral_library)} library references"
+    "Annotating %d query spectra against %d library references",
+    length(query_sp@backend@peaksData),
+    length(spectral_library)
   )
 
   sim_raw <- compute_similarity_safe(
@@ -238,7 +244,16 @@ annotate_spectra <- function(
   }
 
   log_info(
-    "{nrow(df_final |> tidytable::distinct(candidate_structure_inchikey_connectivity_layer, candidate_structure_smiles_no_stereo))} Candidates annotated on {nrow(df_final |> tidytable::distinct(feature_id))} features (threshold >= {threshold})."
+    "%d Candidates annotated on %d features (threshold >= %f).",
+    nrow(
+      df_final |>
+        tidytable::distinct(
+          candidate_structure_inchikey_connectivity_layer,
+          candidate_structure_smiles_no_stereo
+        )
+    ),
+    nrow(df_final |> tidytable::distinct(feature_id)),
+    threshold
   )
 
   persist_annotation_parameters(params)
@@ -299,7 +314,9 @@ filter_library_paths_by_polarity <- function(paths, polarity) {
   filtered <- paths[grepl(polarity, paths, fixed = TRUE)]
   if (length(filtered) < length(paths)) {
     log_debug(
-      "Filtered libraries by polarity: {length(paths)} -> {length(filtered)}"
+      "Filtered libraries by polarity: %d -> %d",
+      length(paths),
+      length(filtered)
     )
   }
   filtered
@@ -439,7 +456,7 @@ compute_similarity_safe <- function(
       approx = approx
     ),
     error = function(e) {
-      log_error("Similarity computation failed: {conditionMessage(e)}")
+      log_error("Similarity computation failed: %s", conditionMessage(e))
       tidytable::tidytable()
     }
   )
@@ -531,7 +548,11 @@ log_library_stats <- function(lib_sp) {
     ) |>
     tidytable::arrange(tidytable::desc(spectra))
   log_info(
-    "\n{paste(capture.output(print.data.frame(stats, row.names = FALSE)), collapse = '\n')}"
+    "\n%s",
+    paste(
+      capture.output(print.data.frame(stats, row.names = FALSE)),
+      collapse = "\n"
+    )
   )
   invisible(NULL)
 }

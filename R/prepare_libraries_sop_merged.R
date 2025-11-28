@@ -324,9 +324,9 @@ prepare_libraries_sop_merged <- function(
   )
 
   log_info("Preparing merged structure-organism pairs library")
-  log_debug("Filter mode: {filter}")
+  log_debug("Filter mode: %s", filter)
   if (filter) {
-    log_info("Filtering by {level}: {value}")
+    log_info("Filtering by %s: %s", level, value)
   }
 
   # Load and Process Libraries ----

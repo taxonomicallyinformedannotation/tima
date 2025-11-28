@@ -38,7 +38,7 @@ get_default_paths <- function(
       yaml::read_yaml(file = yaml)
     },
     error = function(e) {
-      log_error("Failed to parse paths YAML: {e$message}")
+      log_error("Failed to parse paths YAML: %s", e$message)
       stop("Failed to parse paths YAML file: ", conditionMessage(e))
     }
   )

@@ -118,7 +118,7 @@ extract_spectra <- function(object) {
 
   if (length(columns_to_harmonize) > 0L) {
     # log_trace(
-    #  "Harmonizing {length(columns_to_harmonize)} column names"
+    #  "Harmonizing %d column names", length(columns_to_harmonize)
     # )
     spectra <- spectra |>
       tidytable::select(
@@ -127,7 +127,7 @@ extract_spectra <- function(object) {
       tidytable::rename(tidyselect::any_of(x = columns_to_harmonize))
   }
 
-  log_debug("Extracted {nrow(spectra)} spectra")
+  log_debug("Extracted %d spectra", nrow(spectra))
 
   return(spectra)
 }

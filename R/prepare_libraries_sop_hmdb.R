@@ -45,11 +45,11 @@ prepare_libraries_sop_hmdb <- function(
 
   if (!file.exists(output) || file.size(output) < 100000) {
     if (!file.exists(input)) {
-      log_warn("HMDB file not found: {input}")
+      log_warn("HMDB file not found: %s", input)
       log_info("Creating empty HMDB library")
       hmdb_prepared <- fake_sop_columns()
     } else {
-      log_debug("Processing HMDB from: {input}")
+      log_debug("Processing HMDB from: %s", input)
       # log_trace("Unzipping HMDB")
       hmdb_prepared <- tryCatch(
         expr = {
@@ -189,7 +189,7 @@ prepare_libraries_sop_hmdb <- function(
         },
         error = function(e) {
           log_error(
-            "Something went wrong with HMDB processing: ",
+            "Something went wrong with HMDB processing: %s",
             conditionMessage(e)
           )
           fake_sop_columns()
