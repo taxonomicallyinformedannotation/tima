@@ -2720,7 +2720,7 @@ if (file.exists("/.dockerenv")) {
   host <- "127.0.0.1"
 }
 options(shiny.maxRequestSize = 2000 * 1024^2)
-log_info(
+tima:::log_info(
   "Please, open: {url} on your favorite browser, but not Edge."
 )
 shiny::shinyApp(
