@@ -550,7 +550,7 @@ log_library_stats <- function(lib_sp) {
   log_info(
     "\n%s",
     paste(
-      capture.output(print.data.frame(stats, row.names = FALSE)),
+      utils::capture.output(print.data.frame(x = stats, row.names = FALSE)),
       collapse = "\n"
     )
   )

@@ -342,7 +342,10 @@ log_annotation_stats <- function(annotation_table) {
   log_info(
     "\n%s",
     paste(
-      capture.output(print.data.frame(annotation_stats, row.names = FALSE)),
+      utils::capture.output(print.data.frame(
+        x = annotation_stats,
+        row.names = FALSE
+      )),
       collapse = "\n"
     )
   )

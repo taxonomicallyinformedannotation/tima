@@ -159,6 +159,7 @@ utils::globalVariables(
     "label_npclassifier",
     "label_npclassifier_predicted",
     "label_npclassifier_structure",
+    "lib_precursors",
     "library_name",
     "logp",
     "loss",

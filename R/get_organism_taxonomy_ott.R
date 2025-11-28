@@ -271,8 +271,8 @@ get_organism_taxonomy_ott <- function(
     log_info(
       "Retrying with %d genus names: %s %s",
       length(genus_names),
-      paste(head(genus_names, 5), collapse = ", "),
-      ifelse(length(genus_names) > 5, "...", "")
+      paste(utils::head(genus_names, n = 5L), collapse = ", "),
+      ifelse(length(genus_names) > 5, yes = "...", no = "")
     )
 
     # Query OTT API with genus names only

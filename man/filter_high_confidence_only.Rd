@@ -3,7 +3,7 @@
 \name{filter_high_confidence_only}
 \alias{filter_high_confidence_only}
 \title{Filter high confidence only
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}}
+\verb{r lifecycle::badge("experimental")}}
 \usage{
 filter_high_confidence_only(
   df,
