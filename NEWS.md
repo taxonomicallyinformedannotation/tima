@@ -23,6 +23,7 @@
 * Renamed some functions/utils for consistency
 * Replaced `logger` with `lgr` for `covr` compatibility
 * Switched documentation from `pkgdown` to `altdoc`
+* `tima_full()` has been deprecated in favor of `run_tima()`
 * Updated to Massbank version `2025.05.1`
 * Updated minimal R version to `4.4.0` (and related Bioconductor dependencies)
 

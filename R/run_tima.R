@@ -274,3 +274,71 @@ run_tima <- function(
 
   invisible(NULL)
 }
+
+#' @title Run Complete TIMA Workflow (DEPRECATED)
+#'
+#' @description **DEPRECATED:** This function has been renamed to \code{\link{run_tima}}.
+#'     Please use \code{run_tima()} instead. \code{tima_full()} will be removed in a
+#'     future version.
+#'
+#' @details
+#' This function is deprecated as of TIMA version 2.12.0 (November 2025).
+#' It now simply calls \code{\link{run_tima}} with all arguments passed through,
+#' but issues a deprecation warning.
+#'
+#' \strong{Migration Guide:}
+#' \itemize{
+#'   \item Old: \code{tima_full(target_pattern = "^ann_wei$")}
+#'   \item New: \code{run_tima(target_pattern = "^ann_wei$")}
+#' }
+#'
+#' All parameters and behavior are identical between the two functions.
+#'
+#' @param target_pattern Character. Regex pattern for target selection.
+#'     Default: "^ann_wei$"
+#' @param log_file Character. Path to log file. Default: "tima.log"
+#' @param clean_old_logs Logical. Remove old log file before starting.
+#'     Default: TRUE
+#' @param log_level Character or numeric. Logging verbosity level.
+#'     Default: "info"
+#'
+#' @return Invisible NULL (same as \code{\link{run_tima}})
+#'
+#' @export
+#'
+#' @seealso \code{\link{run_tima}} for the current function
+#'
+#' @examples
+#' \dontrun{
+#' # DEPRECATED - Use run_tima() instead
+#' # tima_full()
+#'
+#' # RECOMMENDED
+#' run_tima()
+#' }
+tima_full <- function(
+  target_pattern = "^ann_wei$",
+  log_file = "tima.log",
+  clean_old_logs = TRUE,
+  log_level = "info"
+) {
+  # Issue deprecation warning
+  .Deprecated(
+    new = "run_tima",
+    package = "tima",
+    msg = paste0(
+      "tima_full() is deprecated and will be removed in a future version.\n",
+      "Please use run_tima() instead.\n",
+      "All parameters work exactly the same way.\n",
+      "Update your code: tima_full(...) -> run_tima(...)"
+    )
+  )
+
+  # Call the new function with all arguments
+  run_tima(
+    target_pattern = target_pattern,
+    log_file = log_file,
+    clean_old_logs = clean_old_logs,
+    log_level = log_level
+  )
+}
