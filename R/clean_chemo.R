@@ -590,7 +590,7 @@ clean_chemo <- function(
     summarize
   )
   log_info(
-    "Filtering top %d candidates and keeping only MS1 candidates with minimum %f biological score %s %f chemical score",
+    "Filtering top %d candidates and keeping only MS1 candidates with minimum %f2 biological score %s %f2 chemical score",
     candidates_final,
     minimal_ms1_bio,
     minimal_ms1_condition,

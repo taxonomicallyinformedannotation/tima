@@ -134,7 +134,7 @@ read_mgf_opti <- function(
   # Get file size for progress reporting
   file_size_mb <- file.info(f)$size / 1024^2
   log_info(
-    "Reading MGF file (%f MB) with optimized parser: %s",
+    "Reading MGF file (%f2 MB) with optimized parser: %s",
     round(file_size_mb, 2),
     f
   )

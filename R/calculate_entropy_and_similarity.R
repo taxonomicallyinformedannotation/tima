@@ -83,7 +83,7 @@ calculate_entropy_and_similarity <- function(
     length(query_spectra)
   )
   log_debug(
-    "Method: %s, PPM: %f, Dalton: %f",
+    "Method: %s, PPM: %f2, Dalton: %f2",
     method,
     ppm,
     dalton

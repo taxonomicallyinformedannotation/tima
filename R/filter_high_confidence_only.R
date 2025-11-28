@@ -191,7 +191,7 @@ filter_high_confidence_only <- function(
 
   n_after <- nrow(df_filtered)
   n_removed <- n_before - n_after
-  percent_removed <- round(n_removed / n_before, 1)
+  percent_removed <- round(100 * n_removed / n_before, 1)
 
   # Build a tag for log lines if context is provided
   tag <- if (!is.null(context) && nzchar(context)) {
@@ -201,17 +201,17 @@ filter_high_confidence_only <- function(
   }
 
   log_info(
-    "%s Removed %d low-confidence candidates (%s of %d total)",
+    "%s Removed %d low-confidence candidates (%s%% of %d total)",
     tag,
     n_removed,
     percent_removed,
     n_before
   )
   log_info(
-    "%s %d high-confidence candidates remaining (%f)",
+    "%s %d high-confidence candidates remaining (%s%%)",
     tag,
     n_after,
-    round(n_after / n_before, 1)
+    round(100 * n_after / n_before, 1)
   )
 
   df_filtered
