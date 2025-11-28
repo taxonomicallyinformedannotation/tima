@@ -33,7 +33,8 @@ get_file <- function(url, export, limit = 3600L) {
   # Check if file already exists
   if (file.exists(export)) {
     log_debug(
-      "File already exists, skipping download: {basename(export)}"
+      "File already exists, skipping download: %s",
+      basename(export)
     )
     return(invisible(export))
   }
@@ -41,7 +42,7 @@ get_file <- function(url, export, limit = 3600L) {
   # Prepare for Download ----
   create_dir(export = export)
   options(timeout = limit)
-  log_debug("Downloading from: {url}")
+  log_debug("Downloading from: %s", url)
 
   # Download File ----
   start_time <- Sys.time()
@@ -55,7 +56,7 @@ get_file <- function(url, export, limit = 3600L) {
   elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
   file_size <- file.info(export)$size
   log_file_op("Downloaded", export, size_bytes = file_size)
-  log_debug("Download completed in {format_time(elapsed)}")
+  log_debug("Download completed in %s", format_time(elapsed))
 
   invisible(export)
 }

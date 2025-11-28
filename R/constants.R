@@ -282,9 +282,8 @@ get_constant <- function(name, default = NULL) {
       stop("Constant '", name, "' not found and no default provided")
     }
     log_warn(
-      "Constant '",
+      "Constant %s not found, using default: %s",
       name,
-      "' not found, using default: ",
       default
     )
     return(default)
@@ -304,10 +303,8 @@ validate_against_constant <- function(value, constant_name) {
   constant_value <- get_constant(constant_name)
   if (!value %in% constant_value) {
     stop(
-      "Invalid value '",
+      "Invalid value %s. Must be one of: %s",
       value,
-      "'. ",
-      "Must be one of: ",
       paste(constant_value, collapse = ", ")
     )
   }

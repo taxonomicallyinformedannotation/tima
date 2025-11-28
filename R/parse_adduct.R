@@ -96,11 +96,9 @@ parse_adduct <- function(
         result <- parse_single_adduct(alt_adduct, regex, failed_parse)
         if (!all(result == 0)) {
           log_debug(
-            "Successfully parsed alternative '",
+            "Successfully parsed alternative %s from composite adduct %s",
             alt_adduct,
-            "' from composite adduct '",
-            adduct_string,
-            "'"
+            adduct_string
           )
           return(result)
         }
@@ -109,9 +107,8 @@ parse_adduct <- function(
 
     # If none of the alternatives worked, return failed parse silently
     log_debug(
-      "Could not parse any alternative from: '",
-      adduct_string,
-      "'"
+      "Could not parse any alternative from: %s",
+      adduct_string
     )
     return(failed_parse)
   }
@@ -129,10 +126,9 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
   parse_result <- match_adduct_regex(adduct_string, regex)
   if (!parse_result$valid) {
     msg <- paste0(
-      "Invalid adduct format: '",
-      adduct_string,
-      "'. ",
-      "Expected format: [nM<isotope><modifications>]charge (e.g., [M+H]+)"
+      "Invalid adduct format: %s.
+      Expected format: [nM<isotope><modifications>]charge (e.g., [M+H]+)",
+      adduct_string
     )
     log_debug(msg)
     return(failed_parse)
@@ -149,9 +145,8 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
   modifications <- process_modifications(matches[4L])
   if (!modifications$valid) {
     msg <- paste0(
-      "Failed to process modifications in: '",
+      "Failed to process modifications in: %s. %s",
       adduct_string,
-      "'. ",
       modifications$message
     )
     log_debug(msg)
@@ -169,9 +164,8 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
     )))
   ) {
     msg <- paste0(
-      "Unexpected NA values during adduct parsing for: '",
-      adduct_string,
-      "'"
+      "Unexpected NA values during adduct parsing for: %s",
+      adduct_string
     )
     log_debug(msg)
     return(failed_parse)
@@ -455,7 +449,7 @@ calculate_modification_masses <- function(elements, signs, multiplicities) {
     },
     error = function(e) {
       log_debug(
-        "Failed to calculate modification masses: ",
+        "Failed to calculate modification masses: %s",
         conditionMessage(e)
       )
       return(NULL)

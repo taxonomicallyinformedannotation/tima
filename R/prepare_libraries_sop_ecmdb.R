@@ -45,11 +45,11 @@ prepare_libraries_sop_ecmdb <- function(
 
   if (!file.exists(output) || file.size(output) < 100000) {
     if (!file.exists(input)) {
-      log_warn("ECMDB file not found: {input}")
+      log_warn("ECMDB file not found: %s", input)
       log_info("Creating empty ECMDB library")
       ecmdb_prepared <- fake_sop_columns()
     } else {
-      log_debug("Processing ECMDB from: {input}")
+      log_debug("Processing ECMDB from: %s", input)
       # log_trace("Loading ECMDB resources")
 
       file <- gsub(

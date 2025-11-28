@@ -121,8 +121,8 @@ create_edges_spectra <- function(
   # Import and Process Spectra ----
 
   log_info("Creating spectral similarity network edges")
-  log_debug("Parameters - Threshold: {threshold}, Method: {method}")
-  log_debug("Tolerances - PPM: {ppm}, Dalton: {dalton}")
+  log_debug("Parameters - Threshold: %f, Method: %s", threshold, method)
+  log_debug("Tolerances - PPM: %f, Dalton: %f", ppm, dalton)
 
   # Import spectra with specified parameters
   spectra <- input |>
@@ -135,7 +135,8 @@ create_edges_spectra <- function(
   # Early exit if only one or no spectra
   if (length(spectra) <= 1L) {
     log_warn(
-      "Only {length(spectra)} spectrum found - need at least 2 for network edges"
+      "Only %d spectrum found - need at least 2 for network edges",
+      length(spectra)
     )
     edges <- tidytable::tidytable(
       !!as.name(name_source) := NA,
@@ -152,7 +153,7 @@ create_edges_spectra <- function(
   # Compute Spectral Similarities ----
 
   # log_trace(
-  #  "Performing spectral comparison on {length(spectra)} spectra"
+  #  "Performing spectral comparison on %d spectra", length(spectra)
   # )
   # log_trace(
   #  "As the precursors delta is not limited, expect a long processing time."

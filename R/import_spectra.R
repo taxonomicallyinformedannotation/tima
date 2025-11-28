@@ -75,10 +75,13 @@ import_spectra <- function(
 
   # Import Spectra ----
 
-  log_info("Importing spectra from: {file}")
+  log_info("Importing spectra from: %s", file)
   log_debug(
-    "Parameters: cutoff={cutoff}, dalton={dalton}, ppm={ppm}, ",
-    "polarity={ifelse(is.na(polarity), 'all', polarity)}"
+    "Parameters: cutoff=%f, dalton=%f, ppm=%f, polarity=%s",
+    cutoff,
+    dalton,
+    ppm,
+    ifelse(is.na(polarity), "all", polarity)
   )
 
   # Extract file extension (handle MassBank naming convention)
@@ -94,7 +97,7 @@ import_spectra <- function(
       vectorize_all = FALSE
     )
 
-  # log_trace("Detected file format: {file_ext}")
+  # log_trace("Detected file format: %s", file_ext)
 
   # Import spectra based on file format
   spectra <- tryCatch(
@@ -123,13 +126,13 @@ import_spectra <- function(
       )
     },
     error = function(e) {
-      log_error("Failed to import spectra: {conditionMessage(e)}")
+      log_error("Failed to import spectra: %s", conditionMessage(e))
       stop("Failed to import spectra from ", file, ": ", conditionMessage(e))
     }
   )
 
   n_initial <- length(spectra)
-  log_info("Loaded {n_initial} spectra from file")
+  log_info("Loaded %d spectra from file", n_initial)
 
   # Early exit for empty files
   if (n_initial == 0L) {
@@ -143,8 +146,8 @@ import_spectra <- function(
   if (0L %in% spectra@backend@spectraData$precursorCharge) {
     n_unknown <- sum(spectra@backend@spectraData$precursorCharge == 0L)
     log_warn(
-      "Found {n_unknown} spectra with precursorCharge = 0 ",
-      "(unknown polarity - should be avoided in practice)"
+      "Found %d spectra with precursorCharge = 0 (unknown polarity - should be avoided in practice)",
+      n_unknown
     )
   }
 
@@ -173,7 +176,10 @@ import_spectra <- function(
     n_removed <- n_before - n_after
     if (n_removed > 0L) {
       log_debug(
-        "Filtered to MS2 spectra: {n_before} -> {n_after} ({n_removed} removed)"
+        "Filtered to MS2 spectra: %d -> %d (%d removed)",
+        n_before,
+        n_after,
+        n_removed
       )
     }
   }
@@ -184,7 +190,9 @@ import_spectra <- function(
     spectra <- spectra[spectra@backend@spectraData$Spectrum_type == "MS2"]
     n_after <- length(spectra)
     log_debug(
-      "Filtered to MS2 spectra (MassBank): {n_before} -> {n_after} spectra"
+      "Filtered to MS2 spectra (MassBank): %d -> %d spectra",
+      n_before,
+      n_after
     )
   }
 
@@ -202,7 +210,10 @@ import_spectra <- function(
     )
     n_after <- length(spectra)
     log_debug(
-      "Filtered to {polarity} polarity: {n_before} -> {n_after} spectra"
+      "Filtered to %s polarity: %d -> %d spectra",
+      polarity,
+      n_before,
+      n_after
     )
   }
 
@@ -219,7 +230,7 @@ import_spectra <- function(
         ) |>
         Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
       n_after <- length(spectra)
-      log_debug("Combined replicates: {n_before} -> {n_after} spectra")
+      log_debug("Combined replicates: %d -> %d spectra", n_before, n_after)
     } else if ("SLAW_ID" %in% colnames(spectra@backend@spectraData)) {
       log_debug("Combining replicate spectra by SLAW_ID")
       spectra <- spectra |>
@@ -230,7 +241,7 @@ import_spectra <- function(
         ) |>
         Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
       n_after <- length(spectra)
-      log_debug("Combined replicates: {n_before} -> {n_after} spectra")
+      log_debug("Combined replicates: %d -> %d spectra", n_before, n_after)
     } else {
       # log_trace(
       #  "No replicate grouping field found, skipping combination"
@@ -241,7 +252,7 @@ import_spectra <- function(
   # Sanitize spectra if requested
   if (sanitize) {
     n_before <- length(spectra)
-    log_debug("Sanitizing spectra (cutoff={cutoff})")
+    log_debug("Sanitizing spectra (cutoff=%f)", cutoff)
     spectra <- sanitize_spectra(
       spectra = spectra,
       cutoff = cutoff,
@@ -249,11 +260,12 @@ import_spectra <- function(
       ppm = ppm
     )
     n_after <- length(spectra)
-    log_debug("Sanitization complete: {n_before} -> {n_after} spectra")
+    log_debug("Sanitization complete: %d -> %d spectra", n_before, n_after)
   }
 
   log_info(
-    "Import complete: {length(spectra)} spectra ready for analysis"
+    "Import complete: %d spectra ready for analysis",
+    length(spectra)
   )
 
   return(spectra)

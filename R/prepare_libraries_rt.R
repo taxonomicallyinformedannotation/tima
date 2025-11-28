@@ -83,7 +83,7 @@ prepare_libraries_rt <- function(
   dir.create(dirname(output_sop), showWarnings = FALSE, recursive = TRUE)
 
   log_info("Preparing retention time libraries")
-  log_debug("RT unit: {unit_rt}")
+  log_debug("RT unit: %s", unit_rt)
 
   ## default transforms from `Spectra`
   if (!is.na(col_rt) && col_rt == "RTINSECONDS") {
@@ -199,11 +199,10 @@ prepare_libraries_rt <- function(
 
     if (missing_n > 0L) {
       log_warn(
-        "There are ",
-        missing_n,
-        " entries without InChIKey.",
-        " We would recommend you adding them but will try completing.",
-        " We will query them on the fly, this might take some time."
+        "There are %d entries without InChIKey.
+        We would recommend you adding them but will try completing.
+        We will query them on the fly, this might take some time.",
+        missing_n
       )
     }
 

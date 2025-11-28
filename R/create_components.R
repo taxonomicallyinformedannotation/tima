@@ -53,7 +53,7 @@ create_components <- function(
 
   # Load Edge Data ----
 
-  log_info("Creating components from {length(input)} edge file(s)")
+  log_info("Creating components from %d edge file(s)", length(input))
 
   # Load and combine all edge files
   # log_trace("Loading edge data")
@@ -76,7 +76,9 @@ create_components <- function(
   )))
 
   log_info(
-    "Loaded {n_edges} edges connecting {n_unique_features} unique features"
+    "Loaded %d edges connecting %d unique features",
+    n_edges,
+    n_unique_features
   )
 
   # Early exit for empty edges
@@ -109,7 +111,7 @@ create_components <- function(
   # Organize features by component
   features_by_component <- split(feature_names, component_membership)
 
-  log_info("Found {length(features_by_component)} components")
+  log_info("Found %d components", length(features_by_component))
 
   # Format Component Assignments ----
 
@@ -134,9 +136,10 @@ create_components <- function(
   # Calculate component size statistics
   component_sizes <- table(components_table$componentindex)
   log_info(
-    "Component sizes - Min: {min(component_sizes)}, ",
-    "Max: {max(component_sizes)}, ",
-    "Mean: {round(mean(component_sizes), 1)}"
+    "Component sizes - Min: %d, Max: %d, Mean: %f",
+    min(component_sizes),
+    max(component_sizes),
+    round(mean(component_sizes), 1)
   )
 
   # Export Results ----
@@ -148,7 +151,7 @@ create_components <- function(
 
   export_output(x = components_table, file = output)
 
-  log_info("Components written to: {output}")
+  log_info("Components written to: %s", output)
 
   return(output)
 }

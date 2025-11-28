@@ -134,9 +134,11 @@ read_mgf_opti <- function(
   # Get file size for progress reporting
   file_size_mb <- file.info(f)$size / 1024^2
   log_info(
-    "Reading MGF file ({round(file_size_mb, 2)} MB) with optimized parser: {f}"
+    "Reading MGF file (%f MB) with optimized parser: %s",
+    round(file_size_mb, 2),
+    f
   )
-  log_debug("Using MS level: {msLevel}")
+  log_debug("Using MS level: %d", msLevel)
 
   sp_list <- list()
   current_spectrum <- list()
@@ -176,7 +178,7 @@ read_mgf_opti <- function(
 
       # Progress logging at appropriate intervals
       if (total_processed %% batch_size == 0L) {
-        log_info("Processed {total_processed} spectra...")
+        log_info("Processed %s spectra...", total_processed)
       }
 
       current_spectrum <- list()
@@ -189,7 +191,7 @@ read_mgf_opti <- function(
     }
   }
 
-  log_info("Total spectra read: {total_processed}")
+  log_info("Total spectra read: %s", total_processed)
   # log_trace("Combining spectrum data into DataFrame")
   res <- MsCoreUtils::rbindFill(sp_list)
 

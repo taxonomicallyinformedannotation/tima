@@ -44,7 +44,10 @@ copy_file_to_target <- function(file_path, target_dir, file_description) {
   target_path <- file.path(target_dir, basename(file_path))
 
   log_debug(
-    "Copying {file_description} from {file_path} to {target_path}"
+    "Copying %s from %s to %s",
+    file_description,
+    file_path,
+    target_path
   )
 
   fs::file_copy(
@@ -168,7 +171,7 @@ change_params_small <- function(
 
   # Update File Pattern ----
   if (!is.null(fil_pat)) {
-    log_debug("Setting file pattern to: {fil_pat}")
+    log_debug("Setting file pattern to: %s", fil_pat)
     yaml_small$files$pattern <- fil_pat
   }
 
@@ -210,30 +213,30 @@ change_params_small <- function(
 
   # Update Configuration Parameters ----
   if (!is.null(ms_pol)) {
-    log_debug("Setting MS polarity to: {ms_pol}")
+    log_debug("Setting MS polarity to: %s", ms_pol)
     yaml_small$ms$polarity <- ms_pol
   }
 
   if (!is.null(org_tax)) {
-    log_debug("Setting organism taxonomy to: {org_tax}")
+    log_debug("Setting organism taxonomy to: %s", org_tax)
     yaml_small$organisms$taxon <- org_tax
   } else {
     yaml_small$organisms$taxon <- NA
   }
 
   if (!is.null(hig_con)) {
-    log_debug("Setting high confidence filter: {hig_con}")
+    log_debug("Setting high confidence filter: %s", hig_con)
     yaml_small$options$high_confidence <- hig_con
   }
 
   if (!is.null(summarize)) {
-    log_debug("Setting summarize option: {summarize}")
+    log_debug("Setting summarize option: %s", summarize)
     yaml_small$options$summarize <- summarize
   }
 
   # Write Updated Configuration ----
   output_path <- paths$params$prepare_params
-  log_info("Writing updated parameters to: {output_path}")
+  log_info("Writing updated parameters to: %s", output_path)
 
   yaml::write_yaml(
     x = yaml_small,

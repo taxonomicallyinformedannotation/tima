@@ -61,7 +61,7 @@ validate_install_inputs <- function(package, repos, dependencies, test) {
 #' @return NULL (side effect: logging)
 #' @keywords internal
 show_system_messages <- function(system, test) {
-  log_info("Detected operating system: {system}")
+  log_info("Detected operating system: %s", system)
 
   if (system == "Windows" || isTRUE(test)) {
     log_info("You should install RTools if not already done")
@@ -101,7 +101,7 @@ check_or_install_python <- function(test = FALSE) {
   python <- Sys.which("python3")
 
   if (nzchar(python) && isFALSE(test)) {
-    log_info("System Python found at: {python}")
+    log_info("System Python found at: %s", python)
     return(python)
   }
 
@@ -118,7 +118,7 @@ check_or_install_python <- function(test = FALSE) {
         log_success("Miniconda installed successfully")
       },
       error = function(e) {
-        log_error("Failed to install Miniconda: {e$message}")
+        log_error("Failed to install Miniconda: %s", e$message)
         stop(
           "Failed to install Miniconda: ",
           conditionMessage(e),
@@ -142,7 +142,7 @@ check_or_install_python <- function(test = FALSE) {
     )
   }
 
-  log_info("Using Miniconda Python at: {python_path}")
+  log_info("Using Miniconda Python at: %s", python_path)
   return(python_path)
 }
 
@@ -167,7 +167,7 @@ setup_virtualenv <- function(
   }
 
   if (!reticulate::virtualenv_exists(envname = envname)) {
-    log_info("Creating Python virtualenv: {envname}")
+    log_info("Creating Python virtualenv: %s", envname)
 
     tryCatch(
       expr = {
@@ -178,7 +178,7 @@ setup_virtualenv <- function(
         log_success("Virtualenv created successfully")
       },
       error = function(e) {
-        log_error("Creating Python virtualenv failed: {e$message}")
+        log_error("Creating Python virtualenv failed: %s", e$message)
         log_info(
           "Retrying with clean Python install (version {rescue_python_version})"
         )
@@ -205,10 +205,10 @@ setup_virtualenv <- function(
       }
     )
   } else {
-    log_info("Using existing Python virtualenv: {envname}")
+    log_info("Using existing Python virtualenv: %s", envname)
   }
 
-  log_info("Installing RDKit in virtualenv: {envname}")
+  log_info("Installing RDKit in virtualenv: %s", envname)
 
   tryCatch(
     {
@@ -221,7 +221,7 @@ setup_virtualenv <- function(
       log_success("RDKit installed successfully")
     },
     error = function(e) {
-      log_error("Failed to install RDKit: {e$message}")
+      log_error("Failed to install RDKit: %s", e$message)
       stop(
         "Failed to install RDKit in virtualenv: ",
         conditionMessage(e),
@@ -265,11 +265,11 @@ try_install_package <- function(
         type = if (from_source) "source" else getOption("pkgType")
       )
 
-      log_success("Successfully installed R package: {package}")
+      log_success("Successfully installed R package: %s", package)
       return(TRUE)
     },
     error = function(e) {
-      log_error("Installation failed: {e$message}")
+      log_error("Installation failed: %s", e$message)
       return(FALSE)
     }
   )
@@ -353,7 +353,7 @@ install <- function(
     return(invisible(NULL))
   }
 
-  log_info("Starting installation/update of '{package}'")
+  log_info("Starting installation/update of '%s'", package)
 
   # System Detection and Messages ----
   system <- Sys.info()[["sysname"]]
@@ -364,7 +364,7 @@ install <- function(
   python <- check_or_install_python(test = test)
 
   # R Package Installation (Always Update) ----
-  log_info("Installing/updating R package '{package}' from r-universe")
+  log_info("Installing/updating R package '%s' from r-universe", package)
   log_debug("This ensures you have the latest version with all updates")
 
   success <- try_install_package(
@@ -407,7 +407,7 @@ install <- function(
       log_success("Backbone files copied")
     },
     error = function(e) {
-      log_warn("Failed to copy backbone files: {e$message}")
+      log_warn("Failed to copy backbone files: %s", e$message)
     }
   )
 
@@ -417,11 +417,11 @@ install <- function(
       log_success("Targets pipeline cleaned")
     },
     error = function(e) {
-      log_warn("Failed to clean targets pipeline: {e$message}")
+      log_warn("Failed to clean targets pipeline: %s", e$message)
     }
   )
 
-  log_success("Installation of '{package}' completed successfully!")
+  log_success("Installation of '%s' completed successfully!", package)
 
   invisible(NULL)
 }

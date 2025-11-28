@@ -75,7 +75,8 @@ clean_bio <- function(
   edges_filtered <- .filter_edges_for_consistency(edges_table)
 
   log_debug(
-    "Found {nrow(edges_filtered)} valid edges for consistency calculation"
+    "Found %d valid edges for consistency calculation",
+    nrow(edges_filtered)
   )
 
   # Early exit if no valid edges - add required columns with defaults

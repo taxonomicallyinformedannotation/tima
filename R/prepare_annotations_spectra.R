@@ -118,7 +118,8 @@ prepare_annotations_spectra <- function(
   # Load and Process Spectral Annotations ----
 
   log_info(
-    "Preparing spectral matching annotations from {length(input)} file(s)"
+    "Preparing spectral matching annotations from %d file(s)",
+    length(input)
   )
   # log_trace("Loading and formatting spectral matches")
 

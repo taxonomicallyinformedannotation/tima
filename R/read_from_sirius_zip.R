@@ -62,7 +62,7 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     )
   }
 
-  log_debug("Extracting file: {matching_file}")
+  log_debug("Extracting file: %s", matching_file)
 
   # Read and parse the file from archive
   result <- archive::archive_read(archive = sirius_zip, file = matching_file) |>
@@ -74,7 +74,7 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     ) |>
     tidytable::tidytable()
 
-  # log_trace("Successfully read ", nrow(result), " rows from archive")
+  # log_trace("Successfully read %d rows from archive", nrow(result))
 
   return(result)
 }

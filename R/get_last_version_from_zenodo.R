@@ -79,7 +79,7 @@ fetch_zenodo_record <- function(record, doi) {
   base_url <- "https://zenodo.org/records/"
   url <- paste0(base_url, record, "/latest")
 
-  log_debug("Fetching metadata from: {url}")
+  log_debug("Fetching metadata from: %s", url)
 
   tryCatch(
     {
@@ -123,7 +123,7 @@ fetch_zenodo_record <- function(record, doi) {
 #' @return List with parsed JSON content
 #' @keywords internal
 parse_zenodo_content <- function(api_url) {
-  log_debug("Parsing API response from: {api_url}")
+  log_debug("Parsing API response from: %s", api_url)
 
   tryCatch(
     {
@@ -262,11 +262,11 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
   # Input Validation ----
   validate_zenodo_inputs(doi = doi, pattern = pattern, path = path)
 
-  log_info("Retrieving latest version from Zenodo: {doi}")
+  log_info("Retrieving latest version from Zenodo: %s", doi)
 
   # Extract Record ID ----
   record <- extract_zenodo_record_id(doi)
-  log_debug("Record ID: {record}")
+  log_debug("Record ID: %s", record)
 
   # Fetch Record Metadata ----
   record_response <- fetch_zenodo_record(record = record, doi = doi)
@@ -296,22 +296,24 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
   file_url <- paste0(record_response$url, "/files/", filename)
   zenodo_size <- content$files$size[match_idx]
 
-  log_debug("Found file: {filename} ({zenodo_size} bytes)")
+  log_debug("Found file: %s (%f bytes)", filename, zenodo_size)
 
   # Download if Needed ----
   if (is_download_needed(path = path, zenodo_size = zenodo_size)) {
     # Remove existing file if present (may be corrupted or wrong size)
     if (file.exists(path)) {
-      log_debug("Removing existing file: {path}")
+      log_debug("Removing existing file: %s", path)
       file.remove(path)
     }
 
     log_info(
-      "Downloading {filename} from https://doi.org/{doi}"
+      "Downloading %s from https://doi.org/%s",
+      filename,
+      doi
     )
 
     if (!is.null(content$metadata$title)) {
-      log_debug("Record title: {content$metadata$title}")
+      log_debug("Record title: %s", content$metadata$title)
     }
 
     log_debug(
@@ -322,7 +324,7 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
     create_dir(export = path)
     get_file(url = file_url, export = path)
 
-    log_success("Download completed: {path}")
+    log_success("Download completed: %s", path)
   } else {
     log_info(
       "File already present with correct size. Skipping download."

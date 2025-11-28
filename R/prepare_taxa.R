@@ -93,7 +93,7 @@ prepare_taxa <- function(
 
   # Check if using single taxon or metadata-based assignment
   if (!is.null(taxon) && !is.na(taxon)) {
-    log_info("Assigning all features to single organism: {taxon}")
+    log_info("Assigning all features to single organism: %s", taxon)
   } else {
     if (!is.character(metadata) || length(metadata) != 1L) {
       stop("metadata path must be provided if taxon is not specified")

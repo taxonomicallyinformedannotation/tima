@@ -58,7 +58,7 @@ process_smiles <- function(
     return(df)
   }
 
-  log_debug("Processing {nrow(table_smiles)} unique SMILES")
+  log_debug("Processing %d unique SMILES", nrow(table_smiles))
 
   # Load or Initialize Cache ----
   table_processed_1 <- load_smiles_cache(cache, smiles_colname)
@@ -89,9 +89,8 @@ process_smiles <- function(
   output_csv_file <- tempfile(fileext = ".csv.gz")
 
   log_info(
-    "Processing ",
-    nrow(table_smiles_to_process),
-    " new SMILES with RDKit"
+    "Processing %d new SMILES with RDKit",
+    nrow(table_smiles_to_process)
   )
 
   # Write SMILES to temporary file
@@ -117,9 +116,8 @@ process_smiles <- function(
     )
 
   log_info(
-    "Successfully processed ",
-    nrow(table_processed_2),
-    " SMILES"
+    "Successfully processed %d SMILES",
+    nrow(table_processed_2)
   )
 
   # Combine cached and new results
@@ -152,7 +150,8 @@ load_python_smiles_processor <- function() {
     },
     error = function(e) {
       log_error(
-        "Failed to load Python processor: {conditionMessage(e)}"
+        "Failed to load Python processor: %s",
+        conditionMessage(e)
       )
       stop(
         "Cannot load Python SMILES processor: ",
@@ -181,11 +180,11 @@ load_smiles_cache <- function(cache, smiles_colname) {
   tryCatch(
     {
       cached <- tidytable::fread(cache)
-      log_debug("Loaded {nrow(cached)} cached SMILES")
+      log_debug("Loaded %d cached SMILES", nrow(cached))
       cached
     },
     error = function(e) {
-      log_warn("Cache load failed: {conditionMessage(e)}")
+      log_warn("Cache load failed: %s", conditionMessage(e))
       create_empty_smiles_template(smiles_colname)
     }
   )

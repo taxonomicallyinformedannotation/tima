@@ -79,10 +79,14 @@ calculate_entropy_and_similarity <- function(
   assert_flag(approx, "approx")
 
   log_info(
-    "Calculating entropy and similarity for {length(query_spectra)} spectra"
+    "Calculating entropy and similarity for %d spectra",
+    length(query_spectra)
   )
   log_debug(
-    "Parameters - Method: {method}, Dalton: {dalton}, PPM: {ppm}"
+    "Method: %s, PPM: %f, Dalton: %f",
+    method,
+    ppm,
+    dalton
   )
 
   # Detect if running in a subprocess (callr/targets environment)

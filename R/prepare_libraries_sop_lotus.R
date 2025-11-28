@@ -65,7 +65,8 @@ prepare_libraries_sop_lotus <- function(
     )
   } else {
     log_warn(
-      "LOTUS database not found at: {input}"
+      "LOTUS database not found at: %s",
+      input
     )
     log_warn("Returning empty placeholder file")
     lotus_prepared <- fake_sop_columns()

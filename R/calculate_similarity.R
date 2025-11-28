@@ -101,7 +101,7 @@ calculate_similarity <- function(
         clean_spectra = TRUE
       ),
       error = function(e) {
-        log_warn("Entropy calculation failed: {e$message}")
+        log_warn("Entropy calculation failed: %s", e$message)
         return(
           if (return_matched_peaks) {
             list(score = 0.0, matches = 0L)
@@ -141,7 +141,7 @@ calculate_similarity <- function(
       )
     ),
     error = function(e) {
-      log_warn("Peak matching failed: {e$message}")
+      log_warn("Peak matching failed: %s", e$message)
       list(integer(0L), integer(0L))
     }
   )
@@ -163,7 +163,7 @@ calculate_similarity <- function(
   result <- tryCatch(
     gnps_wrapper(x = x_mat, y = y_mat),
     error = function(e) {
-      log_warn("Similarity calculation failed: {e$message}")
+      log_warn("Similarity calculation failed: %s", e$message)
       list(score = 0.0, matches = 0L)
     }
   )

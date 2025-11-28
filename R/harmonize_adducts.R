@@ -97,7 +97,9 @@ harmonize_adducts <- function(
   # Log reduction in unique forms (indicates successful harmonization)
   if (n_unique_before != n_unique_after) {
     log_error(
-      "Harmonized: {n_unique_before} -> {n_unique_after} unique adduct forms"
+      "Harmonized: %d -> %d unique adduct forms",
+      n_unique_before,
+      n_unique_after
     )
   }
 

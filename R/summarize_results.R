@@ -64,7 +64,7 @@ summarize_results <- function(
   }
 
   log_info("Summarizing annotation results")
-  log_debug("Remove ties: {remove_ties}, Summarize: {summarize}")
+  log_debug("Remove ties: %s, Summarize: %s", remove_ties, summarize)
 
   model <- columns_model()
 

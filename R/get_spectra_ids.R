@@ -40,7 +40,7 @@ get_spectra_ids <- function(spectra) {
     return(spectra@backend@spectraData[[valid_field]])
   } else {
     log_warn(
-      "No valid spectrum ID field found. Checked fields: ",
+      "No valid spectrum ID field found. Checked fields: %s",
       paste(possible_ids, collapse = ", ")
     )
     return(NULL)

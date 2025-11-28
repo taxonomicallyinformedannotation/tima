@@ -152,7 +152,8 @@ get_organism_taxonomy_ott <- function(
 
   n_organisms <- nrow(df)
   log_info(
-    "Processing {n_organisms} organism name(s) for OTT taxonomy lookup"
+    "Processing %d organism name(s) for OTT taxonomy lookup",
+    n_organisms
   )
 
   # Clean and prepare organism names
@@ -185,7 +186,7 @@ get_organism_taxonomy_ott <- function(
   organisms <- organism_table$canonical_name
   n_unique <- length(organisms)
 
-  log_debug("Cleaned to {n_unique} unique organism name(s)")
+  log_debug("Cleaned to %d unique organism name(s)", n_unique)
 
   # Test OTT API availability
   log_debug("Testing Open Tree of Life API availability")
@@ -202,7 +203,7 @@ get_organism_taxonomy_ott <- function(
         httr2::resp_status_desc()
     },
     error = function(e) {
-      log_error("Failed to connect to OTT API: {conditionMessage(e)}")
+      log_error("Failed to connect to OTT API: %s", conditionMessage(e))
       "ERROR"
     }
   )
@@ -224,7 +225,7 @@ get_organism_taxonomy_ott <- function(
   batch_size <- 100L
   organism_batches <- .create_batches(organisms, batch_size)
 
-  log_info("Querying OTT API in {length(organism_batches)} batches")
+  log_info("Querying OTT API in %d batches", length(organism_batches))
 
   # Query OTT API for each batch
   taxonomy_matches <- organism_batches |>
@@ -268,9 +269,10 @@ get_organism_taxonomy_ott <- function(
     genus_names <- unique(failed_organisms$search_string)
 
     log_info(
-      "Retrying with {length(genus_names)} genus names: ",
-      "{paste(head(genus_names, 5), collapse = ', ')}",
-      "{ifelse(length(genus_names) > 5, '...', '')}"
+      "Retrying with %d genus names: %s %s",
+      length(genus_names),
+      paste(head(genus_names, 5), collapse = ", "),
+      ifelse(length(genus_names) > 5, "...", "")
     )
 
     # Query OTT API with genus names only
@@ -297,7 +299,8 @@ get_organism_taxonomy_ott <- function(
     )
 
     log_debug(
-      "Retry complete: {nrow(retry_ott_ids)} additional matches found"
+      "Retry complete: %d additional matches found",
+      nrow(retry_ott_ids)
     )
   }
 
@@ -306,7 +309,8 @@ get_organism_taxonomy_ott <- function(
     ott_ids <- new_ott_id$ott_id
 
     log_info(
-      "Retrieving detailed taxonomy for {length(ott_ids)} unique OTT IDs"
+      "Retrieving detailed taxonomy for %d unique OTT IDs",
+      length(ott_ids)
     )
 
     # Query OTT API for detailed taxonomic information

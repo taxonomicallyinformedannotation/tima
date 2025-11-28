@@ -55,7 +55,7 @@ complement_metadata_structures <- function(
     str_tax_npc = str_tax_npc
   ))
 
-  log_debug("Complementing metadata for {nrow(df)} rows")
+  log_debug("Complementing metadata for %d rows", nrow(df))
 
   # Load stereochemistry data
   stereo <- tidytable::fread(

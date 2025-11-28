@@ -55,7 +55,8 @@ prepare_features_components <- function(
 
   # Load Component Data ----
   log_debug(
-    "Loading molecular network components from {length(input)} file(s)"
+    "Loading molecular network components from %d file(s)",
+    length(input)
   )
 
   # Load and combine component tables

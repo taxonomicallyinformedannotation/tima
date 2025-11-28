@@ -38,7 +38,7 @@ export_spectra_rds <- function(file, spectra) {
     return(invisible(NULL))
   }
 
-  log_debug("Exporting ", length(valid_spectra), " spectra to: ", file)
+  log_debug("Exporting %d spectra to: %s", length(valid_spectra), file)
 
   # Create output directory if needed
   create_dir(export = file)

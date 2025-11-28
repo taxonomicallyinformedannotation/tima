@@ -74,7 +74,9 @@ create_fake_gnps_files <- function(
       export_output(x = data, file = file),
       error = function(e) {
         log_warn(
-          "Writing {file} failed, using fallback: {conditionMessage(e)}"
+          "Writing %s failed, using fallback: %s",
+          file,
+          conditionMessage(e)
         )
         utils::write.table(
           x = data,
@@ -143,11 +145,13 @@ download_gnps_file <- function(url, file_path, file_type) {
     tryCatch(
       {
         get_file(url = url, export = file_path)
-        log_debug("Downloaded {file_type}: {file_path}")
+        log_debug("Downloaded %s: %s", file_type, file_path)
       },
       error = function(e) {
         log_warn(
-          "Failed to download {file_type}: {conditionMessage(e)}"
+          "Failed to download %s: %s",
+          file_type,
+          conditionMessage(e)
         )
       }
     )
@@ -239,7 +243,7 @@ get_gnps_tables <- function(
     )
   }
 
-  log_info("Downloading GNPS tables for job: {gnps_job_id}")
+  log_info("Downloading GNPS tables for job: %s", gnps_job_id)
 
   # Construct URLs
   gnps_base_url <- "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task="

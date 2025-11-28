@@ -51,7 +51,7 @@ run_app <- function(host = "127.0.0.1", port = 3838, browser = TRUE) {
     log_info("Running in standard environment")
   }
 
-  log_info("Starting TIMA Shiny app on {host}:{port}")
+  log_info("Starting TIMA Shiny app on %s:%d", host, port)
 
   # Ensure Dependencies ----
   install()

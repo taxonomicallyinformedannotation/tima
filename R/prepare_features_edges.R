@@ -78,8 +78,8 @@ prepare_features_edges <- function(
   # Load Edge Tables ----
 
   log_info("Preparing molecular network edges")
-  log_debug("MS1 edges: {input[['ms1']]}")
-  log_debug("Spectral edges: {input[['spectral']]}")
+  log_debug("MS1 edges: %s", input[['ms1']])
+  log_debug("Spectral edges: %s", input[['spectral']])
 
   # Load edges tables
   # log_trace("Loading edge tables")
@@ -101,8 +101,8 @@ prepare_features_edges <- function(
   edges_ms2 <- edges_tables[["spectral"]]
   rm(edges_tables)
 
-  log_debug("MS1 edges: {nrow(edges_ms1)} rows")
-  log_debug("Spectral edges: {nrow(edges_ms2)} rows")
+  log_debug("MS1 edges: %d rows", nrow(edges_ms1))
+  log_debug("Spectral edges: %d rows", nrow(edges_ms2))
 
   # Extract Entropy Information ----
 
@@ -116,7 +116,7 @@ prepare_features_edges <- function(
     tidytable::distinct()
 
   # log_trace(
-  # "Extracted entropy for {nrow(features_entropy)} features"
+  # "Extracted entropy for %d features", nrow(features_entropy)
   # )
 
   # Combine and Format Edges ----
@@ -134,7 +134,7 @@ prepare_features_edges <- function(
       feature_target := tidytable::coalesce(feature_target, feature_source)
     )
 
-  log_info("Prepared {nrow(edges_table_treated)} total edges")
+  log_info("Prepared %d total edges", nrow(edges_table_treated))
 
   # Explicit memory cleanup
   rm(edges_ms1, edges_ms2, features_entropy)

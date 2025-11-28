@@ -261,101 +261,77 @@ init_logging <- function() {
   setup_logger(filename = log_file, threshold = threshold)
 }
 
+#' @title Logging wrapper functions for lgr compatibility
+#'
+#' @description Simple logging wrappers that use sprintf-style formatting
+#'
+#' @param msg Message template (use sprintf format: "Value: %s")
+#' @param ... Values to substitute into msg via sprintf
+#'
+#' @return NULL (invisibly)
 #' @keywords internal
-log_trace <- function(...) {
-  msg <- eval_glue_safely(...)
+#' @name logging_wrappers
+NULL
+
+#' @rdname logging_wrappers
+log_trace <- function(msg, ...) {
+  if (...length() > 0) {
+    msg <- sprintf(msg, ...)
+  }
   lgr::lgr$trace(msg)
   invisible(NULL)
 }
 
-#' @keywords internal
-log_debug <- function(...) {
-  msg <- eval_glue_safely(...)
+#' @rdname logging_wrappers
+log_debug <- function(msg, ...) {
+  if (...length() > 0) {
+    msg <- sprintf(msg, ...)
+  }
   lgr::lgr$debug(msg)
   invisible(NULL)
 }
 
-#' @keywords internal
-log_info <- function(...) {
-  msg <- eval_glue_safely(...)
+#' @rdname logging_wrappers
+log_info <- function(msg, ...) {
+  if (...length() > 0) {
+    msg <- sprintf(msg, ...)
+  }
   lgr::lgr$info(msg)
   invisible(NULL)
 }
 
-#' @keywords internal
-log_warn <- function(...) {
-  msg <- eval_glue_safely(...)
+#' @rdname logging_wrappers
+log_warn <- function(msg, ...) {
+  if (...length() > 0) {
+    msg <- sprintf(msg, ...)
+  }
   lgr::lgr$warn(msg)
   invisible(NULL)
 }
 
-#' @keywords internal
-log_error <- function(...) {
-  msg <- eval_glue_safely(...)
+#' @rdname logging_wrappers
+log_error <- function(msg, ...) {
+  if (...length() > 0) {
+    msg <- sprintf(msg, ...)
+  }
   lgr::lgr$error(msg)
   invisible(NULL)
 }
 
-#' @keywords internal
-log_fatal <- function(...) {
-  msg <- eval_glue_safely(...)
+#' @rdname logging_wrappers
+log_fatal <- function(msg, ...) {
+  if (...length() > 0) {
+    msg <- sprintf(msg, ...)
+  }
   lgr::lgr$fatal(msg)
   invisible(NULL)
 }
 
-#' @keywords internal
-log_success <- function(...) {
-  msg <- eval_glue_safely(...)
+#' @rdname logging_wrappers
+log_success <- function(msg, ...) {
+  if (...length() > 0) {
+    msg <- sprintf(msg, ...)
+  }
   lgr::lgr$info(msg)
   invisible(NULL)
-}
-
-#' Evaluate glue-style formatting safely
-#'
-#' @param ... Message parts to combine
-#'
-#' @return Character string with glue-style interpolation applied
-#' @keywords internal
-eval_glue_safely <- function(...) {
-  # Collect all arguments
-  args <- list(...)
-
-  # If single character argument, process it for glue-style formatting
-  if (length(args) == 1 && is.character(args[[1]])) {
-    msg <- args[[1]]
-
-    # Check if message contains glue-style {variable} patterns
-    if (grepl("\\{.+?\\}", msg)) {
-      # Get parent environment for variable lookup
-      parent_env <- parent.frame(n = 2)
-
-      # Simple regex-based replacement for {var} patterns
-      # Extract all {var} patterns
-      matches <- gregexpr("\\{([^}]+)\\}", msg)
-      if (matches[[1]][1] != -1) {
-        # Process each match
-        match_data <- regmatches(msg, matches)[[1]]
-        for (match in match_data) {
-          # Extract variable name (remove { and })
-          var_expr <- gsub("^\\{|\\}$", "", match)
-
-          # Try to evaluate the expression in parent environment
-          tryCatch(
-            {
-              value <- eval(parse(text = var_expr), envir = parent_env)
-              # Replace {var} with value
-              msg <- sub(match, as.character(value), msg, fixed = TRUE)
-            },
-            error = function(e) {
-              # If evaluation fails, leave the pattern as-is
-            }
-          )
-        }
-      }
-    }
-    return(msg)
-  }
-
-  # Otherwise, just paste all arguments together
-  paste(..., sep = "", collapse = "")
 }

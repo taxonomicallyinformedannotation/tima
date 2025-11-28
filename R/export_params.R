@@ -43,16 +43,15 @@ export_params <- function(
   filepath <- file.path(directory, filename)
 
   # Log the export location
-  log_info("Exporting parameters to: {filepath}")
+  log_info("Exporting parameters to: %s", filepath)
 
   # Write parameters to YAML file
   tryCatch(
     {
       yaml::write_yaml(x = parameters, file = filepath)
       log_debug(
-        "Successfully exported ",
-        length(parameters),
-        " parameters"
+        "Successfully exported %d parameters",
+        length(parameters)
       )
     },
     error = function(e) {
