@@ -212,12 +212,12 @@ decorate_chemo <- function(
 
   log_info(
     "Chemically informed metabolite annotation reranked:
-    Classyfire:
+  Classyfire:
     Kingdom level:    %d structures
     Superclass level: %d structures
     Class level:      %d structures
     Parent level:     %d structures
-    NPClassifier:
+  NPClassifier:
     Pathway level:    %d structures
     Superclass level: %d structures
     Class level:      %d structures",
