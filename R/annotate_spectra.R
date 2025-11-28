@@ -126,7 +126,7 @@ annotate_spectra <- function(
 
   log_info("Starting spectral annotation in %s mode", polarity)
   log_debug(
-    "Method: %s, Threshold: %f, PPM: %f, Dalton: %f",
+    "Method: %s, Threshold: %f2, PPM: %f2, Dalton: %f2",
     method,
     threshold,
     ppm,
@@ -244,7 +244,7 @@ annotate_spectra <- function(
   }
 
   log_info(
-    "%d Candidates annotated on %d features (threshold >= %f).",
+    "%d Candidates annotated on %d features (threshold >= %f2).",
     nrow(
       df_final |>
         tidytable::distinct(

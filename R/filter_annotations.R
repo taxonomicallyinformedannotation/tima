@@ -257,7 +257,7 @@ filter_annotations <- function(
   # Load and Process Data ----
 
   log_info("Filtering annotations")
-  log_debug("RT tolerance: %f minutes", tolerance_rt)
+  log_debug("RT tolerance: %f2 minutes", tolerance_rt)
 
   features_table <- tidytable::fread(
     file = features,

@@ -1003,7 +1003,7 @@ weight_annotations <- function(
   rm(annot_table_wei_chemo)
 
   elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-  log_info("Annotation weighting complete in %fs", round(elapsed, 1))
+  log_info("Annotation weighting complete in %f2 s", round(elapsed, 1))
 
   # Export Results ----
   log_debug("Exporting results to disk")

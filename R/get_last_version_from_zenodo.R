@@ -296,7 +296,7 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
   file_url <- paste0(record_response$url, "/files/", filename)
   zenodo_size <- content$files$size[match_idx]
 
-  log_debug("Found file: %s (%f bytes)", filename, zenodo_size)
+  log_debug("Found file: %s (%f2 bytes)", filename, zenodo_size)
 
   # Download if Needed ----
   if (is_download_needed(path = path, zenodo_size = zenodo_size)) {

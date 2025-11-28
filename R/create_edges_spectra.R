@@ -121,8 +121,8 @@ create_edges_spectra <- function(
   # Import and Process Spectra ----
 
   log_info("Creating spectral similarity network edges")
-  log_debug("Parameters - Threshold: %f, Method: %s", threshold, method)
-  log_debug("Tolerances - PPM: %f, Dalton: %f", ppm, dalton)
+  log_debug("Parameters - Threshold: %f2, Method: %s", threshold, method)
+  log_debug("Tolerances - PPM: %f2, Dalton: %f2", ppm, dalton)
 
   # Import spectra with specified parameters
   spectra <- input |>
