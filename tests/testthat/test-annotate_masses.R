@@ -50,12 +50,15 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
   )
 
   # Too large tolerance should error
-  expect_error(
-    annotate_masses(
-      tolerance_ppm = 25,
-      ms_mode = "pos"
+  expect_warning(
+    expect_error(
+      annotate_masses(
+        tolerance_ppm = 25,
+        ms_mode = "pos"
+      ),
+      "Please verify file paths and ensure all required files are present."
     ),
-    "Please verify file paths and ensure all required files are present."
+    "This may result in excessive false positives."
   )
 
   # Non-numeric tolerance should error
@@ -90,13 +93,16 @@ test_that("annotate_masses validates tolerance_rt correctly", {
   )
 
   # Too large tolerance should error
-  expect_error(
-    annotate_masses(
-      tolerance_rt = 0.1,
-      tolerance_ppm = 10,
-      ms_mode = "pos"
+  expect_warning(
+    expect_error(
+      annotate_masses(
+        tolerance_rt = 0.1,
+        tolerance_ppm = 10,
+        ms_mode = "pos"
+      ),
+      "Please verify file paths and ensure all required files are present."
     ),
-    "Please verify file paths and ensure all required files are present."
+    "This may group unrelated features."
   )
 })
 
@@ -382,27 +388,32 @@ test_that("annotate_masses handles no valid monocharged adducts", {
   output_edges <- "data/interim/edges.tsv"
 
   # Test the function
+  # COMMENT: Crazy triple warning!
   expect_warning(
-    expect_error(
-      annotate_masses(
-        features = features_file,
-        library = library_file,
-        str_stereo = str_stereo,
-        str_met = str_met,
-        str_nam = str_nam,
-        str_tax_cla = str_tax_cla,
-        str_tax_npc = str_tax_npc,
-        adducts_list = list(pos = c("[M+2H]2+")), # Only multicharged
-        clusters_list = list(pos = character(0)), # No clusters
-        neutral_losses_list = c("H2O"),
-        ms_mode = "pos",
-        tolerance_ppm = 10,
-        tolerance_rt = 0.02,
-        output_annotations = output_annotations,
-        output_edges = output_edges
+    expect_warning(
+      expect_error(
+        annotate_masses(
+          features = features_file,
+          library = library_file,
+          str_stereo = str_stereo,
+          str_met = str_met,
+          str_nam = str_nam,
+          str_tax_cla = str_tax_cla,
+          str_tax_npc = str_tax_npc,
+          adducts_list = list(pos = c("[M+2H]2+")), # Only multicharged
+          clusters_list = list(pos = character(0)), # No clusters
+          neutral_losses_list = c("H2O"),
+          ms_mode = "pos",
+          tolerance_ppm = 10,
+          tolerance_rt = 0.02,
+          output_annotations = output_annotations,
+          output_edges = output_edges
+        ),
+        "Please check your adducts and clusters"
       ),
-      "Please check your adducts and clusters"
-    )
+      "cannot calculate neutral mass"
+    ),
+    "No clusters_list will be applied."
   )
 })
 
