@@ -129,8 +129,8 @@ tima::run_app()
 
 If you do not even need a GUI ☠️:
 
-```{r tima_full, eval=FALSE, include=TRUE}
-tima::tima_full()
+```{r run_tima, eval=FALSE, include=TRUE}
+tima::run_tima()
 ```
 
 In case you just want to change some small parameters between jobs, a convenience function is available:

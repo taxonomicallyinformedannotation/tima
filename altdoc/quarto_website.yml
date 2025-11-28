@@ -145,12 +145,12 @@ website:
             contents:
               - text: run_app
                 file: man/run_app.qmd
+              - text: run_tima
+                file: man/run_tima.qmd
           - section: Weight
             contents:
               - text: weight_annotations
                 file: man/weight_annotations.qmd
-          - text: tima_full
-            file: man/tima_full.qmd
 
 format:
   html:

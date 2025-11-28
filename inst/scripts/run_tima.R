@@ -1,3 +1,3 @@
 library("tima")
 
-tima_full()
+run_tima()

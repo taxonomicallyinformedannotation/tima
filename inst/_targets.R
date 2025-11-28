@@ -1634,9 +1634,9 @@ list(
     format = "file"
   ),
   tar_target(
-    name = ann_pre,
+    name = ann_wei,
     command = {
-      ann_pre <- weight_annotations(
+      ann_wei <- weight_annotations(
         library = lib_mer_key,
         org_tax_ott = lib_mer_org_tax_ott,
         str_stereo = lib_mer_str_stereo,
