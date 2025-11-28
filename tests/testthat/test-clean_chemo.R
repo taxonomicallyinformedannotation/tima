@@ -751,32 +751,34 @@ test_that("remove_compound_names keeps names when compounds_names=TRUE", {
 test_that("clean_chemo normal", {
   fixture <- make_clean_chemo_fixture()
 
-  expect_warning(
-    clean_chemo(
-      annot_table_wei_chemo = fixture$annot_table_wei_chemo,
-      components_table = fixture$components_table,
-      features_table = fixture$features_table,
-      structure_organism_pairs_table = fixture$structure_organism_pairs_table,
-      candidates_final = 5,
-      best_percentile = 0.9,
-      minimal_ms1_bio = 0.1,
-      minimal_ms1_chemo = 0.1,
-      minimal_ms1_condition = "OR",
-      compounds_names = TRUE,
-      high_confidence = FALSE,
-      remove_ties = FALSE,
-      summarize = FALSE,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.2,
-      score_chemical_cla_class = 0.3,
-      score_chemical_cla_parent = 0.4,
-      score_chemical_npc_pathway = 0.3,
-      score_chemical_npc_superclass = 0.2,
-      score_chemical_npc_class = 0.1,
-      max_per_score = 7L
-    ),
-    "NAs introduced by coercion"
+  result <- clean_chemo(
+    annot_table_wei_chemo = fixture$annot_table_wei_chemo,
+    components_table = fixture$components_table,
+    features_table = fixture$features_table,
+    structure_organism_pairs_table = fixture$structure_organism_pairs_table,
+    candidates_final = 5,
+    best_percentile = 0.9,
+    minimal_ms1_bio = 0.1,
+    minimal_ms1_chemo = 0.1,
+    minimal_ms1_condition = "OR",
+    compounds_names = TRUE,
+    high_confidence = FALSE,
+    remove_ties = FALSE,
+    summarize = FALSE,
+    score_chemical_cla_kingdom = 0.1,
+    score_chemical_cla_superclass = 0.2,
+    score_chemical_cla_class = 0.3,
+    score_chemical_cla_parent = 0.4,
+    score_chemical_npc_pathway = 0.3,
+    score_chemical_npc_superclass = 0.2,
+    score_chemical_npc_class = 0.1,
+    max_per_score = 7L
   )
+
+  # Verify result structure
+  expect_true(is.data.frame(result$full))
+  expect_true(is.data.frame(result$filtered))
+  expect_true(is.data.frame(result$mini))
 })
 
 test_that("clean_chemo validates inputs through main function", {
