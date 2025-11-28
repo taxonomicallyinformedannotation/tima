@@ -216,21 +216,15 @@ test_that("harmonize_names_sirius is reasonably fast", {
 })
 
 test_that("harmonize_names_sirius scales linearly", {
-  skip_if_not_installed("bench")
   skip_on_cran()
 
   # Test with different input sizes
-  small <- replicate(10, paste0(sample(1:10, 1), "_name"))
-  large <- replicate(100, paste0(sample(1:10, 1), "_name"))
+  small <- replicate(1E4, paste0(sample(1:10, 1), "_name"))
+  large <- replicate(1E5, paste0(sample(1:10, 1), "_name"))
 
-  time_small <- system.time(replicate(
-    n = 50L,
-    expr = sapply(small, harmonize_names_sirius, USE.NAMES = FALSE)
-  ))
-  time_large <- system.time(replicate(
-    n = 50L,
-    expr = sapply(large, harmonize_names_sirius, USE.NAMES = FALSE)
-  ))
+  # Benchmark a single call for each size
+  time_small <- system.time(harmonize_names_sirius(small))
+  time_large <- system.time(harmonize_names_sirius(large))
 
   # Should scale roughly linearly (within 20x for 10x data)
   ratio <- time_large["elapsed"] / time_small["elapsed"]
