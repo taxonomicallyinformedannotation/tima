@@ -65,7 +65,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../man/weight_annotations.html" rel="prev">
 <link href="../man/figures/logo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -363,7 +362,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Functions</li><li class="breadcrumb-item"><a href="../man/tima_full.html">tima_full</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -762,6 +761,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">run_app</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../man/run_tima.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">run_tima</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -781,12 +786,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
       </ul>
   </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/tima_full.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">tima_full</span></a>
-  </div>
-</li>
       </ul>
   </li>
     </ul>
@@ -799,35 +798,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#run-complete-tima-workflow" id="toc-run-complete-tima-workflow" class="nav-link active" data-scroll-target="#run-complete-tima-workflow">Run Complete TIMA Workflow</a>
+  <li><a href="#run-complete-tima-workflow-deprecated" id="toc-run-complete-tima-workflow-deprecated" class="nav-link active" data-scroll-target="#run-complete-tima-workflow-deprecated">Run Complete TIMA Workflow (DEPRECATED)</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
   <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Functions</li><li class="breadcrumb-item"><a href="../man/tima_full.html">tima_full</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 <script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 
 
 
 
-<section id="run-complete-tima-workflow" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="run-complete-tima-workflow">Run Complete TIMA Workflow</h2>
+<section id="run-complete-tima-workflow-deprecated" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="run-complete-tima-workflow-deprecated">Run Complete TIMA Workflow (DEPRECATED)</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>Executes the full Taxonomically Informed Metabolite Annotation (TIMA) workflow from start to finish. This includes data preparation, library loading, annotation, weighting, and output generation. The function runs the targets pipeline and archives logs with timestamps for reproducibility.</p>
+<p><strong>DEPRECATED:</strong> This function has been renamed to <code>run_tima</code>. Please use <code>run_tima()</code> instead. <code>tima_full()</code> will be removed in a future version.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <pre><code class="language-R">tima_full(
-  target_pattern = "^ann_pre\$",
+  target_pattern = "^ann_wei\$",
   log_file = "tima.log",
   clean_old_logs = TRUE,
   log_level = "info"
@@ -842,7 +842,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="target_pattern">target_pattern</code>
 </td>
 <td>
-Character. Regex pattern for target selection. Default: "^ann_pre$" (annotation preparation target)
+Character. Regex pattern for target selection. Default: "^ann_wei$"
 </td>
 </tr>
 <tr>
@@ -866,59 +866,43 @@ Logical. Remove old log file before starting. Default: TRUE
 <code id="log_level">log_level</code>
 </td>
 <td>
-Character or numeric. Logging verbosity level. Can be one of: "trace", "debug", "info", "warn", "error", "fatal" or numeric values: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200, FATAL=100. Default: "info" (400). Use "debug" for detailed troubleshooting.
+Character or numeric. Logging verbosity level. Default: "info"
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>The workflow performs the following steps:</p>
+<p>This function is deprecated as of TIMA version 2.11.0 (November 2025). It now simply calls <code>run_tima</code> with all arguments passed through, but issues a deprecation warning.</p>
+<p><strong>Migration Guide:</strong></p>
 <ul>
 <li>
-<p>Initializes logging and timing</p>
+<p>Old: <code>tima_full(target_pattern = “^ann_wei$”)</code></p>
 </li>
 <li>
-<p>Navigates to cache directory</p>
-</li>
-<li>
-<p>Executes the targets pipeline (annotation preparation)</p>
-</li>
-<li>
-<p>Archives timestamped logs to data/processed/</p>
+<p>New: <code>run_tima(target_pattern = “^ann_wei$”)</code></p>
 </li>
 </ul>
+<p>All parameters and behavior are identical between the two functions.</p>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Invisible NULL. Executes workflow as side effect and creates timestamped log files in data/processed/</p>
+<p>Invisible NULL (same as <code>run_tima</code>)</p>
+</section>
+<section id="see-also" class="level3">
+<h3 class="anchored" data-anchor-id="see-also">See Also</h3>
+<p><code>run_tima</code> for the current function</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Run full workflow with defaults (INFO level)</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tima_full</span>()</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">DEPRECATED</span><span class="co"> - Use run_tima() instead</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># tima_full()</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Run with debug logging for troubleshooting</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tima_full</span>(<span class="at">log_level =</span> <span class="st">"debug"</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Run with minimal logging (warnings and errors only)</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tima_full</span>(<span class="at">log_level =</span> <span class="st">"warn"</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Run with custom target pattern</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">tima_full</span>(<span class="at">target_pattern =</span> <span class="st">"^prepare_"</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Preserve existing logs</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">tima_full</span>(<span class="at">clean_old_logs =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine multiple options</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">tima_full</span>(</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">target_pattern =</span> <span class="st">"^ann_"</span>,</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">log_level =</span> <span class="st">"debug"</span>,</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">clean_old_logs =</span> <span class="cn">FALSE</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># RECOMMENDED</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
@@ -1339,15 +1323,6 @@ Character or numeric. Logging verbosity level. Can be one of: "trace", "debug", 
     }
   });
   </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../man/weight_annotations.html" class="pagination-link" aria-label="weight_annotations">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">weight_annotations</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-  </div>
-</nav>
 </div> <!-- /content -->
 
 
