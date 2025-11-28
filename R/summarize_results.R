@@ -293,7 +293,10 @@ summarize_results <- function(
       ) |>
       tidytable::distinct()
   ) |>
-    tidytable::arrange(as.numeric(feature_id)) |>
+    tidytable::arrange(
+      # Try to sort numerically if possible, otherwise alphabetically
+      suppressWarnings(as.numeric(feature_id))
+    ) |>
     tidytable::select(tidyselect::where(fn = ~ any(!is.na(.))))
 
   rm(df_processed)

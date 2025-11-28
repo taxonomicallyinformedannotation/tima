@@ -79,7 +79,8 @@ test_that("prepare_libraries_sop_closed handles empty input file", {
 })
 
 test_that("prepare_libraries_sop_closed processes fixture closed data", {
-  temp_input <- file.path(tempfile(), "closed_test.csv")
+  temp_dir <- tempdir()
+  temp_input <- file.path(temp_dir, "closed_test.csv")
   file.copy(
     testthat::test_path("fixtures", "closed.csv"),
     temp_input,
@@ -102,7 +103,8 @@ test_that("prepare_libraries_sop_closed processes fixture closed data", {
 })
 
 test_that("prepare_libraries_sop_closed extracts 2D InChIKey from fixture", {
-  temp_input <- file.path(tempfile(), "closed_inchikey.csv")
+  temp_dir <- tempdir()
+  temp_input <- file.path(temp_dir, "closed_inchikey.csv")
   file.copy(
     testthat::test_path("fixtures", "closed.csv"),
     temp_input,
@@ -122,7 +124,8 @@ test_that("prepare_libraries_sop_closed extracts 2D InChIKey from fixture", {
 })
 
 test_that("prepare_libraries_sop_closed renames structure_nameTraditional", {
-  temp_input <- file.path(tempfile(), "closed_rename.csv")
+  temp_dir <- tempdir()
+  temp_input <- file.path(temp_dir, "closed_rename.csv")
   file.copy(
     testthat::test_path("fixtures", "closed.csv"),
     temp_input,
