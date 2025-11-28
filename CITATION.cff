@@ -377,6 +377,20 @@ references:
   doi: 10.32614/CRAN.package.jsonlite
   version: '>= 2.0.0'
 - type: software
+  title: lgr
+  abstract: 'lgr: A Fully Featured Logging Framework'
+  notes: Imports
+  url: https://s-fleck.github.io/lgr/
+  repository: https://CRAN.R-project.org/package=lgr
+  authors:
+  - family-names: Fleck
+    given-names: Stefan
+    email: stefan.b.fleck@gmail.com
+    orcid: https://orcid.org/0000-0003-3344-9851
+  year: '2025'
+  doi: 10.32614/CRAN.package.lgr
+  version: '>= 0.5.0'
+- type: software
   title: methods
   abstract: 'R: A Language and Environment for Statistical Computing'
   notes: Imports
