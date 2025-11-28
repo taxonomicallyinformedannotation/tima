@@ -41,6 +41,7 @@ if (dir.exists("../../inst")) {
 tima:::copy_backbone()
 logger <- lgr::lgr
 logger$set_threshold(level = 400)
+tima::get_example_files()
 ```
 
 This vignette describes how **T**axonomically **I**nformed **M**etabolite **A**nnotation is performed.

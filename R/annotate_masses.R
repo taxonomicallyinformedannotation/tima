@@ -359,7 +359,7 @@ annotate_masses <-
       log_info(
         "\n%s",
         paste(
-          capture.output(print.data.frame(bins, row.names = FALSE)),
+          utils::capture.output(print.data.frame(x = bins, row.names = FALSE)),
           collapse = "\n"
         )
       )
