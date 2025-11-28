@@ -37,10 +37,7 @@ library("tima")
 if (dir.exists("../../inst")) {
   knitr::opts_knit$set(root.dir = "../../inst")
 }
-logger::log_threshold(
-  level = logger::INFO,
-  namespace = logger::log_namespaces()
-)
+lgr::lgr(400)  # INFO level
 ```
 
 This vignette describes the main steps of the annotation process.

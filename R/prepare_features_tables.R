@@ -56,11 +56,11 @@ prepare_features_tables <- function(
   )
 
   # Load Features Table ----
-  logger::log_info("Preparing features table from: {features}")
-  logger::log_debug("Retaining top {candidates} intensity samples per feature")
+  log_info("Preparing features table from: {features}")
+  log_debug("Retaining top {candidates} intensity samples per feature")
 
   features_raw <- .load_features_file(features)
-  logger::log_debug("Loaded {nrow(features_raw)} features")
+  log_debug("Loaded {nrow(features_raw)} features")
 
   # Format and Filter ----
   features_selected <- .select_intensity_columns(
@@ -90,7 +90,7 @@ prepare_features_tables <- function(
     name_adduct = name_adduct
   )
 
-  logger::log_info("Prepared {nrow(features_prepared)} feature-sample pairs")
+  log_info("Prepared {nrow(features_prepared)} feature-sample pairs")
 
   # Export Results ----
   export_params(

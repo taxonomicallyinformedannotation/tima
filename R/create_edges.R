@@ -51,7 +51,7 @@ create_edges <- function(
 
   # Early exit for insufficient spectra
   if (nspecs < 2L) {
-    logger::log_warn("Less than 2 spectra provided, no edges to create")
+    log_warn("Less than 2 spectra provided, no edges to create")
     return(tidytable::tidytable(
       feature_id = NA_integer_,
       target_id = NA_integer_,
@@ -80,7 +80,7 @@ create_edges <- function(
   indices <- seq_len(nspecs - 1L)
   n_comparisons <- sum(indices)
 
-  logger::log_debug("Calculating {n_comparisons} pairwise similarities")
+  log_debug("Calculating {n_comparisons} pairwise similarities")
 
   # Disable progress bar in subprocess environments to prevent crashes
   show_progress <- interactive() && !isTRUE(getOption("knitr.in.progress"))
@@ -167,10 +167,10 @@ create_edges <- function(
 
   if (length(edges) > 0L) {
     result <- tidytable::bind_rows(edges)
-    logger::log_info("Created {nrow(result)} edges passing thresholds")
+    log_info("Created {nrow(result)} edges passing thresholds")
     result
   } else {
-    logger::log_warn("No edges passed the specified thresholds")
+    log_warn("No edges passed the specified thresholds")
     tidytable::tidytable(
       feature_id = NA_integer_,
       target_id = NA_integer_,

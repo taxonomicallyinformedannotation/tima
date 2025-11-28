@@ -10,7 +10,7 @@
 #' @keywords internal
 archive_log_file <- function(log_file, timestamp) {
   if (!file.exists(log_file)) {
-    logger::log_debug("No log file to archive: {log_file}")
+    log_debug("No log file to archive: {log_file}")
     return(FALSE)
   }
 
@@ -29,21 +29,21 @@ archive_log_file <- function(log_file, timestamp) {
     )
   )
 
-  logger::log_debug("Archiving log to: {output_log}")
+  log_debug("Archiving log to: {output_log}")
 
   success <- tryCatch(
     {
       file.copy(from = log_file, to = output_log, overwrite = TRUE)
     },
     error = function(e) {
-      logger::log_warn("Failed to archive log: {conditionMessage(e)}")
+      log_warn("Failed to archive log: {conditionMessage(e)}")
       return(FALSE)
     }
   )
 
   if (isTRUE(success)) {
     file.remove(log_file)
-    logger::log_info("Log archived: {output_log}")
+    log_info("Log archived: {output_log}")
   }
 
   return(success)
@@ -59,15 +59,15 @@ archive_log_file <- function(log_file, timestamp) {
 #' @return Invisible NULL
 #' @keywords internal
 execute_targets_pipeline <- function(target_pattern = "^ann_pre$") {
-  logger::log_info("Executing targets pipeline (pattern: {target_pattern})...")
+  log_info("Executing targets pipeline (pattern: {target_pattern})...")
 
   tryCatch(
     {
       targets::tar_make(names = tidyselect::matches(match = target_pattern))
-      logger::log_success("Targets pipeline completed successfully")
+      log_success("Targets pipeline completed successfully")
     },
     error = function(e) {
-      logger::log_error("Pipeline execution failed: {conditionMessage(e)}")
+      log_error("Pipeline execution failed: {conditionMessage(e)}")
       stop(
         "TIMA workflow pipeline failed. ",
         "Check logs for details: ",
@@ -76,7 +76,7 @@ execute_targets_pipeline <- function(target_pattern = "^ann_pre$") {
       )
     },
     warning = function(w) {
-      logger::log_warn("Pipeline warning: {conditionMessage(w)}")
+      log_warn("Pipeline warning: {conditionMessage(w)}")
       invokeRestart("muffleWarning")
     }
   )
@@ -147,23 +147,23 @@ tima_full <- function(
 
   # Clean up previous log file if requested
   if (isTRUE(clean_old_logs) && file.exists(log_file)) {
-    logger::log_debug("Removing old log file: {log_file}")
+    log_debug("Removing old log file: {log_file}")
     file.remove(log_file)
   }
 
-  logger::log_info("=" |> rep(60) |> paste(collapse = ""))
-  logger::log_info("Starting Complete TIMA Annotation Workflow")
-  logger::log_info("=" |> rep(60) |> paste(collapse = ""))
-  logger::log_info("Start time: {format(start_time, '%Y-%m-%d %H:%M:%S')}")
-  logger::log_info("Authors: Adriano Rutz (AR)")
-  logger::log_info("Contributors: Pierre-Marie Allard (PMA)")
-  logger::log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_info("Starting Complete TIMA Annotation Workflow")
+  log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_info("Start time: {format(start_time, '%Y-%m-%d %H:%M:%S')}")
+  log_info("Authors: Adriano Rutz (AR)")
+  log_info("Contributors: Pierre-Marie Allard (PMA)")
+  log_info("=" |> rep(60) |> paste(collapse = ""))
 
   # Setup Environment ----
   tryCatch(
     {
       go_to_cache()
-      logger::log_debug("Working directory: {getwd()}")
+      log_debug("Working directory: {getwd()}")
     },
     error = function(e) {
       stop(
@@ -185,12 +185,12 @@ tima_full <- function(
     units = "auto"
   )
 
-  logger::log_info("=" |> rep(60) |> paste(collapse = ""))
-  logger::log_success(
+  log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_success(
     "Complete TIMA workflow finished successfully in {elapsed_formatted}"
   )
-  logger::log_info("End time: {format(end_time, '%Y-%m-%d %H:%M:%S')}")
-  logger::log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_info("End time: {format(end_time, '%Y-%m-%d %H:%M:%S')}")
+  log_info("=" |> rep(60) |> paste(collapse = ""))
 
   # Archive Logs ----
   archive_log_file(log_file = log_file, timestamp = end_time)

@@ -377,24 +377,6 @@ references:
   doi: 10.32614/CRAN.package.jsonlite
   version: '>= 2.0.0'
 - type: software
-  title: logger
-  abstract: 'logger: A Lightweight, Modern and Flexible Logging Utility'
-  notes: Imports
-  url: https://daroczig.github.io/logger/
-  repository: https://CRAN.R-project.org/package=logger
-  authors:
-  - family-names: Daróczi
-    given-names: Gergely
-    email: daroczig@rapporter.net
-    orcid: https://orcid.org/0000-0003-3149-8537
-  - family-names: Wickham
-    given-names: Hadley
-    email: hadley@posit.co
-    orcid: https://orcid.org/0000-0003-4757-117X
-  year: '2025'
-  doi: 10.32614/CRAN.package.logger
-  version: '>= 0.4.1'
-- type: software
   title: methods
   abstract: 'R: A Language and Environment for Statistical Computing'
   notes: Imports

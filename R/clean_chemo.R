@@ -534,7 +534,7 @@ clean_chemo <- function(
 
   # Early exit for empty input
   if (nrow(annot_table_wei_chemo) == 0L) {
-    logger::log_warn("Empty annotation table provided")
+    log_warn("Empty annotation table provided")
     return(annot_table_wei_chemo)
   }
 
@@ -578,19 +578,19 @@ clean_chemo <- function(
 
   # Log Processing Parameters ----
 
-  logger::log_info("Cleaning chemically weighted annotations")
-  logger::log_debug("Keeping top {candidates_final} candidates per feature")
-  logger::log_debug(
+  log_info("Cleaning chemically weighted annotations")
+  log_debug("Keeping top {candidates_final} candidates per feature")
+  log_debug(
     "Using best_percentile: {best_percentile} for consistent filtering"
   )
-  logger::log_debug(
+  log_debug(
     "Options - High confidence: {high_confidence}, ",
     "Remove ties: {remove_ties}, Summarize: {summarize}"
   )
-  logger::log_info(
+  log_info(
     "Filtering top {candidates_final} candidates and keeping only MS1 candidates with minimum {minimal_ms1_bio} biological score {minimal_ms1_condition} {minimal_ms1_chemo} chemical score"
   )
-  logger::log_debug(
+  log_debug(
     "Sampling max_per_score = {max_per_score} candidates per (feature_id, rank_final) after filters"
   )
 
@@ -623,7 +623,7 @@ clean_chemo <- function(
     nrow()
 
   if (n_sampled_features > 0L) {
-    logger::log_info(
+    log_info(
       "Sampling candidates for ",
       n_sampled_features,
       " features with more than ",

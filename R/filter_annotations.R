@@ -105,11 +105,11 @@ validate_filter_annotations_inputs <- function(
 #' @keywords internal
 filter_ms1_redundancy <- function(annotation_tables_list) {
   if (!"ms1" %in% names(annotation_tables_list)) {
-    logger::log_debug("No MS1 annotations to filter, combining all annotations")
+    log_debug("No MS1 annotations to filter, combining all annotations")
     return(tidytable::bind_rows(annotation_tables_list))
   }
 
-  logger::log_info("Removing MS1 annotations superseded by spectral matches")
+  log_info("Removing MS1 annotations superseded by spectral matches")
 
   # Extract spectral annotations (all non-MS1)
   spectral_names <- names(annotation_tables_list)[
@@ -119,7 +119,7 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
     tidytable::bind_rows()
 
   n_spectral <- nrow(annotations_tables_spectral)
-  logger::log_debug("Found {n_spectral} spectral annotations")
+  log_debug("Found {n_spectral} spectral annotations")
 
   # Create key for anti-join
   spectral_keys <- annotations_tables_spectral |>
@@ -142,7 +142,7 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
     tidytable::bind_rows(annotations_tables_spectral)
 
   n_ms1_removed <- n_ms1_before - (nrow(annotation_table) - n_spectral)
-  logger::log_info("Removed {n_ms1_removed} redundant MS1 annotations")
+  log_info("Removed {n_ms1_removed} redundant MS1 annotations")
 
   annotation_table
 }
@@ -158,7 +158,7 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
 #' @return Filtered data frame
 #' @keywords internal
 apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
-  logger::log_info(
+  log_info(
     "Filtering annotations outside {tolerance_rt} min RT tolerance"
   )
 
@@ -256,8 +256,8 @@ filter_annotations <- function(
 
   # Load and Process Data ----
 
-  logger::log_info("Filtering annotations")
-  logger::log_debug("RT tolerance: {tolerance_rt} minutes")
+  log_info("Filtering annotations")
+  log_debug("RT tolerance: {tolerance_rt} minutes")
 
   features_table <- tidytable::fread(
     file = features,
@@ -267,13 +267,13 @@ filter_annotations <- function(
     tidytable::distinct(feature_id, rt, mz)
 
   n_features <- nrow(features_table)
-  logger::log_info(
+  log_info(
     "Processing {n_features} unique features for annotation filtering"
   )
 
   # Load and Merge Annotations ----
 
-  logger::log_debug("Loading {length(annotations)} annotation file(s)")
+  log_debug("Loading {length(annotations)} annotation file(s)")
   annotation_tables_list <- purrr::map(
     .x = annotations,
     .f = tidytable::fread,
@@ -286,7 +286,7 @@ filter_annotations <- function(
   rm(annotation_tables_list)
 
   n_total_annotations <- nrow(annotation_table)
-  logger::log_info(
+  log_info(
     "Total annotations before RT filtering: {n_total_annotations}"
   )
 
@@ -317,7 +317,7 @@ filter_annotations <- function(
     }
 
     n_rt_standards <- nrow(rt_table)
-    logger::log_debug("Loaded {n_rt_standards} retention time standards")
+    log_debug("Loaded {n_rt_standards} retention time standards")
 
     features_annotated_table_2 <- apply_rt_filter(
       features_annotated_table_1,
@@ -325,14 +325,14 @@ filter_annotations <- function(
       tolerance_rt
     )
   } else {
-    logger::log_debug("No RT library provided, skipping RT filtering")
+    log_debug("No RT library provided, skipping RT filtering")
     features_annotated_table_2 <- features_annotated_table_1 |>
       tidytable::mutate(candidate_structure_error_rt = NA)
   }
 
   n_removed_rt <- nrow(features_annotated_table_1) -
     nrow(features_annotated_table_2)
-  logger::log_info(
+  log_info(
     "Removed {n_removed_rt} annotations based on retention time tolerance"
   )
   rm(features_annotated_table_1)

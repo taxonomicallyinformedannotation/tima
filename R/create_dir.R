@@ -33,7 +33,7 @@ create_dir <- function(export) {
 
   # Path length sanity check
   if (nchar(export) > MAX_PATH_LENGTH) {
-    logger::log_warn(
+    log_warn(
       "Path length ({nchar(export)}) exceeds typical OS maximum ({MAX_PATH_LENGTH}). ",
       "This may cause issues on some systems."
     )
@@ -78,12 +78,12 @@ ensure_directory_exists <- function(dir_path) {
   created <- tryCatch(
     {
       dir.create(dir_path, recursive = TRUE, showWarnings = FALSE)
-      logger::log_debug("Created directory: {dir_path}")
+      log_debug("Created directory: {dir_path}")
       TRUE
     },
     error = function(e) {
-      logger::log_error("Failed to create directory: {dir_path}")
-      logger::log_debug("Error: {conditionMessage(e)}")
+      log_error("Failed to create directory: {dir_path}")
+      log_debug("Error: {conditionMessage(e)}")
       FALSE
     }
   )
@@ -105,7 +105,7 @@ ensure_directory_exists <- function(dir_path) {
 #' @keywords internal
 verify_directory_writable <- function(dir_path) {
   if (!dir.exists(dir_path)) {
-    logger::log_warn(
+    log_warn(
       "Directory does not exist for write verification: {dir_path}"
     )
     return(invisible(FALSE))
@@ -124,11 +124,11 @@ verify_directory_writable <- function(dir_path) {
       TRUE
     },
     error = function(e) {
-      logger::log_warn(
+      log_warn(
         "Directory exists but may not be writable: {dir_path}. ",
         "This may cause failures in Docker/restricted environments."
       )
-      logger::log_debug("Write test error: {conditionMessage(e)}")
+      log_debug("Write test error: {conditionMessage(e)}")
       FALSE
     }
   )

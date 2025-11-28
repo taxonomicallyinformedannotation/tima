@@ -53,10 +53,10 @@ create_components <- function(
 
   # Load Edge Data ----
 
-  logger::log_info("Creating components from {length(input)} edge file(s)")
+  log_info("Creating components from {length(input)} edge file(s)")
 
   # Load and combine all edge files
-  # logger::log_trace("Loading edge data")
+  # log_trace("Loading edge data")
   edges <- purrr::map(
     .x = input,
     .f = tidytable::fread,
@@ -75,13 +75,13 @@ create_components <- function(
     edges$feature_target
   )))
 
-  logger::log_info(
+  log_info(
     "Loaded {n_edges} edges connecting {n_unique_features} unique features"
   )
 
   # Early exit for empty edges
   if (n_edges == 0L) {
-    logger::log_warn("No edges found, creating empty components file")
+    log_warn("No edges found, creating empty components file")
     components_table <- tidytable::tidytable(
       `cluster index` = character(0),
       componentindex = character(0)
@@ -93,14 +93,14 @@ create_components <- function(
   # Build Graph and Find Components ----
 
   # Create undirected graph from edges
-  # logger::log_trace("Building graph structure")
+  # log_trace("Building graph structure")
   network_graph <- igraph::graph_from_data_frame(
     d = edges,
     directed = FALSE
   )
 
   # Find connected components
-  # logger::log_trace("Identifying connected components")
+  # log_trace("Identifying connected components")
   component_membership <- igraph::components(
     graph = network_graph
   )$membership
@@ -109,12 +109,12 @@ create_components <- function(
   # Organize features by component
   features_by_component <- split(feature_names, component_membership)
 
-  logger::log_info("Found {length(features_by_component)} components")
+  log_info("Found {length(features_by_component)} components")
 
   # Format Component Assignments ----
 
   # Convert to tidy format
-  # logger::log_trace("Formatting component assignments")
+  # log_trace("Formatting component assignments")
   components_table <- features_by_component |>
     rbind() |>
     t() |>
@@ -133,7 +133,7 @@ create_components <- function(
 
   # Calculate component size statistics
   component_sizes <- table(components_table$componentindex)
-  logger::log_info(
+  log_info(
     "Component sizes - Min: {min(component_sizes)}, ",
     "Max: {max(component_sizes)}, ",
     "Mean: {round(mean(component_sizes), 1)}"
@@ -148,7 +148,7 @@ create_components <- function(
 
   export_output(x = components_table, file = output)
 
-  logger::log_info("Components written to: {output}")
+  log_info("Components written to: {output}")
 
   return(output)
 }

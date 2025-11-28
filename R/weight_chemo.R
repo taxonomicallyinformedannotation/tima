@@ -122,7 +122,7 @@ weight_chemo <- function(
   # Early Exit ----
   n_annotations <- nrow(annot_table_wei_bio_clean)
   if (n_annotations == 0L) {
-    logger::log_warn(
+    log_warn(
       "Empty annotation table provided, skipping chemical weighting"
     )
     return(annot_table_wei_bio_clean)
@@ -157,10 +157,10 @@ weight_chemo <- function(
     }
   }
 
-  logger::log_info(
+  log_info(
     "Weighting {n_annotations} annotations by chemical consistency"
   )
-  logger::log_debug(
+  log_debug(
     "Weights - Spectral: ",
     weight_spectral,
     ", Biological: ",

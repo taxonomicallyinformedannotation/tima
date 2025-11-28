@@ -39,10 +39,7 @@ if (dir.exists("../../inst")) {
   knitr::opts_knit$set(root.dir = "../../inst")
 }
 tima:::copy_backbone()
-logger::log_threshold(
-  level = logger::INFO,
-  namespace = logger::log_namespaces()
-)
+lgr::lgr(400)  # INFO level
 tima::get_example_files()
 ```
 

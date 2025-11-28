@@ -23,7 +23,7 @@ fake_lotus <- function(export) {
     stop("export path must be a single character string")
   }
 
-  logger::log_warn(
+  log_warn(
     "LOTUS download failed. Creating empty placeholder file with proper structure."
   )
 
@@ -74,6 +74,6 @@ fake_lotus <- function(export) {
   create_dir(export = export)
   tidytable::fwrite(x = fake_data, file = export)
 
-  logger::log_debug("Created fake LOTUS file at: {export}")
+  log_debug("Created fake LOTUS file at: {export}")
   return(export)
 }

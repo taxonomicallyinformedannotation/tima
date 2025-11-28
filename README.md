@@ -16,8 +16,7 @@ coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge
 [![r-universe
 badge](https://taxonomicallyinformedannotation.r-universe.dev/tima/badges/version?&color=blue&style=classic.png)](https://taxonomicallyinformedannotation.r-universe.dev/tima)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5797920.svg)](https://doi.org/10.5281/zenodo.5797920)
-[![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/adafede/tima-r/)
-
+[![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white.png)](https://hub.docker.com/r/adafede/tima-r/)
 
 <!-- badges: end -->
 
@@ -181,22 +180,21 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
 | docopt | 0.7.2 | de Jonge (2025) |
-| DT | 0.34.0 | Xie, Cheng, and Tan (2024) |
+| DT | 0.34.0 | Xie et al. (2025) |
 | fs | 1.6.6 | Hester, Wickham, and Csárdi (2025) |
 | gt | 1.1.0 | Iannone et al. (2025) |
 | httr2 | 1.2.1 | Wickham (2025) |
-| igraph | 2.2.1 | Csardi and Nepusz (2006); (**igraph2023?**); Csárdi et al. (2025) |
+| igraph | 2.2.1 | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2025) |
 | IRanges | 2.44.0 | Lawrence et al. (2013) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
-| logger | 0.4.1 | Daróczi and Wickham (2024) |
-| MetaboCoreUtils | 1.18.0 | Rainer et al. (2022a) |
+| lgr | 0.5.0 | Fleck (2025) |
+| MetaboCoreUtils | 1.18.1 | Rainer et al. (2022a) |
 | MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
 | MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
 | MsCoreUtils | 1.21.0 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
-| R.utils | 2.13.0 | (**Rutils?**) |
-| reticulate | 1.44.0 | Ushey, Allaire, and Tang (2025) |
-| rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); (**rmarkdown2025?**) |
+| reticulate | 1.44.1 | Ushey, Allaire, and Tang (2025) |
+| rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
 | rotl | 3.1.0 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
 | shiny | 1.11.1 | Chang et al. (2025) |
 | shinybusy | 0.3.3 | Meyer and Perrier (2024) |
@@ -208,25 +206,44 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | Spectra | 1.20.0 | Rainer et al. (2022d) |
 | stringi | 1.8.7 | Gagolewski (2022) |
 | targets | 1.11.4 | Landau (2021) |
-| testthat | 3.3.0 | Wickham (2011) |
+| testthat | 3.3.1 | Wickham (2011) |
 | tidyfst | 1.8.2 | Huang and Zhao (2020) |
 | tidyselect | 1.2.1 | Henry and Wickham (2024) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
 | tima | 2.12.0 | Rutz et al. (2019); Rutz and Allard (2025) |
-| visNetwork | 2.1.4 | Almende B.V. and Contributors and Thieurmel (2022) |
-| withr | 3.0.2 | (**withr?**) |
+| visNetwork | 2.1.4 | Almende B.V. and Contributors and Thieurmel (2025) |
+| withr | 3.0.2 | Hester et al. (2024) |
 | yaml | 2.3.10 | Garbett et al. (2024) |
 
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">
 
+<div id="ref-rmarkdown2025" class="csl-entry">
+
+Allaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier
+Luraschi, Kevin Ushey, Aron Atkins, et al. 2025.
+*<span class="nocase">rmarkdown</span>: Dynamic Documents for r*.
+<https://github.com/rstudio/rmarkdown>.
+
+</div>
+
 <div id="ref-visNetwork" class="csl-entry">
 
-Almende B.V. and Contributors, and Benoit Thieurmel. 2022.
+Almende B.V. and Contributors, and Benoit Thieurmel. 2025.
 *<span class="nocase">visNetwork</span>: Network Visualization Using
 “<span class="nocase">vis.js</span>” Library*.
 <https://doi.org/10.32614/CRAN.package.visNetwork>.
+
+</div>
+
+<div id="ref-igraph2023" class="csl-entry">
+
+Antonov, Michael, Gábor Csárdi, Szabolcs Horvát, Kirill Müller, Tamás
+Nepusz, Daniel Noom, Maëlle Salmon, Vincent Traag, Brooke Foucault
+Welles, and Fabio Zanini. 2023. “Igraph Enables Fast and Robust Network
+Analysis Across Programming Languages.” *arXiv Preprint
+arXiv:2311.10260*. <https://doi.org/10.48550/arXiv.2311.10260>.
 
 </div>
 
@@ -249,7 +266,7 @@ Framework for r*. <https://doi.org/10.32614/CRAN.package.shiny>.
 
 <div id="ref-igraph2006" class="csl-entry">
 
-Csardi, Gabor, and Tamas Nepusz. 2006. “The Igraph Software Package for
+Csárdi, Gábor, and Tamás Nepusz. 2006. “The Igraph Software Package for
 Complex Network Research.” *InterJournal* Complex Systems: 1695.
 <https://igraph.org>.
 
@@ -258,17 +275,9 @@ Complex Network Research.” *InterJournal* Complex Systems: 1695.
 <div id="ref-igraph2025" class="csl-entry">
 
 Csárdi, Gábor, Tamás Nepusz, Vincent Traag, Szabolcs Horvát, Fabio
-Zanini, Daniel Noom, and Kirill Müller. 2025.
-*<span class="nocase">igraph</span>: Network Analysis and Visualization
-in r*. <https://doi.org/10.5281/zenodo.7682609>.
-
-</div>
-
-<div id="ref-logger" class="csl-entry">
-
-Daróczi, Gergely, and Hadley Wickham. 2024.
-*<span class="nocase">logger</span>: A Lightweight, Modern and Flexible
-Logging Utility*. <https://doi.org/10.32614/CRAN.package.logger>.
+Zanini, Daniel Noom, Kirill Müller, David Schoch, and Maëlle Salmon.
+2025. *<span class="nocase">igraph</span>: Network Analysis and
+Visualization in r*. <https://doi.org/10.5281/zenodo.7682609>.
 
 </div>
 
@@ -285,6 +294,13 @@ Interface Specification Language*.
 Fairbanks, Mark. 2024. *<span class="nocase">tidytable</span>: Tidy
 Interface to “<span class="nocase">data.table</span>”*.
 <https://doi.org/10.32614/CRAN.package.tidytable>.
+
+</div>
+
+<div id="ref-lgr" class="csl-entry">
+
+Fleck, Stefan. 2025. *<span class="nocase">lgr</span>: A Fully Featured
+Logging Framework*. <https://doi.org/10.32614/CRAN.package.lgr>.
 
 </div>
 
@@ -326,6 +342,15 @@ Henry, Lionel, and Hadley Wickham. 2024.
 Hester, Jim, and Gábor Csárdi. 2025.
 *<span class="nocase">archive</span>: Multi-Format Archive and
 Compression Support*. <https://doi.org/10.32614/CRAN.package.archive>.
+
+</div>
+
+<div id="ref-withr" class="csl-entry">
+
+Hester, Jim, Lionel Henry, Kirill Müller, Kevin Ushey, Hadley Wickham,
+and Winston Chang. 2024. *<span class="nocase">withr</span>: Run Code
+“With” Temporarily Modified Global State*.
+<https://doi.org/10.32614/CRAN.package.withr>.
 
 </div>
 
@@ -537,7 +562,7 @@ Facilities for Parallel Evaluation*.
 
 Wickham, Hadley. 2011. “<span class="nocase">testthat</span>: Get
 Started with Testing.” *The R Journal* 3: 5–10.
-<https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf>.
+<https://journal.r-project.org/articles/RJ-2011-002/>.
 
 </div>
 
@@ -590,8 +615,8 @@ Definitive Guide*. Boca Raton, Florida: Chapman; Hall/CRC.
 
 <div id="ref-DT" class="csl-entry">
 
-Xie, Yihui, Joe Cheng, and Xianying Tan. 2024. *DT: A Wrapper of the
-JavaScript Library “DataTables”*.
+Xie, Yihui, Joe Cheng, Xianying Tan, and Garrick Aden-Buie. 2025. *DT: A
+Wrapper of the JavaScript Library “DataTables”*.
 <https://doi.org/10.32614/CRAN.package.DT>.
 
 </div>

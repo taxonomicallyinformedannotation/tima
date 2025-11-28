@@ -20,7 +20,7 @@ fake_hmdb <- function(export) {
     stop("export path must be a single character string")
   }
 
-  logger::log_warn(
+  log_warn(
     "HMDB download failed. Creating minimal placeholder SDF file."
   )
 
@@ -65,7 +65,7 @@ fake_hmdb <- function(export) {
   )
 
   if (zip_result != 0) {
-    logger::log_warn("Failed to create zip file, trying alternative method")
+    log_warn("Failed to create zip file, trying alternative method")
     utils::zip(zipfile = basename(export), files = fake_export)
   }
 
@@ -77,6 +77,6 @@ fake_hmdb <- function(export) {
   # Clean up temporary file
   unlink(fake_export)
 
-  logger::log_debug("Created fake HMDB file at: {export}")
+  log_debug("Created fake HMDB file at: {export}")
   return(export)
 }

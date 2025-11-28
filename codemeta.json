@@ -430,16 +430,16 @@
     },
     "14": {
       "@type": "SoftwareApplication",
-      "identifier": "logger",
-      "name": "logger",
-      "version": ">= 0.4.1",
+      "identifier": "lgr",
+      "name": "lgr",
+      "version": ">= 0.5.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
         "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
       },
-      "sameAs": "https://CRAN.R-project.org/package=logger"
+      "sameAs": "https://CRAN.R-project.org/package=lgr"
     },
     "15": {
       "@type": "SoftwareApplication",
@@ -706,7 +706,7 @@
     "SystemRequirements": "\n    python (< 3.14,>= 3.10)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome", "lc-msms", "metabolite-annotation", "metabolomics", "natural-products", "scoring-system", "taxonomy", "specialized-metabolome", "r"],
-  "fileSize": "4047.539KB",
+  "fileSize": "3956.804KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

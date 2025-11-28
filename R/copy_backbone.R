@@ -48,7 +48,7 @@ copy_backbone <- function(
     stop("Package '", package, "' not found. Is it installed?")
   }
 
-  logger::log_info("Setting up TIMA cache directory at: {cache_dir}")
+  log_info("Setting up TIMA cache directory at: {cache_dir}")
 
   # Create cache directory
   tryCatch(
@@ -56,7 +56,7 @@ copy_backbone <- function(
       fs::dir_create(path = cache_dir)
     },
     error = function(e) {
-      logger::log_error("Failed to create cache directory: {e$message}")
+      log_error("Failed to create cache directory: {e$message}")
       stop("Failed to create cache directory: ", conditionMessage(e))
     }
   )
@@ -69,10 +69,10 @@ copy_backbone <- function(
         new_path = cache_dir,
         overwrite = TRUE
       )
-      logger::log_info("Successfully copied package backbone to cache")
+      log_info("Successfully copied package backbone to cache")
     },
     error = function(e) {
-      logger::log_error("Failed to copy package backbone: {e$message}")
+      log_error("Failed to copy package backbone: {e$message}")
       stop("Failed to copy package backbone: ", conditionMessage(e))
     }
   )

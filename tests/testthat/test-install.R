@@ -49,7 +49,6 @@ test_that("install() errors on invalid test flag (character)", {
 # ---- Success paths ----
 
 test_that("install(test=TRUE) logs test mode and returns invisible NULL", {
-  skip_if_not_installed("logger")
   expect_message(
     res <- install(package = "tima", test = TRUE),
     "Test mode",
@@ -59,7 +58,6 @@ test_that("install(test=TRUE) logs test mode and returns invisible NULL", {
 })
 
 test_that("install() with dependencies=TRUE in test mode runs without error", {
-  skip_if_not_installed("logger")
   expect_message(
     install(package = "tima", dependencies = TRUE, test = TRUE),
     "Test mode",
@@ -68,7 +66,6 @@ test_that("install() with dependencies=TRUE in test mode runs without error", {
 })
 
 test_that("install() accepts multiple repos in test mode", {
-  skip_if_not_installed("logger")
   expect_message(
     install(package = "tima", repos = .make_repos(), test = TRUE),
     "Test mode",
@@ -77,7 +74,6 @@ test_that("install() accepts multiple repos in test mode", {
 })
 
 test_that("install() can run with dependencies=FALSE (branch coverage)", {
-  skip_if_not_installed("logger")
   expect_message(
     install(package = "tima", dependencies = FALSE, test = TRUE),
     "Test mode",
@@ -88,7 +84,6 @@ test_that("install() can run with dependencies=FALSE (branch coverage)", {
 # ---- Edge / branch: nonexistent package (still in test mode) ----
 
 test_that("install() handles nonexistent package gracefully in test mode", {
-  skip_if_not_installed("logger")
   # Should not attempt real installation; just log test mode.
   expect_message(
     install(package = "definitelyNotAPackage123", test = TRUE),

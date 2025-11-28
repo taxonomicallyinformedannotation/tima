@@ -56,12 +56,12 @@ clean_bio <- function(
 
   # Early exit for empty inputs
   if (nrow(annot_table_wei_bio) == 0L) {
-    logger::log_warn("Empty annotation table provided")
+    log_warn("Empty annotation table provided")
     return(annot_table_wei_bio)
   }
 
   if (nrow(edges_table) == 0L) {
-    logger::log_warn("Empty edges table provided, cannot calculate consistency")
+    log_warn("Empty edges table provided, cannot calculate consistency")
     return(.add_default_prediction_columns(annot_table_wei_bio))
   }
 
@@ -74,16 +74,16 @@ clean_bio <- function(
 
   edges_filtered <- .filter_edges_for_consistency(edges_table)
 
-  logger::log_debug(
+  log_debug(
     "Found {nrow(edges_filtered)} valid edges for consistency calculation"
   )
 
   # Early exit if no valid edges - add required columns with defaults
   if (nrow(edges_filtered) == 0L) {
-    logger::log_warn(
+    log_warn(
       "No features with >=2 neighbors found, skipping consistency calculation"
     )
-    logger::log_debug(
+    log_debug(
       "Adding default feature_pred_tax columns (all features marked as 'empty')"
     )
     return(.add_default_prediction_columns(annot_table_wei_bio))
@@ -110,7 +110,7 @@ clean_bio <- function(
   ) |>
     tidytable::filter(!is.na(feature_source))
 
-  # logger::log_trace("Calculating consistency scores across network edges")
+  # log_trace("Calculating consistency scores across network edges")
 
   # Calculate Consistency Scores ----
 
@@ -120,7 +120,7 @@ clean_bio <- function(
     minimal_consistency
   )
 
-  # logger::log_trace("Splitting already computed predictions")
+  # log_trace("Splitting already computed predictions")
   if ("feature_pred_tax_cla_02sup_val" %in% colnames(annotations_distinct)) {
     df1 <- annotations_distinct |>
       tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
@@ -141,7 +141,7 @@ clean_bio <- function(
   }
   rm(annotations_distinct)
 
-  # logger::log_trace("Joining all except -1 together")
+  # log_trace("Joining all except -1 together")
   supp_tables <- consistency_results
 
   annot_table_wei_bio_preclean <- purrr::reduce(
@@ -188,7 +188,7 @@ clean_bio <- function(
     coalesce_if_present("feature_pred_tax_cla_04dirpar_score", 0)
   rm(df2, supp_tables)
 
-  # logger::log_trace("Adding already computed predictions back")
+  # log_trace("Adding already computed predictions back")
   if (nrow(df1b) == 0L) {
     return(annot_table_wei_bio_preclean)
   }

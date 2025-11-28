@@ -53,7 +53,7 @@ parse_adduct <- function(
       is.null(adduct_string) ||
       length(adduct_string) == 0L
   ) {
-    # logger::log_trace("Adduct string is NULL or missing, returning zero values")
+    # log_trace("Adduct string is NULL or missing, returning zero values")
     return(failed_parse)
   }
 
@@ -72,7 +72,7 @@ parse_adduct <- function(
         nchar(adduct_string) > 0L
     ) {
       warning(validation_result$message, call. = FALSE)
-      logger::log_warn(validation_result$message)
+      log_warn(validation_result$message)
     }
     return(failed_parse)
   }
@@ -95,7 +95,7 @@ parse_adduct <- function(
       if (nchar(alt_adduct) > 0L) {
         result <- parse_single_adduct(alt_adduct, regex, failed_parse)
         if (!all(result == 0)) {
-          logger::log_debug(
+          log_debug(
             "Successfully parsed alternative '",
             alt_adduct,
             "' from composite adduct '",
@@ -108,7 +108,7 @@ parse_adduct <- function(
     }
 
     # If none of the alternatives worked, return failed parse silently
-    logger::log_debug(
+    log_debug(
       "Could not parse any alternative from: '",
       adduct_string,
       "'"
@@ -134,7 +134,7 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
       "'. ",
       "Expected format: [nM<isotope><modifications>]charge (e.g., [M+H]+)"
     )
-    logger::log_debug(msg)
+    log_debug(msg)
     return(failed_parse)
   }
 
@@ -154,7 +154,7 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
       "'. ",
       modifications$message
     )
-    logger::log_debug(msg)
+    log_debug(msg)
     return(failed_parse)
   }
 
@@ -173,12 +173,12 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
       adduct_string,
       "'"
     )
-    logger::log_debug(msg)
+    log_debug(msg)
     return(failed_parse)
   }
 
   # Log successful parse at trace level
-  # logger::log_trace(
+  # log_trace(
   #   "Successfully parsed adduct '",
   #   adduct_string,
   #   "': ",
@@ -263,7 +263,7 @@ match_adduct_regex <- function(adduct_string, regex) {
       )
     },
     error = function(e) {
-      logger::log_error(
+      log_error(
         "Regex matching failed: ",
         conditionMessage(e)
       )
@@ -454,7 +454,7 @@ calculate_modification_masses <- function(elements, signs, multiplicities) {
       MetaboCoreUtils::calculateMass(x = elements)
     },
     error = function(e) {
-      logger::log_debug(
+      log_debug(
         "Failed to calculate modification masses: ",
         conditionMessage(e)
       )

@@ -79,7 +79,7 @@ fetch_zenodo_record <- function(record, doi) {
   base_url <- "https://zenodo.org/records/"
   url <- paste0(base_url, record, "/latest")
 
-  logger::log_debug("Fetching metadata from: {url}")
+  log_debug("Fetching metadata from: {url}")
 
   tryCatch(
     {
@@ -123,7 +123,7 @@ fetch_zenodo_record <- function(record, doi) {
 #' @return List with parsed JSON content
 #' @keywords internal
 parse_zenodo_content <- function(api_url) {
-  logger::log_debug("Parsing API response from: {api_url}")
+  log_debug("Parsing API response from: {api_url}")
 
   tryCatch(
     {
@@ -190,25 +190,25 @@ find_matching_file <- function(filenames, pattern, doi) {
 #' @keywords internal
 is_download_needed <- function(path, zenodo_size) {
   if (!file.exists(path)) {
-    logger::log_debug("File does not exist locally, download needed")
+    log_debug("File does not exist locally, download needed")
     return(TRUE)
   }
 
   local_size <- file.size(path)
 
   if (is.na(local_size)) {
-    logger::log_debug("Cannot determine local file size, download needed")
+    log_debug("Cannot determine local file size, download needed")
     return(TRUE)
   }
 
   if (local_size != zenodo_size) {
-    logger::log_debug(
+    log_debug(
       "File size mismatch (local: {local_size}, remote: {zenodo_size}), download needed"
     )
     return(TRUE)
   }
 
-  logger::log_debug("File exists with correct size, skipping download")
+  log_debug("File exists with correct size, skipping download")
   return(FALSE)
 }
 
@@ -262,11 +262,11 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
   # Input Validation ----
   validate_zenodo_inputs(doi = doi, pattern = pattern, path = path)
 
-  logger::log_info("Retrieving latest version from Zenodo: {doi}")
+  log_info("Retrieving latest version from Zenodo: {doi}")
 
   # Extract Record ID ----
   record <- extract_zenodo_record_id(doi)
-  logger::log_debug("Record ID: {record}")
+  log_debug("Record ID: {record}")
 
   # Fetch Record Metadata ----
   record_response <- fetch_zenodo_record(record = record, doi = doi)
@@ -296,25 +296,25 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
   file_url <- paste0(record_response$url, "/files/", filename)
   zenodo_size <- content$files$size[match_idx]
 
-  logger::log_debug("Found file: {filename} ({zenodo_size} bytes)")
+  log_debug("Found file: {filename} ({zenodo_size} bytes)")
 
   # Download if Needed ----
   if (is_download_needed(path = path, zenodo_size = zenodo_size)) {
     # Remove existing file if present (may be corrupted or wrong size)
     if (file.exists(path)) {
-      logger::log_debug("Removing existing file: {path}")
+      log_debug("Removing existing file: {path}")
       file.remove(path)
     }
 
-    logger::log_info(
+    log_info(
       "Downloading {filename} from https://doi.org/{doi}"
     )
 
     if (!is.null(content$metadata$title)) {
-      logger::log_debug("Record title: {content$metadata$title}")
+      log_debug("Record title: {content$metadata$title}")
     }
 
-    logger::log_debug(
+    log_debug(
       "File size: {zenodo_size} bytes ({round(zenodo_size / 1024^2, 2)} MB)"
     )
 
@@ -322,9 +322,9 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
     create_dir(export = path)
     get_file(url = file_url, export = path)
 
-    logger::log_success("Download completed: {path}")
+    log_success("Download completed: {path}")
   } else {
-    logger::log_info(
+    log_info(
       "File already present with correct size. Skipping download."
     )
   }

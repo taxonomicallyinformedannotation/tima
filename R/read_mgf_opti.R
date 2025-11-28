@@ -133,10 +133,10 @@ read_mgf_opti <- function(
 
   # Get file size for progress reporting
   file_size_mb <- file.info(f)$size / 1024^2
-  logger::log_info(
+  log_info(
     "Reading MGF file ({round(file_size_mb, 2)} MB) with optimized parser: {f}"
   )
-  logger::log_debug("Using MS level: {msLevel}")
+  log_debug("Using MS level: {msLevel}")
 
   sp_list <- list()
   current_spectrum <- list()
@@ -176,7 +176,7 @@ read_mgf_opti <- function(
 
       # Progress logging at appropriate intervals
       if (total_processed %% batch_size == 0L) {
-        logger::log_info("Processed {total_processed} spectra...")
+        log_info("Processed {total_processed} spectra...")
       }
 
       current_spectrum <- list()
@@ -189,8 +189,8 @@ read_mgf_opti <- function(
     }
   }
 
-  logger::log_info("Total spectra read: {total_processed}")
-  # logger::log_trace("Combining spectrum data into DataFrame")
+  log_info("Total spectra read: {total_processed}")
+  # log_trace("Combining spectrum data into DataFrame")
   res <- MsCoreUtils::rbindFill(sp_list)
 
   # Format charge field if present
@@ -199,7 +199,7 @@ read_mgf_opti <- function(
   }
 
   # Map MGF field names to standard spectra variable names
-  # logger::log_trace("Mapping field names to standard spectra variables")
+  # log_trace("Mapping field names to standard spectra variables")
   idx <- match(colnames(res), mapping)
   not_na <- !is.na(idx)
   if (any(not_na)) {
@@ -226,7 +226,7 @@ read_mgf_opti <- function(
   }
 
   # Convert to DataFrame and set up peak lists
-  # logger::log_trace("Finalizing DataFrame structure")
+  # log_trace("Finalizing DataFrame structure")
   res <- methods::as(object = res, Class = "DataFrame")
   res$mz <- IRanges::NumericList(res$mz, compress = FALSE)
   res$dataOrigin <- f

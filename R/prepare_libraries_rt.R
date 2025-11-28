@@ -82,8 +82,8 @@ prepare_libraries_rt <- function(
   }
   dir.create(dirname(output_sop), showWarnings = FALSE, recursive = TRUE)
 
-  logger::log_info("Preparing retention time libraries")
-  logger::log_debug("RT unit: {unit_rt}")
+  log_info("Preparing retention time libraries")
+  log_debug("RT unit: {unit_rt}")
 
   ## default transforms from `Spectra`
   if (!is.na(col_rt) && col_rt == "RTINSECONDS") {
@@ -116,10 +116,10 @@ prepare_libraries_rt <- function(
 
   # Readers ----
   rts_from_mgf <- function(mgf) {
-    # logger::log_trace("Importing spectra")
+    # log_trace("Importing spectra")
     spectra <- mgf |>
       purrr::map(.f = import_spectra)
-    # logger::log_trace("Extracting retention times")
+    # log_trace("Extracting retention times")
     rts <- spectra |>
       # TODO
       purrr::map(
@@ -144,7 +144,7 @@ prepare_libraries_rt <- function(
   }
 
   rts_from_tab <- function(tab) {
-    # logger::log_trace("Importing file")
+    # log_trace("Importing file")
     tab |>
       purrr::map(.f = tidytable::fread) |>
       tidytable::bind_rows() |>
@@ -198,7 +198,7 @@ prepare_libraries_rt <- function(
     missing_n <- nrow(df_missing)
 
     if (missing_n > 0L) {
-      logger::log_warn(
+      log_warn(
         "There are ",
         missing_n,
         " entries without InChIKey.",
@@ -248,7 +248,7 @@ prepare_libraries_rt <- function(
       nrow()
 
     if (missing_n2 > 0L) {
-      logger::log_warn(
+      log_warn(
         "There were still ",
         missing_n2,
         " entries for which no InChIKey could not be found in the end."
@@ -347,7 +347,7 @@ prepare_libraries_rt <- function(
   rm(df_rts)
 
   if (nrow(rts) == 0) {
-    logger::log_warn(
+    log_warn(
       "No retention time library found, returning empty retention time and sop tables."
     )
     sop <- tidytable::tidytable(

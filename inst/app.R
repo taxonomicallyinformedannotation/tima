@@ -1992,8 +1992,8 @@ ui <- shiny::fluidPage(
   ms_pol <- shiny::isolate(input$ms_pol)
   summarize <- shiny::isolate(input$summarize)
 
-  logger::log_trace("Changing parameters ...")
-  logger::log_trace("... Small")
+  log_trace("Changing parameters ...")
+  log_trace("... Small")
   yaml_small <- yamls_params[["params/prepare_params"]]
   yaml_small$files$pattern <- fil_pat
   yaml_small$files$features$raw <- fil_fea_raw
@@ -2010,7 +2010,7 @@ ui <- shiny::fluidPage(
     file = tima:::get_default_paths()$params$prepare_params
   )
 
-  logger::log_trace("... Advanced")
+  log_trace("... Advanced")
   yaml_advanced <- yamls_params[["params/prepare_params_advanced"]]
   yaml_advanced$annotations$candidates$final <-
     shiny::isolate(input$ann_can_fin)
@@ -2720,7 +2720,7 @@ if (file.exists("/.dockerenv")) {
   host <- "127.0.0.1"
 }
 options(shiny.maxRequestSize = 2000 * 1024^2)
-logger::log_info(
+log_info(
   "Please, open: {url} on your favorite browser, but not Edge."
 )
 shiny::shinyApp(

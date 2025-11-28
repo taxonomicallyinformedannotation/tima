@@ -100,7 +100,7 @@ harmonize_spectra <- function(
 
   # Harmonize Column Names ----
 
-  # logger::log_trace("Harmonizing spectra headers for mode: {mode}")
+  # log_trace("Harmonizing spectra headers for mode: {mode}")
 
   # Define standard column names
   columns <- c(

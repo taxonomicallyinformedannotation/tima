@@ -68,7 +68,7 @@ filter_high_confidence_only <- function(
   validate_dataframe(df, param_name = "df", allow_empty = TRUE)
 
   if (nrow(df) == 0L) {
-    logger::log_warn("Empty data frame provided to filter")
+    log_warn("Empty data frame provided to filter")
     return(df)
   }
 
@@ -200,7 +200,7 @@ filter_high_confidence_only <- function(
     ""
   }
 
-  logger::log_info(
+  log_info(
     tag,
     "Removed ",
     n_removed,
@@ -210,7 +210,7 @@ filter_high_confidence_only <- function(
     n_before,
     " total)"
   )
-  logger::log_info(
+  log_info(
     tag,
     n_after,
     " high-confidence candidates remaining (",

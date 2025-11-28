@@ -98,7 +98,7 @@ calculate_mass_of_m <- function(
       "cannot calculate neutral mass"
     )
     warning(msg, call. = FALSE)
-    logger::log_warn(msg)
+    log_warn(msg)
     return(0)
   }
 
@@ -111,7 +111,7 @@ calculate_mass_of_m <- function(
 
   # Validate critical values to avoid division by zero
   if (n_mer == 0L) {
-    logger::log_error(
+    log_error(
       "Invalid multimer count (n_mer = 0) in adduct '",
       adduct_string,
       "'. ",
@@ -121,7 +121,7 @@ calculate_mass_of_m <- function(
   }
 
   if (n_charges == 0L) {
-    logger::log_error(
+    log_error(
       "Invalid charge count (n_charges = 0) in adduct '",
       adduct_string,
       "'. ",
@@ -144,7 +144,7 @@ calculate_mass_of_m <- function(
 
   # Validate result
   if (is.na(neutral_mass) || !is.finite(neutral_mass)) {
-    logger::log_error(
+    log_error(
       "Calculated neutral mass is not finite for adduct '",
       adduct_string,
       "' and m/z ",
@@ -155,7 +155,7 @@ calculate_mass_of_m <- function(
 
   ## COMMENT: This is actually llowed for neutral mass calculations
   # if (neutral_mass < 0) {
-  #   logger::log_warn(
+  #   log_warn(
   #     "Calculated negative neutral mass (",
   #     round(neutral_mass, 4),
   #     " Da) ",
@@ -171,7 +171,7 @@ calculate_mass_of_m <- function(
 
   # Log successful calculation at trace level
   ## COMMENT too many logs
-  # logger::log_trace(
+  # log_trace(
   #   "Calculated neutral mass: ",
   #   round(neutral_mass, 4),
   #   " Da ",
@@ -210,7 +210,7 @@ validate_mz <- function(mz) {
 
   # Sanity check: warn if m/z is suspiciously high
   if (mz > MAX_MASS_DALTONS) {
-    logger::log_warn(
+    log_warn(
       "m/z value ({mz} Da) exceeds typical small molecule range ",
       "({MAX_MASS_DALTONS} Da). Please verify this is correct."
     )
@@ -243,7 +243,7 @@ validate_electron_mass <- function(electron_mass) {
 
   if (relative_diff > 0.01) {
     # More than 1% difference
-    logger::log_warn(
+    log_warn(
       "electron_mass ({electron_mass}) differs from CODATA 2018 value ",
       "({expected_value}) by {round(relative_diff * 100, 2)}%. ",
       "Please verify this is intentional."
@@ -331,7 +331,7 @@ calculate_mz_from_mass <- function(
   if (is_parse_failed(parsed_adduct)) {
     msg <- paste0("Failed to parse adduct: ", adduct_string)
     warning(msg, call. = FALSE)
-    logger::log_warn(msg)
+    log_warn(msg)
     return(0)
   }
 
@@ -344,7 +344,7 @@ calculate_mz_from_mass <- function(
 
   # Check for division by zero
   if (n_charges == 0L) {
-    logger::log_error("Cannot calculate m/z with zero charges")
+    log_error("Cannot calculate m/z with zero charges")
     return(0)
   }
 
@@ -354,7 +354,7 @@ calculate_mz_from_mass <- function(
   charged_mass <- total_mass + (n_charges * charge_sign * electron_mass)
   mz <- (charged_mass / n_charges) - n_iso
 
-  # logger::log_trace(
+  # log_trace(
   #  "Calculated m/z: ",
   #  round(mz, 4),
   #  " from mass ",

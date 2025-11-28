@@ -117,10 +117,10 @@ prepare_annotations_spectra <- function(
 
   # Load and Process Spectral Annotations ----
 
-  logger::log_info(
+  log_info(
     "Preparing spectral matching annotations from {length(input)} file(s)"
   )
-  # logger::log_trace("Loading and formatting spectral matches")
+  # log_trace("Loading and formatting spectral matches")
 
   table <-
     purrr::map(

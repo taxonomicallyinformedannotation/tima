@@ -159,7 +159,7 @@ weight_bio <- function(
   # Early exit for empty input
   n_annotations <- nrow(annotation_table_taxed)
   if (n_annotations == 0L) {
-    logger::log_warn(
+    log_warn(
       "Empty annotation table provided, skipping biological weighting"
     )
     return(annotation_table_taxed)
@@ -211,14 +211,14 @@ weight_bio <- function(
 
   # Log Processing Information ----
 
-  logger::log_info("Weighting {n_annotations} annotations by biological source")
-  logger::log_debug(
+  log_info("Weighting {n_annotations} annotations by biological source")
+  log_debug(
     "Weights - Spectral: {weight_spectral}, Biological: {weight_biological}"
   )
 
   # Filter Structure-Organism Pairs ----
 
-  # logger::log_trace("Filtering structure-organism pairs")
+  # log_trace("Filtering structure-organism pairs")
   df0 <- structure_organism_pairs_table |>
     tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
     tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
@@ -250,9 +250,9 @@ weight_bio <- function(
       .fns = ~ tidytable::na_if(x = .x, y = "")
     ))
 
-  logger::log_debug("Filtered to {nrow(df0)} structure-organism pairs")
+  log_debug("Filtered to {nrow(df0)} structure-organism pairs")
 
-  # logger::log_trace("Preparing annotation table")
+  # log_trace("Preparing annotation table")
   df1 <- annotation_table_taxed |>
     tidytable::select(
       candidate_structure_inchikey_connectivity_layer,
@@ -354,7 +354,7 @@ weight_bio <- function(
 
   # Calculate Biological Scores at All Taxonomic Levels ----
 
-  # logger::log_trace("Calculating biological score at all levels ...")
+  # log_trace("Calculating biological score at all levels ...")
 
   # Define all taxonomic levels and their scores (DRY principle)
   taxonomic_levels <- list(
@@ -432,7 +432,7 @@ weight_bio <- function(
 
   # Calculate scores for all levels
   supp_tables <- lapply(taxonomic_levels, function(tax_level) {
-    # logger::log_trace("... {tax_level$level}")
+    # log_trace("... {tax_level$level}")
 
     df2 |>
       score_per_level_bio(
@@ -443,7 +443,7 @@ weight_bio <- function(
       )
   })
 
-  # logger::log_trace("Keeping best biological score")
+  # log_trace("Keeping best biological score")
 
   annot_table_wei_bio_init <- purrr::reduce(
     .x = supp_tables,

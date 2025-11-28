@@ -30,7 +30,7 @@ decorate_masses <- function(annotation_table_ms1) {
     !"candidate_structure_inchikey_connectivity_layer" %in%
       colnames(annotation_table_ms1)
   ) {
-    logger::log_warn(
+    log_warn(
       "MS1 annotation table missing ",
       "candidate_structure_inchikey_connectivity_layer column. ",
       "Skipping annotation summary."
@@ -55,7 +55,7 @@ decorate_masses <- function(annotation_table_ms1) {
     nrow()
 
   # Log Summary ----
-  logger::log_info(
+  log_info(
     "MS1 annotations: {n_unique_structures} unique structures ",
     "across {n_unique_features} features"
   )

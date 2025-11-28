@@ -25,7 +25,7 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 
   # Early exit for empty data
   if (nrow(df) == 0L) {
-    logger::log_warn("Empty CANOPUS data frame")
+    log_warn("Empty CANOPUS data frame")
     return(df)
   }
 

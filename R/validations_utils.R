@@ -113,7 +113,7 @@ validate_ms_mode <- function(ms_mode) {
     )
   }
 
-  # logger::log_trace("MS mode validated: ", ms_mode)
+  # log_trace("MS mode validated: ", ms_mode)
   invisible(TRUE)
 }
 
@@ -172,10 +172,10 @@ validate_tolerances <- function(
         " ppm). This may result in excessive false positives."
       )
       warning(msg, call. = FALSE)
-      logger::log_warn(msg)
+      log_warn(msg)
     }
 
-    # logger::log_trace("Mass tolerance validated: ", tolerance_ppm, " ppm")
+    # log_trace("Mass tolerance validated: ", tolerance_ppm, " ppm")
   }
 
   # Validate RT tolerance
@@ -208,10 +208,10 @@ validate_tolerances <- function(
         " min). This may group unrelated features."
       )
       warning(msg, call. = FALSE)
-      logger::log_warn(msg)
+      log_warn(msg)
     }
 
-    # logger::log_trace("RT tolerance validated: ", tolerance_rt, " minutes")
+    # log_trace("RT tolerance validated: ", tolerance_rt, " minutes")
   }
 
   invisible(TRUE)
@@ -261,10 +261,10 @@ validate_adduct_list <- function(
       " will be applied."
     )
     warning(msg, call. = FALSE)
-    logger::log_warn(msg)
+    log_warn(msg)
   }
 
-  # logger::log_trace(
+  # log_trace(
   #  list_name,
   # " validated: ",
   # length(adducts_list[[ms_mode]]),

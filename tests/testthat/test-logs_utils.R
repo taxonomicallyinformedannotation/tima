@@ -70,21 +70,21 @@ test_that("format_time rounds appropriately", {
 ## log_with_count ----
 
 test_that("log_with_count logs correctly with count", {
-  # Just check it doesn't error
-  expect_silent(log_with_count("Test message", n = 1234))
-  expect_silent(log_with_count("Test message", n = 1000000))
+  # Just check it doesn't error (lgr outputs to console so can't use expect_silent)
+  expect_no_error(log_with_count("Test message", n = 1234))
+  expect_no_error(log_with_count("Test message", n = 1000000))
 })
 
 test_that("log_with_count logs correctly with count and elapsed", {
-  expect_silent(log_with_count("Test message", n = 1234, elapsed = 5.2))
+  expect_no_error(log_with_count("Test message", n = 1234, elapsed = 5.2))
 })
 
 test_that("log_with_count logs correctly with just elapsed", {
-  expect_silent(log_with_count("Test message", elapsed = 2.5))
+  expect_no_error(log_with_count("Test message", elapsed = 2.5))
 })
 
 test_that("log_with_count logs correctly with neither", {
-  expect_silent(log_with_count("Test message"))
+  expect_no_error(log_with_count("Test message"))
 })
 
 ## log_file_op ----
@@ -95,22 +95,22 @@ test_that("log_file_op logs file operations correctly", {
   writeLines("test", tmp)
   file_size <- file.info(tmp)$size
 
-  expect_silent(log_file_op(
+  expect_no_error(log_file_op(
     "Exported",
     tmp,
     size_bytes = file_size,
     n_rows = 100
   ))
-  expect_silent(log_file_op("Downloaded", tmp, size_bytes = file_size))
-  expect_silent(log_file_op("Loaded", tmp))
+  expect_no_error(log_file_op("Downloaded", tmp, size_bytes = file_size))
+  expect_no_error(log_file_op("Loaded", tmp))
 })
 
 test_that("log_file_op handles missing size and rows", {
   tmp <- withr::local_tempfile()
   writeLines("test", tmp)
 
-  expect_silent(log_file_op("Action", tmp, n_rows = 100))
-  expect_silent(log_file_op("Action", tmp, size_bytes = 1024))
+  expect_no_error(log_file_op("Action", tmp, n_rows = 100))
+  expect_no_error(log_file_op("Action", tmp, size_bytes = 1024))
 })
 
 ## Integration tests ----
@@ -132,8 +132,8 @@ test_that("formatters work together", {
 
 test_that("logging helpers are safe with edge cases", {
   # Should not error with unusual inputs
-  expect_silent(log_with_count("Test", n = 0))
-  expect_silent(log_file_op("Test", "nonexistent.txt"))
+  expect_no_error(log_with_count("Test", n = 0))
+  expect_no_error(log_file_op("Test", "nonexistent.txt"))
 })
 
 ## Performance ----
@@ -181,7 +181,7 @@ test_that("setup_logger creates log file", {
   expect_silent(setup_logger(filename = log_file))
 
   # Write a test message
-  logger::log_info("Test message")
+  log_info("Test message")
 
   # File should be created
   expect_true(file.exists(log_file))
@@ -191,11 +191,11 @@ test_that("setup_logger sets threshold correctly", {
   log_file <- tempfile(fileext = ".log")
 
   # Test different thresholds
-  expect_silent(setup_logger(filename = log_file, threshold = logger::INFO))
-  expect_silent(setup_logger(filename = log_file, threshold = logger::WARN))
-  expect_silent(setup_logger(filename = log_file, threshold = logger::ERROR))
-  expect_silent(setup_logger(filename = log_file, threshold = logger::DEBUG))
-  expect_silent(setup_logger(filename = log_file, threshold = logger::TRACE))
+  expect_silent(setup_logger(filename = log_file, threshold = 400))
+  expect_silent(setup_logger(filename = log_file, threshold = 300))
+  expect_silent(setup_logger(filename = log_file, threshold = 200))
+  expect_silent(setup_logger(filename = log_file, threshold = 500))
+  expect_silent(setup_logger(filename = log_file, threshold = 600))
 })
 
 test_that("setup_logger returns invisibly", {
@@ -218,9 +218,9 @@ test_that("setup_logger can be called multiple times", {
 test_that("setup_logger writes to file with correct format", {
   log_file <- tempfile(fileext = ".log")
 
-  setup_logger(filename = log_file, threshold = logger::INFO)
-  logger::log_info("Test info message")
-  logger::log_warn("Test warning message")
+  setup_logger(filename = log_file, threshold = 400)
+  log_info("Test info message")
+  log_warn("Test warning message")
 
   # Read log file
   log_content <- readLines(log_file)
@@ -243,11 +243,11 @@ test_that("setup_logger respects threshold levels", {
   log_file <- tempfile(fileext = ".log")
 
   # Set threshold to WARN (should not log INFO)
-  setup_logger(filename = log_file, threshold = logger::WARN)
+  setup_logger(filename = log_file, threshold = 300)
 
-  logger::log_info("This should not appear")
-  logger::log_warn("This should appear")
-  logger::log_error("This should also appear")
+  log_info("This should not appear")
+  log_warn("This should appear")
+  log_error("This should also appear")
 
   log_content <- readLines(log_file)
 
@@ -276,7 +276,7 @@ test_that("init_logging reads TIMA_LOG_FILE from environment", {
   expect_silent(init_logging())
 
   # Write test message
-  logger::log_info("Test from env")
+  log_info("Test from env")
 
   expect_true(file.exists(log_file))
 })
@@ -292,8 +292,8 @@ test_that("init_logging reads TIMA_LOG_LEVEL from environment", {
   expect_silent(init_logging())
 
   # INFO should not be logged
-  logger::log_info("Should not appear")
-  logger::log_warn("Should appear")
+  log_info("Should not appear")
+  log_warn("Should appear")
 
   log_content <- readLines(log_file)
   expect_false(any(grepl("Should not appear", log_content)))

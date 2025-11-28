@@ -55,16 +55,16 @@ sanitize_spectra <- function(
 
   # Early exit for empty spectra
   if (n_initial == 0L) {
-    logger::log_warn("No spectra to sanitize")
+    log_warn("No spectra to sanitize")
     return(spectra)
   }
 
-  logger::log_info("Sanitizing {n_initial} spectra (cutoff: {cutoff})")
+  log_info("Sanitizing {n_initial} spectra (cutoff: {cutoff})")
 
   # Apply Sanitization Steps ----
 
   # Apply sequential sanitization steps with detailed logging
-  # logger::log_trace("Applying sanitization pipeline...")
+  # log_trace("Applying sanitization pipeline...")
 
   n_before <- length(spectra)
 
@@ -89,7 +89,7 @@ sanitize_spectra <- function(
   n_removed_peaks <- n_before - length(spectra)
   if (n_removed_peaks > 0L) {
     pct_removed <- round(100 * n_removed_peaks / n_before, 1)
-    logger::log_debug(
+    log_debug(
       "Removed {n_removed_peaks} spectra with <= 2 peaks ({pct_removed}%)"
     )
   }
@@ -105,7 +105,7 @@ sanitize_spectra <- function(
   if (n_nan > 0L) {
     spectra <- spectra[!has_nan]
     pct_nan <- round(100 * n_nan / n_before, 1)
-    logger::log_debug(
+    log_debug(
       "Removed {n_nan} spectra containing NaN values ({pct_nan}%)"
     )
   }
@@ -121,7 +121,7 @@ sanitize_spectra <- function(
   if (n_null > 0L) {
     spectra <- spectra[!has_null]
     pct_null <- round(100 * n_null / n_before, 1)
-    logger::log_debug(
+    log_debug(
       "Removed {n_null} NULL spectra ({pct_null}%)"
     )
   }
@@ -132,7 +132,7 @@ sanitize_spectra <- function(
   n_total_removed <- n_initial - n_final
   pct_retained <- round(100 * n_final / n_initial, 1)
 
-  logger::log_info(
+  log_info(
     "Sanitization complete: {n_final}/{n_initial} spectra retained ",
     "({pct_retained}%, {n_total_removed} removed)"
   )

@@ -103,7 +103,7 @@ get_sirius_filenames <- function(version) {
 #' @keywords internal
 load_sirius_tables <- function(input_directory, version) {
   fnames <- get_sirius_filenames(version)
-  logger::log_debug("Loading SIRIUS tables (version {version})")
+  log_debug("Loading SIRIUS tables (version {version})")
   canopus <- read_from_sirius_zip(input_directory, file = fnames$canopus)
   if (version == "6" && nrow(canopus) > 0L) {
     canopus <- canopus |> tidytable::filter(formulaRank == 1L)
@@ -123,7 +123,7 @@ load_sirius_tables <- function(input_directory, version) {
       denovo <- read_from_sirius_zip(input_directory, file = fnames$denovo)
     }
   }
-  logger::log_debug(
+  log_debug(
     "Loaded SIRIUS tables: CANOPUS={nrow(canopus)}, formulas={nrow(formulas)}, structures={nrow(structures)}, denovo={nrow(denovo)} rows"
   )
   list(
@@ -157,7 +157,7 @@ load_sirius_summaries <- function(input_directory) {
     fixed = TRUE
   )]
   if (length(summary_files) == 0L) {
-    logger::log_debug("No structure candidate summaries found")
+    log_debug("No structure candidate summaries found")
     return(tidytable::tidytable())
   }
   base_name <- basename(input_directory) |>
@@ -165,7 +165,7 @@ load_sirius_summaries <- function(input_directory) {
   summary_files <- summary_files |>
     gsub(pattern = base_name, replacement = "") |>
     gsub(pattern = "^/", replacement = "")
-  logger::log_debug("Loading {length(summary_files)} structure summary files")
+  log_debug("Loading {length(summary_files)} structure summary files")
   summaries <- purrr::map(
     summary_files,
     ~ read_from_sirius_zip(input_directory, file = .x)
@@ -267,7 +267,7 @@ split_sirius_results <- function(table) {
     ) |>
     tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
     tidytable::distinct()
-  logger::log_debug(
+  log_debug(
     "Split results: CANOPUS={nrow(canopus)}, formulas={nrow(formula)}, structures={nrow(structures)} rows"
   )
   list(canopus = canopus, formula = formula, structures = structures)
@@ -371,14 +371,14 @@ prepare_annotations_sirius <-
       str_tax_cla = str_tax_cla,
       str_tax_npc = str_tax_npc
     )
-    logger::log_info("Preparing SIRIUS v{sirius_version} annotations")
+    log_info("Preparing SIRIUS v{sirius_version} annotations")
     # Handle missing input ----
     if (is.null(input_directory)) {
       input_directory <- "Th1sd1rw0nt3x1st"
     }
-    logger::log_debug("SIRIUS directory: {input_directory}")
+    log_debug("SIRIUS directory: {input_directory}")
     if (!file.exists(input_directory)) {
-      logger::log_warn(
+      log_warn(
         "SIRIUS input directory does not exist; returning empty template"
       )
       table <- create_empty_sirius_annotations()
@@ -387,7 +387,7 @@ prepare_annotations_sirius <-
       tables <- load_sirius_tables(input_directory, version = sirius_version)
       summaries <- load_sirius_summaries(input_directory)
       # Prepare tables ----
-      logger::log_debug(
+      log_debug(
         "Preparing CANOPUS, formulas, structures for version {sirius_version}"
       )
       canopus_prepared <- tables$canopus |>
@@ -413,7 +413,7 @@ prepare_annotations_sirius <-
       denovo_prepared <- tables$denovo |>
         tidytable::mutate(feature_id = mappingFeatureId) |>
         select_sirius_columns_structures(sirius_version = sirius_version)
-      logger::log_debug("Joining SIRIUS results")
+      log_debug("Joining SIRIUS results")
       table <- purrr::reduce(
         .x = list(formulas_prepared, canopus_prepared, denovo_prepared),
         .init = structures_prepared,
@@ -424,7 +424,7 @@ prepare_annotations_sirius <-
           candidate_structure_tax_cla_chemontid = NA_character_,
           candidate_structure_tax_cla_01kin = NA_character_
         )
-      logger::log_debug("Selecting annotation columns and integrating metadata")
+      log_debug("Selecting annotation columns and integrating metadata")
       table <- table |>
         select_annotations_columns(
           str_stereo = str_stereo,
@@ -435,11 +435,11 @@ prepare_annotations_sirius <-
         )
     }
     # Split and export ----
-    logger::log_debug(
+    log_debug(
       "Splitting results into CANOPUS, formula, and structure tables"
     )
     splits <- split_sirius_results(table)
-    logger::log_info("Exporting SIRIUS results to {length(splits)} files")
+    log_info("Exporting SIRIUS results to {length(splits)} files")
     export_params(
       parameters = get_params(step = "prepare_annotations_sirius"),
       step = "prepare_annotations_sirius"
@@ -447,7 +447,7 @@ prepare_annotations_sirius <-
     export_output(x = splits$canopus, file = output_can)
     export_output(x = splits$formula, file = output_for)
     export_output(x = splits$structures, file = output_ann[[1]])
-    logger::log_success("SIRIUS annotations prepared successfully")
+    log_success("SIRIUS annotations prepared successfully")
     invisible(c(
       "canopus" = output_can,
       "formula" = output_for,

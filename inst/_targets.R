@@ -1119,7 +1119,7 @@ list(
               },
               warning = function(w) {
                 ## See #118
-                logger::log_warn(
+                log_warn(
                   "HMDB download failed partially, returning empty file instead"
                 )
                 unlink(paths$data$source$libraries$sop$hmdb)
@@ -1768,10 +1768,10 @@ list(
           sp@backend@spectraData$PRECURSOR_MZ |>
           as.numeric()
 
-        logger::log_trace("Imported")
+        log_trace("Imported")
         sp_clean <- sp
 
-        logger::log_trace("Cleaned")
+        log_trace("Cleaned")
         df_meta <- tidytable::tidytable(
           adduct = sp_clean$ADDUCT,
           inchikey = sp_clean$INCHIKEY,
@@ -1798,7 +1798,7 @@ list(
             )
           )
 
-        logger::log_trace("Framed")
+        log_trace("Framed")
         df_clean <- df_meta |>
           tidytable::filter(!is.na(inchikey)) |>
           tidytable::filter(fragments >= 5) |>

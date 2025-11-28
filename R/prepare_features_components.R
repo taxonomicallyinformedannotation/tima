@@ -54,12 +54,12 @@ prepare_features_components <- function(
   }
 
   # Load Component Data ----
-  logger::log_debug(
+  log_debug(
     "Loading molecular network components from {length(input)} file(s)"
   )
 
   # Load and combine component tables
-  # logger::log_trace("Loading component tables")
+  # log_trace("Loading component tables")
   table <- tryCatch(
     {
       purrr::map(
@@ -79,13 +79,13 @@ prepare_features_components <- function(
 
   # Early exit for empty data
   if (nrow(table) == 0L) {
-    logger::log_warn("No component data found in input files")
+    log_warn("No component data found in input files")
     table <- tidytable::tidytable(
       feature_id = character(0),
       component_id = character(0)
     )
   } else {
-    logger::log_debug(
+    log_debug(
       "Loaded {format_count(nrow(table))} component assignments"
     )
 

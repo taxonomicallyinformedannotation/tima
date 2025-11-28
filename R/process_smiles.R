@@ -45,7 +45,7 @@ process_smiles <- function(
     )
   }
 
-  logger::log_info("Processing SMILES with RDKit")
+  log_info("Processing SMILES with RDKit")
 
   # Load Python Processor ----
   load_python_smiles_processor()
@@ -54,11 +54,11 @@ process_smiles <- function(
   table_smiles <- extract_unique_smiles(df, smiles_colname)
 
   if (nrow(table_smiles) == 0L) {
-    logger::log_warn("No valid SMILES to process")
+    log_warn("No valid SMILES to process")
     return(df)
   }
 
-  logger::log_debug("Processing {nrow(table_smiles)} unique SMILES")
+  log_debug("Processing {nrow(table_smiles)} unique SMILES")
 
   # Load or Initialize Cache ----
   table_processed_1 <- load_smiles_cache(cache, smiles_colname)
@@ -70,8 +70,8 @@ process_smiles <- function(
   n_to_process <- nrow(table_smiles_to_process)
 
   if (n_to_process == 0L) {
-    logger::log_info("All SMILES already in cache, no processing needed")
-    logger::log_info("All SMILES already cached, returning existing results")
+    log_info("All SMILES already in cache, no processing needed")
+    log_info("All SMILES already cached, returning existing results")
     return(
       table_processed_1 |>
         tidytable::mutate(
@@ -88,7 +88,7 @@ process_smiles <- function(
   input_smi_file <- tempfile(fileext = ".smi")
   output_csv_file <- tempfile(fileext = ".csv.gz")
 
-  logger::log_info(
+  log_info(
     "Processing ",
     nrow(table_smiles_to_process),
     " new SMILES with RDKit"
@@ -116,7 +116,7 @@ process_smiles <- function(
       !!as.name(smiles_colname) := "structure_smiles_initial"
     )
 
-  logger::log_info(
+  log_info(
     "Successfully processed ",
     nrow(table_processed_2),
     " SMILES"
@@ -151,7 +151,7 @@ load_python_smiles_processor <- function() {
       reticulate::source_python(file = py_script)
     },
     error = function(e) {
-      logger::log_error(
+      log_error(
         "Failed to load Python processor: {conditionMessage(e)}"
       )
       stop(
@@ -181,11 +181,11 @@ load_smiles_cache <- function(cache, smiles_colname) {
   tryCatch(
     {
       cached <- tidytable::fread(cache)
-      logger::log_debug("Loaded {nrow(cached)} cached SMILES")
+      log_debug("Loaded {nrow(cached)} cached SMILES")
       cached
     },
     error = function(e) {
-      logger::log_warn("Cache load failed: {conditionMessage(e)}")
+      log_warn("Cache load failed: {conditionMessage(e)}")
       create_empty_smiles_template(smiles_colname)
     }
   )

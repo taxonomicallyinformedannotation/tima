@@ -37,7 +37,7 @@ prepare_libraries_sop_lotus <- function(
   # Process LOTUS data if available
   if (file.exists(input)) {
     file_size <- file.info(input)$size
-    logger::log_info(
+    log_info(
       "Loading LOTUS database: {basename(input)} ({format_bytes(file_size)})"
     )
 
@@ -64,15 +64,15 @@ prepare_libraries_sop_lotus <- function(
       n = nrow(lotus_prepared)
     )
   } else {
-    logger::log_warn(
+    log_warn(
       "LOTUS database not found at: {input}"
     )
-    logger::log_warn("Returning empty placeholder file")
+    log_warn("Returning empty placeholder file")
     lotus_prepared <- fake_sop_columns()
   }
 
   # Export prepared data
-  # logger::log_trace("Exporting prepared LOTUS data")
+  # log_trace("Exporting prepared LOTUS data")
   export_output(x = lotus_prepared, file = output)
 
   return(output)

@@ -48,7 +48,7 @@ extract_spectra <- function(object) {
   # Extract Spectra Metadata ----
 
   # Extract spectra metadata
-  # logger::log_trace("Extracting spectra metadata")
+  # log_trace("Extracting spectra metadata")
   spectra <- object@backend@spectraData |>
     data.frame() |>
     tidytable::as_tidytable()
@@ -56,7 +56,7 @@ extract_spectra <- function(object) {
   # Extract Peak Data ----
 
   # Extract peak data (mz and intensity) efficiently
-  # logger::log_trace("Extracting peak data (mz and intensity)")
+  # log_trace("Extracting peak data (mz and intensity)")
   spectra$mz <- lapply(
     X = object@backend@peaksData,
     # TODO
@@ -93,7 +93,7 @@ extract_spectra <- function(object) {
   # Harmonize Column Types ----
 
   # Harmonize column types
-  # logger::log_trace("Harmonizing column types")
+  # log_trace("Harmonizing column types")
   spectra <- spectra |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::any_of(x = incoherent_logical),
@@ -117,7 +117,7 @@ extract_spectra <- function(object) {
   ]
 
   if (length(columns_to_harmonize) > 0L) {
-    # logger::log_trace(
+    # log_trace(
     #  "Harmonizing {length(columns_to_harmonize)} column names"
     # )
     spectra <- spectra |>
@@ -127,7 +127,7 @@ extract_spectra <- function(object) {
       tidytable::rename(tidyselect::any_of(x = columns_to_harmonize))
   }
 
-  logger::log_debug("Extracted {nrow(spectra)} spectra")
+  log_debug("Extracted {nrow(spectra)} spectra")
 
   return(spectra)
 }

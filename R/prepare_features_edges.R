@@ -77,12 +77,12 @@ prepare_features_edges <- function(
 
   # Load Edge Tables ----
 
-  logger::log_info("Preparing molecular network edges")
-  logger::log_debug("MS1 edges: {input[['ms1']]}")
-  logger::log_debug("Spectral edges: {input[['spectral']]}")
+  log_info("Preparing molecular network edges")
+  log_debug("MS1 edges: {input[['ms1']]}")
+  log_debug("Spectral edges: {input[['spectral']]}")
 
   # Load edges tables
-  # logger::log_trace("Loading edge tables")
+  # log_trace("Loading edge tables")
   edges_tables <- tryCatch(
     {
       purrr::map(
@@ -101,8 +101,8 @@ prepare_features_edges <- function(
   edges_ms2 <- edges_tables[["spectral"]]
   rm(edges_tables)
 
-  logger::log_debug("MS1 edges: {nrow(edges_ms1)} rows")
-  logger::log_debug("Spectral edges: {nrow(edges_ms2)} rows")
+  log_debug("MS1 edges: {nrow(edges_ms1)} rows")
+  log_debug("Spectral edges: {nrow(edges_ms2)} rows")
 
   # Extract Entropy Information ----
 
@@ -115,14 +115,14 @@ prepare_features_edges <- function(
     ) |>
     tidytable::distinct()
 
-  # logger::log_trace(
+  # log_trace(
   # "Extracted entropy for {nrow(features_entropy)} features"
   # )
 
   # Combine and Format Edges ----
 
   # Combine and format edges table
-  # logger::log_trace("Combining and formatting edge tables")
+  # log_trace("Combining and formatting edge tables")
   edges_table_treated <- edges_ms1 |>
     tidytable::full_join(y = features_entropy) |>
     tidytable::full_join(y = edges_ms2) |>
@@ -134,7 +134,7 @@ prepare_features_edges <- function(
       feature_target := tidytable::coalesce(feature_target, feature_source)
     )
 
-  logger::log_info("Prepared {nrow(edges_table_treated)} total edges")
+  log_info("Prepared {nrow(edges_table_treated)} total edges")
 
   # Explicit memory cleanup
   rm(edges_ms1, edges_ms2, features_entropy)

@@ -74,7 +74,7 @@ prepare_annotations_gnps <- function(
     }
   }
 
-  logger::log_info("Preparing GNPS annotations")
+  log_info("Preparing GNPS annotations")
 
   if (length(input) == 0) {
     input <- "w1llN3v3r3v3r3x1st"
@@ -85,7 +85,7 @@ prepare_annotations_gnps <- function(
         unlist()
     )
   ) {
-    # logger::log_trace("Loading and formatting GNPS results")
+    # log_trace("Loading and formatting GNPS results")
     ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
     table <- purrr::map(
       .x = input,
@@ -150,7 +150,7 @@ prepare_annotations_gnps <- function(
         str_tax_npc = str_tax_npc
       )
   } else {
-    logger::log_warn(
+    log_warn(
       "No GNPS annotations found, returning an empty file instead"
     )
     table <- fake_annotations_columns()

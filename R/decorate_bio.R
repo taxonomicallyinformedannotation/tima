@@ -116,7 +116,7 @@ decorate_bio <- function(
   missing_cols <- setdiff(required_cols, names(annot_table_wei_bio))
 
   if (length(missing_cols) > 0) {
-    logger::log_warn(
+    log_warn(
       "decorate_bio: missing expected columns: {paste(missing_cols, collapse = ', ')}"
     )
     return(annot_table_wei_bio)
@@ -165,7 +165,7 @@ decorate_bio <- function(
 
   # Log Summary Statistics ----
 
-  logger::log_info(
+  log_info(
     "Taxonomically informed metabolite annotation reranked:\n",
     "  Kingdom level: {counts['kingdom']} structures\n",
     "  Phylum level:  {counts['phylum']} structures\n",
