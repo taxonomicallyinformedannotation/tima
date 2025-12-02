@@ -1,3 +1,106 @@
+# Helper Functions ----
+
+#' Calculate similarity for a target spectrum
+#' @keywords internal
+.calculate_target_similarity <- function(
+  target_idx,
+  frags,
+  precs,
+  method,
+  ms2_tolerance,
+  ppm_tolerance,
+  query_spectrum,
+  query_precursor
+) {
+  target_spectrum <- frags[[target_idx]]
+  target_precursor <- precs[[target_idx]]
+  calculate_similarity(
+    method = method,
+    query_spectrum = query_spectrum,
+    target_spectrum = target_spectrum,
+    query_precursor = query_precursor,
+    target_precursor = target_precursor,
+    dalton = ms2_tolerance,
+    ppm = ppm_tolerance,
+    return_matched_peaks = TRUE
+  )
+}
+
+#' Process query spectrum against all subsequent spectra
+#' @keywords internal
+.process_query_spectrum <- function(
+  index,
+  nspecs,
+  frags,
+  precs,
+  method,
+  ms2_tolerance,
+  ppm_tolerance,
+  threshold,
+  matched_peaks
+) {
+  target_indices <- (index + 1L):nspecs
+  query_spectrum <- frags[[index]]
+  query_precursor <- precs[[index]]
+
+  # Calculate similarities for all targets
+  results <- purrr::map(
+    .x = target_indices,
+    .f = .calculate_target_similarity,
+    frags = frags,
+    precs = precs,
+    method = method,
+    ms2_tolerance = ms2_tolerance,
+    ppm_tolerance = ppm_tolerance,
+    query_spectrum = query_spectrum,
+    query_precursor = query_precursor
+  )
+
+  # Extract scores and matches
+  # Handle both list format (score/matches) and numeric format (entropy)
+  scores <- vapply(
+    results,
+    function(x) {
+      if (is.list(x) && "score" %in% names(x)) {
+        x$score
+      } else if (is.numeric(x)) {
+        x
+      } else {
+        0.0
+      }
+    },
+    numeric(1L),
+    USE.NAMES = FALSE
+  )
+
+  matches <- vapply(
+    results,
+    function(x) {
+      if (is.list(x) && "matches" %in% names(x)) {
+        x$matches
+      } else {
+        0L # No match count for entropy method
+      }
+    },
+    integer(1L),
+    USE.NAMES = FALSE
+  )
+
+  # Filter by thresholds
+  valid_indices <- which(scores >= threshold & matches >= matched_peaks)
+
+  if (length(valid_indices) > 0L) {
+    data.frame(
+      feature_id = index,
+      target_id = target_indices[valid_indices],
+      score = scores[valid_indices],
+      matched_peaks = matches[valid_indices]
+    )
+  } else {
+    NULL
+  }
+}
+
 #' @title Create spectral similarity network edges
 #'
 #' @description Calculates pairwise spectral similarity between all spectra to
@@ -88,79 +191,18 @@ create_edges <- function(
   edges <- purrr::map(
     .progress = show_progress,
     .x = indices,
-    # TODO
-    .f = function(index) {
-      target_indices <- (index + 1L):nspecs
-      query_spectrum <- frags[[index]]
-      query_precursor <- precs[[index]]
-
-      # Calculate similarities for all targets
-      results <- purrr::map(
-        .x = target_indices,
-        # TODO
-        .f = function(target_idx) {
-          target_spectrum <- frags[[target_idx]]
-          target_precursor <- precs[[target_idx]]
-          calculate_similarity(
-            method = method,
-            query_spectrum = query_spectrum,
-            target_spectrum = target_spectrum,
-            query_precursor = query_precursor,
-            target_precursor = target_precursor,
-            dalton = ms2_tolerance,
-            ppm = ppm_tolerance,
-            return_matched_peaks = TRUE
-          )
-        }
-      )
-
-      # Extract scores and matches
-      # Handle both list format (score/matches) and numeric format (entropy)
-      scores <- vapply(
-        results,
-        function(x) {
-          if (is.list(x) && "score" %in% names(x)) {
-            x$score
-          } else if (is.numeric(x)) {
-            x
-          } else {
-            0.0
-          }
-        },
-        numeric(1L),
-        USE.NAMES = FALSE
-      )
-
-      matches <- vapply(
-        results,
-        function(x) {
-          if (is.list(x) && "matches" %in% names(x)) {
-            x$matches
-          } else {
-            0L # No match count for entropy method
-          }
-        },
-        integer(1L),
-        USE.NAMES = FALSE
-      )
-
-      # Filter by thresholds
-      valid_indices <- which(scores >= threshold & matches >= matched_peaks)
-
-      if (length(valid_indices) > 0L) {
-        data.frame(
-          feature_id = index,
-          target_id = target_indices[valid_indices],
-          score = scores[valid_indices],
-          matched_peaks = matches[valid_indices]
-        )
-      } else {
-        NULL
-      }
-    }
+    .f = .process_query_spectrum,
+    nspecs = nspecs,
+    frags = frags,
+    precs = precs,
+    method = method,
+    ms2_tolerance = ms2_tolerance,
+    ppm_tolerance = ppm_tolerance,
+    threshold = threshold,
+    matched_peaks = matched_peaks
   )
 
-  # Combine and Return Results ----
+  # Combine Results ----
 
   # Remove NULL entries and combine
   edges <- edges[!vapply(edges, is.null, logical(1L), USE.NAMES = FALSE)]
