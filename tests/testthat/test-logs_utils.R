@@ -401,11 +401,11 @@ test_that("logging functions use sprintf-style formatting", {
   on.exit(unlink(temp_log), add = TRUE)
 
   # Setup logger
-  tima:::setup_logger(temp_log, 400)
+  setup_logger(temp_log, 400)
 
   # Test sprintf-style logging
-  tima:::log_info("Test %d: %s", 1, "message")
-  tima:::log_warn("Warning %s", "test")
+  log_info("Test %d: %s", 1, "message")
+  log_warn("Warning %s", "test")
 
   # Read log and verify format
   log_content <- readLines(temp_log)

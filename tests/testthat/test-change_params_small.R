@@ -501,3 +501,86 @@ test_that("change_params_small updates both yaml files", {
   expect_equal(params1$files$pattern, "updated_pattern")
   expect_equal(params2$files$pattern, "test")
 })
+
+# ---- Internal function tests ----
+
+test_that("validate_params_small_inputs validates polarity", {
+  # Valid values
+  expect_silent(validate_params_small_inputs(ms_pol = "pos"))
+  expect_silent(validate_params_small_inputs(ms_pol = "neg"))
+  expect_silent(validate_params_small_inputs(ms_pol = NULL))
+
+  # Invalid values
+  expect_error(
+    validate_params_small_inputs(ms_pol = "invalid"),
+    "must be either 'pos' or 'neg'"
+  )
+
+  expect_error(
+    validate_params_small_inputs(ms_pol = "positive"),
+    "must be either 'pos' or 'neg'"
+  )
+
+  expect_error(
+    validate_params_small_inputs(ms_pol = 1),
+    "must be either 'pos' or 'neg'"
+  )
+})
+
+test_that("copy_file_to_target copies files correctly", {
+  skip_if_not_installed("fs")
+
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  # Create source file
+  source_file <- file.path(tmpdir, "source.txt")
+  writeLines("test content", source_file)
+
+  # Create target directory
+  target_dir <- file.path(tmpdir, "target")
+  dir.create(target_dir, recursive = TRUE)
+
+  # Copy file
+  result <- copy_file_to_target(
+    file_path = source_file,
+    target_dir = target_dir,
+    file_description = "Test"
+  )
+
+  expect_true(file.exists(result))
+  expect_equal(dirname(result), target_dir)
+  expect_equal(basename(result), "source.txt")
+})
+
+test_that("copy_file_to_target errors on missing file", {
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  expect_error(
+    copy_file_to_target(
+      file_path = file.path(tmpdir, "nonexistent.txt"),
+      target_dir = tmpdir,
+      file_description = "Missing"
+    ),
+    "Missing file does not exist"
+  )
+})
+
+test_that("create_yaml_null_handler creates proper function", {
+  handler <- create_yaml_null_handler()
+
+  expect_true(is.function(handler))
+
+  # Test NA conversion
+  result_na <- handler(NA)
+  expect_equal(result_na |> names(), NULL)
+  expect_s3_class(result_na, "verbatim")
+
+  # Test non-NA passthrough
+  expect_equal(handler("test"), "test")
+  expect_equal(handler(42), 42)
+  expect_equal(handler(TRUE), TRUE)
+})
