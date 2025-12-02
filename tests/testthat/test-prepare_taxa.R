@@ -285,32 +285,6 @@ test_that("prepare_taxa handles pipe-separated organisms", {
   expect_true(grepl("Org1|Org2", df$sample_organism_name[1]))
 })
 
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("prepare_taxa requires metadata if taxon not specified", {
-#   temp_input <- tempfile(fileext = ".tsv")
-#   temp_ott <- tempfile(fileext = ".tsv")
-#
-#   writeLines("feature_id\tintensity\nFT001\t1000", temp_input)
-#   writeLines("organism\tottid\nHomo sapiens\t770309", temp_ott)
-#
-#   # Test missing metadata when taxon is NULL
-#   expect_error(
-#     prepare_taxa(
-#       input = temp_input,
-#       org_tax_ott = temp_ott,
-#       metadata = "nonexistent_metadata.tsv",
-#       taxon = NULL,
-#       output = "output.tsv"
-#     ),
-#     "not found|must be provided"
-#   )
-#
-#   unlink(temp_input)
-#   unlink(temp_ott)
-# })
-
 test_that("prepare_taxa works with single taxon assignment", {
   # Create temp files for test
   temp_input <- tempfile(fileext = ".tsv")
@@ -379,33 +353,3 @@ test_that("prepare_taxa works with single taxon assignment", {
   expect_true(all(result$sample_organism_08_genus == "Arabidopsis"))
   expect_true(all(result$sample_organism_09_species == "Arabidopsis thaliana"))
 })
-
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("prepare_taxa handles empty taxon string as NULL", {
-#
-#
-#
-#   input <- file.path( "features.tsv")
-#   ott <- file.path( "ott.tsv")
-#   metadata <- file.path( "metadata.tsv")
-#   output <- file.path( "output.tsv")
-#
-#   writeLines("feature_id\trt\tmz\nFT001\t1.5\t200", input)
-#   writeLines("organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\nTest org\t12345\tEukaryota", ott)
-#   writeLines("filename\torganism\nfile1\tTest org", metadata)
-#
-#   # Empty string should be treated as NULL and require metadata
-#   expect_error(
-#     prepare_taxa(
-#       input = input,
-#       org_tax_ott = ott,
-#       taxon = "",  # Empty string
-#       metadata = file.path( "nonexistent.tsv"),
-#       output = output,
-#       extension = FALSE
-#     ),
-#     "not found|must be provided"
-#   )
-# })

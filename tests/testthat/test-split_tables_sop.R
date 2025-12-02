@@ -1,41 +1,6 @@
 # Test Suite: split_tables_sop ----
 
 library(testthat)
-set.seed(NULL)
-
-## Internal Utility Helpers ----
-
-# Create a minimal SOP table with processed SMILES data
-# (simulates what process_smiles would return)
-create_processed_sop_table <- function(n = 2) {
-  tidytable::tidytable(
-    structure_inchikey_connectivity_layer = generate_fake_inchikey(
-      n,
-      seed = 42
-    )[1:n] |>
-      stringi::stri_sub(from = 1, to = 14),
-    structure_inchikey = generate_fake_inchikey(n, seed = 42),
-    structure_smiles = c("CCO", "CCC")[1:n],
-    structure_smiles_no_stereo = c("CCO", "CCC")[1:n],
-    structure_name = c("Ethanol", "Propane")[1:n],
-    structure_molecular_formula = c("C2H6O", "C3H8")[1:n],
-    structure_exact_mass = c(46.041865, 44.062600)[1:n],
-    structure_xlogp = c(-0.18, 1.09)[1:n],
-    organism_name = c("Homo sapiens", "Mus musculus")[1:n],
-    organism_taxonomy_01domain = rep("Eukaryota", n),
-    organism_taxonomy_02kingdom = rep("Animalia", n),
-    organism_taxonomy_03phylum = rep("Chordata", n),
-    organism_taxonomy_04class = rep("Mammalia", n),
-    organism_taxonomy_05order = c("Primates", "Rodentia")[1:n],
-    organism_taxonomy_06family = c("Hominidae", "Muridae")[1:n],
-    organism_taxonomy_07tribe = rep(NA_character_, n),
-    organism_taxonomy_08genus = c("Homo", "Mus")[1:n],
-    organism_taxonomy_09species = c("Homo sapiens", "Mus musculus")[1:n],
-    organism_taxonomy_10varietas = rep(NA_character_, n),
-    organism_taxonomy_ottid = as.character(123456 + seq_len(n) - 1),
-    reference_doi = paste0("10.1234/test", seq_len(n))
-  )
-}
 
 ## Input validation ----
 
@@ -79,47 +44,8 @@ test_that("split_tables_sop handles empty table gracefully", {
 ## Functional Tests ----
 
 test_that("split_tables_sop splits table into components", {
-  # Create pre-processed table (simulating process_smiles output)
-  sop_table <- tidytable::tidytable(
-    structure_inchikey = c(
-      "ABCDEFGHIJKLMN-UHFFFAOYSA-N",
-      "OPQRSTUVWXYZAB-UHFFFAOYSA-N"
-    ),
-    structure_inchikey_connectivity_layer = c(
-      "ABCDEFGHIJKLMN",
-      "OPQRSTUVWXYZAB"
-    ),
-    structure_smiles = c("CCO", "CCC"),
-    structure_smiles_no_stereo = c("CCO", "CCC"),
-    structure_name = c("Ethanol", "Propane"),
-    structure_molecular_formula = c("C2H6O", "C3H8"),
-    structure_exact_mass = c(46.041865, 44.062600),
-    structure_xlogp = c(-0.18, 1.09),
-    structure_tax_cla_chemontid = c("CHEMONT:001", "CHEMONT:002"),
-    structure_tax_cla_01kin = c("Organic compounds", "Organic compounds"),
-    structure_tax_cla_02sup = c("Alcohols", "Alkanes"),
-    structure_tax_cla_03cla = c("Primary alcohols", "Straight chain alkanes"),
-    structure_tax_cla_04dirpar = c(
-      "Ethanol derivatives",
-      "Propane derivatives"
-    ),
-    structure_tax_npc_01pat = c("Pathway1", "Pathway2"),
-    structure_tax_npc_02sup = c("Superclass1", "Superclass2"),
-    structure_tax_npc_03cla = c("Class1", "Class2"),
-    organism_name = c("Homo sapiens", "Mus musculus"),
-    organism_taxonomy_01domain = c("Eukaryota", "Eukaryota"),
-    organism_taxonomy_02kingdom = c("Animalia", "Animalia"),
-    organism_taxonomy_03phylum = c("Chordata", "Chordata"),
-    organism_taxonomy_04class = c("Mammalia", "Mammalia"),
-    organism_taxonomy_05order = c("Primates", "Rodentia"),
-    organism_taxonomy_06family = c("Hominidae", "Muridae"),
-    organism_taxonomy_07tribe = c(NA, NA),
-    organism_taxonomy_08genus = c("Homo", "Mus"),
-    organism_taxonomy_09species = c("Homo sapiens", "Mus musculus"),
-    organism_taxonomy_10varietas = c(NA, NA),
-    organism_taxonomy_ottid = c("123456", "234567"),
-    reference_doi = c("10.1234/test1", "10.1234/test2")
-  )
+  # Load fixture instead of creating table inline
+  sop_table <- load_fixture("sop_table_minimal")
 
   # Mock process_smiles to return the same structure data
   with_mocked_bindings(
@@ -178,37 +104,8 @@ test_that("split_tables_sop splits table into components", {
 })
 
 test_that("split_tables_sop handles missing SMILES gracefully", {
-  sop_table <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
-    structure_inchikey = "ABCDEFGHIJKLMN-UHFFFAOYSA-N",
-    structure_smiles = NA_character_,
-    structure_smiles_no_stereo = "CCO",
-    structure_name = "Ethanol",
-    structure_molecular_formula = "C2H6O",
-    structure_exact_mass = 46.041865,
-    structure_xlogp = -0.18,
-    organism_name = "Test organism",
-    organism_taxonomy_01domain = "Eukaryota",
-    organism_taxonomy_02kingdom = "Plantae",
-    organism_taxonomy_03phylum = "Tracheophyta",
-    organism_taxonomy_04class = "Magnoliopsida",
-    organism_taxonomy_05order = "Gentianales",
-    organism_taxonomy_06family = "Gentianaceae",
-    organism_taxonomy_07tribe = NA,
-    organism_taxonomy_08genus = "Gentiana",
-    organism_taxonomy_09species = "Gentiana lutea",
-    organism_taxonomy_10varietas = NA,
-    organism_taxonomy_ottid = "123456",
-    reference_doi = "10.1234/test",
-    structure_tax_cla_chemontid = "CHEMONT:001",
-    structure_tax_cla_01kin = "Organic compounds",
-    structure_tax_cla_02sup = NA,
-    structure_tax_cla_03cla = NA,
-    structure_tax_cla_04dirpar = NA,
-    structure_tax_npc_01pat = NA,
-    structure_tax_npc_02sup = NA,
-    structure_tax_npc_03cla = NA
-  )
+  # Load fixture with missing SMILES instead of creating inline
+  sop_table <- load_fixture("sop_table_missing_smiles")
 
   with_mocked_bindings(
     process_smiles = function(table, cache) {
@@ -239,38 +136,8 @@ test_that("split_tables_sop handles missing SMILES gracefully", {
 })
 
 test_that("split_tables_sop preserves unique organisms", {
-  # Table with duplicate organisms
-  sop_table <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = c("ABCDEFG", "HIJKLMN"),
-    structure_inchikey = c("ABCDEFG-UHFFFAOYSA-N", "HIJKLMN-UHFFFAOYSA-N"),
-    structure_smiles = c("CCO", "CCC"),
-    structure_smiles_no_stereo = c("CCO", "CCC"),
-    structure_name = c("Ethanol", "Propane"),
-    structure_molecular_formula = c("C2H6O", "C3H8"),
-    structure_exact_mass = c(46.041865, 44.062600),
-    structure_xlogp = c(-0.18, 1.09),
-    organism_name = c("Homo sapiens", "Homo sapiens"), # Same organism
-    organism_taxonomy_01domain = c("Eukaryota", "Eukaryota"),
-    organism_taxonomy_02kingdom = c("Animalia", "Animalia"),
-    organism_taxonomy_03phylum = c("Chordata", "Chordata"),
-    organism_taxonomy_04class = c("Mammalia", "Mammalia"),
-    organism_taxonomy_05order = c("Primates", "Primates"),
-    organism_taxonomy_06family = c("Hominidae", "Hominidae"),
-    organism_taxonomy_07tribe = c(NA, NA),
-    organism_taxonomy_08genus = c("Homo", "Homo"),
-    organism_taxonomy_09species = c("Homo sapiens", "Homo sapiens"),
-    organism_taxonomy_10varietas = c(NA, NA),
-    organism_taxonomy_ottid = c("123456", "123456"),
-    reference_doi = c("10.1234/test1", "10.1234/test2"),
-    structure_tax_cla_chemontid = c("CHEMONT:001", "CHEMONT:002"),
-    structure_tax_cla_01kin = c("Organic", "Organic"),
-    structure_tax_cla_02sup = c(NA, NA),
-    structure_tax_cla_03cla = c(NA, NA),
-    structure_tax_cla_04dirpar = c(NA, NA),
-    structure_tax_npc_01pat = c(NA, NA),
-    structure_tax_npc_02sup = c(NA, NA),
-    structure_tax_npc_03cla = c(NA, NA)
-  )
+  # Load fixture with duplicate organisms instead of creating inline
+  sop_table <- load_fixture("sop_table_duplicate_organisms")
 
   with_mocked_bindings(
     process_smiles = function(table, cache) {
@@ -306,31 +173,8 @@ test_that("split_tables_sop preserves unique organisms", {
 })
 
 test_that("split_tables_sop handles cache parameter", {
-  skip("Requires RDKit/Python - process_smiles dependency")
-
-  sop_table <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
-    structure_inchikey = "ABCDEFGHIJKLMN-UHFFFAOYSA-N",
-    structure_smiles = "CCO",
-    structure_smiles_no_stereo = "CCO",
-    structure_name = "Ethanol",
-    structure_molecular_formula = "C2H6O",
-    structure_exact_mass = 46.041865,
-    structure_xlogp = -0.18,
-    organism_name = "Test organism",
-    organism_taxonomy_01domain = "Eukaryota",
-    organism_taxonomy_02kingdom = "Plantae",
-    organism_taxonomy_03phylum = "Tracheophyta",
-    organism_taxonomy_04class = "Magnoliopsida",
-    organism_taxonomy_05order = "Gentianales",
-    organism_taxonomy_06family = "Gentianaceae",
-    organism_taxonomy_07tribe = NA,
-    organism_taxonomy_08genus = "Gentiana",
-    organism_taxonomy_09species = "Gentiana lutea",
-    organism_taxonomy_10varietas = NA,
-    organism_taxonomy_ottid = "123456",
-    reference_doi = "10.1234/test"
-  )
+  # Load fixture instead of creating inline
+  sop_table <- load_fixture("sop_table_cache_test")
 
   # With NULL cache
   result_no_cache <- split_tables_sop(table = sop_table, cache = NULL)
@@ -345,67 +189,21 @@ test_that("split_tables_sop handles cache parameter", {
 ## Edge Cases ----
 
 test_that("split_tables_sop handles special characters in organism names", {
-  skip("Requires RDKit/Python - process_smiles dependency")
-
-  sop_table <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
-    structure_inchikey = "ABCDEFGHIJKLMN-UHFFFAOYSA-N",
-    structure_smiles = "CCO",
-    structure_smiles_no_stereo = "CCO",
-    structure_name = "Ethanol",
-    structure_molecular_formula = "C2H6O",
-    structure_exact_mass = 46.041865,
-    structure_xlogp = -0.18,
-    organism_name = "Test-organism (with special) chars!",
-    organism_taxonomy_01domain = "Eukaryota",
-    organism_taxonomy_02kingdom = "Plantae",
-    organism_taxonomy_03phylum = "Tracheophyta",
-    organism_taxonomy_04class = "Magnoliopsida",
-    organism_taxonomy_05order = "Gentianales",
-    organism_taxonomy_06family = "Gentianaceae",
-    organism_taxonomy_07tribe = NA,
-    organism_taxonomy_08genus = "Gentiana",
-    organism_taxonomy_09species = "Gentiana lutea",
-    organism_taxonomy_10varietas = NA,
-    organism_taxonomy_ottid = "123456",
-    reference_doi = "10.1234/test"
-  )
+  # Load fixture with special characters instead of creating inline
+  sop_table <- load_fixture("sop_table_special_chars")
 
   result <- split_tables_sop(table = sop_table, cache = NULL)
 
   expect_type(result, "list")
-  expect_true(nrow(result$table_organisms) > 0)
+  expect_true(nrow(result$org_tax_ott) > 0)
 })
 
 test_that("split_tables_sop handles missing taxonomy fields", {
-  skip("Requires RDKit/Python - process_smiles dependency")
-
-  sop_table <- tidytable::tidytable(
-    structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
-    structure_inchikey = "ABCDEFGHIJKLMN-UHFFFAOYSA-N",
-    structure_smiles = "CCO",
-    structure_smiles_no_stereo = "CCO",
-    structure_name = "Ethanol",
-    structure_molecular_formula = "C2H6O",
-    structure_exact_mass = 46.041865,
-    structure_xlogp = -0.18,
-    organism_name = "Test organism",
-    organism_taxonomy_01domain = NA,
-    organism_taxonomy_02kingdom = NA,
-    organism_taxonomy_03phylum = NA,
-    organism_taxonomy_04class = NA,
-    organism_taxonomy_05order = NA,
-    organism_taxonomy_06family = NA,
-    organism_taxonomy_07tribe = NA,
-    organism_taxonomy_08genus = NA,
-    organism_taxonomy_09species = NA,
-    organism_taxonomy_10varietas = NA,
-    organism_taxonomy_ottid = "123456",
-    reference_doi = "10.1234/test"
-  )
+  # Load fixture with missing taxonomy instead of creating inline
+  sop_table <- load_fixture("sop_table_missing_taxonomy")
 
   result <- split_tables_sop(table = sop_table, cache = NULL)
 
   expect_type(result, "list")
-  expect_true(nrow(result$table_organisms) >= 0)
+  expect_true(nrow(result$org_tax_ott) >= 0)
 })

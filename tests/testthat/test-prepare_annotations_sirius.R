@@ -82,7 +82,7 @@ test_that("test-prepare_annotations_sirius validates output parameters and struc
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "output_ann must be a single character string",
+    "Output path(s) must be single character strings: output_ann",
     fixed = TRUE
   )
   expect_error(
@@ -98,8 +98,8 @@ test_that("test-prepare_annotations_sirius validates output parameters and struc
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "file(.*) not found",
-    fixed = FALSE
+    "Required file(s) not found:",
+    fixed = TRUE
   )
 })
 
@@ -229,7 +229,8 @@ test_that("validate_sirius_inputs validates output paths", {
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "output_ann must be a single character string"
+    "Output path(s) must be single character strings: output_ann",
+    fixed = TRUE
   )
 
   expect_error(
@@ -244,7 +245,8 @@ test_that("validate_sirius_inputs validates output paths", {
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "output_can must be a single character string"
+    "Output path(s) must be single character strings: output_can",
+    fixed = TRUE
   )
 
   expect_error(
@@ -259,7 +261,8 @@ test_that("validate_sirius_inputs validates output paths", {
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "output_for must be a single character string"
+    "Output path(s) must be single character strings: output_for",
+    fixed = TRUE
   )
 })
 

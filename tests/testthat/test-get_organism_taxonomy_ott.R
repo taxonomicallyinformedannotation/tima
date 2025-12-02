@@ -12,7 +12,15 @@ test_that("get_organism_taxonomy_ott works with valid organism", {
 test_that("get_organism_taxonomy_ott handles invalid organism", {
   wrong_taxon_df <- data.frame("organism" = "Gentiano luteo")
 
-  result <- get_organism_taxonomy_ott(df = wrong_taxon_df)
+  expect_warning(
+    expect_warning(
+      result <- get_organism_taxonomy_ott(df = wrong_taxon_df),
+      "gentiano are not matched",
+      fixed = TRUE
+    ),
+    "Gentiano luteo are not matched",
+    fixed = TRUE
+  )
   expect_s3_class(result, "data.frame")
 })
 

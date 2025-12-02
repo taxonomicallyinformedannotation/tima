@@ -287,7 +287,7 @@ test_that("get_last_version_from_zenodo handles network errors gracefully", {
 test_that("get_last_version_from_zenodo handles file size comparison", {
   skip_if_offline()
   skip_on_cran()
-  skip("Requires actual Zenodo download - use for integration testing")
+  skip("Requires actual Zenodo download")
 
   # This would test actual download from a real Zenodo record
   # Skipped to avoid network calls in regular testing
@@ -317,7 +317,7 @@ test_that("get_last_version_from_zenodo handles file size comparison", {
 test_that("get_last_version_from_zenodo accepts various valid DOI formats", {
   skip_if_offline()
   skip_on_cran()
-  skip("Requires network access")
+  skip("Requires actual Zenodo download")
 
   # Standard Zenodo DOI - should not error during validation
   # (will error at network layer which we catch differently)

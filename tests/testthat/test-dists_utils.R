@@ -145,13 +145,15 @@ test_that("dist_groups validates input length", {
   # Group vector too short
   expect_error(
     dist_groups(d, c("A")),
-    "Grouping vector length (.*) must match number of observations (.*)"
+    "Grouping vector length (1) must match number of observations (2)",
+    fixed = TRUE
   )
 
   # Group vector too long
   expect_error(
     dist_groups(d, c("A", "B", "C")),
-    "Grouping vector length (.*) must match number of observations (.*)"
+    "Grouping vector length (3) must match number of observations (2)",
+    fixed = TRUE
   )
 })
 

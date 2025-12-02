@@ -375,8 +375,16 @@ test_that("parse_adduct handles all test cases correctly", {
 test_that("parse_adduct is deterministic", {
   adduct <- "[M+H-H2O]+]+"
 
-  result1 <- parse_adduct(adduct)
-  result2 <- parse_adduct(adduct)
+  expect_warning(
+    result1 <- parse_adduct(adduct),
+    "The given formula '' contains invalid symbols.",
+    fixed = TRUE
+  )
+  expect_warning(
+    result2 <- parse_adduct(adduct),
+    "The given formula '' contains invalid symbols.",
+    fixed = TRUE
+  )
 
   expect_identical(result1, result2)
 })
