@@ -225,26 +225,27 @@ weight_bio <- function(
     tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
     tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
     tidytable::select(
-      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
-      candidate_organism_name = organism_name,
-      candidate_organism_01_domain = organism_taxonomy_01domain,
-      candidate_organism_02_kingdom = organism_taxonomy_02kingdom,
-      candidate_organism_03_phylum = organism_taxonomy_03phylum,
-      candidate_organism_04_class = organism_taxonomy_04class,
-      candidate_organism_05_order = organism_taxonomy_05order,
-      # candidate_organism_05_1_infraorder =
-      # organism_taxonomy_05_1infraorder,
-      candidate_organism_06_family = organism_taxonomy_06family,
-      # candidate_organism_06_1_subfamily =
-      # organism_taxonomy_06_1subfamily,
-      candidate_organism_07_tribe = organism_taxonomy_07tribe,
-      # candidate_organism_07_1_subtribe = organism_taxonomy_07_1subtribe,
-      candidate_organism_08_genus = organism_taxonomy_08genus,
-      # candidate_organism_08_1_subgenus = organism_taxonomy_08_1subgenus,
-      candidate_organism_09_species = organism_taxonomy_09species,
-      # candidate_organism_09_1_subspecies =
-      # organism_taxonomy_09_1subspecies,
-      candidate_organism_10_varietas = organism_taxonomy_10varietas
+      tidyselect::all_of(
+        x = c(
+          "candidate_structure_inchikey_connectivity_layer" = "structure_inchikey_connectivity_layer",
+          "candidate_organism_name" = "organism_name",
+          "candidate_organism_01_domain" = "organism_taxonomy_01domain",
+          "candidate_organism_02_kingdom" = "organism_taxonomy_02kingdom",
+          "candidate_organism_03_phylum" = "organism_taxonomy_03phylum",
+          "candidate_organism_04_class" = "organism_taxonomy_04class",
+          "candidate_organism_05_order" = "organism_taxonomy_05order",
+          # "candidate_organism_05_1_infraorder" = "organism_taxonomy_05_1infraorder",
+          "candidate_organism_06_family" = "organism_taxonomy_06family",
+          # "candidate_organism_06_1_subfamily" = "organism_taxonomy_06_1subfamily",
+          "candidate_organism_07_tribe" = "organism_taxonomy_07tribe",
+          # "candidate_organism_07_1_subtribe" = "organism_taxonomy_07_1subtribe",
+          "candidate_organism_08_genus" = "organism_taxonomy_08genus",
+          # "candidate_organism_08_1_subgenus" = "organism_taxonomy_08_1subgenus",
+          "candidate_organism_09_species" = "organism_taxonomy_09species",
+          # "candidate_organism_09_1_subspecies" = "organism_taxonomy_09_1subspecies",
+          "candidate_organism_10_varietas" = "organism_taxonomy_10varietas"
+        )
+      )
     ) |>
     tidytable::distinct() |>
     tidytable::mutate(tidytable::across(
