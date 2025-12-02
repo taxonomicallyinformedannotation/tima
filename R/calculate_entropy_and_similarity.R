@@ -1,47 +1,3 @@
-#' @title Calculate entropy score
-#'
-#' @description This function calculates spectral entropy and similarity scores
-#'     by comparing query spectra against library spectra. Uses entropy-based
-#'     similarity measures to match MS2 fragmentation patterns.
-#'
-#' @include calculate_similarity.R
-#' @include validations_utils.R
-#'
-#' @param lib_ids Character vector of library spectrum IDs
-#' @param lib_precursors Numeric vector of library precursor m/z values
-#' @param lib_spectra List of library spectra (each a matrix of mz/intensity)
-#' @param query_ids Character vector of query spectrum IDs
-#' @param query_precursors Numeric vector of query precursor m/z values
-#' @param query_spectra List of query spectra (each a matrix of mz/intensity)
-#' @param method Character string similarity method to use
-#' @param dalton Numeric absolute mass tolerance in Daltons
-#' @param ppm Numeric relative mass tolerance in ppm
-#' @param threshold Numeric minimum similarity threshold (0-1)
-#' @param approx Logical whether to perform approximate matching without
-#'     precursor mass filtering
-#'
-#' @return Data frame with spectrum IDs, entropy scores, and similarity scores
-#'
-#' @keywords internal
-#'
-#' @examples
-#' \dontrun{
-#' # Calculate entropy-based similarity
-#' results <- calculate_entropy_and_similarity(
-#'   lib_ids = library_ids,
-#'   lib_precursors = library_mz,
-#'   lib_spectra = library_spectra_list,
-#'   query_ids = feature_ids,
-#'   query_precursors = feature_mz,
-#'   query_spectra = feature_spectra_list,
-#'   method = "entropy",
-#'   dalton = 0.01,
-#'   ppm = 10,
-#'   threshold = 0.7,
-#'   approx = FALSE
-#' )
-#' }
-
 # Helper Functions ----
 
 #' Count matched peaks between query and library spectra
@@ -207,6 +163,49 @@
   NULL
 }
 
+#' @title Calculate entropy score
+#'
+#' @description This function calculates spectral entropy and similarity scores
+#'     by comparing query spectra against library spectra. Uses entropy-based
+#'     similarity measures to match MS2 fragmentation patterns.
+#'
+#' @include calculate_similarity.R
+#' @include validations_utils.R
+#'
+#' @param lib_ids Character vector of library spectrum IDs
+#' @param lib_precursors Numeric vector of library precursor m/z values
+#' @param lib_spectra List of library spectra (each a matrix of mz/intensity)
+#' @param query_ids Character vector of query spectrum IDs
+#' @param query_precursors Numeric vector of query precursor m/z values
+#' @param query_spectra List of query spectra (each a matrix of mz/intensity)
+#' @param method Character string similarity method to use
+#' @param dalton Numeric absolute mass tolerance in Daltons
+#' @param ppm Numeric relative mass tolerance in ppm
+#' @param threshold Numeric minimum similarity threshold (0-1)
+#' @param approx Logical whether to perform approximate matching without
+#'     precursor mass filtering
+#'
+#' @return Data frame with spectrum IDs, entropy scores, and similarity scores
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' # Calculate entropy-based similarity
+#' results <- calculate_entropy_and_similarity(
+#'   lib_ids = library_ids,
+#'   lib_precursors = library_mz,
+#'   lib_spectra = library_spectra_list,
+#'   query_ids = feature_ids,
+#'   query_precursors = feature_mz,
+#'   query_spectra = feature_spectra_list,
+#'   method = "entropy",
+#'   dalton = 0.01,
+#'   ppm = 10,
+#'   threshold = 0.7,
+#'   approx = FALSE
+#' )
+#' }
 calculate_entropy_and_similarity <- function(
   lib_ids,
   lib_precursors,
