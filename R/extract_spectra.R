@@ -21,6 +21,29 @@
 #' head(spectra_df)
 #' peaks <- spectra_df$mz[[1]] # First spectrum peaks
 #' }
+
+# Helper Functions ----
+
+#' Extract m/z values from peak data matrix
+#' @keywords internal
+.extract_mz_values <- function(peakData) {
+  if (is.matrix(peakData) && ncol(peakData) >= 1L) {
+    peakData[, 1L]
+  } else {
+    numeric(0)
+  }
+}
+
+#' Extract intensity values from peak data matrix
+#' @keywords internal
+.extract_intensity_values <- function(peakData) {
+  if (is.matrix(peakData) && ncol(peakData) >= 2L) {
+    peakData[, 2L]
+  } else {
+    numeric(0)
+  }
+}
+
 extract_spectra <- function(object) {
   # Input Validation ----
   if (!inherits(object, "Spectra")) {
@@ -61,27 +84,15 @@ extract_spectra <- function(object) {
   # Extract m/z values (first column of peak matrices)
   spectra$mz <- lapply(
     X = object@backend@peaksData,
-    # TODO
-    FUN = function(peakData) {
-      if (is.matrix(peakData) && ncol(peakData) >= 1L) {
-        peakData[, 1L]
-      } else {
-        numeric(0)
-      }
-    }
+    # Extract m/z column from peak data matrix, return empty vector if invalid
+    FUN = .extract_mz_values
   )
 
   # Extract intensity values (second column of peak matrices)
   spectra$intensity <- lapply(
     X = object@backend@peaksData,
-    # TODO
-    FUN = function(peakData) {
-      if (is.matrix(peakData) && ncol(peakData) >= 2L) {
-        peakData[, 2L]
-      } else {
-        numeric(0)
-      }
-    }
+    # Extract intensity column from peak data matrix, return empty vector if invalid
+    FUN = .extract_intensity_values
   )
 
   ## Synonyms issue

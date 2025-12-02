@@ -257,7 +257,13 @@ try_install_package <- function(
   tryCatch(
     expr = {
       log_info(
-        "Installing R package: {package} (from {if (from_source) 'source' else 'binary'})"
+        "Installing R package: %s (from %s)",
+        package,
+        if (from_source) {
+          "source"
+        } else {
+          "binary"
+        }
       )
 
       # Capture warnings as well as errors
