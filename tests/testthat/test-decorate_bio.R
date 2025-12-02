@@ -3,9 +3,11 @@
 library(testthat)
 
 test_that("decorate_bio handles empty input", {
-  # Use fixture utilities for empty structure
-  empty_df <- create_empty_table("annotation")
-  empty_df$score_biological <- numeric(0)
+  # Create empty annotation table
+  empty_df <- tidytable::tidytable(
+    feature_id = character(0),
+    score_biological = numeric(0)
+  )
 
   result <- decorate_bio(
     annot_table_wei_bio = empty_df,
@@ -25,9 +27,11 @@ test_that("decorate_bio handles empty input", {
 })
 
 test_that("decorate_bio returns input unchanged", {
-  # Use fixture utilities for test data
-  test_df <- create_minimal_data("annotation", n_rows = 2)
-  test_df$score_biological <- c(0.8, 0.9)
+  # Create minimal test data
+  test_df <- tidytable::tidytable(
+    feature_id = c("FT001", "FT002"),
+    score_biological = c(0.8, 0.9)
+  )
 
   result <- decorate_bio(
     annot_table_wei_bio = test_df,
