@@ -33,32 +33,43 @@ validate_sirius_inputs <- function(
       call. = FALSE
     )
   }
+
+  # Validate output paths
   output_paths <- list(
     output_ann = output_ann,
     output_can = output_can,
     output_for = output_for
   )
-  for (nm in names(output_paths)) {
-    val <- output_paths[[nm]]
-    if (!is.character(val) || length(val) != 1L) {
-      stop(nm, " must be a single character string", call. = FALSE)
-    }
-  }
-  str_files <- list(
-    str_stereo = str_stereo,
-    str_met = str_met,
-    str_nam = str_nam,
-    str_tax_cla = str_tax_cla,
-    str_tax_npc = str_tax_npc
+
+  are_valid_outputs <- vapply(
+    output_paths,
+    function(p) {
+      is.character(p) && length(p) == 1L
+    },
+    logical(1L)
   )
-  missing <- purrr::keep(.x = str_files, .p = ~ !file.exists(.x))
-  if (length(missing) > 0L) {
+
+  if (!all(are_valid_outputs)) {
+    invalid <- names(output_paths)[!are_valid_outputs]
     stop(
-      "Structure file(s) not found: ",
-      paste(names(missing), missing, sep = " at ", collapse = "; "),
+      "Output path(s) must be single character strings: ",
+      paste(invalid, collapse = ", "),
       call. = FALSE
     )
   }
+
+  # Validate structure files exist
+  validate_file_existence(
+    file_list = list(
+      str_stereo = str_stereo,
+      str_met = str_met,
+      str_nam = str_nam,
+      str_tax_cla = str_tax_cla,
+      str_tax_npc = str_tax_npc
+    ),
+    allow_null = FALSE
+  )
+
   invisible(NULL)
 }
 

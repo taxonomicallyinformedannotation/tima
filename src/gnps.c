@@ -4,14 +4,28 @@
  *
  * Implements the GNPS (Global Natural Products Social molecular networking)
  * spectral similarity algorithm using an auction-based Linear Sum Assignment
- * Problem (LSAP) solver. The code is optimized for performance with:
- * - OpenMP parallelization for multi-core systems
- * - Memory prefetching for better cache utilization
+ * Problem (LSAP) solver.
+ *
+ * PERFORMANCE OPTIMIZATIONS:
+ * - OpenMP parallelization for multi-core systems (peak matching)
+ * - Memory prefetching for better cache utilization (__builtin_prefetch)
  * - Loop unrolling in critical paths
- * - Efficient sorting and binary search
+ * - Binary search for peak matching (O(log n) vs O(n) linear search)
+ * - Auction algorithm for assignment problem (faster than Hungarian)
+ *
+ * ALGORITHM COMPLEXITY:
+ * - Peak matching: O(n log m) where n = query peaks, m = library peaks
+ * - Auction algorithm: O(n^2 * epsilon^-1) average case
+ * - Overall: O(n^2) for typical spectral similarity calculations
+ *
+ * MEMORY USAGE:
+ * - Primary allocation: O(n*m) for cost matrix
+ * - Auxiliary: O(n+m) for matching and pricing vectors
+ * - Stack usage: minimal, all large structures heap-allocated
  *
  * @author TIMA Development Team
  * @license GPL-3+
+ * @see https://github.com/taxonomicallyinformedannotation/tima
  */
 
 #include <R.h>

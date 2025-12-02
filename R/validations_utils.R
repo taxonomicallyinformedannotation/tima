@@ -20,14 +20,15 @@
 #' }
 validate_file_existence <- function(file_list, allow_null = FALSE) {
   if (!is.list(file_list)) {
-    stop("file_list must be a named list of file paths")
+    stop("file_list must be a named list of file paths", call. = FALSE)
   }
 
   if (length(file_list) == 0L) {
-    stop("file_list cannot be empty")
+    stop("file_list cannot be empty", call. = FALSE)
   }
 
-  missing_files <- list()
+  missing_files <- character(0L)
+  invalid_files <- character(0L)
 
   for (file_name in names(file_list)) {
     file_path <- file_list[[file_name]]
@@ -35,42 +36,62 @@ validate_file_existence <- function(file_list, allow_null = FALSE) {
     # Handle NULL values
     if (is.null(file_path)) {
       if (!allow_null) {
-        missing_files[[file_name]] <- "NULL (file path is NULL)"
+        missing_files <- c(
+          missing_files,
+          paste0(file_name, ": NULL (file path is NULL)")
+        )
       }
       next
     }
 
     # Validate type
     if (!is.character(file_path) || length(file_path) != 1L) {
-      stop(
-        "File path for '",
-        file_name,
-        "' must be a single character string, ",
-        "got: ",
-        class(file_path)[1L]
+      invalid_files <- c(
+        invalid_files,
+        paste0(
+          file_name,
+          ": must be a single character string, got ",
+          class(file_path)[1L]
+        )
       )
+      next
     }
 
     # Check existence
     if (!file.exists(file_path)) {
-      missing_files[[file_name]] <- file_path
+      missing_files <- c(missing_files, paste0(file_name, ": ", file_path))
     }
   }
 
-  # Report missing files
+  # Report errors
+  errors <- c()
+  if (length(invalid_files) > 0L) {
+    errors <- c(
+      errors,
+      "Invalid file path types:",
+      paste0("  - ", invalid_files)
+    )
+  }
   if (length(missing_files) > 0L) {
-    error_msg <- paste0(
-      "The following required file(s) were not found:\n",
-      paste0(
-        "  - ",
-        names(missing_files),
-        ": ",
-        unlist(missing_files),
+    errors <- c(
+      errors,
+      "Required file(s) not found:",
+      paste0("  - ", missing_files)
+    )
+  }
+
+  if (length(errors) > 0L) {
+    stop(
+      paste(
+        c(
+          errors,
+          "",
+          "Please verify file paths and ensure all required files are present."
+        ),
         collapse = "\n"
       ),
-      "\n\nPlease verify file paths and ensure all required files are present."
+      call. = FALSE
     )
-    stop(error_msg)
   }
 
   invisible(TRUE)

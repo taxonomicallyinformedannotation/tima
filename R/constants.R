@@ -58,14 +58,36 @@ MAX_MASS_DALTONS <- 5000
 # Regular Expression Patterns ----
 
 #' Regular expression pattern for parsing adduct notation
-#' Matches patterns like: \[M+H\]+, \[2M+Na\]+, \[M-H2O+H\]+, \[2M1+H\]2+
-#' Groups: (1) multimer, (2) isotope, (3) modifications, (4) charge count, (5) charge sign
+#'
+#' @details Pattern breakdown:
+#' \describe{
+#'   \item{\code{\\[}}{Opening bracket (literal)}
+#'   \item{\code{(\\d*)}}{Group 1: Optional multimer count (e.g., "2" in \[2M+H\]+)}
+#'   \item{\code{M}}{Required literal "M" for molecule}
+#'   \item{\code{(?![a-z])}}{Negative lookahead: prevent matching element symbols like "Mg"}
+#'   \item{\code{(\\d*)}}{Group 2: Optional isotope shift (e.g., "1" in \[M1+H\]+ for M+1)}
+#'   \item{\code{([+-][\\w\\d].*)?}}{Group 3: Optional modifications (e.g., "+H", "-H2O+Na")}
+#'   \item{\code{.*\\]}}{Any characters until closing bracket}
+#'   \item{\code{(\\d*)}}{Group 4: Optional charge count (e.g., "2" in \[M+H\]2+)}
+#'   \item{\code{([+-])?}}{Group 5: Optional charge sign (+ or -)}
+#' }
+#'
+#' @examples
+#' # Matches: [M+H]+, [2M+Na]+, [M-H2O+H]+, [2M1+H]2+
 #' @keywords internal
 ADDUCT_REGEX_PATTERN <- "\\[(\\d*)M(?![a-z])(\\d*)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?"
 
 #' Regular expression for individual adduct modifications
-#' Matches: +H, -H2O, +Na, etc.
-#' Groups: (1) sign, (2) count, (3) element/formula
+#'
+#' @details Pattern breakdown:
+#' \describe{
+#'   \item{\code{([+-])}}{Group 1: Addition (+) or loss (-) sign}
+#'   \item{\code{(\\d*)}}{Group 2: Optional stoichiometric coefficient (e.g., "2" in +2H)}
+#'   \item{\code{([A-Z][a-z]?\\d*(?:[A-Z][a-z]?\\d*)*)}}{Group 3: Element formula (e.g., "H", "H2O", "NaCl")}
+#' }
+#'
+#' @examples
+#' # Matches: +H, -H2O, +2Na, +C6H12O6
 #' @keywords internal
 MODIFICATION_REGEX_PATTERN <- "([+-])(\\d*)([A-Z][a-z]?\\d*(?:[A-Z][a-z]?\\d*)*)"
 

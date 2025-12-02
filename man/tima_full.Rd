@@ -32,7 +32,7 @@ Please use \code{run_tima()} instead. \code{tima_full()} will be removed in a
 future version.
 }
 \details{
-This function is deprecated as of TIMA version 2.11.0 (November 2025).
+This function is deprecated as of TIMA version 2.12.0 (November 2025).
 It now simply calls \code{\link{run_tima}} with all arguments passed through,
 but issues a deprecation warning.
 

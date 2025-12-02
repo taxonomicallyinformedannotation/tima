@@ -57,6 +57,8 @@ extract_spectra <- function(object) {
 
   # Extract peak data (mz and intensity) efficiently
   # log_trace("Extracting peak data (mz and intensity)")
+
+  # Extract m/z values (first column of peak matrices)
   spectra$mz <- lapply(
     X = object@backend@peaksData,
     # TODO
@@ -69,6 +71,7 @@ extract_spectra <- function(object) {
     }
   )
 
+  # Extract intensity values (second column of peak matrices)
   spectra$intensity <- lapply(
     X = object@backend@peaksData,
     # TODO

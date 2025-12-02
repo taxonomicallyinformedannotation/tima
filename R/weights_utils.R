@@ -9,23 +9,39 @@
 #' where w are weights and v are value columns. Weights are normalized to sum to 1.
 compute_weighted_sum <- function(..., weights) {
   values <- list(...)
-  stopifnot(length(values) == length(weights))
-  stopifnot(all(sapply(values, is.numeric)))
-  stopifnot(is.numeric(weights), all(weights >= 0))
+
+  # Input validation
+  if (length(values) != length(weights)) {
+    stop(
+      "Number of value vectors (",
+      length(values),
+      ") must equal number of weights (",
+      length(weights),
+      ")",
+      call. = FALSE
+    )
+  }
+
+  if (!all(vapply(values, is.numeric, logical(1L)))) {
+    stop("All value vectors must be numeric", call. = FALSE)
+  }
+
+  if (!is.numeric(weights) || any(weights < 0)) {
+    stop("Weights must be numeric and non-negative", call. = FALSE)
+  }
 
   weight_sum <- sum(weights)
   if (weight_sum <= 0) {
-    return(rep(0, length(values[[1]])))
+    return(rep(0, length(values[[1L]])))
   }
 
   # Normalize weights to sum to 1
   norm_weights <- weights / weight_sum
 
-  # Compute row-wise weighted sum
-  result <- rep(0, length(values[[1]]))
-  for (i in seq_along(values)) {
-    result <- result + norm_weights[i] * values[[i]]
-  }
+  # Vectorized computation using weighted matrix multiplication
+  # Convert list to matrix for efficient row-wise operations
+  values_matrix <- do.call(cbind, values)
 
-  as.numeric(result)
+  # Matrix multiplication: each row multiplied by weights
+  as.numeric(values_matrix %*% norm_weights)
 }

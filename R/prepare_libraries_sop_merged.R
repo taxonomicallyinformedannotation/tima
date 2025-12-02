@@ -32,11 +32,22 @@ validate_sop_merged_inputs <- function(
     output_str_tax_npc = output_str_tax_npc
   )
 
-  for (param_name in names(output_paths)) {
-    param_value <- output_paths[[param_name]]
-    if (!is.character(param_value) || length(param_value) != 1L) {
-      stop(param_name, " must be a single character string", call. = FALSE)
-    }
+  # Validate all output paths are single character strings
+  are_valid <- vapply(
+    output_paths,
+    function(p) {
+      is.character(p) && length(p) == 1L
+    },
+    logical(1L)
+  )
+
+  if (!all(are_valid)) {
+    invalid_params <- names(output_paths)[!are_valid]
+    stop(
+      "The following output parameters must be single character strings: ",
+      paste(invalid_params, collapse = ", "),
+      call. = FALSE
+    )
   }
 
   # Validate taxonomic filter parameters if filtering

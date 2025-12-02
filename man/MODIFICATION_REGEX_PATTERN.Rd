@@ -3,9 +3,7 @@
 \docType{data}
 \name{MODIFICATION_REGEX_PATTERN}
 \alias{MODIFICATION_REGEX_PATTERN}
-\title{Regular expression for individual adduct modifications
-Matches: +H, -H2O, +Na, etc.
-Groups: (1) sign, (2) count, (3) element/formula}
+\title{Regular expression for individual adduct modifications}
 \format{
 An object of class \code{character} of length 1.
 }
@@ -14,7 +12,16 @@ MODIFICATION_REGEX_PATTERN
 }
 \description{
 Regular expression for individual adduct modifications
-Matches: +H, -H2O, +Na, etc.
-Groups: (1) sign, (2) count, (3) element/formula
+}
+\details{
+Pattern breakdown:
+\describe{
+\item{\code{([+-])}}{Group 1: Addition (+) or loss (-) sign}
+\item{\code{(\\d*)}}{Group 2: Optional stoichiometric coefficient (e.g., "2" in +2H)}
+\item{\code{([A-Z][a-z]?\\d*(?:[A-Z][a-z]?\\d*)*)}}{Group 3: Element formula (e.g., "H", "H2O", "NaCl")}
+}
+}
+\examples{
+# Matches: +H, -H2O, +2Na, +C6H12O6
 }
 \keyword{internal}
