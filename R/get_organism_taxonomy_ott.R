@@ -62,23 +62,27 @@
 #' @return Data frame with complete taxonomy lineage
 #' @keywords internal
 .build_taxonomy_lineage <- function(taxon_info, taxon_lineage, ott_ids) {
+  # Helper: combine taxon info with lineage for a single OTT ID
+  .combine_single_taxon <- function(idx, taxon_info, taxon_lineage, ott_ids) {
+    tidytable::bind_rows(
+      data.frame(
+        id = ott_ids[idx],
+        rank = taxon_info[[idx]]$rank,
+        name = taxon_info[[idx]]$name,
+        unique_name = taxon_info[[idx]]$unique_name,
+        ott_id = as.character(taxon_info[[idx]]$ott_id)
+      ),
+      data.frame(id = ott_ids[idx], taxon_lineage[[idx]])
+    )
+  }
+
   # Combine taxon info with lineage for each OTT ID
-  # Creates a data frame with full taxonomic hierarchy
   list_df <- seq_along(taxon_lineage) |>
     purrr::map(
-      # TODO
-      .f = function(x) {
-        tidytable::bind_rows(
-          data.frame(
-            id = ott_ids[x],
-            rank = taxon_info[[x]]$rank,
-            name = taxon_info[[x]]$name,
-            unique_name = taxon_info[[x]]$unique_name,
-            ott_id = as.character(taxon_info[[x]]$ott_id)
-          ),
-          data.frame(id = ott_ids[x], taxon_lineage[[x]])
-        )
-      }
+      .f = .combine_single_taxon,
+      taxon_info = taxon_info,
+      taxon_lineage = taxon_lineage,
+      ott_ids = ott_ids
     )
 
   tidytable::bind_rows(list_df) |>
