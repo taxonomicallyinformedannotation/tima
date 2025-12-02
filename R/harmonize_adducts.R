@@ -79,17 +79,13 @@ harmonize_adducts <- function(
   patterns_escaped <- .escape_regex(patterns)
   repls <- adducts_translations
 
-  df[[adducts_colname]] <- purrr::reduce(
-    .x = seq_along(patterns),
-    .init = df[[adducts_colname]],
-    .f = function(col, i) {
-      pat <- paste0("^", patterns_escaped[i], "$")
-      stringi::stri_replace_all_regex(
-        str = col,
-        pattern = pat,
-        replacement = repls[[i]]
-      )
-    }
+  patterns_anchored <- paste0("^", patterns_escaped, "$")
+
+  df[[adducts_colname]] <- stringi::stri_replace_all_regex(
+    str = df[[adducts_colname]],
+    pattern = patterns_anchored,
+    replacement = repls,
+    vectorize_all = FALSE
   )
 
   n_unique_after <- count_unique_values(df[[adducts_colname]])

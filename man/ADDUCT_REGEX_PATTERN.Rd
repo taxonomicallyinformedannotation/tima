@@ -3,9 +3,7 @@
 \docType{data}
 \name{ADDUCT_REGEX_PATTERN}
 \alias{ADDUCT_REGEX_PATTERN}
-\title{Regular expression pattern for parsing adduct notation
-Matches patterns like: [M+H]+, [2M+Na]+, [M-H2O+H]+, [2M1+H]2+
-Groups: (1) multimer, (2) isotope, (3) modifications, (4) charge count, (5) charge sign}
+\title{Regular expression pattern for parsing adduct notation}
 \format{
 An object of class \code{character} of length 1.
 }
@@ -14,7 +12,22 @@ ADDUCT_REGEX_PATTERN
 }
 \description{
 Regular expression pattern for parsing adduct notation
-Matches patterns like: [M+H]+, [2M+Na]+, [M-H2O+H]+, [2M1+H]2+
-Groups: (1) multimer, (2) isotope, (3) modifications, (4) charge count, (5) charge sign
+}
+\details{
+Pattern breakdown:
+\describe{
+\item{\code{\\[}}{Opening bracket (literal)}
+\item{\code{(\\d*)}}{Group 1: Optional multimer count (e.g., "2" in [2M+H]+)}
+\item{\code{M}}{Required literal "M" for molecule}
+\item{\code{(?![a-z])}}{Negative lookahead: prevent matching element symbols like "Mg"}
+\item{\code{(\\d*)}}{Group 2: Optional isotope shift (e.g., "1" in [M1+H]+ for M+1)}
+\item{\code{([+-][\\w\\d].*)?}}{Group 3: Optional modifications (e.g., "+H", "-H2O+Na")}
+\item{\code{.*\\]}}{Any characters until closing bracket}
+\item{\code{(\\d*)}}{Group 4: Optional charge count (e.g., "2" in [M+H]2+)}
+\item{\code{([+-])?}}{Group 5: Optional charge sign (+ or -)}
+}
+}
+\examples{
+# Matches: [M+H]+, [2M+Na]+, [M-H2O+H]+, [2M1+H]2+
 }
 \keyword{internal}

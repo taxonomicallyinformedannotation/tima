@@ -57,6 +57,8 @@
 #' @return Data frame with complete taxonomy lineage
 #' @keywords internal
 .build_taxonomy_lineage <- function(taxon_info, taxon_lineage, ott_ids) {
+  # Combine taxon info with lineage for each OTT ID
+  # Creates a data frame with full taxonomic hierarchy
   list_df <- seq_along(taxon_lineage) |>
     purrr::map(
       # TODO

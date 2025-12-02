@@ -52,27 +52,20 @@ prepare_annotations_gnps <- function(
 ) {
   # Validate output path
   if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string")
+    stop("output must be a single character string", call. = FALSE)
   }
 
-  # Validate structure file paths
-  str_files <- list(
-    str_stereo = str_stereo,
-    str_met = str_met,
-    str_nam = str_nam,
-    str_tax_cla = str_tax_cla,
-    str_tax_npc = str_tax_npc
+  # Validate all structure file paths
+  validate_file_existence(
+    file_list = list(
+      str_stereo = str_stereo,
+      str_met = str_met,
+      str_nam = str_nam,
+      str_tax_cla = str_tax_cla,
+      str_tax_npc = str_tax_npc
+    ),
+    allow_null = FALSE
   )
-
-  for (param_name in names(str_files)) {
-    param_value <- str_files[[param_name]]
-    if (!is.character(param_value) || length(param_value) != 1L) {
-      stop(param_name, " must be a single character string")
-    }
-    if (!file.exists(param_value)) {
-      stop(param_name, " file not found: ", param_value)
-    }
-  }
 
   log_info("Preparing GNPS annotations")
 
