@@ -110,5 +110,9 @@ reconstruct_path <- function(dir_path, filename) {
 #' @keywords internal
 #' @noRd
 `%||%` <- function(a, b) {
-  if (is.null(a)) b else a
+  if (is.null(a)) {
+    b
+  } else {
+    a
+  }
 }

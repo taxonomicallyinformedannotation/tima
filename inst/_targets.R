@@ -1096,7 +1096,7 @@ list(
                 )
               },
               error = function(e) {
-                fake_ecmdb(
+                tima:::fake_ecmdb(
                   export = paths$data$source$libraries$sop$ecmdb
                 )
               },
@@ -1123,12 +1123,12 @@ list(
                   "HMDB download failed partially, returning empty file instead"
                 )
                 unlink(paths$data$source$libraries$sop$hmdb)
-                fake_hmdb(
+                tima:::fake_hmdb(
                   export = paths$data$source$libraries$sop$hmdb
                 )
               },
               error = function(e) {
-                fake_hmdb(
+                tima:::fake_hmdb(
                   export = paths$data$source$libraries$sop$hmdb
                 )
               },
@@ -1152,7 +1152,7 @@ list(
                 )
               },
               error = function(e) {
-                fake_lotus(
+                tima:::fake_lotus(
                   export = paths$data$source$libraries$sop$lotus
                 )
               },

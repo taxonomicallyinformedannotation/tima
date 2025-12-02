@@ -106,7 +106,11 @@ prepare_libraries_rt <- function(
     }
     x <- as.character(x)
     x <- x[!is.na(x) & nzchar(trimws(x))]
-    if (length(x) == 0L) NULL else x
+    if (length(x) == 0L) {
+      NULL
+    } else {
+      x
+    }
   }
 
   mgf_exp <- .normalize_input_vec(mgf_exp)

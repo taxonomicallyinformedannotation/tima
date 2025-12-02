@@ -63,7 +63,11 @@ extract_directory_path <- function(path) {
   if (has_extension) {
     dir_part <- dirname(path)
     # Normalize "." to current directory
-    if (dir_part == ".") "." else dir_part
+    if (dir_part == ".") {
+      "."
+    } else {
+      dir_part
+    }
   } else {
     path
   }
