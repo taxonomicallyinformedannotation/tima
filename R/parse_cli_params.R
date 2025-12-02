@@ -492,20 +492,24 @@ parse_cli_params <- function(arguments, parameters) {
     summarize = list(path = c("options", "summarize"), type = as.logical)
   )
 
+  # Helper: apply single argument to parameters
+  .apply_argument <- function(parameters, arg_name, arguments, mappings) {
+    if (!is.null(arguments[[arg_name]])) {
+      parameters |>
+        purrr::modify_in(
+          mappings[[arg_name]]$path,
+          ~ mappings[[arg_name]]$type(arguments[[arg_name]])
+        )
+    } else {
+      parameters
+    }
+  }
+
   parameters <- names(mappings) |>
     purrr::reduce(
-      # TODO
-      .f = function(parameters, arg_name) {
-        if (!is.null(arguments[[arg_name]])) {
-          parameters |>
-            purrr::modify_in(
-              mappings[[arg_name]]$path,
-              ~ mappings[[arg_name]]$type(arguments[[arg_name]])
-            )
-        } else {
-          parameters
-        }
-      },
+      .f = .apply_argument,
+      arguments = arguments,
+      mappings = mappings,
       .init = parameters
     )
   return(parameters)

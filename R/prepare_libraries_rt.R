@@ -121,19 +121,19 @@ prepare_libraries_rt <- function(
 
   # Readers ----
   rts_from_mgf <- function(mgf) {
+    # Helper: extract spectra data as tidytable
+    .extract_spectra_data <- function(spectra_obj) {
+      spectra_obj@backend@spectraData |>
+        data.frame() |>
+        tidytable::as_tidytable()
+    }
+
     # log_trace("Importing spectra")
     spectra <- mgf |>
       purrr::map(.f = import_spectra)
     # log_trace("Extracting retention times")
     rts <- spectra |>
-      # TODO
-      purrr::map(
-        .f = function(x) {
-          x@backend@spectraData |>
-            data.frame() |>
-            tidytable::as_tidytable()
-        }
-      ) |>
+      purrr::map(.f = .extract_spectra_data) |>
       tidytable::bind_rows() |>
       tidytable::select(
         tidyselect::any_of(
@@ -350,7 +350,8 @@ prepare_libraries_rt <- function(
         perl = TRUE
       )
     ) |>
-    ## TODO REMINDER FOR NOW
+    # Keep only unique RT entries per structure connectivity layer and type
+    # This deduplicates stereoisomers while preserving both experimental and predicted RTs
     tidytable::distinct(
       rt,
       candidate_structure_inchikey_connectivity_layer,

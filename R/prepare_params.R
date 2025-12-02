@@ -941,14 +941,18 @@ prepare_params <- function(
       )]
   }
 
+  # Helper: write single YAML file
+  .write_yaml_file <- function(idx, yamls_params, yaml_export) {
+    yaml::write_yaml(x = yamls_params[[idx]], file = yaml_export[idx])
+  }
+
   # log_trace("Exporting params")
   create_dir(export = yaml_export[[1]])
   purrr::map(
     .x = seq_along(yaml_export),
-    # TODO
-    .f = function(x) {
-      yaml::write_yaml(x = yamls_params[[x]], file = yaml_export[x])
-    }
+    .f = .write_yaml_file,
+    yamls_params = yamls_params,
+    yaml_export = yaml_export
   )
   return(yaml_export)
 }
