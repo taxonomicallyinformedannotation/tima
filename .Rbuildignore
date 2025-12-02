@@ -26,3 +26,5 @@ CITATION.cff
 ^altdoc$
 ^_quarto$
 ^grateful-refs\.bib$
+^[.]?air[.]toml$
+^\.vscode$
