@@ -2,42 +2,11 @@
 
 library(testthat)
 
-## Input Validation ----
+## Test Helpers ----
 
-test_that("weight_chemo validates data frame input", {
-  # Use fixture utilities
-  empty_table <- tidytable::tidytable(
-    feature_id = character(0),
-    candidate_structure_inchikey_connectivity_layer = character(0)
-  )
-
-  expect_error(
-    weight_chemo(
-      annot_table_wei_bio_clean = "not_a_dataframe",
-      weight_spectral = 0.33,
-      weight_biological = 0.33,
-      weight_chemical = 0.34,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.2,
-      score_chemical_cla_class = 0.3,
-      score_chemical_cla_parent = 0.4,
-      score_chemical_npc_pathway = 0.5,
-      score_chemical_npc_superclass = 0.6,
-      score_chemical_npc_class = 0.7
-    ),
-    "data frame"
-  )
-})
-
-test_that("weight_chemo handles empty data frame", {
-  # Use fixture utilities
-  empty_annot <- tidytable::tidytable(
-    feature_id = character(0),
-    candidate_structure_inchikey_connectivity_layer = character(0)
-  )
-
-  result <- weight_chemo(
-    annot_table_wei_bio_clean = empty_annot,
+# Default parameters for weight_chemo to reduce duplication
+default_weight_chemo_params <- function() {
+  list(
     weight_spectral = 0.33,
     weight_biological = 0.33,
     weight_chemical = 0.34,
@@ -49,13 +18,49 @@ test_that("weight_chemo handles empty data frame", {
     score_chemical_npc_superclass = 0.6,
     score_chemical_npc_class = 0.7
   )
+}
+
+## Input Validation ----
+
+test_that("weight_chemo validates data frame input", {
+  empty_table <- tidytable::tidytable(
+    feature_id = character(0),
+    candidate_structure_inchikey_connectivity_layer = character(0)
+  )
+
+  params <- default_weight_chemo_params()
+  expect_error(
+    do.call(
+      weight_chemo,
+      c(
+        list(annot_table_wei_bio_clean = "not_a_dataframe"),
+        params
+      )
+    ),
+    "data frame"
+  )
+})
+
+test_that("weight_chemo handles empty data frame", {
+  empty_annot <- tidytable::tidytable(
+    feature_id = character(0),
+    candidate_structure_inchikey_connectivity_layer = character(0)
+  )
+
+  params <- default_weight_chemo_params()
+  result <- do.call(
+    weight_chemo,
+    c(
+      list(annot_table_wei_bio_clean = empty_annot),
+      params
+    )
+  )
 
   expect_s3_class(result, "data.frame")
   expect_equal(nrow(result), 0L)
 })
 
 test_that("weight_chemo validates weight ranges and sum", {
-  # Create minimal non-empty annotation table
   annot_table <- tidytable::tidytable(
     feature_id = "F1",
     candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
@@ -63,38 +68,34 @@ test_that("weight_chemo validates weight ranges and sum", {
     candidate_score_pseudo_initial = 0
   )
 
+  params <- default_weight_chemo_params()
+
   # Negative weight
+  params_neg <- params
+  params_neg$weight_spectral <- -0.1
   expect_error(
-    weight_chemo(
-      annot_table_wei_bio_clean = annot_table,
-      weight_spectral = -0.1,
-      weight_biological = 0.5,
-      weight_chemical = 0.6,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.2,
-      score_chemical_cla_class = 0.3,
-      score_chemical_cla_parent = 0.4,
-      score_chemical_npc_pathway = 0.5,
-      score_chemical_npc_superclass = 0.6,
-      score_chemical_npc_class = 0.7
+    do.call(
+      weight_chemo,
+      c(
+        list(annot_table_wei_bio_clean = annot_table),
+        params_neg
+      )
     ),
     "non-negative"
   )
 
   # Weights don't sum to 1
+  params_bad_sum <- params
+  params_bad_sum$weight_spectral <- 0.5
+  params_bad_sum$weight_biological <- 0.5
+  params_bad_sum$weight_chemical <- 0.5
   expect_error(
-    weight_chemo(
-      annot_table_wei_bio_clean = annot_table,
-      weight_spectral = 0.5,
-      weight_biological = 0.5,
-      weight_chemical = 0.5,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.2,
-      score_chemical_cla_class = 0.3,
-      score_chemical_cla_parent = 0.4,
-      score_chemical_npc_pathway = 0.5,
-      score_chemical_npc_superclass = 0.6,
-      score_chemical_npc_class = 0.7
+    do.call(
+      weight_chemo,
+      c(
+        list(annot_table_wei_bio_clean = annot_table),
+        params_bad_sum
+      )
     ),
     "sum to 1"
   )
