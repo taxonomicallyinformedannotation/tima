@@ -1,0 +1,5 @@
+structure_inchikey,structure_inchikey_connectivity_layer,structure_smiles_no_stereo,organism_name,organism_taxonomy_ottid,organism_taxonomy_01domain,organism_taxonomy_02kingdom,organism_taxonomy_03phylum,organism_taxonomy_04class,organism_taxonomy_05order,organism_taxonomy_06family,organism_taxonomy_07tribe,organism_taxonomy_08genus,organism_taxonomy_09species,organism_taxonomy_10varietas
+AAAAAAAAAAAAA,AAAAAAAAAAAAA,CCC,PlantSpecies1,123,Eukaryota,Plantae,Tracheophyta,NA,NA,NA,NA,NA,NA,NA
+BBBBBBBBBBBBB,BBBBBBBBBBBBB,CCCC,PlantSpecies2,456,Eukaryota,Plantae,Tracheophyta,NA,NA,NA,NA,NA,NA,NA
+CCCCCCCCCCCCC,CCCCCCCCCCCCC,CCCCC,BacteriumSpecies1,789,Bacteria,Bacteria,Proteobacteria,NA,NA,NA,NA,NA,NA,NA
+

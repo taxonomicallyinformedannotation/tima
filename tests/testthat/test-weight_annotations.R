@@ -2,210 +2,39 @@
 
 library(testthat)
 
-# Fixture creation ----
+# Fixture staging ----
 
-create_minimal_wa_data <- function() {
-  tmpdir <- tempfile(pattern = "wa_test_")
-  dir.create(tmpdir, recursive = TRUE)
+#' Stage weight_annotations test fixtures
+#'
+#' @param root Root directory for staging (created if needed)
+#' @return Named list of file paths for all required inputs
+stage_weight_annotations_fixtures <- function(
+  root = temp_test_dir("weight_ann")
+) {
+  dir.create(root, recursive = TRUE, showWarnings = FALSE)
 
-  # Minimal annotation data with all required columns
-  ann_data <- data.frame(
-    feature_id = c("F1", "F1", "F2", "F3"),
-    feature_mz = c(100.05, 100.05, 150.08, 200.10),
-    feature_rt = c(1.2, 1.2, 2.5, 3.1),
-    candidate_adduct = c("add1", "add2", "add3", "add4"),
-    candidate_library = c("MS1", "lib1", "lib2", "lib1"),
-    candidate_structure_inchikey_connectivity_layer = c(
-      "AAAAAAAAAAAAA",
-      "BBBBBBBBBBBBB",
-      "CCCCCCCCCCCCC",
-      "AAAAAAAAAAAAA"
-    ),
-    candidate_structure_smiles_no_stereo = c("CCC", "CCCC", "CCCCC", "CCC"),
-    candidate_structure_error_mz = c(NA_real_, 0.4, NA_real_, 0.5),
-    candidate_structure_error_rt = c(NA_real_, 0.4, NA_real_, 0.5),
-    # TODO MS1 only needs this, refactor later
-    candidate_score_similarity = c(0.9, 0.85, NA_real_, 0.6),
-    candidate_score_sirius_csi = c(NA_real_, 0.4, NA_real_, 0.5),
-    candidate_structure_name = c("AAA", "BBB", "CCC", "DDD"),
-    candidate_structure_molecular_formula = c("C3H8", "C4H10", "C5H12", "C3H8"),
-    candidate_structure_exact_mass = c(44.06, 58.08, 72.09, 44.06),
-    candidate_structure_xlogp = c(1.5, 2.0, 2.5, 1.5),
-    candidate_structure_tax_cla_01kin = c(
-      "Organic",
-      "Organic",
-      "Organic",
-      "Organic"
-    ),
-    candidate_structure_tax_cla_02sup = c(
-      NA_character_,
-      NA_character_,
-      NA_character_,
-      NA_character_
-    ),
-    candidate_structure_tax_cla_03cla = c(
-      NA_character_,
-      NA_character_,
-      NA_character_,
-      NA_character_
-    ),
-    candidate_structure_tax_cla_04dirpar = c(
-      NA_character_,
-      NA_character_,
-      NA_character_,
-      NA_character_
-    ),
-    candidate_structure_tax_npc_01pat = c(
-      "Alkaloids",
-      "Terpenoids",
-      "Alkaloids",
-      "Alkaloids"
-    ),
-    candidate_structure_tax_npc_02sup = c(
-      NA_character_,
-      NA_character_,
-      NA_character_,
-      NA_character_
-    ),
-    candidate_structure_tax_npc_03cla = c(
-      NA_character_,
-      NA_character_,
-      NA_character_,
-      NA_character_
-    ),
-    candidate_structure_organism_occurrence_closest = c(
-      "Plantae",
-      "Plantae",
-      NA_character_,
-      "Plantae"
-    ),
-    candidate_structure_organism_occurrence_reference = c(
-      NA_character_,
-      NA_character_,
-      NA_character_,
-      NA_character_
-    ),
-    candidate_spectrum_entropy = c(2.5, 2.3, 2.8, 2.1),
-    stringsAsFactors = FALSE
-  )
-  ann_file <- file.path(tmpdir, "annotations.tsv")
-  write.table(ann_data, ann_file, sep = "\t", row.names = FALSE, quote = FALSE)
+  # Copy fixtures to temp location
+  ann_file <- file.path(root, "annotations.tsv")
+  lib_file <- file.path(root, "library.tsv")
+  comp_file <- file.path(root, "components.tsv")
+  edges_file <- file.path(root, "edges.tsv")
+  taxa_file <- file.path(root, "taxa.tsv")
+  canopus_file <- file.path(root, "canopus.tsv")
+  formula_file <- file.path(root, "formula.tsv")
+  output_file <- file.path(root, "weighted.tsv")
 
-  # Minimal library with complete taxonomy
-  lib_data <- data.frame(
-    structure_inchikey = c("AAAAAAAAAAAAA", "BBBBBBBBBBBBB", "CCCCCCCCCCCCC"),
-    structure_inchikey_connectivity_layer = c(
-      "AAAAAAAAAAAAA",
-      "BBBBBBBBBBBBB",
-      "CCCCCCCCCCCCC"
-    ),
-    structure_smiles_no_stereo = c("CCC", "CCCC", "CCCCC"),
-    organism_name = c("PlantSpecies1", "PlantSpecies2", "BacteriumSpecies1"),
-    organism_taxonomy_ottid = c(123, 456, 789),
-    organism_taxonomy_01domain = c("Eukaryota", "Eukaryota", "Bacteria"),
-    organism_taxonomy_02kingdom = c("Plantae", "Plantae", "Bacteria"),
-    organism_taxonomy_03phylum = c(
-      "Tracheophyta",
-      "Tracheophyta",
-      "Proteobacteria"
-    ),
-    organism_taxonomy_04class = c(NA_character_, NA_character_, NA_character_),
-    organism_taxonomy_05order = c(NA_character_, NA_character_, NA_character_),
-    organism_taxonomy_06family = c(NA_character_, NA_character_, NA_character_),
-    organism_taxonomy_07tribe = c(NA_character_, NA_character_, NA_character_),
-    organism_taxonomy_08genus = c(NA_character_, NA_character_, NA_character_),
-    organism_taxonomy_09species = c(
-      NA_character_,
-      NA_character_,
-      NA_character_
-    ),
-    organism_taxonomy_10varietas = c(
-      NA_character_,
-      NA_character_,
-      NA_character_
-    ),
-    stringsAsFactors = FALSE
-  )
-  lib_file <- file.path(tmpdir, "library.tsv")
-  write.table(lib_data, lib_file, sep = "\t", row.names = FALSE, quote = FALSE)
+  copy_fixture_to("annotations_weighted.csv", ann_file)
+  copy_fixture_to("library_weighted.csv", lib_file)
+  copy_fixture_to("components_weighted.csv", comp_file)
+  copy_fixture_to("edges_weighted.csv", edges_file)
+  copy_fixture_to("taxa_weighted.csv", taxa_file)
 
-  # Minimal components
-  comp_data <- data.frame(
-    feature_id = c("F1", "F2", "F3"),
-    component_id = c("C1", "C1", "C2"),
-    stringsAsFactors = FALSE
-  )
-  comp_file <- file.path(tmpdir, "components.tsv")
-  write.table(
-    comp_data,
-    comp_file,
-    sep = "\t",
-    row.names = FALSE,
-    quote = FALSE
-  )
-
-  # Minimal edges
-  edges_data <- data.frame(
-    feature_source = c("F1", "F2"),
-    feature_target = c("F2", "F3"),
-    candidate_score_similarity = c(0.9, 0.8),
-    feature_spectrum_entropy = c(2.5, 2.8),
-    feature_spectrum_peaks = c(50, 60),
-    stringsAsFactors = FALSE
-  )
-  edges_file <- file.path(tmpdir, "edges.tsv")
-  write.table(
-    edges_data,
-    edges_file,
-    sep = "\t",
-    row.names = FALSE,
-    quote = FALSE
-  )
-
-  # Minimal taxa with complete taxonomy
-  taxa_data <- data.frame(
-    feature_id = c("F1", "F2", "F3"),
-    sample_organism_name = c(
-      "PlantSpecies1",
-      "PlantSpecies2",
-      "BacteriumSpecies1"
-    ),
-    sample_organism_01_domain = c("Eukaryota", "Eukaryota", "Bacteria"),
-    sample_organism_02_kingdom = c("Plantae", "Plantae", "Bacteria"),
-    sample_organism_03_phylum = c(NA_character_, NA_character_, NA_character_),
-    sample_organism_04_class = c(NA_character_, NA_character_, NA_character_),
-    sample_organism_05_order = c(NA_character_, NA_character_, NA_character_),
-    sample_organism_06_family = c(NA_character_, NA_character_, NA_character_),
-    sample_organism_07_tribe = c(NA_character_, NA_character_, NA_character_),
-    sample_organism_08_genus = c(NA_character_, NA_character_, NA_character_),
-    sample_organism_09_species = c(NA_character_, NA_character_, NA_character_),
-    sample_organism_10_varietas = c(
-      NA_character_,
-      NA_character_,
-      NA_character_
-    ),
-    stringsAsFactors = FALSE
-  )
-  taxa_file <- file.path(tmpdir, "taxa.tsv")
-  write.table(
-    taxa_data,
-    taxa_file,
-    sep = "\t",
-    row.names = FALSE,
-    quote = FALSE
-  )
-
-  # Empty canopus and formula files (required but can be empty)
-  canopus_file <- file.path(tmpdir, "canopus.tsv")
+  # Create empty canopus and formula files (required but can be empty)
   writeLines("feature_id", canopus_file)
-
-  formula_file <- file.path(tmpdir, "formula.tsv")
   writeLines("feature_id", formula_file)
 
-  output_file <- file.path(tmpdir, "weighted.tsv")
-
   list(
-    tmpdir = tmpdir,
+    tmpdir = root,
     library = lib_file,
     annotations = ann_file,
     components = comp_file,
@@ -242,7 +71,7 @@ test_that("weight_annotations() validates required file existence", {
 test_that("weight_annotations() validates weight sum", {
   skip_if_not_installed("tidytable")
 
-  fixtures <- create_minimal_wa_data()
+  fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
     weight_annotations(
@@ -266,7 +95,7 @@ test_that("weight_annotations() validates weight sum", {
 test_that("weight_annotations() validates minimal_ms1_condition", {
   skip_if_not_installed("tidytable")
 
-  fixtures <- create_minimal_wa_data()
+  fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
     weight_annotations(
@@ -291,7 +120,7 @@ test_that("weight_annotations() validates minimal_ms1_condition", {
 test_that("weight_annotations() rejects negative weights", {
   skip_if_not_installed("tidytable")
 
-  fixtures <- create_minimal_wa_data()
+  fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
     weight_annotations(
@@ -315,7 +144,7 @@ test_that("weight_annotations() rejects negative weights", {
 test_that("weight_annotations() rejects invalid logical parameters", {
   skip_if_not_installed("tidytable")
 
-  fixtures <- create_minimal_wa_data()
+  fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
     weight_annotations(
@@ -340,7 +169,7 @@ test_that("weight_annotations() rejects invalid logical parameters", {
 test_that("weight_annotations() rejects invalid candidate counts", {
   skip_if_not_installed("tidytable")
 
-  fixtures <- create_minimal_wa_data()
+  fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
     weight_annotations(
@@ -368,7 +197,7 @@ test_that("weight_annotations() runs successfully with minimal inputs", {
   skip_if_not_installed("tidytable")
   skip_if_not_installed("purrr")
 
-  fixtures <- create_minimal_wa_data()
+  fixtures <- stage_weight_annotations_fixtures()
   withr::local_dir(new = fixtures$tmpdir)
 
   # Mock get_default_paths to return our temp dir
@@ -447,7 +276,7 @@ test_that("weight_annotations() runs successfully with minimal inputs", {
 test_that("weight_annotations() processes MS1-only annotations", {
   skip_if_not_installed("tidytable")
 
-  fixtures <- create_minimal_wa_data()
+  fixtures <- stage_weight_annotations_fixtures()
   withr::local_dir(new = fixtures$tmpdir)
 
   local_mocked_bindings(
@@ -521,7 +350,7 @@ test_that("weight_annotations() processes MS1-only annotations", {
 test_that("weight_annotations() handles different weight combinations", {
   skip_if_not_installed("tidytable")
 
-  fixtures <- create_minimal_wa_data()
+  fixtures <- stage_weight_annotations_fixtures()
   withr::local_dir(new = fixtures$tmpdir)
 
   local_mocked_bindings(
@@ -596,7 +425,7 @@ test_that("weight_annotations() handles different weight combinations", {
 test_that("weight_annotations() handles boolean flags", {
   skip_if_not_installed("tidytable")
 
-  fixtures <- create_minimal_wa_data()
+  fixtures <- stage_weight_annotations_fixtures()
   withr::local_dir(new = fixtures$tmpdir)
 
   local_mocked_bindings(

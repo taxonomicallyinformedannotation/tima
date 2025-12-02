@@ -1,0 +1,6 @@
+feature_id,feature_mz,feature_rt,candidate_adduct,candidate_library,candidate_structure_inchikey_connectivity_layer,candidate_structure_smiles_no_stereo,candidate_structure_error_mz,candidate_structure_error_rt,candidate_score_similarity,candidate_score_sirius_csi,candidate_structure_name,candidate_structure_molecular_formula,candidate_structure_exact_mass,candidate_structure_xlogp,candidate_structure_tax_cla_01kin,candidate_structure_tax_cla_02sup,candidate_structure_tax_cla_03cla,candidate_structure_tax_cla_04dirpar,candidate_structure_tax_npc_01pat,candidate_structure_tax_npc_02sup,candidate_structure_tax_npc_03cla,candidate_structure_organism_occurrence_closest,candidate_structure_organism_occurrence_reference,candidate_spectrum_entropy
+F1,100.05,1.2,add1,MS1,AAAAAAAAAAAAA,CCC,NA,NA,0.9,NA,AAA,C3H8,44.06,1.5,Organic,NA,NA,NA,Alkaloids,NA,NA,Plantae,NA,2.5
+F1,100.05,1.2,add2,lib1,BBBBBBBBBBBBB,CCCC,0.4,0.4,0.85,0.4,BBB,C4H10,58.08,2.0,Organic,NA,NA,NA,Terpenoids,NA,NA,Plantae,NA,2.3
+F2,150.08,2.5,add3,lib2,CCCCCCCCCCCCC,CCCCC,NA,NA,NA,NA,CCC,C5H12,72.09,2.5,Organic,NA,NA,NA,Alkaloids,NA,NA,NA,NA,2.8
+F3,200.10,3.1,add4,lib1,AAAAAAAAAAAAA,CCC,0.5,0.5,0.6,0.5,DDD,C3H8,44.06,1.5,Organic,NA,NA,NA,Alkaloids,NA,NA,Plantae,NA,2.1
+

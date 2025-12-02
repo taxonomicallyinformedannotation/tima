@@ -1,0 +1,5 @@
+feature_id,sample_organism_name,sample_organism_01_domain,sample_organism_02_kingdom,sample_organism_03_phylum,sample_organism_04_class,sample_organism_05_order,sample_organism_06_family,sample_organism_07_tribe,sample_organism_08_genus,sample_organism_09_species,sample_organism_10_varietas
+F1,PlantSpecies1,Eukaryota,Plantae,NA,NA,NA,NA,NA,NA,NA,NA
+F2,PlantSpecies2,Eukaryota,Plantae,NA,NA,NA,NA,NA,NA,NA,NA
+F3,BacteriumSpecies1,Bacteria,Bacteria,NA,NA,NA,NA,NA,NA,NA,NA
+
