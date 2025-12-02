@@ -207,15 +207,15 @@ create_edges_spectra <- function(
   rm(spectra)
   edges <- edges |>
     tidytable::mutate(
-      name_source = idz[name_source],
-      name_target = idz[name_target]
+      !!as.name(name_source) := idz[!!as.name(name_source)],
+      !!as.name(name_target) := idz[!!as.name(name_target)]
     )
   entropy_df <- tidytable::tidytable(entropy) |>
     tidytable::mutate(
       !!as.name(name_source) := tidytable::row_number()
     ) |>
     tidytable::mutate(
-      name_source = idz[name_source],
+      !!as.name(name_source) := idz[!!as.name(name_source)],
       feature_spectrum_entropy = as.character(entropy),
       feature_spectrum_peaks = as.character(npeaks)
     ) |>
