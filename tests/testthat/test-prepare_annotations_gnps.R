@@ -8,7 +8,9 @@ library(testthat)
 #'
 #' @param root Root directory for staging
 #' @return Named list of structure file paths
-stage_structure_fixtures <- function(root = temp_test_dir("prep_gnps_structures")) {
+stage_structure_fixtures <- function(
+  root = temp_test_dir("prep_gnps_structures")
+) {
   # Create directory structure
   dir.create(
     file.path(root, "structures", "taxonomies"),
