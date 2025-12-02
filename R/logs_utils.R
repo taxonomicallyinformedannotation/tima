@@ -83,15 +83,15 @@ format_bytes <- function(bytes) {
   GB <- 1024^3
 
   out[!bad] <- ifelse(
-    b < KB,
-    paste0(b, " B"),
-    ifelse(
-      b < MB,
-      paste0(round(b / KB, 1), " KB"),
-      ifelse(
-        b < GB,
-        paste0(round(b / MB, 1), " MB"),
-        paste0(round(b / GB, 2), " GB")
+    test = b < KB,
+    yes = paste0(b, " B"),
+    no = ifelse(
+      test = b < MB,
+      yes = paste0(round(b / KB, 1), " KB"),
+      no = ifelse(
+        test = b < GB,
+        yes = paste0(round(b / MB, 1), " MB"),
+        no = paste0(round(b / GB, 2), " GB")
       )
     )
   )
@@ -127,9 +127,9 @@ format_time <- function(seconds) {
     m <- s[idx3] %/% 60
     sec <- round(s[idx3] - m * 60)
     out[!bad][idx3] <- ifelse(
-      sec == 0,
-      paste0(m, "m"),
-      paste0(m, "m ", sec, "s")
+      test = sec == 0,
+      yes = paste0(m, "m"),
+      no = paste0(m, "m ", sec, "s")
     )
   }
 
@@ -140,9 +140,9 @@ format_time <- function(seconds) {
     h <- total_m %/% 60
     m <- round(total_m - h * 60)
     out[!bad][idx4] <- ifelse(
-      m == 0,
-      paste0(h, "h"),
-      paste0(h, "h ", m, "m")
+      test = m == 0,
+      yes = paste0(h, "h"),
+      no = paste0(h, "h ", m, "m")
     )
   }
 

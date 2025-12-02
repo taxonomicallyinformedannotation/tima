@@ -76,7 +76,13 @@ calculate_similarity <- function(
   assert_flag(return_matched_peaks, "return_matched_peaks")
   # Early exit for empty spectra
   if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
-    return(if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0)
+    return(
+      if (return_matched_peaks) {
+        list(score = 0.0, matches = 0L)
+      } else {
+        0.0
+      }
+    )
   }
 
   # Method: Entropy (no peak matching required) ----
@@ -152,7 +158,13 @@ calculate_similarity <- function(
   # Early exit if no matches
   if (length(matched_x) == 0L) {
     # log_trace("No matching peaks found between spectra")
-    return(if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0)
+    return(
+      if (return_matched_peaks) {
+        list(score = 0.0, matches = 0L)
+      } else {
+        0.0
+      }
+    )
   }
 
   # Extract matched peaks (drop=FALSE preserves matrix structure)

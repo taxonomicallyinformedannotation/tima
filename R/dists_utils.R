@@ -60,7 +60,7 @@ dist_get <- function(d, idx1, idx2) {
   )
 
   # Return: 0 for diagonal, matrix value otherwise
-  ifelse(i == j, 0, d[linear_idx])
+  ifelse(test = i == j, yes = 0, no = d[linear_idx])
 }
 
 #' @title Calculate pairwise distances with group labels
@@ -133,9 +133,9 @@ dist_groups <- function(d, g) {
   level2 <- levels(g)[pmax(as.numeric(group1), as.numeric(group2))]
 
   comparison_labels <- ifelse(
-    level1 == level2,
-    paste("Within", level1),
-    paste("Between", level1, "and", level2)
+    test = level1 == level2,
+    yes = paste("Within", level1),
+    no = paste("Between", level1, "and", level2)
   )
 
   # Build Result Data Frame ----

@@ -81,7 +81,7 @@ import_spectra <- function(
     cutoff,
     dalton,
     ppm,
-    ifelse(is.na(polarity), "all", polarity)
+    ifelse(test = is.na(polarity), yes = "all", no = polarity)
   )
 
   # Extract file extension (handle MassBank naming convention)

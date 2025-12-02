@@ -251,19 +251,57 @@ try_install_package <- function(
   dependencies,
   from_source = FALSE
 ) {
+  # Check if package was already installed before attempt
+  was_installed <- requireNamespace(package, quietly = TRUE)
+
   tryCatch(
     expr = {
       log_info(
         "Installing R package: {package} (from {if (from_source) 'source' else 'binary'})"
       )
 
-      utils::install.packages(
-        package,
-        repos = repos,
-        dependencies = dependencies,
-        INSTALL_opts = c("--no-lock", "--no-test-load"),
-        type = if (from_source) "source" else getOption("pkgType")
+      # Capture warnings as well as errors
+      result <- tryCatch(
+        {
+          utils::install.packages(
+            package,
+            repos = repos,
+            dependencies = dependencies,
+            INSTALL_opts = c("--no-lock", "--no-test-load"),
+            type = if (from_source) {
+              "source"
+            } else {
+              getOption("pkgType")
+            }
+          )
+          TRUE
+        },
+        warning = function(w) {
+          # Some installation failures only produce warnings
+          if (
+            grepl(
+              "package.*not available|is not available",
+              w$message,
+              ignore.case = TRUE
+            )
+          ) {
+            log_warn("Package not available: %s", w$message)
+            return(FALSE)
+          }
+          TRUE
+        }
       )
+
+      # Verify package was actually installed
+      is_now_installed <- requireNamespace(package, quietly = TRUE)
+
+      if (!was_installed && !is_now_installed) {
+        log_error(
+          "Installation failed: package '%s' not found in repositories",
+          package
+        )
+        return(FALSE)
+      }
 
       log_success("Successfully installed R package: %s", package)
       return(TRUE)

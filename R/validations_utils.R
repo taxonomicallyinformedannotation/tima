@@ -764,13 +764,21 @@ assert_positive_integer <- function(
     )
   }
 
-  min_val <- if (allow_zero) 0L else 1L
+  min_val <- if (allow_zero) {
+    0L
+  } else {
+    1L
+  }
 
   if (x < min_val) {
     stop(
       arg_name,
       " must be ",
-      if (allow_zero) ">= 0" else "> 0",
+      if (allow_zero) {
+        ">= 0"
+      } else {
+        "> 0"
+      },
       ", got: ",
       x,
       call. = FALSE
