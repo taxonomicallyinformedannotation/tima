@@ -416,3 +416,239 @@ test_that("NA fallback for smiles and inchikey connectivity is applied", {
     grepl("-", df$candidate_structure_inchikey_connectivity_layer) == FALSE
   ))
 })
+
+# Internal helper function tests ----
+
+test_that("normalize_input_files handles different input types", {
+  # Character vector
+  result <- normalize_input_files(c("file1.mgf", "file2.mgf"), "Test")
+  expect_equal(result, c("file1.mgf", "file2.mgf"))
+
+  # List
+  result <- normalize_input_files(list("file1.mgf", "file2.mgf"), "Test")
+  expect_equal(result, c("file1.mgf", "file2.mgf"))
+
+  # Named list
+  result <- normalize_input_files(
+    list(pos = "file1.mgf", neg = "file2.mgf"),
+    "Test"
+  )
+  expect_equal(result, c("file1.mgf", "file2.mgf"))
+
+  # Error on invalid type
+  expect_error(
+    normalize_input_files(123, "Test"),
+    "Test elements must be character strings"
+  )
+})
+
+test_that("resolve_annotation_output handles paths correctly", {
+  result <- resolve_annotation_output("path1.tsv")
+  expect_equal(result, "path1.tsv")
+
+  result <- resolve_annotation_output(c("path1.tsv", "path2.tsv"))
+  expect_equal(result, "path1.tsv")
+
+  expect_error(
+    resolve_annotation_output(123),
+    "Output path must be a character string"
+  )
+
+  expect_error(
+    resolve_annotation_output(character(0)),
+    "Output must contain at least one file path"
+  )
+})
+
+test_that("filter_library_paths_by_polarity filters correctly", {
+  paths <- c(
+    "lib_pos.mgf",
+    "lib_neg.mgf",
+    "lib_pos_2.mgf",
+    "neutral.mgf"
+  )
+
+  result_pos <- filter_library_paths_by_polarity(paths, "pos")
+  expect_true(all(grepl("pos", result_pos)))
+  expect_equal(length(result_pos), 2)
+
+  result_neg <- filter_library_paths_by_polarity(paths, "neg")
+  expect_true(all(grepl("neg", result_neg)))
+  expect_equal(length(result_neg), 1)
+
+  # Single path unchanged
+  result <- filter_library_paths_by_polarity("lib.mgf", "pos")
+  expect_equal(result, "lib.mgf")
+
+  # Empty list
+  result <- filter_library_paths_by_polarity(character(0), "pos")
+  expect_equal(length(result), 0)
+})
+
+# test_that("annotate_spectra handles multiple input files", {
+#   skip_on_cran()
+#   withr::local_dir(new = temp_test_dir("ann_spe_multi"))
+#   local_test_project(copy = TRUE)
+#
+#   # Create multiple query files
+#   query_dir <- dirname(get_params(step = "annotate_spectra")$files$spectral$raw[
+#     1
+#   ])
+#   dir.create(query_dir, recursive = TRUE, showWarnings = FALSE)
+#   query1 <- file.path(query_dir, "query1.mgf")
+#   query2 <- file.path(query_dir, "query2.mgf")
+#   write_minimal_mgf(query1, precursors = c(150))
+#   write_minimal_mgf(query2, precursors = c(200))
+#
+#   lib_path <- file.path(
+#     "data",
+#     "interim",
+#     "libraries",
+#     "spectra",
+#     "lib_pos.mgf"
+#   )
+#   write_minimal_mgf(lib_path, precursors = c(150, 200))
+#
+#   out <- annotate_spectra(
+#     input = c(query1, query2),
+#     libraries = list(pos = lib_path),
+#     polarity = "pos",
+#     threshold = 0
+#   )
+#
+#   expect_true(file.exists(out))
+#   df <- fread(out)
+#   expect_true(nrow(df) >= 0)
+# })
+
+test_that("annotate_spectra handles empty library error", {
+  skip_on_cran()
+  withr::local_dir(new = temp_test_dir("ann_spe_empty_lib"))
+  local_test_project(copy = TRUE)
+
+  paths <- get_default_paths()
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+
+  expect_error(
+    annotate_spectra(libraries = character(0), polarity = "pos"),
+    "At least one library must be provided"
+  )
+
+  expect_error(
+    annotate_spectra(libraries = list(), polarity = "pos"),
+    "Library elements must be character strings"
+  )
+})
+
+test_that("annotate_spectra applies intensity cutoff", {
+  skip_on_cran()
+  withr::local_dir(new = temp_test_dir("ann_spe_cutoff"))
+  local_test_project(copy = TRUE)
+
+  paths <- get_default_paths()
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "lib_pos.mgf"
+  )
+  write_minimal_mgf(lib_path, precursors = c(200))
+
+  # High cutoff
+  out <- annotate_spectra(
+    libraries = list(pos = lib_path),
+    polarity = "pos",
+    qutoff = 50,
+    threshold = 0
+  )
+
+  expect_true(file.exists(out))
+})
+
+test_that("annotate_spectra handles different similarity methods", {
+  skip_on_cran()
+  withr::local_dir(new = temp_test_dir("ann_spe_methods"))
+  local_test_project(copy = TRUE)
+
+  paths <- get_default_paths()
+  get_file(
+    url = paths$urls$examples$spectra_mini,
+    export = paths$data$source$spectra
+  )
+
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "lib_pos.mgf"
+  )
+  write_minimal_mgf(lib_path, precursors = c(200))
+
+  # Test entropy method
+  out <- annotate_spectra(
+    libraries = list(pos = lib_path),
+    polarity = "pos",
+    method = "entropy",
+    threshold = 0
+  )
+
+  expect_true(file.exists(out))
+})
+
+test_that("annotate_spectra validates method parameter", {
+  skip_on_cran()
+  withr::local_dir(new = temp_test_dir("ann_spe_method_invalid"))
+  local_test_project(copy = TRUE)
+
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "lib_pos.mgf"
+  )
+  write_minimal_mgf(lib_path, precursors = c(150))
+
+  expect_error(
+    annotate_spectra(
+      libraries = list(pos = lib_path),
+      polarity = "pos",
+      method = "invalid_method"
+    ),
+    "method"
+  )
+})
+
+test_that("annotate_spectra validates approx parameter", {
+  skip_on_cran()
+  withr::local_dir(new = temp_test_dir("ann_spe_approx_invalid"))
+  local_test_project(copy = TRUE)
+
+  lib_path <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "lib_pos.mgf"
+  )
+  write_minimal_mgf(lib_path, precursors = c(150))
+
+  expect_error(
+    annotate_spectra(
+      libraries = list(pos = lib_path),
+      polarity = "pos",
+      approx = "yes"
+    ),
+    "approx"
+  )
+})
