@@ -57,7 +57,10 @@ copy_fixture_to <- function(filename, dest) {
   src <- resolve_fixture_path(filename)
   dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
   if (!file.copy(src, dest, overwrite = TRUE)) {
-    stop(sprintf("Failed to copy fixture '%s' to '%s'", filename, dest), call. = FALSE)
+    stop(
+      sprintf("Failed to copy fixture '%s' to '%s'", filename, dest),
+      call. = FALSE
+    )
   }
   dest
 }
@@ -571,7 +574,9 @@ load_fixture <- function(fixture_name, cache = TRUE) {
   fixture_path <- resolve_fixture_path(
     paste0(fixture_name, ".csv"),
     missing_msg = paste0(
-      "Fixture '", fixture_name, "' not found."
+      "Fixture '",
+      fixture_name,
+      "' not found."
     )
   )
 
@@ -618,7 +623,9 @@ load_mgf_fixture <- function(fixture_name) {
   resolve_fixture_path(
     fixture_name,
     missing_msg = paste0(
-      "MGF fixture '", fixture_name, "' not found."
+      "MGF fixture '",
+      fixture_name,
+      "' not found."
     )
   )
 }
@@ -1242,4 +1249,3 @@ copy_csv_fixture_to_dir <- function(fixture, dir, dest) {
   src <- if (grepl("\\.csv$", fixture)) fixture else paste0(fixture, ".csv")
   copy_fixture_to(src, file.path(dir, dest))
 }
-

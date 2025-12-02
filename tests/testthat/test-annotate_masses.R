@@ -374,4 +374,3 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
   # (May be 0 or 1 depending on exact mass calculations)
   expect_true(nrow(annotations_tight) <= 1)
 })
-

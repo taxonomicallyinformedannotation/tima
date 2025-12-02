@@ -8,7 +8,9 @@ library(testthat)
 #'
 #' @param root Root directory for staging
 #' @return Named list of structure file paths
-stage_structure_fixtures <- function(root = temp_test_dir("prep_sirius_structures")) {
+stage_structure_fixtures <- function(
+  root = temp_test_dir("prep_sirius_structures")
+) {
   # Create directory structure
   dir.create(
     file.path(root, "structures", "taxonomies"),
@@ -126,4 +128,3 @@ test_that("test-prepare_annotations_sirius handles missing input by producing em
   expect_true(file.exists(out_ann))
   expect_true(is.character(res[1]))
 })
-
