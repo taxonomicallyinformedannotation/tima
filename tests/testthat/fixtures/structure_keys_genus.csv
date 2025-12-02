@@ -1,0 +1,5 @@
+structure_inchikey,structure_smiles_no_stereo,organism_name,reference_doi
+A,S1,Species1,doi1
+B,S2,Species2,doi2
+C,S3,Species3,doi3
+

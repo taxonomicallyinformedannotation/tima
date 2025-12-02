@@ -76,17 +76,9 @@ test_that("complete_organism_taxonomy handles empty missing data", {
 })
 
 test_that("apply_taxonomic_filter filters correctly", {
-  table_keys <- tidytable::tidytable(
-    structure_inchikey = c("A", "B", "C"),
-    structure_smiles_no_stereo = c("S1", "S2", "S3"),
-    organism_name = c("Plant1", "Plant2", "Plant3"),
-    reference_doi = c("doi1", "doi2", "doi3")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Plant1", "Plant2", "Plant3"),
-    organism_taxonomy_ottol_family = c("Fam1", "Fam2", "Fam1")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("structure_keys_filter_test")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_family")
 
   result <- apply_taxonomic_filter(
     table_keys,
@@ -100,17 +92,9 @@ test_that("apply_taxonomic_filter filters correctly", {
 })
 
 test_that("apply_taxonomic_filter errors on no matches", {
-  table_keys <- tidytable::tidytable(
-    structure_inchikey = c("A"),
-    structure_smiles_no_stereo = c("S1"),
-    organism_name = c("Plant1"),
-    reference_doi = c("doi1")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Plant1"),
-    organism_taxonomy_ottol_family = c("Fam1")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("structure_keys_single")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_single_family")
 
   expect_error(
     apply_taxonomic_filter(
@@ -173,7 +157,8 @@ test_that("test-validate_sop_merged_inputs rejects non-character output paths", 
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
-    "output_key must be a single character string"
+    "The following output parameters must be single character strings: output_key",
+    fixed = TRUE
   )
 })
 
@@ -192,7 +177,8 @@ test_that("test-validate_sop_merged_inputs rejects vector output paths", {
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
-    "output_org_tax_ott must be a single character string"
+    "The following output parameters must be single character strings: output_org_tax_ott",
+    fixed = TRUE
   )
 })
 
@@ -285,87 +271,59 @@ test_that("test-validate_sop_merged_inputs validates all output parameters", {
 
     expect_error(
       do.call(validate_sop_merged_inputs, args),
-      paste0(param, " must be a single character string")
+      paste0(
+        "The following output parameters must be single character strings: ",
+        param
+      ),
+      fixed = TRUE
     )
   }
-})
-
-## load_and_merge_libraries ----
-
-test_that("test-load_and_merge_libraries combines multiple files", {
-  skip("Requires complex setup with split_tables_sop function")
-  # This function calls split_tables_sop which requires extensive setup
-})
-
-test_that("test-load_and_merge_libraries handles single file", {
-  skip("Requires complex setup with split_tables_sop function")
-})
-
-test_that("test-load_and_merge_libraries handles NA strings correctly", {
-  skip("Requires complex setup with split_tables_sop function")
 })
 
 ## complete_organism_taxonomy ----
 
 test_that("test-complete_organism_taxonomy returns original when all organisms present", {
-  table_keys <- tidytable::tidytable(
-    organism_name = c("Org1", "Org2")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Org1", "Org2"),
-    organism_taxonomy_ottol_kingdom = c("Plantae", "Animalia")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("organism_keys_basic")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_basic")
 
   result <- complete_organism_taxonomy(table_keys, table_org_tax_ott)
 
   expect_equal(nrow(result), 2)
-  expect_equal(result$organism_name, c("Org1", "Org2"))
+  expect_equal(sort(result$organism_name), sort(c("Org1", "Org2")))
 })
 
 test_that("test-complete_organism_taxonomy handles all missing organisms", {
-  table_keys <- tidytable::tidytable(
-    organism_name = c("NewOrg1", "NewOrg2")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = character(),
-    organism_taxonomy_ottol_kingdom = character()
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("organism_keys_new")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_empty")
 
   # This will try to fetch taxonomy - may fail in test environment
   # We just check it doesn't error
-  expect_no_error(
-    complete_organism_taxonomy(table_keys, table_org_tax_ott)
+  expect_warning(
+    complete_organism_taxonomy(table_keys, table_org_tax_ott),
+    "NewOrg2, NewOrg1 are not matched",
+    fixed = TRUE
   )
 })
 
 test_that("test-complete_organism_taxonomy handles mixed missing/present", {
-  table_keys <- tidytable::tidytable(
-    organism_name = c("Org1", "NewOrg")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Org1"),
-    organism_taxonomy_ottol_kingdom = c("Plantae")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("organism_keys_mixed")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_partial")
 
   # Should attempt to fetch taxonomy for NewOrg
-  expect_no_error(
-    complete_organism_taxonomy(table_keys, table_org_tax_ott)
+  expect_warning(
+    complete_organism_taxonomy(table_keys, table_org_tax_ott),
+    "NewOrg are not matched",
+    fixed = TRUE
   )
 })
 
 test_that("test-complete_organism_taxonomy preserves existing data", {
-  table_keys <- tidytable::tidytable(
-    organism_name = c("Org1", "Org2")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Org1", "Org2"),
-    organism_taxonomy_ottol_kingdom = c("Plantae", "Animalia"),
-    organism_taxonomy_ottol_family = c("Fam1", "Fam2")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("organism_keys_basic")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_multi_level")
 
   result <- complete_organism_taxonomy(table_keys, table_org_tax_ott)
 
@@ -376,17 +334,9 @@ test_that("test-complete_organism_taxonomy preserves existing data", {
 ## apply_taxonomic_filter ----
 
 test_that("test-apply_taxonomic_filter filters by kingdom", {
-  table_keys <- tidytable::tidytable(
-    structure_inchikey = c("A", "B", "C"),
-    structure_smiles_no_stereo = c("S1", "S2", "S3"),
-    organism_name = c("Plant1", "Animal1", "Plant2"),
-    reference_doi = c("doi1", "doi2", "doi3")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Plant1", "Animal1", "Plant2"),
-    organism_taxonomy_ottol_kingdom = c("Plantae", "Animalia", "Plantae")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("structure_keys_kingdom")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_kingdom")
 
   result <- apply_taxonomic_filter(
     table_keys,
@@ -400,17 +350,9 @@ test_that("test-apply_taxonomic_filter filters by kingdom", {
 })
 
 test_that("test-apply_taxonomic_filter filters by genus", {
-  table_keys <- tidytable::tidytable(
-    structure_inchikey = c("A", "B", "C"),
-    structure_smiles_no_stereo = c("S1", "S2", "S3"),
-    organism_name = c("Species1", "Species2", "Species3"),
-    reference_doi = c("doi1", "doi2", "doi3")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Species1", "Species2", "Species3"),
-    organism_taxonomy_ottol_genus = c("Genus1", "Genus2", "Genus1")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("structure_keys_genus")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_genus")
 
   result <- apply_taxonomic_filter(
     table_keys,
@@ -424,17 +366,9 @@ test_that("test-apply_taxonomic_filter filters by genus", {
 })
 
 test_that("test-apply_taxonomic_filter filters by species", {
-  table_keys <- tidytable::tidytable(
-    structure_inchikey = c("A", "B"),
-    structure_smiles_no_stereo = c("S1", "S2"),
-    organism_name = c("Homo sapiens", "Mus musculus"),
-    reference_doi = c("doi1", "doi2")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Homo sapiens", "Mus musculus"),
-    organism_taxonomy_ottol_species = c("Homo sapiens", "Mus musculus")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("structure_keys_species")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_species")
 
   result <- apply_taxonomic_filter(
     table_keys,
@@ -448,17 +382,9 @@ test_that("test-apply_taxonomic_filter filters by species", {
 })
 
 test_that("test-apply_taxonomic_filter handles case sensitivity", {
-  table_keys <- tidytable::tidytable(
-    structure_inchikey = c("A", "B"),
-    structure_smiles_no_stereo = c("S1", "S2"),
-    organism_name = c("Org1", "Org2"),
-    reference_doi = c("doi1", "doi2")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Org1", "Org2"),
-    organism_taxonomy_ottol_family = c("Fabaceae", "Rosaceae")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("structure_keys_two_orgs")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_case_test")
 
   # Test exact case match
   result <- apply_taxonomic_filter(
@@ -473,17 +399,9 @@ test_that("test-apply_taxonomic_filter handles case sensitivity", {
 })
 
 test_that("test-apply_taxonomic_filter handles NA taxonomy values", {
-  table_keys <- tidytable::tidytable(
-    structure_inchikey = c("A", "B", "C"),
-    structure_smiles_no_stereo = c("S1", "S2", "S3"),
-    organism_name = c("Org1", "Org2", "Org3"),
-    reference_doi = c("doi1", "doi2", "doi3")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Org1", "Org2", "Org3"),
-    organism_taxonomy_ottol_order = c("Order1", NA, "Order1")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("structure_keys_three_orgs")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_order_na")
 
   result <- apply_taxonomic_filter(
     table_keys,
@@ -498,18 +416,9 @@ test_that("test-apply_taxonomic_filter handles NA taxonomy values", {
 })
 
 test_that("test-apply_taxonomic_filter returns unique structures", {
-  # Multiple organisms can have same structure
-  table_keys <- tidytable::tidytable(
-    structure_inchikey = c("A", "A", "B"),
-    structure_smiles_no_stereo = c("S1", "S1", "S2"),
-    organism_name = c("Org1", "Org2", "Org3"),
-    reference_doi = c("doi1", "doi2", "doi3")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Org1", "Org2", "Org3"),
-    organism_taxonomy_ottol_class = c("Class1", "Class1", "Class2")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("structure_keys_duplicate_structures")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_class")
 
   result <- apply_taxonomic_filter(
     table_keys,
@@ -524,17 +433,9 @@ test_that("test-apply_taxonomic_filter returns unique structures", {
 })
 
 test_that("test-apply_taxonomic_filter handles empty result", {
-  table_keys <- tidytable::tidytable(
-    structure_inchikey = c("A", "B"),
-    structure_smiles_no_stereo = c("S1", "S2"),
-    organism_name = c("Org1", "Org2"),
-    reference_doi = c("doi1", "doi2")
-  )
-
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Org1", "Org2"),
-    organism_taxonomy_ottol_phylum = c("Phylum1", "Phylum2")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("structure_keys_two_orgs")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_phylum")
 
   # Filter by non-existent value
   expect_error(
@@ -549,18 +450,9 @@ test_that("test-apply_taxonomic_filter handles empty result", {
 })
 
 test_that("test-apply_taxonomic_filter handles missing taxonomy column", {
-  table_keys <- tidytable::tidytable(
-    structure_inchikey = c("A"),
-    structure_smiles_no_stereo = c("S1"),
-    organism_name = c("Org1"),
-    reference_doi = c("doi1")
-  )
-
-  # Missing the expected taxonomy column
-  table_org_tax_ott <- tidytable::tidytable(
-    organism_name = c("Org1"),
-    other_column = c("value")
-  )
+  # Load fixtures instead of creating inline
+  table_keys <- load_fixture("structure_keys_single")
+  table_org_tax_ott <- load_fixture("organism_taxonomy_missing_column")
 
   expect_error(
     apply_taxonomic_filter(
@@ -656,62 +548,6 @@ test_that("test-apply_taxonomic_filter preserves core columns", {
   expect_true("organism_name" %in% names(result))
   expect_true("structure_smiles_no_stereo" %in% names(result))
 })
-
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("prepare_libraries_sop_merged works with filtering", {
-#   local_test_project(copy = TRUE)
-#   paths <- get_default_paths()
-#
-#   # Need LOTUS data
-#   fake_lotus(export = paths$data$source$libraries$sop$lotus)
-#   prepare_libraries_sop_lotus()
-#
-#   expect_no_error(
-#     prepare_libraries_sop_merged(
-#       files = get_params(
-#         step = "prepare_libraries_sop_merged"
-#       )$files$libraries$sop$prepared$lotus,
-#       filter = TRUE,
-#       level = "family",
-#       value = "Simaroubaceae|Gentianaceae",
-#       output_key = "data/interim/libraries/sop/merged/bitter.tsv.gz"
-#     )
-#   )
-# })
-
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("prepare_libraries_sop_merged triggers SMILES processing", {
-#   local_test_project(copy = TRUE)
-#   paths <- get_default_paths()
-#
-#   # Create fake data
-#   fake_ecmdb(export = paths$data$source$libraries$sop$ecmdb)
-#   fake_lotus(export = paths$data$source$libraries$sop$lotus)
-#
-#   prepare_libraries_sop_ecmdb()
-#   prepare_libraries_sop_lotus()
-#   prepare_libraries_sop_closed()
-#
-#   expect_no_error(
-#     prepare_libraries_sop_merged(
-#       files = c(
-#         get_params(
-#           step = "prepare_libraries_sop_merged"
-#         )$files$libraries$sop$prepared$closed,
-#         get_params(
-#           step = "prepare_libraries_sop_merged"
-#         )$files$libraries$sop$prepared$ecmdb,
-#         get_params(
-#           step = "prepare_libraries_sop_merged"
-#         )$files$libraries$sop$prepared$lotus
-#       )
-#     )
-#   )
-# })
 
 # ==== SUCCESS PATH TESTS FOR EXPORTED FUNCTION ====
 

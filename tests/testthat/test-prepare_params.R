@@ -99,38 +99,3 @@ test_that("prepare_params accepts explicit fixture lists", {
     params_advanced = fixture_adv("MANUAL")
   ))
 })
-
-## get_params: unknown step ----
-
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("get_params errors for unknown step", {
-#   # Create a temp script directory mimicking docopt scripts
-#   tmp_scripts <- withr::local_tempdir()
-#   writeLines(
-#     "Usage: prepare_params",
-#     file.path(tmp_scripts, "prepare_params.txt")
-#   )
-#   writeLines(
-#     "Usage: annotate_masses",
-#     file.path(tmp_scripts, "annotate_masses.txt")
-#   )
-#
-#   testthat::local_mocked_bindings(
-#     .env = baseenv(),
-#     get_default_paths = function() {
-#       list(
-#         params = list(
-#           default = list(path = "params/default"),
-#           prepare_params = "params/prepare_params.yaml"
-#         )
-#       )
-#     },
-#     system.file = function(subdir = NULL, package = NULL) tmp_scripts,
-#     parse_cli_params = function(...) list(),
-#     parse_yaml_params = function(...) list(parameters = list())
-#   )
-#
-#   expect_error(get_params("unknown"), "does not exist")
-# })

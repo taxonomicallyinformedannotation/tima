@@ -110,6 +110,8 @@ complete_organism_taxonomy <- function(table_keys, table_org_tax_ott) {
   table_org_tax_ott_2 <- table_keys |>
     tidytable::anti_join(y = table_org_tax_ott, by = "organism_name") |>
     tidytable::distinct(organism = organism_name) |>
+    # Filter out NA organism names before querying API
+    tidytable::filter(!is.na(organism)) |>
     data.frame()
 
   if (nrow(table_org_tax_ott_2) == 0) {

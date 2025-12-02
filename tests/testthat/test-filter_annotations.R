@@ -400,29 +400,3 @@ test_that("filter_annotations handles multiple annotation files", {
 
   expect_true(file.exists(result))
 })
-
-# test_that("filter_annotations handles RT library filtering", {
-#   skip_if_not_installed("tidytable")
-#
-#   ann <- tempfile(fileext = ".tsv")
-#   .make_ann(ann)
-#   feat <- tempfile(fileext = ".tsv")
-#   .make_feat(feat)
-#   rts <- tempfile(fileext = ".tsv")
-#   .make_rt(rts)
-#   out <- tempfile(fileext = ".tsv")
-#
-#   result <- filter_annotations(
-#     annotations = ann,
-#     features = feat,
-#     rts = rts,
-#     output = out,
-#     tolerance_rt = 0.1
-#   )
-#
-#   expect_true(file.exists(result))
-#
-#   # Read result and check RT filtering was applied
-#   result_data <- tidytable::fread(result)
-#   expect_true(nrow(result_data) >= 0)
-# })

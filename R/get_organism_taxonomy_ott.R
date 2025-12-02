@@ -7,9 +7,14 @@
 #' @return List of character vectors (batches)
 #' @keywords internal
 .create_batches <- function(items, batch_size) {
+  # Handle empty input
+  if (length(items) == 0L) {
+    return(list())
+  }
+
   purrr::map(
     .x = seq(1L, length(items), batch_size),
-    # TODO
+    # Split items into batches, removing NA values
     .f = function(i) {
       end_idx <- min(i + batch_size - 1L, length(items))
       items[i:end_idx][!is.na(items[i:end_idx])]

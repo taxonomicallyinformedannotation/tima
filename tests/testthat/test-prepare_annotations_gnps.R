@@ -77,7 +77,8 @@ test_that("test-prepare_annotations_gnps validates structure file paths", {
       str_tax_cla = temp_test_path("missing.tsv"),
       str_tax_npc = temp_test_path("missing.tsv")
     ),
-    "file not found"
+    "Required file(s) not found",
+    fixed = TRUE
   )
 })
 
