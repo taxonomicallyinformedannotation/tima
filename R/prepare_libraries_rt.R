@@ -8,6 +8,7 @@
 #'
 #' @include get_params.R
 #' @include import_spectra.R
+#' @include process_smiles.R
 #'
 #' @param mgf_exp Character vector of paths to MGF files with experimental RT
 #' @param mgf_is Character vector of paths to MGF files with in silico predicted RT
@@ -212,24 +213,33 @@ prepare_libraries_rt <- function(
 
     smiles <- unique(df_missing$smiles)
 
-    ## TODO replace with process_smiles
-    get_inchikey <- function(smiles, toolkit = "rdkit") {
-      url <- paste0(
-        "https://api.naturalproducts.net/latest/convert/inchikey?smiles=",
-        utils::URLencode(URL = smiles),
-        "&toolkit=",
-        toolkit
+    # Use process_smiles to get InChIKeys from SMILES
+    smiles_df <- tidytable::tidytable(
+      structure_smiles_initial = smiles
+    )
+
+    processed <- process_smiles(smiles_df, cache = NULL)
+
+    # Extract the InChIKeys from processed results
+    # Handle case where process_smiles might return empty or different columns
+    if (nrow(processed) > 0 && "structure_inchikey" %in% names(processed)) {
+      smiles_to_inchikey <- processed |>
+        tidytable::select(
+          smiles = structure_smiles_initial,
+          inchikey = structure_inchikey
+        ) |>
+        tidytable::distinct()
+    } else {
+      # If processing failed, create empty mapping
+      smiles_to_inchikey <- tidytable::tidytable(
+        smiles = character(0),
+        inchikey = character(0)
       )
-      tryCatch(expr = jsonlite::fromJSON(txt = url), error = function(e) {
-        NA_character_
-      })
     }
 
-    inchikey <- purrr::map(.x = smiles, .f = get_inchikey) |>
-      as.character()
     df_missing <- df_missing |>
       tidytable::select(-inchikey) |>
-      tidytable::left_join(y = tidytable::tidytable(smiles, inchikey))
+      tidytable::left_join(y = smiles_to_inchikey, by = "smiles")
 
     df_completed <- df_full |>
       tidytable::bind_rows(df_missing) |>
