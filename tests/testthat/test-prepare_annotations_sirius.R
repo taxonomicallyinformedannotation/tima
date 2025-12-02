@@ -4,30 +4,46 @@ library(testthat)
 
 ## Internal Utility Helpers ----
 
-.make_structs <- function() {
-  tmp <- tempdir()
+#' Stage structure fixtures for SIRIUS annotation tests
+#'
+#' @param root Root directory for staging
+#' @return Named list of structure file paths
+stage_structure_fixtures <- function(root = temp_test_dir("prep_sirius_structures")) {
+  # Create directory structure
   dir.create(
-    file.path(tmp, "structures", "taxonomies"),
+    file.path(root, "structures", "taxonomies"),
     recursive = TRUE,
     showWarnings = FALSE
   )
-  stereo <- file.path(tmp, "structures", "stereo.tsv")
-  met <- file.path(tmp, "structures", "metadata.tsv")
-  nam <- file.path(tmp, "structures", "names.tsv")
-  cla <- file.path(tmp, "structures", "taxonomies", "classyfire.tsv")
-  npc <- file.path(tmp, "structures", "taxonomies", "npc.tsv")
-  writeLines("", stereo)
-  writeLines("", met)
-  writeLines("", nam)
-  writeLines("", cla)
-  writeLines("", npc)
-  list(stereo = stereo, met = met, nam = nam, cla = cla, npc = npc)
+
+  # Define target paths
+  stereo <- file.path(root, "structures", "stereo.tsv")
+  met <- file.path(root, "structures", "metadata.tsv")
+  nam <- file.path(root, "structures", "names.tsv")
+  cla <- file.path(root, "structures", "taxonomies", "classyfire.tsv")
+  npc <- file.path(root, "structures", "taxonomies", "npc.tsv")
+
+  # Copy fixtures using the helper that handles path resolution
+  copy_fixture_to("structures_stereo.csv", stereo)
+  copy_fixture_to("structures_metadata.csv", met)
+  copy_fixture_to("structures_names.csv", nam)
+  copy_fixture_to("structures_taxonomy_cla.csv", cla)
+  copy_fixture_to("structures_taxonomy_npc.csv", npc)
+
+  list(
+    root = root,
+    stereo = stereo,
+    met = met,
+    nam = nam,
+    cla = cla,
+    npc = npc
+  )
 }
 
 ## Validation ----
 
 test_that("test-prepare_annotations_sirius validates sirius_version", {
-  s <- .make_structs()
+  s <- stage_structure_fixtures()
   tmp <- tempdir()
   out_ann <- file.path(tmp, "ann.tsv")
   out_can <- file.path(tmp, "can.tsv")
@@ -50,7 +66,7 @@ test_that("test-prepare_annotations_sirius validates sirius_version", {
 })
 
 test_that("test-prepare_annotations_sirius validates output parameters and structure files", {
-  s <- .make_structs()
+  s <- stage_structure_fixtures()
   expect_error(
     prepare_annotations_sirius(
       input_directory = temp_test_path("missing.zip"),
@@ -88,7 +104,7 @@ test_that("test-prepare_annotations_sirius validates output parameters and struc
 ## Behavior ----
 
 test_that("test-prepare_annotations_sirius handles missing input by producing empty outputs", {
-  s <- .make_structs()
+  s <- stage_structure_fixtures()
   tmp <- tempdir()
   out_ann <- file.path(tmp, "ann.tsv")
   out_can <- file.path(tmp, "can.tsv")
@@ -111,50 +127,3 @@ test_that("test-prepare_annotations_sirius handles missing input by producing em
   expect_true(is.character(res[1]))
 })
 
-# test_that("prepare_annotations_sirius() succeeds with empty directory and structure files (v5)", {
-#   skip_if_not_installed("tidytable")
-#   s <- .make_structs()
-#   dir_in <- tempfile()
-#   dir.create(dir_in)
-#   out_ann <- tempfile(fileext = ".tsv")
-#   out_can <- tempfile(fileext = ".tsv")
-#   out_for <- tempfile(fileext = ".tsv")
-#   res <- prepare_annotations_sirius(
-#     input_directory = dir_in,
-#     output_ann = out_ann,
-#     output_can = out_can,
-#     output_for = out_for,
-#     sirius_version = "5",
-#     str_stereo = s$stereo,
-#     str_met = s$met,
-#     str_nam = s$nam,
-#     str_tax_cla = s$cla,
-#     str_tax_npc = s$npc
-#   )
-#   expect_true(all(file.exists(c(out_ann, out_can, out_for))))
-#   expect_type(res, "character")
-# })
-
-# test_that("prepare_annotations_sirius() handles sirius_version switch to 6", {
-#   skip_if_not_installed("tidytable")
-#   s <- .make_structs()
-#   dir_in <- tempfile()
-#   dir.create(dir_in)
-#   out_ann <- tempfile(fileext = ".tsv")
-#   out_can <- tempfile(fileext = ".tsv")
-#   out_for <- tempfile(fileext = ".tsv")
-#   res <- prepare_annotations_sirius(
-#     input_directory = dir_in,
-#     output_ann = out_ann,
-#     output_can = out_can,
-#     output_for = out_for,
-#     sirius_version = "6",
-#     str_stereo = s$stereo,
-#     str_met = s$met,
-#     str_nam = s$nam,
-#     str_tax_cla = s$cla,
-#     str_tax_npc = s$npc
-#   )
-#   expect_true(all(file.exists(c(out_ann, out_can, out_for))))
-#   expect_type(res, "character")
-# })

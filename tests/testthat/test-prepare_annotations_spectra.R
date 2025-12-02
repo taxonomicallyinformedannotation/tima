@@ -4,56 +4,46 @@ library(testthat)
 
 ## Internal Utility Helpers ----
 
-make_min_struct_files_spectra <- function(tmp) {
-  # Use tmp directory or create temp path
-  if (is.null(tmp)) {
-    tmp <- temp_test_dir("spectra_test")
-  }
-
+#' Stage structure fixtures for spectral annotation tests
+#'
+#' @param root Root directory for staging
+#' @return Named list of structure file paths
+stage_structure_fixtures <- function(root = temp_test_dir("prep_spectra_structures")) {
+  # Create directory structure
   dir.create(
-    file.path(tmp, "structures", "taxonomies"),
+    file.path(root, "structures", "taxonomies"),
     recursive = TRUE,
     showWarnings = FALSE
   )
-  stereo <- file.path(tmp, "structures", "stereo.tsv")
-  met <- file.path(tmp, "structures", "metadata.tsv")
-  nam <- file.path(tmp, "structures", "names.tsv")
-  cla <- file.path(tmp, "structures", "taxonomies", "classyfire.tsv")
-  npc <- file.path(tmp, "structures", "taxonomies", "npc.tsv")
 
-  # Use fixtures instead of creating inline
-  tidytable::fwrite(
-    load_fixture("structures_stereo"),
-    stereo,
-    sep = "\t"
+  # Define target paths
+  stereo <- file.path(root, "structures", "stereo.tsv")
+  met <- file.path(root, "structures", "metadata.tsv")
+  nam <- file.path(root, "structures", "names.tsv")
+  cla <- file.path(root, "structures", "taxonomies", "classyfire.tsv")
+  npc <- file.path(root, "structures", "taxonomies", "npc.tsv")
+
+  # Copy fixtures using the helper that handles path resolution
+  copy_fixture_to("structures_stereo.csv", stereo)
+  copy_fixture_to("structures_metadata.csv", met)
+  copy_fixture_to("structures_names.csv", nam)
+  copy_fixture_to("structures_taxonomy_cla.csv", cla)
+  copy_fixture_to("structures_taxonomy_npc.csv", npc)
+
+  list(
+    root = root,
+    stereo = stereo,
+    met = met,
+    nam = nam,
+    cla = cla,
+    npc = npc
   )
-  tidytable::fwrite(
-    load_fixture("structures_metadata"),
-    met,
-    sep = "\t"
-  )
-  tidytable::fwrite(
-    load_fixture("structures_names"),
-    nam,
-    sep = "\t"
-  )
-  tidytable::fwrite(
-    load_fixture("structures_taxonomy_cla"),
-    cla,
-    sep = "\t"
-  )
-  tidytable::fwrite(
-    load_fixture("structures_taxonomy_npc"),
-    npc,
-    sep = "\t"
-  )
-  list(stereo = stereo, met = met, nam = nam, cla = cla, npc = npc)
 }
 
 ## Validation ----
 
 test_that("test-prepare_annotations_spectra validates input vector and files", {
-  s <- make_min_struct_files_spectra(NULL)
+  s <- stage_structure_fixtures()
   out <- temp_test_path("spectra.tsv")
   expect_error(
     prepare_annotations_spectra(
@@ -103,7 +93,7 @@ test_that("test-prepare_annotations_spectra validates structure files", {
 ## Behavior ----
 
 test_that("test-prepare_annotations_spectra processes minimal formatted input", {
-  s <- make_min_struct_files_spectra(NULL)
+  s <- stage_structure_fixtures()
   out <- temp_test_path("spectra.tsv")
 
   tbl <- tidytable::tidytable(
