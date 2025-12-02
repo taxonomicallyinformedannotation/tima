@@ -347,11 +347,15 @@ test_that("split_sirius_results splits table correctly", {
   mock_table <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3"),
     feature_pred_tax_cla_01kin_val = c("Kingdom1", NA, "Kingdom3"),
-    feature_pred_tax_cla_02sup_val = c("Superclass1", "Superclass2", "Superclass2"),
+    feature_pred_tax_cla_02sup_val = c(
+      "Superclass1",
+      "Superclass2",
+      "Superclass2"
+    ),
     candidate_adduct = c("[M+H]+", "[M+Na]+", "[M+H]+"),
     candidate_score_sirius_sirius = c(0.9, 0.8, 0.7),
     candidate_structure_inchikey = c("KEY1", "KEY2", "KEY3"),
-    candidate_count_sirius_peaks_explained = c(1,2,3)
+    candidate_count_sirius_peaks_explained = c(1, 2, 3)
   )
 
   result <- split_sirius_results(mock_table)
@@ -365,4 +369,3 @@ test_that("split_sirius_results splits table correctly", {
   expect_true(tidytable::is_tidytable(result$formula))
   expect_true(tidytable::is_tidytable(result$structures))
 })
-
