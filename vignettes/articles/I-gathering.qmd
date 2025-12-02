@@ -178,7 +178,7 @@ targets::tar_visnetwork(
 )
 ```
 
-As you can see, one target seems outdated.
+As you can see, the targets seem outdated.
 In reality, we force it to search if a new version of LOTUS exists each time.
 If a newer version exists, it will fetch it and re-run needed steps accordingly.
 
