@@ -1,3 +1,25 @@
+# Helper Functions ----
+
+#' Extract m/z values from peak data matrix
+#' @keywords internal
+.extract_mz_values <- function(peakData) {
+  if (is.matrix(peakData) && ncol(peakData) >= 1L) {
+    peakData[, 1L]
+  } else {
+    numeric(0)
+  }
+}
+
+#' Extract intensity values from peak data matrix
+#' @keywords internal
+.extract_intensity_values <- function(peakData) {
+  if (is.matrix(peakData) && ncol(peakData) >= 2L) {
+    peakData[, 2L]
+  } else {
+    numeric(0)
+  }
+}
+
 #' @title Extract spectra from Spectra object
 #'
 #' @description Extracts and harmonizes spectra data from a Spectra object into
@@ -21,29 +43,6 @@
 #' head(spectra_df)
 #' peaks <- spectra_df$mz[[1]] # First spectrum peaks
 #' }
-
-# Helper Functions ----
-
-#' Extract m/z values from peak data matrix
-#' @keywords internal
-.extract_mz_values <- function(peakData) {
-  if (is.matrix(peakData) && ncol(peakData) >= 1L) {
-    peakData[, 1L]
-  } else {
-    numeric(0)
-  }
-}
-
-#' Extract intensity values from peak data matrix
-#' @keywords internal
-.extract_intensity_values <- function(peakData) {
-  if (is.matrix(peakData) && ncol(peakData) >= 2L) {
-    peakData[, 2L]
-  } else {
-    numeric(0)
-  }
-}
-
 extract_spectra <- function(object) {
   # Input Validation ----
   if (!inherits(object, "Spectra")) {

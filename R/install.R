@@ -180,7 +180,8 @@ setup_virtualenv <- function(
       error = function(e) {
         log_error("Creating Python virtualenv failed: %s", e$message)
         log_info(
-          "Retrying with clean Python install (version {rescue_python_version})"
+          "Retrying with clean Python install (version %s)",
+          rescue_python_version
         )
 
         tryCatch(
@@ -256,29 +257,23 @@ try_install_package <- function(
 
   tryCatch(
     expr = {
+      install_type <- if (from_source) "source" else "binary"
       log_info(
         "Installing R package: %s (from %s)",
         package,
-        if (from_source) {
-          "source"
-        } else {
-          "binary"
-        }
+        install_type
       )
 
       # Capture warnings as well as errors
       result <- tryCatch(
         {
+          pkg_type <- if (from_source) "source" else getOption("pkgType")
           utils::install.packages(
             package,
             repos = repos,
             dependencies = dependencies,
             INSTALL_opts = c("--no-lock", "--no-test-load"),
-            type = if (from_source) {
-              "source"
-            } else {
-              getOption("pkgType")
-            }
+            type = pkg_type
           )
           TRUE
         },
@@ -297,6 +292,11 @@ try_install_package <- function(
           TRUE
         }
       )
+
+      # If warning handler already returned FALSE, bail out early
+      if (isFALSE(result)) {
+        return(FALSE)
+      }
 
       # Verify package was actually installed
       is_now_installed <- requireNamespace(package, quietly = TRUE)
