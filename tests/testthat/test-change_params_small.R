@@ -218,6 +218,172 @@ test_that("change_params_small updates all file parameters", {
   expect_true(grepl("new_features.csv", params$files$features$raw))
 })
 
+## Internal Helper Tests ----
+
+test_that("validate_params_small_inputs accepts valid polarity", {
+  expect_silent(validate_params_small_inputs(ms_pol = "pos"))
+  expect_silent(validate_params_small_inputs(ms_pol = "neg"))
+  expect_silent(validate_params_small_inputs(ms_pol = NULL))
+})
+
+test_that("validate_params_small_inputs errors on invalid polarity", {
+  expect_error(
+    validate_params_small_inputs(ms_pol = "invalid"),
+    "must be either 'pos' or 'neg'"
+  )
+  expect_error(
+    validate_params_small_inputs(ms_pol = "positive"),
+    "must be either 'pos' or 'neg'"
+  )
+  expect_error(
+    validate_params_small_inputs(ms_pol = 1),
+    "must be either 'pos' or 'neg'"
+  )
+})
+
+test_that("copy_file_to_target copies file successfully", {
+  skip_if_not_installed("fs")
+
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  # Create source file
+  source_file <- file.path(tmpdir, "source.txt")
+  writeLines("test content", source_file)
+
+  # Create target directory
+  target_dir <- file.path(tmpdir, "target")
+  dir.create(target_dir, recursive = TRUE)
+
+  # Copy file
+  result <- copy_file_to_target(
+    file_path = source_file,
+    target_dir = target_dir,
+    file_description = "Test file"
+  )
+
+  expect_true(file.exists(result))
+  expect_equal(basename(result), "source.txt")
+  expect_true(file.exists(file.path(target_dir, "source.txt")))
+})
+
+test_that("copy_file_to_target errors on missing file", {
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  expect_error(
+    copy_file_to_target(
+      file_path = file.path(tmpdir, "nonexistent.txt"),
+      target_dir = tmpdir,
+      file_description = "Missing file"
+    ),
+    "Missing file.*does not exist"
+  )
+})
+
+test_that("copy_file_to_target overwrites existing file", {
+  skip_if_not_installed("fs")
+
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  # Create source file
+  source_file <- file.path(tmpdir, "source.txt")
+  writeLines("new content", source_file)
+
+  # Create target directory with existing file
+  target_dir <- file.path(tmpdir, "target")
+  dir.create(target_dir, recursive = TRUE)
+  target_file <- file.path(target_dir, "source.txt")
+  writeLines("old content", target_file)
+
+  # Copy file (should overwrite)
+  result <- copy_file_to_target(
+    file_path = source_file,
+    target_dir = target_dir,
+    file_description = "Test file"
+  )
+
+  expect_true(file.exists(result))
+  content <- readLines(result)
+  expect_equal(content, "new content")
+})
+
+test_that("create_yaml_null_handler creates proper function", {
+  handler <- create_yaml_null_handler()
+  expect_true(is.function(handler))
+
+  # Test NA conversion
+  result_na <- handler(NA)
+  expect_equal(result_na |> names(), NULL)
+  expect_s3_class(result_na, "verbatim")
+
+  # Test non-NA passthrough
+  result_string <- handler("test")
+  expect_equal(result_string, "test")
+  expect_false(inherits(result_string, "verbatim"))
+
+  result_number <- handler(42)
+  expect_equal(result_number, 42)
+
+  result_logical <- handler(TRUE)
+  expect_equal(result_logical, TRUE)
+})
+
+test_that("change_params_small handles NULL parameters gracefully", {
+  skip_if_not_installed("yaml")
+  skip_on_ci()
+
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  # Create minimal params
+  minimal_params <- list(
+    ms = list(polarity = "pos"),
+    files = list(
+      pattern = "original",
+      features = list(raw = "features.csv"),
+      metadata = list(raw = "metadata.tsv"),
+      annotations = list(raw = list(sirius = "sirius.zip")),
+      spectral = list(raw = "spectra.mgf")
+    )
+  )
+
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params.yaml")
+  )
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params_advanced.yaml")
+  )
+
+  # Create source directory
+  source_dir <- file.path(tmpdir, "data/source")
+  dir.create(source_dir, recursive = TRUE)
+
+  # Create dummy files
+  write.csv(data.frame(a = 1), file.path(source_dir, "features.csv"), row.names = FALSE)
+  write.table(data.frame(b = 1), file.path(source_dir, "metadata.tsv"), sep = "\t", row.names = FALSE)
+  writeLines("dummy", file.path(source_dir, "sirius.zip"))
+  writeLines("dummy", file.path(source_dir, "spectra.mgf"))
+
+  # Run with all NULL parameters - should not error
+  expect_no_error(
+    change_params_small(cache_dir = tmpdir)
+  )
+
+  # Verify params unchanged
+  params <- yaml::read_yaml(file.path(tmpdir, "params/prepare_params.yaml"))
+  expect_equal(params$files$pattern, "original")
+  expect_equal(params$ms$polarity, "pos")
+})
+
 test_that("change_params_small handles partial updates", {
   skip_if_not_installed("yaml")
   skip_on_ci()
