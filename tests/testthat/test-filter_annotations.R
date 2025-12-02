@@ -322,15 +322,15 @@ test_that("filter_ms1_redundancy handles no MS1 annotations", {
 
 # test_that("filter_ms1_redundancy handles only MS1 annotations", {
 #   skip_if_not_installed("tidytable")
-# 
+#
 #   ms1_data <- tidytable::tidytable(
 #     feature_id = c("F1", "F2"),
 #     candidate_structure_inchikey_connectivity_layer = c("A", "B"),
 #     candidate_library = c("ms1", "ms1")
 #   )
-# 
+#
 #   ann_list <- list(ms1 = ms1_data)
-# 
+#
 #   result <- filter_ms1_redundancy(ann_list)
 #   expect_equal(nrow(result), 2)
 #   expect_true(all(result$candidate_library == "ms1"))
@@ -403,7 +403,7 @@ test_that("filter_annotations handles multiple annotation files", {
 
 # test_that("filter_annotations handles RT library filtering", {
 #   skip_if_not_installed("tidytable")
-# 
+#
 #   ann <- tempfile(fileext = ".tsv")
 #   .make_ann(ann)
 #   feat <- tempfile(fileext = ".tsv")
@@ -411,7 +411,7 @@ test_that("filter_annotations handles multiple annotation files", {
 #   rts <- tempfile(fileext = ".tsv")
 #   .make_rt(rts)
 #   out <- tempfile(fileext = ".tsv")
-# 
+#
 #   result <- filter_annotations(
 #     annotations = ann,
 #     features = feat,
@@ -419,11 +419,10 @@ test_that("filter_annotations handles multiple annotation files", {
 #     output = out,
 #     tolerance_rt = 0.1
 #   )
-# 
+#
 #   expect_true(file.exists(result))
-# 
+#
 #   # Read result and check RT filtering was applied
 #   result_data <- tidytable::fread(result)
 #   expect_true(nrow(result_data) >= 0)
 # })
-

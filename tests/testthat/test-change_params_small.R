@@ -368,8 +368,17 @@ test_that("change_params_small handles NULL parameters gracefully", {
   dir.create(source_dir, recursive = TRUE)
 
   # Create dummy files
-  write.csv(data.frame(a = 1), file.path(source_dir, "features.csv"), row.names = FALSE)
-  write.table(data.frame(b = 1), file.path(source_dir, "metadata.tsv"), sep = "\t", row.names = FALSE)
+  write.csv(
+    data.frame(a = 1),
+    file.path(source_dir, "features.csv"),
+    row.names = FALSE
+  )
+  write.table(
+    data.frame(b = 1),
+    file.path(source_dir, "metadata.tsv"),
+    sep = "\t",
+    row.names = FALSE
+  )
   writeLines("dummy", file.path(source_dir, "sirius.zip"))
   writeLines("dummy", file.path(source_dir, "spectra.mgf"))
 
