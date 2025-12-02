@@ -1,3 +1,15 @@
-structure_smiles_no_stereo,structure_tax_npc_01pat,structure_tax_npc_02sup,structure_tax_npc_03cla
-C,NA,NA,NA
+structure_inchikey,structure_smiles_no_stereo,structure_tax_npc_01pat,structure_tax_npc_02sup,structure_tax_npc_03cla
+AAAAAAAAAAAAA-BBBBBBBBBB-C,CCCC,Shikimates and Phenylpropanoids,Flavonoids,Flavones
+AAAAAAAAAAAAA-BBBBBBBBBB-A,CCCCOC,Shikimates and Phenylpropanoids,Flavonoids,Flavones
+BBBBBBBBBBBB-CCCCCCCCCC-B,C1CCCCC1,Alkaloids,Indole alkaloids,Beta-carbolines
+CCCCCCCCCCCC-DDDDDDDDDD-C,CCCCN,Terpenoids,Monoterpenoids,Iridoid monoterpenoids
+DDDDDDDDDDDD-EEEEEEEEEE-D,CCCCO,Shikimates and Phenylpropanoids,Coumarins,Simple coumarins
+EEEEEEEEEEEE-FFFFFFFFFF-E,CCOC,Alkaloids,Quinoline alkaloids,Simple quinolines
+FFFFFFFFFFFFF-GGGGGGGGGG-F,CCCCC,Terpenoids,Sesquiterpenoids,Germacranolides
+GGGGGGGGGGGG-HHHHHHHHHH-G,COCOC,Shikimates and Phenylpropanoids,Lignans,Furofuran lignans
+HHHHHHHHHHHH-IIIIIIIIII-H,CNCN,Alkaloids,Isoquinoline alkaloids,Benzylisoquinolines
+IIIIIIIIIIII-JJJJJJJJJJ-I,CCOCC,Terpenoids,Diterpenoids,Kaurane diterpenoids
+JJJJJJJJJJJJ-KKKKKKKKKK-J,CCNCC,Shikimates and Phenylpropanoids,Stilbenoids,Stilbenes
+TOLERANCE-MATCH-A,CCCCCC,Alkaloids,Simple alkaloids,Amino acids and peptides
+TOLERANCE-NOMATCH-B,CCCCCC,Alkaloids,Simple alkaloids,Amino acids and peptides
 

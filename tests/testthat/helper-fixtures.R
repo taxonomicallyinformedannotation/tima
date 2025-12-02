@@ -2,6 +2,66 @@
 
 ## Internal Utility Helpers ----
 
+fixture_roots <- local({
+  cache <- NULL
+  function() {
+    if (!is.null(cache)) {
+      return(cache)
+    }
+
+    roots <- character()
+
+    pkg_root <- suppressWarnings(tryCatch(
+      find_package_root(),
+      error = function(e) NA_character_
+    ))
+    if (!is.na(pkg_root)) {
+      roots <- c(roots, file.path(pkg_root, "tests", "testthat", "fixtures"))
+    }
+
+    testthat_root <- suppressWarnings(tryCatch(
+      testthat::test_path("fixtures"),
+      error = function(e) NA_character_
+    ))
+    if (!is.na(testthat_root)) {
+      roots <- c(roots, testthat_root)
+    }
+
+    roots <- c(roots, file.path("tests", "testthat", "fixtures"))
+
+    roots <- unique(roots)
+    roots <- roots[!is.na(roots)]
+    roots <- normalizePath(roots, winslash = "/", mustWork = FALSE)
+    cache <<- roots
+    roots
+  }
+})
+
+resolve_fixture_path <- function(filename, missing_msg = NULL) {
+  candidates <- file.path(fixture_roots(), filename)
+  existing <- candidates[file.exists(candidates)]
+  if (length(existing) > 0L) {
+    return(existing[[1]])
+  }
+  if (is.null(missing_msg)) {
+    missing_msg <- sprintf(
+      "Fixture file not found: %s (looked in %s)",
+      filename,
+      paste(candidates, collapse = ", ")
+    )
+  }
+  stop(missing_msg, call. = FALSE)
+}
+
+copy_fixture_to <- function(filename, dest) {
+  src <- resolve_fixture_path(filename)
+  dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
+  if (!file.copy(src, dest, overwrite = TRUE)) {
+    stop(sprintf("Failed to copy fixture '%s' to '%s'", filename, dest), call. = FALSE)
+  }
+  dest
+}
+
 .testthat_helper_state <- local({
   new.env(parent = emptyenv())
 })
@@ -508,19 +568,12 @@ expect_required_columns <- function(df, required_cols) {
 #' features <- load_fixture("features")
 #' lotus <- load_fixture("lotus")
 load_fixture <- function(fixture_name, cache = TRUE) {
-  fixture_path <- testthat::test_path("fixtures", paste0(fixture_name, ".csv"))
-
-  if (!file.exists(fixture_path)) {
-    stop(
-      "Fixture '",
-      fixture_name,
-      "' not found at: ",
-      fixture_path,
-      "\nAvailable fixtures: annotations, features, edges, components, ",
-      "metadata, names, stereo, structure_organism_pairs, ",
-      "taxonomy_classyfire, taxonomy_npc, lotus, closed"
+  fixture_path <- resolve_fixture_path(
+    paste0(fixture_name, ".csv"),
+    missing_msg = paste0(
+      "Fixture '", fixture_name, "' not found."
     )
-  }
+  )
 
   # Use a simple caching mechanism
   cache_env <- get_fixture_cache_env()
@@ -562,19 +615,12 @@ load_mgf_fixture <- function(fixture_name) {
     fixture_name <- paste0(fixture_name, ".mgf")
   }
 
-  fixture_path <- testthat::test_path("fixtures", fixture_name)
-
-  if (!file.exists(fixture_path)) {
-    stop(
-      "MGF fixture '",
-      fixture_name,
-      "' not found at: ",
-      fixture_path,
-      "\nAvailable MGF fixtures: spectra_query.mgf, spectra_library.mgf"
+  resolve_fixture_path(
+    fixture_name,
+    missing_msg = paste0(
+      "MGF fixture '", fixture_name, "' not found."
     )
-  }
-
-  fixture_path
+  )
 }
 
 #' Copy MGF fixture to temp location for modification
@@ -722,10 +768,7 @@ create_features_with_edges <- function(
 #' @return tidytable loaded from CSV
 #' @keywords internal
 load_fixture_csv <- function(filename) {
-  path <- testthat::test_path("fixtures", filename)
-  if (!file.exists(path)) {
-    stop("Fixture file not found: ", filename)
-  }
+  path <- resolve_fixture_path(filename)
   tidytable::fread(path, na.strings = c("", "NA"))
 }
 
@@ -1145,3 +1188,58 @@ create_fixture_yamls_params <- function(id = "TESTID") {
 # - Testing with varying sizes/scenarios
 # Example: features <- create_test_features(n_features = 100, seed = 123)
 # Example: spectrum <- create_test_spectrum(n_peaks = 20, seed = 456)
+
+prepare_annotation_fixture_env <- function(
+  feature_fixture,
+  library_fixture,
+  dir_root = temp_test_dir("annotate_masses"),
+  feature_dest = "features.tsv"
+) {
+  dirs <- list(
+    root = dir_root,
+    features = file.path(dir_root, "data", "interim", "features"),
+    libraries = file.path(dir_root, "data", "interim", "libraries"),
+    outputs = file.path(dir_root, "data", "interim")
+  )
+  lapply(dirs, dir.create, recursive = TRUE, showWarnings = FALSE)
+
+  feature_path <- file.path(dirs$features, feature_dest)
+  copy_csv_fixture_to_dir(feature_fixture, dirs$features, feature_dest)
+
+  library_path <- file.path(dirs$libraries, "library.tsv")
+  copy_csv_fixture_to_dir(library_fixture, dirs$libraries, "library.tsv")
+
+  structures <- list(
+    stereo = "structures_stereo.csv",
+    metadata = "structures_metadata.csv",
+    names = "structures_names.csv",
+    tax_cla = "structures_taxonomy_cla.csv",
+    tax_npc = "structures_taxonomy_npc.csv"
+  )
+
+  structure_paths <- lapply(names(structures), function(name) {
+    dest_name <- paste0(name, ".tsv")
+    copy_csv_fixture_to_dir(structures[[name]], dirs$libraries, dest_name)
+    file.path(dirs$libraries, dest_name)
+  })
+  names(structure_paths) <- names(structures)
+
+  list(
+    dirs = dirs,
+    features = feature_path,
+    library = library_path,
+    str_stereo = structure_paths$stereo,
+    str_met = structure_paths$metadata,
+    str_nam = structure_paths$names,
+    str_tax_cla = structure_paths$tax_cla,
+    str_tax_npc = structure_paths$tax_npc,
+    output_annotations = file.path(dirs$outputs, "annotations.tsv"),
+    output_edges = file.path(dirs$outputs, "edges.tsv")
+  )
+}
+
+copy_csv_fixture_to_dir <- function(fixture, dir, dest) {
+  src <- if (grepl("\\.csv$", fixture)) fixture else paste0(fixture, ".csv")
+  copy_fixture_to(src, file.path(dir, dest))
+}
+
