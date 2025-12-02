@@ -589,7 +589,7 @@ weight_bio <- function(
           !is.na(candidate_score_sirius_csi) ~
           (as.numeric(candidate_score_similarity) +
             candidate_score_sirius_csi_tmp) /
-            2,
+          2,
         !is.na(candidate_score_similarity) ~
           as.numeric(candidate_score_similarity),
         !is.na(candidate_score_sirius_csi) ~ candidate_score_sirius_csi_tmp,
