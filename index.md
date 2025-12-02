@@ -214,7 +214,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | tima | 2.12.0 | Rutz et al. (2019); Rutz and Allard (2025) |
 | visNetwork | 2.1.4 | Almende B.V. and Contributors and Thieurmel (2025) |
 | withr | 3.0.2 | Hester et al. (2024) |
-| yaml | 2.3.10 | Garbett et al. (2024) |
+| yaml | 2.3.11 | Garbett et al. (2024) |
 
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">
