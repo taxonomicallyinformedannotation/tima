@@ -23,7 +23,8 @@ test_that("{shinytest2} recording: inst", {
       host = "127.0.0.1",
       port = 3838,
       launch.browser = FALSE
-    )
+    ),
+    variant = NULL
   )
   app$upload_file(fil_spe_raw = "data/source/example_spectra.mgf")
   app$upload_file(fil_fea_raw = "data/source/example_features.csv")
@@ -31,6 +32,6 @@ test_that("{shinytest2} recording: inst", {
   app$click("save")
   ## COMMENT See <https://github.com/rstudio/shinytest2/issues/417>
   # app$expect_screenshot()
-  # app$expect_values()
+  app$expect_values()
   app$stop()
 })
