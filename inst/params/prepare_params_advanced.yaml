@@ -15,7 +15,7 @@ annotations:
     neighbors: 16
 
     #' Number of samples to keep per feature. INTEGER
-    samples: 5
+    samples: 1
 
   #' Erase MS2 results and keep MS1 only. BOOLEAN
   ms1only: false
