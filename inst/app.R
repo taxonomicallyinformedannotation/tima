@@ -238,7 +238,7 @@ ui <- shiny::fluidPage(
             label = "Number of samples to keep per feature",
             min = 1L,
             max = 5L,
-            value = 5L,
+            value = 1L,
             step = 1L,
             ticks = FALSE
           ) |>
