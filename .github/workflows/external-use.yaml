@@ -35,39 +35,80 @@ jobs:
         with:
           use-public-rspm: true
           Ncpus: ${{ steps.cpu-cores.outputs.count }}
+      
+      # Fix library path on Windows
+      - name: Setup R library path (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE, showWarnings = FALSE)
+          cat(sprintf("R_LIBS_USER=%s\n", Sys.getenv("R_LIBS_USER")), file = Sys.getenv("GITHUB_ENV"), append = TRUE)
+          .libPaths(Sys.getenv("R_LIBS_USER"))
+          cat("Library paths:\n")
+          print(.libPaths())
+        shell: Rscript {0}
+      
       - name: Install dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: >
           sudo apt-get update && sudo apt-get install -y --no-install-recommends
           libarchive-dev libcurl4-openssl-dev libfribidi-dev libharfbuzz-dev \
-
           && sudo apt-get clean \
-
           && sudo rm -rf /var/lib/apt/lists/*
+      
       - name: Install (Linux)
         if: matrix.os == 'ubuntu-latest'
-        run: >
-          install.packages("tima", repos =
-          c("https://taxonomicallyinformedannotation.r-universe.dev",
-          "https://bioc.r-universe.dev", "https://cloud.r-project.org"), type =
-          "source")
-
+        run: |
+          install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://bioc.r-universe.dev", "https://cloud.r-project.org"), type = "source")
           tima::install()
         shell: Rscript {0}
-      - name: Install (MacOS and Windows)
-        if: matrix.os != 'ubuntu-latest'
-        run: >
-          install.packages("tima", repos =
-          c("https://taxonomicallyinformedannotation.r-universe.dev",
-          "https://bioc.r-universe.dev", "https://cloud.r-project.org"), type =
-          "binary")
-
+      
+      - name: Install (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          install.packages("tima", repos = c("https://taxonomicallyinformedannotation.r-universe.dev", "https://bioc.r-universe.dev", "https://cloud.r-project.org"), type = "binary")
           tima::install()
         shell: Rscript {0}
+      
+      - name: Install (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          # Ensure we're using the correct library path
+          lib_path <- Sys.getenv("R_LIBS_USER")
+          if (nchar(lib_path) == 0) {
+            lib_path <- file.path(Sys.getenv("USERPROFILE"), "R", "win-library", paste0(getRversion()[,1], ".", getRversion()[,2]))
+          }
+          dir.create(lib_path, recursive = TRUE, showWarnings = FALSE)
+          .libPaths(lib_path)
+          
+          cat("Installing to library path:\n")
+          print(.libPaths())
+          
+          # Install tima
+          install.packages("tima", 
+                          repos = c("https://taxonomicallyinformedannotation.r-universe.dev", 
+                                   "https://bioc.r-universe.dev", 
+                                   "https://cloud.r-project.org"), 
+                          type = "binary",
+                          lib = .libPaths()[1])
+          
+          # Verify installation immediately
+          if (!requireNamespace("tima", quietly = TRUE)) {
+            stop("tima package not found after installation!")
+          }
+          
+          pkg_path <- find.package("tima")
+          cat("Package installed at:", pkg_path, "\n")
+          cat("DESCRIPTION exists:", file.exists(file.path(pkg_path, "DESCRIPTION")), "\n")
+          
+          # Run tima::install()
+          tima::install()
+        shell: Rscript {0}
+      
       - name: Get example files
         run: |
           tima::get_example_files()
         shell: Rscript {0}
+      
       - name: Run pipeline
         run: |
           tima::run_tima()
