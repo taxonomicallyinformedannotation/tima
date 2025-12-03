@@ -172,6 +172,8 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 
 ## Additional software credits
 
+    [1] TRUE
+
 | Package | Version | Citation |
 |:---|:---|:---|
 | archive | 1.1.12 | Hester and Csárdi (2025) |
@@ -191,10 +193,11 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
 | MsCoreUtils | 1.21.0 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
+| R.utils | 2.13.0 | Bengtsson (2025) |
 | reticulate | 1.44.1 | Ushey, Allaire, and Tang (2025) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
 | rotl | 3.1.0 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
-| shiny | 1.11.1 | Chang et al. (2025) |
+| shiny | 1.12.0 | Chang et al. (2025) |
 | shinyhelper | 0.3.2 | Mason-Thom (2019) |
 | shinyjs | 2.1.0 | Attali (2021) |
 | shinytest2 | 0.4.1 | Schloerke (2025) |
@@ -209,7 +212,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
 | tima | 2.12.0 | Rutz et al. (2019); Rutz and Allard (2025) |
 | withr | 3.0.2 | Hester et al. (2024) |
-| yaml | 2.3.11 | Garbett et al. (2024) |
+| yaml | 2.3.11 | Stephens and Simonov (2025) |
 
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">
@@ -241,12 +244,19 @@ the User Experience of Your Shiny Apps in Seconds*.
 
 </div>
 
+<div id="ref-Rutils" class="csl-entry">
+
+Bengtsson, Henrik. 2025. *<span class="nocase">R.utils</span>: Various
+Programming Utilities*. <https://doi.org/10.32614/CRAN.package.R.utils>.
+
+</div>
+
 <div id="ref-shiny" class="csl-entry">
 
 Chang, Winston, Joe Cheng, JJ Allaire, Carson Sievert, Barret Schloerke,
-Yihui Xie, Jeff Allen, Jonathan McPherson, Alan Dipert, and Barbara
-Borges. 2025. *<span class="nocase">shiny</span>: Web Application
-Framework for r*. <https://doi.org/10.32614/CRAN.package.shiny>.
+Garrick Aden-Buie, Yihui Xie, et al. 2025.
+*<span class="nocase">shiny</span>: Web Application Framework for r*.
+<https://doi.org/10.32614/CRAN.package.shiny>.
 
 </div>
 
@@ -295,15 +305,6 @@ Logging Framework*. <https://doi.org/10.32614/CRAN.package.lgr>.
 Gagolewski, Marek. 2022. “<span class="nocase">stringi</span>: Fast and
 Portable Character String Processing in R.” *Journal of Statistical
 Software* 103 (2): 1–59. <https://doi.org/10.18637/jss.v103.i02>.
-
-</div>
-
-<div id="ref-yaml" class="csl-entry">
-
-Garbett, Shawn P, Jeremy Stephens, Kirill Simonov, Yihui Xie, Zhuoer
-Dong, Hadley Wickham, Jeffrey Horner, et al. 2024.
-*<span class="nocase">yaml</span>: Methods to Convert r Data to YAML and
-Back*. <https://doi.org/10.32614/CRAN.package.yaml>.
 
 </div>
 
@@ -498,6 +499,14 @@ Schloerke, Barret. 2025. *Shinytest2: Testing for Shiny Applications*.
 Sievert, Carson, Richard Iannone, and Joe Cheng. 2023.
 *<span class="nocase">shinyvalidate</span>: Input Validation for Shiny
 Apps*. <https://doi.org/10.32614/CRAN.package.shinyvalidate>.
+
+</div>
+
+<div id="ref-yaml" class="csl-entry">
+
+Stephens, Jeremy, and Kirill Simonov. 2025.
+*<span class="nocase">yaml</span>: Methods to Convert r Data to YAML and
+Back*. <https://doi.org/10.32614/CRAN.package.yaml>.
 
 </div>
 
