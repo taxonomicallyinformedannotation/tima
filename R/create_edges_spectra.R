@@ -205,11 +205,15 @@ create_edges_spectra <- function(
   idz <- spectra |>
     get_spectra_ids()
   rm(spectra)
+
+  # Ensure consistent typing for IDs - keep as-is from source
+  # This prevents type mismatch in the later join
   edges <- edges |>
     tidytable::mutate(
       !!as.name(name_source) := idz[!!as.name(name_source)],
       !!as.name(name_target) := idz[!!as.name(name_target)]
     )
+
   entropy_df <- tidytable::tidytable(entropy) |>
     tidytable::mutate(
       !!as.name(name_source) := tidytable::row_number()
@@ -218,9 +222,6 @@ create_edges_spectra <- function(
       !!as.name(name_source) := idz[!!as.name(name_source)],
       feature_spectrum_entropy = as.character(entropy),
       feature_spectrum_peaks = as.character(npeaks)
-    ) |>
-    tidytable::mutate(
-      !!as.name(name_source) := as.integer(!!as.name(name_source))
     ) |>
     tidytable::distinct(
       !!as.name(name_source),
