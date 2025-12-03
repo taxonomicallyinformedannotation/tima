@@ -350,8 +350,7 @@ try_install_package <- function(
             repos = repos,
             dependencies = dependencies,
             INSTALL_opts = c("--no-lock", "--no-test-load"),
-            type = pkg_type,
-            lib = .libPaths()[1] # Explicitly install to first library path
+            type = pkg_type
           )
           TRUE
         },
