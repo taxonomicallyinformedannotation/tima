@@ -4,18 +4,12 @@
 \alias{setup_virtualenv}
 \title{Setup Python Virtual Environment}
 \usage{
-setup_virtualenv(
-  envname = "tima-env",
-  python = NULL,
-  rescue_python_version = "3.13"
-)
+setup_virtualenv(envname = "tima-env", python = NULL)
 }
 \arguments{
 \item{envname}{Character name of virtual environment}
 
 \item{python}{Character path to Python executable}
-
-\item{rescue_python_version}{Character Python version for fallback}
 }
 \value{
 NULL (side effect: creates virtualenv and installs packages)

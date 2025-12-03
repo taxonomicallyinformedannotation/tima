@@ -4,10 +4,7 @@
 \alias{check_or_install_python}
 \title{Check or Install Python}
 \usage{
-check_or_install_python(test = FALSE)
-}
-\arguments{
-\item{test}{Logical test mode flag}
+check_or_install_python()
 }
 \value{
 Character path to Python executable

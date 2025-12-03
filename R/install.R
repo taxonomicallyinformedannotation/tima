@@ -92,54 +92,31 @@ show_system_messages <- function(system, test) {
 #' @description Internal helper to ensure Python is available, installing
 #'     Miniconda as fallback if needed. Implements Single Responsibility Principle.
 #'
-#' @param test Logical test mode flag
-#'
 #' @return Character path to Python executable
 #' @keywords internal
-check_or_install_python <- function(test = FALSE) {
-  system <- Sys.info()[["sysname"]]
+check_or_install_python <- function() {
   python <- Sys.which("python3")
 
-  if (nzchar(python) && isFALSE(test)) {
+  if (nzchar(python)) {
     log_info("System Python found at: %s", python)
     return(python)
   }
 
-  log_warn("System Python not found. Installing Miniconda as fallback.")
+  log_warn("System Python not found. Installing Miniconda...")
 
   minipath <- reticulate::miniconda_path()
-
   if (!file.exists(minipath)) {
-    log_info("Installing Miniconda...")
-    tryCatch(
-      {
-        reticulate::install_miniconda()
-        minipath <- reticulate::miniconda_path()
-        log_success("Miniconda installed successfully")
-      },
-      error = function(e) {
-        log_error("Failed to install Miniconda: %s", e$message)
-        stop(
-          "Failed to install Miniconda: ",
-          conditionMessage(e),
-          call. = FALSE
-        )
-      }
-    )
+    reticulate::install_miniconda()
   }
 
-  python_path <- if (system == "Windows") {
+  python_path <- if (Sys.info()[["sysname"]] == "Windows") {
     file.path(minipath, "python.exe")
   } else {
     file.path(minipath, "bin", "python")
   }
 
   if (!file.exists(python_path)) {
-    stop(
-      "Python executable not found at expected location: ",
-      python_path,
-      call. = FALSE
-    )
+    stop("Python executable not found at: ", python_path, call. = FALSE)
   }
 
   log_info("Using Miniconda Python at: %s", python_path)
@@ -153,15 +130,10 @@ check_or_install_python <- function(test = FALSE) {
 #'
 #' @param envname Character name of virtual environment
 #' @param python Character path to Python executable
-#' @param rescue_python_version Character Python version for fallback
 #'
 #' @return NULL (side effect: creates virtualenv and installs packages)
 #' @keywords internal
-setup_virtualenv <- function(
-  envname = "tima-env",
-  python = NULL,
-  rescue_python_version = "3.13"
-) {
+setup_virtualenv <- function(envname = "tima-env", python = NULL) {
   if (is.null(python)) {
     python <- check_or_install_python()
   }
@@ -170,52 +142,25 @@ setup_virtualenv <- function(
     log_info("Creating Python virtualenv: %s", envname)
 
     tryCatch(
-      expr = {
-        reticulate::virtualenv_create(
-          envname = envname,
-          python = python
-        )
+      {
+        reticulate::virtualenv_create(envname = envname, python = python)
         log_success("Virtualenv created successfully")
       },
       error = function(e) {
-        log_error("Creating Python virtualenv failed: %s", e$message)
-        log_info(
-          "Retrying with clean Python install (version %s)",
-          rescue_python_version
-        )
-
-        tryCatch(
-          {
-            python <- reticulate::install_python(
-              version = rescue_python_version
-            )
-            reticulate::virtualenv_create(
-              envname = envname,
-              python = python
-            )
-            log_success("Virtualenv created with rescue Python")
-          },
-          error = function(e2) {
-            stop(
-              "Failed to create virtualenv even with rescue Python: ",
-              conditionMessage(e2),
-              call. = FALSE
-            )
-          }
-        )
+        log_error("Failed to create virtualenv: %s", e$message)
+        stop("Failed to create Python virtualenv", call. = FALSE)
       }
     )
   } else {
-    log_info("Using existing Python virtualenv: %s", envname)
+    log_info("Using existing virtualenv: %s", envname)
   }
 
-  log_info("Installing RDKit in virtualenv: %s", envname)
+  log_info("Installing RDKit...")
 
   tryCatch(
     {
       reticulate::virtualenv_install(
         envname = envname,
-        python = python,
         packages = "rdkit",
         ignore_installed = TRUE
       )
@@ -223,11 +168,7 @@ setup_virtualenv <- function(
     },
     error = function(e) {
       log_error("Failed to install RDKit: %s", e$message)
-      stop(
-        "Failed to install RDKit in virtualenv: ",
-        conditionMessage(e),
-        call. = FALSE
-      )
+      stop("Failed to install RDKit in virtualenv", call. = FALSE)
     }
   )
 
@@ -236,53 +177,78 @@ setup_virtualenv <- function(
 
 #' Verify Package Installation is Complete
 #'
-#' @description Checks that package is not only installed but can be loaded.
-#'     This catches incomplete or corrupted installations that may occur on Windows.
+#' @description Robust validation that the package is fully installed,
+#'   not corrupted, and actually loadable. Avoids false positives from
+#'   leftover / half-installed directories in Windows or CI paths.
 #'
 #' @param package Character package name
 #'
 #' @return Logical TRUE if valid, FALSE otherwise
 #' @keywords internal
 verify_package_installation <- function(package) {
-  # Check namespace exists
+  # 1. Namespace reachable?
   if (!requireNamespace(package, quietly = TRUE)) {
-    log_error("Package '%s' namespace not found", package)
+    log_error("Namespace for '%s' not found.", package)
     return(FALSE)
   }
 
-  # Check DESCRIPTION file exists and is readable
-  pkg_path <- tryCatch(
-    find.package(package, quiet = TRUE),
-    error = function(e) character(0)
-  )
+  # 2. Attempt to resolve ALL possible paths
+  pkg_paths <- suppressWarnings(find.package(package, quiet = TRUE))
 
-  if (length(pkg_path) == 0) {
-    log_error("Cannot find package path for '%s'", package)
+  # find.package returns character(0) on failure
+  if (length(pkg_paths) == 0) {
+    log_error("find.package() could not resolve path for '%s'.", package)
     return(FALSE)
   }
 
-  desc_file <- file.path(pkg_path, "DESCRIPTION")
-  if (!file.exists(desc_file)) {
+  # 3. Filter out invalid paths (empty, nonexistent, no DESCRIPTION)
+  valid_paths <- pkg_paths[
+    vapply(
+      pkg_paths,
+      function(p) {
+        file.exists(p) && file.exists(file.path(p, "DESCRIPTION"))
+      },
+      logical(1L)
+    )
+  ]
+
+  if (length(valid_paths) == 0) {
     log_error(
-      "DESCRIPTION file missing for package '%s' at %s",
-      package,
-      pkg_path
+      "No valid installation directory for '%s'. " |>
+        paste(
+          "Possible broken R library structure. All found paths:\n  - ",
+          paste(pkg_paths, collapse = "\n  - ")
+        )
     )
     return(FALSE)
   }
 
-  # Try to read DESCRIPTION
+  # Prefer the first good match
+  pkg_path <- valid_paths[[1]]
+  desc_file <- file.path(pkg_path, "DESCRIPTION")
+
+  # 4. Try reading DESCRIPTION robustly
   desc_ok <- tryCatch(
     {
-      desc <- read.dcf(desc_file)
-      !is.null(desc) && nrow(desc) > 0
+      df <- read.dcf(desc_file)
+      isTRUE(nrow(df) > 0)
     },
     error = function(e) {
-      log_error("Cannot read DESCRIPTION for '%s': %s", package, e$message)
+      log_error(
+        "Could not read DESCRIPTION for '%s' at '%s': %s",
+        package,
+        pkg_path,
+        e$message
+      )
       FALSE
     },
     warning = function(w) {
-      log_error("Warning reading DESCRIPTION for '%s': %s", package, w$message)
+      log_warn(
+        "Warning while reading DESCRIPTION for '%s' at '%s': %s",
+        package,
+        pkg_path,
+        w$message
+      )
       FALSE
     }
   )
@@ -291,14 +257,19 @@ verify_package_installation <- function(package) {
     return(FALSE)
   }
 
-  # Try to actually load the namespace
+  # 5. Validate namespace loading
   load_ok <- tryCatch(
     {
       loadNamespace(package)
       TRUE
     },
     error = function(e) {
-      log_error("Cannot load namespace for '%s': %s", package, e$message)
+      log_error(
+        "Namespace load failed for '%s' at '%s': %s",
+        package,
+        pkg_path,
+        e$message
+      )
       FALSE
     }
   )
@@ -307,9 +278,14 @@ verify_package_installation <- function(package) {
     return(FALSE)
   }
 
-  log_success("Package '%s' installation verified successfully", package)
-  return(TRUE)
+  log_success(
+    "Package '%s' installation verified successfully at: %s",
+    package,
+    pkg_path
+  )
+  TRUE
 }
+
 
 #' Attempt Package Installation
 #'
@@ -399,37 +375,11 @@ try_install_package <- function(
 #' @title Install TIMA Package and Dependencies
 #'
 #' @description Installs or updates the TIMA package from r-universe and sets up
-#'     a Python virtual environment with RDKit for chemical structure processing.
-#'     This function always installs/updates the R package to ensure you have the
-#'     latest version, while the Python environment is only created if it doesn't
-#'     already exist (idempotent).
+#'     a Python virtual environment with RDKit.
 #'
-#' @details
-#' The installation process:
-#' \itemize{
-#'   \item Validates all input parameters
-#'   \item Detects the operating system and shows relevant instructions
-#'   \item **Always installs/updates the R package** from r-universe (to get latest updates)
-#'   \item Falls back to source installation if binary fails
-#'   \item Verifies installation is complete and package can be loaded
-#'   \item Checks for Python or installs Miniconda as fallback
-#'   \item Creates a Python virtual environment (tima-env) **only if it doesn't exist**
-#'   \item Installs RDKit in the virtual environment (skipped if already present)
-#'   \item Copies the TIMA backbone files
-#'   \item Cleans up any existing targets pipeline
-#' }
-#'
-#' @section Idempotency:
-#' - **R package**: Always reinstalled/updated (ensures latest version from r-universe)
-#' - **Python environment**: Only created if missing (idempotent - safe to call multiple times)
-#'
-#' @include copy_backbone.R
-#'
-#' @param package Character string name of the package to install (default: "tima")
-#' @param repos Character vector of repository URLs for install.packages.
-#'     Default includes r-universe, Bioconductor, and CRAN.
-#' @param dependencies Logical whether to install package dependencies (default: TRUE)
-#' @param test Logical whether to use fallback/test installation mode (default: FALSE)
+#' @param package Character string name of the package (default: "tima")
+#' @param repos Character vector of repository URLs
+#' @param dependencies Logical whether to install dependencies (default: TRUE)
 #'
 #' @return NULL (invisibly). Installs packages and sets up Python environment as
 #'     side effects.
@@ -438,14 +388,7 @@ try_install_package <- function(
 #'
 #' @examples
 #' \dontrun{
-#' # Standard installation (updates package, checks Python env)
 #' install()
-#'
-#' # Install with custom repositories
-#' install(repos = c("https://cloud.r-project.org"))
-#'
-#' # Install without dependencies (not recommended)
-#' install(dependencies = FALSE)
 #' }
 install <- function(
   package = "tima",
@@ -454,138 +397,52 @@ install <- function(
     "https://bioc.r-universe.dev",
     "https://cloud.r-project.org"
   ),
-  dependencies = TRUE,
-  test = FALSE
+  dependencies = TRUE
 ) {
-  # Input Validation ----
-  validate_install_inputs(
-    package = package,
-    repos = repos,
-    dependencies = dependencies,
-    test = test
-  )
+  log_info("Starting installation of '%s'", package)
 
-  # Test mode: shortcut - no system / python / R package side effects ----
-  if (isTRUE(test)) {
-    message(
-      "Test mode: skipping real installation steps for package '",
-      package,
-      "'."
-    )
-    return(invisible(NULL))
-  }
-
-  log_info("Starting installation/update of '%s'", package)
-
-  # System Detection and Messages ----
+  # System info
   system <- Sys.info()[["sysname"]]
-  show_system_messages(system = system, test = test)
+  log_info("Operating system: %s", system)
 
-  # Python Setup ----
-  log_debug("Checking Python environment")
-  python <- check_or_install_python(test = test)
+  # Python setup
+  log_info("Setting up Python environment")
+  python <- check_or_install_python()
 
-  # Windows-specific: Ensure proper library path and clean removal ----
-  if (system == "Windows") {
-    log_debug("Windows detected: ensuring proper library path")
+  # R Package installation
+  log_info("Installing R package '%s'", package)
 
-    # Ensure R_LIBS_USER is set and exists
-    lib_user <- Sys.getenv("R_LIBS_USER")
-    if (nchar(lib_user) == 0) {
-      lib_user <- file.path(
-        Sys.getenv("USERPROFILE"),
-        "R",
-        "win-library",
-        paste0(getRversion()[, 1], ".", getRversion()[, 2])
+  tryCatch(
+    {
+      utils::install.packages(
+        package,
+        repos = repos,
+        dependencies = dependencies,
+        type = if (system == "Linux") "source" else "binary"
       )
-      Sys.setenv(R_LIBS_USER = lib_user)
+      log_success("R package installed successfully")
+    },
+    error = function(e) {
+      log_error("Installation failed: %s", e$message)
+      stop("Failed to install package '", package, "'", call. = FALSE)
     }
-
-    dir.create(lib_user, recursive = TRUE, showWarnings = FALSE)
-    .libPaths(lib_user)
-
-    log_debug("Library paths: %s", paste(.libPaths(), collapse = ", "))
-
-    # Clean removal
-    log_debug("Performing clean removal first")
-    tryCatch(
-      {
-        remove.packages(package)
-        # Also manually remove directory in case of corruption
-        lib_path <- .libPaths()[1]
-        pkg_dir <- file.path(lib_path, package)
-        if (dir.exists(pkg_dir)) {
-          log_debug("Removing existing package directory: %s", pkg_dir)
-          unlink(pkg_dir, recursive = TRUE, force = TRUE)
-          Sys.sleep(1) # Give Windows time to release file locks
-        }
-      },
-      error = function(e) {
-        log_debug(
-          "Clean removal step (expected if not installed): %s",
-          e$message
-        )
-      }
-    )
-  }
-
-  # R Package Installation (Always Update) ----
-  log_info("Installing/updating R package '%s' from r-universe", package)
-  log_debug("This ensures you have the latest version with all updates")
-
-  success <- try_install_package(
-    package = package,
-    repos = repos,
-    dependencies = dependencies,
-    from_source = FALSE
   )
 
-  if (!success) {
-    log_warn("Binary installation failed. Retrying from source.")
-    success <- try_install_package(
-      package = package,
-      repos = repos,
-      dependencies = dependencies,
-      from_source = TRUE
-    )
+  # Verify installation
+  if (!requireNamespace(package, quietly = TRUE)) {
+    stop("Package '", package, "' not found after installation", call. = FALSE)
   }
 
-  if (!success) {
-    log_fatal("All installation attempts failed")
-    stop(
-      "Failed to install package '",
-      package,
-      "'. Please check the error messages above.",
-      call. = FALSE
-    )
-  }
-
-  # Verify Installation is Complete ----
-  log_info("Verifying package installation integrity")
-
-  if (!verify_package_installation(package)) {
-    log_fatal("Package installed but is corrupted or incomplete")
-    stop(
-      "Package '",
-      package,
-      "' installation is incomplete or corrupted. ",
-      "This may be due to file locking, path issues, or download interruption. ",
-      "On Windows, try: (1) closing RStudio/R, (2) manually deleting the package ",
-      "directory, (3) running the installation again.",
-      call. = FALSE
-    )
-  }
-
-  # Python Virtual Environment Setup (Idempotent) ----
-  log_info("Configuring Python virtual environment (idempotent)")
+  # Python virtualenv setup
+  log_info("Configuring Python virtual environment")
   setup_virtualenv(envname = "tima-env", python = python)
 
-  # Post-Installation Setup ----
+  # Post-installation setup
   log_info("Running post-installation setup")
 
   tryCatch(
     {
-      loadNamespace("tima")
+      loadNamespace(package = package)
       copy_backbone()
       log_success("Backbone files copied")
     },
@@ -600,11 +457,10 @@ install <- function(
       log_success("Targets pipeline cleaned")
     },
     error = function(e) {
-      log_warn("Failed to clean targets pipeline: %s", e$message)
+      log_debug("No targets pipeline to clean")
     }
   )
 
-  log_success("Installation of '%s' completed successfully!", package)
-
+  log_success("Installation of '%s' completed!", package)
   invisible(NULL)
 }
