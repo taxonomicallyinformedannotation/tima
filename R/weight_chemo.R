@@ -209,6 +209,7 @@ weight_chemo <- function(
 
     df |>
       tidytable::distinct(!!cand_sym, !!fval_sym, !!fsc_sym) |>
+      tidytable::filter(!!cand_sym != "notClassified") |>
       tidytable::filter(
         !is.na(!!cand_sym),
         !is.na(!!fval_sym)
