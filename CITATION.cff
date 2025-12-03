@@ -941,6 +941,21 @@ references:
   doi: 10.32614/CRAN.package.testthat
   version: '>= 3.3.0'
 - type: software
+  title: visNetwork
+  abstract: 'visNetwork: Network Visualization using ''vis.js'' Library'
+  notes: Suggests
+  url: https://datastorm-open.github.io/visNetwork/
+  repository: https://CRAN.R-project.org/package=visNetwork
+  authors:
+  - name: Almende B.V. and Contributors
+    website: https://visjs.org/
+  - family-names: Thieurmel
+    given-names: Benoit
+    email: bthieurmel@gmail.com
+  year: '2025'
+  doi: 10.32614/CRAN.package.visNetwork
+  version: '>= 2.1.4'
+- type: software
   title: withr
   abstract: 'withr: Run Code ''With'' Temporarily Modified Global State'
   notes: Suggests
