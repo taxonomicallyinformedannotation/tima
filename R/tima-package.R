@@ -11,7 +11,7 @@ NULL
 .onLoad <- function(libname, pkgname) {
   # Hints/operators to appease R CMD check and lazy loading quirks
   R.utils::Arguments()
-  
+
   # NOTE: Logging is NOT initialized here to avoid creating empty log files
   # when the package is loaded. Instead, logging is initialized on-demand
   # when functions that need logging are called (e.g., run_tima()).

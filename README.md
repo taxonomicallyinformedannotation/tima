@@ -172,8 +172,6 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 
 ## Additional software credits
 
-    [1] TRUE
-
 | Package | Version | Citation |
 |:---|:---|:---|
 | archive | 1.1.12 | Hester and Csárdi (2025) |
