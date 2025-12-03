@@ -222,7 +222,8 @@ get_organism_taxonomy_ott <- function(
   # Handle API unavailability
   if (api_status != "OK") {
     log_error(
-      "Open Tree of Life API is unavailable (status: {api_status})"
+      "Open Tree of Life API is unavailable (status: %s)",
+      api_status
     )
     log_warn(
       "Returning empty taxonomy template due to API unavailability"
