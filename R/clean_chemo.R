@@ -631,11 +631,9 @@ clean_chemo <- function(
 
   if (n_sampled_features > 0L) {
     log_info(
-      "Sampling candidates for ",
+      "Sampling candidates for %d features with more than %d candidates per score",
       n_sampled_features,
-      " features with more than ",
-      max_per_score,
-      " candidates per score"
+      max_per_score
     )
   }
 
