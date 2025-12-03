@@ -38,7 +38,9 @@ prepare_libraries_sop_lotus <- function(
   if (file.exists(input)) {
     file_size <- file.info(input)$size
     log_info(
-      "Loading LOTUS database: {basename(input)} ({format_bytes(file_size)})"
+      "Loading LOTUS database: %s (%s)",
+      basename(input),
+      format_bytes(file_size)
     )
 
     lotus_prepared <- input |>
