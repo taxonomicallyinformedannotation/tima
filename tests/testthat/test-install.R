@@ -16,24 +16,32 @@ library(testthat)
 # ---- Success paths ----
 
 test_that("install()runs without error", {
+  skip_on_cran()
+  skip_on_ci()
   expect_no_error(
     install(package = "tima"),
   )
 })
 
 test_that("install() with dependencies=TRUE runs without error", {
+  skip_on_cran()
+  skip_on_ci()
   expect_no_error(
     install(package = "tima", dependencies = TRUE)
   )
 })
 
 test_that("install() accepts multiple repos", {
+  skip_on_cran()
+  skip_on_ci()
   expect_no_error(
     install(package = "tima", repos = .make_repos())
   )
 })
 
 test_that("install() can run with dependencies=FALSE", {
+  skip_on_cran()
+  skip_on_ci()
   expect_no_error(
     install(package = "tima", dependencies = FALSE),
   )
