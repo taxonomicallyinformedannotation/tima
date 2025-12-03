@@ -199,27 +199,6 @@ references:
   doi: 10.32614/CRAN.package.dplyr
   version: '>= 1.1.4'
 - type: software
-  title: DT
-  abstract: 'DT: A Wrapper of the JavaScript Library ''DataTables'''
-  notes: Imports
-  url: https://github.com/rstudio/DT
-  repository: https://CRAN.R-project.org/package=DT
-  authors:
-  - family-names: Xie
-    given-names: Yihui
-  - family-names: Cheng
-    given-names: Joe
-    email: joe@posit.co
-  - family-names: Tan
-    given-names: Xianying
-  - family-names: Aden-Buie
-    given-names: Garrick
-    email: garrick@posit.co
-    orcid: https://orcid.org/0000-0002-7111-0077
-  year: '2025'
-  doi: 10.32614/CRAN.package.DT
-  version: '>= 0.34'
-- type: software
   title: fs
   abstract: 'fs: Cross-Platform File System Operations Based on ''libuv'''
   notes: Imports
@@ -237,45 +216,6 @@ references:
   year: '2025'
   doi: 10.32614/CRAN.package.fs
   version: '>= 1.6.6'
-- type: software
-  title: gt
-  abstract: 'gt: Easily Create Presentation-Ready Display Tables'
-  notes: Imports
-  url: https://gt.rstudio.com
-  repository: https://CRAN.R-project.org/package=gt
-  authors:
-  - family-names: Iannone
-    given-names: Richard
-    email: rich@posit.co
-    orcid: https://orcid.org/0000-0003-3925-190X
-  - family-names: Cheng
-    given-names: Joe
-    email: joe@posit.co
-  - family-names: Schloerke
-    given-names: Barret
-    email: barret@posit.co
-    orcid: https://orcid.org/0000-0001-9986-114X
-  - family-names: Hughes
-    given-names: Ellis
-    email: ellis.h.hughes@gsk.com
-    orcid: https://orcid.org/0000-0003-0637-4436
-  - family-names: Lauer
-    given-names: Alexandra
-    email: alexandralauer1@gmail.com
-    orcid: https://orcid.org/0000-0002-4191-6301
-  - family-names: Seo
-    given-names: JooYoung
-    email: jseo1005@illinois.edu
-    orcid: https://orcid.org/0000-0002-4064-6012
-  - family-names: Brevoort
-    given-names: Ken
-    email: ken@brevoort.com
-    orcid: https://orcid.org/0000-0002-4001-8358
-  - family-names: Roy
-    given-names: Olivier
-  year: '2025'
-  doi: 10.32614/CRAN.package.gt
-  version: '>= 1.1.0'
 - type: software
   title: httr
   abstract: 'httr: Tools for Working with URLs and HTTP'
@@ -595,6 +535,10 @@ references:
     given-names: Barret
     email: barret@posit.co
     orcid: https://orcid.org/0000-0001-9986-114X
+  - family-names: Aden-Buie
+    given-names: Garrick
+    email: garrick@adenbuie.com
+    orcid: https://orcid.org/0000-0002-7111-0077
   - family-names: Xie
     given-names: Yihui
     email: yihui@posit.co
@@ -610,38 +554,6 @@ references:
   year: '2025'
   doi: 10.32614/CRAN.package.shiny
   version: '>= 1.11.1'
-- type: software
-  title: shinybusy
-  abstract: 'shinybusy: Busy Indicators and Notifications for ''Shiny'' Applications'
-  notes: Imports
-  url: https://dreamrs.github.io/shinybusy/
-  repository: https://CRAN.R-project.org/package=shinybusy
-  authors:
-  - family-names: Meyer
-    given-names: Fanny
-  - family-names: Perrier
-    given-names: Victor
-    email: victor.perrier@dreamrs.fr
-  year: '2025'
-  doi: 10.32614/CRAN.package.shinybusy
-  version: '>= 0.3.3'
-- type: software
-  title: shinyWidgets
-  abstract: 'shinyWidgets: Custom Inputs Widgets for Shiny'
-  notes: Imports
-  url: https://dreamrs.github.io/shinyWidgets/
-  repository: https://CRAN.R-project.org/package=shinyWidgets
-  authors:
-  - family-names: Perrier
-    given-names: Victor
-    email: victor.perrier@dreamrs.fr
-  - family-names: Meyer
-    given-names: Fanny
-  - family-names: Granjon
-    given-names: David
-  year: '2025'
-  doi: 10.32614/CRAN.package.shinyWidgets
-  version: '>= 0.9.0'
 - type: software
   title: Spectra
   abstract: 'Spectra: Spectra Infrastructure for Mass Spectrometry Data'
@@ -759,21 +671,6 @@ references:
     name: R Foundation for Statistical Computing
     address: Vienna, Austria
   year: '2025'
-- type: software
-  title: visNetwork
-  abstract: 'visNetwork: Network Visualization using ''vis.js'' Library'
-  notes: Imports
-  url: https://datastorm-open.github.io/visNetwork/
-  repository: https://CRAN.R-project.org/package=visNetwork
-  authors:
-  - name: Almende B.V. and Contributors
-    website: https://visjs.org/
-  - family-names: Thieurmel
-    given-names: Benoit
-    email: bthieurmel@gmail.com
-  year: '2025'
-  doi: 10.32614/CRAN.package.visNetwork
-  version: '>= 2.1.4'
 - type: software
   title: yaml
   abstract: 'yaml: Methods to Convert R Data to YAML and Back'
