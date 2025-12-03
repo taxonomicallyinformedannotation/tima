@@ -447,7 +447,8 @@ install <- function(
 
   tryCatch(
     {
-      copy_backbone()
+      loadNamespace("tima")
+      tima:::copy_backbone()
       log_success("Backbone files copied")
     },
     error = function(e) {
