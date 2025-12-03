@@ -350,7 +350,8 @@ try_install_package <- function(
             repos = repos,
             dependencies = dependencies,
             INSTALL_opts = c("--no-lock", "--no-test-load"),
-            type = pkg_type
+            type = pkg_type,
+            lib = .libPaths()[1] # Explicitly install to first library path
           )
           TRUE
         },
@@ -485,9 +486,29 @@ install <- function(
   log_debug("Checking Python environment")
   python <- check_or_install_python(test = test)
 
-  # Windows-specific: Force clean removal first to avoid corruption ----
+  # Windows-specific: Ensure proper library path and clean removal ----
   if (system == "Windows") {
-    log_debug("Windows detected: performing clean removal first")
+    log_debug("Windows detected: ensuring proper library path")
+
+    # Ensure R_LIBS_USER is set and exists
+    lib_user <- Sys.getenv("R_LIBS_USER")
+    if (nchar(lib_user) == 0) {
+      lib_user <- file.path(
+        Sys.getenv("USERPROFILE"),
+        "R",
+        "win-library",
+        paste0(getRversion()[, 1], ".", getRversion()[, 2])
+      )
+      Sys.setenv(R_LIBS_USER = lib_user)
+    }
+
+    dir.create(lib_user, recursive = TRUE, showWarnings = FALSE)
+    .libPaths(lib_user)
+
+    log_debug("Library paths: %s", paste(.libPaths(), collapse = ", "))
+
+    # Clean removal
+    log_debug("Performing clean removal first")
     tryCatch(
       {
         remove.packages(package)
