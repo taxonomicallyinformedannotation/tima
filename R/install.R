@@ -234,6 +234,83 @@ setup_virtualenv <- function(
   invisible(NULL)
 }
 
+#' Verify Package Installation is Complete
+#'
+#' @description Checks that package is not only installed but can be loaded.
+#'     This catches incomplete or corrupted installations that may occur on Windows.
+#'
+#' @param package Character package name
+#'
+#' @return Logical TRUE if valid, FALSE otherwise
+#' @keywords internal
+verify_package_installation <- function(package) {
+  # Check namespace exists
+  if (!requireNamespace(package, quietly = TRUE)) {
+    log_error("Package '%s' namespace not found", package)
+    return(FALSE)
+  }
+
+  # Check DESCRIPTION file exists and is readable
+  pkg_path <- tryCatch(
+    find.package(package, quiet = TRUE),
+    error = function(e) character(0)
+  )
+
+  if (length(pkg_path) == 0) {
+    log_error("Cannot find package path for '%s'", package)
+    return(FALSE)
+  }
+
+  desc_file <- file.path(pkg_path, "DESCRIPTION")
+  if (!file.exists(desc_file)) {
+    log_error(
+      "DESCRIPTION file missing for package '%s' at %s",
+      package,
+      pkg_path
+    )
+    return(FALSE)
+  }
+
+  # Try to read DESCRIPTION
+  desc_ok <- tryCatch(
+    {
+      desc <- read.dcf(desc_file)
+      !is.null(desc) && nrow(desc) > 0
+    },
+    error = function(e) {
+      log_error("Cannot read DESCRIPTION for '%s': %s", package, e$message)
+      FALSE
+    },
+    warning = function(w) {
+      log_error("Warning reading DESCRIPTION for '%s': %s", package, w$message)
+      FALSE
+    }
+  )
+
+  if (!desc_ok) {
+    return(FALSE)
+  }
+
+  # Try to actually load the namespace
+  load_ok <- tryCatch(
+    {
+      loadNamespace(package)
+      TRUE
+    },
+    error = function(e) {
+      log_error("Cannot load namespace for '%s': %s", package, e$message)
+      FALSE
+    }
+  )
+
+  if (!load_ok) {
+    return(FALSE)
+  }
+
+  log_success("Package '%s' installation verified successfully", package)
+  return(TRUE)
+}
+
 #' Attempt Package Installation
 #'
 #' @description Internal helper to attempt R package installation with error handling.
@@ -334,6 +411,7 @@ try_install_package <- function(
 #'   \item Detects the operating system and shows relevant instructions
 #'   \item **Always installs/updates the R package** from r-universe (to get latest updates)
 #'   \item Falls back to source installation if binary fails
+#'   \item Verifies installation is complete and package can be loaded
 #'   \item Checks for Python or installs Miniconda as fallback
 #'   \item Creates a Python virtual environment (tima-env) **only if it doesn't exist**
 #'   \item Installs RDKit in the virtual environment (skipped if already present)
@@ -407,6 +485,30 @@ install <- function(
   log_debug("Checking Python environment")
   python <- check_or_install_python(test = test)
 
+  # Windows-specific: Force clean removal first to avoid corruption ----
+  if (system == "Windows") {
+    log_debug("Windows detected: performing clean removal first")
+    tryCatch(
+      {
+        remove.packages(package)
+        # Also manually remove directory in case of corruption
+        lib_path <- .libPaths()[1]
+        pkg_dir <- file.path(lib_path, package)
+        if (dir.exists(pkg_dir)) {
+          log_debug("Removing existing package directory: %s", pkg_dir)
+          unlink(pkg_dir, recursive = TRUE, force = TRUE)
+          Sys.sleep(1) # Give Windows time to release file locks
+        }
+      },
+      error = function(e) {
+        log_debug(
+          "Clean removal step (expected if not installed): %s",
+          e$message
+        )
+      }
+    )
+  }
+
   # R Package Installation (Always Update) ----
   log_info("Installing/updating R package '%s' from r-universe", package)
   log_debug("This ensures you have the latest version with all updates")
@@ -434,6 +536,22 @@ install <- function(
       "Failed to install package '",
       package,
       "'. Please check the error messages above.",
+      call. = FALSE
+    )
+  }
+
+  # Verify Installation is Complete ----
+  log_info("Verifying package installation integrity")
+
+  if (!verify_package_installation(package)) {
+    log_fatal("Package installed but is corrupted or incomplete")
+    stop(
+      "Package '",
+      package,
+      "' installation is incomplete or corrupted. ",
+      "This may be due to file locking, path issues, or download interruption. ",
+      "On Windows, try: (1) closing RStudio/R, (2) manually deleting the package ",
+      "directory, (3) running the installation again.",
       call. = FALSE
     )
   }
