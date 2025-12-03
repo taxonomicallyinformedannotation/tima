@@ -13,14 +13,6 @@ NULL
   # when the package is loaded. Instead, logging is initialized on-demand
   # when functions that need logging are called (e.g., run_tima()).
   # Users can still manually initialize logging with init_logging() if needed.
-
-  # Hints/operators to appease R CMD check and lazy loading quirks
-  DT::`%>%`
-  gt::`%>%`
-  shinybusy::use_busy_spinner()
-  shinyWidgets::animations
-  visNetwork::`%>%`
-
   # Ensure RDKit availability for Python-based features (no-op if unavailable)
   try(
     {
