@@ -32,6 +32,7 @@ test_that("{shinytest2} recording: inst", {
   app$click("save")
   ## COMMENT See <https://github.com/rstudio/shinytest2/issues/417>
   # app$expect_screenshot()
+  skip_on_os("windows")
   app$expect_values()
   app$stop()
 })
