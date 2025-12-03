@@ -238,7 +238,7 @@ ui <- shiny::fluidPage(
             label = "Number of samples to keep per feature",
             min = 1L,
             max = 5L,
-            value = 1L,
+            value = 5L,
             step = 1L,
             ticks = FALSE
           ) |>
@@ -1846,18 +1846,6 @@ ui <- shiny::fluidPage(
       )
     ),
     shinyjs::hidden(
-      shiny::div(
-        id = "targets",
-        targets::tar_watch_ui(
-          id = "targets",
-          seconds = 10,
-          targets_only = TRUE,
-          degree_from = 8,
-          display = "graph"
-        )
-      )
-    ),
-    shinyjs::hidden(
       shiny::downloadButton(
         outputId = "results_mini",
         "Download mini results"
@@ -1992,9 +1980,9 @@ ui <- shiny::fluidPage(
   ms_pol <- shiny::isolate(input$ms_pol)
   summarize <- shiny::isolate(input$summarize)
 
-  log_trace("Changing parameters ...")
-  log_trace("... Small")
-  yaml_small <- yamls_params[["params/prepare_params"]]
+  tima:::log_trace("Changing parameters ...")
+  tima:::log_trace("... Small")
+  yaml_small <- yamls_params[["prepare_params"]]
   yaml_small$files$pattern <- fil_pat
   yaml_small$files$features$raw <- fil_fea_raw
   yaml_small$files$metadata$raw <- fil_met_raw
@@ -2010,8 +1998,8 @@ ui <- shiny::fluidPage(
     file = tima:::get_default_paths()$params$prepare_params
   )
 
-  log_trace("... Advanced")
-  yaml_advanced <- yamls_params[["params/prepare_params_advanced"]]
+  tima:::log_trace("... Advanced")
+  yaml_advanced <- yamls_params[["prepare_params_advanced"]]
   yaml_advanced$annotations$candidates$final <-
     shiny::isolate(input$ann_can_fin)
   yaml_advanced$annotations$candidates$neighbors <-
@@ -2324,7 +2312,6 @@ ui <- shiny::fluidPage(
   yaml_advanced$options$remove_ties <-
     shiny::isolate(input$remove_ties)
   yaml_advanced$options$summarize <- summarize
-
   if (!is.null(prefil_met_raw)) {
     yamls_params$prepare_taxa$files$metadata$raw <- fil_met_raw
   }
@@ -2332,7 +2319,6 @@ ui <- shiny::fluidPage(
     yamls_params$prepare_taxa$files$metadata$raw <-
       file.path(paths_data_source, paste0(gnps_job_id, "_metadata.tsv"))
   }
-
   yaml::write_yaml(
     x = yaml_advanced,
     file = tima:::get_default_paths()$params$prepare_params_advanced
@@ -2658,13 +2644,14 @@ server <- function(input, output) {
 
   shiny::observeEvent(eventExpr = input$launch, handlerExpr = {
     shinyjs::show("job_msg")
-    shinyjs::show("targets")
     shinyjs::hide("thankyou_msg")
     shinyjs::hide("error")
     shinyjs::hide("params")
     shinyjs::hide("form")
     shinyjs::hide("job_end")
-    shinyjs::hide("results")
+    shinyjs::hide("results_mini")
+    shinyjs::hide("results_filtered")
+    shinyjs::hide("results_full")
     shinyjs::hide("close")
     ## For shinylive, see
     ## https://github.com/taxonomicallyinformedannotation/tima-shinylive/pull/7
