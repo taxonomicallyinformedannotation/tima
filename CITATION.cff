@@ -471,6 +471,19 @@ references:
   doi: 10.32614/CRAN.package.purrr
   version: '>= 1.2.0'
 - type: software
+  title: R.utils
+  abstract: 'R.utils: Various Programming Utilities'
+  notes: Imports
+  url: https://henrikbengtsson.github.io/R.utils/
+  repository: https://CRAN.R-project.org/package=R.utils
+  authors:
+  - family-names: Bengtsson
+    given-names: Henrik
+    email: henrikb@braju.com
+  year: '2025'
+  doi: 10.32614/CRAN.package.R.utils
+  version: '>= 2.13.0'
+- type: software
   title: reticulate
   abstract: 'reticulate: Interface to ''Python'''
   notes: Imports
@@ -489,7 +502,7 @@ references:
     orcid: https://orcid.org/0000-0001-5243-233X
   year: '2025'
   doi: 10.32614/CRAN.package.reticulate
-  version: '>= 1.44.0'
+  version: '>= 1.44.1'
 - type: software
   title: rotl
   abstract: 'rotl: Interface to the ''Open Tree of Life'' API'
@@ -553,7 +566,7 @@ references:
     given-names: Barbara
   year: '2025'
   doi: 10.32614/CRAN.package.shiny
-  version: '>= 1.11.1'
+  version: '>= 1.12.0'
 - type: software
   title: Spectra
   abstract: 'Spectra: Spectra Infrastructure for Mass Spectrometry Data'
@@ -684,7 +697,7 @@ references:
     given-names: Kirill
   year: '2025'
   doi: 10.32614/CRAN.package.yaml
-  version: '>= 2.3.10'
+  version: '>= 2.3.11'
 - type: software
   title: altdoc
   abstract: 'altdoc: Package Documentation Websites with ''Quarto'', ''Docsify'',
@@ -819,19 +832,6 @@ references:
   year: '2025'
   doi: 10.32614/CRAN.package.quarto
   version: '>= 1.5.1'
-- type: software
-  title: R.utils
-  abstract: 'R.utils: Various Programming Utilities'
-  notes: Suggests
-  url: https://henrikbengtsson.github.io/R.utils/
-  repository: https://CRAN.R-project.org/package=R.utils
-  authors:
-  - family-names: Bengtsson
-    given-names: Henrik
-    email: henrikb@braju.com
-  year: '2025'
-  doi: 10.32614/CRAN.package.R.utils
-  version: '>= 2.13.0'
 - type: software
   title: rlang
   abstract: 'rlang: Functions for Base Types and Core R and ''Tidyverse'' Features'
