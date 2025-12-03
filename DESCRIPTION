@@ -62,7 +62,6 @@ Suggests:
     lifecycle (>= 1.0.4),
     pkgload (>= 1.4.1),
     quarto (>= 1.5.1),
-    R.utils (>= 2.13.0),
     rlang (>= 1.1.6),
     shinyhelper (>= 0.3.2),
     shinyjs (>= 2.1.0),
