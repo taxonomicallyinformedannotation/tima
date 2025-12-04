@@ -204,7 +204,6 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | stringi | 1.8.7 | Gagolewski (2022) |
 | targets | 1.11.4 | Landau (2021) |
 | testthat | 3.3.1 | Wickham (2011) |
-| tidyfst | 1.8.2 | Huang and Zhao (2020) |
 | tidyselect | 1.2.1 | Henry and Wickham (2024) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
@@ -345,15 +344,6 @@ Hester, Jim, Hadley Wickham, and Gábor Csárdi. 2025.
 *<span class="nocase">fs</span>: Cross-Platform File System Operations
 Based on “<span class="nocase">libuv</span>”*.
 <https://doi.org/10.32614/CRAN.package.fs>.
-
-</div>
-
-<div id="ref-tidyfst" class="csl-entry">
-
-Huang, Tian-Yuan, and Bin Zhao. 2020.
-“<span class="nocase">tidyfst</span>: Tidy Verbs for Fast Data
-Manipulation.” *Journal of Open Source Software* 5 (52): 2388.
-<https://doi.org/10.21105/joss.02388>.
 
 </div>
 
