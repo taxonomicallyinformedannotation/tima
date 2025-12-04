@@ -410,6 +410,103 @@ compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
     tidytable::distinct()
 }
 
+#' Sample Candidates Per Group with RT Error Priority
+#'
+#' @description Internal helper to sample candidates per (feature_id, rank_final)
+#'     group, prioritizing those with non-NA candidate_structure_error_rt values.
+#'
+#' @param df Data frame with ranked candidates
+#' @param max_per_score Integer, maximum candidates to keep per group
+#' @param seed Integer, random seed for reproducibility
+#'
+#' @return List with two elements:
+#'   \describe{
+#'     \item{df}{Filtered data frame with sampled candidates}
+#'     \item{n_sampled_features}{Number of features affected by sampling}
+#'   }
+#' @keywords internal
+sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
+  if (nrow(df) == 0L) {
+    return(list(df = df, n_sampled_features = 0L))
+  }
+
+  # Create group keys
+  df$.group_key <- paste(
+    df$feature_id,
+    df$candidate_adduct,
+    df$rank_final,
+    sep = "\r"
+  )
+  group_keys <- unique(df$.group_key)
+
+  # Split by group
+  groups <- split(seq_len(nrow(df)), df$.group_key)
+
+  # Identify oversized groups
+  oversized_groups <- names(groups)[
+    vapply(groups, length, integer(1)) > max_per_score
+  ]
+  oversized_feature_ids <- if (length(oversized_groups) == 0L) {
+    character(0)
+  } else {
+    unique(sub("\r.*", "", oversized_groups))
+  }
+  n_sampled_features <- length(oversized_feature_ids)
+
+  # Initialize annotation column
+  annotation_note <- rep(NA_character_, nrow(df))
+
+  set.seed(seed)
+  selected_idx <- unlist(
+    lapply(group_keys, function(k) {
+      idx <- groups[[k]]
+      n <- length(idx)
+
+      if (n <= max_per_score) {
+        return(idx)
+      }
+
+      # Prioritize candidates with non-NA RT error
+      has_rt_error <- !is.na(df$candidate_structure_error_rt[idx])
+      good_idx <- idx[has_rt_error]
+      other_idx <- idx[!has_rt_error]
+
+      if (length(good_idx) >= max_per_score) {
+        # More RT-error candidates than needed, sample from them
+        chosen <- sample(good_idx, max_per_score)
+      } else {
+        # Take all RT-error candidates and fill remaining with others
+        needed <- max_per_score - length(good_idx)
+        chosen_more <- if (needed > 0L && length(other_idx) > 0L) {
+          sample(other_idx, min(needed, length(other_idx)))
+        } else {
+          integer(0)
+        }
+        chosen <- c(good_idx, chosen_more)
+      }
+
+      # Add annotation for chosen rows in this oversized group
+      annotation_note[chosen] <<- paste0(
+        "Sampled ",
+        max_per_score,
+        " of ",
+        n,
+        " candidates with same score"
+      )
+      chosen
+    }),
+    use.names = FALSE
+  )
+
+  # Keep selected rows preserving order
+  selected_idx <- sort(unique(selected_idx))
+  out_df <- df[selected_idx, , drop = FALSE]
+  out_df$annotation_note <- annotation_note[selected_idx]
+  out_df$.group_key <- NULL
+
+  list(df = out_df, n_sampled_features = n_sampled_features)
+}
+
 #' Remove Compound Names from Results
 #'
 #' @description Internal helper to optionally remove compound names from
@@ -632,20 +729,15 @@ clean_chemo <- function(
   df_ranked <- rank_and_deduplicate(df_base)
 
   ## Sampling ----
+  # Sample candidates per (feature_id, rank_final) group
+  # Prioritize candidates with non-NA candidate_structure_error_rt
+  sampling_result <- sample_candidates_per_group(
+    df = df_ranked,
+    max_per_score = max_per_score,
+    seed = 42L
+  )
 
-  ## Sampling with reproducible seed (tidytable) ----
-  df_ranked <- df_ranked |>
-    tidytable::mutate(
-      .n_per_group = tidytable::n(),
-      .by = c(feature_id, rank_final)
-    )
-
-  # Count features that need sampling
-  n_sampled_features <- df_ranked |>
-    tidytable::filter(.n_per_group > max_per_score) |>
-    tidytable::distinct(feature_id) |>
-    nrow()
-
+  n_sampled_features <- sampling_result$n_sampled_features
   if (n_sampled_features > 0L) {
     log_info(
       "Sampling candidates for %d features with more than %d candidates per score",
@@ -654,38 +746,7 @@ clean_chemo <- function(
     )
   }
 
-  # Add group sizes per (feature_id, rank_final)
-  df_ranked <- df_ranked |>
-    tidytable::mutate(
-      .n_per_group = tidytable::n(),
-      .by = c(feature_id, rank_final)
-    )
-
-  # Groups that do NOT need sampling
-  df_keep_all <- df_ranked |>
-    tidytable::filter(.n_per_group <= max_per_score)
-
-  # Groups that DO need sampling
-  set.seed(42)
-  df_sampled <- df_ranked |>
-    tidytable::filter(.n_per_group > max_per_score) |>
-    tidytable::slice_sample(
-      n = max_per_score,
-      by = c(feature_id, rank_final)
-    ) |>
-    tidytable::mutate(
-      annotation_note = paste0(
-        "Sampled ",
-        max_per_score,
-        " of ",
-        .n_per_group,
-        " candidates with same score"
-      )
-    )
-
-  # Combine back
-  df_ranked <- tidytable::bind_rows(df_keep_all, df_sampled) |>
-    tidytable::select(-.n_per_group)
+  df_ranked <- sampling_result$df
 
   # Apply Percentile Filter -----
   # This is done BEFORE high-confidence filter to get accurate counts
