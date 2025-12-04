@@ -50,7 +50,7 @@ Imports:
     tidyselect (>= 1.2.1),
     tidytable (>= 0.11.2),
     utils,
-    yaml (>= 2.3.11)
+    yaml (>= 2.3.10)
 Suggests:
     altdoc (>= 0.7.0),
     BiocManager (>= 1.30.26),
