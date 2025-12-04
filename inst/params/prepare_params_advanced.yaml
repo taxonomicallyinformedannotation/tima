@@ -142,7 +142,7 @@ files:
         merlin: data/interim/libraries/sop/merlin_13911806_prepared.tsv.gz
 
         #' Wikidata spectral prepared structure organism pairs library. STRING
-        wikidata: data/interim/libraries/sop/wikidata_spectral_5607185_prepared.tsv.gz
+        wikidata: data/interim/libraries/sop/wikidata_5607185_prepared.tsv.gz
 
       #' Merged structure organism pairs library.
       merged:
