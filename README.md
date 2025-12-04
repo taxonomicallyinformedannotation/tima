@@ -189,7 +189,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | MetaboCoreUtils | 1.18.1 | Rainer et al. (2022a) |
 | MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
 | MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
-| MsCoreUtils | 1.21.0 | Rainer et al. (2022c) |
+| MsCoreUtils | 1.22.1 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
 | R.utils | 2.13.0 | Bengtsson (2025) |
 | reticulate | 1.44.1 | Ushey, Allaire, and Tang (2025) |
@@ -204,7 +204,6 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | stringi | 1.8.7 | Gagolewski (2022) |
 | targets | 1.11.4 | Landau (2021) |
 | testthat | 3.3.1 | Wickham (2011) |
-| tidyfst | 1.8.2 | Huang and Zhao (2020) |
 | tidyselect | 1.2.1 | Henry and Wickham (2024) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
@@ -345,15 +344,6 @@ Hester, Jim, Hadley Wickham, and Gábor Csárdi. 2025.
 *<span class="nocase">fs</span>: Cross-Platform File System Operations
 Based on “<span class="nocase">libuv</span>”*.
 <https://doi.org/10.32614/CRAN.package.fs>.
-
-</div>
-
-<div id="ref-tidyfst" class="csl-entry">
-
-Huang, Tian-Yuan, and Bin Zhao. 2020.
-“<span class="nocase">tidyfst</span>: Tidy Verbs for Fast Data
-Manipulation.” *Journal of Open Source Software* 5 (52): 2388.
-<https://doi.org/10.21105/joss.02388>.
 
 </div>
 
