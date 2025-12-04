@@ -639,7 +639,7 @@ references:
     given-names: Kirill
   year: '2025'
   doi: 10.32614/CRAN.package.yaml
-  version: '>= 2.3.11'
+  version: '>= 2.3.10'
 - type: software
   title: altdoc
   abstract: 'altdoc: Package Documentation Websites with ''Quarto'', ''Docsify'',
