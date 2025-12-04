@@ -524,50 +524,6 @@ references:
   doi: 10.32614/CRAN.package.rotl
   version: '>= 3.1.0'
 - type: software
-  title: shiny
-  abstract: 'shiny: Web Application Framework for R'
-  notes: Imports
-  url: https://shiny.posit.co/
-  repository: https://CRAN.R-project.org/package=shiny
-  authors:
-  - family-names: Chang
-    given-names: Winston
-    email: winston@posit.co
-    orcid: https://orcid.org/0000-0002-1576-2126
-  - family-names: Cheng
-    given-names: Joe
-    email: joe@posit.co
-  - family-names: Allaire
-    given-names: JJ
-    email: jj@posit.co
-  - family-names: Sievert
-    given-names: Carson
-    email: carson@posit.co
-    orcid: https://orcid.org/0000-0002-4958-2844
-  - family-names: Schloerke
-    given-names: Barret
-    email: barret@posit.co
-    orcid: https://orcid.org/0000-0001-9986-114X
-  - family-names: Aden-Buie
-    given-names: Garrick
-    email: garrick@adenbuie.com
-    orcid: https://orcid.org/0000-0002-7111-0077
-  - family-names: Xie
-    given-names: Yihui
-    email: yihui@posit.co
-  - family-names: Allen
-    given-names: Jeff
-  - family-names: McPherson
-    given-names: Jonathan
-    email: jonathan@posit.co
-  - family-names: Dipert
-    given-names: Alan
-  - family-names: Borges
-    given-names: Barbara
-  year: '2025'
-  doi: 10.32614/CRAN.package.shiny
-  version: '>= 1.12.0'
-- type: software
   title: Spectra
   abstract: 'Spectra: Spectra Infrastructure for Mass Spectrometry Data'
   notes: Imports
@@ -834,6 +790,50 @@ references:
   year: '2025'
   doi: 10.32614/CRAN.package.rlang
   version: '>= 1.1.6'
+- type: software
+  title: shiny
+  abstract: 'shiny: Web Application Framework for R'
+  notes: Suggests
+  url: https://shiny.posit.co/
+  repository: https://CRAN.R-project.org/package=shiny
+  authors:
+  - family-names: Chang
+    given-names: Winston
+    email: winston@posit.co
+    orcid: https://orcid.org/0000-0002-1576-2126
+  - family-names: Cheng
+    given-names: Joe
+    email: joe@posit.co
+  - family-names: Allaire
+    given-names: JJ
+    email: jj@posit.co
+  - family-names: Sievert
+    given-names: Carson
+    email: carson@posit.co
+    orcid: https://orcid.org/0000-0002-4958-2844
+  - family-names: Schloerke
+    given-names: Barret
+    email: barret@posit.co
+    orcid: https://orcid.org/0000-0001-9986-114X
+  - family-names: Aden-Buie
+    given-names: Garrick
+    email: garrick@adenbuie.com
+    orcid: https://orcid.org/0000-0002-7111-0077
+  - family-names: Xie
+    given-names: Yihui
+    email: yihui@posit.co
+  - family-names: Allen
+    given-names: Jeff
+  - family-names: McPherson
+    given-names: Jonathan
+    email: jonathan@posit.co
+  - family-names: Dipert
+    given-names: Alan
+  - family-names: Borges
+    given-names: Barbara
+  year: '2025'
+  doi: 10.32614/CRAN.package.shiny
+  version: '>= 1.12.0'
 - type: software
   title: shinyhelper
   abstract: 'shinyhelper: Easily Add Markdown Help Files to ''shiny'' App Elements'
