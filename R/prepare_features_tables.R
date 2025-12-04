@@ -149,18 +149,23 @@ prepare_features_tables <- function(
     name_rt = name_rt,
     name_mz = name_mz
   )
-  for (param_name in names(col_params)) {
-    val <- col_params[[param_name]]
-    if (!is.character(val) || length(val) != 1L || is.na(val) || !nzchar(val)) {
-      stop(
-        param_name,
-        " must be a single non-empty character string",
-        call. = FALSE
-      )
-    }
-  }
+  # Validate all parameters
+  purrr::iwalk(col_params, .validate_column_name_param)
 
   invisible(NULL)
+}
+
+#' Validate column name parameter
+#' @keywords internal
+#' @noRd
+.validate_column_name_param <- function(val, param_name) {
+  if (!is.character(val) || length(val) != 1L || is.na(val) || !nzchar(val)) {
+    stop(
+      param_name,
+      " must be a single non-empty character string",
+      call. = FALSE
+    )
+  }
 }
 
 #' Load features file with error handling
@@ -234,15 +239,19 @@ prepare_features_tables <- function(
     " Peak height" = ""
   )
 
-  col_names_clean <- colnames(tbl)
-  for (pattern in names(replacements)) {
-    col_names_clean <- stringi::stri_replace_all_fixed(
-      col_names_clean,
-      pattern = pattern,
-      replacement = replacements[[pattern]],
-      vectorize_all = FALSE
-    )
-  }
+  # Sequential replacements
+  col_names_clean <- Reduce(
+    function(names_vec, pattern) {
+      stringi::stri_replace_all_fixed(
+        str = names_vec,
+        pattern = pattern,
+        replacement = replacements[[pattern]],
+        vectorize_all = FALSE
+      )
+    },
+    names(replacements),
+    init = colnames(tbl)
+  )
   colnames(tbl) <- col_names_clean
   tbl
 }

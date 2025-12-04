@@ -255,9 +255,18 @@ complement_metadata_structures <- function(
     "candidate_structure_tax_cla_03cla",
     "candidate_structure_tax_cla_04dirpar"
   )
-  for (col in placeholder_candidate_cols) {
-    if (!col %in% names(df)) df[[col]] <- NA_character_
+  # Add missing candidate columns
+  missing_candidate_cols <- setdiff(placeholder_candidate_cols, names(df))
+  if (length(missing_candidate_cols) > 0L) {
+    df <- df |>
+      tidytable::mutate(
+        !!!stats::setNames(
+          rep(list(NA_character_), length(missing_candidate_cols)),
+          missing_candidate_cols
+        )
+      )
   }
+
   placeholder_structure_cols <- c(
     "structure_molecular_formula",
     "structure_exact_mass",
@@ -266,8 +275,16 @@ complement_metadata_structures <- function(
     "structure_inchikey_connectivity_layer",
     "structure_smiles_no_stereo"
   )
-  for (col in placeholder_structure_cols) {
-    if (!col %in% names(df)) df[[col]] <- NA_character_
+  # Add missing structure columns
+  missing_structure_cols <- setdiff(placeholder_structure_cols, names(df))
+  if (length(missing_structure_cols) > 0L) {
+    df <- df |>
+      tidytable::mutate(
+        !!!stats::setNames(
+          rep(list(NA_character_), length(missing_structure_cols)),
+          missing_structure_cols
+        )
+      )
   }
 
   ## Always returning preferentially internal values

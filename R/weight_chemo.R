@@ -1,3 +1,14 @@
+# Helper Functions ----
+
+#' Validate that a score is between 0 and 1
+#' @keywords internal
+#' @noRd
+.is_valid_score <- function(score) {
+  is.numeric(score) && score >= 0 && score <= 1
+}
+
+# Exported Functions ----
+
 #' @title Weight annotations by chemical consistency
 #'
 #' @description Weights biologically weighted annotations according to their
@@ -150,11 +161,14 @@ weight_chemo <- function(
     npc_class = score_chemical_npc_class
   )
 
-  for (level in names(chem_scores)) {
-    score <- chem_scores[[level]]
-    if (!is.numeric(score) || score < 0 || score > 1) {
-      stop("score_chemical_", level, " must be between 0 and 1, got: ", score)
-    }
+  # Validate all scores
+  invalid_scores <- !vapply(chem_scores, .is_valid_score, logical(1L))
+  if (any(invalid_scores)) {
+    invalid_names <- names(chem_scores)[invalid_scores]
+    stop(
+      "The following scores must be between 0 and 1: ",
+      paste0("score_chemical_", invalid_names, collapse = ", ")
+    )
   }
 
   log_info(
