@@ -9,6 +9,7 @@ utils::globalVariables(
     ".pred_denom",
     ".pred_sum",
     ".rt_err_min",
+    ".rt_priority",
     ".score_bio",
     ".score_final",
     ".score_ini",

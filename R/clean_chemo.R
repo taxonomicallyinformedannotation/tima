@@ -430,81 +430,77 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
     return(list(df = df, n_sampled_features = 0L))
   }
 
-  # Create group keys
-  df$.group_key <- paste(
-    df$feature_id,
-    df$candidate_adduct,
-    df$rank_final,
-    sep = "\r"
-  )
-  group_keys <- unique(df$.group_key)
+  # Add group sizes per (feature_id, candidate_adduct, rank_final)
+  df <- df |>
+    tidytable::mutate(
+      .n_per_group = tidytable::n(),
+      .by = c(feature_id, candidate_adduct, rank_final)
+    )
 
-  # Split by group
-  groups <- split(seq_len(nrow(df)), df$.group_key)
+  # Count features that need sampling
+  n_sampled_features <- df |>
+    tidytable::filter(.n_per_group > max_per_score) |>
+    tidytable::distinct(feature_id) |>
+    nrow()
 
-  # Identify oversized groups
-  oversized_groups <- names(groups)[
-    vapply(groups, length, integer(1)) > max_per_score
-  ]
-  oversized_feature_ids <- if (length(oversized_groups) == 0L) {
-    character(0)
-  } else {
-    unique(sub("\r.*", "", oversized_groups))
-  }
-  n_sampled_features <- length(oversized_feature_ids)
+  # Groups that do NOT need sampling
+  df_keep_all <- df |>
+    tidytable::filter(.n_per_group <= max_per_score)
 
-  # Initialize annotation column
-  annotation_note <- rep(NA_character_, nrow(df))
+  # Groups that DO need sampling - prioritize RT error candidates
+  has_rt_col <- "candidate_structure_error_rt" %in% names(df)
 
-  set.seed(seed)
-  selected_idx <- unlist(
-    lapply(group_keys, function(k) {
-      idx <- groups[[k]]
-      n <- length(idx)
+  df_needs_sampling <- df |>
+    tidytable::filter(.n_per_group > max_per_score)
 
-      if (n <= max_per_score) {
-        return(idx)
-      }
+  if (nrow(df_needs_sampling) > 0L && has_rt_col) {
+    # Add priority flag: TRUE for candidates with RT error
+    df_needs_sampling <- df_needs_sampling |>
+      tidytable::mutate(.rt_priority = !is.na(candidate_structure_error_rt))
 
-      # Prioritize candidates with non-NA RT error
-      has_rt_error <- !is.na(df$candidate_structure_error_rt[idx])
-      good_idx <- idx[has_rt_error]
-      other_idx <- idx[!has_rt_error]
-
-      if (length(good_idx) >= max_per_score) {
-        # More RT-error candidates than needed, sample from them
-        chosen <- sample(good_idx, max_per_score)
-      } else {
-        # Take all RT-error candidates and fill remaining with others
-        needed <- max_per_score - length(good_idx)
-        chosen_more <- if (needed > 0L && length(other_idx) > 0L) {
-          sample(other_idx, min(needed, length(other_idx)))
-        } else {
-          integer(0)
-        }
-        chosen <- c(good_idx, chosen_more)
-      }
-
-      # Add annotation for chosen rows in this oversized group
-      annotation_note[chosen] <<- paste0(
-        "Sampled ",
-        max_per_score,
-        " of ",
-        n,
-        " candidates with same score"
+    set.seed(seed)
+    df_sampled <- df_needs_sampling |>
+      tidytable::arrange(tidytable::desc(.rt_priority)) |>
+      tidytable::slice_head(
+        n = max_per_score,
+        by = c(feature_id, candidate_adduct, rank_final)
+      ) |>
+      tidytable::mutate(
+        annotation_note = paste0(
+          "Sampled ",
+          max_per_score,
+          " of ",
+          .n_per_group,
+          " candidates with same score"
+        )
+      ) |>
+      tidytable::select(-.rt_priority)
+  } else if (nrow(df_needs_sampling) > 0L) {
+    # No RT column, just sample randomly
+    set.seed(seed)
+    df_sampled <- df_needs_sampling |>
+      tidytable::slice_sample(
+        n = max_per_score,
+        by = c(feature_id, candidate_adduct, rank_final)
+      ) |>
+      tidytable::mutate(
+        annotation_note = paste0(
+          "Sampled ",
+          max_per_score,
+          " of ",
+          .n_per_group,
+          " candidates with same score"
+        )
       )
-      chosen
-    }),
-    use.names = FALSE
-  )
+  } else {
+    df_sampled <- tidytable::tidytable()
+  }
 
-  # Keep selected rows preserving order
-  selected_idx <- sort(unique(selected_idx))
-  out_df <- df[selected_idx, , drop = FALSE]
-  out_df$annotation_note <- annotation_note[selected_idx]
-  out_df$.group_key <- NULL
+  # Combine back
+  df_result <- tidytable::bind_rows(df_keep_all, df_sampled) |>
+    tidytable::select(-.n_per_group)
 
-  list(df = out_df, n_sampled_features = n_sampled_features)
+  list(df = df_result, n_sampled_features = n_sampled_features)
 }
 
 #' Remove Compound Names from Results
