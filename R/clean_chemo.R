@@ -1,3 +1,25 @@
+# Helper Functions ----
+
+#' Validate data frame with feature_id column
+#' @keywords internal
+#' @noRd
+.validate_features_dataframe <- function(tbl) {
+  if (!is.data.frame(tbl)) {
+    stop(
+      "features_table and components_table must be data frames",
+      call. = FALSE
+    )
+  }
+  if (!"feature_id" %in% names(tbl)) {
+    stop(
+      "features_table/components_table must contain feature_id column",
+      call. = FALSE
+    )
+  }
+}
+
+# Exported Functions ----
+
 #' Validate Inputs for clean_chemo
 #'
 #' @description Internal helper to validate all input parameters for clean_chemo.
@@ -539,20 +561,10 @@ clean_chemo <- function(
   }
 
   # Validate features and components schema minimally
-  for (tbl in list(features_table, components_table)) {
-    if (!is.data.frame(tbl)) {
-      stop(
-        "features_table and components_table must be data frames",
-        call. = FALSE
-      )
-    }
-    if (!"feature_id" %in% names(tbl)) {
-      stop(
-        "features_table/components_table must contain feature_id column",
-        call. = FALSE
-      )
-    }
-  }
+  purrr::walk(
+    .x = list(features_table, components_table),
+    .f = .validate_features_dataframe
+  )
   if (!is.data.frame(structure_organism_pairs_table)) {
     stop("structure_organism_pairs_table must be a data frame", call. = FALSE)
   }
@@ -570,10 +582,15 @@ clean_chemo <- function(
     "candidate_score_sirius_csi"
   )
 
-  for (col in score_columns) {
-    if (col %in% names(annot_table_wei_chemo)) {
-      annot_table_wei_chemo[[col]] <- as.numeric(annot_table_wei_chemo[[col]])
-    }
+  cols_to_convert <- intersect(score_columns, names(annot_table_wei_chemo))
+  if (length(cols_to_convert) > 0L) {
+    annot_table_wei_chemo <- annot_table_wei_chemo |>
+      tidytable::mutate(
+        tidytable::across(
+          .cols = tidyselect::all_of(cols_to_convert),
+          .fns = as.numeric
+        )
+      )
   }
 
   # Log Processing Parameters ----

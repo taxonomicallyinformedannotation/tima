@@ -89,20 +89,21 @@ parse_adduct <- function(
   if (grepl("[/|]", adduct_no_comments)) {
     alternatives <- strsplit(adduct_no_comments, "[/|]")[[1L]]
     alternatives <- trimws(alternatives)
+    alternatives <- alternatives[nchar(alternatives) > 0L]
 
     # Try each alternative until one parses successfully
-    for (alt_adduct in alternatives) {
-      if (nchar(alt_adduct) > 0L) {
-        result <- parse_single_adduct(alt_adduct, regex, failed_parse)
-        if (!all(result == 0)) {
-          log_debug(
-            "Successfully parsed alternative %s from composite adduct %s",
-            alt_adduct,
-            adduct_string
-          )
-          return(result)
-        }
-      }
+    result <- purrr::detect(
+      .x = alternatives,
+      .f = .is_parseable_adduct,
+      regex = regex,
+      failed_parse = failed_parse,
+      adduct_string = adduct_string,
+      .default = NULL
+    )
+
+    # If we found a valid alternative, parse and return it
+    if (!is.null(result)) {
+      return(parse_single_adduct(result, regex, failed_parse))
     }
 
     # If none of the alternatives worked, return failed parse silently
@@ -472,4 +473,25 @@ calculate_modification_masses <- function(elements, signs, multiplicities) {
     total_mass = total_mass_change,
     message = ""
   )
+}
+
+#' Check if an alternative adduct string is parseable
+#' @keywords internal
+#' @noRd
+.is_parseable_adduct <- function(
+  alt_adduct,
+  regex,
+  failed_parse,
+  adduct_string
+) {
+  parsed <- parse_single_adduct(alt_adduct, regex, failed_parse)
+  if (!all(parsed == 0)) {
+    log_debug(
+      "Successfully parsed alternative %s from composite adduct %s",
+      alt_adduct,
+      adduct_string
+    )
+    return(TRUE)
+  }
+  FALSE
 }

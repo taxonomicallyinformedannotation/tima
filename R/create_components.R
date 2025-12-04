@@ -117,20 +117,23 @@ create_components <- function(
 
   # Convert to tidy format
   # log_trace("Formatting component assignments")
-  components_table <- features_by_component |>
+
+  # Convert list to matrix, then to data frame with rownames as column
+  components_matrix <- features_by_component |>
     rbind() |>
-    t() |>
-    data.frame() |>
-    tidytable::as_tidytable(rownames = "ComponentIndex") |>
+    t()
+
+  components_df <- as.data.frame(components_matrix, stringsAsFactors = FALSE)
+  components_df$ComponentIndex <- rownames(components_df)
+  rownames(components_df) <- NULL
+
+  components_table <- components_df |>
+    tidytable::as_tidytable() |>
     tidytable::unnest(features_by_component) |>
     tidytable::distinct(
       `cluster index` = features_by_component,
       componentindex = ComponentIndex
     ) |>
-    # tidytable::mutate(tidytable::across(
-    #   .cols = tidyselect::where(is.character),
-    #   .fns = as.numeric
-    # )) |>
     tidytable::arrange(`cluster index`)
 
   # Calculate component size statistics

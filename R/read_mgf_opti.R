@@ -216,15 +216,27 @@ read_mgf_opti <- function(
   col_names <- colnames(res)
   spv_names <- names(spv)
 
-  for (i in seq_along(res)) {
-    if (all(lengths(res[[i]]) == 1L)) {
-      res[[i]] <- unlist(res[[i]], use.names = FALSE)
-    }
-    # Check if column name matches any core spectra variable
-    col_match <- match(col_names[i], spv_names, nomatch = 0L)
-    if (col_match > 0L) {
-      res[[i]] <- methods::as(object = res[[i]], Class = spv[col_match])
-    }
+  # First, unlist single-element columns
+  is_single_element <- vapply(
+    res,
+    function(col) all(lengths(col) == 1L),
+    logical(1L)
+  )
+  res[is_single_element] <- lapply(
+    res[is_single_element],
+    unlist,
+    use.names = FALSE
+  )
+
+  # Then, convert types for matching core spectra variables
+  col_matches <- match(col_names, spv_names, nomatch = 0L)
+  needs_conversion <- col_matches > 0L
+  if (any(needs_conversion)) {
+    res[needs_conversion] <- Map(
+      function(col, type_class) methods::as(object = col, Class = type_class),
+      res[needs_conversion],
+      spv[col_matches[needs_conversion]]
+    )
   }
 
   # Convert to DataFrame and set up peak lists

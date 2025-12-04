@@ -1,3 +1,45 @@
+#' Validate a single file path
+#' @keywords internal
+#' @noRd
+.validate_single_file_path <- function(
+  file_path,
+  file_name,
+  allow_null = FALSE
+) {
+  # Handle NULL values
+  if (is.null(file_path)) {
+    if (!allow_null) {
+      return(list(
+        type = "missing",
+        msg = paste0(file_name, ": NULL (file path is NULL)")
+      ))
+    }
+    return(NULL)
+  }
+
+  # Validate type
+  if (!is.character(file_path) || length(file_path) != 1L) {
+    return(list(
+      type = "invalid",
+      msg = paste0(
+        file_name,
+        ": must be a single character string, got ",
+        class(file_path)[1L]
+      )
+    ))
+  }
+
+  # Check existence
+  if (!file.exists(file_path)) {
+    return(list(
+      type = "missing",
+      msg = paste0(file_name, ": ", file_path)
+    ))
+  }
+
+  NULL
+}
+
 #' Validate that files exist
 #'
 #' @description Checks that one or more file paths exist on the filesystem.
@@ -27,41 +69,23 @@ validate_file_existence <- function(file_list, allow_null = FALSE) {
     stop("file_list cannot be empty", call. = FALSE)
   }
 
-  missing_files <- character(0L)
-  invalid_files <- character(0L)
+  # Validate each file and collect results
+  validation_results <- purrr::imap(
+    .x = file_list,
+    .f = .validate_single_file_path,
+    allow_null = allow_null
+  )
 
-  for (file_name in names(file_list)) {
-    file_path <- file_list[[file_name]]
-
-    # Handle NULL values
-    if (is.null(file_path)) {
-      if (!allow_null) {
-        missing_files <- c(
-          missing_files,
-          paste0(file_name, ": NULL (file path is NULL)")
-        )
-      }
-      next
-    }
-
-    # Validate type
-    if (!is.character(file_path) || length(file_path) != 1L) {
-      invalid_files <- c(
-        invalid_files,
-        paste0(
-          file_name,
-          ": must be a single character string, got ",
-          class(file_path)[1L]
-        )
-      )
-      next
-    }
-
-    # Check existence
-    if (!file.exists(file_path)) {
-      missing_files <- c(missing_files, paste0(file_name, ": ", file_path))
-    }
-  }
+  # Filter and categorize results
+  validation_results <- purrr::compact(validation_results)
+  invalid_files <- purrr::map_chr(
+    purrr::keep(validation_results, ~ .x$type == "invalid"),
+    ~ .x$msg
+  )
+  missing_files <- purrr::map_chr(
+    purrr::keep(validation_results, ~ .x$type == "missing"),
+    ~ .x$msg
+  )
 
   # Report errors
   errors <- c()
