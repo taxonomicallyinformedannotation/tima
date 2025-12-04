@@ -429,15 +429,14 @@ get_organism_taxonomy_ott <- function(
     new_cols <- setdiff(cols_to_set, colnames(biological_metadata))
     # Add new columns if they don't exist
     if (length(new_cols) > 0) {
-      tidyfst::setDT(x = biological_metadata)
-      tidyfst::set(
-        x = biological_metadata,
-        i = NULL,
-        j = new_cols,
-        value = NA_character_
+      # Create list of NA columns to add
+      new_cols_list <- stats::setNames(
+        rep(list(NA_character_), length(new_cols)),
+        new_cols
       )
-      biological_metadata |>
-        tidytable::as_tidytable()
+      biological_metadata <- biological_metadata |>
+        tidytable::as_tidytable() |>
+        tidytable::mutate(!!!new_cols_list)
     }
   }
 
