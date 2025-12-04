@@ -346,7 +346,8 @@ prepare_libraries_sop_merged <- function(
 
   tables <- load_and_merge_libraries(files, cache)
 
-  table_keys <- tables$key |> data.frame()
+  table_keys <- tables$key |>
+    data.frame()
   table_org_tax_ott <- tables$org_tax_ott
 
   # Complete organism taxonomy
