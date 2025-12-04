@@ -121,7 +121,7 @@ create_components <- function(
     rbind() |>
     t() |>
     data.frame() |>
-    tidyfst::rn_col("ComponentIndex") |>
+    tidytable::as_tidytable(rownames = "ComponentIndex") |>
     tidytable::unnest(features_by_component) |>
     tidytable::distinct(
       `cluster index` = features_by_component,
