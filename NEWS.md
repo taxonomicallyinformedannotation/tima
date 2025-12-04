@@ -15,8 +15,9 @@
 * Implemented GNPS similarity method in C
 * Improved high confidence filtering
 * Improved logs using `logger` (#189)
-* Keep (only) best molecular formula and canopus annotations from SIRIUS
+* Keep (only) the best molecular formula and canopus annotations from SIRIUS
 * New ISDB version with 1 million compounds (see <https://doi.org/10.5281/zenodo.14887271>)
+* Reduced dependencies and moved some to `Suggests`
 * Refactored adducts parsing to read adducts like `[M+H]+/[M]+`
 * Refactored MS1 annotation step to work per sample (#194)
 * Refactored tests
