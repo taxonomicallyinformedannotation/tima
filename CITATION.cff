@@ -632,20 +632,6 @@ references:
   doi: 10.32614/CRAN.package.targets
   version: '>= 1.11.4'
 - type: software
-  title: tidyfst
-  abstract: 'tidyfst: Tidy Verbs for Fast Data Manipulation'
-  notes: Imports
-  url: https://hope-data-science.github.io/tidyfst/
-  repository: https://CRAN.R-project.org/package=tidyfst
-  authors:
-  - family-names: Huang
-    given-names: Tian-Yuan
-    email: huang.tian-yuan@qq.com
-    orcid: https://orcid.org/0000-0002-4151-3764
-  year: '2025'
-  doi: 10.32614/CRAN.package.tidyfst
-  version: '>= 1.8.2'
-- type: software
   title: tidyselect
   abstract: 'tidyselect: Select from a Set of Strings'
   notes: Imports
