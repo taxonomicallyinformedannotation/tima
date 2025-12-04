@@ -1,7 +1,6 @@
 # Test Suite: annotate_spectra ----
 
 library(testthat)
-library(tidytable)
 
 # Helper to create minimal mgf with adjustable precursor masses & polarity
 write_minimal_mgf <- function(path, precursors, charge = "1+") {
@@ -108,7 +107,7 @@ test_that("annotate_spectra produces output file and columns", {
     dalton = 0.05
   )
   expect_true(file.exists(out))
-  df <- fread(out)
+  df <- tidytable::fread(out)
   expect_true(all(
     c(
       "feature_id",
@@ -147,8 +146,8 @@ test_that("threshold filtering removes low similarity candidates", {
     polarity = "pos",
     threshold = 0.9
   )
-  df_low <- fread(out_low)
-  df_high <- fread(out_high)
+  df_low <- tidytable::fread(out_low)
+  df_high <- tidytable::fread(out_high)
   expect_true(nrow(df_low) >= nrow(df_high))
 })
 
@@ -188,8 +187,8 @@ test_that("approx mode keeps more library spectra than strict mode", {
     dalton = 0.01,
     threshold = 0
   )
-  df_strict <- fread(out_strict)
-  df_approx <- fread(out_approx)
+  df_strict <- tidytable::fread(out_strict)
+  df_approx <- tidytable::fread(out_approx)
   # Approximated search should not have fewer distinct library candidates when any matches occur
   expect_true(nrow(df_approx) >= nrow(df_strict) || nrow(df_approx) == 0)
 })
@@ -220,7 +219,7 @@ test_that("empty result exports template", {
     ppm = 5,
     threshold = 0.5
   )
-  df <- fread(out)
+  df <- tidytable::fread(out)
   expect_true(all(fake_annotations_columns() |> names() %in% names(df)))
   expect_equal(nrow(df), 1) # template has single row
 })
@@ -253,7 +252,7 @@ test_that("polarity filtering drops non-matching libraries and handles none left
     polarity = "pos",
     threshold = 0
   )
-  df2 <- fread(out2)
+  df2 <- tidytable::fread(out2)
   expect_equal(nrow(df2), 1)
 })
 
@@ -302,7 +301,7 @@ test_that("library spectra with empty peaks are removed before concatenation", {
     threshold = 0
   )
   expect_true(file.exists(out))
-  df <- fread(out)
+  df <- tidytable::fread(out)
   expect_true(nrow(df) >= 1)
 })
 
@@ -332,7 +331,7 @@ test_that("high qutoff removes all query peaks leading to empty template", {
     qutoff = 1e9,
     threshold = 0
   )
-  df <- fread(out)
+  df <- tidytable::fread(out)
   expect_equal(nrow(df), 1)
 })
 
@@ -357,7 +356,7 @@ test_that("duplicate candidates collapsed by connectivity layer are unique", {
     polarity = "pos",
     threshold = 0
   )
-  df <- fread(out)
+  df <- tidytable::fread(out)
   uniq <- tidytable::distinct(
     df,
     feature_id,
@@ -408,7 +407,7 @@ test_that("NA fallback for smiles and inchikey connectivity is applied", {
     polarity = "pos",
     threshold = 0
   )
-  df <- fread(out)
+  df <- tidytable::fread(out)
   expect_true("candidate_structure_smiles_no_stereo" %in% names(df))
   expect_true("candidate_structure_inchikey_connectivity_layer" %in% names(df))
   # Fallback should derive connectivity layer from INCHIKEY if missing 2D field
@@ -517,7 +516,7 @@ test_that("filter_library_paths_by_polarity filters correctly", {
 #   )
 #
 #   expect_true(file.exists(out))
-#   df <- fread(out)
+#   df <- tidytable::fread(out)
 #   expect_true(nrow(df) >= 0)
 # })
 
