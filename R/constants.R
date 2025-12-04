@@ -279,7 +279,7 @@ DEFAULT_HC_SCORE_SPECTRAL_MIN <- NULL
 
 #' Default maximum allowed retention time error (minutes) for high-confidence filter
 #' @keywords internal
-DEFAULT_HC_MAX_RT_ERROR_MIN <- 0.05
+DEFAULT_HC_MAX_RT_ERROR_MIN <- 0.15
 
 # InChI Patterns ----
 
