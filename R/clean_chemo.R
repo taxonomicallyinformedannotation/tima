@@ -445,7 +445,8 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
 
   # Groups that do NOT need sampling
   df_keep_all <- df |>
-    tidytable::filter(.n_per_group <= max_per_score)
+    tidytable::filter(.n_per_group <= max_per_score) |>
+    tidytable::mutate(annotation_note = NA_character_)
 
   # Groups that DO need sampling - prioritize RT error candidates
   has_rt_col <- "candidate_structure_error_rt" %in% names(df)
@@ -973,7 +974,7 @@ clean_chemo <- function(
         )
       )
     ) |>
-    tidytable::distinct() |>
+    tidytable::distinct(feature_id, .keep_all = TRUE) |>
     tidytable::mutate(
       label_classyfire = tidytable::if_else(
         condition = !is.na(score),
