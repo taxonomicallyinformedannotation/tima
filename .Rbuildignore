@@ -28,3 +28,4 @@ CITATION.cff
 ^grateful-refs\.bib$
 ^[.]?air[.]toml$
 ^\.vscode$
+^.*\.log$
