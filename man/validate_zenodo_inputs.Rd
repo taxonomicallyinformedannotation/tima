@@ -18,6 +18,5 @@ NULL (stops on validation error)
 }
 \description{
 Internal helper to validate all input parameters for Zenodo operations.
-Implements Single Responsibility Principle by separating validation logic.
 }
 \keyword{internal}
