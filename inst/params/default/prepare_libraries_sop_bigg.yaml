@@ -1,0 +1,11 @@
+---
+#' Files.
+files:
+  #' Libraries files.
+  libraries:
+    #' Structure organism pairs libraries.
+    sop:
+      #' List of prepared structure organism pairs libraries.
+      prepared:
+        #' BiGG prepared structure organism pairs library. STRING
+        bigg: data/interim/libraries/sop/bigg_prepared.tsv.gz

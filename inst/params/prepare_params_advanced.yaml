@@ -117,6 +117,9 @@ files:
 
       #' List of prepared structure organism pairs libraries.
       prepared:
+        #' BiGG prepared structure organism pairs library. STRING
+        bigg: data/interim/libraries/sop/bigg_prepared.tsv.gz
+
         #' Closed prepared structure organism pairs library. STRING
         closed: data/interim/libraries/sop/closed_prepared.tsv.gz
 

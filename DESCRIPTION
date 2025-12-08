@@ -158,6 +158,7 @@ Collate:
     'process_smiles.R'
     'prepare_libraries_rt.R'
     'select_sop_columns.R'
+    'prepare_libraries_sop_bigg.R'
     'prepare_libraries_sop_closed.R'
     'prepare_libraries_sop_ecmdb.R'
     'prepare_libraries_sop_hmdb.R'
