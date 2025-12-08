@@ -501,18 +501,22 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
 
   # Extract annotation_note as a separate lookup table
   # annotation_note is per (feature_id, adduct, rank_final) group
-  annotation_notes_lookup <- df_result |>
-    tidytable::filter(!is.na(annotation_note)) |>
-    tidytable::distinct(
-      feature_id,
-      candidate_adduct,
-      rank_final,
-      annotation_note
-    )
+  annotation_notes_lookup <- tidytable::tidytable()
 
-  # Remove annotation_note from main data
-  df_result <- df_result |>
-    tidytable::select(-tidyselect::any_of("annotation_note"))
+  if ("annotation_note" %in% names(df_result)) {
+    annotation_notes_lookup <- df_result |>
+      tidytable::filter(!is.na(annotation_note)) |>
+      tidytable::distinct(
+        feature_id,
+        candidate_adduct,
+        rank_final,
+        annotation_note
+      )
+
+    # Remove annotation_note from main data
+    df_result <- df_result |>
+      tidytable::select(-tidyselect::any_of("annotation_note"))
+  }
 
   list(
     df = df_result,

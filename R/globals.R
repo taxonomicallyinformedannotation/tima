@@ -20,6 +20,7 @@ utils::globalVariables(
     "adduct.x",
     "adduct.y",
     "adduct_dest",
+    "annotation_note",
     "candidate_adduct",
     "candidate_count_similarity_peaks_matched",
     "candidate_library",

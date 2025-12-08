@@ -11,7 +11,8 @@ summarize_results(
   structure_organism_pairs_table,
   annot_table_wei_chemo,
   remove_ties,
-  summarize
+  summarize,
+  annotation_notes_lookup = NULL
 )
 }
 \arguments{
