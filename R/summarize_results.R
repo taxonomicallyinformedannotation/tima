@@ -38,7 +38,8 @@ summarize_results <- function(
   structure_organism_pairs_table,
   annot_table_wei_chemo,
   remove_ties,
-  summarize
+  summarize,
+  annotation_notes_lookup = NULL
 ) {
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
@@ -142,9 +143,7 @@ summarize_results <- function(
     "score_biological",
     "score_interim" = "score_weighted_bio",
     "score_chemical",
-    "score_final" = "score_weighted_chemo",
-    # TODO
-    "annotation_note"
+    "score_final" = "score_weighted_chemo"
   )
 
   final_select_cols <- c(
@@ -172,6 +171,15 @@ summarize_results <- function(
     tidytable::left_join(y = organism_lookup) |>
     tidytable::select(tidyselect::any_of(x = final_select_cols)) |>
     tidytable::arrange(rank_final)
+
+  # Add annotation_note from lookup table at the very end
+  if (!is.null(annotation_notes_lookup) && nrow(annotation_notes_lookup) > 0) {
+    df_joined <- df_joined |>
+      tidytable::left_join(
+        y = annotation_notes_lookup,
+        by = c("feature_id", "candidate_adduct", "rank_final")
+      )
+  }
 
   rm(df, organism_lookup)
   # gc()

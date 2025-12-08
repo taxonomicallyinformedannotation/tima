@@ -310,8 +310,7 @@ count_candidates <- function(df_ranked, df_percentile) {
 
   tidytable::left_join(
     x = candidates_evaluated,
-    y = candidates_best,
-    by = "feature_id"
+    y = candidates_best
   )
 }
 
@@ -445,8 +444,7 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
 
   # Groups that do NOT need sampling
   df_keep_all <- df |>
-    tidytable::filter(.n_per_group <= max_per_score) |>
-    tidytable::mutate(annotation_note = NA_character_)
+    tidytable::filter(.n_per_group <= max_per_score)
 
   # Groups that DO need sampling - prioritize RT error candidates
   has_rt_col <- "candidate_structure_error_rt" %in% names(df)
@@ -501,7 +499,26 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
   df_result <- tidytable::bind_rows(df_keep_all, df_sampled) |>
     tidytable::select(-.n_per_group)
 
-  list(df = df_result, n_sampled_features = n_sampled_features)
+  # Extract annotation_note as a separate lookup table
+  # annotation_note is per (feature_id, adduct, rank_final) group
+  annotation_notes_lookup <- df_result |>
+    tidytable::filter(!is.na(annotation_note)) |>
+    tidytable::distinct(
+      feature_id,
+      candidate_adduct,
+      rank_final,
+      annotation_note
+    )
+
+  # Remove annotation_note from main data
+  df_result <- df_result |>
+    tidytable::select(-tidyselect::any_of("annotation_note"))
+
+  list(
+    df = df_result,
+    n_sampled_features = n_sampled_features,
+    annotation_notes = annotation_notes_lookup
+  )
 }
 
 #' Remove Compound Names from Results
@@ -735,6 +752,9 @@ clean_chemo <- function(
   )
 
   n_sampled_features <- sampling_result$n_sampled_features
+  annotation_notes_lookup <- sampling_result$annotation_notes
+  df_ranked <- sampling_result$df
+
   if (n_sampled_features > 0L) {
     log_info(
       "Sampling candidates for %d features with more than %d candidates per score",
@@ -742,8 +762,6 @@ clean_chemo <- function(
       max_per_score
     )
   }
-
-  df_ranked <- sampling_result$df
 
   # Apply Percentile Filter -----
   # This is done BEFORE high-confidence filter to get accurate counts
@@ -769,9 +787,10 @@ clean_chemo <- function(
       structure_organism_pairs_table = structure_organism_pairs_table,
       annot_table_wei_chemo = annot_table_wei_chemo,
       remove_ties = remove_ties,
-      summarize = summarize
+      summarize = summarize,
+      annotation_notes_lookup = annotation_notes_lookup
     ) |>
-    tidytable::left_join(y = results_candidates, by = "feature_id") |>
+    tidytable::left_join(y = results_candidates) |>
     tidytable::mutate(
       # Set candidates_best to NA when no inchikey
       candidates_best = tidytable::if_else(
@@ -849,7 +868,7 @@ clean_chemo <- function(
 
     # Combine ClassyFire and NPClassifier
     df_pred_tax <- df_cla |>
-      tidytable::left_join(y = df_npc, by = "feature_id")
+      tidytable::left_join(y = df_npc)
   } else {
     df_pred_tax <- tidytable::tidytable(
       feature_id = character(0),
@@ -862,7 +881,7 @@ clean_chemo <- function(
 
   # Combine: use structure taxonomy when inchikey exists, predicted when not
   df_classes_mini <- df_structure_tax |>
-    tidytable::left_join(y = df_pred_tax, by = "feature_id") |>
+    tidytable::left_join(y = df_pred_tax) |>
     tidytable::mutate(
       label_classyfire = tidytable::if_else(
         has_inchikey,
@@ -904,23 +923,33 @@ clean_chemo <- function(
 
   # Combine mini results and adjust candidates_best based on inchikey presence
   results_mini <- features_table |>
-    tidytable::left_join(y = df_classes_mini, by = "feature_id") |>
-    tidytable::left_join(y = results_filtered, by = "feature_id") |>
+    tidytable::left_join(y = df_classes_mini) |>
+    tidytable::left_join(y = results_filtered) |>
     tidytable::left_join(
       y = df_filtered |>
         tidytable::select(
           feature_id,
-          label_compound = candidate_structure_name,
-          adduct = candidate_adduct,
-          smiles_no_stereo = candidate_structure_smiles_no_stereo,
-          inchikey_connectivity_layer = candidate_structure_inchikey_connectivity_layer,
-          library = candidate_library,
-          error_mz = candidate_structure_error_mz,
-          error_rt = candidate_structure_error_rt,
-          organism_closest = candidate_structure_organism_occurrence_closest,
-          score = score_weighted_chemo
-        ),
-      by = "feature_id"
+          candidate_structure_name,
+          candidate_adduct,
+          candidate_structure_smiles_no_stereo,
+          candidate_structure_inchikey_connectivity_layer,
+          candidate_library,
+          candidate_structure_error_mz,
+          candidate_structure_error_rt,
+          candidate_structure_organism_occurrence_closest,
+          score_weighted_chemo
+        )
+    ) |>
+    tidytable::rename(
+      label_compound = candidate_structure_name,
+      adduct = candidate_adduct,
+      smiles_no_stereo = candidate_structure_smiles_no_stereo,
+      inchikey_connectivity_layer = candidate_structure_inchikey_connectivity_layer,
+      library = candidate_library,
+      error_mz = candidate_structure_error_mz,
+      error_rt = candidate_structure_error_rt,
+      organism_closest = candidate_structure_organism_occurrence_closest,
+      score = score_weighted_chemo
     ) |>
     tidytable::mutate(
       # Set candidates to NA when no inchikey
@@ -974,7 +1003,7 @@ clean_chemo <- function(
         )
       )
     ) |>
-    tidytable::distinct(feature_id, .keep_all = TRUE) |>
+    tidytable::distinct() |>
     tidytable::mutate(
       label_classyfire = tidytable::if_else(
         condition = !is.na(score),
@@ -1003,9 +1032,10 @@ clean_chemo <- function(
       structure_organism_pairs_table = structure_organism_pairs_table,
       annot_table_wei_chemo = annot_table_wei_chemo,
       remove_ties = remove_ties,
-      summarize = summarize
+      summarize = summarize,
+      annotation_notes_lookup = annotation_notes_lookup
     ) |>
-    tidytable::left_join(y = results_candidates, by = "feature_id") |>
+    tidytable::left_join(y = results_candidates) |>
     tidytable::mutate(
       # Set candidates_best to NA when no inchikey
       candidates_best = tidytable::if_else(
