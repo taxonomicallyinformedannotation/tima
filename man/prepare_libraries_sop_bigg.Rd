@@ -33,6 +33,14 @@ This function prepares BiGG (Biochemical, Genetic and
 Genomic) structure-organism pairs by querying BiGG models and PubChem
 for metabolite information, extracting chemical structures, and
 formatting for TIMA annotation workflows.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{**Biota organism**: This function creates a special "Biota" organism
+for metabolites present in all models (shared core metabolism). These
+structures represent universal biochemical pathways found across all
+life forms and are always assigned maximum biological score during
+annotation, regardless of sample taxonomy. The Biota organism has
+organism_taxonomy_01domain = "Biota" and ottid = 0.
+}\if{html}{\out{</div>}}
 }
 \examples{
 \dontrun{

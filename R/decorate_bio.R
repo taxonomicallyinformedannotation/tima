@@ -17,6 +17,7 @@
 #' @param score_biological_genus Minimum score for genus-level matches
 #' @param score_biological_species Minimum score for species-level matches
 #' @param score_biological_variety Minimum score for variety-level matches
+#' @param score_biological_variety Minimum score for Biota-level matches
 #'
 #' @return The input annotation table (unchanged), for pipeline compatibility
 #'
@@ -35,7 +36,8 @@
 #'     score_biological_tribe = 0.6,
 #'     score_biological_genus = 0.7,
 #'     score_biological_species = 0.8,
-#'     score_biological_variety = 0.9
+#'     score_biological_variety = 0.9,
+#'     score_biological_biota = 1.0
 #'   )
 #' }
 decorate_bio <- function(
@@ -48,7 +50,8 @@ decorate_bio <- function(
   score_biological_tribe,
   score_biological_genus,
   score_biological_species,
-  score_biological_variety
+  score_biological_variety,
+  score_biological_biota
 ) {
   # Input Validation ----
   validate_dataframe(annot_table_wei_bio, param_name = "annot_table_wei_bio")
@@ -108,6 +111,12 @@ decorate_bio <- function(
     1,
     param_name = "score_biological_variety"
   )
+  validate_numeric_range(
+    score_biological_biota,
+    0,
+    1.007277,
+    param_name = "score_biological_biota"
+  )
 
   required_cols <- c(
     "score_biological",
@@ -151,7 +160,8 @@ decorate_bio <- function(
     tribe = score_biological_tribe,
     genus = score_biological_genus,
     species = score_biological_species,
-    variety = score_biological_variety
+    variety = score_biological_variety,
+    biota = score_biological_biota
   )
 
   # Calculate all counts
@@ -176,7 +186,8 @@ decorate_bio <- function(
     Tribe level:   %d structures
     Genus level:   %d structures
     Species level: %d structures
-    Variety level: %d structures",
+    Variety level: %d structures
+    Biota level:   %d structures",
     counts["kingdom"],
     counts["phylum"],
     counts["class"],
@@ -185,7 +196,8 @@ decorate_bio <- function(
     counts["tribe"],
     counts["genus"],
     counts["species"],
-    counts["variety"]
+    counts["variety"],
+    counts["biota"]
   )
 
   return(annot_table_wei_bio)

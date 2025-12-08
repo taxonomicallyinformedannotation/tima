@@ -5,6 +5,13 @@
 #'     for metabolite information, extracting chemical structures, and
 #'     formatting for TIMA annotation workflows.
 #'
+#'     **Biota organism**: This function creates a special "Biota" organism
+#'     for metabolites present in all models (shared core metabolism). These
+#'     structures represent universal biochemical pathways found across all
+#'     life forms and are always assigned maximum biological score during
+#'     annotation, regardless of sample taxonomy. The Biota organism has
+#'     organism_taxonomy_01domain = "Biota" and ottid = 0.
+#'
 #' @include columns_utils.R
 #' @include get_params.R
 #' @include round_reals.R
@@ -213,7 +220,11 @@ prepare_libraries_sop_bigg <- function(
         )
 
         # Helper to create organism table
-        create_organism_table <- function(organism_name, taxonomy_template, doi) {
+        create_organism_table <- function(
+          organism_name,
+          taxonomy_template,
+          doi
+        ) {
           if (is.null(doi)) {
             return(NULL)
           }

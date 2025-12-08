@@ -18,7 +18,8 @@ weight_bio(
   score_biological_tribe,
   score_biological_genus,
   score_biological_species,
-  score_biological_variety
+  score_biological_variety,
+  score_biological_biota
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ weight_bio(
 \item{score_biological_species}{Score for species-level match (0-1)}
 
 \item{score_biological_variety}{Score for variety-level match (0-1, highest)}
+
+\item{score_biological_biota}{Score for Biota-level match (0-1, special)}
 }
 \value{
 Data frame with biologically weighted annotations including biological
@@ -59,7 +62,16 @@ Weights MS annotations according to their biological source by
 comparing the taxonomic hierarchy of candidate structures' reported
 organisms with the sample's organism taxonomy. Higher taxonomic
 similarity results in higher biological scores.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{**Special case: Biota domain** - Candidates from the "Biota" domain
+(organism_taxonomy_01domain == "Biota") represent shared core metabolism
+found across all life forms. These candidates ALWAYS receive the maximum
+biological score, ensuring they are considered in all annotations
+regardless of sample taxonomy. This recognizes universal metabolic pathways
+like glycolysis, citric acid cycle, and other fundamental biochemical processes.
+
 Internal helper for weight_annotations().
+}\if{html}{\out{</div>}}
 }
 \details{
 The weights are automatically normalized by dividing by their sum,
@@ -83,7 +95,8 @@ weighted <- weight_bio(
   score_biological_tribe = 0.5,
   score_biological_genus = 0.7,
   score_biological_species = 0.9,
-  score_biological_variety = 1.0
+  score_biological_variety = 1.0,
+  score_biological_biota = 1.007276
 )
 }
 }

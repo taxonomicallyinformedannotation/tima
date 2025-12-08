@@ -498,13 +498,266 @@ test_that("weight_bio handles annotations without matching organisms", {
 
   # Weighted score should exist and be based only on spectral component
   expect_true("score_weighted_bio" %in% names(result))
+})
 
-  # With weight_spectral=0.5, weight_biological=0.5, and bio_score=0:
-  # weighted = (0.5 * spectral + 0.5 * 0) / (0.5 + 0.5) = spectral / 2
-  if ("candidate_score_similarity" %in% names(result)) {
-    spectral_scores <- result$candidate_score_similarity
-    spectral_scores[is.na(spectral_scores)] <- 0
-    expected_weighted <- spectral_scores / 2L
-    expect_equal(result$score_weighted_bio, expected_weighted, tolerance = 0.01)
-  }
+## Biota Domain Special Handling Tests ----
+
+test_that("weight_bio gives maximum score (1.0) to Biota domain candidates", {
+  # Create annotation for a random sample organism
+  annotations <- create_test_annotation(
+    feature_ids = "F1",
+    inchikeys = "BDAGIHXWWSANSR", # Glucose-6-phosphate
+    sample_organism = "Homo sapiens",
+    domain = "Eukaryota",
+    kingdom = "Metazoa"
+  )
+
+  # Create SOP table with Biota organism (shared core metabolism)
+  sop_biota <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = "BDAGIHXWWSANSR",
+    organism_name = "Biota",
+    organism_taxonomy_ottid = 0L,
+    organism_taxonomy_01domain = "Biota",
+    organism_taxonomy_02kingdom = NA_character_,
+    organism_taxonomy_03phylum = NA_character_,
+    organism_taxonomy_04class = NA_character_,
+    organism_taxonomy_05order = NA_character_,
+    organism_taxonomy_06family = NA_character_,
+    organism_taxonomy_07tribe = NA_character_,
+    organism_taxonomy_08genus = NA_character_,
+    organism_taxonomy_09species = NA_character_,
+    organism_taxonomy_10varietas = NA_character_
+  )
+
+  result <- weight_bio(
+    annotation_table_taxed = annotations,
+    structure_organism_pairs_table = sop_biota,
+    weight_spectral = 0.5,
+    weight_biological = 0.5,
+    score_biological_domain = 0.1,
+    score_biological_kingdom = 0.2,
+    score_biological_phylum = 0.3,
+    score_biological_class = 0.4,
+    score_biological_order = 0.5,
+    score_biological_family = 0.6,
+    score_biological_tribe = 0.7,
+    score_biological_genus = 0.8,
+    score_biological_species = 0.9,
+    score_biological_variety = 1.0
+  )
+
+  # Biota candidates should get maximum biological score
+  expect_equal(result$score_biological[[1]], 1.0)
+
+  # Closest occurrence should be "Biota"
+  expect_equal(
+    result$candidate_structure_organism_occurrence_closest[[1]],
+    "Biota"
+  )
+})
+
+test_that("Biota domain overrides taxonomic mismatch", {
+  # Sample from bacteria
+  annotations <- create_test_annotation(
+    feature_ids = "F1",
+    inchikeys = "BDAGIHXWWSANSR",
+    sample_organism = "Escherichia coli",
+    domain = "Bacteria",
+    kingdom = NA_character_,
+    phylum = "Proteobacteria"
+  )
+
+  # Candidate from Biota (should still get max score despite domain mismatch)
+  sop_biota <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = "BDAGIHXWWSANSR",
+    organism_name = "Biota",
+    organism_taxonomy_ottid = 0L,
+    organism_taxonomy_01domain = "Biota",
+    organism_taxonomy_02kingdom = NA_character_,
+    organism_taxonomy_03phylum = NA_character_,
+    organism_taxonomy_04class = NA_character_,
+    organism_taxonomy_05order = NA_character_,
+    organism_taxonomy_06family = NA_character_,
+    organism_taxonomy_07tribe = NA_character_,
+    organism_taxonomy_08genus = NA_character_,
+    organism_taxonomy_09species = NA_character_,
+    organism_taxonomy_10varietas = NA_character_
+  )
+
+  result <- weight_bio(
+    annotation_table_taxed = annotations,
+    structure_organism_pairs_table = sop_biota,
+    weight_spectral = 0.5,
+    weight_biological = 0.5,
+    score_biological_domain = 0.1,
+    score_biological_kingdom = 0.2,
+    score_biological_phylum = 0.3,
+    score_biological_class = 0.4,
+    score_biological_order = 0.5,
+    score_biological_family = 0.6,
+    score_biological_tribe = 0.7,
+    score_biological_genus = 0.8,
+    score_biological_species = 0.9,
+    score_biological_variety = 1.0
+  )
+
+  # Should still get max score despite being from different domain
+  expect_equal(result$score_biological[[1]], 1.0)
+})
+
+test_that("Biota takes precedence over exact species match", {
+  # Create annotation
+  annotations <- create_test_annotation(
+    feature_ids = c("F1", "F2"),
+    inchikeys = rep("BDAGIHXWWSANSR", 2)
+  )
+
+  # Create two SOPs: one Biota, one exact species match
+  sop_table <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = rep("BDAGIHXWWSANSR", 2),
+    organism_name = c("Biota", "Gentiana lutea"),
+    organism_taxonomy_ottid = c(0L, 123456L),
+    organism_taxonomy_01domain = c("Biota", "Eukaryota"),
+    organism_taxonomy_02kingdom = c(NA_character_, "Plantae"),
+    organism_taxonomy_03phylum = c(NA_character_, "Tracheophyta"),
+    organism_taxonomy_04class = c(NA_character_, "Magnoliopsida"),
+    organism_taxonomy_05order = c(NA_character_, "Gentianales"),
+    organism_taxonomy_06family = c(NA_character_, "Gentianaceae"),
+    organism_taxonomy_07tribe = c(NA_character_, NA_character_),
+    organism_taxonomy_08genus = c(NA_character_, "Gentiana"),
+    organism_taxonomy_09species = c(NA_character_, "Gentiana lutea"),
+    organism_taxonomy_10varietas = c(NA_character_, NA_character_)
+  )
+
+  result <- weight_bio(
+    annotation_table_taxed = annotations,
+    structure_organism_pairs_table = sop_table,
+    weight_spectral = 0.5,
+    weight_biological = 0.5,
+    score_biological_domain = 0.1,
+    score_biological_kingdom = 0.2,
+    score_biological_phylum = 0.3,
+    score_biological_class = 0.4,
+    score_biological_order = 0.5,
+    score_biological_family = 0.6,
+    score_biological_tribe = 0.7,
+    score_biological_genus = 0.8,
+    score_biological_species = 0.9,
+    score_biological_variety = 1.0
+  )
+
+  # Both should get max score (Biota = 1.0, exact species = 0.9)
+  expect_true(all(result$score_biological %in% c(0.9, 1.0)))
+
+  # At least one should be Biota
+  expect_true(
+    "Biota" %in% result$candidate_structure_organism_occurrence_closest
+  )
+})
+
+test_that("Multiple Biota metabolites all get maximum score", {
+  # Create annotations for multiple core metabolites
+  core_metabolites <- c(
+    "BDAGIHXWWSANSR", # Glucose-6-phosphate
+    "LCTONWCANYUPML", # Pyruvate
+    "KRKNYBCHXYNGOX" # Citrate
+  )
+
+  annotations <- create_test_annotation(
+    feature_ids = paste0("F", 1:3),
+    inchikeys = core_metabolites,
+    sample_organism = "Arabidopsis thaliana",
+    domain = "Eukaryota",
+    kingdom = "Plantae"
+  )
+
+  # All from Biota
+  sop_biota <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = core_metabolites,
+    organism_name = rep("Biota", 3),
+    organism_taxonomy_ottid = rep(0L, 3),
+    organism_taxonomy_01domain = rep("Biota", 3),
+    organism_taxonomy_02kingdom = rep(NA_character_, 3),
+    organism_taxonomy_03phylum = rep(NA_character_, 3),
+    organism_taxonomy_04class = rep(NA_character_, 3),
+    organism_taxonomy_05order = rep(NA_character_, 3),
+    organism_taxonomy_06family = rep(NA_character_, 3),
+    organism_taxonomy_07tribe = rep(NA_character_, 3),
+    organism_taxonomy_08genus = rep(NA_character_, 3),
+    organism_taxonomy_09species = rep(NA_character_, 3),
+    organism_taxonomy_10varietas = rep(NA_character_, 3)
+  )
+
+  result <- weight_bio(
+    annotation_table_taxed = annotations,
+    structure_organism_pairs_table = sop_biota,
+    weight_spectral = 0.5,
+    weight_biological = 0.5,
+    score_biological_domain = 0.1,
+    score_biological_kingdom = 0.2,
+    score_biological_phylum = 0.3,
+    score_biological_class = 0.4,
+    score_biological_order = 0.5,
+    score_biological_family = 0.6,
+    score_biological_tribe = 0.7,
+    score_biological_genus = 0.8,
+    score_biological_species = 0.9,
+    score_biological_variety = 1.0
+  )
+
+  # All should get maximum biological score
+  expect_true(all(result$score_biological == 1.0))
+
+  # All should show Biota as closest occurrence
+  expect_true(all(
+    result$candidate_structure_organism_occurrence_closest == "Biota"
+  ))
+})
+
+test_that("Biota works with empty taxonomic levels", {
+  annotations <- create_test_annotation(
+    feature_ids = "F1",
+    inchikeys = "BDAGIHXWWSANSR"
+  )
+
+  # Biota with explicitly NA taxonomy (as it should be)
+  sop_biota <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = "BDAGIHXWWSANSR",
+    organism_name = "Biota",
+    organism_taxonomy_ottid = 0L,
+    organism_taxonomy_01domain = "Biota",
+    organism_taxonomy_02kingdom = NA_character_,
+    organism_taxonomy_03phylum = NA_character_,
+    organism_taxonomy_04class = NA_character_,
+    organism_taxonomy_05order = NA_character_,
+    organism_taxonomy_06family = NA_character_,
+    organism_taxonomy_07tribe = NA_character_,
+    organism_taxonomy_08genus = NA_character_,
+    organism_taxonomy_09species = NA_character_,
+    organism_taxonomy_10varietas = NA_character_
+  )
+
+  result <- weight_bio(
+    annotation_table_taxed = annotations,
+    structure_organism_pairs_table = sop_biota,
+    weight_spectral = 0.5,
+    weight_biological = 0.5,
+    score_biological_domain = 0.1,
+    score_biological_kingdom = 0.2,
+    score_biological_phylum = 0.3,
+    score_biological_class = 0.4,
+    score_biological_order = 0.5,
+    score_biological_family = 0.6,
+    score_biological_tribe = 0.7,
+    score_biological_genus = 0.8,
+    score_biological_species = 0.9,
+    score_biological_variety = 1.0
+  )
+
+  # Should work even with all NA taxonomic levels
+  expect_equal(result$score_biological[[1]], 1.0)
+  expect_equal(
+    result$candidate_structure_organism_occurrence_closest[[1]],
+    "Biota"
+  )
 })

@@ -90,6 +90,7 @@ prepare_params <- function(
   fil_lib_sop_raw_hmd <- params_advanced$files$libraries$sop$raw$hmdb
   fil_lib_sop_raw_lot <- params_advanced$files$libraries$sop$raw$lotus
   fil_lib_sop_pre <- params_advanced$files$libraries$sop$prepared
+  fil_lib_sop_pre_big <- params_advanced$files$libraries$sop$prepared$bigg
   fil_lib_sop_pre_clo <- params_advanced$files$libraries$sop$prepared$closed
   fil_lib_sop_pre_ecm <- params_advanced$files$libraries$sop$prepared$ecmdb
   fil_lib_sop_pre_hmd <- params_advanced$files$libraries$sop$prepared$hmdb
@@ -213,6 +214,7 @@ prepare_params <- function(
   wei_bio_13 <- params_advanced$weights$biological$species
   wei_bio_14 <- params_advanced$weights$biological$subspecies
   wei_bio_15 <- params_advanced$weights$biological$variety
+  wei_bio_16 <- params_advanced$weights$biological$Biota
   wei_che_11 <- params_advanced$weights$chemical$cla$kingdom
   wei_che_21 <- params_advanced$weights$chemical$npc$pathway
   wei_che_12 <- params_advanced$weights$chemical$cla$superclass
@@ -485,6 +487,10 @@ prepare_params <- function(
   yamls_params$prepare_libraries_rt$units$rt <-
     units_rt
 
+  ## prepare_libraries_sop_bigg
+  yamls_params$prepare_libraries_sop_closed$files$libraries$sop$prepared$bigg <-
+    fil_lib_sop_pre_big
+
   ## prepare_libraries_sop_closed
   yamls_params$prepare_libraries_sop_closed$files$libraries$sop$raw$closed <-
     fil_lib_sop_raw_clo
@@ -670,6 +676,8 @@ prepare_params <- function(
     wei_bio_14
   yamls_params$weight_annotations$weights$biological$variety <-
     wei_bio_15
+  yamls_params$weight_annotations$weights$biological$Biota <-
+    wei_bio_16
   yamls_params$weight_annotations$weights$chemical$cla$kingdom <-
     wei_che_11
   yamls_params$weight_annotations$weights$chemical$npc$pathway <-

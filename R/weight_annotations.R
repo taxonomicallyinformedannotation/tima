@@ -544,6 +544,8 @@ export_results <- function(results_list, output, pattern) {
 #' (should be lower than `variety`)
 #' @param score_biological_variety Score for a `variety` match
 #' (should be the highest)
+#' @param score_biological_biota Score for a `Biota` match
+#' (should be the highest, special)
 #' @param score_chemical_cla_kingdom Score for a `Classyfire kingdom` match
 #' (should be lower than ` Classyfire superclass`)
 #' @param score_chemical_cla_superclass
@@ -734,6 +736,9 @@ weight_annotations <- function(
   score_biological_variety = get_params(
     step = "weight_annotations"
   )$weights$biological$variety,
+  score_biological_biota = get_params(
+    step = "weight_annotations"
+  )$weights$biological$biota,
   score_chemical_cla_kingdom = get_params(
     step = "weight_annotations"
   )$weights$chemical$cla$kingdom,
@@ -916,7 +921,8 @@ weight_annotations <- function(
     score_biological_tribe = score_biological_tribe,
     score_biological_genus = score_biological_genus,
     score_biological_species = score_biological_species,
-    score_biological_variety = score_biological_variety
+    score_biological_variety = score_biological_variety,
+    score_biological_biota = score_biological_biota
   )
   rm(annotation_table_taxed)
   log_debug(
@@ -934,7 +940,8 @@ weight_annotations <- function(
       score_biological_tribe = score_biological_tribe,
       score_biological_genus = score_biological_genus,
       score_biological_species = score_biological_species,
-      score_biological_variety = score_biological_variety
+      score_biological_variety = score_biological_variety,
+      score_biological_biota = score_biological_biota
     )
 
   annot_table_wei_bio_clean <- annot_table_wei_bio |>
