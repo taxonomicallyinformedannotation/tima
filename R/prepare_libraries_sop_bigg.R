@@ -10,6 +10,10 @@
 #' @include round_reals.R
 #' @include select_sop_columns.R
 #'
+#' @param bigg_doi Character string DOI for BiGG database reference
+#' @param bigg_models Named list of BiGG models with organism names as keys
+#'     and named character vectors containing "model_id" and "doi" as values
+#' @param bigg_url Character string base URL for BiGG models API
 #' @param output Character string path for prepared BiGG library output
 #'
 #' @return Character string path to prepared BiGG structure-organism pairs
@@ -24,6 +28,22 @@
 #' unlink("data", recursive = TRUE)
 #' }
 prepare_libraries_sop_bigg <- function(
+  bigg_doi = "10.1093/nar/gkv1049",
+  bigg_models = list(
+    "Escherichia coli" = c(
+      "model_id" = "iML1515",
+      "doi" = "10.1038/nbt.3956"
+    ),
+    "Saccharomyces cerevisiae" = c(
+      "model_id" = "iMM904",
+      "doi" = "10.1186/1752-0509-3-37"
+    ),
+    "Homo sapiens" = c(
+      "model_id" = "Recon3D",
+      "doi" = "10.1038/nbt.4072"
+    )
+  ),
+  bigg_url = "http://bigg.ucsd.edu/static/models/",
   output = get_params(
     step = "prepare_libraries_sop_bigg"
   )$files$libraries$sop$prepared$bigg
@@ -39,30 +59,12 @@ prepare_libraries_sop_bigg <- function(
     log_debug("Processing BiGG from online resources")
     bigg_prepared <- tryCatch(
       expr = {
-        # Constants
-        BIGG_DOI <- "10.1093/nar/gkv1049"
-        default_models <- list(
-          "Escherichia coli" = c(
-            "model_id" = "iML1515",
-            "doi" = "10.1038/nbt.3956"
-          ),
-          "Saccharomyces cerevisiae" = c(
-            "model_id" = "iMM904",
-            "doi" = "10.1186/1752-0509-3-37"
-          ),
-          "Homo sapiens" = c(
-            "model_id" = "Recon3D",
-            "doi" = "10.1038/nbt.4072"
-          )
-        )
-
-        n_models <- length(default_models)
+        n_models <- length(bigg_models)
 
         # Helper functions
         get_bigg_model <- function(model_id) {
-          BIGG_URL <- "http://bigg.ucsd.edu/static/models/"
           jsonlite::fromJSON(
-            txt = paste0(BIGG_URL, model_id["model_id"], ".json"),
+            txt = paste0(bigg_url, model_id["model_id"], ".json"),
             flatten = TRUE
           )
         }
@@ -115,7 +117,7 @@ prepare_libraries_sop_bigg <- function(
         }
 
         # Main processing
-        models <- default_models |>
+        models <- bigg_models |>
           purrr::map(.f = get_bigg_model)
 
         metabolites <- models |>
@@ -167,80 +169,101 @@ prepare_libraries_sop_bigg <- function(
         metabolites_processed <- metabolites_cleaned |>
           process_smiles("SMILES")
 
-        # Organism taxonomy tables
-        e_coli <- tidytable::tidytable() |>
-          tidytable::mutate(
-            organism_name = "Escherichia coli",
-            organism_taxonomy_ottid = 474506,
-            organism_taxonomy_01domain = "Bacteria",
-            organism_taxonomy_02kingdom = NA_character_,
-            organism_taxonomy_03phylum = "Proteobacteria",
-            organism_taxonomy_04class = "Gammaproteobacteria",
-            organism_taxonomy_05order = "Enterobacteriales",
-            organism_taxonomy_06family = "Enterobacteriaceae",
-            organism_taxonomy_07tribe = NA_character_,
-            organism_taxonomy_08genus = NA_character_,
-            organism_taxonomy_09species = "Escherichia coli",
-            organism_taxonomy_10varietas = NA_character_
-          ) |>
-          tidytable::mutate(
-            reference_doi = default_models$`Escherichia coli`["doi"]
+        # Organism taxonomy tables - created conditionally based on bigg_models
+        taxonomy_templates <- list(
+          "Escherichia coli" = list(
+            ottid = 474506L,
+            domain = "Bacteria",
+            kingdom = NA_character_,
+            phylum = "Proteobacteria",
+            class = "Gammaproteobacteria",
+            order = "Enterobacteriales",
+            family = "Enterobacteriaceae",
+            tribe = NA_character_,
+            genus = NA_character_,
+            species = "Escherichia coli",
+            varietas = NA_character_
+          ),
+          "Homo sapiens" = list(
+            ottid = 770315L,
+            domain = "Eukaryota",
+            kingdom = "Metazoa",
+            phylum = "Chordata",
+            class = "Mammalia",
+            order = "Primates",
+            family = "Hominidae",
+            tribe = NA_character_,
+            genus = "Homo",
+            species = "Homo sapiens",
+            varietas = NA_character_
+          ),
+          "Saccharomyces cerevisiae" = list(
+            ottid = 356221L,
+            domain = "Eukaryota",
+            kingdom = "Fungi",
+            phylum = "Ascomycota",
+            class = "Saccharomycetes",
+            order = NA_character_,
+            family = "Saccharomycetaceae",
+            tribe = NA_character_,
+            genus = "Saccharomyces",
+            species = "Saccharomyces cerevisiae",
+            varietas = NA_character_
           )
+        )
 
-        h_sapiens <- tidytable::tidytable() |>
-          tidytable::mutate(
-            organism_name = "Homo sapiens",
-            organism_taxonomy_ottid = 770315,
-            organism_taxonomy_01domain = "Eukaryota",
-            organism_taxonomy_02kingdom = "Metazoa",
-            organism_taxonomy_03phylum = "Chordata",
-            organism_taxonomy_04class = "Mammalia",
-            organism_taxonomy_05order = "Primates",
-            organism_taxonomy_06family = "Hominidae",
-            organism_taxonomy_07tribe = NA_character_,
-            organism_taxonomy_08genus = "Homo",
-            organism_taxonomy_09species = "Homo sapiens",
-            organism_taxonomy_10varietas = NA_character_
-          ) |>
-          tidytable::mutate(
-            reference_doi = default_models$`Homo sapiens`["doi"]
+        # Helper to create organism table
+        create_organism_table <- function(organism_name, taxonomy_template, doi) {
+          if (is.null(doi)) {
+            return(NULL)
+          }
+          tidytable::tidytable(
+            organism_name = organism_name,
+            organism_taxonomy_ottid = taxonomy_template$ottid,
+            organism_taxonomy_01domain = taxonomy_template$domain,
+            organism_taxonomy_02kingdom = taxonomy_template$kingdom,
+            organism_taxonomy_03phylum = taxonomy_template$phylum,
+            organism_taxonomy_04class = taxonomy_template$class,
+            organism_taxonomy_05order = taxonomy_template$order,
+            organism_taxonomy_06family = taxonomy_template$family,
+            organism_taxonomy_07tribe = taxonomy_template$tribe,
+            organism_taxonomy_08genus = taxonomy_template$genus,
+            organism_taxonomy_09species = taxonomy_template$species,
+            organism_taxonomy_10varietas = taxonomy_template$varietas,
+            reference_doi = doi
           )
+        }
 
-        s_cerevisiae <- tidytable::tidytable() |>
-          tidytable::mutate(
-            organism_name = "Saccharomyces cerevisiae",
-            organism_taxonomy_ottid = 356221,
-            organism_taxonomy_01domain = "Eukaryota",
-            organism_taxonomy_02kingdom = "Fungi",
-            organism_taxonomy_03phylum = "Ascomycota",
-            organism_taxonomy_04class = "Saccharomycetes",
-            organism_taxonomy_05order = NA_character_,
-            organism_taxonomy_06family = "Saccharomycetaceae",
-            organism_taxonomy_07tribe = NA_character_,
-            organism_taxonomy_08genus = "Saccharomyces",
-            organism_taxonomy_09species = "Saccharomyces cerevisiae",
-            organism_taxonomy_10varietas = NA_character_
-          ) |>
-          tidytable::mutate(
-            reference_doi = default_models$`Saccharomyces cerevisiae`["doi"]
-          )
+        # Create tables only for organisms in bigg_models
+        organism_tables <- list()
+        for (org_name in names(bigg_models)) {
+          doi <- bigg_models[[org_name]]["doi"]
+          taxonomy <- taxonomy_templates[[org_name]]
+          if (!is.null(taxonomy)) {
+            organism_tables[[org_name]] <- create_organism_table(
+              org_name,
+              taxonomy,
+              doi
+            )
+          }
+        }
 
-        biota <- tidytable::tidytable() |>
-          tidytable::mutate(
-            organism_name = "Biota",
-            organism_taxonomy_ottid = 0,
-            organism_taxonomy_01domain = "Biota",
-            organism_taxonomy_02kingdom = NA_character_,
-            organism_taxonomy_03phylum = NA_character_,
-            organism_taxonomy_04class = NA_character_,
-            organism_taxonomy_05order = NA_character_,
-            organism_taxonomy_06family = NA_character_,
-            organism_taxonomy_07tribe = NA_character_,
-            organism_taxonomy_08genus = NA_character_,
-            organism_taxonomy_09species = NA_character_,
-            organism_taxonomy_10varietas = NA_character_
-          ) |>
-          tidytable::mutate(reference_doi = BIGG_DOI)
+        # Create Biota table (universal)
+        biota <- tidytable::tidytable(
+          organism_name = "Biota",
+          organism_taxonomy_ottid = 0L,
+          organism_taxonomy_01domain = "Biota",
+          organism_taxonomy_02kingdom = NA_character_,
+          organism_taxonomy_03phylum = NA_character_,
+          organism_taxonomy_04class = NA_character_,
+          organism_taxonomy_05order = NA_character_,
+          organism_taxonomy_06family = NA_character_,
+          organism_taxonomy_07tribe = NA_character_,
+          organism_taxonomy_08genus = NA_character_,
+          organism_taxonomy_09species = NA_character_,
+          organism_taxonomy_10varietas = NA_character_,
+          reference_doi = bigg_doi
+        )
 
         metabolites_prefinal <- metabolites_processed |>
           tidytable::inner_join(metabolites_cleaned) |>
@@ -268,23 +291,17 @@ prepare_libraries_sop_bigg <- function(
             structure_taxonomy_classyfire_04directparent = NA_character_
           )
 
-        metabolites_ecoli <- metabolites_prefinal |>
-          tidytable::inner_join(e_coli) |>
-          select_sop_columns() |>
-          round_reals() |>
-          tidytable::distinct()
-
-        metabolites_hsapiens <- metabolites_prefinal |>
-          tidytable::inner_join(h_sapiens) |>
-          select_sop_columns() |>
-          round_reals() |>
-          tidytable::distinct()
-
-        metabolites_scerevisiae <- metabolites_prefinal |>
-          tidytable::inner_join(s_cerevisiae) |>
-          select_sop_columns() |>
-          round_reals() |>
-          tidytable::distinct()
+        # Process metabolites for each organism
+        metabolites_by_organism <- purrr::map_dfr(
+          .x = organism_tables,
+          .f = function(org_table) {
+            metabolites_prefinal |>
+              tidytable::inner_join(org_table) |>
+              select_sop_columns() |>
+              round_reals() |>
+              tidytable::distinct()
+          }
+        )
 
         metabolites_biota <- metabolites_prefinal |>
           tidytable::group_by(structure_inchikey) |>
@@ -298,12 +315,9 @@ prepare_libraries_sop_bigg <- function(
           round_reals() |>
           tidytable::distinct()
 
-        metabolites_biota |>
-          tidytable::bind_rows(
-            metabolites_ecoli,
-            metabolites_hsapiens,
-            metabolites_scerevisiae
-          ) |>
+        # Combine organism tables with Biota
+        metabolites_by_organism |>
+          tidytable::bind_rows(metabolites_biota) |>
           tidytable::arrange(structure_name)
       },
       error = function(e) {

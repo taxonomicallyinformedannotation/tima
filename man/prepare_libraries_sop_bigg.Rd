@@ -5,11 +5,24 @@
 \title{Prepare libraries of structure organism pairs BiGG}
 \usage{
 prepare_libraries_sop_bigg(
+  bigg_doi = "10.1093/nar/gkv1049",
+  bigg_models = list(`Escherichia coli` = c(model_id = "iML1515", doi =
+    "10.1038/nbt.3956"), `Saccharomyces cerevisiae` = c(model_id = "iMM904", doi =
+    "10.1186/1752-0509-3-37"), `Homo sapiens` = c(model_id = "Recon3D", doi =
+    "10.1038/nbt.4072")),
+  bigg_url = "http://bigg.ucsd.edu/static/models/",
   output = get_params(step =
     "prepare_libraries_sop_bigg")$files$libraries$sop$prepared$bigg
 )
 }
 \arguments{
+\item{bigg_doi}{Character string DOI for BiGG database reference}
+
+\item{bigg_models}{Named list of BiGG models with organism names as keys
+and named character vectors containing "model_id" and "doi" as values}
+
+\item{bigg_url}{Character string base URL for BiGG models API}
+
 \item{output}{Character string path for prepared BiGG library output}
 }
 \value{
