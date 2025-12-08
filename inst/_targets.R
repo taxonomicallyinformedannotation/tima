@@ -166,6 +166,16 @@ list(
         format = "file"
       ),
       tar_target(
+        name = par_def_pre_lib_sop_big,
+        command = {
+          par_def_pre_lib_sop_big <- system.file(
+            "params/default/prepare_libraries_sop_bigg.yaml",
+            package = "tima"
+          )
+        },
+        format = "file"
+      ),
+      tar_target(
         name = par_def_pre_lib_sop_clo,
         command = {
           par_def_pre_lib_sop_clo <- system.file(
@@ -431,6 +441,18 @@ list(
           format = "file"
         ),
         tar_target(
+          name = par_usr_pre_lib_sop_big,
+          command = {
+            par_usr_pre_lib_sop_big <-
+              prepare_params(
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
+                step = "prepare_libraries_sop_bigg"
+              )
+          },
+          format = "file"
+        ),
+        tar_target(
           name = par_usr_pre_lib_sop_clo,
           command = {
             par_usr_pre_lib_sop_clo <-
@@ -658,6 +680,17 @@ list(
             tima:::parse_yaml_params(
               def = par_def_pre_lib_rt,
               usr = par_usr_pre_lib_rt[[1]]
+            )
+        },
+        format = "rds"
+      ),
+      tar_target(
+        name = par_pre_lib_sop_big,
+        command = {
+          par_pre_lib_sop_big <-
+            tima:::parse_yaml_params(
+              def = par_def_pre_lib_sop_big,
+              usr = par_usr_pre_lib_sop_big[[1]]
             )
         },
         format = "rds"
@@ -1157,6 +1190,16 @@ list(
       ## Prepared
       list(
         tar_target(
+          name = lib_sop_big_pre,
+          command = {
+            lib_sop_big_pre <-
+              prepare_libraries_sop_bigg(
+                output = par_pre_lib_sop_big$files$libraries$sop$prepared$bigg
+              )
+          },
+          format = "file"
+        ),
+        tar_target(
           name = lib_sop_clo_pre,
           command = {
             lib_sop_clo_pre <-
@@ -1222,6 +1265,7 @@ list(
           command = {
             lib_sop_mer <- prepare_libraries_sop_merged(
               files = c(
+                lib_sop_big_pre,
                 lib_sop_clo_pre,
                 lib_sop_ecm_pre,
                 lib_sop_hmd_pre,

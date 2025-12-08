@@ -15,6 +15,7 @@ data:
       path: data/interim/libraries
       sop:
         path: data/interim/libraries/sop
+        bigg: data/interim/libraries/sop/bigg_prepared.tsv.gz
         closed: data/interim/libraries/sop/closed_prepared.tsv.gz
         gnps: data/interim/libraries/sop/gnps_11566051_prepared.tsv.gz
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
@@ -135,6 +136,7 @@ params:
       libraries:
         rt: params/default/prepare_libraries_rt.yaml
         sop:
+          bigg: params/default/prepare_libraries_sop_bigg.yaml
           closed: params/default/prepare_libraries_sop_closed.yaml
           ecmdb: params/default/prepare_libraries_sop_ecmdb.yaml
           hmdb: params/default/prepare_libraries_sop_hmdb.yaml
@@ -169,6 +171,7 @@ params:
       libraries:
         rt: params/user/prepare_libraries_rt.yaml
         sop:
+          bigg: params/user/prepare_libraries_sop_bigg.yaml
           closed: params/user/prepare_libraries_sop_closed.yaml
           ecmdb: params/user/prepare_libraries_sop_ecmdb.yaml
           hmdb: params/user/prepare_libraries_sop_hmdb.yaml

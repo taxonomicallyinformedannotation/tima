@@ -2,6 +2,7 @@
 
 # tima 2.13.0
 
+* Added [BiGG](http://bigg.ucsd.edu/) as SOP library
 * More in depth molecular sanitization
 
 # tima 2.12.0
