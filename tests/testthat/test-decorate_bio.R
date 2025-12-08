@@ -19,7 +19,8 @@ test_that("decorate_bio handles empty input", {
     score_biological_tribe = 0.6,
     score_biological_genus = 0.7,
     score_biological_species = 0.8,
-    score_biological_variety = 0.9
+    score_biological_variety = 0.9,
+    score_biological_biota = 1.007276
   )
 
   expect_s3_class(result, "data.frame")
@@ -43,7 +44,8 @@ test_that("decorate_bio returns input unchanged", {
     score_biological_tribe = 0.6,
     score_biological_genus = 0.7,
     score_biological_species = 0.8,
-    score_biological_variety = 0.9
+    score_biological_variety = 0.9,
+    score_biological_biota = 1.007276
   )
 
   # Should return input unchanged (decorator pattern)
@@ -67,7 +69,8 @@ test_that("decorate_bio warns on missing columns", {
       score_biological_tribe = 0.6,
       score_biological_genus = 0.7,
       score_biological_species = 0.8,
-      score_biological_variety = 0.9
+      score_biological_variety = 0.9,
+      score_biological_biota = 1.007276
     ),
     NA # Should log warning but not throw error
   )
@@ -98,7 +101,8 @@ test_that("decoration functions are fast", {
     score_biological_tribe = 0.6,
     score_biological_genus = 0.7,
     score_biological_species = 0.8,
-    score_biological_variety = 0.9
+    score_biological_variety = 0.9,
+    score_biological_biota = 1.007276
   )
   end_time <- Sys.time()
 
