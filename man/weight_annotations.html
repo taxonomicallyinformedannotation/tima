@@ -878,6 +878,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "weight_annotations")\$weights\$biological\$subspecies,
   score_biological_variety = get_params(step =
     "weight_annotations")\$weights\$biological\$variety,
+  score_biological_biota = get_params(step =
+    "weight_annotations")\$weights\$biological\$biota,
   score_chemical_cla_kingdom = get_params(step =
     "weight_annotations")\$weights\$chemical\$cla\$kingdom,
   score_chemical_cla_superclass = get_params(step =
@@ -1159,6 +1161,14 @@ Score for a <code>subspecies</code> match (should be lower than <code>variety</c
 </td>
 <td>
 Score for a <code>variety</code> match (should be the highest)
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="score_biological_biota">score_biological_biota</code>
+</td>
+<td>
+Score for a <code>Biota</code> match (should be the highest, special)
 </td>
 </tr>
 <tr>

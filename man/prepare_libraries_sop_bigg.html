@@ -821,10 +821,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
 <p>This function prepares BiGG (Biochemical, Genetic and Genomic) structure-organism pairs by querying BiGG models and PubChem for metabolite information, extracting chemical structures, and formatting for TIMA annotation workflows.</p>
+<div class="sourceCode">
+<pre>**Biota organism**: This function creates a special "Biota" organism
+for metabolites present in all models (shared core metabolism). These
+structures represent universal biochemical pathways found across all
+life forms and are always assigned maximum biological score during
+annotation, regardless of sample taxonomy. The Biota organism has
+organism_taxonomy_01domain = "Biota" and ottid = 0.
+</pre>
+</div>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <pre><code class="language-R">prepare_libraries_sop_bigg(
+  bigg_doi = "10.1093/nar/gkv1049",
+  bigg_models = list(`Escherichia coli` = c(model_id = "iML1515", doi =
+    "10.1038/nbt.3956"), `Saccharomyces cerevisiae` = c(model_id = "iMM904", doi =
+    "10.1186/1752-0509-3-37"), `Homo sapiens` = c(model_id = "Recon3D", doi =
+    "10.1038/nbt.4072")),
+  bigg_url = "http://bigg.ucsd.edu/static/models/",
   output = get_params(step =
     "prepare_libraries_sop_bigg")\$files\$libraries\$sop\$prepared\$bigg
 )
@@ -834,6 +849,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
 <table role="presentation">
 <tbody><tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="bigg_doi">bigg_doi</code>
+</td>
+<td>
+Character string DOI for BiGG database reference
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="bigg_models">bigg_models</code>
+</td>
+<td>
+Named list of BiGG models with organism names as keys and named character vectors containing "model_id" and "doi" as values
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="bigg_url">bigg_url</code>
+</td>
+<td>
+Character string base URL for BiGG models API
+</td>
+</tr>
+<tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
 <code id="output">output</code>
 </td>
