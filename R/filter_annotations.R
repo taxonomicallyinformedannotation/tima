@@ -159,7 +159,8 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
 #' @keywords internal
 apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
   log_info(
-    "Filtering annotations outside %d min RT tolerance", tolerance_rt
+    "Filtering annotations outside %d min RT tolerance",
+    tolerance_rt
   )
 
   features_annotated_table |>
