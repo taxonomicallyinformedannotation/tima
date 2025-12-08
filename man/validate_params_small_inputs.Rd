@@ -14,6 +14,5 @@ NULL (stops on validation error)
 }
 \description{
 Internal helper to validate parameters before processing.
-Implements Single Responsibility Principle by separating validation logic.
 }
 \keyword{internal}

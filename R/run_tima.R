@@ -1,7 +1,6 @@
 #' Archive Log File with Timestamp
 #'
 #' @description Internal helper to archive log files with timestamps.
-#'     Implements Single Responsibility Principle.
 #'
 #' @param log_file Character path to log file
 #' @param timestamp POSIXct timestamp for filename
@@ -52,7 +51,6 @@ archive_log_file <- function(log_file, timestamp) {
 #' Execute TIMA Targets Pipeline
 #'
 #' @description Internal helper to run the targets workflow with error handling.
-#'     Implements Single Responsibility Principle.
 #'
 #' @param target_pattern Character regex pattern to match target names
 #'

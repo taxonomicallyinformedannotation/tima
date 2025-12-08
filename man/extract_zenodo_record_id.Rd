@@ -14,6 +14,5 @@ Character record ID
 }
 \description{
 Internal helper to extract the record number from a Zenodo DOI.
-Implements Single Responsibility Principle.
 }
 \keyword{internal}

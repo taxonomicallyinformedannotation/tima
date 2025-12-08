@@ -16,6 +16,5 @@ NULL (side effect: logging)
 }
 \description{
 Internal helper to show OS-specific installation instructions.
-Implements Single Responsibility Principle.
 }
 \keyword{internal}

@@ -16,6 +16,5 @@ Logical TRUE if download needed, FALSE otherwise
 }
 \description{
 Internal helper to determine if download is required by comparing sizes.
-Implements Single Responsibility Principle.
 }
 \keyword{internal}

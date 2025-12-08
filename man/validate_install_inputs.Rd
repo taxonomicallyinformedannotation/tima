@@ -20,6 +20,5 @@ NULL (stops on validation error)
 }
 \description{
 Internal helper to validate all input parameters for install().
-Implements Single Responsibility Principle.
 }
 \keyword{internal}

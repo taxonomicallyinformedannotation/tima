@@ -186,7 +186,6 @@ calculate_mass_of_m <- function(
 }
 
 # Helper Functions ----
-# Implement Single Responsibility Principle
 
 #' Validate m/z value
 #'

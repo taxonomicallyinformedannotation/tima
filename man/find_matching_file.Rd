@@ -18,6 +18,5 @@ Integer index of first matching file
 }
 \description{
 Internal helper to find a file matching the pattern in Zenodo record.
-Implements Single Responsibility Principle.
 }
 \keyword{internal}

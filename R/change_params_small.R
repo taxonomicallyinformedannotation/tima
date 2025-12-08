@@ -1,7 +1,6 @@
 #' Validate Input Parameters for change_params_small
 #'
 #' @description Internal helper to validate parameters before processing.
-#'     Implements Single Responsibility Principle by separating validation logic.
 #'
 #' @param ms_pol MS polarity parameter
 #'

@@ -14,6 +14,5 @@ Invisible NULL
 }
 \description{
 Internal helper to run the targets workflow with error handling.
-Implements Single Responsibility Principle.
 }
 \keyword{internal}

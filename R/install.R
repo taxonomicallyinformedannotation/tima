@@ -1,7 +1,6 @@
 #' Validate Install Function Inputs
 #'
 #' @description Internal helper to validate all input parameters for install().
-#'     Implements Single Responsibility Principle.
 #'
 #' @param package Character package name
 #' @param repos Character vector of repositories
@@ -53,7 +52,6 @@ validate_install_inputs <- function(package, repos, dependencies, test) {
 #' Display System-Specific Installation Messages
 #'
 #' @description Internal helper to show OS-specific installation instructions.
-#'     Implements Single Responsibility Principle.
 #'
 #' @param system Character OS name from Sys.info()
 #' @param test Logical test mode flag
@@ -90,7 +88,7 @@ show_system_messages <- function(system, test) {
 #' Check or Install Python
 #'
 #' @description Internal helper to ensure Python is available, installing
-#'     Miniconda as fallback if needed. Implements Single Responsibility Principle.
+#'     Miniconda as fallback if needed.
 #'
 #' @return Character path to Python executable
 #' @keywords internal
@@ -290,7 +288,6 @@ verify_package_installation <- function(package) {
 #' Attempt Package Installation
 #'
 #' @description Internal helper to attempt R package installation with error handling.
-#'     Implements Single Responsibility Principle.
 #'
 #' @param package Character package name
 #' @param repos Character vector of repositories
