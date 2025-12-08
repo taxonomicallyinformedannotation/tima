@@ -233,24 +233,6 @@ test_that("remove_ties keeps only one entry per feature-rank combination", {
 
 # Data cleaning tests ----
 
-test_that("summarize_results converts all columns to character", {
-  test_data <- create_test_annotation_data()
-
-  result <- summarize_results(
-    df = test_data$df,
-    features_table = test_data$features_table,
-    components_table = test_data$components_table,
-    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-    remove_ties = FALSE,
-    summarize = FALSE
-  )
-
-  # All columns should be character
-  column_types <- sapply(result, class)
-  expect_true(all(sapply(column_types, function(x) "character" %in% x)))
-})
-
 test_that("summarize_results trims whitespace", {
   test_data <- create_test_annotation_data()
 

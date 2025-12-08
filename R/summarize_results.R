@@ -247,6 +247,11 @@ summarize_results <- function(
   # gc()
 
   # Final processing: convert to character, trim, handle NAs
+  # But preserve numeric types for feature-related columns that might be used in joins
+  numeric_feature_cols <- colnames(df_final)[
+    grepl("^feature_", colnames(df_final)) & sapply(df_final, is.numeric)
+  ]
+
   df_processed <- df_final |>
     tidytable::mutate(
       tidytable::across(
@@ -258,6 +263,12 @@ summarize_results <- function(
       tidytable::across(
         .cols = tidyselect::where(fn = is.character),
         .fns = ~ tidytable::na_if(x = trimws(.x), y = "")
+      )
+    ) |>
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidyselect::any_of(x = numeric_feature_cols),
+        .fns = as.numeric
       )
     ) |>
     tidytable::select(tidyselect::any_of(x = final_select_cols))
