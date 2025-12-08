@@ -2,8 +2,7 @@
 #'
 #' @description This function prepares HMDB (Human Metabolome Database)
 #'     structure-organism pairs by parsing SDF files, extracting metadata,
-#'     and formatting for TIMA annotation workflows. Handles human metabolite
-#'     data with structures and biofluid/tissue associations.
+#'     and formatting for TIMA annotation workflows.
 #'
 #' @include columns_utils.R
 #' @include get_params.R

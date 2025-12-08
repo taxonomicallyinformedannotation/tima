@@ -20,6 +20,5 @@ Logical TRUE if successful, FALSE otherwise
 }
 \description{
 Internal helper to attempt R package installation with error handling.
-Implements Single Responsibility Principle.
 }
 \keyword{internal}

@@ -11,6 +11,6 @@ Character path to Python executable
 }
 \description{
 Internal helper to ensure Python is available, installing
-Miniconda as fallback if needed. Implements Single Responsibility Principle.
+Miniconda as fallback if needed.
 }
 \keyword{internal}

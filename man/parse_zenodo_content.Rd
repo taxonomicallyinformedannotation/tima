@@ -14,6 +14,5 @@ List with parsed JSON content
 }
 \description{
 Internal helper to parse JSON content from Zenodo API.
-Implements Single Responsibility Principle with error handling.
 }
 \keyword{internal}

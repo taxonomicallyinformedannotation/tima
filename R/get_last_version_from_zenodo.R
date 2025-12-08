@@ -1,7 +1,6 @@
 #' Validate Zenodo Function Inputs
 #'
 #' @description Internal helper to validate all input parameters for Zenodo operations.
-#'     Implements Single Responsibility Principle by separating validation logic.
 #'
 #' @param doi Character DOI string
 #' @param pattern Character pattern string
@@ -50,7 +49,6 @@ validate_zenodo_inputs <- function(doi, pattern, path) {
 #' Extract Zenodo Record ID from DOI
 #'
 #' @description Internal helper to extract the record number from a Zenodo DOI.
-#'     Implements Single Responsibility Principle.
 #'
 #' @param doi Character DOI string
 #'
@@ -68,7 +66,6 @@ extract_zenodo_record_id <- function(doi) {
 #' Fetch Zenodo Record Metadata
 #'
 #' @description Internal helper to retrieve record metadata from Zenodo API.
-#'     Implements Single Responsibility Principle with proper error handling.
 #'
 #' @param record Character record ID
 #' @param doi Character DOI (for error messages)
@@ -116,7 +113,6 @@ fetch_zenodo_record <- function(record, doi) {
 #' Parse Zenodo API Response
 #'
 #' @description Internal helper to parse JSON content from Zenodo API.
-#'     Implements Single Responsibility Principle with error handling.
 #'
 #' @param api_url Character URL to Zenodo API endpoint
 #'
@@ -143,7 +139,6 @@ parse_zenodo_content <- function(api_url) {
 #' Find Matching File in Zenodo Record
 #'
 #' @description Internal helper to find a file matching the pattern in Zenodo record.
-#'     Implements Single Responsibility Principle.
 #'
 #' @param filenames Character vector of filenames
 #' @param pattern Character pattern to match
@@ -181,7 +176,6 @@ find_matching_file <- function(filenames, pattern, doi) {
 #' Check if File Download is Needed
 #'
 #' @description Internal helper to determine if download is required by comparing sizes.
-#'     Implements Single Responsibility Principle.
 #'
 #' @param path Character local file path
 #' @param zenodo_size Numeric size in bytes from Zenodo

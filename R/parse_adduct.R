@@ -200,7 +200,6 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
 }
 
 # Helper Functions ----
-# These functions implement Single Responsibility Principle
 
 #' Create failed parse result
 #' @keywords internal

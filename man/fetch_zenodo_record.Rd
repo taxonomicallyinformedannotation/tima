@@ -16,6 +16,5 @@ httr2 response object
 }
 \description{
 Internal helper to retrieve record metadata from Zenodo API.
-Implements Single Responsibility Principle with proper error handling.
 }
 \keyword{internal}

@@ -139,7 +139,8 @@ prepare_taxa <- function(
     tidytable::filter(!is.na(!!as.name(colname))) |>
     tidytable::distinct(!!as.name(colname)) |>
     tidytable::select(organism = !!as.name(colname)) |>
-    tidytable::separate_rows(organism, sep = "\\|", )
+    tidytable::separate_rows(organism, sep = "\\|") |>
+    tidytable::mutate(organism = trimws(organism))
 
   # log_trace(
   #  "Retrieving already computed Open Tree of Life Taxonomy"
@@ -228,6 +229,7 @@ prepare_taxa <- function(
   taxed_features_table <-
     metadata_table_joined |>
     tidytable::separate_rows(organismOriginal, sep = "\\|") |>
+    tidytable::mutate(organismOriginal = trimws(organismOriginal)) |>
     tidytable::left_join(
       y = biological_metadata,
       by = c("organismOriginal" = "organism_name")

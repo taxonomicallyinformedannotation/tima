@@ -278,9 +278,7 @@ annotate_masses <-
       tidytable::distinct(feature_id, adduct) |>
       tidytable::filter(!is.na(adduct))
     log_info(
-      "Already {
-      nrow(already_assigned)
-      } adducts previously detected"
+      "Already %d adducts previously detected", nrow(already_assigned)
     )
     features_table <- features_table |>
       harmonize_adducts(adducts_translations = adducts_translations)

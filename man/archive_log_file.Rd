@@ -16,6 +16,5 @@ Logical TRUE if successful, FALSE otherwise
 }
 \description{
 Internal helper to archive log files with timestamps.
-Implements Single Responsibility Principle.
 }
 \keyword{internal}
