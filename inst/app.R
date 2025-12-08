@@ -1504,6 +1504,22 @@ ui <- shiny::fluidPage(
               )
             ),
           shiny::sliderInput(
+            inputId = "wei_bio_16",
+            label = "Score for a biological Biota match",
+            min = 0,
+            max = 1.007276,
+            value = 1.007276,
+            step = 0.000001,
+            ticks = FALSE
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = c(
+                "Score for a `Biota` match.",
+                "This is a special value."
+              )
+            ),
+          shiny::sliderInput(
             inputId = "wei_che_11",
             label = "Score for a (classyfire) chemical kingdom match",
             min = 0,
@@ -2290,6 +2306,8 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$wei_bio_14)
   yaml_advanced$weights$biological$variety <-
     shiny::isolate(input$wei_bio_15)
+  yaml_advanced$weights$biological$biota <-
+    shiny::isolate(input$wei_bio_16)
   yaml_advanced$weights$chemical$cla$kingdom <-
     shiny::isolate(input$wei_che_11)
   yaml_advanced$weights$chemical$npc$pathway <-

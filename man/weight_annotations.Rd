@@ -56,6 +56,8 @@ weight_annotations(
     "weight_annotations")$weights$biological$subspecies,
   score_biological_variety = get_params(step =
     "weight_annotations")$weights$biological$variety,
+  score_biological_biota = get_params(step =
+    "weight_annotations")$weights$biological$biota,
   score_chemical_cla_kingdom = get_params(step =
     "weight_annotations")$weights$chemical$cla$kingdom,
   score_chemical_cla_superclass = get_params(step =
@@ -166,6 +168,9 @@ filtering between mini and filtered outputs.}
 
 \item{score_biological_variety}{Score for a \code{variety} match
 (should be the highest)}
+
+\item{score_biological_biota}{Score for a \code{Biota} match
+(should be the highest, special)}
 
 \item{score_chemical_cla_kingdom}{Score for a \verb{Classyfire kingdom} match
 (should be lower than \verb{ Classyfire superclass})}

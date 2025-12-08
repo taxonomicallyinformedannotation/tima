@@ -72,6 +72,7 @@ They will then be saved as YAML you will be able to share.
 To ensure optimal reproducibility and avoiding re-computing endlessly steps that did not change, we decided to build a [{targets}](https://books.ropensci.org/targets/) pipeline.
 Each step of the whole pipeline will be described next.
 
+
 ```{r targets, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 try(
   expr = {
@@ -148,3 +149,28 @@ tima::change_params_small(
   summarize = FALSE
 )
 ```
+
+
+## Biological Weighting and Core Metabolism
+
+TIMA's core principle is that candidates that are close to your sample's taxonomic origin receive higher biological scores.
+For example, if you are analyzing a plant extract (*Gentiana lutea*),
+metabolites reported from plants will score higher than those only reported from bacteria or animals.
+
+### The Special Case: "Biota" Superdomain
+
+However, some metabolites are *universal*, they are part of the shared core metabolism found across all domains of life.
+To ensure these universal metabolites are always considered in annotations regardless of sample taxonomy,
+TIMA implements a special `"Biota" Superdomain`.
+
+### How Biota Works
+
+When preparing structure-organism pair libraries (e.g., from BiGG metabolic models),
+metabolites present in all model organisms are assigned to the special "Biota" organism with:
+
+- `organism_taxonomy_01domain = "Biota"`
+- `organism_taxonomy_ottid = 0`
+
+During biological weighting, any candidate from the Biota domain receives the maximal biological score.
+This ensures that core metabolic pathways are never inappropriately filtered out due to taxonomic mismatches,
+while still maintaining the taxonomic prioritization for organism-specific specialized metabolism.

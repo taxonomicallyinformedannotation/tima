@@ -14,7 +14,8 @@ decorate_bio(
   score_biological_tribe,
   score_biological_genus,
   score_biological_species,
-  score_biological_variety
+  score_biological_variety,
+  score_biological_biota
 )
 }
 \arguments{
@@ -36,7 +37,7 @@ decorate_bio(
 
 \item{score_biological_species}{Minimum score for species-level matches}
 
-\item{score_biological_variety}{Minimum score for variety-level matches}
+\item{score_biological_variety}{Minimum score for Biota-level matches}
 }
 \value{
 The input annotation table (unchanged), for pipeline compatibility
@@ -60,7 +61,8 @@ weighted_bio |>
     score_biological_tribe = 0.6,
     score_biological_genus = 0.7,
     score_biological_species = 0.8,
-    score_biological_variety = 0.9
+    score_biological_variety = 0.9,
+    score_biological_biota = 1.0
   )
 }
 }

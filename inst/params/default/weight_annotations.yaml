@@ -156,6 +156,9 @@ weights:
     #' Score for a biological variety match. FLOAT
     variety: 1.00
 
+    #' Score for a biological Biota match. FLOAT
+    biota: 1.007276
+
   #' Weights for the chemical part.
   chemical:
     #' Score for a classyfire match.

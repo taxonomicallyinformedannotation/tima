@@ -72,7 +72,7 @@ test_that("prepare_libraries_sop_bigg uses existing valid output file", {
   initial_mtime <- file.mtime(output_file)
 
   # Run function
-  Sys.sleep(0.1)  # Small delay to ensure mtime difference if file is rewritten
+  Sys.sleep(0.1) # Small delay to ensure mtime difference if file is rewritten
   result <- prepare_libraries_sop_bigg(
     bigg_models = test_bigg_models,
     output = output_file
@@ -99,25 +99,25 @@ test_that("prepare_libraries_sop_bigg just runs", {
   )
 
   df <- tidytable::fread(result)
-  
+
   # Check for expected columns
   expect_true("structure_inchikey" %in% names(df))
   expect_true("structure_name" %in% names(df))
   expect_true("organism_name" %in% names(df))
-  
+
   # Check for organism taxonomy columns
   expect_true("organism_taxonomy_ottid" %in% names(df))
   expect_true("organism_taxonomy_01domain" %in% names(df))
   expect_true("organism_taxonomy_09species" %in% names(df))
   expect_true("reference_doi" %in% names(df))
-  
+
   raw_content <- readLines(result, n = 2)
   expect_true(any(grepl("\t", raw_content, fixed = TRUE)))
-  
+
   expect_true(file.exists(result))
   expect_equal(result, output_file)
   expect_type(result, "character")
-  
+
   expect_length(result, 1L)
   expect_false(is.na(result))
   expect_false(result == "")

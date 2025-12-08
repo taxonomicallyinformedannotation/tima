@@ -4,6 +4,14 @@
 #'     comparing the taxonomic hierarchy of candidate structures' reported
 #'     organisms with the sample's organism taxonomy. Higher taxonomic
 #'     similarity results in higher biological scores.
+#'
+#'     **Special case: Biota domain** - Candidates from the "Biota" domain
+#'     (organism_taxonomy_01domain == "Biota") represent shared core metabolism
+#'     found across all life forms. These candidates ALWAYS receive the maximum
+#'     biological score, ensuring they are considered in all annotations
+#'     regardless of sample taxonomy. This recognizes universal metabolic pathways
+#'     like glycolysis, citric acid cycle, and other fundamental biochemical processes.
+#'
 #'     Internal helper for weight_annotations().
 #'
 #' @details The weights are automatically normalized by dividing by their sum,
@@ -28,6 +36,7 @@
 #' @param score_biological_genus Score for genus-level match (0-1)
 #' @param score_biological_species Score for species-level match (0-1)
 #' @param score_biological_variety Score for variety-level match (0-1, highest)
+#' @param score_biological_biota Score for Biota-level match (0-1, special)
 #'
 #' @return Data frame with biologically weighted annotations including biological
 #'     scores and combined weighted scores
@@ -51,7 +60,8 @@
 #'   score_biological_tribe = 0.5,
 #'   score_biological_genus = 0.7,
 #'   score_biological_species = 0.9,
-#'   score_biological_variety = 1.0
+#'   score_biological_variety = 1.0,
+#'   score_biological_biota = 1.007276
 #' )
 #' }
 weight_bio <- function(
@@ -68,7 +78,8 @@ weight_bio <- function(
   score_biological_tribe,
   score_biological_genus,
   score_biological_species,
-  score_biological_variety
+  score_biological_variety,
+  score_biological_biota
 ) {
   # Input Validation ----
   validate_dataframe(
@@ -491,8 +502,23 @@ weight_bio <- function(
         .fns = as.character
       )
     ) |>
+    # Special handling for "Biota" domain (shared core metabolism)
+    # Organisms from Biota always get maximum biological score (1.0)
+    # These represent universal metabolites found across all life
+    tidytable::mutate(
+      score_biological = tidytable::if_else(
+        condition = !is.na(candidate_organism_01_domain) &
+          candidate_organism_01_domain == "Biota",
+        true = score_biological_biota,
+        false = score_biological
+      )
+    ) |>
     tidytable::mutate(
       candidate_structure_organism_occurrence_closest = tidytable::case_when(
+        # Biota gets special treatment - always considered closest match
+        !is.na(candidate_organism_01_domain) &
+          candidate_organism_01_domain == "Biota" ~
+          "Biota",
         score_biological == score_biological_domain ~
           candidate_organism_01_domain,
         score_biological == score_biological_kingdom ~

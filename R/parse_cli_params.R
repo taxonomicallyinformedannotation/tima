@@ -451,6 +451,10 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("weights", "biological", "variety"),
       type = as.numeric
     ),
+    wei_bio_16 = list(
+      path = c("weights", "biological", "Biota"),
+      type = as.numeric
+    ),
     wei_che11 = list(
       path = c("weights", "chemical", "cla", "kingdom"),
       type = as.numeric
