@@ -16,10 +16,10 @@ NULL
   # when the package is loaded. Instead, logging is initialized on-demand
   # when functions that need logging are called (e.g., run_tima()).
   # Users can still manually initialize logging with init_logging() if needed.
-  # Ensure RDKit availability for Python-based features (no-op if unavailable)
+  # Ensure RDKit and chembl_structure_pipeline availability for Python features
   try(
     {
-      reticulate::py_require(packages = "rdkit")
+      reticulate::py_require(packages = c("rdkit", "chembl_structure_pipeline"))
     },
     silent = TRUE
   )
