@@ -157,7 +157,9 @@ prepare_libraries_sop_bigg <- function(
           ) |>
           tidytable::mutate(length = stringi::stri_length(Title)) |>
           tidytable::arrange(length) |>
-          tidytable::distinct(organism_name, structure_inchikey,
+          tidytable::distinct(
+            organism_name,
+            structure_inchikey,
             .keep_all = TRUE
           ) |>
           tidytable::select(-length)
@@ -320,4 +322,3 @@ prepare_libraries_sop_bigg <- function(
 
   return(output)
 }
-
