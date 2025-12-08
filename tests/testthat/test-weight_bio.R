@@ -64,7 +64,8 @@ test_that("weight_bio validates data frame inputs", {
       score_biological_tribe = 0.7,
       score_biological_genus = 0.8,
       score_biological_species = 0.9,
-      score_biological_variety = 1.0
+      score_biological_variety = 1.0,
+      score_biological_biota = 1.007276
     ),
     "annotation_table_taxed must be a data frame"
   )
@@ -85,7 +86,8 @@ test_that("weight_bio validates data frame inputs", {
       score_biological_tribe = 0.7,
       score_biological_genus = 0.8,
       score_biological_species = 0.9,
-      score_biological_variety = 1.0
+      score_biological_variety = 1.0,
+      score_biological_biota = 1.007276
     ),
     "structure_organism_pairs_table must be a data frame"
   )
@@ -108,7 +110,8 @@ test_that("weight_bio validates weight parameters", {
       score_biological_tribe = 0.7,
       score_biological_genus = 0.8,
       score_biological_species = 0.9,
-      score_biological_variety = 1.0
+      score_biological_variety = 1.0,
+      score_biological_biota = 1.007276
     ),
     "weights must be non-negative. Negative weight(s): position 1",
     fixed = TRUE
@@ -130,7 +133,8 @@ test_that("weight_bio validates weight parameters", {
       score_biological_tribe = 0.7,
       score_biological_genus = 0.8,
       score_biological_species = 0.9,
-      score_biological_variety = 1.0
+      score_biological_variety = 1.0,
+      score_biological_biota = 1.007276
     ),
     "Weight(s) must be between 0 and 1: biological",
     fixed = TRUE
@@ -154,7 +158,8 @@ test_that("weight_bio validates biological score parameters", {
       score_biological_tribe = 0.7,
       score_biological_genus = 0.8,
       score_biological_species = 0.9,
-      score_biological_variety = 1.0
+      score_biological_variety = 1.0,
+      score_biological_biota = 1.007276
     ),
     "score_biological_domain must be between 0 and 1, got: -0.1"
   )
@@ -208,7 +213,8 @@ test_that("weight_bio handles empty annotation table", {
     score_biological_tribe = 0.7,
     score_biological_genus = 0.8,
     score_biological_species = 0.9,
-    score_biological_variety = 1.0
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276
   )
 
   # Should return empty input unchanged
@@ -261,7 +267,8 @@ test_that("weight_bio assigns highest score to exact species match", {
     score_biological_tribe = 0.7,
     score_biological_genus = 0.8,
     score_biological_species = 0.9,
-    score_biological_variety = 1.0
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276
   )
 
   expect_true(nrow(result) > 0)
@@ -316,7 +323,8 @@ test_that("weight_bio assigns correct score to genus-level match", {
     score_biological_tribe = 0.7,
     score_biological_genus = 0.8,
     score_biological_species = 0.9,
-    score_biological_variety = 1.0
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276
   )
 
   expect_true(nrow(result) > 0)
@@ -372,7 +380,8 @@ test_that("weight_bio assigns correct score to family-level match", {
     score_biological_tribe = 0.7,
     score_biological_genus = 0.8,
     score_biological_species = 0.9,
-    score_biological_variety = 1.0
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276
   )
 
   expect_true(nrow(result) > 0)
@@ -425,7 +434,8 @@ test_that("weight_bio returns expected columns", {
     score_biological_tribe = 0.7,
     score_biological_genus = 0.8,
     score_biological_species = 0.9,
-    score_biological_variety = 1.0
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276
   )
 
   # Should contain score_biological column
@@ -484,7 +494,8 @@ test_that("weight_bio handles annotations without matching organisms", {
     score_biological_tribe = 0.7,
     score_biological_genus = 0.8,
     score_biological_species = 0.9,
-    score_biological_variety = 1.0
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276
   )
 
   # Should return results
@@ -543,11 +554,12 @@ test_that("weight_bio gives maximum score (1.0) to Biota domain candidates", {
     score_biological_tribe = 0.7,
     score_biological_genus = 0.8,
     score_biological_species = 0.9,
-    score_biological_variety = 1.0
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276
   )
 
   # Biota candidates should get maximum biological score
-  expect_equal(result$score_biological[[1]], 1.0)
+  expect_equal(result$score_biological[[1]], 1.007276)
 
   # Closest occurrence should be "Biota"
   expect_equal(
@@ -598,11 +610,12 @@ test_that("Biota domain overrides taxonomic mismatch", {
     score_biological_tribe = 0.7,
     score_biological_genus = 0.8,
     score_biological_species = 0.9,
-    score_biological_variety = 1.0
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276
   )
 
   # Should still get max score despite being from different domain
-  expect_equal(result$score_biological[[1]], 1.0)
+  expect_equal(result$score_biological[[1]], 1.007276)
 })
 
 test_that("Biota takes precedence over exact species match", {
@@ -643,11 +656,12 @@ test_that("Biota takes precedence over exact species match", {
     score_biological_tribe = 0.7,
     score_biological_genus = 0.8,
     score_biological_species = 0.9,
-    score_biological_variety = 1.0
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276
   )
 
   # Both should get max score (Biota = 1.0, exact species = 0.9)
-  expect_true(all(result$score_biological %in% c(0.9, 1.0)))
+  expect_true(all(result$score_biological %in% c(0.9, 1.007276)))
 
   # At least one should be Biota
   expect_true(
@@ -702,11 +716,12 @@ test_that("Multiple Biota metabolites all get maximum score", {
     score_biological_tribe = 0.7,
     score_biological_genus = 0.8,
     score_biological_species = 0.9,
-    score_biological_variety = 1.0
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276
   )
 
   # All should get maximum biological score
-  expect_true(all(result$score_biological == 1.0))
+  expect_true(all(result$score_biological == 1.007276))
 
   # All should show Biota as closest occurrence
   expect_true(all(
@@ -751,11 +766,12 @@ test_that("Biota works with empty taxonomic levels", {
     score_biological_tribe = 0.7,
     score_biological_genus = 0.8,
     score_biological_species = 0.9,
-    score_biological_variety = 1.0
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276
   )
 
   # Should work even with all NA taxonomic levels
-  expect_equal(result$score_biological[[1]], 1.0)
+  expect_equal(result$score_biological[[1]], 1.007276)
   expect_equal(
     result$candidate_structure_organism_occurrence_closest[[1]],
     "Biota"
