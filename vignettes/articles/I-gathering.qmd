@@ -182,9 +182,19 @@ As you can see, the targets seem outdated.
 In reality, we force it to search if a new version of LOTUS exists each time.
 If a newer version exists, it will fetch it and re-run needed steps accordingly.
 
+##### BiGG
+
+By default, we also complement LOTUS pairs with the ones coming from [BiGG](http://bigg.ucsd.edu/).
+
+```{r prepare-bigg-1, eval=FALSE, include=TRUE}
+targets::tar_make(
+  names = tidyselect::matches("lib_sop_big_pre")
+)
+```
+
 ##### ECMDB
 
-By default, we also complement LOTUS pairs with the ones coming from [ECMDB](https://ecmdb.ca/).
+And the ones from [ECMDB](https://ecmdb.ca/).
 
 ```{r prepare-ecmdb-1, eval=FALSE, include=TRUE}
 targets::tar_make(
