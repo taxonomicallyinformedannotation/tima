@@ -224,9 +224,11 @@ prepare_taxa <- function(
   rm(feature_table_0, metadata_table)
 
   # log_trace("Joining with cleaned taxonomy table")
+  # Split organismOriginal to match the split organism_name in biological_metadata
   taxed_features_table <-
+    metadata_table_joined |>
+    tidytable::separate_rows(organismOriginal, sep = "\\|") |>
     tidytable::left_join(
-      x = metadata_table_joined,
       y = biological_metadata,
       by = c("organismOriginal" = "organism_name")
     ) |>
