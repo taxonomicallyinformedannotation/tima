@@ -152,20 +152,20 @@ setup_virtualenv <- function(envname = "tima-env", python = NULL) {
     log_info("Using existing virtualenv: %s", envname)
   }
 
-  log_info("Installing RDKit...")
+  log_info("Installing dependencies...")
 
   tryCatch(
     {
       reticulate::virtualenv_install(
         envname = envname,
-        packages = "rdkit",
+        packages = c("rdkit", "chembl_structure_pipeline"),
         ignore_installed = TRUE
       )
-      log_success("RDKit installed successfully")
+      log_success("Dependencies installed successfully")
     },
     error = function(e) {
-      log_error("Failed to install RDKit: %s", e$message)
-      stop("Failed to install RDKit in virtualenv", call. = FALSE)
+      log_error("Failed to install dependencies: %s", e$message)
+      stop("Failed to install dependencies in virtualenv", call. = FALSE)
     }
   )
 
@@ -371,7 +371,7 @@ try_install_package <- function(
 #' @title Install TIMA Package and Dependencies
 #'
 #' @description Installs or updates the TIMA package from r-universe and sets up
-#'     a Python virtual environment with RDKit.
+#'     a Python virtual environment with dependencies.
 #'
 #' @param package Character string name of the package (default: "tima")
 #' @param repos Character vector of repository URLs
