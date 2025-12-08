@@ -162,9 +162,6 @@ metabolites reported from plants will score higher than those only reported from
 However, some metabolites are *universal*, they are part of the shared core metabolism found across all domains of life.
 To ensure these universal metabolites are always considered in annotations regardless of sample taxonomy,
 TIMA implements a special `"Biota" Superdomain`.
-
-### How Biota Works
-
 When preparing structure-organism pair libraries (e.g., from BiGG metabolic models),
 metabolites present in all model organisms are assigned to the special "Biota" organism with:
 
