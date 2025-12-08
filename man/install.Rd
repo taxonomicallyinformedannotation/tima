@@ -24,7 +24,7 @@ side effects.
 }
 \description{
 Installs or updates the TIMA package from r-universe and sets up
-a Python virtual environment with RDKit.
+a Python virtual environment with dependencies.
 }
 \examples{
 \dontrun{

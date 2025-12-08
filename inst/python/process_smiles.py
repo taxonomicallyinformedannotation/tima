@@ -13,10 +13,10 @@ import gzip
 import logging
 import os
 import sys
+from chembl_structure_pipeline import standardizer
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import List, Optional, Tuple, Any, Iterable
-
 from rdkit import RDLogger
 from rdkit.Chem import (
     SmilesMolSupplier,
@@ -26,6 +26,7 @@ from rdkit.Chem import (
     Mol,
 )
 from rdkit.Chem.Descriptors import ExactMolWt, MolLogP
+from rdkit.Chem.MolStandardize import rdMolStandardize
 from rdkit.Chem.rdMolDescriptors import CalcMolFormula
 
 
@@ -161,13 +162,14 @@ def _copy_molecule(mol: Mol) -> Mol:
         return mol.__copy__()
 
 
-def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
+def process_molecule(mol: Any, original_smiles: str, un: rdMolStandardize.Uncharger) -> Optional[List[Any]]:
     """
     Process a single molecule to extract chemical properties.
 
     Args:
         mol: RDKit Mol object
         original_smiles: Original SMILES string
+        un: rdMolStandardize.Uncharger
 
     Returns:
         List of molecular properties or None if processing fails
@@ -175,15 +177,16 @@ def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
     if mol is None:
         return None
     try:
-        # Calculate all properties in one pass to minimize overhead
-        smiles = MolToSmiles(mol)
-        inchikey = MolToInchiKey(mol)
-        formula = CalcMolFormula(mol)
-        exact_mass = ExactMolWt(mol)
-        xlogp = MolLogP(mol)
+        m, _ = standardizer.get_parent_mol(mol)
+        un.uncharge(m)
+        smiles = MolToSmiles(m)
+        inchikey = MolToInchiKey(m)
+        formula = CalcMolFormula(m)
+        exact_mass = ExactMolWt(m)
+        xlogp = MolLogP(m)
 
         # Create a copy for stereochemistry removal to avoid modifying original
-        mol_no_stereo = _copy_molecule(mol)
+        mol_no_stereo = _copy_molecule(m)
         RemoveStereochemistry(mol_no_stereo)
         smiles_no_stereo = MolToSmiles(mol_no_stereo)
 
@@ -247,7 +250,14 @@ def process_batch(
     log = _logger or logger
     batch_processed = 0
     # Use map for efficient parallel processing with minimal overhead
-    results = executor.map(process_molecule, batch, original_smiles_list)
+    un = rdMolStandardize.Uncharger()
+    
+    # Create a wrapper that includes the uncharger
+    def process_with_uncharger(args):
+        mol, smiles = args
+        return process_molecule(mol, smiles, un)
+    
+    results = executor.map(process_with_uncharger, zip(batch, original_smiles_list))
 
     for result in results:
         if result:

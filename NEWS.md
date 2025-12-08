@@ -1,5 +1,9 @@
 # tima
 
+# tima 2.13.0
+
+* More in depth molecular sanitization
+
 # tima 2.12.0
 
 * Added automatic retention time conversion (in minutes)

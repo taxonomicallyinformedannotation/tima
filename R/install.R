@@ -123,8 +123,7 @@ check_or_install_python <- function() {
 
 #' Setup Python Virtual Environment
 #'
-#' @description Internal helper to create and configure Python virtualenv with RDKit.
-#'     Implements Single Responsibility Principle.
+#' @description Internal helper to create and configure Python virtualenv with dependencies.
 #'
 #' @param envname Character name of virtual environment
 #' @param python Character path to Python executable
