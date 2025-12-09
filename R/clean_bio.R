@@ -129,11 +129,17 @@ clean_bio <- function(
     df1b <- df1 |>
       tidytable::select(-tidyselect::contains(match = "feature_pred_tax"))
 
+    # Get feature_ids that have predictions to exclude from the main set
+    feature_ids_with_pred <- df1b |>
+      tidytable::distinct(feature_id) |>
+      tidytable::pull(feature_id)
+
+    # Filter to rows without predictions, then add back rows with predictions
     df2 <- annotations_distinct |>
       tidytable::select(
         -tidyselect::contains(match = "feature_pred_tax")
       ) |>
-      tidytable::anti_join(y = df1) |>
+      tidytable::filter(!feature_id %in% feature_ids_with_pred) |>
       tidytable::bind_rows(df1b)
   } else {
     df1 <- tidytable::tidytable()
@@ -193,8 +199,14 @@ clean_bio <- function(
   if (nrow(df1b) == 0L) {
     return(annot_table_wei_bio_preclean)
   }
+
+  # Get distinct feature_ids from df1b to avoid Cartesian product in anti_join
+  feature_ids_from_df1b <- df1b |>
+    tidytable::distinct(feature_id) |>
+    tidytable::pull(feature_id)
+
   annot_table_wei_bio_clean <- annot_table_wei_bio_preclean |>
-    tidytable::anti_join(y = df1b, by = "feature_id") |>
+    tidytable::filter(!feature_id %in% feature_ids_from_df1b) |>
     tidytable::bind_rows(df1)
 
   rm(
