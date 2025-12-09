@@ -196,7 +196,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | reticulate | 1.44.1 | Ushey, Allaire, and Tang (2025) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
 | rotl | 3.1.0 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
-| shiny | 1.12.0 | Chang et al. (2025) |
+| shiny | 1.12.1 | Chang et al. (2025) |
 | shinyhelper | 0.3.2 | Mason-Thom (2019) |
 | shinyjs | 2.1.0 | Attali (2021) |
 | shinytest2 | 0.4.1 | Schloerke (2025) |
