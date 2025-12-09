@@ -1,5 +1,5 @@
 # Use the Bioconductor base image
-FROM bioconductor/bioconductor_docker:RELEASE_3_21-R-4.5.0
+FROM bioconductor/bioconductor_docker:RELEASE_3_22-R-4.5.2
 
 # Add a non-root user and set up the R library directory
 RUN useradd -m tima-user && \
