@@ -158,8 +158,11 @@ setup_virtualenv <- function(envname = "tima-env", python = NULL) {
     {
       reticulate::virtualenv_install(
         envname = envname,
-        packages = c("rdkit", "chembl-structure-pipeline"),
-        ignore_installed = TRUE
+        packages = c("rdkit", "chembl-structure-pipeline")
+      )
+      ## Additional safety
+      reticulate::py_install(
+        packages = c("rdkit", "chembl-structure-pipeline")
       )
       log_success("Dependencies installed successfully")
     },
