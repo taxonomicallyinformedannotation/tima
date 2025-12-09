@@ -467,6 +467,7 @@ weight_bio <- function(
     tidytable::select(
       sample_organism_name,
       -tidyselect::contains(match = "sample_organism_0"),
+      -tidyselect::contains(match = "sample_organism_1"),
       tidyselect::contains(match = "candidate_organism"),
       tidyselect::contains(match = "score")
     )

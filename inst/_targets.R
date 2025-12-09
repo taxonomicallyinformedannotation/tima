@@ -1031,7 +1031,7 @@ list(
                   col_xl = par_pre_lib_spe$names$mgf$xlogp
                 )
             },
-            format = "rds"
+            format = "file"
           ),
           tar_target(
             name = lib_spe_exp_int_pre_pos,
@@ -1290,7 +1290,7 @@ list(
               output_str_tax_npc = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$npc
             )
           },
-          format = "rds"
+          format = "file"
         ),
         tar_target(
           name = lib_mer_key,
@@ -1372,7 +1372,7 @@ list(
               tolerance_rt = par_ann_mas$ms$tolerances$rt$adducts
             )
         },
-        format = "rds"
+        format = "file"
       ),
       tar_target(
         name = ann_ms1_pre_ann,
@@ -1513,7 +1513,7 @@ list(
             str_tax_npc = lib_mer_str_tax_npc
           )
       },
-      format = "rds"
+      format = "file"
     ),
     tar_target(
       name = ann_sir_pre_can,
