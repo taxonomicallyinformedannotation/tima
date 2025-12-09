@@ -220,7 +220,8 @@ prepare_taxa <- function(
         feature_id,
         organismOriginal = tidyselect::all_of(x = colname),
         tidyselect::everything()
-      )
+      ) |>
+      tidytable::separate_rows(organismOriginal, sep = "\\|")
   }
   rm(feature_table_0, metadata_table)
 
@@ -228,7 +229,6 @@ prepare_taxa <- function(
   # Split organismOriginal to match the split organism_name in biological_metadata
   taxed_features_table <-
     metadata_table_joined |>
-    tidytable::separate_rows(organismOriginal, sep = "\\|") |>
     tidytable::mutate(organismOriginal = trimws(organismOriginal)) |>
     tidytable::left_join(
       y = biological_metadata,
