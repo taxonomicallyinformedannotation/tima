@@ -28,6 +28,6 @@ Pattern breakdown:
 }
 }
 \examples{
-# Matches: [M+H]+, [2M+Na]+, [M-H2O+H]+, [2M1+H]2+
+# Matches: [M+H]+, [2M+Na]+, [M-H2O+H]+, [2M1+H]2+, [M+1+H]+, [M-2+H]+
 }
 \keyword{internal}
