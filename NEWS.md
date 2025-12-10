@@ -3,6 +3,7 @@
 # tima 2.13.0
 
 * Added [BiGG](http://bigg.ucsd.edu/) as SOP library
+* Added basic isotopologues handling
 * Added special "Biota" superdomain handling for shared core metabolism
 * More in depth molecular sanitization
 
