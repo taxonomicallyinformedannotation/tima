@@ -10,9 +10,13 @@ expect_mass_equal <- function(calculated, expected, tolerance = 0.0001) {
   expect_true(
     abs(calculated - expected) < tolerance,
     label = paste0(
-      "Mass differs: calculated=", format(calculated, digits = 10),
-      " expected=", format(expected, digits = 10),
-      " (diff=", format(abs(calculated - expected), digits = 10), " Da)"
+      "Mass differs: calculated=",
+      format(calculated, digits = 10),
+      " expected=",
+      format(expected, digits = 10),
+      " (diff=",
+      format(abs(calculated - expected), digits = 10),
+      " Da)"
     )
   )
 }
@@ -22,16 +26,23 @@ expect_mz_equal <- function(calculated, expected, tolerance = 0.0001) {
   expect_true(
     abs(calculated - expected) < tolerance,
     label = paste0(
-      "m/z differs: calculated=", format(calculated, digits = 10),
-      " expected=", format(expected, digits = 10),
-      " (diff=", format(abs(calculated - expected), digits = 10), " Da)"
+      "m/z differs: calculated=",
+      format(calculated, digits = 10),
+      " expected=",
+      format(expected, digits = 10),
+      " (diff=",
+      format(abs(calculated - expected), digits = 10),
+      " Da)"
     )
   )
 }
 
 # Helper for round-trip testing with strict tolerance
 expect_round_trip <- function(original_mass, adduct, tolerance = 0.0001) {
-  mz <- calculate_mz_from_mass(neutral_mass = original_mass, adduct_string = adduct)
+  mz <- calculate_mz_from_mass(
+    neutral_mass = original_mass,
+    adduct_string = adduct
+  )
   mass_back <- calculate_mass_of_m(mz = mz, adduct_string = adduct)
   expect_mass_equal(mass_back, original_mass, tolerance = tolerance)
 }
@@ -43,8 +54,8 @@ H_MASS <- ADDUCT_MASSES$H
 Na_MASS <- ADDUCT_MASSES$Na
 K_MASS <- ADDUCT_MASSES$K
 NH4_MASS <- ADDUCT_MASSES$NH4
-H2O_LOSS <- 18.010565      # Water loss (exact)
-NH3_LOSS <- 17.026549      # Ammonia loss (exact)
+H2O_LOSS <- 18.010565 # Water loss (exact)
+NH3_LOSS <- 17.026549 # Ammonia loss (exact)
 
 test_that("calculate_mass_of_m calculates mass from [M+H]+", {
   mz <- 195.0877 # Caffeine [M+H]+
@@ -213,7 +224,7 @@ test_that("calculate_mass_of_m rejects non-numeric electron mass", {
 
 test_that("calculate_mass_of_m handles dimer correctly", {
   neutral_mass <- 100.0
-  mz_dimer <- neutral_mass * 2 + H_MASS  # [2M+H]+
+  mz_dimer <- neutral_mass * 2 + H_MASS # [2M+H]+
 
   mass <- calculate_mass_of_m(mz = mz_dimer, adduct_string = "[2M+H]+")
   expect_mass_equal(mass, neutral_mass)
@@ -221,7 +232,7 @@ test_that("calculate_mass_of_m handles dimer correctly", {
 
 test_that("calculate_mass_of_m handles trimer correctly", {
   neutral_mass <- 100.0
-  mz_trimer <- neutral_mass * 3 + H_MASS  # [3M+H]+
+  mz_trimer <- neutral_mass * 3 + H_MASS # [3M+H]+
 
   mass <- calculate_mass_of_m(mz = mz_trimer, adduct_string = "[3M+H]+")
   expect_mass_equal(mass, neutral_mass)
@@ -314,7 +325,7 @@ test_that("calculate_mass_of_m logs warnings appropriately", {
 
 test_that("calculate_mass_of_m works with glucose", {
   glucose_mass <- 180.0634
-  glucose_mz <- glucose_mass + Na_MASS  # [M+Na]+
+  glucose_mz <- glucose_mass + Na_MASS # [M+Na]+
 
   mass <- calculate_mass_of_m(mz = glucose_mz, adduct_string = "[M+Na]+")
   expect_mass_equal(mass, glucose_mass)
@@ -322,7 +333,7 @@ test_that("calculate_mass_of_m works with glucose", {
 
 test_that("calculate_mass_of_m works with caffeine", {
   caffeine_mass <- 194.0803
-  caffeine_mz <- caffeine_mass + H_MASS  # [M+H]+
+  caffeine_mz <- caffeine_mass + H_MASS # [M+H]+
 
   mass <- calculate_mass_of_m(mz = caffeine_mz, adduct_string = "[M+H]+")
   expect_mass_equal(mass, caffeine_mass)
@@ -330,7 +341,7 @@ test_that("calculate_mass_of_m works with caffeine", {
 
 test_that("calculate_mass_of_m works with cholesterol", {
   cholesterol_mass <- 386.3549
-  cholesterol_mz <- cholesterol_mass + NH4_MASS  # [M+NH4]+
+  cholesterol_mz <- cholesterol_mass + NH4_MASS # [M+NH4]+
 
   mass <- calculate_mass_of_m(mz = cholesterol_mz, adduct_string = "[M+NH4]+")
   expect_mass_equal(mass, cholesterol_mass)
@@ -356,8 +367,11 @@ test_that("calculate_mass_of_m is fast for batch processing", {
 ## Basic m/z calculation ----
 
 test_that("calculate_mz_from_mass calculates m/z from neutral mass [M+H]+", {
-  neutral_mass <- 194.0803  # Caffeine
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[M+H]+")
+  neutral_mass <- 194.0803 # Caffeine
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M+H]+"
+  )
 
   expect_type(mz, "double")
   expect_true(mz > 0)
@@ -367,8 +381,11 @@ test_that("calculate_mz_from_mass calculates m/z from neutral mass [M+H]+", {
 })
 
 test_that("calculate_mz_from_mass calculates m/z [M+Na]+", {
-  neutral_mass <- 180.0634  # Glucose
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[M+Na]+")
+  neutral_mass <- 180.0634 # Glucose
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M+Na]+"
+  )
 
   expect_true(mz > 0)
   # Expected: (mass + Na_MASS + electron) / 1
@@ -378,7 +395,10 @@ test_that("calculate_mz_from_mass calculates m/z [M+Na]+", {
 
 test_that("calculate_mz_from_mass calculates m/z [M-H]-", {
   neutral_mass <- 200.0
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[M-H]-")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M-H]-"
+  )
 
   expect_true(mz > 0)
   expect_true(abs(mz - 199.0) < 0.1)
@@ -430,7 +450,10 @@ test_that("calculate_mz_from_mass returns 0 for invalid adduct with warning", {
 
 test_that("calculate_mz_from_mass handles dimer [2M+H]+", {
   neutral_mass <- 100.0
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[2M+H]+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[2M+H]+"
+  )
 
   # Expected: (2*100 + H_MASS + electron) / 1
   expected_mz <- (2 * neutral_mass + H_MASS) / 1
@@ -439,7 +462,10 @@ test_that("calculate_mz_from_mass handles dimer [2M+H]+", {
 
 test_that("calculate_mz_from_mass handles trimer [3M+H]+", {
   neutral_mass <- 100.0
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[3M+H]+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[3M+H]+"
+  )
 
   # Expected: (3*100 + H_MASS + electron) / 1
   expected_mz <- (3 * neutral_mass + H_MASS) / 1
@@ -450,7 +476,10 @@ test_that("calculate_mz_from_mass handles trimer [3M+H]+", {
 
 test_that("calculate_mz_from_mass handles doubly charged [M+2H]2+", {
   neutral_mass <- 500.0
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[M+2H]2+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M+2H]2+"
+  )
 
   # Expected: (500 + 2*H_MASS + 2*electron) / 2
   expected_mz <- (neutral_mass + 2 * H_MASS) / 2
@@ -459,7 +488,10 @@ test_that("calculate_mz_from_mass handles doubly charged [M+2H]2+", {
 
 test_that("calculate_mz_from_mass handles triply charged [M+3H]3+", {
   neutral_mass <- 1000.0
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[M+3H]3+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M+3H]3+"
+  )
 
   # Expected: (1000 + 3*H_MASS + 3*electron) / 3
   expected_mz <- (neutral_mass + 3 * H_MASS) / 3
@@ -470,7 +502,10 @@ test_that("calculate_mz_from_mass handles triply charged [M+3H]3+", {
 
 test_that("calculate_mz_from_mass handles M+1 isotopologue [M1+H]+", {
   neutral_mass <- 200.0
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[M1+H]+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M1+H]+"
+  )
 
   # Expected: ((200 + 1.007825) / 1) - 1 = 200.007825 Da (after isotope shift subtraction)
   expect_type(mz, "double")
@@ -479,7 +514,10 @@ test_that("calculate_mz_from_mass handles M+1 isotopologue [M1+H]+", {
 
 test_that("calculate_mz_from_mass handles M+2 isotopologue [M2+H]+", {
   neutral_mass <- 200.0
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[M2+H]+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M2+H]+"
+  )
 
   expect_type(mz, "double")
   expect_true(mz > 0)
@@ -487,7 +525,10 @@ test_that("calculate_mz_from_mass handles M+2 isotopologue [M2+H]+", {
 
 test_that("calculate_mz_from_mass handles M+1 alternative notation [M+1+H]+", {
   neutral_mass <- 150.0
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[M+1+H]+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M+1+H]+"
+  )
 
   expect_type(mz, "double")
   expect_true(mz > 0)
@@ -495,7 +536,10 @@ test_that("calculate_mz_from_mass handles M+1 alternative notation [M+1+H]+", {
 
 test_that("calculate_mz_from_mass handles dimer with M+1 [2M1+Na]+", {
   neutral_mass <- 100.0
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[2M1+Na]+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[2M1+Na]+"
+  )
 
   # Expected: ((2*100 + 22.989) / 1) - 1 = 221.989
   expect_type(mz, "double")
@@ -505,8 +549,11 @@ test_that("calculate_mz_from_mass handles dimer with M+1 [2M1+Na]+", {
 ## Complex modifications ----
 
 test_that("calculate_mz_from_mass handles water loss [M+H-H2O]+", {
-  neutral_mass <- 180.0634  # Glucose
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[M+H-H2O]+")
+  neutral_mass <- 180.0634 # Glucose
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M+H-H2O]+"
+  )
 
   # Expected: (180.0634 + H_MASS - H2O_LOSS + electron) / 1
   expected_mz <- (neutral_mass + H_MASS - H2O_LOSS) / 1
@@ -515,7 +562,10 @@ test_that("calculate_mz_from_mass handles water loss [M+H-H2O]+", {
 
 test_that("calculate_mz_from_mass handles ammonia loss [M+H-NH3]+", {
   neutral_mass <- 150.0
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[M+H-NH3]+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M+H-NH3]+"
+  )
 
   # Expected: (150 + H_MASS - NH3_LOSS + electron) / 1
   expected_mz <- (neutral_mass + H_MASS - NH3_LOSS) / 1
@@ -552,7 +602,10 @@ test_that("round-trip works for [M+H-H2O]+", {
 
 test_that("calculate_mz_from_mass handles very small masses", {
   neutral_mass <- 1.0
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[M+H]+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M+H]+"
+  )
 
   expect_true(mz > 0)
   expected_mz <- (neutral_mass + H_MASS) / 1
@@ -561,7 +614,10 @@ test_that("calculate_mz_from_mass handles very small masses", {
 
 test_that("calculate_mz_from_mass handles very large masses", {
   neutral_mass <- 4000.0
-  mz <- calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = "[M+H]+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M+H]+"
+  )
 
   expect_true(mz > 0)
   expected_mz <- (neutral_mass + H_MASS) / 1
@@ -575,7 +631,10 @@ test_that("calculate_mz_from_mass works with glucose", {
   # Expected: (mass + Na_MASS + electron) / 1
   expected_mz <- (glucose_mass + Na_MASS) / 1
 
-  mz <- calculate_mz_from_mass(neutral_mass = glucose_mass, adduct_string = "[M+Na]+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = glucose_mass,
+    adduct_string = "[M+Na]+"
+  )
   expect_mz_equal(mz, expected_mz)
 })
 
@@ -584,7 +643,9 @@ test_that("calculate_mz_from_mass works with caffeine", {
   # Expected: (mass + H_MASS + electron) / 1
   expected_mz <- (caffeine_mass + H_MASS) / 1
 
-  mz <- calculate_mz_from_mass(neutral_mass = caffeine_mass, adduct_string = "[M+H]+")
+  mz <- calculate_mz_from_mass(
+    neutral_mass = caffeine_mass,
+    adduct_string = "[M+H]+"
+  )
   expect_mz_equal(mz, expected_mz)
 })
-
