@@ -316,32 +316,38 @@ test_that("parse_adduct handles extra whitespace", {
 test_that("parse_adduct handles completely invalid adduct strings", {
   # These should return all zeros because they completely fail parsing
   invalid_adducts <- c(
-    "M+H",       # Missing brackets entirely
-    "garbage",   # Random string
-    "[garbage]"  # Invalid content
+    "M+H", # Missing brackets entirely
+    "garbage", # Random string
+    "[garbage]" # Invalid content
   )
 
   for (adduct in invalid_adducts) {
     # Invalid adducts should return all zeros
     result <- parse_adduct(adduct)
     expect_equal(sum(result), 0, label = paste("Failed for:", adduct))
-    expect_named(result, c("n_mer", "n_iso", "los_add_clu", "n_charges", "charge"))
+    expect_named(
+      result,
+      c("n_mer", "n_iso", "los_add_clu", "n_charges", "charge")
+    )
   }
 })
 
 test_that("parse_adduct handles edge case adducts with missing components", {
   # These parse partially but should still be handled gracefully
   edge_cases <- c(
-    "[M+H]",    # Missing charge sign - parses but incomplete
-    "[M++]+",   # Double plus - parses with no modifications
-    "[M+]+"     # No modification - parses with empty modifications
+    "[M+H]", # Missing charge sign - parses but incomplete
+    "[M++]+", # Double plus - parses with no modifications
+    "[M+]+" # No modification - parses with empty modifications
   )
 
   for (adduct in edge_cases) {
     result <- parse_adduct(adduct)
     # Expect it to be handled (no crash), result structure is valid
     expect_length(result, 5)
-    expect_named(result, c("n_mer", "n_iso", "los_add_clu", "n_charges", "charge"))
+    expect_named(
+      result,
+      c("n_mer", "n_iso", "los_add_clu", "n_charges", "charge")
+    )
   }
 })
 
