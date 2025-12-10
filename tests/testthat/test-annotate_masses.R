@@ -359,7 +359,7 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
     clusters_list = list(pos = c("[M]")),
     neutral_losses_list = character(0),
     ms_mode = "pos",
-    tolerance_ppm = 5,
+    tolerance_ppm = 5.0,
     tolerance_rt = 0.02,
     output_annotations = env$output_annotations,
     output_edges = env$output_edges
@@ -370,7 +370,8 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
     colClasses = "character"
   )
 
-  # Verify only close match is found
-  # (May be 0 or 1 depending on exact mass calculations)
-  expect_true(nrow(annotations_tight) <= 1)
+  # Verify only one match within 5 ppm tolerance
+  # 199.091500 is 0.000675 Da away (within 5 ppm of 199.092175)
+  # 199.094000 is 0.001825 Da away (outside 5 ppm tolerance)
+  expect_equal(nrow(annotations_tight), 1L)
 })
