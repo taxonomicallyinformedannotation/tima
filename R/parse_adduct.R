@@ -249,6 +249,9 @@ validate_adduct_string <- function(adduct_string) {
 #' Match adduct string against regex pattern
 #' @keywords internal
 match_adduct_regex <- function(adduct_string, regex) {
+  # Strip leading and trailing whitespace before matching
+  adduct_string <- trimws(adduct_string)
+
   matches <- tryCatch(
     {
       stringi::stri_match_all_regex(

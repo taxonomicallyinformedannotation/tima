@@ -53,7 +53,7 @@ MAX_MASS_DALTONS <- 5000
 #' @examples
 #' # Matches: [M+H]+, [2M+Na]+, [M-H2O+H]+, [2M1+H]2+, [M+1+H]+, [M-2+H]+
 #' @keywords internal
-ADDUCT_REGEX_PATTERN <- "\\[(\\d*)M(?![a-z])((?:[+-]?\\d+(?![A-Z]))?)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?"
+ADDUCT_REGEX_PATTERN <- "^\\[(\\d*)M(?![a-z])((?:[+-]?\\d+(?![A-Z]))?)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?$"
 
 #' Regular expression for individual adduct modifications
 #'
