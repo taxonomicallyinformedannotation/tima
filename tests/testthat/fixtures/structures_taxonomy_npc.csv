@@ -11,5 +11,5 @@ HHHHHHHHHHHH-IIIIIIIIII-H,CNCN,Alkaloids,Isoquinoline alkaloids,Benzylisoquinoli
 IIIIIIIIIIII-JJJJJJJJJJ-I,CCOCC,Terpenoids,Diterpenoids,Kaurane diterpenoids
 JJJJJJJJJJJJ-KKKKKKKKKK-J,CCNCC,Shikimates and Phenylpropanoids,Stilbenoids,Stilbenes
 TOLERANCE-MATCH-A,CCCCCC,Alkaloids,Simple alkaloids,Amino acids and peptides
-TOLERANCE-NOMATCH-B,CCCCCC,Alkaloids,Simple alkaloids,Amino acids and peptides
+TOLERANCE-NOMATCH-B,CCCCCC1,Alkaloids,Simple alkaloids,Amino acids and peptides
 
