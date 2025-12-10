@@ -13,28 +13,6 @@
 #' @keywords internal
 ELECTRON_MASS_DALTONS <- 5.485799E-4
 
-#' Proton mass in Daltons
-#' @keywords internal
-PROTON_MASS_DALTONS <- 1.007276466812
-
-# Default Tolerance Values ----
-
-#' Default mass tolerance in parts per million (ppm) for MS1
-#' @keywords internal
-DEFAULT_TOLERANCE_PPM_MS1 <- 10
-
-#' Default mass tolerance in ppm for MS2
-#' @keywords internal
-DEFAULT_TOLERANCE_PPM_MS2 <- 10
-
-#' Default retention time tolerance in minutes for adduct grouping
-#' @keywords internal
-DEFAULT_TOLERANCE_RT_ADDUCTS <- 0.02
-
-#' Default retention time tolerance in minutes for library matching
-#' @keywords internal
-DEFAULT_TOLERANCE_RT_LIBRARY <- Inf
-
 # Validation Thresholds ----
 
 #' Maximum allowed mass tolerance in ppm
@@ -91,20 +69,6 @@ ADDUCT_REGEX_PATTERN <- "\\[(\\d*)M(?![a-z])((?:[+-]?\\d+(?![A-Z]))?)([+-][\\w\\
 #' @keywords internal
 MODIFICATION_REGEX_PATTERN <- "([+-])(\\d*)([A-Z][a-z]?\\d*(?:[A-Z][a-z]?\\d*)*)"
 
-# File Extension Patterns ----
-
-#' Supported compressed file extensions
-#' @keywords internal
-COMPRESSED_EXTENSIONS <- c(".gz", ".zip", ".bz2")
-
-#' Supported table file extensions
-#' @keywords internal
-TABLE_EXTENSIONS <- c(".tsv", ".csv", ".txt")
-
-#' Supported spectral data formats
-#' @keywords internal
-SPECTRAL_FORMATS <- c(".mgf", ".msp", ".mzML", ".mzXML")
-
 # File System Constants ----
 
 #' Temporary file prefix for write tests
@@ -115,41 +79,12 @@ TEMP_FILE_PREFIX <- ".tima_write_test_"
 #' @keywords internal
 MAX_PATH_LENGTH <- 260L
 
-# Chemical Formula Component Masses ----
-# Common adduct components and their exact masses
-
-#' Exact masses of common adduct components (Daltons)
-#' @keywords internal
-ADDUCT_MASSES <- list(
-  H = 1.00783,
-  Li = 7.01600,
-  NH4 = 18.03437,
-  Na = 22.98977,
-  Mg = 23.98504,
-  Cl = 34.96885,
-  K = 38.96371,
-  Ca = 39.96259,
-  HCOO = 44.99765, # Formate
-  Fe = 55.93494,
-  CH3COO = 59.01330, # Acetate
-  Br = 78.91834,
-  CF3COO = 112.98504 # Trifluoroacetate
-)
-
 # Statistical Thresholds ----
 
 #' Tolerance for floating point weight sum comparisons
 #' Used when validating that weights sum to 1.0
 #' @keywords internal
 WEIGHT_SUM_TOLERANCE <- 0.01
-
-# MS1 Filtering Defaults ----
-
-#' Default MS1 score combination logic for filtering
-#' Either "OR" (at least one threshold met) or "AND" (both thresholds met)
-#' @keywords internal
-DEFAULT_MINIMAL_MS1_CONDITION <- "OR"
-
 
 # Ionization Modes ----
 
@@ -183,83 +118,11 @@ DEFAULT_BATCH_SIZE <- 1000
 #' @keywords internal
 DEFAULT_PROGRESS_INTERVAL <- 10000
 
-#' Default number of parallel workers (NULL = auto-detect)
-#' @keywords internal
-DEFAULT_NUM_WORKERS <- NULL
-
-# Scoring Defaults ----
-
-#' Default biological score weights by taxonomic rank
-#' Lower ranks (more specific) get higher scores
-#' @keywords internal
-DEFAULT_BIO_SCORES <- list(
-  domain = 0.1,
-  kingdom = 0.2,
-  phylum = 0.3,
-  class = 0.4,
-  order = 0.5,
-  infraorder = 0.55,
-  family = 0.6,
-  subfamily = 0.65,
-  tribe = 0.7,
-  subtribe = 0.75,
-  genus = 0.8,
-  subgenus = 0.85,
-  species = 0.9,
-  subspecies = 0.95,
-  variety = 1
-)
-
-#' Default chemical taxonomy score weights
-#' @keywords internal
-DEFAULT_CHEM_SCORES <- list(
-  # ClassyFire
-  cla_kingdom = 0.25,
-  cla_superclass = 0.50,
-  cla_class = 0.75,
-  cla_parent = 1.00,
-  # NPClassifier
-  npc_pathway = 0.33,
-  npc_superclass = 0.66,
-  npc_class = 1.00
-)
-
-# Annotation Filtering ----
-
-#' Default percentile threshold for top candidate selection
-#' Only candidates with scores above this percentile are retained
-#' @keywords internal
-DEFAULT_BEST_PERCENTILE <- 0.9
-
-#' Default number of neighboring candidates to retain during network annotation
-#' @keywords internal
-DEFAULT_CANDIDATES_NEIGHBORS <- 16
-
-#' Default number of final candidates to report per feature
-#' @keywords internal
-DEFAULT_CANDIDATES_FINAL <- 1
-
-#' Minimum consistency score threshold for taxonomic predictions
-#' @keywords internal
-DEFAULT_MINIMAL_CONSISTENCY <- 0.0
-
-#' Minimum MS1 biological score threshold
-#' @keywords internal
-DEFAULT_MINIMAL_MS1_BIO <- 0.0
-
-#' Minimum MS1 chemical score threshold
-#' @keywords internal
-DEFAULT_MINIMAL_MS1_CHEMO <- 0.0
-
 # High-Confidence Filtering Defaults ----
 
 #' Default minimum biological score threshold for high-confidence filter
 #' @keywords internal
 DEFAULT_HC_SCORE_BIO_MIN <- 0.85
-
-#' Minimum chemical score for high confidence annotations
-#' @keywords internal
-DEFAULT_HC_SCORE_CHEM_MIN <- 0.8
 
 #' Default minimum initial (pseudo) score threshold for high-confidence filter
 #' @keywords internal

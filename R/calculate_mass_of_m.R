@@ -272,7 +272,6 @@ calculate_neutral_mass_formula <- function(
 ) {
   # Apply the neutral mass calculation formula
   # M = ((z * (m/z + iso) - modifications) / n_mer)
-  # NOTE: electron_mass correction not applied since ADDUCT_MASSES uses atomic masses
 
   charged_mass <- n_charges * (mz + n_iso)
   corrected_mass <- charged_mass - mass_modifications
@@ -350,7 +349,6 @@ calculate_mz_from_mass <- function(
   # Calculate m/z using inverse formula
   # Inverse of: M = ((z * (m/z + iso) - modifications) / n_mer)
   # Therefore: m/z = ((M * n_mer + modifications) / z) - iso
-  # NOTE: electron_mass correction not applied since ADDUCT_MASSES uses atomic masses
   total_mass <- neutral_mass * n_mer + mass_modifications
   mz <- (total_mass / n_charges) - n_iso
 

@@ -49,7 +49,22 @@ expect_round_trip <- function(original_mass, adduct, tolerance = 0.0001) {
 
 ## Basic mass calculation ----
 
-# Define mass constants for strict accuracy (from constants.R)
+# Define mass constants for strict accuracy
+ADDUCT_MASSES <- list(
+  H = 1.00783,
+  Li = 7.01600,
+  NH4 = 18.03437,
+  Na = 22.98977,
+  Mg = 23.98504,
+  Cl = 34.96885,
+  K = 38.96371,
+  Ca = 39.96259,
+  HCOO = 44.99765, # Formate
+  Fe = 55.93494,
+  CH3COO = 59.01330, # Acetate
+  Br = 78.91834,
+  CF3COO = 112.98504 # Trifluoroacetate
+)
 H_MASS <- ADDUCT_MASSES$H
 Na_MASS <- ADDUCT_MASSES$Na
 K_MASS <- ADDUCT_MASSES$K
