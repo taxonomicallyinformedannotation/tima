@@ -298,7 +298,18 @@ extract_isotope_shift <- function(match_value) {
   if (is.na(match_value) || match_value == "") {
     return(0L)
   }
-  as.integer(match_value)
+
+  # Remove +/- signs and convert to integer
+  # Isotope shifts are always positive (M+1, M+2, etc.)
+  isotope_num <- as.integer(gsub("[+-]", "", match_value))
+
+  # Return 0 if parsing resulted in NA
+  if (is.na(isotope_num)) {
+    return(0L)
+  }
+
+  # Return absolute value in case of negative notation
+  as.integer(abs(isotope_num))
 }
 
 #' Extract charge information from regex matches

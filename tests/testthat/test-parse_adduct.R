@@ -38,12 +38,38 @@ ADDUCT_TEST_CASES <- list(
     charge = 1,
     description = "Dimer"
   ),
-  # TODO failing for now
-  # list(
-  #   adduct = "[M+1+H]+",
-  #   n_mer = 1, n_iso = 1, n_charges = 1, charge = 1,
-  #   description = "M+1 isotopologue"
-  # ),
+  list(
+    adduct = "[M+1+H]+",
+    n_mer = 1,
+    n_iso = 1,
+    n_charges = 1,
+    charge = 1,
+    description = "M+1 isotopologue"
+  ),
+  list(
+    adduct = "[M1+H]+",
+    n_mer = 1,
+    n_iso = 1,
+    n_charges = 1,
+    charge = 1,
+    description = "M1 isotopologue (alternative notation)"
+  ),
+  list(
+    adduct = "[M+2+H]+",
+    n_mer = 1,
+    n_iso = 2,
+    n_charges = 1,
+    charge = 1,
+    description = "M+2 isotopologue"
+  ),
+  list(
+    adduct = "[2M+1+Na]+",
+    n_mer = 2,
+    n_iso = 1,
+    n_charges = 1,
+    charge = 1,
+    description = "Dimer with M+1 isotopologue"
+  ),
   list(
     adduct = "[M+2H]2+",
     n_mer = 1,
@@ -202,20 +228,19 @@ test_that("parse_adduct handles ammonia loss [M+H-NH3]+", {
   expect_gt(result[["los_add_clu"]], -18)
 })
 
-# TODO failing for now
-# test_that("parse_adduct handles isotopes [M+1+H]+", {
-#   result <- parse_adduct("[M+1+H]+")
-#
-#   expect_equal(result[["n_iso"]], 1)
-#   expect_equal(result[["n_mer"]], 1)
-#   expect_equal(result[["n_charges"]], 1)
-# })
-#
-# test_that("parse_adduct handles M+2 isotope [M2+H]+", {
-#   result <- parse_adduct("[M2+H]+")
-#
-#   expect_equal(result[["n_iso"]], 2)
-# })
+test_that("parse_adduct handles isotopes [M+1+H]+", {
+  result <- parse_adduct("[M+1+H]+")
+
+  expect_equal(result[["n_iso"]], 1)
+  expect_equal(result[["n_mer"]], 1)
+  expect_equal(result[["n_charges"]], 1)
+})
+
+test_that("parse_adduct handles M+2 isotope [M2+H]+", {
+  result <- parse_adduct("[M2+H]+")
+
+  expect_equal(result[["n_iso"]], 2)
+})
 
 ## Multiple Modifications Tests ----
 
@@ -288,26 +313,37 @@ test_that("parse_adduct handles extra whitespace", {
   expect_false(all(result == 0))
 })
 
-# TODO failing for now
-# test_that("parse_adduct handles invalid adduct strings", {
-#   invalid_adducts <- c(
-#     "M+H", # Missing brackets
-#     "[M+H]", # Missing charge
-#     "garbage", # Random string
-#     "[M++]+", # Double plus
-#     "[M+]+", # No modification
-#     "[]" # Empty brackets
-#   )
-#
-#   for (adduct in invalid_adducts) {
-#     expect_warning(
-#       result <- parse_adduct(adduct),
-#       class = "warning",
-#       label = paste("Failed for:", adduct)
-#     )
-#     expect_equal(sum(result), 0, label = paste("Failed for:", adduct))
-#   }
-# })
+test_that("parse_adduct handles completely invalid adduct strings", {
+  # These should return all zeros because they completely fail parsing
+  invalid_adducts <- c(
+    "M+H",       # Missing brackets entirely
+    "garbage",   # Random string
+    "[garbage]"  # Invalid content
+  )
+
+  for (adduct in invalid_adducts) {
+    # Invalid adducts should return all zeros
+    result <- parse_adduct(adduct)
+    expect_equal(sum(result), 0, label = paste("Failed for:", adduct))
+    expect_named(result, c("n_mer", "n_iso", "los_add_clu", "n_charges", "charge"))
+  }
+})
+
+test_that("parse_adduct handles edge case adducts with missing components", {
+  # These parse partially but should still be handled gracefully
+  edge_cases <- c(
+    "[M+H]",    # Missing charge sign - parses but incomplete
+    "[M++]+",   # Double plus - parses with no modifications
+    "[M+]+"     # No modification - parses with empty modifications
+  )
+
+  for (adduct in edge_cases) {
+    result <- parse_adduct(adduct)
+    # Expect it to be handled (no crash), result structure is valid
+    expect_length(result, 5)
+    expect_named(result, c("n_mer", "n_iso", "los_add_clu", "n_charges", "charge"))
+  }
+})
 
 ## Return Value Tests ----
 

@@ -73,9 +73,9 @@ MAX_MASS_DALTONS <- 5000
 #' }
 #'
 #' @examples
-#' # Matches: [M+H]+, [2M+Na]+, [M-H2O+H]+, [2M1+H]2+
+#' # Matches: [M+H]+, [2M+Na]+, [M-H2O+H]+, [2M1+H]2+, [M+1+H]+, [M-2+H]+
 #' @keywords internal
-ADDUCT_REGEX_PATTERN <- "\\[(\\d*)M(?![a-z])(\\d*)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?"
+ADDUCT_REGEX_PATTERN <- "\\[(\\d*)M(?![a-z])((?:[+-]?\\d+(?![A-Z]))?)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?"
 
 #' Regular expression for individual adduct modifications
 #'
@@ -121,19 +121,19 @@ MAX_PATH_LENGTH <- 260L
 #' Exact masses of common adduct components (Daltons)
 #' @keywords internal
 ADDUCT_MASSES <- list(
-  H = 1.007825032,
-  Na = 22.98976928,
-  K = 38.96370668,
-  NH4 = 18.033823,
-  Li = 7.0160034,
-  Ca = 39.9625912,
-  Mg = 23.9850417,
-  Fe = 55.9349375,
-  Cl = 34.9688527,
-  Br = 78.9183371,
-  HCOO = 44.9976542, # Formate
-  CH3COO = 59.0133044, # Acetate
-  CF3COO = 112.9855944 # Trifluoroacetate
+  H = 1.00783,
+  Li = 7.01600,
+  NH4 = 18.03437,
+  Na = 22.98977,
+  Mg = 23.98504,
+  Cl = 34.96885,
+  K = 38.96371,
+  Ca = 39.96259,
+  HCOO = 44.99765, # Formate
+  Fe = 55.93494,
+  CH3COO = 59.01330, # Acetate
+  Br = 78.91834,
+  CF3COO = 112.98504 # Trifluoroacetate
 )
 
 # Statistical Thresholds ----
