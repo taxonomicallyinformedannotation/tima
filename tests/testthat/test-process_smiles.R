@@ -45,7 +45,7 @@ test_that("process_smiles correctly processes isotope notation [13C]", {
   # Test single 13C isotope
   # Natural glucose: C6H12O6, mass = 180.0634 Da
   # With [13C] on first carbon: mass increases by ~1.0034 Da
-  isotope_smiles <- "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O"  # glucose
+  isotope_smiles <- "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O" # glucose
   isotope_smiles_13c <- "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O"
   # RDKit isotope notation: [13C] instead of C
   isotope_smiles_with_13c <- "OC[13C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O"
@@ -119,8 +119,8 @@ test_that("process_smiles handles multiple isotopes [13C]", {
 test_that("process_smiles handles 15N isotope [15N]", {
   # Test 15N isotope
   # 15N - 14N ≈ 1.0044 Da (slightly different from 13C)
-  aniline_natural <- "Nc1ccccc1"  # C6H7N
-  aniline_15n <- "N[15c]1ccccc1"  # Note: [15N] syntax
+  aniline_natural <- "Nc1ccccc1" # C6H7N
+  aniline_15n <- "N[15c]1ccccc1" # Note: [15N] syntax
 
   input <- tidytable::tidytable(
     structure_smiles_initial = c(aniline_natural, aniline_15n)
@@ -209,7 +209,7 @@ test_that("process_smiles handles mixed natural and isotopic SMILES", {
   # Mix natural and isotope-containing SMILES
   natural_glucose <- "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O"
   isotope_glucose <- "OC[13C@H]1OC(O)[13C@H](O)[13C@@H](O)[13C@@H]1O"
-  another_natural <- "CC(C)Cc1ccc(cc1)[C@@H](C)C(O)=O"  # ibuprofen
+  another_natural <- "CC(C)Cc1ccc(cc1)[C@@H](C)C(O)=O" # ibuprofen
 
   input <- tidytable::tidytable(
     structure_smiles_initial = c(
