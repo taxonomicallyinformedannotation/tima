@@ -5,7 +5,7 @@
 \alias{DEFAULT_HC_SCORE_SIRIUS_MIN}
 \title{Default minimum SIRIUS confidence score threshold for high-confidence filter}
 \format{
-An object of class \code{NULL} of length 0.
+An object of class \code{numeric} of length 1.
 }
 \usage{
 DEFAULT_HC_SCORE_SIRIUS_MIN
