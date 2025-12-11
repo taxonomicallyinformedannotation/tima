@@ -664,3 +664,250 @@ test_that("calculate_mz_from_mass works with caffeine", {
   )
   expect_mz_equal(mz, expected_mz)
 })
+
+## Isotopologues ----
+
+test_that("calculate_mass_of_m correctly handles M+1 isotope [M1+H]+", {
+  # Test with glucose M+1
+  # Glucose exact mass: 180.0634 Da
+  # [M1+H]+ m/z calculation:
+  # From mass: ((180.0634 + H_MASS) / 1) - 1 = 180.0707
+  # To mass: should recover 180.0634 Da
+
+  glucose_mass <- 180.0634
+  mz_m1 <- calculate_mz_from_mass(
+    neutral_mass = glucose_mass,
+    adduct_string = "[M1+H]+"
+  )
+
+  # Reverse calculation
+  mass_calculated <- calculate_mass_of_m(
+    mz = mz_m1,
+    adduct_string = "[M1+H]+"
+  )
+
+  expect_mz_equal(mass_calculated, glucose_mass)
+})
+
+test_that("calculate_mass_of_m correctly handles M+2 isotope [M2+Na]+", {
+  # Test M+2 with sodium adduct
+  neutral_mass <- 200.0
+  mz_m2 <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M2+Na]+"
+  )
+
+  mass_calculated <- calculate_mass_of_m(
+    mz = mz_m2,
+    adduct_string = "[M2+Na]+"
+  )
+
+  expect_mz_equal(mass_calculated, neutral_mass)
+})
+
+test_that("calculate_mass_of_m handles isotope alternative notation [M+1+H]+", {
+  neutral_mass <- 150.0
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M+1+H]+"
+  )
+
+  mass_back <- calculate_mass_of_m(
+    mz = mz,
+    adduct_string = "[M+1+H]+"
+  )
+
+  expect_mz_equal(mass_back, neutral_mass)
+})
+
+test_that("isotope shifts are correctly subtracted in m/z calculation", {
+  # For [M1+H]+, the m/z formula is: ((M + H_MASS) / 1) + ISOTOPE_SHIFT
+  # The isotope shift (1.0033548 Da) is added to get the higher m/z
+  neutral_mass <- 100.0
+  mz_m0 <- calculate_mz_from_mass(neutral_mass, "[M+H]+")
+  mz_m1 <- calculate_mz_from_mass(neutral_mass, "[M1+H]+")
+
+  # M+1 should be exactly ISOTOPE_MASS_SHIFT_DALTONS higher than M+0
+  expect_equal(mz_m1 - mz_m0, ISOTOPE_MASS_SHIFT_DALTONS, tolerance = 1e-6)
+})
+
+test_that("isotope calculations work with multiple charges [M2+2H]2+", {
+  neutral_mass <- 500.0
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M2+2H]2+"
+  )
+
+  mass_back <- calculate_mass_of_m(
+    mz = mz,
+    adduct_string = "[M2+2H]2+"
+  )
+
+  expect_mz_equal(mass_back, neutral_mass)
+})
+
+test_that("isotope calculations work with dimers [2M1+Na]+", {
+  neutral_mass <- 100.0
+
+  # Calculate expected m/z for dimer M+1
+  # Formula: ((2 * M + Na_MASS) / 1) + ISOTOPE_SHIFT
+  expected_mz <- ((2 * neutral_mass + Na_MASS) / 1) + ISOTOPE_MASS_SHIFT_DALTONS
+
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[2M1+Na]+"
+  )
+
+  expect_mz_equal(mz, expected_mz)
+
+  # Verify round-trip
+  mass_back <- calculate_mass_of_m(
+    mz = mz,
+    adduct_string = "[2M1+Na]+"
+  )
+
+  expect_mz_equal(mass_back, neutral_mass)
+})
+
+test_that("M+0 and monoisotopic calculations are identical", {
+  neutral_mass <- 122.45
+
+  # M+0 and M (no isotope designation) should give same results
+  # Both have n_iso = 0, so no isotope shift is applied
+  mz_m <- calculate_mz_from_mass(neutral_mass, "[M+H]+")
+  mz_m0 <- calculate_mz_from_mass(neutral_mass, "[M0+H]+")
+
+  expect_equal(mz_m, mz_m0)
+})
+
+test_that("isotope calculations work in negative mode [M1-H]-", {
+  neutral_mass <- 150.0
+
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M1-H]-"
+  )
+
+  mass_back <- calculate_mass_of_m(
+    mz = mz,
+    adduct_string = "[M1-H]-"
+  )
+
+  expect_mz_equal(mass_back, neutral_mass)
+})
+
+test_that("isotope with water loss [M1+H-H2O]+ calculates correctly", {
+  # Test combined isotope and neutral loss
+  neutral_mass <- 180.0634 # Glucose
+
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M1+H-H2O]+"
+  )
+
+  mass_back <- calculate_mass_of_m(
+    mz = mz,
+    adduct_string = "[M1+H-H2O]+"
+  )
+
+  expect_mz_equal(mass_back, neutral_mass)
+})
+
+test_that("large isotope shifts work correctly [M13+H]+", {
+  # For fully 13C-labeled glucose (6 carbons)
+  # Or other heavily labeled compounds
+  neutral_mass <- 180.0634
+
+  mz <- calculate_mz_from_mass(
+    neutral_mass = neutral_mass,
+    adduct_string = "[M13+H]+"
+  )
+
+  # M+13 should be 13 * ISOTOPE_MASS_SHIFT_DALTONS more than M+0 in m/z
+  mz_m0 <- calculate_mz_from_mass(neutral_mass, "[M+H]+")
+  expect_equal(
+    mz - mz_m0,
+    13.0 * ISOTOPE_MASS_SHIFT_DALTONS,
+    tolerance = 1e-6
+  )
+
+  # Verify round-trip
+  mass_back <- calculate_mass_of_m(
+    mz = mz,
+    adduct_string = "[M13+H]+"
+  )
+
+  expect_mz_equal(mass_back, neutral_mass)
+})
+
+test_that("isotope annotation distinguishes from regular mass differences", {
+  # Verify that M+1 isotope gives different m/z than M+Na
+  # Both add mass, but in different ways
+  neutral_mass <- 100.0
+
+  mz_m1 <- calculate_mz_from_mass(neutral_mass, "[M1+H]+")
+  mz_mna <- calculate_mz_from_mass(neutral_mass, "[M+Na]+")
+
+  # These should be different values
+  expect_false(abs(mz_m1 - mz_mna) < 0.01)
+
+  # M+1 with H should be less than M with Na
+  # [M1+H]+ = ((100 + 1.008) / 1) - 1 = 100.008
+  # [M+Na]+ = ((100 + 22.990) / 1) = 122.990
+  expect_lt(mz_m1, mz_mna)
+})
+
+test_that("realistic 13C-glucose example", {
+  # 13C6-glucose (all 6 carbons labeled)
+  # Natural glucose: 180.0634 Da
+  # When measuring 13C6-glucose, the M+6 peak appears at higher m/z
+  # But we annotate using natural mass with M6 designation
+
+  natural_glucose <- 180.0634
+
+  # The m/z for [M6+H]+ of natural glucose mass
+  # Formula: ((180.0634 + H_MASS) / 1) + 6 * ISOTOPE_SHIFT
+  mz_m6 <- calculate_mz_from_mass(
+    neutral_mass = natural_glucose,
+    adduct_string = "[M6+H]+"
+  )
+
+  # Should be 6 * ISOTOPE_MASS_SHIFT_DALTONS higher than M+0
+  mz_m0 <- calculate_mz_from_mass(natural_glucose, "[M+H]+")
+  expect_equal(
+    mz_m6 - mz_m0,
+    6.0 * ISOTOPE_MASS_SHIFT_DALTONS,
+    tolerance = 1e-6
+  )
+
+  # Verify we can back-calculate the natural mass
+  mass_back <- calculate_mass_of_m(
+    mz = mz_m6,
+    adduct_string = "[M6+H]+"
+  )
+
+  expect_mz_equal(mass_back, natural_glucose)
+})
+
+test_that("isotope round-trips work for all common adducts", {
+  neutral_mass <- 200.0
+  isotope_adducts <- c(
+    "[M1+H]+",
+    "[M1+Na]+",
+    "[M1+K]+",
+    "[M1-H]-",
+    "[M2+H]+",
+    "[2M1+H]+",
+    "[M1+2H]2+"
+  )
+
+  for (adduct in isotope_adducts) {
+    mz <- calculate_mz_from_mass(neutral_mass, adduct)
+    mass_back <- calculate_mass_of_m(mz, adduct)
+
+    expect_mz_equal(
+      mass_back,
+      neutral_mass
+    )
+  }
+})

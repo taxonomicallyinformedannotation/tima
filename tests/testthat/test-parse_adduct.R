@@ -242,6 +242,135 @@ test_that("parse_adduct handles M+2 isotope [M2+H]+", {
   expect_equal(result[["n_iso"]], 2)
 })
 
+test_that("parse_adduct handles M+3 isotope [M3+H]+", {
+  result <- parse_adduct("[M3+H]+")
+
+  expect_equal(result[["n_iso"]], 3)
+  expect_equal(result[["n_mer"]], 1)
+  expect_equal(result[["n_charges"]], 1)
+})
+
+test_that("parse_adduct handles isotope in negative mode [M1-H]-", {
+  result <- parse_adduct("[M1-H]-")
+
+  expect_equal(result[["n_iso"]], 1)
+  expect_equal(result[["n_mer"]], 1)
+  expect_equal(result[["n_charges"]], 1)
+  expect_equal(result[["charge"]], -1)
+})
+
+test_that("parse_adduct handles isotope with alternative notation [M+2+Na]+", {
+  result <- parse_adduct("[M+2+Na]+")
+
+  expect_equal(result[["n_iso"]], 2)
+  expect_equal(result[["n_mer"]], 1)
+  # Should have Na mass contribution
+  expect_gt(result[["los_add_clu"]], 20)
+})
+
+test_that("parse_adduct handles isotope with water loss [M1+H-H2O]+", {
+  result <- parse_adduct("[M1+H-H2O]+")
+
+  expect_equal(result[["n_iso"]], 1)
+  expect_equal(result[["n_mer"]], 1)
+  # Net: +H -H2O = ~-17 Da
+  expect_lt(result[["los_add_clu"]], -15)
+  expect_gt(result[["los_add_clu"]], -20)
+})
+
+test_that("parse_adduct handles trimer with M+1 isotope [3M1+H]+", {
+  result <- parse_adduct("[3M1+H]+")
+
+  expect_equal(result[["n_iso"]], 1)
+  expect_equal(result[["n_mer"]], 3)
+  expect_equal(result[["n_charges"]], 1)
+})
+
+test_that("parse_adduct handles isotope with multiple charges [M2+2H]2+", {
+  result <- parse_adduct("[M2+2H]2+")
+
+  expect_equal(result[["n_iso"]], 2)
+  expect_equal(result[["n_mer"]], 1)
+  expect_equal(result[["n_charges"]], 2)
+  expect_equal(result[["charge"]], 1)
+})
+
+test_that("parse_adduct handles complex isotope notation [2M+1+Na]+", {
+  result <- parse_adduct("[2M+1+Na]+")
+
+  expect_equal(result[["n_iso"]], 1)
+  expect_equal(result[["n_mer"]], 2)
+  expect_equal(result[["n_charges"]], 1)
+})
+
+test_that("parse_adduct isotope shift is always positive", {
+  # Even if notation suggests negative, isotope shift should be absolute
+  result1 <- parse_adduct("[M1+H]+")
+  result2 <- parse_adduct("[M+1+H]+")
+
+  expect_equal(result1[["n_iso"]], 1)
+  expect_equal(result2[["n_iso"]], 1)
+  # Both notations should give same isotope count
+  expect_gte(result1[["n_iso"]], 0)
+  expect_gte(result2[["n_iso"]], 0)
+})
+
+test_that("parse_adduct handles M+0 (monoisotopic) explicitly", {
+  # M+0 or M0 should be treated same as M (no isotope shift)
+  result1 <- parse_adduct("[M+H]+")
+  result2 <- parse_adduct("[M0+H]+")
+
+  expect_equal(result1[["n_iso"]], 0)
+  expect_equal(result2[["n_iso"]], 0)
+})
+
+test_that("parse_adduct distinguishes isotope from multimer", {
+  # [2M+H]+ is dimer, not M+2 isotope
+  # [M2+H]+ is M+2 isotope
+  dimer <- parse_adduct("[2M+H]+")
+  isotope <- parse_adduct("[M2+H]+")
+
+  expect_equal(dimer[["n_mer"]], 2)
+  expect_equal(dimer[["n_iso"]], 0)
+
+  expect_equal(isotope[["n_mer"]], 1)
+  expect_equal(isotope[["n_iso"]], 2)
+})
+
+test_that("parse_adduct handles large isotope numbers [M13+H]+", {
+  # For highly enriched labeled compounds (e.g., fully 13C labeled)
+  result <- parse_adduct("[M13+H]+")
+
+  expect_equal(result[["n_iso"]], 13)
+  expect_equal(result[["n_mer"]], 1)
+})
+
+test_that("parse_adduct isotopes work with all common adducts", {
+  # Test isotope notation compatibility with various adducts
+  test_adducts <- c(
+    "[M1+H]+",
+    "[M1+Na]+",
+    "[M1+K]+",
+    "[M1+NH4]+",
+    "[M1-H]-",
+    "[M1+Cl]-",
+    "[M1+HCOO]-"
+  )
+
+  for (adduct in test_adducts) {
+    result <- parse_adduct(adduct)
+    expect_equal(
+      result[["n_iso"]],
+      1,
+      label = paste("Isotope parsing failed for", adduct)
+    )
+    expect_false(
+      all(result == 0),
+      label = paste("Complete parse failure for", adduct)
+    )
+  }
+})
+
 ## Multiple Modifications Tests ----
 
 test_that("parse_adduct handles multiple additions [M+H+Na]+", {
