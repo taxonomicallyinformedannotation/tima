@@ -13,6 +13,7 @@ filter_high_confidence_only(
   error_rt_max = DEFAULT_HC_MAX_RT_ERROR_MIN,
   confidence_sirius_min = DEFAULT_HC_SCORE_SIRIUS_MIN,
   similarity_spectral_min = DEFAULT_HC_SCORE_SPECTRAL_MIN,
+  matched_peaks_min = DEFAULT_HC_SCORE_MIN_PEAKS,
   context = NULL
 )
 }
@@ -27,9 +28,18 @@ filter_high_confidence_only(
 
 \item{error_rt_max}{Numeric maximum retention time error in minutes (default: 0.05). Must be > 0}
 
-\item{confidence_sirius_min}{Numeric minimum SIRIUS confidence score threshold (optional). Range: 0-1}
+\item{confidence_sirius_min}{Numeric minimum SIRIUS confidence score threshold (optional).
+Range: 0-1. If provided, candidates WITH a confidence score below this threshold
+are filtered out, but candidates with NA/missing scores are retained.}
 
-\item{similarity_spectral_min}{Numeric minimum spectral similarity threshold (optional). Range: 0-1}
+\item{similarity_spectral_min}{Numeric minimum spectral similarity threshold (optional).
+Range: 0-1. If provided, candidates WITH a similarity score below this threshold
+are filtered out, but candidates with NA/missing scores are retained.}
+
+\item{matched_peaks_min}{Numeric minimum count of matched peaks threshold (optional).
+Must be >= 0 (typically a small integer). If provided, candidates WITH a matched
+peak count below this threshold are filtered out, but candidates with NA/missing
+peak counts are retained.}
 
 \item{context}{Optional character string to tag logs with a stage label (e.g.,
 "mini+filtered" or "full"). Defaults to NULL (no tag).}
@@ -50,13 +60,30 @@ Columns used when present:
 \item candidate_score_pseudo_initial
 \item score_weighted_chemo
 \item candidate_structure_error_rt (assumed in minutes; NA means unknown and is allowed)
-\item candidate_score_sirius_confidence (optional)
-\item candidate_similarity (optional)
+\item candidate_score_sirius_confidence (optional, NA values allowed)
+\item candidate_similarity (optional, NA values allowed, 0 always filtered)
+\item candidate_matched_peaks (optional, NA values allowed)
 }
 
 Missing score columns are treated as absent for that criterion and do not
 cause errors; at least one of the three primary scores must satisfy its
 threshold for a row to be retained.
+
+\strong{NA value handling:}
+\itemize{
+\item RT error: NA values (unknown RT) are allowed to pass
+\item SIRIUS confidence: NA values (no SIRIUS annotation) are allowed to pass
+\item Spectral similarity: NA values (no spectral match) are allowed to pass, but 0 is ALWAYS filtered
+\item Matched peaks: NA values (no peak matching data) are allowed to pass
+}
+
+\strong{SIRIUS and Spectral filtering (OR logic):}
+When both \code{confidence_sirius_min} and \code{similarity_spectral_min} are set,
+candidates pass if EITHER the SIRIUS confidence OR spectral similarity meets
+its threshold. This allows candidates with good SIRIUS but poor spectral match
+(or vice versa) to pass. Spectral similarity = 0 is always filtered out as invalid.
+
+This means thresholds only apply when the corresponding value is present.
 }
 \examples{
 \dontrun{
