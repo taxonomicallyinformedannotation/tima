@@ -142,11 +142,15 @@ DEFAULT_HC_SCORE_FINAL_MIN <- 0.75
 
 #' Default minimum SIRIUS confidence score threshold for high-confidence filter
 #' @keywords internal
-DEFAULT_HC_SCORE_SIRIUS_MIN <- NULL
+DEFAULT_HC_SCORE_SIRIUS_MIN <- 0.4
 
 #' Default minimum spectral similarity score threshold for high-confidence filter
 #' @keywords internal
-DEFAULT_HC_SCORE_SPECTRAL_MIN <- NULL
+DEFAULT_HC_SCORE_SPECTRAL_MIN <- 0.4
+
+#' Default minimum number of matched peaks for high-confidence filter
+#' @keywords internal
+DEFAULT_HC_SCORE_MIN_PEAKS <- 2L
 
 #' Default maximum allowed retention time error (minutes) for high-confidence filter
 #' @keywords internal

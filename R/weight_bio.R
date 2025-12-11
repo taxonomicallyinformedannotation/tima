@@ -620,7 +620,7 @@ weight_bio <- function(
         !is.na(candidate_score_similarity) ~
           as.numeric(candidate_score_similarity),
         !is.na(candidate_score_sirius_csi) ~ candidate_score_sirius_csi_tmp,
-        TRUE ~ 0
+        TRUE ~ NA_real_ # MS1-only hits have no MS2 spectrum data, so score is NA not 0
       )
     ) |>
     tidytable::select(-candidate_score_sirius_csi_tmp) |>

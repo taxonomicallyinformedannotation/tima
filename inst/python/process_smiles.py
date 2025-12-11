@@ -255,7 +255,9 @@ def calculate_isotope_mass_shift(original_smiles: str) -> float:
 
         if atomic_num not in ISOTOPE_MASS_SHIFTS:
             # No shift data for this element
-            logger.warning(f"  No mass shift data for {element} (atomic_num={atomic_num})")
+            logger.warning(
+                f"  No mass shift data for {element} (atomic_num={atomic_num})"
+            )
             continue
 
         iso_shift = ISOTOPE_MASS_SHIFTS[atomic_num]
