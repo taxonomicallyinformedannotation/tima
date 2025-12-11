@@ -38,9 +38,12 @@ compute_weighted_sum <- function(..., weights) {
   # Normalize weights to sum to 1
   norm_weights <- weights / weight_sum
 
-  # Vectorized computation using weighted matrix multiplication
   # Convert list to matrix for efficient row-wise operations
   values_matrix <- do.call(cbind, values)
+
+  # Replace NA values with 0 for computation
+  # NA means "no score" which contributes 0 to the weighted sum
+  values_matrix[is.na(values_matrix)] <- 0
 
   # Matrix multiplication: each row multiplied by weights
   as.numeric(values_matrix %*% norm_weights)
