@@ -375,3 +375,73 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
   # 199.094000 is 0.001825 Da away (outside 5 ppm tolerance)
   expect_equal(nrow(annotations_tight), 1L)
 })
+
+## Isotopologues ----
+
+test_that("annotate_masses correctly handles isotopes [M1+H]+ and [M2+H]+", {
+  local_quiet_logging()
+
+  # Test isotope annotation using fixtures
+  # Glucose (exact mass = 180.0634 Da)
+  # Isotope formula: M = ((z * (m/z - iso_shift) - modifications) / n_mer)
+  # Reverse: m/z = ((M * n_mer + modifications) / z) + iso_shift
+  # Isotope mass shift = 1.0033548 Da (13C - 12C difference)
+  # M+0: [M+H]+ at 181.0712 m/z (monoisotopic peak)
+  # M+1: [M1+H]+ at 182.0746 m/z (~1.0034 Da HIGHER - one 13C)
+  # M+2: [M2+H]+ at 183.0779 m/z (~2.0067 Da HIGHER - two 13C or one 18O)
+
+  env <- prepare_annotation_fixture_env(
+    feature_fixture = "features_isotope.csv",
+    library_fixture = "library_isotope.csv"
+  )
+
+  withr::local_dir(new = env$dirs$root)
+
+  # Run annotation with M+0, M+1, and M+2 adducts
+  result <- annotate_masses(
+    features = env$features,
+    library = env$library,
+    str_stereo = env$str_stereo,
+    str_met = env$str_met,
+    str_nam = env$str_nam,
+    str_tax_cla = env$str_tax_cla,
+    str_tax_npc = env$str_tax_npc,
+    adducts_list = list(pos = c("[M+H]+", "[M1+H]+", "[M2+H]+")),
+    clusters_list = list(pos = c("[M]")),
+    neutral_losses_list = character(0),
+    ms_mode = "pos",
+    tolerance_ppm = 5.0,
+    tolerance_rt = 0.02,
+    output_annotations = env$output_annotations,
+    output_edges = env$output_edges
+  )
+
+  annotations <- tidytable::fread(
+    result["annotations"],
+    colClasses = "character"
+  )
+
+  # At least some isotopes should be annotated
+  # (The exact number depends on tolerance and mass matching)
+  expect_gte(nrow(annotations), 1L)
+
+  # Check each isotope is annotated with correct adduct
+  m0_annotation <- annotations |>
+    tidytable::filter(feature_id == "FT_M0")
+  expect_true("[M+H]+" %in% m0_annotation$candidate_adduct)
+
+  m1_annotation <- annotations |>
+    tidytable::filter(feature_id == "FT_M1")
+  expect_true("[M1+H]+" %in% m1_annotation$candidate_adduct)
+
+  m2_annotation <- annotations |>
+    tidytable::filter(feature_id == "FT_M2")
+  expect_true("[M2+H]+" %in% m2_annotation$candidate_adduct)
+
+  # All should point to the same structure (glucose)
+  if ("candidate_structure_inchikey" %in% colnames(annotations)) {
+    unique_structures <- unique(annotations$candidate_structure_inchikey)
+    expect_equal(length(unique_structures), 1L)
+    expect_equal(unique_structures[[1]], "WQZGKKKJIJFFOK-GASJEMHNSA-N")
+  }
+})

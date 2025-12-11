@@ -271,9 +271,14 @@ calculate_neutral_mass_formula <- function(
   n_mer
 ) {
   # Apply the neutral mass calculation formula
-  # M = ((z * (m/z + iso) - modifications) / n_mer)
+  # M = ((z * (m/z - iso_shift) - modifications) / n_mer)
+  # Note: isotope shift is SUBTRACTED because isotope peaks are at HIGHER m/z
+  # Example: [M1+H]+ at 182.07 m/z -> subtract 1.0033548 to get back to monoisotopic mass
 
-  charged_mass <- n_charges * (mz + n_iso)
+  # Calculate actual isotope mass shift (n_iso * isotope unit)
+  isotope_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
+
+  charged_mass <- n_charges * (mz - isotope_shift)
   corrected_mass <- charged_mass - mass_modifications
   neutral_mass <- corrected_mass / n_mer
 
@@ -347,10 +352,15 @@ calculate_mz_from_mass <- function(
   }
 
   # Calculate m/z using inverse formula
-  # Inverse of: M = ((z * (m/z + iso) - modifications) / n_mer)
-  # Therefore: m/z = ((M * n_mer + modifications) / z) - iso
+  # Inverse of: M = ((z * (m/z - iso_shift) - modifications) / n_mer)
+  # Therefore: m/z = ((M * n_mer + modifications) / z) + iso_shift
+  # Note: isotope shift is ADDED because isotope peaks appear at HIGHER m/z
+
+  # Calculate actual isotope mass shift (n_iso * isotope unit)
+  isotope_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
+
   total_mass <- neutral_mass * n_mer + mass_modifications
-  mz <- (total_mass / n_charges) - n_iso
+  mz <- (total_mass / n_charges) + isotope_shift
 
   # log_trace(
   #  "Calculated m/z: ",

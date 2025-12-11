@@ -1,15 +1,15 @@
 structure_inchikey,structure_inchikey_connectivity_layer,structure_tax_cla_chemontid,structure_tax_cla_01kin,structure_tax_cla_02sup,structure_tax_cla_03cla,structure_tax_cla_04dirpar
-AAAAAAAAAAAAA-BBBBBBBBBB-C,AAAAAAAAAAAAA-BBBBBBBBBB,CHEMONTID:0000001,Organic compounds,Phenylpropanoids and polyketides,Flavonoids,Flavones
-AAAAAAAAAAAAA-BBBBBBBBBB-A,AAAAAAAAAAAAA-BBBBBBBBBB,CHEMONTID:0000001,Organic compounds,Phenylpropanoids and polyketides,Flavonoids,Flavones
-BBBBBBBBBBBB-CCCCCCCCCC-B,BBBBBBBBBBBB-CCCCCCCCCC,CHEMONTID:0000002,Organic compounds,Alkaloids and derivatives,Indole alkaloids,Beta-carbolines
-CCCCCCCCCCCC-DDDDDDDDDD-C,CCCCCCCCCCCC-DDDDDDDDDD,CHEMONTID:0000003,Organic compounds,Terpenoids,Monoterpenoids,Iridoids
-DDDDDDDDDDDD-EEEEEEEEEE-D,DDDDDDDDDDDD-EEEEEEEEEE,CHEMONTID:0000004,Organic compounds,Phenylpropanoids and polyketides,Coumarins,Simple coumarins
-EEEEEEEEEEEE-FFFFFFFFFF-E,EEEEEEEEEEEE-FFFFFFFFFF,CHEMONTID:0000005,Organic compounds,Alkaloids and derivatives,Quinoline alkaloids,Simple quinolines
-FFFFFFFFFFFFF-GGGGGGGGGG-F,FFFFFFFFFFFFF-GGGGGGGGGG,CHEMONTID:0000006,Organic compounds,Terpenoids,Sesquiterpenoids,Germacranolides
-GGGGGGGGGGGG-HHHHHHHHHH-G,GGGGGGGGGGGG-HHHHHHHHHH,CHEMONTID:0000007,Organic compounds,Phenylpropanoids and polyketides,Lignans,Furofuran lignans
-HHHHHHHHHHHH-IIIIIIIIII-H,HHHHHHHHHHHH-IIIIIIIIII,CHEMONTID:0000008,Organic compounds,Alkaloids and derivatives,Isoquinoline alkaloids,Benzylisoquinolines
-IIIIIIIIIIII-JJJJJJJJJJ-I,IIIIIIIIIIII-JJJJJJJJJJ,CHEMONTID:0000009,Organic compounds,Terpenoids,Diterpenoids,Kaurane diterpenoids
-JJJJJJJJJJJJ-KKKKKKKKKK-J,JJJJJJJJJJJJ-KKKKKKKKKK,CHEMONTID:0000010,Organic compounds,Phenylpropanoids and polyketides,Stilbenoids,Stilbenes
+AAAAAAAAAAAAA-BBBBBBBBBB-C,AAAAAAAAAAAAA,CHEMONTID:0000001,Organic compounds,Phenylpropanoids and polyketides,Flavonoids,Flavones
+AAAAAAAAAAAAA-BBBBBBBBBB-A,AAAAAAAAAAAAA,CHEMONTID:0000001,Organic compounds,Phenylpropanoids and polyketides,Flavonoids,Flavones
+BBBBBBBBBBBB-CCCCCCCCCC-B,BBBBBBBBBBBB,CHEMONTID:0000002,Organic compounds,Alkaloids and derivatives,Indole alkaloids,Beta-carbolines
+CCCCCCCCCCCC-DDDDDDDDDD-C,CCCCCCCCCCCC,CHEMONTID:0000003,Organic compounds,Terpenoids,Monoterpenoids,Iridoids
+DDDDDDDDDDDD-EEEEEEEEEE-D,DDDDDDDDDDDD,CHEMONTID:0000004,Organic compounds,Phenylpropanoids and polyketides,Coumarins,Simple coumarins
+EEEEEEEEEEEE-FFFFFFFFFF-E,EEEEEEEEEEEE,CHEMONTID:0000005,Organic compounds,Alkaloids and derivatives,Quinoline alkaloids,Simple quinolines
+FFFFFFFFFFFFF-GGGGGGGGGG-F,FFFFFFFFFFFFF,CHEMONTID:0000006,Organic compounds,Terpenoids,Sesquiterpenoids,Germacranolides
+GGGGGGGGGGGG-HHHHHHHHHH-G,GGGGGGGGGGGG,CHEMONTID:0000007,Organic compounds,Phenylpropanoids and polyketides,Lignans,Furofuran lignans
+HHHHHHHHHHHH-IIIIIIIIII-H,HHHHHHHHHHHH,CHEMONTID:0000008,Organic compounds,Alkaloids and derivatives,Isoquinoline alkaloids,Benzylisoquinolines
+IIIIIIIIIIII-JJJJJJJJJJ-I,IIIIIIIIIIII,CHEMONTID:0000009,Organic compounds,Terpenoids,Diterpenoids,Kaurane diterpenoids
+JJJJJJJJJJJJ-KKKKKKKKKK-J,JJJJJJJJJJJJ,CHEMONTID:0000010,Organic compounds,Phenylpropanoids and polyketides,Stilbenoids,Stilbenes
 TOLERANCE-MATCH-A,TOLERANCE-MATCH,CHEMONTID:0000011,Organic compounds,Phenylpropanoids and polyketides,Flavonoids,Flavones
 TOLERANCE-NOMATCH-B,TOLERANCE-NOMATCH,CHEMONTID:0000011,Organic compounds,Phenylpropanoids and polyketides,Flavonoids,Flavones
-
+WQZGKKKJIJFFOK-GASJEMHNSA-N,WQZGKKKJIJFFOK,CHEMONTID:0000011,Organic compounds,Sugars and sugary stuff,Sugars,Hexoses

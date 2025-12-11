@@ -13,6 +13,14 @@
 #' @keywords internal
 ELECTRON_MASS_DALTONS <- 5.485799E-4
 
+#' Isotope mass shift in Daltons
+#' @description Represents the average mass difference between isotopes,
+#'     primarily the 13C - 12C difference (1.0033548 Da). This is used for
+#'     calculating masses of isotopically labelled compounds (M+1, M+2, etc.).
+#'     The value is very close to the neutron-proton mass difference.
+#' @keywords internal
+ISOTOPE_MASS_SHIFT_DALTONS <- 1.0033548378
+
 # Validation Thresholds ----
 
 #' Maximum allowed mass tolerance in ppm
