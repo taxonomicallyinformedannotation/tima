@@ -11,16 +11,30 @@
 #'     (default: "structure_smiles_initial")
 #' @param cache Path to cached processed SMILES file, or NULL to skip caching
 #'
-#' @return Data frame with processed SMILES including InChIKey, molecular formula,
-#'     exact mass, 2D SMILES, xLogP, and connectivity layer
+#' @return Data frame with processed SMILES including InChIKey, molecular formula
+#'     (with isotopes shown), exact mass (with isotope contributions), 2D SMILES,
+#'     xLogP, and connectivity layer
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' smiles <- "C=C[C@H]1[C@@H](OC=C2C1=CCOC2=O)O[C@H]3[C@@H]([C@H]([C@@H]([C@H](O3)CO)O)O)O"
-#' df <- data.frame(structure_smiles_initial = smiles)
-#' process_smiles(df)
+#' # Natural compound
+#' df <- data.frame(
+#'   structure_smiles_initial = "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O"
+#' )
+#' result <- process_smiles(df)
+#' # Formula: C6H12O6, Mass: 180.063 Da
+#'
+#' # Isotope-labeled compound (4× 13C)
+#' df_labeled <- data.frame(
+#'   structure_smiles_initial = "OC[13C@H]1OC(O)[13C@H](O)[13C@@H](O)[13C@@H]1O"
+#' )
+#' result_labeled <- process_smiles(df_labeled)
+#' # Formula: C2[13C]4H12O6 (isotopes shown separately)
+#' # Mass: 184.077 Da (difference of ~4.013 Da from natural)
+#' # SMILES preserves [13C] notation
+#' # InChIKey differs from natural glucose
 #' }
 process_smiles <- function(
   df,

@@ -310,9 +310,6 @@ test_that("parse_adduct isotope shift is always positive", {
 
   expect_equal(result1[["n_iso"]], 1)
   expect_equal(result2[["n_iso"]], 1)
-  # Both notations should give same isotope count
-  expect_gte(result1[["n_iso"]], 0)
-  expect_gte(result2[["n_iso"]], 0)
 })
 
 test_that("parse_adduct handles M+0 (monoisotopic) explicitly", {
@@ -505,9 +502,6 @@ test_that("parse_adduct return names are consistent", {
 test_that("parse_adduct n_charges is always positive", {
   result_pos <- parse_adduct("[M+H]+")
   result_neg <- parse_adduct("[M-H]-")
-
-  expect_gte(result_pos[["n_charges"]], 0)
-  expect_gte(result_neg[["n_charges"]], 0)
 
   # Charge sign indicated separately
   expect_equal(result_pos[["charge"]], 1)

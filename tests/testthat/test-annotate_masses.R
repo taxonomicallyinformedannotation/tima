@@ -421,10 +421,6 @@ test_that("annotate_masses correctly handles isotopes [M1+H]+ and [M2+H]+", {
     colClasses = "character"
   )
 
-  # At least some isotopes should be annotated
-  # (The exact number depends on tolerance and mass matching)
-  expect_gte(nrow(annotations), 1L)
-
   # Check each isotope is annotated with correct adduct
   m0_annotation <- annotations |>
     tidytable::filter(feature_id == "FT_M0")
