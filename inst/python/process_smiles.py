@@ -19,14 +19,12 @@ from pathlib import Path
 from typing import List, Optional, Tuple, Any, Iterable
 from rdkit import RDLogger
 from rdkit.Chem import (
-    SmilesMolSupplier,
     MolToSmiles,
     MolToInchiKey,
     RemoveStereochemistry,
-    Mol,
+    SmilesMolSupplier,
 )
 from rdkit.Chem.Descriptors import ExactMolWt, MolLogP
-from rdkit.Chem.MolStandardize import rdMolStandardize
 from rdkit.Chem.rdMolDescriptors import CalcMolFormula
 
 
@@ -49,17 +47,26 @@ OUTPUT_COLUMNS: List[str] = [
 ]
 
 DEFAULT_LOG_LEVEL = logging.INFO
-LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+LOG_FORMAT = "[%(asctime)s] [%(levelname)-5s] %(message)s"
+LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
-# Isotope mass differences (13C - 12C, etc.)
-# These are used to calculate accurate masses for isotope-labeled compounds
-# Keys are atomic numbers: H=1, C=6, N=7, O=8
-ISOTOPE_MASS_SHIFTS = {
-    1: 1.0078250321,  # Deuterium (2H - 1H)
-    6: 1.0033548378,  # 13C - 12C  (Carbon atomic number = 6)
-    7: 0.9963779,  # 15N - 14N  (Nitrogen atomic number = 7)
-    8: 2.0042895,  # 18O - 16O  (Oxygen atomic number = 8)
-}
+
+class MillisecondFormatter(logging.Formatter):
+    """Custom formatter to add milliseconds to timestamp."""
+
+    def formatTime(self, record, datefmt=None):
+        """Override formatTime to include milliseconds."""
+        import datetime
+
+        ct = datetime.datetime.fromtimestamp(record.created)
+        if datefmt:
+            s = ct.strftime(datefmt)
+        else:
+            s = ct.strftime("%Y-%m-%d %H:%M:%S")
+        # Add milliseconds (3 digits)
+        s = f"{s}.{int(record.msecs):03d}"
+        return s
+
 
 __all__ = [
     "process_smiles",
@@ -67,8 +74,6 @@ __all__ = [
     "validate_input_file",
     "validate_output_file",
     "validate_processing_params",
-    "parse_isotopes_from_smiles",
-    "calculate_isotope_mass_shift",
 ]
 
 
@@ -81,7 +86,8 @@ def get_logger(name: str = __name__, level: int = DEFAULT_LOG_LEVEL) -> logging.
     logger.setLevel(level)
     if not logger.handlers:
         console_handler = logging.StreamHandler(sys.stderr)
-        console_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+        formatter = MillisecondFormatter(LOG_FORMAT, datefmt=LOG_DATE_FORMAT)
+        console_handler.setFormatter(formatter)
         console_handler.setLevel(level)
         logger.addHandler(console_handler)
     return logger
@@ -167,186 +173,52 @@ def validate_processing_params(
 
 
 # =====================================================================================
-# Isotope Handling Functions
-# =====================================================================================
-
-
-def parse_isotopes_from_smiles(smiles: str) -> dict:
-    """
-    Parse isotope information from SMILES string.
-
-    Counts occurrences of isotope notation like [13C], [15N], [18O], [2H], etc.
-
-    Args:
-        smiles: SMILES string
-
-    Returns:
-        Dictionary mapping atomic number to count of that isotope
-        Example: {'C': {13: 1}, 'N': {15: 1}} for [13C][15N]...
-    """
-    import re
-
-    isotopes = {}
-
-    # Pattern to match: [number+Element+optional_rest]
-    # Examples: [13C], [13C@H], [15N], [18O], [2H], [13C@@H]
-    # Matches: [digit(s) + uppercase letter + optional lowercase + anything else + ]
-    pattern = r"\[(\d+)([A-Z][a-z]?)([^\]]*)\]"
-
-    matches = list(re.finditer(pattern, smiles))
-    logger.debug(f"Parsing '{smiles}' - found {len(matches)} isotope candidates")
-
-    for match in matches:
-        mass_num = int(match.group(1))
-        element = match.group(2)
-        rest = match.group(3)
-
-        if element not in isotopes:
-            isotopes[element] = {}
-            logger.info(f"Created dict for element {element}")
-
-        isotopes[element][mass_num] = isotopes[element].get(mass_num, 0) + 1
-        logger.debug(
-            f"Matched isotope [{mass_num}{element}{rest}] -> isotopes is now {isotopes}"
-        )
-
-    logger.debug(
-        f"After loop, isotopes = {isotopes}, bool(isotopes) = {bool(isotopes)}"
-    )
-    if isotopes:
-        logger.debug(f"Final isotopes dict: {isotopes}")
-        return isotopes
-    else:
-        logger.debug(f"Returning empty dict")
-        return isotopes
-
-
-def calculate_isotope_mass_shift(original_smiles: str) -> float:
-    """
-    Calculate the mass shift due to isotope labeling in SMILES.
-
-    Args:
-        original_smiles: SMILES string potentially containing isotope notation
-
-    Returns:
-        Float: Total mass shift in Daltons from isotope substitution
-    """
-    logger.debug(f"calculate_isotope_mass_shift('{original_smiles[:50]}...')")
-
-    isotopes = parse_isotopes_from_smiles(original_smiles)
-    logger.debug(f"  Parsed isotopes: {isotopes}")
-
-    if not isotopes:
-        logger.debug(f"  No isotopes found, returning 0.0 Da")
-        return 0.0
-
-    total_shift = 0.0
-
-    # Element atomic numbers for common isotopes
-    element_to_atomic_num = {"H": 1, "C": 6, "N": 7, "O": 8}
-
-    for element, isotope_counts in isotopes.items():
-        atomic_num = element_to_atomic_num.get(element)
-
-        if atomic_num is None:
-            # Unknown element, skip
-            logger.warning(f"  Unknown element: {element}")
-            continue
-
-        if atomic_num not in ISOTOPE_MASS_SHIFTS:
-            # No shift data for this element
-            logger.warning(
-                f"  No mass shift data for {element} (atomic_num={atomic_num})"
-            )
-            continue
-
-        iso_shift = ISOTOPE_MASS_SHIFTS[atomic_num]
-        count = sum(isotope_counts.values())
-        shift_contrib = iso_shift * count
-        total_shift += shift_contrib
-        logger.info(
-            f"  {element}: {count} atoms × {iso_shift:.6f} Da = {shift_contrib:.6f} Da"
-        )
-
-    logger.info(f"  *** TOTAL ISOTOPE SHIFT: {total_shift:.6f} Da ***")
-    return total_shift
-
-
-# =====================================================================================
 # Core Molecule Processing
 # =====================================================================================
 
 
-def _copy_molecule(mol: Mol) -> Mol:
-    """Safely copy an RDKit molecule."""
-    # Mol() copy constructor performs a deep copy
-    try:
-        return Mol(mol)
-    except Exception:
-        # Fallback to __copy__ if necessary
-        return mol.__copy__()
-
-
-def process_molecule(
-    mol: Any, original_smiles: str, un: rdMolStandardize.Uncharger
-) -> Optional[List[Any]]:
+def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
     """
     Process a single molecule to extract chemical properties.
 
-    For isotope-labeled compounds, the exact mass is corrected by adding
-    the isotope mass shift to account for heavier isotopes (e.g., 13C, 15N, 18O).
+    **Output Format:**
+    - SMILES: Canonical with isotope notation preserved (e.g., [13C], [2H])
+    - InChIKey: Isotope-aware
+    - Formula: Isotopes shown separated (e.g., C2[13C]4H12O6, [2H]4C)
+    - Exact mass: RDKit automatically uses isotope atomic masses
 
     Args:
         mol: RDKit Mol object
-        original_smiles: Original SMILES string (used for isotope detection)
-        un: rdMolStandardize.Uncharger
+        original_smiles: Original SMILES string (for logging/debugging)
 
     Returns:
-        List of molecular properties or None if processing fails
+        List of [original_smiles, smiles, inchikey, formula, exact_mass,
+                 smiles_no_stereo, xlogp] or None if processing fails
+
+    Example:
+        Input:  OC[13C@H]1OC(O)[13C@H](O)[13C@@H](O)[13C@@H]1O
+        Output: ['...', 'OC[13C@H]1...', 'INCHIKEY...', 'C2[13C]4H12O6', 184.077, '...', ...]
+
+        Input:  [2H]C([2H])([2H])[2H]
+        Output: ['...', '[2H]C([2H])([2H])[2H]', 'INCHIKEY...', '[2H]4C', 20.063, '...', ...]
     """
-    # CRITICAL: Calculate isotope shift FIRST from original SMILES
-    # This must be done BEFORE any RDKit processing that might strip isotope info
-    iso_shift = calculate_isotope_mass_shift(original_smiles)
-    logger.debug(f"Processing: {original_smiles[:60]}... iso_shift={iso_shift:.6f} Da")
 
     if mol is None:
-        logger.warning(
-            f"process_molecule: received None mol for SMILES '{original_smiles}'"
-        )
         return None
+
     try:
-        m, _ = standardizer.get_parent_mol(mol)
-        un.uncharge(m)
+        m = standardizer.standardize_mol(mol)
+
+        # Generate outputs from standardized molecule
         smiles = MolToSmiles(m)
         inchikey = MolToInchiKey(m)
-        formula = CalcMolFormula(m)
+        formula = CalcMolFormula(m, separateIsotopes=True)
         exact_mass = ExactMolWt(m)
         xlogp = MolLogP(m)
 
-        # Apply the isotope shift that was calculated from original SMILES
-        if iso_shift != 0.0:
-            logger.info(
-                f"Applying isotope shift {iso_shift:.6f} Da to '{original_smiles[:50]}...'"
-            )
-            exact_mass += iso_shift
-
-        # Create a copy for stereochemistry removal to avoid modifying original
-        mol_no_stereo = _copy_molecule(m)
-        RemoveStereochemistry(mol_no_stereo)
-        smiles_no_stereo = MolToSmiles(mol_no_stereo)
-
-        return [
-            original_smiles,
-            smiles,
-            inchikey,
-            formula,
-            exact_mass,
-            smiles_no_stereo,
-            xlogp,
-        ]
-    except Exception as e:
-        logger.warning(f"Failed to process SMILES '{original_smiles}': {e}")
-        return None
+        # Create stereo-removed version without copying the original molecule
+        RemoveStereochemistry(m)
+        smiles_no_stereo = MolToSmiles(m)
 
         return [
             original_smiles,
@@ -375,6 +247,19 @@ def open_output_file(output_file: Path):
     if str(output_file).endswith(".gz"):
         return gzip.open(output_file, "wt", newline="", encoding="utf-8")
     return open(output_file, "w", newline="", encoding="utf-8")
+
+
+def _process_molecule_wrapper(args: Tuple[Any, str]) -> Optional[List[Any]]:
+    """Wrapper for process_molecule to work with map parallelization.
+
+    Args:
+        args: Tuple of (mol, smiles_str)
+
+    Returns:
+        List of processed properties or None if failed
+    """
+    mol, smiles = args
+    return process_molecule(mol, smiles)
 
 
 # =====================================================================================
@@ -408,17 +293,27 @@ def process_batch(
     """
     log = _logger or logger
     batch_processed = 0
-    # Use serial processing instead of parallel to avoid thread pool issues
-    un = rdMolStandardize.Uncharger()
+    batch_failed = 0
 
-    for mol, smiles in zip(batch, original_smiles_list):
-        result = process_molecule(mol, smiles, un)
+    # Prepare work pairs and process in parallel; writing remains on the main thread
+    pairs = list(zip(batch, original_smiles_list))
+
+    # Process all results at once
+    results = list(executor.map(_process_molecule_wrapper, pairs))
+
+    # Write results and count successes/failures
+    for result in results:
         if result:
             writer.writerow(result)
             batch_processed += 1
             total = current_count + batch_processed
             if total % progress_interval == 0:
                 log.info(f"Processed {total} molecules")
+        else:
+            batch_failed += 1
+
+    if batch_failed > 0:
+        log.warning(f"Batch processing: {batch_failed}/{len(pairs)} molecules failed")
 
     return batch_processed
 
@@ -476,7 +371,7 @@ def process_smiles(
         writer = csv.writer(f)
         writer.writerow(OUTPUT_COLUMNS)
 
-        # Pre-allocate lists with capacity to reduce reallocation overhead
+        # Pre-allocate lists to reduce reallocation overhead
         batch: List[Any] = []
         originals: List[str] = []
 
@@ -486,20 +381,20 @@ def process_smiles(
                     batch.append(mol)
                     originals.append(supplier.GetItemText(i))
 
-                # Process batch when full
-                if len(batch) >= batch_size:
-                    molecules_processed += process_batch(
-                        executor,
-                        batch,
-                        originals,
-                        writer,
-                        molecules_processed,
-                        progress_interval,
-                        _logger=log,
-                    )
-                    # Clear lists efficiently
-                    batch.clear()
-                    originals.clear()
+                    # Process batch when full
+                    if len(batch) >= batch_size:
+                        molecules_processed += process_batch(
+                            executor,
+                            batch,
+                            originals,
+                            writer,
+                            molecules_processed,
+                            progress_interval,
+                            _logger=log,
+                        )
+                        # Clear lists efficiently
+                        batch.clear()
+                        originals.clear()
 
             # Process remaining molecules
             if batch:

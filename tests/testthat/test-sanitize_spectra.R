@@ -265,7 +265,6 @@ test_that("sanitize_spectra handles single spectrum", {
   result <- sanitize_spectra(spectra)
 
   expect_s4_class(result, "Spectra")
-  expect_gte(length(result), 0)
 })
 
 test_that("sanitize_spectra handles large spectrum count", {

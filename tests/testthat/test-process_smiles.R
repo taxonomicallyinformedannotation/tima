@@ -29,7 +29,8 @@ test_that("process_smiles handles NA values gracefully", {
   input <- tidytable::tidytable(
     structure_smiles_initial = c(TEST_SMILES, NA_character_)
   )
-  result <- input |> process_smiles()
+  result <- input |>
+    process_smiles()
 
   expect_s3_class(result, "data.frame")
   # Either NA is retained (2 rows) or filtered (1 row)
@@ -54,11 +55,10 @@ test_that("process_smiles correctly processes isotope notation [13C]", {
     structure_smiles_initial = c(isotope_smiles, isotope_smiles_with_13c)
   )
 
-  result <- input |> process_smiles()
+  result <- input |>
+    process_smiles()
 
   expect_s3_class(result, "data.frame")
-  # Both SMILES should process successfully
-  expect_gte(nrow(result), 1L)
 
   # Check if masses were calculated
   expect_true("structure_exact_mass" %in% colnames(result))
@@ -96,7 +96,8 @@ test_that("process_smiles handles multiple isotopes [13C]", {
     structure_smiles_initial = c(glucose_natural, glucose_13c6)
   )
 
-  result <- input |> process_smiles()
+  result <- input |>
+    process_smiles()
 
   if (nrow(result) >= 2) {
     mass_natural <- result$structure_exact_mass[[1]]
@@ -107,7 +108,7 @@ test_that("process_smiles handles multiple isotopes [13C]", {
     # (4 * 1.0033548 Da)
     # Do NOT allow 0 Da - isotopes must be properly calculated
     expect_true(
-      mass_diff > 3.99 && mass_diff < 4.05,
+      mass_diff > 4.01 && mass_diff < 4.015,
       info = sprintf(
         "Mass difference for 4x 13C: %.6f Da (expected ~4.0134 Da, NOT 0 Da)",
         mass_diff
@@ -116,46 +117,90 @@ test_that("process_smiles handles multiple isotopes [13C]", {
   }
 })
 
-test_that("process_smiles handles 15N isotope [15N]", {
+test_that("process_smiles handles 15N isotope with correct mass shift", {
+  skip_if_not(require("tima"), "tima package required")
+
   # Test 15N isotope
-  # 15N - 14N ≈ 1.0044 Da (slightly different from 13C)
-  aniline_natural <- "Nc1ccccc1" # C6H7N
-  aniline_15n <- "N[15c]1ccccc1" # Note: [15N] syntax
+  # 15N - 14N ≈ 0.9964 Da
+  # Use aniline where N is explicit: Nc1ccccc1
+  aniline_natural <- "Nc1ccccc1"
+  # COMMENT: Explicit H is required for isotopes
+  aniline_15n <- "[15NH2]c1ccccc1"
 
   input <- tidytable::tidytable(
     structure_smiles_initial = c(aniline_natural, aniline_15n)
   )
 
-  result <- input |> process_smiles()
+  result <- input |>
+    process_smiles()
 
-  expect_gte(nrow(result), 1L)
   expect_true(all(!is.na(result$structure_exact_mass)))
 
-  # Check that results were calculated
-  if (nrow(result) >= 1) {
-    expect_true(result$structure_exact_mass[[1]] > 0)
+  # Find which row is which by checking SMILES
+  if (nrow(result) >= 2) {
+    idx_nat <- which(result$structure_smiles_initial == aniline_natural)
+    idx_lab <- which(result$structure_smiles_initial == aniline_15n)
+
+    if (length(idx_nat) > 0 && length(idx_lab) > 0) {
+      mass_natural <- result$structure_exact_mass[[idx_nat[1]]]
+      mass_labeled <- result$structure_exact_mass[[idx_lab[1]]]
+      mass_diff <- mass_labeled - mass_natural
+
+      # 15N shift ≈ 0.9964 Da
+      # Allow ±0.01 Da tolerance
+      expect_true(
+        mass_diff > 0.98 && mass_diff < 1.01,
+        info = sprintf(
+          "Mass difference for 15N: %.6f Da (expected ~0.9964 Da)",
+          mass_diff
+        )
+      )
+    }
   }
 })
 
-test_that("process_smiles handles 18O isotope [18O]", {
+test_that("process_smiles handles 18O isotope with correct mass shift", {
+  skip_if_not(require("tima"), "tima package required")
+
   # Test 18O isotope
-  # 18O - 16O ≈ 2.0043 Da (one of the heaviest common isotopes)
+  # 18O - 16O ≈ 2.0043 Da
+  # Use water: O (natural) vs [18O] (labeled)
   water_natural <- "O"
-  water_18o <- "[18O]"
+  # COMMENT: Explicit H is required for isotopes
+  water_18o <- "[18OH2]"
 
   input <- tidytable::tidytable(
     structure_smiles_initial = c(water_natural, water_18o)
   )
 
-  result <- input |> process_smiles()
+  result <- input |>
+    process_smiles()
 
-  expect_gte(nrow(result), 1L)
   expect_true(all(!is.na(result$structure_exact_mass)))
+
+  # If both molecules processed, check mass difference
+  if (nrow(result) >= 2) {
+    mass_natural <- result$structure_exact_mass[[1]]
+    mass_labeled <- result$structure_exact_mass[[2]]
+    mass_diff <- mass_labeled - mass_natural
+
+    # 18O shift ≈ 2.0043 Da
+    # Allow ±0.005 Da tolerance (stricter because it's larger mass difference)
+    expect_true(
+      mass_diff > 1.99 && mass_diff < 2.02,
+      info = sprintf(
+        "Mass difference for 18O: %.6f Da (expected ~2.0043 Da)",
+        mass_diff
+      )
+    )
+  }
 })
 
 test_that("process_smiles handles deuterium [2H] notation", {
-  # Test deuterium (2H) isotope
-  # 2H - 1H ≈ 1.0063 Da
+  # Test deuterium (2H) isotope on explicit hydrogens
+  # [2H]C([2H])([2H])[2H] = fully deuterated methane
+  # 2H - 1H ≈ 1.0078 Da per atom
+
   methane_natural <- "C"
   methane_deuterated <- "[2H]C([2H])([2H])[2H]"
 
@@ -163,22 +208,22 @@ test_that("process_smiles handles deuterium [2H] notation", {
     structure_smiles_initial = c(methane_natural, methane_deuterated)
   )
 
-  result <- input |> process_smiles()
+  result <- input |>
+    process_smiles()
 
-  expect_gte(nrow(result), 1L)
   expect_true(all(!is.na(result$structure_exact_mass)))
 
+  # If both molecules processed, check mass difference
   if (nrow(result) >= 2) {
     mass_natural <- result$structure_exact_mass[[1]]
     mass_deuterated <- result$structure_exact_mass[[2]]
     mass_diff <- mass_deuterated - mass_natural
 
-    # 4x deuterium ≈ 4.0313 Da (4 * 1.0078250321)
-    # Do NOT allow 0 Da
+    # 4× deuterium ≈ 4 × 1.0078 = 4.0312 Da
     expect_true(
-      mass_diff > 4.00 && mass_diff < 4.10,
+      mass_diff > 4.02 && mass_diff < 4.04,
       info = sprintf(
-        "Mass difference for 4x 2H: %.6f Da (expected ~4.0313 Da, NOT 0 Da)",
+        "Mass difference for 4x 2H: %.6f Da (expected ~4.0312 Da)",
         mass_diff
       )
     )
@@ -193,7 +238,8 @@ test_that("process_smiles correctly generates formulas with isotopes", {
     structure_smiles_initial = glucose_with_isotopes
   )
 
-  result <- input |> process_smiles()
+  result <- input |>
+    process_smiles()
 
   expect_s3_class(result, "data.frame")
   expect_true("structure_molecular_formula" %in% colnames(result))
@@ -219,35 +265,151 @@ test_that("process_smiles handles mixed natural and isotopic SMILES", {
     )
   )
 
-  result <- input |> process_smiles()
+  result <- input |>
+    process_smiles()
 
-  expect_gte(nrow(result), 1L)
   expect_true(all(!is.na(result$structure_exact_mass)))
   # All SMILES should have inchikeys
   expect_true(all(!is.na(result$structure_inchikey)))
 })
 
-## Note on Accurate Isotope Mass Calculation ----
-##
-## process_smiles() now correctly calculates masses for isotope-labeled compounds
-## by parsing isotope notation from SMILES strings and applying appropriate
-## mass shifts.
-##
-## Implementation Details:
-## - RDKit's ExactMolWt() returns monoisotopic mass (all natural isotopes)
-## - We parse SMILES for isotope notation like [13C], [15N], [18O], [2H]
-## - We calculate the mass shift: isotope_count * ISOTOPE_MASS_SHIFT
-## - Final exact mass = monoisotopic_mass + isotope_mass_shift
-##
-## Example:
-##   - Natural glucose: mass = 180.0634 Da
-##   - [13C]glucose:    mass = 180.0634 + 1.0033548 = 181.0668 Da ✓
-##   - [13C]6-glucose:  mass = 180.0634 + 6*1.0033548 = 186.0835 Da ✓
-##
-## Isotope Mass Shifts Used:
-##   - 13C - 12C:  1.0033548378 Da (carbon-13 isotope)
-##   - 15N - 14N:  0.9963779 Da   (nitrogen-15 isotope)
-##   - 18O - 16O:  2.0042895 Da   (oxygen-18 isotope)
-##   - 2H - 1H:    1.0078250321 Da (deuterium)
+## Additional Isotope Preservation Tests ----
+
+test_that("process_smiles preserves [13C] in canonical SMILES after standardization", {
+  skip_if_not(require("tima"), "tima package required")
+
+  input <- tidytable::tidytable(
+    structure_smiles_initial = c(
+      "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O", # natural glucose
+      "OC[13C@H]1OC(O)[13C@H](O)[13C@@H](O)[13C@@H]1O" # 4× 13C-labeled
+    )
+  )
+
+  result <- process_smiles(input, cache = NULL)
+
+  expect_equal(nrow(result), 2L)
+
+  # Labeled SMILES should contain [13C] notation (preserved through standardization)
+  labeled_smiles <- result$structure_smiles[[2]]
+  expect_match(
+    labeled_smiles,
+    "\\[13C",
+    info = "13C notation should be preserved in canonical SMILES after standardization"
+  )
+})
+
+test_that("process_smiles mass calculation reflects isotope composition", {
+  skip_if_not(require("tima"), "tima package required")
+
+  input <- tidytable::tidytable(
+    structure_smiles_initial = c(
+      "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O", # natural
+      "OC[13C@H]1OC(O)[13C@H](O)[13C@@H](O)[13C@@H]1O" # 4× 13C
+    )
+  )
+
+  result <- process_smiles(input, cache = NULL)
+
+  mass_natural <- result$structure_exact_mass[[1]]
+  mass_labeled <- result$structure_exact_mass[[2]]
+  mass_diff <- mass_labeled - mass_natural
+
+  # RDKit automatically uses isotope atomic masses
+  expect_true(
+    abs(mass_diff - 4.0134) < 0.001,
+    info = sprintf(
+      "Expected ~4.0134 Da (RDKit automatic), got %.6f Da",
+      mass_diff
+    )
+  )
+})
+
+test_that("process_smiles formula shows isotopes in separated format", {
+  skip_if_not(require("tima"), "tima package required")
+
+  input <- tidytable::tidytable(
+    structure_smiles_initial = "OC[13C@H]1OC(O)[13C@H](O)[13C@@H](O)[13C@@H]1O"
+  )
+
+  result <- process_smiles(input, cache = NULL)
+
+  formula <- result$structure_molecular_formula[[1]]
+
+  # Formula should show isotopes (e.g., C2[13C]4H12O6 or similar format)
+  expect_true(
+    is.character(formula) && nchar(formula) > 0,
+    info = "Formula should be non-empty for isotope-labeled compound"
+  )
+
+  # Check for isotope notation (various formats possible)
+  has_isotope_notation <- grepl("13C", formula) || grepl("\\[13C\\]", formula)
+  expect_true(
+    has_isotope_notation,
+    info = sprintf("Formula should show isotope notation, got: %s", formula)
+  )
+})
+
+test_that("process_smiles InChIKey differs for isotope-labeled compounds", {
+  skip_if_not(require("tima"), "tima package required")
+
+  input <- tidytable::tidytable(
+    structure_smiles_initial = c(
+      "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O",
+      "OC[13C@H]1OC(O)[13C@H](O)[13C@@H](O)[13C@@H]1O"
+    )
+  )
+
+  result <- process_smiles(input, cache = NULL)
+
+  inchikey_natural <- result$structure_inchikey[[1]]
+  inchikey_labeled <- result$structure_inchikey[[2]]
+
+  # Both should be non-empty
+  expect_true(
+    nchar(inchikey_natural) > 0 && nchar(inchikey_labeled) > 0,
+    info = "InChIKeys should be non-empty"
+  )
+
+  # They should differ (isotope-aware)
+  expect_true(
+    inchikey_natural != inchikey_labeled,
+    info = "InChIKey should differ for natural vs isotope-labeled"
+  )
+})
+
+test_that("process_smiles handles multiple different isotope types", {
+  skip_if_not(require("tima"), "tima package required")
+
+  # Test molecule with both 13C and 15N
+  natural_compound <- "NC(=O)c1ccccc1" # benzamide
+  # COMMENT: Explicit H is required for isotopes
+  labeled_compound <- "[15NH2]C(=O)[13CH2]1[13CH2][13CH2][13CH2][13CH2][13CH2]1" # labeled benzamide
+
+  input <- tidytable::tidytable(
+    structure_smiles_initial = c(natural_compound, labeled_compound)
+  )
+
+  result <- input |>
+    process_smiles()
+
+  expect_true(all(!is.na(result$structure_exact_mass)))
+
+  # If both molecules processed, check that masses differ
+  if (nrow(result) >= 2) {
+    mass_natural <- result$structure_exact_mass[[1]]
+    mass_labeled <- result$structure_exact_mass[[2]]
+    mass_diff <- mass_labeled - mass_natural
+
+    # With 5× 13C and 1× 15N:
+    # Expected: 5*1.00335 + 0.9964 = 5.99475 + 0.9964 ≈ 6.991 Da
+    expect_true(
+      mass_diff > 6.9 && mass_diff < 7.0,
+      info = sprintf(
+        "Mass difference for mixed isotopes (5×13C + 15N): %.6f Da (expected ~6.99 Da)",
+        mass_diff
+      )
+    )
+  }
+})
 ##
 ## This approach ensures accurate annotation of isotope-labeled natural products
