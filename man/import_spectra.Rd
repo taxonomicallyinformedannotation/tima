@@ -6,7 +6,7 @@
 \usage{
 import_spectra(
   file,
-  cutoff = 0,
+  cutoff = NULL,
   dalton = 0.01,
   polarity = NA,
   ppm = 10,
@@ -17,7 +17,7 @@ import_spectra(
 \arguments{
 \item{file}{Character string path to the spectrum file (.mgf, .msp, or .rds)}
 
-\item{cutoff}{Numeric absolute minimal intensity threshold (default: 0)}
+\item{cutoff}{Numeric absolute minimal intensity threshold (default: NULL)}
 
 \item{dalton}{Numeric Dalton tolerance for peak matching (default: 0.01)}
 
