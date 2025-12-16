@@ -8,7 +8,7 @@
 #' @include sanitize_spectra.R
 #'
 #' @param file Character string path to the spectrum file (.mgf, .msp, or .rds)
-#' @param cutoff Numeric absolute minimal intensity threshold (default: 0)
+#' @param cutoff Numeric absolute minimal intensity threshold (default: NULL)
 #' @param dalton Numeric Dalton tolerance for peak matching (default: 0.01)
 #' @param polarity Character string for polarity filtering: "pos", "neg", or NA
 #'     to keep all (default: NA)
@@ -34,7 +34,7 @@
 #' }
 import_spectra <- function(
   file,
-  cutoff = 0,
+  cutoff = NULL,
   dalton = 0.01,
   polarity = NA,
   ppm = 10,
@@ -44,10 +44,6 @@ import_spectra <- function(
   # Input Validation ----
 
   # Validate numeric parameters first (cheapest checks)
-  if (!is.numeric(cutoff) || cutoff < 0) {
-    stop("Cutoff must be a non-negative number, got: ", cutoff)
-  }
-
   if (!is.numeric(dalton) || dalton <= 0 || !is.numeric(ppm) || ppm <= 0) {
     stop(
       "Dalton and PPM tolerances must be positive numbers ",
@@ -67,6 +63,10 @@ import_spectra <- function(
   # Validate file path (I/O check - more expensive)
   if (!is.character(file) || length(file) != 1L) {
     stop("file must be a single character string")
+  }
+
+  if (!is.null(cutoff) && (!is.numeric(cutoff) || cutoff < 0)) {
+    stop("Cutoff intensity must be non-negative or NULL, got: ", cutoff)
   }
 
   if (!file.exists(file)) {
@@ -221,7 +221,7 @@ import_spectra <- function(
   if (combine) {
     n_before <- length(spectra)
     if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
-      log_debug("Combining replicate spectra by FEATURE_ID")
+      log_info("Combining replicate spectra by FEATURE_ID")
       spectra <- spectra |>
         Spectra::combineSpectra(
           f = spectra$FEATURE_ID,
@@ -230,9 +230,9 @@ import_spectra <- function(
         ) |>
         Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
       n_after <- length(spectra)
-      log_debug("Combined replicates: %d -> %d spectra", n_before, n_after)
+      log_info("Combined replicates: %d -> %d spectra", n_before, n_after)
     } else if ("SLAW_ID" %in% colnames(spectra@backend@spectraData)) {
-      log_debug("Combining replicate spectra by SLAW_ID")
+      log_info("Combining replicate spectra by SLAW_ID")
       spectra <- spectra |>
         Spectra::combineSpectra(
           f = spectra$SLAW_ID,
@@ -241,7 +241,7 @@ import_spectra <- function(
         ) |>
         Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
       n_after <- length(spectra)
-      log_debug("Combined replicates: %d -> %d spectra", n_before, n_after)
+      log_info("Combined replicates: %d -> %d spectra", n_before, n_after)
     } else {
       # log_trace(
       #  "No replicate grouping field found, skipping combination"

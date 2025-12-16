@@ -99,7 +99,9 @@ annotate_spectra <- function(
   assert_scalar_numeric(threshold, "threshold", min = 0, max = 1)
   assert_scalar_numeric(ppm, "ppm", min = 0)
   assert_scalar_numeric(dalton, "dalton", min = 0)
-  assert_scalar_numeric(qutoff, "qutoff", min = 0)
+  if (!is.null(qutoff) && (!is.numeric(qutoff) || qutoff < 0)) {
+    stop("qutoff must be non-negative or NULL, got: ", qutoff)
+  }
 
   input_vec <- normalize_input_files(input, "Input")
   libs_vec <- normalize_input_files(libraries, "Library")
