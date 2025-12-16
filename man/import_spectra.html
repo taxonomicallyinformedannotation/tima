@@ -828,7 +828,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <pre><code class="language-R">import_spectra(
   file,
-  cutoff = 0,
+  cutoff = NULL,
   dalton = 0.01,
   polarity = NA,
   ppm = 10,
@@ -853,7 +853,7 @@ Character string path to the spectrum file (.mgf, .msp, or .rds)
 <code id="cutoff">cutoff</code>
 </td>
 <td>
-Numeric absolute minimal intensity threshold (default: 0)
+Numeric absolute minimal intensity threshold (default: NULL)
 </td>
 </tr>
 <tr>
