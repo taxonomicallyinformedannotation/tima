@@ -764,7 +764,10 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#tima" id="toc-tima" class="nav-link active" data-scroll-target="#tima">tima</a></li>
-  <li><a href="#tima-2.13.0" id="toc-tima-2.13.0" class="nav-link" data-scroll-target="#tima-2.13.0">tima 2.13.0</a></li>
+  <li><a href="#tima-2.13.0" id="toc-tima-2.13.0" class="nav-link" data-scroll-target="#tima-2.13.0">tima 2.13.0</a>
+  <ul class="collapse">
+  <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link" data-scroll-target="#breaking-changes">Breaking Changes</a></li>
+  </ul></li>
   <li><a href="#tima-2.12.0" id="toc-tima-2.12.0" class="nav-link" data-scroll-target="#tima-2.12.0">tima 2.12.0</a></li>
   <li><a href="#tima-2.11.1-unreleased" id="toc-tima-2.11.1-unreleased" class="nav-link" data-scroll-target="#tima-2.11.1-unreleased">tima 2.11.1 (unreleased)</a></li>
   <li><a href="#tima-2.11.0" id="toc-tima-2.11.0" class="nav-link" data-scroll-target="#tima-2.11.0">tima 2.11.0</a></li>
@@ -819,7 +822,18 @@ ul.task-list li input[type="checkbox"] {
 <li>Added basic isotopologues handling</li>
 <li>Added special “Biota” superdomain handling for shared core metabolism</li>
 <li>More in depth molecular sanitization</li>
+<li>Enhanced <code>sanitize_spectra()</code> with adaptive noise filtering:
+<ul>
+<li>Dynamic intensity thresholds (MAD-based, now default when <code>cutoff = NULL</code>)</li>
+<li>Low noise removal targets repetitive instrumental artifacts</li>
+</ul></li>
 </ul>
+<section id="breaking-changes" class="level2">
+<h2 class="anchored" data-anchor-id="breaking-changes">Breaking Changes</h2>
+<ul>
+<li><code>sanitize_spectra()</code>: <code>cutoff</code> parameter now defaults to <code>NULL</code> (dynamic) instead of <code>0</code></li>
+</ul>
+</section>
 </section>
 <section id="tima-2.12.0" class="level1">
 <h1>tima 2.12.0</h1>
