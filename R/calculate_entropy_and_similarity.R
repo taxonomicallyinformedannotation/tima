@@ -250,7 +250,7 @@ calculate_entropy_and_similarity <- function(
 
   log_info(
     "Calculating entropy and similarity for %d spectra",
-    length(query_spectra)
+    length(query_ids)
   )
   log_debug(
     "Method: %s, PPM: %f2, Dalton: %f2",
@@ -259,13 +259,17 @@ calculate_entropy_and_similarity <- function(
     dalton
   )
 
-  # Disable progress bar in subprocess environments
-  show_progress <- interactive() && !isTRUE(getOption("knitr.in.progress"))
-
-  results <- purrr::map(
-    .progress = show_progress,
-    .x = seq_along(query_spectra),
-    .f = .process_query_against_library,
+  results <- lapply(
+    X = seq_along(query_spectra),
+    FUN = function(k, ...) {
+      i <- query_ids[[k]]
+      l <- length(query_ids)
+      res <- .process_query_against_library(i, ...)
+      if (k %% 500L == 0) {
+        log_info("Processed %d / %d queries", k, l)
+      }
+      res
+    },
     query_spectra = query_spectra,
     query_precursors = query_precursors,
     query_ids = query_ids,

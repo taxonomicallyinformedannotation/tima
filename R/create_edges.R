@@ -114,6 +114,7 @@
 #'
 #' @include calculate_similarity.R
 #' @include constants.R
+#' @include predicates_utils.R
 #' @include validations_utils.R
 #'
 #' @param frags List of fragment spectra matrices
@@ -190,13 +191,17 @@ create_edges <- function(
 
   log_debug("Calculating %d pairwise similarities", n_comparisons)
 
-  # Disable progress bar in subprocess environments to prevent crashes
-  show_progress <- interactive() && !isTRUE(getOption("knitr.in.progress"))
-
-  edges <- purrr::map(
-    .progress = show_progress,
-    .x = indices,
-    .f = .process_query_spectrum,
+  edges <- lapply(
+    X = seq_along(indices),
+    FUN = function(k, ...) {
+      i <- indices[[k]]
+      l <- length(indices)
+      res <- .process_query_spectrum(i, ...)
+      if (k %% 500L == 0) {
+        log_info("Processed %d / %d queries", k, l)
+      }
+      res
+    },
     nspecs = nspecs,
     frags = frags,
     precs = precs,

@@ -169,7 +169,8 @@ test_that("harmonize_spectra validates column name parameters are strings or NUL
       col_sy = "synonyms",
       col_xl = "xlogp"
     ),
-    "must be single character strings or NULL"
+    "Column name parameter(s) must satisfy validation: col_ad",
+    fixed = TRUE
   )
 
   # Test vector of column names (should be single string)
@@ -196,7 +197,8 @@ test_that("harmonize_spectra validates column name parameters are strings or NUL
       col_sy = "synonyms",
       col_xl = "xlogp"
     ),
-    "must be single character strings or NULL"
+    "Column name parameter(s) must satisfy validation: col_ad",
+    fixed = TRUE
   )
 })
 
@@ -229,6 +231,7 @@ test_that("harmonize_spectra validates column parameters", {
       col_sy = "synonyms",
       col_xl = "xlogp"
     ),
-    "must be single character strings or NULL"
+    "Column name parameter(s) must satisfy validation: col_ad, col_ce, col_ci",
+    fixed = TRUE
   )
 })
