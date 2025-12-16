@@ -277,10 +277,12 @@ is_logging_initialized <- function() {
     return(FALSE)
   }
 
-  # Check if any appender is a file appender
+  # Helper to check if an appender is a file appender
+  .is_file_appender <- function(x) inherits(x, "AppenderFile")
+
   has_file <- any(vapply(
-    appenders,
-    function(x) inherits(x, "AppenderFile"),
+    X = appenders,
+    FUN = .is_file_appender,
     logical(1)
   ))
 

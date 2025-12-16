@@ -58,30 +58,35 @@
 
   # Extract scores and matches
   # Handle both list format (score/matches) and numeric format (entropy)
+
+  .extract_score <- function(x) {
+    if (is.list(x) && "score" %in% names(x)) {
+      x$score
+    } else if (is.numeric(x)) {
+      x
+    } else {
+      0.0
+    }
+  }
+
+  .extract_matches <- function(x) {
+    if (is.list(x) && "matches" %in% names(x)) {
+      x$matches
+    } else {
+      0L
+    }
+  }
+
   scores <- vapply(
-    results,
-    function(x) {
-      if (is.list(x) && "score" %in% names(x)) {
-        x$score
-      } else if (is.numeric(x)) {
-        x
-      } else {
-        0.0
-      }
-    },
+    X = results,
+    FUN = .extract_score,
     numeric(1L),
     USE.NAMES = FALSE
   )
 
   matches <- vapply(
-    results,
-    function(x) {
-      if (is.list(x) && "matches" %in% names(x)) {
-        x$matches
-      } else {
-        0L # No match count for entropy method
-      }
-    },
+    X = results,
+    FUN = .extract_matches,
     integer(1L),
     USE.NAMES = FALSE
   )
@@ -205,7 +210,14 @@ create_edges <- function(
   # Combine Results ----
 
   # Remove NULL entries and combine
-  edges <- edges[!vapply(edges, is.null, logical(1L), USE.NAMES = FALSE)]
+  edges <- edges[
+    !vapply(
+      X = edges,
+      FUN = is.null,
+      logical(1L),
+      USE.NAMES = FALSE
+    )
+  ]
 
   if (length(edges) > 0L) {
     result <- tidytable::bind_rows(edges)

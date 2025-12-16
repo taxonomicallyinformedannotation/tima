@@ -22,7 +22,13 @@ compute_weighted_sum <- function(..., weights) {
     )
   }
 
-  if (!all(vapply(values, is.numeric, logical(1L)))) {
+  if (
+    !all(vapply(
+      X = values,
+      FUN = is.numeric,
+      logical(1L)
+    ))
+  ) {
     stop("All value vectors must be numeric", call. = FALSE)
   }
 

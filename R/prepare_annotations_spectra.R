@@ -6,6 +6,7 @@
 #'     spectral matching result formats.
 #'
 #' @include get_params.R
+#' @include predicates_utils.R
 #' @include select_annotations_columns.R
 #'
 #' @param input Character string path to spectral matching results file
@@ -93,17 +94,7 @@ prepare_annotations_spectra <- function(
   )
 
   # Check all are single strings
-  is_valid_string <- sapply(str_files, function(x) {
-    is.character(x) && length(x) == 1L
-  })
-
-  if (!all(is_valid_string)) {
-    invalid_params <- names(str_files)[!is_valid_string]
-    stop(
-      "Parameter(s) must be single character strings: ",
-      paste(invalid_params, collapse = ", ")
-    )
-  }
+  validate_all_single_strings(str_files, "Structure file parameter(s)")
 
   # Check all files exist
   str_files_vec <- unlist(str_files)

@@ -97,9 +97,12 @@ sanitize_spectra <- function(
   }
 
   # Filter spectra containing NaN values (using vapply for type safety)
+  # Helper to check if spectrum data contains NaN
+  .has_nan_values <- function(x) any(is.nan(x))
+
   has_nan <- vapply(
-    spectra@backend@peaksData,
-    function(x) any(is.nan(x)),
+    X = spectra@backend@peaksData,
+    FUN = .has_nan_values,
     logical(1L),
     USE.NAMES = FALSE
   )
@@ -116,8 +119,8 @@ sanitize_spectra <- function(
 
   # Filter NULL spectra (workaround for edge cases)
   has_null <- vapply(
-    spectra@backend@peaksData,
-    is.null,
+    X = spectra@backend@peaksData,
+    FUN = is.null,
     logical(1L),
     USE.NAMES = FALSE
   )

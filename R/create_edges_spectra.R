@@ -182,8 +182,8 @@ create_edges_spectra <- function(
   # Calculate spectral entropy
   # log_trace("Calculating features' entropy")
   entropy <- vapply(
-    fragz,
-    msentropy::calculate_spectral_entropy,
+    X = fragz,
+    FUN = msentropy::calculate_spectral_entropy,
     FUN.VALUE = numeric(1),
     USE.NAMES = FALSE
   )

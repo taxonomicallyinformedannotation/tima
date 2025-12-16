@@ -13,28 +13,33 @@
   # Vectorized approach: calculate tolerances for all query peaks at once
   tolerances <- pmax(dalton, ppm * query_mz * 1E-6)
 
+  # Helper to check if a single query peak matches any library peak
+  .peak_has_match <- function(i) {
+    mz <- query_mz[i]
+    tol <- tolerances[i]
+    lower_bound <- mz - tol
+    upper_bound <- mz + tol
+
+    # Binary search for matching peaks
+    low_idx <- findInterval(lower_bound, lib_mz_sorted)
+    high_idx <- findInterval(
+      upper_bound,
+      lib_mz_sorted,
+      rightmost.closed = TRUE
+    )
+
+    # Check if any peaks fall within tolerance
+    as.integer(high_idx > low_idx)
+  }
+
   # Use findInterval for fast binary search
-  matched_count <- sum(vapply(
-    seq_along(query_mz),
-    function(i) {
-      mz <- query_mz[i]
-      tol <- tolerances[i]
-      lower_bound <- mz - tol
-      upper_bound <- mz + tol
-
-      # Binary search for matching peaks
-      low_idx <- findInterval(lower_bound, lib_mz_sorted)
-      high_idx <- findInterval(
-        upper_bound,
-        lib_mz_sorted,
-        rightmost.closed = TRUE
-      )
-
-      # Check if any peaks fall within tolerance
-      as.integer(high_idx > low_idx)
-    },
-    FUN.VALUE = integer(1)
-  ))
+  matched_count <- sum(
+    vapply(
+      X = seq_along(query_mz),
+      FUN = .peak_has_match,
+      FUN.VALUE = integer(1)
+    )
+  )
 
   return(matched_count)
 }
@@ -274,7 +279,7 @@ calculate_entropy_and_similarity <- function(
     threshold = threshold
   )
 
-  if (all(sapply(results, is.null))) {
+  if (all(sapply(X = results, FUN = is.null))) {
     tidytable::tidytable(
       feature_id = NA_integer_,
       precursorMz = NA_real_,
@@ -284,6 +289,6 @@ calculate_entropy_and_similarity <- function(
       candidate_count_similarity_peaks_matched = NA_integer_
     )
   } else {
-    tidytable::bind_rows(results[!sapply(results, is.null)])
+    tidytable::bind_rows(results[!sapply(X = results, FUN = is.null)])
   }
 }

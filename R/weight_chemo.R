@@ -162,7 +162,11 @@ weight_chemo <- function(
   )
 
   # Validate all scores
-  invalid_scores <- !vapply(chem_scores, .is_valid_score, logical(1L))
+  invalid_scores <- !vapply(
+    X = chem_scores,
+    FUN = .is_valid_score,
+    logical(1L)
+  )
   if (any(invalid_scores)) {
     invalid_names <- names(chem_scores)[invalid_scores]
     stop(

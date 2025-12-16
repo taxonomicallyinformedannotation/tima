@@ -461,8 +461,8 @@ clean_bio <- function(
     )
   )
 
-  # Calculate consistency for each level
-  lapply(levels, function(level) {
+  # Helper to calculate consistency for a single taxonomic level
+  .process_level_consistency <- function(level) {
     .calculate_consistency_per_level(
       df3,
       candidates = level$col,
@@ -471,5 +471,11 @@ clean_bio <- function(
       feature_val_name = level$val,
       minimal_consistency = minimal_consistency
     )
-  })
+  }
+
+  # Calculate consistency for each level
+  lapply(
+    X = levels,
+    FUN = .process_level_consistency
+  )
 }

@@ -217,14 +217,18 @@ read_mgf_opti <- function(
   spv_names <- names(spv)
 
   # First, unlist single-element columns
+  .is_single_element_column <- function(col) {
+    all(lengths(col) == 1L)
+  }
+
   is_single_element <- vapply(
-    res,
-    function(col) all(lengths(col) == 1L),
+    X = res,
+    FUN = .is_single_element_column,
     logical(1L)
   )
   res[is_single_element] <- lapply(
-    res[is_single_element],
-    unlist,
+    X = res[is_single_element],
+    FUN = unlist,
     use.names = FALSE
   )
 

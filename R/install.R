@@ -202,12 +202,15 @@ verify_package_installation <- function(package) {
   }
 
   # 3. Filter out invalid paths (empty, nonexistent, no DESCRIPTION)
+  # Helper to check if a path is valid for installation
+  .is_valid_install_path <- function(p) {
+    file.exists(p) && file.exists(file.path(p, "DESCRIPTION"))
+  }
+
   valid_paths <- pkg_paths[
     vapply(
-      pkg_paths,
-      function(p) {
-        file.exists(p) && file.exists(file.path(p, "DESCRIPTION"))
-      },
+      X = pkg_paths,
+      FUN = .is_valid_install_path,
       logical(1L)
     )
   ]

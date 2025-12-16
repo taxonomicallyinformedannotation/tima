@@ -123,6 +123,7 @@ Collate:
     'import_spectra.R'
     'get_spectra_ids.R'
     'create_edges_spectra.R'
+    'predicates_utils.R'
     'decorate_bio.R'
     'decorate_chemo.R'
     'logs_utils.R'

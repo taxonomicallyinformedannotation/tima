@@ -41,22 +41,7 @@ validate_sirius_inputs <- function(
     output_for = output_for
   )
 
-  are_valid_outputs <- vapply(
-    output_paths,
-    function(p) {
-      is.character(p) && length(p) == 1L
-    },
-    logical(1L)
-  )
-
-  if (!all(are_valid_outputs)) {
-    invalid <- names(output_paths)[!are_valid_outputs]
-    stop(
-      "Output path(s) must be single character strings: ",
-      paste(invalid, collapse = ", "),
-      call. = FALSE
-    )
-  }
+  validate_all_single_strings(output_paths, "Output path(s)")
 
   # Validate structure files exist
   validate_file_existence(
@@ -322,6 +307,7 @@ split_sirius_results <- function(table) {
 #' @include get_params.R
 #' @include harmonize_names_sirius.R
 #' @include pre_harmonize_names_sirius.R
+#' @include predicates_utils.R
 #' @include read_from_sirius_zip.R
 #' @include select_annotations_columns.R
 #' @include select_sirius_columns.R

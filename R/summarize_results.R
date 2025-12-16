@@ -249,7 +249,8 @@ summarize_results <- function(
   # Final processing: convert to character, trim, handle NAs
   # But preserve numeric types for feature-related columns that might be used in joins
   numeric_feature_cols <- colnames(df_final)[
-    grepl("^feature_", colnames(df_final)) & sapply(df_final, is.numeric)
+    grepl("^feature_", colnames(df_final)) &
+      sapply(X = df_final, FUN = is.numeric)
   ]
 
   df_processed <- df_final |>
