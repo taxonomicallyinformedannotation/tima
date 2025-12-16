@@ -259,14 +259,22 @@ calculate_entropy_and_similarity <- function(
     dalton
   )
 
+  # Pre-calculate length once for efficiency
+  n_queries <- length(query_ids)
+
+  # Progress counter for logging
+  progress_counter <- 0L
+
   results <- lapply(
     X = seq_along(query_spectra),
     FUN = function(k, ...) {
-      i <- query_ids[[k]]
-      l <- length(query_ids)
+      # Increment progress counter in parent environment
+      progress_counter <<- progress_counter + 1L
+
       res <- .process_query_against_library(k, ...)
-      if (k %% 500L == 0L) {
-        log_info("Processed %d / %d queries", k, l)
+
+      if (progress_counter %% 500L == 0L) {
+        log_info("Processed %d / %d queries", progress_counter, n_queries)
       }
       res
     },

@@ -43,10 +43,10 @@
   query_spectrum <- frags[[index]]
   query_precursor <- precs[[index]]
 
-  # Calculate similarities for all targets
-  results <- purrr::map(
-    .x = target_indices,
-    .f = .calculate_target_similarity,
+  # Calculate similarities for all targets - use base lapply for speed
+  results <- lapply(
+    X = target_indices,
+    FUN = .calculate_target_similarity,
     frags = frags,
     precs = precs,
     method = method,
@@ -191,14 +191,22 @@ create_edges <- function(
 
   log_debug("Calculating %d pairwise similarities", n_comparisons)
 
+  # Pre-calculate length once for efficiency
+  n_queries <- length(indices)
+
+  # Progress counter for logging
+  progress_counter <- 0L
+
   edges <- lapply(
-    X = seq_along(indices),
-    FUN = function(k, ...) {
-      i <- indices[[k]]
-      l <- length(indices)
+    X = indices,
+    FUN = function(i, ...) {
+      # Increment progress counter in parent environment
+      progress_counter <<- progress_counter + 1L
+
       res <- .process_query_spectrum(i, ...)
-      if (k %% 500L == 0) {
-        log_info("Processed %d / %d queries", k, l)
+
+      if (progress_counter %% 500L == 0L) {
+        log_info("Processed %d / %d queries", progress_counter, n_queries)
       }
       res
     },
