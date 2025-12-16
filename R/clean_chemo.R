@@ -140,7 +140,7 @@ validate_clean_chemo_inputs <- function(
     summarize = summarize
   )
 
-  is_valid_logical <- vapply(logical_params, is.logical, logical(1))
+  is_valid_logical <- vapply(X = logical_params, FUN = is.logical, logical(1))
   if (!all(is_valid_logical)) {
     invalid_params <- names(logical_params)[!is_valid_logical]
     stop(
@@ -170,14 +170,20 @@ validate_clean_chemo_inputs <- function(
     score_chemical_npc_class
   )
   if (
-    any(!vapply(weights, function(x) is.null(x) || is.numeric(x), logical(1)))
+    any(
+      !vapply(
+        X = weights,
+        FUN = function(x) is.null(x) || is.numeric(x),
+        logical(1)
+      )
+    )
   ) {
     stop(
       "taxonomy weight parameters must be numeric when provided",
       call. = FALSE
     )
   }
-  weights_num <- weights[!vapply(weights, is.null, logical(1))]
+  weights_num <- weights[!vapply(X = weights, FUN = is.null, logical(1))]
   if (length(weights_num) > 0) {
     if (any(weights_num < 0 | weights_num > 1)) {
       stop("taxonomy weights must be within [0,1]", call. = FALSE)

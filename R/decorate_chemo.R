@@ -186,8 +186,8 @@ decorate_chemo <- function(
   )
 
   cla_counts <- vapply(
-    cla_dataframes,
-    count_unique_structures,
+    X = cla_dataframes,
+    FUN = count_unique_structures,
     integer(1L),
     USE.NAMES = FALSE
   )
@@ -201,8 +201,8 @@ decorate_chemo <- function(
   )
 
   npc_counts <- vapply(
-    npc_dataframes,
-    count_unique_structures,
+    X = npc_dataframes,
+    FUN = count_unique_structures,
     integer(1L),
     USE.NAMES = FALSE
   )

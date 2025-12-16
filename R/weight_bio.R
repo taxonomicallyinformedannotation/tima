@@ -182,9 +182,11 @@ weight_bio <- function(
     biological = weight_biological
   )
 
-  is_valid_weight <- sapply(weights, function(w) {
-    is.numeric(w) && w >= 0 && w <= 1
-  })
+  is_valid_weight <- vapply(
+    X = weights,
+    FUN = function(w) is_numeric_in_range(w, 0, 1),
+    logical(1)
+  )
 
   if (!all(is_valid_weight)) {
     invalid_weights <- names(weights)[!is_valid_weight]
@@ -208,9 +210,11 @@ weight_bio <- function(
     variety = score_biological_variety
   )
 
-  is_valid_score <- sapply(bio_scores, function(s) {
-    is.numeric(s) && s >= 0 && s <= 1
-  })
+  is_valid_score <- vapply(
+    X = bio_scores,
+    FUN = function(s) is_numeric_in_range(s, 0, 1),
+    logical(1)
+  )
 
   if (!all(is_valid_score)) {
     invalid_scores <- names(bio_scores)[!is_valid_score]
@@ -445,9 +449,8 @@ weight_bio <- function(
   )
 
   # Calculate scores for all levels
-  supp_tables <- lapply(taxonomic_levels, function(tax_level) {
-    # log_trace("... %s", tax_level$level)
-
+  # Helper to process a single taxonomic level
+  .score_taxonomic_level <- function(tax_level) {
     df2 |>
       score_per_level_bio(
         candidates = tax_level$candidate,
@@ -455,9 +458,12 @@ weight_bio <- function(
         score = tax_level$score,
         score_name = paste0("score_biological_", tax_level$num)
       )
-  })
+  }
 
-  # log_trace("Keeping best biological score")
+  supp_tables <- lapply(
+    X = taxonomic_levels,
+    FUN = .score_taxonomic_level
+  )
 
   annot_table_wei_bio_init <- purrr::reduce(
     .x = supp_tables,

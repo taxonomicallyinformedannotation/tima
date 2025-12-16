@@ -258,23 +258,9 @@ harmonize_spectra <- function(
 #' Validate column mapping parameters
 #' @keywords internal
 validate_column_mappings <- function(col_params) {
-  # Check all parameters are single character strings or NULL
-  is_valid <- vapply(
-    col_params,
-    function(param) {
-      is.null(param) || (is.character(param) && length(param) == 1L)
-    },
-    logical(1)
+  validate_all_with_predicate(
+    x_list = col_params,
+    predicate_fn = is_null_or_single_string,
+    error_prefix = "Column name parameter(s)"
   )
-
-  if (!all(is_valid)) {
-    invalid_params <- names(col_params)[!is_valid]
-    stop(
-      "Column name parameter(s) must be single character strings or NULL: ",
-      paste(invalid_params, collapse = ", "),
-      call. = FALSE
-    )
-  }
-
-  invisible(TRUE)
 }

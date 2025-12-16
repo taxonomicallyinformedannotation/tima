@@ -5,6 +5,7 @@
 #'     on organism occurrence data. Validates required columns and handles
 #'     empty inputs gracefully. Internal logging helper for weight_annotations().
 #'
+#' @include predicates_utils.R
 #' @include validations_utils.R
 #'
 #' @param annot_table_wei_bio Data frame with biologically weighted annotations
@@ -135,7 +136,8 @@ decorate_bio <- function(
   # Helper Function ----
 
   # Count unique structures at a given score threshold
-  count_structures_at_level <- function(df, min_score) {
+  # Parameter order: score first (from vapply X), df second (from ... args)
+  count_structures_at_level <- function(min_score, df) {
     if (nrow(df) == 0L) {
       return(0L)
     }
@@ -164,15 +166,15 @@ decorate_bio <- function(
     biota = score_biological_biota
   )
 
-  # Calculate all counts
+  # Calculate all counts using extracted counter function
+  # No progress needed for small vector (10 elements)
   counts <- vapply(
-    levels,
-    function(score) count_structures_at_level(annot_table_wei_bio, score),
-    integer(1L),
-    USE.NAMES = FALSE
+    X = levels,
+    FUN = count_structures_at_level,
+    FUN.VALUE = integer(1L),
+    USE.NAMES = TRUE,
+    df = annot_table_wei_bio
   )
-
-  names(counts) <- names(levels)
 
   # Log Summary Statistics ----
 

@@ -33,22 +33,7 @@ validate_sop_merged_inputs <- function(
   )
 
   # Validate all output paths are single character strings
-  are_valid <- vapply(
-    output_paths,
-    function(p) {
-      is.character(p) && length(p) == 1L
-    },
-    logical(1L)
-  )
-
-  if (!all(are_valid)) {
-    invalid_params <- names(output_paths)[!are_valid]
-    stop(
-      "The following output parameters must be single character strings: ",
-      paste(invalid_params, collapse = ", "),
-      call. = FALSE
-    )
-  }
+  validate_all_single_strings(output_paths, "Output parameter(s)")
 
   # Validate taxonomic filter parameters if filtering
   if (isTRUE(filter)) {

@@ -41,7 +41,12 @@ create_components <- function(
   # Input Validation ----
 
   # File existence check
-  input_exists <- vapply(input, file.exists, logical(1L), USE.NAMES = FALSE)
+  input_exists <- vapply(
+    X = input,
+    FUN = file.exists,
+    logical(1L),
+    USE.NAMES = FALSE
+  )
 
   if (!all(input_exists)) {
     missing_files <- input[!input_exists]

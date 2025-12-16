@@ -79,12 +79,15 @@ round_reals <- function(
 #' Find columns matching any pattern
 #' @keywords internal
 find_matching_columns <- function(column_names, patterns) {
+  # Helper to find matches for a single pattern
+  .find_pattern_matches <- function(pattern) {
+    grep(pattern, column_names, fixed = TRUE, value = TRUE)
+  }
+
   # Vectorized: create regex pattern from all search patterns
   # This is faster than looping for many columns
   all_matches <- unlist(
-    lapply(patterns, function(pattern) {
-      grep(pattern, column_names, fixed = TRUE, value = TRUE)
-    }),
+    lapply(X = patterns, FUN = .find_pattern_matches),
     use.names = FALSE
   )
 
