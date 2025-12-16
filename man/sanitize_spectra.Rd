@@ -4,13 +4,14 @@
 \alias{sanitize_spectra}
 \title{Sanitize spectra}
 \usage{
-sanitize_spectra(spectra, cutoff = 0, dalton = 0.01, ppm = 10)
+sanitize_spectra(spectra, cutoff = NULL, dalton = 0.01, ppm = 10)
 }
 \arguments{
 \item{spectra}{Spectra object from the Spectra package}
 
-\item{cutoff}{Numeric absolute minimal intensity threshold (default: 0).
-Peaks below this intensity are removed.}
+\item{cutoff}{Numeric absolute minimal intensity threshold (default: NULL).
+Peaks below this intensity are removed. If NULL, a dynamic threshold
+based on each spectrum's intensity distribution will be used.}
 
 \item{dalton}{Numeric Dalton tolerance for peak matching (default: 0.01)}
 
