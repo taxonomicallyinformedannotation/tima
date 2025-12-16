@@ -45,7 +45,7 @@ ms:
     #' MS2 related parameters.
     ms2:
       #' Intensity threshold for MS2. FLOAT
-      intensity: 0.0
+      intensity: null
 
   #' Polarity used. Must be "pos" or "neg". STRING
   polarity: pos

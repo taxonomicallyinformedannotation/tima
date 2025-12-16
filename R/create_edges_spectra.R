@@ -84,8 +84,8 @@ create_edges_spectra <- function(
     stop("dalton must be a positive number, got: ", dalton)
   }
 
-  if (!is.numeric(qutoff) || qutoff < 0) {
-    stop("qutoff must be a non-negative number, got: ", qutoff)
+  if (!is.null(qutoff) && (!is.numeric(qutoff) || qutoff < 0)) {
+    stop("qutoff intensity must be non-negative or NULL, got: ", qutoff)
   }
 
   # Validate output path

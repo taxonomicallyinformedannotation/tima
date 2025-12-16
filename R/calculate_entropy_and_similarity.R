@@ -264,8 +264,8 @@ calculate_entropy_and_similarity <- function(
     FUN = function(k, ...) {
       i <- query_ids[[k]]
       l <- length(query_ids)
-      res <- .process_query_against_library(i, ...)
-      if (k %% 500L == 0) {
+      res <- .process_query_against_library(k, ...)
+      if (k %% 500L == 0L) {
         log_info("Processed %d / %d queries", k, l)
       }
       res
