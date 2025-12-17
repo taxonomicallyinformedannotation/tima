@@ -398,7 +398,7 @@ log_success <- function(msg, ...) {
 #' binned by 0.1 within \[0, 1\], including bins with zero counts. Output is
 #' formatted using capture.output to match other table-style logs.
 #'
-#' @param scores Numeric vector (or coercible) of scores expected in [0, 1].
+#' @param scores Numeric vector (or coercible) of scores expected in \[0, 1\].
 #'   Values outside are clamped to the range; NA/NaN/Inf are ignored.
 #' @param title Character scalar for the header line preceding the table log.
 #'
