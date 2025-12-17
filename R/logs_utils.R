@@ -388,3 +388,48 @@ log_success <- function(msg, ...) {
   lgr::lgr$info(msg)
   invisible(NULL)
 }
+
+#' @keywords internal
+#' @title Logging helpers
+#' @description Utilities for consistent logging output.
+#'
+#' @details
+#' log_similarity_distribution: logs the distribution of similarity scores
+#' binned by 0.1 within [0, 1], including bins with zero counts. Output is
+#' formatted using capture.output to match other table-style logs.
+#'
+#' @param scores Numeric vector (or coercible) of scores expected in [0, 1].
+#'   Values outside are clamped to the range; NA/NaN/Inf are ignored.
+#' @param title Character scalar for the header line preceding the table log.
+#'
+#' @return Invisibly returns NULL. Side-effects: logs via log_info.
+#'
+log_similarity_distribution <- function(scores, title) {
+  sc <- suppressWarnings(as.numeric(scores))
+  sc <- sc[is.finite(sc)]
+  if (length(sc) == 0L) {
+    return(invisible(NULL))
+  }
+  # Clamp to [0, 1]
+  sc <- pmin(pmax(sc, 0), 1)
+  bins <- cut(
+    x = sc,
+    breaks = seq(0, 1, by = 0.1),
+    include.lowest = TRUE,
+    right = TRUE
+  )
+  # Ensure all bins are present, including zeros
+  lvl <- levels(bins)
+  tab <- table(bins)
+  counts <- as.integer(tab[lvl])
+  dist <- data.frame(bin = lvl, N = counts, stringsAsFactors = FALSE)
+  log_info(title)
+  log_info(
+    "\n%s",
+    paste(
+      utils::capture.output(print.data.frame(x = dist, row.names = FALSE)),
+      collapse = "\n"
+    )
+  )
+  invisible(NULL)
+}
