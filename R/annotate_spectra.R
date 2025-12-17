@@ -33,6 +33,7 @@
 #'
 #' @include adducts_utils.R
 #' @include columns_utils.R
+#' @include logs_utils.R
 #' @include validations_utils.R
 #'
 #' @param input Character vector or list of query spectral file paths (.mgf).
@@ -242,6 +243,16 @@ annotate_spectra <- function(
           threshold
         )
       )
+    )
+  }
+
+  # Log distribution of annotation scores by 0.1 bins before export (0-0.1, ..., 0.9-1.0)
+  if (
+    nrow(df_final) > 0L && "candidate_score_similarity" %in% names(df_final)
+  ) {
+    log_similarity_distribution(
+      scores = df_final$candidate_score_similarity,
+      title = "Here is the distribution of annotation similarity scores (0.1 bins):"
     )
   }
 

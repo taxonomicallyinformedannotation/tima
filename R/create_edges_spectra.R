@@ -8,6 +8,7 @@
 #' @include get_params.R
 #' @include get_spectra_ids.R
 #' @include import_spectra.R
+#' @include logging_utils.R
 #'
 #' @param input Character string path or list of paths to query MGF file(s) containing spectra
 #' @param output Character string path for output edges file
@@ -241,6 +242,14 @@ create_edges_spectra <- function(
         )
       )
     )
+
+  # Log distribution of edge scores by 0.1 bins before export (0-0.1, ..., 0.9-1.0)
+  if (nrow(edges) > 0L && "candidate_score_similarity" %in% names(edges)) {
+    log_similarity_distribution(
+      scores = edges$candidate_score_similarity,
+      title = "Here is the distribution of edge similarity scores (0.1 bins):"
+    )
+  }
 
   edges <- edges |>
     tidytable::filter(candidate_score_similarity >= threshold)
