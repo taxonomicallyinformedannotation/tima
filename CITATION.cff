@@ -630,7 +630,7 @@ references:
   title: yaml
   abstract: 'yaml: Methods to Convert R Data to YAML and Back'
   notes: Imports
-  url: https://github.com/vubiostat/r-yaml/
+  url: https://yaml.r-lib.org
   repository: https://CRAN.R-project.org/package=yaml
   authors:
   - family-names: Stephens
