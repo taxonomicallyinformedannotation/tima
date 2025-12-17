@@ -7,7 +7,7 @@
 log_similarity_distribution(scores, title)
 }
 \arguments{
-\item{scores}{Numeric vector (or coercible) of scores expected in \link{0, 1}.
+\item{scores}{Numeric vector (or coercible) of scores expected in [0, 1].
 Values outside are clamped to the range; NA/NaN/Inf are ignored.}
 
 \item{title}{Character scalar for the header line preceding the table log.}
