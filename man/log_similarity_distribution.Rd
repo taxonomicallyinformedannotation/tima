@@ -20,7 +20,7 @@ Utilities for consistent logging output.
 }
 \details{
 log_similarity_distribution: logs the distribution of similarity scores
-binned by 0.1 within \link{0, 1}, including bins with zero counts. Output is
+binned by 0.1 within [0, 1], including bins with zero counts. Output is
 formatted using capture.output to match other table-style logs.
 }
 \keyword{internal}
