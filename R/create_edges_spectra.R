@@ -8,7 +8,7 @@
 #' @include get_params.R
 #' @include get_spectra_ids.R
 #' @include import_spectra.R
-#' @include logging_utils.R
+#' @include logs_utils.R
 #'
 #' @param input Character string path or list of paths to query MGF file(s) containing spectra
 #' @param output Character string path for output edges file
