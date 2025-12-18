@@ -433,3 +433,58 @@ log_similarity_distribution <- function(scores, title) {
   )
   invisible(NULL)
 }
+
+#' @keywords internal
+#' @title Accumulate similarity score bins
+#' @description Build or update 0.1-binned counts for scores in \[0,1\].
+#' @param scores Numeric vector of scores (NA/Inf ignored; values clamped to \[0,1\]).
+#' @return Named integer vector of counts for each bin label (all bins present).
+accumulate_similarity_bins <- function(scores) {
+  breaks <- seq(0, 1, by = 0.1)
+  sc <- suppressWarnings(as.numeric(scores))
+  sc <- sc[is.finite(sc)]
+  if (length(sc) == 0L) {
+    tmp <- cut(
+      breaks[-length(breaks)],
+      breaks = breaks,
+      include.lowest = TRUE,
+      right = TRUE
+    )
+    out <- integer(length(levels(tmp)))
+    names(out) <- levels(tmp)
+    return(out)
+  }
+  sc <- pmin(pmax(sc, 0), 1)
+  bins <- cut(x = sc, breaks = breaks, include.lowest = TRUE, right = TRUE)
+  lvl <- levels(bins)
+  tab <- table(bins)
+  counts <- as.integer(tab[lvl])
+  names(counts) <- lvl
+  counts
+}
+
+#' @keywords internal
+#' @title Log similarity distribution from counts
+#' @description Log a pre-accumulated distribution (named counts) in the standard table style.
+#' @param counts Named integer vector whose names are bin labels (e.g., "(0,0.1\]", "(0.1,0.2\]", ...).
+#' @param title Header line to log before the table.
+#' @return Invisibly returns NULL.
+log_similarity_distribution_counts <- function(counts, title) {
+  if (is.null(counts) || length(counts) == 0L) {
+    return(invisible(NULL))
+  }
+  dist <- data.frame(
+    bin = names(counts),
+    N = as.integer(counts),
+    stringsAsFactors = FALSE
+  )
+  log_info(title)
+  log_info(
+    "\n%s",
+    paste(
+      utils::capture.output(print.data.frame(x = dist, row.names = FALSE)),
+      collapse = "\n"
+    )
+  )
+  invisible(NULL)
+}

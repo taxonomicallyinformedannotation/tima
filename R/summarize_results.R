@@ -321,5 +321,27 @@ summarize_results <- function(
 
   rm(df_processed)
 
+  # Log percentage of annotated features based on final results
+  total_features <- results |>
+    tidytable::distinct(feature_id) |>
+    nrow()
+  annotated_features <- results |>
+    tidytable::filter(
+      !is.na(candidate_structure_inchikey_connectivity_layer)
+    ) |>
+    tidytable::distinct(feature_id) |>
+    nrow()
+  pct_annotated <- if (total_features > 0L) {
+    100 * annotated_features / total_features
+  } else {
+    0
+  }
+  log_info(
+    "Annotated features: %d/%d (%.1f%%)",
+    annotated_features,
+    total_features,
+    pct_annotated
+  )
+
   return(results)
 }

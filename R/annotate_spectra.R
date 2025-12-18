@@ -533,7 +533,6 @@ finalize_results <- function(df_sim, meta, threshold) {
         )
       )
     ) |>
-    tidytable::filter(candidate_score_similarity >= threshold) |>
     tidytable::arrange(tidytable::desc(x = candidate_score_similarity)) |>
     tidytable::distinct(
       feature_id,
