@@ -32,7 +32,7 @@ load_yaml_files <- function() {
   default_path <- get_path(paths$params$default$path)
   user_path <- get_path(paths$params$user$path)
 
-  # Get file lists once for efficiency (cached for reuse)
+  # Get file lists once for efficiency
   default_files <- list.files(
     path = default_path,
     pattern = "\\.yaml$",

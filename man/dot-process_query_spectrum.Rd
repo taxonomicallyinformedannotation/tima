@@ -13,7 +13,8 @@
   ms2_tolerance,
   ppm_tolerance,
   threshold,
-  matched_peaks
+  matched_peaks,
+  score_bins_acc
 )
 }
 \description{

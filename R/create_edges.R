@@ -37,7 +37,8 @@
   ms2_tolerance,
   ppm_tolerance,
   threshold,
-  matched_peaks
+  matched_peaks,
+  score_bins_acc
 ) {
   target_indices <- (index + 1L):nspecs
   query_spectrum <- frags[[index]]
@@ -91,18 +92,24 @@
     USE.NAMES = FALSE
   )
 
-  # Filter by thresholds
+  # Accumulate raw score distribution prior to filtering (0.1 bins)
+  score_bins_acc <- score_bins_acc + accumulate_similarity_bins(scores)
+
+  # Filter by thresholds (single filtering point)
   valid_indices <- which(scores >= threshold & matches >= matched_peaks)
 
   if (length(valid_indices) > 0L) {
-    data.frame(
-      feature_id = index,
-      target_id = target_indices[valid_indices],
-      score = scores[valid_indices],
-      matched_peaks = matches[valid_indices]
+    list(
+      df = data.frame(
+        feature_id = index,
+        target_id = target_indices[valid_indices],
+        score = scores[valid_indices],
+        matched_peaks = matches[valid_indices]
+      ),
+      bins = score_bins_acc
     )
   } else {
-    NULL
+    list(df = NULL, bins = score_bins_acc)
   }
 }
 
@@ -114,6 +121,7 @@
 #'
 #' @include calculate_similarity.R
 #' @include constants.R
+#' @include logs_utils.R
 #' @include predicates_utils.R
 #' @include validations_utils.R
 #'
@@ -197,18 +205,24 @@ create_edges <- function(
   # Progress counter for logging
   progress_counter <- 0L
 
-  edges <- lapply(
+  # Initialize score bins accumulator (all-zero vector with labels)
+  score_bins_acc <- accumulate_similarity_bins(numeric(0))
+
+  lst <- lapply(
     X = indices,
     FUN = function(i, ...) {
       # Increment progress counter in parent environment
       progress_counter <<- progress_counter + 1L
 
-      res <- .process_query_spectrum(i, ...)
+      res <- .process_query_spectrum(i, ..., score_bins_acc = score_bins_acc)
+
+      # Update accumulator with returned bins
+      score_bins_acc <<- res$bins
 
       if (progress_counter %% 500L == 0L) {
         log_info("Processed %d / %d queries", progress_counter, n_queries)
       }
-      res
+      res$df
     },
     nspecs = nspecs,
     frags = frags,
@@ -223,14 +237,21 @@ create_edges <- function(
   # Combine Results ----
 
   # Remove NULL entries and combine
-  edges <- edges[
+  edges <- lst[
     !vapply(
-      X = edges,
+      X = lst,
       FUN = is.null,
       logical(1L),
       USE.NAMES = FALSE
     )
   ]
+
+  # Log the raw similarity distribution before threshold filtering (accumulated)
+  # Note: distribution is for all pairwise comparisons evaluated
+  log_similarity_distribution_counts(
+    counts = score_bins_acc,
+    title = "Here is the distribution of edge similarity scores (0.1 bins) BEFORE filtering:"
+  )
 
   if (length(edges) > 0L) {
     result <- tidytable::bind_rows(edges)
