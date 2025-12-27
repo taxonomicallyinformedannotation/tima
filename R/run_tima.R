@@ -216,6 +216,13 @@ run_tima <- function(
   # Initialize ----
   start_time <- Sys.time()
 
+  # Start operation logging
+  ctx <- log_operation(
+    "run_tima",
+    target_pattern = target_pattern,
+    log_level = log_level
+  )
+
   # Setup logger with specified threshold
   setup_logger(filename = log_file, threshold = log_threshold)
 
@@ -252,23 +259,14 @@ run_tima <- function(
   execute_targets_pipeline(target_pattern = target_pattern)
 
   # Finalize ----
-  end_time <- Sys.time()
-  elapsed_time <- end_time - start_time
-  elapsed_formatted <- format(
-    round(elapsed_time, digits = 2),
-    units = "auto"
-  )
+  log_complete(ctx)
 
   log_info("=" |> rep(60) |> paste(collapse = ""))
-  log_success(
-    "Complete TIMA workflow finished successfully in %s",
-    elapsed_formatted
-  )
-  log_info("End time: %s", format(end_time, '%Y-%m-%d %H:%M:%S'))
+  log_success("Complete TIMA workflow finished successfully")
   log_info("=" |> rep(60) |> paste(collapse = ""))
 
   # Archive Logs ----
-  archive_log_file(log_file = log_file, timestamp = end_time)
+  archive_log_file(log_file = log_file, timestamp = Sys.time())
 
   invisible(NULL)
 }

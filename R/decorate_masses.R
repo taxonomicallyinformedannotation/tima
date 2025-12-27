@@ -19,6 +19,11 @@
 #'   decorate_masses()
 #' }
 decorate_masses <- function(annotation_table_ms1) {
+  ctx <- log_operation(
+    "decorate_masses",
+    n_annotations = nrow(annotation_table_ms1)
+  )
+
   # Input Validation ----
   validate_dataframe(
     annotation_table_ms1,
@@ -59,6 +64,12 @@ decorate_masses <- function(annotation_table_ms1) {
     "MS1 annotations: %d unique structures across %d features",
     n_unique_structures,
     n_unique_features
+  )
+
+  log_complete(
+    ctx,
+    n_structures = n_unique_structures,
+    n_features = n_unique_features
   )
 
   annotation_table_ms1

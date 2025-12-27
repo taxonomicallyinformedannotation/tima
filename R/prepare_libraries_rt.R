@@ -9,6 +9,7 @@
 #' @include get_params.R
 #' @include import_spectra.R
 #' @include process_smiles.R
+#' @include safe_fread.R
 #'
 #' @param mgf_exp Character vector of paths to MGF files with experimental RT
 #' @param mgf_is Character vector of paths to MGF files with in silico predicted RT
@@ -151,7 +152,13 @@ prepare_libraries_rt <- function(
   rts_from_tab <- function(tab) {
     # log_trace("Importing file")
     tab |>
-      purrr::map(.f = tidytable::fread) |>
+      purrr::map2(
+        .y = seq_along(tab),
+        .f = ~ safe_fread(
+          file = .x,
+          file_type = paste0("RT library ", .y)
+        )
+      ) |>
       tidytable::bind_rows() |>
       tidytable::select(
         tidyselect::any_of(

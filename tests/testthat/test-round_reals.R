@@ -50,7 +50,7 @@ test_that("round_reals rounds only specified columns", {
 test_that("round_reals requires data frame input", {
   expect_error(
     round_reals("not_a_df"),
-    "must be a data frame"
+    "Expected data frame"
   )
 })
 

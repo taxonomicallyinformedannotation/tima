@@ -21,6 +21,7 @@ stage_weight_annotations_fixtures <- function(
   taxa_file <- file.path(root, "taxa.tsv")
   canopus_file <- file.path(root, "canopus.tsv")
   formula_file <- file.path(root, "formula.tsv")
+  org_tax_file <- file.path(root, "taxonomy_ott.tsv")
   output_file <- file.path(root, "weighted.tsv")
 
   copy_fixture_to("annotations_weighted.csv", ann_file)
@@ -28,8 +29,9 @@ stage_weight_annotations_fixtures <- function(
   copy_fixture_to("components_weighted.csv", comp_file)
   copy_fixture_to("edges_weighted.csv", edges_file)
   copy_fixture_to("taxa_weighted.csv", taxa_file)
+  copy_fixture_to("organism_taxonomy_gentiana.csv", org_tax_file)
 
-  # Create empty canopus and formula files (required but can be empty)
+  # Create empty canopus, formula files (required but can be empty)
   writeLines("feature_id", canopus_file)
   writeLines("feature_id", formula_file)
 
@@ -42,6 +44,7 @@ stage_weight_annotations_fixtures <- function(
     taxa = taxa_file,
     canopus = canopus_file,
     formula = formula_file,
+    org_tax_ott = org_tax_file,
     output = output_file
   )
 }
@@ -82,6 +85,7 @@ test_that("weight_annotations() validates weight sum", {
       taxa = fixtures$taxa,
       canopus = fixtures$canopus,
       formula = fixtures$formula,
+      org_tax_ott = fixtures$org_tax_ott,
       output = fixtures$output,
       weight_spectral = 0.5,
       weight_chemical = 0.5,
@@ -106,6 +110,7 @@ test_that("weight_annotations() validates minimal_ms1_condition", {
       taxa = fixtures$taxa,
       canopus = fixtures$canopus,
       formula = fixtures$formula,
+      org_tax_ott = fixtures$org_tax_ott,
       output = fixtures$output,
       weight_spectral = 0.5,
       weight_chemical = 0.3,
@@ -131,6 +136,7 @@ test_that("weight_annotations() rejects negative weights", {
       taxa = fixtures$taxa,
       canopus = fixtures$canopus,
       formula = fixtures$formula,
+      org_tax_ott = fixtures$org_tax_ott,
       output = fixtures$output,
       weight_spectral = -0.1,
       weight_chemical = 0.6,
@@ -155,6 +161,7 @@ test_that("weight_annotations() rejects invalid logical parameters", {
       taxa = fixtures$taxa,
       canopus = fixtures$canopus,
       formula = fixtures$formula,
+      org_tax_ott = fixtures$org_tax_ott,
       output = fixtures$output,
       weight_spectral = 0.5,
       weight_chemical = 0.3,
@@ -180,6 +187,7 @@ test_that("weight_annotations() rejects invalid candidate counts", {
       taxa = fixtures$taxa,
       canopus = fixtures$canopus,
       formula = fixtures$formula,
+      org_tax_ott = fixtures$org_tax_ott,
       output = fixtures$output,
       weight_spectral = 0.5,
       weight_chemical = 0.3,
@@ -226,6 +234,7 @@ test_that("weight_annotations() runs successfully with minimal inputs", {
     taxa = fixtures$taxa,
     canopus = fixtures$canopus,
     formula = fixtures$formula,
+    org_tax_ott = fixtures$org_tax_ott,
     output = fixtures$output,
     candidates_neighbors = 3L,
     candidates_final = 1L,
@@ -303,6 +312,7 @@ test_that("weight_annotations() processes MS1-only annotations", {
     taxa = fixtures$taxa,
     canopus = fixtures$canopus,
     formula = fixtures$formula,
+    org_tax_ott = fixtures$org_tax_ott,
     output = fixtures$output,
     candidates_neighbors = 3L,
     candidates_final = 1L,
@@ -379,6 +389,7 @@ test_that("weight_annotations() handles different weight combinations", {
     taxa = fixtures$taxa,
     canopus = fixtures$canopus,
     formula = fixtures$formula,
+    org_tax_ott = fixtures$org_tax_ott,
     output = fixtures$output,
     candidates_neighbors = 3L,
     candidates_final = 1L,
@@ -454,6 +465,7 @@ test_that("weight_annotations() handles boolean flags", {
     taxa = fixtures$taxa,
     canopus = fixtures$canopus,
     formula = fixtures$formula,
+    org_tax_ott = fixtures$org_tax_ott,
     output = fixtures$output,
     candidates_neighbors = 3L,
     candidates_final = 1L,

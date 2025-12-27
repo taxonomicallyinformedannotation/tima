@@ -8,12 +8,14 @@ test_that("split_tables_sop validates data frame input", {
   # Non-data frame should error
   expect_error(
     split_tables_sop(table = "not a dataframe", cache = NULL),
-    "data frame or tibble"
+    "Fix: Ensure input is a valid data frame",
+    fixed = TRUE
   )
 
   expect_error(
     split_tables_sop(table = list(a = 1), cache = NULL),
-    "data frame or tibble"
+    "Fix: Ensure input is a valid data frame",
+    fixed = TRUE
   )
 })
 

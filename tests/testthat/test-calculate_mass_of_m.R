@@ -117,7 +117,8 @@ test_that("calculate_mass_of_m requires adduct_string parameter", {
 test_that("calculate_mass_of_m rejects negative m/z", {
   expect_error(
     calculate_mass_of_m(mz = -100, adduct_string = "[M+H]+"),
-    "mz must be between 0 and Inf, got: -100"
+    "Fix: Use a value between 0 and Inf",
+    fixed = TRUE
   )
 })
 
@@ -131,7 +132,7 @@ test_that("calculate_mass_of_m rejects NA m/z", {
 test_that("calculate_mass_of_m rejects NA m/z", {
   expect_error(
     calculate_mass_of_m(mz = NA, adduct_string = "[M+H]+"),
-    "mz must be a single numeric value, got: logical"
+    "Invalid type for mz"
   )
 })
 
@@ -152,7 +153,7 @@ test_that("calculate_mass_of_m rejects non-numeric m/z", {
 test_that("calculate_mass_of_m rejects multiple m/z values", {
   expect_error(
     calculate_mass_of_m(mz = c(100, 200), adduct_string = "[M+H]+"),
-    "mz must be a single numeric value, got: vector of length 2"
+    "Invalid type for mz"
   )
 })
 
@@ -209,7 +210,7 @@ test_that("calculate_mass_of_m accepts custom electron mass", {
 test_that("calculate_mass_of_m rejects negative electron mass", {
   expect_error(
     calculate_mass_of_m(mz = 100, adduct_string = "[M+H]+", electron_mass = -1),
-    "electron_mass must be between 0 and 0.001, got: -1"
+    "electron_mass out of valid range"
   )
 })
 
@@ -440,7 +441,7 @@ test_that("calculate_mz_from_mass requires adduct_string parameter", {
 test_that("calculate_mz_from_mass rejects negative mass", {
   expect_error(
     calculate_mz_from_mass(neutral_mass = -100, adduct_string = "[M+H]+"),
-    "must be between 0 and Inf"
+    "neutral_mass out of valid range"
   )
 })
 

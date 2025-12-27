@@ -41,6 +41,8 @@ process_smiles <- function(
   smiles_colname = "structure_smiles_initial",
   cache = NULL
 ) {
+  ctx <- log_operation("process_smiles", n_structures = nrow(df))
+
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
   validate_character(
@@ -124,7 +126,10 @@ process_smiles <- function(
   )
 
   # Read processed results
-  table_processed_2 <- tidytable::fread(output_csv_file) |>
+  table_processed_2 <- safe_fread(
+    file = output_csv_file,
+    file_type = "RDKit processed SMILES"
+  ) |>
     tidytable::rename(
       !!as.name(smiles_colname) := "structure_smiles_initial"
     )
@@ -148,6 +153,8 @@ process_smiles <- function(
         to = 14L
       )
     )
+
+  log_complete(ctx, n_processed = nrow(table_final))
 
   return(table_final)
 }
@@ -193,7 +200,10 @@ load_smiles_cache <- function(cache, smiles_colname) {
 
   tryCatch(
     {
-      cached <- tidytable::fread(cache)
+      cached <- safe_fread(
+        file = cache,
+        file_type = "SMILES cache"
+      )
       log_debug("Loaded %d cached SMILES", nrow(cached))
       cached
     },

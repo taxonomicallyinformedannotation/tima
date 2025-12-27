@@ -79,7 +79,8 @@ test_that("read_from_sirius_zip validates sirius_zip parameter", {
 
   expect_error(
     read_from_sirius_zip(sirius_zip = 123, file = "test"),
-    "sirius_zip must be a single character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   expect_error(
@@ -87,12 +88,14 @@ test_that("read_from_sirius_zip validates sirius_zip parameter", {
       sirius_zip = c("file1.zip", "file2.zip"),
       file = "test"
     ),
-    "sirius_zip must be a single character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   expect_error(
     read_from_sirius_zip(sirius_zip = NULL, file = "test"),
-    "Provide a non-NULL character string."
+    "Fix: Provide a non-NULL character string",
+    fixed = TRUE
   )
 })
 
@@ -113,12 +116,14 @@ test_that("read_from_sirius_zip validates file pattern parameter", {
 
   expect_error(
     read_from_sirius_zip(sirius_zip = test_zip$zip_file, file = 123),
-    "Ensure the parameter is a length-1 character value."
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   expect_error(
     read_from_sirius_zip(sirius_zip = test_zip$zip_file, file = c("a", "b")),
-    "Ensure the parameter is a length-1 character value."
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 })
 

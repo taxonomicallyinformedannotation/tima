@@ -33,6 +33,12 @@ clean_bio <- function(
   edges_table,
   minimal_consistency
 ) {
+  ctx <- log_operation(
+    "clean_bio",
+    n_annotations = nrow(annot_table_wei_bio),
+    minimal_consistency = minimal_consistency
+  )
+
   # Input Validation (using centralized validators) ----
 
   validate_dataframe(
@@ -214,6 +220,8 @@ clean_bio <- function(
     df1,
     df1b
   )
+
+  log_complete(ctx, n_cleaned = nrow(annot_table_wei_bio_clean))
 
   return(annot_table_wei_bio_clean)
 }

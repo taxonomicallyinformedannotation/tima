@@ -91,7 +91,8 @@ test_that("summarize_results validates input types", {
       remove_ties = FALSE,
       summarize = FALSE
     ),
-    "df must be a data frame"
+    "Fix: Ensure input is a valid data frame",
+    fixed = TRUE
   )
 
   # features_table must be data frame
@@ -105,7 +106,8 @@ test_that("summarize_results validates input types", {
       remove_ties = FALSE,
       summarize = FALSE
     ),
-    "features_table must be a data frame"
+    "Fix: Ensure input is a valid data frame",
+    fixed = TRUE
   )
 
   # components_table must be data frame
@@ -119,7 +121,8 @@ test_that("summarize_results validates input types", {
       remove_ties = FALSE,
       summarize = FALSE
     ),
-    "components_table must be a data frame"
+    "Fix: Ensure input is a valid data frame",
+    fixed = TRUE
   )
 
   # remove_ties must be logical

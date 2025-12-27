@@ -2,11 +2,11 @@
 % Please edit documentation in R/get_file.R
 \name{download_with_error_handling}
 \alias{download_with_error_handling}
-\title{Download file with error handling}
+\title{Download file with error handling and retry}
 \usage{
 download_with_error_handling(url, export)
 }
 \description{
-Download file with error handling
+Download file with error handling and retry
 }
 \keyword{internal}

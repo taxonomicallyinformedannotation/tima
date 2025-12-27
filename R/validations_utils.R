@@ -1,3 +1,442 @@
+#' Validation Utilities
+#'
+#' @description Functions for validating inputs to TIMA functions
+#'
+#' @include errors_utils.R
+#' @keywords internal
+#' @name validation_utils
+NULL
+
+# Core Validation Functions ----
+
+#' Choice validation with fuzzy matching
+#'
+#' @description Validates that a value is one of allowed choices, with
+#'     intelligent suggestions for typos
+#'
+#' @param value Value to validate
+#' @param valid_values Character vector of allowed values
+#' @param param_name Parameter name for error messages
+#' @param context Optional context (e.g., "Found in: params$annotate_masses$ms_mode")
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' validate_choice("positive", c("pos", "neg"), "ms_mode")
+#' # Error shows: Did you mean 'pos'?
+#' }
+validate_choice <- function(
+  value,
+  valid_values,
+  param_name = "value",
+  context = NULL
+) {
+  # Type checking
+  if (!is.character(value) || length(value) != 1L) {
+    msg <- format_error(
+      problem = paste0("Invalid type for ", param_name),
+      expected = "single character string",
+      received = paste0(class(value)[1L], " of length ", length(value)),
+      location = context,
+      fix = "Provide a single character value"
+    )
+    stop(msg, call. = FALSE)
+  }
+
+  # Value checking
+  if (!value %in% valid_values) {
+    suggestion <- .fuzzy_match(value, valid_values)
+
+    msg <- format_error(
+      problem = paste0("Invalid ", param_name, ": '", value, "'"),
+      expected = paste0(
+        "one of: ",
+        paste(paste0("'", valid_values, "'"), collapse = ", ")
+      ),
+      location = context,
+      suggestion = if (!is.null(suggestion)) {
+        paste0("Did you mean '", suggestion, "'?")
+      } else {
+        NULL
+      },
+      fix = paste0("Choose one of: ", paste(valid_values, collapse = ", "))
+    )
+    stop(msg, call. = FALSE)
+  }
+
+  invisible(TRUE)
+}
+
+#' File existence validation
+#'
+#' @description Validates file exists with helpful suggestions for similar files
+#'
+#' @param path File path to validate
+#' @param file_type Type description (e.g., "MGF file", "parameter file")
+#' @param param_name Parameter name for error messages
+#' @param required Whether file is required (vs optional)
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#' @keywords internal
+validate_file_exists <- function(
+  path,
+  file_type = "file",
+  param_name = NULL,
+  required = TRUE
+) {
+  if (is.null(path)) {
+    if (required) {
+      msg <- format_error(
+        problem = paste0(stringr::str_to_title(file_type), " path is NULL"),
+        location = param_name,
+        fix = "Provide a valid file path"
+      )
+      stop(msg, call. = FALSE)
+    }
+    return(invisible(TRUE))
+  }
+
+  if (!is.character(path) || length(path) != 1L) {
+    msg <- format_error(
+      problem = "Invalid file path type",
+      expected = "single character string",
+      received = class(path)[1L],
+      location = param_name,
+      fix = "Provide a character string file path"
+    )
+    stop(msg, call. = FALSE)
+  }
+
+  if (!file.exists(path)) {
+    dir_path <- dirname(path)
+    dir_exists <- dir.exists(dir_path)
+
+    # Look for similar files
+    similar <- character(0)
+    available <- character(0)
+    if (dir_exists) {
+      available_files <- list.files(dir_path, full.names = FALSE)
+      if (length(available_files) > 0) {
+        available <- head(available_files, 5)
+        distances <- adist(basename(path), available_files)
+        similar_idx <- which(distances <= 3)
+        if (length(similar_idx) > 0) {
+          similar <- available_files[similar_idx][1:min(3, length(similar_idx))]
+        }
+      }
+    }
+
+    suggestion_text <- NULL
+    if (length(similar) > 0) {
+      suggestion_text <- paste0(
+        "Similar files in directory:\n  ",
+        paste0("- ", similar, collapse = "\n  ")
+      )
+    } else if (length(available) > 0) {
+      suggestion_text <- paste0(
+        "Available files in directory:\n  ",
+        paste0("- ", available, collapse = "\n  ")
+      )
+    }
+
+    msg <- format_error(
+      problem = paste0(stringr::str_to_title(file_type), " not found"),
+      received = path,
+      location = if (!dir_exists) {
+        paste0("Directory does not exist: ", dir_path)
+      } else {
+        "Directory exists, but file is missing"
+      },
+      suggestion = suggestion_text,
+      fix = paste0(
+        "1. Verify the file path is correct\n",
+        "2. Check file permissions\n",
+        "3. Ensure the file exists at the specified location"
+      )
+    )
+    stop(msg, call. = FALSE)
+  }
+
+  invisible(TRUE)
+}
+
+#' DataFrame structure validation
+#'
+#' @description Validates dataframe with helpful column name suggestions
+#'
+#' @param df Data frame to validate
+#' @param required_cols Character vector of required column names
+#' @param optional_cols Character vector of optional column names
+#' @param df_name Name of the data frame for error messages
+#' @param min_rows Minimum number of rows required
+#'
+#' @return Invisible TRUE if valid, stops with error otherwise
+#' @keywords internal
+validate_dataframe_structure <- function(
+  df,
+  required_cols = NULL,
+  optional_cols = NULL,
+  df_name = "data frame",
+  min_rows = 0L
+) {
+  # Type check
+  if (!is.data.frame(df)) {
+    msg <- format_error(
+      problem = paste0("Expected data frame for ", df_name),
+      expected = "data.frame or tibble",
+      received = paste(class(df), collapse = ", "),
+      fix = "Ensure input is a valid data frame"
+    )
+    stop(msg, call. = FALSE)
+  }
+
+  # Row count check
+  if (nrow(df) < min_rows) {
+    msg <- format_error(
+      problem = paste0(df_name, " has insufficient rows"),
+      expected = paste0("at least ", min_rows, " row(s)"),
+      received = paste0(nrow(df), " row(s)"),
+      fix = "Provide a data frame with more rows or adjust min_rows parameter"
+    )
+    stop(msg, call. = FALSE)
+  }
+
+  # Column validation
+  if (!is.null(required_cols)) {
+    missing_required <- setdiff(required_cols, names(df))
+
+    if (length(missing_required) > 0) {
+      # Try to match missing columns with suggestions
+      suggestions <- lapply(missing_required, function(col) {
+        match <- .fuzzy_match(col, names(df))
+        if (!is.null(match)) {
+          list(missing = col, suggestion = match)
+        } else {
+          NULL
+        }
+      })
+      suggestions <- Filter(Negate(is.null), suggestions)
+
+      suggestion_text <- NULL
+      if (length(suggestions) > 0) {
+        suggestion_text <- paste0(
+          "Did you mean:\n",
+          paste(
+            sprintf(
+              "  - '%s' instead of '%s'?",
+              sapply(suggestions, `[[`, "suggestion"),
+              sapply(suggestions, `[[`, "missing")
+            ),
+            collapse = "\n"
+          )
+        )
+      }
+
+      msg <- format_error(
+        problem = paste0("Missing required columns in ", df_name),
+        expected = paste(paste0("'", required_cols, "'"), collapse = ", "),
+        received = paste0(
+          "present: ",
+          paste(paste0("'", names(df), "'"), collapse = ", "),
+          "\n",
+          "missing: ",
+          paste(paste0("'", missing_required, "'"), collapse = ", ")
+        ),
+        suggestion = suggestion_text,
+        fix = "Ensure your data contains all required columns with correct names"
+      )
+      stop(msg, call. = FALSE)
+    }
+  }
+
+  # Warn about unexpected columns
+  if (!is.null(optional_cols)) {
+    all_expected <- c(required_cols, optional_cols)
+    unexpected <- setdiff(names(df), all_expected)
+
+    if (length(unexpected) > 0) {
+      warning(
+        sprintf(
+          "\u26A0 Unexpected columns in %s: %s\n  These will be ignored.",
+          df_name,
+          paste(paste0("'", unexpected, "'"), collapse = ", ")
+        ),
+        call. = FALSE,
+        immediate. = TRUE
+      )
+    }
+  }
+
+  invisible(TRUE)
+}
+
+#' Numeric range validation
+#'
+#' @description Validates numeric values with contextual guidance
+#'
+#' @param value Numeric value to validate
+#' @param min_value Minimum allowed value
+#' @param max_value Maximum allowed value
+#' @param param_name Parameter name for error messages
+#' @param recommended_min Recommended minimum (for warnings)
+#' @param recommended_max Recommended maximum (for warnings)
+#' @param context Why this range matters
+#'
+#' @return Invisible TRUE if valid, stops/warns with messages otherwise
+#' @keywords internal
+validate_numeric_range <- function(
+  value,
+  min_value = -Inf,
+  max_value = Inf,
+  param_name = "value",
+  recommended_min = NULL,
+  recommended_max = NULL,
+  context = NULL
+) {
+  # Type check
+  if (!is.numeric(value) || length(value) != 1L) {
+    msg <- format_error(
+      problem = paste0("Invalid type for ", param_name),
+      expected = "single numeric value",
+      received = if (is.numeric(value)) {
+        paste0("numeric vector of length ", length(value))
+      } else {
+        class(value)[1L]
+      },
+      fix = "Provide a single numeric value"
+    )
+    stop(msg, call. = FALSE)
+  }
+
+  if (is.na(value)) {
+    msg <- format_error(
+      problem = paste0(param_name, " cannot be NA"),
+      fix = "Provide a non-NA numeric value"
+    )
+    stop(msg, call. = FALSE)
+  }
+
+  # Hard limits
+  if (value < min_value || value > max_value) {
+    msg <- format_error(
+      problem = paste0(param_name, " out of valid range"),
+      expected = paste0("between ", min_value, " and ", max_value),
+      received = as.character(value),
+      context = context,
+      fix = paste0("Use a value between ", min_value, " and ", max_value)
+    )
+    stop(msg, call. = FALSE)
+  }
+
+  # Recommended range warnings
+  if (!is.null(recommended_min) && value < recommended_min) {
+    warning(
+      sprintf(
+        "\u26A0 %s (%s) is below recommended minimum (%s)\n  %s",
+        param_name,
+        value,
+        recommended_min,
+        if (!is.null(context)) context else ""
+      ),
+      call. = FALSE,
+      immediate. = TRUE
+    )
+  }
+
+  if (!is.null(recommended_max) && value > recommended_max) {
+    warning(
+      sprintf(
+        "\u26A0 %s (%s) exceeds recommended maximum (%s)\n  %s",
+        param_name,
+        value,
+        recommended_max,
+        if (!is.null(context)) context else ""
+      ),
+      call. = FALSE,
+      immediate. = TRUE
+    )
+  }
+
+  invisible(TRUE)
+}
+
+#' Tolerance validation with instrument context
+#'
+#' @description Validates mass tolerance with instrument-specific guidance
+#'
+#' @param tolerance_ppm Mass tolerance in parts per million
+#' @param param_name Parameter name for error messages
+#' @param context Additional context about usage
+#'
+#' @return Invisible TRUE if valid, stops/warns with messages otherwise
+#' @keywords internal
+validate_tolerance_ppm <- function(
+  tolerance_ppm,
+  param_name = "tolerance_ppm",
+  context = NULL
+) {
+  if (!is.numeric(tolerance_ppm) || length(tolerance_ppm) != 1L) {
+    msg <- format_error(
+      problem = paste0("Invalid ", param_name),
+      expected = "single numeric value (ppm)",
+      received = class(tolerance_ppm)[1L],
+      fix = "Provide a numeric tolerance value in parts per million (ppm)"
+    )
+    stop(msg, call. = FALSE)
+  }
+
+  if (tolerance_ppm <= 0) {
+    msg <- format_error(
+      problem = paste0(param_name, " must be positive"),
+      received = paste0(tolerance_ppm, " ppm"),
+      context = "Mass tolerance defines the matching window for annotation",
+      fix = "Use a positive value appropriate for your instrument"
+    )
+    stop(msg, call. = FALSE)
+  }
+
+  # Provide instrument-specific guidance
+  if (tolerance_ppm > MAX_TOLERANCE_PPM) {
+    instrument_guidance <- paste0(
+      "Your instrument: This seems unusually large. For comparison:\n",
+      "  - Orbitrap: typically 1-5 ppm\n",
+      "  - Q-TOF: typically 5-15 ppm\n",
+      "  - Q-Trap: typically 10-50 ppm\n",
+      "  - Ion Trap: typically 100-500 ppm"
+    )
+
+    msg <- format_error(
+      problem = "Mass tolerance exceeds recommended maximum",
+      expected = paste0(
+        "typically \u2264 ",
+        MAX_TOLERANCE_PPM,
+        " ppm for high-resolution MS"
+      ),
+      received = paste0(tolerance_ppm, " ppm"),
+      context = paste0(
+        "Large tolerances may produce excessive false positives and slow annotation.\n",
+        instrument_guidance
+      ),
+      fix = paste0(
+        "1. Check if you meant ",
+        floor(tolerance_ppm / 100),
+        " ppm (not ",
+        tolerance_ppm,
+        ")\n",
+        "2. Verify your instrument's actual mass accuracy\n",
+        "3. Consider recalibrating your mass spectrometer"
+      )
+    )
+    warning(msg, call. = FALSE, immediate. = TRUE)
+  }
+
+  invisible(TRUE)
+}
+
+# TIMA-Specific Validation Functions ----
+
 #' Validate a single file path
 #' @keywords internal
 #' @noRd
@@ -29,15 +468,24 @@
     ))
   }
 
-  # Check existence
-  if (!file.exists(file_path)) {
-    return(list(
-      type = "missing",
-      msg = paste0(file_name, ": ", file_path)
-    ))
-  }
-
-  NULL
+  # Check existence using validation
+  tryCatch(
+    {
+      validate_file_exists(
+        path = file_path,
+        file_type = file_name,
+        param_name = file_name,
+        required = !allow_null
+      )
+      NULL
+    },
+    error = function(e) {
+      list(
+        type = "missing",
+        msg = paste0(file_name, ": ", file_path)
+      )
+    }
+  )
 }
 
 #' Validate that files exist
@@ -135,28 +583,26 @@ validate_file_existence <- function(file_list, allow_null = FALSE) {
 #' \dontrun{
 #' validate_ms_mode("pos") # OK
 #' validate_ms_mode("neg") # OK
-#' validate_ms_mode("both") # Error
+#' validate_ms_mode("both") # Error with suggestion
 #' }
 validate_ms_mode <- function(ms_mode) {
   if (missing(ms_mode) || is.null(ms_mode)) {
-    stop("ms_mode must be provided")
-  }
-
-  if (!is.character(ms_mode) || length(ms_mode) != 1L) {
-    stop("ms_mode must be a single character string, got: ", class(ms_mode)[1L])
-  }
-
-  if (!ms_mode %in% VALID_MS_MODES) {
     stop(
-      "Invalid ms_mode: '",
-      ms_mode,
-      "'. ",
-      "Must be one of: ",
-      paste(VALID_MS_MODES, collapse = ", "),
-      ".\n",
-      "Please check your configuration and ensure polarity is correctly specified."
+      format_error(
+        problem = "ms_mode is required but was not provided",
+        expected = "one of: 'pos', 'neg'",
+        fix = "Specify ms_mode = 'pos' or ms_mode = 'neg' in your parameters"
+      ),
+      call. = FALSE
     )
   }
+
+  validate_choice(
+    value = ms_mode,
+    valid_values = VALID_MS_MODES,
+    param_name = "ms_mode",
+    context = "Ionization mode for mass spectrometry analysis"
+  )
 
   # log_trace("MS mode validated: ", ms_mode)
   invisible(TRUE)
@@ -189,73 +635,29 @@ validate_tolerances <- function(
 ) {
   # Validate PPM tolerance
   if (!is.null(tolerance_ppm)) {
-    if (!is.numeric(tolerance_ppm) || length(tolerance_ppm) != 1L) {
-      stop(
-        "tolerance_ppm must be a single numeric value, got: ",
-        class(tolerance_ppm)[1L]
-      )
-    }
-
-    if (tolerance_ppm <= 0) {
-      stop(
-        "tolerance_ppm must be positive, got: ",
-        tolerance_ppm,
-        ".\n",
-        "Recommended range: 1-",
-        max_ppm,
-        " ppm for ",
-        context
-      )
-    }
-
-    if (tolerance_ppm > max_ppm) {
-      msg <- paste0(
-        "tolerance_ppm (",
-        tolerance_ppm,
-        ") exceeds recommended maximum (",
-        max_ppm,
-        " ppm). This may result in excessive false positives."
-      )
-      warning(msg, call. = FALSE)
-      log_warn(msg)
-    }
-
+    validate_tolerance_ppm(
+      tolerance_ppm = tolerance_ppm,
+      param_name = "tolerance_ppm",
+      context = context
+    )
     # log_trace("Mass tolerance validated: ", tolerance_ppm, " ppm")
   }
 
   # Validate RT tolerance
   if (!is.null(tolerance_rt)) {
-    if (!is.numeric(tolerance_rt) || length(tolerance_rt) != 1L) {
-      stop(
-        "tolerance_rt must be a single numeric value, got: ",
-        class(tolerance_rt)[1L]
+    validate_numeric_range(
+      value = tolerance_rt,
+      min_value = 0,
+      max_value = Inf,
+      param_name = "tolerance_rt",
+      recommended_max = max_rt,
+      context = paste0(
+        "RT tolerance for ",
+        context,
+        ". ",
+        "Large values may group unrelated features together"
       )
-    }
-
-    if (tolerance_rt <= 0) {
-      stop(
-        "tolerance_rt must be positive, got: ",
-        tolerance_rt,
-        " minutes.\n",
-        "Recommended range: 0.01-",
-        max_rt,
-        " minutes for ",
-        context
-      )
-    }
-
-    if (tolerance_rt > max_rt) {
-      msg <- paste0(
-        "tolerance_rt (",
-        tolerance_rt,
-        " min) exceeds recommended maximum (",
-        max_rt,
-        " min). This may group unrelated features."
-      )
-      warning(msg, call. = FALSE)
-      log_warn(msg)
-    }
-
+    )
     # log_trace("RT tolerance validated: ", tolerance_rt, " minutes")
   }
 
@@ -279,24 +681,50 @@ validate_adduct_list <- function(
   list_name = "adducts_list"
 ) {
   if (!is.list(adducts_list)) {
-    stop(list_name, " must be a list, got: ", class(adducts_list)[1L])
+    msg <- format_error(
+      problem = paste0(list_name, " has wrong type"),
+      expected = "list",
+      received = class(adducts_list)[1L],
+      context = "Adduct lists must be organized by MS mode (pos/neg)",
+      fix = "Ensure the adduct configuration is a list with 'pos' and 'neg' entries"
+    )
+    stop(msg, call. = FALSE)
   }
 
   if (is.null(adducts_list[[ms_mode]])) {
-    stop(
-      list_name,
-      " must contain '",
-      ms_mode,
-      "' mode entries.\n",
-      "Available modes: ",
-      paste(names(adducts_list), collapse = ", "),
-      ".\n",
-      "Please ensure your configuration includes adducts for the specified polarity."
+    available_modes <- names(adducts_list)
+    msg <- format_error(
+      problem = paste0("Missing '", ms_mode, "' mode in ", list_name),
+      expected = paste0("List entry for '", ms_mode, "' mode"),
+      received = paste0(
+        "Available modes: ",
+        paste(available_modes, collapse = ", ")
+      ),
+      context = "Adduct lists must contain entries for the ionization mode being used",
+      suggestion = if (ms_mode == "pos" && "neg" %in% available_modes) {
+        "Did you mean to use 'neg' mode instead?"
+      } else if (ms_mode == "neg" && "pos" %in% available_modes) {
+        "Did you mean to use 'pos' mode instead?"
+      } else {
+        NULL
+      },
+      fix = paste0(
+        "Add adduct definitions for '",
+        ms_mode,
+        "' mode to your configuration:\n",
+        "  ",
+        list_name,
+        "$",
+        ms_mode,
+        " <- c('[M+H]+', '[M+Na]+', ...)"
+      )
     )
+    stop(msg, call. = FALSE)
   }
 
   if (length(adducts_list[[ms_mode]]) == 0L) {
     msg <- paste0(
+      "⚠ ",
       list_name,
       " for '",
       ms_mode,
@@ -308,15 +736,6 @@ validate_adduct_list <- function(
     warning(msg, call. = FALSE)
     log_warn(msg)
   }
-
-  # log_trace(
-  #  list_name,
-  # " validated: ",
-  # length(adducts_list[[ms_mode]]),
-  # " entries for ",
-  # ms_mode,
-  # " mode"
-  # )
 
   invisible(TRUE)
 }
@@ -331,6 +750,7 @@ validate_adduct_list <- function(
 #' @param required_cols Character vector of required column names
 #' @param min_rows Minimum number of rows required (default: 0)
 #' @param allow_empty Logical, whether empty data frames are allowed
+#' @param optional_cols Optional character vector of expected optional columns
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -345,51 +765,16 @@ validate_dataframe <- function(
   param_name = "input",
   required_cols = NULL,
   min_rows = 0L,
-  allow_empty = TRUE
+  allow_empty = TRUE,
+  optional_cols = NULL
 ) {
-  # Check if data frame or tibble
-  if (!is.data.frame(df) && !inherits(df, "tbl")) {
-    stop(
-      param_name,
-      " must be a data frame or tibble, got: ",
-      paste(class(df), collapse = ", "),
-      call. = FALSE
-    )
-  }
-
-  # Check row count
-  n_rows <- nrow(df)
-
-  if (!allow_empty && n_rows == 0L) {
-    stop(param_name, " cannot be empty", call. = FALSE)
-  }
-
-  if (n_rows < min_rows) {
-    stop(
-      param_name,
-      " must have at least ",
-      min_rows,
-      " row(s), got: ",
-      n_rows,
-      call. = FALSE
-    )
-  }
-
-  # Check required columns
-  if (!is.null(required_cols)) {
-    missing_cols <- setdiff(required_cols, colnames(df))
-
-    if (length(missing_cols) > 0L) {
-      stop(
-        param_name,
-        " is missing required column(s): ",
-        paste(missing_cols, collapse = ", "),
-        "\nAvailable columns: ",
-        paste(colnames(df), collapse = ", "),
-        call. = FALSE
-      )
-    }
-  }
+  validate_dataframe_structure(
+    df = df,
+    required_cols = required_cols,
+    optional_cols = optional_cols,
+    df_name = param_name,
+    min_rows = if (allow_empty) 0L else max(1L, min_rows)
+  )
 
   invisible(TRUE)
 }
@@ -408,56 +793,6 @@ validate_dataframe <- function(
 #'
 #' @keywords internal
 #'
-#' @examples
-#' \dontrun{
-#' validate_numeric_range(0.5, min_value = 0, max_value = 1, param_name = "threshold")
-#' }
-validate_numeric_range <- function(
-  value,
-  min_value = -Inf,
-  max_value = Inf,
-  param_name = "value",
-  allow_null = FALSE
-) {
-  if (is.null(value)) {
-    if (!allow_null) {
-      stop(param_name, " cannot be NULL", call. = FALSE)
-    }
-    return(invisible(TRUE))
-  }
-
-  if (!is.numeric(value) || length(value) != 1L) {
-    stop(
-      param_name,
-      " must be a single numeric value, got: ",
-      if (is.numeric(value)) {
-        paste0("vector of length ", length(value))
-      } else {
-        class(value)[1L]
-      },
-      call. = FALSE
-    )
-  }
-
-  if (is.na(value)) {
-    stop(param_name, " cannot be NA", call. = FALSE)
-  }
-
-  if (value < min_value || value > max_value) {
-    stop(
-      param_name,
-      " must be between ",
-      min_value,
-      " and ",
-      max_value,
-      ", got: ",
-      value,
-      call. = FALSE
-    )
-  }
-
-  invisible(TRUE)
-}
 
 #' Validate weights
 #'
@@ -537,51 +872,6 @@ validate_weights <- function(weights, param_name = "weights") {
 #' \dontrun{
 #' validate_choice("OR", c("OR", "AND"), param_name = "condition")
 #' }
-validate_choice <- function(value, choices, param_name = "value") {
-  if (!is.character(value) || length(value) != 1L) {
-    stop(
-      param_name,
-      " must be a single character string, got: ",
-      class(value)[1L],
-      call. = FALSE
-    )
-  }
-
-  if (!value %in% choices) {
-    stop(
-      param_name,
-      " must be one of: ",
-      paste(choices, collapse = ", "),
-      "\nGot: '",
-      value,
-      "'",
-      call. = FALSE
-    )
-  }
-
-  invisible(TRUE)
-}
-
-#' Format a standardized error message
-#'
-#' @description Helper to format consistent error messages containing
-#'     what went wrong, why, and how to fix.
-#'
-#' @param what Short description of what went wrong
-#' @param why  Optional explanation of why it is a problem
-#' @param how  Optional guidance on how to fix
-#'
-#' @keywords internal
-format_error <- function(what, why = NULL, how = NULL) {
-  parts <- c(what, why, how)
-  paste(stats::na.omit(object = parts), collapse = "\n")
-}
-
-#' Stop with standardized error formatting
-#' @keywords internal
-stopf <- function(what, why = NULL, how = NULL) {
-  stop(format_error(what, why, how))
-}
 
 #' Validate character parameter
 #'
@@ -605,42 +895,45 @@ validate_character <- function(
 ) {
   if (is.null(value)) {
     if (!allow_null) {
-      stopf(
-        what = paste0(param_name, " cannot be NULL"),
-        how = "Provide a non-NULL character string."
+      stop(
+        format_error(
+          problem = paste0(param_name, " cannot be NULL"),
+          fix = "Provide a non-NULL character string"
+        ),
+        call. = FALSE
       )
     }
     return(invisible(TRUE))
   }
 
   if (!is.character(value) || length(value) != 1L) {
-    stopf(
-      what = paste0(
-        param_name,
-        " must be a single character string, got: ",
-        class(value)[1L]
+    stop(
+      format_error(
+        problem = paste0("Invalid type for ", param_name),
+        expected = "single character string",
+        received = class(value)[1L],
+        fix = "Ensure the parameter is a length-1 character value"
       ),
-      how = "Ensure the parameter is a length-1 character value."
+      call. = FALSE
     )
   }
 
   if (!allow_empty && nchar(value) == 0L) {
-    stopf(
-      what = paste0(param_name, " cannot be an empty string"),
-      how = "Provide a non-empty string."
+    stop(
+      format_error(
+        problem = paste0(param_name, " cannot be an empty string"),
+        fix = "Provide a non-empty string"
+      ),
+      call. = FALSE
     )
   }
 
   if (!is.null(allowed_values) && !value %in% allowed_values) {
-    stopf(
-      what = paste0(
-        param_name,
-        " (",
-        value,
-        ") must be one of: ",
-        paste(allowed_values, collapse = ", ")
-      ),
-      how = paste0("Choose one of: ", paste(allowed_values, collapse = ", "))
+    # Use the validate_choice for this case
+    validate_choice(
+      value = value,
+      valid_values = allowed_values,
+      param_name = param_name
     )
   }
 

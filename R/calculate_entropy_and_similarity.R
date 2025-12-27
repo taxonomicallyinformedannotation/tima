@@ -224,6 +224,13 @@ calculate_entropy_and_similarity <- function(
   threshold,
   approx
 ) {
+  ctx <- log_operation(
+    "calculate_entropy_similarity",
+    n_library = length(lib_ids),
+    n_query = length(query_ids),
+    method = method
+  )
+
   assert_choice(method, VALID_SIMILARITY_METHODS, "method")
   if (
     length(lib_ids) != length(lib_spectra) ||
@@ -292,7 +299,7 @@ calculate_entropy_and_similarity <- function(
   )
 
   if (all(sapply(X = results, FUN = is.null))) {
-    tidytable::tidytable(
+    result <- tidytable::tidytable(
       feature_id = NA_integer_,
       precursorMz = NA_real_,
       target_id = NA_integer_,
@@ -301,6 +308,10 @@ calculate_entropy_and_similarity <- function(
       candidate_count_similarity_peaks_matched = NA_integer_
     )
   } else {
-    tidytable::bind_rows(results[!sapply(X = results, FUN = is.null)])
+    result <- tidytable::bind_rows(results[!sapply(X = results, FUN = is.null)])
   }
+
+  log_complete(ctx, n_comparisons = nrow(result))
+
+  result
 }

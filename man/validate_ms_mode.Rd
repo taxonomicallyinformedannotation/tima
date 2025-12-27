@@ -19,7 +19,7 @@ Ensures the MS mode is valid ('pos' or 'neg')
 \dontrun{
 validate_ms_mode("pos") # OK
 validate_ms_mode("neg") # OK
-validate_ms_mode("both") # Error
+validate_ms_mode("both") # Error with suggestion
 }
 }
 \keyword{internal}

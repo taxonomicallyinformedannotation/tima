@@ -55,7 +55,7 @@ export_output <- function(x, file) {
   }
 
   # Write Data with Error Handling ----
-  start_time <- Sys.time()
+  ctx <- log_operation("export_output", file = file, n_rows = nrows)
 
   tryCatch(
     {
@@ -68,11 +68,9 @@ export_output <- function(x, file) {
         showProgress = FALSE
       )
 
-      # Log success with timing
-      elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+      # Log success
       file_size <- file.info(file)$size
-      log_file_op("Exported", file, size_bytes = file_size, n_rows = nrows)
-      log_debug("Export completed in %s", format_time(elapsed))
+      log_complete(ctx, size_bytes = file_size)
     },
     error = function(e) {
       log_error("Export failed: %s", conditionMessage(e))

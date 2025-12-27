@@ -44,6 +44,12 @@ prepare_features_tables <- function(
   name_rt = get_params(step = "prepare_features_tables")$names$rt$features,
   name_mz = get_params(step = "prepare_features_tables")$names$precursor
 ) {
+  ctx <- log_operation(
+    "prepare_features_tables",
+    input = features,
+    candidates = candidates
+  )
+
   # Input Validation ----
   .validate_prepare_features_inputs(
     features = features,
@@ -56,7 +62,6 @@ prepare_features_tables <- function(
   )
 
   # Load Features Table ----
-  log_info("Preparing features table from: %s", features)
   log_debug("Retaining top %d intensity samples per feature", candidates)
 
   features_raw <- .load_features_file(features)
@@ -93,6 +98,8 @@ prepare_features_tables <- function(
   log_info("Prepared %d feature-sample pairs", nrow(features_prepared))
 
   # Export Results ----
+  log_complete(ctx, n_features = nrow(features_prepared))
+
   export_params(
     parameters = get_params(step = "prepare_features_tables"),
     step = "prepare_features_tables"
@@ -116,15 +123,13 @@ prepare_features_tables <- function(
   name_mz
 ) {
   # Validate file paths
-  if (!is.character(features) || length(features) != 1L || is.na(features)) {
-    stop("features must be a single non-NA character string", call. = FALSE)
-  }
-  if (!file.exists(features)) {
-    stop("Features file not found: ", features, call. = FALSE)
-  }
-  if (!is.character(output) || length(output) != 1L || is.na(output)) {
-    stop("output must be a single non-NA character string", call. = FALSE)
-  }
+  validate_character(features, param_name = "features", allow_empty = FALSE)
+  validate_file_exists(
+    path = features,
+    file_type = "features file",
+    param_name = "features"
+  )
+  validate_character(output, param_name = "output", allow_empty = FALSE)
 
   # Validate candidates (allow NULL or integer in range)
   if (!is.null(candidates)) {

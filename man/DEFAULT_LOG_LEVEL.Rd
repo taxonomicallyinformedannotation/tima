@@ -3,14 +3,19 @@
 \docType{data}
 \name{DEFAULT_LOG_LEVEL}
 \alias{DEFAULT_LOG_LEVEL}
-\title{Default log level for package operations}
+\title{Default log level}
 \format{
+An object of class \code{character} of length 1.
+
 An object of class \code{character} of length 1.
 }
 \usage{
 DEFAULT_LOG_LEVEL
+
+DEFAULT_LOG_LEVEL
 }
 \description{
-Default log level for package operations
+Default logging level if TIMA_LOG_LEVEL environment variable
+is not set. Valid values: "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
 }
 \keyword{internal}

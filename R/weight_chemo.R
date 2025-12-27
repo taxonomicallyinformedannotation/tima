@@ -71,6 +71,11 @@ weight_chemo <- function(
   score_chemical_npc_superclass,
   score_chemical_npc_class
 ) {
+  ctx <- log_operation(
+    "weight_chemo",
+    n_input = nrow(annot_table_wei_bio_clean)
+  )
+
   # Input Validation ----
   validate_dataframe(
     annot_table_wei_bio_clean,
@@ -359,6 +364,8 @@ weight_chemo <- function(
     )
 
   rm(annot_table_wei_chemo_interim)
+
+  log_complete(ctx, n_weighted = nrow(annot_table_wei_chemo))
 
   return(annot_table_wei_chemo)
 }

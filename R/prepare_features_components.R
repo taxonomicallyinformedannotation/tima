@@ -7,6 +7,7 @@
 #'
 #' @include get_params.R
 #' @include logs_utils.R
+#' @include safe_fread.R
 #'
 #' @param input Character vector of paths to input component files. Can be
 #'     a single file or multiple files that will be combined.
@@ -43,14 +44,23 @@ prepare_features_components <- function(
     stop("input must be a non-empty character vector")
   }
 
-  if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string")
-  }
+  ctx <- log_operation("prepare_features_components", n_files = length(input))
+
+  validate_character(output, param_name = "output", allow_empty = FALSE)
 
   # File existence check
   missing_files <- input[!file.exists(input)]
   if (length(missing_files) > 0L) {
-    stop("Input file(s) not found: ", paste(missing_files, collapse = ", "))
+    msg <- format_error(
+      problem = "Component file(s) not found",
+      expected = "All input files to exist",
+      received = paste0(length(missing_files), " missing file(s)"),
+      fix = paste0(
+        "Check these files:\n",
+        paste0("  - ", missing_files, collapse = "\n")
+      )
+    )
+    stop(msg, call. = FALSE)
   }
 
   # Load Component Data ----
@@ -63,11 +73,15 @@ prepare_features_components <- function(
   # log_trace("Loading component tables")
   table <- tryCatch(
     {
-      purrr::map(
+      purrr::map2(
         .x = input,
-        .f = tidytable::fread,
-        na.strings = c("", "NA"),
-        colClasses = "character"
+        .y = seq_along(input),
+        .f = ~ safe_fread(
+          file = .x,
+          file_type = paste0("component file ", .y),
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        )
       ) |>
         tidytable::bind_rows()
     },
@@ -98,10 +112,7 @@ prepare_features_components <- function(
       ) |>
       tidytable::distinct()
 
-    log_with_count(
-      "Prepared unique feature-component assignments",
-      n = nrow(table)
-    )
+    log_complete(ctx, n_assignments = nrow(table))
   }
 
   # Export Results ----

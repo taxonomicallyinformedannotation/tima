@@ -5,10 +5,11 @@
 * Added [BiGG](http://bigg.ucsd.edu/) as SOP library
 * Added basic isotopologues handling
 * Added special "Biota" superdomain handling for shared core metabolism
-* More in depth molecular sanitization
 * Enhanced `sanitize_spectra()` with adaptive noise filtering:
     - Dynamic intensity thresholds (MAD-based, now default when `cutoff = NULL`)
     - Low noise removal targets repetitive instrumental artifacts
+* Improved log and error messages
+* More in depth molecular sanitization
 
 ## Breaking Changes
 

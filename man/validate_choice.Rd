@@ -2,26 +2,30 @@
 % Please edit documentation in R/validations_utils.R
 \name{validate_choice}
 \alias{validate_choice}
-\title{Validate choice parameter}
+\title{Choice validation with fuzzy matching}
 \usage{
-validate_choice(value, choices, param_name = "value")
+validate_choice(value, valid_values, param_name = "value", context = NULL)
 }
 \arguments{
 \item{value}{Value to validate}
 
-\item{choices}{Character vector of allowed choices}
+\item{valid_values}{Character vector of allowed values}
 
-\item{param_name}{Name of the parameter (for error messages)}
+\item{param_name}{Parameter name for error messages}
+
+\item{context}{Optional context (e.g., "Found in: params$annotate_masses$ms_mode")}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise
 }
 \description{
-Validates that a value is one of a set of allowed choices
+Validates that a value is one of allowed choices, with
+intelligent suggestions for typos
 }
 \examples{
 \dontrun{
-validate_choice("OR", c("OR", "AND"), param_name = "condition")
+validate_choice("positive", c("pos", "neg"), "ms_mode")
+# Error shows: Did you mean 'pos'?
 }
 }
 \keyword{internal}

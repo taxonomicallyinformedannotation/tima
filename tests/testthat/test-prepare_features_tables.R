@@ -8,19 +8,21 @@ test_that("prepare_features_tables validates features parameter", {
   # Non-character features
   expect_error(
     prepare_features_tables(features = 123),
-    "features must be a single non-NA character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   # Multiple values
   expect_error(
     prepare_features_tables(features = c("file1.csv", "file2.csv")),
-    "features must be a single non-NA character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   # Missing file
   expect_error(
     prepare_features_tables(features = "nonexistent_file.csv"),
-    "not found"
+    "not found|does not exist"
   )
 })
 
@@ -40,7 +42,8 @@ test_that("prepare_features_tables validates output parameter", {
 
   expect_error(
     prepare_features_tables(features = test_features, output = 123),
-    "output must be a single non-NA character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   expect_error(
@@ -48,7 +51,8 @@ test_that("prepare_features_tables validates output parameter", {
       features = test_features,
       output = c("out1.tsv", "out2.tsv")
     ),
-    "output must be a single non-NA character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 })
 

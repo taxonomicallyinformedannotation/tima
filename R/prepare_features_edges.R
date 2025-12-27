@@ -60,24 +60,36 @@ prepare_features_edges <- function(
     stop("output must be a single character string")
   }
 
-  if (!is.character(name_source) || length(name_source) != 1L) {
-    stop("name_source must be a single character string")
-  }
+  ctx <- log_operation("prepare_features_edges", n_edge_types = length(input))
 
-  if (!is.character(name_target) || length(name_target) != 1L) {
-    stop("name_target must be a single character string")
-  }
+  validate_character(
+    name_source,
+    param_name = "name_source",
+    allow_empty = FALSE
+  )
+  validate_character(
+    name_target,
+    param_name = "name_target",
+    allow_empty = FALSE
+  )
 
   # File existence check
   all_files <- unlist(input)
   missing_files <- all_files[!file.exists(all_files)]
   if (length(missing_files) > 0L) {
-    stop("Input file(s) not found: ", paste(missing_files, collapse = ", "))
+    msg <- format_error(
+      problem = "Edge file(s) not found",
+      expected = "All edge files to exist",
+      received = paste0(length(missing_files), " missing file(s)"),
+      fix = paste0(
+        "Check these files:\n",
+        paste0("  - ", missing_files, collapse = "\n")
+      )
+    )
+    stop(msg, call. = FALSE)
   }
 
   # Load Edge Tables ----
-
-  log_info("Preparing molecular network edges")
   log_debug("MS1 edges: %s", input[['ms1']])
   log_debug("Spectral edges: %s", input[['spectral']])
 
@@ -85,11 +97,14 @@ prepare_features_edges <- function(
   # log_trace("Loading edge tables")
   edges_tables <- tryCatch(
     {
-      purrr::map(
+      purrr::imap(
         .x = input,
-        .f = tidytable::fread,
-        na.strings = c("", "NA"),
-        colClasses = "character"
+        .f = ~ safe_fread(
+          file = .x,
+          file_type = paste0(.y, " edges"),
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        )
       )
     },
     error = function(e) {
@@ -134,7 +149,7 @@ prepare_features_edges <- function(
       feature_target := tidytable::coalesce(feature_target, feature_source)
     )
 
-  log_info("Prepared %d total edges", nrow(edges_table_treated))
+  log_complete(ctx, n_edges = nrow(edges_table_treated))
 
   # Explicit memory cleanup
   rm(edges_ms1, edges_ms2, features_entropy)

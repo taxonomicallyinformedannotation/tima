@@ -17,13 +17,15 @@ test_that("annotate_masses validates ms_mode correctly", {
       str_tax_npc = tempfile(),
       ms_mode = "invalid_mode"
     ),
-    "Must be one of: pos, neg."
+    "Fix: Choose one of: pos, neg",
+    fixed = TRUE
   )
 
   # Blank mode should error
   expect_error(
     annotate_masses(ms_mode = ""),
-    "Must be one of: pos, neg."
+    "Did you mean 'pos'?",
+    fixed = TRUE
   )
 
   # NULL mode should error (handled by parameter default or earlier validation)
@@ -31,56 +33,122 @@ test_that("annotate_masses validates ms_mode correctly", {
 })
 
 test_that("annotate_masses validates tolerance_ppm correctly", {
+  # Create temp files to pass file validation
+  temp_files <- list(
+    features = tempfile(),
+    library = tempfile(),
+    str_stereo = tempfile(),
+    str_met = tempfile(),
+    str_nam = tempfile(),
+    str_tax_cla = tempfile(),
+    str_tax_npc = tempfile()
+  )
+  # Create the temp files so they exist
+  lapply(temp_files, function(f) writeLines("", f))
+  on.exit(lapply(temp_files, unlink), add = TRUE)
+
   # Zero tolerance should error
   expect_error(
     annotate_masses(
       tolerance_ppm = 0,
-      ms_mode = "pos"
+      ms_mode = "pos",
+      features = temp_files$features,
+      library = temp_files$library,
+      str_stereo = temp_files$str_stereo,
+      str_met = temp_files$str_met,
+      str_nam = temp_files$str_nam,
+      str_tax_cla = temp_files$str_tax_cla,
+      str_tax_npc = temp_files$str_tax_npc
     ),
-    "Recommended range: 1-20 ppm for mass annotation"
+    "Fix: Use a positive value appropriate for your instrument",
+    fixed = TRUE
   )
 
   # Negative tolerance should error
   expect_error(
     annotate_masses(
       tolerance_ppm = -5,
-      ms_mode = "pos"
+      ms_mode = "pos",
+      features = temp_files$features,
+      library = temp_files$library,
+      str_stereo = temp_files$str_stereo,
+      str_met = temp_files$str_met,
+      str_nam = temp_files$str_nam,
+      str_tax_cla = temp_files$str_tax_cla,
+      str_tax_npc = temp_files$str_tax_npc
     ),
-    "Recommended range: 1-20 ppm for mass annotation"
+    "Fix: Use a positive value appropriate for your instrument",
+    fixed = TRUE
   )
 
-  # Too large tolerance should error
+  # Too large tolerance should warn
   expect_warning(
-    expect_error(
-      annotate_masses(
-        tolerance_ppm = 25,
-        ms_mode = "pos"
-      ),
-      "Please verify file paths and ensure all required files are present."
+    annotate_masses(
+      tolerance_ppm = 25,
+      ms_mode = "pos",
+      features = temp_files$features,
+      library = temp_files$library,
+      str_stereo = temp_files$str_stereo,
+      str_met = temp_files$str_met,
+      str_nam = temp_files$str_nam,
+      str_tax_cla = temp_files$str_tax_cla,
+      str_tax_npc = temp_files$str_tax_npc
     ),
-    "This may result in excessive false positives."
-  )
+    "Received: 25 ppm",
+    fixed = TRUE
+  ) |>
+    expect_error("Fix: 1. Verify the file was created correctly", fixed = TRUE)
 
   # Non-numeric tolerance should error
   expect_error(
     annotate_masses(
       tolerance_ppm = "10",
-      ms_mode = "pos"
+      ms_mode = "pos",
+      features = temp_files$features,
+      library = temp_files$library,
+      str_stereo = temp_files$str_stereo,
+      str_met = temp_files$str_met,
+      str_nam = temp_files$str_nam,
+      str_tax_cla = temp_files$str_tax_cla,
+      str_tax_npc = temp_files$str_tax_npc
     ),
-    "tolerance_ppm must be a single numeric value, got: character"
+    "Fix: Provide a numeric tolerance value in parts per million (ppm)",
+    fixed = TRUE
   )
 })
 
 test_that("annotate_masses validates tolerance_rt correctly", {
+  # Create temp files to pass file validation
+  temp_files <- list(
+    features = tempfile(),
+    library = tempfile(),
+    str_stereo = tempfile(),
+    str_met = tempfile(),
+    str_nam = tempfile(),
+    str_tax_cla = tempfile(),
+    str_tax_npc = tempfile()
+  )
+  # Create the temp files so they exist
+  lapply(temp_files, function(f) writeLines("", f))
+  on.exit(lapply(temp_files, unlink), add = TRUE)
+
   # Zero tolerance should error
   expect_error(
     annotate_masses(
       tolerance_rt = 0,
       tolerance_ppm = 10,
-      ms_mode = "pos"
+      ms_mode = "pos",
+      features = temp_files$features,
+      library = temp_files$library,
+      str_stereo = temp_files$str_stereo,
+      str_met = temp_files$str_met,
+      str_nam = temp_files$str_nam,
+      str_tax_cla = temp_files$str_tax_cla,
+      str_tax_npc = temp_files$str_tax_npc
     ),
     "Recommended range: 0.01-0.05 minutes for mass annotation"
-  )
+  ) |>
+    expect_error("Fix: 1. Verify the file was created correctly", fixed = TRUE)
 
   # Negative tolerance should error
   expect_error(
@@ -89,7 +157,7 @@ test_that("annotate_masses validates tolerance_rt correctly", {
       tolerance_ppm = 10,
       ms_mode = "pos"
     ),
-    "Recommended range: 0.01-0.05 minutes for mass annotation"
+    "Fix: Use a value between 0 and Inf"
   )
 
   # Too large tolerance should error
@@ -102,7 +170,8 @@ test_that("annotate_masses validates tolerance_rt correctly", {
       ),
       "Please verify file paths and ensure all required files are present."
     ),
-    "This may group unrelated features."
+    "Large values may group unrelated features together",
+    fixed = TRUE
   )
 })
 
@@ -115,7 +184,9 @@ test_that("annotate_masses validates adducts_list structure", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "Please ensure your configuration includes adducts for the specified polarity."
+    "Fix: Add adduct definitions for 'pos' mode to your configuration:
+  adducts_list$pos <- c('[M+H]+', '[M+Na]+', ...)",
+    fixed = TRUE
   )
 
   # NULL adducts for mode should error
@@ -126,7 +197,9 @@ test_that("annotate_masses validates adducts_list structure", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "Please ensure your configuration includes adducts for the specified polarity."
+    "Fix: Add adduct definitions for 'pos' mode to your configuration:
+  adducts_list$pos <- c('[M+H]+', '[M+Na]+', ...)",
+    fixed = TRUE
   )
 
   # Non-list adducts should error
@@ -137,7 +210,8 @@ test_that("annotate_masses validates adducts_list structure", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "adducts_list must be a list, got: character"
+    "Fix: Ensure the adduct configuration is a list with 'pos' and 'neg' entries",
+    fixed = TRUE
   )
 })
 
@@ -151,7 +225,9 @@ test_that("annotate_masses validates clusters_list structure", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "Please ensure your configuration includes adducts for the specified polarity."
+    "Fix: Add adduct definitions for 'pos' mode to your configuration:
+  clusters_list$pos <- c('[M+H]+', '[M+Na]+', ...)",
+    fixed = TRUE
   )
 })
 

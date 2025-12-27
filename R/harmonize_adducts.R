@@ -33,6 +33,8 @@ harmonize_adducts <- function(
   adducts_colname = "adduct",
   adducts_translations
 ) {
+  ctx <- log_operation("harmonize_adducts", n_rows = nrow(df))
+
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
   validate_character(
@@ -98,6 +100,12 @@ harmonize_adducts <- function(
       n_unique_after
     )
   }
+
+  log_complete(
+    ctx,
+    n_unique_before = n_unique_before,
+    n_unique_after = n_unique_after
+  )
 
   df
 }

@@ -13,7 +13,8 @@ test_that("clean_bio validates data frame inputs", {
       edges_table = data.frame(),
       minimal_consistency = 0.5
     ),
-    "annot_table_wei_bio must be a data frame or tibble"
+    "Fix: Ensure input is a valid data frame",
+    fixed = TRUE
   )
 
   # Non-data frame edges_table should error
@@ -23,7 +24,8 @@ test_that("clean_bio validates data frame inputs", {
       edges_table = list(),
       minimal_consistency = 0.5
     ),
-    "edges_table must be a data frame or tibble"
+    "Fix: Ensure input is a valid data frame",
+    fixed = TRUE
   )
 })
 
@@ -35,7 +37,8 @@ test_that("clean_bio validates minimal_consistency parameter", {
       edges_table = data.frame(),
       minimal_consistency = -0.1
     ),
-    "minimal_consistency must be between 0 and 1"
+    "Fix: Use a value between 0 and 1",
+    fixed = TRUE
   )
 
   # Consistency > 1 should error
@@ -45,7 +48,8 @@ test_that("clean_bio validates minimal_consistency parameter", {
       edges_table = data.frame(),
       minimal_consistency = 1.5
     ),
-    "minimal_consistency must be between 0 and 1"
+    "Fix: Use a value between 0 and 1",
+    fixed = TRUE
   )
 
   # Non-numeric consistency should error
@@ -55,7 +59,8 @@ test_that("clean_bio validates minimal_consistency parameter", {
       edges_table = data.frame(),
       minimal_consistency = "0.5"
     ),
-    "minimal_consistency must be a single numeric value, got: character"
+    "Fix: Provide a single numeric value",
+    fixed = TRUE
   )
 })
 

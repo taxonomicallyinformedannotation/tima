@@ -38,6 +38,8 @@ create_components <- function(
     step = "create_components"
   )$files$networks$spectral$components$raw
 ) {
+  ctx <- log_operation("create_components", n_input_files = length(input))
+
   # Input Validation ----
 
   # File existence check
@@ -62,11 +64,15 @@ create_components <- function(
 
   # Load and combine all edge files
   # log_trace("Loading edge data")
-  edges <- purrr::map(
+  edges <- purrr::map2(
     .x = input,
-    .f = tidytable::fread,
-    na.strings = c("", "NA"),
-    colClasses = "character"
+    .y = seq_along(input),
+    .f = ~ safe_fread(
+      file = .x,
+      file_type = paste0("edge file ", .y),
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    )
   ) |>
     tidytable::bind_rows() |>
     tidytable::select(feature_source, feature_target) |>
@@ -160,6 +166,12 @@ create_components <- function(
   export_output(x = components_table, file = output)
 
   log_info("Components written to: %s", output)
+
+  log_complete(
+    ctx,
+    n_components = length(unique(components_table$component_id)),
+    n_features = nrow(components_table)
+  )
 
   return(output)
 }

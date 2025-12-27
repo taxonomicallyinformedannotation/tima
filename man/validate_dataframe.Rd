@@ -9,7 +9,8 @@ validate_dataframe(
   param_name = "input",
   required_cols = NULL,
   min_rows = 0L,
-  allow_empty = TRUE
+  allow_empty = TRUE,
+  optional_cols = NULL
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ validate_dataframe(
 \item{min_rows}{Minimum number of rows required (default: 0)}
 
 \item{allow_empty}{Logical, whether empty data frames are allowed}
+
+\item{optional_cols}{Optional character vector of expected optional columns}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

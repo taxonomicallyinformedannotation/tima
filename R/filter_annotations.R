@@ -193,6 +193,7 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
 #'     retention time tolerance when RT libraries are available.
 #'
 #' @include get_params.R
+#' @include safe_fread.R
 #'
 #' @param annotations Character vector or list of paths to prepared annotation files
 #' @param features Character string path to prepared features file
@@ -240,6 +241,13 @@ filter_annotations <- function(
     step = "filter_annotations"
   )$ms$tolerances$rt$library
 ) {
+  # Start operation logging
+  ctx <- log_operation(
+    "filter_annotations",
+    n_annotation_files = length(unlist(annotations)),
+    tolerance_rt = tolerance_rt
+  )
+
   # Input Validation ----
 
   validate_filter_annotations_inputs(
@@ -260,8 +268,10 @@ filter_annotations <- function(
   log_info("Filtering annotations")
   log_debug("RT tolerance: %f2 minutes", tolerance_rt)
 
-  features_table <- tidytable::fread(
+  features_table <- safe_fread(
     file = features,
+    file_type = "features table",
+    required_cols = c("feature_id"),
     colClasses = "character",
     na.strings = c("", "NA")
   ) |>
@@ -276,11 +286,15 @@ filter_annotations <- function(
   # Load and Merge Annotations ----
 
   log_debug("Loading %d annotation file(s)", length(annotations))
-  annotation_tables_list <- purrr::map(
+  annotation_tables_list <- purrr::map2(
     .x = annotations,
-    .f = tidytable::fread,
-    na.strings = c("", "NA"),
-    colClasses = "character"
+    .y = seq_along(annotations),
+    .f = ~ safe_fread(
+      file = .x,
+      file_type = paste0("annotation file ", .y),
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    )
   )
 
   # Filter MS1 redundancy
@@ -300,11 +314,15 @@ filter_annotations <- function(
   rm(annotation_table)
 
   if (!is.null(rts)) {
-    rt_table <- purrr::map(
+    rt_table <- purrr::map2(
       .x = rts,
-      .f = tidytable::fread,
-      na.strings = c("", "NA"),
-      colClasses = "character"
+      .y = seq_along(rts),
+      .f = ~ safe_fread(
+        file = .x,
+        file_type = paste0("retention time library ", .y),
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
     ) |>
       tidytable::bind_rows()
 
@@ -355,6 +373,8 @@ filter_annotations <- function(
     step = "filter_annotations"
   )
   export_output(x = final_table, file = output[[1]])
+
+  log_complete(ctx, n_filtered = nrow(final_table))
 
   rm(final_table)
   return(output[[1]])

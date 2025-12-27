@@ -9,7 +9,8 @@ test_that("prepare_taxa validates input parameter", {
       input = 123,
       output = "output.tsv"
     ),
-    "must be a single character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   # Test vector input
@@ -18,7 +19,8 @@ test_that("prepare_taxa validates input parameter", {
       input = c("file1.tsv", "file2.tsv"),
       output = "output.tsv"
     ),
-    "must be a single character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 })
 
@@ -69,7 +71,8 @@ test_that("prepare_taxa validates org_tax_ott parameter", {
       org_tax_ott = 123,
       output = "output.tsv"
     ),
-    "must be a single character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   # Test vector org_tax_ott
@@ -79,7 +82,8 @@ test_that("prepare_taxa validates org_tax_ott parameter", {
       org_tax_ott = c("ott1.tsv", "ott2.tsv"),
       output = "output.tsv"
     ),
-    "must be a single character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   unlink(temp_input)

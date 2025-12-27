@@ -368,6 +368,8 @@ prepare_annotations_sirius <-
       step = "prepare_annotations_sirius"
     )$files$libraries$sop$merged$structures$taxonomies$npc
   ) {
+    ctx <- log_operation("prepare_annotations_sirius", version = sirius_version)
+
     # Validation ----
     sirius_version <- as.character(sirius_version)
     validate_sirius_inputs(
@@ -381,7 +383,8 @@ prepare_annotations_sirius <-
       str_tax_cla = str_tax_cla,
       str_tax_npc = str_tax_npc
     )
-    log_info("Preparing SIRIUS v%s annotations", sirius_version)
+
+    log_debug("SIRIUS version: %s", sirius_version)
     # Handle missing input ----
     if (is.null(input_directory)) {
       input_directory <- "Th1sd1rw0nt3x1st"
@@ -450,7 +453,14 @@ prepare_annotations_sirius <-
       "Splitting results into CANOPUS, formula, and structure tables"
     )
     splits <- split_sirius_results(table)
-    log_info("Exporting SIRIUS results to %d files", length(splits))
+
+    log_complete(
+      ctx,
+      n_canopus = nrow(splits$canopus),
+      n_formulas = nrow(splits$formula),
+      n_structures = nrow(splits$structures)
+    )
+
     export_params(
       parameters = get_params(step = "prepare_annotations_sirius"),
       step = "prepare_annotations_sirius"
@@ -458,7 +468,7 @@ prepare_annotations_sirius <-
     export_output(x = splits$canopus, file = output_can)
     export_output(x = splits$formula, file = output_for)
     export_output(x = splits$structures, file = output_ann[[1]])
-    log_success("SIRIUS annotations prepared successfully")
+
     invisible(c(
       "canopus" = output_can,
       "formula" = output_for,

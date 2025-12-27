@@ -20,13 +20,15 @@ test_that("get_file validates URL parameter", {
   # Empty URL
   expect_error(
     get_file(url = "", export = "test.txt"),
-    "Provide a non-empty string."
+    "Fix: Provide a non-empty string",
+    fixed = TRUE
   )
 
   # Non-character URL
   expect_error(
     get_file(url = 123, export = "test.txt"),
-    "Ensure the parameter is a length-1 character value."
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 })
 
@@ -40,13 +42,15 @@ test_that("get_file validates export parameter", {
   # NULL export
   expect_error(
     get_file(url = "https://example.com/file.txt", export = NULL),
-    "Provide a non-NULL character string."
+    "Fix: Provide a non-NULL character string",
+    fixed = TRUE
   )
 
   # Empty export
   expect_error(
     get_file(url = "https://example.com/file.txt", export = ""),
-    "Provide a non-empty string."
+    "Fix: Provide a non-empty string",
+    fixed = TRUE
   )
 })
 
@@ -134,7 +138,9 @@ test_that("get_file downloads file successfully", {
 ## Download Failure Handling ----
 
 test_that("get_file fails gracefully with invalid URL", {
-  tmp <- temp_test_dir("get_file_invalid_url")
+  # skip("Network test - too slow with retry logic")
+
+  tmp <- temp_test_dir("get_file_invalid")
   withr::local_dir(new = tmp)
   paths <- local_test_project(copy = TRUE)
   test_file <- file.path("data", "source", "test.txt")
@@ -148,12 +154,14 @@ test_that("get_file fails gracefully with invalid URL", {
       export = test_file,
       limit = 5
     ),
-    "Failed to download"
+    "failed after retries"
   )
   expect_false(file.exists(test_file))
 })
 
 test_that("get_file handles 404 errors", {
+  # skip("Network test - too slow with retry logic")
+
   tmp <- temp_test_dir("get_file_404")
   withr::local_dir(new = tmp)
   paths <- local_test_project(copy = TRUE)
@@ -168,7 +176,7 @@ test_that("get_file handles 404 errors", {
       export = test_file,
       limit = 10
     ),
-    "Failed to download"
+    "failed after retries"
   )
 })
 
