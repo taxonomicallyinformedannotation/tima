@@ -2,7 +2,7 @@
 % Please edit documentation in R/validations_utils.R
 \name{validate_character}
 \alias{validate_character}
-\title{Validate character parameter}
+\title{Validate choice parameter}
 \usage{
 validate_character(
   value,
@@ -22,11 +22,24 @@ validate_character(
 \item{allow_null}{Allow NULL values (default: FALSE)}
 
 \item{allow_empty}{Allow empty strings (default: FALSE)}
+
+\item{choices}{Character vector of allowed choices}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise
+
+Invisible TRUE if valid, stops with error otherwise
 }
 \description{
+Validates that a value is one of a set of allowed choices
+
 Generic validator for character string parameters
+}
+\examples{
+\dontrun{
+validate_choice("OR", c("OR", "AND"), param_name = "condition")
+}
+Validate character parameter
+
 }
 \keyword{internal}

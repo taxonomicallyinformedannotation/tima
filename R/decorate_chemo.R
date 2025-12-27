@@ -44,6 +44,11 @@ decorate_chemo <- function(
   score_chemical_npc_superclass,
   score_chemical_npc_class
 ) {
+  ctx <- log_operation(
+    "decorate_chemo",
+    n_annotations = nrow(annot_table_wei_chemo)
+  )
+
   # Input Validation ----
   validate_dataframe(
     annot_table_wei_chemo,
@@ -229,6 +234,8 @@ decorate_chemo <- function(
     npc_counts["superclass"],
     npc_counts["class"]
   )
+
+  log_complete(ctx, n_processed = nrow(annot_table_wei_chemo))
 
   return(annot_table_wei_chemo)
 }

@@ -21,6 +21,14 @@ ELECTRON_MASS_DALTONS <- 5.485799E-4
 #' @keywords internal
 ISOTOPE_MASS_SHIFT_DALTONS <- 1.0033548378
 
+# Logging Configuration ----
+
+#' Default log level
+#' @description Default logging level if TIMA_LOG_LEVEL environment variable
+#'     is not set. Valid values: "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
+#' @keywords internal
+DEFAULT_LOG_LEVEL <- "INFO"
+
 # Validation Thresholds ----
 
 #' Maximum allowed mass tolerance in ppm

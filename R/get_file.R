@@ -7,6 +7,7 @@
 #' @include constants.R
 #' @include create_dir.R
 #' @include logs_utils.R
+#' @include retry_utils.R
 #' @include validations_utils.R
 #'
 #' @param url Character string URL of the file to download
@@ -45,7 +46,8 @@ get_file <- function(url, export, limit = 3600L) {
   log_debug("Downloading from: %s", url)
 
   # Download File ----
-  start_time <- Sys.time()
+  ctx <- log_operation("download_file", url = url, destination = export)
+
   resp <- download_with_error_handling(url, export)
   validate_http_response(resp, url, export)
 
@@ -53,32 +55,31 @@ get_file <- function(url, export, limit = 3600L) {
   validate_downloaded_file(export, url)
 
   # Log Success ----
-  elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
   file_size <- file.info(export)$size
-  log_file_op("Downloaded", export, size_bytes = file_size)
-  log_debug("Download completed in %s", format_time(elapsed))
+  log_complete(ctx, size_bytes = file_size)
 
   invisible(export)
 }
 
 # Helper Functions ----
 
-#' Download file with error handling
+#' Download file with error handling and retry
 #' @keywords internal
 download_with_error_handling <- function(url, export) {
   tryCatch(
-    httr2::request(base_url = url) |>
-      httr2::req_progress() |>
-      httr2::req_perform(path = export),
+    with_retry(
+      expr = {
+        httr2::request(base_url = url) |>
+          httr2::req_progress() |>
+          httr2::req_perform(path = export)
+      },
+      max_attempts = 3L,
+      backoff = 2,
+      operation_name = "file download"
+    ),
     error = function(e) {
       cleanup_failed_download(export)
-      stop(
-        "Failed to download from ",
-        url,
-        ": ",
-        conditionMessage(e),
-        call. = FALSE
-      )
+      stop(e)
     }
   )
 }
@@ -90,13 +91,39 @@ validate_http_response <- function(resp, url, export) {
 
   if (status < 200L || status >= 300L) {
     cleanup_failed_download(export)
-    stop(
-      "HTTP error ",
-      status,
-      " downloading from: ",
-      url,
-      call. = FALSE
+
+    # Provide helpful context based on status code
+    status_explanation <- switch(
+      as.character(status),
+      "404" = "Resource not found - URL may be incorrect or resource removed",
+      "403" = "Access forbidden - authentication or permissions required",
+      "401" = "Unauthorized - credentials may be required",
+      "500" = "Server error - try again later",
+      "503" = "Service unavailable - server temporarily down",
+      "301" = "Resource moved permanently - update URL",
+      "302" = "Resource moved temporarily",
+      paste0("HTTP error ", status)
     )
+
+    msg <- format_error(
+      problem = status_explanation,
+      expected = "HTTP status 200-299 (success)",
+      received = paste0("HTTP ", status),
+      location = url,
+      suggestion = if (status == 404) {
+        "Double-check the URL spelling and path"
+      } else if (status %in% c(500, 503)) {
+        "Server is experiencing issues - try again in a few minutes"
+      } else {
+        NULL
+      },
+      fix = paste0(
+        "1. Verify the URL is correct\n",
+        "2. Check if resource has moved\n",
+        "3. Contact data provider if issue persists"
+      )
+    )
+    stop(msg, call. = FALSE)
   }
 }
 
@@ -105,22 +132,38 @@ validate_http_response <- function(resp, url, export) {
 validate_downloaded_file <- function(export, url) {
   # Check file exists
   if (!file.exists(export)) {
-    stop(
-      "Download failed - file not created: ",
-      export,
-      call. = FALSE
+    msg <- format_error(
+      problem = "Download completed but file not created",
+      expected = paste0("File at: ", export),
+      location = url,
+      context = "File system permissions or disk space issues may prevent file creation",
+      fix = paste0(
+        "1. Check directory exists and is writable\n",
+        "2. Verify sufficient disk space\n",
+        "3. Check file system permissions"
+      )
     )
+    stop(msg, call. = FALSE)
   }
 
   # Check file size
   file_size <- file.size(export)
   if (file_size <= 0L) {
     cleanup_failed_download(export)
-    stop(
-      "Download failed - empty file from: ",
-      url,
-      call. = FALSE
+    msg <- format_error(
+      problem = "Downloaded file is empty (0 bytes)",
+      expected = "File with data content",
+      received = "0 byte file",
+      location = url,
+      context = "Server may have returned empty response or download was interrupted",
+      fix = paste0(
+        "1. Verify the URL points to actual data\n",
+        "2. Check if server requires authentication\n",
+        "3. Try downloading manually to test\n",
+        "4. Check server logs if you have access"
+      )
     )
+    stop(msg, call. = FALSE)
   }
 
   # Validate file content (detect HTML error pages)
@@ -145,11 +188,26 @@ validate_file_content <- function(export, url) {
   # Check for HTML error page
   if (is_html_content(header_raw)) {
     cleanup_failed_download(export)
-    stop(
-      "Download failed - received HTML error page from: ",
-      url,
-      call. = FALSE
+    msg <- format_error(
+      problem = "Server returned HTML error page instead of data",
+      expected = "Binary data file (ZIP, GZIP) or text data",
+      received = "HTML error page",
+      location = url,
+      context = paste0(
+        "Server sent an HTML error page instead of the requested file. ",
+        "This often happens when:\n",
+        "  - URL is incorrect or resource moved\n",
+        "  - Authentication is required\n",
+        "  - Server encountered an error"
+      ),
+      fix = paste0(
+        "1. Open the URL in a web browser to see the actual error\n",
+        "2. Check if authentication or API key is required\n",
+        "3. Verify the URL path is correct\n",
+        "4. Contact the data provider for correct download URL"
+      )
     )
+    stop(msg, call. = FALSE)
   }
 
   invisible(TRUE)

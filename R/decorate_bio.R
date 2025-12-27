@@ -54,6 +54,11 @@ decorate_bio <- function(
   score_biological_variety,
   score_biological_biota
 ) {
+  ctx <- log_operation(
+    "decorate_bio",
+    n_annotations = nrow(annot_table_wei_bio)
+  )
+
   # Input Validation ----
   validate_dataframe(annot_table_wei_bio, param_name = "annot_table_wei_bio")
 
@@ -201,6 +206,8 @@ decorate_bio <- function(
     counts["variety"],
     counts["biota"]
   )
+
+  log_complete(ctx, n_processed = nrow(annot_table_wei_bio))
 
   return(annot_table_wei_bio)
 }

@@ -74,7 +74,8 @@ test_that("prepare_features_edges validates column name parameters", {
       output = "output.tsv",
       name_source = 123
     ),
-    "must be a single character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   # Test vector name_target
@@ -85,7 +86,8 @@ test_that("prepare_features_edges validates column name parameters", {
       name_source = "ID1",
       name_target = c("ID2", "ID3")
     ),
-    "must be a single character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   # unlink(temp_ms1)

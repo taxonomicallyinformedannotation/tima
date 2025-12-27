@@ -67,7 +67,7 @@ prepare_annotations_gnps <- function(
     allow_null = FALSE
   )
 
-  log_info("Preparing GNPS annotations")
+  ctx <- log_operation("prepare_annotations_gnps", n_files = length(input))
 
   if (length(input) == 0) {
     input <- "w1llN3v3r3v3r3x1st"
@@ -80,11 +80,15 @@ prepare_annotations_gnps <- function(
   ) {
     # log_trace("Loading and formatting GNPS results")
     ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
-    table <- purrr::map(
+    table <- purrr::map2(
       .x = input,
-      .f = tidytable::fread,
-      na.strings = c("", "NA"),
-      colClasses = "character"
+      .y = seq_along(input),
+      .f = ~ safe_fread(
+        file = .x,
+        file_type = paste0("GNPS results file ", .y),
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
     ) |>
       tidytable::bind_rows() |>
       tidytable::mutate(
@@ -148,6 +152,8 @@ prepare_annotations_gnps <- function(
     )
     table <- fake_annotations_columns()
   }
+
+  log_complete(ctx, n_annotations = nrow(table))
 
   export_params(
     parameters = get_params(step = "prepare_annotations_gnps"),

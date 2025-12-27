@@ -13,6 +13,7 @@
 #' @include get_params.R
 #' @include harmonize_adducts.R
 #' @include round_reals.R
+#' @include safe_fread.R
 #' @include validations_utils.R
 #'
 #' @param features Table containing your previous annotation to complement
@@ -102,6 +103,14 @@ annotate_masses <-
       step = "annotate_masses"
     )$ms$tolerances$rt$adducts
   ) {
+    # Start operation logging
+    ctx <- log_operation(
+      "annotate_masses",
+      ms_mode = ms_mode,
+      tolerance_ppm = tolerance_ppm,
+      tolerance_rt = tolerance_rt
+    )
+
     # Input Validation ----
     log_info("Starting mass-based annotation")
 
@@ -141,8 +150,10 @@ annotate_masses <-
     ## Load and Validate Features ----
 
     # log_trace("Loading features table from: %s", features)
-    features_table <- tidytable::fread(
+    features_table <- safe_fread(
       file = features,
+      file_type = "features table",
+      required_cols = c("feature_id"),
       na.strings = c("", "NA"),
       colClasses = "character"
     )
@@ -206,21 +217,32 @@ annotate_masses <-
 
     # log_trace("Loading library and supplementary data")
 
-    library_table <-
-      tidytable::fread(
-        file = library,
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )
+    library_table <- safe_fread(
+      file = library,
+      file_type = "structure library",
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    )
 
     # Load all supplementary files
     supp_files <- list(str_stereo, str_met, str_nam, str_tax_cla, str_tax_npc)
+    supp_names <- c(
+      "stereochemistry",
+      "metadata",
+      "names",
+      "ClassyFire taxonomy",
+      "NPClassifier taxonomy"
+    )
 
-    supp_tables <- purrr::map(
+    supp_tables <- purrr::map2(
       .x = supp_files,
-      .f = tidytable::fread,
-      na.strings = c("", "NA"),
-      colClasses = "character"
+      .y = supp_names,
+      .f = ~ safe_fread(
+        file = .x,
+        file_type = .y,
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
     )
 
     # Single reduce operation for all joins
@@ -973,6 +995,8 @@ annotate_masses <-
     )
     export_output(x = edges, file = output_edges[[1]])
     export_output(x = df_final, file = output_annotations[[1]])
+
+    log_complete(ctx, n_annotations = nrow(df_final), n_edges = nrow(edges))
 
     rm(edges, df_final)
     return(

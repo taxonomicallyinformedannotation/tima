@@ -67,7 +67,8 @@ test_that("weight_bio validates data frame inputs", {
       score_biological_variety = 1.0,
       score_biological_biota = 1.007276
     ),
-    "annotation_table_taxed must be a data frame"
+    "Fix: Ensure input is a valid data frame",
+    fixed = TRUE
   )
 
   # Non-data frame structure_organism_pairs_table should error
@@ -89,7 +90,8 @@ test_that("weight_bio validates data frame inputs", {
       score_biological_variety = 1.0,
       score_biological_biota = 1.007276
     ),
-    "structure_organism_pairs_table must be a data frame"
+    "Fix: Ensure input is a valid data frame",
+    fixed = TRUE
   )
 })
 
@@ -161,7 +163,8 @@ test_that("weight_bio validates biological score parameters", {
       score_biological_variety = 1.0,
       score_biological_biota = 1.007276
     ),
-    "score_biological_domain must be between 0 and 1, got: -0.1"
+    "Fix: Use a value between 0 and 1",
+    fixed = TRUE
   )
 })
 

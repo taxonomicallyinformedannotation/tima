@@ -2,7 +2,7 @@
 % Please edit documentation in R/validations_utils.R
 \name{validate_weights}
 \alias{validate_weights}
-\title{Validate weights}
+\title{Validate numeric range}
 \usage{
 validate_weights(weights, param_name = "weights")
 }
@@ -10,11 +10,23 @@ validate_weights(weights, param_name = "weights")
 \item{weights}{Named list or vector of weights}
 
 \item{param_name}{Name of the parameter (for error messages)}
+
+\item{value}{Numeric value to validate}
+
+\item{min_value}{Minimum allowed value (inclusive)}
+
+\item{max_value}{Maximum allowed value (inclusive)}
+
+\item{allow_null}{Whether NULL values are allowed}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise
+
+Invisible TRUE if valid, stops with error otherwise
 }
 \description{
+Validates that a numeric value is within a specified range
+
 Validates that a set of weights are non-negative and positive.
 Note: Weights do NOT need to sum to 1, as the weighting functions
 normalize them by dividing by their sum.
@@ -26,4 +38,6 @@ validate_weights(list(spectral = 1, chemical = 2, biological = 3))
 validate_weights(list(spectral = 0.5, biological = 0.5))
 }
 }
+\keyword{Validate}
 \keyword{internal}
+\keyword{weights}

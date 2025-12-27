@@ -65,6 +65,12 @@ harmonize_spectra <- function(
   col_sy,
   col_xl
 ) {
+  ctx <- log_operation(
+    "harmonize_spectra",
+    n_spectra = nrow(spectra),
+    mode = mode
+  )
+
   # Input Validation ----
   validate_dataframe(spectra, param_name = "spectra")
 
@@ -249,6 +255,8 @@ harmonize_spectra <- function(
     ) |>
     data.frame()
   rm(spectra_filtered)
+
+  log_complete(ctx, n_harmonized = nrow(spectra_harmonized))
 
   return(spectra_harmonized)
 }

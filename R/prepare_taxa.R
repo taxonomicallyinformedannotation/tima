@@ -14,6 +14,8 @@
 #' @include columns_utils.R
 #' @include get_params.R
 #' @include get_organism_taxonomy_ott.R
+#' @include safe_fread.R
+#' @include validations_utils.R
 #'
 #' @param input Character string path to features file with intensities
 #' @param extension Logical whether column names contain file extensions
@@ -63,22 +65,26 @@ prepare_taxa <- function(
   output = get_params(step = "prepare_taxa")$files$metadata$prepared,
   taxon = get_params(step = "prepare_taxa")$organisms$taxon
 ) {
+  ctx <- log_operation("prepare_taxa", taxon = taxon)
+
   # Validate file paths
-  if (!is.character(input) || length(input) != 1L) {
-    stop("input must be a single character string")
-  }
+  validate_character(input, param_name = "input", allow_empty = FALSE)
+  validate_file_exists(
+    path = input,
+    file_type = "features file",
+    param_name = "input"
+  )
 
-  if (!file.exists(input)) {
-    stop("Input features file not found: ", input)
-  }
-
-  if (!is.character(org_tax_ott) || length(org_tax_ott) != 1L) {
-    stop("org_tax_ott must be a single character string")
-  }
-
-  if (!file.exists(org_tax_ott)) {
-    stop("OTT taxonomy file not found: ", org_tax_ott)
-  }
+  validate_character(
+    org_tax_ott,
+    param_name = "org_tax_ott",
+    allow_empty = FALSE
+  )
+  validate_file_exists(
+    path = org_tax_ott,
+    file_type = "OTT taxonomy file",
+    param_name = "org_tax_ott"
+  )
 
   if (!is.character(output) || length(output) != 1L) {
     stop("output must be a single character string")
@@ -89,18 +95,16 @@ prepare_taxa <- function(
     stop("extension must be a single logical value (TRUE/FALSE)")
   }
 
-  log_info("Preparing taxonomic assignments for features")
-
   # Check if using single taxon or metadata-based assignment
   if (!is.null(taxon) && !is.na(taxon)) {
-    log_info("Assigning all features to single organism: %s", taxon)
+    log_debug("Assigning all features to single organism: %s", taxon)
   } else {
-    if (!is.character(metadata) || length(metadata) != 1L) {
-      stop("metadata path must be provided if taxon is not specified")
-    }
-    if (!file.exists(metadata)) {
-      stop("Metadata file not found: ", metadata)
-    }
+    validate_character(metadata, param_name = "metadata", allow_empty = FALSE)
+    validate_file_exists(
+      path = metadata,
+      file_type = "metadata file",
+      param_name = "metadata"
+    )
   }
 
   # Handle empty taxon string as NULL
@@ -109,20 +113,22 @@ prepare_taxa <- function(
   }
 
   if (is.null(taxon)) {
-    log_info("Using metadata for organism assignments")
+    log_debug("Using metadata for organism assignments")
   }
 
   # log_trace("Loading feature table")
-  feature_table_0 <- tidytable::fread(
+  feature_table_0 <- safe_fread(
     file = input,
+    file_type = "features table",
     na.strings = c("", "NA"),
     colClasses = "character"
   )
 
   if (is.null(taxon)) {
     # log_trace("Loading metadata table")
-    metadata_table <- tidytable::fread(
+    metadata_table <- safe_fread(
       file = metadata,
+      file_type = "metadata table",
       na.strings = c("", "NA"),
       colClasses = "character"
     )
@@ -274,6 +280,8 @@ prepare_taxa <- function(
       .fns = ~ tidytable::replace_na(.x = .x, replace = "ND")
     ))
   rm(biological_metadata, metadata_table_joined)
+
+  log_complete(ctx, n_features = nrow(taxed_features_table))
 
   export_params(
     parameters = get_params(step = "prepare_taxa"),

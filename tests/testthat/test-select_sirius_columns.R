@@ -7,7 +7,8 @@ library(testthat)
 test_that("test-select_sirius_columns_canopus validates df parameter", {
   expect_error(
     select_sirius_columns_canopus(df = "not_a_df", sirius_version = "5"),
-    "df must be a data frame"
+    "Fix: Ensure input is a valid data frame",
+    fixed = TRUE
   )
 })
 

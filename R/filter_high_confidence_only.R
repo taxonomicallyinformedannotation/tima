@@ -88,6 +88,12 @@ filter_high_confidence_only <- function(
   matched_peaks_min = DEFAULT_HC_SCORE_MIN_PEAKS,
   context = NULL
 ) {
+  ctx <- log_operation(
+    "filter_high_confidence",
+    n_input = nrow(df),
+    context = context %||% "default"
+  )
+
   # Validation ----
   validate_dataframe(df, param_name = "df", allow_empty = TRUE)
 
@@ -304,6 +310,8 @@ filter_high_confidence_only <- function(
     n_after,
     round(100 * n_after / n_before, 1)
   )
+
+  log_complete(ctx, n_filtered = n_after, n_removed = n_removed)
 
   df_filtered
 }

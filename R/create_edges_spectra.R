@@ -55,6 +55,13 @@ create_edges_spectra <- function(
   )$ms$tolerances$mass$dalton$ms2,
   qutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity
 ) {
+  ctx <- log_operation(
+    "create_edges_spectra",
+    method = method,
+    threshold = threshold,
+    n_input_files = length(input)
+  )
+
   # Validate similarity method early
   if (!method %in% VALID_SIMILARITY_METHODS) {
     stop(
@@ -261,8 +268,11 @@ create_edges_spectra <- function(
     step = "create_edges_spectra"
   )
 
+  n_edges <- nrow(edges)
   export_output(x = edges, file = output[[1]])
   rm(edges)
+
+  log_complete(ctx, n_edges = n_edges)
 
   return(output[[1]])
 }

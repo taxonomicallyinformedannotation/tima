@@ -5,6 +5,7 @@
 #'     Stops execution with informative messages if any condition is violated.
 #'
 #' @include constants.R
+#' @include safe_fread.R
 #' @include validations_utils.R
 #'
 #' @param library Character, path to library file (required).
@@ -185,11 +186,15 @@ validate_weight_annotations_inputs <- function(
 load_annotation_tables <- function(annotations, ms1_only) {
   log_debug("Loading %d annotation file(s)", length(annotations))
   annotation_table <- tryCatch(
-    purrr::map(
+    purrr::map2(
       .x = annotations,
-      .f = tidytable::fread,
-      na.strings = c("", "NA"),
-      colClasses = "character"
+      .y = seq_along(annotations),
+      .f = ~ safe_fread(
+        file = .x,
+        file_type = paste0("annotation file ", .y),
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
     ) |>
       tidytable::bind_rows(),
     error = function(e) {
@@ -237,8 +242,9 @@ load_annotation_tables <- function(annotations, ms1_only) {
 load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
   log_debug("Loading library from: %s", library)
   library_table <- tryCatch(
-    tidytable::fread(
+    safe_fread(
       file = library,
+      file_type = "structure library",
       na.strings = c("", "NA"),
       colClasses = "character"
     ),
@@ -248,14 +254,17 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
   )
 
   supp_files <- list(str_stereo, org_tax_ott)
-  supp_tables <- purrr::map(
+  supp_names <- c("stereochemistry", "organism taxonomy")
+  supp_tables <- purrr::map2(
     .x = supp_files,
-    .f = function(path) {
+    .y = supp_names,
+    .f = function(path, name) {
       if (is.null(path) || !file.exists(path)) {
         return(tidytable::tidytable())
       }
-      tidytable::fread(
+      safe_fread(
         file = path,
+        file_type = name,
         na.strings = c("", "NA"),
         colClasses = "character"
       )
@@ -288,8 +297,9 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
 load_edges_table <- function(edges, candidates_neighbors) {
   log_debug("Loading edges from: %s", edges)
   edges_table <- tryCatch(
-    tidytable::fread(
+    safe_fread(
       file = edges,
+      file_type = "spectral edges table",
       na.strings = c("", "NA"),
       colClasses = "character"
     ),
@@ -832,13 +842,18 @@ weight_annotations <- function(
     high_confidence
   )
 
-  start_time <- Sys.time()
+  ctx <- log_operation(
+    "weight_annotations",
+    n_candidates_neighbors = candidates_neighbors,
+    n_candidates_final = candidates_final
+  )
 
   # Load Input Data ----
   log_debug("Loading input data tables")
 
-  components_table <- tidytable::fread(
+  components_table <- safe_fread(
     file = components,
+    file_type = "components table",
     na.strings = c("", "NA"),
     colClasses = "character"
   )
@@ -855,14 +870,16 @@ weight_annotations <- function(
     nrow(structure_organism_pairs_table)
   )
 
-  canopus_table <- tidytable::fread(
+  canopus_table <- safe_fread(
     file = canopus,
+    file_type = "CANOPUS classifications",
     na.strings = c("", "NA"),
     colClasses = "character"
   )
 
-  formula_table <- tidytable::fread(
+  formula_table <- safe_fread(
     file = formula,
+    file_type = "molecular formulas",
     na.strings = c("", "NA"),
     colClasses = "character"
   )
@@ -897,8 +914,9 @@ weight_annotations <- function(
 
   annotation_table_taxed <- annotation_table |>
     tidytable::left_join(
-      y = tidytable::fread(
+      y = safe_fread(
         file = taxa,
+        file_type = "features taxed",
         na.strings = c("", "NA"),
         colClasses = "character"
       )
@@ -1012,8 +1030,7 @@ weight_annotations <- function(
     )
   rm(annot_table_wei_chemo)
 
-  elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-  log_info("Annotation weighting complete in %s s", round(elapsed, 1))
+  log_complete(ctx, n_annotations = nrow(results_list$taxa))
 
   # Export Results ----
   log_debug("Exporting results to disk")

@@ -2,36 +2,37 @@
 % Please edit documentation in R/validations_utils.R
 \name{validate_numeric_range}
 \alias{validate_numeric_range}
-\title{Validate numeric range}
+\title{Numeric range validation}
 \usage{
 validate_numeric_range(
   value,
   min_value = -Inf,
   max_value = Inf,
   param_name = "value",
-  allow_null = FALSE
+  recommended_min = NULL,
+  recommended_max = NULL,
+  context = NULL
 )
 }
 \arguments{
 \item{value}{Numeric value to validate}
 
-\item{min_value}{Minimum allowed value (inclusive)}
+\item{min_value}{Minimum allowed value}
 
-\item{max_value}{Maximum allowed value (inclusive)}
+\item{max_value}{Maximum allowed value}
 
-\item{param_name}{Name of the parameter (for error messages)}
+\item{param_name}{Parameter name for error messages}
 
-\item{allow_null}{Whether NULL values are allowed}
+\item{recommended_min}{Recommended minimum (for warnings)}
+
+\item{recommended_max}{Recommended maximum (for warnings)}
+
+\item{context}{Why this range matters}
 }
 \value{
-Invisible TRUE if valid, stops with error otherwise
+Invisible TRUE if valid, stops/warns with messages otherwise
 }
 \description{
-Validates that a numeric value is within a specified range
-}
-\examples{
-\dontrun{
-validate_numeric_range(0.5, min_value = 0, max_value = 1, param_name = "threshold")
-}
+Validates numeric values with contextual guidance
 }
 \keyword{internal}

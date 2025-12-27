@@ -6,6 +6,7 @@
 #'
 #' @include columns_utils.R
 #' @include validations_utils.R
+#' @include safe_fread.R
 #'
 #' @param df Data frame with structural metadata to complement
 #' @param str_stereo Path to structure stereochemistry file
@@ -37,6 +38,8 @@ complement_metadata_structures <- function(
   str_tax_cla,
   str_tax_npc
 ) {
+  ctx <- log_operation("complement_metadata", n_input = nrow(df))
+
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
 
@@ -58,8 +61,9 @@ complement_metadata_structures <- function(
   log_debug("Complementing metadata for %d rows", nrow(df))
 
   # Load stereochemistry data
-  stereo <- tidytable::fread(
-    str_stereo,
+  stereo <- safe_fread(
+    file = str_stereo,
+    file_type = "stereochemistry data",
     na.strings = c("", "NA"),
     colClasses = "character"
   )
@@ -89,8 +93,9 @@ complement_metadata_structures <- function(
     )
   # log_trace("Stereo loaded")
 
-  met_2d <- tidytable::fread(
-    str_met,
+  met_2d <- safe_fread(
+    file = str_met,
+    file_type = "structure metadata",
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
@@ -114,8 +119,9 @@ complement_metadata_structures <- function(
     tidytable::distinct(structure_smiles_no_stereo, .keep_all = TRUE)
   # log_trace("Metadata loaded")
 
-  nam_2d <- tidytable::fread(
-    str_nam,
+  nam_2d <- safe_fread(
+    file = str_nam,
+    file_type = "structure names",
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
@@ -142,8 +148,9 @@ complement_metadata_structures <- function(
     tidytable::distinct(structure_smiles_no_stereo, .keep_all = TRUE)
   # log_trace("Names loaded")
 
-  tax_cla <- tidytable::fread(
-    str_tax_cla,
+  tax_cla <- safe_fread(
+    file = str_tax_cla,
+    file_type = "ClassyFire taxonomy",
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
@@ -164,8 +171,9 @@ complement_metadata_structures <- function(
     )
   # log_trace("Classyfire done")
 
-  tax_npc <- tidytable::fread(
-    str_tax_npc,
+  tax_npc <- safe_fread(
+    file = str_tax_npc,
+    file_type = "NPClassifier taxonomy",
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
@@ -410,6 +418,8 @@ complement_metadata_structures <- function(
     tax_cla,
     tax_npc
   )
+
+  log_complete(ctx, n_enriched = nrow(table_final))
 
   return(table_final)
 }

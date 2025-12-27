@@ -28,7 +28,8 @@ test_that("harmonize_spectra validates input is a data frame", {
       col_sy = "synonyms",
       col_xl = "xlogp"
     ),
-    "must be a data frame"
+    "Fix: Ensure input is a valid data frame",
+    fixed = TRUE
   )
 })
 

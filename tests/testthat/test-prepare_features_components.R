@@ -42,7 +42,8 @@ test_that("prepare_features_components validates output parameter", {
       input = temp_input,
       output = 123
     ),
-    "must be a single character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   # Test vector output
@@ -51,7 +52,8 @@ test_that("prepare_features_components validates output parameter", {
       input = temp_input,
       output = c("out1.tsv", "out2.tsv")
     ),
-    "must be a single character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 })
 

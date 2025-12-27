@@ -12,13 +12,15 @@ test_that("export_spectra_rds validates file parameter", {
   # NULL file
   expect_error(
     export_spectra_rds(file = NULL, spectra = Spectra::Spectra()),
-    "Provide a non-NULL character string."
+    "Fix: Provide a non-NULL character string",
+    fixed = TRUE
   )
 
   # Non-character file
   expect_error(
     export_spectra_rds(file = 123, spectra = Spectra::Spectra()),
-    "file must be a single character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 
   # Multiple file paths
@@ -27,7 +29,8 @@ test_that("export_spectra_rds validates file parameter", {
       file = c("path1.rds", "path2.rds"),
       spectra = Spectra::Spectra()
     ),
-    "file must be a single character string"
+    "Fix: Ensure the parameter is a length-1 character value",
+    fixed = TRUE
   )
 })
 

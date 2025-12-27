@@ -488,3 +488,201 @@ log_similarity_distribution_counts <- function(counts, title) {
   )
   invisible(NULL)
 }
+
+# Advanced Logging: Structured Operations ----
+
+#' @title Create a logging context for operations
+#'
+#' @description
+#' Creates a structured logging context that tracks operation lifecycle:
+#' start time, parameters, results, and elapsed time. This enables rich,
+#' hierarchical logging that's easy to parse and analyze.
+#'
+#' @param operation_name Character, name of the operation (e.g., "classify_structures")
+#' @param ... Named parameters to log with the operation
+#'
+#' @return A list with class "tima_log_context" containing:
+#'   - operation: name of the operation
+#'   - start_time: POSIXct timestamp
+#'   - params: list of parameters
+#'   - metadata: list for storing intermediate results
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#' ctx <- log_operation("classify_structures", n_smiles = 100)
+#' # ... do work ...
+#' log_complete(ctx, n_classified = 95, n_failed = 5)
+#' }
+log_operation <- function(operation_name, ...) {
+  ensure_logging_initialized()
+
+  params <- list(...)
+
+  ctx <- structure(
+    list(
+      operation = as.character(operation_name),
+      start_time = Sys.time(),
+      params = params,
+      metadata = list()
+    ),
+    class = "tima_log_context"
+  )
+
+  # Log operation start
+  param_str <- if (length(params) > 0) {
+    paste(names(params), params, sep = "=", collapse = ", ")
+  } else {
+    "(no parameters)"
+  }
+
+  log_info("▶ Starting: %s [%s]", operation_name, param_str)
+
+  invisible(ctx)
+}
+
+#' @title Log operation completion
+#'
+#' @description
+#' Logs the successful completion of an operation with results and timing.
+#'
+#' @param ctx tima_log_context object from log_operation()
+#' @param ... Named results to log
+#'
+#' @return The input context (invisibly)
+#' @export
+log_complete <- function(ctx, ...) {
+  if (!inherits(ctx, "tima_log_context")) {
+    stop("ctx must be a tima_log_context from log_operation()", call. = FALSE)
+  }
+
+  results <- list(...)
+  elapsed <- as.numeric(difftime(Sys.time(), ctx$start_time, units = "secs"))
+
+  result_str <- if (length(results) > 0) {
+    paste(names(results), results, sep = "=", collapse = ", ")
+  } else {
+    "(no results)"
+  }
+
+  log_info(
+    "✓ Completed: %s [%s] (%s)",
+    ctx$operation,
+    result_str,
+    format_time(elapsed)
+  )
+
+  invisible(ctx)
+}
+
+#' @title Log operation failure
+#'
+#' @description
+#' Logs operation failure with error details and timing.
+#'
+#' @param ctx tima_log_context object from log_operation()
+#' @param error Error object or character message
+#' @param ... Additional context to log
+#'
+#' @return The input context (invisibly)
+#' @export
+log_failed <- function(ctx, error, ...) {
+  if (!inherits(ctx, "tima_log_context")) {
+    stop("ctx must be a tima_log_context from log_operation()", call. = FALSE)
+  }
+
+  extra <- list(...)
+  elapsed <- as.numeric(difftime(Sys.time(), ctx$start_time, units = "secs"))
+
+  error_msg <- if (inherits(error, "error")) {
+    conditionMessage(error)
+  } else {
+    as.character(error)
+  }
+
+  extra_str <- if (length(extra) > 0) {
+    paste0(" [", paste(names(extra), extra, sep = "=", collapse = ", "), "]")
+  } else {
+    ""
+  }
+
+  log_error(
+    "✗ Failed: %s - %s%s (%s)",
+    ctx$operation,
+    error_msg,
+    extra_str,
+    format_time(elapsed)
+  )
+
+  invisible(ctx)
+}
+
+#' @title Log intermediate operation metadata
+#'
+#' @description
+#' Adds metadata to an operation context and logs it.
+#'
+#' @param ctx tima_log_context object from log_operation()
+#' @param ... Named metadata to add and log
+#'
+#' @return The updated context (invisibly)
+#' @export
+log_metadata <- function(ctx, ...) {
+  if (!inherits(ctx, "tima_log_context")) {
+    stop("ctx must be a tima_log_context from log_operation()", call. = FALSE)
+  }
+
+  metadata <- list(...)
+  ctx$metadata <- c(ctx$metadata, metadata)
+
+  metadata_str <- paste(names(metadata), metadata, sep = "=", collapse = ", ")
+  log_debug("  %s: %s", ctx$operation, metadata_str)
+
+  invisible(ctx)
+}
+
+#' @title Wrap an operation with automatic logging
+#'
+#' @description
+#' Wraps an expression with automatic start/complete/failed logging.
+#' This is the recommended way to add operation logging - it handles
+#' errors gracefully and ensures cleanup.
+#'
+#' @param operation_name Character, name of the operation
+#' @param expr Expression to evaluate
+#' @param ... Parameters to log with operation start
+#'
+#' @return Result of expr, or throws error if expr fails
+#' @export
+#' @examples
+#' \dontrun{
+#' result <- with_logging("classify", n = 100, {
+#'   # Your code here
+#'   classify_structures(df)
+#' })
+#' }
+with_logging <- function(operation_name, expr, ...) {
+  ctx <- log_operation(operation_name, ...)
+
+  tryCatch(
+    {
+      result <- force(expr)
+
+      # Try to extract meaningful result metadata
+      result_meta <- list()
+      if (is.data.frame(result)) {
+        result_meta$n_rows <- nrow(result)
+        result_meta$n_cols <- ncol(result)
+      } else if (is.list(result) && !is.data.frame(result)) {
+        result_meta$n_elements <- length(result)
+      }
+
+      log_complete(ctx, !!!result_meta)
+      result
+    },
+    error = function(e) {
+      log_failed(ctx, e)
+      stop(e)
+    }
+  )
+}

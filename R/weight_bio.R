@@ -81,6 +81,11 @@ weight_bio <- function(
   score_biological_variety,
   score_biological_biota
 ) {
+  ctx <- log_operation(
+    "weight_bio",
+    n_annotations = nrow(annotation_table_taxed),
+    n_sop = nrow(structure_organism_pairs_table)
+  )
   # Input Validation ----
   validate_dataframe(
     annotation_table_taxed,
@@ -639,6 +644,8 @@ weight_bio <- function(
     )
 
   rm(annot_table_wei_bio_big)
+
+  log_complete(ctx, n_weighted = nrow(annot_table_wei_bio))
 
   return(annot_table_wei_bio)
 }
