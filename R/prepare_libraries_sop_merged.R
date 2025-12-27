@@ -76,9 +76,14 @@ validate_sop_merged_inputs <- function(
 load_and_merge_libraries <- function(files, cache) {
   libraries <- files |>
     purrr::map(
-      .f = tidytable::fread,
-      na.strings = c("", "NA"),
-      colClasses = "character"
+      .f = function(file) {
+        safe_fread(
+          file = file,
+          file_type = "library",
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        )
+      }
     )
 
   libraries |>

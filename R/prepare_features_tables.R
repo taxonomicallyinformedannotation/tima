@@ -176,19 +176,11 @@ prepare_features_tables <- function(
 #' Load features file with error handling
 #' @keywords internal
 .load_features_file <- function(features) {
-  tbl <- tryCatch(
-    tidytable::fread(
-      features,
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    ),
-    error = function(e) {
-      stop(
-        "Failed to read features file: ",
-        conditionMessage(e),
-        call. = FALSE
-      )
-    }
+  tbl <- safe_fread(
+    file = features,
+    file_type = "features table",
+    na.strings = c("", "NA"),
+    colClasses = "character"
   )
 
   if (nrow(tbl) == 0L) {

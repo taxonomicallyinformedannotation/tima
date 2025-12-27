@@ -38,15 +38,17 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
   ))
 
   log_info("Loading benchmark features from: %s", input)
-  features <- tidytable::fread(
-    input,
+  features <- safe_fread(
+    file = input,
+    file_type = "benchmark features",
     na.strings = c("", "NA"),
     colClasses = "character"
   )
 
   log_debug("Loading structure-organism pairs from: %s", keys)
-  sop <- tidytable::fread(
-    keys,
+  sop <- safe_fread(
+    file = keys,
+    file_type = "structure-organism pairs",
     na.strings = c("", "NA"),
     colClasses = "character"
   ) |>
@@ -60,8 +62,9 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
     )
 
   log_debug("Loading organism taxonomy from: %s", org_tax_ott)
-  taxo <- tidytable::fread(
-    org_tax_ott,
+  taxo <- safe_fread(
+    file = org_tax_ott,
+    file_type = "organism taxonomy",
     na.strings = c("", "NA"),
     colClasses = "character"
   )

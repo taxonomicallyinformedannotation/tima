@@ -153,8 +153,9 @@ prepare_taxa <- function(
   # )
   organism_table_filled <- organism_table |>
     tidytable::left_join(
-      y = tidytable::fread(
-        org_tax_ott,
+      y = safe_fread(
+        file = org_tax_ott,
+        file_type = "organism taxonomy (OTT)",
         na.strings = c("", "NA"),
         colClasses = "character"
       ),

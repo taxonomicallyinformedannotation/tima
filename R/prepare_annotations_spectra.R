@@ -117,9 +117,14 @@ prepare_annotations_spectra <- function(
   table <-
     purrr::map(
       .x = input,
-      .f = tidytable::fread,
-      na.strings = c("", "NA"),
-      colClasses = "character"
+      .f = function(file) {
+        safe_fread(
+          file = file,
+          file_type = "spectral annotations",
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        )
+      }
     ) |>
     tidytable::bind_rows() |>
     tidytable::filter(!is.na(feature_id)) |>

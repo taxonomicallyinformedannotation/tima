@@ -46,17 +46,11 @@ prepare_libraries_sop_closed <- function(
   if (file.exists(input)) {
     log_debug("Loading closed resource from: %s", input)
 
-    closed <- tryCatch(
-      {
-        tidytable::fread(
-          input,
-          na.strings = c("", "NA"),
-          colClasses = "character"
-        )
-      },
-      error = function(e) {
-        stop("Failed to read closed library file: ", conditionMessage(e))
-      }
+    closed <- safe_fread(
+      file = input,
+      file_type = "closed library",
+      na.strings = c("", "NA"),
+      colClasses = "character"
     )
 
     if (nrow(closed) == 0L) {
