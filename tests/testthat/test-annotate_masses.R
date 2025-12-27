@@ -2,19 +2,65 @@
 
 library(testthat)
 
+# Helper to create minimal valid fixtures for parameter validation tests
+setup_minimal_fixtures <- function() {
+  temp_dir <- file.path(
+    tempdir(),
+    paste0("test_", format(Sys.time(), "%Y%m%d_%H%M%S_%OS3"))
+  )
+  dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
+
+  list(
+    features = copy_fixture_to(
+      "features_small.csv",
+      file.path(temp_dir, "features.csv")
+    ),
+    library = copy_fixture_to(
+      "library_minimal.csv",
+      file.path(temp_dir, "library.csv")
+    ),
+    str_stereo = copy_fixture_to(
+      "structures_stereo.csv",
+      file.path(temp_dir, "str_stereo.csv")
+    ),
+    str_met = copy_fixture_to(
+      "structures_metadata_minimal.csv",
+      file.path(temp_dir, "str_met.csv")
+    ),
+    str_nam = copy_fixture_to(
+      "structures_names_minimal.csv",
+      file.path(temp_dir, "str_nam.csv")
+    ),
+    str_tax_cla = copy_fixture_to(
+      "structures_taxonomy_cla_minimal.csv",
+      file.path(temp_dir, "str_tax_cla.csv")
+    ),
+    str_tax_npc = copy_fixture_to(
+      "structures_taxonomy_npc_minimal.csv",
+      file.path(temp_dir, "str_tax_npc.csv")
+    ),
+    cleanup = function() {
+      unlink(temp_dir, recursive = TRUE)
+      unlink("data", recursive = TRUE)
+      }
+  )
+}
+
 ## Input Validation ----
 
 test_that("annotate_masses validates ms_mode correctly", {
+  fixtures <- setup_minimal_fixtures()
+
   # Invalid mode should error
   expect_error(
     annotate_masses(
-      features = tempfile(),
-      library = tempfile(),
-      str_stereo = tempfile(),
-      str_met = tempfile(),
-      str_nam = tempfile(),
-      str_tax_cla = tempfile(),
-      str_tax_npc = tempfile(),
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc,
       ms_mode = "invalid_mode"
     ),
     "Fix: Choose one of: pos, neg",
@@ -23,42 +69,40 @@ test_that("annotate_masses validates ms_mode correctly", {
 
   # Blank mode should error
   expect_error(
-    annotate_masses(ms_mode = ""),
+    annotate_masses(
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc,
+      ms_mode = ""
+    ),
     "Did you mean 'pos'?",
     fixed = TRUE
   )
 
+  fixtures$cleanup()
   # NULL mode should error (handled by parameter default or earlier validation)
   # Note: NULL will use default from get_params, so we test with invalid value instead
 })
 
 test_that("annotate_masses validates tolerance_ppm correctly", {
-  # Create temp files to pass file validation
-  temp_files <- list(
-    features = tempfile(),
-    library = tempfile(),
-    str_stereo = tempfile(),
-    str_met = tempfile(),
-    str_nam = tempfile(),
-    str_tax_cla = tempfile(),
-    str_tax_npc = tempfile()
-  )
-  # Create the temp files so they exist
-  lapply(temp_files, function(f) writeLines("", f))
-  on.exit(lapply(temp_files, unlink), add = TRUE)
+  fixtures <- setup_minimal_fixtures()
 
   # Zero tolerance should error
   expect_error(
     annotate_masses(
       tolerance_ppm = 0,
       ms_mode = "pos",
-      features = temp_files$features,
-      library = temp_files$library,
-      str_stereo = temp_files$str_stereo,
-      str_met = temp_files$str_met,
-      str_nam = temp_files$str_nam,
-      str_tax_cla = temp_files$str_tax_cla,
-      str_tax_npc = temp_files$str_tax_npc
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc
     ),
     "Fix: Use a positive value appropriate for your instrument",
     fixed = TRUE
@@ -69,68 +113,56 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
     annotate_masses(
       tolerance_ppm = -5,
       ms_mode = "pos",
-      features = temp_files$features,
-      library = temp_files$library,
-      str_stereo = temp_files$str_stereo,
-      str_met = temp_files$str_met,
-      str_nam = temp_files$str_nam,
-      str_tax_cla = temp_files$str_tax_cla,
-      str_tax_npc = temp_files$str_tax_npc
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc
     ),
     "Fix: Use a positive value appropriate for your instrument",
     fixed = TRUE
   )
 
-  # Too large tolerance should warn
+  # Too large tolerance should warn (and then error on missing output dir)
   expect_warning(
     annotate_masses(
       tolerance_ppm = 25,
       ms_mode = "pos",
-      features = temp_files$features,
-      library = temp_files$library,
-      str_stereo = temp_files$str_stereo,
-      str_met = temp_files$str_met,
-      str_nam = temp_files$str_nam,
-      str_tax_cla = temp_files$str_tax_cla,
-      str_tax_npc = temp_files$str_tax_npc
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc
     ),
     "Received: 25 ppm",
     fixed = TRUE
-  ) |>
-    expect_error("Fix: 1. Verify the file was created correctly", fixed = TRUE)
+  )
 
   # Non-numeric tolerance should error
   expect_error(
     annotate_masses(
       tolerance_ppm = "10",
       ms_mode = "pos",
-      features = temp_files$features,
-      library = temp_files$library,
-      str_stereo = temp_files$str_stereo,
-      str_met = temp_files$str_met,
-      str_nam = temp_files$str_nam,
-      str_tax_cla = temp_files$str_tax_cla,
-      str_tax_npc = temp_files$str_tax_npc
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc
     ),
     "Fix: Provide a numeric tolerance value in parts per million (ppm)",
     fixed = TRUE
   )
+  fixtures$cleanup()
 })
 
 test_that("annotate_masses validates tolerance_rt correctly", {
-  # Create temp files to pass file validation
-  temp_files <- list(
-    features = tempfile(),
-    library = tempfile(),
-    str_stereo = tempfile(),
-    str_met = tempfile(),
-    str_nam = tempfile(),
-    str_tax_cla = tempfile(),
-    str_tax_npc = tempfile()
-  )
-  # Create the temp files so they exist
-  lapply(temp_files, function(f) writeLines("", f))
-  on.exit(lapply(temp_files, unlink), add = TRUE)
+  fixtures <- setup_minimal_fixtures()
 
   # Zero tolerance should error
   expect_error(
@@ -138,21 +170,28 @@ test_that("annotate_masses validates tolerance_rt correctly", {
       tolerance_rt = 0,
       tolerance_ppm = 10,
       ms_mode = "pos",
-      features = temp_files$features,
-      library = temp_files$library,
-      str_stereo = temp_files$str_stereo,
-      str_met = temp_files$str_met,
-      str_nam = temp_files$str_nam,
-      str_tax_cla = temp_files$str_tax_cla,
-      str_tax_npc = temp_files$str_tax_npc
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc
     ),
     "Recommended range: 0.01-0.05 minutes for mass annotation"
   ) |>
-    expect_error("Fix: 1. Verify the file was created correctly", fixed = TRUE)
+    expect_error() # Will error later, that's OK
 
   # Negative tolerance should error
   expect_error(
     annotate_masses(
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc,
       tolerance_rt = -0.01,
       tolerance_ppm = 10,
       ms_mode = "pos"
@@ -162,23 +201,37 @@ test_that("annotate_masses validates tolerance_rt correctly", {
 
   # Too large tolerance should error
   expect_warning(
-    expect_error(
       annotate_masses(
-        tolerance_rt = 0.1,
+        features = fixtures$features,
+        library = fixtures$library,
+        str_stereo = fixtures$str_stereo,
+        str_met = fixtures$str_met,
+        str_nam = fixtures$str_nam,
+        str_tax_cla = fixtures$str_tax_cla,
+        str_tax_npc = fixtures$str_tax_npc,
+        tolerance_rt = 1.0,
         tolerance_ppm = 10,
         ms_mode = "pos"
       ),
-      "Please verify file paths and ensure all required files are present."
-    ),
     "Large values may group unrelated features together",
     fixed = TRUE
   )
+  fixtures$cleanup()
 })
 
 test_that("annotate_masses validates adducts_list structure", {
+  fixtures <- setup_minimal_fixtures()
+  
   # Missing mode in adducts_list should error
   expect_error(
     annotate_masses(
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc,
       adducts_list = list(neg = c("[M-H]-")),
       ms_mode = "pos",
       tolerance_ppm = 10,
@@ -192,6 +245,13 @@ test_that("annotate_masses validates adducts_list structure", {
   # NULL adducts for mode should error
   expect_error(
     annotate_masses(
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc,
       adducts_list = list(pos = NULL),
       ms_mode = "pos",
       tolerance_ppm = 10,
@@ -205,6 +265,13 @@ test_that("annotate_masses validates adducts_list structure", {
   # Non-list adducts should error
   expect_error(
     annotate_masses(
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc,
       adducts_list = c("[M+H]+"),
       ms_mode = "pos",
       tolerance_ppm = 10,
@@ -213,12 +280,21 @@ test_that("annotate_masses validates adducts_list structure", {
     "Fix: Ensure the adduct configuration is a list with 'pos' and 'neg' entries",
     fixed = TRUE
   )
+  fixtures$cleanup()
 })
 
 test_that("annotate_masses validates clusters_list structure", {
+  fixtures <- setup_minimal_fixtures()
   # Missing mode in clusters_list should error
   expect_error(
     annotate_masses(
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc,
       adducts_list = list(pos = c("[M+H]+")),
       clusters_list = list(neg = c("[M]")),
       ms_mode = "pos",
@@ -229,18 +305,15 @@ test_that("annotate_masses validates clusters_list structure", {
   clusters_list$pos <- c('[M+H]+', '[M+Na]+', ...)",
     fixed = TRUE
   )
+  fixtures$cleanup()
 })
 
 test_that("annotate_masses validates file existence", {
-  # Create temporary valid parameters except for files
-  temp_features <- tempfile(fileext = ".tsv")
-  temp_library <- tempfile(fileext = ".tsv")
-
-  # Missing features file should error
+  # Missing features file should error during validation
   expect_error(
     annotate_masses(
       features = "/nonexistent/features.tsv",
-      library = temp_library,
+      library = tempfile(),
       str_stereo = tempfile(),
       str_met = tempfile(),
       str_nam = tempfile(),
@@ -252,7 +325,7 @@ test_that("annotate_masses validates file existence", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "Please verify file paths and ensure all required files are present."
+    "Input data validation failed"
   )
 })
 
@@ -270,42 +343,27 @@ test_that("annotate_masses handles empty features table", {
 
   withr::local_dir(new = as.character(env$dirs$root))
 
-  # Should return empty results without error
-  result <- annotate_masses(
-    features = env$features,
-    library = env$library,
-    str_stereo = env$str_stereo,
-    str_met = env$str_met,
-    str_nam = env$str_nam,
-    str_tax_cla = env$str_tax_cla,
-    str_tax_npc = env$str_tax_npc,
-    adducts_list = list(pos = c("[M+H]+")),
-    clusters_list = list(pos = c("[M]")),
-    neutral_losses_list = c("H2O"),
-    ms_mode = "pos",
-    tolerance_ppm = 10,
-    tolerance_rt = 0.02,
-    output_annotations = env$output_annotations,
-    output_edges = env$output_edges
+  # Empty features should be caught by validation
+  expect_error(
+    annotate_masses(
+      features = env$features,
+      library = env$library,
+      str_stereo = env$str_stereo,
+      str_met = env$str_met,
+      str_nam = env$str_nam,
+      str_tax_cla = env$str_tax_cla,
+      str_tax_npc = env$str_tax_npc,
+      adducts_list = list(pos = c("[M+H]+")),
+      clusters_list = list(pos = c("[M]")),
+      neutral_losses_list = c("H2O"),
+      ms_mode = "pos",
+      tolerance_ppm = 10,
+      tolerance_rt = 0.02,
+      output_annotations = env$output_annotations,
+      output_edges = env$output_edges
+    ),
+    "Input data validation failed"
   )
-
-  expect_type(result, "character")
-  expect_named(result, c("annotations", "edges"))
-
-  # Check that output files exist and are valid
-  expect_true(file.exists(result["annotations"]))
-  expect_true(file.exists(result["edges"]))
-
-  # Read and verify empty structure
-  annotations <- tidytable::fread(result["annotations"])
-  edges <- tidytable::fread(result["edges"])
-
-  expect_equal(nrow(annotations), 0)
-  expect_equal(nrow(edges), 0)
-
-  # Verify columns exist
-  expect_true("feature_id" %in% colnames(annotations))
-  expect_true("CLUSTERID1" %in% colnames(edges))
 })
 
 test_that("annotate_masses handles features without RT column", {

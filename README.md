@@ -99,6 +99,35 @@ data using:
 tima::get_example_files()
 ```
 
+## Quick Start
+
+### 1. Validate Your Data First
+
+**Always start by validating your input files** to catch issues early
+and save debugging time:
+
+``` r
+# Check if your data is matches expectations before processing
+validate_inputs(
+  features = "data/source/example_features.csv",
+  spectra = "data/source/example_spectra.mgf",
+  metadata = "data/source/example_metadata.tsv",
+  sirius = "data/interim/annotations/example_sirius.zip",
+  feature_col = "row ID",
+  filename_col = "filename",
+  organism_col = "ATTRIBUTE_species"
+  )
+```
+
+This will:
+
+- Count spectra in MGF files
+- Count features and check required columns
+- Check metadata file consistency
+- Report eventual issues immediately
+
+### 2. Run the Pipeline
+
 Once you are done, you can open a small GUI to adapt your parameters and
 launch your job:
 
@@ -175,17 +204,17 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 
 | Package | Version | Citation |
 |:---|:---|:---|
-| archive | 1.1.12 | Hester and Csárdi (2025) |
+| archive | 1.1.12.1 | Hester and Csárdi (2025) |
 | base | 4.5.2 | R Core Team (2025) |
 | BiocManager | 1.30.27 | Morgan and Ramos (2025) |
 | BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
 | docopt | 0.7.2 | de Jonge (2025) |
 | fs | 1.6.6 | Hester, Wickham, and Csárdi (2025) |
-| httr2 | 1.2.1 | Wickham (2025) |
+| httr2 | 1.2.2 | Wickham (2025) |
 | igraph | 2.2.1 | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2025) |
 | IRanges | 2.44.0 | Lawrence et al. (2013) |
-| knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
+| knitr | 1.51 | Xie (2014); Xie (2015); Xie (2025) |
 | lgr | 0.5.0 | Fleck (2025) |
 | MetaboCoreUtils | 1.18.1 | Rainer et al. (2022a) |
 | MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
@@ -196,7 +225,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | reticulate | 1.44.1 | Ushey, Allaire, and Tang (2025) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
 | rotl | 3.1.0 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
-| shiny | 1.12.0 | Chang et al. (2025) |
+| shiny | 1.12.1 | Chang et al. (2025) |
 | shinyhelper | 0.3.2 | Mason-Thom (2019) |
 | shinyjs | 2.1.0 | Attali (2021) |
 | shinytest2 | 0.4.1 | Schloerke (2025) |
@@ -210,7 +239,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
 | tima | 2.12.0 | Rutz et al. (2019); Rutz and Allard (2025) |
 | withr | 3.0.2 | Hester et al. (2024) |
-| yaml | 2.3.11 | Stephens and Simonov (2025) |
+| yaml | 2.3.12 | Stephens and Simonov (2025) |
 
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">

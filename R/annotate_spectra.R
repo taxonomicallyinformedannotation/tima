@@ -110,6 +110,12 @@ annotate_spectra <- function(
     stop("At least one library must be provided", call. = FALSE)
   }
 
+  # Pre-flight data sanitizing for MGF files
+  log_debug("Running pre-flight checks on input MGF files...")
+  for (mgf in input_vec) {
+    sanitize_all_inputs(mgf_file = mgf)
+  }
+
   missing_in <- input_vec[!file.exists(input_vec)]
   if (length(missing_in)) {
     stop(

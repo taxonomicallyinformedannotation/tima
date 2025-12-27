@@ -114,6 +114,10 @@ annotate_masses <-
     # Input Validation ----
     log_info("Starting mass-based annotation")
 
+    # Pre-flight data sanitizing (catch issues early)
+    log_debug("Running pre-flight data checks...")
+    sanitize_all_inputs(features_file = features)
+
     # Validate MS mode (cheapest check first)
     validate_ms_mode(ms_mode)
 

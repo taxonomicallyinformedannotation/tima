@@ -75,7 +75,7 @@ test_that("annotate_spectra validates parameters", {
       libraries = list(pos = lib_path),
       polarity = "pos"
     ),
-    "Input file"
+    "Input data validation failed"
   )
   expect_error(
     annotate_spectra(libraries = list(pos = "nope.mgf"), polarity = "pos"),

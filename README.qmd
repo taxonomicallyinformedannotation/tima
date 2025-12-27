@@ -80,6 +80,35 @@ In case you do not have your data ready, you can obtain some example data using:
 tima::get_example_files()
 ```
 
+## Quick Start
+
+### 1. Validate Your Data First
+
+**Always start by validating your input files** to catch issues early
+and save debugging time:
+
+``` r
+# Check if your data is matches expectations before processing
+validate_inputs(
+  features = "data/source/example_features.csv",
+  spectra = "data/source/example_spectra.mgf",
+  metadata = "data/source/example_metadata.tsv",
+  sirius = "data/interim/annotations/example_sirius.zip",
+  feature_col = "row ID",
+  filename_col = "filename",
+  organism_col = "ATTRIBUTE_species"
+  )
+```
+
+This will:
+
+- Count spectra in MGF files
+- Count features and check required columns
+- Check metadata file consistency
+- Report eventual issues immediately
+
+### 2. Run the Pipeline
+
 Once you are done, you can open a small GUI to adapt your parameters and launch your job:
 
 ``` r

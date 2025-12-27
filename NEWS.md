@@ -2,6 +2,7 @@
 
 # tima 2.13.0
 
+* Added a new validation helper, see <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html>
 * Added [BiGG](http://bigg.ucsd.edu/) as SOP library
 * Added basic isotopologues handling
 * Added special "Biota" superdomain handling for shared core metabolism
