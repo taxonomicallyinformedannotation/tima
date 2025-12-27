@@ -125,9 +125,6 @@ We now recommend you to read the following vignettes:
 
 **Important:** Always validate your data first to catch issues early!
 
-```{r hidden_files, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
-get_example_files(in_cache = FALSE)
-```
 ```{r validate_first, eval=FALSE, include=TRUE}
 validate_inputs(
   features = "data/source/example_features.csv",
