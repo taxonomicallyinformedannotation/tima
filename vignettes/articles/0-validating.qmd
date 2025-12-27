@@ -376,7 +376,7 @@ Add validation to your automated workflows:
 ```{r best_practice_3, eval=FALSE}
 # Snakemake, Nextflow, or targets pipeline
 validate_inputs(...)  # Fails fast if data is bad
-run_tima()           # Only runs if validation passes
+run_tima()            # Only runs if validation passes
 ```
 
 ### Document Your Validation
@@ -398,12 +398,12 @@ sink()
 
 Data validation with `validate_inputs()`:
 
-- ✅ **Saves time** - Catches errors in seconds, not hours
-- ✅ **Clear messages** - Shows exactly what's wrong and how to fix it
-- ✅ **Comprehensive** - Checks MGF, CSV, metadata, and SIRIUS data
-- ✅ **Automatic** - Integrated into main TIMA functions
-- ✅ **Preventive** - Stops before expensive operations
-- ✅ **Informative** - Reports row counts, spectra counts, file lists
+- **Saves time** - Catches errors in seconds, not minutes
+- **Clear messages** - Shows exactly what's wrong and how to fix it
+- **Comprehensive** - Checks MGF, CSV, metadata, and SIRIUS data
+- **Automatic** - Integrated into main TIMA functions
+- **Preventive** - Stops before expensive operations
+- **Informative** - Reports row counts, spectra counts, file lists
 
 **Always validate your data first!** It's the best way to ensure a smooth
 TIMA experience.
