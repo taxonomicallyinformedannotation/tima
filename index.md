@@ -99,6 +99,35 @@ data using:
 tima::get_example_files()
 ```
 
+## Quick Start
+
+### 1. Validate Your Data First
+
+**Always start by validating your input files** to catch issues early
+and save debugging time:
+
+``` r
+# Check if your data is matches expectations before processing
+validate_inputs(
+  features = "data/source/example_features.csv",
+  spectra = "data/source/example_spectra.mgf",
+  metadata = "data/source/example_metadata.tsv",
+  sirius = "data/interim/annotations/example_sirius.zip",
+  feature_col = "row ID",
+  filename_col = "filename",
+  organism_col = "ATTRIBUTE_species"
+  )
+```
+
+This will:
+
+- Count spectra in MGF files
+- Count features and check required columns
+- Check metadata file consistency
+- Report eventual issues immediately
+
+### 2. Run the Pipeline
+
 Once you are done, you can open a small GUI to adapt your parameters and
 launch your job:
 
@@ -175,7 +204,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 
 | Package | Version | Citation |
 |:---|:---|:---|
-| archive | 1.1.12 | Hester and Csárdi (2025) |
+| archive | 1.1.12.1 | Hester and Csárdi (2025) |
 | base | 4.5.2 | R Core Team (2025) |
 | BiocManager | 1.30.27 | Morgan and Ramos (2025) |
 | BiocParallel | 1.44.0 | Wang et al. (2025) |
@@ -185,13 +214,14 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | httr2 | 1.2.2 | Wickham (2025) |
 | igraph | 2.2.1 | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2025) |
 | IRanges | 2.44.0 | Lawrence et al. (2013) |
-| knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
+| knitr | 1.51 | Xie (2014); Xie (2015); Xie (2025) |
 | lgr | 0.5.0 | Fleck (2025) |
-| MetaboCoreUtils | 1.18.0 | Rainer et al. (2022a) |
+| MetaboCoreUtils | 1.18.1 | Rainer et al. (2022a) |
 | MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
 | MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
-| MsCoreUtils | 1.21.0 | Rainer et al. (2022c) |
+| MsCoreUtils | 1.22.1 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
+| progress | 1.2.3 | Csárdi and FitzJohn (2023) |
 | R.utils | 2.13.0 | Bengtsson (2025) |
 | reticulate | 1.44.1 | Ushey, Allaire, and Tang (2025) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
@@ -201,7 +231,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | shinyjs | 2.1.0 | Attali (2021) |
 | shinytest2 | 0.4.1 | Schloerke (2025) |
 | shinyvalidate | 0.1.3 | Sievert, Iannone, and Cheng (2023) |
-| Spectra | 1.19.11 | Rainer et al. (2022d) |
+| Spectra | 1.20.0 | Rainer et al. (2022d) |
 | stringi | 1.8.7 | Gagolewski (2022) |
 | targets | 1.11.4 | Landau (2021) |
 | testthat | 3.3.1 | Wickham (2011) |
@@ -255,6 +285,14 @@ Chang, Winston, Joe Cheng, JJ Allaire, Carson Sievert, Barret Schloerke,
 Garrick Aden-Buie, Yihui Xie, et al. 2025.
 *<span class="nocase">shiny</span>: Web Application Framework for r*.
 <https://doi.org/10.32614/CRAN.package.shiny>.
+
+</div>
+
+<div id="ref-progress" class="csl-entry">
+
+Csárdi, Gábor, and Rich FitzJohn. 2023.
+*<span class="nocase">progress</span>: Terminal Progress Bars*.
+<https://doi.org/10.32614/CRAN.package.progress>.
 
 </div>
 

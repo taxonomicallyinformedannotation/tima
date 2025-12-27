@@ -818,15 +818,17 @@ ul.task-list li input[type="checkbox"] {
 <section id="tima-2.13.0" class="level1">
 <h1>tima 2.13.0</h1>
 <ul>
+<li>Added a new validation helper, see <a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html" class="uri">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html</a></li>
 <li>Added <a href="http://bigg.ucsd.edu/">BiGG</a> as SOP library</li>
 <li>Added basic isotopologues handling</li>
 <li>Added special “Biota” superdomain handling for shared core metabolism</li>
-<li>More in depth molecular sanitization</li>
 <li>Enhanced <code>sanitize_spectra()</code> with adaptive noise filtering:
 <ul>
 <li>Dynamic intensity thresholds (MAD-based, now default when <code>cutoff = NULL</code>)</li>
 <li>Low noise removal targets repetitive instrumental artifacts</li>
 </ul></li>
+<li>Improved log and error messages</li>
+<li>More in depth molecular sanitization</li>
 </ul>
 <section id="breaking-changes" class="level2">
 <h2 class="anchored" data-anchor-id="breaking-changes">Breaking Changes</h2>

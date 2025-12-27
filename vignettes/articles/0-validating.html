@@ -9,7 +9,7 @@
 <meta name="author" content="Adriano Rutz">
 <meta name="dcterms.date" content="2025-12-27">
 
-<title>General comments about the infrastructure – tima</title>
+<title>0 Validating your data – tima</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -60,29 +60,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../man/figures/logo.svg" rel="icon" type="image/svg+xml">
-<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-c56c8b360dac9905fa004422789ab249.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-8a31036c803348cb054eb59479076bd4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-c56c8b360dac9905fa004422789ab249.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../man/figures/logo.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-c56c8b360dac9905fa004422789ab249.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-8a31036c803348cb054eb59479076bd4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-c56c8b360dac9905fa004422789ab249.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -122,20 +122,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     document.body.classList.add('hypothesis-enabled');
   });
 </script>
-<link href="../site_libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
-<script src="../site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
-<link href="../site_libs/vis-9.1.0/vis-network.min.css" rel="stylesheet">
-<script src="../site_libs/vis-9.1.0/vis-network.min.js"></script>
-<script src="../site_libs/visNetwork-binding-2.1.4/visNetwork.js"></script>
 
 
-<meta name="citation_title" content="General comments about the infrastructure">
+<meta name="citation_title" content="0 Validating your data">
 <meta name="citation_author" content="Adriano Rutz">
 <meta name="citation_publication_date" content="2025-12-27">
 <meta name="citation_cover_date" content="2025-12-27">
 <meta name="citation_year" content="2025">
 <meta name="citation_online_date" content="2025-12-27">
-<meta name="citation_fulltext_html_url" content="https://taxonomicallyinformedannotation.github.io/tima/vignettes/tima.html">
+<meta name="citation_fulltext_html_url" content="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html">
 <meta name="citation_language" content="en">
 </head>
 
@@ -317,11 +312,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../man/figures/logo.svg" alt="tima logo" class="navbar-logo light-content">
-    <img src="../man/figures/logo.svg" alt="tima logo" class="navbar-logo dark-content">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../man/figures/logo.svg" alt="tima logo" class="navbar-logo light-content">
+    <img src="../../man/figures/logo.svg" alt="tima logo" class="navbar-logo dark-content">
     </a>
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">TIMA</span>
     </a>
   </div>
@@ -332,7 +327,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../vignettes/tima.html" aria-current="page"> 
+    <a class="nav-link" href="../../vignettes/tima.html"> 
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -341,33 +336,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-articles">    
         <li>
-    <a class="dropdown-item" href="../vignettes/articles/I-gathering.html">
+    <a class="dropdown-item" href="../../vignettes/articles/I-gathering.html">
  <span class="dropdown-text">1 Gathering everything you need</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../vignettes/articles/II-preparing.html">
+    <a class="dropdown-item" href="../../vignettes/articles/II-preparing.html">
  <span class="dropdown-text">2 Preparing inputs</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../vignettes/articles/III-processing.html">
+    <a class="dropdown-item" href="../../vignettes/articles/III-processing.html">
  <span class="dropdown-text">3 Performing Taxonomically Informed Metabolite Annotation</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../vignettes/articles/IV-benchmarking.html">
+    <a class="dropdown-item" href="../../vignettes/articles/IV-benchmarking.html">
  <span class="dropdown-text">4 Benchmarking Performance</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="../NEWS.html"> 
+    <a class="nav-link" href="../../NEWS.html"> 
 <span class="menu-text">News</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../LICENSE.html"> 
+    <a class="nav-link" href="../../LICENSE.html"> 
 <span class="menu-text">License</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../CITATION.html"> 
+    <a class="nav-link" href="../../CITATION.html"> 
 <span class="menu-text">Citation</span></a>
   </li>  
 </ul>
@@ -389,7 +384,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">General comments about the infrastructure</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">0 Validating your data</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -421,13 +416,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/annotate_masses.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/annotate_masses.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">annotate_masses</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/annotate_spectra.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/annotate_spectra.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">annotate_spectra</span></a>
   </div>
 </li>
@@ -444,19 +439,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/calculate_mass_of_m.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/calculate_mass_of_m.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">calculate_mass_of_m</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/calculate_mz_from_mass.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/calculate_mz_from_mass.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">calculate_mz_from_mass</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/calculate_similarity.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/calculate_similarity.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">calculate_similarity</span></a>
   </div>
 </li>
@@ -473,7 +468,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/change_params_small.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/change_params_small.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">change_params_small</span></a>
   </div>
 </li>
@@ -490,25 +485,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/create_components.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/create_components.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_components</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/create_dir.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/create_dir.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_dir</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/create_edges.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/create_edges.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_edges</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/create_edges_spectra.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/create_edges_spectra.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_edges_spectra</span></a>
   </div>
 </li>
@@ -525,7 +520,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/filter_annotations.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/filter_annotations.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">filter_annotations</span></a>
   </div>
 </li>
@@ -542,25 +537,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/get_example_files.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/get_example_files.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_example_files</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/get_file.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/get_file.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_file</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/get_last_version_from_zenodo.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/get_last_version_from_zenodo.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_last_version_from_zenodo</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/get_organism_taxonomy_ott.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/get_organism_taxonomy_ott.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">get_organism_taxonomy_ott</span></a>
   </div>
 </li>
@@ -577,7 +572,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/harmonize_adducts.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/harmonize_adducts.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">harmonize_adducts</span></a>
   </div>
 </li>
@@ -594,7 +589,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/import_spectra.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/import_spectra.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">import_spectra</span></a>
   </div>
 </li>
@@ -611,7 +606,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/parse_adduct.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/parse_adduct.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">parse_adduct</span></a>
   </div>
 </li>
@@ -637,19 +632,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_annotations_gnps.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_annotations_gnps.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_annotations_gnps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_annotations_sirius.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_annotations_sirius.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_annotations_sirius</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_annotations_spectra.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_annotations_spectra.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_annotations_spectra</span></a>
   </div>
 </li>
@@ -666,19 +661,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_features_components.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_features_components.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_features_components</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_features_edges.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_features_edges.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_features_edges</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_features_tables.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_features_tables.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_features_tables</span></a>
   </div>
 </li>
@@ -695,7 +690,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_libraries_rt.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_libraries_rt.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_libraries_rt</span></a>
   </div>
 </li>
@@ -710,31 +705,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_libraries_sop_closed.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_libraries_sop_closed.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_libraries_sop_closed</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_libraries_sop_ecmdb.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_libraries_sop_ecmdb.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_libraries_sop_ecmdb</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_libraries_sop_hmdb.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_libraries_sop_hmdb.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_libraries_sop_hmdb</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_libraries_sop_lotus.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_libraries_sop_lotus.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_libraries_sop_lotus</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_libraries_sop_merged.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_libraries_sop_merged.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_libraries_sop_merged</span></a>
   </div>
 </li>
@@ -742,7 +737,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_libraries_spectra.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_libraries_spectra.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_libraries_spectra</span></a>
   </div>
 </li>
@@ -750,7 +745,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_taxa.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/prepare_taxa.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_taxa</span></a>
   </div>
 </li>
@@ -767,7 +762,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-16" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/process_smiles.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/process_smiles.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">process_smiles</span></a>
   </div>
 </li>
@@ -784,13 +779,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/run_app.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/run_app.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">run_app</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/run_tima.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/run_tima.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">run_tima</span></a>
   </div>
 </li>
@@ -807,7 +802,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-18" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/weight_annotations.html" class="sidebar-item-text sidebar-link">
+  <a href="../../man/weight_annotations.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">weight_annotations</span></a>
   </div>
 </li>
@@ -825,19 +820,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#philosophy" id="toc-philosophy" class="nav-link active" data-scroll-target="#philosophy">Philosophy</a>
+  <li><a href="#why-validate-your-data-first" id="toc-why-validate-your-data-first" class="nav-link active" data-scroll-target="#why-validate-your-data-first">Why Validate Your Data First?</a>
   <ul class="collapse">
-  <li><a href="#flexibility" id="toc-flexibility" class="nav-link" data-scroll-target="#flexibility">Flexibility</a></li>
-  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility">Reproducibility</a></li>
+  <li><a href="#the-problem" id="toc-the-problem" class="nav-link" data-scroll-target="#the-problem">The Problem</a></li>
   </ul></li>
-  <li><a href="#use" id="toc-use" class="nav-link" data-scroll-target="#use">Use</a>
+  <li><a href="#quick-start" id="toc-quick-start" class="nav-link" data-scroll-target="#quick-start">Quick Start</a>
   <ul class="collapse">
-  <li><a href="#tldr" id="toc-tldr" class="nav-link" data-scroll-target="#tldr">tl;dr</a></li>
+  <li><a href="#example-output" id="toc-example-output" class="nav-link" data-scroll-target="#example-output">Example Output</a></li>
   </ul></li>
-  <li><a href="#biological-weighting-and-core-metabolism" id="toc-biological-weighting-and-core-metabolism" class="nav-link" data-scroll-target="#biological-weighting-and-core-metabolism">Biological Weighting and Core Metabolism</a>
+  <li><a href="#what-gets-validated" id="toc-what-gets-validated" class="nav-link" data-scroll-target="#what-gets-validated">What Gets Validated?</a>
   <ul class="collapse">
-  <li><a href="#the-special-case-biota-superdomain" id="toc-the-special-case-biota-superdomain" class="nav-link" data-scroll-target="#the-special-case-biota-superdomain">The Special Case: “Biota” Superdomain</a></li>
+  <li><a href="#mgf-files-mass-spectra" id="toc-mgf-files-mass-spectra" class="nav-link" data-scroll-target="#mgf-files-mass-spectra">1. MGF Files (Mass Spectra)</a></li>
+  <li><a href="#features-files-csvtsv" id="toc-features-files-csvtsv" class="nav-link" data-scroll-target="#features-files-csvtsv">2. Features Files (CSV/TSV)</a></li>
+  <li><a href="#metadata-consistency" id="toc-metadata-consistency" class="nav-link" data-scroll-target="#metadata-consistency">3. Metadata Consistency</a></li>
+  <li><a href="#sirius-output-completeness" id="toc-sirius-output-completeness" class="nav-link" data-scroll-target="#sirius-output-completeness">4. SIRIUS Output Completeness</a></li>
   </ul></li>
+  <li><a href="#integration-with-pipeline" id="toc-integration-with-pipeline" class="nav-link" data-scroll-target="#integration-with-pipeline">Integration with Pipeline</a>
+  <ul class="collapse">
+  <li><a href="#automatic-validation" id="toc-automatic-validation" class="nav-link" data-scroll-target="#automatic-validation">Automatic Validation</a></li>
+  <li><a href="#manual-validation" id="toc-manual-validation" class="nav-link" data-scroll-target="#manual-validation">Manual Validation</a></li>
+  </ul></li>
+  <li><a href="#common-issues-caught" id="toc-common-issues-caught" class="nav-link" data-scroll-target="#common-issues-caught">Common Issues Caught</a>
+  <ul class="collapse">
+  <li><a href="#mgf-file-issues" id="toc-mgf-file-issues" class="nav-link" data-scroll-target="#mgf-file-issues">MGF File Issues</a></li>
+  <li><a href="#features-file-issues" id="toc-features-file-issues" class="nav-link" data-scroll-target="#features-file-issues">Features File Issues</a></li>
+  <li><a href="#metadata-issues" id="toc-metadata-issues" class="nav-link" data-scroll-target="#metadata-issues">Metadata Issues</a></li>
+  <li><a href="#sirius-issues" id="toc-sirius-issues" class="nav-link" data-scroll-target="#sirius-issues">SIRIUS Issues</a></li>
+  </ul></li>
+  <li><a href="#advanced-usage" id="toc-advanced-usage" class="nav-link" data-scroll-target="#advanced-usage">Advanced Usage</a>
+  <ul class="collapse">
+  <li><a href="#programmatic-validation" id="toc-programmatic-validation" class="nav-link" data-scroll-target="#programmatic-validation">Programmatic Validation</a></li>
+  <li><a href="#batch-validation" id="toc-batch-validation" class="nav-link" data-scroll-target="#batch-validation">Batch Validation</a></li>
+  </ul></li>
+  <li><a href="#best-practices" id="toc-best-practices" class="nav-link" data-scroll-target="#best-practices">Best Practices</a>
+  <ul class="collapse">
+  <li><a href="#always-validate-first" id="toc-always-validate-first" class="nav-link" data-scroll-target="#always-validate-first">1. Always Validate First</a></li>
+  <li><a href="#validate-after-data-conversion" id="toc-validate-after-data-conversion" class="nav-link" data-scroll-target="#validate-after-data-conversion">2. Validate After Data Conversion</a></li>
+  <li><a href="#include-in-automated-pipelines" id="toc-include-in-automated-pipelines" class="nav-link" data-scroll-target="#include-in-automated-pipelines">3. Include in Automated Pipelines</a></li>
+  <li><a href="#document-your-validation" id="toc-document-your-validation" class="nav-link" data-scroll-target="#document-your-validation">4. Document Your Validation</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next Steps</a></li>
   </ul>
 </nav>
     </div>
@@ -847,7 +870,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">General comments about the infrastructure</h1>
+<h1 class="title">0 Validating your data</h1>
 </div>
 
 
@@ -876,113 +899,331 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 <script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-<p>This vignette describes the philosophy behind the infrastructure of <strong>TIMA</strong>.</p>
-<section id="philosophy" class="level2">
-<h2 class="anchored" data-anchor-id="philosophy">Philosophy</h2>
-<p>Our main goals were <strong>flexibility</strong> and <strong>reproducibility</strong>.</p>
-<section id="flexibility" class="level3">
-<h3 class="anchored" data-anchor-id="flexibility">Flexibility</h3>
-<p>To ensure flexibility, we tried to split the process in as much tiny parts as needed. So you can decide whether to skip an optional part, add your own processing, etc. We tried to cover most use cases, but of course they are not exhaustive. If you feel like something useful to other users is missing, please fill an <a href="https://github.com/taxonomicallyinformedannotation/tima/issues">issue</a>.</p>
+<section id="why-validate-your-data-first" class="level2">
+<h2 class="anchored" data-anchor-id="why-validate-your-data-first">Why Validate Your Data First?</h2>
+<p>Before starting the TIMA pipeline, it’s crucial to validate your input data. This <strong>pre-flight check</strong> saves you hours of time by catching issues immediately instead of discovering them after expensive operations like library downloads.</p>
+<section id="the-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-problem">The Problem</h3>
+<p><strong>Without validation:</strong></p>
+<ol type="1">
+<li>Start pipeline</li>
+<li>Download libraries (30+ minutes)</li>
+<li>Process data (10+ minutes)</li>
+<li><strong>ERROR</strong>: “MGF file has no spectra!”</li>
+<li>Time wasted: <strong>40+ minutes</strong></li>
+</ol>
+<p><strong>With validation:</strong></p>
+<ol type="1">
+<li>Run <code>validate_inputs()</code> (&lt; 1 minute)</li>
+<li><strong>ERROR caught immediately</strong>: “No spectra found”</li>
+<li>Fix the issue</li>
+<li>Run pipeline successfully</li>
+<li>Time saved: <strong>39+ minutes per error!</strong></li>
+</ol>
 </section>
-<section id="reproducibility" class="level3">
-<h3 class="anchored" data-anchor-id="reproducibility">Reproducibility</h3>
-<p>After some time using TIMA, you will probably wonder: “<em>What was the parameters I used to generate this file?</em>” … Or a collaborator might ask you to share your data and parameters. Writing them down each time might be time-consuming and not really in line with modern computational approaches. Therefore, we chose to implement all parameters of all steps (almost…) as YAML files. They are human-readable and can be used in batches. If you do not like YAML, parameters of each step can also be given as command line arguments. They will then be saved as YAML you will be able to share.</p>
-<p>To ensure optimal reproducibility and avoiding re-computing endlessly steps that did not change, we decided to build a <a href="https://books.ropensci.org/targets/">{targets}</a> pipeline. Each step of the whole pipeline will be described next.</p>
+</section>
+<section id="quick-start" class="level2">
+<h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
 <div class="cell">
-<div class="cell-output-display">
-<div class="visNetwork html-widget html-fill-item" id="htmlwidget-fe69cee1f03e7dd1f1cb" style="width:100%;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-fe69cee1f03e7dd1f1cb">{"x":{"nodes":{"name":["ann_fil","ann_ms1_pre","ann_ms1_pre_ann","ann_ms1_pre_edg","ann_sir_pre","ann_sir_pre_can","ann_sir_pre_for","ann_sir_pre_str","ann_spe_neg","ann_spe_pos","ann_spe_pre","ann_wei","edg_spe","fea_com","fea_com_pre","fea_edg_pre","fea_edg_spe","fea_pre","input_features","input_spectra","int_com","lib_mer_key","lib_mer_org_tax_ott","lib_mer_str_met","lib_mer_str_nam","lib_mer_str_stereo","lib_mer_str_tax_cla","lib_mer_str_tax_npc","lib_rt","lib_rt_rts","lib_rt_sop","lib_sop_big_pre","lib_sop_clo_pre","lib_sop_ecm","lib_sop_ecm_pre","lib_sop_hmd","lib_sop_hmd_pre","lib_sop_lot","lib_sop_lot_pre","lib_sop_mer","lib_sop_mer_str_pro","tax_pre"],"type":["stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem","stem"],"description":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"status":["outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated","outdated"],"seconds":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"bytes":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"branches":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"label":["ann_fil","ann_ms1_pre","ann_ms1_pre_ann","ann_ms1_pre_edg","ann_sir_pre","ann_sir_pre_can","ann_sir_pre_for","ann_sir_pre_str","ann_spe_neg","ann_spe_pos","ann_spe_pre","ann_wei","edg_spe","fea_com","fea_com_pre","fea_edg_pre","fea_edg_spe","fea_pre","input_features","input_spectra","int_com","lib_mer_key","lib_mer_org_tax_ott","lib_mer_str_met","lib_mer_str_nam","lib_mer_str_stereo","lib_mer_str_tax_cla","lib_mer_str_tax_npc","lib_rt","lib_rt_rts","lib_rt_sop","lib_sop_big_pre","lib_sop_clo_pre","lib_sop_ecm","lib_sop_ecm_pre","lib_sop_hmd","lib_sop_hmd_pre","lib_sop_lot","lib_sop_lot_pre","lib_sop_mer","lib_sop_mer_str_pro","tax_pre"],"color":["#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5"],"id":["ann_fil","ann_ms1_pre","ann_ms1_pre_ann","ann_ms1_pre_edg","ann_sir_pre","ann_sir_pre_can","ann_sir_pre_for","ann_sir_pre_str","ann_spe_neg","ann_spe_pos","ann_spe_pre","ann_wei","edg_spe","fea_com","fea_com_pre","fea_edg_pre","fea_edg_spe","fea_pre","input_features","input_spectra","int_com","lib_mer_key","lib_mer_org_tax_ott","lib_mer_str_met","lib_mer_str_nam","lib_mer_str_stereo","lib_mer_str_tax_cla","lib_mer_str_tax_npc","lib_rt","lib_rt_rts","lib_rt_sop","lib_sop_big_pre","lib_sop_clo_pre","lib_sop_ecm","lib_sop_ecm_pre","lib_sop_hmd","lib_sop_hmd_pre","lib_sop_lot","lib_sop_lot_pre","lib_sop_mer","lib_sop_mer_str_pro","tax_pre"],"level":[7,5,6,6,5,6,6,6,2,2,5,11,3,8,10,7,2,2,1,1,9,4,4,4,4,4,4,4,1,2,2,1,1,1,2,1,2,1,2,3,1,5],"shape":["dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot","dot"]},"edges":{"from":["ann_sir_pre_str","ann_ms1_pre_ann","fea_pre","lib_rt_rts","ann_spe_pre","fea_pre","lib_mer_str_stereo","lib_mer_str_tax_cla","lib_mer_str_nam","lib_mer_str_tax_npc","lib_mer_key","lib_mer_str_met","ann_ms1_pre","ann_ms1_pre","lib_mer_str_met","lib_mer_str_tax_npc","lib_mer_str_nam","lib_mer_str_stereo","lib_mer_str_tax_cla","ann_sir_pre","ann_sir_pre","ann_sir_pre","input_spectra","input_spectra","lib_mer_str_nam","ann_spe_pos","ann_spe_neg","lib_mer_str_met","lib_mer_str_stereo","lib_mer_str_tax_cla","lib_mer_str_tax_npc","ann_fil","lib_mer_org_tax_ott","lib_mer_str_stereo","fea_com_pre","fea_edg_pre","ann_sir_pre_for","ann_sir_pre_can","tax_pre","lib_mer_key","fea_edg_spe","fea_edg_pre","int_com","edg_spe","ann_ms1_pre_edg","input_spectra","input_features","fea_com","lib_sop_mer","lib_sop_mer","lib_sop_mer","lib_sop_mer","lib_sop_mer","lib_sop_mer","lib_sop_mer","lib_rt","lib_rt","lib_sop_ecm","lib_sop_hmd","lib_sop_lot","lib_sop_big_pre","lib_sop_clo_pre","lib_sop_mer_str_pro","lib_rt_sop","lib_sop_ecm_pre","lib_sop_hmd_pre","lib_sop_lot_pre","lib_mer_org_tax_ott","fea_pre"],"to":["ann_fil","ann_fil","ann_fil","ann_fil","ann_fil","ann_ms1_pre","ann_ms1_pre","ann_ms1_pre","ann_ms1_pre","ann_ms1_pre","ann_ms1_pre","ann_ms1_pre","ann_ms1_pre_ann","ann_ms1_pre_edg","ann_sir_pre","ann_sir_pre","ann_sir_pre","ann_sir_pre","ann_sir_pre","ann_sir_pre_can","ann_sir_pre_for","ann_sir_pre_str","ann_spe_neg","ann_spe_pos","ann_spe_pre","ann_spe_pre","ann_spe_pre","ann_spe_pre","ann_spe_pre","ann_spe_pre","ann_spe_pre","ann_wei","ann_wei","ann_wei","ann_wei","ann_wei","ann_wei","ann_wei","ann_wei","ann_wei","edg_spe","fea_com","fea_com_pre","fea_edg_pre","fea_edg_pre","fea_edg_spe","fea_pre","int_com","lib_mer_key","lib_mer_org_tax_ott","lib_mer_str_met","lib_mer_str_nam","lib_mer_str_stereo","lib_mer_str_tax_cla","lib_mer_str_tax_npc","lib_rt_rts","lib_rt_sop","lib_sop_ecm_pre","lib_sop_hmd_pre","lib_sop_lot_pre","lib_sop_mer","lib_sop_mer","lib_sop_mer","lib_sop_mer","lib_sop_mer","lib_sop_mer","lib_sop_mer","tax_pre","tax_pre"],"color":["#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5","#78B7C5"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","physics":false},"manipulation":{"enabled":false},"edges":{"smooth":{"type":"cubicBezier","forceDirection":"horizontal"}},"physics":{"stabilization":false},"interaction":{"zoomSpeed":1},"layout":{"hierarchical":{"enabled":true,"levelSeparation":150,"direction":"LR"}}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":{"text":"","style":"font-family:Georgia, Times New Roman, Times, serif;font-weight:bold;font-size:20px;text-align:center;"},"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":true,"hoverNearest":false,"degree":{"from":8,"to":1},"algorithm":"hierarchical","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":true,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"},"legend":{"width":0.2,"useGroups":false,"position":"right","ncol":1,"stepX":100,"stepY":100,"zoom":true,"nodes":{"label":["Outdated","Regular\ntarget"],"color":["#78B7C5","#899DA4"],"shape":["dot","dot"]},"nodesToDataframe":true},"tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tima)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate all inputs before starting</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="st">"data/features.csv"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="st">"data/spectra.mgf"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata =</span> <span class="st">"data/metadata.tsv"</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius =</span> <span class="st">"output/sirius"</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</div>
+<section id="example-output" class="level3">
+<h3 class="anchored" data-anchor-id="example-output">Example Output</h3>
+<pre><code>============================================================
+Data Sanitizing: Pre-flight Checks
+============================================================
+Checking features file...
+✓ Features file: 1250 rows, 15 columns
+  Columns: feature_id, mz, rt, intensity, ...
+
+Checking MGF file...
+✓ MGF file: 843 spectra found
+
+Checking metadata file...
+✓ Metadata file: 120/120 files found
+
+Checking SIRIUS output...
+✓ SIRIUS output: 843 features, all required files present
+  - formula_identifications.tsv: ✓
+  - canopus_summary.tsv: ✓
+  - compound_identifications.tsv: ✓
+============================================================
+✓ All pre-flight checks passed!
+Data validation complete. Ready to proceed.
+============================================================</code></pre>
 </section>
 </section>
-<section id="use" class="level2">
-<h2 class="anchored" data-anchor-id="use">Use</h2>
-<p>All coming steps admit you already installed <code>tima</code>:</p>
+<section id="what-gets-validated" class="level2">
+<h2 class="anchored" data-anchor-id="what-gets-validated">What Gets Validated?</h2>
+<section id="mgf-files-mass-spectra" class="level3">
+<h3 class="anchored" data-anchor-id="mgf-files-mass-spectra">1. MGF Files (Mass Spectra)</h3>
+<p>Checks for: - File exists and is readable - Contains valid spectra (BEGIN IONS markers) - Each spectrum has PEPMASS field - Peak data is present - BEGIN IONS/END IONS are balanced</p>
+<p><strong>Reports:</strong> - Number of spectra found - Specific issues if any</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tima"</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">repos =</span> <span class="fu">c</span>(</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://taxonomicallyinformedannotation.r-universe.dev"</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://bioc.r-universe.dev"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://cloud.r-project.org"</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">install</span>()</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">get_example_files</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate just the MGF file</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">spectra =</span> <span class="st">"data/spectra.mgf"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>We now recommend you to read the following vignettes:</p>
+</section>
+<section id="features-files-csvtsv" class="level3">
+<h3 class="anchored" data-anchor-id="features-files-csvtsv">2. Features Files (CSV/TSV)</h3>
+<p>Checks for: - File exists and is readable - Not empty (has rows and columns) - Required columns present (e.g., <code>feature_id</code>) - Valid CSV/TSV format</p>
+<p><strong>Reports:</strong> - Number of rows (features) - Number of columns - Column names - Missing required columns</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate features file</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">features =</span> <span class="st">"data/features.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="metadata-consistency" class="level3">
+<h3 class="anchored" data-anchor-id="metadata-consistency">3. Metadata Consistency</h3>
+<p>Checks for: - Metadata file exists - Filename column present - Files referenced in metadata actually exist - No broken file references</p>
+<p><strong>Reports:</strong> - Number of files in metadata - Number of files found on disk - List of missing files</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate metadata consistency</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata =</span> <span class="st">"data/metadata.tsv"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata_filename_col =</span> <span class="st">"filename"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata_data_dir =</span> <span class="st">"data/raw"</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="sirius-output-completeness" class="level3">
+<h3 class="anchored" data-anchor-id="sirius-output-completeness">4. SIRIUS Output Completeness</h3>
+<p>Checks for: - SIRIUS directory exists - Required summary files present: - <code>formula_identifications.tsv</code> - <code>canopus_summary.tsv</code> - <code>compound_identifications.tsv</code> - Feature directories exist</p>
+<p><strong>Reports:</strong> - Presence of each required file - Number of feature directories - Specific missing files</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate SIRIUS output</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">sirius =</span> <span class="st">"output/sirius"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="integration-with-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="integration-with-pipeline">Integration with Pipeline</h2>
+<p>The validation functions are <strong>automatically integrated</strong> into the main TIMA functions:</p>
+<section id="automatic-validation" class="level3">
+<h3 class="anchored" data-anchor-id="automatic-validation">Automatic Validation</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># These functions automatically validate inputs</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">annotate_masses</span>(...)  <span class="co"># Validates features file first</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">annotate_spectra</span>(...) <span class="co"># Validates MGF files first</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="manual-validation" class="level3">
+<h3 class="anchored" data-anchor-id="manual-validation">Manual Validation</h3>
+<p>For full control, validate manually before running the pipeline:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Validate everything first</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="st">"data/features.csv"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="st">"data/spectra.mgf"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius =</span> <span class="st">"output/sirius"</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. If all checks pass, run the pipeline</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="common-issues-caught" class="level2">
+<h2 class="anchored" data-anchor-id="common-issues-caught">Common Issues Caught</h2>
+<section id="mgf-file-issues" class="level3">
+<h3 class="anchored" data-anchor-id="mgf-file-issues">MGF File Issues</h3>
+<p><strong>Issue:</strong> No spectra found</p>
+<pre><code>✗ MGF file has issues:
+  - No spectra found (no BEGIN IONS markers)</code></pre>
+<p><strong>Fix:</strong> Check if the file is actually in MGF format and contains spectra.</p>
+<hr>
+<p><strong>Issue:</strong> Mismatched markers</p>
+<pre><code>✗ MGF file has issues:
+  - Mismatched BEGIN IONS (10) and END IONS (9)</code></pre>
+<p><strong>Fix:</strong> One spectrum is missing an END IONS marker. Check the file structure.</p>
+<hr>
+<p><strong>Issue:</strong> Missing required fields</p>
+<pre><code>✗ MGF file has issues:
+  - First spectrum missing PEPMASS field</code></pre>
+<p><strong>Fix:</strong> Each spectrum must have a PEPMASS field specifying the precursor m/z.</p>
+</section>
+<section id="features-file-issues" class="level3">
+<h3 class="anchored" data-anchor-id="features-file-issues">Features File Issues</h3>
+<p><strong>Issue:</strong> Empty file</p>
+<pre><code>✗ Features file has issues:
+  - features table is empty (0 rows)</code></pre>
+<p><strong>Fix:</strong> Ensure the file contains actual feature data, not just a header.</p>
+<hr>
+<p><strong>Issue:</strong> Missing columns</p>
+<pre><code>✗ Features file has issues:
+  - Missing required columns: feature_id, mz</code></pre>
+<p><strong>Fix:</strong> Add the required columns to your features table.</p>
+</section>
+<section id="metadata-issues" class="level3">
+<h3 class="anchored" data-anchor-id="metadata-issues">Metadata Issues</h3>
+<p><strong>Issue:</strong> Files not found</p>
+<pre><code>✗ Metadata validation has issues:
+  - Missing 5/120 files referenced in metadata
+  Missing files:
+    - sample_001.mzML
+    - sample_023.mzML
+    - sample_045.mzML
+    - sample_067.mzML
+    - sample_089.mzML</code></pre>
+<p><strong>Fix:</strong> Ensure all files listed in metadata are present in the data directory.</p>
+<hr>
+<p><strong>Issue:</strong> Wrong column name</p>
+<pre><code>✗ Metadata validation has issues:
+  - Column 'filename' not found in metadata</code></pre>
+<p><strong>Fix:</strong> Rename your column to <code>filename</code> or specify the correct column with <code>metadata_filename_col</code> parameter.</p>
+</section>
+<section id="sirius-issues" class="level3">
+<h3 class="anchored" data-anchor-id="sirius-issues">SIRIUS Issues</h3>
+<p><strong>Issue:</strong> Missing output files</p>
+<pre><code>✗ SIRIUS output has issues:
+  - Missing formula_identifications.tsv
+  - Missing canopus_summary.tsv</code></pre>
+<p><strong>Fix:</strong> Re-run SIRIUS with the correct output options enabled, or check that the output directory path is correct.</p>
+<hr>
+<p><strong>Issue:</strong> Empty output</p>
+<pre><code>✗ SIRIUS output has issues:
+  - No feature directories found in SIRIUS output</code></pre>
+<p><strong>Fix:</strong> The SIRIUS job may have failed or not completed. Check SIRIUS logs.</p>
+</section>
+</section>
+<section id="advanced-usage" class="level2">
+<h2 class="anchored" data-anchor-id="advanced-usage">Advanced Usage</h2>
+<section id="programmatic-validation" class="level3">
+<h3 class="anchored" data-anchor-id="programmatic-validation">Programmatic Validation</h3>
+<p>For scripts and pipelines, you can capture validation results:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The function returns TRUE on success or stops with error</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tryCatch</span>(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">validate_inputs</span>(<span class="at">features =</span> <span class="st">"data/features.csv"</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">"Validation passed - proceeding..."</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Continue with pipeline</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">"Validation failed: "</span>, e<span class="sc">$</span>message)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Handle error (e.g., send notification, log, exit)</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="batch-validation" class="level3">
+<h3 class="anchored" data-anchor-id="batch-validation">Batch Validation</h3>
+<p>Validate multiple datasets in a loop:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>datasets <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"dataset1"</span>, <span class="st">"dataset2"</span>, <span class="st">"dataset3"</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (dataset <span class="cf">in</span> datasets) {</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"Validating "</span>, dataset, <span class="st">"..."</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tryCatch</span>(</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">validate_inputs</span>(</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">features =</span> <span class="fu">file.path</span>(dataset, <span class="st">"features.csv"</span>),</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">spectra =</span> <span class="fu">file.path</span>(dataset, <span class="st">"spectra.mgf"</span>)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">message</span>(<span class="st">"  ✓ "</span>, dataset, <span class="st">" is valid"</span>)</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">message</span>(<span class="st">"  ✗ "</span>, dataset, <span class="st">" has issues: "</span>, e<span class="sc">$</span>message)</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="best-practices" class="level2">
+<h2 class="anchored" data-anchor-id="best-practices">Best Practices</h2>
+<section id="always-validate-first" class="level3">
+<h3 class="anchored" data-anchor-id="always-validate-first">1. Always Validate First</h3>
+<p>Make validation the <strong>first step</strong> in your workflow:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Good practice</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">features =</span> <span class="st">"data/features.csv"</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Bad practice (will waste time if data is invalid)</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()  <span class="co"># Might fail after 30+ minutes</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="validate-after-data-conversion" class="level3">
+<h3 class="anchored" data-anchor-id="validate-after-data-conversion">2. Validate After Data Conversion</h3>
+<p>If you convert data formats (e.g., mzML to MGF), validate the output:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert data</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">convert_mzml_to_mgf</span>(<span class="st">"raw_data/"</span>, <span class="st">"processed/spectra.mgf"</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate immediately</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">spectra =</span> <span class="st">"processed/spectra.mgf"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="include-in-automated-pipelines" class="level3">
+<h3 class="anchored" data-anchor-id="include-in-automated-pipelines">3. Include in Automated Pipelines</h3>
+<p>Add validation to your automated workflows:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Snakemake, Nextflow, or targets pipeline</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(...)  <span class="co"># Fails fast if data is bad</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()           <span class="co"># Only runs if validation passes</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="document-your-validation" class="level3">
+<h3 class="anchored" data-anchor-id="document-your-validation">4. Document Your Validation</h3>
+<p>Keep a record of validation results:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Capture output to log file</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sink</span>(<span class="st">"validation_log.txt"</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="st">"data/features.csv"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="st">"data/spectra.mgf"</span>,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius =</span> <span class="st">"output/sirius"</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sink</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>Data validation with <code>validate_inputs()</code>:</p>
 <ul>
-<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html" class="uri">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html</a> <strong>Start here!</strong> Validate your data before running the pipeline</li>
-<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html" class="uri">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html</a></li>
-<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html" class="uri">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html</a></li>
-<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html" class="uri">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html</a></li>
-<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html" class="uri">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html</a></li>
+<li>✅ <strong>Saves time</strong> - Catches errors in seconds, not hours</li>
+<li>✅ <strong>Clear messages</strong> - Shows exactly what’s wrong and how to fix it</li>
+<li>✅ <strong>Comprehensive</strong> - Checks MGF, CSV, metadata, and SIRIUS data</li>
+<li>✅ <strong>Automatic</strong> - Integrated into main TIMA functions</li>
+<li>✅ <strong>Preventive</strong> - Stops before expensive operations</li>
+<li>✅ <strong>Informative</strong> - Reports row counts, spectra counts, file lists</li>
 </ul>
-<section id="tldr" class="level3">
-<h3 class="anchored" data-anchor-id="tldr">tl;dr</h3>
-<p><strong>Important:</strong> Always validate your data first to catch issues early!</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="st">"data/source/example_features.csv"</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="st">"data/source/example_spectra.mgf"</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata =</span> <span class="st">"data/source/example_metadata.tsv"</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius =</span> <span class="st">"data/interim/annotations/example_sirius.zip"</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">feature_col =</span> <span class="st">"row ID"</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">filename_col =</span> <span class="st">"filename"</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">organism_col =</span> <span class="st">"ATTRIBUTE_species"</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>If you do not feel like going through all the steps, then just do 🚀:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">run_app</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>If you do not even need a GUI ☠️:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">run_tima</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>In case you just want to change some small parameters between jobs, a convenience function is available:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">change_params_small</span>(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">fil_pat =</span> <span class="st">"myExamplePattern"</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">fil_fea_raw =</span> <span class="st">"myExampleDir/myExampleFeatures.csv"</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fil_met_raw =</span> <span class="st">"myExampleDir2SomeWhereElse/myOptionalMetadata.tsv"</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">fil_sir_raw =</span> <span class="st">"myExampleDir3/myAwesomeSiriusProject.zip"</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">fil_spe_raw =</span> <span class="st">"myBeautifulSpectra.mgf"</span>,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ms_pol =</span> <span class="st">"pos"</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">org_tax =</span> <span class="st">"Gentiana lutea"</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">hig_con =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">summarize =</span> <span class="cn">FALSE</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
+<p><strong>Always validate your data first!</strong> It’s the best way to ensure a smooth TIMA experience.</p>
 </section>
-</section>
-<section id="biological-weighting-and-core-metabolism" class="level2">
-<h2 class="anchored" data-anchor-id="biological-weighting-and-core-metabolism">Biological Weighting and Core Metabolism</h2>
-<p>TIMA’s core principle is that candidates that are close to your sample’s taxonomic origin receive higher biological scores. For example, if you are analyzing a plant extract (<em>Gentiana lutea</em>), metabolites reported from plants will score higher than those only reported from bacteria or animals.</p>
-<section id="the-special-case-biota-superdomain" class="level3">
-<h3 class="anchored" data-anchor-id="the-special-case-biota-superdomain">The Special Case: “Biota” Superdomain</h3>
-<p>However, some metabolites are <em>universal</em>, they are part of the shared core metabolism found across all domains of life. To ensure these universal metabolites are always considered in annotations regardless of sample taxonomy, TIMA implements a special <code>"Biota" Superdomain</code>. When preparing structure-organism pair libraries (e.g., from BiGG metabolic models), metabolites present in all model organisms are assigned to the special “Biota” organism with:</p>
+<section id="next-steps" class="level2">
+<h2 class="anchored" data-anchor-id="next-steps">Next Steps</h2>
+<p>Now that your data is validated:</p>
 <ul>
-<li><code>organism_taxonomy_01domain = "Biota"</code></li>
-<li><code>organism_taxonomy_ottid = 0</code></li>
+<li><a href="I-gathering.html">I. Gathering</a> - Collect your data</li>
+<li><a href="II-preparing.html">II. Preparing</a> - Prepare your libraries</li>
+<li><a href="III-processing.html">III. Processing</a> - Run the annotation pipeline</li>
+<li><a href="IV-benchmarking.html">IV. Benchmarking</a> - Evaluate your results</li>
 </ul>
-<p>During biological weighting, any candidate from the Biota domain receives the maximal biological score. This ensures that core metabolic pathways are never inappropriately filtered out due to taxonomic mismatches, while still maintaining the taxonomic prioritization for organism-specific specialized metabolism.</p>
 
 
-</section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{rutz2025,
   author = {Rutz, Adriano},
-  title = {General Comments about the Infrastructure},
+  title = {0 {Validating} Your Data},
   date = {2025-12-27},
-  url = {https://taxonomicallyinformedannotation.github.io/tima/vignettes/tima.html},
+  url = {https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-rutz2025" class="csl-entry quarto-appendix-citeas" role="listitem">
-Rutz, Adriano. 2025. <span>“General Comments about the
-Infrastructure.”</span> December 27, 2025. <a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/tima.html">https://taxonomicallyinformedannotation.github.io/tima/vignettes/tima.html</a>.
+Rutz, Adriano. 2025. <span>“0 Validating Your Data.”</span> December 27,
+2025. <a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1434,5 +1675,5 @@ Infrastructure.”</span> December 27, 2025. <a href="https://taxonomicallyinfor
 
 
 
-<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>
