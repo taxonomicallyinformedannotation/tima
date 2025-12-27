@@ -101,10 +101,10 @@ tima::get_example_files()
 
 ## Quick Start
 
-### 1. Validate Your Data First
+### Validate Your Data
 
-**Always start by validating your input files** to catch issues early
-and save debugging time:
+**Start by validating your input files** to catch issues early and save
+debugging time:
 
 ``` r
 # Check if your data is matches expectations before processing
@@ -126,7 +126,7 @@ This will:
 - Check metadata file consistency
 - Report eventual issues immediately
 
-### 2. Run the Pipeline
+### Run the Pipeline
 
 Once you are done, you can open a small GUI to adapt your parameters and
 launch your job:
@@ -221,7 +221,6 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
 | MsCoreUtils | 1.22.1 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
-| progress | 1.2.3 | Csárdi and FitzJohn (2023) |
 | R.utils | 2.13.0 | Bengtsson (2025) |
 | reticulate | 1.44.1 | Ushey, Allaire, and Tang (2025) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
@@ -285,14 +284,6 @@ Chang, Winston, Joe Cheng, JJ Allaire, Carson Sievert, Barret Schloerke,
 Garrick Aden-Buie, Yihui Xie, et al. 2025.
 *<span class="nocase">shiny</span>: Web Application Framework for r*.
 <https://doi.org/10.32614/CRAN.package.shiny>.
-
-</div>
-
-<div id="ref-progress" class="csl-entry">
-
-Csárdi, Gábor, and Rich FitzJohn. 2023.
-*<span class="nocase">progress</span>: Terminal Progress Bars*.
-<https://doi.org/10.32614/CRAN.package.progress>.
 
 </div>
 

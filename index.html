@@ -334,6 +334,10 @@ div.csl-indent {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-articles">    
         <li>
+    <a class="dropdown-item" href="./vignettes/articles/0-validating.html">
+ <span class="dropdown-text">0 Validating your data</span></a>
+  </li>  
+        <li>
     <a class="dropdown-item" href="./vignettes/articles/I-gathering.html">
  <span class="dropdown-text">1 Gathering everything you need</span></a>
   </li>  
@@ -792,12 +796,29 @@ div.csl-indent {
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false">
- <span class="menu-text">Weight</span></a>
+ <span class="menu-text">Validate</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-18" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/validate_inputs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">validate_inputs</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false">
+ <span class="menu-text">Weight</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./man/weight_annotations.html" class="sidebar-item-text sidebar-link">
@@ -828,8 +849,8 @@ div.csl-indent {
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
   <li><a href="#quick-start" id="toc-quick-start" class="nav-link" data-scroll-target="#quick-start">Quick Start</a>
   <ul class="collapse">
-  <li><a href="#validate-your-data-first" id="toc-validate-your-data-first" class="nav-link" data-scroll-target="#validate-your-data-first">1. Validate Your Data First</a></li>
-  <li><a href="#run-the-pipeline" id="toc-run-the-pipeline" class="nav-link" data-scroll-target="#run-the-pipeline">2. Run the Pipeline</a></li>
+  <li><a href="#validate-your-data" id="toc-validate-your-data" class="nav-link" data-scroll-target="#validate-your-data">Validate Your Data</a></li>
+  <li><a href="#run-the-pipeline" id="toc-run-the-pipeline" class="nav-link" data-scroll-target="#run-the-pipeline">Run the Pipeline</a></li>
   <li><a href="#docker" id="toc-docker" class="nav-link" data-scroll-target="#docker">Docker</a></li>
   </ul></li>
   <li><a href="#main-citations" id="toc-main-citations" class="nav-link" data-scroll-target="#main-citations">Main Citations</a>
@@ -911,9 +932,9 @@ div.csl-indent {
 </section>
 <section id="quick-start" class="level2">
 <h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
-<section id="validate-your-data-first" class="level3">
-<h3 class="anchored" data-anchor-id="validate-your-data-first">1. Validate Your Data First</h3>
-<p><strong>Always start by validating your input files</strong> to catch issues early and save debugging time:</p>
+<section id="validate-your-data" class="level3">
+<h3 class="anchored" data-anchor-id="validate-your-data">Validate Your Data</h3>
+<p><strong>Start by validating your input files</strong> to catch issues early and save debugging time:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if your data is matches expectations before processing</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="st">"data/source/example_features.csv"</span>,</span>
@@ -933,7 +954,7 @@ div.csl-indent {
 </ul>
 </section>
 <section id="run-the-pipeline" class="level3">
-<h3 class="anchored" data-anchor-id="run-the-pipeline">2. Run the Pipeline</h3>
+<h3 class="anchored" data-anchor-id="run-the-pipeline">Run the Pipeline</h3>
 <p>Once you are done, you can open a small GUI to adapt your parameters and launch your job:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">run_app</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This command will open a small app in your default browser.</p>
@@ -1095,101 +1116,96 @@ div.csl-indent {
 <td style="text-align: left;"><span class="citation" data-cites="msentropy">Li (<a href="#ref-msentropy" role="doc-biblioref">2023</a>)</span></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">progress</td>
-<td style="text-align: left;">1.2.3</td>
-<td style="text-align: left;"><span class="citation" data-cites="progress">Csárdi and FitzJohn (<a href="#ref-progress" role="doc-biblioref">2023</a>)</span></td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;">R.utils</td>
 <td style="text-align: left;">2.13.0</td>
 <td style="text-align: left;"><span class="citation" data-cites="Rutils">Bengtsson (<a href="#ref-Rutils" role="doc-biblioref">2025</a>)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">reticulate</td>
 <td style="text-align: left;">1.44.1</td>
 <td style="text-align: left;"><span class="citation" data-cites="reticulate">Ushey, Allaire, and Tang (<a href="#ref-reticulate" role="doc-biblioref">2025</a>)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">rmarkdown</td>
 <td style="text-align: left;">2.30</td>
 <td style="text-align: left;"><span class="citation" data-cites="rmarkdown2018">Xie, Allaire, and Grolemund (<a href="#ref-rmarkdown2018" role="doc-biblioref">2018</a>)</span>; <span class="citation" data-cites="rmarkdown2020">Xie, Dervieux, and Riederer (<a href="#ref-rmarkdown2020" role="doc-biblioref">2020</a>)</span>; <span class="citation" data-cites="rmarkdown2025">Allaire et al. (<a href="#ref-rmarkdown2025" role="doc-biblioref">2025</a>)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">rotl</td>
 <td style="text-align: left;">3.1.0</td>
 <td style="text-align: left;"><span class="citation" data-cites="rotl2016">Michonneau, Brown, and Winter (<a href="#ref-rotl2016" role="doc-biblioref">2016</a>)</span>; <span class="citation" data-cites="rotl2019">OpenTreeOfLife et al. (<a href="#ref-rotl2019" role="doc-biblioref">2019</a>)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">shiny</td>
 <td style="text-align: left;">1.12.1</td>
 <td style="text-align: left;"><span class="citation" data-cites="shiny">Chang et al. (<a href="#ref-shiny" role="doc-biblioref">2025</a>)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">shinyhelper</td>
 <td style="text-align: left;">0.3.2</td>
 <td style="text-align: left;"><span class="citation" data-cites="shinyhelper">Mason-Thom (<a href="#ref-shinyhelper" role="doc-biblioref">2019</a>)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">shinyjs</td>
 <td style="text-align: left;">2.1.0</td>
 <td style="text-align: left;"><span class="citation" data-cites="shinyjs">Attali (<a href="#ref-shinyjs" role="doc-biblioref">2021</a>)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">shinytest2</td>
 <td style="text-align: left;">0.4.1</td>
 <td style="text-align: left;"><span class="citation" data-cites="shinytest2">Schloerke (<a href="#ref-shinytest2" role="doc-biblioref">2025</a>)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">shinyvalidate</td>
 <td style="text-align: left;">0.1.3</td>
 <td style="text-align: left;"><span class="citation" data-cites="shinyvalidate">Sievert, Iannone, and Cheng (<a href="#ref-shinyvalidate" role="doc-biblioref">2023</a>)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">Spectra</td>
 <td style="text-align: left;">1.20.0</td>
 <td style="text-align: left;"><span class="citation" data-cites="Spectra">Rainer et al. (<a href="#ref-Spectra" role="doc-biblioref">2022d</a>)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">stringi</td>
 <td style="text-align: left;">1.8.7</td>
 <td style="text-align: left;"><span class="citation" data-cites="stringi">Gagolewski (<a href="#ref-stringi" role="doc-biblioref">2022</a>)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">targets</td>
 <td style="text-align: left;">1.11.4</td>
 <td style="text-align: left;"><span class="citation" data-cites="targets">Landau (<a href="#ref-targets" role="doc-biblioref">2021</a>)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">testthat</td>
 <td style="text-align: left;">3.3.1</td>
 <td style="text-align: left;"><span class="citation" data-cites="testthat">Wickham (<a href="#ref-testthat" role="doc-biblioref">2011</a>)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">tidyselect</td>
 <td style="text-align: left;">1.2.1</td>
 <td style="text-align: left;"><span class="citation" data-cites="tidyselect">Henry and Wickham (<a href="#ref-tidyselect" role="doc-biblioref">2024</a>)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">tidytable</td>
 <td style="text-align: left;">0.11.2</td>
 <td style="text-align: left;"><span class="citation" data-cites="tidytable">Fairbanks (<a href="#ref-tidytable" role="doc-biblioref">2024</a>)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">tidyverse</td>
 <td style="text-align: left;">2.0.0</td>
 <td style="text-align: left;"><span class="citation" data-cites="tidyverse">Wickham et al. (<a href="#ref-tidyverse" role="doc-biblioref">2019</a>)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">tima</td>
 <td style="text-align: left;">2.12.0</td>
 <td style="text-align: left;"><span class="citation" data-cites="tima2019">Rutz et al. (<a href="#ref-tima2019" role="doc-biblioref">2019</a>)</span>; <span class="citation" data-cites="tima2025">Rutz and Allard (<a href="#ref-tima2025" role="doc-biblioref">2025</a>)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">withr</td>
 <td style="text-align: left;">3.0.2</td>
 <td style="text-align: left;"><span class="citation" data-cites="withr">Hester et al. (<a href="#ref-withr" role="doc-biblioref">2024</a>)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">yaml</td>
 <td style="text-align: left;">2.3.12</td>
 <td style="text-align: left;"><span class="citation" data-cites="yaml">Stephens and Simonov (<a href="#ref-yaml" role="doc-biblioref">2025</a>)</span></td>
@@ -1219,9 +1235,6 @@ Bengtsson, Henrik. 2025. <em><span class="nocase">R.utils</span>: Various Progra
 </div>
 <div id="ref-shiny" class="csl-entry" role="listitem">
 Chang, Winston, Joe Cheng, JJ Allaire, Carson Sievert, Barret Schloerke, Garrick Aden-Buie, Yihui Xie, et al. 2025. <em><span class="nocase">shiny</span>: Web Application Framework for r</em>. <a href="https://doi.org/10.32614/CRAN.package.shiny">https://doi.org/10.32614/CRAN.package.shiny</a>.
-</div>
-<div id="ref-progress" class="csl-entry" role="listitem">
-Csárdi, Gábor, and Rich FitzJohn. 2023. <em><span class="nocase">progress</span>: Terminal Progress Bars</em>. <a href="https://doi.org/10.32614/CRAN.package.progress">https://doi.org/10.32614/CRAN.package.progress</a>.
 </div>
 <div id="ref-igraph2006" class="csl-entry" role="listitem">
 Csárdi, Gábor, and Tamás Nepusz. 2006. <span>“The Igraph Software Package for Complex Network Research.”</span> <em>InterJournal</em> Complex Systems: 1695. <a href="https://igraph.org">https://igraph.org</a>.

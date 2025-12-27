@@ -336,6 +336,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-articles">    
         <li>
+    <a class="dropdown-item" href="../../vignettes/articles/0-validating.html">
+ <span class="dropdown-text">0 Validating your data</span></a>
+  </li>  
+        <li>
     <a class="dropdown-item" href="../../vignettes/articles/I-gathering.html">
  <span class="dropdown-text">1 Gathering everything you need</span></a>
   </li>  
@@ -794,12 +798,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false">
- <span class="menu-text">Weight</span></a>
+ <span class="menu-text">Validate</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-18" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../man/validate_inputs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">validate_inputs</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false">
+ <span class="menu-text">Weight</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../man/weight_annotations.html" class="sidebar-item-text sidebar-link">
@@ -820,20 +841,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#why-validate-your-data-first" id="toc-why-validate-your-data-first" class="nav-link active" data-scroll-target="#why-validate-your-data-first">Why Validate Your Data First?</a>
-  <ul class="collapse">
-  <li><a href="#the-problem" id="toc-the-problem" class="nav-link" data-scroll-target="#the-problem">The Problem</a></li>
-  </ul></li>
+  <li><a href="#why-validate-your-data-first" id="toc-why-validate-your-data-first" class="nav-link active" data-scroll-target="#why-validate-your-data-first">Why Validate Your Data First?</a></li>
   <li><a href="#quick-start" id="toc-quick-start" class="nav-link" data-scroll-target="#quick-start">Quick Start</a>
   <ul class="collapse">
   <li><a href="#example-output" id="toc-example-output" class="nav-link" data-scroll-target="#example-output">Example Output</a></li>
   </ul></li>
   <li><a href="#what-gets-validated" id="toc-what-gets-validated" class="nav-link" data-scroll-target="#what-gets-validated">What Gets Validated?</a>
   <ul class="collapse">
-  <li><a href="#mgf-files-mass-spectra" id="toc-mgf-files-mass-spectra" class="nav-link" data-scroll-target="#mgf-files-mass-spectra">1. MGF Files (Mass Spectra)</a></li>
-  <li><a href="#features-files-csvtsv" id="toc-features-files-csvtsv" class="nav-link" data-scroll-target="#features-files-csvtsv">2. Features Files (CSV/TSV)</a></li>
-  <li><a href="#metadata-consistency" id="toc-metadata-consistency" class="nav-link" data-scroll-target="#metadata-consistency">3. Metadata Consistency</a></li>
-  <li><a href="#sirius-output-completeness" id="toc-sirius-output-completeness" class="nav-link" data-scroll-target="#sirius-output-completeness">4. SIRIUS Output Completeness</a></li>
+  <li><a href="#mgf-files-mass-spectra" id="toc-mgf-files-mass-spectra" class="nav-link" data-scroll-target="#mgf-files-mass-spectra">MGF Files (Mass Spectra)</a></li>
+  <li><a href="#features-files-csvtsv" id="toc-features-files-csvtsv" class="nav-link" data-scroll-target="#features-files-csvtsv">Features Files (CSV/TSV)</a></li>
+  <li><a href="#metadata-consistency" id="toc-metadata-consistency" class="nav-link" data-scroll-target="#metadata-consistency">Metadata Consistency</a></li>
+  <li><a href="#sirius-output-completeness" id="toc-sirius-output-completeness" class="nav-link" data-scroll-target="#sirius-output-completeness">SIRIUS Output Completeness</a></li>
   </ul></li>
   <li><a href="#integration-with-pipeline" id="toc-integration-with-pipeline" class="nav-link" data-scroll-target="#integration-with-pipeline">Integration with Pipeline</a>
   <ul class="collapse">
@@ -854,10 +872,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#best-practices" id="toc-best-practices" class="nav-link" data-scroll-target="#best-practices">Best Practices</a>
   <ul class="collapse">
-  <li><a href="#always-validate-first" id="toc-always-validate-first" class="nav-link" data-scroll-target="#always-validate-first">1. Always Validate First</a></li>
-  <li><a href="#validate-after-data-conversion" id="toc-validate-after-data-conversion" class="nav-link" data-scroll-target="#validate-after-data-conversion">2. Validate After Data Conversion</a></li>
-  <li><a href="#include-in-automated-pipelines" id="toc-include-in-automated-pipelines" class="nav-link" data-scroll-target="#include-in-automated-pipelines">3. Include in Automated Pipelines</a></li>
-  <li><a href="#document-your-validation" id="toc-document-your-validation" class="nav-link" data-scroll-target="#document-your-validation">4. Document Your Validation</a></li>
+  <li><a href="#always-validate-first" id="toc-always-validate-first" class="nav-link" data-scroll-target="#always-validate-first">Always Validate First</a></li>
+  <li><a href="#validate-after-data-conversion" id="toc-validate-after-data-conversion" class="nav-link" data-scroll-target="#validate-after-data-conversion">Validate After Data Conversion</a></li>
+  <li><a href="#include-in-automated-pipelines" id="toc-include-in-automated-pipelines" class="nav-link" data-scroll-target="#include-in-automated-pipelines">Include in Automated Pipelines</a></li>
+  <li><a href="#document-your-validation" id="toc-document-your-validation" class="nav-link" data-scroll-target="#document-your-validation">Document Your Validation</a></li>
   </ul></li>
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
   <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next Steps</a></li>
@@ -901,26 +919,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 <section id="why-validate-your-data-first" class="level2">
 <h2 class="anchored" data-anchor-id="why-validate-your-data-first">Why Validate Your Data First?</h2>
-<p>Before starting the TIMA pipeline, it’s crucial to validate your input data. This <strong>pre-flight check</strong> saves you hours of time by catching issues immediately instead of discovering them after expensive operations like library downloads.</p>
-<section id="the-problem" class="level3">
-<h3 class="anchored" data-anchor-id="the-problem">The Problem</h3>
-<p><strong>Without validation:</strong></p>
-<ol type="1">
-<li>Start pipeline</li>
-<li>Download libraries (30+ minutes)</li>
-<li>Process data (10+ minutes)</li>
-<li><strong>ERROR</strong>: “MGF file has no spectra!”</li>
-<li>Time wasted: <strong>40+ minutes</strong></li>
-</ol>
-<p><strong>With validation:</strong></p>
-<ol type="1">
-<li>Run <code>validate_inputs()</code> (&lt; 1 minute)</li>
-<li><strong>ERROR caught immediately</strong>: “No spectra found”</li>
-<li>Fix the issue</li>
-<li>Run pipeline successfully</li>
-<li>Time saved: <strong>39+ minutes per error!</strong></li>
-</ol>
-</section>
+<p>Before starting the TIMA pipeline, it’s recommended to validate your input data. This <strong>pre-flight check</strong> saves you time by catching issues immediately instead of discovering them after expensive operations like library downloads.</p>
 </section>
 <section id="quick-start" class="level2">
 <h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
@@ -964,7 +963,7 @@ Data validation complete. Ready to proceed.
 <section id="what-gets-validated" class="level2">
 <h2 class="anchored" data-anchor-id="what-gets-validated">What Gets Validated?</h2>
 <section id="mgf-files-mass-spectra" class="level3">
-<h3 class="anchored" data-anchor-id="mgf-files-mass-spectra">1. MGF Files (Mass Spectra)</h3>
+<h3 class="anchored" data-anchor-id="mgf-files-mass-spectra">MGF Files (Mass Spectra)</h3>
 <p>Checks for: - File exists and is readable - Contains valid spectra (BEGIN IONS markers) - Each spectrum has PEPMASS field - Peak data is present - BEGIN IONS/END IONS are balanced</p>
 <p><strong>Reports:</strong> - Number of spectra found - Specific issues if any</p>
 <div class="cell">
@@ -973,7 +972,7 @@ Data validation complete. Ready to proceed.
 </div>
 </section>
 <section id="features-files-csvtsv" class="level3">
-<h3 class="anchored" data-anchor-id="features-files-csvtsv">2. Features Files (CSV/TSV)</h3>
+<h3 class="anchored" data-anchor-id="features-files-csvtsv">Features Files (CSV/TSV)</h3>
 <p>Checks for: - File exists and is readable - Not empty (has rows and columns) - Required columns present (e.g., <code>feature_id</code>) - Valid CSV/TSV format</p>
 <p><strong>Reports:</strong> - Number of rows (features) - Number of columns - Column names - Missing required columns</p>
 <div class="cell">
@@ -982,7 +981,7 @@ Data validation complete. Ready to proceed.
 </div>
 </section>
 <section id="metadata-consistency" class="level3">
-<h3 class="anchored" data-anchor-id="metadata-consistency">3. Metadata Consistency</h3>
+<h3 class="anchored" data-anchor-id="metadata-consistency">Metadata Consistency</h3>
 <p>Checks for: - Metadata file exists - Filename column present - Files referenced in metadata actually exist - No broken file references</p>
 <p><strong>Reports:</strong> - Number of files in metadata - Number of files found on disk - List of missing files</p>
 <div class="cell">
@@ -995,8 +994,8 @@ Data validation complete. Ready to proceed.
 </div>
 </section>
 <section id="sirius-output-completeness" class="level3">
-<h3 class="anchored" data-anchor-id="sirius-output-completeness">4. SIRIUS Output Completeness</h3>
-<p>Checks for: - SIRIUS directory exists - Required summary files present: - <code>formula_identifications.tsv</code> - <code>canopus_summary.tsv</code> - <code>compound_identifications.tsv</code> - Feature directories exist</p>
+<h3 class="anchored" data-anchor-id="sirius-output-completeness">SIRIUS Output Completeness</h3>
+<p>Checks for: - SIRIUS directory exists - Required summary files present: - <code>formula_identifications_all.tsv</code> - <code>canopus_formula_summary_all.tsv</code> - <code>compound/structure_identifications_all.tsv</code> - Feature directories exist</p>
 <p><strong>Reports:</strong> - Presence of each required file - Number of feature directories - Specific missing files</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate SIRIUS output</span></span>
@@ -1084,8 +1083,8 @@ Data validation complete. Ready to proceed.
 <h3 class="anchored" data-anchor-id="sirius-issues">SIRIUS Issues</h3>
 <p><strong>Issue:</strong> Missing output files</p>
 <pre><code>✗ SIRIUS output has issues:
-  - Missing formula_identifications.tsv
-  - Missing canopus_summary.tsv</code></pre>
+  - Missing formula_identifications_all.tsv
+  - Missing canopus_summary_all.tsv</code></pre>
 <p><strong>Fix:</strong> Re-run SIRIUS with the correct output options enabled, or check that the output directory path is correct.</p>
 <hr>
 <p><strong>Issue:</strong> Empty output</p>
@@ -1142,7 +1141,7 @@ Data validation complete. Ready to proceed.
 <section id="best-practices" class="level2">
 <h2 class="anchored" data-anchor-id="best-practices">Best Practices</h2>
 <section id="always-validate-first" class="level3">
-<h3 class="anchored" data-anchor-id="always-validate-first">1. Always Validate First</h3>
+<h3 class="anchored" data-anchor-id="always-validate-first">Always Validate First</h3>
 <p>Make validation the <strong>first step</strong> in your workflow:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Good practice</span></span>
@@ -1150,11 +1149,11 @@ Data validation complete. Ready to proceed.
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()</span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Bad practice (will waste time if data is invalid)</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()  <span class="co"># Might fail after 30+ minutes</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()  <span class="co"># Might fail after 10+ minutes</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="validate-after-data-conversion" class="level3">
-<h3 class="anchored" data-anchor-id="validate-after-data-conversion">2. Validate After Data Conversion</h3>
+<h3 class="anchored" data-anchor-id="validate-after-data-conversion">Validate After Data Conversion</h3>
 <p>If you convert data formats (e.g., mzML to MGF), validate the output:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert data</span></span>
@@ -1165,7 +1164,7 @@ Data validation complete. Ready to proceed.
 </div>
 </section>
 <section id="include-in-automated-pipelines" class="level3">
-<h3 class="anchored" data-anchor-id="include-in-automated-pipelines">3. Include in Automated Pipelines</h3>
+<h3 class="anchored" data-anchor-id="include-in-automated-pipelines">Include in Automated Pipelines</h3>
 <p>Add validation to your automated workflows:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Snakemake, Nextflow, or targets pipeline</span></span>
@@ -1174,7 +1173,7 @@ Data validation complete. Ready to proceed.
 </div>
 </section>
 <section id="document-your-validation" class="level3">
-<h3 class="anchored" data-anchor-id="document-your-validation">4. Document Your Validation</h3>
+<h3 class="anchored" data-anchor-id="document-your-validation">Document Your Validation</h3>
 <p>Keep a record of validation results:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Capture output to log file</span></span>

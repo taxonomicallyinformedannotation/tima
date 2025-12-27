@@ -20,6 +20,8 @@ website:
         file: vignettes/tima.qmd
       - text: Articles
         menu:
+          - text: 0 Validating your data
+            file: vignettes/articles/0-validating.qmd
           - text: 1 Gathering everything you need
             file: vignettes/articles/I-gathering.qmd
           - text: 2 Preparing inputs
@@ -147,6 +149,10 @@ website:
                 file: man/run_app.qmd
               - text: run_tima
                 file: man/run_tima.qmd
+          - section: Validate
+            contents:
+              - text: validate_inputs
+                file: man/validate_inputs.qmd
           - section: Weight
             contents:
               - text: weight_annotations
