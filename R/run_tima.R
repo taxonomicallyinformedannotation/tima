@@ -240,6 +240,11 @@ run_tima <- function(
   log_info("Contributors: Pierre-Marie Allard (PMA)")
   log_info("=" |> rep(60) |> paste(collapse = ""))
 
+  # Pre-flight Data Validation (Optional but Recommended) ----
+  # Note: Individual functions also validate their inputs
+  # This is just for early detection of major issues
+  log_debug("Pre-flight checks should be run with: validate_inputs()")
+
   # Setup Environment ----
   tryCatch(
     {

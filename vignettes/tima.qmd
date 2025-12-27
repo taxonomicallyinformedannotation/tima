@@ -115,12 +115,30 @@ tima::get_example_files()
 
 We now recommend you to read the following vignettes:
 
+- <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html> **Start here!** Validate your data before running the pipeline
 - <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html>
 - <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html>
 - <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html>
 - <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html>
 
 ### tl;dr
+
+**Important:** Always validate your data first to catch issues early!
+
+```{r hidden_files, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+get_example_files(in_cache = FALSE)
+```
+```{r validate_first, eval=FALSE, include=TRUE}
+validate_inputs(
+  features = "data/source/example_features.csv",
+  spectra = "data/source/example_spectra.mgf",
+  metadata = "data/source/example_metadata.tsv",
+  sirius = "data/interim/annotations/example_sirius.zip",
+  feature_col = "row ID",
+  filename_col = "filename",
+  organism_col = "ATTRIBUTE_species"
+  )
+```
 
 If you do not feel like going through all the steps, then just do 🚀:
 
