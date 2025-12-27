@@ -42,7 +42,7 @@ setup_minimal_fixtures <- function() {
     cleanup = function() {
       unlink(temp_dir, recursive = TRUE)
       unlink("data", recursive = TRUE)
-      }
+    }
   )
 }
 
@@ -201,18 +201,18 @@ test_that("annotate_masses validates tolerance_rt correctly", {
 
   # Too large tolerance should error
   expect_warning(
-      annotate_masses(
-        features = fixtures$features,
-        library = fixtures$library,
-        str_stereo = fixtures$str_stereo,
-        str_met = fixtures$str_met,
-        str_nam = fixtures$str_nam,
-        str_tax_cla = fixtures$str_tax_cla,
-        str_tax_npc = fixtures$str_tax_npc,
-        tolerance_rt = 1.0,
-        tolerance_ppm = 10,
-        ms_mode = "pos"
-      ),
+    annotate_masses(
+      features = fixtures$features,
+      library = fixtures$library,
+      str_stereo = fixtures$str_stereo,
+      str_met = fixtures$str_met,
+      str_nam = fixtures$str_nam,
+      str_tax_cla = fixtures$str_tax_cla,
+      str_tax_npc = fixtures$str_tax_npc,
+      tolerance_rt = 1.0,
+      tolerance_ppm = 10,
+      ms_mode = "pos"
+    ),
     "Large values may group unrelated features together",
     fixed = TRUE
   )
@@ -221,7 +221,7 @@ test_that("annotate_masses validates tolerance_rt correctly", {
 
 test_that("annotate_masses validates adducts_list structure", {
   fixtures <- setup_minimal_fixtures()
-  
+
   # Missing mode in adducts_list should error
   expect_error(
     annotate_masses(
