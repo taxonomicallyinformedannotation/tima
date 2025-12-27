@@ -123,7 +123,7 @@ We now recommend you to read the following vignettes:
 
 ### tl;dr
 
-**Important:** Always validate your data first to catch issues early!
+**Important:** Always validate your data to catch issues early!
 
 ```{r validate_first, eval=FALSE, include=TRUE}
 validate_inputs(

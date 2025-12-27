@@ -41,27 +41,9 @@ knitr::opts_chunk$set(
 
 ## Why Validate Your Data First?
 
-Before starting the TIMA pipeline, it's crucial to validate your input data.
-This **pre-flight check** saves you hours of time by catching issues immediately
+Before starting the TIMA pipeline, it's recommended to validate your input data.
+This **pre-flight check** saves you time by catching issues immediately
 instead of discovering them after expensive operations like library downloads.
-
-### The Problem
-
-**Without validation:**
-
-1. Start pipeline
-2. Download libraries (30+ minutes)
-3. Process data (10+ minutes)
-4. **ERROR**: "MGF file has no spectra!"
-5. Time wasted: **40+ minutes**
-
-**With validation:**
-
-1. Run `validate_inputs()` (< 1 minute)
-2. **ERROR caught immediately**: "No spectra found"
-3. Fix the issue
-4. Run pipeline successfully
-5. Time saved: **39+ minutes per error!**
 
 ## Quick Start
 
@@ -106,7 +88,7 @@ Data validation complete. Ready to proceed.
 
 ## What Gets Validated?
 
-### 1. MGF Files (Mass Spectra)
+### MGF Files (Mass Spectra)
 
 Checks for:
 - File exists and is readable
@@ -124,7 +106,7 @@ Checks for:
 validate_inputs(spectra = "data/spectra.mgf")
 ```
 
-### 2. Features Files (CSV/TSV)
+### Features Files (CSV/TSV)
 
 Checks for:
 - File exists and is readable
@@ -143,7 +125,7 @@ Checks for:
 validate_inputs(features = "data/features.csv")
 ```
 
-### 3. Metadata Consistency
+### Metadata Consistency
 
 Checks for:
 - Metadata file exists
@@ -165,14 +147,14 @@ validate_inputs(
 )
 ```
 
-### 4. SIRIUS Output Completeness
+### SIRIUS Output Completeness
 
 Checks for:
 - SIRIUS directory exists
 - Required summary files present:
-  - `formula_identifications.tsv`
-  - `canopus_summary.tsv`
-  - `compound_identifications.tsv`
+  - `formula_identifications_all.tsv`
+  - `canopus_formula_summary_all.tsv`
+  - `compound/structure_identifications_all.tsv`
 - Feature directories exist
 
 **Reports:**
@@ -297,8 +279,8 @@ run_tima()
 **Issue:** Missing output files
 ```
 ✗ SIRIUS output has issues:
-  - Missing formula_identifications.tsv
-  - Missing canopus_summary.tsv
+  - Missing formula_identifications_all.tsv
+  - Missing canopus_summary_all.tsv
 ```
 
 **Fix:** Re-run SIRIUS with the correct output options enabled, or check that
@@ -362,7 +344,7 @@ for (dataset in datasets) {
 
 ## Best Practices
 
-### 1. Always Validate First
+### Always Validate First
 
 Make validation the **first step** in your workflow:
 
@@ -372,10 +354,10 @@ validate_inputs(features = "data/features.csv")
 run_tima()
 
 # Bad practice (will waste time if data is invalid)
-run_tima()  # Might fail after 30+ minutes
+run_tima()  # Might fail after 10+ minutes
 ```
 
-### 2. Validate After Data Conversion
+### Validate After Data Conversion
 
 If you convert data formats (e.g., mzML to MGF), validate the output:
 
@@ -387,7 +369,7 @@ convert_mzml_to_mgf("raw_data/", "processed/spectra.mgf")
 validate_inputs(spectra = "processed/spectra.mgf")
 ```
 
-### 3. Include in Automated Pipelines
+### Include in Automated Pipelines
 
 Add validation to your automated workflows:
 
@@ -397,7 +379,7 @@ validate_inputs(...)  # Fails fast if data is bad
 run_tima()           # Only runs if validation passes
 ```
 
-### 4. Document Your Validation
+### Document Your Validation
 
 Keep a record of validation results:
 
@@ -434,4 +416,3 @@ Now that your data is validated:
 - [II. Preparing](II-preparing.html) - Prepare your libraries
 - [III. Processing](III-processing.html) - Run the annotation pipeline
 - [IV. Benchmarking](IV-benchmarking.html) - Evaluate your results
-

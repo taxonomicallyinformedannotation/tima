@@ -172,7 +172,6 @@ Collate:
     'prepare_libraries_spectra.R'
     'prepare_params.R'
     'prepare_taxa.R'
-    'progress_utils.R'
     'replace_id.R'
     'run_app.R'
     'run_tima.R'

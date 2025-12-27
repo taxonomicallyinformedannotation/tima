@@ -23,7 +23,7 @@ NULL
     return(NULL)
   }
 
-  distances <- adist(value, valid_values)[1, ]
+  distances <- utils::adist(value, valid_values)[1, ]
   closest_idx <- which.min(distances)
 
   # Be more lenient for short target strings

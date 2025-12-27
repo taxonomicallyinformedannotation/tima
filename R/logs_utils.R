@@ -536,7 +536,7 @@ log_operation <- function(operation_name, ...) {
     "(no parameters)"
   }
 
-  log_info("▶ Starting: %s [%s]", operation_name, param_str)
+  log_info("> Starting: %s [%s]", operation_name, param_str)
 
   invisible(ctx)
 }
@@ -566,7 +566,7 @@ log_complete <- function(ctx, ...) {
   }
 
   log_info(
-    "✓ Completed: %s [%s] (%s)",
+    "[OK] Completed: %s [%s] (%s)",
     ctx$operation,
     result_str,
     format_time(elapsed)
@@ -607,7 +607,7 @@ log_failed <- function(ctx, error, ...) {
   }
 
   log_error(
-    "✗ Failed: %s - %s%s (%s)",
+    "[FAIL] Failed: %s - %s%s (%s)",
     ctx$operation,
     error_msg,
     extra_str,
