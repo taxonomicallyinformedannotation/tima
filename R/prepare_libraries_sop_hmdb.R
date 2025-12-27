@@ -40,7 +40,7 @@ prepare_libraries_sop_hmdb <- function(
     stop("output must be a single character string")
   }
 
-  log_info("Preparing HMDB structure-organism pairs")
+  ctx <- log_operation("prepare_libraries_sop_hmdb", input = input)
 
   if (!file.exists(output) || file.size(output) < 100000) {
     if (!file.exists(input)) {
@@ -197,8 +197,10 @@ prepare_libraries_sop_hmdb <- function(
     }
 
     export_output(x = hmdb_prepared, file = output)
+    log_complete(ctx, n_pairs = nrow(hmdb_prepared))
   } else {
-    # log_trace("HMDB library already exists and is valid")
+    log_debug("HMDB library already exists and is valid")
+    log_complete(ctx, cached = TRUE)
   }
 
   return(output)

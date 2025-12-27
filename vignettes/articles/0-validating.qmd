@@ -76,10 +76,10 @@ Checking metadata file...
 ✓ Metadata file: 120/120 files found
 
 Checking SIRIUS output...
-✓ SIRIUS output: 843 features, all required files present
-  - formula_identifications.tsv: ✓
-  - canopus_summary.tsv: ✓
-  - compound_identifications.tsv: ✓
+✓ SIRIUS output: 843 annotations, all required files present
+  - formula_identifications_all.tsv: ✓
+  - canopus_summary_all.tsv: ✓
+  - compound_identifications_all.tsv: ✓
 ============================================================
 ✓ All pre-flight checks passed!
 Data validation complete. Ready to proceed.
