@@ -89,7 +89,10 @@ validate_file_exists <- function(
   if (is.null(path)) {
     if (required) {
       msg <- format_error(
-        problem = paste0(stringr::str_to_title(file_type), " path is NULL"),
+        problem = paste0(
+          stringi::stri_trans_totitle(file_type),
+          " path is NULL"
+        ),
         location = param_name,
         fix = "Provide a valid file path"
       )
@@ -119,8 +122,8 @@ validate_file_exists <- function(
     if (dir_exists) {
       available_files <- list.files(dir_path, full.names = FALSE)
       if (length(available_files) > 0) {
-        available <- head(available_files, 5)
-        distances <- adist(basename(path), available_files)
+        available <- utils::head(available_files, 5)
+        distances <- utils::adist(basename(path), available_files)
         similar_idx <- which(distances <= 3)
         if (length(similar_idx) > 0) {
           similar <- available_files[similar_idx][1:min(3, length(similar_idx))]
@@ -142,7 +145,7 @@ validate_file_exists <- function(
     }
 
     msg <- format_error(
-      problem = paste0(stringr::str_to_title(file_type), " not found"),
+      problem = paste0(stringi::stri_trans_totitle(file_type), " not found"),
       received = path,
       location = if (!dir_exists) {
         paste0("Directory does not exist: ", dir_path)
@@ -724,7 +727,7 @@ validate_adduct_list <- function(
 
   if (length(adducts_list[[ms_mode]]) == 0L) {
     msg <- paste0(
-      "⚠ ",
+      "[WARNING] ",
       list_name,
       " for '",
       ms_mode,
@@ -778,21 +781,6 @@ validate_dataframe <- function(
 
   invisible(TRUE)
 }
-
-#' Validate numeric range
-#'
-#' @description Validates that a numeric value is within a specified range
-#'
-#' @param value Numeric value to validate
-#' @param min_value Minimum allowed value (inclusive)
-#' @param max_value Maximum allowed value (inclusive)
-#' @param param_name Name of the parameter (for error messages)
-#' @param allow_null Whether NULL values are allowed
-#'
-#' @return Invisible TRUE if valid, stops with error otherwise
-#'
-#' @keywords internal
-#'
 
 #' Validate weights
 #'
@@ -856,22 +844,6 @@ validate_weights <- function(weights, param_name = "weights") {
   invisible(TRUE)
 }
 
-#' Validate choice parameter
-#'
-#' @description Validates that a value is one of a set of allowed choices
-#'
-#' @param value Value to validate
-#' @param choices Character vector of allowed choices
-#' @param param_name Name of the parameter (for error messages)
-#'
-#' @return Invisible TRUE if valid, stops with error otherwise
-#'
-#' @keywords internal
-#'
-#' @examples
-#' \dontrun{
-#' validate_choice("OR", c("OR", "AND"), param_name = "condition")
-#' }
 
 #' Validate character parameter
 #'

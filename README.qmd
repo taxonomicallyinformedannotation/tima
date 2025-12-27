@@ -82,9 +82,9 @@ tima::get_example_files()
 
 ## Quick Start
 
-### 1. Validate Your Data First
+### Validate Your Data
 
-**Always start by validating your input files** to catch issues early
+**Start by validating your input files** to catch issues early
 and save debugging time:
 
 ``` r
@@ -107,7 +107,7 @@ This will:
 - Check metadata file consistency
 - Report eventual issues immediately
 
-### 2. Run the Pipeline
+### Run the Pipeline
 
 Once you are done, you can open a small GUI to adapt your parameters and launch your job:
 

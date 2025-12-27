@@ -482,7 +482,7 @@ sanitize_metadata <- function(
           } else {
             log_warn(
               "  Missing: %s, ... and %d more",
-              paste(head(missing_files, 5), collapse = ", "),
+              paste(utils::head(missing_files, 5), collapse = ", "),
               length(missing_files) - 5L
             )
           }
@@ -785,13 +785,13 @@ sanitize_all_inputs <- function(
 
     if (result$valid) {
       log_success(
-        "✓ Features file: %d rows, %d columns",
+        "[OK] Features file: %d rows, %d columns",
         result$n_rows,
         result$n_cols
       )
       log_debug("  Columns: %s", paste(result$columns, collapse = ", "))
     } else {
-      log_error("✗ Features file has issues:")
+      log_error("[X] Features file has issues:")
       for (issue in result$issues) {
         log_error("  - %s", issue)
       }
@@ -806,9 +806,9 @@ sanitize_all_inputs <- function(
     result <- sanitize_mgf(file = mgf_file, file_type = "MGF spectra")
 
     if (result$valid) {
-      log_success("✓ MGF file: %d MS2 spectra found", result$n_spectra)
+      log_success("[OK] MGF file: %d MS2 spectra found", result$n_spectra)
     } else {
-      log_error("✗ MGF file has issues:")
+      log_error("[X] MGF file has issues:")
       for (issue in result$issues) {
         log_error("  - %s", issue)
       }
@@ -829,7 +829,7 @@ sanitize_all_inputs <- function(
 
     if (result$valid) {
       log_success(
-        "✓ Metadata file: %d samples, %d with organism info",
+        "[OK] Metadata file: %d samples, %d with organism info",
         result$n_samples,
         result$n_with_organism
       )
@@ -846,13 +846,13 @@ sanitize_all_inputs <- function(
         )
       }
     } else {
-      log_error("✗ Metadata validation has issues:")
+      log_error("[X] Metadata validation has issues:")
       for (issue in result$issues) {
         log_error("  - %s", issue)
       }
       if (length(result$unmatched_files) > 0L) {
         log_error("  Unmatched files:")
-        for (f in head(result$unmatched_files, 5)) {
+        for (f in utils::head(result$unmatched_files, 5)) {
           log_error("    - %s", f)
         }
         if (length(result$unmatched_files) > 5L) {
@@ -877,22 +877,25 @@ sanitize_all_inputs <- function(
         ""
       }
       log_success(
-        "✓ SIRIUS output%s%s: %d annotations, all required files present",
+        "[OK] SIRIUS output%s%s: %d annotations, all required files present",
         format_type,
         version_info,
         result$n_features
       )
       log_debug(
         "  - Formula identifications: %s",
-        if (result$has_formula) "✓" else "✗"
+        if (result$has_formula) "[OK]" else "[X]"
       )
-      log_debug("  - CANOPUS summary: %s", if (result$has_canopus) "✓" else "✗")
+      log_debug(
+        "  - CANOPUS summary: %s",
+        if (result$has_canopus) "[OK]" else "[X]"
+      )
       log_debug(
         "  - Structure identifications: %s",
-        if (result$has_structure) "✓" else "✗"
+        if (result$has_structure) "[OK]" else "[X]"
       )
     } else {
-      log_error("✗ SIRIUS output has issues:")
+      log_error("[X] SIRIUS output has issues:")
       for (issue in result$issues) {
         log_error("  - %s", issue)
       }
@@ -905,12 +908,12 @@ sanitize_all_inputs <- function(
   log_info("=" |> rep(60) |> paste(collapse = ""))
 
   if (all_valid) {
-    log_success("✓ All pre-flight checks passed!")
+    log_success("[OK] All pre-flight checks passed!")
     log_info("Data validation complete. Ready to proceed.")
     log_info("=" |> rep(60) |> paste(collapse = ""))
     return(invisible(TRUE))
   } else {
-    log_error("✗ Pre-flight checks failed!")
+    log_error("[X] Pre-flight checks failed!")
     log_error(
       "Found issues in: %s",
       paste(names(issues_found), collapse = ", ")
