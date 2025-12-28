@@ -310,6 +310,14 @@ prepare_libraries_sop_merged <- function(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$structures$taxonomies$npc
 ) {
+  # Initialize logging context
+  ctx <- log_operation(
+    "prepare_libraries_sop_merged",
+    n_libraries = length(files),
+    filter_enabled = isTRUE(filter),
+    filter_level = if (isTRUE(filter)) level else "none"
+  )
+
   # Input Validation ----
 
   validate_sop_merged_inputs(
@@ -326,13 +334,8 @@ prepare_libraries_sop_merged <- function(
     output_str_tax_npc = output_str_tax_npc
   )
 
-  log_info("Preparing merged structure-organism pairs library")
-  log_debug("Filter mode: %s", filter)
-  if (filter) {
-    log_info("Filtering by %s: %s", level, value)
-  }
-
   # Load and Process Libraries ----
+  log_metadata(ctx, phase = "loading", n_files = length(files))
 
   tables <- load_and_merge_libraries(files, cache)
 
@@ -353,15 +356,33 @@ prepare_libraries_sop_merged <- function(
   # Apply Taxonomic Filter (if enabled) ----
 
   if (filter) {
+    n_pre_filter <- nrow(table_keys)
+    log_metadata(ctx,
+      phase = "filtering",
+      n_pre_filter = n_pre_filter,
+      filter_level = level,
+      filter_value = value
+    )
+
     table_keys <- apply_taxonomic_filter(
       table_keys,
       table_org_tax_ott,
       level,
       value
     )
+
+    log_metadata(ctx,
+      n_post_filter = nrow(table_keys),
+      n_removed = n_pre_filter - nrow(table_keys)
+    )
   }
 
   # Export Results ----
+  log_metadata(ctx,
+    phase = "exporting",
+    n_structures = nrow(table_structures_stereo),
+    n_organisms = nrow(table_org_tax_ott)
+  )
 
   export_params(
     parameters = get_params(step = "prepare_libraries_sop_merged"),
@@ -383,6 +404,13 @@ prepare_libraries_sop_merged <- function(
     output_str_nam = output_str_nam,
     output_str_tax_cla = output_str_tax_cla,
     output_str_tax_npc = output_str_tax_npc
+  )
+
+  log_complete(ctx,
+    n_pairs = nrow(table_keys),
+    n_structures = nrow(table_structures_stereo),
+    n_organisms = nrow(table_org_tax_ott),
+    files_exported = length(result)
   )
 
   # Clean up

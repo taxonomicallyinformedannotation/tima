@@ -236,7 +236,13 @@ prepare_libraries_spectra <-
     col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
     col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp
   ) {
-    log_info("Preparing spectral library: %s", nam_lib)
+    # Initialize logging context
+    ctx <- log_operation(
+      "prepare_libraries_spectra",
+      library_name = nam_lib,
+      n_input_files = length(input)
+    )
+
     # Define output paths ----
     output_pos <- file.path(
       get_default_paths()$data$interim$libraries$spectra$exp$path,
@@ -253,7 +259,10 @@ prepare_libraries_spectra <-
     # Check if already prepared (idempotency) ----
     outputs_exist <- all(file.exists(c(output_pos, output_neg, output_sop)))
     if (outputs_exist) {
-      log_info("Library '%s' already prepared; skipping", nam_lib)
+      log_complete(ctx,
+        status = "cached",
+        note = "Library already prepared, skipping"
+      )
       export_params(
         parameters = get_params(step = "prepare_libraries_spectra"),
         step = "prepare_libraries_spectra"
@@ -278,12 +287,14 @@ prepare_libraries_spectra <-
       sop <- create_empty_sop_library()
     } else {
       # Import and extract ----
-      log_debug("Importing %d spectral file(s)", length(input))
+      log_metadata(ctx, phase = "importing", n_files = length(input))
       spectra <- purrr::map(.x = input, .f = import_spectra, combine = FALSE)
-      log_debug("Extracting spectra metadata")
+
+      log_metadata(ctx, phase = "extracting")
       spectra_extracted <- purrr::map(.x = spectra, .f = extract_spectra)
+
       # Harmonize for both polarities ----
-      log_debug("Harmonizing spectra for positive mode")
+      log_metadata(ctx, phase = "harmonizing", polarity = "positive")
       spectra_harmonized_pos <- harmonize_spectra_polarity(
         spectra_extracted,
         mode = "pos",
@@ -307,7 +318,12 @@ prepare_libraries_spectra <-
         col_xl
       )
       spectra_pos <- Spectra::Spectra(object = spectra_harmonized_pos)
-      log_debug("Harmonizing spectra for negative mode")
+
+      log_metadata(ctx,
+        phase = "harmonizing",
+        polarity = "negative",
+        n_pos_spectra = length(spectra_pos)
+      )
       spectra_harmonized_neg <- harmonize_spectra_polarity(
         spectra_extracted,
         mode = "neg",
@@ -331,8 +347,12 @@ prepare_libraries_spectra <-
         col_xl
       )
       spectra_neg <- Spectra::Spectra(object = spectra_harmonized_neg)
+
       # Extract SOP table ----
-      log_debug("Extracting structure-organism pairs for SOP library")
+      log_metadata(ctx,
+        phase = "sop_extraction",
+        n_neg_spectra = length(spectra_neg)
+      )
       sop <- tidytable::bind_rows(
         spectra_harmonized_pos,
         spectra_harmonized_neg
@@ -355,15 +375,15 @@ prepare_libraries_spectra <-
           .keep_all = TRUE
         ) |>
         tidytable::mutate(organism_name = NA_character_)
-      log_debug(
-        "SOP table: %d unique structures (pos=%d, neg=%d spectra)",
-        nrow(sop),
-        nrow(spectra_harmonized_pos),
-        nrow(spectra_harmonized_neg)
-      )
     }
+
     # Export ----
-    log_info("Exporting spectral library files")
+    log_metadata(ctx,
+      phase = "exporting",
+      n_unique_structures = nrow(sop),
+      n_pos_spectra = length(spectra_pos),
+      n_neg_spectra = length(spectra_neg)
+    )
     export_spectra_rds(file = output_pos, spectra = spectra_pos)
     export_spectra_rds(file = output_neg, spectra = spectra_neg)
     export_output(sop, file = output_sop)
@@ -371,7 +391,13 @@ prepare_libraries_spectra <-
       parameters = get_params(step = "prepare_libraries_spectra"),
       step = "prepare_libraries_spectra"
     )
-    log_success("Spectral library '%s' prepared successfully", nam_lib)
+
+    log_complete(ctx,
+      n_structures = nrow(sop),
+      n_spectra_total = length(spectra_pos) + length(spectra_neg),
+      files_exported = 3
+    )
+
     invisible(c(
       "pos" = output_pos,
       "neg" = output_neg,
