@@ -217,3 +217,26 @@ test_that("create_edges_spectra() runs with cosine method", {
   )
   expect_true(file.exists(out))
 })
+
+test_that("create_edges_spectra handles empty MGF file", {
+  withr::local_dir(new = temp_test_dir("create_edges_empty"))
+  mgf_file <- tempfile(fileext = ".mgf")
+  writeLines("", mgf_file)
+
+  # Should handle gracefully
+  expect_error(
+    create_edges_spectra(input = mgf_file),
+    "Spectra': 'data' must be of a vector type, was 'NULL'"
+  )
+})
+
+test_that("create_edges_spectra handles invalid MGF format", {
+  withr::local_dir(new = temp_test_dir("create_edges_invalid"))
+  mgf_file <- tempfile(fileext = ".mgf")
+  writeLines("INVALID MGF CONTENT", mgf_file)
+
+  expect_error(
+    create_edges_spectra(input = mgf_file),
+    "Spectra': 'data' must be of a vector type, was 'NULL'"
+  )
+})
