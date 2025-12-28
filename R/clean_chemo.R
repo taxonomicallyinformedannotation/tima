@@ -723,7 +723,8 @@ clean_chemo <- function(
   }
 
   # Core Filtering Pipeline ----
-  log_metadata(ctx,
+  log_metadata(
+    ctx,
     phase = "filtering",
     best_percentile = best_percentile,
     minimal_ms1_bio = minimal_ms1_bio,
@@ -1057,7 +1058,8 @@ clean_chemo <- function(
   # Remove compound names from outputs if requested
   results_list <- remove_compound_names(results_list, compounds_names)
 
-  log_complete(ctx,
+  log_complete(
+    ctx,
     n_final_full = nrow(results_full),
     n_final_filtered = nrow(results_filtered),
     n_final_mini = nrow(results_mini),

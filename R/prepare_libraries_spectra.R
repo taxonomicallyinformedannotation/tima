@@ -259,7 +259,8 @@ prepare_libraries_spectra <-
     # Check if already prepared (idempotency) ----
     outputs_exist <- all(file.exists(c(output_pos, output_neg, output_sop)))
     if (outputs_exist) {
-      log_complete(ctx,
+      log_complete(
+        ctx,
         status = "cached",
         note = "Library already prepared, skipping"
       )
@@ -319,7 +320,8 @@ prepare_libraries_spectra <-
       )
       spectra_pos <- Spectra::Spectra(object = spectra_harmonized_pos)
 
-      log_metadata(ctx,
+      log_metadata(
+        ctx,
         phase = "harmonizing",
         polarity = "negative",
         n_pos_spectra = length(spectra_pos)
@@ -349,7 +351,8 @@ prepare_libraries_spectra <-
       spectra_neg <- Spectra::Spectra(object = spectra_harmonized_neg)
 
       # Extract SOP table ----
-      log_metadata(ctx,
+      log_metadata(
+        ctx,
         phase = "sop_extraction",
         n_neg_spectra = length(spectra_neg)
       )
@@ -378,7 +381,8 @@ prepare_libraries_spectra <-
     }
 
     # Export ----
-    log_metadata(ctx,
+    log_metadata(
+      ctx,
       phase = "exporting",
       n_unique_structures = nrow(sop),
       n_pos_spectra = length(spectra_pos),
@@ -392,7 +396,8 @@ prepare_libraries_spectra <-
       step = "prepare_libraries_spectra"
     )
 
-    log_complete(ctx,
+    log_complete(
+      ctx,
       n_structures = nrow(sop),
       n_spectra_total = length(spectra_pos) + length(spectra_neg),
       files_exported = 3
