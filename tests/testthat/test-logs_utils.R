@@ -413,3 +413,55 @@ test_that("logging functions use sprintf-style formatting", {
   expect_true(any(grepl("Test 1: message", log_content)))
   expect_true(any(grepl("Warning test", log_content)))
 })
+
+## Additional Coverage Tests ----
+
+test_that("log_complete validates context object", {
+  expect_error(
+    log_complete("not a context"),
+    "ctx must be a tima_log_context"
+  )
+})
+
+test_that("log_complete works without results", {
+  ctx <- log_operation("test_op")
+  expect_no_error(log_complete(ctx))
+})
+
+test_that("log_failed validates context object", {
+  expect_error(
+    log_failed("not a context", "error"),
+    "ctx must be a tima_log_context"
+  )
+})
+
+test_that("log_failed handles error objects", {
+  ctx <- log_operation("test_op")
+  err <- simpleError("Test error")
+  expect_no_error(log_failed(ctx, err))
+})
+
+test_that("log_failed handles character messages", {
+  ctx <- log_operation("test_op")
+  expect_no_error(log_failed(ctx, "Failed"))
+})
+
+test_that("format_bytes handles edge cases", {
+  expect_equal(format_bytes(NA), "unknown")
+  expect_equal(format_bytes(-1), "unknown")
+  expect_match(format_bytes(1024^4), "TB|1024")
+})
+
+test_that("format_time handles complex durations", {
+  expect_equal(format_time(45), "45s")
+  expect_equal(format_time(9045), "2h 30m")
+  expect_equal(format_time(7200), "2h")
+  expect_equal(format_time(NA), "unknown")
+})
+
+test_that("log_operation stores metadata", {
+  ctx <- log_operation("test", a = 1, b = NULL)
+  expect_equal(ctx$params$a, 1)
+  expect_null(ctx$params$b)
+  expect_type(ctx$metadata, "list")
+})
