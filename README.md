@@ -209,7 +209,6 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | BiocManager | 1.30.27 | Morgan and Ramos (2025) |
 | BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
-| classyfireR | 0.3.8 | (**classyfireR?**) |
 | docopt | 0.7.2 | de Jonge (2025) |
 | fs | 1.6.6 | Hester, Wickham, and Csárdi (2025) |
 | httr2 | 1.2.2 | Wickham (2025) |
