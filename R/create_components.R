@@ -169,7 +169,7 @@ create_components <- function(
 
   log_complete(
     ctx,
-    n_components = length(unique(components_table$component_id)),
+    n_components = length(unique(components_table$componentindex)),
     n_features = nrow(components_table)
   )
 
