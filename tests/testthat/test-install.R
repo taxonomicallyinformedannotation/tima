@@ -101,6 +101,76 @@ test_that("validate_install_inputs validates repos parameter", {
 })
 
 test_that("validate_install_inputs validates dependencies parameter", {
+  expect_error(
+    validate_install_inputs("tima", .make_repos(), "yes", FALSE),
+    "dependencies must be a single logical"
+  )
+
+  expect_error(
+    validate_install_inputs("tima", .make_repos(), c(TRUE, FALSE), FALSE),
+    "dependencies must be a single logical"
+  )
+})
+
+test_that("validate_install_inputs validates test parameter", {
+  expect_error(
+    validate_install_inputs("tima", .make_repos(), TRUE, "no"),
+    "test must be a single logical"
+  )
+
+  expect_error(
+    validate_install_inputs("tima", .make_repos(), TRUE, c(TRUE, FALSE)),
+    "test must be a single logical"
+  )
+})
+
+test_that("validate_install_inputs passes with valid inputs", {
+  expect_no_error(
+    validate_install_inputs("tima", .make_repos(), TRUE, FALSE)
+  )
+
+  expect_no_error(
+    validate_install_inputs("tima", .make_repos(), FALSE, TRUE)
+  )
+})
+
+test_that("show_system_messages handles different OS types", {
+  # Test Windows path
+  expect_no_error(
+    show_system_messages("Windows", test = FALSE)
+  )
+
+  # Test Linux path
+  expect_no_error(
+    show_system_messages("Linux", test = FALSE)
+  )
+
+  # Test macOS/Darwin path
+  expect_no_error(
+    show_system_messages("Darwin", test = FALSE)
+  )
+
+  # Test with test=TRUE (Windows path)
+  expect_no_error(
+    show_system_messages("Unknown", test = TRUE)
+  )
+})
+
+test_that("check_or_install_python detects system python", {
+  skip_on_cran()
+
+  # If python3 exists, should find it
+  python_path <- Sys.which("python3")
+  if (nzchar(python_path)) {
+    result <- check_or_install_python()
+    expect_type(result, "character")
+    expect_true(nchar(result) > 0)
+  } else {
+    skip("No system python3 available")
+  }
+})
+
+test_that("validate_install_inputs validates dependencies parameter", {
   # Non-logical
   expect_error(
     validate_install_inputs("tima", .make_repos(), "yes", FALSE),

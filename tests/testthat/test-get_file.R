@@ -99,7 +99,9 @@ test_that("get_file skips download if file already exists", {
 ## Directory Creation ----
 
 test_that("get_file creates output directory if needed", {
-  tmp <- temp_test_dir("get_file_dir_create")
+  skip_on_cran()
+  skip_if_offline()
+  tmp <- temp_test_dir("get_file_create_dir")
   withr::local_dir(new = tmp)
   paths <- local_test_project(copy = TRUE)
   test_url <- paste0(
@@ -109,10 +111,201 @@ test_that("get_file creates output directory if needed", {
   )
   nested_path <- file.path("data", "deep", "nested", "dir", "file.txt")
 
-  result <- get_file(url = test_url, export = nested_path)
+  expect_no_error({
+    result <- get_file(
+      url = test_url,
+      export = nested_path
+    )
+  })
 
   expect_true(file.exists(nested_path))
-  expect_true(dir.exists(dirname(nested_path)))
+})
+
+## Helper Function Tests ----
+
+test_that("validate_http_response detects 404 errors", {
+  # Create mock response with 404 status
+  mock_resp <- structure(
+    list(status_code = 404L),
+    class = "httr2_response"
+  )
+
+  expect_error(
+    validate_http_response(
+      mock_resp,
+      "http://example.com/missing",
+      "output.txt"
+    ),
+    "Resource not found"
+  )
+})
+
+test_that("validate_http_response detects 403 errors", {
+  mock_resp <- structure(
+    list(status_code = 403L),
+    class = "httr2_response"
+  )
+
+  expect_error(
+    validate_http_response(
+      mock_resp,
+      "http://example.com/forbidden",
+      "output.txt"
+    ),
+    "Access forbidden"
+  )
+})
+
+test_that("validate_http_response detects 500 errors", {
+  mock_resp <- structure(
+    list(status_code = 500L),
+    class = "httr2_response"
+  )
+
+  expect_error(
+    validate_http_response(mock_resp, "http://example.com/error", "output.txt"),
+    "Server error"
+  )
+})
+
+test_that("validate_http_response detects redirect codes", {
+  mock_resp_301 <- structure(
+    list(status_code = 301L),
+    class = "httr2_response"
+  )
+
+  expect_error(
+    validate_http_response(
+      mock_resp_301,
+      "http://example.com/moved",
+      "output.txt"
+    ),
+    "Resource moved"
+  )
+})
+
+test_that("validate_http_response passes on success status", {
+  mock_resp <- structure(
+    list(status_code = 200L),
+    class = "httr2_response"
+  )
+
+  expect_no_error(
+    validate_http_response(mock_resp, "http://example.com/ok", "output.txt")
+  )
+})
+
+test_that("validate_downloaded_file detects missing files", {
+  expect_error(
+    validate_downloaded_file(
+      "/nonexistent/file.txt",
+      "http://example.com/file"
+    ),
+    "Download completed but file not created"
+  )
+})
+
+test_that("validate_downloaded_file passes for valid files", {
+  tmp_file <- temp_test_path("valid.txt")
+  writeLines("some content here", tmp_file)
+
+  expect_no_error(
+    validate_downloaded_file(tmp_file, "http://example.com/file")
+  )
+})
+
+test_that("is_valid_binary_format detects ZIP files", {
+  # ZIP magic bytes: PK (0x50 0x4B)
+  zip_header <- as.raw(c(0x50, 0x4B, 0x03, 0x04))
+  expect_true(is_valid_binary_format(zip_header))
+})
+
+test_that("is_valid_binary_format detects GZIP files", {
+  # GZIP magic bytes: 0x1F 0x8B
+  gzip_header <- as.raw(c(0x1F, 0x8B, 0x08, 0x00))
+  expect_true(is_valid_binary_format(gzip_header))
+})
+
+test_that("is_valid_binary_format rejects text", {
+  text_header <- charToRaw("This is text content")
+  expect_false(is_valid_binary_format(text_header))
+})
+
+test_that("is_valid_binary_format handles short headers", {
+  short_header <- as.raw(c(0x50))
+  expect_false(is_valid_binary_format(short_header))
+
+  empty_header <- raw(0)
+  expect_false(is_valid_binary_format(empty_header))
+})
+
+test_that("is_html_content detects HTML documents", {
+  html_header <- charToRaw("<!DOCTYPE html><html>")
+  expect_true(is_html_content(html_header))
+
+  html_lower <- charToRaw("<html><head>")
+  expect_true(is_html_content(html_lower))
+
+  html_upper <- charToRaw("<HTML><HEAD>")
+  expect_true(is_html_content(html_upper))
+})
+
+test_that("is_html_content rejects non-HTML content", {
+  text_header <- charToRaw("This is plain text")
+  expect_false(is_html_content(text_header))
+
+  csv_header <- charToRaw("id,name,value\n1,test,123")
+  expect_false(is_html_content(csv_header))
+
+  empty_header <- raw(0)
+  expect_false(is_html_content(empty_header))
+})
+
+test_that("is_html_content handles whitespace before HTML", {
+  html_ws <- charToRaw("\n\n  <!doctype html>")
+  expect_true(is_html_content(html_ws))
+})
+
+test_that("validate_file_content detects HTML error pages", {
+  tmp_file <- temp_test_path("error.html")
+  writeLines("<html><head><title>404 Error</title></head></html>", tmp_file)
+
+  expect_error(
+    validate_file_content(tmp_file, "http://example.com/file"),
+    "Server returned HTML error page"
+  )
+})
+
+test_that("validate_file_content passes for ZIP files", {
+  # Create a minimal ZIP file
+  tmp_dir <- temp_test_path("ziptest")
+  dir.create(tmp_dir, recursive = TRUE)
+  tmp_txt <- file.path(tmp_dir, "test.txt")
+  writeLines("content", tmp_txt)
+
+  zip_file <- temp_test_path("test.zip")
+  withr::with_dir(tmp_dir, {
+    utils::zip(zipfile = zip_file, files = "test.txt")
+  })
+
+  expect_no_error(
+    validate_file_content(zip_file, "http://example.com/file.zip")
+  )
+})
+
+test_that("cleanup_failed_download removes files", {
+  tmp_file <- temp_test_path("cleanup_test.txt")
+  writeLines("test", tmp_file)
+  expect_true(file.exists(tmp_file))
+
+  cleanup_failed_download(tmp_file)
+  expect_false(file.exists(tmp_file))
+})
+
+test_that("cleanup_failed_download handles nonexistent files", {
+  expect_no_error(
+    cleanup_failed_download("/nonexistent/file.txt")
+  )
 })
 
 ## Download Success ----
