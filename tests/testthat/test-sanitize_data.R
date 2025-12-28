@@ -275,10 +275,9 @@ test_that("sanitize_sirius handles ZIP files", {
   # Create ZIP file
   zip_file <- temp_test_path("sirius_test.zip")
   withr::with_dir(dirname(sirius_dir), {
-    zip::zip(
+    utils::zip(
       zipfile = basename(zip_file),
-      files = basename(sirius_dir),
-      mode = "cherry-pick"
+      files = basename(sirius_dir)
     )
   })
 
