@@ -206,10 +206,7 @@ create_edges <- function(
   indices <- seq_len(nspecs - 1L)
   n_comparisons <- sum(indices)
 
-  log_metadata(ctx,
-    phase = "calculating",
-    n_comparisons = n_comparisons
-  )
+  log_metadata(ctx, phase = "calculating", n_comparisons = n_comparisons)
 
   # Pre-calculate length once for efficiency
   n_queries <- length(indices)
@@ -267,7 +264,8 @@ create_edges <- function(
 
   if (length(edges) > 0L) {
     result <- tidytable::bind_rows(edges)
-    log_complete(ctx,
+    log_complete(
+      ctx,
       n_edges = nrow(result),
       n_comparisons = n_comparisons,
       pass_rate = sprintf("%.1f%%", 100 * nrow(result) / n_comparisons)

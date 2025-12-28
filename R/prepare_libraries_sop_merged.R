@@ -357,7 +357,8 @@ prepare_libraries_sop_merged <- function(
 
   if (filter) {
     n_pre_filter <- nrow(table_keys)
-    log_metadata(ctx,
+    log_metadata(
+      ctx,
       phase = "filtering",
       n_pre_filter = n_pre_filter,
       filter_level = level,
@@ -371,14 +372,16 @@ prepare_libraries_sop_merged <- function(
       value
     )
 
-    log_metadata(ctx,
+    log_metadata(
+      ctx,
       n_post_filter = nrow(table_keys),
       n_removed = n_pre_filter - nrow(table_keys)
     )
   }
 
   # Export Results ----
-  log_metadata(ctx,
+  log_metadata(
+    ctx,
     phase = "exporting",
     n_structures = nrow(table_structures_stereo),
     n_organisms = nrow(table_org_tax_ott)
@@ -406,7 +409,8 @@ prepare_libraries_sop_merged <- function(
     output_str_tax_npc = output_str_tax_npc
   )
 
-  log_complete(ctx,
+  log_complete(
+    ctx,
     n_pairs = nrow(table_keys),
     n_structures = nrow(table_structures_stereo),
     n_organisms = nrow(table_org_tax_ott),
