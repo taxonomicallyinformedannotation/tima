@@ -58,6 +58,7 @@ adducts_translations <-
     # mzmine
     "+TFA" = "+C2HF3O2",
     # MassBank
-    "[M+CH3COO]-/[M-CH3]-" = "[M+CH3COO]-"
-    # weird MassBank
+    "[M+CH3COO]-/[M-CH3]-" = "[M+CH3COO]-",
+    # additional
+    "[M+2H]+2" = "[M+2H]2+"
   )
