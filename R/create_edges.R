@@ -163,12 +163,21 @@ create_edges <- function(
   threshold,
   matched_peaks
 ) {
+  # Initialize logging context
+  ctx <- log_operation(
+    "create_edges",
+    n_spectra = nspecs,
+    method = method,
+    threshold = threshold,
+    min_peaks = matched_peaks
+  )
+
   # Input Validation ----
   validate_choice(method, VALID_SIMILARITY_METHODS, param_name = "method")
 
   # Early exit for insufficient spectra
   if (nspecs < 2L) {
-    log_warn("Less than 2 spectra provided, no edges to create")
+    log_complete(ctx, n_edges = 0, note = "Less than 2 spectra")
     return(tidytable::tidytable(
       feature_id = NA_integer_,
       target_id = NA_integer_,
@@ -197,7 +206,10 @@ create_edges <- function(
   indices <- seq_len(nspecs - 1L)
   n_comparisons <- sum(indices)
 
-  log_debug("Calculating %d pairwise similarities", n_comparisons)
+  log_metadata(ctx,
+    phase = "calculating",
+    n_comparisons = n_comparisons
+  )
 
   # Pre-calculate length once for efficiency
   n_queries <- length(indices)
@@ -255,10 +267,14 @@ create_edges <- function(
 
   if (length(edges) > 0L) {
     result <- tidytable::bind_rows(edges)
-    log_info("Created %d edges passing thresholds", nrow(result))
+    log_complete(ctx,
+      n_edges = nrow(result),
+      n_comparisons = n_comparisons,
+      pass_rate = sprintf("%.1f%%", 100 * nrow(result) / n_comparisons)
+    )
     result
   } else {
-    log_warn("No edges passed the specified thresholds")
+    log_complete(ctx, n_edges = 0, note = "No edges passed thresholds")
     tidytable::tidytable(
       feature_id = NA_integer_,
       target_id = NA_integer_,

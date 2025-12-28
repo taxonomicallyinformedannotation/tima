@@ -652,6 +652,14 @@ clean_chemo <- function(
   score_chemical_npc_class = 0.1,
   max_per_score = 7L
 ) {
+  # Initialize logging context
+  ctx <- log_operation(
+    "clean_chemo",
+    n_annotations = nrow(annot_table_wei_chemo),
+    candidates_final = candidates_final,
+    high_confidence = high_confidence
+  )
+
   # Input Validation ----
 
   validate_clean_chemo_inputs(
@@ -677,7 +685,7 @@ clean_chemo <- function(
 
   # Early exit for empty input
   if (nrow(annot_table_wei_chemo) == 0L) {
-    log_warn("Empty annotation table provided")
+    log_complete(ctx, n_final = 0, note = "Empty annotation table")
     return(annot_table_wei_chemo)
   }
 
@@ -714,32 +722,14 @@ clean_chemo <- function(
       )
   }
 
-  # Log Processing Parameters ----
-
-  log_info("Cleaning chemically weighted annotations")
-  log_debug("Keeping top %d candidates per feature", candidates_final)
-  log_debug(
-    "Using best_percentile: {best_percentile} for consistent filtering"
-  )
-  log_debug(
-    "Options - High confidence: %s, Remove ties: %s, Summarize: %s",
-    high_confidence,
-    remove_ties,
-    summarize
-  )
-  log_info(
-    "Filtering top %d candidates and keeping only MS1 candidates with minimum %s biological score %s %s chemical score",
-    candidates_final,
-    minimal_ms1_bio,
-    minimal_ms1_condition,
-    minimal_ms1_chemo
-  )
-  log_debug(
-    "Sampling max_per_score = %d candidates per (feature_id, rank_final) after filters",
-    max_per_score
-  )
-
   # Core Filtering Pipeline ----
+  log_metadata(ctx,
+    phase = "filtering",
+    best_percentile = best_percentile,
+    minimal_ms1_bio = minimal_ms1_bio,
+    minimal_ms1_chemo = minimal_ms1_chemo,
+    max_per_score = max_per_score
+  )
 
   # Step 1: Filter MS1 annotations based on score thresholds
   df_base <- filter_ms1_annotations(
@@ -1066,6 +1056,13 @@ clean_chemo <- function(
 
   # Remove compound names from outputs if requested
   results_list <- remove_compound_names(results_list, compounds_names)
+
+  log_complete(ctx,
+    n_final_full = nrow(results_full),
+    n_final_filtered = nrow(results_filtered),
+    n_final_mini = nrow(results_mini),
+    n_features = tidytable::n_distinct(results_filtered$feature_id)
+  )
 
   # Clean up intermediate objects
   rm(
