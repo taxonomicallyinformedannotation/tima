@@ -212,7 +212,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | docopt | 0.7.2 | de Jonge (2025) |
 | fs | 1.6.6 | Hester, Wickham, and Csárdi (2025) |
 | httr2 | 1.2.2 | Wickham (2025) |
-| igraph | 2.2.1 | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2025) |
+| igraph | 2.2.1 | Csárdi and Nepusz (2006); Antonov et al. (2023); (**igraph2026?**) |
 | IRanges | 2.44.0 | Lawrence et al. (2013) |
 | knitr | 1.51 | Xie (2014); Xie (2015); Xie (2025) |
 | lgr | 0.5.0 | Fleck (2025) |
@@ -230,7 +230,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | shinyjs | 2.1.0 | Attali (2021) |
 | shinytest2 | 0.4.1 | Schloerke (2025) |
 | shinyvalidate | 0.1.3 | Sievert, Iannone, and Cheng (2023) |
-| Spectra | 1.20.0 | Rainer et al. (2022d) |
+| Spectra | 1.20.1 | Rainer et al. (2022d) |
 | stringi | 1.8.7 | Gagolewski (2022) |
 | targets | 1.11.4 | Landau (2021) |
 | testthat | 3.3.1 | Wickham (2011) |
@@ -292,15 +292,6 @@ Garrick Aden-Buie, Yihui Xie, et al. 2025.
 Csárdi, Gábor, and Tamás Nepusz. 2006. “The Igraph Software Package for
 Complex Network Research.” *InterJournal* Complex Systems: 1695.
 <https://igraph.org>.
-
-</div>
-
-<div id="ref-igraph2025" class="csl-entry">
-
-Csárdi, Gábor, Tamás Nepusz, Vincent Traag, Szabolcs Horvát, Fabio
-Zanini, Daniel Noom, Kirill Müller, David Schoch, and Maëlle Salmon.
-2025. *<span class="nocase">igraph</span>: Network Analysis and
-Visualization in r*. <https://doi.org/10.5281/zenodo.7682609>.
 
 </div>
 

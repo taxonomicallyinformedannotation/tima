@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Adriano Rutz">
-<meta name="dcterms.date" content="2025-12-28">
+<meta name="dcterms.date" content="2026-01-04">
 
 <title>0 Validating your data – tima</title>
 <style>
@@ -22,6 +22,7 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
 /* CSS for syntax highlighting */
 html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
@@ -60,56 +61,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
 <link href="../../man/figures/logo.svg" rel="icon" type="image/svg+xml">
-<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-c56c8b360dac9905fa004422789ab249.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-8a31036c803348cb054eb59479076bd4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-c56c8b360dac9905fa004422789ab249.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
-<script id="quarto-search-options" type="application/json">{
-  "location": "navbar",
-  "copy-button": false,
-  "collapse-after": 3,
-  "panel-placement": "end",
-  "type": "overlay",
-  "limit": 50,
-  "keyboard-shortcut": [
-    "f",
-    "/",
-    "s"
-  ],
-  "show-item-context": false,
-  "language": {
-    "search-no-results-text": "No results",
-    "search-matching-documents-text": "matching documents",
-    "search-copy-link-title": "Copy link to search",
-    "search-hide-matches-text": "Hide additional matches",
-    "search-more-match-text": "more match in this document",
-    "search-more-matches-text": "more matches in this document",
-    "search-clear-button-title": "Clear",
-    "search-text-placeholder": "",
-    "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
-  }
-}</script>
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-html-734cb40618f438257b19a1e532635a32.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <style>html{ scroll-behavior: smooth; }</style>
 <script type="application/json" class="js-hypothesis-config">
 {
@@ -126,803 +87,71 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <meta name="citation_title" content="0 Validating your data">
 <meta name="citation_author" content="Adriano Rutz">
-<meta name="citation_publication_date" content="2025-12-28">
-<meta name="citation_cover_date" content="2025-12-28">
-<meta name="citation_year" content="2025">
-<meta name="citation_online_date" content="2025-12-28">
+<meta name="citation_publication_date" content="2026-01-04">
+<meta name="citation_cover_date" content="2026-01-04">
+<meta name="citation_year" content="2026">
+<meta name="citation_online_date" content="2026-01-04">
 <meta name="citation_fulltext_html_url" content="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html">
 <meta name="citation_language" content="en">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
-    const toggleBodyColorMode = (bsSheetEl) => {
-      const mode = bsSheetEl.getAttribute("data-mode");
-      const bodyEl = window.document.querySelector("body");
-      if (mode === "dark") {
-        bodyEl.classList.add("quarto-dark");
-        bodyEl.classList.remove("quarto-light");
-      } else {
-        bodyEl.classList.add("quarto-light");
-        bodyEl.classList.remove("quarto-dark");
-      }
-    }
-    const toggleBodyColorPrimary = () => {
-      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
-      if (bsSheetEl) {
-        toggleBodyColorMode(bsSheetEl);
-      }
-    }
-    const setColorSchemeToggle = (alternate) => {
-      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
-      for (let i=0; i < toggles.length; i++) {
-        const toggle = toggles[i];
-        if (toggle) {
-          if (alternate) {
-            toggle.classList.add("alternate");
-          } else {
-            toggle.classList.remove("alternate");
-          }
-        }
-      }
-    };
-    const toggleColorMode = (alternate) => {
-      // Switch the stylesheets
-      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
-      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
-      manageTransitions('#quarto-margin-sidebar .nav-link', false);
-      if (alternate) {
-        // note: dark is layered on light, we don't disable primary!
-        enableStylesheet(alternateStylesheets);
-        for (const sheetNode of alternateStylesheets) {
-          if (sheetNode.id === "quarto-bootstrap") {
-            toggleBodyColorMode(sheetNode);
-          }
-        }
-      } else {
-        disableStylesheet(alternateStylesheets);
-        enableStylesheet(primaryStylesheets)
-        toggleBodyColorPrimary();
-      }
-      manageTransitions('#quarto-margin-sidebar .nav-link', true);
-      // Switch the toggles
-      setColorSchemeToggle(alternate)
-      // Hack to workaround the fact that safari doesn't
-      // properly recolor the scrollbar when toggling (#1455)
-      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
-        manageTransitions("body", false);
-        window.scrollTo(0, 1);
-        setTimeout(() => {
-          window.scrollTo(0, 0);
-          manageTransitions("body", true);
-        }, 40);
-      }
-    }
-    const disableStylesheet = (stylesheets) => {
-      for (let i=0; i < stylesheets.length; i++) {
-        const stylesheet = stylesheets[i];
-        stylesheet.rel = 'disabled-stylesheet';
-      }
-    }
-    const enableStylesheet = (stylesheets) => {
-      for (let i=0; i < stylesheets.length; i++) {
-        const stylesheet = stylesheets[i];
-        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
-          stylesheet.rel = 'stylesheet';
-        }
-      }
-    }
-    const manageTransitions = (selector, allowTransitions) => {
-      const els = window.document.querySelectorAll(selector);
-      for (let i=0; i < els.length; i++) {
-        const el = els[i];
-        if (allowTransitions) {
-          el.classList.remove('notransition');
-        } else {
-          el.classList.add('notransition');
-        }
-      }
-    }
-    const isFileUrl = () => {
-      return window.location.protocol === 'file:';
-    }
-    const hasAlternateSentinel = () => {
-      let styleSentinel = getColorSchemeSentinel();
-      if (styleSentinel !== null) {
-        return styleSentinel === "alternate";
-      } else {
-        return false;
-      }
-    }
-    const setStyleSentinel = (alternate) => {
-      const value = alternate ? "alternate" : "default";
-      if (!isFileUrl()) {
-        window.localStorage.setItem("quarto-color-scheme", value);
-      } else {
-        localAlternateSentinel = value;
-      }
-    }
-    const getColorSchemeSentinel = () => {
-      if (!isFileUrl()) {
-        const storageValue = window.localStorage.getItem("quarto-color-scheme");
-        return storageValue != null ? storageValue : localAlternateSentinel;
-      } else {
-        return localAlternateSentinel;
-      }
-    }
-    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
-      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
-      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
-      let newTheme = '';
-      if(authorPrefersDark) {
-        newTheme = isAlternate ? baseTheme : alternateTheme;
-      } else {
-        newTheme = isAlternate ? alternateTheme : baseTheme;
-      }
-      const changeGiscusTheme = () => {
-        // From: https://github.com/giscus/giscus/issues/336
-        const sendMessage = (message) => {
-          const iframe = document.querySelector('iframe.giscus-frame');
-          if (!iframe) return;
-          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
-        }
-        sendMessage({
-          setConfig: {
-            theme: newTheme
-          }
-        });
-      }
-      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
-      if (isGiscussLoaded) {
-        changeGiscusTheme();
-      }
-    };
-    const authorPrefersDark = false;
-    const queryPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-    const darkModeDefault = queryPrefersDark.matches;
-      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
-      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
-    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
-    // Dark / light mode switch
-    window.quartoToggleColorScheme = () => {
-      // Read the current dark / light value
-      let toAlternate = !hasAlternateSentinel();
-      toggleColorMode(toAlternate);
-      setStyleSentinel(toAlternate);
-      toggleGiscusIfUsed(toAlternate, darkModeDefault);
-      window.dispatchEvent(new Event('resize'));
-    };
-    queryPrefersDark.addEventListener("change", e => {
-      if(window.localStorage.getItem("quarto-color-scheme") !== null)
-        return;
-      const alternate = e.matches
-      toggleColorMode(alternate);
-      localAlternateSentinel = e.matches ? 'alternate' : 'default'; // this is used alongside local storage!
-      toggleGiscusIfUsed(alternate, darkModeDefault);
-    });
-    // Switch to dark mode if need be
-    if (hasAlternateSentinel()) {
-      toggleColorMode(true);
-    } else {
-      toggleColorMode(false);
-    }
-  </script>
+<body>
 
-<div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../man/figures/logo.svg" alt="tima logo" class="navbar-logo light-content">
-    <img src="../../man/figures/logo.svg" alt="tima logo" class="navbar-logo dark-content">
-    </a>
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">TIMA</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../vignettes/tima.html"> 
-<span class="menu-text">Get started</span></a>
-  </li>  
-  <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-articles" role="link" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">Articles</span>
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-articles">    
-        <li>
-    <a class="dropdown-item" href="../../vignettes/articles/0-validating.html">
- <span class="dropdown-text">0 Validating your data</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="../../vignettes/articles/I-gathering.html">
- <span class="dropdown-text">1 Gathering everything you need</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="../../vignettes/articles/II-preparing.html">
- <span class="dropdown-text">2 Preparing inputs</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="../../vignettes/articles/III-processing.html">
- <span class="dropdown-text">3 Performing Taxonomically Informed Metabolite Annotation</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="../../vignettes/articles/IV-benchmarking.html">
- <span class="dropdown-text">4 Benchmarking Performance</span></a>
-  </li>  
-    </ul>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="../../NEWS.html"> 
-<span class="menu-text">News</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../LICENSE.html"> 
-<span class="menu-text">License</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../CITATION.html"> 
-<span class="menu-text">Citation</span></a>
-  </li>  
-</ul>
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/taxonomicallyinformedannotation/tima"> <i class="bi bi-github" role="img" aria-label="tima GitHub">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
-  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
-</div>
-      </div> <!-- /container-fluid -->
-    </nav>
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">0 Validating your data</li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
-    </div>
-  </nav>
+
+<header id="title-block-header">
+<h1 class="title">0 Validating your data</h1>
+<p class="author">Adriano Rutz</p>
+
+<p class="date">2026-01-04</p>
 </header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
-<!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Functions</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
- <span class="menu-text">Annotate</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/annotate_masses.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">annotate_masses</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/annotate_spectra.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">annotate_spectra</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">Calculate</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/calculate_mass_of_m.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">calculate_mass_of_m</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/calculate_mz_from_mass.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">calculate_mz_from_mass</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/calculate_similarity.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">calculate_similarity</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
- <span class="menu-text">Change</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/change_params_small.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">change_params_small</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
- <span class="menu-text">Create</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/create_components.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">create_components</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/create_dir.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">create_dir</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/create_edges.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">create_edges</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/create_edges_spectra.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">create_edges_spectra</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
- <span class="menu-text">Filter</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/filter_annotations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">filter_annotations</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
- <span class="menu-text">Get</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/get_example_files.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">get_example_files</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/get_file.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">get_file</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/get_last_version_from_zenodo.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">get_last_version_from_zenodo</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/get_organism_taxonomy_ott.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">get_organism_taxonomy_ott</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
- <span class="menu-text">Harmonize</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/harmonize_adducts.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">harmonize_adducts</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
- <span class="menu-text">Import</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/import_spectra.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">import_spectra</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
- <span class="menu-text">Parse</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/parse_adduct.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">parse_adduct</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
- <span class="menu-text">Prepare</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
- <span class="menu-text">Annotations</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth3 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_annotations_gnps.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_annotations_gnps</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_annotations_sirius.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_annotations_sirius</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_annotations_spectra.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_annotations_spectra</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false">
- <span class="menu-text">Features</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth3 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_features_components.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_features_components</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_features_edges.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_features_edges</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_features_tables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_features_tables</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false">
- <span class="menu-text">Libraries</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth3 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_libraries_rt.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_libraries_rt</span></a>
-  </div>
-</li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false">
- <span class="menu-text">Structure Organism Pairs</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth4 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_libraries_sop_closed.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_libraries_sop_closed</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_libraries_sop_ecmdb.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_libraries_sop_ecmdb</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_libraries_sop_hmdb.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_libraries_sop_hmdb</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_libraries_sop_lotus.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_libraries_sop_lotus</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_libraries_sop_merged.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_libraries_sop_merged</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_libraries_spectra.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_libraries_spectra</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/prepare_taxa.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_taxa</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false">
- <span class="menu-text">Process</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-16" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/process_smiles.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">process_smiles</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="false">
- <span class="menu-text">Run</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/run_app.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">run_app</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/run_tima.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">run_tima</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false">
- <span class="menu-text">Validate</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-18" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/validate_inputs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">validate_inputs</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false">
- <span class="menu-text">Weight</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../man/weight_annotations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">weight_annotations</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-      </ul>
-  </li>
-    </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
-<!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+
+<nav id="TOC" role="doc-toc">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#why-validate-your-data-first" id="toc-why-validate-your-data-first" class="nav-link active" data-scroll-target="#why-validate-your-data-first">Why Validate Your Data First?</a></li>
-  <li><a href="#quick-start" id="toc-quick-start" class="nav-link" data-scroll-target="#quick-start">Quick Start</a>
-  <ul class="collapse">
-  <li><a href="#example-output" id="toc-example-output" class="nav-link" data-scroll-target="#example-output">Example Output</a></li>
+  <li><a href="#why-validate-your-data-first" id="toc-why-validate-your-data-first">Why Validate Your Data First?</a></li>
+  <li><a href="#quick-start" id="toc-quick-start">Quick Start</a>
+  <ul>
+  <li><a href="#example-output" id="toc-example-output">Example Output</a></li>
   </ul></li>
-  <li><a href="#what-gets-validated" id="toc-what-gets-validated" class="nav-link" data-scroll-target="#what-gets-validated">What Gets Validated?</a>
-  <ul class="collapse">
-  <li><a href="#mgf-files-mass-spectra" id="toc-mgf-files-mass-spectra" class="nav-link" data-scroll-target="#mgf-files-mass-spectra">MGF Files (Mass Spectra)</a></li>
-  <li><a href="#features-files-csvtsv" id="toc-features-files-csvtsv" class="nav-link" data-scroll-target="#features-files-csvtsv">Features Files (CSV/TSV)</a></li>
-  <li><a href="#metadata-consistency" id="toc-metadata-consistency" class="nav-link" data-scroll-target="#metadata-consistency">Metadata Consistency</a></li>
-  <li><a href="#sirius-output-completeness" id="toc-sirius-output-completeness" class="nav-link" data-scroll-target="#sirius-output-completeness">SIRIUS Output Completeness</a></li>
+  <li><a href="#what-gets-validated" id="toc-what-gets-validated">What Gets Validated?</a>
+  <ul>
+  <li><a href="#mgf-files-mass-spectra" id="toc-mgf-files-mass-spectra">MGF Files (Mass Spectra)</a></li>
+  <li><a href="#features-files-csvtsv" id="toc-features-files-csvtsv">Features Files (CSV/TSV)</a></li>
+  <li><a href="#metadata-consistency" id="toc-metadata-consistency">Metadata Consistency</a></li>
+  <li><a href="#sirius-output-completeness" id="toc-sirius-output-completeness">SIRIUS Output Completeness</a></li>
   </ul></li>
-  <li><a href="#integration-with-pipeline" id="toc-integration-with-pipeline" class="nav-link" data-scroll-target="#integration-with-pipeline">Integration with Pipeline</a>
-  <ul class="collapse">
-  <li><a href="#automatic-validation" id="toc-automatic-validation" class="nav-link" data-scroll-target="#automatic-validation">Automatic Validation</a></li>
-  <li><a href="#manual-validation" id="toc-manual-validation" class="nav-link" data-scroll-target="#manual-validation">Manual Validation</a></li>
+  <li><a href="#integration-with-pipeline" id="toc-integration-with-pipeline">Integration with Pipeline</a>
+  <ul>
+  <li><a href="#automatic-validation" id="toc-automatic-validation">Automatic Validation</a></li>
+  <li><a href="#manual-validation" id="toc-manual-validation">Manual Validation</a></li>
   </ul></li>
-  <li><a href="#common-issues-caught" id="toc-common-issues-caught" class="nav-link" data-scroll-target="#common-issues-caught">Common Issues Caught</a>
-  <ul class="collapse">
-  <li><a href="#mgf-file-issues" id="toc-mgf-file-issues" class="nav-link" data-scroll-target="#mgf-file-issues">MGF File Issues</a></li>
-  <li><a href="#features-file-issues" id="toc-features-file-issues" class="nav-link" data-scroll-target="#features-file-issues">Features File Issues</a></li>
-  <li><a href="#metadata-issues" id="toc-metadata-issues" class="nav-link" data-scroll-target="#metadata-issues">Metadata Issues</a></li>
-  <li><a href="#sirius-issues" id="toc-sirius-issues" class="nav-link" data-scroll-target="#sirius-issues">SIRIUS Issues</a></li>
+  <li><a href="#common-issues-caught" id="toc-common-issues-caught">Common Issues Caught</a>
+  <ul>
+  <li><a href="#mgf-file-issues" id="toc-mgf-file-issues">MGF File Issues</a></li>
+  <li><a href="#features-file-issues" id="toc-features-file-issues">Features File Issues</a></li>
+  <li><a href="#metadata-issues" id="toc-metadata-issues">Metadata Issues</a></li>
+  <li><a href="#sirius-issues" id="toc-sirius-issues">SIRIUS Issues</a></li>
   </ul></li>
-  <li><a href="#advanced-usage" id="toc-advanced-usage" class="nav-link" data-scroll-target="#advanced-usage">Advanced Usage</a>
-  <ul class="collapse">
-  <li><a href="#programmatic-validation" id="toc-programmatic-validation" class="nav-link" data-scroll-target="#programmatic-validation">Programmatic Validation</a></li>
-  <li><a href="#batch-validation" id="toc-batch-validation" class="nav-link" data-scroll-target="#batch-validation">Batch Validation</a></li>
+  <li><a href="#advanced-usage" id="toc-advanced-usage">Advanced Usage</a>
+  <ul>
+  <li><a href="#programmatic-validation" id="toc-programmatic-validation">Programmatic Validation</a></li>
+  <li><a href="#batch-validation" id="toc-batch-validation">Batch Validation</a></li>
   </ul></li>
-  <li><a href="#best-practices" id="toc-best-practices" class="nav-link" data-scroll-target="#best-practices">Best Practices</a>
-  <ul class="collapse">
-  <li><a href="#always-validate-first" id="toc-always-validate-first" class="nav-link" data-scroll-target="#always-validate-first">Always Validate First</a></li>
-  <li><a href="#validate-after-data-conversion" id="toc-validate-after-data-conversion" class="nav-link" data-scroll-target="#validate-after-data-conversion">Validate After Data Conversion</a></li>
-  <li><a href="#include-in-automated-pipelines" id="toc-include-in-automated-pipelines" class="nav-link" data-scroll-target="#include-in-automated-pipelines">Include in Automated Pipelines</a></li>
-  <li><a href="#document-your-validation" id="toc-document-your-validation" class="nav-link" data-scroll-target="#document-your-validation">Document Your Validation</a></li>
+  <li><a href="#best-practices" id="toc-best-practices">Best Practices</a>
+  <ul>
+  <li><a href="#always-validate-first" id="toc-always-validate-first">Always Validate First</a></li>
+  <li><a href="#validate-after-data-conversion" id="toc-validate-after-data-conversion">Validate After Data Conversion</a></li>
+  <li><a href="#include-in-automated-pipelines" id="toc-include-in-automated-pipelines">Include in Automated Pipelines</a></li>
+  <li><a href="#document-your-validation" id="toc-document-your-validation">Document Your Validation</a></li>
   </ul></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
-  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next Steps</a></li>
+  <li><a href="#summary" id="toc-summary">Summary</a></li>
+  <li><a href="#next-steps" id="toc-next-steps">Next Steps</a></li>
   </ul>
 </nav>
-    </div>
-<!-- main -->
-<main class="content" id="quarto-document-content">
-
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">0 Validating your data</h1>
-</div>
-
-
-
-<div class="quarto-title-meta">
-
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Adriano Rutz <a href="https://orcid.org/0000-0003-0443-9902" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
-          </div>
-  </div>
-    
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">December 28, 2025</p>
-    </div>
-  </div>
-  
-    
-  </div>
-  
-
-
-</header>
-
-<script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-<section id="why-validate-your-data-first" class="level2">
-<h2 class="anchored" data-anchor-id="why-validate-your-data-first">Why Validate Your Data First?</h2>
+<h2 id="why-validate-your-data-first" class="anchored">Why Validate Your Data First?</h2>
 <p>Before starting the TIMA pipeline, it’s recommended to validate your input data. This <strong>pre-flight check</strong> saves you time by catching issues immediately instead of discovering them after expensive operations like library downloads.</p>
-</section>
-<section id="quick-start" class="level2">
-<h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
+<h2 id="quick-start" class="anchored">Quick Start</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tima)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -934,8 +163,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius =</span> <span class="st">"output/sirius"</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<section id="example-output" class="level3">
-<h3 class="anchored" data-anchor-id="example-output">Example Output</h3>
+<h3 id="example-output" class="anchored">Example Output</h3>
 <pre><code>============================================================
 Data Sanitizing: Pre-flight Checks
 ============================================================
@@ -958,30 +186,22 @@ Checking SIRIUS output...
 ✓ All pre-flight checks passed!
 Data validation complete. Ready to proceed.
 ============================================================</code></pre>
-</section>
-</section>
-<section id="what-gets-validated" class="level2">
-<h2 class="anchored" data-anchor-id="what-gets-validated">What Gets Validated?</h2>
-<section id="mgf-files-mass-spectra" class="level3">
-<h3 class="anchored" data-anchor-id="mgf-files-mass-spectra">MGF Files (Mass Spectra)</h3>
+<h2 id="what-gets-validated" class="anchored">What Gets Validated?</h2>
+<h3 id="mgf-files-mass-spectra" class="anchored">MGF Files (Mass Spectra)</h3>
 <p>Checks for: - File exists and is readable - Contains valid spectra (BEGIN IONS markers) - Each spectrum has PEPMASS field - Peak data is present - BEGIN IONS/END IONS are balanced</p>
 <p><strong>Reports:</strong> - Number of spectra found - Specific issues if any</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate just the MGF file</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">spectra =</span> <span class="st">"data/spectra.mgf"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-<section id="features-files-csvtsv" class="level3">
-<h3 class="anchored" data-anchor-id="features-files-csvtsv">Features Files (CSV/TSV)</h3>
+<h3 id="features-files-csvtsv" class="anchored">Features Files (CSV/TSV)</h3>
 <p>Checks for: - File exists and is readable - Not empty (has rows and columns) - Required columns present (e.g., <code>feature_id</code>) - Valid CSV/TSV format</p>
 <p><strong>Reports:</strong> - Number of rows (features) - Number of columns - Column names - Missing required columns</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate features file</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">features =</span> <span class="st">"data/features.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-<section id="metadata-consistency" class="level3">
-<h3 class="anchored" data-anchor-id="metadata-consistency">Metadata Consistency</h3>
+<h3 id="metadata-consistency" class="anchored">Metadata Consistency</h3>
 <p>Checks for: - Metadata file exists - Filename column present - Files referenced in metadata actually exist - No broken file references</p>
 <p><strong>Reports:</strong> - Number of files in metadata - Number of files found on disk - List of missing files</p>
 <div class="cell">
@@ -992,30 +212,22 @@ Data validation complete. Ready to proceed.
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata_data_dir =</span> <span class="st">"data/raw"</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-<section id="sirius-output-completeness" class="level3">
-<h3 class="anchored" data-anchor-id="sirius-output-completeness">SIRIUS Output Completeness</h3>
+<h3 id="sirius-output-completeness" class="anchored">SIRIUS Output Completeness</h3>
 <p>Checks for: - SIRIUS directory exists - Required summary files present: - <code>formula_identifications_all.tsv</code> - <code>canopus_formula_summary_all.tsv</code> - <code>compound/structure_identifications_all.tsv</code> - Feature directories exist</p>
 <p><strong>Reports:</strong> - Presence of each required file - Number of feature directories - Specific missing files</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate SIRIUS output</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">sirius =</span> <span class="st">"output/sirius"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-</section>
-<section id="integration-with-pipeline" class="level2">
-<h2 class="anchored" data-anchor-id="integration-with-pipeline">Integration with Pipeline</h2>
+<h2 id="integration-with-pipeline" class="anchored">Integration with Pipeline</h2>
 <p>The validation functions are <strong>automatically integrated</strong> into the main TIMA functions:</p>
-<section id="automatic-validation" class="level3">
-<h3 class="anchored" data-anchor-id="automatic-validation">Automatic Validation</h3>
+<h3 id="automatic-validation" class="anchored">Automatic Validation</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># These functions automatically validate inputs</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">annotate_masses</span>(...)  <span class="co"># Validates features file first</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">annotate_spectra</span>(...) <span class="co"># Validates MGF files first</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-<section id="manual-validation" class="level3">
-<h3 class="anchored" data-anchor-id="manual-validation">Manual Validation</h3>
+<h3 id="manual-validation" class="anchored">Manual Validation</h3>
 <p>For full control, validate manually before running the pipeline:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Validate everything first</span></span>
@@ -1028,12 +240,8 @@ Data validation complete. Ready to proceed.
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. If all checks pass, run the pipeline</span></span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-</section>
-<section id="common-issues-caught" class="level2">
-<h2 class="anchored" data-anchor-id="common-issues-caught">Common Issues Caught</h2>
-<section id="mgf-file-issues" class="level3">
-<h3 class="anchored" data-anchor-id="mgf-file-issues">MGF File Issues</h3>
+<h2 id="common-issues-caught" class="anchored">Common Issues Caught</h2>
+<h3 id="mgf-file-issues" class="anchored">MGF File Issues</h3>
 <p><strong>Issue:</strong> No spectra found</p>
 <pre><code>✗ MGF file has issues:
   - No spectra found (no BEGIN IONS markers)</code></pre>
@@ -1048,9 +256,7 @@ Data validation complete. Ready to proceed.
 <pre><code>✗ MGF file has issues:
   - First spectrum missing PEPMASS field</code></pre>
 <p><strong>Fix:</strong> Each spectrum must have a PEPMASS field specifying the precursor m/z.</p>
-</section>
-<section id="features-file-issues" class="level3">
-<h3 class="anchored" data-anchor-id="features-file-issues">Features File Issues</h3>
+<h3 id="features-file-issues" class="anchored">Features File Issues</h3>
 <p><strong>Issue:</strong> Empty file</p>
 <pre><code>✗ Features file has issues:
   - features table is empty (0 rows)</code></pre>
@@ -1060,9 +266,7 @@ Data validation complete. Ready to proceed.
 <pre><code>✗ Features file has issues:
   - Missing required columns: feature_id, mz</code></pre>
 <p><strong>Fix:</strong> Add the required columns to your features table.</p>
-</section>
-<section id="metadata-issues" class="level3">
-<h3 class="anchored" data-anchor-id="metadata-issues">Metadata Issues</h3>
+<h3 id="metadata-issues" class="anchored">Metadata Issues</h3>
 <p><strong>Issue:</strong> Files not found</p>
 <pre><code>✗ Metadata validation has issues:
   - Missing 5/120 files referenced in metadata
@@ -1078,9 +282,7 @@ Data validation complete. Ready to proceed.
 <pre><code>✗ Metadata validation has issues:
   - Column 'filename' not found in metadata</code></pre>
 <p><strong>Fix:</strong> Rename your column to <code>filename</code> or specify the correct column with <code>metadata_filename_col</code> parameter.</p>
-</section>
-<section id="sirius-issues" class="level3">
-<h3 class="anchored" data-anchor-id="sirius-issues">SIRIUS Issues</h3>
+<h3 id="sirius-issues" class="anchored">SIRIUS Issues</h3>
 <p><strong>Issue:</strong> Missing output files</p>
 <pre><code>✗ SIRIUS output has issues:
   - Missing formula_identifications_all.tsv
@@ -1091,12 +293,8 @@ Data validation complete. Ready to proceed.
 <pre><code>✗ SIRIUS output has issues:
   - No feature directories found in SIRIUS output</code></pre>
 <p><strong>Fix:</strong> The SIRIUS job may have failed or not completed. Check SIRIUS logs.</p>
-</section>
-</section>
-<section id="advanced-usage" class="level2">
-<h2 class="anchored" data-anchor-id="advanced-usage">Advanced Usage</h2>
-<section id="programmatic-validation" class="level3">
-<h3 class="anchored" data-anchor-id="programmatic-validation">Programmatic Validation</h3>
+<h2 id="advanced-usage" class="anchored">Advanced Usage</h2>
+<h3 id="programmatic-validation" class="anchored">Programmatic Validation</h3>
 <p>For scripts and pipelines, you can capture validation results:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The function returns TRUE on success or stops with error</span></span>
@@ -1112,9 +310,7 @@ Data validation complete. Ready to proceed.
 <span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-<section id="batch-validation" class="level3">
-<h3 class="anchored" data-anchor-id="batch-validation">Batch Validation</h3>
+<h3 id="batch-validation" class="anchored">Batch Validation</h3>
 <p>Validate multiple datasets in a loop:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>datasets <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"dataset1"</span>, <span class="st">"dataset2"</span>, <span class="st">"dataset3"</span>)</span>
@@ -1136,12 +332,8 @@ Data validation complete. Ready to proceed.
 <span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-</section>
-<section id="best-practices" class="level2">
-<h2 class="anchored" data-anchor-id="best-practices">Best Practices</h2>
-<section id="always-validate-first" class="level3">
-<h3 class="anchored" data-anchor-id="always-validate-first">Always Validate First</h3>
+<h2 id="best-practices" class="anchored">Best Practices</h2>
+<h3 id="always-validate-first" class="anchored">Always Validate First</h3>
 <p>Make validation the <strong>first step</strong> in your workflow:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Good practice</span></span>
@@ -1151,9 +343,7 @@ Data validation complete. Ready to proceed.
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Bad practice (will waste time if data is invalid)</span></span>
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()  <span class="co"># Might fail after 10+ minutes</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-<section id="validate-after-data-conversion" class="level3">
-<h3 class="anchored" data-anchor-id="validate-after-data-conversion">Validate After Data Conversion</h3>
+<h3 id="validate-after-data-conversion" class="anchored">Validate After Data Conversion</h3>
 <p>If you convert data formats (e.g., mzML to MGF), validate the output:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert data</span></span>
@@ -1162,18 +352,14 @@ Data validation complete. Ready to proceed.
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate immediately</span></span>
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">spectra =</span> <span class="st">"processed/spectra.mgf"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-<section id="include-in-automated-pipelines" class="level3">
-<h3 class="anchored" data-anchor-id="include-in-automated-pipelines">Include in Automated Pipelines</h3>
+<h3 id="include-in-automated-pipelines" class="anchored">Include in Automated Pipelines</h3>
 <p>Add validation to your automated workflows:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Snakemake, Nextflow, or targets pipeline</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(...)  <span class="co"># Fails fast if data is bad</span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()            <span class="co"># Only runs if validation passes</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-<section id="document-your-validation" class="level3">
-<h3 class="anchored" data-anchor-id="document-your-validation">Document Your Validation</h3>
+<h3 id="document-your-validation" class="anchored">Document Your Validation</h3>
 <p>Keep a record of validation results:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Capture output to log file</span></span>
@@ -1185,10 +371,7 @@ Data validation complete. Ready to proceed.
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sink</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-</section>
-<section id="summary" class="level2">
-<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<h2 id="summary" class="anchored">Summary</h2>
 <p>Data validation with <code>validate_inputs()</code>:</p>
 <ul>
 <li><strong>Saves time</strong> - Catches errors in seconds, not minutes</li>
@@ -1199,9 +382,7 @@ Data validation complete. Ready to proceed.
 <li><strong>Informative</strong> - Reports row counts, spectra counts, file lists</li>
 </ul>
 <p><strong>Always validate your data first!</strong> It’s the best way to ensure a smooth TIMA experience.</p>
-</section>
-<section id="next-steps" class="level2">
-<h2 class="anchored" data-anchor-id="next-steps">Next Steps</h2>
+<h2 id="next-steps" class="anchored">Next Steps</h2>
 <p>Now that your data is validated:</p>
 <ul>
 <li><a href="I-gathering.html">I. Gathering</a> - Collect your data</li>
@@ -1211,34 +392,12 @@ Data validation complete. Ready to proceed.
 </ul>
 
 
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{rutz2025,
-  author = {Rutz, Adriano},
-  title = {0 {Validating} Your Data},
-  date = {2025-12-28},
-  url = {https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html},
-  langid = {en}
-}
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-rutz2025" class="csl-entry quarto-appendix-citeas" role="listitem">
-Rutz, Adriano. 2025. <span>“0 Validating Your Data.”</span> December 28,
-2025. <a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html</a>.
-</div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
-    // Ensure there is a toggle, if there isn't float one in the top right
-    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
-      const a = window.document.createElement('a');
-      a.classList.add('top-right');
-      a.classList.add('quarto-color-scheme-toggle');
-      a.href = "";
-      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
-      const i = window.document.createElement("i");
-      i.classList.add('bi');
-      a.appendChild(i);
-      window.document.body.appendChild(a);
-    }
-    setColorSchemeToggle(hasAlternateSentinel())
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
     const icon = "";
     const anchorJS = new window.AnchorJS();
     anchorJS.options = {
@@ -1337,7 +496,7 @@ Rutz, Adriano. 2025. <span>“0 Validating Your Data.”</span> December 28,
         },
         interactive: true,
         interactiveBorder: 10,
-        theme: 'quarto',
+        theme: 'light-border',
         placement: 'bottom-start',
       };
       if (contentFn) {
@@ -1645,9 +804,6 @@ Rutz, Adriano. 2025. <span>“0 Validating Your Data.”</span> December 28,
     const getTheme = () => {
       let baseTheme = document.getElementById('giscus-base-theme').value;
       let altTheme = document.getElementById('giscus-alt-theme').value;
-      if (authorPrefersDark) {
-          [baseTheme, altTheme] = [altTheme, baseTheme];
-      }
       return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
     };
     const script = document.createElement("script");
@@ -1669,7 +825,6 @@ Rutz, Adriano. 2025. <span>“0 Validating Your Data.”</span> December 28,
   }
   loadGiscus();
 </script>
-</div> <!-- /content -->
 
 
 
