@@ -20,76 +20,647 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-.display.math{display: block; text-align: center; margin: 0.5rem auto;}
 </style>
 
 
-<link href="./man/figures/logo.svg" rel="icon" type="image/svg+xml">
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-html/tabby.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./man/figures/logo.svg" rel="icon" type="image/svg+xml">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-html-734cb40618f438257b19a1e532635a32.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-c2cc733cf12bdbc468fe7c5ee555446a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
 
 
 </head>
 
-<body>
+<body class="nav-sidebar floating nav-fixed quarto-light">
 
-
-
-
-<nav id="TOC" role="doc-toc">
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./man/figures/logo.svg" alt="tima logo" class="navbar-logo light-content">
+    <img src="./man/figures/logo.svg" alt="tima logo" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">TIMA</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./vignettes/tima.html"> 
+<span class="menu-text">Get started</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-articles" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Articles</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-articles">    
+        <li>
+    <a class="dropdown-item" href="./vignettes/articles/0-validating.html">
+ <span class="dropdown-text">0 Validating your data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./vignettes/articles/I-gathering.html">
+ <span class="dropdown-text">1 Gathering everything you need</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./vignettes/articles/II-preparing.html">
+ <span class="dropdown-text">2 Preparing inputs</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./vignettes/articles/III-processing.html">
+ <span class="dropdown-text">3 Performing Taxonomically Informed Metabolite Annotation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./vignettes/articles/IV-benchmarking.html">
+ <span class="dropdown-text">4 Benchmarking Performance</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" href="./NEWS.html" aria-current="page"> 
+<span class="menu-text">News</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./LICENSE.html"> 
+<span class="menu-text">License</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./CITATION.html"> 
+<span class="menu-text">Citation</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/taxonomicallyinformedannotation/tima"> <i class="bi bi-github" role="img" aria-label="tima GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Functions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Annotate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/annotate_masses.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">annotate_masses</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/annotate_spectra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">annotate_spectra</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Calculate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/calculate_mass_of_m.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">calculate_mass_of_m</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/calculate_mz_from_mass.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">calculate_mz_from_mass</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/calculate_similarity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">calculate_similarity</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Change</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/change_params_small.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">change_params_small</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Create</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/create_components.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">create_components</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/create_dir.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">create_dir</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/create_edges.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">create_edges</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/create_edges_spectra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">create_edges_spectra</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Filter</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/filter_annotations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">filter_annotations</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Get</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/get_example_files.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_example_files</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/get_file.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_file</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/get_last_version_from_zenodo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_last_version_from_zenodo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/get_organism_taxonomy_ott.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_organism_taxonomy_ott</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Harmonize</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/harmonize_adducts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">harmonize_adducts</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">Import</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/import_spectra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">import_spectra</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+ <span class="menu-text">Parse</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/parse_adduct.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">parse_adduct</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
+ <span class="menu-text">Prepare</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
+ <span class="menu-text">Annotations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_annotations_gnps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_annotations_gnps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_annotations_sirius.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_annotations_sirius</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_annotations_spectra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_annotations_spectra</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false">
+ <span class="menu-text">Features</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_features_components.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_features_components</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_features_edges.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_features_edges</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_features_tables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_features_tables</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false">
+ <span class="menu-text">Libraries</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_rt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_rt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false">
+ <span class="menu-text">Structure Organism Pairs</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_sop_closed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_sop_closed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_sop_ecmdb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_sop_ecmdb</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_sop_hmdb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_sop_hmdb</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_sop_lotus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_sop_lotus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_sop_merged.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_sop_merged</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_spectra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_spectra</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_taxa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_taxa</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false">
+ <span class="menu-text">Process</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-16" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/process_smiles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">process_smiles</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="false">
+ <span class="menu-text">Run</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/run_app.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">run_app</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/run_tima.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">run_tima</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false">
+ <span class="menu-text">Validate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-18" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/validate_inputs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">validate_inputs</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false">
+ <span class="menu-text">Weight</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/weight_annotations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">weight_annotations</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#tima" id="toc-tima">tima</a></li>
-  <li><a href="#tima-2.13.0" id="toc-tima-2.13.0">tima 2.13.0</a>
-  <ul>
-  <li><a href="#breaking-changes" id="toc-breaking-changes">Breaking Changes</a></li>
+  <li><a href="#tima" id="toc-tima" class="nav-link active" data-scroll-target="#tima">tima</a></li>
+  <li><a href="#tima-2.13.0" id="toc-tima-2.13.0" class="nav-link" data-scroll-target="#tima-2.13.0">tima 2.13.0</a>
+  <ul class="collapse">
+  <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link" data-scroll-target="#breaking-changes">Breaking Changes</a></li>
   </ul></li>
-  <li><a href="#tima-2.12.0" id="toc-tima-2.12.0">tima 2.12.0</a></li>
-  <li><a href="#tima-2.11.1-unreleased" id="toc-tima-2.11.1-unreleased">tima 2.11.1 (unreleased)</a></li>
-  <li><a href="#tima-2.11.0" id="toc-tima-2.11.0">tima 2.11.0</a></li>
-  <li><a href="#tima-2.10.0" id="toc-tima-2.10.0">tima 2.10.0</a></li>
-  <li><a href="#tima-2.9.6" id="toc-tima-2.9.6">tima 2.9.6</a></li>
-  <li><a href="#tima-2.9.5" id="toc-tima-2.9.5">tima 2.9.5</a></li>
-  <li><a href="#tima-2.9.4" id="toc-tima-2.9.4">tima 2.9.4</a></li>
-  <li><a href="#tima-2.9.3" id="toc-tima-2.9.3">tima 2.9.3</a></li>
-  <li><a href="#tima-2.9.2" id="toc-tima-2.9.2">tima 2.9.2</a></li>
-  <li><a href="#tima-2.9.1" id="toc-tima-2.9.1">tima 2.9.1</a></li>
-  <li><a href="#tima-2.9.0" id="toc-tima-2.9.0">tima 2.9.0</a></li>
-  <li><a href="#tima-2.8.2" id="toc-tima-2.8.2">tima 2.8.2</a></li>
-  <li><a href="#tima-2.8.1" id="toc-tima-2.8.1">tima 2.8.1</a></li>
-  <li><a href="#tima-2.8.0" id="toc-tima-2.8.0">tima 2.8.0</a></li>
-  <li><a href="#tima-2.7.4" id="toc-tima-2.7.4">tima 2.7.4</a></li>
-  <li><a href="#tima-2.7.3" id="toc-tima-2.7.3">tima 2.7.3</a></li>
-  <li><a href="#tima-2.7.2" id="toc-tima-2.7.2">tima 2.7.2</a></li>
-  <li><a href="#tima-2.7.1" id="toc-tima-2.7.1">tima 2.7.1</a></li>
-  <li><a href="#tima-2.7.0" id="toc-tima-2.7.0">tima 2.7.0</a></li>
-  <li><a href="#tima-2.6.0" id="toc-tima-2.6.0">tima 2.6.0</a></li>
-  <li><a href="#tima-2.5.6" id="toc-tima-2.5.6">tima 2.5.6</a></li>
-  <li><a href="#tima-2.5.5" id="toc-tima-2.5.5">tima 2.5.5</a></li>
-  <li><a href="#tima-2.5.4" id="toc-tima-2.5.4">tima 2.5.4</a></li>
-  <li><a href="#tima-2.5.3" id="toc-tima-2.5.3">tima 2.5.3</a></li>
-  <li><a href="#tima-2.5.2" id="toc-tima-2.5.2">tima 2.5.2</a></li>
-  <li><a href="#tima-2.5.1" id="toc-tima-2.5.1">tima 2.5.1</a></li>
-  <li><a href="#tima-2.5.0" id="toc-tima-2.5.0">tima 2.5.0</a></li>
-  <li><a href="#tima-2.4.0" id="toc-tima-2.4.0">tima 2.4.0</a></li>
-  <li><a href="#tima-2.3.0" id="toc-tima-2.3.0">tima 2.3.0</a></li>
-  <li><a href="#tima-2.2.2" id="toc-tima-2.2.2">tima 2.2.2</a></li>
-  <li><a href="#tima-2.2.1" id="toc-tima-2.2.1">tima 2.2.1</a></li>
-  <li><a href="#tima-2.2.0" id="toc-tima-2.2.0">tima 2.2.0</a></li>
-  <li><a href="#tima-2.1.0" id="toc-tima-2.1.0">tima 2.1.0</a></li>
-  <li><a href="#tima-2.0.0" id="toc-tima-2.0.0">tima 2.0.0</a></li>
+  <li><a href="#tima-2.12.0" id="toc-tima-2.12.0" class="nav-link" data-scroll-target="#tima-2.12.0">tima 2.12.0</a></li>
+  <li><a href="#tima-2.11.1-unreleased" id="toc-tima-2.11.1-unreleased" class="nav-link" data-scroll-target="#tima-2.11.1-unreleased">tima 2.11.1 (unreleased)</a></li>
+  <li><a href="#tima-2.11.0" id="toc-tima-2.11.0" class="nav-link" data-scroll-target="#tima-2.11.0">tima 2.11.0</a></li>
+  <li><a href="#tima-2.10.0" id="toc-tima-2.10.0" class="nav-link" data-scroll-target="#tima-2.10.0">tima 2.10.0</a></li>
+  <li><a href="#tima-2.9.6" id="toc-tima-2.9.6" class="nav-link" data-scroll-target="#tima-2.9.6">tima 2.9.6</a></li>
+  <li><a href="#tima-2.9.5" id="toc-tima-2.9.5" class="nav-link" data-scroll-target="#tima-2.9.5">tima 2.9.5</a></li>
+  <li><a href="#tima-2.9.4" id="toc-tima-2.9.4" class="nav-link" data-scroll-target="#tima-2.9.4">tima 2.9.4</a></li>
+  <li><a href="#tima-2.9.3" id="toc-tima-2.9.3" class="nav-link" data-scroll-target="#tima-2.9.3">tima 2.9.3</a></li>
+  <li><a href="#tima-2.9.2" id="toc-tima-2.9.2" class="nav-link" data-scroll-target="#tima-2.9.2">tima 2.9.2</a></li>
+  <li><a href="#tima-2.9.1" id="toc-tima-2.9.1" class="nav-link" data-scroll-target="#tima-2.9.1">tima 2.9.1</a></li>
+  <li><a href="#tima-2.9.0" id="toc-tima-2.9.0" class="nav-link" data-scroll-target="#tima-2.9.0">tima 2.9.0</a></li>
+  <li><a href="#tima-2.8.2" id="toc-tima-2.8.2" class="nav-link" data-scroll-target="#tima-2.8.2">tima 2.8.2</a></li>
+  <li><a href="#tima-2.8.1" id="toc-tima-2.8.1" class="nav-link" data-scroll-target="#tima-2.8.1">tima 2.8.1</a></li>
+  <li><a href="#tima-2.8.0" id="toc-tima-2.8.0" class="nav-link" data-scroll-target="#tima-2.8.0">tima 2.8.0</a></li>
+  <li><a href="#tima-2.7.4" id="toc-tima-2.7.4" class="nav-link" data-scroll-target="#tima-2.7.4">tima 2.7.4</a></li>
+  <li><a href="#tima-2.7.3" id="toc-tima-2.7.3" class="nav-link" data-scroll-target="#tima-2.7.3">tima 2.7.3</a></li>
+  <li><a href="#tima-2.7.2" id="toc-tima-2.7.2" class="nav-link" data-scroll-target="#tima-2.7.2">tima 2.7.2</a></li>
+  <li><a href="#tima-2.7.1" id="toc-tima-2.7.1" class="nav-link" data-scroll-target="#tima-2.7.1">tima 2.7.1</a></li>
+  <li><a href="#tima-2.7.0" id="toc-tima-2.7.0" class="nav-link" data-scroll-target="#tima-2.7.0">tima 2.7.0</a></li>
+  <li><a href="#tima-2.6.0" id="toc-tima-2.6.0" class="nav-link" data-scroll-target="#tima-2.6.0">tima 2.6.0</a></li>
+  <li><a href="#tima-2.5.6" id="toc-tima-2.5.6" class="nav-link" data-scroll-target="#tima-2.5.6">tima 2.5.6</a></li>
+  <li><a href="#tima-2.5.5" id="toc-tima-2.5.5" class="nav-link" data-scroll-target="#tima-2.5.5">tima 2.5.5</a></li>
+  <li><a href="#tima-2.5.4" id="toc-tima-2.5.4" class="nav-link" data-scroll-target="#tima-2.5.4">tima 2.5.4</a></li>
+  <li><a href="#tima-2.5.3" id="toc-tima-2.5.3" class="nav-link" data-scroll-target="#tima-2.5.3">tima 2.5.3</a></li>
+  <li><a href="#tima-2.5.2" id="toc-tima-2.5.2" class="nav-link" data-scroll-target="#tima-2.5.2">tima 2.5.2</a></li>
+  <li><a href="#tima-2.5.1" id="toc-tima-2.5.1" class="nav-link" data-scroll-target="#tima-2.5.1">tima 2.5.1</a></li>
+  <li><a href="#tima-2.5.0" id="toc-tima-2.5.0" class="nav-link" data-scroll-target="#tima-2.5.0">tima 2.5.0</a></li>
+  <li><a href="#tima-2.4.0" id="toc-tima-2.4.0" class="nav-link" data-scroll-target="#tima-2.4.0">tima 2.4.0</a></li>
+  <li><a href="#tima-2.3.0" id="toc-tima-2.3.0" class="nav-link" data-scroll-target="#tima-2.3.0">tima 2.3.0</a></li>
+  <li><a href="#tima-2.2.2" id="toc-tima-2.2.2" class="nav-link" data-scroll-target="#tima-2.2.2">tima 2.2.2</a></li>
+  <li><a href="#tima-2.2.1" id="toc-tima-2.2.1" class="nav-link" data-scroll-target="#tima-2.2.1">tima 2.2.1</a></li>
+  <li><a href="#tima-2.2.0" id="toc-tima-2.2.0" class="nav-link" data-scroll-target="#tima-2.2.0">tima 2.2.0</a></li>
+  <li><a href="#tima-2.1.0" id="toc-tima-2.1.0" class="nav-link" data-scroll-target="#tima-2.1.0">tima 2.1.0</a></li>
+  <li><a href="#tima-2.0.0" id="toc-tima-2.0.0" class="nav-link" data-scroll-target="#tima-2.0.0">tima 2.0.0</a></li>
   </ul>
 </nav>
-<h1 id="tima">tima</h1>
-<h1 id="tima-2.13.0">tima 2.13.0</h1>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+
+
+
+<script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+<section id="tima" class="level1">
+<h1>tima</h1>
+</section>
+<section id="tima-2.13.0" class="level1">
+<h1>tima 2.13.0</h1>
 <ul>
 <li>Added a new validation helper, see <a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html" class="uri">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html</a></li>
 <li>Added <a href="http://bigg.ucsd.edu/">BiGG</a> as SOP library</li>
@@ -103,11 +674,15 @@ ul.task-list li input[type="checkbox"] {
 <li>Improved log and error messages</li>
 <li>More in depth molecular sanitization</li>
 </ul>
-<h2 id="breaking-changes" class="anchored">Breaking Changes</h2>
+<section id="breaking-changes" class="level2">
+<h2 class="anchored" data-anchor-id="breaking-changes">Breaking Changes</h2>
 <ul>
 <li><code>sanitize_spectra()</code>: <code>cutoff</code> parameter now defaults to <code>NULL</code> (dynamic) instead of <code>0</code></li>
 </ul>
-<h1 id="tima-2.12.0">tima 2.12.0</h1>
+</section>
+</section>
+<section id="tima-2.12.0" class="level1">
+<h1>tima 2.12.0</h1>
 <ul>
 <li>Added automatic retention time conversion (in minutes)</li>
 <li>Added a minimal output</li>
@@ -135,12 +710,16 @@ ul.task-list li input[type="checkbox"] {
 <li>Updated to Massbank version <code>2025.05.1</code></li>
 <li>Updated minimal R version to <code>4.4.0</code> (and related Bioconductor dependencies)</li>
 </ul>
-<h1 id="tima-2.11.1-unreleased">tima 2.11.1 (unreleased)</h1>
+</section>
+<section id="tima-2.11.1-unreleased" class="level1">
+<h1>tima 2.11.1 (unreleased)</h1>
 <ul>
 <li>Added <code>SIRIUS</code> feature tables support (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/185">#185</a>)</li>
 <li>Added <code>.rar</code> compression support for <code>SIRIUS</code> workspaces (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/186">#186</a>)</li>
 </ul>
-<h1 id="tima-2.11.0">tima 2.11.0</h1>
+</section>
+<section id="tima-2.11.0" class="level1">
+<h1>tima 2.11.0</h1>
 <ul>
 <li>Added convenience function to change small parameters (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/177">#177</a>)</li>
 <li>Added demo files download to the app</li>
@@ -157,7 +736,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Simplified install and vignettes</li>
 <li>Switched from <code>base::lapply</code> to <code>purrr::map</code></li>
 </ul>
-<h1 id="tima-2.10.0">tima 2.10.0</h1>
+</section>
+<section id="tima-2.10.0" class="level1">
+<h1>tima 2.10.0</h1>
 <ul>
 <li>Added alt text to vignettes</li>
 <li>Added the possibility to add internal libraries through the GUI (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/159">#159</a>)</li>
@@ -175,7 +756,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Reduced warnings</li>
 <li>Updated benchmarking steps</li>
 </ul>
-<h1 id="tima-2.9.6">tima 2.9.6</h1>
+</section>
+<section id="tima-2.9.6" class="level1">
+<h1>tima 2.9.6</h1>
 <ul>
 <li>Added light-switch thanks to <code>pkgdown 2.1.0</code>.</li>
 <li>Attempt to simplify installation</li>
@@ -183,13 +766,17 @@ ul.task-list li input[type="checkbox"] {
 <li>Fixed some incorrect adduct differences annotations</li>
 <li>Refactored adducts / neutral losses / dimers annotation to allow for more flexibility (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/141">#141</a>, <a href="https://github.com/taxonomicallyinformedannotation/tima/issues/144">#144</a>)</li>
 </ul>
-<h1 id="tima-2.9.5">tima 2.9.5</h1>
+</section>
+<section id="tima-2.9.5" class="level1">
+<h1>tima 2.9.5</h1>
 <ul>
 <li>Do not re-package if already the latest version</li>
 <li>SIRIUS 6 default and compatible (keeping SIRIUS 5 backward compatibility)</li>
 <li>Updated to Massbank version <code>2024.06</code></li>
 </ul>
-<h1 id="tima-2.9.4">tima 2.9.4</h1>
+</section>
+<section id="tima-2.9.4" class="level1">
+<h1>tima 2.9.4</h1>
 <ul>
 <li>Automated update</li>
 <li>Added an option to remove ties (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/134">#134</a>)</li>
@@ -202,7 +789,9 @@ ul.task-list li input[type="checkbox"] {
 <li>New working directory at <code>$HOME/.tima</code></li>
 <li>Updated R and Bioconductor versions</li>
 </ul>
-<h1 id="tima-2.9.3">tima 2.9.3</h1>
+</section>
+<section id="tima-2.9.3" class="level1">
+<h1>tima 2.9.3</h1>
 <ul>
 <li>Allowed for SIRIUS jobs containing only summaries</li>
 <li>Allowed for underscores in job pattern</li>
@@ -212,7 +801,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Removed further some inconsistent MS1 annotations</li>
 <li>Removed tests dependencies by default</li>
 </ul>
-<h1 id="tima-2.9.2">tima 2.9.2</h1>
+</section>
+<section id="tima-2.9.2" class="level1">
+<h1>tima 2.9.2</h1>
 <ul>
 <li>Added Nitrogen rule to filter out some annotations</li>
 <li>Better handling of partial downloads (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/118">#118</a>)</li>
@@ -220,7 +811,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Fixed some port issues in Shiny (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/122">#122</a>)</li>
 <li>Removed completely empty columns from final output to avoid confusion (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/120">#120</a>)</li>
 </ul>
-<h1 id="tima-2.9.1">tima 2.9.1</h1>
+</section>
+<section id="tima-2.9.1" class="level1">
+<h1>tima 2.9.1</h1>
 <ul>
 <li>Added <a href="https://caltechlibrary.github.io/waystation/">Waystation</a> action</li>
 <li>Added structures from spectral libraries to SOP library (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/113">#113</a>)</li>
@@ -231,7 +824,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Updated to Massbank version <code>2023.11</code></li>
 <li>Updated SIRIUS preparation (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/74">#74</a>, <a href="https://github.com/taxonomicallyinformedannotation/tima/issues/115">#115</a>)</li>
 </ul>
-<h1 id="tima-2.9.0">tima 2.9.0</h1>
+</section>
+<section id="tima-2.9.0" class="level1">
+<h1>tima 2.9.0</h1>
 <ul>
 <li>Added compounds names as parameter</li>
 <li>Added MassBank spectral library (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/77">#77</a>)</li>
@@ -250,7 +845,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Refactored Sirius scores (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/92">#92</a>)</li>
 <li>Removed GNPS dependency by default</li>
 </ul>
-<h1 id="tima-2.8.2">tima 2.8.2</h1>
+</section>
+<section id="tima-2.8.2" class="level1">
+<h1>tima 2.8.2</h1>
 <ul>
 <li>Added spectral entropy</li>
 <li>Added MS1 only possibility</li>
@@ -264,7 +861,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Performance improvement by replacing the <a href="https://www.tidyverse.org">tidyverse</a> by the <a href="https://fastverse.github.io/fastverse">fastverse</a> (in progress)</li>
 <li>Reduced warnings (CRAN and jscpd)</li>
 </ul>
-<h1 id="tima-2.8.1">tima 2.8.1</h1>
+</section>
+<section id="tima-2.8.1" class="level1">
+<h1>tima 2.8.1</h1>
 <ul>
 <li>Adapted tests</li>
 <li>Added <code>retry</code> parameter to <code>get_organism_taxonomy_ott</code></li>
@@ -274,12 +873,16 @@ ul.task-list li input[type="checkbox"] {
 <li>Performance improvement by replacing the <a href="https://www.tidyverse.org">tidyverse</a> by the <a href="https://fastverse.github.io/fastverse">fastverse</a> (in progress)</li>
 <li>Replaced <code>extdata</code> loading</li>
 </ul>
-<h1 id="tima-2.8.0">tima 2.8.0</h1>
+</section>
+<section id="tima-2.8.0" class="level1">
+<h1>tima 2.8.0</h1>
 <ul>
 <li>Added GUI prototype</li>
 <li>Started using <a href="https://rstudio.github.io/renv/index.html">renv</a></li>
 </ul>
-<h1 id="tima-2.7.4">tima 2.7.4</h1>
+</section>
+<section id="tima-2.7.4" class="level1">
+<h1>tima 2.7.4</h1>
 <ul>
 <li>Clearer vocabulary</li>
 <li>ECMDB support</li>
@@ -292,7 +895,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Retention time matching additionally to MS2 if RT present in library</li>
 <li>Steps refactoring</li>
 </ul>
-<h1 id="tima-2.7.3">tima 2.7.3</h1>
+</section>
+<section id="tima-2.7.3" class="level1">
+<h1>tima 2.7.3</h1>
 <ul>
 <li>Improved calculations over redundant formulas</li>
 <li>Minor fixes</li>
@@ -300,7 +905,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Spectral matching update (see <a href="https://github.com/rformassspectrometry/MetaboAnnotation/issues/93" class="uri">https://github.com/rformassspectrometry/MetaboAnnotation/issues/93</a>)</li>
 <li><a href="https://books.ropensci.org/targets/">Targets</a> implementation</li>
 </ul>
-<h1 id="tima-2.7.2">tima 2.7.2</h1>
+</section>
+<section id="tima-2.7.2" class="level1">
+<h1>tima 2.7.2</h1>
 <ul>
 <li>Benchmark update (including negative mode)</li>
 <li>Improved parameters documentation</li>
@@ -308,7 +915,9 @@ ul.task-list li input[type="checkbox"] {
 <li>Spectral comparison + intensity filtering update</li>
 <li>Switched r-base Docker image to bioconductor with ARM support</li>
 </ul>
-<h1 id="tima-2.7.1">tima 2.7.1</h1>
+</section>
+<section id="tima-2.7.1" class="level1">
+<h1>tima 2.7.1</h1>
 <ul>
 <li>Added MONA helpers</li>
 <li>Added parallelization on process_spectra</li>
@@ -317,61 +926,83 @@ ul.task-list li input[type="checkbox"] {
 <li>Improved testing time</li>
 <li>Minor fixes</li>
 </ul>
-<h1 id="tima-2.7.0">tima 2.7.0</h1>
+</section>
+<section id="tima-2.7.0" class="level1">
+<h1>tima 2.7.0</h1>
 <ul>
 <li>Added HMDB helpers for both taxo and ISDB</li>
 <li>Added MS2 annotation capability (kudos <a href="https://github.com/jorainer"><span class="citation" data-cites="jorainer">@jorainer</span></a> for the awesome <em>Spectra</em> suite)</li>
 <li>Minor fixes</li>
 </ul>
-<h1 id="tima-2.6.0">tima 2.6.0</h1>
+</section>
+<section id="tima-2.6.0" class="level1">
+<h1>tima 2.6.0</h1>
 <ul>
 <li>Added Docker container</li>
 <li>Changed data architecture</li>
 <li>Minor fixes</li>
 </ul>
-<h1 id="tima-2.5.6">tima 2.5.6</h1>
+</section>
+<section id="tima-2.5.6" class="level1">
+<h1>tima 2.5.6</h1>
 <ul>
 <li>Dependencies removal (e.g.&nbsp;metabo-store)</li>
 <li>Minor fixes</li>
 <li>Partial functions cleanup</li>
 </ul>
-<h1 id="tima-2.5.5">tima 2.5.5</h1>
+</section>
+<section id="tima-2.5.5" class="level1">
+<h1>tima 2.5.5</h1>
 <ul>
 <li>Automation and parameters improvement</li>
 <li>Minor fixes</li>
 </ul>
-<h1 id="tima-2.5.4">tima 2.5.4</h1>
+</section>
+<section id="tima-2.5.4" class="level1">
+<h1>tima 2.5.4</h1>
 <ul>
 <li>Minor fixes</li>
 <li>Metadata completion improvement</li>
 <li>Molecular formula and adducts formalism improvement</li>
 </ul>
-<h1 id="tima-2.5.3">tima 2.5.3</h1>
+</section>
+<section id="tima-2.5.3" class="level1">
+<h1>tima 2.5.3</h1>
 <ul>
 <li>Imports improvements</li>
 <li>LOTUS update</li>
 </ul>
-<h1 id="tima-2.5.2">tima 2.5.2</h1>
+</section>
+<section id="tima-2.5.2" class="level1">
+<h1>tima 2.5.2</h1>
 <ul>
 <li>Packaging improvements</li>
 </ul>
-<h1 id="tima-2.5.1">tima 2.5.1</h1>
+</section>
+<section id="tima-2.5.1" class="level1">
+<h1>tima 2.5.1</h1>
 <ul>
 <li>Improved support for SIRIUS (with new summaries)</li>
 </ul>
-<h1 id="tima-2.5.0">tima 2.5.0</h1>
+</section>
+<section id="tima-2.5.0" class="level1">
+<h1>tima 2.5.0</h1>
 <ul>
 <li>LOTUS update</li>
 <li>Minor fixes</li>
 </ul>
-<h1 id="tima-2.4.0">tima 2.4.0</h1>
+</section>
+<section id="tima-2.4.0" class="level1">
+<h1>tima 2.4.0</h1>
 <ul>
 <li>Added chemical names and xlogp to output (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/33">#33</a>)</li>
 <li>Added support for case when no consensus is found (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/30">#30</a>)</li>
 <li>Improved output (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/34">#34</a>)</li>
 <li>Minor fixes</li>
 </ul>
-<h1 id="tima-2.3.0">tima 2.3.0</h1>
+</section>
+<section id="tima-2.3.0" class="level1">
+<h1>tima 2.3.0</h1>
 <ul>
 <li>Added support for annotation without MN (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/28">#28</a>)</li>
 <li>Added support for multi tool annotations (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/27">#27</a>)</li>
@@ -382,36 +1013,45 @@ ul.task-list li input[type="checkbox"] {
 <li>Minor fixes</li>
 <li>Updated adducts</li>
 </ul>
-<h1 id="tima-2.2.2">tima 2.2.2</h1>
+</section>
+<section id="tima-2.2.2" class="level1">
+<h1>tima 2.2.2</h1>
 <ul>
 <li>Additional benchmark figure (<a href="https://taxonomicallyinformedannotation.github.io/tima/articles/IV-benchmarking.html#candidates-distribution">Candidates distribution</a>)</li>
 <li>Minor fixes</li>
 </ul>
-<h1 id="tima-2.2.1">tima 2.2.1</h1>
+</section>
+<section id="tima-2.2.1" class="level1">
+<h1>tima 2.2.1</h1>
 <ul>
 <li>Minor version name fixes</li>
 </ul>
-<h1 id="tima-2.2.0">tima 2.2.0</h1>
+</section>
+<section id="tima-2.2.0" class="level1">
+<h1>tima 2.2.0</h1>
 <ul>
 <li>Added benchmark (<a href="https://taxonomicallyinformedannotation.github.io/tima/articles/IV-benchmarking.html">here</a>)</li>
 <li>Various fixes</li>
 </ul>
-<h1 id="tima-2.1.0">tima 2.1.0</h1>
+</section>
+<section id="tima-2.1.0" class="level1">
+<h1>tima 2.1.0</h1>
 <ul>
 <li>Fixes, deletion of binary dependencies.</li>
 </ul>
-<h1 id="tima-2.0.0">tima 2.0.0</h1>
+</section>
+<section id="tima-2.0.0" class="level1">
+<h1>tima 2.0.0</h1>
 <ul>
 <li>Initial version.</li>
 </ul>
 
 
+</section>
+
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
-    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
-    tabsets.forEach(function(tabset) {
-      const tabby = new Tabby('#' + tabset.id);
-    });
     const icon = "";
     const anchorJS = new window.AnchorJS();
     anchorJS.options = {
@@ -510,7 +1150,7 @@ ul.task-list li input[type="checkbox"] {
         },
         interactive: true,
         interactiveBorder: 10,
-        theme: 'light-border',
+        theme: 'quarto',
         placement: 'bottom-start',
       };
       if (contentFn) {
@@ -810,6 +1450,7 @@ ul.task-list li input[type="checkbox"] {
     }
   });
   </script>
+</div> <!-- /content -->
 
 
 
