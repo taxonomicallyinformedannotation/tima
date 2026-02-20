@@ -106,6 +106,16 @@ list(
         format = "file"
       ),
       tar_target(
+        name = par_def_pre_ann_mzm,
+        command = {
+          par_def_pre_ann_mzm <- system.file(
+            "params/default/prepare_annotations_mzmine.yaml",
+            package = "tima"
+          )
+        },
+        format = "file"
+      ),
+      tar_target(
         name = par_def_pre_ann_sir,
         command = {
           par_def_pre_ann_sir <- system.file(
@@ -369,6 +379,18 @@ list(
           format = "file"
         ),
         tar_target(
+          name = par_usr_pre_ann_mzm,
+          command = {
+            par_usr_pre_ann_mzm <-
+              prepare_params(
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
+                step = "prepare_annotations_mzmine"
+              )
+          },
+          format = "file"
+        ),
+        tar_target(
           name = par_usr_pre_ann_sir,
           command = {
             par_usr_pre_ann_sir <-
@@ -614,6 +636,17 @@ list(
             tima:::parse_yaml_params(
               def = par_def_pre_ann_gnp,
               usr = par_usr_pre_ann_gnp[[1]]
+            )
+        },
+        format = "rds"
+      ),
+      tar_target(
+        name = par_pre_ann_mzm,
+        command = {
+          par_pre_ann_mzm <-
+            tima:::parse_yaml_params(
+              def = par_def_pre_ann_mzm,
+              usr = par_usr_pre_ann_mzm[[1]]
             )
         },
         format = "rds"
@@ -1393,24 +1426,39 @@ list(
     ## Spectral
     list(
       ## GNPS
-      list(
-        tar_target(
-          name = ann_spe_exp_gnp_pre,
-          command = {
-            ann_spe_exp_gnp_pre <-
-              prepare_annotations_gnps(
-                # input = gnps_annotations,
-                input = par_pre_ann_gnp$files$annotations$raw$spectral$gnps,
-                output = par_pre_ann_gnp$files$annotations$prepared$structural$gnps,
-                str_stereo = lib_mer_str_stereo,
-                str_met = lib_mer_str_met,
-                str_nam = lib_mer_str_nam,
-                str_tax_cla = lib_mer_str_tax_cla,
-                str_tax_npc = lib_mer_str_tax_npc
-              )
-          },
-          format = "file"
-        )
+      tar_target(
+        name = ann_spe_exp_gnp_pre,
+        command = {
+          ann_spe_exp_gnp_pre <-
+            prepare_annotations_gnps(
+              # input = gnps_annotations,
+              input = par_pre_ann_gnp$files$annotations$raw$spectral$gnps,
+              output = par_pre_ann_gnp$files$annotations$prepared$structural$gnps,
+              str_stereo = lib_mer_str_stereo,
+              str_met = lib_mer_str_met,
+              str_nam = lib_mer_str_nam,
+              str_tax_cla = lib_mer_str_tax_cla,
+              str_tax_npc = lib_mer_str_tax_npc
+            )
+        },
+        format = "file"
+      ),
+      ## mzmine
+      tar_target(
+        name = ann_spe_exp_mzm_pre,
+        command = {
+          ann_spe_exp_mzm_pre <-
+            prepare_annotations_mzmine(
+              input = par_pre_ann_mzm$files$annotations$raw$spectral$mzmine,
+              output = par_pre_ann_mzm$files$annotations$prepared$structural$mzmine,
+              str_stereo = lib_mer_str_stereo,
+              str_met = lib_mer_str_met,
+              str_nam = lib_mer_str_nam,
+              str_tax_cla = lib_mer_str_tax_cla,
+              str_tax_npc = lib_mer_str_tax_npc
+            )
+        },
+        format = "file"
       ),
       ## Classic
       list(
@@ -1655,6 +1703,7 @@ list(
       ann_fil <- filter_annotations(
         annotations = c(
           "gnps" = ann_spe_exp_gnp_pre,
+          "mzmine" = ann_spe_exp_mzm_pre,
           "spectral" = ann_spe_pre,
           "sirius" = ann_sir_pre_str,
           "ms1" = ann_ms1_pre_ann

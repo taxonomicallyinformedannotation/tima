@@ -5,6 +5,7 @@
 * Added a new validation helper, see <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html>
 * Added [BiGG](http://bigg.ucsd.edu/) as SOP library
 * Added basic isotopologues handling
+* Added mzmine annotation support
 * Added special "Biota" superdomain handling for shared core metabolism
 * Enhanced `sanitize_spectra()` with adaptive noise filtering:
     - Dynamic intensity thresholds (MAD-based, now default when `cutoff = NULL`)

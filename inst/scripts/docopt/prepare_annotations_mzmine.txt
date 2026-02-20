@@ -1,0 +1,13 @@
+You can use this script with the following example:
+  Rscript inst/scripts/prepare_annotations_mzmine.R --fil-ann-raw-spe-mzm data/interim/annotations/example_mzmine.tsv --fil-ann-pre-str data/interim/annotations/example_mzminePrepared.tsv.gz
+
+Usage:
+  prepare_annotations_mzmine.R [--=fil-ann-pre-str<fil-ann-pre-str>]
+
+Arguments:
+  fil-ann-raw-spe-mzm        List of mzmine spectral matching results. STRING
+  fil-ann-pre-str            List of prepared structural annotations. STRING
+
+Options:
+  -h --help                  Shows this screen.
+  -v --version               Shows version.

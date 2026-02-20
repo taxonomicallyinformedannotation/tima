@@ -80,6 +80,10 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("files", "annotations", "raw", "spectral", "gnps"),
       type = as.character
     ),
+    fil_ann_raw_spe_mzm = list(
+      path = c("files", "annotations", "raw", "spectral", "mzmine"),
+      type = as.character
+    ),
     fil_ann_raw_spe_spe = list(
       path = c("files", "annotations", "raw", "spectral", "spectral"),
       type = as.character

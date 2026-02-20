@@ -68,6 +68,7 @@ prepare_params <- function(
 
   # Extract file paths - annotations
   fil_ann_raw_spe_gnp <- params_advanced$files$annotations$raw$spectral$gnps
+  fil_ann_raw_spe_mzm <- params_advanced$files$annotations$raw$spectral$mzmine
   fil_ann_raw_spe_spe <- params_advanced$files$annotations$raw$spectral$spectral
   # fil_ann_raw_sir <- params_advanced$files$annotations$raw$sirius
   fil_ann_pre_can <- params_advanced$files$annotations$prepared$canopus
@@ -75,6 +76,7 @@ prepare_params <- function(
   fil_ann_pre_str <- params_advanced$files$annotations$prepared$structural
   fil_ann_pre_str_gnp <- params_advanced$files$annotations$prepared$structural$gnps
   # fil_ann_pre_str_ms1 <- params_advanced$files$annotations$prepared$structural$ms1
+  fil_ann_pre_str_mzm <- params_advanced$files$annotations$prepared$structural$mzmine
   fil_ann_pre_str_sir <- params_advanced$files$annotations$prepared$structural$sirius
   fil_ann_pre_str_spe <- params_advanced$files$annotations$prepared$structural$spectral
   fil_ann_fil <- params_advanced$files$annotations$filtered
