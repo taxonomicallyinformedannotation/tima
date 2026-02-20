@@ -54,11 +54,14 @@ files:
       spectral:
         #' GNPS spectral matching annotations. STRING
         gnps: data/interim/annotations/example_gnps.tsv
+        
+        #' The optional file containing the mzmine annotations. STRING
+        mzmine: data/interim/annotations/mzmine_annotations.csv
 
         #' Spectral spectral matching annotations. STRING
         spectral: data/interim/annotations/example_spectralMatches.tsv.gz
 
-      #' The directory containing the sirius annotations. STRING
+      #' The optional directory containing the sirius annotations. STRING
       sirius: data/interim/annotations/example_sirius.zip
 
     #' List of filtered annotations. STRING
@@ -79,6 +82,9 @@ files:
 
         #' Prepared MS1 structural annotations. STRING
         ms1: data/interim/annotations/example_ms1Prepared.tsv.gz
+        
+        #' Prepared mzmine structural annotations. STRING
+        mzmine: data/interim/annotations/example_mzminePrepared.tsv.gz
 
         #' Prepared SIRIUS structural annotations. STRING
         sirius: data/interim/annotations/example_siriusPrepared.tsv.gz
