@@ -18,7 +18,10 @@ files:
   #' Annotations files.
   annotations:
     raw:
-      #' The directory containing the sirius annotations. STRING
+      spectral:
+        #' The optional file containing the mzmine annotations. STRING
+        mzmine: data/interim/annotations/mzmine_annotations.csv
+      #' The optional directory containing the sirius annotations. STRING
       sirius: data/interim/annotations/example_sirius.zip
 ms:
   #' The polarity used. Must be either "pos" or "neg". STRING

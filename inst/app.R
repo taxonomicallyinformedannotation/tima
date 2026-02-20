@@ -137,6 +137,19 @@ ui <- shiny::fluidPage(
               )
             ),
           shiny::fileInput(
+            inputId = "fil_ann_raw_mzm",
+            label = "mzmine annotations (optional)",
+            accept = c(".csv")
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = c(
+                "Optional mzmine annotation file",
+                "Should be located in `data/interim`.",
+                "Reason therefore is to find it in the future."
+              )
+            ),
+          shiny::fileInput(
             inputId = "fil_ann_raw_sir",
             label = "SIRIUS project space (optional)",
             accept = c(".zip")
@@ -1901,6 +1914,8 @@ ui <- shiny::fluidPage(
   prefil_fea_raw <- shiny::isolate(input$fil_fea_raw)
   prefil_spe_raw <- shiny::isolate(input$fil_spe_raw)
   prefil_met_raw <- shiny::isolate(input$fil_met_raw)
+  prefil_mzm_raw <- shiny::isolate(input$fil_mzm_raw)
+  prefil_mzt_raw <- shiny::isolate(input$fil_mzt_raw)
   prefil_sir_raw <- shiny::isolate(input$fil_ann_raw_sir)
   lib_tmp_exp_csv <- shiny::isolate(input$lib_tmp_exp_csv)
   lib_tmp_is_csv <- shiny::isolate(input$lib_tmp_is_csv)
@@ -1909,6 +1924,9 @@ ui <- shiny::fluidPage(
   prefil_spe_raw_1 <- file.path(paths_data_source, prefil_spe_raw[[1]])
   if (!is.null(prefil_met_raw)) {
     prefil_met_raw_1 <- file.path(paths_data_source, prefil_met_raw[[1]])
+  }
+  if (!is.null(prefil_mzm_raw)) {
+    prefil_mzm_raw_1 <- file.path(paths_data_interim_annotations, prefil_mzm_raw[[1]])
   }
   if (!is.null(prefil_sir_raw)) {
     prefil_sir_raw_1 <-
@@ -1939,6 +1957,19 @@ ui <- shiny::fluidPage(
     }
   } else {
     prefil_met_raw_1 <- NULL
+  }
+  if (!is.null(prefil_mzm_raw)) {
+    if (!file.exists(prefil_mzm_raw_1)) {
+      ## safety
+      tima:::create_dir(paths_data_interim_annotations)
+      fs::file_copy(
+        path = prefil_mzm_raw[[4]],
+        new_path = file.path(prefil_mzm_raw_1),
+        overwrite = TRUE
+      )
+    }
+  } else {
+    prefil_mzm_raw_1 <- NULL
   }
   if (!is.null(prefil_sir_raw)) {
     if (!file.exists(prefil_sir_raw_1)) {
@@ -2002,6 +2033,7 @@ ui <- shiny::fluidPage(
   yaml_small$files$pattern <- fil_pat
   yaml_small$files$features$raw <- fil_fea_raw
   yaml_small$files$metadata$raw <- fil_met_raw
+  yaml_small$files$annotations$raw$mzmine <- fil_mzm_raw
   yaml_small$files$annotations$raw$sirius <- fil_sir_raw
   yaml_small$files$spectral$raw <- fil_spe_raw
   yaml_small$ms$polarity <- ms_pol
@@ -2040,6 +2072,7 @@ ui <- shiny::fluidPage(
   yaml_advanced$files$annotations$raw$spectral$gnps <-
     yaml_advanced$files$annotations$raw$spectral$gnps |>
     tima:::replace_id()
+  yaml_advanced$files$annotations$raw$mzmine <- fil_mzm_raw
   yaml_advanced$files$annotations$raw$spectral$spectral <-
     yaml_advanced$files$annotations$raw$spectral$spectral |>
     tima:::replace_id()

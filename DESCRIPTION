@@ -151,6 +151,7 @@ Collate:
     'pre_harmonize_names_sirius.R'
     'select_annotations_columns.R'
     'prepare_annotations_gnps.R'
+    'prepare_annotations_mzmine.R'
     'select_sirius_columns.R'
     'read_from_sirius_zip.R'
     'prepare_annotations_sirius.R'
