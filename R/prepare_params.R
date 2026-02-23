@@ -235,6 +235,7 @@ prepare_params <- function(
   fil_fea_raw <- params_small$files$features$raw
   fil_met_raw <- params_small$files$metadata$raw
   fil_spe_raw <- params_small$files$spectral$raw
+  fil_ann_raw_mzm <- params_small$files$annotations$raw$spectral$mzmine
   fil_ann_raw_sir <- params_small$files$annotations$raw$sirius
   ms_pol <- params_small$ms$polarity
   org_tax <- params_small$organisms$taxon
@@ -246,6 +247,7 @@ prepare_params <- function(
   yamls_params$`prepare_params_advanced`$files$features$raw <- fil_fea_raw
   yamls_params$`prepare_params_advanced`$files$metadata$raw <- fil_met_raw
   yamls_params$`prepare_params_advanced`$files$spectral$raw <- fil_spe_raw
+  yamls_params$`prepare_params_advanced`$files$annotations$raw$spectral$mzmine <- fil_ann_raw_spe_mzm
   yamls_params$`prepare_params_advanced`$files$annotations$raw$sirius <- fil_ann_raw_sir
   yamls_params$`prepare_params_advanced`$ms$polarity <- ms_pol
   yamls_params$`prepare_params_advanced`$organisms$taxon <- org_tax
@@ -383,6 +385,22 @@ prepare_params <- function(
   yamls_params$prepare_annotations_gnps$files$libraries$sop$merged$structures$taxonomies$cla <-
     fil_lib_sop_mer_str_tax_cla
   yamls_params$prepare_annotations_gnps$files$libraries$sop$merged$structures$taxonomies$npc <-
+    fil_lib_sop_mer_str_tax_npc
+  
+  ## prepare_annotations_mzmine
+  yamls_params$prepare_annotations_mzmine$files$annotations$raw$spectral$mzmine <-
+    fil_ann_raw_spe_mzm
+  yamls_params$prepare_annotations_mzmine$files$annotations$prepared$structural$mzmine <-
+    fil_ann_pre_str_mzm
+  yamls_params$prepare_annotations_mzmine$files$libraries$sop$merged$structures$stereo <-
+    fil_lib_sop_mer_str_ste
+  yamls_params$prepare_annotations_mzmine$files$libraries$sop$merged$structures$metadata <-
+    fil_lib_sop_mer_str_met
+  yamls_params$prepare_annotations_mzmine$files$libraries$sop$merged$structures$names <-
+    fil_lib_sop_mer_str_nam
+  yamls_params$prepare_annotations_mzmine$files$libraries$sop$merged$structures$taxonomies$cla <-
+    fil_lib_sop_mer_str_tax_cla
+  yamls_params$prepare_annotations_mzmine$files$libraries$sop$merged$structures$taxonomies$npc <-
     fil_lib_sop_mer_str_tax_npc
 
   ## prepare_annotations_sirius
@@ -794,6 +812,14 @@ prepare_params <- function(
     purrr::map(.f = replace_id)
   yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural$gnps <-
     yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural$gnps |>
+    purrr::map(.f = replace_id)
+  
+  ## prepare_annotations_mzmine
+  # yamls_params$prepare_annotations_mzmine$files$annotations$raw$spectral$mzmine <-
+  #   yamls_params$prepare_annotations_mzmine$files$annotations$raw$spectral$mzmine |>
+  #   purrr::map(.f = replace_id)
+  yamls_params$prepare_annotations_mzmine$files$annotations$prepared$structural$mzmine <-
+    yamls_params$prepare_annotations_mzmine$files$annotations$prepared$structural$mzmine |>
     purrr::map(.f = replace_id)
 
   ## prepare_annotations_sirius
