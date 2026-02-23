@@ -113,7 +113,7 @@ references:
   institution:
     name: R Foundation for Statistical Computing
     address: Vienna, Austria
-  year: '2025'
+  year: '2026'
   version: '>= 4.4.0'
 - type: software
   title: archive
@@ -128,7 +128,7 @@ references:
   - family-names: Csárdi
     given-names: Gábor
     email: csardi.gabor@gmail.com
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.archive
   version: '>= 1.1.12'
 - type: software
@@ -154,7 +154,7 @@ references:
     email: rct@thompsonclan.org
   - family-names: Turaga
     given-names: Nitesh
-  year: '2025'
+  year: '2026'
   doi: 10.18129/B9.bioc.BiocParallel
   version: '>= 1.40.2'
 - type: software
@@ -169,7 +169,7 @@ references:
     name-particle: de
     email: edwindjonge@gmail.com
     orcid: https://orcid.org/0000-0002-6580-4718
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.docopt
   version: '>= 0.7.2'
 - type: software
@@ -195,7 +195,7 @@ references:
     given-names: Davis
     email: davis@posit.co
     orcid: https://orcid.org/0000-0003-4777-038X
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.dplyr
   version: '>= 1.1.4'
 - type: software
@@ -213,7 +213,7 @@ references:
   - family-names: Csárdi
     given-names: Gábor
     email: csardi.gabor@gmail.com
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.fs
   version: '>= 1.6.6'
 - type: software
@@ -226,7 +226,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.httr
   version: '>= 1.4.7'
 - type: software
@@ -239,7 +239,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.httr2
   version: '>= 1.2.1'
 - type: software
@@ -282,7 +282,7 @@ references:
     given-names: Maëlle
     email: maelle@cynkra.com
     orcid: https://orcid.org/0000-0002-2815-0399
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.igraph
   version: '>= 2.1.4'
 - type: software
@@ -290,7 +290,7 @@ references:
   abstract: 'IRanges: Foundation of integer range manipulation in Bioconductor'
   notes: Imports
   url: https://bioconductor.org/packages/IRanges
-  repository: https://bioconductor.org/
+  repository: https://bioc-release.r-universe.dev
   authors:
   - family-names: Pagès
     given-names: Hervé
@@ -299,8 +299,7 @@ references:
     given-names: Patrick
   - family-names: Lawrence
     given-names: Michael
-  year: '2025'
-  doi: 10.18129/B9.bioc.IRanges
+  year: '2026'
   version: '>= 2.40.1'
 - type: software
   title: jsonlite
@@ -313,7 +312,7 @@ references:
     given-names: Jeroen
     email: jeroenooms@gmail.com
     orcid: https://orcid.org/0000-0002-4035-0289
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.jsonlite
   version: '>= 2.0.0'
 - type: software
@@ -327,7 +326,7 @@ references:
     given-names: Stefan
     email: stefan.b.fleck@gmail.com
     orcid: https://orcid.org/0000-0003-3344-9851
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.lgr
   version: '>= 0.5.0'
 - type: software
@@ -339,13 +338,13 @@ references:
   institution:
     name: R Foundation for Statistical Computing
     address: Vienna, Austria
-  year: '2025'
+  year: '2026'
 - type: software
   title: MetaboCoreUtils
   abstract: 'MetaboCoreUtils: Core Utils for Metabolomics Data'
   notes: Imports
   url: https://github.com/RforMassSpectrometry/MetaboCoreUtils
-  repository: https://bioconductor.org/
+  repository: https://bioc-release.r-universe.dev
   authors:
   - family-names: Rainer
     given-names: Johannes
@@ -370,8 +369,7 @@ references:
     given-names: Philippine
     email: philippine.louail@eurac.edu
     orcid: https://orcid.org/0009-0007-5429-6846
-  year: '2025'
-  doi: 10.18129/B9.bioc.MetaboCoreUtils
+  year: '2026'
   version: '>= 1.14.0'
 - type: software
   title: MsBackendMgf
@@ -379,7 +377,7 @@ references:
     (mgf) Files'
   notes: Imports
   url: https://github.com/RforMassSpectrometry/MsBackendMgf
-  repository: https://bioconductor.org/
+  repository: https://bioc-release.r-universe.dev
   authors:
   - family-names: Gatto
     given-names: Laurent
@@ -393,15 +391,14 @@ references:
     given-names: Sebastian
     email: mail@sebastiangibb.de
     orcid: https://orcid.org/0000-0001-7406-4443
-  year: '2025'
-  doi: 10.18129/B9.bioc.MsBackendMgf
+  year: '2026'
   version: '>= 1.14.0'
 - type: software
   title: MsBackendMsp
   abstract: 'MsBackendMsp: Mass Spectrometry Data Backend for NIST msp Files'
   notes: Imports
   url: https://github.com/RforMassSpectrometry/MsBackendMsp
-  repository: https://bioconductor.org/
+  repository: https://bioc-release.r-universe.dev
   authors:
   - family-names: Steffen
     given-names: Neumann
@@ -411,15 +408,14 @@ references:
     given-names: Johannes
     email: Johannes.Rainer@eurac.edu
     orcid: https://orcid.org/0000-0002-6977-7147
-  year: '2025'
-  doi: 10.18129/B9.bioc.MsBackendMsp
+  year: '2026'
   version: '>= 1.10.0'
 - type: software
   title: MsCoreUtils
   abstract: 'MsCoreUtils: Core Utils for Mass Spectrometry Data'
   notes: Imports
   url: https://github.com/RforMassSpectrometry/MsCoreUtils
-  repository: https://bioconductor.org/
+  repository: https://bioc-release.r-universe.dev
   authors:
   - family-names: Gatto
     given-names: Laurent
@@ -437,8 +433,7 @@ references:
     given-names: Philippine
     email: philippine.louail@eurac.edu
     orcid: https://orcid.org/0009-0007-5429-6846
-  year: '2025'
-  doi: 10.18129/B9.bioc.MsCoreUtils
+  year: '2026'
   version: '>= 1.18.0'
 - type: software
   title: msentropy
@@ -450,7 +445,7 @@ references:
   - family-names: Li
     given-names: Yuanyue
     email: liyuanyue@gmail.com
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.msentropy
   version: '>= 0.1.4'
 - type: software
@@ -467,7 +462,7 @@ references:
   - family-names: Henry
     given-names: Lionel
     email: lionel@posit.co
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.purrr
   version: '>= 1.2.0'
 - type: software
@@ -480,7 +475,7 @@ references:
   - family-names: Bengtsson
     given-names: Henrik
     email: henrikb@braju.com
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.R.utils
   version: '>= 2.13.0'
 - type: software
@@ -500,7 +495,7 @@ references:
     given-names: Yuan
     email: terrytangyuan@gmail.com
     orcid: https://orcid.org/0000-0001-5243-233X
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.reticulate
   version: '>= 1.44.1'
 - type: software
@@ -520,7 +515,7 @@ references:
   - family-names: Winter
     given-names: David
     orcid: https://orcid.org/0000-0002-6165-0029
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.rotl
   version: '>= 3.1.0'
 - type: software
@@ -528,7 +523,7 @@ references:
   abstract: 'Spectra: Spectra Infrastructure for Mass Spectrometry Data'
   notes: Imports
   url: https://github.com/RforMassSpectrometry/Spectra
-  repository: https://bioconductor.org/
+  repository: https://bioc-release.r-universe.dev
   authors:
   - family-names: Gatto
     given-names: Laurent
@@ -546,8 +541,7 @@ references:
     given-names: Philippine
     email: philippine.louail@eurac.edu
     orcid: https://orcid.org/0009-0007-5429-6846
-  year: '2025'
-  doi: 10.18129/B9.bioc.Spectra
+  year: '2026'
   version: '>= 1.16.1'
 - type: software
   title: stats
@@ -558,7 +552,7 @@ references:
   institution:
     name: R Foundation for Statistical Computing
     address: Vienna, Austria
-  year: '2025'
+  year: '2026'
 - type: software
   title: stringi
   abstract: 'stringi: Fast and Portable Character String Processing Facilities'
@@ -570,7 +564,7 @@ references:
     given-names: Marek
     email: marek@gagolewski.com
     orcid: https://orcid.org/0000-0003-0637-6028
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.stringi
   version: '>= 1.8.7'
 - type: software
@@ -584,7 +578,7 @@ references:
     given-names: William Michael
     email: will.landau.oss@gmail.com
     orcid: https://orcid.org/0000-0003-1878-3253
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.targets
   version: '>= 1.11.4'
 - type: software
@@ -600,7 +594,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.tidyselect
   version: '>= 1.2.1'
 - type: software
@@ -613,7 +607,7 @@ references:
   - family-names: Fairbanks
     given-names: Mark
     email: mark.t.fairbanks@gmail.com
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.tidytable
   version: '>= 0.11.2'
 - type: software
@@ -625,7 +619,7 @@ references:
   institution:
     name: R Foundation for Statistical Computing
     address: Vienna, Austria
-  year: '2025'
+  year: '2026'
 - type: software
   title: yaml
   abstract: 'yaml: Methods to Convert R Data to YAML and Back'
@@ -637,7 +631,7 @@ references:
     given-names: Jeremy
   - family-names: Simonov
     given-names: Kirill
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.yaml
   version: '>= 2.3.10'
 - type: software
@@ -655,7 +649,7 @@ references:
     given-names: Vincent
     email: vincent.arel-bundock@umontreal.ca
     orcid: https://orcid.org/0000-0003-2042-7063
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.altdoc
   version: '>= 0.7.0'
 - type: software
@@ -673,20 +667,19 @@ references:
     given-names: Marcel
     email: marcel.ramos@sph.cuny.edu
     orcid: https://orcid.org/0000-0002-3242-0582
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.BiocManager
   version: '>= 1.30.26'
 - type: software
   title: BiocVersion
   abstract: 'BiocVersion: Set the appropriate version of Bioconductor packages'
   notes: Suggests
-  repository: https://bioconductor.org/
+  repository: https://bioc-release.r-universe.dev
   authors:
   - family-names: Morgan
     given-names: Martin
     email: martin.morgan@roswellpark.org
-  year: '2025'
-  doi: 10.18129/B9.bioc.BiocVersion
+  year: '2026'
   version: '>= 3.20.0'
 - type: software
   title: grateful
@@ -703,7 +696,7 @@ references:
     given-names: Connor P.
     email: connor@cpjackson.net
     orcid: https://orcid.org/0000-0002-4220-5210
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.grateful
   version: '>= 0.3.0'
 - type: software
@@ -717,7 +710,7 @@ references:
     given-names: Yihui
     email: xie@yihui.name
     orcid: https://orcid.org/0000-0003-0645-5666
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.knitr
   version: '>= 1.50'
 - type: software
@@ -734,7 +727,7 @@ references:
     given-names: Hadley
     email: hadley@posit.co
     orcid: https://orcid.org/0000-0003-4757-117X
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.lifecycle
   version: '>= 1.0.4'
 - type: software
@@ -753,7 +746,7 @@ references:
   - family-names: Henry
     given-names: Lionel
     email: lionel@posit.co
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.pkgload
   version: '>= 1.4.1'
 - type: software
@@ -771,7 +764,7 @@ references:
     given-names: Christophe
     email: cderv@posit.co
     orcid: https://orcid.org/0000-0003-4474-2498
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.quarto
   version: '>= 1.5.1'
 - type: software
@@ -787,7 +780,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.rlang
   version: '>= 1.1.6'
 - type: software
@@ -831,7 +824,7 @@ references:
     given-names: Alan
   - family-names: Borges
     given-names: Barbara
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.shiny
   version: '>= 1.12.0'
 - type: software
@@ -844,7 +837,7 @@ references:
   - family-names: Mason-Thom
     given-names: Chris
     email: christopher.w.thom@outlook.com
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.shinyhelper
   version: '>= 0.3.2'
 - type: software
@@ -858,7 +851,7 @@ references:
     given-names: Dean
     email: daattali@gmail.com
     orcid: https://orcid.org/0000-0002-5645-3493
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.shinyjs
   version: '>= 2.1.0'
 - type: software
@@ -872,7 +865,7 @@ references:
     given-names: Barret
     email: barret@posit.co
     orcid: https://orcid.org/0000-0001-9986-114X
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.shinytest2
   version: '>= 0.4.1'
 - type: software
@@ -893,7 +886,7 @@ references:
   - family-names: Cheng
     given-names: Joe
     email: joe@posit.co
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.shinyvalidate
   version: '>= 0.1.3'
 - type: software
@@ -910,7 +903,7 @@ references:
   - family-names: Hester
     given-names: Jim
     email: james.hester@rstudio.com
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.spelling
   version: '>= 2.3.2'
 - type: software
@@ -923,7 +916,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.testthat
   version: '>= 3.3.0'
 - type: software
@@ -934,11 +927,10 @@ references:
   repository: https://CRAN.R-project.org/package=visNetwork
   authors:
   - name: Almende B.V. and Contributors
-    website: https://visjs.org/
   - family-names: Thieurmel
     given-names: Benoit
     email: bthieurmel@gmail.com
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.visNetwork
   version: '>= 2.1.4'
 - type: software
@@ -964,7 +956,7 @@ references:
     email: hadley@posit.co
   - family-names: Chang
     given-names: Winston
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.withr
   version: '>= 3.0.2'
 
