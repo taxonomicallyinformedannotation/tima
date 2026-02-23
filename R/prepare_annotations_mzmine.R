@@ -90,12 +90,6 @@ prepare_annotations_mzmine <- function(
       )
     ) |>
       tidytable::bind_rows() |>
-      tidytable::mutate(
-        candidate_structure_error_mz = as.numeric(MZErrorPPM) *
-          1E-6 *
-          as.numeric(Precursor_MZ)
-      ) |>
-      ## WIP TODO HERE
       tidytable::select(
         tidyselect::any_of(
           x = c(
@@ -105,7 +99,7 @@ prepare_annotations_mzmine <- function(
             "candidate_structure_smiles_no_stereo" = "smiles",
             "candidate_structure_molecular_formula" = "mol_formula",
             "candidate_adduct" = "adduct",
-            "candidate_score_similarity" = "score",
+            "candidate_score_similarity" = "score"
           )
         )
       ) |>
@@ -114,9 +108,15 @@ prepare_annotations_mzmine <- function(
         # TODO temporary
         "candidate_library" = "mzmine",
         "candidate_structure_error_mz" = NA_real_,
-        "candidate_structure_error_rt" = NA_real_,
+        "candidate_structure_error_rt" = NA_real_
       ) |>
-      # TODO strip 14 inchikey
+      tidytable::mutate(
+        candidate_structure_inchikey_connectivity_layer = stringi::stri_sub(
+          str = candidate_structure_inchikey_connectivity_layer,
+          from = 1,
+          to = 14
+        )
+      ) |>
       tidytable::mutate(
         "candidate_structure_exact_mass" = NA_real_,
         "candidate_structure_xlogp" = NA_real_,
