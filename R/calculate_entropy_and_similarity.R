@@ -13,159 +13,13 @@
   # Vectorized approach: calculate tolerances for all query peaks at once
   tolerances <- pmax(dalton, ppm * query_mz * 1E-6)
 
-  # Helper to check if a single query peak matches any library peak
-  .peak_has_match <- function(i) {
-    mz <- query_mz[i]
-    tol <- tolerances[i]
-    lower_bound <- mz - tol
-    upper_bound <- mz + tol
+  # Use findInterval for fast binary search - fully vectorized
+  lower_bounds <- query_mz - tolerances
+  upper_bounds <- query_mz + tolerances
+  low_idx <- findInterval(lower_bounds, lib_mz_sorted)
+  high_idx <- findInterval(upper_bounds, lib_mz_sorted, rightmost.closed = TRUE)
 
-    # Binary search for matching peaks
-    low_idx <- findInterval(lower_bound, lib_mz_sorted)
-    high_idx <- findInterval(
-      upper_bound,
-      lib_mz_sorted,
-      rightmost.closed = TRUE
-    )
-
-    # Check if any peaks fall within tolerance
-    as.integer(high_idx > low_idx)
-  }
-
-  # Use findInterval for fast binary search
-  matched_count <- sum(
-    vapply(
-      X = seq_along(query_mz),
-      FUN = .peak_has_match,
-      FUN.VALUE = integer(1)
-    )
-  )
-
-  return(matched_count)
-}
-
-#' Calculate similarity for one library spectrum against query
-#' @keywords internal
-.calc_lib_spectrum_similarity <- function(
-  lib_idx,
-  lib_spectra_sub,
-  lib_precursors_sub,
-  current_spectrum,
-  current_precursor,
-  method,
-  dalton,
-  ppm
-) {
-  lib_spectrum <- lib_spectra_sub[[lib_idx]]
-  score <- calculate_similarity(
-    method = method,
-    query_spectrum = current_spectrum,
-    target_spectrum = lib_spectrum,
-    query_precursor = current_precursor,
-    target_precursor = lib_precursors_sub[[lib_idx]],
-    dalton = dalton,
-    ppm = ppm
-  )
-  entropy_target <- msentropy::calculate_spectral_entropy(lib_spectrum)
-
-  # Count matched peaks
-  query_mz <- current_spectrum[, 1]
-  lib_mz <- lib_spectrum[, 1]
-  matched_peaks <- .count_matched_peaks(query_mz, lib_mz, dalton, ppm)
-
-  list(
-    score = as.numeric(score),
-    entropy = entropy_target,
-    matched = matched_peaks
-  )
-}
-
-#' Process one query spectrum against library
-#' @keywords internal
-.process_query_against_library <- function(
-  spectrum_idx,
-  query_spectra,
-  query_precursors,
-  query_ids,
-  lib_spectra,
-  lib_precursors,
-  lib_ids,
-  approx,
-  dalton,
-  ppm,
-  method,
-  threshold
-) {
-  current_spectrum <- query_spectra[[spectrum_idx]]
-  current_precursor <- query_precursors[spectrum_idx]
-  current_id <- query_ids[spectrum_idx]
-
-  # Filter library spectra by precursor mass if not approximating
-  if (approx == FALSE) {
-    val_ind <- lib_precursors >=
-      min(
-        current_precursor - dalton,
-        current_precursor * (1 - (1E-6 * ppm))
-      ) &
-      lib_precursors <=
-        max(
-          current_precursor + dalton,
-          current_precursor * (1 + (1E-6 * ppm))
-        )
-
-    lib_spectra_sub <- lib_spectra[val_ind]
-    lib_precursors_sub <- lib_precursors[val_ind]
-    lib_ids_sub <- lib_ids[val_ind]
-  } else {
-    lib_spectra_sub <- lib_spectra
-    lib_precursors_sub <- lib_precursors
-    lib_ids_sub <- lib_ids
-  }
-
-  if (length(lib_ids_sub) == 0) {
-    return(NULL)
-  }
-
-  # Calculate similarities for all library matches
-  similarities <- vapply(
-    X = seq_along(lib_spectra_sub),
-    FUN = .calc_lib_spectrum_similarity,
-    FUN.VALUE = list(
-      score = numeric(1),
-      entropy = numeric(1),
-      matched = integer(1)
-    ),
-    lib_spectra_sub = lib_spectra_sub,
-    lib_precursors_sub = lib_precursors_sub,
-    current_spectrum = current_spectrum,
-    current_precursor = current_precursor,
-    method = method,
-    dalton = dalton,
-    ppm = ppm
-  )
-
-  # Filter by threshold
-  if (any(similarities[1, ] >= threshold)) {
-    valid_indices <- which(similarities[1, ] >= threshold)
-
-    if (length(valid_indices) > 0) {
-      return(
-        tidytable::tidytable(
-          feature_id = current_id,
-          precursorMz = current_precursor,
-          target_id = lib_ids_sub[valid_indices],
-          candidate_spectrum_entropy = similarities[2, valid_indices],
-          candidate_score_similarity = similarities[1, valid_indices],
-          candidate_count_similarity_peaks_matched = similarities[
-            3,
-            valid_indices
-          ]
-        )
-      )
-    }
-  }
-
-  NULL
+  sum(high_idx > low_idx)
 }
 
 #' @title Calculate entropy score
@@ -269,36 +123,111 @@ calculate_entropy_and_similarity <- function(
   # Pre-calculate length once for efficiency
   n_queries <- length(query_ids)
 
-  # Progress counter for logging
-  progress_counter <- 0L
-
+  # Use closures to avoid passing large objects through function arguments.
+  # R's lexical scoping means the closure captures references to
+  # lib_spectra, lib_precursors, lib_ids, query_spectra, etc. from the
+  # parent environment without copying them on each iteration.
   results <- lapply(
     X = seq_along(query_spectra),
-    FUN = function(k, ...) {
-      # Increment progress counter in parent environment
-      progress_counter <<- progress_counter + 1L
+    FUN = function(spectrum_idx) {
+      current_spectrum <- query_spectra[[spectrum_idx]]
+      current_precursor <- query_precursors[spectrum_idx]
+      current_id <- query_ids[spectrum_idx]
 
-      res <- .process_query_against_library(k, ...)
+      # Filter library spectra by precursor mass if not approximating
+      if (approx == FALSE) {
+        val_ind <- lib_precursors >=
+          min(
+            current_precursor - dalton,
+            current_precursor * (1 - (1E-6 * ppm))
+          ) &
+          lib_precursors <=
+            max(
+              current_precursor + dalton,
+              current_precursor * (1 + (1E-6 * ppm))
+            )
 
-      if (progress_counter %% 500L == 0L) {
-        log_info("Processed %d / %d queries", progress_counter, n_queries)
+        lib_spectra_sub <- lib_spectra[val_ind]
+        lib_precursors_sub <- lib_precursors[val_ind]
+        lib_ids_sub <- lib_ids[val_ind]
+      } else {
+        lib_spectra_sub <- lib_spectra
+        lib_precursors_sub <- lib_precursors
+        lib_ids_sub <- lib_ids
       }
-      res
-    },
-    query_spectra = query_spectra,
-    query_precursors = query_precursors,
-    query_ids = query_ids,
-    lib_spectra = lib_spectra,
-    lib_precursors = lib_precursors,
-    lib_ids = lib_ids,
-    approx = approx,
-    dalton = dalton,
-    ppm = ppm,
-    method = method,
-    threshold = threshold
+
+      if (length(lib_ids_sub) == 0) {
+        return(NULL)
+      }
+
+      # Calculate similarities using closure over current_spectrum, etc.
+      similarities <- vapply(
+        X = seq_along(lib_spectra_sub),
+        FUN = function(lib_idx) {
+          lib_spectrum <- lib_spectra_sub[[lib_idx]]
+          score <- calculate_similarity(
+            method = method,
+            query_spectrum = current_spectrum,
+            target_spectrum = lib_spectrum,
+            query_precursor = current_precursor,
+            target_precursor = lib_precursors_sub[[lib_idx]],
+            dalton = dalton,
+            ppm = ppm
+          )
+          entropy_target <- msentropy::calculate_spectral_entropy(lib_spectrum)
+
+          # Count matched peaks
+          query_mz <- current_spectrum[, 1]
+          lib_mz <- lib_spectrum[, 1]
+          matched_peaks <- .count_matched_peaks(
+            query_mz,
+            lib_mz,
+            dalton,
+            ppm
+          )
+
+          list(
+            score = as.numeric(score),
+            entropy = entropy_target,
+            matched = matched_peaks
+          )
+        },
+        FUN.VALUE = list(
+          score = numeric(1),
+          entropy = numeric(1),
+          matched = integer(1)
+        )
+      )
+
+      # Filter by threshold
+      if (any(similarities[1, ] >= threshold)) {
+        valid_indices <- which(similarities[1, ] >= threshold)
+
+        if (length(valid_indices) > 0) {
+          return(
+            tidytable::tidytable(
+              feature_id = current_id,
+              precursorMz = current_precursor,
+              target_id = lib_ids_sub[valid_indices],
+              candidate_spectrum_entropy = similarities[2, valid_indices],
+              candidate_score_similarity = similarities[1, valid_indices],
+              candidate_count_similarity_peaks_matched = similarities[
+                3,
+                valid_indices
+              ]
+            )
+          )
+        }
+      }
+
+      NULL
+    }
   )
 
-  if (all(sapply(X = results, FUN = is.null))) {
+  # Log progress summary
+  log_info("Processed %d / %d queries", n_queries, n_queries)
+
+  if (all(vapply(X = results, FUN = is.null, FUN.VALUE = logical(1)))) {
     result <- tidytable::tidytable(
       feature_id = NA_integer_,
       precursorMz = NA_real_,
@@ -308,7 +237,9 @@ calculate_entropy_and_similarity <- function(
       candidate_count_similarity_peaks_matched = NA_integer_
     )
   } else {
-    result <- tidytable::bind_rows(results[!sapply(X = results, FUN = is.null)])
+    result <- tidytable::bind_rows(
+      results[!vapply(X = results, FUN = is.null, FUN.VALUE = logical(1))]
+    )
   }
 
   log_complete(ctx, n_comparisons = nrow(result))
