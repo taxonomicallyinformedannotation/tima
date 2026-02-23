@@ -12,6 +12,7 @@
     "ann_thr_ms1_con": "OR",
     "close": 0,
     "compounds_names": false,
+    "fil_ann_raw_mzm": null,
     "fil_ann_raw_sir": null,
     "fil_fea_raw": {
       "name": [

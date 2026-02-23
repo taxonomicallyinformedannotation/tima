@@ -386,7 +386,7 @@ prepare_params <- function(
     fil_lib_sop_mer_str_tax_cla
   yamls_params$prepare_annotations_gnps$files$libraries$sop$merged$structures$taxonomies$npc <-
     fil_lib_sop_mer_str_tax_npc
-  
+
   ## prepare_annotations_mzmine
   yamls_params$prepare_annotations_mzmine$files$annotations$raw$spectral$mzmine <-
     fil_ann_raw_spe_mzm
@@ -813,7 +813,7 @@ prepare_params <- function(
   yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural$gnps <-
     yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural$gnps |>
     purrr::map(.f = replace_id)
-  
+
   ## prepare_annotations_mzmine
   # yamls_params$prepare_annotations_mzmine$files$annotations$raw$spectral$mzmine <-
   #   yamls_params$prepare_annotations_mzmine$files$annotations$raw$spectral$mzmine |>

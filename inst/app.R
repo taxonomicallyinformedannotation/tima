@@ -1926,7 +1926,10 @@ ui <- shiny::fluidPage(
     prefil_met_raw_1 <- file.path(paths_data_source, prefil_met_raw[[1]])
   }
   if (!is.null(prefil_mzm_raw)) {
-    prefil_mzm_raw_1 <- file.path(paths_data_interim_annotations, prefil_mzm_raw[[1]])
+    prefil_mzm_raw_1 <- file.path(
+      paths_data_interim_annotations,
+      prefil_mzm_raw[[1]]
+    )
   }
   if (!is.null(prefil_sir_raw)) {
     prefil_sir_raw_1 <-
