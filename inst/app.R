@@ -188,7 +188,6 @@ ui <- shiny::fluidPage(
                 "For example, the corresponding SIRIUS results will be named:",
                 "`yourPattern_sirius`."
               )
-            )
             ),
           shiny::hr(),
           shiny::h3("Alternative: Import from mzTab-M"),
