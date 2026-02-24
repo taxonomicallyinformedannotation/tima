@@ -362,10 +362,12 @@ import_and_clean_library_collection <- function(paths, dalton, polarity, ppm) {
 }
 
 remove_empty_peak_spectra <- function(sp) {
-  empty_flags <- sp@backend@peaksData |>
-    purrr::map(.f = is.null) |>
-    purrr::map_lgl(.f = any)
-  sp[!empty_flags]
+  has_peaks <- !vapply(
+    sp@backend@peaksData,
+    is.null,
+    logical(1)
+  )
+  sp[has_peaks]
 }
 
 extract_vector <- function(obj, field, len, fill = NA) {
@@ -550,7 +552,8 @@ finalize_results <- function(df_sim, meta, threshold) {
 }
 
 log_library_stats <- function(lib_sp) {
-  sd <- Spectra::spectraData(object = lib_sp)
+  # Use backend spectraData directly to avoid materializing peak data
+  sd <- lib_sp@backend@spectraData
   if (!"library" %in% names(sd)) {
     return(invisible(NULL))
   }
