@@ -1,0 +1,45 @@
+---
+#' mzTab-M Import Parameters
+files:
+  #' Input files
+  input:
+    #' Path to mzTab-M file (set to empty string "" to disable mzTab import). STRING
+    mztab: ""
+  
+  #' Output files from mzTab import
+  features:
+    #' Raw features table extracted from mzTab. STRING
+    raw: data/interim/features/features_from_mztab.csv
+  
+  #' Spectra file path (MGF format). STRING
+  spectra: data/source/spectra_from_mztab.mgf
+  
+  #' Metadata file path. STRING
+  metadata: data/source/metadata_from_mztab.csv
+  
+  #' Output annotated mzTab file
+  output:
+    #' Annotated mzTab file path. STRING
+    mztab: data/output/annotated.mztab
+
+#' Column name mappings
+names:
+  #' Feature ID column name. STRING
+  features: feature_id
+  
+  #' Retention time column name. STRING
+  rt: rt
+  
+  #' M/Z column name. STRING
+  precursor: mz
+  
+  #' Adduct column name. STRING
+  adduct: adduct
+
+#' Export settings for annotated mzTab
+export:
+  #' Number of top annotations per feature to include (NULL for all). INTEGER
+  top_n: 3
+  
+  #' Minimum score threshold for inclusion (0-1). FLOAT
+  score_threshold: 0.0

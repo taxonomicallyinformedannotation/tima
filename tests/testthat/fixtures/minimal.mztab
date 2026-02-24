@@ -1,0 +1,12 @@
+COM	This is a minimal mzTab-M test file
+MTD	mzTab-version	2.0.0-M
+MTD	mzTab-id	TIMA_TEST_001
+MTD	description	Minimal mzTab-M for testing
+MTD	sample[1]	TestSample1
+MTD	assay[1]-sample_ref	sample[1]
+MTD	ms_run[1]-location	file:///test/sample1.mzML
+SMH	SML_ID	chemical_name	chemical_formula	smiles	inchi	inchikey	adduct_ions	reliability	exp_mass_to_charge	retention_time_in_seconds	theoretical_neutral_mass	abundance_assay[1]
+SML	1	Quercetin	C15H10O7	OC1=CC(O)=C2C(=O)C(O)=C(OC2=C1)C1=CC=C(O)C(O)=C1	InChI=1S/C15H10O7/c16-7-4-10(19)12-11(5-7)22-15(14(21)13(12)20)6-1-2-8(17)9(18)3-6/h1-5,16-19,21H	REFJWTPEDVJJIY-UHFFFAOYSA-N	[M+H]1+	2	303.0505	180.0	302.0427	10000
+SML	2	Kaempferol	C15H10O6	OC1=CC(O)=C2C(=O)C(O)=C(OC2=C1)C1=CC=C(O)C=C1	null	IYRMWMYOFI5XKO-UHFFFAOYSA-N	[M-H]1-	3	285.0399	210.0	286.0477	5000
+SML	3	Unknown	null	null	null	null	[M+H]1+	4	150.0	120.0	null	2000
+

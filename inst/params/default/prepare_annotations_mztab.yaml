@@ -1,0 +1,41 @@
+---
+#' mzTab-M Annotation Preparation Parameters
+files:
+  #' Input mzTab file (should match read_mztab input). STRING
+  input:
+    mztab: ""
+  
+  #' Annotations files
+  annotations:
+    #' Prepared annotations
+    prepared:
+      #' Structural annotations
+      structural:
+        #' Prepared mzTab structural annotations. STRING
+        mztab: data/interim/annotations/mztabPrepared.tsv.gz
+  
+  #' Libraries files
+  libraries:
+    #' Structure organism pairs libraries
+    sop:
+      #' Merged structure organism pairs library
+      merged:
+        #' Structures libraries
+        structures:
+          #' Structures stereo. STRING
+          stereo: data/interim/libraries/sop/merged/structures/stereo.tsv.gz
+          
+          #' Structures metadata. STRING
+          metadata: data/interim/libraries/sop/merged/structures/metadata.tsv.gz
+          
+          #' Structures names. STRING
+          names: data/interim/libraries/sop/merged/structures/names.tsv.gz
+          
+          #' Structures taxonomies
+          taxonomies:
+            #' Classyfire structures taxonomy. STRING
+            cla: data/interim/libraries/sop/merged/structures/taxonomies/classyfire.tsv.gz
+            
+            #' NPClassifier structures taxonomy. STRING
+            npc: data/interim/libraries/sop/merged/structures/taxonomies/npc.tsv.gz
+
