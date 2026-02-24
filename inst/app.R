@@ -189,6 +189,75 @@ ui <- shiny::fluidPage(
                 "`yourPattern_sirius`."
               )
             )
+            ),
+          shiny::hr(),
+          shiny::h3("Alternative: Import from mzTab-M"),
+          shiny::p(
+            "If you have an mzTab-M file, you can import features and spectra directly.",
+            "This will override the MGF and features table inputs above."
+          ),
+          shiny::div(
+            shiny::fileInput(
+              inputId = "fil_mzt_raw",
+              label = "mzTab-M file (optional)",
+              accept = c(".mztab", ".mztab.txt")
+            ),
+            shiny::downloadButton(
+              outputId = "demo_mzt",
+              "Download example mzTab-M"
+            )
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = c(
+                "mzTab-M (Metabolomics) format file following PSI standard.",
+                "Must contain Small Molecule (SML) table with features.",
+                "MS/MS spectra (SME table) are optional - MS1-only MGF will be created if missing.",
+                "Metadata section will be extracted automatically if available.",
+                "See: https://github.com/HUPO-PSI/mzTab-M/"
+              )
+            ),
+          shiny::checkboxInput(
+            inputId = "opt_mzt_exp",
+            label = "Export annotated results back to mzTab-M format",
+            value = TRUE
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = c(
+                "After TIMA annotation completes, export results to mzTab-M format.",
+                "Creates annotated.mztab with TIMA scores and structural annotations.",
+                "Preserves original mzTab data and adds TIMA results as custom fields."
+              )
+            ),
+          shiny::conditionalPanel(
+            condition = "input.opt_mzt_exp == true",
+            shiny::numericInput(
+              inputId = "opt_mzt_top",
+              label = "Top N annotations per feature",
+              value = 1,
+              min = 1,
+              max = 10,
+              step = 1
+            ) |>
+              shinyhelper::helper(
+                type = "inline",
+                content = "Number of top-scored annotation candidates to include per feature in exported mzTab-M"
+              ),
+            shiny::sliderInput(
+              inputId = "opt_mzt_thr",
+              label = "Minimum score threshold",
+              value = 0.0,
+              min = 0.0,
+              max = 1.0,
+              step = 0.05,
+              ticks = FALSE
+            ) |>
+              shinyhelper::helper(
+                type = "inline",
+                content = "Only annotations with scores above this threshold will be included in exported mzTab-M"
+              )
+          )
         ),
         shiny::tabPanel(
           title = "Annotations",
@@ -2010,9 +2079,64 @@ ui <- shiny::fluidPage(
     lib_tmp_is_csv <- NULL
   }
 
-  fil_fea_raw <- prefil_fea_raw_1
-  fil_spe_raw <- prefil_spe_raw_1
-  fil_met_raw <- prefil_met_raw_1
+  ## mzTab-M processing ----
+  if (!is.null(prefil_mzt_raw)) {
+    # Copy mzTab file
+    prefil_mzt_raw_1 <- file.path(
+      paths_data_source,
+      paste0(shiny::isolate(input$fil_pat), ".mztab")
+    )
+
+    if (!file.exists(prefil_mzt_raw_1)) {
+      fs::file_copy(
+        path = prefil_mzt_raw[[4]],
+        new_path = file.path(prefil_mzt_raw_1),
+        overwrite = TRUE
+      )
+    }
+
+    # Import mzTab-M and extract features, spectra, metadata
+    tryCatch(
+      {
+        mztab_paths <- tima::read_mztab(
+          input = prefil_mzt_raw_1,
+          output_features = file.path(
+            tima:::get_default_paths()$data$interim$features$path,
+            paste0(shiny::isolate(input$fil_pat), "_features.csv")
+          ),
+          output_spectra = file.path(
+            paths_data_source,
+            paste0(shiny::isolate(input$fil_pat), "_spectra.mgf")
+          ),
+          output_metadata = file.path(
+            paths_data_source,
+            paste0(shiny::isolate(input$fil_pat), "_metadata.csv")
+          )
+        )
+
+        # Override file paths if mzTab was successfully imported
+        if (!is.null(mztab_paths$features)) {
+          fil_fea_raw <- mztab_paths$features
+        }
+        if (!is.null(mztab_paths$spectra)) {
+          fil_spe_raw <- mztab_paths$spectra
+        }
+        if (!is.null(mztab_paths$metadata)) {
+          fil_met_raw <- mztab_paths$metadata
+        }
+      },
+      error = function(e) {
+        message("mzTab-M import failed: ", conditionMessage(e))
+        # Continue with original files if mzTab import fails
+      }
+    )
+  } else {
+    fil_fea_raw <- prefil_fea_raw_1
+    fil_spe_raw <- prefil_spe_raw_1
+    fil_met_raw <- prefil_met_raw_1
+  }
+
+  fil_mzm_raw <- prefil_mzm_raw_1
   fil_sir_raw <- prefil_sir_raw_1
 
   fil_pat <- shiny::isolate(input$fil_pat)
@@ -2043,6 +2167,18 @@ ui <- shiny::fluidPage(
   yaml_small$organisms$taxon <- org_tax
   yaml_small$options$high_confidence <- hig_con
   yaml_small$options$summarize <- summarize
+
+  # Add mzTab parameters if mzTab was used
+  if (!is.null(prefil_mzt_raw)) {
+    yaml_small$mztab$input <- file.path(
+      paths_data_source,
+      paste0(fil_pat, ".mztab")
+    )
+    yaml_small$mztab$export_enabled <- shiny::isolate(input$opt_mzt_exp)
+    yaml_small$mztab$top_n <- shiny::isolate(input$opt_mzt_top)
+    yaml_small$mztab$score_threshold <- shiny::isolate(input$opt_mzt_thr)
+  }
+
   tima:::create_dir("params")
   yaml::write_yaml(
     x = yaml_small,
@@ -2413,29 +2549,123 @@ server <- function(input, output) {
     }
   )
 
-  ## Mandatory fields
-  fields_mandatory <- c("fil_fea_raw", "fil_spe_raw", "fil_pat")
+  ## Reactive mzTab processing ----
+  # Automatically process mzTab when uploaded
+  mztab_processed <- shiny::reactiveVal(NULL)
+
+  shiny::observeEvent(input$fil_mzt_raw, {
+    req(input$fil_mzt_raw, input$fil_pat)
+
+    # Show processing notification
+    notification_id <- shiny::showNotification(
+      "Processing mzTab-M file...",
+      duration = NULL,
+      type = "message"
+    )
+
+    tryCatch(
+      {
+        paths_data_source <- tima:::get_default_paths()$data$source$path
+
+        # Copy mzTab file
+        mztab_path <- file.path(
+          paths_data_source,
+          paste0(input$fil_pat, ".mztab")
+        )
+
+        tima:::create_dir(paths_data_source)
+        file.copy(input$fil_mzt_raw$datapath, mztab_path, overwrite = TRUE)
+
+        # Process mzTab
+        paths <- tima::read_mztab(
+          input = mztab_path,
+          output_features = file.path(
+            tima:::get_default_paths()$data$interim$features$path,
+            paste0(input$fil_pat, "_features.csv")
+          ),
+          output_spectra = file.path(
+            paths_data_source,
+            paste0(input$fil_pat, "_spectra.mgf")
+          ),
+          output_metadata = file.path(
+            paths_data_source,
+            paste0(input$fil_pat, "_metadata.csv")
+          )
+        )
+
+        # Store processed paths
+        mztab_processed(paths)
+
+        # Success notification
+        shiny::removeNotification(notification_id)
+        shiny::showNotification(
+          paste0(
+            "mzTab-M processed successfully!\n",
+            "Features: ",
+            ifelse(!is.null(paths$features), "✓", "✗"),
+            "\n",
+            "Spectra: ",
+            ifelse(!is.null(paths$spectra), "✓ (", "✗"),
+            ifelse(
+              !is.null(paths$spectra),
+              ifelse(
+                grepl(
+                  "MS1",
+                  readLines(paths$spectra, n = 20),
+                  ignore.case = TRUE
+                ),
+                "MS1-only",
+                "MS2"
+              ),
+              ""
+            ),
+            ")\n",
+            "Metadata: ",
+            ifelse(!is.null(paths$metadata), "✓", "✗")
+          ),
+          duration = 10,
+          type = "message"
+        )
+      },
+      error = function(e) {
+        shiny::removeNotification(notification_id)
+        shiny::showNotification(
+          paste("Failed to process mzTab-M:", conditionMessage(e)),
+          duration = NULL,
+          type = "error"
+        )
+        mztab_processed(NULL)
+      }
+    )
+  })
+
+  ## Mandatory fields - pattern and either (mzTab) OR (features + spectra)
 
   ## Enable the Submit button when all mandatory fields are filled out
   shiny::observe(x = {
-    mandatory_filled <-
-      vapply(
-        X = fields_mandatory,
-        FUN = function(x) {
-          suppressWarnings(any(!is.null(input[[x]]), input[[x]] != ""))
-        },
-        FUN.VALUE = logical(1)
-      ) |>
-      all()
+    # Pattern is always required
+    pattern_filled <- !is.null(input$fil_pat) && input$fil_pat != ""
 
+    # Either mzTab OR (features + spectra)
+    mztab_filled <- !is.null(input$fil_mzt_raw) && length(input$fil_mzt_raw) > 0
+    regular_filled <- (!is.null(input$fil_fea_raw) &&
+      length(input$fil_fea_raw) > 0) &&
+      (!is.null(input$fil_spe_raw) && length(input$fil_spe_raw) > 0)
+
+    data_filled <- mztab_filled || regular_filled
+
+    # Taxon: metadata file OR manual entry OR mzTab (which includes metadata)
     taxon_filled <- {
       taxon_fil <- input[["fil_met_raw"]][1]
       taxon_man <- input[["org_tax"]]
+      has_mztab <- !is.null(input$fil_mzt_raw) && length(input$fil_mzt_raw) > 0
+
       (!is.null(taxon_fil) && taxon_fil != "") ||
-        (!is.null(taxon_man) && taxon_man != "")
+        (!is.null(taxon_man) && taxon_man != "") ||
+        has_mztab # mzTab may contain metadata
     }
 
-    all_conditions <- mandatory_filled && taxon_filled
+    all_conditions <- pattern_filled && data_filled && taxon_filled
 
     shinyjs::toggleState(id = "save", condition = all_conditions)
     shinyjs::toggleState(id = "launch", condition = input$save >= 1)
@@ -2568,6 +2798,43 @@ server <- function(input, output) {
       })
     })
   })
+
+  ## Download handler for example mzTab-M file ----
+  output$demo_mzt <- shiny::downloadHandler(
+    filename = "example.mztab",
+    content = function(file) {
+      # Check if example file exists in inst/extdata
+      example_path <- system.file("extdata", "example.mztab", package = "tima")
+
+      if (file.exists(example_path)) {
+        file.copy(example_path, file)
+      } else {
+        # Download from GitHub if not bundled or create minimal example
+        tryCatch(
+          {
+            utils::download.file(
+              url = "https://github.com/HUPO-PSI/mzTab-M/raw/main/examples/masster_0.5.25_null.mztab",
+              destfile = file,
+              mode = "wb"
+            )
+          },
+          error = function(e) {
+            # Create minimal example if download fails
+            writeLines(
+              c(
+                "COM\tExample mzTab-M file",
+                "MTD\tmzTab-version\t2.0.0-M",
+                "MTD\tmzTab-id\tExample",
+                "SMH\tSML_ID\texp_mass_to_charge\tretention_time_in_seconds\tadduct_ions",
+                "SML\t1\t181.0501\t120.5\t[M+H]1+"
+              ),
+              file
+            )
+          }
+        )
+      }
+    }
+  )
 }
 
 url <- "<http://127.0.0.1:3838>"

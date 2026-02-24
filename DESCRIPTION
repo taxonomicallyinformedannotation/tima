@@ -61,6 +61,7 @@ Suggests:
     pkgload (>= 1.4.1),
     quarto (>= 1.5.1),
     rlang (>= 1.1.6),
+    RmzTabM (>= 0.97.2),
     shiny (>= 1.12.0),
     shinyhelper (>= 0.3.2),
     shinyjs (>= 2.1.0),
@@ -148,10 +149,12 @@ Collate:
     'harmonize_names_sirius.R'
     'harmonize_spectra.R'
     'install.R'
+    'mztab_utils.R'
     'pre_harmonize_names_sirius.R'
     'select_annotations_columns.R'
     'prepare_annotations_gnps.R'
     'prepare_annotations_mzmine.R'
+    'prepare_annotations_mztab.R'
     'select_sirius_columns.R'
     'read_from_sirius_zip.R'
     'prepare_annotations_sirius.R'
@@ -173,6 +176,7 @@ Collate:
     'prepare_libraries_spectra.R'
     'prepare_params.R'
     'prepare_taxa.R'
+    'read_mztab.R'
     'replace_id.R'
     'run_app.R'
     'run_tima.R'
@@ -184,3 +188,4 @@ Collate:
     'weight_chemo.R'
     'weight_bio.R'
     'weight_annotations.R'
+    'write_mztab.R'

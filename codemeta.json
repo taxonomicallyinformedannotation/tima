@@ -539,6 +539,12 @@
     },
     "22": {
       "@type": "SoftwareApplication",
+      "identifier": "RmzTabM",
+      "name": "RmzTabM",
+      "version": ">= 0.97.2"
+    },
+    "23": {
+      "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
       "version": ">= 3.1.0",
@@ -550,7 +556,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "23": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -563,12 +569,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "24": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "25": {
+    "26": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -581,7 +587,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "26": {
+    "27": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -594,7 +600,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "27": {
+    "28": {
       "@type": "SoftwareApplication",
       "identifier": "tidyselect",
       "name": "tidyselect",
@@ -607,7 +613,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyselect"
     },
-    "28": {
+    "29": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -620,12 +626,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "29": {
+    "30": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "30": {
+    "31": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -641,7 +647,7 @@
     "SystemRequirements": "\n    python (< 3.14,>= 3.10)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome", "lc-msms", "metabolite-annotation", "metabolomics", "natural-products", "scoring-system", "taxonomy", "specialized-metabolome", "r"],
-  "fileSize": "4364.466KB",
+  "fileSize": "4472.138KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

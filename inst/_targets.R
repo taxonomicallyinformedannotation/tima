@@ -264,6 +264,26 @@ list(
           )
         },
         format = "file"
+      ),
+      tar_target(
+        name = par_def_rea_mzt,
+        command = {
+          par_def_rea_mzt <- system.file(
+            "params/default/read_mztab.yaml",
+            package = "tima"
+          )
+        },
+        format = "file"
+      ),
+      tar_target(
+        name = par_def_pre_ann_mzt,
+        command = {
+          par_def_pre_ann_mzt <- system.file(
+            "params/default/prepare_annotations_mztab.yaml",
+            package = "tima"
+          )
+        },
+        format = "file"
       )
     ),
     list(
@@ -569,6 +589,30 @@ list(
               )
           },
           format = "file"
+        ),
+        tar_target(
+          name = par_usr_rea_mzt,
+          command = {
+            par_usr_rea_mzt <-
+              prepare_params(
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
+                step = "read_mztab"
+              )
+          },
+          format = "file"
+        ),
+        tar_target(
+          name = par_usr_pre_ann_mzt,
+          command = {
+            par_usr_pre_ann_mzt <-
+              prepare_params(
+                params_small = par_fin_par,
+                params_advanced = par_fin_par2,
+                step = "prepare_annotations_mztab"
+              )
+          },
+          format = "file"
         )
       )
     ),
@@ -815,11 +859,58 @@ list(
             )
         },
         format = "rds"
+      ),
+      tar_target(
+        name = par_rea_mzt,
+        command = {
+          par_rea_mzt <-
+            tima:::parse_yaml_params(
+              def = par_def_rea_mzt,
+              usr = par_usr_rea_mzt[[1]]
+            )
+        },
+        format = "rds"
+      ),
+      tar_target(
+        name = par_pre_ann_mzt,
+        command = {
+          par_pre_ann_mzt <-
+            tima:::parse_yaml_params(
+              def = par_def_pre_ann_mzt,
+              usr = par_usr_pre_ann_mzt[[1]]
+            )
+        },
+        format = "rds"
       )
     )
   ),
   ## Inputs
   list(
+    ## mzTab-M import (optional) ----
+    tar_target(
+      name = mzt_imp,
+      command = {
+        mzt_fil <- par_rea_mzt$files$input$mztab
+
+        # Only process if mzTab file path is provided and exists
+        if (
+          !is.null(mzt_fil) &&
+            nzchar(mzt_fil) &&
+            file.exists(mzt_fil)
+        ) {
+          mzt_imp <- read_mztab(
+            input = mzt_fil,
+            output_features = par_rea_mzt$files$features$raw,
+            output_spectra = par_rea_mzt$files$spectra,
+            output_metadata = par_rea_mzt$files$metadata
+          )
+        } else {
+          # Return list with NULL paths if no mzTab
+          mzt_imp <- list(features = NULL, spectra = NULL, metadata = NULL)
+        }
+      },
+      format = "rds"
+    ),
     tar_target(
       name = par_pre_fea_tab_fil_fea_raw,
       command = {
@@ -830,16 +921,12 @@ list(
     tar_target(
       name = input_features,
       command = {
-        input_features <- par_pre_fea_tab_fil_fea_raw
-        # input_features <-
-        #   ifelse(
-        #     test = !is.null(gnps_features),
-        #     yes = ifelse(test = file.exists(gnps_features),
-        #       yes = gnps_features,
-        #       no = par_pre_tax$files$features$raw
-        #     ),
-        #     no = par_pre_tax$files$features$raw
-        #   )
+        # Use mzTab features if available, otherwise use regular input
+        if (!is.null(mzt_imp$features) && file.exists(mzt_imp$features)) {
+          mzt_imp$features
+        } else {
+          par_pre_fea_tab_fil_fea_raw
+        }
       },
       format = "file"
     ),
@@ -856,17 +943,11 @@ list(
         input_spectra <-
           ifelse(
             test = paths$test$mode == FALSE,
-            yes = par_ann_spe_fil_spe_raw,
-            # yes = ifelse(
-            #   test = !is.null(gnps_spectra),
-            #   yes =
-            #     ifelse(
-            #       test = file.exists(gnps_spectra),
-            #       yes = gnps_spectra,
-            #       no = par_ann_spe$files$spectral$raw
-            #     ),
-            #   no = par_ann_spe$files$spectral$raw
-            # ),
+            yes = ifelse(
+              test = !is.null(mzt_imp$spectra) && file.exists(mzt_imp$spectra),
+              yes = mzt_imp$spectra,
+              no = par_ann_spe_fil_spe_raw
+            ),
             no = {
               get_file(
                 url = paths$urls$examples$spectra$mini,
@@ -874,6 +955,26 @@ list(
               )
             }
           )
+      },
+      format = "file"
+    ),
+    ## Metadata path selection
+    tar_target(
+      name = par_pre_tax_fil_met_raw,
+      command = {
+        par_pre_tax$files$metadata$raw
+      },
+      format = "file"
+    ),
+    tar_target(
+      name = input_metadata,
+      command = {
+        # Use mzTab metadata if available, otherwise use regular input
+        if (!is.null(mzt_imp$metadata) && file.exists(mzt_imp$metadata)) {
+          mzt_imp$metadata
+        } else {
+          par_pre_tax_fil_met_raw
+        }
       },
       format = "file"
     )
@@ -1584,7 +1685,33 @@ list(
       },
       format = "file"
     ),
-    list()
+    ## mzTab annotations ----
+    tar_target(
+      name = ann_mzt_pre,
+      command = {
+        mzt_fil <- par_rea_mzt$files$input$mztab
+
+        if (
+          !is.null(mzt_fil) &&
+            nzchar(mzt_fil) &&
+            file.exists(mzt_fil)
+        ) {
+          ann_mzt_pre <- prepare_annotations_mztab(
+            input = mzt_fil,
+            output = par_pre_ann_mztab$files$annotations$prepared$structural$mztab,
+            str_stereo = lib_mer_str_stereo,
+            str_met = lib_mer_str_met,
+            str_nam = lib_mer_str_nam,
+            str_tax_cla = lib_mer_str_tax_cla,
+            str_tax_npc = lib_mer_str_tax_npc
+          )
+        } else {
+          # Create empty placeholder if no mzTab
+          ann_mzt_pre <- NULL
+        }
+      },
+      format = "file"
+    )
   ),
   ## Features
   list(
@@ -1689,7 +1816,7 @@ list(
         name_filename = par_pre_tax$names$filename,
         extension = par_pre_tax$names$extension,
         colname = par_pre_tax$names$taxon,
-        metadata = par_pre_tax$files$metadata$raw,
+        metadata = input_metadata,
         org_tax_ott = lib_mer_org_tax_ott,
         output = par_pre_tax$files$metadata$prepared,
         taxon = par_pre_tax$organisms$taxon
@@ -1770,6 +1897,31 @@ list(
         pattern = par_wei_ann$files$pattern,
         force = par_wei_ann$options$force
       )
+    },
+    format = "file"
+  ),
+  ## mzTab export ----
+  tar_target(
+    name = mzt_ann,
+    command = {
+      mzt_fil <- par_rea_mzt$files$input$mztab
+
+      # Only export if we imported from mzTab originally
+      if (
+        !is.null(mzt_fil) &&
+          nzchar(mzt_fil) &&
+          file.exists(mzt_fil)
+      ) {
+        mzt_ann <- write_mztab(
+          annotations = ann_wei,
+          original_mztab = mzt_fil,
+          output = par_rea_mzt$files$output$mztab,
+          top_n = par_rea_mzt$export$top_n,
+          score_threshold = par_rea_mzt$export$score_threshold
+        )
+      } else {
+        mzt_ann <- NULL
+      }
     },
     format = "file"
   ),
