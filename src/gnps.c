@@ -48,7 +48,7 @@
 #  define PREFETCH(p) ((void)0)
 #endif
 
-#define DENSE_THRESHOLD 128
+#define DENSE_THRESHOLD 16
 
 /* ── Allocation helpers ──────────────────────────────────────────────────── */
 static void *xmalloc(size_t n)
