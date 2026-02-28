@@ -79,3 +79,44 @@ join_gnps_wrapper <- function(
     ppm = ppm
   )
 }
+
+#' @title Wrapper for the C function "gnps_compute"
+#'
+#' @description Performs GNPS-style peak matching between query and target
+#'     mass lists with tolerance-based matching and precursor filtering
+#'
+#' @param x Numeric vector of query m/z values
+#' @param y Numeric vector of target m/z values
+#' @param xPrecursorMz Numeric precursor m/z for query spectrum
+#' @param yPrecursorMz Numeric precursor m/z for target spectrum
+#' @param tolerance Numeric value specifying the absolute tolerance in Daltons
+#' @param ppm Numeric value specifying the relative tolerance in ppm
+#'
+#' @return A list with two integer vectors:
+#'   \item{indices_x}{Indices of matched peaks in x}
+#'   \item{indices_y}{Indices of matched peaks in y}
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' query_mz <- c(100.05, 200.10, 300.15)
+#' target_mz <- c(100.06, 200.11, 400.20)
+#' matches <- join_gnps_wrapper(
+#'   x = query_mz,
+#'   y = target_mz,
+#'   xPrecursorMz = 500.0,
+#'   yPrecursorMz = 500.0,
+#'   tolerance = 0.01,
+#'   ppm = 10
+#' )
+#' }
+gnps_compute_wrapper <- function(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm) {
+  .Call("gnps_compute",
+        x = x, y = y,
+        xPrecursorMz = xPrecursorMz,
+        yPrecursorMz = yPrecursorMz,
+        tolerance = tolerance,
+        ppm = ppm
+  )
+}
