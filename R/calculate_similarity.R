@@ -155,22 +155,24 @@ calculate_similarity <- function(
   matched_x <- map[[1L]]
   matched_y <- map[[2L]]
 
-  # Early exit if no matches
+  # Filter unmatched (NA) entries and deduplicate shifted+direct overlaps
+  valid <- !is.na(matched_x) & !is.na(matched_y)
+  matched_x <- matched_x[valid]
+  matched_y <- matched_y[valid]
+
   if (length(matched_x) == 0L) {
-    # log_trace("No matching peaks found between spectra")
     return(
-      if (return_matched_peaks) {
-        list(score = 0.0, matches = 0L)
-      } else {
-        0.0
-      }
+      if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0
     )
   }
 
-  # Extract matched peaks (drop=FALSE preserves matrix structure)
+  # Deduplicate: precursor-shift pass can produce pairs already in direct pass
+  dups <- duplicated(data.frame(x = matched_x, y = matched_y))
+  matched_x <- matched_x[!dups]
+  matched_y <- matched_y[!dups]
+
   x_mat <- query_spectrum[matched_x, , drop = FALSE]
   y_mat <- target_spectrum[matched_y, , drop = FALSE]
-
   # Calculate similarity using optimized C GNPS algorithm
   result <- tryCatch(
     gnps_wrapper(x = x_mat, y = y_mat),

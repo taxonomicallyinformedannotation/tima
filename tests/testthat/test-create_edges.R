@@ -155,12 +155,12 @@ test_that("create_edges filters by similarity threshold", {
   # Create very different spectra (low similarity expected)
   frags <- list(
     matrix(
-      c(100, 1000, 200, 500),
+      c(100, 400, 1000, 500, 200, 500),
       ncol = 2,
       dimnames = list(NULL, c("mz", "int"))
     ),
     matrix(
-      c(400, 1000, 500, 500),
+      c(100, 400, 1000, 0, 500, 500),
       ncol = 2,
       dimnames = list(NULL, c("mz", "int"))
     )

@@ -16,7 +16,7 @@ create_edges(
 )
 }
 \arguments{
-\item{frags}{List of fragment spectra matrices}
+\item{frags}{List of aligned fragment spectra matrices}
 
 \item{nspecs}{Integer number of spectra}
 

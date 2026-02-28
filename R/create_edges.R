@@ -125,7 +125,7 @@
 #' @include predicates_utils.R
 #' @include validations_utils.R
 #'
-#' @param frags List of fragment spectra matrices
+#' @param frags List of aligned fragment spectra matrices
 #' @param nspecs Integer number of spectra
 #' @param precs Numeric vector of precursor m/z values
 #' @param method Similarity method ("entropy", "gnps", or "cosine")
