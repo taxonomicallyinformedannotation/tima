@@ -307,24 +307,43 @@ for(int i=0;i<u_count;i++){
   arcs[i].col=col_map[arcs[i].col];
 }
 free(row_map); free(col_map);
-int m=(nr>nc)?nr:nc;
+/* Use nr rows only — columns beyond nr stay unassigned (score 0).
+ * Squaring to max(nr,nc) creates empty rows that make LAPJV infeasible. */
+int m = nr;
+/* re-sort after index remapping so CSR columns are in order */
+qsort(arcs,(size_t)u_count,sizeof(Arc),arc_cmp);
 
 /* ── 6. LAPJV ─────────────────────────────────────────────────────── */
 double total=0.0; int matched=0;
+/* nc = number of real columns; dummy at index nc */
+int ncols = nc;
 int *row2col=(int*)xmalloc((size_t)(m+1)*sizeof(int));
 
 if(m<=DENSE_THRESHOLD){
-  double *smat=(double*)xcalloc((size_t)m*m,sizeof(double));
+  /* dense: square up to max(m,ncols) for matrix, use nr rows in LAPJV */
+  int msq=(m>ncols)?m:ncols;
+  double *smat=(double*)xcalloc((size_t)m*(size_t)msq,sizeof(double));
   for(int i=0;i<u_count;i++)
-    smat[(size_t)arcs[i].row*m+arcs[i].col]=-arcs[i].sc;
-  lapjv_dense(m,smat,row2col);
-  for(int r=0;r<m;r++){
-    int c=row2col[r];
-    if(c>=0&&c<m){double sv=-smat[(size_t)r*m+c];if(sv>0){total+=sv;matched++;}}
+    smat[(size_t)arcs[i].row*msq+arcs[i].col]=-arcs[i].sc;
+  /* run dense LAPJV on m×msq (lapjv_dense handles dummy at index msq) */
+  /* re-use lapjv_dense which takes square m×m; pad if needed */
+  int mpad=(m>ncols)?m:ncols;
+  if(mpad!=m){
+    /* rebuild square smat */
+    free(smat);
+    smat=(double*)xcalloc((size_t)mpad*mpad,sizeof(double));
+    for(int i=0;i<u_count;i++)
+      smat[(size_t)arcs[i].row*mpad+arcs[i].col]=-arcs[i].sc;
   }
-  free(smat);
+  int *r2c=(int*)xmalloc((size_t)(mpad+1)*sizeof(int));
+  lapjv_dense(mpad,smat,r2c);
+  for(int r=0;r<m;r++){  /* only score rows 0..nr-1 */
+    int c=r2c[r];
+    if(c>=0&&c<ncols){double sv=-smat[(size_t)r*mpad+c];if(sv>0){total+=sv;matched++;}}
+  }
+  free(smat); free(r2c);
 } else {
-  /* CSR — arcs already sorted by (row,col) */
+  /* sparse: m rows, ncols real columns, dummy at ncols */
   int *rowcnt=(int*)xcalloc((size_t)m,sizeof(int));
   for(int i=0;i<u_count;i++) rowcnt[arcs[i].row]++;
   int *first=(int*)xmalloc((size_t)(m+1)*sizeof(int));
@@ -341,12 +360,11 @@ if(m<=DENSE_THRESHOLD){
     cc[pos]=-arcs[i].sc; kk[pos]=arcs[i].col; csc[pos]=arcs[i].sc;
   }
   free(cur);
-  /* columns already sorted (arcs sorted by row then col) */
   
   lapjv_sparse(m,cc,kk,first,u_count,row2col);
   
   for(int r=0;r<m;r++){
-    int c=row2col[r]; if(c<0||c>=m) continue;
+    int c=row2col[r]; if(c<0||c>=ncols) continue;
     int lo=first[r],hi=first[r+1]-1;
     while(lo<=hi){int mid=(lo+hi)>>1;
       if(kk[mid]==c){if(csc[mid]>0){total+=csc[mid];matched++;}break;}
@@ -479,40 +497,52 @@ SEXP gnps(SEXP x, SEXP y)
   for(int i=0;i<raw_nc2;i++) if(cmap[i]==0) cmap[i]=nc2++;
   for(int i=0;i<u_count;i++){arcs[i].row=rmap[arcs[i].row];arcs[i].col=cmap[arcs[i].col];}
   free(rmap); free(cmap);
-  int msize=(nr2>nc2)?nr2:nc2;
+  /* Use nr2 rows only — squaring creates empty rows → infeasible LAPJV */
+  int nr = nr2, nc = nc2;
+  /* re-sort after index remapping so CSR columns are in order */
+  qsort(arcs,(size_t)u_count,sizeof(Arc),arc_cmp);
   
   double total=0.0; int matched=0;
-  int *row2col=(int*)xmalloc((size_t)(msize+1)*sizeof(int));
+  int *row2col=(int*)xmalloc((size_t)(nr+1)*sizeof(int));
   
-  if(msize<=DENSE_THRESHOLD){
-    double *smat=(double*)xcalloc((size_t)msize*msize,sizeof(double));
+  if(nr<=DENSE_THRESHOLD){
+    int mpad=(nr>nc)?nr:nc;
+    double *smat=(double*)xcalloc((size_t)nr*(size_t)mpad,sizeof(double));
     for(int i=0;i<u_count;i++)
-      smat[(size_t)arcs[i].row*msize+arcs[i].col]=-arcs[i].sc;
-    lapjv_dense(msize,smat,row2col);
-    for(int r=0;r<msize;r++){
-      int c=row2col[r];
-      if(c>=0&&c<msize){double sv=-smat[(size_t)r*msize+c];if(sv>0){total+=sv;matched++;}}
+      smat[(size_t)arcs[i].row*mpad+arcs[i].col]=-arcs[i].sc;
+    int *r2c=(int*)xmalloc((size_t)(mpad+1)*sizeof(int));
+    /* lapjv_dense needs square matrix — pad rows with zeros if nr<nc */
+    if(mpad>nr){
+      double *smat2=(double*)xcalloc((size_t)mpad*mpad,sizeof(double));
+      for(int r=0;r<nr;r++)
+        memcpy(smat2+(size_t)r*mpad, smat+(size_t)r*mpad, (size_t)mpad*sizeof(double));
+      free(smat); smat=smat2;
     }
-    free(smat);
+    lapjv_dense(mpad,smat,r2c);
+    for(int r=0;r<nr;r++){
+      int c=r2c[r];
+      if(c>=0&&c<nc){double sv=-smat[(size_t)r*mpad+c];if(sv>0){total+=sv;matched++;}}
+    }
+    free(smat); free(r2c);
   } else {
-    int *rowcnt=(int*)xcalloc((size_t)msize,sizeof(int));
+    int *rowcnt=(int*)xcalloc((size_t)nr,sizeof(int));
     for(int i=0;i<u_count;i++) rowcnt[arcs[i].row]++;
-    int *first=(int*)xmalloc((size_t)(msize+1)*sizeof(int));
-    first[0]=0; for(int r=0;r<msize;r++) first[r+1]=first[r]+rowcnt[r];
+    int *first=(int*)xmalloc((size_t)(nr+1)*sizeof(int));
+    first[0]=0; for(int r=0;r<nr;r++) first[r+1]=first[r]+rowcnt[r];
     free(rowcnt);
     double *cc=(double*)xmalloc((size_t)u_count*sizeof(double));
     int    *kk=(int*)   xmalloc((size_t)u_count*sizeof(int));
     double *csc=(double*)xmalloc((size_t)u_count*sizeof(double));
-    int    *cur=(int*)  xcalloc((size_t)msize,sizeof(int));
-    memcpy(cur,first,(size_t)msize*sizeof(int));
+    int    *cur=(int*)  xcalloc((size_t)nr,sizeof(int));
+    memcpy(cur,first,(size_t)nr*sizeof(int));
     for(int i=0;i<u_count;i++){
       int pos=cur[arcs[i].row]++;
       cc[pos]=-arcs[i].sc; kk[pos]=arcs[i].col; csc[pos]=arcs[i].sc;
     }
     free(cur);
-    lapjv_sparse(msize,cc,kk,first,u_count,row2col);
-    for(int r=0;r<msize;r++){
-      int c=row2col[r]; if(c<0||c>=msize) continue;
+    lapjv_sparse(nr,cc,kk,first,u_count,row2col);
+    for(int r=0;r<nr;r++){
+      int c=row2col[r]; if(c<0||c>=nc) continue;
       int lo=first[r],hi=first[r+1]-1;
       while(lo<=hi){int mid=(lo+hi)>>1;
         if(kk[mid]==c){if(csc[mid]>0){total+=csc[mid];matched++;}break;}

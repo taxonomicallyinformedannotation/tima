@@ -111,12 +111,21 @@ join_gnps_wrapper <- function(
 #'   ppm = 10
 #' )
 #' }
-gnps_compute_wrapper <- function(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm) {
-  .Call("gnps_compute",
-        x = x, y = y,
-        xPrecursorMz = xPrecursorMz,
-        yPrecursorMz = yPrecursorMz,
-        tolerance = tolerance,
-        ppm = ppm
+gnps_compute_wrapper <- function(
+  x,
+  y,
+  xPrecursorMz,
+  yPrecursorMz,
+  tolerance,
+  ppm
+) {
+  .Call(
+    "gnps_compute",
+    x = x,
+    y = y,
+    xPrecursorMz = xPrecursorMz,
+    yPrecursorMz = yPrecursorMz,
+    tolerance = tolerance,
+    ppm = ppm
   )
 }
