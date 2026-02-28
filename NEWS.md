@@ -12,6 +12,7 @@
     - Low noise removal targets repetitive instrumental artifacts
 * Improved log and error messages
 * More in depth molecular sanitization
+* Updated the C implementation of the spectral similarity
 
 ## Breaking Changes
 
