@@ -96,32 +96,55 @@ calculate_similarity <- function(
   # Sanity check: ensure spectra are sanitized (unique m/z, sorted, no NaN)
   # The C scoring functions assume well-separated peaks. Unsanitized input
   # (e.g. duplicate m/z values) produces mathematically incorrect scores.
-  if (!is_spectrum_sanitized(query_spectrum, tolerance = dalton, ppm = ppm)) {
-    warning(
-      "Query spectrum has unsanitized peaks (duplicate or unsorted m/z). ",
-      "Sanitizing on the fly. For best performance, use ",
-      "import_spectra(sanitize = TRUE) upstream.",
-      call. = FALSE
-    )
-    query_spectrum <- sanitize_spectrum_matrix(
-      query_spectrum,
-      tolerance = dalton,
-      ppm = ppm
-    )
-  }
-  if (!is_spectrum_sanitized(target_spectrum, tolerance = dalton, ppm = ppm)) {
-    warning(
-      "Target spectrum has unsanitized peaks (duplicate or unsorted m/z). ",
-      "Sanitizing on the fly. For best performance, use ",
-      "import_spectra(sanitize = TRUE) upstream.",
-      call. = FALSE
-    )
-    target_spectrum <- sanitize_spectrum_matrix(
-      target_spectrum,
-      tolerance = dalton,
-      ppm = ppm
-    )
-  }
+  # Uses a package-level env to warn only once per session, not per call.
+  tryCatch(
+    {
+      if (
+        !is_spectrum_sanitized(query_spectrum, tolerance = dalton, ppm = ppm)
+      ) {
+        if (!isTRUE(.tima_sanitize_env$warned_query)) {
+          .tima_sanitize_env$warned_query <- TRUE
+          warning(
+            "Unsanitized query spectrum detected (duplicate/unsorted m/z or NaN). ",
+            "Auto-fixing on the fly. For best performance, use ",
+            "import_spectra(sanitize = TRUE) upstream.",
+            call. = FALSE
+          )
+        }
+        query_spectrum <- sanitize_spectrum_matrix(
+          query_spectrum,
+          tolerance = dalton,
+          ppm = ppm
+        )
+      }
+      if (
+        !is_spectrum_sanitized(target_spectrum, tolerance = dalton, ppm = ppm)
+      ) {
+        if (!isTRUE(.tima_sanitize_env$warned_target)) {
+          .tima_sanitize_env$warned_target <- TRUE
+          warning(
+            "Unsanitized target spectrum detected (duplicate/unsorted m/z or NaN). ",
+            "Auto-fixing on the fly. For best performance, use ",
+            "import_spectra(sanitize = TRUE) upstream.",
+            call. = FALSE
+          )
+        }
+        target_spectrum <- sanitize_spectrum_matrix(
+          target_spectrum,
+          tolerance = dalton,
+          ppm = ppm
+        )
+      }
+    },
+    error = function(e) {
+      warning(
+        "Spectrum sanitization check failed: ",
+        conditionMessage(e),
+        ". Proceeding with original spectra.",
+        call. = FALSE
+      )
+    }
+  )
 
   # Re-check after sanitization (may have become empty)
   if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
