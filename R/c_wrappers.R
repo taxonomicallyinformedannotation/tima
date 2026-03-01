@@ -6,7 +6,14 @@
 #' @title Wrapper for the C function "gnps"
 #'
 #' @description Calculates GNPS-style spectral similarity score between
-#'     two matched peak matrices
+#'     two matched peak matrices using a chain-DP optimal assignment
+#'     algorithm (O(n+m) time).
+#'
+#'     **Spectra must be sanitized** before calling this function:
+#'     unique m/z values (no duplicates within tolerance), sorted by m/z,
+#'     no NaN/NA. This is guaranteed by [sanitize_spectra()] via
+#'     [import_spectra()]. See [sanitize_spectrum_matrix()] for a
+#'     lightweight fallback.
 #'
 #' @param x Numeric matrix with matched peaks from query spectrum.
 #'     Must have columns for mz and intensity.
@@ -82,11 +89,18 @@ join_gnps_wrapper <- function(
 
 #' @title Wrapper for the C function "gnps_compute"
 #'
-#' @description Performs GNPS-style peak matching between query and target
-#'     mass lists with tolerance-based matching and precursor filtering
+#' @description Fused GNPS join + score in a single C call. Performs
+#'     peak matching and scoring internally without R-level allocation.
+#'     Uses chain-DP optimal assignment (O(n+m) time).
 #'
-#' @param x Numeric vector of query m/z values
-#' @param y Numeric vector of target m/z values
+#'     **Spectra must be sanitized** before calling this function:
+#'     unique m/z values (no duplicates within tolerance), sorted by m/z,
+#'     no NaN/NA. This is guaranteed by [sanitize_spectra()] via
+#'     [import_spectra()]. See [sanitize_spectrum_matrix()] for a
+#'     lightweight fallback.
+#'
+#' @param x Numeric matrix with query spectrum peaks (mz, intensity).
+#' @param y Numeric matrix with target spectrum peaks (mz, intensity).
 #' @param xPrecursorMz Numeric precursor m/z for query spectrum
 #' @param yPrecursorMz Numeric precursor m/z for target spectrum
 #' @param tolerance Numeric value specifying the absolute tolerance in Daltons

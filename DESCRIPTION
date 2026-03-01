@@ -106,6 +106,7 @@ Collate:
     'columns_utils.R'
     'annotate_spectra.R'
     'benchmark_taxize_spectra.R'
+    'sanitize_spectrum_matrix.R'
     'c_wrappers.R'
     'calculate_similarity.R'
     'calculate_entropy_and_similarity.R'
