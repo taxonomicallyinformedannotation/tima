@@ -1,15 +1,41 @@
 /**
- * @brief Fused GNPS join + score — single C call, zero R-level matrix alloc.
+ * @file gnps.c
+ * @brief GNPS modified cosine similarity — mathematically exact, near-linear.
  *
- * gnps_compute(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
+ * IMPORTANT: Input spectra MUST be sanitized before calling these functions.
+ * Sanitized spectra have:
+ *   - Unique m/z values (no two peaks within matching tolerance of each other)
+ *   - Non-negative intensities, no NaN/NA intensities
+ *   - Peaks sorted by m/z in ascending order
  *
- *   Takes the raw peak matrices x and y directly (no pre-alignment needed).
- *   Performs join_gnps matching and gnps scoring internally in one pass.
- *   Returns list(score, matches).
+ * In tima, this is guaranteed by sanitize_spectra() (called from
+ * import_spectra(sanitize = TRUE)), which applies Spectra::reduceSpectra(),
+ * Spectra::combinePeaks(), and Spectra::scalePeaks().
  *
- * Also exports the standalone:
- *   gnps(x, y)          — score aligned matrices (backward compat)
- *   join_gnps(x,y,...)  — peak matching only (backward compat)
+ * The chain-DP algorithm assumes at most one direct match and one shifted
+ * match per peak — a property that holds exactly when peaks within each
+ * spectrum are well-separated (> tolerance apart). Unsanitized spectra with
+ * duplicate or near-duplicate m/z values will produce incorrect scores.
+ *
+ * Algorithm: chain-DP optimal assignment inspired by Sirius/FastCosine
+ * (Dührkop et al., Jena). Instead of O(n³) Hungarian/LAPJV, we exploit the
+ * structure of mass-tolerance matching: after sorting both spectra by m/z,
+ * the direct and shifted match assignments form chains where each peak has
+ * at most one direct match and one shifted match. Conflicts along these chains
+ * are resolved optimally by dynamic programming in O(n+m) total time.
+ *
+ * The scoring formula matches MsCoreUtils::gnps exactly:
+ *   score_ij = sqrt(x_int_i) / sqrt(sum_unique_x_int)
+ *            * sqrt(y_int_j) / sqrt(sum_unique_y_int)
+ *   total = sum of score_ij for optimally assigned pairs
+ *
+ * Exports:
+ *   gnps_compute(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
+ *     — Fused join+score, takes raw peak matrices. Fast path.
+ *   gnps(x, y)
+ *     — Score pre-aligned matrices (backward compat with MsCoreUtils).
+ *   join_gnps(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
+ *     — Peak matching only (backward compat).
  */
 
 #include <R.h>
@@ -19,158 +45,348 @@
 #include <string.h>
 #include <float.h>
 
-/* ── tunables ────────────────────────────────────────────────────────────── */
-#define DENSE_THRESHOLD 16   /* use dense LAPJV when m <= this */
-
 /* ── helpers ─────────────────────────────────────────────────────────────── */
 static void *xmalloc(size_t n) {
   void *p = malloc(n); if (!p) error("malloc(%zu)", n); return p; }
 static void *xcalloc(size_t n, size_t s) {
-  void *p = calloc(n,s); if (!p) error("calloc(%zu)", n*s); return p; }
+  void *p = calloc(n, s); if (!p) error("calloc(%zu)", n * s); return p; }
 
 /* ── bitset ──────────────────────────────────────────────────────────────── */
-#define BS_SET(b,i)  ((b)[(i)>>3] |=  (unsigned char)(1u<<((i)&7u)))
-#define BS_TEST(b,i) ((b)[(i)>>3] &   (unsigned char)(1u<<((i)&7u)))
-
-/* ── (key,pos) sort ──────────────────────────────────────────────────────── */
-typedef struct { double key; int pos; } KP;
-static int kp_cmp(const void *a, const void *b) {
-  double da=((const KP*)a)->key, db=((const KP*)b)->key;
-  return (da<db)?-1:(da>db)?1:0; }
-
-/* ── (row,col,score) arc for dedup ──────────────────────────────────────── */
-typedef struct { int row,col; double sc; } Arc;
-static int arc_cmp(const void *a, const void *b) {
-  const Arc *aa=(const Arc*)a, *bb=(const Arc*)b;
-  return (aa->row!=bb->row) ? aa->row-bb->row : aa->col-bb->col; }
+#define BS_SET(b,i)  ((b)[(i)>>3] |=  (unsigned char)(1u << ((i) & 7u)))
+#define BS_TEST(b,i) ((b)[(i)>>3] &   (unsigned char)(1u << ((i) & 7u)))
 
 /* ── MassIndex for join ──────────────────────────────────────────────────── */
 typedef struct { double mass; int idx; } MI;
 static int mi_cmp(const void *a, const void *b) {
-  double da=((const MI*)a)->mass, db=((const MI*)b)->mass;
-  return (da<db)?-1:(da>db)?1:0; }
+  double da = ((const MI *)a)->mass, db = ((const MI *)b)->mass;
+  return (da < db) ? -1 : (da > db) ? 1 : 0;
+}
 static int lower_bound(const MI *arr, int n, double lb) {
-  int lo=0,hi=n;
-  while(lo<hi){ int mid=lo+((hi-lo)>>1); if(arr[mid].mass<lb) lo=mid+1; else hi=mid; }
-  return lo; }
+  int lo = 0, hi = n;
+  while (lo < hi) {
+    int mid = lo + ((hi - lo) >> 1);
+    if (arr[mid].mass < lb) lo = mid + 1; else hi = mid;
+  }
+  return lo;
+}
+
+/* ── (key,pos) sort ──────────────────────────────────────────────────────── */
+typedef struct { double key; int pos; } KP;
+static int kp_cmp(const void *a, const void *b) {
+  double da = ((const KP *)a)->key, db = ((const KP *)b)->key;
+  return (da < db) ? -1 : (da > db) ? 1 : 0;
+}
 
 /* ── zero result ─────────────────────────────────────────────────────────── */
 static SEXP zero_result(void) {
-  SEXP r=PROTECT(allocVector(VECSXP,2)), nm=PROTECT(allocVector(STRSXP,2));
-  SET_VECTOR_ELT(r,0,ScalarReal(0.0)); SET_VECTOR_ELT(r,1,ScalarInteger(0));
-  SET_STRING_ELT(nm,0,mkChar("score")); SET_STRING_ELT(nm,1,mkChar("matches"));
-  setAttrib(r,R_NamesSymbol,nm); UNPROTECT(2); return r; }
-
-/* ══════════════════════════════════════════════════════════════════════════
- * DENSE LAPJV  — score[r*m+c] negated, m×m with dummy col at m
- * ══════════════════════════════════════════════════════════════════════════ */
-static void lapjv_dense(int m, const double *sc, int *row2col) {
-  int N=m+1;
-  size_t db=(size_t)N*sizeof(double), ib=(size_t)N*sizeof(int);
-  char *blk=(char*)xmalloc(3*db+3*ib);
-  double *u=(double*)blk, *v=(double*)(blk+db), *d=(double*)(blk+2*db);
-  int *p=(int*)(blk+3*db), *prev=(int*)(blk+3*db+ib), *done=(int*)(blk+3*db+2*ib);
-  memset(blk,0,3*db+3*ib);
-  for(int j=0;j<N;j++) p[j]=-1;
-  for(int i=0;i<m;i++) row2col[i]=-1;
-  for(int i=0;i<m;i++){
-    for(int j=0;j<N;j++){d[j]=DBL_MAX;prev[j]=-1;done[j]=0;}
-    const double ui=u[i]; const double *ri=sc+(size_t)i*m;
-    for(int j=0;j<m;j++){double r=ri[j]-ui-v[j];if(r<d[j])d[j]=r;}
-    {double r=-ui-v[m];if(r<d[m])d[m]=r;}
-    int j_aug=-1;
-    for(int it=0;it<N;it++){
-      double dmin=DBL_MAX; int jmin=-1;
-      for(int j=0;j<N;j++) if(!done[j]&&d[j]<dmin){dmin=d[j];jmin=j;}
-      if(jmin<0) break; done[jmin]=1;
-      if(p[jmin]==-1){j_aug=jmin;break;}
-      int i2=p[jmin]; const double *ri2=sc+(size_t)i2*m;
-      double base=dmin-u[i2]+v[jmin];
-      for(int j2=0;j2<m;j2++){if(done[j2])continue;
-      double r=base+ri2[j2]-v[j2]; if(r<d[j2]){d[j2]=r;prev[j2]=jmin;}}
-      if(!done[m]){double r=base-v[m];if(r<d[m]){d[m]=r;prev[m]=jmin;}}
-    }
-    if(j_aug<0) error("LAPJV dense: infeasible");
-    double da=d[j_aug]; u[i]+=da;
-    for(int j=0;j<N;j++){if(!done[j])continue;
-    if(p[j]!=-1)u[p[j]]+=d[j]-da; v[j]-=d[j]-da;}
-    for(int jc=j_aug;jc!=-1;){int jp=prev[jc],ic=(jp==-1)?i:p[jp];p[jc]=ic;row2col[ic]=jc;jc=jp;}
-  }
-  free(blk);
+  SEXP r = PROTECT(allocVector(VECSXP, 2));
+  SEXP nm = PROTECT(allocVector(STRSXP, 2));
+  SET_VECTOR_ELT(r, 0, ScalarReal(0.0));
+  SET_VECTOR_ELT(r, 1, ScalarInteger(0));
+  SET_STRING_ELT(nm, 0, mkChar("score"));
+  SET_STRING_ELT(nm, 1, mkChar("matches"));
+  setAttrib(r, R_NamesSymbol, nm);
+  UNPROTECT(2);
+  return r;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
- * BINARY HEAP
+ * CHAIN-DP OPTIMAL ASSIGNMENT
+ *
+ * Given two sorted spectra where peaks are matched by m/z tolerance,
+ * each left peak has at most one DIRECT match and one SHIFTED match
+ * to right peaks. Conflicts (two left peaks wanting the same right peak
+ * via different match types) form chains. We resolve each chain by DP.
+ *
+ * This is mathematically equivalent to solve_LSAP on the score matrix
+ * built by MsCoreUtils::gnps, but runs in O(n+m) instead of O(l³).
+ *
+ * Algorithm (following Sirius ModifiedCosine by Dührkop et al.):
+ *
+ * 1. Two-pointer direct matching: left[i] <-> right[j] if |mz_i - mz_j| < tol
+ * 2. Two-pointer shifted matching (reverse scan): left[i] <-> right[j]
+ *    if |mz_i + delta - mz_j| < tol, where delta = precursorRight - precursorLeft
+ *    (We enforce delta >= 0 by swapping if needed)
+ * 3. For each left peak:
+ *    - If only direct match: assign it
+ *    - If only shifted match: assign it
+ *    - If both, and no conflict: pick the better one
+ *    - If conflict (shifted match's right peak is also direct-matched by
+ *      another left peak): follow the chain and solve optimally by DP
+ *
+ * Each right peak is assigned to at most one left peak (1-to-1).
  * ══════════════════════════════════════════════════════════════════════════ */
-typedef struct { double key; int val; } HN;
-static inline void h_push(HN *h,int *sz,double k,int v){
-  int i=(*sz)++; h[i]=(HN){k,v};
-  while(i>0){int p=(i-1)>>1;if(h[p].key<=h[i].key)break;HN t=h[p];h[p]=h[i];h[i]=t;i=p;}}
-static inline HN h_pop(HN *h,int *sz){
-  HN top=h[0]; h[0]=h[--(*sz)]; int i=0;
-  for(;;){int l=2*i+1,r=2*i+2,s=i;
-    if(l<*sz&&h[l].key<h[s].key)s=l; if(r<*sz&&h[r].key<h[s].key)s=r;
-    if(s==i)break; HN t=h[s];h[s]=h[i];h[i]=t;i=s;} return top;}
 
-/* ══════════════════════════════════════════════════════════════════════════
- * SPARSE LAPJV — CSR over unique arcs, dummy col at m
- * ══════════════════════════════════════════════════════════════════════════ */
-static void lapjv_sparse(int m, const double *cc, const int *kk,
-                         const int *first, int arc_count, int *row2col) {
-  int N=m+1;
-  size_t db=(size_t)N*sizeof(double), ib=(size_t)N*sizeof(int);
-  size_t hb=(size_t)(arc_count+m+2)*sizeof(HN);
-  char *blk=(char*)xmalloc(3*db+4*ib+hb);
-  double *u=(double*)blk,*v=(double*)(blk+db),*dist=(double*)(blk+2*db);
-  int *p=(int*)(blk+3*db),*prev=(int*)(blk+3*db+ib);
-  int *vg=(int*)(blk+3*db+2*ib),*stk=(int*)(blk+3*db+3*ib);
-  HN  *heap=(HN*)(blk+3*db+4*ib);
-  memset(blk,0,3*db+4*ib);
-  for(int j=0;j<N;j++) p[j]=-1;
-  for(int i=0;i<m;i++) row2col[i]=-1;
-  int cg=0;
-  for(int i=0;i<m;i++){
-    cg++; int hsz=0,nstk=0; const double ui=u[i];
-    for(int e=first[i];e<first[i+1];e++){
-      int jj=kk[e]; double red=cc[e]-ui-v[jj];
-      if(vg[jj]!=cg){vg[jj]=cg;dist[jj]=red;prev[jj]=-1;h_push(heap,&hsz,red,jj);}
-      else if(red<dist[jj]){dist[jj]=red;prev[jj]=-1;h_push(heap,&hsz,red,jj);}
-    }
-    {double red=-ui-v[m];
-      if(vg[m]!=cg){vg[m]=cg;dist[m]=red;prev[m]=-1;h_push(heap,&hsz,red,m);}
-      else if(red<dist[m]){dist[m]=red;prev[m]=-1;h_push(heap,&hsz,red,m);}}
-    int j_aug=-1;
-    while(hsz>0){
-      HN hn=h_pop(heap,&hsz); int jj=hn.val;
-      if(hn.key>dist[jj]) continue;
-      vg[jj]=-cg; stk[nstk++]=jj;
-      if(p[jj]==-1){j_aug=jj;break;}
-      int i2=p[jj]; double base=dist[jj]-u[i2]+v[jj];
-      for(int e=first[i2];e<first[i2+1];e++){
-        int jj2=kk[e]; if(vg[jj2]==-cg) continue;
-        double red=base+cc[e]-v[jj2];
-        if(vg[jj2]!=cg){vg[jj2]=cg;dist[jj2]=red;prev[jj2]=jj;h_push(heap,&hsz,red,jj2);}
-        else if(red<dist[jj2]){dist[jj2]=red;prev[jj2]=jj;h_push(heap,&hsz,red,jj2);}
+/* ── scoring helper ──────────────────────────────────────────────────────── */
+static inline double score_pair(double x_int, double y_int,
+                                double inv_sqrt_xsum, double inv_sqrt_ysum) {
+  return sqrt(x_int) * inv_sqrt_xsum * sqrt(y_int) * inv_sqrt_ysum;
+}
+
+/**
+ * @brief Compute GNPS modified cosine using chain-DP.
+ *
+ * @param x_mz, x_int  Sorted x spectrum (length nx), no NAs
+ * @param y_mz, y_int  Sorted y spectrum (length ny), no NAs
+ * @param nx, ny        Lengths
+ * @param inv_sqrt_xsum 1/sqrt(sum of unique x intensities)
+ * @param inv_sqrt_ysum 1/sqrt(sum of unique y intensities)
+ * @param delta         yPrecursorMz - xPrecursorMz (>= 0)
+ * @param do_shift      Whether to do shifted matching
+ * @param tol           Absolute tolerance in Da
+ * @param ppm_val       PPM tolerance
+ * @param out_matched   [out] number of matched pairs
+ * @return              The GNPS similarity score
+ */
+static double chain_dp_score(
+    const double *x_mz, const double *x_int, int nx,
+    const double *y_mz, const double *y_int, int ny,
+    double inv_sqrt_xsum, double inv_sqrt_ysum,
+    double delta, int do_shift,
+    double tol, double ppm_val,
+    int *out_matched)
+{
+  /* direct_match[i] = index in y matched directly to x[i], or -1 */
+  /* shift_match[i]  = index in y matched via shift to x[i], or -1 */
+  /* back_direct[j]  = index in x that directly matched y[j], or -1 */
+  int *direct_match = (int *)xmalloc((size_t)nx * sizeof(int));
+  int *shift_match  = (int *)xmalloc((size_t)nx * sizeof(int));
+  int *back_direct  = (int *)xmalloc((size_t)ny * sizeof(int));
+  memset(direct_match, 0xFF, (size_t)nx * sizeof(int)); /* -1 */
+  memset(shift_match,  0xFF, (size_t)nx * sizeof(int));
+  memset(back_direct,  0xFF, (size_t)ny * sizeof(int));
+
+  /* ── Step 1: Direct matching (forward two-pointer) ───────────────── */
+  {
+    int i = 0, j = 0;
+    while (i < nx && j < ny) {
+      double ml = x_mz[i], mr = y_mz[j];
+      double allowed = tol + ppm_val * ((ml < mr) ? ml : mr) * 1e-6;
+      double d = ml - mr;
+      if (d < -allowed) { ++i; }
+      else if (d > allowed) { ++j; }
+      else {
+        direct_match[i] = j;
+        back_direct[j] = i;
+        ++i; ++j;
       }
-      if(vg[m]!=-cg){double red=base-v[m];
-        if(vg[m]!=cg){vg[m]=cg;dist[m]=red;prev[m]=jj;h_push(heap,&hsz,red,m);}
-        else if(red<dist[m]){dist[m]=red;prev[m]=jj;h_push(heap,&hsz,red,m);}}
     }
-    if(j_aug<0) error("LAPJV sparse: infeasible");
-    double da=dist[j_aug]; u[i]+=da;
-    for(int k=0;k<nstk;k++){int j=stk[k];if(p[j]!=-1)u[p[j]]+=dist[j]-da;v[j]-=dist[j]-da;}
-    for(int jc=j_aug;jc!=-1;){int jp=prev[jc],ic=(jp==-1)?i:p[jp];p[jc]=ic;row2col[ic]=jc;jc=jp;}
   }
-  free(blk);
+
+  /* ── Step 2: Shifted matching (reverse two-pointer) ──────────────── */
+  if (do_shift) {
+    int i = nx - 1, j = ny - 1;
+    while (i >= 0 && j >= 0) {
+      double ml_shifted = x_mz[i] + delta;
+      double mr = y_mz[j];
+      double allowed = tol + ppm_val * ((ml_shifted < mr) ? ml_shifted : mr) * 1e-6;
+      double d = ml_shifted - mr;
+      if (d > allowed) { --i; }
+      else if (d < -allowed) { --j; }
+      else {
+        /* Only record shifted match if it doesn't point to the same pair
+         * as the direct match (degenerate case when delta ~ 0) */
+        if (back_direct[j] != i) {
+          shift_match[i] = j;
+        }
+        --i; --j;
+      }
+    }
+  }
+
+  /* ── Step 3: Optimal assignment via chain-DP ─────────────────────── */
+  unsigned char *visited = (unsigned char *)xcalloc((size_t)((nx + 7) >> 3), 1);
+  double total = 0.0;
+  int matched = 0;
+
+  /* DP workspace — reused across chains */
+  /* Each chain step has 3 states: (matched_direct, matched_shift, skip) */
+  int dp_cap = 64;
+  double *dp_buf = (double *)xmalloc((size_t)dp_cap * 3 * sizeof(double));
+
+  for (int k = 0; k < nx; ++k) {
+    if (BS_TEST(visited, k)) continue;
+
+    int dm = direct_match[k];
+    int sm = shift_match[k];
+
+    if (dm < 0 && sm < 0) continue; /* no match at all */
+
+    if (sm < 0) {
+      /* Only direct match, no conflict possible */
+      total += score_pair(x_int[k], y_int[dm], inv_sqrt_xsum, inv_sqrt_ysum);
+      matched++;
+      continue;
+    }
+
+    if (dm < 0) {
+      /* Only shifted match */
+      int conflict = back_direct[sm];
+      if (conflict < 0) {
+        /* No conflict — just assign shifted */
+        total += score_pair(x_int[k], y_int[sm], inv_sqrt_xsum, inv_sqrt_ysum);
+        matched++;
+        continue;
+      }
+      /* Fall through to chain-DP below */
+    }
+
+    /* Check if shifted match conflicts with another peak's direct match */
+    int conflict = back_direct[sm];
+    if (conflict < 0) {
+      /* No conflict — pick better of direct vs shifted */
+      double ds = (dm >= 0) ? score_pair(x_int[k], y_int[dm], inv_sqrt_xsum, inv_sqrt_ysum) : 0.0;
+      double ss = score_pair(x_int[k], y_int[sm], inv_sqrt_xsum, inv_sqrt_ysum);
+      if (ds >= ss) {
+        total += ds;
+      } else {
+        total += ss;
+      }
+      matched++;
+      continue;
+    }
+
+    /* ── Chain-DP: resolve conflict chain ──────────────────────────── */
+    /* Chain structure: k has shift_match -> sm, which is direct_match of
+     * `conflict`. `conflict` may itself have a shift_match pointing to some
+     * other y-peak, which may be direct_match of yet another x-peak, etc.
+     *
+     * States per chain node:
+     *   state 0: assign direct match to this node
+     *   state 1: assign shifted match to this node
+     *   state 2: skip this node (no assignment)
+     *
+     * Constraint: If node i uses state 1 (shift -> y[j]), and y[j] is the
+     * direct match of node i+1, then node i+1 CANNOT use state 0.
+     * After state 0 or 2: next node can use any state.
+     */
+    int chain_len = 0;
+
+    /* First node is k */
+    if (chain_len >= dp_cap) {
+      dp_cap *= 2;
+      dp_buf = (double *)realloc(dp_buf, (size_t)dp_cap * 3 * sizeof(double));
+      if (!dp_buf) error("realloc dp");
+    }
+    {
+      double ds = (dm >= 0)
+        ? score_pair(x_int[k], y_int[dm], inv_sqrt_xsum, inv_sqrt_ysum)
+        : -1.0;
+      double ss = score_pair(x_int[k], y_int[sm], inv_sqrt_xsum, inv_sqrt_ysum);
+      dp_buf[0] = ds;   /* direct */
+      dp_buf[1] = ss;   /* shift */
+      dp_buf[2] = 0.0;  /* skip */
+    }
+    BS_SET(visited, k);
+    chain_len++;
+
+    /* Follow the chain */
+    int u = conflict;
+    while (u >= 0 && !BS_TEST(visited, u)) {
+      BS_SET(visited, u);
+
+      if (chain_len >= dp_cap) {
+        dp_cap *= 2;
+        dp_buf = (double *)realloc(dp_buf, (size_t)dp_cap * 3 * sizeof(double));
+        if (!dp_buf) error("realloc dp");
+      }
+
+      int u_dm = direct_match[u];
+      int u_sm = shift_match[u];
+
+      double u_ds = (u_dm >= 0)
+        ? score_pair(x_int[u], y_int[u_dm], inv_sqrt_xsum, inv_sqrt_ysum)
+        : -1.0;
+      double u_ss = (u_sm >= 0)
+        ? score_pair(x_int[u], y_int[u_sm], inv_sqrt_xsum, inv_sqrt_ysum)
+        : -1.0;
+
+      /* DP transitions from previous node's states */
+      double prev_d = dp_buf[(chain_len - 1) * 3 + 0];
+      double prev_s = dp_buf[(chain_len - 1) * 3 + 1];
+      double prev_n = dp_buf[(chain_len - 1) * 3 + 2];
+
+      /* State 0 (direct match for u):
+       * Previous cannot have been shift (which consumed u's direct y-peak).
+       * So: max(prev_d, prev_n) + u_ds */
+      double best_not_shift = (prev_d > prev_n) ? prev_d : prev_n;
+      dp_buf[chain_len * 3 + 0] = (u_ds >= 0.0)
+        ? best_not_shift + u_ds : -1.0;
+
+      /* State 1 (shift match for u):
+       * Previous can be anything: max(prev_d, prev_s, prev_n) + u_ss */
+      double best_any = prev_d;
+      if (prev_s > best_any) best_any = prev_s;
+      if (prev_n > best_any) best_any = prev_n;
+      dp_buf[chain_len * 3 + 1] = (u_ss >= 0.0)
+        ? best_any + u_ss : -1.0;
+
+      /* State 2 (skip u):
+       * Previous can be anything */
+      dp_buf[chain_len * 3 + 2] = best_any;
+
+      chain_len++;
+
+      /* Follow chain: u's shift_match points to some y-peak, which may
+       * be direct-matched by another x-peak */
+      if (u_sm >= 0) {
+        u = back_direct[u_sm];
+      } else {
+        u = -1;
+      }
+    }
+
+    /* Find maximum over last chain node's states */
+    double chain_score = -1.0;
+    int last = chain_len - 1;
+    for (int s = 0; s < 3; s++) {
+      if (dp_buf[last * 3 + s] > chain_score)
+        chain_score = dp_buf[last * 3 + s];
+    }
+
+    if (chain_score > 0.0) {
+      total += chain_score;
+
+      /* Count matched pairs by backtracing through the DP */
+      int best_s = 2;
+      for (int s = 0; s < 3; s++) {
+        if (dp_buf[last * 3 + s] > dp_buf[last * 3 + best_s])
+          best_s = s;
+      }
+      if (best_s < 2) matched++;
+
+      for (int t = last - 1; t >= 0; t--) {
+        int next_state = best_s;
+        if (next_state == 0) {
+          /* Direct: previous was not shift -> max(prev_d, prev_n) */
+          double d_val = dp_buf[t * 3 + 0];
+          double n_val = dp_buf[t * 3 + 2];
+          best_s = (d_val >= 0.0 && d_val >= n_val) ? 0 : 2;
+        } else {
+          /* Shift or skip: previous was anything -> max all 3 */
+          best_s = 2;
+          for (int s = 0; s < 3; s++) {
+            if (dp_buf[t * 3 + s] >= 0.0 &&
+                (dp_buf[t * 3 + best_s] < 0.0 ||
+                 dp_buf[t * 3 + s] > dp_buf[t * 3 + best_s]))
+              best_s = s;
+          }
+        }
+        if (best_s < 2) matched++;
+      }
+    }
+  }
+
+  free(dp_buf);
+  free(visited);
+  free(direct_match); free(shift_match); free(back_direct);
+
+  *out_matched = matched;
+  return total;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
  * FUSED: join_gnps + gnps in one call
- *
- * x_mz, x_in : raw x spectrum columns (length nx)
- * y_mz, y_in : raw y spectrum columns (length ny)
- * x_pre, y_pre: precursor m/z (may be NA)
- * tol, ppm   : matching tolerances
  * ══════════════════════════════════════════════════════════════════════════ */
 static SEXP gnps_fused(const double *x_mz, const double *x_in, int nx,
                        const double *y_mz, const double *y_in, int ny,
@@ -178,469 +394,378 @@ static SEXP gnps_fused(const double *x_mz, const double *x_in, int nx,
                        double tol, double ppm_val)
 {
   /* ── 1. Sort non-NA peaks ──────────────────────────────────────────── */
-  MI *xs = (MI*)xmalloc((size_t)nx*sizeof(MI));
-  MI *ys = (MI*)xmalloc((size_t)ny*sizeof(MI));
-  int vx=0, vy=0;
-  for(int i=0;i<nx;i++) if(!ISNA(x_mz[i])){xs[vx].mass=x_mz[i];xs[vx].idx=i;vx++;}
-  for(int i=0;i<ny;i++) if(!ISNA(y_mz[i])){ys[vy].mass=y_mz[i];ys[vy].idx=i;vy++;}
-  qsort(xs,(size_t)vx,sizeof(MI),mi_cmp);
-  qsort(ys,(size_t)vy,sizeof(MI),mi_cmp);
-  
-  /* ── 2. unique-intensity sums (walk sorted arrays, sum first occ) ── */
-  double xs_sum=0.0, ys_sum=0.0;
-  for(int i=0;i<vx;i++) if(i==0||xs[i].mass!=xs[i-1].mass) xs_sum+=x_in[xs[i].idx];
-  for(int i=0;i<vy;i++) if(i==0||ys[i].mass!=ys[i-1].mass) ys_sum+=y_in[ys[i].idx];
-  
-  if(xs_sum==0.0||ys_sum==0.0){free(xs);free(ys);return zero_result();}
-  
-  const double sxs=sqrt(xs_sum), sys=sqrt(ys_sum);
-  const int do_pdiff = (!ISNA(x_pre)&&!ISNA(y_pre));
-  const double pdiff = do_pdiff ? y_pre-x_pre : 0.0;
-  
-  /* ── 3. Match peaks → collect (xf,yf,score) arcs ─────────────────── */
-  /* Upper bound: each x can match all y in direct + all y in shifted window.
-   * Allocate conservatively: vx*vy arcs max (rare). */
-  int arc_cap = vx + vy + 2;  /* minimum; will realloc if needed */
-  Arc *arcs = (Arc*)xmalloc((size_t)arc_cap*sizeof(Arc));
-  int n_arcs = 0;
-  
-  /* We need factor indices for x and y mz.
-   * Since xs/ys are sorted, rank = position of first occurrence. */
-  /* Build x-factor map: sorted unique x mz → rank */
-  int *xf_sorted = (int*)xmalloc((size_t)vx*sizeof(int));  /* factor for sorted xs[i] */
-  { int rank=0;
-    for(int i=0;i<vx;i++){
-      if(i==0||xs[i].mass!=xs[i-1].mass) rank++;
-      xf_sorted[i]=rank;
+  MI *xs = (MI *)xmalloc((size_t)nx * sizeof(MI));
+  MI *ys = (MI *)xmalloc((size_t)ny * sizeof(MI));
+  int vx = 0, vy = 0;
+  for (int i = 0; i < nx; i++)
+    if (!ISNA(x_mz[i])) { xs[vx].mass = x_mz[i]; xs[vx].idx = i; vx++; }
+  for (int i = 0; i < ny; i++)
+    if (!ISNA(y_mz[i])) { ys[vy].mass = y_mz[i]; ys[vy].idx = i; vy++; }
+  qsort(xs, (size_t)vx, sizeof(MI), mi_cmp);
+  qsort(ys, (size_t)vy, sizeof(MI), mi_cmp);
+
+  /* ── 2. Unique-intensity sums ──────────────────────────────────────── */
+  double xs_sum = 0.0, ys_sum = 0.0;
+  for (int i = 0; i < vx; i++)
+    if (i == 0 || xs[i].mass != xs[i - 1].mass)
+      xs_sum += x_in[xs[i].idx];
+  for (int i = 0; i < vy; i++)
+    if (i == 0 || ys[i].mass != ys[i - 1].mass)
+      ys_sum += y_in[ys[i].idx];
+
+  if (xs_sum == 0.0 || ys_sum == 0.0) {
+    free(xs); free(ys); return zero_result();
+  }
+
+  double inv_sxs = 1.0 / sqrt(xs_sum);
+  double inv_sys = 1.0 / sqrt(ys_sum);
+
+  /* ── 3. Build sorted mz/int arrays ─────────────────────────────────── */
+  double *sx_mz  = (double *)xmalloc((size_t)vx * sizeof(double));
+  double *sx_int = (double *)xmalloc((size_t)vx * sizeof(double));
+  double *sy_mz  = (double *)xmalloc((size_t)vy * sizeof(double));
+  double *sy_int = (double *)xmalloc((size_t)vy * sizeof(double));
+  for (int i = 0; i < vx; i++) {
+    sx_mz[i]  = xs[i].mass;
+    sx_int[i] = x_in[xs[i].idx];
+  }
+  for (int i = 0; i < vy; i++) {
+    sy_mz[i]  = ys[i].mass;
+    sy_int[i] = y_in[ys[i].idx];
+  }
+  free(xs); free(ys);
+
+  /* ── 4. Determine delta and shift flag ─────────────────────────────── */
+  int do_shift = (!ISNA(x_pre) && !ISNA(y_pre));
+  double delta = 0.0;
+  const double *left_mz, *left_int, *right_mz, *right_int;
+  int nleft, nright;
+
+  if (do_shift) {
+    delta = y_pre - x_pre;
+    if (delta < 0) {
+      /* Swap left/right so delta >= 0 */
+      left_mz = sy_mz; left_int = sy_int; nleft = vy;
+      right_mz = sx_mz; right_int = sx_int; nright = vx;
+      delta = -delta;
+      double tmp = inv_sxs; inv_sxs = inv_sys; inv_sys = tmp;
+    } else {
+      left_mz = sx_mz; left_int = sx_int; nleft = vx;
+      right_mz = sy_mz; right_int = sy_int; nright = vy;
     }
+    /* If delta is within tolerance of zero, skip shift matching */
+    double max_pre = (x_pre > y_pre) ? x_pre : y_pre;
+    double shift_tol = tol + ppm_val * max_pre * 1e-6;
+    if (delta <= shift_tol) do_shift = 0;
+  } else {
+    left_mz = sx_mz; left_int = sx_int; nleft = vx;
+    right_mz = sy_mz; right_int = sy_int; nright = vy;
   }
-  int *yf_sorted = (int*)xmalloc((size_t)vy*sizeof(int));
-  { int rank=0;
-    for(int i=0;i<vy;i++){
-      if(i==0||ys[i].mass!=ys[i-1].mass) rank++;
-      yf_sorted[i]=rank;
-    }
-  }
-  
-  /* Helper: ensure arc array capacity */
-#define ARC_PUSH(xrow, ycol, score_val) do {                 \
-  if (n_arcs >= arc_cap) {                                   \
-    arc_cap *= 2;                                            \
-    arcs = (Arc*)realloc(arcs, (size_t)arc_cap*sizeof(Arc)); \
-    if (!arcs) error("realloc arcs");                        \
-  }                                                          \
-  arcs[n_arcs].row = (xrow);                                 \
-  arcs[n_arcs].col = (ycol);                                 \
-  arcs[n_arcs].sc  = (score_val);                            \
-  n_arcs++;                                                  \
-} while(0)
 
-/* Direct matches */
-for(int i=0;i<vx;i++){
-  const double xm=xs[i].mass;
-  const double half=tol+ppm_val*xm*1e-6;
-  const int start=lower_bound(ys,vy,xm-half);
-  for(int j=start;j<vy&&ys[j].mass<=xm+half;j++){
-    double sc=(sqrt(x_in[xs[i].idx])/sxs)*(sqrt(y_in[ys[j].idx])/sys);
-    ARC_PUSH(xf_sorted[i]-1, yf_sorted[j]-1, sc);
-  }
-}
-/* Precursor-shifted matches */
-if(do_pdiff){
-  for(int i=0;i<vx;i++){
-    const double xadj=xs[i].mass+pdiff;
-    const double half=tol+ppm_val*xadj*1e-6;
-    const int start=lower_bound(ys,vy,xadj-half);
-    for(int j=start;j<vy&&ys[j].mass<=xadj+half;j++){
-      double sc=(sqrt(x_in[xs[i].idx])/sxs)*(sqrt(y_in[ys[j].idx])/sys);
-      ARC_PUSH(xf_sorted[i]-1, yf_sorted[j]-1, sc);
-    }
-  }
-}
+  int matched = 0;
+  double score = chain_dp_score(
+    left_mz, left_int, nleft,
+    right_mz, right_int, nright,
+    inv_sxs, inv_sys,
+    delta, do_shift,
+    tol, ppm_val,
+    &matched
+  );
 
-free(xf_sorted); free(yf_sorted); free(xs); free(ys);
+  free(sx_mz); free(sx_int); free(sy_mz); free(sy_int);
 
-if(n_arcs==0){ free(arcs); return zero_result(); }
-
-/* ── 4. Dedup: sort by (row,col), keep last (= max score) ─────────── */
-/* For equal (row,col), keep highest score (best pair, per GNPS spec) */
-qsort(arcs,(size_t)n_arcs,sizeof(Arc),arc_cmp);
-int u_count=0;
-for(int i=0;i<n_arcs;i++){
-  if(i+1<n_arcs&&arcs[i].row==arcs[i+1].row&&arcs[i].col==arcs[i+1].col){
-    /* keep higher score */
-    if(arcs[i].sc>arcs[i+1].sc) arcs[i+1].sc=arcs[i].sc;
-    continue;
-  }
-  arcs[u_count++]=arcs[i];
-}
-
-/* ── 5. Compact rows and cols to contiguous indices ──────────────────
- * arcs[].row and arcs[].col are factor ranks (0-based) from the full
- * sorted unique mz lists. After dedup, only a subset of those ranks
- * may appear. We remap to contiguous 0..nr-1 and 0..nc-1 so the
- * LAPJV matrix has no empty rows/cols that would make it infeasible.
- *
- * After compaction: m = max(nr, nc).
- * ──────────────────────────────────────────────────────────────────── */
-/* find max raw indices */
-int raw_nr=0, raw_nc=0;
-for(int i=0;i<u_count;i++){
-  if(arcs[i].row>=raw_nr) raw_nr=arcs[i].row+1;
-  if(arcs[i].col>=raw_nc) raw_nc=arcs[i].col+1;
-}
-/* remap rows: mark which raw row indices appear, assign compact index */
-int *row_map=(int*)xmalloc((size_t)raw_nr*sizeof(int));
-int *col_map=(int*)xmalloc((size_t)raw_nc*sizeof(int));
-memset(row_map,-1,(size_t)raw_nr*sizeof(int));
-memset(col_map,-1,(size_t)raw_nc*sizeof(int));
-for(int i=0;i<u_count;i++){
-  row_map[arcs[i].row]=0; /* mark present */
-col_map[arcs[i].col]=0;
-}
-int nr=0,nc=0;
-for(int i=0;i<raw_nr;i++) if(row_map[i]==0) row_map[i]=nr++;
-for(int i=0;i<raw_nc;i++) if(col_map[i]==0) col_map[i]=nc++;
-/* apply remapping */
-for(int i=0;i<u_count;i++){
-  arcs[i].row=row_map[arcs[i].row];
-  arcs[i].col=col_map[arcs[i].col];
-}
-free(row_map); free(col_map);
-/* Use nr rows only — columns beyond nr stay unassigned (score 0).
- * Squaring to max(nr,nc) creates empty rows that make LAPJV infeasible. */
-int m = nr;
-/* re-sort after index remapping so CSR columns are in order */
-qsort(arcs,(size_t)u_count,sizeof(Arc),arc_cmp);
-
-/* ── 6. LAPJV ─────────────────────────────────────────────────────── */
-double total=0.0; int matched=0;
-/* nc = number of real columns; dummy at index nc */
-int ncols = nc;
-int *row2col=(int*)xmalloc((size_t)(m+1)*sizeof(int));
-
-if(m<=DENSE_THRESHOLD){
-  /* dense: square up to max(m,ncols) for matrix, use nr rows in LAPJV */
-  int msq=(m>ncols)?m:ncols;
-  double *smat=(double*)xcalloc((size_t)m*(size_t)msq,sizeof(double));
-  for(int i=0;i<u_count;i++)
-    smat[(size_t)arcs[i].row*msq+arcs[i].col]=-arcs[i].sc;
-  /* run dense LAPJV on m×msq (lapjv_dense handles dummy at index msq) */
-  /* re-use lapjv_dense which takes square m×m; pad if needed */
-  int mpad=(m>ncols)?m:ncols;
-  if(mpad!=m){
-    /* rebuild square smat */
-    free(smat);
-    smat=(double*)xcalloc((size_t)mpad*mpad,sizeof(double));
-    for(int i=0;i<u_count;i++)
-      smat[(size_t)arcs[i].row*mpad+arcs[i].col]=-arcs[i].sc;
-  }
-  int *r2c=(int*)xmalloc((size_t)(mpad+1)*sizeof(int));
-  lapjv_dense(mpad,smat,r2c);
-  for(int r=0;r<m;r++){  /* only score rows 0..nr-1 */
-    int c=r2c[r];
-    if(c>=0&&c<ncols){double sv=-smat[(size_t)r*mpad+c];if(sv>0){total+=sv;matched++;}}
-  }
-  free(smat); free(r2c);
-} else {
-  /* sparse: m rows, ncols real columns, dummy at ncols */
-  int *rowcnt=(int*)xcalloc((size_t)m,sizeof(int));
-  for(int i=0;i<u_count;i++) rowcnt[arcs[i].row]++;
-  int *first=(int*)xmalloc((size_t)(m+1)*sizeof(int));
-  first[0]=0; for(int r=0;r<m;r++) first[r+1]=first[r]+rowcnt[r];
-  free(rowcnt);
-  
-  double *cc=(double*)xmalloc((size_t)u_count*sizeof(double));
-  int    *kk=(int*)   xmalloc((size_t)u_count*sizeof(int));
-  double *csc=(double*)xmalloc((size_t)u_count*sizeof(double));
-  int    *cur=(int*)  xcalloc((size_t)m,sizeof(int));
-  memcpy(cur,first,(size_t)m*sizeof(int));
-  for(int i=0;i<u_count;i++){
-    int pos=cur[arcs[i].row]++;
-    cc[pos]=-arcs[i].sc; kk[pos]=arcs[i].col; csc[pos]=arcs[i].sc;
-  }
-  free(cur);
-  
-  lapjv_sparse(m,cc,kk,first,u_count,row2col);
-  
-  for(int r=0;r<m;r++){
-    int c=row2col[r]; if(c<0||c>=ncols) continue;
-    int lo=first[r],hi=first[r+1]-1;
-    while(lo<=hi){int mid=(lo+hi)>>1;
-      if(kk[mid]==c){if(csc[mid]>0){total+=csc[mid];matched++;}break;}
-      if(kk[mid]<c) lo=mid+1; else hi=mid-1;}
-  }
-  free(first);free(cc);free(kk);free(csc);
-}
-
-free(arcs); free(row2col);
-
-SEXP r=PROTECT(allocVector(VECSXP,2)),nm=PROTECT(allocVector(STRSXP,2));
-SET_VECTOR_ELT(r,0,ScalarReal(total)); SET_VECTOR_ELT(r,1,ScalarInteger(matched));
-SET_STRING_ELT(nm,0,mkChar("score")); SET_STRING_ELT(nm,1,mkChar("matches"));
-setAttrib(r,R_NamesSymbol,nm); UNPROTECT(2); return r;
+  SEXP r = PROTECT(allocVector(VECSXP, 2));
+  SEXP nm = PROTECT(allocVector(STRSXP, 2));
+  SET_VECTOR_ELT(r, 0, ScalarReal(score));
+  SET_VECTOR_ELT(r, 1, ScalarInteger(matched));
+  SET_STRING_ELT(nm, 0, mkChar("score"));
+  SET_STRING_ELT(nm, 1, mkChar("matches"));
+  setAttrib(r, R_NamesSymbol, nm);
+  UNPROTECT(2);
+  return r;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
  * R entry: gnps_compute(x_mat, y_mat, xPrecursorMz, yPrecursorMz, tol, ppm)
- * x_mat / y_mat: full peak matrices (mz | intensity), NOT pre-aligned.
- * This is the fast path — no R-level join needed.
  * ══════════════════════════════════════════════════════════════════════════ */
 SEXP gnps_compute(SEXP x, SEXP y,
                   SEXP xPrecursorMz, SEXP yPrecursorMz,
                   SEXP tolerance, SEXP ppm)
 {
-  if(!isReal(x)||!isReal(y)) error("x and y must be numeric matrices");
-  SEXP xd=getAttrib(x,R_DimSymbol), yd=getAttrib(y,R_DimSymbol);
-  if(!isInteger(xd)||!isInteger(yd)) error("dim must be integer");
-  int nx=INTEGER(xd)[0], ny=INTEGER(yd)[0];
-  const double *xmz=REAL(x), *xin=xmz+nx;
-  const double *ymz=REAL(y), *yin=ymz+ny;
-  return gnps_fused(xmz,xin,nx, ymz,yin,ny,
+  if (!isReal(x) || !isReal(y)) error("x and y must be numeric matrices");
+  SEXP xd = getAttrib(x, R_DimSymbol), yd = getAttrib(y, R_DimSymbol);
+  if (!isInteger(xd) || !isInteger(yd)) error("dim must be integer");
+  int nx = INTEGER(xd)[0], ny = INTEGER(yd)[0];
+  const double *xmz = REAL(x), *xin = xmz + nx;
+  const double *ymz = REAL(y), *yin = ymz + ny;
+  return gnps_fused(xmz, xin, nx, ymz, yin, ny,
                     asReal(xPrecursorMz), asReal(yPrecursorMz),
                     asReal(tolerance), asReal(ppm));
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
  * R entry: gnps(x_aligned, y_aligned)  — backward compatible
- * x/y are pre-aligned matrices from join_gnps (may have NA rows).
+ *
+ * Replicates MsCoreUtils::gnps exactly:
+ *   1. Sum unique x/y intensities
+ *   2. Keep rows where both x and y have non-NA mz
+ *   3. Factor x_mz and y_mz into integer group indices
+ *   4. Build score_mat[x_idx, y_idx] = sqrt(x_int)/sqrt(x_sum) * ...
+ *   5. Solve optimal 1-to-1 assignment
+ *
+ * Uses clean shortest-augmenting-path Hungarian (O(n³) but n is typically
+ * tiny — number of unique mz groups in matched peaks).
  * ══════════════════════════════════════════════════════════════════════════ */
 SEXP gnps(SEXP x, SEXP y)
 {
-  if(!isReal(x)||!isReal(y)) error("Inputs must be numeric matrices");
-  SEXP xd=getAttrib(x,R_DimSymbol), yd=getAttrib(y,R_DimSymbol);
-  if(!isInteger(xd)||!isInteger(yd)) error("dim must be integer");
-  int n=INTEGER(xd)[0];
-  if(n!=INTEGER(yd)[0]) error("row count mismatch");
-  const double *xmz=REAL(x), *xin=xmz+n;
-  const double *ymz=REAL(y), *yin=ymz+n;
-  
-  /* unique-intensity sums — walk in original order, first occ of each mz */
-  KP *buf=(KP*)xmalloc((size_t)n*sizeof(KP));
-  int m=0;
-  for(int i=0;i<n;i++) if(!ISNA(xmz[i])) {buf[m].key=xmz[i];buf[m].pos=i;m++;}
-  qsort(buf,(size_t)m,sizeof(KP),kp_cmp);
-  double xs=0.0; for(int i=0;i<m;i++) if(i==0||buf[i].key!=buf[i-1].key) xs+=xin[buf[i].pos];
-  
-  m=0;
-  for(int i=0;i<n;i++) if(!ISNA(ymz[i])) {buf[m].key=ymz[i];buf[m].pos=i;m++;}
-  qsort(buf,(size_t)m,sizeof(KP),kp_cmp);
-  double ys=0.0; for(int i=0;i<m;i++) if(i==0||buf[i].key!=buf[i-1].key) ys+=yin[buf[i].pos];
+  if (!isReal(x) || !isReal(y)) error("Inputs must be numeric matrices");
+  SEXP xd = getAttrib(x, R_DimSymbol), yd = getAttrib(y, R_DimSymbol);
+  if (!isInteger(xd) || !isInteger(yd)) error("dim must be integer");
+  int n = INTEGER(xd)[0];
+  if (n != INTEGER(yd)[0]) error("row count mismatch");
+  const double *xmz = REAL(x), *xin = xmz + n;
+  const double *ymz = REAL(y), *yin = ymz + n;
+
+  /* ── unique-intensity sums ──────────────────────────────────────────── */
+  KP *buf = (KP *)xmalloc((size_t)n * sizeof(KP));
+  int m = 0;
+  for (int i = 0; i < n; i++)
+    if (!ISNA(xmz[i])) { buf[m].key = xmz[i]; buf[m].pos = i; m++; }
+  qsort(buf, (size_t)m, sizeof(KP), kp_cmp);
+  double xs_sum = 0.0;
+  for (int i = 0; i < m; i++)
+    if (i == 0 || buf[i].key != buf[i - 1].key) xs_sum += xin[buf[i].pos];
+
+  m = 0;
+  for (int i = 0; i < n; i++)
+    if (!ISNA(ymz[i])) { buf[m].key = ymz[i]; buf[m].pos = i; m++; }
+  qsort(buf, (size_t)m, sizeof(KP), kp_cmp);
+  double ys_sum = 0.0;
+  for (int i = 0; i < m; i++)
+    if (i == 0 || buf[i].key != buf[i - 1].key) ys_sum += yin[buf[i].pos];
   free(buf);
-  
-  if(xs==0.0||ys==0.0) return zero_result();
-  
-  /* build keep[], x_fac[], y_fac[] */
-  int *x_fac=(int*)xmalloc((size_t)n*sizeof(int));
-  int *y_fac=(int*)xmalloc((size_t)n*sizeof(int));
-  KP  *kpb  =(KP*) xmalloc((size_t)n*sizeof(KP));
-  
-  int l=0;
-  for(int i=0;i<n;i++) if(!ISNA(xmz[i])&&!ISNA(ymz[i])) l++;
-  if(!l){free(x_fac);free(y_fac);free(kpb);return zero_result();}
-  
-  /* x factors */
-  { int k=0;
-    for(int i=0;i<n;i++) if(!ISNA(xmz[i])&&!ISNA(ymz[i])){kpb[k].key=xmz[i];kpb[k].pos=k;k++;}
-    qsort(kpb,(size_t)l,sizeof(KP),kp_cmp);
-    int rank=0;
-    for(int i=0;i<l;i++){if(i==0||kpb[i].key!=kpb[i-1].key)rank++; x_fac[kpb[i].pos]=rank;}
-  }
-  /* y factors */
-  { int k=0;
-    for(int i=0;i<n;i++) if(!ISNA(xmz[i])&&!ISNA(ymz[i])){kpb[k].key=ymz[i];kpb[k].pos=k;k++;}
-    qsort(kpb,(size_t)l,sizeof(KP),kp_cmp);
-    int rank=0;
-    for(int i=0;i<l;i++){if(i==0||kpb[i].key!=kpb[i-1].key)rank++; y_fac[kpb[i].pos]=rank;}
-  }
-  free(kpb);
-  
-  const double sxs=sqrt(xs), sys=sqrt(ys);
-  
-  /* build arc list (l entries, one per kept row) */
-  Arc *arcs=(Arc*)xmalloc((size_t)l*sizeof(Arc));
-  { int k=0;
-    for(int i=0;i<n;i++){
-      if(!ISNA(xmz[i])&&!ISNA(ymz[i])){
-        arcs[k].row=x_fac[k]-1; arcs[k].col=y_fac[k]-1;
-        arcs[k].sc=(sqrt(xin[i])/sxs)*(sqrt(yin[i])/sys);
+
+  if (xs_sum == 0.0 || ys_sum == 0.0) return zero_result();
+
+  /* ── build kept arrays ─────────────────────────────────────────────── */
+  int l = 0;
+  for (int i = 0; i < n; i++)
+    if (!ISNA(xmz[i]) && !ISNA(ymz[i])) l++;
+  if (!l) return zero_result();
+
+  double *keep_xmz = (double *)xmalloc((size_t)l * sizeof(double));
+  double *keep_ymz = (double *)xmalloc((size_t)l * sizeof(double));
+  double *keep_xin = (double *)xmalloc((size_t)l * sizeof(double));
+  double *keep_yin = (double *)xmalloc((size_t)l * sizeof(double));
+  { int k = 0;
+    for (int i = 0; i < n; i++) {
+      if (!ISNA(xmz[i]) && !ISNA(ymz[i])) {
+        keep_xmz[k] = xmz[i]; keep_ymz[k] = ymz[i];
+        keep_xin[k] = xin[i];  keep_yin[k] = yin[i];
         k++;
       }
     }
   }
+
+  /* ── compute factor indices ────────────────────────────────────────── */
+  int *x_fac = (int *)xmalloc((size_t)l * sizeof(int));
+  int *y_fac = (int *)xmalloc((size_t)l * sizeof(int));
+  { KP *kpb = (KP *)xmalloc((size_t)l * sizeof(KP));
+    for (int i = 0; i < l; i++) { kpb[i].key = keep_xmz[i]; kpb[i].pos = i; }
+    qsort(kpb, (size_t)l, sizeof(KP), kp_cmp);
+    int rank = 0;
+    for (int i = 0; i < l; i++) {
+      if (i == 0 || kpb[i].key != kpb[i - 1].key) rank++;
+      x_fac[kpb[i].pos] = rank;
+    }
+    for (int i = 0; i < l; i++) { kpb[i].key = keep_ymz[i]; kpb[i].pos = i; }
+    qsort(kpb, (size_t)l, sizeof(KP), kp_cmp);
+    rank = 0;
+    for (int i = 0; i < l; i++) {
+      if (i == 0 || kpb[i].key != kpb[i - 1].key) rank++;
+      y_fac[kpb[i].pos] = rank;
+    }
+    free(kpb);
+  }
+
+  int n_xgroups = 0, n_ygroups = 0;
+  for (int i = 0; i < l; i++) {
+    if (x_fac[i] > n_xgroups) n_xgroups = x_fac[i];
+    if (y_fac[i] > n_ygroups) n_ygroups = y_fac[i];
+  }
+
+  double inv_sxs = 1.0 / sqrt(xs_sum);
+  double inv_sys = 1.0 / sqrt(ys_sum);
+
+  int mat_dim = (n_xgroups > n_ygroups) ? n_xgroups : n_ygroups;
+  if (mat_dim == 0) {
+    free(x_fac); free(y_fac);
+    free(keep_xmz); free(keep_ymz); free(keep_xin); free(keep_yin);
+    return zero_result();
+  }
+
+  /* Build square score matrix — last write wins (matching R) */
+  double *score_mat = (double *)xcalloc((size_t)mat_dim * (size_t)mat_dim,
+                                        sizeof(double));
+  for (int i = 0; i < l; i++) {
+    int r = x_fac[i] - 1;
+    int c = y_fac[i] - 1;
+    double sc = sqrt(keep_xin[i]) * inv_sxs * sqrt(keep_yin[i]) * inv_sys;
+    score_mat[(size_t)r * mat_dim + c] = sc;
+  }
+
   free(x_fac); free(y_fac);
-  
-  /* dedup: sort by (row,col), keep max score per cell */
-  qsort(arcs,(size_t)l,sizeof(Arc),arc_cmp);
-  int u_count=0;
-  for(int i=0;i<l;i++){
-    if(i+1<l&&arcs[i].row==arcs[i+1].row&&arcs[i].col==arcs[i+1].col){
-      if(arcs[i].sc>arcs[i+1].sc) arcs[i+1].sc=arcs[i].sc;
-      continue;
+  free(keep_xmz); free(keep_ymz); free(keep_xin); free(keep_yin);
+
+  /* ── Shortest-augmenting-path Hungarian (maximize via negation) ────── */
+  {
+    int N = mat_dim;
+    double *u = (double *)xcalloc((size_t)(N + 1), sizeof(double));
+    double *v = (double *)xcalloc((size_t)(N + 1), sizeof(double));
+    int    *p = (int *)xmalloc((size_t)(N + 1) * sizeof(int));
+    int  *way = (int *)xmalloc((size_t)(N + 1) * sizeof(int));
+    double *minv = (double *)xmalloc((size_t)(N + 1) * sizeof(double));
+    int  *used = (int *)xcalloc((size_t)(N + 1), sizeof(int));
+
+    for (int j = 0; j <= N; j++) p[j] = 0;
+
+    for (int i = 1; i <= N; i++) {
+      p[0] = i;
+      int j0 = 0;
+      for (int j = 0; j <= N; j++) { minv[j] = DBL_MAX; used[j] = 0; }
+      do {
+        used[j0] = 1;
+        int i0 = p[j0], j1 = 0;
+        double del = DBL_MAX;
+        for (int j = 1; j <= N; j++) {
+          if (used[j]) continue;
+          double cur = -score_mat[(size_t)(i0 - 1) * N + (j - 1)] - u[i0] - v[j];
+          if (cur < minv[j]) { minv[j] = cur; way[j] = j0; }
+          if (minv[j] < del) { del = minv[j]; j1 = j; }
+        }
+        for (int j = 0; j <= N; j++) {
+          if (used[j]) { u[p[j]] += del; v[j] -= del; }
+          else { minv[j] -= del; }
+        }
+        j0 = j1;
+      } while (p[j0] != 0);
+      do { int j1 = way[j0]; p[j0] = p[j1]; j0 = j1; } while (j0);
     }
-    arcs[u_count++]=arcs[i];
+
+    double total = 0.0;
+    int matched = 0;
+    for (int j = 1; j <= N; j++) {
+      int row = p[j] - 1;
+      int col = j - 1;
+      double sc = score_mat[(size_t)row * N + col];
+      if (sc > 0.0) { total += sc; matched++; }
+    }
+
+    free(u); free(v); free(p); free(way); free(minv); free(used);
+    free(score_mat);
+
+    SEXP r = PROTECT(allocVector(VECSXP, 2));
+    SEXP nm = PROTECT(allocVector(STRSXP, 2));
+    SET_VECTOR_ELT(r, 0, ScalarReal(total));
+    SET_VECTOR_ELT(r, 1, ScalarInteger(matched));
+    SET_STRING_ELT(nm, 0, mkChar("score"));
+    SET_STRING_ELT(nm, 1, mkChar("matches"));
+    setAttrib(r, R_NamesSymbol, nm);
+    UNPROTECT(2);
+    return r;
   }
-  
-  /* compact: remap to contiguous row/col indices (only those present in arcs) */
-  int raw_nr2=0, raw_nc2=0;
-  for(int i=0;i<u_count;i++){
-    if(arcs[i].row>=raw_nr2) raw_nr2=arcs[i].row+1;
-    if(arcs[i].col>=raw_nc2) raw_nc2=arcs[i].col+1;
-  }
-  int *rmap=(int*)xmalloc((size_t)raw_nr2*sizeof(int));
-  int *cmap=(int*)xmalloc((size_t)raw_nc2*sizeof(int));
-  memset(rmap,-1,(size_t)raw_nr2*sizeof(int));
-  memset(cmap,-1,(size_t)raw_nc2*sizeof(int));
-  for(int i=0;i<u_count;i++){rmap[arcs[i].row]=0;cmap[arcs[i].col]=0;}
-  int nr2=0,nc2=0;
-  for(int i=0;i<raw_nr2;i++) if(rmap[i]==0) rmap[i]=nr2++;
-  for(int i=0;i<raw_nc2;i++) if(cmap[i]==0) cmap[i]=nc2++;
-  for(int i=0;i<u_count;i++){arcs[i].row=rmap[arcs[i].row];arcs[i].col=cmap[arcs[i].col];}
-  free(rmap); free(cmap);
-  /* Use nr2 rows only — squaring creates empty rows → infeasible LAPJV */
-  int nr = nr2, nc = nc2;
-  /* re-sort after index remapping so CSR columns are in order */
-  qsort(arcs,(size_t)u_count,sizeof(Arc),arc_cmp);
-  
-  double total=0.0; int matched=0;
-  int *row2col=(int*)xmalloc((size_t)(nr+1)*sizeof(int));
-  
-  if(nr<=DENSE_THRESHOLD){
-    int mpad=(nr>nc)?nr:nc;
-    double *smat=(double*)xcalloc((size_t)nr*(size_t)mpad,sizeof(double));
-    for(int i=0;i<u_count;i++)
-      smat[(size_t)arcs[i].row*mpad+arcs[i].col]=-arcs[i].sc;
-    int *r2c=(int*)xmalloc((size_t)(mpad+1)*sizeof(int));
-    /* lapjv_dense needs square matrix — pad rows with zeros if nr<nc */
-    if(mpad>nr){
-      double *smat2=(double*)xcalloc((size_t)mpad*mpad,sizeof(double));
-      for(int r=0;r<nr;r++)
-        memcpy(smat2+(size_t)r*mpad, smat+(size_t)r*mpad, (size_t)mpad*sizeof(double));
-      free(smat); smat=smat2;
-    }
-    lapjv_dense(mpad,smat,r2c);
-    for(int r=0;r<nr;r++){
-      int c=r2c[r];
-      if(c>=0&&c<nc){double sv=-smat[(size_t)r*mpad+c];if(sv>0){total+=sv;matched++;}}
-    }
-    free(smat); free(r2c);
-  } else {
-    int *rowcnt=(int*)xcalloc((size_t)nr,sizeof(int));
-    for(int i=0;i<u_count;i++) rowcnt[arcs[i].row]++;
-    int *first=(int*)xmalloc((size_t)(nr+1)*sizeof(int));
-    first[0]=0; for(int r=0;r<nr;r++) first[r+1]=first[r]+rowcnt[r];
-    free(rowcnt);
-    double *cc=(double*)xmalloc((size_t)u_count*sizeof(double));
-    int    *kk=(int*)   xmalloc((size_t)u_count*sizeof(int));
-    double *csc=(double*)xmalloc((size_t)u_count*sizeof(double));
-    int    *cur=(int*)  xcalloc((size_t)nr,sizeof(int));
-    memcpy(cur,first,(size_t)nr*sizeof(int));
-    for(int i=0;i<u_count;i++){
-      int pos=cur[arcs[i].row]++;
-      cc[pos]=-arcs[i].sc; kk[pos]=arcs[i].col; csc[pos]=arcs[i].sc;
-    }
-    free(cur);
-    lapjv_sparse(nr,cc,kk,first,u_count,row2col);
-    for(int r=0;r<nr;r++){
-      int c=row2col[r]; if(c<0||c>=nc) continue;
-      int lo=first[r],hi=first[r+1]-1;
-      while(lo<=hi){int mid=(lo+hi)>>1;
-        if(kk[mid]==c){if(csc[mid]>0){total+=csc[mid];matched++;}break;}
-        if(kk[mid]<c)lo=mid+1;else hi=mid-1;}
-    }
-    free(first);free(cc);free(kk);free(csc);
-  }
-  free(arcs); free(row2col);
-  
-  SEXP r=PROTECT(allocVector(VECSXP,2)),nm=PROTECT(allocVector(STRSXP,2));
-  SET_VECTOR_ELT(r,0,ScalarReal(total)); SET_VECTOR_ELT(r,1,ScalarInteger(matched));
-  SET_STRING_ELT(nm,0,mkChar("score")); SET_STRING_ELT(nm,1,mkChar("matches"));
-  setAttrib(r,R_NamesSymbol,nm); UNPROTECT(2); return r;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
  * join_gnps — standalone peak matching (backward compat)
  * ══════════════════════════════════════════════════════════════════════════ */
-#define BITSET_SET(bs,i)  ((bs)[(i)>>3]|=(unsigned char)(1u<<((i)&7u)))
-#define BITSET_TEST(bs,i) ((bs)[(i)>>3]& (unsigned char)(1u<<((i)&7u)))
-
 SEXP join_gnps(SEXP x, SEXP y,
                SEXP xPrecursorMz, SEXP yPrecursorMz,
                SEXP tolerance, SEXP ppm)
 {
-  if(!isReal(x)||!isReal(y)) error("x and y must be numeric vectors");
-  const double *xp=REAL(x),*yp=REAL(y);
-  const double x_pre=asReal(xPrecursorMz), y_pre=asReal(yPrecursorMz);
-  const double tol=asReal(tolerance), ppm_val=asReal(ppm);
-  const int nx=(int)xlength(x), ny=(int)xlength(y);
-  const double pdiff=y_pre-x_pre;
-  const int do_pdiff=(!ISNA(x_pre)&&!ISNA(y_pre));
-  
-  MI *xs=(MI*)xmalloc((size_t)nx*sizeof(MI));
-  MI *ys=(MI*)xmalloc((size_t)ny*sizeof(MI));
-  int vx=0,vy=0;
-  for(int i=0;i<nx;i++) if(!ISNA(xp[i])){xs[vx].mass=xp[i];xs[vx].idx=i;vx++;}
-  for(int i=0;i<ny;i++) if(!ISNA(yp[i])){ys[vy].mass=yp[i];ys[vy].idx=i;vy++;}
-  qsort(xs,(size_t)vx,sizeof(MI),mi_cmp);
-  qsort(ys,(size_t)vy,sizeof(MI),mi_cmp);
-  
-  const size_t bsz=((size_t)ny+7u)>>3;
-  unsigned char *y_used=(unsigned char*)xcalloc(bsz,1);
-  
+  if (!isReal(x) || !isReal(y)) error("x and y must be numeric vectors");
+  const double *xp = REAL(x), *yp = REAL(y);
+  const double x_pre = asReal(xPrecursorMz), y_pre = asReal(yPrecursorMz);
+  const double tol = asReal(tolerance), ppm_val = asReal(ppm);
+  const int nx = (int)xlength(x), ny = (int)xlength(y);
+  const double pdiff = y_pre - x_pre;
+  const int do_pdiff = (!ISNA(x_pre) && !ISNA(y_pre));
+
+  MI *xs_arr = (MI *)xmalloc((size_t)nx * sizeof(MI));
+  MI *ys_arr = (MI *)xmalloc((size_t)ny * sizeof(MI));
+  int vx = 0, vy = 0;
+  for (int i = 0; i < nx; i++)
+    if (!ISNA(xp[i])) { xs_arr[vx].mass = xp[i]; xs_arr[vx].idx = i; vx++; }
+  for (int i = 0; i < ny; i++)
+    if (!ISNA(yp[i])) { ys_arr[vy].mass = yp[i]; ys_arr[vy].idx = i; vy++; }
+  qsort(xs_arr, (size_t)vx, sizeof(MI), mi_cmp);
+  qsort(ys_arr, (size_t)vy, sizeof(MI), mi_cmp);
+
+  const size_t bsz = ((size_t)ny + 7u) >> 3;
+  unsigned char *y_used = (unsigned char *)xcalloc(bsz, 1);
+
   /* count pass */
-  int cnt=0;
-  /* NA x rows */
-  for(int i=0;i<nx;i++) if(ISNA(xp[i])) cnt++;
-  /* direct matches */
-  for(int i=0;i<vx;i++){
-    const double xm=xs[i].mass, half=tol+ppm_val*xm*1e-6;
-    int start=lower_bound(ys,vy,xm-half), found=0;
-    for(int j=start;j<vy&&ys[j].mass<=xm+half;j++){BS_SET(y_used,ys[j].idx);found++;cnt++;}
-    if(!found) cnt++;
+  int cnt = 0;
+  for (int i = 0; i < nx; i++) if (ISNA(xp[i])) cnt++;
+  for (int i = 0; i < vx; i++) {
+    const double xm = xs_arr[i].mass, half = tol + ppm_val * xm * 1e-6;
+    int start = lower_bound(ys_arr, vy, xm - half), found = 0;
+    for (int j = start; j < vy && ys_arr[j].mass <= xm + half; j++) {
+      BS_SET(y_used, ys_arr[j].idx); found++; cnt++;
+    }
+    if (!found) cnt++;
   }
-  /* shifted matches */
-  if(do_pdiff){
-    for(int i=0;i<vx;i++){
-      const double xa=xs[i].mass+pdiff, half=tol+ppm_val*xa*1e-6;
-      for(int j=lower_bound(ys,vy,xa-half);j<vy&&ys[j].mass<=xa+half;j++) cnt++;
+  if (do_pdiff) {
+    for (int i = 0; i < vx; i++) {
+      const double xa = xs_arr[i].mass + pdiff, half = tol + ppm_val * xa * 1e-6;
+      for (int j = lower_bound(ys_arr, vy, xa - half);
+           j < vy && ys_arr[j].mass <= xa + half; j++)
+        cnt++;
     }
   }
-  /* unmatched y */
-  for(int i=0;i<ny;i++) if(!ISNA(yp[i])&&!BS_TEST(y_used,i)) cnt++;
-  
-  memset(y_used,0,bsz);
-  
-  SEXP rx=PROTECT(allocVector(INTSXP,cnt));
-  SEXP ry=PROTECT(allocVector(INTSXP,cnt));
-  int *ox=INTEGER(rx), *oy=INTEGER(ry), pos=0;
-  
-  /* fill pass — same order */
-  for(int i=0;i<nx;i++) if(ISNA(xp[i])){ox[pos]=i+1;oy[pos]=NA_INTEGER;pos++;}
-  for(int i=0;i<vx;i++){
-    const double xm=xs[i].mass, half=tol+ppm_val*xm*1e-6;
-    int start=lower_bound(ys,vy,xm-half), found=0;
-    for(int j=start;j<vy&&ys[j].mass<=xm+half;j++){
-      BS_SET(y_used,ys[j].idx);
-      ox[pos]=xs[i].idx+1; oy[pos]=ys[j].idx+1; pos++; found++;
+  for (int i = 0; i < ny; i++)
+    if (!ISNA(yp[i]) && !BS_TEST(y_used, i)) cnt++;
+
+  memset(y_used, 0, bsz);
+
+  SEXP rx = PROTECT(allocVector(INTSXP, cnt));
+  SEXP ry = PROTECT(allocVector(INTSXP, cnt));
+  int *ox = INTEGER(rx), *oy = INTEGER(ry), pos = 0;
+
+  for (int i = 0; i < nx; i++)
+    if (ISNA(xp[i])) { ox[pos] = i + 1; oy[pos] = NA_INTEGER; pos++; }
+  for (int i = 0; i < vx; i++) {
+    const double xm = xs_arr[i].mass, half = tol + ppm_val * xm * 1e-6;
+    int start = lower_bound(ys_arr, vy, xm - half), found = 0;
+    for (int j = start; j < vy && ys_arr[j].mass <= xm + half; j++) {
+      BS_SET(y_used, ys_arr[j].idx);
+      ox[pos] = xs_arr[i].idx + 1; oy[pos] = ys_arr[j].idx + 1; pos++; found++;
     }
-    if(!found){ox[pos]=xs[i].idx+1;oy[pos]=NA_INTEGER;pos++;}
+    if (!found) { ox[pos] = xs_arr[i].idx + 1; oy[pos] = NA_INTEGER; pos++; }
   }
-  if(do_pdiff){
-    for(int i=0;i<vx;i++){
-      const double xa=xs[i].mass+pdiff, half=tol+ppm_val*xa*1e-6;
-      for(int j=lower_bound(ys,vy,xa-half);j<vy&&ys[j].mass<=xa+half;j++){
-        ox[pos]=xs[i].idx+1; oy[pos]=ys[j].idx+1; pos++;
+  if (do_pdiff) {
+    for (int i = 0; i < vx; i++) {
+      const double xa = xs_arr[i].mass + pdiff, half = tol + ppm_val * xa * 1e-6;
+      for (int j = lower_bound(ys_arr, vy, xa - half);
+           j < vy && ys_arr[j].mass <= xa + half; j++) {
+        ox[pos] = xs_arr[i].idx + 1; oy[pos] = ys_arr[j].idx + 1; pos++;
       }
     }
   }
-  for(int i=0;i<ny;i++) if(!ISNA(yp[i])&&!BS_TEST(y_used,i)){ox[pos]=NA_INTEGER;oy[pos]=i+1;pos++;}
-  
-  free(xs);free(ys);free(y_used);
-  
-  SEXP result=PROTECT(allocVector(VECSXP,2));
-  SET_VECTOR_ELT(result,0,rx); SET_VECTOR_ELT(result,1,ry);
-  SEXP names=PROTECT(allocVector(STRSXP,2));
-  SET_STRING_ELT(names,0,mkChar("x")); SET_STRING_ELT(names,1,mkChar("y"));
-  setAttrib(result,R_NamesSymbol,names);
-  UNPROTECT(4); return result;
+  for (int i = 0; i < ny; i++)
+    if (!ISNA(yp[i]) && !BS_TEST(y_used, i)) {
+      ox[pos] = NA_INTEGER; oy[pos] = i + 1; pos++;
+    }
+
+  free(xs_arr); free(ys_arr); free(y_used);
+
+  SEXP result = PROTECT(allocVector(VECSXP, 2));
+  SET_VECTOR_ELT(result, 0, rx);
+  SET_VECTOR_ELT(result, 1, ry);
+  SEXP names = PROTECT(allocVector(STRSXP, 2));
+  SET_STRING_ELT(names, 0, mkChar("x"));
+  SET_STRING_ELT(names, 1, mkChar("y"));
+  setAttrib(result, R_NamesSymbol, names);
+  UNPROTECT(4);
+  return result;
 }

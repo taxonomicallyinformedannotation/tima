@@ -3,7 +3,15 @@
 #' @description Calculates similarity scores between query and
 #'     target spectra using either entropy, cosine, or GNPS methods.
 #'
+#'     **Important:** For correct results with the GNPS and cosine methods,
+#'     input spectra should be sanitized (unique, well-separated m/z values;
+#'     no NaN; sorted by m/z). This is automatically done by
+#'     [import_spectra()] with `sanitize = TRUE`. If unsanitized spectra are
+#'     detected (duplicate m/z within tolerance), they are sanitized on the fly
+#'     with a warning.
+#'
 #' @include c_wrappers.R
+#' @include sanitize_spectrum_matrix.R
 #' @include validations_utils.R
 #'
 #' @param method Character string specifying method: "entropy", "gnps", or "cosine"
@@ -75,6 +83,43 @@ calculate_similarity <- function(
   assert_scalar_numeric(ppm, "ppm", min = 0)
   assert_flag(return_matched_peaks, "return_matched_peaks")
   # Early exit for empty spectra
+  if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
+    return(
+      if (return_matched_peaks) {
+        list(score = 0.0, matches = 0L)
+      } else {
+        0.0
+      }
+    )
+  }
+
+  # Sanity check: ensure spectra are sanitized (unique m/z, sorted, no NaN)
+  # The C scoring functions assume well-separated peaks. Unsanitized input
+  # (e.g. duplicate m/z values) produces mathematically incorrect scores.
+  if (!is_spectrum_sanitized(query_spectrum, tolerance = dalton, ppm = ppm)) {
+    warning(
+      "Query spectrum has unsanitized peaks (duplicate or unsorted m/z). ",
+      "Sanitizing on the fly. For best performance, use ",
+      "import_spectra(sanitize = TRUE) upstream.",
+      call. = FALSE
+    )
+    query_spectrum <- sanitize_spectrum_matrix(
+      query_spectrum, tolerance = dalton, ppm = ppm
+    )
+  }
+  if (!is_spectrum_sanitized(target_spectrum, tolerance = dalton, ppm = ppm)) {
+    warning(
+      "Target spectrum has unsanitized peaks (duplicate or unsorted m/z). ",
+      "Sanitizing on the fly. For best performance, use ",
+      "import_spectra(sanitize = TRUE) upstream.",
+      call. = FALSE
+    )
+    target_spectrum <- sanitize_spectrum_matrix(
+      target_spectrum, tolerance = dalton, ppm = ppm
+    )
+  }
+
+  # Re-check after sanitization (may have become empty)
   if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
     return(
       if (return_matched_peaks) {
