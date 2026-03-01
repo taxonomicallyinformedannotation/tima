@@ -667,6 +667,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
 <p>Calculates similarity scores between query and target spectra using either entropy, cosine, or GNPS methods.</p>
+<div class="sourceCode">
+<pre>**Important:** For correct results with the GNPS and cosine methods,
+input spectra should be sanitized (unique, well-separated m/z values;
+no NaN; sorted by m/z). This is automatically done by
+[import_spectra()] with `sanitize = TRUE`. If unsanitized spectra are
+detected (duplicate m/z within tolerance), they are sanitized on the fly
+with a warning.
+</pre>
+</div>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
