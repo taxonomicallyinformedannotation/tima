@@ -43,6 +43,14 @@ if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.
 \description{
 Calculates similarity scores between query and
 target spectra using either entropy, cosine, or GNPS methods.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{**Important:** For correct results with the GNPS and cosine methods,
+input spectra should be sanitized (unique, well-separated m/z values;
+no NaN; sorted by m/z). This is automatically done by
+[import_spectra()] with `sanitize = TRUE`. If unsanitized spectra are
+detected (duplicate m/z within tolerance), they are sanitized on the fly
+with a warning.
+}\if{html}{\out{</div>}}
 }
 \examples{
 sp_1 <- cbind(

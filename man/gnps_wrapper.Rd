@@ -20,7 +20,15 @@ A list containing:
 }
 \description{
 Calculates GNPS-style spectral similarity score between
-two matched peak matrices
+two matched peak matrices using a chain-DP optimal assignment
+algorithm (O(n+m) time).
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{**Spectra must be sanitized** before calling this function:
+unique m/z values (no duplicates within tolerance), sorted by m/z,
+no NaN/NA. This is guaranteed by [sanitize_spectra()] via
+[import_spectra()]. See [sanitize_spectrum_matrix()] for a
+lightweight fallback.
+}\if{html}{\out{</div>}}
 }
 \examples{
 \dontrun{
