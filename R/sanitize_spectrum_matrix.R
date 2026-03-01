@@ -17,7 +17,9 @@
 #'
 #' @keywords internal
 is_spectrum_sanitized <- function(spectrum, tolerance = 0.01, ppm = 10) {
-  if (!is.matrix(spectrum) || nrow(spectrum) < 2L) return(TRUE)
+  if (!is.matrix(spectrum) || nrow(spectrum) < 2L) {
+    return(TRUE)
+  }
 
   mz <- spectrum[, 1L]
   int <- spectrum[, 2L]
@@ -28,13 +30,17 @@ is_spectrum_sanitized <- function(spectrum, tolerance = 0.01, ppm = 10) {
   }
 
   # Check sorted
-  if (is.unsorted(mz)) return(FALSE)
+  if (is.unsorted(mz)) {
+    return(FALSE)
+  }
 
   # Check for duplicates within tolerance
   diffs <- diff(mz)
   # Tolerance at each pair: tol + ppm * min(mz_i, mz_i+1) * 1e-6
   allowed <- tolerance + ppm * mz[-length(mz)] * 1e-6
-  if (any(diffs < allowed)) return(FALSE)
+  if (any(diffs < allowed)) {
+    return(FALSE)
+  }
 
   TRUE
 }
@@ -64,7 +70,9 @@ is_spectrum_sanitized <- function(spectrum, tolerance = 0.01, ppm = 10) {
 #'
 #' @keywords internal
 sanitize_spectrum_matrix <- function(spectrum, tolerance = 0.01, ppm = 10) {
-  if (!is.matrix(spectrum) || nrow(spectrum) == 0L) return(spectrum)
+  if (!is.matrix(spectrum) || nrow(spectrum) == 0L) {
+    return(spectrum)
+  }
 
   mz <- spectrum[, 1L]
   int <- spectrum[, 2L]
@@ -75,7 +83,11 @@ sanitize_spectrum_matrix <- function(spectrum, tolerance = 0.01, ppm = 10) {
   int <- int[valid]
 
   if (length(mz) == 0L) {
-    return(matrix(numeric(0L), ncol = 2L, dimnames = list(NULL, c("mz", "intensity"))))
+    return(matrix(
+      numeric(0L),
+      ncol = 2L,
+      dimnames = list(NULL, c("mz", "intensity"))
+    ))
   }
 
   # 2. Sort by m/z
@@ -117,4 +129,3 @@ sanitize_spectrum_matrix <- function(spectrum, tolerance = 0.01, ppm = 10) {
 
   cbind(mz = merged_mz[1L:k], intensity = merged_int[1L:k])
 }
-
