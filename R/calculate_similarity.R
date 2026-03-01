@@ -227,24 +227,27 @@ calculate_similarity <- function(
   matched_x <- map[[1L]]
   matched_y <- map[[2L]]
 
-  # Filter unmatched (NA) entries and deduplicate shifted+direct overlaps
-  valid <- !is.na(matched_x) & !is.na(matched_y)
-  matched_x <- matched_x[valid]
-  matched_y <- matched_y[valid]
-
-  if (length(matched_x) == 0L) {
+  # Early exit if no matches at all
+  if (length(matched_x) == 0L || all(is.na(matched_x) | is.na(matched_y))) {
     return(
       if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0
     )
   }
 
   # Deduplicate: precursor-shift pass can produce pairs already in direct pass
-  dups <- duplicated(data.frame(x = matched_x, y = matched_y))
+  # (keep NAs — they carry unmatched peaks needed for correct denominators)
+  both_valid <- !is.na(matched_x) & !is.na(matched_y)
+  dups <- both_valid & duplicated(data.frame(x = matched_x, y = matched_y))
   matched_x <- matched_x[!dups]
   matched_y <- matched_y[!dups]
 
+  # Build aligned matrices WITH NAs for unmatched peaks.
+  # gnps() needs ALL peaks (matched + unmatched) to compute the correct
+  # intensity-sum denominators: sqrt(int_i)/sqrt(sum_ALL_unique_int).
+  # Stripping NAs here would inflate scores.
   x_mat <- query_spectrum[matched_x, , drop = FALSE]
   y_mat <- target_spectrum[matched_y, , drop = FALSE]
+
   # Calculate similarity using optimized C GNPS algorithm
   result <- tryCatch(
     gnps_wrapper(x = x_mat, y = y_mat),
