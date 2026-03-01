@@ -1,3 +1,19 @@
+# Package-level environment for "warn once" sanitization messages.
+# Resets on package load. Prevents flooding billions of warnings in hot loops.
+.tima_sanitize_env <- new.env(parent = emptyenv())
+
+#' @title Reset sanitization warnings
+#'
+#' @description Resets the "warn once" flags so that subsequent unsanitized
+#'     spectra will trigger a warning again. Useful between pipeline runs.
+#'
+#' @keywords internal
+reset_sanitize_warnings <- function() {
+  .tima_sanitize_env$warned_query <- FALSE
+  .tima_sanitize_env$warned_target <- FALSE
+  invisible(NULL)
+}
+
 #' @title Check if a spectrum matrix is sanitized
 #'
 #' @description Fast check that a peak matrix has the properties required
@@ -17,32 +33,49 @@
 #'
 #' @keywords internal
 is_spectrum_sanitized <- function(spectrum, tolerance = 0.01, ppm = 10) {
-  if (!is.matrix(spectrum) || nrow(spectrum) < 2L) {
-    return(TRUE)
-  }
+  # Bulletproof: never produce NA, never error — only TRUE or FALSE
+  tryCatch(
+    {
+      if (is.null(spectrum)) {
+        return(TRUE)
+      }
+      if (!is.matrix(spectrum)) {
+        return(FALSE)
+      }
+      if (ncol(spectrum) < 2L) {
+        return(FALSE)
+      }
+      if (nrow(spectrum) < 2L) {
+        return(TRUE)
+      }
 
-  mz <- spectrum[, 1L]
-  int <- spectrum[, 2L]
+      mz <- spectrum[, 1L]
+      int <- spectrum[, 2L]
 
-  # Check for NaN/NA
-  if (anyNA(mz) || anyNA(int) || any(is.nan(mz)) || any(is.nan(int))) {
-    return(FALSE)
-  }
+      # Check for NaN/NA
+      if (anyNA(mz) || anyNA(int)) {
+        return(FALSE)
+      }
+      if (any(is.nan(mz)) || any(is.nan(int))) {
+        return(FALSE)
+      }
 
-  # Check sorted
-  if (is.unsorted(mz)) {
-    return(FALSE)
-  }
+      # Check sorted
+      if (is.unsorted(mz, na.rm = FALSE)) {
+        return(FALSE)
+      }
 
-  # Check for duplicates within tolerance
-  diffs <- diff(mz)
-  # Tolerance at each pair: tol + ppm * min(mz_i, mz_i+1) * 1e-6
-  allowed <- tolerance + ppm * mz[-length(mz)] * 1e-6
-  if (any(diffs < allowed)) {
-    return(FALSE)
-  }
+      # Check for duplicates within tolerance
+      diffs <- diff(mz)
+      allowed <- tolerance + ppm * mz[-length(mz)] * 1e-6
+      if (any(diffs < allowed, na.rm = TRUE)) {
+        return(FALSE)
+      }
 
-  TRUE
+      TRUE
+    },
+    error = function(e) FALSE
+  )
 }
 
 #' @title Sanitize a spectrum matrix for C-level scoring
