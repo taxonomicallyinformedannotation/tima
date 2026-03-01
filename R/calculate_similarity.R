@@ -104,7 +104,9 @@ calculate_similarity <- function(
       call. = FALSE
     )
     query_spectrum <- sanitize_spectrum_matrix(
-      query_spectrum, tolerance = dalton, ppm = ppm
+      query_spectrum,
+      tolerance = dalton,
+      ppm = ppm
     )
   }
   if (!is_spectrum_sanitized(target_spectrum, tolerance = dalton, ppm = ppm)) {
@@ -115,7 +117,9 @@ calculate_similarity <- function(
       call. = FALSE
     )
     target_spectrum <- sanitize_spectrum_matrix(
-      target_spectrum, tolerance = dalton, ppm = ppm
+      target_spectrum,
+      tolerance = dalton,
+      ppm = ppm
     )
   }
 
