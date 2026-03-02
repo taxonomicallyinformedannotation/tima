@@ -180,6 +180,39 @@ test_that("prepare_features_tables retains top intensity samples", {
 
 ## Edge Cases ----
 
+test_that("prepare_features_tables handles both Peak area and Peak height", {
+  withr::local_dir(new = temp_test_dir("prep_feat_tables_area_height"))
+  paths <- local_test_project(copy = TRUE)
+
+  both_features <- tidytable::tidytable(
+    "row ID" = 1:2,
+    "row m/z" = c(123.456, 234.567),
+    "row retention time" = c(1.5, 2.0),
+    "sample1.mzML Peak area" = c(1000, 2000),
+    "sample1.mzML Peak height" = c(500, 900),
+    "sample2.mzML Peak area" = c(1500, 2500),
+    "sample2.mzML Peak height" = c(700, 1100)
+  )
+
+  dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
+  test_file <- file.path("data", "source", "area_height.csv")
+  tidytable::fwrite(x = both_features, file = test_file)
+
+  output_file <- file.path("data", "interim", "features", "prepared.tsv.gz")
+
+  result <- prepare_features_tables(
+    features = test_file,
+    output = output_file,
+    candidates = 5
+  )
+
+  expect_true(file.exists(result))
+  prepared <- tidytable::fread(output_file)
+  expect_true("feature_id" %in% colnames(prepared))
+  # Should not have duplicate sample columns
+  expect_equal(length(unique(colnames(prepared))), length(colnames(prepared)))
+})
+
 test_that("prepare_features_tables handles empty file", {
   withr::local_dir(new = temp_test_dir("prep_feat_tables_empty"))
   paths <- local_test_project(copy = TRUE)
