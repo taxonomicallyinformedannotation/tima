@@ -202,6 +202,57 @@ create_edges <- function(
 
   # Calculate Pairwise Similarities ----
 
+  # Pre-flight: sanitize spectra once if needed (not per pair)
+  .needs_sanitize <- FALSE
+  sample_idx <- unique(c(
+    1L,
+    as.integer(seq(1L, nspecs, length.out = min(20L, nspecs)))
+  ))
+  for (idx in sample_idx) {
+    sp <- frags[[idx]]
+    if (
+      is.matrix(sp) &&
+        nrow(sp) >= 2L &&
+        !is_spectrum_sanitized(
+          sp,
+          tolerance = ms2_tolerance,
+          ppm = ppm_tolerance
+        )
+    ) {
+      .needs_sanitize <- TRUE
+      break
+    }
+  }
+  if (.needs_sanitize) {
+    log_warn(
+      paste0(
+        "Unsanitized spectra detected. ",
+        "Sanitizing %d spectra in-place before edge creation. ",
+        "Consider using import_spectra(sanitize = TRUE) upstream."
+      ),
+      nspecs
+    )
+    frags <- lapply(frags, function(sp) {
+      if (
+        is.matrix(sp) &&
+          nrow(sp) >= 2L &&
+          !is_spectrum_sanitized(
+            sp,
+            tolerance = ms2_tolerance,
+            ppm = ppm_tolerance
+          )
+      ) {
+        sanitize_spectrum_matrix(
+          sp,
+          tolerance = ms2_tolerance,
+          ppm = ppm_tolerance
+        )
+      } else {
+        sp
+      }
+    })
+  }
+
   # Create all pairwise comparisons
   indices <- seq_len(nspecs - 1L)
   n_comparisons <- sum(indices)

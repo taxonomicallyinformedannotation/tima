@@ -123,42 +123,53 @@ calculate_entropy_and_similarity <- function(
   # Pre-calculate length once for efficiency
   n_queries <- length(query_ids)
 
-  # Reset warn-once flags for this run
-  reset_sanitize_warnings()
-
-  # Pre-flight check: sample a few spectra to detect unsanitized input early.
-  # This gives the user a clear, actionable warning before the hot loop.
-  .check_spectra_batch <- function(spectra_list, label, dalton, ppm) {
+  # Pre-flight: sample a few spectra to detect unsanitized input.
+  # If any are found, sanitize the entire list once before the hot loop.
+  .ensure_sanitized <- function(spectra_list, label, dalton, ppm) {
     n <- length(spectra_list)
     if (n == 0L) {
-      return(invisible(NULL))
+      return(spectra_list)
     }
-    sample_idx <- unique(c(1L, seq(1L, n, length.out = min(20L, n))))
-    n_bad <- 0L
+    sample_idx <- unique(c(
+      1L,
+      as.integer(seq(1L, n, length.out = min(20L, n)))
+    ))
+    needs_fix <- FALSE
     for (idx in sample_idx) {
       sp <- spectra_list[[idx]]
       if (is.matrix(sp) && nrow(sp) >= 2L) {
         if (!is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)) {
-          n_bad <- n_bad + 1L
+          needs_fix <- TRUE
+          break
         }
       }
     }
-    if (n_bad > 0L) {
+    if (needs_fix) {
       log_warn(
         paste0(
-          "%d/%d sampled %s spectra are not sanitized ",
-          "(duplicate/unsorted m/z or NaN). They will be auto-fixed per call, ",
-          "but this adds overhead. Consider using ",
-          "import_spectra(sanitize = TRUE) upstream."
+          "Unsanitized %s spectra detected. ",
+          "Sanitizing %d spectra in-place before scoring. ",
+          "Consider using import_spectra(sanitize = TRUE) upstream."
         ),
-        n_bad,
-        length(sample_idx),
-        label
+        label,
+        n
       )
+      spectra_list <- lapply(spectra_list, function(sp) {
+        if (
+          is.matrix(sp) &&
+            nrow(sp) >= 2L &&
+            !is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)
+        ) {
+          sanitize_spectrum_matrix(sp, tolerance = dalton, ppm = ppm)
+        } else {
+          sp
+        }
+      })
     }
+    spectra_list
   }
-  .check_spectra_batch(query_spectra, "query", dalton, ppm)
-  .check_spectra_batch(lib_spectra, "library", dalton, ppm)
+  query_spectra <- .ensure_sanitized(query_spectra, "query", dalton, ppm)
+  lib_spectra <- .ensure_sanitized(lib_spectra, "library", dalton, ppm)
 
   # Use closures to avoid passing large objects through function arguments.
   # R's lexical scoping means the closure captures references to
