@@ -1,128 +1,15 @@
 # Helper Functions ----
 
-#' Calculate similarity for a target spectrum
-#' @keywords internal
-.calculate_target_similarity <- function(
-  target_idx,
-  frags,
-  precs,
-  method,
-  ms2_tolerance,
-  ppm_tolerance,
-  query_spectrum,
-  query_precursor
-) {
-  target_spectrum <- frags[[target_idx]]
-  target_precursor <- precs[[target_idx]]
-  calculate_similarity(
-    method = method,
-    query_spectrum = query_spectrum,
-    target_spectrum = target_spectrum,
-    query_precursor = query_precursor,
-    target_precursor = target_precursor,
-    dalton = ms2_tolerance,
-    ppm = ppm_tolerance,
-    return_matched_peaks = TRUE
-  )
-}
-
-#' Process query spectrum against all subsequent spectra
-#' @keywords internal
-.process_query_spectrum <- function(
-  index,
-  nspecs,
-  frags,
-  precs,
-  method,
-  ms2_tolerance,
-  ppm_tolerance,
-  threshold,
-  matched_peaks,
-  score_bins_acc
-) {
-  target_indices <- (index + 1L):nspecs
-  query_spectrum <- frags[[index]]
-  query_precursor <- precs[[index]]
-
-  # Calculate similarities for all targets - use base lapply for speed
-  results <- lapply(
-    X = target_indices,
-    FUN = .calculate_target_similarity,
-    frags = frags,
-    precs = precs,
-    method = method,
-    ms2_tolerance = ms2_tolerance,
-    ppm_tolerance = ppm_tolerance,
-    query_spectrum = query_spectrum,
-    query_precursor = query_precursor
-  )
-
-  # Extract scores and matches
-  # Handle both list format (score/matches) and numeric format (entropy)
-
-  .extract_score <- function(x) {
-    if (is.list(x) && "score" %in% names(x)) {
-      x$score
-    } else if (is.numeric(x)) {
-      x
-    } else {
-      0.0
-    }
-  }
-
-  .extract_matches <- function(x) {
-    if (is.list(x) && "matches" %in% names(x)) {
-      x$matches
-    } else {
-      0L
-    }
-  }
-
-  scores <- vapply(
-    X = results,
-    FUN = .extract_score,
-    numeric(1L),
-    USE.NAMES = FALSE
-  )
-
-  matches <- vapply(
-    X = results,
-    FUN = .extract_matches,
-    integer(1L),
-    USE.NAMES = FALSE
-  )
-
-  # Accumulate raw score distribution prior to filtering (0.1 bins)
-  score_bins_acc <- score_bins_acc + accumulate_similarity_bins(scores)
-
-  # Filter by thresholds (single filtering point)
-  valid_indices <- which(scores >= threshold & matches >= matched_peaks)
-
-  if (length(valid_indices) > 0L) {
-    list(
-      df = data.frame(
-        feature_id = index,
-        target_id = target_indices[valid_indices],
-        score = scores[valid_indices],
-        matched_peaks = matches[valid_indices]
-      ),
-      bins = score_bins_acc
-    )
-  } else {
-    list(df = NULL, bins = score_bins_acc)
-  }
-}
-
 #' @title Create spectral similarity network edges
 #'
 #' @description Calculates pairwise spectral similarity between all spectra to
-#'     create a network edge list. Uses parallel processing via purrr for
-#'     efficiency.
+#'     create a network edge list.
 #'
 #' @include calculate_similarity.R
 #' @include constants.R
 #' @include logs_utils.R
 #' @include predicates_utils.R
+#' @include sanitize_spectrum_matrix.R
 #' @include validations_utils.R
 #'
 #' @param frags List of aligned fragment spectra matrices
@@ -141,12 +28,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Create network edges from spectra
 #' edges <- create_edges(
 #'   frags = fragment_list,
 #'   nspecs = length(fragment_list),
 #'   precs = precursor_mz,
-#'   method = "cosine",
+#'   method = "gnps",
 #'   ms2_tolerance = 0.02,
 #'   ppm_tolerance = 10,
 #'   threshold = 0.7,
@@ -163,6 +49,13 @@ create_edges <- function(
   threshold,
   matched_peaks
 ) {
+  empty_result <- tidytable::tidytable(
+    feature_id = NA_integer_,
+    target_id = NA_integer_,
+    score = NA_real_,
+    matched_peaks = NA_integer_
+  )
+
   # Initialize logging context
   ctx <- log_operation(
     "create_edges",
@@ -175,18 +68,11 @@ create_edges <- function(
   # Input Validation ----
   validate_choice(method, VALID_SIMILARITY_METHODS, param_name = "method")
 
-  # Early exit for insufficient spectra
   if (nspecs < 2L) {
     log_complete(ctx, n_edges = 0, note = "Less than 2 spectra")
-    return(tidytable::tidytable(
-      feature_id = NA_integer_,
-      target_id = NA_integer_,
-      score = NA_real_,
-      matched_peaks = NA_integer_
-    ))
+    return(empty_result)
   }
 
-  # Validate input consistency
   if (length(frags) != nspecs || length(precs) != nspecs) {
     stop(
       "Length mismatch: frags (",
@@ -196,18 +82,17 @@ create_edges <- function(
       length(precs),
       "), nspecs (",
       nspecs,
-      ") must be consistent"
+      ")",
+      call. = FALSE
     )
   }
 
-  # Calculate Pairwise Similarities ----
-
-  # Pre-flight: sanitize spectra once if needed (not per pair)
-  .needs_sanitize <- FALSE
+  # Pre-flight: sanitize spectra once if needed ----
   sample_idx <- unique(c(
     1L,
     as.integer(seq(1L, nspecs, length.out = min(20L, nspecs)))
   ))
+  needs_sanitize <- FALSE
   for (idx in sample_idx) {
     sp <- frags[[idx]]
     if (
@@ -219,17 +104,13 @@ create_edges <- function(
           ppm = ppm_tolerance
         )
     ) {
-      .needs_sanitize <- TRUE
+      needs_sanitize <- TRUE
       break
     }
   }
-  if (.needs_sanitize) {
+  if (needs_sanitize) {
     log_warn(
-      paste0(
-        "Unsanitized spectra detected. ",
-        "Sanitizing %d spectra in-place before edge creation. ",
-        "Consider using import_spectra(sanitize = TRUE) upstream."
-      ),
+      "Unsanitized spectra detected. Sanitizing %d spectra before edge creation.",
       nspecs
     )
     frags <- lapply(frags, function(sp) {
@@ -253,68 +134,106 @@ create_edges <- function(
     })
   }
 
-  # Create all pairwise comparisons
-  indices <- seq_len(nspecs - 1L)
-  n_comparisons <- sum(indices)
+  # Calculate Pairwise Similarities ----
+
+  n_queries <- nspecs - 1L
+  n_comparisons <- as.double(nspecs) * (nspecs - 1L) / 2
 
   log_metadata(ctx, phase = "calculating", n_comparisons = n_comparisons)
 
-  # Pre-calculate length once for efficiency
-  n_queries <- length(indices)
-
-  # Progress counter for logging
+  # Score histogram bins (accumulated across all queries)
+  bin_counts <- integer(10L)
+  use_gnps <- (method == "gnps")
   progress_counter <- 0L
 
-  # Initialize score bins accumulator (all-zero vector with labels)
-  score_bins_acc <- accumulate_similarity_bins(numeric(0))
+  results <- lapply(seq_len(n_queries), function(i) {
+    progress_counter <<- progress_counter + 1L
+    if (progress_counter %% 500L == 0L) {
+      log_info("Processed %d / %d queries", progress_counter, n_queries)
+    }
 
-  lst <- lapply(
-    X = indices,
-    FUN = function(i, ...) {
-      # Increment progress counter in parent environment
-      progress_counter <<- progress_counter + 1L
+    q_sp <- frags[[i]]
+    q_pre <- precs[i]
+    targets <- (i + 1L):nspecs
 
-      res <- .process_query_spectrum(i, ..., score_bins_acc = score_bins_acc)
+    # Inner loop: one .Call per target, collect scores + matches
+    pairs <- lapply(targets, function(j) {
+      t_sp <- frags[[j]]
+      t_pre <- precs[j]
 
-      # Update accumulator with returned bins
-      score_bins_acc <<- res$bins
-
-      if (progress_counter %% 500L == 0L) {
-        log_info("Processed %d / %d queries", progress_counter, n_queries)
+      if (use_gnps) {
+        res <- .Call(
+          "gnps_compute",
+          q_sp,
+          t_sp,
+          q_pre,
+          t_pre,
+          ms2_tolerance,
+          ppm_tolerance
+        )
+        sc <- res[["score"]]
+        mp <- res[["matches"]]
+      } else {
+        res <- calculate_similarity(
+          method = method,
+          query_spectrum = q_sp,
+          target_spectrum = t_sp,
+          query_precursor = q_pre,
+          target_precursor = t_pre,
+          dalton = ms2_tolerance,
+          ppm = ppm_tolerance,
+          return_matched_peaks = TRUE
+        )
+        sc <- if (is.list(res)) res[["score"]] else as.numeric(res)
+        mp <- if (is.list(res)) res[["matches"]] else 0L
       }
-      res$df
-    },
-    nspecs = nspecs,
-    frags = frags,
-    precs = precs,
-    method = method,
-    ms2_tolerance = ms2_tolerance,
-    ppm_tolerance = ppm_tolerance,
-    threshold = threshold,
-    matched_peaks = matched_peaks
+
+      # Accumulate score histogram in parent env
+      bin <- min(9L, max(0L, as.integer(sc * 10)))
+      bin_counts[bin + 1L] <<- bin_counts[bin + 1L] + 1L
+
+      if (sc >= threshold && mp >= matched_peaks) {
+        c(i, j, sc, mp)
+      }
+    })
+
+    # Drop NULLs and combine into matrix (4 columns) for this query
+    pairs <- pairs[!vapply(pairs, is.null, FALSE, USE.NAMES = FALSE)]
+    if (length(pairs) > 0L) {
+      do.call(rbind, pairs)
+    }
+  })
+
+  # Score distribution logging ----
+  bin_labels <- c(
+    "[0,0.1]",
+    "(0.1,0.2]",
+    "(0.2,0.3]",
+    "(0.3,0.4]",
+    "(0.4,0.5]",
+    "(0.5,0.6]",
+    "(0.6,0.7]",
+    "(0.7,0.8]",
+    "(0.8,0.9]",
+    "(0.9,1]"
   )
-
-  # Combine Results ----
-
-  # Remove NULL entries and combine
-  edges <- lst[
-    !vapply(
-      X = lst,
-      FUN = is.null,
-      logical(1L),
-      USE.NAMES = FALSE
-    )
-  ]
-
-  # Log the raw similarity distribution before threshold filtering (accumulated)
-  # Note: distribution is for all pairwise comparisons evaluated
+  names(bin_counts) <- bin_labels
   log_similarity_distribution_counts(
-    counts = score_bins_acc,
+    counts = bin_counts,
     title = "Here is the distribution of edge similarity scores (0.1 bins) BEFORE filtering:"
   )
 
-  if (length(edges) > 0L) {
-    result <- tidytable::bind_rows(edges)
+  # Combine all query results into one matrix, then to tidytable ----
+  results <- results[!vapply(results, is.null, FALSE, USE.NAMES = FALSE)]
+
+  if (length(results) > 0L) {
+    mat <- do.call(rbind, results)
+    result <- tidytable::tidytable(
+      feature_id = as.integer(mat[, 1L]),
+      target_id = as.integer(mat[, 2L]),
+      score = mat[, 3L],
+      matched_peaks = as.integer(mat[, 4L])
+    )
     log_complete(
       ctx,
       n_edges = nrow(result),
@@ -324,11 +243,6 @@ create_edges <- function(
     result
   } else {
     log_complete(ctx, n_edges = 0, note = "No edges passed thresholds")
-    tidytable::tidytable(
-      feature_id = NA_integer_,
-      target_id = NA_integer_,
-      score = NA_real_,
-      matched_peaks = NA_integer_
-    )
+    empty_result
   }
 }
