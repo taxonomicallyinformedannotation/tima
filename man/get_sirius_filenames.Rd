@@ -11,9 +11,12 @@ get_sirius_filenames(version)
 }
 \value{
 Named list with keys: canopus, formulas, structures, denovo, spectral.
+Values are fixed filenames (v5) or regex patterns (v6).
 }
 \description{
-Internal helper returning a list of expected filenames for a
-given SIRIUS version (v5 vs v6).
+Internal helper returning a list of expected filenames (v5) or
+regex patterns (v6) for matching SIRIUS output files. The v6 patterns
+accept any suffix after the base name (e.g. \code{_all.tsv},
+\code{-15.tsv}, \code{_analog_top-15.tsv}).
 }
 \keyword{internal}

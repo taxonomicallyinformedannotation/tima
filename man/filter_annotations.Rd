@@ -16,7 +16,9 @@ filter_annotations(
 \arguments{
 \item{annotations}{Character vector or list of paths to prepared annotation files}
 
-\item{features}{Character string path to prepared features file}
+\item{features}{Character string path to prepared features file.
+Must contain a \code{feature_id} column. The \code{rt} column is optional;
+if absent, RT filtering is skipped even when an RT library is provided.}
 
 \item{rts}{Character string path to prepared retention time library (optional)}
 
