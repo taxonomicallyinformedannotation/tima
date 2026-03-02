@@ -671,9 +671,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre>**Important:** For correct results with the GNPS and cosine methods,
 input spectra should be sanitized (unique, well-separated m/z values;
 no NaN; sorted by m/z). This is automatically done by
-[import_spectra()] with `sanitize = TRUE`. If unsanitized spectra are
-detected (duplicate m/z within tolerance), they are sanitized on the fly
-with a warning.
+[import_spectra()] with `sanitize = TRUE`.
 </pre>
 </div>
 </section>
@@ -764,7 +762,7 @@ Logical; return matched peaks count? Not compatible with ‘entropy’ method. D
 <code id="...">…</code>
 </td>
 <td>
-Additional arguments passed to MsCoreUtils::join
+Additional arguments passed to MsCoreUtils::join (cosine only)
 </td>
 </tr>
 </tbody></table>
