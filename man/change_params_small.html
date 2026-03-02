@@ -677,6 +677,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   fil_met_raw = NULL,
   fil_sir_raw = NULL,
   fil_spe_raw = NULL,
+  fil_ann_mzm = NULL,
   ms_pol = NULL,
   org_tax = NULL,
   hig_con = NULL,
@@ -726,6 +727,14 @@ Character. Path to SIRIUS annotations directory/zip
 </td>
 <td>
 Character. Path to spectra file (MGF format with MS1/MS2)
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="fil_ann_mzm">fil_ann_mzm</code>
+</td>
+<td>
+Character. Path to mzmine annotations file
 </td>
 </tr>
 <tr>
@@ -805,11 +814,12 @@ Character. Cache directory path (for testing; uses go_to_cache() if NULL)
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">fil_met_raw =</span> <span class="st">"data/raw/metadata.tsv"</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">fil_sir_raw =</span> <span class="st">"data/raw/sirius_output.zip"</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">fil_spe_raw =</span> <span class="st">"data/raw/spectra.mgf"</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">ms_pol =</span> <span class="st">"pos"</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">org_tax =</span> <span class="st">"Gentiana lutea"</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">hig_con =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">summarize =</span> <span class="cn">FALSE</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">fil_ann_mzm =</span> <span class="st">"data/raw/mzmine_annotations.csv"</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">ms_pol =</span> <span class="st">"pos"</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">org_tax =</span> <span class="st">"Gentiana lutea"</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">hig_con =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">summarize =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
