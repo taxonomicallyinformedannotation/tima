@@ -38,17 +38,15 @@ Returns empty data frame with NA values if no edges pass thresholds.
 }
 \description{
 Calculates pairwise spectral similarity between all spectra to
-create a network edge list. Uses parallel processing via purrr for
-efficiency.
+create a network edge list.
 }
 \examples{
 \dontrun{
-# Create network edges from spectra
 edges <- create_edges(
   frags = fragment_list,
   nspecs = length(fragment_list),
   precs = precursor_mz,
-  method = "cosine",
+  method = "gnps",
   ms2_tolerance = 0.02,
   ppm_tolerance = 10,
   threshold = 0.7,

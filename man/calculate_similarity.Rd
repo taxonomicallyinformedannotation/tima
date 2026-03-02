@@ -34,7 +34,7 @@ calculate_similarity(
 \item{return_matched_peaks}{Logical; return matched peaks count?
 Not compatible with 'entropy' method. Default: FALSE}
 
-\item{...}{Additional arguments passed to MsCoreUtils::join}
+\item{...}{Additional arguments passed to MsCoreUtils::join (cosine only)}
 }
 \value{
 Numeric similarity score (0-1), or list with score and matches
@@ -47,9 +47,7 @@ target spectra using either entropy, cosine, or GNPS methods.
 \if{html}{\out{<div class="sourceCode">}}\preformatted{**Important:** For correct results with the GNPS and cosine methods,
 input spectra should be sanitized (unique, well-separated m/z values;
 no NaN; sorted by m/z). This is automatically done by
-[import_spectra()] with `sanitize = TRUE`. If unsanitized spectra are
-detected (duplicate m/z within tolerance), they are sanitized on the fly
-with a warning.
+[import_spectra()] with `sanitize = TRUE`.
 }\if{html}{\out{</div>}}
 }
 \examples{
