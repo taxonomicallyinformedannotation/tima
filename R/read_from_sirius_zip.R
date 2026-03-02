@@ -41,7 +41,7 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     utils::unzip(list = TRUE) |>
     tidytable::filter(
       Name |>
-        grepl(pattern = file)
+        grepl(pattern = file, perl = TRUE)
     ) |>
     tidytable::arrange(Name, decreasing = TRUE) |>
     # Avoid empty files (those starting with underscore)

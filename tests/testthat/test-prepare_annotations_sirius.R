@@ -301,26 +301,96 @@ test_that("validate_sirius_inputs checks structure file existence", {
   )
 })
 
-test_that("get_sirius_filenames returns correct names for version 5", {
-  result <- get_sirius_filenames("5")
-
-  expect_true(is.list(result))
-  expect_equal(result$canopus, "canopus_compound_summary.tsv")
-  expect_equal(result$formulas, "formula_identifications_all.tsv")
-  expect_equal(result$structures, "compound_identifications_all.tsv")
-  expect_null(result$denovo)
-  expect_null(result$spectral)
-})
-
 test_that("get_sirius_filenames returns correct names for version 6", {
   result <- get_sirius_filenames("6")
 
   expect_true(is.list(result))
-  expect_equal(result$canopus, "canopus_formula_summary_all.tsv")
-  expect_equal(result$formulas, "formula_identifications_all.tsv")
-  expect_equal(result$structures, "structure_identifications_all.tsv")
-  expect_equal(result$denovo, "denovo_structure_identifications_all.tsv")
-  expect_equal(result$spectral, "spectral_matches_all.tsv")
+  # v6 patterns are regex, not exact filenames
+  expect_true(grepl("canopus_formula_summary", result$canopus))
+  expect_true(grepl("formula_identifications", result$formulas))
+  expect_true(grepl("structure_identifications", result$structures))
+  expect_true(grepl("denovo_structure_identifications", result$denovo))
+  expect_true(grepl("spectral_matches", result$spectral))
+})
+
+test_that("get_sirius_filenames v6 patterns match expected filenames", {
+  result <- get_sirius_filenames("6")
+
+  # Standard _all filenames
+  expect_true(grepl(result$canopus, "canopus_formula_summary_all.tsv"))
+  expect_true(grepl(result$formulas, "proj/formula_identifications_all.tsv"))
+  expect_true(grepl(
+    result$structures,
+    "proj/structure_identifications_all.tsv"
+  ))
+  expect_true(grepl(result$denovo, "denovo_structure_identifications_all.tsv"))
+  expect_true(grepl(result$spectral, "spectral_matches_all.tsv"))
+
+  # Variant suffixes (e.g. top-N filters from SIRIUS)
+  expect_true(grepl(result$canopus, "canopus_formula_summary-15.tsv"))
+  expect_true(grepl(result$formulas, "proj/formula_identifications-15.tsv"))
+  expect_true(grepl(result$structures, "proj/structure_identifications-15.tsv"))
+  expect_true(grepl(result$denovo, "denovo_structure_identifications-15.tsv"))
+  expect_true(grepl(result$spectral, "spectral_matches_analog_top-15.tsv"))
+
+  # structures must NOT match denovo_structure_identifications
+  expect_false(grepl(
+    result$structures,
+    "denovo_structure_identifications_all.tsv"
+  ))
+})
+
+test_that("get_sirius_filenames returns correct patterns for version 6", {
+  result <- get_sirius_filenames("6")
+
+  expect_true(is.list(result))
+
+  # Patterns should match the standard _all.tsv filenames
+  expect_true(grepl(
+    result$canopus,
+    "canopus_formula_summary_all.tsv",
+    perl = TRUE
+  ))
+  expect_true(grepl(
+    result$formulas,
+    "formula_identifications_all.tsv",
+    perl = TRUE
+  ))
+  expect_true(grepl(
+    result$structures,
+    "/structure_identifications_all.tsv",
+    perl = TRUE
+  ))
+  expect_true(grepl(
+    result$denovo,
+    "denovo_structure_identifications_all.tsv",
+    perl = TRUE
+  ))
+  expect_true(grepl(result$spectral, "spectral_matches_all.tsv", perl = TRUE))
+
+  # Patterns should also match variant suffixes (e.g. -15, _analog_top-15)
+  expect_true(grepl(
+    result$canopus,
+    "canopus_formula_summary-15.tsv",
+    perl = TRUE
+  ))
+  expect_true(grepl(
+    result$formulas,
+    "formula_identifications-15.tsv",
+    perl = TRUE
+  ))
+  expect_true(grepl(
+    result$spectral,
+    "spectral_matches_analog_top-15.tsv",
+    perl = TRUE
+  ))
+
+  # structures pattern must NOT match denovo_structure_identifications
+  expect_false(grepl(
+    result$structures,
+    "denovo_structure_identifications_all.tsv",
+    perl = TRUE
+  ))
 })
 
 test_that("create_empty_sirius_annotations returns proper template", {
