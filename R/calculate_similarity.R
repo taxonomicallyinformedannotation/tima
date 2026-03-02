@@ -6,9 +6,7 @@
 #'     **Important:** For correct results with the GNPS and cosine methods,
 #'     input spectra should be sanitized (unique, well-separated m/z values;
 #'     no NaN; sorted by m/z). This is automatically done by
-#'     [import_spectra()] with `sanitize = TRUE`. If unsanitized spectra are
-#'     detected (duplicate m/z within tolerance), they are sanitized on the fly
-#'     with a warning.
+#'     [import_spectra()] with `sanitize = TRUE`.
 #'
 #' @include c_wrappers.R
 #' @include sanitize_spectrum_matrix.R
@@ -23,7 +21,7 @@
 #' @param ppm Numeric PPM tolerance for peak matching
 #' @param return_matched_peaks Logical; return matched peaks count?
 #'     Not compatible with 'entropy' method. Default: FALSE
-#' @param ... Additional arguments passed to MsCoreUtils::join
+#' @param ... Additional arguments passed to MsCoreUtils::join (cosine only)
 #'
 #' @return Numeric similarity score (0-1), or list with score and matches
 #'     if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.
@@ -71,7 +69,7 @@ calculate_similarity <- function(
   return_matched_peaks = FALSE,
   ...
 ) {
-  # ---- Input Validation (centralized helpers) ----
+  # ---- Input Validation ----
   assert_choice(method, VALID_SIMILARITY_METHODS, "method")
   if (!is.matrix(query_spectrum) || !is.matrix(target_spectrum)) {
     stop("Spectra must be matrices", call. = FALSE)
@@ -82,19 +80,14 @@ calculate_similarity <- function(
   assert_scalar_numeric(dalton, "dalton", min = 0)
   assert_scalar_numeric(ppm, "ppm", min = 0)
   assert_flag(return_matched_peaks, "return_matched_peaks")
-  # Early exit for empty spectra
+
   if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
     return(
-      if (return_matched_peaks) {
-        list(score = 0.0, matches = 0L)
-      } else {
-        0.0
-      }
+      if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0
     )
   }
 
-  # Method: Entropy (no peak matching required) ----
-
+  # ---- Method: Entropy ----
   if (method == "entropy") {
     result <- tryCatch(
       msentropy::calculate_entropy_similarity(
@@ -110,43 +103,40 @@ calculate_similarity <- function(
       ),
       error = function(e) {
         log_warn("Entropy calculation failed: %s", e$message)
-        return(
-          if (return_matched_peaks) {
-            list(score = 0.0, matches = 0L)
-          } else {
-            0.0
-          }
-        )
+        if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0
       }
     )
     return(result)
   }
 
-  # Methods: GNPS or Cosine (require peak matching) ----
-
-  # Extract masses efficiently (direct column access)
-  query_masses <- query_spectrum[, 1L]
-  target_masses <- target_spectrum[, 1L]
-
-  # Get peak matching map using optimized C implementation for GNPS
-  map <- tryCatch(
-    switch(
-      method,
-      "gnps" = join_gnps_wrapper(
-        x = query_masses,
-        y = target_masses,
+  # ---- Methods: GNPS / Cosine ----
+  if (method == "gnps") {
+    # Fused join + score in a single C call, O(n+m) chain-DP.
+    result <- tryCatch(
+      gnps_compute_wrapper(
+        x = query_spectrum,
+        y = target_spectrum,
         xPrecursorMz = query_precursor,
         yPrecursorMz = target_precursor,
         tolerance = dalton,
         ppm = ppm
       ),
-      "cosine" = MsCoreUtils::join(
-        x = query_masses,
-        y = target_masses,
-        tolerance = dalton,
-        ppm = ppm,
-        ...
-      )
+      error = function(e) {
+        log_warn("GNPS computation failed: %s", e$message)
+        list(score = 0.0, matches = 0L)
+      }
+    )
+    return(if (return_matched_peaks) result else result$score)
+  }
+
+  # Cosine: two-step join + score
+  map <- tryCatch(
+    MsCoreUtils::join(
+      x = query_spectrum[, 1L],
+      y = target_spectrum[, 1L],
+      tolerance = dalton,
+      ppm = ppm,
+      ...
     ),
     error = function(e) {
       log_warn("Peak matching failed: %s", e$message)
@@ -154,43 +144,16 @@ calculate_similarity <- function(
     }
   )
 
-  matched_x <- map[[1L]]
-  matched_y <- map[[2L]]
-
-  # Early exit if no matches at all
-  if (length(matched_x) == 0L || all(is.na(matched_x) | is.na(matched_y))) {
-    return(
-      if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0
-    )
-  }
-
-  # Deduplicate: precursor-shift pass can produce pairs already in direct pass
-  # (keep NAs — they carry unmatched peaks needed for correct denominators)
-  both_valid <- !is.na(matched_x) & !is.na(matched_y)
-  dups <- both_valid & duplicated(data.frame(x = matched_x, y = matched_y))
-  matched_x <- matched_x[!dups]
-  matched_y <- matched_y[!dups]
-
-  # Build aligned matrices WITH NAs for unmatched peaks.
-  # gnps() needs ALL peaks (matched + unmatched) to compute the correct
-  # intensity-sum denominators: sqrt(int_i)/sqrt(sum_ALL_unique_int).
-  # Stripping NAs here would inflate scores.
-  x_mat <- query_spectrum[matched_x, , drop = FALSE]
-  y_mat <- target_spectrum[matched_y, , drop = FALSE]
-
-  # Calculate similarity using optimized C GNPS algorithm
   result <- tryCatch(
-    gnps_wrapper(x = x_mat, y = y_mat),
+    gnps_wrapper(
+      x = query_spectrum[map[[1L]], , drop = FALSE],
+      y = target_spectrum[map[[2L]], , drop = FALSE]
+    ),
     error = function(e) {
       log_warn("Similarity calculation failed: %s", e$message)
       list(score = 0.0, matches = 0L)
     }
   )
 
-  # Return appropriate format
-  if (return_matched_peaks) {
-    result
-  } else {
-    result$score
-  }
+  if (return_matched_peaks) result else result$score
 }

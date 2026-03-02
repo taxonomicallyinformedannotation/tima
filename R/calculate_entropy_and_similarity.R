@@ -208,36 +208,46 @@ calculate_entropy_and_similarity <- function(
         return(NULL)
       }
 
-      # Calculate similarities using closure over current_spectrum, etc.
+      # Calculate similarities
+      use_gnps <- (method == "gnps")
+      q_mz <- current_spectrum[, 1L]
+
       similarities <- vapply(
         X = seq_along(lib_spectra_sub),
         FUN = function(lib_idx) {
           lib_spectrum <- lib_spectra_sub[[lib_idx]]
-          score <- calculate_similarity(
-            method = method,
-            query_spectrum = current_spectrum,
-            target_spectrum = lib_spectrum,
-            query_precursor = current_precursor,
-            target_precursor = lib_precursors_sub[[lib_idx]],
-            dalton = dalton,
-            ppm = ppm
-          )
-          entropy_target <- msentropy::calculate_spectral_entropy(lib_spectrum)
 
-          # Count matched peaks
-          query_mz <- current_spectrum[, 1]
-          lib_mz <- lib_spectrum[, 1]
-          matched_peaks <- .count_matched_peaks(
-            query_mz,
-            lib_mz,
-            dalton,
-            ppm
-          )
+          if (use_gnps) {
+            # Single fused .Call — join + score in C, O(n+m) chain-DP
+            res <- .Call(
+              "gnps_compute",
+              current_spectrum,
+              lib_spectrum,
+              current_precursor,
+              lib_precursors_sub[[lib_idx]],
+              dalton,
+              ppm
+            )
+            score <- res[["score"]]
+          } else {
+            score <- calculate_similarity(
+              method = method,
+              query_spectrum = current_spectrum,
+              target_spectrum = lib_spectrum,
+              query_precursor = current_precursor,
+              target_precursor = lib_precursors_sub[[lib_idx]],
+              dalton = dalton,
+              ppm = ppm
+            )
+          }
+
+          entropy_target <- msentropy::calculate_spectral_entropy(lib_spectrum)
+          matched <- .count_matched_peaks(q_mz, lib_spectrum[, 1L], dalton, ppm)
 
           list(
             score = as.numeric(score),
             entropy = entropy_target,
-            matched = matched_peaks
+            matched = matched
           )
         },
         FUN.VALUE = list(
