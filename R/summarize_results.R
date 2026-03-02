@@ -290,7 +290,7 @@ summarize_results <- function(
     # Features without structures - add consensus
     df_processed |>
       tidytable::filter(!has_structure) |>
-      tidytable::distinct(tidyselect::all_of(x = model$features_columns)) |>
+      tidytable::distinct(tidyselect::any_of(x = model$features_columns)) |>
       tidytable::left_join(
         y = annot_table_wei_chemo |>
           tidytable::mutate(
