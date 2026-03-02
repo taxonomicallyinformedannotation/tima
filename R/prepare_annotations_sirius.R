@@ -60,12 +60,15 @@ validate_sirius_inputs <- function(
 
 #' Get SIRIUS Version-Specific Filenames
 #'
-#' @description Internal helper returning a list of expected filenames for a
-#'     given SIRIUS version (v5 vs v6).
+#' @description Internal helper returning a list of expected filenames (v5) or
+#'     regex patterns (v6) for matching SIRIUS output files. The v6 patterns
+#'     accept any suffix after the base name (e.g. \code{_all.tsv},
+#'     \code{-15.tsv}, \code{_analog_top-15.tsv}).
 #'
 #' @param version Character "5" or "6".
 #'
 #' @return Named list with keys: canopus, formulas, structures, denovo, spectral.
+#'     Values are fixed filenames (v5) or regex patterns (v6).
 #' @keywords internal
 get_sirius_filenames <- function(version) {
   if (version == "5") {
@@ -77,12 +80,14 @@ get_sirius_filenames <- function(version) {
       spectral = NULL
     )
   } else {
+    # Patterns use regex to match any suffix after the base name
+    # (e.g. _all.tsv, -15.tsv, _analog_top-15.tsv)
     list(
-      canopus = "canopus_formula_summary_all.tsv",
-      formulas = "formula_identifications_all.tsv",
-      structures = "structure_identifications_all.tsv",
-      denovo = "denovo_structure_identifications_all.tsv",
-      spectral = "spectral_matches_all.tsv"
+      canopus = "canopus_formula_summary[^/]*\\.tsv$",
+      formulas = "(^|/)formula_identifications[^/]*\\.tsv$",
+      structures = "(^|/)structure_identifications[^/]*\\.tsv$",
+      denovo = "denovo_structure_identifications[^/]*\\.tsv$",
+      spectral = "spectral_matches[^/]*\\.tsv$"
     )
   }
 }
@@ -115,7 +120,7 @@ load_sirius_tables <- function(input_directory, version) {
       utils::unzip(zipfile = input_directory, list = TRUE),
       error = function(e) list(Name = list.files(input_directory))
     )
-    if (any(grepl(fnames$denovo, files$Name, fixed = TRUE))) {
+    if (any(grepl(fnames$denovo, files$Name))) {
       denovo <- read_from_sirius_zip(input_directory, file = fnames$denovo)
     }
   }
