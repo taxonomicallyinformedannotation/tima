@@ -2,7 +2,7 @@
 #'
 #' @description Prepares LC-MS feature tables by standardizing column names,
 #' filtering to top-intensity samples per feature, and formatting for
-#' downstream analysis. Supports multiple formats (MZmine, SLAW, SIRIUS).
+#' downstream analysis. Supports multiple formats (mzmine, SLAW, SIRIUS).
 #'
 #' @include get_params.R
 #' @include rts_utils.R
@@ -199,7 +199,7 @@ prepare_features_tables <- function(
   name_mz,
   name_adduct
 ) {
-  # Detect and select columns for MZmine (Peak area/height), SLAW (quant_), SIRIUS
+  # Detect and select columns for mzmine (Peak area/height), SLAW (quant_), SIRIUS
   tbl |>
     tidytable::select(
       tidyselect::any_of(x = c(name_features, name_rt, name_mz, name_adduct)),

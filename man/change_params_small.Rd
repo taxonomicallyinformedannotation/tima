@@ -20,7 +20,7 @@ change_params_small(
 \arguments{
 \item{fil_pat}{Character. Job identifier/pattern for output files (optional)}
 
-\item{fil_fea_raw}{Character. Path to features file (e.g., from MZmine/SIRIUS)}
+\item{fil_fea_raw}{Character. Path to features file (e.g., from mzmine/SIRIUS)}
 
 \item{fil_met_raw}{Character. Path to metadata file (optional if single taxon)}
 
