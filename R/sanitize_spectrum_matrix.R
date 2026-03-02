@@ -110,8 +110,8 @@ sanitize_spectrum_matrix <- function(spectrum, tolerance = 0.01, ppm = 10) {
   mz <- spectrum[, 1L]
   int <- spectrum[, 2L]
 
-  # 1. Remove NaN/NA rows
-  valid <- !is.na(mz) & !is.na(int) & !is.nan(mz) & !is.nan(int)
+  # 1. Remove NaN/NA rows and non-positive intensities
+  valid <- is.finite(mz) & is.finite(int) & (int > 0)
   mz <- mz[valid]
   int <- int[valid]
 
@@ -139,7 +139,6 @@ sanitize_spectrum_matrix <- function(spectrum, tolerance = 0.01, ppm = 10) {
   k <- 1L
   merged_mz[1L] <- mz[1L] * int[1L]
   merged_int[1L] <- int[1L]
-  group_count <- 1L
 
   for (i in 2L:n) {
     # Current group representative m/z
