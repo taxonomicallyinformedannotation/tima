@@ -89,10 +89,11 @@ create_yaml_null_handler <- function() {
 #' @include load_yaml_files.R
 #'
 #' @param fil_pat Character. Job identifier/pattern for output files (optional)
-#' @param fil_fea_raw Character. Path to features file (e.g., from MZmine/SIRIUS)
+#' @param fil_fea_raw Character. Path to features file (e.g., from mzmine/SIRIUS)
 #' @param fil_met_raw Character. Path to metadata file (optional if single taxon)
 #' @param fil_sir_raw Character. Path to SIRIUS annotations directory/zip
 #' @param fil_spe_raw Character. Path to spectra file (MGF format with MS1/MS2)
+#' @param fil_ann_mzm Character. Path to mzmine annotations file
 #' @param ms_pol Character. MS polarity: "pos" or "neg"
 #' @param org_tax Character. Scientific name for single-taxon experiments
 #' @param hig_con Logical. Filter for high confidence candidates only
@@ -122,6 +123,7 @@ create_yaml_null_handler <- function() {
 #'   fil_met_raw = "data/raw/metadata.tsv",
 #'   fil_sir_raw = "data/raw/sirius_output.zip",
 #'   fil_spe_raw = "data/raw/spectra.mgf",
+#'   fil_ann_mzm = "data/raw/mzmine_annotations.csv",
 #'   ms_pol = "pos",
 #'   org_tax = "Gentiana lutea",
 #'   hig_con = TRUE,
@@ -134,6 +136,7 @@ change_params_small <- function(
   fil_met_raw = NULL,
   fil_sir_raw = NULL,
   fil_spe_raw = NULL,
+  fil_ann_mzm = NULL,
   ms_pol = NULL,
   org_tax = NULL,
   hig_con = NULL,
@@ -207,6 +210,14 @@ change_params_small <- function(
       file_path = fil_spe_raw,
       target_dir = paths_data_source,
       file_description = "Spectra"
+    )
+  }
+
+  if (!is.null(fil_ann_mzm)) {
+    yaml_small$files$annotations$raw$mzmine <- copy_file_to_target(
+      file_path = fil_ann_mzm,
+      target_dir = paths_data_interim_annotations,
+      file_description = "mzmine annotations"
     )
   }
 

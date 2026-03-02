@@ -87,7 +87,7 @@ test_that("prepare_features_tables validates candidates parameter", {
 
 ## Format Detection and Standardization ----
 
-test_that("prepare_features_tables handles MZmine format (Peak area)", {
+test_that("prepare_features_tables handles mzmine format (Peak area)", {
   withr::local_dir(new = temp_test_dir("prep_feat_tables_mzmine"))
   paths <- local_test_project(copy = TRUE)
 

@@ -36,7 +36,7 @@ character(1) Path to the prepared feature table (invisibly).
 \description{
 Prepares LC-MS feature tables by standardizing column names,
 filtering to top-intensity samples per feature, and formatting for
-downstream analysis. Supports multiple formats (MZmine, SLAW, SIRIUS).
+downstream analysis. Supports multiple formats (mzmine, SLAW, SIRIUS).
 }
 \examples{
 \dontrun{
