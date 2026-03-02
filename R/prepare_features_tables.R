@@ -200,7 +200,7 @@ prepare_features_tables <- function(
   name_adduct
 ) {
   # Detect and select columns for mzmine (Peak area/height), SLAW (quant_), SIRIUS
-  tbl |>
+  selected <- tbl |>
     tidytable::select(
       tidyselect::any_of(x = c(name_features, name_rt, name_mz, name_adduct)),
       tidyselect::matches(match = " Peak area"),
@@ -209,6 +209,29 @@ prepare_features_tables <- function(
       tidyselect::matches(match = " Peak height")
     ) |>
     tidytable::select(-tidyselect::matches(match = "quant_peaktable"))
+
+  # When both Peak area and Peak height are present for the same samples,
+  # prefer Peak area and drop Peak height duplicates
+  area_cols <- grep(" Peak area$", colnames(selected), value = TRUE)
+  height_cols <- grep(" Peak height$", colnames(selected), value = TRUE)
+
+  if (length(area_cols) > 0L && length(height_cols) > 0L) {
+    # Derive sample stems by stripping suffixes
+    area_stems <- sub(" Peak area$", "", area_cols)
+    height_stems <- sub(" Peak height$", "", height_cols)
+    redundant_heights <- height_cols[height_stems %in% area_stems]
+
+    if (length(redundant_heights) > 0L) {
+      log_info(
+        "Both Peak area and Peak height detected for %d sample(s); using Peak area",
+        length(redundant_heights)
+      )
+      selected <- selected |>
+        tidytable::select(-tidyselect::all_of(redundant_heights))
+    }
+  }
+
+  selected
 }
 
 #' Normalize RT column to minutes (auto-detect unit if possible)
@@ -249,6 +272,22 @@ prepare_features_tables <- function(
     names(replacements),
     init = colnames(tbl)
   )
+
+  # Safety guard: if stripping suffixes produced duplicate names (e.g. both
+
+  # Peak area and Peak height survived), keep the first occurrence (area is
+  # selected before height by .select_intensity_columns)
+  dup_idx <- duplicated(col_names_clean)
+  if (any(dup_idx)) {
+    dup_names <- unique(col_names_clean[dup_idx])
+    log_warn(
+      "Duplicate column names after standardization (%s); keeping first occurrence (Peak area preferred)",
+      paste(dup_names, collapse = ", ")
+    )
+    tbl <- tbl[, !dup_idx, with = FALSE]
+    col_names_clean <- col_names_clean[!dup_idx]
+  }
+
   colnames(tbl) <- col_names_clean
   tbl
 }
