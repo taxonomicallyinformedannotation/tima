@@ -95,6 +95,57 @@ test_that("filter_annotations() runs end-to-end without RT library", {
   expect_true(file.exists(res))
 })
 
+test_that("filter_annotations() runs when features table has no rt column", {
+  ann <- tempfile(fileext = ".tsv")
+  .make_ann(ann)
+  feat <- tempfile(fileext = ".tsv")
+  write.table(
+    data.frame(
+      feature_id = c("F1", "F2"),
+      mz = c(100.05, 150.08)
+    ),
+    feat,
+    sep = "\t",
+    row.names = FALSE
+  )
+  out <- tempfile(fileext = ".tsv")
+  res <- filter_annotations(
+    annotations = ann,
+    features = feat,
+    rts = character(0),
+    output = out,
+    tolerance_rt = 0.5
+  )
+  expect_true(file.exists(res))
+})
+
+test_that("filter_annotations() skips RT filtering when features lack rt column", {
+  ann <- tempfile(fileext = ".tsv")
+  .make_ann(ann)
+  feat <- tempfile(fileext = ".tsv")
+  write.table(
+    data.frame(
+      feature_id = c("F1", "F2"),
+      mz = c(100.05, 150.08)
+    ),
+    feat,
+    sep = "\t",
+    row.names = FALSE
+  )
+  rts <- tempfile(fileext = ".tsv")
+  .make_rt(rts)
+  out <- tempfile(fileext = ".tsv")
+  # Should succeed (log_warn is issued but doesn't raise R warning)
+  res <- filter_annotations(
+    annotations = ann,
+    features = feat,
+    rts = rts,
+    output = out,
+    tolerance_rt = 0.5
+  )
+  expect_true(file.exists(res))
+})
+
 # test_that("filter_annotations() runs with RT library and multiple annotation files", {
 #   ann1 <- tempfile(fileext = ".tsv")
 #   .make_ann(ann1)
@@ -115,17 +166,19 @@ test_that("filter_annotations() runs end-to-end without RT library", {
 #   expect_true(file.exists(res))
 # })
 
-test_that("filter_annotations() errors on invalid tolerance_rt", {
+test_that("filter_annotations() errors on invalid tolerance_rt with RT library", {
   ann <- tempfile(fileext = ".tsv")
   .make_ann(ann)
   feat <- tempfile(fileext = ".tsv")
   .make_feat(feat)
+  rts <- tempfile(fileext = ".tsv")
+  .make_rt(rts)
   out <- tempfile(fileext = ".tsv")
   expect_error(
     filter_annotations(
       annotations = ann,
       features = feat,
-      rts = character(0),
+      rts = rts,
       output = out,
       tolerance_rt = -1
     ),
@@ -135,17 +188,19 @@ test_that("filter_annotations() errors on invalid tolerance_rt", {
 
 ## Internal Helper Tests ----
 
-test_that("validate_filter_annotations_inputs validates tolerance_rt", {
+test_that("validate_filter_annotations_inputs validates tolerance_rt with RT library", {
   ann <- tempfile(fileext = ".tsv")
   .make_ann(ann)
   feat <- tempfile(fileext = ".tsv")
   .make_feat(feat)
+  rts <- tempfile(fileext = ".tsv")
+  .make_rt(rts)
 
   expect_error(
     validate_filter_annotations_inputs(
       annotations = ann,
       features = feat,
-      rts = character(0),
+      rts = rts,
       output = tempfile(),
       tolerance_rt = 0
     ),
@@ -156,7 +211,7 @@ test_that("validate_filter_annotations_inputs validates tolerance_rt", {
     validate_filter_annotations_inputs(
       annotations = ann,
       features = feat,
-      rts = character(0),
+      rts = rts,
       output = tempfile(),
       tolerance_rt = -5
     ),
@@ -167,11 +222,29 @@ test_that("validate_filter_annotations_inputs validates tolerance_rt", {
     validate_filter_annotations_inputs(
       annotations = ann,
       features = feat,
-      rts = character(0),
+      rts = rts,
       output = tempfile(),
       tolerance_rt = "invalid"
     ),
     "tolerance_rt must be a positive number"
+  )
+})
+
+test_that("validate_filter_annotations_inputs allows invalid tolerance_rt without RT library", {
+  ann <- tempfile(fileext = ".tsv")
+  .make_ann(ann)
+  feat <- tempfile(fileext = ".tsv")
+  .make_feat(feat)
+
+  # Should NOT error when rts is empty, even with bad tolerance_rt
+  expect_silent(
+    validate_filter_annotations_inputs(
+      annotations = ann,
+      features = feat,
+      rts = character(0),
+      output = tempfile(),
+      tolerance_rt = -5
+    )
   )
 })
 

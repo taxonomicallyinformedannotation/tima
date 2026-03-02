@@ -17,13 +17,20 @@ validate_filter_annotations_inputs <- function(
   output,
   tolerance_rt
 ) {
-  # Validate tolerance first (cheapest check)
-  if (!is.numeric(tolerance_rt) || tolerance_rt <= 0) {
-    stop(
-      "tolerance_rt must be a positive number, got: ",
-      tolerance_rt,
-      call. = FALSE
-    )
+  # Validate tolerance (only enforce when RT library is provided)
+  if (
+    !is.numeric(tolerance_rt) ||
+      length(tolerance_rt) != 1L ||
+      is.na(tolerance_rt) ||
+      tolerance_rt <= 0
+  ) {
+    if (length(rts) > 0) {
+      stop(
+        "tolerance_rt must be a positive number when RT library is provided, got: ",
+        tolerance_rt,
+        call. = FALSE
+      )
+    }
   }
 
   # Validate output path
@@ -196,7 +203,9 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
 #' @include safe_fread.R
 #'
 #' @param annotations Character vector or list of paths to prepared annotation files
-#' @param features Character string path to prepared features file
+#' @param features Character string path to prepared features file.
+#'     Must contain a \code{feature_id} column. The \code{rt} column is optional;
+#'     if absent, RT filtering is skipped even when an RT library is provided.
 #' @param rts Character string path to prepared retention time library (optional)
 #' @param output Character string path for filtered annotations output
 #' @param tolerance_rt Numeric RT tolerance in minutes for library matching
@@ -266,7 +275,13 @@ filter_annotations <- function(
   # Load and Process Data ----
 
   log_info("Filtering annotations")
-  log_debug("RT tolerance: %f2 minutes", tolerance_rt)
+  if (
+    is.numeric(tolerance_rt) &&
+      length(tolerance_rt) == 1L &&
+      !is.na(tolerance_rt)
+  ) {
+    log_debug("RT tolerance: %f2 minutes", tolerance_rt)
+  }
 
   features_table <- safe_fread(
     file = features,
@@ -274,8 +289,13 @@ filter_annotations <- function(
     required_cols = c("feature_id"),
     colClasses = "character",
     na.strings = c("", "NA")
-  ) |>
-    tidytable::distinct(feature_id, rt, mz)
+  )
+
+  has_rt <- "rt" %in% names(features_table)
+  distinct_cols <- c("feature_id", if (has_rt) "rt", "mz")
+  distinct_cols <- intersect(distinct_cols, names(features_table))
+  features_table <- features_table |>
+    tidytable::distinct(tidyselect::all_of(distinct_cols))
 
   n_features <- nrow(features_table)
   log_info(
@@ -312,6 +332,16 @@ filter_annotations <- function(
   features_annotated_table_1 <- features_table |>
     tidytable::left_join(y = annotation_table, by = "feature_id")
   rm(annotation_table)
+
+  if (!is.null(rts) && !has_rt) {
+    log_warn(
+      paste(
+        "RT library provided but features table has no 'rt' column.",
+        "Skipping RT filtering."
+      )
+    )
+    rts <- NULL
+  }
 
   if (!is.null(rts)) {
     rt_table <- purrr::map2(
