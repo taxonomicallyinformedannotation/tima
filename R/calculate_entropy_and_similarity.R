@@ -168,16 +168,33 @@ calculate_entropy_and_similarity <- function(
     }
     spectra_list
   }
-  query_spectra <- .ensure_sanitized(query_spectra, "query", dalton, ppm)
-  lib_spectra <- .ensure_sanitized(lib_spectra, "library", dalton, ppm)
+  query_spectra <- .ensure_sanitized(
+    spectra_list = query_spectra,
+    label = "query",
+    dalton = dalton,
+    ppm = ppm
+  )
+  lib_spectra <- .ensure_sanitized(
+    spectra_list = lib_spectra,
+    label = "library",
+    dalton = dalton,
+    ppm = ppm
+  )
 
   # Use closures to avoid passing large objects through function arguments.
   # R's lexical scoping means the closure captures references to
   # lib_spectra, lib_precursors, lib_ids, query_spectra, etc. from the
   # parent environment without copying them on each iteration.
+  progress_counter <- 0L
+
   results <- lapply(
     X = seq_along(query_spectra),
     FUN = function(spectrum_idx) {
+      progress_counter <<- progress_counter + 1L
+      if (progress_counter %% 500L == 0L) {
+        log_info("Processed %d / %d queries", progress_counter, n_queries)
+      }
+
       current_spectrum <- query_spectra[[spectrum_idx]]
       current_precursor <- query_precursors[spectrum_idx]
       current_id <- query_ids[spectrum_idx]
