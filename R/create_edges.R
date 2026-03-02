@@ -189,10 +189,12 @@ create_edges <- function(
       }
 
       # Accumulate score histogram in parent env
-      bin <- min(9L, max(0L, as.integer(sc * 10)))
-      bin_counts[bin + 1L] <<- bin_counts[bin + 1L] + 1L
+      if (is.finite(sc)) {
+        bin <- min(9L, max(0L, as.integer(sc * 10)))
+        bin_counts[bin + 1L] <<- bin_counts[bin + 1L] + 1L
+      }
 
-      if (sc >= threshold && mp >= matched_peaks) {
+      if (isTRUE(sc >= threshold) && isTRUE(mp >= matched_peaks)) {
         c(i, j, sc, mp)
       }
     })

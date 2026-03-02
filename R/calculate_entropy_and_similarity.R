@@ -217,8 +217,16 @@ calculate_entropy_and_similarity <- function(
         FUN = function(lib_idx) {
           lib_spectrum <- lib_spectra_sub[[lib_idx]]
 
+          # Guard: skip degenerate spectra
+          if (
+            !is.matrix(lib_spectrum) ||
+              nrow(lib_spectrum) == 0L ||
+              ncol(lib_spectrum) < 2L
+          ) {
+            return(list(score = 0, entropy = NA_real_, matched = 0L))
+          }
+
           if (use_gnps) {
-            # Single fused .Call — join + score in C, O(n+m) chain-DP
             res <- .Call(
               "gnps_compute",
               current_spectrum,
@@ -257,25 +265,24 @@ calculate_entropy_and_similarity <- function(
         )
       )
 
-      # Filter by threshold
-      if (any(similarities[1, ] >= threshold)) {
-        valid_indices <- which(similarities[1, ] >= threshold)
+      # Filter by threshold (guard against NA scores)
+      scores <- as.numeric(similarities[1L, ])
+      valid_indices <- which(scores >= threshold)
 
-        if (length(valid_indices) > 0) {
-          return(
-            tidytable::tidytable(
-              feature_id = current_id,
-              precursorMz = current_precursor,
-              target_id = lib_ids_sub[valid_indices],
-              candidate_spectrum_entropy = similarities[2, valid_indices],
-              candidate_score_similarity = similarities[1, valid_indices],
-              candidate_count_similarity_peaks_matched = similarities[
-                3,
-                valid_indices
-              ]
-            )
+      if (length(valid_indices) > 0L) {
+        return(
+          tidytable::tidytable(
+            feature_id = current_id,
+            precursorMz = current_precursor,
+            target_id = lib_ids_sub[valid_indices],
+            candidate_spectrum_entropy = similarities[2L, valid_indices],
+            candidate_score_similarity = scores[valid_indices],
+            candidate_count_similarity_peaks_matched = similarities[
+              3L,
+              valid_indices
+            ]
           )
-        }
+        )
       }
 
       NULL
