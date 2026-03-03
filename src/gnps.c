@@ -2,40 +2,18 @@
  * @file gnps.c
  * @brief GNPS modified cosine similarity — mathematically exact, near-linear.
  *
- * IMPORTANT: Input spectra MUST be sanitized before calling these functions.
- * Sanitized spectra have:
- *   - Unique m/z values (no two peaks within matching tolerance of each other)
- *   - Non-negative intensities, no NaN/NA intensities
- *   - Peaks sorted by m/z in ascending order
+ * Input spectra MUST be sanitized (import_spectra(sanitize = TRUE)):
+ *   - Unique m/z values, sorted ascending, no NA/NaN intensities.
  *
- * In tima, this is guaranteed by sanitize_spectra() (called from
- * import_spectra(sanitize = TRUE)), which applies Spectra::reduceSpectra(),
- * Spectra::combinePeaks(), and Spectra::scalePeaks().
+ * Algorithm: chain-DP optimal assignment (Sirius/FastCosine, Dührkop et al.)
+ * exploits mass-tolerance structure for O(n+m) instead of O(n³) Hungarian.
  *
- * The chain-DP algorithm assumes at most one direct match and one shifted
- * match per peak — a property that holds exactly when peaks within each
- * spectrum are well-separated (> tolerance apart). Unsanitized spectra with
- * duplicate or near-duplicate m/z values will produce incorrect scores.
- *
- * Algorithm: chain-DP optimal assignment inspired by Sirius/FastCosine
- * (Dührkop et al., Jena). Instead of O(n³) Hungarian/LAPJV, we exploit the
- * structure of mass-tolerance matching: after sorting both spectra by m/z,
- * the direct and shifted match assignments form chains where each peak has
- * at most one direct match and one shifted match. Conflicts along these chains
- * are resolved optimally by dynamic programming in O(n+m) total time.
- *
- * The scoring formula matches MsCoreUtils::gnps exactly:
- *   score_ij = sqrt(x_int_i) / sqrt(sum_unique_x_int)
- *            * sqrt(y_int_j) / sqrt(sum_unique_y_int)
- *   total = sum of score_ij for optimally assigned pairs
+ * Scoring: sqrt(x_i)/sqrt(Σx) · sqrt(y_j)/sqrt(Σy)  (matches MsCoreUtils).
  *
  * Exports:
- *   gnps_compute(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
- *     — Fused join+score, takes raw peak matrices. Fast path.
- *   gnps(x, y)
- *     — Score pre-aligned matrices (backward compat with MsCoreUtils).
- *   join_gnps(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
- *     — Peak matching only (backward compat).
+ *   gnps_compute  — fused join+score from raw peak matrices (hot path)
+ *   gnps          — score pre-aligned matrices (backward compat)
+ *   join_gnps     — peak matching only (backward compat)
  */
 
 #include <R.h>
@@ -46,21 +24,35 @@
 #include <float.h>
 
 /* ── helpers ─────────────────────────────────────────────────────────────── */
+
 static void *xmalloc(size_t n) {
-  void *p = malloc(n); if (!p) error("malloc(%zu)", n); return p; }
+  void *p = malloc(n);
+  if (!p) error("malloc(%zu)", n);
+  return p;
+}
+
 static void *xcalloc(size_t n, size_t s) {
-  void *p = calloc(n, s); if (!p) error("calloc(%zu)", n * s); return p; }
+  void *p = calloc(n, s);
+  if (!p) error("calloc(%zu)", n * s);
+  return p;
+}
 
-/* ── bitset ──────────────────────────────────────────────────────────────── */
-#define BS_SET(b,i)  ((b)[(unsigned)(i)>>3] |=  (unsigned char)(1u << ((unsigned)(i) & 7u)))
-#define BS_TEST(b,i) ((b)[(unsigned)(i)>>3] &   (unsigned char)(1u << ((unsigned)(i) & 7u)))
+/* ── bitset (index cast to unsigned to silence -Wsign-conversion) ────────── */
 
-/* ── MassIndex for join ──────────────────────────────────────────────────── */
+#define BS_SET(b, i)                                                           \
+  ((b)[(unsigned)(i) >> 3] |= (unsigned char)(1u << ((unsigned)(i) & 7u)))
+#define BS_TEST(b, i)                                                          \
+  ((b)[(unsigned)(i) >> 3] & (unsigned char)(1u << ((unsigned)(i) & 7u)))
+
+/* ── MassIndex for join_gnps ─────────────────────────────────────────────── */
+
 typedef struct { double mass; int idx; } MI;
+
 static int mi_cmp(const void *a, const void *b) {
   double da = ((const MI *)a)->mass, db = ((const MI *)b)->mass;
   return (da < db) ? -1 : (da > db) ? 1 : 0;
 }
+
 static int lower_bound(const MI *arr, int n, double lb) {
   int lo = 0, hi = n;
   while (lo < hi) {
@@ -70,19 +62,22 @@ static int lower_bound(const MI *arr, int n, double lb) {
   return lo;
 }
 
-/* ── (key,pos) sort ──────────────────────────────────────────────────────── */
+/* ── (key,pos) sort for gnps() backward compat ───────────────────────────── */
+
 typedef struct { double key; int pos; } KP;
+
 static int kp_cmp(const void *a, const void *b) {
   double da = ((const KP *)a)->key, db = ((const KP *)b)->key;
   return (da < db) ? -1 : (da > db) ? 1 : 0;
 }
 
-/* ── zero result ─────────────────────────────────────────────────────────── */
-static SEXP zero_result(void) {
-  SEXP r = PROTECT(allocVector(VECSXP, 2));
+/* ── SEXP result builder ─────────────────────────────────────────────────── */
+
+static SEXP make_result(double score, int matches) {
+  SEXP r  = PROTECT(allocVector(VECSXP, 2));
   SEXP nm = PROTECT(allocVector(STRSXP, 2));
-  SET_VECTOR_ELT(r, 0, ScalarReal(0.0));
-  SET_VECTOR_ELT(r, 1, ScalarInteger(0));
+  SET_VECTOR_ELT(r, 0, ScalarReal(score));
+  SET_VECTOR_ELT(r, 1, ScalarInteger(matches));
   SET_STRING_ELT(nm, 0, mkChar("score"));
   SET_STRING_ELT(nm, 1, mkChar("matches"));
   setAttrib(r, R_NamesSymbol, nm);
@@ -90,404 +85,165 @@ static SEXP zero_result(void) {
   return r;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
- * CHAIN-DP OPTIMAL ASSIGNMENT
- *
- * Given two sorted spectra where peaks are matched by m/z tolerance,
- * each left peak has at most one DIRECT match and one SHIFTED match
- * to right peaks. Conflicts (two left peaks wanting the same right peak
- * via different match types) form chains. We resolve each chain by DP.
- *
- * This is mathematically equivalent to solve_LSAP on the score matrix
- * built by MsCoreUtils::gnps, but runs in O(n+m) instead of O(l³).
- *
- * Algorithm (following Sirius ModifiedCosine by Dührkop et al.):
- *
- * 1. Two-pointer direct matching: left[i] <-> right[j] if |mz_i - mz_j| < tol
- * 2. Two-pointer shifted matching (reverse scan): left[i] <-> right[j]
- *    if |mz_i + delta - mz_j| < tol, where delta = precursorRight - precursorLeft
- *    (We enforce delta >= 0 by swapping if needed)
- * 3. For each left peak:
- *    - If only direct match: assign it
- *    - If only shifted match: assign it
- *    - If both, and no conflict: pick the better one
- *    - If conflict (shifted match's right peak is also direct-matched by
- *      another left peak): follow the chain and solve optimally by DP
- *
- * Each right peak is assigned to at most one left peak (1-to-1).
- * ══════════════════════════════════════════════════════════════════════════ */
-
 /* ── scoring helper ──────────────────────────────────────────────────────── */
-static inline double score_pair(double x_int, double y_int,
-                                double inv_sqrt_xsum, double inv_sqrt_ysum) {
-  return sqrt(x_int) * inv_sqrt_xsum * sqrt(y_int) * inv_sqrt_ysum;
+
+static inline double score_pair(double xi, double yj,
+                                double inv_sx, double inv_sy) {
+  return sqrt(xi) * inv_sx * sqrt(yj) * inv_sy;
 }
 
-/**
- * @brief Compute GNPS modified cosine using chain-DP.
- *
- * @param x_mz, x_int  Sorted x spectrum (length nx), no NAs
- * @param y_mz, y_int  Sorted y spectrum (length ny), no NAs
- * @param nx, ny        Lengths
- * @param inv_sqrt_xsum 1/sqrt(sum of unique x intensities)
- * @param inv_sqrt_ysum 1/sqrt(sum of unique y intensities)
- * @param delta         yPrecursorMz - xPrecursorMz (>= 0)
- * @param do_shift      Whether to do shifted matching
- * @param tol           Absolute tolerance in Da
- * @param ppm_val       PPM tolerance
- * @param out_matched   [out] number of matched pairs
- * @return              The GNPS similarity score
- */
+/* ══════════════════════════════════════════════════════════════════════════ *
+ * CHAIN-DP OPTIMAL ASSIGNMENT                                              *
+ *                                                                          *
+ * Two-pointer direct + shifted matching, then DP on conflict chains.       *
+ * All workspace is heap-allocated to exact size — portable and fast.        *
+ * ══════════════════════════════════════════════════════════════════════════ */
+
 static double chain_dp_score(
     const double *x_mz, const double *x_int, int nx,
     const double *y_mz, const double *y_int, int ny,
-    double inv_sqrt_xsum, double inv_sqrt_ysum,
+    double inv_sx, double inv_sy,
     double delta, int do_shift,
     double tol, double ppm_val,
     int *out_matched)
 {
-  /* direct_match[i] = index in y matched directly to x[i], or -1 */
-  /* shift_match[i]  = index in y matched via shift to x[i], or -1 */
-  /* back_direct[j]  = index in x that directly matched y[j], or -1 */
-  int *direct_match = (int *)xmalloc((size_t)nx * sizeof(int));
-  int *shift_match  = (int *)xmalloc((size_t)nx * sizeof(int));
-  int *back_direct  = (int *)xmalloc((size_t)ny * sizeof(int));
-  memset(direct_match, 0xFF, (size_t)nx * sizeof(int)); /* -1 */
-  memset(shift_match,  0xFF, (size_t)nx * sizeof(int));
-  memset(back_direct,  0xFF, (size_t)ny * sizeof(int));
+  /* Single allocation for all workspace: dm[nx] sm[nx] bd[ny] dp[nx*3] vis[] */
+  size_t vis_bytes = (size_t)(((unsigned)nx + 7u) >> 3);
+  size_t int_need  = (size_t)(nx + nx + ny);
+  size_t dbl_need  = (size_t)nx * 3;
+  size_t total_sz  = int_need * sizeof(int)
+                   + dbl_need * sizeof(double)
+                   + vis_bytes;
+  char *buf = (char *)xmalloc(total_sz);
 
-  /* ── Step 1: Direct matching (forward two-pointer) ───────────────── */
-  {
-    int i = 0, j = 0;
-    while (i < nx && j < ny) {
-      double ml = x_mz[i], mr = y_mz[j];
-      double allowed = tol + ppm_val * ((ml < mr) ? ml : mr) * 1e-6;
-      double d = ml - mr;
-      if (d < -allowed) { ++i; }
-      else if (d > allowed) { ++j; }
-      else {
-        direct_match[i] = j;
-        back_direct[j] = i;
-        ++i; ++j;
-      }
-    }
+  int *dm_arr = (int *)buf;
+  int *sm_arr = dm_arr + nx;
+  int *bd_arr = sm_arr + nx;
+  double *dp  = (double *)(bd_arr + ny);
+  unsigned char *vis = (unsigned char *)(dp + dbl_need);
+
+  memset(dm_arr, 0xFF, (size_t)nx * sizeof(int));
+  memset(sm_arr, 0xFF, (size_t)nx * sizeof(int));
+  memset(bd_arr, 0xFF, (size_t)ny * sizeof(int));
+  memset(vis, 0, vis_bytes);
+
+  /* ── Step 1: direct matching (forward two-pointer) ─────────────────── */
+  for (int i = 0, j = 0; i < nx && j < ny; ) {
+    double ml = x_mz[i], mr = y_mz[j];
+    double a = tol + ppm_val * ((ml < mr) ? ml : mr) * 1e-6;
+    double d = ml - mr;
+    if      (d < -a) ++i;
+    else if (d >  a) ++j;
+    else { dm_arr[i] = j; bd_arr[j] = i; ++i; ++j; }
   }
 
-  /* ── Step 2: Shifted matching (reverse two-pointer) ──────────────── */
+  /* ── Step 2: shifted matching (reverse two-pointer) ────────────────── */
   if (do_shift) {
-    int i = nx - 1, j = ny - 1;
-    while (i >= 0 && j >= 0) {
-      double ml_shifted = x_mz[i] + delta;
-      double mr = y_mz[j];
-      double allowed = tol + ppm_val * ((ml_shifted < mr) ? ml_shifted : mr) * 1e-6;
-      double d = ml_shifted - mr;
-      if (d > allowed) { --i; }
-      else if (d < -allowed) { --j; }
+    for (int i = nx - 1, j = ny - 1; i >= 0 && j >= 0; ) {
+      double ml = x_mz[i] + delta, mr = y_mz[j];
+      double a = tol + ppm_val * ((ml < mr) ? ml : mr) * 1e-6;
+      double d = ml - mr;
+      if      (d >  a) --i;
+      else if (d < -a) --j;
       else {
-        /* Only record shifted match if it doesn't point to the same pair
-         * as the direct match (degenerate case when delta ~ 0) */
-        if (back_direct[j] != i) {
-          shift_match[i] = j;
-        }
+        if (bd_arr[j] != i) sm_arr[i] = j;
         --i; --j;
       }
     }
   }
 
-  /* ── Step 3: Optimal assignment via chain-DP ─────────────────────── */
-  unsigned char *visited = (unsigned char *)xcalloc((size_t)((nx + 7) >> 3), 1);
+  /* ── Step 3: resolve assignments via chain-DP ──────────────────────── */
   double total = 0.0;
   int matched = 0;
 
-  /* DP workspace — reused across chains */
-  /* Each chain step has 3 states: (matched_direct, matched_shift, skip) */
-  int dp_cap = 64;
-  double *dp_buf = (double *)xmalloc((size_t)dp_cap * 3 * sizeof(double));
-
   for (int k = 0; k < nx; ++k) {
-    if (BS_TEST(visited, k)) continue;
+    if (BS_TEST(vis, k)) continue;
+    int dm = dm_arr[k], sm = sm_arr[k];
 
-    int dm = direct_match[k];
-    int sm = shift_match[k];
-
-    if (dm < 0 && sm < 0) continue; /* no match at all */
+    if (dm < 0 && sm < 0) continue;
 
     if (sm < 0) {
-      /* Only direct match, no conflict possible */
-      total += score_pair(x_int[k], y_int[dm], inv_sqrt_xsum, inv_sqrt_ysum);
+      total += score_pair(x_int[k], y_int[dm], inv_sx, inv_sy);
       matched++;
       continue;
     }
 
-    if (dm < 0) {
-      /* Only shifted match */
-      int conflict = back_direct[sm];
-      if (conflict < 0) {
-        /* No conflict — just assign shifted */
-        total += score_pair(x_int[k], y_int[sm], inv_sqrt_xsum, inv_sqrt_ysum);
-        matched++;
-        continue;
-      }
-      /* Fall through to chain-DP below */
-    }
-
-    /* Check if shifted match conflicts with another peak's direct match */
-    int conflict = back_direct[sm];
-    if (conflict < 0) {
-      /* No conflict — pick better of direct vs shifted */
-      double ds = (dm >= 0) ? score_pair(x_int[k], y_int[dm], inv_sqrt_xsum, inv_sqrt_ysum) : 0.0;
-      double ss = score_pair(x_int[k], y_int[sm], inv_sqrt_xsum, inv_sqrt_ysum);
-      if (ds >= ss) {
-        total += ds;
-      } else {
-        total += ss;
-      }
+    if (dm < 0 && bd_arr[sm] < 0) {
+      total += score_pair(x_int[k], y_int[sm], inv_sx, inv_sy);
       matched++;
       continue;
     }
 
-    /* ── Chain-DP: resolve conflict chain ──────────────────────────── */
-    /* Chain structure: k has shift_match -> sm, which is direct_match of
-     * `conflict`. `conflict` may itself have a shift_match pointing to some
-     * other y-peak, which may be direct_match of yet another x-peak, etc.
-     *
-     * States per chain node:
-     *   state 0: assign direct match to this node
-     *   state 1: assign shifted match to this node
-     *   state 2: skip this node (no assignment)
-     *
-     * Constraint: If node i uses state 1 (shift -> y[j]), and y[j] is the
-     * direct match of node i+1, then node i+1 CANNOT use state 0.
-     * After state 0 or 2: next node can use any state.
-     */
-    int chain_len = 0;
-
-    /* First node is k */
-    if (chain_len >= dp_cap) {
-      dp_cap *= 2;
-      dp_buf = (double *)realloc(dp_buf, (size_t)dp_cap * 3 * sizeof(double));
-      if (!dp_buf) error("realloc dp");
-    }
-    {
-      double ds = (dm >= 0)
-        ? score_pair(x_int[k], y_int[dm], inv_sqrt_xsum, inv_sqrt_ysum)
-        : -1.0;
-      double ss = score_pair(x_int[k], y_int[sm], inv_sqrt_xsum, inv_sqrt_ysum);
-      dp_buf[0] = ds;   /* direct */
-      dp_buf[1] = ss;   /* shift */
-      dp_buf[2] = 0.0;  /* skip */
-    }
-    BS_SET(visited, k);
-    chain_len++;
-
-    /* Follow the chain */
-    int u = conflict;
-    while (u >= 0 && !BS_TEST(visited, u)) {
-      BS_SET(visited, u);
-
-      if (chain_len >= dp_cap) {
-        dp_cap *= 2;
-        dp_buf = (double *)realloc(dp_buf, (size_t)dp_cap * 3 * sizeof(double));
-        if (!dp_buf) error("realloc dp");
-      }
-
-      int u_dm = direct_match[u];
-      int u_sm = shift_match[u];
-
-      double u_ds = (u_dm >= 0)
-        ? score_pair(x_int[u], y_int[u_dm], inv_sqrt_xsum, inv_sqrt_ysum)
-        : -1.0;
-      double u_ss = (u_sm >= 0)
-        ? score_pair(x_int[u], y_int[u_sm], inv_sqrt_xsum, inv_sqrt_ysum)
-        : -1.0;
-
-      /* DP transitions from previous node's states */
-      double prev_d = dp_buf[(chain_len - 1) * 3 + 0];
-      double prev_s = dp_buf[(chain_len - 1) * 3 + 1];
-      double prev_n = dp_buf[(chain_len - 1) * 3 + 2];
-
-      /* State 0 (direct match for u):
-       * Previous cannot have been shift (which consumed u's direct y-peak).
-       * So: max(prev_d, prev_n) + u_ds */
-      double best_not_shift = (prev_d > prev_n) ? prev_d : prev_n;
-      dp_buf[chain_len * 3 + 0] = (u_ds >= 0.0)
-        ? best_not_shift + u_ds : -1.0;
-
-      /* State 1 (shift match for u):
-       * Previous can be anything: max(prev_d, prev_s, prev_n) + u_ss */
-      double best_any = prev_d;
-      if (prev_s > best_any) best_any = prev_s;
-      if (prev_n > best_any) best_any = prev_n;
-      dp_buf[chain_len * 3 + 1] = (u_ss >= 0.0)
-        ? best_any + u_ss : -1.0;
-
-      /* State 2 (skip u):
-       * Previous can be anything */
-      dp_buf[chain_len * 3 + 2] = best_any;
-
-      chain_len++;
-
-      /* Follow chain: u's shift_match points to some y-peak, which may
-       * be direct-matched by another x-peak */
-      if (u_sm >= 0) {
-        u = back_direct[u_sm];
-      } else {
-        u = -1;
-      }
+    int conf = bd_arr[sm];
+    if (conf < 0) {
+      double ds = (dm >= 0) ? score_pair(x_int[k], y_int[dm], inv_sx, inv_sy) : 0.0;
+      double ss = score_pair(x_int[k], y_int[sm], inv_sx, inv_sy);
+      total += (ds >= ss) ? ds : ss;
+      matched++;
+      continue;
     }
 
-    /* Find maximum over last chain node's states */
-    double chain_score = -1.0;
-    int last = chain_len - 1;
-    for (int s = 0; s < 3; s++) {
-      if (dp_buf[last * 3 + s] > chain_score)
-        chain_score = dp_buf[last * 3 + s];
+    /* chain-DP */
+    int clen = 0;
+    dp[0] = (dm >= 0) ? score_pair(x_int[k], y_int[dm], inv_sx, inv_sy) : -1.0;
+    dp[1] = score_pair(x_int[k], y_int[sm], inv_sx, inv_sy);
+    dp[2] = 0.0;
+    BS_SET(vis, k);
+    clen = 1;
+
+    for (int u = conf; u >= 0 && !BS_TEST(vis, u); ) {
+      BS_SET(vis, u);
+      int udm = dm_arr[u], usm = sm_arr[u];
+      double uds = (udm >= 0) ? score_pair(x_int[u], y_int[udm], inv_sx, inv_sy) : -1.0;
+      double uss = (usm >= 0) ? score_pair(x_int[u], y_int[usm], inv_sx, inv_sy) : -1.0;
+
+      double pd = dp[(clen-1)*3], ps = dp[(clen-1)*3+1], pn = dp[(clen-1)*3+2];
+      double bns = (pd > pn) ? pd : pn;
+      double ba = pd; if (ps > ba) ba = ps; if (pn > ba) ba = pn;
+
+      dp[clen*3]   = (uds >= 0.0) ? bns + uds : -1.0;
+      dp[clen*3+1] = (uss >= 0.0) ? ba  + uss : -1.0;
+      dp[clen*3+2] = ba;
+      clen++;
+      u = (usm >= 0) ? bd_arr[usm] : -1;
     }
 
-    if (chain_score > 0.0) {
-      total += chain_score;
+    int last = clen - 1;
+    double cs = dp[last*3+2]; int bs = 2;
+    for (int s = 0; s < 2; s++)
+      if (dp[last*3+s] > cs) { cs = dp[last*3+s]; bs = s; }
 
-      /* Count matched pairs by backtracing through the DP */
-      int best_s = 2;
-      for (int s = 0; s < 3; s++) {
-        if (dp_buf[last * 3 + s] > dp_buf[last * 3 + best_s])
-          best_s = s;
-      }
-      if (best_s < 2) matched++;
-
+    if (cs > 0.0) {
+      total += cs;
+      if (bs < 2) matched++;
       for (int t = last - 1; t >= 0; t--) {
-        int next_state = best_s;
-        if (next_state == 0) {
-          /* Direct: previous was not shift -> max(prev_d, prev_n) */
-          double d_val = dp_buf[t * 3 + 0];
-          double n_val = dp_buf[t * 3 + 2];
-          best_s = (d_val >= 0.0 && d_val >= n_val) ? 0 : 2;
+        if (bs == 0) {
+          double dv = dp[t*3], nv = dp[t*3+2];
+          bs = (dv >= 0.0 && dv >= nv) ? 0 : 2;
         } else {
-          /* Shift or skip: previous was anything -> max all 3 */
-          best_s = 2;
-          for (int s = 0; s < 3; s++) {
-            if (dp_buf[t * 3 + s] >= 0.0 &&
-                (dp_buf[t * 3 + best_s] < 0.0 ||
-                 dp_buf[t * 3 + s] > dp_buf[t * 3 + best_s]))
-              best_s = s;
-          }
+          bs = 2;
+          for (int s = 0; s < 3; s++)
+            if (dp[t*3+s] >= 0.0 &&
+                (dp[t*3+bs] < 0.0 || dp[t*3+s] > dp[t*3+bs]))
+              bs = s;
         }
-        if (best_s < 2) matched++;
+        if (bs < 2) matched++;
       }
     }
   }
 
-  free(dp_buf);
-  free(visited);
-  free(direct_match); free(shift_match); free(back_direct);
+  free(buf);
 
   *out_matched = matched;
   return total;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
- * FUSED: join_gnps + gnps in one call
+/* ══════════════════════════════════════════════════════════════════════════ *
+ * gnps_compute — fused join+score (hot path for sanitized spectra)         *
+ *                                                                          *
+ * Sanitized input: sorted, no NAs, unique m/z → skip sort/filter/copy.     *
  * ══════════════════════════════════════════════════════════════════════════ */
-static SEXP gnps_fused(const double *x_mz, const double *x_in, int nx,
-                       const double *y_mz, const double *y_in, int ny,
-                       double x_pre, double y_pre,
-                       double tol, double ppm_val)
-{
-  /* ── 1. Sort non-NA peaks ──────────────────────────────────────────── */
-  MI *xs = (MI *)xmalloc((size_t)nx * sizeof(MI));
-  MI *ys = (MI *)xmalloc((size_t)ny * sizeof(MI));
-  int vx = 0, vy = 0;
-  for (int i = 0; i < nx; i++)
-    if (!ISNA(x_mz[i])) { xs[vx].mass = x_mz[i]; xs[vx].idx = i; vx++; }
-  for (int i = 0; i < ny; i++)
-    if (!ISNA(y_mz[i])) { ys[vy].mass = y_mz[i]; ys[vy].idx = i; vy++; }
-  qsort(xs, (size_t)vx, sizeof(MI), mi_cmp);
-  qsort(ys, (size_t)vy, sizeof(MI), mi_cmp);
 
-  /* ── 2. Unique-intensity sums ──────────────────────────────────────── */
-  double xs_sum = 0.0, ys_sum = 0.0;
-  for (int i = 0; i < vx; i++)
-    if (i == 0 || xs[i].mass != xs[i - 1].mass)
-      xs_sum += x_in[xs[i].idx];
-  for (int i = 0; i < vy; i++)
-    if (i == 0 || ys[i].mass != ys[i - 1].mass)
-      ys_sum += y_in[ys[i].idx];
-
-  if (xs_sum == 0.0 || ys_sum == 0.0) {
-    free(xs); free(ys); return zero_result();
-  }
-
-  double inv_sxs = 1.0 / sqrt(xs_sum);
-  double inv_sys = 1.0 / sqrt(ys_sum);
-
-  /* ── 3. Build sorted mz/int arrays ─────────────────────────────────── */
-  double *sx_mz  = (double *)xmalloc((size_t)vx * sizeof(double));
-  double *sx_int = (double *)xmalloc((size_t)vx * sizeof(double));
-  double *sy_mz  = (double *)xmalloc((size_t)vy * sizeof(double));
-  double *sy_int = (double *)xmalloc((size_t)vy * sizeof(double));
-  for (int i = 0; i < vx; i++) {
-    sx_mz[i]  = xs[i].mass;
-    sx_int[i] = x_in[xs[i].idx];
-  }
-  for (int i = 0; i < vy; i++) {
-    sy_mz[i]  = ys[i].mass;
-    sy_int[i] = y_in[ys[i].idx];
-  }
-  free(xs); free(ys);
-
-  /* ── 4. Determine delta and shift flag ─────────────────────────────── */
-  int do_shift = (!ISNA(x_pre) && !ISNA(y_pre));
-  double delta = 0.0;
-  const double *left_mz, *left_int, *right_mz, *right_int;
-  int nleft, nright;
-
-  if (do_shift) {
-    delta = y_pre - x_pre;
-    if (delta < 0) {
-      /* Swap left/right so delta >= 0 */
-      left_mz = sy_mz; left_int = sy_int; nleft = vy;
-      right_mz = sx_mz; right_int = sx_int; nright = vx;
-      delta = -delta;
-      double tmp = inv_sxs; inv_sxs = inv_sys; inv_sys = tmp;
-    } else {
-      left_mz = sx_mz; left_int = sx_int; nleft = vx;
-      right_mz = sy_mz; right_int = sy_int; nright = vy;
-    }
-    /* If delta is within tolerance of zero, skip shift matching */
-    double max_pre = (x_pre > y_pre) ? x_pre : y_pre;
-    double shift_tol = tol + ppm_val * max_pre * 1e-6;
-    if (delta <= shift_tol) do_shift = 0;
-  } else {
-    left_mz = sx_mz; left_int = sx_int; nleft = vx;
-    right_mz = sy_mz; right_int = sy_int; nright = vy;
-  }
-
-  int matched = 0;
-  double score = chain_dp_score(
-    left_mz, left_int, nleft,
-    right_mz, right_int, nright,
-    inv_sxs, inv_sys,
-    delta, do_shift,
-    tol, ppm_val,
-    &matched
-  );
-
-  free(sx_mz); free(sx_int); free(sy_mz); free(sy_int);
-
-  SEXP r = PROTECT(allocVector(VECSXP, 2));
-  SEXP nm = PROTECT(allocVector(STRSXP, 2));
-  SET_VECTOR_ELT(r, 0, ScalarReal(score));
-  SET_VECTOR_ELT(r, 1, ScalarInteger(matched));
-  SET_STRING_ELT(nm, 0, mkChar("score"));
-  SET_STRING_ELT(nm, 1, mkChar("matches"));
-  setAttrib(r, R_NamesSymbol, nm);
-  UNPROTECT(2);
-  return r;
-}
-
-/* ══════════════════════════════════════════════════════════════════════════
- * R entry: gnps_compute(x_mat, y_mat, xPrecursorMz, yPrecursorMz, tol, ppm)
- * ══════════════════════════════════════════════════════════════════════════ */
 SEXP gnps_compute(SEXP x, SEXP y,
                   SEXP xPrecursorMz, SEXP yPrecursorMz,
                   SEXP tolerance, SEXP ppm)
@@ -495,27 +251,56 @@ SEXP gnps_compute(SEXP x, SEXP y,
   if (!isReal(x) || !isReal(y)) error("x and y must be numeric matrices");
   SEXP xd = getAttrib(x, R_DimSymbol), yd = getAttrib(y, R_DimSymbol);
   if (!isInteger(xd) || !isInteger(yd)) error("dim must be integer");
+
   int nx = INTEGER(xd)[0], ny = INTEGER(yd)[0];
-  const double *xmz = REAL(x), *xin = xmz + nx;
-  const double *ymz = REAL(y), *yin = ymz + ny;
-  return gnps_fused(xmz, xin, nx, ymz, yin, ny,
-                    asReal(xPrecursorMz), asReal(yPrecursorMz),
-                    asReal(tolerance), asReal(ppm));
+  const double *x_mz = REAL(x), *x_int = x_mz + nx;
+  const double *y_mz = REAL(y), *y_int = y_mz + ny;
+  double x_pre = asReal(xPrecursorMz), y_pre = asReal(yPrecursorMz);
+  double tol = asReal(tolerance), ppm_val = asReal(ppm);
+
+  if (nx == 0 || ny == 0) return make_result(0.0, 0);
+
+  /* intensity sums (sanitized → no duplicates) */
+  double xsum = 0.0, ysum = 0.0;
+  for (int i = 0; i < nx; i++) xsum += x_int[i];
+  for (int i = 0; i < ny; i++) ysum += y_int[i];
+  if (xsum == 0.0 || ysum == 0.0) return make_result(0.0, 0);
+
+  double inv_sx = 1.0 / sqrt(xsum), inv_sy = 1.0 / sqrt(ysum);
+
+  /* orient so delta >= 0 */
+  int do_shift = (!ISNA(x_pre) && !ISNA(y_pre));
+  double delta = 0.0;
+  const double *lm = x_mz, *li = x_int, *rm = y_mz, *ri = y_int;
+  int nl = nx, nr = ny;
+
+  if (do_shift) {
+    delta = y_pre - x_pre;
+    if (delta < 0.0) {
+      lm = y_mz; li = y_int; nl = ny;
+      rm = x_mz; ri = x_int; nr = nx;
+      delta = -delta;
+      double t = inv_sx; inv_sx = inv_sy; inv_sy = t;
+    }
+    double mp = (x_pre > y_pre) ? x_pre : y_pre;
+    if (delta <= tol + ppm_val * mp * 1e-6) do_shift = 0;
+  }
+
+  int matched = 0;
+  double score = chain_dp_score(lm, li, nl, rm, ri, nr,
+                                inv_sx, inv_sy, delta, do_shift,
+                                tol, ppm_val, &matched);
+  return make_result(score, matched);
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
- * R entry: gnps(x_aligned, y_aligned)  — backward compatible
- *
- * Replicates MsCoreUtils::gnps exactly:
- *   1. Sum unique x/y intensities
- *   2. Keep rows where both x and y have non-NA mz
- *   3. Factor x_mz and y_mz into integer group indices
- *   4. Build score_mat[x_idx, y_idx] = sqrt(x_int)/sqrt(x_sum) * ...
- *   5. Solve optimal 1-to-1 assignment
- *
- * Uses clean shortest-augmenting-path Hungarian (O(n³) but n is typically
- * tiny — number of unique mz groups in matched peaks).
+/* ══════════════════════════════════════════════════════════════════════════ *
+ * gnps — backward compatible with MsCoreUtils pre-aligned matrices         *
+ *                                                                          *
+ * Exact shortest-augmenting-path Hungarian on the score matrix.            *
+ * O(n³) but n is tiny (number of unique mz groups in matched peaks).       *
+ * Single allocation for all workspace to minimize overhead.                *
  * ══════════════════════════════════════════════════════════════════════════ */
+
 SEXP gnps(SEXP x, SEXP y)
 {
   if (!isReal(x) || !isReal(y)) error("Inputs must be numeric matrices");
@@ -526,7 +311,7 @@ SEXP gnps(SEXP x, SEXP y)
   const double *xmz = REAL(x), *xin = xmz + n;
   const double *ymz = REAL(y), *yin = ymz + n;
 
-  /* ── unique-intensity sums ──────────────────────────────────────────── */
+  /* unique-intensity sums */
   KP *buf = (KP *)xmalloc((size_t)n * sizeof(KP));
   int m = 0;
   for (int i = 0; i < n; i++)
@@ -545,13 +330,13 @@ SEXP gnps(SEXP x, SEXP y)
     if (i == 0 || buf[i].key != buf[i - 1].key) ys_sum += yin[buf[i].pos];
   free(buf);
 
-  if (xs_sum == 0.0 || ys_sum == 0.0) return zero_result();
+  if (xs_sum == 0.0 || ys_sum == 0.0) return make_result(0.0, 0);
 
-  /* ── build kept arrays ─────────────────────────────────────────────── */
+  /* build kept arrays */
   int l = 0;
   for (int i = 0; i < n; i++)
     if (!ISNA(xmz[i]) && !ISNA(ymz[i])) l++;
-  if (!l) return zero_result();
+  if (!l) return make_result(0.0, 0);
 
   double *keep_xmz = (double *)xmalloc((size_t)l * sizeof(double));
   double *keep_ymz = (double *)xmalloc((size_t)l * sizeof(double));
@@ -567,7 +352,7 @@ SEXP gnps(SEXP x, SEXP y)
     }
   }
 
-  /* ── compute factor indices ────────────────────────────────────────── */
+  /* compute factor indices */
   int *x_fac = (int *)xmalloc((size_t)l * sizeof(int));
   int *y_fac = (int *)xmalloc((size_t)l * sizeof(int));
   { KP *kpb = (KP *)xmalloc((size_t)l * sizeof(KP));
@@ -588,46 +373,52 @@ SEXP gnps(SEXP x, SEXP y)
     free(kpb);
   }
 
-  int n_xgroups = 0, n_ygroups = 0;
+  int n_xg = 0, n_yg = 0;
   for (int i = 0; i < l; i++) {
-    if (x_fac[i] > n_xgroups) n_xgroups = x_fac[i];
-    if (y_fac[i] > n_ygroups) n_ygroups = y_fac[i];
+    if (x_fac[i] > n_xg) n_xg = x_fac[i];
+    if (y_fac[i] > n_yg) n_yg = y_fac[i];
   }
 
-  double inv_sxs = 1.0 / sqrt(xs_sum);
-  double inv_sys = 1.0 / sqrt(ys_sum);
+  double inv_sxs = 1.0 / sqrt(xs_sum), inv_sys = 1.0 / sqrt(ys_sum);
 
-  int mat_dim = (n_xgroups > n_ygroups) ? n_xgroups : n_ygroups;
-  if (mat_dim == 0) {
+  int N = (n_xg > n_yg) ? n_xg : n_yg;
+  if (N == 0) {
     free(x_fac); free(y_fac);
     free(keep_xmz); free(keep_ymz); free(keep_xin); free(keep_yin);
-    return zero_result();
+    return make_result(0.0, 0);
   }
 
-  /* Build square score matrix — last write wins (matching R) */
-  double *score_mat = (double *)xcalloc((size_t)mat_dim * (size_t)mat_dim,
-                                        sizeof(double));
+  /* score matrix */
+  double *sm = (double *)xcalloc((size_t)N * (size_t)N, sizeof(double));
   for (int i = 0; i < l; i++) {
-    int r = x_fac[i] - 1;
-    int c = y_fac[i] - 1;
-    double sc = sqrt(keep_xin[i]) * inv_sxs * sqrt(keep_yin[i]) * inv_sys;
-    score_mat[(size_t)r * (size_t)mat_dim + (size_t)c] = sc;
+    size_t r = (size_t)(x_fac[i] - 1), c = (size_t)(y_fac[i] - 1);
+    sm[r * (size_t)N + c] = sqrt(keep_xin[i]) * inv_sxs
+                           * sqrt(keep_yin[i]) * inv_sys;
   }
-
   free(x_fac); free(y_fac);
   free(keep_xmz); free(keep_ymz); free(keep_xin); free(keep_yin);
 
-  /* ── Shortest-augmenting-path Hungarian (maximize via negation) ────── */
+  /* Exact shortest-augmenting-path Hungarian (maximize via negation).
+   * Single allocation for all workspace: u[N+1] v[N+1] p[N+1] way[N+1]
+   * minv[N+1] used[N+1].  1-indexed internally (row 0 = virtual). */
   {
-    int N = mat_dim;
-    double *u = (double *)xcalloc((size_t)(N + 1), sizeof(double));
-    double *v = (double *)xcalloc((size_t)(N + 1), sizeof(double));
-    int    *p = (int *)xmalloc((size_t)(N + 1) * sizeof(int));
-    int  *way = (int *)xmalloc((size_t)(N + 1) * sizeof(int));
-    double *minv = (double *)xmalloc((size_t)(N + 1) * sizeof(double));
-    int  *used = (int *)xcalloc((size_t)(N + 1), sizeof(int));
+    size_t N1 = (size_t)(N + 1);
+    size_t buf_sz = N1 * 2 * sizeof(double)   /* u, v */
+                  + N1 * 2 * sizeof(int)       /* p, way */
+                  + N1 * sizeof(double)         /* minv */
+                  + N1 * sizeof(int);           /* used */
+    char *hbuf = (char *)xmalloc(buf_sz);
 
-    for (int j = 0; j <= N; j++) p[j] = 0;
+    double *u   = (double *)hbuf;
+    double *v   = u + N1;
+    int    *p   = (int *)(v + N1);
+    int    *way = p + (int)N1;
+    double *minv = (double *)(way + (int)N1);
+    int    *used = (int *)(minv + N1);
+
+    memset(u, 0, N1 * sizeof(double));
+    memset(v, 0, N1 * sizeof(double));
+    memset(p, 0, N1 * sizeof(int));
 
     for (int i = 1; i <= N; i++) {
       p[0] = i;
@@ -636,16 +427,17 @@ SEXP gnps(SEXP x, SEXP y)
       do {
         used[j0] = 1;
         int i0 = p[j0], j1 = 0;
-        double del = DBL_MAX;
+        double delta = DBL_MAX;
         for (int j = 1; j <= N; j++) {
           if (used[j]) continue;
-          double cur = -score_mat[(size_t)(i0 - 1) * (size_t)N + (size_t)(j - 1)] - u[i0] - v[j];
+          double cur = -sm[(size_t)(i0 - 1) * (size_t)N + (size_t)(j - 1)]
+                       - u[i0] - v[j];
           if (cur < minv[j]) { minv[j] = cur; way[j] = j0; }
-          if (minv[j] < del) { del = minv[j]; j1 = j; }
+          if (minv[j] < delta) { delta = minv[j]; j1 = j; }
         }
         for (int j = 0; j <= N; j++) {
-          if (used[j]) { u[p[j]] += del; v[j] -= del; }
-          else { minv[j] -= del; }
+          if (used[j]) { u[p[j]] += delta; v[j] -= delta; }
+          else         { minv[j] -= delta; }
         }
         j0 = j1;
       } while (p[j0] != 0);
@@ -655,30 +447,19 @@ SEXP gnps(SEXP x, SEXP y)
     double total = 0.0;
     int matched = 0;
     for (int j = 1; j <= N; j++) {
-      int row = p[j] - 1;
-      int col = j - 1;
-      double sc = score_mat[(size_t)row * (size_t)N + (size_t)col];
+      double sc = sm[(size_t)(p[j] - 1) * (size_t)N + (size_t)(j - 1)];
       if (sc > 0.0) { total += sc; matched++; }
     }
 
-    free(u); free(v); free(p); free(way); free(minv); free(used);
-    free(score_mat);
-
-    SEXP r = PROTECT(allocVector(VECSXP, 2));
-    SEXP nm = PROTECT(allocVector(STRSXP, 2));
-    SET_VECTOR_ELT(r, 0, ScalarReal(total));
-    SET_VECTOR_ELT(r, 1, ScalarInteger(matched));
-    SET_STRING_ELT(nm, 0, mkChar("score"));
-    SET_STRING_ELT(nm, 1, mkChar("matches"));
-    setAttrib(r, R_NamesSymbol, nm);
-    UNPROTECT(2);
-    return r;
+    free(hbuf); free(sm);
+    return make_result(total, matched);
   }
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
- * join_gnps — standalone peak matching (backward compat)
+/* ══════════════════════════════════════════════════════════════════════════ *
+ * join_gnps — standalone peak matching (backward compat)                   *
  * ══════════════════════════════════════════════════════════════════════════ */
+
 SEXP join_gnps(SEXP x, SEXP y,
                SEXP xPrecursorMz, SEXP yPrecursorMz,
                SEXP tolerance, SEXP ppm)
@@ -717,7 +498,8 @@ SEXP join_gnps(SEXP x, SEXP y,
   }
   if (do_pdiff) {
     for (int i = 0; i < vx; i++) {
-      const double xa = xs_arr[i].mass + pdiff, half = tol + ppm_val * xa * 1e-6;
+      const double xa = xs_arr[i].mass + pdiff,
+                   half = tol + ppm_val * xa * 1e-6;
       for (int j = lower_bound(ys_arr, vy, xa - half);
            j < vy && ys_arr[j].mass <= xa + half; j++)
         cnt++;
@@ -739,13 +521,15 @@ SEXP join_gnps(SEXP x, SEXP y,
     int start = lower_bound(ys_arr, vy, xm - half), found = 0;
     for (int j = start; j < vy && ys_arr[j].mass <= xm + half; j++) {
       BS_SET(y_used, ys_arr[j].idx);
-      ox[pos] = xs_arr[i].idx + 1; oy[pos] = ys_arr[j].idx + 1; pos++; found++;
+      ox[pos] = xs_arr[i].idx + 1; oy[pos] = ys_arr[j].idx + 1;
+      pos++; found++;
     }
     if (!found) { ox[pos] = xs_arr[i].idx + 1; oy[pos] = NA_INTEGER; pos++; }
   }
   if (do_pdiff) {
     for (int i = 0; i < vx; i++) {
-      const double xa = xs_arr[i].mass + pdiff, half = tol + ppm_val * xa * 1e-6;
+      const double xa = xs_arr[i].mass + pdiff,
+                   half = tol + ppm_val * xa * 1e-6;
       for (int j = lower_bound(ys_arr, vy, xa - half);
            j < vy && ys_arr[j].mass <= xa + half; j++) {
         ox[pos] = xs_arr[i].idx + 1; oy[pos] = ys_arr[j].idx + 1; pos++;
