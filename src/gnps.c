@@ -531,16 +531,32 @@ SEXP gnps_compute(SEXP x, SEXP y,
    * exactly matching MsCoreUtils::join_gnps which does join(x+pdiff, y).
    * No swap: always x on the left, y on the right.
    *
-   * Skip shifted matching when |pdiff| is within tolerance of zero:
-   * the shifted pass would just duplicate the direct pass.  This is
-   * stricter than MsCoreUtils (which only skips when pdiff == 0 exactly)
-   * but scientifically more correct — if two precursors are within
-   * measurement tolerance of each other, there is no meaningful neutral
-   * loss to match.
+   * ── When to skip the shifted pass ─────────────────────────────────
    *
-   * This is an issue in MsCoreUtils. Let's not reproduce it.
-   * The code below matches their implementation:
-   *   if (pdiff == 0.0) do_shift = 0;                                    */
+   * We skip shifted matching when |pdiff| <= tol + ppm * max_precursor * 1e-6,
+   * i.e. when the precursor mass difference is within peak matching tolerance.
+   *
+   * MsCoreUtils only skips when pdiff == 0.0 exactly — this is a bug.
+   * To reproduce their behavior, replace our check with:
+   *   if (pdiff == 0.0) do_shift = 0;
+   *
+   * Why our approach is correct — concrete example from pesticides.mgf:
+   *
+   *   precursor_x = 341.026,  precursor_y = 341.039
+   *   pdiff       = 0.013 Da
+   *   tolerance   = 0.01 + 10 ppm × 341.039 = 0.01341 Da
+   *   pdiff / tol = 97%  →  the "neutral loss" IS measurement noise
+   *
+   *   MsCoreUtils (modified cosine): 24 matches, score = 0.14547
+   *   Our code    (modified cosine): 23 matches, score = 0.14482
+   *   MsCoreUtils (plain cosine):    23 matches, score = 0.14482
+   *                                  ^^^^^ identical to ours
+   *
+   * The shifted pass is redundant when pdiff ≈ tolerance: it re-matches
+   * peaks already found by the direct pass, inflating the score by 6.56e-4.
+   * No chemical transformation produces a 0.013 Da neutral loss.
+   * When pdiff ≈ tolerance, modified cosine degenerates to cosine,
+   * and our implementation correctly recognizes that.                      */
   int do_shift = (!ISNA(x_pre) && !ISNA(y_pre));
   double pdiff = 0.0;
 
