@@ -536,7 +536,11 @@ SEXP gnps_compute(SEXP x, SEXP y,
    * stricter than MsCoreUtils (which only skips when pdiff == 0 exactly)
    * but scientifically more correct — if two precursors are within
    * measurement tolerance of each other, there is no meaningful neutral
-   * loss to match.                                                        */
+   * loss to match.
+   *
+   * This is an issue in MsCoreUtils. Let's not reproduce it.
+   * The code below matches their implementation:
+   *   if (pdiff == 0.0) do_shift = 0;                                    */
   int do_shift = (!ISNA(x_pre) && !ISNA(y_pre));
   double pdiff = 0.0;
 
