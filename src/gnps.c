@@ -1,14 +1,30 @@
 /**
  * @file gnps.c
- * @brief GNPS modified cosine similarity — mathematically exact, near-linear.
+ * @brief GNPS modified cosine similarity — mathematically exact.
  *
- * Input spectra MUST be sanitized (import_spectra(sanitize = TRUE)):
- *   - Unique m/z values, sorted ascending, no NA/NaN intensities.
+ * IMPORTANT: Input spectra MUST be sanitized before calling these functions.
+ * Sanitized spectra have:
+ *   - Unique m/z values (no two peaks within matching tolerance)
+ *   - Non-negative intensities, no NaN/NA intensities
+ *   - Peaks sorted by m/z in ascending order
  *
- * Algorithm: chain-DP optimal assignment (Sirius/FastCosine, Dührkop et al.)
- * exploits mass-tolerance structure for O(n+m) instead of O(n³) Hungarian.
+ * In tima, this is guaranteed by sanitize_spectra() (called from
+ * import_spectra(sanitize = TRUE)), which applies Spectra::reduceSpectra(),
+ * Spectra::combinePeaks(), and Spectra::scalePeaks().
  *
- * Scoring: sqrt(x_i)/sqrt(Σx) · sqrt(y_j)/sqrt(Σy)  (matches MsCoreUtils).
+ * Algorithm (gnps_compute, hot path):
+ *   1. Y-centric closest-match for direct and shifted passes, replicating
+ *      MsCoreUtils::join(type="outer") one-to-one semantics.
+ *   2. If no shifted match conflicts with a direct match: O(n+m) greedy
+ *      scoring (pick the better of direct/shifted per x peak).
+ *   3. If conflicts exist: build a sparse score matrix from matched peaks
+ *      and solve with the exact shortest-augmenting-path Hungarian O(k³),
+ *      where k = number of involved peaks (typically very small).
+ *
+ * Scoring formula (matches MsCoreUtils::gnps exactly):
+ *   score_ij = sqrt(x_int_i) / sqrt(sum_unique_x_int)
+ *            * sqrt(y_int_j) / sqrt(sum_unique_y_int)
+ *   total = sum of score_ij for optimally assigned pairs
  *
  * Exports:
  *   gnps_compute  — fused join+score from raw peak matrices (hot path)
@@ -53,15 +69,6 @@ static int mi_cmp(const void *a, const void *b) {
   return (da < db) ? -1 : (da > db) ? 1 : 0;
 }
 
-static int lower_bound(const MI *arr, int n, double lb) {
-  int lo = 0, hi = n;
-  while (lo < hi) {
-    int mid = lo + ((hi - lo) >> 1);
-    if (arr[mid].mass < lb) lo = mid + 1; else hi = mid;
-  }
-  return lo;
-}
-
 /* ── (key,pos) sort for gnps() backward compat ───────────────────────────── */
 
 typedef struct { double key; int pos; } KP;
@@ -93,9 +100,11 @@ static inline double score_pair(double xi, double yj,
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ *
- * CHAIN-DP OPTIMAL ASSIGNMENT                                              *
+ * OPTIMAL ASSIGNMENT SCORER                                                *
  *                                                                          *
- * Two-pointer direct + shifted matching, then DP on conflict chains.       *
+ * Y-centric closest-match for direct + shifted, then:                      *
+ *   - Fast path (no conflicts): greedy O(n+m)                             *
+ *   - Conflict path: exact Hungarian on involved peaks                     *
  * All workspace is heap-allocated to exact size — portable and fast.        *
  * ══════════════════════════════════════════════════════════════════════════ */
 
@@ -103,133 +112,209 @@ static double chain_dp_score(
     const double *x_mz, const double *x_int, int nx,
     const double *y_mz, const double *y_int, int ny,
     double inv_sx, double inv_sy,
-    double delta, int do_shift,
+    double pdiff, int do_shift,
     double tol, double ppm_val,
     int *out_matched)
 {
-  /* Single allocation for all workspace: dm[nx] sm[nx] bd[ny] dp[nx*3] vis[] */
-  size_t vis_bytes = (size_t)(((unsigned)nx + 7u) >> 3);
+  /* Single allocation for all workspace: dm[nx] sm[nx] bd[ny] */
   size_t int_need  = (size_t)(nx + nx + ny);
-  size_t dbl_need  = (size_t)nx * 3;
-  size_t total_sz  = int_need * sizeof(int)
-                   + dbl_need * sizeof(double)
-                   + vis_bytes;
+  size_t total_sz  = int_need * sizeof(int);
   char *buf = (char *)xmalloc(total_sz);
 
   int *dm_arr = (int *)buf;
   int *sm_arr = dm_arr + nx;
   int *bd_arr = sm_arr + nx;
-  double *dp  = (double *)(bd_arr + ny);
-  unsigned char *vis = (unsigned char *)(dp + dbl_need);
 
   memset(dm_arr, 0xFF, (size_t)nx * sizeof(int));
   memset(sm_arr, 0xFF, (size_t)nx * sizeof(int));
   memset(bd_arr, 0xFF, (size_t)ny * sizeof(int));
-  memset(vis, 0, vis_bytes);
 
-  /* ── Step 1: direct matching (forward two-pointer) ─────────────────── */
-  for (int i = 0, j = 0; i < nx && j < ny; ) {
-    double ml = x_mz[i], mr = y_mz[j];
-    double a = tol + ppm_val * ((ml < mr) ? ml : mr) * 1e-6;
-    double d = ml - mr;
-    if      (d < -a) ++i;
-    else if (d >  a) ++j;
-    else { dm_arr[i] = j; bd_arr[j] = i; ++i; ++j; }
-  }
+  const double eps_tol = sqrt(DBL_EPSILON);
 
-  /* ── Step 2: shifted matching (reverse two-pointer) ────────────────── */
-  if (do_shift) {
-    for (int i = nx - 1, j = ny - 1; i >= 0 && j >= 0; ) {
-      double ml = x_mz[i] + delta, mr = y_mz[j];
-      double a = tol + ppm_val * ((ml < mr) ? ml : mr) * 1e-6;
-      double d = ml - mr;
-      if      (d >  a) --i;
-      else if (d < -a) --j;
-      else {
-        if (bd_arr[j] != i) sm_arr[i] = j;
-        --i; --j;
+  /* ── Step 1: direct matching ──────────────────────────────────────────
+   * Replicate MsCoreUtils::C_join_outer: for each y[j], find the closest
+   * x[i] within tolerance (= tol + ppm(x[i]) + sqrt(eps)).  When two x
+   * compete for the same y, the closer one wins.  Iterate y in order;
+   * because both arrays are sorted, a sliding window on x suffices.     */
+  {
+    int ilo = 0;
+    for (int j = 0; j < ny; j++) {
+      double ym = y_mz[j];
+      /* We need to check which x[i] values have ym within their own
+       * per-element tolerance band: |x[i] - ym| <= tol+ppm(x[i])+eps.
+       * Advance ilo past x values whose upper tolerance bound is below ym. */
+      while (ilo < nx && x_mz[ilo] + tol + ppm_val * x_mz[ilo] * 1e-6 + eps_tol < ym)
+        ilo++;
+      int best_i = -1;
+      double best_d = DBL_MAX;
+      for (int i = ilo; i < nx; i++) {
+        double xm = x_mz[i];
+        if (xm - tol - ppm_val * xm * 1e-6 - eps_tol > ym) break;
+        double ai = tol + ppm_val * xm * 1e-6 + eps_tol;
+        double dij = fabs(xm - ym);
+        if (dij <= ai && dij < best_d) { best_d = dij; best_i = i; }
+      }
+      if (best_i >= 0 && dm_arr[best_i] < 0) {
+        dm_arr[best_i] = j; bd_arr[j] = best_i;
+      } else if (best_i >= 0) {
+        /* x[best_i] already matched to another y — keep the closer one */
+        int prev_j = dm_arr[best_i];
+        double prev_d = fabs(x_mz[best_i] - y_mz[prev_j]);
+        if (best_d < prev_d) {
+          bd_arr[prev_j] = -1;     /* release previous y */
+          dm_arr[best_i] = j; bd_arr[j] = best_i;
+        }
       }
     }
   }
 
-  /* ── Step 3: resolve assignments via chain-DP ──────────────────────── */
+  /* ── Step 2: shifted matching ──────────────────────────────────────── */
+  /* x_mz[i]+pdiff vs y_mz[j], same closest-match from y's perspective.
+   * Shifted matches don't conflict with each other (one-to-one forward
+   * scan) but may conflict with direct matches (resolved in Step 3).    */
+  if (do_shift) {
+    int ilo = 0;
+    for (int j = 0; j < ny; j++) {
+      double ym = y_mz[j];
+      /* Advance past shifted x values too far below ym */
+      while (ilo < nx) {
+        double shifted = x_mz[ilo] + pdiff;
+        double ai = tol + ppm_val * fabs(shifted) * 1e-6 + eps_tol;
+        if (shifted + ai >= ym) break;
+        ilo++;
+      }
+      int best_i = -1;
+      double best_d = DBL_MAX;
+      for (int i = ilo; i < nx; i++) {
+        double shifted = x_mz[i] + pdiff;
+        double ai = tol + ppm_val * fabs(shifted) * 1e-6 + eps_tol;
+        if (shifted - ai > ym) break;
+        double dij = fabs(shifted - ym);
+        if (dij <= ai && dij < best_d) {
+          best_d = dij; best_i = i;
+        }
+      }
+      if (best_i >= 0 && sm_arr[best_i] < 0) {
+        sm_arr[best_i] = j;
+      } else if (best_i >= 0) {
+        /* x[best_i] already has a shifted match — keep closer one */
+        int prev_j = sm_arr[best_i];
+        double prev_shifted = x_mz[best_i] + pdiff;
+        double prev_d = fabs(prev_shifted - y_mz[prev_j]);
+        if (best_d < prev_d) sm_arr[best_i] = j;
+      }
+    }
+  }
+
+  /* ── Step 3: score optimally ─────────────────────────────────────────── *
+   *                                                                       *
+   * Check if any shifted match conflicts with a direct match (same y).    *
+   * If no conflicts: score all matches directly in O(n+m).                *
+   * If conflicts: build score matrix for involved peaks, run Hungarian.   *
+   * ───────────────────────────────────────────────────────────────────── */
+
+  int has_conflict = 0;
+  for (int i = 0; i < nx && !has_conflict; i++)
+    if (sm_arr[i] >= 0 && bd_arr[sm_arr[i]] >= 0 && bd_arr[sm_arr[i]] != i)
+      has_conflict = 1;
+
   double total = 0.0;
   int matched = 0;
 
-  for (int k = 0; k < nx; ++k) {
-    if (BS_TEST(vis, k)) continue;
-    int dm = dm_arr[k], sm = sm_arr[k];
-
-    if (dm < 0 && sm < 0) continue;
-
-    if (sm < 0) {
-      total += score_pair(x_int[k], y_int[dm], inv_sx, inv_sy);
-      matched++;
-      continue;
-    }
-
-    if (dm < 0 && bd_arr[sm] < 0) {
-      total += score_pair(x_int[k], y_int[sm], inv_sx, inv_sy);
-      matched++;
-      continue;
-    }
-
-    int conf = bd_arr[sm];
-    if (conf < 0) {
-      double ds = (dm >= 0) ? score_pair(x_int[k], y_int[dm], inv_sx, inv_sy) : 0.0;
-      double ss = score_pair(x_int[k], y_int[sm], inv_sx, inv_sy);
+  if (!has_conflict) {
+    /* Fast path: no conflicts — each y peak is used at most once.
+     * For each x, pick the better of direct/shifted (both can't share y). */
+    for (int i = 0; i < nx; i++) {
+      int dm = dm_arr[i], sm = sm_arr[i];
+      if (dm < 0 && sm < 0) continue;
+      double ds = (dm >= 0) ? score_pair(x_int[i], y_int[dm], inv_sx, inv_sy) : 0.0;
+      double ss = (sm >= 0) ? score_pair(x_int[i], y_int[sm], inv_sx, inv_sy) : 0.0;
       total += (ds >= ss) ? ds : ss;
       matched++;
-      continue;
+    }
+  } else {
+    /* Conflict path: build score matrix and solve with Hungarian.
+     * Collect all x-peaks and y-peaks involved in any match.             */
+    int n_xm = 0, n_ym = 0;
+
+    int *xi_map = (int *)xmalloc((size_t)nx * sizeof(int));
+    memset(xi_map, 0xFF, (size_t)nx * sizeof(int));
+    for (int i = 0; i < nx; i++)
+      if (dm_arr[i] >= 0 || sm_arr[i] >= 0) xi_map[i] = n_xm++;
+
+    int *yi_map = (int *)xmalloc((size_t)ny * sizeof(int));
+    memset(yi_map, 0xFF, (size_t)ny * sizeof(int));
+    for (int i = 0; i < nx; i++) {
+      if (dm_arr[i] >= 0 && yi_map[dm_arr[i]] < 0) yi_map[dm_arr[i]] = n_ym++;
+      if (sm_arr[i] >= 0 && yi_map[sm_arr[i]] < 0) yi_map[sm_arr[i]] = n_ym++;
     }
 
-    /* chain-DP */
-    int clen = 0;
-    dp[0] = (dm >= 0) ? score_pair(x_int[k], y_int[dm], inv_sx, inv_sy) : -1.0;
-    dp[1] = score_pair(x_int[k], y_int[sm], inv_sx, inv_sy);
-    dp[2] = 0.0;
-    BS_SET(vis, k);
-    clen = 1;
+    int N = (n_xm > n_ym) ? n_xm : n_ym;
+    if (N == 0) { free(xi_map); free(yi_map); free(buf);
+                  *out_matched = 0; return 0.0; }
 
-    for (int u = conf; u >= 0 && !BS_TEST(vis, u); ) {
-      BS_SET(vis, u);
-      int udm = dm_arr[u], usm = sm_arr[u];
-      double uds = (udm >= 0) ? score_pair(x_int[u], y_int[udm], inv_sx, inv_sy) : -1.0;
-      double uss = (usm >= 0) ? score_pair(x_int[u], y_int[usm], inv_sx, inv_sy) : -1.0;
-
-      double pd = dp[(clen-1)*3], ps = dp[(clen-1)*3+1], pn = dp[(clen-1)*3+2];
-      double bns = (pd > pn) ? pd : pn;
-      double ba = pd; if (ps > ba) ba = ps; if (pn > ba) ba = pn;
-
-      dp[clen*3]   = (uds >= 0.0) ? bns + uds : -1.0;
-      dp[clen*3+1] = (uss >= 0.0) ? ba  + uss : -1.0;
-      dp[clen*3+2] = ba;
-      clen++;
-      u = (usm >= 0) ? bd_arr[usm] : -1;
-    }
-
-    int last = clen - 1;
-    double cs = dp[last*3+2]; int bs = 2;
-    for (int s = 0; s < 2; s++)
-      if (dp[last*3+s] > cs) { cs = dp[last*3+s]; bs = s; }
-
-    if (cs > 0.0) {
-      total += cs;
-      if (bs < 2) matched++;
-      for (int t = last - 1; t >= 0; t--) {
-        if (bs == 0) {
-          double dv = dp[t*3], nv = dp[t*3+2];
-          bs = (dv >= 0.0 && dv >= nv) ? 0 : 2;
-        } else {
-          bs = 2;
-          for (int s = 0; s < 3; s++)
-            if (dp[t*3+s] >= 0.0 &&
-                (dp[t*3+bs] < 0.0 || dp[t*3+s] > dp[t*3+bs]))
-              bs = s;
-        }
-        if (bs < 2) matched++;
+    double *smat = (double *)xcalloc((size_t)N * (size_t)N, sizeof(double));
+    for (int i = 0; i < nx; i++) {
+      int r = xi_map[i]; if (r < 0) continue;
+      if (dm_arr[i] >= 0) {
+        int c = yi_map[dm_arr[i]];
+        double sc = score_pair(x_int[i], y_int[dm_arr[i]], inv_sx, inv_sy);
+        if (sc > smat[(size_t)r * (size_t)N + (size_t)c])
+          smat[(size_t)r * (size_t)N + (size_t)c] = sc;
+      }
+      if (sm_arr[i] >= 0) {
+        int c = yi_map[sm_arr[i]];
+        double sc = score_pair(x_int[i], y_int[sm_arr[i]], inv_sx, inv_sy);
+        if (sc > smat[(size_t)r * (size_t)N + (size_t)c])
+          smat[(size_t)r * (size_t)N + (size_t)c] = sc;
       }
     }
+    free(xi_map); free(yi_map);
+
+    /* Exact shortest-augmenting-path Hungarian (1-indexed) */
+    size_t N1 = (size_t)(N + 1);
+    char *hbuf = (char *)xmalloc(
+      N1 * 2 * sizeof(double) + N1 * 2 * sizeof(int) +
+      N1 * sizeof(double) + N1 * sizeof(int));
+    double *hu   = (double *)hbuf;
+    double *hv   = hu + N1;
+    int    *hp   = (int *)(hv + N1);
+    int    *hway = hp + (int)N1;
+    double *hmin = (double *)(hway + (int)N1);
+    int    *hused = (int *)(hmin + N1);
+
+    memset(hu, 0, N1 * sizeof(double));
+    memset(hv, 0, N1 * sizeof(double));
+    memset(hp, 0, N1 * sizeof(int));
+
+    for (int i = 1; i <= N; i++) {
+      hp[0] = i; int j0 = 0;
+      for (int j = 0; j <= N; j++) { hmin[j] = DBL_MAX; hused[j] = 0; }
+      do {
+        hused[j0] = 1;
+        int i0 = hp[j0], j1 = 0;
+        double delta = DBL_MAX;
+        for (int j = 1; j <= N; j++) {
+          if (hused[j]) continue;
+          double cur = -smat[(size_t)(i0-1) * (size_t)N + (size_t)(j-1)]
+                       - hu[i0] - hv[j];
+          if (cur < hmin[j]) { hmin[j] = cur; hway[j] = j0; }
+          if (hmin[j] < delta) { delta = hmin[j]; j1 = j; }
+        }
+        for (int j = 0; j <= N; j++) {
+          if (hused[j]) { hu[hp[j]] += delta; hv[j] -= delta; }
+          else          { hmin[j] -= delta; }
+        }
+        j0 = j1;
+      } while (hp[j0] != 0);
+      do { int j1 = hway[j0]; hp[j0] = hp[j1]; j0 = j1; } while (j0);
+    }
+
+    for (int j = 1; j <= N; j++) {
+      double sc = smat[(size_t)(hp[j]-1) * (size_t)N + (size_t)(j-1)];
+      if (sc > 0.0) { total += sc; matched++; }
+    }
+    free(hbuf); free(smat);
   }
 
   free(buf);
@@ -268,27 +353,22 @@ SEXP gnps_compute(SEXP x, SEXP y,
 
   double inv_sx = 1.0 / sqrt(xsum), inv_sy = 1.0 / sqrt(ysum);
 
-  /* orient so delta >= 0 */
+  /* pdiff = y_pre - x_pre; shifted matching uses x_mz + pdiff vs y_mz,
+   * exactly matching MsCoreUtils::join_gnps which does join(x+pdiff, y).
+   * No swap: always x on the left, y on the right.                      */
   int do_shift = (!ISNA(x_pre) && !ISNA(y_pre));
-  double delta = 0.0;
-  const double *lm = x_mz, *li = x_int, *rm = y_mz, *ri = y_int;
-  int nl = nx, nr = ny;
+  double pdiff = 0.0;
 
   if (do_shift) {
-    delta = y_pre - x_pre;
-    if (delta < 0.0) {
-      lm = y_mz; li = y_int; nl = ny;
-      rm = x_mz; ri = x_int; nr = nx;
-      delta = -delta;
-      double t = inv_sx; inv_sx = inv_sy; inv_sy = t;
-    }
+    pdiff = y_pre - x_pre;
     double mp = (x_pre > y_pre) ? x_pre : y_pre;
     if (delta <= tol + ppm_val * mp * 1e-6) do_shift = 0;
+    if (fabs(pdiff) <= tol + ppm_val * mp * 1e-6) do_shift = 0;
   }
 
   int matched = 0;
-  double score = chain_dp_score(lm, li, nl, rm, ri, nr,
-                                inv_sx, inv_sy, delta, do_shift,
+  double score = chain_dp_score(x_mz, x_int, nx, y_mz, y_int, ny,
+                                inv_sx, inv_sy, pdiff, do_shift,
                                 tol, ppm_val, &matched);
   return make_result(score, matched);
 }
@@ -458,6 +538,11 @@ SEXP gnps(SEXP x, SEXP y)
 
 /* ══════════════════════════════════════════════════════════════════════════ *
  * join_gnps — standalone peak matching (backward compat)                   *
+ *                                                                          *
+ * Replicates MsCoreUtils::join_gnps outer-join semantics:                  *
+ *   direct pass  = join(x, y, type="outer")          — closest one-to-one *
+ *   shifted pass = join(x + pdiff, y, type="outer")  — closest one-to-one *
+ * Then merge both into a single outer-join result.                         *
  * ══════════════════════════════════════════════════════════════════════════ */
 
 SEXP join_gnps(SEXP x, SEXP y,
@@ -471,7 +556,9 @@ SEXP join_gnps(SEXP x, SEXP y,
   const int nx = (int)xlength(x), ny = (int)xlength(y);
   const double pdiff = y_pre - x_pre;
   const int do_pdiff = (!ISNA(x_pre) && !ISNA(y_pre));
+  const double eps_tol = sqrt(DBL_EPSILON);
 
+  /* Sort x and y by mass (keeping original indices) */
   MI *xs_arr = (MI *)xmalloc((size_t)nx * sizeof(MI));
   MI *ys_arr = (MI *)xmalloc((size_t)ny * sizeof(MI));
   int vx = 0, vy = 0;
@@ -482,66 +569,137 @@ SEXP join_gnps(SEXP x, SEXP y,
   qsort(xs_arr, (size_t)vx, sizeof(MI), mi_cmp);
   qsort(ys_arr, (size_t)vy, sizeof(MI), mi_cmp);
 
+  /* ── Direct matching: closest one-to-one (y-centric) ─────────────── */
+  int *dm_x = (int *)xmalloc((size_t)vx * sizeof(int)); /* dm_x[xi] = yj or -1 */
+  int *dm_y = (int *)xmalloc((size_t)vy * sizeof(int)); /* dm_y[yj] = xi or -1 */
+  memset(dm_x, 0xFF, (size_t)vx * sizeof(int));
+  memset(dm_y, 0xFF, (size_t)vy * sizeof(int));
+
+  {
+    int ilo = 0;
+    for (int j = 0; j < vy; j++) {
+      double ym = ys_arr[j].mass;
+      while (ilo < vx) {
+        double xm = xs_arr[ilo].mass;
+        if (xm + tol + ppm_val * xm * 1e-6 + eps_tol >= ym) break;
+        ilo++;
+      }
+      int best_i = -1;
+      double best_d = DBL_MAX;
+      for (int i = ilo; i < vx; i++) {
+        double xm = xs_arr[i].mass;
+        if (xm - tol - ppm_val * xm * 1e-6 - eps_tol > ym) break;
+        double ai = tol + ppm_val * xm * 1e-6 + eps_tol;
+        double dij = fabs(xm - ym);
+        if (dij <= ai && dij < best_d) { best_d = dij; best_i = i; }
+      }
+      if (best_i >= 0 && dm_x[best_i] < 0) {
+        dm_x[best_i] = j; dm_y[j] = best_i;
+      } else if (best_i >= 0) {
+        int prev_j = dm_x[best_i];
+        double prev_d = fabs(xs_arr[best_i].mass - ys_arr[prev_j].mass);
+        if (best_d < prev_d) {
+          dm_y[prev_j] = -1;
+          dm_x[best_i] = j; dm_y[j] = best_i;
+        }
+      }
+    }
+  }
+
+  /* ── Shifted matching: closest one-to-one (y-centric) ────────────── */
+  int *sm_x = (int *)xmalloc((size_t)vx * sizeof(int)); /* sm_x[xi] = yj or -1 */
+  memset(sm_x, 0xFF, (size_t)vx * sizeof(int));
+
+  if (do_pdiff) {
+    int ilo = 0;
+    for (int j = 0; j < vy; j++) {
+      double ym = ys_arr[j].mass;
+      while (ilo < vx) {
+        double shifted = xs_arr[ilo].mass + pdiff;
+        double ai = tol + ppm_val * fabs(shifted) * 1e-6 + eps_tol;
+        if (shifted + ai >= ym) break;
+        ilo++;
+      }
+      int best_i = -1;
+      double best_d = DBL_MAX;
+      for (int i = ilo; i < vx; i++) {
+        double shifted = xs_arr[i].mass + pdiff;
+        double ai = tol + ppm_val * fabs(shifted) * 1e-6 + eps_tol;
+        if (shifted - ai > ym) break;
+        double dij = fabs(shifted - ym);
+        if (dij <= ai && dij < best_d) { best_d = dij; best_i = i; }
+      }
+      if (best_i >= 0 && sm_x[best_i] < 0) {
+        sm_x[best_i] = j;
+      } else if (best_i >= 0) {
+        int prev_j = sm_x[best_i];
+        double prev_d = fabs(xs_arr[best_i].mass + pdiff - ys_arr[prev_j].mass);
+        if (best_d < prev_d) sm_x[best_i] = j;
+      }
+    }
+  }
+
+  /* ── Build outer-join result ─────────────────────────────────────── */
+  /* Track which y indices appear in any match */
   const size_t bsz = ((size_t)ny + 7u) >> 3;
   unsigned char *y_used = (unsigned char *)xcalloc(bsz, 1);
 
-  /* count pass */
+  /* Count output rows */
   int cnt = 0;
-  for (int i = 0; i < nx; i++) if (ISNA(xp[i])) cnt++;
+  for (int i = 0; i < nx; i++) if (ISNA(xp[i])) cnt++;  /* NA x entries */
   for (int i = 0; i < vx; i++) {
-    const double xm = xs_arr[i].mass, half = tol + ppm_val * xm * 1e-6;
-    int start = lower_bound(ys_arr, vy, xm - half), found = 0;
-    for (int j = start; j < vy && ys_arr[j].mass <= xm + half; j++) {
-      BS_SET(y_used, ys_arr[j].idx); found++; cnt++;
+    if (dm_x[i] >= 0) {
+      BS_SET(y_used, (unsigned)ys_arr[dm_x[i]].idx);
+      cnt++;
+    } else {
+      cnt++;  /* unmatched x */
     }
-    if (!found) cnt++;
   }
-  if (do_pdiff) {
-    for (int i = 0; i < vx; i++) {
-      const double xa = xs_arr[i].mass + pdiff,
-                   half = tol + ppm_val * xa * 1e-6;
-      for (int j = lower_bound(ys_arr, vy, xa - half);
-           j < vy && ys_arr[j].mass <= xa + half; j++)
-        cnt++;
-    }
+  for (int i = 0; i < vx; i++) {
+    if (sm_x[i] >= 0) cnt++;  /* shifted matches are additional rows */
   }
   for (int i = 0; i < ny; i++)
-    if (!ISNA(yp[i]) && !BS_TEST(y_used, i)) cnt++;
+    if (!ISNA(yp[i]) && !BS_TEST(y_used, (unsigned)i)) cnt++;  /* unmatched y */
 
-  memset(y_used, 0, bsz);
-
+  /* Fill output */
   SEXP rx = PROTECT(allocVector(INTSXP, cnt));
   SEXP ry = PROTECT(allocVector(INTSXP, cnt));
   int *ox = INTEGER(rx), *oy = INTEGER(ry), pos = 0;
 
+  /* NA x entries first */
   for (int i = 0; i < nx; i++)
     if (ISNA(xp[i])) { ox[pos] = i + 1; oy[pos] = NA_INTEGER; pos++; }
+
+  /* Direct matches and unmatched x */
   for (int i = 0; i < vx; i++) {
-    const double xm = xs_arr[i].mass, half = tol + ppm_val * xm * 1e-6;
-    int start = lower_bound(ys_arr, vy, xm - half), found = 0;
-    for (int j = start; j < vy && ys_arr[j].mass <= xm + half; j++) {
-      BS_SET(y_used, ys_arr[j].idx);
-      ox[pos] = xs_arr[i].idx + 1; oy[pos] = ys_arr[j].idx + 1;
-      pos++; found++;
-    }
-    if (!found) { ox[pos] = xs_arr[i].idx + 1; oy[pos] = NA_INTEGER; pos++; }
-  }
-  if (do_pdiff) {
-    for (int i = 0; i < vx; i++) {
-      const double xa = xs_arr[i].mass + pdiff,
-                   half = tol + ppm_val * xa * 1e-6;
-      for (int j = lower_bound(ys_arr, vy, xa - half);
-           j < vy && ys_arr[j].mass <= xa + half; j++) {
-        ox[pos] = xs_arr[i].idx + 1; oy[pos] = ys_arr[j].idx + 1; pos++;
-      }
+    if (dm_x[i] >= 0) {
+      ox[pos] = xs_arr[i].idx + 1;
+      oy[pos] = ys_arr[dm_x[i]].idx + 1;
+      pos++;
+    } else {
+      ox[pos] = xs_arr[i].idx + 1;
+      oy[pos] = NA_INTEGER;
+      pos++;
     }
   }
+
+  /* Shifted matches */
+  for (int i = 0; i < vx; i++) {
+    if (sm_x[i] >= 0) {
+      ox[pos] = xs_arr[i].idx + 1;
+      oy[pos] = ys_arr[sm_x[i]].idx + 1;
+      pos++;
+    }
+  }
+
+  /* Unmatched y */
   for (int i = 0; i < ny; i++)
-    if (!ISNA(yp[i]) && !BS_TEST(y_used, i)) {
+    if (!ISNA(yp[i]) && !BS_TEST(y_used, (unsigned)i)) {
       ox[pos] = NA_INTEGER; oy[pos] = i + 1; pos++;
     }
 
   free(xs_arr); free(ys_arr); free(y_used);
+  free(dm_x); free(dm_y); free(sm_x);
 
   SEXP result = PROTECT(allocVector(VECSXP, 2));
   SET_VECTOR_ELT(result, 0, rx);
