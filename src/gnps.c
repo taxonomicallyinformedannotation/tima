@@ -364,6 +364,9 @@ SEXP gnps_compute(SEXP x, SEXP y,
     double mp = (x_pre > y_pre) ? x_pre : y_pre;
     if (delta <= tol + ppm_val * mp * 1e-6) do_shift = 0;
     if (fabs(pdiff) <= tol + ppm_val * mp * 1e-6) do_shift = 0;
+    // This is an issue in MsCoreUtils. Let's not reproduce it.
+    // The code below matches their implementation
+    // if (pdiff == 0.0) do_shift = 0;
   }
 
   int matched = 0;
