@@ -52,8 +52,8 @@ static void *xcalloc(size_t n, size_t s) {
   void *p = calloc(n, s); if (!p) error("calloc(%zu)", n * s); return p; }
 
 /* ── bitset ──────────────────────────────────────────────────────────────── */
-#define BS_SET(b,i)  ((b)[(i)>>3] |=  (unsigned char)(1u << ((i) & 7u)))
-#define BS_TEST(b,i) ((b)[(i)>>3] &   (unsigned char)(1u << ((i) & 7u)))
+#define BS_SET(b,i)  ((b)[(unsigned)(i)>>3] |=  (unsigned char)(1u << ((unsigned)(i) & 7u)))
+#define BS_TEST(b,i) ((b)[(unsigned)(i)>>3] &   (unsigned char)(1u << ((unsigned)(i) & 7u)))
 
 /* ── MassIndex for join ──────────────────────────────────────────────────── */
 typedef struct { double mass; int idx; } MI;
@@ -611,7 +611,7 @@ SEXP gnps(SEXP x, SEXP y)
     int r = x_fac[i] - 1;
     int c = y_fac[i] - 1;
     double sc = sqrt(keep_xin[i]) * inv_sxs * sqrt(keep_yin[i]) * inv_sys;
-    score_mat[(size_t)r * mat_dim + c] = sc;
+    score_mat[(size_t)r * (size_t)mat_dim + (size_t)c] = sc;
   }
 
   free(x_fac); free(y_fac);
@@ -639,7 +639,7 @@ SEXP gnps(SEXP x, SEXP y)
         double del = DBL_MAX;
         for (int j = 1; j <= N; j++) {
           if (used[j]) continue;
-          double cur = -score_mat[(size_t)(i0 - 1) * N + (j - 1)] - u[i0] - v[j];
+          double cur = -score_mat[(size_t)(i0 - 1) * (size_t)N + (size_t)(j - 1)] - u[i0] - v[j];
           if (cur < minv[j]) { minv[j] = cur; way[j] = j0; }
           if (minv[j] < del) { del = minv[j]; j1 = j; }
         }
@@ -657,7 +657,7 @@ SEXP gnps(SEXP x, SEXP y)
     for (int j = 1; j <= N; j++) {
       int row = p[j] - 1;
       int col = j - 1;
-      double sc = score_mat[(size_t)row * N + col];
+      double sc = score_mat[(size_t)row * (size_t)N + (size_t)col];
       if (sc > 0.0) { total += sc; matched++; }
     }
 
