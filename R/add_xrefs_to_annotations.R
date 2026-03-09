@@ -152,10 +152,10 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
 
   # Prepare xref subset with standardized column names
   xrefs_subset <- xrefs_wide |>
-    tidytable::select(inchikey, all_of(non_empty_cols)) |>
+    tidytable::select(inchikey, tidyselect::all_of(non_empty_cols)) |>
     tidytable::rename_with(
       ~ paste0("candidate_structure_id_", .x),
-      .cols = all_of(non_empty_cols)
+      .cols = tidyselect::all_of(non_empty_cols)
     )
 
   # Join: left_join to preserve all annotation rows

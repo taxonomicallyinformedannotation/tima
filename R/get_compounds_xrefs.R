@@ -49,7 +49,10 @@ get_compounds_xrefs <- function(
     # P3890,
     "P8691"
   ),
-  bioregistry_url = "https://raw.githubusercontent.com/biopragmatics/bioregistry/refs/heads/main/src/bioregistry/data/bioregistry.json",
+  bioregistry_url = paste0(
+    "https://raw.githubusercontent.com/",
+    "biopragmatics/bioregistry/refs/heads/main/src/bioregistry/data/bioregistry.json"
+  ),
   qlever_url = "https://qlever.cs.uni-freiburg.de/api/wikidata",
   max_age_hours = 24,
   output = get_default_paths()$data$interim$xrefs$compounds
@@ -138,7 +141,7 @@ get_compounds_xrefs <- function(
   )
 
   # Build lookup: P683 → "ChEBI", P592 → "ChEMBL", …
-  prop_to_prefix <- setNames(
+  prop_to_prefix <- stats::setNames(
     preferred_prefixes,
     vapply(matched, `[[`, character(1L), "property")
   )
