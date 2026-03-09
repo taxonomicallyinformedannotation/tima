@@ -245,7 +245,7 @@ calculate_entropy_and_similarity <- function(
 
           if (use_gnps) {
             res <- .Call(
-              "gnps_compute",
+              "gnps_chain_dp",
               current_spectrum,
               lib_spectrum,
               current_precursor,

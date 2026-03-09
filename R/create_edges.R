@@ -163,7 +163,7 @@ create_edges <- function(
 
       if (use_gnps) {
         res <- .Call(
-          "gnps_compute",
+          "gnps_chain_dp",
           q_sp,
           t_sp,
           q_pre,

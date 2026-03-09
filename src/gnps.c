@@ -3,8 +3,8 @@
  * @brief GNPS modified cosine similarity — mathematically exact, near-linear.
  *
  * Computes the GNPS modified cosine score between two mass spectra, matching
- * MsCoreUtils::gnps / MsCoreUtils::join_gnps numerically (≤ 2.2e-16 on all
- * tested pairs when using identical join semantics).
+ * the existing MsCoreUtils::gnps / MsCoreUtils::join_gnps numerically
+ * (≤ 2.2e-16 on all tested pairs when using identical join semantics).
  *
  * ═══════════════════════════════════════════════════════════════════════════
  * PREREQUISITES — spectra MUST be sanitized before calling these functions.
@@ -15,9 +15,8 @@
  *   • Non-negative intensities, no NaN/NA/Inf intensities
  *   • Peaks sorted by m/z in ascending order
  *
- * In tima this is guaranteed by sanitize_spectra() (called from
- * import_spectra(sanitize = TRUE)), which applies Spectra::reduceSpectra(),
- * Spectra::combinePeaks(), and Spectra::scalePeaks().
+ * Use Spectra::reduceSpectra(), Spectra::combinePeaks(), and
+ * Spectra::scalePeaks() to ensure spectra are properly sanitized.
  *
  * Why it matters: the matching algorithm assumes at most one direct match
  * and one shifted match per peak — a property that holds exactly when peaks
@@ -26,43 +25,111 @@
  * scores silently.
  *
  * ═══════════════════════════════════════════════════════════════════════════
- * ALGORITHM — gnps_compute (hot path)
+ * ALGORITHM — Chain-DP Optimal Assignment (gnps_chain_dp hot path)
  * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * KEY INSIGHT — Chain Structure of Tolerance Matching
+ * ────────────────────────────────────────────────────────────────────────
+ *
+ * When spectra are SANITIZED (peaks well-separated, > tolerance apart within
+ * each spectrum), the bipartite matching graph forms CHAINS, not arbitrary
+ * networks. Here's why:
+ *
+ * Example: x = [100, 200, 300], y = [100.01, 200.02, 300.01], tol = 0.05
+ *
+ *   Direct pass (x vs y):
+ *     x[0]=100  →  y[0]=100.01  (distance 0.01 < tol)
+ *     x[1]=200  →  y[1]=200.02  (distance 0.02 < tol)
+ *     x[2]=300  →  y[2]=300.01  (distance 0.01 < tol)
+ *
+ *   This forms LINEAR CHAINS:  x[0]→y[0],  x[1]→y[1],  x[2]→y[2]
+ *
+ *   Shifted pass (x+pdiff vs y, pdiff=14):
+ *     x[0]+14=114  →  NO MATCH (y has no peaks near 114)
+ *     x[1]+14=214  →  NO MATCH
+ *     x[2]+14=314  →  NO MATCH
+ *
+ *   Result: Each x peak can match AT MOST TWO targets:
+ *     - ONE direct match:  x[i] vs y[j]
+ *     - ONE shifted match: (x[i]+pdiff) vs y[k]
+ *
+ * Why sanitization is crucial:
+ * ─────────────────────────────
+ *
+ * Without sanitization (duplicate/close m/z values):
+ *   x = [100, 100.001, 200]  (two peaks within tolerance!)
+ *
+ *   Direct matching can create CYCLES (not chains):
+ *     x[0]=100     →  y[0]=100.001  OR  y[1]=99.999
+ *     x[1]=100.001 →  y[0]=100.001  (CONFLICT: both want y[0])
+ *
+ *   This breaks the chain structure → need full Hungarian algorithm
+ *   Result: O(n³) instead of O(n+m)
+ *
+ * ─────────────────────────────────────────────────────────────────────────
  *
  * Step 1 — Direct matching  [O(n+m)]
  *   Y-centric closest-match with a sliding window on sorted x.
- *   Replicates MsCoreUtils::join(x, y, type="outer") one-to-one semantics.
- *   Each x[i] gets at most one direct match dm_arr[i] = j.
- *   Each y[j] records its direct claimant bd_arr[j] = i.
- *   Tolerance per element: tol + ppm * x[i] * 1e-6 + sqrt(DBL_EPSILON).
+ *   Replicates join(x, y, type="outer") one-to-one semantics.
+ *
+ *   Result: Each peak has AT MOST ONE direct match:
+ *     dm_arr[i] = j  (x[i] matches y[j])  or  -1 (no match)
+ *     bd_arr[j] = i  (y[j] is matched by x[i])  or  -1 (no match)
+ *
+ *   Tolerance per element: tol + ppm * x[i] * 1e-6 + sqrt(DBL_EPSILON)
  *
  * Step 2 — Shifted matching  [O(n+m)]
  *   Same algorithm on (x_mz + pdiff) vs y_mz, where pdiff = y_pre - x_pre.
- *   Replicates MsCoreUtils::join(x + pdiff, y, type="outer").
- *   Each x[i] gets at most one shifted match sm_arr[i] = j.
- *   Skipped entirely when |pdiff| ≤ tol + ppm * max(x_pre, y_pre) * 1e-6,
- *   since the shifted join would only duplicate direct matches.
+ *   Replicates join(x + pdiff, y, type="outer").
+ *
+ *   Result: Each peak has AT MOST ONE shifted match:
+ *     sm_arr[i] = j  (x[i]+pdiff matches y[j])  or  -1 (no match)
+ *
+ *   Skipped when |pdiff| ≤ tol + ppm * max(x_pre, y_pre) * 1e-6
+ *   (pdiff is within measurement noise, no meaningful neutral loss)
+ *
+ * CRITICAL PROPERTY — Why This Forms Chains:
+ * ────────────────────────────────────────
+ *
+ * Because peaks within each spectrum are well-separated (> tolerance apart),
+ * EACH y-peak can be targeted by AT MOST 2 x-peaks:
+ *   - One x[i] via direct match:   x[i] close to y[j]
+ *   - One x[k] via shifted match:  x[k]+pdiff close to y[j]
+ *
+ * Proof:
+ *   If y[j] is within tolerance of x[i] AND x[k] directly,
+ *   then x[i] and x[k] are within tolerance of each other.
+ *   But sanitized spectra have NO peaks within tolerance of each other!
+ *   Contradiction → At most one direct match per y[j].
+ *
+ *   Similarly, at most one shifted match per y[j].
+ *
+ * Result: The bipartite graph is a collection of SIMPLE CHAINS and ISOLATED
+ * vertices, not arbitrary networks. This is the key to O(n+m) complexity!
+ *
+ * ─────────────────────────────────────────────────────────────────────────
  *
  * Step 3 — Optimal scoring  [O(n) typical, O(n + k³) worst]
- *   A "conflict" arises when x[i]'s shifted match targets a y[j] that is
- *   already directly matched by a different x[k].
+ *
+ *   A "conflict" occurs when x[i]'s shifted match targets a y[j] that is
+ *   ALREADY directly matched by a different x[k]:
+ *     dm_arr[k] = j  AND  sm_arr[i] = j  (both want y[j])
+ *
+ *   This BREAKS the chain structure locally, creating a small conflict cluster.
  *
  *   3a. No conflicts (~99% of pairs on real data):
- *       Greedy O(n) pass — for each x, pick max(direct_score, shifted_score).
- *       This is provably optimal when no y is claimed by two different x's.
+ *       ✓ The bipartite graph remains fully decomposed into chains.
+ *       ✓ Greedy O(n) pass — for each x, pick max(direct, shifted) score.
+ *       ✓ PROVABLY OPTIMAL: No y is claimed by two x's, so greedy = global opt.
  *
  *   3b. Conflicts exist (~1% of pairs):
- *       - Mark the conflict cluster: the two competing x's, the contested y,
- *         and all their other match targets (direct + shifted).  Typically
- *         k ≈ 3–5 peaks per cluster.
- *       - Score all non-conflict peaks greedily (same as 3a).
- *       - Build a k×k score matrix for the conflict cluster only.
- *       - Solve with the exact shortest-augmenting-path Hungarian algorithm
- *         (1-indexed, maximization via negation).  O(k³) with k ≈ 3–5
- *         means ~27–125 inner-loop iterations — negligible.
- *       - Sum the Hungarian assignment into the total.
+ *       ✗ One or more conflict clusters exist (small local breakages).
+ *       ✓ Score all non-conflict peaks greedily (safe — no overlap).
+ *       ✓ Build a k×k score matrix for the conflict cluster only (k ≈ 3–5).
+ *       ✓ Solve with exact shortest-augmenting-path Hungarian.
+ *       ✓ O(k³) with k ≈ 3–5 means ~27–125 inner-loop iterations (negligible).
  *
- * Overall complexity: O(n+m) for matching + O(n) for scoring.
+ * Overall complexity: O(n+m) for matching + O(n) for scoring + O(k³) conflicts.
  * The O(k³) Hungarian fallback fires rarely and on tiny matrices.
  *
  * ═══════════════════════════════════════════════════════════════════════════
@@ -75,24 +142,39 @@
  *   total = Σ score(i,j) over all optimally assigned (i,j) pairs
  *
  * ═══════════════════════════════════════════════════════════════════════════
- * EXPORTED FUNCTIONS (registered in init.c)
+ * EXPORTED FUNCTIONS (register in init.c)
  * ═══════════════════════════════════════════════════════════════════════════
  *
- *   gnps_compute(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
+ *   gnps_chain_dp(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
  *     Fused join + score from raw peak matrices.  Hot path.
  *     x, y: n×2 numeric matrices [mz, intensity], sorted by mz.
  *     Returns list(score = double, matches = int).
  *
  *   gnps(x, y)
- *     Score pre-aligned matrices (backward compat with MsCoreUtils::gnps).
+ *     Score pre-aligned matrices (backward compat).
  *     x, y: n×2 matrices from an outer join (may contain NAs).
  *     Builds full score matrix, solves with Hungarian.
  *     Returns list(score = double, matches = int).
  *
  *   join_gnps(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
- *     Peak matching only (backward compat with MsCoreUtils::join_gnps).
+ *     Peak matching only (backward compat).
  *     x, y: numeric vectors of m/z values.
  *     Returns list(x = integer, y = integer) with 1-based indices.
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ * REFERENCES
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * - Wang M, Carver JJ, Phelan VV, et al. (2016). "Sharing and community
+ *   curation of mass spectrometry data with Global Natural Products Social
+ *   Molecular Networking." Nature Biotechnology 34:828–837.
+ *   doi:10.1038/nbt.3597
+ *
+ * - Dührkop K, Fleischauer M, Ludwig M, et al. (2019). "SIRIUS 4: a rapid
+ *   tool for turning tandem mass spectra into metabolite structure information."
+ *   Nature Methods 16:299–302. doi:10.1038/s41592-019-0344-8
+ *   Chain-DP algorithm: https://github.com/sirius-ms/sirius/blob/stable/
+ *   spectral_alignment/src/main/java/de/unijena/bionf/fastcosine/FastCosine.java
  *
  * @author TIMA Development Team
  * @license GPL-3+
@@ -110,13 +192,13 @@
 
 static void *xmalloc(size_t n) {
   void *p = malloc(n);
-  if (!p) error("malloc(%zu)", n);
+  if (!p) error("malloc(%zu) failed", n);
   return p;
 }
 
 static void *xcalloc(size_t n, size_t s) {
   void *p = calloc(n, s);
-  if (!p) error("calloc(%zu)", n * s);
+  if (!p) error("calloc(%zu) failed", n * s);
   return p;
 }
 
@@ -175,22 +257,22 @@ static inline double score_pair(double xi, double yj,
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ *
- * score_matched — optimal assignment scorer for direct + shifted matches    *
- *                                                                          *
- * Inputs:                                                                  *
- *   x_mz, x_int  — query spectrum (sorted by mz, length nx)               *
- *   y_mz, y_int  — library spectrum (sorted by mz, length ny)             *
- *   inv_sx, inv_sy — precomputed 1/sqrt(sum_intensity) for each           *
- *   pdiff        — precursor mass difference (y_pre - x_pre)              *
- *   do_shift     — whether to perform shifted matching                     *
- *   tol, ppm_val — absolute and relative tolerance for matching           *
- *   out_matched  — [out] number of matched peak pairs                     *
- *                                                                          *
- * Returns: total similarity score (sum of assigned pair scores).           *
- *                                                                          *
- * Workspace: single heap allocation for dm_arr[nx], sm_arr[nx], bd_arr[ny].*
- * The conflict-cluster Hungarian uses additional small allocations only     *
- * when conflicts exist.                                                    *
+ * score_matched — optimal assignment scorer for direct + shifted matches     *
+ *                                                                            *
+ * Inputs:                                                                    *
+ *   x_mz, x_int  — query spectrum (sorted by mz, length nx)                  *
+ *   y_mz, y_int  — library spectrum (sorted by mz, length ny)                *
+ *   inv_sx, inv_sy — precomputed 1/sqrt(sum_intensity) for each              *
+ *   pdiff        — precursor mass difference (y_pre - x_pre)                 *
+ *   do_shift     — whether to perform shifted matching                       *
+ *   tol, ppm_val — absolute and relative tolerance for matching              *
+ *   out_matched  — [out] number of matched peak pairs                        *
+ *                                                                            *
+ * Returns: total similarity score (sum of assigned pair scores).             *
+ *                                                                            *
+ * Workspace: single heap allocation for dm_arr[nx], sm_arr[nx], bd_arr[ny].  *
+ * The conflict-cluster Hungarian uses additional small allocations only      *
+ * when conflicts exist.                                                      *
  * ══════════════════════════════════════════════════════════════════════════ */
 
 static double score_matched(
@@ -218,9 +300,9 @@ static double score_matched(
 
   /* ── Step 1: direct matching  [O(n+m)] ────────────────────────────────
    *
-   * Replicate MsCoreUtils::join(x, y, type="outer") closest one-to-one
-   * semantics.  For each y[j] (in sorted order), find the closest x[i]
-   * within per-element tolerance:  |x[i] - y[j]| ≤ tol + ppm·x[i]·1e-6
+   * Replicate join(x, y, type="outer") closest one-to-one semantics.
+   * For each y[j] (in sorted order), find the closest x[i] within
+   * per-element tolerance:  |x[i] - y[j]| ≤ tol + ppm·x[i]·1e-6
    * + sqrt(DBL_EPSILON).  When two y's compete for the same x, the closer
    * one wins and the loser is released.
    *
@@ -263,7 +345,7 @@ static double score_matched(
 
   /* ── Step 2: shifted matching  [O(n+m)] ──────────────────────────────
    *
-   * Replicate MsCoreUtils::join(x + pdiff, y, type="outer").
+   * Replicate join(x + pdiff, y, type="outer").
    * Same y-centric closest-match as Step 1, but matching (x_mz[i]+pdiff)
    * against y_mz[j].  Tolerance is computed on the shifted value.
    *
@@ -487,25 +569,25 @@ static double score_matched(
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ *
- * gnps_compute — fused join + score (hot path for sanitized spectra)        *
- *                                                                          *
- * Combines peak matching and scoring in a single pass, avoiding the        *
- * overhead of building R-level join results.  Input spectra must be        *
- * sanitized (sorted, unique m/z, no NAs).                                  *
- *                                                                          *
- * Parameters:                                                              *
- *   x, y           — n×2 numeric matrices [mz, intensity]                 *
- *   xPrecursorMz   — precursor m/z of x (scalar)                         *
- *   yPrecursorMz   — precursor m/z of y (scalar)                         *
- *   tolerance      — absolute tolerance in Da                              *
- *   ppm            — relative tolerance in ppm                             *
- *                                                                          *
- * Returns: list(score = double, matches = int)                             *
+ * gnps_chain_dp — fused join + score (hot path for sanitized spectra)         *
+ *                                                                            *
+ * Combines peak matching and scoring in a single pass, avoiding the          *
+ * overhead of building R-level join results.  Input spectra must be          *
+ * sanitized (sorted, unique m/z, no NAs).                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *   x, y           — n×2 numeric matrices [mz, intensity]                    *
+ *   xPrecursorMz   — precursor m/z of x (scalar)                             *
+ *   yPrecursorMz   — precursor m/z of y (scalar)                             *
+ *   tolerance      — absolute tolerance in Da                                *
+ *   ppm            — relative tolerance in ppm                               *
+ *                                                                            *
+ * Returns: list(score = double, matches = int)                               *
  * ══════════════════════════════════════════════════════════════════════════ */
 
-SEXP gnps_compute(SEXP x, SEXP y,
-                  SEXP xPrecursorMz, SEXP yPrecursorMz,
-                  SEXP tolerance, SEXP ppm)
+SEXP gnps_chain_dp(SEXP x, SEXP y,
+                   SEXP xPrecursorMz, SEXP yPrecursorMz,
+                   SEXP tolerance, SEXP ppm)
 {
   if (!isReal(x) || !isReal(y)) error("x and y must be numeric matrices");
   SEXP xd = getAttrib(x, R_DimSymbol), yd = getAttrib(y, R_DimSymbol);
@@ -536,8 +618,9 @@ SEXP gnps_compute(SEXP x, SEXP y,
    * We skip shifted matching when |pdiff| <= tol + ppm * max_precursor * 1e-6,
    * i.e. when the precursor mass difference is within peak matching tolerance.
    *
-   * MsCoreUtils only skips when pdiff == 0.0 exactly — this is a bug.
-   * To reproduce their behavior, replace our check with:
+   * The existing implementation only skips when pdiff == 0.0 exactly.
+   * This is an issue in MsCoreUtils. Let's not reproduce it.
+   * The code below matches their implementation:
    *   if (pdiff == 0.0) do_shift = 0;
    *
    * Why our approach is correct — concrete example from pesticides.mgf:
@@ -574,22 +657,21 @@ SEXP gnps_compute(SEXP x, SEXP y,
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ *
- * gnps — score pre-aligned matrices (backward compat)                      *
- *                                                                          *
- * Accepts the output of join_gnps / MsCoreUtils::join_gnps: two n×2       *
- * matrices where row i represents a matched pair (NA if unmatched on one   *
- * side).  Builds a full score matrix indexed by unique m/z groups, then    *
- * solves with exact shortest-augmenting-path Hungarian (maximize via       *
- * negation).                                                               *
- *                                                                          *
- * O(n³) where n = max(unique x groups, unique y groups), but n is small   *
- * because the input is already filtered to matched peaks.                  *
- * Single allocation for all Hungarian workspace.                           *
- *                                                                          *
- * Parameters:                                                              *
- *   x, y — n×2 numeric matrices [mz, intensity] from an outer join       *
- *                                                                          *
- * Returns: list(score = double, matches = int)                             *
+ * gnps — score pre-aligned matrices (backward compat)                        *
+ *                                                                            *
+ * Accepts the output of join_gnps: two n×2 matrices where row i represents   *
+ * a matched pair (NA if unmatched on one side).  Builds a full score         *
+ * matrix indexed by unique m/z groups, then solves with exact shortest-      *
+ * augmenting-path Hungarian (maximize via negation).                         *
+ *                                                                            *
+ * O(n³) where n = max(unique x groups, unique y groups), but n is small      *
+ * because the input is already filtered to matched peaks.                    *
+ * Single allocation for all Hungarian workspace.                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *   x, y — n×2 numeric matrices [mz, intensity] from an outer join           *
+ *                                                                            *
+ * Returns: list(score = double, matches = int)                               *
  * ══════════════════════════════════════════════════════════════════════════ */
 
 SEXP gnps(SEXP x, SEXP y)
@@ -749,25 +831,25 @@ SEXP gnps(SEXP x, SEXP y)
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ *
- * join_gnps — peak matching only (backward compat)                         *
- *                                                                          *
- * Replicates MsCoreUtils::join_gnps outer-join semantics exactly:          *
- *   direct pass  = join(x, y, type="outer")          — closest one-to-one *
- *   shifted pass = join(x + pdiff, y, type="outer")  — closest one-to-one *
- * Then merges both into a single result with direct matches, shifted       *
- * matches, and unmatched entries (NA on the missing side).                 *
- *                                                                          *
- * Verified: 2850/2850 pairs identical to MsCoreUtils::join_gnps on the    *
- * pesticides test set.                                                     *
- *                                                                          *
- * Parameters:                                                              *
- *   x, y           — numeric vectors of m/z values                        *
- *   xPrecursorMz   — precursor m/z of x (scalar)                         *
- *   yPrecursorMz   — precursor m/z of y (scalar)                         *
- *   tolerance      — absolute tolerance in Da                              *
- *   ppm            — relative tolerance in ppm                             *
- *                                                                          *
- * Returns: list(x = integer, y = integer) with 1-based R indices           *
+ * join_gnps — peak matching only (backward compat)                           *
+ *                                                                            *
+ * Replicates MsCoreUtils::join_gnps outer-join semantics exactly:            *
+ *   direct pass  = join(x, y, type="outer")          — closest one-to-one    *
+ *   shifted pass = join(x + pdiff, y, type="outer")  — closest one-to-one    *
+ * Then merges both into a single result with direct matches, shifted         *
+ * matches, and unmatched entries (NA on the missing side).                   *
+ *                                                                            *
+ * Verified: 2850/2850 pairs identical to MsCoreUtils::join_gnps on the       *
+ * pesticides test set.                                                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *   x, y           — numeric vectors of m/z values                           *
+ *   xPrecursorMz   — precursor m/z of x (scalar)                             *
+ *   yPrecursorMz   — precursor m/z of y (scalar)                             *
+ *   tolerance      — absolute tolerance in Da                                *
+ *   ppm            — relative tolerance in ppm                               *
+ *                                                                            *
+ * Returns: list(x = integer, y = integer) with 1-based R indices             *
  * ══════════════════════════════════════════════════════════════════════════ */
 
 SEXP join_gnps(SEXP x, SEXP y,

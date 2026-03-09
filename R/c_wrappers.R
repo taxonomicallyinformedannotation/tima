@@ -87,7 +87,7 @@ join_gnps_wrapper <- function(
   )
 }
 
-#' @title Wrapper for the C function "gnps_compute"
+#' @title Wrapper for the C function "gnps_chain_dp"
 #'
 #' @description Fused GNPS join + score in a single C call. Performs
 #'     peak matching and scoring internally without R-level allocation.
@@ -125,7 +125,7 @@ join_gnps_wrapper <- function(
 #'   ppm = 10
 #' )
 #' }
-gnps_compute_wrapper <- function(
+gnps_chain_dp_wrapper <- function(
   x,
   y,
   xPrecursorMz,
@@ -134,7 +134,7 @@ gnps_compute_wrapper <- function(
   ppm
 ) {
   .Call(
-    "gnps_compute",
+    "gnps_chain_dp",
     x = x,
     y = y,
     xPrecursorMz = xPrecursorMz,
