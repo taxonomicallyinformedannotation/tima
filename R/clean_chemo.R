@@ -566,6 +566,7 @@ remove_compound_names <- function(results_list, compounds_names) {
 #'     ranking, and optional high-confidence filtering. Returns three-tier output:
 #'     full (comprehensive), filtered (top candidates), and mini (one row per feature).
 #'
+#' @include add_xrefs_to_annotations.R
 #' @include filter_high_confidence_only.R
 #' @include summarize_results.R
 #'
@@ -599,6 +600,9 @@ remove_compound_names <- function(results_list, compounds_names) {
 #' @param score_chemical_npc_pathway Numeric (0-1), score for NPClassifier pathway level
 #' @param score_chemical_npc_superclass Numeric (0-1), score for NPClassifier superclass level
 #' @param score_chemical_npc_class Numeric (0-1), score for NPClassifier class level
+#' @param xrefs_table Optional data frame with columns inchikey/prefix/id from
+#'   get_compounds_xrefs(), used to add candidate_structure_id_* columns before
+#'   summarization.
 #'
 #' @return Named list with three data frames:
 #'   \describe{
@@ -650,7 +654,8 @@ clean_chemo <- function(
   score_chemical_npc_pathway = 0.3,
   score_chemical_npc_superclass = 0.2,
   score_chemical_npc_class = 0.1,
-  max_per_score = 7L
+  max_per_score = 7L,
+  xrefs_table = NULL
 ) {
   # Initialize logging context
   ctx <- log_operation(
@@ -780,6 +785,10 @@ clean_chemo <- function(
   df_filtered <- df_percentile |>
     filter_high_confidence_only(context = "filtered") |>
     tidytable::filter(rank_final <= candidates_final)
+
+  if (!is.null(xrefs_table) && nrow(xrefs_table) > 0L) {
+    df_filtered <- .add_xrefs_to_df(df_filtered, xrefs_table)
+  }
 
   results_filtered <- df_filtered |>
     summarize_results(
@@ -1018,12 +1027,41 @@ clean_chemo <- function(
       )
     )
 
+  if (!is.null(xrefs_table) && nrow(xrefs_table) > 0L) {
+    results_mini <- results_mini |>
+      tidytable::rename(
+        candidate_structure_inchikey_connectivity_layer = inchikey_connectivity_layer
+      ) |>
+      .add_xrefs_to_df(xrefs = xrefs_table) |>
+      tidytable::rename(
+        inchikey_connectivity_layer = candidate_structure_inchikey_connectivity_layer
+      )
+
+    mini_id_cols <- grep(
+      pattern = "^candidate_structure_id_",
+      x = names(results_mini),
+      value = TRUE
+    )
+
+    if (length(mini_id_cols) > 0L) {
+      results_mini <- results_mini |>
+        tidytable::rename_with(
+          ~ sub("^candidate_structure_", "", .x),
+          .cols = tidyselect::all_of(mini_id_cols)
+        )
+    }
+  }
+
   # Tier 3: FULL - Optionally apply high-confidence filter
   df_full <- if (high_confidence) {
     df_ranked |>
       filter_high_confidence_only(context = "full")
   } else {
     df_ranked
+  }
+
+  if (!is.null(xrefs_table) && nrow(xrefs_table) > 0L) {
+    df_full <- .add_xrefs_to_df(df_full, xrefs_table)
   }
 
   results_full <- df_full |>

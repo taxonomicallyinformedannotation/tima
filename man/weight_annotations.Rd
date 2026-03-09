@@ -86,7 +86,8 @@ weight_annotations(
   remove_ties = get_params(step = "weight_annotations")$options$remove_ties,
   summarize = get_params(step = "weight_annotations")$options$summarize,
   pattern = get_params(step = "weight_annotations")$files$pattern,
-  force = get_params(step = "weight_annotations")$options$force
+  force = get_params(step = "weight_annotations")$options$force,
+  xrefs_file = NULL
 )
 }
 \arguments{
@@ -214,6 +215,9 @@ match (should be lower than \verb{NPC class})}
 \item{pattern}{Pattern to identify your job. STRING}
 
 \item{force}{Force parameters. Use it at your own risk}
+
+\item{xrefs_file}{Optional character path to xrefs file from \code{\link[=get_compounds_xrefs]{get_compounds_xrefs()}}.
+If provided, external database identifiers will be added to results.}
 }
 \value{
 The path to the weighted annotations

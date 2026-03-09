@@ -4,6 +4,7 @@
 #'     Checks file existence, data types, ranges, and logical consistency of weights.
 #'     Stops execution with informative messages if any condition is violated.
 #'
+#' @include add_xrefs_to_annotations.R
 #' @include constants.R
 #' @include safe_fread.R
 #' @include validations_utils.R
@@ -582,6 +583,8 @@ export_results <- function(results_list, output, pattern) {
 #' @param remove_ties Remove ties. BOOLEAN
 #' @param summarize Summarize results (1 row per feature). BOOLEAN
 #' @param pattern Pattern to identify your job. STRING
+#' @param xrefs_file Optional character path to xrefs file from [get_compounds_xrefs()].
+#'     If provided, external database identifiers will be added to results.
 #'
 #' @return The path to the weighted annotations
 #'
@@ -792,7 +795,8 @@ weight_annotations <- function(
   remove_ties = get_params(step = "weight_annotations")$options$remove_ties,
   summarize = get_params(step = "weight_annotations")$options$summarize,
   pattern = get_params(step = "weight_annotations")$files$pattern,
-  force = get_params(step = "weight_annotations")$options$force
+  force = get_params(step = "weight_annotations")$options$force,
+  xrefs_file = NULL
 ) {
   # Input Validation ----
 
@@ -1005,6 +1009,17 @@ weight_annotations <- function(
     )
 
   log_debug("Finalizing results (filtering, ranking, deduplication)")
+
+  xrefs_table <- NULL
+  if (!is.null(xrefs_file) && file.exists(xrefs_file)) {
+    xrefs_table <- safe_fread(
+      file = xrefs_file,
+      file_type = "compound xrefs",
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    )
+  }
+
   results_list <- annot_table_wei_chemo |>
     clean_chemo(
       components_table = components_table,
@@ -1026,9 +1041,10 @@ weight_annotations <- function(
       score_chemical_npc_pathway = score_chemical_npc_pathway,
       score_chemical_npc_superclass = score_chemical_npc_superclass,
       score_chemical_npc_class = score_chemical_npc_class,
-      max_per_score = 7L
+      max_per_score = 7L,
+      xrefs_table = xrefs_table
     )
-  rm(annot_table_wei_chemo)
+  rm(annot_table_wei_chemo, xrefs_table)
 
   log_complete(ctx, n_annotations = nrow(results_list$taxa))
 
