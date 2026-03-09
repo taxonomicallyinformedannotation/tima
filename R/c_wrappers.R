@@ -181,10 +181,23 @@ gnps_chain_dp_wrapper <- function(
         NULL
       }
     )
-    avail <- if (!is.null(regs) && nrow(regs) > 0L) regs[, "name"] else character(0)
+    avail <- if (!is.null(regs) && nrow(regs) > 0L) {
+      regs[, "name"]
+    } else {
+      character(0)
+    }
     stop(
-      "Native symbol not registered: ", name,
-      if (length(avail)) paste0(". Available .Call symbols: ", paste(avail, collapse = ", "), ".") else ".",
+      "Native symbol not registered: ",
+      name,
+      if (length(avail)) {
+        paste0(
+          ". Available .Call symbols: ",
+          paste(avail, collapse = ", "),
+          "."
+        )
+      } else {
+        "."
+      },
       call. = FALSE
     )
   }
