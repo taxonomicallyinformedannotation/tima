@@ -186,6 +186,8 @@ calculate_entropy_and_similarity <- function(
   # lib_spectra, lib_precursors, lib_ids, query_spectra, etc. from the
   # parent environment without copying them on each iteration.
   progress_counter <- 0L
+  # Local alias avoids repeated global lookup in inner scoring loops.
+  call_gnps <- .call_gnps_chain_dp
 
   results <- lapply(
     X = seq_along(query_spectra),
@@ -244,8 +246,7 @@ calculate_entropy_and_similarity <- function(
           }
 
           if (use_gnps) {
-            res <- .Call(
-              "gnps_chain_dp",
+            res <- call_gnps(
               current_spectrum,
               lib_spectrum,
               current_precursor,
