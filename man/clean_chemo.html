@@ -690,7 +690,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   score_chemical_npc_pathway = 0.3,
   score_chemical_npc_superclass = 0.2,
   score_chemical_npc_class = 0.1,
-  max_per_score = 7L
+  max_per_score = 7L,
+  xrefs_table = NULL
 )
 </code></pre>
 </section>
@@ -863,6 +864,14 @@ Numeric (0-1), score for NPClassifier class level
 </td>
 <td>
 Integer, max candidates to keep per feature per score. If more exist, they are randomly sampled and a note is added. Default 7.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="xrefs_table">xrefs_table</code>
+</td>
+<td>
+Optional data frame with columns inchikey/prefix/id from get_compounds_xrefs(), used to add candidate_structure_id_* columns before summarization.
 </td>
 </tr>
 </tbody></table>

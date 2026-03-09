@@ -752,7 +752,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   remove_ties = get_params(step = "weight_annotations")\$options\$remove_ties,
   summarize = get_params(step = "weight_annotations")\$options\$summarize,
   pattern = get_params(step = "weight_annotations")\$files\$pattern,
-  force = get_params(step = "weight_annotations")\$options\$force
+  force = get_params(step = "weight_annotations")\$options\$force,
+  xrefs_file = NULL
 )
 </code></pre>
 </section>
@@ -1157,6 +1158,14 @@ Pattern to identify your job. STRING
 </td>
 <td>
 Force parameters. Use it at your own risk
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="xrefs_file">xrefs_file</code>
+</td>
+<td>
+Optional character path to xrefs file from <code>get_compounds_xrefs()</code>. If provided, external database identifiers will be added to results.
 </td>
 </tr>
 </tbody></table>
