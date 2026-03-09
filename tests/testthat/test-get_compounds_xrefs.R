@@ -127,7 +127,9 @@ test_that("get_compounds_xrefs fetches fresh data from QLever", {
   expect_true(all(c("inchikey", "prefix", "id") %in% names(df)))
 
   if (nrow(df) == 0L) {
-    skip("Upstream xrefs service unavailable; graceful fallback returned empty table")
+    skip(
+      "Upstream xrefs service unavailable; graceful fallback returned empty table"
+    )
   }
 
   expect_gt(nrow(df), 0L)
@@ -165,7 +167,9 @@ test_that("get_compounds_xrefs refreshes stale cache with real data", {
   df <- tidytable::fread(result)
 
   if (nrow(df) == 0L) {
-    skip("Upstream xrefs service unavailable; graceful fallback returned empty table")
+    skip(
+      "Upstream xrefs service unavailable; graceful fallback returned empty table"
+    )
   }
 
   # Should no longer contain our fake data
