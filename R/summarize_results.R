@@ -68,6 +68,11 @@ summarize_results <- function(
   log_debug("Remove ties: %s, Summarize: %s", remove_ties, summarize)
 
   model <- columns_model()
+  candidate_id_cols <- grep(
+    pattern = "^candidate_structure_id_",
+    x = names(df),
+    value = TRUE
+  )
 
   # Pre-process organism taxonomy data
   organism_lookup <- structure_organism_pairs_table |>
@@ -138,6 +143,7 @@ summarize_results <- function(
     model$candidates_sirius_str_columns,
     model$candidates_spectra_columns,
     model$candidates_structures_columns,
+    candidate_id_cols,
     model$rank_columns,
     "score_initial" = "candidate_score_pseudo_initial",
     "score_biological",
@@ -155,6 +161,7 @@ summarize_results <- function(
     model$candidates_sirius_str_columns,
     model$candidates_spectra_columns,
     model$candidates_structures_columns,
+    candidate_id_cols,
     model$rank_columns,
     model$score_columns,
     # TODO

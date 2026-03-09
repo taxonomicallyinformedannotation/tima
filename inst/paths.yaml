@@ -69,6 +69,9 @@ data:
       path: data/interim/params
     taxa:
       path: data/interim/taxa
+    xrefs:
+      path: data/interim/xrefs
+      compounds: data/interim/xrefs/compounds.tsv.gz
   processed:
     path: data/processed
   source:

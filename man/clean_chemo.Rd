@@ -25,7 +25,8 @@ clean_chemo(
   score_chemical_npc_pathway = 0.3,
   score_chemical_npc_superclass = 0.2,
   score_chemical_npc_class = 0.1,
-  max_per_score = 7L
+  max_per_score = 7L,
+  xrefs_table = NULL
 )
 }
 \arguments{
@@ -79,6 +80,10 @@ Candidates with scores >= percentile * max_score are kept. Default: 0.9 (90th pe
 
 \item{max_per_score}{Integer, max candidates to keep per feature per score.
 If more exist, they are randomly sampled and a note is added. Default 7.}
+
+\item{xrefs_table}{Optional data frame with columns inchikey/prefix/id from
+get_compounds_xrefs(), used to add candidate_structure_id_* columns before
+summarization.}
 }
 \value{
 Named list with three data frames:

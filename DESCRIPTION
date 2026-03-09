@@ -85,10 +85,12 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 X-schema.org-keywords: metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome
 Collate:
-    'adducts_utils.R'
+    'logs_utils.R'
     'errors_utils.R'
     'validations_utils.R'
     'safe_fread.R'
+    'add_xrefs_to_annotations.R'
+    'adducts_utils.R'
     'round_reals.R'
     'harmonize_adducts.R'
     'parse_yaml_params.R'
@@ -102,7 +104,6 @@ Collate:
     'parse_adduct.R'
     'calculate_mass_of_m.R'
     'annotate_masses.R'
-    'logs_utils.R'
     'columns_utils.R'
     'annotate_spectra.R'
     'benchmark_taxize_spectra.R'
@@ -138,6 +139,7 @@ Collate:
     'fake_hmdb.R'
     'fake_lotus.R'
     'filter_annotations.R'
+    'get_compounds_xrefs.R'
     'retry_utils.R'
     'get_file.R'
     'get_example_sirius.R'

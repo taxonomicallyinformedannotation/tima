@@ -1377,6 +1377,18 @@ list(
       )
     )
   ),
+  ## Cross-references
+  list(
+    tar_target(
+      name = xrefs_compounds,
+      command = {
+        xrefs_compounds <- get_compounds_xrefs(
+          output = paths$data$interim$xrefs$compounds
+        )
+      },
+      format = "file"
+    )
+  ),
   ## Annotations
   list(
     ## MS1
@@ -1768,7 +1780,8 @@ list(
         remove_ties = par_wei_ann$options$remove_ties,
         summarize = par_wei_ann$options$summarize,
         pattern = par_wei_ann$files$pattern,
-        force = par_wei_ann$options$force
+        force = par_wei_ann$options$force,
+        xrefs_file = xrefs_compounds
       )
     },
     format = "file"
