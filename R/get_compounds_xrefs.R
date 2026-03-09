@@ -80,7 +80,11 @@ get_compounds_xrefs <- function(
 
   .fallback_output <- function(reason) {
     if (file.exists(output)) {
-      log_warn("%s. Returning existing cached xrefs: %s", reason, basename(output))
+      log_warn(
+        "%s. Returning existing cached xrefs: %s",
+        reason,
+        basename(output)
+      )
       return(invisible(output))
     }
 
@@ -211,7 +215,9 @@ SELECT ?item ?inchikey ?db ?id WHERE {
   )
 
   if (is.null(raw)) {
-    return(.fallback_output("QLever request failed (possibly transient upstream error)"))
+    return(.fallback_output(
+      "QLever request failed (possibly transient upstream error)"
+    ))
   }
 
   # ── 5. External DB rows ─────────────────────────────────────────────────────
