@@ -7,11 +7,8 @@
 get_compounds_xrefs(
   props = c("P231", "P592", "P661", "P662", "P665", "P683", "P715", "P2057", "P2063",
     "P2877", "P8691"),
-  bioregistry_url =
-    paste0(
-      "https://raw.githubusercontent.com/",
-      "biopragmatics/bioregistry/refs/heads/main/src/bioregistry/data/bioregistry.json"
-    ),
+  bioregistry_url = paste0("https://raw.githubusercontent.com/",
+    "biopragmatics/bioregistry/refs/heads/main/src/bioregistry/data/bioregistry.json"),
   qlever_url = "https://qlever.cs.uni-freiburg.de/api/wikidata",
   max_age_hours = 24,
   output = get_default_paths()$data$interim$xrefs$compounds
