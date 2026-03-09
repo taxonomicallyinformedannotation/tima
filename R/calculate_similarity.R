@@ -113,7 +113,7 @@ calculate_similarity <- function(
   if (method == "gnps") {
     # Fused join + score in a single C call, O(n+m) chain-DP.
     result <- tryCatch(
-      gnps_compute_wrapper(
+      gnps_chain_dp_wrapper(
         x = query_spectrum,
         y = target_spectrum,
         xPrecursorMz = query_precursor,
