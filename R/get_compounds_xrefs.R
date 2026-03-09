@@ -78,14 +78,37 @@ get_compounds_xrefs <- function(
     )
   }
 
+  .fallback_output <- function(reason) {
+    if (file.exists(output)) {
+      log_warn("%s. Returning existing cached xrefs: %s", reason, basename(output))
+      return(invisible(output))
+    }
+
+    log_warn("%s. Writing empty xrefs file: %s", reason, basename(output))
+    empty <- tidytable::tidytable(
+      inchikey = character(),
+      prefix = character(),
+      id = character()
+    )
+    export_output(x = empty, file = output)
+    invisible(output)
+  }
+
   log_info("Fetching compound cross-references from Wikidata / QLever")
   ctx <- log_operation("get_compounds_xrefs")
 
   # ── 1. Load bioregistry & match props to entry keys ────────────────────────
-  bioregistry_json <- jsonlite::fromJSON(
-    bioregistry_url,
-    simplifyVector = FALSE
+  bioregistry_json <- tryCatch(
+    jsonlite::fromJSON(
+      bioregistry_url,
+      simplifyVector = FALSE
+    ),
+    error = function(e) NULL
   )
+
+  if (is.null(bioregistry_json)) {
+    return(.fallback_output("Failed to load Bioregistry metadata"))
+  }
 
   matched <- Filter(
     Negate(is.null),
@@ -172,14 +195,24 @@ SELECT ?item ?inchikey ?db ?id WHERE {
   )
 
   # ── 4. Query QLever ─────────────────────────────────────────────────────────
-  resp_qlever <- httr2::request(qlever_url) |>
-    httr2::req_method("POST") |>
-    httr2::req_body_form(query = sparql) |>
-    httr2::req_headers(Accept = "text/csv") |>
-    httr2::req_error(is_error = \(r) httr2::resp_status(r) >= 400L) |>
-    httr2::req_perform()
+  raw <- tryCatch(
+    {
+      resp_qlever <- httr2::request(qlever_url) |>
+        httr2::req_method("POST") |>
+        httr2::req_body_form(query = sparql) |>
+        httr2::req_headers(Accept = "text/csv") |>
+        httr2::req_retry(max_tries = 3) |>
+        httr2::req_error(is_error = \(r) httr2::resp_status(r) >= 400L) |>
+        httr2::req_perform()
 
-  raw <- tidytable::fread(httr2::resp_body_string(resp_qlever))
+      tidytable::fread(httr2::resp_body_string(resp_qlever))
+    },
+    error = function(e) NULL
+  )
+
+  if (is.null(raw)) {
+    return(.fallback_output("QLever request failed (possibly transient upstream error)"))
+  }
 
   # ── 5. External DB rows ─────────────────────────────────────────────────────
   results_external <- raw |>
