@@ -209,10 +209,8 @@ references:
     given-names: Jim
   - family-names: Wickham
     given-names: Hadley
-    email: hadley@posit.co
   - family-names: Csárdi
     given-names: Gábor
-    email: csardi.gabor@gmail.com
   year: '2026'
   doi: 10.32614/CRAN.package.fs
   version: '>= 1.6.6'
