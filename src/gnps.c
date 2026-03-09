@@ -585,7 +585,7 @@ static double score_matched(
  * Returns: list(score = double, matches = int)                               *
  * ══════════════════════════════════════════════════════════════════════════ */
 
-SEXP gnps_chain_dp(SEXP x, SEXP y,
+SEXP C_gnps_chain_dp(SEXP x, SEXP y,
                    SEXP xPrecursorMz, SEXP yPrecursorMz,
                    SEXP tolerance, SEXP ppm)
 {
@@ -674,7 +674,7 @@ SEXP gnps_chain_dp(SEXP x, SEXP y,
  * Returns: list(score = double, matches = int)                               *
  * ══════════════════════════════════════════════════════════════════════════ */
 
-SEXP gnps(SEXP x, SEXP y)
+SEXP C_gnps(SEXP x, SEXP y)
 {
   if (!isReal(x) || !isReal(y)) error("Inputs must be numeric matrices");
   SEXP xd = getAttrib(x, R_DimSymbol), yd = getAttrib(y, R_DimSymbol);
@@ -852,7 +852,7 @@ SEXP gnps(SEXP x, SEXP y)
  * Returns: list(x = integer, y = integer) with 1-based R indices             *
  * ══════════════════════════════════════════════════════════════════════════ */
 
-SEXP join_gnps(SEXP x, SEXP y,
+SEXP C_join_gnps(SEXP x, SEXP y,
                SEXP xPrecursorMz, SEXP yPrecursorMz,
                SEXP tolerance, SEXP ppm)
 {

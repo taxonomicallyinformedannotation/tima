@@ -1,17 +1,10 @@
-#include <R.h>
-#include <Rinternals.h>
-#include <R_ext/Rdynload.h>
-
-/* Function declarations */
-extern SEXP join_gnps(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP gnps(SEXP, SEXP);
-extern SEXP gnps_chain_dp(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+#include "tima.h"
 
 /* Registration table */
 static const R_CallMethodDef callMethods[] = {
-  {"join_gnps",    (DL_FUNC) &join_gnps,    6},
-  {"gnps",         (DL_FUNC) &gnps,         2},
-  {"gnps_chain_dp", (DL_FUNC) &gnps_chain_dp, 6},
+  {"C_join_gnps",    (DL_FUNC) &C_join_gnps,    6},
+  {"C_gnps",         (DL_FUNC) &C_gnps,         2},
+  {"C_gnps_chain_dp", (DL_FUNC) &C_gnps_chain_dp, 6},
   {NULL, NULL, 0}
 };
 

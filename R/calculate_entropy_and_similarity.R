@@ -187,7 +187,7 @@ calculate_entropy_and_similarity <- function(
   # parent environment without copying them on each iteration.
   progress_counter <- 0L
   # Local alias avoids repeated global lookup in inner scoring loops.
-  call_gnps <- .call_gnps_chain_dp
+  call_gnps <- gnps_chain_dp_wrapper
 
   results <- lapply(
     X = seq_along(query_spectra),

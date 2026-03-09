@@ -34,7 +34,7 @@
 #' }
 #' @keywords internal
 gnps_wrapper <- function(x, y) {
-  .call_registered("gnps", x = x, y = y)
+  .Call(C_gnps, x = x, y = y)
 }
 
 #' @title Wrapper for the C function "join_gnps"
@@ -76,8 +76,8 @@ join_gnps_wrapper <- function(
   tolerance,
   ppm
 ) {
-  .call_registered(
-    "join_gnps",
+  .Call(
+    C_join_gnps,
     x = x,
     y = y,
     xPrecursorMz = xPrecursorMz,
@@ -133,94 +133,8 @@ gnps_chain_dp_wrapper <- function(
   tolerance,
   ppm
 ) {
-  .call_gnps_chain_dp(
-    x = x,
-    y = y,
-    xPrecursorMz = xPrecursorMz,
-    yPrecursorMz = yPrecursorMz,
-    tolerance = tolerance,
-    ppm = ppm
-  )
-}
-
-# Cache native symbols lazily; resolve only when needed.
-.tima_native_syms <- new.env(parent = emptyenv())
-
-.get_tima_dll <- function() {
-  dll <- getLoadedDLLs()[["tima"]]
-  if (is.null(dll)) {
-    loadNamespace("tima")
-    dll <- getLoadedDLLs()[["tima"]]
-  }
-  if (is.null(dll)) {
-    stop("Package DLL 'tima' is not loaded.", call. = FALSE)
-  }
-  dll
-}
-
-.resolve_native_symbol <- function(name) {
-  sym <- .tima_native_syms[[name]]
-  if (!is.null(sym)) {
-    return(sym)
-  }
-
-  dll <- .get_tima_dll()
-  sym <- tryCatch(
-    getNativeSymbolInfo(name, PACKAGE = dll),
-    error = function(e) {
-      invisible(e)
-      NULL
-    }
-  )
-
-  if (is.null(sym)) {
-    regs <- tryCatch(
-      getDLLRegisteredRoutines(dll)[[".Call"]],
-      error = function(e) {
-        invisible(e)
-        NULL
-      }
-    )
-    avail <- if (!is.null(regs) && nrow(regs) > 0L) {
-      regs[, "name"]
-    } else {
-      character(0)
-    }
-    stop(
-      "Native symbol not registered: ",
-      name,
-      if (length(avail)) {
-        paste0(
-          ". Available .Call symbols: ",
-          paste(avail, collapse = ", "),
-          "."
-        )
-      } else {
-        "."
-      },
-      call. = FALSE
-    )
-  }
-
-  .tima_native_syms[[name]] <- sym
-  sym
-}
-
-.call_registered <- function(name, ...) {
-  .Call(.resolve_native_symbol(name), ...)
-}
-
-# Fast internal helper for the hot path used in tight pairwise loops.
-.call_gnps_chain_dp <- function(
-  x,
-  y,
-  xPrecursorMz,
-  yPrecursorMz,
-  tolerance,
-  ppm
-) {
   .Call(
-    .resolve_native_symbol("gnps_chain_dp"),
+    C_gnps_chain_dp,
     x,
     y,
     xPrecursorMz,
