@@ -80,7 +80,9 @@ harmonize_spectra_polarity <- function(
               condition = is.na(inchikey),
               true = inchikey_connectivity_layer,
               false = gsub(pattern = "-.*", replacement = "", x = inchikey)
-            )
+            ),
+            xlogp = xlogp |>
+              as.numeric()
           ) |>
           data.frame()
       }
@@ -114,7 +116,7 @@ create_empty_spectral_library <- function() {
     spectrum_id = NA_integer_,
     splash = NA_character_,
     synonyms = NA_character_,
-    xlogp = NA_character_,
+    xlogp = NA_real_,
     rtime = NA_real_,
     mz = list(c(1, 2, 3)),
     intensity = list(c(1, 2, 3)),

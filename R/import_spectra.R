@@ -162,6 +162,9 @@ import_spectra <- function(
   if ("PRECURSOR_MZ" %in% spec_cols) {
     spectra$precursorMz <- as.numeric(spectra$PRECURSOR_MZ)
   }
+  if ("PrecursorMZ" %in% spec_cols) {
+    spectra$precursorMz <- as.numeric(spectra$PrecursorMZ)
+  }
   if ("spectrum_id" %in% spec_cols) {
     spectra$spectrum_id <- as.character(spectra$spectrum_id)
   }
@@ -185,7 +188,17 @@ import_spectra <- function(
   }
 
   # Handle MassBank-specific MS level field if present
-  if ("Spectrum_type" %in% colnames(spectra@backend@spectraData)) {
+  if ("precursorMz" %in% colnames(spectra@backend@spectraData)) {
+    n_before <- length(spectra)
+    spectra <- spectra[!is.na(spectra@backend@spectraData$precursorMz)]
+    n_after <- length(spectra)
+    log_debug(
+      "Filtered to MS2 spectra (MassBank): %d -> %d spectra",
+      n_before,
+      n_after
+    )
+  }
+  if ("precursor" %in% colnames(spectra@backend@spectraData)) {
     n_before <- length(spectra)
     spectra <- spectra[spectra@backend@spectraData$Spectrum_type == "MS2"]
     n_after <- length(spectra)

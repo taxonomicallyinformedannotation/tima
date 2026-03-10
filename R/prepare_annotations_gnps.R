@@ -134,7 +134,7 @@ prepare_annotations_gnps <- function(
             replacement = "",
             perl = TRUE
           ),
-        candidate_structure_xlogp = NA,
+        candidate_structure_xlogp = NA_real_,
         ## Only partially present
         candidate_structure_tax_cla_chemontid = NA,
         candidate_structure_tax_cla_01kin = NA

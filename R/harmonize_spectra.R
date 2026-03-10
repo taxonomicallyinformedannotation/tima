@@ -76,33 +76,31 @@ harmonize_spectra <- function(
 
   # Validate mode contains 'pos' or 'neg'
   if (!grepl("pos|neg", mode, ignore.case = TRUE)) {
-    stop(
-      "mode must contain 'pos' or 'neg', got: ",
-      mode,
-      call. = FALSE
-    )
+    stop("mode must contain 'pos' or 'neg', got: ", mode, call. = FALSE)
   }
 
   # Validate all column parameters are character strings or NULL
-  validate_column_mappings(list(
-    col_ad = col_ad,
-    col_ce = col_ce,
-    col_ci = col_ci,
-    col_em = col_em,
-    col_in = col_in,
-    col_io = col_io,
-    col_ik = col_ik,
-    col_il = col_il,
-    col_mf = col_mf,
-    col_na = col_na,
-    col_po = col_po,
-    col_sm = col_sm,
-    col_sn = col_sn,
-    col_si = col_si,
-    col_sp = col_sp,
-    col_sy = col_sy,
-    col_xl = col_xl
-  ))
+  validate_column_mappings(
+    list(
+      col_ad = col_ad,
+      col_ce = col_ce,
+      col_ci = col_ci,
+      col_em = col_em,
+      col_in = col_in,
+      col_io = col_io,
+      col_ik = col_ik,
+      col_il = col_il,
+      col_mf = col_mf,
+      col_na = col_na,
+      col_po = col_po,
+      col_sm = col_sm,
+      col_sn = col_sn,
+      col_si = col_si,
+      col_sp = col_sp,
+      col_sy = col_sy,
+      col_xl = col_xl
+    )
+  )
 
   # Harmonize Column Names ----
 
@@ -209,33 +207,31 @@ harmonize_spectra <- function(
 
   spectra_harmonized <- spectra_filtered |>
     tidytable::full_join(y = spectra_missing) |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          "adduct",
-          "collision_energy",
-          "compound_id",
-          "exactmass",
-          "formula",
-          "inchi",
-          "inchi_no_stereo",
-          "inchikey",
-          "inchikey_connectivity_layer",
-          "name",
-          "precursorMz",
-          "precursorCharge",
-          "smiles",
-          "smiles_no_stereo",
-          "spectrum_id",
-          "splash",
-          "synonyms",
-          "xlogp",
-          "rtime",
-          "mz",
-          "intensity"
-        )
+    tidytable::select(tidyselect::any_of(
+      x = c(
+        "adduct",
+        "collision_energy",
+        "compound_id",
+        "exactmass",
+        "formula",
+        "inchi",
+        "inchi_no_stereo",
+        "inchikey",
+        "inchikey_connectivity_layer",
+        "name",
+        "precursorMz",
+        "precursorCharge",
+        "smiles",
+        "smiles_no_stereo",
+        "spectrum_id",
+        "splash",
+        "synonyms",
+        "xlogp",
+        "rtime",
+        "mz",
+        "intensity"
       )
-    ) |>
+    )) |>
     tidytable::mutate(
       library = metad,
       exactmass = as.numeric(exactmass),
@@ -254,7 +250,22 @@ harmonize_spectra <- function(
       )
     ) |>
     data.frame()
-  rm(spectra_filtered)
+  smiles_harmonized <- spectra_harmonized |>
+    process_smiles(smiles_colname = "smiles")
+  colnames(smiles_harmonized) <- c(
+    "smiles_old",
+    colnames(smiles_harmonized)[-1L] |>
+      gsub(pattern = "structure_", replacement = "")
+  )
+  smiles_harmonized <- smiles_harmonized |>
+    tidytable::rename(smiles = smiles_old, smiles_new = smiles)
+
+  spectra_harmonized <- spectra_harmonized |>
+    tidytable::select(-tidyselect::any_of(colnames(smiles_harmonized)[-1L])) |>
+    tidytable::inner_join(smiles_harmonized) |>
+    tidytable::select(-smiles) |>
+    tidytable::rename(smiles = smiles_new)
+  rm(spectra_filtered, smiles_harmonized)
 
   log_complete(ctx, n_harmonized = nrow(spectra_harmonized))
 
