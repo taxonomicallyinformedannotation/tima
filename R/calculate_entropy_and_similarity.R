@@ -254,7 +254,7 @@ calculate_entropy_and_similarity <- function(
               dalton,
               ppm
             )
-            score <- res[["score"]]
+            score <- res[1L]
           } else {
             score <- calculate_similarity(
               method = method,
@@ -315,6 +315,7 @@ calculate_entropy_and_similarity <- function(
       feature_id = NA_integer_,
       precursorMz = NA_real_,
       target_id = NA_integer_,
+      candidate_spectrum_id = NA,
       candidate_spectrum_entropy = NA_real_,
       candidate_score_similarity = NA_real_,
       candidate_count_similarity_peaks_matched = NA_integer_
