@@ -204,7 +204,11 @@ SELECT ?item ?inchikey ?db ?id WHERE {
       resp_qlever <- httr2::request(qlever_url) |>
         httr2::req_method("POST") |>
         httr2::req_body_form(query = sparql) |>
-        httr2::req_headers(Accept = "text/csv") |>
+        httr2::req_headers(
+          Accept = "text/csv",
+          `Content-Type` = "application/x-www-form-urlencoded",
+          `User-Agent` = "TIMA external ID fetcher"
+        ) |>
         httr2::req_retry(max_tries = 3) |>
         httr2::req_error(is_error = \(r) httr2::resp_status(r) >= 400L) |>
         httr2::req_perform()
