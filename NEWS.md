@@ -14,6 +14,8 @@
 * Improved log and error messages
 * More in depth molecular sanitization
 * Updated the C implementation of the spectral similarity
+* Updated to Massbank version `2025.10`
+* Updated to MSnLib `v7`
 
 ## Breaking Changes
 
