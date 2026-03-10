@@ -83,7 +83,7 @@ calculate_similarity <- function(
 
   if (nrow(query_spectrum) == 0L || nrow(target_spectrum) == 0L) {
     return(
-      if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0
+      if (return_matched_peaks) c(score = 0.0, matches = 0) else 0.0
     )
   }
 
@@ -103,7 +103,7 @@ calculate_similarity <- function(
       ),
       error = function(e) {
         log_warn("Entropy calculation failed: %s", e$message)
-        if (return_matched_peaks) list(score = 0.0, matches = 0L) else 0.0
+        if (return_matched_peaks) c(score = 0.0, matches = 0) else 0.0
       }
     )
     return(result)
@@ -123,10 +123,10 @@ calculate_similarity <- function(
       ),
       error = function(e) {
         log_warn("GNPS computation failed: %s", e$message)
-        list(score = 0.0, matches = 0L)
+        c(score = 0.0, matches = 0)
       }
     )
-    return(if (return_matched_peaks) result else result$score)
+    return(if (return_matched_peaks) result else result["score"])
   }
 
   # Cosine: two-step join + score
@@ -151,9 +151,9 @@ calculate_similarity <- function(
     ),
     error = function(e) {
       log_warn("Similarity calculation failed: %s", e$message)
-      list(score = 0.0, matches = 0L)
+      c(score = 0.0, matches = 0)
     }
   )
 
-  if (return_matched_peaks) result else result$score
+  if (return_matched_peaks) result else result["score"]
 }

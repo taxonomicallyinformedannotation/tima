@@ -185,8 +185,14 @@ create_edges <- function(
           ppm = ppm_tolerance,
           return_matched_peaks = TRUE
         )
-        sc <- if (is.list(res)) res[["score"]] else as.numeric(res)
-        mp <- if (is.list(res)) res[["matches"]] else 0L
+        # Handle both named vector and scalar returns
+        if (is.numeric(res) && length(res) >= 2L) {
+          sc <- res[["score"]]
+          mp <- res[["matches"]]
+        } else {
+          sc <- as.numeric(res)
+          mp <- 0L
+        }
       }
 
       # Accumulate score histogram in parent env
