@@ -114,7 +114,7 @@ calculate_entropy_and_similarity <- function(
     length(query_ids)
   )
   log_debug(
-    "Method: %s, PPM: %f2, Dalton: %f2",
+    "Method: %s, PPM: %.2f, Dalton: %.2f",
     method,
     ppm,
     dalton

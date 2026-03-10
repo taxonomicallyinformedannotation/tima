@@ -185,7 +185,7 @@ weight_chemo <- function(
     n_annotations
   )
   log_debug(
-    "Weights - Spectral: %f2, Biological: %f2, Chemical: %f2",
+    "Weights - Spectral: %.2f, Biological: %.2f, Chemical: %.2f",
     weight_spectral,
     weight_biological,
     weight_chemical

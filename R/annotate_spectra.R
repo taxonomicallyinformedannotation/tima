@@ -135,7 +135,7 @@ annotate_spectra <- function(
 
   log_info("Starting spectral annotation in %s mode", polarity)
   log_debug(
-    "Method: %s, Threshold: %f2, PPM: %f2, Dalton: %f2",
+    "Method: %s, Threshold: %.2f, PPM: %.2f, Dalton: %.2f",
     method,
     threshold,
     ppm,
