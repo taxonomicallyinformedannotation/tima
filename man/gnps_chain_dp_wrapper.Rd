@@ -21,8 +21,8 @@ gnps_chain_dp_wrapper(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
 }
 \value{
 A numeric vector of length 2:
-\item{\link{1}}{Numeric similarity score (0-1)}
-\item{\link{2}}{Numeric count of matched peaks}
+\item{[1]}{Numeric similarity score (0-1)}
+\item{[2]}{Numeric count of matched peaks}
 }
 \description{
 Fused GNPS join + score in a single C call. Performs
@@ -48,8 +48,8 @@ result <- gnps_chain_dp_wrapper(
   tolerance = 0.01,
   ppm = 10
 )
-print(result[1])  # score
-print(result[2])  # matches
+print(result\[1\])  # score
+print(result\[2\])  # matches
 }
 }
 \keyword{internal}
