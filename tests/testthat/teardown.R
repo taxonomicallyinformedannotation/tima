@@ -3,6 +3,18 @@
 # Check that tests didn't create unwanted files/dirs in tests/testthat
 testthat_root <- getwd()
 
+# Remove transient diagnostics folder created by failed snapshot/problem reporters
+problems_dir <- file.path(testthat_root, "_problems")
+if (dir.exists(problems_dir)) {
+  unlink(problems_dir, recursive = TRUE, force = TRUE)
+}
+
+# Remove testthat transient diagnostics file before pollution check to avoid false warning
+problems_file <- file.path(testthat_root, "testthat-problems.rds")
+if (file.exists(problems_file)) {
+  unlink(problems_file, force = TRUE)
+}
+
 # List of allowed items in tests/testthat (excluding temp R session files)
 allowed_patterns <- c(
   "^fixtures$", # Fixture directory
