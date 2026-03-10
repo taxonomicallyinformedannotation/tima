@@ -10,7 +10,8 @@
 #'     algorithm (O(n+m) time).
 #'
 #'     **Spectra must be sanitized** before calling this function:
-#'     unique m/z values (no duplicates within tolerance), sorted by m/z,
+#'     no two peaks in the same spectrum should have m/z values close enough
+#'     to match each other (i.e., |mz_i - mz_j| > tolerance), sorted by m/z,
 #'     no NaN/NA. This is guaranteed by [sanitize_spectra()] via
 #'     [import_spectra()]. See [sanitize_spectrum_matrix()] for a
 #'     lightweight fallback.
@@ -95,7 +96,8 @@ join_gnps_wrapper <- function(
 #'     Uses chain-DP optimal assignment (O(n+m) time).
 #'
 #'     **Spectra must be sanitized** before calling this function:
-#'     unique m/z values (no duplicates within tolerance), sorted by m/z,
+#'     no two peaks in the same spectrum should have m/z values close enough
+#'     to match each other (i.e., |mz_i - mz_j| > tolerance), sorted by m/z,
 #'     no NaN/NA. This is guaranteed by [sanitize_spectra()] via
 #'     [import_spectra()]. See [sanitize_spectrum_matrix()] for a
 #'     lightweight fallback.

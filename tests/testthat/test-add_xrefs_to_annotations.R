@@ -43,7 +43,7 @@ test_that("add_xrefs_to_annotations adds xref columns to results", {
     id = c("15365", "Q2270", "CHEMBL123", "5891")
   )
   xrefs_file <- temp_test_path("xrefs_test.tsv.gz")
-  tima:::export_output(x = xrefs_data, file = xrefs_file)
+  export_output(x = xrefs_data, file = xrefs_file)
 
   # Test function
   result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
@@ -125,7 +125,7 @@ test_that("add_xrefs_to_annotations handles empty xrefs file", {
     id = character()
   )
   xrefs_file <- temp_test_path("empty_xrefs.tsv.gz")
-  tima:::export_output(x = empty_xrefs, file = xrefs_file)
+  export_output(x = empty_xrefs, file = xrefs_file)
 
   result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
 
@@ -159,7 +159,7 @@ test_that("add_xrefs_to_annotations filters out databases with all NA", {
     id = c("15365", "Q2270")
   )
   xrefs_file <- temp_test_path("xrefs_partial.tsv.gz")
-  tima:::export_output(x = xrefs_data, file = xrefs_file)
+  export_output(x = xrefs_data, file = xrefs_file)
 
   result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
 
@@ -199,7 +199,7 @@ test_that("add_xrefs_to_annotations handles multiple IDs per inchikey", {
     id = c("15365", "15366", "Q2270")
   )
   xrefs_file <- temp_test_path("xrefs_multi.tsv.gz")
-  tima:::export_output(x = xrefs_data, file = xrefs_file)
+  export_output(x = xrefs_data, file = xrefs_file)
 
   result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
 
@@ -235,7 +235,7 @@ test_that("add_xrefs_to_annotations errors on missing inchikey column", {
     id = "15365"
   )
   xrefs_file <- temp_test_path("xrefs_bad.tsv.gz")
-  tima:::export_output(x = xrefs_data, file = xrefs_file)
+  export_output(x = xrefs_data, file = xrefs_file)
 
   # Should warn but not error (graceful degradation)
   result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
@@ -265,7 +265,7 @@ test_that("add_xrefs_to_annotations errors on malformed xrefs", {
     # Missing 'id' column
   )
   xrefs_file <- temp_test_path("xrefs_malformed.tsv.gz")
-  tima:::export_output(x = bad_xrefs, file = xrefs_file)
+  export_output(x = bad_xrefs, file = xrefs_file)
 
   expect_error(
     tima:::add_xrefs_to_annotations(results_list, xrefs_file),
@@ -310,7 +310,7 @@ test_that("add_xrefs_to_annotations preserves all original columns", {
     id = "15365"
   )
   xrefs_file <- temp_test_path("xrefs_preserve.tsv.gz")
-  tima:::export_output(x = xrefs_data, file = xrefs_file)
+  export_output(x = xrefs_data, file = xrefs_file)
 
   result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
 
@@ -352,7 +352,7 @@ test_that("add_xrefs_to_annotations matches on 14-char inchikey connectivity lay
     id = "Q123"
   )
   xrefs_file <- temp_test_path("xrefs_connectivity_layer.tsv.gz")
-  tima:::export_output(x = xrefs_data, file = xrefs_file)
+  export_output(x = xrefs_data, file = xrefs_file)
 
   result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
 
