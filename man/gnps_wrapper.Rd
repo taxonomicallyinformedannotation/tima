@@ -14,9 +14,9 @@ Must have columns for mz and intensity.}
 Must have columns for mz and intensity.}
 }
 \value{
-A list containing:
-\item{score}{Numeric similarity score (0-1)}
-\item{matches}{Integer count of matched peaks}
+A numeric vector of length 2:
+\item{\link{1}}{Numeric similarity score (0-1)}
+\item{\link{2}}{Numeric count of matched peaks}
 }
 \description{
 Calculates GNPS-style spectral similarity score between
@@ -36,7 +36,8 @@ lightweight fallback.
 x_peaks <- cbind(mz = c(100, 200), intensity = c(50, 100))
 y_peaks <- cbind(mz = c(100, 200), intensity = c(45, 95))
 result <- gnps_wrapper(x = x_peaks, y = y_peaks)
-print(result$score)
+print(result[1])  # score
+print(result[2])  # matches
 }
 }
 \keyword{internal}
