@@ -38,8 +38,8 @@ test_that("calculate_similarity works with gnps method returning matches", {
     ppm = 10,
     return_matched_peaks = TRUE
   )
-  expect_type(res["score"], "double")
-  expect_true(res["matches"] >= 0)
+  expect_type(res[1L], "double")
+  expect_true(res[2L] >= 0)
 })
 
 test_that("calculate_similarity works with cosine method", {
@@ -84,8 +84,8 @@ test_that("calculate_similarity returns 0 for empty spectra", {
     ppm = 10,
     return_matched_peaks = TRUE
   )
-  expect_equal(res["score"], c(score = 0.0))
-  expect_equal(res["matches"], c(matches = 0))
+  expect_equal(res[1L], 0.0)
+  expect_equal(res[2L], 0)
 })
 
 test_that("calculate_similarity rejects negative tolerances", {

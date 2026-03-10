@@ -20,9 +20,9 @@ gnps_chain_dp_wrapper(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
 \item{ppm}{Numeric value specifying the relative tolerance in ppm}
 }
 \value{
-A list with two integer vectors:
-\item{indices_x}{Indices of matched peaks in x}
-\item{indices_y}{Indices of matched peaks in y}
+A numeric vector of length 2:
+\item{\link{1}}{Numeric similarity score (0-1)}
+\item{\link{2}}{Numeric count of matched peaks}
 }
 \description{
 Fused GNPS join + score in a single C call. Performs
@@ -38,16 +38,18 @@ lightweight fallback.
 }
 \examples{
 \dontrun{
-query_mz <- c(100.05, 200.10, 300.15)
-target_mz <- c(100.06, 200.11, 400.20)
-matches <- join_gnps_wrapper(
-  x = query_mz,
-  y = target_mz,
+query <- cbind(mz = c(100.05, 200.10, 300.15), intensity = c(100, 50, 25))
+target <- cbind(mz = c(100.06, 200.11, 400.20), intensity = c(90, 45, 30))
+result <- gnps_chain_dp_wrapper(
+  x = query,
+  y = target,
   xPrecursorMz = 500.0,
   yPrecursorMz = 500.0,
   tolerance = 0.01,
   ppm = 10
 )
+print(result[1])  # score
+print(result[2])  # matches
 }
 }
 \keyword{internal}

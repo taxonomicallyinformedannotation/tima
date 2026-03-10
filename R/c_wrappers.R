@@ -20,9 +20,9 @@
 #' @param y Numeric matrix with matched peaks from target spectrum.
 #'     Must have columns for mz and intensity.
 #'
-#' @return A named numeric vector of length 2:
-#'   \item{score}{Numeric similarity score (0-1)}
-#'   \item{matches}{Numeric count of matched peaks}
+#' @return A numeric vector of length 2:
+#'   \item{[1]}{Numeric similarity score (0-1)}
+#'   \item{[2]}{Numeric count of matched peaks}
 #'
 #' @examples
 #' \dontrun{
@@ -30,7 +30,8 @@
 #' x_peaks <- cbind(mz = c(100, 200), intensity = c(50, 100))
 #' y_peaks <- cbind(mz = c(100, 200), intensity = c(45, 95))
 #' result <- gnps_wrapper(x = x_peaks, y = y_peaks)
-#' print(result["score"])
+#' print(result[1])  # score
+#' print(result[2])  # matches
 #' }
 #' @keywords internal
 gnps_wrapper <- function(x, y) {
@@ -106,9 +107,9 @@ join_gnps_wrapper <- function(
 #' @param tolerance Numeric value specifying the absolute tolerance in Daltons
 #' @param ppm Numeric value specifying the relative tolerance in ppm
 #'
-#' @return A named numeric vector of length 2:
-#'   \item{score}{Numeric similarity score (0-1)}
-#'   \item{matches}{Numeric count of matched peaks}
+#' @return A numeric vector of length 2:
+#'   \item{[1]}{Numeric similarity score (0-1)}
+#'   \item{[2]}{Numeric count of matched peaks}
 #'
 #' @keywords internal
 #'
@@ -124,7 +125,8 @@ join_gnps_wrapper <- function(
 #'   tolerance = 0.01,
 #'   ppm = 10
 #' )
-#' print(result["score"])
+#' print(result[1])  # score
+#' print(result[2])  # matches
 #' }
 gnps_chain_dp_wrapper <- function(
   x,

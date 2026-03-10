@@ -172,8 +172,8 @@ create_edges <- function(
           ms2_tolerance,
           ppm_tolerance
         )
-        sc <- res[["score"]]
-        mp <- res[["matches"]]
+        sc <- res[1L]
+        mp <- res[2L]
       } else {
         res <- calculate_similarity(
           method = method,
@@ -185,10 +185,10 @@ create_edges <- function(
           ppm = ppm_tolerance,
           return_matched_peaks = TRUE
         )
-        # Handle both named vector and scalar returns
+        # Handle both numeric vector and scalar returns
         if (is.numeric(res) && length(res) >= 2L) {
-          sc <- res[["score"]]
-          mp <- res[["matches"]]
+          sc <- res[1L]
+          mp <- res[2L]
         } else {
           sc <- as.numeric(res)
           mp <- 0L
