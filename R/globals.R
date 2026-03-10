@@ -267,6 +267,8 @@ utils::globalVariables(
     "similarity_min",
     "SMILES",
     "smiles",
+    "smiles_old",
+    "smiles_new",
     "smiles_no_stereo",
     "spectra",
     "spectrum_id",
