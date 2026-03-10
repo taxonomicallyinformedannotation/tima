@@ -77,7 +77,7 @@ import_spectra <- function(
 
   log_info("Importing spectra from: %s", file)
   log_debug(
-    "Parameters: cutoff=%f2, dalton=%f2, ppm=%f2, polarity=%s",
+    "Parameters: cutoff=%.2f, dalton=%.2f, ppm=%.2f, polarity=%s",
     cutoff,
     dalton,
     ppm,
@@ -252,7 +252,7 @@ import_spectra <- function(
   # Sanitize spectra if requested
   if (sanitize) {
     n_before <- length(spectra)
-    log_debug("Sanitizing spectra (cutoff=%f2)", cutoff)
+    log_debug("Sanitizing spectra (cutoff=%.2f)", cutoff)
     spectra <- sanitize_spectra(
       spectra = spectra,
       cutoff = cutoff,

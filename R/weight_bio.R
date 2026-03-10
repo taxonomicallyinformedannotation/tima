@@ -233,7 +233,7 @@ weight_bio <- function(
 
   log_info("Weighting %d annotations by biological source", n_annotations)
   log_debug(
-    "Weights - Spectral: %f2, Biological: %f2",
+    "Weights - Spectral: %.2f, Biological: %.2f",
     weight_spectral,
     weight_biological
   )

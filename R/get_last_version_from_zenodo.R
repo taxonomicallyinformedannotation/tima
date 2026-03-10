@@ -89,7 +89,8 @@ fetch_zenodo_record <- function(record, doi) {
       stop(
         "Zenodo record not found: ",
         doi,
-        ". Please verify the DOI is correct.",
+        ". Please verify the DOI is correct. ",
+        conditionMessage(e),
         call. = FALSE
       )
     },
@@ -197,7 +198,9 @@ is_download_needed <- function(path, zenodo_size) {
 
   if (local_size != zenodo_size) {
     log_debug(
-      "File size mismatch (local: {local_size}, remote: {zenodo_size}), download needed"
+      "File size mismatch (local: %s, remote: %s), download needed",
+      local_size,
+      zenodo_size
     )
     return(TRUE)
   }
@@ -290,7 +293,7 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
   file_url <- paste0(record_response$url, "/files/", filename)
   zenodo_size <- content$files$size[match_idx]
 
-  log_debug("Found file: %s (%f2 bytes)", filename, zenodo_size)
+  log_debug("Found file: %s (%.0f bytes)", filename, zenodo_size)
 
   # Download if Needed ----
   if (is_download_needed(path = path, zenodo_size = zenodo_size)) {
@@ -311,7 +314,9 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
     }
 
     log_debug(
-      "File size: {zenodo_size} bytes ({round(zenodo_size / 1024^2, 2)} MB)"
+      "File size: %s bytes (%.2f MB)",
+      zenodo_size,
+      zenodo_size / 1024^2
     )
 
     # Create directory and download

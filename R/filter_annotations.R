@@ -280,7 +280,7 @@ filter_annotations <- function(
       length(tolerance_rt) == 1L &&
       !is.na(tolerance_rt)
   ) {
-    log_debug("RT tolerance: %f2 minutes", tolerance_rt)
+    log_debug("RT tolerance: %.2f minutes", tolerance_rt)
   }
 
   features_table <- safe_fread(
