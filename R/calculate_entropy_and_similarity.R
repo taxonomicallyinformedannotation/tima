@@ -252,9 +252,11 @@ calculate_entropy_and_similarity <- function(
               current_precursor,
               lib_precursors_sub[[lib_idx]],
               dalton,
-              ppm
+              ppm,
+              matchedPeaksCount = TRUE
             )
             score <- res[1L]
+            matched <- res[2L]
           } else {
             score <- calculate_similarity(
               method = method,
@@ -265,10 +267,15 @@ calculate_entropy_and_similarity <- function(
               dalton = dalton,
               ppm = ppm
             )
+            matched <- .count_matched_peaks(
+              q_mz,
+              lib_spectrum[, 1L],
+              dalton,
+              ppm
+            )
           }
 
           entropy_target <- msentropy::calculate_spectral_entropy(lib_spectrum)
-          matched <- .count_matched_peaks(q_mz, lib_spectrum[, 1L], dalton, ppm)
 
           list(
             score = as.numeric(score),
