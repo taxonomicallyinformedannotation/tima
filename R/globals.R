@@ -210,6 +210,7 @@ utils::globalVariables(
     "organism_taxonomy_ottid",
     "ott_id",
     "output",
+    "parse_hmdb_like_input",
     "polarity",
     "precursorCharge",
     "precursorMz",

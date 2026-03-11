@@ -258,7 +258,10 @@ parse_hmdb_like_sdf_lines <- function(sdf_lines) {
     }
 
     if (startsWith(line_trim, ">")) {
-      field_match <- stringr::str_match(line_trim, "^>\\s*<([^>]+)>")
+      field_match <- stringi::stri_match_first_regex(
+        str = line_trim,
+        pattern = "^>\\s*<([^>]+)>"
+      )
       if (!is.na(field_match[1, 2])) {
         current_target <- canonical_field(field_match[1, 2])
       } else {
@@ -294,8 +297,8 @@ extract_hmdb_like_sdf_fields <- function(record_lines) {
   n <- length(record_lines)
 
   while (i <= n) {
-    field_match <- stringr::str_match(
-      string = record_lines[[i]],
+    field_match <- stringi::stri_match_first_regex(
+      str = record_lines[[i]],
       pattern = "^>\\s*<([^>]+)>"
     )
 

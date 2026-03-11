@@ -123,71 +123,54 @@ calculate_entropy_and_similarity <- function(
   # Pre-calculate length once for efficiency
   n_queries <- length(query_ids)
 
-  # Pre-flight: sample a few spectra to detect unsanitized input.
-  # If any are found, sanitize the entire list once before the hot loop.
-  .ensure_sanitized <- function(spectra_list, label, dalton, ppm) {
-    n <- length(spectra_list)
-    if (n == 0L) {
-      return(spectra_list)
-    }
-    sample_idx <- unique(c(
-      1L,
-      as.integer(seq(1L, n, length.out = min(20L, n)))
-    ))
-    needs_fix <- FALSE
-    for (idx in sample_idx) {
-      sp <- spectra_list[[idx]]
-      if (is.matrix(sp) && nrow(sp) >= 2L) {
-        if (!is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)) {
-          needs_fix <- TRUE
-          break
-        }
-      }
-    }
-    if (needs_fix) {
-      log_warn(
-        paste0(
-          "Unsanitized %s spectra detected. ",
-          "Sanitizing %d spectra in-place before scoring. ",
-          "Consider using import_spectra(sanitize = TRUE) upstream."
-        ),
-        label,
-        n
-      )
-      spectra_list <- lapply(spectra_list, function(sp) {
-        if (
-          is.matrix(sp) &&
-            nrow(sp) >= 2L &&
-            !is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)
-        ) {
-          sanitize_spectrum_matrix(sp, tolerance = dalton, ppm = ppm)
-        } else {
-          sp
-        }
-      })
-    }
-    spectra_list
-  }
-  query_spectra <- .ensure_sanitized(
-    spectra_list = query_spectra,
-    label = "query",
-    dalton = dalton,
-    ppm = ppm
-  )
-  lib_spectra <- .ensure_sanitized(
-    spectra_list = lib_spectra,
-    label = "library",
-    dalton = dalton,
-    ppm = ppm
-  )
+  # Lazy sanitize-on-first-use state.
+  # This avoids up-front full scans and only sanitizes spectra that need it.
+  n_query <- length(query_spectra)
+  n_lib <- length(lib_spectra)
+  query_checked <- rep(FALSE, n_query)
+  lib_checked <- rep(FALSE, n_lib)
+  query_sanitized <- logical(n_query)
+  lib_sanitized <- logical(n_lib)
 
-  # Use closures to avoid passing large objects through function arguments.
-  # R's lexical scoping means the closure captures references to
-  # lib_spectra, lib_precursors, lib_ids, query_spectra, etc. from the
-  # parent environment without copying them on each iteration.
-  progress_counter <- 0L
-  # Local alias avoids repeated global lookup in inner scoring loops.
-  call_gnps <- gnps_chain_dp_wrapper
+  ensure_query_ready <- function(idx) {
+    if (!query_checked[[idx]]) {
+      sp <- query_spectra[[idx]]
+      if (
+        is.matrix(sp) &&
+          nrow(sp) >= 2L &&
+          !is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)
+      ) {
+        query_spectra[[idx]] <<- sanitize_spectrum_matrix(
+          sp,
+          tolerance = dalton,
+          ppm = ppm
+        )
+        query_sanitized[[idx]] <<- TRUE
+      }
+      query_checked[[idx]] <<- TRUE
+    }
+    query_spectra[[idx]]
+  }
+
+  ensure_lib_ready <- function(idx) {
+    if (!lib_checked[[idx]]) {
+      sp <- lib_spectra[[idx]]
+      if (
+        is.matrix(sp) &&
+          nrow(sp) >= 2L &&
+          !is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)
+      ) {
+        lib_spectra[[idx]] <<- sanitize_spectrum_matrix(
+          sp,
+          tolerance = dalton,
+          ppm = ppm
+        )
+        lib_sanitized[[idx]] <<- TRUE
+      }
+      lib_checked[[idx]] <<- TRUE
+    }
+    lib_spectra[[idx]]
+  }
 
   results <- lapply(
     X = seq_along(query_spectra),
@@ -197,7 +180,7 @@ calculate_entropy_and_similarity <- function(
         log_info("Processed %d / %d queries", progress_counter, n_queries)
       }
 
-      current_spectrum <- query_spectra[[spectrum_idx]]
+      current_spectrum <- ensure_query_ready(spectrum_idx)
       current_precursor <- query_precursors[spectrum_idx]
       current_id <- query_ids[spectrum_idx]
 
@@ -213,28 +196,32 @@ calculate_entropy_and_similarity <- function(
               current_precursor + dalton,
               current_precursor * (1 + (1E-6 * ppm))
             )
-
-        lib_spectra_sub <- lib_spectra[val_ind]
-        lib_precursors_sub <- lib_precursors[val_ind]
-        lib_ids_sub <- lib_ids[val_ind]
+        lib_indices_sub <- which(val_ind)
       } else {
-        lib_spectra_sub <- lib_spectra
-        lib_precursors_sub <- lib_precursors
-        lib_ids_sub <- lib_ids
+        lib_indices_sub <- seq_along(lib_spectra)
       }
 
-      if (length(lib_ids_sub) == 0) {
+      if (length(lib_indices_sub) == 0) {
         return(NULL)
       }
+
+      # Ensure each library spectrum is sanitized at most once.
+      for (lib_idx in lib_indices_sub) {
+        ensure_lib_ready(lib_idx)
+      }
+
+      lib_precursors_sub <- lib_precursors[lib_indices_sub]
+      lib_ids_sub <- lib_ids[lib_indices_sub]
 
       # Calculate similarities
       use_gnps <- (method == "gnps")
       q_mz <- current_spectrum[, 1L]
 
       similarities <- vapply(
-        X = seq_along(lib_spectra_sub),
-        FUN = function(lib_idx) {
-          lib_spectrum <- lib_spectra_sub[[lib_idx]]
+        X = seq_along(lib_indices_sub),
+        FUN = function(pos_idx) {
+          lib_idx <- lib_indices_sub[[pos_idx]]
+          lib_spectrum <- lib_spectra[[lib_idx]]
 
           # Guard: skip degenerate spectra
           if (
@@ -250,7 +237,7 @@ calculate_entropy_and_similarity <- function(
               current_spectrum,
               lib_spectrum,
               current_precursor,
-              lib_precursors_sub[[lib_idx]],
+              lib_precursors_sub[[pos_idx]],
               dalton,
               ppm,
               matchedPeaksCount = TRUE
@@ -263,7 +250,7 @@ calculate_entropy_and_similarity <- function(
               query_spectrum = current_spectrum,
               target_spectrum = lib_spectrum,
               query_precursor = current_precursor,
-              target_precursor = lib_precursors_sub[[lib_idx]],
+              target_precursor = lib_precursors_sub[[pos_idx]],
               dalton = dalton,
               ppm = ppm
             )
@@ -313,6 +300,21 @@ calculate_entropy_and_similarity <- function(
       NULL
     }
   )
+
+  if (any(query_sanitized)) {
+    log_warn(
+      "Sanitized %d/%d query spectra on-demand before similarity scoring.",
+      sum(query_sanitized),
+      n_query
+    )
+  }
+  if (any(lib_sanitized)) {
+    log_warn(
+      "Sanitized %d/%d library spectra on-demand before similarity scoring.",
+      sum(lib_sanitized),
+      n_lib
+    )
+  }
 
   # Log progress summary
   log_info("Processed %d / %d queries", n_queries, n_queries)

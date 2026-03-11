@@ -74,8 +74,14 @@ summarize_results <- function(
     value = TRUE
   )
 
+  sop_with_tag <- structure_organism_pairs_table
+  if (!"tag" %in% names(sop_with_tag)) {
+    sop_with_tag <- sop_with_tag |>
+      tidytable::mutate(tag = NA_character_)
+  }
+
   # Pre-process organism taxonomy data
-  organism_lookup <- structure_organism_pairs_table |>
+  organism_lookup <- sop_with_tag |>
     tidytable::filter(
       structure_inchikey_connectivity_layer %in%
         df$candidate_structure_inchikey_connectivity_layer
@@ -132,7 +138,7 @@ summarize_results <- function(
     tidytable::ungroup()
 
   # Standalone tag lookup (inchikey <-> tag), independent from taxonomy matching
-  tag_lookup <- structure_organism_pairs_table |>
+  tag_lookup <- sop_with_tag |>
     tidytable::filter(
       structure_inchikey_connectivity_layer %in%
         df$candidate_structure_inchikey_connectivity_layer
