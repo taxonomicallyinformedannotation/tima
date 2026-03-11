@@ -25,12 +25,6 @@ select_sop_columns <- function(df) {
     return(df)
   }
 
-  # Ensure optional pipeline columns exist before strict selection
-  if (!"tag" %in% names(df)) {
-    df <- df |>
-      tidytable::mutate(tag = NA_character_)
-  }
-
   # Select and Rename Columns ----
   df |>
     tidytable::select(

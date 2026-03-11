@@ -61,7 +61,15 @@ summarize_results <- function(
     msg <- "Empty results table provided"
     warning(msg, call. = FALSE)
     log_warn(msg)
-    return(df)
+
+    if (!"candidate_structure_organism_occurrence_tag" %in% names(df)) {
+      df <- df |>
+        tidytable::mutate(
+          candidate_structure_organism_occurrence_tag = NA_character_
+        )
+    }
+
+    return(df[0, , drop = FALSE])
   }
 
   log_info("Summarizing annotation results")
@@ -78,6 +86,10 @@ summarize_results <- function(
   if (!"tag" %in% names(sop_with_tag)) {
     sop_with_tag <- sop_with_tag |>
       tidytable::mutate(tag = NA_character_)
+  }
+  if (!"reference_doi" %in% names(sop_with_tag)) {
+    sop_with_tag <- sop_with_tag |>
+      tidytable::mutate(reference_doi = NA_character_)
   }
 
   # Pre-process organism taxonomy data
@@ -175,7 +187,7 @@ summarize_results <- function(
     "score_final" = "score_weighted_chemo"
   )
 
-  final_select_cols <- c(
+  final_select_cols <- unique(c(
     model$features_columns,
     model$features_calculated_columns,
     model$components_columns,
@@ -187,9 +199,10 @@ summarize_results <- function(
     candidate_id_cols,
     model$rank_columns,
     model$score_columns,
+    "candidate_structure_organism_occurrence_tag",
     # TODO
     "annotation_note"
-  )
+  ))
 
   # Join smaller tables first, then select columns early
   # This reduces the amount of data carried through the pipeline
@@ -199,7 +212,22 @@ summarize_results <- function(
     tidytable::select(tidyselect::any_of(x = select_cols)) |>
     tidytable::distinct() |>
     tidytable::left_join(y = organism_lookup) |>
-    tidytable::left_join(y = tag_lookup) |>
+    tidytable::left_join(y = tag_lookup)
+
+  if (!"candidate_structure_organism_occurrence_tag" %in% names(df_joined)) {
+    df_joined <- df_joined |>
+      tidytable::mutate(
+        candidate_structure_organism_occurrence_tag = NA_character_
+      )
+  }
+
+  df_joined <- df_joined |>
+    tidytable::mutate(
+      candidate_structure_organism_occurrence_tag = tidytable::na_if(
+        trimws(candidate_structure_organism_occurrence_tag),
+        ""
+      )
+    ) |>
     tidytable::select(tidyselect::any_of(x = final_select_cols)) |>
     tidytable::arrange(rank_final)
 

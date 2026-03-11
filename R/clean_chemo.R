@@ -849,11 +849,11 @@ clean_chemo <- function(
   # Extract predicted taxonomy with scores (when NO inchikey - use predicted columns)
   df_pred_tax <- df_percentile |>
     tidytable::select(
-      tidytable::contains(match = c("feature_id", "feature_pred"))
+      tidyselect::contains(match = c("feature_id", "feature_pred"))
     ) |>
     tidytable::mutate(
       tidytable::across(
-        tidytable::contains(match = "score"),
+        tidyselect::contains(match = "score"),
         as.numeric
       )
     )
@@ -938,16 +938,19 @@ clean_chemo <- function(
     tidytable::left_join(
       y = df_filtered |>
         tidytable::select(
-          feature_id,
-          candidate_structure_name,
-          candidate_adduct,
-          candidate_structure_smiles_no_stereo,
-          candidate_structure_inchikey_connectivity_layer,
-          candidate_library,
-          candidate_structure_error_mz,
-          candidate_structure_error_rt,
-          candidate_structure_organism_occurrence_closest,
-          score_weighted_chemo
+          tidyselect::any_of(c(
+            "feature_id",
+            "candidate_structure_name",
+            "candidate_adduct",
+            "candidate_structure_smiles_no_stereo",
+            "candidate_structure_inchikey_connectivity_layer",
+            "candidate_library",
+            "candidate_structure_error_mz",
+            "candidate_structure_error_rt",
+            "candidate_structure_organism_occurrence_closest",
+            "candidate_structure_organism_occurrence_tag",
+            "score_weighted_chemo"
+          ))
         )
     ) |>
     tidytable::rename(
@@ -991,7 +994,7 @@ clean_chemo <- function(
       )
     ) |>
     tidytable::select(
-      tidytable::any_of(
+      tidyselect::any_of(
         x = c(
           "feature_id",
           "rt",
