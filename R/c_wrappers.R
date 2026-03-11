@@ -108,10 +108,11 @@ join_gnps_wrapper <- function(
 #' @param yPrecursorMz Numeric precursor m/z for target spectrum
 #' @param tolerance Numeric value specifying the absolute tolerance in Daltons
 #' @param ppm Numeric value specifying the relative tolerance in ppm
+#' @param matchedPeaksCount Logical flag; if `TRUE`, return both score and
+#'   matched-peak count, otherwise return score only.
 #'
-#' @return A numeric vector of length 2:
-#'   \item{\[1\]}{Numeric similarity score (0-1)}
-#'   \item{\[2\]}{Numeric count of matched peaks}
+#' @return A numeric vector of length 1 by default (score), or length 2 when
+#'   `matchedPeaksCount = TRUE` (`c(score, matched_peaks)`).
 #'
 #' @keywords internal
 #'
@@ -136,9 +137,10 @@ gnps_chain_dp_wrapper <- function(
   xPrecursorMz,
   yPrecursorMz,
   tolerance,
-  ppm
+  ppm,
+  matchedPeaksCount = FALSE
 ) {
-  .Call(
+  res <- .Call(
     C_gnps_chain_dp,
     x,
     y,
@@ -147,4 +149,6 @@ gnps_chain_dp_wrapper <- function(
     tolerance,
     ppm
   )
+
+  if (matchedPeaksCount) res else res[1L]
 }

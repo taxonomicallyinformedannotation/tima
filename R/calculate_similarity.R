@@ -119,7 +119,8 @@ calculate_similarity <- function(
         xPrecursorMz = query_precursor,
         yPrecursorMz = target_precursor,
         tolerance = dalton,
-        ppm = ppm
+        ppm = ppm,
+        matchedPeaksCount = TRUE
       ),
       error = function(e) {
         log_warn("GNPS computation failed: %s", e$message)

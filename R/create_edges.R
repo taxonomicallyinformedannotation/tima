@@ -170,7 +170,8 @@ create_edges <- function(
           q_pre,
           t_pre,
           ms2_tolerance,
-          ppm_tolerance
+          ppm_tolerance,
+          matchedPeaksCount = TRUE
         )
         sc <- res[1L]
         mp <- res[2L]

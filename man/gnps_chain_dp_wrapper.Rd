@@ -4,7 +4,15 @@
 \alias{gnps_chain_dp_wrapper}
 \title{Wrapper for the C function "gnps_chain_dp"}
 \usage{
-gnps_chain_dp_wrapper(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
+gnps_chain_dp_wrapper(
+  x,
+  y,
+  xPrecursorMz,
+  yPrecursorMz,
+  tolerance,
+  ppm,
+  matchedPeaksCount = FALSE
+)
 }
 \arguments{
 \item{x}{Numeric matrix with query spectrum peaks (mz, intensity).}
@@ -18,11 +26,13 @@ gnps_chain_dp_wrapper(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
 \item{tolerance}{Numeric value specifying the absolute tolerance in Daltons}
 
 \item{ppm}{Numeric value specifying the relative tolerance in ppm}
+
+\item{matchedPeaksCount}{Logical flag; if \code{TRUE}, return both score and
+matched-peak count, otherwise return score only.}
 }
 \value{
-A numeric vector of length 2:
-\item{[1]}{Numeric similarity score (0-1)}
-\item{[2]}{Numeric count of matched peaks}
+A numeric vector of length 1 by default (score), or length 2 when
+\code{matchedPeaksCount = TRUE} (\code{c(score, matched_peaks)}).
 }
 \description{
 Fused GNPS join + score in a single C call. Performs
