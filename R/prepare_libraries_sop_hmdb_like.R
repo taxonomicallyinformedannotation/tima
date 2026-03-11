@@ -148,27 +148,28 @@ prepare_libraries_sop_hmdb_like <- function(
 
 parse_hmdb_like_input <- function(input) {
   if (grepl("\\.zip$", input, ignore.case = TRUE)) {
-    sdf_entries <- archive::archive(input) |>
-      tidytable::as_tidytable() |>
-      tidytable::filter(grepl("\\.sdf$", path, ignore.case = TRUE)) |>
-      tidytable::pull(path)
+    archive_index <- archive::archive(input)
+    sdf_entries <- archive_index$path[grepl(
+      "\\.sdf$",
+      archive_index$path,
+      ignore.case = TRUE
+    )]
 
     if (length(sdf_entries) == 0L) {
       stop("No .sdf file found after unzip")
     }
 
-    return(purrr::map_dfr(
-      .x = sdf_entries,
-      .f = function(sdf_entry) {
-        con <- archive::archive_read(input, file = sdf_entry)
-        on.exit(close(con), add = TRUE)
-        parse_hmdb_like_sdf_lines(readLines(
-          con = con,
-          warn = FALSE,
-          encoding = "UTF-8"
-        ))
-      }
-    ))
+    parsed_tables <- lapply(sdf_entries, function(sdf_entry) {
+      con <- archive::archive_read(input, file = sdf_entry)
+      on.exit(close(con), add = TRUE)
+      parse_hmdb_like_sdf_lines(readLines(
+        con = con,
+        warn = FALSE,
+        encoding = "UTF-8"
+      ))
+    })
+
+    return(tidytable::bind_rows(parsed_tables))
   }
 
   if (grepl("\\.sdf$", input, ignore.case = TRUE)) {
@@ -219,18 +220,8 @@ parse_hmdb_like_sdf_lines <- function(sdf_lines) {
     DATABASE_NAME = "name"
   )
 
-  canonical_field <- function(field_name) {
-    mapped <- unname(field_map[toupper(field_name)])
-    if (length(mapped) == 0L) {
-      return(NA_character_)
-    }
-    mapped[[1L]]
-  }
-
-  n_records <- sum(trimws(sdf_lines) == "$$$$")
-  if (n_records == 0L) {
-    n_records <- 1L
-  }
+  record_end_idx <- which(sdf_lines == "$$$$")
+  n_records <- if (length(record_end_idx) == 0L) 1L else length(record_end_idx)
 
   out <- list(
     id = rep(NA_character_, n_records),
@@ -242,53 +233,56 @@ parse_hmdb_like_sdf_lines <- function(sdf_lines) {
     name = rep(NA_character_, n_records)
   )
 
-  rec_idx <- 1L
-  current_target <- NA_character_
+  header_match <- stringi::stri_match_first_regex(
+    str = sdf_lines,
+    pattern = "^>\\s*<([^>]+)>"
+  )
+  header_idx <- which(!is.na(header_match[, 2]))
 
-  for (line in sdf_lines) {
-    line_trim <- trimws(line)
-
-    if (identical(line_trim, "$$$$")) {
-      rec_idx <- rec_idx + 1L
-      if (rec_idx > n_records) {
-        break
-      }
-      current_target <- NA_character_
-      next
-    }
-
-    if (startsWith(line_trim, ">")) {
-      field_match <- stringi::stri_match_first_regex(
-        str = line_trim,
-        pattern = "^>\\s*<([^>]+)>"
-      )
-      if (!is.na(field_match[1, 2])) {
-        current_target <- canonical_field(field_match[1, 2])
-      } else {
-        current_target <- NA_character_
-      }
-      next
-    }
-
-    if (
-      !is.na(current_target) &&
-        nzchar(line_trim) &&
-        is.na(out[[current_target]][rec_idx])
-    ) {
-      out[[current_target]][rec_idx] <- line_trim
-      current_target <- NA_character_
-    }
+  if (length(header_idx) == 0L) {
+    return(tidytable::as_tidytable(out))
   }
 
-  tidytable::tidytable(
-    id = out$id,
-    smiles = out$smiles,
-    inchikey = out$inchikey,
-    formula = out$formula,
-    mass = out$mass,
-    logp = out$logp,
-    name = out$name
-  )
+  header_fields <- toupper(trimws(header_match[header_idx, 2]))
+  canonical_fields <- unname(field_map[header_fields])
+  keep_idx <- which(!is.na(canonical_fields))
+
+  if (length(keep_idx) == 0L) {
+    return(tidytable::as_tidytable(out))
+  }
+
+  header_idx <- header_idx[keep_idx]
+  canonical_fields <- canonical_fields[keep_idx]
+
+  value_idx <- pmin(header_idx + 1L, length(sdf_lines))
+  values <- trimws(sdf_lines[value_idx])
+  valid_values <- nzchar(values) & values != "$$$$"
+
+  if (!all(valid_values)) {
+    header_idx <- header_idx[valid_values]
+    canonical_fields <- canonical_fields[valid_values]
+    values <- values[valid_values]
+  }
+
+  if (length(values) == 0L) {
+    return(tidytable::as_tidytable(out))
+  }
+
+  record_ids <- if (length(record_end_idx) == 0L) {
+    rep.int(1L, length(header_idx))
+  } else {
+    findInterval(header_idx, record_end_idx) + 1L
+  }
+
+  for (field_name in unique(canonical_fields)) {
+    field_pos <- which(canonical_fields == field_name)
+    field_records <- record_ids[field_pos]
+    first_occurrence <- !duplicated(field_records)
+    out[[field_name]][field_records[first_occurrence]] <-
+      values[field_pos[first_occurrence]]
+  }
+
+  tidytable::as_tidytable(out)
 }
 
 extract_hmdb_like_sdf_fields <- function(record_lines) {

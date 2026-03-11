@@ -144,8 +144,7 @@ files:
         # exposome_explorer: data/source/libraries/sop/exposome_explorer/structures.zip
 
         #' SMPDB structure organism pairs library. STRING
-        # TODO don't know what to do with it for now
-        # smpdb: data/source/libraries/sop/smpdb/structures.zip
+        smpdb: data/source/libraries/sop/smpdb/structures.zip
 
         #' MiMeDB structure organism pairs library. STRING
         mimedb: data/source/libraries/sop/mimedb/structures.zip
@@ -216,8 +215,7 @@ files:
         # exposome_explorer: data/interim/libraries/sop/exposome_explorer_prepared.tsv.gz
 
         #' SMPDB prepared structure organism pairs library. STRING
-        # TODO don't know what to do with it for now
-        # smpdb: data/interim/libraries/sop/smpdb_prepared.tsv.gz
+        smpdb: data/interim/libraries/sop/smpdb_prepared.tsv.gz
 
         #' MiMeDB prepared structure organism pairs library. STRING
         mimedb: data/interim/libraries/sop/mimedb_prepared.tsv.gz
