@@ -1305,8 +1305,7 @@ list(
               mcdb = "milk",
               # TODO too different format for now
               # exposome_explorer = "exposome",
-              # TODO don't know what to do with it for now
-              # smpdb = "pathway",
+              smpdb = "pathway",
               mimedb = "microbiome",
               t3db = "toxin",
               bovinedb = NA_character_,
@@ -1328,8 +1327,7 @@ list(
               # TODO too different format for now
               # exposome_explorer = "Homo sapiens",
               # TODO safest for now...
-              # TODO don't know what to do with it for now
-              # smpdb = NA_character_,
+              smpdb = NA_character_,
               mimedb = NA_character_,
               t3db = NA_character_,
               bovinedb = "Bos taurus",
@@ -1391,7 +1389,7 @@ list(
               # exposome_explorer = "Homo sapiens",
               # TODO safest for now...
               # TODO don't know what to do with it for now
-              # smpdb = empty_list,
+              smpdb = empty_list,
               mimedb = empty_list,
               t3db = empty_list,
               bovinedb = cow_list,

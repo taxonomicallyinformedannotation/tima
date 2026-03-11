@@ -29,8 +29,7 @@ data:
         mcdb: data/interim/libraries/sop/mcdb_prepared.tsv.gz
         # TODO too different format for now
         # exposome_explorer: data/interim/libraries/sop/exposome_explorer_prepared.tsv.gz
-        # TODO don't know what to do with it for now
-        # smpdb: data/interim/libraries/sop/smpdb_prepared.tsv.gz
+        smpdb: data/interim/libraries/sop/smpdb_prepared.tsv.gz
         # TODO can contain improved tags
         mimedb: data/interim/libraries/sop/mimedb_prepared.tsv.gz
         t3db: data/interim/libraries/sop/t3db_prepared.tsv.gz
@@ -127,8 +126,7 @@ data:
         mcdb: data/source/libraries/sop/mcdb/structures.zip
         # TODO too different format for now
         # exposome_explorer: data/source/libraries/sop/exposome_explorer/structures.zip
-        # TODO don't know what to do with it for now
-        # smpdb: data/source/libraries/sop/smpdb/structures.zip
+        smpdb: data/source/libraries/sop/smpdb/structures.zip
         # TODO can contain improved tags
         mimedb: data/source/libraries/sop/mimedb/structures.zip
         t3db: data/source/libraries/sop/t3db/structures.zip
@@ -270,8 +268,7 @@ urls:
     mcdb: https://mcdb.ca/system/downloads/current/milk_metabolites_structures.zip
     # TODO too different format for now
     # exposome_explorer: http://exposome-explorer.iarc.fr/downloads
-    # TODO don't know what to do with it for now
-    # smpdb: https://smpdb.ca/downloads/smpdb_structures.zip
+    smpdb: https://smpdb.ca/downloads/smpdb_structures.zip
     # TODO can contain improved tags
     mimedb: https://mimedb.org/system/downloads/2.0/mimedb.sdf.zip
     t3db: https://t3db.ca/system/downloads/current/structures.zip
