@@ -221,7 +221,7 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 #' dir <- paste0(github, repo)
-#' annotations <- get_params(step = "filter_annotations")$files$annotations$prepared$structural[[2]] |>
+#' annotations <- get_params(step = "filter_annotations")$files$annotations$prepared$structural[[2L]] |>
 #'   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
 #' features <- get_params(step = "filter_annotations")$files$features$prepared |>
 #'   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
@@ -402,10 +402,10 @@ filter_annotations <- function(
     parameters = get_params(step = "filter_annotations"),
     step = "filter_annotations"
   )
-  export_output(x = final_table, file = output[[1]])
+  export_output(x = final_table, file = output[[1L]])
 
   log_complete(ctx, n_filtered = nrow(final_table))
 
   rm(final_table)
-  return(output[[1]])
+  return(output[[1L]])
 }

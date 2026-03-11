@@ -356,6 +356,9 @@ test_that("add_xrefs_to_annotations matches on 14-char inchikey connectivity lay
 
   result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
 
-  expect_identical(result$full$candidate_structure_id_wikidata[[1]], "Q123")
-  expect_identical(result$filtered$candidate_structure_id_wikidata[[1]], "Q123")
+  expect_identical(result$full$candidate_structure_id_wikidata[[1L]], "Q123")
+  expect_identical(
+    result$filtered$candidate_structure_id_wikidata[[1L]],
+    "Q123"
+  )
 })

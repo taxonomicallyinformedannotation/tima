@@ -269,10 +269,10 @@ create_edges_spectra <- function(
   )
 
   n_edges <- nrow(edges)
-  export_output(x = edges, file = output[[1]])
+  export_output(x = edges, file = output[[1L]])
   rm(edges)
 
   log_complete(ctx, n_edges = n_edges)
 
-  return(output[[1]])
+  return(output[[1L]])
 }

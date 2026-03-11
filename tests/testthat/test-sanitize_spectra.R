@@ -108,7 +108,7 @@ test_that("sanitize_spectra applies intensity cutoff", {
   result <- sanitize_spectra(spectra, cutoff = 10)
 
   # Should remove peak with intensity 5
-  result_peaks <- Spectra::peaksData(object = result)[[1]]
+  result_peaks <- Spectra::peaksData(object = result)[[1L]]
   expect_true(all(result_peaks[, "mz"] >= 200))
 })
 
@@ -168,7 +168,7 @@ test_that("sanitize_spectra handles precursor peak removal", {
   spectra@backend@peaksData <- list(peaks)
   result <- sanitize_spectra(spectra, dalton = 0.01, ppm = 10)
 
-  result_peaks <- Spectra::peaksData(object = result)[[1]]
+  result_peaks <- Spectra::peaksData(object = result)[[1L]]
   # Should have multiple peaks remaining
   expect_true(nrow(result_peaks) >= 3)
 })
@@ -194,7 +194,7 @@ test_that("sanitize_spectra removes spectra with NaN values", {
 
   # Spectrum with NaN should be removed
   expect_equal(length(result), 1)
-  expect_true(all(!is.nan(Spectra::peaksData(object = result)[[1]])))
+  expect_true(all(!is.nan(Spectra::peaksData(object = result)[[1L]])))
 })
 
 test_that("sanitize_spectra handles NULL peaks gracefully", {
@@ -239,7 +239,7 @@ test_that("sanitize_spectra combines similar peaks", {
 
   result <- sanitize_spectra(spectra, dalton = 0.01, ppm = 100)
 
-  result_peaks <- Spectra::peaksData(object = result)[[1]]
+  result_peaks <- Spectra::peaksData(object = result)[[1L]]
 
   # Peaks at 100.000 and 100.005 should be combined
   expect_lt(nrow(result_peaks), nrow(peaks))
@@ -249,7 +249,7 @@ test_that("sanitize_spectra scales peak intensities", {
   spectra <- create_test_spectra_object(n_spectra = 1, n_peaks = 5)
   result <- sanitize_spectra(spectra)
 
-  result_peaks <- Spectra::peaksData(object = result)[[1]]
+  result_peaks <- Spectra::peaksData(object = result)[[1L]]
   max_intensity <- max(result_peaks[, "intensity"])
 
   # After scaling, max intensity should be normalized

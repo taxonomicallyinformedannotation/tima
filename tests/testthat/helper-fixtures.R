@@ -41,7 +41,7 @@ resolve_fixture_path <- function(filename, missing_msg = NULL) {
   candidates <- file.path(fixture_roots(), filename)
   existing <- candidates[file.exists(candidates)]
   if (length(existing) > 0L) {
-    return(existing[[1]])
+    return(existing[[1L]])
   }
   if (is.null(missing_msg)) {
     missing_msg <- sprintf(

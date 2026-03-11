@@ -104,6 +104,7 @@ columns_model <- function() {
     # "candidate_structure_tax_npc",
     "candidate_structure_organism_occurrence_closest",
     "candidate_structure_organism_occurrence_reference",
+    "candidate_structure_organism_occurrence_tag",
     "candidate_structure_error_mz",
     "candidate_structure_error_rt"
   )
@@ -289,6 +290,7 @@ fake_annotations_columns <- function() {
     candidate_structure_tax_cla_02sup = NA_character_,
     candidate_structure_tax_cla_03cla = NA_character_,
     candidate_structure_tax_cla_04dirpar = NA_character_,
+    candidate_structure_organism_occurrence_tag = NA_character_,
     stringsAsFactors = FALSE
   )
 }
@@ -345,6 +347,7 @@ fake_sop_columns <- function() {
     organism_taxonomy_08genus = NA_character_,
     organism_taxonomy_09species = NA_character_,
     organism_taxonomy_10varietas = NA_character_,
-    reference_doi = NA_character_
+    reference_doi = NA_character_,
+    tag = NA_character_
   )
 }

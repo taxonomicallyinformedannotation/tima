@@ -150,7 +150,7 @@ prepare_annotations_mzmine <- function(
     parameters = get_params(step = "prepare_annotations_mzmine"),
     step = "prepare_annotations_mzmine"
   )
-  export_output(x = table, file = output[[1]])
+  export_output(x = table, file = output[[1L]])
   rm(table)
-  return(output[[1]])
+  return(output[[1L]])
 }

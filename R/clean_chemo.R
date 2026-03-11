@@ -1006,6 +1006,7 @@ clean_chemo <- function(
           "error_mz",
           "error_rt",
           "organism_closest",
+          "tag" = "candidate_structure_organism_occurrence_tag",
           "score",
           "candidates_evaluated",
           "candidates_best",

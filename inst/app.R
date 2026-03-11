@@ -1920,32 +1920,32 @@ ui <- shiny::fluidPage(
   lib_tmp_exp_csv <- shiny::isolate(input$lib_tmp_exp_csv)
   lib_tmp_is_csv <- shiny::isolate(input$lib_tmp_is_csv)
 
-  prefil_fea_raw_1 <- file.path(paths_data_source, prefil_fea_raw[[1]])
-  prefil_spe_raw_1 <- file.path(paths_data_source, prefil_spe_raw[[1]])
+  prefil_fea_raw_1 <- file.path(paths_data_source, prefil_fea_raw[[1L]])
+  prefil_spe_raw_1 <- file.path(paths_data_source, prefil_spe_raw[[1L]])
   if (!is.null(prefil_met_raw)) {
-    prefil_met_raw_1 <- file.path(paths_data_source, prefil_met_raw[[1]])
+    prefil_met_raw_1 <- file.path(paths_data_source, prefil_met_raw[[1L]])
   }
   if (!is.null(prefil_mzm_raw)) {
     prefil_mzm_raw_1 <- file.path(
       paths_data_interim_annotations,
-      prefil_mzm_raw[[1]]
+      prefil_mzm_raw[[1L]]
     )
   }
   if (!is.null(prefil_sir_raw)) {
     prefil_sir_raw_1 <-
-      file.path(paths_data_interim_annotations, prefil_sir_raw[[1]])
+      file.path(paths_data_interim_annotations, prefil_sir_raw[[1L]])
   }
 
   if (!file.exists(prefil_fea_raw_1)) {
     fs::file_copy(
-      path = prefil_fea_raw[[4]],
+      path = prefil_fea_raw[[4L]],
       new_path = file.path(prefil_fea_raw_1),
       overwrite = TRUE
     )
   }
   if (!file.exists(prefil_spe_raw_1)) {
     fs::file_copy(
-      path = prefil_spe_raw[[4]],
+      path = prefil_spe_raw[[4L]],
       new_path = file.path(prefil_spe_raw_1),
       overwrite = TRUE
     )
@@ -1953,7 +1953,7 @@ ui <- shiny::fluidPage(
   if (!is.null(prefil_met_raw)) {
     if (!file.exists(prefil_met_raw_1)) {
       fs::file_copy(
-        path = prefil_met_raw[[4]],
+        path = prefil_met_raw[[4L]],
         new_path = file.path(prefil_met_raw_1),
         overwrite = TRUE
       )
@@ -1966,7 +1966,7 @@ ui <- shiny::fluidPage(
       ## safety
       tima:::create_dir(paths_data_interim_annotations)
       fs::file_copy(
-        path = prefil_mzm_raw[[4]],
+        path = prefil_mzm_raw[[4L]],
         new_path = file.path(prefil_mzm_raw_1),
         overwrite = TRUE
       )
@@ -1979,7 +1979,7 @@ ui <- shiny::fluidPage(
       ## safety
       tima:::create_dir(paths_data_interim_annotations)
       fs::file_copy(
-        path = prefil_sir_raw[[4]],
+        path = prefil_sir_raw[[4L]],
         new_path = file.path(prefil_sir_raw_1),
         overwrite = TRUE
       )
@@ -1990,7 +1990,7 @@ ui <- shiny::fluidPage(
   if (!is.null(lib_tmp_exp_csv)) {
     if (!file.exists(lib_tmp_exp_csv)) {
       fs::file_copy(
-        path = lib_tmp_exp_csv[[4]],
+        path = lib_tmp_exp_csv[[4L]],
         new_path = file.path(lib_tmp_exp_csv),
         overwrite = TRUE
       )
@@ -2001,7 +2001,7 @@ ui <- shiny::fluidPage(
   if (!is.null(lib_tmp_is_csv)) {
     if (!file.exists(lib_tmp_is_csv)) {
       fs::file_copy(
-        path = lib_tmp_is_csv[[4]],
+        path = lib_tmp_is_csv[[4L]],
         new_path = file.path(lib_tmp_is_csv),
         overwrite = TRUE
       )

@@ -5,7 +5,6 @@
 \title{Validate Inputs for prepare_libraries_sop_merged}
 \usage{
 validate_sop_merged_inputs(
-  files,
   filter,
   level,
   value,
