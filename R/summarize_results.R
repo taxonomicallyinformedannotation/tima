@@ -131,6 +131,23 @@ summarize_results <- function(
     ) |>
     tidytable::ungroup()
 
+  # Standalone tag lookup (inchikey <-> tag), independent from taxonomy matching
+  tag_lookup <- structure_organism_pairs_table |>
+    tidytable::filter(
+      structure_inchikey_connectivity_layer %in%
+        df$candidate_structure_inchikey_connectivity_layer
+    ) |>
+    tidytable::select(
+      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
+      tidyselect::any_of("tag")
+    ) |>
+    tidytable::mutate(tag = tidytable::na_if(trimws(tag), "")) |>
+    tidytable::distinct() |>
+    tidytable::group_by(candidate_structure_inchikey_connectivity_layer) |>
+    clean_collapse(cols = c("tag")) |>
+    tidytable::ungroup() |>
+    tidytable::rename(candidate_structure_organism_occurrence_tag = tag)
+
   # Define columns to select
   select_cols <- c(
     "feature_id",
@@ -176,6 +193,7 @@ summarize_results <- function(
     tidytable::select(tidyselect::any_of(x = select_cols)) |>
     tidytable::distinct() |>
     tidytable::left_join(y = organism_lookup) |>
+    tidytable::left_join(y = tag_lookup) |>
     tidytable::select(tidyselect::any_of(x = final_select_cols)) |>
     tidytable::arrange(rank_final)
 
@@ -188,7 +206,7 @@ summarize_results <- function(
       )
   }
 
-  rm(df, organism_lookup)
+  rm(df, organism_lookup, tag_lookup)
   # gc()
 
   # Remove ties if requested
@@ -324,7 +342,10 @@ summarize_results <- function(
       # Try to sort numerically if possible, otherwise alphabetically
       suppressWarnings(as.numeric(feature_id))
     ) |>
-    tidytable::select(tidyselect::where(fn = ~ any(!is.na(.))))
+    tidytable::select(
+      tidyselect::where(fn = ~ any(!is.na(.))) |
+        tidyselect::any_of("candidate_structure_organism_occurrence_tag")
+    )
 
   rm(df_processed)
 

@@ -15,6 +15,42 @@ files:
         gnps: data/interim/libraries/sop/gnps_11566051_prepared.tsv.gz
         #' HMDB prepared structure organism pairs library. STRING
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
+        #' CSF Metabolome prepared structure organism pairs library. STRING
+        csfmetabolome: data/interim/libraries/sop/csfmetabolome_prepared.tsv.gz
+        #' Fecal Metabolome prepared structure organism pairs library. STRING
+        fecalmetabolome: data/interim/libraries/sop/fecalmetabolome_prepared.tsv.gz
+        #' Saliva Metabolome prepared structure organism pairs library. STRING
+        salivametabolome: data/interim/libraries/sop/salivametabolome_prepared.tsv.gz
+        #' Serum Metabolome prepared structure organism pairs library. STRING
+        serummetabolome: data/interim/libraries/sop/serummetabolome_prepared.tsv.gz
+        #' Sweat Metabolome prepared structure organism pairs library. STRING
+        sweatmetabolome: data/interim/libraries/sop/sweatmetabolome_prepared.tsv.gz
+        #' Urine Metabolome prepared structure organism pairs library. STRING
+        urinemetabolome: data/interim/libraries/sop/urinemetabolome_prepared.tsv.gz
+        #' MCDB prepared structure organism pairs library. STRING
+        mcdb: data/interim/libraries/sop/mcdb_prepared.tsv.gz
+        #' Exposome Explorer prepared structure organism pairs library. STRING
+        # TODO too different format for now
+        # exposome_explorer: data/interim/libraries/sop/exposome_explorer_prepared.tsv.gz
+        #' SMPDB prepared structure organism pairs library. STRING
+        # TODO don't know what to do with it for now
+        # smpdb: data/interim/libraries/sop/smpdb_prepared.tsv.gz
+        #' MiMeDB prepared structure organism pairs library. STRING
+        mimedb: data/interim/libraries/sop/mimedb_prepared.tsv.gz
+        #' T3DB prepared structure organism pairs library. STRING
+        t3db: data/interim/libraries/sop/t3db_prepared.tsv.gz
+        #' BovineDB prepared structure organism pairs library. STRING
+        bovinedb: data/interim/libraries/sop/bovinedb_prepared.tsv.gz
+        #' ContaminantDB prepared structure organism pairs library. STRING
+        # TODO too different format for now
+        # contaminantdb: data/interim/libraries/sop/contaminantdb_prepared.tsv.gz
+        #' MarkerDB prepared structure organism pairs library. STRING
+        # TODO too different format for now
+        # markerdb: data/interim/libraries/sop/markerdb_prepared.tsv.gz
+        #' YMDB prepared structure organism pairs library. STRING
+        ymdb: data/interim/libraries/sop/ymdb_prepared.tsv.gz
+        #' Cannabis Database prepared structure organism pairs library. STRING
+        cannabisdatabase: data/interim/libraries/sop/cannabisdatabase_prepared.tsv.gz
         #' Lotus prepared structure organism pairs library. STRING
         lotus: data/interim/libraries/sop/lotus_prepared.tsv.gz
         #' RT prepared structure organism pairs library. STRING

@@ -38,11 +38,11 @@ test_that("read_mgf_opti reads minimal mgf", {
   expect_equal(nrow(res), 1L)
   expect_true("mz" %in% colnames(res))
   expect_true("intensity" %in% colnames(res))
-  expect_equal(as.numeric(unlist(res$mz[[1]])), c(100, 101))
-  expect_equal(as.numeric(unlist(res$intensity[[1]])), c(10, 20))
+  expect_equal(as.numeric(unlist(res$mz[[1L]])), c(100, 101))
+  expect_equal(as.numeric(unlist(res$intensity[[1L]])), c(10, 20))
   # CHARGE formatting
   if ("CHARGE" %in% colnames(res)) {
-    expect_equal(as.character(res$CHARGE[[1]]), "2")
+    expect_equal(as.character(res$CHARGE[[1L]]), "2")
   }
   expect_true(all(res$msLevel == 2L))
 })

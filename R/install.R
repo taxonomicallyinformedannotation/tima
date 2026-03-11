@@ -227,7 +227,7 @@ verify_package_installation <- function(package) {
   }
 
   # Prefer the first good match
-  pkg_path <- valid_paths[[1]]
+  pkg_path <- valid_paths[[1L]]
   desc_file <- file.path(pkg_path, "DESCRIPTION")
 
   # 4. Try reading DESCRIPTION robustly

@@ -562,11 +562,11 @@ test_that("weight_bio gives maximum score (1.0) to Biota domain candidates", {
   )
 
   # Biota candidates should get maximum biological score
-  expect_equal(result$score_biological[[1]], 1.007276)
+  expect_equal(result$score_biological[[1L]], 1.007276)
 
   # Closest occurrence should be "Biota"
   expect_equal(
-    result$candidate_structure_organism_occurrence_closest[[1]],
+    result$candidate_structure_organism_occurrence_closest[[1L]],
     "Biota"
   )
 })
@@ -618,7 +618,7 @@ test_that("Biota domain overrides taxonomic mismatch", {
   )
 
   # Should still get max score despite being from different domain
-  expect_equal(result$score_biological[[1]], 1.007276)
+  expect_equal(result$score_biological[[1L]], 1.007276)
 })
 
 test_that("Biota takes precedence over exact species match", {
@@ -774,9 +774,9 @@ test_that("Biota works with empty taxonomic levels", {
   )
 
   # Should work even with all NA taxonomic levels
-  expect_equal(result$score_biological[[1]], 1.007276)
+  expect_equal(result$score_biological[[1L]], 1.007276)
   expect_equal(
-    result$candidate_structure_organism_occurrence_closest[[1]],
+    result$candidate_structure_organism_occurrence_closest[[1L]],
     "Biota"
   )
 })

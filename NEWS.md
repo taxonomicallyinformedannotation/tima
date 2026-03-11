@@ -6,6 +6,7 @@
 * Added [BiGG](http://bigg.ucsd.edu/) as SOP library
 * Added basic isotopologues handling
 * Added external identifiers to the final results (#142)
+* Added multiple new sub-libraries and a new `tag` column
 * Added mzmine annotation support
 * Added special "Biota" superdomain handling for shared core metabolism
 * Enhanced `sanitize_spectra()` with adaptive noise filtering:

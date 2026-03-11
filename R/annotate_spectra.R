@@ -288,7 +288,7 @@ resolve_annotation_output <- function(output) {
   if (length(output) == 0L) {
     stop("Output must contain at least one file path", call. = FALSE)
   }
-  output[[1]]
+  output[[1L]]
 }
 
 #' @keywords internal

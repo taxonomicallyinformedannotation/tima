@@ -20,6 +20,28 @@ data:
         gnps: data/interim/libraries/sop/gnps_11566051_prepared.tsv.gz
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
         hmdb_minimal: data/interim/libraries/sop/hmdb_minimal.tsv.gz
+        csfmetabolome: data/interim/libraries/sop/csfmetabolome_prepared.tsv.gz
+        fecalmetabolome: data/interim/libraries/sop/fecalmetabolome_prepared.tsv.gz
+        salivametabolome: data/interim/libraries/sop/salivametabolome_prepared.tsv.gz
+        serummetabolome: data/interim/libraries/sop/serummetabolome_prepared.tsv.gz
+        sweatmetabolome: data/interim/libraries/sop/sweatmetabolome_prepared.tsv.gz
+        urinemetabolome: data/interim/libraries/sop/urinemetabolome_prepared.tsv.gz
+        mcdb: data/interim/libraries/sop/mcdb_prepared.tsv.gz
+        # TODO too different format for now
+        # exposome_explorer: data/interim/libraries/sop/exposome_explorer_prepared.tsv.gz
+        # TODO don't know what to do with it for now
+        # smpdb: data/interim/libraries/sop/smpdb_prepared.tsv.gz
+        # TODO can contain improved tags
+        mimedb: data/interim/libraries/sop/mimedb_prepared.tsv.gz
+        t3db: data/interim/libraries/sop/t3db_prepared.tsv.gz
+        # TODO can contain improved tags
+        bovinedb: data/interim/libraries/sop/bovinedb_prepared.tsv.gz
+        # TODO "Downloads will be available after official publication"
+        # contaminantdb: data/interim/libraries/sop/contaminantdb_prepared.tsv.gz
+        # TODO too different format for now
+        # markerdb: data/interim/libraries/sop/markerdb_prepared.tsv.gz
+        ymdb: data/interim/libraries/sop/ymdb_prepared.tsv.gz
+        cannabisdatabase: data/interim/libraries/sop/cannabisdatabase_prepared.tsv.gz
         lotus: data/interim/libraries/sop/lotus_prepared.tsv.gz
         massbank: data/interim/libraries/sop/massbank_202510_prepared.tsv.gz
         merlin: data/interim/libraries/sop/merlin_16984129_prepared.tsv.gz
@@ -96,6 +118,28 @@ data:
         closed: ../lotus-processor/data/processed/230224_closed_metadata.csv.gz
         ecmdb: data/source/libraries/sop/ecmdb.json.zip
         hmdb: data/source/libraries/sop/hmdb/structures.zip
+        csfmetabolome: data/source/libraries/sop/csfmetabolome/structures.zip
+        fecalmetabolome: data/source/libraries/sop/fecalmetabolome/structures.zip
+        salivametabolome: data/source/libraries/sop/salivametabolome/structures.zip
+        serummetabolome: data/source/libraries/sop/serummetabolome/structures.zip
+        sweatmetabolome: data/source/libraries/sop/sweatmetabolome/structures.zip
+        urinemetabolome: data/source/libraries/sop/urinemetabolome/structures.zip
+        mcdb: data/source/libraries/sop/mcdb/structures.zip
+        # TODO too different format for now
+        # exposome_explorer: data/source/libraries/sop/exposome_explorer/structures.zip
+        # TODO don't know what to do with it for now
+        # smpdb: data/source/libraries/sop/smpdb/structures.zip
+        # TODO can contain improved tags
+        mimedb: data/source/libraries/sop/mimedb/structures.zip
+        t3db: data/source/libraries/sop/t3db/structures.zip
+        # TODO can contain improved tags
+        bovinedb: data/source/libraries/sop/bovinedb/structures.zip
+        # TODO "Downloads will be available after official publication"
+        # contaminantdb: data/source/libraries/sop/contaminantdb/structures.zip
+        # TODO too different format for now
+        # markerdb: data/source/libraries/sop/markerdb/structures.zip
+        ymdb: data/source/libraries/sop/ymdb/structures.zip
+        cannabisdatabase: data/source/libraries/sop/cannabisdatabase/compounds.sdf
         lotus: data/source/libraries/sop/lotus.csv.gz
       spectra:
         path: data/source/libraries/spectra
@@ -216,6 +260,29 @@ urls:
     spectra:
       predicted: https://hmdb.ca/system/downloads/current/spectral_data/spectra_xml/hmdb_predicted_msms_spectra.zip
     structures: https://hmdb.ca/system/downloads/current/structures.zip
+  hmdb_family:
+    csfmetabolome: https://www.csfmetabolome.ca/system/downloads/current/csf_metabolites_structures.zip
+    fecalmetabolome: https://www.fecalmetabolome.ca/system/downloads/current/feces_metabolites_structures.zip
+    salivametabolome: https://www.salivametabolome.ca/system/downloads/current/saliva_metabolites_structures.zip
+    serummetabolome: https://www.serummetabolome.ca/system/downloads/current/serum_metabolites_structures.zip
+    sweatmetabolome: https://www.sweatmetabolome.ca/system/downloads/current/sweat_metabolites_structures.zip
+    urinemetabolome: https://www.urinemetabolome.ca/system/downloads/current/urine_metabolites_structures.zip
+    mcdb: https://mcdb.ca/system/downloads/current/milk_metabolites_structures.zip
+    # TODO too different format for now
+    # exposome_explorer: http://exposome-explorer.iarc.fr/downloads
+    # TODO don't know what to do with it for now
+    # smpdb: https://smpdb.ca/downloads/smpdb_structures.zip
+    # TODO can contain improved tags
+    mimedb: https://mimedb.org/system/downloads/2.0/mimedb.sdf.zip
+    t3db: https://t3db.ca/system/downloads/current/structures.zip
+    # TODO can contain improved tags
+    bovinedb: https://bovinedb.ca/system/downloads/current/structures.zip
+    # TODO "Downloads will be available after official publication"
+    # contaminantdb: https://contaminantdb.ca/contaminants
+    # TODO too different format for now
+    # markerdb: https://markerdb.ca/downloads
+    ymdb: https://www.ymdb.ca/system/downloads/current/ymdb.sdf.zip
+    cannabisdatabase: https://cannabisdatabase.ca/simple/download_compound_as_sdf
   lotus:
     doi: 10.5281/zenodo.5794106
     pattern: frozen_metadata.csv.gz

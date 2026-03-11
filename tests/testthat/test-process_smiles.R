@@ -65,8 +65,8 @@ test_that("process_smiles correctly processes isotope notation [13C]", {
   expect_true(all(!is.na(result$structure_exact_mass)))
 
   if (nrow(result) >= 2) {
-    mass_natural <- result$structure_exact_mass[[1]]
-    mass_isotope <- result$structure_exact_mass[[2]]
+    mass_natural <- result$structure_exact_mass[[1L]]
+    mass_isotope <- result$structure_exact_mass[[2L]]
 
     # The 13C version should be heavier by approximately 1.0034 Da
     mass_diff <- mass_isotope - mass_natural
@@ -100,8 +100,8 @@ test_that("process_smiles handles multiple isotopes [13C]", {
     process_smiles()
 
   if (nrow(result) >= 2) {
-    mass_natural <- result$structure_exact_mass[[1]]
-    mass_labeled <- result$structure_exact_mass[[2]]
+    mass_natural <- result$structure_exact_mass[[1L]]
+    mass_labeled <- result$structure_exact_mass[[2L]]
     mass_diff <- mass_labeled - mass_natural
 
     # For 4 13C substitutions, expect ~4.0134 Da difference
@@ -180,8 +180,8 @@ test_that("process_smiles handles 18O isotope with correct mass shift", {
 
   # If both molecules processed, check mass difference
   if (nrow(result) >= 2) {
-    mass_natural <- result$structure_exact_mass[[1]]
-    mass_labeled <- result$structure_exact_mass[[2]]
+    mass_natural <- result$structure_exact_mass[[1L]]
+    mass_labeled <- result$structure_exact_mass[[2L]]
     mass_diff <- mass_labeled - mass_natural
 
     # 18O shift ≈ 2.0043 Da
@@ -215,8 +215,8 @@ test_that("process_smiles handles deuterium [2H] notation", {
 
   # If both molecules processed, check mass difference
   if (nrow(result) >= 2) {
-    mass_natural <- result$structure_exact_mass[[1]]
-    mass_deuterated <- result$structure_exact_mass[[2]]
+    mass_natural <- result$structure_exact_mass[[1L]]
+    mass_deuterated <- result$structure_exact_mass[[2L]]
     mass_diff <- mass_deuterated - mass_natural
 
     # 4× deuterium ≈ 4 × 1.0078 = 4.0312 Da
@@ -245,7 +245,7 @@ test_that("process_smiles correctly generates formulas with isotopes", {
   expect_true("structure_molecular_formula" %in% colnames(result))
 
   if (nrow(result) > 0) {
-    formula <- result$structure_molecular_formula[[1]]
+    formula <- result$structure_molecular_formula[[1L]]
     # Formula should reflect isotopes (e.g., C6H12O6 or C5[13C]H12O6)
     expect_true(is.character(formula) && nchar(formula) > 0)
   }
@@ -290,7 +290,7 @@ test_that("process_smiles preserves [13C] in canonical SMILES after standardizat
   expect_equal(nrow(result), 2L)
 
   # Labeled SMILES should contain [13C] notation (preserved through standardization)
-  labeled_smiles <- result$structure_smiles[[2]]
+  labeled_smiles <- result$structure_smiles[[2L]]
   expect_match(
     labeled_smiles,
     "\\[13C",
@@ -310,8 +310,8 @@ test_that("process_smiles mass calculation reflects isotope composition", {
 
   result <- process_smiles(input, cache = NULL)
 
-  mass_natural <- result$structure_exact_mass[[1]]
-  mass_labeled <- result$structure_exact_mass[[2]]
+  mass_natural <- result$structure_exact_mass[[1L]]
+  mass_labeled <- result$structure_exact_mass[[2L]]
   mass_diff <- mass_labeled - mass_natural
 
   # RDKit automatically uses isotope atomic masses
@@ -333,7 +333,7 @@ test_that("process_smiles formula shows isotopes in separated format", {
 
   result <- process_smiles(input, cache = NULL)
 
-  formula <- result$structure_molecular_formula[[1]]
+  formula <- result$structure_molecular_formula[[1L]]
 
   # Formula should show isotopes (e.g., C2[13C]4H12O6 or similar format)
   expect_true(
@@ -361,8 +361,8 @@ test_that("process_smiles InChIKey differs for isotope-labeled compounds", {
 
   result <- process_smiles(input, cache = NULL)
 
-  inchikey_natural <- result$structure_inchikey[[1]]
-  inchikey_labeled <- result$structure_inchikey[[2]]
+  inchikey_natural <- result$structure_inchikey[[1L]]
+  inchikey_labeled <- result$structure_inchikey[[2L]]
 
   # Both should be non-empty
   expect_true(
@@ -396,8 +396,8 @@ test_that("process_smiles handles multiple different isotope types", {
 
   # If both molecules processed, check that masses differ
   if (nrow(result) >= 2) {
-    mass_natural <- result$structure_exact_mass[[1]]
-    mass_labeled <- result$structure_exact_mass[[2]]
+    mass_natural <- result$structure_exact_mass[[1L]]
+    mass_labeled <- result$structure_exact_mass[[2L]]
     mass_diff <- mass_labeled - mass_natural
 
     # With 5× 13C and 1× 15N:

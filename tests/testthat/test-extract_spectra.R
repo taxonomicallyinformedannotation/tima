@@ -68,8 +68,8 @@ test_that("extract_spectra extracts peak data (mz and intensity)", {
   expect_type(result$intensity, "list")
 
   # Check extracted peak data
-  expect_equal(result$mz[[1]], c(50.0, 75.0, 100.0))
-  expect_equal(result$intensity[[1]], c(10, 20, 30))
+  expect_equal(result$mz[[1L]], c(50.0, 75.0, 100.0))
+  expect_equal(result$intensity[[1L]], c(10, 20, 30))
 })
 
 test_that("extract_spectra handles spectra with no peaks", {
@@ -84,8 +84,8 @@ test_that("extract_spectra handles spectra with no peaks", {
 
   result <- extract_spectra(object = spectra)
 
-  expect_equal(length(result$mz[[1]]), 0)
-  expect_equal(length(result$intensity[[1]]), 0)
+  expect_equal(length(result$mz[[1L]]), 0)
+  expect_equal(length(result$intensity[[1L]]), 0)
 })
 
 test_that("extract_spectra harmonizes column names", {
@@ -163,8 +163,8 @@ test_that("extract_spectra handles malformed peak data gracefully", {
 
   result <- extract_spectra(object = spectra)
 
-  expect_equal(length(result$mz[[1]]), 0)
-  expect_equal(length(result$intensity[[1]]), 0)
+  expect_equal(length(result$mz[[1L]]), 0)
+  expect_equal(length(result$intensity[[1L]]), 0)
 })
 
 test_that("extract_spectra preserves all original columns", {

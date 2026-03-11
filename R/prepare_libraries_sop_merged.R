@@ -4,7 +4,6 @@
 #'
 #' @keywords internal
 validate_sop_merged_inputs <- function(
-  files,
   filter,
   level,
   value,
@@ -165,7 +164,8 @@ apply_taxonomic_filter <- function(
       structure_inchikey,
       structure_smiles_no_stereo,
       organism_name,
-      reference_doi
+      reference_doi,
+      tag
     ) |>
     tidytable::distinct()
 
@@ -321,7 +321,6 @@ prepare_libraries_sop_merged <- function(
   # Input Validation ----
 
   validate_sop_merged_inputs(
-    files = files,
     filter = filter,
     level = level,
     value = value,

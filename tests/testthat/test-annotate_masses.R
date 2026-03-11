@@ -572,6 +572,6 @@ test_that("annotate_masses correctly handles isotopes [M1+H]+ and [M2+H]+", {
   if ("candidate_structure_inchikey" %in% colnames(annotations)) {
     unique_structures <- unique(annotations$candidate_structure_inchikey)
     expect_equal(length(unique_structures), 1L)
-    expect_equal(unique_structures[[1]], "WQZGKKKJIJFFOK-GASJEMHNSA-N")
+    expect_equal(unique_structures[[1L]], "WQZGKKKJIJFFOK-GASJEMHNSA-N")
   }
 })

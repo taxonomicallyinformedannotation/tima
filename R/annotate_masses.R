@@ -204,8 +204,8 @@ annotate_masses <-
       export_output(x = empty_edges, file = output_edges)
 
       return(c(
-        "annotations" = output_annotations[[1]],
-        "edges" = output_edges[[1]]
+        "annotations" = output_annotations[[1L]],
+        "edges" = output_edges[[1L]]
       ))
     }
 
@@ -997,16 +997,16 @@ annotate_masses <-
       parameters = get_params(step = "annotate_masses"),
       step = "annotate_masses"
     )
-    export_output(x = edges, file = output_edges[[1]])
-    export_output(x = df_final, file = output_annotations[[1]])
+    export_output(x = edges, file = output_edges[[1L]])
+    export_output(x = df_final, file = output_annotations[[1L]])
 
     log_complete(ctx, n_annotations = nrow(df_final), n_edges = nrow(edges))
 
     rm(edges, df_final)
     return(
       c(
-        "annotations" = output_annotations[[1]],
-        "edges" = output_edges[[1]]
+        "annotations" = output_annotations[[1L]],
+        "edges" = output_edges[[1L]]
       )
     )
   }

@@ -580,7 +580,7 @@ list(
           par_ann_mas <-
             tima:::parse_yaml_params(
               def = par_def_ann_mas,
-              usr = par_usr_ann_mas[[1]]
+              usr = par_usr_ann_mas[[1L]]
             )
         },
         format = "rds"
@@ -591,7 +591,7 @@ list(
           par_ann_spe <-
             tima:::parse_yaml_params(
               def = par_def_ann_spe,
-              usr = par_usr_ann_spe[[1]]
+              usr = par_usr_ann_spe[[1L]]
             )
         },
         format = "rds"
@@ -602,7 +602,7 @@ list(
           par_cre_com <-
             tima:::parse_yaml_params(
               def = par_def_cre_com,
-              usr = par_usr_cre_com[[1]]
+              usr = par_usr_cre_com[[1L]]
             )
         },
         format = "rds"
@@ -613,7 +613,7 @@ list(
           par_cre_edg_spe <-
             tima:::parse_yaml_params(
               def = par_def_cre_edg_spe,
-              usr = par_usr_cre_edg_spe[[1]]
+              usr = par_usr_cre_edg_spe[[1L]]
             )
         },
         format = "rds"
@@ -624,7 +624,7 @@ list(
           par_fil_ann <-
             tima:::parse_yaml_params(
               def = par_def_fil_ann,
-              usr = par_usr_fil_ann[[1]]
+              usr = par_usr_fil_ann[[1L]]
             )
         },
         format = "rds"
@@ -635,7 +635,7 @@ list(
           par_pre_ann_gnp <-
             tima:::parse_yaml_params(
               def = par_def_pre_ann_gnp,
-              usr = par_usr_pre_ann_gnp[[1]]
+              usr = par_usr_pre_ann_gnp[[1L]]
             )
         },
         format = "rds"
@@ -646,7 +646,7 @@ list(
           par_pre_ann_mzm <-
             tima:::parse_yaml_params(
               def = par_def_pre_ann_mzm,
-              usr = par_usr_pre_ann_mzm[[1]]
+              usr = par_usr_pre_ann_mzm[[1L]]
             )
         },
         format = "rds"
@@ -657,7 +657,7 @@ list(
           par_pre_ann_sir <-
             tima:::parse_yaml_params(
               def = par_def_pre_ann_sir,
-              usr = par_usr_pre_ann_sir[[1]]
+              usr = par_usr_pre_ann_sir[[1L]]
             )
         },
         format = "rds"
@@ -668,7 +668,7 @@ list(
           par_pre_ann_spe <-
             tima:::parse_yaml_params(
               def = par_def_pre_ann_spe,
-              usr = par_usr_pre_ann_spe[[1]]
+              usr = par_usr_pre_ann_spe[[1L]]
             )
         },
         format = "rds"
@@ -679,7 +679,7 @@ list(
           par_pre_fea_com <-
             tima:::parse_yaml_params(
               def = par_def_pre_fea_com,
-              usr = par_usr_pre_fea_com[[1]]
+              usr = par_usr_pre_fea_com[[1L]]
             )
         },
         format = "rds"
@@ -690,7 +690,7 @@ list(
           par_pre_fea_edg <-
             tima:::parse_yaml_params(
               def = par_def_pre_fea_edg,
-              usr = par_usr_pre_fea_edg[[1]]
+              usr = par_usr_pre_fea_edg[[1L]]
             )
         },
         format = "rds"
@@ -701,7 +701,7 @@ list(
           par_pre_fea_tab <-
             tima:::parse_yaml_params(
               def = par_def_pre_fea_tab,
-              usr = par_usr_pre_fea_tab[[1]]
+              usr = par_usr_pre_fea_tab[[1L]]
             )
         },
         format = "rds"
@@ -712,7 +712,7 @@ list(
           par_pre_lib_rt <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_rt,
-              usr = par_usr_pre_lib_rt[[1]]
+              usr = par_usr_pre_lib_rt[[1L]]
             )
         },
         format = "rds"
@@ -723,7 +723,7 @@ list(
           par_pre_lib_sop_big <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_sop_big,
-              usr = par_usr_pre_lib_sop_big[[1]]
+              usr = par_usr_pre_lib_sop_big[[1L]]
             )
         },
         format = "rds"
@@ -734,7 +734,7 @@ list(
           par_pre_lib_sop_clo <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_sop_clo,
-              usr = par_usr_pre_lib_sop_clo[[1]]
+              usr = par_usr_pre_lib_sop_clo[[1L]]
             )
         },
         format = "rds"
@@ -745,7 +745,7 @@ list(
           par_pre_lib_sop_ecm <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_sop_ecm,
-              usr = par_usr_pre_lib_sop_ecm[[1]]
+              usr = par_usr_pre_lib_sop_ecm[[1L]]
             )
         },
         format = "rds"
@@ -756,7 +756,7 @@ list(
           par_pre_lib_sop_hmd <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_sop_hmd,
-              usr = par_usr_pre_lib_sop_hmd[[1]]
+              usr = par_usr_pre_lib_sop_hmd[[1L]]
             )
         },
         format = "rds"
@@ -767,7 +767,7 @@ list(
           par_pre_lib_sop_lot <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_sop_lot,
-              usr = par_usr_pre_lib_sop_lot[[1]]
+              usr = par_usr_pre_lib_sop_lot[[1L]]
             )
         },
         format = "rds"
@@ -778,7 +778,7 @@ list(
           par_pre_lib_sop_mer <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_sop_mer,
-              usr = par_usr_pre_lib_sop_mer[[1]]
+              usr = par_usr_pre_lib_sop_mer[[1L]]
             )
         },
         format = "rds"
@@ -789,7 +789,7 @@ list(
           par_pre_lib_spe <-
             tima:::parse_yaml_params(
               def = par_def_pre_lib_spe,
-              usr = par_usr_pre_lib_spe[[1]]
+              usr = par_usr_pre_lib_spe[[1L]]
             )
         },
         format = "rds"
@@ -800,7 +800,7 @@ list(
           par_pre_tax <-
             tima:::parse_yaml_params(
               def = par_def_pre_tax,
-              usr = par_usr_pre_tax[[1]]
+              usr = par_usr_pre_tax[[1L]]
             )
         },
         format = "rds"
@@ -811,7 +811,7 @@ list(
           par_wei_ann <-
             tima:::parse_yaml_params(
               def = par_def_wei_ann,
-              usr = par_usr_wei_ann[[1]]
+              usr = par_usr_wei_ann[[1L]]
             )
         },
         format = "rds"
@@ -1069,21 +1069,21 @@ list(
           tar_target(
             name = lib_spe_exp_int_pre_pos,
             command = {
-              lib_spe_exp_int_pre_pos <- lib_spe_exp_int_pre[[1]]
+              lib_spe_exp_int_pre_pos <- lib_spe_exp_int_pre[[1L]]
             },
             format = "file"
           ),
           tar_target(
             name = lib_spe_exp_int_pre_neg,
             command = {
-              lib_spe_exp_int_pre_neg <- lib_spe_exp_int_pre[[2]]
+              lib_spe_exp_int_pre_neg <- lib_spe_exp_int_pre[[2L]]
             },
             format = "file"
           ),
           tar_target(
             name = lib_spe_exp_int_pre_sop,
             command = {
-              lib_spe_exp_int_pre_sop <- lib_spe_exp_int_pre[[3]]
+              lib_spe_exp_int_pre_sop <- lib_spe_exp_int_pre[[3L]]
             },
             format = "file"
           )
@@ -1117,14 +1117,14 @@ list(
     tar_target(
       name = lib_rt_rts,
       command = {
-        lib_rt_rts <- lib_rt[[1]]
+        lib_rt_rts <- lib_rt[[1L]]
       },
       format = "file"
     ),
     tar_target(
       name = lib_rt_sop,
       command = {
-        lib_rt_sop <- lib_rt[[2]]
+        lib_rt_sop <- lib_rt[[2L]]
       },
       format = "file"
     ),
@@ -1192,6 +1192,33 @@ list(
                 paths$data$source$libraries$sop$hmdb
               }
             )
+          },
+          format = "file"
+        ),
+        tar_target(
+          name = lib_sop_hmd_fam_raw,
+          command = {
+            hmdb_family_names <- names(paths$urls$hmdb_family)
+            lib_sop_hmd_fam_raw <- purrr::map_chr(
+              .x = hmdb_family_names,
+              .f = function(lib_name) {
+                output_file <- paths$data$source$libraries$sop[[lib_name]]
+                tryCatch(
+                  expr = {
+                    get_file(
+                      url = paths$urls$hmdb_family[[lib_name]],
+                      export = output_file
+                    )
+                  },
+                  error = function(e) {
+                    tima:::fake_hmdb(export = output_file)
+                  }
+                )
+                output_file
+              }
+            )
+            names(lib_sop_hmd_fam_raw) <- hmdb_family_names
+            lib_sop_hmd_fam_raw
           },
           format = "file"
         ),
@@ -1266,6 +1293,181 @@ list(
           format = "file"
         ),
         tar_target(
+          name = lib_sop_hmd_fam_pre,
+          command = {
+            hmdb_family_tags <- c(
+              csfmetabolome = "csf",
+              fecalmetabolome = "fecal",
+              salivametabolome = "saliva",
+              serummetabolome = "serum",
+              sweatmetabolome = "sweat",
+              urinemetabolome = "urine",
+              mcdb = "milk",
+              # TODO too different format for now
+              # exposome_explorer = "exposome",
+              # TODO don't know what to do with it for now
+              # smpdb = "pathway",
+              mimedb = "microbiome",
+              t3db = "toxin",
+              bovinedb = NA_character_,
+              # TODO too different format for now
+              # contaminantdb = "contaminant",
+              # TODO too different format for now
+              # markerdb = "marker",
+              ymdb = NA_character_,
+              cannabisdatabase = NA_character_
+            )
+            hmdb_family_organisms <- c(
+              csfmetabolome = "Homo sapiens",
+              fecalmetabolome = "Homo sapiens",
+              salivametabolome = "Homo sapiens",
+              serummetabolome = "Homo sapiens",
+              sweatmetabolome = "Homo sapiens",
+              urinemetabolome = "Homo sapiens",
+              mcdb = "Bos taurus",
+              # TODO too different format for now
+              # exposome_explorer = "Homo sapiens",
+              # TODO safest for now...
+              # TODO don't know what to do with it for now
+              # smpdb = NA_character_,
+              mimedb = NA_character_,
+              t3db = NA_character_,
+              bovinedb = "Bos taurus",
+              # TODO too different format for now
+              # contaminantdb = NA_character_,
+              # TODO too different format for now
+              # markerdb = "Homo sapiens",
+              ymdb = "Saccharomyces cerevisiae",
+              cannabisdatabase = "Cannabis"
+            )
+            human_list <- list(
+              organism_taxonomy_ottid = "770315",
+              organism_taxonomy_01domain = "Eukaryota",
+              organism_taxonomy_02kingdom = "Metazoa",
+              organism_taxonomy_03phylum = "Chordata",
+              organism_taxonomy_04class = "Mammalia",
+              organism_taxonomy_05order = "Primates",
+              organism_taxonomy_06family = "Hominidae",
+              organism_taxonomy_07tribe = NA_character_,
+              organism_taxonomy_08genus = "Homo",
+              organism_taxonomy_09species = "Homo sapiens",
+              organism_taxonomy_10varietas = NA_character_
+            )
+            cow_list <- list(
+              organism_taxonomy_ottid = "490099",
+              organism_taxonomy_01domain = "Eukaryota",
+              organism_taxonomy_02kingdom = "Metazoa",
+              organism_taxonomy_03phylum = "Chordata",
+              organism_taxonomy_04class = "Mammalia",
+              organism_taxonomy_05order = "Artiodactyla",
+              organism_taxonomy_06family = "Bovidae",
+              organism_taxonomy_07tribe = NA_character_,
+              organism_taxonomy_08genus = "Bos",
+              organism_taxonomy_09species = "Bos taurus",
+              organism_taxonomy_10varietas = NA_character_
+            )
+            empty_list <- list(
+              organism_taxonomy_ottid = "",
+              organism_taxonomy_01domain = NA_character_,
+              organism_taxonomy_02kingdom = NA_character_,
+              organism_taxonomy_03phylum = NA_character_,
+              organism_taxonomy_04class = NA_character_,
+              organism_taxonomy_05order = NA_character_,
+              organism_taxonomy_06family = NA_character_,
+              organism_taxonomy_07tribe = NA_character_,
+              organism_taxonomy_08genus = NA_character_,
+              organism_taxonomy_09species = NA_character_,
+              organism_taxonomy_10varietas = NA_character_
+            )
+            hmdb_family_taxonomy <- list(
+              csfmetabolome = human_list,
+              fecalmetabolome = human_list,
+              salivametabolome = human_list,
+              serummetabolome = human_list,
+              sweatmetabolome = human_list,
+              urinemetabolome = human_list,
+              mcdb = cow_list,
+              # TODO too different format for now
+              # exposome_explorer = "Homo sapiens",
+              # TODO safest for now...
+              # TODO don't know what to do with it for now
+              # smpdb = empty_list,
+              mimedb = empty_list,
+              t3db = empty_list,
+              bovinedb = cow_list,
+              # TODO too different format for now
+              # contaminantdb = empty_list,
+              # TODO too different format for now
+              # markerdb = human_list,
+              ymdb = list(
+                organism_taxonomy_ottid = "356221",
+                organism_taxonomy_01domain = "Eukaryota",
+                organism_taxonomy_02kingdom = "Fungi",
+                organism_taxonomy_03phylum = "Ascomycota",
+                organism_taxonomy_04class = NA_character_,
+                organism_taxonomy_05order = "Saccharomycetales",
+                organism_taxonomy_06family = "Saccharomycetaceae",
+                organism_taxonomy_07tribe = NA_character_,
+                organism_taxonomy_08genus = "Saccharomyces",
+                organism_taxonomy_09species = "Saccharomyces cerevisiae",
+                organism_taxonomy_10varietas = NA_character_
+              ),
+              cannabisdatabase = list(
+                organism_taxonomy_ottid = "84008",
+                organism_taxonomy_01domain = "Eukaryota",
+                organism_taxonomy_02kingdom = "Archaeplastida",
+                organism_taxonomy_03phylum = "Streptophyta",
+                organism_taxonomy_04class = "Magnoliopsida",
+                organism_taxonomy_05order = "Rosales",
+                organism_taxonomy_06family = "Cannabaceae",
+                organism_taxonomy_07tribe = NA_character_,
+                organism_taxonomy_08genus = "Cannabis",
+                organism_taxonomy_09species = NA_character_,
+                organism_taxonomy_10varietas = NA_character_
+              )
+            )
+
+            hmdb_family_names <- names(hmdb_family_tags)
+
+            # `format = "file"` targets can lose names; rebuild a stable lookup.
+            raw_hmdb_family_files <- lib_sop_hmd_fam_raw
+            if (
+              is.null(names(raw_hmdb_family_files)) ||
+                !all(hmdb_family_names %in% names(raw_hmdb_family_files))
+            ) {
+              raw_hmdb_family_files <- stats::setNames(
+                as.character(raw_hmdb_family_files),
+                names(paths$urls$hmdb_family)[seq_along(raw_hmdb_family_files)]
+              )
+            }
+
+            hmdb_family_prepared <- purrr::map_chr(
+              .x = hmdb_family_names,
+              .f = function(lib_name) {
+                input_file <- raw_hmdb_family_files[[lib_name]]
+                if (
+                  is.null(input_file) ||
+                    is.na(input_file) ||
+                    !nzchar(input_file)
+                ) {
+                  input_file <- paths$data$source$libraries$sop[[lib_name]]
+                }
+
+                tima:::prepare_libraries_sop_hmdb_like(
+                  input = input_file,
+                  output = paths$data$interim$libraries$sop[[lib_name]],
+                  source_name = toupper(lib_name),
+                  organism_name = hmdb_family_organisms[[lib_name]],
+                  organism_taxonomy = hmdb_family_taxonomy[[lib_name]],
+                  tag = hmdb_family_tags[[lib_name]]
+                )
+              }
+            )
+            hmdb_family_prepared
+          },
+          format = "file"
+        ),
+        tar_target(
           name = lib_sop_lot_pre,
           command = {
             lib_sop_lot_pre <-
@@ -1302,6 +1504,7 @@ list(
                 lib_sop_clo_pre,
                 lib_sop_ecm_pre,
                 lib_sop_hmd_pre,
+                lib_sop_hmd_fam_pre,
                 lib_sop_lot_pre,
                 lib_rt_sop,
                 lib_spe_exp_int_pre_sop,
@@ -1328,49 +1531,49 @@ list(
         tar_target(
           name = lib_mer_key,
           command = {
-            lib_mer_key <- lib_sop_mer[[1]]
+            lib_mer_key <- lib_sop_mer[[1L]]
           },
           format = "file"
         ),
         tar_target(
           name = lib_mer_org_tax_ott,
           command = {
-            lib_mer_org_tax_ott <- lib_sop_mer[[2]]
+            lib_mer_org_tax_ott <- lib_sop_mer[[2L]]
           },
           format = "file"
         ),
         tar_target(
           name = lib_mer_str_stereo,
           command = {
-            lib_mer_str_stereo <- lib_sop_mer[[3]]
+            lib_mer_str_stereo <- lib_sop_mer[[3L]]
           },
           format = "file"
         ),
         tar_target(
           name = lib_mer_str_met,
           command = {
-            lib_mer_str_met <- lib_sop_mer[[4]]
+            lib_mer_str_met <- lib_sop_mer[[4L]]
           },
           format = "file"
         ),
         tar_target(
           name = lib_mer_str_nam,
           command = {
-            lib_mer_str_nam <- lib_sop_mer[[5]]
+            lib_mer_str_nam <- lib_sop_mer[[5L]]
           },
           format = "file"
         ),
         tar_target(
           name = lib_mer_str_tax_cla,
           command = {
-            lib_mer_str_tax_cla <- lib_sop_mer[[6]]
+            lib_mer_str_tax_cla <- lib_sop_mer[[6L]]
           },
           format = "file"
         ),
         tar_target(
           name = lib_mer_str_tax_npc,
           command = {
-            lib_mer_str_tax_npc <- lib_sop_mer[[7]]
+            lib_mer_str_tax_npc <- lib_sop_mer[[7L]]
           },
           format = "file"
         )
@@ -1423,14 +1626,14 @@ list(
         name = ann_ms1_pre_ann,
         command = {
           ann_ms1_pre_ann <-
-            ann_ms1_pre[[1]]
+            ann_ms1_pre[[1L]]
         },
         format = "file"
       ),
       tar_target(
         name = ann_ms1_pre_edg,
         command = {
-          ann_ms1_pre_edg <- ann_ms1_pre[[2]]
+          ann_ms1_pre_edg <- ann_ms1_pre[[2L]]
         },
         format = "file"
       )
@@ -1578,21 +1781,21 @@ list(
     tar_target(
       name = ann_sir_pre_can,
       command = {
-        ann_sir_pre_can <- ann_sir_pre[[1]]
+        ann_sir_pre_can <- ann_sir_pre[[1L]]
       },
       format = "file"
     ),
     tar_target(
       name = ann_sir_pre_for,
       command = {
-        ann_sir_pre_for <- ann_sir_pre[[2]]
+        ann_sir_pre_for <- ann_sir_pre[[2L]]
       },
       format = "file"
     ),
     tar_target(
       name = ann_sir_pre_str,
       command = {
-        ann_sir_pre_str <- ann_sir_pre[[3]]
+        ann_sir_pre_str <- ann_sir_pre[[3L]]
       },
       format = "file"
     ),
@@ -2091,25 +2294,25 @@ list(
     tar_target(
       name = benchmark_pre_mgf_pos,
       command = {
-        benchmark_pre_mgf_pos <- benchmark_prepared[[1]]
+        benchmark_pre_mgf_pos <- benchmark_prepared[[1L]]
       }
     ),
     tar_target(
       name = benchmark_pre_mgf_neg,
       command = {
-        benchmark_pre_mgf_neg <- benchmark_prepared[[2]]
+        benchmark_pre_mgf_neg <- benchmark_prepared[[2L]]
       }
     ),
     tar_target(
       name = benchmark_pre_meta_pos,
       command = {
-        benchmark_pre_meta_pos <- benchmark_prepared[[3]]
+        benchmark_pre_meta_pos <- benchmark_prepared[[3L]]
       }
     ),
     tar_target(
       name = benchmark_pre_meta_neg,
       command = {
-        benchmark_pre_meta_neg <- benchmark_prepared[[4]]
+        benchmark_pre_meta_neg <- benchmark_prepared[[4L]]
       }
     ),
     tar_target(
@@ -2249,7 +2452,7 @@ list(
         benchmark_edg_pre_pos <- prepare_features_edges(
           input = list(
             "spectral" = benchmark_edg_spe_pos,
-            "ms1" = benchmark_ann_ms1_pre_pos[[2]]
+            "ms1" = benchmark_ann_ms1_pre_pos[[2L]]
           ),
           output = "data/interim/benchmark/benchmark_edges_pos.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
@@ -2263,7 +2466,7 @@ list(
         benchmark_edg_pre_neg <- prepare_features_edges(
           input = list(
             "spectral" = benchmark_edg_spe_neg,
-            "ms1" = benchmark_ann_ms1_pre_neg[[2]]
+            "ms1" = benchmark_ann_ms1_pre_neg[[2L]]
           ),
           output = "data/interim/benchmark/benchmark_edges_neg.tsv.gz",
           name_source = benchmark_def_pre_fea_edg$names$source,
@@ -2442,19 +2645,19 @@ list(
     tar_target(
       name = benchmark_ann_sir_pre_can,
       command = {
-        benchmark_ann_sir_pre_can <- benchmark_ann_sir_pre[[1]]
+        benchmark_ann_sir_pre_can <- benchmark_ann_sir_pre[[1L]]
       }
     ),
     tar_target(
       name = benchmark_ann_sir_pre_for,
       command = {
-        benchmark_ann_sir_pre_for <- benchmark_ann_sir_pre[[2]]
+        benchmark_ann_sir_pre_for <- benchmark_ann_sir_pre[[2L]]
       }
     ),
     tar_target(
       name = benchmark_ann_sir_pre_str,
       command = {
-        benchmark_ann_sir_pre_str <- benchmark_ann_sir_pre[[3]]
+        benchmark_ann_sir_pre_str <- benchmark_ann_sir_pre[[3L]]
       }
     ),
     tar_target(
@@ -2487,7 +2690,7 @@ list(
         benchmark_ann_fil_spe_ms1_neg <- filter_annotations(
           annotations = c(
             benchmark_ann_spe_pre_neg,
-            benchmark_ann_ms1_pre_neg[[1]],
+            benchmark_ann_ms1_pre_neg[[1L]],
             benchmark_ann_sir_pre_str
           ),
           features = benchmark_pre_meta_neg,
@@ -2502,7 +2705,7 @@ list(
       command = {
         benchmark_ann_fil_ms1_neg <- filter_annotations(
           annotations = c(
-            benchmark_ann_ms1_pre_neg[[1]],
+            benchmark_ann_ms1_pre_neg[[1L]],
             benchmark_ann_sir_pre_str
           ),
           features = benchmark_pre_meta_neg,
@@ -2533,7 +2736,7 @@ list(
         benchmark_ann_fil_spe_ms1_pos <- filter_annotations(
           annotations = c(
             benchmark_ann_spe_pre_pos,
-            benchmark_ann_ms1_pre_pos[[1]],
+            benchmark_ann_ms1_pre_pos[[1L]],
             benchmark_ann_sir_pre_str
           ),
           features = benchmark_pre_meta_pos,
@@ -2548,7 +2751,7 @@ list(
       command = {
         benchmark_ann_fil_ms1_pos <- filter_annotations(
           annotations = c(
-            benchmark_ann_ms1_pre_pos[[1]],
+            benchmark_ann_ms1_pre_pos[[1L]],
             benchmark_ann_sir_pre_str
           ),
           features = benchmark_pre_meta_pos,

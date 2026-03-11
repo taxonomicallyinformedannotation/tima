@@ -964,14 +964,14 @@ prepare_params <- function(
     ## The dollar is for steps having similar names separated by underscores
     yamls_params <-
       yamls_params[grepl(
-        pattern = paste0(step[[1]], "$"),
+        pattern = paste0(step[[1L]], "$"),
         x = names(yamls_params),
         perl = TRUE
       )]
     ## The dot is for steps having similar names separated by underscores
     yaml_export <-
       yaml_export[grepl(
-        pattern = paste0(step[[1]], "\\."),
+        pattern = paste0(step[[1L]], "\\."),
         x = yaml_export,
         perl = TRUE
       )]
@@ -983,7 +983,7 @@ prepare_params <- function(
   }
 
   # log_trace("Exporting params")
-  create_dir(export = yaml_export[[1]])
+  create_dir(export = yaml_export[[1L]])
   purrr::map(
     .x = seq_along(yaml_export),
     .f = .write_yaml_file,
