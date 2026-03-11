@@ -87,33 +87,13 @@ create_edges <- function(
     )
   }
 
-  # Pre-flight: sanitize spectra once if needed ----
-  sample_idx <- unique(c(
-    1L,
-    as.integer(seq(1L, nspecs, length.out = min(20L, nspecs)))
-  ))
-  needs_sanitize <- FALSE
-  for (idx in sample_idx) {
-    sp <- frags[[idx]]
-    if (
-      is.matrix(sp) &&
-        nrow(sp) >= 2L &&
-        !is_spectrum_sanitized(
-          sp,
-          tolerance = ms2_tolerance,
-          ppm = ppm_tolerance
-        )
-    ) {
-      needs_sanitize <- TRUE
-      break
-    }
-  }
-  if (needs_sanitize) {
-    log_warn(
-      "Unsanitized spectra detected. Sanitizing %d spectra before edge creation.",
-      nspecs
-    )
-    frags <- lapply(frags, function(sp) {
+  # Lazy sanitize-once state: avoid scanning/sanitizing all spectra upfront.
+  checked_sanitization <- rep(FALSE, nspecs)
+  sanitized_indices <- logical(nspecs)
+
+  ensure_spectrum_ready <- function(idx) {
+    if (!checked_sanitization[[idx]]) {
+      sp <- frags[[idx]]
       if (
         is.matrix(sp) &&
           nrow(sp) >= 2L &&
@@ -123,15 +103,16 @@ create_edges <- function(
             ppm = ppm_tolerance
           )
       ) {
-        sanitize_spectrum_matrix(
+        frags[[idx]] <<- sanitize_spectrum_matrix(
           sp,
           tolerance = ms2_tolerance,
           ppm = ppm_tolerance
         )
-      } else {
-        sp
+        sanitized_indices[[idx]] <<- TRUE
       }
-    })
+      checked_sanitization[[idx]] <<- TRUE
+    }
+    frags[[idx]]
   }
 
   # Calculate Pairwise Similarities ----
@@ -154,13 +135,13 @@ create_edges <- function(
       log_info("Processed %d / %d queries", progress_counter, n_queries)
     }
 
-    q_sp <- frags[[i]]
+    q_sp <- ensure_spectrum_ready(i)
     q_pre <- precs[i]
     targets <- (i + 1L):nspecs
 
     # Inner loop: one .Call per target, collect scores + matches
     pairs <- lapply(targets, function(j) {
-      t_sp <- frags[[j]]
+      t_sp <- ensure_spectrum_ready(j)
       t_pre <- precs[j]
 
       if (use_gnps) {
@@ -213,6 +194,14 @@ create_edges <- function(
       do.call(rbind, pairs)
     }
   })
+
+  if (any(sanitized_indices)) {
+    log_warn(
+      "Sanitized %d/%d spectra on-demand before edge scoring.",
+      sum(sanitized_indices),
+      nspecs
+    )
+  }
 
   # Score distribution logging ----
   bin_labels <- c(

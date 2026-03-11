@@ -41,7 +41,7 @@ go_to_cache()
 github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 dir <- paste0(github, repo)
-annotations <- get_params(step = "filter_annotations")$files$annotations$prepared$structural[[2L]] |>
+ann <- get_params(step = "filter_annotations")$files$annotations$prepared$structural[[2L]] |>
   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
 features <- get_params(step = "filter_annotations")$files$features$prepared |>
   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
@@ -51,7 +51,7 @@ get_file(url = paste0(dir, annotations), export = annotations)
 get_file(url = paste0(dir, features), export = features)
 get_file(url = paste0(dir, rts), export = rts)
 filter_annotations(
-  annotations = annotations,
+  annotations = ann,
   features = features,
   rts = rts
 )

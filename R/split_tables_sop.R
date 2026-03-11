@@ -90,10 +90,17 @@ split_tables_sop <- function(table, cache) {
       tidyselect::contains(match = "reference"),
       tidyselect::any_of("tag")
     ) |>
-    tidytable::mutate(tag = tidytable::coalesce(tag, NA_character_)) |>
     tidytable::distinct() |>
     tidytable::inner_join(y = table_structural) |>
     tidytable::distinct()
+
+  if (!"tag" %in% names(table)) {
+    table <- table |>
+      tidytable::mutate(tag = NA_character_)
+  } else {
+    table <- table |>
+      tidytable::mutate(tag = tidytable::coalesce(tag, NA_character_))
+  }
 
   table_keys <- table |>
     tidytable::filter(!is.na(structure_inchikey)) |>
@@ -104,8 +111,9 @@ split_tables_sop <- function(table, cache) {
       structure_smiles_no_stereo,
       organism_name,
       reference_doi,
-      tag
+      tidyselect::any_of("tag")
     ) |>
+    tidytable::mutate(tag = tidytable::coalesce(tag, NA_character_)) |>
     tidytable::distinct() |>
     tidytable::group_by(structure_inchikey, organism_name, tag) |>
     tidytable::add_count() |>
