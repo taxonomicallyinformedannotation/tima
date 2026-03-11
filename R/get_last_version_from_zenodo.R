@@ -78,36 +78,54 @@ fetch_zenodo_record <- function(record, doi) {
 
   log_debug("Fetching metadata from: %s", url)
 
-  tryCatch(
-    {
-      httr2::request(base_url = url) |>
-        httr2::req_timeout(seconds = 30) |>
-        httr2::req_retry(max_tries = 3L) |>
-        httr2::req_perform()
-    },
-    httr2_http_404 = function(e) {
-      stop(
-        "Zenodo record not found: ",
-        doi,
-        ". Please verify the DOI is correct. ",
-        conditionMessage(e),
-        call. = FALSE
-      )
-    },
-    httr2_http = function(e) {
-      stop(
-        "HTTP error retrieving Zenodo record: ",
-        conditionMessage(e),
-        call. = FALSE
-      )
-    },
-    error = function(e) {
-      stop(
-        "Failed to retrieve Zenodo record: ",
-        conditionMessage(e),
-        call. = FALSE
+  max_attempts <- 5L
+  last_error <- NULL
+
+  for (attempt in seq_len(max_attempts)) {
+    response <- tryCatch(
+      {
+        httr2::request(base_url = url) |>
+          httr2::req_timeout(seconds = 90) |>
+          httr2::req_retry(max_tries = 2L) |>
+          httr2::req_perform()
+      },
+      httr2_http_404 = function(e) {
+        stop(
+          "Zenodo record not found: ",
+          doi,
+          ". Please verify the DOI is correct. ",
+          conditionMessage(e),
+          call. = FALSE
+        )
+      },
+      httr2_http = function(e) {
+        last_error <<- e
+        NULL
+      },
+      error = function(e) {
+        last_error <<- e
+        NULL
+      }
+    )
+
+    if (!is.null(response)) {
+      return(response)
+    }
+
+    if (attempt < max_attempts) {
+      Sys.sleep(min(2^(attempt - 1L), 8L))
+      log_debug(
+        "Retrying Zenodo metadata fetch (attempt %d/%d)",
+        attempt + 1L,
+        max_attempts
       )
     }
+  }
+
+  stop(
+    "Failed to retrieve Zenodo record: ",
+    conditionMessage(last_error),
+    call. = FALSE
   )
 }
 

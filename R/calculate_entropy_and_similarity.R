@@ -172,6 +172,10 @@ calculate_entropy_and_similarity <- function(
     lib_spectra[[idx]]
   }
 
+  # Progress and local function alias used in the hot loop closure
+  progress_counter <- 0L
+  call_gnps <- gnps_chain_dp_wrapper
+
   results <- lapply(
     X = seq_along(query_spectra),
     FUN = function(spectrum_idx) {

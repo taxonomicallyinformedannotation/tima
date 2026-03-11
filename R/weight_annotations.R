@@ -894,7 +894,7 @@ weight_annotations <- function(
   log_annotation_stats(annotation_table)
 
   features_table <- annotation_table |>
-    tidytable::distinct(tidytable::any_of(x = c("feature_id", "rt", "mz")))
+    tidytable::distinct(tidyselect::any_of(x = c("feature_id", "rt", "mz")))
   log_debug("Extracted %d unique features", nrow(features_table))
 
   # Rearrange and Merge Annotations ----

@@ -26,6 +26,18 @@ stage_weight_annotations_fixtures <- function(
 
   copy_fixture_to("annotations_weighted.csv", ann_file)
   copy_fixture_to("library_weighted.csv", lib_file)
+  # Ensure fixture library always contains non-empty tags for propagation tests.
+  lib_df <- utils::read.csv(
+    file = lib_file,
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+  if (!"tag" %in% names(lib_df)) {
+    lib_df$tag <- "serum"
+  } else {
+    lib_df$tag[is.na(lib_df$tag) | lib_df$tag == ""] <- "serum"
+  }
+  utils::write.csv(lib_df, file = lib_file, row.names = FALSE)
   copy_fixture_to("components_weighted.csv", comp_file)
   copy_fixture_to("edges_weighted.csv", edges_file)
   copy_fixture_to("taxa_weighted.csv", taxa_file)
@@ -510,4 +522,111 @@ test_that("weight_annotations() handles boolean flags", {
   )
 
   expect_type(result, "character")
+})
+
+test_that("weight_annotations() exports propagated tag columns", {
+  skip_if_not_installed("tidytable")
+  skip_if_not_installed("purrr")
+
+  fixtures <- stage_weight_annotations_fixtures()
+  withr::local_dir(new = fixtures$tmpdir)
+
+  local_mocked_bindings(
+    get_default_paths = function() {
+      list(
+        data = list(
+          processed = list(path = file.path(fixtures$tmpdir, "processed"))
+        )
+      )
+    },
+    get_params = function(step) list(step = "prepare_params"),
+    export_params = function(...) invisible(NULL),
+    .package = "tima"
+  )
+
+  dir.create(file.path(fixtures$tmpdir, "processed"), recursive = TRUE)
+
+  result <- weight_annotations(
+    library = fixtures$library,
+    annotations = fixtures$annotations,
+    components = fixtures$components,
+    edges = fixtures$edges,
+    taxa = fixtures$taxa,
+    canopus = fixtures$canopus,
+    formula = fixtures$formula,
+    org_tax_ott = fixtures$org_tax_ott,
+    output = fixtures$output,
+    candidates_neighbors = 3L,
+    candidates_final = 1L,
+    best_percentile = 0.9,
+    weight_spectral = 0.2,
+    weight_chemical = 0.3,
+    weight_biological = 0.5,
+    score_biological_domain = 0.1,
+    score_biological_kingdom = 0.2,
+    score_biological_phylum = 0.3,
+    score_biological_class = 0.4,
+    score_biological_order = 0.5,
+    score_biological_infraorder = 0.55,
+    score_biological_family = 0.6,
+    score_biological_subfamily = 0.65,
+    score_biological_tribe = 0.7,
+    score_biological_subtribe = 0.75,
+    score_biological_genus = 0.8,
+    score_biological_subgenus = 0.85,
+    score_biological_species = 0.9,
+    score_biological_subspecies = 0.95,
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276,
+    score_chemical_cla_kingdom = 0.25,
+    score_chemical_cla_superclass = 0.5,
+    score_chemical_cla_class = 0.75,
+    score_chemical_cla_parent = 1.0,
+    score_chemical_npc_pathway = 0.33,
+    score_chemical_npc_superclass = 0.66,
+    score_chemical_npc_class = 1.0,
+    minimal_consistency = 0.6,
+    minimal_ms1_bio = 0.6,
+    minimal_ms1_chemo = 0.6,
+    minimal_ms1_condition = "AND",
+    ms1_only = FALSE,
+    compounds_names = TRUE,
+    high_confidence = FALSE,
+    remove_ties = FALSE,
+    summarize = FALSE,
+    pattern = "tagtest",
+    force = FALSE
+  )
+
+  full_path <- unname(result[["full"]])
+  filtered_path <- unname(result[["filtered"]])
+  mini_path <- sub("\\.tsv$", "_mini.tsv", full_path)
+
+  expect_true(file.exists(full_path))
+  expect_true(file.exists(filtered_path))
+  expect_true(file.exists(mini_path))
+
+  full_tbl <- tidytable::fread(full_path)
+  filtered_tbl <- tidytable::fread(filtered_path)
+  mini_tbl <- tidytable::fread(mini_path)
+
+  expect_true(
+    "candidate_structure_organism_occurrence_tag" %in% names(full_tbl)
+  )
+  expect_true(
+    "candidate_structure_organism_occurrence_tag" %in% names(filtered_tbl)
+  )
+  expect_true("tag" %in% names(mini_tbl))
+
+  expect_true(
+    any(
+      full_tbl$candidate_structure_organism_occurrence_tag == "serum",
+      na.rm = TRUE
+    ) ||
+      any(
+        filtered_tbl$candidate_structure_organism_occurrence_tag == "serum",
+        na.rm = TRUE
+      ) ||
+      any(mini_tbl$tag == "serum", na.rm = TRUE)
+  )
 })

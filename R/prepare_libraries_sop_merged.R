@@ -4,6 +4,7 @@
 #'
 #' @keywords internal
 validate_sop_merged_inputs <- function(
+  files,
   filter,
   level,
   value,
@@ -15,6 +16,15 @@ validate_sop_merged_inputs <- function(
   output_str_tax_cla,
   output_str_tax_npc
 ) {
+  # Validate files parameter
+  if (
+    !is.character(files) ||
+      length(files) < 1L ||
+      anyNA(files)
+  ) {
+    stop("files must be a non-empty character vector", call. = FALSE)
+  }
+
   # Validate filter parameter
   if (!is.logical(filter) || length(filter) != 1L) {
     stop("filter must be a single logical value (TRUE/FALSE)", call. = FALSE)
@@ -143,6 +153,11 @@ apply_taxonomic_filter <- function(
   table_keys_filtered <- table_keys |>
     tidytable::left_join(y = table_org_tax_ott, by = "organism_name")
 
+  if (!"tag" %in% names(table_keys_filtered)) {
+    table_keys_filtered <- table_keys_filtered |>
+      tidytable::mutate(tag = NA_character_)
+  }
+
   # Find column matching the taxonomic level
   level_col <- colnames(table_keys_filtered)[grepl(
     pattern = level,
@@ -165,8 +180,9 @@ apply_taxonomic_filter <- function(
       structure_smiles_no_stereo,
       organism_name,
       reference_doi,
-      tag
+      tidyselect::any_of("tag")
     ) |>
+    tidytable::mutate(tag = tidytable::coalesce(tag, NA_character_)) |>
     tidytable::distinct()
 
   if (nrow(table_keys_filtered) == 0) {
@@ -321,6 +337,7 @@ prepare_libraries_sop_merged <- function(
   # Input Validation ----
 
   validate_sop_merged_inputs(
+    files = files,
     filter = filter,
     level = level,
     value = value,
