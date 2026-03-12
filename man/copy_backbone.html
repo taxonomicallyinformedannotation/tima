@@ -668,11 +668,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">copy_backbone(
-  cache_dir = fs::path_home(".tima"),
-  package = "tima",
-  force_overwrite = FALSE
-)
+<pre><code class="language-R">copy_backbone(cache_dir = fs::path_home(".tima"), package = "tima")
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -692,14 +688,6 @@ Character string path to the cache directory (default: "~/.tima" in user’s hom
 </td>
 <td>
 Character string name of the package (default: "tima")
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="force_overwrite">force_overwrite</code>
-</td>
-<td>
-logical if TRUE, overwrite existing cache contents with package defaults; if FALSE, keep existing cache as-is
 </td>
 </tr>
 </tbody></table>

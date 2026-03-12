@@ -790,7 +790,7 @@ div.csl-indent {
 <h3 class="anchored" data-anchor-id="docker">Docker</h3>
 <p>A container is also available, together with a small compose file. Main commands are below:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> pull adafede/tima-r</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># docker build . -t adafede/tima-r</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># docker build inst/. -t adafede/tima-r</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--user</span> tima-user <span class="at">-v</span> <span class="st">"</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/.tima/data:/home/tima-user/.tima/data"</span> <span class="at">-p</span> 3838:3838 adafede/tima-r Rscript <span class="at">-e</span> <span class="st">"tima::run_app()"</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r Rscript -e "tima::run_tima()"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
@@ -887,7 +887,7 @@ div.csl-indent {
 </tr>
 <tr class="odd">
 <td style="text-align: left;">fs</td>
-<td style="text-align: left;">1.6.6</td>
+<td style="text-align: left;">1.6.7</td>
 <td style="text-align: left;">Hester, Wickham, and Csárdi (2025)</td>
 </tr>
 <tr class="even">
@@ -897,8 +897,8 @@ div.csl-indent {
 </tr>
 <tr class="odd">
 <td style="text-align: left;">igraph</td>
-<td style="text-align: left;">2.2.1</td>
-<td style="text-align: left;">Csárdi and Nepusz (2006); Antonov et al.&nbsp;(2023); Csárdi et al.&nbsp;(2025)</td>
+<td style="text-align: left;">2.2.2</td>
+<td style="text-align: left;">Csárdi and Nepusz (2006); Antonov et al.&nbsp;(2023); (<strong>igraph2026?</strong>)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">IRanges</td>
@@ -912,7 +912,7 @@ div.csl-indent {
 </tr>
 <tr class="even">
 <td style="text-align: left;">lgr</td>
-<td style="text-align: left;">0.5.0</td>
+<td style="text-align: left;">0.5.2</td>
 <td style="text-align: left;">Fleck (2025)</td>
 </tr>
 <tr class="odd">
@@ -947,7 +947,7 @@ div.csl-indent {
 </tr>
 <tr class="odd">
 <td style="text-align: left;">reticulate</td>
-<td style="text-align: left;">1.44.1</td>
+<td style="text-align: left;">1.45.0</td>
 <td style="text-align: left;">Ushey, Allaire, and Tang (2025)</td>
 </tr>
 <tr class="even">
@@ -957,12 +957,12 @@ div.csl-indent {
 </tr>
 <tr class="odd">
 <td style="text-align: left;">rotl</td>
-<td style="text-align: left;">3.1.0</td>
+<td style="text-align: left;">3.1.1</td>
 <td style="text-align: left;">Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al.&nbsp;(2019)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">shiny</td>
-<td style="text-align: left;">1.12.1</td>
+<td style="text-align: left;">1.13.0</td>
 <td style="text-align: left;">Chang et al.&nbsp;(2025)</td>
 </tr>
 <tr class="odd">
@@ -972,12 +972,12 @@ div.csl-indent {
 </tr>
 <tr class="even">
 <td style="text-align: left;">shinyjs</td>
-<td style="text-align: left;">2.1.0</td>
+<td style="text-align: left;">2.1.1</td>
 <td style="text-align: left;">Attali (2021)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">shinytest2</td>
-<td style="text-align: left;">0.4.1</td>
+<td style="text-align: left;">0.5.1</td>
 <td style="text-align: left;">Schloerke (2025)</td>
 </tr>
 <tr class="even">
@@ -987,7 +987,7 @@ div.csl-indent {
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Spectra</td>
-<td style="text-align: left;">1.20.0</td>
+<td style="text-align: left;">1.20.1</td>
 <td style="text-align: left;">Rainer et al.&nbsp;(2022d)</td>
 </tr>
 <tr class="even">
@@ -997,12 +997,12 @@ div.csl-indent {
 </tr>
 <tr class="odd">
 <td style="text-align: left;">targets</td>
-<td style="text-align: left;">1.11.4</td>
+<td style="text-align: left;">1.12.0</td>
 <td style="text-align: left;">Landau (2021)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">testthat</td>
-<td style="text-align: left;">3.3.1</td>
+<td style="text-align: left;">3.3.2</td>
 <td style="text-align: left;">Wickham (2011)</td>
 </tr>
 <tr class="odd">
@@ -1055,9 +1055,6 @@ Chang, Winston, Joe Cheng, JJ Allaire, Carson Sievert, Barret Schloerke, Garrick
 </div>
 <div id="ref-igraph2006" class="csl-entry" role="listitem">
 Csárdi, Gábor, and Tamás Nepusz. 2006. “The Igraph Software Package for Complex Network Research.” <em>InterJournal</em> Complex Systems: 1695. <a href="https://igraph.org" class="uri">https://igraph.org</a>.
-</div>
-<div id="ref-igraph2025" class="csl-entry" role="listitem">
-Csárdi, Gábor, Tamás Nepusz, Vincent Traag, Szabolcs Horvát, Fabio Zanini, Daniel Noom, Kirill Müller, David Schoch, and Maëlle Salmon. 2025. <em><span class="nocase">igraph</span>: Network Analysis and Visualization in r</em>. <a href="https://doi.org/10.5281/zenodo.7682609" class="uri">https://doi.org/10.5281/zenodo.7682609</a>.
 </div>
 <div id="ref-docopt" class="csl-entry" role="listitem">
 de Jonge, Edwin. 2025. <em><span class="nocase">docopt</span>: Command-Line Interface Specification Language</em>. <a href="https://doi.org/10.32614/CRAN.package.docopt" class="uri">https://doi.org/10.32614/CRAN.package.docopt</a>.
@@ -1169,6 +1166,9 @@ Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>R Markdown: The Defi
 </div>
 <div id="ref-rmarkdown2020" class="csl-entry" role="listitem">
 Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. <em>R Markdown Cookbook</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://bookdown.org/yihui/rmarkdown-cookbook" class="uri">https://bookdown.org/yihui/rmarkdown-cookbook</a>.
+</div>
+<div id="ref-classyfireR" class="csl-entry" role="listitem">
+Y, Djoumbou Feunang, Eisner R, Knox C, Chepelev L, Hastings J, Owen G, Fahy E, et al.&nbsp;2016. <em>ClassyFire: Automated Chemical Classification with a Comprehensive, Computable Taxonomy</em>. <em>Journal of Cheminformatics</em>. Vol. 8:61. <a href="https://doi.org/10.1186/s13321-016-0174-y" class="uri">https://doi.org/10.1186/s13321-016-0174-y</a>.
 </div>
 </div>
 
