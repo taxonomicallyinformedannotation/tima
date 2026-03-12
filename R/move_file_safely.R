@@ -29,4 +29,3 @@ move_file_safely <- function(from, to) {
   unlink(from)
   TRUE
 }
-
