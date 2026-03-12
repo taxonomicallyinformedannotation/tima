@@ -46,7 +46,7 @@ test_that("add_xrefs_to_annotations adds xref columns to results", {
   export_output(x = xrefs_data, file = xrefs_file)
 
   # Test function
-  result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
+  result <- add_xrefs_to_annotations(results_list, xrefs_file)
 
   # Verify structure
   expect_type(result, "list")
@@ -96,7 +96,7 @@ test_that("add_xrefs_to_annotations handles missing xrefs file gracefully", {
 
   nonexistent_file <- temp_test_path("nonexistent.tsv.gz")
 
-  result <- tima:::add_xrefs_to_annotations(results_list, nonexistent_file)
+  result <- add_xrefs_to_annotations(results_list, nonexistent_file)
 
   # Should return unchanged results_list
   expect_equal(names(result$full), names(results_list$full))
@@ -127,7 +127,7 @@ test_that("add_xrefs_to_annotations handles empty xrefs file", {
   xrefs_file <- temp_test_path("empty_xrefs.tsv.gz")
   export_output(x = empty_xrefs, file = xrefs_file)
 
-  result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
+  result <- add_xrefs_to_annotations(results_list, xrefs_file)
 
   # Should return unchanged results_list (no xrefs to add)
   expect_equal(names(result$full), names(results_list$full))
@@ -161,7 +161,7 @@ test_that("add_xrefs_to_annotations filters out databases with all NA", {
   xrefs_file <- temp_test_path("xrefs_partial.tsv.gz")
   export_output(x = xrefs_data, file = xrefs_file)
 
-  result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
+  result <- add_xrefs_to_annotations(results_list, xrefs_file)
 
   # Should only have columns for non-empty databases
   xref_cols <- grep(
@@ -201,7 +201,7 @@ test_that("add_xrefs_to_annotations handles multiple IDs per inchikey", {
   xrefs_file <- temp_test_path("xrefs_multi.tsv.gz")
   export_output(x = xrefs_data, file = xrefs_file)
 
-  result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
+  result <- add_xrefs_to_annotations(results_list, xrefs_file)
 
   # Should collapse multiple IDs with " $ " separator
   chebi_val <- result$full$candidate_structure_id_chebi[1]
@@ -214,7 +214,7 @@ test_that("add_xrefs_to_annotations handles multiple IDs per inchikey", {
 
 test_that("add_xrefs_to_annotations errors on invalid results_list", {
   expect_error(
-    tima:::add_xrefs_to_annotations(
+    add_xrefs_to_annotations(
       list(full = NULL, filtered = NULL),
       "dummy.tsv.gz"
     ),
@@ -238,7 +238,7 @@ test_that("add_xrefs_to_annotations errors on missing inchikey column", {
   export_output(x = xrefs_data, file = xrefs_file)
 
   # Should warn but not error (graceful degradation)
-  result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
+  result <- add_xrefs_to_annotations(results_list, xrefs_file)
   expect_equal(names(result$full), names(results_list$full))
 })
 
@@ -268,7 +268,7 @@ test_that("add_xrefs_to_annotations errors on malformed xrefs", {
   export_output(x = bad_xrefs, file = xrefs_file)
 
   expect_error(
-    tima:::add_xrefs_to_annotations(results_list, xrefs_file),
+    add_xrefs_to_annotations(results_list, xrefs_file),
     "xrefs file must contain columns"
   )
 })
@@ -312,7 +312,7 @@ test_that("add_xrefs_to_annotations preserves all original columns", {
   xrefs_file <- temp_test_path("xrefs_preserve.tsv.gz")
   export_output(x = xrefs_data, file = xrefs_file)
 
-  result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
+  result <- add_xrefs_to_annotations(results_list, xrefs_file)
 
   # Verify all original columns are preserved
   for (col in original_cols) {
@@ -354,7 +354,7 @@ test_that("add_xrefs_to_annotations matches on 14-char inchikey connectivity lay
   xrefs_file <- temp_test_path("xrefs_connectivity_layer.tsv.gz")
   export_output(x = xrefs_data, file = xrefs_file)
 
-  result <- tima:::add_xrefs_to_annotations(results_list, xrefs_file)
+  result <- add_xrefs_to_annotations(results_list, xrefs_file)
 
   expect_identical(result$full$candidate_structure_id_wikidata[[1L]], "Q123")
   expect_identical(

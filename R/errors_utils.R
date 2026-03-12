@@ -14,11 +14,11 @@ NULL
 #'
 #' @param value User-provided value to check
 #' @param valid_values Vector of valid values to match against
-#' @param max_distance Maximum edit distance to consider (default: 5)
+#' @param max_distance Maximum edit distance to consider (default: 5L)
 #'
 #' @return Character string of closest match, or NULL if no close match
 #' @keywords internal
-.fuzzy_match <- function(value, valid_values, max_distance = 5) {
+.fuzzy_match <- function(value, valid_values, max_distance = 5L) {
   if (!is.character(value) || !is.character(valid_values)) {
     return(NULL)
   }
@@ -30,7 +30,7 @@ NULL
   # e.g., "positive" -> "pos" has distance 5, which is acceptable
   max_allowed <- max(
     max_distance,
-    min(distances[closest_idx], nchar(valid_values[closest_idx]) + 2)
+    min(distances[closest_idx], nchar(valid_values[closest_idx]) + 1L)
   )
 
   if (distances[closest_idx] <= max_allowed) {

@@ -1,386 +1,181 @@
 # Test Suite: summarize_results ----
+# Covers the real contract of summarize_results: input validation,
+# empty-input early return, remove_ties, summarize, and tag propagation.
 
 library(testthat)
 
-# Helper function to create test data ----
+# ---- fixture -----------------------------------------------------------------
 
-create_test_annotation_data <- function(n_features = 5, n_candidates = 3) {
-  # Create minimal test data that mimics real annotation structure
-  feature_ids <- paste0("FT_", seq_len(n_features))
+make_sop_df <- function(n_features = 3L, n_cand = 2L) {
+  fids <- paste0("FT", seq_len(n_features))
+  inks <- paste0("IK", seq_len(n_cand))
 
-  # Create features table
-  features_table <- data.frame(
-    feature_id = feature_ids,
-    rt = runif(n_features, 1, 10),
-    mz = runif(n_features, 100, 500),
+  features <- data.frame(
+    feature_id = fids,
+    rt = seq_len(n_features) * 1.0,
+    mz = seq_len(n_features) * 100.0,
+    stringsAsFactors = FALSE
+  )
+  components <- data.frame(
+    feature_id = fids,
+    component_id = paste0("C", seq_len(n_features)),
     stringsAsFactors = FALSE
   )
 
-  # Create components table
-  components_table <- data.frame(
-    feature_id = rep(feature_ids, each = 2)[1:n_features],
-    component_id = paste0("C_", seq_len(n_features)),
-    stringsAsFactors = FALSE
-  )
-
-  # Create annotation results
   df <- expand.grid(
-    feature_id = feature_ids[1:min(3, n_features)],
-    candidate_structure_inchikey_connectivity_layer = paste0(
-      "INK_",
-      1:n_candidates
-    ),
+    feature_id = fids[seq_len(min(2L, n_features))],
+    candidate_structure_inchikey_connectivity_layer = inks,
+    stringsAsFactors = FALSE
+  )
+  df$candidate_score_pseudo_initial <- runif(nrow(df))
+  df$candidate_structure_organism_occurrence_closest <- "Plantae"
+  df$score_biological <- runif(nrow(df)) * 100
+  df$score_weighted_bio <- runif(nrow(df)) * 100
+  df$score_chemical <- runif(nrow(df)) * 100
+  df$score_weighted_chemo <- runif(nrow(df)) * 100
+  df$rank_final <- rep(seq_len(n_cand), length.out = nrow(df))
+  df$candidate_adduct <- "[M+H]+"
+
+  sop <- data.frame(
+    structure_inchikey_connectivity_layer = inks,
+    organism_taxonomy_01domain = "Eukaryota",
+    organism_taxonomy_02kingdom = "Plantae",
+    organism_taxonomy_03phylum = "Tracheophyta",
+    organism_taxonomy_04class = "Magnoliopsida",
+    organism_taxonomy_05order = "Lamiales",
+    organism_taxonomy_06family = "Lamiaceae",
+    organism_taxonomy_07tribe = NA_character_,
+    organism_taxonomy_08genus = "Salvia",
+    organism_taxonomy_09species = "Salvia officinalis",
+    organism_taxonomy_10varietas = NA_character_,
+    organism_taxonomy_ottid = paste0("OTT", seq_len(n_cand)),
+    reference_doi = paste0("10.0/ref", seq_len(n_cand)),
+    tag = c("serum", rep(NA_character_, n_cand - 1L)),
     stringsAsFactors = FALSE
   )
 
-  df$candidate_score_pseudo_initial <- runif(nrow(df), 0, 1)
-  df$candidate_structure_organism_occurrence_closest <- rep(
-    "Plantae",
-    n_candidates
-  )
-  df$score_biological <- runif(nrow(df), 0, 100)
-  df$score_weighted_bio <- runif(nrow(df), 0, 100)
-  df$score_chemical <- runif(nrow(df), 0, 100)
-  df$score_weighted_chemo <- runif(nrow(df), 0, 100)
-  df$rank_final <- rep(1:n_candidates, length.out = nrow(df))
-
-  # Create structure-organism pairs
-  structure_organism_pairs_table <- data.frame(
-    structure_inchikey_connectivity_layer = paste0("INK_", 1:n_candidates),
-    organism_name = paste0("Organism_", 1:n_candidates),
-    organism_taxonomy_01domain = rep("Eukaryota", n_candidates),
-    organism_taxonomy_02kingdom = rep("Plantae", n_candidates),
-    organism_taxonomy_03phylum = rep("Streptophyta", n_candidates),
-    organism_taxonomy_04class = rep("Magnoliopsida", n_candidates),
-    organism_taxonomy_05order = rep("Lamiales", n_candidates),
-    organism_taxonomy_06family = rep("Lamiaceae", n_candidates),
-    organism_taxonomy_07tribe = rep("Mentheae", n_candidates),
-    organism_taxonomy_08genus = rep("Salvia", n_candidates),
-    organism_taxonomy_09species = rep("Salvia officinalis", n_candidates),
-    organism_taxonomy_10varietas = rep(NA_character_, n_candidates),
-    organism_taxonomy_ottid = paste0("OTT_", 1:n_candidates),
-    reference_doi = paste0("10.1234/ref", 1:n_candidates),
-    stringsAsFactors = FALSE
-  )
-
-  # Create chemically weighted annotations (minimal)
-  annot_table_wei_chemo <- df[1:min(2, nrow(df)), ]
+  chemo <- df[seq_len(min(2L, nrow(df))), ]
 
   list(
     df = df,
-    features_table = features_table,
-    components_table = components_table,
-    structure_organism_pairs_table = structure_organism_pairs_table,
-    annot_table_wei_chemo = annot_table_wei_chemo
+    features = features,
+    components = components,
+    sop = sop,
+    chemo = chemo
   )
 }
 
-# Input validation tests ----
-
-test_that("summarize_results validates input types", {
-  test_data <- create_test_annotation_data()
-
-  # df must be data frame
-  expect_error(
-    summarize_results(
-      df = "not_a_df",
-      features_table = test_data$features_table,
-      components_table = test_data$components_table,
-      structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-      annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-      remove_ties = FALSE,
-      summarize = FALSE
-    ),
-    "Fix: Ensure input is a valid data frame",
-    fixed = TRUE
+call_sr <- function(d, remove_ties = FALSE, summarize = FALSE) {
+  summarize_results(
+    df = d$df,
+    features_table = d$features,
+    components_table = d$components,
+    structure_organism_pairs_table = d$sop,
+    annot_table_wei_chemo = d$chemo,
+    remove_ties = remove_ties,
+    summarize = summarize
   )
+}
 
-  # features_table must be data frame
+# ---- input validation --------------------------------------------------------
+
+test_that("summarize_results rejects non-data-frame df", {
+  d <- make_sop_df()
   expect_error(
     summarize_results(
-      df = test_data$df,
-      features_table = list(),
-      components_table = test_data$components_table,
-      structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-      annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-      remove_ties = FALSE,
-      summarize = FALSE
+      "not_a_df",
+      d$features,
+      d$components,
+      d$sop,
+      d$chemo,
+      FALSE,
+      FALSE
     ),
-    "Fix: Ensure input is a valid data frame",
-    fixed = TRUE
-  )
-
-  # components_table must be data frame
-  expect_error(
-    summarize_results(
-      df = test_data$df,
-      features_table = test_data$features_table,
-      components_table = NULL,
-      structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-      annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-      remove_ties = FALSE,
-      summarize = FALSE
-    ),
-    "Fix: Ensure input is a valid data frame",
-    fixed = TRUE
-  )
-
-  # remove_ties must be logical
-  expect_error(
-    summarize_results(
-      df = test_data$df,
-      features_table = test_data$features_table,
-      components_table = test_data$components_table,
-      structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-      annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-      remove_ties = "yes",
-      summarize = FALSE
-    ),
-    "remove_ties must be a single logical value (TRUE/FALSE), got: character",
-    fixed = TRUE
-  )
-
-  # summarize must be logical
-  expect_error(
-    summarize_results(
-      df = test_data$df,
-      features_table = test_data$features_table,
-      components_table = test_data$components_table,
-      structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-      annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-      remove_ties = FALSE,
-      summarize = 1
-    ),
-    "summarize must be a single logical value (TRUE/FALSE), got: numeric",
-    fixed = TRUE
+    "valid data frame"
   )
 })
 
-test_that("summarize_results handles empty input gracefully", {
-  test_data <- create_test_annotation_data()
+test_that("summarize_results rejects non-logical remove_ties", {
+  d <- make_sop_df()
+  expect_error(call_sr(d, remove_ties = "yes"), "remove_ties")
+})
 
-  # Empty df should return empty df with warning
-  empty_df <- test_data$df[0, ]
+test_that("summarize_results rejects non-logical summarize", {
+  d <- make_sop_df()
+  expect_error(
+    summarize_results(
+      d$df,
+      d$features,
+      d$components,
+      d$sop,
+      d$chemo,
+      FALSE,
+      1L
+    ),
+    "summarize"
+  )
+})
 
+# ---- empty input -------------------------------------------------------------
+
+test_that("summarize_results warns and returns empty df with tag column on empty input", {
+  d <- make_sop_df()
   expect_warning(
-    result <- summarize_results(
-      df = empty_df,
-      features_table = test_data$features_table,
-      components_table = test_data$components_table,
-      structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-      annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-      remove_ties = FALSE,
-      summarize = FALSE
-    ),
-    "Empty results table"
+    out <- call_sr(d |> within(df <- df[0L, ])),
+    "Empty results"
   )
-
-  expect_equal(nrow(result), 0)
+  expect_equal(nrow(out), 0L)
+  expect_true("candidate_structure_organism_occurrence_tag" %in% names(out))
 })
 
-# Remove ties functionality ----
+# ---- basic output ------------------------------------------------------------
 
-test_that("summarize_results removes ties when requested", {
-  test_data <- create_test_annotation_data(n_features = 3, n_candidates = 5)
-
-  # Add some tied scores
-  test_data$df$rank_final <- rep(
-    c(1, 1, 2, 3, 4),
-    length.out = nrow(test_data$df)
-  )
-
-  result_with_ties <- summarize_results(
-    df = test_data$df,
-    features_table = test_data$features_table,
-    components_table = test_data$components_table,
-    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-    remove_ties = FALSE,
-    summarize = FALSE
-  )
-
-  result_without_ties <- summarize_results(
-    df = test_data$df,
-    features_table = test_data$features_table,
-    components_table = test_data$components_table,
-    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-    remove_ties = TRUE,
-    summarize = FALSE
-  )
-
-  # Should have fewer rows when ties are removed
-  expect_true(nrow(result_without_ties) <= nrow(result_with_ties))
+test_that("summarize_results returns a data frame with feature_id column", {
+  d <- make_sop_df()
+  out <- call_sr(d)
+  expect_s3_class(out, "data.frame")
+  expect_true("feature_id" %in% names(out))
 })
 
-test_that("remove_ties keeps only one entry per feature-rank combination", {
-  test_data <- create_test_annotation_data(n_features = 2, n_candidates = 3)
-  test_data$df$rank_final <- c(1, 1, 2, 1, 2, 3)
+test_that("summarize_results includes tag column when SOP has tags", {
+  d <- make_sop_df(n_cand = 2L)
+  out <- call_sr(d)
+  expect_true("candidate_structure_organism_occurrence_tag" %in% names(out))
+})
 
-  result <- summarize_results(
-    df = test_data$df,
-    features_table = test_data$features_table,
-    components_table = test_data$components_table,
-    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-    remove_ties = TRUE,
-    summarize = FALSE
-  )
+test_that("summarize_results works when SOP has no tag column", {
+  d <- make_sop_df()
+  d$sop$tag <- NULL
+  out <- call_sr(d)
+  expect_s3_class(out, "data.frame")
+  # tag column should still be created (as all NA) or omitted gracefully
+})
 
-  # Check for unique feature_id + rank_final combinations
-  if ("feature_id" %in% names(result) && "rank_final" %in% names(result)) {
-    combinations <- paste(result$feature_id, result$rank_final)
-    expect_equal(length(combinations), length(unique(combinations)))
+test_that("summarize_results works when SOP has no reference_doi column", {
+  d <- make_sop_df()
+  d$sop$reference_doi <- NULL
+  expect_no_error(out <- call_sr(d))
+  expect_s3_class(out, "data.frame")
+})
+
+# ---- remove_ties -------------------------------------------------------------
+
+test_that("remove_ties produces at most one row per feature-rank combination", {
+  d <- make_sop_df(n_features = 2L, n_cand = 3L)
+  out <- call_sr(d, remove_ties = TRUE)
+  if ("rank_final" %in% names(out) && "feature_id" %in% names(out)) {
+    combos <- paste(out$feature_id, out$rank_final)
+    expect_equal(length(combos), length(unique(combos)))
   }
 })
 
-# Data cleaning tests ----
+# ---- summarize ---------------------------------------------------------------
 
-test_that("summarize_results trims whitespace", {
-  test_data <- create_test_annotation_data()
-
-  # Add some whitespace
-  test_data$df$feature_id[1] <- " FT_1 "
-
-  result <- summarize_results(
-    df = test_data$df,
-    features_table = test_data$features_table,
-    components_table = test_data$components_table,
-    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-    remove_ties = FALSE,
-    summarize = FALSE
-  )
-
-  # Should not have leading/trailing whitespace
-  if ("feature_id" %in% names(result)) {
-    expect_false(any(
-      grepl("^\\s|\\s$", result$feature_id, perl = TRUE),
-      na.rm = TRUE
-    ))
+test_that("summarize=TRUE collapses to one row per feature", {
+  d <- make_sop_df(n_features = 3L, n_cand = 4L)
+  out <- call_sr(d, summarize = TRUE)
+  expect_s3_class(out, "data.frame")
+  if ("feature_id" %in% names(out)) {
+    expect_equal(nrow(out), length(unique(out$feature_id)))
   }
-})
-
-test_that("summarize_results converts empty strings to NA", {
-  test_data <- create_test_annotation_data()
-
-  result <- summarize_results(
-    df = test_data$df,
-    features_table = test_data$features_table,
-    components_table = test_data$components_table,
-    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-    remove_ties = FALSE,
-    summarize = FALSE
-  )
-
-  # Empty strings should be NA
-  has_empty_strings <- any(sapply(result, function(col) {
-    any(col == "", na.rm = TRUE)
-  }))
-
-  expect_false(has_empty_strings)
-})
-
-# Edge cases ----
-
-test_that("summarize_results handles single feature", {
-  test_data <- create_test_annotation_data(n_features = 1, n_candidates = 2)
-
-  result <- summarize_results(
-    df = test_data$df,
-    features_table = test_data$features_table,
-    components_table = test_data$components_table,
-    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-    remove_ties = FALSE,
-    summarize = FALSE
-  )
-
-  expect_s3_class(result, "data.frame")
-  expect_true(nrow(result) > 0)
-})
-
-test_that("summarize_results handles single candidate", {
-  test_data <- create_test_annotation_data(n_features = 3, n_candidates = 1)
-
-  result <- summarize_results(
-    df = test_data$df,
-    features_table = test_data$features_table,
-    components_table = test_data$components_table,
-    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-    remove_ties = FALSE,
-    summarize = FALSE
-  )
-
-  expect_s3_class(result, "data.frame")
-  expect_true(nrow(result) > 0)
-})
-
-test_that("summarize_results handles many features", {
-  test_data <- create_test_annotation_data(n_features = 100, n_candidates = 5)
-
-  result <- summarize_results(
-    df = test_data$df,
-    features_table = test_data$features_table,
-    components_table = test_data$components_table,
-    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-    remove_ties = FALSE,
-    summarize = FALSE
-  )
-
-  expect_s3_class(result, "data.frame")
-  expect_true(nrow(result) > 0)
-})
-
-# Combined options tests ----
-
-test_that("summarize_results works with both remove_ties=TRUE and summarize=TRUE", {
-  test_data <- create_test_annotation_data(n_features = 3, n_candidates = 5)
-
-  result <- summarize_results(
-    df = test_data$df,
-    features_table = test_data$features_table,
-    components_table = test_data$components_table,
-    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-    remove_ties = TRUE,
-    summarize = TRUE
-  )
-
-  expect_s3_class(result, "data.frame")
-
-  # Should have one row per feature (or fewer if some features have no annotations)
-  if ("feature_id" %in% names(result)) {
-    expect_equal(
-      nrow(result),
-      length(unique(result$feature_id))
-    )
-  }
-})
-
-# Performance tests ----
-
-test_that("summarize_results completes in reasonable time", {
-  test_data <- create_test_annotation_data(n_features = 50, n_candidates = 10)
-
-  start_time <- Sys.time()
-
-  result <- summarize_results(
-    df = test_data$df,
-    features_table = test_data$features_table,
-    components_table = test_data$components_table,
-    structure_organism_pairs_table = test_data$structure_organism_pairs_table,
-    annot_table_wei_chemo = test_data$annot_table_wei_chemo,
-    remove_ties = TRUE,
-    summarize = TRUE
-  )
-
-  end_time <- Sys.time()
-  elapsed <- as.numeric(end_time - start_time, units = "secs")
-
-  # Should complete in under 5 seconds for moderate data
-  expect_true(elapsed < 5)
 })

@@ -27,7 +27,6 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
   issues <- character(0)
   n_spectra <- 0L
 
-  # Basic file validation
   if (!file.exists(file)) {
     return(list(
       valid = FALSE,
@@ -36,63 +35,18 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
     ))
   }
 
-  # Read and parse MGF
   tryCatch(
     {
       lines <- readLines(file, warn = FALSE)
+      n_lines <- length(lines)
 
-      # Count all spectra (BEGIN IONS markers)
       begin_ions <- grep("^BEGIN IONS", lines, ignore.case = TRUE)
       end_ions <- grep("^END IONS", lines, ignore.case = TRUE)
       total_spectra <- length(begin_ions)
 
-      # Count only MS2 spectra (exclude MS1)
-      # MS2 spectra either have MSLEVEL=2 or have fragment peaks
-      n_ms2 <- 0L
-      if (total_spectra > 0L) {
-        for (i in seq_along(begin_ions)) {
-          spec_start <- begin_ions[i]
-          spec_end <- if (i <= length(end_ions)) end_ions[i] else length(lines)
-          spectrum <- lines[spec_start:spec_end]
-
-          # Check MSLEVEL - if present and =2, it's MS2
-          mslevel_line <- grep(
-            "^MSLEVEL=",
-            spectrum,
-            ignore.case = TRUE,
-            value = TRUE
-          )
-          if (length(mslevel_line) > 0) {
-            level <- gsub("^MSLEVEL=", "", mslevel_line[1], ignore.case = TRUE)
-            if (trimws(level) == "2") {
-              n_ms2 <- n_ms2 + 1L
-            }
-          } else {
-            # No MSLEVEL specified - assume MS2 if it has fragment peaks
-            # (MS1 spectra typically don't have MSLEVEL in MGF, but MS2 do have peaks)
-            has_peaks <- any(grepl("^[0-9]", spectrum))
-            if (has_peaks) {
-              n_ms2 <- n_ms2 + 1L
-            }
-          }
-        }
-      }
-
-      n_spectra <- n_ms2
-
-      # Check for basic MGF structure issues
       if (total_spectra == 0L) {
         issues <- c(issues, "No spectra found (no BEGIN IONS markers)")
-      } else if (n_ms2 == 0L) {
-        issues <- c(
-          issues,
-          sprintf(
-            "No MS2 spectra found (%d total spectra, but all are MS1 or empty)",
-            total_spectra
-          )
-        )
       }
-
       if (length(begin_ions) != length(end_ions)) {
         issues <- c(
           issues,
@@ -104,57 +58,85 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
         )
       }
 
-      # Check for required fields in at least one MS2 spectrum
-      if (n_ms2 > 0L) {
-        # Find first MS2 spectrum
-        first_ms2_idx <- NULL
-        for (i in seq_along(begin_ions)) {
-          spec_start <- begin_ions[i]
-          spec_end <- if (i <= length(end_ions)) end_ions[i] else length(lines)
-          spectrum <- lines[spec_start:spec_end]
-
-          mslevel_line <- grep(
-            "^MSLEVEL=",
-            spectrum,
-            ignore.case = TRUE,
-            value = TRUE
-          )
-          is_ms2 <- if (length(mslevel_line) > 0) {
-            level <- gsub("^MSLEVEL=", "", mslevel_line[1], ignore.case = TRUE)
-            trimws(level) == "2"
-          } else {
-            any(grepl("^[0-9]", spectrum))
-          }
-
-          if (is_ms2) {
-            first_ms2_idx <- i
-            break
-          }
+      # Vectorised MS2 detection - no per-spectrum loop needed.
+      # Build a logical vector "which line belongs to which spectrum" is not
+      # necessary: instead, mark lines that carry MSLEVEL=2 or look like peaks
+      # (start with a digit), then for each spectrum check presence via
+      # findInterval on pre-computed global grep results.
+      if (total_spectra > 0L) {
+        end_ions_capped <- if (length(end_ions) >= total_spectra) {
+          end_ions[seq_len(total_spectra)]
+        } else {
+          c(end_ions, rep(n_lines, total_spectra - length(end_ions)))
         }
 
-        if (!is.null(first_ms2_idx)) {
-          first_spectrum_start <- begin_ions[first_ms2_idx]
-          first_spectrum_end <- if (first_ms2_idx <= length(end_ions)) {
-            end_ions[first_ms2_idx]
-          } else {
-            length(lines)
-          }
-          first_spectrum <- lines[first_spectrum_start:first_spectrum_end]
+        # Global positions of MSLEVEL=2 and digit-starting (peak) lines
+        mslevel2_lines <- grep("^MSLEVEL=2$", lines, ignore.case = TRUE)
+        peak_lines <- grep("^[0-9]", lines)
 
-          has_mz <- any(grepl("^PEPMASS=", first_spectrum, ignore.case = TRUE))
-          has_peaks <- any(grepl("^[0-9]", first_spectrum))
+        # For each spectrum i, its line range is [begin_ions[i], end_ions[i]].
+        # A line L belongs to spectrum i iff begin_ions[i] <= L <= end_ions[i],
+        # i.e., findInterval(L, begin_ions) == i and L <= end_ions[i].
+        .lines_in_spectrum <- function(target_lines, starts, ends) {
+          idx <- findInterval(target_lines, starts) # spectrum index (0 = before first)
+          in_range <- idx >= 1L & target_lines <= ends[idx]
+          idx[in_range] # spectrum indices that contain a matching line
+        }
 
-          if (!has_mz) {
+        ms2_by_level <- unique(.lines_in_spectrum(
+          mslevel2_lines,
+          begin_ions,
+          end_ions_capped
+        ))
+        # Spectra with no MSLEVEL tag at all (treat as MS2 if they have peaks)
+        has_mslevel_line <- grep("^MSLEVEL=", lines, ignore.case = TRUE)
+        spectra_with_mslevel <- unique(findInterval(
+          has_mslevel_line,
+          begin_ions
+        ))
+        spectra_without_mslevel <- setdiff(
+          seq_len(total_spectra),
+          spectra_with_mslevel
+        )
+        spectra_with_peaks <- unique(.lines_in_spectrum(
+          peak_lines,
+          begin_ions,
+          end_ions_capped
+        ))
+        ms2_by_peaks <- intersect(spectra_without_mslevel, spectra_with_peaks)
+
+        ms2_indices <- sort(unique(c(ms2_by_level, ms2_by_peaks)))
+        n_ms2 <- length(ms2_indices)
+        n_spectra <- n_ms2
+
+        if (n_ms2 == 0L && total_spectra > 0L) {
+          issues <- c(
+            issues,
+            sprintf(
+              "No MS2 spectra found (%d total spectra, but all are MS1 or empty)",
+              total_spectra
+            )
+          )
+        }
+
+        # Check first MS2 spectrum for required fields
+        if (n_ms2 > 0L) {
+          first_idx <- ms2_indices[[1L]]
+          first_start <- begin_ions[[first_idx]]
+          first_end <- end_ions_capped[[first_idx]]
+          first_spec <- lines[first_start:first_end]
+
+          if (!any(grepl("^PEPMASS=", first_spec, ignore.case = TRUE))) {
             issues <- c(issues, "First MS2 spectrum missing PEPMASS field")
           }
-          if (!has_peaks) {
+          if (!any(grepl("^[0-9]", first_spec))) {
             issues <- c(issues, "First MS2 spectrum missing peak data")
           }
         }
       }
     },
     error = function(e) {
-      issues <- c(issues, paste0("Failed to parse MGF: ", conditionMessage(e)))
+      issues <<- c(issues, paste0("Failed to parse MGF: ", conditionMessage(e)))
     }
   )
 
