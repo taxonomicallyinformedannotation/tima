@@ -19,3 +19,4 @@ The input context (invisibly)
 \description{
 Logs operation failure with error details and timing.
 }
+\keyword{internal}

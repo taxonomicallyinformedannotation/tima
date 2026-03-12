@@ -32,3 +32,4 @@ ctx <- log_operation("classify_structures", n_smiles = 100)
 log_complete(ctx, n_classified = 95, n_failed = 5)
 }
 }
+\keyword{internal}

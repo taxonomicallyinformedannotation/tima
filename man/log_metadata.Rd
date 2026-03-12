@@ -17,3 +17,4 @@ The updated context (invisibly)
 \description{
 Adds metadata to an operation context and logs it.
 }
+\keyword{internal}

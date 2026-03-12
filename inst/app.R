@@ -2013,6 +2013,7 @@ ui <- shiny::fluidPage(
   fil_fea_raw <- prefil_fea_raw_1
   fil_spe_raw <- prefil_spe_raw_1
   fil_met_raw <- prefil_met_raw_1
+  fil_mzm_raw <- prefil_mzm_raw_1
   fil_sir_raw <- prefil_sir_raw_1
 
   fil_pat <- shiny::isolate(input$fil_pat)
@@ -2379,7 +2380,252 @@ ui <- shiny::fluidPage(
   )
 }
 
-server <- function(input, output) {
+.update_input_if_present <- function(session, input_id, value, updater) {
+  if (is.null(value)) {
+    return(invisible(NULL))
+  }
+
+  updater(session, inputId = input_id)
+  invisible(NULL)
+}
+
+.restore_saved_params <- function(session) {
+  yamls_params <- tima:::load_yaml_files()$yamls_params
+  yaml_small <- yamls_params[["prepare_params"]]
+  yaml_advanced <- yamls_params[["prepare_params_advanced"]]
+
+  # Small/common parameters
+  .update_input_if_present(
+    session,
+    "fil_pat",
+    yaml_small$files$pattern,
+    shiny::updateTextInput
+  )
+  .update_input_if_present(
+    session,
+    "ms_pol",
+    yaml_small$ms$polarity,
+    shiny::updateSelectInput
+  )
+  .update_input_if_present(
+    session,
+    "org_tax",
+    yaml_small$organisms$taxon,
+    shiny::updateTextInput
+  )
+  .update_input_if_present(
+    session,
+    "high_confidence",
+    yaml_small$options$high_confidence,
+    shiny::updateCheckboxInput
+  )
+  .update_input_if_present(
+    session,
+    "summarize",
+    yaml_small$options$summarize,
+    shiny::updateCheckboxInput
+  )
+
+  # Annotation parameters
+  .update_input_if_present(session, "ann_can_fin",
+    yaml_advanced$annotations$candidates$final,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ann_can_nei",
+    yaml_advanced$annotations$candidates$neighbors,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ann_can_sam",
+    yaml_advanced$annotations$candidates$samples,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ann_can_bes",
+    yaml_advanced$annotations$candidates$best_percentile,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ann_ms1only",
+    yaml_advanced$annotations$ms1only,
+    shiny::updateCheckboxInput)
+  .update_input_if_present(session, "ann_ms2_app",
+    yaml_advanced$annotations$ms2approx,
+    shiny::updateCheckboxInput)
+  .update_input_if_present(session, "ann_thr_con",
+    yaml_advanced$annotations$thresholds$consistency,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ann_thr_ms1_bio",
+    yaml_advanced$annotations$thresholds$ms1$biological,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ann_thr_ms1_che",
+    yaml_advanced$annotations$thresholds$ms1$chemical,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ann_thr_ms1_con",
+    yaml_advanced$annotations$thresholds$ms1$condition,
+    shiny::updateSelectInput)
+
+  # GNPS / organisms / options
+  .update_input_if_present(session, "gnps_id",
+    yaml_advanced$gnps$id,
+    shiny::updateTextInput)
+  .update_input_if_present(session, "gnps_workflow",
+    yaml_advanced$gnps$workflow,
+    shiny::updateSelectInput)
+  .update_input_if_present(session, "org_fil_mod",
+    yaml_advanced$organisms$filter$mode,
+    shiny::updateCheckboxInput)
+  .update_input_if_present(session, "org_fil_lev",
+    yaml_advanced$organisms$filter$level,
+    shiny::updateSelectInput)
+  .update_input_if_present(session, "org_fil_val",
+    yaml_advanced$organisms$filter$value,
+    shiny::updateTextInput)
+  .update_input_if_present(session, "compounds_names",
+    yaml_advanced$options$compounds_names,
+    shiny::updateCheckboxInput)
+  .update_input_if_present(session, "remove_ties",
+    yaml_advanced$options$remove_ties,
+    shiny::updateCheckboxInput)
+  .update_input_if_present(session, "force",
+    yaml_advanced$options$force,
+    shiny::updateCheckboxInput)
+  .update_input_if_present(session, "too_sir_ver",
+    yaml_advanced$tools$sirius$version,
+    shiny::updateSelectInput)
+  .update_input_if_present(session, "uni_rt",
+    yaml_advanced$units$rt,
+    shiny::updateSelectInput)
+
+  # MS parameters
+  .update_input_if_present(session, "ms_add_neg",
+    yaml_advanced$ms$adducts$neg,
+    shiny::updateCheckboxGroupInput)
+  .update_input_if_present(session, "ms_add_pos",
+    yaml_advanced$ms$adducts$pos,
+    shiny::updateCheckboxGroupInput)
+  .update_input_if_present(session, "ms_clu_neg",
+    yaml_advanced$ms$clusters$neg,
+    shiny::updateCheckboxGroupInput)
+  .update_input_if_present(session, "ms_clu_pos",
+    yaml_advanced$ms$clusters$pos,
+    shiny::updateCheckboxGroupInput)
+  .update_input_if_present(session, "ms_neu",
+    yaml_advanced$ms$neutral_losses,
+    shiny::updateCheckboxGroupInput)
+  .update_input_if_present(session, "ms_thr_ms2_int",
+    yaml_advanced$ms$thresholds$ms2$intensity,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ms_tol_mas_ppm_ms1",
+    yaml_advanced$ms$tolerances$mass$ppm$ms1,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ms_tol_mas_ppm_ms2",
+    yaml_advanced$ms$tolerances$mass$ppm$ms2,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ms_tol_mas_dal_ms1",
+    yaml_advanced$ms$tolerances$mass$dalton$ms1,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ms_tol_mas_dal_ms2",
+    yaml_advanced$ms$tolerances$mass$dalton$ms2,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ms_tol_rt_add",
+    yaml_advanced$ms$tolerances$rt$adducts,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "ms_tol_rt_lib",
+    yaml_advanced$ms$tolerances$rt$library,
+    shiny::updateSliderInput)
+
+  # Similarities
+  .update_input_if_present(session, "sim_met_ann",
+    yaml_advanced$similarities$methods$annotations,
+    shiny::updateSelectInput)
+  .update_input_if_present(session, "sim_met_edg",
+    yaml_advanced$similarities$methods$edges,
+    shiny::updateSelectInput)
+  .update_input_if_present(session, "sim_thr_ann",
+    yaml_advanced$similarities$thresholds$annotations,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "sim_thr_edg",
+    yaml_advanced$similarities$thresholds$edges,
+    shiny::updateSliderInput)
+  .update_input_if_present(session, "sim_thr_mat",
+    yaml_advanced$similarities$thresholds$matched_peaks,
+    shiny::updateSliderInput)
+
+  # Names
+  name_text_inputs <- list(
+    names_adduct = yaml_advanced$names$adduct,
+    names_compound_name = yaml_advanced$names$compound_name,
+    names_filename = yaml_advanced$names$filename,
+    names_features = yaml_advanced$names$features,
+    names_inchikey = yaml_advanced$names$inchikey,
+    names_libraries = yaml_advanced$names$libraries,
+    names_precursor = yaml_advanced$names$precursor,
+    names_rt = yaml_advanced$names$rt$features,
+    names_rt_2 = yaml_advanced$names$rt$library,
+    names_smiles = yaml_advanced$names$smiles,
+    names_source = yaml_advanced$names$source,
+    names_target = yaml_advanced$names$target,
+    names_taxon = yaml_advanced$names$taxon,
+    names_mgf_ad = yaml_advanced$names$mgf$adduct,
+    names_mgf_ce = yaml_advanced$names$mgf$collision_energy,
+    names_mgf_ci = yaml_advanced$names$mgf$compound_id,
+    names_mgf_em = yaml_advanced$names$mgf$exact_mass,
+    names_mgf_in = yaml_advanced$names$mgf$inchi,
+    names_mgf_io = yaml_advanced$names$mgf$inchi_no_stereo,
+    names_mgf_ik = yaml_advanced$names$mgf$inchikey,
+    names_mgf_il = yaml_advanced$names$mgf$inchikey_connectivity_layer,
+    names_mgf_mf = yaml_advanced$names$mgf$molecular_formula,
+    names_mgf_na = yaml_advanced$names$mgf$name,
+    names_mgf_po = yaml_advanced$names$mgf$polarity,
+    names_mgf_rt = yaml_advanced$names$mgf$retention_time,
+    names_mgf_sm = yaml_advanced$names$mgf$smiles,
+    names_mgf_sn = yaml_advanced$names$mgf$smiles_no_stereo,
+    names_mgf_si = yaml_advanced$names$mgf$spectrum_id,
+    names_mgf_sp = yaml_advanced$names$mgf$splash,
+    names_mgf_sy = yaml_advanced$names$mgf$synonyms,
+    names_mgf_xl = yaml_advanced$names$mgf$xlogp
+  )
+
+  purrr::iwalk(name_text_inputs, function(value, input_id) {
+    .update_input_if_present(session, input_id, value, shiny::updateTextInput)
+  })
+
+  .update_input_if_present(session, "names_extension",
+    yaml_advanced$names$extension,
+    shiny::updateCheckboxInput)
+
+  # Weights
+  weight_slider_inputs <- list(
+    wei_glo_bio = yaml_advanced$weights$global$biological,
+    wei_glo_che = yaml_advanced$weights$global$chemical,
+    wei_glo_spe = yaml_advanced$weights$global$spectral,
+    wei_bio_01 = yaml_advanced$weights$biological$domain,
+    wei_bio_02 = yaml_advanced$weights$biological$kingdom,
+    wei_bio_03 = yaml_advanced$weights$biological$phylum,
+    wei_bio_04 = yaml_advanced$weights$biological$class,
+    wei_bio_05 = yaml_advanced$weights$biological$order,
+    wei_bio_06 = yaml_advanced$weights$biological$infraorder,
+    wei_bio_07 = yaml_advanced$weights$biological$family,
+    wei_bio_08 = yaml_advanced$weights$biological$subfamily,
+    wei_bio_09 = yaml_advanced$weights$biological$tribe,
+    wei_bio_10 = yaml_advanced$weights$biological$subtribe,
+    wei_bio_11 = yaml_advanced$weights$biological$genus,
+    wei_bio_12 = yaml_advanced$weights$biological$subgenus,
+    wei_bio_13 = yaml_advanced$weights$biological$species,
+    wei_bio_14 = yaml_advanced$weights$biological$subspecies,
+    wei_bio_15 = yaml_advanced$weights$biological$variety,
+    wei_bio_16 = yaml_advanced$weights$biological$biota,
+    wei_che_11 = yaml_advanced$weights$chemical$cla$kingdom,
+    wei_che_12 = yaml_advanced$weights$chemical$cla$superclass,
+    wei_che_13 = yaml_advanced$weights$chemical$cla$class,
+    wei_che_14 = yaml_advanced$weights$chemical$cla$parent,
+    wei_che_21 = yaml_advanced$weights$chemical$npc$pathway,
+    wei_che_22 = yaml_advanced$weights$chemical$npc$superclass,
+    wei_che_23 = yaml_advanced$weights$chemical$npc$class
+  )
+
+  purrr::iwalk(weight_slider_inputs, function(value, input_id) {
+    .update_input_if_present(session, input_id, value, shiny::updateSliderInput)
+  })
+
+  invisible(NULL)
+}
+
+server <- function(input, output, session) {
   ## Observe helpers
   shinyhelper::observe_helpers()
 
@@ -2473,6 +2719,10 @@ server <- function(input, output) {
   })
   iv$enable()
 
+  session$onFlushed(function() {
+    .restore_saved_params(session)
+  }, once = TRUE)
+
   ## When the Save button is clicked, save the response
   shiny::observeEvent(eventExpr = input$save, handlerExpr = {
     ## User-experience stuff
@@ -2504,7 +2754,7 @@ server <- function(input, output) {
         shinyjs::enable("save")
         shinyjs::enable("launch")
         shinyjs::hide("save_msg")
-        shinyjs::hide("error")
+        # Keep potential save errors visible; only clear transient job/result UI
         shinyjs::hide("job_msg")
         shinyjs::hide("job_end")
         shinyjs::hide("results_mini")
@@ -2516,6 +2766,23 @@ server <- function(input, output) {
   })
 
   shiny::observeEvent(eventExpr = input$launch, handlerExpr = {
+    # Persist latest UI state even if user changed inputs after last save click
+    save_ok <- tryCatch(
+      {
+        .save_input(input = input)
+        TRUE
+      },
+      error = function(err) {
+        shinyjs::html("error_msg", err$message)
+        shinyjs::show(id = "error", anim = TRUE, animType = "fade")
+        FALSE
+      }
+    )
+
+    if (!save_ok) {
+      return(invisible(NULL))
+    }
+
     shinyjs::show("job_msg")
     shinyjs::hide("thankyou_msg")
     shinyjs::hide("error")
@@ -2590,7 +2857,7 @@ shiny::shinyApp(
     tima:::go_to_cache()
   },
   options = list(
-    "host" = host,
-    "port" = 3838
+    host = host,
+    port = 3838
   )
 )

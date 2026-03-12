@@ -4,14 +4,14 @@
 \alias{.fuzzy_match}
 \title{Calculate Levenshtein distance for fuzzy matching}
 \usage{
-.fuzzy_match(value, valid_values, max_distance = 5)
+.fuzzy_match(value, valid_values, max_distance = 5L)
 }
 \arguments{
 \item{value}{User-provided value to check}
 
 \item{valid_values}{Vector of valid values to match against}
 
-\item{max_distance}{Maximum edit distance to consider (default: 5)}
+\item{max_distance}{Maximum edit distance to consider (default: 5L)}
 }
 \value{
 Character string of closest match, or NULL if no close match

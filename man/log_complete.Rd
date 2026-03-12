@@ -17,3 +17,4 @@ The input context (invisibly)
 \description{
 Logs the successful completion of an operation with results and timing.
 }
+\keyword{internal}
