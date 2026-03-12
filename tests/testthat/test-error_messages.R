@@ -209,15 +209,15 @@ test_that("format_error creates structured messages", {
 
 test_that("fuzzy_match finds close matches", {
   # Test internal function
-  match <- tima:::.fuzzy_match("positiv", c("pos", "neg", "positive"))
+  match <- .fuzzy_match("positiv", c("pos", "neg", "positive"))
   expect_equal(match, "positive")
 
   # Test partial match
-  match <- tima:::.fuzzy_match("positive", c("pos", "neg"))
+  match <- .fuzzy_match("positive", c("pos", "neg"))
   expect_equal(match, "pos") # Should match closest
 
   # Test no match for very distant strings
-  match <- tima:::.fuzzy_match(
+  match <- .fuzzy_match(
     "verylongstring",
     c("abc", "def", "ghi"),
     max_distance = 2

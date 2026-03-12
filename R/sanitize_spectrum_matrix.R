@@ -33,7 +33,7 @@ reset_sanitize_warnings <- function() {
 #'
 #' @keywords internal
 is_spectrum_sanitized <- function(spectrum, tolerance = 0.01, ppm = 10) {
-  # Bulletproof: never produce NA, never error — only TRUE or FALSE
+  # Bulletproof: never produce NA, never error - only TRUE or FALSE
   tryCatch(
     {
       if (is.null(spectrum)) {
