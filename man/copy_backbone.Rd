@@ -4,20 +4,13 @@
 \alias{copy_backbone}
 \title{Copy backbone}
 \usage{
-copy_backbone(
-  cache_dir = fs::path_home(".tima"),
-  package = "tima",
-  force_overwrite = FALSE
-)
+copy_backbone(cache_dir = fs::path_home(".tima"), package = "tima")
 }
 \arguments{
 \item{cache_dir}{Character string path to the cache directory
 (default: "~/.tima" in user's home directory)}
 
 \item{package}{Character string name of the package (default: "tima")}
-
-\item{force_overwrite}{\link{logical} if TRUE, overwrite existing cache contents
-with package defaults; if FALSE, keep existing cache as-is}
 }
 \value{
 NULL (invisibly). Creates cache directory structure as side effect.
