@@ -480,8 +480,7 @@ END IONS",
       metadata_file = metadata_file,
       sirius_dir = sirius_dir
     ),
-    "Input data validation failed",
-    fixed = TRUE
+    class = "tima_validation_error"
   )
 })
 
@@ -505,7 +504,7 @@ test_that("validate_inputs works with valid inputs", {
 test_that("validate_inputs stops on invalid inputs", {
   expect_error(
     validate_inputs(features = "/nonexistent/file.csv"),
-    "Input data validation failed"
+    class = "tima_validation_error"
   )
 })
 

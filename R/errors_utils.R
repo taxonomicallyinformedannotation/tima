@@ -76,15 +76,72 @@ format_error <- function(
   context = NULL
 ) {
   parts <- c(
-    paste0("\u2717 ", problem), # ✗ symbol
-    "",
+    paste0("x ", problem),
     if (!is.null(location)) paste0("Location: ", location),
     if (!is.null(expected)) paste0("Expected: ", expected),
     if (!is.null(received)) paste0("Received: ", received),
-    if (!is.null(context)) paste0("\nReason: ", context),
-    if (!is.null(suggestion)) paste0("\n", suggestion),
-    if (!is.null(fix)) paste0("\nFix: ", fix)
+    if (!is.null(context)) paste0("Reason: ", context),
+    if (!is.null(suggestion)) suggestion,
+    if (!is.null(fix)) paste0("Fix: ", fix)
   )
 
   paste(parts[nzchar(parts)], collapse = "\n")
+}
+
+#' Abort with a classed TIMA error
+#'
+#' @description Creates a formatted TIMA error message and throws it using
+#'     cli::cli_abort so callers can assert on error classes in tests.
+#'
+#' @param problem Main problem statement
+#' @param expected What was expected
+#' @param received What was actually received
+#' @param location Where the problem occurred
+#' @param suggestion Optional suggestion to fix the issue
+#' @param fix Optional actionable fix steps
+#' @param context Optional context about why this matters
+#' @param class Character vector of additional condition classes
+#'
+#' @return No return value. Always throws an error.
+#' @keywords internal
+#' @noRd
+tima_abort <- function(
+  problem,
+  expected = NULL,
+  received = NULL,
+  location = NULL,
+  suggestion = NULL,
+  fix = NULL,
+  context = NULL,
+  class = "tima_error"
+) {
+  cli::cli_abort(
+    message = format_error(
+      problem = problem,
+      expected = expected,
+      received = received,
+      location = location,
+      suggestion = suggestion,
+      fix = fix,
+      context = context
+    ),
+    class = class,
+    call = NULL
+  )
+}
+
+#' Abort with a preformatted message
+#'
+#' @param message Preformatted error message string
+#' @param class Character vector of additional condition classes
+#'
+#' @return No return value. Always throws an error.
+#' @keywords internal
+#' @noRd
+tima_abort_message <- function(message, class = "tima_error") {
+  cli::cli_abort(
+    message = message,
+    class = class,
+    call = NULL
+  )
 }

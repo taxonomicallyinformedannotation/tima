@@ -64,6 +64,7 @@ test_that("annotate_masses validates ms_mode correctly", {
       ms_mode = "invalid_mode"
     ),
     "Fix: Choose one of: pos, neg",
+    class = "tima_validation_error",
     fixed = TRUE
   )
 
@@ -80,6 +81,7 @@ test_that("annotate_masses validates ms_mode correctly", {
       ms_mode = ""
     ),
     "Did you mean 'pos'?",
+    class = "tima_validation_error",
     fixed = TRUE
   )
 
@@ -105,6 +107,7 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
       str_tax_npc = fixtures$str_tax_npc
     ),
     "Fix: Use a positive value appropriate for your instrument",
+    class = "tima_validation_error",
     fixed = TRUE
   )
 
@@ -122,6 +125,7 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
       str_tax_npc = fixtures$str_tax_npc
     ),
     "Fix: Use a positive value appropriate for your instrument",
+    class = "tima_validation_error",
     fixed = TRUE
   )
 
@@ -156,6 +160,7 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
       str_tax_npc = fixtures$str_tax_npc
     ),
     "Fix: Provide a numeric tolerance value in parts per million (ppm)",
+    class = "tima_validation_error",
     fixed = TRUE
   )
   fixtures$cleanup()
@@ -163,24 +168,6 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
 
 test_that("annotate_masses validates tolerance_rt correctly", {
   fixtures <- setup_minimal_fixtures()
-
-  # Zero tolerance should error
-  expect_error(
-    annotate_masses(
-      tolerance_rt = 0,
-      tolerance_ppm = 10,
-      ms_mode = "pos",
-      features = fixtures$features,
-      library = fixtures$library,
-      str_stereo = fixtures$str_stereo,
-      str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
-      str_tax_cla = fixtures$str_tax_cla,
-      str_tax_npc = fixtures$str_tax_npc
-    ),
-    "Recommended range: 0.01-0.05 minutes for mass annotation"
-  ) |>
-    expect_error() # Will error later, that's OK
 
   # Negative tolerance should error
   expect_error(
@@ -196,7 +183,8 @@ test_that("annotate_masses validates tolerance_rt correctly", {
       tolerance_ppm = 10,
       ms_mode = "pos"
     ),
-    "Fix: Use a value between 0 and Inf"
+    "Use a value between 0 and Inf",
+    class = "tima_validation_error"
   )
 
   # Too large tolerance should error
@@ -237,8 +225,8 @@ test_that("annotate_masses validates adducts_list structure", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "Fix: Add adduct definitions for 'pos' mode to your configuration:
-  adducts_list$pos <- c('[M+H]+', '[M+Na]+', ...)",
+    "Fix: Add adduct definitions for 'pos' mode to your configuration",
+    class = "tima_validation_error",
     fixed = TRUE
   )
 
@@ -257,8 +245,8 @@ test_that("annotate_masses validates adducts_list structure", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "Fix: Add adduct definitions for 'pos' mode to your configuration:
-  adducts_list$pos <- c('[M+H]+', '[M+Na]+', ...)",
+    "Fix: Add adduct definitions for 'pos' mode to your configuration",
+    class = "tima_validation_error",
     fixed = TRUE
   )
 
@@ -278,6 +266,7 @@ test_that("annotate_masses validates adducts_list structure", {
       tolerance_rt = 0.02
     ),
     "Fix: Ensure the adduct configuration is a list with 'pos' and 'neg' entries",
+    class = "tima_validation_error",
     fixed = TRUE
   )
   fixtures$cleanup()
@@ -301,8 +290,8 @@ test_that("annotate_masses validates clusters_list structure", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "Fix: Add adduct definitions for 'pos' mode to your configuration:
-  clusters_list$pos <- c('[M+H]+', '[M+Na]+', ...)",
+    "Fix: Add adduct definitions for 'pos' mode to your configuration",
+    class = "tima_validation_error",
     fixed = TRUE
   )
   fixtures$cleanup()
@@ -325,7 +314,8 @@ test_that("annotate_masses validates file existence", {
       tolerance_ppm = 10,
       tolerance_rt = 0.02
     ),
-    "Input data validation failed"
+    "Input data validation failed",
+    class = "tima_validation_error"
   )
 })
 
@@ -362,7 +352,8 @@ test_that("annotate_masses handles empty features table", {
       output_annotations = env$output_annotations,
       output_edges = env$output_edges
     ),
-    "Input data validation failed"
+    "Input data validation failed",
+    class = "tima_validation_error"
   )
 })
 

@@ -42,7 +42,10 @@ validate_choice <- function(
       location = context,
       fix = "Provide a single character value"
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   # Value checking
@@ -63,7 +66,10 @@ validate_choice <- function(
       },
       fix = paste0("Choose one of: ", paste(valid_values, collapse = ", "))
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   invisible(TRUE)
@@ -96,7 +102,10 @@ validate_file_exists <- function(
         location = param_name,
         fix = "Provide a valid file path"
       )
-      stop(msg, call. = FALSE)
+      tima_abort_message(
+        msg,
+        class = c("tima_validation_error", "tima_error")
+      )
     }
     return(invisible(TRUE))
   }
@@ -109,7 +118,10 @@ validate_file_exists <- function(
       location = param_name,
       fix = "Provide a character string file path"
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   if (!file.exists(path)) {
@@ -159,7 +171,10 @@ validate_file_exists <- function(
         "3. Ensure the file exists at the specified location"
       )
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   invisible(TRUE)
@@ -192,7 +207,10 @@ validate_dataframe_structure <- function(
       received = paste(class(df), collapse = ", "),
       fix = "Ensure input is a valid data frame"
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   # Row count check
@@ -203,7 +221,10 @@ validate_dataframe_structure <- function(
       received = paste0(nrow(df), " row(s)"),
       fix = "Provide a data frame with more rows or adjust min_rows parameter"
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   # Column validation
@@ -250,7 +271,10 @@ validate_dataframe_structure <- function(
         suggestion = suggestion_text,
         fix = "Ensure your data contains all required columns with correct names"
       )
-      stop(msg, call. = FALSE)
+      tima_abort_message(
+        msg,
+        class = c("tima_validation_error", "tima_error")
+      )
     }
   }
 
@@ -310,7 +334,10 @@ validate_numeric_range <- function(
       },
       fix = "Provide a single numeric value"
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   if (is.na(value)) {
@@ -318,7 +345,10 @@ validate_numeric_range <- function(
       problem = paste0(param_name, " cannot be NA"),
       fix = "Provide a non-NA numeric value"
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   # Hard limits
@@ -330,7 +360,10 @@ validate_numeric_range <- function(
       context = context,
       fix = paste0("Use a value between ", min_value, " and ", max_value)
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   # Recommended range warnings
@@ -387,7 +420,10 @@ validate_tolerance_ppm <- function(
       received = class(tolerance_ppm)[1L],
       fix = "Provide a numeric tolerance value in parts per million (ppm)"
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   if (tolerance_ppm <= 0) {
@@ -397,7 +433,10 @@ validate_tolerance_ppm <- function(
       context = "Mass tolerance defines the matching window for annotation",
       fix = "Use a positive value appropriate for your instrument"
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   # Provide instrument-specific guidance
@@ -513,11 +552,17 @@ validate_tolerance_ppm <- function(
 #' }
 validate_file_existence <- function(file_list, allow_null = FALSE) {
   if (!is.list(file_list)) {
-    stop("file_list must be a named list of file paths", call. = FALSE)
+    tima_abort(
+      problem = "file_list must be a named list of file paths",
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   if (length(file_list) == 0L) {
-    stop("file_list cannot be empty", call. = FALSE)
+    tima_abort(
+      problem = "file_list cannot be empty",
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   # Validate each file and collect results
@@ -556,8 +601,8 @@ validate_file_existence <- function(file_list, allow_null = FALSE) {
   }
 
   if (length(errors) > 0L) {
-    stop(
-      paste(
+    tima_abort_message(
+      message = paste(
         c(
           errors,
           "",
@@ -565,7 +610,7 @@ validate_file_existence <- function(file_list, allow_null = FALSE) {
         ),
         collapse = "\n"
       ),
-      call. = FALSE
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
@@ -590,13 +635,11 @@ validate_file_existence <- function(file_list, allow_null = FALSE) {
 #' }
 validate_ms_mode <- function(ms_mode) {
   if (missing(ms_mode) || is.null(ms_mode)) {
-    stop(
-      format_error(
-        problem = "ms_mode is required but was not provided",
-        expected = "one of: 'pos', 'neg'",
-        fix = "Specify ms_mode = 'pos' or ms_mode = 'neg' in your parameters"
-      ),
-      call. = FALSE
+    tima_abort(
+      problem = "ms_mode is required but was not provided",
+      expected = "one of: 'pos', 'neg'",
+      fix = "Specify ms_mode = 'pos' or ms_mode = 'neg' in your parameters",
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
@@ -691,7 +734,10 @@ validate_adduct_list <- function(
       context = "Adduct lists must be organized by MS mode (pos/neg)",
       fix = "Ensure the adduct configuration is a list with 'pos' and 'neg' entries"
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   if (is.null(adducts_list[[ms_mode]])) {
@@ -722,7 +768,10 @@ validate_adduct_list <- function(
         " <- c('[M+H]+', '[M+Na]+', ...)"
       )
     )
-    stop(msg, call. = FALSE)
+    tima_abort_message(
+      msg,
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   if (length(adducts_list[[ms_mode]]) == 0L) {
@@ -803,17 +852,22 @@ validate_dataframe <- function(
 #' }
 validate_weights <- function(weights, param_name = "weights") {
   if (!is.numeric(weights)) {
-    stop(
-      param_name,
-      " must be numeric, got: ",
-      class(weights)[1L],
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        param_name,
+        " must be numeric, got: ",
+        class(weights)[1L]
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   # Check for NA values
   if (any(is.na(weights))) {
-    stop(param_name, " cannot contain NA values", call. = FALSE)
+    tima_abort(
+      problem = paste0(param_name, " cannot contain NA values"),
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   # Check for negative weights
@@ -824,20 +878,24 @@ validate_weights <- function(weights, param_name = "weights") {
     } else {
       paste0("position ", negative_idx)
     }
-    stop(
-      param_name,
-      " must be non-negative. Negative weight(s): ",
-      paste(negative_names, collapse = ", "),
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        param_name,
+        " must be non-negative. Negative weight(s): ",
+        paste(negative_names, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   # Check for all zeros (would cause division by zero)
   if (sum(weights) == 0) {
-    stop(
-      param_name,
-      " cannot all be zero (would cause division by zero)",
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        param_name,
+        " cannot all be zero (would cause division by zero)"
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
@@ -867,36 +925,27 @@ validate_character <- function(
 ) {
   if (is.null(value)) {
     if (!allow_null) {
-      stop(
-        format_error(
-          problem = paste0(param_name, " cannot be NULL"),
-          fix = "Provide a non-NULL character string"
-        ),
-        call. = FALSE
+      tima_abort(
+        problem = paste0(param_name, " cannot be NULL"),
+        fix = "Provide a non-NULL character string"
       )
     }
     return(invisible(TRUE))
   }
 
   if (!is.character(value) || length(value) != 1L) {
-    stop(
-      format_error(
-        problem = paste0("Invalid type for ", param_name),
-        expected = "single character string",
-        received = class(value)[1L],
-        fix = "Ensure the parameter is a length-1 character value"
-      ),
-      call. = FALSE
+    tima_abort(
+      problem = paste0("Invalid type for ", param_name),
+      expected = "single character string",
+      received = class(value)[1L],
+      fix = "Ensure the parameter is a length-1 character value"
     )
   }
 
   if (!allow_empty && nchar(value) == 0L) {
-    stop(
-      format_error(
-        problem = paste0(param_name, " cannot be an empty string"),
-        fix = "Provide a non-empty string"
-      ),
-      call. = FALSE
+    tima_abort(
+      problem = paste0(param_name, " cannot be an empty string"),
+      fix = "Provide a non-empty string"
     )
   }
 
@@ -926,22 +975,30 @@ validate_character <- function(
 validate_logical <- function(value, param_name = "value", allow_null = FALSE) {
   if (is.null(value)) {
     if (!allow_null) {
-      stop(param_name, " cannot be NULL", call. = FALSE)
+      tima_abort(
+        problem = paste0(param_name, " cannot be NULL"),
+        class = c("tima_validation_error", "tima_error")
+      )
     }
     return(invisible(TRUE))
   }
 
   if (!is.logical(value) || length(value) != 1L) {
-    stop(
-      param_name,
-      " must be a single logical value (TRUE/FALSE), got: ",
-      class(value)[1L],
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        param_name,
+        " must be a single logical value (TRUE/FALSE), got: ",
+        class(value)[1L]
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   if (is.na(value)) {
-    stop(param_name, " cannot be NA", call. = FALSE)
+    tima_abort(
+      problem = paste0(param_name, " cannot be NA"),
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   invisible(TRUE)
@@ -969,41 +1026,50 @@ validate_list_or_vector <- function(
 ) {
   if (is.null(value)) {
     if (!allow_null) {
-      stop(param_name, " cannot be NULL", call. = FALSE)
+      tima_abort(
+        problem = paste0(param_name, " cannot be NULL"),
+        class = c("tima_validation_error", "tima_error")
+      )
     }
     return(invisible(TRUE))
   }
 
   if (!is.list(value) && !is.vector(value)) {
-    stop(
-      param_name,
-      " must be a list or vector, got: ",
-      class(value)[1L],
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        param_name,
+        " must be a list or vector, got: ",
+        class(value)[1L]
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   value_length <- length(value)
 
   if (value_length < min_length) {
-    stop(
-      param_name,
-      " must have at least ",
-      min_length,
-      " element(s), got: ",
-      value_length,
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        param_name,
+        " must have at least ",
+        min_length,
+        " element(s), got: ",
+        value_length
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   if (!is.null(max_length) && value_length > max_length) {
-    stop(
-      param_name,
-      " cannot have more than ",
-      max_length,
-      " element(s), got: ",
-      value_length,
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        param_name,
+        " cannot have more than ",
+        max_length,
+        " element(s), got: ",
+        value_length
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
@@ -1023,17 +1089,19 @@ validate_list_or_vector <- function(
 #' @keywords internal
 assert_flag <- function(x, arg_name = deparse(substitute(x))) {
   if (!is.logical(x) || length(x) != 1L || is.na(x)) {
-    stop(
-      arg_name,
-      " must be a single TRUE or FALSE value, got: ",
-      if (!is.logical(x)) {
-        class(x)[1L]
-      } else if (length(x) != 1L) {
-        paste0("logical vector of length ", length(x))
-      } else {
-        "NA"
-      },
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        arg_name,
+        " must be a single TRUE or FALSE value, got: ",
+        if (!is.logical(x)) {
+          class(x)[1L]
+        } else if (length(x) != 1L) {
+          paste0("logical vector of length ", length(x))
+        } else {
+          "NA"
+        }
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
   invisible(TRUE)
@@ -1056,21 +1124,21 @@ assert_positive_integer <- function(
   allow_zero = FALSE
 ) {
   if (!is.numeric(x) || length(x) != 1L || is.na(x)) {
-    stop(
-      arg_name,
-      " must be a single numeric value, got: ",
-      class(x)[1L],
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        arg_name,
+        " must be a single numeric value, got: ",
+        class(x)[1L]
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   # Check if it's a whole number
   if (x != as.integer(x)) {
-    stop(
-      arg_name,
-      " must be an integer, got: ",
-      x,
-      call. = FALSE
+    tima_abort(
+      problem = paste0(arg_name, " must be an integer, got: ", x),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
@@ -1081,17 +1149,19 @@ assert_positive_integer <- function(
   }
 
   if (x < min_val) {
-    stop(
-      arg_name,
-      " must be ",
-      if (allow_zero) {
-        ">= 0"
-      } else {
-        "> 0"
-      },
-      ", got: ",
-      x,
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        arg_name,
+        " must be ",
+        if (allow_zero) {
+          ">= 0"
+        } else {
+          "> 0"
+        },
+        ", got: ",
+        x
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
@@ -1102,17 +1172,22 @@ assert_positive_integer <- function(
 
 assert_choice <- function(value, choices, param_name = "value") {
   if (length(value) != 1L || !is.character(value)) {
-    stop(param_name, " must be a single character string", call. = FALSE)
+    tima_abort(
+      problem = paste0(param_name, " must be a single character string"),
+      class = c("tima_validation_error", "tima_error")
+    )
   }
   if (!value %in% choices) {
-    stop(
-      "Invalid ",
-      param_name,
-      ": '",
-      value,
-      "'. Must be one of: ",
-      paste(choices, collapse = ", "),
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        "Invalid ",
+        param_name,
+        ": '",
+        value,
+        "'. Must be one of: ",
+        paste(choices, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
   invisible(TRUE)
@@ -1139,21 +1214,29 @@ assert_scalar_numeric <- function(
   allow_na = FALSE
 ) {
   if (!is.numeric(x) || length(x) != 1L) {
-    stop(param_name, " must be a single numeric value", call. = FALSE)
+    tima_abort(
+      problem = paste0(param_name, " must be a single numeric value"),
+      class = c("tima_validation_error", "tima_error")
+    )
   }
   if (is.na(x) && !allow_na) {
-    stop(param_name, " cannot be NA", call. = FALSE)
+    tima_abort(
+      problem = paste0(param_name, " cannot be NA"),
+      class = c("tima_validation_error", "tima_error")
+    )
   }
   if (!is.na(x) && (x < min || x > max)) {
-    stop(
-      param_name,
-      " must be between ",
-      min,
-      " and ",
-      max,
-      ", got: ",
-      x,
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        param_name,
+        " must be between ",
+        min,
+        " and ",
+        max,
+        ", got: ",
+        x
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
   invisible(TRUE)
