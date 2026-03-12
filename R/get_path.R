@@ -27,35 +27,41 @@ get_path <- function(base_path) {
   # Input Validation ----
   validate_character(base_path, param_name = "base_path", allow_empty = FALSE)
 
-  # Try 1: path exists as provided
+  # Try 1: Check if base path exists as-is
   if (file.exists(base_path)) {
     return(base_path)
   }
 
-  # Try 2: remove a leading inst/ prefix for installed-package layouts
-  path_without_inst <- sub(pattern = "^inst/", replacement = "", x = base_path)
+  # Try 2: Remove "inst" prefix (for installed packages)
+  # In installed packages, files from inst/ are moved to package root
+  path_without_inst <- gsub(
+    pattern = "inst",
+    replacement = "",
+    x = base_path,
+    fixed = TRUE
+  )
+
   if (file.exists(path_without_inst)) {
     return(path_without_inst)
   }
 
-  # Try 3: resolve from installed package root
-  pkg_path <- system.file(path_without_inst, package = "tima")
-  if (nzchar(pkg_path) && file.exists(pkg_path)) {
-    return(pkg_path)
+  # Try 3: Replace "inst" with package installation directory
+  # This handles cases where files are in the installed package location
+  path_with_pkg_dir <- gsub(
+    pattern = "inst",
+    replacement = system.file(package = "tima"),
+    x = base_path,
+    fixed = TRUE
+  )
+
+  if (file.exists(path_with_pkg_dir)) {
+    return(path_with_pkg_dir)
   }
 
-  # Try 4: fallback to package root + original base_path
-  pkg_root <- system.file(package = "tima")
-  if (nzchar(pkg_root)) {
-    candidate <- file.path(pkg_root, base_path)
-    if (file.exists(candidate)) {
-      return(candidate)
-    }
-  }
+  # If none of the paths exist, return the last attempt and let caller handle
+  # log_warn(
+  #  "Path not found. Tried: %s, %s, %s", base_path, path_without_inst, path_with_pkg_dir
+  # )
 
-  # Return best-effort package-relative candidate for caller diagnostics
-  if (nzchar(pkg_path)) {
-    return(pkg_path)
-  }
-  path_without_inst
+  return(path_with_pkg_dir)
 }
