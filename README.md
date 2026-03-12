@@ -144,7 +144,7 @@ commands are below:
 
 ``` bash
 docker pull adafede/tima-r
-# docker build . -t adafede/tima-r
+# docker build inst/. -t adafede/tima-r
 ```
 
 ``` bash
@@ -210,30 +210,30 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
 | docopt | 0.7.2 | de Jonge (2025) |
-| fs | 1.6.6 | Hester, Wickham, and Csárdi (2025) |
+| fs | 1.6.7 | Hester, Wickham, and Csárdi (2025) |
 | httr2 | 1.2.2 | Wickham (2025) |
-| igraph | 2.2.1 | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2025) |
+| igraph | 2.2.2 | Csárdi and Nepusz (2006); Antonov et al. (2023); (**igraph2026?**) |
 | IRanges | 2.44.0 | Lawrence et al. (2013) |
 | knitr | 1.51 | Xie (2014); Xie (2015); Xie (2025) |
-| lgr | 0.5.0 | Fleck (2025) |
+| lgr | 0.5.2 | Fleck (2025) |
 | MetaboCoreUtils | 1.18.1 | Rainer et al. (2022a) |
 | MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
 | MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
 | MsCoreUtils | 1.22.1 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
 | R.utils | 2.13.0 | Bengtsson (2025) |
-| reticulate | 1.44.1 | Ushey, Allaire, and Tang (2025) |
+| reticulate | 1.45.0 | Ushey, Allaire, and Tang (2025) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
-| rotl | 3.1.0 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
-| shiny | 1.12.1 | Chang et al. (2025) |
+| rotl | 3.1.1 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
+| shiny | 1.13.0 | Chang et al. (2025) |
 | shinyhelper | 0.3.2 | Mason-Thom (2019) |
-| shinyjs | 2.1.0 | Attali (2021) |
-| shinytest2 | 0.4.1 | Schloerke (2025) |
+| shinyjs | 2.1.1 | Attali (2021) |
+| shinytest2 | 0.5.1 | Schloerke (2025) |
 | shinyvalidate | 0.1.3 | Sievert, Iannone, and Cheng (2023) |
-| Spectra | 1.20.0 | Rainer et al. (2022d) |
+| Spectra | 1.20.1 | Rainer et al. (2022d) |
 | stringi | 1.8.7 | Gagolewski (2022) |
-| targets | 1.11.4 | Landau (2021) |
-| testthat | 3.3.1 | Wickham (2011) |
+| targets | 1.12.0 | Landau (2021) |
+| testthat | 3.3.2 | Wickham (2011) |
 | tidyselect | 1.2.1 | Henry and Wickham (2024) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
@@ -292,15 +292,6 @@ Garrick Aden-Buie, Yihui Xie, et al. 2025.
 Csárdi, Gábor, and Tamás Nepusz. 2006. “The Igraph Software Package for
 Complex Network Research.” *InterJournal* Complex Systems: 1695.
 <https://igraph.org>.
-
-</div>
-
-<div id="ref-igraph2025" class="csl-entry">
-
-Csárdi, Gábor, Tamás Nepusz, Vincent Traag, Szabolcs Horvát, Fabio
-Zanini, Daniel Noom, Kirill Müller, David Schoch, and Maëlle Salmon.
-2025. *<span class="nocase">igraph</span>: Network Analysis and
-Visualization in r*. <https://doi.org/10.5281/zenodo.7682609>.
 
 </div>
 
@@ -605,6 +596,15 @@ Definitive Guide*. Boca Raton, Florida: Chapman; Hall/CRC.
 Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. *R Markdown
 Cookbook*. Boca Raton, Florida: Chapman; Hall/CRC.
 <https://bookdown.org/yihui/rmarkdown-cookbook>.
+
+</div>
+
+<div id="ref-classyfireR" class="csl-entry">
+
+Y, Djoumbou Feunang, Eisner R, Knox C, Chepelev L, Hastings J, Owen G,
+Fahy E, et al. 2016. *ClassyFire: Automated Chemical Classification with
+a Comprehensive, Computable Taxonomy*. *Journal of Cheminformatics*.
+Vol. 8:61. <https://doi.org/10.1186/s13321-016-0174-y>.
 
 </div>
 
