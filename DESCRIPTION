@@ -14,8 +14,13 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-3389-2191"))
   )
 Maintainer: Adriano Rutz <adafede@gmail.com>
-Description: This package provides the infrastructure to perform
-    Taxonomically Informed Metabolite Annotation.
+Description: TIMA provides a reproducible workflow for taxonomically informed
+    metabolite annotation from feature tables, MS/MS spectra, and optional
+    external resources such as SIRIUS and GNPS outputs. It combines mass,
+    spectral, taxonomic, and structural evidence into a transparent scoring
+    framework that can be inspected step-by-step. The package targets
+    metabolomics practitioners who need configurable, scriptable, and
+    documented annotation pipelines for research and production settings.
 License: AGPL (>= 3)
 URL: https://github.com/taxonomicallyinformedannotation/tima, https://taxonomicallyinformedannotation.github.io/tima-shinylive, https://taxonomicallyinformedannotation.github.io/tima
 BugReports: https://github.com/taxonomicallyinformedannotation/tima/issues
@@ -24,6 +29,7 @@ Depends:
 Imports:
     archive (>= 1.1.12),
     BiocParallel (>= 1.40.2),
+    cli (>= 3.6.5),
     docopt (>= 0.7.2),
     dplyr (>= 1.1.4),
     fs (>= 1.6.6),

@@ -35,7 +35,7 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
     ))
   }
 
-  tryCatch(
+  mgf_error <- tryCatch(
     {
       lines <- readLines(file, warn = FALSE)
       n_lines <- length(lines)
@@ -134,11 +134,16 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
           }
         }
       }
+
+      NULL
     },
     error = function(e) {
-      issues <<- c(issues, paste0("Failed to parse MGF: ", conditionMessage(e)))
+      conditionMessage(e)
     }
   )
+  if (!is.null(mgf_error)) {
+    issues <- c(issues, paste0("Failed to parse MGF: ", mgf_error))
+  }
 
   list(
     valid = length(issues) == 0L,
@@ -187,20 +192,26 @@ sanitize_csv <- function(
   }
 
   # Try to read and validate
-  df <- tryCatch(
+  read_result <- tryCatch(
     {
-      safe_fread(
-        file = file,
-        file_type = file_type,
-        na.strings = c("", "NA"),
-        colClasses = "character"
+      list(
+        data = safe_fread(
+          file = file,
+          file_type = file_type,
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        ),
+        error = NULL
       )
     },
     error = function(e) {
-      issues <<- c(issues, paste0("Failed to read file: ", conditionMessage(e)))
-      return(tidytable::tidytable()) # Return empty on error
+      list(data = tidytable::tidytable(), error = conditionMessage(e))
     }
   )
+  df <- read_result$data
+  if (!is.null(read_result$error)) {
+    issues <- c(issues, paste0("Failed to read file: ", read_result$error))
+  }
 
   n_rows <- nrow(df)
   n_cols <- ncol(df)
@@ -290,23 +301,29 @@ sanitize_metadata <- function(
   }
 
   # Read metadata
-  metadata <- tryCatch(
+  metadata_result <- tryCatch(
     {
-      safe_fread(
-        file = metadata_file,
-        file_type = "metadata",
-        na.strings = c("", "NA"),
-        colClasses = "character"
+      list(
+        data = safe_fread(
+          file = metadata_file,
+          file_type = "metadata",
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        ),
+        error = NULL
       )
     },
     error = function(e) {
-      issues <<- c(
-        issues,
-        paste0("Failed to read metadata: ", conditionMessage(e))
-      )
-      return(tidytable::tidytable()) # Return empty on error
+      list(data = tidytable::tidytable(), error = conditionMessage(e))
     }
   )
+  metadata <- metadata_result$data
+  if (!is.null(metadata_result$error)) {
+    issues <- c(
+      issues,
+      paste0("Failed to read metadata: ", metadata_result$error)
+    )
+  }
 
   n_samples <- nrow(metadata)
 
@@ -407,7 +424,7 @@ sanitize_metadata <- function(
       file.exists(features_file) &&
       !is.null(filename_col_actual)
   ) {
-    tryCatch(
+    features_error <- tryCatch(
       {
         features <- safe_fread(
           file = features_file,
@@ -476,14 +493,19 @@ sanitize_metadata <- function(
             n_matched
           )
         }
+
+        NULL
       },
       error = function(e) {
-        issues <<- c(
-          issues,
-          paste0("Failed to read features file: ", conditionMessage(e))
-        )
+        conditionMessage(e)
       }
     )
+    if (!is.null(features_error)) {
+      issues <- c(
+        issues,
+        paste0("Failed to read features file: ", features_error)
+      )
+    }
   }
 
   list(
@@ -552,8 +574,7 @@ sanitize_sirius <- function(sirius_dir) {
       dir.create(temp_dir, recursive = TRUE)
       cleanup_temp <- TRUE
 
-      # Extract ZIP to temp directory
-      tryCatch(
+      unzip_error <- tryCatch(
         {
           utils::unzip(sirius_dir, exdir = temp_dir)
 
@@ -566,17 +587,19 @@ sanitize_sirius <- function(sirius_dir) {
             # Multiple items or files, use temp_dir
             sirius_dir <- temp_dir
           }
+
+          NULL
         },
         error = function(e) {
-          issues <<- c(
-            issues,
-            paste0("Failed to extract ZIP: ", conditionMessage(e))
-          )
-          if (cleanup_temp && dir.exists(temp_dir)) {
-            unlink(temp_dir, recursive = TRUE)
-          }
+          conditionMessage(e)
         }
       )
+      if (!is.null(unzip_error)) {
+        issues <- c(issues, paste0("Failed to extract ZIP: ", unzip_error))
+        if (cleanup_temp && dir.exists(temp_dir)) {
+          unlink(temp_dir, recursive = TRUE)
+        }
+      }
     } else {
       return(list(
         valid = FALSE,
@@ -726,8 +749,7 @@ sanitize_sirius <- function(sirius_dir) {
 #' @param feature_col Character name of feature ID column (default: "feature_id")
 #'
 #' @return Invisible TRUE if all validations pass, stops with error otherwise
-#'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -902,23 +924,21 @@ sanitize_all_inputs <- function(
     )
     log_info("=" |> rep(60) |> paste(collapse = ""))
 
-    stop(
-      format_error(
-        problem = "Input data validation failed",
-        received = sprintf("%d issue(s) found", length(issues_found)),
-        context = paste(
-          "Please fix the issues above before running expensive operations",
-          "like library downloads or processing.",
-          sep = "\n"
-        ),
-        fix = paste(
-          "1. Review the error messages above",
-          "2. Fix the identified issues in your input files",
-          "3. Re-run the validation",
-          sep = "\n"
-        )
+    tima_abort(
+      problem = "Input data validation failed",
+      received = sprintf("%d issue(s) found", length(issues_found)),
+      context = paste(
+        "Please fix the issues above before running expensive operations",
+        "like library downloads or processing",
+        sep = "\n"
       ),
-      call. = FALSE
+      fix = paste(
+        "1. Review the error messages above",
+        "2. Fix the identified issues in your input files",
+        "3. Re-run the validation",
+        sep = "\n"
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 }

@@ -506,8 +506,7 @@ log_similarity_distribution_counts <- function(counts, title) {
 #'   - start_time: POSIXct timestamp
 #'   - params: list of parameters
 #'   - metadata: list for storing intermediate results
-#'
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' ctx <- log_operation("classify_structures", n_smiles = 100)
@@ -550,7 +549,7 @@ log_operation <- function(operation_name, ...) {
 #' @param ... Named results to log
 #'
 #' @return The input context (invisibly)
-#' @export
+#' @keywords internal
 log_complete <- function(ctx, ...) {
   if (!inherits(ctx, "tima_log_context")) {
     stop("ctx must be a tima_log_context from log_operation()", call. = FALSE)
@@ -585,7 +584,7 @@ log_complete <- function(ctx, ...) {
 #' @param ... Additional context to log
 #'
 #' @return The input context (invisibly)
-#' @export
+#' @keywords internal
 log_failed <- function(ctx, error, ...) {
   if (!inherits(ctx, "tima_log_context")) {
     stop("ctx must be a tima_log_context from log_operation()", call. = FALSE)
@@ -626,7 +625,7 @@ log_failed <- function(ctx, error, ...) {
 #' @param ... Named metadata to add and log
 #'
 #' @return The updated context (invisibly)
-#' @export
+#' @keywords internal
 log_metadata <- function(ctx, ...) {
   if (!inherits(ctx, "tima_log_context")) {
     stop("ctx must be a tima_log_context from log_operation()", call. = FALSE)
@@ -653,7 +652,7 @@ log_metadata <- function(ctx, ...) {
 #' @param ... Parameters to log with operation start
 #'
 #' @return Result of expr, or throws error if expr fails
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' result <- with_logging("classify", n = 100, {

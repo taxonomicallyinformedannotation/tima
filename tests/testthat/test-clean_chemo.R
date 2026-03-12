@@ -272,7 +272,8 @@ test_that("validate_clean_chemo_inputs works", {
       summarize = FALSE,
       max_per_score = 7L
     ),
-    "data frame"
+    "data frame",
+    class = "tima_validation_error"
   )
 })
 
@@ -801,7 +802,8 @@ test_that("clean_chemo validates inputs through main function", {
       remove_ties = FALSE,
       summarize = FALSE
     ),
-    "positive integer"
+    "positive integer",
+    class = "tima_validation_error"
   )
 
   # Invalid best_percentile
@@ -821,7 +823,8 @@ test_that("clean_chemo validates inputs through main function", {
       remove_ties = FALSE,
       summarize = FALSE
     ),
-    "between 0 and 1"
+    "between 0 and 1",
+    class = "tima_validation_error"
   )
 })
 test_that("clean_chemo filters MS1-only annotations correctly with OR condition", {
@@ -919,4 +922,147 @@ test_that("clean_chemo handles character score columns", {
       minimal_ms1_condition = "OR"
     )
   })
+})
+
+test_that("coerce_score_columns converts only existing score columns", {
+  ann <- tidytable::tidytable(
+    feature_id = "F1",
+    score_biological = "0.5",
+    score_weighted_chemo = "0.9",
+    non_score = "kept"
+  )
+
+  result <- coerce_score_columns(ann)
+
+  expect_type(result$score_biological, "double")
+  expect_type(result$score_weighted_chemo, "double")
+  expect_type(result$non_score, "character")
+  expect_equal(result$non_score, "kept")
+})
+
+test_that("prepare_ranked_candidates returns expected objects", {
+  fixture <- make_clean_chemo_fixture(n_features = 2, n_candidates = 4)
+  ann <- coerce_score_columns(fixture$annot_table_wei_chemo)
+
+  out <- prepare_ranked_candidates(
+    annot_table_wei_chemo = ann,
+    minimal_ms1_bio = 0,
+    minimal_ms1_chemo = 0,
+    minimal_ms1_condition = "OR",
+    best_percentile = 0.9,
+    max_per_score = 7L
+  )
+
+  expect_true(is.data.frame(out$df_ranked))
+  expect_true(is.data.frame(out$df_percentile))
+  expect_true(is.data.frame(out$results_candidates))
+  expect_true(is.data.frame(out$annotation_notes_lookup))
+  expect_type(out$n_sampled_features, "integer")
+})
+test_that("build_mini_taxonomy_table returns mini taxonomy columns", {
+  fixture <- make_clean_chemo_fixture(n_features = 2, n_candidates = 4)
+  ann <- coerce_score_columns(fixture$annot_table_wei_chemo)
+
+  ranked <- prepare_ranked_candidates(
+    annot_table_wei_chemo = ann,
+    minimal_ms1_bio = 0,
+    minimal_ms1_chemo = 0,
+    minimal_ms1_condition = "OR",
+    best_percentile = 0.9,
+    max_per_score = 7L
+  )
+
+  out <- build_mini_taxonomy_table(
+    df_percentile = ranked$df_percentile,
+    score_chemical_cla_kingdom = 0.1,
+    score_chemical_cla_superclass = 0.2,
+    score_chemical_cla_class = 0.3,
+    score_chemical_cla_parent = 0.4,
+    score_chemical_npc_pathway = 0.3,
+    score_chemical_npc_superclass = 0.2,
+    score_chemical_npc_class = 0.1
+  )
+
+  expect_true(is.data.frame(out))
+  expect_true(all(
+    c(
+      "feature_id",
+      "has_inchikey",
+      "label_classyfire",
+      "label_npclassifier",
+      "score_classyfire",
+      "score_npclassifier"
+    ) %in%
+      names(out)
+  ))
+})
+
+test_that("build_mini_results_table assembles expected mini output", {
+  features_table <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    rt = c(1.1, 2.2),
+    mz = c(101.1, 202.2)
+  )
+
+  df_classes_mini <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    has_inchikey = c(TRUE, FALSE),
+    label_classyfire = c("ClassA", "ClassB"),
+    label_npclassifier = c("NPCA", "NPCB"),
+    score_classyfire = c(NA_real_, 0.8),
+    score_npclassifier = c(NA_real_, 0.6)
+  )
+
+  results_filtered <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidates_evaluated = c(3L, 2L),
+    candidates_best = c(1L, 1L),
+    annotation_note = c(NA_character_, "sampled")
+  )
+
+  df_filtered <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_name = c("Cmpd1", "Cmpd2"),
+    candidate_adduct = c("[M+H]+", "[M+Na]+"),
+    candidate_structure_smiles_no_stereo = c("CCO", "CCC"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", NA_character_),
+    candidate_library = c("lib1", "lib2"),
+    candidate_structure_error_mz = c(0.1, 0.2),
+    candidate_structure_error_rt = c(0.01, 0.02),
+    candidate_structure_organism_occurrence_closest = c("Org1", "Org2"),
+    candidate_structure_organism_occurrence_tag = c("reported", "predicted"),
+    score_weighted_chemo = c(0.9, 0.4)
+  )
+
+  out <- build_mini_results_table(
+    features_table = features_table,
+    df_classes_mini = df_classes_mini,
+    results_filtered = results_filtered,
+    df_filtered = df_filtered,
+    xrefs_table = NULL
+  )
+
+  expect_true(is.data.frame(out))
+  expect_true(all(
+    c(
+      "feature_id",
+      "rt",
+      "mz",
+      "label_classyfire",
+      "label_npclassifier",
+      "label_compound",
+      "adduct",
+      "smiles_no_stereo",
+      "inchikey_connectivity_layer",
+      "library",
+      "error_mz",
+      "error_rt",
+      "organism_closest",
+      "score",
+      "candidates_evaluated",
+      "candidates_best",
+      "note"
+    ) %in%
+      names(out)
+  ))
 })

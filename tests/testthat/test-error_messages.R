@@ -3,12 +3,14 @@ test_that("validate_choice provides fuzzy matching suggestions", {
   expect_error(
     validate_choice("positive", c("pos", "neg"), "ms_mode"),
     "Invalid ms_mode: 'positive'",
+    class = "tima_validation_error",
     fixed = TRUE
   )
 
   expect_error(
     validate_choice("negatve", c("pos", "neg"), "ms_mode"),
     "Did you mean 'neg'\\?",
+    class = "tima_validation_error",
     fixed = FALSE
   )
 
@@ -16,6 +18,7 @@ test_that("validate_choice provides fuzzy matching suggestions", {
   expect_error(
     validate_choice("both", c("pos", "neg"), "ms_mode"),
     "Invalid ms_mode: 'both'",
+    class = "tima_validation_error",
     fixed = TRUE
   )
 
@@ -29,6 +32,7 @@ test_that("validate_choice shows expected values", {
   expect_error(
     validate_choice("xyz", c("a", "b", "c"), "param"),
     "one of: 'a', 'b', 'c'",
+    class = "tima_validation_error",
     fixed = TRUE
   )
 })
@@ -47,6 +51,7 @@ test_that("validate_file_exists suggests similar files", {
   expect_error(
     validate_file_exists(test_file, "CSV file", "input_file"),
     "Similar files in directory",
+    class = "tima_validation_error",
     fixed = FALSE
   )
 
@@ -62,6 +67,7 @@ test_that("validate_file_exists handles missing directories", {
   expect_error(
     validate_file_exists(fake_path, "data file"),
     "Directory does not exist",
+    class = "tima_validation_error",
     fixed = FALSE
   )
 })
@@ -134,6 +140,7 @@ test_that("validate_numeric_range provides context", {
       context = "Values above 100 may cause performance issues"
     ),
     "performance issues",
+    class = "tima_validation_error",
     fixed = FALSE
   )
 
@@ -184,6 +191,7 @@ test_that("validate_tolerance_ppm provides instrument guidance", {
       param_name = "mass_tolerance"
     ),
     "must be positive",
+    class = "tima_validation_error",
     fixed = FALSE
   )
 
@@ -204,7 +212,7 @@ test_that("format_error creates structured messages", {
   expect_true(grepl("Expected:", msg, fixed = TRUE))
   expect_true(grepl("Received:", msg, fixed = TRUE))
   expect_true(grepl("Fix:", msg, fixed = TRUE))
-  expect_true(grepl("✗", msg, fixed = TRUE)) # Check mark present
+  expect_true(grepl("x ", msg, fixed = TRUE))
 })
 
 test_that("fuzzy_match finds close matches", {
@@ -229,12 +237,14 @@ test_that("validate_ms_mode uses enhanced errors", {
   expect_error(
     validate_ms_mode("positive"),
     "Invalid ms_mode: 'positive'",
+    class = "tima_validation_error",
     fixed = TRUE
   )
 
   expect_error(
     validate_ms_mode(NULL),
     "ms_mode is required",
+    class = "tima_validation_error",
     fixed = FALSE
   )
 
@@ -252,12 +262,14 @@ test_that("validate_tolerances uses enhanced errors", {
   expect_error(
     validate_tolerances(tolerance_ppm = "not_numeric"),
     "Invalid tolerance_ppm",
+    class = "tima_validation_error",
     fixed = FALSE
   )
 
   expect_error(
     validate_tolerances(tolerance_ppm = -10),
     "must be positive",
+    class = "tima_validation_error",
     fixed = FALSE
   )
 
@@ -272,6 +284,7 @@ test_that("validate_dataframe uses enhanced errors", {
   expect_error(
     validate_dataframe(df, required_cols = c("a", "c")),
     "Missing required columns",
+    class = "tima_validation_error",
     fixed = FALSE
   )
 
@@ -284,6 +297,7 @@ test_that("validate_choice uses enhanced errors", {
   expect_error(
     validate_choice("invalid", c("valid1", "valid2"), "option"),
     "Invalid option",
+    class = "tima_validation_error",
     fixed = FALSE
   )
 
@@ -292,10 +306,11 @@ test_that("validate_choice uses enhanced errors", {
   )
 })
 
-test_that("error messages include unicode symbols", {
+test_that("error messages include ASCII prefix", {
   expect_error(
     validate_choice("bad", c("good"), "param"),
-    "\u2717", # ✗ symbol
+    "x ",
+    class = "tima_validation_error",
     fixed = TRUE
   )
 })
@@ -304,6 +319,7 @@ test_that("type errors are clear and actionable", {
   expect_error(
     validate_choice(123, c("a", "b"), "param"),
     "Invalid type.*Expected.*single character string",
+    class = "tima_validation_error",
     fixed = FALSE
   )
 
@@ -315,6 +331,7 @@ test_that("type errors are clear and actionable", {
       param_name = "threshold"
     ),
     "Invalid type.*Expected.*single numeric value",
+    class = "tima_validation_error",
     fixed = FALSE
   )
 })

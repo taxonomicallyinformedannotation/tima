@@ -5,15 +5,15 @@
 #' @noRd
 .validate_features_dataframe <- function(tbl) {
   if (!is.data.frame(tbl)) {
-    stop(
-      "features_table and components_table must be data frames",
-      call. = FALSE
+    tima_abort(
+      problem = "features_table and components_table must be data frames",
+      class = c("tima_validation_error", "tima_error")
     )
   }
   if (!"feature_id" %in% names(tbl)) {
-    stop(
-      "features_table/components_table must contain feature_id column",
-      call. = FALSE
+    tima_abort(
+      problem = "features_table/components_table must contain feature_id column",
+      class = c("tima_validation_error", "tima_error")
     )
   }
 }
@@ -61,7 +61,10 @@ validate_clean_chemo_inputs <- function(
 ) {
   # Validate data frame
   if (!is.data.frame(annot_table_wei_chemo)) {
-    stop("annot_table_wei_chemo must be a data frame", call. = FALSE)
+    tima_abort(
+      problem = "annot_table_wei_chemo must be a data frame",
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   # Basic required columns in annotation table
@@ -75,39 +78,47 @@ validate_clean_chemo_inputs <- function(
   )
   missing_cols <- setdiff(required_cols, names(annot_table_wei_chemo))
   if (length(missing_cols) > 0) {
-    stop(
-      "annot_table_wei_chemo missing required columns: ",
-      paste(missing_cols, collapse = ", "),
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        "annot_table_wei_chemo missing required columns: ",
+        paste(missing_cols, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   # Validate numeric parameters
   if (!is.numeric(candidates_final) || candidates_final < 1) {
-    stop(
-      "candidates_final must be a positive integer, got: ",
-      candidates_final,
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        "candidates_final must be a positive integer, got: ",
+        candidates_final
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   if (
     !is.numeric(best_percentile) || best_percentile < 0 || best_percentile > 1
   ) {
-    stop(
-      "best_percentile must be between 0 and 1, got: ",
-      best_percentile,
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        "best_percentile must be between 0 and 1, got: ",
+        best_percentile
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   if (
     !is.numeric(minimal_ms1_bio) || minimal_ms1_bio < 0 || minimal_ms1_bio > 1
   ) {
-    stop(
-      "minimal_ms1_bio must be between 0 and 1, got: ",
-      minimal_ms1_bio,
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        "minimal_ms1_bio must be between 0 and 1, got: ",
+        minimal_ms1_bio
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
@@ -116,19 +127,23 @@ validate_clean_chemo_inputs <- function(
       minimal_ms1_chemo < 0 ||
       minimal_ms1_chemo > 1
   ) {
-    stop(
-      "minimal_ms1_chemo must be between 0 and 1, got: ",
-      minimal_ms1_chemo,
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        "minimal_ms1_chemo must be between 0 and 1, got: ",
+        minimal_ms1_chemo
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   # Validate condition
   if (!minimal_ms1_condition %in% c("OR", "AND")) {
-    stop(
-      "minimal_ms1_condition must be 'OR' or 'AND', got: ",
-      minimal_ms1_condition,
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        "minimal_ms1_condition must be 'OR' or 'AND', got: ",
+        minimal_ms1_condition
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
@@ -143,19 +158,23 @@ validate_clean_chemo_inputs <- function(
   is_valid_logical <- vapply(X = logical_params, FUN = is.logical, logical(1))
   if (!all(is_valid_logical)) {
     invalid_params <- names(logical_params)[!is_valid_logical]
-    stop(
-      "Parameter(s) must be logical (TRUE/FALSE): ",
-      paste(invalid_params, collapse = ", "),
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        "Parameter(s) must be logical (TRUE/FALSE): ",
+        paste(invalid_params, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   # Validate max_per_score
   if (!is.numeric(max_per_score) || max_per_score < 1) {
-    stop(
-      "max_per_score must be a positive integer, got: ",
-      max_per_score,
-      call. = FALSE
+    tima_abort(
+      problem = paste0(
+        "max_per_score must be a positive integer, got: ",
+        max_per_score
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
@@ -178,15 +197,18 @@ validate_clean_chemo_inputs <- function(
       )
     )
   ) {
-    stop(
-      "taxonomy weight parameters must be numeric when provided",
-      call. = FALSE
+    tima_abort(
+      problem = "taxonomy weight parameters must be numeric when provided",
+      class = c("tima_validation_error", "tima_error")
     )
   }
   weights_num <- weights[!vapply(X = weights, FUN = is.null, logical(1))]
   if (length(weights_num) > 0) {
     if (any(weights_num < 0 | weights_num > 1)) {
-      stop("taxonomy weights must be within [0,1]", call. = FALSE)
+      tima_abort(
+        problem = "taxonomy weights must be within [0,1]",
+        class = c("tima_validation_error", "tima_error")
+      )
     }
   }
 
@@ -559,6 +581,356 @@ remove_compound_names <- function(results_list, compounds_names) {
   results_list
 }
 
+#' Coerce score columns to numeric
+#'
+#' @description Internal helper that normalizes score-like columns loaded as
+#'     character values (e.g., from TSV/CSV inputs) before numeric operations.
+#'
+#' @param annot_table_wei_chemo Data frame with annotation scores
+#'
+#' @return Data frame with existing score columns coerced to numeric
+#' @keywords internal
+coerce_score_columns <- function(annot_table_wei_chemo) {
+  score_columns <- c(
+    "score_biological",
+    "score_chemical",
+    "score_weighted_chemo",
+    "candidate_score_pseudo_initial",
+    "candidate_score_similarity",
+    "candidate_score_sirius_csi"
+  )
+
+  cols_to_convert <- intersect(score_columns, names(annot_table_wei_chemo))
+  if (length(cols_to_convert) == 0L) {
+    return(annot_table_wei_chemo)
+  }
+
+  annot_table_wei_chemo |>
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidyselect::all_of(cols_to_convert),
+        .fns = as.numeric
+      )
+    )
+}
+
+#' Prepare ranked candidate tables for downstream tiers
+#'
+#' @param annot_table_wei_chemo Data frame with normalized score columns
+#' @param minimal_ms1_bio Numeric threshold for biological score
+#' @param minimal_ms1_chemo Numeric threshold for chemical score
+#' @param minimal_ms1_condition Character filter mode ("OR" or "AND")
+#' @param best_percentile Numeric percentile threshold
+#' @param max_per_score Integer max candidates per score group
+#'
+#' @return Named list with ranked/percentile tables and candidate counts
+#' @keywords internal
+prepare_ranked_candidates <- function(
+  annot_table_wei_chemo,
+  minimal_ms1_bio,
+  minimal_ms1_chemo,
+  minimal_ms1_condition,
+  best_percentile,
+  max_per_score
+) {
+  df_base <- filter_ms1_annotations(
+    annot_table_wei_chemo = annot_table_wei_chemo,
+    minimal_ms1_bio = minimal_ms1_bio,
+    minimal_ms1_chemo = minimal_ms1_chemo,
+    minimal_ms1_condition = minimal_ms1_condition
+  )
+
+  df_ranked <- rank_and_deduplicate(df_base)
+
+  sampling_result <- sample_candidates_per_group(
+    df = df_ranked,
+    max_per_score = max_per_score,
+    seed = 42L
+  )
+
+  df_ranked <- sampling_result$df
+  df_percentile <- apply_percentile_filter(df_ranked, best_percentile)
+
+  list(
+    df_ranked = df_ranked,
+    df_percentile = df_percentile,
+    results_candidates = count_candidates(df_ranked, df_percentile),
+    n_sampled_features = sampling_result$n_sampled_features,
+    annotation_notes_lookup = sampling_result$annotation_notes
+  )
+}
+
+#' Build mini-tier taxonomy table
+#'
+#' @param df_percentile Percentile-filtered candidate table
+#' @param score_chemical_cla_kingdom ClassyFire kingdom weight
+#' @param score_chemical_cla_superclass ClassyFire superclass weight
+#' @param score_chemical_cla_class ClassyFire class weight
+#' @param score_chemical_cla_parent ClassyFire direct parent weight
+#' @param score_chemical_npc_pathway NPClassifier pathway weight
+#' @param score_chemical_npc_superclass NPClassifier superclass weight
+#' @param score_chemical_npc_class NPClassifier class weight
+#'
+#' @return Mini-tier taxonomy table keyed by feature_id
+#' @keywords internal
+build_mini_taxonomy_table <- function(
+  df_percentile,
+  score_chemical_cla_kingdom,
+  score_chemical_cla_superclass,
+  score_chemical_cla_class,
+  score_chemical_cla_parent,
+  score_chemical_npc_pathway,
+  score_chemical_npc_superclass,
+  score_chemical_npc_class
+) {
+  df_structure_tax <- df_percentile |>
+    tidytable::select(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer,
+      tidyselect::starts_with(match = "candidate_structure_tax_cla"),
+      tidyselect::starts_with(match = "candidate_structure_tax_npc")
+    ) |>
+    tidytable::distinct(feature_id, .keep_all = TRUE) |>
+    tidytable::mutate(
+      label_classyfire_structure = tidytable::coalesce(
+        candidate_structure_tax_cla_04dirpar,
+        candidate_structure_tax_cla_03cla,
+        candidate_structure_tax_cla_02sup,
+        candidate_structure_tax_cla_01kin
+      ),
+      label_npclassifier_structure = tidytable::coalesce(
+        candidate_structure_tax_npc_03cla,
+        candidate_structure_tax_npc_02sup,
+        candidate_structure_tax_npc_01pat
+      ),
+      has_inchikey = !is.na(candidate_structure_inchikey_connectivity_layer)
+    ) |>
+    tidytable::select(
+      feature_id,
+      has_inchikey,
+      label_classyfire_structure,
+      label_npclassifier_structure
+    )
+
+  df_pred_tax <- df_percentile |>
+    tidytable::select(
+      tidyselect::contains(match = c("feature_id", "feature_pred"))
+    ) |>
+    tidytable::mutate(
+      tidytable::across(
+        tidyselect::contains(match = "score"),
+        as.numeric
+      )
+    )
+
+  if (nrow(df_pred_tax) > 0L) {
+    weights <- list(
+      w_cla_kin = score_chemical_cla_kingdom,
+      w_cla_sup = score_chemical_cla_superclass,
+      w_cla_cla = score_chemical_cla_class,
+      w_cla_par = score_chemical_cla_parent,
+      w_npc_pat = score_chemical_npc_pathway,
+      w_npc_sup = score_chemical_npc_superclass,
+      w_npc_cla = score_chemical_npc_class
+    )
+
+    df_cla <- compute_classyfire_taxonomy(df_pred_tax, weights)
+    df_npc <- compute_npclassifier_taxonomy(df_pred_tax, weights)
+
+    df_pred_tax <- df_cla |>
+      tidytable::left_join(y = df_npc)
+  } else {
+    df_pred_tax <- tidytable::tidytable(
+      feature_id = character(0),
+      label_classyfire_predicted = character(0),
+      label_npclassifier_predicted = character(0),
+      score_classyfire = numeric(0),
+      score_npclassifier = numeric(0)
+    )
+  }
+
+  df_structure_tax |>
+    tidytable::left_join(y = df_pred_tax) |>
+    tidytable::mutate(
+      label_classyfire = tidytable::if_else(
+        has_inchikey,
+        label_classyfire_structure,
+        label_classyfire_predicted
+      ),
+      label_npclassifier = tidytable::if_else(
+        has_inchikey,
+        label_npclassifier_structure,
+        label_npclassifier_predicted
+      ),
+      score_classyfire = tidytable::if_else(
+        has_inchikey,
+        NA_real_,
+        score_classyfire
+      ),
+      score_npclassifier = tidytable::if_else(
+        has_inchikey,
+        NA_real_,
+        score_npclassifier
+      )
+    ) |>
+    tidytable::select(
+      feature_id,
+      has_inchikey,
+      label_classyfire,
+      label_npclassifier,
+      score_classyfire,
+      score_npclassifier
+    ) |>
+    tidytable::distinct() |>
+    tidytable::filter(
+      score_classyfire != 0 |
+        score_npclassifier != 0 |
+        is.na(score_classyfire) |
+        is.na(score_npclassifier)
+    )
+}
+
+#' Build mini-tier result table
+#'
+#' @param features_table Feature metadata table
+#' @param df_classes_mini Mini taxonomy table keyed by feature_id
+#' @param results_filtered Filtered-tier summarized results
+#' @param df_filtered Filtered candidate table prior to summarization
+#' @param xrefs_table Optional cross-reference table
+#'
+#' @return Mini-tier output table
+#' @keywords internal
+build_mini_results_table <- function(
+  features_table,
+  df_classes_mini,
+  results_filtered,
+  df_filtered,
+  xrefs_table = NULL
+) {
+  results_mini <- features_table |>
+    tidytable::left_join(y = df_classes_mini) |>
+    tidytable::left_join(y = results_filtered) |>
+    tidytable::left_join(
+      y = df_filtered |>
+        tidytable::select(
+          tidyselect::any_of(c(
+            "feature_id",
+            "candidate_structure_name",
+            "candidate_adduct",
+            "candidate_structure_smiles_no_stereo",
+            "candidate_structure_inchikey_connectivity_layer",
+            "candidate_library",
+            "candidate_structure_error_mz",
+            "candidate_structure_error_rt",
+            "candidate_structure_organism_occurrence_closest",
+            "candidate_structure_organism_occurrence_tag",
+            "score_weighted_chemo"
+          ))
+        )
+    ) |>
+    tidytable::rename(
+      label_compound = candidate_structure_name,
+      adduct = candidate_adduct,
+      smiles_no_stereo = candidate_structure_smiles_no_stereo,
+      inchikey_connectivity_layer = candidate_structure_inchikey_connectivity_layer,
+      library = candidate_library,
+      error_mz = candidate_structure_error_mz,
+      error_rt = candidate_structure_error_rt,
+      organism_closest = candidate_structure_organism_occurrence_closest,
+      score = score_weighted_chemo
+    ) |>
+    tidytable::mutate(
+      candidates_evaluated = tidytable::if_else(
+        is.na(inchikey_connectivity_layer),
+        NA_integer_,
+        candidates_evaluated
+      ),
+      candidates_best = tidytable::if_else(
+        is.na(inchikey_connectivity_layer),
+        NA_integer_,
+        candidates_best
+      ),
+      .pred_denom = as.numeric(!is.na(score_classyfire)) +
+        as.numeric(!is.na(score_npclassifier)),
+      .pred_sum = tidytable::coalesce(score_classyfire, 0) +
+        tidytable::coalesce(score_npclassifier, 0),
+      .pred_avg = tidytable::if_else(
+        .pred_denom > 0,
+        .pred_sum / .pred_denom,
+        NA_real_
+      ),
+      score = tidytable::if_else(
+        is.na(inchikey_connectivity_layer),
+        .pred_avg,
+        score
+      )
+    ) |>
+    tidytable::select(
+      tidyselect::any_of(
+        x = c(
+          "feature_id",
+          "rt",
+          "mz",
+          "label_classyfire",
+          "label_npclassifier",
+          "label_compound",
+          "adduct",
+          "smiles_no_stereo",
+          "inchikey_connectivity_layer",
+          "library",
+          "error_mz",
+          "error_rt",
+          "organism_closest",
+          "tag" = "candidate_structure_organism_occurrence_tag",
+          "score",
+          "candidates_evaluated",
+          "candidates_best",
+          "note" = "annotation_note"
+        )
+      )
+    ) |>
+    tidytable::distinct() |>
+    tidytable::mutate(
+      label_classyfire = tidytable::if_else(
+        condition = !is.na(score),
+        true = label_classyfire,
+        false = NA_character_
+      ),
+      label_npclassifier = tidytable::if_else(
+        condition = !is.na(score),
+        true = label_npclassifier,
+        false = NA_character_
+      )
+    )
+
+  if (!is.null(xrefs_table) && nrow(xrefs_table) > 0L) {
+    results_mini <- results_mini |>
+      tidytable::rename(
+        candidate_structure_inchikey_connectivity_layer = inchikey_connectivity_layer
+      ) |>
+      .add_xrefs_to_df(xrefs = xrefs_table) |>
+      tidytable::rename(
+        inchikey_connectivity_layer = candidate_structure_inchikey_connectivity_layer
+      )
+
+    mini_id_cols <- grep(
+      pattern = "^candidate_structure_id_",
+      x = names(results_mini),
+      value = TRUE
+    )
+
+    if (length(mini_id_cols) > 0L) {
+      results_mini <- results_mini |>
+        tidytable::rename_with(
+          ~ sub("^candidate_structure_", "", .x),
+          .cols = tidyselect::all_of(mini_id_cols)
+        )
+    }
+  }
+
+  results_mini
+}
+
 #' @title Clean Chemical Annotations
 #'
 #' @description Cleans and filters chemically weighted annotation results through
@@ -700,32 +1072,15 @@ clean_chemo <- function(
     .f = .validate_features_dataframe
   )
   if (!is.data.frame(structure_organism_pairs_table)) {
-    stop("structure_organism_pairs_table must be a data frame", call. = FALSE)
+    tima_abort(
+      problem = "structure_organism_pairs_table must be a data frame",
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   # Ensure Score Columns are Numeric ----
 
-  # Convert score columns to numeric to prevent "non-numeric argument" errors
-  # These columns may be character if loaded from TSV files
-  score_columns <- c(
-    "score_biological",
-    "score_chemical",
-    "score_weighted_chemo",
-    "candidate_score_pseudo_initial",
-    "candidate_score_similarity",
-    "candidate_score_sirius_csi"
-  )
-
-  cols_to_convert <- intersect(score_columns, names(annot_table_wei_chemo))
-  if (length(cols_to_convert) > 0L) {
-    annot_table_wei_chemo <- annot_table_wei_chemo |>
-      tidytable::mutate(
-        tidytable::across(
-          .cols = tidyselect::all_of(cols_to_convert),
-          .fns = as.numeric
-        )
-      )
-  }
+  annot_table_wei_chemo <- coerce_score_columns(annot_table_wei_chemo)
 
   # Core Filtering Pipeline ----
   log_metadata(
@@ -737,45 +1092,27 @@ clean_chemo <- function(
     max_per_score = max_per_score
   )
 
-  # Step 1: Filter MS1 annotations based on score thresholds
-  df_base <- filter_ms1_annotations(
+  candidate_tables <- prepare_ranked_candidates(
     annot_table_wei_chemo = annot_table_wei_chemo,
     minimal_ms1_bio = minimal_ms1_bio,
     minimal_ms1_chemo = minimal_ms1_chemo,
-    minimal_ms1_condition = minimal_ms1_condition
+    minimal_ms1_condition = minimal_ms1_condition,
+    best_percentile = best_percentile,
+    max_per_score = max_per_score
   )
 
-  # Step 2: Rank and deduplicate ----
-  df_ranked <- rank_and_deduplicate(df_base)
+  df_ranked <- candidate_tables$df_ranked
+  df_percentile <- candidate_tables$df_percentile
+  results_candidates <- candidate_tables$results_candidates
+  annotation_notes_lookup <- candidate_tables$annotation_notes_lookup
 
-  ## Sampling ----
-  # Sample candidates per (feature_id, rank_final) group
-  # Prioritize candidates with non-NA candidate_structure_error_rt
-  sampling_result <- sample_candidates_per_group(
-    df = df_ranked,
-    max_per_score = max_per_score,
-    seed = 42L
-  )
-
-  n_sampled_features <- sampling_result$n_sampled_features
-  annotation_notes_lookup <- sampling_result$annotation_notes
-  df_ranked <- sampling_result$df
-
-  if (n_sampled_features > 0L) {
+  if (candidate_tables$n_sampled_features > 0L) {
     log_info(
       "Sampling candidates for %d features with more than %d candidates per score",
-      n_sampled_features,
+      candidate_tables$n_sampled_features,
       max_per_score
     )
   }
-
-  # Apply Percentile Filter -----
-  # This is done BEFORE high-confidence filter to get accurate counts
-  df_percentile <- apply_percentile_filter(df_ranked, best_percentile)
-
-  # Count Candidates BEFORE High-Confidence Filter ----
-
-  results_candidates <- count_candidates(df_ranked, df_percentile)
 
   # Three-Tier Output Generation ----
 
@@ -813,248 +1150,25 @@ clean_chemo <- function(
   # Tier 1: MINI - Extract from df_percentile BEFORE high-confidence filter
   # This ensures we get predicted taxonomy for features without inchikey
 
-  # Extract best compound per feature
-  # (downstream mini assembly uses filtered tier instead)
-  df_structure_tax <- df_percentile |>
-    tidytable::select(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      tidyselect::starts_with(match = "candidate_structure_tax_cla"),
-      tidyselect::starts_with(match = "candidate_structure_tax_npc")
-    ) |>
-    tidytable::distinct(feature_id, .keep_all = TRUE) |>
-    tidytable::mutate(
-      # Get best ClassyFire from structure (most specific level)
-      label_classyfire_structure = tidytable::coalesce(
-        candidate_structure_tax_cla_04dirpar,
-        candidate_structure_tax_cla_03cla,
-        candidate_structure_tax_cla_02sup,
-        candidate_structure_tax_cla_01kin
-      ),
-      # Get best NPClassifier from structure (most specific level)
-      label_npclassifier_structure = tidytable::coalesce(
-        candidate_structure_tax_npc_03cla,
-        candidate_structure_tax_npc_02sup,
-        candidate_structure_tax_npc_01pat
-      ),
-      has_inchikey = !is.na(candidate_structure_inchikey_connectivity_layer)
-    ) |>
-    tidytable::select(
-      feature_id,
-      has_inchikey,
-      label_classyfire_structure,
-      label_npclassifier_structure
-    )
-
-  # Extract predicted taxonomy with scores (when NO inchikey - use predicted columns)
-  df_pred_tax <- df_percentile |>
-    tidytable::select(
-      tidyselect::contains(match = c("feature_id", "feature_pred"))
-    ) |>
-    tidytable::mutate(
-      tidytable::across(
-        tidyselect::contains(match = "score"),
-        as.numeric
-      )
-    )
-
-  if (nrow(df_pred_tax) > 0L) {
-    # Build weights list from explicit parameters
-    weights <- list(
-      w_cla_kin = score_chemical_cla_kingdom,
-      w_cla_sup = score_chemical_cla_superclass,
-      w_cla_cla = score_chemical_cla_class,
-      w_cla_par = score_chemical_cla_parent,
-      w_npc_pat = score_chemical_npc_pathway,
-      w_npc_sup = score_chemical_npc_superclass,
-      w_npc_cla = score_chemical_npc_class
-    )
-
-    # For ClassyFire: compute weighted scores for ALL levels, pick single best
-    df_cla <- compute_classyfire_taxonomy(df_pred_tax, weights)
-
-    # For NPClassifier: compute weighted scores for ALL levels, pick single best
-    df_npc <- compute_npclassifier_taxonomy(df_pred_tax, weights)
-
-    # Combine ClassyFire and NPClassifier
-    df_pred_tax <- df_cla |>
-      tidytable::left_join(y = df_npc)
-  } else {
-    df_pred_tax <- tidytable::tidytable(
-      feature_id = character(0),
-      label_classyfire_predicted = character(0),
-      label_npclassifier_predicted = character(0),
-      score_classyfire = numeric(0),
-      score_npclassifier = numeric(0)
-    )
-  }
-
-  # Combine: use structure taxonomy when inchikey exists, predicted when not
-  df_classes_mini <- df_structure_tax |>
-    tidytable::left_join(y = df_pred_tax) |>
-    tidytable::mutate(
-      label_classyfire = tidytable::if_else(
-        has_inchikey,
-        label_classyfire_structure,
-        label_classyfire_predicted
-      ),
-      label_npclassifier = tidytable::if_else(
-        has_inchikey,
-        label_npclassifier_structure,
-        label_npclassifier_predicted
-      ),
-      # Keep scores only when using predicted (no inchikey)
-      score_classyfire = tidytable::if_else(
-        has_inchikey,
-        NA_real_,
-        score_classyfire
-      ),
-      score_npclassifier = tidytable::if_else(
-        has_inchikey,
-        NA_real_,
-        score_npclassifier
-      )
-    ) |>
-    tidytable::select(
-      feature_id,
-      has_inchikey,
-      label_classyfire,
-      label_npclassifier,
-      score_classyfire,
-      score_npclassifier
-    ) |>
-    tidytable::distinct() |>
-    tidytable::filter(
-      score_classyfire != 0 |
-        score_npclassifier != 0 |
-        is.na(score_classyfire) |
-        is.na(score_npclassifier)
-    )
+  df_classes_mini <- build_mini_taxonomy_table(
+    df_percentile = df_percentile,
+    score_chemical_cla_kingdom = score_chemical_cla_kingdom,
+    score_chemical_cla_superclass = score_chemical_cla_superclass,
+    score_chemical_cla_class = score_chemical_cla_class,
+    score_chemical_cla_parent = score_chemical_cla_parent,
+    score_chemical_npc_pathway = score_chemical_npc_pathway,
+    score_chemical_npc_superclass = score_chemical_npc_superclass,
+    score_chemical_npc_class = score_chemical_npc_class
+  )
 
   # Combine mini results and adjust candidates_best based on inchikey presence
-  results_mini <- features_table |>
-    tidytable::left_join(y = df_classes_mini) |>
-    tidytable::left_join(y = results_filtered) |>
-    tidytable::left_join(
-      y = df_filtered |>
-        tidytable::select(
-          tidyselect::any_of(c(
-            "feature_id",
-            "candidate_structure_name",
-            "candidate_adduct",
-            "candidate_structure_smiles_no_stereo",
-            "candidate_structure_inchikey_connectivity_layer",
-            "candidate_library",
-            "candidate_structure_error_mz",
-            "candidate_structure_error_rt",
-            "candidate_structure_organism_occurrence_closest",
-            "candidate_structure_organism_occurrence_tag",
-            "score_weighted_chemo"
-          ))
-        )
-    ) |>
-    tidytable::rename(
-      label_compound = candidate_structure_name,
-      adduct = candidate_adduct,
-      smiles_no_stereo = candidate_structure_smiles_no_stereo,
-      inchikey_connectivity_layer = candidate_structure_inchikey_connectivity_layer,
-      library = candidate_library,
-      error_mz = candidate_structure_error_mz,
-      error_rt = candidate_structure_error_rt,
-      organism_closest = candidate_structure_organism_occurrence_closest,
-      score = score_weighted_chemo
-    ) |>
-    tidytable::mutate(
-      # Set candidates to NA when no inchikey
-      candidates_evaluated = tidytable::if_else(
-        is.na(inchikey_connectivity_layer),
-        NA_integer_,
-        candidates_evaluated
-      ),
-      candidates_best = tidytable::if_else(
-        is.na(inchikey_connectivity_layer),
-        NA_integer_,
-        candidates_best
-      ),
-      # Average taxonomy score when no inchikey (across available classifiers)
-      .pred_denom = as.numeric(!is.na(score_classyfire)) +
-        as.numeric(!is.na(score_npclassifier)),
-      .pred_sum = tidytable::coalesce(score_classyfire, 0) +
-        tidytable::coalesce(score_npclassifier, 0),
-      .pred_avg = tidytable::if_else(
-        .pred_denom > 0,
-        .pred_sum / .pred_denom,
-        NA_real_
-      ),
-      # Replace compound score with averaged taxonomy score when there is no inchikey
-      score = tidytable::if_else(
-        is.na(inchikey_connectivity_layer),
-        .pred_avg,
-        score
-      )
-    ) |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          "feature_id",
-          "rt",
-          "mz",
-          "label_classyfire",
-          "label_npclassifier",
-          "label_compound",
-          "adduct",
-          "smiles_no_stereo",
-          "inchikey_connectivity_layer",
-          "library",
-          "error_mz",
-          "error_rt",
-          "organism_closest",
-          "tag" = "candidate_structure_organism_occurrence_tag",
-          "score",
-          "candidates_evaluated",
-          "candidates_best",
-          "note" = "annotation_note"
-        )
-      )
-    ) |>
-    tidytable::distinct() |>
-    tidytable::mutate(
-      label_classyfire = tidytable::if_else(
-        condition = !is.na(score),
-        true = label_classyfire,
-        false = NA_character_
-      ),
-      label_npclassifier = tidytable::if_else(
-        condition = !is.na(score),
-        true = label_npclassifier,
-        false = NA_character_
-      )
-    )
-
-  if (!is.null(xrefs_table) && nrow(xrefs_table) > 0L) {
-    results_mini <- results_mini |>
-      tidytable::rename(
-        candidate_structure_inchikey_connectivity_layer = inchikey_connectivity_layer
-      ) |>
-      .add_xrefs_to_df(xrefs = xrefs_table) |>
-      tidytable::rename(
-        inchikey_connectivity_layer = candidate_structure_inchikey_connectivity_layer
-      )
-
-    mini_id_cols <- grep(
-      pattern = "^candidate_structure_id_",
-      x = names(results_mini),
-      value = TRUE
-    )
-
-    if (length(mini_id_cols) > 0L) {
-      results_mini <- results_mini |>
-        tidytable::rename_with(
-          ~ sub("^candidate_structure_", "", .x),
-          .cols = tidyselect::all_of(mini_id_cols)
-        )
-    }
-  }
+  results_mini <- build_mini_results_table(
+    features_table = features_table,
+    df_classes_mini = df_classes_mini,
+    results_filtered = results_filtered,
+    df_filtered = df_filtered,
+    xrefs_table = xrefs_table
+  )
 
   # Tier 3: FULL - Optionally apply high-confidence filter
   df_full <- if (high_confidence) {
@@ -1111,7 +1225,6 @@ clean_chemo <- function(
   # Clean up intermediate objects
   rm(
     annot_table_wei_chemo,
-    df_base,
     df_ranked,
     df_percentile,
     df_filtered,
@@ -1119,7 +1232,8 @@ clean_chemo <- function(
     results_candidates,
     features_table,
     components_table,
-    structure_organism_pairs_table
+    structure_organism_pairs_table,
+    candidate_tables
   )
 
   return(results_list)
