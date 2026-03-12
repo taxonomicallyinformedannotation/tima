@@ -157,6 +157,7 @@ Collate:
     'harmonize_names_sirius.R'
     'harmonize_spectra.R'
     'install.R'
+    'move_file_safely.R'
     'pre_harmonize_names_sirius.R'
     'select_annotations_columns.R'
     'prepare_annotations_gnps.R'

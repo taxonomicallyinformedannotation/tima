@@ -7,6 +7,8 @@
 #' @param cache_dir Character string path to the cache directory
 #'     (default: "~/.tima" in user's home directory)
 #' @param package Character string name of the package (default: "tima")
+#' @param force_overwrite [logical] if TRUE, overwrite existing cache contents
+#'     with package defaults; if FALSE, keep existing cache as-is
 #'
 #' @return NULL (invisibly). Creates cache directory structure as side effect.
 #'
@@ -20,7 +22,8 @@
 #' }
 copy_backbone <- function(
   cache_dir = fs::path_home(".tima"),
-  package = "tima"
+  package = "tima",
+  force_overwrite = FALSE
 ) {
   # Validate inputs
   if (
@@ -39,6 +42,10 @@ copy_backbone <- function(
       nchar(package) == 0L
   ) {
     stop("Package name must be a non-empty character string")
+  }
+
+  if (!is.logical(force_overwrite) || length(force_overwrite) != 1L) {
+    stop("force_overwrite must be a single logical value")
   }
 
   # Get package installation path
@@ -60,6 +67,16 @@ copy_backbone <- function(
       stop("Failed to create cache directory: ", conditionMessage(e))
     }
   )
+
+  # Preserve existing cache by default so saved GUI parameters survive restarts
+  cache_has_content <- length(list.files(cache_dir, all.files = TRUE)) > 2L
+  if (cache_has_content && !force_overwrite) {
+    log_info(
+      "Using existing TIMA cache at %s (set force_overwrite=TRUE to refresh)",
+      cache_dir
+    )
+    return(invisible(NULL))
+  }
 
   # Copy package structure to cache
   tryCatch(

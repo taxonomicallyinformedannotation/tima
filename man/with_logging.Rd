@@ -29,3 +29,4 @@ result <- with_logging("classify", n = 100, {
 })
 }
 }
+\keyword{internal}

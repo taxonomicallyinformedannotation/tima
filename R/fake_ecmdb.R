@@ -63,9 +63,12 @@ fake_ecmdb <- function(export) {
     utils::zip(zipfile = basename(export), files = fake_export)
   }
 
-  # Move to final location
+  # Move to final location (handles cross-device moves in Docker)
   if (file.exists(basename(export))) {
-    file.rename(basename(export), export)
+    moved <- move_file_safely(basename(export), export)
+    if (!isTRUE(moved)) {
+      stop(sprintf("Failed to move temporary archive to %s", export))
+    }
   }
 
   # Clean up temporary file
