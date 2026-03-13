@@ -214,10 +214,7 @@ parse_hmdb_like_sdf_lines <- function(sdf_lines) {
     JCHEM_LOGP = "logp",
     ALOGPS_LOGP = "logp",
     XLOGP3 = "logp",
-    GENERIC_NAME = "name",
-    NAME = "name",
-    COMMON_NAME = "name",
-    DATABASE_NAME = "name"
+    GENERIC_NAME = "name"
   )
 
   record_end_idx <- which(sdf_lines == "$$$$")
