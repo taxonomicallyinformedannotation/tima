@@ -144,12 +144,12 @@ commands are below:
 
 ``` bash
 docker pull adafede/tima-r
-# docker build inst/. -t adafede/tima-r
+# docker build inst/. -t adafede/tima-r --no-cache
 ```
 
 ``` bash
-docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" -p 3838:3838 adafede/tima-r Rscript -e "tima::run_app()"
-# docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r Rscript -e "tima::run_tima()"
+docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" -p 3838:3838 adafede/tima-r
+# docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r
 ```
 
 ## Main Citations
@@ -222,6 +222,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | BiocManager | 1.30.27 | Morgan and Ramos (2025) |
 | BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
+| classyfireR | 0.3.8 | Y et al. (2016) |
 | docopt | 0.7.2 | de Jonge (2025) |
 | fs | 1.6.7 | Hester, Wickham, and Csárdi (2025) |
 | httr2 | 1.2.2 | Wickham (2025) |
