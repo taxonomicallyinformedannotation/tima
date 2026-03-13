@@ -194,8 +194,21 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 ### Others
 
 - BiGG: <https://doi.org/10.1093/nar/gkv1049>
+- BMDB: <https://doi.org/10.3390/metabo10060233>
+- Cannabis DB: <https://doi.org/10.1021/acs.jafc.3c06616>
 - ECMDB 2.0: <https://doi.org/10.1093/nar/gkv1060>
 - HMDB 5.0: <https://doi.org/10.1093/nar/gkab1062>
+  - CSF: <https://doi.org/10.1016/j.jchromb.2008.05.001>
+  - Fecal: <https://doi.org/10.1016/j.aca.2018.05.031>
+  - Saliva: <https://doi.org/10.1007/s11306-015-0840-5>
+  - Serum: <https://doi.org/10.1371/journal.pone.0016957>
+  - Sweat:
+  - Urine: <https://doi.org/10.1371/journal.pone.0073076>
+- MCDB: <https://doi.org/10.1021/acs.jafc.9b00204>
+- SMPDB 2.0: <https://doi.org/10.1093/nar/gkt1067>
+  <!-- -   MiMeDB 2.0: <https://doi.org/10.1093/nar/gkaf1272> -->
+- T3DB: <https://doi.org/10.1093/nar/gku1004>
+- YMDB 2.0: <https://doi.org/10.1093/nar/gkw1058>
 - MassBank: <https://doi.org/10.5281/zenodo.3378723>
 - Merlin: <https://doi.org/10.5281/zenodo.13911806>
 - NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
@@ -205,7 +218,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | Package | Version | Citation |
 |:---|:---|:---|
 | archive | 1.1.12.1 | Hester and Csárdi (2025) |
-| base | 4.5.2 | R Core Team (2025) |
+| base | 4.5.3 | R Core Team (2025) |
 | BiocManager | 1.30.27 | Morgan and Ramos (2025) |
 | BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
