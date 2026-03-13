@@ -12,7 +12,8 @@ summarize_results(
   annot_table_wei_chemo,
   remove_ties,
   summarize,
-  annotation_notes_lookup = NULL
+  annotation_notes_lookup = NULL,
+  feature_consensus_table = NULL
 )
 }
 \arguments{
