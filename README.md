@@ -148,8 +148,8 @@ docker pull adafede/tima-r
 ```
 
 ``` bash
-docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" -p 3838:3838 adafede/tima-r
-# docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r
+docker run --user tima-user -v "$(pwd)/.tima/_targets:/home/tima-user/.tima/_targets" -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" -p 3838:3838 adafede/tima-r
+# docker run --user tima-user -v "$(pwd)/.tima/_targets:/home/tima-user/.tima/_targets" -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r
 ```
 
 ## Main Citations
