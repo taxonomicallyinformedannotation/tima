@@ -123,12 +123,12 @@ A container is also available, together with a small compose file. Main commands
 
 ``` bash
 docker pull adafede/tima-r
-# docker build inst/. -t adafede/tima-r
+# docker build inst/. -t adafede/tima-r --no-cache
 ```
 
 ``` bash
-docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" -p 3838:3838 adafede/tima-r Rscript -e "tima::run_app()"
-# docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r Rscript -e "tima::run_tima()"
+docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" -p 3838:3838 adafede/tima-r
+# docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r
 ```
 
 ## Main Citations
