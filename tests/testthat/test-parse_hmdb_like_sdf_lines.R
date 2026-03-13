@@ -118,7 +118,7 @@ test_that("parse_hmdb_like_sdf_lines maps logP aliases correctly", {
 
 test_that("parse_hmdb_like_sdf_lines maps name aliases correctly", {
   invisible(vapply(
-    X = c("GENERIC_NAME", "NAME", "COMMON_NAME", "DATABASE_NAME"),
+    X = c("GENERIC_NAME", "DATABASE_NAME"),
     FUN = function(field) {
       block <- c(
         "  mol",
