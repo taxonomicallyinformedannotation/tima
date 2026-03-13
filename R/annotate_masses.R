@@ -178,6 +178,7 @@ annotate_masses <-
         "candidate_structure_molecular_formula",
         "candidate_structure_exact_mass",
         "candidate_structure_xlogp",
+        "candidate_structure_tag",
         "candidate_library",
         "candidate_structure_tax_npc_01pat",
         "candidate_structure_tax_npc_02sup",
@@ -697,7 +698,8 @@ annotate_masses <-
       "structure_smiles_no_stereo",
       "structure_molecular_formula",
       "structure_exact_mass",
-      "structure_xlogp"
+      "structure_xlogp",
+      "structure_tag"
     )
     cols_to_select <- intersect(required_cols, available_cols)
 
@@ -710,7 +712,8 @@ annotate_masses <-
             "structure_inchikey_connectivity_layer",
             "structure_molecular_formula",
             "structure_exact_mass",
-            "structure_xlogp"
+            "structure_xlogp",
+            "structure_tag"
           )
         ),
         .keep_all = TRUE
@@ -859,6 +862,7 @@ annotate_masses <-
             "structure_molecular_formula",
             "structure_exact_mass",
             "structure_xlogp",
+            "structure_tag",
             "library"
           )
         )
@@ -879,6 +883,7 @@ annotate_masses <-
           x = "structure_exact_mass"
         ),
         candidate_structure_xlogp = tidyselect::any_of(x = "structure_xlogp"),
+        candidate_structure_tag = tidyselect::any_of(x = "structure_tag"),
         candidate_library = tidyselect::any_of(x = "library")
       ) |>
       tidytable::distinct()
@@ -998,7 +1003,17 @@ annotate_masses <-
       step = "annotate_masses"
     )
     export_output(x = edges, file = output_edges[[1L]])
-    export_output(x = df_final, file = output_annotations[[1L]])
+    export_output(
+      x = df_final |>
+        select_annotations_columns(
+          str_stereo = str_stereo,
+          str_met = str_met,
+          str_nam = str_nam,
+          str_tax_cla = str_tax_cla,
+          str_tax_npc = str_tax_npc
+        ),
+      file = output_annotations[[1L]]
+    )
 
     log_complete(ctx, n_annotations = nrow(df_final), n_edges = nrow(edges))
 

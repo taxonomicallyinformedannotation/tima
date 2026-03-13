@@ -184,7 +184,7 @@ files:
         ecmdb: data/interim/libraries/sop/ecmdb_prepared.tsv.gz
 
         #' GNPS prepared structure organism pairs library. STRING
-        gnps: data/interim/libraries/sop/gnps_11193898_prepared.tsv.gz
+        gnps: data/interim/libraries/sop/gnps_11566051_prepared.tsv.gz
         
         #' HMDB prepared structure organism pairs library. STRING
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
@@ -247,10 +247,10 @@ files:
         rt: data/interim/libraries/sop/rt_prepared.tsv.gz
 
         #' Massbank spectral prepared structure organism pairs library. STRING
-        massbank: data/interim/libraries/sop/massbank_2025051_prepared.tsv.gz
+        massbank: data/interim/libraries/sop/massbank_202510_prepared.tsv.gz
 
         #' Merlin spectral prepared structure organism pairs library. STRING
-        merlin: data/interim/libraries/sop/merlin_13911806_prepared.tsv.gz
+        merlin: data/interim/libraries/sop/merlin_16984129_prepared.tsv.gz
 
         #' Wikidata spectral prepared structure organism pairs library. STRING
         wikidata: data/interim/libraries/sop/wikidata_5607185_prepared.tsv.gz

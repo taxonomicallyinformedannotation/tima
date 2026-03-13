@@ -13,6 +13,7 @@ sop_row <- function(n = 1L) {
     structure_molecular_formula = rep("C16H22O9", n),
     structure_exact_mass = rep(358.126, n),
     structure_xlogp = rep(-1.1, n),
+    structure_tag = rep("tag", n),
     structure_taxonomy_npclassifier_01pathway = rep("Terpenoids", n),
     structure_taxonomy_npclassifier_02superclass = rep("Iridoids", n),
     structure_taxonomy_npclassifier_03class = rep("Secoiridoids", n),
@@ -34,7 +35,6 @@ sop_row <- function(n = 1L) {
     organism_taxonomy_09species = rep("Gentiana lutea", n),
     organism_taxonomy_10varietas = rep(NA_character_, n),
     reference_doi = rep("10.1234/example", n),
-    tag = rep("plant", n),
     extra_col = rep("drop_me", n)
   )
 }
@@ -47,7 +47,7 @@ test_that("select_sop_columns strips extra columns and renames correctly", {
   expect_true("structure_smiles_no_stereo" %in% names(out))
   expect_true("structure_tax_npc_01pat" %in% names(out))
   expect_true("structure_tax_cla_04dirpar" %in% names(out))
-  expect_true("tag" %in% names(out))
+  expect_true("structure_tag" %in% names(out))
 })
 
 test_that("select_sop_columns has exactly the expected column count", {

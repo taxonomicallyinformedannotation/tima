@@ -105,6 +105,7 @@ complement_metadata_structures <- function(
       structure_smiles_no_stereo,
       structure_exact_mass,
       structure_xlogp,
+      structure_tag,
       structure_molecular_formula
     ) |>
     tidytable::filter(
@@ -195,7 +196,8 @@ complement_metadata_structures <- function(
       candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
       candidate_structure_molecular_formula_i = structure_molecular_formula,
       candidate_structure_exact_mass_i = structure_exact_mass,
-      candidate_structure_xlogp_i = structure_xlogp
+      candidate_structure_xlogp_i = structure_xlogp,
+      candidate_structure_tag_i = structure_tag,
     ) |>
     tidytable::filter(
       !is.na(candidate_structure_inchikey_connectivity_layer)
@@ -210,7 +212,8 @@ complement_metadata_structures <- function(
       candidate_structure_smiles_no_stereo = structure_smiles_no_stereo,
       candidate_structure_molecular_formula_s = structure_molecular_formula,
       candidate_structure_exact_mass_s = structure_exact_mass,
-      candidate_structure_xlogp_s = structure_xlogp
+      candidate_structure_xlogp_s = structure_xlogp,
+      candidate_structure_tag_s = structure_tag,
     ) |>
     tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
     tidytable::distinct(
@@ -251,6 +254,7 @@ complement_metadata_structures <- function(
     "candidate_structure_molecular_formula",
     "candidate_structure_exact_mass",
     "candidate_structure_xlogp",
+    "candidate_structure_tag",
     "candidate_structure_name",
     "candidate_structure_inchikey_connectivity_layer",
     "candidate_structure_smiles_no_stereo",
@@ -279,6 +283,7 @@ complement_metadata_structures <- function(
     "structure_molecular_formula",
     "structure_exact_mass",
     "structure_xlogp",
+    "structure_tag",
     "structure_name",
     "structure_inchikey_connectivity_layer",
     "structure_smiles_no_stereo"
@@ -331,6 +336,11 @@ complement_metadata_structures <- function(
         candidate_structure_xlogp_s,
         candidate_structure_xlogp_i,
         candidate_structure_xlogp
+      ),
+      candidate_structure_tag = tidytable::coalesce(
+        candidate_structure_tag_s,
+        candidate_structure_tag_i,
+        candidate_structure_tag
       )
     ) |>
     tidytable::select(
@@ -339,7 +349,9 @@ complement_metadata_structures <- function(
       -candidate_structure_exact_mass_s,
       -candidate_structure_exact_mass_i,
       -candidate_structure_xlogp_s,
-      -candidate_structure_xlogp_i
+      -candidate_structure_xlogp_i,
+      -candidate_structure_tag_s,
+      -candidate_structure_tag_i
     ) |>
     tidytable::left_join(y = nam_i) |>
     tidytable::left_join(y = nam_s) |>

@@ -27,6 +27,7 @@ make_sop_df <- function(n_features = 3L, n_cand = 2L) {
     candidate_structure_inchikey_connectivity_layer = inks,
     stringsAsFactors = FALSE
   )
+  df$candidate_structure_tag <- "tag"
   df$candidate_score_pseudo_initial <- runif(nrow(df))
   df$candidate_structure_organism_occurrence_closest <- "Plantae"
   df$score_biological <- runif(nrow(df)) * 100
@@ -125,7 +126,7 @@ test_that("summarize_results warns and returns empty df with tag column on empty
     "Empty results"
   )
   expect_equal(nrow(out), 0L)
-  expect_true("candidate_structure_organism_occurrence_tag" %in% names(out))
+  expect_true("candidate_structure_tag" %in% names(out))
 })
 
 # ---- basic output ------------------------------------------------------------
@@ -140,7 +141,7 @@ test_that("summarize_results returns a data frame with feature_id column", {
 test_that("summarize_results includes tag column when SOP has tags", {
   d <- make_sop_df(n_cand = 2L)
   out <- call_sr(d)
-  expect_true("candidate_structure_organism_occurrence_tag" %in% names(out))
+  expect_true("candidate_structure_tag" %in% names(out))
 })
 
 test_that("summarize_results works when SOP has no tag column", {

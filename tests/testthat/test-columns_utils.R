@@ -34,7 +34,7 @@ test_that("columns_model feature columns contain core identifiers", {
 test_that("columns_model tag column is present in candidates_structures_columns", {
   m <- columns_model()
   expect_true(
-    "candidate_structure_organism_occurrence_tag" %in%
+    "candidate_structure_tag" %in%
       m$candidates_structures_columns
   )
 })
@@ -92,7 +92,7 @@ test_that("fake_annotations_columns returns a 1-row NA data frame", {
   expect_s3_class(out, "data.frame")
   expect_equal(nrow(out), 1L)
   expect_true("feature_id" %in% names(out))
-  expect_true("candidate_structure_organism_occurrence_tag" %in% names(out))
+  expect_true("candidate_structure_tag" %in% names(out))
   expect_true(all(is.na(out)))
 })
 
@@ -102,8 +102,8 @@ test_that("fake_sop_columns returns a 1-row NA tidytable with tag column", {
   out <- fake_sop_columns()
   expect_s3_class(out, "data.frame")
   expect_equal(nrow(out), 1L)
-  expect_true("tag" %in% names(out))
+  expect_true("structure_tag" %in% names(out))
   expect_true("organism_name" %in% names(out))
   expect_true("structure_inchikey" %in% names(out))
-  expect_true(is.na(out$tag))
+  expect_true(is.na(out$structure_tag))
 })
