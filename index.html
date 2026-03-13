@@ -790,9 +790,9 @@ div.csl-indent {
 <h3 class="anchored" data-anchor-id="docker">Docker</h3>
 <p>A container is also available, together with a small compose file. Main commands are below:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> pull adafede/tima-r</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># docker build inst/. -t adafede/tima-r</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--user</span> tima-user <span class="at">-v</span> <span class="st">"</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/.tima/data:/home/tima-user/.tima/data"</span> <span class="at">-p</span> 3838:3838 adafede/tima-r Rscript <span class="at">-e</span> <span class="st">"tima::run_app()"</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r Rscript -e "tima::run_tima()"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># docker build inst/. -t adafede/tima-r --no-cache</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--user</span> tima-user <span class="at">-v</span> <span class="st">"</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/.tima/data:/home/tima-user/.tima/data"</span> <span class="at">-p</span> 3838:3838 adafede/tima-r</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># docker run --user tima-user -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" adafede/tima-r</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="main-citations" class="level2">
@@ -895,156 +895,161 @@ div.csl-indent {
 <td style="text-align: left;">Morgan (2025)</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">classyfireR</td>
+<td style="text-align: left;">0.3.8</td>
+<td style="text-align: left;">Y et al.&nbsp;(2016)</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">docopt</td>
 <td style="text-align: left;">0.7.2</td>
 <td style="text-align: left;">de Jonge (2025)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">fs</td>
 <td style="text-align: left;">1.6.7</td>
 <td style="text-align: left;">Hester, Wickham, and Csárdi (2025)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">httr2</td>
 <td style="text-align: left;">1.2.2</td>
 <td style="text-align: left;">Wickham (2025)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">igraph</td>
 <td style="text-align: left;">2.2.2</td>
 <td style="text-align: left;">Csárdi and Nepusz (2006); Antonov et al.&nbsp;(2023); (<strong>igraph2026?</strong>)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">IRanges</td>
 <td style="text-align: left;">2.44.0</td>
 <td style="text-align: left;">Lawrence et al.&nbsp;(2013)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">knitr</td>
 <td style="text-align: left;">1.51</td>
 <td style="text-align: left;">Xie (2014); Xie (2015); Xie (2025)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">lgr</td>
 <td style="text-align: left;">0.5.2</td>
 <td style="text-align: left;">Fleck (2025)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">MetaboCoreUtils</td>
 <td style="text-align: left;">1.18.1</td>
 <td style="text-align: left;">Rainer et al.&nbsp;(2022a)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">MsBackendMgf</td>
 <td style="text-align: left;">1.18.0</td>
 <td style="text-align: left;">Gatto, Rainer, and Gibb (2025)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">MsBackendMsp</td>
 <td style="text-align: left;">1.14.0</td>
 <td style="text-align: left;">Rainer et al.&nbsp;(2022b)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">MsCoreUtils</td>
 <td style="text-align: left;">1.22.1</td>
 <td style="text-align: left;">Rainer et al.&nbsp;(2022c)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">msentropy</td>
 <td style="text-align: left;">0.1.4</td>
 <td style="text-align: left;">Li (2023)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">R.utils</td>
 <td style="text-align: left;">2.13.0</td>
 <td style="text-align: left;">Bengtsson (2025)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">reticulate</td>
 <td style="text-align: left;">1.45.0</td>
 <td style="text-align: left;">Ushey, Allaire, and Tang (2025)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">rmarkdown</td>
 <td style="text-align: left;">2.30</td>
 <td style="text-align: left;">Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al.&nbsp;(2025)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">rotl</td>
 <td style="text-align: left;">3.1.1</td>
 <td style="text-align: left;">Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al.&nbsp;(2019)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">shiny</td>
 <td style="text-align: left;">1.13.0</td>
 <td style="text-align: left;">Chang et al.&nbsp;(2025)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">shinyhelper</td>
 <td style="text-align: left;">0.3.2</td>
 <td style="text-align: left;">Mason-Thom (2019)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">shinyjs</td>
 <td style="text-align: left;">2.1.1</td>
 <td style="text-align: left;">Attali (2021)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">shinytest2</td>
 <td style="text-align: left;">0.5.1</td>
 <td style="text-align: left;">Schloerke (2025)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">shinyvalidate</td>
 <td style="text-align: left;">0.1.3</td>
 <td style="text-align: left;">Sievert, Iannone, and Cheng (2023)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">Spectra</td>
 <td style="text-align: left;">1.20.1</td>
 <td style="text-align: left;">Rainer et al.&nbsp;(2022d)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">stringi</td>
 <td style="text-align: left;">1.8.7</td>
 <td style="text-align: left;">Gagolewski (2022)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">targets</td>
 <td style="text-align: left;">1.12.0</td>
 <td style="text-align: left;">Landau (2021)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">testthat</td>
 <td style="text-align: left;">3.3.2</td>
 <td style="text-align: left;">Wickham (2011)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">tidyselect</td>
 <td style="text-align: left;">1.2.1</td>
 <td style="text-align: left;">Henry and Wickham (2024)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">tidytable</td>
 <td style="text-align: left;">0.11.2</td>
 <td style="text-align: left;">Fairbanks (2024)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">tidyverse</td>
 <td style="text-align: left;">2.0.0</td>
 <td style="text-align: left;">Wickham et al.&nbsp;(2019)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">tima</td>
 <td style="text-align: left;">2.12.0</td>
 <td style="text-align: left;">Rutz et al.&nbsp;(2019); Rutz and Allard (2025)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">withr</td>
 <td style="text-align: left;">3.0.2</td>
 <td style="text-align: left;">Hester et al.&nbsp;(2024)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">yaml</td>
 <td style="text-align: left;">2.3.12</td>
 <td style="text-align: left;">Stephens and Simonov (2025)</td>
