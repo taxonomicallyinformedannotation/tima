@@ -51,6 +51,16 @@ annotate_spectra(
 \item{approx}{Logical; if TRUE perform matching ignoring precursor masses
 (broader, slower); if FALSE restrict library to precursor-tolerant
 spectra first.}
+
+\item{str_stereo}{File containing structures stereo}
+
+\item{str_met}{File containing structures metadata}
+
+\item{str_nam}{File containing structures names}
+
+\item{str_tax_cla}{File containing Classyfire taxonomy}
+
+\item{str_tax_npc}{File containing NPClassifier taxonomy}
 }
 \value{
 Character scalar: the output file path (invisible). Side effect:

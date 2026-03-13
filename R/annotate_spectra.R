@@ -50,6 +50,11 @@
 #' @param approx Logical; if TRUE perform matching ignoring precursor masses
 #'     (broader, slower); if FALSE restrict library to precursor-tolerant
 #'     spectra first.
+#' @param str_stereo File containing structures stereo
+#' @param str_met File containing structures metadata
+#' @param str_nam File containing structures names
+#' @param str_tax_cla File containing Classyfire taxonomy
+#' @param str_tax_npc File containing NPClassifier taxonomy
 #'
 #' @return Character scalar: the output file path (invisible). Side effect:
 #'     writes the annotations table to `output`.
