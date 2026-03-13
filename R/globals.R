@@ -59,7 +59,7 @@ utils::globalVariables(
     "candidate_structure_name_s",
     "candidate_structure_organism_occurrence_closest",
     "candidate_structure_organism_occurrence_reference",
-    "candidate_structure_organism_occurrence_tag",
+    "candidate_structure_tag",
     "candidate_structure_smiles_no_stereo",
     "candidate_structure_smiles_no_stereo_i",
     "candidate_structure_smiles_no_stereo_s",

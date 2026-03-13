@@ -1030,7 +1030,7 @@ test_that("build_mini_results_table assembles expected mini output", {
     candidate_structure_error_mz = c(0.1, 0.2),
     candidate_structure_error_rt = c(0.01, 0.02),
     candidate_structure_organism_occurrence_closest = c("Org1", "Org2"),
-    candidate_structure_organism_occurrence_tag = c("reported", "predicted"),
+    candidate_structure_tag = c("reported", "predicted"),
     score_weighted_chemo = c(0.9, 0.4)
   )
 

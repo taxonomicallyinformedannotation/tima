@@ -63,7 +63,8 @@ test_that("split_tables_sop splits table into components", {
               "structure_smiles_no_stereo",
               "structure_molecular_formula",
               "structure_exact_mass",
-              "structure_xlogp"
+              "structure_xlogp",
+              "structure_tag"
             )
           )
         ) |>
@@ -122,7 +123,8 @@ test_that("split_tables_sop handles missing SMILES gracefully", {
               "structure_smiles_no_stereo",
               "structure_molecular_formula",
               "structure_exact_mass",
-              "structure_xlogp"
+              "structure_xlogp",
+              "structure_tag"
             )
           )
         )
@@ -154,7 +156,8 @@ test_that("split_tables_sop preserves unique organisms", {
               "structure_smiles_no_stereo",
               "structure_molecular_formula",
               "structure_exact_mass",
-              "structure_xlogp"
+              "structure_xlogp",
+              "structure_tag"
             )
           )
         )

@@ -823,7 +823,7 @@ build_mini_results_table <- function(
             "candidate_structure_error_mz",
             "candidate_structure_error_rt",
             "candidate_structure_organism_occurrence_closest",
-            "candidate_structure_organism_occurrence_tag",
+            "candidate_structure_tag",
             "score_weighted_chemo"
           ))
         )
@@ -881,7 +881,7 @@ build_mini_results_table <- function(
           "error_mz",
           "error_rt",
           "organism_closest",
-          "tag" = "candidate_structure_organism_occurrence_tag",
+          "tag" = "candidate_structure_tag",
           "score",
           "candidates_evaluated",
           "candidates_best",

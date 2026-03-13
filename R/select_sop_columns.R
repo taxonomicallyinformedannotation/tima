@@ -36,6 +36,7 @@ select_sop_columns <- function(df) {
       structure_molecular_formula,
       structure_exact_mass,
       structure_xlogp,
+      tidyselect::any_of("structure_tag"),
       structure_tax_npc_01pat = structure_taxonomy_npclassifier_01pathway,
       structure_tax_npc_02sup = structure_taxonomy_npclassifier_02superclass,
       structure_tax_npc_03cla = structure_taxonomy_npclassifier_03class,
@@ -56,7 +57,6 @@ select_sop_columns <- function(df) {
       organism_taxonomy_08genus,
       organism_taxonomy_09species,
       organism_taxonomy_10varietas,
-      reference_doi,
-      tidyselect::any_of("tag")
+      reference_doi
     )
 }

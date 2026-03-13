@@ -611,22 +611,22 @@ test_that("weight_annotations() exports propagated tag columns", {
   mini_tbl <- tidytable::fread(mini_path)
 
   expect_true(
-    "candidate_structure_organism_occurrence_tag" %in% names(full_tbl)
+    "candidate_structure_tag" %in% names(full_tbl)
   )
   expect_true(
-    "candidate_structure_organism_occurrence_tag" %in% names(filtered_tbl)
+    "candidate_structure_tag" %in% names(filtered_tbl)
   )
   expect_true("tag" %in% names(mini_tbl))
 
   expect_true(
     any(
-      full_tbl$candidate_structure_organism_occurrence_tag == "serum",
+      full_tbl$candidate_structure_tag == "foo",
       na.rm = TRUE
     ) ||
       any(
-        filtered_tbl$candidate_structure_organism_occurrence_tag == "serum",
+        filtered_tbl$candidate_structure_tag == "foo",
         na.rm = TRUE
       ) ||
-      any(mini_tbl$tag == "serum", na.rm = TRUE)
+      any(mini_tbl$tag == "foo", na.rm = TRUE)
   )
 })

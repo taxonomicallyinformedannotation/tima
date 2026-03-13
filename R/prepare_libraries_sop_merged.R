@@ -153,11 +153,6 @@ apply_taxonomic_filter <- function(
   table_keys_filtered <- table_keys |>
     tidytable::left_join(y = table_org_tax_ott, by = "organism_name")
 
-  if (!"tag" %in% names(table_keys_filtered)) {
-    table_keys_filtered <- table_keys_filtered |>
-      tidytable::mutate(tag = NA_character_)
-  }
-
   # Find column matching the taxonomic level
   level_col <- colnames(table_keys_filtered)[grepl(
     pattern = level,
@@ -179,10 +174,8 @@ apply_taxonomic_filter <- function(
       structure_inchikey,
       structure_smiles_no_stereo,
       organism_name,
-      reference_doi,
-      tidyselect::any_of("tag")
+      reference_doi
     ) |>
-    tidytable::mutate(tag = tidytable::coalesce(tag, NA_character_)) |>
     tidytable::distinct()
 
   if (nrow(table_keys_filtered) == 0) {

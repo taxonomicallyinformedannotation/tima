@@ -76,6 +76,7 @@ split_tables_sop <- function(table, cache) {
     tidytable::select(
       structure_smiles_initial,
       structure_name,
+      tidyselect::contains(match = "_tag"),
       tidyselect::contains(match = "_tax")
     ) |>
     tidytable::distinct() |>
@@ -87,20 +88,11 @@ split_tables_sop <- function(table, cache) {
     tidytable::select(
       structure_smiles_initial,
       tidyselect::contains(match = "organism"),
-      tidyselect::contains(match = "reference"),
-      tidyselect::any_of("tag")
+      tidyselect::contains(match = "reference")
     ) |>
     tidytable::distinct() |>
     tidytable::inner_join(y = table_structural) |>
     tidytable::distinct()
-
-  if (!"tag" %in% names(table)) {
-    table <- table |>
-      tidytable::mutate(tag = NA_character_)
-  } else {
-    table <- table |>
-      tidytable::mutate(tag = tidytable::coalesce(tag, NA_character_))
-  }
 
   table_keys <- table |>
     tidytable::filter(!is.na(structure_inchikey)) |>
@@ -110,12 +102,10 @@ split_tables_sop <- function(table, cache) {
       structure_inchikey,
       structure_smiles_no_stereo,
       organism_name,
-      reference_doi,
-      tidyselect::any_of("tag")
+      reference_doi
     ) |>
-    tidytable::mutate(tag = tidytable::coalesce(tag, NA_character_)) |>
     tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey, organism_name, tag) |>
+    tidytable::group_by(structure_inchikey, organism_name) |>
     tidytable::add_count() |>
     tidytable::ungroup() |>
     tidytable::filter(!is.na(reference_doi) | n == 1) |>
@@ -176,9 +166,17 @@ split_tables_sop <- function(table, cache) {
       structure_inchikey,
       structure_molecular_formula,
       structure_exact_mass,
+      structure_xlogp,
+      structure_tag
+    ) |>
+    tidytable::distinct() |>
+    tidytable::group_by(
+      structure_inchikey,
+      structure_molecular_formula,
+      structure_exact_mass,
       structure_xlogp
     ) |>
-    tidytable::distinct()
+    clean_collapse()
 
   table_structures_names <- table_structural |>
     tidytable::filter(!is.na(structure_inchikey)) |>

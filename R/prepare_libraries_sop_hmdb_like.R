@@ -109,9 +109,9 @@ prepare_libraries_sop_hmdb_like <- function(
                 structure_taxonomy_classyfire_02superclass = NA_character_,
                 structure_taxonomy_classyfire_03class = NA_character_,
                 structure_taxonomy_classyfire_04directparent = NA_character_,
+                structure_tag = tag,
                 organism_name = organism_name,
-                reference_doi = NA_character_,
-                tag = tag
+                reference_doi = NA_character_
               ) |>
               tidytable::mutate(!!!organism_taxonomy) |>
               select_sop_columns() |>

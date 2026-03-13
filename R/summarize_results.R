@@ -63,13 +63,6 @@ summarize_results <- function(
     warning(msg, call. = FALSE)
     log_warn(msg)
 
-    if (!"candidate_structure_organism_occurrence_tag" %in% names(df)) {
-      df <- df |>
-        tidytable::mutate(
-          candidate_structure_organism_occurrence_tag = NA_character_
-        )
-    }
-
     return(df[0, , drop = FALSE])
   }
 
@@ -89,18 +82,13 @@ summarize_results <- function(
     value = TRUE
   )
 
-  sop_with_tag <- structure_organism_pairs_table
-  if (!"tag" %in% names(sop_with_tag)) {
-    sop_with_tag <- sop_with_tag |>
-      tidytable::mutate(tag = NA_character_)
-  }
-  if (!"reference_doi" %in% names(sop_with_tag)) {
-    sop_with_tag <- sop_with_tag |>
+  if (!"reference_doi" %in% names(structure_organism_pairs_table)) {
+    structure_organism_pairs_table <- structure_organism_pairs_table |>
       tidytable::mutate(reference_doi = NA_character_)
   }
 
   # Pre-process organism taxonomy data
-  organism_lookup <- sop_with_tag |>
+  organism_lookup <- structure_organism_pairs_table |>
     tidytable::filter(
       structure_inchikey_connectivity_layer %in%
         df$candidate_structure_inchikey_connectivity_layer
@@ -156,23 +144,6 @@ summarize_results <- function(
     ) |>
     tidytable::ungroup()
 
-  # Standalone tag lookup (inchikey <-> tag), independent from taxonomy matching
-  tag_lookup <- sop_with_tag |>
-    tidytable::filter(
-      structure_inchikey_connectivity_layer %in%
-        df$candidate_structure_inchikey_connectivity_layer
-    ) |>
-    tidytable::select(
-      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
-      tidyselect::any_of("tag")
-    ) |>
-    tidytable::mutate(tag = tidytable::na_if(trimws(tag), "")) |>
-    tidytable::distinct() |>
-    tidytable::group_by(candidate_structure_inchikey_connectivity_layer) |>
-    clean_collapse(cols = c("tag")) |>
-    tidytable::ungroup() |>
-    tidytable::rename(candidate_structure_organism_occurrence_tag = tag)
-
   # Define columns to select
   select_cols <- c(
     "feature_id",
@@ -206,7 +177,6 @@ summarize_results <- function(
     candidate_id_cols,
     model$rank_columns,
     model$score_columns,
-    "candidate_structure_organism_occurrence_tag",
     # TODO
     "annotation_note"
   ))
@@ -219,22 +189,6 @@ summarize_results <- function(
     tidytable::select(tidyselect::any_of(x = select_cols)) |>
     tidytable::distinct() |>
     tidytable::left_join(y = organism_lookup) |>
-    tidytable::left_join(y = tag_lookup)
-
-  if (!"candidate_structure_organism_occurrence_tag" %in% names(df_joined)) {
-    df_joined <- df_joined |>
-      tidytable::mutate(
-        candidate_structure_organism_occurrence_tag = NA_character_
-      )
-  }
-
-  df_joined <- df_joined |>
-    tidytable::mutate(
-      candidate_structure_organism_occurrence_tag = tidytable::na_if(
-        trimws(candidate_structure_organism_occurrence_tag),
-        ""
-      )
-    ) |>
     tidytable::select(tidyselect::any_of(x = final_select_cols)) |>
     tidytable::arrange(rank_final)
 
@@ -247,7 +201,7 @@ summarize_results <- function(
       )
   }
 
-  rm(df, organism_lookup, tag_lookup)
+  rm(df, organism_lookup)
   # gc()
 
   # Remove ties if requested
@@ -376,8 +330,7 @@ summarize_results <- function(
       suppressWarnings(as.numeric(feature_id))
     ) |>
     tidytable::select(
-      tidyselect::where(fn = ~ any(!is.na(.))) |
-        tidyselect::any_of("candidate_structure_organism_occurrence_tag")
+      tidyselect::where(fn = ~ any(!is.na(.)))
     )
 
   rm(df_processed)
