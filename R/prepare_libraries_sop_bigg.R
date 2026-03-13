@@ -343,6 +343,7 @@ prepare_libraries_sop_bigg <- function(
     export_output(x = bigg_prepared, file = output)
   } else {
     # log_trace("BiGG library already exists and is valid")
+    return(output)
   }
 
   return(output)

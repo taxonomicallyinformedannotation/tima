@@ -128,6 +128,7 @@ prepare_libraries_sop_ecmdb <- function(
     rm(ecmdb_prepared)
   } else {
     # log_trace("ECMDB library already exists and is valid")
+    return(output)
   }
 
   return(output)
