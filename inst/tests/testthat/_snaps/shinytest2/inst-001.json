@@ -121,7 +121,7 @@
       "C12H20O10 (2xhexose-H2O)"
     ],
     "ms_pol": "pos",
-    "ms_thr_ms2_int": 5,
+    "ms_thr_ms2_int": 0,
     "ms_tol_mas_dal_ms1": 0.01,
     "ms_tol_mas_dal_ms2": 0.01,
     "ms_tol_mas_ppm_ms1": 10,

@@ -39,7 +39,8 @@ summarize_results <- function(
   annot_table_wei_chemo,
   remove_ties,
   summarize,
-  annotation_notes_lookup = NULL
+  annotation_notes_lookup = NULL,
+  feature_consensus_table = NULL
 ) {
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
@@ -76,6 +77,12 @@ summarize_results <- function(
   log_debug("Remove ties: %s, Summarize: %s", remove_ties, summarize)
 
   model <- columns_model()
+  if (is.null(feature_consensus_table)) {
+    feature_consensus_table <- .build_feature_consensus_table(
+      annot_table_wei_chemo = annot_table_wei_chemo,
+      model = model
+    )
+  }
   candidate_id_cols <- grep(
     pattern = "^candidate_structure_id_",
     x = names(df),
@@ -350,15 +357,7 @@ summarize_results <- function(
     df_processed |>
       tidytable::filter(!has_structure) |>
       tidytable::distinct(tidyselect::any_of(x = model$features_columns)) |>
-      tidytable::left_join(
-        y = annot_table_wei_chemo |>
-          tidytable::mutate(
-            tidytable::across(
-              .cols = tidyselect::everything(),
-              .fns = as.character
-            )
-          )
-      ) |>
+      tidytable::left_join(y = feature_consensus_table) |>
       tidytable::select(
         tidyselect::any_of(
           x = c(
@@ -406,4 +405,25 @@ summarize_results <- function(
   )
 
   return(results)
+}
+
+.build_feature_consensus_table <- function(annot_table_wei_chemo, model) {
+  annot_table_wei_chemo |>
+    tidytable::select(
+      tidyselect::any_of(
+        x = c(
+          model$features_columns,
+          model$features_calculated_columns,
+          model$components_columns,
+          "annotation_note"
+        )
+      )
+    ) |>
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidyselect::everything(),
+        .fns = as.character
+      )
+    ) |>
+    tidytable::distinct()
 }

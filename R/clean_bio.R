@@ -163,42 +163,11 @@ clean_bio <- function(
     .f = tidytable::left_join,
     by = stats::setNames(object = "feature_source", nm = "feature_id")
   ) |>
-    tidytable::select(feature_id, tidyselect::everything()) |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(fn = is.logical),
-      .fns = as.character
-    ))
-  # Conditional coalescing
-  coalesce_if_present <- function(df, col, default) {
-    if (col %in% colnames(df)) {
-      df[[col]] <- tidytable::coalesce(df[[col]], default)
-    } else {
-      df[[col]] <- default
-    }
-    df
-  }
-  annot_table_wei_bio_preclean <- annot_table_wei_bio_preclean |>
-    coalesce_if_present("feature_pred_tax_cla_01kin_val", "empty") |>
-    coalesce_if_present("consistency_structure_cla_kin", 1) |>
-    coalesce_if_present("feature_pred_tax_cla_01kin_score", 0) |>
-    coalesce_if_present("feature_pred_tax_npc_01pat_val", "empty") |>
-    coalesce_if_present("consistency_structure_npc_pat", 1) |>
-    coalesce_if_present("feature_pred_tax_npc_01pat_score", 0) |>
-    coalesce_if_present("feature_pred_tax_cla_02sup_val", "empty") |>
-    coalesce_if_present("consistency_structure_cla_sup", 1) |>
-    coalesce_if_present("feature_pred_tax_cla_02sup_score", 0) |>
-    coalesce_if_present("feature_pred_tax_npc_02sup_val", "empty") |>
-    coalesce_if_present("consistency_structure_npc_sup", 1) |>
-    coalesce_if_present("feature_pred_tax_npc_02sup_score", 0) |>
-    coalesce_if_present("feature_pred_tax_cla_03cla_val", "empty") |>
-    coalesce_if_present("consistency_structure_cla_cla", 1) |>
-    coalesce_if_present("feature_pred_tax_cla_03cla_score", 0) |>
-    coalesce_if_present("feature_pred_tax_npc_03cla_val", "empty") |>
-    coalesce_if_present("consistency_structure_npc_cla", 1) |>
-    coalesce_if_present("feature_pred_tax_npc_03cla_score", 0) |>
-    coalesce_if_present("feature_pred_tax_cla_04dirpar_val", "empty") |>
-    coalesce_if_present("consistency_structure_cla_par", 1) |>
-    coalesce_if_present("feature_pred_tax_cla_04dirpar_score", 0)
+    tidytable::select(feature_id, tidyselect::everything())
+
+  annot_table_wei_bio_preclean <- .apply_prediction_defaults(
+    annot_table_wei_bio_preclean
+  )
   rm(df2, supp_tables)
 
   # log_trace("Adding already computed predictions back")
@@ -227,6 +196,50 @@ clean_bio <- function(
 }
 
 # Internal Helper Functions ----
+
+.apply_prediction_defaults <- function(df) {
+  defaults <- list(
+    feature_pred_tax_cla_01kin_val = "empty",
+    consistency_structure_cla_kin = 1,
+    feature_pred_tax_cla_01kin_score = 0,
+    feature_pred_tax_npc_01pat_val = "empty",
+    consistency_structure_npc_pat = 1,
+    feature_pred_tax_npc_01pat_score = 0,
+    feature_pred_tax_cla_02sup_val = "empty",
+    consistency_structure_cla_sup = 1,
+    feature_pred_tax_cla_02sup_score = 0,
+    feature_pred_tax_npc_02sup_val = "empty",
+    consistency_structure_npc_sup = 1,
+    feature_pred_tax_npc_02sup_score = 0,
+    feature_pred_tax_cla_03cla_val = "empty",
+    consistency_structure_cla_cla = 1,
+    feature_pred_tax_cla_03cla_score = 0,
+    feature_pred_tax_npc_03cla_val = "empty",
+    consistency_structure_npc_cla = 1,
+    feature_pred_tax_npc_03cla_score = 0,
+    feature_pred_tax_cla_04dirpar_val = "empty",
+    consistency_structure_cla_par = 1,
+    feature_pred_tax_cla_04dirpar_score = 0
+  )
+
+  n_rows <- nrow(df)
+  for (col in names(defaults)) {
+    default <- defaults[[col]]
+
+    if (!col %in% names(df)) {
+      df[[col]] <- rep(default, n_rows)
+    } else {
+      values <- df[[col]]
+      na_idx <- is.na(values)
+      if (any(na_idx)) {
+        values[na_idx] <- default
+        df[[col]] <- values
+      }
+    }
+  }
+
+  tidytable::as_tidytable(df)
+}
 
 #' Add default prediction columns to annotation table
 #'

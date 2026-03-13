@@ -1082,6 +1082,13 @@ clean_chemo <- function(
 
   annot_table_wei_chemo <- coerce_score_columns(annot_table_wei_chemo)
 
+  # Precompute feature-level consensus metadata once to avoid repeated
+  # full-table coercion inside summarize_results for each output tier.
+  feature_consensus_table <- .build_feature_consensus_table(
+    annot_table_wei_chemo = annot_table_wei_chemo,
+    model = columns_model()
+  )
+
   # Core Filtering Pipeline ----
   log_metadata(
     ctx,
@@ -1135,7 +1142,8 @@ clean_chemo <- function(
       annot_table_wei_chemo = annot_table_wei_chemo,
       remove_ties = remove_ties,
       summarize = summarize,
-      annotation_notes_lookup = annotation_notes_lookup
+      annotation_notes_lookup = annotation_notes_lookup,
+      feature_consensus_table = feature_consensus_table
     ) |>
     tidytable::left_join(y = results_candidates) |>
     tidytable::mutate(
@@ -1190,7 +1198,8 @@ clean_chemo <- function(
       annot_table_wei_chemo = annot_table_wei_chemo,
       remove_ties = remove_ties,
       summarize = summarize,
-      annotation_notes_lookup = annotation_notes_lookup
+      annotation_notes_lookup = annotation_notes_lookup,
+      feature_consensus_table = feature_consensus_table
     ) |>
     tidytable::left_join(y = results_candidates) |>
     tidytable::mutate(
@@ -1233,7 +1242,8 @@ clean_chemo <- function(
     features_table,
     components_table,
     structure_organism_pairs_table,
-    candidate_tables
+    candidate_tables,
+    feature_consensus_table
   )
 
   return(results_list)
