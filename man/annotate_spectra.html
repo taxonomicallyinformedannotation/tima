@@ -683,7 +683,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   ppm = get_params(step = "annotate_spectra")\$ms\$tolerances\$mass\$ppm\$ms2,
   dalton = get_params(step = "annotate_spectra")\$ms\$tolerances\$mass\$dalton\$ms2,
   qutoff = get_params(step = "annotate_spectra")\$ms\$thresholds\$ms2\$intensity,
-  approx = get_params(step = "annotate_spectra")\$annotations\$ms2approx
+  approx = get_params(step = "annotate_spectra")\$annotations\$ms2approx,
+  str_stereo = get_params(step =
+    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$stereo,
+  str_met = get_params(step =
+    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$metadata,
+  str_nam = get_params(step =
+    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$names,
+  str_tax_cla = get_params(step =
+    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$cla,
+  str_tax_npc = get_params(step =
+    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$npc
 )
 </code></pre>
 </section>
