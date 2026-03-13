@@ -129,16 +129,22 @@ docker pull adafede/tima-r
 ``` bash
 docker run \
 --user tima-user \
+--memory="12g" \
 -v "$(pwd)/.tima/_targets:/home/tima-user/.tima/_targets" \
 -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" \
 -p 3838:3838 \
 adafede/tima-r
 # docker run \
 # --user tima-user \
+# --memory="12g" \
 # -v "$(pwd)/.tima/_targets:/home/tima-user/.tima/_targets" \
 # -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" \
 # adafede/tima-r
 ```
+
+Adapt the memory limit as needed.
+The app will be available at <http://localhost:3838/>.
+Results will be written to `.tima/data` (your mounted folder).
 
 ## Main Citations
 
