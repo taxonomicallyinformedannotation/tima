@@ -52,11 +52,16 @@ test_that("is_spectrum_sanitized returns FALSE for matrix with < 2 columns", {
 
 test_that("is_spectrum_sanitized never errors or returns NA on garbage input", {
   bad_inputs <- list(list(), TRUE, 42L, matrix(character(0), ncol = 2))
-  for (x in bad_inputs) {
-    result <- tima:::is_spectrum_sanitized(x)
-    expect_type(result, "logical")
-    expect_false(is.na(result))
-  }
+  invisible(vapply(
+    X = bad_inputs,
+    FUN = function(x) {
+      result <- tima:::is_spectrum_sanitized(x)
+      expect_type(result, "logical")
+      expect_false(is.na(result))
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 })
 
 # ---- sanitize_spectrum_matrix ------------------------------------------------

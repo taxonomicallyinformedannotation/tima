@@ -81,7 +81,7 @@ fetch_zenodo_record <- function(record, doi) {
   max_attempts <- 5L
   last_error <- NULL
 
-  for (attempt in seq_len(max_attempts)) {
+  fetch_attempt <- function(attempt) {
     response <- tryCatch(
       {
         httr2::request(base_url = url) |>
@@ -119,14 +119,17 @@ fetch_zenodo_record <- function(record, doi) {
         attempt + 1L,
         max_attempts
       )
+      return(fetch_attempt(attempt + 1L))
     }
+
+    stop(
+      "Failed to retrieve Zenodo record: ",
+      conditionMessage(last_error),
+      call. = FALSE
+    )
   }
 
-  stop(
-    "Failed to retrieve Zenodo record: ",
-    conditionMessage(last_error),
-    call. = FALSE
-  )
+  fetch_attempt(1L)
 }
 
 #' Parse Zenodo API Response

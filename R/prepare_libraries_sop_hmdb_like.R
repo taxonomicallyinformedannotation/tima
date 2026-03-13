@@ -274,13 +274,16 @@ parse_hmdb_like_sdf_lines <- function(sdf_lines) {
     findInterval(header_idx, record_end_idx) + 1L
   }
 
-  for (field_name in unique(canonical_fields)) {
-    field_pos <- which(canonical_fields == field_name)
+  field_positions <- split(seq_along(canonical_fields), canonical_fields)
+
+  invisible(lapply(field_positions, function(field_pos) {
+    field_name <- canonical_fields[[field_pos[[1L]]]]
     field_records <- record_ids[field_pos]
     first_occurrence <- !duplicated(field_records)
-    out[[field_name]][field_records[first_occurrence]] <-
+    out[[field_name]][field_records[first_occurrence]] <<-
       values[field_pos[first_occurrence]]
-  }
+    NULL
+  }))
 
   tidytable::as_tidytable(out)
 }

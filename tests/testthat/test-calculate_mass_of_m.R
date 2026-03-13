@@ -666,6 +666,18 @@ test_that("calculate_mz_from_mass works with caffeine", {
   expect_mz_equal(mz, expected_mz)
 })
 
+test_that("calculate_mz_from_mass works with cholesterol", {
+  cholesterol_mass <- 386.3549
+  # Expected: (mass + NH4_MASS + electron) / 1
+  expected_mz <- (cholesterol_mass + NH4_MASS) / 1
+
+  mz <- calculate_mz_from_mass(
+    neutral_mass = cholesterol_mass,
+    adduct_string = "[M+NH4]+"
+  )
+  expect_mz_equal(mz, expected_mz)
+})
+
 ## Isotopologues ----
 
 test_that("calculate_mass_of_m correctly handles M+1 isotope [M1+H]+", {
@@ -902,13 +914,14 @@ test_that("isotope round-trips work for all common adducts", {
     "[M1+2H]2+"
   )
 
-  for (adduct in isotope_adducts) {
-    mz <- calculate_mz_from_mass(neutral_mass, adduct)
-    mass_back <- calculate_mass_of_m(mz, adduct)
-
-    expect_mz_equal(
-      mass_back,
-      neutral_mass
-    )
-  }
+  invisible(vapply(
+    X = isotope_adducts,
+    FUN = function(adduct) {
+      mz <- calculate_mz_from_mass(neutral_mass, adduct)
+      mass_back <- calculate_mass_of_m(mz, adduct)
+      expect_mz_equal(mass_back, neutral_mass)
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 })

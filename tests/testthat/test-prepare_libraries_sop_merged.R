@@ -123,23 +123,28 @@ test_that("test-validate_sop_merged_inputs accepts all valid taxonomic levels", 
     "varietas"
   )
 
-  for (lvl in valid_levels) {
-    expect_silent(
-      validate_sop_merged_inputs(
-        files = c("file1.tsv"),
-        filter = TRUE,
-        level = lvl,
-        value = "TestValue",
-        output_key = temp_test_path("key.tsv"),
-        output_org_tax_ott = temp_test_path("org.tsv"),
-        output_str_stereo = temp_test_path("stereo.tsv"),
-        output_str_met = temp_test_path("met.tsv"),
-        output_str_nam = temp_test_path("nam.tsv"),
-        output_str_tax_cla = temp_test_path("cla.tsv"),
-        output_str_tax_npc = temp_test_path("npc.tsv")
+  invisible(vapply(
+    X = valid_levels,
+    FUN = function(lvl) {
+      expect_silent(
+        validate_sop_merged_inputs(
+          files = c("file1.tsv"),
+          filter = TRUE,
+          level = lvl,
+          value = "TestValue",
+          output_key = temp_test_path("key.tsv"),
+          output_org_tax_ott = temp_test_path("org.tsv"),
+          output_str_stereo = temp_test_path("stereo.tsv"),
+          output_str_met = temp_test_path("met.tsv"),
+          output_str_nam = temp_test_path("nam.tsv"),
+          output_str_tax_cla = temp_test_path("cla.tsv"),
+          output_str_tax_npc = temp_test_path("npc.tsv")
+        )
       )
-    )
-  }
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 })
 
 test_that("test-validate_sop_merged_inputs rejects non-character output paths", {
@@ -251,33 +256,35 @@ test_that("test-validate_sop_merged_inputs validates all output parameters", {
     "output_str_tax_npc"
   )
 
-  for (param in output_params) {
-    args <- list(
-      files = c("file1.tsv"),
-      filter = FALSE,
-      level = "family",
-      value = "Test",
-      output_key = temp_test_path("key.tsv"),
-      output_org_tax_ott = temp_test_path("org.tsv"),
-      output_str_stereo = temp_test_path("stereo.tsv"),
-      output_str_met = temp_test_path("met.tsv"),
-      output_str_nam = temp_test_path("nam.tsv"),
-      output_str_tax_cla = temp_test_path("cla.tsv"),
-      output_str_tax_npc = temp_test_path("npc.tsv")
-    )
-
-    # Set the specific parameter to invalid value
-    args[[param]] <- c("path1.tsv", "path2.tsv")
-
-    expect_error(
-      do.call(validate_sop_merged_inputs, args),
-      paste0(
-        "Output parameter(s) must be single character strings: ",
-        param
-      ),
-      fixed = TRUE
-    )
-  }
+  invisible(vapply(
+    X = output_params,
+    FUN = function(param) {
+      args <- list(
+        files = c("file1.tsv"),
+        filter = FALSE,
+        level = "family",
+        value = "Test",
+        output_key = temp_test_path("key.tsv"),
+        output_org_tax_ott = temp_test_path("org.tsv"),
+        output_str_stereo = temp_test_path("stereo.tsv"),
+        output_str_met = temp_test_path("met.tsv"),
+        output_str_nam = temp_test_path("nam.tsv"),
+        output_str_tax_cla = temp_test_path("cla.tsv"),
+        output_str_tax_npc = temp_test_path("npc.tsv")
+      )
+      args[[param]] <- c("path1.tsv", "path2.tsv")
+      expect_error(
+        do.call(validate_sop_merged_inputs, args),
+        paste0(
+          "Output parameter(s) must be single character strings: ",
+          param
+        ),
+        fixed = TRUE
+      )
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 })
 
 ## complete_organism_taxonomy ----

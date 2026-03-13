@@ -354,18 +354,23 @@ test_that("parse_adduct isotopes work with all common adducts", {
     "[M1+HCOO]-"
   )
 
-  for (adduct in test_adducts) {
-    result <- parse_adduct(adduct)
-    expect_equal(
-      result[["n_iso"]],
-      1,
-      label = paste("Isotope parsing failed for", adduct)
-    )
-    expect_false(
-      all(result == 0),
-      label = paste("Complete parse failure for", adduct)
-    )
-  }
+  invisible(vapply(
+    X = test_adducts,
+    FUN = function(adduct) {
+      result <- parse_adduct(adduct)
+      expect_equal(
+        result[["n_iso"]],
+        1,
+        label = paste("Isotope parsing failed for", adduct)
+      )
+      expect_false(
+        all(result == 0),
+        label = paste("Complete parse failure for", adduct)
+      )
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 })
 
 ## Multiple Modifications Tests ----
@@ -447,15 +452,19 @@ test_that("parse_adduct handles completely invalid adduct strings", {
     "[garbage]" # Invalid content
   )
 
-  for (adduct in invalid_adducts) {
-    # Invalid adducts should return all zeros
-    result <- parse_adduct(adduct)
-    expect_equal(sum(result), 0, label = paste("Failed for:", adduct))
-    expect_named(
-      result,
-      c("n_mer", "n_iso", "los_add_clu", "n_charges", "charge")
-    )
-  }
+  invisible(vapply(
+    X = invalid_adducts,
+    FUN = function(adduct) {
+      result <- parse_adduct(adduct)
+      expect_equal(sum(result), 0, label = paste("Failed for:", adduct))
+      expect_named(
+        result,
+        c("n_mer", "n_iso", "los_add_clu", "n_charges", "charge")
+      )
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 })
 
 test_that("parse_adduct handles edge case adducts with missing components", {
@@ -466,15 +475,19 @@ test_that("parse_adduct handles edge case adducts with missing components", {
     "[M+]+" # No modification - parses with empty modifications
   )
 
-  for (adduct in edge_cases) {
-    result <- parse_adduct(adduct)
-    # Expect it to be handled (no crash), result structure is valid
-    expect_length(result, 5)
-    expect_named(
-      result,
-      c("n_mer", "n_iso", "los_add_clu", "n_charges", "charge")
-    )
-  }
+  invisible(vapply(
+    X = edge_cases,
+    FUN = function(adduct) {
+      result <- parse_adduct(adduct)
+      expect_length(result, 5)
+      expect_named(
+        result,
+        c("n_mer", "n_iso", "los_add_clu", "n_charges", "charge")
+      )
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 })
 
 ## Return Value Tests ----
@@ -511,30 +524,35 @@ test_that("parse_adduct n_charges is always positive", {
 ## Regression Tests ----
 
 test_that("parse_adduct handles all test cases correctly", {
-  for (test_case in ADDUCT_TEST_CASES) {
-    result <- parse_adduct(test_case$adduct)
-
-    expect_equal(
-      result[["n_mer"]],
-      test_case$n_mer,
-      label = paste(test_case$description, "- n_mer")
-    )
-    expect_equal(
-      result[["n_iso"]],
-      test_case$n_iso,
-      label = paste(test_case$description, "- n_iso")
-    )
-    expect_equal(
-      result[["n_charges"]],
-      test_case$n_charges,
-      label = paste(test_case$description, "- n_charges")
-    )
-    expect_equal(
-      result[["charge"]],
-      test_case$charge,
-      label = paste(test_case$description, "- charge")
-    )
-  }
+  invisible(vapply(
+    X = seq_along(ADDUCT_TEST_CASES),
+    FUN = function(idx) {
+      test_case <- ADDUCT_TEST_CASES[[idx]]
+      result <- parse_adduct(test_case$adduct)
+      expect_equal(
+        result[["n_mer"]],
+        test_case$n_mer,
+        label = paste(test_case$description, "- n_mer")
+      )
+      expect_equal(
+        result[["n_iso"]],
+        test_case$n_iso,
+        label = paste(test_case$description, "- n_iso")
+      )
+      expect_equal(
+        result[["n_charges"]],
+        test_case$n_charges,
+        label = paste(test_case$description, "- n_charges")
+      )
+      expect_equal(
+        result[["charge"]],
+        test_case$charge,
+        label = paste(test_case$description, "- charge")
+      )
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 })
 
 test_that("parse_adduct is deterministic", {

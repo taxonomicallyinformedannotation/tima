@@ -246,18 +246,21 @@ prepare_libraries_sop_bigg <- function(
         }
 
         # Create tables only for organisms in bigg_models
-        organism_tables <- list()
-        for (org_name in names(bigg_models)) {
-          doi <- bigg_models[[org_name]]["doi"]
-          taxonomy <- taxonomy_templates[[org_name]]
-          if (!is.null(taxonomy)) {
-            organism_tables[[org_name]] <- create_organism_table(
-              org_name,
-              taxonomy,
-              doi
-            )
-          }
-        }
+        organism_tables <- purrr::keep(
+          purrr::map(
+            .x = names(bigg_models),
+            .f = function(org_name) {
+              doi <- bigg_models[[org_name]]["doi"]
+              taxonomy <- taxonomy_templates[[org_name]]
+              if (is.null(taxonomy)) {
+                return(NULL)
+              }
+              create_organism_table(org_name, taxonomy, doi)
+            }
+          ) |>
+            stats::setNames(names(bigg_models)),
+          .p = Negate(is.null)
+        )
 
         # Create Biota table (universal)
         biota <- tidytable::tidytable(

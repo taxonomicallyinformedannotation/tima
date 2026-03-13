@@ -193,9 +193,14 @@ test_that("change_params_small updates all file parameters", {
     spectra = file.path(source_dir, "new_spectra.mgf")
   )
 
-  for (f in new_files) {
-    writeLines("dummy", f)
-  }
+  invisible(vapply(
+    X = new_files,
+    FUN = function(f) {
+      writeLines("dummy", f)
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 
   # Update all parameters with cache_dir
   result <- change_params_small(

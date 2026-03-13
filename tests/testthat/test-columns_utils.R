@@ -41,9 +41,9 @@ test_that("columns_model tag column is present in candidates_structures_columns"
 
 test_that("columns_model score columns include all primary scores", {
   m <- columns_model()
-  for (s in c("score_biological", "score_chemical", "score_final")) {
-    expect_true(s %in% m$score_columns, label = s)
-  }
+  expect_true(all(
+    c("score_biological", "score_chemical", "score_final") %in% m$score_columns
+  ))
 })
 
 # ---- clean_collapse ----------------------------------------------------------

@@ -48,13 +48,12 @@ with_retry <- function(
   expr_captured <- substitute(expr)
   parent_env <- parent.frame()
 
-  for (attempt in seq_len(max_attempts)) {
+  retry_attempt <- function(attempt) {
     result <- tryCatch(
       eval(expr_captured, envir = parent_env),
       error = function(e) e
     )
 
-    # Success - return result
     if (!inherits(result, "error")) {
       if (attempt > 1 && !silent) {
         log_debug("Retry succeeded on attempt %d/%d", attempt, max_attempts)
@@ -62,7 +61,6 @@ with_retry <- function(
       return(result)
     }
 
-    # Failed - decide whether to retry
     if (attempt < max_attempts) {
       wait_time <- backoff^(attempt - 1)
 
@@ -78,28 +76,30 @@ with_retry <- function(
       }
 
       Sys.sleep(wait_time)
-    } else {
-      # Final attempt failed - give up with error
-      msg <- format_error(
-        problem = paste0(operation_name, " failed after retries"),
-        expected = "Successful operation",
-        received = conditionMessage(result),
-        context = sprintf(
-          "Tried %d times with exponential backoff",
-          max_attempts
-        ),
-        fix = paste0(
-          "Possible solutions:\n",
-          "  1. Check network connection\n",
-          "  2. Verify server/service is available\n",
-          "  3. Check authentication credentials\n",
-          "  4. Try again later if service is down\n",
-          "  5. Increase max_attempts if transient failures are common"
-        )
-      )
-      stop(msg, call. = FALSE)
+      return(retry_attempt(attempt + 1L))
     }
+
+    msg <- format_error(
+      problem = paste0(operation_name, " failed after retries"),
+      expected = "Successful operation",
+      received = conditionMessage(result),
+      context = sprintf(
+        "Tried %d times with exponential backoff",
+        max_attempts
+      ),
+      fix = paste0(
+        "Possible solutions:\n",
+        "  1. Check network connection\n",
+        "  2. Verify server/service is available\n",
+        "  3. Check authentication credentials\n",
+        "  4. Try again later if service is down\n",
+        "  5. Increase max_attempts if transient failures are common"
+      )
+    )
+    stop(msg, call. = FALSE)
   }
+
+  retry_attempt(1L)
 }
 
 #' Retry Wrapper for HTTP Requests
@@ -177,9 +177,12 @@ with_smart_retry <- function(
   backoff = 2,
   operation_name = "operation"
 ) {
-  for (attempt in seq_len(max_attempts)) {
+  expr_captured <- substitute(expr)
+  parent_env <- parent.frame()
+
+  retry_attempt <- function(attempt) {
     result <- tryCatch(
-      expr,
+      eval(expr_captured, envir = parent_env),
       error = function(e) e
     )
 
@@ -187,7 +190,6 @@ with_smart_retry <- function(
       return(result)
     }
 
-    # Check if error is worth retrying
     if (!is_retryable_error(result)) {
       log_debug(
         "Error appears permanent, not retrying: %s",
@@ -196,7 +198,6 @@ with_smart_retry <- function(
       stop(result)
     }
 
-    # Retry transient error
     if (attempt < max_attempts) {
       wait_time <- backoff^(attempt - 1)
       log_warn(
@@ -207,8 +208,11 @@ with_smart_retry <- function(
         wait_time
       )
       Sys.sleep(wait_time)
-    } else {
-      stop(result)
+      return(retry_attempt(attempt + 1L))
     }
+
+    stop(result)
   }
+
+  retry_attempt(1L)
 }

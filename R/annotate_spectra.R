@@ -112,9 +112,14 @@ annotate_spectra <- function(
 
   # Pre-flight data sanitizing for MGF files
   log_debug("Running pre-flight checks on input MGF files...")
-  for (mgf in input_vec) {
-    sanitize_all_inputs(mgf_file = mgf)
-  }
+  invisible(vapply(
+    X = input_vec,
+    FUN = function(mgf) {
+      sanitize_all_inputs(mgf_file = mgf)
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 
   missing_in <- input_vec[!file.exists(input_vec)]
   if (length(missing_in)) {

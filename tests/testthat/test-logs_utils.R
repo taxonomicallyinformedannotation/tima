@@ -319,14 +319,18 @@ test_that("init_logging supports all valid log levels", {
 
   levels <- c("TRACE", "DEBUG", "INFO", "WARN", "ERROR")
 
-  for (level in levels) {
-    withr::local_envvar(
-      TIMA_LOG_FILE = log_file,
-      TIMA_LOG_LEVEL = level
-    )
-
-    expect_silent(init_logging())
-  }
+  invisible(vapply(
+    X = levels,
+    FUN = function(level) {
+      withr::local_envvar(
+        TIMA_LOG_FILE = log_file,
+        TIMA_LOG_LEVEL = level
+      )
+      expect_silent(init_logging())
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 })
 
 test_that("init_logging is case-insensitive for log level", {

@@ -150,16 +150,14 @@ test_that("prepare_features_tables retains top intensity samples", {
   paths <- local_test_project(copy = TRUE)
 
   n_samples <- 10
+  sample_cols <- as.list(seq_len(n_samples) * 100)
+  names(sample_cols) <- paste0("sample", seq_len(n_samples), ".mzML Peak area")
   features_data <- tidytable::tidytable(
     "row ID" = 1,
     "row m/z" = 123.456,
     "row retention time" = 1.5
-  )
-
-  for (i in seq_len(n_samples)) {
-    col_name <- paste0("sample", i, ".mzML Peak area")
-    features_data[[col_name]] <- i * 100
-  }
+  ) |>
+    tidytable::mutate(!!!sample_cols)
 
   dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_file <- file.path("data", "source", "many_samples.csv")

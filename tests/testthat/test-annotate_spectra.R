@@ -5,27 +5,27 @@ library(testthat)
 # Helper to create minimal mgf with adjustable precursor masses & polarity
 write_minimal_mgf <- function(path, precursors, charge = "1+") {
   dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
-  lines <- c()
-  for (i in seq_along(precursors)) {
-    mz <- precursors[i]
-    lines <- c(
-      lines,
-      "BEGIN IONS",
-      paste0("TITLE=Spectrum_", i),
-      paste0("PEPMASS=", mz),
-      paste0("CHARGE=", charge),
-      paste0("NAME=Name_", i),
-      paste0("INCHIKEY=AAAAAAAAAAAAAA-BBBBBBBBBB-C"),
-      paste0("SMILES=CCC"),
-      "MSLEVEL=2",
-      # 3 dummy peaks
-      paste0(round(mz * 0.5), " 100"),
-      paste0(round(mz * 0.75), " 200"),
-      paste0(round(mz), " 300"),
-      "END IONS",
-      ""
-    )
-  }
+  lines <- unlist(
+    lapply(seq_along(precursors), function(i) {
+      mz <- precursors[[i]]
+      c(
+        "BEGIN IONS",
+        paste0("TITLE=Spectrum_", i),
+        paste0("PEPMASS=", mz),
+        paste0("CHARGE=", charge),
+        paste0("NAME=Name_", i),
+        paste0("INCHIKEY=AAAAAAAAAAAAAA-BBBBBBBBBB-C"),
+        paste0("SMILES=CCC"),
+        "MSLEVEL=2",
+        paste0(round(mz * 0.5), " 100"),
+        paste0(round(mz * 0.75), " 200"),
+        paste0(round(mz), " 300"),
+        "END IONS",
+        ""
+      )
+    }),
+    use.names = FALSE
+  )
   writeLines(lines, path)
   invisible(path)
 }

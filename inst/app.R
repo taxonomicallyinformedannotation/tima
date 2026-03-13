@@ -456,7 +456,7 @@ ui <- shiny::fluidPage(
             label = "Intensity threshold for MS2",
             min = 0,
             max = 1E4,
-            value = 5,
+            value = 0,
             ticks = FALSE
           ) |>
             shinyhelper::helper(

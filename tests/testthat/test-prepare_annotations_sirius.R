@@ -410,9 +410,7 @@ test_that("create_empty_sirius_annotations returns proper template", {
     "candidate_score_sirius_zodiac"
   )
 
-  for (col in expected_cols) {
-    expect_true(col %in% names(result))
-  }
+  expect_true(all(expected_cols %in% names(result)))
 })
 
 test_that("split_sirius_results splits table correctly", {

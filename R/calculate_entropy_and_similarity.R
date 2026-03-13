@@ -190,16 +190,16 @@ calculate_entropy_and_similarity <- function(
 
       # Filter library spectra by precursor mass if not approximating
       if (approx == FALSE) {
-        val_ind <- lib_precursors >=
+        val_ind <- (lib_precursors >=
           min(
             current_precursor - dalton,
             current_precursor * (1 - (1E-6 * ppm))
-          ) &
-          lib_precursors <=
+          )) &
+          (lib_precursors <=
             max(
               current_precursor + dalton,
               current_precursor * (1 + (1E-6 * ppm))
-            )
+            ))
         lib_indices_sub <- which(val_ind)
       } else {
         lib_indices_sub <- seq_along(lib_spectra)
@@ -210,9 +210,7 @@ calculate_entropy_and_similarity <- function(
       }
 
       # Ensure each library spectrum is sanitized at most once.
-      for (lib_idx in lib_indices_sub) {
-        ensure_lib_ready(lib_idx)
-      }
+      purrr::walk(lib_indices_sub, ensure_lib_ready)
 
       lib_precursors_sub <- lib_precursors[lib_indices_sub]
       lib_ids_sub <- lib_ids[lib_indices_sub]
