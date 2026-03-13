@@ -68,64 +68,75 @@ test_that("parse_hmdb_like_sdf_lines maps all known ID aliases to 'id'", {
     "T3DB_ID",
     "MIMEDB_ID"
   )
-  for (alias in aliases) {
-    lines <- c(
-      make_sdf_block(INCHI_KEY = "FAKE0000000000-UHFFFAOYSA-N")
-    )
-    # Build a block explicitly using the alias name
-    block <- c(
-      "  mol",
-      "  prog",
-      "",
-      "  0  0  0  0  0  0  0  0  0  0999 V2000",
-      "M  END",
-      paste0("> <", alias, ">"),
-      "DB00001",
-      "",
-      "> <INCHI_KEY>",
-      "QTBSBXVTEAMEQO-UHFFFAOYSA-N",
-      "",
-      "$$$$"
-    )
-    out <- parse_hmdb_like_sdf_lines(block)
-    expect_equal(out$id, "DB00001", label = paste("alias:", alias))
-  }
+  invisible(vapply(
+    X = aliases,
+    FUN = function(alias) {
+      block <- c(
+        "  mol",
+        "  prog",
+        "",
+        "  0  0  0  0  0  0  0  0  0  0999 V2000",
+        "M  END",
+        paste0("> <", alias, ">"),
+        "DB00001",
+        "",
+        "> <INCHI_KEY>",
+        "QTBSBXVTEAMEQO-UHFFFAOYSA-N",
+        "",
+        "$$$$"
+      )
+      out <- parse_hmdb_like_sdf_lines(block)
+      expect_equal(out$id, "DB00001", label = paste("alias:", alias))
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 })
 
 test_that("parse_hmdb_like_sdf_lines maps logP aliases correctly", {
-  for (field in c("JCHEM_LOGP", "ALOGPS_LOGP", "XLOGP3")) {
-    block <- c(
-      "  mol",
-      "  prog",
-      "",
-      "  0  0  0  0  0  0  0  0  0  0999 V2000",
-      "M  END",
-      paste0("> <", field, ">"),
-      "2.5",
-      "",
-      "$$$$"
-    )
-    out <- parse_hmdb_like_sdf_lines(block)
-    expect_equal(out$logp, "2.5", label = paste("logp alias:", field))
-  }
+  invisible(vapply(
+    X = c("JCHEM_LOGP", "ALOGPS_LOGP", "XLOGP3"),
+    FUN = function(field) {
+      block <- c(
+        "  mol",
+        "  prog",
+        "",
+        "  0  0  0  0  0  0  0  0  0  0999 V2000",
+        "M  END",
+        paste0("> <", field, ">"),
+        "2.5",
+        "",
+        "$$$$"
+      )
+      out <- parse_hmdb_like_sdf_lines(block)
+      expect_equal(out$logp, "2.5", label = paste("logp alias:", field))
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 })
 
 test_that("parse_hmdb_like_sdf_lines maps name aliases correctly", {
-  for (field in c("GENERIC_NAME", "NAME", "COMMON_NAME", "DATABASE_NAME")) {
-    block <- c(
-      "  mol",
-      "  prog",
-      "",
-      "  0  0  0  0  0  0  0  0  0  0999 V2000",
-      "M  END",
-      paste0("> <", field, ">"),
-      "TestName",
-      "",
-      "$$$$"
-    )
-    out <- parse_hmdb_like_sdf_lines(block)
-    expect_equal(out$name, "TestName", label = paste("name alias:", field))
-  }
+  invisible(vapply(
+    X = c("GENERIC_NAME", "NAME", "COMMON_NAME", "DATABASE_NAME"),
+    FUN = function(field) {
+      block <- c(
+        "  mol",
+        "  prog",
+        "",
+        "  0  0  0  0  0  0  0  0  0  0999 V2000",
+        "M  END",
+        paste0("> <", field, ">"),
+        "TestName",
+        "",
+        "$$$$"
+      )
+      out <- parse_hmdb_like_sdf_lines(block)
+      expect_equal(out$name, "TestName", label = paste("name alias:", field))
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 })
 
 # ---- multi-record ------------------------------------------------------------

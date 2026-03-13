@@ -315,11 +315,16 @@ test_that("add_xrefs_to_annotations preserves all original columns", {
   result <- add_xrefs_to_annotations(results_list, xrefs_file)
 
   # Verify all original columns are preserved
-  for (col in original_cols) {
-    expect_true(col %in% names(result$full))
-    expect_true(col %in% names(result$filtered))
-    expect_true(col %in% names(result$mini))
-  }
+  invisible(vapply(
+    X = original_cols,
+    FUN = function(col) {
+      expect_true(col %in% names(result$full))
+      expect_true(col %in% names(result$filtered))
+      expect_true(col %in% names(result$mini))
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
 
   # Verify original data is unchanged
   expect_equal(result$full$feature_id, results_list$full$feature_id)

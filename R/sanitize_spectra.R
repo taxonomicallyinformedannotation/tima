@@ -199,16 +199,18 @@ sanitize_spectra <- function(
       1:min(10L, length(unique(intensities)))
     ]
 
-    # Count peaks at each of these intensities
-    for (intensity_val in smallest_10) {
-      n_at_intensity <- sum(intensities == intensity_val)
+    # Remove small repeated noise-intensity levels in one pass
+    intensity_counts <- table(intensities)
+    smallest_keys <- as.character(smallest_10)
+    remove_values <- suppressWarnings(as.numeric(
+      names(intensity_counts)[
+        names(intensity_counts) %in% smallest_keys & intensity_counts > 5L
+      ]
+    ))
 
-      # If more than 5 peaks have this intensity, remove them
-      if (n_at_intensity > 5L) {
-        keep_idx <- intensities != intensity_val
-        peak_matrix <- peak_matrix[keep_idx, , drop = FALSE]
-        intensities <- intensities[keep_idx]
-      }
+    if (length(remove_values) > 0L) {
+      keep_idx <- !(intensities %in% remove_values)
+      peak_matrix <- peak_matrix[keep_idx, , drop = FALSE]
     }
 
     # Rescale intensities so sum = 1 if any peaks remain

@@ -344,7 +344,6 @@ sanitize_metadata <- function(
   meta_cols <- names(metadata)
 
   # Check for filename column (try common variants)
-  filename_col_actual <- NULL
   possible_filename_cols <- c(
     filename_col,
     "file",
@@ -352,11 +351,13 @@ sanitize_metadata <- function(
     "sample_id",
     "sampleID"
   )
-  for (col in possible_filename_cols) {
-    if (col %in% meta_cols) {
-      filename_col_actual <- col
-      break
-    }
+  filename_matches <- possible_filename_cols[
+    possible_filename_cols %in% meta_cols
+  ]
+  filename_col_actual <- if (length(filename_matches) > 0L) {
+    filename_matches[[1L]]
+  } else {
+    NULL
   }
 
   if (is.null(filename_col_actual)) {
@@ -370,7 +371,6 @@ sanitize_metadata <- function(
   }
 
   # Check for organism column (try common variants, starting with the provided one)
-  organism_col_actual <- NULL
   possible_organism_cols <- unique(c(
     organism_col,
     "ATTRIBUTE_species",
@@ -380,11 +380,13 @@ sanitize_metadata <- function(
     "taxon",
     "taxonomy"
   ))
-  for (col in possible_organism_cols) {
-    if (col %in% meta_cols) {
-      organism_col_actual <- col
-      break
-    }
+  organism_matches <- possible_organism_cols[
+    possible_organism_cols %in% meta_cols
+  ]
+  organism_col_actual <- if (length(organism_matches) > 0L) {
+    organism_matches[[1L]]
+  } else {
+    NULL
   }
 
   if (is.null(organism_col_actual)) {
@@ -442,18 +444,16 @@ sanitize_metadata <- function(
         metadata_basenames <- gsub("\\.[^.]*$", "", metadata_filenames)
 
         # Check if metadata filenames (without extension) are PART OF feature column names
-        matched_files <- character(0)
-        missing_files <- character(0)
+        basename_found <- vapply(
+          X = metadata_basenames,
+          FUN = function(basename) {
+            any(grepl(basename, feature_cols, fixed = TRUE))
+          },
+          FUN.VALUE = logical(1L)
+        )
 
-        for (basename in metadata_basenames) {
-          # Check if this basename appears in any feature column name
-          found <- any(grepl(basename, feature_cols, fixed = TRUE))
-          if (found) {
-            matched_files <- c(matched_files, basename)
-          } else {
-            missing_files <- c(missing_files, basename)
-          }
-        }
+        matched_files <- metadata_basenames[basename_found]
+        missing_files <- metadata_basenames[!basename_found]
 
         n_matched <- length(matched_files)
         n_unmatched <- length(missing_files)
@@ -796,9 +796,14 @@ sanitize_all_inputs <- function(
       log_debug("  Columns: %s", paste(result$columns, collapse = ", "))
     } else {
       log_error("[X] Features file has issues:")
-      for (issue in result$issues) {
-        log_error("  - %s", issue)
-      }
+      invisible(vapply(
+        X = result$issues,
+        FUN = function(issue) {
+          log_error("  - %s", issue)
+          TRUE
+        },
+        FUN.VALUE = logical(1L)
+      ))
       issues_found$features <- result$issues
       all_valid <- FALSE
     }
@@ -813,9 +818,14 @@ sanitize_all_inputs <- function(
       log_success("[OK] MGF file: %d MS2 spectra found", result$n_spectra)
     } else {
       log_error("[X] MGF file has issues:")
-      for (issue in result$issues) {
-        log_error("  - %s", issue)
-      }
+      invisible(vapply(
+        X = result$issues,
+        FUN = function(issue) {
+          log_error("  - %s", issue)
+          TRUE
+        },
+        FUN.VALUE = logical(1L)
+      ))
       issues_found$mgf <- result$issues
       all_valid <- FALSE
     }
@@ -851,14 +861,24 @@ sanitize_all_inputs <- function(
       }
     } else {
       log_error("[X] Metadata validation has issues:")
-      for (issue in result$issues) {
-        log_error("  - %s", issue)
-      }
+      invisible(vapply(
+        X = result$issues,
+        FUN = function(issue) {
+          log_error("  - %s", issue)
+          TRUE
+        },
+        FUN.VALUE = logical(1L)
+      ))
       if (length(result$unmatched_files) > 0L) {
         log_error("  Unmatched files:")
-        for (f in utils::head(result$unmatched_files, 5)) {
-          log_error("    - %s", f)
-        }
+        invisible(vapply(
+          X = utils::head(result$unmatched_files, 5),
+          FUN = function(f) {
+            log_error("    - %s", f)
+            TRUE
+          },
+          FUN.VALUE = logical(1L)
+        ))
         if (length(result$unmatched_files) > 5L) {
           log_error("    ... and %d more", length(result$unmatched_files) - 5L)
         }
@@ -900,9 +920,14 @@ sanitize_all_inputs <- function(
       )
     } else {
       log_error("[X] SIRIUS output has issues:")
-      for (issue in result$issues) {
-        log_error("  - %s", issue)
-      }
+      invisible(vapply(
+        X = result$issues,
+        FUN = function(issue) {
+          log_error("  - %s", issue)
+          TRUE
+        },
+        FUN.VALUE = logical(1L)
+      ))
       issues_found$sirius <- result$issues
       all_valid <- FALSE
     }

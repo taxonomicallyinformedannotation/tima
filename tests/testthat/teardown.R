@@ -45,15 +45,20 @@ if (length(unexpected) > 0) {
   message("========================================")
   message("WARNING: Unexpected items in tests/testthat:")
   message("========================================")
-  for (item in unexpected) {
-    item_path <- file.path(testthat_root, item)
-    if (dir.exists(item_path)) {
-      n_files <- length(list.files(item_path, recursive = TRUE))
-      message(sprintf("  [DIR]  %s (%d files)", item, n_files))
-    } else {
-      message(sprintf("  [FILE] %s", item))
-    }
-  }
+  invisible(vapply(
+    X = unexpected,
+    FUN = function(item) {
+      item_path <- file.path(testthat_root, item)
+      if (dir.exists(item_path)) {
+        n_files <- length(list.files(item_path, recursive = TRUE))
+        message(sprintf("  [DIR]  %s (%d files)", item, n_files))
+      } else {
+        message(sprintf("  [FILE] %s", item))
+      }
+      TRUE
+    },
+    FUN.VALUE = logical(1L)
+  ))
   message("\nThese items should be cleaned up.")
   message("Tests should only write to tempdir(), not tests/testthat/")
   message("========================================")
