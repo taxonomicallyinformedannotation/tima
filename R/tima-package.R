@@ -26,7 +26,7 @@ NULL
 }
 
 .onAttach <- function(libname, pkgname) {
-  cli::cli_inform(
-    "Welcome to {.pkg {pkgname}} v{utils::packageVersion(pkgname)}"
+  packageStartupMessage(
+    sprintf("Welcome to %s v%s", pkgname, utils::packageVersion(pkgname))
   )
 }
