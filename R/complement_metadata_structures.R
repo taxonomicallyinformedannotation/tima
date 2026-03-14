@@ -91,10 +91,8 @@ complement_metadata_structures <- function(
 
   if (
     nrow(stereo) > 0L &&
-      (
-        all(is.na(stereo$structure_inchikey_connectivity_layer)) ||
-          all(is.na(stereo$structure_smiles_no_stereo))
-      )
+      (all(is.na(stereo$structure_inchikey_connectivity_layer)) ||
+        all(is.na(stereo$structure_smiles_no_stereo)))
   ) {
     stop(
       "stereochemistry data must contain structure_inchikey_connectivity_layer and structure_smiles_no_stereo",
@@ -178,7 +176,8 @@ complement_metadata_structures <- function(
   met_2d <- met_2d |>
     .ensure_columns(cols = met_cols) |>
     tidytable::filter(
-      structure_inchikey %in% keys$inchikey_full |
+      structure_inchikey %in%
+        keys$inchikey_full |
         structure_inchikey_connectivity_layer %in% keys$inchikey |
         structure_smiles_no_stereo %in% keys$smiles
     ) |>
@@ -188,10 +187,12 @@ complement_metadata_structures <- function(
       by = "structure_inchikey",
       suffix = c("", "_stereo")
     ) |>
-    .ensure_columns(cols = c(
-      "structure_inchikey_connectivity_layer_stereo",
-      "structure_smiles_no_stereo_stereo"
-    )) |>
+    .ensure_columns(
+      cols = c(
+        "structure_inchikey_connectivity_layer_stereo",
+        "structure_smiles_no_stereo_stereo"
+      )
+    ) |>
     tidytable::mutate(
       structure_inchikey_connectivity_layer = tidytable::coalesce(
         as.character(structure_inchikey_connectivity_layer),
@@ -250,7 +251,8 @@ complement_metadata_structures <- function(
   nam_2d <- nam_2d |>
     .ensure_columns(cols = nam_cols) |>
     tidytable::filter(
-      structure_inchikey %in% keys$inchikey_full |
+      structure_inchikey %in%
+        keys$inchikey_full |
         structure_inchikey_connectivity_layer %in% keys$inchikey |
         structure_smiles_no_stereo %in% keys$smiles
     ) |>
@@ -260,10 +262,12 @@ complement_metadata_structures <- function(
       by = "structure_inchikey",
       suffix = c("", "_stereo")
     ) |>
-    .ensure_columns(cols = c(
-      "structure_inchikey_connectivity_layer_stereo",
-      "structure_smiles_no_stereo_stereo"
-    )) |>
+    .ensure_columns(
+      cols = c(
+        "structure_inchikey_connectivity_layer_stereo",
+        "structure_smiles_no_stereo_stereo"
+      )
+    ) |>
     tidytable::mutate(
       structure_inchikey_connectivity_layer = tidytable::coalesce(
         as.character(structure_inchikey_connectivity_layer),
@@ -349,8 +353,7 @@ complement_metadata_structures <- function(
 
   met_lookup <- met_2d |>
     tidytable::select(
-      candidate_structure_inchikey_connectivity_layer =
-        structure_inchikey_connectivity_layer,
+      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
       structure_molecular_formula,
       structure_exact_mass,
       structure_xlogp,
@@ -374,8 +377,7 @@ complement_metadata_structures <- function(
 
   nam_lookup <- nam_2d |>
     tidytable::select(
-      candidate_structure_inchikey_connectivity_layer =
-        structure_inchikey_connectivity_layer,
+      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
       structure_name
     ) |>
     tidytable::filter(
@@ -763,4 +765,3 @@ complement_metadata_structures <- function(
   x_chr[x_chr == ""] <- NA_character_
   x_chr
 }
-
