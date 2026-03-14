@@ -17,6 +17,7 @@
 * Updated the C implementation of the spectral similarity
 * Updated to Massbank version `2025.10`
 * Updated to MSnLib `v7`
+* Standardized package licensing metadata to `AGPL-3`
 
 ## Breaking Changes
 

@@ -21,7 +21,7 @@ Description: TIMA provides a reproducible workflow for taxonomically informed
     framework that can be inspected step-by-step. The package targets
     metabolomics practitioners who need configurable, scriptable, and
     documented annotation pipelines for research and production settings.
-License: AGPL (>= 3)
+License: AGPL-3
 URL: https://github.com/taxonomicallyinformedannotation/tima, https://taxonomicallyinformedannotation.github.io/tima-shinylive, https://taxonomicallyinformedannotation.github.io/tima
 BugReports: https://github.com/taxonomicallyinformedannotation/tima/issues
 Depends:

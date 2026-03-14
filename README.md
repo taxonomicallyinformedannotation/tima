@@ -163,9 +163,9 @@ adafede/tima-r
 # adafede/tima-r
 ```
 
-Adapt the memory limit as needed.
-The app will be available at <http://localhost:3838/>.
-Results will be written to `.tima/data` (your mounted folder).
+Adapt the memory limit as needed. The app will be available at
+<http://localhost:3838/>. Results will be written to `.tima/data` (your
+mounted folder).
 
 ## Main Citations
 
