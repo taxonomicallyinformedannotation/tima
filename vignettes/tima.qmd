@@ -41,7 +41,7 @@ install.packages(
     "https://cloud.r-project.org"
   )
 )
-tima::install_tima()
+tima::install()
 tima::go_to_cache()
 ```
 
@@ -112,7 +112,7 @@ install.packages(
     "https://cloud.r-project.org"
   )
 )
-tima::install_tima()
+tima::install()
 tima::get_example_files()
 ```
 
