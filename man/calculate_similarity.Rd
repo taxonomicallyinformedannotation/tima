@@ -17,21 +17,21 @@ calculate_similarity(
 )
 }
 \arguments{
-\item{method}{Character string specifying method: "entropy", "gnps", or "cosine"}
+\item{method}{\link{character} Similarity method: "entropy", "gnps", or "cosine"}
 
-\item{query_spectrum}{Numeric matrix with columns for mz and intensity}
+\item{query_spectrum}{\link{matrix} Numeric matrix with columns for mz and intensity}
 
-\item{target_spectrum}{Numeric matrix with columns for mz and intensity}
+\item{target_spectrum}{\link{matrix} Numeric matrix with columns for mz and intensity}
 
-\item{query_precursor}{Numeric precursor m/z value for query}
+\item{query_precursor}{\link{numeric} Precursor m/z value for query}
 
-\item{target_precursor}{Numeric precursor m/z value for target}
+\item{target_precursor}{\link{numeric} Precursor m/z value for target}
 
-\item{dalton}{Numeric Dalton tolerance for peak matching}
+\item{dalton}{\link{numeric} Dalton tolerance for peak matching}
 
-\item{ppm}{Numeric PPM tolerance for peak matching}
+\item{ppm}{\link{numeric} PPM tolerance for peak matching}
 
-\item{return_matched_peaks}{Logical; return matched peaks count?
+\item{return_matched_peaks}{\link{logical} Return matched peaks count?
 Not compatible with 'entropy' method. Default: FALSE}
 
 \item{...}{Additional arguments passed to MsCoreUtils::join (cosine only)}

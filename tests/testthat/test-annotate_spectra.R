@@ -66,8 +66,7 @@ test_that("annotate_spectra validates parameters", {
   )
   expect_error(
     annotate_spectra(libraries = list(pos = lib_path), cutoff = -10),
-    "cutoff must be non-negative or NULL, got: -10",
-    fixed = TRUE
+    "cutoff"
   )
   expect_error(
     annotate_spectra(

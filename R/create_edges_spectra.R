@@ -9,16 +9,16 @@
 #' @include get_spectra_ids.R
 #' @include import_spectra.R
 #'
-#' @param input Character string path or list of paths to query MGF file(s) containing spectra
-#' @param output Character string path for output edges file
-#' @param name_source Character string name of source feature column
-#' @param name_target Character string name of target feature column
-#' @param method Character string similarity method to use
-#' @param threshold Numeric minimum similarity threshold (0-1) to report edge
-#' @param matched_peaks Integer minimum number of matched peaks required
-#' @param ppm Numeric relative mass tolerance in ppm
-#' @param dalton Numeric absolute mass tolerance in Daltons
-#' @param cutoff Numeric intensity cutoff below which MS2 fragments are removed.
+#' @param input [character] Path or list of paths to query MGF file(s) containing spectra
+#' @param output [character] Path for output edges file
+#' @param name_source [character] Name of source feature column
+#' @param name_target [character] Name of target feature column
+#' @param method [character] Similarity method to use
+#' @param threshold [numeric] Minimum similarity threshold (0-1) to report edge
+#' @param matched_peaks [integer] Minimum number of matched peaks required
+#' @param ppm [numeric] Relative mass tolerance in ppm
+#' @param dalton [numeric] Absolute mass tolerance in Daltons
+#' @param cutoff [numeric] Intensity cutoff below which MS2 fragments are removed.
 #'     Non-negative numeric or NULL for dynamic thresholding.
 #' @param qutoff `r lifecycle::badge("deprecated")` Use `cutoff` instead.
 #'
@@ -81,12 +81,9 @@ create_edges_spectra <- function(
 
   # Validate similarity method early
   if (!method %in% VALID_SIMILARITY_METHODS) {
-    stop(
-      "Similarity method must be one of: ",
-      paste(VALID_SIMILARITY_METHODS, collapse = ", "),
-      "; got: ",
-      method,
-      call. = FALSE
+    cli::cli_abort(
+      "{.arg method} must be one of {.or {.val {VALID_SIMILARITY_METHODS}}}, not {.val {method}}",
+      class = "tima_validation_error"
     )
   }
 
@@ -94,30 +91,37 @@ create_edges_spectra <- function(
 
   # Validate numeric parameters first (cheap checks)
   if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
-    stop("threshold must be between 0 and 1, got: ", threshold, call. = FALSE)
+    cli::cli_abort(
+      "{.arg threshold} must be between 0 and 1, got {.val {threshold}}",
+      class = "tima_validation_error"
+    )
   }
 
   if (!is.numeric(matched_peaks) || matched_peaks < 1) {
-    stop(
-      "matched_peaks must be a positive integer, got: ",
-      matched_peaks,
-      call. = FALSE
+    cli::cli_abort(
+      "{.arg matched_peaks} must be a positive integer, got {.val {matched_peaks}}",
+      class = "tima_validation_error"
     )
   }
 
   if (!is.numeric(ppm) || ppm <= 0) {
-    stop("ppm must be a positive number, got: ", ppm, call. = FALSE)
+    cli::cli_abort(
+      "{.arg ppm} must be a positive number, got {.val {ppm}}",
+      class = "tima_validation_error"
+    )
   }
 
   if (!is.numeric(dalton) || dalton <= 0) {
-    stop("dalton must be a positive number, got: ", dalton, call. = FALSE)
+    cli::cli_abort(
+      "{.arg dalton} must be a positive number, got {.val {dalton}}",
+      class = "tima_validation_error"
+    )
   }
 
   if (!is.null(cutoff) && (!is.numeric(cutoff) || cutoff < 0)) {
-    stop(
-      "cutoff intensity must be non-negative or NULL, got: ",
-      cutoff,
-      call. = FALSE
+    cli::cli_abort(
+      "{.arg cutoff} must be non-negative or NULL, got {.val {cutoff}}",
+      class = "tima_validation_error"
     )
   }
 

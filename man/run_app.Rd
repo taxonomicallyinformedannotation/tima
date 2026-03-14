@@ -7,12 +7,12 @@
 run_app(host = "127.0.0.1", port = 3838, browser = TRUE)
 }
 \arguments{
-\item{host}{Character string specifying the host/IP address to listen on.
+\item{host}{\link{character} Host/IP address to listen on.
 Default: "127.0.0.1" (localhost). Use "0.0.0.0" to allow external connections.}
 
-\item{port}{Integer port number to listen on. Default: 3838. Valid range: 1-65535.}
+\item{port}{\link{integer} Port number to listen on. Default: 3838. Valid range: 1-65535.}
 
-\item{browser}{Logical whether to automatically launch a web browser when
+\item{browser}{\link{logical} Whether to automatically launch a web browser when
 starting the app. Default: TRUE. Automatically set to FALSE in Docker.}
 }
 \value{

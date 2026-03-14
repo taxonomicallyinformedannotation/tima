@@ -12,15 +12,15 @@ run_tima(
 )
 }
 \arguments{
-\item{target_pattern}{Character. Regex pattern for target selection.
+\item{target_pattern}{\link{character} Regex pattern for target selection.
 Default: "^ann_wei$" (annotation preparation target)}
 
-\item{log_file}{Character. Path to log file. Default: "tima.log"}
+\item{log_file}{\link{character} Path to log file. Default: "tima.log"}
 
-\item{clean_old_logs}{Logical. Remove old log file before starting.
+\item{clean_old_logs}{\link{logical} Remove old log file before starting.
 Default: TRUE}
 
-\item{log_level}{Character or numeric. Logging verbosity level.
+\item{log_level}{\link{character} or \link{numeric} Logging verbosity level.
 Can be one of: "trace", "debug", "info", "warn", "error", "fatal"
 or numeric values: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200, FATAL=100.
 Default: "info" (400). Use "debug" for detailed troubleshooting.}

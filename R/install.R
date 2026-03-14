@@ -1,15 +1,15 @@
 #' Validate Install Function Inputs
 #'
-#' @description Internal helper to validate all input parameters for install().
+#' @description Internal helper to validate all input parameters for
+#'     install_tima().
 #'
-#' @param package Character package name
-#' @param repos Character vector of repositories
-#' @param dependencies Logical dependencies flag
-#' @param test Logical test mode flag
+#' @param package [character] Single non-empty package name
+#' @param repos [character] Vector of repository URLs
+#' @param dependencies [logical] Whether to install dependencies
 #'
 #' @return NULL (stops on validation error)
 #' @keywords internal
-validate_install_inputs <- function(package, repos, dependencies, test) {
+validate_install_inputs <- function(package, repos, dependencies) {
   if (!is.character(package) || length(package) != 1L || nchar(package) == 0L) {
     stop(
       "package must be a single non-empty character string, got: ",
@@ -39,13 +39,6 @@ validate_install_inputs <- function(package, repos, dependencies, test) {
     )
   }
 
-  if (!is.logical(test) || length(test) != 1L) {
-    stop(
-      "test must be a single logical value (TRUE or FALSE)",
-      call. = FALSE
-    )
-  }
-
   invisible(NULL)
 }
 
@@ -53,15 +46,14 @@ validate_install_inputs <- function(package, repos, dependencies, test) {
 #'
 #' @description Internal helper to show OS-specific installation instructions.
 #'
-#' @param system Character OS name from Sys.info()
-#' @param test Logical test mode flag
+#' @param system [character] OS name from Sys.info()
 #'
 #' @return NULL (side effect: logging)
 #' @keywords internal
-show_system_messages <- function(system, test) {
+show_system_messages <- function(system) {
   log_info("Detected operating system: %s", system)
 
-  if (system == "Windows" || isTRUE(test)) {
+  if (system == "Windows") {
     log_info("You should install RTools if not already done")
     log_info(
       "Download from: https://cran.r-project.org/bin/windows/Rtools/"
@@ -379,9 +371,9 @@ try_install_package <- function(
 #' @description Installs or updates the TIMA package from r-universe and sets up
 #'     a Python virtual environment with dependencies.
 #'
-#' @param package Character string name of the package (default: "tima")
-#' @param repos Character vector of repository URLs
-#' @param dependencies Logical whether to install dependencies (default: TRUE)
+#' @param package [character] Name of the package (default: "tima")
+#' @param repos [character] Vector of repository URLs
+#' @param dependencies [logical] Whether to install dependencies (default: TRUE)
 #'
 #' @return NULL (invisibly). Installs packages and sets up Python environment as
 #'     side effects.

@@ -4,21 +4,20 @@
 \alias{validate_install_inputs}
 \title{Validate Install Function Inputs}
 \usage{
-validate_install_inputs(package, repos, dependencies, test)
+validate_install_inputs(package, repos, dependencies)
 }
 \arguments{
-\item{package}{Character package name}
+\item{package}{\link{character} Single non-empty package name}
 
-\item{repos}{Character vector of repositories}
+\item{repos}{\link{character} Vector of repository URLs}
 
-\item{dependencies}{Logical dependencies flag}
-
-\item{test}{Logical test mode flag}
+\item{dependencies}{\link{logical} Whether to install dependencies}
 }
 \value{
 NULL (stops on validation error)
 }
 \description{
-Internal helper to validate all input parameters for install().
+Internal helper to validate all input parameters for
+install_tima().
 }
 \keyword{internal}

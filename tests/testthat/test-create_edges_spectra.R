@@ -21,12 +21,12 @@ test_that("create_edges_spectra validates threshold parameter", {
 
   expect_error(
     create_edges_spectra(input = mgf_file, threshold = -0.1),
-    "between 0 and 1"
+    "threshold"
   )
 
   expect_error(
     create_edges_spectra(input = mgf_file, threshold = 1.5),
-    "between 0 and 1"
+    "threshold"
   )
 })
 
@@ -37,12 +37,12 @@ test_that("create_edges_spectra validates matched_peaks parameter", {
 
   expect_error(
     create_edges_spectra(input = mgf_file, matched_peaks = 0),
-    "positive integer"
+    "matched_peaks"
   )
 
   expect_error(
     create_edges_spectra(input = mgf_file, matched_peaks = -5),
-    "positive integer"
+    "matched_peaks"
   )
 })
 
@@ -53,7 +53,7 @@ test_that("create_edges_spectra validates ppm parameter", {
 
   expect_error(
     create_edges_spectra(input = mgf_file, ppm = -10),
-    "positive"
+    "ppm"
   )
 })
 
@@ -64,7 +64,7 @@ test_that("create_edges_spectra validates dalton parameter", {
 
   expect_error(
     create_edges_spectra(input = mgf_file, dalton = -0.01),
-    "positive"
+    "dalton"
   )
 })
 

@@ -23,13 +23,15 @@
 }
 
 #' Query OTT API for a single batch
-#' @description Queries the Open Tree of Life API for taxonomic names
-#' @param batch Character vector of organism names
+#' @description Queries the Open Tree of Life API for taxonomic names.
+#'     Disables SSL verification as workaround for rotl issue #147.
+#' @param batch [character] Vector of organism names
 #' @return Data frame with taxonomy matches
 #' @keywords internal
 .query_ott_batch <- function(batch) {
   # SSL verification disabled due to rotl package issue #147
   # See: https://github.com/ropensci/rotl/issues/147
+  # httr is an indirect dependency via rotl, so always available here
   httr::with_config(
     httr::config(ssl_verifypeer = FALSE),
     rotl::tnrs_match_names(
@@ -329,6 +331,7 @@ get_organism_taxonomy_ott <- function(
 
     # Query OTT API for detailed taxonomic information
     # SSL verification disabled due to rotl package issue #147
+    # httr is an indirect dependency via rotl, so always available here
     taxon_info <- httr::with_config(
       httr::config(ssl_verifypeer = FALSE),
       rotl::taxonomy_taxon_info(

@@ -7,10 +7,10 @@
 #' @include install.R
 #' @include validations_utils.R
 #'
-#' @param host Character string specifying the host/IP address to listen on.
+#' @param host [character] Host/IP address to listen on.
 #'     Default: "127.0.0.1" (localhost). Use "0.0.0.0" to allow external connections.
-#' @param port Integer port number to listen on. Default: 3838. Valid range: 1-65535.
-#' @param browser Logical whether to automatically launch a web browser when
+#' @param port [integer] Port number to listen on. Default: 3838. Valid range: 1-65535.
+#' @param browser [logical] Whether to automatically launch a web browser when
 #'     starting the app. Default: TRUE. Automatically set to FALSE in Docker.
 #'
 #' @return NULL (invisibly). Launches the Shiny app as a side effect.

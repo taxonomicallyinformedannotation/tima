@@ -10,9 +10,9 @@
 #' @include retry_utils.R
 #' @include validations_utils.R
 #'
-#' @param url Character string URL of the file to download
-#' @param export Character string file path where the file should be saved
-#' @param limit Integer timeout limit in seconds (default: 3600 = 1 hour)
+#' @param url [character] URL of the file to download
+#' @param export [character] File path where the file should be saved
+#' @param limit [integer] Timeout limit in seconds (default: 3600 = 1 hour)
 #'
 #' @return Path to the downloaded file (invisibly)
 #'

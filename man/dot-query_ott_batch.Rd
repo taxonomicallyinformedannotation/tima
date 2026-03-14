@@ -7,12 +7,13 @@
 .query_ott_batch(batch)
 }
 \arguments{
-\item{batch}{Character vector of organism names}
+\item{batch}{\link{character} Vector of organism names}
 }
 \value{
 Data frame with taxonomy matches
 }
 \description{
-Queries the Open Tree of Life API for taxonomic names
+Queries the Open Tree of Life API for taxonomic names.
+Disables SSL verification as workaround for rotl issue #147.
 }
 \keyword{internal}

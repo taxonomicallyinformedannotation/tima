@@ -1,5 +1,16 @@
 
-# tima 2.13.0 (development)
+# tima 2.12.0.9000 (development)
+
+## Breaking changes
+
+* `sanitize_spectra()`: `cutoff` parameter now defaults to `NULL` (dynamic) instead of `0`
+* `annotate_spectra()` / `create_edges_spectra()`: the misspelled `qutoff` parameter is deprecated; use `cutoff` instead
+* `install()` is deprecated in favor of `install_tima()`
+* `validate_install_inputs()` no longer accepts a `test` parameter
+* `show_system_messages()` no longer accepts a `test` parameter
+* `R.utils` moved from Imports to Suggests
+
+## New features
 
 * Added a new validation helper, see <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html>
 * Added [BiGG](http://bigg.ucsd.edu/) as SOP library
@@ -11,18 +22,34 @@
 * Enhanced `sanitize_spectra()` with adaptive noise filtering:
     - Dynamic intensity thresholds (MAD-based, now default when `cutoff = NULL`)
     - Low noise removal targets repetitive instrumental artifacts
+
+## Internal / performance
+
 * Improved log and error messages
-* More in depth molecular sanitization
+* More in-depth molecular sanitization
+* Standardized error handling to use `cli::cli_abort()` in exported functions
+* Replaced nested `ifelse()` in `format_bytes()` with `findInterval()`
+* Fixed `1:n` patterns to use `seq_len()` for safety
 * Updated the C implementation of the spectral similarity
+
+## Documentation
+
+* Startup message now uses `cli::cli_inform()`
+
+## Data updates
+
 * Updated to Massbank version `2025.10`
 * Updated to MSnLib `v7`
-* Standardized package licensing metadata to `AGPL-3`
-
-## Breaking Changes
-
-* `sanitize_spectra()`: `cutoff` parameter now defaults to `NULL` (dynamic) instead of `0`
 
 # tima 2.12.0
+
+## Breaking changes
+
+* `.RDS` spectra are now stored more efficiently. To avoid errors, delete any `.RDS` files created before version `2.12.0`
+* `tima_full()` has been deprecated in favor of `run_tima()`
+* Updated minimal R version to `4.4.0` (and related Bioconductor dependencies)
+
+## New features
 
 * Added automatic retention time conversion (in minutes)
 * Added a minimal output
@@ -30,25 +57,34 @@
 * Added MERLIN spectral libraries (#190)
 * Added optional compound name from RT libraries
 * Added `RDKit`-based structures processing through `reticulate` (#19)
-* Breaking Change: `.RDS` spectra are now stored more efficiently. To avoid errors, delete any `.RDS` files created before version `2.12.0`
-* Externalized spectral libraries preparation to [SpectRalLibRaRies](https://github.com/Adafede/SpectRalLibRaRies)
-* Fix memory crashes in case of large number of ties, limiting to 7 with note (#216)
 * Introduced similarity method argument (entropy and GNPS for now)
+
+## Bug fixes
+
+* Fixed memory crashes in case of large number of ties, limiting to 7 with note (#216)
+
+## Internal / performance
+
+* Externalized spectral libraries preparation to [SpectRalLibRaRies](https://github.com/Adafede/SpectRalLibRaRies)
 * Implemented GNPS similarity method in C
 * Improved high confidence filtering
 * Improved logs using `logger` (#189)
 * Keep (only) the best molecular formula and canopus annotations from SIRIUS
-* New ISDB version with 1 million compounds (see <https://doi.org/10.5281/zenodo.14887271>)
 * Reduced dependencies and moved some to `Suggests`
 * Refactored adducts parsing to read adducts like `[M+H]+/[M]+`
 * Refactored MS1 annotation step to work per sample (#194)
 * Refactored tests
 * Renamed some functions/utils for consistency
 * Replaced `logger` with `lgr` for `covr` compatibility
+
+## Documentation
+
 * Switched documentation from `pkgdown` to `altdoc`
-* `tima_full()` has been deprecated in favor of `run_tima()`
+
+## Data updates
+
+* New ISDB version with 1 million compounds (see <https://doi.org/10.5281/zenodo.14887271>)
 * Updated to Massbank version `2025.05.1`
-* Updated minimal R version to `4.4.0` (and related Bioconductor dependencies)
 
 # tima 2.11.1 (unreleased)
 

@@ -64,37 +64,28 @@ format_count <- function(x) {
 
 #' Format file size in human-readable format
 #'
-#' @param bytes File size in bytes
+#' @param bytes [numeric] File size in bytes
 #'
 #' @return Formatted string (e.g., "1.5 MB")
 #' @keywords internal
 format_bytes <- function(bytes) {
-  # Handle NA and negative
   out <- character(length(bytes))
   bad <- is.na(bytes) | bytes < 0
   out[bad] <- "unknown"
 
-  # Safe default for good values
   b <- bytes[!bad]
+  if (length(b) == 0L) {
+    return(out)
+  }
 
-  # Define thresholds
-  KB <- 1024
-  MB <- 1024^2
-  GB <- 1024^3
+  # Use findInterval for clean threshold-based formatting
+  thresholds <- c(0, 1024, 1024^2, 1024^3)
+  labels <- c("B", "KB", "MB", "GB")
+  divisors <- c(1, 1024, 1024^2, 1024^3)
+  digits <- c(0L, 1L, 1L, 2L)
 
-  out[!bad] <- ifelse(
-    test = b < KB,
-    yes = paste0(b, " B"),
-    no = ifelse(
-      test = b < MB,
-      yes = paste0(round(b / KB, 1), " KB"),
-      no = ifelse(
-        test = b < GB,
-        yes = paste0(round(b / MB, 1), " MB"),
-        no = paste0(round(b / GB, 2), " GB")
-      )
-    )
-  )
+  idx <- findInterval(b, thresholds, rightmost.closed = FALSE)
+  out[!bad] <- paste0(round(b / divisors[idx], digits[idx]), " ", labels[idx])
   out
 }
 

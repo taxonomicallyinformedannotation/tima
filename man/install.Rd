@@ -12,11 +12,11 @@ install(
 )
 }
 \arguments{
-\item{package}{Character string name of the package (default: "tima")}
+\item{package}{\link{character} Name of the package (default: "tima")}
 
-\item{repos}{Character vector of repository URLs}
+\item{repos}{\link{character} Vector of repository URLs}
 
-\item{dependencies}{Logical whether to install dependencies (default: TRUE)}
+\item{dependencies}{\link{logical} Whether to install dependencies (default: TRUE)}
 }
 \value{
 NULL (invisibly).

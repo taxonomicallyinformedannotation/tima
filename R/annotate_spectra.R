@@ -36,19 +36,19 @@
 #' @include logs_utils.R
 #' @include validations_utils.R
 #'
-#' @param input Character vector or list of query spectral file paths (.mgf).
-#' @param libraries Character vector or list of library spectral file paths
+#' @param input [character] Vector or list of query spectral file paths (.mgf).
+#' @param libraries [character] Vector or list of library spectral file paths
 #'   (.mgf / Spectra-supported). Must contain at least one path.
-#' @param polarity MS polarity; one of `VALID_MS_MODES` ("pos", "neg").
-#' @param output Output file path (the function writes a tabular file here).
-#' @param method Similarity method; one of `VALID_SIMILARITY_METHODS`.
-#' @param threshold Minimal similarity score to retain candidates (0-1).
-#' @param ppm Relative mass tolerance (ppm) for MS/MS matching.
-#' @param dalton Absolute mass tolerance (Daltons) for MS/MS matching.
-#' @param cutoff Intensity cutoff under which MS2 fragments are removed.
+#' @param polarity [character] MS polarity; one of `VALID_MS_MODES` ("pos", "neg").
+#' @param output [character] Output file path (the function writes a tabular file here).
+#' @param method [character] Similarity method; one of `VALID_SIMILARITY_METHODS`.
+#' @param threshold [numeric] Minimal similarity score to retain candidates (0-1).
+#' @param ppm [numeric] Relative mass tolerance (ppm) for MS/MS matching.
+#' @param dalton [numeric] Absolute mass tolerance (Daltons) for MS/MS matching.
+#' @param cutoff [numeric] Intensity cutoff under which MS2 fragments are removed.
 #'     Non-negative numeric or NULL for dynamic thresholding.
 #' @param qutoff `r lifecycle::badge("deprecated")` Use `cutoff` instead.
-#' @param approx Logical; if TRUE perform matching ignoring precursor masses
+#' @param approx [logical] If TRUE perform matching ignoring precursor masses
 #'     (broader, slower); if FALSE restrict library to precursor-tolerant
 #'     spectra first.
 #'
@@ -115,7 +115,10 @@ annotate_spectra <- function(
   assert_scalar_numeric(ppm, "ppm", min = 0)
   assert_scalar_numeric(dalton, "dalton", min = 0)
   if (!is.null(cutoff) && (!is.numeric(cutoff) || cutoff < 0)) {
-    stop("cutoff must be non-negative or NULL, got: ", cutoff, call. = FALSE)
+    cli::cli_abort(
+      "{.arg cutoff} must be non-negative or NULL, got {.val {cutoff}}",
+      class = "tima_validation_error"
+    )
   }
 
   input_vec <- normalize_input_files(input, "Input")

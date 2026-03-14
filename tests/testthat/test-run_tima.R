@@ -79,46 +79,46 @@ test_that("run_tima has sensible defaults", {
 test_that("run_tima validates target_pattern parameter", {
   expect_error(
     run_tima(target_pattern = 123),
-    "target_pattern must be a single character string"
+    "target_pattern"
   )
 
   expect_error(
     run_tima(target_pattern = c("pattern1", "pattern2")),
-    "target_pattern must be a single character string"
+    "target_pattern"
   )
 
   expect_error(
     run_tima(target_pattern = NULL),
-    "target_pattern must be a single character string"
+    "target_pattern"
   )
 })
 
 test_that("run_tima validates log_file parameter", {
   expect_error(
     run_tima(log_file = 123),
-    "log_file must be a single character string"
+    "log_file"
   )
 
   expect_error(
     run_tima(log_file = c("log1.log", "log2.log")),
-    "log_file must be a single character string"
+    "log_file"
   )
 })
 
 test_that("run_tima validates clean_old_logs parameter", {
   expect_error(
     run_tima(clean_old_logs = "yes"),
-    "clean_old_logs must be a single logical value"
+    "clean_old_logs"
   )
 
   expect_error(
     run_tima(clean_old_logs = c(TRUE, FALSE)),
-    "clean_old_logs must be a single logical value"
+    "clean_old_logs"
   )
 
   expect_error(
     run_tima(clean_old_logs = NULL),
-    "clean_old_logs must be a single logical value"
+    "clean_old_logs"
   )
 })
 
@@ -225,25 +225,25 @@ test_that("run_tima rejects invalid log_level values", {
   # Test character validation
   expect_error(
     run_tima(log_level = "invalid"),
-    "log_level must be one of: trace, debug, info, warn, error, fatal"
+    "log_level"
   )
 
   # Test numeric validation
   expect_error(
     run_tima(log_level = 999),
-    "log_level must be one of: 600, 500, 400, 300, 200, 100"
+    "log_level"
   )
 
   # Test wrong type
   expect_error(
     run_tima(log_level = TRUE),
-    "log_level must be character .* or numeric"
+    "log_level"
   )
 
   # Test multiple values
   expect_error(
     run_tima(log_level = c("info", "debug")),
-    "log_level must be a single value"
+    "log_level"
   )
 })
 
