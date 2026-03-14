@@ -14,17 +14,7 @@ annotate_spectra(
   ppm = get_params(step = "annotate_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(step = "annotate_spectra")$ms$tolerances$mass$dalton$ms2,
   qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
-  approx = get_params(step = "annotate_spectra")$annotations$ms2approx,
-  str_stereo = get_params(step =
-    "annotate_masses")$files$libraries$sop$merged$structures$stereo,
-  str_met = get_params(step =
-    "annotate_masses")$files$libraries$sop$merged$structures$metadata,
-  str_nam = get_params(step =
-    "annotate_masses")$files$libraries$sop$merged$structures$names,
-  str_tax_cla = get_params(step =
-    "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$cla,
-  str_tax_npc = get_params(step =
-    "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$npc
+  approx = get_params(step = "annotate_spectra")$annotations$ms2approx
 )
 }
 \arguments{
@@ -51,16 +41,6 @@ annotate_spectra(
 \item{approx}{Logical; if TRUE perform matching ignoring precursor masses
 (broader, slower); if FALSE restrict library to precursor-tolerant
 spectra first.}
-
-\item{str_stereo}{File containing structures stereo}
-
-\item{str_met}{File containing structures metadata}
-
-\item{str_nam}{File containing structures names}
-
-\item{str_tax_cla}{File containing Classyfire taxonomy}
-
-\item{str_tax_npc}{File containing NPClassifier taxonomy}
 }
 \value{
 Character scalar: the output file path (invisible). Side effect:

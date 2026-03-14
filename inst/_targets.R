@@ -1701,12 +1701,7 @@ list(
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
               qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
-              approx = par_ann_spe$annotations$ms2approx,
-              str_stereo = lib_mer_str_stereo,
-              str_met = lib_mer_str_met,
-              str_nam = lib_mer_str_nam,
-              str_tax_cla = lib_mer_str_tax_cla,
-              str_tax_npc = lib_mer_str_tax_npc
+              approx = par_ann_spe$annotations$ms2approx
             )
           },
           format = "file"

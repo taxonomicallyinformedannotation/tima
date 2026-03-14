@@ -355,12 +355,39 @@ count_candidates <- function(df_ranked, df_percentile) {
 compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
   df_pred_tax |>
     tidytable::mutate(
+      cla_kin_valid = !is.na(feature_pred_tax_cla_01kin_val) &
+        feature_pred_tax_cla_01kin_val != "notClassified" &
+        feature_pred_tax_cla_01kin_val != "empty",
+      cla_sup_valid = !is.na(feature_pred_tax_cla_02sup_val) &
+        feature_pred_tax_cla_02sup_val != "notClassified" &
+        feature_pred_tax_cla_02sup_val != "empty",
+      cla_cla_valid = !is.na(feature_pred_tax_cla_03cla_val) &
+        feature_pred_tax_cla_03cla_val != "notClassified" &
+        feature_pred_tax_cla_03cla_val != "empty",
+      cla_par_valid = !is.na(feature_pred_tax_cla_04dirpar_val) &
+        feature_pred_tax_cla_04dirpar_val != "notClassified" &
+        feature_pred_tax_cla_04dirpar_val != "empty",
       # Compute weighted score for each level
-      ws_kin = as.numeric(feature_pred_tax_cla_01kin_score) * weights$w_cla_kin,
-      ws_sup = as.numeric(feature_pred_tax_cla_02sup_score) * weights$w_cla_sup,
-      ws_cla = as.numeric(feature_pred_tax_cla_03cla_score) * weights$w_cla_cla,
-      ws_par = as.numeric(feature_pred_tax_cla_04dirpar_score) *
-        weights$w_cla_par,
+      ws_kin = tidytable::if_else(
+        cla_kin_valid,
+        as.numeric(feature_pred_tax_cla_01kin_score) * weights$w_cla_kin,
+        NA_real_
+      ),
+      ws_sup = tidytable::if_else(
+        cla_sup_valid,
+        as.numeric(feature_pred_tax_cla_02sup_score) * weights$w_cla_sup,
+        NA_real_
+      ),
+      ws_cla = tidytable::if_else(
+        cla_cla_valid,
+        as.numeric(feature_pred_tax_cla_03cla_score) * weights$w_cla_cla,
+        NA_real_
+      ),
+      ws_par = tidytable::if_else(
+        cla_par_valid,
+        as.numeric(feature_pred_tax_cla_04dirpar_score) * weights$w_cla_par,
+        NA_real_
+      ),
       # Find which level has max weighted score
       max_ws = pmax(ws_kin, ws_sup, ws_cla, ws_par, na.rm = TRUE),
       # Pick label and score from that level
@@ -383,7 +410,11 @@ compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
         TRUE ~ NA_real_
       )
     ) |>
-    tidytable::filter(label_classyfire_predicted != "empty") |>
+    tidytable::filter(
+      !is.na(label_classyfire_predicted),
+      label_classyfire_predicted != "empty",
+      label_classyfire_predicted != "notClassified"
+    ) |>
     tidytable::select(
       feature_id,
       label_classyfire_predicted,
@@ -405,10 +436,31 @@ compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
 compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
   df_pred_tax |>
     tidytable::mutate(
+      npc_pat_valid = !is.na(feature_pred_tax_npc_01pat_val) &
+        feature_pred_tax_npc_01pat_val != "notClassified" &
+        feature_pred_tax_npc_01pat_val != "empty",
+      npc_sup_valid = !is.na(feature_pred_tax_npc_02sup_val) &
+        feature_pred_tax_npc_02sup_val != "notClassified" &
+        feature_pred_tax_npc_02sup_val != "empty",
+      npc_cla_valid = !is.na(feature_pred_tax_npc_03cla_val) &
+        feature_pred_tax_npc_03cla_val != "notClassified" &
+        feature_pred_tax_npc_03cla_val != "empty",
       # Compute weighted score for each level
-      ws_pat = as.numeric(feature_pred_tax_npc_01pat_score) * weights$w_npc_pat,
-      ws_sup = as.numeric(feature_pred_tax_npc_02sup_score) * weights$w_npc_sup,
-      ws_cla = as.numeric(feature_pred_tax_npc_03cla_score) * weights$w_npc_cla,
+      ws_pat = tidytable::if_else(
+        npc_pat_valid,
+        as.numeric(feature_pred_tax_npc_01pat_score) * weights$w_npc_pat,
+        NA_real_
+      ),
+      ws_sup = tidytable::if_else(
+        npc_sup_valid,
+        as.numeric(feature_pred_tax_npc_02sup_score) * weights$w_npc_sup,
+        NA_real_
+      ),
+      ws_cla = tidytable::if_else(
+        npc_cla_valid,
+        as.numeric(feature_pred_tax_npc_03cla_score) * weights$w_npc_cla,
+        NA_real_
+      ),
       # Find which level has max weighted score
       max_ws = pmax(ws_pat, ws_sup, ws_cla, na.rm = TRUE),
       # Pick label and score from that level
@@ -428,7 +480,11 @@ compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
         TRUE ~ NA_real_
       )
     ) |>
-    tidytable::filter(label_npclassifier_predicted != "empty") |>
+    tidytable::filter(
+      !is.na(label_npclassifier_predicted),
+      label_npclassifier_predicted != "empty",
+      label_npclassifier_predicted != "notClassified"
+    ) |>
     tidytable::select(
       feature_id,
       label_npclassifier_predicted,
@@ -1112,6 +1168,10 @@ clean_chemo <- function(
   df_percentile <- candidate_tables$df_percentile
   results_candidates <- candidate_tables$results_candidates
   annotation_notes_lookup <- candidate_tables$annotation_notes_lookup
+  organism_lookup <- .build_organism_lookup(
+    structure_organism_pairs_table = structure_organism_pairs_table,
+    df = df_ranked
+  )
 
   if (candidate_tables$n_sampled_features > 0L) {
     log_info(
@@ -1143,7 +1203,8 @@ clean_chemo <- function(
       remove_ties = remove_ties,
       summarize = summarize,
       annotation_notes_lookup = annotation_notes_lookup,
-      feature_consensus_table = feature_consensus_table
+      feature_consensus_table = feature_consensus_table,
+      organism_lookup = organism_lookup
     ) |>
     tidytable::left_join(y = results_candidates) |>
     tidytable::mutate(
@@ -1178,6 +1239,9 @@ clean_chemo <- function(
     xrefs_table = xrefs_table
   )
 
+  rm(df_classes_mini, df_filtered, df_percentile)
+  invisible(gc(verbose = FALSE))
+
   # Tier 3: FULL - Optionally apply high-confidence filter
   df_full <- if (high_confidence) {
     df_ranked |>
@@ -1199,7 +1263,8 @@ clean_chemo <- function(
       remove_ties = remove_ties,
       summarize = summarize,
       annotation_notes_lookup = annotation_notes_lookup,
-      feature_consensus_table = feature_consensus_table
+      feature_consensus_table = feature_consensus_table,
+      organism_lookup = organism_lookup
     ) |>
     tidytable::left_join(y = results_candidates) |>
     tidytable::mutate(
@@ -1210,6 +1275,9 @@ clean_chemo <- function(
         candidates_best
       )
     )
+
+  rm(df_full, df_ranked)
+  invisible(gc(verbose = FALSE))
 
   # Optionally Remove Compound Names (After All Processing) ----
 
@@ -1234,16 +1302,13 @@ clean_chemo <- function(
   # Clean up intermediate objects
   rm(
     annot_table_wei_chemo,
-    df_ranked,
-    df_percentile,
-    df_filtered,
-    df_full,
     results_candidates,
     features_table,
     components_table,
     structure_organism_pairs_table,
     candidate_tables,
-    feature_consensus_table
+    feature_consensus_table,
+    organism_lookup
   )
 
   return(results_list)

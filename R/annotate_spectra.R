@@ -50,11 +50,6 @@
 #' @param approx Logical; if TRUE perform matching ignoring precursor masses
 #'     (broader, slower); if FALSE restrict library to precursor-tolerant
 #'     spectra first.
-#' @param str_stereo File containing structures stereo
-#' @param str_met File containing structures metadata
-#' @param str_nam File containing structures names
-#' @param str_tax_cla File containing Classyfire taxonomy
-#' @param str_tax_npc File containing NPClassifier taxonomy
 #'
 #' @return Character scalar: the output file path (invisible). Side effect:
 #'     writes the annotations table to `output`.
@@ -94,22 +89,7 @@ annotate_spectra <- function(
   ppm = get_params(step = "annotate_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(step = "annotate_spectra")$ms$tolerances$mass$dalton$ms2,
   qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
-  approx = get_params(step = "annotate_spectra")$annotations$ms2approx,
-  str_stereo = get_params(
-    step = "annotate_masses"
-  )$files$libraries$sop$merged$structures$stereo,
-  str_met = get_params(
-    step = "annotate_masses"
-  )$files$libraries$sop$merged$structures$metadata,
-  str_nam = get_params(
-    step = "annotate_masses"
-  )$files$libraries$sop$merged$structures$names,
-  str_tax_cla = get_params(
-    step = "annotate_masses"
-  )$files$libraries$sop$merged$structures$taxonomies$cla,
-  str_tax_npc = get_params(
-    step = "annotate_masses"
-  )$files$libraries$sop$merged$structures$taxonomies$npc
+  approx = get_params(step = "annotate_spectra")$annotations$ms2approx
 ) {
   params <- get_params(step = "annotate_spectra")
   output_path <- resolve_annotation_output(output)
@@ -262,12 +242,7 @@ annotate_spectra <- function(
   df_final <- finalize_results(
     df_sim = tidytable::as_tidytable(x = sim_raw),
     meta = meta,
-    threshold = threshold,
-    str_stereo = str_stereo,
-    str_met = str_met,
-    str_nam = str_nam,
-    str_tax_cla = str_tax_cla,
-    str_tax_npc = str_tax_npc
+    threshold = threshold
   )
   if (nrow(df_final) == 0L) {
     return(
@@ -521,12 +496,7 @@ compute_similarity_safe <- function(
 finalize_results <- function(
   df_sim,
   meta,
-  threshold,
-  str_stereo,
-  str_met,
-  str_nam,
-  str_tax_cla,
-  str_tax_npc
+  threshold
 ) {
   if (nrow(df_sim) == 0) {
     return(tidytable::tidytable())
@@ -586,13 +556,6 @@ finalize_results <- function(
       candidate_library,
       candidate_structure_inchikey_connectivity_layer,
       .keep_all = TRUE
-    ) |>
-    select_annotations_columns(
-      str_stereo = str_stereo,
-      str_met = str_met,
-      str_nam = str_nam,
-      str_tax_cla = str_tax_cla,
-      str_tax_npc = str_tax_npc
     )
   df_final
 }

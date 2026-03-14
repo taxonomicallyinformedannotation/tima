@@ -602,6 +602,56 @@ test_that("compute_classyfire_taxonomy filters empty labels", {
   expect_equal(result$feature_id, "F1")
 })
 
+test_that("compute_classyfire_taxonomy ignores notClassified at all levels", {
+  weights <- list(
+    w_cla_kin = 0.4,
+    w_cla_sup = 0.3,
+    w_cla_cla = 0.2,
+    w_cla_par = 0.1
+  )
+
+  df_pred_tax <- tidytable::tidytable(
+    feature_id = "F1",
+    feature_pred_tax_cla_01kin_val = "Kingdom1",
+    feature_pred_tax_cla_01kin_score = "0.8",
+    feature_pred_tax_cla_02sup_val = "Super1",
+    feature_pred_tax_cla_02sup_score = "0.7",
+    feature_pred_tax_cla_03cla_val = "notClassified",
+    feature_pred_tax_cla_03cla_score = "0.99",
+    feature_pred_tax_cla_04dirpar_val = "notClassified",
+    feature_pred_tax_cla_04dirpar_score = "0.99"
+  )
+
+  result <- compute_classyfire_taxonomy(df_pred_tax, weights)
+
+  expect_equal(result$label_classyfire_predicted, "Kingdom1")
+  expect_equal(as.numeric(result$score_classyfire), 0.8)
+})
+
+test_that("compute_classyfire_taxonomy drops rows when all levels are notClassified", {
+  weights <- list(
+    w_cla_kin = 0.1,
+    w_cla_sup = 0.2,
+    w_cla_cla = 0.3,
+    w_cla_par = 0.4
+  )
+
+  df_pred_tax <- tidytable::tidytable(
+    feature_id = "F1",
+    feature_pred_tax_cla_01kin_val = "notClassified",
+    feature_pred_tax_cla_01kin_score = "0.8",
+    feature_pred_tax_cla_02sup_val = "notClassified",
+    feature_pred_tax_cla_02sup_score = "0.7",
+    feature_pred_tax_cla_03cla_val = "notClassified",
+    feature_pred_tax_cla_03cla_score = "0.6",
+    feature_pred_tax_cla_04dirpar_val = "notClassified",
+    feature_pred_tax_cla_04dirpar_score = "0.5"
+  )
+
+  result <- compute_classyfire_taxonomy(df_pred_tax, weights)
+  expect_equal(nrow(result), 0)
+})
+
 test_that("compute_npclassifier_taxonomy selects highest weighted level", {
   weights <- list(
     w_npc_pat = 0.3,
@@ -648,6 +698,51 @@ test_that("compute_npclassifier_taxonomy handles NA values", {
   # Only superclass available
   expect_equal(result$label_npclassifier_predicted, "Super1")
   expect_equal(as.numeric(result$score_npclassifier), 0.8)
+})
+
+test_that("compute_npclassifier_taxonomy ignores notClassified at all levels", {
+  weights <- list(
+    w_npc_pat = 0.5,
+    w_npc_sup = 0.3,
+    w_npc_cla = 0.1
+  )
+
+  df_pred_tax <- tidytable::tidytable(
+    feature_id = "F1",
+    feature_pred_tax_npc_01pat_val = "Pathway1",
+    feature_pred_tax_npc_01pat_score = "0.95",
+    feature_pred_tax_npc_02sup_val = "Super1",
+    feature_pred_tax_npc_02sup_score = "0.9",
+    feature_pred_tax_npc_03cla_val = "notClassified",
+    feature_pred_tax_npc_03cla_score = "0.2"
+  )
+
+  result <- compute_npclassifier_taxonomy(df_pred_tax, weights)
+
+  # notClassified class is ignored; pathway wins among valid levels.
+  expect_equal(result$label_npclassifier_predicted, "Pathway1")
+  expect_equal(as.numeric(result$score_npclassifier), 0.95)
+})
+
+test_that("compute_npclassifier_taxonomy drops rows when all levels are notClassified", {
+  weights <- list(
+    w_npc_pat = 0.3,
+    w_npc_sup = 0.2,
+    w_npc_cla = 0.1
+  )
+
+  df_pred_tax <- tidytable::tidytable(
+    feature_id = "F1",
+    feature_pred_tax_npc_01pat_val = "notClassified",
+    feature_pred_tax_npc_01pat_score = "0.95",
+    feature_pred_tax_npc_02sup_val = "notClassified",
+    feature_pred_tax_npc_02sup_score = "0.8",
+    feature_pred_tax_npc_03cla_val = "notClassified",
+    feature_pred_tax_npc_03cla_score = "0.7"
+  )
+
+  result <- compute_npclassifier_taxonomy(df_pred_tax, weights)
+  expect_equal(nrow(result), 0)
 })
 
 # Compound Name Tests ----

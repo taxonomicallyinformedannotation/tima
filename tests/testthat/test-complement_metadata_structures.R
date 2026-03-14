@@ -194,3 +194,381 @@ test_that("complement_metadata_structures errors when required columns missing",
     )
   )
 })
+
+.write_min_lookup_files <- function(
+  st_file,
+  met_file,
+  nam_file,
+  cla_file,
+  npc_file,
+  inchikey,
+  smiles,
+  mass = "100",
+  formula = "C10H20O",
+  xlogp = "2.1",
+  tag = "clean",
+  name = "LibName"
+) {
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = inchikey,
+      structure_smiles_no_stereo = smiles
+    ),
+    st_file,
+    sep = "\t"
+  )
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = inchikey,
+      structure_smiles_no_stereo = smiles,
+      structure_exact_mass = mass,
+      structure_xlogp = xlogp,
+      structure_tag = tag,
+      structure_molecular_formula = formula
+    ),
+    met_file,
+    sep = "\t"
+  )
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = inchikey,
+      structure_smiles_no_stereo = smiles,
+      structure_name = name
+    ),
+    nam_file,
+    sep = "\t"
+  )
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = inchikey,
+      structure_tax_cla_chemontid = "CHEMONTID:0000000",
+      structure_tax_cla_01kin = "Organic compounds",
+      structure_tax_cla_02sup = "Lipids",
+      structure_tax_cla_03cla = "Fatty acyls",
+      structure_tax_cla_04dirpar = "Fatty acids"
+    ),
+    cla_file,
+    sep = "\t"
+  )
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_smiles_no_stereo = smiles,
+      structure_tax_npc_01pat = "Pathway",
+      structure_tax_npc_02sup = "Superclass",
+      structure_tax_npc_03cla = "Class"
+    ),
+    npc_file,
+    sep = "\t"
+  )
+}
+
+test_that("clean lookup values are always used before existing candidate metadata", {
+  df <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK1"),
+    candidate_structure_smiles_no_stereo = c("C", "C"),
+    candidate_structure_exact_mass = c("999", "888"),
+    candidate_structure_molecular_formula = c("OLD1", "OLD2"),
+    candidate_structure_xlogp = c("9.9", "8.8"),
+    candidate_structure_tag = c("legacy", "legacy"),
+    candidate_structure_name = c("OldName1", "OldName2")
+  )
+
+  st_file <- temp_test_path("prio_st.tsv")
+  met_file <- temp_test_path("prio_met.tsv")
+  nam_file <- temp_test_path("prio_nam.tsv")
+  cla_file <- temp_test_path("prio_cla.tsv")
+  npc_file <- temp_test_path("prio_npc.tsv")
+
+  .write_min_lookup_files(
+    st_file = st_file,
+    met_file = met_file,
+    nam_file = nam_file,
+    cla_file = cla_file,
+    npc_file = npc_file,
+    inchikey = "IK1",
+    smiles = "C",
+    mass = "100",
+    formula = "C10H20O",
+    xlogp = "2.1",
+    tag = "clean",
+    name = "LibName"
+  )
+
+  out <- complement_metadata_structures(
+    df,
+    str_stereo = st_file,
+    str_met = met_file,
+    str_nam = nam_file,
+    str_tax_cla = cla_file,
+    str_tax_npc = npc_file
+  )
+
+  expect_true(all(out$candidate_structure_exact_mass == "100"))
+  expect_true(all(out$candidate_structure_molecular_formula == "C10H20O"))
+  expect_true(all(out$candidate_structure_xlogp == "2.1"))
+  expect_true(all(out$candidate_structure_tag == "clean"))
+  expect_true(all(out$candidate_structure_name == "LibName"))
+})
+
+test_that("existing candidate metadata is used only when no lookup values exist", {
+  df <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = "IK2",
+    candidate_structure_smiles_no_stereo = "N",
+    candidate_structure_exact_mass = "777",
+    candidate_structure_molecular_formula = "C7H7N",
+    candidate_structure_xlogp = "1.7",
+    candidate_structure_tag = "existing",
+    candidate_structure_name = "ExistingName"
+  )
+
+  st_file <- temp_test_path("fallback_st.tsv")
+  met_file <- temp_test_path("fallback_met.tsv")
+  nam_file <- temp_test_path("fallback_nam.tsv")
+  cla_file <- temp_test_path("fallback_cla.tsv")
+  npc_file <- temp_test_path("fallback_npc.tsv")
+
+  # Only unrelated lookup entries: no library match for IK2/N.
+  .write_min_lookup_files(
+    st_file = st_file,
+    met_file = met_file,
+    nam_file = nam_file,
+    cla_file = cla_file,
+    npc_file = npc_file,
+    inchikey = "OTHER",
+    smiles = "CC"
+  )
+
+  out <- complement_metadata_structures(
+    df,
+    str_stereo = st_file,
+    str_met = met_file,
+    str_nam = nam_file,
+    str_tax_cla = cla_file,
+    str_tax_npc = npc_file
+  )
+
+  expect_equal(out$candidate_structure_exact_mass[[1]], "777")
+  expect_equal(out$candidate_structure_molecular_formula[[1]], "C7H7N")
+  expect_equal(out$candidate_structure_xlogp[[1]], "1.7")
+  expect_equal(out$candidate_structure_tag[[1]], "existing")
+  expect_equal(out$candidate_structure_name[[1]], "ExistingName")
+})
+
+test_that("one canonical value is returned per inchikey across rows", {
+  df <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = c("IK3", "IK3", "IK3"),
+    candidate_structure_smiles_no_stereo = c("O", "O", "O"),
+    candidate_structure_exact_mass = c("901", "902", "903"),
+    candidate_structure_molecular_formula = c("OLD_A", "OLD_B", "OLD_C"),
+    candidate_structure_xlogp = c("0.1", "0.2", "0.3"),
+    candidate_structure_tag = c("legacy_a", "legacy_b", "legacy_c"),
+    candidate_structure_name = c("OldA", "OldB", "OldC")
+  )
+
+  st_file <- temp_test_path("canon_st.tsv")
+  met_file <- temp_test_path("canon_met.tsv")
+  nam_file <- temp_test_path("canon_nam.tsv")
+  cla_file <- temp_test_path("canon_cla.tsv")
+  npc_file <- temp_test_path("canon_npc.tsv")
+
+  .write_min_lookup_files(
+    st_file = st_file,
+    met_file = met_file,
+    nam_file = nam_file,
+    cla_file = cla_file,
+    npc_file = npc_file,
+    inchikey = "IK3",
+    smiles = "O",
+    mass = "123.45",
+    formula = "C6H6O",
+    xlogp = "1.2",
+    tag = "clean_canon",
+    name = "CanonicalName"
+  )
+
+  out <- complement_metadata_structures(
+    df,
+    str_stereo = st_file,
+    str_met = met_file,
+    str_nam = nam_file,
+    str_tax_cla = cla_file,
+    str_tax_npc = npc_file
+  )
+
+  expect_equal(length(unique(out$candidate_structure_exact_mass)), 1L)
+  expect_equal(length(unique(out$candidate_structure_molecular_formula)), 1L)
+  expect_equal(length(unique(out$candidate_structure_xlogp)), 1L)
+  expect_equal(length(unique(out$candidate_structure_tag)), 1L)
+  expect_equal(length(unique(out$candidate_structure_name)), 1L)
+
+  expect_equal(unique(out$candidate_structure_exact_mass), "123.45")
+  expect_equal(unique(out$candidate_structure_molecular_formula), "C6H6O")
+  expect_equal(unique(out$candidate_structure_xlogp), "1.2")
+  expect_equal(unique(out$candidate_structure_tag), "clean_canon")
+  expect_equal(unique(out$candidate_structure_name), "CanonicalName")
+})
+
+test_that("name harmonization is case-insensitive within complement_metadata_structures", {
+  df <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = c("IK4", "IK4"),
+    candidate_structure_smiles_no_stereo = c("CCO", "CCO"),
+    candidate_structure_name = c("SUCROSE", "sucrose")
+  )
+
+  st_file <- temp_test_path("name_harm_st.tsv")
+  met_file <- temp_test_path("name_harm_met.tsv")
+  nam_file <- temp_test_path("name_harm_nam.tsv")
+  cla_file <- temp_test_path("name_harm_cla.tsv")
+  npc_file <- temp_test_path("name_harm_npc.tsv")
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = "IK4",
+      structure_smiles_no_stereo = "CCO"
+    ),
+    st_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = "IK4",
+      structure_smiles_no_stereo = "CCO",
+      structure_exact_mass = "180.16",
+      structure_xlogp = "-3.0",
+      structure_tag = "clean",
+      structure_molecular_formula = "C12H22O11"
+    ),
+    met_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = c("IK4", "IK4"),
+      structure_smiles_no_stereo = c("CCO", "CCO"),
+      structure_name = c("SUCROSE", "sucrose")
+    ),
+    nam_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = "IK4",
+      structure_tax_cla_chemontid = "CHEMONTID:0000000",
+      structure_tax_cla_01kin = "Organic compounds",
+      structure_tax_cla_02sup = "Carbohydrates",
+      structure_tax_cla_03cla = "Oligosaccharides",
+      structure_tax_cla_04dirpar = "Disaccharides"
+    ),
+    cla_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_smiles_no_stereo = "CCO",
+      structure_tax_npc_01pat = "Pathway",
+      structure_tax_npc_02sup = "Superclass",
+      structure_tax_npc_03cla = "Class"
+    ),
+    npc_file,
+    sep = "\t"
+  )
+
+  out <- complement_metadata_structures(
+    df,
+    str_stereo = st_file,
+    str_met = met_file,
+    str_nam = nam_file,
+    str_tax_cla = cla_file,
+    str_tax_npc = npc_file
+  )
+
+  expect_equal(length(unique(out$candidate_structure_name)), 1L)
+  expect_equal(unique(out$candidate_structure_name), "SUCROSE")
+})
+
+test_that("metadata and names keyed by structure_inchikey are mapped via stereo", {
+  df <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = "IK5-CONN",
+    candidate_structure_smiles_no_stereo = "CNO"
+  )
+
+  st_file <- temp_test_path("inchikey_only_st.tsv")
+  met_file <- temp_test_path("inchikey_only_met.tsv")
+  nam_file <- temp_test_path("inchikey_only_nam.tsv")
+  cla_file <- temp_test_path("inchikey_only_cla.tsv")
+  npc_file <- temp_test_path("inchikey_only_npc.tsv")
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey = "IK5-FULL-KEY",
+      structure_inchikey_connectivity_layer = "IK5-CONN",
+      structure_smiles_no_stereo = "CNO"
+    ),
+    st_file,
+    sep = "\t"
+  )
+
+  # Metadata + names intentionally keyed only by full inchikey.
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey = "IK5-FULL-KEY",
+      structure_exact_mass = "250.12",
+      structure_xlogp = "1.5",
+      structure_tag = "clean_lookup",
+      structure_molecular_formula = "C10H18N2O5"
+    ),
+    met_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey = "IK5-FULL-KEY",
+      structure_name = "MappedByInchikey"
+    ),
+    nam_file,
+    sep = "\t"
+  )
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = "IK5-CONN",
+      structure_tax_cla_chemontid = "CHEMONTID:0000000",
+      structure_tax_cla_01kin = "Organic compounds",
+      structure_tax_cla_02sup = "Alkaloids",
+      structure_tax_cla_03cla = "Amines",
+      structure_tax_cla_04dirpar = "Primary amines"
+    ),
+    cla_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_smiles_no_stereo = "CNO",
+      structure_tax_npc_01pat = "Pathway",
+      structure_tax_npc_02sup = "Superclass",
+      structure_tax_npc_03cla = "Class"
+    ),
+    npc_file,
+    sep = "\t"
+  )
+
+  out <- complement_metadata_structures(
+    df,
+    str_stereo = st_file,
+    str_met = met_file,
+    str_nam = nam_file,
+    str_tax_cla = cla_file,
+    str_tax_npc = npc_file
+  )
+
+  expect_equal(out$candidate_structure_exact_mass[[1]], "250.12")
+  expect_equal(out$candidate_structure_molecular_formula[[1]], "C10H18N2O5")
+  expect_equal(out$candidate_structure_xlogp[[1]], "1.5")
+  expect_equal(out$candidate_structure_tag[[1]], "clean_lookup")
+  expect_equal(out$candidate_structure_name[[1]], "MappedByInchikey")
+})
+
