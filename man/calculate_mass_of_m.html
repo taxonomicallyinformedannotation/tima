@@ -299,7 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/create_dir.html" class="sidebar-item-text sidebar-link">
+  <a href="../man/create_dir.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_dir</span></a>
   </div>
 </li>
@@ -651,6 +651,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
@@ -695,7 +696,7 @@ where:
 <code id="mz">mz</code>
 </td>
 <td>
-Numeric observed m/z value in Daltons. Must be positive.
+numeric Observed m/z value in Daltons. Must be positive.
 </td>
 </tr>
 <tr>
@@ -703,7 +704,7 @@ Numeric observed m/z value in Daltons. Must be positive.
 <code id="adduct_string">adduct_string</code>
 </td>
 <td>
-Character string representing the adduct (e.g., <code>[M+H]+</code>, <code>[2M+Na]+</code>, <code>[M-H2O+H]+</code>)
+character Adduct notation string (e.g., <code>[M+H]+</code>, <code>[2M+Na]+</code>, <code>[M-H2O+H]+</code>)
 </td>
 </tr>
 <tr>
@@ -711,7 +712,7 @@ Character string representing the adduct (e.g., <code>[M+H]+</code>, <code>[2M+N
 <code id="electron_mass">electron_mass</code>
 </td>
 <td>
-Numeric electron mass in Daltons (default: ELECTRON_MASS_DALTONS from constants.R - CODATA 2018 value)
+numeric Electron mass in Daltons (default: ELECTRON_MASS_DALTONS from constants.R - CODATA 2018 value)
 </td>
 </tr>
 </tbody></table>
@@ -720,41 +721,49 @@ Numeric electron mass in Daltons (default: ELECTRON_MASS_DALTONS from constants.
 <h3 class="anchored" data-anchor-id="value">Value</h3>
 <p>Numeric neutral mass (M) in Daltons. Returns 0 if: - Adduct parsing fails - Invalid input parameters - Division by zero would occur (n_mer = 0 or n_charges = 0) Returns NA if calculated mass is negative (physically impossible)</p>
 </section>
+<section id="see-also" class="level3">
+<h3 class="anchored" data-anchor-id="see-also">See Also</h3>
+<p>Other mass-spectrometry: <code>calculate_mz_from_mass()</code>, <code>calculate_similarity()</code>, <code>harmonize_adducts()</code>, <code>import_spectra()</code>, <code>parse_adduct()</code></p>
+</section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple protonated molecule</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">123.4567</span>, <span class="at">adduct_string =</span> <span class="st">"[M+H]+"</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: ~122.45 Da</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Sodium adduct</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">145.4421</span>, <span class="at">adduct_string =</span> <span class="st">"[M+Na]+"</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: ~122.45 Da</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Complex adduct with water loss</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">105.4467</span>, <span class="at">adduct_string =</span> <span class="st">"[M+H-H2O]+"</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: ~122.45 Da</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Dimer</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">245.9053</span>, <span class="at">adduct_string =</span> <span class="st">"[2M+H]+"</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: ~122.45 Da</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Doubly charged</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">62.2311</span>, <span class="at">adduct_string =</span> <span class="st">"[M+2H]2+"</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: ~122.45 Da</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># M+1 isotopologue</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">124.4600</span>, <span class="at">adduct_string =</span> <span class="st">"[M1+H]+"</span>)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: ~122.45 Da</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Using custom electron mass (for testing)</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">mz =</span> <span class="fl">123.4567</span>,</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">adduct_string =</span> <span class="st">"[M+H]+"</span>,</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">electron_mass =</span> <span class="fl">0.0005486</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">123.4567</span>, <span class="at">adduct_string =</span> <span class="st">"[M+H]+"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 122.4489</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: ~122.45 Da</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Sodium adduct</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">145.4421</span>, <span class="at">adduct_string =</span> <span class="st">"[M+Na]+"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 122.4523</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: ~122.45 Da</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Complex adduct with water loss</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">105.4467</span>, <span class="at">adduct_string =</span> <span class="st">"[M+H-H2O]+"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 122.4494</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: ~122.45 Da</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Dimer</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">245.9053</span>, <span class="at">adduct_string =</span> <span class="st">"[2M+H]+"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 122.4487</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: ~122.45 Da</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Doubly charged</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mass_of_m</span>(<span class="at">mz =</span> <span class="fl">62.2311</span>, <span class="at">adduct_string =</span> <span class="st">"[M+2H]2+"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 122.4465</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: ~122.45 Da</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

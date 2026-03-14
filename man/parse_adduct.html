@@ -299,7 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/create_dir.html" class="sidebar-item-text sidebar-link">
+  <a href="../man/create_dir.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_dir</span></a>
   </div>
 </li>
@@ -651,6 +651,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
@@ -741,6 +742,10 @@ Integer charge polarity (+1 for positive mode, -1 for negative mode)
 </tbody></table>
 <p>Returns all zeros if parsing fails.</p>
 </section>
+<section id="see-also" class="level3">
+<h3 class="anchored" data-anchor-id="see-also">See Also</h3>
+<p>Other mass-spectrometry: <code>calculate_mass_of_m()</code>, <code>calculate_mz_from_mass()</code>, <code>calculate_similarity()</code>, <code>harmonize_adducts()</code>, <code>import_spectra()</code></p>
+</section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
@@ -754,12 +759,10 @@ Integer charge polarity (+1 for positive mode, -1 for negative mode)
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Complex adducts</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M+Na]+"</span>) <span class="co"># Dimer with sodium</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M+H-H2O]+"</span>) <span class="co"># Protonated with water loss</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M1+H]+"</span>) <span class="co"># M+1 isotopologue</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M1-C6H12O6 (hexose)+NaCl+H]2+"</span>) <span class="co"># Complex modification</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Error cases</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="cn">NULL</span>) <span class="co"># Returns all zeros</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"invalid"</span>) <span class="co"># Returns all zeros with warning</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Advanced cases</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[M1+H]+"</span>) <span class="co"># M+1 isotopologue</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_adduct</span>(<span class="st">"[2M1-C6H12O6 (hexose)+NaCl+H]2+"</span>) <span class="co"># Complex modification</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

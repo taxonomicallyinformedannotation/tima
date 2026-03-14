@@ -299,7 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/create_dir.html" class="sidebar-item-text sidebar-link">
+  <a href="../man/create_dir.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_dir</span></a>
   </div>
 </li>
@@ -651,6 +651,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
@@ -698,7 +699,7 @@ no NaN; sorted by m/z). This is automatically done by
 <code id="method">method</code>
 </td>
 <td>
-Character string specifying method: "entropy", "gnps", or "cosine"
+character Similarity method: "entropy", "gnps", or "cosine"
 </td>
 </tr>
 <tr>
@@ -706,7 +707,7 @@ Character string specifying method: "entropy", "gnps", or "cosine"
 <code id="query_spectrum">query_spectrum</code>
 </td>
 <td>
-Numeric matrix with columns for mz and intensity
+matrix Numeric matrix with columns for mz and intensity
 </td>
 </tr>
 <tr>
@@ -714,7 +715,7 @@ Numeric matrix with columns for mz and intensity
 <code id="target_spectrum">target_spectrum</code>
 </td>
 <td>
-Numeric matrix with columns for mz and intensity
+matrix Numeric matrix with columns for mz and intensity
 </td>
 </tr>
 <tr>
@@ -722,7 +723,7 @@ Numeric matrix with columns for mz and intensity
 <code id="query_precursor">query_precursor</code>
 </td>
 <td>
-Numeric precursor m/z value for query
+numeric Precursor m/z value for query
 </td>
 </tr>
 <tr>
@@ -730,7 +731,7 @@ Numeric precursor m/z value for query
 <code id="target_precursor">target_precursor</code>
 </td>
 <td>
-Numeric precursor m/z value for target
+numeric Precursor m/z value for target
 </td>
 </tr>
 <tr>
@@ -738,7 +739,7 @@ Numeric precursor m/z value for target
 <code id="dalton">dalton</code>
 </td>
 <td>
-Numeric Dalton tolerance for peak matching
+numeric Dalton tolerance for peak matching
 </td>
 </tr>
 <tr>
@@ -746,7 +747,7 @@ Numeric Dalton tolerance for peak matching
 <code id="ppm">ppm</code>
 </td>
 <td>
-Numeric PPM tolerance for peak matching
+numeric PPM tolerance for peak matching
 </td>
 </tr>
 <tr>
@@ -754,7 +755,7 @@ Numeric PPM tolerance for peak matching
 <code id="return_matched_peaks">return_matched_peaks</code>
 </td>
 <td>
-Logical; return matched peaks count? Not compatible with ‘entropy’ method. Default: FALSE
+logical Return matched peaks count? Not compatible with ‘entropy’ method. Default: FALSE
 </td>
 </tr>
 <tr>
@@ -770,6 +771,10 @@ Additional arguments passed to MsCoreUtils::join (cosine only)
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
 <p>Numeric similarity score (0-1), or list with score and matches if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.</p>
+</section>
+<section id="see-also" class="level3">
+<h3 class="anchored" data-anchor-id="see-also">See Also</h3>
+<p>Other mass-spectrometry: <code>calculate_mass_of_m()</code>, <code>calculate_mz_from_mass()</code>, <code>harmonize_adducts()</code>, <code>import_spectra()</code>, <code>parse_adduct()</code></p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

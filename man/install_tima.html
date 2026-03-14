@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>annotate_masses – tima</title>
+<title>install_tima – tima</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,7 +65,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../man/annotate_spectra.html" rel="next">
 <link href="../man/figures/logo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -191,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Functions</li><li class="breadcrumb-item"><a href="../man/annotate_masses.html">Annotate</a></li><li class="breadcrumb-item"><a href="../man/annotate_masses.html">annotate_masses</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -214,16 +213,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
  <span class="menu-text">Annotate</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/annotate_masses.html" class="sidebar-item-text sidebar-link active">
+  <a href="../man/annotate_masses.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">annotate_masses</span></a>
   </div>
 </li>
@@ -644,7 +643,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#annotate-masses" id="toc-annotate-masses" class="nav-link active" data-scroll-target="#annotate-masses">Annotate masses</a>
+  <li><a href="#install-tima-package-and-dependencies" id="toc-install-tima-package-and-dependencies" class="nav-link active" data-scroll-target="#install-tima-package-and-dependencies">Install TIMA Package and Dependencies</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -657,44 +656,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Functions</li><li class="breadcrumb-item"><a href="../man/annotate_masses.html">Annotate</a></li><li class="breadcrumb-item"><a href="../man/annotate_masses.html">annotate_masses</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
 <script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-<section id="annotate-masses" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="annotate-masses">Annotate masses</h2>
+<section id="install-tima-package-and-dependencies" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="install-tima-package-and-dependencies">Install TIMA Package and Dependencies</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function annotates a feature table based on exact mass match. It requires a structural library, its metadata, and lists of adducts, clusters, and neutral losses to be considered. The polarity has to be <code>pos</code> or <code>neg</code> and retention time and mass tolerances should be given. The feature table is expected to be pre-formatted.</p>
+<p>Installs or updates the TIMA package from r-universe and sets up a Python virtual environment with dependencies.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">annotate_masses(
-  features = get_params(step = "annotate_masses")\$files\$features\$prepared,
-  output_annotations = get_params(step =
-    "annotate_masses")\$files\$annotations\$prepared\$structural\$ms1,
-  output_edges = get_params(step =
-    "annotate_masses")\$files\$networks\$spectral\$edges\$raw\$ms1,
-  name_source = get_params(step = "annotate_masses")\$names\$source,
-  name_target = get_params(step = "annotate_masses")\$names\$target,
-  library = get_params(step = "annotate_masses")\$files\$libraries\$sop\$merged\$keys,
-  str_stereo = get_params(step =
-    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$stereo,
-  str_met = get_params(step =
-    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$metadata,
-  str_nam = get_params(step =
-    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$names,
-  str_tax_cla = get_params(step =
-    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$cla,
-  str_tax_npc = get_params(step =
-    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$npc,
-  adducts_list = get_params(step = "annotate_masses")\$ms\$adducts,
-  clusters_list = get_params(step = "annotate_masses")\$ms\$clusters,
-  neutral_losses_list = get_params(step = "annotate_masses")\$ms\$neutral_losses,
-  ms_mode = get_params(step = "annotate_masses")\$ms\$polarity,
-  tolerance_ppm = get_params(step = "annotate_masses")\$ms\$tolerances\$mass\$ppm\$ms1,
-  tolerance_rt = get_params(step = "annotate_masses")\$ms\$tolerances\$rt\$adducts
+<pre><code class="language-R">install_tima(
+  package = "tima",
+  repos = c("https://taxonomicallyinformedannotation.r-universe.dev",
+    "https://bioc.r-universe.dev", "https://cloud.r-project.org"),
+  dependencies = TRUE
 )
 </code></pre>
 </section>
@@ -703,175 +682,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table role="presentation">
 <tbody><tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="features">features</code>
+<code id="package">package</code>
 </td>
 <td>
-Table containing your previous annotation to complement
+character Name of the package (default: "tima")
 </td>
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="output_annotations">output_annotations</code>
+<code id="repos">repos</code>
 </td>
 <td>
-Output for mass based structural annotations
+character Vector of repository URLs
 </td>
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="output_edges">output_edges</code>
+<code id="dependencies">dependencies</code>
 </td>
 <td>
-Output for mass based edges
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="name_source">name_source</code>
-</td>
-<td>
-Name of the source features column
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="name_target">name_target</code>
-</td>
-<td>
-Name of the target features column
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="library">library</code>
-</td>
-<td>
-Library containing the keys
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_stereo">str_stereo</code>
-</td>
-<td>
-File containing structures stereo
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_met">str_met</code>
-</td>
-<td>
-File containing structures metadata
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_nam">str_nam</code>
-</td>
-<td>
-File containing structures names
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_tax_cla">str_tax_cla</code>
-</td>
-<td>
-File containing Classyfire taxonomy
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_tax_npc">str_tax_npc</code>
-</td>
-<td>
-File containing NPClassifier taxonomy
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="adducts_list">adducts_list</code>
-</td>
-<td>
-List of adducts to be used
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="clusters_list">clusters_list</code>
-</td>
-<td>
-List of clusters to be used
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="neutral_losses_list">neutral_losses_list</code>
-</td>
-<td>
-List of neutral losses to be used
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="ms_mode">ms_mode</code>
-</td>
-<td>
-Ionization mode. Must be ‘pos’ or ‘neg’
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="tolerance_ppm">tolerance_ppm</code>
-</td>
-<td>
-Tolerance to perform annotation. Should be &lt;= 20 ppm
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="tolerance_rt">tolerance_rt</code>
-</td>
-<td>
-Tolerance to group adducts. Should be &lt;= 0.05 minutes
+logical Whether to install dependencies (default: TRUE)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the files containing MS1 annotations and edges</p>
+<p>NULL (invisibly). Installs packages and sets up Python environment as side effects.</p>
 </section>
 <section id="see-also" class="level3">
 <h3 class="anchored" data-anchor-id="see-also">See Also</h3>
-<p>Other annotation: <code>annotate_spectra()</code>, <code>filter_annotations()</code>, <code>weight_annotations()</code></p>
+<p>Other workflow: <code>change_params_small()</code>, <code>create_components()</code>, <code>create_edges()</code>, <code>create_edges_spectra()</code>, <code>go_to_cache()</code>, <code>install()</code>, <code>run_app()</code>, <code>run_tima()</code>, <code>tima_full()</code>, <code>validate_inputs()</code></p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">copy_backbone</span>()</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">go_to_cache</span>()</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>github <span class="ot">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/"</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>repo <span class="ot">&lt;-</span> <span class="st">"taxonomicallyinformedannotation/tima-example-files/main/"</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>data_interim <span class="ot">&lt;-</span> <span class="st">"data/interim/"</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(github, repo)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir, data_interim)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>dir_sop_mer <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir, <span class="st">"libraries/sop/merged/"</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>dir_str <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir_sop_mer, <span class="st">"structures/"</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>dir_tax <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir_str, <span class="st">"taxonomies/"</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">annotate_masses</span>(</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="fu">paste0</span>(dir, <span class="st">"features/example_features.tsv"</span>),</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">library =</span> <span class="fu">paste0</span>(dir_sop_mer, <span class="st">"keys.tsv"</span>),</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_stereo =</span> <span class="fu">paste0</span>(dir_str, <span class="st">"stereo.tsv"</span>),</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_met =</span> <span class="fu">paste0</span>(dir_str, <span class="st">"metadata.tsv"</span>),</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_nam =</span> <span class="fu">paste0</span>(dir_str, <span class="st">"names.tsv"</span>),</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_cla =</span> <span class="fu">paste0</span>(dir_tax, <span class="st">"classyfire.tsv"</span>),</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_npc =</span> <span class="fu">paste0</span>(dir_tax, <span class="st">"npc.tsv"</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install_tima</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
@@ -1279,15 +1127,6 @@ Tolerance to group adducts. Should be &lt;= 0.05 minutes
     }
   });
   </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../man/annotate_spectra.html" class="pagination-link" aria-label="annotate_spectra">
-        <span class="nav-page-text">annotate_spectra</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 
 

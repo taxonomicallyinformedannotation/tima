@@ -262,7 +262,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./man/create_dir.html" class="sidebar-item-text sidebar-link">
+  <a href="./man/create_dir.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_dir</span></a>
   </div>
 </li>
@@ -608,12 +608,23 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#tima" id="toc-tima" class="nav-link active" data-scroll-target="#tima">tima</a></li>
-  <li><a href="#tima-2.13.0" id="toc-tima-2.13.0" class="nav-link" data-scroll-target="#tima-2.13.0">tima 2.13.0</a>
+  <li><a href="#tima-2.12.0.9000-development" id="toc-tima-2.12.0.9000-development" class="nav-link active" data-scroll-target="#tima-2.12.0.9000-development">tima 2.12.0.9000 (development)</a>
   <ul class="collapse">
-  <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link" data-scroll-target="#breaking-changes">Breaking Changes</a></li>
+  <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link" data-scroll-target="#breaking-changes">Breaking changes</a></li>
+  <li><a href="#new-features" id="toc-new-features" class="nav-link" data-scroll-target="#new-features">New features</a></li>
+  <li><a href="#internal-performance" id="toc-internal-performance" class="nav-link" data-scroll-target="#internal-performance">Internal / performance</a></li>
+  <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
+  <li><a href="#data-updates" id="toc-data-updates" class="nav-link" data-scroll-target="#data-updates">Data updates</a></li>
   </ul></li>
-  <li><a href="#tima-2.12.0" id="toc-tima-2.12.0" class="nav-link" data-scroll-target="#tima-2.12.0">tima 2.12.0</a></li>
+  <li><a href="#tima-2.12.0" id="toc-tima-2.12.0" class="nav-link" data-scroll-target="#tima-2.12.0">tima 2.12.0</a>
+  <ul class="collapse">
+  <li><a href="#breaking-changes-1" id="toc-breaking-changes-1" class="nav-link" data-scroll-target="#breaking-changes-1">Breaking changes</a></li>
+  <li><a href="#new-features-1" id="toc-new-features-1" class="nav-link" data-scroll-target="#new-features-1">New features</a></li>
+  <li><a href="#bug-fixes" id="toc-bug-fixes" class="nav-link" data-scroll-target="#bug-fixes">Bug fixes</a></li>
+  <li><a href="#internal-performance-1" id="toc-internal-performance-1" class="nav-link" data-scroll-target="#internal-performance-1">Internal / performance</a></li>
+  <li><a href="#documentation-1" id="toc-documentation-1" class="nav-link" data-scroll-target="#documentation-1">Documentation</a></li>
+  <li><a href="#data-updates-1" id="toc-data-updates-1" class="nav-link" data-scroll-target="#data-updates-1">Data updates</a></li>
+  </ul></li>
   <li><a href="#tima-2.11.1-unreleased" id="toc-tima-2.11.1-unreleased" class="nav-link" data-scroll-target="#tima-2.11.1-unreleased">tima 2.11.1 (unreleased)</a></li>
   <li><a href="#tima-2.11.0" id="toc-tima-2.11.0" class="nav-link" data-scroll-target="#tima-2.11.0">tima 2.11.0</a></li>
   <li><a href="#tima-2.10.0" id="toc-tima-2.10.0" class="nav-link" data-scroll-target="#tima-2.10.0">tima 2.10.0</a></li>
@@ -656,11 +667,21 @@ ul.task-list li input[type="checkbox"] {
 
 
 <script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-<section id="tima" class="level1">
-<h1>tima</h1>
+<section id="tima-2.12.0.9000-development" class="level1">
+<h1>tima 2.12.0.9000 (development)</h1>
+<section id="breaking-changes" class="level2">
+<h2 class="anchored" data-anchor-id="breaking-changes">Breaking changes</h2>
+<ul>
+<li><code>sanitize_spectra()</code>: <code>cutoff</code> parameter now defaults to <code>NULL</code> (dynamic) instead of <code>0</code></li>
+<li><code>annotate_spectra()</code> / <code>create_edges_spectra()</code>: the misspelled <code>qutoff</code> parameter is deprecated; use <code>cutoff</code> instead</li>
+<li><code>install()</code> is deprecated in favor of <code>install_tima()</code></li>
+<li><code>validate_install_inputs()</code> no longer accepts a <code>test</code> parameter</li>
+<li><code>show_system_messages()</code> no longer accepts a <code>test</code> parameter</li>
+<li><code>R.utils</code> moved from Imports to Suggests</li>
+</ul>
 </section>
-<section id="tima-2.13.0" class="level1">
-<h1>tima 2.13.0</h1>
+<section id="new-features" class="level2">
+<h2 class="anchored" data-anchor-id="new-features">New features</h2>
 <ul>
 <li>Added a new validation helper, see <a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html" class="uri">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html</a></li>
 <li>Added <a href="http://bigg.ucsd.edu/">BiGG</a> as SOP library</li>
@@ -674,21 +695,45 @@ ul.task-list li input[type="checkbox"] {
 <li>Dynamic intensity thresholds (MAD-based, now default when <code>cutoff = NULL</code>)</li>
 <li>Low noise removal targets repetitive instrumental artifacts</li>
 </ul></li>
+</ul>
+</section>
+<section id="internal-performance" class="level2">
+<h2 class="anchored" data-anchor-id="internal-performance">Internal / performance</h2>
+<ul>
 <li>Improved log and error messages</li>
-<li>More in depth molecular sanitization</li>
+<li>More in-depth molecular sanitization</li>
+<li>Standardized error handling to use <code>cli::cli_abort()</code> in exported functions</li>
+<li>Replaced nested <code>ifelse()</code> in <code>format_bytes()</code> with <code>findInterval()</code></li>
+<li>Fixed <code>1:n</code> patterns to use <code>seq_len()</code> for safety</li>
 <li>Updated the C implementation of the spectral similarity</li>
+</ul>
+</section>
+<section id="documentation" class="level2">
+<h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
+<ul>
+<li>Startup message now uses <code>cli::cli_inform()</code></li>
+</ul>
+</section>
+<section id="data-updates" class="level2">
+<h2 class="anchored" data-anchor-id="data-updates">Data updates</h2>
+<ul>
 <li>Updated to Massbank version <code>2025.10</code></li>
 <li>Updated to MSnLib <code>v7</code></li>
-</ul>
-<section id="breaking-changes" class="level2">
-<h2 class="anchored" data-anchor-id="breaking-changes">Breaking Changes</h2>
-<ul>
-<li><code>sanitize_spectra()</code>: <code>cutoff</code> parameter now defaults to <code>NULL</code> (dynamic) instead of <code>0</code></li>
 </ul>
 </section>
 </section>
 <section id="tima-2.12.0" class="level1">
 <h1>tima 2.12.0</h1>
+<section id="breaking-changes-1" class="level2">
+<h2 class="anchored" data-anchor-id="breaking-changes-1">Breaking changes</h2>
+<ul>
+<li><code>.RDS</code> spectra are now stored more efficiently. To avoid errors, delete any <code>.RDS</code> files created before version <code>2.12.0</code></li>
+<li><code>tima_full()</code> has been deprecated in favor of <code>run_tima()</code></li>
+<li>Updated minimal R version to <code>4.4.0</code> (and related Bioconductor dependencies)</li>
+</ul>
+</section>
+<section id="new-features-1" class="level2">
+<h2 class="anchored" data-anchor-id="new-features-1">New features</h2>
 <ul>
 <li>Added automatic retention time conversion (in minutes)</li>
 <li>Added a minimal output</li>
@@ -696,26 +741,44 @@ ul.task-list li input[type="checkbox"] {
 <li>Added MERLIN spectral libraries (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/190">#190</a>)</li>
 <li>Added optional compound name from RT libraries</li>
 <li>Added <code>RDKit</code>-based structures processing through <code>reticulate</code> (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/19">#19</a>)</li>
-<li>Breaking Change: <code>.RDS</code> spectra are now stored more efficiently. To avoid errors, delete any <code>.RDS</code> files created before version <code>2.12.0</code></li>
-<li>Externalized spectral libraries preparation to <a href="https://github.com/Adafede/SpectRalLibRaRies">SpectRalLibRaRies</a></li>
-<li>Fix memory crashes in case of large number of ties, limiting to 7 with note (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/216">#216</a>)</li>
 <li>Introduced similarity method argument (entropy and GNPS for now)</li>
+</ul>
+</section>
+<section id="bug-fixes" class="level2">
+<h2 class="anchored" data-anchor-id="bug-fixes">Bug fixes</h2>
+<ul>
+<li>Fixed memory crashes in case of large number of ties, limiting to 7 with note (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/216">#216</a>)</li>
+</ul>
+</section>
+<section id="internal-performance-1" class="level2">
+<h2 class="anchored" data-anchor-id="internal-performance-1">Internal / performance</h2>
+<ul>
+<li>Externalized spectral libraries preparation to <a href="https://github.com/Adafede/SpectRalLibRaRies">SpectRalLibRaRies</a></li>
 <li>Implemented GNPS similarity method in C</li>
 <li>Improved high confidence filtering</li>
 <li>Improved logs using <code>logger</code> (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/189">#189</a>)</li>
 <li>Keep (only) the best molecular formula and canopus annotations from SIRIUS</li>
-<li>New ISDB version with 1 million compounds (see <a href="https://doi.org/10.5281/zenodo.14887271" class="uri">https://doi.org/10.5281/zenodo.14887271</a>)</li>
 <li>Reduced dependencies and moved some to <code>Suggests</code></li>
 <li>Refactored adducts parsing to read adducts like <code>[M+H]+/[M]+</code></li>
 <li>Refactored MS1 annotation step to work per sample (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/194">#194</a>)</li>
 <li>Refactored tests</li>
 <li>Renamed some functions/utils for consistency</li>
 <li>Replaced <code>logger</code> with <code>lgr</code> for <code>covr</code> compatibility</li>
-<li>Switched documentation from <code>pkgdown</code> to <code>altdoc</code></li>
-<li><code>tima_full()</code> has been deprecated in favor of <code>run_tima()</code></li>
-<li>Updated to Massbank version <code>2025.05.1</code></li>
-<li>Updated minimal R version to <code>4.4.0</code> (and related Bioconductor dependencies)</li>
 </ul>
+</section>
+<section id="documentation-1" class="level2">
+<h2 class="anchored" data-anchor-id="documentation-1">Documentation</h2>
+<ul>
+<li>Switched documentation from <code>pkgdown</code> to <code>altdoc</code></li>
+</ul>
+</section>
+<section id="data-updates-1" class="level2">
+<h2 class="anchored" data-anchor-id="data-updates-1">Data updates</h2>
+<ul>
+<li>New ISDB version with 1 million compounds (see <a href="https://doi.org/10.5281/zenodo.14887271" class="uri">https://doi.org/10.5281/zenodo.14887271</a>)</li>
+<li>Updated to Massbank version <code>2025.05.1</code></li>
+</ul>
+</section>
 </section>
 <section id="tima-2.11.1-unreleased" class="level1">
 <h1>tima 2.11.1 (unreleased)</h1>

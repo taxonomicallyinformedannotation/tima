@@ -299,7 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/create_dir.html" class="sidebar-item-text sidebar-link">
+  <a href="../man/create_dir.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_dir</span></a>
   </div>
 </li>
@@ -652,6 +652,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
   <li><a href="#details" id="toc-details" class="nav-link" data-scroll-target="#details">Details</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
@@ -687,7 +688,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="target_pattern">target_pattern</code>
 </td>
 <td>
-Character. Regex pattern for target selection. Default: "^ann_wei$" (annotation preparation target)
+character Regex pattern for target selection. Default: "^ann_wei$" (annotation preparation target)
 </td>
 </tr>
 <tr>
@@ -695,7 +696,7 @@ Character. Regex pattern for target selection. Default: "^ann_wei$" (annotation 
 <code id="log_file">log_file</code>
 </td>
 <td>
-Character. Path to log file. Default: "tima.log"
+character Path to log file. Default: "tima.log"
 </td>
 </tr>
 <tr>
@@ -703,7 +704,7 @@ Character. Path to log file. Default: "tima.log"
 <code id="clean_old_logs">clean_old_logs</code>
 </td>
 <td>
-Logical. Remove old log file before starting. Default: TRUE
+logical Remove old log file before starting. Default: TRUE
 </td>
 </tr>
 <tr>
@@ -711,7 +712,7 @@ Logical. Remove old log file before starting. Default: TRUE
 <code id="log_level">log_level</code>
 </td>
 <td>
-Character or numeric. Logging verbosity level. Can be one of: "trace", "debug", "info", "warn", "error", "fatal" or numeric values: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200, FATAL=100. Default: "info" (400). Use "debug" for detailed troubleshooting.
+character or numeric Logging verbosity level. Can be one of: "trace", "debug", "info", "warn", "error", "fatal" or numeric values: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200, FATAL=100. Default: "info" (400). Use "debug" for detailed troubleshooting.
 </td>
 </tr>
 </tbody></table>
@@ -737,6 +738,10 @@ Character or numeric. Logging verbosity level. Can be one of: "trace", "debug", 
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
 <p>Invisible NULL. Executes workflow as side effect and creates timestamped log files in data/processed/</p>
+</section>
+<section id="see-also" class="level3">
+<h3 class="anchored" data-anchor-id="see-also">See Also</h3>
+<p>Other workflow: <code>change_params_small()</code>, <code>create_components()</code>, <code>create_edges()</code>, <code>create_edges_spectra()</code>, <code>go_to_cache()</code>, <code>install()</code>, <code>install_tima()</code>, <code>run_app()</code>, <code>tima_full()</code>, <code>validate_inputs()</code></p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

@@ -299,7 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/create_dir.html" class="sidebar-item-text sidebar-link">
+  <a href="../man/create_dir.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_dir</span></a>
   </div>
 </li>
@@ -651,6 +651,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
@@ -682,7 +683,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "create_edges_spectra")\$similarities\$thresholds\$matched_peaks,
   ppm = get_params(step = "create_edges_spectra")\$ms\$tolerances\$mass\$ppm\$ms2,
   dalton = get_params(step = "create_edges_spectra")\$ms\$tolerances\$mass\$dalton\$ms2,
-  qutoff = get_params(step = "create_edges_spectra")\$ms\$thresholds\$ms2\$intensity
+  cutoff = get_params(step = "create_edges_spectra")\$ms\$thresholds\$ms2\$intensity,
+  qutoff = deprecated()
 )
 </code></pre>
 </section>
@@ -694,7 +696,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="input">input</code>
 </td>
 <td>
-Character string path or list of paths to query MGF file(s) containing spectra
+character Path or list of paths to query MGF file(s) containing spectra
 </td>
 </tr>
 <tr>
@@ -702,7 +704,7 @@ Character string path or list of paths to query MGF file(s) containing spectra
 <code id="output">output</code>
 </td>
 <td>
-Character string path for output edges file
+character Path for output edges file
 </td>
 </tr>
 <tr>
@@ -710,7 +712,7 @@ Character string path for output edges file
 <code id="name_source">name_source</code>
 </td>
 <td>
-Character string name of source feature column
+character Name of source feature column
 </td>
 </tr>
 <tr>
@@ -718,7 +720,7 @@ Character string name of source feature column
 <code id="name_target">name_target</code>
 </td>
 <td>
-Character string name of target feature column
+character Name of target feature column
 </td>
 </tr>
 <tr>
@@ -726,7 +728,7 @@ Character string name of target feature column
 <code id="method">method</code>
 </td>
 <td>
-Character string similarity method to use
+character Similarity method to use
 </td>
 </tr>
 <tr>
@@ -734,7 +736,7 @@ Character string similarity method to use
 <code id="threshold">threshold</code>
 </td>
 <td>
-Numeric minimum similarity threshold (0-1) to report edge
+numeric Minimum similarity threshold (0-1) to report edge
 </td>
 </tr>
 <tr>
@@ -742,7 +744,7 @@ Numeric minimum similarity threshold (0-1) to report edge
 <code id="matched_peaks">matched_peaks</code>
 </td>
 <td>
-Integer minimum number of matched peaks required
+integer Minimum number of matched peaks required
 </td>
 </tr>
 <tr>
@@ -750,7 +752,7 @@ Integer minimum number of matched peaks required
 <code id="ppm">ppm</code>
 </td>
 <td>
-Numeric relative mass tolerance in ppm
+numeric Relative mass tolerance in ppm
 </td>
 </tr>
 <tr>
@@ -758,7 +760,15 @@ Numeric relative mass tolerance in ppm
 <code id="dalton">dalton</code>
 </td>
 <td>
-Numeric absolute mass tolerance in Daltons
+numeric Absolute mass tolerance in Daltons
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="cutoff">cutoff</code>
+</td>
+<td>
+numeric Intensity cutoff below which MS2 fragments are removed. Non-negative numeric or NULL for dynamic thresholding.
 </td>
 </tr>
 <tr>
@@ -766,7 +776,7 @@ Numeric absolute mass tolerance in Daltons
 <code id="qutoff">qutoff</code>
 </td>
 <td>
-Numeric intensity cutoff below which MS2 fragments are removed
+<a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated"><img src="../help/figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>cutoff</code> instead.
 </td>
 </tr>
 </tbody></table>
@@ -774,6 +784,10 @@ Numeric intensity cutoff below which MS2 fragments are removed
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
 <p>Character string path to the created spectral edges file</p>
+</section>
+<section id="see-also" class="level3">
+<h3 class="anchored" data-anchor-id="see-also">See Also</h3>
+<p>Other workflow: <code>change_params_small()</code>, <code>create_components()</code>, <code>create_edges()</code>, <code>go_to_cache()</code>, <code>install()</code>, <code>install_tima()</code>, <code>run_app()</code>, <code>run_tima()</code>, <code>tima_full()</code>, <code>validate_inputs()</code></p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

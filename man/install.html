@@ -297,7 +297,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/create_dir.html" class="sidebar-item-text sidebar-link">
+  <a href="../man/create_dir.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_dir</span></a>
   </div>
 </li>
@@ -643,12 +643,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#install-tima-package-and-dependencies" id="toc-install-tima-package-and-dependencies" class="nav-link active" data-scroll-target="#install-tima-package-and-dependencies">Install TIMA Package and Dependencies</a>
+  <li><a href="#install-tima-package-and-dependencies-deprecated" id="toc-install-tima-package-and-dependencies-deprecated" class="nav-link active" data-scroll-target="#install-tima-package-and-dependencies-deprecated">Install TIMA Package and Dependencies (DEPRECATED)</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
@@ -660,11 +661,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-<section id="install-tima-package-and-dependencies" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="install-tima-package-and-dependencies">Install TIMA Package and Dependencies</h2>
+<section id="install-tima-package-and-dependencies-deprecated" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="install-tima-package-and-dependencies-deprecated">Install TIMA Package and Dependencies (DEPRECATED)</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>Installs or updates the TIMA package from r-universe and sets up a Python virtual environment with dependencies.</p>
+<p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated"><img src="../help/figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a></p>
+<p><strong>DEPRECATED:</strong> Use <code>install_tima()</code> instead. <code>install()</code> will be removed in a future version. The generic name <code>install</code> risks masking other packages.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -684,7 +686,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="package">package</code>
 </td>
 <td>
-Character string name of the package (default: "tima")
+character Name of the package (default: "tima")
 </td>
 </tr>
 <tr>
@@ -692,7 +694,7 @@ Character string name of the package (default: "tima")
 <code id="repos">repos</code>
 </td>
 <td>
-Character vector of repository URLs
+character Vector of repository URLs
 </td>
 </tr>
 <tr>
@@ -700,21 +702,26 @@ Character vector of repository URLs
 <code id="dependencies">dependencies</code>
 </td>
 <td>
-Logical whether to install dependencies (default: TRUE)
+logical Whether to install dependencies (default: TRUE)
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>NULL (invisibly). Installs packages and sets up Python environment as side effects.</p>
+<p>NULL (invisibly).</p>
+</section>
+<section id="see-also" class="level3">
+<h3 class="anchored" data-anchor-id="see-also">See Also</h3>
+<p>Other workflow: <code>change_params_small()</code>, <code>create_components()</code>, <code>create_edges()</code>, <code>create_edges_spectra()</code>, <code>go_to_cache()</code>, <code>install_tima()</code>, <code>run_app()</code>, <code>run_tima()</code>, <code>tima_full()</code>, <code>validate_inputs()</code></p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">DEPRECATED</span><span class="co"> — use install_tima() instead</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">install_tima</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

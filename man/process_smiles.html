@@ -299,7 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/create_dir.html" class="sidebar-item-text sidebar-link">
+  <a href="../man/create_dir.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">create_dir</span></a>
   </div>
 </li>
@@ -651,6 +651,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
   <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
@@ -681,7 +682,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="df">df</code>
 </td>
 <td>
-Data frame containing SMILES strings
+data.frame Data frame containing SMILES strings
 </td>
 </tr>
 <tr>
@@ -689,7 +690,7 @@ Data frame containing SMILES strings
 <code id="smiles_colname">smiles_colname</code>
 </td>
 <td>
-Column name containing SMILES (default: "structure_smiles_initial")
+character Column name containing SMILES (default: "structure_smiles_initial")
 </td>
 </tr>
 <tr>
@@ -697,7 +698,7 @@ Column name containing SMILES (default: "structure_smiles_initial")
 <code id="cache">cache</code>
 </td>
 <td>
-Path to cached processed SMILES file, or NULL to skip caching
+character Path to cached processed SMILES file, or NULL to skip caching
 </td>
 </tr>
 </tbody></table>
@@ -705,6 +706,10 @@ Path to cached processed SMILES file, or NULL to skip caching
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
 <p>Data frame with processed SMILES including InChIKey, molecular formula (with isotopes shown), exact mass (with isotope contributions), 2D SMILES, xLogP, and connectivity layer</p>
+</section>
+<section id="see-also" class="level3">
+<h3 class="anchored" data-anchor-id="see-also">See Also</h3>
+<p>Other chemical-classification: <code>classy_magic()</code>, <code>get_classyfire_taxonomy()</code>, <code>normalize_inchikey()</code>, <code>npclassifier_classify_smiles()</code></p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
