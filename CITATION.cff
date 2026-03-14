@@ -6,7 +6,7 @@
 cff-version: 1.2.0
 message: 'To cite package "tima" in publications use:'
 type: software
-license: AGPL-3.0-or-later
+license: AGPL-3.0-only
 title: 'tima: Taxonomically Informed Metabolite Annotation'
 version: 2.12.0
 doi: 10.5281/zenodo.5797920
@@ -345,6 +345,23 @@ references:
   doi: 10.32614/CRAN.package.lgr
   version: '>= 0.5.0'
 - type: software
+  title: lifecycle
+  abstract: 'lifecycle: Manage the Life Cycle of your Package Functions'
+  notes: Imports
+  url: https://lifecycle.r-lib.org/
+  repository: https://CRAN.R-project.org/package=lifecycle
+  authors:
+  - family-names: Henry
+    given-names: Lionel
+    email: lionel@posit.co
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+    orcid: https://orcid.org/0000-0003-4757-117X
+  year: '2026'
+  doi: 10.32614/CRAN.package.lifecycle
+  version: '>= 1.0.4'
+- type: software
   title: methods
   abstract: 'R: A Language and Environment for Statistical Computing'
   notes: Imports
@@ -513,6 +530,22 @@ references:
   year: '2026'
   doi: 10.32614/CRAN.package.reticulate
   version: '>= 1.44.1'
+- type: software
+  title: rlang
+  abstract: 'rlang: Functions for Base Types and Core R and ''Tidyverse'' Features'
+  notes: Imports
+  url: https://rlang.r-lib.org
+  repository: https://CRAN.R-project.org/package=rlang
+  authors:
+  - family-names: Henry
+    given-names: Lionel
+    email: lionel@posit.co
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  year: '2026'
+  doi: 10.32614/CRAN.package.rlang
+  version: '>= 1.1.6'
 - type: software
   title: rotl
   abstract: 'rotl: Interface to the ''Open Tree of Life'' API'
@@ -729,23 +762,6 @@ references:
   doi: 10.32614/CRAN.package.knitr
   version: '>= 1.50'
 - type: software
-  title: lifecycle
-  abstract: 'lifecycle: Manage the Life Cycle of your Package Functions'
-  notes: Suggests
-  url: https://lifecycle.r-lib.org/
-  repository: https://CRAN.R-project.org/package=lifecycle
-  authors:
-  - family-names: Henry
-    given-names: Lionel
-    email: lionel@posit.co
-  - family-names: Wickham
-    given-names: Hadley
-    email: hadley@posit.co
-    orcid: https://orcid.org/0000-0003-4757-117X
-  year: '2026'
-  doi: 10.32614/CRAN.package.lifecycle
-  version: '>= 1.0.4'
-- type: software
   title: pkgload
   abstract: 'pkgload: Simulate Package Installation and Attach'
   notes: Suggests
@@ -782,22 +798,6 @@ references:
   year: '2026'
   doi: 10.32614/CRAN.package.quarto
   version: '>= 1.5.1'
-- type: software
-  title: rlang
-  abstract: 'rlang: Functions for Base Types and Core R and ''Tidyverse'' Features'
-  notes: Suggests
-  url: https://rlang.r-lib.org
-  repository: https://CRAN.R-project.org/package=rlang
-  authors:
-  - family-names: Henry
-    given-names: Lionel
-    email: lionel@posit.co
-  - family-names: Wickham
-    given-names: Hadley
-    email: hadley@posit.co
-  year: '2026'
-  doi: 10.32614/CRAN.package.rlang
-  version: '>= 1.1.6'
 - type: software
   title: shiny
   abstract: 'shiny: Web Application Framework for R'
