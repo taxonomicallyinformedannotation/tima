@@ -3,6 +3,7 @@
 
 ## usethis namespace: start
 #' @useDynLib tima, .registration = TRUE
+#' @importFrom lifecycle deprecated
 ## usethis namespace: end
 NULL
 
@@ -16,21 +17,17 @@ NULL
   # when the package is loaded. Instead, logging is initialized on-demand
   # when functions that need logging are called (e.g., run_tima()).
   # Users can still manually initialize logging with init_logging() if needed.
-  # Ensure RDKit and chembl_structure_pipeline availability for Python features
-  try(
-    {
-      reticulate::py_require(packages = c("rdkit", "chembl_structure_pipeline"))
-    },
-    silent = TRUE
-  )
+
+  # NOTE: Python/RDKit initialization is deferred to first use
+
+  # (e.g., process_smiles()) to avoid slow package loading and failures
+  # when Python is not installed. See load_python_smiles_processor().
 
   invisible()
 }
 
 .onAttach <- function(libname, pkgname) {
-  packageStartupMessage("Welcome to ", pkgname)
   packageStartupMessage(
-    utils::citation(package = pkgname) |>
-      format()
+    sprintf("Welcome to %s v%s", pkgname, utils::packageVersion(pkgname))
   )
 }

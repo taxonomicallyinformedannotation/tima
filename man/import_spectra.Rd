@@ -51,3 +51,12 @@ import_spectra(
 )
 }
 }
+\seealso{
+Other mass-spectrometry: 
+\code{\link{calculate_mass_of_m}()},
+\code{\link{calculate_mz_from_mass}()},
+\code{\link{calculate_similarity}()},
+\code{\link{harmonize_adducts}()},
+\code{\link{parse_adduct}()}
+}
+\concept{mass-spectrometry}

@@ -21,6 +21,8 @@
 #'   \item{charge}{Integer charge polarity (+1 for positive mode, -1 for negative mode)}
 #'   Returns all zeros if parsing fails.
 #'
+#' @family mass-spectrometry
+#'
 #' @export
 #'
 #' @examples

@@ -4,6 +4,8 @@
 #'     Loads YAML configuration files, extracts all parameters, and sets up
 #'     the parameter structure for downstream analysis steps.
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @include create_dir.R

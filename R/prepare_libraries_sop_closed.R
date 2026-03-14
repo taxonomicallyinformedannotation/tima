@@ -15,6 +15,8 @@
 #'
 #' @return Character string path to the prepared structure-organism pairs library
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

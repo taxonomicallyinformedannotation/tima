@@ -18,6 +18,8 @@
 #'
 #' @return character(1) Path to the prepared feature table (invisibly).
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

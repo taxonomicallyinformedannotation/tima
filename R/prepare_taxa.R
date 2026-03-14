@@ -29,6 +29,8 @@
 #'
 #' @return Character string path to the prepared taxa file
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

@@ -13,7 +13,6 @@ Authors@R: c(
            role = "ctb",
            comment = c(ORCID = "0000-0003-3389-2191"))
   )
-Maintainer: Adriano Rutz <adafede@gmail.com>
 Description: TIMA provides a reproducible workflow for taxonomically informed
     metabolite annotation from feature tables, MS/MS spectra, and optional
     external resources such as SIRIUS and GNPS outputs. It combines mass,
@@ -39,6 +38,7 @@ Imports:
     IRanges (>= 2.40.1),
     jsonlite (>= 2.0.0),
     lgr (>= 0.5.0),
+    lifecycle (>= 1.0.4),
     methods,
     MetaboCoreUtils (>= 1.14.0),
     MsBackendMgf (>= 1.14.0),
@@ -48,6 +48,7 @@ Imports:
     purrr (>= 1.2.0),
     R.utils (>= 2.13.0),
     reticulate (>= 1.44.1),
+    rlang (>= 1.1.6),
     rotl (>= 3.1.0),
     Spectra (>= 1.16.1),
     stats,
@@ -63,10 +64,8 @@ Suggests:
     BiocVersion (>= 3.20.0),
     grateful (>= 0.3.0),
     knitr (>= 1.50),
-    lifecycle (>= 1.0.4),
     pkgload (>= 1.4.1),
     quarto (>= 1.5.1),
-    rlang (>= 1.1.6),
     shiny (>= 1.12.0),
     shinyhelper (>= 0.3.2),
     shinyjs (>= 2.1.0),
@@ -77,7 +76,7 @@ Suggests:
     visNetwork (>= 2.1.4),
     withr (>= 3.0.2)
 SystemRequirements:
-    python (< 3.14,>= 3.10)
+    python (>= 3.10, < 3.15)
 VignetteBuilder:
     quarto
 biocViews: metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome
@@ -86,7 +85,6 @@ Config/testthat/edition: 3
 Config/testthat/parallel: false
 Encoding: UTF-8
 Language: en-US
-LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 X-schema.org-keywords: metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome

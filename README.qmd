@@ -67,7 +67,7 @@ install.packages(
 Then, you should be able to install the rest with:
 
 ``` r
-tima::install()
+tima::install_tima()
 ```
 
 Normally, everything you need should then be installed (as tested in [here](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/external-use.yaml)). If for some reason, some packages were not installed, try to install them manually. To avoid such issues, we offer a containerized version (see [Docker](#docker)).

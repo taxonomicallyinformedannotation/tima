@@ -36,6 +36,8 @@
 #'
 #' @return The path to the files containing MS1 annotations and edges
 #'
+#' @family annotation
+#'
 #' @export
 #'
 #' @examples

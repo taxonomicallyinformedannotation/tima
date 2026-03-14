@@ -16,6 +16,8 @@
 #'
 #' @return NULL (invisibly). Downloads files as a side effect.
 #'
+#' @family data-retrieval
+#'
 #' @export
 #'
 #' @examples

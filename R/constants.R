@@ -116,10 +116,6 @@ VALID_SIMILARITY_METHODS <- c("entropy", "cosine", "gnps")
 
 # Logging Configuration ----
 
-#' Default log level for package operations
-#' @keywords internal
-DEFAULT_LOG_LEVEL <- "INFO"
-
 #' Log levels available (in order of severity)
 #' @keywords internal
 LOG_LEVELS <- c("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL")
@@ -184,7 +180,12 @@ INCHI_NO_STEREO_PATTERN <- "-UHFFFAOYSA-"
 get_constant <- function(name, default = NULL) {
   if (!exists(name, mode = "any")) {
     if (is.null(default)) {
-      stop("Constant '", name, "' not found and no default provided")
+      stop(
+        "Constant '",
+        name,
+        "' not found and no default provided",
+        call. = FALSE
+      )
     }
     log_warn(
       "Constant %s not found, using default: %s",
@@ -208,9 +209,12 @@ validate_against_constant <- function(value, constant_name) {
   constant_value <- get_constant(constant_name)
   if (!value %in% constant_value) {
     stop(
-      "Invalid value %s. Must be one of: %s",
-      value,
-      paste(constant_value, collapse = ", ")
+      sprintf(
+        "Invalid value %s. Must be one of: %s",
+        value,
+        paste(constant_value, collapse = ", ")
+      ),
+      call. = FALSE
     )
   }
   TRUE

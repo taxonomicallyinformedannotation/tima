@@ -18,6 +18,8 @@
 #'
 #' @return Spectra object containing the imported and processed spectra
 #'
+#' @family mass-spectrometry
+#'
 #' @export
 #'
 #' @examples

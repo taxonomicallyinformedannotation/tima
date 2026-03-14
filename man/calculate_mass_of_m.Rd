@@ -74,3 +74,12 @@ calculate_mass_of_m(
 )
 }
 }
+\seealso{
+Other mass-spectrometry: 
+\code{\link{calculate_mz_from_mass}()},
+\code{\link{calculate_similarity}()},
+\code{\link{harmonize_adducts}()},
+\code{\link{import_spectra}()},
+\code{\link{parse_adduct}()}
+}
+\concept{mass-spectrometry}

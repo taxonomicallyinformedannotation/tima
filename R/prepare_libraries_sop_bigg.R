@@ -25,6 +25,8 @@
 #'
 #' @return Character string path to prepared BiGG structure-organism pairs
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples
@@ -57,7 +59,7 @@ prepare_libraries_sop_bigg <- function(
 ) {
   # Validate inputs
   if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string")
+    stop("output must be a single character string", call. = FALSE)
   }
 
   log_info("Preparing BiGG structure-organism pairs")

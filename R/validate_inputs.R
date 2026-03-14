@@ -14,6 +14,8 @@
 #'
 #' @return Invisible TRUE if all checks pass, stops with error otherwise
 #'
+#' @family workflow
+#'
 #' @export
 #'
 #' @examples

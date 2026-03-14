@@ -13,6 +13,8 @@
 #'
 #' @return Character string path to the created components file
 #'
+#' @family workflow
+#'
 #' @export
 #'
 #' @examples

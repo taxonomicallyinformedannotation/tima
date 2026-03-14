@@ -18,6 +18,8 @@
 #'
 #' @return Character string path to prepared mzmine annotations
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

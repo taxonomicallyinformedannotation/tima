@@ -65,8 +65,8 @@ test_that("annotate_spectra validates parameters", {
     "must be between"
   )
   expect_error(
-    annotate_spectra(libraries = list(pos = lib_path), qutoff = -10),
-    "qutoff must be non-negative or NULL, got: -10",
+    annotate_spectra(libraries = list(pos = lib_path), cutoff = -10),
+    "cutoff must be non-negative or NULL, got: -10",
     fixed = TRUE
   )
   expect_error(
@@ -308,7 +308,7 @@ test_that("library spectra with empty peaks are removed before concatenation", {
 
 # High intensity cutoff yields no query spectra ----
 
-test_that("high qutoff removes all query peaks leading to empty template", {
+test_that("high cutoff removes all query peaks leading to empty template", {
   withr::local_dir(new = temp_test_dir("ann_spe_high_cutoff"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
@@ -329,7 +329,7 @@ test_that("high qutoff removes all query peaks leading to empty template", {
     input = query_path,
     libraries = list(pos = lib_path),
     polarity = "pos",
-    qutoff = 1e9,
+    cutoff = 1e9,
     threshold = 0
   )
   df <- tidytable::fread(out)
@@ -567,7 +567,7 @@ test_that("annotate_spectra applies intensity cutoff", {
   out <- annotate_spectra(
     libraries = list(pos = lib_path),
     polarity = "pos",
-    qutoff = 50,
+    cutoff = 50,
     threshold = 0
   )
 

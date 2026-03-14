@@ -386,13 +386,15 @@ try_install_package <- function(
 #' @return NULL (invisibly). Installs packages and sets up Python environment as
 #'     side effects.
 #'
+#' @family workflow
+#'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' install()
+#' install_tima()
 #' }
-install <- function(
+install_tima <- function(
   package = "tima",
   repos = c(
     "https://taxonomicallyinformedannotation.r-universe.dev",
@@ -465,4 +467,45 @@ install <- function(
 
   log_success("Installation of '%s' completed!", package)
   invisible(NULL)
+}
+
+#' @title Install TIMA Package and Dependencies (DEPRECATED)
+#'
+#' @description `r lifecycle::badge("deprecated")`
+#'
+#' **DEPRECATED:** Use [install_tima()] instead. `install()` will be removed
+#' in a future version. The generic name `install` risks masking other packages.
+#'
+#' @inheritParams install_tima
+#'
+#' @return NULL (invisibly).
+#'
+#' @family workflow
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # DEPRECATED — use install_tima() instead
+#' install_tima()
+#' }
+install <- function(
+  package = "tima",
+  repos = c(
+    "https://taxonomicallyinformedannotation.r-universe.dev",
+    "https://bioc.r-universe.dev",
+    "https://cloud.r-project.org"
+  ),
+  dependencies = TRUE
+) {
+  lifecycle::deprecate_warn(
+    "2.13.0",
+    "install()",
+    "install_tima()"
+  )
+  install_tima(
+    package = package,
+    repos = repos,
+    dependencies = dependencies
+  )
 }

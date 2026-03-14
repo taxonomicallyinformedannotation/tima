@@ -189,6 +189,8 @@ create_empty_sop_library <- function() {
 #'
 #' @return Character vector with paths to prepared library files (invisible).
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

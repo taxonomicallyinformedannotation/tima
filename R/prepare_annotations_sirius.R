@@ -331,6 +331,8 @@ split_sirius_results <- function(table) {
 #'
 #' @return Character path to the prepared SIRIUS annotations file (invisible).
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

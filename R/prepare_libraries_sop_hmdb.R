@@ -15,6 +15,8 @@
 #'
 #' @return Character string path to prepared HMDB structure-organism pairs
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

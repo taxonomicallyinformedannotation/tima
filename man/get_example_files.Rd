@@ -35,3 +35,12 @@ get_example_files(
 )
 }
 }
+\seealso{
+Other data-retrieval: 
+\code{\link{get_compounds_xrefs}()},
+\code{\link{get_file}()},
+\code{\link{get_gnps_tables}()},
+\code{\link{get_last_version_from_zenodo}()},
+\code{\link{get_organism_taxonomy_ott}()}
+}
+\concept{data-retrieval}

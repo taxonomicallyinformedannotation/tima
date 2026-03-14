@@ -2,7 +2,7 @@
 
 library(testthat)
 
-# All tests exercise install() directly; internal helpers are not tested.
+# All tests exercise install_tima() directly; internal helpers are not tested.
 # Uses test=TRUE to avoid side-effects and network-heavy operations.
 
 .make_repos <- function() {
@@ -15,35 +15,43 @@ library(testthat)
 
 # ---- Success paths ----
 
-test_that("install()runs without error", {
+test_that("install_tima() runs without error", {
   skip_on_cran()
   skip_on_ci()
   expect_no_error(
-    install(package = "tima"),
+    install_tima(package = "tima"),
   )
 })
 
-test_that("install() with dependencies=TRUE runs without error", {
+test_that("install_tima() with dependencies=TRUE runs without error", {
   skip_on_cran()
   skip_on_ci()
   expect_no_error(
-    install(package = "tima", dependencies = TRUE)
+    install_tima(package = "tima", dependencies = TRUE)
   )
 })
 
-test_that("install() accepts multiple repos", {
+test_that("install_tima() accepts multiple repos", {
   skip_on_cran()
   skip_on_ci()
   expect_no_error(
-    install(package = "tima", repos = .make_repos())
+    install_tima(package = "tima", repos = .make_repos())
   )
 })
 
-test_that("install() can run with dependencies=FALSE", {
+test_that("install_tima() can run with dependencies=FALSE", {
   skip_on_cran()
   skip_on_ci()
   expect_no_error(
-    install(package = "tima", dependencies = FALSE),
+    install_tima(package = "tima", dependencies = FALSE),
+  )
+})
+
+test_that("install() emits deprecation warning", {
+  skip_on_cran()
+  skip_on_ci()
+  lifecycle::expect_deprecated(
+    install(package = "tima")
   )
 })
 

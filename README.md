@@ -79,7 +79,7 @@ install.packages(
 Then, you should be able to install the rest with:
 
 ``` r
-tima::install()
+tima::install_tima()
 ```
 
 Normally, everything you need should then be installed (as tested in

@@ -29,6 +29,8 @@
 #'
 #' @return Character string path to the prepared retention time library
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

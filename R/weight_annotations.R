@@ -588,6 +588,8 @@ export_results <- function(results_list, output, pattern) {
 #'
 #' @return The path to the weighted annotations
 #'
+#' @family annotation
+#'
 #' @export
 #'
 #' @seealso annotate_masses weight_bio weight_chemo
