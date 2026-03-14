@@ -264,6 +264,8 @@ export_library_tables <- function(
 #'
 #' @return Character string path to the prepared merged SOP library
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

@@ -185,6 +185,8 @@ download_gnps_file <- function(url, file_path, file_type) {
 #'
 #' @return A named character vector with paths to the written/available files.
 #'
+#' @family data-retrieval
+#'
 #' @export
 #'
 #' @examples

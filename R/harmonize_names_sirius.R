@@ -21,7 +21,7 @@
 harmonize_names_sirius <- function(x) {
   # Validate input
   if (missing(x) || is.null(x)) {
-    stop("Input 'x' must be provided")
+    stop("Input 'x' must be provided", call. = FALSE)
   }
 
   if (!is.character(x)) {

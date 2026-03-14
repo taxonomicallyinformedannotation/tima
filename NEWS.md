@@ -1,6 +1,5 @@
-# tima
 
-# tima 2.13.0
+# tima 2.13.0 (development)
 
 * Added a new validation helper, see <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html>
 * Added [BiGG](http://bigg.ucsd.edu/) as SOP library

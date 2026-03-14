@@ -93,3 +93,23 @@ prepare_libraries_spectra()
 unlink("data", recursive = TRUE)
 }
 }
+\seealso{
+Other preparation: 
+\code{\link{prepare_annotations_gnps}()},
+\code{\link{prepare_annotations_mzmine}()},
+\code{\link{prepare_annotations_sirius}()},
+\code{\link{prepare_annotations_spectra}()},
+\code{\link{prepare_features_components}()},
+\code{\link{prepare_features_edges}()},
+\code{\link{prepare_features_tables}()},
+\code{\link{prepare_libraries_rt}()},
+\code{\link{prepare_libraries_sop_bigg}()},
+\code{\link{prepare_libraries_sop_closed}()},
+\code{\link{prepare_libraries_sop_ecmdb}()},
+\code{\link{prepare_libraries_sop_hmdb}()},
+\code{\link{prepare_libraries_sop_lotus}()},
+\code{\link{prepare_libraries_sop_merged}()},
+\code{\link{prepare_params}()},
+\code{\link{prepare_taxa}()}
+}
+\concept{preparation}

@@ -111,6 +111,8 @@ create_yaml_null_handler <- function() {
 #'
 #' @return Invisible NULL. Modifies prepare_params YAML as side effect.
 #'
+#' @family workflow
+#'
 #' @export
 #'
 #' @examples

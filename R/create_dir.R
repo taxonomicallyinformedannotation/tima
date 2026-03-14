@@ -12,7 +12,7 @@
 #'
 #' @return NULL (invisibly). Creates directory as a side effect.
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

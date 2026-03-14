@@ -77,3 +77,17 @@ change_params_small(
 )
 }
 }
+\seealso{
+Other workflow: 
+\code{\link{create_components}()},
+\code{\link{create_edges}()},
+\code{\link{create_edges_spectra}()},
+\code{\link{go_to_cache}()},
+\code{\link{install}()},
+\code{\link{install_tima}()},
+\code{\link{run_app}()},
+\code{\link{run_tima}()},
+\code{\link{tima_full}()},
+\code{\link{validate_inputs}()}
+}
+\concept{workflow}

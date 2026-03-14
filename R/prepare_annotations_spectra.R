@@ -19,6 +19,8 @@
 #'
 #' @return Character string path to prepared spectral annotations
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

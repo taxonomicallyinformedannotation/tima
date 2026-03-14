@@ -16,6 +16,8 @@
 #'
 #' @return Path to the downloaded file (invisibly)
 #'
+#' @family data-retrieval
+#'
 #' @export
 #'
 #' @examples

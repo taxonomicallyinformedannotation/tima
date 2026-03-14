@@ -85,7 +85,7 @@
 #' @return A DataFrame containing the parsed spectra data with standardized
 #'     variable names
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{

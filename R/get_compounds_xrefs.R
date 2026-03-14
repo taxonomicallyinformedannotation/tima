@@ -24,6 +24,7 @@
 #' @return Character path to the exported file (invisibly), for
 #'   \pkg{targets} \code{format = "file"} compatibility.
 #'
+#' @family data-retrieval
 #'
 #' @export
 #'

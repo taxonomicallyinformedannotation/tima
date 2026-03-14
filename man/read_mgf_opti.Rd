@@ -48,3 +48,4 @@ spectra_data <- read_mgf_opti(
 sps <- Spectra(spectra_data)
 }
 }
+\keyword{internal}

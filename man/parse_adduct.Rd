@@ -46,3 +46,12 @@ parse_adduct(NULL) # Returns all zeros
 parse_adduct("invalid") # Returns all zeros with warning
 }
 }
+\seealso{
+Other mass-spectrometry: 
+\code{\link{calculate_mass_of_m}()},
+\code{\link{calculate_mz_from_mass}()},
+\code{\link{calculate_similarity}()},
+\code{\link{harmonize_adducts}()},
+\code{\link{import_spectra}()}
+}
+\concept{mass-spectrometry}

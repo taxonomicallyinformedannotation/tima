@@ -114,6 +114,8 @@ execute_targets_pipeline <- function(target_pattern = "^ann_wei$") {
 #' @return Invisible NULL. Executes workflow as side effect and creates
 #'     timestamped log files in data/processed/
 #'
+#' @family workflow
+#'
 #' @export
 #'
 #' @examples
@@ -304,6 +306,8 @@ run_tima <- function(
 #'     Default: "info"
 #'
 #' @return Invisible NULL (same as \code{\link{run_tima}})
+#'
+#' @family workflow
 #'
 #' @export
 #'

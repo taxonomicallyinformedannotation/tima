@@ -45,14 +45,17 @@
 #' @param threshold Minimal similarity score to retain candidates (0-1).
 #' @param ppm Relative mass tolerance (ppm) for MS/MS matching.
 #' @param dalton Absolute mass tolerance (Daltons) for MS/MS matching.
-#' @param qutoff Intensity cutoff under which MS2 fragments are removed.
-#'     (Parameter name kept for backwards compatibility; spelled "cutoff").
+#' @param cutoff Intensity cutoff under which MS2 fragments are removed.
+#'     Non-negative numeric or NULL for dynamic thresholding.
+#' @param qutoff `r lifecycle::badge("deprecated")` Use `cutoff` instead.
 #' @param approx Logical; if TRUE perform matching ignoring precursor masses
 #'     (broader, slower); if FALSE restrict library to precursor-tolerant
 #'     spectra first.
 #'
 #' @return Character scalar: the output file path (invisible). Side effect:
 #'     writes the annotations table to `output`.
+#'
+#' @family annotation
 #'
 #' @export
 #'
@@ -88,9 +91,20 @@ annotate_spectra <- function(
   )$similarities$thresholds$annotations,
   ppm = get_params(step = "annotate_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(step = "annotate_spectra")$ms$tolerances$mass$dalton$ms2,
-  qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
-  approx = get_params(step = "annotate_spectra")$annotations$ms2approx
+  cutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
+  approx = get_params(step = "annotate_spectra")$annotations$ms2approx,
+  qutoff = deprecated()
 ) {
+  # Handle deprecated qutoff parameter
+  if (lifecycle::is_present(qutoff)) {
+    lifecycle::deprecate_warn(
+      "2.13.0",
+      "annotate_spectra(qutoff)",
+      "annotate_spectra(cutoff)"
+    )
+    cutoff <- qutoff
+  }
+
   params <- get_params(step = "annotate_spectra")
   output_path <- resolve_annotation_output(output)
 
@@ -100,8 +114,8 @@ annotate_spectra <- function(
   assert_scalar_numeric(threshold, "threshold", min = 0, max = 1)
   assert_scalar_numeric(ppm, "ppm", min = 0)
   assert_scalar_numeric(dalton, "dalton", min = 0)
-  if (!is.null(qutoff) && (!is.numeric(qutoff) || qutoff < 0)) {
-    stop("qutoff must be non-negative or NULL, got: ", qutoff)
+  if (!is.null(cutoff) && (!is.numeric(cutoff) || cutoff < 0)) {
+    stop("cutoff must be non-negative or NULL, got: ", cutoff, call. = FALSE)
   }
 
   input_vec <- normalize_input_files(input, "Input")
@@ -149,7 +163,7 @@ annotate_spectra <- function(
 
   query_sp <- import_spectra(
     input_vec,
-    cutoff = qutoff,
+    cutoff = cutoff,
     dalton = dalton,
     polarity = polarity,
     ppm = ppm

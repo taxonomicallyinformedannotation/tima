@@ -212,6 +212,8 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
 #'
 #' @return Character string path to the filtered annotations file
 #'
+#' @family annotation
+#'
 #' @export
 #'
 #' @examples

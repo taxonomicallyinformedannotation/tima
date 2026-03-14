@@ -15,6 +15,8 @@
 #'     (with isotopes shown), exact mass (with isotope contributions), 2D SMILES,
 #'     xLogP, and connectivity layer
 #'
+#' @family chemical-classification
+#'
 #' @export
 #'
 #' @examples
@@ -121,7 +123,11 @@ process_smiles <- function(
       reticulate::py$process_smiles(input_smi_file, output_csv_file)
     },
     error = function(e) {
-      stop("RDKit SMILES processing failed: ", conditionMessage(e))
+      stop(
+        "RDKit SMILES processing failed: ",
+        conditionMessage(e),
+        call. = FALSE
+      )
     }
   )
 
@@ -166,6 +172,7 @@ process_smiles <- function(
 load_python_smiles_processor <- function() {
   tryCatch(
     {
+      reticulate::py_require(packages = c("rdkit", "chembl_structure_pipeline"))
       py_script <- system.file("python/process_smiles.py", package = "tima")
       reticulate::source_python(file = py_script)
     },

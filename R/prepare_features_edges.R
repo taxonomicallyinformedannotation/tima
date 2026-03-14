@@ -15,6 +15,8 @@
 #'
 #' @return Character string path to the prepared edges file
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

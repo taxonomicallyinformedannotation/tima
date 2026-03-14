@@ -20,6 +20,8 @@
 #'
 #' @return Data frame with harmonized adduct column
 #'
+#' @family mass-spectrometry
+#'
 #' @export
 #'
 #' @examples

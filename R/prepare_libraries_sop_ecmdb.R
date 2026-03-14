@@ -15,6 +15,8 @@
 #'
 #' @return Character string path to prepared ECMDB structure-organism pairs
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

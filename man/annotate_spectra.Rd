@@ -13,8 +13,9 @@ annotate_spectra(
   threshold = get_params(step = "annotate_spectra")$similarities$thresholds$annotations,
   ppm = get_params(step = "annotate_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(step = "annotate_spectra")$ms$tolerances$mass$dalton$ms2,
-  qutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
-  approx = get_params(step = "annotate_spectra")$annotations$ms2approx
+  cutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
+  approx = get_params(step = "annotate_spectra")$annotations$ms2approx,
+  qutoff = deprecated()
 )
 }
 \arguments{
@@ -35,12 +36,14 @@ annotate_spectra(
 
 \item{dalton}{Absolute mass tolerance (Daltons) for MS/MS matching.}
 
-\item{qutoff}{Intensity cutoff under which MS2 fragments are removed.
-(Parameter name kept for backwards compatibility; spelled "cutoff").}
+\item{cutoff}{Intensity cutoff under which MS2 fragments are removed.
+Non-negative numeric or NULL for dynamic thresholding.}
 
 \item{approx}{Logical; if TRUE perform matching ignoring precursor masses
 (broader, slower); if FALSE restrict library to precursor-tolerant
 spectra first.}
+
+\item{qutoff}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{cutoff} instead.}
 }
 \value{
 Character scalar: the output file path (invisible). Side effect:
@@ -103,3 +106,10 @@ annotate_spectra(
 unlink("data", recursive = TRUE)
 }
 }
+\seealso{
+Other annotation: 
+\code{\link{annotate_masses}()},
+\code{\link{filter_annotations}()},
+\code{\link{weight_annotations}()}
+}
+\concept{annotation}

@@ -30,8 +30,14 @@ sanitize_spectra <- function(
   dalton = 0.01,
   ppm = 10
 ) {
+  # TODO(M6): Replace @backend@peaksData slot access with Spectra::peaksData()
+
+  # accessor where possible. Write-back has no clean API equivalent yet.
   if (!inherits(spectra, "Spectra")) {
-    stop("Input must be a Spectra object from the Spectra package")
+    stop(
+      "Input must be a Spectra object from the Spectra package",
+      call. = FALSE
+    )
   }
   if (!is.null(cutoff) && (!is.numeric(cutoff) || cutoff < 0)) {
     stop("Cutoff intensity must be non-negative or NULL, got: ", cutoff)

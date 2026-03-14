@@ -15,6 +15,8 @@
 #'
 #' @return Character string path to the prepared features' components file
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

@@ -18,6 +18,8 @@
 #'
 #' @return Character string path to prepared GNPS annotations
 #'
+#' @family preparation
+#'
 #' @export
 #'
 #' @examples

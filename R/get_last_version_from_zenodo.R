@@ -258,6 +258,8 @@ is_download_needed <- function(path, zenodo_size) {
 #'
 #' @return Character path to the downloaded (or existing) file
 #'
+#' @family data-retrieval
+#'
 #' @export
 #'
 #' @examples

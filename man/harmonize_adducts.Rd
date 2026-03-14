@@ -36,3 +36,12 @@ translations <- c("M+H" = "[M+H]+", "(M-H)-" = "[M-H]-")
 harmonize_adducts(df, adducts_translations = translations)
 }
 }
+\seealso{
+Other mass-spectrometry: 
+\code{\link{calculate_mass_of_m}()},
+\code{\link{calculate_mz_from_mass}()},
+\code{\link{calculate_similarity}()},
+\code{\link{import_spectra}()},
+\code{\link{parse_adduct}()}
+}
+\concept{mass-spectrometry}

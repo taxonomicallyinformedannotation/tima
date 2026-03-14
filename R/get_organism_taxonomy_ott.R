@@ -135,6 +135,8 @@
 #' @return Data frame with taxonomic information including OTT IDs, ranks, and
 #'     taxonomic hierarchy. Returns empty template if API is unavailable.
 #'
+#' @family data-retrieval
+#'
 #' @export
 #'
 #' @examples

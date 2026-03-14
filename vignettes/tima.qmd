@@ -41,12 +41,12 @@ install.packages(
     "https://cloud.r-project.org"
   )
 )
-tima::install()
+tima::install_tima()
 tima::go_to_cache()
 ```
 
 Before using this vignette, install `tima` from r-universe and run
-`tima::install()` once in an interactive session.
+`tima::install_tima()` once in an interactive session.
 
 This vignette describes the philosophy behind the infrastructure of **TIMA**.
 
@@ -112,7 +112,7 @@ install.packages(
     "https://cloud.r-project.org"
   )
 )
-tima::install()
+tima::install_tima()
 tima::get_example_files()
 ```
 

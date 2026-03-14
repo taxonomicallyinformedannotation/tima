@@ -26,6 +26,8 @@
 #' @return Numeric similarity score (0-1), or list with score and matches
 #'     if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.
 #'
+#' @family mass-spectrometry
+#'
 #' @export
 #'
 #' @examples

@@ -42,3 +42,17 @@ go_to_cache(dir = ".my_cache")
 cache_path <- go_to_cache()
 }
 }
+\seealso{
+Other workflow: 
+\code{\link{change_params_small}()},
+\code{\link{create_components}()},
+\code{\link{create_edges}()},
+\code{\link{create_edges_spectra}()},
+\code{\link{install}()},
+\code{\link{install_tima}()},
+\code{\link{run_app}()},
+\code{\link{run_tima}()},
+\code{\link{tima_full}()},
+\code{\link{validate_inputs}()}
+}
+\concept{workflow}

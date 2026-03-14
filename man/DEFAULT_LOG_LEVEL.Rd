@@ -6,12 +6,8 @@
 \title{Default log level}
 \format{
 An object of class \code{character} of length 1.
-
-An object of class \code{character} of length 1.
 }
 \usage{
-DEFAULT_LOG_LEVEL
-
 DEFAULT_LOG_LEVEL
 }
 \description{

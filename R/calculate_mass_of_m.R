@@ -32,6 +32,8 @@
 #'     - Division by zero would occur (n_mer = 0 or n_charges = 0)
 #'     Returns NA if calculated mass is negative (physically impossible)
 #'
+#' @family mass-spectrometry
+#'
 #' @export
 #'
 #' @examples
@@ -295,6 +297,8 @@ calculate_neutral_mass_formula <- function(
 #' @param electron_mass Numeric electron mass in Daltons
 #'
 #' @return Numeric m/z value in Daltons
+#'
+#' @family mass-spectrometry
 #'
 #' @export
 #'

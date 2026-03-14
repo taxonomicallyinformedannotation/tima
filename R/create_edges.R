@@ -24,6 +24,8 @@
 #' @return Data frame with columns: feature_id, target_id, score, matched_peaks.
 #'     Returns empty data frame with NA values if no edges pass thresholds.
 #'
+#' @family workflow
+#'
 #' @export
 #'
 #' @examples

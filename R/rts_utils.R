@@ -24,7 +24,7 @@ normalize_rt_to_minutes <- function(
   }
 
   if (!is.numeric(rt_vec)) {
-    stop("rt_vec must be coercible to numeric")
+    stop("rt_vec must be coercible to numeric", call. = FALSE)
   }
   if (length(rt_vec) == 0L) {
     return(rt_vec)

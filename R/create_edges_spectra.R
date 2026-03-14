@@ -18,9 +18,13 @@
 #' @param matched_peaks Integer minimum number of matched peaks required
 #' @param ppm Numeric relative mass tolerance in ppm
 #' @param dalton Numeric absolute mass tolerance in Daltons
-#' @param qutoff Numeric intensity cutoff below which MS2 fragments are removed
+#' @param cutoff Numeric intensity cutoff below which MS2 fragments are removed.
+#'     Non-negative numeric or NULL for dynamic thresholding.
+#' @param qutoff `r lifecycle::badge("deprecated")` Use `cutoff` instead.
 #'
 #' @return Character string path to the created spectral edges file
+#'
+#' @family workflow
 #'
 #' @export
 #'
@@ -53,8 +57,21 @@ create_edges_spectra <- function(
   dalton = get_params(
     step = "create_edges_spectra"
   )$ms$tolerances$mass$dalton$ms2,
-  qutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity
+  cutoff = get_params(
+    step = "create_edges_spectra"
+  )$ms$thresholds$ms2$intensity,
+  qutoff = deprecated()
 ) {
+  # Handle deprecated qutoff parameter
+  if (lifecycle::is_present(qutoff)) {
+    lifecycle::deprecate_warn(
+      "2.13.0",
+      "create_edges_spectra(qutoff)",
+      "create_edges_spectra(cutoff)"
+    )
+    cutoff <- qutoff
+  }
+
   ctx <- log_operation(
     "create_edges_spectra",
     method = method,
@@ -68,7 +85,8 @@ create_edges_spectra <- function(
       "Similarity method must be one of: ",
       paste(VALID_SIMILARITY_METHODS, collapse = ", "),
       "; got: ",
-      method
+      method,
+      call. = FALSE
     )
   }
 
@@ -76,23 +94,31 @@ create_edges_spectra <- function(
 
   # Validate numeric parameters first (cheap checks)
   if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
-    stop("threshold must be between 0 and 1, got: ", threshold)
+    stop("threshold must be between 0 and 1, got: ", threshold, call. = FALSE)
   }
 
   if (!is.numeric(matched_peaks) || matched_peaks < 1) {
-    stop("matched_peaks must be a positive integer, got: ", matched_peaks)
+    stop(
+      "matched_peaks must be a positive integer, got: ",
+      matched_peaks,
+      call. = FALSE
+    )
   }
 
   if (!is.numeric(ppm) || ppm <= 0) {
-    stop("ppm must be a positive number, got: ", ppm)
+    stop("ppm must be a positive number, got: ", ppm, call. = FALSE)
   }
 
   if (!is.numeric(dalton) || dalton <= 0) {
-    stop("dalton must be a positive number, got: ", dalton)
+    stop("dalton must be a positive number, got: ", dalton, call. = FALSE)
   }
 
-  if (!is.null(qutoff) && (!is.numeric(qutoff) || qutoff < 0)) {
-    stop("qutoff intensity must be non-negative or NULL, got: ", qutoff)
+  if (!is.null(cutoff) && (!is.numeric(cutoff) || cutoff < 0)) {
+    stop(
+      "cutoff intensity must be non-negative or NULL, got: ",
+      cutoff,
+      call. = FALSE
+    )
   }
 
   # Validate output path
@@ -134,7 +160,7 @@ create_edges_spectra <- function(
   # Import spectra with specified parameters
   spectra <- input |>
     import_spectra(
-      cutoff = qutoff,
+      cutoff = cutoff,
       dalton = dalton,
       ppm = ppm
     )

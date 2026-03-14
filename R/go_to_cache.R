@@ -22,6 +22,8 @@
 #' @return Path to cache directory (invisibly). Changes working directory
 #'     as side effect.
 #'
+#' @family workflow
+#'
 #' @export
 #'
 #' @examples

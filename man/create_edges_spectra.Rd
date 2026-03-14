@@ -16,7 +16,8 @@ create_edges_spectra(
     "create_edges_spectra")$similarities$thresholds$matched_peaks,
   ppm = get_params(step = "create_edges_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(step = "create_edges_spectra")$ms$tolerances$mass$dalton$ms2,
-  qutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity
+  cutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity,
+  qutoff = deprecated()
 )
 }
 \arguments{
@@ -38,7 +39,10 @@ create_edges_spectra(
 
 \item{dalton}{Numeric absolute mass tolerance in Daltons}
 
-\item{qutoff}{Numeric intensity cutoff below which MS2 fragments are removed}
+\item{cutoff}{Numeric intensity cutoff below which MS2 fragments are removed.
+Non-negative numeric or NULL for dynamic thresholding.}
+
+\item{qutoff}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{cutoff} instead.}
 }
 \value{
 Character string path to the created spectral edges file
@@ -60,3 +64,17 @@ create_edges_spectra()
 unlink("data", recursive = TRUE)
 }
 }
+\seealso{
+Other workflow: 
+\code{\link{change_params_small}()},
+\code{\link{create_components}()},
+\code{\link{create_edges}()},
+\code{\link{go_to_cache}()},
+\code{\link{install}()},
+\code{\link{install_tima}()},
+\code{\link{run_app}()},
+\code{\link{run_tima}()},
+\code{\link{tima_full}()},
+\code{\link{validate_inputs}()}
+}
+\concept{workflow}

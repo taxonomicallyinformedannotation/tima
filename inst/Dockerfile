@@ -17,7 +17,7 @@ WORKDIR /home/tima-user
 
 # Install R dependencies
 RUN Rscript -e "devtools::install_github('taxonomicallyinformedannotation/tima')" && \
-    Rscript -e "tima::install()"
+    Rscript -e "tima::install_tima()"
 
 # Expose the necessary ports for Shiny
 EXPOSE 3838
