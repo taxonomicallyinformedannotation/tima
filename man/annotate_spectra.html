@@ -683,17 +683,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   ppm = get_params(step = "annotate_spectra")\$ms\$tolerances\$mass\$ppm\$ms2,
   dalton = get_params(step = "annotate_spectra")\$ms\$tolerances\$mass\$dalton\$ms2,
   qutoff = get_params(step = "annotate_spectra")\$ms\$thresholds\$ms2\$intensity,
-  approx = get_params(step = "annotate_spectra")\$annotations\$ms2approx,
-  str_stereo = get_params(step =
-    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$stereo,
-  str_met = get_params(step =
-    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$metadata,
-  str_nam = get_params(step =
-    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$names,
-  str_tax_cla = get_params(step =
-    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$cla,
-  str_tax_npc = get_params(step =
-    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$npc
+  approx = get_params(step = "annotate_spectra")\$annotations\$ms2approx
 )
 </code></pre>
 </section>
@@ -778,46 +768,6 @@ Intensity cutoff under which MS2 fragments are removed. (Parameter name kept for
 </td>
 <td>
 Logical; if TRUE perform matching ignoring precursor masses (broader, slower); if FALSE restrict library to precursor-tolerant spectra first.
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_stereo">str_stereo</code>
-</td>
-<td>
-File containing structures stereo
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_met">str_met</code>
-</td>
-<td>
-File containing structures metadata
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_nam">str_nam</code>
-</td>
-<td>
-File containing structures names
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_tax_cla">str_tax_cla</code>
-</td>
-<td>
-File containing Classyfire taxonomy
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_tax_npc">str_tax_npc</code>
-</td>
-<td>
-File containing NPClassifier taxonomy
 </td>
 </tr>
 </tbody></table>
