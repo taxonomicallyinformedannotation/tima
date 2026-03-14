@@ -21,25 +21,25 @@ create_edges_spectra(
 )
 }
 \arguments{
-\item{input}{Character string path or list of paths to query MGF file(s) containing spectra}
+\item{input}{\link{character} Path or list of paths to query MGF file(s) containing spectra}
 
-\item{output}{Character string path for output edges file}
+\item{output}{\link{character} Path for output edges file}
 
-\item{name_source}{Character string name of source feature column}
+\item{name_source}{\link{character} Name of source feature column}
 
-\item{name_target}{Character string name of target feature column}
+\item{name_target}{\link{character} Name of target feature column}
 
-\item{method}{Character string similarity method to use}
+\item{method}{\link{character} Similarity method to use}
 
-\item{threshold}{Numeric minimum similarity threshold (0-1) to report edge}
+\item{threshold}{\link{numeric} Minimum similarity threshold (0-1) to report edge}
 
-\item{matched_peaks}{Integer minimum number of matched peaks required}
+\item{matched_peaks}{\link{integer} Minimum number of matched peaks required}
 
-\item{ppm}{Numeric relative mass tolerance in ppm}
+\item{ppm}{\link{numeric} Relative mass tolerance in ppm}
 
-\item{dalton}{Numeric absolute mass tolerance in Daltons}
+\item{dalton}{\link{numeric} Absolute mass tolerance in Daltons}
 
-\item{cutoff}{Numeric intensity cutoff below which MS2 fragments are removed.
+\item{cutoff}{\link{numeric} Intensity cutoff below which MS2 fragments are removed.
 Non-negative numeric or NULL for dynamic thresholding.}
 
 \item{qutoff}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{cutoff} instead.}

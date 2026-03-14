@@ -1,6 +1,6 @@
 Package: tima
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.12.0
+Version: 2.12.0.9000
 Authors@R: c(
     person(given = "Adriano",
            family = "Rutz",
@@ -21,7 +21,7 @@ Description: TIMA provides a reproducible workflow for taxonomically informed
     framework that can be inspected step-by-step. The package targets
     metabolomics practitioners who need configurable, scriptable, and
     documented annotation pipelines for research and production settings.
-License: AGPL-3
+License: AGPL (>= 3)
 URL: https://github.com/taxonomicallyinformedannotation/tima, https://taxonomicallyinformedannotation.github.io/tima-shinylive, https://taxonomicallyinformedannotation.github.io/tima
 BugReports: https://github.com/taxonomicallyinformedannotation/tima/issues
 Depends:
@@ -83,7 +83,7 @@ VignetteBuilder:
 biocViews: metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome
 ByteCompile: true
 Config/testthat/edition: 3
-Config/testthat/parallel: false
+Config/testthat/parallel: true
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)

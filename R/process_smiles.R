@@ -6,10 +6,10 @@
 #'
 #' @include validations_utils.R
 #'
-#' @param df Data frame containing SMILES strings
-#' @param smiles_colname Column name containing SMILES
+#' @param df [data.frame] Data frame containing SMILES strings
+#' @param smiles_colname [character] Column name containing SMILES
 #'     (default: "structure_smiles_initial")
-#' @param cache Path to cached processed SMILES file, or NULL to skip caching
+#' @param cache [character] Path to cached processed SMILES file, or NULL to skip caching
 #'
 #' @return Data frame with processed SMILES including InChIKey, molecular formula
 #'     (with isotopes shown), exact mass (with isotope contributions), 2D SMILES,

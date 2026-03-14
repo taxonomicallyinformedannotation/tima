@@ -101,12 +101,12 @@ execute_targets_pipeline <- function(target_pattern = "^ann_wei$") {
 #' @include go_to_cache.R
 #' @include logs_utils.R
 #'
-#' @param target_pattern Character. Regex pattern for target selection.
+#' @param target_pattern [character] Regex pattern for target selection.
 #'     Default: "^ann_wei$" (annotation preparation target)
-#' @param log_file Character. Path to log file. Default: "tima.log"
-#' @param clean_old_logs Logical. Remove old log file before starting.
+#' @param log_file [character] Path to log file. Default: "tima.log"
+#' @param clean_old_logs [logical] Remove old log file before starting.
 #'     Default: TRUE
-#' @param log_level Character or numeric. Logging verbosity level.
+#' @param log_level [character] or [numeric] Logging verbosity level.
 #'     Can be one of: "trace", "debug", "info", "warn", "error", "fatal"
 #'     or numeric values: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200, FATAL=100.
 #'     Default: "info" (400). Use "debug" for detailed troubleshooting.
@@ -150,34 +150,42 @@ run_tima <- function(
 ) {
   # Input Validation ----
   if (!is.character(target_pattern) || length(target_pattern) != 1L) {
-    stop("target_pattern must be a single character string", call. = FALSE)
+    cli::cli_abort(
+      "{.arg target_pattern} must be a single character string",
+      class = "tima_validation_error"
+    )
   }
 
   if (!is.character(log_file) || length(log_file) != 1L) {
-    stop("log_file must be a single character string", call. = FALSE)
+    cli::cli_abort(
+      "{.arg log_file} must be a single character string",
+      class = "tima_validation_error"
+    )
   }
 
   if (!is.logical(clean_old_logs) || length(clean_old_logs) != 1L) {
-    stop("clean_old_logs must be a single logical value", call. = FALSE)
+    cli::cli_abort(
+      "{.arg clean_old_logs} must be a single logical value",
+      class = "tima_validation_error"
+    )
   }
 
   # Validate and convert log_level
   if (is.character(log_level)) {
     if (length(log_level) != 1L) {
-      stop("log_level must be a single value", call. = FALSE)
+      cli::cli_abort(
+        "{.arg log_level} must be a single value",
+        class = "tima_validation_error"
+      )
     }
 
     valid_levels <- c("trace", "debug", "info", "warn", "error", "fatal")
     log_level_lower <- tolower(log_level)
 
     if (!log_level_lower %in% valid_levels) {
-      stop(
-        sprintf(
-          "log_level must be one of: %s (got '%s')",
-          paste(valid_levels, collapse = ", "),
-          log_level
-        ),
-        call. = FALSE
+      cli::cli_abort(
+        "{.arg log_level} must be one of: {.or {.val {valid_levels}}} (got {.val {log_level}})",
+        class = "tima_validation_error"
       )
     }
 
@@ -193,25 +201,24 @@ run_tima <- function(
     log_threshold <- level_map[[log_level_lower]]
   } else if (is.numeric(log_level)) {
     if (length(log_level) != 1L) {
-      stop("log_level must be a single value", call. = FALSE)
+      cli::cli_abort(
+        "{.arg log_level} must be a single value",
+        class = "tima_validation_error"
+      )
     }
 
     valid_numeric <- c(600, 500, 400, 300, 200, 100)
     if (!log_level %in% valid_numeric) {
-      stop(
-        sprintf(
-          "log_level must be one of: %s (got %g)",
-          paste(valid_numeric, collapse = ", "),
-          log_level
-        ),
-        call. = FALSE
+      cli::cli_abort(
+        "{.arg log_level} must be one of: {.or {.val {valid_numeric}}} (got {.val {log_level}})",
+        class = "tima_validation_error"
       )
     }
     log_threshold <- as.integer(log_level)
   } else {
-    stop(
-      "log_level must be character (e.g., 'info') or numeric (e.g., 400)",
-      call. = FALSE
+    cli::cli_abort(
+      "{.arg log_level} must be character (e.g., {.val info}) or numeric (e.g., {.val 400})",
+      class = "tima_validation_error"
     )
   }
 

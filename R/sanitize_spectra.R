@@ -4,12 +4,12 @@
 #'     precursor peaks, and empty spectra. It applies multiple cleaning steps
 #'     including intensity filtering, peak reduction, and normalization.
 #'
-#' @param spectra Spectra object from the Spectra package
-#' @param cutoff Numeric absolute minimal intensity threshold (default: NULL).
+#' @param spectra [Spectra] Spectra object from the Spectra package
+#' @param cutoff [numeric] Absolute minimal intensity threshold (default: NULL).
 #'     Peaks below this intensity are removed. If NULL, a dynamic threshold
 #'     based on each spectrum's intensity distribution will be used.
-#' @param dalton Numeric Dalton tolerance for peak matching (default: 0.01)
-#' @param ppm Numeric PPM tolerance for peak matching (default: 10)
+#' @param dalton [numeric] Dalton tolerance for peak matching (default: 0.01)
+#' @param ppm [numeric] PPM tolerance for peak matching (default: 10)
 #'
 #' @return A sanitized Spectra object with noise and artifacts removed
 #'
@@ -158,7 +158,7 @@ sanitize_spectra <- function(
     }
 
     smallest_10 <- sort(unique(intensities))[
-      1:min(10L, length(unique(intensities)))
+      seq_len(min(10L, length(unique(intensities))))
     ]
 
     for (intensity_val in smallest_10) {

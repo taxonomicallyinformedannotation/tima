@@ -12,14 +12,14 @@
 #' @include sanitize_spectrum_matrix.R
 #' @include validations_utils.R
 #'
-#' @param method Character string specifying method: "entropy", "gnps", or "cosine"
-#' @param query_spectrum Numeric matrix with columns for mz and intensity
-#' @param target_spectrum Numeric matrix with columns for mz and intensity
-#' @param query_precursor Numeric precursor m/z value for query
-#' @param target_precursor Numeric precursor m/z value for target
-#' @param dalton Numeric Dalton tolerance for peak matching
-#' @param ppm Numeric PPM tolerance for peak matching
-#' @param return_matched_peaks Logical; return matched peaks count?
+#' @param method [character] Similarity method: "entropy", "gnps", or "cosine"
+#' @param query_spectrum [matrix] Numeric matrix with columns for mz and intensity
+#' @param target_spectrum [matrix] Numeric matrix with columns for mz and intensity
+#' @param query_precursor [numeric] Precursor m/z value for query
+#' @param target_precursor [numeric] Precursor m/z value for target
+#' @param dalton [numeric] Dalton tolerance for peak matching
+#' @param ppm [numeric] PPM tolerance for peak matching
+#' @param return_matched_peaks [logical] Return matched peaks count?
 #'     Not compatible with 'entropy' method. Default: FALSE
 #' @param ... Additional arguments passed to MsCoreUtils::join (cosine only)
 #'
@@ -74,10 +74,16 @@ calculate_similarity <- function(
   # ---- Input Validation ----
   assert_choice(method, VALID_SIMILARITY_METHODS, "method")
   if (!is.matrix(query_spectrum) || !is.matrix(target_spectrum)) {
-    stop("Spectra must be matrices", call. = FALSE)
+    cli::cli_abort(
+      "Both {.arg query_spectrum} and {.arg target_spectrum} must be matrices",
+      class = "tima_validation_error"
+    )
   }
   if (ncol(query_spectrum) < 2L || ncol(target_spectrum) < 2L) {
-    stop("Spectra must have at least 2 columns (mz, intensity)", call. = FALSE)
+    cli::cli_abort(
+      "Spectra must have at least 2 columns (mz, intensity)",
+      class = "tima_validation_error"
+    )
   }
   assert_scalar_numeric(dalton, "dalton", min = 0)
   assert_scalar_numeric(ppm, "ppm", min = 0)

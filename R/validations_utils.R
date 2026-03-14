@@ -138,7 +138,10 @@ validate_file_exists <- function(
         distances <- utils::adist(basename(path), available_files)
         similar_idx <- which(distances <= 3)
         if (length(similar_idx) > 0) {
-          similar <- available_files[similar_idx][1:min(3, length(similar_idx))]
+          similar <- available_files[similar_idx][seq_len(min(
+            3,
+            length(similar_idx)
+          ))]
         }
       }
     }

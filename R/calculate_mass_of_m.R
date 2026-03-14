@@ -20,10 +20,10 @@
 #' @include parse_adduct.R
 #' @include validations_utils.R
 #'
-#' @param mz Numeric observed m/z value in Daltons. Must be positive.
-#' @param adduct_string Character string representing the adduct
+#' @param mz [numeric] Observed m/z value in Daltons. Must be positive.
+#' @param adduct_string [character] Adduct notation string
 #'     (e.g., \code{[M+H]+}, \code{[2M+Na]+}, \code{[M-H2O+H]+})
-#' @param electron_mass Numeric electron mass in Daltons
+#' @param electron_mass [numeric] Electron mass in Daltons
 #'     (default: ELECTRON_MASS_DALTONS from constants.R - CODATA 2018 value)
 #'
 #' @return Numeric neutral mass (M) in Daltons. Returns 0 if:
@@ -37,7 +37,6 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' # Simple protonated molecule
 #' calculate_mass_of_m(mz = 123.4567, adduct_string = "[M+H]+")
 #' # Expected: ~122.45 Da
@@ -57,18 +56,6 @@
 #' # Doubly charged
 #' calculate_mass_of_m(mz = 62.2311, adduct_string = "[M+2H]2+")
 #' # Expected: ~122.45 Da
-#'
-#' # M+1 isotopologue
-#' calculate_mass_of_m(mz = 124.4600, adduct_string = "[M1+H]+")
-#' # Expected: ~122.45 Da
-#'
-#' # Using custom electron mass (for testing)
-#' calculate_mass_of_m(
-#'   mz = 123.4567,
-#'   adduct_string = "[M+H]+",
-#'   electron_mass = 0.0005486
-#' )
-#' }
 calculate_mass_of_m <- function(
   mz,
   adduct_string,
@@ -303,7 +290,6 @@ calculate_neutral_mass_formula <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' # Calculate m/z for a protonated molecule
 #' calculate_mz_from_mass(neutral_mass = 122.45, adduct_string = "[M+H]+")
 #' # Expected: ~123.4567
@@ -314,7 +300,6 @@ calculate_neutral_mass_formula <- function(
 #' mz <- calculate_mz_from_mass(mass, adduct)
 #' mass_back <- calculate_mass_of_m(mz, adduct)
 #' all.equal(mass, mass_back) # Should be TRUE
-#' }
 calculate_mz_from_mass <- function(
   neutral_mass,
   adduct_string,

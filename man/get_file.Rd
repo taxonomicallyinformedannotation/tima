@@ -7,11 +7,11 @@
 get_file(url, export, limit = 3600L)
 }
 \arguments{
-\item{url}{Character string URL of the file to download}
+\item{url}{\link{character} URL of the file to download}
 
-\item{export}{Character string file path where the file should be saved}
+\item{export}{\link{character} File path where the file should be saved}
 
-\item{limit}{Integer timeout limit in seconds (default: 3600 = 1 hour)}
+\item{limit}{\link{integer} Timeout limit in seconds (default: 3600 = 1 hour)}
 }
 \value{
 Path to the downloaded file (invisibly)

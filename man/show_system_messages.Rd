@@ -4,12 +4,10 @@
 \alias{show_system_messages}
 \title{Display System-Specific Installation Messages}
 \usage{
-show_system_messages(system, test)
+show_system_messages(system)
 }
 \arguments{
-\item{system}{Character OS name from Sys.info()}
-
-\item{test}{Logical test mode flag}
+\item{system}{\link{character} OS name from Sys.info()}
 }
 \value{
 NULL (side effect: logging)

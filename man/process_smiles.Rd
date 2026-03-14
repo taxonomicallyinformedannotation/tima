@@ -7,12 +7,12 @@
 process_smiles(df, smiles_colname = "structure_smiles_initial", cache = NULL)
 }
 \arguments{
-\item{df}{Data frame containing SMILES strings}
+\item{df}{\link{data.frame} Data frame containing SMILES strings}
 
-\item{smiles_colname}{Column name containing SMILES
+\item{smiles_colname}{\link{character} Column name containing SMILES
 (default: "structure_smiles_initial")}
 
-\item{cache}{Path to cached processed SMILES file, or NULL to skip caching}
+\item{cache}{\link{character} Path to cached processed SMILES file, or NULL to skip caching}
 }
 \value{
 Data frame with processed SMILES including InChIKey, molecular formula

@@ -29,7 +29,6 @@ charge state, and charge sign. It handles complex adducts with multiple
 additions/losses.
 }
 \examples{
-\dontrun{
 # Simple adducts
 parse_adduct("[M+H]+") # Protonated molecule
 parse_adduct("[M-H]-") # Deprotonated molecule
@@ -38,12 +37,11 @@ parse_adduct("[M+Na]+") # Sodium adduct
 # Complex adducts
 parse_adduct("[2M+Na]+") # Dimer with sodium
 parse_adduct("[M+H-H2O]+") # Protonated with water loss
+
+\dontrun{
+# Advanced cases
 parse_adduct("[M1+H]+") # M+1 isotopologue
 parse_adduct("[2M1-C6H12O6 (hexose)+NaCl+H]2+") # Complex modification
-
-# Error cases
-parse_adduct(NULL) # Returns all zeros
-parse_adduct("invalid") # Returns all zeros with warning
 }
 }
 \seealso{

@@ -19,27 +19,27 @@ annotate_spectra(
 )
 }
 \arguments{
-\item{input}{Character vector or list of query spectral file paths (.mgf).}
+\item{input}{\link{character} Vector or list of query spectral file paths (.mgf).}
 
-\item{libraries}{Character vector or list of library spectral file paths
+\item{libraries}{\link{character} Vector or list of library spectral file paths
 (.mgf / Spectra-supported). Must contain at least one path.}
 
-\item{polarity}{MS polarity; one of \code{VALID_MS_MODES} ("pos", "neg").}
+\item{polarity}{\link{character} MS polarity; one of \code{VALID_MS_MODES} ("pos", "neg").}
 
-\item{output}{Output file path (the function writes a tabular file here).}
+\item{output}{\link{character} Output file path (the function writes a tabular file here).}
 
-\item{method}{Similarity method; one of \code{VALID_SIMILARITY_METHODS}.}
+\item{method}{\link{character} Similarity method; one of \code{VALID_SIMILARITY_METHODS}.}
 
-\item{threshold}{Minimal similarity score to retain candidates (0-1).}
+\item{threshold}{\link{numeric} Minimal similarity score to retain candidates (0-1).}
 
-\item{ppm}{Relative mass tolerance (ppm) for MS/MS matching.}
+\item{ppm}{\link{numeric} Relative mass tolerance (ppm) for MS/MS matching.}
 
-\item{dalton}{Absolute mass tolerance (Daltons) for MS/MS matching.}
+\item{dalton}{\link{numeric} Absolute mass tolerance (Daltons) for MS/MS matching.}
 
-\item{cutoff}{Intensity cutoff under which MS2 fragments are removed.
+\item{cutoff}{\link{numeric} Intensity cutoff under which MS2 fragments are removed.
 Non-negative numeric or NULL for dynamic thresholding.}
 
-\item{approx}{Logical; if TRUE perform matching ignoring precursor masses
+\item{approx}{\link{logical} If TRUE perform matching ignoring precursor masses
 (broader, slower); if FALSE restrict library to precursor-tolerant
 spectra first.}
 

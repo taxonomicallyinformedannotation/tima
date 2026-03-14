@@ -7,7 +7,7 @@
 format_bytes(bytes)
 }
 \arguments{
-\item{bytes}{File size in bytes}
+\item{bytes}{\link{numeric} File size in bytes}
 }
 \value{
 Formatted string (e.g., "1.5 MB")
