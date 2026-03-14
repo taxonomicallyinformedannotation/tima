@@ -13,6 +13,7 @@ Authors@R: c(
            role = "ctb",
            comment = c(ORCID = "0000-0003-3389-2191"))
   )
+Maintainer: Adriano Rutz <adafede@gmail.com>
 Description: TIMA provides a reproducible workflow for taxonomically informed
     metabolite annotation from feature tables, MS/MS spectra, and optional
     external resources such as SIRIUS and GNPS outputs. It combines mass,
