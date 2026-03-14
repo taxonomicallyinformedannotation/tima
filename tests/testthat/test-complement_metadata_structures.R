@@ -571,4 +571,3 @@ test_that("metadata and names keyed by structure_inchikey are mapped via stereo"
   expect_equal(out$candidate_structure_tag[[1]], "clean_lookup")
   expect_equal(out$candidate_structure_name[[1]], "MappedByInchikey")
 })
-
