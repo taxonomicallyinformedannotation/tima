@@ -40,7 +40,8 @@ summarize_results <- function(
   remove_ties,
   summarize,
   annotation_notes_lookup = NULL,
-  feature_consensus_table = NULL
+  feature_consensus_table = NULL,
+  organism_lookup = NULL
 ) {
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
@@ -87,62 +88,12 @@ summarize_results <- function(
       tidytable::mutate(reference_doi = NA_character_)
   }
 
-  # Pre-process organism taxonomy data
-  organism_lookup <- structure_organism_pairs_table |>
-    tidytable::filter(
-      structure_inchikey_connectivity_layer %in%
-        df$candidate_structure_inchikey_connectivity_layer
-    ) |>
-    tidytable::select(
-      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
-      reference_doi,
-      tidyselect::contains(match = "organism_taxonomy_"),
-      -organism_taxonomy_ottid
-    ) |>
-    tidytable::distinct() |>
-    tidytable::inner_join(
-      y = df |>
-        tidytable::distinct(
-          candidate_structure_organism_occurrence_closest,
-          candidate_structure_inchikey_connectivity_layer
-        )
-    ) |>
-    tidytable::filter(
-      candidate_structure_organism_occurrence_closest ==
-        organism_taxonomy_01domain |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_02kingdom |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_03phylum |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_04class |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_05order |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_06family |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_07tribe |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_08genus |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_09species |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_10varietas
-    ) |>
-    tidytable::distinct(
-      candidate_structure_inchikey_connectivity_layer,
-      candidate_structure_organism_occurrence_closest,
-      candidate_structure_organism_occurrence_reference = reference_doi,
-      .keep_all = TRUE
-    ) |>
-    tidytable::group_by(
-      candidate_structure_inchikey_connectivity_layer,
-      candidate_structure_organism_occurrence_closest
-    ) |>
-    clean_collapse(
-      cols = c("candidate_structure_organism_occurrence_reference")
-    ) |>
-    tidytable::ungroup()
+  if (is.null(organism_lookup)) {
+    organism_lookup <- .build_organism_lookup(
+      structure_organism_pairs_table = structure_organism_pairs_table,
+      df = df
+    )
+  }
 
   # Define columns to select
   select_cols <- c(
@@ -213,9 +164,7 @@ summarize_results <- function(
 
   # Summarize if requested
   if (summarize == TRUE) {
-    # gc()
-
-    # Get column names that match the pattern once
+    # Get column names that match the pattern once.
     collapse_cols <- colnames(df_joined)[grepl(
       pattern = "^candidate|^rank|^score",
       x = colnames(df_joined),
@@ -232,33 +181,25 @@ summarize_results <- function(
       )
     }
 
-    df_summarized <- df_joined |>
+    # Summarize all fields in one grouped pass to avoid materializing
+    # an additional wide distinct table and joining it back.
+    keep_cols <- setdiff(colnames(df_joined), c("feature_id", collapse_cols))
+
+    df_final <- df_joined |>
       tidytable::group_by(feature_id) |>
-      tidytable::reframe(
+      tidytable::summarize(
         tidytable::across(
           .cols = tidyselect::all_of(x = collapse_cols),
           .fns = collapse_fn
+        ),
+        tidytable::across(
+          .cols = tidyselect::all_of(x = keep_cols),
+          .fns = .first_non_missing
         )
       ) |>
       tidytable::ungroup()
 
-    # Get remaining columns (non-collapsed)
-    remaining_cols <- setdiff(
-      colnames(df_joined),
-      c("feature_id", collapse_cols)
-    )
-
-    df_final <- df_summarized |>
-      tidytable::left_join(
-        y = df_joined |>
-          tidytable::select(c(
-            "feature_id",
-            tidyselect::all_of(x = remaining_cols)
-          )) |>
-          tidytable::distinct()
-      )
-
-    rm(df_summarized, df_joined)
+    rm(df_joined)
   } else {
     df_final <- df_joined
     rm(df_joined)
@@ -273,10 +214,12 @@ summarize_results <- function(
       sapply(X = df_final, FUN = is.numeric)
   ]
 
+  cols_to_character <- setdiff(colnames(df_final), numeric_feature_cols)
+
   df_processed <- df_final |>
     tidytable::mutate(
       tidytable::across(
-        .cols = tidyselect::everything(),
+        .cols = tidyselect::all_of(x = cols_to_character),
         .fns = as.character
       )
     ) |>
@@ -358,6 +301,73 @@ summarize_results <- function(
   )
 
   return(results)
+}
+
+.build_organism_lookup <- function(structure_organism_pairs_table, df) {
+  structure_organism_pairs_table |>
+    tidytable::filter(
+      structure_inchikey_connectivity_layer %in%
+        df$candidate_structure_inchikey_connectivity_layer
+    ) |>
+    tidytable::select(
+      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
+      reference_doi,
+      tidyselect::contains(match = "organism_taxonomy_"),
+      -organism_taxonomy_ottid
+    ) |>
+    tidytable::distinct() |>
+    tidytable::inner_join(
+      y = df |>
+        tidytable::distinct(
+          candidate_structure_organism_occurrence_closest,
+          candidate_structure_inchikey_connectivity_layer
+        )
+    ) |>
+    tidytable::filter(
+      candidate_structure_organism_occurrence_closest ==
+        organism_taxonomy_01domain |
+        candidate_structure_organism_occurrence_closest ==
+          organism_taxonomy_02kingdom |
+        candidate_structure_organism_occurrence_closest ==
+          organism_taxonomy_03phylum |
+        candidate_structure_organism_occurrence_closest ==
+          organism_taxonomy_04class |
+        candidate_structure_organism_occurrence_closest ==
+          organism_taxonomy_05order |
+        candidate_structure_organism_occurrence_closest ==
+          organism_taxonomy_06family |
+        candidate_structure_organism_occurrence_closest ==
+          organism_taxonomy_07tribe |
+        candidate_structure_organism_occurrence_closest ==
+          organism_taxonomy_08genus |
+        candidate_structure_organism_occurrence_closest ==
+          organism_taxonomy_09species |
+        candidate_structure_organism_occurrence_closest ==
+          organism_taxonomy_10varietas
+    ) |>
+    tidytable::distinct(
+      candidate_structure_inchikey_connectivity_layer,
+      candidate_structure_organism_occurrence_closest,
+      candidate_structure_organism_occurrence_reference = reference_doi,
+      .keep_all = TRUE
+    ) |>
+    tidytable::group_by(
+      candidate_structure_inchikey_connectivity_layer,
+      candidate_structure_organism_occurrence_closest
+    ) |>
+    clean_collapse(
+      cols = c("candidate_structure_organism_occurrence_reference")
+    ) |>
+    tidytable::ungroup()
+}
+
+.first_non_missing <- function(x) {
+  idx <- which(!is.na(x))
+  if (length(idx) == 0L) {
+    return(x[1L])
+  }
+
+  x[idx[1L]]
 }
 
 .build_feature_consensus_table <- function(annot_table_wei_chemo, model) {

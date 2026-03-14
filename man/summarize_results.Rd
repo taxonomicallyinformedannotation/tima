@@ -13,7 +13,8 @@ summarize_results(
   remove_ties,
   summarize,
   annotation_notes_lookup = NULL,
-  feature_consensus_table = NULL
+  feature_consensus_table = NULL,
+  organism_lookup = NULL
 )
 }
 \arguments{
