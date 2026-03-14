@@ -7,12 +7,12 @@
 calculate_mass_of_m(mz, adduct_string, electron_mass = ELECTRON_MASS_DALTONS)
 }
 \arguments{
-\item{mz}{Numeric observed m/z value in Daltons. Must be positive.}
+\item{mz}{\link{numeric} Observed m/z value in Daltons. Must be positive.}
 
-\item{adduct_string}{Character string representing the adduct
+\item{adduct_string}{\link{character} Adduct notation string
 (e.g., \code{[M+H]+}, \code{[2M+Na]+}, \code{[M-H2O+H]+})}
 
-\item{electron_mass}{Numeric electron mass in Daltons
+\item{electron_mass}{\link{numeric} Electron mass in Daltons
 (default: ELECTRON_MASS_DALTONS from constants.R - CODATA 2018 value)}
 }
 \value{
@@ -41,7 +41,6 @@ where:
 }\if{html}{\out{</div>}}
 }
 \examples{
-\dontrun{
 # Simple protonated molecule
 calculate_mass_of_m(mz = 123.4567, adduct_string = "[M+H]+")
 # Expected: ~122.45 Da
@@ -61,18 +60,6 @@ calculate_mass_of_m(mz = 245.9053, adduct_string = "[2M+H]+")
 # Doubly charged
 calculate_mass_of_m(mz = 62.2311, adduct_string = "[M+2H]2+")
 # Expected: ~122.45 Da
-
-# M+1 isotopologue
-calculate_mass_of_m(mz = 124.4600, adduct_string = "[M1+H]+")
-# Expected: ~122.45 Da
-
-# Using custom electron mass (for testing)
-calculate_mass_of_m(
-  mz = 123.4567,
-  adduct_string = "[M+H]+",
-  electron_mass = 0.0005486
-)
-}
 }
 \seealso{
 Other mass-spectrometry: 

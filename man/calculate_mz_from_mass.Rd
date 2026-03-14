@@ -25,7 +25,6 @@ This is the inverse of calculate_mass_of_m. Given a neutral
 mass and adduct, it calculates the expected m/z value.
 }
 \examples{
-\dontrun{
 # Calculate m/z for a protonated molecule
 calculate_mz_from_mass(neutral_mass = 122.45, adduct_string = "[M+H]+")
 # Expected: ~123.4567
@@ -36,7 +35,6 @@ adduct <- "[M+H]+"
 mz <- calculate_mz_from_mass(mass, adduct)
 mass_back <- calculate_mass_of_m(mz, adduct)
 all.equal(mass, mass_back) # Should be TRUE
-}
 }
 \seealso{
 Other mass-spectrometry: 
