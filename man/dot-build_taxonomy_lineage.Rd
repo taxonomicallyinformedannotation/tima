@@ -7,11 +7,11 @@
 .build_taxonomy_lineage(taxon_info, taxon_lineage, ott_ids)
 }
 \arguments{
-\item{taxon_info}{List of taxonomy information from rotl}
+\item{taxon_info}{\link{list} List of taxonomy information from rotl}
 
-\item{taxon_lineage}{List of lineage information from rotl}
+\item{taxon_lineage}{\link{list} List of lineage information from rotl}
 
-\item{ott_ids}{Integer vector of OTT IDs}
+\item{ott_ids}{\link{integer} Integer vector of OTT IDs}
 }
 \value{
 Data frame with complete taxonomy lineage

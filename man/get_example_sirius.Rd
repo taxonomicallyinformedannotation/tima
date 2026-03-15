@@ -10,9 +10,9 @@ get_example_sirius(
 )
 }
 \arguments{
-\item{url}{List containing URLs for SIRIUS examples (must have $v5 and $v6 elements)}
+\item{url}{\link{list} List containing URLs for SIRIUS examples (must have $v5 and $v6 elements)}
 
-\item{export}{List containing export paths for SIRIUS examples (must have $v5 and $v6 elements)}
+\item{export}{\link{list} List containing export paths for SIRIUS examples (must have $v5 and $v6 elements)}
 }
 \value{
 NULL (invisibly). Downloads files as a side effect.
