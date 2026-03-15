@@ -44,11 +44,4 @@ result_labeled <- process_smiles(df_labeled)
 # InChIKey differs from natural glucose
 }
 }
-\seealso{
-Other chemical-classification: 
-\code{\link{classy_magic}()},
-\code{\link{get_classyfire_taxonomy}()},
-\code{\link{normalize_inchikey}()},
-\code{\link{npclassifier_classify_smiles}()}
-}
 \concept{chemical-classification}
