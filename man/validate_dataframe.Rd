@@ -14,7 +14,7 @@ validate_dataframe(
 )
 }
 \arguments{
-\item{df}{\link{ANY} Input to validate}
+\item{df}{Input to validate}
 
 \item{param_name}{\link{character} Name of the parameter (for error messages)}
 

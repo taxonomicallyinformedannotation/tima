@@ -11,12 +11,12 @@ get_organism_taxonomy_ott(
 )
 }
 \arguments{
-\item{df}{Data frame containing organism names in a column named "organism"}
+\item{df}{\link{data.frame} Data frame containing organism names in a column named "organism"}
 
-\item{url}{Character string URL of the OTT API endpoint (default: production API,
+\item{url}{\link{character} Character string URL of the OTT API endpoint (default: production API,
 can be changed for testing)}
 
-\item{retry}{Logical indicating whether to retry failed queries using only the
+\item{retry}{\link{logical} Logical indicating whether to retry failed queries using only the
 generic epithet (genus name) when full species names fail (default: TRUE)}
 }
 \value{

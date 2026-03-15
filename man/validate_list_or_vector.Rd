@@ -13,7 +13,7 @@ validate_list_or_vector(
 )
 }
 \arguments{
-\item{value}{\link{ANY} Value to validate}
+\item{value}{Value to validate}
 
 \item{min_length}{\link{integer} Minimum required length}
 
