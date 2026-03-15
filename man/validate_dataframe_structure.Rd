@@ -13,15 +13,15 @@ validate_dataframe_structure(
 )
 }
 \arguments{
-\item{df}{Data frame to validate}
+\item{df}{\link{data.frame} Data frame to validate}
 
-\item{required_cols}{Character vector of required column names}
+\item{required_cols}{\link{character} Character vector of required column names}
 
-\item{optional_cols}{Character vector of optional column names}
+\item{optional_cols}{\link{character} Character vector of optional column names}
 
-\item{df_name}{Name of the data frame for error messages}
+\item{df_name}{\link{character} Name of the data frame for error messages}
 
-\item{min_rows}{Minimum number of rows required}
+\item{min_rows}{\link{integer} Minimum number of rows required}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

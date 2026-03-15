@@ -7,7 +7,7 @@
 split_sirius_results(table)
 }
 \arguments{
-\item{table}{Data frame with combined SIRIUS results.}
+\item{table}{\link{data.frame} Data frame with combined SIRIUS results.}
 }
 \value{
 Named list with keys: canopus, formula, structures.

@@ -15,19 +15,19 @@ validate_numeric_range(
 )
 }
 \arguments{
-\item{value}{Numeric value to validate}
+\item{value}{\link{numeric} Numeric value to validate}
 
-\item{min_value}{Minimum allowed value}
+\item{min_value}{\link{numeric} Minimum allowed value}
 
-\item{max_value}{Maximum allowed value}
+\item{max_value}{\link{numeric} Maximum allowed value}
 
-\item{param_name}{Parameter name for error messages}
+\item{param_name}{\link{character} Parameter name for error messages}
 
-\item{recommended_min}{Recommended minimum (for warnings)}
+\item{recommended_min}{\link{numeric} Recommended minimum (for warnings)}
 
-\item{recommended_max}{Recommended maximum (for warnings)}
+\item{recommended_max}{\link{numeric} Recommended maximum (for warnings)}
 
-\item{context}{Why this range matters}
+\item{context}{\link{character} Why this range matters}
 }
 \value{
 Invisible TRUE if valid, stops/warns with messages otherwise

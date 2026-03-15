@@ -7,7 +7,7 @@
 execute_targets_pipeline(target_pattern = "^ann_wei$")
 }
 \arguments{
-\item{target_pattern}{Character regex pattern to match target names}
+\item{target_pattern}{\link{character} Character regex pattern to match target names}
 }
 \value{
 Invisible NULL

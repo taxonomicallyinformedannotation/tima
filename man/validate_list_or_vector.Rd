@@ -13,15 +13,15 @@ validate_list_or_vector(
 )
 }
 \arguments{
-\item{value}{Value to validate}
+\item{value}{\link{ANY} Value to validate}
 
-\item{min_length}{Minimum required length}
+\item{min_length}{\link{integer} Minimum required length}
 
-\item{max_length}{Maximum allowed length (NULL = no limit)}
+\item{max_length}{\link{integer} Maximum allowed length (NULL = no limit)}
 
-\item{param_name}{Name of the parameter (for error messages)}
+\item{param_name}{\link{character} Name of the parameter (for error messages)}
 
-\item{allow_null}{Allow NULL values (default: FALSE)}
+\item{allow_null}{\link{logical} Allow NULL values (default: FALSE)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

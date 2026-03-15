@@ -7,9 +7,9 @@
 read_from_sirius_zip(sirius_zip, file)
 }
 \arguments{
-\item{sirius_zip}{Path to compressed SIRIUS workspace (.zip)}
+\item{sirius_zip}{\link{character} Path to compressed SIRIUS workspace (.zip)}
 
-\item{file}{Pattern to match files within the archive}
+\item{file}{\link{character} Pattern to match files within the archive}
 }
 \value{
 Data frame (tidytable) containing the parsed file contents

@@ -28,45 +28,45 @@ harmonize_spectra_polarity(
 )
 }
 \arguments{
-\item{spectra_extracted}{List of extracted spectra data frames.}
+\item{spectra_extracted}{\link{list} List of extracted spectra data frames.}
 
-\item{mode}{Character "pos" or "neg".}
+\item{mode}{\link{character} Character "pos" or "neg".}
 
-\item{metad}{Character library metadata name.}
+\item{metad}{\link{character} Character library metadata name.}
 
-\item{col_ad}{Adduct field name}
+\item{col_ad}{\link{character} Adduct field name}
 
-\item{col_ce}{Collision energy field name}
+\item{col_ce}{\link{character} Collision energy field name}
 
-\item{col_ci}{Compound ID field name}
+\item{col_ci}{\link{character} Compound ID field name}
 
-\item{col_em}{Exact mass field name}
+\item{col_em}{\link{character} Exact mass field name}
 
-\item{col_in}{InChI field name}
+\item{col_in}{\link{character} InChI field name}
 
-\item{col_io}{InChI without stereochemistry field name}
+\item{col_io}{\link{character} InChI without stereochemistry field name}
 
-\item{col_ik}{InChIKey field name}
+\item{col_ik}{\link{character} InChIKey field name}
 
-\item{col_il}{InChIKey connectivity layer field name}
+\item{col_il}{\link{character} InChIKey connectivity layer field name}
 
-\item{col_mf}{Molecular formula field name}
+\item{col_mf}{\link{character} Molecular formula field name}
 
-\item{col_na}{Compound name field name}
+\item{col_na}{\link{character} Compound name field name}
 
-\item{col_po}{Polarity field name}
+\item{col_po}{\link{character} Polarity field name}
 
-\item{col_sm}{SMILES field name}
+\item{col_sm}{\link{character} SMILES field name}
 
-\item{col_sn}{SMILES without stereochemistry field name}
+\item{col_sn}{\link{character} SMILES without stereochemistry field name}
 
-\item{col_si}{Spectrum ID field name}
+\item{col_si}{\link{character} Spectrum ID field name}
 
-\item{col_sp}{SPLASH field name}
+\item{col_sp}{\link{character} SPLASH field name}
 
-\item{col_sy}{Synonyms field name}
+\item{col_sy}{\link{character} Synonyms field name}
 
-\item{col_xl}{xLogP field name}
+\item{col_xl}{\link{character} xLogP field name}
 }
 \value{
 Data frame with harmonized spectra.

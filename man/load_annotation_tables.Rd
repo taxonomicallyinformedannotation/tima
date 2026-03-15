@@ -7,9 +7,9 @@
 load_annotation_tables(annotations, ms1_only)
 }
 \arguments{
-\item{annotations}{Character vector of file paths to annotation files.}
+\item{annotations}{\link{character} Character vector of file paths to annotation files.}
 
-\item{ms1_only}{Logical; if TRUE, keep only annotations where both
+\item{ms1_only}{\link{logical} Logical; if TRUE, keep only annotations where both
 \code{candidate_score_similarity} and \code{candidate_score_sirius_csi} are NA.}
 }
 \value{

@@ -12,13 +12,13 @@ with_smart_retry(
 )
 }
 \arguments{
-\item{expr}{Expression to evaluate}
+\item{expr}{\link{expression} Expression to evaluate}
 
-\item{max_attempts}{Integer maximum attempts (default: 3)}
+\item{max_attempts}{\link{integer} Integer maximum attempts (default: 3)}
 
-\item{backoff}{Numeric backoff multiplier (default: 2)}
+\item{backoff}{\link{numeric} Numeric backoff multiplier (default: 2)}
 
-\item{operation_name}{Character operation name for logging}
+\item{operation_name}{\link{character} Character operation name for logging}
 }
 \value{
 Result of expr if successful

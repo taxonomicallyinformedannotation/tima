@@ -247,20 +247,20 @@ export_library_tables <- function(
 #' @include get_params.R
 #' @include split_tables_sop.R
 #'
-#' @param files Character vector or list of paths to prepared library files
-#' @param filter Logical whether to filter the merged library by taxonomy
-#' @param level Character string taxonomic rank for filtering (kingdom, phylum,
+#' @param files [character] Character vector or list of paths to prepared library files
+#' @param filter [logical] Logical whether to filter the merged library by taxonomy
+#' @param level [character] Character string taxonomic rank for filtering (kingdom, phylum,
 #'     family, genus, etc.)
-#' @param value Character string taxon name(s) to keep (can use | for multiple,
+#' @param value [character] Character string taxon name(s) to keep (can use | for multiple,
 #'     e.g., 'Gentianaceae|Apocynaceae')
-#' @param cache Character string path to cache directory for processed SMILES
-#' @param output_key Character string path for output keys file
-#' @param output_org_tax_ott Character string path for organisms taxonomy (OTT) file
-#' @param output_str_stereo Character string path for structures stereochemistry file
-#' @param output_str_met Character string path for structures metadata file
-#' @param output_str_nam Character string path for structures names file
-#' @param output_str_tax_cla Character string path for ClassyFire taxonomy file
-#' @param output_str_tax_npc Character string path for NPClassifier taxonomy file
+#' @param cache [character] Character string path to cache directory for processed SMILES
+#' @param output_key [character] Character string path for output keys file
+#' @param output_org_tax_ott [character] Character string path for organisms taxonomy (OTT) file
+#' @param output_str_stereo [character] Character string path for structures stereochemistry file
+#' @param output_str_met [character] Character string path for structures metadata file
+#' @param output_str_nam [character] Character string path for structures names file
+#' @param output_str_tax_cla [character] Character string path for ClassyFire taxonomy file
+#' @param output_str_tax_npc [character] Character string path for NPClassifier taxonomy file
 #'
 #' @return Character string path to the prepared merged SOP library
 #'

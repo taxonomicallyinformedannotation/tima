@@ -12,13 +12,13 @@ rearrange_annotations(
 )
 }
 \arguments{
-\item{annotation_table}{Data frame with annotations}
+\item{annotation_table}{\link{data.frame} Data frame with annotations}
 
-\item{formula_table}{Data frame with formula data}
+\item{formula_table}{\link{data.frame} Data frame with formula data}
 
-\item{canopus_table}{Data frame with canopus data}
+\item{canopus_table}{\link{data.frame} Data frame with canopus data}
 
-\item{edges_table}{Data frame with edges}
+\item{edges_table}{\link{data.frame} Data frame with edges}
 }
 \value{
 Data frame with rearranged annotations

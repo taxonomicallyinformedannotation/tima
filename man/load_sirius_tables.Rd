@@ -7,9 +7,9 @@
 load_sirius_tables(input_directory, version)
 }
 \arguments{
-\item{input_directory}{Character path to SIRIUS output (directory or zip).}
+\item{input_directory}{\link{character} Character path to SIRIUS output (directory or zip).}
 
-\item{version}{Character "5" or "6".}
+\item{version}{\link{character} Character "5" or "6".}
 }
 \value{
 Named list with canopus, formulas, structures, denovo data frames.

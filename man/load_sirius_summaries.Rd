@@ -7,7 +7,7 @@
 load_sirius_summaries(input_directory)
 }
 \arguments{
-\item{input_directory}{Character path to SIRIUS output.}
+\item{input_directory}{\link{character} Character path to SIRIUS output.}
 }
 \value{
 Data frame with structure summaries (bound rows), or empty tidytable.

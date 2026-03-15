@@ -7,7 +7,7 @@
 validate_ms_mode(ms_mode)
 }
 \arguments{
-\item{ms_mode}{Character string indicating ionization mode}
+\item{ms_mode}{\link{character} Character string indicating ionization mode}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

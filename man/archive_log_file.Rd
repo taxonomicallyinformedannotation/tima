@@ -7,9 +7,9 @@
 archive_log_file(log_file, timestamp)
 }
 \arguments{
-\item{log_file}{Character path to log file}
+\item{log_file}{\link{character} Character path to log file}
 
-\item{timestamp}{POSIXct timestamp for filename}
+\item{timestamp}{\link{POSIXct} POSIXct timestamp for filename}
 }
 \value{
 Logical TRUE if successful, FALSE otherwise

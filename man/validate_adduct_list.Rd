@@ -7,11 +7,11 @@
 validate_adduct_list(adducts_list, ms_mode, list_name = "adducts_list")
 }
 \arguments{
-\item{adducts_list}{List containing adduct definitions}
+\item{adducts_list}{\link{list} List containing adduct definitions}
 
-\item{ms_mode}{Required ionization mode ('pos' or 'neg')}
+\item{ms_mode}{\link{character} Required ionization mode ('pos' or 'neg')}
 
-\item{list_name}{Name of the list (for error messages)}
+\item{list_name}{\link{character} Name of the list (for error messages)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

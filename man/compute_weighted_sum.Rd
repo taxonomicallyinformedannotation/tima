@@ -7,9 +7,9 @@
 compute_weighted_sum(..., weights)
 }
 \arguments{
-\item{...}{Numeric columns/vectors of component values (passed as separate arguments).}
+\item{...}{\link{numeric} Numeric columns/vectors of component values (passed as separate arguments).}
 
-\item{weights}{Numeric vector of non-negative weights (one per component).}
+\item{weights}{\link{numeric} Numeric vector of non-negative weights (one per component).}
 }
 \value{
 Numeric vector: row-wise weighted sum with normalized weights.

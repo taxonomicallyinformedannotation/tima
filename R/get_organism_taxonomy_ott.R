@@ -2,8 +2,8 @@
 
 #' Create batches from a vector
 #' @description Splits a vector into batches of specified size
-#' @param items Character vector to batch
-#' @param batch_size Integer size of each batch
+#' @param items [character] Character vector to batch
+#' @param batch_size [integer] Integer size of each batch
 #' @return List of character vectors (batches)
 #' @keywords internal
 .create_batches <- function(items, batch_size) {
@@ -44,7 +44,7 @@
 
 #' Extract genus name from organism name
 #' @description Extracts the first word (genus) from binomial/trinomial names
-#' @param organism_names Character vector of organism names
+#' @param organism_names [character] Character vector of organism names
 #' @return Character vector of genus names
 #' @keywords internal
 .extract_genus_names <- function(organism_names) {
@@ -58,9 +58,9 @@
 
 #' Build taxonomy lineage data frame
 #' @description Constructs taxonomy lineage from OTT taxon info
-#' @param taxon_info List of taxonomy information from rotl
-#' @param taxon_lineage List of lineage information from rotl
-#' @param ott_ids Integer vector of OTT IDs
+#' @param taxon_info [list] List of taxonomy information from rotl
+#' @param taxon_lineage [list] List of lineage information from rotl
+#' @param ott_ids [integer] Integer vector of OTT IDs
 #' @return Data frame with complete taxonomy lineage
 #' @keywords internal
 .build_taxonomy_lineage <- function(taxon_info, taxon_lineage, ott_ids) {
@@ -128,10 +128,10 @@
 #'     API, and returns structured taxonomic data including OTT IDs and hierarchical
 #'     classifications.
 #'
-#' @param df Data frame containing organism names in a column named "organism"
-#' @param url Character string URL of the OTT API endpoint (default: production API,
+#' @param df [data.frame] Data frame containing organism names in a column named "organism"
+#' @param url [character] Character string URL of the OTT API endpoint (default: production API,
 #'     can be changed for testing)
-#' @param retry Logical indicating whether to retry failed queries using only the
+#' @param retry [logical] Logical indicating whether to retry failed queries using only the
 #'     generic epithet (genus name) when full species names fail (default: TRUE)
 #'
 #' @return Data frame with taxonomic information including OTT IDs, ranks, and

@@ -7,7 +7,7 @@
 all_single_strings(x_list)
 }
 \arguments{
-\item{x_list}{Named list of values to check}
+\item{x_list}{\link{list} Named list of values to check}
 }
 \value{
 Named logical vector indicating which elements are single strings

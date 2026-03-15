@@ -15,19 +15,19 @@ validate_inputs(
 )
 }
 \arguments{
-\item{features}{Character path to features CSV/TSV file}
+\item{features}{\link{character} Character path to features CSV/TSV file}
 
-\item{spectra}{Character path to MGF spectra file}
+\item{spectra}{\link{character} Character path to MGF spectra file}
 
-\item{metadata}{Character path to metadata file}
+\item{metadata}{\link{character} Character path to metadata file}
 
-\item{sirius}{Character path to SIRIUS output directory or ZIP file}
+\item{sirius}{\link{character} Character path to SIRIUS output directory or ZIP file}
 
-\item{filename_col}{Character name of filename column (default: "filename")}
+\item{filename_col}{\link{character} Character name of filename column (default: "filename")}
 
-\item{organism_col}{Character name of organism column (default: "organism")}
+\item{organism_col}{\link{character} Character name of organism column (default: "organism")}
 
-\item{feature_col}{Character name of feature ID column (default: "feature_id")}
+\item{feature_col}{\link{character} Character name of feature ID column (default: "feature_id")}
 }
 \value{
 Invisible TRUE if all checks pass, stops with error otherwise

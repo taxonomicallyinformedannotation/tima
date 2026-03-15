@@ -12,13 +12,13 @@ sanitize_metadata(
 )
 }
 \arguments{
-\item{metadata_file}{Character path to metadata file}
+\item{metadata_file}{\link{character} Character path to metadata file}
 
-\item{features_file}{Character path to features file (optional)}
+\item{features_file}{\link{character} Character path to features file (optional)}
 
-\item{filename_col}{Character name of column containing filenames in both files}
+\item{filename_col}{\link{character} Character name of column containing filenames in both files}
 
-\item{organism_col}{Character name of organism column in metadata (default: "organism")}
+\item{organism_col}{\link{character} Character name of organism column in metadata (default: "organism")}
 }
 \value{
 List with validation results:

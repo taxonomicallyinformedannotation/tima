@@ -22,19 +22,19 @@ prepare_annotations_gnps(
 )
 }
 \arguments{
-\item{input}{Character string or vector of paths to GNPS annotation files}
+\item{input}{\link{character} Character string or vector of paths to GNPS annotation files}
 
-\item{output}{Character string path for prepared GNPS annotations output}
+\item{output}{\link{character} Character string path for prepared GNPS annotations output}
 
-\item{str_stereo}{Character string path to structures stereochemistry file}
+\item{str_stereo}{\link{character} Character string path to structures stereochemistry file}
 
-\item{str_met}{Character string path to structures metadata file}
+\item{str_met}{\link{character} Character string path to structures metadata file}
 
-\item{str_nam}{Character string path to structures names file}
+\item{str_nam}{\link{character} Character string path to structures names file}
 
-\item{str_tax_cla}{Character string path to ClassyFire taxonomy file}
+\item{str_tax_cla}{\link{character} Character string path to ClassyFire taxonomy file}
 
-\item{str_tax_npc}{Character string path to NPClassifier taxonomy file}
+\item{str_tax_npc}{\link{character} Character string path to NPClassifier taxonomy file}
 }
 \value{
 Character string path to prepared GNPS annotations

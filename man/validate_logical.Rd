@@ -7,11 +7,11 @@
 validate_logical(value, param_name = "value", allow_null = FALSE)
 }
 \arguments{
-\item{value}{Logical value to validate}
+\item{value}{\link{logical} Logical value to validate}
 
-\item{param_name}{Name of the parameter (for error messages)}
+\item{param_name}{\link{character} Name of the parameter (for error messages)}
 
-\item{allow_null}{Allow NULL values (default: FALSE)}
+\item{allow_null}{\link{logical} Allow NULL values (default: FALSE)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

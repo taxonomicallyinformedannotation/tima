@@ -8,8 +8,8 @@
 #' @include get_file.R
 #' @include logs_utils.R
 #'
-#' @param url List containing URLs for SIRIUS examples (must have $v5 and $v6 elements)
-#' @param export List containing export paths for SIRIUS examples (must have $v5 and $v6 elements)
+#' @param url [list] List containing URLs for SIRIUS examples (must have $v5 and $v6 elements)
+#' @param export [list] List containing export paths for SIRIUS examples (must have $v5 and $v6 elements)
 #'
 #' @return NULL (invisibly). Downloads files as a side effect.
 #'

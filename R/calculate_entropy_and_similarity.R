@@ -31,17 +31,17 @@
 #' @include calculate_similarity.R
 #' @include validations_utils.R
 #'
-#' @param lib_ids Character vector of library spectrum IDs
-#' @param lib_precursors Numeric vector of library precursor m/z values
-#' @param lib_spectra List of library spectra (each a matrix of mz/intensity)
-#' @param query_ids Character vector of query spectrum IDs
-#' @param query_precursors Numeric vector of query precursor m/z values
-#' @param query_spectra List of query spectra (each a matrix of mz/intensity)
-#' @param method Character string similarity method to use
-#' @param dalton Numeric absolute mass tolerance in Daltons
-#' @param ppm Numeric relative mass tolerance in ppm
-#' @param threshold Numeric minimum similarity threshold (0-1)
-#' @param approx Logical whether to perform approximate matching without
+#' @param lib_ids [character] Character vector of library spectrum IDs
+#' @param lib_precursors [numeric] Numeric vector of library precursor m/z values
+#' @param lib_spectra [list] List of library spectra (each a matrix of mz/intensity)
+#' @param query_ids [character] Character vector of query spectrum IDs
+#' @param query_precursors [numeric] Numeric vector of query precursor m/z values
+#' @param query_spectra [list] List of query spectra (each a matrix of mz/intensity)
+#' @param method [character] Character string similarity method to use
+#' @param dalton [numeric] Numeric absolute mass tolerance in Daltons
+#' @param ppm [numeric] Numeric relative mass tolerance in ppm
+#' @param threshold [numeric] Numeric minimum similarity threshold (0-1)
+#' @param approx [logical] Logical whether to perform approximate matching without
 #'     precursor mass filtering
 #'
 #' @return Data frame with spectrum IDs, entropy scores, and similarity scores

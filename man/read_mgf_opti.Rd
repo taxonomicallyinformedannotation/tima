@@ -11,11 +11,11 @@ read_mgf_opti(
 )
 }
 \arguments{
-\item{f}{Character string specifying the path to a single MGF file}
+\item{f}{\link{character} Character string specifying the path to a single MGF file}
 
-\item{msLevel}{Integer MS level to assign to spectra (default: 2L for MS2)}
+\item{msLevel}{\link{integer} Integer MS level to assign to spectra (default: 2L for MS2)}
 
-\item{mapping}{Named character vector mapping MGF field names to standard
+\item{mapping}{\link{character} Named character vector mapping MGF field names to standard
 spectra variable names. Default uses the mapping from MsBackendMgf.}
 }
 \value{

@@ -36,7 +36,7 @@ is_single_string <- function(x) {
 #' @description Vectorized check for lists of parameters that should all be
 #'     single character strings. More efficient than repeated individual checks.
 #'
-#' @param x_list Named list of values to check
+#' @param x_list [list] Named list of values to check
 #'
 #' @return Named logical vector indicating which elements are single strings
 #'
@@ -66,8 +66,8 @@ all_single_strings <- function(x_list) {
 #' @description Validates and reports which parameters failed the single string
 #'     check. Stops execution with informative error if any validation fails.
 #'
-#' @param x_list Named list of values to validate
-#' @param error_prefix Character string to prefix error message
+#' @param x_list [list] Named list of values to validate
+#' @param error_prefix [character] Character string to prefix error message
 #'
 #' @return NULL (invisible) if validation passes, stops with error otherwise
 #'
@@ -106,8 +106,8 @@ validate_all_single_strings <- function(
 #' @description Generic counter applying a predicate function to count how many
 #'     elements satisfy the condition. More flexible than specific counters.
 #'
-#' @param x List or vector to process
-#' @param predicate_fn Function taking one element and returning logical
+#' @param x [list] List or vector to process
+#' @param predicate_fn [function] Function taking one element and returning logical
 #' @param ... Additional arguments passed to predicate_fn
 #'
 #' @return Integer count of elements for which predicate_fn returns TRUE
@@ -176,8 +176,8 @@ is_null_or_proportion <- function(x) {
 #'     bounds. Useful for parameter ranges.
 #'
 #' @param x Value to check
-#' @param min Minimum allowed value (inclusive)
-#' @param max Maximum allowed value (inclusive)
+#' @param min [numeric] Minimum allowed value (inclusive)
+#' @param max [numeric] Maximum allowed value (inclusive)
 #'
 #' @return Logical TRUE if x is numeric and in \[min, max\]
 #'
@@ -198,9 +198,9 @@ is_numeric_in_range <- function(x, min = -Inf, max = Inf) {
 #' @description Validates that all elements in a list satisfy a predicate
 #'     function. Stops with informative cli error if any fail.
 #'
-#' @param x_list Named list of values to check
-#' @param predicate_fn Function taking one element and returning logical
-#' @param error_prefix Character prefix for error message
+#' @param x_list [list] Named list of values to check
+#' @param predicate_fn [function] Function taking one element and returning logical
+#' @param error_prefix [character] Character prefix for error message
 #' @param ... Additional arguments passed to predicate_fn
 #'
 #' @return NULL (invisible) if all elements pass, stops with error otherwise

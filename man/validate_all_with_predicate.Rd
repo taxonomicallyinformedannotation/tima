@@ -12,11 +12,11 @@ validate_all_with_predicate(
 )
 }
 \arguments{
-\item{x_list}{Named list of values to check}
+\item{x_list}{\link{list} Named list of values to check}
 
-\item{predicate_fn}{Function taking one element and returning logical}
+\item{predicate_fn}{\link{function} Function taking one element and returning logical}
 
-\item{error_prefix}{Character prefix for error message}
+\item{error_prefix}{\link{character} Character prefix for error message}
 
 \item{...}{Additional arguments passed to predicate_fn}
 }

@@ -22,21 +22,21 @@
 #' @include validations_utils.R
 #' @include weights_utils.R
 #'
-#' @param annotation_table_taxed Data frame with initial annotations and sample taxonomy
-#' @param structure_organism_pairs_table Data frame with structure-organism pairs and taxonomies
-#' @param weight_spectral Weight for spectral similarity score (any positive number)
-#' @param weight_biological Weight for biological source score (any positive number)
-#' @param score_biological_domain Score for domain-level taxonomic match (0-1)
-#' @param score_biological_kingdom Score for kingdom-level match (0-1)
-#' @param score_biological_phylum Score for phylum-level match (0-1)
-#' @param score_biological_class Score for class-level match (0-1)
-#' @param score_biological_order Score for order-level match (0-1)
-#' @param score_biological_family Score for family-level match (0-1)
-#' @param score_biological_tribe Score for tribe-level match (0-1)
-#' @param score_biological_genus Score for genus-level match (0-1)
-#' @param score_biological_species Score for species-level match (0-1)
-#' @param score_biological_variety Score for variety-level match (0-1, highest)
-#' @param score_biological_biota Score for Biota-level match (0-1, special)
+#' @param annotation_table_taxed [data.frame] Data frame with initial annotations and sample taxonomy
+#' @param structure_organism_pairs_table [data.frame] Data frame with structure-organism pairs and taxonomies
+#' @param weight_spectral [numeric] Weight for spectral similarity score (any positive number)
+#' @param weight_biological [numeric] Weight for biological source score (any positive number)
+#' @param score_biological_domain [numeric] Score for domain-level taxonomic match (0-1)
+#' @param score_biological_kingdom [numeric] Score for kingdom-level match (0-1)
+#' @param score_biological_phylum [numeric] Score for phylum-level match (0-1)
+#' @param score_biological_class [numeric] Score for class-level match (0-1)
+#' @param score_biological_order [numeric] Score for order-level match (0-1)
+#' @param score_biological_family [numeric] Score for family-level match (0-1)
+#' @param score_biological_tribe [numeric] Score for tribe-level match (0-1)
+#' @param score_biological_genus [numeric] Score for genus-level match (0-1)
+#' @param score_biological_species [numeric] Score for species-level match (0-1)
+#' @param score_biological_variety [numeric] Score for variety-level match (0-1, highest)
+#' @param score_biological_biota [numeric] Score for Biota-level match (0-1, special)
 #'
 #' @return Data frame with biologically weighted annotations including biological
 #'     scores and combined weighted scores

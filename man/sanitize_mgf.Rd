@@ -7,9 +7,9 @@
 sanitize_mgf(file, file_type = "MGF file")
 }
 \arguments{
-\item{file}{Character path to MGF file}
+\item{file}{\link{character} Character path to MGF file}
 
-\item{file_type}{Character description for error messages}
+\item{file_type}{\link{character} Character description for error messages}
 }
 \value{
 List with validation results:

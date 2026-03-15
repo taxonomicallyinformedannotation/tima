@@ -17,23 +17,23 @@ validate_sirius_inputs(
 )
 }
 \arguments{
-\item{sirius_version}{Character SIRIUS version ("5", "6", or coercible to those).}
+\item{sirius_version}{\link{character} Character SIRIUS version ("5", "6", or coercible to those).}
 
-\item{output_ann}{Character output path for annotations.}
+\item{output_ann}{\link{character} Character output path for annotations.}
 
-\item{output_can}{Character output path for CANOPUS.}
+\item{output_can}{\link{character} Character output path for CANOPUS.}
 
-\item{output_for}{Character output path for formulas.}
+\item{output_for}{\link{character} Character output path for formulas.}
 
-\item{str_stereo}{Character path to stereo file.}
+\item{str_stereo}{\link{character} Character path to stereo file.}
 
-\item{str_met}{Character path to metadata file.}
+\item{str_met}{\link{character} Character path to metadata file.}
 
-\item{str_nam}{Character path to names file.}
+\item{str_nam}{\link{character} Character path to names file.}
 
-\item{str_tax_cla}{Character path to ClassyFire taxonomy.}
+\item{str_tax_cla}{\link{character} Character path to ClassyFire taxonomy.}
 
-\item{str_tax_npc}{Character path to NPClassifier taxonomy.}
+\item{str_tax_npc}{\link{character} Character path to NPClassifier taxonomy.}
 }
 \value{
 NULL (invisible). Stops on validation failure.

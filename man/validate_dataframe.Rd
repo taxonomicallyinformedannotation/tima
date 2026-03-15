@@ -14,17 +14,17 @@ validate_dataframe(
 )
 }
 \arguments{
-\item{df}{Input to validate}
+\item{df}{\link{ANY} Input to validate}
 
-\item{param_name}{Name of the parameter (for error messages)}
+\item{param_name}{\link{character} Name of the parameter (for error messages)}
 
-\item{required_cols}{Character vector of required column names}
+\item{required_cols}{\link{character} Character vector of required column names}
 
-\item{min_rows}{Minimum number of rows required (default: 0)}
+\item{min_rows}{\link{integer} Minimum number of rows required (default: 0)}
 
-\item{allow_empty}{Logical, whether empty data frames are allowed}
+\item{allow_empty}{\link{logical} Logical, whether empty data frames are allowed}
 
-\item{optional_cols}{Optional character vector of expected optional columns}
+\item{optional_cols}{\link{character} Optional character vector of expected optional columns}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

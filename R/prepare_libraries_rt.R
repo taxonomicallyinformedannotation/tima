@@ -11,21 +11,21 @@
 #' @include process_smiles.R
 #' @include safe_fread.R
 #'
-#' @param mgf_exp Character vector of paths to MGF files with experimental RT
-#' @param mgf_is Character vector of paths to MGF files with in silico predicted RT
-#' @param temp_exp Character vector of paths to CSV files with experimental RT
-#' @param temp_is Character vector of paths to CSV files with in silico predicted RT
-#' @param output_rt Character string path for prepared RT library output
-#' @param output_sop Character string path for pseudo SOP output
-#' @param col_ik Character string name of InChIKey column in MGF
-#' @param col_na Character string name of chompound name column in MGF
-#' @param col_rt Character string name of retention time column in MGF
-#' @param col_sm Character string name of SMILES column in MGF
-#' @param name_inchikey Character string name of InChIKey column in CSV
-#' @param name_name Character string name of compound name column in CSV
-#' @param name_rt Character string name of retention time column in CSV
-#' @param name_smiles Character string name of SMILES column in CSV
-#' @param unit_rt Character string RT unit: "seconds" or "minutes"
+#' @param mgf_exp [character] Character vector of paths to MGF files with experimental RT
+#' @param mgf_is [character] Character vector of paths to MGF files with in silico predicted RT
+#' @param temp_exp [character] Character vector of paths to CSV files with experimental RT
+#' @param temp_is [character] Character vector of paths to CSV files with in silico predicted RT
+#' @param output_rt [character] Character string path for prepared RT library output
+#' @param output_sop [character] Character string path for pseudo SOP output
+#' @param col_ik [character] Character string name of InChIKey column in MGF
+#' @param col_na [character] Character string name of chompound name column in MGF
+#' @param col_rt [character] Character string name of retention time column in MGF
+#' @param col_sm [character] Character string name of SMILES column in MGF
+#' @param name_inchikey [character] Character string name of InChIKey column in CSV
+#' @param name_name [character] Character string name of compound name column in CSV
+#' @param name_rt [character] Character string name of retention time column in CSV
+#' @param name_smiles [character] Character string name of SMILES column in CSV
+#' @param unit_rt [character] Character string RT unit: "seconds" or "minutes"
 #'
 #' @return Character string path to the prepared retention time library
 #'

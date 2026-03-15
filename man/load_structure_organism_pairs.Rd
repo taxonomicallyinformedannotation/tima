@@ -7,11 +7,11 @@
 load_structure_organism_pairs(library, str_stereo, org_tax_ott)
 }
 \arguments{
-\item{library}{Character, path to main library file (required).}
+\item{library}{\link{character} Character, path to main library file (required).}
 
-\item{str_stereo}{Character, path to stereo structures file (optional; NULL allowed).}
+\item{str_stereo}{\link{character} Character, path to stereo structures file (optional; NULL allowed).}
 
-\item{org_tax_ott}{Character, path to organism taxonomy file (optional; NULL allowed).}
+\item{org_tax_ott}{\link{character} Character, path to organism taxonomy file (optional; NULL allowed).}
 }
 \value{
 Data frame with structure-organism pairs, including any joined metadata.

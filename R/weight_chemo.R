@@ -24,17 +24,17 @@
 #' @include validations_utils.R
 #' @include weights_utils.R
 #'
-#' @param annot_table_wei_bio_clean Data frame with cleaned biologically weighted annotations
-#' @param weight_spectral Weight for spectral similarity score (any positive number)
-#' @param weight_biological Weight for biological source score (any positive number)
-#' @param weight_chemical Weight for chemical consistency score (any positive number)
-#' @param score_chemical_cla_kingdom Score for ClassyFire kingdom match (0-1)
-#' @param score_chemical_cla_superclass Score for ClassyFire superclass match (0-1)
-#' @param score_chemical_cla_class Score for ClassyFire class match (0-1)
-#' @param score_chemical_cla_parent Score for ClassyFire parent match (0-1, highest)
-#' @param score_chemical_npc_pathway Score for NPC pathway match (0-1)
-#' @param score_chemical_npc_superclass Score for NPC superclass match (0-1)
-#' @param score_chemical_npc_class Score for NPC class match (0-1, highest)
+#' @param annot_table_wei_bio_clean [data.frame] Data frame with cleaned biologically weighted annotations
+#' @param weight_spectral [numeric] Weight for spectral similarity score (any positive number)
+#' @param weight_biological [numeric] Weight for biological source score (any positive number)
+#' @param weight_chemical [numeric] Weight for chemical consistency score (any positive number)
+#' @param score_chemical_cla_kingdom [numeric] Score for ClassyFire kingdom match (0-1)
+#' @param score_chemical_cla_superclass [numeric] Score for ClassyFire superclass match (0-1)
+#' @param score_chemical_cla_class [numeric] Score for ClassyFire class match (0-1)
+#' @param score_chemical_cla_parent [numeric] Score for ClassyFire parent match (0-1, highest)
+#' @param score_chemical_npc_pathway [numeric] Score for NPC pathway match (0-1)
+#' @param score_chemical_npc_superclass [numeric] Score for NPC superclass match (0-1)
+#' @param score_chemical_npc_class [numeric] Score for NPC class match (0-1, highest)
 #'
 #' @return Data frame with chemically weighted annotations including chemical
 #'     consistency scores and final weighted scores

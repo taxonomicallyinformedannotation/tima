@@ -4,8 +4,8 @@
 #'
 #' @include validations_utils.R
 #'
-#' @param df Data frame of SIRIUS CANOPUS results.
-#' @param sirius_version SIRIUS version ("5" or "6").
+#' @param df [data.frame] Data frame of SIRIUS CANOPUS results.
+#' @param sirius_version [character] SIRIUS version ("5" or "6").
 #'
 #' @return Data frame with standardized CANOPUS columns.
 #'
@@ -99,8 +99,8 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 #'
 #' @description Standardize SIRIUS formula-level columns.
 #'
-#' @param df Data frame of SIRIUS formula results.
-#' @param sirius_version SIRIUS version ("5" or "6").
+#' @param df [data.frame] Data frame of SIRIUS formula results.
+#' @param sirius_version [character] SIRIUS version ("5" or "6").
 #'
 #' @return Data frame with standardized formula columns.
 #'
@@ -160,8 +160,8 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
 #'
 #' @description Standardize SIRIUS structure-level columns.
 #'
-#' @param df Data frame of SIRIUS structure results.
-#' @param sirius_version SIRIUS version ("5" or "6").
+#' @param df [data.frame] Data frame of SIRIUS structure results.
+#' @param sirius_version [character] SIRIUS version ("5" or "6").
 #'
 #' @return Data frame with standardized structure columns.
 #'

@@ -7,7 +7,7 @@
 select_sop_columns(df)
 }
 \arguments{
-\item{df}{Data frame containing structure-organism pair data.}
+\item{df}{\link{data.frame} Data frame containing structure-organism pair data.}
 }
 \value{
 Data frame with standardized SOP columns.

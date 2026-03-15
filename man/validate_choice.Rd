@@ -7,13 +7,13 @@
 validate_choice(value, valid_values, param_name = "value", context = NULL)
 }
 \arguments{
-\item{value}{Value to validate}
+\item{value}{\link{character} Value to validate}
 
-\item{valid_values}{Character vector of allowed values}
+\item{valid_values}{\link{character} Character vector of allowed values}
 
-\item{param_name}{Parameter name for error messages}
+\item{param_name}{\link{character} Parameter name for error messages}
 
-\item{context}{Optional context (e.g., "Found in: params$annotate_masses$ms_mode")}
+\item{context}{\link{character} Optional context (e.g., "Found in: params$annotate_masses$ms_mode")}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

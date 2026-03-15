@@ -11,9 +11,9 @@ prepare_libraries_sop_ecmdb(
 )
 }
 \arguments{
-\item{input}{Character string path to ECMDB JSON zip file}
+\item{input}{\link{character} Character string path to ECMDB JSON zip file}
 
-\item{output}{Character string path for prepared ECMDB library output}
+\item{output}{\link{character} Character string path for prepared ECMDB library output}
 }
 \value{
 Character string path to prepared ECMDB structure-organism pairs

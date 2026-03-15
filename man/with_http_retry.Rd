@@ -9,9 +9,9 @@ with_http_retry(request, max_attempts = 3L, backoff = 2)
 \arguments{
 \item{request}{httr2 request object or expression that performs request}
 
-\item{max_attempts}{Integer maximum retry attempts (default: 3)}
+\item{max_attempts}{\link{integer} Integer maximum retry attempts (default: 3)}
 
-\item{backoff}{Numeric backoff multiplier (default: 2)}
+\item{backoff}{\link{numeric} Numeric backoff multiplier (default: 2)}
 }
 \value{
 Response object

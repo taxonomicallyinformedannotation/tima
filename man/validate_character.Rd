@@ -13,15 +13,15 @@ validate_character(
 )
 }
 \arguments{
-\item{value}{Character value to validate}
+\item{value}{\link{character} Character value to validate}
 
-\item{allowed_values}{Optional character vector of allowed values}
+\item{allowed_values}{\link{character} Optional character vector of allowed values}
 
-\item{param_name}{Name of the parameter (for error messages)}
+\item{param_name}{\link{character} Name of the parameter (for error messages)}
 
-\item{allow_null}{Allow NULL values (default: FALSE)}
+\item{allow_null}{\link{logical} Allow NULL values (default: FALSE)}
 
-\item{allow_empty}{Allow empty strings (default: FALSE)}
+\item{allow_empty}{\link{logical} Allow empty strings (default: FALSE)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

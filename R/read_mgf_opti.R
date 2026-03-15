@@ -3,8 +3,8 @@
 ##' Extract **all** fields from the MGF eventually renaming the field names to
 ##' the spectra variable names specified with `mapping`.
 ##'
-##' @param mgf `character()` of lines defining a spectrum in mgf
-##'     format.
+#' @param mgf [character] `character()` of lines defining a spectrum in mgf
+#'     format.
 ##'
 ##' @author Laurent Gatto, Johannes Rainer
 ##'
@@ -54,7 +54,7 @@
 
 #' Format MGF charge string into an integer compatible format.
 #'
-#' @param x `character`
+#' @param x [character] `character`
 #' @return `character`, charge without +/- at the end but - as prefix if needed
 #' @noRd
 .format_charge <- function(x) {
@@ -77,9 +77,9 @@
 #'     and avoid loading the entire file into memory at once. It extracts all
 #'     MGF fields and maps them to standard spectra variable names.
 #'
-#' @param f Character string specifying the path to a single MGF file
-#' @param msLevel Integer MS level to assign to spectra (default: 2L for MS2)
-#' @param mapping Named character vector mapping MGF field names to standard
+#' @param f [character] Character string specifying the path to a single MGF file
+#' @param msLevel [integer] Integer MS level to assign to spectra (default: 2L for MS2)
+#' @param mapping [character] Named character vector mapping MGF field names to standard
 #'     spectra variable names. Default uses the mapping from MsBackendMgf.
 #'
 #' @return A DataFrame containing the parsed spectra data with standardized

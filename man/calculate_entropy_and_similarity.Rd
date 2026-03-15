@@ -19,27 +19,27 @@ calculate_entropy_and_similarity(
 )
 }
 \arguments{
-\item{lib_ids}{Character vector of library spectrum IDs}
+\item{lib_ids}{\link{character} Character vector of library spectrum IDs}
 
-\item{lib_precursors}{Numeric vector of library precursor m/z values}
+\item{lib_precursors}{\link{numeric} Numeric vector of library precursor m/z values}
 
-\item{lib_spectra}{List of library spectra (each a matrix of mz/intensity)}
+\item{lib_spectra}{\link{list} List of library spectra (each a matrix of mz/intensity)}
 
-\item{query_ids}{Character vector of query spectrum IDs}
+\item{query_ids}{\link{character} Character vector of query spectrum IDs}
 
-\item{query_precursors}{Numeric vector of query precursor m/z values}
+\item{query_precursors}{\link{numeric} Numeric vector of query precursor m/z values}
 
-\item{query_spectra}{List of query spectra (each a matrix of mz/intensity)}
+\item{query_spectra}{\link{list} List of query spectra (each a matrix of mz/intensity)}
 
-\item{method}{Character string similarity method to use}
+\item{method}{\link{character} Character string similarity method to use}
 
-\item{dalton}{Numeric absolute mass tolerance in Daltons}
+\item{dalton}{\link{numeric} Numeric absolute mass tolerance in Daltons}
 
-\item{ppm}{Numeric relative mass tolerance in ppm}
+\item{ppm}{\link{numeric} Numeric relative mass tolerance in ppm}
 
-\item{threshold}{Numeric minimum similarity threshold (0-1)}
+\item{threshold}{\link{numeric} Numeric minimum similarity threshold (0-1)}
 
-\item{approx}{Logical whether to perform approximate matching without
+\item{approx}{\link{logical} Logical whether to perform approximate matching without
 precursor mass filtering}
 }
 \value{

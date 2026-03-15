@@ -9,13 +9,13 @@
 #' @include round_reals.R
 #' @include validations_utils.R
 #'
-#' @param df Data frame containing annotation results with structure and
+#' @param df [data.frame] Data frame containing annotation results with structure and
 #'     candidate information
-#' @param str_stereo Path to structure stereochemistry file
-#' @param str_met Path to structure metadata file
-#' @param str_nam Path to structure names file
-#' @param str_tax_cla Path to ClassyFire taxonomy file
-#' @param str_tax_npc Path to NPClassifier taxonomy file
+#' @param str_stereo [character] Path to structure stereochemistry file
+#' @param str_met [character] Path to structure metadata file
+#' @param str_nam [character] Path to structure names file
+#' @param str_tax_cla [character] Path to ClassyFire taxonomy file
+#' @param str_tax_npc [character] Path to NPClassifier taxonomy file
 #'
 #' @return Data frame with standardized annotation columns, cleaned values,
 #'     and complemented metadata

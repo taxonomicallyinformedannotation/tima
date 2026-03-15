@@ -23,35 +23,35 @@ weight_bio(
 )
 }
 \arguments{
-\item{annotation_table_taxed}{Data frame with initial annotations and sample taxonomy}
+\item{annotation_table_taxed}{\link{data.frame} Data frame with initial annotations and sample taxonomy}
 
-\item{structure_organism_pairs_table}{Data frame with structure-organism pairs and taxonomies}
+\item{structure_organism_pairs_table}{\link{data.frame} Data frame with structure-organism pairs and taxonomies}
 
-\item{weight_spectral}{Weight for spectral similarity score (any positive number)}
+\item{weight_spectral}{\link{numeric} Weight for spectral similarity score (any positive number)}
 
-\item{weight_biological}{Weight for biological source score (any positive number)}
+\item{weight_biological}{\link{numeric} Weight for biological source score (any positive number)}
 
-\item{score_biological_domain}{Score for domain-level taxonomic match (0-1)}
+\item{score_biological_domain}{\link{numeric} Score for domain-level taxonomic match (0-1)}
 
-\item{score_biological_kingdom}{Score for kingdom-level match (0-1)}
+\item{score_biological_kingdom}{\link{numeric} Score for kingdom-level match (0-1)}
 
-\item{score_biological_phylum}{Score for phylum-level match (0-1)}
+\item{score_biological_phylum}{\link{numeric} Score for phylum-level match (0-1)}
 
-\item{score_biological_class}{Score for class-level match (0-1)}
+\item{score_biological_class}{\link{numeric} Score for class-level match (0-1)}
 
-\item{score_biological_order}{Score for order-level match (0-1)}
+\item{score_biological_order}{\link{numeric} Score for order-level match (0-1)}
 
-\item{score_biological_family}{Score for family-level match (0-1)}
+\item{score_biological_family}{\link{numeric} Score for family-level match (0-1)}
 
-\item{score_biological_tribe}{Score for tribe-level match (0-1)}
+\item{score_biological_tribe}{\link{numeric} Score for tribe-level match (0-1)}
 
-\item{score_biological_genus}{Score for genus-level match (0-1)}
+\item{score_biological_genus}{\link{numeric} Score for genus-level match (0-1)}
 
-\item{score_biological_species}{Score for species-level match (0-1)}
+\item{score_biological_species}{\link{numeric} Score for species-level match (0-1)}
 
-\item{score_biological_variety}{Score for variety-level match (0-1, highest)}
+\item{score_biological_variety}{\link{numeric} Score for variety-level match (0-1, highest)}
 
-\item{score_biological_biota}{Score for Biota-level match (0-1, special)}
+\item{score_biological_biota}{\link{numeric} Score for Biota-level match (0-1, special)}
 }
 \value{
 Data frame with biologically weighted annotations including biological

@@ -3,26 +3,26 @@
 #' @description Internal helper to harmonize extracted spectra for a specific
 #'     polarity mode, applying column mappings and fixing precursor/inchikey issues.
 #'
-#' @param spectra_extracted List of extracted spectra data frames.
-#' @param mode Character "pos" or "neg".
-#' @param metad Character library metadata name.
-#' @param col_ad Adduct field name
-#' @param col_ce Collision energy field name
-#' @param col_ci Compound ID field name
-#' @param col_em Exact mass field name
-#' @param col_in InChI field name
-#' @param col_io InChI without stereochemistry field name
-#' @param col_ik InChIKey field name
-#' @param col_il InChIKey connectivity layer field name
-#' @param col_mf Molecular formula field name
-#' @param col_na Compound name field name
-#' @param col_po Polarity field name
-#' @param col_sm SMILES field name
-#' @param col_sn SMILES without stereochemistry field name
-#' @param col_si Spectrum ID field name
-#' @param col_sp SPLASH field name
-#' @param col_sy Synonyms field name
-#' @param col_xl xLogP field name
+#' @param spectra_extracted [list] List of extracted spectra data frames.
+#' @param mode [character] Character "pos" or "neg".
+#' @param metad [character] Character library metadata name.
+#' @param col_ad [character] Adduct field name
+#' @param col_ce [character] Collision energy field name
+#' @param col_ci [character] Compound ID field name
+#' @param col_em [character] Exact mass field name
+#' @param col_in [character] InChI field name
+#' @param col_io [character] InChI without stereochemistry field name
+#' @param col_ik [character] InChIKey field name
+#' @param col_il [character] InChIKey connectivity layer field name
+#' @param col_mf [character] Molecular formula field name
+#' @param col_na [character] Compound name field name
+#' @param col_po [character] Polarity field name
+#' @param col_sm [character] SMILES field name
+#' @param col_sn [character] SMILES without stereochemistry field name
+#' @param col_si [character] Spectrum ID field name
+#' @param col_sp [character] SPLASH field name
+#' @param col_sy [character] Synonyms field name
+#' @param col_xl [character] xLogP field name
 #'
 #' @return Data frame with harmonized spectra.
 #' @keywords internal
@@ -167,25 +167,25 @@ create_empty_sop_library <- function() {
 #' @include harmonize_spectra.R
 #' @include import_spectra.R
 #'
-#' @param input Character vector of file paths containing spectral data.
-#' @param nam_lib Character library name for metadata.
-#' @param col_ad Name of the adduct column in MGF.
-#' @param col_ce Name of the collision energy column in MGF.
-#' @param col_ci Name of the compound ID column in MGF.
-#' @param col_em Name of the exact mass column in MGF.
-#' @param col_in Name of the InChI column in MGF.
-#' @param col_io Name of the InChI without stereo column in MGF.
-#' @param col_ik Name of the InChIKey column in MGF.
-#' @param col_il Name of the InChIKey connectivity layer column in MGF.
-#' @param col_mf Name of the molecular formula column in MGF.
-#' @param col_na Name of the name column in MGF.
-#' @param col_po Name of the polarity column in MGF.
-#' @param col_sm Name of the SMILES column in MGF.
-#' @param col_sn Name of the SMILES without stereo column in MGF.
-#' @param col_si Name of the spectrum ID column in MGF.
-#' @param col_sp Name of the SPLASH column in MGF.
-#' @param col_sy Name of the synonyms column in MGF.
-#' @param col_xl Name of the xlogp column in MGF.
+#' @param input [character] Character vector of file paths containing spectral data.
+#' @param nam_lib [character] Character library name for metadata.
+#' @param col_ad [character] Name of the adduct column in MGF.
+#' @param col_ce [character] Name of the collision energy column in MGF.
+#' @param col_ci [character] Name of the compound ID column in MGF.
+#' @param col_em [character] Name of the exact mass column in MGF.
+#' @param col_in [character] Name of the InChI column in MGF.
+#' @param col_io [character] Name of the InChI without stereo column in MGF.
+#' @param col_ik [character] Name of the InChIKey column in MGF.
+#' @param col_il [character] Name of the InChIKey connectivity layer column in MGF.
+#' @param col_mf [character] Name of the molecular formula column in MGF.
+#' @param col_na [character] Name of the name column in MGF.
+#' @param col_po [character] Name of the polarity column in MGF.
+#' @param col_sm [character] Name of the SMILES column in MGF.
+#' @param col_sn [character] Name of the SMILES without stereo column in MGF.
+#' @param col_si [character] Name of the spectrum ID column in MGF.
+#' @param col_sp [character] Name of the SPLASH column in MGF.
+#' @param col_sy [character] Name of the synonyms column in MGF.
+#' @param col_xl [character] Name of the xlogp column in MGF.
 #'
 #' @return Character vector with paths to prepared library files (invisible).
 #'

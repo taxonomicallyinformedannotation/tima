@@ -7,11 +7,11 @@
 #'
 #' @include get_params.R
 #'
-#' @param input Named list containing paths to edge files. Must have "ms1" and
+#' @param input [list] Named list containing paths to edge files. Must have "ms1" and
 #'     "spectral" elements pointing to respective edge files.
-#' @param output Character string path where prepared edges should be saved
-#' @param name_source Character string name of the source feature column in input files
-#' @param name_target Character string name of the target feature column in input files
+#' @param output [character] Character string path where prepared edges should be saved
+#' @param name_source [character] Character string name of the source feature column in input files
+#' @param name_target [character] Character string name of the target feature column in input files
 #'
 #' @return Character string path to the prepared edges file
 #'

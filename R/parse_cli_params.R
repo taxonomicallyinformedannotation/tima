@@ -7,8 +7,8 @@
 #'
 #' @include validations_utils.R
 #'
-#' @param arguments Named list of CLI arguments from docopt or similar parser
-#' @param parameters Nested list of default parameters to be updated with CLI values
+#' @param arguments [list] Named list of CLI arguments from docopt or similar parser
+#' @param parameters [list] Nested list of default parameters to be updated with CLI values
 #'
 #' @return Updated parameters list with CLI arguments merged in, maintaining
 #'     the nested structure and applying type conversions

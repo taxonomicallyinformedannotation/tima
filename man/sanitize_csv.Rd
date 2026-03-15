@@ -12,13 +12,13 @@ sanitize_csv(
 )
 }
 \arguments{
-\item{file}{Character path to CSV/TSV file}
+\item{file}{\link{character} Character path to CSV/TSV file}
 
-\item{file_type}{Character description for error messages}
+\item{file_type}{\link{character} Character description for error messages}
 
-\item{required_cols}{Character vector of required column names (optional)}
+\item{required_cols}{\link{character} Character vector of required column names (optional)}
 
-\item{feature_col}{Character name of feature ID column (default: "feature_id")}
+\item{feature_col}{\link{character} Character name of feature ID column (default: "feature_id")}
 }
 \value{
 List with validation results:

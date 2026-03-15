@@ -7,15 +7,15 @@
 assert_scalar_numeric(x, param_name, min = -Inf, max = Inf, allow_na = FALSE)
 }
 \arguments{
-\item{x}{Value to validate}
+\item{x}{\link{numeric} Value to validate}
 
-\item{param_name}{Name of the parameter (for error messages)}
+\item{param_name}{\link{character} Name of the parameter (for error messages)}
 
-\item{min}{Minimum allowed value}
+\item{min}{\link{numeric} Minimum allowed value}
 
-\item{max}{Maximum allowed value}
+\item{max}{\link{numeric} Maximum allowed value}
 
-\item{allow_na}{Whether NA is allowed}
+\item{allow_na}{\link{logical} Whether NA is allowed}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

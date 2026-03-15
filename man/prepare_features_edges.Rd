@@ -13,14 +13,14 @@ prepare_features_edges(
 )
 }
 \arguments{
-\item{input}{Named list containing paths to edge files. Must have "ms1" and
+\item{input}{\link{list} Named list containing paths to edge files. Must have "ms1" and
 "spectral" elements pointing to respective edge files.}
 
-\item{output}{Character string path where prepared edges should be saved}
+\item{output}{\link{character} Character string path where prepared edges should be saved}
 
-\item{name_source}{Character string name of the source feature column in input files}
+\item{name_source}{\link{character} Character string name of the source feature column in input files}
 
-\item{name_target}{Character string name of the target feature column in input files}
+\item{name_target}{\link{character} Character string name of the target feature column in input files}
 }
 \value{
 Character string path to the prepared edges file

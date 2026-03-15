@@ -12,13 +12,13 @@ validate_file_exists(
 )
 }
 \arguments{
-\item{path}{File path to validate}
+\item{path}{\link{character} File path to validate}
 
-\item{file_type}{Type description (e.g., "MGF file", "parameter file")}
+\item{file_type}{\link{character} Type description (e.g., "MGF file", "parameter file")}
 
-\item{param_name}{Parameter name for error messages}
+\item{param_name}{\link{character} Parameter name for error messages}
 
-\item{required}{Whether file is required (vs optional)}
+\item{required}{\link{logical} Whether file is required (vs optional)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

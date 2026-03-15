@@ -17,14 +17,14 @@
 #' @include safe_fread.R
 #' @include validations_utils.R
 #'
-#' @param input Character string path to features file with intensities
-#' @param extension Logical whether column names contain file extensions
-#' @param name_filename Character string name of filename column in metadata
-#' @param colname Character string name of column with biological source info
-#' @param metadata Character string path to metadata file with organism info
-#' @param org_tax_ott Character string path to Open Tree of Life taxonomy file
-#' @param output Character string path for output file
-#' @param taxon Character string organism name to enforce for all features
+#' @param input [character] Character string path to features file with intensities
+#' @param extension [logical] Logical whether column names contain file extensions
+#' @param name_filename [character] Character string name of filename column in metadata
+#' @param colname [character] Character string name of column with biological source info
+#' @param metadata [character] Character string path to metadata file with organism info
+#' @param org_tax_ott [character] Character string path to Open Tree of Life taxonomy file
+#' @param output [character] Character string path for output file
+#' @param taxon [character] Character string organism name to enforce for all features
 #'     (e.g., "Homo sapiens"). If provided, overrides metadata-based assignment.
 #'
 #' @return Character string path to the prepared taxa file

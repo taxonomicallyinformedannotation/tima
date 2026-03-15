@@ -7,13 +7,13 @@
 #' @include columns_utils.R
 #' @include validations_utils.R
 #'
-#' @param df Data frame containing weighted annotation results
-#' @param features_table Data frame with feature metadata (RT, m/z, etc.)
-#' @param components_table Data frame with network component assignments
-#' @param structure_organism_pairs_table Data frame with structure-organism pairs
-#' @param annot_table_wei_chemo Data frame with chemically weighted annotations
-#' @param remove_ties Logical whether to remove tied scores (keep only highest)
-#' @param summarize Logical whether to collapse to 1 row per feature
+#' @param df [data.frame] Data frame containing weighted annotation results
+#' @param features_table [data.frame] Data frame with feature metadata (RT, m/z, etc.)
+#' @param components_table [data.frame] Data frame with network component assignments
+#' @param structure_organism_pairs_table [data.frame] Data frame with structure-organism pairs
+#' @param annot_table_wei_chemo [data.frame] Data frame with chemically weighted annotations
+#' @param remove_ties [logical] Logical whether to remove tied scores (keep only highest)
+#' @param summarize [logical] Logical whether to collapse to 1 row per feature
 #'
 #' @return Data frame containing summarized annotation results
 #'

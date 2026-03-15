@@ -7,10 +7,10 @@
 split_tables_sop(table, cache)
 }
 \arguments{
-\item{table}{Data frame containing combined structure-organism pair data with
+\item{table}{\link{data.frame} Data frame containing combined structure-organism pair data with
 columns for structures (SMILES, InChI, names), organisms, and references}
 
-\item{cache}{Path to cache file for previously processed SMILES, or NULL to
+\item{cache}{\link{character} Path to cache file for previously processed SMILES, or NULL to
 skip caching}
 }
 \value{

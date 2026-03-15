@@ -7,7 +7,7 @@
 sanitize_sirius(sirius_dir)
 }
 \arguments{
-\item{sirius_dir}{Character path to SIRIUS output directory or ZIP file}
+\item{sirius_dir}{\link{character} Character path to SIRIUS output directory or ZIP file}
 }
 \value{
 List with validation results:

@@ -23,35 +23,35 @@ prepare_libraries_rt(
 )
 }
 \arguments{
-\item{mgf_exp}{Character vector of paths to MGF files with experimental RT}
+\item{mgf_exp}{\link{character} Character vector of paths to MGF files with experimental RT}
 
-\item{mgf_is}{Character vector of paths to MGF files with in silico predicted RT}
+\item{mgf_is}{\link{character} Character vector of paths to MGF files with in silico predicted RT}
 
-\item{temp_exp}{Character vector of paths to CSV files with experimental RT}
+\item{temp_exp}{\link{character} Character vector of paths to CSV files with experimental RT}
 
-\item{temp_is}{Character vector of paths to CSV files with in silico predicted RT}
+\item{temp_is}{\link{character} Character vector of paths to CSV files with in silico predicted RT}
 
-\item{output_rt}{Character string path for prepared RT library output}
+\item{output_rt}{\link{character} Character string path for prepared RT library output}
 
-\item{output_sop}{Character string path for pseudo SOP output}
+\item{output_sop}{\link{character} Character string path for pseudo SOP output}
 
-\item{col_ik}{Character string name of InChIKey column in MGF}
+\item{col_ik}{\link{character} Character string name of InChIKey column in MGF}
 
-\item{col_na}{Character string name of chompound name column in MGF}
+\item{col_na}{\link{character} Character string name of chompound name column in MGF}
 
-\item{col_rt}{Character string name of retention time column in MGF}
+\item{col_rt}{\link{character} Character string name of retention time column in MGF}
 
-\item{col_sm}{Character string name of SMILES column in MGF}
+\item{col_sm}{\link{character} Character string name of SMILES column in MGF}
 
-\item{name_inchikey}{Character string name of InChIKey column in CSV}
+\item{name_inchikey}{\link{character} Character string name of InChIKey column in CSV}
 
-\item{name_name}{Character string name of compound name column in CSV}
+\item{name_name}{\link{character} Character string name of compound name column in CSV}
 
-\item{name_rt}{Character string name of retention time column in CSV}
+\item{name_rt}{\link{character} Character string name of retention time column in CSV}
 
-\item{name_smiles}{Character string name of SMILES column in CSV}
+\item{name_smiles}{\link{character} Character string name of SMILES column in CSV}
 
-\item{unit_rt}{Character string RT unit: "seconds" or "minutes"}
+\item{unit_rt}{\link{character} Character string RT unit: "seconds" or "minutes"}
 }
 \value{
 Character string path to the prepared retention time library

@@ -13,15 +13,15 @@ validate_tolerances(
 )
 }
 \arguments{
-\item{tolerance_ppm}{Numeric mass tolerance in parts per million}
+\item{tolerance_ppm}{\link{numeric} Numeric mass tolerance in parts per million}
 
-\item{tolerance_rt}{Numeric retention time tolerance in minutes}
+\item{tolerance_rt}{\link{numeric} Numeric retention time tolerance in minutes}
 
-\item{max_ppm}{Maximum allowed ppm tolerance (default: from constants)}
+\item{max_ppm}{\link{numeric} Maximum allowed ppm tolerance (default: from constants)}
 
-\item{max_rt}{Maximum allowed RT tolerance (default: from constants)}
+\item{max_rt}{\link{numeric} Maximum allowed RT tolerance (default: from constants)}
 
-\item{context}{Character string describing context (for error messages)}
+\item{context}{\link{character} Character string describing context (for error messages)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

@@ -4,8 +4,8 @@
 #'   back to copy + delete when source and destination are on different devices
 #'   (common in Docker bind mounts).
 #'
-#' @param from Source file path
-#' @param to Destination file path
+#' @param from [character] Source file path
+#' @param to [character] Destination file path
 #'
 #' @return `TRUE` on success, `FALSE` otherwise
 #' @keywords internal

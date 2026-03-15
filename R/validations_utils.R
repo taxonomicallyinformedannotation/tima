@@ -14,10 +14,10 @@ NULL
 #' @description Validates that a value is one of allowed choices, with
 #'     intelligent suggestions for typos
 #'
-#' @param value Value to validate
-#' @param valid_values Character vector of allowed values
-#' @param param_name Parameter name for error messages
-#' @param context Optional context (e.g., "Found in: params$annotate_masses$ms_mode")
+#' @param value [character] Value to validate
+#' @param valid_values [character] Character vector of allowed values
+#' @param param_name [character] Parameter name for error messages
+#' @param context [character] Optional context (e.g., "Found in: params$annotate_masses$ms_mode")
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #' @keywords internal
@@ -79,10 +79,10 @@ validate_choice <- function(
 #'
 #' @description Validates file exists with helpful suggestions for similar files
 #'
-#' @param path File path to validate
-#' @param file_type Type description (e.g., "MGF file", "parameter file")
-#' @param param_name Parameter name for error messages
-#' @param required Whether file is required (vs optional)
+#' @param path [character] File path to validate
+#' @param file_type [character] Type description (e.g., "MGF file", "parameter file")
+#' @param param_name [character] Parameter name for error messages
+#' @param required [logical] Whether file is required (vs optional)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #' @keywords internal
@@ -187,11 +187,11 @@ validate_file_exists <- function(
 #'
 #' @description Validates dataframe with helpful column name suggestions
 #'
-#' @param df Data frame to validate
-#' @param required_cols Character vector of required column names
-#' @param optional_cols Character vector of optional column names
-#' @param df_name Name of the data frame for error messages
-#' @param min_rows Minimum number of rows required
+#' @param df [data.frame] Data frame to validate
+#' @param required_cols [character] Character vector of required column names
+#' @param optional_cols [character] Character vector of optional column names
+#' @param df_name [character] Name of the data frame for error messages
+#' @param min_rows [integer] Minimum number of rows required
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #' @keywords internal
@@ -306,13 +306,13 @@ validate_dataframe_structure <- function(
 #'
 #' @description Validates numeric values with contextual guidance
 #'
-#' @param value Numeric value to validate
-#' @param min_value Minimum allowed value
-#' @param max_value Maximum allowed value
-#' @param param_name Parameter name for error messages
-#' @param recommended_min Recommended minimum (for warnings)
-#' @param recommended_max Recommended maximum (for warnings)
-#' @param context Why this range matters
+#' @param value [numeric] Numeric value to validate
+#' @param min_value [numeric] Minimum allowed value
+#' @param max_value [numeric] Maximum allowed value
+#' @param param_name [character] Parameter name for error messages
+#' @param recommended_min [numeric] Recommended minimum (for warnings)
+#' @param recommended_max [numeric] Recommended maximum (for warnings)
+#' @param context [character] Why this range matters
 #'
 #' @return Invisible TRUE if valid, stops/warns with messages otherwise
 #' @keywords internal
@@ -405,9 +405,9 @@ validate_numeric_range <- function(
 #'
 #' @description Validates mass tolerance with instrument-specific guidance
 #'
-#' @param tolerance_ppm Mass tolerance in parts per million
-#' @param param_name Parameter name for error messages
-#' @param context Additional context about usage
+#' @param tolerance_ppm [numeric] Mass tolerance in parts per million
+#' @param param_name [character] Parameter name for error messages
+#' @param context [character] Additional context about usage
 #'
 #' @return Invisible TRUE if valid, stops/warns with messages otherwise
 #' @keywords internal
@@ -538,9 +538,9 @@ validate_tolerance_ppm <- function(
 #' @description Checks that one or more file paths exist on the filesystem.
 #'     Provides detailed error messages indicating which files are missing.
 #'
-#' @param file_list Named list of file paths to validate. Names are used
+#' @param file_list [list] Named list of file paths to validate. Names are used
 #'     in error messages to identify which file is missing.
-#' @param allow_null Logical, if TRUE, NULL values are allowed (default: FALSE)
+#' @param allow_null [logical] Logical, if TRUE, NULL values are allowed (default: FALSE)
 #'
 #' @return Invisible TRUE if all files exist, stops with error otherwise
 #'
@@ -624,7 +624,7 @@ validate_file_existence <- function(file_list, allow_null = FALSE) {
 #'
 #' @description Ensures the MS mode is valid ('pos' or 'neg')
 #'
-#' @param ms_mode Character string indicating ionization mode
+#' @param ms_mode [character] Character string indicating ionization mode
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -661,11 +661,11 @@ validate_ms_mode <- function(ms_mode) {
 #'
 #' @description Validates that tolerance values are within acceptable ranges
 #'
-#' @param tolerance_ppm Numeric mass tolerance in parts per million
-#' @param tolerance_rt Numeric retention time tolerance in minutes
-#' @param max_ppm Maximum allowed ppm tolerance (default: from constants)
-#' @param max_rt Maximum allowed RT tolerance (default: from constants)
-#' @param context Character string describing context (for error messages)
+#' @param tolerance_ppm [numeric] Numeric mass tolerance in parts per million
+#' @param tolerance_rt [numeric] Numeric retention time tolerance in minutes
+#' @param max_ppm [numeric] Maximum allowed ppm tolerance (default: from constants)
+#' @param max_rt [numeric] Maximum allowed RT tolerance (default: from constants)
+#' @param context [character] Character string describing context (for error messages)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -717,9 +717,9 @@ validate_tolerances <- function(
 #'
 #' @description Ensures adduct list contains required mode and is properly formatted
 #'
-#' @param adducts_list List containing adduct definitions
-#' @param ms_mode Required ionization mode ('pos' or 'neg')
-#' @param list_name Name of the list (for error messages)
+#' @param adducts_list [list] List containing adduct definitions
+#' @param ms_mode [character] Required ionization mode ('pos' or 'neg')
+#' @param list_name [character] Name of the list (for error messages)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -801,11 +801,11 @@ validate_adduct_list <- function(
 #'     for required columns and minimum row count
 #'
 #' @param df Input to validate
-#' @param param_name Name of the parameter (for error messages)
-#' @param required_cols Character vector of required column names
-#' @param min_rows Minimum number of rows required (default: 0)
-#' @param allow_empty Logical, whether empty data frames are allowed
-#' @param optional_cols Optional character vector of expected optional columns
+#' @param param_name [character] Name of the parameter (for error messages)
+#' @param required_cols [character] Character vector of required column names
+#' @param min_rows [integer] Minimum number of rows required (default: 0)
+#' @param allow_empty [logical] Logical, whether empty data frames are allowed
+#' @param optional_cols [character] Optional character vector of expected optional columns
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -840,8 +840,8 @@ validate_dataframe <- function(
 #'     Note: Weights do NOT need to sum to 1, as the weighting functions
 #'     normalize them by dividing by their sum.
 #'
-#' @param weights Named list or vector of weights
-#' @param param_name Name of the parameter (for error messages)
+#' @param weights [numeric] Named list or vector of weights
+#' @param param_name [character] Name of the parameter (for error messages)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -910,11 +910,11 @@ validate_weights <- function(weights, param_name = "weights") {
 #'
 #' @description Generic validator for character string parameters
 #'
-#' @param value Character value to validate
-#' @param allowed_values Optional character vector of allowed values
-#' @param param_name Name of the parameter (for error messages)
-#' @param allow_null Allow NULL values (default: FALSE)
-#' @param allow_empty Allow empty strings (default: FALSE)
+#' @param value [character] Character value to validate
+#' @param allowed_values [character] Optional character vector of allowed values
+#' @param param_name [character] Name of the parameter (for error messages)
+#' @param allow_null [logical] Allow NULL values (default: FALSE)
+#' @param allow_empty [logical] Allow empty strings (default: FALSE)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -968,9 +968,9 @@ validate_character <- function(
 #'
 #' @description Generic validator for logical (boolean) parameters
 #'
-#' @param value Logical value to validate
-#' @param param_name Name of the parameter (for error messages)
-#' @param allow_null Allow NULL values (default: FALSE)
+#' @param value [logical] Logical value to validate
+#' @param param_name [character] Name of the parameter (for error messages)
+#' @param allow_null [logical] Allow NULL values (default: FALSE)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -1012,10 +1012,10 @@ validate_logical <- function(value, param_name = "value", allow_null = FALSE) {
 #' @description Validates that a parameter is either a list or vector
 #'
 #' @param value Value to validate
-#' @param min_length Minimum required length
-#' @param max_length Maximum allowed length (NULL = no limit)
-#' @param param_name Name of the parameter (for error messages)
-#' @param allow_null Allow NULL values (default: FALSE)
+#' @param min_length [integer] Minimum required length
+#' @param max_length [integer] Maximum allowed length (NULL = no limit)
+#' @param param_name [character] Name of the parameter (for error messages)
+#' @param allow_null [logical] Allow NULL values (default: FALSE)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -1084,8 +1084,8 @@ validate_list_or_vector <- function(
 #' @description Validates that a parameter is a single non-NA logical value.
 #'     This is a strict version of validate_logical.
 #'
-#' @param x Value to check
-#' @param arg_name Name of the argument (for error messages)
+#' @param x [logical] Value to check
+#' @param arg_name [character] Name of the argument (for error messages)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -1114,9 +1114,9 @@ assert_flag <- function(x, arg_name = deparse(substitute(x))) {
 #'
 #' @description Validates that a parameter is a single positive integer.
 #'
-#' @param x Value to check
-#' @param arg_name Name of the argument (for error messages)
-#' @param allow_zero Whether zero is allowed (default: FALSE)
+#' @param x [numeric] Value to check
+#' @param arg_name [character] Name of the argument (for error messages)
+#' @param allow_zero [logical] Whether zero is allowed (default: FALSE)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -1200,11 +1200,11 @@ assert_choice <- function(value, choices, param_name = "value") {
 #'
 #' @description Validates that a parameter is a single numeric value within range
 #'
-#' @param x Value to validate
-#' @param param_name Name of the parameter (for error messages)
-#' @param min Minimum allowed value
-#' @param max Maximum allowed value
-#' @param allow_na Whether NA is allowed
+#' @param x [numeric] Value to validate
+#' @param param_name [character] Name of the parameter (for error messages)
+#' @param min [numeric] Minimum allowed value
+#' @param max [numeric] Maximum allowed value
+#' @param allow_na [logical] Whether NA is allowed
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
