@@ -11,11 +11,11 @@ assert_positive_integer(
 )
 }
 \arguments{
-\item{x}{Value to check}
+\item{x}{\link{numeric} Value to check}
 
-\item{arg_name}{Name of the argument (for error messages)}
+\item{arg_name}{\link{character} Name of the argument (for error messages)}
 
-\item{allow_zero}{Whether zero is allowed (default: FALSE)}
+\item{allow_zero}{\link{logical} Whether zero is allowed (default: FALSE)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

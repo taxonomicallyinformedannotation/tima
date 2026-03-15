@@ -178,8 +178,8 @@ validate_weight_annotations_inputs <- function(
 #'     Reads multiple annotation files, binds rows, and optionally filters to
 #'     retain only MS1-based annotations (those without MS2 similarity or SIRIUS CSI scores).
 #'
-#' @param annotations Character vector of file paths to annotation files.
-#' @param ms1_only Logical; if TRUE, keep only annotations where both
+#' @param annotations [character] Character vector of file paths to annotation files.
+#' @param ms1_only [logical] Logical; if TRUE, keep only annotations where both
 #'     `candidate_score_similarity` and `candidate_score_sirius_csi` are NA.
 #'
 #' @return Data frame with combined (and optionally filtered) annotations.
@@ -234,9 +234,9 @@ load_annotation_tables <- function(annotations, ms1_only) {
 #'     left-join optional supplemental tables (stereo structures, organism taxonomy).
 #'     Returns a combined data frame suitable for biological scoring.
 #'
-#' @param library Character, path to main library file (required).
-#' @param str_stereo Character, path to stereo structures file (optional; NULL allowed).
-#' @param org_tax_ott Character, path to organism taxonomy file (optional; NULL allowed).
+#' @param library [character] Character, path to main library file (required).
+#' @param str_stereo [character] Character, path to stereo structures file (optional; NULL allowed).
+#' @param org_tax_ott [character] Character, path to organism taxonomy file (optional; NULL allowed).
 #'
 #' @return Data frame with structure-organism pairs, including any joined metadata.
 #' @keywords internal
@@ -290,8 +290,8 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
 #'     neighbors (by similarity score) for each feature. This reduces complexity
 #'     for downstream annotation propagation and scoring.
 #'
-#' @param edges Character, path to edges file.
-#' @param candidates_neighbors Integer, number of top neighbors to keep per feature.
+#' @param edges [character] Character, path to edges file.
+#' @param candidates_neighbors [integer] Integer, number of top neighbors to keep per feature.
 #'
 #' @return Data frame with filtered edges (top `candidates_neighbors` per `feature_source`).
 #' @keywords internal
@@ -332,7 +332,7 @@ load_edges_table <- function(edges, candidates_neighbors) {
 #'
 #' @description Internal helper to log annotation counts by library.
 #'
-#' @param annotation_table Data frame with annotations
+#' @param annotation_table [data.frame] Data frame with annotations
 #'
 #' @return NULL (logs statistics as side effect)
 #' @keywords internal
@@ -370,10 +370,10 @@ log_annotation_stats <- function(annotation_table) {
 #'
 #' @include columns_utils.R
 #'
-#' @param annotation_table Data frame with annotations
-#' @param formula_table Data frame with formula data
-#' @param canopus_table Data frame with canopus data
-#' @param edges_table Data frame with edges
+#' @param annotation_table [data.frame] Data frame with annotations
+#' @param formula_table [data.frame] Data frame with formula data
+#' @param canopus_table [data.frame] Data frame with canopus data
+#' @param edges_table [data.frame] Data frame with edges
 #'
 #' @return Data frame with rearranged annotations
 #' @keywords internal
@@ -447,9 +447,9 @@ rearrange_annotations <- function(
 #'
 #' @description Internal helper to export all result tiers and parameters.
 #'
-#' @param results_list List with full, filtered, mini data frames
-#' @param output Character, base output filename
-#' @param pattern Character, pattern for directory naming
+#' @param results_list [list] List with full, filtered, mini data frames
+#' @param output [character] Character, base output filename
+#' @param pattern [character] Character, pattern for directory naming
 #'
 #' @return Named character vector with output file paths
 #' @keywords internal

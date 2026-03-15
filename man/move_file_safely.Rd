@@ -7,9 +7,9 @@
 move_file_safely(from, to)
 }
 \arguments{
-\item{from}{Source file path}
+\item{from}{\link{character} Source file path}
 
-\item{to}{Destination file path}
+\item{to}{\link{character} Destination file path}
 }
 \value{
 \code{TRUE} on success, \code{FALSE} otherwise

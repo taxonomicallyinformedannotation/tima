@@ -18,19 +18,19 @@ summarize_results(
 )
 }
 \arguments{
-\item{df}{Data frame containing weighted annotation results}
+\item{df}{\link{data.frame} Data frame containing weighted annotation results}
 
-\item{features_table}{Data frame with feature metadata (RT, m/z, etc.)}
+\item{features_table}{\link{data.frame} Data frame with feature metadata (RT, m/z, etc.)}
 
-\item{components_table}{Data frame with network component assignments}
+\item{components_table}{\link{data.frame} Data frame with network component assignments}
 
-\item{structure_organism_pairs_table}{Data frame with structure-organism pairs}
+\item{structure_organism_pairs_table}{\link{data.frame} Data frame with structure-organism pairs}
 
-\item{annot_table_wei_chemo}{Data frame with chemically weighted annotations}
+\item{annot_table_wei_chemo}{\link{data.frame} Data frame with chemically weighted annotations}
 
-\item{remove_ties}{Logical whether to remove tied scores (keep only highest)}
+\item{remove_ties}{\link{logical} Logical whether to remove tied scores (keep only highest)}
 
-\item{summarize}{Logical whether to collapse to 1 row per feature}
+\item{summarize}{\link{logical} Logical whether to collapse to 1 row per feature}
 }
 \value{
 Data frame containing summarized annotation results

@@ -7,9 +7,9 @@
 parse_yaml_params(def, usr = NULL)
 }
 \arguments{
-\item{def}{Path to the default YAML parameters file}
+\item{def}{\link{character} Path to the default YAML parameters file}
 
-\item{usr}{Path to the user-specified YAML parameters file (optional).
+\item{usr}{\link{character} Path to the user-specified YAML parameters file (optional).
 If it exists, it will override default values.}
 }
 \value{

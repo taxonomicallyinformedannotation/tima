@@ -28,31 +28,31 @@ prepare_libraries_sop_merged(
 )
 }
 \arguments{
-\item{files}{Character vector or list of paths to prepared library files}
+\item{files}{\link{character} Character vector or list of paths to prepared library files}
 
-\item{filter}{Logical whether to filter the merged library by taxonomy}
+\item{filter}{\link{logical} Logical whether to filter the merged library by taxonomy}
 
-\item{level}{Character string taxonomic rank for filtering (kingdom, phylum,
+\item{level}{\link{character} Character string taxonomic rank for filtering (kingdom, phylum,
 family, genus, etc.)}
 
-\item{value}{Character string taxon name(s) to keep (can use | for multiple,
+\item{value}{\link{character} Character string taxon name(s) to keep (can use | for multiple,
 e.g., 'Gentianaceae|Apocynaceae')}
 
-\item{cache}{Character string path to cache directory for processed SMILES}
+\item{cache}{\link{character} Character string path to cache directory for processed SMILES}
 
-\item{output_key}{Character string path for output keys file}
+\item{output_key}{\link{character} Character string path for output keys file}
 
-\item{output_org_tax_ott}{Character string path for organisms taxonomy (OTT) file}
+\item{output_org_tax_ott}{\link{character} Character string path for organisms taxonomy (OTT) file}
 
-\item{output_str_stereo}{Character string path for structures stereochemistry file}
+\item{output_str_stereo}{\link{character} Character string path for structures stereochemistry file}
 
-\item{output_str_met}{Character string path for structures metadata file}
+\item{output_str_met}{\link{character} Character string path for structures metadata file}
 
-\item{output_str_nam}{Character string path for structures names file}
+\item{output_str_nam}{\link{character} Character string path for structures names file}
 
-\item{output_str_tax_cla}{Character string path for ClassyFire taxonomy file}
+\item{output_str_tax_cla}{\link{character} Character string path for ClassyFire taxonomy file}
 
-\item{output_str_tax_npc}{Character string path for NPClassifier taxonomy file}
+\item{output_str_tax_npc}{\link{character} Character string path for NPClassifier taxonomy file}
 }
 \value{
 Character string path to the prepared merged SOP library

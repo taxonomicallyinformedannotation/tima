@@ -11,11 +11,11 @@ prepare_params(
 )
 }
 \arguments{
-\item{params_small}{List of basic parameters for the workflow}
+\item{params_small}{\link{list} List of basic parameters for the workflow}
 
-\item{params_advanced}{List of advanced parameters for the workflow}
+\item{params_advanced}{\link{list} List of advanced parameters for the workflow}
 
-\item{step}{Workflow step identifier (default: NA)}
+\item{step}{\link{character} Workflow step identifier (default: NA)}
 }
 \value{
 Character vector of paths to YAML files containing prepared parameters

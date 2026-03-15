@@ -7,7 +7,7 @@
 get_sirius_filenames(version)
 }
 \arguments{
-\item{version}{Character "5" or "6".}
+\item{version}{\link{character} Character "5" or "6".}
 }
 \value{
 Named list with keys: canopus, formulas, structures, denovo, spectral.

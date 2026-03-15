@@ -9,9 +9,9 @@ is_numeric_in_range(x, min = -Inf, max = Inf)
 \arguments{
 \item{x}{Value to check}
 
-\item{min}{Minimum allowed value (inclusive)}
+\item{min}{\link{numeric} Minimum allowed value (inclusive)}
 
-\item{max}{Maximum allowed value (inclusive)}
+\item{max}{\link{numeric} Maximum allowed value (inclusive)}
 }
 \value{
 Logical TRUE if x is numeric and in [min, max]

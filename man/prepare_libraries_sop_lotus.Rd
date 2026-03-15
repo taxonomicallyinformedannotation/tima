@@ -11,9 +11,9 @@ prepare_libraries_sop_lotus(
 )
 }
 \arguments{
-\item{input}{Character string path to the raw LOTUS data file}
+\item{input}{\link{character} Character string path to the raw LOTUS data file}
 
-\item{output}{Character string path for the prepared output file}
+\item{output}{\link{character} Character string path for the prepared output file}
 }
 \value{
 Character string path to the prepared structure-organism pairs

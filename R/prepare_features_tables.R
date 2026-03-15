@@ -7,14 +7,14 @@
 #' @include get_params.R
 #' @include rts_utils.R
 #'
-#' @param features character(1) Path to raw features file (CSV/TSV).
-#' @param output character(1) Path where prepared features should be saved.
-#' @param candidates integer(1) Number of top-intensity samples to retain per
+#' @param features [character] Path to raw features file (CSV/TSV).
+#' @param output [character] Path where prepared features should be saved.
+#' @param candidates [integer] Number of top-intensity samples to retain per
 #'   feature (default: from params; recommended ≤5 to balance data size and coverage).
-#' @param name_adduct character(1) Name of the adduct column in input.
-#' @param name_features character(1) Name of the feature ID column in input.
-#' @param name_rt character(1) Name of the retention time column in input.
-#' @param name_mz character(1) Name of the m/z column in input.
+#' @param name_adduct [character] Name of the adduct column in input.
+#' @param name_features [character] Name of the feature ID column in input.
+#' @param name_rt [character] Name of the retention time column in input.
+#' @param name_mz [character] Name of the m/z column in input.
 #'
 #' @return character(1) Path to the prepared feature table (invisibly).
 #'

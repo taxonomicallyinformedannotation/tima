@@ -15,20 +15,20 @@ prepare_features_tables(
 )
 }
 \arguments{
-\item{features}{character(1) Path to raw features file (CSV/TSV).}
+\item{features}{\link{character} Path to raw features file (CSV/TSV).}
 
-\item{output}{character(1) Path where prepared features should be saved.}
+\item{output}{\link{character} Path where prepared features should be saved.}
 
-\item{candidates}{integer(1) Number of top-intensity samples to retain per
+\item{candidates}{\link{integer} Number of top-intensity samples to retain per
 feature (default: from params; recommended ≤5 to balance data size and coverage).}
 
-\item{name_adduct}{character(1) Name of the adduct column in input.}
+\item{name_adduct}{\link{character} Name of the adduct column in input.}
 
-\item{name_features}{character(1) Name of the feature ID column in input.}
+\item{name_features}{\link{character} Name of the feature ID column in input.}
 
-\item{name_rt}{character(1) Name of the retention time column in input.}
+\item{name_rt}{\link{character} Name of the retention time column in input.}
 
-\item{name_mz}{character(1) Name of the m/z column in input.}
+\item{name_mz}{\link{character} Name of the m/z column in input.}
 }
 \value{
 character(1) Path to the prepared feature table (invisibly).

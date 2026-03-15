@@ -16,14 +16,14 @@ prepare_libraries_sop_bigg(
 )
 }
 \arguments{
-\item{bigg_doi}{Character string DOI for BiGG database reference}
+\item{bigg_doi}{\link{character} Character string DOI for BiGG database reference}
 
-\item{bigg_models}{Named list of BiGG models with organism names as keys
+\item{bigg_models}{\link{list} Named list of BiGG models with organism names as keys
 and named character vectors containing "model_id" and "doi" as values}
 
-\item{bigg_url}{Character string base URL for BiGG models API}
+\item{bigg_url}{\link{character} Character string base URL for BiGG models API}
 
-\item{output}{Character string path for prepared BiGG library output}
+\item{output}{\link{character} Character string path for prepared BiGG library output}
 }
 \value{
 Character string path to prepared BiGG structure-organism pairs

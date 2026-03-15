@@ -7,9 +7,9 @@
 validate_weights(weights, param_name = "weights")
 }
 \arguments{
-\item{weights}{Named list or vector of weights}
+\item{weights}{\link{numeric} Named list or vector of weights}
 
-\item{param_name}{Name of the parameter (for error messages)}
+\item{param_name}{\link{character} Name of the parameter (for error messages)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

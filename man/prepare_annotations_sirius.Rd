@@ -27,26 +27,26 @@ prepare_annotations_sirius(
 )
 }
 \arguments{
-\item{input_directory}{Character path to directory or zip file containing
+\item{input_directory}{\link{character} Character path to directory or zip file containing
 SIRIUS results.}
 
-\item{output_ann}{Character path for prepared structure annotation output.}
+\item{output_ann}{\link{character} Character path for prepared structure annotation output.}
 
-\item{output_can}{Character path for prepared CANOPUS output.}
+\item{output_can}{\link{character} Character path for prepared CANOPUS output.}
 
-\item{output_for}{Character path for prepared formula output.}
+\item{output_for}{\link{character} Character path for prepared formula output.}
 
-\item{sirius_version}{Character SIRIUS version ("5" or "6").}
+\item{sirius_version}{\link{character} Character SIRIUS version ("5" or "6").}
 
-\item{str_stereo}{Character path to structure stereochemistry file.}
+\item{str_stereo}{\link{character} Character path to structure stereochemistry file.}
 
-\item{str_met}{Character path to structure metadata file.}
+\item{str_met}{\link{character} Character path to structure metadata file.}
 
-\item{str_nam}{Character path to structure names file.}
+\item{str_nam}{\link{character} Character path to structure names file.}
 
-\item{str_tax_cla}{Character path to ClassyFire taxonomy file.}
+\item{str_tax_cla}{\link{character} Character path to ClassyFire taxonomy file.}
 
-\item{str_tax_npc}{Character path to NPClassifier taxonomy file.}
+\item{str_tax_npc}{\link{character} Character path to NPClassifier taxonomy file.}
 }
 \value{
 Character path to the prepared SIRIUS annotations file (invisible).

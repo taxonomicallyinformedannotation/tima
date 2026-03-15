@@ -7,11 +7,11 @@
 #' @include errors_utils.R
 #' @include logs_utils.R
 #'
-#' @param expr Expression to evaluate
-#' @param max_attempts Integer maximum number of attempts (default: 3)
-#' @param backoff Numeric base for exponential backoff in seconds (default: 2)
-#' @param operation_name Character name of operation for logging
-#' @param silent Logical whether to suppress retry warnings (default: FALSE)
+#' @param expr [expression] Expression to evaluate
+#' @param max_attempts [integer] Integer maximum number of attempts (default: 3)
+#' @param backoff [numeric] Numeric base for exponential backoff in seconds (default: 2)
+#' @param operation_name [character] Character name of operation for logging
+#' @param silent [logical] Logical whether to suppress retry warnings (default: FALSE)
 #'
 #' @return Result of expr if successful
 #'
@@ -108,8 +108,8 @@ with_retry <- function(
 #'     detection for transient vs permanent failures.
 #'
 #' @param request httr2 request object or expression that performs request
-#' @param max_attempts Integer maximum retry attempts (default: 3)
-#' @param backoff Numeric backoff multiplier (default: 2)
+#' @param max_attempts [integer] Integer maximum retry attempts (default: 3)
+#' @param backoff [numeric] Numeric backoff multiplier (default: 2)
 #'
 #' @return Response object
 #'
@@ -128,7 +128,7 @@ with_http_retry <- function(request, max_attempts = 3L, backoff = 2) {
 #' @description Determines if an error should trigger a retry based on the
 #'     error message or type.
 #'
-#' @param error Error condition object
+#' @param error [condition] Error condition object
 #'
 #' @return Logical TRUE if error appears transient/retryable
 #'
@@ -163,10 +163,10 @@ is_retryable_error <- function(error) {
 #' @description Retry with automatic detection of transient vs permanent errors.
 #'     Only retries if error appears transient.
 #'
-#' @param expr Expression to evaluate
-#' @param max_attempts Integer maximum attempts (default: 3)
-#' @param backoff Numeric backoff multiplier (default: 2)
-#' @param operation_name Character operation name for logging
+#' @param expr [expression] Expression to evaluate
+#' @param max_attempts [integer] Integer maximum attempts (default: 3)
+#' @param backoff [numeric] Numeric backoff multiplier (default: 2)
+#' @param operation_name [character] Character operation name for logging
 #'
 #' @return Result of expr if successful
 #'

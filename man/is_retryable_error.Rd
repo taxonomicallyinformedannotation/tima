@@ -7,7 +7,7 @@
 is_retryable_error(error)
 }
 \arguments{
-\item{error}{Error condition object}
+\item{error}{\link{condition} Error condition object}
 }
 \value{
 Logical TRUE if error appears transient/retryable

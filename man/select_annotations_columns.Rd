@@ -14,18 +14,18 @@ select_annotations_columns(
 )
 }
 \arguments{
-\item{df}{Data frame containing annotation results with structure and
+\item{df}{\link{data.frame} Data frame containing annotation results with structure and
 candidate information}
 
-\item{str_stereo}{Path to structure stereochemistry file}
+\item{str_stereo}{\link{character} Path to structure stereochemistry file}
 
-\item{str_met}{Path to structure metadata file}
+\item{str_met}{\link{character} Path to structure metadata file}
 
-\item{str_nam}{Path to structure names file}
+\item{str_nam}{\link{character} Path to structure names file}
 
-\item{str_tax_cla}{Path to ClassyFire taxonomy file}
+\item{str_tax_cla}{\link{character} Path to ClassyFire taxonomy file}
 
-\item{str_tax_npc}{Path to NPClassifier taxonomy file}
+\item{str_tax_npc}{\link{character} Path to NPClassifier taxonomy file}
 }
 \value{
 Data frame with standardized annotation columns, cleaned values,

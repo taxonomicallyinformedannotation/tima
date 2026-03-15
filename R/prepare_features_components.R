@@ -9,9 +9,9 @@
 #' @include logs_utils.R
 #' @include safe_fread.R
 #'
-#' @param input Character vector of paths to input component files. Can be
+#' @param input [character] Character vector of paths to input component files. Can be
 #'     a single file or multiple files that will be combined.
-#' @param output Character string path where prepared components should be saved
+#' @param output [character] Character string path where prepared components should be saved
 #'
 #' @return Character string path to the prepared features' components file
 #'

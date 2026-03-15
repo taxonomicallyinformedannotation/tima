@@ -7,10 +7,10 @@
 validate_file_existence(file_list, allow_null = FALSE)
 }
 \arguments{
-\item{file_list}{Named list of file paths to validate. Names are used
+\item{file_list}{\link{list} Named list of file paths to validate. Names are used
 in error messages to identify which file is missing.}
 
-\item{allow_null}{Logical, if TRUE, NULL values are allowed (default: FALSE)}
+\item{allow_null}{\link{logical} Logical, if TRUE, NULL values are allowed (default: FALSE)}
 }
 \value{
 Invisible TRUE if all files exist, stops with error otherwise

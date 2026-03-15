@@ -4,9 +4,9 @@
 #' if all non-missing RTs are > 120 or if the 95th percentile exceeds 180 (common upper
 #' bound for minutes in typical gradients). Otherwise assumes minutes.
 #'
-#' @param rt_vec Numeric vector (character allowed; will be coerced) of retention times.
-#' @param unit Character scalar: one of 'auto', 'seconds', or 'minutes'.
-#' @param quiet Logical; if FALSE, logs detection/conversion decisions.
+#' @param rt_vec [numeric] Numeric vector (character allowed; will be coerced) of retention times.
+#' @param unit [character] Character scalar: one of 'auto', 'seconds', or 'minutes'.
+#' @param quiet [logical] Logical; if FALSE, logs detection/conversion decisions.
 #'
 #' @return Numeric vector of RTs in minutes.
 #' @keywords internal

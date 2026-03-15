@@ -10,8 +10,8 @@
 #' @include round_reals.R
 #' @include select_sop_columns.R
 #'
-#' @param input Character string path to input closed library file
-#' @param output Character string path where prepared library should be saved
+#' @param input [character] Character string path to input closed library file
+#' @param output [character] Character string path where prepared library should be saved
 #'
 #' @return Character string path to the prepared structure-organism pairs library
 #'

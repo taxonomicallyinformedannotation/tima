@@ -12,8 +12,8 @@
 #' @include select_sop_columns.R
 #' @include logs_utils.R
 #'
-#' @param input Character string path to the raw LOTUS data file
-#' @param output Character string path for the prepared output file
+#' @param input [character] Character string path to the raw LOTUS data file
+#' @param output [character] Character string path for the prepared output file
 #'
 #' @return Character string path to the prepared structure-organism pairs
 #'     library file

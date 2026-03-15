@@ -12,11 +12,11 @@
 #' @include get_params.R
 #' @include validations_utils.R
 #'
-#' @param x Character string containing the file path with default ID
-#' @param user_filename Character string for custom filename pattern
+#' @param x [character] Character string containing the file path with default ID
+#' @param user_filename [character] Character string for custom filename pattern
 #'     (used if user_gnps is NULL)
-#' @param user_gnps Character string for GNPS job ID (takes precedence)
-#' @param example_gnps Character string for example GNPS job ID to detect
+#' @param user_gnps [character] Character string for GNPS job ID (takes precedence)
+#' @param example_gnps [character] Character string for example GNPS job ID to detect
 #'
 #' @return Character string with ID replaced
 #'

@@ -12,10 +12,10 @@ prepare_features_components(
 )
 }
 \arguments{
-\item{input}{Character vector of paths to input component files. Can be
+\item{input}{\link{character} Character vector of paths to input component files. Can be
 a single file or multiple files that will be combined.}
 
-\item{output}{Character string path where prepared components should be saved}
+\item{output}{\link{character} Character string path where prepared components should be saved}
 }
 \value{
 Character string path to the prepared features' components file

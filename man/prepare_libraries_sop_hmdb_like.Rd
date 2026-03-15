@@ -19,17 +19,17 @@ prepare_libraries_sop_hmdb_like(
 )
 }
 \arguments{
-\item{input}{Character string path to SDF zip file}
+\item{input}{\link{character} Character string path to SDF zip file}
 
-\item{output}{Character string path for prepared SOP output}
+\item{output}{\link{character} Character string path for prepared SOP output}
 
-\item{source_name}{Character label used in logs}
+\item{source_name}{\link{character} Character label used in logs}
 
-\item{organism_name}{Character organism name attached to all rows}
+\item{organism_name}{\link{character} Character organism name attached to all rows}
 
-\item{organism_taxonomy}{Named list containing organism taxonomy fields}
+\item{organism_taxonomy}{\link{list} Named list containing organism taxonomy fields}
 
-\item{tag}{Character scalar tag propagated through SOP pipeline}
+\item{tag}{\link{character} Character scalar tag propagated through SOP pipeline}
 }
 \value{
 Character string path to prepared SOP file

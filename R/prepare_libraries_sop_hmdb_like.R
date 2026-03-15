@@ -7,12 +7,12 @@
 #' @include round_reals.R
 #' @include select_sop_columns.R
 #'
-#' @param input Character string path to SDF zip file
-#' @param output Character string path for prepared SOP output
-#' @param source_name Character label used in logs
-#' @param organism_name Character organism name attached to all rows
-#' @param organism_taxonomy Named list containing organism taxonomy fields
-#' @param tag Character scalar tag propagated through SOP pipeline
+#' @param input [character] Character string path to SDF zip file
+#' @param output [character] Character string path for prepared SOP output
+#' @param source_name [character] Character label used in logs
+#' @param organism_name [character] Character organism name attached to all rows
+#' @param organism_taxonomy [list] Named list containing organism taxonomy fields
+#' @param tag [character] Character scalar tag propagated through SOP pipeline
 #'
 #' @return Character string path to prepared SOP file
 #'

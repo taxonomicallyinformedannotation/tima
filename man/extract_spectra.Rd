@@ -7,7 +7,7 @@
 extract_spectra(object)
 }
 \arguments{
-\item{object}{Spectra object from the Spectra package}
+\item{object}{\link[Spectra:Spectra]{Spectra::Spectra} Spectra object from the Spectra package}
 }
 \value{
 Data frame containing harmonized spectra metadata with mz and

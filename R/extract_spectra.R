@@ -26,7 +26,7 @@
 #'     a flat data frame format. Handles column name inconsistencies, type
 #'     conversions, and extracts peak lists (mz/intensity).
 #'
-#' @param object Spectra object from the Spectra package
+#' @param object [Spectra] Spectra object from the Spectra package
 #'
 #' @return Data frame containing harmonized spectra metadata with mz and
 #'     intensity list columns containing peak data

@@ -7,9 +7,9 @@
 select_sirius_columns_canopus(df, sirius_version)
 }
 \arguments{
-\item{df}{Data frame of SIRIUS CANOPUS results.}
+\item{df}{\link{data.frame} Data frame of SIRIUS CANOPUS results.}
 
-\item{sirius_version}{SIRIUS version ("5" or "6").}
+\item{sirius_version}{\link{character} SIRIUS version ("5" or "6").}
 }
 \value{
 Data frame with standardized CANOPUS columns.

@@ -12,9 +12,9 @@ prepare_libraries_sop_closed(
 )
 }
 \arguments{
-\item{input}{Character string path to input closed library file}
+\item{input}{\link{character} Character string path to input closed library file}
 
-\item{output}{Character string path where prepared library should be saved}
+\item{output}{\link{character} Character string path where prepared library should be saved}
 }
 \value{
 Character string path to the prepared structure-organism pairs library

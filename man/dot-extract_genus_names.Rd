@@ -7,7 +7,7 @@
 .extract_genus_names(organism_names)
 }
 \arguments{
-\item{organism_names}{Character vector of organism names}
+\item{organism_names}{\link{character} Character vector of organism names}
 }
 \value{
 Character vector of genus names

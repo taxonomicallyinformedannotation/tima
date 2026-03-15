@@ -4,7 +4,7 @@
 #'
 #' @include validations_utils.R
 #'
-#' @param df Data frame containing structure-organism pair data.
+#' @param df [data.frame] Data frame containing structure-organism pair data.
 #'
 #' @return Data frame with standardized SOP columns.
 #'

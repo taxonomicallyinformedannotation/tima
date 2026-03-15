@@ -7,9 +7,9 @@
 assert_flag(x, arg_name = deparse(substitute(x)))
 }
 \arguments{
-\item{x}{Value to check}
+\item{x}{\link{logical} Value to check}
 
-\item{arg_name}{Name of the argument (for error messages)}
+\item{arg_name}{\link{character} Name of the argument (for error messages)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

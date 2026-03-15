@@ -11,11 +11,11 @@ validate_tolerance_ppm(
 )
 }
 \arguments{
-\item{tolerance_ppm}{Mass tolerance in parts per million}
+\item{tolerance_ppm}{\link{numeric} Mass tolerance in parts per million}
 
-\item{param_name}{Parameter name for error messages}
+\item{param_name}{\link{character} Parameter name for error messages}
 
-\item{context}{Additional context about usage}
+\item{context}{\link{character} Additional context about usage}
 }
 \value{
 Invisible TRUE if valid, stops/warns with messages otherwise

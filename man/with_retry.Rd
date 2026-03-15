@@ -13,15 +13,15 @@ with_retry(
 )
 }
 \arguments{
-\item{expr}{Expression to evaluate}
+\item{expr}{\link{expression} Expression to evaluate}
 
-\item{max_attempts}{Integer maximum number of attempts (default: 3)}
+\item{max_attempts}{\link{integer} Integer maximum number of attempts (default: 3)}
 
-\item{backoff}{Numeric base for exponential backoff in seconds (default: 2)}
+\item{backoff}{\link{numeric} Numeric base for exponential backoff in seconds (default: 2)}
 
-\item{operation_name}{Character name of operation for logging}
+\item{operation_name}{\link{character} Character name of operation for logging}
 
-\item{silent}{Logical whether to suppress retry warnings (default: FALSE)}
+\item{silent}{\link{logical} Logical whether to suppress retry warnings (default: FALSE)}
 }
 \value{
 Result of expr if successful

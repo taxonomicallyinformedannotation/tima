@@ -2,8 +2,8 @@
 #'
 #' @description Internal helper to archive log files with timestamps.
 #'
-#' @param log_file Character path to log file
-#' @param timestamp POSIXct timestamp for filename
+#' @param log_file [character] Character path to log file
+#' @param timestamp [POSIXct] POSIXct timestamp for filename
 #'
 #' @return Logical TRUE if successful, FALSE otherwise
 #' @keywords internal
@@ -52,7 +52,7 @@ archive_log_file <- function(log_file, timestamp) {
 #'
 #' @description Internal helper to run the targets workflow with error handling.
 #'
-#' @param target_pattern Character regex pattern to match target names
+#' @param target_pattern [character] Character regex pattern to match target names
 #'
 #' @return Invisible NULL
 #' @keywords internal

@@ -10,9 +10,9 @@
 #' @include logs_utils.R
 #' @include validations_utils.R
 #'
-#' @param table Data frame containing combined structure-organism pair data with
+#' @param table [data.frame] Data frame containing combined structure-organism pair data with
 #'     columns for structures (SMILES, InChI, names), organisms, and references
-#' @param cache Path to cache file for previously processed SMILES, or NULL to
+#' @param cache [character] Path to cache file for previously processed SMILES, or NULL to
 #'     skip caching
 #'
 #' @return List of normalized data frames:

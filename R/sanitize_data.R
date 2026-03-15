@@ -14,8 +14,8 @@ NULL
 #' @description Validates MGF (Mascot Generic Format) file structure and
 #'     reports the number of spectra found.
 #'
-#' @param file Character path to MGF file
-#' @param file_type Character description for error messages
+#' @param file [character] Character path to MGF file
+#' @param file_type [character] Character description for error messages
 #'
 #' @return List with validation results:
 #'   - valid: Logical, TRUE if file is valid
@@ -156,10 +156,10 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
 #'
 #' @description Validates CSV/TSV file structure and reports record count.
 #'
-#' @param file Character path to CSV/TSV file
-#' @param file_type Character description for error messages
-#' @param required_cols Character vector of required column names (optional)
-#' @param feature_col Character name of feature ID column (default: "feature_id")
+#' @param file [character] Character path to CSV/TSV file
+#' @param file_type [character] Character description for error messages
+#' @param required_cols [character] Character vector of required column names (optional)
+#' @param feature_col [character] Character name of feature ID column (default: "feature_id")
 #'
 #' @return List with validation results:
 #'   - valid: Logical, TRUE if file is valid
@@ -256,10 +256,10 @@ sanitize_csv <- function(
 #' @description Checks that filenames in feature table match those in metadata,
 #'     and validates that metadata contains organism information.
 #'
-#' @param metadata_file Character path to metadata file
-#' @param features_file Character path to features file (optional)
-#' @param filename_col Character name of column containing filenames in both files
-#' @param organism_col Character name of organism column in metadata (default: "organism")
+#' @param metadata_file [character] Character path to metadata file
+#' @param features_file [character] Character path to features file (optional)
+#' @param filename_col [character] Character name of column containing filenames in both files
+#' @param organism_col [character] Character name of organism column in metadata (default: "organism")
 #'
 #' @return List with validation results:
 #'   - valid: Logical, TRUE if metadata is consistent
@@ -526,7 +526,7 @@ sanitize_metadata <- function(
 #'     necessary files for TIMA processing. Handles both extracted directories
 #'     and ZIP archives. Supports SIRIUS v5 and v6 formats.
 #'
-#' @param sirius_dir Character path to SIRIUS output directory or ZIP file
+#' @param sirius_dir [character] Character path to SIRIUS output directory or ZIP file
 #'
 #' @return List with validation results:
 #'   - valid: Logical, TRUE if all required files present
@@ -740,13 +740,13 @@ sanitize_sirius <- function(sirius_dir) {
 #' @description Comprehensive validation of all input data before starting
 #'     expensive processing. Reports issues immediately to save time.
 #'
-#' @param features_file Character path to features CSV/TSV (optional)
-#' @param mgf_file Character path to MGF file (optional)
-#' @param metadata_file Character path to metadata file (optional)
-#' @param sirius_dir Character path to SIRIUS output directory or ZIP (optional)
-#' @param filename_col Character name of filename column (default: "filename")
-#' @param organism_col Character name of organism column (default: "organism")
-#' @param feature_col Character name of feature ID column (default: "feature_id")
+#' @param features_file [character] Character path to features CSV/TSV (optional)
+#' @param mgf_file [character] Character path to MGF file (optional)
+#' @param metadata_file [character] Character path to metadata file (optional)
+#' @param sirius_dir [character] Character path to SIRIUS output directory or ZIP (optional)
+#' @param filename_col [character] Character name of filename column (default: "filename")
+#' @param organism_col [character] Character name of organism column (default: "organism")
+#' @param feature_col [character] Character name of feature ID column (default: "feature_id")
 #'
 #' @return Invisible TRUE if all validations pass, stops with error otherwise
 #' @keywords internal

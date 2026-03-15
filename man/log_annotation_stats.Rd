@@ -7,7 +7,7 @@
 log_annotation_stats(annotation_table)
 }
 \arguments{
-\item{annotation_table}{Data frame with annotations}
+\item{annotation_table}{\link{data.frame} Data frame with annotations}
 }
 \value{
 NULL (logs statistics as side effect)

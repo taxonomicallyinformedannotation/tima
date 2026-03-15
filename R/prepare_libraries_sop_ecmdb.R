@@ -10,8 +10,8 @@
 #' @include round_reals.R
 #' @include select_sop_columns.R
 #'
-#' @param input Character string path to ECMDB JSON zip file
-#' @param output Character string path for prepared ECMDB library output
+#' @param input [character] Character string path to ECMDB JSON zip file
+#' @param output [character] Character string path for prepared ECMDB library output
 #'
 #' @return Character string path to prepared ECMDB structure-organism pairs
 #'

@@ -7,9 +7,9 @@
 count_if(x, predicate_fn, ...)
 }
 \arguments{
-\item{x}{List or vector to process}
+\item{x}{\link{list} List or vector to process}
 
-\item{predicate_fn}{Function taking one element and returning logical}
+\item{predicate_fn}{\link{function} Function taking one element and returning logical}
 
 \item{...}{Additional arguments passed to predicate_fn}
 }

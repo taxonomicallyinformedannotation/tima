@@ -8,9 +8,9 @@
 #' @include constants.R
 #' @include validations_utils.R
 #'
-#' @param adduct_string Character string representing the adduct in standard
+#' @param adduct_string [character] Character string representing the adduct in standard
 #'     notation (e.g., "\[M+H\]+", "\[2M+Na\]+", "\[M-H2O+H\]+")
-#' @param regex Character string regular expression pattern for parsing
+#' @param regex [character] Character string regular expression pattern for parsing
 #'     (default: uses ADDUCT_REGEX_PATTERN from constants)
 #'
 #' @return Named numeric vector containing:

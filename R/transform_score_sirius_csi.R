@@ -9,9 +9,9 @@
 #'
 #' @include validations_utils.R
 #'
-#' @param csi_score Numeric SIRIUS CSI score (can be negative, NA, NULL, or absent)
-#' @param K Numeric shift parameter to adjust the sigmoid center (default: 50)
-#' @param scale Numeric scale parameter controlling sigmoid steepness (default: 10)
+#' @param csi_score [numeric] Numeric SIRIUS CSI score (can be negative, NA, NULL, or absent)
+#' @param K [numeric] Numeric shift parameter to adjust the sigmoid center (default: 50)
+#' @param scale [numeric] Numeric scale parameter controlling sigmoid steepness (default: 10)
 #'
 #' @return Numeric transformed score in the range (0, 1), or NA if input is NA/NULL/absent
 #'

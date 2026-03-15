@@ -6,8 +6,8 @@
 #'
 #' @include validations_utils.R
 #'
-#' @param sirius_zip Path to compressed SIRIUS workspace (.zip)
-#' @param file Pattern to match files within the archive
+#' @param sirius_zip [character] Path to compressed SIRIUS workspace (.zip)
+#' @param file [character] Pattern to match files within the archive
 #'
 #' @return Data frame (tidytable) containing the parsed file contents
 #'

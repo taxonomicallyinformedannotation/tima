@@ -7,11 +7,11 @@
 export_results(results_list, output, pattern)
 }
 \arguments{
-\item{results_list}{List with full, filtered, mini data frames}
+\item{results_list}{\link{list} List with full, filtered, mini data frames}
 
-\item{output}{Character, base output filename}
+\item{output}{\link{character} Character, base output filename}
 
-\item{pattern}{Character, pattern for directory naming}
+\item{pattern}{\link{character} Character, pattern for directory naming}
 }
 \value{
 Named character vector with output file paths

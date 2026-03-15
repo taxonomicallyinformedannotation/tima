@@ -1,7 +1,7 @@
 #' Compute normalized weighted sum (row-wise for data frames)
 #'
-#' @param ... Numeric columns/vectors of component values (passed as separate arguments).
-#' @param weights Numeric vector of non-negative weights (one per component).
+#' @param ... [numeric] Numeric columns/vectors of component values (passed as separate arguments).
+#' @param weights [numeric] Numeric vector of non-negative weights (one per component).
 #' @return Numeric vector: row-wise weighted sum with normalized weights.
 #' @keywords internal
 #'

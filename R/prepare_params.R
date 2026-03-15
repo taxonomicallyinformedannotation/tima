@@ -14,9 +14,9 @@
 #' @include load_yaml_files.R
 #' @include validations_utils.R
 #'
-#' @param params_small List of basic parameters for the workflow
-#' @param params_advanced List of advanced parameters for the workflow
-#' @param step Workflow step identifier (default: NA)
+#' @param params_small [list] List of basic parameters for the workflow
+#' @param params_advanced [list] List of advanced parameters for the workflow
+#' @param step [character] Workflow step identifier (default: NA)
 #'
 #' @return Character vector of paths to YAML files containing prepared parameters
 #'
