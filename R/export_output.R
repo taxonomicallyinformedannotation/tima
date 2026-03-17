@@ -74,12 +74,14 @@ export_output <- function(x, file) {
     },
     error = function(e) {
       log_error("Export failed: %s", conditionMessage(e))
-      stop(
-        "Failed to export data to '",
-        file,
-        "': ",
-        conditionMessage(e),
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "failed to export data",
+          "x" = file,
+          "i" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
       )
     }
   )
