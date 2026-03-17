@@ -54,12 +54,20 @@ prepare_features_edges <- function(
       !"ms1" %in% input_names ||
       !"spectral" %in% input_names
   ) {
-    stop("input must contain 'ms1' and 'spectral' elements")
+    cli::cli_abort(
+      "input must contain 'ms1' and 'spectral' elements",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate output and column names
   if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string")
+    cli::cli_abort(
+      "output must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   ctx <- log_operation("prepare_features_edges", n_edge_types = length(input))
@@ -88,7 +96,11 @@ prepare_features_edges <- function(
         paste0("  - ", missing_files, collapse = "\n")
       )
     )
-    stop(msg, call. = FALSE)
+    cli::cli_abort(
+      msg,
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Load Edge Tables ----
@@ -110,7 +122,14 @@ prepare_features_edges <- function(
       )
     },
     error = function(e) {
-      stop("Failed to read edge files: ", conditionMessage(e))
+      cli::cli_abort(
+        c(
+          "failed to read edge files",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 

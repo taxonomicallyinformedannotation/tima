@@ -43,7 +43,11 @@ prepare_features_components <- function(
 
   # Validate inputs
   if (!is.character(input) || length(input) == 0L) {
-    stop("input must be a non-empty character vector")
+    cli::cli_abort(
+      "input must be a non-empty character vector",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   ctx <- log_operation("prepare_features_components", n_files = length(input))
@@ -62,7 +66,11 @@ prepare_features_components <- function(
         paste0("  - ", missing_files, collapse = "\n")
       )
     )
-    stop(msg, call. = FALSE)
+    cli::cli_abort(
+      msg,
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Load Component Data ----
@@ -88,7 +96,14 @@ prepare_features_components <- function(
         tidytable::bind_rows()
     },
     error = function(e) {
-      stop("Failed to read component files: ", conditionMessage(e))
+      cli::cli_abort(
+        c(
+          "failed to read component files",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 

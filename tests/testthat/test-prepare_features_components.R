@@ -9,7 +9,8 @@ test_that("prepare_features_components validates input parameter", {
       input = 123,
       output = temp_test_path("output.tsv")
     ),
-    "must be a non-empty character vector"
+    "must be a non-empty character vector",
+    class = "tima_validation_error"
   )
 
   # Test empty character vector
@@ -18,7 +19,8 @@ test_that("prepare_features_components validates input parameter", {
       input = character(0),
       output = temp_test_path("output.tsv")
     ),
-    "must be a non-empty character vector"
+    "must be a non-empty character vector",
+    class = "tima_validation_error"
   )
 
   # Test NULL input
@@ -27,7 +29,8 @@ test_that("prepare_features_components validates input parameter", {
       input = NULL,
       output = temp_test_path("output.tsv")
     ),
-    "must be a non-empty character vector"
+    "must be a non-empty character vector",
+    class = "tima_validation_error"
   )
 })
 
@@ -64,7 +67,8 @@ test_that("prepare_features_components checks file existence", {
       input = temp_test_path("nonexistent_file.tsv"),
       output = temp_test_path("output.tsv")
     ),
-    "not found"
+    "not found",
+    class = "tima_validation_error"
   )
 
   # Test multiple files, some missing
@@ -76,7 +80,8 @@ test_that("prepare_features_components checks file existence", {
       input = c(temp_file1, temp_test_path("missing_file.tsv")),
       output = temp_test_path("output.tsv")
     ),
-    "not found"
+    "not found",
+    class = "tima_validation_error"
   )
 })
 

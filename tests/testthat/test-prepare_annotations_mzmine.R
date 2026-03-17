@@ -58,7 +58,8 @@ test_that("test-prepare_annotations_mzmine validates output path", {
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "output must be a single character string"
+    "output must be a single character string",
+    class = "tima_validation_error"
   )
 })
 
