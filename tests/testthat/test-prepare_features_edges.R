@@ -9,7 +9,8 @@ test_that("prepare_features_edges validates input structure", {
       input = list("only_one" = "file.tsv"),
       output = "output.tsv"
     ),
-    "must contain 'ms1' and 'spectral'"
+    "must contain 'ms1' and 'spectral'",
+    class = "tima_validation_error"
   )
 
   # Test input with NULL names
@@ -18,7 +19,8 @@ test_that("prepare_features_edges validates input structure", {
       input = list("file1.tsv", "file2.tsv"),
       output = "output.tsv"
     ),
-    "must contain 'ms1' and 'spectral'"
+    "must contain 'ms1' and 'spectral'",
+    class = "tima_validation_error"
   )
 
   # Test input missing 'spectral'
@@ -27,7 +29,8 @@ test_that("prepare_features_edges validates input structure", {
       input = list("ms1" = "file1.tsv", "other" = "file2.tsv"),
       output = "output.tsv"
     ),
-    "must contain 'ms1' and 'spectral'"
+    "must contain 'ms1' and 'spectral'",
+    class = "tima_validation_error"
   )
 })
 
@@ -44,7 +47,8 @@ test_that("prepare_features_edges validates output parameter", {
       input = list("ms1" = temp_ms1, "spectral" = temp_spectral),
       output = 123
     ),
-    "must be a single character string"
+    "must be a single character string",
+    class = "tima_validation_error"
   )
 
   # Test vector output
@@ -53,7 +57,8 @@ test_that("prepare_features_edges validates output parameter", {
       input = list("ms1" = temp_ms1, "spectral" = temp_spectral),
       output = c("out1.tsv", "out2.tsv")
     ),
-    "must be a single character string"
+    "must be a single character string",
+    class = "tima_validation_error"
   )
 
   # unlink(temp_ms1)
@@ -104,7 +109,8 @@ test_that("prepare_features_edges checks file existence", {
       ),
       output = "output.tsv"
     ),
-    "not found"
+    "not found",
+    class = "tima_validation_error"
   )
 
   # Test one existing, one missing
@@ -116,7 +122,8 @@ test_that("prepare_features_edges checks file existence", {
       input = list("ms1" = temp_ms1, "spectral" = "missing.tsv"),
       output = "output.tsv"
     ),
-    "not found"
+    "not found",
+    class = "tima_validation_error"
   )
 
   # unlink(temp_ms1)
