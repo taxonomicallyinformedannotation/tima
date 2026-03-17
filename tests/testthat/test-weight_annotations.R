@@ -245,75 +245,64 @@ test_that("weight_annotations() runs successfully with minimal inputs", {
     showWarnings = FALSE
   )
 
-  expect_warning(
-    {
-      result <- withCallingHandlers(
-        weight_annotations(
-          library = fixtures$library,
-          annotations = fixtures$annotations,
-          components = fixtures$components,
-          edges = fixtures$edges,
-          taxa = fixtures$taxa,
-          canopus = fixtures$canopus,
-          formula = fixtures$formula,
-          org_tax_ott = fixtures$org_tax_ott,
-          output = fixtures$output,
-          candidates_neighbors = 3L,
-          candidates_final = 1L,
-          best_percentile = 0.9,
-          weight_spectral = 0.2,
-          weight_chemical = 0.3,
-          weight_biological = 0.5,
-          score_biological_domain = 0.1,
-          score_biological_kingdom = 0.2,
-          score_biological_phylum = 0.3,
-          score_biological_class = 0.4,
-          score_biological_order = 0.5,
-          score_biological_infraorder = 0.55,
-          score_biological_family = 0.6,
-          score_biological_subfamily = 0.65,
-          score_biological_tribe = 0.7,
-          score_biological_subtribe = 0.75,
-          score_biological_genus = 0.8,
-          score_biological_subgenus = 0.85,
-          score_biological_species = 0.9,
-          score_biological_subspecies = 0.95,
-          score_biological_variety = 1.0,
-          score_biological_biota = 1.007276,
-          score_chemical_cla_kingdom = 0.25,
-          score_chemical_cla_superclass = 0.5,
-          score_chemical_cla_class = 0.75,
-          score_chemical_cla_parent = 1.0,
-          score_chemical_npc_pathway = 0.33,
-          score_chemical_npc_superclass = 0.66,
-          score_chemical_npc_class = 1.0,
-          minimal_consistency = 0.6,
-          minimal_ms1_bio = 0.6,
-          minimal_ms1_chemo = 0.6,
-          minimal_ms1_condition = "AND",
-          ms1_only = TRUE,
-          compounds_names = TRUE,
-          high_confidence = FALSE,
-          remove_ties = FALSE,
-          summarize = TRUE,
-          pattern = "test",
-          force = FALSE
-        ),
-        warning = function(w) {
-          if (
-            grepl(
-              "Empty results table provided",
-              conditionMessage(w),
-              fixed = TRUE
-            )
-          ) {
-            invokeRestart("muffleWarning")
-          }
-        }
-      )
-    },
-    "no non-missing arguments to max; returning -Inf|Empty results table provided"
-  )
+  warnings <- testthat::capture_warnings({
+    result <- weight_annotations(
+      library = fixtures$library,
+      annotations = fixtures$annotations,
+      components = fixtures$components,
+      edges = fixtures$edges,
+      taxa = fixtures$taxa,
+      canopus = fixtures$canopus,
+      formula = fixtures$formula,
+      org_tax_ott = fixtures$org_tax_ott,
+      output = fixtures$output,
+      candidates_neighbors = 3L,
+      candidates_final = 1L,
+      best_percentile = 0.9,
+      weight_spectral = 0.2,
+      weight_chemical = 0.3,
+      weight_biological = 0.5,
+      score_biological_domain = 0.1,
+      score_biological_kingdom = 0.2,
+      score_biological_phylum = 0.3,
+      score_biological_class = 0.4,
+      score_biological_order = 0.5,
+      score_biological_infraorder = 0.55,
+      score_biological_family = 0.6,
+      score_biological_subfamily = 0.65,
+      score_biological_tribe = 0.7,
+      score_biological_subtribe = 0.75,
+      score_biological_genus = 0.8,
+      score_biological_subgenus = 0.85,
+      score_biological_species = 0.9,
+      score_biological_subspecies = 0.95,
+      score_biological_variety = 1.0,
+      score_biological_biota = 1.007276,
+      score_chemical_cla_kingdom = 0.25,
+      score_chemical_cla_superclass = 0.5,
+      score_chemical_cla_class = 0.75,
+      score_chemical_cla_parent = 1.0,
+      score_chemical_npc_pathway = 0.33,
+      score_chemical_npc_superclass = 0.66,
+      score_chemical_npc_class = 1.0,
+      minimal_consistency = 0.6,
+      minimal_ms1_bio = 0.6,
+      minimal_ms1_chemo = 0.6,
+      minimal_ms1_condition = "AND",
+      ms1_only = TRUE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = TRUE,
+      pattern = "test",
+      force = FALSE
+    )
+  })
+
+  expect_true(any(grepl(
+    "no non-missing arguments to max; returning -Inf|Empty results table provided",
+    warnings
+  )))
 
   # Should return output paths
   expect_type(result, "character")
