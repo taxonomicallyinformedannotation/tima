@@ -127,7 +127,11 @@ filter_high_confidence_only <- function(
       is.na(error_rt_max) ||
       error_rt_max <= 0
   ) {
-    stop("RT error threshold must be positive (minutes)")
+    cli::cli_abort(
+      "RT error threshold must be positive (minutes)",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (!is.null(confidence_sirius_min)) {
@@ -153,7 +157,11 @@ filter_high_confidence_only <- function(
         is.na(matched_peaks_min) ||
         matched_peaks_min < 0
     ) {
-      stop("Matched peaks threshold must be a non-negative number")
+      cli::cli_abort(
+        "matched peaks threshold must be a non-negative number",
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
     }
   }
 

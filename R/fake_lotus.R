@@ -20,7 +20,11 @@
 fake_lotus <- function(export) {
   # Validate input
   if (missing(export) || !is.character(export) || length(export) != 1L) {
-    stop("export path must be a single character string")
+    cli::cli_abort(
+      "export path must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   log_warn(

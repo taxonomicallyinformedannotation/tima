@@ -66,24 +66,31 @@ test_that("fake_lotus creates file with correct structure", {
 
 test_that("fake_lotus validates input parameters", {
   # Missing export parameter
-  expect_error(fake_lotus(), "export path must be a single character string")
+  expect_error(
+    fake_lotus(),
+    "export path must be a single character string",
+    class = "tima_validation_error"
+  )
 
   # NULL export
   expect_error(
     fake_lotus(export = NULL),
-    "export path must be a single character string"
+    "export path must be a single character string",
+    class = "tima_validation_error"
   )
 
   # Non-character export
   expect_error(
     fake_lotus(export = 123),
-    "export path must be a single character string"
+    "export path must be a single character string",
+    class = "tima_validation_error"
   )
 
   # Multiple paths
   expect_error(
     fake_lotus(export = c("path1", "path2")),
-    "export path must be a single character string"
+    "export path must be a single character string",
+    class = "tima_validation_error"
   )
 })
 

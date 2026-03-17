@@ -83,18 +83,24 @@ validate_all_single_strings <- function(
   error_prefix = "Parameter(s)"
 ) {
   if (!is.list(x_list) || is.null(names(x_list))) {
-    stop("x_list must be a named list", call. = FALSE)
+    cli::cli_abort(
+      "x_list must be a named list",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   checks <- all_single_strings(x_list)
 
   if (!all(checks)) {
     invalid_params <- names(x_list)[!checks]
-    stop(
-      error_prefix,
-      " must be single character strings: ",
-      paste(invalid_params, collapse = ", "),
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        paste0(error_prefix, " must be single character strings"),
+        "x" = paste(invalid_params, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -213,7 +219,11 @@ validate_all_with_predicate <- function(
   ...
 ) {
   if (!is.list(x_list) || is.null(names(x_list))) {
-    stop("x_list must be a named list", call = NULL)
+    cli::cli_abort(
+      "x_list must be a named list",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   checks <- vapply(
@@ -225,11 +235,13 @@ validate_all_with_predicate <- function(
 
   if (!all(checks)) {
     invalid_params <- names(x_list)[!checks]
-    stop(
-      error_prefix,
-      " must satisfy validation: ",
-      paste(invalid_params, collapse = ", "),
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        paste0(error_prefix, " must satisfy validation"),
+        "x" = paste(invalid_params, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
