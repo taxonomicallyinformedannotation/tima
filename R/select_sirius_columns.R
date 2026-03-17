@@ -31,7 +31,11 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 
   # Validate SIRIUS version
   if (!sirius_version %in% c("5", "6", 5, 6)) {
-    stop("sirius_version must be '5' or '6'", call. = FALSE)
+    cli::cli_abort(
+      "sirius_version must be '5' or '6'",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   df <- df |>

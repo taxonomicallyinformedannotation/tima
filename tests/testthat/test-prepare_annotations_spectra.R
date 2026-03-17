@@ -57,17 +57,21 @@ test_that("test-prepare_annotations_spectra validates input vector and files", {
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "non-empty character"
+    "non-empty character",
+    class = "tima_validation_error"
   )
-  expect_error(prepare_annotations_spectra(
-    input = c(temp_test_path("missing.tsv")),
-    output = out,
-    str_stereo = s$stereo,
-    str_met = s$met,
-    str_nam = s$nam,
-    str_tax_cla = s$cla,
-    str_tax_npc = s$npc
-  ))
+  expect_error(
+    prepare_annotations_spectra(
+      input = c(temp_test_path("missing.tsv")),
+      output = out,
+      str_stereo = s$stereo,
+      str_met = s$met,
+      str_nam = s$nam,
+      str_tax_cla = s$cla,
+      str_tax_npc = s$npc
+    ),
+    class = "tima_validation_error"
+  )
 })
 
 test_that("test-prepare_annotations_spectra validates structure files", {
@@ -88,7 +92,8 @@ test_that("test-prepare_annotations_spectra validates structure files", {
       str_tax_cla = temp_test_path("missing.tsv"),
       str_tax_npc = temp_test_path("missing.tsv")
     ),
-    "Structure file\\(s\\) not found"
+    "structure file\\(s\\) not found",
+    class = "tima_validation_error"
   )
 })
 

@@ -42,7 +42,8 @@ test_that("prepare_taxa validates output parameter", {
       taxon = "Homo sapiens",
       output = 123
     ),
-    "must be a single character string"
+    "must be a single character string",
+    class = "tima_validation_error"
   )
 
   # Test vector output
@@ -53,7 +54,8 @@ test_that("prepare_taxa validates output parameter", {
       taxon = "Homo sapiens",
       output = c("out1.tsv", "out2.tsv")
     ),
-    "must be a single character string"
+    "must be a single character string",
+    class = "tima_validation_error"
   )
 
   unlink(temp_input)
@@ -104,7 +106,8 @@ test_that("prepare_taxa validates extension parameter", {
       extension = "yes",
       output = "output.tsv"
     ),
-    "must be a single logical value"
+    "must be a single logical value",
+    class = "tima_validation_error"
   )
 
   # Test vector extension
@@ -115,7 +118,8 @@ test_that("prepare_taxa validates extension parameter", {
       extension = c(TRUE, FALSE),
       output = "output.tsv"
     ),
-    "must be a single logical value"
+    "must be a single logical value",
+    class = "tima_validation_error"
   )
 
   unlink(temp_input)

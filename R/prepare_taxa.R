@@ -89,12 +89,20 @@ prepare_taxa <- function(
   )
 
   if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string")
+    cli::cli_abort(
+      "output must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate logical parameter
   if (!is.logical(extension) || length(extension) != 1L) {
-    stop("extension must be a single logical value (TRUE/FALSE)")
+    cli::cli_abort(
+      "extension must be a single logical value (TRUE/FALSE)",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Check if using single taxon or metadata-based assignment
