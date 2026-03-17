@@ -190,6 +190,7 @@ test_that("get_compounds_xrefs errors on invalid props", {
       props = c("P_NONEXISTENT_99999"),
       output = output_file
     ),
-    "None of the supplied props were found"
+    "supplied props were found",
+    class = "tima_validation_error"
   )
 })

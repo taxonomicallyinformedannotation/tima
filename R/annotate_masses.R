@@ -458,11 +458,14 @@ annotate_masses <-
         Please check your adducts and clusters configuration.",
         ms_mode
       )
-      stop(
-        "No valid monocharged adducts or clusters found for mode %s.
-        Cannot proceed with mass annotation.
-        Please check your adducts and clusters configuration.",
-        ms_mode
+      cli::cli_abort(
+        c(
+          "no valid monocharged adducts or clusters found",
+          "x" = paste0("mode: ", ms_mode),
+          "i" = "check adduct and cluster configuration"
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
 

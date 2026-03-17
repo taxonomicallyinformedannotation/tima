@@ -84,7 +84,14 @@ download_with_error_handling <- function(url, export) {
     ),
     error = function(e) {
       cleanup_failed_download(export)
-      stop(e)
+      cli::cli_abort(
+        c(
+          "file download failed",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 }
@@ -128,7 +135,11 @@ validate_http_response <- function(resp, url, export) {
         "3. Contact data provider if issue persists"
       )
     )
-    stop(msg, call. = FALSE)
+    cli::cli_abort(
+      msg,
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
+    )
   }
 }
 
@@ -148,7 +159,11 @@ validate_downloaded_file <- function(export, url) {
         "3. Check file system permissions"
       )
     )
-    stop(msg, call. = FALSE)
+    cli::cli_abort(
+      msg,
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Check file size
@@ -168,7 +183,11 @@ validate_downloaded_file <- function(export, url) {
         "4. Check server logs if you have access"
       )
     )
-    stop(msg, call. = FALSE)
+    cli::cli_abort(
+      msg,
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate file content (detect HTML error pages)
@@ -212,7 +231,11 @@ validate_file_content <- function(export, url) {
         "4. Contact the data provider for correct download URL"
       )
     )
-    stop(msg, call. = FALSE)
+    cli::cli_abort(
+      msg,
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
+    )
   }
 
   invisible(TRUE)
@@ -227,7 +250,7 @@ read_file_header <- function(file_path, n_bytes = 512L) {
       on.exit(close(con), add = TRUE)
       readBin(con, what = "raw", n = n_bytes)
     },
-    error = function(e) raw()
+    error = function(...) raw()
   )
 }
 
@@ -252,7 +275,7 @@ is_valid_binary_format <- function(header_raw) {
 is_html_content <- function(header_raw) {
   header_txt <- tryCatch(
     tolower(paste0(rawToChar(header_raw, multiple = TRUE), collapse = "")),
-    error = function(e) ""
+    error = function(...) ""
   )
 
   header_trim <- sub("^[\t\r\n ]+", "", header_txt)
