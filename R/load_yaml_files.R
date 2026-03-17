@@ -84,7 +84,14 @@ load_yaml_files <- function() {
       purrr::map(.x = yaml_files, .f = yaml::read_yaml)
     },
     error = function(e) {
-      stop("Failed to parse YAML files: ", conditionMessage(e))
+      cli::cli_abort(
+        c(
+          "failed to parse YAML files",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 

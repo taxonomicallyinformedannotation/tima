@@ -7,7 +7,8 @@ library(testthat)
 test_that("copy_backbone validates cache_dir must be non-NULL character", {
   expect_error(
     copy_backbone(cache_dir = NULL),
-    "Cache directory path must be",
+    "cache directory path must be",
+    class = "tima_validation_error",
     info = "NULL cache_dir should error"
   )
 })
@@ -15,7 +16,8 @@ test_that("copy_backbone validates cache_dir must be non-NULL character", {
 test_that("copy_backbone validates cache_dir must be non-empty", {
   expect_error(
     copy_backbone(cache_dir = ""),
-    "Cache directory path must be",
+    "cache directory path must be",
+    class = "tima_validation_error",
     info = "Empty cache_dir should error"
   )
 })
@@ -23,7 +25,8 @@ test_that("copy_backbone validates cache_dir must be non-empty", {
 test_that("copy_backbone validates cache_dir must be character type", {
   expect_error(
     copy_backbone(cache_dir = 123),
-    "Cache directory path must be",
+    "cache directory path must be",
+    class = "tima_validation_error",
     info = "Non-character cache_dir should error"
   )
 })
@@ -31,7 +34,8 @@ test_that("copy_backbone validates cache_dir must be character type", {
 test_that("copy_backbone validates cache_dir must be scalar", {
   expect_error(
     copy_backbone(cache_dir = c("dir1", "dir2")),
-    "Cache directory path must be",
+    "cache directory path must be",
+    class = "tima_validation_error",
     info = "Multiple values for cache_dir should error"
   )
 })
@@ -41,7 +45,8 @@ test_that("copy_backbone validates package must be non-NULL character", {
 
   expect_error(
     copy_backbone(cache_dir = test_cache, package = NULL),
-    "Package name must be",
+    "package name must be",
+    class = "tima_validation_error",
     info = "NULL package should error"
   )
 })
@@ -51,7 +56,8 @@ test_that("copy_backbone validates package must be non-empty", {
 
   expect_error(
     copy_backbone(cache_dir = test_cache, package = ""),
-    "Package name must be",
+    "package name must be",
+    class = "tima_validation_error",
     info = "Empty package should error"
   )
 })
@@ -61,7 +67,8 @@ test_that("copy_backbone validates package must be character type", {
 
   expect_error(
     copy_backbone(cache_dir = test_cache, package = 123),
-    "Package name must be",
+    "package name must be",
+    class = "tima_validation_error",
     info = "Non-character package should error"
   )
 })
@@ -74,7 +81,8 @@ test_that("copy_backbone rejects non-existent package names", {
       cache_dir = test_cache,
       package = "NonExistentPackage123456"
     ),
-    "Package.*not found",
+    "package not found",
+    class = "tima_validation_error",
     info = "Non-existent package should error"
   )
 })

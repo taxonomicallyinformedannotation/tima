@@ -38,20 +38,36 @@ prepare_libraries_sop_hmdb_like <- function(
   tag = NA_character_
 ) {
   if (!is.character(input) || length(input) != 1L) {
-    stop("input must be a single character string")
+    cli::cli_abort(
+      "input must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
   if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string")
+    cli::cli_abort(
+      "output must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
   if (!is.character(source_name) || length(source_name) != 1L) {
-    stop("source_name must be a single character string")
+    cli::cli_abort(
+      "source_name must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (is.null(tag) || length(tag) == 0L) {
     tag <- NA_character_
   }
   if (!is.character(tag) || length(tag) != 1L) {
-    stop("tag must be a single character string or NA")
+    cli::cli_abort(
+      "tag must be a single character string or NA",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   ctx <- log_operation(
@@ -156,7 +172,11 @@ parse_hmdb_like_input <- function(input) {
     )]
 
     if (length(sdf_entries) == 0L) {
-      stop("No .sdf file found after unzip")
+      cli::cli_abort(
+        "no .sdf file found after unzip",
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
     }
 
     parsed_tables <- lapply(sdf_entries, function(sdf_entry) {
@@ -176,7 +196,11 @@ parse_hmdb_like_input <- function(input) {
     return(parse_hmdb_like_sdf_file(input))
   }
 
-  stop("Unsupported input format. Expected .zip or .sdf file")
+  cli::cli_abort(
+    "unsupported input format. expected .zip or .sdf file",
+    class = c("tima_validation_error", "tima_error"),
+    call = NULL
+  )
 }
 
 parse_hmdb_like_sdf_file <- function(sdf_file) {

@@ -9,5 +9,9 @@ test_that("get_default_paths returns named list", {
 })
 
 test_that("get_default_paths errors for missing yaml", {
-  expect_error(get_default_paths(yaml = "nonexistent.yaml"), "not found")
+  expect_error(
+    get_default_paths(yaml = "nonexistent.yaml"),
+    "not found",
+    class = "tima_validation_error"
+  )
 })

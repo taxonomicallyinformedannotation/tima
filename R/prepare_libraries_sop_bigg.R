@@ -59,7 +59,11 @@ prepare_libraries_sop_bigg <- function(
 ) {
   # Validate inputs
   if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string", call. = FALSE)
+    cli::cli_abort(
+      "output must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   log_info("Preparing BiGG structure-organism pairs")

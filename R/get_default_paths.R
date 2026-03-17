@@ -25,10 +25,14 @@ get_default_paths <- function(
 ) {
   # Validate that YAML file exists
   if (!file.exists(yaml)) {
-    stop(
-      "Paths configuration file not found: ",
-      yaml,
-      "\nEnsure the tima package is properly installed."
+    cli::cli_abort(
+      c(
+        "paths configuration file not found",
+        "x" = yaml,
+        "i" = "ensure the tima package is properly installed"
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -39,7 +43,14 @@ get_default_paths <- function(
     },
     error = function(e) {
       log_error("Failed to parse paths YAML: %s", e$message)
-      stop("Failed to parse paths YAML file: ", conditionMessage(e))
+      cli::cli_abort(
+        c(
+          "failed to parse paths YAML file",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 
