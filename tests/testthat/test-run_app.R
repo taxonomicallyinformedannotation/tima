@@ -85,7 +85,3 @@ test_that("run_app keeps provided settings outside Docker", {
   expect_identical(seen$host, "127.0.0.1")
   expect_false(seen$launch.browser)
 })
-
-
-
-

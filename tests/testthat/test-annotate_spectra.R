@@ -651,3 +651,248 @@ test_that("annotate_spectra validates approx parameter", {
     "approx"
   )
 })
+
+test_that("annotate_spectra maps deprecated qutoff to cutoff", {
+  seen <- new.env(parent = emptyenv())
+  seen$cutoff <- NULL
+  query_file <- tempfile(fileext = ".mgf")
+  lib_file <- tempfile(fileext = ".mgf")
+  writeLines("BEGIN IONS\nEND IONS", query_file)
+  writeLines("BEGIN IONS\nEND IONS", lib_file)
+
+  local_mocked_bindings(
+    get_params = function(step) list(),
+    resolve_annotation_output = function(output) output,
+    assert_choice = function(...) invisible(NULL),
+    assert_flag = function(...) invisible(NULL),
+    assert_scalar_numeric = function(...) invisible(NULL),
+    normalize_input_files = function(x, label) x,
+    sanitize_all_inputs = function(mgf_file) invisible(NULL),
+    import_spectra = function(input, cutoff, dalton, polarity, ppm) {
+      seen$cutoff <- cutoff
+      list()
+    },
+    annotate_spectra_handle_empty_result = function(
+      path,
+      params,
+      message = NULL
+    ) {
+      path
+    }
+  )
+
+  expect_warning(
+    out <- annotate_spectra(
+      input = query_file,
+      libraries = lib_file,
+      polarity = "pos",
+      output = "out.tsv",
+      qutoff = 42,
+      approx = TRUE
+    ),
+    "deprecated"
+  )
+
+  expect_identical(out, "out.tsv")
+  expect_identical(seen$cutoff, 42)
+})
+
+test_that("annotate_spectra reports missing input files after pre-flight checks", {
+  local_mocked_bindings(
+    get_params = function(step) list(),
+    resolve_annotation_output = function(output) output,
+    assert_choice = function(...) invisible(NULL),
+    assert_flag = function(...) invisible(NULL),
+    assert_scalar_numeric = function(...) invisible(NULL),
+    normalize_input_files = function(x, label) x,
+    sanitize_all_inputs = function(mgf_file) invisible(NULL)
+  )
+
+  expect_error(
+    annotate_spectra(
+      input = "missing_query.mgf",
+      libraries = "lib_pos.mgf",
+      polarity = "pos",
+      output = "out.tsv",
+      approx = TRUE
+    ),
+    "Input file\\(s\\) not found"
+  )
+})
+
+test_that("annotate_spectra reports missing library files after pre-flight checks", {
+  query_file <- tempfile(fileext = ".mgf")
+  writeLines(
+    c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS"),
+    query_file
+  )
+
+  local_mocked_bindings(
+    get_params = function(step) list(),
+    resolve_annotation_output = function(output) output,
+    assert_choice = function(...) invisible(NULL),
+    assert_flag = function(...) invisible(NULL),
+    assert_scalar_numeric = function(...) invisible(NULL),
+    normalize_input_files = function(x, label) x,
+    sanitize_all_inputs = function(mgf_file) invisible(NULL)
+  )
+
+  expect_error(
+    annotate_spectra(
+      input = query_file,
+      libraries = "missing_library.mgf",
+      polarity = "pos",
+      output = "out.tsv",
+      approx = TRUE
+    ),
+    "Library file\\(s\\) not found"
+  )
+})
+
+test_that("annotate_spectra returns empty template when polarity filtering removes all libraries", {
+  query_file <- tempfile(fileext = ".mgf")
+  lib_a <- tempfile(fileext = ".mgf")
+  lib_b <- tempfile(fileext = ".mgf")
+  writeLines("BEGIN IONS\nEND IONS", query_file)
+  writeLines("BEGIN IONS\nEND IONS", lib_a)
+  writeLines("BEGIN IONS\nEND IONS", lib_b)
+
+  local_mocked_bindings(
+    get_params = function(step) list(),
+    resolve_annotation_output = function(output) output,
+    assert_choice = function(...) invisible(NULL),
+    assert_flag = function(...) invisible(NULL),
+    assert_scalar_numeric = function(...) invisible(NULL),
+    normalize_input_files = function(x, label) x,
+    sanitize_all_inputs = function(mgf_file) invisible(NULL),
+    import_spectra = function(input, cutoff, dalton, polarity, ppm) {
+      list("query")
+    },
+    filter_library_paths_by_polarity = function(paths, polarity) character(0),
+    annotate_spectra_handle_empty_result = function(
+      path,
+      params,
+      message = NULL
+    ) {
+      expect_identical(message, "No libraries remain after polarity filtering")
+      path
+    }
+  )
+
+  out <- annotate_spectra(
+    input = query_file,
+    libraries = c(lib_a, lib_b),
+    polarity = "pos",
+    output = "out.tsv",
+    approx = TRUE
+  )
+
+  expect_identical(out, "out.tsv")
+})
+
+test_that("annotate_spectra returns empty template when cleaned library is empty", {
+  query_file <- tempfile(fileext = ".mgf")
+  lib_file <- tempfile(fileext = ".mgf")
+  writeLines("BEGIN IONS\nEND IONS", query_file)
+  writeLines("BEGIN IONS\nEND IONS", lib_file)
+
+  local_mocked_bindings(
+    get_params = function(step) list(),
+    resolve_annotation_output = function(output) output,
+    assert_choice = function(...) invisible(NULL),
+    assert_flag = function(...) invisible(NULL),
+    assert_scalar_numeric = function(...) invisible(NULL),
+    normalize_input_files = function(x, label) x,
+    sanitize_all_inputs = function(mgf_file) invisible(NULL),
+    import_spectra = function(input, cutoff, dalton, polarity, ppm) {
+      list("query")
+    },
+    filter_library_paths_by_polarity = function(paths, polarity) paths,
+    import_and_clean_library_collection = function(
+      libs_vec,
+      dalton,
+      polarity,
+      ppm
+    ) {
+      list()
+    },
+    annotate_spectra_handle_empty_result = function(
+      path,
+      params,
+      message = NULL
+    ) {
+      expect_identical(message, "No spectra left in library after cleaning")
+      path
+    }
+  )
+
+  out <- annotate_spectra(
+    input = query_file,
+    libraries = lib_file,
+    polarity = "pos",
+    output = "out.tsv",
+    approx = TRUE
+  )
+
+  expect_identical(out, "out.tsv")
+})
+
+test_that("annotate_spectra returns empty template when precursor reduction removes all library spectra", {
+  query_file <- tempfile(fileext = ".mgf")
+  lib_file <- tempfile(fileext = ".mgf")
+  writeLines("BEGIN IONS\nEND IONS", query_file)
+  writeLines("BEGIN IONS\nEND IONS", lib_file)
+
+  local_mocked_bindings(
+    get_params = function(step) list(),
+    resolve_annotation_output = function(output) output,
+    assert_choice = function(...) invisible(NULL),
+    assert_flag = function(...) invisible(NULL),
+    assert_scalar_numeric = function(...) invisible(NULL),
+    normalize_input_files = function(x, label) x,
+    sanitize_all_inputs = function(mgf_file) invisible(NULL),
+    import_spectra = function(input, cutoff, dalton, polarity, ppm) {
+      list("query")
+    },
+    filter_library_paths_by_polarity = function(paths, polarity) paths,
+    import_and_clean_library_collection = function(
+      libs_vec,
+      dalton,
+      polarity,
+      ppm
+    ) {
+      list("lib")
+    },
+    log_library_stats = function(spectral_library) invisible(NULL),
+    get_precursors = function(x) 100,
+    reduce_library_by_precursor = function(
+      lib_sp,
+      query_precursors,
+      dalton,
+      ppm
+    ) {
+      list()
+    },
+    annotate_spectra_handle_empty_result = function(
+      path,
+      params,
+      message = NULL
+    ) {
+      expect_identical(
+        message,
+        "No spectra remain after precursor-based reduction"
+      )
+      path
+    }
+  )
+
+  out <- annotate_spectra(
+    input = query_file,
+    libraries = lib_file,
+    polarity = "pos",
+    output = "out.tsv",
+    approx = FALSE
+  )
+
+  expect_identical(out, "out.tsv")
+})

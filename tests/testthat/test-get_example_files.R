@@ -115,7 +115,9 @@ test_that("get_example_files enters cache mode before downloading", {
     },
     get_default_paths = function() {
       list(
-        urls = list(examples = list(features = "https://example.test/features.csv")),
+        urls = list(
+          examples = list(features = "https://example.test/features.csv")
+        ),
         data = list(source = list(features = "data/source/features.csv"))
       )
     },
@@ -209,21 +211,32 @@ test_that("get_example_files handles a single example file", {
 
   with_mocked_bindings(
     {
-      expect_invisible(get_example_files(example = "features", in_cache = FALSE))
+      expect_invisible(get_example_files(
+        example = "features",
+        in_cache = FALSE
+      ))
     },
     get_default_paths = function() {
       list(
-        urls = list(examples = list(features = "https://example.test/features.csv")),
+        urls = list(
+          examples = list(features = "https://example.test/features.csv")
+        ),
         data = list(source = list(features = "data/source/features.csv"))
       )
     },
     get_file = function(url, export) {
-      calls$get_file[[length(calls$get_file) + 1L]] <<- c(url = url, export = export)
+      calls$get_file[[length(calls$get_file) + 1L]] <<- c(
+        url = url,
+        export = export
+      )
       invisible(export)
     },
     .package = "tima"
   )
 
   expect_length(calls$get_file, 1L)
-  expect_identical(unname(calls$get_file[[1L]][["export"]]), "data/source/features.csv")
+  expect_identical(
+    unname(calls$get_file[[1L]][["export"]]),
+    "data/source/features.csv"
+  )
 })

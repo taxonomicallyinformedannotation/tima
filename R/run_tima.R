@@ -261,10 +261,12 @@ run_tima <- function(
       log_debug("Working directory: %s", getwd())
     },
     error = function(e) {
-      stop(
-        "Failed to navigate to cache directory: ",
-        conditionMessage(e),
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "failed to navigate to cache directory",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error")
       )
     }
   )

@@ -350,7 +350,9 @@ test_that("verify_package_installation returns TRUE for a valid package", {
 test_that("install_tima fails when installed package remains unavailable", {
   local_mocked_bindings(
     check_or_install_python = function() "/opt/mock/bin/python3",
-    .install_packages = function(package, repos, dependencies, type, ...) invisible(NULL),
+    .install_packages = function(package, repos, dependencies, type, ...) {
+      invisible(NULL)
+    },
     .require_namespace = function(package, quietly = TRUE) FALSE
   )
 
@@ -416,7 +418,9 @@ test_that("try_install_package handles errors gracefully", {
   local_mocked_bindings(
     .require_namespace = function(package, quietly = TRUE) FALSE,
     .install_packages = function(package, repos, dependencies, type, ...) {
-      warning("package 'thisPackageDefinitelyDoesNotExist12345' is not available")
+      warning(
+        "package 'thisPackageDefinitelyDoesNotExist12345' is not available"
+      )
     }
   )
 

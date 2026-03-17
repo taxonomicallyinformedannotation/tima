@@ -124,6 +124,67 @@ test_that("run_tima validates clean_old_logs parameter", {
 
 # Functional Tests (Mocked) ----
 
+test_that("run_tima executes orchestrated workflow with mocked dependencies", {
+  calls <- new.env(parent = emptyenv())
+  calls$go_to_cache <- 0L
+  calls$execute_targets_pipeline <- 0L
+  calls$archive_log_file <- 0L
+
+  local_mocked_bindings(
+    log_operation = function(...) list(id = "run_tima_ctx"),
+    setup_logger = function(filename, threshold) {
+      expect_identical(filename, "mock.log")
+      expect_identical(threshold, 500)
+      invisible(NULL)
+    },
+    go_to_cache = function() {
+      calls$go_to_cache <- calls$go_to_cache + 1L
+      invisible(NULL)
+    },
+    execute_targets_pipeline = function(target_pattern) {
+      calls$execute_targets_pipeline <- calls$execute_targets_pipeline + 1L
+      expect_identical(target_pattern, "^ann_mock$")
+      invisible(NULL)
+    },
+    archive_log_file = function(log_file, timestamp) {
+      calls$archive_log_file <- calls$archive_log_file + 1L
+      expect_identical(log_file, "mock.log")
+      expect_true(inherits(timestamp, "POSIXct"))
+      TRUE
+    },
+    log_complete = function(...) invisible(NULL)
+  )
+
+  expect_invisible(
+    run_tima(
+      target_pattern = "^ann_mock$",
+      log_file = "mock.log",
+      clean_old_logs = FALSE,
+      log_level = "debug"
+    )
+  )
+
+  expect_equal(calls$go_to_cache, 1L)
+  expect_equal(calls$execute_targets_pipeline, 1L)
+  expect_equal(calls$archive_log_file, 1L)
+})
+
+test_that("run_tima raises classed error when cache navigation fails", {
+  local_mocked_bindings(
+    log_operation = function(...) list(id = "run_tima_ctx"),
+    setup_logger = function(filename, threshold) invisible(NULL),
+    go_to_cache = function() {
+      stop("cache unavailable")
+    }
+  )
+
+  expect_error(
+    run_tima(clean_old_logs = FALSE),
+    regexp = "failed to navigate to cache directory",
+    class = "tima_runtime_error"
+  )
+})
+
 test_that("run_tima execution flow (requires targets setup)", {
   skip_if_not(interactive(), "Requires complete TIMA cache setup")
   skip_if_not_installed("targets")
