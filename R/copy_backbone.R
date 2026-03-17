@@ -29,7 +29,11 @@ copy_backbone <- function(
       length(cache_dir) != 1L ||
       nchar(cache_dir) == 0L
   ) {
-    stop("Cache directory path must be a non-empty character string")
+    cli::cli_abort(
+      "cache directory path must be a non-empty character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (
@@ -38,14 +42,25 @@ copy_backbone <- function(
       length(package) != 1L ||
       nchar(package) == 0L
   ) {
-    stop("Package name must be a non-empty character string")
+    cli::cli_abort(
+      "package name must be a non-empty character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Get package installation path
   pkg_path <- system.file(package = package)
 
   if (nchar(pkg_path) == 0L) {
-    stop("Package '", package, "' not found. Is it installed?")
+    cli::cli_abort(
+      c(
+        "package not found. is it installed?",
+        "x" = package
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   log_info("Setting up TIMA cache directory at: %s", cache_dir)
@@ -57,7 +72,14 @@ copy_backbone <- function(
     },
     error = function(e) {
       log_error("Failed to create cache directory: %s", e$message)
-      stop("Failed to create cache directory: ", conditionMessage(e))
+      cli::cli_abort(
+        c(
+          "failed to create cache directory",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 
@@ -73,7 +95,14 @@ copy_backbone <- function(
     },
     error = function(e) {
       log_error("Failed to copy package backbone: %s", e$message)
-      stop("Failed to copy package backbone: ", conditionMessage(e))
+      cli::cli_abort(
+        c(
+          "failed to copy package backbone",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 

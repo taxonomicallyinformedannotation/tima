@@ -149,13 +149,40 @@ test_that("prepare_libraries_sop_hmdb attaches full human taxonomy by default", 
 test_that("prepare_libraries_sop_hmdb rejects non-character input", {
   expect_error(
     prepare_libraries_sop_hmdb(input = 123, output = "x.tsv"),
-    "character"
+    "single character",
+    class = "tima_validation_error"
   )
 })
 
 test_that("prepare_libraries_sop_hmdb rejects vector output", {
   expect_error(
     prepare_libraries_sop_hmdb(input = "x.zip", output = c("a.tsv", "b.tsv")),
-    "character"
+    "single character",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("parse_hmdb_like_input rejects unsupported input extensions", {
+  expect_error(
+    parse_hmdb_like_input("input.txt"),
+    "unsupported input format",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("parse_hmdb_like_input rejects zip archives without sdf entries", {
+  td <- tempfile()
+  dir.create(td)
+  on.exit(unlink(td, recursive = TRUE))
+
+  txt_file <- file.path(td, "readme.txt")
+  writeLines("not an sdf", txt_file)
+  zip_file <- file.path(td, "archive.zip")
+  withr::with_dir(td, utils::zip(basename(zip_file), basename(txt_file)))
+
+  expect_error(
+    parse_hmdb_like_input(zip_file),
+    "no .sdf file found after unzip",
+    class = "tima_validation_error"
   )
 })

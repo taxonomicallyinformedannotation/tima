@@ -19,7 +19,8 @@ test_that("prepare_libraries_sop_bigg validates output path parameter", {
       bigg_models = test_bigg_models,
       output = 123
     ),
-    "output must be a single character string"
+    "output must be a single character string",
+    class = "tima_validation_error"
   )
 
   # Vector output
@@ -28,7 +29,8 @@ test_that("prepare_libraries_sop_bigg validates output path parameter", {
       bigg_models = test_bigg_models,
       output = c("out1.tsv", "out2.tsv")
     ),
-    "output must be a single character string"
+    "output must be a single character string",
+    class = "tima_validation_error"
   )
 
   # NULL output
@@ -37,7 +39,8 @@ test_that("prepare_libraries_sop_bigg validates output path parameter", {
       bigg_models = test_bigg_models,
       output = NULL
     ),
-    "output must be a single character string"
+    "output must be a single character string",
+    class = "tima_validation_error"
   )
 })
 
@@ -47,7 +50,8 @@ test_that("prepare_libraries_sop_bigg validates output is single value", {
       bigg_models = test_bigg_models,
       output = character(0)
     ),
-    "output must be a single character string"
+    "output must be a single character string",
+    class = "tima_validation_error"
   )
 })
 

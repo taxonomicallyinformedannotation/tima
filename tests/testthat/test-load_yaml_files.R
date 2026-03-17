@@ -54,3 +54,58 @@ test_that("load_yaml_files function exists", {
   expect_true(exists("load_yaml_files"))
   expect_type(load_yaml_files, "closure")
 })
+
+test_that("load_yaml_files parses yaml files from configured paths", {
+  fixture <- setup_yaml_test_env()
+  on.exit(unlink(fixture$dir, recursive = TRUE), add = TRUE)
+
+  local_mocked_bindings(
+    get_default_paths = function() {
+      list(
+        params = list(
+          default = list(path = fixture$default_dir),
+          user = list(path = fixture$user_dir),
+          prepare_params = fixture$prepare_params,
+          prepare_params_advanced = fixture$prepare_params_advanced
+        )
+      )
+    },
+    get_path = function(path) path,
+    .package = "tima"
+  )
+
+  loaded <- load_yaml_files()
+
+  expect_type(loaded, "list")
+  expect_true("yamls_params" %in% names(loaded))
+  expect_length(loaded$yamls_params, 3L)
+})
+
+test_that("load_yaml_files raises classed runtime error on yaml parse failure", {
+  fixture <- setup_yaml_test_env()
+  on.exit(unlink(fixture$dir, recursive = TRUE), add = TRUE)
+
+  writeLines(c("bad_yaml:", "  - ok", "  : broken"), fixture$prepare_params)
+
+  local_mocked_bindings(
+    get_default_paths = function() {
+      list(
+        params = list(
+          default = list(path = fixture$default_dir),
+          user = list(path = fixture$user_dir),
+          prepare_params = fixture$prepare_params,
+          prepare_params_advanced = fixture$prepare_params_advanced
+        )
+      )
+    },
+    get_path = function(path) path,
+    .package = "tima"
+  )
+
+  expect_error(
+    load_yaml_files(),
+    "failed to parse YAML files",
+    class = "tima_runtime_error"
+  )
+})
+

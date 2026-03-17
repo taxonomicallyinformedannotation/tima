@@ -32,24 +32,31 @@ test_that("fake_hmdb creates zip file with SDF content", {
 
 test_that("fake_hmdb validates input parameters", {
   # Missing export parameter
-  expect_error(fake_hmdb(), "export path must be a single character string")
+  expect_error(
+    fake_hmdb(),
+    "export path must be a single character string",
+    class = "tima_validation_error"
+  )
 
   # NULL export
   expect_error(
     fake_hmdb(export = NULL),
-    "export path must be a single character string"
+    "export path must be a single character string",
+    class = "tima_validation_error"
   )
 
   # Non-character export
   expect_error(
     fake_hmdb(export = 123),
-    "export path must be a single character string"
+    "export path must be a single character string",
+    class = "tima_validation_error"
   )
 
   # Multiple paths
   expect_error(
     fake_hmdb(export = c("path1", "path2")),
-    "export path must be a single character string"
+    "export path must be a single character string",
+    class = "tima_validation_error"
   )
 })
 
