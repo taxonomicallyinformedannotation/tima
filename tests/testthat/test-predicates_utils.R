@@ -58,29 +58,34 @@ test_that("validate_all_single_strings stops on invalid input", {
   invalid <- list(file1 = c("a", "b"), file2 = 123)
   expect_error(
     validate_all_single_strings(invalid),
-    "must be single character strings"
+    "must be single character strings",
+    class = "tima_validation_error"
   )
   expect_error(
     validate_all_single_strings(invalid),
-    "file1, file2"
+    "file1, file2",
+    class = "tima_validation_error"
   )
 
   # Should error with custom prefix
   expect_error(
     validate_all_single_strings(invalid, "Custom prefix"),
-    "Custom prefix"
+    "Custom prefix",
+    class = "tima_validation_error"
   )
 
   # Should error on non-list input
   expect_error(
     validate_all_single_strings("not a list"),
-    "must be a named list"
+    "must be a named list",
+    class = "tima_validation_error"
   )
 
   # Should error on unnamed list
   expect_error(
     validate_all_single_strings(list("a", "b")),
-    "must be a named list"
+    "must be a named list",
+    class = "tima_validation_error"
   )
 })
 
@@ -131,7 +136,8 @@ test_that("validate_all_single_strings edge cases", {
   null_val <- list(file = NULL)
   expect_error(
     validate_all_single_strings(null_val),
-    "must be single character strings"
+    "must be single character strings",
+    class = "tima_validation_error"
   )
 })
 

@@ -50,7 +50,8 @@ test_that("filter_high_confidence_only validates threshold ranges", {
   )
   expect_error(
     filter_high_confidence_only(df, error_rt_max = 0),
-    "positive"
+    "positive",
+    class = "tima_validation_error"
   )
 })
 
@@ -356,13 +357,15 @@ test_that("filter_high_confidence_only validates matched peaks threshold", {
   # Negative threshold should error
   expect_error(
     filter_high_confidence_only(df, matched_peaks_min = -1),
-    "non-negative"
+    "non-negative",
+    class = "tima_validation_error"
   )
 
   # Non-numeric should error
   expect_error(
     filter_high_confidence_only(df, matched_peaks_min = "five"),
-    "non-negative"
+    "non-negative",
+    class = "tima_validation_error"
   )
 })
 
