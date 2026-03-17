@@ -16,7 +16,8 @@ test_that("prepare_libraries_rt validates unit_rt parameter", {
       output_rt = file.path(tempdir(), "rt.tsv"),
       output_sop = file.path(tempdir(), "sop.tsv")
     ),
-    "unit_rt must be 'seconds' or 'minutes'"
+    "unit_rt",
+    class = "tima_validation_error"
   )
 
   # Empty string should error
@@ -30,7 +31,8 @@ test_that("prepare_libraries_rt validates unit_rt parameter", {
       output_rt = file.path(tempdir(), "rt.tsv"),
       output_sop = file.path(tempdir(), "sop.tsv")
     ),
-    "unit_rt must be 'seconds' or 'minutes'"
+    "unit_rt",
+    class = "tima_validation_error"
   )
 })
 
@@ -46,7 +48,8 @@ test_that("prepare_libraries_rt validates output_rt parameter", {
       output_rt = 123,
       output_sop = file.path(tempdir(), "sop.tsv")
     ),
-    "output_rt must be a single character string"
+    "output_rt",
+    class = "tima_validation_error"
   )
 
   # Vector should error
@@ -60,7 +63,8 @@ test_that("prepare_libraries_rt validates output_rt parameter", {
       output_rt = c("file1.tsv", "file2.tsv"),
       output_sop = file.path(tempdir(), "sop.tsv")
     ),
-    "output_rt must be a single character string"
+    "output_rt",
+    class = "tima_validation_error"
   )
 })
 
@@ -76,7 +80,8 @@ test_that("prepare_libraries_rt validates output_sop parameter", {
       output_rt = file.path(tempdir(), "rt.tsv"),
       output_sop = NULL
     ),
-    "output_sop must be a single character string"
+    "output_sop",
+    class = "tima_validation_error"
   )
 })
 

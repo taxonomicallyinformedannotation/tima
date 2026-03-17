@@ -72,17 +72,29 @@ prepare_libraries_rt <- function(
   # Validate core arguments and normalize outputs ----
   # Validate RT unit
   if (!unit_rt %in% c("seconds", "minutes")) {
-    stop("unit_rt must be 'seconds' or 'minutes', got: ", unit_rt)
+    cli::cli_abort(
+      "{.arg unit_rt} must be 'seconds' or 'minutes', got {.val {unit_rt}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate output paths and create directories
   if (!is.character(output_rt) || length(output_rt) != 1L) {
-    stop("output_rt must be a single character string")
+    cli::cli_abort(
+      "{.arg output_rt} must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
   dir.create(dirname(output_rt), showWarnings = FALSE, recursive = TRUE)
 
   if (!is.character(output_sop) || length(output_sop) != 1L) {
-    stop("output_sop must be a single character string")
+    cli::cli_abort(
+      "{.arg output_sop} must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
   dir.create(dirname(output_sop), showWarnings = FALSE, recursive = TRUE)
 

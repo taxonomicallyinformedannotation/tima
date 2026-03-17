@@ -94,6 +94,28 @@ test_that("export_output handles NA values correctly", {
   expect_true(is.na(loaded$number[2]))
 })
 
+test_that("export_output throws classed runtime error on write failure", {
+  local_mocked_bindings(
+    fwrite = function(...) {
+      args <- list(...)
+      if (length(args) < 0L) {
+        return(invisible(NULL))
+      }
+      stop("disk full")
+    },
+    .package = "tidytable"
+  )
+
+  expect_error(
+    export_output(
+      x = tidytable::tidytable(a = 1),
+      file = temp_test_path("cannot_write.tsv")
+    ),
+    "failed to export data",
+    class = "tima_runtime_error"
+  )
+})
+
 ## Edge Cases ----
 
 test_that("export_output handles special characters in data", {

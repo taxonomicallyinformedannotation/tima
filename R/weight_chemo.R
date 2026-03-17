@@ -147,12 +147,20 @@ weight_chemo <- function(
   # Validate weights sum to 1 (with tolerance for floating-point precision)
   weight_sum <- weight_spectral + weight_biological + weight_chemical
   if (abs(weight_sum - 1.0) > 0.01) {
-    stop("Weights must sum to 1.0, got: ", round(weight_sum, 4))
+    cli::cli_abort(
+      "weights must sum to 1.0, got {.val {round(weight_sum, 4)}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate all weights are non-negative
   if (weight_spectral < 0 || weight_biological < 0 || weight_chemical < 0) {
-    stop("All weights must be non-negative")
+    cli::cli_abort(
+      "all weights must be non-negative",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate chemical scores
@@ -174,9 +182,13 @@ weight_chemo <- function(
   )
   if (any(invalid_scores)) {
     invalid_names <- names(chem_scores)[invalid_scores]
-    stop(
-      "The following scores must be between 0 and 1: ",
-      paste0("score_chemical_", invalid_names, collapse = ", ")
+    cli::cli_abort(
+      c(
+        "the following scores must be between 0 and 1",
+        "x" = paste0("score_chemical_", invalid_names, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

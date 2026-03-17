@@ -23,11 +23,19 @@ get_example_sirius <- function(
 ) {
   # Validate inputs
   if (!is.list(url) || is.null(url$v5) || is.null(url$v6)) {
-    stop("url must be a list with $v5 and $v6 elements")
+    cli::cli_abort(
+      "{.arg url} must be a list with {.field v5} and {.field v6} elements",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (!is.list(export) || is.null(export$v5) || is.null(export$v6)) {
-    stop("export must be a list with $v5 and $v6 elements")
+    cli::cli_abort(
+      "{.arg export} must be a list with {.field v5} and {.field v6} elements",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   log_debug("Downloading SIRIUS example files (v5 and v6)")
