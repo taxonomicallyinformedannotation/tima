@@ -42,7 +42,11 @@ transform_score_sirius_csi <- function(csi_score = NULL, K = 50, scale = 10) {
 
   # Validate inputs
   if (!is.numeric(csi_score)) {
-    stop("csi_score must be numeric, NA, or NULL", call. = FALSE)
+    cli::cli_abort(
+      "csi_score must be numeric, NA, or NULL",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
   assert_scalar_numeric(K, "K")
   assert_scalar_numeric(scale, "scale", min = .Machine$double.eps)

@@ -21,7 +21,11 @@
 get_spectra_ids <- function(spectra) {
   # Validate input
   if (!inherits(spectra, "Spectra")) {
-    stop("Input must be a Spectra object from the Spectra package")
+    cli::cli_abort(
+      "input must be a Spectra object from the Spectra package",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Priority order of ID field names to check

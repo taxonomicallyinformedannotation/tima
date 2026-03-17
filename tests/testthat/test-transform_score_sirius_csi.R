@@ -39,7 +39,11 @@ test_that("transform_score_sirius_csi preserves NA values", {
 })
 
 test_that("transform_score_sirius_csi errors on non-numeric input", {
-  expect_error(transform_score_sirius_csi("bad"), "numeric")
+  expect_error(
+    transform_score_sirius_csi("bad"),
+    "numeric",
+    class = "tima_validation_error"
+  )
 })
 
 test_that("transform_score_sirius_csi respects custom K and scale", {

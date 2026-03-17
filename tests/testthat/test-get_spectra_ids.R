@@ -98,16 +98,19 @@ test_that("get_spectra_ids validates input type", {
   # Non-Spectra input
   expect_error(
     get_spectra_ids(data.frame(x = 1)),
-    "Input must be a Spectra object"
+    "Spectra object",
+    class = "tima_validation_error"
   )
 
   expect_error(
     get_spectra_ids(list(a = 1)),
-    "Input must be a Spectra object"
+    "Spectra object",
+    class = "tima_validation_error"
   )
 
   expect_error(
     get_spectra_ids(NULL),
-    "Input must be a Spectra object"
+    "Spectra object",
+    class = "tima_validation_error"
   )
 })
