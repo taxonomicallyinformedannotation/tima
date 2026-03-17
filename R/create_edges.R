@@ -76,16 +76,20 @@ create_edges <- function(
   }
 
   if (length(frags) != nspecs || length(precs) != nspecs) {
-    stop(
-      "Length mismatch: frags (",
-      length(frags),
-      "), ",
-      "precs (",
-      length(precs),
-      "), nspecs (",
-      nspecs,
-      ")",
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "length mismatch among frags, precs, and nspecs",
+        "x" = paste0(
+          "frags=",
+          length(frags),
+          "; precs=",
+          length(precs),
+          "; nspecs=",
+          nspecs
+        )
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

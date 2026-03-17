@@ -29,4 +29,3 @@ test_that("export_params raises classed runtime error when write fails", {
     class = "tima_runtime_error"
   )
 })
-

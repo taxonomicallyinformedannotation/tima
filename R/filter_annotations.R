@@ -25,64 +25,94 @@ validate_filter_annotations_inputs <- function(
       tolerance_rt <= 0
   ) {
     if (length(rts) > 0) {
-      stop(
-        "tolerance_rt must be a positive number when RT library is provided, got: ",
-        tolerance_rt,
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "tolerance_rt must be a positive number when RT library is provided",
+          "x" = as.character(tolerance_rt)
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
   }
 
   # Validate output path
   if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string", call. = FALSE)
+    cli::cli_abort(
+      "output must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate features
   if (!is.character(features) || length(features) != 1L) {
-    stop("features must be a single character string", call. = FALSE)
+    cli::cli_abort(
+      "features must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (!file.exists(features)) {
-    stop("Features file not found: ", features, call. = FALSE)
+    cli::cli_abort(
+      c(
+        "features file not found",
+        "x" = features
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate annotations (handle both list and character vector)
   if (is.list(annotations)) {
     if (length(annotations) == 0L) {
-      stop(
+      cli::cli_abort(
         "annotations must be a non-empty list or character vector",
-        call. = FALSE
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
 
     ann_vec <- unlist(annotations)
     if (!is.character(ann_vec)) {
-      stop("All annotation elements must be character strings", call. = FALSE)
+      cli::cli_abort(
+        "all annotation elements must be character strings",
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
     }
 
     missing_annotations <- ann_vec[!file.exists(ann_vec)]
     if (length(missing_annotations) > 0L) {
-      stop(
-        "Annotation file(s) not found: ",
-        paste(missing_annotations, collapse = ", "),
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "annotation file(s) not found",
+          "x" = paste(missing_annotations, collapse = ", ")
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
   } else {
     if (!is.character(annotations) || length(annotations) == 0L) {
-      stop(
+      cli::cli_abort(
         "annotations must be a non-empty character vector or list",
-        call. = FALSE
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
 
     missing_annotations <- annotations[!file.exists(annotations)]
     if (length(missing_annotations) > 0L) {
-      stop(
-        "Annotation file(s) not found: ",
-        paste(missing_annotations, collapse = ", "),
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "annotation file(s) not found",
+          "x" = paste(missing_annotations, collapse = ", ")
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
   }
@@ -91,10 +121,13 @@ validate_filter_annotations_inputs <- function(
   if (length(rts) > 0) {
     rts_exist <- purrr::map_lgl(.x = rts, .f = file.exists)
     if (!all(rts_exist)) {
-      stop(
-        "Retention time file(s) not found: ",
-        paste(rts[!rts_exist], collapse = ", "),
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "retention time file(s) not found",
+          "x" = paste(rts[!rts_exist], collapse = ", ")
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
   }
@@ -363,9 +396,10 @@ filter_annotations <- function(
       rt_table <- rt_table |>
         tidytable::rename(rt_target = rt)
     } else if (!"rt_target" %in% names(rt_table)) {
-      stop(
-        "Retention time library must contain column 'rt' or 'rt_target'",
-        call. = FALSE
+      cli::cli_abort(
+        "retention time library must contain column 'rt' or 'rt_target'",
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
 

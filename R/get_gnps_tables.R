@@ -125,11 +125,14 @@ create_fake_gnps_files <- function(
 #' @keywords internal
 validate_gnps_job_id <- function(gnps_job_id, gnps_job_example) {
   if (!identical(gnps_job_id, gnps_job_example) && nchar(gnps_job_id) != 32L) {
-    stop(
-      "Invalid GNPS job ID: '",
-      gnps_job_id,
-      "' - GNPS job IDs must be exactly 32 characters long unless it's the bundled example ID.",
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "invalid GNPS job ID",
+        "x" = gnps_job_id,
+        "i" = "job IDs must be 32 characters unless using bundled example ID"
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
   invisible(NULL)
@@ -237,11 +240,14 @@ get_gnps_tables <- function(
   validate_gnps_job_id(gnps_job_id, gnps_job_example)
 
   if (!workflow %in% c("fbmn", "classical")) {
-    stop(
-      "Unsupported workflow: '",
-      workflow,
-      "' - supported: 'fbmn' or 'classical'",
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "unsupported workflow",
+        "x" = workflow,
+        "i" = "supported values: fbmn, classical"
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

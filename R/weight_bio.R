@@ -169,7 +169,11 @@ weight_bio <- function(
   # Check Data Frames ----
 
   if (!is.data.frame(structure_organism_pairs_table)) {
-    stop("structure_organism_pairs_table must be a data frame")
+    cli::cli_abort(
+      "structure_organism_pairs_table must be a data frame",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Early exit for empty input
@@ -195,9 +199,13 @@ weight_bio <- function(
 
   if (!all(is_valid_weight)) {
     invalid_weights <- names(weights)[!is_valid_weight]
-    stop(
-      "Weight(s) must be between 0 and 1: ",
-      paste(invalid_weights, collapse = ", ")
+    cli::cli_abort(
+      c(
+        "weight(s) must be between 0 and 1",
+        "x" = paste(invalid_weights, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -223,9 +231,16 @@ weight_bio <- function(
 
   if (!all(is_valid_score)) {
     invalid_scores <- names(bio_scores)[!is_valid_score]
-    stop(
-      "Biological score(s) must be between 0 and 1: ",
-      paste(paste0("score_biological_", invalid_scores), collapse = ", ")
+    cli::cli_abort(
+      c(
+        "biological score(s) must be between 0 and 1",
+        "x" = paste(
+          paste0("score_biological_", invalid_scores),
+          collapse = ", "
+        )
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

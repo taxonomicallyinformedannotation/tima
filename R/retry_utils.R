@@ -96,7 +96,11 @@ with_retry <- function(
         "  5. Increase max_attempts if transient failures are common"
       )
     )
-    stop(msg, call. = FALSE)
+    cli::cli_abort(
+      msg,
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
+    )
   }
 
   retry_attempt(1L)
@@ -195,7 +199,14 @@ with_smart_retry <- function(
         "Error appears permanent, not retrying: %s",
         conditionMessage(result)
       )
-      stop(result)
+      cli::cli_abort(
+        c(
+          paste0(operation_name, " failed with non-retryable error"),
+          "x" = conditionMessage(result)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
 
     if (attempt < max_attempts) {
@@ -211,7 +222,14 @@ with_smart_retry <- function(
       return(retry_attempt(attempt + 1L))
     }
 
-    stop(result)
+    cli::cli_abort(
+      c(
+        paste0(operation_name, " failed after retries"),
+        "x" = conditionMessage(result)
+      ),
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
+    )
   }
 
   retry_attempt(1L)

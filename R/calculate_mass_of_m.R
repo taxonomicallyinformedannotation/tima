@@ -63,9 +63,13 @@ calculate_mass_of_m <- function(
 ) {
   # Validate required inputs
   if (missing(adduct_string) || missing(mz)) {
-    stop(
-      "Both adduct_string and mz must be provided.\n",
-      "Usage: calculate_mass_of_m(adduct_string = '[M+H]+', mz = 123.456)"
+    cli::cli_abort(
+      c(
+        "both adduct_string and mz must be provided",
+        "i" = "usage: calculate_mass_of_m(adduct_string = '[M+H]+', mz = 123.456)"
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -307,7 +311,11 @@ calculate_mz_from_mass <- function(
 ) {
   # Validate inputs
   if (missing(neutral_mass) || missing(adduct_string)) {
-    stop("Both neutral_mass and adduct_string must be provided")
+    cli::cli_abort(
+      "both neutral_mass and adduct_string must be provided",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   validate_numeric_range(

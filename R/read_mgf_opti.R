@@ -110,25 +110,49 @@ read_mgf_opti <- function(
 ) {
   # Validate inputs
   if (missing(f) || is.null(f) || length(f) == 0L) {
-    stop("File path 'f' must be provided")
+    cli::cli_abort(
+      "file path 'f' must be provided",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (length(f) != 1L) {
-    stop(
-      "Please provide a single MGF file. For multiple files, call this function separately for each."
+    cli::cli_abort(
+      "please provide a single MGF file. for multiple files, call this function separately for each.",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
   if (!file.exists(f)) {
-    stop("MGF file not found: ", f)
+    cli::cli_abort(
+      c(
+        "MGF file not found",
+        "x" = f
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (!is.numeric(msLevel) || msLevel < 1L) {
-    stop("msLevel must be a positive integer, got: ", msLevel)
+    cli::cli_abort(
+      c(
+        "msLevel must be a positive integer",
+        "x" = as.character(msLevel)
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (!requireNamespace("MsBackendMgf", quietly = TRUE)) {
-    stop("Package 'MsBackendMgf' is required but not installed")
+    cli::cli_abort(
+      "package 'MsBackendMgf' is required but not installed",
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Get file size for progress reporting

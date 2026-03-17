@@ -21,7 +21,11 @@
 pre_harmonize_names_sirius <- function(x) {
   # Validate input
   if (missing(x) || is.null(x)) {
-    stop("Input 'x' must be provided")
+    cli::cli_abort(
+      "input 'x' must be provided",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (!is.character(x)) {

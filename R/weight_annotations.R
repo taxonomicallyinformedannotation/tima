@@ -144,9 +144,13 @@ validate_weight_annotations_inputs <- function(
       c(
         "Weights must sum to 1",
         "x" = paste0(
-          "tolerance=", WEIGHT_SUM_TOLERANCE,
-          "; sum=", signif(weight_sum, 6),
-          " (", paste(names(weights), weights, sep = "=", collapse = ", "), ")"
+          "tolerance=",
+          WEIGHT_SUM_TOLERANCE,
+          "; sum=",
+          signif(weight_sum, 6),
+          " (",
+          paste(names(weights), weights, sep = "=", collapse = ", "),
+          ")"
         )
       ),
       class = c("tima_validation_error", "tima_error"),

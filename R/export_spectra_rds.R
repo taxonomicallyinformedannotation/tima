@@ -27,7 +27,11 @@ export_spectra_rds <- function(file, spectra) {
   validate_character(file, param_name = "file", allow_empty = FALSE)
 
   if (!inherits(spectra, "Spectra")) {
-    stop("spectra must be a Spectra object", call. = FALSE)
+    cli::cli_abort(
+      "spectra must be a Spectra object",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Filter to spectra with valid compound IDs

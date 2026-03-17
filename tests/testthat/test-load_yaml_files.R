@@ -108,4 +108,3 @@ test_that("load_yaml_files raises classed runtime error on yaml parse failure", 
     class = "tima_runtime_error"
   )
 })
-

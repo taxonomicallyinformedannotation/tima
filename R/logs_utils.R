@@ -168,7 +168,11 @@ setup_logger <- function(filename = "tima.log", threshold = 600) {
       length(filename) != 1L ||
       nchar(filename) == 0L
   ) {
-    stop("Log filename must be a non-empty character string")
+    cli::cli_abort(
+      "log filename must be a non-empty character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Convert logger constants to lgr numeric levels if needed
@@ -180,7 +184,11 @@ setup_logger <- function(filename = "tima.log", threshold = 600) {
   } else if (is.character(threshold)) {
     tolower(threshold)
   } else {
-    stop("threshold must be numeric or character")
+    cli::cli_abort(
+      "threshold must be numeric or character",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Configure logger threshold
@@ -543,7 +551,11 @@ log_operation <- function(operation_name, ...) {
 #' @keywords internal
 log_complete <- function(ctx, ...) {
   if (!inherits(ctx, "tima_log_context")) {
-    stop("ctx must be a tima_log_context from log_operation()", call. = FALSE)
+    cli::cli_abort(
+      "ctx must be a tima_log_context from log_operation()",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   results <- list(...)
@@ -578,7 +590,11 @@ log_complete <- function(ctx, ...) {
 #' @keywords internal
 log_failed <- function(ctx, error, ...) {
   if (!inherits(ctx, "tima_log_context")) {
-    stop("ctx must be a tima_log_context from log_operation()", call. = FALSE)
+    cli::cli_abort(
+      "ctx must be a tima_log_context from log_operation()",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   extra <- list(...)
@@ -619,7 +635,11 @@ log_failed <- function(ctx, error, ...) {
 #' @keywords internal
 log_metadata <- function(ctx, ...) {
   if (!inherits(ctx, "tima_log_context")) {
-    stop("ctx must be a tima_log_context from log_operation()", call. = FALSE)
+    cli::cli_abort(
+      "ctx must be a tima_log_context from log_operation()",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   metadata <- list(...)
@@ -672,7 +692,14 @@ with_logging <- function(operation_name, expr, ...) {
     },
     error = function(e) {
       log_failed(ctx, e)
-      stop(e)
+      cli::cli_abort(
+        c(
+          paste0(operation_name, " failed"),
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 }

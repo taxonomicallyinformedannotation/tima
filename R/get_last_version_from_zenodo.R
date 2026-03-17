@@ -12,7 +12,11 @@ validate_zenodo_inputs <- function(doi, pattern, path) {
   if (
     missing(doi) || !is.character(doi) || length(doi) != 1L || nchar(doi) == 0L
   ) {
-    stop("doi must be a single non-empty character string", call. = FALSE)
+    cli::cli_abort(
+      "doi must be a single non-empty character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (
@@ -21,7 +25,11 @@ validate_zenodo_inputs <- function(doi, pattern, path) {
       length(pattern) != 1L ||
       nchar(pattern) == 0L
   ) {
-    stop("pattern must be a single non-empty character string", call. = FALSE)
+    cli::cli_abort(
+      "pattern must be a single non-empty character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (
@@ -30,16 +38,23 @@ validate_zenodo_inputs <- function(doi, pattern, path) {
       length(path) != 1L ||
       nchar(path) == 0L
   ) {
-    stop("path must be a single non-empty character string", call. = FALSE)
+    cli::cli_abort(
+      "path must be a single non-empty character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate DOI format
   if (!grepl("^10\\.[0-9]+/zenodo\\.[0-9]+$", doi, perl = TRUE)) {
-    stop(
-      "Invalid Zenodo DOI format. Expected format: '10.5281/zenodo.XXXXXX', got: '",
-      doi,
-      "'",
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "invalid Zenodo DOI format",
+        "x" = doi,
+        "i" = "expected format: 10.5281/zenodo.XXXXXX"
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -90,12 +105,14 @@ fetch_zenodo_record <- function(record, doi) {
           httr2::req_perform()
       },
       httr2_http_404 = function(e) {
-        stop(
-          "Zenodo record not found: ",
-          doi,
-          ". Please verify the DOI is correct. ",
-          conditionMessage(e),
-          call. = FALSE
+        cli::cli_abort(
+          c(
+            "Zenodo record not found",
+            "x" = doi,
+            "i" = conditionMessage(e)
+          ),
+          class = c("tima_validation_error", "tima_error"),
+          call = NULL
         )
       },
       httr2_http = function(e) {
@@ -122,10 +139,13 @@ fetch_zenodo_record <- function(record, doi) {
       return(fetch_attempt(attempt + 1L))
     }
 
-    stop(
-      "Failed to retrieve Zenodo record: ",
-      conditionMessage(last_error),
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "failed to retrieve Zenodo record",
+        "x" = conditionMessage(last_error)
+      ),
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -148,11 +168,14 @@ parse_zenodo_content <- function(api_url) {
       jsonlite::fromJSON(txt = api_url)
     },
     error = function(e) {
-      stop(
-        "Failed to parse Zenodo API response. ",
-        "The API format may have changed. Error: ",
-        conditionMessage(e),
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "failed to parse Zenodo API response",
+          "x" = conditionMessage(e),
+          "i" = "the API format may have changed"
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
       )
     }
   )
@@ -170,25 +193,28 @@ parse_zenodo_content <- function(api_url) {
 #' @keywords internal
 find_matching_file <- function(filenames, pattern, doi) {
   if (length(filenames) == 0L) {
-    stop(
-      "No files found in Zenodo record: ",
-      doi,
-      ". The record may be empty or inaccessible.",
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "no files found in Zenodo record",
+        "x" = doi,
+        "i" = "the record may be empty or inaccessible"
+      ),
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
     )
   }
 
   indices <- grepl(pattern = pattern, x = filenames, fixed = TRUE)
 
   if (!any(indices)) {
-    stop(
-      "No files matching pattern '",
-      pattern,
-      "' found in record ",
-      doi,
-      ". Available files: ",
-      paste(filenames, collapse = ", "),
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "no files matching pattern found in Zenodo record",
+        "x" = pattern,
+        "i" = paste("available files:", paste(filenames, collapse = ", "))
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

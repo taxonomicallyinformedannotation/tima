@@ -315,10 +315,18 @@ annotate_spectra <- function(
 #' @keywords internal
 resolve_annotation_output <- function(output) {
   if (!is.character(output)) {
-    stop("Output path must be a character string", call. = FALSE)
+    cli::cli_abort(
+      "output path must be a character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
   if (length(output) == 0L) {
-    stop("Output must contain at least one file path", call. = FALSE)
+    cli::cli_abort(
+      "output must contain at least one file path",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
   output[[1L]]
 }
@@ -329,7 +337,11 @@ normalize_input_files <- function(x, label) {
     x <- unlist(x, use.names = FALSE)
   }
   if (!is.character(x)) {
-    stop(label, " elements must be character strings", call. = FALSE)
+    cli::cli_abort(
+      paste0(label, " elements must be character strings"),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
   x
 }

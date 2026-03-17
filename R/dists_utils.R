@@ -106,14 +106,13 @@ dist_groups <- function(d, g) {
   n_obs <- attr(d, "Size")
 
   if (length(g) != n_obs) {
-    stop(
-      "Grouping vector length (",
-      length(g),
-      ") must match ",
-      "number of observations (",
-      n_obs,
-      ")",
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "grouping vector length must match number of observations",
+        "x" = paste0("length(g)=", length(g), "; n_obs=", n_obs)
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

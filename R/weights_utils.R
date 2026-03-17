@@ -12,13 +12,13 @@ compute_weighted_sum <- function(..., weights) {
 
   # Input validation
   if (length(values) != length(weights)) {
-    stop(
-      "Number of value vectors (",
-      length(values),
-      ") must equal number of weights (",
-      length(weights),
-      ")",
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "number of value vectors must equal number of weights",
+        "x" = paste0("values=", length(values), "; weights=", length(weights))
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -29,11 +29,19 @@ compute_weighted_sum <- function(..., weights) {
       logical(1L)
     ))
   ) {
-    stop("All value vectors must be numeric", call. = FALSE)
+    cli::cli_abort(
+      "all value vectors must be numeric",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (!is.numeric(weights) || any(weights < 0)) {
-    stop("Weights must be numeric and non-negative", call. = FALSE)
+    cli::cli_abort(
+      "weights must be numeric and non-negative",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   weight_sum <- sum(weights)
