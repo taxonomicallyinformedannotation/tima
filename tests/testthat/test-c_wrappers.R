@@ -89,3 +89,61 @@ test_that("gnps_chain_dp_wrapper gives maximal similarity for identical spectra"
 
   expect_equal(score, 1.0, tolerance = 1e-6)
 })
+
+test_that("join_gnps_wrapper returns no pairs for non-overlapping masses", {
+  res <- join_gnps_wrapper(
+    x = c(100, 200),
+    y = c(1000, 2000),
+    xPrecursorMz = 500,
+    yPrecursorMz = 500,
+    tolerance = 0.001,
+    ppm = 1
+  )
+
+  # Outer-join semantics: unmatched peaks are retained with NA counterpart.
+  expect_equal(length(res[[1L]]), 4L)
+  expect_equal(length(res[[2L]]), 4L)
+  expect_equal(sum(is.na(res[[1L]])), 2L)
+  expect_equal(sum(is.na(res[[2L]])), 2L)
+})
+
+test_that("gnps_chain_dp_wrapper can match shifted peaks when precursor differs", {
+  x <- cbind(mz = c(100, 200), intensity = c(100, 80))
+  y <- cbind(mz = c(110, 210), intensity = c(95, 70))
+
+  res <- gnps_chain_dp_wrapper(
+    x = x,
+    y = y,
+    xPrecursorMz = 500,
+    yPrecursorMz = 510,
+    tolerance = 0.01,
+    ppm = 5,
+    matchedPeaksCount = TRUE
+  )
+
+  expect_gte(res[1L], 0)
+  expect_gte(res[2L], 1)
+})
+
+test_that("gnps_wrapper handles pre-joined matrices with NA peaks", {
+  x_joined <- cbind(mz = c(100, NA, 200), intensity = c(50, NA, 30))
+  y_joined <- cbind(mz = c(100, 150, NA), intensity = c(45, 20, NA))
+
+  res <- gnps_wrapper(x_joined, y_joined)
+  expect_length(res, 2L)
+  expect_true(is.finite(res[1L]))
+})
+
+test_that("gnps_chain_dp_wrapper validates matrix-like inputs", {
+  expect_error(
+    gnps_chain_dp_wrapper(
+      x = c(1, 2, 3),
+      y = sp_b,
+      xPrecursorMz = pmz,
+      yPrecursorMz = pmz,
+      tolerance = 0.01,
+      ppm = 10,
+      matchedPeaksCount = TRUE
+    )
+  )
+})
