@@ -94,12 +94,14 @@ ensure_directory_exists <- function(dir_path) {
   )
 
   if (!created) {
-    stop(
-      "Could not create directory: ",
-      dir_path,
-      "\n",
-      "Please check permissions and ensure parent path exists.",
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "could not create directory",
+        "x" = dir_path,
+        "i" = "please check permissions and ensure parent path exists"
+      ),
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
     )
   }
 

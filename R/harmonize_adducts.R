@@ -118,18 +118,21 @@ harmonize_adducts <- function(
 #' @keywords internal
 validate_adduct_translations <- function(translations) {
   if (!is.character(translations)) {
-    stop(
-      "adducts_translations must be a character vector, got: ",
-      class(translations)[1],
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "adducts_translations must be a character vector",
+        "x" = class(translations)[1]
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
   if (is.null(names(translations))) {
-    stop(
-      "adducts_translations must be a named vector ",
-      "(names = original, values = replacements)",
-      call. = FALSE
+    cli::cli_abort(
+      "adducts_translations must be a named vector (names = original, values = replacements)",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

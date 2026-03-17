@@ -17,7 +17,11 @@
 fake_ecmdb <- function(export) {
   # Validate input
   if (missing(export) || !is.character(export) || length(export) != 1L) {
-    stop("export path must be a single character string")
+    cli::cli_abort(
+      "export path must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   log_warn("ECMDB download failed. Creating empty placeholder file.")
@@ -67,7 +71,14 @@ fake_ecmdb <- function(export) {
   if (file.exists(basename(export))) {
     moved <- move_file_safely(basename(export), export)
     if (!isTRUE(moved)) {
-      stop(sprintf("Failed to move temporary archive to %s", export))
+      cli::cli_abort(
+        c(
+          "failed to move temporary archive",
+          "x" = export
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   }
 

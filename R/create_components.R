@@ -54,9 +54,13 @@ create_components <- function(
 
   if (!all(input_exists)) {
     missing_files <- input[!input_exists]
-    stop(
-      "Input file(s) not found: ",
-      paste(missing_files, collapse = ", ")
+    cli::cli_abort(
+      c(
+        "input file(s) not found",
+        "x" = paste(missing_files, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

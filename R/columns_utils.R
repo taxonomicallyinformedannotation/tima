@@ -207,10 +207,13 @@ determine_columns_to_process <- function(df, cols) {
   # Validate columns exist
   missing_cols <- setdiff(cols, names(df))
   if (length(missing_cols) > 0L) {
-    stop(
-      "Column(s) not found: ",
-      paste(missing_cols, collapse = ", "),
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "column(s) not found",
+        "x" = paste(missing_cols, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

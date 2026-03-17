@@ -9,10 +9,13 @@
 validate_params_small_inputs <- function(ms_pol) {
   # Validate polarity if provided
   if (!is.null(ms_pol) && !ms_pol %in% c("pos", "neg")) {
-    stop(
-      "ms_pol must be either 'pos' or 'neg', got: ",
-      ms_pol,
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "ms_pol must be either 'pos' or 'neg'",
+        "x" = as.character(ms_pol)
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -32,11 +35,13 @@ validate_params_small_inputs <- function(ms_pol) {
 #' @keywords internal
 copy_file_to_target <- function(file_path, target_dir, file_description) {
   if (!file.exists(file_path)) {
-    stop(
-      file_description,
-      " file does not exist: ",
-      file_path,
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        paste0(file_description, " file does not exist"),
+        "x" = file_path
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

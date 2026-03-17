@@ -66,11 +66,14 @@ execute_targets_pipeline <- function(target_pattern = "^ann_wei$") {
     },
     error = function(e) {
       log_error("Pipeline execution failed: %s", conditionMessage(e))
-      stop(
-        "TIMA workflow pipeline failed. ",
-        "Check logs for details: ",
-        conditionMessage(e),
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "tima workflow pipeline failed",
+          "x" = conditionMessage(e),
+          "i" = "check logs for details"
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
       )
     },
     warning = function(w) {

@@ -94,9 +94,13 @@ complement_metadata_structures <- function(
       (all(is.na(stereo$structure_inchikey_connectivity_layer)) ||
         all(is.na(stereo$structure_smiles_no_stereo)))
   ) {
-    stop(
-      "stereochemistry data must contain structure_inchikey_connectivity_layer and structure_smiles_no_stereo",
-      call. = FALSE
+    cli::cli_abort(
+      paste(
+        "stereochemistry data must contain",
+        "structure_inchikey_connectivity_layer and structure_smiles_no_stereo"
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

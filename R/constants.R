@@ -180,11 +180,13 @@ INCHI_NO_STEREO_PATTERN <- "-UHFFFAOYSA-"
 get_constant <- function(name, default = NULL) {
   if (!exists(name, mode = "any")) {
     if (is.null(default)) {
-      stop(
-        "Constant '",
-        name,
-        "' not found and no default provided",
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "constant not found and no default provided",
+          "x" = name
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
     log_warn(
@@ -208,13 +210,14 @@ get_constant <- function(name, default = NULL) {
 validate_against_constant <- function(value, constant_name) {
   constant_value <- get_constant(constant_name)
   if (!value %in% constant_value) {
-    stop(
-      sprintf(
-        "Invalid value %s. Must be one of: %s",
-        value,
-        paste(constant_value, collapse = ", ")
+    cli::cli_abort(
+      c(
+        "invalid value",
+        "x" = as.character(value),
+        "i" = paste("must be one of:", paste(constant_value, collapse = ", "))
       ),
-      call. = FALSE
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
   TRUE
