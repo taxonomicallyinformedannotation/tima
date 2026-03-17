@@ -29,3 +29,5 @@ CITATION.cff
 ^[.]?air[.]toml$
 ^\.vscode$
 ^.*\.log$
+^\.lintr$
+^dev$

@@ -45,7 +45,7 @@ run_app <- function(host = "127.0.0.1", port = 3838, browser = TRUE) {
   port <- as.integer(port)
 
   # Detect Docker Environment ----
-  if (file.exists("/.dockerenv")) {
+  if (is_docker_env()) {
     log_info("Docker environment detected - adjusting settings")
     browser <- FALSE
     host <- "0.0.0.0"
@@ -59,19 +59,46 @@ run_app <- function(host = "127.0.0.1", port = 3838, browser = TRUE) {
   install_tima()
 
   # Launch Shiny App ----
-  app_path <- system.file("app.R", package = "tima")
+  app_path <- get_app_path()
 
-  if (!file.exists(app_path)) {
-    stop(
-      "TIMA app.R file not found. Package may not be properly installed.",
-      call. = FALSE
+  if (!nzchar(app_path) || !app_path_exists(app_path)) {
+    cli::cli_abort(
+      "app file not found; package may not be properly installed",
+      class = c("tima_runtime_error", "tima_error")
     )
   }
 
-  shiny::runApp(
-    appDir = shiny::shinyAppFile(appFile = app_path),
+  run_shiny_app(
+    appDir = build_shiny_app_dir(app_path),
     port = port,
     host = host,
     launch.browser = browser
   )
 }
+
+# Helpers kept separate so tests can mock them without invoking Shiny.
+is_docker_env <- function() {
+  file.exists("/.dockerenv")
+}
+
+get_app_path <- function() {
+  system.file("app.R", package = "tima")
+}
+
+app_path_exists <- function(app_path) {
+  file.exists(app_path)
+}
+
+build_shiny_app_dir <- function(app_path) {
+  shiny::shinyAppFile(appFile = app_path)
+}
+
+run_shiny_app <- function(appDir, port, host, launch.browser) {
+  shiny::runApp(
+    appDir = appDir,
+    port = port,
+    host = host,
+    launch.browser = launch.browser
+  )
+}
+
