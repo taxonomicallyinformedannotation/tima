@@ -108,7 +108,7 @@ get_compounds_xrefs <- function(
       bioregistry_url,
       simplifyVector = FALSE
     ),
-    error = function(e) NULL
+    error = function(...) NULL
   )
 
   if (is.null(bioregistry_json)) {
@@ -133,9 +133,10 @@ get_compounds_xrefs <- function(
   )
 
   if (length(matched) == 0L) {
-    stop(
-      "None of the supplied props were found in the Bioregistry.",
-      call. = FALSE
+    cli::cli_abort(
+      "none of the supplied props were found in the Bioregistry",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -146,7 +147,10 @@ get_compounds_xrefs <- function(
       entry_key
     )) |>
       httr2::req_headers(Accept = "application/json") |>
-      httr2::req_error(is_error = \(r) FALSE) |> # handle errors manually
+      httr2::req_error(is_error = \(resp) {
+        invisible(resp)
+        FALSE
+      }) |> # handle errors manually
       httr2::req_perform()
 
     if (httr2::resp_status(resp) != 200L) {
@@ -216,7 +220,7 @@ SELECT ?item ?inchikey ?db ?id WHERE {
 
       tidytable::fread(httr2::resp_body_string(resp_qlever))
     },
-    error = function(e) NULL
+    error = function(...) NULL
   )
 
   if (is.null(raw)) {

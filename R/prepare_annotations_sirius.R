@@ -27,10 +27,10 @@ validate_sirius_inputs <- function(
   str_tax_npc
 ) {
   if (!sirius_version %in% c("5", "6", 5, 6)) {
-    stop(
-      "sirius_version must be '5' or '6', got: ",
-      sirius_version,
-      call. = FALSE
+    cli::cli_abort(
+      "sirius_version must be '5' or '6', got {.val {sirius_version}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -118,7 +118,7 @@ load_sirius_tables <- function(input_directory, version) {
   if (!is.null(fnames$denovo)) {
     files <- tryCatch(
       utils::unzip(zipfile = input_directory, list = TRUE),
-      error = function(e) list(Name = list.files(input_directory))
+      error = function(...) list(Name = list.files(input_directory))
     )
     if (any(grepl(fnames$denovo, files$Name))) {
       denovo <- read_from_sirius_zip(input_directory, file = fnames$denovo)
@@ -150,7 +150,7 @@ load_sirius_tables <- function(input_directory, version) {
 load_sirius_summaries <- function(input_directory) {
   zip_list <- tryCatch(
     utils::unzip(zipfile = input_directory, list = TRUE),
-    error = function(e) {
+    error = function(...) {
       out <- list()
       out$Name <- list.files(input_directory)
       out

@@ -63,7 +63,8 @@ test_that("test-prepare_annotations_sirius validates sirius_version", {
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "sirius_version must be '5' or '6'"
+    "sirius_version must be '5' or '6'",
+    class = "tima_validation_error"
   )
 })
 
@@ -194,7 +195,8 @@ test_that("validate_sirius_inputs validates version correctly", {
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "sirius_version must be '5' or '6'"
+    "sirius_version must be '5' or '6'",
+    class = "tima_validation_error"
   )
 
   # Test invalid type
@@ -210,7 +212,8 @@ test_that("validate_sirius_inputs validates version correctly", {
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "sirius_version must be '5' or '6'"
+    "sirius_version must be '5' or '6'",
+    class = "tima_validation_error"
   )
 })
 
