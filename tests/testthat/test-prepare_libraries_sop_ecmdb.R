@@ -26,11 +26,13 @@ library(testthat)
 test_that("test-prepare_libraries_sop_ecmdb validates input and output types", {
   expect_error(
     prepare_libraries_sop_ecmdb(input = c("a", "b"), output = "x.tsv"),
-    "single character"
+    "single character",
+    class = "tima_validation_error"
   )
   expect_error(
     prepare_libraries_sop_ecmdb(input = "a.zip", output = c("x", "y")),
-    "single character"
+    "single character",
+    class = "tima_validation_error"
   )
 })
 

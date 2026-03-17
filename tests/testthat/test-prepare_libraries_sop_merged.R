@@ -37,7 +37,8 @@ test_that("validate_sop_merged_inputs rejects invalid filter", {
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
-    "filter must be a single logical value"
+    "filter must be a single logical value",
+    class = "tima_validation_error"
   )
 })
 
@@ -56,7 +57,8 @@ test_that("validate_sop_merged_inputs rejects invalid level", {
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
-    "level must be one of"
+    "supported taxonomic ranks",
+    class = "tima_validation_error"
   )
 })
 
@@ -103,7 +105,8 @@ test_that("apply_taxonomic_filter errors on no matches", {
       level = "family",
       value = "NonExistent"
     ),
-    "Filter led to no entries"
+    "filter led to no entries",
+    class = "tima_validation_error"
   )
 })
 
@@ -202,7 +205,8 @@ test_that("test-validate_sop_merged_inputs requires value when filtering", {
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
-    "value must be a single character string"
+    "value must be a single character string",
+    class = "tima_validation_error"
   )
 })
 
@@ -240,7 +244,8 @@ test_that("test-validate_sop_merged_inputs rejects NULL filter", {
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
-    "filter must be a single logical value"
+    "filter must be a single logical value",
+    class = "tima_validation_error"
   )
 })
 
@@ -452,7 +457,8 @@ test_that("test-apply_taxonomic_filter handles empty result", {
       level = "phylum",
       value = "NonExistentPhylum"
     ),
-    "Filter led to no entries"
+    "filter led to no entries",
+    class = "tima_validation_error"
   )
 })
 
@@ -468,7 +474,8 @@ test_that("test-apply_taxonomic_filter handles missing taxonomy column", {
       level = "tribe",
       value = "TestTribe"
     ),
-    "No column found matching level"
+    "no column found matching requested taxonomic level",
+    class = "tima_validation_error"
   )
 })
 
@@ -490,7 +497,8 @@ test_that("test-prepare_libraries_sop_merged validates inputs before processing"
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
-    "filter must be a single logical value"
+    "filter must be a single logical value",
+    class = "tima_validation_error"
   )
 })
 
