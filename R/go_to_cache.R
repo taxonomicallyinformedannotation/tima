@@ -72,12 +72,14 @@ ensure_cache_exists <- function(cache) {
     },
     error = function(e) {
       log_error("Failed to create cache: %s", conditionMessage(e))
-      stop(
-        "Cannot create cache directory '",
-        cache,
-        "': ",
-        conditionMessage(e),
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "cannot create cache directory",
+          "x" = cache,
+          "i" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
       )
     }
   )
@@ -93,12 +95,14 @@ change_to_cache <- function(cache) {
     },
     error = function(e) {
       log_error("Failed to change directory: %s", conditionMessage(e))
-      stop(
-        "Cannot change to cache directory '",
-        cache,
-        "': ",
-        conditionMessage(e),
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "cannot change to cache directory",
+          "x" = cache,
+          "i" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
       )
     }
   )

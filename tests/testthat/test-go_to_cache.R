@@ -315,7 +315,8 @@ test_that("change_to_cache errors on invalid directory", {
   with_temp_wd({
     expect_error(
       change_to_cache("/nonexistent/directory/path"),
-      "Cannot change"
+      "cannot change",
+      class = "tima_runtime_error"
     )
   })
 })

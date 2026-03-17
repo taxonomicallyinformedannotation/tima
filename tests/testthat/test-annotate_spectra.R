@@ -78,7 +78,7 @@ test_that("annotate_spectra validates parameters", {
   )
   expect_error(
     annotate_spectra(libraries = list(pos = "nope.mgf"), polarity = "pos"),
-    "Library file"
+    "library file"
   )
 })
 
@@ -533,7 +533,8 @@ test_that("annotate_spectra handles empty library error", {
 
   expect_error(
     annotate_spectra(libraries = character(0), polarity = "pos"),
-    "At least one library must be provided"
+    "at least one library must be provided",
+    class = "tima_validation_error"
   )
 
   expect_error(
@@ -716,7 +717,8 @@ test_that("annotate_spectra reports missing input files after pre-flight checks"
       output = "out.tsv",
       approx = TRUE
     ),
-    "Input file\\(s\\) not found"
+    "input file\\(s\\) not found",
+    class = "tima_validation_error"
   )
 })
 
@@ -745,7 +747,8 @@ test_that("annotate_spectra reports missing library files after pre-flight check
       output = "out.tsv",
       approx = TRUE
     ),
-    "Library file\\(s\\) not found"
+    "library file\\(s\\) not found",
+    class = "tima_validation_error"
   )
 })
 

@@ -31,20 +31,41 @@ parse_yaml_params <- function(def, usr = NULL) {
 
   # Validate default file exists
   if (!file.exists(def)) {
-    stop("Default YAML file not found: ", def, call. = FALSE)
+    cli::cli_abort(
+      c(
+        "default YAML file not found",
+        "x" = def
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Read the default YAML file
   params <- tryCatch(
     yaml::read_yaml(file = def),
     error = function(e) {
-      stop("Failed to parse default YAML file: ", conditionMessage(e))
+      cli::cli_abort(
+        c(
+          "failed to parse default YAML file",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 
   # Validate that parameters were successfully loaded
   if (!is.list(params) || length(params) == 0L) {
-    stop("Default YAML file is empty or invalid: ", def)
+    cli::cli_abort(
+      c(
+        "default YAML file is empty or invalid",
+        "x" = def
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # If a user-specified YAML file exists, merge it with defaults
@@ -56,7 +77,14 @@ parse_yaml_params <- function(def, usr = NULL) {
       yaml::read_yaml(file = usr),
       error = function(e) {
         log_error("Failed to parse user YAML file: %s", e$message)
-        stop("Failed to parse user YAML file: ", conditionMessage(e))
+        cli::cli_abort(
+          c(
+            "failed to parse user YAML file",
+            "x" = conditionMessage(e)
+          ),
+          class = c("tima_runtime_error", "tima_error"),
+          call = NULL
+        )
       }
     )
 
