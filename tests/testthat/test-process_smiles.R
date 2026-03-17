@@ -25,6 +25,16 @@ test_that("process_smiles handles empty data frame", {
   expect_true(nrow(result) == 0L)
 })
 
+test_that("process_smiles errors when smiles column is missing", {
+  bad_input <- tidytable::tidytable(other_column = TEST_SMILES)
+
+  expect_error(
+    process_smiles(bad_input),
+    "column not found",
+    class = "tima_validation_error"
+  )
+})
+
 test_that("process_smiles handles NA values gracefully", {
   input <- tidytable::tidytable(
     structure_smiles_initial = c(TEST_SMILES, NA_character_)

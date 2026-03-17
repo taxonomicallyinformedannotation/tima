@@ -62,7 +62,8 @@ test_that("harmonize_spectra validates mode parameter", {
       col_sy = "synonyms",
       col_xl = "xlogp"
     ),
-    "must contain 'pos' or 'neg'"
+    "must contain 'pos' or 'neg'",
+    class = "tima_validation_error"
   )
 })
 
@@ -75,7 +76,8 @@ test_that("harmonize_spectra validates mode with regex pattern", {
   )
   expect_error(
     harmonize_spectra(df, metad = "lib", mode = "foo", col_po = "mode_col"),
-    "pos.*neg"
+    "pos.*neg",
+    class = "tima_validation_error"
   )
 })
 
@@ -170,8 +172,7 @@ test_that("harmonize_spectra validates column name parameters are strings or NUL
       col_sy = "synonyms",
       col_xl = "xlogp"
     ),
-    "Column name parameter(s) must satisfy validation: col_ad",
-    fixed = TRUE
+    "Column name parameter\\(s\\) must satisfy validation.*col_ad"
   )
 
   # Test vector of column names (should be single string)
@@ -198,8 +199,7 @@ test_that("harmonize_spectra validates column name parameters are strings or NUL
       col_sy = "synonyms",
       col_xl = "xlogp"
     ),
-    "Column name parameter(s) must satisfy validation: col_ad",
-    fixed = TRUE
+    "Column name parameter\\(s\\) must satisfy validation.*col_ad"
   )
 })
 
@@ -232,7 +232,6 @@ test_that("harmonize_spectra validates column parameters", {
       col_sy = "synonyms",
       col_xl = "xlogp"
     ),
-    "Column name parameter(s) must satisfy validation: col_ad, col_ce, col_ci",
-    fixed = TRUE
+    "Column name parameter\\(s\\) must satisfy validation.*col_ad, col_ce, col_ci"
   )
 })

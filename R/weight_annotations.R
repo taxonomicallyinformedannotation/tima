@@ -71,25 +71,31 @@ validate_weight_annotations_inputs <- function(
   )
   missing_required <- purrr::keep(.x = required_files, .p = ~ !file.exists(.x))
   if (length(missing_required) > 0L) {
-    stop(
-      "Required file(s) not found: ",
-      paste(
-        names(missing_required),
-        missing_required,
-        sep = " at ",
-        collapse = "; "
+    cli::cli_abort(
+      c(
+        "Required file(s) not found",
+        "x" = paste(
+          names(missing_required),
+          missing_required,
+          sep = " at ",
+          collapse = "; "
+        )
       ),
-      call. = FALSE
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
   # Validate annotation files
   missing_annotations <- annotations[!file.exists(annotations)]
   if (length(missing_annotations) > 0L) {
-    stop(
-      "Annotation file(s) not found: ",
-      paste(missing_annotations, collapse = ", "),
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "Annotation file(s) not found",
+        "x" = paste(missing_annotations, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -116,29 +122,35 @@ validate_weight_annotations_inputs <- function(
     biological = weight_biological
   )
   if (!all(is.numeric(weights)) || any(is.na(weights))) {
-    stop(
+    cli::cli_abort(
       "All weights (spectral, chemical, biological) must be numeric and non-NA",
-      call. = FALSE
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
   if (any(weights < 0)) {
-    stop(
-      "All weights must be non-negative, got: ",
-      paste(names(weights), "=", weights, collapse = ", "),
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "All weights must be non-negative",
+        "x" = paste(names(weights), "=", weights, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
   weight_sum <- sum(weights)
   if (abs(weight_sum - 1) > WEIGHT_SUM_TOLERANCE) {
-    stop(
-      "Weights must sum to 1 (tolerance ",
-      WEIGHT_SUM_TOLERANCE,
-      "), got sum = ",
-      signif(weight_sum, 6),
-      " (",
-      paste(names(weights), weights, sep = "=", collapse = ", "),
-      ")",
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "Weights must sum to 1",
+        "x" = paste0(
+          "tolerance=", WEIGHT_SUM_TOLERANCE,
+          "; sum=", signif(weight_sum, 6),
+          " (", paste(names(weights), weights, sep = "=", collapse = ", "), ")"
+        )
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -199,10 +211,13 @@ load_annotation_tables <- function(annotations, ms1_only) {
     ) |>
       tidytable::bind_rows(),
     error = function(e) {
-      stop(
-        "Failed to load annotation files: ",
-        conditionMessage(e),
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "Failed to load annotation files",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
       )
     }
   )
@@ -250,7 +265,14 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
       colClasses = "character"
     ),
     error = function(e) {
-      stop("Failed to load library file: ", conditionMessage(e), call. = FALSE)
+      cli::cli_abort(
+        c(
+          "Failed to load library file",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 
@@ -305,7 +327,14 @@ load_edges_table <- function(edges, candidates_neighbors) {
       colClasses = "character"
     ),
     error = function(e) {
-      stop("Failed to load edges file: ", conditionMessage(e), call. = FALSE)
+      cli::cli_abort(
+        c(
+          "Failed to load edges file",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 

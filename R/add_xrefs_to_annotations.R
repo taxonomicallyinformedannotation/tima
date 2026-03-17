@@ -21,9 +21,10 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
     !is.list(results_list) ||
       !all(c("full", "filtered", "mini") %in% names(results_list))
   ) {
-    stop(
+    cli::cli_abort(
       "results_list must be a list with elements: full, filtered, mini",
-      call. = FALSE
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -50,10 +51,13 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
   # Validate xrefs structure ----
   required_cols <- c("inchikey", "prefix", "id")
   if (!all(required_cols %in% names(xrefs))) {
-    stop(
-      "xrefs file must contain columns: ",
-      paste(required_cols, collapse = ", "),
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "xrefs file must contain required columns",
+        "x" = paste(required_cols, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

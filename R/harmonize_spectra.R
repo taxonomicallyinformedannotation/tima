@@ -76,7 +76,14 @@ harmonize_spectra <- function(
 
   # Validate mode contains 'pos' or 'neg'
   if (!grepl("pos|neg", mode, ignore.case = TRUE)) {
-    stop("mode must contain 'pos' or 'neg', got: ", mode, call. = FALSE)
+    cli::cli_abort(
+      c(
+        "mode must contain 'pos' or 'neg'",
+        "x" = as.character(mode)
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate all column parameters are character strings or NULL

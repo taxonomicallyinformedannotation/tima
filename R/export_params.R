@@ -55,7 +55,14 @@ export_params <- function(
       )
     },
     error = function(e) {
-      stop("Failed to export parameters: ", conditionMessage(e))
+      cli::cli_abort(
+        c(
+          "failed to export parameters",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 
