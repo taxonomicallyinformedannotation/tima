@@ -35,15 +35,18 @@ create_test_spectra_object <- function(
 test_that("sanitize_spectra requires Spectra object", {
   expect_error(
     sanitize_spectra(data.frame(a = 1)),
-    "Spectra object"
+    "Spectra object",
+    class = "tima_validation_error"
   )
   expect_error(
     sanitize_spectra(list()),
-    "Spectra object"
+    "Spectra object",
+    class = "tima_validation_error"
   )
   expect_error(
     sanitize_spectra(NULL),
-    "Spectra object"
+    "Spectra object",
+    class = "tima_validation_error"
   )
 })
 
@@ -52,11 +55,13 @@ test_that("sanitize_spectra validates cutoff parameter", {
 
   expect_error(
     sanitize_spectra(spectra, cutoff = -1),
-    "non-negative"
+    "non-negative",
+    class = "tima_validation_error"
   )
   expect_error(
     sanitize_spectra(spectra, cutoff = "high"),
-    "non-negative"
+    "non-negative",
+    class = "tima_validation_error"
   )
 })
 
@@ -65,19 +70,23 @@ test_that("sanitize_spectra validates tolerance parameters", {
 
   expect_error(
     sanitize_spectra(spectra, dalton = 0),
-    "positive"
+    "positive",
+    class = "tima_validation_error"
   )
   expect_error(
     sanitize_spectra(spectra, dalton = -0.1),
-    "positive"
+    "positive",
+    class = "tima_validation_error"
   )
   expect_error(
     sanitize_spectra(spectra, ppm = 0),
-    "positive"
+    "positive",
+    class = "tima_validation_error"
   )
   expect_error(
     sanitize_spectra(spectra, ppm = -10),
-    "positive"
+    "positive",
+    class = "tima_validation_error"
   )
 })
 

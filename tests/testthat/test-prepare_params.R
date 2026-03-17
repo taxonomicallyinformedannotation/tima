@@ -69,11 +69,27 @@ test_that("prepare_params validates list inputs", {
 ## get_params: invalid step value handling ----
 
 test_that("get_params rejects missing or invalid step values", {
-  expect_error(get_params(NULL), "must be provided")
-  expect_error(get_params(""), "must be provided")
-  expect_error(get_params(NA_character_), "does not exist")
+  expect_error(
+    get_params(NULL),
+    "must be provided",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    get_params(""),
+    "must be provided",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    get_params(NA_character_),
+    "must be provided",
+    class = "tima_validation_error"
+  )
   # Length >1 should error; capture error containing length diagnostic
-  expect_error(get_params(c("a", "b")), "length = 2")
+  expect_error(
+    get_params(c("a", "b")),
+    "single character",
+    class = "tima_validation_error"
+  )
 })
 
 ## prepare_params manual param injection ----

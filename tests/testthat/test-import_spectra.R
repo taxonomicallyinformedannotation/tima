@@ -41,3 +41,31 @@ test_that("import_spectra handles MSP files with failures", {
     skip("MSP test file not found")
   }
 })
+
+test_that("import_spectra validates file and polarity inputs", {
+  expect_error(
+    import_spectra(file = 123),
+    "single character string",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    import_spectra(file = tempfile(fileext = ".mgf"), polarity = "bad"),
+    "polarity",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("import_spectra validates tolerances and missing files", {
+  expect_error(
+    import_spectra(file = "missing_file.mgf", dalton = 0),
+    "positive",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    import_spectra(file = "missing_file.mgf"),
+    "spectra file not found",
+    class = "tima_validation_error"
+  )
+})

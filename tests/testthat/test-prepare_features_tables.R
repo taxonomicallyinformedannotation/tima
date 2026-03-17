@@ -71,17 +71,20 @@ test_that("prepare_features_tables validates candidates parameter", {
 
   expect_error(
     prepare_features_tables(features = test_features, candidates = 0),
-    "between 1 and 100"
+    "between 1 and 100",
+    class = "tima_validation_error"
   )
 
   expect_error(
     prepare_features_tables(features = test_features, candidates = 101),
-    "between 1 and 100"
+    "between 1 and 100",
+    class = "tima_validation_error"
   )
 
   expect_error(
     prepare_features_tables(features = test_features, candidates = -1),
-    "between 1 and 100"
+    "between 1 and 100",
+    class = "tima_validation_error"
   )
 })
 
@@ -227,7 +230,8 @@ test_that("prepare_features_tables handles empty file", {
 
   expect_error(
     prepare_features_tables(features = test_file),
-    "empty"
+    "empty",
+    class = "tima_validation_error"
   )
 })
 
