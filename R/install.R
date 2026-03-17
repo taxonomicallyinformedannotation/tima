@@ -11,31 +11,30 @@
 #' @keywords internal
 validate_install_inputs <- function(package, repos, dependencies) {
   if (!is.character(package) || length(package) != 1L || nchar(package) == 0L) {
-    stop(
-      "package must be a single non-empty character string, got: ",
-      if (is.null(package)) "NULL" else class(package)[1],
-      call. = FALSE
+    cli::cli_abort(
+      "package must be a single non-empty character string, got {.val {if (is.null(package)) 'NULL' else class(package)[1]}}",
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   if (!is.character(repos) || length(repos) == 0L) {
-    stop(
+    cli::cli_abort(
       "repos must be a non-empty character vector",
-      call. = FALSE
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   if (any(nchar(repos) == 0L)) {
-    stop(
-      "All repository URLs must be non-empty strings",
-      call. = FALSE
+    cli::cli_abort(
+      "all repository URLs must be non-empty strings",
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   if (!is.logical(dependencies) || length(dependencies) != 1L) {
-    stop(
+    cli::cli_abort(
       "dependencies must be a single logical value (TRUE or FALSE)",
-      call. = FALSE
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
@@ -168,7 +167,10 @@ check_or_install_python <- function() {
   }
 
   if (!.path_exists(python_path)) {
-    stop("Python executable not found at: ", python_path, call. = FALSE)
+    cli::cli_abort(
+      "python executable not found at {.path {python_path}}",
+      class = c("tima_runtime_error", "tima_error")
+    )
   }
 
   log_info("Using Miniconda Python at: %s", python_path)
@@ -199,7 +201,10 @@ setup_virtualenv <- function(envname = "tima-env", python = NULL) {
       },
       error = function(e) {
         log_error("Failed to create virtualenv: %s", e$message)
-        stop("Failed to create Python virtualenv", call. = FALSE)
+        cli::cli_abort(
+          "failed to create python virtualenv",
+          class = c("tima_runtime_error", "tima_error")
+        )
       }
     )
   } else {
@@ -222,7 +227,10 @@ setup_virtualenv <- function(envname = "tima-env", python = NULL) {
     },
     error = function(e) {
       log_error("Failed to install dependencies: %s", e$message)
-      stop("Failed to install dependencies in virtualenv", call. = FALSE)
+      cli::cli_abort(
+        "failed to install dependencies in virtualenv",
+        class = c("tima_runtime_error", "tima_error")
+      )
     }
   )
 
@@ -457,6 +465,12 @@ install_tima <- function(
   ),
   dependencies = TRUE
 ) {
+  validate_install_inputs(
+    package = package,
+    repos = repos,
+    dependencies = dependencies
+  )
+
   log_info("Starting installation of '%s'", package)
 
   # System info
@@ -482,13 +496,22 @@ install_tima <- function(
     },
     error = function(e) {
       log_error("Installation failed: %s", e$message)
-      stop("Failed to install package '", package, "'", call. = FALSE)
+      cli::cli_abort(
+        c(
+          "failed to install package {.val {package}}",
+          "x" = e$message
+        ),
+        class = c("tima_runtime_error", "tima_error")
+      )
     }
   )
 
   # Verify installation
   if (!.require_namespace(package, quietly = TRUE)) {
-    stop("Package '", package, "' not found after installation", call. = FALSE)
+    cli::cli_abort(
+      "package {.val {package}} not found after installation",
+      class = c("tima_runtime_error", "tima_error")
+    )
   }
 
   # Python virtualenv setup

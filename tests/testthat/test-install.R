@@ -180,7 +180,7 @@ test_that("validate_install_inputs rejects repos with empty strings", {
       c("https://cran.r-project.org", ""),
       TRUE
     ),
-    "All repository URLs must be non-empty"
+    "all repository URLs must be non-empty"
   )
 })
 
