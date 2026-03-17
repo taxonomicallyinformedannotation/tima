@@ -83,8 +83,8 @@ test_that("test-prepare_annotations_sirius validates output parameters and struc
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "Output path(s) must be single character strings: output_ann",
-    fixed = TRUE
+    "Output path\\(s\\) must be single character strings.*output_ann",
+    class = "tima_validation_error"
   )
   expect_error(
     prepare_annotations_sirius(
@@ -232,8 +232,8 @@ test_that("validate_sirius_inputs validates output paths", {
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "Output path(s) must be single character strings: output_ann",
-    fixed = TRUE
+    "Output path\\(s\\) must be single character strings.*output_ann",
+    class = "tima_validation_error"
   )
 
   expect_error(
@@ -248,8 +248,8 @@ test_that("validate_sirius_inputs validates output paths", {
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "Output path(s) must be single character strings: output_can",
-    fixed = TRUE
+    "Output path\\(s\\) must be single character strings.*output_can",
+    class = "tima_validation_error"
   )
 
   expect_error(
@@ -264,8 +264,8 @@ test_that("validate_sirius_inputs validates output paths", {
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
-    "Output path(s) must be single character strings: output_for",
-    fixed = TRUE
+    "Output path\\(s\\) must be single character strings.*output_for",
+    class = "tima_validation_error"
   )
 })
 

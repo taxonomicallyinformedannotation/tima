@@ -156,22 +156,22 @@ test_that("formatters are fast", {
 test_that("setup_logger validates filename parameter", {
   expect_error(
     setup_logger(filename = NULL),
-    "Log filename must be a non-empty character string"
+    "log filename must be a non-empty character string"
   )
 
   expect_error(
     setup_logger(filename = ""),
-    "Log filename must be a non-empty character string"
+    "log filename must be a non-empty character string"
   )
 
   expect_error(
     setup_logger(filename = 123),
-    "Log filename must be a non-empty character string"
+    "log filename must be a non-empty character string"
   )
 
   expect_error(
     setup_logger(filename = c("file1.log", "file2.log")),
-    "Log filename must be a non-empty character string"
+    "log filename must be a non-empty character string"
   )
 })
 

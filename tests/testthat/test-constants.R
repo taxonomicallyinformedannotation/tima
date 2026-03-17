@@ -96,6 +96,6 @@ test_that("validate_against_constant succeeds for valid ms mode", {
 test_that("validate_against_constant errors for invalid ms mode", {
   expect_error(
     validate_against_constant("invalid", "VALID_MS_MODES"),
-    "Invalid value"
+    "invalid value"
   )
 })

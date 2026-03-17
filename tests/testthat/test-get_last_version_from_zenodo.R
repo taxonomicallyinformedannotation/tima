@@ -131,7 +131,8 @@ test_that("test-get_last_version_from_zenodo handles invalid DOI gracefully", {
       pattern = "*.txt",
       path = output
     ),
-    "Failed to retrieve Zenodo record"
+    "failed to retrieve Zenodo record|Zenodo record not found",
+    class = "tima_error"
   )
 })
 
@@ -144,7 +145,8 @@ test_that("get_last_version_from_zenodo validates all inputs", {
       pattern = "test",
       path = "out"
     ),
-    "Invalid Zenodo DOI format"
+    "invalid Zenodo DOI format",
+    class = "tima_validation_error"
   )
 
   expect_error(
@@ -191,7 +193,8 @@ test_that("get_last_version_from_zenodo validates DOI format", {
       pattern = "data.csv",
       path = "output/data.csv"
     ),
-    "Invalid Zenodo DOI format"
+    "invalid Zenodo DOI format",
+    class = "tima_validation_error"
   )
 
   expect_error(
@@ -200,7 +203,8 @@ test_that("get_last_version_from_zenodo validates DOI format", {
       pattern = "data.csv",
       path = "output/data.csv"
     ),
-    "Please verify the DOI is correct"
+    "invalid Zenodo DOI format|failed to retrieve Zenodo record|Zenodo record not found",
+    class = "tima_error"
   )
 
   expect_error(
@@ -209,7 +213,8 @@ test_that("get_last_version_from_zenodo validates DOI format", {
       pattern = "data.csv",
       path = "output/data.csv"
     ),
-    "Invalid Zenodo DOI format"
+    "invalid Zenodo DOI format",
+    class = "tima_validation_error"
   )
 })
 
@@ -381,7 +386,8 @@ test_that("error messages are informative", {
       pattern = "test",
       path = "out"
     ),
-    "Expected format.*10\\.5281/zenodo"
+    "expected format.*10\\.5281/zenodo",
+    class = "tima_validation_error"
   )
 
   # Empty string errors are clear

@@ -20,7 +20,7 @@ test_that("create_edges validates input consistency", {
       threshold = 0.5,
       matched_peaks = 1L
     ),
-    "Length mismatch"
+    "length mismatch"
   )
 
   expect_error(
@@ -34,7 +34,7 @@ test_that("create_edges validates input consistency", {
       threshold = 0.5,
       matched_peaks = 1L
     ),
-    "Length mismatch"
+    "length mismatch"
   )
 })
 

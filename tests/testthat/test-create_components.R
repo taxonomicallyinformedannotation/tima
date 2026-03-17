@@ -12,7 +12,7 @@ test_that("test-create_components validates input files exist", {
       input = temp_test_path("missing.tsv"),
       output = output
     ),
-    "Input file\\(s\\) not found"
+    "input file\\(s\\) not found"
   )
 })
 
@@ -31,7 +31,7 @@ test_that("test-create_components validates multiple input files", {
       input = c(file1, temp_test_path("missing.tsv")),
       output = output
     ),
-    "Input file\\(s\\) not found"
+    "input file\\(s\\) not found"
   )
 })
 
