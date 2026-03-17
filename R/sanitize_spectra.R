@@ -34,21 +34,24 @@ sanitize_spectra <- function(
 
   # accessor where possible. Write-back has no clean API equivalent yet.
   if (!inherits(spectra, "Spectra")) {
-    stop(
-      "Input must be a Spectra object from the Spectra package",
-      call. = FALSE
+    cli::cli_abort(
+      "input must be a Spectra object from the Spectra package",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
   if (!is.null(cutoff) && (!is.numeric(cutoff) || cutoff < 0)) {
-    stop("Cutoff intensity must be non-negative or NULL, got: ", cutoff)
+    cli::cli_abort(
+      "cutoff intensity must be non-negative or NULL, got {.val {cutoff}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
   if (!is.numeric(dalton) || dalton <= 0 || !is.numeric(ppm) || ppm <= 0) {
-    stop(
-      "Tolerance values must be positive (dalton: ",
-      dalton,
-      ", ppm: ",
-      ppm,
-      ")"
+    cli::cli_abort(
+      "tolerance values must be positive (dalton: {.val {dalton}}, ppm: {.val {ppm}})",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

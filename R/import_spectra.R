@@ -47,32 +47,48 @@ import_spectra <- function(
 
   # Validate numeric parameters first (cheapest checks)
   if (!is.numeric(dalton) || dalton <= 0 || !is.numeric(ppm) || ppm <= 0) {
-    stop(
-      "Dalton and PPM tolerances must be positive numbers ",
-      "(dalton: ",
-      dalton,
-      ", ppm: ",
-      ppm,
-      ")"
+    cli::cli_abort(
+      "dalton and ppm tolerances must be positive numbers (dalton: {.val {dalton}}, ppm: {.val {ppm}})",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
   # Validate polarity
   if (!is.na(polarity) && !polarity %in% c("pos", "neg")) {
-    stop("Polarity must be 'pos', 'neg', or NA, got: ", polarity)
+    cli::cli_abort(
+      "polarity must be 'pos', 'neg', or NA, got {.val {polarity}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate file path (I/O check - more expensive)
   if (!is.character(file) || length(file) != 1L) {
-    stop("file must be a single character string")
+    cli::cli_abort(
+      "{.arg file} must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (!is.null(cutoff) && (!is.numeric(cutoff) || cutoff < 0)) {
-    stop("Cutoff intensity must be non-negative or NULL, got: ", cutoff)
+    cli::cli_abort(
+      "cutoff intensity must be non-negative or NULL, got {.val {cutoff}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (!file.exists(file)) {
-    stop("Spectra file not found: ", file)
+    cli::cli_abort(
+      c(
+        "spectra file not found",
+        "x" = file
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Import Spectra ----
@@ -120,16 +136,27 @@ import_spectra <- function(
           log_debug("Reading RDS file...")
           readRDS(file = file)
         },
-        stop(
-          "Unsupported file format: '",
-          file_ext,
-          "'. Supported formats: mgf, msp, rds"
+        cli::cli_abort(
+          "unsupported file format {.val {file_ext}}; supported formats: mgf, msp, rds",
+          class = c("tima_validation_error", "tima_error"),
+          call = NULL
         )
       )
     },
     error = function(e) {
+      if (inherits(e, "tima_error")) {
+        rlang::cnd_signal(e)
+      }
       log_error("Failed to import spectra: %s", conditionMessage(e))
-      stop("Failed to import spectra from ", file, ": ", conditionMessage(e))
+      cli::cli_abort(
+        c(
+          "failed to import spectra",
+          "x" = file,
+          "i" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 

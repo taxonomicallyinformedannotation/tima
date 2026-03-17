@@ -44,7 +44,10 @@ test_that("get_example_sirius downloads v5 and adjusted v6 paths", {
         v5 = "https://example.org/v5.zip",
         v6 = "https://example.org/v6.zip"
       ),
-      export = list(v5 = "path/to/example_sirius_5.zip", v6 = "path/to/example_sirius_6.zip")
+      export = list(
+        v5 = "path/to/example_sirius_5.zip",
+        v6 = "path/to/example_sirius_6.zip"
+      )
     )
   )
 

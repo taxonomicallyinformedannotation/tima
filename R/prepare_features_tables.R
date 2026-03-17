@@ -138,13 +138,17 @@ prepare_features_tables <- function(
     if (
       !is.numeric(candidates) || length(candidates) != 1L || is.na(candidates)
     ) {
-      stop("candidates must be a single numeric value or NULL", call. = FALSE)
+      cli::cli_abort(
+        "candidates must be a single numeric value or NULL",
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
     }
     if (candidates < 1L || candidates > 100L) {
-      stop(
-        "candidates must be between 1 and 100, got: ",
-        candidates,
-        call. = FALSE
+      cli::cli_abort(
+        "candidates must be between 1 and 100, got {.val {candidates}}",
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
   }
@@ -167,10 +171,14 @@ prepare_features_tables <- function(
 #' @noRd
 .validate_column_name_param <- function(val, param_name) {
   if (!is.character(val) || length(val) != 1L || is.na(val) || !nzchar(val)) {
-    stop(
-      param_name,
-      " must be a single non-empty character string",
-      call. = FALSE
+    msg <- sprintf(
+      "`%s` must be a single non-empty character string",
+      param_name
+    )
+    cli::cli_abort(
+      msg,
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 }
@@ -186,7 +194,14 @@ prepare_features_tables <- function(
   )
 
   if (nrow(tbl) == 0L) {
-    stop("Features file is empty: ", features, call. = FALSE)
+    cli::cli_abort(
+      c(
+        "features file is empty",
+        "x" = features
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   tbl

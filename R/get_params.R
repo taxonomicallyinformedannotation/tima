@@ -25,12 +25,28 @@
 get_params <- function(step) {
   # Input Validation (early check) ----
 
-  if (missing(step) || is.null(step) || !nzchar(step)) {
-    stop("Step name must be provided and non-empty")
+  if (missing(step) || is.null(step)) {
+    cli::cli_abort(
+      "step name must be provided and non-empty",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (!is.character(step) || length(step) != 1L) {
-    stop("Step must be a single character string, got: ", class(step))
+    cli::cli_abort(
+      "step must be a single character string, got {.val {class(step)}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+
+  if (is.na(step) || !nzchar(step)) {
+    cli::cli_abort(
+      "step name must be provided and non-empty",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Get Default Paths and Available Steps ----
@@ -58,16 +74,14 @@ get_params <- function(step) {
 
   # Validate step exists early (before file I/O)
   if (!step_normalized %in% available_steps) {
-    stop(
-      "Step '",
-      step,
-      "' does not exist. Available steps: ",
-      paste(utils::head(x = available_steps, n = 10L), collapse = ", "),
-      if (length(available_steps) > 10) {
-        "..."
-      } else {
-        ""
-      }
+    cli::cli_abort(
+      c(
+        "step does not exist",
+        "x" = as.character(step),
+        "i" = paste(utils::head(x = available_steps, n = 10L), collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -93,11 +107,14 @@ get_params <- function(step) {
 
   # Validate default parameter file exists
   if (!file.exists(default_param_path)) {
-    stop(
-      "Default parameter file not found for step '",
-      step,
-      "': ",
-      default_param_path
+    cli::cli_abort(
+      c(
+        "default parameter file not found",
+        "x" = as.character(step),
+        "i" = default_param_path
+      ),
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -111,11 +128,14 @@ get_params <- function(step) {
 
   # Validate docopt file exists
   if (!file.exists(docopt_path)) {
-    stop(
-      "Docopt documentation not found for step '",
-      step_normalized,
-      "': ",
-      docopt_path
+    cli::cli_abort(
+      c(
+        "docopt documentation not found",
+        "x" = step_normalized,
+        "i" = docopt_path
+      ),
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -126,7 +146,14 @@ get_params <- function(step) {
       nchars = file.info(docopt_path)$size
     ),
     error = function(e) {
-      stop("Failed to read docopt file: ", conditionMessage(e))
+      cli::cli_abort(
+        c(
+          "failed to read docopt file",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 
@@ -159,7 +186,14 @@ get_params <- function(step) {
 
   # Validate that parameters were successfully loaded
   if (!is.list(params) || length(params) == 0L) {
-    stop("Failed to load parameters for step '", step, "'")
+    cli::cli_abort(
+      c(
+        "failed to load parameters for step",
+        "x" = as.character(step)
+      ),
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Parse and Merge CLI Arguments ----
