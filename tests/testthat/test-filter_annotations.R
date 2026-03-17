@@ -60,7 +60,7 @@ test_that("filter_annotations() errors on missing annotations file", {
       rts = character(0),
       output = out
     ),
-    "Annotation file"
+    "annotation file"
   )
 })
 
@@ -75,7 +75,7 @@ test_that("filter_annotations() errors on missing features file", {
       rts = character(0),
       output = out
     ),
-    "Features file"
+    "features file"
   )
 })
 
@@ -289,7 +289,7 @@ test_that("validate_filter_annotations_inputs validates features", {
       output = tempfile(),
       tolerance_rt = 0.5
     ),
-    "Features file not found"
+    "features file not found"
   )
 
   expect_error(

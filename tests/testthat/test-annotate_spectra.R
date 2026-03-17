@@ -450,12 +450,12 @@ test_that("resolve_annotation_output handles paths correctly", {
 
   expect_error(
     resolve_annotation_output(123),
-    "Output path must be a character string"
+    "output path must be a character string"
   )
 
   expect_error(
     resolve_annotation_output(character(0)),
-    "Output must contain at least one file path"
+    "output must contain at least one file path"
   )
 })
 

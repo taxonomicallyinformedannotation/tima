@@ -165,8 +165,8 @@ test_that("test-validate_sop_merged_inputs rejects non-character output paths", 
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
-    "Output parameter(s) must be single character strings: output_key",
-    fixed = TRUE
+    "Output parameter\\(s\\) must be single character strings.*output_key",
+    class = "tima_validation_error"
   )
 })
 
@@ -185,8 +185,8 @@ test_that("test-validate_sop_merged_inputs rejects vector output paths", {
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
-    "Output parameter(s) must be single character strings: output_org_tax_ott",
-    fixed = TRUE
+    "Output parameter\\(s\\) must be single character strings.*output_org_tax_ott",
+    class = "tima_validation_error"
   )
 })
 
@@ -281,10 +281,10 @@ test_that("test-validate_sop_merged_inputs validates all output parameters", {
       expect_error(
         do.call(validate_sop_merged_inputs, args),
         paste0(
-          "Output parameter(s) must be single character strings: ",
+          "Output parameter\\(s\\) must be single character strings.*",
           param
         ),
-        fixed = TRUE
+        class = "tima_validation_error"
       )
       TRUE
     },
