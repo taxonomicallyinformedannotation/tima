@@ -47,21 +47,28 @@ get_example_files <- function(
 
   # Validate inputs
   if (!is.character(example) || length(example) == 0L) {
-    stop("example must be a non-empty character vector")
+    cli::cli_abort(
+      "{.arg example} must be a non-empty character vector",
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   invalid_examples <- setdiff(example, valid_examples)
   if (length(invalid_examples) > 0L) {
-    stop(
-      "Invalid example file(s): ",
-      paste(invalid_examples, collapse = ", "),
-      "\nValid options: ",
-      paste(valid_examples, collapse = ", ")
+    cli::cli_abort(
+      c(
+        "invalid {.arg example} value{?s}: {.val {invalid_examples}}",
+        "i" = "Valid options: {.val {valid_examples}}"
+      ),
+      class = c("tima_validation_error", "tima_error")
     )
   }
 
   if (!is.logical(in_cache) || length(in_cache) != 1L) {
-    stop("in_cache must be a single logical value (TRUE/FALSE)")
+    cli::cli_abort(
+      "{.arg in_cache} must be a single logical value",
+      class = c("tima_validation_error", "tima_error")
+    )
   }
 
   log_debug(

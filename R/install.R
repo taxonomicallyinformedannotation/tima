@@ -42,6 +42,68 @@ validate_install_inputs <- function(package, repos, dependencies) {
   invisible(NULL)
 }
 
+.require_namespace <- function(package, quietly = TRUE) {
+  requireNamespace(package, quietly = quietly)
+}
+
+.find_package_paths <- function(package, quiet = TRUE) {
+  suppressWarnings(find.package(package, quiet = quiet))
+}
+
+.path_exists <- function(path) {
+  file.exists(path)
+}
+
+.read_description_dcf <- function(path) {
+  read.dcf(path)
+}
+
+.load_namespace <- function(package) {
+  loadNamespace(package)
+}
+
+.sys_which <- function(command) {
+  Sys.which(command)
+}
+
+.miniconda_path <- function() {
+  reticulate::miniconda_path()
+}
+
+.install_miniconda <- function() {
+  reticulate::install_miniconda()
+}
+
+.virtualenv_exists <- function(envname) {
+  reticulate::virtualenv_exists(envname = envname)
+}
+
+.virtualenv_create <- function(envname, python) {
+  reticulate::virtualenv_create(envname = envname, python = python)
+}
+
+.virtualenv_install <- function(envname, packages) {
+  reticulate::virtualenv_install(envname = envname, packages = packages)
+}
+
+.py_install <- function(packages) {
+  reticulate::py_install(packages = packages)
+}
+
+.install_packages <- function(package, repos, dependencies, type, ...) {
+  utils::install.packages(
+    package,
+    repos = repos,
+    dependencies = dependencies,
+    type = type,
+    ...
+  )
+}
+
+.tar_destroy <- function() {
+  targets::tar_destroy(ask = FALSE)
+}
+
 #' Display System-Specific Installation Messages
 #'
 #' @description Internal helper to show OS-specific installation instructions.
@@ -85,7 +147,7 @@ show_system_messages <- function(system) {
 #' @return Character path to Python executable
 #' @keywords internal
 check_or_install_python <- function() {
-  python <- Sys.which("python3")
+  python <- .sys_which("python3")
 
   if (nzchar(python)) {
     log_info("System Python found at: %s", python)
@@ -94,9 +156,9 @@ check_or_install_python <- function() {
 
   log_warn("System Python not found. Installing Miniconda...")
 
-  minipath <- reticulate::miniconda_path()
-  if (!file.exists(minipath)) {
-    reticulate::install_miniconda()
+  minipath <- .miniconda_path()
+  if (!.path_exists(minipath)) {
+    .install_miniconda()
   }
 
   python_path <- if (Sys.info()[["sysname"]] == "Windows") {
@@ -105,7 +167,7 @@ check_or_install_python <- function() {
     file.path(minipath, "bin", "python")
   }
 
-  if (!file.exists(python_path)) {
+  if (!.path_exists(python_path)) {
     stop("Python executable not found at: ", python_path, call. = FALSE)
   }
 
@@ -127,12 +189,12 @@ setup_virtualenv <- function(envname = "tima-env", python = NULL) {
     python <- check_or_install_python()
   }
 
-  if (!reticulate::virtualenv_exists(envname = envname)) {
+  if (!.virtualenv_exists(envname = envname)) {
     log_info("Creating Python virtualenv: %s", envname)
 
     tryCatch(
       {
-        reticulate::virtualenv_create(envname = envname, python = python)
+        .virtualenv_create(envname = envname, python = python)
         log_success("Virtualenv created successfully")
       },
       error = function(e) {
@@ -148,12 +210,12 @@ setup_virtualenv <- function(envname = "tima-env", python = NULL) {
 
   tryCatch(
     {
-      reticulate::virtualenv_install(
+      .virtualenv_install(
         envname = envname,
         packages = c("rdkit", "chembl-structure-pipeline")
       )
       ## Additional safety
-      reticulate::py_install(
+      .py_install(
         packages = c("rdkit", "chembl-structure-pipeline")
       )
       log_success("Dependencies installed successfully")
@@ -179,13 +241,13 @@ setup_virtualenv <- function(envname = "tima-env", python = NULL) {
 #' @keywords internal
 verify_package_installation <- function(package) {
   # 1. Namespace reachable?
-  if (!requireNamespace(package, quietly = TRUE)) {
+  if (!.require_namespace(package, quietly = TRUE)) {
     log_error("Namespace for '%s' not found.", package)
     return(FALSE)
   }
 
   # 2. Attempt to resolve ALL possible paths
-  pkg_paths <- suppressWarnings(find.package(package, quiet = TRUE))
+  pkg_paths <- .find_package_paths(package, quiet = TRUE)
 
   # find.package returns character(0) on failure
   if (length(pkg_paths) == 0) {
@@ -196,7 +258,7 @@ verify_package_installation <- function(package) {
   # 3. Filter out invalid paths (empty, nonexistent, no DESCRIPTION)
   # Helper to check if a path is valid for installation
   .is_valid_install_path <- function(p) {
-    file.exists(p) && file.exists(file.path(p, "DESCRIPTION"))
+    .path_exists(p) && .path_exists(file.path(p, "DESCRIPTION"))
   }
 
   valid_paths <- pkg_paths[
@@ -225,7 +287,7 @@ verify_package_installation <- function(package) {
   # 4. Try reading DESCRIPTION robustly
   desc_ok <- tryCatch(
     {
-      df <- read.dcf(desc_file)
+      df <- .read_description_dcf(desc_file)
       isTRUE(nrow(df) > 0)
     },
     error = function(e) {
@@ -255,7 +317,7 @@ verify_package_installation <- function(package) {
   # 5. Validate namespace loading
   load_ok <- tryCatch(
     {
-      loadNamespace(package)
+      .load_namespace(package)
       TRUE
     },
     error = function(e) {
@@ -300,7 +362,7 @@ try_install_package <- function(
   from_source = FALSE
 ) {
   # Check if package was already installed before attempt
-  was_installed <- requireNamespace(package, quietly = TRUE)
+  was_installed <- .require_namespace(package, quietly = TRUE)
 
   tryCatch(
     expr = {
@@ -315,12 +377,12 @@ try_install_package <- function(
       result <- tryCatch(
         {
           pkg_type <- if (from_source) "source" else getOption("pkgType")
-          utils::install.packages(
+          .install_packages(
             package,
             repos = repos,
             dependencies = dependencies,
-            INSTALL_opts = c("--no-lock", "--no-test-load"),
-            type = pkg_type
+            type = pkg_type,
+            INSTALL_opts = c("--no-lock", "--no-test-load")
           )
           TRUE
         },
@@ -346,7 +408,7 @@ try_install_package <- function(
       }
 
       # Verify package was actually installed
-      is_now_installed <- requireNamespace(package, quietly = TRUE)
+      is_now_installed <- .require_namespace(package, quietly = TRUE)
 
       if (!was_installed && !is_now_installed) {
         log_error(
@@ -410,7 +472,7 @@ install_tima <- function(
 
   tryCatch(
     {
-      utils::install.packages(
+      .install_packages(
         package,
         repos = repos,
         dependencies = dependencies,
@@ -425,7 +487,7 @@ install_tima <- function(
   )
 
   # Verify installation
-  if (!requireNamespace(package, quietly = TRUE)) {
+  if (!.require_namespace(package, quietly = TRUE)) {
     stop("Package '", package, "' not found after installation", call. = FALSE)
   }
 
@@ -438,7 +500,7 @@ install_tima <- function(
 
   tryCatch(
     {
-      loadNamespace(package = package)
+      .load_namespace(package = package)
       copy_backbone()
       log_success("Backbone files copied")
     },
@@ -449,11 +511,11 @@ install_tima <- function(
 
   tryCatch(
     {
-      targets::tar_destroy(ask = FALSE)
+      .tar_destroy()
       log_success("Targets pipeline cleaned")
     },
     error = function(e) {
-      log_debug("No targets pipeline to clean")
+      log_debug("No targets pipeline to clean: %s", e$message)
     }
   )
 
