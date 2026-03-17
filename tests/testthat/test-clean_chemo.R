@@ -1161,3 +1161,87 @@ test_that("build_mini_results_table assembles expected mini output", {
       names(out)
   ))
 })
+
+test_that("sample_candidates_per_group prioritizes non-NA RT errors", {
+  df <- tidytable::tidytable(
+    feature_id = rep("F1", 4),
+    candidate_adduct = rep("[M+H]+", 4),
+    rank_final = rep(1L, 4),
+    candidate_structure_error_rt = c(NA, 0.1, NA, 0.2),
+    candidate_structure_inchikey_connectivity_layer = paste0("IK", 1:4)
+  )
+
+  out <- sample_candidates_per_group(df = df, max_per_score = 2L, seed = 1L)
+
+  expect_equal(nrow(out$df), 2L)
+  expect_equal(out$n_sampled_features, 1L)
+  expect_true(all(!is.na(out$df$candidate_structure_error_rt)))
+  expect_equal(nrow(out$annotation_notes), 1L)
+})
+
+test_that("sample_candidates_per_group handles missing RT column", {
+  df <- tidytable::tidytable(
+    feature_id = rep("F1", 3),
+    candidate_adduct = rep("[M+H]+", 3),
+    rank_final = rep(1L, 3),
+    candidate_structure_inchikey_connectivity_layer = paste0("IK", 1:3)
+  )
+
+  out <- sample_candidates_per_group(df = df, max_per_score = 1L, seed = 42L)
+
+  expect_equal(nrow(out$df), 1L)
+  expect_equal(out$n_sampled_features, 1L)
+  expect_true("annotation_notes" %in% names(out))
+})
+
+test_that("build_mini_results_table appends xrefs and renames id columns", {
+  features_table <- tidytable::tidytable(feature_id = "F1", rt = 1, mz = 100)
+  df_classes_mini <- tidytable::tidytable(
+    feature_id = "F1",
+    has_inchikey = TRUE,
+    label_classyfire = "ClassA",
+    label_npclassifier = "NPCA",
+    score_classyfire = NA_real_,
+    score_npclassifier = NA_real_
+  )
+  results_filtered <- tidytable::tidytable(
+    feature_id = "F1",
+    candidates_evaluated = 1L,
+    candidates_best = 1L,
+    annotation_note = NA_character_
+  )
+  df_filtered <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_name = "Cmpd1",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_smiles_no_stereo = "CCO",
+    candidate_structure_inchikey_connectivity_layer = "IK1",
+    candidate_library = "lib1",
+    candidate_structure_error_mz = 0.1,
+    candidate_structure_error_rt = 0.01,
+    candidate_structure_organism_occurrence_closest = "Org1",
+    candidate_structure_tag = "reported",
+    score_weighted_chemo = 0.9
+  )
+
+  local_mocked_bindings(
+    .add_xrefs_to_df = function(df, xrefs) {
+      df$candidate_structure_id_pubchem <- "12345"
+      df
+    }
+  )
+
+  out <- build_mini_results_table(
+    features_table = features_table,
+    df_classes_mini = df_classes_mini,
+    results_filtered = results_filtered,
+    df_filtered = df_filtered,
+    xrefs_table = tidytable::tidytable(
+      inchikey = "IK1",
+      prefix = "pubchem",
+      id = "12345"
+    )
+  )
+
+  expect_true("id_pubchem" %in% names(out))
+})

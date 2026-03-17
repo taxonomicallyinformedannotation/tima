@@ -899,3 +899,87 @@ test_that("annotate_spectra returns empty template when precursor reduction remo
 
   expect_identical(out, "out.tsv")
 })
+
+test_that("resolve_annotation_output validates type and length", {
+  expect_error(
+    resolve_annotation_output(1),
+    "output path must be a character string",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    resolve_annotation_output(character(0)),
+    "output must contain at least one file path",
+    class = "tima_validation_error"
+  )
+
+  expect_identical(resolve_annotation_output(c("a.tsv", "b.tsv")), "a.tsv")
+})
+
+test_that("normalize_input_files flattens lists and validates element types", {
+  expect_equal(
+    normalize_input_files(list("a.mgf", "b.mgf"), "Input"),
+    c("a.mgf", "b.mgf")
+  )
+
+  expect_error(
+    normalize_input_files(1:3, "Input"),
+    "Input elements must be character strings",
+    class = "tima_validation_error"
+  )
+
+  expect_equal(
+    normalize_input_files(list("a.mgf", 2), "Input"),
+    c("a.mgf", "2")
+  )
+})
+
+test_that("filter_library_paths_by_polarity keeps single path and filters vectors", {
+  expect_identical(
+    filter_library_paths_by_polarity("lib_pos.mgf", "pos"),
+    "lib_pos.mgf"
+  )
+
+  expect_equal(
+    filter_library_paths_by_polarity(
+      c("lib_pos_a.mgf", "lib_neg_b.mgf", "lib_pos_c.mgf"),
+      "pos"
+    ),
+    c("lib_pos_a.mgf", "lib_pos_c.mgf")
+  )
+})
+
+test_that("finalize_results backfills connectivity layer from inchikey", {
+  df_sim <- tidytable::tidytable(
+    feature_id = "F1",
+    target_id = 1L,
+    precursorMz = 100,
+    candidate_spectrum_entropy = "0.8",
+    candidate_score_similarity = "0.7",
+    candidate_count_similarity_peaks_matched = "3"
+  )
+
+  meta <- tidytable::tidytable(
+    target_id = 1L,
+    target_adduct = "[M+H]+",
+    target_library = "lib",
+    target_spectrum_id = "sp1",
+    target_inchikey = "ABCDEFGHIJKLMN-TEST-1",
+    target_inchikey_connectivity_layer = NA_character_,
+    target_smiles = "CCO",
+    target_smiles_no_stereo = NA_character_,
+    target_formula = "C2H6O",
+    target_exactmass = 46.0,
+    target_name = "ethanol",
+    target_xlogp = -0.3,
+    target_precursorMz = 101
+  )
+
+  out <- finalize_results(df_sim = df_sim, meta = meta, threshold = 0)
+
+  expect_equal(
+    out$candidate_structure_inchikey_connectivity_layer,
+    "ABCDEFGHIJKLMN"
+  )
+  expect_equal(out$candidate_structure_smiles_no_stereo, "CCO")
+})

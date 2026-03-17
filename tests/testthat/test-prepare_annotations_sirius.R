@@ -443,3 +443,55 @@ test_that("split_sirius_results splits table correctly", {
   expect_true(tidytable::is_tidytable(result$formula))
   expect_true(tidytable::is_tidytable(result$structures))
 })
+
+test_that("load_sirius_tables filters formulaRank and loads denovo when present", {
+  local_mocked_bindings(
+    read_from_sirius_zip = function(input_directory, file) {
+      if (grepl("canopus_formula_summary", file)) {
+        return(tidytable::tidytable(formulaRank = c(1L, 2L), x = c("a", "b")))
+      }
+      if (grepl("formula_identifications", file)) {
+        return(tidytable::tidytable(formulaRank = c(1L, 3L), y = c("c", "d")))
+      }
+      if (grepl("structure_identifications", file) && !grepl("denovo", file)) {
+        return(tidytable::tidytable(id = 1:2))
+      }
+      if (grepl("denovo_structure_identifications", file)) {
+        return(tidytable::tidytable(mappingFeatureId = c("F1", "F2")))
+      }
+      tidytable::tidytable()
+    },
+    .package = "tima"
+  )
+  local_mocked_bindings(
+    unzip = function(zipfile, list = FALSE, ...) {
+      if (isTRUE(list)) {
+        return(data.frame(Name = c("denovo_structure_identifications_all.tsv")))
+      }
+      invisible(NULL)
+    },
+    .package = "utils"
+  )
+
+  out <- load_sirius_tables(input_directory = "dummy.zip", version = "6")
+
+  expect_equal(nrow(out$canopus), 1L)
+  expect_equal(nrow(out$formulas), 1L)
+  expect_equal(nrow(out$structures), 2L)
+  expect_equal(nrow(out$denovo), 2L)
+})
+
+test_that("load_sirius_summaries returns empty when no summary files", {
+  local_mocked_bindings(
+    unzip = function(zipfile, list = FALSE, ...) {
+      if (isTRUE(list)) {
+        return(data.frame(Name = c("other.tsv")))
+      }
+      invisible(NULL)
+    },
+    .package = "utils"
+  )
+
+  out <- load_sirius_summaries("dummy.zip")
+  expect_equal(nrow(out), 0L)
+})

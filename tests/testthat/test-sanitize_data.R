@@ -380,6 +380,43 @@ test_that("sanitize_sirius detects missing files", {
   expect_gt(length(result$issues), 0)
 })
 
+test_that("sanitize_sirius detects SIRIUS v5 format", {
+  sirius_dir <- temp_test_path("sirius_v5")
+  dir.create(sirius_dir, recursive = TRUE)
+
+  write.table(
+    data.frame(id = 1:3),
+    file.path(sirius_dir, "formula_identifications.tsv"),
+    sep = "\t",
+    row.names = FALSE
+  )
+  write.table(
+    data.frame(id = 1:3),
+    file.path(sirius_dir, "canopus_summary.tsv"),
+    sep = "\t",
+    row.names = FALSE
+  )
+  write.table(
+    data.frame(id = 1:3),
+    file.path(sirius_dir, "compound_identifications.tsv"),
+    sep = "\t",
+    row.names = FALSE
+  )
+
+  result <- sanitize_sirius(sirius_dir = sirius_dir)
+  expect_true(result$valid)
+  expect_equal(result$sirius_version, "5")
+})
+
+test_that("sanitize_sirius rejects non-zip regular files", {
+  not_zip <- temp_test_path("not_zip.txt")
+  writeLines("plain text", not_zip)
+
+  result <- sanitize_sirius(sirius_dir = not_zip)
+  expect_false(result$valid)
+  expect_true(any(grepl("not a directory or ZIP", result$issues)))
+})
+
 # test_that("sanitize_sirius detects SIRIUS v5 format", {
 #   sirius_dir <- temp_test_path("sirius_v5")
 #   dir.create(sirius_dir, recursive = TRUE)
@@ -481,6 +518,47 @@ END IONS",
       sirius_dir = sirius_dir
     ),
     class = "tima_validation_error"
+  )
+})
+
+test_that("sanitize_all_inputs passes when metadata filenames match features", {
+  features_file <- temp_test_path("features_ok.csv")
+  mgf_file <- temp_test_path("spectra_ok.mgf")
+  metadata_file <- temp_test_path("metadata_ok.tsv")
+
+  write.csv(
+    data.frame(feature_id = 1:2, sample1 = c(10, 20), mz = c(100, 200)),
+    features_file,
+    row.names = FALSE
+  )
+
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "FEATURE_ID=1",
+      "PEPMASS=100.5",
+      "MSLEVEL=2",
+      "50.0 100",
+      "END IONS"
+    ),
+    mgf_file
+  )
+
+  write.table(
+    data.frame(filename = "sample1.mzML", ATTRIBUTE_species = "Species A"),
+    metadata_file,
+    sep = "\t",
+    row.names = FALSE
+  )
+
+  expect_true(
+    isTRUE(
+      sanitize_all_inputs(
+        features_file = features_file,
+        mgf_file = mgf_file,
+        metadata_file = metadata_file
+      )
+    )
   )
 })
 
