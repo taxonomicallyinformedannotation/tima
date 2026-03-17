@@ -62,8 +62,29 @@ test_that("prepare_params handles empty taxon (removes raw metadata) without err
 ## input validation errors ----
 
 test_that("prepare_params validates list inputs", {
-  expect_error(prepare_params(params_small = "bad"), "In index: 1.")
-  expect_error(prepare_params(params_advanced = "bad"), "In index: 1.")
+  local_mocked_bindings(
+    load_yaml_files = function() fixture_yamls("VAL"),
+    get_params = function(step) {
+      if (step == "prepare_params") {
+        return(fixture_small("VAL"))
+      }
+      if (step == "prepare_params_advanced") {
+        return(fixture_adv("VAL"))
+      }
+      stop("unexpected step")
+    },
+    export_params = function(...) character(),
+    create_dir = function(export) invisible(NULL)
+  )
+
+  expect_error(
+    prepare_params(params_small = "bad"),
+    "In index: 1\\.|invalid for atomic vectors"
+  )
+  expect_error(
+    prepare_params(params_advanced = "bad"),
+    "In index: 1\\.|invalid for atomic vectors"
+  )
 })
 
 ## get_params: invalid step value handling ----
