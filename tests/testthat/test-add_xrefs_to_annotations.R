@@ -218,7 +218,8 @@ test_that("add_xrefs_to_annotations errors on invalid results_list", {
       list(full = NULL, filtered = NULL),
       "dummy.tsv.gz"
     ),
-    "results_list must be a list with elements"
+    "results_list must be a list with elements",
+    class = "tima_validation_error"
   )
 })
 
@@ -269,7 +270,8 @@ test_that("add_xrefs_to_annotations errors on malformed xrefs", {
 
   expect_error(
     add_xrefs_to_annotations(results_list, xrefs_file),
-    "xrefs file must contain columns"
+    "xrefs file must contain",
+    class = "tima_validation_error"
   )
 })
 

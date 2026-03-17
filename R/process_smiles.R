@@ -55,11 +55,13 @@ process_smiles <- function(
 
   # Validate column exists
   if (!smiles_colname %in% names(df)) {
-    stop(
-      "Column '",
-      smiles_colname,
-      "' not found in data frame",
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "column not found in data frame",
+        "x" = smiles_colname
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -123,10 +125,13 @@ process_smiles <- function(
       reticulate::py$process_smiles(input_smi_file, output_csv_file)
     },
     error = function(e) {
-      stop(
-        "RDKit SMILES processing failed: ",
-        conditionMessage(e),
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "rdkit smiles processing failed",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
       )
     }
   )
@@ -181,10 +186,13 @@ load_python_smiles_processor <- function() {
         "Failed to load Python processor: %s",
         conditionMessage(e)
       )
-      stop(
-        "Cannot load Python SMILES processor: ",
-        conditionMessage(e),
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "cannot load python smiles processor",
+          "x" = conditionMessage(e)
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
       )
     }
   )

@@ -102,7 +102,8 @@ test_that("read_from_sirius_zip validates sirius_zip parameter", {
 test_that("read_from_sirius_zip validates file existence", {
   expect_error(
     read_from_sirius_zip(sirius_zip = "nonexistent.zip", file = "test"),
-    "SIRIUS zip file not found"
+    "SIRIUS zip file not found",
+    class = "tima_validation_error"
   )
 })
 
@@ -152,7 +153,8 @@ test_that("read_from_sirius_zip filters empty files", {
       sirius_zip = test_zip$zip_file,
       file = "_empty"
     ),
-    "No matching file found"
+    "No matching file found",
+    class = "tima_runtime_error"
   )
 })
 
@@ -192,7 +194,8 @@ test_that("read_from_sirius_zip handles non-matching patterns", {
       sirius_zip = test_zip$zip_file,
       file = "nonexistent_pattern"
     ),
-    "No matching file found"
+    "No matching file found",
+    class = "tima_runtime_error"
   )
 })
 
@@ -212,7 +215,8 @@ test_that("read_from_sirius_zip handles empty zip archive", {
 
   expect_error(
     read_from_sirius_zip(sirius_zip = empty_zip, file = "test"),
-    "No matching file found"
+    "No matching file found",
+    class = "tima_runtime_error"
   )
 })
 

@@ -33,7 +33,14 @@ read_from_sirius_zip <- function(sirius_zip, file) {
 
   # Validate file exists
   if (!file.exists(sirius_zip)) {
-    stop("SIRIUS zip file not found: ", sirius_zip, call. = FALSE)
+    cli::cli_abort(
+      c(
+        "SIRIUS zip file not found",
+        "x" = sirius_zip
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # List archive contents and filter
@@ -54,11 +61,14 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     utils::head(n = 1L)
 
   if (length(matching_file) == 0L) {
-    stop(
-      "No matching file found for pattern '",
-      file,
-      "' in archive: ",
-      sirius_zip
+    cli::cli_abort(
+      c(
+        "No matching file found in archive",
+        "x" = paste0("pattern=", file),
+        "i" = sirius_zip
+      ),
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
     )
   }
 

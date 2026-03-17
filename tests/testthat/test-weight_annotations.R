@@ -79,7 +79,8 @@ test_that("weight_annotations() validates required file existence", {
       output = tempfile(),
       pattern = "test"
     ),
-    "Required file.*not found"
+    "Required file.*not found",
+    class = "tima_validation_error"
   )
 })
 
@@ -104,7 +105,8 @@ test_that("weight_annotations() validates weight sum", {
       weight_biological = 0.5, # Sum = 1.5, invalid
       pattern = "test"
     ),
-    "Weights must sum to 1"
+    "Weights must sum to 1",
+    class = "tima_validation_error"
   )
 })
 
@@ -155,7 +157,8 @@ test_that("weight_annotations() rejects negative weights", {
       weight_biological = 0.5,
       pattern = "test"
     ),
-    "must be non-negative"
+    "must be non-negative",
+    class = "tima_validation_error"
   )
 })
 
