@@ -72,18 +72,33 @@ prepare_annotations_spectra <- function(
 
   # Validate input files
   if (!is.character(input) || length(input) == 0L) {
-    stop("input must be a non-empty character vector")
+    cli::cli_abort(
+      "input must be a non-empty character vector",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Vectorized file existence check
   missing_files <- input[!file.exists(input)]
   if (length(missing_files) > 0L) {
-    stop("Input file(s) not found: ", paste(missing_files, collapse = ", "))
+    cli::cli_abort(
+      c(
+        "input file(s) not found",
+        "x" = paste(missing_files, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate output
   if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string")
+    cli::cli_abort(
+      "output must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate structure file paths
@@ -102,9 +117,13 @@ prepare_annotations_spectra <- function(
   str_files_vec <- unlist(str_files)
   missing_str_files <- str_files_vec[!file.exists(str_files_vec)]
   if (length(missing_str_files) > 0L) {
-    stop(
-      "Structure file(s) not found: ",
-      paste(missing_str_files, collapse = ", ")
+    cli::cli_abort(
+      c(
+        "structure file(s) not found",
+        "x" = paste(missing_str_files, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

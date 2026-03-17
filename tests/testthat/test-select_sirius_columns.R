@@ -17,12 +17,14 @@ test_that("test-select_sirius_columns_canopus validates sirius_version", {
 
   expect_error(
     select_sirius_columns_canopus(df = df, sirius_version = "7"),
-    "sirius_version must be '5' or '6'"
+    "sirius_version must be '5' or '6'",
+    class = "tima_validation_error"
   )
 
   expect_error(
     select_sirius_columns_canopus(df = df, sirius_version = "invalid"),
-    "sirius_version must be '5' or '6'"
+    "sirius_version must be '5' or '6'",
+    class = "tima_validation_error"
   )
 })
 

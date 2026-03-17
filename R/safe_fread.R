@@ -106,7 +106,11 @@ safe_fread <- function(
         )
       }
 
-      stop(msg, call. = FALSE)
+      cli::cli_abort(
+        msg,
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
     }
   )
 
