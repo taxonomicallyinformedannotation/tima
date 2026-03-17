@@ -6,14 +6,16 @@
 test_that("harmonize_names_sirius requires input", {
   expect_error(
     harmonize_names_sirius(),
-    "must be provided"
+    "must be provided",
+    class = "tima_validation_error"
   )
 })
 
 test_that("harmonize_names_sirius handles NULL", {
   expect_error(
     harmonize_names_sirius(NULL),
-    "must be provided"
+    "must be provided",
+    class = "tima_validation_error"
   )
 })
 

@@ -50,7 +50,11 @@ test_that("normalize_rt_to_minutes coerces character to numeric", {
 })
 
 test_that("normalize_rt_to_minutes errors on non-numeric non-character", {
-  expect_error(normalize_rt_to_minutes(list(1, 2), quiet = TRUE), "numeric")
+  expect_error(
+    normalize_rt_to_minutes(list(1, 2), quiet = TRUE),
+    "numeric",
+    class = "tima_validation_error"
+  )
 })
 
 test_that("normalize_rt_to_minutes: min > 2 triggers seconds detection", {

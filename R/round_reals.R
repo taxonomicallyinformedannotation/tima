@@ -48,10 +48,10 @@ round_reals <- function(
       dig < 0 ||
       (dig %% 1) != 0
   ) {
-    stop(
-      "dig must be a non-negative integer (>= 0), got: ",
-      dig,
-      call. = FALSE
+    cli::cli_abort(
+      "dig must be a non-negative integer (>= 0), got {.val {dig}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

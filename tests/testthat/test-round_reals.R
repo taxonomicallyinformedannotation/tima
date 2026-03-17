@@ -43,9 +43,21 @@ test_that("round_reals returns df unchanged when no columns match", {
 
 test_that("round_reals rejects invalid dig", {
   df <- data.frame(structure_exact_mass = 1.0)
-  expect_error(round_reals(df, dig = -1), "non-negative")
-  expect_error(round_reals(df, dig = "5"), "non-negative integer")
-  expect_error(round_reals(df, dig = 2.5), "non-negative integer")
+  expect_error(
+    round_reals(df, dig = -1),
+    "non-negative",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    round_reals(df, dig = "5"),
+    "non-negative integer",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    round_reals(df, dig = 2.5),
+    "non-negative integer",
+    class = "tima_validation_error"
+  )
 })
 
 test_that("round_reals rejects non-data-frame input", {

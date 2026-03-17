@@ -24,7 +24,11 @@ normalize_rt_to_minutes <- function(
   }
 
   if (!is.numeric(rt_vec)) {
-    stop("rt_vec must be coercible to numeric", call. = FALSE)
+    cli::cli_abort(
+      "rt_vec must be coercible to numeric",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
   if (length(rt_vec) == 0L) {
     return(rt_vec)
