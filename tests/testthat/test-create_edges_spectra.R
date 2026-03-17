@@ -68,6 +68,57 @@ test_that("create_edges_spectra validates dalton parameter", {
   )
 })
 
+test_that("create_edges_spectra validates method parameter", {
+  mgf_file <- tempfile(fileext = ".mgf")
+  writeLines(
+    c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS"),
+    mgf_file
+  )
+
+  expect_error(
+    create_edges_spectra(input = mgf_file, method = "unknown_method"),
+    "method"
+  )
+})
+
+test_that("create_edges_spectra validates cutoff parameter", {
+  mgf_file <- tempfile(fileext = ".mgf")
+  writeLines(
+    c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS"),
+    mgf_file
+  )
+
+  expect_error(
+    create_edges_spectra(input = mgf_file, cutoff = -0.5),
+    "cutoff"
+  )
+})
+
+test_that("create_edges_spectra validates output parameter", {
+  mgf_file <- tempfile(fileext = ".mgf")
+  writeLines(
+    c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS"),
+    mgf_file
+  )
+
+  expect_error(
+    create_edges_spectra(input = mgf_file, output = 123),
+    "output must be a single character string"
+  )
+})
+
+test_that("create_edges_spectra validates list input file entries", {
+  expect_error(
+    create_edges_spectra(input = list(1, 2)),
+    "All input elements must be character strings"
+  )
+
+  expect_error(
+    create_edges_spectra(input = list("missing_a.mgf", "missing_b.mgf")),
+    "Input file\\(s\\) not found"
+  )
+})
+
 test_that("create_edges_spectra checks input file exists", {
   expect_error(
     create_edges_spectra(input = "nonexistent.mgf"),
@@ -239,4 +290,76 @@ test_that("create_edges_spectra handles invalid MGF format", {
     create_edges_spectra(input = mgf_file),
     "Spectra': 'data' must be of a vector type, was 'NULL'"
   )
+})
+
+test_that("create_edges_spectra completes downstream edge-building with mocked spectra", {
+  input_file <- tempfile(fileext = ".mgf")
+  writeLines("BEGIN IONS\nEND IONS", input_file)
+  query_mats <- list(
+    matrix(c(50, 10, 75, 20), ncol = 2, byrow = TRUE),
+    matrix(c(50, 15, 80, 30), ncol = 2, byrow = TRUE)
+  )
+  mock_spectra <- Spectra::Spectra(
+    object = data.frame(
+      msLevel = c(2L, 2L),
+      precursorMz = c(100, 110)
+    )
+  )
+  mock_spectra@backend@peaksData <- query_mats
+  exported <- new.env(parent = emptyenv())
+  exported$data <- NULL
+  exported$file <- NULL
+
+  local_mocked_bindings(
+    get_params = function(step) list(),
+    import_spectra = function(input, cutoff, dalton, ppm) mock_spectra,
+    create_edges = function(
+      frags,
+      nspecs,
+      precs,
+      method,
+      ms2_tolerance,
+      ppm_tolerance,
+      threshold,
+      matched_peaks
+    ) {
+      tidytable::tidytable(
+        feature_id = 1L,
+        target_id = 2L,
+        score = 0.91,
+        matched_peaks = 2L
+      )
+    },
+    get_spectra_ids = function(x) c("F1", "F2"),
+    export_params = function(parameters, step) invisible(NULL),
+    export_output = function(x, file) {
+      exported$data <- x
+      exported$file <- file
+      invisible(file)
+    },
+    log_complete = function(ctx, ...) invisible(NULL)
+  )
+
+  out <- create_edges_spectra(
+    input = input_file,
+    output = "mock_edges.tsv",
+    name_source = "CLUSTERID1",
+    name_target = "CLUSTERID2",
+    method = "gnps",
+    threshold = 0.2,
+    matched_peaks = 1,
+    ppm = 10,
+    dalton = 0.01,
+    cutoff = NULL
+  )
+
+  expect_identical(out, "mock_edges.tsv")
+  expect_identical(exported$file, "mock_edges.tsv")
+  expect_true(all(c("CLUSTERID1", "CLUSTERID2") %in% names(exported$data)))
+  expect_true(all(
+    c("feature_spectrum_entropy", "feature_spectrum_peaks") %in%
+      names(exported$data)
+  ))
+  expect_true(any(exported$data$CLUSTERID1 == "F1"))
+  expect_true(any(exported$data$CLUSTERID2 == "F2"))
 })

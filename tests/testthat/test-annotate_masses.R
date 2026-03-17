@@ -322,6 +322,57 @@ test_that("annotate_masses validates file existence", {
 
 ## Edge Cases and Empty Input Tests ----
 
+test_that("annotate_masses returns empty outputs for an empty features table", {
+  seen <- new.env(parent = emptyenv())
+  seen$exports <- list()
+
+  local_mocked_bindings(
+    log_operation = function(...) list(id = "annotate_masses_ctx"),
+    sanitize_all_inputs = function(features_file = NULL, ...) invisible(NULL),
+    validate_ms_mode = function(ms_mode) invisible(NULL),
+    validate_tolerances = function(...) invisible(NULL),
+    validate_adduct_list = function(...) invisible(NULL),
+    validate_file_existence = function(...) invisible(NULL),
+    safe_fread = function(file, file_type, required_cols = NULL, ...) {
+      data.frame(feature_id = character())
+    },
+    export_output = function(x, file) {
+      seen$exports[[length(seen$exports) + 1L]] <- list(x = x, file = file)
+      invisible(file)
+    }
+  )
+
+  result <- annotate_masses(
+    features = "features.tsv",
+    library = "library.tsv",
+    str_stereo = "stereo.tsv",
+    str_met = "metadata.tsv",
+    str_nam = "names.tsv",
+    str_tax_cla = "cla.tsv",
+    str_tax_npc = "npc.tsv",
+    output_annotations = "annotations.tsv",
+    output_edges = "edges.tsv",
+    adducts_list = list(pos = c("[M+H]+")),
+    clusters_list = list(pos = c("[M]")),
+    neutral_losses_list = c("H2O"),
+    ms_mode = "pos",
+    tolerance_ppm = 10,
+    tolerance_rt = 0.02
+  )
+
+  expect_identical(
+    unname(result),
+    c("annotations.tsv", "edges.tsv")
+  )
+  expect_length(seen$exports, 2L)
+  expect_identical(seen$exports[[1L]]$file, "annotations.tsv")
+  expect_identical(seen$exports[[2L]]$file, "edges.tsv")
+  expect_equal(nrow(seen$exports[[1L]]$x), 0L)
+  expect_true(all(
+    c("CLUSTERID1", "CLUSTERID2", "label") %in% names(seen$exports[[2L]]$x)
+  ))
+})
+
 test_that("annotate_masses handles empty features table", {
   local_quiet_logging()
 

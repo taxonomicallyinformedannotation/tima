@@ -101,4 +101,3 @@ run_shiny_app <- function(appDir, port, host, launch.browser) {
     launch.browser = launch.browser
   )
 }
-
