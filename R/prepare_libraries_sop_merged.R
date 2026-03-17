@@ -22,12 +22,20 @@ validate_sop_merged_inputs <- function(
       length(files) < 1L ||
       anyNA(files)
   ) {
-    stop("files must be a non-empty character vector", call. = FALSE)
+    cli::cli_abort(
+      "files must be a non-empty character vector",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate filter parameter
   if (!is.logical(filter) || length(filter) != 1L) {
-    stop("filter must be a single logical value (TRUE/FALSE)", call. = FALSE)
+    cli::cli_abort(
+      "filter must be a single logical value (TRUE/FALSE)",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate output paths
@@ -60,17 +68,23 @@ validate_sop_merged_inputs <- function(
     )
 
     if (!level %in% valid_levels) {
-      stop(
-        "level must be one of: ",
-        paste(valid_levels, collapse = ", "),
-        ". Got: ",
-        level,
-        call. = FALSE
+      cli::cli_abort(
+        c(
+          "level must be one of the supported taxonomic ranks",
+          "x" = paste(valid_levels, collapse = ", "),
+          "i" = paste0("got: ", level)
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
 
     if (!is.character(value) || length(value) != 1L) {
-      stop("value must be a single character string", call. = FALSE)
+      cli::cli_abort(
+        "value must be a single character string",
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
     }
   }
 
@@ -161,7 +175,14 @@ apply_taxonomic_filter <- function(
   )]
 
   if (length(level_col) == 0) {
-    stop("No column found matching level: ", level, call. = FALSE)
+    cli::cli_abort(
+      c(
+        "no column found matching requested taxonomic level",
+        "x" = level
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   table_keys_filtered <- table_keys_filtered |>
@@ -179,13 +200,15 @@ apply_taxonomic_filter <- function(
     tidytable::distinct()
 
   if (nrow(table_keys_filtered) == 0) {
-    stop(
-      "Filter led to no entries. Level: ",
-      level,
-      ", Value: ",
-      value,
-      ". Try different criteria.",
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "filter led to no entries",
+        "x" = paste0("level: ", level),
+        "i" = paste0("value: ", value),
+        "i" = "try different filter criteria"
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

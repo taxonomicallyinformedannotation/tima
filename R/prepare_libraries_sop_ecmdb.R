@@ -36,11 +36,19 @@ prepare_libraries_sop_ecmdb <- function(
 ) {
   # Validate inputs
   if (!is.character(input) || length(input) != 1L) {
-    stop("input must be a single character string")
+    cli::cli_abort(
+      "input must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string")
+    cli::cli_abort(
+      "output must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   log_info("Preparing ECMDB structure-organism pairs")

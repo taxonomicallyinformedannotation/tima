@@ -103,19 +103,22 @@ test_that("create_edges_spectra validates output parameter", {
 
   expect_error(
     create_edges_spectra(input = mgf_file, output = 123),
-    "output must be a single character string"
+    "output must be a single character string",
+    class = "tima_validation_error"
   )
 })
 
 test_that("create_edges_spectra validates list input file entries", {
   expect_error(
     create_edges_spectra(input = list(1, 2)),
-    "All input elements must be character strings"
+    "all input elements must be character strings",
+    class = "tima_validation_error"
   )
 
   expect_error(
     create_edges_spectra(input = list("missing_a.mgf", "missing_b.mgf")),
-    "Input file\\(s\\) not found"
+    "input file\\(s\\) not found",
+    class = "tima_validation_error"
   )
 })
 

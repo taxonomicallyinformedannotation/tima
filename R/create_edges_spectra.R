@@ -127,31 +127,52 @@ create_edges_spectra <- function(
 
   # Validate output path
   if (!is.character(output) || length(output) != 1L) {
-    stop("output must be a single character string")
+    cli::cli_abort(
+      "output must be a single character string",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Validate input file paths
   if (is.list(input)) {
     input_vec <- unlist(input)
     if (!is.character(input_vec)) {
-      stop("All input elements must be character strings")
+      cli::cli_abort(
+        "all input elements must be character strings",
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
     }
 
     missing_files <- input_vec[!file.exists(input_vec)]
     if (length(missing_files) > 0L) {
-      stop(
-        "Input file(s) not found: ",
-        paste(missing_files, collapse = ", ")
+      cli::cli_abort(
+        c(
+          "input file(s) not found",
+          "x" = paste(missing_files, collapse = ", ")
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
   } else {
     if (!is.character(input) || length(input) != 1L) {
-      stop(
-        "input must be a single character string or a list of character strings"
+      cli::cli_abort(
+        "input must be a single character string or a list of character strings",
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
       )
     }
     if (!file.exists(input)) {
-      stop("Input file not found: ", input)
+      cli::cli_abort(
+        c(
+          "input file not found",
+          "x" = input
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
     }
   }
 

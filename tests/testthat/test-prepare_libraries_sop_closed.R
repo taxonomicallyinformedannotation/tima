@@ -8,7 +8,8 @@ test_that("prepare_libraries_sop_closed validates input parameter", {
       input = NULL,
       output = temp_test_path("out.tsv")
     ),
-    "input must be a single character string"
+    "input must be a single character string",
+    class = "tima_validation_error"
   )
 
   expect_error(
@@ -16,7 +17,8 @@ test_that("prepare_libraries_sop_closed validates input parameter", {
       input = 123,
       output = temp_test_path("out.tsv")
     ),
-    "input must be a single character string"
+    "input must be a single character string",
+    class = "tima_validation_error"
   )
 
   expect_error(
@@ -24,7 +26,8 @@ test_that("prepare_libraries_sop_closed validates input parameter", {
       input = c("file1", "file2"),
       output = temp_test_path("out.tsv")
     ),
-    "input must be a single character string"
+    "input must be a single character string",
+    class = "tima_validation_error"
   )
 })
 
@@ -34,12 +37,14 @@ test_that("prepare_libraries_sop_closed validates output parameter", {
 
   expect_error(
     prepare_libraries_sop_closed(input = temp_input, output = NULL),
-    "output must be a single character string"
+    "output must be a single character string",
+    class = "tima_validation_error"
   )
 
   expect_error(
     prepare_libraries_sop_closed(input = temp_input, output = 123),
-    "output must be a single character string"
+    "output must be a single character string",
+    class = "tima_validation_error"
   )
 })
 
