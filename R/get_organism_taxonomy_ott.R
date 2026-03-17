@@ -158,11 +158,19 @@ get_organism_taxonomy_ott <- function(
 ) {
   # Validate inputs
   if (missing(df) || !is.data.frame(df)) {
-    stop("Input 'df' must be a data frame")
+    cli::cli_abort(
+      "input 'df' must be a data frame",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (!"organism" %in% names(df)) {
-    stop("Data frame must contain an 'organism' column")
+    cli::cli_abort(
+      "data frame must contain an 'organism' column",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   n_organisms <- nrow(df)

@@ -90,18 +90,20 @@ calculate_entropy_and_similarity <- function(
     length(lib_ids) != length(lib_spectra) ||
       length(lib_ids) != length(lib_precursors)
   ) {
-    stop(
+    cli::cli_abort(
       "lib_ids, lib_precursors, and lib_spectra must have the same length",
-      call. = FALSE
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
   if (
     length(query_ids) != length(query_spectra) ||
       length(query_ids) != length(query_precursors)
   ) {
-    stop(
+    cli::cli_abort(
       "query_ids, query_precursors, and query_spectra must have the same length",
-      call. = FALSE
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
   assert_scalar_numeric(dalton, "dalton", min = 0, max = Inf)

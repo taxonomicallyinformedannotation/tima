@@ -2,6 +2,22 @@
 
 library(testthat)
 
+test_that("get_organism_taxonomy_ott validates df input", {
+  expect_error(
+    get_organism_taxonomy_ott(df = 1),
+    "must be a data frame",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("get_organism_taxonomy_ott requires organism column", {
+  expect_error(
+    get_organism_taxonomy_ott(df = data.frame(x = "Homo sapiens")),
+    "must contain an 'organism' column",
+    class = "tima_validation_error"
+  )
+})
+
 test_that("get_organism_taxonomy_ott works with valid organism", {
   fake_taxon_df <- data.frame("organism" = "Gentiana lutea")
 

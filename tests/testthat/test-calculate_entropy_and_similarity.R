@@ -169,7 +169,9 @@ test_that("mismatched lib_ids / lib_spectra length errors", {
       ppm = 10,
       threshold = 0,
       approx = TRUE
-    )
+    ),
+    "must have the same length",
+    class = "tima_validation_error"
   )
 })
 
