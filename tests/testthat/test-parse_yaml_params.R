@@ -5,7 +5,19 @@ library(testthat)
 test_that("parse_yaml_params errors if default file missing", {
   expect_error(
     parse_yaml_params(def = temp_test_path("missing.yaml"), usr = NULL),
-    "not found"
+    "not found",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("parse_yaml_params errors on invalid default YAML", {
+  def_file <- temp_test_path("broken_default.yaml")
+  writeLines("a: [", def_file)
+
+  expect_error(
+    parse_yaml_params(def = def_file, usr = NULL),
+    "failed to parse default YAML file",
+    class = "tima_runtime_error"
   )
 })
 

@@ -63,7 +63,7 @@ To ensure optimal reproducibility and avoiding re-computing endlessly steps that
 Each step of the whole pipeline will be described next.
 
 
-```{r targets, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+```{r targets, echo=FALSE, eval=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 try(
   expr = {
     library(targets)

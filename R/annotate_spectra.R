@@ -124,7 +124,11 @@ annotate_spectra <- function(
   input_vec <- normalize_input_files(input, "Input")
   libs_vec <- normalize_input_files(libraries, "Library")
   if (length(libs_vec) == 0L) {
-    stop("At least one library must be provided", call. = FALSE)
+    cli::cli_abort(
+      "at least one library must be provided",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   # Pre-flight data sanitizing for MGF files
@@ -140,18 +144,24 @@ annotate_spectra <- function(
 
   missing_in <- input_vec[!file.exists(input_vec)]
   if (length(missing_in)) {
-    stop(
-      "Input file(s) not found: ",
-      paste(missing_in, collapse = ", "),
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "input file(s) not found",
+        "x" = paste(missing_in, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
   missing_lib <- libs_vec[!file.exists(libs_vec)]
   if (length(missing_lib)) {
-    stop(
-      "Library file(s) not found: ",
-      paste(missing_lib, collapse = ", "),
-      call. = FALSE
+    cli::cli_abort(
+      c(
+        "library file(s) not found",
+        "x" = paste(missing_lib, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
