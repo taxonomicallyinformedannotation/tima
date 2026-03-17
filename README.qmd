@@ -12,7 +12,7 @@ bibliography: ../grateful-refs.bib
 <!-- badges: start -->
 
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN status](https://www.r-pkg.org/badges/version/tima)](https://CRAN.R-project.org/package=tima)
+<!-- [![CRAN status](https://www.r-pkg.org/badges/version/tima)](https://CRAN.R-project.org/package=tima) -->
 [![R-CMD-check](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima)
 [![r-universe badge](https://taxonomicallyinformedannotation.r-universe.dev/tima/badges/version?&color=blue&style=classic)](https://taxonomicallyinformedannotation.r-universe.dev/tima)

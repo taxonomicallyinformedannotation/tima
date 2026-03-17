@@ -8,8 +8,7 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN
-status](https://www.r-pkg.org/badges/version/tima.png)](https://CRAN.R-project.org/package=tima)
+<!-- [![CRAN status](https://www.r-pkg.org/badges/version/tima)](https://CRAN.R-project.org/package=tima) -->
 [![R-CMD-check](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima)
@@ -245,6 +244,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | IRanges | 2.44.0 | Lawrence et al. (2013) |
 | knitr | 1.51 | Xie (2014); Xie (2015); Xie (2025) |
 | lgr | 0.5.2 | Fleck (2025) |
+| lifecycle | 1.0.5 | (**lifecycle?**) |
 | MetaboCoreUtils | 1.18.1 | Rainer et al. (2022a) |
 | MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
 | MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
@@ -266,7 +266,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | tidyselect | 1.2.1 | Henry and Wickham (2024) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
-| tima | 2.12.0 | Rutz et al. (2019); Rutz and Allard (2025) |
+| tima | 2.12.0.9000 | Rutz et al. (2019); Rutz and Allard (2025) |
 | withr | 3.0.2 | Hester et al. (2024) |
 | yaml | 2.3.12 | Stephens and Simonov (2025) |
 
