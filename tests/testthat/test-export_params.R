@@ -9,7 +9,11 @@ test_that("export_params function exists", {
 
 test_that("export_params raises classed runtime error when write fails", {
   local_mocked_bindings(
-    write_yaml = function(...) {
+    write_yaml = function(x, file, ...) {
+      force(x)
+      force(file)
+      unused_dots <- list(...)
+      invisible(unused_dots)
       stop("mock write failure")
     },
     .package = "yaml"

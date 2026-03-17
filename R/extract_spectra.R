@@ -46,9 +46,10 @@
 extract_spectra <- function(object) {
   # Input Validation ----
   if (!inherits(object, "Spectra")) {
-    stop(
-      "Input must be a Spectra object from the Spectra package",
-      call. = FALSE
+    cli::cli_abort(
+      "input must be a Spectra object from the Spectra package",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 

@@ -5,17 +5,20 @@ library(testthat)
 test_that("extract_spectra validates input is Spectra object", {
   expect_error(
     extract_spectra(object = data.frame()),
-    "Input must be a Spectra object"
+    "input must be a Spectra object",
+    class = "tima_validation_error"
   )
 
   expect_error(
     extract_spectra(object = list()),
-    "Input must be a Spectra object"
+    "input must be a Spectra object",
+    class = "tima_validation_error"
   )
 
   expect_error(
     extract_spectra(object = NULL),
-    "Input must be a Spectra object"
+    "input must be a Spectra object",
+    class = "tima_validation_error"
   )
 })
 
