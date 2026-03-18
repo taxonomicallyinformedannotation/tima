@@ -202,3 +202,23 @@ test_that("unsanitized query spectrum is sanitized on demand without error", {
   })
   expect_s3_class(out, "data.frame")
 })
+
+test_that("degenerate library spectra are ignored even at zero threshold", {
+  lib_bad <- matrix(numeric(0), ncol = 2)
+  out <- calculate_entropy_and_similarity(
+    lib_ids = 1L,
+    lib_precursors = 61.0,
+    lib_spectra = list(lib_bad),
+    query_ids = 1L,
+    query_precursors = 61.0,
+    query_spectra = list(sp_acetic),
+    method = "cosine",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0,
+    approx = TRUE
+  )
+
+  expect_s3_class(out, "data.frame")
+  expect_true(all(is.na(out$candidate_score_similarity)))
+})

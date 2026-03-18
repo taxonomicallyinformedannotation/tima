@@ -132,11 +132,22 @@ summarize_results <- function(
     "annotation_note"
   ))
 
-  # Join smaller tables first, then select columns early
-  # This reduces the amount of data carried through the pipeline
-  df_joined <- features_table |>
-    tidytable::left_join(y = components_table) |>
-    tidytable::left_join(y = df) |>
+  features_min <- features_table |>
+    tidytable::select(
+      tidyselect::any_of(c("feature_id", "rt", "mz"))
+    ) |>
+    tidytable::distinct(feature_id, .keep_all = TRUE)
+
+  components_min <- components_table |>
+    tidytable::select(
+      tidyselect::any_of(c("feature_id", model$components_columns))
+    ) |>
+    tidytable::distinct(feature_id, .keep_all = TRUE)
+
+  # Start from annotation rows and add compact per-feature metadata.
+  df_joined <- df |>
+    tidytable::left_join(y = features_min, by = "feature_id") |>
+    tidytable::left_join(y = components_min, by = "feature_id") |>
     tidytable::select(tidyselect::any_of(x = select_cols)) |>
     tidytable::distinct() |>
     tidytable::left_join(y = organism_lookup) |>
@@ -207,32 +218,24 @@ summarize_results <- function(
 
   # gc()
 
-  # Final processing: convert to character, trim, handle NAs
-  # But preserve numeric types for feature-related columns that might be used in joins
-  numeric_feature_cols <- colnames(df_final)[
-    grepl("^feature_", colnames(df_final)) &
-      sapply(X = df_final, FUN = is.numeric)
-  ]
-
-  cols_to_character <- setdiff(colnames(df_final), numeric_feature_cols)
+  # Trim only character/factor fields to avoid full-table coercion copies.
+  text_cols <- colnames(df_final)[vapply(
+    X = df_final,
+    FUN = function(x) is.character(x) || is.factor(x),
+    FUN.VALUE = logical(1L)
+  )]
 
   df_processed <- df_final |>
     tidytable::mutate(
       tidytable::across(
-        .cols = tidyselect::all_of(x = cols_to_character),
+        .cols = tidyselect::all_of(x = text_cols),
         .fns = as.character
       )
     ) |>
     tidytable::mutate(
       tidytable::across(
-        .cols = tidyselect::where(fn = is.character),
+        .cols = tidyselect::all_of(x = text_cols),
         .fns = ~ tidytable::na_if(x = trimws(.x), y = "")
-      )
-    ) |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidyselect::any_of(x = numeric_feature_cols),
-        .fns = as.numeric
       )
     ) |>
     tidytable::select(tidyselect::any_of(x = final_select_cols))
@@ -245,28 +248,25 @@ summarize_results <- function(
     df_processed$candidate_structure_inchikey_connectivity_layer
   )
 
-  results <- tidytable::bind_rows(
-    # Features with structures
-    df_processed |>
-      tidytable::filter(has_structure),
-
-    # Features without structures - add consensus
-    df_processed |>
-      tidytable::filter(!has_structure) |>
-      tidytable::distinct(tidyselect::any_of(x = model$features_columns)) |>
-      tidytable::left_join(y = feature_consensus_table) |>
-      tidytable::select(
-        tidyselect::any_of(
-          x = c(
-            model$features_columns,
-            model$features_calculated_columns,
-            model$components_columns,
-            # TODO
-            "annotation_note"
-          )
+  results_with_structure <- df_processed[has_structure, , drop = FALSE]
+  results_without_structure <- df_processed[!has_structure, , drop = FALSE] |>
+    tidytable::distinct(tidyselect::any_of(x = model$features_columns)) |>
+    tidytable::left_join(y = feature_consensus_table) |>
+    tidytable::select(
+      tidyselect::any_of(
+        x = c(
+          model$features_columns,
+          model$features_calculated_columns,
+          model$components_columns,
+          "annotation_note"
         )
-      ) |>
-      tidytable::distinct()
+      )
+    ) |>
+    tidytable::distinct()
+
+  results <- tidytable::bind_rows(
+    results_with_structure,
+    results_without_structure
   ) |>
     tidytable::arrange(
       # Try to sort numerically if possible, otherwise alphabetically
@@ -279,15 +279,12 @@ summarize_results <- function(
   rm(df_processed)
 
   # Log percentage of annotated features based on final results
-  total_features <- results |>
-    tidytable::distinct(feature_id) |>
-    nrow()
-  annotated_features <- results |>
-    tidytable::filter(
-      !is.na(candidate_structure_inchikey_connectivity_layer)
-    ) |>
-    tidytable::distinct(feature_id) |>
-    nrow()
+  total_features <- length(unique(results$feature_id))
+  annotated_features <- length(unique(
+    results$feature_id[
+      !is.na(results$candidate_structure_inchikey_connectivity_layer)
+    ]
+  ))
   pct_annotated <- if (total_features > 0L) {
     100 * annotated_features / total_features
   } else {
