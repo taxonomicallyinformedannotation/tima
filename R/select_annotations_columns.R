@@ -80,6 +80,7 @@ select_annotations_columns <- function(
       )
     )
 
+  # Clean NULL/NA sentinels in one pass while preserving current output semantics.
   character_cols <- names(df)[vapply(df, is.character, logical(1L))]
   if (length(character_cols) > 0L) {
     df <- df |>
@@ -92,6 +93,11 @@ select_annotations_columns <- function(
   df <- df |>
     # Round numeric values
     round_reals() |>
+    # Convert all numeric to character for consistency
+    tidytable::mutate(tidytable::across(
+      .cols = tidyselect::where(fn = is.numeric),
+      .fns = as.character
+    )) |>
     # Complement with structure metadata
     complement_metadata_structures(
       str_stereo = str_stereo,
@@ -101,22 +107,13 @@ select_annotations_columns <- function(
       str_tax_npc = str_tax_npc
     )
 
-  numeric_cols <- names(df)[vapply(df, is.numeric, logical(1L))]
-  if (length(numeric_cols) > 0L) {
-    df <- df |>
-      tidytable::mutate(tidytable::across(
-        .cols = tidyselect::all_of(x = numeric_cols),
-        .fns = as.character
-      ))
-  }
-
   # log_trace("Output: ", nrow(df), " rows, ", ncol(df), " columns")
 
   return(df)
 }
 
 .normalize_annotation_text <- function(x) {
-  vals <- trimws(as.character(x))
+  vals <- trimws(x)
   vals[vals %in% c("N/A", "null", "")] <- NA_character_
   vals
 }
