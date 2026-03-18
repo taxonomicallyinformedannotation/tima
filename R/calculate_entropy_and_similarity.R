@@ -133,6 +133,7 @@ calculate_entropy_and_similarity <- function(
   lib_checked <- rep(FALSE, n_lib)
   query_sanitized <- logical(n_query)
   lib_sanitized <- logical(n_lib)
+  lib_entropy <- rep(NA_real_, n_lib)
 
   ensure_query_ready <- function(idx) {
     if (!query_checked[[idx]]) {
@@ -168,6 +169,15 @@ calculate_entropy_and_similarity <- function(
           ppm = ppm
         )
         lib_sanitized[[idx]] <<- TRUE
+      }
+      if (
+        is.matrix(lib_spectra[[idx]]) &&
+          nrow(lib_spectra[[idx]]) > 0L &&
+          ncol(lib_spectra[[idx]]) >= 2L
+      ) {
+        lib_entropy[[idx]] <<- msentropy::calculate_spectral_entropy(
+          lib_spectra[[idx]]
+        )
       }
       lib_checked[[idx]] <<- TRUE
     }
@@ -211,90 +221,72 @@ calculate_entropy_and_similarity <- function(
         return(NULL)
       }
 
-      # Ensure each library spectrum is sanitized at most once.
-      purrr::walk(lib_indices_sub, ensure_lib_ready)
-
-      lib_precursors_sub <- lib_precursors[lib_indices_sub]
-      lib_ids_sub <- lib_ids[lib_indices_sub]
-
-      # Calculate similarities
+      # Calculate similarities with pre-allocated vectors to reduce overhead.
+      n_candidates <- length(lib_indices_sub)
+      # Keep invalid/degenerate candidates as NA so they are never selected.
+      scores <- rep(NA_real_, n_candidates)
+      entropies <- rep(NA_real_, n_candidates)
+      matched_counts <- integer(n_candidates)
       use_gnps <- (method == "gnps")
       q_mz <- current_spectrum[, 1L]
 
-      similarities <- vapply(
-        X = seq_along(lib_indices_sub),
-        FUN = function(pos_idx) {
-          lib_idx <- lib_indices_sub[[pos_idx]]
-          lib_spectrum <- lib_spectra[[lib_idx]]
+      for (pos_idx in seq_len(n_candidates)) {
+        lib_idx <- lib_indices_sub[[pos_idx]]
+        lib_spectrum <- ensure_lib_ready(lib_idx)
 
-          # Guard: skip degenerate spectra
-          if (
-            !is.matrix(lib_spectrum) ||
-              nrow(lib_spectrum) == 0L ||
-              ncol(lib_spectrum) < 2L
-          ) {
-            return(list(score = 0, entropy = NA_real_, matched = 0L))
-          }
+        if (
+          !is.matrix(lib_spectrum) ||
+            nrow(lib_spectrum) == 0L ||
+            ncol(lib_spectrum) < 2L
+        ) {
+          next
+        }
 
-          if (use_gnps) {
-            res <- call_gnps(
-              current_spectrum,
-              lib_spectrum,
-              current_precursor,
-              lib_precursors_sub[[pos_idx]],
-              dalton,
-              ppm,
-              matchedPeaksCount = TRUE
-            )
-            score <- res[1L]
-            matched <- res[2L]
-          } else {
-            score <- calculate_similarity(
-              method = method,
-              query_spectrum = current_spectrum,
-              target_spectrum = lib_spectrum,
-              query_precursor = current_precursor,
-              target_precursor = lib_precursors_sub[[pos_idx]],
-              dalton = dalton,
-              ppm = ppm
-            )
-            matched <- .count_matched_peaks(
-              q_mz,
-              lib_spectrum[, 1L],
-              dalton,
-              ppm
-            )
-          }
-
-          entropy_target <- msentropy::calculate_spectral_entropy(lib_spectrum)
-
-          list(
-            score = as.numeric(score),
-            entropy = entropy_target,
-            matched = matched
+        target_precursor <- lib_precursors[[lib_idx]]
+        if (use_gnps) {
+          res <- call_gnps(
+            current_spectrum,
+            lib_spectrum,
+            current_precursor,
+            target_precursor,
+            dalton,
+            ppm,
+            matchedPeaksCount = TRUE
           )
-        },
-        FUN.VALUE = list(
-          score = numeric(1),
-          entropy = numeric(1),
-          matched = integer(1)
-        )
-      )
+          scores[[pos_idx]] <- as.numeric(res[[1L]])
+          matched_counts[[pos_idx]] <- as.integer(res[[2L]])
+        } else {
+          scores[[pos_idx]] <- as.numeric(calculate_similarity(
+            method = method,
+            query_spectrum = current_spectrum,
+            target_spectrum = lib_spectrum,
+            query_precursor = current_precursor,
+            target_precursor = target_precursor,
+            dalton = dalton,
+            ppm = ppm
+          ))
+          matched_counts[[pos_idx]] <- .count_matched_peaks(
+            q_mz,
+            lib_spectrum[, 1L],
+            dalton,
+            ppm
+          )
+        }
 
-      # Filter by threshold (guard against NA scores)
-      scores <- as.numeric(similarities[1L, ])
-      valid_indices <- which(scores >= threshold)
+        entropies[[pos_idx]] <- lib_entropy[[lib_idx]]
+      }
+
+      valid_indices <- which(!is.na(scores) & scores >= threshold)
 
       if (length(valid_indices) > 0L) {
         return(
           tidytable::tidytable(
             feature_id = current_id,
             precursorMz = current_precursor,
-            target_id = lib_ids_sub[valid_indices],
-            candidate_spectrum_entropy = similarities[2L, valid_indices],
+            target_id = lib_ids[lib_indices_sub[valid_indices]],
+            candidate_spectrum_entropy = entropies[valid_indices],
             candidate_score_similarity = scores[valid_indices],
-            candidate_count_similarity_peaks_matched = similarities[
-              3L,
+            candidate_count_similarity_peaks_matched = matched_counts[
               valid_indices
             ]
           )

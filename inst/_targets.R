@@ -1700,7 +1700,7 @@ list(
               threshold = par_ann_spe$similarities$thresholds$annotations,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-              qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
+              cutoff = par_ann_spe$ms$thresholds$ms2$intensity,
               approx = par_ann_spe$annotations$ms2approx
             )
           },
@@ -1730,7 +1730,7 @@ list(
               threshold = par_ann_spe$similarities$thresholds$annotations,
               ppm = par_ann_spe$ms$tolerances$mass$ppm$ms2,
               dalton = par_ann_spe$ms$tolerances$mass$dalton$ms2,
-              qutoff = par_ann_spe$ms$thresholds$ms2$intensity,
+              cutoff = par_ann_spe$ms$thresholds$ms2$intensity,
               approx = par_ann_spe$annotations$ms2approx
             )
           },
@@ -1814,7 +1814,7 @@ list(
           matched_peaks = par_cre_edg_spe$similarities$thresholds$matched_peaks,
           ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          qutoff = par_cre_edg_spe$ms$thresholds$ms2$intensity
+          cutoff = par_cre_edg_spe$ms$thresholds$ms2$intensity
         )
       },
       format = "file"
@@ -2415,7 +2415,7 @@ list(
           matched_peaks = benchmark_def_cre_edg_spe$similarities$thresholds$matched_peaks,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          qutoff = 0
+          cutoff = 0
         )
       }
     ),
@@ -2431,7 +2431,7 @@ list(
           matched_peaks = benchmark_def_cre_edg_spe$similarities$thresholds$matched_peaks,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          qutoff = 0
+          cutoff = 0
         )
       }
     ),
@@ -2551,7 +2551,7 @@ list(
           threshold = benchmark_def_ann_spe$similarities$thresholds$annotations,
           ppm = benchmark_def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_ann_spe$ms$tolerances$mass$dalton$ms2,
-          qutoff = 0,
+          cutoff = 0,
           approx = benchmark_def_ann_spe$annotations$ms2approx
         )
       }
@@ -2572,7 +2572,7 @@ list(
           threshold = benchmark_def_ann_spe$similarities$thresholds$annotations,
           ppm = benchmark_def_ann_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_ann_spe$ms$tolerances$mass$dalton$ms2,
-          qutoff = 0,
+          cutoff = 0,
           approx = benchmark_def_ann_spe$annotations$ms2approx
         )
       }

@@ -52,7 +52,7 @@ jobs:
           "https://bioc.r-universe.dev", "https://cloud.r-project.org"), type =
           "source")
 
-          tima::install()
+          tima::install_tima()
         shell: Rscript {0}
       - name: Install (MacOS and Windows)
         if: matrix.os != 'ubuntu-latest'
@@ -62,7 +62,7 @@ jobs:
           "https://bioc.r-universe.dev", "https://cloud.r-project.org"), type =
           "binary")
 
-          tima::install()
+          tima::install_tima()
         shell: Rscript {0}
       - name: Get example files
         run: |

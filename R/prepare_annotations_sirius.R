@@ -435,16 +435,22 @@ prepare_annotations_sirius <-
         tidytable::mutate(feature_id = mappingFeatureId) |>
         select_sirius_columns_structures(sirius_version = sirius_version)
       log_debug("Joining SIRIUS results")
-      table <- purrr::reduce(
-        .x = list(formulas_prepared, canopus_prepared, denovo_prepared),
-        .init = structures_prepared,
-        .f = tidytable::left_join
-      ) |>
-        tidytable::distinct() |>
+      table <- structures_prepared |>
+        tidytable::left_join(formulas_prepared) |>
+        tidytable::left_join(canopus_prepared) |>
+        tidytable::left_join(denovo_prepared) |>
         tidytable::mutate(
           candidate_structure_tax_cla_chemontid = NA_character_,
           candidate_structure_tax_cla_01kin = NA_character_
         )
+      rm(
+        canopus_prepared,
+        formulas_prepared,
+        structures_prepared,
+        denovo_prepared,
+        tables,
+        summaries
+      )
       log_debug("Selecting annotation columns and integrating metadata")
       table <- table |>
         select_annotations_columns(
