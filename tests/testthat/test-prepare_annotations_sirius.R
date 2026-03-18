@@ -495,3 +495,33 @@ test_that("load_sirius_summaries returns empty when no summary files", {
   out <- load_sirius_summaries("dummy.zip")
   expect_equal(nrow(out), 0L)
 })
+
+test_that("load_sirius_summaries loads and binds discovered summary files", {
+  local_mocked_bindings(
+    unzip = function(zipfile, list = FALSE, ...) {
+      if (isTRUE(list)) {
+        return(data.frame(
+          Name = c(
+            "dummy/feat1/structure_candidates.tsv",
+            "dummy/feat2/structure_candidates.tsv"
+          )
+        ))
+      }
+      invisible(NULL)
+    },
+    .package = "utils"
+  )
+  local_mocked_bindings(
+    read_from_sirius_zip = function(input_directory, file) {
+      if (grepl("feat1", file)) {
+        return(tidytable::tidytable(score = 0.9))
+      }
+      tidytable::tidytable(score = 0.8)
+    },
+    .package = "tima"
+  )
+
+  out <- load_sirius_summaries("dummy.zip")
+  expect_true("feature_id" %in% names(out))
+  expect_equal(nrow(out), 2L)
+})

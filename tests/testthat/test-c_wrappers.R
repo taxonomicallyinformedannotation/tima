@@ -147,3 +147,7 @@ test_that("gnps_chain_dp_wrapper validates matrix-like inputs", {
     )
   )
 })
+
+test_that("gnps_wrapper validates matrix-like inputs", {
+  expect_error(gnps_wrapper(c(1, 2, 3), sp_b))
+})

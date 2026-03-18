@@ -983,3 +983,56 @@ test_that("finalize_results backfills connectivity layer from inchikey", {
   )
   expect_equal(out$candidate_structure_smiles_no_stereo, "CCO")
 })
+
+test_that("finalize_results returns empty tidytable for empty similarity input", {
+  out <- finalize_results(
+    df_sim = tidytable::tidytable(),
+    meta = tidytable::tidytable(),
+    threshold = 0
+  )
+
+  expect_equal(nrow(out), 0L)
+})
+
+test_that("compute_similarity_safe returns empty table on calculation error", {
+  withr::local_dir(new = temp_test_dir("ann_spe_compute_safe"))
+  local_test_project(copy = TRUE)
+
+  query_path <- tempfile(fileext = ".mgf")
+  lib_path <- tempfile(fileext = ".mgf")
+  write_minimal_mgf(query_path, precursors = c(200))
+  write_minimal_mgf(lib_path, precursors = c(200))
+
+  query_sp <- import_spectra(
+    query_path,
+    cutoff = 0,
+    dalton = 0.01,
+    polarity = "pos",
+    ppm = 10
+  )
+  lib_sp <- import_spectra(
+    lib_path,
+    cutoff = 0,
+    dalton = 0.01,
+    polarity = "pos",
+    ppm = 10
+  )
+
+  local_mocked_bindings(
+    calculate_entropy_and_similarity = function(...) {
+      stop("forced similarity failure")
+    }
+  )
+
+  out <- compute_similarity_safe(
+    lib_sp = lib_sp,
+    query_sp = query_sp,
+    method = "gnps",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0,
+    approx = TRUE
+  )
+
+  expect_equal(nrow(out), 0L)
+})

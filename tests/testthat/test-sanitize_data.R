@@ -417,6 +417,22 @@ test_that("sanitize_sirius rejects non-zip regular files", {
   expect_true(any(grepl("not a directory or ZIP", result$issues)))
 })
 
+test_that("sanitize_sirius reports unzip extraction failures", {
+  bad_zip <- temp_test_path("broken.zip")
+  writeLines("not really a zip", bad_zip)
+
+  local_mocked_bindings(
+    unzip = function(zipfile, exdir = NULL, list = FALSE, ...) {
+      stop("mock unzip failure")
+    },
+    .package = "utils"
+  )
+
+  result <- sanitize_sirius(sirius_dir = bad_zip)
+  expect_false(result$valid)
+  expect_true(any(grepl("Failed to extract ZIP", result$issues)))
+})
+
 # test_that("sanitize_sirius detects SIRIUS v5 format", {
 #   sirius_dir <- temp_test_path("sirius_v5")
 #   dir.create(sirius_dir, recursive = TRUE)

@@ -1194,6 +1194,18 @@ test_that("sample_candidates_per_group handles missing RT column", {
   expect_true("annotation_notes" %in% names(out))
 })
 
+test_that("sample_candidates_per_group returns empty result for empty input", {
+  df <- tidytable::tidytable(
+    feature_id = character(0),
+    candidate_adduct = character(0),
+    rank_final = integer(0)
+  )
+
+  out <- sample_candidates_per_group(df = df, max_per_score = 1L)
+  expect_equal(nrow(out$df), 0L)
+  expect_equal(out$n_sampled_features, 0L)
+})
+
 test_that("build_mini_results_table appends xrefs and renames id columns", {
   features_table <- tidytable::tidytable(feature_id = "F1", rt = 1, mz = 100)
   df_classes_mini <- tidytable::tidytable(
