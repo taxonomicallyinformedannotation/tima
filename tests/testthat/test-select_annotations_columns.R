@@ -39,6 +39,81 @@ test_that("select_annotations_columns handles empty input", {
   expect_equal(nrow(result), 0)
 })
 
+test_that("select_annotations_columns cleans text sentinels and keeps expected columns", {
+  paths <- make_fake_struct_files()
+
+  local_mocked_bindings(
+    complement_metadata_structures = function(df, ...) {
+      invisible(list(...))
+      df
+    },
+    .package = "tima"
+  )
+
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F3"),
+    feature_spectrum_entropy = c(0.5, 0.9, 1.1),
+    candidate_structure_molecular_formula = c("N/A", "null", " C10H20 "),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2", "IK3"),
+    candidate_score_sirius_intensity = c(100, 200, 300)
+  )
+
+  result <- select_annotations_columns(
+    df = df,
+    str_stereo = paths$stereo,
+    str_met = paths$met,
+    str_nam = paths$nam,
+    str_tax_cla = paths$cla,
+    str_tax_npc = paths$npc
+  )
+
+  expect_equal(result$candidate_structure_molecular_formula[[1]], NA_character_)
+  expect_equal(result$candidate_structure_molecular_formula[[2]], NA_character_)
+  expect_equal(result$candidate_structure_molecular_formula[[3]], "C10H20")
+  expect_true(all(
+    c(
+      "feature_id",
+      "candidate_structure_molecular_formula",
+      "candidate_score_sirius_intensity"
+    ) %in%
+      names(result)
+  ))
+})
+
+test_that("select_annotations_columns converts numeric outputs to character once standardized", {
+  paths <- make_fake_struct_files()
+
+  local_mocked_bindings(
+    complement_metadata_structures = function(df, ...) {
+      invisible(list(...))
+      df
+    },
+    .package = "tima"
+  )
+
+  df <- tidytable::tidytable(
+    feature_id = "F1",
+    feature_spectrum_entropy = 0.5,
+    candidate_score_sirius_intensity = 100,
+    candidate_structure_exact_mass = 123.456789,
+    candidate_structure_inchikey_connectivity_layer = "IK1"
+  )
+
+  result <- select_annotations_columns(
+    df = df,
+    str_stereo = paths$stereo,
+    str_met = paths$met,
+    str_nam = paths$nam,
+    str_tax_cla = paths$cla,
+    str_tax_npc = paths$npc
+  )
+
+  expect_type(result$feature_spectrum_entropy, "character")
+  expect_type(result$candidate_score_sirius_intensity, "character")
+  expect_type(result$candidate_structure_exact_mass, "character")
+  expect_equal(result$candidate_structure_exact_mass, "123.45679")
+})
+
 # test_that(
 #   skip("Not implemented")
 # )

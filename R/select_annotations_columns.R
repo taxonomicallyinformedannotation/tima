@@ -78,27 +78,20 @@ select_annotations_columns <- function(
           model$candidates_structures_columns
         )
       )
-    ) |>
-    # Clean various NULL/NA representations
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(fn = is.character),
-      .fns = ~ tidytable::na_if(x = .x, y = "N/A")
-    )) |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(fn = is.character),
-      .fns = ~ tidytable::na_if(x = .x, y = "null")
-    )) |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(fn = is.character),
-      .fns = ~ tidytable::na_if(x = .x, y = "")
-    )) |>
+    )
+
+  character_cols <- names(df)[vapply(df, is.character, logical(1L))]
+  if (length(character_cols) > 0L) {
+    df <- df |>
+      tidytable::mutate(tidytable::across(
+        .cols = tidyselect::all_of(x = character_cols),
+        .fns = .normalize_annotation_text
+      ))
+  }
+
+  df <- df |>
     # Round numeric values
     round_reals() |>
-    # Convert all numeric to character for consistency
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(fn = is.numeric),
-      .fns = as.character
-    )) |>
     # Complement with structure metadata
     complement_metadata_structures(
       str_stereo = str_stereo,
@@ -108,7 +101,22 @@ select_annotations_columns <- function(
       str_tax_npc = str_tax_npc
     )
 
+  numeric_cols <- names(df)[vapply(df, is.numeric, logical(1L))]
+  if (length(numeric_cols) > 0L) {
+    df <- df |>
+      tidytable::mutate(tidytable::across(
+        .cols = tidyselect::all_of(x = numeric_cols),
+        .fns = as.character
+      ))
+  }
+
   # log_trace("Output: ", nrow(df), " rows, ", ncol(df), " columns")
 
   return(df)
+}
+
+.normalize_annotation_text <- function(x) {
+  vals <- trimws(as.character(x))
+  vals[vals %in% c("N/A", "null", "")] <- NA_character_
+  vals
 }

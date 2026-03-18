@@ -2558,7 +2558,14 @@ server <- function(input, output) {
         output[[paste0("results_", name)]] <- downloadHandler(
           filename = basename(results[[name]]),
           content = function(file) {
-            writeLines(readLines(results[[name]]), file)
+            ok <- file.copy(results[[name]], file, overwrite = TRUE)
+            if (!ok) {
+              cli::cli_abort(
+                "failed to copy result file {.file {results[[name]]}}",
+                class = c("tima_runtime_error", "tima_error"),
+                call = NULL
+              )
+            }
           }
         )
         shinyjs::show(paste0("results_", name))
