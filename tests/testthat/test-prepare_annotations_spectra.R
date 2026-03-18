@@ -136,3 +136,48 @@ test_that("test-prepare_annotations_spectra processes minimal formatted input", 
   df <- tidytable::fread(out)
   expect_true("feature_id" %in% names(df))
 })
+
+test_that("test-prepare_annotations_spectra deduplicates repeated rows across inputs", {
+  s <- stage_structure_fixtures()
+  out <- temp_test_path("spectra_dupes.tsv")
+
+  tbl <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    candidate_adduct = c("[M+H]+", "[M+H]+"),
+    candidate_library = c("lib", "lib"),
+    candidate_spectrum_id = c("id1", "id1"),
+    candidate_spectrum_entropy = c("1.0", "1.0"),
+    candidate_structure_error_mz = c("0.0", "0.0"),
+    candidate_structure_name = c("Cmpd", "Cmpd"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "AAAA-BBBB",
+      "AAAA-BBBB"
+    ),
+    candidate_structure_smiles_no_stereo = c("C", "C"),
+    candidate_structure_molecular_formula = c("CH4", "CH4"),
+    candidate_structure_exact_mass = c("16.0313", "16.0313"),
+    candidate_structure_xlogp = c("0.1", "0.1"),
+    candidate_score_similarity = c("0.9", "0.9"),
+    candidate_count_similarity_peaks_matched = c("10", "10")
+  )
+
+  ann1 <- temp_test_path("ann_dupe1.tsv")
+  ann2 <- temp_test_path("ann_dupe2.tsv")
+  tidytable::fwrite(x = tbl, file = ann1, sep = "\t")
+  tidytable::fwrite(x = tbl, file = ann2, sep = "\t")
+
+  expect_no_error(
+    prepare_annotations_spectra(
+      input = c(ann1, ann2),
+      output = out,
+      str_stereo = s$stereo,
+      str_met = s$met,
+      str_nam = s$nam,
+      str_tax_cla = s$cla,
+      str_tax_npc = s$npc
+    )
+  )
+
+  df <- tidytable::fread(out)
+  expect_equal(nrow(df), 1L)
+})

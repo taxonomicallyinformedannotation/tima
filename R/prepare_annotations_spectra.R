@@ -135,35 +135,35 @@ prepare_annotations_spectra <- function(
   )
   # log_trace("Loading and formatting spectral matches")
 
-  table <-
-    purrr::map(
-      .x = input,
-      .f = function(file) {
-        safe_fread(
-          file = file,
-          file_type = "spectral annotations",
-          na.strings = c("", "NA"),
-          colClasses = "character"
-        )
-      }
-    ) |>
+  annotation_cols <- c(
+    "feature_id",
+    "candidate_adduct",
+    "candidate_library",
+    "candidate_spectrum_id",
+    "candidate_spectrum_entropy",
+    "candidate_structure_error_mz",
+    "candidate_structure_name",
+    "candidate_structure_inchikey_connectivity_layer",
+    "candidate_structure_smiles_no_stereo",
+    "candidate_structure_molecular_formula",
+    "candidate_structure_exact_mass",
+    "candidate_structure_xlogp",
+    "candidate_score_similarity",
+    "candidate_count_similarity_peaks_matched"
+  )
+
+  table <- purrr::map(
+    .x = input,
+    .f = function(file) {
+      prepare_spectral_annotation_chunk(
+        file = file,
+        annotation_cols = annotation_cols
+      )
+    }
+  ) |>
     tidytable::bind_rows() |>
-    tidytable::filter(!is.na(feature_id)) |>
     tidytable::distinct(
-      feature_id,
-      candidate_adduct,
-      candidate_library,
-      candidate_spectrum_id,
-      candidate_spectrum_entropy,
-      candidate_structure_error_mz,
-      candidate_structure_name,
-      candidate_structure_inchikey_connectivity_layer,
-      candidate_structure_smiles_no_stereo,
-      candidate_structure_molecular_formula,
-      candidate_structure_exact_mass,
-      candidate_structure_xlogp,
-      candidate_score_similarity,
-      candidate_count_similarity_peaks_matched
+      tidyselect::all_of(annotation_cols)
     ) |>
     ## Add new columns
     tidytable::mutate(
@@ -177,7 +177,7 @@ prepare_annotations_spectra <- function(
       candidate_structure_tax_cla_01kin = NA_character_,
       candidate_structure_tax_cla_02sup = NA_character_,
       candidate_structure_tax_cla_03cla = NA_character_,
-      candidate_structure_tax_cla_04dirpar = NA_character_,
+      candidate_structure_tax_cla_04dirpar = NA_character_
     ) |>
     select_annotations_columns(
       str_stereo = str_stereo,
@@ -195,4 +195,40 @@ prepare_annotations_spectra <- function(
   rm(table)
 
   return(output[[1L]])
+}
+
+prepare_spectral_annotation_chunk <- function(file, annotation_cols) {
+  selected_cols <- names(tidytable::fread(
+    file = file,
+    nrows = 0L,
+    showProgress = FALSE
+  ))
+  selected_cols <- intersect(annotation_cols, selected_cols)
+
+  safe_fread(
+    file = file,
+    file_type = "spectral annotations",
+    na.strings = c("", "NA"),
+    colClasses = "character",
+    select = selected_cols
+  ) |>
+    .ensure_expected_annotation_cols(annotation_cols) |>
+    tidytable::filter(!is.na(feature_id)) |>
+    tidytable::distinct(tidyselect::all_of(annotation_cols))
+}
+
+.ensure_expected_annotation_cols <- function(df, annotation_cols) {
+  missing_cols <- setdiff(annotation_cols, names(df))
+  if (length(missing_cols) == 0L) {
+    return(df)
+  }
+
+  df |>
+    tidytable::mutate(
+      !!!stats::setNames(
+        rep(list(NA_character_), length(missing_cols)),
+        missing_cols
+      )
+    ) |>
+    tidytable::select(tidyselect::all_of(annotation_cols))
 }
