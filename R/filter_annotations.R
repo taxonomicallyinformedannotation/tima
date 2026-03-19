@@ -198,12 +198,20 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
 #' @return Filtered data frame
 #' @keywords internal
 apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
-  log_info(
-    "Filtering annotations outside %f min RT tolerance",
-    tolerance_rt
-  )
+  apply_tolerance <- is.finite(tolerance_rt)
 
-  features_annotated_table |>
+  if (apply_tolerance) {
+    log_info(
+      "Filtering annotations outside %f min RT tolerance",
+      tolerance_rt
+    )
+  } else {
+    log_info(
+      "RT tolerance is Inf: joining RT library without filtering"
+    )
+  }
+
+  joined <- features_annotated_table |>
     tidytable::left_join(
       y = rt_table,
       by = "candidate_structure_inchikey_connectivity_layer"
@@ -211,18 +219,44 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
     tidytable::mutate(
       candidate_structure_error_rt = as.numeric(rt) -
         as.numeric(rt_target)
-    ) |>
-    tidytable::arrange(abs(candidate_structure_error_rt)) |>
-    tidytable::distinct(
-      -candidate_structure_error_rt,
-      -rt_target,
-      .keep_all = TRUE
-    ) |>
-    tidytable::filter(
-      abs(candidate_structure_error_rt) <=
-        abs(tolerance_rt) + .Machine$double.eps |
-        is.na(candidate_structure_error_rt)
-    ) |>
+    )
+
+  # Deduplication by best RT match is only meaningful when a tolerance
+  # cutoff will actually be applied. With tolerance = Inf every row would
+  # pass anyway, so the arrange + distinct just silently drops rows from
+  # compounds that appear more than once.
+  if (apply_tolerance) {
+    n_before_dedup <- nrow(joined)
+    joined <- joined |>
+      tidytable::arrange(abs(candidate_structure_error_rt)) |>
+      tidytable::distinct(
+        -candidate_structure_error_rt,
+        -rt_target,
+        .keep_all = TRUE
+      )
+    n_dedup <- n_before_dedup - nrow(joined)
+    if (n_dedup > 0L) {
+      log_info(
+        "Removed %d duplicate RT library matches (keeping best match per annotation)",
+        n_dedup
+      )
+    }
+
+    n_before_filter <- nrow(joined)
+    joined <- joined |>
+      tidytable::filter(
+        abs(candidate_structure_error_rt) <=
+          abs(tolerance_rt) + .Machine$double.eps |
+          is.na(candidate_structure_error_rt)
+      )
+    n_filtered <- n_before_filter - nrow(joined)
+    log_info(
+      "Removed %d annotations outside RT tolerance",
+      n_filtered
+    )
+  }
+
+  joined |>
     tidytable::select(-tidyselect::any_of(x = c("rt_target", "type")))
 }
 
