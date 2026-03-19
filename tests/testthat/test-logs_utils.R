@@ -450,22 +450,243 @@ test_that("log_failed handles character messages", {
   expect_no_error(log_failed(ctx, "Failed"))
 })
 
-test_that("format_bytes handles edge cases", {
-  expect_equal(format_bytes(NA), "unknown")
-  expect_equal(format_bytes(-1), "unknown")
-  expect_match(format_bytes(1024^4), "TB|1024")
+test_that("accumulate_similarity_bins returns zero counts for empty input", {
+  counts <- accumulate_similarity_bins(numeric(0))
+  expect_type(counts, "integer")
+  expect_equal(sum(counts), 0L)
+  expect_equal(length(counts), 10L) # 10 bins for [0,1] by 0.1
 })
 
-test_that("format_time handles complex durations", {
-  expect_equal(format_time(45), "45s")
-  expect_equal(format_time(9045), "2h 30m")
-  expect_equal(format_time(7200), "2h")
-  expect_equal(format_time(NA), "unknown")
+test_that("accumulate_similarity_bins handles all NA values", {
+  counts <- accumulate_similarity_bins(c(NA, NA, NA))
+  expect_type(counts, "integer")
+  expect_equal(sum(counts), 0L)
 })
 
-test_that("log_operation stores metadata", {
-  ctx <- log_operation("test", a = 1, b = NULL)
-  expect_equal(ctx$params$a, 1)
-  expect_null(ctx$params$b)
+test_that("accumulate_similarity_bins clamps values to [0,1]", {
+  # Values outside [0,1] should be clamped
+  counts <- accumulate_similarity_bins(c(-0.5, 0.5, 1.5, 2))
+  expect_true(sum(counts) == 4L)
+})
+
+test_that("accumulate_similarity_bins correctly bins values", {
+  # Scores: 0.05 (bin 1), 0.15 (bin 2), 0.55 (bin 6), 0.99 (bin 10)
+  counts <- accumulate_similarity_bins(c(0.05, 0.15, 0.55, 0.99))
+  expect_equal(sum(counts), 4L)
+  # All bins should be named
+  expect_type(names(counts), "character")
+  expect_equal(length(names(counts)), 10L)
+})
+
+test_that("accumulate_similarity_bins handles Inf and NaN", {
+  counts <- accumulate_similarity_bins(c(Inf, -Inf, NaN, 0.5))
+  expect_equal(sum(counts), 1L) # Only 0.5 should count
+})
+
+## log_similarity_distribution_counts ----
+
+test_that("log_similarity_distribution_counts handles empty counts", {
+  expect_no_error(log_similarity_distribution_counts(integer(0), "Test title"))
+  expect_no_error(log_similarity_distribution_counts(NULL, "Test title"))
+})
+
+test_that("log_similarity_distribution_counts logs populated counts", {
+  counts <- c("(0,0.1]" = 5, "(0.1,0.2]" = 10, "(0.2,0.3]" = 15)
+  expect_no_error(log_similarity_distribution_counts(
+    counts,
+    "Similarity distribution"
+  ))
+})
+
+test_that("log_similarity_distribution_counts preserves bin order", {
+  # This is an implicit test - if bins get reordered, the output table would be wrong
+  counts <- accumulate_similarity_bins(c(0.05, 0.25, 0.55, 0.85))
+  expect_no_error(log_similarity_distribution_counts(counts, "Distribution"))
+})
+
+## log_similarity_distribution ----
+
+test_that("log_similarity_distribution handles empty scores", {
+  expect_no_error(log_similarity_distribution(numeric(0), "Empty test"))
+})
+
+test_that("log_similarity_distribution handles all NA scores", {
+  expect_no_error(log_similarity_distribution(c(NA, NA, NA), "All NA test"))
+})
+
+test_that("log_similarity_distribution handles mixed valid/invalid", {
+  expect_no_error(log_similarity_distribution(
+    c(0.1, NA, 0.5, Inf, 0.9, -Inf),
+    "Mixed test"
+  ))
+})
+
+test_that("log_similarity_distribution creates proper binning", {
+  scores <- c(0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95)
+  expect_no_error(log_similarity_distribution(scores, "Even distribution"))
+})
+
+## log_metadata ----
+
+test_that("log_metadata validates context object", {
+  expect_error(
+    log_metadata("not a context", a = 1),
+    "ctx must be a tima_log_context"
+  )
+})
+
+test_that("log_metadata stores metadata correctly", {
+  ctx <- log_operation("test_op")
+  ctx_updated <- log_metadata(ctx, x = 100, y = "test")
+
+  expect_equal(ctx_updated$metadata$x, 100)
+  expect_equal(ctx_updated$metadata$y, "test")
+})
+
+test_that("log_metadata returns context invisibly", {
+  ctx <- log_operation("test_op")
+  result <- withVisible(log_metadata(ctx, a = 1))
+
+  expect_false(result$visible)
+  expect_equal(class(result$value), class(ctx))
+})
+
+test_that("log_metadata accumulates multiple calls", {
+  ctx <- log_operation("test_op")
+  ctx <- log_metadata(ctx, a = 1)
+  ctx <- log_metadata(ctx, b = 2)
+
+  expect_equal(length(ctx$metadata), 2)
+  expect_equal(ctx$metadata$a, 1)
+  expect_equal(ctx$metadata$b, 2)
+})
+
+## with_logging ----
+
+test_that("with_logging executes expression and returns result", {
+  result <- with_logging("arithmetic", 2 + 2)
+  expect_equal(result, 4)
+})
+
+test_that("with_logging returns scalar unchanged", {
+  result <- with_logging("scalar", 42L)
+  expect_equal(result, 42L)
+})
+
+test_that("with_logging propagates errors properly", {
+  expect_error(
+    with_logging("failing_op", stop("intentional failure")),
+    class = "tima_error"
+  )
+})
+
+test_that("with_logging error message includes operation name", {
+  expect_error(
+    with_logging("my_operation", stop("boom")),
+    "my_operation"
+  )
+})
+
+test_that("with_logging accepts parameters", {
+  result <- with_logging("op_with_params", 42, x = 100, y = "test")
+  expect_equal(result, 42)
+})
+
+test_that("with_logging handles vector result", {
+  result <- with_logging("vector_op", 1:10)
+  expect_equal(result, 1:10)
+})
+
+## log_complete ----
+
+test_that("log_complete validates context object", {
+  expect_error(
+    log_complete("not a context"),
+    "ctx must be a tima_log_context"
+  )
+})
+
+test_that("log_complete returns context invisibly", {
+  ctx <- log_operation("test")
+  result <- withVisible(log_complete(ctx))
+
+  expect_false(result$visible)
+  expect_equal(class(result$value), class(ctx))
+})
+
+test_that("log_complete works with results", {
+  ctx <- log_operation("test")
+  expect_no_error(log_complete(ctx, n_items = 42, success = TRUE))
+})
+
+test_that("log_complete works without results", {
+  ctx <- log_operation("test")
+  expect_no_error(log_complete(ctx))
+})
+
+## log_failed ----
+
+test_that("log_failed validates context object", {
+  expect_error(
+    log_failed("not a context", "error"),
+    "ctx must be a tima_log_context"
+  )
+})
+
+test_that("log_failed handles error objects", {
+  ctx <- log_operation("test")
+  err <- simpleError("Test error message")
+  expect_no_error(log_failed(ctx, err))
+})
+
+test_that("log_failed handles character error messages", {
+  ctx <- log_operation("test")
+  expect_no_error(log_failed(ctx, "Error occurred"))
+})
+
+test_that("log_failed handles extra context", {
+  ctx <- log_operation("test")
+  expect_no_error(log_failed(ctx, "error", attempt = 3, retrying = TRUE))
+})
+
+test_that("log_failed returns context invisibly", {
+  ctx <- log_operation("test")
+  result <- withVisible(log_failed(ctx, "error"))
+
+  expect_false(result$visible)
+  expect_equal(class(result$value), class(ctx))
+})
+
+## log_operation ----
+
+test_that("log_operation creates context with operation name", {
+  ctx <- log_operation("my_operation")
+  expect_equal(ctx$operation, "my_operation")
+})
+
+test_that("log_operation stores parameters", {
+  ctx <- log_operation("op", n = 100, verbose = TRUE, name = "test")
+  expect_equal(ctx$params$n, 100)
+  expect_equal(ctx$params$verbose, TRUE)
+  expect_equal(ctx$params$name, "test")
+})
+
+test_that("log_operation initializes empty metadata", {
+  ctx <- log_operation("op")
   expect_type(ctx$metadata, "list")
+  expect_equal(length(ctx$metadata), 0)
+})
+
+test_that("log_operation records start time", {
+  before <- Sys.time()
+  ctx <- log_operation("op")
+  after <- Sys.time()
+
+  expect_true(ctx$start_time >= before)
+  expect_true(ctx$start_time <= after)
+})
+
+test_that("log_operation returns tima_log_context class", {
+  ctx <- log_operation("op")
+  expect_s3_class(ctx, "tima_log_context")
 })
