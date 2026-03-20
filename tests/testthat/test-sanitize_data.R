@@ -280,6 +280,95 @@ test_that("sanitize_metadata validates filename matching", {
   expect_equal(result$n_matched, 2)
 })
 
+test_that("sanitize_metadata returns invalid when metadata file is missing", {
+  result <- sanitize_metadata(
+    metadata_file = temp_test_path("does_not_exist.tsv"),
+    features_file = NULL
+  )
+
+  expect_false(result$valid)
+  expect_match(result$issues, "Metadata file not found")
+  expect_equal(result$n_samples, 0L)
+  expect_false(result$filenames_match)
+})
+
+test_that("sanitize_metadata reports missing filename column", {
+  metadata_file <- temp_test_path("metadata_no_filename.tsv")
+  write.table(
+    data.frame(ATTRIBUTE_species = c("sp1", "sp2")),
+    metadata_file,
+    sep = "\t",
+    row.names = FALSE
+  )
+
+  result <- sanitize_metadata(
+    metadata_file = metadata_file,
+    features_file = NULL
+  )
+
+  expect_false(result$valid)
+  expect_true(any(grepl("Filename column not found", result$issues)))
+})
+
+test_that("sanitize_metadata marks invalid when no filenames match features columns", {
+  metadata_file <- temp_test_path("metadata_nomatch.tsv")
+  features_file <- temp_test_path("features_nomatch.csv")
+
+  write.table(
+    data.frame(filename = c("sampleA.mzML", "sampleB.mzML")),
+    metadata_file,
+    sep = "\t",
+    row.names = FALSE
+  )
+  write.csv(
+    data.frame(feature_id = 1:2, other_sample = c(10, 20)),
+    features_file,
+    row.names = FALSE
+  )
+
+  result <- sanitize_metadata(
+    metadata_file = metadata_file,
+    features_file = features_file
+  )
+
+  expect_false(result$valid)
+  expect_false(result$filenames_match)
+  expect_equal(result$n_matched, 0L)
+  expect_equal(result$n_unmatched, 2L)
+  expect_true(any(grepl("No metadata filenames", result$issues)))
+})
+
+test_that("sanitize_metadata allows partial filename matches with warning semantics", {
+  metadata_file <- temp_test_path("metadata_partial.tsv")
+  features_file <- temp_test_path("features_partial.csv")
+
+  write.table(
+    data.frame(
+      filename = c("sample1.mzML", "sample2.mzML", "sample3.mzML"),
+      ATTRIBUTE_species = c("A", "B", "C")
+    ),
+    metadata_file,
+    sep = "\t",
+    row.names = FALSE
+  )
+  write.csv(
+    data.frame(feature_id = 1:3, sample1 = c(1, 2, 3), sample3 = c(4, 5, 6)),
+    features_file,
+    row.names = FALSE
+  )
+
+  result <- sanitize_metadata(
+    metadata_file = metadata_file,
+    features_file = features_file
+  )
+
+  expect_true(result$valid)
+  expect_true(result$filenames_match)
+  expect_equal(result$n_matched, 2L)
+  expect_equal(result$n_unmatched, 1L)
+  expect_equal(result$unmatched_files, "sample2")
+})
+
 ## sanitize_sirius Tests ----
 
 test_that("sanitize_sirius validates SIRIUS directories", {

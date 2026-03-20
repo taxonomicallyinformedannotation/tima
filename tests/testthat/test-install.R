@@ -70,12 +70,30 @@ test_that("install_tima() with dependencies=TRUE runs without error", {
   local_mocked_bindings(
     check_or_install_python = function() "/opt/mock/bin/python3",
     .install_packages = function(package, repos, dependencies, type, ...) {
+      captured_args <- list(
+        package = package,
+        repos = repos,
+        type = type,
+        dots = list(...)
+      )
       expect_true(isTRUE(dependencies))
+      invisible(captured_args)
       invisible(NULL)
     },
-    .require_namespace = function(package, quietly = TRUE) TRUE,
-    setup_virtualenv = function(envname, python) invisible(NULL),
-    .load_namespace = function(package) invisible(TRUE),
+    .require_namespace = function(package, quietly = TRUE) {
+      captured_args <- list(package = package, quietly = quietly)
+      invisible(captured_args)
+      TRUE
+    },
+    setup_virtualenv = function(envname, python) {
+      captured_args <- list(envname = envname, python = python)
+      invisible(captured_args)
+      invisible(NULL)
+    },
+    .load_namespace = function(package) {
+      invisible(package)
+      invisible(TRUE)
+    },
     copy_backbone = function() invisible(NULL),
     .tar_destroy = function() invisible(NULL)
   )
@@ -89,12 +107,30 @@ test_that("install_tima() accepts multiple repos", {
   local_mocked_bindings(
     check_or_install_python = function() "/opt/mock/bin/python3",
     .install_packages = function(package, repos, dependencies, type, ...) {
+      captured_args <- list(
+        package = package,
+        dependencies = dependencies,
+        type = type,
+        dots = list(...)
+      )
       repos_seen <<- repos
+      invisible(captured_args)
       invisible(NULL)
     },
-    .require_namespace = function(package, quietly = TRUE) TRUE,
-    setup_virtualenv = function(envname, python) invisible(NULL),
-    .load_namespace = function(package) invisible(TRUE),
+    .require_namespace = function(package, quietly = TRUE) {
+      captured_args <- list(package = package, quietly = quietly)
+      invisible(captured_args)
+      TRUE
+    },
+    setup_virtualenv = function(envname, python) {
+      captured_args <- list(envname = envname, python = python)
+      invisible(captured_args)
+      invisible(NULL)
+    },
+    .load_namespace = function(package) {
+      invisible(package)
+      invisible(TRUE)
+    },
     copy_backbone = function() invisible(NULL),
     .tar_destroy = function() invisible(NULL)
   )
@@ -109,12 +145,30 @@ test_that("install_tima() can run with dependencies=FALSE", {
   local_mocked_bindings(
     check_or_install_python = function() "/opt/mock/bin/python3",
     .install_packages = function(package, repos, dependencies, type, ...) {
+      captured_args <- list(
+        package = package,
+        repos = repos,
+        type = type,
+        dots = list(...)
+      )
       dependencies_seen <<- dependencies
+      invisible(captured_args)
       invisible(NULL)
     },
-    .require_namespace = function(package, quietly = TRUE) TRUE,
-    setup_virtualenv = function(envname, python) invisible(NULL),
-    .load_namespace = function(package) invisible(TRUE),
+    .require_namespace = function(package, quietly = TRUE) {
+      captured_args <- list(package = package, quietly = quietly)
+      invisible(captured_args)
+      TRUE
+    },
+    setup_virtualenv = function(envname, python) {
+      captured_args <- list(envname = envname, python = python)
+      invisible(captured_args)
+      invisible(NULL)
+    },
+    .load_namespace = function(package) {
+      invisible(package)
+      invisible(TRUE)
+    },
     copy_backbone = function() invisible(NULL),
     .tar_destroy = function() invisible(NULL)
   )
@@ -351,9 +405,21 @@ test_that("install_tima fails when installed package remains unavailable", {
   local_mocked_bindings(
     check_or_install_python = function() "/opt/mock/bin/python3",
     .install_packages = function(package, repos, dependencies, type, ...) {
+      captured_args <- list(
+        package = package,
+        repos = repos,
+        dependencies = dependencies,
+        type = type,
+        dots = list(...)
+      )
+      invisible(captured_args)
       invisible(NULL)
     },
-    .require_namespace = function(package, quietly = TRUE) FALSE
+    .require_namespace = function(package, quietly = TRUE) {
+      captured_args <- list(package = package, quietly = quietly)
+      invisible(captured_args)
+      FALSE
+    }
   )
 
   expect_error(
@@ -388,7 +454,10 @@ test_that("setup_virtualenv handles test scenarios", {
 
   local_mocked_bindings(
     check_or_install_python = function() "/opt/mock/bin/python3",
-    .virtualenv_exists = function(envname) FALSE,
+    .virtualenv_exists = function(envname) {
+      invisible(envname)
+      FALSE
+    },
     .virtualenv_create = function(envname, python) {
       calls$created <- calls$created + 1L
       expect_identical(envname, "tima-env")
@@ -416,8 +485,20 @@ test_that("setup_virtualenv handles test scenarios", {
 
 test_that("try_install_package handles errors gracefully", {
   local_mocked_bindings(
-    .require_namespace = function(package, quietly = TRUE) FALSE,
+    .require_namespace = function(package, quietly = TRUE) {
+      captured_args <- list(package = package, quietly = quietly)
+      invisible(captured_args)
+      FALSE
+    },
     .install_packages = function(package, repos, dependencies, type, ...) {
+      captured_args <- list(
+        package = package,
+        repos = repos,
+        dependencies = dependencies,
+        type = type,
+        dots = list(...)
+      )
+      invisible(captured_args)
       warning(
         "package 'thisPackageDefinitelyDoesNotExist12345' is not available"
       )
@@ -432,4 +513,395 @@ test_that("try_install_package handles errors gracefully", {
   )
   expect_true(is.logical(result))
   expect_false(result)
+})
+
+test_that("check_or_install_python installs miniconda when system python is missing", {
+  calls <- new.env(parent = emptyenv())
+  calls$installed <- FALSE
+
+  minipath <- file.path(tempdir(), "mock_miniconda")
+  expected_python <- if (Sys.info()[["sysname"]] == "Windows") {
+    file.path(minipath, "python.exe")
+  } else {
+    file.path(minipath, "bin", "python")
+  }
+
+  local_mocked_bindings(
+    .sys_which = function(command) {
+      force(command)
+      ""
+    },
+    .miniconda_path = function() minipath,
+    .path_exists = function(path) {
+      if (identical(path, minipath)) {
+        return(calls$installed)
+      }
+      if (identical(path, expected_python)) {
+        return(calls$installed)
+      }
+      FALSE
+    },
+    .install_miniconda = function() {
+      calls$installed <- TRUE
+      invisible(NULL)
+    }
+  )
+
+  result <- check_or_install_python()
+  expect_identical(result, expected_python)
+  expect_true(calls$installed)
+})
+
+test_that("check_or_install_python errors when miniconda python executable is missing", {
+  minipath <- file.path(tempdir(), "mock_miniconda_missing_py")
+
+  local_mocked_bindings(
+    .sys_which = function(command) {
+      force(command)
+      ""
+    },
+    .miniconda_path = function() minipath,
+    .path_exists = function(path) {
+      identical(path, minipath)
+    },
+    .install_miniconda = function() invisible(NULL)
+  )
+
+  expect_error(
+    check_or_install_python(),
+    "python executable not found",
+    class = "tima_runtime_error"
+  )
+})
+
+test_that("check_or_install_python uses existing miniconda without reinstalling", {
+  calls <- new.env(parent = emptyenv())
+  calls$installed <- 0L
+
+  minipath <- file.path(tempdir(), "existing_miniconda")
+  expected_python <- if (Sys.info()[["sysname"]] == "Windows") {
+    file.path(minipath, "python.exe")
+  } else {
+    file.path(minipath, "bin", "python")
+  }
+
+  local_mocked_bindings(
+    .sys_which = function(command) {
+      invisible(command)
+      ""
+    },
+    .miniconda_path = function() minipath,
+    .path_exists = function(path) {
+      path %in% c(minipath, expected_python)
+    },
+    .install_miniconda = function() {
+      calls$installed <- calls$installed + 1L
+      invisible(NULL)
+    }
+  )
+
+  expect_identical(check_or_install_python(), expected_python)
+  expect_equal(calls$installed, 0L)
+})
+
+test_that("setup_virtualenv uses existing env without creating it", {
+  calls <- new.env(parent = emptyenv())
+  calls$created <- 0L
+  calls$venv_install <- 0L
+  calls$py_install <- 0L
+
+  local_mocked_bindings(
+    .virtualenv_exists = function(envname) {
+      force(envname)
+      TRUE
+    },
+    .virtualenv_create = function(envname, python) {
+      force(envname)
+      force(python)
+      calls$created <- calls$created + 1L
+      invisible(NULL)
+    },
+    .virtualenv_install = function(envname, packages) {
+      force(envname)
+      force(packages)
+      calls$venv_install <- calls$venv_install + 1L
+      invisible(NULL)
+    },
+    .py_install = function(packages) {
+      force(packages)
+      calls$py_install <- calls$py_install + 1L
+      invisible(NULL)
+    }
+  )
+
+  expect_no_error(setup_virtualenv(
+    envname = "tima-env",
+    python = "/tmp/python"
+  ))
+  expect_equal(calls$created, 0L)
+  expect_equal(calls$venv_install, 1L)
+  expect_equal(calls$py_install, 1L)
+})
+
+test_that("setup_virtualenv aborts when virtualenv creation fails", {
+  local_mocked_bindings(
+    .virtualenv_exists = function(envname) {
+      force(envname)
+      FALSE
+    },
+    .virtualenv_create = function(envname, python) {
+      force(envname)
+      force(python)
+      stop("boom")
+    }
+  )
+
+  expect_error(
+    setup_virtualenv(envname = "tima-env", python = "/tmp/python"),
+    "failed to create python virtualenv",
+    class = "tima_runtime_error"
+  )
+})
+
+test_that("setup_virtualenv aborts when dependency install fails", {
+  local_mocked_bindings(
+    .virtualenv_exists = function(envname) {
+      force(envname)
+      TRUE
+    },
+    .virtualenv_install = function(envname, packages) {
+      force(envname)
+      force(packages)
+      stop("dep fail")
+    },
+    .py_install = function(packages) {
+      force(packages)
+      invisible(NULL)
+    }
+  )
+
+  expect_error(
+    setup_virtualenv(envname = "tima-env", python = "/tmp/python"),
+    "failed to install dependencies in virtualenv",
+    class = "tima_runtime_error"
+  )
+})
+
+test_that("install_tima continues when copy_backbone fails", {
+  calls <- new.env(parent = emptyenv())
+  calls$tar_destroy <- 0L
+
+  local_mocked_bindings(
+    check_or_install_python = function() "/opt/mock/bin/python3",
+    .install_packages = function(package, repos, dependencies, type, ...) {
+      force(package)
+      force(repos)
+      force(dependencies)
+      force(type)
+      invisible(list(...))
+      invisible(NULL)
+    },
+    .require_namespace = function(package, quietly = TRUE) {
+      force(package)
+      force(quietly)
+      TRUE
+    },
+    setup_virtualenv = function(envname, python) {
+      force(envname)
+      force(python)
+      invisible(NULL)
+    },
+    .load_namespace = function(package) {
+      force(package)
+      TRUE
+    },
+    copy_backbone = function() {
+      stop("copy failed")
+    },
+    .tar_destroy = function() {
+      calls$tar_destroy <- calls$tar_destroy + 1L
+      invisible(NULL)
+    }
+  )
+
+  expect_no_error(install_tima(package = "tima", dependencies = FALSE))
+  expect_equal(calls$tar_destroy, 1L)
+})
+
+test_that("install_tima uses source installation on Linux", {
+  install_type_seen <- NULL
+
+  local_mocked_bindings(
+    Sys.info = function() c(sysname = "Linux"),
+    .package = "base"
+  )
+
+  local_mocked_bindings(
+    check_or_install_python = function() "/opt/mock/bin/python3",
+    .install_packages = function(package, repos, dependencies, type, ...) {
+      invisible(list(
+        package = package,
+        repos = repos,
+        dependencies = dependencies,
+        dots = list(...)
+      ))
+      install_type_seen <<- type
+      invisible(NULL)
+    },
+    .require_namespace = function(package, quietly = TRUE) {
+      invisible(list(package = package, quietly = quietly))
+      TRUE
+    },
+    setup_virtualenv = function(envname, python) {
+      invisible(list(envname = envname, python = python))
+      invisible(NULL)
+    },
+    .load_namespace = function(package) {
+      invisible(package)
+      TRUE
+    },
+    copy_backbone = function() invisible(NULL),
+    .tar_destroy = function() invisible(NULL)
+  )
+
+  expect_no_error(install_tima(package = "tima", dependencies = FALSE))
+  expect_identical(install_type_seen, "source")
+})
+
+test_that("install_tima tolerates tar_destroy failure", {
+  local_mocked_bindings(
+    check_or_install_python = function() "/opt/mock/bin/python3",
+    .install_packages = function(package, repos, dependencies, type, ...) {
+      invisible(list(
+        package = package,
+        repos = repos,
+        dependencies = dependencies,
+        type = type,
+        dots = list(...)
+      ))
+      invisible(NULL)
+    },
+    .require_namespace = function(package, quietly = TRUE) {
+      invisible(list(package = package, quietly = quietly))
+      TRUE
+    },
+    setup_virtualenv = function(envname, python) {
+      invisible(list(envname = envname, python = python))
+      invisible(NULL)
+    },
+    .load_namespace = function(package) {
+      invisible(package)
+      TRUE
+    },
+    copy_backbone = function() invisible(NULL),
+    .tar_destroy = function() stop("no targets")
+  )
+
+  expect_no_error(install_tima(package = "tima", dependencies = FALSE))
+})
+
+test_that("try_install_package returns TRUE when installation succeeds", {
+  state <- new.env(parent = emptyenv())
+  state$installed <- FALSE
+
+  local_mocked_bindings(
+    .require_namespace = function(package, quietly = TRUE) {
+      force(package)
+      force(quietly)
+      state$installed
+    },
+    .install_packages = function(package, repos, dependencies, type, ...) {
+      force(package)
+      force(repos)
+      force(dependencies)
+      force(type)
+      invisible(list(...))
+      state$installed <- TRUE
+      invisible(NULL)
+    }
+  )
+
+  expect_true(
+    try_install_package(
+      package = "tima",
+      repos = .make_repos(),
+      dependencies = TRUE,
+      from_source = FALSE
+    )
+  )
+})
+
+test_that("try_install_package returns FALSE when install throws error", {
+  local_mocked_bindings(
+    .require_namespace = function(package, quietly = TRUE) {
+      force(package)
+      force(quietly)
+      FALSE
+    },
+    .install_packages = function(package, repos, dependencies, type, ...) {
+      force(package)
+      force(repos)
+      force(dependencies)
+      force(type)
+      invisible(list(...))
+      stop("install explosion")
+    }
+  )
+
+  expect_false(
+    try_install_package(
+      package = "tima",
+      repos = .make_repos(),
+      dependencies = FALSE,
+      from_source = TRUE
+    )
+  )
+})
+
+test_that("verify_package_installation returns FALSE on DESCRIPTION warning", {
+  local_mocked_bindings(
+    .require_namespace = function(package, quietly = TRUE) {
+      force(package)
+      force(quietly)
+      TRUE
+    },
+    .find_package_paths = function(package, quiet = TRUE) {
+      force(package)
+      force(quiet)
+      "/tmp/warnpkg"
+    },
+    .path_exists = function(path) {
+      path %in% c("/tmp/warnpkg", "/tmp/warnpkg/DESCRIPTION")
+    },
+    .read_description_dcf = function(path) {
+      force(path)
+      warning("warning in DESCRIPTION")
+    },
+    .load_namespace = function(package) {
+      force(package)
+      TRUE
+    }
+  )
+
+  expect_false(verify_package_installation("warnpkg"))
+})
+
+test_that("install_tima aborts when package installation itself fails", {
+  local_mocked_bindings(
+    check_or_install_python = function() "/opt/mock/bin/python3",
+    .install_packages = function(package, repos, dependencies, type, ...) {
+      force(package)
+      force(repos)
+      force(dependencies)
+      force(type)
+      invisible(list(...))
+      stop("repo unavailable")
+    }
+  )
+
+  expect_error(
+    install_tima(package = "tima", dependencies = FALSE),
+    "failed to install package",
+    class = "tima_runtime_error"
+  )
 })
