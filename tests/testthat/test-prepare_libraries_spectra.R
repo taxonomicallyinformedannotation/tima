@@ -156,3 +156,158 @@ test_that("prepare_libraries_spectra() runs when optional columns are absent", {
   res <- prepare_libraries_spectra(input = mgf, nam_lib = "NO_META")
   expect_type(res, "character")
 })
+
+test_that("create_empty_spectral_library returns minimal Spectra object", {
+  skip_if_not_installed("Spectra")
+  sp <- create_empty_spectral_library()
+  expect_s4_class(sp, "Spectra")
+  expect_true(length(sp) >= 1L)
+})
+
+test_that("create_empty_sop_library returns expected columns", {
+  sop <- create_empty_sop_library()
+  expect_true(all(
+    c(
+      "structure_inchikey",
+      "structure_smiles",
+      "structure_smiles_no_stereo",
+      "structure_inchikey_connectivity_layer",
+      "organism_name"
+    ) %in%
+      names(sop)
+  ))
+})
+
+test_that("prepare_libraries_spectra returns cached outputs when files already exist", {
+  skip_if_not_installed("Spectra")
+  tmp <- withr::local_tempdir()
+
+  out_pos <- file.path(
+    tmp,
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "exp",
+    "LIB_pos.rds"
+  )
+  out_neg <- file.path(
+    tmp,
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "exp",
+    "LIB_neg.rds"
+  )
+  out_sop <- file.path(
+    tmp,
+    "data",
+    "interim",
+    "libraries",
+    "sop",
+    "LIB_prepared.tsv.gz"
+  )
+  dir.create(dirname(out_pos), recursive = TRUE, showWarnings = FALSE)
+  dir.create(dirname(out_sop), recursive = TRUE, showWarnings = FALSE)
+  file.create(out_pos)
+  file.create(out_neg)
+  file.create(out_sop)
+
+  local_mocked_bindings(
+    get_default_paths = function() {
+      list(
+        data = list(
+          interim = list(
+            libraries = list(
+              spectra = list(exp = list(path = dirname(out_pos))),
+              sop = list(path = dirname(out_sop))
+            )
+          )
+        )
+      )
+    },
+    get_params = function(step) {
+      force(step)
+      list(
+        files = list(libraries = list(spectral = list(raw = character(0L)))),
+        names = list(mgf = list())
+      )
+    },
+    export_params = function(parameters, step) {
+      force(parameters)
+      force(step)
+      invisible(NULL)
+    },
+    .package = "tima"
+  )
+
+  out <- prepare_libraries_spectra(input = "dummy.mgf", nam_lib = "LIB")
+  expect_equal(unname(out), c(out_pos, out_neg, out_sop))
+})
+
+test_that("prepare_libraries_spectra creates empty templates when input is missing", {
+  skip_if_not_installed("Spectra")
+  tmp <- withr::local_tempdir()
+
+  captured <- new.env(parent = emptyenv())
+  captured$pos <- NULL
+  captured$neg <- NULL
+  captured$sop <- NULL
+
+  local_mocked_bindings(
+    get_default_paths = function() {
+      list(
+        data = list(
+          interim = list(
+            libraries = list(
+              spectra = list(exp = list(path = file.path(tmp, "spectra"))),
+              sop = list(path = file.path(tmp, "sop"))
+            )
+          )
+        )
+      )
+    },
+    export_spectra_rds = function(file, spectra) {
+      if (grepl("_pos\\.rds$", file)) {
+        captured$pos <- spectra
+      }
+      if (grepl("_neg\\.rds$", file)) {
+        captured$neg <- spectra
+      }
+      invisible(NULL)
+    },
+    export_output = function(x, file) {
+      force(file)
+      captured$sop <- x
+      invisible(NULL)
+    },
+    get_params = function(step) {
+      force(step)
+      list(
+        files = list(libraries = list(spectral = list(raw = character(0L)))),
+        names = list(mgf = list())
+      )
+    },
+    export_params = function(parameters, step) {
+      force(parameters)
+      force(step)
+      invisible(NULL)
+    },
+    .package = "tima"
+  )
+
+  expect_no_error(
+    prepare_libraries_spectra(
+      input = NULL,
+      nam_lib = "EMPTYLIB"
+    )
+  )
+
+  expect_s4_class(captured$pos, "Spectra")
+  expect_s4_class(captured$neg, "Spectra")
+  expect_true(
+    is.data.frame(captured$sop) || tidytable::is_tidytable(captured$sop)
+  )
+  expect_true(all(names(create_empty_sop_library()) %in% names(captured$sop)))
+})

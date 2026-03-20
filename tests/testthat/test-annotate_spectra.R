@@ -1036,3 +1036,45 @@ test_that("compute_similarity_safe returns empty table on calculation error", {
 
   expect_equal(nrow(out), 0L)
 })
+
+test_that("annotate_spectra_handle_empty_result persists params and returns path", {
+  persisted <- NULL
+
+  local_mocked_bindings(
+    persist_annotation_parameters = function(params) {
+      persisted <<- params
+      invisible(NULL)
+    },
+    annotate_spectra_return_empty_template = function(path) {
+      invisible(path)
+    }
+  )
+
+  out <- annotate_spectra_handle_empty_result(
+    path = "out.tsv",
+    params = list(a = 1L),
+    message = NULL
+  )
+
+  expect_equal(out, "out.tsv")
+  expect_equal(persisted$a, 1L)
+})
+
+test_that("extract_vector uses fill when field is missing", {
+  skip_if_not_installed("Spectra")
+
+  obj <- Spectra::Spectra(data.frame(
+    precursorMz = 123.4,
+    mz = I(list(c(50, 100))),
+    intensity = I(list(c(1, 2)))
+  ))
+
+  out <- extract_vector(
+    obj = obj,
+    field = "nonexistent_field",
+    len = 3L,
+    fill = "missing"
+  )
+
+  expect_equal(out, rep("missing", 3L))
+})

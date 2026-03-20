@@ -473,3 +473,146 @@ test_that("filter_annotations handles multiple annotation files", {
 
   expect_true(file.exists(result))
 })
+
+test_that("validate_filter_annotations_inputs rejects non-character list elements", {
+  feat <- tempfile(fileext = ".tsv")
+  .make_feat(feat)
+
+  expect_error(
+    validate_filter_annotations_inputs(
+      annotations = list(123),
+      features = feat,
+      rts = character(0),
+      output = tempfile(),
+      tolerance_rt = 0.5
+    ),
+    "all annotation elements must be character strings"
+  )
+})
+
+test_that("validate_filter_annotations_inputs rejects missing RT library files", {
+  ann <- tempfile(fileext = ".tsv")
+  .make_ann(ann)
+  feat <- tempfile(fileext = ".tsv")
+  .make_feat(feat)
+
+  expect_error(
+    validate_filter_annotations_inputs(
+      annotations = ann,
+      features = feat,
+      rts = "does_not_exist_rt.tsv",
+      output = tempfile(),
+      tolerance_rt = 0.5
+    ),
+    "retention time file\\(s\\) not found"
+  )
+})
+
+test_that("apply_rt_filter with Inf keeps duplicate RT matches", {
+  skip_if_not_installed("tidytable")
+
+  features_ann <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "A",
+    rt = "1.0"
+  )
+
+  # Two RT entries for same structure -> duplicate join rows
+  rt_lib <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = c("A", "A"),
+    rt_target = c("1.00", "1.10")
+  )
+
+  result <- apply_rt_filter(features_ann, rt_lib, tolerance_rt = Inf)
+
+  expect_equal(nrow(result), 2L)
+  expect_true("candidate_structure_error_rt" %in% names(result))
+})
+
+test_that("apply_rt_filter deduplicates to best RT match when tolerance is finite", {
+  skip_if_not_installed("tidytable")
+
+  features_ann <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "A",
+    rt = "1.0"
+  )
+
+  rt_lib <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = c("A", "A"),
+    rt_target = c("1.20", "1.01")
+  )
+
+  result <- apply_rt_filter(features_ann, rt_lib, tolerance_rt = 1.0)
+
+  expect_equal(nrow(result), 1L)
+  expect_true(abs(result$candidate_structure_error_rt[[1L]]) < 0.05)
+})
+
+test_that("filter_annotations errors when RT table has neither rt nor rt_target", {
+  ann <- tempfile(fileext = ".tsv")
+  .make_ann(ann)
+  feat <- tempfile(fileext = ".tsv")
+  .make_feat(feat)
+  bad_rt <- tempfile(fileext = ".tsv")
+  write.table(
+    data.frame(
+      candidate_structure_inchikey_connectivity_layer = c("A", "B"),
+      wrong_col = c("1", "2")
+    ),
+    bad_rt,
+    sep = "\t",
+    row.names = FALSE
+  )
+
+  expect_error(
+    filter_annotations(
+      annotations = ann,
+      features = feat,
+      rts = bad_rt,
+      output = tempfile(fileext = ".tsv"),
+      tolerance_rt = 0.5
+    ),
+    "retention time library must contain column 'rt' or 'rt_target'",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("filter_annotations accepts RT libraries already using rt_target", {
+  ann <- tempfile(fileext = ".tsv")
+  # Keep annotation table without rt column to avoid rt/rt suffix ambiguity.
+  write.table(
+    data.frame(
+      feature_id = c("F1", "F2"),
+      candidate_library = c("ms1", "spectral"),
+      candidate_structure_inchikey_connectivity_layer = c("A", "B"),
+      candidate_score_similarity = c(NA, 0.8)
+    ),
+    ann,
+    sep = "\t",
+    row.names = FALSE
+  )
+  feat <- tempfile(fileext = ".tsv")
+  .make_feat(feat)
+  rt_target_file <- tempfile(fileext = ".tsv")
+  write.table(
+    data.frame(
+      candidate_structure_inchikey_connectivity_layer = c("A", "B"),
+      rt_target = c("1.02", "2.05")
+    ),
+    rt_target_file,
+    sep = "\t",
+    row.names = FALSE
+  )
+
+  out <- tempfile(fileext = ".tsv")
+  res <- filter_annotations(
+    annotations = ann,
+    features = feat,
+    rts = rt_target_file,
+    output = out,
+    tolerance_rt = 0.2
+  )
+
+  expect_true(file.exists(res))
+})

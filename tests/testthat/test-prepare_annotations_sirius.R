@@ -481,6 +481,72 @@ test_that("load_sirius_tables filters formulaRank and loads denovo when present"
   expect_equal(nrow(out$denovo), 2L)
 })
 
+test_that("load_sirius_tables keeps all rows for version 5 and leaves denovo template", {
+  local_mocked_bindings(
+    read_from_sirius_zip = function(input_directory, file) {
+      force(input_directory)
+      if (identical(file, "canopus_compound_summary.tsv")) {
+        return(tidytable::tidytable(formulaRank = c(1L, 2L), a = c("x", "y")))
+      }
+      if (identical(file, "formula_identifications_all.tsv")) {
+        return(tidytable::tidytable(formulaRank = c(1L, 3L), b = c("u", "v")))
+      }
+      if (identical(file, "compound_identifications_all.tsv")) {
+        return(tidytable::tidytable(id = 1:2))
+      }
+      tidytable::tidytable()
+    },
+    .package = "tima"
+  )
+
+  out <- load_sirius_tables(input_directory = "dummy.zip", version = "5")
+
+  expect_equal(nrow(out$canopus), 2L)
+  expect_equal(nrow(out$formulas), 2L)
+  expect_equal(nrow(out$structures), 2L)
+  expect_equal(nrow(out$denovo), 1L)
+  expect_true(all(is.na(out$denovo$mappingFeatureId)))
+})
+
+test_that("load_sirius_tables v6 leaves denovo template when file is not present", {
+  local_mocked_bindings(
+    read_from_sirius_zip = function(input_directory, file) {
+      force(input_directory)
+      if (grepl("canopus_formula_summary", file)) {
+        return(tidytable::tidytable(formulaRank = 1L, x = "a"))
+      }
+      if (grepl("formula_identifications", file)) {
+        return(tidytable::tidytable(formulaRank = 1L, y = "b"))
+      }
+      if (grepl("structure_identifications", file) && !grepl("denovo", file)) {
+        return(tidytable::tidytable(id = 1L))
+      }
+      tidytable::tidytable()
+    },
+    .package = "tima"
+  )
+
+  local_mocked_bindings(
+    unzip = function(zipfile, list = FALSE, ...) {
+      force(zipfile)
+      invisible(list(...))
+      if (isTRUE(list)) {
+        return(data.frame(Name = c("structure_identifications_all.tsv")))
+      }
+      invisible(NULL)
+    },
+    .package = "utils"
+  )
+
+  out <- load_sirius_tables(input_directory = "dummy.zip", version = "6")
+
+  expect_equal(nrow(out$canopus), 1L)
+  expect_equal(nrow(out$formulas), 1L)
+  expect_equal(nrow(out$structures), 1L)
+  expect_equal(nrow(out$denovo), 1L)
+  expect_true(all(is.na(out$denovo$mappingFeatureId)))
+})
+
 test_that("load_sirius_summaries returns empty when no summary files", {
   local_mocked_bindings(
     unzip = function(zipfile, list = FALSE, ...) {
@@ -524,4 +590,36 @@ test_that("load_sirius_summaries loads and binds discovered summary files", {
   out <- load_sirius_summaries("dummy.zip")
   expect_true("feature_id" %in% names(out))
   expect_equal(nrow(out), 2L)
+})
+
+test_that("load_sirius_summaries returns empty when all discovered summaries are empty", {
+  local_mocked_bindings(
+    unzip = function(zipfile, list = FALSE, ...) {
+      force(zipfile)
+      invisible(list(...))
+      if (isTRUE(list)) {
+        return(data.frame(
+          Name = c(
+            "dummy/feat1/structure_candidates.tsv",
+            "dummy/feat2/structure_candidates.tsv"
+          )
+        ))
+      }
+      invisible(NULL)
+    },
+    .package = "utils"
+  )
+
+  local_mocked_bindings(
+    read_from_sirius_zip = function(input_directory, file) {
+      force(input_directory)
+      force(file)
+      tidytable::tidytable()
+    },
+    .package = "tima"
+  )
+
+  out <- load_sirius_summaries("dummy.zip")
+  expect_true(tidytable::is_tidytable(out))
+  expect_equal(nrow(out), 0L)
 })

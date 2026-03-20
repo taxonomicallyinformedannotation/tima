@@ -507,6 +507,85 @@ test_that("change_params_small updates both yaml files", {
   expect_equal(params2$files$pattern, "test")
 })
 
+test_that("change_params_small uses go_to_cache when cache_dir is NULL", {
+  skip_if_not_installed("withr")
+
+  tmp <- withr::local_tempdir()
+  captured_yaml <- NULL
+
+  local_mocked_bindings(
+    go_to_cache = function() {
+      setwd(tmp)
+      invisible(NULL)
+    },
+    get_default_paths = function() {
+      list(
+        data = list(
+          source = list(path = file.path(tmp, "data", "source")),
+          interim = list(
+            annotations = list(
+              path = file.path(tmp, "data", "interim", "annotations")
+            )
+          )
+        ),
+        params = list(
+          prepare_params = file.path(tmp, "params", "prepare_params.yaml")
+        )
+      )
+    },
+    create_dir = function(path) {
+      dir.create(path, recursive = TRUE, showWarnings = FALSE)
+      invisible(NULL)
+    },
+    load_yaml_files = function() {
+      list(
+        yamls_params = list(
+          prepare_params = list(
+            files = list(
+              pattern = "old",
+              features = list(raw = "old_features.csv"),
+              metadata = list(raw = "old_metadata.tsv"),
+              annotations = list(
+                raw = list(sirius = "old_sirius.zip", mzmine = "old_mzmine.csv")
+              ),
+              spectral = list(raw = "old_spectra.mgf")
+            ),
+            ms = list(polarity = "pos"),
+            organisms = list(taxon = "Old taxon"),
+            options = list(high_confidence = FALSE, summarize = FALSE)
+          )
+        )
+      )
+    },
+    copy_file_to_target = function(file_path, target_dir, file_description) {
+      force(file_description)
+      file.path(target_dir, basename(file_path))
+    },
+    .package = "tima"
+  )
+
+  local_mocked_bindings(
+    write_yaml = function(x, file, handlers = NULL) {
+      force(file)
+      force(handlers)
+      captured_yaml <<- x
+      invisible(NULL)
+    },
+    .package = "yaml"
+  )
+
+  expect_no_error(change_params_small(
+    fil_pat = "new_pattern",
+    fil_sir_raw = NULL,
+    org_tax = NULL,
+    cache_dir = NULL
+  ))
+
+  expect_equal(captured_yaml$files$pattern, "new_pattern")
+  expect_true(is.na(captured_yaml$files$annotations$raw$sirius))
+  expect_true(is.na(captured_yaml$organisms$taxon))
+})
+
 # ---- Internal function tests ----
 
 test_that("validate_params_small_inputs validates polarity", {
