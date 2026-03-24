@@ -851,29 +851,25 @@ list(
       format = "file"
     ),
     tar_target(
+      name = test_spectra_mini,
+      command = {
+        test_spectra_mini <-
+          get_file(
+            url = paths$urls$examples$spectra_mini,
+            export = paths$data$source$spectra
+          )
+      },
+      format = "file"
+    ),
+    tar_target(
       name = input_spectra,
       command = {
         input_spectra <-
-          ifelse(
-            test = paths$test$mode == FALSE,
-            yes = par_ann_spe_fil_spe_raw,
-            # yes = ifelse(
-            #   test = !is.null(gnps_spectra),
-            #   yes =
-            #     ifelse(
-            #       test = file.exists(gnps_spectra),
-            #       yes = gnps_spectra,
-            #       no = par_ann_spe$files$spectral$raw
-            #     ),
-            #   no = par_ann_spe$files$spectral$raw
-            # ),
-            no = {
-              get_file(
-                url = paths$urls$examples$spectra$mini,
-                export = paths$data$source$spectra
-              )
-            }
-          )
+          if (paths$test$mode == FALSE) {
+            par_ann_spe_fil_spe_raw
+          } else {
+            test_spectra_mini
+          }
       },
       format = "file"
     )
