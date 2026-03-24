@@ -18,6 +18,7 @@
 * Added external identifiers to the final results (#142)
 * Added multiple new sub-libraries and a new `tag` column
 * Added mzmine annotation support
+* Added Sirius spectral results support
 * Added special "Biota" superdomain handling for shared core metabolism
 * Enhanced `sanitize_spectra()` with adaptive noise filtering:
     - Dynamic intensity thresholds (MAD-based, now default when `cutoff = NULL`)
