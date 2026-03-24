@@ -175,6 +175,21 @@ ui <- shiny::fluidPage(
                 "We highly recommend 6, the default."
               )
             ),
+          shiny::numericInput(
+            inputId = "too_sir_max_analog_abs_mz_error",
+            label = "Max abs m/z error for SIRIUS analog hits (Da)",
+            value = 0.01,
+            min = 0,
+            step = 0.001
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = c(
+                "Filters SIRIUS spectral analog candidates by absolute precursor m/z deviation.",
+                "Only analogs with |mz_error| <= this threshold are kept.",
+                "Set a larger value to keep more analog candidates."
+              )
+            ),
           shiny::textInput(
             inputId = "fil_pat",
             label = .label_mandatory("Pattern to identify your job locally"),
@@ -2300,6 +2315,8 @@ ui <- shiny::fluidPage(
   #   shiny::isolate(input$too_x)
   yaml_advanced$tools$sirius$version <-
     shiny::isolate(input$too_sir_ver)
+  yaml_advanced$tools$sirius$max_analog_abs_mz_error <-
+    shiny::isolate(input$too_sir_max_analog_abs_mz_error)
   # TODO
   # yaml_advanced$tools$taxonomies$biological <-
   #   shiny::isolate(input$too_x)
@@ -2423,7 +2440,7 @@ server <- function(input, output) {
       vapply(
         X = fields_mandatory,
         FUN = function(x) {
-          suppressWarnings(any(!is.null(input[[x]]), input[[x]] != ""))
+          any(!is.null(input[[x]]), input[[x]] != "")
         },
         FUN.VALUE = logical(1)
       ) |>

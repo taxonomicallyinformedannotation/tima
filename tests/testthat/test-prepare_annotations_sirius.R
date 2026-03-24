@@ -193,7 +193,8 @@ test_that("validate_sirius_inputs validates version correctly", {
       str_met = s$met,
       str_nam = s$nam,
       str_tax_cla = s$cla,
-      str_tax_npc = s$npc
+      str_tax_npc = s$npc,
+      max_analog_abs_mz_error = 0.01
     ),
     "sirius_version must be '5' or '6'",
     class = "tima_validation_error"
@@ -210,7 +211,8 @@ test_that("validate_sirius_inputs validates version correctly", {
       str_met = s$met,
       str_nam = s$nam,
       str_tax_cla = s$cla,
-      str_tax_npc = s$npc
+      str_tax_npc = s$npc,
+      max_analog_abs_mz_error = 0.01
     ),
     "sirius_version must be '5' or '6'",
     class = "tima_validation_error"
@@ -230,7 +232,8 @@ test_that("validate_sirius_inputs validates output paths", {
       str_met = s$met,
       str_nam = s$nam,
       str_tax_cla = s$cla,
-      str_tax_npc = s$npc
+      str_tax_npc = s$npc,
+      max_analog_abs_mz_error = 0.01
     ),
     "Output path\\(s\\) must be single character strings.*output_ann",
     class = "tima_validation_error"
@@ -246,7 +249,8 @@ test_that("validate_sirius_inputs validates output paths", {
       str_met = s$met,
       str_nam = s$nam,
       str_tax_cla = s$cla,
-      str_tax_npc = s$npc
+      str_tax_npc = s$npc,
+      max_analog_abs_mz_error = 0.01
     ),
     "Output path\\(s\\) must be single character strings.*output_can",
     class = "tima_validation_error"
@@ -262,7 +266,8 @@ test_that("validate_sirius_inputs validates output paths", {
       str_met = s$met,
       str_nam = s$nam,
       str_tax_cla = s$cla,
-      str_tax_npc = s$npc
+      str_tax_npc = s$npc,
+      max_analog_abs_mz_error = 0.01
     ),
     "Output path\\(s\\) must be single character strings.*output_for",
     class = "tima_validation_error"
@@ -283,7 +288,8 @@ test_that("validate_sirius_inputs checks structure file existence", {
       str_met = s$met,
       str_nam = s$nam,
       str_tax_cla = s$cla,
-      str_tax_npc = s$npc
+      str_tax_npc = s$npc,
+      max_analog_abs_mz_error = 0.01
     ),
     "file.*not found"
   )
@@ -298,9 +304,32 @@ test_that("validate_sirius_inputs checks structure file existence", {
       str_met = "nonexistent_metadata.tsv",
       str_nam = s$nam,
       str_tax_cla = s$cla,
-      str_tax_npc = s$npc
+      str_tax_npc = s$npc,
+      max_analog_abs_mz_error = 0.01
     ),
     "file.*not found"
+  )
+})
+
+test_that("validate_sirius_inputs validates max_analog_abs_mz_error", {
+  s <- stage_structure_fixtures()
+  tmp <- tempdir()
+
+  expect_error(
+    validate_sirius_inputs(
+      sirius_version = "5",
+      output_ann = file.path(tmp, "ann.tsv"),
+      output_can = file.path(tmp, "can.tsv"),
+      output_for = file.path(tmp, "for.tsv"),
+      str_stereo = s$stereo,
+      str_met = s$met,
+      str_nam = s$nam,
+      str_tax_cla = s$cla,
+      str_tax_npc = s$npc,
+      max_analog_abs_mz_error = -0.01
+    ),
+    "max_analog_abs_mz_error out of valid range",
+    fixed = TRUE
   )
 })
 
@@ -444,7 +473,477 @@ test_that("split_sirius_results splits table correctly", {
   expect_true(tidytable::is_tidytable(result$structures))
 })
 
-test_that("load_sirius_tables filters formulaRank and loads denovo when present", {
+test_that("merge_sirius_structures_with_spectral merges matching candidates", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
+    candidate_structure_smiles_no_stereo = "CCO",
+    candidate_structure_name = NA_character_,
+    candidate_spectrum_id = NA_character_,
+    candidate_score_sirius_csi = "-25"
+  )
+
+  spectral_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS spectral",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
+    candidate_structure_smiles_no_stereo = "CCO",
+    candidate_structure_name = "ReferenceHit",
+    candidate_spectrum_id = "splash10-ref",
+    candidate_score_similarity = "0.86",
+    candidate_count_similarity_peaks_matched = "14"
+  )
+
+  out <- merge_sirius_structures_with_spectral(
+    structures_prepared,
+    spectral_prepared
+  )
+
+  expect_equal(nrow(out), 1L)
+  expect_equal(out$candidate_library[[1L]], "SIRIUS")
+  expect_equal(as.numeric(out$candidate_score_similarity[[1L]]), 0.86)
+  expect_equal(out$candidate_structure_name[[1L]], "ReferenceHit")
+  expect_equal(out$candidate_spectrum_id[[1L]], "splash10-ref")
+  expect_equal(
+    as.integer(out$candidate_count_similarity_peaks_matched[[1L]]),
+    14L
+  )
+  expect_equal(out$candidate_score_sirius_csi[[1L]], "-25")
+})
+
+test_that("merge_sirius_structures_with_spectral keeps all unmatched direct rows", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "AAAAAAAAAAAAAA",
+    candidate_structure_smiles_no_stereo = "CCO"
+  )
+
+  spectral_prepared <- tidytable::tidytable(
+    feature_id = c("F2", "F2"),
+    candidate_library = c("SIRIUS spectral", "SIRIUS spectral"),
+    candidate_adduct = c("[M+H]+", "[M+H]+"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "BBBBBBBBBBBBBB",
+      "BBBBBBBBBBBBBB"
+    ),
+    candidate_structure_smiles_no_stereo = c("CCCC", "CCCC"),
+    candidate_spectrum_id = c("splash10-a", "splash10-b"),
+    candidate_score_similarity = c("0.40", "0.42"),
+    candidate_count_similarity_peaks_matched = c("9", "11")
+  )
+
+  out <- merge_sirius_structures_with_spectral(
+    structures_prepared,
+    spectral_prepared
+  )
+
+  spectral_out <- out[out$candidate_library == "SIRIUS spectral", ]
+  expect_equal(nrow(spectral_out), 2L)
+  expect_true(all(
+    c("splash10-a", "splash10-b") %in% spectral_out$candidate_spectrum_id
+  ))
+})
+
+test_that("merge_sirius_structures_with_spectral filters high-error analog rows by default", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "AAAAAAAAAAAAAA",
+    candidate_structure_smiles_no_stereo = "CCO"
+  )
+
+  spectral_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS spectral (analog)",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "BBBBBBBBBBBBBB",
+    candidate_structure_smiles_no_stereo = "CCCC",
+    candidate_score_similarity = "0.42",
+    candidate_structure_error_mz = "17.03"
+  )
+
+  out <- merge_sirius_structures_with_spectral(
+    structures_prepared,
+    spectral_prepared
+  )
+
+  expect_equal(nrow(out), 1L)
+  expect_true(any(out$candidate_library == "SIRIUS"))
+  expect_false(any(out$candidate_library == "SIRIUS spectral (analog)"))
+})
+
+test_that("merge_sirius_structures_with_spectral merges analog hits like direct spectral", {
+  # Analog hits are now treated identically to direct spectral matches:
+  # if feature_id + InChIKey match, they merge into the structure row.
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "SAMEKEY0000000",
+    candidate_structure_smiles_no_stereo = "CCO",
+    candidate_score_sirius_csi = "-30"
+  )
+
+  spectral_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS spectral (analog)",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "SAMEKEY0000000",
+    candidate_structure_smiles_no_stereo = "CCO",
+    candidate_score_similarity = "0.55",
+    candidate_structure_error_mz = "14.02"
+  )
+
+  out <- merge_sirius_structures_with_spectral(
+    structures_prepared,
+    spectral_prepared,
+    max_analog_abs_mz_error = 20
+  )
+
+  # Should merge into one row because keys overlap
+  expect_equal(nrow(out), 1L)
+  expect_equal(out$candidate_library[[1L]], "SIRIUS")
+  expect_equal(as.numeric(out$candidate_score_similarity[[1L]]), 0.55)
+  expect_equal(out$candidate_score_sirius_csi[[1L]], "-30")
+})
+
+test_that("merge_sirius_structures_with_spectral filters analog by threshold", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "AAAAAAAAAAAAAA",
+    candidate_structure_smiles_no_stereo = "CCO"
+  )
+
+  spectral_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS spectral (analog)",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "BBBBBBBBBBBBBB",
+    candidate_structure_smiles_no_stereo = "CCCC",
+    candidate_score_similarity = "0.42",
+    candidate_structure_error_mz = "17.03"
+  )
+
+  out <- merge_sirius_structures_with_spectral(
+    structures_prepared,
+    spectral_prepared,
+    max_analog_abs_mz_error = 0.02
+  )
+
+  # Analog has error 17.03 > threshold 0.02, so it is filtered out
+  expect_equal(nrow(out), 1L)
+  expect_true(any(out$candidate_library == "SIRIUS"))
+  expect_false(any(out$candidate_library == "SIRIUS spectral (analog)"))
+})
+
+test_that("merge_sirius_structures_with_spectral keeps analog standalone when no key match", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "STRUCTKEY000001",
+    candidate_structure_smiles_no_stereo = "CCO",
+    candidate_score_sirius_csi = "-30"
+  )
+
+  spectral_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS spectral (analog)",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "DIFFERENTKEY000",
+    candidate_structure_smiles_no_stereo = "CCCC",
+    candidate_score_similarity = "0.55",
+    candidate_structure_error_mz = "14.02"
+  )
+
+  out <- merge_sirius_structures_with_spectral(
+    structures_prepared,
+    spectral_prepared,
+    max_analog_abs_mz_error = 20
+  )
+
+  # Different InChIKeys => no overlap => both stay as separate candidates
+  expect_equal(nrow(out), 2L)
+  expect_true(any(out$candidate_library == "SIRIUS"))
+  expect_true(any(out$candidate_library == "SIRIUS spectral (analog)"))
+})
+
+test_that("merge_sirius_structures_with_spectral can keep high-error analogs when disabled", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "AAAAAAAAAAAAAA",
+    candidate_structure_smiles_no_stereo = "CCO"
+  )
+
+  spectral_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS spectral (analog)",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "BBBBBBBBBBBBBB",
+    candidate_structure_smiles_no_stereo = "CCCC",
+    candidate_score_similarity = "0.42",
+    candidate_structure_error_mz = "17.03"
+  )
+
+  out <- merge_sirius_structures_with_spectral(
+    structures_prepared,
+    spectral_prepared,
+    max_analog_abs_mz_error = Inf
+  )
+
+  expect_equal(nrow(out), 2L)
+  expect_true(any(out$candidate_library == "SIRIUS spectral (analog)"))
+})
+
+test_that("join_sirius_annotation_tables keeps formula mz error on structure rows", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_molecular_formula = "C10H12N2",
+    candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
+    candidate_score_sirius_csi = "-25"
+  )
+
+  formulas_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_molecular_formula = "C10H12N2",
+    candidate_structure_exact_mass = 160.1000,
+    candidate_structure_error_mz = 0.0012,
+    candidate_score_sirius_sirius = 15
+  )
+
+  canopus_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_molecular_formula = "C10H12N2",
+    feature_pred_tax_npc_01pat_val = "Alkaloids"
+  )
+
+  denovo_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_molecular_formula = "C10H12N2",
+    candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
+    candidate_score_sirius_csi = "-20"
+  )
+
+  out <- join_sirius_annotation_tables(
+    structures_prepared = structures_prepared,
+    formulas_prepared = formulas_prepared,
+    canopus_prepared = canopus_prepared,
+    denovo_prepared = denovo_prepared
+  )
+
+  expect_equal(nrow(out), 1L)
+  expect_equal(as.numeric(out$candidate_structure_error_mz[[1L]]), 0.0012)
+  expect_equal(out$feature_pred_tax_npc_01pat_val[[1L]], "Alkaloids")
+})
+
+test_that("join_sirius_annotation_tables retains de novo-only candidates", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_molecular_formula = "C10H12N2",
+    candidate_structure_inchikey_connectivity_layer = "STRUCTKEY000001",
+    candidate_structure_smiles_no_stereo = "CCO",
+    candidate_library = "SIRIUS"
+  )
+
+  formulas_prepared <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_adduct = c("[M+H]+", "[M+H]+"),
+    candidate_structure_molecular_formula = c("C10H12N2", "C11H14N2"),
+    candidate_structure_error_mz = c(0.0012, 0.0025)
+  )
+
+  canopus_prepared <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_adduct = c("[M+H]+", "[M+H]+"),
+    candidate_structure_molecular_formula = c("C10H12N2", "C11H14N2"),
+    feature_pred_tax_npc_01pat_val = c("Alkaloids", "Peptides")
+  )
+
+  denovo_prepared <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_adduct = c("[M+H]+", "[M+H]+"),
+    candidate_structure_molecular_formula = c("C10H12N2", "C11H14N2"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "STRUCTKEY000001",
+      "DENOVOKEY000002"
+    ),
+    candidate_structure_smiles_no_stereo = c("CCO", "CCN"),
+    candidate_library = c("SIRIUS", "SIRIUS")
+  )
+
+  out <- join_sirius_annotation_tables(
+    structures_prepared = structures_prepared,
+    formulas_prepared = formulas_prepared,
+    canopus_prepared = canopus_prepared,
+    denovo_prepared = denovo_prepared
+  )
+
+  expect_equal(nrow(out), 2L)
+  expect_true(any(out$feature_id == "F2"))
+  denovo_row <- out[out$feature_id == "F2", ]
+  expect_equal(
+    denovo_row$candidate_structure_inchikey_connectivity_layer[[1L]],
+    "DENOVOKEY000002"
+  )
+  expect_equal(
+    as.numeric(denovo_row$candidate_structure_error_mz[[1L]]),
+    0.0025
+  )
+  expect_equal(denovo_row$feature_pred_tax_npc_01pat_val[[1L]], "Peptides")
+})
+
+test_that("join_sirius_annotation_tables backfills de novo error_mz by feature_id", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_molecular_formula = "C10H12N2",
+    candidate_structure_inchikey_connectivity_layer = "STRUCTKEY000001",
+    candidate_structure_smiles_no_stereo = "CCO",
+    candidate_library = "SIRIUS"
+  )
+
+  formulas_prepared <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_adduct = c("[M+H]+", "[M+H]+"),
+    candidate_structure_molecular_formula = c("C10H12N2", "C11H14N2"),
+    candidate_structure_error_mz = c(0.0012, 0.0042)
+  )
+
+  canopus_prepared <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    feature_pred_tax_npc_01pat_val = c("Alkaloids", "Peptides")
+  )
+
+  # F2 is de novo-only and intentionally missing adduct/formula keys
+  denovo_prepared <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "STRUCTKEY000001",
+      "DENOVOKEY000002"
+    ),
+    candidate_structure_smiles_no_stereo = c("CCO", "CCN"),
+    candidate_library = c("SIRIUS", "SIRIUS")
+  )
+
+  out <- join_sirius_annotation_tables(
+    structures_prepared = structures_prepared,
+    formulas_prepared = formulas_prepared,
+    canopus_prepared = canopus_prepared,
+    denovo_prepared = denovo_prepared
+  )
+
+  expect_equal(nrow(out), 2L)
+  denovo_row <- out[out$feature_id == "F2", ]
+  expect_equal(
+    as.numeric(denovo_row$candidate_structure_error_mz[[1L]]),
+    0.0042
+  )
+})
+
+test_that("join_sirius_annotation_tables ignores non-overlapping optional join keys", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_molecular_formula = "C10H12N2",
+    candidate_structure_inchikey_connectivity_layer = "STRUCTKEY000001",
+    candidate_structure_smiles_no_stereo = "CCO",
+    candidate_library = "SIRIUS"
+  )
+
+  formulas_prepared <- tidytable::tidytable(
+    feature_id = "F2",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_molecular_formula = "C11H14N2",
+    candidate_structure_error_mz = 0.0061
+  )
+
+  canopus_prepared <- tidytable::tidytable(feature_id = character())
+
+  # De novo-only row has optional key columns present but non-overlapping/NA.
+  # Previous logic used all shared columns and over-constrained joins.
+  denovo_prepared <- tidytable::tidytable(
+    feature_id = "F2",
+    candidate_adduct = NA_character_,
+    candidate_structure_molecular_formula = NA_character_,
+    candidate_structure_inchikey_connectivity_layer = "DENOVOKEY000002",
+    candidate_structure_smiles_no_stereo = "CCN",
+    candidate_library = "SIRIUS"
+  )
+
+  out <- join_sirius_annotation_tables(
+    structures_prepared = structures_prepared,
+    formulas_prepared = formulas_prepared,
+    canopus_prepared = canopus_prepared,
+    denovo_prepared = denovo_prepared
+  )
+
+  denovo_row <- out[out$feature_id == "F2", ]
+  expect_equal(nrow(denovo_row), 1L)
+  expect_equal(
+    as.numeric(denovo_row$candidate_structure_error_mz[[1L]]),
+    0.0061
+  )
+})
+
+test_that("join_sirius_annotation_tables fills de novo error_mz despite adduct formatting mismatch", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_adduct = "[M-H]-",
+    candidate_structure_molecular_formula = "C7H14N2O3",
+    candidate_structure_inchikey_connectivity_layer = "STRUCTKEY000001",
+    candidate_structure_smiles_no_stereo = "CCO",
+    candidate_library = "SIRIUS"
+  )
+
+  formulas_prepared <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_adduct = c("[M-H]-", "[M-H]-"),
+    candidate_structure_molecular_formula = c("C7H14N2O3", "C7H14N2O3"),
+    candidate_structure_error_mz = c(0.0012, 0.5860)
+  )
+
+  canopus_prepared <- tidytable::tidytable(feature_id = character())
+
+  denovo_prepared <- tidytable::tidytable(
+    feature_id = "F2",
+    candidate_adduct = "[M - H]-",
+    candidate_structure_molecular_formula = "C7H14N2O3",
+    candidate_structure_inchikey_connectivity_layer = "DENOVOKEY000002",
+    candidate_structure_smiles_no_stereo = "CCN",
+    candidate_library = "SIRIUS"
+  )
+
+  out <- join_sirius_annotation_tables(
+    structures_prepared = structures_prepared,
+    formulas_prepared = formulas_prepared,
+    canopus_prepared = canopus_prepared,
+    denovo_prepared = denovo_prepared
+  )
+
+  denovo_row <- out[out$feature_id == "F2", ]
+  expect_equal(nrow(denovo_row), 1L)
+  expect_equal(
+    as.numeric(denovo_row$candidate_structure_error_mz[[1L]]),
+    0.5860
+  )
+})
+
+test_that("load_sirius_tables filters formulaRank and loads denovo/spectral when present", {
   local_mocked_bindings(
     read_from_sirius_zip = function(input_directory, file) {
       if (grepl("canopus_formula_summary", file)) {
@@ -461,12 +960,27 @@ test_that("load_sirius_tables filters formulaRank and loads denovo when present"
       }
       tidytable::tidytable()
     },
+    read_sirius_internal_file = function(input_directory, internal_file) {
+      force(input_directory)
+      tidytable::tidytable(
+        mappingFeatureId = "F_spec",
+        analogHit = grepl("analog", internal_file),
+        similarity = "0.8",
+        sharedPeaks = "10"
+      )
+    },
     .package = "tima"
   )
   local_mocked_bindings(
     unzip = function(zipfile, list = FALSE, ...) {
       if (isTRUE(list)) {
-        return(data.frame(Name = c("denovo_structure_identifications_all.tsv")))
+        return(data.frame(
+          Name = c(
+            "denovo_structure_identifications_all.tsv",
+            "spectral_matches_all.tsv",
+            "spectral_matches_analog_all.tsv"
+          )
+        ))
       }
       invisible(NULL)
     },
@@ -479,36 +993,10 @@ test_that("load_sirius_tables filters formulaRank and loads denovo when present"
   expect_equal(nrow(out$formulas), 1L)
   expect_equal(nrow(out$structures), 2L)
   expect_equal(nrow(out$denovo), 2L)
+  expect_equal(nrow(out$spectral), 2L)
 })
 
-test_that("load_sirius_tables keeps all rows for version 5 and leaves denovo template", {
-  local_mocked_bindings(
-    read_from_sirius_zip = function(input_directory, file) {
-      force(input_directory)
-      if (identical(file, "canopus_compound_summary.tsv")) {
-        return(tidytable::tidytable(formulaRank = c(1L, 2L), a = c("x", "y")))
-      }
-      if (identical(file, "formula_identifications_all.tsv")) {
-        return(tidytable::tidytable(formulaRank = c(1L, 3L), b = c("u", "v")))
-      }
-      if (identical(file, "compound_identifications_all.tsv")) {
-        return(tidytable::tidytable(id = 1:2))
-      }
-      tidytable::tidytable()
-    },
-    .package = "tima"
-  )
-
-  out <- load_sirius_tables(input_directory = "dummy.zip", version = "5")
-
-  expect_equal(nrow(out$canopus), 2L)
-  expect_equal(nrow(out$formulas), 2L)
-  expect_equal(nrow(out$structures), 2L)
-  expect_equal(nrow(out$denovo), 1L)
-  expect_true(all(is.na(out$denovo$mappingFeatureId)))
-})
-
-test_that("load_sirius_tables v6 leaves denovo template when file is not present", {
+test_that("load_sirius_tables v6 leaves spectral template when no spectral files", {
   local_mocked_bindings(
     read_from_sirius_zip = function(input_directory, file) {
       force(input_directory)
@@ -540,11 +1028,8 @@ test_that("load_sirius_tables v6 leaves denovo template when file is not present
 
   out <- load_sirius_tables(input_directory = "dummy.zip", version = "6")
 
-  expect_equal(nrow(out$canopus), 1L)
-  expect_equal(nrow(out$formulas), 1L)
-  expect_equal(nrow(out$structures), 1L)
-  expect_equal(nrow(out$denovo), 1L)
-  expect_true(all(is.na(out$denovo$mappingFeatureId)))
+  expect_equal(nrow(out$spectral), 1L)
+  expect_true(all(is.na(out$spectral$mappingFeatureId)))
 })
 
 test_that("load_sirius_summaries returns empty when no summary files", {
@@ -622,4 +1107,82 @@ test_that("load_sirius_summaries returns empty when all discovered summaries are
   out <- load_sirius_summaries("dummy.zip")
   expect_true(tidytable::is_tidytable(out))
   expect_equal(nrow(out), 0L)
+})
+
+test_that("load_sirius_tables v6 keeps only formulaRank 1 when ranks are character", {
+  skip_if_not_installed("archive")
+
+  tmp <- temp_test_dir("sirius_formula_rank_char")
+  dir.create(tmp, recursive = TRUE, showWarnings = FALSE)
+
+  can_path <- file.path(tmp, "canopus_formula_summary_all.tsv")
+  for_path <- file.path(tmp, "formula_identifications_all.tsv")
+  str_path <- file.path(tmp, "structure_identifications_all.tsv")
+  zip_path <- file.path(tmp, "sirius_mock.zip")
+
+  can_df <- data.frame(
+    mappingFeatureId = c("F1", "F1"),
+    formulaRank = c("1", "2"),
+    adduct = c("[M+H]+", "[M+H]+"),
+    molecularFormula = c("C10H12N2", "C9H10N2"),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+  for_df <- data.frame(
+    mappingFeatureId = c("F1", "F1"),
+    formulaRank = c("1", "2"),
+    adduct = c("[M+H]+", "[M+H]+"),
+    ionMass = c("160.1", "150.1"),
+    `massErrorPrecursor.ppm.` = c("1.2", "2.4"),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+  str_df <- data.frame(
+    mappingFeatureId = "F1",
+    adduct = "[M+H]+",
+    InChIkey2D = "AAAAAAAAAAAAAA",
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+
+  utils::write.table(
+    can_df,
+    can_path,
+    sep = "\t",
+    quote = FALSE,
+    row.names = FALSE
+  )
+  utils::write.table(
+    for_df,
+    for_path,
+    sep = "\t",
+    quote = FALSE,
+    row.names = FALSE
+  )
+  utils::write.table(
+    str_df,
+    str_path,
+    sep = "\t",
+    quote = FALSE,
+    row.names = FALSE
+  )
+
+  old_wd <- getwd()
+  setwd(tmp)
+  on.exit(setwd(old_wd), add = TRUE)
+  utils::zip(
+    zipfile = zip_path,
+    files = c(
+      basename(can_path),
+      basename(for_path),
+      basename(str_path)
+    )
+  )
+
+  out <- load_sirius_tables(zip_path, version = "6")
+
+  expect_equal(nrow(out$canopus), 1L)
+  expect_equal(nrow(out$formulas), 1L)
+  expect_equal(out$canopus$formulaRank[[1L]], "1")
+  expect_equal(out$formulas$formulaRank[[1L]], "1")
 })

@@ -46,7 +46,7 @@ validate_install_inputs <- function(package, repos, dependencies) {
 }
 
 .find_package_paths <- function(package, quiet = TRUE) {
-  suppressWarnings(find.package(package, quiet = quiet))
+  find.package(package, quiet = quiet)
 }
 
 .path_exists <- function(path) {

@@ -46,3 +46,18 @@ test_that("parse_cli_params preserves unmodified parameters", {
   # Other parameters should remain unchanged
   expect_true(length(result) >= length(params))
 })
+
+test_that("parse_cli_params maps SIRIUS analog mz-error CLI argument", {
+  local_test_project(copy = TRUE)
+  params <- get_params(step = "prepare_params_advanced")
+
+  result <- parse_cli_params(
+    arguments = list(too_sir_max_analog_abs_mz_error = 0.005),
+    parameters = params
+  )
+
+  expect_equal(
+    result$tools$sirius$max_analog_abs_mz_error,
+    0.005
+  )
+})

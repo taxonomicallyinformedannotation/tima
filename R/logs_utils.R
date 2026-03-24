@@ -404,7 +404,7 @@ log_success <- function(msg, ...) {
 #' @return Invisibly returns NULL. Side-effects: logs via log_info.
 #'
 log_similarity_distribution <- function(scores, title) {
-  sc <- suppressWarnings(as.numeric(scores))
+  sc <- as.numeric(scores)
   sc <- sc[is.finite(sc)]
   if (length(sc) == 0L) {
     return(invisible(NULL))
@@ -440,7 +440,7 @@ log_similarity_distribution <- function(scores, title) {
 #' @return Named integer vector of counts for each bin label (all bins present).
 accumulate_similarity_bins <- function(scores) {
   breaks <- seq(0, 1, by = 0.1)
-  sc <- suppressWarnings(as.numeric(scores))
+  sc <- as.numeric(scores)
   sc <- sc[is.finite(sc)]
   if (length(sc) == 0L) {
     tmp <- cut(

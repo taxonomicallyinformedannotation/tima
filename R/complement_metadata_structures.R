@@ -456,7 +456,7 @@ complement_metadata_structures <- function(
       )
     ) |>
     tidytable::mutate(
-      candidate_structure_molecular_formula = tidytable::coalesce(
+      candidate_structure_molecular_formula = .pick_enrichment(
         .enr_candidate_structure_molecular_formula,
         candidate_structure_molecular_formula
       ),
@@ -468,43 +468,43 @@ complement_metadata_structures <- function(
         .enr_candidate_structure_xlogp,
         candidate_structure_xlogp
       ),
-      candidate_structure_tag = tidytable::coalesce(
+      candidate_structure_tag = .pick_enrichment(
         .enr_candidate_structure_tag,
         candidate_structure_tag
       ),
-      candidate_structure_name = tidytable::coalesce(
+      candidate_structure_name = .pick_enrichment(
         .enr_candidate_structure_name,
         candidate_structure_name
       ),
-      candidate_structure_tax_npc_01pat = tidytable::coalesce(
+      candidate_structure_tax_npc_01pat = .pick_enrichment(
         .enr_candidate_structure_tax_npc_01pat,
         candidate_structure_tax_npc_01pat
       ),
-      candidate_structure_tax_npc_02sup = tidytable::coalesce(
+      candidate_structure_tax_npc_02sup = .pick_enrichment(
         .enr_candidate_structure_tax_npc_02sup,
         candidate_structure_tax_npc_02sup
       ),
-      candidate_structure_tax_npc_03cla = tidytable::coalesce(
+      candidate_structure_tax_npc_03cla = .pick_enrichment(
         .enr_candidate_structure_tax_npc_03cla,
         candidate_structure_tax_npc_03cla
       ),
-      candidate_structure_tax_cla_chemontid = tidytable::coalesce(
+      candidate_structure_tax_cla_chemontid = .pick_enrichment(
         .enr_candidate_structure_tax_cla_chemontid,
         candidate_structure_tax_cla_chemontid
       ),
-      candidate_structure_tax_cla_01kin = tidytable::coalesce(
+      candidate_structure_tax_cla_01kin = .pick_enrichment(
         .enr_candidate_structure_tax_cla_01kin,
         candidate_structure_tax_cla_01kin
       ),
-      candidate_structure_tax_cla_02sup = tidytable::coalesce(
+      candidate_structure_tax_cla_02sup = .pick_enrichment(
         .enr_candidate_structure_tax_cla_02sup,
         candidate_structure_tax_cla_02sup
       ),
-      candidate_structure_tax_cla_03cla = tidytable::coalesce(
+      candidate_structure_tax_cla_03cla = .pick_enrichment(
         .enr_candidate_structure_tax_cla_03cla,
         candidate_structure_tax_cla_03cla
       ),
-      candidate_structure_tax_cla_04dirpar = tidytable::coalesce(
+      candidate_structure_tax_cla_04dirpar = .pick_enrichment(
         .enr_candidate_structure_tax_cla_04dirpar,
         candidate_structure_tax_cla_04dirpar
       )
@@ -682,7 +682,7 @@ complement_metadata_structures <- function(
 }
 
 .resolve_numeric_or_na <- function(x, tolerance = 1e-8) {
-  nums <- suppressWarnings(as.numeric(stats::na.omit(as.character(x))))
+  nums <- as.numeric(stats::na.omit(as.character(x)))
   nums <- nums[is.finite(nums)]
 
   if (length(nums) == 0L) {
@@ -698,7 +698,7 @@ complement_metadata_structures <- function(
 }
 
 .resolve_xlogp <- function(x, tolerance = 1e-6) {
-  nums <- suppressWarnings(as.numeric(stats::na.omit(as.character(x))))
+  nums <- as.numeric(stats::na.omit(as.character(x)))
   nums <- nums[is.finite(nums)]
 
   if (length(nums) == 0L) {
@@ -768,4 +768,22 @@ complement_metadata_structures <- function(
   x_chr <- trimws(as.character(x))
   x_chr[x_chr == ""] <- NA_character_
   x_chr
+}
+
+.normalize_enrichment_text <- function(x) {
+  vals <- as.character(x)
+  trimmed <- trimws(vals)
+  low <- tolower(trimmed)
+  invalid <- is.na(vals) |
+    trimmed == "" |
+    low %in% c("na", "n/a", "null", "notclassified", "empty")
+  vals[invalid] <- NA_character_
+  vals
+}
+
+.pick_enrichment <- function(enriched, existing) {
+  tidytable::coalesce(
+    .normalize_enrichment_text(enriched),
+    existing
+  )
 }

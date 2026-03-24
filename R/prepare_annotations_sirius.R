@@ -12,6 +12,8 @@
 #' @param str_nam [character] Character path to names file.
 #' @param str_tax_cla [character] Character path to ClassyFire taxonomy.
 #' @param str_tax_npc [character] Character path to NPClassifier taxonomy.
+#' @param max_analog_abs_mz_error [numeric] Maximum allowed absolute m/z
+#'     deviation (Da) for keeping SIRIUS spectral analog hits.
 #'
 #' @return NULL (invisible). Stops on validation failure.
 #' @keywords internal
@@ -24,7 +26,8 @@ validate_sirius_inputs <- function(
   str_met,
   str_nam,
   str_tax_cla,
-  str_tax_npc
+  str_tax_npc,
+  max_analog_abs_mz_error
 ) {
   if (!sirius_version %in% c("5", "6", 5, 6)) {
     cli::cli_abort(
@@ -53,6 +56,17 @@ validate_sirius_inputs <- function(
       str_tax_npc = str_tax_npc
     ),
     allow_null = FALSE
+  )
+
+  validate_numeric_range(
+    value = max_analog_abs_mz_error,
+    min_value = 0,
+    max_value = Inf,
+    param_name = "max_analog_abs_mz_error",
+    context = paste(
+      "Maximum absolute precursor m/z deviation for keeping",
+      "SIRIUS spectral analog candidates"
+    )
   )
 
   invisible(NULL)
@@ -100,42 +114,80 @@ get_sirius_filenames <- function(version) {
 #' @param input_directory [character] Character path to SIRIUS output (directory or zip).
 #' @param version [character] Character "5" or "6".
 #'
-#' @return Named list with canopus, formulas, structures, denovo data frames.
+#' @return Named list with canopus, formulas, structures, denovo, spectral data frames.
 #' @keywords internal
 load_sirius_tables <- function(input_directory, version) {
   fnames <- get_sirius_filenames(version)
   log_debug("Loading SIRIUS tables (version %s)", version)
+
   canopus <- read_from_sirius_zip(input_directory, file = fnames$canopus)
-  if (version == "6" && nrow(canopus) > 0L) {
-    canopus <- canopus |> tidytable::filter(formulaRank == 1L)
+  if (
+    version == "6" && nrow(canopus) > 0L && "formulaRank" %in% names(canopus)
+  ) {
+    canopus <- canopus |>
+      tidytable::mutate(
+        .formula_rank = as.integer(formulaRank)
+      ) |>
+      tidytable::filter(!is.na(.formula_rank), .formula_rank == 1L) |>
+      tidytable::select(-.formula_rank)
   }
+
   formulas <- read_from_sirius_zip(input_directory, file = fnames$formulas)
-  if (version == "6" && nrow(formulas) > 0L) {
-    formulas <- formulas |> tidytable::filter(formulaRank == 1L)
+  if (
+    version == "6" && nrow(formulas) > 0L && "formulaRank" %in% names(formulas)
+  ) {
+    formulas <- formulas |>
+      tidytable::mutate(
+        .formula_rank = as.integer(formulaRank)
+      ) |>
+      tidytable::filter(!is.na(.formula_rank), .formula_rank == 1L) |>
+      tidytable::select(-.formula_rank)
   }
+
   structures <- read_from_sirius_zip(input_directory, file = fnames$structures)
+
+  files <- tryCatch(
+    utils::unzip(zipfile = input_directory, list = TRUE),
+    error = function(e) {
+      out <- list()
+      out$Name <- list.files(input_directory, recursive = TRUE)
+      out
+    }
+  )
+
   denovo <- tidytable::tidytable(mappingFeatureId = NA_character_)
-  if (!is.null(fnames$denovo)) {
-    files <- tryCatch(
-      utils::unzip(zipfile = input_directory, list = TRUE),
-      error = function(...) list(Name = list.files(input_directory))
-    )
-    if (any(grepl(fnames$denovo, files$Name))) {
-      denovo <- read_from_sirius_zip(input_directory, file = fnames$denovo)
+  if (!is.null(fnames$denovo) && any(grepl(fnames$denovo, files$Name))) {
+    denovo <- read_from_sirius_zip(input_directory, file = fnames$denovo)
+  }
+
+  spectral <- tidytable::tidytable(mappingFeatureId = NA_character_)
+  if (!is.null(fnames$spectral)) {
+    spectral_files <- files$Name[grepl(fnames$spectral, files$Name)]
+    if (length(spectral_files) > 0L) {
+      spectral <- purrr::map(
+        spectral_files,
+        ~ read_sirius_internal_file(input_directory, .x) |>
+          tidytable::mutate(.sirius_source_file = .x)
+      ) |>
+        tidytable::bind_rows()
     }
   }
+
   log_debug(
-    "Loaded SIRIUS tables: CANOPUS=%d, formulas=%d, structures=%d, denovo=%d rows",
+    "Loaded SIRIUS tables: CANOPUS=%d, formulas=%d, structures=%d, denovo=%d, spectral=%d rows",
     nrow(canopus),
     nrow(formulas),
     nrow(structures),
-    nrow(denovo)
+    nrow(denovo),
+    nrow(spectral)
   )
+
   list(
     canopus = canopus,
     formulas = formulas,
     structures = structures,
-    denovo = denovo
+    denovo = denovo,
+    spectral = spectral
   )
 }
 
@@ -287,6 +339,353 @@ split_sirius_results <- function(table) {
   list(canopus = canopus, formula = formula, structures = structures)
 }
 
+#' Merge SIRIUS structure candidates with spectral match scores
+#'
+#' @description Joins spectral match results into structure candidate rows by
+#'     `feature_id` + `candidate_structure_inchikey_connectivity_layer`.
+#'     A candidate that appears in both gets all SIRIUS structure scores AND
+#'     the spectral similarity score in a single row.  Spectral hits whose
+#'     InChIKey does not appear in the structure table are kept as standalone
+#'     candidate rows.
+#'
+#' @param structures_prepared [data.frame] Standardised structure candidates.
+#' @param spectral_prepared [data.frame] Standardised spectral-match candidates.
+#'
+#' @return data.frame with merged and unmatched rows combined.
+#' @keywords internal
+merge_sirius_structures_with_spectral <- function(
+  structures_prepared,
+  spectral_prepared,
+  max_analog_abs_mz_error = 0.01
+) {
+  if (nrow(spectral_prepared) == 0L) {
+    return(structures_prepared)
+  }
+  if (nrow(structures_prepared) == 0L) {
+    return(spectral_prepared)
+  }
+
+  inchikey_col <- "candidate_structure_inchikey_connectivity_layer"
+  if (
+    !inchikey_col %in% names(spectral_prepared) ||
+      all(is.na(spectral_prepared[[inchikey_col]]))
+  ) {
+    # No matchable spectral InChIKeys – nothing to join, keep spectral as-is
+    return(
+      tidytable::bind_rows(structures_prepared, spectral_prepared) |>
+        tidytable::distinct()
+    )
+  }
+
+  join_key <- c("feature_id", "candidate_structure_inchikey_connectivity_layer")
+
+  spectral_direct <- spectral_prepared |>
+    tidytable::filter(candidate_library != "SIRIUS spectral (analog)")
+  spectral_analogs <- spectral_prepared |>
+    tidytable::filter(candidate_library == "SIRIUS spectral (analog)")
+
+  if (is.finite(max_analog_abs_mz_error) && nrow(spectral_analogs) > 0L) {
+    spectral_analogs <- spectral_analogs |>
+      tidytable::mutate(
+        .analog_abs_error_mz = abs(
+          as.numeric(candidate_structure_error_mz)
+        )
+      ) |>
+      tidytable::filter(
+        !is.na(.analog_abs_error_mz),
+        .analog_abs_error_mz <= max_analog_abs_mz_error
+      ) |>
+      tidytable::select(-.analog_abs_error_mz)
+  }
+
+  spectral_all <- tidytable::bind_rows(spectral_direct, spectral_analogs)
+
+  if (!"candidate_count_similarity_peaks_matched" %in% names(spectral_all)) {
+    spectral_all <- spectral_all |>
+      tidytable::mutate(candidate_count_similarity_peaks_matched = NA_integer_)
+  }
+  if (!"candidate_spectrum_id" %in% names(spectral_all)) {
+    spectral_all <- spectral_all |>
+      tidytable::mutate(candidate_spectrum_id = NA_character_)
+  }
+  if (!"candidate_structure_name" %in% names(spectral_all)) {
+    spectral_all <- spectral_all |>
+      tidytable::mutate(candidate_structure_name = NA_character_)
+  }
+
+  spectral_typed <- spectral_all |>
+    tidytable::mutate(
+      candidate_score_similarity = as.numeric(candidate_score_similarity),
+      candidate_count_similarity_peaks_matched = as.integer(
+        candidate_count_similarity_peaks_matched
+      )
+    )
+
+  structures_keyed <- structures_prepared |>
+    tidytable::filter(
+      !is.na(feature_id),
+      !is.na(candidate_structure_inchikey_connectivity_layer)
+    )
+
+  structures_no_key <- structures_prepared |>
+    tidytable::filter(
+      is.na(feature_id) | is.na(candidate_structure_inchikey_connectivity_layer)
+    )
+
+  spectral_keyed <- spectral_typed |>
+    tidytable::filter(
+      !is.na(feature_id),
+      !is.na(candidate_structure_inchikey_connectivity_layer)
+    )
+
+  spectral_no_key <- spectral_typed |>
+    tidytable::filter(
+      is.na(feature_id) | is.na(candidate_structure_inchikey_connectivity_layer)
+    )
+
+  # Full join keeps overlap rows merged and preserves non-overlap rows as candidates.
+  merged_keyed <- tidytable::full_join(
+    structures_keyed,
+    spectral_keyed,
+    by = join_key
+  )
+
+  suffixed_bases <- names(merged_keyed)
+  suffixed_bases <- suffixed_bases[grepl("\\.x$", suffixed_bases)]
+  suffixed_bases <- sub("\\.x$", "", suffixed_bases)
+
+  for (col in suffixed_bases) {
+    col_x <- paste0(col, ".x")
+    col_y <- paste0(col, ".y")
+
+    merged_keyed <- merged_keyed |>
+      tidytable::mutate(
+        !!as.name(col) := tidytable::coalesce(
+          !!as.name(col_x),
+          !!as.name(col_y)
+        )
+      ) |>
+      tidytable::select(-tidyselect::any_of(c(col_x, col_y)))
+  }
+
+  if ("candidate_score_similarity" %in% names(merged_keyed)) {
+    merged_keyed <- merged_keyed |>
+      tidytable::mutate(
+        candidate_score_similarity = as.numeric(candidate_score_similarity)
+      )
+  }
+
+  if ("candidate_count_similarity_peaks_matched" %in% names(merged_keyed)) {
+    merged_keyed <- merged_keyed |>
+      tidytable::mutate(
+        candidate_count_similarity_peaks_matched = as.integer(
+          candidate_count_similarity_peaks_matched
+        )
+      )
+  }
+
+  tidytable::bind_rows(
+    merged_keyed,
+    structures_no_key,
+    spectral_no_key
+  ) |>
+    tidytable::distinct()
+}
+
+.has_overlap_non_na <- function(x, y, col) {
+  if (!(col %in% names(x) && col %in% names(y))) {
+    return(FALSE)
+  }
+  xv <- unique(as.character(x[[col]]))
+  yv <- unique(as.character(y[[col]]))
+  xv <- xv[!is.na(xv) & nzchar(trimws(xv))]
+  yv <- yv[!is.na(yv) & nzchar(trimws(yv))]
+  if (length(xv) == 0L || length(yv) == 0L) {
+    return(FALSE)
+  }
+  length(intersect(xv, yv)) > 0L
+}
+
+.pick_sirius_join_keys <- function(x, y, preferred_keys) {
+  # Always anchor on feature_id when available.
+  keys <- character(0)
+  if ("feature_id" %in% names(x) && "feature_id" %in% names(y)) {
+    keys <- "feature_id"
+  }
+
+  # Add optional keys only if they can actually match (non-NA overlap).
+  optional_keys <- setdiff(preferred_keys, "feature_id")
+  optional_keys <- optional_keys[
+    optional_keys %in% names(x) & optional_keys %in% names(y)
+  ]
+
+  for (k in optional_keys) {
+    if (.has_overlap_non_na(x, y, k)) {
+      keys <- c(keys, k)
+    }
+  }
+
+  unique(keys)
+}
+
+.left_join_new_sirius_columns <- function(x, y, by) {
+  if (nrow(x) == 0L || nrow(y) == 0L || length(by) == 0L) {
+    return(x)
+  }
+
+  new_cols <- setdiff(names(y), names(x))
+  if (length(new_cols) == 0L) {
+    return(x)
+  }
+
+  y_reduced <- y |>
+    tidytable::select(tidyselect::any_of(c(by, new_cols))) |>
+    tidytable::distinct()
+
+  tidytable::left_join(x, y_reduced, by = by)
+}
+
+join_sirius_annotation_tables <- function(
+  structures_prepared,
+  formulas_prepared,
+  canopus_prepared,
+  denovo_prepared
+) {
+  formula_keys <- .pick_sirius_join_keys(
+    structures_prepared,
+    formulas_prepared,
+    c("feature_id", "candidate_adduct", "candidate_structure_molecular_formula")
+  )
+  canopus_keys <- .pick_sirius_join_keys(
+    structures_prepared,
+    canopus_prepared,
+    c("feature_id", "candidate_adduct", "candidate_structure_molecular_formula")
+  )
+  denovo_keys <- .pick_sirius_join_keys(
+    structures_prepared,
+    denovo_prepared,
+    c(
+      "feature_id",
+      "candidate_adduct",
+      "candidate_structure_inchikey_connectivity_layer",
+      "candidate_structure_smiles_no_stereo",
+      "candidate_structure_molecular_formula"
+    )
+  )
+
+  structures_enriched <- structures_prepared |>
+    .left_join_new_sirius_columns(formulas_prepared, by = formula_keys) |>
+    .left_join_new_sirius_columns(canopus_prepared, by = canopus_keys) |>
+    .left_join_new_sirius_columns(denovo_prepared, by = denovo_keys)
+
+  # Keep de novo candidates that do not exist in structure_identifications.
+  denovo_match_keys <- c(
+    "feature_id",
+    "candidate_structure_inchikey_connectivity_layer",
+    "candidate_structure_smiles_no_stereo",
+    "candidate_structure_molecular_formula",
+    "candidate_adduct"
+  )
+  denovo_match_keys <- denovo_match_keys[
+    denovo_match_keys %in%
+      names(structures_prepared) &
+      denovo_match_keys %in% names(denovo_prepared)
+  ]
+
+  denovo_only <- if (
+    nrow(denovo_prepared) == 0L ||
+      !"feature_id" %in% denovo_match_keys ||
+      length(denovo_match_keys) < 2L
+  ) {
+    denovo_prepared
+  } else {
+    denovo_prepared |>
+      tidytable::anti_join(
+        structures_prepared |>
+          tidytable::distinct(tidyselect::any_of(denovo_match_keys)),
+        by = denovo_match_keys
+      )
+  }
+
+  denovo_only_enriched <- denovo_only |>
+    .left_join_new_sirius_columns(
+      formulas_prepared,
+      by = .pick_sirius_join_keys(
+        denovo_only,
+        formulas_prepared,
+        c(
+          "feature_id",
+          "candidate_structure_molecular_formula"
+        )
+      )
+    ) |>
+    .left_join_new_sirius_columns(
+      canopus_prepared,
+      by = .pick_sirius_join_keys(
+        denovo_only,
+        canopus_prepared,
+        c(
+          "feature_id",
+          "candidate_adduct",
+          "candidate_structure_molecular_formula"
+        )
+      )
+    )
+
+  # Build fallback mz error from formula-level data (best match per feature)
+  # This is used for both de novo and structure candidates that lack mz_error.
+  formula_error_fallback <- formulas_prepared |>
+    tidytable::filter(!is.na(feature_id)) |>
+    tidytable::mutate(
+      candidate_structure_error_mz = as.numeric(candidate_structure_error_mz)
+    ) |>
+    tidytable::filter(!is.na(candidate_structure_error_mz)) |>
+    tidytable::arrange(feature_id, abs(candidate_structure_error_mz)) |>
+    tidytable::distinct(feature_id, .keep_all = TRUE) |>
+    tidytable::select(
+      feature_id,
+      candidate_structure_error_mz_fallback = candidate_structure_error_mz
+    )
+
+  # Apply fallback to structures that are missing mz_error
+  if (!"candidate_structure_error_mz" %in% names(structures_enriched)) {
+    structures_enriched <- structures_enriched |>
+      tidytable::mutate(candidate_structure_error_mz = NA_real_)
+  }
+
+  structures_with_fallback <- structures_enriched |>
+    tidytable::left_join(formula_error_fallback, by = "feature_id") |>
+    tidytable::mutate(
+      candidate_structure_error_mz = ifelse(
+        is.na(as.numeric(candidate_structure_error_mz)),
+        candidate_structure_error_mz_fallback,
+        as.numeric(candidate_structure_error_mz)
+      )
+    ) |>
+    tidytable::select(-candidate_structure_error_mz_fallback)
+
+  # Some de novo candidates can miss adduct/formula keys and therefore bypass
+  # strict formula joins; backfill mz error from the formula-level feature row.
+  if (!"candidate_structure_error_mz" %in% names(denovo_only_enriched)) {
+    denovo_only_enriched <- denovo_only_enriched |>
+      tidytable::mutate(candidate_structure_error_mz = NA_real_)
+  }
+
+  denovo_only_enriched <- denovo_only_enriched |>
+    tidytable::left_join(formula_error_fallback, by = "feature_id") |>
+    tidytable::mutate(
+      candidate_structure_error_mz = ifelse(
+        is.na(as.numeric(candidate_structure_error_mz)),
+        candidate_structure_error_mz_fallback,
+        as.numeric(candidate_structure_error_mz)
+      )
+    ) |>
+    tidytable::select(-candidate_structure_error_mz_fallback)
+
+  tidytable::bind_rows(structures_with_fallback, denovo_only_enriched) |>
+    tidytable::distinct()
+}
+
 #' @title Prepare annotations SIRIUS
 #'
 #' @description Prepares SIRIUS annotation results (structure predictions,
@@ -298,7 +697,7 @@ split_sirius_results <- function(table) {
 #' This function:
 #' \itemize{
 #'   \item Validates inputs (version, paths, file existence).
-#'   \item Loads SIRIUS output files (CANOPUS, formulas, structures, denovo).
+#'   \item Loads SIRIUS output files (CANOPUS, formulas, structures, denovo, spectral matches).
 #'   \item Harmonizes column names across SIRIUS v5 and v6.
 #'   \item Joins with structure metadata (stereochemistry, names, taxonomy).
 #'   \item Splits results into three output files: annotations, CANOPUS, formulas.
@@ -328,6 +727,8 @@ split_sirius_results <- function(table) {
 #' @param str_nam [character] Character path to structure names file.
 #' @param str_tax_cla [character] Character path to ClassyFire taxonomy file.
 #' @param str_tax_npc [character] Character path to NPClassifier taxonomy file.
+#' @param max_analog_abs_mz_error [numeric] Maximum allowed absolute m/z
+#'     deviation (Da) for keeping SIRIUS spectral analog hits.
 #'
 #' @return Character path to the prepared SIRIUS annotations file (invisible).
 #'
@@ -373,7 +774,10 @@ prepare_annotations_sirius <-
     )$files$libraries$sop$merged$structures$taxonomies$cla,
     str_tax_npc = get_params(
       step = "prepare_annotations_sirius"
-    )$files$libraries$sop$merged$structures$taxonomies$npc
+    )$files$libraries$sop$merged$structures$taxonomies$npc,
+    max_analog_abs_mz_error = get_params(
+      step = "prepare_annotations_sirius"
+    )$tools$sirius$max_analog_abs_mz_error
   ) {
     ctx <- log_operation("prepare_annotations_sirius", version = sirius_version)
 
@@ -388,7 +792,8 @@ prepare_annotations_sirius <-
       str_met = str_met,
       str_nam = str_nam,
       str_tax_cla = str_tax_cla,
-      str_tax_npc = str_tax_npc
+      str_tax_npc = str_tax_npc,
+      max_analog_abs_mz_error = max_analog_abs_mz_error
     )
 
     log_debug("SIRIUS version: %s", sirius_version)
@@ -434,11 +839,23 @@ prepare_annotations_sirius <-
       denovo_prepared <- tables$denovo |>
         tidytable::mutate(feature_id = mappingFeatureId) |>
         select_sirius_columns_structures(sirius_version = sirius_version)
+      spectral_prepared <- tables$spectral |>
+        select_sirius_columns_spectral(sirius_version = sirius_version)
       log_debug("Joining SIRIUS results")
-      table <- structures_prepared |>
-        tidytable::left_join(formulas_prepared) |>
-        tidytable::left_join(canopus_prepared) |>
-        tidytable::left_join(denovo_prepared) |>
+
+      structures_enriched <- join_sirius_annotation_tables(
+        structures_prepared = structures_prepared,
+        formulas_prepared = formulas_prepared,
+        canopus_prepared = canopus_prepared,
+        denovo_prepared = denovo_prepared
+      )
+
+      merged_structures <- merge_sirius_structures_with_spectral(
+        structures_enriched,
+        spectral_prepared,
+        max_analog_abs_mz_error = max_analog_abs_mz_error
+      )
+      table <- merged_structures |>
         tidytable::mutate(
           candidate_structure_tax_cla_chemontid = NA_character_,
           candidate_structure_tax_cla_01kin = NA_character_
@@ -447,7 +864,10 @@ prepare_annotations_sirius <-
         canopus_prepared,
         formulas_prepared,
         structures_prepared,
+        structures_enriched,
+        merged_structures,
         denovo_prepared,
+        spectral_prepared,
         tables,
         summaries
       )
@@ -488,3 +908,37 @@ prepare_annotations_sirius <-
       "structural" = output_ann[[1L]]
     ))
   }
+
+read_sirius_internal_file <- function(input_directory, internal_file) {
+  from_zip <- tryCatch(
+    {
+      archive::archive_read(archive = input_directory, file = internal_file) |>
+        utils::read.delim(
+          quote = "",
+          na.strings = c("", "NA"),
+          colClasses = "character",
+          stringsAsFactors = FALSE
+        ) |>
+        tidytable::tidytable()
+    },
+    error = function(e) NULL
+  )
+
+  if (!is.null(from_zip)) {
+    return(from_zip)
+  }
+
+  path <- file.path(input_directory, internal_file)
+  if (!file.exists(path)) {
+    return(tidytable::tidytable())
+  }
+
+  utils::read.delim(
+    file = path,
+    quote = "",
+    na.strings = c("", "NA"),
+    colClasses = "character",
+    stringsAsFactors = FALSE
+  ) |>
+    tidytable::tidytable()
+}

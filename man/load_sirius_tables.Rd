@@ -12,7 +12,7 @@ load_sirius_tables(input_directory, version)
 \item{version}{\link{character} Character "5" or "6".}
 }
 \value{
-Named list with canopus, formulas, structures, denovo data frames.
+Named list with canopus, formulas, structures, denovo, spectral data frames.
 }
 \description{
 Internal helper to load CANOPUS, formulas, structures, and

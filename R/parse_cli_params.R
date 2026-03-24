@@ -374,6 +374,10 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("tools", "sirius", "version"),
       type = as.integer
     ),
+    too_sir_max_analog_abs_mz_error = list(
+      path = c("tools", "sirius", "max_analog_abs_mz_error"),
+      type = as.numeric
+    ),
     too_tax_bio = list(
       path = c("tools", "taxonomies", "biological"),
       type = as.character

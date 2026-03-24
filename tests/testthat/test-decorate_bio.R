@@ -76,6 +76,40 @@ test_that("decorate_bio warns on missing columns", {
   )
 })
 
+test_that("decorate_bio logs both candidate and unique structure counts", {
+  test_df <- tidytable::tidytable(
+    feature_id = c("FT001", "FT002"),
+    score_biological = c(0.9, 0.8),
+    candidate_structure_inchikey_connectivity_layer = c("AAAAA", "AAAAA")
+  )
+
+  logged <- capture.output(
+    decorate_bio(
+      annot_table_wei_bio = test_df,
+      score_biological_kingdom = 0.7,
+      score_biological_phylum = 0.7,
+      score_biological_class = 0.7,
+      score_biological_order = 0.7,
+      score_biological_family = 0.7,
+      score_biological_tribe = 0.7,
+      score_biological_genus = 0.7,
+      score_biological_species = 0.7,
+      score_biological_variety = 0.7,
+      score_biological_biota = 0.7
+    )
+  )
+  logged <- paste(logged, collapse = "\n")
+
+  expect_true(grepl("candidates", logged, fixed = TRUE))
+  expect_true(grepl("unique structures", logged, fixed = TRUE))
+  expect_true(
+    grepl(
+      "Kingdom\\s+level:\\s+2 candidates \\(1 unique structures\\)",
+      logged
+    )
+  )
+})
+
 ## Performance ----
 
 test_that("decoration functions are fast", {

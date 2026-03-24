@@ -1,9 +1,10 @@
 #' @title Decorate biological annotation results with statistics
 #'
 #' @description Logs summary statistics about biologically weighted annotations,
-#'     showing how many structures were reranked at each taxonomic level based
-#'     on organism occurrence data. Validates required columns and handles
-#'     empty inputs gracefully. Internal logging helper for weight_annotations().
+#'     showing how many candidate rows and unique structures were reranked at
+#'     each taxonomic level based on organism occurrence data. Validates
+#'     required columns and handles empty inputs gracefully. Internal logging
+#'     helper for weight_annotations().
 #'
 #' @include predicates_utils.R
 #' @include validations_utils.R
@@ -140,19 +141,21 @@ decorate_bio <- function(
 
   # Helper Function ----
 
-  # Count unique structures at a given score threshold
-  # Parameter order: score first (from vapply X), df second (from ... args)
-  count_structures_at_level <- function(min_score, df) {
+  # Count total candidates and unique structures at a given score threshold.
+  count_stats_at_level <- function(min_score, df) {
     if (nrow(df) == 0L) {
-      return(0L)
+      return(c(n_candidates = 0L, n_unique_structures = 0L))
     }
 
-    df |>
-      tidytable::filter(score_biological >= min_score) |>
-      tidytable::distinct(
-        candidate_structure_inchikey_connectivity_layer
-      ) |>
-      nrow()
+    filtered <- df |>
+      tidytable::filter(score_biological >= min_score)
+
+    c(
+      n_candidates = nrow(filtered),
+      n_unique_structures = filtered |>
+        tidytable::distinct(candidate_structure_inchikey_connectivity_layer) |>
+        nrow()
+    )
   }
 
   # Calculate Counts for Each Taxonomic Level ----
@@ -171,40 +174,38 @@ decorate_bio <- function(
     biota = score_biological_biota
   )
 
-  # Calculate all counts using extracted counter function
-  # No progress needed for small vector (10 elements)
-  counts <- vapply(
-    X = levels,
-    FUN = count_structures_at_level,
-    FUN.VALUE = integer(1L),
-    USE.NAMES = TRUE,
-    df = annot_table_wei_bio
-  )
+  counts <- lapply(levels, count_stats_at_level, df = annot_table_wei_bio)
 
   # Log Summary Statistics ----
 
+  fmt_level <- function(level_name, width = 8L) {
+    level_counts <- counts[[level_name]]
+    sprintf(
+      "    %-*s level: %d candidates (%d unique)",
+      width,
+      tools::toTitleCase(level_name),
+      level_counts[["n_candidates"]],
+      level_counts[["n_unique_structures"]]
+    )
+  }
+
   log_info(
-    "Taxonomically informed metabolite annotation reranked:
-    Kingdom level: %d structures
-    Phylum level:  %d structures
-    Class level:   %d structures
-    Order level:   %d structures
-    Family level:  %d structures
-    Tribe level:   %d structures
-    Genus level:   %d structures
-    Species level: %d structures
-    Variety level: %d structures
-    Biota level:   %d structures",
-    counts["kingdom"],
-    counts["phylum"],
-    counts["class"],
-    counts["order"],
-    counts["family"],
-    counts["tribe"],
-    counts["genus"],
-    counts["species"],
-    counts["variety"],
-    counts["biota"]
+    paste(
+      c(
+        "Taxonomically informed metabolite annotation reranked:",
+        fmt_level("kingdom"),
+        fmt_level("phylum"),
+        fmt_level("class"),
+        fmt_level("order"),
+        fmt_level("family"),
+        fmt_level("tribe"),
+        fmt_level("genus"),
+        fmt_level("species"),
+        fmt_level("variety"),
+        fmt_level("biota")
+      ),
+      collapse = "\n"
+    )
   )
 
   log_complete(ctx, n_processed = nrow(annot_table_wei_bio))

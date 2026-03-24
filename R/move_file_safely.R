@@ -16,7 +16,7 @@ move_file_safely <- function(from, to) {
 
   dir.create(dirname(to), recursive = TRUE, showWarnings = FALSE)
 
-  renamed <- suppressWarnings(file.rename(from, to))
+  renamed <- file.rename(from, to)
   if (isTRUE(renamed)) {
     return(TRUE)
   }

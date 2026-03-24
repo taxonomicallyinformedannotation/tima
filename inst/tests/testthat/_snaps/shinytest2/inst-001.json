@@ -172,6 +172,7 @@
     "sim_thr_edg": 0.7,
     "sim_thr_mat": 6,
     "summarize": false,
+    "too_sir_max_analog_abs_mz_error": 0.01,
     "too_sir_ver": "6",
     "uni_rt": "seconds",
     "wei_bio_01": 0.1,

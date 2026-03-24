@@ -571,3 +571,85 @@ test_that("metadata and names keyed by structure_inchikey are mapped via stereo"
   expect_equal(out$candidate_structure_tag[[1]], "clean_lookup")
   expect_equal(out$candidate_structure_name[[1]], "MappedByInchikey")
 })
+
+test_that("complement_metadata_structures keeps existing taxonomy when lookup is placeholder", {
+  df <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = "IK_PLACEHOLDER",
+    candidate_structure_smiles_no_stereo = "CCO",
+    candidate_structure_tax_cla_02sup = "ExistingSuperclass",
+    candidate_structure_tax_npc_01pat = "ExistingPathway"
+  )
+
+  st_file <- temp_test_path("st_placeholder.tsv")
+  met_file <- temp_test_path("met_placeholder.tsv")
+  nam_file <- temp_test_path("nam_placeholder.tsv")
+  cla_file <- temp_test_path("cla_placeholder.tsv")
+  npc_file <- temp_test_path("npc_placeholder.tsv")
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = "IK_PLACEHOLDER",
+      structure_smiles_no_stereo = "CCO"
+    ),
+    st_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = "IK_PLACEHOLDER",
+      structure_smiles_no_stereo = "CCO",
+      structure_molecular_formula = "C2H6O",
+      structure_exact_mass = "46.0419",
+      structure_xlogp = "-0.3",
+      structure_tag = ""
+    ),
+    met_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = "IK_PLACEHOLDER",
+      structure_smiles_no_stereo = "CCO",
+      structure_name = ""
+    ),
+    nam_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = "IK_PLACEHOLDER",
+      structure_tax_cla_chemontid = "CHEMONTID:0000000",
+      structure_tax_cla_01kin = "Organic compounds",
+      structure_tax_cla_02sup = "notClassified",
+      structure_tax_cla_03cla = "empty",
+      structure_tax_cla_04dirpar = ""
+    ),
+    cla_file,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_smiles_no_stereo = "CCO",
+      structure_tax_npc_01pat = "notClassified",
+      structure_tax_npc_02sup = "empty",
+      structure_tax_npc_03cla = ""
+    ),
+    npc_file,
+    sep = "\t"
+  )
+
+  out <- complement_metadata_structures(
+    df,
+    str_stereo = st_file,
+    str_met = met_file,
+    str_nam = nam_file,
+    str_tax_cla = cla_file,
+    str_tax_npc = npc_file
+  )
+
+  expect_equal(
+    out$candidate_structure_tax_cla_02sup[[1L]],
+    "ExistingSuperclass"
+  )
+  expect_equal(out$candidate_structure_tax_npc_01pat[[1L]], "ExistingPathway")
+})

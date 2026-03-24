@@ -1257,3 +1257,47 @@ test_that("build_mini_results_table appends xrefs and renames id columns", {
 
   expect_true("id_pubchem" %in% names(out))
 })
+
+test_that("build_mini_taxonomy_table falls back to predicted labels when structure labels are placeholders", {
+  df_percentile <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "IK1",
+    candidate_structure_tax_cla_01kin = "notClassified",
+    candidate_structure_tax_cla_02sup = "empty",
+    candidate_structure_tax_cla_03cla = NA_character_,
+    candidate_structure_tax_cla_04dirpar = "notClassified",
+    candidate_structure_tax_npc_01pat = "notClassified",
+    candidate_structure_tax_npc_02sup = "empty",
+    candidate_structure_tax_npc_03cla = NA_character_,
+    feature_pred_tax_cla_01kin_val = NA_character_,
+    feature_pred_tax_cla_01kin_score = NA_character_,
+    feature_pred_tax_cla_02sup_val = "Organic compounds",
+    feature_pred_tax_cla_02sup_score = "0.8",
+    feature_pred_tax_cla_03cla_val = NA_character_,
+    feature_pred_tax_cla_03cla_score = NA_character_,
+    feature_pred_tax_cla_04dirpar_val = NA_character_,
+    feature_pred_tax_cla_04dirpar_score = NA_character_,
+    feature_pred_tax_npc_01pat_val = "Alkaloids",
+    feature_pred_tax_npc_01pat_score = "0.7",
+    feature_pred_tax_npc_02sup_val = NA_character_,
+    feature_pred_tax_npc_02sup_score = NA_character_,
+    feature_pred_tax_npc_03cla_val = NA_character_,
+    feature_pred_tax_npc_03cla_score = NA_character_
+  )
+
+  out <- build_mini_taxonomy_table(
+    df_percentile = df_percentile,
+    score_chemical_cla_kingdom = 0.1,
+    score_chemical_cla_superclass = 0.2,
+    score_chemical_cla_class = 0.3,
+    score_chemical_cla_parent = 0.4,
+    score_chemical_npc_pathway = 0.3,
+    score_chemical_npc_superclass = 0.2,
+    score_chemical_npc_class = 0.1
+  )
+
+  expect_equal(out$label_classyfire[[1L]], "Organic compounds")
+  expect_equal(out$label_npclassifier[[1L]], "Alkaloids")
+  expect_true(!is.na(out$score_classyfire[[1L]]))
+  expect_true(!is.na(out$score_npclassifier[[1L]]))
+})

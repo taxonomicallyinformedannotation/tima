@@ -38,6 +38,8 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
     )
   }
 
+  df <- .normalize_sirius_aliases(df)
+
   df <- df |>
     tidytable::mutate(
       feature_id = switch(
@@ -119,6 +121,14 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 #' )
 #' }
 select_sirius_columns_formulas <- function(df, sirius_version) {
+  df <- .normalize_sirius_aliases(df)
+
+  mass_error_ppm <- if ("massErrorPrecursor.ppm." %in% names(df)) {
+    as.numeric(df[["massErrorPrecursor.ppm."]])
+  } else {
+    rep(NA_real_, nrow(df))
+  }
+
   df <- df |>
     tidytable::mutate(
       feature_id = switch(
@@ -129,15 +139,9 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
     ) |>
     tidytable::mutate(
       candidate_structure_exact_mass = as.numeric(ionMass) -
-        as.numeric(`massErrorPrecursor.ppm.`) *
-          # tidytable version
-          # as.numeric(`massErrorPrecursor(ppm)`) *
-          as.numeric(ionMass) *
-          1E-6,
+        mass_error_ppm * as.numeric(ionMass) * 1E-6,
       candidate_structure_error_mz = as.numeric(ionMass) *
-        as.numeric(`massErrorPrecursor.ppm.`) *
-        # tidytable version
-        # as.numeric(`massErrorPrecursor(ppm)`) *
+        mass_error_ppm *
         1E-6
     ) |>
     tidytable::select(
@@ -217,4 +221,128 @@ select_sirius_columns_structures <- function(df, sirius_version) {
       candidate_structure_tax_cla_04dirpar = NA_character_
     ))
   return(df)
+}
+
+# Normalize common SIRIUS column aliases across versions/export formats.
+.normalize_sirius_aliases <- function(df) {
+  alias_map <- list(
+    "NPC.pathway" = c("NPC#pathway"),
+    "NPC.pathway.Probability" = c("NPC#pathway Probability"),
+    "NPC.superclass" = c("NPC#superclass"),
+    "NPC.superclass.Probability" = c("NPC#superclass Probability"),
+    "NPC.class" = c("NPC#class"),
+    "NPC.class.Probability" = c("NPC#class Probability"),
+    "ClassyFire.superclass" = c("ClassyFire#superclass"),
+    "ClassyFire.superclass.probability" = c(
+      "ClassyFire#superclass probability"
+    ),
+    "ClassyFire.class" = c("ClassyFire#class"),
+    "ClassyFire.class.Probability" = c("ClassyFire#class Probability"),
+    "ClassyFire.most.specific.class" = c("ClassyFire#most specific class"),
+    "ClassyFire.most.specific.class.Probability" = c(
+      "ClassyFire#most specific class Probability"
+    ),
+    "massErrorPrecursor.ppm." = c("massErrorPrecursor(ppm)")
+  )
+
+  for (target in names(alias_map)) {
+    if (target %in% names(df)) {
+      next
+    }
+    src <- alias_map[[target]]
+    src <- src[src %in% names(df)]
+    if (length(src) > 0L) {
+      names(df)[names(df) == src[[1L]]] <- target
+    }
+  }
+
+  df
+}
+
+.get_col_or_na <- function(df, col) {
+  if (col %in% names(df)) {
+    return(as.character(df[[col]]))
+  }
+  rep(NA_character_, nrow(df))
+}
+
+#' @title Select SIRIUS spectral match columns
+#'
+#' @description Standardize SIRIUS spectral-match columns (including analog hits)
+#'     into the common annotation model.
+#'
+#' @param df [data.frame] Data frame of SIRIUS spectral match results.
+#' @param sirius_version [character] SIRIUS version ("5" or "6").
+#'
+#' @return Data frame with standardized spectral-match columns.
+#' @keywords internal
+select_sirius_columns_spectral <- function(df, sirius_version) {
+  validate_dataframe(df, param_name = "df")
+
+  if (nrow(df) == 0L) {
+    return(tidytable::tidytable())
+  }
+
+  analog_vals <- .get_col_or_na(df, "analogHit")
+  analog_logical <- tolower(trimws(analog_vals)) %in% c("true", "t", "1")
+
+  feature_id <- switch(
+    as.character(sirius_version),
+    "5" = harmonize_names_sirius(.get_col_or_na(df, "id")),
+    "6" = .get_col_or_na(df, "mappingFeatureId")
+  )
+
+  # Mass deviation: feature precursor (ionMass) minus library reference precursor
+  # (referencePrecursorMz), both provided directly by SIRIUS spectral_matches.
+  # For direct hits this is the instrument mass error (should be small).
+  # For analog hits this is the structural delta-mass (e.g. +14 Da methylation).
+  ion_mz <- as.numeric(.get_col_or_na(df, "ionMass"))
+  ref_mz <- as.numeric(.get_col_or_na(
+    df,
+    "referencePrecursorMz"
+  ))
+  raw_mz_dev <- ion_mz - ref_mz
+
+  tidytable::tidytable(
+    feature_id = feature_id,
+    candidate_library = tidytable::if_else(
+      analog_logical,
+      "SIRIUS spectral (analog)",
+      "SIRIUS spectral"
+    ),
+    candidate_adduct = .get_col_or_na(df, "referenceAdduct"),
+    candidate_structure_error_mz = raw_mz_dev,
+    candidate_spectrum_id = .get_col_or_na(df, "referenceSplash"),
+    candidate_structure_name = .get_col_or_na(df, "referenceName"),
+    candidate_structure_smiles_no_stereo = .get_col_or_na(
+      df,
+      "referenceSmiles"
+    ),
+    candidate_structure_inchikey_connectivity_layer = .get_col_or_na(
+      df,
+      "InChIkey2D"
+    ),
+    candidate_structure_molecular_formula = .get_col_or_na(
+      df,
+      "molecularFormula"
+    ),
+    candidate_score_similarity = as.numeric(.get_col_or_na(
+      df,
+      "similarity"
+    )),
+    candidate_count_similarity_peaks_matched = as.integer(.get_col_or_na(
+      df,
+      "sharedPeaks"
+    )),
+    candidate_structure_tax_npc_01pat = NA_character_,
+    candidate_structure_tax_npc_02sup = NA_character_,
+    candidate_structure_tax_npc_03cla = NA_character_,
+    candidate_structure_tax_cla_chemontid = NA_character_,
+    candidate_structure_tax_cla_01kin = NA_character_,
+    candidate_structure_tax_cla_02sup = NA_character_,
+    candidate_structure_tax_cla_03cla = NA_character_,
+    candidate_structure_tax_cla_04dirpar = NA_character_
+  ) |>
+    tidytable::filter(!is.na(feature_id)) |>
+    tidytable::distinct()
 }

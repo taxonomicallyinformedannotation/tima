@@ -240,10 +240,27 @@ filter_ms1_annotations <- function(
       score_chemical = as.numeric(score_chemical)
     )
 
-  # Keep annotations with MS2 data OR MS1 meeting score thresholds
-  has_ms2 <- quote(
-    !is.na(candidate_score_similarity) | !is.na(candidate_score_sirius_csi)
-  )
+  # Keep annotations with MS2 data OR MS1 meeting score thresholds.
+  # "has MS2 data" = has a direct spectral similarity score, a raw SIRIUS CSI
+  # score, or a SIRIUS confidence score (top-1 per feature from v5/v6).
+  # Build the expression dynamically so it gracefully handles data frames that
+  # do not contain the confidence column (e.g., older fixture files or pure
+  # spectral annotation runs).
+  has_confidence_col <- "candidate_score_sirius_confidence" %in%
+    names(annot_table_wei_chemo)
+
+  if (has_confidence_col) {
+    has_ms2 <- quote(
+      !is.na(candidate_score_similarity) |
+        !is.na(candidate_score_sirius_csi) |
+        (!is.na(candidate_score_sirius_confidence) &
+          as.numeric(candidate_score_sirius_confidence) > 0)
+    )
+  } else {
+    has_ms2 <- quote(
+      !is.na(candidate_score_similarity) | !is.na(candidate_score_sirius_csi)
+    )
+  }
 
   if (minimal_ms1_condition == "OR") {
     ms1_condition <- quote(
@@ -653,7 +670,8 @@ coerce_score_columns <- function(annot_table_wei_chemo) {
     "score_weighted_chemo",
     "candidate_score_pseudo_initial",
     "candidate_score_similarity",
-    "candidate_score_sirius_csi"
+    "candidate_score_sirius_csi",
+    "candidate_score_sirius_confidence"
   )
 
   cols_to_convert <- intersect(score_columns, names(annot_table_wei_chemo))
@@ -739,6 +757,14 @@ build_mini_taxonomy_table <- function(
   score_chemical_npc_superclass,
   score_chemical_npc_class
 ) {
+  normalize_tax_label <- function(x) {
+    vals <- trimws(as.character(x))
+    vals[
+      vals %in% c("", "notClassified", "empty", "N/A", "null")
+    ] <- NA_character_
+    vals
+  }
+
   df_structure_tax <- df_percentile |>
     tidytable::select(
       feature_id,
@@ -748,6 +774,10 @@ build_mini_taxonomy_table <- function(
     ) |>
     tidytable::distinct(feature_id, .keep_all = TRUE) |>
     tidytable::mutate(
+      tidytable::across(
+        .cols = tidyselect::starts_with(match = "candidate_structure_tax_"),
+        .fns = normalize_tax_label
+      ),
       label_classyfire_structure = tidytable::coalesce(
         candidate_structure_tax_cla_04dirpar,
         candidate_structure_tax_cla_03cla,
@@ -808,23 +838,23 @@ build_mini_taxonomy_table <- function(
   df_structure_tax |>
     tidytable::left_join(y = df_pred_tax) |>
     tidytable::mutate(
-      label_classyfire = tidytable::if_else(
-        has_inchikey,
+      use_structure_cla = has_inchikey & !is.na(label_classyfire_structure),
+      use_structure_npc = has_inchikey & !is.na(label_npclassifier_structure),
+      label_classyfire = tidytable::coalesce(
         label_classyfire_structure,
         label_classyfire_predicted
       ),
-      label_npclassifier = tidytable::if_else(
-        has_inchikey,
+      label_npclassifier = tidytable::coalesce(
         label_npclassifier_structure,
         label_npclassifier_predicted
       ),
       score_classyfire = tidytable::if_else(
-        has_inchikey,
+        use_structure_cla,
         NA_real_,
         score_classyfire
       ),
       score_npclassifier = tidytable::if_else(
-        has_inchikey,
+        use_structure_npc,
         NA_real_,
         score_npclassifier
       )

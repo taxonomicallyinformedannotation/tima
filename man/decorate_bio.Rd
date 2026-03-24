@@ -44,9 +44,10 @@ The input annotation table (unchanged), for pipeline compatibility
 }
 \description{
 Logs summary statistics about biologically weighted annotations,
-showing how many structures were reranked at each taxonomic level based
-on organism occurrence data. Validates required columns and handles
-empty inputs gracefully. Internal logging helper for weight_annotations().
+showing how many candidate rows and unique structures were reranked at
+each taxonomic level based on organism occurrence data. Validates
+required columns and handles empty inputs gracefully. Internal logging
+helper for weight_annotations().
 }
 \examples{
 \dontrun{
