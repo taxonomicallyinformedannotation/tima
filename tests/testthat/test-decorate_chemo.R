@@ -80,9 +80,9 @@ test_that("decorate_chemo logs both candidate and unique structure counts", {
   logged <- paste(logged, collapse = "\n")
 
   expect_true(grepl("candidates", logged, fixed = TRUE))
-  expect_true(grepl("unique structures", logged, fixed = TRUE))
+  expect_true(grepl("unique", logged, fixed = TRUE))
   expect_true(
-    grepl("Kingdom level:\\s+2 candidates \\(1 unique structures\\)", logged)
+    grepl("Kingdom level:\\s+2 candidates \\(1 unique\\)", logged)
   )
 })
 
