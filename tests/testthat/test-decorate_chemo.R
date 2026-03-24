@@ -51,6 +51,41 @@ test_that("decorate_chemo warns on missing columns", {
   )
 })
 
+test_that("decorate_chemo logs both candidate and unique structure counts", {
+  test_df <- tidytable::tidytable(
+    feature_id = c("FT001", "FT002"),
+    score_chemical = c(0.8, 0.8),
+    candidate_structure_inchikey_connectivity_layer = c("AAAAA", "AAAAA"),
+    feature_pred_tax_cla_01kin_val = c("Organic", "Organic"),
+    feature_pred_tax_cla_02sup_val = c("Alkaloids", "Alkaloids"),
+    feature_pred_tax_cla_03cla_val = c("Class1", "Class1"),
+    feature_pred_tax_cla_04dirpar_val = c("Parent1", "Parent1"),
+    feature_pred_tax_npc_01pat_val = c("Path1", "Path1"),
+    feature_pred_tax_npc_02sup_val = c("Super1", "Super1"),
+    feature_pred_tax_npc_03cla_val = c("NPC1", "NPC1")
+  )
+
+  logged <- capture.output(
+    decorate_chemo(
+      annot_table_wei_chemo = test_df,
+      score_chemical_cla_kingdom = 0.7,
+      score_chemical_cla_superclass = 0.7,
+      score_chemical_cla_class = 0.7,
+      score_chemical_cla_parent = 0.7,
+      score_chemical_npc_pathway = 0.7,
+      score_chemical_npc_superclass = 0.7,
+      score_chemical_npc_class = 0.7
+    )
+  )
+  logged <- paste(logged, collapse = "\n")
+
+  expect_true(grepl("candidates", logged, fixed = TRUE))
+  expect_true(grepl("unique structures", logged, fixed = TRUE))
+  expect_true(
+    grepl("Kingdom level:\\s+2 candidates \\(1 unique structures\\)", logged)
+  )
+})
+
 # test_that(
 #   skip("Not implemented")
 # )

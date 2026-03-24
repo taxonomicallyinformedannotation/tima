@@ -228,11 +228,25 @@ load_annotation_tables <- function(annotations, ms1_only) {
 
   if (ms1_only) {
     n_before <- nrow(annotation_table)
-    annotation_table <- annotation_table |>
-      tidytable::filter(
-        is.na(candidate_score_similarity) &
-          is.na(candidate_score_sirius_csi)
-      )
+    has_sirius_confidence <- "candidate_score_sirius_confidence" %in%
+      names(annotation_table)
+
+    if (has_sirius_confidence) {
+      annotation_table <- annotation_table |>
+        tidytable::filter(
+          is.na(candidate_score_similarity) &
+            is.na(candidate_score_sirius_csi) &
+            (is.na(candidate_score_sirius_confidence) |
+              as.numeric(candidate_score_sirius_confidence) == 0)
+        )
+    } else {
+      annotation_table <- annotation_table |>
+        tidytable::filter(
+          is.na(candidate_score_similarity) &
+            is.na(candidate_score_sirius_csi)
+        )
+    }
+
     log_debug(
       "MS1-only filter: %d -> %d rows",
       n_before,

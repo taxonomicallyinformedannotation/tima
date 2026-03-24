@@ -270,7 +270,7 @@ summarize_results <- function(
   ) |>
     tidytable::arrange(
       # Try to sort numerically if possible, otherwise alphabetically
-      suppressWarnings(as.numeric(feature_id))
+      as.numeric(feature_id)
     ) |>
     tidytable::select(
       tidyselect::where(fn = ~ any(!is.na(.)))

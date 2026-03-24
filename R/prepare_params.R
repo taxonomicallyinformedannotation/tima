@@ -197,6 +197,8 @@ prepare_params <- function(
   # too_net_spe_com <- params_advanced$tools$networks$spectral$components
   # too_net_spe_edg <- params_advanced$tools$networks$spectral$edges
   too_sir_ver <- params_advanced$tools$sirius$version
+  too_sir_max_analog_abs_mz_error <-
+    params_advanced$tools$sirius$max_analog_abs_mz_error
   # too_tax_bio <- params_advanced$tools$taxonomies$biological
   # too_tax_che <- params_advanced$tools$taxonomies$chemical
   units_rt <- params_advanced$units$rt
@@ -426,6 +428,8 @@ prepare_params <- function(
     fil_lib_sop_mer_str_tax_npc
   yamls_params$prepare_annotations_sirius$tools$sirius$version <-
     too_sir_ver
+  yamls_params$prepare_annotations_sirius$tools$sirius$max_analog_abs_mz_error <-
+    too_sir_max_analog_abs_mz_error
 
   ## prepare_annotations_spectra
   yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral$spectral <-

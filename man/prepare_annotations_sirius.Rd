@@ -23,7 +23,9 @@ prepare_annotations_sirius(
   str_tax_cla = get_params(step =
     "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$cla,
   str_tax_npc = get_params(step =
-    "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$npc
+    "prepare_annotations_sirius")$files$libraries$sop$merged$structures$taxonomies$npc,
+  max_analog_abs_mz_error = get_params(step =
+    "prepare_annotations_sirius")$tools$sirius$max_analog_abs_mz_error
 )
 }
 \arguments{
@@ -47,6 +49,9 @@ SIRIUS results.}
 \item{str_tax_cla}{\link{character} Character path to ClassyFire taxonomy file.}
 
 \item{str_tax_npc}{\link{character} Character path to NPClassifier taxonomy file.}
+
+\item{max_analog_abs_mz_error}{\link{numeric} Maximum allowed absolute m/z
+deviation (Da) for keeping SIRIUS spectral analog hits.}
 }
 \value{
 Character path to the prepared SIRIUS annotations file (invisible).
@@ -61,7 +66,7 @@ integrating with structure metadata.
 This function:
 \itemize{
 \item Validates inputs (version, paths, file existence).
-\item Loads SIRIUS output files (CANOPUS, formulas, structures, denovo).
+\item Loads SIRIUS output files (CANOPUS, formulas, structures, denovo, spectral matches).
 \item Harmonizes column names across SIRIUS v5 and v6.
 \item Joins with structure metadata (stereochemistry, names, taxonomy).
 \item Splits results into three output files: annotations, CANOPUS, formulas.

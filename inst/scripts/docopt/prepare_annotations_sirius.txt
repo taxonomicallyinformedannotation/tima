@@ -1,15 +1,17 @@
 You can use this script with the following example:
-  Rscript inst/scripts/prepare_annotations_sirius.R --fil-ann-raw-sir data/interim/annotations/example_sirius/ --fil-ann-pre-can data/interim/annotations/example_canopusPrepared.tsv.gz --fil-ann-pre-for data/interim/annotations/example_formulaPrepared.tsv.gz --fil-ann-pre-str data/interim/annotations/example_siriusPrepared.tsv.gz
+  Rscript inst/scripts/prepare_annotations_sirius.R --fil-ann-raw-sir data/interim/annotations/example_sirius/ --fil-ann-pre-can data/interim/annotations/example_canopusPrepared.tsv.gz --fil-ann-pre-for data/interim/annotations/example_formulaPrepared.tsv.gz --fil-ann-pre-str data/interim/annotations/example_siriusPrepared.tsv.gz --too-sir-ver 6 --too-sir-max-analog-abs-mz-error 0.01
 
 Usage:
-  prepare_annotations_sirius.R [--fil-ann-raw-sir=<fil-ann-raw-sir>] [--fil-ann-pre-can=<fil-ann-pre-can>] [--fil-ann-pre-for=<fil-ann-pre-for>] [--fil-ann-pre-str=<fil-ann-pre-str>]
+  prepare_annotations_sirius.R [--fil-ann-raw-sir=<fil-ann-raw-sir>] [--fil-ann-pre-can=<fil-ann-pre-can>] [--fil-ann-pre-for=<fil-ann-pre-for>] [--fil-ann-pre-str=<fil-ann-pre-str>] [--too-sir-ver=<too-sir-ver>] [--too-sir-max-analog-abs-mz-error=<too-sir-max-analog-abs-mz-error>]
 
 Arguments:
   fil-ann-raw-sir            Directory containing the sirius results. STRING
   fil-ann-pre-can            List of prepared canopus annotations. STRING
   fil-ann-pre-for            List of prepared formula annotations. STRING
   fil-ann-pre-str            List of prepared structural annotations. STRING
-  
+  too-sir-ver                SIRIUS version. Currently only 5 or 6 supported. INTEGER
+  too-sir-max-analog-abs-mz-error  Maximum absolute precursor m/z deviation (Da) for keeping SIRIUS spectral analog hits. NUMERIC
+
 Options:
   -h --help                  Shows this screen.
   -v --version               Shows version.

@@ -53,6 +53,9 @@ tools:
     #' Sirius version.
     #' Currently only 5 or 6 supported. INTEGER
     version: 6
+    #' Maximum absolute precursor m/z deviation (Da) allowed for
+    #' keeping SIRIUS spectral analog hits. NUMERIC
+    max_analog_abs_mz_error: 0.01
   #' Taxonomies related parameters.
   taxonomies:
     #' Chemical taxonomy used for matching.

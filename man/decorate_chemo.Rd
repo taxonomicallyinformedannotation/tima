@@ -37,9 +37,10 @@ The input annotation table (unchanged), for pipeline compatibility
 }
 \description{
 Logs summary statistics about chemically weighted annotations,
-showing how many structures were reranked at each chemical classification
-level. Uses cascading filters where each level builds on the previous.
-Internal logging helper for weight_annotations().
+showing how many candidate rows and unique structures were reranked at
+each chemical classification level. Uses cascading filters where each
+level builds on the previous. Internal logging helper for
+weight_annotations().
 }
 \examples{
 \dontrun{

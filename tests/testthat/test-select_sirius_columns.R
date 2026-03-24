@@ -134,6 +134,21 @@ test_that("test-select_sirius_columns_formulas processes SIRIUS v6 formulas", {
   expect_equal(result$feature_id[1], "F1")
 })
 
+test_that("test-select_sirius_columns_formulas supports massErrorPrecursor(ppm) alias", {
+  df <- tidytable::tidytable(
+    mappingFeatureId = c("F1"),
+    ionMass = c("180.0634"),
+    `massErrorPrecursor(ppm)` = c("2.5"),
+    adduct = c("[M+H]+")
+  )
+
+  result <- select_sirius_columns_formulas(df = df, sirius_version = "6")
+
+  expect_true("candidate_structure_exact_mass" %in% names(result))
+  expect_true("candidate_structure_error_mz" %in% names(result))
+  expect_true(!is.na(result$candidate_structure_error_mz[[1L]]))
+})
+
 ## select_sirius_columns_structures ----
 
 test_that("test-select_sirius_columns_structures processes SIRIUS v5 structures", {
@@ -187,4 +202,132 @@ test_that("test-select_sirius_columns_structures accepts both string and numeric
 
   # Should accept 6
   expect_no_error(select_sirius_columns_structures(df = df, sirius_version = 6))
+})
+
+test_that("test-select_sirius_columns_canopus supports hash-style alias columns", {
+  df <- tidytable::tidytable(
+    mappingFeatureId = c("F_alias"),
+    adduct = c("[M+H]+"),
+    molecularFormula = c("C10H14N2"),
+    `NPC#pathway` = c("Alkaloids"),
+    `NPC#pathway Probability` = c("0.91"),
+    `NPC#superclass` = c("Pathway superclass"),
+    `NPC#superclass Probability` = c("0.82"),
+    `NPC#class` = c("Pathway class"),
+    `NPC#class Probability` = c("0.77"),
+    `ClassyFire#superclass` = c("Organic compounds"),
+    `ClassyFire#superclass probability` = c("0.95"),
+    `ClassyFire#class` = c("Alkaloids and derivatives"),
+    `ClassyFire#class Probability` = c("0.87"),
+    `ClassyFire#most specific class` = c("Indole alkaloids"),
+    `ClassyFire#most specific class Probability` = c("0.81")
+  )
+
+  result <- select_sirius_columns_canopus(df = df, sirius_version = "6")
+
+  expect_equal(result$feature_id[[1L]], "F_alias")
+  expect_equal(result$feature_pred_tax_npc_01pat_val[[1L]], "Alkaloids")
+  expect_equal(
+    result$feature_pred_tax_cla_04dirpar_val[[1L]],
+    "Indole alkaloids"
+  )
+})
+
+test_that("test-select_sirius_columns_spectral maps direct spectral hits", {
+  df <- tidytable::tidytable(
+    mappingFeatureId = "F_spec",
+    analogHit = "false",
+    similarity = "0.81",
+    sharedPeaks = "20",
+    referenceSplash = "splash10-aaaa",
+    referenceAdduct = "[M+H]+",
+    referenceSmiles = "CCO",
+    referenceName = "SpecMatch",
+    InChIkey2D = "ABCDEFGHIJKLMN",
+    ionMass = "201.0500",
+    referencePrecursorMz = "201.0488"
+  )
+
+  result <- select_sirius_columns_spectral(df = df, sirius_version = "6")
+
+  expect_equal(result$feature_id[[1L]], "F_spec")
+  expect_equal(result$candidate_library[[1L]], "SIRIUS spectral")
+  expect_equal(result$candidate_spectrum_id[[1L]], "splash10-aaaa")
+  expect_equal(result$candidate_structure_name[[1L]], "SpecMatch")
+  expect_equal(as.numeric(result$candidate_score_similarity[[1L]]), 0.81)
+  expect_equal(
+    as.integer(result$candidate_count_similarity_peaks_matched[[1L]]),
+    20L
+  )
+  expect_equal(
+    round(as.numeric(result$candidate_structure_error_mz[[1L]]), 4),
+    round(201.0500 - 201.0488, 4)
+  )
+})
+
+test_that("test-select_sirius_columns_spectral does not fallback for spectrum id and name", {
+  df <- tidytable::tidytable(
+    mappingFeatureId = "F_spec3",
+    analogHit = "false",
+    similarity = "0.66",
+    sharedPeaks = "8",
+    splash = "splash10-bbbb",
+    name = "FallbackName",
+    referenceAdduct = "[M+H]+",
+    referenceSmiles = "CCN",
+    InChIkey2D = "YYYYYYYYYYYYYY",
+    ionMass = "155.1000",
+    referencePrecursorMz = "155.0990"
+  )
+
+  result <- select_sirius_columns_spectral(df = df, sirius_version = "6")
+
+  expect_true(is.na(result$candidate_spectrum_id[[1L]]))
+  expect_true(is.na(result$candidate_structure_name[[1L]]))
+})
+
+test_that("test-select_sirius_columns_spectral approximates error_mz from precursor mz columns", {
+  df <- tidytable::tidytable(
+    mappingFeatureId = "F_spec2",
+    analogHit = "false",
+    similarity = "0.75",
+    sharedPeaks = "10",
+    referenceAdduct = "[M+H]+",
+    referenceSmiles = "CCCO",
+    InChIkey2D = "XXXXXXXXXXX",
+    ionMass = "201.0500",
+    referencePrecursorMz = "201.0488"
+  )
+
+  result <- select_sirius_columns_spectral(df = df, sirius_version = "6")
+
+  err <- as.numeric(result$candidate_structure_error_mz[[1L]])
+  expect_true(!is.na(err))
+  expect_equal(round(err, 4), round(201.0500 - 201.0488, 4))
+})
+
+test_that("test-select_sirius_columns_spectral maps analog hits", {
+  df <- tidytable::tidytable(
+    mappingFeatureId = "F_analog",
+    analogHit = "true",
+    similarity = "0.37",
+    sharedPeaks = "7",
+    referenceAdduct = "[M+H3N+H]+",
+    referenceSmiles = "CCCC",
+    referenceName = "AnalogMatch",
+    InChIkey2D = "ZZZZZZZZZZZZZZ",
+    ionMass = "300.1500",
+    referencePrecursorMz = "283.1184"
+  )
+
+  result <- select_sirius_columns_spectral(df = df, sirius_version = "6")
+
+  expect_equal(result$feature_id[[1L]], "F_analog")
+  expect_equal(result$candidate_library[[1L]], "SIRIUS spectral (analog)")
+  expect_equal(as.numeric(result$candidate_score_similarity[[1L]]), 0.37)
+  # For analog hits the mass deviation is the delta-mass between query and reference
+  expect_equal(
+    round(as.numeric(result$candidate_structure_error_mz[[1L]]), 4),
+    round(300.1500 - 283.1184, 4)
+  )
 })

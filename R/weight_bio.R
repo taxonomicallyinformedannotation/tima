@@ -622,34 +622,46 @@ weight_bio <- function(
     annotation_table_taxed
   )
 
+  # Ensure candidate_score_sirius_confidence column exists (may be absent when
+  # the input comes from non-SIRIUS sources or older fixture files).
+  if (
+    !"candidate_score_sirius_confidence" %in% names(annot_table_wei_bio_big)
+  ) {
+    annot_table_wei_bio_big <- annot_table_wei_bio_big |>
+      tidytable::mutate(candidate_score_sirius_confidence = NA_real_)
+  }
+
   annot_table_wei_bio <- annot_table_wei_bio_big |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::matches(match = "candidate_structure_tax"),
-      .fns = ~ tidytable::replace_na(
-        .x = .x,
-        replace = "notClassified"
-      )
-    )) |>
     tidytable::mutate(
       candidate_score_sirius_csi_tmp = transform_score_sirius_csi(
-        candidate_score_sirius_csi |>
-          as.numeric()
+        as.numeric(candidate_score_sirius_csi)
+      ),
+      # Prefer the already-normalised confidence score (0-1) when available
+      # (set for the top-1 candidate per feature by SIRIUS v5 ConfidenceScore
+      # and v6 ConfidenceScoreApproximate).  Fall back to the transformed CSI
+      # for rank-2+ candidates where confidence is NA.
+      candidate_score_sirius_tmp = tidytable::coalesce(
+        as.numeric(candidate_score_sirius_confidence),
+        candidate_score_sirius_csi_tmp
       )
     ) |>
     tidytable::mutate(
       candidate_score_pseudo_initial = tidytable::case_when(
         !is.na(candidate_score_similarity) &
-          !is.na(candidate_score_sirius_csi) ~
+          !is.na(candidate_score_sirius_tmp) ~
           (as.numeric(candidate_score_similarity) +
-            candidate_score_sirius_csi_tmp) /
+            candidate_score_sirius_tmp) /
           2,
         !is.na(candidate_score_similarity) ~
           as.numeric(candidate_score_similarity),
-        !is.na(candidate_score_sirius_csi) ~ candidate_score_sirius_csi_tmp,
+        !is.na(candidate_score_sirius_tmp) ~ candidate_score_sirius_tmp,
         TRUE ~ NA_real_ # MS1-only hits have no MS2 spectrum data, so score is NA not 0
       )
     ) |>
-    tidytable::select(-candidate_score_sirius_csi_tmp) |>
+    tidytable::select(
+      -candidate_score_sirius_csi_tmp,
+      -candidate_score_sirius_tmp
+    ) |>
     tidytable::mutate(
       score_weighted_bio = compute_weighted_sum(
         score_biological,

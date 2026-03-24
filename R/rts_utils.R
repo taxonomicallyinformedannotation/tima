@@ -20,7 +20,7 @@ normalize_rt_to_minutes <- function(
     return(rt_vec)
   }
   if (is.character(rt_vec)) {
-    rt_vec <- suppressWarnings(as.numeric(rt_vec))
+    rt_vec <- as.numeric(rt_vec)
   }
 
   if (!is.numeric(rt_vec)) {

@@ -11,18 +11,18 @@ fixture_roots <- local({
 
     roots <- character()
 
-    pkg_root <- suppressWarnings(tryCatch(
+    pkg_root <- tryCatch(
       find_package_root(),
       error = function(e) NA_character_
-    ))
+    )
     if (!is.na(pkg_root)) {
       roots <- c(roots, file.path(pkg_root, "tests", "testthat", "fixtures"))
     }
 
-    testthat_root <- suppressWarnings(tryCatch(
+    testthat_root <- tryCatch(
       testthat::test_path("fixtures"),
       error = function(e) NA_character_
-    ))
+    )
     if (!is.na(testthat_root)) {
       roots <- c(roots, testthat_root)
     }

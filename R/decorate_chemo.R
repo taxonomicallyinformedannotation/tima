@@ -1,9 +1,10 @@
 #' @title Decorate chemical annotation results with statistics
 #'
 #' @description Logs summary statistics about chemically weighted annotations,
-#'     showing how many structures were reranked at each chemical classification
-#'     level. Uses cascading filters where each level builds on the previous.
-#'     Internal logging helper for weight_annotations().
+#'     showing how many candidate rows and unique structures were reranked at
+#'     each chemical classification level. Uses cascading filters where each
+#'     level builds on the previous. Internal logging helper for
+#'     weight_annotations().
 #'
 #' @include validations_utils.R
 #'
@@ -125,12 +126,15 @@ decorate_chemo <- function(
       )
   }
 
-  count_unique_structures <- function(df) {
-    nrow(
-      df |>
-        tidytable::distinct(
-          candidate_structure_inchikey_connectivity_layer
-        )
+  count_stats <- function(df) {
+    c(
+      n_candidates = nrow(df),
+      n_unique_structures = nrow(
+        df |>
+          tidytable::distinct(
+            candidate_structure_inchikey_connectivity_layer
+          )
+      )
     )
   }
 
@@ -180,7 +184,7 @@ decorate_chemo <- function(
     "feature_pred_tax_npc_03cla_val"
   )
 
-  # Count Unique Structures ----
+  # Count total candidates and unique structures ----
 
   # Classyfire counts
   cla_dataframes <- list(
@@ -192,11 +196,12 @@ decorate_chemo <- function(
 
   cla_counts <- vapply(
     X = cla_dataframes,
-    FUN = count_unique_structures,
-    integer(1L),
+    FUN = count_stats,
+    integer(2L),
     USE.NAMES = FALSE
   )
-  names(cla_counts) <- names(cla_dataframes)
+  rownames(cla_counts) <- c("n_candidates", "n_unique_structures")
+  colnames(cla_counts) <- names(cla_dataframes)
 
   # NPClassifier counts
   npc_dataframes <- list(
@@ -207,32 +212,40 @@ decorate_chemo <- function(
 
   npc_counts <- vapply(
     X = npc_dataframes,
-    FUN = count_unique_structures,
-    integer(1L),
+    FUN = count_stats,
+    integer(2L),
     USE.NAMES = FALSE
   )
-  names(npc_counts) <- names(npc_dataframes)
+  rownames(npc_counts) <- c("n_candidates", "n_unique_structures")
+  colnames(npc_counts) <- names(npc_dataframes)
 
   # Log Summary Statistics ----
 
   log_info(
     "Chemically informed metabolite annotation reranked:
   Classyfire:
-    Kingdom level:    %d structures
-    Superclass level: %d structures
-    Class level:      %d structures
-    Parent level:     %d structures
+    Kingdom level:    %d candidates (%d unique)
+    Superclass level: %d candidates (%d unique)
+    Class level:      %d candidates (%d unique)
+    Parent level:     %d candidates (%d unique)
   NPClassifier:
-    Pathway level:    %d structures
-    Superclass level: %d structures
-    Class level:      %d structures",
-    cla_counts["kingdom"],
-    cla_counts["superclass"],
-    cla_counts["class"],
-    cla_counts["parent"],
-    npc_counts["pathway"],
-    npc_counts["superclass"],
-    npc_counts["class"]
+    Pathway level:    %d candidates (%d unique)
+    Superclass level: %d candidates (%d unique)
+    Class level:      %d candidates (%d unique)",
+    cla_counts["n_candidates", "kingdom"],
+    cla_counts["n_unique_structures", "kingdom"],
+    cla_counts["n_candidates", "superclass"],
+    cla_counts["n_unique_structures", "superclass"],
+    cla_counts["n_candidates", "class"],
+    cla_counts["n_unique_structures", "class"],
+    cla_counts["n_candidates", "parent"],
+    cla_counts["n_unique_structures", "parent"],
+    npc_counts["n_candidates", "pathway"],
+    npc_counts["n_unique_structures", "pathway"],
+    npc_counts["n_candidates", "superclass"],
+    npc_counts["n_unique_structures", "superclass"],
+    npc_counts["n_candidates", "class"],
+    npc_counts["n_unique_structures", "class"]
   )
 
   log_complete(ctx, n_processed = nrow(annot_table_wei_chemo))

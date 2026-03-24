@@ -4,14 +4,17 @@
 \alias{transform_score_sirius_csi}
 \title{Transform SIRIUS CSI score}
 \usage{
-transform_score_sirius_csi(csi_score = NULL, K = 50, scale = 10)
+transform_score_sirius_csi(csi_score = NULL, K = 100, scale = 20)
 }
 \arguments{
-\item{csi_score}{\link{numeric} Numeric SIRIUS CSI score (can be negative, NA, NULL, or absent)}
+\item{csi_score}{\link{numeric} Numeric SIRIUS CSI score (expected mostly <= 0;
+can be negative, NA, NULL, or absent)}
 
-\item{K}{\link{numeric} Numeric shift parameter to adjust the sigmoid center (default: 50)}
+\item{K}{\link{numeric} Numeric shift parameter to adjust the sigmoid center
+(default: 100, midpoint at score = -100)}
 
-\item{scale}{\link{numeric} Numeric scale parameter controlling sigmoid steepness (default: 10)}
+\item{scale}{\link{numeric} Numeric scale parameter controlling sigmoid steepness
+(default: 20)}
 }
 \value{
 Numeric transformed score in the range (0, 1), or NA if input is NA/NULL/absent
@@ -24,21 +27,42 @@ scores using a sigmoid function. The transformation maps raw scores to a
 \details{
 This is an experimental transformation not officially approved by
 SIRIUS developers. The sigmoid function is: 1 / (1 + exp(-(score + K) / scale))
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{SIRIUS CSI:FingerID scores are expected to be log-likelihood-like values
+on (-Inf, 0], where values closer to 0 are better. A practical rule of
+thumb is:
+\\itemize\{
+  \\item score > -10: excellent/awesome
+  \\item score > -100: acceptable/okay
+  \\item score <= -100: weak/low confidence
+\}
+
+The defaults K = 100 and scale = 20 place the sigmoid midpoint at
+score = -100 and strongly reward scores near 0:
+\\itemize\{
+  \\item score = -10  -> ~0.989
+  \\item score = -100 -> 0.500
+  \\item score = -200 -> ~0.007
+\}
+Previous defaults (K = 50, scale = 10) placed the midpoint at -50 and
+compressed the useful range to [-70, -30], mapping most realistic SIRIUS
+hits to near-zero scores.
+}\if{html}{\out{</div>}}
 }
 \examples{
 \dontrun{
 # Transform a single score
-transform_score_sirius_csi(csi_score = -20)
+transform_score_sirius_csi(csi_score = -100)
 
 # Transform with custom parameters
-transform_score_sirius_csi(csi_score = -20, K = 30, scale = 5)
+transform_score_sirius_csi(csi_score = -100, K = 100, scale = 20)
 
 # Vectorized transformation
-scores <- c(-50, -20, 0, 20, 50)
+scores <- c(-300, -100, -10, -1, 0)
 transform_score_sirius_csi(csi_score = scores)
 
 # Handle NA values
-scores_with_na <- c(-20, NA, 0, 20)
+scores_with_na <- c(-100, NA, -10, -300)
 transform_score_sirius_csi(csi_score = scores_with_na)
 
 # Handle missing/absent score

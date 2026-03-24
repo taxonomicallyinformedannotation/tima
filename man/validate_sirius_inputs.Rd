@@ -13,7 +13,8 @@ validate_sirius_inputs(
   str_met,
   str_nam,
   str_tax_cla,
-  str_tax_npc
+  str_tax_npc,
+  max_analog_abs_mz_error
 )
 }
 \arguments{
@@ -34,6 +35,9 @@ validate_sirius_inputs(
 \item{str_tax_cla}{\link{character} Character path to ClassyFire taxonomy.}
 
 \item{str_tax_npc}{\link{character} Character path to NPClassifier taxonomy.}
+
+\item{max_analog_abs_mz_error}{\link{numeric} Maximum allowed absolute m/z
+deviation (Da) for keeping SIRIUS spectral analog hits.}
 }
 \value{
 NULL (invisible). Stops on validation failure.
