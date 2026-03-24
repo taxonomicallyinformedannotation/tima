@@ -83,22 +83,24 @@ test_that("decorate_bio logs both candidate and unique structure counts", {
     candidate_structure_inchikey_connectivity_layer = c("AAAAA", "AAAAA")
   )
 
-  logged <- capture.output(
-    decorate_bio(
-      annot_table_wei_bio = test_df,
-      score_biological_kingdom = 0.7,
-      score_biological_phylum = 0.7,
-      score_biological_class = 0.7,
-      score_biological_order = 0.7,
-      score_biological_family = 0.7,
-      score_biological_tribe = 0.7,
-      score_biological_genus = 0.7,
-      score_biological_species = 0.7,
-      score_biological_variety = 0.7,
-      score_biological_biota = 0.7
-    )
+  log_file <- withr::local_tempfile(fileext = ".log")
+  setup_logger(filename = log_file, threshold = 400)
+
+  decorate_bio(
+    annot_table_wei_bio = test_df,
+    score_biological_kingdom = 0.7,
+    score_biological_phylum = 0.7,
+    score_biological_class = 0.7,
+    score_biological_order = 0.7,
+    score_biological_family = 0.7,
+    score_biological_tribe = 0.7,
+    score_biological_genus = 0.7,
+    score_biological_species = 0.7,
+    score_biological_variety = 0.7,
+    score_biological_biota = 0.7
   )
-  logged <- paste(logged, collapse = "\n")
+
+  logged <- paste(readLines(log_file, warn = FALSE), collapse = "\n")
 
   expect_true(grepl("candidates", logged, fixed = TRUE))
   expect_true(grepl("unique", logged, fixed = TRUE))

@@ -65,19 +65,21 @@ test_that("decorate_chemo logs both candidate and unique structure counts", {
     feature_pred_tax_npc_03cla_val = c("NPC1", "NPC1")
   )
 
-  logged <- capture.output(
-    decorate_chemo(
-      annot_table_wei_chemo = test_df,
-      score_chemical_cla_kingdom = 0.7,
-      score_chemical_cla_superclass = 0.7,
-      score_chemical_cla_class = 0.7,
-      score_chemical_cla_parent = 0.7,
-      score_chemical_npc_pathway = 0.7,
-      score_chemical_npc_superclass = 0.7,
-      score_chemical_npc_class = 0.7
-    )
+  log_file <- withr::local_tempfile(fileext = ".log")
+  setup_logger(filename = log_file, threshold = 400)
+
+  decorate_chemo(
+    annot_table_wei_chemo = test_df,
+    score_chemical_cla_kingdom = 0.7,
+    score_chemical_cla_superclass = 0.7,
+    score_chemical_cla_class = 0.7,
+    score_chemical_cla_parent = 0.7,
+    score_chemical_npc_pathway = 0.7,
+    score_chemical_npc_superclass = 0.7,
+    score_chemical_npc_class = 0.7
   )
-  logged <- paste(logged, collapse = "\n")
+
+  logged <- paste(readLines(log_file, warn = FALSE), collapse = "\n")
 
   expect_true(grepl("candidates", logged, fixed = TRUE))
   expect_true(grepl("unique", logged, fixed = TRUE))
