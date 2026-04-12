@@ -17,7 +17,7 @@
 #' @param str_met [character] Path to structure metadata file
 #' @param str_tax_cla [character] Path to ClassyFire taxonomy file
 #' @param str_tax_npc [character] Path to NPClassifier taxonomy file
-#' @param cache [character|NULL] Optional path to a SMILES processing cache
+#' @param cache (character or NULL) Optional path to a SMILES processing cache
 #'     file (e.g. `processed.csv.gz`). When `NULL` (default), the cache path
 #'     is auto-derived from `dirname(str_stereo)/processed.csv.gz`.
 #'
@@ -160,7 +160,7 @@ select_annotations_columns <- function(
 #'     they are consistent with the canonical RDKit output.
 #'
 #' @param df [data.frame] Annotation data frame.
-#' @param cache [character|NULL] Optional path to a SMILES processing cache
+#' @param cache (character or NULL) Optional path to a SMILES processing cache
 #'     file. When provided, previously computed results are reused, avoiding
 #'     redundant RDKit calls.
 #'
