@@ -161,12 +161,17 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
   n_spectral <- nrow(annotations_tables_spectral)
   log_debug("Found %d spectral annotations", n_spectral)
 
-  # Create key for anti-join
+  # Create key for anti-join (prefer inchikey_no_stereo when available)
+  has_no_stereo <- "candidate_structure_inchikey_no_stereo" %in%
+    names(annotations_tables_spectral)
+  anti_join_cols <- if (has_no_stereo) {
+    c("feature_id", "candidate_structure_inchikey_no_stereo")
+  } else {
+    c("feature_id", "candidate_structure_inchikey_connectivity_layer")
+  }
+
   spectral_keys <- annotations_tables_spectral |>
-    tidytable::distinct(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer
-    )
+    tidytable::distinct(tidyselect::any_of(anti_join_cols))
 
   n_ms1_before <- nrow(annotation_tables_list[["ms1"]])
 
@@ -174,10 +179,7 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
   annotation_table <- annotation_tables_list[["ms1"]] |>
     tidytable::anti_join(
       y = spectral_keys,
-      by = c(
-        "feature_id",
-        "candidate_structure_inchikey_connectivity_layer"
-      )
+      by = anti_join_cols
     ) |>
     tidytable::bind_rows(annotations_tables_spectral)
 

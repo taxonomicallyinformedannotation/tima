@@ -4,14 +4,7 @@
 \alias{select_annotations_columns}
 \title{Select and standardize annotation columns}
 \usage{
-select_annotations_columns(
-  df,
-  str_stereo,
-  str_met,
-  str_nam,
-  str_tax_cla,
-  str_tax_npc
-)
+select_annotations_columns(df, str_stereo, str_met, str_tax_cla, str_tax_npc)
 }
 \arguments{
 \item{df}{\link{data.frame} Data frame containing annotation results with structure and
@@ -20,8 +13,6 @@ candidate information}
 \item{str_stereo}{\link{character} Path to structure stereochemistry file}
 
 \item{str_met}{\link{character} Path to structure metadata file}
-
-\item{str_nam}{\link{character} Path to structure names file}
 
 \item{str_tax_cla}{\link{character} Path to ClassyFire taxonomy file}
 
@@ -34,7 +25,8 @@ and complemented metadata
 \description{
 Selects and standardizes annotation columns by filtering to
 relevant fields, cleaning NULL/NA values, rounding numeric values,
-and complementing with structure metadata.
+recomputing all structure properties from SMILES via RDKit, and
+complementing with structure metadata.
 }
 \examples{
 \dontrun{
@@ -42,7 +34,6 @@ result <- select_annotations_columns(
   df = annotations,
   str_stereo = "data/str_stereo.tsv",
   str_met = "data/str_metadata.tsv",
-  str_nam = "data/str_names.tsv",
   str_tax_cla = "data/str_tax_classyfire.tsv",
   str_tax_npc = "data/str_tax_npclassifier.tsv"
 )

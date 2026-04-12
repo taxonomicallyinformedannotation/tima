@@ -134,7 +134,7 @@ test_that("test-create_components filters NA values", {
   expect_true(file.exists(output))
   components <- tidytable::fread(output)
   # Should only contain F1, F2, F3, F4 (NA filtered out)
-  expect_false(any(is.na(components$`cluster index`)))
+  expect_false(anyNA(components$`cluster index`))
 })
 
 test_that("test-create_components creates distinct edges", {

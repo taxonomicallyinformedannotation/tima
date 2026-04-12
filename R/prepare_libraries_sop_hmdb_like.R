@@ -97,13 +97,12 @@ prepare_libraries_sop_hmdb_like <- function(
                 .fns = tidytable::na_if,
                 ""
               )) |>
-              tidytable::filter(!is.na(inchikey)) |>
+              ## SMILES is the single source of truth. All computable
+              ## fields (InChIKey, formula, mass, xlogp) are derived
+              ## from SMILES via process_smiles() in split_tables_sop().
+              tidytable::filter(!is.na(smiles)) |>
               tidytable::mutate(
-                structure_inchikey_2D = stringi::stri_sub(
-                  str = inchikey,
-                  from = 1,
-                  to = 14
-                ),
+                structure_inchikey_2D = NA_character_,
                 structure_smiles_2D = NA_character_
               ) |>
               tidytable::select(

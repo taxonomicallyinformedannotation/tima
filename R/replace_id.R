@@ -59,7 +59,7 @@ replace_id <- function(
 
   # Determine Replacement ID ----
   # GNPS ID takes precedence over filename pattern
-  new_id <- user_gnps %||% user_filename
+  new_id <- rlang::`%||%`(user_gnps, user_filename)
 
   # Replace ID ----
   new_file_name <- replace_id_in_filename(file_name, old_id, new_id)
@@ -103,16 +103,5 @@ reconstruct_path <- function(dir_path, filename) {
     filename
   } else {
     file.path(dir_path, filename)
-  }
-}
-
-#' Null-coalescing operator (like `??` in other languages)
-#' @keywords internal
-#' @noRd
-`%||%` <- function(a, b) {
-  if (is.null(a)) {
-    b
-  } else {
-    a
   }
 }

@@ -12,7 +12,6 @@
 #' @param output [character] Character string path for prepared GNPS annotations output
 #' @param str_stereo [character] Character string path to structures stereochemistry file
 #' @param str_met [character] Character string path to structures metadata file
-#' @param str_nam [character] Character string path to structures names file
 #' @param str_tax_cla [character] Character string path to ClassyFire taxonomy file
 #' @param str_tax_npc [character] Character string path to NPClassifier taxonomy file
 #'
@@ -42,9 +41,6 @@ prepare_annotations_gnps <- function(
   str_met = get_params(
     step = "prepare_annotations_gnps"
   )$files$libraries$sop$merged$structures$metadata,
-  str_nam = get_params(
-    step = "prepare_annotations_gnps"
-  )$files$libraries$sop$merged$structures$names,
   str_tax_cla = get_params(
     step = "prepare_annotations_gnps"
   )$files$libraries$sop$merged$structures$taxonomies$cla,
@@ -66,7 +62,6 @@ prepare_annotations_gnps <- function(
     file_list = list(
       str_stereo = str_stereo,
       str_met = str_met,
-      str_nam = str_nam,
       str_tax_cla = str_tax_cla,
       str_tax_npc = str_tax_npc
     ),
@@ -112,13 +107,14 @@ prepare_annotations_gnps <- function(
             "candidate_structure_name" = "Compound_Name",
             "candidate_score_similarity" = "MQScore",
             "candidate_count_similarity_peaks_matched" = "SharedPeaks",
-            "candidate_structure_inchi" = "INCHI",
-            "candidate_structure_inchikey" = "InChIKey",
-            "candidate_structure_inchikey_connectivity_layer" = "InChIKey-Planar",
+            ## All structural identifiers (InChIKey, formula, mass,
+            ## xlogp) are strictly recomputed from SMILES via
+            ## process_smiles() downstream.  Only the SMILES is kept
+            ## as single source of truth for structure identity.
+            "candidate_structure_smiles_no_stereo" = "Smiles",
             "candidate_structure_tax_npc_01pat" = "npclassifier_pathway",
             "candidate_structure_tax_npc_02sup" = "npclassifier_superclass",
             "candidate_structure_tax_npc_03cla" = "npclassifier_class",
-            "candidate_structure_exact_mass" = "ExactMass",
             ## Only partially present
             "candidate_structure_tax_cla_02sup" = "superclass",
             "candidate_structure_tax_cla_03cla" = "class",
@@ -127,20 +123,6 @@ prepare_annotations_gnps <- function(
         )
       ) |>
       tidytable::mutate(
-        candidate_structure_smiles_no_stereo = NA,
-        candidate_structure_molecular_formula = candidate_structure_inchi |>
-          ## really dirty
-          gsub(
-            pattern = ".*\\/C",
-            replacement = "C",
-            perl = TRUE
-          ) |>
-          gsub(
-            pattern = "\\/.*",
-            replacement = "",
-            perl = TRUE
-          ),
-        candidate_structure_xlogp = NA_real_,
         ## Only partially present
         candidate_structure_tax_cla_chemontid = NA,
         candidate_structure_tax_cla_01kin = NA
@@ -148,7 +130,6 @@ prepare_annotations_gnps <- function(
       select_annotations_columns(
         str_stereo = str_stereo,
         str_met = str_met,
-        str_nam = str_nam,
         str_tax_cla = str_tax_cla,
         str_tax_npc = str_tax_npc
       )

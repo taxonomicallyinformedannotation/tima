@@ -13,8 +13,6 @@ prepare_annotations_spectra(
     "prepare_annotations_spectra")$files$libraries$sop$merged$structures$stereo,
   str_met = get_params(step =
     "prepare_annotations_spectra")$files$libraries$sop$merged$structures$metadata,
-  str_nam = get_params(step =
-    "prepare_annotations_spectra")$files$libraries$sop$merged$structures$names,
   str_tax_cla = get_params(step =
     "prepare_annotations_spectra")$files$libraries$sop$merged$structures$taxonomies$cla,
   str_tax_npc = get_params(step =
@@ -29,8 +27,6 @@ prepare_annotations_spectra(
 \item{str_stereo}{\link{character} Character string path to structures stereochemistry file}
 
 \item{str_met}{\link{character} Character string path to structures metadata file}
-
-\item{str_nam}{\link{character} Character string path to structures names file}
 
 \item{str_tax_cla}{\link{character} Character string path to ClassyFire taxonomy file}
 
@@ -61,7 +57,6 @@ prepare_annotations_spectra(
   input = input,
   str_stereo = paste0(dir, "libraries/sop/merged/structures/stereo.tsv"),
   str_met = paste0(dir, "libraries/sop/merged/structures/metadata.tsv"),
-  str_nam = paste0(dir, "libraries/sop/merged/structures/names.tsv"),
   str_tax_cla = paste0(dir, "libraries/sop/merged/structures/taxonomies/classyfire.tsv"),
   str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv")
 )

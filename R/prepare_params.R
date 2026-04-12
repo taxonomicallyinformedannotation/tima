@@ -106,9 +106,9 @@ prepare_params <- function(
   fil_lib_sop_mer_org_nam <- params_advanced$files$libraries$sop$merged$organisms$names
   fil_lib_sop_mer_org_tax_ott <- params_advanced$files$libraries$sop$merged$organisms$taxonomies$ott
   fil_lib_sop_mer_str_pro <- params_advanced$files$libraries$sop$merged$structures$processed
+  fil_lib_sop_mer_str_can <- params_advanced$files$libraries$sop$merged$structures$canonical
   fil_lib_sop_mer_str_ste <- params_advanced$files$libraries$sop$merged$structures$stereo
   fil_lib_sop_mer_str_met <- params_advanced$files$libraries$sop$merged$structures$metadata
-  fil_lib_sop_mer_str_nam <- params_advanced$files$libraries$sop$merged$structures$names
   fil_lib_sop_mer_str_tax_cla <- params_advanced$files$libraries$sop$merged$structures$taxonomies$cla
   fil_lib_sop_mer_str_tax_npc <- params_advanced$files$libraries$sop$merged$structures$taxonomies$npc
 
@@ -162,12 +162,10 @@ prepare_params <- function(
   names_mgf_ad <- params_advanced$names$mgf$adduct
   names_mgf_ce <- params_advanced$names$mgf$collision_energy
   names_mgf_ci <- params_advanced$names$mgf$compound_id
-  names_mgf_em <- params_advanced$names$mgf$exact_mass
   names_mgf_in <- params_advanced$names$mgf$inchi
   names_mgf_io <- params_advanced$names$mgf$inchi_no_stereo
   names_mgf_ik <- params_advanced$names$mgf$inchikey
   names_mgf_il <- params_advanced$names$mgf$inchikey_connectivity_layer
-  names_mgf_mf <- params_advanced$names$mgf$molecular_formula
   names_mgf_na <- params_advanced$names$mgf$name
   names_mgf_po <- params_advanced$names$mgf$polarity
   names_mgf_rt <- params_advanced$names$mgf$retention_time
@@ -176,7 +174,6 @@ prepare_params <- function(
   names_mgf_si <- params_advanced$names$mgf$spectrum_id
   names_mgf_sp <- params_advanced$names$mgf$splash
   names_mgf_sy <- params_advanced$names$mgf$synonyms
-  names_mgf_xl <- params_advanced$names$mgf$xlogp
   names_precursor <- params_advanced$names$precursor
   names_rt_fea <- params_advanced$names$rt$features
   names_rt_lib <- params_advanced$names$rt$library
@@ -278,8 +275,6 @@ prepare_params <- function(
     fil_lib_sop_mer_str_ste
   yamls_params$annotate_masses$files$libraries$sop$merged$structures$metadata <-
     fil_lib_sop_mer_str_met
-  yamls_params$annotate_masses$files$libraries$sop$merged$structures$names <-
-    fil_lib_sop_mer_str_nam
   yamls_params$annotate_masses$files$libraries$sop$merged$structures$taxonomies$cla <-
     fil_lib_sop_mer_str_tax_cla
   yamls_params$annotate_masses$files$libraries$sop$merged$structures$taxonomies$npc <-
@@ -384,8 +379,6 @@ prepare_params <- function(
     fil_lib_sop_mer_str_ste
   yamls_params$prepare_annotations_gnps$files$libraries$sop$merged$structures$metadata <-
     fil_lib_sop_mer_str_met
-  yamls_params$prepare_annotations_gnps$files$libraries$sop$merged$structures$names <-
-    fil_lib_sop_mer_str_nam
   yamls_params$prepare_annotations_gnps$files$libraries$sop$merged$structures$taxonomies$cla <-
     fil_lib_sop_mer_str_tax_cla
   yamls_params$prepare_annotations_gnps$files$libraries$sop$merged$structures$taxonomies$npc <-
@@ -400,8 +393,6 @@ prepare_params <- function(
     fil_lib_sop_mer_str_ste
   yamls_params$prepare_annotations_mzmine$files$libraries$sop$merged$structures$metadata <-
     fil_lib_sop_mer_str_met
-  yamls_params$prepare_annotations_mzmine$files$libraries$sop$merged$structures$names <-
-    fil_lib_sop_mer_str_nam
   yamls_params$prepare_annotations_mzmine$files$libraries$sop$merged$structures$taxonomies$cla <-
     fil_lib_sop_mer_str_tax_cla
   yamls_params$prepare_annotations_mzmine$files$libraries$sop$merged$structures$taxonomies$npc <-
@@ -420,8 +411,6 @@ prepare_params <- function(
     fil_lib_sop_mer_str_ste
   yamls_params$prepare_annotations_sirius$files$libraries$sop$merged$structures$metadata <-
     fil_lib_sop_mer_str_met
-  yamls_params$prepare_annotations_sirius$files$libraries$sop$merged$structures$names <-
-    fil_lib_sop_mer_str_nam
   yamls_params$prepare_annotations_sirius$files$libraries$sop$merged$structures$taxonomies$cla <-
     fil_lib_sop_mer_str_tax_cla
   yamls_params$prepare_annotations_sirius$files$libraries$sop$merged$structures$taxonomies$npc <-
@@ -440,8 +429,6 @@ prepare_params <- function(
     fil_lib_sop_mer_str_ste
   yamls_params$prepare_annotations_spectra$files$libraries$sop$merged$structures$metadata <-
     fil_lib_sop_mer_str_met
-  yamls_params$prepare_annotations_spectra$files$libraries$sop$merged$structures$names <-
-    fil_lib_sop_mer_str_nam
   yamls_params$prepare_annotations_spectra$files$libraries$sop$merged$structures$taxonomies$cla <-
     fil_lib_sop_mer_str_tax_cla
   yamls_params$prepare_annotations_spectra$files$libraries$sop$merged$structures$taxonomies$npc <-
@@ -552,12 +539,12 @@ prepare_params <- function(
     fil_lib_sop_mer_org_tax_ott
   yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$processed <-
     fil_lib_sop_mer_str_pro
+  yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$canonical <-
+    fil_lib_sop_mer_str_can
   yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$stereo <-
     fil_lib_sop_mer_str_ste
   yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$metadata <-
     fil_lib_sop_mer_str_met
-  yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$names <-
-    fil_lib_sop_mer_str_nam
   yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$taxonomies$cla <-
     fil_lib_sop_mer_str_tax_cla
   yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$taxonomies$npc <-
@@ -580,8 +567,6 @@ prepare_params <- function(
     names_mgf_ce
   yamls_params$prepare_libraries_spectra$names$mgf$compound_id <-
     names_mgf_ci
-  yamls_params$prepare_libraries_spectra$names$mgf$exact_mass <-
-    names_mgf_em
   yamls_params$prepare_libraries_spectra$names$mgf$inchi <-
     names_mgf_in
   yamls_params$prepare_libraries_spectra$names$mgf$inchi_no_stereo <-
@@ -590,8 +575,6 @@ prepare_params <- function(
     names_mgf_ik
   yamls_params$prepare_libraries_spectra$names$mgf$inchikey_connectivity_layer <-
     names_mgf_il
-  yamls_params$prepare_libraries_spectra$names$mgf$molecular_formula <-
-    names_mgf_mf
   yamls_params$prepare_libraries_spectra$names$mgf$name <-
     names_mgf_na
   yamls_params$prepare_libraries_spectra$names$mgf$polarity <-
@@ -606,8 +589,6 @@ prepare_params <- function(
     names_mgf_sp
   yamls_params$prepare_libraries_spectra$names$mgf$synonyms <-
     names_mgf_sy
-  yamls_params$prepare_libraries_spectra$names$mgf$xlogp <-
-    names_mgf_xl
 
   ## prepare_taxa
   yamls_params$prepare_taxa$files$features$prepared <-

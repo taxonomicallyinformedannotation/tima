@@ -11,9 +11,9 @@ validate_sop_merged_inputs(
   value,
   output_key,
   output_org_tax_ott,
+  output_str_can,
   output_str_stereo,
   output_str_met,
-  output_str_nam,
   output_str_tax_cla,
   output_str_tax_npc
 )

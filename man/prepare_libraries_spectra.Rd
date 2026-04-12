@@ -10,21 +10,18 @@ prepare_libraries_spectra(
   col_ad = get_params(step = "prepare_libraries_spectra")$names$mgf$adduct,
   col_ce = get_params(step = "prepare_libraries_spectra")$names$mgf$collision_energy,
   col_ci = get_params(step = "prepare_libraries_spectra")$names$mgf$compound_id,
-  col_em = get_params(step = "prepare_libraries_spectra")$names$mgf$exact_mass,
   col_in = get_params(step = "prepare_libraries_spectra")$names$mgf$inchi,
   col_io = get_params(step = "prepare_libraries_spectra")$names$mgf$inchi_no_stereo,
   col_ik = get_params(step = "prepare_libraries_spectra")$names$mgf$inchikey,
   col_il = get_params(step =
     "prepare_libraries_spectra")$names$mgf$inchikey_connectivity_layer,
-  col_mf = get_params(step = "prepare_libraries_spectra")$names$mgf$molecular_formula,
   col_na = get_params(step = "prepare_libraries_spectra")$names$mgf$name,
   col_po = get_params(step = "prepare_libraries_spectra")$names$mgf$polarity,
   col_sm = get_params(step = "prepare_libraries_spectra")$names$mgf$smiles,
   col_sn = get_params(step = "prepare_libraries_spectra")$names$mgf$smiles_no_stereo,
   col_si = get_params(step = "prepare_libraries_spectra")$names$mgf$spectrum_id,
   col_sp = get_params(step = "prepare_libraries_spectra")$names$mgf$splash,
-  col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
-  col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp
+  col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms
 )
 }
 \arguments{
@@ -38,8 +35,6 @@ prepare_libraries_spectra(
 
 \item{col_ci}{\link{character} Name of the compound ID column in MGF.}
 
-\item{col_em}{\link{character} Name of the exact mass column in MGF.}
-
 \item{col_in}{\link{character} Name of the InChI column in MGF.}
 
 \item{col_io}{\link{character} Name of the InChI without stereo column in MGF.}
@@ -47,8 +42,6 @@ prepare_libraries_spectra(
 \item{col_ik}{\link{character} Name of the InChIKey column in MGF.}
 
 \item{col_il}{\link{character} Name of the InChIKey connectivity layer column in MGF.}
-
-\item{col_mf}{\link{character} Name of the molecular formula column in MGF.}
 
 \item{col_na}{\link{character} Name of the name column in MGF.}
 
@@ -63,8 +56,6 @@ prepare_libraries_spectra(
 \item{col_sp}{\link{character} Name of the SPLASH column in MGF.}
 
 \item{col_sy}{\link{character} Name of the synonyms column in MGF.}
-
-\item{col_xl}{\link{character} Name of the xlogp column in MGF.}
 }
 \value{
 Character vector with paths to prepared library files (invisible).

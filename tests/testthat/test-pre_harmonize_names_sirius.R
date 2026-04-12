@@ -173,7 +173,7 @@ test_that("pre_harmonize_names_sirius works with real SIRIUS output", {
   expect_equal(result[2], "adduct")
   expect_equal(result[4], "SiriusScore")
   expect_equal(result[10], "noSlash")
-  expect_true(all(!grepl("/", result)))
+  expect_true(!any(grepl("/", result)))
 })
 
 test_that("pre_harmonize_names_sirius can be chained with harmonize_names_sirius", {
@@ -264,5 +264,5 @@ test_that("pre_harmonize_names_sirius handles large vectors efficiently", {
   result <- pre_harmonize_names_sirius(large_input)
 
   expect_length(result, 3000)
-  expect_true(all(!grepl("/", result)))
+  expect_true(!any(grepl("/", result)))
 })

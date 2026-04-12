@@ -11,20 +11,17 @@ harmonize_spectra(
   col_ad,
   col_ce,
   col_ci,
-  col_em,
   col_in,
   col_io,
   col_ik,
   col_il,
-  col_mf,
   col_na,
   col_po,
   col_sm,
   col_sn,
   col_si,
   col_sp,
-  col_sy,
-  col_xl
+  col_sy
 )
 }
 \arguments{
@@ -40,8 +37,6 @@ harmonize_spectra(
 
 \item{col_ci}{Compound ID field name}
 
-\item{col_em}{Exact mass field name}
-
 \item{col_in}{InChI field name}
 
 \item{col_io}{InChI without stereochemistry field name}
@@ -49,8 +44,6 @@ harmonize_spectra(
 \item{col_ik}{InChIKey field name}
 
 \item{col_il}{InChIKey connectivity layer field name}
-
-\item{col_mf}{Molecular formula field name}
 
 \item{col_na}{Compound name field name}
 
@@ -65,8 +58,6 @@ harmonize_spectra(
 \item{col_sp}{SPLASH field name}
 
 \item{col_sy}{Synonyms field name}
-
-\item{col_xl}{xLogP field name}
 }
 \value{
 Data frame with harmonized column names and standardized fields

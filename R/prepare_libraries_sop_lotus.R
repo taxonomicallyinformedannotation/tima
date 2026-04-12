@@ -55,12 +55,9 @@ prepare_libraries_sop_lotus <- function(
         colClasses = "character"
       ) |>
       tidytable::mutate(
-        # Extract 2D InChIKey (first 14 characters = connectivity layer)
-        structure_inchikey_2D = stringi::stri_sub(
-          str = structure_inchikey,
-          from = 1L,
-          to = 14L
-        )
+        ## InChIKey connectivity layer is recomputed from SMILES
+        ## via process_smiles() in split_tables_sop().
+        structure_inchikey_2D = NA_character_
       ) |>
       tidytable::rename(structure_name = structure_nameTraditional) |>
       select_sop_columns() |>

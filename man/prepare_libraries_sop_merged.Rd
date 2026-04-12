@@ -15,12 +15,12 @@ prepare_libraries_sop_merged(
     "prepare_libraries_sop_merged")$files$libraries$sop$merged$keys,
   output_org_tax_ott = get_params(step =
     "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$taxonomies$ott,
+  output_str_can = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$canonical,
   output_str_stereo = get_params(step =
     "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$stereo,
   output_str_met = get_params(step =
     "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$metadata,
-  output_str_nam = get_params(step =
-    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$names,
   output_str_tax_cla = get_params(step =
     "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$cla,
   output_str_tax_npc = get_params(step =
@@ -44,11 +44,11 @@ e.g., 'Gentianaceae|Apocynaceae')}
 
 \item{output_org_tax_ott}{\link{character} Character string path for organisms taxonomy (OTT) file}
 
+\item{output_str_can}{\link{character} Character string path for structures canonical SMILES file}
+
 \item{output_str_stereo}{\link{character} Character string path for structures stereochemistry file}
 
 \item{output_str_met}{\link{character} Character string path for structures metadata file}
-
-\item{output_str_nam}{\link{character} Character string path for structures names file}
 
 \item{output_str_tax_cla}{\link{character} Character string path for ClassyFire taxonomy file}
 

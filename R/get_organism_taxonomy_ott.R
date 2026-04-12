@@ -270,7 +270,7 @@ get_organism_taxonomy_ott <- function(
     tidytable::distinct(ott_id)
 
   # Retry failed queries with genus-only names if requested
-  if (nrow(new_matched_otl_exact) != nrow(new_ott_id) && retry == TRUE) {
+  if (nrow(new_matched_otl_exact) != nrow(new_ott_id) && retry) {
     log_info("Retrying failed queries using genus names only")
 
     # Keep successfully matched results

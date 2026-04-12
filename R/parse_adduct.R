@@ -156,13 +156,13 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
 
   # Validate all extracted values
   if (
-    any(is.na(c(
+    anyNA(c(
       n_mer,
       n_iso,
       modifications$total_mass,
       charge_info$n_charges,
       charge_info$charge_sign
-    )))
+    ))
   ) {
     msg <- paste0(
       "Unexpected NA values during adduct parsing for: %s",

@@ -336,7 +336,7 @@ test_that("weight_chemo combines ClassyFire and NPClassifier scores", {
 
   # Check that chemical scores were calculated
   expect_true("score_chemical" %in% names(res))
-  expect_true(all(!is.na(res$score_chemical)))
+  expect_true(!anyNA(res$score_chemical))
 
   # First candidate matches perfectly on both ClassyFire and NPClassifier
   # ClassyFire: 0.1 AND 0.2 AND 0.3 AND 0.4

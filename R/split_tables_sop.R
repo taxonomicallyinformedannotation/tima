@@ -16,10 +16,13 @@
 #'     skip caching
 #'
 #' @return List of normalized data frames:
-#'   \item{table_keys}{Structure-organism pairs with reference DOIs}
-#'   \item{table_structures_stereo}{Structure stereochemistry information}
-#'   \item{table_organisms}{Organism taxonomy information}
-#'   \item{table_structural}{Processed and standardized structure data}
+#'   \item{key}{Structure-organism pairs with reference DOIs}
+#'   \item{org_tax_ott}{Organism taxonomy information}
+#'   \item{str_can}{Canonicalization mapping (smiles_initial -> smiles)}
+#'   \item{str_stereo}{Structure stereochemistry with name, tag, xlogp}
+#'   \item{str_met}{Stereo-invariant physical properties (formula, mass)}
+#'   \item{str_tax_cla}{ClassyFire taxonomy keyed by inchikey}
+#'   \item{str_tax_npc}{NPClassifier taxonomy keyed by smiles (with stereo)}
 #'
 #' @keywords internal
 #'
@@ -32,8 +35,8 @@
 #' )
 #'
 #' # Access individual tables
-#' structures <- result$table_structural
-#' organisms <- result$table_organisms
+#' structures <- result$str_stereo
+#' organisms <- result$org_tax_ott
 #' }
 split_tables_sop <- function(table, cache) {
   # Input Validation ----
@@ -113,6 +116,17 @@ split_tables_sop <- function(table, cache) {
   rm(table)
   log_with_count("Referenced structure-organism pairs", n = nrow(table_keys))
 
+  # str_can: Canonicalization mapping (smiles_initial -> smiles with stereo)
+  table_structures_canonical <- table_structural |>
+    tidytable::filter(!is.na(structure_smiles_initial)) |>
+    tidytable::filter(!is.na(structure_smiles)) |>
+    tidytable::select(
+      structure_smiles_initial,
+      structure_smiles
+    ) |>
+    tidytable::distinct(structure_smiles_initial, .keep_all = TRUE)
+
+  # str_stereo: keyed by full inchikey, includes name, tag, xlogp
   table_structures_stereo <- table_structural |>
     tidytable::filter(!is.na(structure_inchikey)) |>
     tidytable::filter(
@@ -120,13 +134,17 @@ split_tables_sop <- function(table, cache) {
         !is.na(structure_smiles_no_stereo)
     ) |>
     tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
-    tidytable::select(
-      structure_inchikey,
-      structure_smiles,
-      structure_inchikey_connectivity_layer,
-      structure_smiles_no_stereo
-    ) |>
-    tidytable::distinct()
+    tidytable::mutate(
+      structure_inchikey_no_stereo = tidytable::if_else(
+        !is.na(structure_inchikey) & nchar(structure_inchikey) >= 27L,
+        paste0(
+          stringi::stri_sub(str = structure_inchikey, from = 1L, to = 14L),
+          "-",
+          stringi::stri_sub(str = structure_inchikey, from = -1L, to = -1L)
+        ),
+        NA_character_
+      )
+    )
 
   # Calculate structure statistics
   n_stereoisomers <- nrow(
@@ -157,50 +175,89 @@ split_tables_sop <- function(table, cache) {
     format_count(n_constitutional)
   )
 
-  table_structures_metadata <- table_structural |>
-    tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_molecular_formula)) |>
-    tidytable::filter(!is.na(structure_exact_mass)) |>
-    # tidytable::filter(!is.na(structure_xlogp)) |>
+  # Collapse name, tag, xlogp per inchikey
+  table_structures_stereo <- table_structures_stereo |>
     tidytable::select(
       structure_inchikey,
-      structure_molecular_formula,
-      structure_exact_mass,
-      structure_xlogp,
+      structure_smiles,
+      structure_inchikey_connectivity_layer,
+      structure_inchikey_no_stereo,
+      structure_smiles_no_stereo,
+      tidyselect::any_of(c("structure_xlogp")),
+      structure_name,
       structure_tag
     ) |>
     tidytable::distinct() |>
     tidytable::group_by(
       structure_inchikey,
-      structure_molecular_formula,
-      structure_exact_mass,
-      structure_xlogp
+      structure_smiles,
+      structure_inchikey_connectivity_layer,
+      structure_inchikey_no_stereo,
+      structure_smiles_no_stereo
     ) |>
-    clean_collapse()
+    tidytable::summarize(
+      structure_xlogp = if (
+        "structure_xlogp" %in% names(tidytable::pick(tidyselect::everything()))
+      ) {
+        .resolve_numeric_or_na(structure_xlogp)
+      } else {
+        NA_character_
+      },
+      structure_name = .collapse_harmonized_names(structure_name),
+      structure_tag = .collapse_unique_non_empty(structure_tag)
+    ) |>
+    tidytable::ungroup()
 
-  table_structures_names <- table_structural |>
+  # str_met: Stereo-invariant properties keyed by inchikey_no_stereo
+  ## formula and exact_mass are deterministically derived from SMILES via
+  ## process_smiles() and are stereo-invariant (same connectivity + protonation
+  ## = same formula = same mass).
+  table_structures_metadata <- table_structural |>
     tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_name)) |>
-    tidytable::select(structure_inchikey, structure_name) |>
+    tidytable::filter(!is.na(structure_molecular_formula)) |>
+    tidytable::filter(!is.na(structure_exact_mass)) |>
+    tidytable::mutate(
+      structure_inchikey_no_stereo = tidytable::if_else(
+        !is.na(structure_inchikey) & nchar(structure_inchikey) >= 27L,
+        paste0(
+          stringi::stri_sub(str = structure_inchikey, from = 1L, to = 14L),
+          "-",
+          stringi::stri_sub(str = structure_inchikey, from = -1L, to = -1L)
+        ),
+        NA_character_
+      )
+    ) |>
+    tidytable::select(
+      structure_inchikey_no_stereo,
+      structure_molecular_formula,
+      structure_exact_mass
+    ) |>
     tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey) |>
-    clean_collapse(cols = c("structure_name"))
+    tidytable::group_by(structure_inchikey_no_stereo) |>
+    tidytable::summarize(
+      structure_molecular_formula = .resolve_single_or_na(
+        structure_molecular_formula
+      ),
+      structure_exact_mass = .resolve_numeric_or_na(structure_exact_mass)
+    ) |>
+    tidytable::ungroup()
 
+  # str_tax_npc: keyed by canonical SMILES with stereo
   table_structures_taxonomy_npc <- table_structural |>
-    tidytable::filter(!is.na(structure_smiles_no_stereo)) |>
+    tidytable::filter(!is.na(structure_smiles)) |>
     tidytable::filter(
       !is.na(structure_tax_npc_01pat) |
         !is.na(structure_tax_npc_02sup) |
         !is.na(structure_tax_npc_03cla)
     ) |>
     tidytable::select(
-      structure_smiles_no_stereo,
+      structure_smiles,
       structure_tax_npc_01pat,
       structure_tax_npc_02sup,
       structure_tax_npc_03cla
     ) |>
     tidytable::distinct() |>
-    tidytable::group_by(structure_smiles_no_stereo) |>
+    tidytable::group_by(structure_smiles) |>
     clean_collapse(
       cols = c(
         "structure_tax_npc_01pat",
@@ -213,11 +270,12 @@ split_tables_sop <- function(table, cache) {
       .fns = ~ tidytable::replace_na(.x = .x, replace = "notClassified")
     ))
 
+  # str_tax_cla: keyed by full inchikey
   table_structures_taxonomy_cla <- table_structural |>
-    tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
+    tidytable::filter(!is.na(structure_inchikey)) |>
     tidytable::filter(!is.na(structure_tax_cla_chemontid)) |>
     tidytable::select(
-      structure_inchikey_connectivity_layer,
+      structure_inchikey,
       structure_tax_cla_chemontid,
       structure_tax_cla_01kin,
       structure_tax_cla_02sup,
@@ -225,7 +283,7 @@ split_tables_sop <- function(table, cache) {
       structure_tax_cla_04dirpar
     ) |>
     tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey_connectivity_layer) |>
+    tidytable::group_by(structure_inchikey) |>
     clean_collapse(
       cols = c(
         "structure_tax_cla_chemontid",
@@ -261,9 +319,9 @@ split_tables_sop <- function(table, cache) {
       "key" = table_keys,
       # "org_nam" = table_organisms_names,
       "org_tax_ott" = table_org_tax_ott,
+      "str_can" = table_structures_canonical,
       "str_stereo" = table_structures_stereo,
       "str_met" = table_structures_metadata,
-      "str_nam" = table_structures_names,
       "str_tax_cla" = table_structures_taxonomy_cla,
       "str_tax_npc" = table_structures_taxonomy_npc
     )
@@ -272,9 +330,9 @@ split_tables_sop <- function(table, cache) {
     table_keys,
     # table_organisms_names,
     table_org_tax_ott,
+    table_structures_canonical,
     table_structures_stereo,
     table_structures_metadata,
-    table_structures_names,
     table_structures_taxonomy_cla,
     table_structures_taxonomy_npc
   )
@@ -287,9 +345,12 @@ split_tables_sop <- function(table, cache) {
 #' @keywords internal
 create_empty_sop_tables <- function() {
   list(
-    table_keys = tidytable::tidytable(),
-    table_structures_stereo = tidytable::tidytable(),
-    table_organisms = tidytable::tidytable(),
-    table_structural = tidytable::tidytable()
+    "key" = tidytable::tidytable(),
+    "org_tax_ott" = tidytable::tidytable(),
+    "str_can" = tidytable::tidytable(),
+    "str_stereo" = tidytable::tidytable(),
+    "str_met" = tidytable::tidytable(),
+    "str_tax_cla" = tidytable::tidytable(),
+    "str_tax_npc" = tidytable::tidytable()
   )
 }

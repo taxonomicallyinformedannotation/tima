@@ -121,7 +121,7 @@ validate_weight_annotations_inputs <- function(
     chemical = weight_chemical,
     biological = weight_biological
   )
-  if (!all(is.numeric(weights)) || any(is.na(weights))) {
+  if (!all(is.numeric(weights)) || anyNA(weights)) {
     cli::cli_abort(
       "All weights (spectral, chemical, biological) must be numeric and non-NA",
       class = c("tima_validation_error", "tima_error"),
@@ -446,9 +446,11 @@ rearrange_annotations <- function(
     ) |>
     tidytable::arrange(tidytable::desc(x = candidate_score_similarity)) |>
     tidytable::distinct(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      candidate_structure_smiles_no_stereo,
+      tidyselect::any_of(c(
+        "feature_id",
+        "candidate_structure_inchikey_no_stereo",
+        "candidate_structure_inchikey_connectivity_layer"
+      )),
       .keep_all = TRUE
     )
 

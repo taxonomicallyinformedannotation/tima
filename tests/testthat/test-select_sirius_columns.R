@@ -116,7 +116,7 @@ test_that("test-select_sirius_columns_formulas processes SIRIUS v5 formulas", {
   result <- select_sirius_columns_formulas(df = df, sirius_version = "5")
 
   expect_true("feature_id" %in% names(result))
-  expect_true("candidate_structure_exact_mass" %in% names(result))
+  ## exact_mass is now recomputed from SMILES downstream; only error_mz is kept
   expect_true("candidate_structure_error_mz" %in% names(result))
 })
 
@@ -144,7 +144,7 @@ test_that("test-select_sirius_columns_formulas supports massErrorPrecursor(ppm) 
 
   result <- select_sirius_columns_formulas(df = df, sirius_version = "6")
 
-  expect_true("candidate_structure_exact_mass" %in% names(result))
+  ## exact_mass is now recomputed from SMILES downstream; only error_mz is kept
   expect_true("candidate_structure_error_mz" %in% names(result))
   expect_true(!is.na(result$candidate_structure_error_mz[[1L]]))
 })

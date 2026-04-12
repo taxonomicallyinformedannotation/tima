@@ -299,7 +299,6 @@ annotate_spectra <- function(
     nrow(
       df_final |>
         tidytable::distinct(
-          candidate_structure_inchikey_connectivity_layer,
           candidate_structure_smiles_no_stereo
         )
     ),
@@ -415,11 +414,39 @@ remove_empty_peak_spectra <- function(sp) {
 }
 
 extract_vector <- function(obj, field, len, fill = NA) {
-  v <- obj@backend@spectraData[[field]]
-  if (is.null(v)) {
-    v <- rep(fill, len)
+  spectra_data <- obj@backend@spectraData
+  if (!length(field)) {
+    return(rep(fill, len))
   }
-  v
+
+  # Try exact names first (in priority order), then case-insensitive aliases.
+  idx_exact <- match(field, names(spectra_data), nomatch = 0L)
+  idx_exact <- idx_exact[idx_exact > 0L]
+  if (!length(idx_exact)) {
+    idx_ci <- match(tolower(field), tolower(names(spectra_data)), nomatch = 0L)
+    idx_ci <- idx_ci[idx_ci > 0L]
+    if (!length(idx_ci)) {
+      return(rep(fill, len))
+    }
+    idx <- idx_ci[[1L]]
+  } else {
+    idx <- idx_exact[[1L]]
+  }
+
+  v <- spectra_data[[idx]]
+  if (is.null(v)) {
+    return(rep(fill, len))
+  }
+  if (length(v) == len) {
+    return(v)
+  }
+  if (length(v) == 1L) {
+    return(rep(v, len))
+  }
+  if (length(v) < len) {
+    return(c(v, rep(fill, len - length(v))))
+  }
+  v[seq_len(len)]
 }
 
 #' @keywords internal
@@ -427,32 +454,54 @@ build_library_metadata <- function(lib_sp, lib_precursors) {
   n <- length(lib_sp)
   tidytable::tidytable(
     target_id = seq_len(n),
-    target_adduct = extract_vector(lib_sp, "adduct", n, NA_character_),
+    target_adduct = extract_vector(
+      lib_sp,
+      c("adduct", "precursor_type"),
+      n,
+      NA_character_
+    ),
     target_spectrum_id = extract_vector(
       lib_sp,
-      "spectrum_id",
+      c("spectrum_id", "spectrumid", "id"),
       n,
       NA_character_
     ),
-    target_inchikey = extract_vector(lib_sp, "inchikey", n, NA_character_),
-    target_inchikey_connectivity_layer = extract_vector(
+    target_smiles = extract_vector(
       lib_sp,
-      "inchikey_2D",
+      c("smiles", "structure_smiles", "SMILES"),
       n,
       NA_character_
     ),
-    target_smiles = extract_vector(lib_sp, "smiles", n, NA_character_),
     target_smiles_no_stereo = extract_vector(
       lib_sp,
-      "smiles_2D",
+      c(
+        "smiles_no_stereo",
+        "structure_smiles_no_stereo",
+        "smiles_2D",
+        "smiles2D",
+        "structure_smiles_2D"
+      ),
       n,
       NA_character_
     ),
-    target_library = extract_vector(lib_sp, "library", n, NA_character_),
-    target_formula = extract_vector(lib_sp, "formula", n, NA_character_),
-    target_exactmass = extract_vector(lib_sp, "exactmass", n, NA_real_),
-    target_name = extract_vector(lib_sp, "name", n, NA_character_),
-    target_xlogp = extract_vector(lib_sp, "xlogp", n, NA_real_),
+    target_library = extract_vector(
+      lib_sp,
+      c("library", "source_library", "database"),
+      n,
+      NA_character_
+    ),
+    target_name = extract_vector(
+      lib_sp,
+      c("name", "structure_name", "compound_name", "compoundName", "NAME"),
+      n,
+      NA_character_
+    ),
+    target_tag = extract_vector(
+      lib_sp,
+      c("tag", "structure_tag"),
+      n,
+      NA_character_
+    ),
     target_precursorMz = lib_precursors
   ) |>
     harmonize_adducts(
@@ -554,16 +603,10 @@ finalize_results <- function(
     tidytable::select(-target_id) |>
     tidytable::mutate(
       candidate_structure_error_mz = target_precursorMz - precursorMz,
-      candidate_structure_inchikey_connectivity_layer = tidytable::if_else(
-        is.na(target_inchikey_connectivity_layer),
-        gsub(
-          pattern = "-.*",
-          replacement = "",
-          x = target_inchikey,
-          perl = TRUE
-        ),
-        target_inchikey_connectivity_layer
-      ),
+      ## SMILES is the single source of truth for structure identity.
+      ## All structural identifiers (InChIKey, formula, mass, xlogp)
+      ## are strictly recomputed from SMILES via process_smiles()
+      ## downstream in select_annotations_columns().
       candidate_structure_smiles_no_stereo = tidytable::coalesce(
         target_smiles_no_stereo,
         target_smiles
@@ -578,11 +621,7 @@ finalize_results <- function(
           "candidate_spectrum_id" = "target_spectrum_id",
           "candidate_structure_error_mz",
           "candidate_structure_name" = "target_name",
-          "candidate_structure_inchikey_connectivity_layer",
           "candidate_structure_smiles_no_stereo",
-          "candidate_structure_molecular_formula" = "target_formula",
-          "candidate_structure_exact_mass" = "target_exactmass",
-          "candidate_structure_xlogp" = "target_xlogp",
           "candidate_spectrum_entropy",
           "candidate_score_similarity",
           "candidate_count_similarity_peaks_matched"
@@ -593,7 +632,7 @@ finalize_results <- function(
     tidytable::distinct(
       feature_id,
       candidate_library,
-      candidate_structure_inchikey_connectivity_layer,
+      candidate_structure_smiles_no_stereo,
       .keep_all = TRUE
     )
   df_final
@@ -605,20 +644,33 @@ log_library_stats <- function(lib_sp) {
   if (!"library" %in% names(sd)) {
     return(invisible(NULL))
   }
-  stats <- sd |>
+  df <- sd |>
     data.frame() |>
-    tidytable::filter(!is.na(library)) |>
+    tidytable::filter(!is.na(library))
+
+  # Build a reliable structure identity column using coalesce
+  id_cols <- intersect(
+    c("smiles_no_stereo", "smiles", "inchikey", "compound_id"),
+    names(df)
+  )
+  if (length(id_cols) > 0L) {
+    df <- df |>
+      tidytable::mutate(
+        .structure_id = tidytable::coalesce(
+          !!!rlang::syms(id_cols)
+        )
+      )
+  } else {
+    df$.structure_id <- NA_character_
+  }
+
+  stats <- df |>
     tidytable::group_by(library) |>
-    tidytable::add_count(name = "spectra") |>
-    tidytable::distinct(inchikey_connectivity_layer, .keep_all = TRUE) |>
-    tidytable::add_count(name = "unique_connectivities") |>
-    tidytable::ungroup() |>
-    tidytable::select(library, spectra, unique_connectivities) |>
-    tidytable::distinct() |>
-    tidytable::mutate(
-      unique_connectivities = tidytable::case_when(
-        library == "ISDB - Wikidata" ~ spectra,
-        TRUE ~ unique_connectivities
+    tidytable::summarise(
+      spectra = tidytable::n(),
+      unique_structures = tidytable::n_distinct(
+        .structure_id,
+        na.rm = TRUE
       )
     ) |>
     tidytable::arrange(tidytable::desc(x = spectra))

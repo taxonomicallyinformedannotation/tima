@@ -195,7 +195,7 @@ prepare_taxa <- function(
   rm(organism_table_filled, organism_table_missing)
 
   if (is.null(taxon)) {
-    if (extension == FALSE) {
+    if (!extension) {
       # log_trace("Removing filename extensions")
       metadata_table <- metadata_table |>
         tidytable::mutate(

@@ -10,9 +10,9 @@ validate_sop_merged_inputs <- function(
   value,
   output_key,
   output_org_tax_ott,
+  output_str_can,
   output_str_stereo,
   output_str_met,
-  output_str_nam,
   output_str_tax_cla,
   output_str_tax_npc
 ) {
@@ -42,9 +42,9 @@ validate_sop_merged_inputs <- function(
   output_paths <- list(
     output_key = output_key,
     output_org_tax_ott = output_org_tax_ott,
+    output_str_can = output_str_can,
     output_str_stereo = output_str_stereo,
     output_str_met = output_str_met,
-    output_str_nam = output_str_nam,
     output_str_tax_cla = output_str_tax_cla,
     output_str_tax_npc = output_str_tax_npc
   )
@@ -223,33 +223,33 @@ apply_taxonomic_filter <- function(
 export_library_tables <- function(
   table_keys,
   table_org_tax_ott,
+  table_structures_canonical,
   table_structures_stereo,
   table_structures_metadata,
-  table_structures_names,
   table_structures_taxonomy_cla,
   table_structures_taxonomy_npc,
   output_key,
   output_org_tax_ott,
+  output_str_can,
   output_str_stereo,
   output_str_met,
-  output_str_nam,
   output_str_tax_cla,
   output_str_tax_npc
 ) {
   export_output(x = table_keys, file = output_key)
   export_output(x = table_org_tax_ott, file = output_org_tax_ott)
+  export_output(x = table_structures_canonical, file = output_str_can)
   export_output(x = table_structures_stereo, file = output_str_stereo)
   export_output(x = table_structures_metadata, file = output_str_met)
-  export_output(x = table_structures_names, file = output_str_nam)
   export_output(x = table_structures_taxonomy_cla, file = output_str_tax_cla)
   export_output(x = table_structures_taxonomy_npc, file = output_str_tax_npc)
 
   c(
     "key" = output_key,
     "org_tax_ott" = output_org_tax_ott,
+    "str_can" = output_str_can,
     "str_stereo" = output_str_stereo,
     "str_met" = output_str_met,
-    "str_name" = output_str_nam,
     "str_tax_cla" = output_str_tax_cla,
     "str_tax_npc" = output_str_tax_npc
   )
@@ -279,9 +279,9 @@ export_library_tables <- function(
 #' @param cache [character] Character string path to cache directory for processed SMILES
 #' @param output_key [character] Character string path for output keys file
 #' @param output_org_tax_ott [character] Character string path for organisms taxonomy (OTT) file
+#' @param output_str_can [character] Character string path for structures canonical SMILES file
 #' @param output_str_stereo [character] Character string path for structures stereochemistry file
 #' @param output_str_met [character] Character string path for structures metadata file
-#' @param output_str_nam [character] Character string path for structures names file
 #' @param output_str_tax_cla [character] Character string path for ClassyFire taxonomy file
 #' @param output_str_tax_npc [character] Character string path for NPClassifier taxonomy file
 #'
@@ -328,15 +328,15 @@ prepare_libraries_sop_merged <- function(
   output_org_tax_ott = get_params(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$organisms$taxonomies$ott,
+  output_str_can = get_params(
+    step = "prepare_libraries_sop_merged"
+  )$files$libraries$sop$merged$structures$canonical,
   output_str_stereo = get_params(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$structures$stereo,
   output_str_met = get_params(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$structures$metadata,
-  output_str_nam = get_params(
-    step = "prepare_libraries_sop_merged"
-  )$files$libraries$sop$merged$structures$names,
   output_str_tax_cla = get_params(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$structures$taxonomies$cla,
@@ -361,9 +361,9 @@ prepare_libraries_sop_merged <- function(
     value = value,
     output_key = output_key,
     output_org_tax_ott = output_org_tax_ott,
+    output_str_can = output_str_can,
     output_str_stereo = output_str_stereo,
     output_str_met = output_str_met,
-    output_str_nam = output_str_nam,
     output_str_tax_cla = output_str_tax_cla,
     output_str_tax_npc = output_str_tax_npc
   )
@@ -381,9 +381,9 @@ prepare_libraries_sop_merged <- function(
   table_org_tax_ott <- complete_organism_taxonomy(table_keys, table_org_tax_ott)
 
   # Extract structure tables
+  table_structures_canonical <- tables$str_can
   table_structures_stereo <- tables$str_stereo
   table_structures_metadata <- tables$str_met
-  table_structures_names <- tables$str_nam
   table_structures_taxonomy_cla <- tables$str_tax_cla
   table_structures_taxonomy_npc <- tables$str_tax_npc
 
@@ -429,16 +429,16 @@ prepare_libraries_sop_merged <- function(
   result <- export_library_tables(
     table_keys = table_keys,
     table_org_tax_ott = table_org_tax_ott,
+    table_structures_canonical = table_structures_canonical,
     table_structures_stereo = table_structures_stereo,
     table_structures_metadata = table_structures_metadata,
-    table_structures_names = table_structures_names,
     table_structures_taxonomy_cla = table_structures_taxonomy_cla,
     table_structures_taxonomy_npc = table_structures_taxonomy_npc,
     output_key = output_key,
     output_org_tax_ott = output_org_tax_ott,
+    output_str_can = output_str_can,
     output_str_stereo = output_str_stereo,
     output_str_met = output_str_met,
-    output_str_nam = output_str_nam,
     output_str_tax_cla = output_str_tax_cla,
     output_str_tax_npc = output_str_tax_npc
   )
@@ -455,9 +455,9 @@ prepare_libraries_sop_merged <- function(
   rm(
     table_keys,
     table_org_tax_ott,
+    table_structures_canonical,
     table_structures_stereo,
     table_structures_metadata,
-    table_structures_names,
     table_structures_taxonomy_cla,
     table_structures_taxonomy_npc,
     tables

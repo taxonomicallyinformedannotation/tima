@@ -202,7 +202,7 @@ test_that("dist_groups output has correct structure", {
   expect_s3_class(result$Label, "factor")
 
   # No NA values in distance
-  expect_false(any(is.na(result$Distance)))
+  expect_false(anyNA(result$Distance))
 })
 
 test_that("dist_groups includes group information", {

@@ -8,7 +8,6 @@ complement_metadata_structures(
   df,
   str_stereo,
   str_met,
-  str_nam,
   str_tax_cla,
   str_tax_npc
 )
@@ -16,22 +15,20 @@ complement_metadata_structures(
 \arguments{
 \item{df}{Data frame with structural metadata to complement}
 
-\item{str_stereo}{Path to structure stereochemistry file}
+\item{str_stereo}{Path to structure stereochemistry file (includes name, tag, xlogp)}
 
-\item{str_met}{Path to structure metadata file}
+\item{str_met}{Path to structure metadata file (formula, mass)}
 
-\item{str_nam}{Path to structure names file}
+\item{str_tax_cla}{Path to ClassyFire taxonomy file (keyed by inchikey)}
 
-\item{str_tax_cla}{Path to ClassyFire taxonomy file}
-
-\item{str_tax_npc}{Path to NPClassifier taxonomy file}
+\item{str_tax_npc}{Path to NPClassifier taxonomy file (keyed by smiles with stereo)}
 }
 \value{
 Data frame with enriched structural metadata
 }
 \description{
 Complements structural metadata by joining stereochemistry,
-metadata, names, and chemical taxonomy from reference libraries.
+metadata, and chemical taxonomy from reference libraries.
 Enriches annotation results with comprehensive structure information.
 }
 \examples{
@@ -40,7 +37,6 @@ enriched <- complement_metadata_structures(
   df = annotations,
   str_stereo = "data/str_stereo.tsv",
   str_met = "data/str_metadata.tsv",
-  str_nam = "data/str_names.tsv",
   str_tax_cla = "data/str_tax_classyfire.tsv",
   str_tax_npc = "data/str_tax_npclassifier.tsv"
 )

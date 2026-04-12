@@ -266,10 +266,6 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("names", "mgf", "compound_id"),
       type = as.character
     ),
-    names_mgf_em = list(
-      path = c("names", "mgf", "exact_mass"),
-      type = as.character
-    ),
     names_mgf_in = list(path = c("names", "mgf", "inchi"), type = as.character),
     names_mgf_io = list(
       path = c("names", "mgf", "inchi_no_stereo"),
@@ -281,10 +277,6 @@ parse_cli_params <- function(arguments, parameters) {
     ),
     names_mgf_il = list(
       path = c("names", "mgf", "inchikey_connectivity_layer"),
-      type = as.character
-    ),
-    names_mgf_mf = list(
-      path = c("names", "mgf", "molecular_formula"),
       type = as.character
     ),
     names_mgf_na = list(path = c("names", "mgf", "name"), type = as.character),
@@ -314,7 +306,6 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("names", "mgf", "synonyms"),
       type = as.character
     ),
-    names_mgf_xl = list(path = c("names", "mgf", "xlogp"), type = as.character),
     names_precursor = list(path = c("names", "precursor"), type = as.character),
     names_rt_fea = list(
       path = c("names", "rt", "features"),

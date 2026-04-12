@@ -167,14 +167,14 @@ summarize_results <- function(
   # gc()
 
   # Remove ties if requested
-  if (remove_ties == TRUE) {
+  if (remove_ties) {
     log_info("Removing ties")
     df_joined <- df_joined |>
       tidytable::distinct(c(feature_id, rank_final), .keep_all = TRUE)
   }
 
   # Summarize if requested
-  if (summarize == TRUE) {
+  if (summarize) {
     # Get column names that match the pattern once.
     collapse_cols <- colnames(df_joined)[grepl(
       pattern = "^candidate|^rank|^score",
@@ -273,7 +273,7 @@ summarize_results <- function(
       as.numeric(feature_id)
     ) |>
     tidytable::select(
-      tidyselect::where(fn = ~ any(!is.na(.)))
+      tidyselect::where(fn = ~ !all(is.na(.)))
     )
 
   rm(df_processed)

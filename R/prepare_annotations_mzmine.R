@@ -12,7 +12,6 @@
 #' @param output [character] Character string path for prepared mzmine annotations output
 #' @param str_stereo [character] Character string path to structures stereochemistry file
 #' @param str_met [character] Character string path to structures metadata file
-#' @param str_nam [character] Character string path to structures names file
 #' @param str_tax_cla [character] Character string path to ClassyFire taxonomy file
 #' @param str_tax_npc [character] Character string path to NPClassifier taxonomy file
 #'
@@ -42,9 +41,6 @@ prepare_annotations_mzmine <- function(
   str_met = get_params(
     step = "prepare_annotations_mzmine"
   )$files$libraries$sop$merged$structures$metadata,
-  str_nam = get_params(
-    step = "prepare_annotations_mzmine"
-  )$files$libraries$sop$merged$structures$names,
   str_tax_cla = get_params(
     step = "prepare_annotations_mzmine"
   )$files$libraries$sop$merged$structures$taxonomies$cla,
@@ -66,7 +62,6 @@ prepare_annotations_mzmine <- function(
     file_list = list(
       str_stereo = str_stereo,
       str_met = str_met,
-      str_nam = str_nam,
       str_tax_cla = str_tax_cla,
       str_tax_npc = str_tax_npc
     ),
@@ -101,9 +96,10 @@ prepare_annotations_mzmine <- function(
           x = c(
             "feature_id" = "id",
             "candidate_structure_name" = "compound_name",
-            "candidate_structure_inchikey_connectivity_layer" = "inchi_key",
+            ## All structural identifiers (InChIKey, formula, mass,
+            ## xlogp) are strictly recomputed from SMILES via
+            ## process_smiles() downstream.
             "candidate_structure_smiles_no_stereo" = "smiles",
-            "candidate_structure_molecular_formula" = "mol_formula",
             "candidate_adduct" = "adduct",
             "candidate_score_similarity" = "score"
           )
@@ -117,15 +113,8 @@ prepare_annotations_mzmine <- function(
         "candidate_structure_error_rt" = NA_real_
       ) |>
       tidytable::mutate(
-        candidate_structure_inchikey_connectivity_layer = stringi::stri_sub(
-          str = candidate_structure_inchikey_connectivity_layer,
-          from = 1,
-          to = 14
-        )
-      ) |>
-      tidytable::mutate(
-        "candidate_structure_exact_mass" = NA_real_,
-        "candidate_structure_xlogp" = NA_real_,
+        ## exact_mass, xlogp, formula are recomputed from SMILES
+        ## via process_smiles() in select_annotations_columns().
         "candidate_count_similarity_peaks_matched" = NA_integer_,
         "candidate_structure_tax_npc_01pat" = NA_character_,
         "candidate_structure_tax_npc_02sup" = NA_character_,
@@ -139,7 +128,6 @@ prepare_annotations_mzmine <- function(
       select_annotations_columns(
         str_stereo = str_stereo,
         str_met = str_met,
-        str_nam = str_nam,
         str_tax_cla = str_tax_cla,
         str_tax_npc = str_tax_npc
       )

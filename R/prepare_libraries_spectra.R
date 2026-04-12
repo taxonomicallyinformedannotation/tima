@@ -9,12 +9,10 @@
 #' @param col_ad [character] Adduct field name
 #' @param col_ce [character] Collision energy field name
 #' @param col_ci [character] Compound ID field name
-#' @param col_em [character] Exact mass field name
 #' @param col_in [character] InChI field name
 #' @param col_io [character] InChI without stereochemistry field name
 #' @param col_ik [character] InChIKey field name
 #' @param col_il [character] InChIKey connectivity layer field name
-#' @param col_mf [character] Molecular formula field name
 #' @param col_na [character] Compound name field name
 #' @param col_po [character] Polarity field name
 #' @param col_sm [character] SMILES field name
@@ -22,7 +20,6 @@
 #' @param col_si [character] Spectrum ID field name
 #' @param col_sp [character] SPLASH field name
 #' @param col_sy [character] Synonyms field name
-#' @param col_xl [character] xLogP field name
 #'
 #' @return Data frame with harmonized spectra.
 #' @keywords internal
@@ -33,20 +30,17 @@ harmonize_spectra_polarity <- function(
   col_ad,
   col_ce,
   col_ci,
-  col_em,
   col_in,
   col_io,
   col_ik,
   col_il,
-  col_mf,
   col_na,
   col_po,
   col_sm,
   col_sn,
   col_si,
   col_sp,
-  col_sy,
-  col_xl
+  col_sy
 ) {
   purrr::map(
     .x = spectra_extracted,
@@ -56,34 +50,22 @@ harmonize_spectra_polarity <- function(
     col_ad = col_ad,
     col_ce = col_ce,
     col_ci = col_ci,
-    col_em = col_em,
     col_in = col_in,
     col_io = col_io,
     col_ik = col_ik,
     col_il = col_il,
-    col_mf = col_mf,
     col_na = col_na,
     col_po = col_po,
     col_sm = col_sm,
     col_sn = col_sn,
     col_si = col_si,
     col_sp = col_sp,
-    col_sy = col_sy,
-    col_xl = col_xl
+    col_sy = col_sy
   ) |>
     purrr::map(
       .f = function(x) {
         x |>
           tidytable::rename(precursor_mz = precursorMz) |>
-          tidytable::mutate(
-            inchikey_connectivity_layer = tidytable::if_else(
-              condition = is.na(inchikey),
-              true = inchikey_connectivity_layer,
-              false = gsub(pattern = "-.*", replacement = "", x = inchikey)
-            ),
-            xlogp = xlogp |>
-              as.numeric()
-          ) |>
           data.frame()
       }
     ) |>
@@ -135,10 +117,8 @@ create_empty_spectral_library <- function() {
 #' @keywords internal
 create_empty_sop_library <- function() {
   tidytable::tidytable(
-    structure_inchikey = NA_character_,
     structure_smiles = NA_character_,
     structure_smiles_no_stereo = NA_character_,
-    structure_inchikey_connectivity_layer = NA_character_,
     organism_name = NA_character_
   )
 }
@@ -172,12 +152,10 @@ create_empty_sop_library <- function() {
 #' @param col_ad [character] Name of the adduct column in MGF.
 #' @param col_ce [character] Name of the collision energy column in MGF.
 #' @param col_ci [character] Name of the compound ID column in MGF.
-#' @param col_em [character] Name of the exact mass column in MGF.
 #' @param col_in [character] Name of the InChI column in MGF.
 #' @param col_io [character] Name of the InChI without stereo column in MGF.
 #' @param col_ik [character] Name of the InChIKey column in MGF.
 #' @param col_il [character] Name of the InChIKey connectivity layer column in MGF.
-#' @param col_mf [character] Name of the molecular formula column in MGF.
 #' @param col_na [character] Name of the name column in MGF.
 #' @param col_po [character] Name of the polarity column in MGF.
 #' @param col_sm [character] Name of the SMILES column in MGF.
@@ -185,7 +163,6 @@ create_empty_sop_library <- function() {
 #' @param col_si [character] Name of the spectrum ID column in MGF.
 #' @param col_sp [character] Name of the SPLASH column in MGF.
 #' @param col_sy [character] Name of the synonyms column in MGF.
-#' @param col_xl [character] Name of the xlogp column in MGF.
 #'
 #' @return Character vector with paths to prepared library files (invisible).
 #'
@@ -213,9 +190,6 @@ prepare_libraries_spectra <-
     col_ci = get_params(
       step = "prepare_libraries_spectra"
     )$names$mgf$compound_id,
-    col_em = get_params(
-      step = "prepare_libraries_spectra"
-    )$names$mgf$exact_mass,
     col_in = get_params(step = "prepare_libraries_spectra")$names$mgf$inchi,
     col_io = get_params(
       step = "prepare_libraries_spectra"
@@ -224,9 +198,6 @@ prepare_libraries_spectra <-
     col_il = get_params(
       step = "prepare_libraries_spectra"
     )$names$mgf$inchikey_connectivity_layer,
-    col_mf = get_params(
-      step = "prepare_libraries_spectra"
-    )$names$mgf$molecular_formula,
     col_na = get_params(step = "prepare_libraries_spectra")$names$mgf$name,
     col_po = get_params(step = "prepare_libraries_spectra")$names$mgf$polarity,
     col_sm = get_params(step = "prepare_libraries_spectra")$names$mgf$smiles,
@@ -237,8 +208,7 @@ prepare_libraries_spectra <-
       step = "prepare_libraries_spectra"
     )$names$mgf$spectrum_id,
     col_sp = get_params(step = "prepare_libraries_spectra")$names$mgf$splash,
-    col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms,
-    col_xl = get_params(step = "prepare_libraries_spectra")$names$mgf$xlogp
+    col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms
   ) {
     # Initialize logging context
     ctx <- log_operation(
@@ -307,20 +277,17 @@ prepare_libraries_spectra <-
         col_ad,
         col_ce,
         col_ci,
-        col_em,
         col_in,
         col_io,
         col_ik,
         col_il,
-        col_mf,
         col_na,
         col_po,
         col_sm,
         col_sn,
         col_si,
         col_sp,
-        col_sy,
-        col_xl
+        col_sy
       )
       spectra_pos <- Spectra::Spectra(object = spectra_harmonized_pos)
 
@@ -337,20 +304,17 @@ prepare_libraries_spectra <-
         col_ad,
         col_ce,
         col_ci,
-        col_em,
         col_in,
         col_io,
         col_ik,
         col_il,
-        col_mf,
         col_na,
         col_po,
         col_sm,
         col_sn,
         col_si,
         col_sp,
-        col_sy,
-        col_xl
+        col_sy
       )
       spectra_neg <- Spectra::Spectra(object = spectra_harmonized_neg)
 
@@ -364,22 +328,14 @@ prepare_libraries_spectra <-
         spectra_harmonized_pos,
         spectra_harmonized_neg
       ) |>
-        tidytable::filter(!is.na(inchikey)) |>
+        tidytable::filter(!is.na(smiles)) |>
         tidytable::distinct(
-          structure_inchikey = inchikey,
-          structure_inchikey_connectivity_layer = inchikey_connectivity_layer,
           structure_smiles = smiles,
-          structure_smiles_no_stereo = smiles_no_stereo,
-          structure_molecular_formula = formula,
-          structure_exact_mass = exactmass,
-          structure_xlogp = xlogp
+          structure_smiles_no_stereo = smiles_no_stereo
         ) |>
         tidytable::distinct(
-          structure_inchikey,
-          structure_inchikey_connectivity_layer,
           structure_smiles,
-          structure_smiles_no_stereo,
-          .keep_all = TRUE
+          structure_smiles_no_stereo
         ) |>
         tidytable::mutate(organism_name = NA_character_)
     }

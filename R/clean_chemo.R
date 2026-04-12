@@ -189,13 +189,11 @@ validate_clean_chemo_inputs <- function(
     score_chemical_npc_class
   )
   if (
-    any(
-      !vapply(
-        X = weights,
-        FUN = function(x) is.null(x) || is.numeric(x),
-        logical(1)
-      )
-    )
+    !all(vapply(
+      X = weights,
+      FUN = function(x) is.null(x) || is.numeric(x),
+      logical(1)
+    ))
   ) {
     tima_abort(
       problem = "taxonomy weight parameters must be numeric when provided",

@@ -7,16 +7,16 @@
 export_library_tables(
   table_keys,
   table_org_tax_ott,
+  table_structures_canonical,
   table_structures_stereo,
   table_structures_metadata,
-  table_structures_names,
   table_structures_taxonomy_cla,
   table_structures_taxonomy_npc,
   output_key,
   output_org_tax_ott,
+  output_str_can,
   output_str_stereo,
   output_str_met,
-  output_str_nam,
   output_str_tax_cla,
   output_str_tax_npc
 )

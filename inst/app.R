@@ -1090,15 +1090,6 @@ ui <- shiny::fluidPage(
               content = c("Name of the `compound id` column in your MGF file.")
             ),
           shiny::textInput(
-            inputId = "names_mgf_em",
-            label = "Name of `exact mass` variable in the MGF",
-            value = "EXACTMASS"
-          ) |>
-            shinyhelper::helper(
-              type = "inline",
-              content = c("Name of the `exact mass` column in your MGF file.")
-            ),
-          shiny::textInput(
             inputId = "names_mgf_in",
             label = "Name of `InChI` variable in the MGF",
             value = "INCHI"
@@ -1136,17 +1127,6 @@ ui <- shiny::fluidPage(
               type = "inline",
               content = c(
                 "Name of the `InChIKey connectivity layer` column in your MGF file."
-              )
-            ),
-          shiny::textInput(
-            inputId = "names_mgf_mf",
-            label = "Name of `molecular formula` variable in the MGF",
-            value = NULL
-          ) |>
-            shinyhelper::helper(
-              type = "inline",
-              content = c(
-                "Name of the `molecular formula` column in your MGF file."
               )
             ),
           shiny::textInput(
@@ -1224,15 +1204,6 @@ ui <- shiny::fluidPage(
             shinyhelper::helper(
               type = "inline",
               content = c("Name of the `synonyms` column in your MGF file.")
-            ),
-          shiny::textInput(
-            inputId = "names_mgf_xl",
-            label = "Name of `xlogP` variable in the MGF",
-            value = NULL
-          ) |>
-            shinyhelper::helper(
-              type = "inline",
-              content = c("Name of the `xlogP` column in your MGF file.")
             )
         ),
         shiny::tabPanel(
@@ -2244,8 +2215,6 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$names_mgf_ce)
   yaml_advanced$names$mgf$compound_id <-
     shiny::isolate(input$names_mgf_ci)
-  yaml_advanced$names$mgf$exact_mass <-
-    shiny::isolate(input$names_mgf_em)
   yaml_advanced$names$mgf$inchi <-
     shiny::isolate(input$names_mgf_in)
   yaml_advanced$names$mgf$inchi_no_stereo <-
@@ -2254,8 +2223,6 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$names_mgf_ik)
   yaml_advanced$names$mgf$inchikey_connectivity_layer <-
     shiny::isolate(input$names_mgf_il)
-  yaml_advanced$names$mgf$molecular_formula <-
-    shiny::isolate(input$names_mgf_mf)
   yaml_advanced$names$mgf$name <-
     shiny::isolate(input$names_mgf_na)
   yaml_advanced$names$mgf$polarity <-
@@ -2272,8 +2239,6 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$names_mgf_sp)
   yaml_advanced$names$mgf$synonyms <-
     shiny::isolate(input$names_mgf_sy)
-  yaml_advanced$names$mgf$xlogp <-
-    shiny::isolate(input$names_mgf_xl)
   yaml_advanced$names$precursor <-
     shiny::isolate(input$names_precursor)
   yaml_advanced$names$rt$features <-
@@ -2474,7 +2439,7 @@ server <- function(input, output) {
   })
   iv$add_rule("org_tax", function(taxon) {
     if (
-      any(is.na(
+      anyNA(
         stringi::stri_split_fixed(str = taxon, pattern = "|") |>
           purrr::map(
             .f = function(taxon) {
@@ -2484,7 +2449,7 @@ server <- function(input, output) {
               )$ott_id
             }
           )
-      ))
+      )
     ) {
       "Taxon not found in Open Tree of Life"
     }

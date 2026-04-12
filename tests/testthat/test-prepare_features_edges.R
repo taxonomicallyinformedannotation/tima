@@ -360,7 +360,7 @@ test_that("prepare_features_edges fills missing target with source", {
 
   # Verify missing targets were filled
   output_data <- tidytable::fread(temp_output, na.strings = c("", "NA"))
-  expect_true(all(!is.na(output_data$feature_target)))
+  expect_true(!anyNA(output_data$feature_target))
 
   # unlink(temp_ms1)
   # unlink(temp_spectral)

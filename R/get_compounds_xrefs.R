@@ -159,11 +159,7 @@ get_compounds_xrefs <- function(
 
     data <- httr2::resp_body_json(resp)
     preferred <- data[["banana"]]
-    if (!is.null(preferred)) {
-      preferred
-    } else {
-      entry_key
-    }
+    rlang::`%||%`(preferred, entry_key)
   }
 
   preferred_prefixes <- vapply(

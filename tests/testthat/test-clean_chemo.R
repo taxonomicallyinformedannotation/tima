@@ -1175,7 +1175,7 @@ test_that("sample_candidates_per_group prioritizes non-NA RT errors", {
 
   expect_equal(nrow(out$df), 2L)
   expect_equal(out$n_sampled_features, 1L)
-  expect_true(all(!is.na(out$df$candidate_structure_error_rt)))
+  expect_true(!anyNA(out$df$candidate_structure_error_rt))
   expect_equal(nrow(out$annotation_notes), 1L)
 })
 

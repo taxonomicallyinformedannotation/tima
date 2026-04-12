@@ -309,7 +309,10 @@ test_that("clean lookup values are always used before existing candidate metadat
 
   expect_true(all(out$candidate_structure_exact_mass == "100"))
   expect_true(all(out$candidate_structure_molecular_formula == "C10H20O"))
-  expect_true(all(out$candidate_structure_xlogp == "2.1"))
+  ## xlogp is no longer enriched from library (it is stereo-sensitive and
+
+  ## recomputed per-SMILES upstream); existing values pass through unchanged.
+  expect_true(all(out$candidate_structure_xlogp %in% c("9.9", "8.8")))
   expect_true(all(out$candidate_structure_tag == "clean"))
   expect_true(all(out$candidate_structure_name == "LibName"))
 })
@@ -401,13 +404,14 @@ test_that("one canonical value is returned per inchikey across rows", {
 
   expect_equal(length(unique(out$candidate_structure_exact_mass)), 1L)
   expect_equal(length(unique(out$candidate_structure_molecular_formula)), 1L)
-  expect_equal(length(unique(out$candidate_structure_xlogp)), 1L)
+  ## xlogp is no longer enriched from library; per-row values are preserved.
+  expect_equal(length(unique(out$candidate_structure_xlogp)), 3L)
   expect_equal(length(unique(out$candidate_structure_tag)), 1L)
   expect_equal(length(unique(out$candidate_structure_name)), 1L)
 
   expect_equal(unique(out$candidate_structure_exact_mass), "123.45")
   expect_equal(unique(out$candidate_structure_molecular_formula), "C6H6O")
-  expect_equal(unique(out$candidate_structure_xlogp), "1.2")
+  expect_equal(sort(out$candidate_structure_xlogp), c("0.1", "0.2", "0.3"))
   expect_equal(unique(out$candidate_structure_tag), "clean_canon")
   expect_equal(unique(out$candidate_structure_name), "CanonicalName")
 })
@@ -567,7 +571,8 @@ test_that("metadata and names keyed by structure_inchikey are mapped via stereo"
 
   expect_equal(out$candidate_structure_exact_mass[[1]], "250.12")
   expect_equal(out$candidate_structure_molecular_formula[[1]], "C10H18N2O5")
-  expect_equal(out$candidate_structure_xlogp[[1]], "1.5")
+  ## xlogp is no longer enriched from library; it stays as the placeholder NA.
+  expect_true(is.na(out$candidate_structure_xlogp[[1]]))
   expect_equal(out$candidate_structure_tag[[1]], "clean_lookup")
   expect_equal(out$candidate_structure_name[[1]], "MappedByInchikey")
 })
@@ -652,4 +657,99 @@ test_that("complement_metadata_structures keeps existing taxonomy when lookup is
     "ExistingSuperclass"
   )
   expect_equal(out$candidate_structure_tax_npc_01pat[[1L]], "ExistingPathway")
+})
+
+test_that("complement_metadata_structures normalizes empty existing values before fallback", {
+  df <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = "IK_EMPTY",
+    candidate_structure_smiles_no_stereo = "CCN",
+    candidate_structure_exact_mass = "",
+    candidate_structure_molecular_formula = "",
+    candidate_structure_xlogp = "",
+    candidate_structure_tag = "",
+    candidate_structure_name = ""
+  )
+
+  st_file <- temp_test_path("st_empty_existing.tsv")
+  met_file <- temp_test_path("met_empty_existing.tsv")
+  nam_file <- temp_test_path("nam_empty_existing.tsv")
+  cla_file <- temp_test_path("cla_empty_existing.tsv")
+  npc_file <- temp_test_path("npc_empty_existing.tsv")
+
+  .write_min_lookup_files(
+    st_file = st_file,
+    met_file = met_file,
+    nam_file = nam_file,
+    cla_file = cla_file,
+    npc_file = npc_file,
+    inchikey = "IK_EMPTY",
+    smiles = "CCN",
+    mass = "45.08",
+    formula = "C2H7N",
+    xlogp = "-0.4",
+    tag = "lookup_tag",
+    name = "ethylamine"
+  )
+
+  out <- complement_metadata_structures(
+    df,
+    str_stereo = st_file,
+    str_met = met_file,
+    str_nam = nam_file,
+    str_tax_cla = cla_file,
+    str_tax_npc = npc_file
+  )
+
+  expect_equal(out$candidate_structure_exact_mass[[1L]], "45.08")
+  expect_equal(out$candidate_structure_molecular_formula[[1L]], "C2H7N")
+  ## xlogp is no longer enriched from library; existing empty value stays.
+  expect_equal(out$candidate_structure_xlogp[[1L]], "")
+  expect_equal(out$candidate_structure_tag[[1L]], "lookup_tag")
+  expect_equal(out$candidate_structure_name[[1L]], "ethylamine")
+})
+
+test_that("complement_metadata_structures converts placeholder existing values to NA when no lookup exists", {
+  df <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = "IK_NOLOOKUP",
+    candidate_structure_smiles_no_stereo = "CCC",
+    candidate_structure_exact_mass = "",
+    candidate_structure_molecular_formula = "null",
+    candidate_structure_xlogp = "NA",
+    candidate_structure_tag = "empty",
+    candidate_structure_name = "notClassified"
+  )
+
+  st_file <- temp_test_path("st_no_lookup.tsv")
+  met_file <- temp_test_path("met_no_lookup.tsv")
+  nam_file <- temp_test_path("nam_no_lookup.tsv")
+  cla_file <- temp_test_path("cla_no_lookup.tsv")
+  npc_file <- temp_test_path("npc_no_lookup.tsv")
+
+  # Write unrelated lookup records so no enrichment row matches IK_NOLOOKUP/CCC.
+  .write_min_lookup_files(
+    st_file = st_file,
+    met_file = met_file,
+    nam_file = nam_file,
+    cla_file = cla_file,
+    npc_file = npc_file,
+    inchikey = "OTHER",
+    smiles = "CO"
+  )
+
+  out <- complement_metadata_structures(
+    df,
+    str_stereo = st_file,
+    str_met = met_file,
+    str_nam = nam_file,
+    str_tax_cla = cla_file,
+    str_tax_npc = npc_file
+  )
+
+  expect_true(is.na(out$candidate_structure_exact_mass[[1L]]))
+  expect_true(is.na(out$candidate_structure_molecular_formula[[1L]]))
+  ## xlogp is no longer normalized/enriched here; the literal "NA" string
+  ## passes through unchanged (it is cleaned upstream in the pipeline).
+  expect_equal(out$candidate_structure_xlogp[[1L]], "NA")
+  expect_true(is.na(out$candidate_structure_tag[[1L]]))
+  expect_true(is.na(out$candidate_structure_name[[1L]]))
 })

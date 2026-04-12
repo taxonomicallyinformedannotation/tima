@@ -13,20 +13,17 @@ test_that("harmonize_spectra validates input is a data frame", {
       col_ad = "adduct",
       col_ce = "collision_energy",
       col_ci = "compound_id",
-      col_em = "exact_mass",
       col_in = "inchi",
       col_io = "inchi_no_stereo",
       col_ik = "inchikey",
       col_il = "inchikey_layer",
-      col_mf = "formula",
       col_na = "name",
       col_po = "polarity",
       col_sm = "smiles",
       col_sn = "smiles_no_stereo",
       col_si = "spectrum_id",
       col_sp = "splash",
-      col_sy = "synonyms",
-      col_xl = "xlogp"
+      col_sy = "synonyms"
     ),
     "Fix: Ensure input is a valid data frame",
     fixed = TRUE
@@ -47,20 +44,17 @@ test_that("harmonize_spectra validates mode parameter", {
       col_ad = "adduct",
       col_ce = "collision_energy",
       col_ci = "compound_id",
-      col_em = "exact_mass",
       col_in = "inchi",
       col_io = "inchi_no_stereo",
       col_ik = "inchikey",
       col_il = "inchikey_layer",
-      col_mf = "formula",
       col_na = "name",
       col_po = "polarity",
       col_sm = "smiles",
       col_sn = "smiles_no_stereo",
       col_si = "spectrum_id",
       col_sp = "splash",
-      col_sy = "synonyms",
-      col_xl = "xlogp"
+      col_sy = "synonyms"
     ),
     "must contain 'pos' or 'neg'",
     class = "tima_validation_error"
@@ -99,20 +93,17 @@ test_that("harmonize_spectra mode validation is case insensitive", {
       col_ad = NULL,
       col_ce = NULL,
       col_ci = NULL,
-      col_em = NULL,
       col_in = NULL,
       col_io = NULL,
       col_ik = NULL,
       col_il = NULL,
-      col_mf = NULL,
       col_na = NULL,
       col_po = "polarity",
       col_sm = NULL,
       col_sn = NULL,
       col_si = NULL,
       col_sp = NULL,
-      col_sy = NULL,
-      col_xl = NULL
+      col_sy = NULL
     )
   )
 
@@ -125,20 +116,17 @@ test_that("harmonize_spectra mode validation is case insensitive", {
       col_ad = NULL,
       col_ce = NULL,
       col_ci = NULL,
-      col_em = NULL,
       col_in = NULL,
       col_io = NULL,
       col_ik = NULL,
       col_il = NULL,
-      col_mf = NULL,
       col_na = NULL,
       col_po = "polarity",
       col_sm = NULL,
       col_sn = NULL,
       col_si = NULL,
       col_sp = NULL,
-      col_sy = NULL,
-      col_xl = NULL
+      col_sy = NULL
     )
   )
 })
@@ -157,20 +145,17 @@ test_that("harmonize_spectra validates column name parameters are strings or NUL
       col_ad = 123, # Should be character or NULL
       col_ce = "collision_energy",
       col_ci = "compound_id",
-      col_em = "exact_mass",
       col_in = "inchi",
       col_io = "inchi_no_stereo",
       col_ik = "inchikey",
       col_il = "inchikey_layer",
-      col_mf = "formula",
       col_na = "name",
       col_po = "polarity",
       col_sm = "smiles",
       col_sn = "smiles_no_stereo",
       col_si = "spectrum_id",
       col_sp = "splash",
-      col_sy = "synonyms",
-      col_xl = "xlogp"
+      col_sy = "synonyms"
     ),
     "Column name parameter\\(s\\) must satisfy validation.*col_ad"
   )
@@ -184,20 +169,17 @@ test_that("harmonize_spectra validates column name parameters are strings or NUL
       col_ad = c("adduct1", "adduct2"), # Should be single string
       col_ce = "collision_energy",
       col_ci = "compound_id",
-      col_em = "exact_mass",
       col_in = "inchi",
       col_io = "inchi_no_stereo",
       col_ik = "inchikey",
       col_il = "inchikey_layer",
-      col_mf = "formula",
       col_na = "name",
       col_po = "polarity",
       col_sm = "smiles",
       col_sn = "smiles_no_stereo",
       col_si = "spectrum_id",
       col_sp = "splash",
-      col_sy = "synonyms",
-      col_xl = "xlogp"
+      col_sy = "synonyms"
     ),
     "Column name parameter\\(s\\) must satisfy validation.*col_ad"
   )
@@ -217,20 +199,17 @@ test_that("harmonize_spectra validates column parameters", {
       col_ad = 123, # Invalid
       col_ce = c("ce1", "ce2"), # Invalid (vector)
       col_ci = TRUE, # Invalid (not character)
-      col_em = "exact_mass",
       col_in = "inchi",
       col_io = "inchi_no_stereo",
       col_ik = "inchikey",
       col_il = "inchikey_layer",
-      col_mf = "formula",
       col_na = "name",
       col_po = "polarity",
       col_sm = "smiles",
       col_sn = "smiles_no_stereo",
       col_si = "spectrum_id",
       col_sp = "splash",
-      col_sy = "synonyms",
-      col_xl = "xlogp"
+      col_sy = "synonyms"
     ),
     "Column name parameter\\(s\\) must satisfy validation.*col_ad, col_ce, col_ci"
   )

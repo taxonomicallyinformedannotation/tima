@@ -184,7 +184,7 @@ test_that("test-benchmark_taxize_spectra handles missing taxonomy levels gracefu
   )
   out <- read_bench_output(res)
   expect_true("sample_organism_01_domain" %in% names(out))
-  expect_true(any(is.na(out$sample_organism_01_domain)))
+  expect_true(anyNA(out$sample_organism_01_domain))
 })
 
 test_that("test-benchmark_taxize_spectra samples one organism per feature when multiple available", {

@@ -72,7 +72,7 @@ test_that("process_smiles correctly processes isotope notation [13C]", {
 
   # Check if masses were calculated
   expect_true("structure_exact_mass" %in% colnames(result))
-  expect_true(all(!is.na(result$structure_exact_mass)))
+  expect_true(!anyNA(result$structure_exact_mass))
 
   if (nrow(result) >= 2) {
     mass_natural <- result$structure_exact_mass[[1L]]
@@ -144,7 +144,7 @@ test_that("process_smiles handles 15N isotope with correct mass shift", {
   result <- input |>
     process_smiles()
 
-  expect_true(all(!is.na(result$structure_exact_mass)))
+  expect_true(!anyNA(result$structure_exact_mass))
 
   # Find which row is which by checking SMILES
   if (nrow(result) >= 2) {
@@ -186,7 +186,7 @@ test_that("process_smiles handles 18O isotope with correct mass shift", {
   result <- input |>
     process_smiles()
 
-  expect_true(all(!is.na(result$structure_exact_mass)))
+  expect_true(!anyNA(result$structure_exact_mass))
 
   # If both molecules processed, check mass difference
   if (nrow(result) >= 2) {
@@ -221,7 +221,7 @@ test_that("process_smiles handles deuterium [2H] notation", {
   result <- input |>
     process_smiles()
 
-  expect_true(all(!is.na(result$structure_exact_mass)))
+  expect_true(!anyNA(result$structure_exact_mass))
 
   # If both molecules processed, check mass difference
   if (nrow(result) >= 2) {
@@ -278,9 +278,9 @@ test_that("process_smiles handles mixed natural and isotopic SMILES", {
   result <- input |>
     process_smiles()
 
-  expect_true(all(!is.na(result$structure_exact_mass)))
+  expect_true(!anyNA(result$structure_exact_mass))
   # All SMILES should have inchikeys
-  expect_true(all(!is.na(result$structure_inchikey)))
+  expect_true(!anyNA(result$structure_inchikey))
 })
 
 ## Additional Isotope Preservation Tests ----
@@ -402,7 +402,7 @@ test_that("process_smiles handles multiple different isotope types", {
   result <- input |>
     process_smiles()
 
-  expect_true(all(!is.na(result$structure_exact_mass)))
+  expect_true(!anyNA(result$structure_exact_mass))
 
   # If both molecules processed, check that masses differ
   if (nrow(result) >= 2) {

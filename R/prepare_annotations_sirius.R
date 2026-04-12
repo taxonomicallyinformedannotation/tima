@@ -9,7 +9,6 @@
 #' @param output_for [character] Character output path for formulas.
 #' @param str_stereo [character] Character path to stereo file.
 #' @param str_met [character] Character path to metadata file.
-#' @param str_nam [character] Character path to names file.
 #' @param str_tax_cla [character] Character path to ClassyFire taxonomy.
 #' @param str_tax_npc [character] Character path to NPClassifier taxonomy.
 #' @param max_analog_abs_mz_error [numeric] Maximum allowed absolute m/z
@@ -24,7 +23,6 @@ validate_sirius_inputs <- function(
   output_for,
   str_stereo,
   str_met,
-  str_nam,
   str_tax_cla,
   str_tax_npc,
   max_analog_abs_mz_error
@@ -51,7 +49,6 @@ validate_sirius_inputs <- function(
     file_list = list(
       str_stereo = str_stereo,
       str_met = str_met,
-      str_nam = str_nam,
       str_tax_cla = str_tax_cla,
       str_tax_npc = str_tax_npc
     ),
@@ -342,10 +339,10 @@ split_sirius_results <- function(table) {
 #' Merge SIRIUS structure candidates with spectral match scores
 #'
 #' @description Joins spectral match results into structure candidate rows by
-#'     `feature_id` + `candidate_structure_inchikey_connectivity_layer`.
+#'     `feature_id` + `candidate_structure_smiles_no_stereo`.
 #'     A candidate that appears in both gets all SIRIUS structure scores AND
 #'     the spectral similarity score in a single row.  Spectral hits whose
-#'     InChIKey does not appear in the structure table are kept as standalone
+#'     SMILES does not appear in the structure table are kept as standalone
 #'     candidate rows.
 #'
 #' @param structures_prepared [data.frame] Standardised structure candidates.
@@ -365,19 +362,19 @@ merge_sirius_structures_with_spectral <- function(
     return(spectral_prepared)
   }
 
-  inchikey_col <- "candidate_structure_inchikey_connectivity_layer"
+  smiles_col <- "candidate_structure_smiles_no_stereo"
   if (
-    !inchikey_col %in% names(spectral_prepared) ||
-      all(is.na(spectral_prepared[[inchikey_col]]))
+    !smiles_col %in% names(spectral_prepared) ||
+      all(is.na(spectral_prepared[[smiles_col]]))
   ) {
-    # No matchable spectral InChIKeys – nothing to join, keep spectral as-is
+    # No matchable spectral SMILES – nothing to join, keep spectral as-is
     return(
       tidytable::bind_rows(structures_prepared, spectral_prepared) |>
         tidytable::distinct()
     )
   }
 
-  join_key <- c("feature_id", "candidate_structure_inchikey_connectivity_layer")
+  join_key <- c("feature_id", "candidate_structure_smiles_no_stereo")
 
   spectral_direct <- spectral_prepared |>
     tidytable::filter(candidate_library != "SIRIUS spectral (analog)")
@@ -424,23 +421,23 @@ merge_sirius_structures_with_spectral <- function(
   structures_keyed <- structures_prepared |>
     tidytable::filter(
       !is.na(feature_id),
-      !is.na(candidate_structure_inchikey_connectivity_layer)
+      !is.na(candidate_structure_smiles_no_stereo)
     )
 
   structures_no_key <- structures_prepared |>
     tidytable::filter(
-      is.na(feature_id) | is.na(candidate_structure_inchikey_connectivity_layer)
+      is.na(feature_id) | is.na(candidate_structure_smiles_no_stereo)
     )
 
   spectral_keyed <- spectral_typed |>
     tidytable::filter(
       !is.na(feature_id),
-      !is.na(candidate_structure_inchikey_connectivity_layer)
+      !is.na(candidate_structure_smiles_no_stereo)
     )
 
   spectral_no_key <- spectral_typed |>
     tidytable::filter(
-      is.na(feature_id) | is.na(candidate_structure_inchikey_connectivity_layer)
+      is.na(feature_id) | is.na(candidate_structure_smiles_no_stereo)
     )
 
   # Full join keeps overlap rows merged and preserves non-overlap rows as candidates.
@@ -567,7 +564,6 @@ join_sirius_annotation_tables <- function(
     c(
       "feature_id",
       "candidate_adduct",
-      "candidate_structure_inchikey_connectivity_layer",
       "candidate_structure_smiles_no_stereo",
       "candidate_structure_molecular_formula"
     )
@@ -581,7 +577,6 @@ join_sirius_annotation_tables <- function(
   # Keep de novo candidates that do not exist in structure_identifications.
   denovo_match_keys <- c(
     "feature_id",
-    "candidate_structure_inchikey_connectivity_layer",
     "candidate_structure_smiles_no_stereo",
     "candidate_structure_molecular_formula",
     "candidate_adduct"
@@ -724,7 +719,6 @@ join_sirius_annotation_tables <- function(
 #' @param sirius_version [character] Character SIRIUS version ("5" or "6").
 #' @param str_stereo [character] Character path to structure stereochemistry file.
 #' @param str_met [character] Character path to structure metadata file.
-#' @param str_nam [character] Character path to structure names file.
 #' @param str_tax_cla [character] Character path to ClassyFire taxonomy file.
 #' @param str_tax_npc [character] Character path to NPClassifier taxonomy file.
 #' @param max_analog_abs_mz_error [numeric] Maximum allowed absolute m/z
@@ -766,9 +760,6 @@ prepare_annotations_sirius <-
     str_met = get_params(
       step = "prepare_annotations_sirius"
     )$files$libraries$sop$merged$structures$metadata,
-    str_nam = get_params(
-      step = "prepare_annotations_sirius"
-    )$files$libraries$sop$merged$structures$names,
     str_tax_cla = get_params(
       step = "prepare_annotations_sirius"
     )$files$libraries$sop$merged$structures$taxonomies$cla,
@@ -790,7 +781,6 @@ prepare_annotations_sirius <-
       output_for = output_for,
       str_stereo = str_stereo,
       str_met = str_met,
-      str_nam = str_nam,
       str_tax_cla = str_tax_cla,
       str_tax_npc = str_tax_npc,
       max_analog_abs_mz_error = max_analog_abs_mz_error
@@ -876,7 +866,6 @@ prepare_annotations_sirius <-
         select_annotations_columns(
           str_stereo = str_stereo,
           str_met = str_met,
-          str_nam = str_nam,
           str_tax_cla = str_tax_cla,
           str_tax_npc = str_tax_npc
         )

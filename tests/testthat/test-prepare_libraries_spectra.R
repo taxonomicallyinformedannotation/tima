@@ -168,10 +168,8 @@ test_that("create_empty_sop_library returns expected columns", {
   sop <- create_empty_sop_library()
   expect_true(all(
     c(
-      "structure_inchikey",
       "structure_smiles",
       "structure_smiles_no_stereo",
-      "structure_inchikey_connectivity_layer",
       "organism_name"
     ) %in%
       names(sop)

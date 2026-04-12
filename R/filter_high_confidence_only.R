@@ -91,7 +91,7 @@ filter_high_confidence_only <- function(
   ctx <- log_operation(
     "filter_high_confidence",
     n_input = nrow(df),
-    context = context %||% "default"
+    context = rlang::`%||%`(context, "default")
   )
 
   # Validation ----

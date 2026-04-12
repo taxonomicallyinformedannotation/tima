@@ -114,6 +114,50 @@ test_that("select_annotations_columns converts numeric outputs to character once
   expect_equal(result$candidate_structure_exact_mass, "123.45679")
 })
 
+test_that("select_annotations_columns drops duplicate raw structure metadata columns", {
+  paths <- make_fake_struct_files()
+
+  local_mocked_bindings(
+    complement_metadata_structures = function(df, ...) {
+      invisible(list(...))
+      df |>
+        tidytable::mutate(
+          structure_molecular_formula = candidate_structure_molecular_formula,
+          structure_exact_mass = candidate_structure_exact_mass,
+          structure_xlogp = candidate_structure_xlogp,
+          structure_tag = candidate_structure_tag,
+          structure_name = candidate_structure_name,
+          structure_inchikey_connectivity_layer = candidate_structure_inchikey_connectivity_layer,
+          structure_smiles_no_stereo = candidate_structure_smiles_no_stereo
+        )
+    },
+    .package = "tima"
+  )
+
+  df <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_molecular_formula = "C2H6O",
+    candidate_structure_exact_mass = 46.0419,
+    candidate_structure_xlogp = -0.3,
+    candidate_structure_tag = "trusted",
+    candidate_structure_name = "ethanol",
+    candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
+    candidate_structure_smiles_no_stereo = "CCO"
+  )
+
+  result <- select_annotations_columns(
+    df = df,
+    str_stereo = paths$stereo,
+    str_met = paths$met,
+    str_nam = paths$nam,
+    str_tax_cla = paths$cla,
+    str_tax_npc = paths$npc
+  )
+
+  expect_true("candidate_structure_molecular_formula" %in% names(result))
+  expect_false(any(grepl("^structure_", names(result))))
+})
+
 # test_that(
 #   skip("Not implemented")
 # )

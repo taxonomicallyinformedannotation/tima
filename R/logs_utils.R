@@ -449,7 +449,7 @@ accumulate_similarity_bins <- function(scores) {
       include.lowest = TRUE,
       right = TRUE
     )
-    out <- integer(length(levels(tmp)))
+    out <- integer(nlevels(tmp))
     names(out) <- levels(tmp)
     return(out)
   }

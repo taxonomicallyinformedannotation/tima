@@ -11,20 +11,17 @@ harmonize_spectra_polarity(
   col_ad,
   col_ce,
   col_ci,
-  col_em,
   col_in,
   col_io,
   col_ik,
   col_il,
-  col_mf,
   col_na,
   col_po,
   col_sm,
   col_sn,
   col_si,
   col_sp,
-  col_sy,
-  col_xl
+  col_sy
 )
 }
 \arguments{
@@ -40,8 +37,6 @@ harmonize_spectra_polarity(
 
 \item{col_ci}{\link{character} Compound ID field name}
 
-\item{col_em}{\link{character} Exact mass field name}
-
 \item{col_in}{\link{character} InChI field name}
 
 \item{col_io}{\link{character} InChI without stereochemistry field name}
@@ -49,8 +44,6 @@ harmonize_spectra_polarity(
 \item{col_ik}{\link{character} InChIKey field name}
 
 \item{col_il}{\link{character} InChIKey connectivity layer field name}
-
-\item{col_mf}{\link{character} Molecular formula field name}
 
 \item{col_na}{\link{character} Compound name field name}
 
@@ -65,8 +58,6 @@ harmonize_spectra_polarity(
 \item{col_sp}{\link{character} SPLASH field name}
 
 \item{col_sy}{\link{character} Synonyms field name}
-
-\item{col_xl}{\link{character} xLogP field name}
 }
 \value{
 Data frame with harmonized spectra.

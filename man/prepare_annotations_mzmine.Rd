@@ -13,8 +13,6 @@ prepare_annotations_mzmine(
     "prepare_annotations_mzmine")$files$libraries$sop$merged$structures$stereo,
   str_met = get_params(step =
     "prepare_annotations_mzmine")$files$libraries$sop$merged$structures$metadata,
-  str_nam = get_params(step =
-    "prepare_annotations_mzmine")$files$libraries$sop$merged$structures$names,
   str_tax_cla = get_params(step =
     "prepare_annotations_mzmine")$files$libraries$sop$merged$structures$taxonomies$cla,
   str_tax_npc = get_params(step =
@@ -29,8 +27,6 @@ prepare_annotations_mzmine(
 \item{str_stereo}{\link{character} Character string path to structures stereochemistry file}
 
 \item{str_met}{\link{character} Character string path to structures metadata file}
-
-\item{str_nam}{\link{character} Character string path to structures names file}
 
 \item{str_tax_cla}{\link{character} Character string path to ClassyFire taxonomy file}
 

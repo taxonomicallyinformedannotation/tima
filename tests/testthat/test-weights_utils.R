@@ -155,5 +155,5 @@ test_that("compute_weighted_sum real-world MS1 scenario", {
   expect_equal(result[3], 0.475)
 
   # Verify no NAs in result
-  expect_true(!any(is.na(result)))
+  expect_true(!anyNA(result))
 })

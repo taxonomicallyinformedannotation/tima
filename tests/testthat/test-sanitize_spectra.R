@@ -203,7 +203,7 @@ test_that("sanitize_spectra removes spectra with NaN values", {
 
   # Spectrum with NaN should be removed
   expect_equal(length(result), 1)
-  expect_true(all(!is.nan(Spectra::peaksData(object = result)[[1L]])))
+  expect_true(!any(is.nan(Spectra::peaksData(object = result)[[1L]])))
 })
 
 test_that("sanitize_spectra handles NULL peaks gracefully", {

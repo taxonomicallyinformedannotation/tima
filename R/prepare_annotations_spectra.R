@@ -13,7 +13,6 @@
 #' @param output [character] Character string path for prepared spectral annotations output
 #' @param str_stereo [character] Character string path to structures stereochemistry file
 #' @param str_met [character] Character string path to structures metadata file
-#' @param str_nam [character] Character string path to structures names file
 #' @param str_tax_cla [character] Character string path to ClassyFire taxonomy file
 #' @param str_tax_npc [character] Character string path to NPClassifier taxonomy file
 #'
@@ -39,7 +38,6 @@
 #'   input = input,
 #'   str_stereo = paste0(dir, "libraries/sop/merged/structures/stereo.tsv"),
 #'   str_met = paste0(dir, "libraries/sop/merged/structures/metadata.tsv"),
-#'   str_nam = paste0(dir, "libraries/sop/merged/structures/names.tsv"),
 #'   str_tax_cla = paste0(dir, "libraries/sop/merged/structures/taxonomies/classyfire.tsv"),
 #'   str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv")
 #' )
@@ -58,9 +56,6 @@ prepare_annotations_spectra <- function(
   str_met = get_params(
     step = "prepare_annotations_spectra"
   )$files$libraries$sop$merged$structures$metadata,
-  str_nam = get_params(
-    step = "prepare_annotations_spectra"
-  )$files$libraries$sop$merged$structures$names,
   str_tax_cla = get_params(
     step = "prepare_annotations_spectra"
   )$files$libraries$sop$merged$structures$taxonomies$cla,
@@ -105,7 +100,6 @@ prepare_annotations_spectra <- function(
   str_files <- list(
     str_stereo = str_stereo,
     str_met = str_met,
-    str_nam = str_nam,
     str_tax_cla = str_tax_cla,
     str_tax_npc = str_tax_npc
   )
@@ -143,11 +137,11 @@ prepare_annotations_spectra <- function(
     "candidate_spectrum_entropy",
     "candidate_structure_error_mz",
     "candidate_structure_name",
-    "candidate_structure_inchikey_connectivity_layer",
+    ## SMILES is the single source of truth for structure identity.
+    ## All structural identifiers (InChIKey, formula, mass, xlogp)
+    ## are strictly recomputed from SMILES via process_smiles()
+    ## downstream.
     "candidate_structure_smiles_no_stereo",
-    "candidate_structure_molecular_formula",
-    "candidate_structure_exact_mass",
-    "candidate_structure_xlogp",
     "candidate_score_similarity",
     "candidate_count_similarity_peaks_matched"
   )
@@ -167,9 +161,6 @@ prepare_annotations_spectra <- function(
     ) |>
     ## Add new columns
     tidytable::mutate(
-      candidate_structure_exact_mass = as.numeric(
-        candidate_structure_exact_mass
-      ),
       candidate_structure_tax_npc_01pat = NA_character_,
       candidate_structure_tax_npc_02sup = NA_character_,
       candidate_structure_tax_npc_03cla = NA_character_,
@@ -182,7 +173,6 @@ prepare_annotations_spectra <- function(
     select_annotations_columns(
       str_stereo = str_stereo,
       str_met = str_met,
-      str_nam = str_nam,
       str_tax_cla = str_tax_cla,
       str_tax_npc = str_tax_npc
     )

@@ -865,7 +865,7 @@ list(
       name = input_spectra,
       command = {
         input_spectra <-
-          if (paths$test$mode == FALSE) {
+          if (!paths$test$mode) {
             par_ann_spe_fil_spe_raw
           } else {
             test_spectra_mini
@@ -1044,20 +1044,17 @@ list(
                   col_ad = par_pre_lib_spe$names$mgf$adduct,
                   col_ce = par_pre_lib_spe$names$mgf$collision_energy,
                   col_ci = par_pre_lib_spe$names$mgf$compound_id,
-                  col_em = par_pre_lib_spe$names$mgf$exact_mass,
                   col_in = par_pre_lib_spe$names$mgf$inchi,
                   col_io = par_pre_lib_spe$names$mgf$inchi_no_stereo,
                   col_ik = par_pre_lib_spe$names$mgf$inchikey,
                   col_il = par_pre_lib_spe$names$mgf$inchikey_connectivity_layer,
-                  col_mf = par_pre_lib_spe$names$mgf$molecular_formula,
                   col_na = par_pre_lib_spe$names$mgf$name,
                   col_po = par_pre_lib_spe$names$mgf$polarity,
                   col_sm = par_pre_lib_spe$names$mgf$smiles,
                   col_sn = par_pre_lib_spe$names$mgf$smiles_no_stereo,
                   col_si = par_pre_lib_spe$names$mgf$spectrum_id,
                   col_sp = par_pre_lib_spe$names$mgf$splash,
-                  col_sy = par_pre_lib_spe$names$mgf$synonyms,
-                  col_xl = par_pre_lib_spe$names$mgf$xlogp
+                  col_sy = par_pre_lib_spe$names$mgf$synonyms
                 )
             },
             format = "file"
@@ -1466,7 +1463,7 @@ list(
           command = {
             lib_sop_lot_pre <-
               prepare_libraries_sop_lotus(
-                input = if (paths$test$mode == FALSE) {
+                input = if (!paths$test$mode) {
                   lib_sop_lot
                 } else {
                   paths$data$source$libraries$sop$lotus
@@ -1515,7 +1512,6 @@ list(
               output_org_tax_ott = par_pre_lib_sop_mer$files$libraries$sop$merged$organisms$taxonomies$ott,
               output_str_stereo = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$stereo,
               output_str_met = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$metadata,
-              output_str_nam = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$names,
               output_str_tax_cla = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$cla,
               output_str_tax_npc = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$npc
             )
@@ -1537,23 +1533,23 @@ list(
           format = "file"
         ),
         tar_target(
+          name = lib_mer_str_can,
+          command = {
+            lib_mer_str_can <- lib_sop_mer[[3L]]
+          },
+          format = "file"
+        ),
+        tar_target(
           name = lib_mer_str_stereo,
           command = {
-            lib_mer_str_stereo <- lib_sop_mer[[3L]]
+            lib_mer_str_stereo <- lib_sop_mer[[4L]]
           },
           format = "file"
         ),
         tar_target(
           name = lib_mer_str_met,
           command = {
-            lib_mer_str_met <- lib_sop_mer[[4L]]
-          },
-          format = "file"
-        ),
-        tar_target(
-          name = lib_mer_str_nam,
-          command = {
-            lib_mer_str_nam <- lib_sop_mer[[5L]]
+            lib_mer_str_met <- lib_sop_mer[[5L]]
           },
           format = "file"
         ),
@@ -1603,7 +1599,6 @@ list(
               name_target = par_ann_mas$names$target,
               str_stereo = lib_mer_str_stereo,
               str_met = lib_mer_str_met,
-              str_nam = lib_mer_str_nam,
               str_tax_cla = lib_mer_str_tax_cla,
               str_tax_npc = lib_mer_str_tax_npc,
               adducts_list = par_ann_mas$ms$adducts,
@@ -1645,7 +1640,6 @@ list(
               output = par_pre_ann_gnp$files$annotations$prepared$structural$gnps,
               str_stereo = lib_mer_str_stereo,
               str_met = lib_mer_str_met,
-              str_nam = lib_mer_str_nam,
               str_tax_cla = lib_mer_str_tax_cla,
               str_tax_npc = lib_mer_str_tax_npc
             )
@@ -1662,7 +1656,6 @@ list(
               output = par_pre_ann_mzm$files$annotations$prepared$structural$mzmine,
               str_stereo = lib_mer_str_stereo,
               str_met = lib_mer_str_met,
-              str_nam = lib_mer_str_nam,
               str_tax_cla = lib_mer_str_tax_cla,
               str_tax_npc = lib_mer_str_tax_npc
             )
@@ -1743,7 +1736,6 @@ list(
               output = par_pre_ann_spe$files$annotations$prepared$structural$spectral,
               str_stereo = lib_mer_str_stereo,
               str_met = lib_mer_str_met,
-              str_nam = lib_mer_str_nam,
               str_tax_cla = lib_mer_str_tax_cla,
               str_tax_npc = lib_mer_str_tax_npc
             )
@@ -1766,7 +1758,6 @@ list(
             max_analog_abs_mz_error = par_pre_ann_sir$tools$sirius$max_analog_abs_mz_error,
             str_stereo = lib_mer_str_stereo,
             str_met = lib_mer_str_met,
-            str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
             str_tax_npc = lib_mer_str_tax_npc
           )
@@ -2354,7 +2345,6 @@ list(
             name_target = benchmark_def_ann_mas$names$target,
             str_stereo = lib_mer_str_stereo,
             str_met = lib_mer_str_met,
-            str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
             str_tax_npc = lib_mer_str_tax_npc,
             adducts_list = par_ann_mas$ms$adducts,
@@ -2379,7 +2369,6 @@ list(
             name_target = benchmark_def_ann_mas$names$target,
             str_stereo = lib_mer_str_stereo,
             str_met = lib_mer_str_met,
-            str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
             str_tax_npc = lib_mer_str_tax_npc,
             adducts_list = par_ann_mas$ms$adducts,
@@ -2591,7 +2580,6 @@ list(
           output = "data/interim/benchmark/benchmark_ann_spe_pre_pos.tsv.gz",
           str_stereo = lib_mer_str_stereo,
           str_met = lib_mer_str_met,
-          str_nam = lib_mer_str_nam,
           str_tax_cla = lib_mer_str_tax_cla,
           str_tax_npc = lib_mer_str_tax_npc
         )
@@ -2605,7 +2593,6 @@ list(
           output = "data/interim/benchmark/benchmark_ann_spe_pre_neg.tsv.gz",
           str_stereo = lib_mer_str_stereo,
           str_met = lib_mer_str_met,
-          str_nam = lib_mer_str_nam,
           str_tax_cla = lib_mer_str_tax_cla,
           str_tax_npc = lib_mer_str_tax_npc
         )
@@ -2632,7 +2619,6 @@ list(
             max_analog_abs_mz_error = benchmark_def_pre_ann_sir$tools$sirius$max_analog_abs_mz_error,
             str_stereo = lib_mer_str_stereo,
             str_met = lib_mer_str_met,
-            str_nam = lib_mer_str_nam,
             str_tax_cla = lib_mer_str_tax_cla,
             str_tax_npc = lib_mer_str_tax_npc
           )

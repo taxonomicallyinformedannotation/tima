@@ -15,10 +15,13 @@ skip caching}
 }
 \value{
 List of normalized data frames:
-\item{table_keys}{Structure-organism pairs with reference DOIs}
-\item{table_structures_stereo}{Structure stereochemistry information}
-\item{table_organisms}{Organism taxonomy information}
-\item{table_structural}{Processed and standardized structure data}
+\item{key}{Structure-organism pairs with reference DOIs}
+\item{org_tax_ott}{Organism taxonomy information}
+\item{str_can}{Canonicalization mapping (smiles_initial -> smiles)}
+\item{str_stereo}{Structure stereochemistry with name, tag, xlogp}
+\item{str_met}{Stereo-invariant physical properties (formula, mass)}
+\item{str_tax_cla}{ClassyFire taxonomy keyed by inchikey}
+\item{str_tax_npc}{NPClassifier taxonomy keyed by smiles (with stereo)}
 }
 \description{
 Splits a concatenated structure-organism pairs (SOP) table into
@@ -35,8 +38,8 @@ result <- split_tables_sop(
 )
 
 # Access individual tables
-structures <- result$table_structural
-organisms <- result$table_organisms
+structures <- result$str_stereo
+organisms <- result$org_tax_ott
 }
 }
 \keyword{internal}

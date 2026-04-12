@@ -346,10 +346,8 @@ test_that("prepare_libraries_rt filters out invalid entries", {
   expect_true(nrow(rt_table) < 5)
 
   # No NA values in rt or inchikey columns
-  expect_true(all(!is.na(rt_table$rt)))
-  expect_true(all(
-    !is.na(rt_table$candidate_structure_inchikey_connectivity_layer)
-  ))
+  expect_true(!anyNA(rt_table$rt))
+  expect_true(!anyNA(rt_table$candidate_structure_inchikey_connectivity_layer))
 })
 
 # Functional Tests - Combined Sources ----

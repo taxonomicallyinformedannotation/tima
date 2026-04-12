@@ -614,9 +614,6 @@ names:
     #' Name of "compound ID" in MGF. STRING
     compound_id: FILENAME
 
-    #' Name of "exact mass" in MGF. STRING
-    exact_mass: EXACTMASS
-
     #' Name of "InChI" in MGF. STRING
     inchi: INCHI
 
@@ -628,9 +625,6 @@ names:
 
     #' Name of "InChIKey connectivity layer" in MGF. STRING
     inchikey_connectivity_layer: null
-
-    #' Name of "molecular formula" in MGF. STRING
-    molecular_formula: null
 
     #' Name of "name" in MGF. STRING
     name: NAME
@@ -655,9 +649,6 @@ names:
 
     #' Name of "synonyms" in MGF. STRING
     synonyms: null
-
-    #' Name of "xlogP" in MGF. STRING
-    xlogp: null
 
   #' Name of "precursor m/z" variable in the input. STRING
   precursor: row m/z

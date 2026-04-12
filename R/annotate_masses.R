@@ -24,7 +24,6 @@
 #' @param library Library containing the keys
 #' @param str_stereo File containing structures stereo
 #' @param str_met File containing structures metadata
-#' @param str_nam File containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param adducts_list List of adducts to be used
@@ -57,7 +56,6 @@
 #'   library = paste0(dir_sop_mer, "keys.tsv"),
 #'   str_stereo = paste0(dir_str, "stereo.tsv"),
 #'   str_met = paste0(dir_str, "metadata.tsv"),
-#'   str_nam = paste0(dir_str, "names.tsv"),
 #'   str_tax_cla = paste0(dir_tax, "classyfire.tsv"),
 #'   str_tax_npc = paste0(dir_tax, "npc.tsv")
 #' )
@@ -83,9 +81,6 @@ annotate_masses <-
     str_met = get_params(
       step = "annotate_masses"
     )$files$libraries$sop$merged$structures$metadata,
-    str_nam = get_params(
-      step = "annotate_masses"
-    )$files$libraries$sop$merged$structures$names,
     str_tax_cla = get_params(
       step = "annotate_masses"
     )$files$libraries$sop$merged$structures$taxonomies$cla,
@@ -143,7 +138,6 @@ annotate_masses <-
         library = library,
         str_stereo = str_stereo,
         str_met = str_met,
-        str_nam = str_nam,
         str_tax_cla = str_tax_cla,
         str_tax_npc = str_tax_npc
       )
@@ -232,11 +226,10 @@ annotate_masses <-
     )
 
     # Load all supplementary files
-    supp_files <- list(str_stereo, str_met, str_nam, str_tax_cla, str_tax_npc)
+    supp_files <- list(str_stereo, str_met, str_tax_cla, str_tax_npc)
     supp_names <- c(
       "stereochemistry",
       "metadata",
-      "names",
       "ClassyFire taxonomy",
       "NPClassifier taxonomy"
     )
@@ -700,11 +693,10 @@ annotate_masses <-
     required_cols <- c(
       "structure_name",
       "structure_inchikey_connectivity_layer",
+      "structure_inchikey_no_stereo",
       "structure_smiles_no_stereo",
       "structure_molecular_formula",
-      "structure_exact_mass",
-      "structure_xlogp",
-      "structure_tag"
+      "structure_exact_mass"
     )
     cols_to_select <- intersect(required_cols, available_cols)
 
@@ -716,9 +708,7 @@ annotate_masses <-
           x = c(
             "structure_inchikey_connectivity_layer",
             "structure_molecular_formula",
-            "structure_exact_mass",
-            "structure_xlogp",
-            "structure_tag"
+            "structure_exact_mass"
           )
         ),
         .keep_all = TRUE
@@ -863,11 +853,8 @@ annotate_masses <-
             "error_mz",
             "structure_name",
             "structure_inchikey_connectivity_layer",
+            "structure_inchikey_no_stereo",
             "structure_smiles_no_stereo",
-            "structure_molecular_formula",
-            "structure_exact_mass",
-            "structure_xlogp",
-            "structure_tag",
             "library"
           )
         )
@@ -878,17 +865,12 @@ annotate_masses <-
         candidate_structure_inchikey_connectivity_layer = tidyselect::any_of(
           x = "structure_inchikey_connectivity_layer"
         ),
+        candidate_structure_inchikey_no_stereo = tidyselect::any_of(
+          x = "structure_inchikey_no_stereo"
+        ),
         candidate_structure_smiles_no_stereo = tidyselect::any_of(
           x = "structure_smiles_no_stereo"
         ),
-        candidate_structure_molecular_formula = tidyselect::any_of(
-          x = "structure_molecular_formula"
-        ),
-        candidate_structure_exact_mass = tidyselect::any_of(
-          x = "structure_exact_mass"
-        ),
-        candidate_structure_xlogp = tidyselect::any_of(x = "structure_xlogp"),
-        candidate_structure_tag = tidyselect::any_of(x = "structure_tag"),
         candidate_library = tidyselect::any_of(x = "library")
       ) |>
       tidytable::distinct()
@@ -1013,7 +995,6 @@ annotate_masses <-
         select_annotations_columns(
           str_stereo = str_stereo,
           str_met = str_met,
-          str_nam = str_nam,
           str_tax_cla = str_tax_cla,
           str_tax_npc = str_tax_npc
         ),

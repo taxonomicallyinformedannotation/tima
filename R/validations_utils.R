@@ -377,7 +377,7 @@ validate_numeric_range <- function(
         param_name,
         value,
         recommended_min,
-        if (!is.null(context)) context else ""
+        rlang::`%||%`(context, "")
       ),
       call. = FALSE,
       immediate. = TRUE
@@ -391,7 +391,7 @@ validate_numeric_range <- function(
         param_name,
         value,
         recommended_max,
-        if (!is.null(context)) context else ""
+        rlang::`%||%`(context, "")
       ),
       call. = FALSE,
       immediate. = TRUE
@@ -866,7 +866,7 @@ validate_weights <- function(weights, param_name = "weights") {
   }
 
   # Check for NA values
-  if (any(is.na(weights))) {
+  if (anyNA(weights)) {
     tima_abort(
       problem = paste0(param_name, " cannot contain NA values"),
       class = c("tima_validation_error", "tima_error")

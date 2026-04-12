@@ -8,11 +8,11 @@ library(testthat)
 sp_acetic <- cbind(mz = c(45, 60), intensity = c(0.3, 0.7)) # simple 2-peak
 sp_ethane <- cbind(
   mz = c(26, 27, 28, 29, 30),
-  intensity = c(.1, .2, .9, .3, .1)
+  intensity = c(0.1, 0.2, 0.9, 0.3, 0.1)
 )
 sp_propane <- cbind(
   mz = c(28, 29, 41, 43, 44),
-  intensity = c(.1, .1, .4, .8, .6)
+  intensity = c(0.1, 0.1, 0.4, 0.8, 0.6)
 )
 
 call_ces <- function(
@@ -165,7 +165,7 @@ test_that("mismatched lib_ids / lib_spectra length errors", {
       query_precursors = 61,
       query_spectra = list(sp_acetic),
       method = "cosine",
-      dalton = .01,
+      dalton = 0.01,
       ppm = 10,
       threshold = 0,
       approx = TRUE

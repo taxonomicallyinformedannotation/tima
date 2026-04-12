@@ -673,7 +673,7 @@ find_package_root <- function() {
   current_dir <- getwd()
 
   # Walk up the directory tree
-  while (TRUE) {
+  repeat {
     if (file.exists(file.path(current_dir, "DESCRIPTION"))) {
       return(current_dir)
     }

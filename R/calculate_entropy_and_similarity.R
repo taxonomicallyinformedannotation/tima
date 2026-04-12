@@ -201,7 +201,7 @@ calculate_entropy_and_similarity <- function(
       current_id <- query_ids[spectrum_idx]
 
       # Filter library spectra by precursor mass if not approximating
-      if (approx == FALSE) {
+      if (!approx) {
         val_ind <- (lib_precursors >=
           min(
             current_precursor - dalton,

@@ -99,6 +99,11 @@ process_smiles <- function(
             str = structure_inchikey,
             from = 1L,
             to = 14L
+          ),
+          structure_inchikey_no_stereo = paste0(
+            stringi::stri_sub(str = structure_inchikey, from = 1L, to = 14L),
+            "-",
+            stringi::stri_sub(str = structure_inchikey, from = -1L, to = -1L)
           )
         )
     )
@@ -162,6 +167,11 @@ process_smiles <- function(
         str = structure_inchikey,
         from = 1L,
         to = 14L
+      ),
+      structure_inchikey_no_stereo = paste0(
+        stringi::stri_sub(str = structure_inchikey, from = 1L, to = 14L),
+        "-",
+        stringi::stri_sub(str = structure_inchikey, from = -1L, to = -1L)
       )
     )
 

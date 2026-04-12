@@ -17,8 +17,6 @@ annotate_masses(
     "annotate_masses")$files$libraries$sop$merged$structures$stereo,
   str_met = get_params(step =
     "annotate_masses")$files$libraries$sop$merged$structures$metadata,
-  str_nam = get_params(step =
-    "annotate_masses")$files$libraries$sop$merged$structures$names,
   str_tax_cla = get_params(step =
     "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$cla,
   str_tax_npc = get_params(step =
@@ -47,8 +45,6 @@ annotate_masses(
 \item{str_stereo}{File containing structures stereo}
 
 \item{str_met}{File containing structures metadata}
-
-\item{str_nam}{File containing structures names}
 
 \item{str_tax_cla}{File containing Classyfire taxonomy}
 
@@ -93,7 +89,6 @@ annotate_masses(
   library = paste0(dir_sop_mer, "keys.tsv"),
   str_stereo = paste0(dir_str, "stereo.tsv"),
   str_met = paste0(dir_str, "metadata.tsv"),
-  str_nam = paste0(dir_str, "names.tsv"),
   str_tax_cla = paste0(dir_tax, "classyfire.tsv"),
   str_tax_npc = paste0(dir_tax, "npc.tsv")
 )

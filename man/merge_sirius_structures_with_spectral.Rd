@@ -20,10 +20,10 @@ data.frame with merged and unmatched rows combined.
 }
 \description{
 Joins spectral match results into structure candidate rows by
-\code{feature_id} + \code{candidate_structure_inchikey_connectivity_layer}.
+\code{feature_id} + \code{candidate_structure_smiles_no_stereo}.
 A candidate that appears in both gets all SIRIUS structure scores AND
 the spectral similarity score in a single row.  Spectral hits whose
-InChIKey does not appear in the structure table are kept as standalone
+SMILES does not appear in the structure table are kept as standalone
 candidate rows.
 }
 \keyword{internal}

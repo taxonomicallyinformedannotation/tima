@@ -11,7 +11,6 @@ validate_sirius_inputs(
   output_for,
   str_stereo,
   str_met,
-  str_nam,
   str_tax_cla,
   str_tax_npc,
   max_analog_abs_mz_error
@@ -29,8 +28,6 @@ validate_sirius_inputs(
 \item{str_stereo}{\link{character} Character path to stereo file.}
 
 \item{str_met}{\link{character} Character path to metadata file.}
-
-\item{str_nam}{\link{character} Character path to names file.}
 
 \item{str_tax_cla}{\link{character} Character path to ClassyFire taxonomy.}
 

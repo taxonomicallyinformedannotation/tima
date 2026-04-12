@@ -12,12 +12,10 @@
 #' @param col_ad Adduct field name
 #' @param col_ce Collision energy field name
 #' @param col_ci Compound ID field name
-#' @param col_em Exact mass field name
 #' @param col_in InChI field name
 #' @param col_io InChI without stereochemistry field name
 #' @param col_ik InChIKey field name
 #' @param col_il InChIKey connectivity layer field name
-#' @param col_mf Molecular formula field name
 #' @param col_na Compound name field name
 #' @param col_po Polarity field name
 #' @param col_sm SMILES field name
@@ -25,7 +23,6 @@
 #' @param col_si Spectrum ID field name
 #' @param col_sp SPLASH field name
 #' @param col_sy Synonyms field name
-#' @param col_xl xLogP field name
 #'
 #' @return Data frame with harmonized column names and standardized fields
 #'
@@ -50,20 +47,17 @@ harmonize_spectra <- function(
   col_ad,
   col_ce,
   col_ci,
-  col_em,
   col_in,
   col_io,
   col_ik,
   col_il,
-  col_mf,
   col_na,
   col_po,
   col_sm,
   col_sn,
   col_si,
   col_sp,
-  col_sy,
-  col_xl
+  col_sy
 ) {
   ctx <- log_operation(
     "harmonize_spectra",
@@ -92,20 +86,17 @@ harmonize_spectra <- function(
       col_ad = col_ad,
       col_ce = col_ce,
       col_ci = col_ci,
-      col_em = col_em,
       col_in = col_in,
       col_io = col_io,
       col_ik = col_ik,
       col_il = col_il,
-      col_mf = col_mf,
       col_na = col_na,
       col_po = col_po,
       col_sm = col_sm,
       col_sn = col_sn,
       col_si = col_si,
       col_sp = col_sp,
-      col_sy = col_sy,
-      col_xl = col_xl
+      col_sy = col_sy
     )
   )
 
@@ -118,8 +109,6 @@ harmonize_spectra <- function(
     "adduct",
     "collision_energy",
     "compound_id",
-    "exactmass",
-    "formula",
     "inchi",
     "inchi_no_stereo",
     "inchikey",
@@ -129,8 +118,7 @@ harmonize_spectra <- function(
     "smiles_no_stereo",
     "spectrum_id",
     "splash",
-    "synonyms",
-    "xlogp"
+    "synonyms"
   )
 
   # Map provided column names to standard names
@@ -138,8 +126,6 @@ harmonize_spectra <- function(
     "adduct" = col_ad,
     "collision_energy" = col_ce,
     "compound_id" = col_ci,
-    "exactmass" = col_em,
-    "formula" = col_mf,
     "inchi" = col_in,
     "inchi_no_stereo" = col_io,
     "inchikey" = col_ik,
@@ -149,8 +135,7 @@ harmonize_spectra <- function(
     "smiles_no_stereo" = col_sn,
     "spectrum_id" = col_si,
     "splash" = col_sp,
-    "synonyms" = col_sy,
-    "xlogp" = col_xl
+    "synonyms" = col_sy
   )
 
   # Remove NA mappings (columns not provided)
@@ -219,8 +204,6 @@ harmonize_spectra <- function(
         "adduct",
         "collision_energy",
         "compound_id",
-        "exactmass",
-        "formula",
         "inchi",
         "inchi_no_stereo",
         "inchikey",
@@ -233,7 +216,6 @@ harmonize_spectra <- function(
         "spectrum_id",
         "splash",
         "synonyms",
-        "xlogp",
         "rtime",
         "mz",
         "intensity"
@@ -241,7 +223,6 @@ harmonize_spectra <- function(
     )) |>
     tidytable::mutate(
       library = metad,
-      exactmass = as.numeric(exactmass),
       spectrum_id = tidytable::if_else(
         condition = is.na(spectrum_id),
         true = tidytable::row_number() |>

@@ -138,8 +138,8 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
       )
     ) |>
     tidytable::mutate(
-      candidate_structure_exact_mass = as.numeric(ionMass) -
-        mass_error_ppm * as.numeric(ionMass) * 1E-6,
+      ## exact_mass is recomputed from SMILES via process_smiles() downstream.
+      ## Keep only mass error for scoring.
       candidate_structure_error_mz = as.numeric(ionMass) *
         mass_error_ppm *
         1E-6
@@ -150,7 +150,6 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
           "feature_id",
           "candidate_adduct" = "adduct",
           "candidate_structure_molecular_formula" = "molecularFormula",
-          "candidate_structure_exact_mass",
           "candidate_structure_error_mz",
           "candidate_score_sirius_zodiac" = "ZodiacScore",
           "candidate_score_sirius_sirius" = "SiriusScore",
@@ -191,10 +190,16 @@ select_sirius_columns_structures <- function(df, sirius_version) {
           "feature_id",
           "candidate_adduct" = "adduct",
           "candidate_structure_name" = "name",
+          ## SMILES is the single source of truth for structure
+          ## identity.  All structural identifiers (InChIKey, formula,
+          ## mass, xlogp) are strictly recomputed from SMILES via
+          ## process_smiles() downstream.
           "candidate_structure_smiles_no_stereo" = "smiles",
-          "candidate_structure_inchikey_connectivity_layer" = "InChIkey2D",
+          ## molecularFormula is kept as a SIRIUS join key (to connect
+          ## structure candidates with formula-level scores and CANOPUS).
+          ## It will be overwritten by the RDKit-derived formula in
+          ## recompute_structure_fields_from_smiles() downstream.
           "candidate_structure_molecular_formula" = "molecularFormula",
-          "candidate_structure_xlogp" = "xlogp",
           # ISSUE see #147
           "candidate_score_sirius_confidence" = switch(
             as.character(sirius_version),
@@ -314,17 +319,13 @@ select_sirius_columns_spectral <- function(df, sirius_version) {
     candidate_structure_error_mz = raw_mz_dev,
     candidate_spectrum_id = .get_col_or_na(df, "referenceSplash"),
     candidate_structure_name = .get_col_or_na(df, "referenceName"),
+    ## SMILES is the single source of truth for structure identity.
+    ## All structural identifiers (InChIKey, formula, mass, xlogp)
+    ## are strictly recomputed from SMILES via process_smiles()
+    ## downstream.
     candidate_structure_smiles_no_stereo = .get_col_or_na(
       df,
       "referenceSmiles"
-    ),
-    candidate_structure_inchikey_connectivity_layer = .get_col_or_na(
-      df,
-      "InChIkey2D"
-    ),
-    candidate_structure_molecular_formula = .get_col_or_na(
-      df,
-      "molecularFormula"
     ),
     candidate_score_similarity = as.numeric(.get_col_or_na(
       df,

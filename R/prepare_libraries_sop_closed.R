@@ -71,11 +71,7 @@ prepare_libraries_sop_closed <- function(
 
       closed_prepared <- closed |>
         tidytable::mutate(
-          structure_inchikey_2D = stringi::stri_sub(
-            str = structure_inchikey,
-            from = 1,
-            to = 14
-          )
+          structure_inchikey_2D = NA_character_
         ) |>
         tidytable::rename(structure_name = structure_nameTraditional) |>
         tidytable::mutate(reference_doi = NA) |>

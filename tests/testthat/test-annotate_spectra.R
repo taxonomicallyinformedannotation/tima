@@ -337,7 +337,7 @@ test_that("high cutoff removes all query peaks leading to empty template", {
 
 # Duplicate candidate collapse by connectivity layer ----
 
-test_that("duplicate candidates collapsed by connectivity layer are unique", {
+test_that("duplicate candidates collapsed by SMILES are unique", {
   withr::local_dir(new = temp_test_dir("ann_spe_dedupe"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
@@ -345,11 +345,11 @@ test_that("duplicate candidates collapsed by connectivity layer are unique", {
     url = paths$urls$examples$spectra_mini,
     export = paths$data$source$spectra
   )
-  # Build two libraries with same connectivity layer but different spectrum IDs
+  # Build two libraries with same SMILES but different spectrum IDs
   lib1 <- file.path("data", "interim", "libraries", "spectra", "lib1_pos.mgf")
   lib2 <- file.path("data", "interim", "libraries", "spectra", "lib2_pos.mgf")
   write_minimal_mgf(lib1, precursors = c(300))
-  # For lib2, reuse same precursor; connectivity is fixed by write_minimal_mgf
+  # For lib2, reuse same precursor; SMILES is fixed by write_minimal_mgf
   write_minimal_mgf(lib2, precursors = c(300))
   out <- annotate_spectra(
     libraries = c(lib1, lib2),
@@ -360,14 +360,14 @@ test_that("duplicate candidates collapsed by connectivity layer are unique", {
   uniq <- tidytable::distinct(
     df,
     feature_id,
-    candidate_structure_inchikey_connectivity_layer
+    candidate_structure_smiles_no_stereo
   )
   expect_equal(nrow(uniq), nrow(df))
 })
 
 # NA metadata fallback handling ----
 
-test_that("NA fallback for smiles and inchikey connectivity is applied", {
+test_that("NA fallback for smiles is applied", {
   withr::local_dir(new = temp_test_dir("ann_spe_na_fallback"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
@@ -375,7 +375,7 @@ test_that("NA fallback for smiles and inchikey connectivity is applied", {
     url = paths$urls$examples$spectra_mini,
     export = paths$data$source$spectra
   )
-  # Create a library entry missing SMILES_2D and INCHIKEY_2D to trigger fallbacks
+  # Create a library entry missing SMILES_2D to trigger fallback to SMILES
   lib_path <- file.path(
     "data",
     "interim",
@@ -391,7 +391,6 @@ test_that("NA fallback for smiles and inchikey connectivity is applied", {
       "PEPMASS=320",
       "CHARGE=1+",
       "NAME=Example",
-      "INCHIKEY=QQQQQQQQQQQQQQ-RRRRRRRRRR-S",
       "SMILES=CCO",
       "MSLEVEL=2",
       "160 100",
@@ -409,11 +408,10 @@ test_that("NA fallback for smiles and inchikey connectivity is applied", {
   )
   df <- tidytable::fread(out)
   expect_true("candidate_structure_smiles_no_stereo" %in% names(df))
-  expect_true("candidate_structure_inchikey_connectivity_layer" %in% names(df))
-  # Fallback should derive connectivity layer from INCHIKEY if missing 2D field
-  expect_true(all(
-    grepl("-", df$candidate_structure_inchikey_connectivity_layer) == FALSE
-  ))
+  # SMILES fallback should use target_smiles when target_smiles_no_stereo is NA
+  if (nrow(df) > 0L) {
+    expect_true(!anyNA(df$candidate_structure_smiles_no_stereo))
+  }
 })
 
 # Internal helper function tests ----
@@ -949,7 +947,7 @@ test_that("filter_library_paths_by_polarity keeps single path and filters vector
   )
 })
 
-test_that("finalize_results backfills connectivity layer from inchikey", {
+test_that("finalize_results uses SMILES for deduplication", {
   df_sim <- tidytable::tidytable(
     feature_id = "F1",
     target_id = 1L,
@@ -964,24 +962,18 @@ test_that("finalize_results backfills connectivity layer from inchikey", {
     target_adduct = "[M+H]+",
     target_library = "lib",
     target_spectrum_id = "sp1",
-    target_inchikey = "ABCDEFGHIJKLMN-TEST-1",
-    target_inchikey_connectivity_layer = NA_character_,
     target_smiles = "CCO",
     target_smiles_no_stereo = NA_character_,
-    target_formula = "C2H6O",
-    target_exactmass = 46.0,
     target_name = "ethanol",
-    target_xlogp = -0.3,
     target_precursorMz = 101
   )
 
   out <- finalize_results(df_sim = df_sim, meta = meta, threshold = 0)
 
-  expect_equal(
-    out$candidate_structure_inchikey_connectivity_layer,
-    "ABCDEFGHIJKLMN"
-  )
   expect_equal(out$candidate_structure_smiles_no_stereo, "CCO")
+  expect_false(
+    "candidate_structure_inchikey_connectivity_layer" %in% names(out)
+  )
 })
 
 test_that("finalize_results returns empty tidytable for empty similarity input", {
@@ -1077,4 +1069,144 @@ test_that("extract_vector uses fill when field is missing", {
   )
 
   expect_equal(out, rep("missing", 3L))
+})
+
+test_that("extract_vector resolves alias names with exact and case-insensitive matching", {
+  skip_if_not_installed("Spectra")
+
+  obj <- Spectra::Spectra(data.frame(
+    precursorMz = c(123.4, 234.5),
+    smiles_no_stereo = c("CCO", "CCC"),
+    FORMULA = c("C2H6O", "C3H8"),
+    mz = I(list(c(50, 100), c(60, 120))),
+    intensity = I(list(c(1, 2), c(3, 4)))
+  ))
+
+  out_smiles <- extract_vector(
+    obj = obj,
+    field = c("smiles_2D", "smiles_no_stereo"),
+    len = 2L,
+    fill = NA_character_
+  )
+  out_formula <- extract_vector(
+    obj = obj,
+    field = c("formula", "FORMULA"),
+    len = 2L,
+    fill = NA_character_
+  )
+
+  expect_equal(out_smiles, c("CCO", "CCC"))
+  expect_equal(out_formula, c("C2H6O", "C3H8"))
+})
+
+test_that("build_library_metadata extracts SMILES-based metadata aliases", {
+  skip_if_not_installed("Spectra")
+
+  lib_sp <- Spectra::Spectra(data.frame(
+    precursorMz = c(100, 200),
+    adduct = c("[M+H]+", "[M+Na]+"),
+    structure_smiles = c("CCO", "CCC"),
+    structure_smiles_no_stereo = c("CCO", "CCC"),
+    structure_name = c("ethanol", "propane"),
+    structure_tag = c("well_formed", "trusted"),
+    library = c("GNPS", "ISDB - Wikidata"),
+    mz = I(list(c(50, 100), c(80, 120))),
+    intensity = I(list(c(10, 20), c(30, 40)))
+  ))
+
+  meta <- build_library_metadata(lib_sp = lib_sp, lib_precursors = c(100, 200))
+
+  expect_equal(meta$target_name, c("ethanol", "propane"))
+  expect_equal(meta$target_smiles_no_stereo, c("CCO", "CCC"))
+  expect_equal(meta$target_tag, c("well_formed", "trusted"))
+  ## InChIKey, formula, mass, xlogp are no longer extracted;
+  ## they are recomputed from SMILES downstream via process_smiles().
+  expect_false("target_inchikey" %in% names(meta))
+  expect_false("target_formula" %in% names(meta))
+})
+
+test_that("finalize_results outputs SMILES-based structure identification only", {
+  df_sim <- tidytable::tidytable(
+    feature_id = "F1",
+    target_id = 1L,
+    precursorMz = 100,
+    candidate_spectrum_entropy = "0.8",
+    candidate_score_similarity = "0.7",
+    candidate_count_similarity_peaks_matched = "3"
+  )
+
+  meta <- tidytable::tidytable(
+    target_id = 1L,
+    target_adduct = "[M+H]+",
+    target_library = "lib",
+    target_spectrum_id = "sp1",
+    target_smiles = "CCO",
+    target_smiles_no_stereo = "CCO",
+    target_name = "ethanol",
+    target_precursorMz = 101
+  )
+
+  out <- finalize_results(df_sim = df_sim, meta = meta, threshold = 0)
+
+  expect_equal(out$candidate_structure_smiles_no_stereo, "CCO")
+  ## InChIKey columns are no longer derived in finalize_results;
+
+  ## they are recomputed from SMILES downstream via process_smiles().
+  expect_false("candidate_structure_inchikey_no_stereo" %in% names(out))
+  expect_false(
+    "candidate_structure_inchikey_connectivity_layer" %in% names(out)
+  )
+})
+
+
+test_that("extract_vector resolves alias names with exact and case-insensitive matching", {
+  skip_if_not_installed("Spectra")
+
+  obj <- Spectra::Spectra(data.frame(
+    precursorMz = c(123.4, 234.5),
+    smiles_no_stereo = c("CCO", "CCC"),
+    FORMULA = c("C2H6O", "C3H8"),
+    mz = I(list(c(50, 100), c(60, 120))),
+    intensity = I(list(c(1, 2), c(3, 4)))
+  ))
+
+  out_smiles <- extract_vector(
+    obj = obj,
+    field = c("smiles_2D", "smiles_no_stereo"),
+    len = 2L,
+    fill = NA_character_
+  )
+  out_formula <- extract_vector(
+    obj = obj,
+    field = c("formula", "FORMULA"),
+    len = 2L,
+    fill = NA_character_
+  )
+
+  expect_equal(out_smiles, c("CCO", "CCC"))
+  expect_equal(out_formula, c("C2H6O", "C3H8"))
+})
+
+test_that("build_library_metadata extracts SMILES-based metadata aliases (2)", {
+  skip_if_not_installed("Spectra")
+
+  lib_sp <- Spectra::Spectra(data.frame(
+    precursorMz = c(100, 200),
+    adduct = c("[M+H]+", "[M+Na]+"),
+    structure_smiles = c("CCO", "CCC"),
+    structure_smiles_no_stereo = c("CCO", "CCC"),
+    structure_name = c("ethanol", "propane"),
+    structure_tag = c("well_formed", "trusted"),
+    library = c("GNPS", "ISDB - Wikidata"),
+    mz = I(list(c(50, 100), c(80, 120))),
+    intensity = I(list(c(10, 20), c(30, 40)))
+  ))
+
+  meta <- build_library_metadata(lib_sp = lib_sp, lib_precursors = c(100, 200))
+
+  expect_equal(meta$target_name, c("ethanol", "propane"))
+  expect_equal(meta$target_smiles_no_stereo, c("CCO", "CCC"))
+  expect_equal(meta$target_tag, c("well_formed", "trusted"))
+  expect_false("target_inchikey" %in% names(meta))
+  expect_false("target_formula" %in% names(meta))
 })

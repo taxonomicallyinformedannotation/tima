@@ -84,11 +84,7 @@ prepare_libraries_sop_ecmdb <- function(
       # log_trace("Formatting ECMDB")
       ecmdb_prepared <- ecmdb |>
         tidytable::mutate(
-          structure_inchikey_2D = stringi::stri_sub(
-            str = moldb_inchikey,
-            from = 1,
-            to = 14
-          ),
+          structure_inchikey_2D = NA_character_,
           structure_smiles_2D = NA_character_
         ) |>
         tidytable::rename(
