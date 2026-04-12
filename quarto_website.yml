@@ -69,8 +69,6 @@ website:
             contents:
               - text: create_components
                 file: man/create_components.qmd
-              - text: create_dir
-                file: man/create_dir.qmd
               - text: create_edges
                 file: man/create_edges.qmd
               - text: create_edges_spectra
