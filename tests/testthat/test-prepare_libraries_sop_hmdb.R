@@ -8,8 +8,12 @@ library(testthat)
 # ---- helpers -----------------------------------------------------------------
 
 #' Write a minimal single-compound HMDB-style SDF as a zip file.
-write_hmdb_zip <- function(dir, compounds = 1L, include_inchikey = TRUE,
-                          include_smiles = TRUE) {
+write_hmdb_zip <- function(
+  dir,
+  compounds = 1L,
+  include_inchikey = TRUE,
+  include_smiles = TRUE
+) {
   blocks <- lapply(seq_len(compounds), function(i) {
     ink <- if (include_inchikey) {
       paste0("AAAAAAA", sprintf("%07d", i), "-UHFFFAOYSA-N")
@@ -128,8 +132,12 @@ test_that("prepare_libraries_sop_hmdb keeps compounds with SMILES but without In
   td <- tempfile()
   dir.create(td)
   on.exit(unlink(td, recursive = TRUE))
-  zip <- write_hmdb_zip(td, compounds = 3L, include_inchikey = FALSE,
-                        include_smiles = TRUE)
+  zip <- write_hmdb_zip(
+    td,
+    compounds = 3L,
+    include_inchikey = FALSE,
+    include_smiles = TRUE
+  )
   out <- file.path(td, "hmdb.tsv")
   prepare_libraries_sop_hmdb(input = zip, output = out)
   df <- tidytable::fread(out)
