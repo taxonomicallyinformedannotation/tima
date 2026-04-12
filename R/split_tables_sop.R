@@ -75,6 +75,7 @@ split_tables_sop <- function(table, cache) {
   table_structural_standardized <- table_structural_initial |>
     process_smiles(cache = cache)
 
+  log_debug("Joining structural data with computed properties")
   table_structural <- table_structural_initial |>
     tidytable::select(
       structure_smiles_initial,
@@ -83,10 +84,19 @@ split_tables_sop <- function(table, cache) {
       tidyselect::contains(match = "_tax")
     ) |>
     tidytable::distinct() |>
-    tidytable::inner_join(y = table_structural_standardized) |>
+    tidytable::inner_join(
+      y = table_structural_standardized,
+      by = "structure_smiles_initial"
+    ) |>
     tidytable::distinct()
   rm(table_structural_initial, table_structural_standardized)
+  log_debug(
+    "table_structural: %s rows x %d cols",
+    format_count(nrow(table_structural)),
+    ncol(table_structural)
+  )
 
+  log_debug("Building structure-organism-reference table")
   table <- table |>
     tidytable::select(
       structure_smiles_initial,
@@ -94,7 +104,10 @@ split_tables_sop <- function(table, cache) {
       tidyselect::contains(match = "reference")
     ) |>
     tidytable::distinct() |>
-    tidytable::inner_join(y = table_structural) |>
+    tidytable::inner_join(
+      y = table_structural,
+      by = "structure_smiles_initial"
+    ) |>
     tidytable::distinct()
 
   table_keys <- table |>
@@ -176,10 +189,17 @@ split_tables_sop <- function(table, cache) {
   )
 
   # Collapse name, tag, xlogp per inchikey
-  # Ensure structure_xlogp column exists before selecting/summarizing
-  # (avoids expensive per-group pick(everything()) check)
+  # xlogp is deterministic from SMILES (computed by process_smiles), so
+  # distinct() is sufficient for it. Only name and tag need collapsing
+  # across multiple library sources.
   if (!"structure_xlogp" %in% names(table_structures_stereo)) {
     table_structures_stereo$structure_xlogp <- NA_character_
+  }
+  if (!"structure_tag" %in% names(table_structures_stereo)) {
+    table_structures_stereo$structure_tag <- NA_character_
+  }
+  if (!"structure_name" %in% names(table_structures_stereo)) {
+    table_structures_stereo$structure_name <- NA_character_
   }
   table_structures_stereo <- table_structures_stereo |>
     tidytable::select(
@@ -192,25 +212,68 @@ split_tables_sop <- function(table, cache) {
       structure_name,
       structure_tag
     ) |>
-    tidytable::distinct() |>
-    tidytable::group_by(
-      structure_inchikey,
-      structure_smiles,
-      structure_inchikey_connectivity_layer,
-      structure_inchikey_no_stereo,
-      structure_smiles_no_stereo
-    ) |>
-    tidytable::summarize(
-      structure_xlogp = .resolve_numeric_or_na(structure_xlogp),
-      structure_name = .collapse_harmonized_names(structure_name),
-      structure_tag = .collapse_unique_non_empty(structure_tag)
-    ) |>
-    tidytable::ungroup()
+    tidytable::distinct()
+
+  # Optimization: most inchikeys map to a single row after distinct().
+  # Only multi-row groups need collapsing. Split into singletons (fast
+  # pass-through) and duplicates (need R-level collapse).
+  dt_stereo <- data.table::as.data.table(table_structures_stereo)
+  dt_stereo[, .n_grp := .N, by = "structure_inchikey"]
+
+  singletons <- dt_stereo[.n_grp == 1L]
+  singletons[, .n_grp := NULL]
+
+  multi <- dt_stereo[.n_grp > 1L]
+  multi[, .n_grp := NULL]
+
+  if (nrow(multi) > 0L) {
+    log_debug(
+      "Collapsing names/tags for %d multi-source inchikeys (%d rows)",
+      data.table::uniqueN(multi$structure_inchikey),
+      nrow(multi)
+    )
+    multi <- multi[
+      ,
+      .(
+        structure_smiles = structure_smiles[1L],
+        structure_inchikey_connectivity_layer =
+          structure_inchikey_connectivity_layer[1L],
+        structure_inchikey_no_stereo = structure_inchikey_no_stereo[1L],
+        structure_smiles_no_stereo = structure_smiles_no_stereo[1L],
+        structure_xlogp = {
+          v <- structure_xlogp[!is.na(structure_xlogp)]
+          if (length(v) == 0L) NA_character_ else v[1L]
+        },
+        structure_name = {
+          vals <- structure_name[!is.na(structure_name)]
+          vals <- trimws(vals)
+          vals <- vals[nzchar(vals)]
+          keys <- tolower(vals)
+          vals <- vals[!duplicated(keys)]
+          if (length(vals) == 0L) NA_character_ else paste(vals, collapse = " $ ")
+        },
+        structure_tag = {
+          vals <- structure_tag[!is.na(structure_tag)]
+          vals <- trimws(vals)
+          vals <- unique(vals[nzchar(vals)])
+          if (length(vals) == 0L) NA_character_ else paste(vals, collapse = " $ ")
+        }
+      ),
+      by = "structure_inchikey"
+    ]
+    table_structures_stereo <- tidytable::as_tidytable(
+      data.table::rbindlist(list(singletons, multi), use.names = TRUE)
+    )
+  } else {
+    table_structures_stereo <- tidytable::as_tidytable(singletons)
+  }
+  rm(dt_stereo, singletons, multi)
 
   # str_met: Stereo-invariant properties keyed by inchikey_no_stereo
   ## formula and exact_mass are deterministically derived from SMILES via
   ## process_smiles() and are stereo-invariant (same connectivity + protonation
-  ## = same formula = same mass).
+  ## = same formula = same mass). No group_by + summarize needed — distinct()
+  ## is sufficient since values are deterministic.
   table_structures_metadata <- table_structural |>
     tidytable::filter(!is.na(structure_inchikey)) |>
     tidytable::filter(!is.na(structure_molecular_formula)) |>
@@ -231,15 +294,7 @@ split_tables_sop <- function(table, cache) {
       structure_molecular_formula,
       structure_exact_mass
     ) |>
-    tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey_no_stereo) |>
-    tidytable::summarize(
-      structure_molecular_formula = .resolve_single_or_na(
-        structure_molecular_formula
-      ),
-      structure_exact_mass = .resolve_numeric_or_na(structure_exact_mass)
-    ) |>
-    tidytable::ungroup()
+    tidytable::distinct(structure_inchikey_no_stereo, .keep_all = TRUE)
 
   # str_tax_npc: keyed by canonical SMILES with stereo
   table_structures_taxonomy_npc <- table_structural |>
@@ -255,19 +310,46 @@ split_tables_sop <- function(table, cache) {
       structure_tax_npc_02sup,
       structure_tax_npc_03cla
     ) |>
-    tidytable::distinct() |>
-    tidytable::group_by(structure_smiles) |>
-    clean_collapse(
-      cols = c(
-        "structure_tax_npc_01pat",
-        "structure_tax_npc_02sup",
-        "structure_tax_npc_03cla"
-      )
-    ) |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(fn = is.character),
-      .fns = ~ tidytable::replace_na(.x = .x, replace = "notClassified")
-    ))
+    tidytable::distinct()
+
+  # Fast collapse: most groups have 1 row; only collapse multi-row groups
+  dt_npc <- data.table::as.data.table(table_structures_taxonomy_npc)
+  npc_cols <- c(
+    "structure_tax_npc_01pat",
+    "structure_tax_npc_02sup",
+    "structure_tax_npc_03cla"
+  )
+  dt_npc[, .n_grp := .N, by = "structure_smiles"]
+  npc_single <- dt_npc[.n_grp == 1L]
+  npc_single[, .n_grp := NULL]
+  for (col in npc_cols) {
+    data.table::set(
+      npc_single,
+      i = which(is.na(npc_single[[col]])),
+      j = col,
+      value = "notClassified"
+    )
+  }
+  npc_multi <- dt_npc[.n_grp > 1L]
+  npc_multi[, .n_grp := NULL]
+  if (nrow(npc_multi) > 0L) {
+    npc_multi <- npc_multi[
+      ,
+      lapply(.SD, function(x) {
+        vals <- unique(trimws(stats::na.omit(x)))
+        vals <- vals[nzchar(vals)]
+        if (length(vals) == 0L) "notClassified" else paste(vals, collapse = " $ ")
+      }),
+      by = "structure_smiles",
+      .SDcols = npc_cols
+    ]
+    table_structures_taxonomy_npc <- tidytable::as_tidytable(
+      data.table::rbindlist(list(npc_single, npc_multi), use.names = TRUE)
+    )
+  } else {
+    table_structures_taxonomy_npc <- tidytable::as_tidytable(npc_single)
+  }
+  rm(dt_npc, npc_single, npc_multi)
 
   # str_tax_cla: keyed by full inchikey
   table_structures_taxonomy_cla <- table_structural |>
@@ -281,21 +363,48 @@ split_tables_sop <- function(table, cache) {
       structure_tax_cla_03cla,
       structure_tax_cla_04dirpar
     ) |>
-    tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey) |>
-    clean_collapse(
-      cols = c(
-        "structure_tax_cla_chemontid",
-        "structure_tax_cla_01kin",
-        "structure_tax_cla_02sup",
-        "structure_tax_cla_03cla",
-        "structure_tax_cla_04dirpar"
-      )
-    ) |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(fn = is.character),
-      .fns = ~ tidytable::replace_na(.x = .x, replace = "notClassified")
-    ))
+    tidytable::distinct()
+
+  # Fast collapse: most groups have 1 row; only collapse multi-row groups
+  dt_cla <- data.table::as.data.table(table_structures_taxonomy_cla)
+  cla_cols <- c(
+    "structure_tax_cla_chemontid",
+    "structure_tax_cla_01kin",
+    "structure_tax_cla_02sup",
+    "structure_tax_cla_03cla",
+    "structure_tax_cla_04dirpar"
+  )
+  dt_cla[, .n_grp := .N, by = "structure_inchikey"]
+  cla_single <- dt_cla[.n_grp == 1L]
+  cla_single[, .n_grp := NULL]
+  for (col in cla_cols) {
+    data.table::set(
+      cla_single,
+      i = which(is.na(cla_single[[col]])),
+      j = col,
+      value = "notClassified"
+    )
+  }
+  cla_multi <- dt_cla[.n_grp > 1L]
+  cla_multi[, .n_grp := NULL]
+  if (nrow(cla_multi) > 0L) {
+    cla_multi <- cla_multi[
+      ,
+      lapply(.SD, function(x) {
+        vals <- unique(trimws(stats::na.omit(x)))
+        vals <- vals[nzchar(vals)]
+        if (length(vals) == 0L) "notClassified" else paste(vals, collapse = " $ ")
+      }),
+      by = "structure_inchikey",
+      .SDcols = cla_cols
+    ]
+    table_structures_taxonomy_cla <- tidytable::as_tidytable(
+      data.table::rbindlist(list(cla_single, cla_multi), use.names = TRUE)
+    )
+  } else {
+    table_structures_taxonomy_cla <- tidytable::as_tidytable(cla_single)
+  }
+  rm(dt_cla, cla_single, cla_multi)
 
   table_organisms_names <- table_organisms |>
     tidytable::filter(!is.na(organism_name)) |>
