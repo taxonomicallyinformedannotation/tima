@@ -85,6 +85,7 @@ complement_metadata_structures <- function(
         structure_smiles_no_stereo %in% keys$smiles
     ) |>
     tidytable::distinct()
+  log_debug("Stereo loaded: %d rows after filtering", nrow(stereo))
 
   # Derive structure_inchikey_no_stereo from full inchikey if not in file
   if (all(is.na(stereo$structure_inchikey_no_stereo)) && nrow(stereo) > 0L) {
@@ -222,8 +223,10 @@ complement_metadata_structures <- function(
   # log_trace("Metadata loaded")
 
   # Build name/tag/xlogp lookup from stereo (keyed by inchikey_no_stereo,
-  # collapsing across stereoisomers)
-  nam_lookup <- stereo |>
+  # collapsing across stereoisomers).
+  # Uses singleton/multi-row split: singletons (~99% of groups) pass through
+  # directly; only multi-row groups need R-level collapse.
+  nam_base <- stereo |>
     tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
     tidytable::select(
       candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
@@ -231,14 +234,57 @@ complement_metadata_structures <- function(
       structure_tag,
       structure_xlogp
     ) |>
-    tidytable::group_by(candidate_structure_inchikey_no_stereo) |>
-    tidytable::summarize(
-      .lk_name = .collapse_harmonized_names(structure_name),
-      .lk_tag = .collapse_unique_non_empty(structure_tag),
-      .lk_xlogp = .resolve_numeric_or_na(structure_xlogp)
+    tidytable::mutate(
+      .n_grp = .N,
+      .by = candidate_structure_inchikey_no_stereo
+    )
+
+  # Singletons: pass through directly (most groups)
+  singletons_nam <- nam_base |>
+    tidytable::filter(.n_grp == 1L) |>
+    tidytable::mutate(
+      .lk_name = tidytable::if_else(
+        is.na(structure_name) | trimws(structure_name) == "",
+        NA_character_,
+        trimws(structure_name)
+      ),
+      .lk_tag = tidytable::if_else(
+        is.na(structure_tag) | trimws(structure_tag) == "",
+        NA_character_,
+        trimws(structure_tag)
+      ),
+      .lk_xlogp = tidytable::if_else(
+        is.na(structure_xlogp) | trimws(structure_xlogp) == "",
+        NA_character_,
+        structure_xlogp
+      )
     ) |>
-    tidytable::ungroup()
-  # log_trace("Names/tag/xlogp lookup done")
+    tidytable::select(
+      candidate_structure_inchikey_no_stereo,
+      .lk_name,
+      .lk_tag,
+      .lk_xlogp
+    )
+
+  # Multi-row groups: apply R-level collapse
+  multi_nam <- nam_base |>
+    tidytable::filter(.n_grp > 1L) |>
+    tidytable::select(-.n_grp)
+
+  if (nrow(multi_nam) > 0L) {
+    multi_nam <- multi_nam |>
+      tidytable::summarize(
+        .lk_name = .collapse_harmonized_names(structure_name),
+        .lk_tag = .collapse_unique_non_empty(structure_tag),
+        .lk_xlogp = .resolve_numeric_or_na(structure_xlogp),
+        .by = candidate_structure_inchikey_no_stereo
+      )
+    nam_lookup <- tidytable::bind_rows(singletons_nam, multi_nam)
+  } else {
+    nam_lookup <- singletons_nam
+  }
+  rm(nam_base, singletons_nam, multi_nam)
+  log_debug("Names/tag/xlogp lookup: %d unique keys", nrow(nam_lookup))
 
   # ClassyFire taxonomy — keyed by full inchikey
   tax_cla <- safe_fread(
@@ -270,7 +316,7 @@ complement_metadata_structures <- function(
       candidate_structure_inchikey,
       .keep_all = TRUE
     )
-  # log_trace("Classyfire done")
+  log_debug("ClassyFire taxonomy: %d rows", nrow(tax_cla))
 
   # NPClassifier taxonomy — keyed by canonical SMILES with stereo
   tax_npc <- safe_fread(
@@ -298,29 +344,27 @@ complement_metadata_structures <- function(
       candidate_structure_smiles,
       .keep_all = TRUE
     )
-  # log_trace("NPClassifier done")
+  log_debug("NPClassifier taxonomy: %d rows", nrow(tax_npc))
 
-  # Build metadata lookup keyed by inchikey_no_stereo
+  # Build metadata lookup keyed by inchikey_no_stereo.
+  # Formula and mass are deterministic from SMILES, so distinct() suffices.
   met_lookup <- met_2d |>
     tidytable::select(
       candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
-      structure_molecular_formula,
-      structure_exact_mass
+      .lk_molecular_formula = structure_molecular_formula,
+      .lk_exact_mass = structure_exact_mass
     ) |>
     tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo)) |>
-    tidytable::group_by(candidate_structure_inchikey_no_stereo) |>
-    tidytable::summarize(
-      .lk_molecular_formula = .resolve_single_or_na(
-        structure_molecular_formula
-      ),
-      .lk_exact_mass = .resolve_numeric_or_na(structure_exact_mass)
-    ) |>
-    tidytable::ungroup()
+    tidytable::distinct(
+      candidate_structure_inchikey_no_stereo,
+      .keep_all = TRUE
+    )
   rm(met_2d)
-  # log_trace("Metadata done")
+  log_debug("Metadata lookup: %d unique keys", nrow(met_lookup))
 
   # Inject placeholder columns early if missing in input df.
   df <- .ensure_structure_placeholders(df)
+  log_debug("Starting key resolution joins on %d rows", nrow(df))
 
   # Derive candidate_structure_inchikey_no_stereo in df.
   # All structural identifiers (SMILES, InChIKey variants) are strictly
@@ -392,6 +436,7 @@ complement_metadata_structures <- function(
       candidate_structure_inchikey_connectivity_layer,
       candidate_structure_smiles_no_stereo
     )
+  log_debug("Structure keys: %d unique combinations", nrow(structure_keys))
 
   # Join met_lookup by inchikey_no_stereo
   key_lookup <- structure_keys |>
@@ -452,6 +497,7 @@ complement_metadata_structures <- function(
       .enr_candidate_structure_tax_cla_04dirpar = candidate_structure_tax_cla_04dirpar_i
     )
 
+  log_debug("Key lookup: %d rows; starting final join", nrow(key_lookup))
   table_final <- df |>
     tidytable::left_join(
       y = key_lookup,

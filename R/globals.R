@@ -27,6 +27,7 @@ utils::globalVariables(
     ".lk_name",
     ".lk_tag",
     ".lk_xlogp",
+    ".n_grp",
     ".n_per_group",
     ".pred_avg",
     ".pred_denom",
