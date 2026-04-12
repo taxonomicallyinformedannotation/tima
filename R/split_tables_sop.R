@@ -176,6 +176,11 @@ split_tables_sop <- function(table, cache) {
   )
 
   # Collapse name, tag, xlogp per inchikey
+  # Ensure structure_xlogp column exists before selecting/summarizing
+  # (avoids expensive per-group pick(everything()) check)
+  if (!"structure_xlogp" %in% names(table_structures_stereo)) {
+    table_structures_stereo$structure_xlogp <- NA_character_
+  }
   table_structures_stereo <- table_structures_stereo |>
     tidytable::select(
       structure_inchikey,
@@ -183,7 +188,7 @@ split_tables_sop <- function(table, cache) {
       structure_inchikey_connectivity_layer,
       structure_inchikey_no_stereo,
       structure_smiles_no_stereo,
-      tidyselect::any_of(c("structure_xlogp")),
+      structure_xlogp,
       structure_name,
       structure_tag
     ) |>
@@ -196,13 +201,7 @@ split_tables_sop <- function(table, cache) {
       structure_smiles_no_stereo
     ) |>
     tidytable::summarize(
-      structure_xlogp = if (
-        "structure_xlogp" %in% names(tidytable::pick(tidyselect::everything()))
-      ) {
-        .resolve_numeric_or_na(structure_xlogp)
-      } else {
-        NA_character_
-      },
+      structure_xlogp = .resolve_numeric_or_na(structure_xlogp),
       structure_name = .collapse_harmonized_names(structure_name),
       structure_tag = .collapse_unique_non_empty(structure_tag)
     ) |>
