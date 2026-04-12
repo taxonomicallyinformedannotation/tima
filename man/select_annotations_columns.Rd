@@ -4,7 +4,14 @@
 \alias{select_annotations_columns}
 \title{Select and standardize annotation columns}
 \usage{
-select_annotations_columns(df, str_stereo, str_met, str_tax_cla, str_tax_npc)
+select_annotations_columns(
+  df,
+  str_stereo,
+  str_met,
+  str_tax_cla,
+  str_tax_npc,
+  cache = NULL
+)
 }
 \arguments{
 \item{df}{\link{data.frame} Data frame containing annotation results with structure and
@@ -17,6 +24,10 @@ candidate information}
 \item{str_tax_cla}{\link{character} Path to ClassyFire taxonomy file}
 
 \item{str_tax_npc}{\link{character} Path to NPClassifier taxonomy file}
+
+\item{cache}{\link{character|NULL} Optional path to a SMILES processing cache
+file (e.g. \code{processed.csv.gz}). When \code{NULL} (default), the cache path
+is auto-derived from \code{dirname(str_stereo)/processed.csv.gz}.}
 }
 \value{
 Data frame with standardized annotation columns, cleaned values,
