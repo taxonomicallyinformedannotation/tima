@@ -9,7 +9,7 @@ recompute_structure_fields_from_smiles(df, cache = NULL)
 \arguments{
 \item{df}{\link{data.frame} Annotation data frame.}
 
-\item{cache}{\link{character|NULL} Optional path to a SMILES processing cache
+\item{cache}{(character or NULL) Optional path to a SMILES processing cache
 file. When provided, previously computed results are reused, avoiding
 redundant RDKit calls.}
 }
