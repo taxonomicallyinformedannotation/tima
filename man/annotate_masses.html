@@ -685,8 +685,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$stereo,
   str_met = get_params(step =
     "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$metadata,
-  str_nam = get_params(step =
-    "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$names,
   str_tax_cla = get_params(step =
     "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$cla,
   str_tax_npc = get_params(step =
@@ -765,14 +763,6 @@ File containing structures stereo
 </td>
 <td>
 File containing structures metadata
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_nam">str_nam</code>
-</td>
-<td>
-File containing structures names
 </td>
 </tr>
 <tr>
@@ -869,11 +859,10 @@ Tolerance to group adducts. Should be &lt;= 0.05 minutes
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">library =</span> <span class="fu">paste0</span>(dir_sop_mer, <span class="st">"keys.tsv"</span>),</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_stereo =</span> <span class="fu">paste0</span>(dir_str, <span class="st">"stereo.tsv"</span>),</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_met =</span> <span class="fu">paste0</span>(dir_str, <span class="st">"metadata.tsv"</span>),</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_nam =</span> <span class="fu">paste0</span>(dir_str, <span class="st">"names.tsv"</span>),</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_cla =</span> <span class="fu">paste0</span>(dir_tax, <span class="st">"classyfire.tsv"</span>),</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_npc =</span> <span class="fu">paste0</span>(dir_tax, <span class="st">"npc.tsv"</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_cla =</span> <span class="fu">paste0</span>(dir_tax, <span class="st">"classyfire.tsv"</span>),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_npc =</span> <span class="fu">paste0</span>(dir_tax, <span class="st">"npc.tsv"</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

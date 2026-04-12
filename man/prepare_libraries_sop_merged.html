@@ -685,12 +685,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "prepare_libraries_sop_merged")\$files\$libraries\$sop\$merged\$keys,
   output_org_tax_ott = get_params(step =
     "prepare_libraries_sop_merged")\$files\$libraries\$sop\$merged\$organisms\$taxonomies\$ott,
+  output_str_can = get_params(step =
+    "prepare_libraries_sop_merged")\$files\$libraries\$sop\$merged\$structures\$canonical,
   output_str_stereo = get_params(step =
     "prepare_libraries_sop_merged")\$files\$libraries\$sop\$merged\$structures\$stereo,
   output_str_met = get_params(step =
     "prepare_libraries_sop_merged")\$files\$libraries\$sop\$merged\$structures\$metadata,
-  output_str_nam = get_params(step =
-    "prepare_libraries_sop_merged")\$files\$libraries\$sop\$merged\$structures\$names,
   output_str_tax_cla = get_params(step =
     "prepare_libraries_sop_merged")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$cla,
   output_str_tax_npc = get_params(step =
@@ -759,6 +759,14 @@ character Character string path for organisms taxonomy (OTT) file
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="output_str_can">output_str_can</code>
+</td>
+<td>
+character Character string path for structures canonical SMILES file
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
 <code id="output_str_stereo">output_str_stereo</code>
 </td>
 <td>
@@ -771,14 +779,6 @@ character Character string path for structures stereochemistry file
 </td>
 <td>
 character Character string path for structures metadata file
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="output_str_nam">output_str_nam</code>
-</td>
-<td>
-character Character string path for structures names file
 </td>
 </tr>
 <tr>

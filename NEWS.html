@@ -615,6 +615,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link" data-scroll-target="#breaking-changes">Breaking changes</a></li>
   <li><a href="#new-features" id="toc-new-features" class="nav-link" data-scroll-target="#new-features">New features</a></li>
   <li><a href="#internal-performance" id="toc-internal-performance" class="nav-link" data-scroll-target="#internal-performance">Internal / performance</a></li>
+  <li><a href="#bug-fixes" id="toc-bug-fixes" class="nav-link" data-scroll-target="#bug-fixes">Bug fixes</a></li>
   <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
   <li><a href="#data-updates" id="toc-data-updates" class="nav-link" data-scroll-target="#data-updates">Data updates</a></li>
   </ul></li>
@@ -622,7 +623,7 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#breaking-changes-1" id="toc-breaking-changes-1" class="nav-link" data-scroll-target="#breaking-changes-1">Breaking changes</a></li>
   <li><a href="#new-features-1" id="toc-new-features-1" class="nav-link" data-scroll-target="#new-features-1">New features</a></li>
-  <li><a href="#bug-fixes" id="toc-bug-fixes" class="nav-link" data-scroll-target="#bug-fixes">Bug fixes</a></li>
+  <li><a href="#bug-fixes-1" id="toc-bug-fixes-1" class="nav-link" data-scroll-target="#bug-fixes-1">Bug fixes</a></li>
   <li><a href="#internal-performance-1" id="toc-internal-performance-1" class="nav-link" data-scroll-target="#internal-performance-1">Internal / performance</a></li>
   <li><a href="#documentation-1" id="toc-documentation-1" class="nav-link" data-scroll-target="#documentation-1">Documentation</a></li>
   <li><a href="#data-updates-1" id="toc-data-updates-1" class="nav-link" data-scroll-target="#data-updates-1">Data updates</a></li>
@@ -711,6 +712,13 @@ ul.task-list li input[type="checkbox"] {
 <li>Updated the C implementation of the spectral similarity</li>
 </ul>
 </section>
+<section id="bug-fixes" class="level2">
+<h2 class="anchored" data-anchor-id="bug-fixes">Bug fixes</h2>
+<ul>
+<li>Fixed <code>split_tables_sop()</code> collapsing numerically identical exact masses into <code>"mass1 $ mass2"</code> strings due to <code>clean_collapse()</code> treating them as different character values; now uses <code>resolve_numeric_or_na()</code> with floating-point tolerance</li>
+<li>Removed xlogp from the structure metadata (<code>str_met</code>) table: xlogp is stereo-sensitive (Crippen atom-typing can differ between stereoisomers), so it is no longer collapsed by <code>inchikey_no_stereo</code>; the per-SMILES value computed by <code>process_smiles()</code> in the annotation pipeline is used instead</li>
+</ul>
+</section>
 <section id="documentation" class="level2">
 <h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
 <ul>
@@ -747,8 +755,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Introduced similarity method argument (entropy and GNPS for now)</li>
 </ul>
 </section>
-<section id="bug-fixes" class="level2">
-<h2 class="anchored" data-anchor-id="bug-fixes">Bug fixes</h2>
+<section id="bug-fixes-1" class="level2">
+<h2 class="anchored" data-anchor-id="bug-fixes-1">Bug fixes</h2>
 <ul>
 <li>Fixed memory crashes in case of large number of ties, limiting to 7 with note (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/216">#216</a>)</li>
 </ul>

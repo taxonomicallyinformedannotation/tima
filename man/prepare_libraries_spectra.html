@@ -680,21 +680,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   col_ad = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$adduct,
   col_ce = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$collision_energy,
   col_ci = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$compound_id,
-  col_em = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$exact_mass,
   col_in = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$inchi,
   col_io = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$inchi_no_stereo,
   col_ik = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$inchikey,
   col_il = get_params(step =
     "prepare_libraries_spectra")\$names\$mgf\$inchikey_connectivity_layer,
-  col_mf = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$molecular_formula,
   col_na = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$name,
   col_po = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$polarity,
   col_sm = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$smiles,
   col_sn = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$smiles_no_stereo,
   col_si = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$spectrum_id,
   col_sp = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$splash,
-  col_sy = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$synonyms,
-  col_xl = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$xlogp
+  col_sy = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$synonyms
 )
 </code></pre>
 </section>
@@ -743,14 +740,6 @@ character Name of the compound ID column in MGF.
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="col_em">col_em</code>
-</td>
-<td>
-character Name of the exact mass column in MGF.
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
 <code id="col_in">col_in</code>
 </td>
 <td>
@@ -779,14 +768,6 @@ character Name of the InChIKey column in MGF.
 </td>
 <td>
 character Name of the InChIKey connectivity layer column in MGF.
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="col_mf">col_mf</code>
-</td>
-<td>
-character Name of the molecular formula column in MGF.
 </td>
 </tr>
 <tr>
@@ -843,14 +824,6 @@ character Name of the SPLASH column in MGF.
 </td>
 <td>
 character Name of the synonyms column in MGF.
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="col_xl">col_xl</code>
-</td>
-<td>
-character Name of the xlogp column in MGF.
 </td>
 </tr>
 </tbody></table>
