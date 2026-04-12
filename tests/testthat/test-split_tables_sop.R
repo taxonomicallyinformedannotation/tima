@@ -29,18 +29,24 @@ test_that("split_tables_sop handles empty table gracefully", {
   expect_named(
     result,
     c(
-      "table_keys",
-      "table_structures_stereo",
-      "table_organisms",
-      "table_structural"
+      "key",
+      "org_tax_ott",
+      "str_can",
+      "str_stereo",
+      "str_met",
+      "str_tax_cla",
+      "str_tax_npc"
     )
   )
 
   # All tables should be empty
-  expect_equal(nrow(result$table_keys), 0)
-  expect_equal(nrow(result$table_structures_stereo), 0)
-  expect_equal(nrow(result$table_organisms), 0)
-  expect_equal(nrow(result$table_structural), 0)
+  expect_equal(nrow(result$key), 0)
+  expect_equal(nrow(result$str_stereo), 0)
+  expect_equal(nrow(result$org_tax_ott), 0)
+  expect_equal(nrow(result$str_met), 0)
+  expect_equal(nrow(result$str_can), 0)
+  expect_equal(nrow(result$str_tax_cla), 0)
+  expect_equal(nrow(result$str_tax_npc), 0)
 })
 
 ## Functional Tests ----
@@ -81,7 +87,6 @@ test_that("split_tables_sop splits table into components", {
           "org_tax_ott",
           "str_stereo",
           "str_met",
-          "str_nam",
           "str_tax_cla",
           "str_tax_npc"
         ) %in%

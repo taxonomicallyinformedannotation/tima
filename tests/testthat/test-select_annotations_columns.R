@@ -62,7 +62,6 @@ test_that("select_annotations_columns cleans text sentinels and keeps expected c
     df = df,
     str_stereo = paths$stereo,
     str_met = paths$met,
-    str_nam = paths$nam,
     str_tax_cla = paths$cla,
     str_tax_npc = paths$npc
   )
@@ -103,7 +102,6 @@ test_that("select_annotations_columns converts numeric outputs to character once
     df = df,
     str_stereo = paths$stereo,
     str_met = paths$met,
-    str_nam = paths$nam,
     str_tax_cla = paths$cla,
     str_tax_npc = paths$npc
   )
@@ -149,7 +147,6 @@ test_that("select_annotations_columns drops duplicate raw structure metadata col
     df = df,
     str_stereo = paths$stereo,
     str_met = paths$met,
-    str_nam = paths$nam,
     str_tax_cla = paths$cla,
     str_tax_npc = paths$npc
   )
@@ -178,7 +175,6 @@ test_that("select_annotations_columns drops duplicate raw structure metadata col
 #     df = df,
 #     str_stereo = paths$stereo,
 #     str_met = paths$met,
-#     str_nam = paths$nam,
 #     str_tax_cla = paths$cla,
 #     str_tax_npc = paths$npc
 #   )
@@ -202,7 +198,6 @@ test_that("select_annotations_columns drops duplicate raw structure metadata col
 #     df = df,
 #     str_stereo = paths$stereo,
 #     str_met = paths$met,
-#     str_nam = paths$nam,
 #     str_tax_cla = paths$cla,
 #     str_tax_npc = paths$npc
 #   )
@@ -223,7 +218,6 @@ test_that("select_annotations_columns drops duplicate raw structure metadata col
 #     df = df,
 #     str_stereo = paths$stereo,
 #     str_met = paths$met,
-#     str_nam = paths$nam,
 #     str_tax_cla = paths$cla,
 #     str_tax_npc = paths$npc
 #   )

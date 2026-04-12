@@ -59,7 +59,6 @@ test_that("test-prepare_annotations_sirius validates sirius_version", {
       sirius_version = "7",
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
@@ -79,7 +78,6 @@ test_that("test-prepare_annotations_sirius validates output parameters and struc
       sirius_version = "5",
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
@@ -95,7 +93,6 @@ test_that("test-prepare_annotations_sirius validates output parameters and struc
       sirius_version = "5",
       str_stereo = temp_test_path("missing.tsv"),
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
@@ -120,7 +117,6 @@ test_that("test-prepare_annotations_sirius handles missing input by producing em
     sirius_version = "5",
     str_stereo = s$stereo,
     str_met = s$met,
-    str_nam = s$nam,
     str_tax_cla = s$cla,
     str_tax_npc = s$npc
   )
@@ -144,7 +140,6 @@ test_that("test-prepare_annotations_sirius handles version 6", {
     sirius_version = "6",
     str_stereo = s$stereo,
     str_met = s$met,
-    str_nam = s$nam,
     str_tax_cla = s$cla,
     str_tax_npc = s$npc
   )
@@ -170,7 +165,6 @@ test_that("test-prepare_annotations_sirius validates numeric version", {
       sirius_version = 5,
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     )
@@ -191,7 +185,6 @@ test_that("validate_sirius_inputs validates version correctly", {
       output_for = file.path(tmp, "for.tsv"),
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc,
       max_analog_abs_mz_error = 0.01
@@ -209,7 +202,6 @@ test_that("validate_sirius_inputs validates version correctly", {
       output_for = file.path(tmp, "for.tsv"),
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc,
       max_analog_abs_mz_error = 0.01
@@ -230,7 +222,6 @@ test_that("validate_sirius_inputs validates output paths", {
       output_for = "for.tsv",
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc,
       max_analog_abs_mz_error = 0.01
@@ -247,7 +238,6 @@ test_that("validate_sirius_inputs validates output paths", {
       output_for = "for.tsv",
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc,
       max_analog_abs_mz_error = 0.01
@@ -264,7 +254,6 @@ test_that("validate_sirius_inputs validates output paths", {
       output_for = NULL,
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc,
       max_analog_abs_mz_error = 0.01
@@ -286,7 +275,6 @@ test_that("validate_sirius_inputs checks structure file existence", {
       output_for = file.path(tmp, "for.tsv"),
       str_stereo = "nonexistent_stereo.tsv",
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc,
       max_analog_abs_mz_error = 0.01
@@ -302,7 +290,6 @@ test_that("validate_sirius_inputs checks structure file existence", {
       output_for = file.path(tmp, "for.tsv"),
       str_stereo = s$stereo,
       str_met = "nonexistent_metadata.tsv",
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc,
       max_analog_abs_mz_error = 0.01
@@ -323,7 +310,6 @@ test_that("validate_sirius_inputs validates max_analog_abs_mz_error", {
       output_for = file.path(tmp, "for.tsv"),
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc,
       max_analog_abs_mz_error = -0.01

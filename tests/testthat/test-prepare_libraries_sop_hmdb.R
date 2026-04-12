@@ -8,7 +8,8 @@ library(testthat)
 # ---- helpers -----------------------------------------------------------------
 
 #' Write a minimal single-compound HMDB-style SDF as a zip file.
-write_hmdb_zip <- function(dir, compounds = 1L, include_inchikey = TRUE) {
+write_hmdb_zip <- function(dir, compounds = 1L, include_inchikey = TRUE,
+                          include_smiles = TRUE) {
   blocks <- lapply(seq_len(compounds), function(i) {
     ink <- if (include_inchikey) {
       paste0("AAAAAAA", sprintf("%07d", i), "-UHFFFAOYSA-N")
@@ -27,9 +28,7 @@ write_hmdb_zip <- function(dir, compounds = 1L, include_inchikey = TRUE) {
       "> <GENERIC_NAME>",
       paste0("Compound", i),
       "",
-      "> <SMILES>",
-      "CC",
-      "",
+      if (include_smiles) c("> <SMILES>", "CC", "") else NULL,
       if (!is.null(ink)) c("> <INCHI_KEY>", ink, "") else NULL,
       "> <FORMULA>",
       "C2H6",
@@ -114,15 +113,27 @@ test_that("prepare_libraries_sop_hmdb parses multiple compounds", {
   expect_equal(nrow(df), 5L)
 })
 
-test_that("prepare_libraries_sop_hmdb drops compounds without InChIKey", {
+test_that("prepare_libraries_sop_hmdb drops compounds without SMILES", {
   td <- tempfile()
   dir.create(td)
   on.exit(unlink(td, recursive = TRUE))
-  zip <- write_hmdb_zip(td, compounds = 3L, include_inchikey = FALSE)
+  zip <- write_hmdb_zip(td, compounds = 3L, include_smiles = FALSE)
   out <- file.path(td, "hmdb.tsv")
   prepare_libraries_sop_hmdb(input = zip, output = out)
   df <- tidytable::fread(out)
   expect_equal(nrow(df), 0L)
+})
+
+test_that("prepare_libraries_sop_hmdb keeps compounds with SMILES but without InChIKey", {
+  td <- tempfile()
+  dir.create(td)
+  on.exit(unlink(td, recursive = TRUE))
+  zip <- write_hmdb_zip(td, compounds = 3L, include_inchikey = FALSE,
+                        include_smiles = TRUE)
+  out <- file.path(td, "hmdb.tsv")
+  prepare_libraries_sop_hmdb(input = zip, output = out)
+  df <- tidytable::fread(out)
+  expect_equal(nrow(df), 3L)
 })
 
 # ---- default organism taxonomy -----------------------------------------------

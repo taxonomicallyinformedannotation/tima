@@ -1237,7 +1237,6 @@ prepare_annotation_fixture_env <- function(
     library = library_path,
     str_stereo = structure_paths$stereo,
     str_met = structure_paths$metadata,
-    str_nam = structure_paths$names,
     str_tax_cla = structure_paths$tax_cla,
     str_tax_npc = structure_paths$tax_npc,
     output_annotations = file.path(dirs$outputs, "annotations.tsv"),

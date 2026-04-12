@@ -53,7 +53,6 @@ test_that("test-prepare_annotations_spectra validates input vector and files", {
       output = out,
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
@@ -66,7 +65,6 @@ test_that("test-prepare_annotations_spectra validates input vector and files", {
       output = out,
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
@@ -88,7 +86,6 @@ test_that("test-prepare_annotations_spectra validates structure files", {
       output = out,
       str_stereo = temp_test_path("missing.tsv"),
       str_met = temp_test_path("missing.tsv"),
-      str_nam = temp_test_path("missing.tsv"),
       str_tax_cla = temp_test_path("missing.tsv"),
       str_tax_npc = temp_test_path("missing.tsv")
     ),
@@ -127,7 +124,6 @@ test_that("test-prepare_annotations_spectra processes minimal formatted input", 
     output = out,
     str_stereo = s$stereo,
     str_met = s$met,
-    str_nam = s$nam,
     str_tax_cla = s$cla,
     str_tax_npc = s$npc
   )
@@ -172,7 +168,6 @@ test_that("test-prepare_annotations_spectra deduplicates repeated rows across in
       output = out,
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     )

@@ -56,7 +56,6 @@ test_that("test-prepare_annotations_gnps validates output path", {
       output = c("a.tsv", "b.tsv"),
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
@@ -74,7 +73,6 @@ test_that("test-prepare_annotations_gnps validates structure file paths", {
       output = out,
       str_stereo = temp_test_path("missing.tsv"),
       str_met = temp_test_path("missing.tsv"),
-      str_nam = temp_test_path("missing.tsv"),
       str_tax_cla = temp_test_path("missing.tsv"),
       str_tax_npc = temp_test_path("missing.tsv")
     ),
@@ -96,7 +94,6 @@ test_that("test-prepare_annotations_gnps handles missing input files by creating
     output = out,
     str_stereo = s$stereo,
     str_met = s$met,
-    str_nam = s$nam,
     str_tax_cla = s$cla,
     str_tax_npc = s$npc
   )
@@ -139,7 +136,6 @@ test_that("test-prepare_annotations_gnps processes minimal valid GNPS file", {
     output = out,
     str_stereo = s$stereo,
     str_met = s$met,
-    str_nam = s$nam,
     str_tax_cla = s$cla,
     str_tax_npc = s$npc
   )

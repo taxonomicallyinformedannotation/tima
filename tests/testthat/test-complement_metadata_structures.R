@@ -18,7 +18,6 @@ test_that("complement_metadata_structures errors on invalid file paths", {
       df,
       str_stereo = "missing_stereo.tsv",
       str_met = "missing_met.tsv",
-      str_nam = "missing_nam.tsv",
       str_tax_cla = "missing_cla.tsv",
       str_tax_npc = "missing_npc.tsv"
     ),
@@ -35,14 +34,12 @@ test_that("complement_metadata_structures validates single character path inputs
   # Use fixtures for structure files
   st_file <- temp_test_path("st.tsv")
   met_file <- temp_test_path("met.tsv")
-  nam_file <- temp_test_path("nam.tsv")
   cla_file <- temp_test_path("cla.tsv")
   npc_file <- temp_test_path("npc.tsv")
 
   # Copy fixtures to temp location using helper
   copy_fixture_to("structures_stereo.csv", st_file)
   copy_fixture_to("structures_metadata.csv", met_file)
-  copy_fixture_to("structures_names.csv", nam_file)
   copy_fixture_to("structures_taxonomy_cla.csv", cla_file)
   copy_fixture_to("structures_taxonomy_npc.csv", npc_file)
 
@@ -52,7 +49,6 @@ test_that("complement_metadata_structures validates single character path inputs
       df,
       str_stereo = c(st_file, st_file),
       str_met = met_file,
-      str_nam = nam_file,
       str_tax_cla = cla_file,
       str_tax_npc = npc_file
     ),
@@ -69,15 +65,12 @@ test_that("complement_metadata_structures collapses multiple names with separato
   # Use fixtures for structure files
   st_file <- temp_test_path("st.tsv")
   met_file <- temp_test_path("met.tsv")
-  nam_file <- temp_test_path("nam.tsv")
   cla_file <- temp_test_path("cla.tsv")
   npc_file <- temp_test_path("npc.tsv")
 
-  # Use fixtures
   # Copy fixtures using helper
   copy_fixture_to("structures_stereo.csv", st_file)
   copy_fixture_to("structures_metadata.csv", met_file)
-  copy_fixture_to("structures_names.csv", nam_file)
   copy_fixture_to("structures_taxonomy_cla.csv", cla_file)
   copy_fixture_to("structures_taxonomy_npc.csv", npc_file)
 
@@ -85,63 +78,12 @@ test_that("complement_metadata_structures collapses multiple names with separato
     df,
     str_stereo = st_file,
     str_met = met_file,
-    str_nam = nam_file,
     str_tax_cla = cla_file,
     str_tax_npc = npc_file
   )
-  expect_true("structure_name" %in% names(result))
-  if (nrow(result) > 0 && !is.na(result$structure_name[1])) {
-    expect_true(grepl(" $ ", result$structure_name[1], fixed = TRUE))
-  }
+  expect_true("candidate_structure_name" %in% names(result))
+  # INK1 does not match any fixture entry, so name will be NA
 })
-
-# test_that(
-#   skip("Not implemented")
-# )
-# test_that("complement_metadata_structures adds taxonomy columns", {
-#
-#
-#   df <- tidytable::tidytable(
-#     candidate_structure_inchikey_connectivity_layer = "INK2",
-#     candidate_structure_smiles_no_stereo = "N"
-#   )
-#   stereo <- tidytable::tidytable(
-#     structure_inchikey_connectivity_layer = "INK2",
-#     structure_smiles_no_stereo = "N"
-#   )
-#   tidytable::fwrite(stereo, file = "stereo.tsv")
-#   tidytable::fwrite(stereo, file = "met.tsv")
-#   tidytable::fwrite(stereo, file = "nam.tsv")
-#   cla <- tidytable::tidytable(
-#     structure_inchikey_connectivity_layer = "INK2",
-#     structure_smiles_no_stereo = "N",
-#     structure_tax_cla_chemontid = "Y",
-#     structure_tax_cla_01kin = "Kin",
-#     structure_tax_cla_02sup = "Sup",
-#     structure_tax_cla_03cla = "Cla",
-#     structure_tax_cla_04dirpar = "Par"
-#   )
-#   tidytable::fwrite(cla, file = "cla.tsv")
-#   npc <- tidytable::tidytable(
-#     structure_smiles_no_stereo = "N",
-#     structure_tax_npc_01pat = "Pat",
-#     structure_tax_npc_02sup = "NSup",
-#     structure_tax_npc_03cla = "NCla"
-#   )
-#   tidytable::fwrite(npc, file = "npc.tsv")
-#   result <- complement_metadata_structures(
-#     df,
-#     str_stereo = "stereo.tsv",
-#     str_met = "met.tsv",
-#     str_nam = "nam.tsv",
-#     str_tax_cla = "cla.tsv",
-#     str_tax_npc = "npc.tsv"
-#   )
-#   expect_true(
-#     any(grepl("tax_cla_01kin", names(result))) ||
-#       any(grepl("tax_npc_01pat", names(result)))
-#   )
-# })
 
 test_that("complement_metadata_structures errors when required columns missing", {
   df <- tidytable::tidytable(
@@ -152,7 +94,6 @@ test_that("complement_metadata_structures errors when required columns missing",
   # Use fixtures for structure files
   st_file <- temp_test_path("st.tsv")
   met_file <- temp_test_path("met.tsv")
-  nam_file <- temp_test_path("nam.tsv")
   cla_file <- temp_test_path("cla.tsv")
   npc_file <- temp_test_path("npc.tsv")
 
@@ -161,26 +102,9 @@ test_that("complement_metadata_structures errors when required columns missing",
   tidytable::fwrite(x = stereo, file = st_file, sep = "\t")
 
   # Use fixtures for the others
-  tidytable::fwrite(
-    x = load_fixture("structures_metadata"),
-    file = met_file,
-    sep = "\t"
-  )
-  tidytable::fwrite(
-    x = load_fixture("structures_names"),
-    file = nam_file,
-    sep = "\t"
-  )
-  tidytable::fwrite(
-    load_fixture("structures_taxonomy_cla"),
-    cla_file,
-    sep = "\t"
-  )
-  tidytable::fwrite(
-    load_fixture("structures_taxonomy_npc"),
-    npc_file,
-    sep = "\t"
-  )
+  copy_fixture_to("structures_metadata.csv", met_file)
+  copy_fixture_to("structures_taxonomy_cla.csv", cla_file)
+  copy_fixture_to("structures_taxonomy_npc.csv", npc_file)
 
   # Expect error due to missing column usage inside joins/select
   expect_error(
@@ -188,7 +112,6 @@ test_that("complement_metadata_structures errors when required columns missing",
       df,
       str_stereo = st_file,
       str_met = met_file,
-      str_nam = nam_file,
       str_tax_cla = cla_file,
       str_tax_npc = npc_file
     )
@@ -198,7 +121,6 @@ test_that("complement_metadata_structures errors when required columns missing",
 .write_min_lookup_files <- function(
   st_file,
   met_file,
-  nam_file,
   cla_file,
   npc_file,
   inchikey,
@@ -209,41 +131,41 @@ test_that("complement_metadata_structures errors when required columns missing",
   tag = "clean",
   name = "LibName"
 ) {
+  # Full inchikey for taxonomy and bridge lookups
+  full_inchikey <- paste0(inchikey, "-AAAAAAAAAA-N")
+  inchikey_no_stereo <- paste0(inchikey, "-N")
+
+  # Stereo file: includes all structural identifiers + name, tag, xlogp
   tidytable::fwrite(
     tidytable::tidytable(
+      structure_inchikey = full_inchikey,
       structure_inchikey_connectivity_layer = inchikey,
-      structure_smiles_no_stereo = smiles
+      structure_inchikey_no_stereo = inchikey_no_stereo,
+      structure_smiles = smiles,
+      structure_smiles_no_stereo = smiles,
+      structure_xlogp = xlogp,
+      structure_name = name,
+      structure_tag = tag
     ),
     st_file,
     sep = "\t"
   )
 
+  # Metadata: keyed by inchikey_no_stereo, only formula + mass
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_inchikey_connectivity_layer = inchikey,
-      structure_smiles_no_stereo = smiles,
+      structure_inchikey_no_stereo = inchikey_no_stereo,
       structure_exact_mass = mass,
-      structure_xlogp = xlogp,
-      structure_tag = tag,
       structure_molecular_formula = formula
     ),
     met_file,
     sep = "\t"
   )
 
+  # ClassyFire taxonomy: keyed by full inchikey
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_inchikey_connectivity_layer = inchikey,
-      structure_smiles_no_stereo = smiles,
-      structure_name = name
-    ),
-    nam_file,
-    sep = "\t"
-  )
-
-  tidytable::fwrite(
-    tidytable::tidytable(
-      structure_inchikey_connectivity_layer = inchikey,
+      structure_inchikey = full_inchikey,
       structure_tax_cla_chemontid = "CHEMONTID:0000000",
       structure_tax_cla_01kin = "Organic compounds",
       structure_tax_cla_02sup = "Lipids",
@@ -254,9 +176,10 @@ test_that("complement_metadata_structures errors when required columns missing",
     sep = "\t"
   )
 
+  # NPClassifier taxonomy: keyed by structure_smiles (with stereo)
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_smiles_no_stereo = smiles,
+      structure_smiles = smiles,
       structure_tax_npc_01pat = "Pathway",
       structure_tax_npc_02sup = "Superclass",
       structure_tax_npc_03cla = "Class"
@@ -279,14 +202,12 @@ test_that("clean lookup values are always used before existing candidate metadat
 
   st_file <- temp_test_path("prio_st.tsv")
   met_file <- temp_test_path("prio_met.tsv")
-  nam_file <- temp_test_path("prio_nam.tsv")
   cla_file <- temp_test_path("prio_cla.tsv")
   npc_file <- temp_test_path("prio_npc.tsv")
 
   .write_min_lookup_files(
     st_file = st_file,
     met_file = met_file,
-    nam_file = nam_file,
     cla_file = cla_file,
     npc_file = npc_file,
     inchikey = "IK1",
@@ -302,17 +223,14 @@ test_that("clean lookup values are always used before existing candidate metadat
     df,
     str_stereo = st_file,
     str_met = met_file,
-    str_nam = nam_file,
     str_tax_cla = cla_file,
     str_tax_npc = npc_file
   )
 
   expect_true(all(out$candidate_structure_exact_mass == "100"))
   expect_true(all(out$candidate_structure_molecular_formula == "C10H20O"))
-  ## xlogp is no longer enriched from library (it is stereo-sensitive and
-
-  ## recomputed per-SMILES upstream); existing values pass through unchanged.
-  expect_true(all(out$candidate_structure_xlogp %in% c("9.9", "8.8")))
+  ## xlogp is now enriched from stereo reference
+  expect_true(all(out$candidate_structure_xlogp == "2.1"))
   expect_true(all(out$candidate_structure_tag == "clean"))
   expect_true(all(out$candidate_structure_name == "LibName"))
 })
@@ -330,7 +248,6 @@ test_that("existing candidate metadata is used only when no lookup values exist"
 
   st_file <- temp_test_path("fallback_st.tsv")
   met_file <- temp_test_path("fallback_met.tsv")
-  nam_file <- temp_test_path("fallback_nam.tsv")
   cla_file <- temp_test_path("fallback_cla.tsv")
   npc_file <- temp_test_path("fallback_npc.tsv")
 
@@ -338,7 +255,6 @@ test_that("existing candidate metadata is used only when no lookup values exist"
   .write_min_lookup_files(
     st_file = st_file,
     met_file = met_file,
-    nam_file = nam_file,
     cla_file = cla_file,
     npc_file = npc_file,
     inchikey = "OTHER",
@@ -349,13 +265,16 @@ test_that("existing candidate metadata is used only when no lookup values exist"
     df,
     str_stereo = st_file,
     str_met = met_file,
-    str_nam = nam_file,
     str_tax_cla = cla_file,
     str_tax_npc = npc_file
   )
 
-  expect_equal(out$candidate_structure_exact_mass[[1]], "777")
-  expect_equal(out$candidate_structure_molecular_formula[[1]], "C7H7N")
+  ## Computable properties (formula, mass) are always overwritten from the
+
+  ## process_smiles reference; with no lookup match they become NA.
+  expect_true(is.na(out$candidate_structure_exact_mass[[1]]))
+  expect_true(is.na(out$candidate_structure_molecular_formula[[1]]))
+  ## Non-computable properties are preserved from existing values via coalesce
   expect_equal(out$candidate_structure_xlogp[[1]], "1.7")
   expect_equal(out$candidate_structure_tag[[1]], "existing")
   expect_equal(out$candidate_structure_name[[1]], "ExistingName")
@@ -374,14 +293,12 @@ test_that("one canonical value is returned per inchikey across rows", {
 
   st_file <- temp_test_path("canon_st.tsv")
   met_file <- temp_test_path("canon_met.tsv")
-  nam_file <- temp_test_path("canon_nam.tsv")
   cla_file <- temp_test_path("canon_cla.tsv")
   npc_file <- temp_test_path("canon_npc.tsv")
 
   .write_min_lookup_files(
     st_file = st_file,
     met_file = met_file,
-    nam_file = nam_file,
     cla_file = cla_file,
     npc_file = npc_file,
     inchikey = "IK3",
@@ -397,21 +314,20 @@ test_that("one canonical value is returned per inchikey across rows", {
     df,
     str_stereo = st_file,
     str_met = met_file,
-    str_nam = nam_file,
     str_tax_cla = cla_file,
     str_tax_npc = npc_file
   )
 
   expect_equal(length(unique(out$candidate_structure_exact_mass)), 1L)
   expect_equal(length(unique(out$candidate_structure_molecular_formula)), 1L)
-  ## xlogp is no longer enriched from library; per-row values are preserved.
-  expect_equal(length(unique(out$candidate_structure_xlogp)), 3L)
+  ## xlogp is now enriched from stereo reference; all rows get the same value
+  expect_equal(length(unique(out$candidate_structure_xlogp)), 1L)
   expect_equal(length(unique(out$candidate_structure_tag)), 1L)
   expect_equal(length(unique(out$candidate_structure_name)), 1L)
 
   expect_equal(unique(out$candidate_structure_exact_mass), "123.45")
   expect_equal(unique(out$candidate_structure_molecular_formula), "C6H6O")
-  expect_equal(sort(out$candidate_structure_xlogp), c("0.1", "0.2", "0.3"))
+  expect_equal(unique(out$candidate_structure_xlogp), "1.2")
   expect_equal(unique(out$candidate_structure_tag), "clean_canon")
   expect_equal(unique(out$candidate_structure_name), "CanonicalName")
 })
@@ -425,25 +341,30 @@ test_that("name harmonization is case-insensitive within complement_metadata_str
 
   st_file <- temp_test_path("name_harm_st.tsv")
   met_file <- temp_test_path("name_harm_met.tsv")
-  nam_file <- temp_test_path("name_harm_nam.tsv")
   cla_file <- temp_test_path("name_harm_cla.tsv")
   npc_file <- temp_test_path("name_harm_npc.tsv")
 
+  full_inchikey <- "IK4AAAAAAAAAA-BBBBBBBBBB-N"
+  inchikey_no_stereo <- "IK4AAAAAAAAAA-N"
+
   tidytable::fwrite(
     tidytable::tidytable(
+      structure_inchikey = full_inchikey,
       structure_inchikey_connectivity_layer = "IK4",
-      structure_smiles_no_stereo = "CCO"
+      structure_inchikey_no_stereo = inchikey_no_stereo,
+      structure_smiles = "CCO",
+      structure_smiles_no_stereo = "CCO",
+      structure_xlogp = "-3.0",
+      structure_name = c("SUCROSE", "sucrose"),
+      structure_tag = "clean"
     ),
     st_file,
     sep = "\t"
   )
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_inchikey_connectivity_layer = "IK4",
-      structure_smiles_no_stereo = "CCO",
+      structure_inchikey_no_stereo = inchikey_no_stereo,
       structure_exact_mass = "180.16",
-      structure_xlogp = "-3.0",
-      structure_tag = "clean",
       structure_molecular_formula = "C12H22O11"
     ),
     met_file,
@@ -451,16 +372,7 @@ test_that("name harmonization is case-insensitive within complement_metadata_str
   )
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_inchikey_connectivity_layer = c("IK4", "IK4"),
-      structure_smiles_no_stereo = c("CCO", "CCO"),
-      structure_name = c("SUCROSE", "sucrose")
-    ),
-    nam_file,
-    sep = "\t"
-  )
-  tidytable::fwrite(
-    tidytable::tidytable(
-      structure_inchikey_connectivity_layer = "IK4",
+      structure_inchikey = full_inchikey,
       structure_tax_cla_chemontid = "CHEMONTID:0000000",
       structure_tax_cla_01kin = "Organic compounds",
       structure_tax_cla_02sup = "Carbohydrates",
@@ -472,7 +384,7 @@ test_that("name harmonization is case-insensitive within complement_metadata_str
   )
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_smiles_no_stereo = "CCO",
+      structure_smiles = "CCO",
       structure_tax_npc_01pat = "Pathway",
       structure_tax_npc_02sup = "Superclass",
       structure_tax_npc_03cla = "Class"
@@ -485,7 +397,6 @@ test_that("name harmonization is case-insensitive within complement_metadata_str
     df,
     str_stereo = st_file,
     str_met = met_file,
-    str_nam = nam_file,
     str_tax_cla = cla_file,
     str_tax_npc = npc_file
   )
@@ -496,50 +407,48 @@ test_that("name harmonization is case-insensitive within complement_metadata_str
 
 test_that("metadata and names keyed by structure_inchikey are mapped via stereo", {
   df <- tidytable::tidytable(
-    candidate_structure_inchikey_connectivity_layer = "IK5-CONN",
+    candidate_structure_inchikey_connectivity_layer = "IK5AAAAABBBBBB",
     candidate_structure_smiles_no_stereo = "CNO"
   )
 
   st_file <- temp_test_path("inchikey_only_st.tsv")
   met_file <- temp_test_path("inchikey_only_met.tsv")
-  nam_file <- temp_test_path("inchikey_only_nam.tsv")
   cla_file <- temp_test_path("inchikey_only_cla.tsv")
   npc_file <- temp_test_path("inchikey_only_npc.tsv")
 
+  full_inchikey <- "IK5AAAAABBBBBB-CCCCCCCCCC-N"
+  inchikey_no_stereo <- "IK5AAAAABBBBBB-N"
+
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_inchikey = "IK5-FULL-KEY",
-      structure_inchikey_connectivity_layer = "IK5-CONN",
-      structure_smiles_no_stereo = "CNO"
+      structure_inchikey = full_inchikey,
+      structure_inchikey_connectivity_layer = "IK5AAAAABBBBBB",
+      structure_inchikey_no_stereo = inchikey_no_stereo,
+      structure_smiles = "C(=O)NO",
+      structure_smiles_no_stereo = "CNO",
+      structure_xlogp = "1.5",
+      structure_name = "MappedByInchikey",
+      structure_tag = "clean_lookup"
     ),
     st_file,
     sep = "\t"
   )
 
-  # Metadata + names intentionally keyed only by full inchikey.
+  # Metadata keyed by inchikey_no_stereo
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_inchikey = "IK5-FULL-KEY",
+      structure_inchikey_no_stereo = inchikey_no_stereo,
       structure_exact_mass = "250.12",
-      structure_xlogp = "1.5",
-      structure_tag = "clean_lookup",
       structure_molecular_formula = "C10H18N2O5"
     ),
     met_file,
     sep = "\t"
   )
-  tidytable::fwrite(
-    tidytable::tidytable(
-      structure_inchikey = "IK5-FULL-KEY",
-      structure_name = "MappedByInchikey"
-    ),
-    nam_file,
-    sep = "\t"
-  )
 
+  # ClassyFire keyed by full inchikey
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_inchikey_connectivity_layer = "IK5-CONN",
+      structure_inchikey = full_inchikey,
       structure_tax_cla_chemontid = "CHEMONTID:0000000",
       structure_tax_cla_01kin = "Organic compounds",
       structure_tax_cla_02sup = "Alkaloids",
@@ -549,9 +458,11 @@ test_that("metadata and names keyed by structure_inchikey are mapped via stereo"
     cla_file,
     sep = "\t"
   )
+
+  # NPClassifier keyed by structure_smiles (with stereo)
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_smiles_no_stereo = "CNO",
+      structure_smiles = "C(=O)NO",
       structure_tax_npc_01pat = "Pathway",
       structure_tax_npc_02sup = "Superclass",
       structure_tax_npc_03cla = "Class"
@@ -564,15 +475,14 @@ test_that("metadata and names keyed by structure_inchikey are mapped via stereo"
     df,
     str_stereo = st_file,
     str_met = met_file,
-    str_nam = nam_file,
     str_tax_cla = cla_file,
     str_tax_npc = npc_file
   )
 
   expect_equal(out$candidate_structure_exact_mass[[1]], "250.12")
   expect_equal(out$candidate_structure_molecular_formula[[1]], "C10H18N2O5")
-  ## xlogp is no longer enriched from library; it stays as the placeholder NA.
-  expect_true(is.na(out$candidate_structure_xlogp[[1]]))
+  ## xlogp is now enriched from stereo reference
+  expect_equal(out$candidate_structure_xlogp[[1]], "1.5")
   expect_equal(out$candidate_structure_tag[[1]], "clean_lookup")
   expect_equal(out$candidate_structure_name[[1]], "MappedByInchikey")
 })
@@ -587,42 +497,38 @@ test_that("complement_metadata_structures keeps existing taxonomy when lookup is
 
   st_file <- temp_test_path("st_placeholder.tsv")
   met_file <- temp_test_path("met_placeholder.tsv")
-  nam_file <- temp_test_path("nam_placeholder.tsv")
   cla_file <- temp_test_path("cla_placeholder.tsv")
   npc_file <- temp_test_path("npc_placeholder.tsv")
 
+  full_inchikey <- "IK_PLACEHOLDER-AAAAAAAAAA-N"
+  inchikey_no_stereo <- "IK_PLACEHOLDER-N"
+
   tidytable::fwrite(
     tidytable::tidytable(
+      structure_inchikey = full_inchikey,
       structure_inchikey_connectivity_layer = "IK_PLACEHOLDER",
-      structure_smiles_no_stereo = "CCO"
+      structure_inchikey_no_stereo = inchikey_no_stereo,
+      structure_smiles = "CCO",
+      structure_smiles_no_stereo = "CCO",
+      structure_xlogp = NA_character_,
+      structure_name = "",
+      structure_tag = ""
     ),
     st_file,
     sep = "\t"
   )
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_inchikey_connectivity_layer = "IK_PLACEHOLDER",
-      structure_smiles_no_stereo = "CCO",
+      structure_inchikey_no_stereo = inchikey_no_stereo,
       structure_molecular_formula = "C2H6O",
-      structure_exact_mass = "46.0419",
-      structure_xlogp = "-0.3",
-      structure_tag = ""
+      structure_exact_mass = "46.0419"
     ),
     met_file,
     sep = "\t"
   )
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_inchikey_connectivity_layer = "IK_PLACEHOLDER",
-      structure_smiles_no_stereo = "CCO",
-      structure_name = ""
-    ),
-    nam_file,
-    sep = "\t"
-  )
-  tidytable::fwrite(
-    tidytable::tidytable(
-      structure_inchikey_connectivity_layer = "IK_PLACEHOLDER",
+      structure_inchikey = full_inchikey,
       structure_tax_cla_chemontid = "CHEMONTID:0000000",
       structure_tax_cla_01kin = "Organic compounds",
       structure_tax_cla_02sup = "notClassified",
@@ -634,7 +540,7 @@ test_that("complement_metadata_structures keeps existing taxonomy when lookup is
   )
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_smiles_no_stereo = "CCO",
+      structure_smiles = "CCO",
       structure_tax_npc_01pat = "notClassified",
       structure_tax_npc_02sup = "empty",
       structure_tax_npc_03cla = ""
@@ -647,7 +553,6 @@ test_that("complement_metadata_structures keeps existing taxonomy when lookup is
     df,
     str_stereo = st_file,
     str_met = met_file,
-    str_nam = nam_file,
     str_tax_cla = cla_file,
     str_tax_npc = npc_file
   )
@@ -672,14 +577,12 @@ test_that("complement_metadata_structures normalizes empty existing values befor
 
   st_file <- temp_test_path("st_empty_existing.tsv")
   met_file <- temp_test_path("met_empty_existing.tsv")
-  nam_file <- temp_test_path("nam_empty_existing.tsv")
   cla_file <- temp_test_path("cla_empty_existing.tsv")
   npc_file <- temp_test_path("npc_empty_existing.tsv")
 
   .write_min_lookup_files(
     st_file = st_file,
     met_file = met_file,
-    nam_file = nam_file,
     cla_file = cla_file,
     npc_file = npc_file,
     inchikey = "IK_EMPTY",
@@ -695,15 +598,14 @@ test_that("complement_metadata_structures normalizes empty existing values befor
     df,
     str_stereo = st_file,
     str_met = met_file,
-    str_nam = nam_file,
     str_tax_cla = cla_file,
     str_tax_npc = npc_file
   )
 
   expect_equal(out$candidate_structure_exact_mass[[1L]], "45.08")
   expect_equal(out$candidate_structure_molecular_formula[[1L]], "C2H7N")
-  ## xlogp is no longer enriched from library; existing empty value stays.
-  expect_equal(out$candidate_structure_xlogp[[1L]], "")
+  ## xlogp is now enriched from stereo reference
+  expect_equal(out$candidate_structure_xlogp[[1L]], "-0.4")
   expect_equal(out$candidate_structure_tag[[1L]], "lookup_tag")
   expect_equal(out$candidate_structure_name[[1L]], "ethylamine")
 })
@@ -721,7 +623,6 @@ test_that("complement_metadata_structures converts placeholder existing values t
 
   st_file <- temp_test_path("st_no_lookup.tsv")
   met_file <- temp_test_path("met_no_lookup.tsv")
-  nam_file <- temp_test_path("nam_no_lookup.tsv")
   cla_file <- temp_test_path("cla_no_lookup.tsv")
   npc_file <- temp_test_path("npc_no_lookup.tsv")
 
@@ -729,7 +630,6 @@ test_that("complement_metadata_structures converts placeholder existing values t
   .write_min_lookup_files(
     st_file = st_file,
     met_file = met_file,
-    nam_file = nam_file,
     cla_file = cla_file,
     npc_file = npc_file,
     inchikey = "OTHER",
@@ -740,16 +640,16 @@ test_that("complement_metadata_structures converts placeholder existing values t
     df,
     str_stereo = st_file,
     str_met = met_file,
-    str_nam = nam_file,
     str_tax_cla = cla_file,
     str_tax_npc = npc_file
   )
 
   expect_true(is.na(out$candidate_structure_exact_mass[[1L]]))
   expect_true(is.na(out$candidate_structure_molecular_formula[[1L]]))
-  ## xlogp is no longer normalized/enriched here; the literal "NA" string
-  ## passes through unchanged (it is cleaned upstream in the pipeline).
-  expect_equal(out$candidate_structure_xlogp[[1L]], "NA")
+  ## xlogp: the literal "NA" string is normalized to NA by .normalize_enrichment_text
+  ## when no enriched value exists, the existing value goes through .pick_enrichment
+  ## which normalizes "NA" to NA_character_
+  expect_true(is.na(out$candidate_structure_xlogp[[1L]]))
   expect_true(is.na(out$candidate_structure_tag[[1L]]))
   expect_true(is.na(out$candidate_structure_name[[1L]]))
 })

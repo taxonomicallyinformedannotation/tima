@@ -54,7 +54,6 @@ test_that("test-prepare_annotations_mzmine validates output path", {
       output = c("a.tsv", "b.tsv"),
       str_stereo = s$stereo,
       str_met = s$met,
-      str_nam = s$nam,
       str_tax_cla = s$cla,
       str_tax_npc = s$npc
     ),
@@ -72,7 +71,6 @@ test_that("test-prepare_annotations_mzmine validates structure file paths", {
       output = out,
       str_stereo = temp_test_path("missing.tsv"),
       str_met = temp_test_path("missing.tsv"),
-      str_nam = temp_test_path("missing.tsv"),
       str_tax_cla = temp_test_path("missing.tsv"),
       str_tax_npc = temp_test_path("missing.tsv")
     ),
@@ -93,7 +91,6 @@ test_that("test-prepare_annotations_mzmine handles missing input files by creati
     output = out,
     str_stereo = s$stereo,
     str_met = s$met,
-    str_nam = s$nam,
     str_tax_cla = s$cla,
     str_tax_npc = s$npc
   )
@@ -126,7 +123,6 @@ test_that("test-prepare_annotations_mzmine processes minimal valid mzmine file",
     output = out,
     str_stereo = s$stereo,
     str_met = s$met,
-    str_nam = s$nam,
     str_tax_cla = s$cla,
     str_tax_npc = s$npc
   )
@@ -148,7 +144,6 @@ test_that("test-prepare_annotations_mzmine handles empty input vector", {
     output = out,
     str_stereo = s$stereo,
     str_met = s$met,
-    str_nam = s$nam,
     str_tax_cla = s$cla,
     str_tax_npc = s$npc
   )
@@ -193,7 +188,6 @@ test_that("test-prepare_annotations_mzmine handles multiple input files", {
     output = out,
     str_stereo = s$stereo,
     str_met = s$met,
-    str_nam = s$nam,
     str_tax_cla = s$cla,
     str_tax_npc = s$npc
   )

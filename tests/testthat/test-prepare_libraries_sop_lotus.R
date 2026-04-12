@@ -59,8 +59,14 @@ test_that("prepare_libraries_sop_lotus extracts 2D InChIKey from fixture", {
 
   df <- tidytable::fread(temp_output, colClasses = "character")
 
-  # 2D InChIKey should be first 14 characters
-  expect_true(all(nchar(df$structure_inchikey_connectivity_layer) == 14))
+  # structure_inchikey_connectivity_layer is set to NA by prepare_libraries_sop_lotus
+
+  # (recomputed from SMILES via process_smiles in split_tables_sop).
+  # After round-tripping through export_output/fread with colClasses="character",
+  # NA values become empty strings "".
+  expect_true("structure_inchikey_connectivity_layer" %in% names(df))
+  vals <- df$structure_inchikey_connectivity_layer
+  expect_true(all(is.na(vals) | vals == ""))
 })
 
 test_that("prepare_libraries_sop_lotus renames structure_nameTraditional", {

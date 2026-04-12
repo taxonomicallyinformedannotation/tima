@@ -13,9 +13,9 @@ test_that("validate_sop_merged_inputs accepts valid inputs", {
       value = "Test",
       output_key = temp_test_path("key.tsv"),
       output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_can = temp_test_path("can.tsv"),
       output_str_stereo = temp_test_path("stereo.tsv"),
       output_str_met = temp_test_path("met.tsv"),
-      output_str_nam = temp_test_path("nam.tsv"),
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     )
@@ -31,9 +31,9 @@ test_that("validate_sop_merged_inputs rejects invalid filter", {
       value = "Test",
       output_key = temp_test_path("key.tsv"),
       output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_can = temp_test_path("can.tsv"),
       output_str_stereo = temp_test_path("stereo.tsv"),
       output_str_met = temp_test_path("met.tsv"),
-      output_str_nam = temp_test_path("nam.tsv"),
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
@@ -51,9 +51,9 @@ test_that("validate_sop_merged_inputs rejects invalid level", {
       value = "Test",
       output_key = temp_test_path("key.tsv"),
       output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_can = temp_test_path("can.tsv"),
       output_str_stereo = temp_test_path("stereo.tsv"),
       output_str_met = temp_test_path("met.tsv"),
-      output_str_nam = temp_test_path("nam.tsv"),
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
@@ -137,9 +137,9 @@ test_that("test-validate_sop_merged_inputs accepts all valid taxonomic levels", 
           value = "TestValue",
           output_key = temp_test_path("key.tsv"),
           output_org_tax_ott = temp_test_path("org.tsv"),
+          output_str_can = temp_test_path("can.tsv"),
           output_str_stereo = temp_test_path("stereo.tsv"),
           output_str_met = temp_test_path("met.tsv"),
-          output_str_nam = temp_test_path("nam.tsv"),
           output_str_tax_cla = temp_test_path("cla.tsv"),
           output_str_tax_npc = temp_test_path("npc.tsv")
         )
@@ -159,9 +159,9 @@ test_that("test-validate_sop_merged_inputs rejects non-character output paths", 
       value = "Test",
       output_key = 123, # Invalid
       output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_can = temp_test_path("can.tsv"),
       output_str_stereo = temp_test_path("stereo.tsv"),
       output_str_met = temp_test_path("met.tsv"),
-      output_str_nam = temp_test_path("nam.tsv"),
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
@@ -179,9 +179,9 @@ test_that("test-validate_sop_merged_inputs rejects vector output paths", {
       value = "Test",
       output_key = temp_test_path("key.tsv"),
       output_org_tax_ott = c("org1.tsv", "org2.tsv"), # Invalid - vector
+      output_str_can = temp_test_path("can.tsv"),
       output_str_stereo = temp_test_path("stereo.tsv"),
       output_str_met = temp_test_path("met.tsv"),
-      output_str_nam = temp_test_path("nam.tsv"),
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
@@ -199,9 +199,9 @@ test_that("test-validate_sop_merged_inputs requires value when filtering", {
       value = 123, # Invalid - not character
       output_key = temp_test_path("key.tsv"),
       output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_can = temp_test_path("can.tsv"),
       output_str_stereo = temp_test_path("stereo.tsv"),
       output_str_met = temp_test_path("met.tsv"),
-      output_str_nam = temp_test_path("nam.tsv"),
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
@@ -220,9 +220,9 @@ test_that("test-validate_sop_merged_inputs accepts filter=FALSE without checking
       value = "Test",
       output_key = temp_test_path("key.tsv"),
       output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_can = temp_test_path("can.tsv"),
       output_str_stereo = temp_test_path("stereo.tsv"),
       output_str_met = temp_test_path("met.tsv"),
-      output_str_nam = temp_test_path("nam.tsv"),
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     )
@@ -238,9 +238,9 @@ test_that("test-validate_sop_merged_inputs rejects NULL filter", {
       value = "Test",
       output_key = temp_test_path("key.tsv"),
       output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_can = temp_test_path("can.tsv"),
       output_str_stereo = temp_test_path("stereo.tsv"),
       output_str_met = temp_test_path("met.tsv"),
-      output_str_nam = temp_test_path("nam.tsv"),
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
@@ -254,9 +254,9 @@ test_that("test-validate_sop_merged_inputs validates all output parameters", {
   output_params <- c(
     "output_key",
     "output_org_tax_ott",
+    "output_str_can",
     "output_str_stereo",
     "output_str_met",
-    "output_str_nam",
     "output_str_tax_cla",
     "output_str_tax_npc"
   )
@@ -271,9 +271,9 @@ test_that("test-validate_sop_merged_inputs validates all output parameters", {
         value = "Test",
         output_key = temp_test_path("key.tsv"),
         output_org_tax_ott = temp_test_path("org.tsv"),
+        output_str_can = temp_test_path("can.tsv"),
         output_str_stereo = temp_test_path("stereo.tsv"),
         output_str_met = temp_test_path("met.tsv"),
-        output_str_nam = temp_test_path("nam.tsv"),
         output_str_tax_cla = temp_test_path("cla.tsv"),
         output_str_tax_npc = temp_test_path("npc.tsv")
       )
@@ -491,9 +491,9 @@ test_that("test-prepare_libraries_sop_merged validates inputs before processing"
       value = "Test",
       output_key = "key.tsv",
       output_org_tax_ott = "org.tsv",
+      output_str_can = temp_test_path("can.tsv"),
       output_str_stereo = temp_test_path("stereo.tsv"),
       output_str_met = temp_test_path("met.tsv"),
-      output_str_nam = "nam.tsv",
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     ),
@@ -513,9 +513,9 @@ test_that("test-validate_sop_merged_inputs accepts empty value when filter=FALSE
       value = "", # Empty string OK when not filtering
       output_key = temp_test_path("key.tsv"),
       output_org_tax_ott = temp_test_path("org.tsv"),
+      output_str_can = temp_test_path("can.tsv"),
       output_str_stereo = temp_test_path("stereo.tsv"),
       output_str_met = temp_test_path("met.tsv"),
-      output_str_nam = temp_test_path("nam.tsv"),
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     )
@@ -610,9 +610,9 @@ test_that("prepare_libraries_sop_merged() runs without filtering", {
   # Output files
   output_key <- file.path(tmpdir, "keys.tsv")
   output_org <- file.path(tmpdir, "org_tax.tsv")
+  output_can <- file.path(tmpdir, "canonical.tsv")
   output_stereo <- file.path(tmpdir, "stereo.tsv")
   output_met <- file.path(tmpdir, "metadata.tsv")
-  output_nam <- file.path(tmpdir, "names.tsv")
   output_cla <- file.path(tmpdir, "classyfire.tsv")
   output_npc <- file.path(tmpdir, "npc.tsv")
 
@@ -629,9 +629,9 @@ test_that("prepare_libraries_sop_merged() runs without filtering", {
     filter = FALSE,
     output_key = output_key,
     output_org_tax_ott = output_org,
+    output_str_can = output_can,
     output_str_stereo = output_stereo,
     output_str_met = output_met,
-    output_str_nam = output_nam,
     output_str_tax_cla = output_cla,
     output_str_tax_npc = output_npc
   )
@@ -685,9 +685,9 @@ test_that("prepare_libraries_sop_merged() filters by taxonomy", {
 
   output_key <- file.path(tmpdir, "keys.tsv")
   output_org <- file.path(tmpdir, "org_tax.tsv")
+  output_can <- file.path(tmpdir, "canonical.tsv")
   output_stereo <- file.path(tmpdir, "stereo.tsv")
   output_met <- file.path(tmpdir, "metadata.tsv")
-  output_nam <- file.path(tmpdir, "names.tsv")
   output_cla <- file.path(tmpdir, "classyfire.tsv")
   output_npc <- file.path(tmpdir, "npc.tsv")
 
@@ -705,9 +705,9 @@ test_that("prepare_libraries_sop_merged() filters by taxonomy", {
     value = "Fam1",
     output_key = output_key,
     output_org_tax_ott = output_org,
+    output_str_can = output_can,
     output_str_stereo = output_stereo,
     output_str_met = output_met,
-    output_str_nam = output_nam,
     output_str_tax_cla = output_cla,
     output_str_tax_npc = output_npc
   )
@@ -805,9 +805,9 @@ test_that("prepare_libraries_sop_merged() merges multiple input files", {
 
   output_key <- file.path(tmpdir, "keys.tsv")
   output_org <- file.path(tmpdir, "org_tax.tsv")
+  output_can <- file.path(tmpdir, "canonical.tsv")
   output_stereo <- file.path(tmpdir, "stereo.tsv")
   output_met <- file.path(tmpdir, "metadata.tsv")
-  output_nam <- file.path(tmpdir, "names.tsv")
   output_cla <- file.path(tmpdir, "classyfire.tsv")
   output_npc <- file.path(tmpdir, "npc.tsv")
 
@@ -823,9 +823,9 @@ test_that("prepare_libraries_sop_merged() merges multiple input files", {
     filter = FALSE,
     output_key = output_key,
     output_org_tax_ott = output_org,
+    output_str_can = output_can,
     output_str_stereo = output_stereo,
     output_str_met = output_met,
-    output_str_nam = output_nam,
     output_str_tax_cla = output_cla,
     output_str_tax_npc = output_npc
   )

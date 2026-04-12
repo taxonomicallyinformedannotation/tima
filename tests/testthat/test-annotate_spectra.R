@@ -388,14 +388,14 @@ test_that("NA fallback for smiles is applied", {
     c(
       "BEGIN IONS",
       "TITLE=MetaMissing",
-      "PEPMASS=320",
+      "PEPMASS=200",
       "CHARGE=1+",
       "NAME=Example",
       "SMILES=CCO",
       "MSLEVEL=2",
-      "160 100",
-      "240 200",
-      "320 300",
+      "100 100",
+      "150 200",
+      "200 300",
       "END IONS",
       ""
     ),
@@ -408,9 +408,11 @@ test_that("NA fallback for smiles is applied", {
   )
   df <- tidytable::fread(out)
   expect_true("candidate_structure_smiles_no_stereo" %in% names(df))
+  # Filter out placeholder/template rows (no similarity score)
+  actual <- df[!is.na(df$candidate_score_similarity), ]
   # SMILES fallback should use target_smiles when target_smiles_no_stereo is NA
-  if (nrow(df) > 0L) {
-    expect_true(!anyNA(df$candidate_structure_smiles_no_stereo))
+  if (nrow(actual) > 0L) {
+    expect_true(!anyNA(actual$candidate_structure_smiles_no_stereo))
   }
 })
 

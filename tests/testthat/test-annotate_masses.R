@@ -27,10 +27,6 @@ setup_minimal_fixtures <- function() {
       "structures_metadata_minimal.csv",
       file.path(temp_dir, "str_met.csv")
     ),
-    str_nam = copy_fixture_to(
-      "structures_names_minimal.csv",
-      file.path(temp_dir, "str_nam.csv")
-    ),
     str_tax_cla = copy_fixture_to(
       "structures_taxonomy_cla_minimal.csv",
       file.path(temp_dir, "str_tax_cla.csv")
@@ -58,7 +54,6 @@ test_that("annotate_masses validates ms_mode correctly", {
       library = fixtures$library,
       str_stereo = fixtures$str_stereo,
       str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc,
       ms_mode = "invalid_mode"
@@ -75,7 +70,6 @@ test_that("annotate_masses validates ms_mode correctly", {
       library = fixtures$library,
       str_stereo = fixtures$str_stereo,
       str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc,
       ms_mode = ""
@@ -102,7 +96,6 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
       library = fixtures$library,
       str_stereo = fixtures$str_stereo,
       str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc
     ),
@@ -120,7 +113,6 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
       library = fixtures$library,
       str_stereo = fixtures$str_stereo,
       str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc
     ),
@@ -138,7 +130,6 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
       library = fixtures$library,
       str_stereo = fixtures$str_stereo,
       str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc
     ),
@@ -155,7 +146,6 @@ test_that("annotate_masses validates tolerance_ppm correctly", {
       library = fixtures$library,
       str_stereo = fixtures$str_stereo,
       str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc
     ),
@@ -176,7 +166,6 @@ test_that("annotate_masses validates tolerance_rt correctly", {
       library = fixtures$library,
       str_stereo = fixtures$str_stereo,
       str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc,
       tolerance_rt = -0.01,
@@ -194,7 +183,6 @@ test_that("annotate_masses validates tolerance_rt correctly", {
       library = fixtures$library,
       str_stereo = fixtures$str_stereo,
       str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc,
       tolerance_rt = 1.0,
@@ -217,7 +205,6 @@ test_that("annotate_masses validates adducts_list structure", {
       library = fixtures$library,
       str_stereo = fixtures$str_stereo,
       str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc,
       adducts_list = list(neg = c("[M-H]-")),
@@ -237,7 +224,6 @@ test_that("annotate_masses validates adducts_list structure", {
       library = fixtures$library,
       str_stereo = fixtures$str_stereo,
       str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc,
       adducts_list = list(pos = NULL),
@@ -257,7 +243,6 @@ test_that("annotate_masses validates adducts_list structure", {
       library = fixtures$library,
       str_stereo = fixtures$str_stereo,
       str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc,
       adducts_list = c("[M+H]+"),
@@ -281,7 +266,6 @@ test_that("annotate_masses validates clusters_list structure", {
       library = fixtures$library,
       str_stereo = fixtures$str_stereo,
       str_met = fixtures$str_met,
-      str_nam = fixtures$str_nam,
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc,
       adducts_list = list(pos = c("[M+H]+")),
@@ -305,7 +289,6 @@ test_that("annotate_masses validates file existence", {
       library = tempfile(),
       str_stereo = tempfile(),
       str_met = tempfile(),
-      str_nam = tempfile(),
       str_tax_cla = tempfile(),
       str_tax_npc = tempfile(),
       adducts_list = list(pos = c("[M+H]+")),
@@ -347,7 +330,6 @@ test_that("annotate_masses returns empty outputs for an empty features table", {
     library = "library.tsv",
     str_stereo = "stereo.tsv",
     str_met = "metadata.tsv",
-    str_nam = "names.tsv",
     str_tax_cla = "cla.tsv",
     str_tax_npc = "npc.tsv",
     output_annotations = "annotations.tsv",
@@ -391,7 +373,6 @@ test_that("annotate_masses handles empty features table", {
       library = env$library,
       str_stereo = env$str_stereo,
       str_met = env$str_met,
-      str_nam = env$str_nam,
       str_tax_cla = env$str_tax_cla,
       str_tax_npc = env$str_tax_npc,
       adducts_list = list(pos = c("[M+H]+")),
@@ -426,7 +407,6 @@ test_that("annotate_masses handles features without RT column", {
       library = env$library,
       str_stereo = env$str_stereo,
       str_met = env$str_met,
-      str_nam = env$str_nam,
       str_tax_cla = env$str_tax_cla,
       str_tax_npc = env$str_tax_npc,
       adducts_list = list(pos = c("[M+H]+")),
@@ -463,7 +443,6 @@ test_that("annotate_masses produces expected output structure", {
     library = env$library,
     str_stereo = env$str_stereo,
     str_met = env$str_met,
-    str_nam = env$str_nam,
     str_tax_cla = env$str_tax_cla,
     str_tax_npc = env$str_tax_npc,
     adducts_list = list(
@@ -528,7 +507,6 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
     library = env$library,
     str_stereo = env$str_stereo,
     str_met = env$str_met,
-    str_nam = env$str_nam,
     str_tax_cla = env$str_tax_cla,
     str_tax_npc = env$str_tax_npc,
     adducts_list = list(pos = c("[M+H]+")),
@@ -579,7 +557,6 @@ test_that("annotate_masses correctly handles isotopes [M1+H]+ and [M2+H]+", {
     library = env$library,
     str_stereo = env$str_stereo,
     str_met = env$str_met,
-    str_nam = env$str_nam,
     str_tax_cla = env$str_tax_cla,
     str_tax_npc = env$str_tax_npc,
     adducts_list = list(pos = c("[M+H]+", "[M1+H]+", "[M2+H]+")),
