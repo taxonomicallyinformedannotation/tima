@@ -232,12 +232,12 @@ split_tables_sop <- function(table, cache) {
       data.table::uniqueN(multi$structure_inchikey),
       nrow(multi)
     )
-    multi <- multi[
-      ,
+    multi <- multi[,
       .(
         structure_smiles = structure_smiles[1L],
-        structure_inchikey_connectivity_layer =
-          structure_inchikey_connectivity_layer[1L],
+        structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer[
+          1L
+        ],
         structure_inchikey_no_stereo = structure_inchikey_no_stereo[1L],
         structure_smiles_no_stereo = structure_smiles_no_stereo[1L],
         structure_xlogp = {
@@ -250,13 +250,21 @@ split_tables_sop <- function(table, cache) {
           vals <- vals[nzchar(vals)]
           keys <- tolower(vals)
           vals <- vals[!duplicated(keys)]
-          if (length(vals) == 0L) NA_character_ else paste(vals, collapse = " $ ")
+          if (length(vals) == 0L) {
+            NA_character_
+          } else {
+            paste(vals, collapse = " $ ")
+          }
         },
         structure_tag = {
           vals <- structure_tag[!is.na(structure_tag)]
           vals <- trimws(vals)
           vals <- unique(vals[nzchar(vals)])
-          if (length(vals) == 0L) NA_character_ else paste(vals, collapse = " $ ")
+          if (length(vals) == 0L) {
+            NA_character_
+          } else {
+            paste(vals, collapse = " $ ")
+          }
         }
       ),
       by = "structure_inchikey"
@@ -333,12 +341,15 @@ split_tables_sop <- function(table, cache) {
   npc_multi <- dt_npc[.n_grp > 1L]
   npc_multi[, .n_grp := NULL]
   if (nrow(npc_multi) > 0L) {
-    npc_multi <- npc_multi[
-      ,
+    npc_multi <- npc_multi[,
       lapply(.SD, function(x) {
         vals <- unique(trimws(stats::na.omit(x)))
         vals <- vals[nzchar(vals)]
-        if (length(vals) == 0L) "notClassified" else paste(vals, collapse = " $ ")
+        if (length(vals) == 0L) {
+          "notClassified"
+        } else {
+          paste(vals, collapse = " $ ")
+        }
       }),
       by = "structure_smiles",
       .SDcols = npc_cols
@@ -388,12 +399,15 @@ split_tables_sop <- function(table, cache) {
   cla_multi <- dt_cla[.n_grp > 1L]
   cla_multi[, .n_grp := NULL]
   if (nrow(cla_multi) > 0L) {
-    cla_multi <- cla_multi[
-      ,
+    cla_multi <- cla_multi[,
       lapply(.SD, function(x) {
         vals <- unique(trimws(stats::na.omit(x)))
         vals <- vals[nzchar(vals)]
-        if (length(vals) == 0L) "notClassified" else paste(vals, collapse = " $ ")
+        if (length(vals) == 0L) {
+          "notClassified"
+        } else {
+          paste(vals, collapse = " $ ")
+        }
       }),
       by = "structure_inchikey",
       .SDcols = cla_cols

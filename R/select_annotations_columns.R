@@ -38,7 +38,8 @@ select_annotations_columns <- function(
   str_stereo,
   str_met,
   str_tax_cla,
-  str_tax_npc
+  str_tax_npc,
+  cache = NULL
 ) {
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
@@ -56,6 +57,15 @@ select_annotations_columns <- function(
     str_tax_cla = str_tax_cla,
     str_tax_npc = str_tax_npc
   ))
+
+  # Derive SMILES cache path from str_stereo if not explicitly provided
+  if (is.null(cache)) {
+    cache <- file.path(dirname(str_stereo), "processed.csv.gz")
+    if (!file.exists(cache)) {
+      log_debug("SMILES cache not found at: %s", cache)
+      cache <- NULL
+    }
+  }
 
   log_debug("Input: %d rows, %d columns", nrow(df), ncol(df))
 
@@ -94,7 +104,7 @@ select_annotations_columns <- function(
   # InChIKey, InChIKey connectivity layer, InChIKey no stereo, formula,
   # exact_mass, xlogp) in one shot.  Each unique SMILES is converted once
   # thanks to the caching inside process_smiles().
-  df <- recompute_structure_fields_from_smiles(df)
+  df <- recompute_structure_fields_from_smiles(df, cache = cache)
 
   df <- df |>
     # Round numeric values
@@ -152,7 +162,7 @@ select_annotations_columns <- function(
 #'     RDKit-derived values.
 #'
 #' @keywords internal
-recompute_structure_fields_from_smiles <- function(df) {
+recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
   smiles_col <- "candidate_structure_smiles_no_stereo"
 
   # Nothing to do if no SMILES column or all NA
@@ -178,7 +188,7 @@ recompute_structure_fields_from_smiles <- function(df) {
   )
 
   processed <- tryCatch(
-    process_smiles(smiles_df, cache = NULL),
+    process_smiles(smiles_df, cache = cache),
     error = function(e) {
       log_warn(
         "SMILES recomputation failed: %s; keeping original values",
