@@ -64,8 +64,8 @@ data:
               path: data/interim/libraries/sop/merged/structures/taxonomies
               cla: data/interim/libraries/sop/merged/structures/taxonomies/classyfire.tsv.gz
               npc: data/interim/libraries/sop/merged/structures/taxonomies/npc.tsv.gz
-              additional_cla: data/interim/libraries/sop/merged/structures/taxonomies/classyfire_cache.csv
-              additional_npc: data/interim/libraries/sop/merged/structures/taxonomies/npclassifier_cache.csv
+              c: data/interim/libraries/sop/merged/structures/taxonomies/classyfire_cache.csv
+              n: data/interim/libraries/sop/merged/structures/taxonomies/npclassifier_cache.csv
       spectra:
         path: data/interim/libraries/spectra
         exp:

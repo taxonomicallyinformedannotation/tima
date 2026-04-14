@@ -11,10 +11,10 @@ prepare_libraries_sop_merged(
   value = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$value,
   cache = get_params(step =
     "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$processed,
-  additional_npc_cache = get_params(step =
-    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$additional_npc,
-  additional_cla_cache = get_params(step =
-    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$additional_cla,
+  npc_cache = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$n,
+  cla_cache = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$c,
   output_key = get_params(step =
     "prepare_libraries_sop_merged")$files$libraries$sop$merged$keys,
   output_org_tax_ott = get_params(step =
@@ -44,7 +44,7 @@ e.g., 'Gentianaceae|Apocynaceae')}
 
 \item{cache}{\link{character} Character string path to cache directory for processed SMILES}
 
-\item{additional_npc_cache}{\link{character} Optional path to an additional NPClassifier
+\item{npc_cache}{\link{character} Optional path to an additional NPClassifier
 taxonomy cache file (TSV/TSV.gz). Structures present in the merged library
 but missing NPClassifier taxonomy will be looked up in this cache. Expected
 columns: \code{structure_smiles}, \code{structure_tax_npc_01pat},
@@ -52,7 +52,7 @@ columns: \code{structure_smiles}, \code{structure_tax_npc_01pat},
 names from external tools (e.g., \code{pathway}, \code{superclass}, \code{class}) are also
 supported.}
 
-\item{additional_cla_cache}{\link{character} Optional path to an additional ClassyFire
+\item{cla_cache}{\link{character} Optional path to an additional ClassyFire
 taxonomy cache file (TSV/TSV.gz). Structures present in the merged library
 but missing ClassyFire taxonomy will be looked up in this cache. Expected
 columns: \code{structure_inchikey}, \code{structure_tax_cla_chemontid},

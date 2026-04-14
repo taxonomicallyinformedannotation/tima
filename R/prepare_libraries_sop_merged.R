@@ -601,14 +601,14 @@ enrich_taxonomy_from_cache <- function(
 #' @param value [character] Character string taxon name(s) to keep (can use | for multiple,
 #'     e.g., 'Gentianaceae|Apocynaceae')
 #' @param cache [character] Character string path to cache directory for processed SMILES
-#' @param additional_npc_cache [character] Optional path to an additional NPClassifier
+#' @param npc_cache [character] Optional path to an additional NPClassifier
 #'   taxonomy cache file (TSV/TSV.gz). Structures present in the merged library
 #'   but missing NPClassifier taxonomy will be looked up in this cache. Expected
 #'   columns: `structure_smiles`, `structure_tax_npc_01pat`,
 #'   `structure_tax_npc_02sup`, `structure_tax_npc_03cla`. Alternative column
 #'   names from external tools (e.g., `pathway`, `superclass`, `class`) are also
 #'   supported.
-#' @param additional_cla_cache [character] Optional path to an additional ClassyFire
+#' @param cla_cache [character] Optional path to an additional ClassyFire
 #'   taxonomy cache file (TSV/TSV.gz). Structures present in the merged library
 #'   but missing ClassyFire taxonomy will be looked up in this cache. Expected
 #'   columns: `structure_inchikey`, `structure_tax_cla_chemontid`,
@@ -659,12 +659,12 @@ prepare_libraries_sop_merged <- function(
   cache = get_params(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$structures$processed,
-  additional_npc_cache = get_params(
+  npc_cache = get_params(
     step = "prepare_libraries_sop_merged"
-  )$files$libraries$sop$merged$structures$taxonomies$additional_npc,
-  additional_cla_cache = get_params(
+  )$files$libraries$sop$merged$structures$taxonomies$n,
+  cla_cache = get_params(
     step = "prepare_libraries_sop_merged"
-  )$files$libraries$sop$merged$structures$taxonomies$additional_cla,
+  )$files$libraries$sop$merged$structures$taxonomies$c,
   output_key = get_params(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$keys,
@@ -736,9 +736,9 @@ prepare_libraries_sop_merged <- function(
 
   # NPClassifier: keyed by structure_smiles
   if (
-    !is.null(additional_npc_cache) &&
-      length(additional_npc_cache) == 1L &&
-      nzchar(additional_npc_cache)
+    !is.null(npc_cache) &&
+      length(npc_cache) == 1L &&
+      nzchar(npc_cache)
   ) {
     all_smiles <- table_structures_stereo |>
       tidytable::filter(!is.na(structure_smiles)) |>
@@ -747,7 +747,7 @@ prepare_libraries_sop_merged <- function(
 
     table_structures_taxonomy_npc <- enrich_taxonomy_from_cache(
       taxonomy_table = table_structures_taxonomy_npc,
-      cache_path = additional_npc_cache,
+      cache_path = npc_cache,
       key_col = "structure_smiles",
       all_keys = all_smiles,
       col_mapping = list(
@@ -771,9 +771,9 @@ prepare_libraries_sop_merged <- function(
 
   # ClassyFire: keyed by structure_inchikey
   if (
-    !is.null(additional_cla_cache) &&
-      length(additional_cla_cache) == 1L &&
-      nzchar(additional_cla_cache)
+    !is.null(cla_cache) &&
+      length(cla_cache) == 1L &&
+      nzchar(cla_cache)
   ) {
     all_inchikeys <- table_keys |>
       tidytable::filter(!is.na(structure_inchikey)) |>
@@ -782,7 +782,7 @@ prepare_libraries_sop_merged <- function(
 
     table_structures_taxonomy_cla <- enrich_taxonomy_from_cache(
       taxonomy_table = table_structures_taxonomy_cla,
-      cache_path = additional_cla_cache,
+      cache_path = cla_cache,
       key_col = "structure_inchikey",
       all_keys = all_inchikeys,
       col_mapping = list(

@@ -102,12 +102,12 @@ files:
             #' Additional ClassyFire taxonomy cache to supplement library data.
             #' Structures in the merged library without ClassyFire taxonomy will
             #' be looked up here. Leave empty to skip. STRING
-            additional_cla: data/interim/libraries/sop/merged/structures/taxonomies/classyfire_cache.csv
+            c: data/interim/libraries/sop/merged/structures/taxonomies/classyfire_cache.csv
 
             #' Additional NPClassifier taxonomy cache to supplement library data.
             #' Structures in the merged library without NPClassifier taxonomy
             #' will be looked up here. Leave empty to skip. STRING
-            additional_npc: data/interim/libraries/sop/merged/structures/taxonomies/npclassifier_cache.csv
+            n: data/interim/libraries/sop/merged/structures/taxonomies/npclassifier_cache.csv
 
 #' Organisms related parameters.
 organisms:

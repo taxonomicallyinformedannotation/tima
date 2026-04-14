@@ -111,8 +111,8 @@ prepare_params <- function(
   fil_lib_sop_mer_str_met <- params_advanced$files$libraries$sop$merged$structures$metadata
   fil_lib_sop_mer_str_tax_cla <- params_advanced$files$libraries$sop$merged$structures$taxonomies$cla
   fil_lib_sop_mer_str_tax_npc <- params_advanced$files$libraries$sop$merged$structures$taxonomies$npc
-  fil_lib_sop_mer_str_tax_add_cla <- params_advanced$files$libraries$sop$merged$structures$taxonomies$additional_cla
-  fil_lib_sop_mer_str_tax_add_npc <- params_advanced$files$libraries$sop$merged$structures$taxonomies$additional_npc
+  fil_lib_sop_mer_str_tax_add_cla <- params_advanced$files$libraries$sop$merged$structures$taxonomies$c
+  fil_lib_sop_mer_str_tax_add_npc <- params_advanced$files$libraries$sop$merged$structures$taxonomies$n
 
   # Extract file paths - spectral libraries
   fil_lib_spe_neg <- params_advanced$files$libraries$spectral$neg
@@ -551,9 +551,9 @@ prepare_params <- function(
     fil_lib_sop_mer_str_tax_cla
   yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$taxonomies$npc <-
     fil_lib_sop_mer_str_tax_npc
-  yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$taxonomies$additional_cla <-
+  yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$taxonomies$cla_c <-
     fil_lib_sop_mer_str_tax_add_cla
-  yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$taxonomies$additional_npc <-
+  yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$taxonomies$npc_c <-
     fil_lib_sop_mer_str_tax_add_npc
   yamls_params$prepare_libraries_sop_merged$organisms$filter$mode <-
     org_fil_mod

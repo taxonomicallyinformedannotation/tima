@@ -1061,7 +1061,7 @@ test_that("prepare_libraries_sop_merged() enriches taxonomy from additional cach
     structure_tax_npc_02sup = c("SuperB"),
     structure_tax_npc_03cla = c("ClassB")
   )
-  npc_cache_path <- file.path(tmpdir, "additional_npc.tsv")
+  npc_cache_path <- file.path(tmpdir, "n.tsv")
   tidytable::fwrite(npc_cache, npc_cache_path, sep = "\t")
 
   # Create additional CLA cache that has taxonomy for "CC"'s real InChIKey
@@ -1074,7 +1074,7 @@ test_that("prepare_libraries_sop_merged() enriches taxonomy from additional cach
     structure_tax_cla_03cla = c("Amines"),
     structure_tax_cla_04dirpar = c("Primary amines")
   )
-  cla_cache_path <- file.path(tmpdir, "additional_cla.tsv")
+  cla_cache_path <- file.path(tmpdir, "c.tsv")
   tidytable::fwrite(cla_cache, cla_cache_path, sep = "\t")
 
   output_key <- file.path(tmpdir, "keys.tsv")
@@ -1094,8 +1094,8 @@ test_that("prepare_libraries_sop_merged() enriches taxonomy from additional cach
   result <- prepare_libraries_sop_merged(
     files = input_file,
     filter = FALSE,
-    additional_npc_cache = npc_cache_path,
-    additional_cla_cache = cla_cache_path,
+    npc_cache = npc_cache_path,
+    cla_cache = cla_cache_path,
     output_key = output_key,
     output_org_tax_ott = output_org,
     output_str_can = output_can,
