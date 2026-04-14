@@ -444,6 +444,22 @@ test_that("parse_adduct handles extra whitespace", {
   expect_false(all(result == 0))
 })
 
+test_that("parse_adduct handles internal whitespace", {
+  # [M + K]+ should parse the same as [M+K]+
+  result_spaces <- parse_adduct("[M + K]+")
+  result_no_spaces <- parse_adduct("[M+K]+")
+
+  expect_equal(result_spaces, result_no_spaces)
+  expect_equal(result_spaces[["n_mer"]], 1)
+  expect_false(all(result_spaces == 0))
+
+  # [M + H]+ should parse the same as [M+H]+
+  result_spaces2 <- parse_adduct("[M + H]+")
+  result_no_spaces2 <- parse_adduct("[M+H]+")
+
+  expect_equal(result_spaces2, result_no_spaces2)
+})
+
 test_that("parse_adduct handles completely invalid adduct strings", {
   # These should return all zeros because they completely fail parsing
   invalid_adducts <- c(

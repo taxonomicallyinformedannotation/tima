@@ -98,6 +98,10 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
     #   "feature_pred_tax_cla_01kin_score" = 0
     # )) |>
     tidytable::distinct()
+  # Normalize SIRIUS adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
+  if ("candidate_adduct" %in% names(df)) {
+    df[["candidate_adduct"]] <- gsub("\\s+", "", df[["candidate_adduct"]])
+  }
   return(df)
 }
 
@@ -160,6 +164,10 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
         )
       )
     )
+  # Normalize SIRIUS adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
+  if ("candidate_adduct" %in% names(df)) {
+    df[["candidate_adduct"]] <- gsub("\\s+", "", df[["candidate_adduct"]])
+  }
   return(df)
 }
 
@@ -225,6 +233,10 @@ select_sirius_columns_structures <- function(df, sirius_version) {
       candidate_structure_tax_cla_03cla = NA_character_,
       candidate_structure_tax_cla_04dirpar = NA_character_
     ))
+  # Normalize SIRIUS adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
+  if ("candidate_adduct" %in% names(df)) {
+    df[["candidate_adduct"]] <- gsub("\\s+", "", df[["candidate_adduct"]])
+  }
   return(df)
 }
 
@@ -315,7 +327,7 @@ select_sirius_columns_spectral <- function(df, sirius_version) {
       "SIRIUS spectral (analog)",
       "SIRIUS spectral"
     ),
-    candidate_adduct = .get_col_or_na(df, "referenceAdduct"),
+    candidate_adduct = gsub("\\s+", "", .get_col_or_na(df, "referenceAdduct")),
     candidate_structure_error_mz = raw_mz_dev,
     candidate_spectrum_id = .get_col_or_na(df, "referenceSplash"),
     candidate_structure_name = .get_col_or_na(df, "referenceName"),

@@ -72,6 +72,9 @@ harmonize_adducts <- function(
   # Harmonize Adducts ----
   n_unique_before <- count_unique_values(df[[adducts_colname]])
 
+  # Normalize internal spaces (e.g., "[M + K]+" -> "[M+K]+")
+  df[[adducts_colname]] <- gsub("\\s+", "", df[[adducts_colname]])
+
   .escape_regex <- function(x) {
     stringi::stri_replace_all_regex(
       x,

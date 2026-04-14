@@ -91,6 +91,11 @@ select_annotations_columns <- function(
       )
     )
 
+  # Normalize adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
+  if ("candidate_adduct" %in% names(df)) {
+    df[["candidate_adduct"]] <- gsub("\\s+", "", df[["candidate_adduct"]])
+  }
+
   # Clean NULL/NA sentinels in one pass while preserving current output semantics.
   character_cols <- names(df)[vapply(df, is.character, logical(1L))]
   if (length(character_cols) > 0L) {

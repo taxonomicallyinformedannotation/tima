@@ -272,6 +272,20 @@ test_that("harmonize_adducts handles brackets in original", {
   expect_equal(result$adduct, c("[M+H]+", "[M+Na]+"))
 })
 
+test_that("harmonize_adducts normalizes internal spaces", {
+  # Adducts with spaces like [M + K]+ should be normalized to [M+K]+
+  df <- data.frame(adduct = c("[M + H]+", "[M + K]+", "[M + Na]+", "M + H"))
+  trans <- c(
+    "M+H" = "[M+H]+",
+    "M+K" = "[M+K]+",
+    "M+Na" = "[M+Na]+"
+  )
+
+  result <- harmonize_adducts(df, adducts_translations = trans)
+
+  expect_equal(result$adduct, c("[M+H]+", "[M+K]+", "[M+Na]+", "[M+H]+"))
+})
+
 ## Tidytable Compatibility ----
 
 test_that("harmonize_adducts works with tidytable", {

@@ -249,8 +249,11 @@ validate_adduct_string <- function(adduct_string) {
 #' Match adduct string against regex pattern
 #' @keywords internal
 match_adduct_regex <- function(adduct_string, regex) {
-  # Strip leading and trailing whitespace before matching
-  adduct_string <- trimws(adduct_string)
+  # Remove comments first (they rely on space before parens to be detected)
+  adduct_string <- remove_comments(adduct_string)
+  # Then strip all remaining whitespace (internal spaces cause mismatches
+  # like [M + K]+ vs [M+K]+)
+  adduct_string <- gsub("\\s+", "", adduct_string)
 
   matches <- tryCatch(
     {
