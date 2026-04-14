@@ -2,6 +2,7 @@
 #'
 #' @description Standardize SOP columns: structures, taxonomy, organism fields.
 #'
+#' @include columns_utils.R
 #' @include validations_utils.R
 #'
 #' @param df [data.frame] Data frame containing structure-organism pair data.
@@ -58,5 +59,10 @@ select_sop_columns <- function(df) {
       organism_taxonomy_09species,
       organism_taxonomy_10varietas,
       reference_doi
+    ) |>
+    tidytable::mutate(
+      structure_tax_cla_chemontid = normalize_chemontid(
+        structure_tax_cla_chemontid
+      )
     )
 }

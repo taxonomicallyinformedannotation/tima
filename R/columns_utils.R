@@ -358,3 +358,35 @@ fake_sop_columns <- function() {
     reference_doi = NA_character_
   )
 }
+
+#' Normalize ClassyFire chemontid values
+#'
+#' @description Normalizes chemontid values to the canonical format
+#'   `CHEMONTID:NNNNNNN` (prefix + 7-digit zero-padded number). Handles
+#'   inputs with or without the `CHEMONTID:` prefix and with inconsistent
+#'   zero-padding (e.g., `2011` vs `0002011` vs `CHEMONTID:0002011`).
+#'
+#' @param x Character vector of chemontid values
+#'
+#' @return Character vector with normalized chemontid values in the format
+#'   `CHEMONTID:NNNNNNN`. `NA` values are preserved.
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' normalize_chemontid(c("CHEMONTID:0002011", "2011", "0002011", NA))
+#' # => c("CHEMONTID:0002011", "CHEMONTID:0002011", "CHEMONTID:0002011", NA)
+#' }
+normalize_chemontid <- function(x) {
+  x <- as.character(x)
+  # Strip "CHEMONTID:" or "CHEMONT:" prefix if present (case-insensitive)
+  stripped <- sub("^CHEMONT(ID)?:", "", x, ignore.case = TRUE)
+  # Zero-pad the numeric part to 7 digits and add the canonical prefix
+  is_numeric <- !is.na(stripped) & grepl("^[0-9]+$", stripped)
+  x[is_numeric] <- paste0(
+    "CHEMONTID:",
+    sprintf("%07d", as.integer(stripped[is_numeric]))
+  )
+  x
+}

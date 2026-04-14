@@ -335,6 +335,80 @@ enrich_taxonomy_from_cache <- function(
     }
   }
 
+  # Normalize chemontid values to prevent duplicates from inconsistent
+  # formatting (e.g., "2011" vs "0002011" vs "CHEMONTID:0002011")
+  chemontid_col <- "structure_tax_cla_chemontid"
+  if (chemontid_col %in% names(cache_data)) {
+    cache_data[[chemontid_col]] <- normalize_chemontid(
+      cache_data[[chemontid_col]]
+    )
+  }
+  if (
+    !is.null(taxonomy_table) &&
+      nrow(taxonomy_table) > 0 &&
+      chemontid_col %in% names(taxonomy_table)
+  ) {
+    taxonomy_table[[chemontid_col]] <- normalize_chemontid(
+      taxonomy_table[[chemontid_col]]
+    )
+  }
+
+  # Determine expected columns for the cache
+  expected_cols <- if (!is.null(taxonomy_table) && ncol(taxonomy_table) > 0) {
+    names(taxonomy_table)
+  } else {
+    intersect(names(cache_data), names(cache_data))
+  }
+
+  # Normalize cache file on disk: harmonize column names, drop extra columns,
+  # strip "notClassified", and normalize chemontid. This runs on every read so
+  # the cache file converges to a clean internal format even when no enrichment
+  # is needed (i.e., before early returns).
+  tryCatch(
+    {
+      cache_clean <- cache_data |>
+        tidytable::select(tidyselect::any_of(expected_cols)) |>
+        tidytable::mutate(
+          tidytable::across(
+            tidyselect::everything(),
+            ~ {
+              x <- as.character(.x)
+              x[!is.na(x) & x == "notClassified"] <- NA_character_
+              x
+            }
+          )
+        ) |>
+        tidytable::distinct()
+
+      compress_method <- if (grepl("\\.gz$", cache_path, ignore.case = TRUE)) {
+        "gzip"
+      } else {
+        "none"
+      }
+      tidytable::fwrite(
+        cache_clean,
+        file = cache_path,
+        sep = "\t",
+        na = "",
+        compress = compress_method,
+        showProgress = FALSE
+      )
+      log_debug(
+        "Normalized %s cache file (%d entries): %s",
+        taxonomy_name,
+        nrow(cache_clean),
+        cache_path
+      )
+    },
+    error = function(e) {
+      log_warn(
+        "Failed to normalize %s cache file: %s",
+        taxonomy_name,
+        conditionMessage(e)
+      )
+    }
+  )
+
   # Verify key column exists in cache
 
   if (!key_col %in% names(cache_data)) {
@@ -377,13 +451,6 @@ enrich_taxonomy_from_cache <- function(
       length(missing_keys)
     )
     return(taxonomy_table)
-  }
-
-  # Ensure cache supplement has the same columns as taxonomy table
-  expected_cols <- if (!is.null(taxonomy_table) && ncol(taxonomy_table) > 0) {
-    names(taxonomy_table)
-  } else {
-    intersect(names(cache_supplement), names(cache_data))
   }
 
   # Select only matching columns, filling missing with NA
@@ -467,6 +534,16 @@ enrich_taxonomy_from_cache <- function(
       }
 
       combined_cache <- tidytable::bind_rows(existing_cache, cache_to_write) |>
+        tidytable::mutate(
+          tidytable::across(
+            tidyselect::everything(),
+            ~ {
+              x <- as.character(.x)
+              x[!is.na(x) & x == "notClassified"] <- NA_character_
+              x
+            }
+          )
+        ) |>
         tidytable::distinct()
 
       create_dir(export = cache_path)

@@ -301,6 +301,11 @@ complement_metadata_structures <- function(
       "structure_tax_cla_04dirpar"
     )
   ) |>
+    tidytable::mutate(
+      structure_tax_cla_chemontid = normalize_chemontid(
+        structure_tax_cla_chemontid
+      )
+    ) |>
     tidytable::select(
       candidate_structure_inchikey = structure_inchikey,
       candidate_structure_tax_cla_chemontid_i = structure_tax_cla_chemontid,

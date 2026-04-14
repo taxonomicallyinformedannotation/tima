@@ -107,3 +107,56 @@ test_that("fake_sop_columns returns a 1-row NA tidytable with tag column", {
   expect_true("structure_inchikey" %in% names(out))
   expect_true(is.na(out$structure_tag))
 })
+
+# ---- normalize_chemontid ----------------------------------------------------
+
+test_that("normalize_chemontid pads bare numbers to CHEMONTID:NNNNNNN", {
+  expect_equal(
+    normalize_chemontid(c("2011", "42")),
+    c("CHEMONTID:0002011", "CHEMONTID:0000042")
+  )
+})
+
+test_that("normalize_chemontid normalizes zero-padded numbers without prefix", {
+  expect_equal(
+    normalize_chemontid(c("0002011", "0003443")),
+    c("CHEMONTID:0002011", "CHEMONTID:0003443")
+  )
+})
+
+test_that("normalize_chemontid preserves already canonical values", {
+  expect_equal(
+    normalize_chemontid("CHEMONTID:0002011"),
+    "CHEMONTID:0002011"
+  )
+})
+
+test_that("normalize_chemontid handles CHEMONT: prefix variant", {
+  expect_equal(
+    normalize_chemontid("CHEMONT:001"),
+    "CHEMONTID:0000001"
+  )
+})
+
+test_that("normalize_chemontid preserves NA", {
+  expect_equal(normalize_chemontid(NA), NA_character_)
+})
+
+test_that("normalize_chemontid handles mixed input", {
+  input <- c("CHEMONTID:0002011", "2011", "0002011", "CHEMONT:001", NA)
+  expected <- c(
+    "CHEMONTID:0002011",
+    "CHEMONTID:0002011",
+    "CHEMONTID:0002011",
+    "CHEMONTID:0000001",
+    NA
+  )
+  expect_equal(normalize_chemontid(input), expected)
+})
+
+test_that("normalize_chemontid deduplicates equivalent chemontids", {
+  # The main use case: 2011 and 0002011 should become identical
+  result <- unique(normalize_chemontid(c("2011", "0002011")))
+  expect_length(result, 1L)
+  expect_equal(result, "CHEMONTID:0002011")
+})

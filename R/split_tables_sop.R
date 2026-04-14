@@ -384,6 +384,11 @@ split_tables_sop <- function(table, cache) {
       structure_tax_cla_03cla,
       structure_tax_cla_04dirpar
     ) |>
+    tidytable::mutate(
+      structure_tax_cla_chemontid = normalize_chemontid(
+        structure_tax_cla_chemontid
+      )
+    ) |>
     tidytable::distinct()
 
   # Fast collapse: most groups have 1 row; only collapse multi-row groups
