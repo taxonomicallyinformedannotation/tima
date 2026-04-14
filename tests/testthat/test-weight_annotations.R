@@ -1,6 +1,7 @@
 # Test Suite: weight_annotations ----
 
 library(testthat)
+devtools::load_all()
 
 # Fixture staging ----
 
@@ -679,4 +680,200 @@ test_that("weight_annotations() exports propagated tag columns", {
       ) ||
       any(mini_tbl$tag == "foo", na.rm = TRUE)
   )
+})
+
+# rearrange_annotations ----
+
+test_that("rearrange_annotations merges SIRIUS scores into spectral entries with same inchikey", {
+  skip_if_not_installed("tidytable")
+
+  # Annotation table: spectral + SIRIUS entries for the same structure.
+  # Glutamine (RWQNBRDOKXIBIV) is a real-world example where tautomers
+
+  # produce different SMILES (amide vs enol form) but share the same
+  # InChIKey connectivity layer.  The merge must succeed on InChIKey
+  # even when the SMILES differ due to tautomerism.
+  annotation_table <- tidytable::tidytable(
+    feature_id = c("1", "1", "2"),
+    feature_mz = c("147.0764", "147.0764", "200.0"),
+    feature_rt = c("5.0", "5.0", "6.0"),
+    candidate_library = c("ISDB", "SIRIUS", "SIRIUS"),
+    candidate_spectrum_id = c("spec_1", NA_character_, NA_character_),
+    candidate_adduct = c("[M+H]+", "[M+H]+", "[M+Na]+"),
+    candidate_count_similarity_peaks_matched = c(
+      "5",
+      NA_character_,
+      NA_character_
+    ),
+    candidate_score_similarity = c("0.85", NA_character_, NA_character_),
+    candidate_spectrum_entropy = c(NA_character_, NA_character_, NA_character_),
+    candidate_structure_name = c("L-Glutamine", "Glutamine", "Compound2"),
+    candidate_structure_exact_mass = c("146.069", "146.069", "199.0"),
+    candidate_structure_molecular_formula = c("C5H10N2O3", "C5H10N2O3", "C8H10N2"),
+    candidate_structure_xlogp = c("-3.1", "-3.1", "1.0"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "RWQNBRDOKXIBIV",
+      "RWQNBRDOKXIBIV",
+      "UNIQUE123456"
+    ),
+    candidate_structure_inchikey_no_stereo = c(
+      "RWQNBRDOKXIBIV-UHFFFAOYSA",
+      "RWQNBRDOKXIBIV-UHFFFAOYSA",
+      "UNIQUE123456-ZZZZZZZZZZ"
+    ),
+    # Tautomeric SMILES: amide form (spectral) vs enol form (SIRIUS)
+    candidate_structure_smiles_no_stereo = c(
+      "NC(=O)CCC(N)C(O)=O",
+      "NC(O)=CCC(N)C(O)=O",
+      "c1ccc2[nH]ccc2c1"
+    ),
+    candidate_structure_tax_npc_01pat = c(
+      "Amino acids and Peptides",
+      NA_character_,
+      NA_character_
+    ),
+    candidate_structure_tax_npc_02sup = c(
+      NA_character_,
+      NA_character_,
+      NA_character_
+    ),
+    candidate_structure_tax_npc_03cla = c(
+      NA_character_,
+      NA_character_,
+      NA_character_
+    ),
+    candidate_structure_tax_cla_chemontid = c(
+      NA_character_,
+      NA_character_,
+      NA_character_
+    ),
+    candidate_structure_tax_cla_01kin = c(
+      NA_character_,
+      NA_character_,
+      NA_character_
+    ),
+    candidate_structure_tax_cla_02sup = c(
+      NA_character_,
+      NA_character_,
+      NA_character_
+    ),
+    candidate_structure_tax_cla_03cla = c(
+      NA_character_,
+      NA_character_,
+      NA_character_
+    ),
+    candidate_structure_tax_cla_04dirpar = c(
+      NA_character_,
+      NA_character_,
+      NA_character_
+    ),
+    candidate_structure_organism_occurrence_closest = c(
+      NA_character_,
+      NA_character_,
+      NA_character_
+    ),
+    candidate_structure_organism_occurrence_reference = c(
+      NA_character_,
+      NA_character_,
+      NA_character_
+    ),
+    candidate_structure_tag = c(NA_character_, NA_character_, NA_character_),
+    candidate_structure_error_mz = c("0.001", "0.002", "0.003"),
+    candidate_structure_error_rt = c(
+      NA_character_,
+      NA_character_,
+      NA_character_
+    ),
+    candidate_score_sirius_confidence = c(NA_character_, "0.9", "0.8"),
+    candidate_score_sirius_csi = c(NA_character_, "-50", "-80"),
+    candidate_score_sirius_msnovelist = c(NA_character_, "0.5", "0.3")
+  )
+
+  formula_table <- tidytable::tidytable(
+    feature_id = c("1", "2"),
+    feature_mz = c("147.0764", "200.0"),
+    feature_rt = c("5.0", "6.0"),
+    candidate_structure_molecular_formula = c("C5H10N2O3", "C8H10N2"),
+    candidate_count_sirius_peaks_explained = c("10", "8"),
+    candidate_score_sirius_intensity = c("0.95", "0.85"),
+    candidate_score_sirius_isotope = c("0.99", "0.90"),
+    candidate_score_sirius_sirius = c("-20", "-30"),
+    candidate_score_sirius_tree = c("-15", "-25"),
+    candidate_score_sirius_zodiac = c("0.8", "0.7")
+  )
+
+  canopus_table <- tidytable::tidytable(
+    feature_id = c("1", "2"),
+    feature_mz = c("147.0764", "200.0"),
+    feature_rt = c("5.0", "6.0"),
+    feature_spectrum_entropy = c("2.5", "3.0"),
+    feature_spectrum_peaks = c("20", "30"),
+    feature_pred_tax_npc_01pat_val = c("Amino acids and Peptides", "Alkaloids"),
+    feature_pred_tax_npc_01pat_score = c("0.9", "0.8"),
+    feature_pred_tax_npc_02sup_val = c(NA_character_, NA_character_),
+    feature_pred_tax_npc_02sup_score = c(NA_character_, NA_character_),
+    feature_pred_tax_npc_03cla_val = c(NA_character_, NA_character_),
+    feature_pred_tax_npc_03cla_score = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_01kin_val = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_01kin_score = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_02sup_val = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_02sup_score = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_03cla_val = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_03cla_score = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_04dirpar_val = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_04dirpar_score = c(NA_character_, NA_character_)
+  )
+
+  edges_table <- tidytable::tidytable(
+    feature_source = c("1", "2"),
+    feature_spectrum_entropy = c("2.5", "3.0"),
+    feature_spectrum_peaks = c("20", "30"),
+    candidate_score_similarity = c("0.7", "0.6")
+  )
+
+  result <- rearrange_annotations(
+    annotation_table = annotation_table,
+    formula_table = formula_table,
+    canopus_table = canopus_table,
+    edges_table = edges_table
+  )
+
+  # Feature 1: spectral entry (ISDB, sim=0.85) and SIRIUS entry (CSI=-50)
+  # share inchikey RWQNBRDOKXIBIV (glutamine).  The spectral entry wins in
+
+  # table_1 (higher similarity).  SIRIUS scores should be MERGED into the
+  # spectral entry despite different tautomeric SMILES.
+  f1 <- result[
+    result$feature_id == "1" &
+      !is.na(result$candidate_structure_inchikey_connectivity_layer) &
+      result$candidate_structure_inchikey_connectivity_layer ==
+        "RWQNBRDOKXIBIV",
+  ]
+
+  # There should be exactly one row for feature_1 + RWQNBRDOKXIBIV
+  expect_equal(nrow(f1), 1L)
+
+  # The merged row should have BOTH spectral and SIRIUS scores
+  expect_equal(f1$candidate_score_similarity, 0.85)
+  expect_false(is.na(f1$candidate_score_sirius_csi))
+  expect_equal(f1$candidate_score_sirius_csi, -50)
+  expect_equal(f1$candidate_library, "ISDB")
+
+  # Feature 2: SIRIUS-only entry (unique inchikey UNIQUE123456)
+  f2 <- result[
+    result$feature_id == "2" &
+      !is.na(result$candidate_structure_inchikey_connectivity_layer) &
+      result$candidate_structure_inchikey_connectivity_layer == "UNIQUE123456",
+  ]
+
+  expect_equal(nrow(f2), 1L)
+  expect_false(is.na(f2$candidate_score_sirius_csi))
+  expect_equal(f2$candidate_library, "SIRIUS")
+
+  # Formula scores should be present
+  expect_true("candidate_score_sirius_zodiac" %in% names(result))
+
+  # CANOPUS predictions should be present
+
+  expect_true("feature_pred_tax_npc_01pat_val" %in% names(result))
 })

@@ -319,7 +319,24 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
       if (nrow(tbl) == 0L) {
         return(acc)
       }
-      tidytable::left_join(x = acc, y = tbl)
+      # Use only structurally unambiguous keys for the join.
+      # Avoid implicit joins on ALL shared columns (which would include
+      # structure_smiles_no_stereo, structure_name, etc.) — these can
+      # differ between files for tautomers or name variants, causing
+      # valid structure-organism pairs to be silently dropped.
+      shared <- intersect(names(acc), names(tbl))
+      # Prefer the most specific InChIKey available, then organism_name.
+      preferred_keys <- c(
+        "structure_inchikey",
+        "structure_inchikey_no_stereo",
+        "structure_inchikey_connectivity_layer",
+        "organism_name"
+      )
+      join_by <- intersect(preferred_keys, shared)
+      if (length(join_by) == 0L) {
+        join_by <- shared
+      }
+      tidytable::left_join(x = acc, y = tbl, by = join_by)
     }
   )
 }
@@ -432,6 +449,7 @@ rearrange_annotations <- function(
 ) {
   model <- columns_model()
 
+  # Table 1: deduplicated annotations (all sources, spectra + structure cols)
   annotation_table_1 <- annotation_table |>
     tidytable::select(tidyselect::any_of(
       x = c(
@@ -454,42 +472,108 @@ rearrange_annotations <- function(
       .keep_all = TRUE
     )
 
+  # Table 2: SIRIUS CSI scores only (join keys + score columns).
+  # Selecting only the score columns (not all structure columns) prevents
+
+  # the full_join from using ~18 structure columns as implicit keys,
+  # which caused SIRIUS scores to fail to merge with spectral annotations
+  # whenever any structure detail (name, SMILES, taxonomy, ...) differed.
   annotation_table_2 <- annotation_table |>
     tidytable::select(
       tidyselect::any_of(
         x = c(
-          model$features_columns,
-          model$candidates_sirius_str_columns,
-          model$candidates_structures_columns
+          "feature_id",
+          "candidate_structure_inchikey_connectivity_layer",
+          model$candidates_sirius_str_columns
         )
-      ),
-      -candidate_structure_error_mz,
-      -candidate_structure_error_rt
+      )
     ) |>
     tidytable::filter(!is.na(candidate_score_sirius_csi)) |>
-    tidytable::distinct()
+    tidytable::mutate(
+      candidate_score_sirius_csi = as.numeric(candidate_score_sirius_csi)
+    ) |>
+    tidytable::arrange(tidytable::desc(candidate_score_sirius_csi)) |>
+    tidytable::distinct(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer,
+      .keep_all = TRUE
+    )
 
-  tables_full <- list(
+  # Step 1: Merge SIRIUS scores into deduplicated annotations.
+  # Using explicit keys ensures SIRIUS CSI scores are matched to
+  # spectral annotations for the same structure even when other
+  # structure columns (name, SMILES, taxonomy) differ between sources.
+  annotation_table_merged <- tidytable::full_join(
     annotation_table_1,
     annotation_table_2,
-    formula_table,
-    canopus_table
+    by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
   )
 
-  annotation_table_merged <- purrr::reduce(
-    .x = tables_full,
-    .f = tidytable::full_join
+  # Step 2: Add formula-level SIRIUS scores.
+  # Join on feature_id + molecular_formula only (not feature_mz/feature_rt
+  # which can have floating-point mismatches across files).
+  formula_new_cols <- setdiff(
+    names(formula_table),
+    names(annotation_table_merged)
   )
-
-  annotation_table_merged |>
-    tidytable::left_join(
-      y = edges_table |>
-        tidytable::distinct(
-          feature_id = feature_source,
-          feature_spectrum_entropy,
-          feature_spectrum_peaks
-        )
+  formula_join_by <- intersect(
+    c("feature_id", "candidate_structure_molecular_formula"),
+    names(formula_table)
+  )
+  if (
+    length(formula_new_cols) > 0L &&
+      length(formula_join_by) > 0L &&
+      nrow(formula_table) > 0L
+  ) {
+    annotation_table_merged <- tidytable::full_join(
+      annotation_table_merged,
+      formula_table |>
+        tidytable::select(
+          tidyselect::any_of(c(formula_join_by, formula_new_cols))
+        ),
+      by = formula_join_by
     )
+  }
+
+  # Step 3: Add CANOPUS predictions (feature-level).
+  canopus_new_cols <- setdiff(
+    names(canopus_table),
+    names(annotation_table_merged)
+  )
+  if (length(canopus_new_cols) > 0L && nrow(canopus_table) > 0L) {
+    annotation_table_merged <- tidytable::full_join(
+      annotation_table_merged,
+      canopus_table |>
+        tidytable::select(
+          tidyselect::any_of(c("feature_id", canopus_new_cols))
+        ),
+      by = "feature_id"
+    )
+  }
+
+  # Step 4: Add edge metadata (feature-level).
+  edge_new_cols <- setdiff(
+    c("feature_spectrum_entropy", "feature_spectrum_peaks"),
+    names(annotation_table_merged)
+  )
+  edges_distinct <- edges_table |>
+    tidytable::distinct(
+      feature_id = feature_source,
+      feature_spectrum_entropy,
+      feature_spectrum_peaks
+    )
+  if (length(edge_new_cols) > 0L) {
+    annotation_table_merged <- annotation_table_merged |>
+      tidytable::left_join(
+        y = edges_distinct |>
+          tidytable::select(
+            tidyselect::any_of(c("feature_id", edge_new_cols))
+          ),
+        by = "feature_id"
+      )
+  }
+
+  annotation_table_merged
 }
 
 #' Export Results to Files
@@ -974,7 +1058,8 @@ weight_annotations <- function(
         file_type = "features taxed",
         na.strings = c("", "NA"),
         colClasses = "character"
-      )
+      ),
+      by = "feature_id"
     )
 
   rm(annotation_table)
