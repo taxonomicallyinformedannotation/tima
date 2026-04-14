@@ -12,6 +12,7 @@
 
 ## New features
 
+* Added support for additional NPClassifier and ClassyFire taxonomy caches in `prepare_libraries_sop_merged()`, allowing structures missing taxonomy in the merged libraries to be enriched from external cache files. Caches grow over time as library entries are written back.
 * Added a new validation helper, see <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html>
 * Added [BiGG](http://bigg.ucsd.edu/) as SOP library
 * Added basic isotopologues handling
