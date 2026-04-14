@@ -513,13 +513,15 @@ complement_metadata_structures <- function(
       )
     ) |>
     tidytable::mutate(
-      ## Computable properties: always use enriched value from
-      ## process_smiles reference files.
-      candidate_structure_molecular_formula = .normalize_enrichment_text(
-        .enr_candidate_structure_molecular_formula
+      ## Computable properties: prefer enriched value from library reference
+      ## files, fall back to values computed by recompute_structure_fields_from_smiles.
+      candidate_structure_molecular_formula = .pick_enrichment(
+        .enr_candidate_structure_molecular_formula,
+        candidate_structure_molecular_formula
       ),
-      candidate_structure_exact_mass = .normalize_enrichment_text(
-        .enr_candidate_structure_exact_mass
+      candidate_structure_exact_mass = .pick_enrichment(
+        .enr_candidate_structure_exact_mass,
+        candidate_structure_exact_mass
       ),
       ## xlogp: enriched from str_stereo (stereo-sensitive, collapsed per inchikey_no_stereo)
       candidate_structure_xlogp = .pick_enrichment(

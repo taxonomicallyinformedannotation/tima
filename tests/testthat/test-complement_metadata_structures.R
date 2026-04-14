@@ -269,11 +269,10 @@ test_that("existing candidate metadata is used only when no lookup values exist"
     str_tax_npc = npc_file
   )
 
-  ## Computable properties (formula, mass) are always overwritten from the
-
-  ## process_smiles reference; with no lookup match they become NA.
-  expect_true(is.na(out$candidate_structure_exact_mass[[1]]))
-  expect_true(is.na(out$candidate_structure_molecular_formula[[1]]))
+  ## Computable properties (formula, mass) fall back to existing values
+  ## when no lookup match is found.
+  expect_equal(out$candidate_structure_exact_mass[[1]], "777")
+  expect_equal(out$candidate_structure_molecular_formula[[1]], "C7H7N")
   ## Non-computable properties are preserved from existing values via coalesce
   expect_equal(out$candidate_structure_xlogp[[1]], "1.7")
   expect_equal(out$candidate_structure_tag[[1]], "existing")
