@@ -1064,9 +1064,10 @@ test_that("prepare_libraries_sop_merged() enriches taxonomy from additional cach
   npc_cache_path <- file.path(tmpdir, "additional_npc.tsv")
   tidytable::fwrite(npc_cache, npc_cache_path, sep = "\t")
 
-  # Create additional CLA cache that has taxonomy for "BBBBB"
+  # Create additional CLA cache that has taxonomy for "CC"'s real InChIKey
+  # process_smiles computes OTMSDBZUPAUEDD-UHFFFAOYSA-N for SMILES "CC"
   cla_cache <- tidytable::tidytable(
-    structure_inchikey = c("BBBBB"),
+    structure_inchikey = c("OTMSDBZUPAUEDD-UHFFFAOYSA-N"),
     structure_tax_cla_chemontid = c("0002"),
     structure_tax_cla_01kin = c("Organic"),
     structure_tax_cla_02sup = c("Alkaloids"),
@@ -1110,7 +1111,7 @@ test_that("prepare_libraries_sop_merged() enriches taxonomy from additional cach
 
   # Check that CLA taxonomy was enriched
   cla_result <- tidytable::fread(output_cla)
-  expect_true("BBBBB" %in% cla_result$structure_inchikey)
+  expect_true("OTMSDBZUPAUEDD-UHFFFAOYSA-N" %in% cla_result$structure_inchikey)
 })
 
 test_that("enrich_taxonomy_from_cache writes back library entries to cache for persistence", {

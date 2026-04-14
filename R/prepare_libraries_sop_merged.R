@@ -380,7 +380,7 @@ enrich_taxonomy_from_cache <- function(
   }
 
   # Ensure cache supplement has the same columns as taxonomy table
-  expected_cols <- if (!is.null(taxonomy_table) && nrow(taxonomy_table) > 0) {
+  expected_cols <- if (!is.null(taxonomy_table) && ncol(taxonomy_table) > 0) {
     names(taxonomy_table)
   } else {
     intersect(names(cache_supplement), names(cache_data))
