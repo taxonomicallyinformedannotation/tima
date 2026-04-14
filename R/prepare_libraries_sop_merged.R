@@ -255,6 +255,253 @@ export_library_tables <- function(
   )
 }
 
+#' Enrich Taxonomy from Additional Cache
+#'
+#' @description Internal helper to supplement taxonomy tables with entries
+#'   from additional external cache files. For structures present in the
+#'   stereo/canonical tables but absent from the taxonomy table, matching
+#'   rows from the cache are appended.
+#'
+#' @param taxonomy_table Existing taxonomy table (NPC or ClassyFire)
+#' @param cache_path Path to additional cache file (TSV/TSV.gz)
+#' @param key_col Column name used as key for matching (e.g., "structure_smiles"
+#'   for NPC, "structure_inchikey" for ClassyFire)
+#' @param all_keys Character vector of all keys present in the library
+#'   (e.g., all unique SMILES or InChIKeys)
+#' @param col_mapping Named list mapping internal column names to a character
+#'   vector of possible cache column names. The first matching name found in
+#'   the cache is used. Example:
+#'   `list("structure_tax_npc_01pat" = c("pathway", "structure_taxonomy_npclassifier_01pathway"))`
+#' @param taxonomy_name Name for logging (e.g., "NPClassifier", "ClassyFire")
+#'
+#' @return Enriched taxonomy table
+#' @keywords internal
+enrich_taxonomy_from_cache <- function(
+  taxonomy_table,
+  cache_path,
+  key_col,
+  all_keys,
+  col_mapping = NULL,
+  taxonomy_name = "taxonomy"
+) {
+  if (is.null(cache_path) || !nzchar(cache_path) || !file.exists(cache_path)) {
+    return(taxonomy_table)
+  }
+
+  log_info(
+    "Enriching %s taxonomy from additional cache: %s",
+    taxonomy_name,
+    cache_path
+  )
+
+  cache_data <- tryCatch(
+    safe_fread(
+      file = cache_path,
+      file_type = paste(taxonomy_name, "additional cache"),
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    ),
+    error = function(e) {
+      log_warn(
+        "Failed to read additional %s cache: %s",
+        taxonomy_name,
+        conditionMessage(e)
+      )
+      return(taxonomy_table)
+    }
+  )
+
+  if (is.null(cache_data) || nrow(cache_data) == 0) {
+    log_info("Additional %s cache is empty", taxonomy_name)
+    return(taxonomy_table)
+  }
+
+  # Apply column mapping if provided
+  if (!is.null(col_mapping)) {
+    for (internal_name in names(col_mapping)) {
+      # Skip if internal name already exists in cache
+      if (internal_name %in% names(cache_data)) {
+        next
+      }
+
+      # Try each possible cache name in order
+      possible_names <- col_mapping[[internal_name]]
+      for (cache_name in possible_names) {
+        if (cache_name %in% names(cache_data)) {
+          names(cache_data)[names(cache_data) == cache_name] <- internal_name
+          break
+        }
+      }
+    }
+  }
+
+  # Verify key column exists in cache
+
+  if (!key_col %in% names(cache_data)) {
+    log_warn(
+      "Key column '%s' not found in additional %s cache. Available: %s",
+      key_col,
+      taxonomy_name,
+      paste(names(cache_data), collapse = ", ")
+    )
+    return(taxonomy_table)
+  }
+
+  # Identify keys already covered by existing taxonomy
+  existing_keys <- if (!is.null(taxonomy_table) && nrow(taxonomy_table) > 0) {
+    taxonomy_table[[key_col]]
+  } else {
+    character(0)
+  }
+
+  # Keep only cache entries for keys present in the library but missing taxonomy
+  missing_keys <- setdiff(all_keys, existing_keys)
+  missing_keys <- missing_keys[!is.na(missing_keys)]
+
+  if (length(missing_keys) == 0) {
+    log_info(
+      "All %s keys already have %s taxonomy",
+      length(all_keys),
+      taxonomy_name
+    )
+    return(taxonomy_table)
+  }
+
+  cache_supplement <- cache_data |>
+    tidytable::filter(.data[[key_col]] %in% missing_keys)
+
+  if (nrow(cache_supplement) == 0) {
+    log_info(
+      "Additional %s cache has no entries for %d missing keys",
+      taxonomy_name,
+      length(missing_keys)
+    )
+    return(taxonomy_table)
+  }
+
+  # Ensure cache supplement has the same columns as taxonomy table
+  expected_cols <- if (!is.null(taxonomy_table) && nrow(taxonomy_table) > 0) {
+    names(taxonomy_table)
+  } else {
+    intersect(names(cache_supplement), names(cache_data))
+  }
+
+  # Select only matching columns, filling missing with NA
+  for (col in expected_cols) {
+    if (!col %in% names(cache_supplement)) {
+      cache_supplement[[col]] <- NA_character_
+    }
+  }
+  cache_supplement <- cache_supplement |>
+    tidytable::select(tidyselect::all_of(expected_cols)) |>
+    tidytable::mutate(
+      tidytable::across(
+        tidyselect::everything(),
+        ~ {
+          x <- as.character(.x)
+          x[is.na(x)] <- "notClassified"
+          x
+        }
+      )
+    ) |>
+    tidytable::distinct()
+
+  enriched <- tidytable::bind_rows(taxonomy_table, cache_supplement) |>
+    tidytable::distinct()
+
+  n_added <- nrow(enriched) - nrow(taxonomy_table)
+  log_info(
+    "Enriched %s taxonomy with %d entries from additional cache (%d missing keys matched)",
+    taxonomy_name,
+    n_added,
+    nrow(cache_supplement)
+  )
+
+  # Write back the full enriched taxonomy to the additional cache so it
+  # grows over time. Entries already present in the library but absent from
+  # the cache are appended, making subsequent runs faster and richer.
+  tryCatch(
+    {
+      cache_to_write <- enriched |>
+        tidytable::select(tidyselect::all_of(expected_cols)) |>
+        tidytable::distinct()
+
+      # Read existing cache again (may have entries for keys NOT in this library)
+      existing_cache <- tryCatch(
+        safe_fread(
+          file = cache_path,
+          file_type = paste(taxonomy_name, "cache for write-back"),
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        ),
+        error = function(e) tidytable::tidytable()
+      )
+
+      # Apply same column mapping to existing cache before merging
+      if (!is.null(col_mapping) && nrow(existing_cache) > 0) {
+        for (internal_name in names(col_mapping)) {
+          if (internal_name %in% names(existing_cache)) {
+            next
+          }
+          possible_names <- col_mapping[[internal_name]]
+          for (cache_name in possible_names) {
+            if (cache_name %in% names(existing_cache)) {
+              names(existing_cache)[
+                names(existing_cache) == cache_name
+              ] <- internal_name
+              break
+            }
+          }
+        }
+      }
+
+      # Keep only expected columns from existing cache
+      if (nrow(existing_cache) > 0) {
+        for (col in expected_cols) {
+          if (!col %in% names(existing_cache)) {
+            existing_cache[[col]] <- NA_character_
+          }
+        }
+        existing_cache <- existing_cache |>
+          tidytable::select(tidyselect::all_of(expected_cols))
+      }
+
+      combined_cache <- tidytable::bind_rows(existing_cache, cache_to_write) |>
+        tidytable::distinct()
+
+      create_dir(export = cache_path)
+      compress_method <- if (grepl("\\.gz$", cache_path, ignore.case = TRUE)) {
+        "gzip"
+      } else {
+        "none"
+      }
+      tidytable::fwrite(
+        combined_cache,
+        file = cache_path,
+        sep = "\t",
+        na = "",
+        compress = compress_method,
+        showProgress = FALSE
+      )
+      log_info(
+        "Updated additional %s cache (%d total entries): %s",
+        taxonomy_name,
+        nrow(combined_cache),
+        cache_path
+      )
+    },
+    error = function(e) {
+      log_warn(
+        "Failed to write back to additional %s cache: %s",
+        taxonomy_name,
+        conditionMessage(e)
+      )
+    }
+  )
+
+  enriched
+}
+
 #' @title Prepare merged structure organism pairs libraries
 #'
 #' @description This function merges all structure-organism pair libraries
@@ -277,6 +524,21 @@ export_library_tables <- function(
 #' @param value [character] Character string taxon name(s) to keep (can use | for multiple,
 #'     e.g., 'Gentianaceae|Apocynaceae')
 #' @param cache [character] Character string path to cache directory for processed SMILES
+#' @param additional_npc_cache [character] Optional path to an additional NPClassifier
+#'   taxonomy cache file (TSV/TSV.gz). Structures present in the merged library
+#'   but missing NPClassifier taxonomy will be looked up in this cache. Expected
+#'   columns: `structure_smiles`, `structure_tax_npc_01pat`,
+#'   `structure_tax_npc_02sup`, `structure_tax_npc_03cla`. Alternative column
+#'   names from external tools (e.g., `pathway`, `superclass`, `class`) are also
+#'   supported.
+#' @param additional_cla_cache [character] Optional path to an additional ClassyFire
+#'   taxonomy cache file (TSV/TSV.gz). Structures present in the merged library
+#'   but missing ClassyFire taxonomy will be looked up in this cache. Expected
+#'   columns: `structure_inchikey`, `structure_tax_cla_chemontid`,
+#'   `structure_tax_cla_01kin`, `structure_tax_cla_02sup`,
+#'   `structure_tax_cla_03cla`, `structure_tax_cla_04dirpar`. Alternative column
+#'   names (e.g., `inchikey`, `chemontid`, `kingdom`, `superclass`, `class`,
+#'   `directparent`) are also supported.
 #' @param output_key [character] Character string path for output keys file
 #' @param output_org_tax_ott [character] Character string path for organisms taxonomy (OTT) file
 #' @param output_str_can [character] Character string path for structures canonical SMILES file
@@ -320,6 +582,12 @@ prepare_libraries_sop_merged <- function(
   cache = get_params(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$structures$processed,
+  additional_npc_cache = get_params(
+    step = "prepare_libraries_sop_merged"
+  )$files$libraries$sop$merged$structures$taxonomies$additional_npc,
+  additional_cla_cache = get_params(
+    step = "prepare_libraries_sop_merged"
+  )$files$libraries$sop$merged$structures$taxonomies$additional_cla,
   output_key = get_params(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$keys,
@@ -386,6 +654,86 @@ prepare_libraries_sop_merged <- function(
   table_structures_metadata <- tables$str_met
   table_structures_taxonomy_cla <- tables$str_tax_cla
   table_structures_taxonomy_npc <- tables$str_tax_npc
+
+  # Enrich taxonomy from additional caches (if provided) ----
+
+  # NPClassifier: keyed by structure_smiles
+  if (
+    !is.null(additional_npc_cache) &&
+      length(additional_npc_cache) == 1L &&
+      nzchar(additional_npc_cache)
+  ) {
+    all_smiles <- table_structures_stereo |>
+      tidytable::filter(!is.na(structure_smiles)) |>
+      tidytable::pull(structure_smiles) |>
+      unique()
+
+    table_structures_taxonomy_npc <- enrich_taxonomy_from_cache(
+      taxonomy_table = table_structures_taxonomy_npc,
+      cache_path = additional_npc_cache,
+      key_col = "structure_smiles",
+      all_keys = all_smiles,
+      col_mapping = list(
+        "structure_smiles" = "smiles",
+        "structure_tax_npc_01pat" = c(
+          "pathway",
+          "structure_taxonomy_npclassifier_01pathway"
+        ),
+        "structure_tax_npc_02sup" = c(
+          "superclass",
+          "structure_taxonomy_npclassifier_02superclass"
+        ),
+        "structure_tax_npc_03cla" = c(
+          "class",
+          "structure_taxonomy_npclassifier_03class"
+        )
+      ),
+      taxonomy_name = "NPClassifier"
+    )
+  }
+
+  # ClassyFire: keyed by structure_inchikey
+  if (
+    !is.null(additional_cla_cache) &&
+      length(additional_cla_cache) == 1L &&
+      nzchar(additional_cla_cache)
+  ) {
+    all_inchikeys <- table_keys |>
+      tidytable::filter(!is.na(structure_inchikey)) |>
+      tidytable::pull(structure_inchikey) |>
+      unique()
+
+    table_structures_taxonomy_cla <- enrich_taxonomy_from_cache(
+      taxonomy_table = table_structures_taxonomy_cla,
+      cache_path = additional_cla_cache,
+      key_col = "structure_inchikey",
+      all_keys = all_inchikeys,
+      col_mapping = list(
+        "structure_inchikey" = "inchikey",
+        "structure_tax_cla_chemontid" = c(
+          "chemontid",
+          "structure_taxonomy_classyfire_chemontid"
+        ),
+        "structure_tax_cla_01kin" = c(
+          "kingdom",
+          "structure_taxonomy_classyfire_01kingdom"
+        ),
+        "structure_tax_cla_02sup" = c(
+          "superclass",
+          "structure_taxonomy_classyfire_02superclass"
+        ),
+        "structure_tax_cla_03cla" = c(
+          "class",
+          "structure_taxonomy_classyfire_03class"
+        ),
+        "structure_tax_cla_04dirpar" = c(
+          "directparent",
+          "structure_taxonomy_classyfire_04directparent"
+        )
+      ),
+      taxonomy_name = "ClassyFire"
+    )
+  }
 
   # Apply Taxonomic Filter (if enabled) ----
 

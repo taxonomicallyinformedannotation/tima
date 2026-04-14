@@ -292,6 +292,14 @@ files:
             #' NPClassifier structures taxonomy. STRING
             npc: data/interim/libraries/sop/merged/structures/taxonomies/npc.tsv.gz
 
+            #' Additional ClassyFire taxonomy cache to supplement library data.
+            #' Leave empty to skip. STRING
+            additional_cla: data/interim/libraries/sop/merged/structures/taxonomies/classyfire_cache.csv
+
+            #' Additional NPClassifier taxonomy cache to supplement library data.
+            #' Leave empty to skip. STRING
+            additional_npc: data/interim/libraries/sop/merged/structures/taxonomies/npclassifier_cache.csv
+
     #' Spectral libraries. STRING
     spectral:
       #' List of negative spectral libraries. STRING

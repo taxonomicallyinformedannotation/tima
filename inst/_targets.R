@@ -1487,6 +1487,26 @@ list(
           format = "file"
         ),
         tar_target(
+          name = lib_sop_mer_npc_cache,
+          command = {
+            lib_sop_mer_npc_cache <- get_file(
+              url = paths$urls$examples$npclassifier_cache,
+              export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$additional_npc
+            )
+          },
+          format = "file"
+        ),
+        tar_target(
+          name = lib_sop_mer_cla_cache,
+          command = {
+            lib_sop_mer_cla_cache <- get_file(
+              url = paths$urls$examples$classyfire_cache,
+              export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$additional_cla
+            )
+          },
+          format = "file"
+        ),
+        tar_target(
           name = lib_sop_mer,
           command = {
             lib_sop_mer <- prepare_libraries_sop_merged(
@@ -1508,6 +1528,8 @@ list(
               level = par_pre_lib_sop_mer$organisms$filter$level,
               value = par_pre_lib_sop_mer$organisms$filter$value,
               cache = lib_sop_mer_str_pro,
+              additional_npc_cache = lib_sop_mer_npc_cache,
+              additional_cla_cache = lib_sop_mer_cla_cache,
               output_key = par_pre_lib_sop_mer$files$libraries$sop$merged$keys,
               output_org_tax_ott = par_pre_lib_sop_mer$files$libraries$sop$merged$organisms$taxonomies$ott,
               output_str_stereo = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$stereo,

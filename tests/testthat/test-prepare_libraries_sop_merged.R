@@ -835,3 +835,422 @@ test_that("prepare_libraries_sop_merged() merges multiple input files", {
   expect_equal(nrow(keys), 2)
   # expect_true(all(c("AAAAA", "BBBBB") %in% keys$structure_inchikey))
 })
+
+## enrich_taxonomy_from_cache ----
+
+test_that("enrich_taxonomy_from_cache returns taxonomy_table when cache_path is NULL", {
+  taxonomy <- tidytable::tidytable(
+    structure_smiles = "C",
+    structure_tax_npc_01pat = "PathA",
+    structure_tax_npc_02sup = "SuperA",
+    structure_tax_npc_03cla = "ClassA"
+  )
+  result <- enrich_taxonomy_from_cache(
+    taxonomy_table = taxonomy,
+    cache_path = NULL,
+    key_col = "structure_smiles",
+    all_keys = c("C", "CC"),
+    taxonomy_name = "NPClassifier"
+  )
+  expect_equal(nrow(result), 1)
+})
+
+test_that("enrich_taxonomy_from_cache returns taxonomy_table when cache file does not exist", {
+  taxonomy <- tidytable::tidytable(
+    structure_smiles = "C",
+    structure_tax_npc_01pat = "PathA",
+    structure_tax_npc_02sup = "SuperA",
+    structure_tax_npc_03cla = "ClassA"
+  )
+  result <- enrich_taxonomy_from_cache(
+    taxonomy_table = taxonomy,
+    cache_path = "/nonexistent/file.tsv",
+    key_col = "structure_smiles",
+    all_keys = c("C", "CC"),
+    taxonomy_name = "NPClassifier"
+  )
+  expect_equal(nrow(result), 1)
+})
+
+test_that("enrich_taxonomy_from_cache enriches NPC taxonomy from cache with internal column names", {
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  taxonomy <- tidytable::tidytable(
+    structure_smiles = "C",
+    structure_tax_npc_01pat = "PathA",
+    structure_tax_npc_02sup = "SuperA",
+    structure_tax_npc_03cla = "ClassA"
+  )
+
+  # Cache with same internal column names
+  cache <- tidytable::tidytable(
+    structure_smiles = c("CC", "CCC"),
+    structure_tax_npc_01pat = c("PathB", "PathC"),
+    structure_tax_npc_02sup = c("SuperB", "SuperC"),
+    structure_tax_npc_03cla = c("ClassB", "ClassC")
+  )
+  cache_path <- file.path(tmpdir, "npc_cache.tsv")
+  tidytable::fwrite(cache, cache_path, sep = "\t")
+
+  result <- enrich_taxonomy_from_cache(
+    taxonomy_table = taxonomy,
+    cache_path = cache_path,
+    key_col = "structure_smiles",
+    all_keys = c("C", "CC", "CCC"),
+    taxonomy_name = "NPClassifier"
+  )
+  expect_equal(nrow(result), 3)
+  expect_true("CC" %in% result$structure_smiles)
+  expect_true("CCC" %in% result$structure_smiles)
+})
+
+test_that("enrich_taxonomy_from_cache applies column mapping for external format", {
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  taxonomy <- tidytable::tidytable(
+    structure_smiles = "C",
+    structure_tax_npc_01pat = "PathA",
+    structure_tax_npc_02sup = "SuperA",
+    structure_tax_npc_03cla = "ClassA"
+  )
+
+  # Cache with external column names (from NPClassifier API)
+  cache <- tidytable::tidytable(
+    structure_smiles = c("CC"),
+    pathway = c("PathB"),
+    superclass = c("SuperB"),
+    class = c("ClassB")
+  )
+  cache_path <- file.path(tmpdir, "npc_cache_ext.tsv")
+  tidytable::fwrite(cache, cache_path, sep = "\t")
+
+  result <- enrich_taxonomy_from_cache(
+    taxonomy_table = taxonomy,
+    cache_path = cache_path,
+    key_col = "structure_smiles",
+    all_keys = c("C", "CC"),
+    col_mapping = list(
+      "structure_smiles" = "structure_smiles",
+      "structure_tax_npc_01pat" = "pathway",
+      "structure_tax_npc_02sup" = "superclass",
+      "structure_tax_npc_03cla" = "class"
+    ),
+    taxonomy_name = "NPClassifier"
+  )
+  expect_equal(nrow(result), 2)
+  added <- result[result$structure_smiles == "CC", ]
+  expect_equal(added$structure_tax_npc_01pat, "PathB")
+})
+
+test_that("enrich_taxonomy_from_cache does not duplicate existing entries", {
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  taxonomy <- tidytable::tidytable(
+    structure_smiles = c("C", "CC"),
+    structure_tax_npc_01pat = c("PathA", "PathB"),
+    structure_tax_npc_02sup = c("SuperA", "SuperB"),
+    structure_tax_npc_03cla = c("ClassA", "ClassB")
+  )
+
+  # Cache also has "CC" but all keys are already covered
+
+  cache <- tidytable::tidytable(
+    structure_smiles = c("CC"),
+    structure_tax_npc_01pat = c("PathB_alt"),
+    structure_tax_npc_02sup = c("SuperB_alt"),
+    structure_tax_npc_03cla = c("ClassB_alt")
+  )
+  cache_path <- file.path(tmpdir, "npc_cache.tsv")
+  tidytable::fwrite(cache, cache_path, sep = "\t")
+
+  result <- enrich_taxonomy_from_cache(
+    taxonomy_table = taxonomy,
+    cache_path = cache_path,
+    key_col = "structure_smiles",
+    all_keys = c("C", "CC"),
+    taxonomy_name = "NPClassifier"
+  )
+  # Should not add anything since all keys already have taxonomy
+  expect_equal(nrow(result), 2)
+})
+
+test_that("enrich_taxonomy_from_cache enriches ClassyFire taxonomy", {
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  taxonomy <- tidytable::tidytable(
+    structure_inchikey = "AAAAA",
+    structure_tax_cla_chemontid = "0001",
+    structure_tax_cla_01kin = "Organic",
+    structure_tax_cla_02sup = "Lipids",
+    structure_tax_cla_03cla = "Fatty acyls",
+    structure_tax_cla_04dirpar = "Fatty acids"
+  )
+
+  cache <- tidytable::tidytable(
+    structure_inchikey = c("BBBBB"),
+    structure_tax_cla_chemontid = c("0002"),
+    structure_tax_cla_01kin = c("Organic"),
+    structure_tax_cla_02sup = c("Alkaloids"),
+    structure_tax_cla_03cla = c("Amines"),
+    structure_tax_cla_04dirpar = c("Primary amines")
+  )
+  cache_path <- file.path(tmpdir, "cla_cache.tsv")
+  tidytable::fwrite(cache, cache_path, sep = "\t")
+
+  result <- enrich_taxonomy_from_cache(
+    taxonomy_table = taxonomy,
+    cache_path = cache_path,
+    key_col = "structure_inchikey",
+    all_keys = c("AAAAA", "BBBBB"),
+    taxonomy_name = "ClassyFire"
+  )
+  expect_equal(nrow(result), 2)
+  expect_true("BBBBB" %in% result$structure_inchikey)
+})
+
+test_that("prepare_libraries_sop_merged() enriches taxonomy from additional caches", {
+  skip_if_not_installed("tidytable")
+
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  # Library data with some structures missing taxonomy
+  sop_data <- tidytable::tidytable(
+    structure_inchikey = c("AAAAA", "BBBBB"),
+    structure_smiles = c("C", "CC"),
+    structure_smiles_no_stereo = c("C", "CC"),
+    structure_molecular_formula = c("CH4", "C2H6"),
+    structure_name = c("nameA", "nameB"),
+    structure_exact_mass = c(16, 30),
+    structure_xlogp = c(1, 1.5),
+    structure_tag = c("foo", "bar"),
+    # Only first structure has NPC taxonomy
+    structure_tax_npc_01pat = c("PathA", NA),
+    structure_tax_npc_02sup = c(NA, NA),
+    structure_tax_npc_03cla = c(NA, NA),
+    structure_tax_cla_chemontid = c(NA, NA),
+    # Only first structure has CLA taxonomy
+    structure_tax_cla_01kin = c("Organic", NA),
+    structure_tax_cla_02sup = c(NA, NA),
+    structure_tax_cla_03cla = c(NA, NA),
+    structure_tax_cla_04dirpar = c(NA, NA),
+    organism_name = c("Plant1", "Plant2"),
+    organism_taxonomy_ottid = c("1", "2"),
+    organism_taxonomy_01domain = c("E", "E"),
+    organism_taxonomy_02kingdom = c("P", "P"),
+    organism_taxonomy_03phylum = c("T", "T"),
+    reference_doi = c("d1", "d2")
+  )
+
+  input_file <- file.path(tmpdir, "library.tsv")
+  tidytable::fwrite(x = sop_data, file = input_file, sep = "\t")
+
+  # Create additional NPC cache that has taxonomy for "CC"
+  npc_cache <- tidytable::tidytable(
+    structure_smiles = c("CC"),
+    structure_tax_npc_01pat = c("PathB"),
+    structure_tax_npc_02sup = c("SuperB"),
+    structure_tax_npc_03cla = c("ClassB")
+  )
+  npc_cache_path <- file.path(tmpdir, "additional_npc.tsv")
+  tidytable::fwrite(npc_cache, npc_cache_path, sep = "\t")
+
+  # Create additional CLA cache that has taxonomy for "BBBBB"
+  cla_cache <- tidytable::tidytable(
+    structure_inchikey = c("BBBBB"),
+    structure_tax_cla_chemontid = c("0002"),
+    structure_tax_cla_01kin = c("Organic"),
+    structure_tax_cla_02sup = c("Alkaloids"),
+    structure_tax_cla_03cla = c("Amines"),
+    structure_tax_cla_04dirpar = c("Primary amines")
+  )
+  cla_cache_path <- file.path(tmpdir, "additional_cla.tsv")
+  tidytable::fwrite(cla_cache, cla_cache_path, sep = "\t")
+
+  output_key <- file.path(tmpdir, "keys.tsv")
+  output_org <- file.path(tmpdir, "org_tax.tsv")
+  output_can <- file.path(tmpdir, "canonical.tsv")
+  output_stereo <- file.path(tmpdir, "stereo.tsv")
+  output_met <- file.path(tmpdir, "metadata.tsv")
+  output_cla <- file.path(tmpdir, "classyfire.tsv")
+  output_npc <- file.path(tmpdir, "npc.tsv")
+
+  local_mocked_bindings(
+    get_params = function(step) list(step = "prepare_libraries_sop_merged"),
+    export_params = function(...) invisible(NULL),
+    .package = "tima"
+  )
+
+  result <- prepare_libraries_sop_merged(
+    files = input_file,
+    filter = FALSE,
+    additional_npc_cache = npc_cache_path,
+    additional_cla_cache = cla_cache_path,
+    output_key = output_key,
+    output_org_tax_ott = output_org,
+    output_str_can = output_can,
+    output_str_stereo = output_stereo,
+    output_str_met = output_met,
+    output_str_tax_cla = output_cla,
+    output_str_tax_npc = output_npc
+  )
+
+  # Check that NPC taxonomy was enriched
+  npc_result <- tidytable::fread(output_npc)
+  expect_true("CC" %in% npc_result$structure_smiles)
+
+  # Check that CLA taxonomy was enriched
+  cla_result <- tidytable::fread(output_cla)
+  expect_true("BBBBB" %in% cla_result$structure_inchikey)
+})
+
+test_that("enrich_taxonomy_from_cache writes back library entries to cache for persistence", {
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  # Library already has taxonomy for "C"
+  taxonomy <- tidytable::tidytable(
+    structure_smiles = "C",
+    structure_tax_npc_01pat = "PathA",
+    structure_tax_npc_02sup = "SuperA",
+    structure_tax_npc_03cla = "ClassA"
+  )
+
+  # Cache has taxonomy for "CC" only
+  cache <- tidytable::tidytable(
+    structure_smiles = c("CC"),
+    structure_tax_npc_01pat = c("PathB"),
+    structure_tax_npc_02sup = c("SuperB"),
+    structure_tax_npc_03cla = c("ClassB")
+  )
+  cache_path <- file.path(tmpdir, "npc_cache.tsv")
+  tidytable::fwrite(cache, cache_path, sep = "\t")
+
+  result <- enrich_taxonomy_from_cache(
+    taxonomy_table = taxonomy,
+    cache_path = cache_path,
+    key_col = "structure_smiles",
+    all_keys = c("C", "CC"),
+    taxonomy_name = "NPClassifier"
+  )
+
+  # Result should have both
+
+  expect_equal(nrow(result), 2)
+
+  # Cache file should now also contain "C" (written back from library)
+  updated_cache <- tidytable::fread(cache_path)
+  expect_true("C" %in% updated_cache$structure_smiles)
+  expect_true("CC" %in% updated_cache$structure_smiles)
+  expect_equal(nrow(updated_cache), 2)
+})
+
+test_that("enrich_taxonomy_from_cache handles classy_magic long-name NPC format", {
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  taxonomy <- tidytable::tidytable(
+    structure_smiles = "C",
+    structure_tax_npc_01pat = "PathA",
+    structure_tax_npc_02sup = "SuperA",
+    structure_tax_npc_03cla = "ClassA"
+  )
+
+  # Cache with classy_magic long-name format
+  cache <- tidytable::tidytable(
+    structure_smiles = c("CC"),
+    structure_taxonomy_npclassifier_01pathway = c("PathB"),
+    structure_taxonomy_npclassifier_02superclass = c("SuperB"),
+    structure_taxonomy_npclassifier_03class = c("ClassB")
+  )
+  cache_path <- file.path(tmpdir, "npc_long.tsv")
+  tidytable::fwrite(cache, cache_path, sep = "\t")
+
+  result <- enrich_taxonomy_from_cache(
+    taxonomy_table = taxonomy,
+    cache_path = cache_path,
+    key_col = "structure_smiles",
+    all_keys = c("C", "CC"),
+    col_mapping = list(
+      "structure_smiles" = "structure_smiles",
+      "structure_tax_npc_01pat" = c(
+        "pathway",
+        "structure_taxonomy_npclassifier_01pathway"
+      ),
+      "structure_tax_npc_02sup" = c(
+        "superclass",
+        "structure_taxonomy_npclassifier_02superclass"
+      ),
+      "structure_tax_npc_03cla" = c(
+        "class",
+        "structure_taxonomy_npclassifier_03class"
+      )
+    ),
+    taxonomy_name = "NPClassifier"
+  )
+  expect_equal(nrow(result), 2)
+  added <- result[result$structure_smiles == "CC", ]
+  expect_equal(added$structure_tax_npc_01pat, "PathB")
+})
+
+test_that("enrich_taxonomy_from_cache handles marimo CSV format (smiles key column)", {
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  taxonomy <- tidytable::tidytable(
+    structure_smiles = "C",
+    structure_tax_npc_01pat = "PathA",
+    structure_tax_npc_02sup = "SuperA",
+    structure_tax_npc_03cla = "ClassA"
+  )
+
+  # Cache with marimo format: 'smiles' key, 'pathway', 'superclass', 'class'
+  cache <- tidytable::tidytable(
+    smiles = c("CC"),
+    pathway = c("PathB"),
+    superclass = c("SuperB"),
+    class = c("ClassB"),
+    isglycoside = c("False"),
+    error = c("")
+  )
+  cache_path <- file.path(tmpdir, "npc_marimo.csv")
+  tidytable::fwrite(cache, cache_path, sep = ",")
+
+  result <- enrich_taxonomy_from_cache(
+    taxonomy_table = taxonomy,
+    cache_path = cache_path,
+    key_col = "structure_smiles",
+    all_keys = c("C", "CC"),
+    col_mapping = list(
+      "structure_smiles" = "smiles",
+      "structure_tax_npc_01pat" = c(
+        "pathway",
+        "structure_taxonomy_npclassifier_01pathway"
+      ),
+      "structure_tax_npc_02sup" = c(
+        "superclass",
+        "structure_taxonomy_npclassifier_02superclass"
+      ),
+      "structure_tax_npc_03cla" = c(
+        "class",
+        "structure_taxonomy_npclassifier_03class"
+      )
+    ),
+    taxonomy_name = "NPClassifier"
+  )
+  expect_equal(nrow(result), 2)
+  added <- result[result$structure_smiles == "CC", ]
+  expect_equal(added$structure_tax_npc_01pat, "PathB")
+})
