@@ -319,24 +319,7 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
       if (nrow(tbl) == 0L) {
         return(acc)
       }
-      # Use only structurally unambiguous keys for the join.
-      # Avoid implicit joins on ALL shared columns (which would include
-      # structure_smiles_no_stereo, structure_name, etc.) — these can
-      # differ between files for tautomers or name variants, causing
-      # valid structure-organism pairs to be silently dropped.
-      shared <- intersect(names(acc), names(tbl))
-      # Prefer the most specific InChIKey available, then organism_name.
-      preferred_keys <- c(
-        "structure_inchikey",
-        "structure_inchikey_no_stereo",
-        "structure_inchikey_connectivity_layer",
-        "organism_name"
-      )
-      join_by <- intersect(preferred_keys, shared)
-      if (length(join_by) == 0L) {
-        join_by <- shared
-      }
-      tidytable::left_join(x = acc, y = tbl, by = join_by)
+      tidytable::left_join(x = acc, y = tbl)
     }
   )
 }
@@ -510,8 +493,8 @@ rearrange_annotations <- function(
   )
 
   # Step 2: Add formula-level SIRIUS scores.
-  # Join on feature_id + molecular_formula only (not feature_mz/feature_rt
-  # which can have floating-point mismatches across files).
+  # left_join (not full_join) so that formula entries without a matching
+  # annotation row do NOT create phantom rows with NA connectivity_layer.
   formula_new_cols <- setdiff(
     names(formula_table),
     names(annotation_table_merged)
@@ -525,7 +508,7 @@ rearrange_annotations <- function(
       length(formula_join_by) > 0L &&
       nrow(formula_table) > 0L
   ) {
-    annotation_table_merged <- tidytable::full_join(
+    annotation_table_merged <- tidytable::left_join(
       annotation_table_merged,
       formula_table |>
         tidytable::select(
@@ -536,12 +519,14 @@ rearrange_annotations <- function(
   }
 
   # Step 3: Add CANOPUS predictions (feature-level).
+  # left_join (not full_join) so that CANOPUS entries for features
+  # without annotations do NOT create phantom rows.
   canopus_new_cols <- setdiff(
     names(canopus_table),
     names(annotation_table_merged)
   )
   if (length(canopus_new_cols) > 0L && nrow(canopus_table) > 0L) {
-    annotation_table_merged <- tidytable::full_join(
+    annotation_table_merged <- tidytable::left_join(
       annotation_table_merged,
       canopus_table |>
         tidytable::select(

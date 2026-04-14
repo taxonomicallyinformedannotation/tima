@@ -303,7 +303,8 @@ weight_bio <- function(
           candidate_structure_inchikey_connectivity_layer,
           candidate_organism_name
         ) |>
-        tidytable::distinct()
+        tidytable::distinct(),
+      by = "candidate_structure_inchikey_connectivity_layer"
     )
 
   df2 <- df1 |>
@@ -327,9 +328,16 @@ weight_bio <- function(
           # sample_organism_09_1_subspecies,
           sample_organism_10_varietas
         ) |>
-        tidytable::distinct()
+        tidytable::distinct(),
+      by = "sample_organism_name"
     ) |>
-    tidytable::inner_join(y = df0) |>
+    tidytable::inner_join(
+      y = df0,
+      by = c(
+        "candidate_structure_inchikey_connectivity_layer",
+        "candidate_organism_name"
+      )
+    ) |>
     tidytable::distinct(
       sample_organism_name,
       sample_organism_01_domain,
@@ -590,7 +598,13 @@ weight_bio <- function(
     ) |>
     tidytable::distinct()
   annot_table_wei_bio_init <- annot_table_wei_bio_init |>
-    tidytable::right_join(y = df1) |>
+    tidytable::right_join(
+      y = df1,
+      by = c(
+        "sample_organism_name",
+        "candidate_organism_name"
+      )
+    ) |>
     tidytable::mutate(
       score_biological = tidytable::if_else(
         condition = is.na(score_biological),
@@ -611,15 +625,37 @@ weight_bio <- function(
       .keep_all = TRUE
     )
 
+  # Join back to full annotation table using only the correct keys.
+  # IMPORTANT: Do NOT use implicit `by` here. The implicit join would include
+  # `candidate_structure_organism_occurrence_closest` as a key, which was
+  # freshly computed above and won't match the original (usually NA) value
+  # in annotation_table_taxed, silently dropping most rows.
+  # Remove columns from annotation_table_taxed that we've recomputed in
+  # annot_table_wei_bio_init, to avoid .x/.y suffix duplication.
+  cols_from_bio <- c(
+    "candidate_structure_organism_occurrence_closest",
+    "candidate_organism_name",
+    "score_biological"
+  )
+  annotation_table_taxed_slim <- annotation_table_taxed |>
+    tidytable::select(-tidyselect::any_of(cols_from_bio))
+
   annot_table_wei_bio_big <- annot_table_wei_bio_init |>
-    tidytable::inner_join(y = annotation_table_taxed) |>
+    tidytable::inner_join(
+      y = annotation_table_taxed_slim,
+      by = c(
+        "candidate_structure_inchikey_connectivity_layer",
+        "sample_organism_name"
+      )
+    ) |>
     tidytable::select(
       -tidyselect::contains(match = "candidate_organism"),
       -tidyselect::contains(match = "sample_organism")
     )
   rm(
     annot_table_wei_bio_init,
-    annotation_table_taxed
+    annotation_table_taxed,
+    annotation_table_taxed_slim
   )
 
   # Ensure candidate_score_sirius_confidence column exists (may be absent when

@@ -435,11 +435,15 @@ complement_metadata_structures <- function(
   # the stereo smiles needed for tax_npc.
   # stereo_k provides: inchikey -> (smiles, connectivity_layer, inchikey_no_stereo, smiles_no_stereo)
 
+  # Build unique key combinations for enrichment lookup.
+  # Use only (inchikey_no_stereo, connectivity_layer) — NOT smiles_no_stereo.
+  # Including smiles_no_stereo would fragment the lookup when tautomers
+  # produce different SMILES for the same InChIKey (e.g., RWQNBRDOKXIBIV
+  # glutamine amide vs enol form), leading to missed enrichments.
   structure_keys <- df |>
     tidytable::distinct(
       candidate_structure_inchikey_no_stereo,
-      candidate_structure_inchikey_connectivity_layer,
-      candidate_structure_smiles_no_stereo
+      candidate_structure_inchikey_connectivity_layer
     )
   log_debug("Structure keys: %d unique combinations", nrow(structure_keys))
 
@@ -455,25 +459,27 @@ complement_metadata_structures <- function(
     )
 
   # For taxonomy joins, we need to bridge through stereo_k to get
-  # full inchikey and stereo smiles from the annotation's coarser keys
-  # Build a bridge: smiles_no_stereo -> (inchikey, smiles with stereo)
-  # Use first match per smiles_no_stereo to avoid fan-out
+  # full inchikey and stereo smiles from the annotation's coarser keys.
+  # Bridge: connectivity_layer -> (inchikey, smiles with stereo)
+  # Use first match per connectivity_layer to avoid fan-out.
   stereo_bridge <- stereo_k |>
     tidytable::select(
-      candidate_structure_smiles_no_stereo = structure_smiles_no_stereo,
+      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
       .bridge_inchikey = structure_inchikey,
       .bridge_smiles = structure_smiles
     ) |>
-    tidytable::filter(!is.na(candidate_structure_smiles_no_stereo)) |>
+    tidytable::filter(
+      !is.na(candidate_structure_inchikey_connectivity_layer)
+    ) |>
     tidytable::distinct(
-      candidate_structure_smiles_no_stereo,
+      candidate_structure_inchikey_connectivity_layer,
       .keep_all = TRUE
     )
 
   key_lookup <- key_lookup |>
     tidytable::left_join(
       y = stereo_bridge,
-      by = "candidate_structure_smiles_no_stereo"
+      by = "candidate_structure_inchikey_connectivity_layer"
     ) |>
     # Join ClassyFire by full inchikey (via bridge)
     tidytable::left_join(
@@ -508,8 +514,7 @@ complement_metadata_structures <- function(
       y = key_lookup,
       by = c(
         "candidate_structure_inchikey_no_stereo",
-        "candidate_structure_inchikey_connectivity_layer",
-        "candidate_structure_smiles_no_stereo"
+        "candidate_structure_inchikey_connectivity_layer"
       )
     ) |>
     tidytable::mutate(

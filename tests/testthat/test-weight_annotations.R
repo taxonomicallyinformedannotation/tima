@@ -1,7 +1,6 @@
 # Test Suite: weight_annotations ----
 
 library(testthat)
-devtools::load_all()
 
 # Fixture staging ----
 
@@ -709,7 +708,11 @@ test_that("rearrange_annotations merges SIRIUS scores into spectral entries with
     candidate_spectrum_entropy = c(NA_character_, NA_character_, NA_character_),
     candidate_structure_name = c("L-Glutamine", "Glutamine", "Compound2"),
     candidate_structure_exact_mass = c("146.069", "146.069", "199.0"),
-    candidate_structure_molecular_formula = c("C5H10N2O3", "C5H10N2O3", "C8H10N2"),
+    candidate_structure_molecular_formula = c(
+      "C5H10N2O3",
+      "C5H10N2O3",
+      "C8H10N2"
+    ),
     candidate_structure_xlogp = c("-3.1", "-3.1", "1.0"),
     candidate_structure_inchikey_connectivity_layer = c(
       "RWQNBRDOKXIBIV",

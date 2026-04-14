@@ -150,7 +150,13 @@ summarize_results <- function(
     tidytable::left_join(y = components_min, by = "feature_id") |>
     tidytable::select(tidyselect::any_of(x = select_cols)) |>
     tidytable::distinct() |>
-    tidytable::left_join(y = organism_lookup) |>
+    tidytable::left_join(
+      y = organism_lookup,
+      by = c(
+        "candidate_structure_inchikey_connectivity_layer",
+        "candidate_structure_organism_occurrence_closest"
+      )
+    ) |>
     tidytable::select(tidyselect::any_of(x = final_select_cols)) |>
     tidytable::arrange(rank_final)
 
@@ -318,7 +324,8 @@ summarize_results <- function(
         tidytable::distinct(
           candidate_structure_organism_occurrence_closest,
           candidate_structure_inchikey_connectivity_layer
-        )
+        ),
+      by = "candidate_structure_inchikey_connectivity_layer"
     ) |>
     tidytable::filter(
       candidate_structure_organism_occurrence_closest ==
