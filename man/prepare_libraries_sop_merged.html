@@ -675,6 +675,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   value = get_params(step = "prepare_libraries_sop_merged")\$organisms\$filter\$value,
   cache = get_params(step =
     "prepare_libraries_sop_merged")\$files\$libraries\$sop\$merged\$structures\$processed,
+  additional_npc_cache = get_params(step =
+    "prepare_libraries_sop_merged")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$additional_npc,
+  additional_cla_cache = get_params(step =
+    "prepare_libraries_sop_merged")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$additional_cla,
   output_key = get_params(step =
     "prepare_libraries_sop_merged")\$files\$libraries\$sop\$merged\$keys,
   output_org_tax_ott = get_params(step =
@@ -733,6 +737,22 @@ character Character string taxon name(s) to keep (can use | for multiple, e.g., 
 </td>
 <td>
 character Character string path to cache directory for processed SMILES
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="additional_npc_cache">additional_npc_cache</code>
+</td>
+<td>
+character Optional path to an additional NPClassifier taxonomy cache file (TSV/TSV.gz). Structures present in the merged library but missing NPClassifier taxonomy will be looked up in this cache. Expected columns: <code>structure_smiles</code>, <code>structure_tax_npc_01pat</code>, <code>structure_tax_npc_02sup</code>, <code>structure_tax_npc_03cla</code>. Alternative column names from external tools (e.g., <code>pathway</code>, <code>superclass</code>, <code>class</code>) are also supported.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="additional_cla_cache">additional_cla_cache</code>
+</td>
+<td>
+character Optional path to an additional ClassyFire taxonomy cache file (TSV/TSV.gz). Structures present in the merged library but missing ClassyFire taxonomy will be looked up in this cache. Expected columns: <code>structure_inchikey</code>, <code>structure_tax_cla_chemontid</code>, <code>structure_tax_cla_01kin</code>, <code>structure_tax_cla_02sup</code>, <code>structure_tax_cla_03cla</code>, <code>structure_tax_cla_04dirpar</code>. Alternative column names (e.g., <code>inchikey</code>, <code>chemontid</code>, <code>kingdom</code>, <code>superclass</code>, <code>class</code>, <code>directparent</code>) are also supported.
 </td>
 </tr>
 <tr>
