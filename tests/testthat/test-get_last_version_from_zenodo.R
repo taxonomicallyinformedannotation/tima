@@ -452,15 +452,15 @@ test_that("get_last_version_from_zenodo success", {
   expect_no_error(
     get_last_version_from_zenodo(
       doi = "10.5281/zenodo.7534071",
-      pattern = "230106_frozen.csv.gz",
-      path = file.path(tmp, "230106_frozen.csv.gz")
+      pattern = "frozen.csv.gz",
+      path = file.path(tmp, "frozen.csv.gz")
     )
   )
   expect_no_error(
     get_last_version_from_zenodo(
       doi = "10.5281/zenodo.7534071",
-      pattern = "230106_frozen.csv.gz",
-      path = file.path(tmp, "230106_frozen.csv.gz")
+      pattern = "frozen.csv.gz",
+      path = file.path(tmp, "frozen.csv.gz")
     )
   )
 })
