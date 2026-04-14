@@ -551,9 +551,9 @@ prepare_params <- function(
     fil_lib_sop_mer_str_tax_cla
   yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$taxonomies$npc <-
     fil_lib_sop_mer_str_tax_npc
-  yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$taxonomies$cla_c <-
+  yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$taxonomies$c <-
     fil_lib_sop_mer_str_tax_add_cla
-  yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$taxonomies$npc_c <-
+  yamls_params$prepare_libraries_sop_merged$files$libraries$sop$merged$structures$taxonomies$n <-
     fil_lib_sop_mer_str_tax_add_npc
   yamls_params$prepare_libraries_sop_merged$organisms$filter$mode <-
     org_fil_mod
