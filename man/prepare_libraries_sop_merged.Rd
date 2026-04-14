@@ -11,6 +11,10 @@ prepare_libraries_sop_merged(
   value = get_params(step = "prepare_libraries_sop_merged")$organisms$filter$value,
   cache = get_params(step =
     "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$processed,
+  additional_npc_cache = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$additional_npc,
+  additional_cla_cache = get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$merged$structures$taxonomies$additional_cla,
   output_key = get_params(step =
     "prepare_libraries_sop_merged")$files$libraries$sop$merged$keys,
   output_org_tax_ott = get_params(step =
@@ -39,6 +43,23 @@ family, genus, etc.)}
 e.g., 'Gentianaceae|Apocynaceae')}
 
 \item{cache}{\link{character} Character string path to cache directory for processed SMILES}
+
+\item{additional_npc_cache}{\link{character} Optional path to an additional NPClassifier
+taxonomy cache file (TSV/TSV.gz). Structures present in the merged library
+but missing NPClassifier taxonomy will be looked up in this cache. Expected
+columns: \code{structure_smiles}, \code{structure_tax_npc_01pat},
+\code{structure_tax_npc_02sup}, \code{structure_tax_npc_03cla}. Alternative column
+names from external tools (e.g., \code{pathway}, \code{superclass}, \code{class}) are also
+supported.}
+
+\item{additional_cla_cache}{\link{character} Optional path to an additional ClassyFire
+taxonomy cache file (TSV/TSV.gz). Structures present in the merged library
+but missing ClassyFire taxonomy will be looked up in this cache. Expected
+columns: \code{structure_inchikey}, \code{structure_tax_cla_chemontid},
+\code{structure_tax_cla_01kin}, \code{structure_tax_cla_02sup},
+\code{structure_tax_cla_03cla}, \code{structure_tax_cla_04dirpar}. Alternative column
+names (e.g., \code{inchikey}, \code{chemontid}, \code{kingdom}, \code{superclass}, \code{class},
+\code{directparent}) are also supported.}
 
 \item{output_key}{\link{character} Character string path for output keys file}
 
