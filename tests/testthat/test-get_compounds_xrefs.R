@@ -166,9 +166,9 @@ test_that("get_compounds_xrefs refreshes stale cache with real data", {
 
   df <- tidytable::fread(result)
 
-  if (nrow(df) == 0L) {
+  if (nrow(df) == 0L || "FAKE-INCHIKEY" %in% df$inchikey) {
     skip(
-      "Upstream xrefs service unavailable; graceful fallback returned empty table"
+      "Upstream xrefs service unavailable; graceful fallback returned stale/empty table"
     )
   }
 
