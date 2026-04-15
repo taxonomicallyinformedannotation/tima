@@ -111,6 +111,24 @@ test_that("get_compounds_xrefs fetches fresh data from QLever", {
   skip_on_cran()
   skip_if_offline()
 
+  # Quick QLever reachability check
+  qlever_ok <- tryCatch(
+    {
+      resp <- httr2::request("https://qlever.cs.uni-freiburg.de/api/wikidata") |>
+        httr2::req_method("POST") |>
+        httr2::req_body_form(query = "SELECT * WHERE { ?s ?p ?o } LIMIT 1") |>
+        httr2::req_headers(Accept = "text/csv") |>
+        httr2::req_timeout(10) |>
+        httr2::req_error(is_error = \(r) FALSE) |>
+        httr2::req_perform()
+      httr2::resp_status(resp) < 500L
+    },
+    error = function(...) FALSE
+  )
+  if (!isTRUE(qlever_ok)) {
+    skip("QLever backend is unreachable; skipping live integration test")
+  }
+
   output_file <- temp_test_path("xrefs_integration.tsv.gz")
 
   result <- get_compounds_xrefs(
@@ -142,6 +160,24 @@ test_that("get_compounds_xrefs refreshes stale cache with real data", {
   skip_on_cran()
   skip_if_offline()
 
+  # Quick QLever reachability check — skip entire test if backend is down
+  qlever_ok <- tryCatch(
+    {
+      resp <- httr2::request("https://qlever.cs.uni-freiburg.de/api/wikidata") |>
+        httr2::req_method("POST") |>
+        httr2::req_body_form(query = "SELECT * WHERE { ?s ?p ?o } LIMIT 1") |>
+        httr2::req_headers(Accept = "text/csv") |>
+        httr2::req_timeout(10) |>
+        httr2::req_error(is_error = \(r) FALSE) |>
+        httr2::req_perform()
+      httr2::resp_status(resp) < 500L
+    },
+    error = function(...) FALSE
+  )
+  if (!isTRUE(qlever_ok)) {
+    skip("QLever backend is unreachable; skipping live refresh test")
+  }
+
   output_file <- temp_test_path("xrefs_refresh.tsv.gz")
 
   # Create a small old-looking file
@@ -156,17 +192,23 @@ test_that("get_compounds_xrefs refreshes stale cache with real data", {
   Sys.sleep(0.1)
 
   # Force refresh by setting max_age_hours = 0
-  result <- get_compounds_xrefs(
-    props = c("P683"),
-    output = output_file,
-    max_age_hours = 0
+  result <- tryCatch(
+    get_compounds_xrefs(
+      props = c("P683"),
+      output = output_file,
+      max_age_hours = 0
+    ),
+    error = function(e) {
+      skip(paste("QLever unavailable during refresh:", conditionMessage(e)))
+    }
   )
 
   expect_true(file.exists(result))
 
   df <- tidytable::fread(result)
 
-  if (nrow(df) == 0L || "FAKE-INCHIKEY" %in% df$inchikey) {
+  # If the service returned stale/empty data, skip gracefully
+  if (nrow(df) == 0L || (nrow(df) == 1L && "FAKE-INCHIKEY" %in% df$inchikey)) {
     skip(
       "Upstream xrefs service unavailable; graceful fallback returned stale/empty table"
     )
