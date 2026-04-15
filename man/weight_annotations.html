@@ -1185,65 +1185,66 @@ Optional character path to xrefs file from <code>get_compounds_xrefs()</code>. I
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>github <span class="ot">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/"</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>repo <span class="ot">&lt;-</span> <span class="st">"taxonomicallyinformedannotation/tima-example-files/main/"</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(github, repo)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>library <span class="ot">&lt;-</span> <span class="fu">get_params</span>(<span class="at">step =</span> <span class="st">"weight_annotations"</span>)<span class="sc">$</span>files<span class="sc">$</span>libraries<span class="sc">$</span>sop<span class="sc">$</span>merged<span class="sc">$</span>keys <span class="sc">|&gt;</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">pattern =</span> <span class="st">".gz"</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">replacement =</span> <span class="st">""</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">fixed =</span> <span class="cn">TRUE</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>org_tax_ott <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/libraries/"</span>,</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"sop/merged/organisms/taxonomies/ott.tsv"</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>str_stereo <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/libraries/"</span>,</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="st">"sop/merged/structures/stereo.tsv"</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>annotations <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/annotations/"</span>,</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="st">"example_annotationsFiltered.tsv"</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>canopus <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/annotations/"</span>,</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="st">"example_canopusPrepared.tsv"</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>formula <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/annotations/"</span>,</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="st">"example_formulaPrepared.tsv"</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>components <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/features/"</span>,</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="st">"example_componentsPrepared.tsv"</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>edges <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/features/"</span>,</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  <span class="st">"example_edges.tsv"</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>taxa <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/taxa/"</span>,</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  <span class="st">"example_taxed.tsv"</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, library), <span class="at">export =</span> library)</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, org_tax_ott), <span class="at">export =</span> org_tax_ott)</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, str_stereo), <span class="at">export =</span> str_stereo)</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, annotations), <span class="at">export =</span> annotations)</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, canopus), <span class="at">export =</span> canopus)</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, formula), <span class="at">export =</span> formula)</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, components), <span class="at">export =</span> components)</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, edges), <span class="at">export =</span> edges)</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, taxa), <span class="at">export =</span> taxa)</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="fu">weight_annotations</span>(</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>  <span class="at">library =</span> library,</span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>  <span class="at">org_tax_ott =</span> org_tax_ott,</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_stereo =</span> str_stereo,</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>  <span class="at">annotations =</span> annotations,</span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>  <span class="at">canopus =</span> canopus,</span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> formula,</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>  <span class="at">components =</span> components,</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>  <span class="at">edges =</span> edges,</span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>  <span class="at">taxa =</span> taxa</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>library <span class="ot">&lt;-</span> <span class="fu">get_params</span>(<span class="at">step =</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"weight_annotations"</span>)<span class="sc">$</span>files<span class="sc">$</span>libraries<span class="sc">$</span>sop<span class="sc">$</span>merged<span class="sc">$</span>keys <span class="sc">|&gt;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">pattern =</span> <span class="st">".gz"</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">replacement =</span> <span class="st">""</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">fixed =</span> <span class="cn">TRUE</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>org_tax_ott <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/libraries/"</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"sop/merged/organisms/taxonomies/ott.tsv"</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>str_stereo <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/libraries/"</span>,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="st">"sop/merged/structures/stereo.tsv"</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>annotations <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/annotations/"</span>,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="st">"example_annotationsFiltered.tsv"</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>canopus <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/annotations/"</span>,</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  <span class="st">"example_canopusPrepared.tsv"</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>formula <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/annotations/"</span>,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="st">"example_formulaPrepared.tsv"</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>components <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/features/"</span>,</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="st">"example_componentsPrepared.tsv"</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>edges <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/features/"</span>,</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  <span class="st">"example_edges.tsv"</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>taxa <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/interim/taxa/"</span>,</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  <span class="st">"example_taxed.tsv"</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, library), <span class="at">export =</span> library)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, org_tax_ott), <span class="at">export =</span> org_tax_ott)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, str_stereo), <span class="at">export =</span> str_stereo)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, annotations), <span class="at">export =</span> annotations)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, canopus), <span class="at">export =</span> canopus)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, formula), <span class="at">export =</span> formula)</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, components), <span class="at">export =</span> components)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, edges), <span class="at">export =</span> edges)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="fu">get_file</span>(<span class="at">url =</span> <span class="fu">paste0</span>(dir, taxa), <span class="at">export =</span> taxa)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="fu">weight_annotations</span>(</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>  <span class="at">library =</span> library,</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>  <span class="at">org_tax_ott =</span> org_tax_ott,</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_stereo =</span> str_stereo,</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>  <span class="at">annotations =</span> annotations,</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>  <span class="at">canopus =</span> canopus,</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> formula,</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>  <span class="at">components =</span> components,</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>  <span class="at">edges =</span> edges,</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>  <span class="at">taxa =</span> taxa</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
