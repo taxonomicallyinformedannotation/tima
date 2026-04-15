@@ -124,7 +124,7 @@ validate_inputs(
   feature_col = "row ID",
   filename_col = "filename",
   organism_col = "ATTRIBUTE_species"
-  )
+)
 ```
 
 If you do not feel like going through all the steps, then just do 🚀:

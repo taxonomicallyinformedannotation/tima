@@ -187,16 +187,16 @@ get_compounds_xrefs <- function(
   )
 
   sparql <- paste0(
-    'PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    "PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?item ?inchikey ?db ?id WHERE {
   VALUES ?db {
-',
+",
     wdt_values,
-    '
+    "
   }
   ?item wdt:P235 ?inchikey .
   ?item ?db ?id .
-}'
+}"
   )
 
   # ── 4. Query QLever ─────────────────────────────────────────────────────────

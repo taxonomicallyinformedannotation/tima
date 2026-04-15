@@ -165,11 +165,12 @@ targets::tar_visnetwork(
   exclude = targets::contains(
     c(
       "benchmark",
-      "par_", 
+      "par_",
       "lib_",
       "paths",
-      "test")
-    ),
+      "test"
+    )
+  ),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -244,11 +245,12 @@ targets::tar_visnetwork(
   exclude = targets::contains(
     c(
       "benchmark",
-      "par_", 
+      "par_",
       "lib_",
       "paths",
-      "test")
-    ),
+      "test"
+    )
+  ),
   targets_only = TRUE,
   degree_from = 8
 )

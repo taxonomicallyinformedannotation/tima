@@ -49,8 +49,8 @@
 #' weighted <- weight_bio(
 #'   annotation_table_taxed = annotations,
 #'   structure_organism_pairs_table = sop_table,
-#'   weight_spectral = 1,      # Will be normalized to 0.5
-#'   weight_biological = 1,    # Will be normalized to 0.5
+#'   weight_spectral = 1, # Will be normalized to 0.5
+#'   weight_biological = 1, # Will be normalized to 0.5
 #'   score_biological_domain = 0.01,
 #'   score_biological_kingdom = 0.02,
 #'   score_biological_phylum = 0.05,

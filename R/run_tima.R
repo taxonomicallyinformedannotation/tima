@@ -247,7 +247,7 @@ run_tima <- function(
   log_info("=" |> rep(60) |> paste(collapse = ""))
   log_info("Starting Complete TIMA Annotation Workflow")
   log_info("=" |> rep(60) |> paste(collapse = ""))
-  log_info("Start time: %s", format(start_time, '%Y-%m-%d %H:%M:%S'))
+  log_info("Start time: %s", format(start_time, "%Y-%m-%d %H:%M:%S"))
   log_info("Authors: Adriano Rutz (AR)")
   log_info("Contributors: Pierre-Marie Allard (PMA)")
   log_info("=" |> rep(60) |> paste(collapse = ""))

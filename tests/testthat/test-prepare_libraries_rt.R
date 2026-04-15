@@ -595,23 +595,21 @@ test_that("prepare_libraries_rt handles missing InChIKeys", {
 
   # Should warn about missing InChIKeys
   # TODO the WARN is as log, not as real warning
-  expect_no_error(
-    {
-      result <- prepare_libraries_rt(
-        mgf_exp = NULL,
-        mgf_is = NULL,
-        temp_exp = csv_exp,
-        temp_is = NULL,
-        unit_rt = "minutes",
-        name_rt = "rt",
-        name_inchikey = "inchikey",
-        name_smiles = "smiles",
-        name_name = "structure_name",
-        output_rt = output_rt,
-        output_sop = output_sop
-      )
-    }
-  )
+  expect_no_error({
+    result <- prepare_libraries_rt(
+      mgf_exp = NULL,
+      mgf_is = NULL,
+      temp_exp = csv_exp,
+      temp_is = NULL,
+      unit_rt = "minutes",
+      name_rt = "rt",
+      name_inchikey = "inchikey",
+      name_smiles = "smiles",
+      name_name = "structure_name",
+      output_rt = output_rt,
+      output_sop = output_sop
+    )
+  })
 
   expect_type(result, "character")
 })

@@ -175,7 +175,7 @@ The validation functions are **automatically integrated** into the main TIMA fun
 
 ```{r automatic_validation, eval=FALSE}
 # These functions automatically validate inputs
-annotate_masses(...)  # Validates features file first
+annotate_masses(...) # Validates features file first
 annotate_spectra(...) # Validates MGF files first
 ```
 
@@ -354,7 +354,7 @@ validate_inputs(features = "data/features.csv")
 run_tima()
 
 # Bad practice (will waste time if data is invalid)
-run_tima()  # Might fail after 10+ minutes
+run_tima() # Might fail after 10+ minutes
 ```
 
 ### Validate After Data Conversion
@@ -375,8 +375,8 @@ Add validation to your automated workflows:
 
 ```{r best_practice_3, eval=FALSE}
 # Snakemake, Nextflow, or targets pipeline
-validate_inputs(...)  # Fails fast if data is bad
-run_tima()            # Only runs if validation passes
+validate_inputs(...) # Fails fast if data is bad
+run_tima() # Only runs if validation passes
 ```
 
 ### Document Your Validation

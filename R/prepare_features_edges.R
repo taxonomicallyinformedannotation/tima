@@ -104,8 +104,8 @@ prepare_features_edges <- function(
   }
 
   # Load Edge Tables ----
-  log_debug("MS1 edges: %s", input[['ms1']])
-  log_debug("Spectral edges: %s", input[['spectral']])
+  log_debug("MS1 edges: %s", input[["ms1"]])
+  log_debug("Spectral edges: %s", input[["spectral"]])
 
   # Load edges tables
   edges_tables <- tryCatch(
