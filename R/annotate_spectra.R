@@ -273,8 +273,7 @@ annotate_spectra <- function(
   meta <- build_library_metadata(spectral_library, lib_precursors)
   df_final <- finalize_results(
     df_sim = tidytable::as_tidytable(x = sim_raw),
-    meta = meta,
-    threshold = threshold
+    meta = meta
   )
   if (nrow(df_final) == 0L) {
     return(
@@ -589,8 +588,7 @@ compute_similarity_safe <- function(
 #' @keywords internal
 finalize_results <- function(
   df_sim,
-  meta,
-  threshold
+  meta
 ) {
   if (nrow(df_sim) == 0) {
     return(tidytable::tidytable())

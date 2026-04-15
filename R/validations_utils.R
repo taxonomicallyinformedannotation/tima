@@ -416,7 +416,8 @@ validate_numeric_range <- function(
 validate_tolerance_ppm <- function(
   tolerance_ppm,
   param_name = "tolerance_ppm",
-  context = NULL
+  context = NULL,
+  max_ppm = MAX_TOLERANCE_PPM
 ) {
   if (!is.numeric(tolerance_ppm) || length(tolerance_ppm) != 1L) {
     msg <- format_error(
@@ -445,7 +446,7 @@ validate_tolerance_ppm <- function(
   }
 
   # Provide instrument-specific guidance
-  if (tolerance_ppm > MAX_TOLERANCE_PPM) {
+  if (tolerance_ppm > max_ppm) {
     instrument_guidance <- paste0(
       "Your instrument: This seems unusually large. For comparison:\n",
       "  - Orbitrap: typically 1-5 ppm\n",
@@ -458,7 +459,7 @@ validate_tolerance_ppm <- function(
       problem = "Mass tolerance exceeds recommended maximum",
       expected = paste0(
         "typically \u2264 ",
-        MAX_TOLERANCE_PPM,
+        max_ppm,
         " ppm for high-resolution MS"
       ),
       received = paste0(tolerance_ppm, " ppm"),
@@ -692,7 +693,8 @@ validate_tolerances <- function(
     validate_tolerance_ppm(
       tolerance_ppm = tolerance_ppm,
       param_name = "tolerance_ppm",
-      context = context
+      context = context,
+      max_ppm = max_ppm
     )
   }
 

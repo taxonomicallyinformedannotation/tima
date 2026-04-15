@@ -97,7 +97,6 @@ calculate_mass_of_m <- function(
 
   # Extract parsed components with descriptive names
   n_charges <- parsed_adduct["n_charges"][[1L]]
-  charge_sign <- parsed_adduct["charge"][[1L]]
   n_mer <- parsed_adduct["n_mer"][[1L]]
   n_iso <- parsed_adduct["n_iso"][[1L]]
   mass_modifications <- parsed_adduct["los_add_clu"][[1L]]
@@ -129,10 +128,8 @@ calculate_mass_of_m <- function(
   neutral_mass <- calculate_neutral_mass_formula(
     mz = mz,
     n_charges = n_charges,
-    charge_sign = charge_sign,
     n_iso = n_iso,
     mass_modifications = mass_modifications,
-    electron_mass = electron_mass,
     n_mer = n_mer
   )
 
@@ -258,10 +255,8 @@ is_parse_failed <- function(parsed_adduct) {
 calculate_neutral_mass_formula <- function(
   mz,
   n_charges,
-  charge_sign,
   n_iso,
   mass_modifications,
-  electron_mass,
   n_mer
 ) {
   # Apply the neutral mass calculation formula
@@ -326,6 +321,9 @@ calculate_mz_from_mass <- function(
     max_value = Inf,
     param_name = "neutral_mass"
   )
+
+  # electron_mass kept for API compatibility (negligible correction)
+  force(electron_mass)
 
   # Parse adduct
   parsed_adduct <- parse_adduct(adduct_string)

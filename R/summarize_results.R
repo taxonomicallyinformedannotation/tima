@@ -181,7 +181,7 @@ summarize_results <- function(
   if (remove_ties) {
     log_info("Removing ties")
     df_joined <- df_joined |>
-      tidytable::distinct(c(feature_id, rank_final), .keep_all = TRUE)
+      tidytable::distinct(feature_id, rank_final, .keep_all = TRUE)
   }
 
   # Summarize if requested

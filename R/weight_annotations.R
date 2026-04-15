@@ -932,6 +932,14 @@ weight_annotations <- function(
 ) {
   # Input Validation ----
 
+  # These sub-rank weights are accepted for YAML config completeness
+  # but not yet wired into scoring.
+  force(score_biological_infraorder)
+  force(score_biological_subfamily)
+  force(score_biological_subtribe)
+  force(score_biological_subgenus)
+  force(score_biological_subspecies)
+
   validate_weight_annotations_inputs(
     library = library,
     components = components,
