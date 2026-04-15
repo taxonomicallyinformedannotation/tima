@@ -84,7 +84,7 @@ test_that("run_app keeps provided settings outside Docker", {
 
   expect_no_error(run_app(host = "10.0.0.1", port = 9999, browser = TRUE))
   expect_identical(seen$appDir, "mock-app-dir")
-  expect_identical(seen$port, 3839L)
-  expect_identical(seen$host, "127.0.0.1")
-  expect_false(seen$launch.browser)
+  expect_identical(seen$port, 9999L)
+  expect_identical(seen$host, "10.0.0.1")
+  expect_true(seen$launch.browser)
 })
