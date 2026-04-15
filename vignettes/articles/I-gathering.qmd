@@ -169,10 +169,13 @@ The process to download LOTUS looks like this:
 ```{r prepare-lotus-3, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
   names = tidyselect::matches("lib_sop_lot"),
-  exclude = c(
-    "benchmark"
-  ) |>
-    tidyselect::contains(),
+  exclude = targets::contains(
+    c(
+      "benchmark",
+      "par_", 
+      "paths",
+      "test")
+    ),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -235,12 +238,13 @@ targets::tar_make(
 ```{r libraries-sop-2, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
   names = starts_with("lib_sop"),
-  exclude = c(
-    "benchmark",
-    "par_",
-    "paths"
-  ) |>
-    tidyselect::contains(),
+  exclude = targets::contains(
+    c(
+      "benchmark",
+      "par_", 
+      "paths",
+      "test")
+    ),
   targets_only = TRUE,
   degree_from = 8
 )

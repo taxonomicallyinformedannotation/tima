@@ -162,12 +162,14 @@ Note that starting from SIRIUS 6, the _approx_ confidence score is the one consi
 ```{r annotations-all, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
   names = starts_with("ann_s"),
-  exclude = c(
-    "benchmark",
-    "par_",
-    "paths"
-  ) |>
-    tidyselect::contains(),
+  exclude = targets::contains(
+    c(
+      "benchmark",
+      "par_", 
+      "lib_",
+      "paths",
+      "test")
+    ),
   targets_only = TRUE,
   degree_from = 8
 )
@@ -239,12 +241,14 @@ You are almost there! See already all the steps accomplished!
 ```{r features-all, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 targets::tar_visnetwork(
   names = tidyselect::matches("^ann_fil"),
-  exclude = c(
-    "benchmark",
-    "par_",
-    "paths"
-  ) |>
-    tidyselect::contains(),
+  exclude = targets::contains(
+    c(
+      "benchmark",
+      "par_", 
+      "lib_",
+      "paths",
+      "test")
+    ),
   targets_only = TRUE,
   degree_from = 8
 )
