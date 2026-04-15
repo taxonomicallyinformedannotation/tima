@@ -636,12 +636,19 @@ weight_bio <- function(
   annotation_table_taxed_slim <- annotation_table_taxed |>
     tidytable::select(-tidyselect::any_of(cols_from_bio))
 
-  annot_table_wei_bio_big <- annot_table_wei_bio_init |>
-    tidytable::inner_join(
-      y = annotation_table_taxed_slim,
+  annot_table_wei_bio_big <- annotation_table_taxed_slim |>
+    tidytable::left_join(
+      y = annot_table_wei_bio_init,
       by = c(
         "candidate_structure_inchikey_connectivity_layer",
         "sample_organism_name"
+      )
+    ) |>
+    tidytable::mutate(
+      score_biological = tidytable::if_else(
+        is.na(score_biological),
+        0,
+        score_biological
       )
     ) |>
     tidytable::select(

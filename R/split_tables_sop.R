@@ -83,7 +83,7 @@ split_tables_sop <- function(table, cache) {
       tidyselect::contains(match = "_tax")
     ) |>
     tidytable::distinct() |>
-    tidytable::inner_join(
+    tidytable::left_join(
       y = table_structural_standardized,
       by = "structure_smiles_initial"
     ) |>
@@ -103,7 +103,7 @@ split_tables_sop <- function(table, cache) {
       tidyselect::contains(match = "reference")
     ) |>
     tidytable::distinct() |>
-    tidytable::inner_join(
+    tidytable::left_join(
       y = table_structural,
       by = "structure_smiles_initial"
     ) |>

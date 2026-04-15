@@ -462,8 +462,9 @@ filter_annotations <- function(
   rm(features_annotated_table_1)
 
   ## in case some features had a single filtered annotation
+  join_cols <- intersect(names(features_table), names(features_annotated_table_2))
   final_table <- features_table |>
-    tidytable::left_join(y = features_annotated_table_2)
+    tidytable::left_join(y = features_annotated_table_2, by = join_cols)
 
   rm(
     features_table,
