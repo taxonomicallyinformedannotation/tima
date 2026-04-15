@@ -127,7 +127,6 @@ prepare_annotations_spectra <- function(
     "Preparing spectral matching annotations from %d file(s)",
     length(input)
   )
-  # log_trace("Loading and formatting spectral matches")
 
   annotation_cols <- c(
     "feature_id",

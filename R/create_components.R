@@ -69,7 +69,6 @@ create_components <- function(
   log_info("Creating components from %d edge file(s)", length(input))
 
   # Load and combine all edge files
-  # log_trace("Loading edge data")
   edges <- purrr::map2(
     .x = input,
     .y = seq_along(input),
@@ -112,14 +111,12 @@ create_components <- function(
   # Build Graph and Find Components ----
 
   # Create undirected graph from edges
-  # log_trace("Building graph structure")
   network_graph <- igraph::graph_from_data_frame(
     d = edges,
     directed = FALSE
   )
 
   # Find connected components
-  # log_trace("Identifying connected components")
   component_membership <- igraph::components(
     graph = network_graph
   )$membership
@@ -133,7 +130,6 @@ create_components <- function(
   # Format Component Assignments ----
 
   # Convert to tidy format
-  # log_trace("Formatting component assignments")
 
   # Convert list to matrix, then to data frame with rownames as column
   components_matrix <- features_by_component |>

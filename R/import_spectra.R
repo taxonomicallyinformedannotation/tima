@@ -115,7 +115,6 @@ import_spectra <- function(
       vectorize_all = FALSE
     )
 
-  # log_trace("Detected file format: %s", file_ext)
 
   # Import spectra based on file format
   spectra <- tryCatch(
@@ -285,7 +284,6 @@ import_spectra <- function(
       n_after <- length(spectra)
       log_info("Combined replicates: %d -> %d spectra", n_before, n_after)
     } else {
-      # log_trace(
       #  "No replicate grouping field found, skipping combination"
       # )
     }

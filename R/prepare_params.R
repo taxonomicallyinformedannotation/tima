@@ -233,7 +233,6 @@ prepare_params <- function(
   opt_rem_tie <- params_advanced$options$remove_ties
   # opt_sum <- params_advanced$options$summarize
 
-  # log_trace("Small params")
   fil_pat <- params_small$files$pattern
   fil_fea_raw <- params_small$files$features$raw
   fil_met_raw <- params_small$files$metadata$raw
@@ -245,7 +244,6 @@ prepare_params <- function(
   opt_hig_con <- params_small$options$high_confidence
   opt_sum <- params_small$options$summarize
 
-  # log_trace("Advanced params")
   yamls_params$`prepare_params_advanced`$files$pattern <- fil_pat
   yamls_params$`prepare_params_advanced`$files$features$raw <- fil_fea_raw
   yamls_params$`prepare_params_advanced`$files$metadata$raw <- fil_met_raw
@@ -265,7 +263,6 @@ prepare_params <- function(
     }
   }
 
-  # log_trace("Changing params")
   ## annotate_masses
   yamls_params$annotate_masses$files$annotations$prepared$structural <-
     fil_ann_pre_str
@@ -716,7 +713,6 @@ prepare_params <- function(
   yamls_params$weight_annotations$options$summarize <-
     opt_sum
 
-  # log_trace("Changing filenames")
   ## annotate_masses
   yamls_params$annotate_masses$files$annotations$prepared$structural <-
     yamls_params$annotate_masses$files$annotations$prepared$structural |>
@@ -975,7 +971,6 @@ prepare_params <- function(
     yaml::write_yaml(x = yamls_params[[idx]], file = yaml_export[idx])
   }
 
-  # log_trace("Exporting params")
   create_dir(export = yaml_export[[1L]])
   purrr::map(
     .x = seq_along(yaml_export),

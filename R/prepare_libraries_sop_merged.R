@@ -461,16 +461,6 @@ enrich_taxonomy_from_cache <- function(
   }
   cache_supplement <- cache_supplement |>
     tidytable::select(tidyselect::all_of(expected_cols)) |>
-    tidytable::mutate(
-      tidytable::across(
-        tidyselect::everything(),
-        ~ {
-          x <- as.character(.x)
-          x[is.na(x)] <- "notClassified"
-          x
-        }
-      )
-    ) |>
     tidytable::distinct()
 
   enriched <- tidytable::bind_rows(taxonomy_table, cache_supplement) |>

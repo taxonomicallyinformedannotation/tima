@@ -296,7 +296,6 @@ fake_annotations_columns <- function() {
     candidate_structure_tax_cla_02sup = NA_character_,
     candidate_structure_tax_cla_03cla = NA_character_,
     candidate_structure_tax_cla_04dirpar = NA_character_,
-    candidate_structure_tag = NA_character_,
     stringsAsFactors = FALSE
   )
 }

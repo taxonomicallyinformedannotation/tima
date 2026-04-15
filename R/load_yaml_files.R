@@ -97,7 +97,6 @@ load_yaml_files <- function() {
 
   names(yamls_parsed) <- yaml_names
 
-  # log_trace("Loaded %d YAML parameter files", length(yamls_parsed))
 
   return(list(
     yamls_params = yamls_parsed,

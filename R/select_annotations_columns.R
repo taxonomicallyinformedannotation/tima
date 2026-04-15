@@ -143,7 +143,6 @@ select_annotations_columns <- function(
       )
     )
 
-  # log_trace("Output: ", nrow(df), " rows, ", ncol(df), " columns")
 
   return(df)
 }

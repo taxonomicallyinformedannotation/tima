@@ -71,7 +71,6 @@ split_tables_sop <- function(table, cache) {
     tidytable::filter(!is.na(organism_name)) |>
     tidytable::distinct()
 
-  # log_trace("Sanitizing structures")
   table_structural_standardized <- table_structural_initial |>
     process_smiles(cache = cache)
 

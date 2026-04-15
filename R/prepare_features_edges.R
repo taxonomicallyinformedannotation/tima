@@ -108,7 +108,6 @@ prepare_features_edges <- function(
   log_debug("Spectral edges: %s", input[['spectral']])
 
   # Load edges tables
-  # log_trace("Loading edge tables")
   edges_tables <- tryCatch(
     {
       purrr::imap(
@@ -151,14 +150,8 @@ prepare_features_edges <- function(
     ) |>
     tidytable::distinct()
 
-  # log_trace(
-  # "Extracted entropy for %d features", nrow(features_entropy)
-  # )
-
   # Combine and Format Edges ----
 
-  # Combine and format edges table
-  # log_trace("Combining and formatting edge tables")
   edges_table_treated <- edges_ms1 |>
     tidytable::full_join(y = features_entropy) |>
     tidytable::full_join(y = edges_ms2) |>

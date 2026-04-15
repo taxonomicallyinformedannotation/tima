@@ -117,7 +117,6 @@ clean_bio <- function(
   ) |>
     tidytable::filter(!is.na(feature_source))
 
-  # log_trace("Calculating consistency scores across network edges")
 
   # Calculate Consistency Scores ----
 
@@ -127,7 +126,6 @@ clean_bio <- function(
     minimal_consistency
   )
 
-  # log_trace("Splitting already computed predictions")
   if ("feature_pred_tax_cla_02sup_val" %in% colnames(annotations_distinct)) {
     df1 <- annotations_distinct |>
       tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
@@ -154,7 +152,6 @@ clean_bio <- function(
   }
   rm(annotations_distinct)
 
-  # log_trace("Joining all except -1 together")
   supp_tables <- consistency_results
 
   annot_table_wei_bio_preclean <- purrr::reduce(
@@ -170,7 +167,6 @@ clean_bio <- function(
   )
   rm(df2, supp_tables)
 
-  # log_trace("Adding already computed predictions back")
   if (nrow(df1b) == 0L) {
     return(annot_table_wei_bio_preclean)
   }

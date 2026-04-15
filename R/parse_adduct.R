@@ -53,7 +53,6 @@ parse_adduct <- function(
       is.null(adduct_string) ||
       length(adduct_string) == 0L
   ) {
-    # log_trace("Adduct string is NULL or missing, returning zero values")
     return(failed_parse)
   }
 
@@ -171,23 +170,6 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
     log_debug(msg)
     return(failed_parse)
   }
-
-  # Log successful parse at trace level
-  # log_trace(
-  #   "Successfully parsed adduct '",
-  #   adduct_string,
-  #   "': ",
-  #   "n_mer=",
-  #   n_mer,
-  #   ", n_iso=",
-  #   n_iso,
-  #   ", mass_change=",
-  #   round(modifications$total_mass, 4),
-  #   ", charges=",
-  #   charge_info$n_charges,
-  #   ", polarity=",
-  #   charge_info$charge_sign
-  # )
 
   # Return parsed components
   return(c(

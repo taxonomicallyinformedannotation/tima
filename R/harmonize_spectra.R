@@ -102,7 +102,6 @@ harmonize_spectra <- function(
 
   # Harmonize Column Names ----
 
-  # log_trace("Harmonizing spectra headers for mode: %s", mode)
 
   # Define standard column names
   columns <- c(

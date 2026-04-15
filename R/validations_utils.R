@@ -653,7 +653,6 @@ validate_ms_mode <- function(ms_mode) {
     context = "Ionization mode for mass spectrometry analysis"
   )
 
-  # log_trace("MS mode validated: ", ms_mode)
   invisible(TRUE)
 }
 
@@ -689,7 +688,6 @@ validate_tolerances <- function(
       param_name = "tolerance_ppm",
       context = context
     )
-    # log_trace("Mass tolerance validated: ", tolerance_ppm, " ppm")
   }
 
   # Validate RT tolerance
@@ -707,7 +705,6 @@ validate_tolerances <- function(
         "Large values may group unrelated features together"
       )
     )
-    # log_trace("RT tolerance validated: ", tolerance_rt, " minutes")
   }
 
   invisible(TRUE)

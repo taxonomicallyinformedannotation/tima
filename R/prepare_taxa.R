@@ -126,7 +126,6 @@ prepare_taxa <- function(
     log_debug("Using metadata for organism assignments")
   }
 
-  # log_trace("Loading feature table")
   feature_table_0 <- safe_fread(
     file = input,
     file_type = "features table",
@@ -135,7 +134,6 @@ prepare_taxa <- function(
   )
 
   if (is.null(taxon)) {
-    # log_trace("Loading metadata table")
     metadata_table <- safe_fread(
       file = metadata,
       file_type = "metadata table",
@@ -145,12 +143,10 @@ prepare_taxa <- function(
   }
 
   if (!is.null(taxon)) {
-    # log_trace("Forcing all features to given organism")
     metadata_table <- data.frame(taxon)
     colnames(metadata_table) <- colname
   }
 
-  # log_trace("Preparing organisms names")
   organism_table <- metadata_table |>
     tidytable::filter(!is.na(!!as.name(colname))) |>
     tidytable::distinct(!!as.name(colname)) |>
@@ -158,7 +154,6 @@ prepare_taxa <- function(
     tidytable::separate_rows(organism, sep = "\\|") |>
     tidytable::mutate(organism = trimws(organism))
 
-  # log_trace(
   #  "Retrieving already computed Open Tree of Life Taxonomy"
   # )
   organism_table_filled <- organism_table |>
@@ -173,7 +168,6 @@ prepare_taxa <- function(
     )
   rm(organism_table)
 
-  # log_trace("Submitting the rest to OTL")
   organism_table_missing <- organism_table_filled |>
     tidytable::filter(is.na(organism_taxonomy_ottid))
 
@@ -181,7 +175,6 @@ prepare_taxa <- function(
     biological_metadata_1 <- organism_table_missing |>
       get_organism_taxonomy_ott()
 
-    # log_trace("Joining all results")
     biological_metadata <- organism_table_filled |>
       tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
       tidytable::rename(organism_name = organism) |>
@@ -196,7 +189,6 @@ prepare_taxa <- function(
 
   if (is.null(taxon)) {
     if (!extension) {
-      # log_trace("Removing filename extensions")
       metadata_table <- metadata_table |>
         tidytable::mutate(
           filename = stringi::stri_replace_all_fixed(
@@ -216,7 +208,6 @@ prepare_taxa <- function(
         )
     }
   }
-  # log_trace("Joining with metadata table")
   if (!is.null(taxon)) {
     metadata_table_joined <- tidytable::inner_join(
       x = feature_table_0 |>
@@ -242,7 +233,6 @@ prepare_taxa <- function(
   }
   rm(feature_table_0, metadata_table)
 
-  # log_trace("Joining with cleaned taxonomy table")
   # Split organismOriginal to match the split organism_name in biological_metadata
   taxed_features_table <-
     metadata_table_joined |>

@@ -255,7 +255,6 @@ weight_bio <- function(
 
   # Filter Structure-Organism Pairs ----
 
-  # log_trace("Filtering structure-organism pairs")
   df0 <- structure_organism_pairs_table |>
     tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
     tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
@@ -290,7 +289,6 @@ weight_bio <- function(
 
   log_debug("Filtered to %d structure-organism pairs", nrow(df0))
 
-  # log_trace("Preparing annotation table")
   df1 <- annotation_table_taxed |>
     tidytable::select(
       candidate_structure_inchikey_connectivity_layer,
@@ -400,7 +398,6 @@ weight_bio <- function(
 
   # Calculate Biological Scores at All Taxonomic Levels ----
 
-  # log_trace("Calculating biological score at all levels ...")
 
   # Define all taxonomic levels and their scores (DRY principle)
   taxonomic_levels <- list(

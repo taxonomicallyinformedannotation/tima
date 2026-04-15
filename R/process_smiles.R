@@ -91,7 +91,6 @@ process_smiles <- function(
 
   if (n_to_process == 0L) {
     log_info("All SMILES already in cache, no processing needed")
-    log_info("All SMILES already cached, returning existing results")
     return(
       table_processed_1 |>
         tidytable::mutate(

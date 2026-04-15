@@ -210,12 +210,6 @@ create_edges_spectra <- function(
 
   # Compute Spectral Similarities ----
 
-  # log_trace(
-  #  "Performing spectral comparison on %d spectra", length(spectra)
-  # )
-  # log_trace(
-  #  "As the precursors delta is not limited, expect a long processing time."
-  # )
   log_info("======================================")
   log_info("Take yourself a break, you deserve it.")
   log_info("======================================")
@@ -238,14 +232,12 @@ create_edges_spectra <- function(
   )
 
   # Calculate spectral entropy
-  # log_trace("Calculating features' entropy")
   entropy <- vapply(
     X = fragz,
     FUN = msentropy::calculate_spectral_entropy,
     FUN.VALUE = numeric(1),
     USE.NAMES = FALSE
   )
-  # log_trace("Counting features' number of peaks")
   npeaks <- vapply(
     X = fragz,
     FUN = nrow,

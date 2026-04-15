@@ -143,10 +143,8 @@ prepare_libraries_rt <- function(
         tidytable::as_tidytable()
     }
 
-    # log_trace("Importing spectra")
     spectra <- mgf |>
       purrr::map(.f = import_spectra)
-    # log_trace("Extracting retention times")
     rts <- spectra |>
       purrr::map(.f = .extract_spectra_data) |>
       tidytable::bind_rows() |>
@@ -164,7 +162,6 @@ prepare_libraries_rt <- function(
   }
 
   rts_from_tab <- function(tab) {
-    # log_trace("Importing file")
     tab |>
       purrr::map2(
         .y = seq_along(tab),

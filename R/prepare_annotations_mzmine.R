@@ -79,7 +79,6 @@ prepare_annotations_mzmine <- function(
         unlist()
     )
   ) {
-    # log_trace("Loading and formatting mzmine results")
     table <- purrr::map2(
       .x = input,
       .y = seq_along(input),

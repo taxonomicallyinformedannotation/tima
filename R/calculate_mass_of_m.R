@@ -164,7 +164,6 @@ calculate_mass_of_m <- function(
 
   # Log successful calculation at trace level
   ## COMMENT too many logs
-  # log_trace(
   #   "Calculated neutral mass: ",
   #   round(neutral_mass, 4),
   #   " Da ",
@@ -359,7 +358,6 @@ calculate_mz_from_mass <- function(
   total_mass <- neutral_mass * n_mer + mass_modifications
   mz <- (total_mass / n_charges) + isotope_shift
 
-  # log_trace(
   #  "Calculated m/z: ",
   #  round(mz, 4),
   #  " from mass ",

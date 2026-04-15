@@ -70,8 +70,6 @@ extract_spectra <- function(object) {
 
   # Extract Spectra Metadata ----
 
-  # Extract spectra metadata
-  # log_trace("Extracting spectra metadata")
   spectra <- object@backend@spectraData |>
     data.frame() |>
     tidytable::as_tidytable()
@@ -79,7 +77,6 @@ extract_spectra <- function(object) {
   # Extract Peak Data ----
 
   # Extract peak data (mz and intensity) efficiently
-  # log_trace("Extracting peak data (mz and intensity)")
 
   # Extract m/z values (first column of peak matrices)
   spectra$mz <- lapply(
@@ -107,7 +104,6 @@ extract_spectra <- function(object) {
   # Harmonize Column Types ----
 
   # Harmonize column types
-  # log_trace("Harmonizing column types")
   spectra <- spectra |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::any_of(x = incoherent_logical),
@@ -131,9 +127,6 @@ extract_spectra <- function(object) {
   ]
 
   if (length(columns_to_harmonize) > 0L) {
-    # log_trace(
-    #  "Harmonizing %d column names", length(columns_to_harmonize)
-    # )
     spectra <- spectra |>
       tidytable::select(
         -tidyselect::any_of(x = names(columns_to_harmonize))

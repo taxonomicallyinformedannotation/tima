@@ -60,7 +60,6 @@ prepare_libraries_sop_ecmdb <- function(
       ecmdb_prepared <- fake_sop_columns()
     } else {
       log_debug("Processing ECMDB from: %s", input)
-      # log_trace("Loading ECMDB resources")
 
       file <- gsub(
         pattern = ".zip",
@@ -81,7 +80,6 @@ prepare_libraries_sop_ecmdb <- function(
         data.frame() |>
         tidytable::as_tidytable()
 
-      # log_trace("Formatting ECMDB")
       ecmdb_prepared <- ecmdb |>
         tidytable::mutate(
           structure_inchikey_2D = NA_character_,
@@ -133,7 +131,6 @@ prepare_libraries_sop_ecmdb <- function(
     export_output(x = ecmdb_prepared, file = output)
     rm(ecmdb_prepared)
   } else {
-    # log_trace("ECMDB library already exists and is valid")
     return(output)
   }
 

@@ -80,7 +80,6 @@ prepare_features_components <- function(
   )
 
   # Load and combine component tables
-  # log_trace("Loading component tables")
   table <- tryCatch(
     {
       purrr::map2(

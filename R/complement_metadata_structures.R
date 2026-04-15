@@ -186,7 +186,6 @@ complement_metadata_structures <- function(
       candidate_structure_inchikey_connectivity_layer,
       .keep_all = TRUE
     )
-  # log_trace("Stereo loaded")
 
   # Load metadata (formula + mass only, keyed by inchikey_no_stereo)
   met_cols <- c(
@@ -220,7 +219,6 @@ complement_metadata_structures <- function(
       structure_molecular_formula
     ) |>
     tidytable::filter(!is.na(structure_inchikey_no_stereo))
-  # log_trace("Metadata loaded")
 
   # Build name/tag/xlogp lookup from stereo (keyed by inchikey_no_stereo,
   # collapsing across stereoisomers).
@@ -716,39 +714,6 @@ complement_metadata_structures <- function(
     )
 }
 
-.filter_rows_by_structure_keys <- function(df, keys) {
-  has_inchikey <- "structure_inchikey_connectivity_layer" %in% names(df)
-  has_smiles <- "structure_smiles_no_stereo" %in% names(df)
-
-  if (!has_inchikey && !has_smiles) {
-    return(df[0L, , drop = FALSE])
-  }
-
-  keep <- rep(FALSE, nrow(df))
-  if (has_inchikey) {
-    keep <- keep | df$structure_inchikey_connectivity_layer %in% keys$inchikey
-  }
-  if (has_smiles) {
-    keep <- keep | df$structure_smiles_no_stereo %in% keys$smiles
-  }
-
-  df[keep, , drop = FALSE]
-}
-
-.resolve_single_or_na <- function(x) {
-  vals <- unique(trimws(stats::na.omit(as.character(x))))
-  vals <- vals[nzchar(vals)]
-
-  if (length(vals) == 0L) {
-    return(NA_character_)
-  }
-  if (length(vals) == 1L) {
-    return(vals[[1L]])
-  }
-
-  # Conflicting values for same key: avoid returning arbitrary metadata.
-  NA_character_
-}
 
 .resolve_numeric_or_na <- function(x, tolerance = 1e-8) {
   nums <- as.numeric(stats::na.omit(as.character(x)))
@@ -763,22 +728,6 @@ complement_metadata_structures <- function(
   }
 
   # Conflicting numeric values for same key: avoid arbitrary assignment.
-  NA_character_
-}
-
-.resolve_xlogp <- function(x, tolerance = 1e-6) {
-  nums <- as.numeric(stats::na.omit(as.character(x)))
-  nums <- nums[is.finite(nums)]
-
-  if (length(nums) == 0L) {
-    return(NA_character_)
-  }
-
-  if ((max(nums) - min(nums)) <= tolerance) {
-    return(as.character(nums[[1L]]))
-  }
-
-  # Conservative default for conflicting xlogp values.
   NA_character_
 }
 
@@ -810,34 +759,6 @@ complement_metadata_structures <- function(
   paste(vals, collapse = sep)
 }
 
-.first_non_empty <- function(x) {
-  vals <- trimws(as.character(x))
-  vals[vals == ""] <- NA_character_
-  idx <- which(!is.na(vals))
-
-  if (length(idx) == 0L) {
-    return(NA_character_)
-  }
-
-  vals[idx[1L]]
-}
-
-.prefer_library_value <- function(existing, primary, secondary, tertiary) {
-  # Library lookups always take precedence when present.
-  lib_value <- .first_non_empty(c(primary, secondary, tertiary))
-  if (!is.na(lib_value)) {
-    return(lib_value)
-  }
-
-  # Fall back to existing candidate value only if lookups are empty.
-  .first_non_empty(existing)
-}
-
-.normalize_structure_name <- function(x) {
-  x_chr <- trimws(as.character(x))
-  x_chr[x_chr == ""] <- NA_character_
-  x_chr
-}
 
 .normalize_enrichment_text <- function(x) {
   vals <- as.character(x)
