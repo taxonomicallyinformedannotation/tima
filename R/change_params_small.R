@@ -164,7 +164,6 @@ change_params_small <- function(
   # Use provided cache_dir or go to cache directory
   if (is.null(cache_dir)) {
     go_to_cache()
-    cache_dir <- getwd()
   } else {
     # Set working directory to cache_dir for the duration of this function
     old_wd <- getwd()

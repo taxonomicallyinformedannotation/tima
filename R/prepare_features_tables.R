@@ -331,7 +331,7 @@ prepare_features_tables <- function(
     tidytable::filter(value != 0) |>
     tidytable::mutate(
       rank = rank(-as.numeric(value)),
-      .by = tidyselect::all_of(x = c(name_features))
+      .by = tidyselect::all_of(x = name_features)
     ) |>
     tidytable::filter(rank <= candidates) |>
     tidytable::select(

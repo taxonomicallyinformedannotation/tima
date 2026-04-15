@@ -391,7 +391,7 @@ clean_bio <- function(
     tidytable::mutate(
       !!as.name(consistency_name) := count /
         tidytable::n_distinct(feature_target),
-      .by = c(feature_source)
+      .by = feature_source
     ) |>
     tidytable::distinct(
       feature_source,

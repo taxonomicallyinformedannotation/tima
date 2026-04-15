@@ -806,7 +806,7 @@ sanitize_all_inputs <- function(
     result <- sanitize_csv(
       file = features_file,
       file_type = "features table",
-      required_cols = c("feature_id"),
+      required_cols = "feature_id",
       feature_col = feature_col
     )
 

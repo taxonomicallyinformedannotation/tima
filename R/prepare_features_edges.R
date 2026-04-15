@@ -166,7 +166,7 @@ prepare_features_edges <- function(
       feature_target = !!as.name(name_target)
     ) |>
     tidytable::mutate(
-      feature_target := tidytable::coalesce(feature_target, feature_source)
+      feature_target = tidytable::coalesce(feature_target, feature_source)
     )
 
   log_complete(ctx, n_edges = nrow(edges_table_treated))
