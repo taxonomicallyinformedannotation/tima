@@ -393,7 +393,10 @@ list(
                 )
               },
               error = function(e) {
-                log_warn("ECMDB download failed: %s", conditionMessage(e))
+                tima:::log_warn(
+                  "ECMDB download failed: %s",
+                  conditionMessage(e)
+                )
                 tima:::fake_ecmdb(
                   export = paths$data$source$libraries$sop$ecmdb
                 )
@@ -417,8 +420,11 @@ list(
               },
               warning = function(w) {
                 ## See #118
-                log_warn("HMDB download warning: %s", conditionMessage(w))
-                log_warn(
+                tima:::log_warn(
+                  "HMDB download warning: %s",
+                  conditionMessage(w)
+                )
+                tima:::log_warn(
                   "HMDB download failed partially, returning empty file instead"
                 )
                 unlink(paths$data$source$libraries$sop$hmdb)
@@ -427,7 +433,7 @@ list(
                 )
               },
               error = function(e) {
-                log_warn("HMDB download failed: %s", conditionMessage(e))
+                tima:::log_warn("HMDB download failed: %s", conditionMessage(e))
                 tima:::fake_hmdb(
                   export = paths$data$source$libraries$sop$hmdb
                 )
@@ -455,7 +461,7 @@ list(
                     )
                   },
                   error = function(e) {
-                    log_warn(
+                    tima:::log_warn(
                       "HMDB family download failed: %s",
                       conditionMessage(e)
                     )
@@ -483,7 +489,10 @@ list(
                 )
               },
               error = function(e) {
-                log_warn("LOTUS download failed: %s", conditionMessage(e))
+                tima:::log_warn(
+                  "LOTUS download failed: %s",
+                  conditionMessage(e)
+                )
                 tima:::fake_lotus(
                   export = paths$data$source$libraries$sop$lotus
                 )
