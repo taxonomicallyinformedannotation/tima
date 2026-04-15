@@ -11,19 +11,25 @@ normalize_rt_to_minutes(
 )
 }
 \arguments{
-\item{rt_vec}{\link{numeric} Numeric vector (character allowed; will be coerced) of retention times.}
+\item{rt_vec}{\link{numeric} Numeric vector (character allowed; will be coerced)
+of retention times.}
 
-\item{unit}{\link{character} Character scalar: one of 'auto', 'seconds', or 'minutes'.}
+\item{unit}{\link{character} Character scalar: one of 'auto', 'seconds', or
+'minutes'.}
 
-\item{quiet}{\link{logical} Logical; if FALSE, logs detection/conversion decisions.}
+\item{quiet}{\link{logical} Logical; if FALSE, logs detection/conversion
+decisions.}
 }
 \value{
 Numeric vector of RTs in minutes.
 }
 \description{
-Converts a numeric retention time vector to minutes based on a specified
-unit or automatic heuristic detection. Automatic detection treats values as seconds
-if all non-missing RTs are > 120 or if the 95th percentile exceeds 180 (common upper
+Converts a numeric retention time vector to minutes based on a
+specified
+unit or automatic heuristic detection. Automatic detection treats values as
+seconds
+if all non-missing RTs are > 120 or if the 95th percentile exceeds 180
+(common upper
 bound for minutes in typical gradients). Otherwise assumes minutes.
 }
 \keyword{internal}

@@ -31,32 +31,43 @@ clean_chemo(
 }
 \arguments{
 \item{annot_table_wei_chemo}{Data frame with chemically weighted annotations.
-Required columns: feature_id, candidate_structure_inchikey_connectivity_layer,
-score_weighted_chemo, score_biological, score_chemical, candidate_score_pseudo_initial}
+Required columns: feature_id,
+candidate_structure_inchikey_connectivity_layer,
+score_weighted_chemo, score_biological, score_chemical,
+candidate_score_pseudo_initial}
 
-\item{components_table}{Data frame with molecular network component assignments.
+\item{components_table}{Data frame with molecular network component
+assignments.
 Required columns: feature_id, component_id}
 
 \item{features_table}{Data frame with feature metadata (RT, m/z, etc.).
 Required columns: feature_id}
 
-\item{structure_organism_pairs_table}{Data frame linking structures to organisms.
+\item{structure_organism_pairs_table}{Data frame linking structures to
+organisms.
 Required columns: structure_inchikey_connectivity_layer}
 
-\item{candidates_final}{Integer, number of top candidates to retain per feature (>= 1)}
+\item{candidates_final}{Integer, number of top candidates to retain per
+feature (>= 1)}
 
-\item{best_percentile}{Numeric (0-1), percentile threshold for score filtering.
-Candidates with scores >= percentile * max_score are kept. Default: 0.9 (90th percentile)}
+\item{best_percentile}{Numeric (0-1), percentile threshold for score
+filtering.
+Candidates with scores >= percentile * max_score are kept. Default: 0.9 (90th
+percentile)}
 
-\item{minimal_ms1_bio}{Numeric (0-1), minimum biological score for MS1-only annotations}
+\item{minimal_ms1_bio}{Numeric (0-1), minimum biological score for MS1-only
+annotations}
 
-\item{minimal_ms1_chemo}{Numeric (0-1), minimum chemical score for MS1-only annotations}
+\item{minimal_ms1_chemo}{Numeric (0-1), minimum chemical score for MS1-only
+annotations}
 
-\item{minimal_ms1_condition}{Character, logical operator for MS1 filtering: "OR" or "AND".
+\item{minimal_ms1_condition}{Character, logical operator for MS1 filtering:
+"OR" or "AND".
 "OR" = keep if bio >= threshold OR chem >= threshold.
 "AND" = keep if bio >= threshold AND chem >= threshold}
 
-\item{compounds_names}{Logical, include compound names in output (may increase size)}
+\item{compounds_names}{Logical, include compound names in output (may
+increase size)}
 
 \item{high_confidence}{Logical, apply strict high-confidence filters}
 
@@ -64,19 +75,26 @@ Candidates with scores >= percentile * max_score are kept. Default: 0.9 (90th pe
 
 \item{summarize}{Logical, collapse results to one row per feature}
 
-\item{score_chemical_cla_kingdom}{Numeric (0-1), score for ClassyFire kingdom level}
+\item{score_chemical_cla_kingdom}{Numeric (0-1), score for ClassyFire kingdom
+level}
 
-\item{score_chemical_cla_superclass}{Numeric (0-1), score for ClassyFire superclass level}
+\item{score_chemical_cla_superclass}{Numeric (0-1), score for ClassyFire
+superclass level}
 
-\item{score_chemical_cla_class}{Numeric (0-1), score for ClassyFire class level}
+\item{score_chemical_cla_class}{Numeric (0-1), score for ClassyFire class
+level}
 
-\item{score_chemical_cla_parent}{Numeric (0-1), score for ClassyFire direct parent level}
+\item{score_chemical_cla_parent}{Numeric (0-1), score for ClassyFire direct
+parent level}
 
-\item{score_chemical_npc_pathway}{Numeric (0-1), score for NPClassifier pathway level}
+\item{score_chemical_npc_pathway}{Numeric (0-1), score for NPClassifier
+pathway level}
 
-\item{score_chemical_npc_superclass}{Numeric (0-1), score for NPClassifier superclass level}
+\item{score_chemical_npc_superclass}{Numeric (0-1), score for NPClassifier
+superclass level}
 
-\item{score_chemical_npc_class}{Numeric (0-1), score for NPClassifier class level}
+\item{score_chemical_npc_class}{Numeric (0-1), score for NPClassifier class
+level}
 
 \item{max_per_score}{Integer, max candidates to keep per feature per score.
 If more exist, they are randomly sampled and a note is added. Default 7.}
@@ -94,10 +112,12 @@ Named list with three data frames:
 }
 }
 \description{
-Cleans and filters chemically weighted annotation results through
+Cleans and filters chemically weighted annotation results
+through
 a multi-tier pipeline. Applies MS1 score thresholds, percentile filtering,
 ranking, and optional high-confidence filtering. Returns three-tier output:
-full (comprehensive), filtered (top candidates), and mini (one row per feature).
+full (comprehensive), filtered (top candidates), and mini (one row per
+feature).
 }
 \examples{
 \dontrun{
@@ -119,6 +139,7 @@ results <- clean_chemo(
 }
 }
 \seealso{
-\code{\link{weight_chemo}}, \code{\link{filter_high_confidence_only}},
+\code{\link{weight_chemo}},
+\code{\link{filter_high_confidence_only}},
 \code{\link{summarize_results}}
 }

@@ -287,6 +287,7 @@ def process_batch(
         writer: CSV writer object
         current_count: Current count of processed molecules
         progress_interval: Logging interval
+        _logger: Optional logger for logging progress and warnings
 
     Returns:
         Number of successfully processed molecules in this batch

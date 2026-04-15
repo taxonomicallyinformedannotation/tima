@@ -21,15 +21,19 @@ calculate_entropy_and_similarity(
 \arguments{
 \item{lib_ids}{\link{character} Character vector of library spectrum IDs}
 
-\item{lib_precursors}{\link{numeric} Numeric vector of library precursor m/z values}
+\item{lib_precursors}{\link{numeric} Numeric vector of library precursor m/z
+values}
 
-\item{lib_spectra}{\link{list} List of library spectra (each a matrix of mz/intensity)}
+\item{lib_spectra}{\link{list} List of library spectra (each a matrix of
+mz/intensity)}
 
 \item{query_ids}{\link{character} Character vector of query spectrum IDs}
 
-\item{query_precursors}{\link{numeric} Numeric vector of query precursor m/z values}
+\item{query_precursors}{\link{numeric} Numeric vector of query precursor m/z
+values}
 
-\item{query_spectra}{\link{list} List of query spectra (each a matrix of mz/intensity)}
+\item{query_spectra}{\link{list} List of query spectra (each a matrix of
+mz/intensity)}
 
 \item{method}{\link{character} Character string similarity method to use}
 
@@ -39,7 +43,8 @@ calculate_entropy_and_similarity(
 
 \item{threshold}{\link{numeric} Numeric minimum similarity threshold (0-1)}
 
-\item{approx}{\link{logical} Logical whether to perform approximate matching without
+\item{approx}{\link{logical} Logical whether to perform approximate matching
+without
 precursor mass filtering}
 }
 \value{

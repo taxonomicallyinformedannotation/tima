@@ -9,7 +9,8 @@ round_reals(df, dig = 5L, cols = c("structure_exact_mass", "structure_xlogp"))
 \arguments{
 \item{df}{\link{data.frame} Data frame or tibble containing columns to round}
 
-\item{dig}{\link{integer} Integer number of decimal digits (default: 5). Must be >= 0.
+\item{dig}{\link{integer} Integer number of decimal digits (default: 5). Must be
+>= 0.
 Use 0 to round to whole numbers.}
 
 \item{cols}{\link{character} Character vector of column name patterns to match
@@ -17,7 +18,8 @@ Use 0 to round to whole numbers.}
 Uses fixed string matching for performance.}
 }
 \value{
-Data frame with specified numeric columns rounded to dig decimal places
+Data frame with specified numeric columns rounded to dig decimal
+places
 }
 \description{
 Rounds numeric values in columns matching specified patterns.

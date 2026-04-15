@@ -34,7 +34,8 @@ data_interim <- "data/interim/"
 dir <- paste0(github, repo, data_interim)
 get_file(
   url = paste0(dir, "features/example_edges.tsv"),
-  export = get_params(step = "create_components")$files$networks$spectral$edges$prepared
+export = get_params(step =
+    "create_components")$files$networks$spectral$edges$prepared
 )
 create_components()
 unlink("data", recursive = TRUE)

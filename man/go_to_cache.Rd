@@ -7,7 +7,8 @@
 go_to_cache(dir = ".tima")
 }
 \arguments{
-\item{dir}{\link{character} Character string name of cache directory (default: ".tima").
+\item{dir}{\link{character} Character string name of cache directory (default:
+".tima").
 Created in user's home directory. Must be non-empty.}
 }
 \value{

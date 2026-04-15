@@ -9,10 +9,12 @@
 #' @include safe_fread.R
 #'
 #' @param df Data frame with structural metadata to complement
-#' @param str_stereo Path to structure stereochemistry file (includes name, tag, xlogp)
+#' @param str_stereo Path to structure stereochemistry file (includes name, tag,
+#'     xlogp)
 #' @param str_met Path to structure metadata file (formula, mass)
 #' @param str_tax_cla Path to ClassyFire taxonomy file (keyed by inchikey)
-#' @param str_tax_npc Path to NPClassifier taxonomy file (keyed by smiles with stereo)
+#' @param str_tax_npc Path to NPClassifier taxonomy file (keyed by smiles with
+#'     stereo)
 #'
 #' @return Data frame with enriched structural metadata
 #'
@@ -203,7 +205,10 @@ complement_metadata_structures <- function(
       attr(met_2d, "selected_cols")
   ) {
     log_warn(
-      "structure metadata has no structure keys; skipping key-based metadata enrichment"
+      paste(
+        "structure metadata has no structure keys;",
+        "skipping key-based metadata enrichment"
+      )
     )
   }
 
@@ -431,7 +436,9 @@ complement_metadata_structures <- function(
   # Build the bridge from annotations (which have inchikey_no_stereo or
   # connectivity_layer) to the full inchikey needed for tax_cla and
   # the stereo smiles needed for tax_npc.
-  # stereo_k provides: inchikey -> (smiles, connectivity_layer, inchikey_no_stereo, smiles_no_stereo)
+  # stereo_k provides: inchikey ->
+  #   (smiles, connectivity_layer, inchikey_no_stereo,
+  #    smiles_no_stereo)
 
   # Build unique key combinations for enrichment lookup.
   # Use only (inchikey_no_stereo, connectivity_layer) — NOT smiles_no_stereo.
@@ -516,8 +523,9 @@ complement_metadata_structures <- function(
       )
     ) |>
     tidytable::mutate(
-      ## Computable properties: prefer enriched value from library reference
-      ## files, fall back to values computed by recompute_structure_fields_from_smiles.
+      ## Computable properties: prefer enriched value from
+      ## library reference files, fall back to values computed
+      ## by recompute_structure_fields_from_smiles.
       candidate_structure_molecular_formula = .pick_enrichment(
         .enr_candidate_structure_molecular_formula,
         candidate_structure_molecular_formula
@@ -526,7 +534,8 @@ complement_metadata_structures <- function(
         .enr_candidate_structure_exact_mass,
         candidate_structure_exact_mass
       ),
-      ## xlogp: enriched from str_stereo (stereo-sensitive, collapsed per inchikey_no_stereo)
+      ## xlogp: enriched from str_stereo (stereo-sensitive,
+      ## collapsed per inchikey_no_stereo)
       candidate_structure_xlogp = .pick_enrichment(
         .enr_candidate_structure_xlogp,
         candidate_structure_xlogp

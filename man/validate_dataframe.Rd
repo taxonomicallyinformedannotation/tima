@@ -24,7 +24,8 @@ validate_dataframe(
 
 \item{allow_empty}{\link{logical} Logical, whether empty data frames are allowed}
 
-\item{optional_cols}{\link{character} Optional character vector of expected optional columns}
+\item{optional_cols}{\link{character} Optional character vector of expected
+optional columns}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise
@@ -35,7 +36,8 @@ for required columns and minimum row count
 }
 \examples{
 \dontrun{
-validate_dataframe(df, param_name = "features", required_cols = c("feature_id", "mz"))
+validate_dataframe(df, param_name = "features", required_cols =
+    c("feature_id", "mz"))
 }
 }
 \keyword{internal}

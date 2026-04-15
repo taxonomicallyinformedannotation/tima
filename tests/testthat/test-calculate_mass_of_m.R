@@ -66,7 +66,7 @@ ADDUCT_MASSES <- list(
   CF3COO = 112.98504 # Trifluoroacetate
 )
 H_MASS <- ADDUCT_MASSES$H
-Na_MASS <- ADDUCT_MASSES$Na
+Na_MASS <- ADDUCT_MASSES$Na # nolint: object_name_linter.
 K_MASS <- ADDUCT_MASSES$K
 NH4_MASS <- ADDUCT_MASSES$NH4
 H2O_LOSS <- 18.010565 # Water loss (exact)

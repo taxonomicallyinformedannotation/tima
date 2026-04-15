@@ -3,7 +3,8 @@
 \docType{data}
 \name{DEFAULT_HC_MAX_RT_ERROR_MIN}
 \alias{DEFAULT_HC_MAX_RT_ERROR_MIN}
-\title{Default maximum allowed retention time error (minutes) for high-confidence filter}
+\title{Default maximum allowed retention time error (minutes) for high-confidence
+filter}
 \format{
 An object of class \code{numeric} of length 1.
 }
@@ -11,6 +12,7 @@ An object of class \code{numeric} of length 1.
 DEFAULT_HC_MAX_RT_ERROR_MIN
 }
 \description{
-Default maximum allowed retention time error (minutes) for high-confidence filter
+Default maximum allowed retention time error (minutes) for high-confidence
+filter
 }
 \keyword{internal}

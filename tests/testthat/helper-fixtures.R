@@ -1123,9 +1123,9 @@ create_fixture_params_advanced <- function(id = "TESTID") {
       )
     ),
     ms = list(
-      adducts = list(pos = c("[M+H]+"), neg = c("[M-H]-")),
+      adducts = list(pos = "[M+H]+", neg = "[M-H]-"),
       tolerances = list(mass = list(ppm = list(ms1 = 5, ms2 = 10))),
-      neutral_losses = c("H2O")
+      neutral_losses = "H2O"
     ),
     annotations = list(
       candidates = list(

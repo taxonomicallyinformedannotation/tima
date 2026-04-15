@@ -1,7 +1,7 @@
 #' Harmonize Spectra for a Given Polarity
 #'
 #' @description Internal helper to harmonize extracted spectra for a specific
-#'     polarity mode, applying column mappings and fixing precursor/inchikey issues.
+#' polarity mode, applying column mappings and fixing precursor/inchikey issues.
 #'
 #' @param spectra_extracted [list] List of extracted spectra data frames.
 #' @param mode [character] Character "pos" or "neg".
@@ -147,7 +147,8 @@ create_empty_sop_library <- function() {
 #' @include harmonize_spectra.R
 #' @include import_spectra.R
 #'
-#' @param input [character] Character vector of file paths containing spectral data.
+#' @param input [character] Character vector of file paths containing spectral
+#'     data.
 #' @param nam_lib [character] Character library name for metadata.
 #' @param col_ad [character] Name of the adduct column in MGF.
 #' @param col_ce [character] Name of the collision energy column in MGF.
@@ -155,7 +156,8 @@ create_empty_sop_library <- function() {
 #' @param col_in [character] Name of the InChI column in MGF.
 #' @param col_io [character] Name of the InChI without stereo column in MGF.
 #' @param col_ik [character] Name of the InChIKey column in MGF.
-#' @param col_il [character] Name of the InChIKey connectivity layer column in MGF.
+#' @param col_il [character] Name of the InChIKey connectivity layer column in
+#'     MGF.
 #' @param col_na [character] Name of the name column in MGF.
 #' @param col_po [character] Name of the polarity column in MGF.
 #' @param col_sm [character] Name of the SMILES column in MGF.

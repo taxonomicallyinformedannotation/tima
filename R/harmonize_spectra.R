@@ -176,10 +176,10 @@ harmonize_spectra <- function(
         )
     ) |>
     tidytable::select(
-      tidyselect::any_of(x = c(columns_full)),
-      tidyselect::any_of(x = c("precursorCharge")),
+      tidyselect::any_of(x = columns_full),
+      tidyselect::any_of(x = "precursorCharge"),
       precursorMz,
-      tidyselect::any_of(x = c("rtime")),
+      tidyselect::any_of(x = "rtime"),
       mz,
       intensity
     ) |>

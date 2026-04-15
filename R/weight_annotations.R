@@ -1,7 +1,9 @@
 #' Validate Inputs for weight_annotations
 #'
-#' @description Internal helper to validate all input parameters for weight_annotations.
-#'     Checks file existence, data types, ranges, and logical consistency of weights.
+#' @description Internal helper to validate all input parameters for
+#'     weight_annotations.
+#' Checks file existence, data types, ranges, and logical consistency of
+#'     weights.
 #'     Stops execution with informative messages if any condition is violated.
 #'
 #' @include add_xrefs_to_annotations.R
@@ -192,9 +194,11 @@ validate_weight_annotations_inputs <- function(
 #'
 #' @description Internal helper to load, combine, and filter annotation tables.
 #'     Reads multiple annotation files, binds rows, and optionally filters to
-#'     retain only MS1-based annotations (those without MS2 similarity or SIRIUS CSI scores).
+#' retain only MS1-based annotations (those without MS2 similarity or SIRIUS CSI
+#'     scores).
 #'
-#' @param annotations [character] Character vector of file paths to annotation files.
+#' @param annotations [character] Character vector of file paths to annotation
+#'     files.
 #' @param ms1_only [logical] Logical; if TRUE, keep only annotations where both
 #'     `candidate_score_similarity` and `candidate_score_sirius_csi` are NA.
 #'
@@ -264,14 +268,18 @@ load_annotation_tables <- function(annotations, ms1_only) {
 #' Load Structure-Organism Pairs
 #'
 #' @description Internal helper to load the main library table and sequentially
-#'     left-join optional supplemental tables (stereo structures, organism taxonomy).
+#' left-join optional supplemental tables (stereo structures, organism
+#'     taxonomy).
 #'     Returns a combined data frame suitable for biological scoring.
 #'
 #' @param library [character] Character, path to main library file (required).
-#' @param str_stereo [character] Character, path to stereo structures file (optional; NULL allowed).
-#' @param org_tax_ott [character] Character, path to organism taxonomy file (optional; NULL allowed).
+#' @param str_stereo [character] Character, path to stereo structures file
+#'     (optional; NULL allowed).
+#' @param org_tax_ott [character] Character, path to organism taxonomy file
+#'     (optional; NULL allowed).
 #'
-#' @return Data frame with structure-organism pairs, including any joined metadata.
+#' @return Data frame with structure-organism pairs, including any joined
+#'     metadata.
 #' @keywords internal
 load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
   log_debug("Loading library from: %s", library)
@@ -331,9 +339,11 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
 #'     for downstream annotation propagation and scoring.
 #'
 #' @param edges [character] Character, path to edges file.
-#' @param candidates_neighbors [integer] Integer, number of top neighbors to keep per feature.
+#' @param candidates_neighbors [integer] Integer, number of top neighbors to
+#'     keep per feature.
 #'
-#' @return Data frame with filtered edges (top `candidates_neighbors` per `feature_source`).
+#' @return Data frame with filtered edges (top `candidates_neighbors` per
+#'     `feature_source`).
 #' @keywords internal
 load_edges_table <- function(edges, candidates_neighbors) {
   log_debug("Loading edges from: %s", edges)
@@ -701,7 +711,8 @@ export_results <- function(results_list, output, pattern) {
 #' @param remove_ties Remove ties. BOOLEAN
 #' @param summarize Summarize results (1 row per feature). BOOLEAN
 #' @param pattern Pattern to identify your job. STRING
-#' @param xrefs_file Optional character path to xrefs file from [get_compounds_xrefs()].
+#' @param xrefs_file Optional character path to xrefs file from
+#'     [get_compounds_xrefs()].
 #'     If provided, external database identifiers will be added to results.
 #'
 #' @return The path to the weighted annotations
@@ -719,7 +730,8 @@ export_results <- function(results_list, output, pattern) {
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 #' dir <- paste0(github, repo)
-#' library <- get_params(step = "weight_annotations")$files$libraries$sop$merged$keys |>
+#' library <- get_params(step =
+#'     "weight_annotations")$files$libraries$sop$merged$keys |>
 #'   gsub(
 #'     pattern = ".gz",
 #'     replacement = "",

@@ -15,7 +15,8 @@ select_sirius_columns_spectral(df, sirius_version)
 Data frame with standardized spectral-match columns.
 }
 \description{
-Standardize SIRIUS spectral-match columns (including analog hits)
+Standardize SIRIUS spectral-match columns (including analog
+hits)
 into the common annotation model.
 }
 \keyword{internal}

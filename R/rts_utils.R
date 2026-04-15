@@ -1,12 +1,18 @@
 #' @title Normalize retention times to minutes
-#' @description Converts a numeric retention time vector to minutes based on a specified
-#' unit or automatic heuristic detection. Automatic detection treats values as seconds
-#' if all non-missing RTs are > 120 or if the 95th percentile exceeds 180 (common upper
+#' @description Converts a numeric retention time vector to minutes based on a
+#'     specified
+#' unit or automatic heuristic detection. Automatic detection treats values as
+#'     seconds
+#' if all non-missing RTs are > 120 or if the 95th percentile exceeds 180
+#'     (common upper
 #' bound for minutes in typical gradients). Otherwise assumes minutes.
 #'
-#' @param rt_vec [numeric] Numeric vector (character allowed; will be coerced) of retention times.
-#' @param unit [character] Character scalar: one of 'auto', 'seconds', or 'minutes'.
-#' @param quiet [logical] Logical; if FALSE, logs detection/conversion decisions.
+#' @param rt_vec [numeric] Numeric vector (character allowed; will be coerced)
+#'     of retention times.
+#' @param unit [character] Character scalar: one of 'auto', 'seconds', or
+#'     'minutes'.
+#' @param quiet [logical] Logical; if FALSE, logs detection/conversion
+#'     decisions.
 #'
 #' @return Numeric vector of RTs in minutes.
 #' @keywords internal
@@ -45,7 +51,8 @@ normalize_rt_to_minutes <- function(
     q95 <- stats::quantile(x = rts_non_na, probs = 0.95, na.rm = TRUE, type = 7)
     min_val <- min(rts_non_na, na.rm = TRUE)
     max_val <- max(rts_non_na, na.rm = TRUE)
-    # Heuristic: treat as seconds if all RT > 2 OR 95th percentile > 45 OR max > 180
+    # Heuristic: treat as seconds if all RT > 2 OR 95th percentile > 45 OR max >
+    # 180
     if ((min_val > 2) || (q95 > 45) || (max_val > 180)) {
       decided_unit <- "seconds"
     } else {

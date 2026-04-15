@@ -148,7 +148,7 @@ format_time <- function(seconds) {
 #' @param filename Character string specifying the log file name.
 #'     Default: "tima.log"
 #' @param threshold Character or integer log level threshold.
-#'     Can be numeric (lgr levels) or logger constants for backwards compatibility.
+#' Can be numeric (lgr levels) or logger constants for backwards compatibility.
 #'     Default: 600 (TRACE level)
 #'
 #' @return NULL (invisibly). Sets up logger as side effect.
@@ -176,8 +176,10 @@ setup_logger <- function(filename = "tima.log", threshold = 600) {
   }
 
   # Convert logger constants to lgr numeric levels if needed
-  # Both logger and lgr use: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200, FATAL=100
-  # lgr also accepts string names: "trace", "debug", "info", "warn", "error", "fatal"
+  # Both logger and lgr use: TRACE=600, DEBUG=500, INFO=400, WARN=300,
+  # ERROR=200, FATAL=100
+  # lgr also accepts string names: "trace", "debug", "info", "warn", "error",
+  # "fatal"
   # We'll keep the same numeric values for compatibility
   lgr_threshold <- if (is.numeric(threshold)) {
     as.integer(threshold)
@@ -307,7 +309,8 @@ ensure_logging_initialized <- function() {
 #' @title Logging wrapper functions for lgr compatibility
 #'
 #' @description Simple logging wrappers that use sprintf-style formatting.
-#'     These functions automatically initialize logging on first use (lazy initialization),
+#' These functions automatically initialize logging on first use (lazy
+#'     initialization),
 #'     so no empty log files are created when the package is merely loaded.
 #'
 #' @param msg Message template (use sprintf format: "Value: %s")
@@ -436,7 +439,8 @@ log_similarity_distribution <- function(scores, title) {
 #' @keywords internal
 #' @title Accumulate similarity score bins
 #' @description Build or update 0.1-binned counts for scores in \[0,1\].
-#' @param scores Numeric vector of scores (NA/Inf ignored; values clamped to \[0,1\]).
+#' @param scores Numeric vector of scores (NA/Inf ignored; values clamped to
+#'     \[0,1\]).
 #' @return Named integer vector of counts for each bin label (all bins present).
 accumulate_similarity_bins <- function(scores) {
   breaks <- seq(0, 1, by = 0.1)
@@ -464,8 +468,10 @@ accumulate_similarity_bins <- function(scores) {
 
 #' @keywords internal
 #' @title Log similarity distribution from counts
-#' @description Log a pre-accumulated distribution (named counts) in the standard table style.
-#' @param counts Named integer vector whose names are bin labels (e.g., "(0,0.1\]", "(0.1,0.2\]", ...).
+#' @description Log a pre-accumulated distribution (named counts) in the
+#'     standard table style.
+#' @param counts Named integer vector whose names are bin labels (e.g.,
+#'     "(0,0.1\]", "(0.1,0.2\]", ...).
 #' @param title Header line to log before the table.
 #' @return Invisibly returns NULL.
 log_similarity_distribution_counts <- function(counts, title) {
@@ -497,7 +503,8 @@ log_similarity_distribution_counts <- function(counts, title) {
 #' start time, parameters, results, and elapsed time. This enables rich,
 #' hierarchical logging that's easy to parse and analyze.
 #'
-#' @param operation_name Character, name of the operation (e.g., "classify_structures")
+#' @param operation_name Character, name of the operation (e.g.,
+#'     "classify_structures")
 #' @param ... Named parameters to log with the operation
 #'
 #' @return A list with class "tima_log_context" containing:

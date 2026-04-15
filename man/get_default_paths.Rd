@@ -7,11 +7,13 @@
 get_default_paths(yaml = system.file("paths.yaml", package = "tima"))
 }
 \arguments{
-\item{yaml}{Character string path to the YAML file containing path definitions.
+\item{yaml}{Character string path to the YAML file containing path
+definitions.
 Default is the paths.yaml file included in the package installation.}
 }
 \value{
-Named list containing all configured paths and settings. The structure
+Named list containing all configured paths and settings. The
+structure
 mirrors the YAML file hierarchy with nested lists for organized access.
 }
 \description{

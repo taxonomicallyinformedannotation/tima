@@ -18,7 +18,8 @@
 #' @param params_advanced [list] List of advanced parameters for the workflow
 #' @param step [character] Workflow step identifier (default: NA)
 #'
-#' @return Character vector of paths to YAML files containing prepared parameters
+#' @return Character vector of paths to YAML files containing prepared
+#'     parameters
 #'
 #' @examples
 #' \dontrun{
@@ -76,11 +77,16 @@ prepare_params <- function(
   fil_ann_pre_can <- params_advanced$files$annotations$prepared$canopus
   fil_ann_pre_for <- params_advanced$files$annotations$prepared$formula
   fil_ann_pre_str <- params_advanced$files$annotations$prepared$structural
-  fil_ann_pre_str_gnp <- params_advanced$files$annotations$prepared$structural$gnps
-  # fil_ann_pre_str_ms1 <- params_advanced$files$annotations$prepared$structural$ms1
-  fil_ann_pre_str_mzm <- params_advanced$files$annotations$prepared$structural$mzmine
-  fil_ann_pre_str_sir <- params_advanced$files$annotations$prepared$structural$sirius
-  fil_ann_pre_str_spe <- params_advanced$files$annotations$prepared$structural$spectral
+  fil_ann_pre_str_gnp <-
+    params_advanced$files$annotations$prepared$structural$gnps
+  # fil_ann_pre_str_ms1 <-
+  # params_advanced$files$annotations$prepared$structural$ms1
+  fil_ann_pre_str_mzm <-
+    params_advanced$files$annotations$prepared$structural$mzmine
+  fil_ann_pre_str_sir <-
+    params_advanced$files$annotations$prepared$structural$sirius
+  fil_ann_pre_str_spe <-
+    params_advanced$files$annotations$prepared$structural$spectral
   fil_ann_fil <- params_advanced$files$annotations$filtered
   fil_ann_pro <- params_advanced$files$annotations$processed
 
@@ -103,24 +109,36 @@ prepare_params <- function(
   # fil_lib_sop_pre_spe <- params_advanced$files$libraries$sop$prepared$spectral
   # fil_lib_sop_pre_wik <- params_advanced$files$libraries$sop$prepared$wikidata
   fil_lib_sop_mer_key <- params_advanced$files$libraries$sop$merged$keys
-  fil_lib_sop_mer_org_nam <- params_advanced$files$libraries$sop$merged$organisms$names
-  fil_lib_sop_mer_org_tax_ott <- params_advanced$files$libraries$sop$merged$organisms$taxonomies$ott
-  fil_lib_sop_mer_str_pro <- params_advanced$files$libraries$sop$merged$structures$processed
-  fil_lib_sop_mer_str_can <- params_advanced$files$libraries$sop$merged$structures$canonical
-  fil_lib_sop_mer_str_ste <- params_advanced$files$libraries$sop$merged$structures$stereo
-  fil_lib_sop_mer_str_met <- params_advanced$files$libraries$sop$merged$structures$metadata
-  fil_lib_sop_mer_str_tax_cla <- params_advanced$files$libraries$sop$merged$structures$taxonomies$cla
-  fil_lib_sop_mer_str_tax_npc <- params_advanced$files$libraries$sop$merged$structures$taxonomies$npc
-  fil_lib_sop_mer_str_tax_add_cla <- params_advanced$files$libraries$sop$merged$structures$taxonomies$c
-  fil_lib_sop_mer_str_tax_add_npc <- params_advanced$files$libraries$sop$merged$structures$taxonomies$n
+  fil_lib_sop_mer_org_nam <-
+    params_advanced$files$libraries$sop$merged$organisms$names
+  fil_lib_sop_mer_org_tax_ott <-
+    params_advanced$files$libraries$sop$merged$organisms$taxonomies$ott
+  fil_lib_sop_mer_str_pro <-
+    params_advanced$files$libraries$sop$merged$structures$processed
+  fil_lib_sop_mer_str_can <-
+    params_advanced$files$libraries$sop$merged$structures$canonical
+  fil_lib_sop_mer_str_ste <-
+    params_advanced$files$libraries$sop$merged$structures$stereo
+  fil_lib_sop_mer_str_met <-
+    params_advanced$files$libraries$sop$merged$structures$metadata
+  fil_lib_sop_mer_str_tax_cla <-
+    params_advanced$files$libraries$sop$merged$structures$taxonomies$cla
+  fil_lib_sop_mer_str_tax_npc <-
+    params_advanced$files$libraries$sop$merged$structures$taxonomies$npc
+  fil_lib_sop_mer_str_tax_add_cla <-
+    params_advanced$files$libraries$sop$merged$structures$taxonomies$c
+  fil_lib_sop_mer_str_tax_add_npc <-
+    params_advanced$files$libraries$sop$merged$structures$taxonomies$n
 
   # Extract file paths - spectral libraries
   fil_lib_spe_neg <- params_advanced$files$libraries$spectral$neg
   fil_lib_spe_pos <- params_advanced$files$libraries$spectral$pos
   fil_lib_spe_raw <- params_advanced$files$libraries$spectral$raw
   fil_lib_tem_exp_csv <- params_advanced$files$libraries$temporal$exp$csv
-  fil_lib_tem_exp_mgf_neg <- params_advanced$files$libraries$temporal$exp$mgf$neg
-  fil_lib_tem_exp_mgf_pos <- params_advanced$files$libraries$temporal$exp$mgf$pos
+  fil_lib_tem_exp_mgf_neg <-
+    params_advanced$files$libraries$temporal$exp$mgf$neg
+  fil_lib_tem_exp_mgf_pos <-
+    params_advanced$files$libraries$temporal$exp$mgf$pos
   fil_lib_tem_is_csv <- params_advanced$files$libraries$temporal$is$csv
   fil_lib_tem_is_mgf_neg <- params_advanced$files$libraries$temporal$is$mgf$neg
   fil_lib_tem_is_mgf_pos <- params_advanced$files$libraries$temporal$is$mgf$pos
@@ -128,11 +146,14 @@ prepare_params <- function(
   # fil_net_spe_edg_raw <- params_advanced$files$networks$spectral$edges$raw
 
   # Extract file paths - networks
-  fil_net_spe_edg_raw_ms1 <- params_advanced$files$networks$spectral$edges$raw$ms1
-  fil_net_spe_edg_raw_spe <- params_advanced$files$networks$spectral$edges$raw$spectral
+  fil_net_spe_edg_raw_ms1 <-
+    params_advanced$files$networks$spectral$edges$raw$ms1
+  fil_net_spe_edg_raw_spe <-
+    params_advanced$files$networks$spectral$edges$raw$spectral
   fil_net_spe_edg_pre <- params_advanced$files$networks$spectral$edges$prepared
   fil_net_spe_com_raw <- params_advanced$files$networks$spectral$components$raw
-  fil_net_spe_com_pre <- params_advanced$files$networks$spectral$components$prepared
+  fil_net_spe_com_pre <-
+    params_advanced$files$networks$spectral$components$prepared
 
   # Extract file paths - metadata
   # fil_met_raw <- params_advanced$files$metadata$raw
@@ -249,7 +270,8 @@ prepare_params <- function(
   yamls_params$`prepare_params_advanced`$files$metadata$raw <- fil_met_raw
   yamls_params$`prepare_params_advanced`$files$spectral$raw <- fil_spe_raw
   yamls_params$`prepare_params_advanced`$files$annotations$raw$spectral$mzmine <- fil_ann_raw_mzm
-  yamls_params$`prepare_params_advanced`$files$annotations$raw$sirius <- fil_ann_raw_sir
+  yamls_params$`prepare_params_advanced`$files$annotations$raw$sirius <-
+    fil_ann_raw_sir
   yamls_params$`prepare_params_advanced`$ms$polarity <- ms_pol
   yamls_params$`prepare_params_advanced`$organisms$taxon <- org_tax
   yamls_params$`prepare_params_advanced`$options$high_confidence <- opt_hig_con
@@ -877,8 +899,10 @@ prepare_params <- function(
   # yamls_params$`params/prepare_params_advanced`$files$annotations$raw$spectral$spectral <-
   #   yamls_params$`params/prepare_params_advanced`$files$annotations$raw$spectral$spectral |>
   #   purrr::map(.f = replace_id)
-  # # yamls_params$`params/prepare_params_advanced`$files$annotations$raw$sirius <-
-  # #   yamls_params$`params/prepare_params_advanced`$files$annotations$raw$sirius |>
+  # # yamls_params$`params/prepare_params_advanced`$files$annotations$raw$sirius
+  # <-
+  # # yamls_params$`params/prepare_params_advanced`$files$annotations$raw$sirius
+  # |>
   # #   purrr::map(.f = replace_id)
   # yamls_params$`params/prepare_params_advanced`$files$annotations$raw$spectral$spectral <-
   #   yamls_params$`params/prepare_params_advanced`$files$annotations$raw$spectral$spectral |>

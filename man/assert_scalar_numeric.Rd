@@ -21,6 +21,7 @@ assert_scalar_numeric(x, param_name, min = -Inf, max = Inf, allow_na = FALSE)
 Invisible TRUE if valid, stops with error otherwise
 }
 \description{
-Validates that a parameter is a single numeric value within range
+Validates that a parameter is a single numeric value within
+range
 }
 \keyword{internal}

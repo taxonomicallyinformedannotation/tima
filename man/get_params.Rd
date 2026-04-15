@@ -7,14 +7,16 @@
 get_params(step)
 }
 \arguments{
-\item{step}{Character string name of the workflow step (e.g., "prepare_params",
+\item{step}{Character string name of the workflow step (e.g.,
+"prepare_params",
 "annotate_masses"). Must match an available step in the package.}
 }
 \value{
 Named list containing the merged parameters for the specified step
 }
 \description{
-This function retrieves and merges parameters for a workflow step,
+This function retrieves and merges parameters for a workflow
+step,
 combining default parameters, user-specified YAML configurations, and
 command-line arguments. It handles both regular and advanced parameter sets.
 }

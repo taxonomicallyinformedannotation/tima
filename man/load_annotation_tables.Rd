@@ -7,7 +7,8 @@
 load_annotation_tables(annotations, ms1_only)
 }
 \arguments{
-\item{annotations}{\link{character} Character vector of file paths to annotation files.}
+\item{annotations}{\link{character} Character vector of file paths to annotation
+files.}
 
 \item{ms1_only}{\link{logical} Logical; if TRUE, keep only annotations where both
 \code{candidate_score_similarity} and \code{candidate_score_sirius_csi} are NA.}
@@ -18,6 +19,7 @@ Data frame with combined (and optionally filtered) annotations.
 \description{
 Internal helper to load, combine, and filter annotation tables.
 Reads multiple annotation files, binds rows, and optionally filters to
-retain only MS1-based annotations (those without MS2 similarity or SIRIUS CSI scores).
+retain only MS1-based annotations (those without MS2 similarity or SIRIUS CSI
+scores).
 }
 \keyword{internal}

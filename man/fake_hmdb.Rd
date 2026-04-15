@@ -7,7 +7,8 @@
 fake_hmdb(export)
 }
 \arguments{
-\item{export}{Character string path where the fake HMDB zip file should be saved}
+\item{export}{Character string path where the fake HMDB zip file should be
+saved}
 }
 \value{
 Character string path to the created fake file

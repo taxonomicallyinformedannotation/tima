@@ -19,9 +19,11 @@ calculate_similarity(
 \arguments{
 \item{method}{\link{character} Similarity method: "entropy", "gnps", or "cosine"}
 
-\item{query_spectrum}{\link{matrix} Numeric matrix with columns for mz and intensity}
+\item{query_spectrum}{\link{matrix} Numeric matrix with columns for mz and
+intensity}
 
-\item{target_spectrum}{\link{matrix} Numeric matrix with columns for mz and intensity}
+\item{target_spectrum}{\link{matrix} Numeric matrix with columns for mz and
+intensity}
 
 \item{query_precursor}{\link{numeric} Precursor m/z value for query}
 

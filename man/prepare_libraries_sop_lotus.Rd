@@ -20,7 +20,8 @@ Character string path to the prepared structure-organism pairs
 library file
 }
 \description{
-This function prepares the LOTUS (LOng-lasting, cUraTed collection
+This function prepares the LOTUS (LOng-lasting, cUraTed
+collection
 of cOnnectivity daTa for natural products) structure-organism pairs database.
 It standardizes columns, extracts 2D InChIKeys, rounds numeric values,
 and removes duplicates.

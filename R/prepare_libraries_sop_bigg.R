@@ -18,10 +18,12 @@
 #' @include select_sop_columns.R
 #'
 #' @param bigg_doi [character] Character string DOI for BiGG database reference
-#' @param bigg_models [list] Named list of BiGG models with organism names as keys
+#' @param bigg_models [list] Named list of BiGG models with organism names as
+#'     keys
 #'     and named character vectors containing "model_id" and "doi" as values
 #' @param bigg_url [character] Character string base URL for BiGG models API
-#' @param output [character] Character string path for prepared BiGG library output
+#' @param output [character] Character string path for prepared BiGG library
+#'     output
 #'
 #' @return Character string path to prepared BiGG structure-organism pairs
 #'

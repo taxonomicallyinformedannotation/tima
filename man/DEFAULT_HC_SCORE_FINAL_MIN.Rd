@@ -3,7 +3,8 @@
 \docType{data}
 \name{DEFAULT_HC_SCORE_FINAL_MIN}
 \alias{DEFAULT_HC_SCORE_FINAL_MIN}
-\title{Default minimum final (weighted chemical) score threshold for high-confidence filter}
+\title{Default minimum final (weighted chemical) score threshold for high-confidence
+filter}
 \format{
 An object of class \code{numeric} of length 1.
 }
@@ -11,6 +12,7 @@ An object of class \code{numeric} of length 1.
 DEFAULT_HC_SCORE_FINAL_MIN
 }
 \description{
-Default minimum final (weighted chemical) score threshold for high-confidence filter
+Default minimum final (weighted chemical) score threshold for high-confidence
+filter
 }
 \keyword{internal}

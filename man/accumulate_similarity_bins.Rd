@@ -7,7 +7,8 @@
 accumulate_similarity_bins(scores)
 }
 \arguments{
-\item{scores}{Numeric vector of scores (NA/Inf ignored; values clamped to [0,1]).}
+\item{scores}{Numeric vector of scores (NA/Inf ignored; values clamped to
+[0,1]).}
 }
 \value{
 Named integer vector of counts for each bin label (all bins present).

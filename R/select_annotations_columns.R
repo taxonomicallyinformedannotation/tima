@@ -11,7 +11,8 @@
 #' @include round_reals.R
 #' @include validations_utils.R
 #'
-#' @param df [data.frame] Data frame containing annotation results with structure and
+#' @param df [data.frame] Data frame containing annotation results with
+#'     structure and
 #'     candidate information
 #' @param str_stereo [character] Path to structure stereochemistry file
 #' @param str_met [character] Path to structure metadata file
@@ -96,7 +97,8 @@ select_annotations_columns <- function(
     df[["candidate_adduct"]] <- gsub("\\s+", "", df[["candidate_adduct"]])
   }
 
-  # Clean NULL/NA sentinels in one pass while preserving current output semantics.
+  # Clean NULL/NA sentinels in one pass while preserving current output
+  # semantics.
   character_cols <- names(df)[vapply(df, is.character, logical(1L))]
   if (length(character_cols) > 0L) {
     df <- df |>
@@ -230,7 +232,8 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
   # Join and overwrite computable fields
   # Ensure target columns exist before coalescing (they may not exist yet
 
-  # if this is the first time they are being computed, e.g., from annotate_spectra output)
+  # if this is the first time they are being computed, e.g., from
+  # annotate_spectra output)
   ensure_cols <- c(
     "candidate_structure_inchikey_connectivity_layer",
     "candidate_structure_inchikey_no_stereo",

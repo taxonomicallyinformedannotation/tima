@@ -10,7 +10,8 @@ is_single_string(x)
 \item{x}{Value to check}
 }
 \value{
-Logical TRUE if x is a single non-NA character string, FALSE otherwise
+Logical TRUE if x is a single non-NA character string, FALSE
+otherwise
 }
 \description{
 Validates that a value is a character vector of length 1.

@@ -1,15 +1,17 @@
 #' @title Get parameters
 #'
-#' @description This function retrieves and merges parameters for a workflow step,
+#' @description This function retrieves and merges parameters for a workflow
+#'     step,
 #'     combining default parameters, user-specified YAML configurations, and
-#'     command-line arguments. It handles both regular and advanced parameter sets.
+#' command-line arguments. It handles both regular and advanced parameter sets.
 #'
 #' @include get_default_paths.R
 #' @include get_path.R
 #' @include parse_cli_params.R
 #' @include parse_yaml_params.R
 #'
-#' @param step Character string name of the workflow step (e.g., "prepare_params",
+#' @param step Character string name of the workflow step (e.g.,
+#'     "prepare_params",
 #'     "annotate_masses"). Must match an available step in the package.
 #'
 #' @return Named list containing the merged parameters for the specified step

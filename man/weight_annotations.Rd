@@ -216,7 +216,8 @@ match (should be lower than \verb{NPC class})}
 
 \item{force}{Force parameters. Use it at your own risk}
 
-\item{xrefs_file}{Optional character path to xrefs file from \code{\link[=get_compounds_xrefs]{get_compounds_xrefs()}}.
+\item{xrefs_file}{Optional character path to xrefs file from
+\code{\link[=get_compounds_xrefs]{get_compounds_xrefs()}}.
 If provided, external database identifiers will be added to results.}
 }
 \value{
@@ -232,7 +233,8 @@ go_to_cache()
 github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 dir <- paste0(github, repo)
-library <- get_params(step = "weight_annotations")$files$libraries$sop$merged$keys |>
+library <- get_params(step =
+    "weight_annotations")$files$libraries$sop$merged$keys |>
   gsub(
     pattern = ".gz",
     replacement = "",

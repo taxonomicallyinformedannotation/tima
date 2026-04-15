@@ -7,7 +7,8 @@
 #'
 #' @include validations_utils.R
 #'
-#' @param annot_table_wei_bio Data frame containing biologically weighted annotations
+#' @param annot_table_wei_bio Data frame containing biologically weighted
+#'     annotations
 #' @param edges_table Data frame containing network edges between features
 #' @param minimal_consistency Numeric minimum consistency score (0-1) required
 #'     to retain a classification at each taxonomic level
@@ -309,7 +310,8 @@ clean_bio <- function(
 #' removes self-loops. Optionally filters by spectral entropy and labels.
 #'
 #' @param edges_table Data frame containing network edges
-#' @param min_neighbors Integer minimum number of neighbors required (default: 2)
+#' @param min_neighbors Integer minimum number of neighbors required (default:
+#'     2)
 #' @param min_entropy Numeric minimum spectral entropy (default: 0)
 #'
 #' @return Filtered edges data frame

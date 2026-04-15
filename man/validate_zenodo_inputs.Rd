@@ -17,6 +17,7 @@ validate_zenodo_inputs(doi, pattern, path)
 NULL (stops on validation error)
 }
 \description{
-Internal helper to validate all input parameters for Zenodo operations.
+Internal helper to validate all input parameters for Zenodo
+operations.
 }
 \keyword{internal}

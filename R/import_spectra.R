@@ -2,7 +2,7 @@
 #'
 #' @description This function imports mass spectra from various file formats
 #'     (.mgf, .msp, .rds), harmonizes metadata field names, filters by MS level
-#'     and polarity, optionally combines replicate spectra, and sanitizes peak data.
+#' and polarity, optionally combines replicate spectra, and sanitizes peak data.
 #'
 #' @include read_mgf_opti.R
 #' @include sanitize_spectra.R
@@ -13,8 +13,10 @@
 #' @param polarity Character string for polarity filtering: "pos", "neg", or NA
 #'     to keep all (default: NA)
 #' @param ppm Numeric PPM tolerance for peak matching (default: 10)
-#' @param sanitize Logical flag indicating whether to sanitize spectra (default: TRUE)
-#' @param combine Logical flag indicating whether to combine replicate spectra (default: TRUE)
+#' @param sanitize Logical flag indicating whether to sanitize spectra (default:
+#'     TRUE)
+#' @param combine Logical flag indicating whether to combine replicate spectra
+#'     (default: TRUE)
 #'
 #' @return Spectra object containing the imported and processed spectra
 #'

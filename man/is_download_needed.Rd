@@ -15,6 +15,7 @@ is_download_needed(path, zenodo_size)
 Logical TRUE if download needed, FALSE otherwise
 }
 \description{
-Internal helper to determine if download is required by comparing sizes.
+Internal helper to determine if download is required by
+comparing sizes.
 }
 \keyword{internal}

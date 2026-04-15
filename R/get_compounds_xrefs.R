@@ -52,7 +52,8 @@ get_compounds_xrefs <- function(
   ),
   bioregistry_url = paste0(
     "https://raw.githubusercontent.com/",
-    "biopragmatics/bioregistry/refs/heads/main/src/bioregistry/data/bioregistry.json"
+    "biopragmatics/bioregistry/refs/heads/main/",
+    "src/bioregistry/data/bioregistry.json"
   ),
   qlever_url = "https://qlever.cs.uni-freiburg.de/api/wikidata",
   max_age_hours = 24,

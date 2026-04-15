@@ -14,7 +14,8 @@ validate_file_exists(
 \arguments{
 \item{path}{\link{character} File path to validate}
 
-\item{file_type}{\link{character} Type description (e.g., "MGF file", "parameter file")}
+\item{file_type}{\link{character} Type description (e.g., "MGF file", "parameter
+file")}
 
 \item{param_name}{\link{character} Parameter name for error messages}
 

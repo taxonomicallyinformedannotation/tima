@@ -39,13 +39,18 @@
 #' @param input [character] Vector or list of query spectral file paths (.mgf).
 #' @param libraries [character] Vector or list of library spectral file paths
 #'   (.mgf / Spectra-supported). Must contain at least one path.
-#' @param polarity [character] MS polarity; one of `VALID_MS_MODES` ("pos", "neg").
-#' @param output [character] Output file path (the function writes a tabular file here).
-#' @param method [character] Similarity method; one of `VALID_SIMILARITY_METHODS`.
-#' @param threshold [numeric] Minimal similarity score to retain candidates (0-1).
+#' @param polarity [character] MS polarity; one of `VALID_MS_MODES` ("pos",
+#'     "neg").
+#' @param output [character] Output file path (the function writes a tabular
+#'     file here).
+#' @param method [character] Similarity method; one of
+#'     `VALID_SIMILARITY_METHODS`.
+#' @param threshold [numeric] Minimal similarity score to retain candidates
+#'     (0-1).
 #' @param ppm [numeric] Relative mass tolerance (ppm) for MS/MS matching.
 #' @param dalton [numeric] Absolute mass tolerance (Daltons) for MS/MS matching.
-#' @param cutoff [numeric] Intensity cutoff under which MS2 fragments are removed.
+#' @param cutoff [numeric] Intensity cutoff under which MS2 fragments are
+#'     removed.
 #'     Non-negative numeric or NULL for dynamic thresholding.
 #' @param qutoff `r lifecycle::badge("deprecated")` Use `cutoff` instead.
 #' @param approx [logical] If TRUE perform matching ignoring precursor masses
@@ -284,7 +289,8 @@ annotate_spectra <- function(
     )
   }
 
-  # Log distribution of annotation scores by 0.1 bins before export (0-0.1, ..., 0.9-1.0)
+  # Log distribution of annotation scores by 0.1 bins before export (0-0.1, ...,
+  # 0.9-1.0)
   if (
     nrow(df_final) > 0L && "candidate_score_similarity" %in% names(df_final)
   ) {

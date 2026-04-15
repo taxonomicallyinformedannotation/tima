@@ -26,9 +26,11 @@ to keep all (default: NA)}
 
 \item{ppm}{Numeric PPM tolerance for peak matching (default: 10)}
 
-\item{sanitize}{Logical flag indicating whether to sanitize spectra (default: TRUE)}
+\item{sanitize}{Logical flag indicating whether to sanitize spectra (default:
+TRUE)}
 
-\item{combine}{Logical flag indicating whether to combine replicate spectra (default: TRUE)}
+\item{combine}{Logical flag indicating whether to combine replicate spectra
+(default: TRUE)}
 }
 \value{
 Spectra object containing the imported and processed spectra

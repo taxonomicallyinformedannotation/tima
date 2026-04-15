@@ -18,22 +18,22 @@ fa_create_min_files <- function(root, with_rt = FALSE) {
 
 fa_ms1_table <- function() {
   tidytable::tidytable(
-    feature_id = c("F1"),
-    candidate_structure_inchikey_connectivity_layer = c("AAA")
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "AAA"
   )
 }
 fa_spectral_table <- function() {
   tidytable::tidytable(
-    feature_id = c("F1"),
-    candidate_structure_inchikey_connectivity_layer = c("AAA"),
-    candidate_score_similarity = c("0.9")
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "AAA",
+    candidate_score_similarity = "0.9"
   )
 }
 
 # Build RT library table
 fa_rt_lib <- function() {
   tidytable::tidytable(
-    candidate_structure_inchikey_connectivity_layer = c("AAA"),
-    rt_target = c("1.0")
+    candidate_structure_inchikey_connectivity_layer = "AAA",
+    rt_target = "1.0"
   )
 }

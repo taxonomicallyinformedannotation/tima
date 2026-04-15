@@ -18,7 +18,8 @@ prepare_params(
 \item{step}{\link{character} Workflow step identifier (default: NA)}
 }
 \value{
-Character vector of paths to YAML files containing prepared parameters
+Character vector of paths to YAML files containing prepared
+parameters
 }
 \description{
 Prepares and validates main parameters for the TIMA workflow.

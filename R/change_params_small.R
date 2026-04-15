@@ -83,10 +83,12 @@ create_yaml_null_handler <- function() {
 
 #' @title Change Parameters (Convenience Function)
 #'
-#' @description Updates TIMA workflow parameters for quick setup with a simplified
-#'     interface. This function modifies the prepare_params YAML configuration file
-#'     by copying provided input files to the appropriate directories and updating
-#'     parameter values. Implements SOLID principles with clear separation of concerns.
+#' @description Updates TIMA workflow parameters for quick setup with a
+#'     simplified
+#' interface. This function modifies the prepare_params YAML configuration file
+#' by copying provided input files to the appropriate directories and updating
+#' parameter values. Implements SOLID principles with clear separation of
+#'     concerns.
 #'
 #' @include create_dir.R
 #' @include get_default_paths.R
@@ -94,8 +96,10 @@ create_yaml_null_handler <- function() {
 #' @include load_yaml_files.R
 #'
 #' @param fil_pat Character. Job identifier/pattern for output files (optional)
-#' @param fil_fea_raw Character. Path to features file (e.g., from mzmine/SIRIUS)
-#' @param fil_met_raw Character. Path to metadata file (optional if single taxon)
+#' @param fil_fea_raw Character. Path to features file (e.g., from
+#'     mzmine/SIRIUS)
+#' @param fil_met_raw Character. Path to metadata file (optional if single
+#'     taxon)
 #' @param fil_sir_raw Character. Path to SIRIUS annotations directory/zip
 #' @param fil_spe_raw Character. Path to spectra file (MGF format with MS1/MS2)
 #' @param fil_ann_mzm Character. Path to mzmine annotations file
@@ -103,7 +107,8 @@ create_yaml_null_handler <- function() {
 #' @param org_tax Character. Scientific name for single-taxon experiments
 #' @param hig_con Logical. Filter for high confidence candidates only
 #' @param summarize Logical. Summarize all candidates per feature to single row
-#' @param cache_dir Character. Cache directory path (for testing; uses go_to_cache() if NULL)
+#' @param cache_dir Character. Cache directory path (for testing; uses
+#'     go_to_cache() if NULL)
 #'
 #' @details
 #' This function:

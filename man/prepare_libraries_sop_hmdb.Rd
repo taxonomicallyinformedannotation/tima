@@ -13,7 +13,8 @@ prepare_libraries_sop_hmdb(
 \arguments{
 \item{input}{\link{character} Character string path to HMDB SDF zip file}
 
-\item{output}{\link{character} Character string path for prepared HMDB library output}
+\item{output}{\link{character} Character string path for prepared HMDB library
+output}
 }
 \value{
 Character string path to prepared HMDB structure-organism pairs

@@ -2,7 +2,7 @@
 #'
 #' @description Reads specific files from a compressed SIRIUS workspace
 #'     directory. Handles file selection, filtering empty files, and
-#'     parsing tab-delimited data. Internal helper for prepare_annotations_sirius().
+#' parsing tab-delimited data. Internal helper for prepare_annotations_sirius().
 #'
 #' @include validations_utils.R
 #'

@@ -20,7 +20,8 @@ prepare_features_tables(
 \item{output}{\link{character} Path where prepared features should be saved.}
 
 \item{candidates}{\link{integer} Number of top-intensity samples to retain per
-feature (default: from params; recommended ≤5 to balance data size and coverage).}
+feature (default: from params; recommended ≤5 to balance data size and
+coverage).}
 
 \item{name_adduct}{\link{character} Name of the adduct column in input.}
 

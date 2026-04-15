@@ -7,10 +7,14 @@
 #' @param features [character] Character path to features CSV/TSV file
 #' @param spectra [character] Character path to MGF spectra file
 #' @param metadata [character] Character path to metadata file
-#' @param sirius [character] Character path to SIRIUS output directory or ZIP file
-#' @param filename_col [character] Character name of filename column (default: "filename")
-#' @param organism_col [character] Character name of organism column (default: "organism")
-#' @param feature_col [character] Character name of feature ID column (default: "feature_id")
+#' @param sirius [character] Character path to SIRIUS output directory or ZIP
+#'     file
+#' @param filename_col [character] Character name of filename column (default:
+#'     "filename")
+#' @param organism_col [character] Character name of organism column (default:
+#'     "organism")
+#' @param feature_col [character] Character name of feature ID column (default:
+#'     "feature_id")
 #'
 #' @return Invisible TRUE if all checks pass, stops with error otherwise
 #'

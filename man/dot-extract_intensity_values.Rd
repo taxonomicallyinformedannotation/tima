@@ -4,7 +4,7 @@
 \alias{.extract_intensity_values}
 \title{Extract intensity values from peak data matrix}
 \usage{
-.extract_intensity_values(peakData)
+.extract_intensity_values(peak_data)
 }
 \description{
 Extract intensity values from peak data matrix

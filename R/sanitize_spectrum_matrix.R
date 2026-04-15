@@ -25,8 +25,10 @@ reset_sanitize_warnings <- function() {
 #'       \item Non-negative intensities
 #'     }
 #'
-#' @param spectrum [matrix] Numeric matrix with at least 2 columns (mz, intensity)
-#' @param tolerance [numeric] Numeric absolute tolerance in Daltons (default: 0.01)
+#' @param spectrum [matrix] Numeric matrix with at least 2 columns (mz,
+#'     intensity)
+#' @param tolerance [numeric] Numeric absolute tolerance in Daltons (default:
+#'     0.01)
 #' @param ppm [numeric] Numeric relative tolerance in ppm (default: 10)
 #'
 #' @return Logical scalar: TRUE if the spectrum is sanitized, FALSE otherwise.
@@ -93,8 +95,10 @@ is_spectrum_sanitized <- function(spectrum, tolerance = 0.01, ppm = 10) {
 #'             summed intensity)
 #'     }
 #'
-#' @param spectrum [matrix] Numeric matrix with at least 2 columns (mz, intensity)
-#' @param tolerance [numeric] Numeric absolute tolerance in Daltons (default: 0.01)
+#' @param spectrum [matrix] Numeric matrix with at least 2 columns (mz,
+#'     intensity)
+#' @param tolerance [numeric] Numeric absolute tolerance in Daltons (default:
+#'     0.01)
 #' @param ppm [numeric] Numeric relative tolerance in ppm (default: 10)
 #'
 #' @return A sanitized numeric matrix with columns mz and intensity.

@@ -15,10 +15,11 @@ test_that("run_app aborts clearly when app file is missing", {
     is_docker_env = function() FALSE,
     get_app_path = function() "",
     run_shiny_app = function(appDir, port, host, launch.browser) {
-      force(appDir)
+      # nolint: object_name_linter.
+      force(appDir) # nolint: object_name_linter.
       force(port)
       force(host)
-      force(launch.browser)
+      force(launch.browser) # nolint: object_name_linter.
       invisible(NULL)
     }
   )
@@ -43,6 +44,7 @@ test_that("run_app enforces Docker host and browser settings", {
       "mock-app-dir"
     },
     run_shiny_app = function(appDir, port, host, launch.browser) {
+      # nolint: object_name_linter.
       seen$appDir <- appDir
       seen$port <- port
       seen$host <- host
@@ -71,6 +73,7 @@ test_that("run_app keeps provided settings outside Docker", {
       "mock-app-dir"
     },
     run_shiny_app = function(appDir, port, host, launch.browser) {
+      # nolint: object_name_linter.
       seen$appDir <- appDir
       seen$port <- port
       seen$host <- host
@@ -79,7 +82,7 @@ test_that("run_app keeps provided settings outside Docker", {
     }
   )
 
-  expect_no_error(run_app(host = "127.0.0.1", port = 3839, browser = FALSE))
+  expect_no_error(run_app(host = "10.0.0.1", port = 9999, browser = TRUE))
   expect_identical(seen$appDir, "mock-app-dir")
   expect_identical(seen$port, 3839L)
   expect_identical(seen$host, "127.0.0.1")

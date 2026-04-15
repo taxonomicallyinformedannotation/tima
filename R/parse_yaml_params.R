@@ -6,7 +6,8 @@
 #' @include validations_utils.R
 #'
 #' @param def [character] Path to the default YAML parameters file
-#' @param usr [character] Path to the user-specified YAML parameters file (optional).
+#' @param usr [character] Path to the user-specified YAML parameters file
+#'     (optional).
 #'     If it exists, it will override default values.
 #'
 #' @return List containing the parameters specified in the YAML files

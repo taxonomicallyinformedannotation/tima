@@ -33,7 +33,8 @@ format_error(
 Formatted error message string
 }
 \description{
-Creates user-friendly error messages with context and suggestions.
+Creates user-friendly error messages with context and
+suggestions.
 This is the core error formatting function used throughout TIMA.
 }
 \examples{

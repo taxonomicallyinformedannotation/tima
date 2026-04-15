@@ -7,7 +7,8 @@
 log_operation(operation_name, ...)
 }
 \arguments{
-\item{operation_name}{Character, name of the operation (e.g., "classify_structures")}
+\item{operation_name}{Character, name of the operation (e.g.,
+"classify_structures")}
 
 \item{...}{Named parameters to log with the operation}
 }

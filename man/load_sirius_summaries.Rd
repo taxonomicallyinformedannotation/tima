@@ -13,6 +13,7 @@ load_sirius_summaries(input_directory)
 Data frame with structure summaries (bound rows), or empty tidytable.
 }
 \description{
-Internal helper to load per-feature structure candidate summaries.
+Internal helper to load per-feature structure candidate
+summaries.
 }
 \keyword{internal}

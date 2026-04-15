@@ -3,7 +3,8 @@
 \docType{data}
 \name{DEFAULT_HC_SCORE_SPECTRAL_MIN}
 \alias{DEFAULT_HC_SCORE_SPECTRAL_MIN}
-\title{Default minimum spectral similarity score threshold for high-confidence filter}
+\title{Default minimum spectral similarity score threshold for high-confidence
+filter}
 \format{
 An object of class \code{numeric} of length 1.
 }
@@ -11,6 +12,7 @@ An object of class \code{numeric} of length 1.
 DEFAULT_HC_SCORE_SPECTRAL_MIN
 }
 \description{
-Default minimum spectral similarity score threshold for high-confidence filter
+Default minimum spectral similarity score threshold for high-confidence
+filter
 }
 \keyword{internal}

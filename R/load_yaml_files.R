@@ -97,9 +97,9 @@ load_yaml_files <- function() {
 
   names(yamls_parsed) <- yaml_names
 
-  return(list(
+  list(
     yamls_params = yamls_parsed,
     yaml_files = yaml_files,
     yaml_names = yaml_names
-  ))
+  )
 }

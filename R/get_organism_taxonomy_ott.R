@@ -125,13 +125,16 @@
 #'
 #' @description This function retrieves taxonomic information from the Open Tree
 #'     of Life (OTT) taxonomy service. It cleans organism names, queries the OTT
-#'     API, and returns structured taxonomic data including OTT IDs and hierarchical
+#' API, and returns structured taxonomic data including OTT IDs and hierarchical
 #'     classifications.
 #'
-#' @param df [data.frame] Data frame containing organism names in a column named "organism"
-#' @param url [character] Character string URL of the OTT API endpoint (default: production API,
+#' @param df [data.frame] Data frame containing organism names in a column named
+#'     "organism"
+#' @param url [character] Character string URL of the OTT API endpoint (default:
+#'     production API,
 #'     can be changed for testing)
-#' @param retry [logical] Logical indicating whether to retry failed queries using only the
+#' @param retry [logical] Logical indicating whether to retry failed queries
+#'     using only the
 #'     generic epithet (genus name) when full species names fail (default: TRUE)
 #'
 #' @return Data frame with taxonomic information including OTT IDs, ranks, and

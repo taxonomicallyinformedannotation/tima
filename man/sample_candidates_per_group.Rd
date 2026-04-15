@@ -21,7 +21,8 @@ List with two elements:
 }
 }
 \description{
-Internal helper to sample candidates per (feature_id, rank_final)
+Internal helper to sample candidates per (feature_id,
+rank_final)
 group, prioritizing those with non-NA candidate_structure_error_rt values.
 }
 \keyword{internal}

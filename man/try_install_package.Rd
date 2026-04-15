@@ -19,6 +19,7 @@ try_install_package(package, repos, dependencies, from_source = FALSE)
 Logical TRUE if successful, FALSE otherwise
 }
 \description{
-Internal helper to attempt R package installation with error handling.
+Internal helper to attempt R package installation with error
+handling.
 }
 \keyword{internal}

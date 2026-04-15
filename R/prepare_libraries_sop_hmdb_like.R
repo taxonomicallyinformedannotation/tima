@@ -11,7 +11,8 @@
 #' @param output [character] Character string path for prepared SOP output
 #' @param source_name [character] Character label used in logs
 #' @param organism_name [character] Character organism name attached to all rows
-#' @param organism_taxonomy [list] Named list containing organism taxonomy fields
+#' @param organism_taxonomy [list] Named list containing organism taxonomy
+#'     fields
 #' @param tag [character] Character scalar tag propagated through SOP pipeline
 #'
 #' @return Character string path to prepared SOP file

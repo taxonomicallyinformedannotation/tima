@@ -17,16 +17,19 @@ can be negative, NA, NULL, or absent)}
 (default: 20)}
 }
 \value{
-Numeric transformed score in the range (0, 1), or NA if input is NA/NULL/absent
+Numeric transformed score in the range (0, 1), or NA if input is
+NA/NULL/absent
 }
 \description{
-This function transforms SIRIUS CSI (Compound Structure Identification)
+This function transforms SIRIUS CSI (Compound Structure
+Identification)
 scores using a sigmoid function. The transformation maps raw scores to a
 0-1 range for better interpretability.
 }
 \details{
 This is an experimental transformation not officially approved by
-SIRIUS developers. The sigmoid function is: 1 / (1 + exp(-(score + K) / scale))
+SIRIUS developers. The sigmoid function is: 1 / (1 + exp(-(score + K) /
+scale))
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{SIRIUS CSI:FingerID scores are expected to be log-likelihood-like values
 on (-Inf, 0], where values closer to 0 are better. A practical rule of

@@ -16,9 +16,11 @@ sanitize_metadata(
 
 \item{features_file}{\link{character} Character path to features file (optional)}
 
-\item{filename_col}{\link{character} Character name of column containing filenames in both files}
+\item{filename_col}{\link{character} Character name of column containing filenames
+in both files}
 
-\item{organism_col}{\link{character} Character name of organism column in metadata (default: "organism")}
+\item{organism_col}{\link{character} Character name of organism column in metadata
+(default: "organism")}
 }
 \value{
 List with validation results:
@@ -29,8 +31,10 @@ List with validation results:
 \item filenames_match: Logical, TRUE if features/metadata filenames match
 \item n_matched: Integer, number of matched filenames (if features provided)
 \item n_unmatched: Integer, number of unmatched filenames (if features provided)
+\itemize{
 \item unmatched_files: Character vector of unmatched filenames
 \item issues: Character vector of issues found (if any)
+}
 }
 }
 \description{

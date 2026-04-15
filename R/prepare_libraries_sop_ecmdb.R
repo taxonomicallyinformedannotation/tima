@@ -11,7 +11,8 @@
 #' @include select_sop_columns.R
 #'
 #' @param input [character] Character string path to ECMDB JSON zip file
-#' @param output [character] Character string path for prepared ECMDB library output
+#' @param output [character] Character string path for prepared ECMDB library
+#'     output
 #'
 #' @return Character string path to prepared ECMDB structure-organism pairs
 #'

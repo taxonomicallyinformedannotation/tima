@@ -11,8 +11,10 @@
 #' @include logs_utils.R
 #'
 #' @param example Character vector specifying which example files to download.
-#'     Valid options: "features", "metadata", "sirius", "spectra", "spectral_lib_with_rt"
-#' @param in_cache Logical whether to store files in the cache directory (default: TRUE)
+#' Valid options: "features", "metadata", "sirius", "spectra",
+#'     "spectral_lib_with_rt"
+#' @param in_cache Logical whether to store files in the cache directory
+#'     (default: TRUE)
 #'
 #' @return NULL (invisibly). Downloads files as a side effect.
 #'

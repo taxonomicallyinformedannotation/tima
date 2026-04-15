@@ -4,10 +4,12 @@
 #'     from a YAML file. These paths define locations for data files, libraries,
 #'     parameters, and other resources used throughout the TIMA workflow.
 #'
-#' @param yaml Character string path to the YAML file containing path definitions.
+#' @param yaml Character string path to the YAML file containing path
+#'     definitions.
 #'     Default is the paths.yaml file included in the package installation.
 #'
-#' @return Named list containing all configured paths and settings. The structure
+#' @return Named list containing all configured paths and settings. The
+#'     structure
 #'     mirrors the YAML file hierarchy with nested lists for organized access.
 #'
 #' @keywords internal
@@ -54,7 +56,8 @@ get_default_paths <- function(
     }
   )
 
-  # Test override: allow tests to redirect interim params path to a temp directory.
+  # Test override: allow tests to redirect interim params path to a temp
+  # directory.
   override_params <- getOption("tima.test.interim_params_dir", default = NULL)
   if (
     !is.null(override_params) &&

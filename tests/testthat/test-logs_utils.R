@@ -387,10 +387,10 @@ test_that("logging does not create file on package load", {
   # the .onLoad function doesn't call init_logging
 
   # Get the .onLoad function
-  onLoad <- get(".onLoad", envir = asNamespace("tima"))
+  onLoad <- get(".onLoad", envir = asNamespace("tima")) # nolint: object_name_linter.
 
   # Convert to character to check it doesn't contain init_logging call
-  onLoad_body <- deparse(body(onLoad))
+  onLoad_body <- deparse(body(onLoad)) # nolint: object_name_linter.
 
   # Should NOT contain init_logging() call
   expect_false(any(grepl("init_logging\\(\\)", onLoad_body, fixed = FALSE)))

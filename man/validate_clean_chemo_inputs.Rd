@@ -52,7 +52,8 @@ validate_clean_chemo_inputs(
 NULL (stops execution if validation fails)
 }
 \description{
-Internal helper to validate all input parameters for clean_chemo.
+Internal helper to validate all input parameters for
+clean_chemo.
 Checks data types, ranges, and logical consistency.
 }
 \keyword{internal}

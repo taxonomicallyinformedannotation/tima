@@ -35,7 +35,8 @@ NULL (invisibly)
 }
 \description{
 Simple logging wrappers that use sprintf-style formatting.
-These functions automatically initialize logging on first use (lazy initialization),
+These functions automatically initialize logging on first use (lazy
+initialization),
 so no empty log files are created when the package is merely loaded.
 }
 \keyword{internal}

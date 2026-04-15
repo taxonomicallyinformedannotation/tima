@@ -7,9 +7,11 @@
 parse_cli_params(arguments, parameters)
 }
 \arguments{
-\item{arguments}{\link{list} Named list of CLI arguments from docopt or similar parser}
+\item{arguments}{\link{list} Named list of CLI arguments from docopt or similar
+parser}
 
-\item{parameters}{\link{list} Nested list of default parameters to be updated with CLI values}
+\item{parameters}{\link{list} Nested list of default parameters to be updated with
+CLI values}
 }
 \value{
 Updated parameters list with CLI arguments merged in, maintaining

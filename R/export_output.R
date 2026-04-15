@@ -9,7 +9,8 @@
 #' @include validations_utils.R
 #'
 #' @param x [data.frame] Data frame or tibble to export
-#' @param file [character] Character string path to the output file. File extension
+#' @param file [character] Character string path to the output file. File
+#'     extension
 #'     determines compression (.gz for gzip compression).
 #'
 #' @return Character string path to the exported file (invisibly)

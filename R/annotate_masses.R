@@ -152,7 +152,7 @@ annotate_masses <-
     features_table <- safe_fread(
       file = features,
       file_type = "features table",
-      required_cols = c("feature_id"),
+      required_cols = "feature_id",
       na.strings = c("", "NA"),
       colClasses = "character"
     )
@@ -252,7 +252,7 @@ annotate_masses <-
     structure_organism_pairs_table <- joined_table |>
       tidytable::filter(!is.na(structure_exact_mass)) |>
       tidytable::mutate(tidytable::across(
-        .cols = c("structure_exact_mass"),
+        .cols = "structure_exact_mass",
         .fns = as.numeric
       ))
 
@@ -279,7 +279,7 @@ annotate_masses <-
       tidytable::filter(!is.na(structure_exact_mass)) |>
       tidytable::distinct(exact_mass = structure_exact_mass) |>
       tidytable::mutate(tidytable::across(
-        .cols = c("exact_mass"),
+        .cols = "exact_mass",
         .fns = as.numeric
       )) |>
       tidytable::mutate(
@@ -304,7 +304,7 @@ annotate_masses <-
 
     df_fea_min <- features_table |>
       tidytable::mutate(tidytable::across(
-        .cols = c("mz"),
+        .cols = "mz",
         .fns = as.numeric
       )) |>
       tidytable::distinct(feature_id, sample, .keep_all = TRUE)
@@ -312,7 +312,7 @@ annotate_masses <-
     if (any(names(features_table) == "rt")) {
       df_fea_min <- df_fea_min |>
         tidytable::mutate(tidytable::across(
-          .cols = c("rt"),
+          .cols = "rt",
           .fns = as.numeric
         ))
     } else {
@@ -523,7 +523,7 @@ annotate_masses <-
       ) |>
       tidytable::filter(!is.na(Group1)) |>
       tidytable::mutate(tidytable::across(
-        .cols = c("rt"),
+        .cols = "rt",
         .fns = as.character
       )) |>
       tidytable::mutate(

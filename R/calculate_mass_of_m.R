@@ -124,7 +124,8 @@ calculate_mass_of_m <- function(
   }
 
   # Calculate neutral mass using the adduct formula
-  # Formula: M = ((z * (m/z + iso) - modifications - (z * sign * e_mass)) / n_mer)
+  # Formula: M = ((z * (m/z + iso) - modifications - (z * sign * e_mass)) /
+  # n_mer)
   neutral_mass <- calculate_neutral_mass_formula(
     mz = mz,
     n_charges = n_charges,
@@ -212,7 +213,8 @@ validate_mz <- function(mz) {
 
 #' Validate electron mass value
 #'
-#' @description Validates electron mass parameter (should be close to CODATA value)
+#' @description Validates electron mass parameter (should be close to CODATA
+#'     value)
 #'
 #' @param electron_mass Numeric electron mass in Daltons
 #'
@@ -265,7 +267,8 @@ calculate_neutral_mass_formula <- function(
   # Apply the neutral mass calculation formula
   # M = ((z * (m/z - iso_shift) - modifications) / n_mer)
   # Note: isotope shift is SUBTRACTED because isotope peaks are at HIGHER m/z
-  # Example: [M1+H]+ at 182.07 m/z -> subtract 1.0033548 to get back to monoisotopic mass
+  # Example: [M1+H]+ at 182.07 m/z -> subtract 1.0033548 to get back to
+  # monoisotopic mass
 
   # Calculate actual isotope mass shift (n_iso * isotope unit)
   isotope_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
@@ -336,7 +339,6 @@ calculate_mz_from_mass <- function(
 
   # Extract components
   n_charges <- parsed_adduct["n_charges"][[1L]]
-  charge_sign <- parsed_adduct["charge"][[1L]]
   n_mer <- parsed_adduct["n_mer"][[1L]]
   n_iso <- parsed_adduct["n_iso"][[1L]]
   mass_modifications <- parsed_adduct["los_add_clu"][[1L]]

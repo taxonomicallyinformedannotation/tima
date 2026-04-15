@@ -1,7 +1,8 @@
 #' @title Prepare libraries of structure organism pairs LOTUS
 #'
-#' @description This function prepares the LOTUS (LOng-lasting, cUraTed collection
-#'     of cOnnectivity daTa for natural products) structure-organism pairs database.
+#' @description This function prepares the LOTUS (LOng-lasting, cUraTed
+#'     collection
+#' of cOnnectivity daTa for natural products) structure-organism pairs database.
 #'     It standardizes columns, extracts 2D InChIKeys, rounds numeric values,
 #'     and removes duplicates.
 #'

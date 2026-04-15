@@ -67,9 +67,11 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
           "feature_pred_tax_cla_03cla_val" = "ClassyFire.class",
           "feature_pred_tax_cla_03cla_score" = "ClassyFire.class.Probability",
           # "feature_pred_tax_cla_04sub_val" = "ClassyFire.subclass",
-          # "feature_pred_tax_cla_04sub_score" ="ClassyFire.subclass.Probability",
+          # "feature_pred_tax_cla_04sub_score"
+          # ="ClassyFire.subclass.Probability",
           # "feature_pred_tax_cla_05lev_val" = "ClassyFire.level.5",
-          # "feature_pred_tax_cla_05lev_score" ="ClassyFire.level.5.Probability",
+          # "feature_pred_tax_cla_05lev_score"
+          # ="ClassyFire.level.5.Probability",
           "feature_pred_tax_cla_04dirpar_val" = "ClassyFire.most.specific.class",
           "feature_pred_tax_cla_04dirpar_score" = "ClassyFire.most.specific.class.Probability"
           # tidytable version
@@ -243,23 +245,19 @@ select_sirius_columns_structures <- function(df, sirius_version) {
 # Normalize common SIRIUS column aliases across versions/export formats.
 .normalize_sirius_aliases <- function(df) {
   alias_map <- list(
-    "NPC.pathway" = c("NPC#pathway"),
-    "NPC.pathway.Probability" = c("NPC#pathway Probability"),
-    "NPC.superclass" = c("NPC#superclass"),
-    "NPC.superclass.Probability" = c("NPC#superclass Probability"),
-    "NPC.class" = c("NPC#class"),
-    "NPC.class.Probability" = c("NPC#class Probability"),
-    "ClassyFire.superclass" = c("ClassyFire#superclass"),
-    "ClassyFire.superclass.probability" = c(
-      "ClassyFire#superclass probability"
-    ),
-    "ClassyFire.class" = c("ClassyFire#class"),
-    "ClassyFire.class.Probability" = c("ClassyFire#class Probability"),
-    "ClassyFire.most.specific.class" = c("ClassyFire#most specific class"),
-    "ClassyFire.most.specific.class.Probability" = c(
-      "ClassyFire#most specific class Probability"
-    ),
-    "massErrorPrecursor.ppm." = c("massErrorPrecursor(ppm)")
+    "NPC.pathway" = "NPC#pathway",
+    "NPC.pathway.Probability" = "NPC#pathway Probability",
+    "NPC.superclass" = "NPC#superclass",
+    "NPC.superclass.Probability" = "NPC#superclass Probability",
+    "NPC.class" = "NPC#class",
+    "NPC.class.Probability" = "NPC#class Probability",
+    "ClassyFire.superclass" = "ClassyFire#superclass",
+    "ClassyFire.superclass.probability" = "ClassyFire#superclass probability",
+    "ClassyFire.class" = "ClassyFire#class",
+    "ClassyFire.class.Probability" = "ClassyFire#class Probability",
+    "ClassyFire.most.specific.class" = "ClassyFire#most specific class",
+    "ClassyFire.most.specific.class.Probability" = "ClassyFire#most specific class Probability",
+    "massErrorPrecursor.ppm." = "massErrorPrecursor(ppm)"
   )
 
   for (target in names(alias_map)) {
@@ -285,7 +283,8 @@ select_sirius_columns_structures <- function(df, sirius_version) {
 
 #' @title Select SIRIUS spectral match columns
 #'
-#' @description Standardize SIRIUS spectral-match columns (including analog hits)
+#' @description Standardize SIRIUS spectral-match columns (including analog
+#'     hits)
 #'     into the common annotation model.
 #'
 #' @param df [data.frame] Data frame of SIRIUS spectral match results.
@@ -309,7 +308,8 @@ select_sirius_columns_spectral <- function(df, sirius_version) {
     "6" = .get_col_or_na(df, "mappingFeatureId")
   )
 
-  # Mass deviation: feature precursor (ionMass) minus library reference precursor
+  # Mass deviation: feature precursor (ionMass) minus library reference
+  # precursor
   # (referencePrecursorMz), both provided directly by SIRIUS spectral_matches.
   # For direct hits this is the instrument mass error (should be small).
   # For analog hits this is the structural delta-mass (e.g. +14 Da methylation).

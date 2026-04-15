@@ -7,7 +7,8 @@
 sanitize_sirius(sirius_dir)
 }
 \arguments{
-\item{sirius_dir}{\link{character} Character path to SIRIUS output directory or ZIP file}
+\item{sirius_dir}{\link{character} Character path to SIRIUS output directory or
+ZIP file}
 }
 \value{
 List with validation results:
@@ -17,9 +18,11 @@ List with validation results:
 \item has_canopus: Logical, canopus summary file found
 \item has_structure: Logical, structure identifications file found
 \item n_features: Integer, number of UNIQUE ANNOTATIONS (rows in structure file)
+\itemize{
 \item is_zip: Logical, TRUE if input was a ZIP file
 \item sirius_version: Character, detected version ("5", "6", or "unknown")
 \item issues: Character vector of issues found (if any)
+}
 }
 }
 \description{

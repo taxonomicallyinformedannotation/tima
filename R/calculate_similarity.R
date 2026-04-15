@@ -13,8 +13,10 @@
 #' @include validations_utils.R
 #'
 #' @param method [character] Similarity method: "entropy", "gnps", or "cosine"
-#' @param query_spectrum [matrix] Numeric matrix with columns for mz and intensity
-#' @param target_spectrum [matrix] Numeric matrix with columns for mz and intensity
+#' @param query_spectrum [matrix] Numeric matrix with columns for mz and
+#'     intensity
+#' @param target_spectrum [matrix] Numeric matrix with columns for mz and
+#'     intensity
 #' @param query_precursor [numeric] Precursor m/z value for query
 #' @param target_precursor [numeric] Precursor m/z value for target
 #' @param dalton [numeric] Dalton tolerance for peak matching

@@ -17,14 +17,21 @@
 #' @include safe_fread.R
 #' @include validations_utils.R
 #'
-#' @param input [character] Character string path to features file with intensities
-#' @param extension [logical] Logical whether column names contain file extensions
-#' @param name_filename [character] Character string name of filename column in metadata
-#' @param colname [character] Character string name of column with biological source info
-#' @param metadata [character] Character string path to metadata file with organism info
-#' @param org_tax_ott [character] Character string path to Open Tree of Life taxonomy file
+#' @param input [character] Character string path to features file with
+#'     intensities
+#' @param extension [logical] Logical whether column names contain file
+#'     extensions
+#' @param name_filename [character] Character string name of filename column in
+#'     metadata
+#' @param colname [character] Character string name of column with biological
+#'     source info
+#' @param metadata [character] Character string path to metadata file with
+#'     organism info
+#' @param org_tax_ott [character] Character string path to Open Tree of Life
+#'     taxonomy file
 #' @param output [character] Character string path for output file
-#' @param taxon [character] Character string organism name to enforce for all features
+#' @param taxon [character] Character string organism name to enforce for all
+#'     features
 #'     (e.g., "Homo sapiens"). If provided, overrides metadata-based assignment.
 #'
 #' @return Character string path to the prepared taxa file
@@ -233,7 +240,8 @@ prepare_taxa <- function(
   }
   rm(feature_table_0, metadata_table)
 
-  # Split organismOriginal to match the split organism_name in biological_metadata
+  # Split organismOriginal to match the split organism_name in
+  # biological_metadata
   taxed_features_table <-
     metadata_table_joined |>
     tidytable::mutate(organismOriginal = trimws(organismOriginal)) |>

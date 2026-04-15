@@ -363,7 +363,7 @@ If you convert data formats (e.g., mzML to MGF), validate the output:
 
 ```{r best_practice_2, eval=FALSE}
 # Convert data
-convert_mzml_to_mgf("raw_data/", "processed/spectra.mgf")
+# convert_mzml_to_mgf("raw_data/", "processed/spectra.mgf")
 
 # Validate immediately
 validate_inputs(spectra = "processed/spectra.mgf")
@@ -412,7 +412,7 @@ TIMA experience.
 
 Now that your data is validated:
 
-- [I. Gathering](I-gathering.html) - Collect your data
-- [II. Preparing](II-preparing.html) - Prepare your libraries
-- [III. Processing](III-processing.html) - Run the annotation pipeline
-- [IV. Benchmarking](IV-benchmarking.html) - Evaluate your results
+- [I. Gathering](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html) - Collect your data
+- [II. Preparing](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html) - Prepare your libraries
+- [III. Processing](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html) - Run the annotation pipeline
+- [IV. Benchmarking](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html) - Evaluate your results

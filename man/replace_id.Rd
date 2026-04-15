@@ -12,14 +12,17 @@ replace_id(
 )
 }
 \arguments{
-\item{x}{\link{character} Character string containing the file path with default ID}
+\item{x}{\link{character} Character string containing the file path with default
+ID}
 
 \item{user_filename}{\link{character} Character string for custom filename pattern
 (used if user_gnps is NULL)}
 
-\item{user_gnps}{\link{character} Character string for GNPS job ID (takes precedence)}
+\item{user_gnps}{\link{character} Character string for GNPS job ID (takes
+precedence)}
 
-\item{example_gnps}{\link{character} Character string for example GNPS job ID to detect}
+\item{example_gnps}{\link{character} Character string for example GNPS job ID to
+detect}
 }
 \value{
 Character string with ID replaced

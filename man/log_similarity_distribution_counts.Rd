@@ -7,7 +7,8 @@
 log_similarity_distribution_counts(counts, title)
 }
 \arguments{
-\item{counts}{Named integer vector whose names are bin labels (e.g., "(0,0.1]", "(0.1,0.2]", ...).}
+\item{counts}{Named integer vector whose names are bin labels (e.g.,
+"(0,0.1]", "(0.1,0.2]", ...).}
 
 \item{title}{Header line to log before the table.}
 }
@@ -15,6 +16,7 @@ log_similarity_distribution_counts(counts, title)
 Invisibly returns NULL.
 }
 \description{
-Log a pre-accumulated distribution (named counts) in the standard table style.
+Log a pre-accumulated distribution (named counts) in the
+standard table style.
 }
 \keyword{internal}

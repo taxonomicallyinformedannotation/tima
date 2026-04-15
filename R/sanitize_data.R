@@ -78,7 +78,8 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
         # A line L belongs to spectrum i iff begin_ions[i] <= L <= end_ions[i],
         # i.e., findInterval(L, begin_ions) == i and L <= end_ions[i].
         .lines_in_spectrum <- function(target_lines, starts, ends) {
-          idx <- findInterval(target_lines, starts) # spectrum index (0 = before first)
+          # spectrum index (0 = before first)
+          idx <- findInterval(target_lines, starts)
           in_range <- idx >= 1L & target_lines <= ends[idx]
           idx[in_range] # spectrum indices that contain a matching line
         }
@@ -113,7 +114,10 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
           issues <- c(
             issues,
             sprintf(
-              "No MS2 spectra found (%d total spectra, but all are MS1 or empty)",
+              paste(
+                "No MS2 spectra found",
+                "(%d total spectra, but all are MS1 or empty)"
+              ),
               total_spectra
             )
           )
@@ -158,8 +162,10 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
 #'
 #' @param file [character] Character path to CSV/TSV file
 #' @param file_type [character] Character description for error messages
-#' @param required_cols [character] Character vector of required column names (optional)
-#' @param feature_col [character] Character name of feature ID column (default: "feature_id")
+#' @param required_cols [character] Character vector of required column names
+#'     (optional)
+#' @param feature_col [character] Character name of feature ID column (default:
+#'     "feature_id")
 #'
 #' @return List with validation results:
 #'   - valid: Logical, TRUE if file is valid
@@ -258,8 +264,10 @@ sanitize_csv <- function(
 #'
 #' @param metadata_file [character] Character path to metadata file
 #' @param features_file [character] Character path to features file (optional)
-#' @param filename_col [character] Character name of column containing filenames in both files
-#' @param organism_col [character] Character name of organism column in metadata (default: "organism")
+#' @param filename_col [character] Character name of column containing filenames
+#'     in both files
+#' @param organism_col [character] Character name of organism column in metadata
+#'     (default: "organism")
 #'
 #' @return List with validation results:
 #'   - valid: Logical, TRUE if metadata is consistent
@@ -267,7 +275,7 @@ sanitize_csv <- function(
 #'   - n_with_organism: Integer, number of samples with organism info
 #'   - filenames_match: Logical, TRUE if features/metadata filenames match
 #'   - n_matched: Integer, number of matched filenames (if features provided)
-#'   - n_unmatched: Integer, number of unmatched filenames (if features provided)
+#' - n_unmatched: Integer, number of unmatched filenames (if features provided)
 #'   - unmatched_files: Character vector of unmatched filenames
 #'   - issues: Character vector of issues found (if any)
 #'
@@ -370,7 +378,8 @@ sanitize_metadata <- function(
     )
   }
 
-  # Check for organism column (try common variants, starting with the provided one)
+  # Check for organism column (try common variants, starting with the provided
+  # one)
   possible_organism_cols <- unique(c(
     organism_col,
     "ATTRIBUTE_species",
@@ -443,7 +452,8 @@ sanitize_metadata <- function(
         # Remove file extensions from metadata filenames for matching
         metadata_basenames <- gsub("\\.[^.]*$", "", metadata_filenames)
 
-        # Check if metadata filenames (without extension) are PART OF feature column names
+        # Check if metadata filenames (without extension) are PART OF feature
+        # column names
         basename_found <- vapply(
           X = metadata_basenames,
           FUN = function(basename) {
@@ -464,7 +474,11 @@ sanitize_metadata <- function(
           issues <- c(
             issues,
             sprintf(
-              "No metadata filenames (without extension) found in features columns (checked %d filenames)",
+              paste(
+                "No metadata filenames (without extension)",
+                "found in features columns",
+                "(checked %d filenames)"
+              ),
               length(metadata_basenames)
             )
           )
@@ -489,7 +503,10 @@ sanitize_metadata <- function(
         } else if (length(metadata_basenames) > 0L) {
           filenames_match <- TRUE
           log_debug(
-            "All %d metadata filenames (without extension) found in features columns",
+            paste(
+              "All %d metadata filenames",
+              "(without extension) found in features columns"
+            ),
             n_matched
           )
         }
@@ -526,14 +543,15 @@ sanitize_metadata <- function(
 #'     necessary files for TIMA processing. Handles both extracted directories
 #'     and ZIP archives. Supports SIRIUS v5 and v6 formats.
 #'
-#' @param sirius_dir [character] Character path to SIRIUS output directory or ZIP file
+#' @param sirius_dir [character] Character path to SIRIUS output directory or
+#'     ZIP file
 #'
 #' @return List with validation results:
 #'   - valid: Logical, TRUE if all required files present
 #'   - has_formula: Logical, formula identifications file found
 #'   - has_canopus: Logical, canopus summary file found
 #'   - has_structure: Logical, structure identifications file found
-#'   - n_features: Integer, number of UNIQUE ANNOTATIONS (rows in structure file)
+#' - n_features: Integer, number of UNIQUE ANNOTATIONS (rows in structure file)
 #'   - is_zip: Logical, TRUE if input was a ZIP file
 #'   - sirius_version: Character, detected version ("5", "6", or "unknown")
 #'   - issues: Character vector of issues found (if any)
@@ -740,13 +758,18 @@ sanitize_sirius <- function(sirius_dir) {
 #' @description Comprehensive validation of all input data before starting
 #'     expensive processing. Reports issues immediately to save time.
 #'
-#' @param features_file [character] Character path to features CSV/TSV (optional)
+#' @param features_file [character] Character path to features CSV/TSV
+#'     (optional)
 #' @param mgf_file [character] Character path to MGF file (optional)
 #' @param metadata_file [character] Character path to metadata file (optional)
-#' @param sirius_dir [character] Character path to SIRIUS output directory or ZIP (optional)
-#' @param filename_col [character] Character name of filename column (default: "filename")
-#' @param organism_col [character] Character name of organism column (default: "organism")
-#' @param feature_col [character] Character name of feature ID column (default: "feature_id")
+#' @param sirius_dir [character] Character path to SIRIUS output directory or
+#'     ZIP (optional)
+#' @param filename_col [character] Character name of filename column (default:
+#'     "filename")
+#' @param organism_col [character] Character name of organism column (default:
+#'     "organism")
+#' @param feature_col [character] Character name of feature ID column (default:
+#'     "feature_id")
 #'
 #' @return Invisible TRUE if all validations pass, stops with error otherwise
 #' @keywords internal

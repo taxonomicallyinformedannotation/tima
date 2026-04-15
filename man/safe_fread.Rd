@@ -9,9 +9,11 @@ safe_fread(file, file_type = "data file", required_cols = NULL, ...)
 \arguments{
 \item{file}{\link{character} Character path to file}
 
-\item{file_type}{\link{character} Character description of file type for error messages}
+\item{file_type}{\link{character} Character description of file type for error
+messages}
 
-\item{required_cols}{\link{character} Character vector of required column names (optional)}
+\item{required_cols}{\link{character} Character vector of required column names
+(optional)}
 
 \item{...}{Additional arguments passed to tidytable::fread}
 }

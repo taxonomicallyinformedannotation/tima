@@ -1,7 +1,7 @@
 #' @title Export spectra to RDS file
 #'
 #' @description Exports a Spectra object to an RDS file format for efficient
-#'     storage and later retrieval. Only exports spectra with valid compound IDs.
+#' storage and later retrieval. Only exports spectra with valid compound IDs.
 #'
 #' @include create_dir.R
 #' @include validations_utils.R

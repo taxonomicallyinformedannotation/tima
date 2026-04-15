@@ -17,6 +17,7 @@ find_matching_file(filenames, pattern, doi)
 Integer index of first matching file
 }
 \description{
-Internal helper to find a file matching the pattern in Zenodo record.
+Internal helper to find a file matching the pattern in Zenodo
+record.
 }
 \keyword{internal}

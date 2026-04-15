@@ -16,21 +16,28 @@ decorate_chemo(
 )
 }
 \arguments{
-\item{annot_table_wei_chemo}{\link{data.frame} Data frame with chemically weighted annotations}
+\item{annot_table_wei_chemo}{\link{data.frame} Data frame with chemically weighted
+annotations}
 
-\item{score_chemical_cla_kingdom}{\link{numeric} Minimum score for Classyfire kingdom}
+\item{score_chemical_cla_kingdom}{\link{numeric} Minimum score for Classyfire
+kingdom}
 
-\item{score_chemical_cla_superclass}{\link{numeric} Minimum score for Classyfire superclass}
+\item{score_chemical_cla_superclass}{\link{numeric} Minimum score for Classyfire
+superclass}
 
 \item{score_chemical_cla_class}{\link{numeric} Minimum score for Classyfire class}
 
-\item{score_chemical_cla_parent}{\link{numeric} Minimum score for Classyfire parent}
+\item{score_chemical_cla_parent}{\link{numeric} Minimum score for Classyfire
+parent}
 
-\item{score_chemical_npc_pathway}{\link{numeric} Minimum score for NPClassifier pathway}
+\item{score_chemical_npc_pathway}{\link{numeric} Minimum score for NPClassifier
+pathway}
 
-\item{score_chemical_npc_superclass}{\link{numeric} Minimum score for NPClassifier superclass}
+\item{score_chemical_npc_superclass}{\link{numeric} Minimum score for NPClassifier
+superclass}
 
-\item{score_chemical_npc_class}{\link{numeric} Minimum score for NPClassifier class}
+\item{score_chemical_npc_class}{\link{numeric} Minimum score for NPClassifier
+class}
 }
 \value{
 The input annotation table (unchanged), for pipeline compatibility

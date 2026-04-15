@@ -10,7 +10,8 @@ get_sirius_filenames(version)
 \item{version}{\link{character} Character "5" or "6".}
 }
 \value{
-Named list with keys: canopus, formulas, structures, denovo, spectral.
+Named list with keys: canopus, formulas, structures, denovo,
+spectral.
 Values are fixed filenames (v5) or regex patterns (v6).
 }
 \description{

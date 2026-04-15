@@ -10,7 +10,8 @@
 #' @param features [character] Path to raw features file (CSV/TSV).
 #' @param output [character] Path where prepared features should be saved.
 #' @param candidates [integer] Number of top-intensity samples to retain per
-#'   feature (default: from params; recommended ≤5 to balance data size and coverage).
+#' feature (default: from params; recommended ≤5 to balance data size and
+#'     coverage).
 #' @param name_adduct [character] Name of the adduct column in input.
 #' @param name_features [character] Name of the feature ID column in input.
 #' @param name_rt [character] Name of the retention time column in input.
@@ -216,7 +217,8 @@ prepare_features_tables <- function(
   name_mz,
   name_adduct
 ) {
-  # Detect and select columns for mzmine (Peak area/height), SLAW (quant_), SIRIUS
+  # Detect and select columns for mzmine (Peak area/height), SLAW (quant_),
+  # SIRIUS
   selected <- tbl |>
     tidytable::select(
       tidyselect::any_of(x = c(name_features, name_rt, name_mz, name_adduct)),

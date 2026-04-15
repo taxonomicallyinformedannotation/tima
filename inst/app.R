@@ -139,7 +139,7 @@ ui <- shiny::fluidPage(
           shiny::fileInput(
             inputId = "fil_ann_raw_mzm",
             label = "mzmine annotations (optional)",
-            accept = c(".csv")
+            accept = ".csv"
           ) |>
             shinyhelper::helper(
               type = "inline",
@@ -152,7 +152,7 @@ ui <- shiny::fluidPage(
           shiny::fileInput(
             inputId = "fil_ann_raw_sir",
             label = "SIRIUS project space (optional)",
-            accept = c(".zip")
+            accept = ".zip"
           ) |>
             shinyhelper::helper(
               type = "inline",
@@ -464,7 +464,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Polarity of the MS experiment.")
+              content = "Polarity of the MS experiment."
             ),
           shiny::sliderInput(
             inputId = "ms_thr_ms2_int",
@@ -491,7 +491,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Mass tolerance (in ppm) used for MS1 annotation.")
+              content = "Mass tolerance (in ppm) used for MS1 annotation."
             ),
           shiny::sliderInput(
             inputId = "ms_tol_mas_dal_ms1",
@@ -503,7 +503,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Mass tolerance (in Da) used for MS1 annotation.")
+              content = "Mass tolerance (in Da) used for MS1 annotation."
             ),
           shiny::sliderInput(
             inputId = "ms_tol_mas_ppm_ms2",
@@ -515,7 +515,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Mass tolerance (in ppm) used for MS2 annotation.")
+              content = "Mass tolerance (in ppm) used for MS2 annotation."
             ),
           shiny::sliderInput(
             inputId = "ms_tol_mas_dal_ms2",
@@ -527,7 +527,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Mass tolerance (in Da) used for MS2 annotation.")
+              content = "Mass tolerance (in Da) used for MS2 annotation."
             ),
           shiny::sliderInput(
             inputId = "ms_tol_rt_add",
@@ -539,9 +539,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c(
-                "Retention time tolerance (minutes) used for adducts annotation."
-              )
+              content = "Retention time tolerance (minutes) used for adducts annotation."
             ),
           shiny::sliderInput(
             inputId = "ms_tol_rt_lib",
@@ -965,7 +963,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `inchikey` column in your file.")
+              content = "Name of the `inchikey` column in your file."
             ),
           shiny::textInput(
             inputId = "names_inchikey",
@@ -974,7 +972,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `inchikey` column in your file.")
+              content = "Name of the `inchikey` column in your file."
             ),
           shiny::textInput(
             inputId = "names_precursor",
@@ -1010,9 +1008,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c(
-                "Name of the `retention time` column in your rt library file."
-              )
+              content = "Name of the `retention time` column in your rt library file."
             ),
           shiny::textInput(
             inputId = "names_smiles",
@@ -1021,7 +1017,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `SMILES` column in your file.")
+              content = "Name of the `SMILES` column in your file."
             ),
           shiny::textInput(
             inputId = "names_source",
@@ -1067,7 +1063,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `adduct` column in your MGF file.")
+              content = "Name of the `adduct` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_ce",
@@ -1076,9 +1072,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c(
-                "Name of the `collision energy` column in your MGF file."
-              )
+              content = "Name of the `collision energy` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_ci",
@@ -1087,7 +1081,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `compound id` column in your MGF file.")
+              content = "Name of the `compound id` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_in",
@@ -1096,7 +1090,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `InChI` column in your MGF file.")
+              content = "Name of the `InChI` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_io",
@@ -1105,9 +1099,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c(
-                "Name of the `InChI no stereo` column in your MGF file."
-              )
+              content = "Name of the `InChI no stereo` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_ik",
@@ -1116,7 +1108,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `InChIKey` column in your MGF file.")
+              content = "Name of the `InChIKey` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_il",
@@ -1125,9 +1117,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c(
-                "Name of the `InChIKey connectivity layer` column in your MGF file."
-              )
+              content = "Name of the `InChIKey connectivity layer` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_na",
@@ -1136,7 +1126,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `name` column in your MGF file.")
+              content = "Name of the `name` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_po",
@@ -1145,7 +1135,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `polarity` column in your MGF file.")
+              content = "Name of the `polarity` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_rt",
@@ -1154,9 +1144,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c(
-                "Name of the `retention time` column in your MGF file."
-              )
+              content = "Name of the `retention time` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_sm",
@@ -1165,7 +1153,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `SMILES` column in your MGF file.")
+              content = "Name of the `SMILES` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_sn",
@@ -1174,9 +1162,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c(
-                "Name of the `SMILES no stereo` column in your MGF file."
-              )
+              content = "Name of the `SMILES no stereo` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_si",
@@ -1185,7 +1171,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `spectrum ID` column in your MGF file.")
+              content = "Name of the `spectrum ID` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_sp",
@@ -1194,7 +1180,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `SPLASH` column in your MGF file.")
+              content = "Name of the `SPLASH` column in your MGF file."
             ),
           shiny::textInput(
             inputId = "names_mgf_sy",
@@ -1203,7 +1189,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c("Name of the `synonyms` column in your MGF file.")
+              content = "Name of the `synonyms` column in your MGF file."
             )
         ),
         shiny::tabPanel(
@@ -1757,7 +1743,7 @@ ui <- shiny::fluidPage(
           shiny::fileInput(
             inputId = "lib_spe_mgf",
             label = "MGF",
-            accept = c(".mgf"),
+            accept = ".mgf",
             multiple = TRUE
           ) |>
             shinyhelper::helper(
@@ -1775,9 +1761,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c(
-                "Name of the library. Related content will be identified with this name."
-              )
+              content = "Name of the library. Related content will be identified with this name."
             ),
           shiny::selectInput(
             inputId = "uni_rt",
@@ -1820,10 +1804,7 @@ ui <- shiny::fluidPage(
           ) |>
             shinyhelper::helper(
               type = "inline",
-              content = c(
-                "We advise `fbmn`,
-                        but we also support `classical` jobs."
-              )
+              content = "We advise `fbmn`, but we also support `classical` jobs."
             )
         )
       )
@@ -2577,7 +2558,7 @@ shiny::shinyApp(
   server = server,
   onStart = function() {
     tima:::copy_backbone()
-    tima:::go_to_cache()
+    tima::go_to_cache()
   },
   options = list(
     host = host,

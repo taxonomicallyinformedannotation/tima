@@ -6,7 +6,7 @@
 #' @include validations_utils.R
 #'
 #' @param annotation_table_ms1 Data frame containing MS1 annotation results
-#'     with feature_id and candidate_structure_inchikey_connectivity_layer columns
+#' with feature_id and candidate_structure_inchikey_connectivity_layer columns
 #'
 #' @return The input annotation table (unchanged), for pipeline compatibility
 #'

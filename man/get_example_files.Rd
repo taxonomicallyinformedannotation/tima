@@ -11,9 +11,11 @@ get_example_files(
 }
 \arguments{
 \item{example}{Character vector specifying which example files to download.
-Valid options: "features", "metadata", "sirius", "spectra", "spectral_lib_with_rt"}
+Valid options: "features", "metadata", "sirius", "spectra",
+"spectral_lib_with_rt"}
 
-\item{in_cache}{Logical whether to store files in the cache directory (default: TRUE)}
+\item{in_cache}{Logical whether to store files in the cache directory
+(default: TRUE)}
 }
 \value{
 NULL (invisibly). Downloads files as a side effect.

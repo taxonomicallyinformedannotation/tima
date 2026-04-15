@@ -13,7 +13,8 @@ validate_choice(value, valid_values, param_name = "value", context = NULL)
 
 \item{param_name}{\link{character} Parameter name for error messages}
 
-\item{context}{\link{character} Optional context (e.g., "Found in: params$annotate_masses$ms_mode")}
+\item{context}{\link{character} Optional context (e.g., "Found in:
+params$annotate_masses$ms_mode")}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

@@ -23,15 +23,20 @@ weight_bio(
 )
 }
 \arguments{
-\item{annotation_table_taxed}{\link{data.frame} Data frame with initial annotations and sample taxonomy}
+\item{annotation_table_taxed}{\link{data.frame} Data frame with initial
+annotations and sample taxonomy}
 
-\item{structure_organism_pairs_table}{\link{data.frame} Data frame with structure-organism pairs and taxonomies}
+\item{structure_organism_pairs_table}{\link{data.frame} Data frame with
+structure-organism pairs and taxonomies}
 
-\item{weight_spectral}{\link{numeric} Weight for spectral similarity score (any positive number)}
+\item{weight_spectral}{\link{numeric} Weight for spectral similarity score (any
+positive number)}
 
-\item{weight_biological}{\link{numeric} Weight for biological source score (any positive number)}
+\item{weight_biological}{\link{numeric} Weight for biological source score (any
+positive number)}
 
-\item{score_biological_domain}{\link{numeric} Score for domain-level taxonomic match (0-1)}
+\item{score_biological_domain}{\link{numeric} Score for domain-level taxonomic
+match (0-1)}
 
 \item{score_biological_kingdom}{\link{numeric} Score for kingdom-level match (0-1)}
 
@@ -49,12 +54,15 @@ weight_bio(
 
 \item{score_biological_species}{\link{numeric} Score for species-level match (0-1)}
 
-\item{score_biological_variety}{\link{numeric} Score for variety-level match (0-1, highest)}
+\item{score_biological_variety}{\link{numeric} Score for variety-level match (0-1,
+highest)}
 
-\item{score_biological_biota}{\link{numeric} Score for Biota-level match (0-1, special)}
+\item{score_biological_biota}{\link{numeric} Score for Biota-level match (0-1,
+special)}
 }
 \value{
-Data frame with biologically weighted annotations including biological
+Data frame with biologically weighted annotations including
+biological
 scores and combined weighted scores
 }
 \description{
@@ -67,10 +75,13 @@ similarity results in higher biological scores.
 (organism_taxonomy_01domain == "Biota") represent shared core metabolism
 found across all life forms. These candidates ALWAYS receive the maximum
 biological score, ensuring they are considered in all annotations
-regardless of sample taxonomy. This recognizes universal metabolic pathways
-like glycolysis, citric acid cycle, and other fundamental biochemical processes.
+}\if{html}{\out{</div>}}
 
-Internal helper for weight_annotations().
+regardless of sample taxonomy. This recognizes universal metabolic pathways
+like glycolysis, citric acid cycle, and other fundamental biochemical
+processes.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Internal helper for weight_annotations().
 }\if{html}{\out{</div>}}
 }
 \details{
@@ -84,8 +95,8 @@ the same result as (0.5, 0.5).
 weighted <- weight_bio(
   annotation_table_taxed = annotations,
   structure_organism_pairs_table = sop_table,
-  weight_spectral = 1,      # Will be normalized to 0.5
-  weight_biological = 1,    # Will be normalized to 0.5
+  weight_spectral = 1, # Will be normalized to 0.5
+  weight_biological = 1, # Will be normalized to 0.5
   score_biological_domain = 0.01,
   score_biological_kingdom = 0.02,
   score_biological_phylum = 0.05,

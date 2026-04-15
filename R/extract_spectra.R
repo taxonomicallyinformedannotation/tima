@@ -2,9 +2,9 @@
 
 #' Extract m/z values from peak data matrix
 #' @keywords internal
-.extract_mz_values <- function(peakData) {
-  if (is.matrix(peakData) && ncol(peakData) >= 1L) {
-    peakData[, 1L]
+.extract_mz_values <- function(peak_data) {
+  if (is.matrix(peak_data) && ncol(peak_data) >= 1L) {
+    peak_data[, 1L]
   } else {
     numeric(0)
   }
@@ -12,9 +12,9 @@
 
 #' Extract intensity values from peak data matrix
 #' @keywords internal
-.extract_intensity_values <- function(peakData) {
-  if (is.matrix(peakData) && ncol(peakData) >= 2L) {
-    peakData[, 2L]
+.extract_intensity_values <- function(peak_data) {
+  if (is.matrix(peak_data) && ncol(peak_data) >= 2L) {
+    peak_data[, 2L]
   } else {
     numeric(0)
   }
@@ -64,9 +64,9 @@ extract_spectra <- function(object) {
   )
 
   # Define expected types for problematic columns
-  incoherent_logical <- c("predicted")
-  incoherent_integer <- c("spectrum_id")
-  incoherent_numeric <- c("PrecursorMZ")
+  incoherent_logical <- "predicted"
+  incoherent_integer <- "spectrum_id"
+  incoherent_numeric <- "PrecursorMZ"
 
   # Extract Spectra Metadata ----
 
@@ -88,7 +88,8 @@ extract_spectra <- function(object) {
   # Extract intensity values (second column of peak matrices)
   spectra$intensity <- lapply(
     X = object@backend@peaksData,
-    # Extract intensity column from peak data matrix, return empty vector if invalid
+    # Extract intensity column from peak data matrix, return empty vector if
+    # invalid
     FUN = .extract_intensity_values
   )
 

@@ -271,7 +271,8 @@ export_library_tables <- function(
 #' @param col_mapping Named list mapping internal column names to a character
 #'   vector of possible cache column names. The first matching name found in
 #'   the cache is used. Example:
-#'   `list("structure_tax_npc_01pat" = c("pathway", "structure_taxonomy_npclassifier_01pathway"))`
+#' `list("structure_tax_npc_01pat" = c("pathway",
+#'     "structure_taxonomy_npclassifier_01pathway"))`
 #' @param taxonomy_name Name for logging (e.g., "NPClassifier", "ClassyFire")
 #'
 #' @return Enriched taxonomy table
@@ -483,7 +484,8 @@ enrich_taxonomy_from_cache <- function(
         tidytable::select(tidyselect::all_of(expected_cols)) |>
         tidytable::distinct()
 
-      # Read existing cache again (may have entries for keys NOT in this library)
+      # Read existing cache again (may have entries for keys NOT in this
+      # library)
       existing_cache <- tryCatch(
         safe_fread(
           file = cache_path,
@@ -584,13 +586,18 @@ enrich_taxonomy_from_cache <- function(
 #' @include get_params.R
 #' @include split_tables_sop.R
 #'
-#' @param files [character] Character vector or list of paths to prepared library files
-#' @param filter [logical] Logical whether to filter the merged library by taxonomy
-#' @param level [character] Character string taxonomic rank for filtering (kingdom, phylum,
+#' @param files [character] Character vector or list of paths to prepared
+#'     library files
+#' @param filter [logical] Logical whether to filter the merged library by
+#'     taxonomy
+#' @param level [character] Character string taxonomic rank for filtering
+#'     (kingdom, phylum,
 #'     family, genus, etc.)
-#' @param value [character] Character string taxon name(s) to keep (can use | for multiple,
+#' @param value [character] Character string taxon name(s) to keep (can use |
+#'     for multiple,
 #'     e.g., 'Gentianaceae|Apocynaceae')
-#' @param cache [character] Character string path to cache directory for processed SMILES
+#' @param cache [character] Character string path to cache directory for
+#'     processed SMILES
 #' @param npc_cache [character] Optional path to an additional NPClassifier
 #'   taxonomy cache file (TSV/TSV.gz). Structures present in the merged library
 #'   but missing NPClassifier taxonomy will be looked up in this cache. Expected
@@ -607,12 +614,18 @@ enrich_taxonomy_from_cache <- function(
 #'   names (e.g., `inchikey`, `chemontid`, `kingdom`, `superclass`, `class`,
 #'   `directparent`) are also supported.
 #' @param output_key [character] Character string path for output keys file
-#' @param output_org_tax_ott [character] Character string path for organisms taxonomy (OTT) file
-#' @param output_str_can [character] Character string path for structures canonical SMILES file
-#' @param output_str_stereo [character] Character string path for structures stereochemistry file
-#' @param output_str_met [character] Character string path for structures metadata file
-#' @param output_str_tax_cla [character] Character string path for ClassyFire taxonomy file
-#' @param output_str_tax_npc [character] Character string path for NPClassifier taxonomy file
+#' @param output_org_tax_ott [character] Character string path for organisms
+#'     taxonomy (OTT) file
+#' @param output_str_can [character] Character string path for structures
+#'     canonical SMILES file
+#' @param output_str_stereo [character] Character string path for structures
+#'     stereochemistry file
+#' @param output_str_met [character] Character string path for structures
+#'     metadata file
+#' @param output_str_tax_cla [character] Character string path for ClassyFire
+#'     taxonomy file
+#' @param output_str_tax_npc [character] Character string path for NPClassifier
+#'     taxonomy file
 #'
 #' @return Character string path to the prepared merged SOP library
 #'
@@ -627,7 +640,8 @@ enrich_taxonomy_from_cache <- function(
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 #' dir <- paste0(github, repo)
-#' files <- get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$prepared$lotus |>
+#' files <- get_params(step =
+#'     "prepare_libraries_sop_merged")$files$libraries$sop$prepared$lotus |>
 #'   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
 #' get_file(url = paste0(dir, files), export = files)
 #' prepare_libraries_sop_merged(files = files)
@@ -659,7 +673,8 @@ prepare_libraries_sop_merged <- function(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$keys,
   ## document it above in case
-  # output_org_nam = get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$names,
+  # output_org_nam = get_params(step =
+  # "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$names,
   output_org_tax_ott = get_params(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$organisms$taxonomies$ott,

@@ -15,13 +15,15 @@ complement_metadata_structures(
 \arguments{
 \item{df}{Data frame with structural metadata to complement}
 
-\item{str_stereo}{Path to structure stereochemistry file (includes name, tag, xlogp)}
+\item{str_stereo}{Path to structure stereochemistry file (includes name, tag,
+xlogp)}
 
 \item{str_met}{Path to structure metadata file (formula, mass)}
 
 \item{str_tax_cla}{Path to ClassyFire taxonomy file (keyed by inchikey)}
 
-\item{str_tax_npc}{Path to NPClassifier taxonomy file (keyed by smiles with stereo)}
+\item{str_tax_npc}{Path to NPClassifier taxonomy file (keyed by smiles with
+stereo)}
 }
 \value{
 Data frame with enriched structural metadata

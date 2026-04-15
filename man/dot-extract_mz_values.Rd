@@ -4,7 +4,7 @@
 \alias{.extract_mz_values}
 \title{Extract m/z values from peak data matrix}
 \usage{
-.extract_mz_values(peakData)
+.extract_mz_values(peak_data)
 }
 \description{
 Extract m/z values from peak data matrix

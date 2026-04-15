@@ -25,7 +25,8 @@ prepare_libraries_spectra(
 )
 }
 \arguments{
-\item{input}{\link{character} Character vector of file paths containing spectral data.}
+\item{input}{\link{character} Character vector of file paths containing spectral
+data.}
 
 \item{nam_lib}{\link{character} Character library name for metadata.}
 
@@ -41,7 +42,8 @@ prepare_libraries_spectra(
 
 \item{col_ik}{\link{character} Name of the InChIKey column in MGF.}
 
-\item{col_il}{\link{character} Name of the InChIKey connectivity layer column in MGF.}
+\item{col_il}{\link{character} Name of the InChIKey connectivity layer column in
+MGF.}
 
 \item{col_na}{\link{character} Name of the name column in MGF.}
 

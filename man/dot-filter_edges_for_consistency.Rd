@@ -9,7 +9,8 @@
 \arguments{
 \item{edges_table}{Data frame containing network edges}
 
-\item{min_neighbors}{Integer minimum number of neighbors required (default: 2)}
+\item{min_neighbors}{Integer minimum number of neighbors required (default:
+2)}
 
 \item{min_entropy}{Numeric minimum spectral entropy (default: 0)}
 }

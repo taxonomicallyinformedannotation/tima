@@ -20,28 +20,40 @@ filter_high_confidence_only(
 \arguments{
 \item{df}{Data frame containing annotation results with score columns}
 
-\item{score_bio_min}{Numeric minimum biological score threshold (default: 0.85). Range: 0-1}
+\item{score_bio_min}{Numeric minimum biological score threshold (default:
+0.85). Range: 0-1}
 
-\item{score_ini_min}{Numeric minimum initial score threshold (default: 0.95). Range: 0-1}
+\item{score_ini_min}{Numeric minimum initial score threshold (default: 0.95).
+Range: 0-1}
 
-\item{score_final_min}{Numeric minimum final (chemical) score threshold (default: 0.75). Range: 0-1}
+\item{score_final_min}{Numeric minimum final (chemical) score threshold
+(default: 0.75). Range: 0-1}
 
-\item{error_rt_max}{Numeric maximum retention time error in minutes (default: 0.05). Must be > 0}
+\item{error_rt_max}{Numeric maximum retention time error in minutes (default:
+0.05). Must be > 0}
 
-\item{confidence_sirius_min}{Numeric minimum SIRIUS confidence score threshold (optional).
-Range: 0-1. If provided, candidates WITH a confidence score below this threshold
+\item{confidence_sirius_min}{Numeric minimum SIRIUS confidence score
+threshold (optional).
+Range: 0-1. If provided, candidates WITH a confidence score below this
+threshold
 are filtered out, but candidates with NA/missing scores are retained.}
 
-\item{similarity_spectral_min}{Numeric minimum spectral similarity threshold (optional).
-Range: 0-1. If provided, candidates WITH a similarity score below this threshold
+\item{similarity_spectral_min}{Numeric minimum spectral similarity threshold
+(optional).
+Range: 0-1. If provided, candidates WITH a similarity score below this
+threshold
 are filtered out, but candidates with NA/missing scores are retained.}
 
-\item{matched_peaks_min}{Numeric minimum count of matched peaks threshold (optional).
-Must be >= 0 (typically a small integer). If provided, candidates WITH a matched
-peak count below this threshold are filtered out, but candidates with NA/missing
+\item{matched_peaks_min}{Numeric minimum count of matched peaks threshold
+(optional).
+Must be >= 0 (typically a small integer). If provided, candidates WITH a
+matched
+peak count below this threshold are filtered out, but candidates with
+NA/missing
 peak counts are retained.}
 
-\item{context}{Optional character string to tag logs with a stage label (e.g.,
+\item{context}{Optional character string to tag logs with a stage label
+(e.g.,
 "mini+filtered" or "full"). Defaults to NULL (no tag).}
 }
 \value{
@@ -59,7 +71,8 @@ Columns used when present:
 \item score_biological
 \item candidate_score_pseudo_initial
 \item score_weighted_chemo
-\item candidate_structure_error_rt (assumed in minutes; NA means unknown and is allowed)
+\item candidate_structure_error_rt (assumed in minutes; NA means unknown and is
+allowed)
 \item candidate_score_sirius_confidence (optional, NA values allowed)
 \item candidate_similarity (optional, NA values allowed, 0 always filtered)
 \item candidate_matched_peaks (optional, NA values allowed)
@@ -73,15 +86,18 @@ threshold for a row to be retained.
 \itemize{
 \item RT error: NA values (unknown RT) are allowed to pass
 \item SIRIUS confidence: NA values (no SIRIUS annotation) are allowed to pass
-\item Spectral similarity: NA values (no spectral match) are allowed to pass, but 0 is ALWAYS filtered
+\item Spectral similarity: NA values (no spectral match) are allowed to pass, but
+0 is ALWAYS filtered
 \item Matched peaks: NA values (no peak matching data) are allowed to pass
 }
 
 \strong{SIRIUS and Spectral filtering (OR logic):}
 When both \code{confidence_sirius_min} and \code{similarity_spectral_min} are set,
 candidates pass if EITHER the SIRIUS confidence OR spectral similarity meets
-its threshold. This allows candidates with good SIRIUS but poor spectral match
-(or vice versa) to pass. Spectral similarity = 0 is always filtered out as invalid.
+its threshold. This allows candidates with good SIRIUS but poor spectral
+match
+(or vice versa) to pass. Spectral similarity = 0 is always filtered out as
+invalid.
 
 This means thresholds only apply when the corresponding value is present.
 }

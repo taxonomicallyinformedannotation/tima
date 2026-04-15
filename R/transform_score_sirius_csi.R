@@ -1,11 +1,13 @@
 #' @title Transform SIRIUS CSI score
 #'
-#' @description This function transforms SIRIUS CSI (Compound Structure Identification)
+#' @description This function transforms SIRIUS CSI (Compound Structure
+#'     Identification)
 #'     scores using a sigmoid function. The transformation maps raw scores to a
 #'     0-1 range for better interpretability.
 #'
 #' @details This is an experimental transformation not officially approved by
-#'     SIRIUS developers. The sigmoid function is: 1 / (1 + exp(-(score + K) / scale))
+#' SIRIUS developers. The sigmoid function is: 1 / (1 + exp(-(score + K) /
+#'     scale))
 #'
 #'     SIRIUS CSI:FingerID scores are expected to be log-likelihood-like values
 #'     on (-Inf, 0], where values closer to 0 are better. A practical rule of
@@ -36,7 +38,8 @@
 #' @param scale [numeric] Numeric scale parameter controlling sigmoid steepness
 #'     (default: 20)
 #'
-#' @return Numeric transformed score in the range (0, 1), or NA if input is NA/NULL/absent
+#' @return Numeric transformed score in the range (0, 1), or NA if input is
+#'     NA/NULL/absent
 #'
 #' @examples
 #' \dontrun{

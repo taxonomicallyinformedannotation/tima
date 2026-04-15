@@ -7,9 +7,11 @@
 compute_weighted_sum(..., weights)
 }
 \arguments{
-\item{...}{\link{numeric} Numeric columns/vectors of component values (passed as separate arguments).}
+\item{...}{\link{numeric} Numeric columns/vectors of component values (passed as
+separate arguments).}
 
-\item{weights}{\link{numeric} Numeric vector of non-negative weights (one per component).}
+\item{weights}{\link{numeric} Numeric vector of non-negative weights (one per
+component).}
 }
 \value{
 Numeric vector: row-wise weighted sum with normalized weights.
@@ -19,6 +21,7 @@ Compute normalized weighted sum (row-wise for data frames)
 }
 \details{
 Original formula: (w1\emph{v1 + w2}v2 + ...) / (w1 + w2 + ...)
-where w are weights and v are value columns. Weights are normalized to sum to 1.
+where w are weights and v are value columns. Weights are normalized to sum to
+1.
 }
 \keyword{internal}

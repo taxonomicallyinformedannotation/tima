@@ -17,7 +17,8 @@ NULL
 #' @param value [character] Value to validate
 #' @param valid_values [character] Character vector of allowed values
 #' @param param_name [character] Parameter name for error messages
-#' @param context [character] Optional context (e.g., "Found in: params$annotate_masses$ms_mode")
+#' @param context [character] Optional context (e.g., "Found in:
+#'     params$annotate_masses$ms_mode")
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #' @keywords internal
@@ -80,7 +81,8 @@ validate_choice <- function(
 #' @description Validates file exists with helpful suggestions for similar files
 #'
 #' @param path [character] File path to validate
-#' @param file_type [character] Type description (e.g., "MGF file", "parameter file")
+#' @param file_type [character] Type description (e.g., "MGF file", "parameter
+#'     file")
 #' @param param_name [character] Parameter name for error messages
 #' @param required [logical] Whether file is required (vs optional)
 #'
@@ -540,7 +542,8 @@ validate_tolerance_ppm <- function(
 #'
 #' @param file_list [list] Named list of file paths to validate. Names are used
 #'     in error messages to identify which file is missing.
-#' @param allow_null [logical] Logical, if TRUE, NULL values are allowed (default: FALSE)
+#' @param allow_null [logical] Logical, if TRUE, NULL values are allowed
+#'     (default: FALSE)
 #'
 #' @return Invisible TRUE if all files exist, stops with error otherwise
 #'
@@ -662,9 +665,12 @@ validate_ms_mode <- function(ms_mode) {
 #'
 #' @param tolerance_ppm [numeric] Numeric mass tolerance in parts per million
 #' @param tolerance_rt [numeric] Numeric retention time tolerance in minutes
-#' @param max_ppm [numeric] Maximum allowed ppm tolerance (default: from constants)
-#' @param max_rt [numeric] Maximum allowed RT tolerance (default: from constants)
-#' @param context [character] Character string describing context (for error messages)
+#' @param max_ppm [numeric] Maximum allowed ppm tolerance (default: from
+#'     constants)
+#' @param max_rt [numeric] Maximum allowed RT tolerance (default: from
+#'     constants)
+#' @param context [character] Character string describing context (for error
+#'     messages)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -712,7 +718,8 @@ validate_tolerances <- function(
 
 #' Validate adduct list structure
 #'
-#' @description Ensures adduct list contains required mode and is properly formatted
+#' @description Ensures adduct list contains required mode and is properly
+#'     formatted
 #'
 #' @param adducts_list [list] List containing adduct definitions
 #' @param ms_mode [character] Required ionization mode ('pos' or 'neg')
@@ -802,7 +809,8 @@ validate_adduct_list <- function(
 #' @param required_cols [character] Character vector of required column names
 #' @param min_rows [integer] Minimum number of rows required (default: 0)
 #' @param allow_empty [logical] Logical, whether empty data frames are allowed
-#' @param optional_cols [character] Optional character vector of expected optional columns
+#' @param optional_cols [character] Optional character vector of expected
+#'     optional columns
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -810,7 +818,8 @@ validate_adduct_list <- function(
 #'
 #' @examples
 #' \dontrun{
-#' validate_dataframe(df, param_name = "features", required_cols = c("feature_id", "mz"))
+#' validate_dataframe(df, param_name = "features", required_cols =
+#'     c("feature_id", "mz"))
 #' }
 validate_dataframe <- function(
   df,
@@ -1195,7 +1204,8 @@ assert_choice <- function(value, choices, param_name = "value") {
 
 #' Assert scalar numeric value
 #'
-#' @description Validates that a parameter is a single numeric value within range
+#' @description Validates that a parameter is a single numeric value within
+#'     range
 #'
 #' @param x [numeric] Value to validate
 #' @param param_name [character] Name of the parameter (for error messages)

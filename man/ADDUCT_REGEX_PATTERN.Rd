@@ -17,11 +17,15 @@ Regular expression pattern for parsing adduct notation
 Pattern breakdown:
 \describe{
 \item{\code{\\[}}{Opening bracket (literal)}
-\item{\code{(\\d*)}}{Group 1: Optional multimer count (e.g., "2" in [2M+H]+)}
+\item{\code{(\\d*)}}{Group 1: Optional multimer count (e.g., "2" in
+[2M+H]+)}
 \item{\code{M}}{Required literal "M" for molecule}
-\item{\code{(?![a-z])}}{Negative lookahead: prevent matching element symbols like "Mg"}
-\item{\code{(\\d*)}}{Group 2: Optional isotope shift (e.g., "1" in [M1+H]+ for M+1)}
-\item{\code{([+-][\\w\\d].*)?}}{Group 3: Optional modifications (e.g., "+H", "-H2O+Na")}
+\item{\code{(?![a-z])}}{Negative lookahead: prevent matching element symbols
+like "Mg"}
+\item{\code{(\\d*)}}{Group 2: Optional isotope shift (e.g., "1" in [M1+H]+
+for M+1)}
+\item{\code{([+-][\\w\\d].*)?}}{Group 3: Optional modifications (e.g., "+H",
+"-H2O+Na")}
 \item{\code{.*\\]}}{Any characters until closing bracket}
 \item{\code{(\\d*)}}{Group 4: Optional charge count (e.g., "2" in [M+H]2+)}
 \item{\code{([+-])?}}{Group 5: Optional charge sign (+ or -)}

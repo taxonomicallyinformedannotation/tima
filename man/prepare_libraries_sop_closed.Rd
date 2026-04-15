@@ -14,10 +14,12 @@ prepare_libraries_sop_closed(
 \arguments{
 \item{input}{\link{character} Character string path to input closed library file}
 
-\item{output}{\link{character} Character string path where prepared library should be saved}
+\item{output}{\link{character} Character string path where prepared library should
+be saved}
 }
 \value{
-Character string path to the prepared structure-organism pairs library
+Character string path to the prepared structure-organism pairs
+library
 }
 \description{
 This function prepares closed (private/restricted) structure-

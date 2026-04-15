@@ -7,9 +7,11 @@
 is_spectrum_sanitized(spectrum, tolerance = 0.01, ppm = 10)
 }
 \arguments{
-\item{spectrum}{\link{matrix} Numeric matrix with at least 2 columns (mz, intensity)}
+\item{spectrum}{\link{matrix} Numeric matrix with at least 2 columns (mz,
+intensity)}
 
-\item{tolerance}{\link{numeric} Numeric absolute tolerance in Daltons (default: 0.01)}
+\item{tolerance}{\link{numeric} Numeric absolute tolerance in Daltons (default:
+0.01)}
 
 \item{ppm}{\link{numeric} Numeric relative tolerance in ppm (default: 10)}
 }

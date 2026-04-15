@@ -17,11 +17,14 @@ validate_tolerances(
 
 \item{tolerance_rt}{\link{numeric} Numeric retention time tolerance in minutes}
 
-\item{max_ppm}{\link{numeric} Maximum allowed ppm tolerance (default: from constants)}
+\item{max_ppm}{\link{numeric} Maximum allowed ppm tolerance (default: from
+constants)}
 
-\item{max_rt}{\link{numeric} Maximum allowed RT tolerance (default: from constants)}
+\item{max_rt}{\link{numeric} Maximum allowed RT tolerance (default: from
+constants)}
 
-\item{context}{\link{character} Character string describing context (for error messages)}
+\item{context}{\link{character} Character string describing context (for error
+messages)}
 }
 \value{
 Invisible TRUE if valid, stops with error otherwise

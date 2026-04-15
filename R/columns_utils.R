@@ -55,7 +55,7 @@ columns_model <- function() {
   )
 
   # Calculated candidate-level properties ----
-  candidates_calculated_columns <- c("candidate_spectrum_entropy")
+  candidates_calculated_columns <- "candidate_spectrum_entropy"
 
   # SIRIUS formula-level columns ----
   candidates_sirius_for_columns <- c(
@@ -111,7 +111,7 @@ columns_model <- function() {
   )
 
   # Component identification ----
-  components_columns <- c("component_id")
+  components_columns <- "component_id"
 
   # Ranking columns ----
   rank_columns <- c("rank_initial", "rank_final")
@@ -125,7 +125,7 @@ columns_model <- function() {
     "score_final"
   )
 
-  return(list(
+  list(
     features_columns = features_columns,
     features_calculated_columns = features_calculated_columns,
     candidates_calculated_columns = candidates_calculated_columns,
@@ -136,12 +136,13 @@ columns_model <- function() {
     components_columns = components_columns,
     rank_columns = rank_columns,
     score_columns = score_columns
-  ))
+  )
 }
 
 #' @title Collapse and clean grouped data
 #'
-#' @description Collapses grouped dataframe by combining unique values per group.
+#' @description Collapses grouped dataframe by combining unique values per
+#'     group.
 #'     Removes NA values, trims whitespace, and converts empty strings to NA.
 #'     Useful for aggregating annotations or metadata.
 #'     Internal helper for cleaning and aggregation functions.

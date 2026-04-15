@@ -21,9 +21,11 @@ change_params_small(
 \arguments{
 \item{fil_pat}{Character. Job identifier/pattern for output files (optional)}
 
-\item{fil_fea_raw}{Character. Path to features file (e.g., from mzmine/SIRIUS)}
+\item{fil_fea_raw}{Character. Path to features file (e.g., from
+mzmine/SIRIUS)}
 
-\item{fil_met_raw}{Character. Path to metadata file (optional if single taxon)}
+\item{fil_met_raw}{Character. Path to metadata file (optional if single
+taxon)}
 
 \item{fil_sir_raw}{Character. Path to SIRIUS annotations directory/zip}
 
@@ -39,16 +41,19 @@ change_params_small(
 
 \item{summarize}{Logical. Summarize all candidates per feature to single row}
 
-\item{cache_dir}{Character. Cache directory path (for testing; uses go_to_cache() if NULL)}
+\item{cache_dir}{Character. Cache directory path (for testing; uses
+go_to_cache() if NULL)}
 }
 \value{
 Invisible NULL. Modifies prepare_params YAML as side effect.
 }
 \description{
-Updates TIMA workflow parameters for quick setup with a simplified
+Updates TIMA workflow parameters for quick setup with a
+simplified
 interface. This function modifies the prepare_params YAML configuration file
 by copying provided input files to the appropriate directories and updating
-parameter values. Implements SOLID principles with clear separation of concerns.
+parameter values. Implements SOLID principles with clear separation of
+concerns.
 }
 \details{
 This function:

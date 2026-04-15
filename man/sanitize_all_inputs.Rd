@@ -15,19 +15,24 @@ sanitize_all_inputs(
 )
 }
 \arguments{
-\item{features_file}{\link{character} Character path to features CSV/TSV (optional)}
+\item{features_file}{\link{character} Character path to features CSV/TSV
+(optional)}
 
 \item{mgf_file}{\link{character} Character path to MGF file (optional)}
 
 \item{metadata_file}{\link{character} Character path to metadata file (optional)}
 
-\item{sirius_dir}{\link{character} Character path to SIRIUS output directory or ZIP (optional)}
+\item{sirius_dir}{\link{character} Character path to SIRIUS output directory or
+ZIP (optional)}
 
-\item{filename_col}{\link{character} Character name of filename column (default: "filename")}
+\item{filename_col}{\link{character} Character name of filename column (default:
+"filename")}
 
-\item{organism_col}{\link{character} Character name of organism column (default: "organism")}
+\item{organism_col}{\link{character} Character name of organism column (default:
+"organism")}
 
-\item{feature_col}{\link{character} Character name of feature ID column (default: "feature_id")}
+\item{feature_col}{\link{character} Character name of feature ID column (default:
+"feature_id")}
 }
 \value{
 Invisible TRUE if all validations pass, stops with error otherwise

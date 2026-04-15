@@ -7,8 +7,10 @@
 #'
 #' @include validations_utils.R
 #'
-#' @param arguments [list] Named list of CLI arguments from docopt or similar parser
-#' @param parameters [list] Nested list of default parameters to be updated with CLI values
+#' @param arguments [list] Named list of CLI arguments from docopt or similar
+#'     parser
+#' @param parameters [list] Nested list of default parameters to be updated with
+#'     CLI values
 #'
 #' @return Updated parameters list with CLI arguments merged in, maintaining
 #'     the nested structure and applying type conversions
@@ -34,7 +36,8 @@ parse_cli_params <- function(arguments, parameters) {
   validate_list_or_vector(parameters, param_name = "parameters", min_length = 0)
 
   # Define mappings from CLI argument names to parameter paths
-  # Each mapping specifies: path (nested list location) and type (conversion function)
+  # Each mapping specifies: path (nested list location) and type (conversion
+  # function)
   mappings <- list(
     ann_can_bes = list(
       path = c("annotations", "candidates", "best_percentile"),
@@ -74,7 +77,8 @@ parse_cli_params <- function(arguments, parameters) {
       type = as.character
     ),
     fil_pat = list(path = c("files", "pattern"), type = as.character),
-    # fil_ann_raw_spe = list(path = c("files", "annotations", "raw", "spectral"),
+    # fil_ann_raw_spe = list(path = c("files", "annotations", "raw",
+    # "spectral"),
     #                        type = as.character),
     fil_ann_raw_spe_gnp = list(
       path = c("files", "annotations", "raw", "spectral", "gnps"),
@@ -284,8 +288,10 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("names", "mgf", "polarity"),
       type = as.character
     ),
-    # names_mgf_pc = list(path = c("names", "mgf", "precursor_charge"), type = as.character),
-    # names_mgf_pm = list(path = c("names", "mgf", "precursor_mz"), type = as.character),
+    # names_mgf_pc = list(path = c("names", "mgf", "precursor_charge"), type =
+    # as.character),
+    # names_mgf_pm = list(path = c("names", "mgf", "precursor_mz"), type =
+    # as.character),
     names_mgf_sm = list(
       path = c("names", "mgf", "smiles"),
       type = as.character

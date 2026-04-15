@@ -1,12 +1,15 @@
 #' Compute normalized weighted sum (row-wise for data frames)
 #'
-#' @param ... [numeric] Numeric columns/vectors of component values (passed as separate arguments).
-#' @param weights [numeric] Numeric vector of non-negative weights (one per component).
+#' @param ... [numeric] Numeric columns/vectors of component values (passed as
+#'     separate arguments).
+#' @param weights [numeric] Numeric vector of non-negative weights (one per
+#'     component).
 #' @return Numeric vector: row-wise weighted sum with normalized weights.
 #' @keywords internal
 #'
 #' @details Original formula: (w1*v1 + w2*v2 + ...) / (w1 + w2 + ...)
-#' where w are weights and v are value columns. Weights are normalized to sum to 1.
+#' where w are weights and v are value columns. Weights are normalized to sum to
+#'     1.
 compute_weighted_sum <- function(..., weights) {
   values <- list(...)
 

@@ -73,8 +73,8 @@ gnps_wrapper <- function(x, y) {
 join_gnps_wrapper <- function(
   x,
   y,
-  xPrecursorMz,
-  yPrecursorMz,
+  xPrecursorMz, # nolint: object_name_linter. C interface name.
+  yPrecursorMz, # nolint: object_name_linter. C interface name.
   tolerance,
   ppm
 ) {
@@ -134,11 +134,11 @@ join_gnps_wrapper <- function(
 gnps_chain_dp_wrapper <- function(
   x,
   y,
-  xPrecursorMz,
-  yPrecursorMz,
+  xPrecursorMz, # nolint: object_name_linter. C interface name.
+  yPrecursorMz, # nolint: object_name_linter. C interface name.
   tolerance,
   ppm,
-  matchedPeaksCount = FALSE
+  matchedPeaksCount = FALSE # nolint: object_name_linter. C interface name.
 ) {
   res <- .Call(
     C_gnps_chain_dp,

@@ -9,7 +9,8 @@ export_output(x, file)
 \arguments{
 \item{x}{\link{data.frame} Data frame or tibble to export}
 
-\item{file}{\link{character} Character string path to the output file. File extension
+\item{file}{\link{character} Character string path to the output file. File
+extension
 determines compression (.gz for gzip compression).}
 }
 \value{

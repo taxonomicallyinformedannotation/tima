@@ -7,7 +7,8 @@
 clean_bio(annot_table_wei_bio, edges_table, minimal_consistency)
 }
 \arguments{
-\item{annot_table_wei_bio}{Data frame containing biologically weighted annotations}
+\item{annot_table_wei_bio}{Data frame containing biologically weighted
+annotations}
 
 \item{edges_table}{Data frame containing network edges between features}
 

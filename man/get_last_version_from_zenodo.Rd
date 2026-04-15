@@ -17,9 +17,12 @@ get_last_version_from_zenodo(doi, pattern, path)
 Character path to the downloaded (or existing) file
 }
 \description{
-Retrieves the latest version of a file from a Zenodo repository record.
-This function checks the file size and only downloads if the local file is missing
-or differs from the remote version. Implements robust error handling and retry logic.
+Retrieves the latest version of a file from a Zenodo repository
+record.
+This function checks the file size and only downloads if the local file is
+missing
+or differs from the remote version. Implements robust error handling and
+retry logic.
 }
 \details{
 Credit goes partially to https://inbo.github.io/inborutils/

@@ -15,7 +15,8 @@ NULL
 #'
 #' @param x Value to check
 #'
-#' @return Logical TRUE if x is a single non-NA character string, FALSE otherwise
+#' @return Logical TRUE if x is a single non-NA character string, FALSE
+#'     otherwise
 #'
 #' @keywords internal
 #'
@@ -113,7 +114,8 @@ validate_all_single_strings <- function(
 #'     elements satisfy the condition. More flexible than specific counters.
 #'
 #' @param x [list] List or vector to process
-#' @param predicate_fn [function] Function taking one element and returning logical
+#' @param predicate_fn [function] Function taking one element and returning
+#'     logical
 #' @param ... Additional arguments passed to predicate_fn
 #'
 #' @return Integer count of elements for which predicate_fn returns TRUE
@@ -205,7 +207,8 @@ is_numeric_in_range <- function(x, min = -Inf, max = Inf) {
 #'     function. Stops with informative cli error if any fail.
 #'
 #' @param x_list [list] Named list of values to check
-#' @param predicate_fn [function] Function taking one element and returning logical
+#' @param predicate_fn [function] Function taking one element and returning
+#'     logical
 #' @param error_prefix [character] Character prefix for error message
 #' @param ... Additional arguments passed to predicate_fn
 #'

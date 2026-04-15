@@ -9,10 +9,12 @@ load_edges_table(edges, candidates_neighbors)
 \arguments{
 \item{edges}{\link{character} Character, path to edges file.}
 
-\item{candidates_neighbors}{\link{integer} Integer, number of top neighbors to keep per feature.}
+\item{candidates_neighbors}{\link{integer} Integer, number of top neighbors to
+keep per feature.}
 }
 \value{
-Data frame with filtered edges (top \code{candidates_neighbors} per \code{feature_source}).
+Data frame with filtered edges (top \code{candidates_neighbors} per
+\code{feature_source}).
 }
 \description{
 Internal helper to load the edges file and retain only the top N

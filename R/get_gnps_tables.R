@@ -93,7 +93,8 @@ create_fake_gnps_files <- function(
   safe_write(fake_edges, edges_file)
   safe_write(fake_metadata, path_metadata)
 
-  # Create minimal placeholder files for features and spectra if paths are provided
+  # Create minimal placeholder files for features and spectra if paths are
+  # provided
   if (!is.null(path_features) && nzchar(path_features)) {
     # Ensure directory exists
     create_dir(export = path_features)
@@ -164,10 +165,11 @@ download_gnps_file <- function(url, file_path, file_type) {
 
 #' @title Get GNPS Tables
 #'
-#' @description This function downloads and retrieves GNPS (Global Natural Products
-#'     Social Molecular Networking) result tables from a completed job. It fetches
-#'     features, metadata, spectra, and annotation files from GNPS servers. When a
-#'     job ID is not provided or GNPS resources are missing, small fake files are
+#' @description This function downloads and retrieves GNPS (Global Natural
+#'     Products
+#' Social Molecular Networking) result tables from a completed job. It fetches
+#' features, metadata, spectra, and annotation files from GNPS servers. When a
+#' job ID is not provided or GNPS resources are missing, small fake files are
 #'     written so downstream steps do not fail during testing.
 #'
 #' @include get_default_paths.R
@@ -176,11 +178,14 @@ download_gnps_file <- function(url, file_path, file_type) {
 #' @param gnps_job_id Character string GNPS job ID (32 characters). Can be NULL
 #'     or empty string to skip download.
 #' @param gnps_job_example Character string example GNPS job ID for testing
-#' @param filename Character string name of the file to download (used for fake outputs)
-#' @param workflow Character string indicating workflow type: "fbmn" (feature-based)
+#' @param filename Character string name of the file to download (used for fake
+#'     outputs)
+#' @param workflow Character string indicating workflow type: "fbmn"
+#'     (feature-based)
 #'     or "classical" molecular networking
 #' @param path_features Character string path for features output (file path)
-#' @param path_metadata Character string path for metadata output (file path or list)
+#' @param path_metadata Character string path for metadata output (file path or
+#'     list)
 #' @param path_spectra Character string path for spectra output (file path)
 #' @param path_source Character string path to store source files
 #' @param path_interim_a Character string path to store interim annotations

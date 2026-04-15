@@ -84,8 +84,10 @@ validate_weight_annotations_inputs(
 NULL (invisible). Stops execution if validation fails.
 }
 \description{
-Internal helper to validate all input parameters for weight_annotations.
-Checks file existence, data types, ranges, and logical consistency of weights.
+Internal helper to validate all input parameters for
+weight_annotations.
+Checks file existence, data types, ranges, and logical consistency of
+weights.
 Stops execution with informative messages if any condition is violated.
 }
 \keyword{internal}

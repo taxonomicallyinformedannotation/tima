@@ -27,10 +27,12 @@ prepare_annotations_sirius(
 )
 }
 \arguments{
-\item{input_directory}{\link{character} Character path to directory or zip file containing
+\item{input_directory}{\link{character} Character path to directory or zip file
+containing
 SIRIUS results.}
 
-\item{output_ann}{\link{character} Character path for prepared structure annotation output.}
+\item{output_ann}{\link{character} Character path for prepared structure
+annotation output.}
 
 \item{output_can}{\link{character} Character path for prepared CANOPUS output.}
 
@@ -38,7 +40,8 @@ SIRIUS results.}
 
 \item{sirius_version}{\link{character} Character SIRIUS version ("5" or "6").}
 
-\item{str_stereo}{\link{character} Character path to structure stereochemistry file.}
+\item{str_stereo}{\link{character} Character path to structure stereochemistry
+file.}
 
 \item{str_met}{\link{character} Character path to structure metadata file.}
 
@@ -62,14 +65,16 @@ integrating with structure metadata.
 This function:
 \itemize{
 \item Validates inputs (version, paths, file existence).
-\item Loads SIRIUS output files (CANOPUS, formulas, structures, denovo, spectral matches).
+\item Loads SIRIUS output files (CANOPUS, formulas, structures, denovo,
+spectral matches).
 \item Harmonizes column names across SIRIUS v5 and v6.
 \item Joins with structure metadata (stereochemistry, names, taxonomy).
 \item Splits results into three output files: annotations, CANOPUS, formulas.
 \item Exports parameters and results.
 }
 
-If the input directory does not exist, returns an empty template with expected
+If the input directory does not exist, returns an empty template with
+expected
 columns to ensure downstream compatibility.
 }
 \examples{

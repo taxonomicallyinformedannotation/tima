@@ -7,19 +7,24 @@
 parse_adduct(adduct_string, regex = ADDUCT_REGEX_PATTERN)
 }
 \arguments{
-\item{adduct_string}{\link{character} Character string representing the adduct in standard
+\item{adduct_string}{\link{character} Character string representing the adduct in
+standard
 notation (e.g., "[M+H]+", "[2M+Na]+", "[M-H2O+H]+")}
 
-\item{regex}{\link{character} Character string regular expression pattern for parsing
+\item{regex}{\link{character} Character string regular expression pattern for
+parsing
 (default: uses ADDUCT_REGEX_PATTERN from constants)}
 }
 \value{
 Named numeric vector containing:
 \item{n_mer}{Integer number of monomers (e.g., 2 for dimer, 1 for monomer)}
-\item{n_iso}{Integer isotope shift (e.g., 1 for M+1 isotopologue, 0 for monoisotopic)}
-\item{los_add_clu}{Numeric total mass change in Daltons from all modifications}
+\item{n_iso}{Integer isotope shift (e.g., 1 for M+1 isotopologue, 0 for
+monoisotopic)}
+\item{los_add_clu}{Numeric total mass change in Daltons from all
+modifications}
 \item{n_charges}{Integer absolute number of charges (always positive)}
-\item{charge}{Integer charge polarity (+1 for positive mode, -1 for negative mode)}
+\item{charge}{Integer charge polarity (+1 for positive mode, -1 for negative
+mode)}
 Returns all zeros if parsing fails.
 }
 \description{

@@ -21,7 +21,8 @@ create_edges_spectra(
 )
 }
 \arguments{
-\item{input}{\link{character} Path or list of paths to query MGF file(s) containing spectra}
+\item{input}{\link{character} Path or list of paths to query MGF file(s)
+containing spectra}
 
 \item{output}{\link{character} Path for output edges file}
 
@@ -39,7 +40,8 @@ create_edges_spectra(
 
 \item{dalton}{\link{numeric} Absolute mass tolerance in Daltons}
 
-\item{cutoff}{\link{numeric} Intensity cutoff below which MS2 fragments are removed.
+\item{cutoff}{\link{numeric} Intensity cutoff below which MS2 fragments are
+removed.
 Non-negative numeric or NULL for dynamic thresholding.}
 
 \item{qutoff}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{cutoff} instead.}

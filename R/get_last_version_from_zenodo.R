@@ -1,6 +1,7 @@
 #' Validate Zenodo Function Inputs
 #'
-#' @description Internal helper to validate all input parameters for Zenodo operations.
+#' @description Internal helper to validate all input parameters for Zenodo
+#'     operations.
 #'
 #' @param doi Character DOI string
 #' @param pattern Character pattern string
@@ -183,7 +184,8 @@ parse_zenodo_content <- function(api_url) {
 
 #' Find Matching File in Zenodo Record
 #'
-#' @description Internal helper to find a file matching the pattern in Zenodo record.
+#' @description Internal helper to find a file matching the pattern in Zenodo
+#'     record.
 #'
 #' @param filenames Character vector of filenames
 #' @param pattern Character pattern to match
@@ -223,7 +225,8 @@ find_matching_file <- function(filenames, pattern, doi) {
 
 #' Check if File Download is Needed
 #'
-#' @description Internal helper to determine if download is required by comparing sizes.
+#' @description Internal helper to determine if download is required by
+#'     comparing sizes.
 #'
 #' @param path Character local file path
 #' @param zenodo_size Numeric size in bytes from Zenodo
@@ -258,9 +261,12 @@ is_download_needed <- function(path, zenodo_size) {
 
 #' @title Get Latest Version from Zenodo
 #'
-#' @description Retrieves the latest version of a file from a Zenodo repository record.
-#'     This function checks the file size and only downloads if the local file is missing
-#'     or differs from the remote version. Implements robust error handling and retry logic.
+#' @description Retrieves the latest version of a file from a Zenodo repository
+#'     record.
+#' This function checks the file size and only downloads if the local file is
+#'     missing
+#' or differs from the remote version. Implements robust error handling and
+#'     retry logic.
 #'
 #' @details
 #' Credit goes partially to https://inbo.github.io/inborutils/

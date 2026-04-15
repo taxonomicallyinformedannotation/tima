@@ -22,7 +22,8 @@ Default: TRUE}
 
 \item{log_level}{\link{character} or \link{numeric} Logging verbosity level.
 Can be one of: "trace", "debug", "info", "warn", "error", "fatal"
-or numeric values: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200, FATAL=100.
+or numeric values: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200,
+FATAL=100.
 Default: "info" (400). Use "debug" for detailed troubleshooting.}
 }
 \value{
@@ -30,8 +31,10 @@ Invisible NULL. Executes workflow as side effect and creates
 timestamped log files in data/processed/
 }
 \description{
-Executes the full Taxonomically Informed Metabolite Annotation (TIMA)
-workflow from start to finish. This includes data preparation, library loading,
+Executes the full Taxonomically Informed Metabolite Annotation
+(TIMA)
+workflow from start to finish. This includes data preparation, library
+loading,
 annotation, weighting, and output generation. The function runs the targets
 pipeline and archives logs with timestamps for reproducibility.
 }

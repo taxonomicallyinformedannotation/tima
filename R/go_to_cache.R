@@ -16,7 +16,8 @@
 #'
 #' @include validations_utils.R
 #'
-#' @param dir [character] Character string name of cache directory (default: ".tima").
+#' @param dir [character] Character string name of cache directory (default:
+#'     ".tima").
 #'     Created in user's home directory. Must be non-empty.
 #'
 #' @return Path to cache directory (invisibly). Changes working directory

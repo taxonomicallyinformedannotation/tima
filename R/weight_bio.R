@@ -9,8 +9,9 @@
 #'     (organism_taxonomy_01domain == "Biota") represent shared core metabolism
 #'     found across all life forms. These candidates ALWAYS receive the maximum
 #'     biological score, ensuring they are considered in all annotations
-#'     regardless of sample taxonomy. This recognizes universal metabolic pathways
-#'     like glycolysis, citric acid cycle, and other fundamental biochemical processes.
+#' regardless of sample taxonomy. This recognizes universal metabolic pathways
+#' like glycolysis, citric acid cycle, and other fundamental biochemical
+#'     processes.
 #'
 #'     Internal helper for weight_annotations().
 #'
@@ -22,11 +23,16 @@
 #' @include validations_utils.R
 #' @include weights_utils.R
 #'
-#' @param annotation_table_taxed [data.frame] Data frame with initial annotations and sample taxonomy
-#' @param structure_organism_pairs_table [data.frame] Data frame with structure-organism pairs and taxonomies
-#' @param weight_spectral [numeric] Weight for spectral similarity score (any positive number)
-#' @param weight_biological [numeric] Weight for biological source score (any positive number)
-#' @param score_biological_domain [numeric] Score for domain-level taxonomic match (0-1)
+#' @param annotation_table_taxed [data.frame] Data frame with initial
+#'     annotations and sample taxonomy
+#' @param structure_organism_pairs_table [data.frame] Data frame with
+#'     structure-organism pairs and taxonomies
+#' @param weight_spectral [numeric] Weight for spectral similarity score (any
+#'     positive number)
+#' @param weight_biological [numeric] Weight for biological source score (any
+#'     positive number)
+#' @param score_biological_domain [numeric] Score for domain-level taxonomic
+#'     match (0-1)
 #' @param score_biological_kingdom [numeric] Score for kingdom-level match (0-1)
 #' @param score_biological_phylum [numeric] Score for phylum-level match (0-1)
 #' @param score_biological_class [numeric] Score for class-level match (0-1)
@@ -35,10 +41,13 @@
 #' @param score_biological_tribe [numeric] Score for tribe-level match (0-1)
 #' @param score_biological_genus [numeric] Score for genus-level match (0-1)
 #' @param score_biological_species [numeric] Score for species-level match (0-1)
-#' @param score_biological_variety [numeric] Score for variety-level match (0-1, highest)
-#' @param score_biological_biota [numeric] Score for Biota-level match (0-1, special)
+#' @param score_biological_variety [numeric] Score for variety-level match (0-1,
+#'     highest)
+#' @param score_biological_biota [numeric] Score for Biota-level match (0-1,
+#'     special)
 #'
-#' @return Data frame with biologically weighted annotations including biological
+#' @return Data frame with biologically weighted annotations including
+#'     biological
 #'     scores and combined weighted scores
 #'
 #' @keywords internal
@@ -268,15 +277,20 @@ weight_bio <- function(
           "candidate_organism_03_phylum" = "organism_taxonomy_03phylum",
           "candidate_organism_04_class" = "organism_taxonomy_04class",
           "candidate_organism_05_order" = "organism_taxonomy_05order",
-          # "candidate_organism_05_1_infraorder" = "organism_taxonomy_05_1infraorder",
+          # "candidate_organism_05_1_infraorder" =
+          # "organism_taxonomy_05_1infraorder",
           "candidate_organism_06_family" = "organism_taxonomy_06family",
-          # "candidate_organism_06_1_subfamily" = "organism_taxonomy_06_1subfamily",
+          # "candidate_organism_06_1_subfamily" =
+          # "organism_taxonomy_06_1subfamily",
           "candidate_organism_07_tribe" = "organism_taxonomy_07tribe",
-          # "candidate_organism_07_1_subtribe" = "organism_taxonomy_07_1subtribe",
+          # "candidate_organism_07_1_subtribe" =
+          # "organism_taxonomy_07_1subtribe",
           "candidate_organism_08_genus" = "organism_taxonomy_08genus",
-          # "candidate_organism_08_1_subgenus" = "organism_taxonomy_08_1subgenus",
+          # "candidate_organism_08_1_subgenus" =
+          # "organism_taxonomy_08_1subgenus",
           "candidate_organism_09_species" = "organism_taxonomy_09species",
-          # "candidate_organism_09_1_subspecies" = "organism_taxonomy_09_1subspecies",
+          # "candidate_organism_09_1_subspecies" =
+          # "organism_taxonomy_09_1subspecies",
           "candidate_organism_10_varietas" = "organism_taxonomy_10varietas"
         )
       )

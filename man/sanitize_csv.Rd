@@ -16,9 +16,11 @@ sanitize_csv(
 
 \item{file_type}{\link{character} Character description for error messages}
 
-\item{required_cols}{\link{character} Character vector of required column names (optional)}
+\item{required_cols}{\link{character} Character vector of required column names
+(optional)}
 
-\item{feature_col}{\link{character} Character name of feature ID column (default: "feature_id")}
+\item{feature_col}{\link{character} Character name of feature ID column (default:
+"feature_id")}
 }
 \value{
 List with validation results:

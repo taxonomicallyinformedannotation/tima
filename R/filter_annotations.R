@@ -137,7 +137,8 @@ validate_filter_annotations_inputs <- function(
 
 #' Filter MS1 Annotations
 #'
-#' @description Internal helper to remove MS1 annotations that have spectral matches.
+#' @description Internal helper to remove MS1 annotations that have spectral
+#'     matches.
 #'
 #' @param annotation_tables_list Named list of annotation tables
 #'
@@ -271,11 +272,13 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
 #' @include get_params.R
 #' @include safe_fread.R
 #'
-#' @param annotations Character vector or list of paths to prepared annotation files
+#' @param annotations Character vector or list of paths to prepared annotation
+#'     files
 #' @param features Character string path to prepared features file.
-#'     Must contain a \code{feature_id} column. The \code{rt} column is optional;
+#' Must contain a \code{feature_id} column. The \code{rt} column is optional;
 #'     if absent, RT filtering is skipped even when an RT library is provided.
-#' @param rts Character string path to prepared retention time library (optional)
+#' @param rts Character string path to prepared retention time library
+#'     (optional)
 #' @param output Character string path for filtered annotations output
 #' @param tolerance_rt Numeric RT tolerance in minutes for library matching
 #'
@@ -292,11 +295,14 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 #' dir <- paste0(github, repo)
-#' ann <- get_params(step = "filter_annotations")$files$annotations$prepared$structural[[2L]] |>
+#' ann <- get_params(step =
+#'     "filter_annotations")$files$annotations$prepared$structural[[2L]] |>
 #'   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
-#' features <- get_params(step = "filter_annotations")$files$features$prepared |>
+#' features <- get_params(step = "filter_annotations")$files$features$prepared
+#'     |>
 #'   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
-#' rts <- get_params(step = "filter_annotations")$files$libraries$temporal$prepared |>
+#' rts <- get_params(step =
+#'     "filter_annotations")$files$libraries$temporal$prepared |>
 #'   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
 #' get_file(url = paste0(dir, annotations), export = annotations)
 #' get_file(url = paste0(dir, features), export = features)
@@ -357,7 +363,7 @@ filter_annotations <- function(
   features_table <- safe_fread(
     file = features,
     file_type = "features table",
-    required_cols = c("feature_id"),
+    required_cols = "feature_id",
     colClasses = "character",
     na.strings = c("", "NA")
   )

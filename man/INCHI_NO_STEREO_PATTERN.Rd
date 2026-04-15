@@ -4,7 +4,8 @@
 \name{INCHI_NO_STEREO_PATTERN}
 \alias{INCHI_NO_STEREO_PATTERN}
 \title{InChI stereochemistry layer pattern indicating no stereochemistry
-Structures with "-UHFFFAOYSA-" in their InChIKey have no defined stereochemistry}
+Structures with "-UHFFFAOYSA-" in their InChIKey have no defined
+stereochemistry}
 \format{
 An object of class \code{character} of length 1.
 }
@@ -13,6 +14,7 @@ INCHI_NO_STEREO_PATTERN
 }
 \description{
 InChI stereochemistry layer pattern indicating no stereochemistry
-Structures with "-UHFFFAOYSA-" in their InChIKey have no defined stereochemistry
+Structures with "-UHFFFAOYSA-" in their InChIKey have no defined
+stereochemistry
 }
 \keyword{internal}

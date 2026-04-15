@@ -179,7 +179,8 @@ check_or_install_python <- function() {
 
 #' Setup Python Virtual Environment
 #'
-#' @description Internal helper to create and configure Python virtualenv with dependencies.
+#' @description Internal helper to create and configure Python virtualenv with
+#'     dependencies.
 #'
 #' @param envname Character name of virtual environment
 #' @param python Character path to Python executable
@@ -354,7 +355,8 @@ verify_package_installation <- function(package) {
 
 #' Attempt Package Installation
 #'
-#' @description Internal helper to attempt R package installation with error handling.
+#' @description Internal helper to attempt R package installation with error
+#'     handling.
 #'
 #' @param package Character package name
 #' @param repos Character vector of repositories

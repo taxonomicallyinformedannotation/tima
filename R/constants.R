@@ -2,7 +2,7 @@
 #'
 #' @description This module contains centralized physical and chemical constants
 #'     used throughout the TIMA package. Centralizing these values ensures
-#'     consistency, facilitates maintenance, and makes the code self-documenting.
+#' consistency, facilitates maintenance, and makes the code self-documenting.
 #'
 #' @name constants
 #' @keywords internal
@@ -25,7 +25,7 @@ ISOTOPE_MASS_SHIFT_DALTONS <- 1.0033548378
 
 #' Default log level
 #' @description Default logging level if TIMA_LOG_LEVEL environment variable
-#'     is not set. Valid values: "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
+#' is not set. Valid values: "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
 #' @keywords internal
 DEFAULT_LOG_LEVEL <- "INFO"
 
@@ -56,13 +56,17 @@ MAX_MASS_DALTONS <- 5000
 #' @details Pattern breakdown:
 #' \describe{
 #'   \item{\code{\\[}}{Opening bracket (literal)}
-#'   \item{\code{(\\d*)}}{Group 1: Optional multimer count (e.g., "2" in \[2M+H\]+)}
+#' \item{\code{(\\d*)}}{Group 1: Optional multimer count (e.g., "2" in
+#'     \[2M+H\]+)}
 #'   \item{\code{M}}{Required literal "M" for molecule}
-#'   \item{\code{(?![a-z])}}{Negative lookahead: prevent matching element symbols like "Mg"}
-#'   \item{\code{(\\d*)}}{Group 2: Optional isotope shift (e.g., "1" in \[M1+H\]+ for M+1)}
-#'   \item{\code{([+-][\\w\\d].*)?}}{Group 3: Optional modifications (e.g., "+H", "-H2O+Na")}
+#' \item{\code{(?![a-z])}}{Negative lookahead: prevent matching element symbols
+#'     like "Mg"}
+#' \item{\code{(\\d*)}}{Group 2: Optional isotope shift (e.g., "1" in \[M1+H\]+
+#'     for M+1)}
+#' \item{\code{([+-][\\w\\d].*)?}}{Group 3: Optional modifications (e.g., "+H",
+#'     "-H2O+Na")}
 #'   \item{\code{.*\\]}}{Any characters until closing bracket}
-#'   \item{\code{(\\d*)}}{Group 4: Optional charge count (e.g., "2" in \[M+H\]2+)}
+#' \item{\code{(\\d*)}}{Group 4: Optional charge count (e.g., "2" in \[M+H\]2+)}
 #'   \item{\code{([+-])?}}{Group 5: Optional charge sign (+ or -)}
 #' }
 #'
@@ -76,14 +80,17 @@ ADDUCT_REGEX_PATTERN <- "^\\[(\\d*)M(?![a-z])((?:[+-]?\\d+(?![A-Z]))?)([+-][\\w\
 #' @details Pattern breakdown:
 #' \describe{
 #'   \item{\code{([+-])}}{Group 1: Addition (+) or loss (-) sign}
-#'   \item{\code{(\\d*)}}{Group 2: Optional stoichiometric coefficient (e.g., "2" in +2H)}
-#'   \item{\code{([A-Z][a-z]?\\d*(?:[A-Z][a-z]?\\d*)*)}}{Group 3: Element formula (e.g., "H", "H2O", "NaCl")}
+#' \item{\code{(\\d*)}}{Group 2: Optional stoichiometric coefficient (e.g., "2"
+#'     in +2H)}
+#' \item{\code{([A-Z][a-z]?\\d*(?:[A-Z][a-z]?\\d*)*)}}{Group 3: Element formula
+#'     (e.g., "H", "H2O", "NaCl")}
 #' }
 #'
 #' @examples
 #' # Matches: +H, -H2O, +2Na, +C6H12O6
 #' @keywords internal
-MODIFICATION_REGEX_PATTERN <- "([+-])(\\d*)([A-Z][a-z]?\\d*(?:[A-Z][a-z]?\\d*)*)"
+MODIFICATION_REGEX_PATTERN <-
+  "([+-])(\\d*)([A-Z][a-z]?\\d*(?:[A-Z][a-z]?\\d*)*)"
 
 # File System Constants ----
 
@@ -140,7 +147,8 @@ DEFAULT_HC_SCORE_BIO_MIN <- 0.85
 #' @keywords internal
 DEFAULT_HC_SCORE_INITIAL_MIN <- 0.95
 
-#' Default minimum final (weighted chemical) score threshold for high-confidence filter
+#' Default minimum final (weighted chemical) score threshold for high-confidence
+#'     filter
 #' @keywords internal
 DEFAULT_HC_SCORE_FINAL_MIN <- 0.75
 
@@ -148,7 +156,8 @@ DEFAULT_HC_SCORE_FINAL_MIN <- 0.75
 #' @keywords internal
 DEFAULT_HC_SCORE_SIRIUS_MIN <- 0.4
 
-#' Default minimum spectral similarity score threshold for high-confidence filter
+#' Default minimum spectral similarity score threshold for high-confidence
+#'     filter
 #' @keywords internal
 DEFAULT_HC_SCORE_SPECTRAL_MIN <- 0.4
 
@@ -156,14 +165,16 @@ DEFAULT_HC_SCORE_SPECTRAL_MIN <- 0.4
 #' @keywords internal
 DEFAULT_HC_SCORE_MIN_PEAKS <- 2L
 
-#' Default maximum allowed retention time error (minutes) for high-confidence filter
+#' Default maximum allowed retention time error (minutes) for high-confidence
+#'     filter
 #' @keywords internal
 DEFAULT_HC_MAX_RT_ERROR_MIN <- 0.15
 
 # InChI Patterns ----
 
 #' InChI stereochemistry layer pattern indicating no stereochemistry
-#' Structures with "-UHFFFAOYSA-" in their InChIKey have no defined stereochemistry
+#' Structures with "-UHFFFAOYSA-" in their InChIKey have no defined
+#'     stereochemistry
 #' @keywords internal
 INCHI_NO_STEREO_PATTERN <- "-UHFFFAOYSA-"
 

@@ -4,7 +4,8 @@
 #'     real download fails. Used as a fallback to prevent pipeline failures
 #'     during testing or when external resources are unavailable.
 #'
-#' @param export Character string path where the fake HMDB zip file should be saved
+#' @param export Character string path where the fake HMDB zip file should be
+#'     saved
 #'
 #' @return Character string path to the created fake file
 #'
@@ -47,7 +48,8 @@ fake_hmdb <- function(export) {
     "> <DATABASE_ID>",
     "HMDB0000001",
     "> <SMILES>",
-    "[H]OC(=O)[C@@]([H])(N([H])[H])C([H])([H])C1=C([H])N(C([H])=N1)C([H])([H])[H]",
+    "[H]OC(=O)[C@@]([H])(N([H])[H])C([H])([H])C1=C([H])N(C([H]) =
+      N1)C([H])([H])[H]",
     "> <INCHI_KEY>",
     "BRMWTNUJHUMWMS-LURJTMIESA-N",
     "> <FORMULA>",

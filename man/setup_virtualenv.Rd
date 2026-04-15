@@ -15,6 +15,7 @@ setup_virtualenv(envname = "tima-env", python = NULL)
 NULL (side effect: creates virtualenv and installs packages)
 }
 \description{
-Internal helper to create and configure Python virtualenv with dependencies.
+Internal helper to create and configure Python virtualenv with
+dependencies.
 }
 \keyword{internal}

@@ -9,10 +9,12 @@
 #' @param df [data.frame] Data frame containing SMILES strings
 #' @param smiles_colname [character] Column name containing SMILES
 #'     (default: "structure_smiles_initial")
-#' @param cache [character] Path to cached processed SMILES file, or NULL to skip caching
+#' @param cache [character] Path to cached processed SMILES file, or NULL to
+#'     skip caching
 #'
-#' @return Data frame with processed SMILES including InChIKey, molecular formula
-#'     (with isotopes shown), exact mass (with isotope contributions), 2D SMILES,
+#' @return Data frame with processed SMILES including InChIKey, molecular
+#'     formula
+#' (with isotopes shown), exact mass (with isotope contributions), 2D SMILES,
 #'     xLogP, and connectivity layer
 #'
 #' @family chemical-classification

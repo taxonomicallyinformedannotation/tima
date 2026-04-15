@@ -7,8 +7,10 @@
 #' @include validations_utils.R
 #'
 #' @param file [character] Character path to file
-#' @param file_type [character] Character description of file type for error messages
-#' @param required_cols [character] Character vector of required column names (optional)
+#' @param file_type [character] Character description of file type for error
+#'     messages
+#' @param required_cols [character] Character vector of required column names
+#'     (optional)
 #' @param ... Additional arguments passed to tidytable::fread
 #'
 #' @return Data frame/tidytable

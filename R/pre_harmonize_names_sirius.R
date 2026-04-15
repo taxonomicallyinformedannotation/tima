@@ -5,7 +5,8 @@
 #'     additional information after a slash (e.g., "columnName/suffix"), and
 #'     this function removes everything from the slash onwards.
 #'
-#' @param x [character] Character string containing a SIRIUS column name to pre-harmonize
+#' @param x [character] Character string containing a SIRIUS column name to
+#'     pre-harmonize
 #'
 #' @return Character string with everything from and including the first
 #'     forward slash (/) removed, leaving only the base column name

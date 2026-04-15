@@ -1,9 +1,11 @@
 #' Validate Inputs for prepare_annotations_sirius
 #'
-#' @description Internal helper to validate inputs for prepare_annotations_sirius.
+#' @description Internal helper to validate inputs for
+#'     prepare_annotations_sirius.
 #'     Checks version, output paths, and structure file existence.
 #'
-#' @param sirius_version [character] Character SIRIUS version ("5", "6", or coercible to those).
+#' @param sirius_version [character] Character SIRIUS version ("5", "6", or
+#'     coercible to those).
 #' @param output_ann [character] Character output path for annotations.
 #' @param output_can [character] Character output path for CANOPUS.
 #' @param output_for [character] Character output path for formulas.
@@ -78,7 +80,8 @@ validate_sirius_inputs <- function(
 #'
 #' @param version [character] Character "5" or "6".
 #'
-#' @return Named list with keys: canopus, formulas, structures, denovo, spectral.
+#' @return Named list with keys: canopus, formulas, structures, denovo,
+#'     spectral.
 #'     Values are fixed filenames (v5) or regex patterns (v6).
 #' @keywords internal
 get_sirius_filenames <- function(version) {
@@ -108,10 +111,12 @@ get_sirius_filenames <- function(version) {
 #' @description Internal helper to load CANOPUS, formulas, structures, and
 #'     denovo tables from a SIRIUS output directory/zip.
 #'
-#' @param input_directory [character] Character path to SIRIUS output (directory or zip).
+#' @param input_directory [character] Character path to SIRIUS output (directory
+#'     or zip).
 #' @param version [character] Character "5" or "6".
 #'
-#' @return Named list with canopus, formulas, structures, denovo, spectral data frames.
+#' @return Named list with canopus, formulas, structures, denovo, spectral data
+#'     frames.
 #' @keywords internal
 load_sirius_tables <- function(input_directory, version) {
   fnames <- get_sirius_filenames(version)
@@ -190,7 +195,8 @@ load_sirius_tables <- function(input_directory, version) {
 
 #' Load SIRIUS Structure Summaries
 #'
-#' @description Internal helper to load per-feature structure candidate summaries.
+#' @description Internal helper to load per-feature structure candidate
+#'     summaries.
 #'
 #' @param input_directory [character] Character path to SIRIUS output.
 #'
@@ -440,7 +446,8 @@ merge_sirius_structures_with_spectral <- function(
       is.na(feature_id) | is.na(candidate_structure_smiles_no_stereo)
     )
 
-  # Full join keeps overlap rows merged and preserves non-overlap rows as candidates.
+  # Full join keeps overlap rows merged and preserves non-overlap rows as
+  # candidates.
   merged_keyed <- tidytable::full_join(
     structures_keyed,
     spectral_keyed,
@@ -692,14 +699,16 @@ join_sirius_annotation_tables <- function(
 #' This function:
 #' \itemize{
 #'   \item Validates inputs (version, paths, file existence).
-#'   \item Loads SIRIUS output files (CANOPUS, formulas, structures, denovo, spectral matches).
+#' \item Loads SIRIUS output files (CANOPUS, formulas, structures, denovo,
+#'     spectral matches).
 #'   \item Harmonizes column names across SIRIUS v5 and v6.
 #'   \item Joins with structure metadata (stereochemistry, names, taxonomy).
-#'   \item Splits results into three output files: annotations, CANOPUS, formulas.
+#' \item Splits results into three output files: annotations, CANOPUS, formulas.
 #'   \item Exports parameters and results.
 #' }
 #'
-#' If the input directory does not exist, returns an empty template with expected
+#' If the input directory does not exist, returns an empty template with
+#'     expected
 #' columns to ensure downstream compatibility.
 #'
 #' @include columns_utils.R
@@ -711,13 +720,16 @@ join_sirius_annotation_tables <- function(
 #' @include select_annotations_columns.R
 #' @include select_sirius_columns.R
 #'
-#' @param input_directory [character] Character path to directory or zip file containing
+#' @param input_directory [character] Character path to directory or zip file
+#'     containing
 #'     SIRIUS results.
-#' @param output_ann [character] Character path for prepared structure annotation output.
+#' @param output_ann [character] Character path for prepared structure
+#'     annotation output.
 #' @param output_can [character] Character path for prepared CANOPUS output.
 #' @param output_for [character] Character path for prepared formula output.
 #' @param sirius_version [character] Character SIRIUS version ("5" or "6").
-#' @param str_stereo [character] Character path to structure stereochemistry file.
+#' @param str_stereo [character] Character path to structure stereochemistry
+#'     file.
 #' @param str_met [character] Character path to structure metadata file.
 #' @param str_tax_cla [character] Character path to ClassyFire taxonomy file.
 #' @param str_tax_npc [character] Character path to NPClassifier taxonomy file.

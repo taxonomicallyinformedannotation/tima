@@ -8,21 +8,33 @@
 #' @include validations_utils.R
 #'
 #' @param df Data frame containing annotation results with score columns
-#' @param score_bio_min Numeric minimum biological score threshold (default: 0.85). Range: 0-1
-#' @param score_ini_min Numeric minimum initial score threshold (default: 0.95). Range: 0-1
-#' @param score_final_min Numeric minimum final (chemical) score threshold (default: 0.75). Range: 0-1
-#' @param error_rt_max Numeric maximum retention time error in minutes (default: 0.05). Must be > 0
-#' @param confidence_sirius_min Numeric minimum SIRIUS confidence score threshold (optional).
-#'     Range: 0-1. If provided, candidates WITH a confidence score below this threshold
+#' @param score_bio_min Numeric minimum biological score threshold (default:
+#'     0.85). Range: 0-1
+#' @param score_ini_min Numeric minimum initial score threshold (default: 0.95).
+#'     Range: 0-1
+#' @param score_final_min Numeric minimum final (chemical) score threshold
+#'     (default: 0.75). Range: 0-1
+#' @param error_rt_max Numeric maximum retention time error in minutes (default:
+#'     0.05). Must be > 0
+#' @param confidence_sirius_min Numeric minimum SIRIUS confidence score
+#'     threshold (optional).
+#' Range: 0-1. If provided, candidates WITH a confidence score below this
+#'     threshold
 #'     are filtered out, but candidates with NA/missing scores are retained.
-#' @param similarity_spectral_min Numeric minimum spectral similarity threshold (optional).
-#'     Range: 0-1. If provided, candidates WITH a similarity score below this threshold
+#' @param similarity_spectral_min Numeric minimum spectral similarity threshold
+#'     (optional).
+#' Range: 0-1. If provided, candidates WITH a similarity score below this
+#'     threshold
 #'     are filtered out, but candidates with NA/missing scores are retained.
-#' @param matched_peaks_min Numeric minimum count of matched peaks threshold (optional).
-#'     Must be >= 0 (typically a small integer). If provided, candidates WITH a matched
-#'     peak count below this threshold are filtered out, but candidates with NA/missing
+#' @param matched_peaks_min Numeric minimum count of matched peaks threshold
+#'     (optional).
+#' Must be >= 0 (typically a small integer). If provided, candidates WITH a
+#'     matched
+#' peak count below this threshold are filtered out, but candidates with
+#'     NA/missing
 #'     peak counts are retained.
-#' @param context Optional character string to tag logs with a stage label (e.g.,
+#' @param context Optional character string to tag logs with a stage label
+#'     (e.g.,
 #'     "mini+filtered" or "full"). Defaults to NULL (no tag).
 #'
 #' @return Data frame containing only high-confidence annotations that meet
@@ -33,7 +45,8 @@
 #' - score_biological
 #' - candidate_score_pseudo_initial
 #' - score_weighted_chemo
-#' - candidate_structure_error_rt (assumed in minutes; NA means unknown and is allowed)
+#' - candidate_structure_error_rt (assumed in minutes; NA means unknown and is
+#'     allowed)
 #' - candidate_score_sirius_confidence (optional, NA values allowed)
 #' - candidate_similarity (optional, NA values allowed, 0 always filtered)
 #' - candidate_matched_peaks (optional, NA values allowed)
@@ -45,14 +58,17 @@
 #' **NA value handling:**
 #' - RT error: NA values (unknown RT) are allowed to pass
 #' - SIRIUS confidence: NA values (no SIRIUS annotation) are allowed to pass
-#' - Spectral similarity: NA values (no spectral match) are allowed to pass, but 0 is ALWAYS filtered
+#' - Spectral similarity: NA values (no spectral match) are allowed to pass, but
+#'     0 is ALWAYS filtered
 #' - Matched peaks: NA values (no peak matching data) are allowed to pass
 #'
 #' **SIRIUS and Spectral filtering (OR logic):**
 #' When both `confidence_sirius_min` and `similarity_spectral_min` are set,
 #' candidates pass if EITHER the SIRIUS confidence OR spectral similarity meets
-#' its threshold. This allows candidates with good SIRIUS but poor spectral match
-#' (or vice versa) to pass. Spectral similarity = 0 is always filtered out as invalid.
+#' its threshold. This allows candidates with good SIRIUS but poor spectral
+#'     match
+#' (or vice versa) to pass. Spectral similarity = 0 is always filtered out as
+#'     invalid.
 #'
 #' This means thresholds only apply when the corresponding value is present.
 #'
@@ -168,7 +184,8 @@ filter_high_confidence_only <- function(
   # Prepare safe columns ----
   # IMPORTANT: We do NOT use coalesce() to convert missing values to -Inf
   # because score=NA (MS1-only hits) is a legitimate value, not missing.
-  # Instead, we create columns with actual values or NA, and handle NA in filtering.
+  # Instead, we create columns with actual values or NA, and handle NA in
+  # filtering.
   # Explicitly convert to numeric to prevent character comparison issues.
 
   rt_err_vec <- if ("candidate_structure_error_rt" %in% names(df)) {
@@ -190,7 +207,8 @@ filter_high_confidence_only <- function(
   # Core filtering ----
 
   # At least one of the three score thresholds must be satisfied
-  # NA values for initial score indicate MS1-only hits (no MS2 spectrum) and don't block other scores
+  # NA values for initial score indicate MS1-only hits (no MS2 spectrum) and
+  # don't block other scores
   # Score = 0 is invalid/missing data and is filtered out
   df_filtered <- df_work |>
     tidytable::filter(
@@ -213,7 +231,8 @@ filter_high_confidence_only <- function(
   }
 
   # SIRIUS confidence and spectral similarity filtering
-  # ALWAYS filter out spectral similarity = 0 (invalid MS2 data) if column exists
+  # ALWAYS filter out spectral similarity = 0 (invalid MS2 data) if column
+  # exists
   if ("candidate_similarity" %in% names(df_filtered)) {
     df_filtered <- df_filtered |>
       tidytable::filter(
@@ -237,7 +256,8 @@ filter_high_confidence_only <- function(
         (!is.na(.data[["candidate_score_sirius_confidence"]]) &
           as.numeric(.data[["candidate_score_sirius_confidence"]]) >=
             confidence_sirius_min) |
-          # OR spectral is valid (not NA, already filtered >0) AND meets threshold
+          # OR spectral is valid (not NA, already filtered >0) AND meets
+          # threshold
           (!is.na(.data[["candidate_score_pseudo_initial"]]) &
             as.numeric(.data[["candidate_score_pseudo_initial"]]) >=
               similarity_spectral_min) |

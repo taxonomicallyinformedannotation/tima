@@ -8,8 +8,10 @@
 #' @include validations_utils.R
 #'
 #' @param host [character] Host/IP address to listen on.
-#'     Default: "127.0.0.1" (localhost). Use "0.0.0.0" to allow external connections.
-#' @param port [integer] Port number to listen on. Default: 3838. Valid range: 1-65535.
+#' Default: "127.0.0.1" (localhost). Use "0.0.0.0" to allow external
+#'     connections.
+#' @param port [integer] Port number to listen on. Default: 3838. Valid range:
+#'     1-65535.
 #' @param browser [logical] Whether to automatically launch a web browser when
 #'     starting the app. Default: TRUE. Automatically set to FALSE in Docker.
 #'
@@ -94,6 +96,7 @@ build_shiny_app_dir <- function(app_path) {
 }
 
 run_shiny_app <- function(appDir, port, host, launch.browser) {
+  # nolint: object_name_linter. Shiny API names.
   shiny::runApp(
     appDir = appDir,
     port = port,

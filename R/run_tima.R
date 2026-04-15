@@ -52,7 +52,8 @@ archive_log_file <- function(log_file, timestamp) {
 #'
 #' @description Internal helper to run the targets workflow with error handling.
 #'
-#' @param target_pattern [character] Character regex pattern to match target names
+#' @param target_pattern [character] Character regex pattern to match target
+#'     names
 #'
 #' @return Invisible NULL
 #' @keywords internal
@@ -87,9 +88,11 @@ execute_targets_pipeline <- function(target_pattern = "^ann_wei$") {
 
 #' @title Run Complete TIMA Workflow
 #'
-#' @description Executes the full Taxonomically Informed Metabolite Annotation (TIMA)
-#'     workflow from start to finish. This includes data preparation, library loading,
-#'     annotation, weighting, and output generation. The function runs the targets
+#' @description Executes the full Taxonomically Informed Metabolite Annotation
+#'     (TIMA)
+#' workflow from start to finish. This includes data preparation, library
+#'     loading,
+#' annotation, weighting, and output generation. The function runs the targets
 #'     pipeline and archives logs with timestamps for reproducibility.
 #'
 #' @details
@@ -111,7 +114,8 @@ execute_targets_pipeline <- function(target_pattern = "^ann_wei$") {
 #'     Default: TRUE
 #' @param log_level [character] or [numeric] Logging verbosity level.
 #'     Can be one of: "trace", "debug", "info", "warn", "error", "fatal"
-#'     or numeric values: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200, FATAL=100.
+#' or numeric values: TRACE=600, DEBUG=500, INFO=400, WARN=300, ERROR=200,
+#'     FATAL=100.
 #'     Default: "info" (400). Use "debug" for detailed troubleshooting.
 #'
 #' @return Invisible NULL. Executes workflow as side effect and creates
@@ -292,8 +296,9 @@ run_tima <- function(
 
 #' @title Run Complete TIMA Workflow (DEPRECATED)
 #'
-#' @description **DEPRECATED:** This function has been renamed to \code{\link{run_tima}}.
-#'     Please use \code{run_tima()} instead. \code{tima_full()} will be removed in a
+#' @description **DEPRECATED:** This function has been renamed to
+#'     \code{\link{run_tima}}.
+#' Please use \code{run_tima()} instead. \code{tima_full()} will be removed in a
 #'     future version.
 #'
 #' @details

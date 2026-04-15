@@ -12,10 +12,12 @@ process_smiles(df, smiles_colname = "structure_smiles_initial", cache = NULL)
 \item{smiles_colname}{\link{character} Column name containing SMILES
 (default: "structure_smiles_initial")}
 
-\item{cache}{\link{character} Path to cached processed SMILES file, or NULL to skip caching}
+\item{cache}{\link{character} Path to cached processed SMILES file, or NULL to
+skip caching}
 }
 \value{
-Data frame with processed SMILES including InChIKey, molecular formula
+Data frame with processed SMILES including InChIKey, molecular
+formula
 (with isotopes shown), exact mass (with isotope contributions), 2D SMILES,
 xLogP, and connectivity layer
 }

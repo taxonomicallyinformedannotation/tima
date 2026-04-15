@@ -9,7 +9,8 @@
 #' @include get_spectra_ids.R
 #' @include import_spectra.R
 #'
-#' @param input [character] Path or list of paths to query MGF file(s) containing spectra
+#' @param input [character] Path or list of paths to query MGF file(s)
+#'     containing spectra
 #' @param output [character] Path for output edges file
 #' @param name_source [character] Name of source feature column
 #' @param name_target [character] Name of target feature column
@@ -18,7 +19,8 @@
 #' @param matched_peaks [integer] Minimum number of matched peaks required
 #' @param ppm [numeric] Relative mass tolerance in ppm
 #' @param dalton [numeric] Absolute mass tolerance in Daltons
-#' @param cutoff [numeric] Intensity cutoff below which MS2 fragments are removed.
+#' @param cutoff [numeric] Intensity cutoff below which MS2 fragments are
+#'     removed.
 #'     Non-negative numeric or NULL for dynamic thresholding.
 #' @param qutoff `r lifecycle::badge("deprecated")` Use `cutoff` instead.
 #'
@@ -292,7 +294,8 @@ create_edges_spectra <- function(
       )
     )
 
-  # Drop placeholder NA row(s) from create_edges; threshold already applied upstream
+  # Drop placeholder NA row(s) from create_edges; threshold already applied
+  # upstream
   edges <- edges |>
     tidytable::filter(!is.na(!!as.name(name_source)))
 

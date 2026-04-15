@@ -121,7 +121,7 @@ sanitize_spectra <- function(
     Spectra::filterPrecursorPeaks(
       tolerance = dalton,
       ppm = ppm,
-      mz = c(">=")
+      mz = ">="
     ) |>
     Spectra::combinePeaks(tolerance = dalton, ppm = ppm)
 

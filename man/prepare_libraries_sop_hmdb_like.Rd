@@ -27,7 +27,8 @@ prepare_libraries_sop_hmdb_like(
 
 \item{organism_name}{\link{character} Character organism name attached to all rows}
 
-\item{organism_taxonomy}{\link{list} Named list containing organism taxonomy fields}
+\item{organism_taxonomy}{\link{list} Named list containing organism taxonomy
+fields}
 
 \item{tag}{\link{character} Character scalar tag propagated through SOP pipeline}
 }

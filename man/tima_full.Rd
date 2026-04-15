@@ -27,7 +27,8 @@ Default: "info"}
 Invisible NULL (same as \code{\link{run_tima}})
 }
 \description{
-\strong{DEPRECATED:} This function has been renamed to \code{\link{run_tima}}.
+\strong{DEPRECATED:} This function has been renamed to
+\code{\link{run_tima}}.
 Please use \code{run_tima()} instead. \code{tima_full()} will be removed in a
 future version.
 }

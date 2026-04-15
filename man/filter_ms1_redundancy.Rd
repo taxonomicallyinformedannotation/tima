@@ -13,6 +13,7 @@ filter_ms1_redundancy(annotation_tables_list)
 Data frame with filtered annotations
 }
 \description{
-Internal helper to remove MS1 annotations that have spectral matches.
+Internal helper to remove MS1 annotations that have spectral
+matches.
 }
 \keyword{internal}

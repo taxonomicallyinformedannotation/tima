@@ -23,14 +23,17 @@ or empty string to skip download.}
 
 \item{gnps_job_example}{Character string example GNPS job ID for testing}
 
-\item{filename}{Character string name of the file to download (used for fake outputs)}
+\item{filename}{Character string name of the file to download (used for fake
+outputs)}
 
-\item{workflow}{Character string indicating workflow type: "fbmn" (feature-based)
+\item{workflow}{Character string indicating workflow type: "fbmn"
+(feature-based)
 or "classical" molecular networking}
 
 \item{path_features}{Character string path for features output (file path)}
 
-\item{path_metadata}{Character string path for metadata output (file path or list)}
+\item{path_metadata}{Character string path for metadata output (file path or
+list)}
 
 \item{path_spectra}{Character string path for spectra output (file path)}
 
@@ -44,7 +47,8 @@ or "classical" molecular networking}
 A named character vector with paths to the written/available files.
 }
 \description{
-This function downloads and retrieves GNPS (Global Natural Products
+This function downloads and retrieves GNPS (Global Natural
+Products
 Social Molecular Networking) result tables from a completed job. It fetches
 features, metadata, spectra, and annotation files from GNPS servers. When a
 job ID is not provided or GNPS resources are missing, small fake files are

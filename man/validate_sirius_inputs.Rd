@@ -17,7 +17,8 @@ validate_sirius_inputs(
 )
 }
 \arguments{
-\item{sirius_version}{\link{character} Character SIRIUS version ("5", "6", or coercible to those).}
+\item{sirius_version}{\link{character} Character SIRIUS version ("5", "6", or
+coercible to those).}
 
 \item{output_ann}{\link{character} Character output path for annotations.}
 
@@ -40,7 +41,8 @@ deviation (Da) for keeping SIRIUS spectral analog hits.}
 NULL (invisible). Stops on validation failure.
 }
 \description{
-Internal helper to validate inputs for prepare_annotations_sirius.
+Internal helper to validate inputs for
+prepare_annotations_sirius.
 Checks version, output paths, and structure file existence.
 }
 \keyword{internal}

@@ -19,27 +19,37 @@ weight_chemo(
 )
 }
 \arguments{
-\item{annot_table_wei_bio_clean}{\link{data.frame} Data frame with cleaned biologically weighted annotations}
+\item{annot_table_wei_bio_clean}{\link{data.frame} Data frame with cleaned
+biologically weighted annotations}
 
-\item{weight_spectral}{\link{numeric} Weight for spectral similarity score (any positive number)}
+\item{weight_spectral}{\link{numeric} Weight for spectral similarity score (any
+positive number)}
 
-\item{weight_biological}{\link{numeric} Weight for biological source score (any positive number)}
+\item{weight_biological}{\link{numeric} Weight for biological source score (any
+positive number)}
 
-\item{weight_chemical}{\link{numeric} Weight for chemical consistency score (any positive number)}
+\item{weight_chemical}{\link{numeric} Weight for chemical consistency score (any
+positive number)}
 
-\item{score_chemical_cla_kingdom}{\link{numeric} Score for ClassyFire kingdom match (0-1)}
+\item{score_chemical_cla_kingdom}{\link{numeric} Score for ClassyFire kingdom
+match (0-1)}
 
-\item{score_chemical_cla_superclass}{\link{numeric} Score for ClassyFire superclass match (0-1)}
+\item{score_chemical_cla_superclass}{\link{numeric} Score for ClassyFire
+superclass match (0-1)}
 
-\item{score_chemical_cla_class}{\link{numeric} Score for ClassyFire class match (0-1)}
+\item{score_chemical_cla_class}{\link{numeric} Score for ClassyFire class match
+(0-1)}
 
-\item{score_chemical_cla_parent}{\link{numeric} Score for ClassyFire parent match (0-1, highest)}
+\item{score_chemical_cla_parent}{\link{numeric} Score for ClassyFire parent match
+(0-1, highest)}
 
 \item{score_chemical_npc_pathway}{\link{numeric} Score for NPC pathway match (0-1)}
 
-\item{score_chemical_npc_superclass}{\link{numeric} Score for NPC superclass match (0-1)}
+\item{score_chemical_npc_superclass}{\link{numeric} Score for NPC superclass match
+(0-1)}
 
-\item{score_chemical_npc_class}{\link{numeric} Score for NPC class match (0-1, highest)}
+\item{score_chemical_npc_class}{\link{numeric} Score for NPC class match (0-1,
+highest)}
 }
 \value{
 Data frame with chemically weighted annotations including chemical

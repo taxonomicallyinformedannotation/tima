@@ -17,17 +17,20 @@ with_retry(
 
 \item{max_attempts}{\link{integer} Integer maximum number of attempts (default: 3)}
 
-\item{backoff}{\link{numeric} Numeric base for exponential backoff in seconds (default: 2)}
+\item{backoff}{\link{numeric} Numeric base for exponential backoff in seconds
+(default: 2)}
 
 \item{operation_name}{\link{character} Character name of operation for logging}
 
-\item{silent}{\link{logical} Logical whether to suppress retry warnings (default: FALSE)}
+\item{silent}{\link{logical} Logical whether to suppress retry warnings (default:
+FALSE)}
 }
 \value{
 Result of expr if successful
 }
 \description{
-Executes an expression with automatic retry logic and exponential
+Executes an expression with automatic retry logic and
+exponential
 backoff. Useful for API calls, network operations, and external tool calls
 that may fail transiently.
 }

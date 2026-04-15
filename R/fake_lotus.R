@@ -7,7 +7,8 @@
 #'
 #' @include create_dir.R
 #'
-#' @param export Character string path where the fake LOTUS TSV file should be saved
+#' @param export Character string path where the fake LOTUS TSV file should be
+#'     saved
 #'
 #' @return Character string path to the created fake file
 #'

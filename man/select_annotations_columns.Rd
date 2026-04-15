@@ -14,7 +14,8 @@ select_annotations_columns(
 )
 }
 \arguments{
-\item{df}{\link{data.frame} Data frame containing annotation results with structure and
+\item{df}{\link{data.frame} Data frame containing annotation results with
+structure and
 candidate information}
 
 \item{str_stereo}{\link{character} Path to structure stereochemistry file}

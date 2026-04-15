@@ -13,6 +13,7 @@ validate_electron_mass(electron_mass)
 Invisible TRUE if valid, stops with error otherwise
 }
 \description{
-Validates electron mass parameter (should be close to CODATA value)
+Validates electron mass parameter (should be close to CODATA
+value)
 }
 \keyword{internal}

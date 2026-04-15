@@ -1,6 +1,7 @@
 #' @title Get Spectra IDs
 #'
-#' @description This function extracts spectrum identifiers from a Spectra object.
+#' @description This function extracts spectrum identifiers from a Spectra
+#'     object.
 #'     Since different data sources use different field names for spectrum IDs,
 #'     this function checks multiple common field names in priority order.
 #'

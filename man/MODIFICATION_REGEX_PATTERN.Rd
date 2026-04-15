@@ -17,8 +17,10 @@ Regular expression for individual adduct modifications
 Pattern breakdown:
 \describe{
 \item{\code{([+-])}}{Group 1: Addition (+) or loss (-) sign}
-\item{\code{(\\d*)}}{Group 2: Optional stoichiometric coefficient (e.g., "2" in +2H)}
-\item{\code{([A-Z][a-z]?\\d*(?:[A-Z][a-z]?\\d*)*)}}{Group 3: Element formula (e.g., "H", "H2O", "NaCl")}
+\item{\code{(\\d*)}}{Group 2: Optional stoichiometric coefficient (e.g., "2"
+in +2H)}
+\item{\code{([A-Z][a-z]?\\d*(?:[A-Z][a-z]?\\d*)*)}}{Group 3: Element formula
+(e.g., "H", "H2O", "NaCl")}
 }
 }
 \examples{

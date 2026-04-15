@@ -14,13 +14,15 @@ filter_annotations(
 )
 }
 \arguments{
-\item{annotations}{Character vector or list of paths to prepared annotation files}
+\item{annotations}{Character vector or list of paths to prepared annotation
+files}
 
 \item{features}{Character string path to prepared features file.
 Must contain a \code{feature_id} column. The \code{rt} column is optional;
 if absent, RT filtering is skipped even when an RT library is provided.}
 
-\item{rts}{Character string path to prepared retention time library (optional)}
+\item{rts}{Character string path to prepared retention time library
+(optional)}
 
 \item{output}{Character string path for filtered annotations output}
 
@@ -41,11 +43,14 @@ go_to_cache()
 github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 dir <- paste0(github, repo)
-ann <- get_params(step = "filter_annotations")$files$annotations$prepared$structural[[2L]] |>
+ann <- get_params(step =
+    "filter_annotations")$files$annotations$prepared$structural[[2L]] |>
   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
-features <- get_params(step = "filter_annotations")$files$features$prepared |>
+features <- get_params(step = "filter_annotations")$files$features$prepared
+    |>
   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
-rts <- get_params(step = "filter_annotations")$files$libraries$temporal$prepared |>
+rts <- get_params(step =
+    "filter_annotations")$files$libraries$temporal$prepared |>
   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
 get_file(url = paste0(dir, annotations), export = annotations)
 get_file(url = paste0(dir, features), export = features)

@@ -19,7 +19,8 @@ If NULL (default), applies to all columns.}
 Data frame with unique values collapsed per group
 }
 \description{
-Collapses grouped dataframe by combining unique values per group.
+Collapses grouped dataframe by combining unique values per
+group.
 Removes NA values, trims whitespace, and converts empty strings to NA.
 Useful for aggregating annotations or metadata.
 Internal helper for cleaning and aggregation functions.

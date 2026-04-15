@@ -42,7 +42,8 @@ NULL
 
 #' Format error message
 #'
-#' @description Creates user-friendly error messages with context and suggestions.
+#' @description Creates user-friendly error messages with context and
+#'     suggestions.
 #'     This is the core error formatting function used throughout TIMA.
 #'
 #' @param problem Main problem statement (required)

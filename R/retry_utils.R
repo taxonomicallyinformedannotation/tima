@@ -1,7 +1,8 @@
 #' Retry Pattern with Exponential Backoff
 #'
-#' @description Executes an expression with automatic retry logic and exponential
-#'     backoff. Useful for API calls, network operations, and external tool calls
+#' @description Executes an expression with automatic retry logic and
+#'     exponential
+#' backoff. Useful for API calls, network operations, and external tool calls
 #'     that may fail transiently.
 #'
 #' @include errors_utils.R
@@ -9,9 +10,11 @@
 #'
 #' @param expr [expression] Expression to evaluate
 #' @param max_attempts [integer] Integer maximum number of attempts (default: 3)
-#' @param backoff [numeric] Numeric base for exponential backoff in seconds (default: 2)
+#' @param backoff [numeric] Numeric base for exponential backoff in seconds
+#'     (default: 2)
 #' @param operation_name [character] Character name of operation for logging
-#' @param silent [logical] Logical whether to suppress retry warnings (default: FALSE)
+#' @param silent [logical] Logical whether to suppress retry warnings (default:
+#'     FALSE)
 #'
 #' @return Result of expr if successful
 #'

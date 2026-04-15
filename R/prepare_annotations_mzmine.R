@@ -8,12 +8,17 @@
 #' @include get_params.R
 #' @include select_annotations_columns.R
 #'
-#' @param input [character] Character string or vector of paths to mzmine annotation files
-#' @param output [character] Character string path for prepared mzmine annotations output
-#' @param str_stereo [character] Character string path to structures stereochemistry file
+#' @param input [character] Character string or vector of paths to mzmine
+#'     annotation files
+#' @param output [character] Character string path for prepared mzmine
+#'     annotations output
+#' @param str_stereo [character] Character string path to structures
+#'     stereochemistry file
 #' @param str_met [character] Character string path to structures metadata file
-#' @param str_tax_cla [character] Character string path to ClassyFire taxonomy file
-#' @param str_tax_npc [character] Character string path to NPClassifier taxonomy file
+#' @param str_tax_cla [character] Character string path to ClassyFire taxonomy
+#'     file
+#' @param str_tax_npc [character] Character string path to NPClassifier taxonomy
+#'     file
 #'
 #' @return Character string path to prepared mzmine annotations
 #'

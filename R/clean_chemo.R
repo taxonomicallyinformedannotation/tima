@@ -22,7 +22,8 @@
 
 #' Validate Inputs for clean_chemo
 #'
-#' @description Internal helper to validate all input parameters for clean_chemo.
+#' @description Internal helper to validate all input parameters for
+#'     clean_chemo.
 #'     Checks data types, ranges, and logical consistency.
 #'
 #' @param annot_table_wei_chemo Data frame with annotations
@@ -510,8 +511,9 @@ compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
 
 #' Sample Candidates Per Group with RT Error Priority
 #'
-#' @description Internal helper to sample candidates per (feature_id, rank_final)
-#'     group, prioritizing those with non-NA candidate_structure_error_rt values.
+#' @description Internal helper to sample candidates per (feature_id,
+#'     rank_final)
+#' group, prioritizing those with non-NA candidate_structure_error_rt values.
 #'
 #' @param df Data frame with ranked candidates
 #' @param max_per_score Integer, maximum candidates to keep per group
@@ -1017,45 +1019,65 @@ build_mini_results_table <- function(
 
 #' @title Clean Chemical Annotations
 #'
-#' @description Cleans and filters chemically weighted annotation results through
-#'     a multi-tier pipeline. Applies MS1 score thresholds, percentile filtering,
-#'     ranking, and optional high-confidence filtering. Returns three-tier output:
-#'     full (comprehensive), filtered (top candidates), and mini (one row per feature).
+#' @description Cleans and filters chemically weighted annotation results
+#'     through
+#' a multi-tier pipeline. Applies MS1 score thresholds, percentile filtering,
+#' ranking, and optional high-confidence filtering. Returns three-tier output:
+#' full (comprehensive), filtered (top candidates), and mini (one row per
+#'     feature).
 #'
 #' @include add_xrefs_to_annotations.R
 #' @include filter_high_confidence_only.R
 #' @include summarize_results.R
 #'
 #' @param annot_table_wei_chemo Data frame with chemically weighted annotations.
-#'     Required columns: feature_id, candidate_structure_inchikey_connectivity_layer,
-#'     score_weighted_chemo, score_biological, score_chemical, candidate_score_pseudo_initial
-#' @param components_table Data frame with molecular network component assignments.
+#' Required columns: feature_id,
+#'     candidate_structure_inchikey_connectivity_layer,
+#' score_weighted_chemo, score_biological, score_chemical,
+#'     candidate_score_pseudo_initial
+#' @param components_table Data frame with molecular network component
+#'     assignments.
 #'     Required columns: feature_id, component_id
 #' @param features_table Data frame with feature metadata (RT, m/z, etc.).
 #'     Required columns: feature_id
-#' @param structure_organism_pairs_table Data frame linking structures to organisms.
+#' @param structure_organism_pairs_table Data frame linking structures to
+#'     organisms.
 #'     Required columns: structure_inchikey_connectivity_layer
-#' @param candidates_final Integer, number of top candidates to retain per feature (>= 1)
-#' @param best_percentile Numeric (0-1), percentile threshold for score filtering.
-#'     Candidates with scores >= percentile * max_score are kept. Default: 0.9 (90th percentile)
-#' @param minimal_ms1_bio Numeric (0-1), minimum biological score for MS1-only annotations
-#' @param minimal_ms1_chemo Numeric (0-1), minimum chemical score for MS1-only annotations
-#' @param minimal_ms1_condition Character, logical operator for MS1 filtering: "OR" or "AND".
+#' @param candidates_final Integer, number of top candidates to retain per
+#'     feature (>= 1)
+#' @param best_percentile Numeric (0-1), percentile threshold for score
+#'     filtering.
+#' Candidates with scores >= percentile * max_score are kept. Default: 0.9 (90th
+#'     percentile)
+#' @param minimal_ms1_bio Numeric (0-1), minimum biological score for MS1-only
+#'     annotations
+#' @param minimal_ms1_chemo Numeric (0-1), minimum chemical score for MS1-only
+#'     annotations
+#' @param minimal_ms1_condition Character, logical operator for MS1 filtering:
+#'     "OR" or "AND".
 #'     "OR" = keep if bio >= threshold OR chem >= threshold.
 #'     "AND" = keep if bio >= threshold AND chem >= threshold
-#' @param compounds_names Logical, include compound names in output (may increase size)
+#' @param compounds_names Logical, include compound names in output (may
+#'     increase size)
 #' @param high_confidence Logical, apply strict high-confidence filters
 #' @param remove_ties Logical, remove tied scores (keep only highest-ranked)
 #' @param summarize Logical, collapse results to one row per feature
 #' @param max_per_score Integer, max candidates to keep per feature per score.
 #'   If more exist, they are randomly sampled and a note is added. Default 7.
-#' @param score_chemical_cla_kingdom Numeric (0-1), score for ClassyFire kingdom level
-#' @param score_chemical_cla_superclass Numeric (0-1), score for ClassyFire superclass level
-#' @param score_chemical_cla_class Numeric (0-1), score for ClassyFire class level
-#' @param score_chemical_cla_parent Numeric (0-1), score for ClassyFire direct parent level
-#' @param score_chemical_npc_pathway Numeric (0-1), score for NPClassifier pathway level
-#' @param score_chemical_npc_superclass Numeric (0-1), score for NPClassifier superclass level
-#' @param score_chemical_npc_class Numeric (0-1), score for NPClassifier class level
+#' @param score_chemical_cla_kingdom Numeric (0-1), score for ClassyFire kingdom
+#'     level
+#' @param score_chemical_cla_superclass Numeric (0-1), score for ClassyFire
+#'     superclass level
+#' @param score_chemical_cla_class Numeric (0-1), score for ClassyFire class
+#'     level
+#' @param score_chemical_cla_parent Numeric (0-1), score for ClassyFire direct
+#'     parent level
+#' @param score_chemical_npc_pathway Numeric (0-1), score for NPClassifier
+#'     pathway level
+#' @param score_chemical_npc_superclass Numeric (0-1), score for NPClassifier
+#'     superclass level
+#' @param score_chemical_npc_class Numeric (0-1), score for NPClassifier class
+#'     level
 #' @param xrefs_table Optional data frame with columns inchikey/prefix/id from
 #'   get_compounds_xrefs(), used to add candidate_structure_id_* columns before
 #'   summarization.
@@ -1067,7 +1089,8 @@ build_mini_results_table <- function(
 #'     \item{mini}{One row per feature with best compound/taxonomy}
 #'   }
 #'
-#' @seealso \code{\link{weight_chemo}}, \code{\link{filter_high_confidence_only}},
+#' @seealso \code{\link{weight_chemo}},
+#'     \code{\link{filter_high_confidence_only}},
 #'     \code{\link{summarize_results}}
 #'
 #' @examples

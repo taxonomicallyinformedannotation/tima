@@ -11,7 +11,7 @@
 ##' @noRd
 .extract_mgf_spectrum <- function(mgf) {
   ## grep description
-  desc.idx <- grep("=", mgf, fixed = TRUE)
+  desc.idx <- grep("=", mgf, fixed = TRUE) # nolint: object_name_linter.
   desc <- mgf[desc.idx]
 
   spec <- strsplit(mgf[-desc.idx], "[[:space:]]+", perl = TRUE)
@@ -77,9 +77,12 @@
 #'     and avoid loading the entire file into memory at once. It extracts all
 #'     MGF fields and maps them to standard spectra variable names.
 #'
-#' @param f [character] Character string specifying the path to a single MGF file
-#' @param msLevel [integer] Integer MS level to assign to spectra (default: 2L for MS2)
-#' @param mapping [character] Named character vector mapping MGF field names to standard
+#' @param f [character] Character string specifying the path to a single MGF
+#'     file
+#' @param msLevel [integer] Integer MS level to assign to spectra (default: 2L
+#'     for MS2)
+#' @param mapping [character] Named character vector mapping MGF field names to
+#'     standard
 #'     spectra variable names. Default uses the mapping from MsBackendMgf.
 #'
 #' @return A DataFrame containing the parsed spectra data with standardized
@@ -103,7 +106,7 @@
 #' }
 read_mgf_opti <- function(
   f,
-  msLevel = 2L,
+  msLevel = 2L, # nolint: object_name_linter. Bioconductor convention.
   mapping = Spectra::spectraVariableMapping(
     object = MsBackendMgf::MsBackendMgf()
   )

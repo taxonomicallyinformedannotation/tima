@@ -9,12 +9,17 @@
 #' @include predicates_utils.R
 #' @include select_annotations_columns.R
 #'
-#' @param input [character] Character string path to spectral matching results file
-#' @param output [character] Character string path for prepared spectral annotations output
-#' @param str_stereo [character] Character string path to structures stereochemistry file
+#' @param input [character] Character string path to spectral matching results
+#'     file
+#' @param output [character] Character string path for prepared spectral
+#'     annotations output
+#' @param str_stereo [character] Character string path to structures
+#'     stereochemistry file
 #' @param str_met [character] Character string path to structures metadata file
-#' @param str_tax_cla [character] Character string path to ClassyFire taxonomy file
-#' @param str_tax_npc [character] Character string path to NPClassifier taxonomy file
+#' @param str_tax_cla [character] Character string path to ClassyFire taxonomy
+#'     file
+#' @param str_tax_npc [character] Character string path to NPClassifier taxonomy
+#'     file
 #'
 #' @return Character string path to prepared spectral annotations
 #'
@@ -30,7 +35,8 @@
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 #' data_interim <- "data/interim/"
 #' dir <- paste0(github, repo)
-#' input <- get_params(step = "prepare_annotations_spectra")$files$annotations$raw$spectral$spectral |>
+#' input <- get_params(step =
+#'     "prepare_annotations_spectra")$files$annotations$raw$spectral$spectral |>
 #'   gsub(pattern = ".tsv.gz", replacement = "_pos.tsv", fixed = TRUE)
 #' get_file(url = paste0(dir, input), export = input)
 #' dir <- paste0(dir, data_interim)
@@ -38,8 +44,10 @@
 #'   input = input,
 #'   str_stereo = paste0(dir, "libraries/sop/merged/structures/stereo.tsv"),
 #'   str_met = paste0(dir, "libraries/sop/merged/structures/metadata.tsv"),
-#'   str_tax_cla = paste0(dir, "libraries/sop/merged/structures/taxonomies/classyfire.tsv"),
-#'   str_tax_npc = paste0(dir, "libraries/sop/merged/structures/taxonomies/npc.tsv")
+#' str_tax_cla = paste0(dir,
+#'     "libraries/sop/merged/structures/taxonomies/classyfire.tsv"),
+#' str_tax_npc = paste0(dir,
+#'     "libraries/sop/merged/structures/taxonomies/npc.tsv")
 #' )
 #' unlink("data", recursive = TRUE)
 #' }

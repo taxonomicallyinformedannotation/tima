@@ -17,6 +17,7 @@ validate_adduct_list(adducts_list, ms_mode, list_name = "adducts_list")
 Invisible TRUE if valid, stops with error otherwise
 }
 \description{
-Ensures adduct list contains required mode and is properly formatted
+Ensures adduct list contains required mode and is properly
+formatted
 }
 \keyword{internal}

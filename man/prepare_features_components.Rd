@@ -12,10 +12,12 @@ prepare_features_components(
 )
 }
 \arguments{
-\item{input}{\link{character} Character vector of paths to input component files. Can be
+\item{input}{\link{character} Character vector of paths to input component files.
+Can be
 a single file or multiple files that will be combined.}
 
-\item{output}{\link{character} Character string path where prepared components should be saved}
+\item{output}{\link{character} Character string path where prepared components
+should be saved}
 }
 \value{
 Character string path to the prepared features' components file
@@ -33,7 +35,8 @@ go_to_cache()
 github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 dir <- paste0(github, repo)
-input <- get_params(step = "prepare_features_components")$files$networks$spectral$components$raw
+input <- get_params(step =
+    "prepare_features_components")$files$networks$spectral$components$raw
 get_file(url = paste0(dir, input), export = input)
 prepare_features_components(input = input)
 unlink("data", recursive = TRUE)

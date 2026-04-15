@@ -1,7 +1,7 @@
 #' @title Prepare libraries of retention times
 #'
 #' @description This function prepares retention time libraries by combining
-#'     experimental and in silico predicted retention times from multiple sources
+#' experimental and in silico predicted retention times from multiple sources
 #'     (MGF files, CSV files). It standardizes retention time units, validates
 #'     structures, and creates both RT libraries and pseudo structure-organism
 #'     pairs for RT-based annotation.
@@ -11,19 +11,29 @@
 #' @include process_smiles.R
 #' @include safe_fread.R
 #'
-#' @param mgf_exp [character] Character vector of paths to MGF files with experimental RT
-#' @param mgf_is [character] Character vector of paths to MGF files with in silico predicted RT
-#' @param temp_exp [character] Character vector of paths to CSV files with experimental RT
-#' @param temp_is [character] Character vector of paths to CSV files with in silico predicted RT
-#' @param output_rt [character] Character string path for prepared RT library output
+#' @param mgf_exp [character] Character vector of paths to MGF files with
+#'     experimental RT
+#' @param mgf_is [character] Character vector of paths to MGF files with in
+#'     silico predicted RT
+#' @param temp_exp [character] Character vector of paths to CSV files with
+#'     experimental RT
+#' @param temp_is [character] Character vector of paths to CSV files with in
+#'     silico predicted RT
+#' @param output_rt [character] Character string path for prepared RT library
+#'     output
 #' @param output_sop [character] Character string path for pseudo SOP output
 #' @param col_ik [character] Character string name of InChIKey column in MGF
-#' @param col_na [character] Character string name of chompound name column in MGF
-#' @param col_rt [character] Character string name of retention time column in MGF
+#' @param col_na [character] Character string name of chompound name column in
+#'     MGF
+#' @param col_rt [character] Character string name of retention time column in
+#'     MGF
 #' @param col_sm [character] Character string name of SMILES column in MGF
-#' @param name_inchikey [character] Character string name of InChIKey column in CSV
-#' @param name_name [character] Character string name of compound name column in CSV
-#' @param name_rt [character] Character string name of retention time column in CSV
+#' @param name_inchikey [character] Character string name of InChIKey column in
+#'     CSV
+#' @param name_name [character] Character string name of compound name column in
+#'     CSV
+#' @param name_rt [character] Character string name of retention time column in
+#'     CSV
 #' @param name_smiles [character] Character string name of SMILES column in CSV
 #' @param unit_rt [character] Character string RT unit: "seconds" or "minutes"
 #'
@@ -369,7 +379,8 @@ prepare_libraries_rt <- function(
       )
     ) |>
     # Keep only unique RT entries per structure connectivity layer and type
-    # This deduplicates stereoisomers while preserving both experimental and predicted RTs
+    # This deduplicates stereoisomers while preserving both experimental and
+    # predicted RTs
     tidytable::distinct(
       rt,
       candidate_structure_inchikey_connectivity_layer,

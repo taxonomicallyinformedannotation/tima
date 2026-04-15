@@ -32,17 +32,22 @@ prepare_libraries_sop_merged(
 )
 }
 \arguments{
-\item{files}{\link{character} Character vector or list of paths to prepared library files}
+\item{files}{\link{character} Character vector or list of paths to prepared
+library files}
 
-\item{filter}{\link{logical} Logical whether to filter the merged library by taxonomy}
+\item{filter}{\link{logical} Logical whether to filter the merged library by
+taxonomy}
 
-\item{level}{\link{character} Character string taxonomic rank for filtering (kingdom, phylum,
+\item{level}{\link{character} Character string taxonomic rank for filtering
+(kingdom, phylum,
 family, genus, etc.)}
 
-\item{value}{\link{character} Character string taxon name(s) to keep (can use | for multiple,
+\item{value}{\link{character} Character string taxon name(s) to keep (can use |
+for multiple,
 e.g., 'Gentianaceae|Apocynaceae')}
 
-\item{cache}{\link{character} Character string path to cache directory for processed SMILES}
+\item{cache}{\link{character} Character string path to cache directory for
+processed SMILES}
 
 \item{npc_cache}{\link{character} Optional path to an additional NPClassifier
 taxonomy cache file (TSV/TSV.gz). Structures present in the merged library
@@ -63,17 +68,23 @@ names (e.g., \code{inchikey}, \code{chemontid}, \code{kingdom}, \code{superclass
 
 \item{output_key}{\link{character} Character string path for output keys file}
 
-\item{output_org_tax_ott}{\link{character} Character string path for organisms taxonomy (OTT) file}
+\item{output_org_tax_ott}{\link{character} Character string path for organisms
+taxonomy (OTT) file}
 
-\item{output_str_can}{\link{character} Character string path for structures canonical SMILES file}
+\item{output_str_can}{\link{character} Character string path for structures
+canonical SMILES file}
 
-\item{output_str_stereo}{\link{character} Character string path for structures stereochemistry file}
+\item{output_str_stereo}{\link{character} Character string path for structures
+stereochemistry file}
 
-\item{output_str_met}{\link{character} Character string path for structures metadata file}
+\item{output_str_met}{\link{character} Character string path for structures
+metadata file}
 
-\item{output_str_tax_cla}{\link{character} Character string path for ClassyFire taxonomy file}
+\item{output_str_tax_cla}{\link{character} Character string path for ClassyFire
+taxonomy file}
 
-\item{output_str_tax_npc}{\link{character} Character string path for NPClassifier taxonomy file}
+\item{output_str_tax_npc}{\link{character} Character string path for NPClassifier
+taxonomy file}
 }
 \value{
 Character string path to the prepared merged SOP library
@@ -96,7 +107,8 @@ go_to_cache()
 github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 dir <- paste0(github, repo)
-files <- get_params(step = "prepare_libraries_sop_merged")$files$libraries$sop$prepared$lotus |>
+files <- get_params(step =
+    "prepare_libraries_sop_merged")$files$libraries$sop$prepared$lotus |>
   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
 get_file(url = paste0(dir, files), export = files)
 prepare_libraries_sop_merged(files = files)

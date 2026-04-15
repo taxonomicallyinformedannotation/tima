@@ -8,14 +8,21 @@
 #'
 #' @include validations_utils.R
 #'
-#' @param annot_table_wei_chemo [data.frame] Data frame with chemically weighted annotations
-#' @param score_chemical_cla_kingdom [numeric] Minimum score for Classyfire kingdom
-#' @param score_chemical_cla_superclass [numeric] Minimum score for Classyfire superclass
+#' @param annot_table_wei_chemo [data.frame] Data frame with chemically weighted
+#'     annotations
+#' @param score_chemical_cla_kingdom [numeric] Minimum score for Classyfire
+#'     kingdom
+#' @param score_chemical_cla_superclass [numeric] Minimum score for Classyfire
+#'     superclass
 #' @param score_chemical_cla_class [numeric] Minimum score for Classyfire class
-#' @param score_chemical_cla_parent [numeric] Minimum score for Classyfire parent
-#' @param score_chemical_npc_pathway [numeric] Minimum score for NPClassifier pathway
-#' @param score_chemical_npc_superclass [numeric] Minimum score for NPClassifier superclass
-#' @param score_chemical_npc_class [numeric] Minimum score for NPClassifier class
+#' @param score_chemical_cla_parent [numeric] Minimum score for Classyfire
+#'     parent
+#' @param score_chemical_npc_pathway [numeric] Minimum score for NPClassifier
+#'     pathway
+#' @param score_chemical_npc_superclass [numeric] Minimum score for NPClassifier
+#'     superclass
+#' @param score_chemical_npc_class [numeric] Minimum score for NPClassifier
+#'     class
 #'
 #' @return The input annotation table (unchanged), for pipeline compatibility
 #'
