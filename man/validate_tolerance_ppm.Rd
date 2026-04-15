@@ -7,7 +7,8 @@
 validate_tolerance_ppm(
   tolerance_ppm,
   param_name = "tolerance_ppm",
-  context = NULL
+  context = NULL,
+  max_ppm = MAX_TOLERANCE_PPM
 )
 }
 \arguments{

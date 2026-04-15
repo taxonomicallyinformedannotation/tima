@@ -4,15 +4,7 @@
 \alias{calculate_neutral_mass_formula}
 \title{Calculate neutral mass using the adduct formula}
 \usage{
-calculate_neutral_mass_formula(
-  mz,
-  n_charges,
-  charge_sign,
-  n_iso,
-  mass_modifications,
-  electron_mass,
-  n_mer
-)
+calculate_neutral_mass_formula(mz, n_charges, n_iso, mass_modifications, n_mer)
 }
 \description{
 Calculate neutral mass using the adduct formula

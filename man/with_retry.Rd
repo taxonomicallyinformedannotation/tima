@@ -45,7 +45,7 @@ result <- with_retry(
 
 # Retry file download
 with_retry(
-  download.file(url, dest),
+  download.file(url, dest, mode = "wb"),
   max_attempts = 3,
   operation_name = "file download"
 )
