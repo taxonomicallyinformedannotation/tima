@@ -55,7 +55,15 @@ class MillisecondFormatter(logging.Formatter):
     """Custom formatter to add milliseconds to timestamp."""
 
     def formatTime(self, record, datefmt=None):
-        """Override formatTime to include milliseconds."""
+        """Override formatTime to include milliseconds.
+
+Parameters
+----------
+record : Any
+    Record.
+datefmt : Any
+    None. Default is None.
+        """
         import datetime
 
         ct = datetime.datetime.fromtimestamp(record.created)
@@ -81,6 +89,18 @@ def get_logger(name: str = __name__, level: int = DEFAULT_LOG_LEVEL) -> logging.
     """Create or retrieve a configured logger.
 
     This avoids global side effects and allows dependency injection for tests.
+
+Parameters
+----------
+name : str
+    Default is __name__.
+level : int
+    DEFAULT_LOG_LEVEL. Default is DEFAULT_LOG_LEVEL.
+
+Returns
+-------
+logging.Logger
+    Return value produced by get logger.
     """
     logger = logging.getLogger(name)
     logger.setLevel(level)
@@ -178,8 +198,7 @@ def validate_processing_params(
 
 
 def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
-    """
-    Process a single molecule to extract chemical properties.
+    """Process a single molecule to extract chemical properties.
 
     **Output Format:**
     - SMILES: Canonical with isotope notation preserved (e.g., [13C], [2H])
@@ -187,20 +206,17 @@ def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
     - Formula: Isotopes shown separated (e.g., C2[13C]4H12O6, [2H]4C)
     - Exact mass: RDKit automatically uses isotope atomic masses
 
-    Args:
-        mol: RDKit Mol object
-        original_smiles: Original SMILES string (for logging/debugging)
+Parameters
+----------
+mol : Any
+    Mol.
+original_smiles : str
+    Original smiles.
 
-    Returns:
-        List of [original_smiles, smiles, inchikey, formula, exact_mass,
-                 smiles_no_stereo, xlogp] or None if processing fails
-
-    Example:
-        Input:  OC[13C@H]1OC(O)[13C@H](O)[13C@@H](O)[13C@@H]1O
-        Output: ['...', 'OC[13C@H]1...', 'INCHIKEY...', 'C2[13C]4H12O6', 184.077, '...', ...]
-
-        Input:  [2H]C([2H])([2H])[2H]
-        Output: ['...', '[2H]C([2H])([2H])[2H]', 'INCHIKEY...', '[2H]4C', 20.063, '...', ...]
+Returns
+-------
+Optional[List[Any]]
+    Return value produced by process molecule.
     """
 
     if mol is None:
@@ -235,14 +251,12 @@ def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
 
 
 def open_output_file(output_file: Path):
-    """
-    Open output file with appropriate compression if needed.
+    """Open output file with appropriate compression if needed.
 
-    Args:
-        output_file: Path to output file
-
-    Returns:
-        File handle (text mode, UTF-8 encoded)
+Parameters
+----------
+output_file : Path
+    Output file.
     """
     if str(output_file).endswith(".gz"):
         return gzip.open(output_file, "wt", newline="", encoding="utf-8")
@@ -252,11 +266,15 @@ def open_output_file(output_file: Path):
 def _process_molecule_wrapper(args: Tuple[Any, str]) -> Optional[List[Any]]:
     """Wrapper for process_molecule to work with map parallelization.
 
-    Args:
-        args: Tuple of (mol, smiles_str)
+Parameters
+----------
+args : Tuple[Any, str]
+    Args.
 
-    Returns:
-        List of processed properties or None if failed
+Returns
+-------
+Optional[List[Any]]
+    Return value produced by  process molecule wrapper.
     """
     mol, smiles = args
     return process_molecule(mol, smiles)
@@ -277,20 +295,29 @@ def process_batch(
     *,
     _logger: Optional[logging.Logger] = None,
 ) -> int:
-    """
-    Process a batch of molecules in parallel and write results.
+    """Process a batch of molecules in parallel and write results.
 
-    Args:
-        executor: ThreadPoolExecutor for parallel processing
-        batch: Iterable of RDKit Mol objects
-        original_smiles_list: Corresponding original SMILES strings
-        writer: CSV writer object
-        current_count: Current count of processed molecules
-        progress_interval: Logging interval
-        _logger: Optional logger for logging progress and warnings
+Parameters
+----------
+executor : ThreadPoolExecutor
+    Executor.
+batch : Iterable[Any]
+    Batch.
+original_smiles_list : Iterable[str]
+    Original smiles list.
+writer : csv.writer
+    Writer.
+current_count : int
+    Current count.
+progress_interval : int
+    Progress interval.
+_logger : Optional[logging.Logger]
+    None. Default is None.
 
-    Returns:
-        Number of successfully processed molecules in this batch
+Returns
+-------
+int
+    Return value produced by process batch.
     """
     log = _logger or logger
     batch_processed = 0
@@ -328,26 +355,30 @@ def process_smiles(
     *,
     _logger: Optional[logging.Logger] = None,
 ) -> int:
-    """
-    Process SMILES file to compute molecular properties.
+    """Process SMILES file to compute molecular properties.
 
     This function reads a SMILES file, processes molecules in parallel batches,
     and outputs molecular properties to a CSV file.
 
-    Args:
-        input_smi_file: Path to input SMILES file (.smi)
-        output_csv_file: Path to output CSV file (.csv or .csv.gz)
-        num_workers: Number of worker threads (None = auto-detect)
-        batch_size: Number of molecules to process per batch
-        progress_interval: Log progress every N molecules
-        _logger: Optional logger to use (defaults to module logger)
+Parameters
+----------
+input_smi_file : str
+    Input smi file.
+output_csv_file : str
+    Output csv file.
+num_workers : Optional[int]
+    DEFAULT_MAX_WORKERS. Default is DEFAULT_MAX_WORKERS.
+batch_size : int
+    DEFAULT_BATCH_SIZE. Default is DEFAULT_BATCH_SIZE.
+progress_interval : int
+    DEFAULT_PROGRESS_INTERVAL. Default is DEFAULT_PROGRESS_INTERVAL.
+_logger : Optional[logging.Logger]
+    None. Default is None.
 
-    Returns:
-        Total number of successfully processed molecules
-
-    Raises:
-        FileValidationError: If input/output files are invalid
-        SmilesProcessingError: If SMILES processing fails
+Returns
+-------
+int
+    Return value produced by process smiles.
     """
     log = _logger or logger
     log.info("Starting SMILES processing pipeline")
@@ -422,6 +453,16 @@ def main(argv: Optional[List[str]] = None) -> int:
     """CLI entry point.
 
     Returns an exit code for easier testing.
+
+Parameters
+----------
+argv : Optional[List[str]]
+    None. Default is None.
+
+Returns
+-------
+int
+    Return value produced by main.
     """
     import argparse
 
