@@ -680,6 +680,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   ppm = get_params(step = "annotate_spectra")\$ms\$tolerances\$mass\$ppm\$ms2,
   dalton = get_params(step = "annotate_spectra")\$ms\$tolerances\$mass\$dalton\$ms2,
   cutoff = get_params(step = "annotate_spectra")\$ms\$thresholds\$ms2\$intensity,
+  min_fragments = get_params(step = "annotate_spectra")\$ms\$thresholds\$ms2\$min_fragments,
   approx = get_params(step = "annotate_spectra")\$annotations\$ms2approx,
   qutoff = deprecated()
 )
@@ -758,6 +759,14 @@ numeric Absolute mass tolerance (Daltons) for MS/MS matching.
 </td>
 <td>
 numeric Intensity cutoff under which MS2 fragments are removed. Non-negative numeric or NULL for dynamic thresholding.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="min_fragments">min_fragments</code>
+</td>
+<td>
+integer Minimum number of fragment peaks a spectrum must have after cleaning to be retained (default: 2).
 </td>
 </tr>
 <tr>

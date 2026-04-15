@@ -671,6 +671,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   file,
   cutoff = NULL,
   dalton = 0.01,
+  min_fragments = 2L,
   polarity = NA,
   ppm = 10,
   sanitize = TRUE,
@@ -703,6 +704,14 @@ Numeric absolute minimal intensity threshold (default: NULL)
 </td>
 <td>
 Numeric Dalton tolerance for peak matching (default: 0.01)
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="min_fragments">min_fragments</code>
+</td>
+<td>
+Integer minimum number of fragment peaks required to keep a spectrum after sanitization (default: 2)
 </td>
 </tr>
 <tr>
