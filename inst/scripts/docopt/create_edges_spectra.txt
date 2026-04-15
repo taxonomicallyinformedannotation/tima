@@ -1,14 +1,15 @@
 You can use this script with the following example:
-  Rscript inst/scripts/create_edges_spectra.R --fil-spe-raw data/source/examples/spectra.mgf --fil-net-spe-edg-raw data/interim/features/example_edgesSpectra.tsv.gz --ms-tol-mas-dal-ms2 0.01 --ms-tol-mas-ppm-ms2 10 --ms-thr-ms2-int 5
+  Rscript inst/scripts/create_edges_spectra.R --fil-spe-raw data/source/examples/spectra.mgf --fil-net-spe-edg-raw data/interim/features/example_edgesSpectra.tsv.gz --ms-tol-mas-dal-ms2 0.01 --ms-tol-mas-ppm-ms2 10 --ms-thr-ms2-int 5 --ms-thr-ms2-min-fragments 2
 
 Usage:
-  create_edges_spectra.R [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-spe-raw=<fil-spe-raw>] [--ms-thr-ms2-int=<ms-thr-ms2-int>] [--ms-tol-mas-ppm-ms2=<ms-tol-mas-ppm-ms2>] [--ms-tol-mas-dal-ms2=<ms-tol-mas-dal-ms2>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--sim-met-edg=<sim-met-edg>] [--sim-thr-edg=<sim-thr-edg>] [--sim-thr-mat=<sim-thr-mat>]
+  create_edges_spectra.R [--fil-net-spe-edg-raw=<fil-net-spe-edg-raw>] [--fil-spe-raw=<fil-spe-raw>] [--ms-thr-ms2-int=<ms-thr-ms2-int>] [--ms-thr-ms2-min-fragments=<ms-thr-ms2-min-fragments>] [--ms-tol-mas-ppm-ms2=<ms-tol-mas-ppm-ms2>] [--ms-tol-mas-dal-ms2=<ms-tol-mas-dal-ms2>] [--ms-tol-rt-min=<ms-tol-rt-min>] [--sim-met-edg=<sim-met-edg>] [--sim-thr-edg=<sim-thr-edg>] [--sim-thr-mat=<sim-thr-mat>]
 
 Arguments:
   fil-net-spe-edg-raw        Raw edges file. STRING
   fil-spe-raw                Raw spectral file. STRING
 
   ms-thr-ms2-int             Intensity threshold for MS2. INTEGER
+  ms-thr-ms2-min-fragments   Minimum number of fragment peaks to keep a spectrum. INTEGER
   ms-tol-mas-ppm-ms2         Relative mass tolerance for MS2 in ppm. FLOAT
   ms-tol-mas-dal-ms2         Absolute mass tolerance for MS2 in Dalton. FLOAT
   ms-tol-rt-min              Retention time tolerance in minutes. FLOAT

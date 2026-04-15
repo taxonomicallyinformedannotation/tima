@@ -90,6 +90,21 @@ test_that("sanitize_spectra validates tolerance parameters", {
   )
 })
 
+test_that("sanitize_spectra validates min_fragments parameter", {
+  spectra <- create_test_spectra_object(n_spectra = 1L)
+
+  expect_error(
+    sanitize_spectra(spectra, min_fragments = 0L),
+    "min_fragments",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    sanitize_spectra(spectra, min_fragments = -1L),
+    "min_fragments",
+    class = "tima_validation_error"
+  )
+})
+
 ## Basic Functionality Tests ----
 
 test_that("sanitize_spectra returns Spectra object", {
@@ -140,8 +155,8 @@ test_that("sanitize_spectra handles empty input", {
 
 ## Peak Filtering Tests ----
 
-test_that("sanitize_spectra removes spectra with <= 2 peaks", {
-  # Create spectrum with exactly 2 peaks
+test_that("sanitize_spectra removes spectra below default min_fragments", {
+  # Create spectrum with exactly 1 peak and one with 2 peaks
   spectra_data <- data.frame(
     spectrum_id = c("SPEC1", "SPEC2"),
     msLevel = c(2L, 2L),
@@ -149,8 +164,8 @@ test_that("sanitize_spectra removes spectra with <= 2 peaks", {
   )
 
   peaks_list <- list(
-    cbind(mz = c(100, 200), intensity = c(100, 200)), # 2 peaks - should be removed
-    cbind(mz = c(100, 200, 300), intensity = c(100, 200, 300)) # 3 peaks - kept
+    cbind(mz = 100, intensity = 100), # 1 peak - below default min_fragments=2
+    cbind(mz = c(100, 200), intensity = c(100, 200)) # 2 peaks - kept
   )
 
   spectra <- Spectra::Spectra(object = spectra_data)
@@ -158,6 +173,35 @@ test_that("sanitize_spectra removes spectra with <= 2 peaks", {
   result <- sanitize_spectra(spectra, cutoff = 0)
 
   expect_equal(length(result), 1)
+})
+
+test_that("sanitize_spectra respects custom min_fragments", {
+  spectra_data <- data.frame(
+    spectrum_id = c("SPEC1", "SPEC2", "SPEC3"),
+    msLevel = c(2L, 2L, 2L),
+    precursorMz = c(600.0, 600.0, 600.0)
+  )
+
+  peaks_list <- list(
+    cbind(mz = c(100, 200), intensity = c(100, 200)), # 2 peaks
+    cbind(mz = c(100, 200, 300), intensity = c(100, 200, 300)), # 3 peaks
+    cbind(mz = c(100, 200, 300, 400), intensity = c(100, 200, 300, 400)) # 4 peaks
+  )
+
+  spectra <- Spectra::Spectra(object = spectra_data)
+  spectra@backend@peaksData <- peaks_list
+
+  # With min_fragments = 2 (default), all 3 spectra survive
+  result_2 <- sanitize_spectra(spectra, cutoff = 0, min_fragments = 2L)
+  expect_equal(length(result_2), 3)
+
+  # With min_fragments = 3, only the 3-peak and 4-peak spectra survive
+  result_3 <- sanitize_spectra(spectra, cutoff = 0, min_fragments = 3L)
+  expect_equal(length(result_3), 2)
+
+  # With min_fragments = 4, only the 4-peak spectrum survives
+  result_4 <- sanitize_spectra(spectra, cutoff = 0, min_fragments = 4L)
+  expect_equal(length(result_4), 1)
 })
 
 test_that("sanitize_spectra handles precursor peak removal", {
@@ -201,7 +245,8 @@ test_that("sanitize_spectra removes spectra with NaN values", {
 
   result <- sanitize_spectra(spectra)
 
-  # Spectrum with NaN should be removed
+  # SPEC1 loses NaN peak (200) and peak at 300 (>= precursorMz 150),
+  # leaving only 1 peak which is below the minimum threshold
   expect_equal(length(result), 1)
   expect_true(!any(is.nan(Spectra::peaksData(object = result)[[1L]])))
 })

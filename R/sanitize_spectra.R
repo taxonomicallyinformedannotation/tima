@@ -9,6 +9,9 @@
 #'     Peaks below this intensity are removed. If NULL, a dynamic threshold
 #'     based on each spectrum's intensity distribution will be used.
 #' @param dalton [numeric] Dalton tolerance for peak matching (default: 0.01)
+#' @param min_fragments [integer] Minimum number of fragment peaks a spectrum
+#'     must have after cleaning to be retained (default: 2). Spectra with
+#'     fewer peaks are discarded.
 #' @param ppm [numeric] PPM tolerance for peak matching (default: 10)
 #'
 #' @return A sanitized Spectra object with noise and artifacts removed
@@ -28,6 +31,7 @@ sanitize_spectra <- function(
   spectra,
   cutoff = NULL,
   dalton = 0.01,
+  min_fragments = 2L,
   ppm = 10
 ) {
   # TODO(M6): Replace @backend@peaksData slot access with Spectra::peaksData()
@@ -50,6 +54,14 @@ sanitize_spectra <- function(
   if (!is.numeric(dalton) || dalton <= 0 || !is.numeric(ppm) || ppm <= 0) {
     cli::cli_abort(
       "tolerance values must be positive (dalton: {.val {dalton}}, ppm: {.val {ppm}})",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+  min_fragments <- as.integer(min_fragments)
+  if (is.na(min_fragments) || min_fragments < 1L) {
+    cli::cli_abort(
+      "min_fragments must be a positive integer, got {.val {min_fragments}}",
       class = c("tima_validation_error", "tima_error"),
       call = NULL
     )
@@ -209,13 +221,20 @@ sanitize_spectra <- function(
     )
   }
 
-  spectra <- spectra[lengths(spectra@backend@peaksData) > 4L]
+  n_peaks <- vapply(
+    spectra@backend@peaksData,
+    function(x) if (is.null(x)) 0L else nrow(x),
+    integer(1L),
+    USE.NAMES = FALSE
+  )
+  spectra <- spectra[n_peaks >= min_fragments]
   n_removed_peaks <- n_before - length(spectra)
   if (n_removed_peaks > 0L) {
     pct_removed <- round(100 * n_removed_peaks / n_before, 1)
     log_debug(
-      "Removed %d spectra with <= 2 peaks (%s%%)",
+      "Removed %d spectra with < %d fragments (%s%%)",
       n_removed_peaks,
+      min_fragments,
       pct_removed
     )
   }

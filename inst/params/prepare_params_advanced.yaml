@@ -558,6 +558,8 @@ ms:
     ms2:
       #' Intensity threshold for MS2. FLOAT
       intensity: 0.0
+      #' Minimum number of fragment peaks to keep a spectrum. INTEGER
+      min_fragments: 2
 
   #' Tolerances.
   tolerances:

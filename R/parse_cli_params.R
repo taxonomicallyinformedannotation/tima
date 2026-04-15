@@ -224,6 +224,10 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("ms", "thresholds", "ms2", "intensity"),
       type = as.numeric
     ),
+    ms_thr_ms2_min_fragments = list(
+      path = c("ms", "thresholds", "ms2", "min_fragments"),
+      type = as.integer
+    ),
     ms_tol_mas_ppm_ms1 = list(
       path = c("ms", "tolerances", "mass", "ppm", "ms1"),
       type = as.numeric

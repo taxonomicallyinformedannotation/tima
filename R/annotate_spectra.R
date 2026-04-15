@@ -52,6 +52,8 @@
 #' @param cutoff [numeric] Intensity cutoff under which MS2 fragments are
 #'     removed.
 #'     Non-negative numeric or NULL for dynamic thresholding.
+#' @param min_fragments [integer] Minimum number of fragment peaks a spectrum
+#'     must have after cleaning to be retained (default: 2).
 #' @param qutoff `r lifecycle::badge("deprecated")` Use `cutoff` instead.
 #' @param approx [logical] If TRUE perform matching ignoring precursor masses
 #'     (broader, slower); if FALSE restrict library to precursor-tolerant
@@ -97,6 +99,9 @@ annotate_spectra <- function(
   ppm = get_params(step = "annotate_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(step = "annotate_spectra")$ms$tolerances$mass$dalton$ms2,
   cutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
+  min_fragments = get_params(
+    step = "annotate_spectra"
+  )$ms$thresholds$ms2$min_fragments,
   approx = get_params(step = "annotate_spectra")$annotations$ms2approx,
   qutoff = deprecated()
 ) {
@@ -183,6 +188,7 @@ annotate_spectra <- function(
     input_vec,
     cutoff = cutoff,
     dalton = dalton,
+    min_fragments = min_fragments,
     polarity = polarity,
     ppm = ppm
   )

@@ -315,7 +315,9 @@ test_that("create_edges_spectra completes downstream edge-building with mocked s
 
   local_mocked_bindings(
     get_params = function(step) list(),
-    import_spectra = function(input, cutoff, dalton, ppm) mock_spectra,
+    import_spectra = function(input, cutoff, dalton, min_fragments, ppm) {
+      mock_spectra
+    },
     create_edges = function(
       frags,
       nspecs,

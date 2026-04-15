@@ -669,7 +669,14 @@ test_that("annotate_spectra maps deprecated qutoff to cutoff", {
     assert_scalar_numeric = function(...) invisible(NULL),
     normalize_input_files = function(x, label) x,
     sanitize_all_inputs = function(mgf_file) invisible(NULL),
-    import_spectra = function(input, cutoff, dalton, polarity, ppm) {
+    import_spectra = function(
+      input,
+      cutoff,
+      dalton,
+      min_fragments,
+      polarity,
+      ppm
+    ) {
       seen$cutoff <- cutoff
       list()
     },
@@ -768,7 +775,14 @@ test_that("annotate_spectra returns empty template when polarity filtering remov
     assert_scalar_numeric = function(...) invisible(NULL),
     normalize_input_files = function(x, label) x,
     sanitize_all_inputs = function(mgf_file) invisible(NULL),
-    import_spectra = function(input, cutoff, dalton, polarity, ppm) {
+    import_spectra = function(
+      input,
+      cutoff,
+      dalton,
+      min_fragments,
+      polarity,
+      ppm
+    ) {
       list("query")
     },
     filter_library_paths_by_polarity = function(paths, polarity) character(0),
@@ -807,7 +821,14 @@ test_that("annotate_spectra returns empty template when cleaned library is empty
     assert_scalar_numeric = function(...) invisible(NULL),
     normalize_input_files = function(x, label) x,
     sanitize_all_inputs = function(mgf_file) invisible(NULL),
-    import_spectra = function(input, cutoff, dalton, polarity, ppm) {
+    import_spectra = function(
+      input,
+      cutoff,
+      dalton,
+      min_fragments,
+      polarity,
+      ppm
+    ) {
       list("query")
     },
     filter_library_paths_by_polarity = function(paths, polarity) paths,
@@ -854,7 +875,14 @@ test_that("annotate_spectra returns empty template when precursor reduction remo
     assert_scalar_numeric = function(...) invisible(NULL),
     normalize_input_files = function(x, label) x,
     sanitize_all_inputs = function(mgf_file) invisible(NULL),
-    import_spectra = function(input, cutoff, dalton, polarity, ppm) {
+    import_spectra = function(
+      input,
+      cutoff,
+      dalton,
+      min_fragments,
+      polarity,
+      ppm
+    ) {
       list("query")
     },
     filter_library_paths_by_polarity = function(paths, polarity) paths,

@@ -22,6 +22,8 @@
 #' @param cutoff [numeric] Intensity cutoff below which MS2 fragments are
 #'     removed.
 #'     Non-negative numeric or NULL for dynamic thresholding.
+#' @param min_fragments [integer] Minimum number of fragment peaks a spectrum
+#'     must have after cleaning to be retained (default: 2).
 #' @param qutoff `r lifecycle::badge("deprecated")` Use `cutoff` instead.
 #'
 #' @return Character string path to the created spectral edges file
@@ -62,6 +64,10 @@ create_edges_spectra <- function(
   cutoff = get_params(
     step = "create_edges_spectra"
   )$ms$thresholds$ms2$intensity,
+  min_fragments = get_params(
+    step = "create_edges_spectra"
+  )$ms$thresholds$ms2$min_fragments %||%
+    2L,
   qutoff = deprecated()
 ) {
   # Handle deprecated qutoff parameter
@@ -189,6 +195,7 @@ create_edges_spectra <- function(
     import_spectra(
       cutoff = cutoff,
       dalton = dalton,
+      min_fragments = min_fragments,
       ppm = ppm
     )
 

@@ -170,6 +170,7 @@ prepare_params <- function(
   ms_neu <- params_advanced$ms$neutral_losses
   # ms_pol <- params_advanced$ms$polarity
   ms_thr_ms2_int <- params_advanced$ms$thresholds$ms2$intensity
+  ms_thr_ms2_min_fragments <- params_advanced$ms$thresholds$ms2$min_fragments
   ms_tol_mas_ppm_ms1 <- params_advanced$ms$tolerances$mass$ppm$ms1
   ms_tol_mas_ppm_ms2 <- params_advanced$ms$tolerances$mass$ppm$ms2
   ms_tol_mas_dal_ms1 <- params_advanced$ms$tolerances$mass$dalton$ms1
@@ -340,6 +341,8 @@ prepare_params <- function(
     fil_spe_raw
   yamls_params$annotate_spectra$ms$thresholds$ms2$intensity <-
     ms_thr_ms2_int
+  yamls_params$annotate_spectra$ms$thresholds$ms2$min_fragments <-
+    ms_thr_ms2_min_fragments
   yamls_params$annotate_spectra$ms$polarity <-
     ms_pol
   yamls_params$annotate_spectra$ms$tolerances$mass$ppm$ms2 <-
@@ -364,6 +367,8 @@ prepare_params <- function(
     fil_spe_raw
   yamls_params$create_edges_spectra$ms$thresholds$ms2$intensity <-
     ms_thr_ms2_int
+  yamls_params$create_edges_spectra$ms$thresholds$ms2$min_fragments <-
+    ms_thr_ms2_min_fragments
   yamls_params$create_edges_spectra$ms$tolerances$mass$ppm$ms2 <-
     ms_tol_mas_ppm_ms2
   yamls_params$create_edges_spectra$ms$tolerances$mass$dalton$ms2 <-

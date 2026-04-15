@@ -14,6 +14,7 @@ annotate_spectra(
   ppm = get_params(step = "annotate_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(step = "annotate_spectra")$ms$tolerances$mass$dalton$ms2,
   cutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
+  min_fragments = get_params(step = "annotate_spectra")$ms$thresholds$ms2$min_fragments,
   approx = get_params(step = "annotate_spectra")$annotations$ms2approx,
   qutoff = deprecated()
 )
@@ -43,6 +44,9 @@ file here).}
 \item{cutoff}{\link{numeric} Intensity cutoff under which MS2 fragments are
 removed.
 Non-negative numeric or NULL for dynamic thresholding.}
+
+\item{min_fragments}{\link{integer} Minimum number of fragment peaks a spectrum
+must have after cleaning to be retained (default: 2).}
 
 \item{approx}{\link{logical} If TRUE perform matching ignoring precursor masses
 (broader, slower); if FALSE restrict library to precursor-tolerant

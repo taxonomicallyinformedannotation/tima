@@ -122,6 +122,7 @@
     ],
     "ms_pol": "pos",
     "ms_thr_ms2_int": 0,
+    "ms_thr_ms2_min_fragments": 2,
     "ms_tol_mas_dal_ms1": 0.01,
     "ms_tol_mas_dal_ms2": 0.01,
     "ms_tol_mas_ppm_ms1": 10,

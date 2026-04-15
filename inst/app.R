@@ -481,6 +481,22 @@ ui <- shiny::fluidPage(
                 "Fragments below this threshold will be removed from spectra."
               )
             ),
+          shiny::numericInput(
+            inputId = "ms_thr_ms2_min_fragments",
+            label = "Minimum number of fragments",
+            min = 1,
+            max = 10,
+            value = 2,
+            step = 1
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = c(
+                "Minimum number of fragment peaks a spectrum must have",
+                "after cleaning to be retained.",
+                "Spectra with fewer peaks are discarded."
+              )
+            ),
           shiny::sliderInput(
             inputId = "ms_tol_mas_ppm_ms1",
             label = "Relative mass tolerance for MS1 in ppm",
@@ -2164,6 +2180,8 @@ ui <- shiny::fluidPage(
   yaml_advanced$ms$polarity <- ms_pol
   yaml_advanced$ms$thresholds$ms2$intensity <-
     shiny::isolate(input$ms_thr_ms2_int)
+  yaml_advanced$ms$thresholds$ms2$min_fragments <-
+    shiny::isolate(input$ms_thr_ms2_min_fragments)
   yaml_advanced$ms$tolerances$mass$ppm$ms1 <-
     shiny::isolate(input$ms_tol_mas_ppm_ms1)
   yaml_advanced$ms$tolerances$mass$ppm$ms2 <-

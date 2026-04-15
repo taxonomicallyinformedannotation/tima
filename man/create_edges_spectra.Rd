@@ -17,6 +17,8 @@ create_edges_spectra(
   ppm = get_params(step = "create_edges_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(step = "create_edges_spectra")$ms$tolerances$mass$dalton$ms2,
   cutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity,
+  min_fragments = get_params(step =
+    "create_edges_spectra")$ms$thresholds$ms2$min_fragments \%||\% 2L,
   qutoff = deprecated()
 )
 }
@@ -43,6 +45,9 @@ containing spectra}
 \item{cutoff}{\link{numeric} Intensity cutoff below which MS2 fragments are
 removed.
 Non-negative numeric or NULL for dynamic thresholding.}
+
+\item{min_fragments}{\link{integer} Minimum number of fragment peaks a spectrum
+must have after cleaning to be retained (default: 2).}
 
 \item{qutoff}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{cutoff} instead.}
 }

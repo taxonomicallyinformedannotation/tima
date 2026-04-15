@@ -4,7 +4,13 @@
 \alias{sanitize_spectra}
 \title{Sanitize spectra}
 \usage{
-sanitize_spectra(spectra, cutoff = NULL, dalton = 0.01, ppm = 10)
+sanitize_spectra(
+  spectra,
+  cutoff = NULL,
+  dalton = 0.01,
+  min_fragments = 2L,
+  ppm = 10
+)
 }
 \arguments{
 \item{spectra}{\link[Spectra:Spectra]{Spectra::Spectra} Spectra object from the Spectra package}
@@ -14,6 +20,10 @@ Peaks below this intensity are removed. If NULL, a dynamic threshold
 based on each spectrum's intensity distribution will be used.}
 
 \item{dalton}{\link{numeric} Dalton tolerance for peak matching (default: 0.01)}
+
+\item{min_fragments}{\link{integer} Minimum number of fragment peaks a spectrum
+must have after cleaning to be retained (default: 2). Spectra with
+fewer peaks are discarded.}
 
 \item{ppm}{\link{numeric} PPM tolerance for peak matching (default: 10)}
 }
