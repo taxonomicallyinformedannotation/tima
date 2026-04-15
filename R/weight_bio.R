@@ -398,7 +398,6 @@ weight_bio <- function(
 
   # Calculate Biological Scores at All Taxonomic Levels ----
 
-
   # Define all taxonomic levels and their scores (DRY principle)
   taxonomic_levels <- list(
     list(

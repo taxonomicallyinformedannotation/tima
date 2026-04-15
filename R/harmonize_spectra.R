@@ -102,7 +102,6 @@ harmonize_spectra <- function(
 
   # Harmonize Column Names ----
 
-
   # Define standard column names
   columns <- c(
     "adduct",

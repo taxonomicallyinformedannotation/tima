@@ -114,7 +114,9 @@ test_that("get_compounds_xrefs fetches fresh data from QLever", {
   # Quick QLever reachability check
   qlever_ok <- tryCatch(
     {
-      resp <- httr2::request("https://qlever.cs.uni-freiburg.de/api/wikidata") |>
+      resp <- httr2::request(
+        "https://qlever.cs.uni-freiburg.de/api/wikidata"
+      ) |>
         httr2::req_method("POST") |>
         httr2::req_body_form(query = "SELECT * WHERE { ?s ?p ?o } LIMIT 1") |>
         httr2::req_headers(Accept = "text/csv") |>
@@ -163,7 +165,9 @@ test_that("get_compounds_xrefs refreshes stale cache with real data", {
   # Quick QLever reachability check — skip entire test if backend is down
   qlever_ok <- tryCatch(
     {
-      resp <- httr2::request("https://qlever.cs.uni-freiburg.de/api/wikidata") |>
+      resp <- httr2::request(
+        "https://qlever.cs.uni-freiburg.de/api/wikidata"
+      ) |>
         httr2::req_method("POST") |>
         httr2::req_body_form(query = "SELECT * WHERE { ?s ?p ?o } LIMIT 1") |>
         httr2::req_headers(Accept = "text/csv") |>

@@ -117,7 +117,6 @@ clean_bio <- function(
   ) |>
     tidytable::filter(!is.na(feature_source))
 
-
   # Calculate Consistency Scores ----
 
   # Calculate consistency scores for each taxonomic level

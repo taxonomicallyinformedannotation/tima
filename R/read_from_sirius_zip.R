@@ -84,6 +84,5 @@ read_from_sirius_zip <- function(sirius_zip, file) {
     ) |>
     tidytable::tidytable()
 
-
   return(result)
 }

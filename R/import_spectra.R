@@ -115,7 +115,6 @@ import_spectra <- function(
       vectorize_all = FALSE
     )
 
-
   # Import spectra based on file format
   spectra <- tryCatch(
     {

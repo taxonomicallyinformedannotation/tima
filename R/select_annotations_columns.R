@@ -143,7 +143,6 @@ select_annotations_columns <- function(
       )
     )
 
-
   return(df)
 }
 

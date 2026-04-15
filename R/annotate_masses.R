@@ -215,7 +215,6 @@ annotate_masses <-
 
     # Load and Join Library Tables ----
 
-
     library_table <- safe_fread(
       file = library,
       file_type = "structure library",
