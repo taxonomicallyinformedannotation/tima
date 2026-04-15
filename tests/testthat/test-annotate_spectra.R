@@ -970,7 +970,7 @@ test_that("finalize_results uses SMILES for deduplication", {
     target_precursorMz = 101
   )
 
-  out <- finalize_results(df_sim = df_sim, meta = meta, threshold = 0)
+  out <- finalize_results(df_sim = df_sim, meta = meta)
 
   expect_equal(out$candidate_structure_smiles_no_stereo, "CCO")
   expect_false(
@@ -981,8 +981,7 @@ test_that("finalize_results uses SMILES for deduplication", {
 test_that("finalize_results returns empty tidytable for empty similarity input", {
   out <- finalize_results(
     df_sim = tidytable::tidytable(),
-    meta = tidytable::tidytable(),
-    threshold = 0
+    meta = tidytable::tidytable()
   )
 
   expect_equal(nrow(out), 0L)
@@ -1148,7 +1147,7 @@ test_that("finalize_results outputs SMILES-based structure identification only",
     target_precursorMz = 101
   )
 
-  out <- finalize_results(df_sim = df_sim, meta = meta, threshold = 0)
+  out <- finalize_results(df_sim = df_sim, meta = meta)
 
   expect_equal(out$candidate_structure_smiles_no_stereo, "CCO")
   ## InChIKey columns are no longer derived in finalize_results;
