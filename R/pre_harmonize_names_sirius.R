@@ -41,5 +41,5 @@ pre_harmonize_names_sirius <- function(x) {
     vectorize_all = FALSE
   )
 
-  return(cleaned_name)
+  cleaned_name
 }

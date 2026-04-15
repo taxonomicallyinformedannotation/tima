@@ -134,5 +134,5 @@ prepare_libraries_sop_ecmdb <- function(
     return(output)
   }
 
-  return(output)
+  output
 }

@@ -249,7 +249,7 @@ match_adduct_regex <- function(adduct_string, regex) {
         "Regex matching failed: ",
         conditionMessage(e)
       )
-      return(NULL)
+      NULL
     }
   )
 
@@ -394,7 +394,7 @@ parse_modification_components <- function(modifications_clean) {
       )[[1L]][-1L]
     },
     error = function(e) {
-      return(NULL)
+      NULL
     }
   )
 
@@ -451,7 +451,7 @@ calculate_modification_masses <- function(elements, signs, multiplicities) {
         "Failed to calculate modification masses: %s",
         conditionMessage(e)
       )
-      return(NULL)
+      NULL
     }
   )
 

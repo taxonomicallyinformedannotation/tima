@@ -412,5 +412,5 @@ prepare_libraries_rt <- function(
     )
   export_output(x = sop_to_write, file = output_sop)
   rm(rts, sop)
-  return(c("rt" = output_rt, "sop" = output_sop))
+  c("rt" = output_rt, "sop" = output_sop)
 }

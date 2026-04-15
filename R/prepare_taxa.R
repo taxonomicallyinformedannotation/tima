@@ -290,5 +290,5 @@ prepare_taxa <- function(
   )
   export_output(x = taxed_features_table, file = output)
   rm(taxed_features_table)
-  return(output)
+  output
 }

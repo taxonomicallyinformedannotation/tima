@@ -483,5 +483,5 @@ filter_annotations <- function(
   log_complete(ctx, n_filtered = nrow(final_table))
 
   rm(final_table)
-  return(output[[1L]])
+  output[[1L]]
 }

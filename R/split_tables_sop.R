@@ -483,7 +483,7 @@ split_tables_sop <- function(table, cache) {
     table_structures_taxonomy_cla,
     table_structures_taxonomy_npc
   )
-  return(tables)
+  tables
 }
 
 # Helper Functions ----

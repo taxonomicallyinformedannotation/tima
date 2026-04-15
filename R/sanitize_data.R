@@ -940,7 +940,7 @@ sanitize_all_inputs <- function(
     log_success("[OK] All pre-flight checks passed!")
     log_info("Data validation complete. Ready to proceed.")
     log_info("=" |> rep(60) |> paste(collapse = ""))
-    return(invisible(TRUE))
+    invisible(TRUE)
   } else {
     log_error("[X] Pre-flight checks failed!")
     log_error(

@@ -92,5 +92,5 @@ fake_hmdb <- function(export) {
   unlink(fake_export)
 
   log_debug("Created fake HMDB file at: %s", export)
-  return(export)
+  export
 }

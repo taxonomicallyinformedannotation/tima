@@ -36,7 +36,7 @@ archive_log_file <- function(log_file, timestamp) {
     },
     error = function(e) {
       log_warn("Failed to archive log: %s", conditionMessage(e))
-      return(FALSE)
+      FALSE
     }
   )
 
@@ -45,7 +45,7 @@ archive_log_file <- function(log_file, timestamp) {
     log_info("Log archived: %s", output_log)
   }
 
-  return(success)
+  success
 }
 
 #' Execute TIMA Targets Pipeline

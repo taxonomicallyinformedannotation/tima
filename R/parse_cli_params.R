@@ -515,5 +515,5 @@ parse_cli_params <- function(arguments, parameters) {
       mappings = mappings,
       .init = parameters
     )
-  return(parameters)
+  parameters
 }

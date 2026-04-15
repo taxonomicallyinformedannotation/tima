@@ -41,5 +41,5 @@ harmonize_names_sirius <- function(x) {
     perl = TRUE
   )
 
-  return(harmonized_name)
+  harmonized_name
 }

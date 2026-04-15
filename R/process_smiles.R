@@ -176,7 +176,7 @@ process_smiles <- function(
 
   log_complete(ctx, n_processed = nrow(table_final))
 
-  return(table_final)
+  table_final
 }
 
 # Helper Functions ----

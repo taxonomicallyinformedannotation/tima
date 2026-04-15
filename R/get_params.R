@@ -213,5 +213,5 @@ get_params <- function(step) {
   # Merge CLI arguments into parameters
   params <- parse_cli_params(arguments = cli_args, parameters = params)
 
-  return(params)
+  params
 }

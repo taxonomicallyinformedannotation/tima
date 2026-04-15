@@ -1339,5 +1339,5 @@ clean_chemo <- function(
     organism_lookup
   )
 
-  return(results_list)
+  results_list
 }

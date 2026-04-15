@@ -303,7 +303,7 @@ summarize_results <- function(
     pct_annotated
   )
 
-  return(results)
+  results
 }
 
 .build_organism_lookup <- function(structure_organism_pairs_table, df) {

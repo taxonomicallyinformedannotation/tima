@@ -50,7 +50,7 @@ test_that("prepare_params handles empty taxon (removes raw metadata) without err
         return(small)
       }
       if (step == "prepare_params_advanced") {
-        return(fixture_adv("AXX"))
+        fixture_adv("AXX")
       }
     },
     export_params = function(...) character(),

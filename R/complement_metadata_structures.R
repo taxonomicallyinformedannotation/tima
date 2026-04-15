@@ -590,7 +590,7 @@ complement_metadata_structures <- function(
 
   log_complete(ctx, n_enriched = nrow(table_final))
 
-  return(table_final)
+  table_final
 }
 
 .extract_structure_keys <- function(df) {

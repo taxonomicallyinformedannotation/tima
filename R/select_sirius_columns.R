@@ -102,7 +102,7 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
   if ("candidate_adduct" %in% names(df)) {
     df[["candidate_adduct"]] <- gsub("\\s+", "", df[["candidate_adduct"]])
   }
-  return(df)
+  df
 }
 
 #' @title Select SIRIUS formula columns
@@ -168,7 +168,7 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
   if ("candidate_adduct" %in% names(df)) {
     df[["candidate_adduct"]] <- gsub("\\s+", "", df[["candidate_adduct"]])
   }
-  return(df)
+  df
 }
 
 #' @title Select SIRIUS structure columns
@@ -237,7 +237,7 @@ select_sirius_columns_structures <- function(df, sirius_version) {
   if ("candidate_adduct" %in% names(df)) {
     df[["candidate_adduct"]] <- gsub("\\s+", "", df[["candidate_adduct"]])
   }
-  return(df)
+  df
 }
 
 # Normalize common SIRIUS column aliases across versions/export formats.

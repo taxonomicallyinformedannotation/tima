@@ -71,7 +71,7 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
     }
   )
 
-  return(results_list)
+  results_list
 }
 
 #' Helper: Add xrefs to a single data frame
@@ -174,5 +174,5 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
     tidytable::left_join(xrefs_for_join, by = "inchikey_key") |>
     tidytable::select(-inchikey_key)
 
-  return(result_df)
+  result_df
 }

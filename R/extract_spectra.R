@@ -136,5 +136,5 @@ extract_spectra <- function(object) {
 
   log_debug("Extracted %d spectra", nrow(spectra))
 
-  return(spectra)
+  spectra
 }

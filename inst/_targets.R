@@ -1461,7 +1461,7 @@ list(
               intensity
             ) |>
             data.frame()
-          return(df)
+          df
         }
 
         spectra_harmonized_pos <- sp_pos |>
@@ -1492,7 +1492,7 @@ list(
               )
             ) |>
             data.frame()
-          return(df)
+          df
         }
 
         df_clean_pos <- spectra_harmonized_pos |>

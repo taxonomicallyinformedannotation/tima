@@ -1176,5 +1176,5 @@ weight_annotations <- function(
   rm(results_list)
 
   log_info("Results exported: %s", basename(output_paths["full"]))
-  return(output_paths)
+  output_paths
 }

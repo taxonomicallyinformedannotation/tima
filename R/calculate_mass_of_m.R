@@ -174,7 +174,7 @@ calculate_mass_of_m <- function(
   #   "'"
   # )
 
-  return(neutral_mass)
+  neutral_mass
 }
 
 # Helper Functions ----
@@ -274,7 +274,7 @@ calculate_neutral_mass_formula <- function(
   corrected_mass <- charged_mass - mass_modifications
   neutral_mass <- corrected_mass / n_mer
 
-  return(neutral_mass)
+  neutral_mass
 }
 
 #' Calculate m/z from neutral mass (inverse operation)
@@ -358,14 +358,5 @@ calculate_mz_from_mass <- function(
   total_mass <- neutral_mass * n_mer + mass_modifications
   mz <- (total_mass / n_charges) + isotope_shift
 
-  #  "Calculated m/z: ",
-  #  round(mz, 4),
-  #  " from mass ",
-  #  round(neutral_mass, 4),
-  #  " with adduct '",
-  #  adduct_string,
-  #  "'"
-  # )
-
-  return(mz)
+  mz
 }

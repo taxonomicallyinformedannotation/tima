@@ -454,5 +454,5 @@ get_organism_taxonomy_ott <- function(
   }
 
   log_info("Got OTTaxonomy!")
-  return(biological_metadata)
+  biological_metadata
 }

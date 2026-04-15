@@ -307,5 +307,5 @@ import_spectra <- function(
     length(spectra)
   )
 
-  return(spectra)
+  spectra
 }

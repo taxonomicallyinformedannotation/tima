@@ -122,5 +122,5 @@ safe_fread <- function(
     )
   }
 
-  return(df)
+  df
 }

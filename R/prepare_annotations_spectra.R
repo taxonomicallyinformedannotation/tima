@@ -183,7 +183,7 @@ prepare_annotations_spectra <- function(
   export_output(x = table, file = output[[1L]])
   rm(table)
 
-  return(output[[1L]])
+  output[[1L]]
 }
 
 prepare_spectral_annotation_chunk <- function(file, annotation_cols) {

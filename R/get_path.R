@@ -63,5 +63,5 @@ get_path <- function(base_path) {
   #  "Path not found. Tried: %s, %s, %s", base_path, path_without_inst, path_with_pkg_dir
   # )
 
-  return(path_with_pkg_dir)
+  path_with_pkg_dir
 }

@@ -143,7 +143,7 @@ select_annotations_columns <- function(
       )
     )
 
-  return(df)
+  df
 }
 
 .normalize_annotation_text <- function(x) {
@@ -288,5 +288,5 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
       ))
     )
 
-  return(df)
+  df
 }

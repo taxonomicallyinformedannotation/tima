@@ -147,5 +147,5 @@ prepare_annotations_gnps <- function(
   )
   export_output(x = table, file = output[[1L]])
   rm(table)
-  return(output[[1L]])
+  output[[1L]]
 }

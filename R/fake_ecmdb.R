@@ -86,5 +86,5 @@ fake_ecmdb <- function(export) {
   unlink(fake_export)
 
   log_debug("Created fake ECMDB file at: %s", export)
-  return(export)
+  export
 }

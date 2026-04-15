@@ -73,5 +73,5 @@ get_default_paths <- function(
     paths_config$data$interim$params$path <- override_params
   }
 
-  return(paths_config)
+  paths_config
 }

@@ -248,7 +248,7 @@ prepare_params <- function(
   yamls_params$`prepare_params_advanced`$files$features$raw <- fil_fea_raw
   yamls_params$`prepare_params_advanced`$files$metadata$raw <- fil_met_raw
   yamls_params$`prepare_params_advanced`$files$spectral$raw <- fil_spe_raw
-  yamls_params$`prepare_params_advanced`$files$annotations$raw$spectral$mzmine <- fil_ann_raw_spe_mzm
+  yamls_params$`prepare_params_advanced`$files$annotations$raw$spectral$mzmine <- fil_ann_raw_mzm
   yamls_params$`prepare_params_advanced`$files$annotations$raw$sirius <- fil_ann_raw_sir
   yamls_params$`prepare_params_advanced`$ms$polarity <- ms_pol
   yamls_params$`prepare_params_advanced`$organisms$taxon <- org_tax
@@ -978,5 +978,5 @@ prepare_params <- function(
     yamls_params = yamls_params,
     yaml_export = yaml_export
   )
-  return(yaml_export)
+  yaml_export
 }

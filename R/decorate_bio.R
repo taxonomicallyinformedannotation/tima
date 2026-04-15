@@ -210,5 +210,5 @@ decorate_bio <- function(
 
   log_complete(ctx, n_processed = nrow(annot_table_wei_bio))
 
-  return(annot_table_wei_bio)
+  annot_table_wei_bio
 }

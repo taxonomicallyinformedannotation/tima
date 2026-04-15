@@ -253,7 +253,7 @@ is_download_needed <- function(path, zenodo_size) {
   }
 
   log_debug("File exists with correct size, skipping download")
-  return(FALSE)
+  FALSE
 }
 
 #' @title Get Latest Version from Zenodo
@@ -379,5 +379,5 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
     )
   }
 
-  return(invisible(path))
+  invisible(path)
 }

@@ -99,7 +99,7 @@ parse_yaml_params <- function(def, usr = NULL) {
   }
 
   # Return the final list of parameters
-  return(params)
+  params
 }
 
 #' Merge a single user list item into the result
@@ -137,5 +137,5 @@ merge_lists_recursive <- function(default, user) {
     default = default
   )
 
-  return(result_env$result)
+  result_env$result
 }

@@ -80,5 +80,5 @@ transform_score_sirius_csi <- function(csi_score = NULL, K = 100, scale = 20) {
   shifted_score <- as.numeric(csi_score) + K
   transformed_score <- 1 / (1 + exp(-shifted_score / scale))
 
-  return(transformed_score)
+  transformed_score
 }

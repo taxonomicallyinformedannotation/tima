@@ -713,5 +713,5 @@ weight_bio <- function(
 
   log_complete(ctx, n_weighted = nrow(annot_table_wei_bio))
 
-  return(annot_table_wei_bio)
+  annot_table_wei_bio
 }

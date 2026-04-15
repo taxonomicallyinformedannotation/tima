@@ -307,7 +307,7 @@ enrich_taxonomy_from_cache <- function(
         taxonomy_name,
         conditionMessage(e)
       )
-      return(taxonomy_table)
+      taxonomy_table
     }
   )
 
@@ -878,5 +878,5 @@ prepare_libraries_sop_merged <- function(
     tables
   )
 
-  return(result)
+  result
 }

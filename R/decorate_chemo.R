@@ -250,5 +250,5 @@ decorate_chemo <- function(
 
   log_complete(ctx, n_processed = nrow(annot_table_wei_chemo))
 
-  return(annot_table_wei_chemo)
+  annot_table_wei_chemo
 }

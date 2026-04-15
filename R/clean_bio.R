@@ -187,7 +187,7 @@ clean_bio <- function(
 
   log_complete(ctx, n_cleaned = nrow(annot_table_wei_bio_clean))
 
-  return(annot_table_wei_bio_clean)
+  annot_table_wei_bio_clean
 }
 
 # Internal Helper Functions ----

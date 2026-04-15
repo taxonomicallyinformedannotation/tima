@@ -350,5 +350,5 @@ prepare_libraries_sop_bigg <- function(
     return(output)
   }
 
-  return(output)
+  output
 }

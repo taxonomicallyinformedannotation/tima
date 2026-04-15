@@ -175,5 +175,5 @@ create_components <- function(
     n_features = nrow(components_table)
   )
 
-  return(output)
+  output
 }

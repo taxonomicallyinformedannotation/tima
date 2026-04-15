@@ -60,7 +60,7 @@ copy_file_to_target <- function(file_path, target_dir, file_description) {
     overwrite = TRUE
   )
 
-  return(target_path)
+  target_path
 }
 
 #' Create YAML Null Handler
@@ -77,7 +77,7 @@ create_yaml_null_handler <- function() {
     }
     res <- "null"
     class(res) <- "verbatim"
-    return(res)
+    res
   }
 }
 

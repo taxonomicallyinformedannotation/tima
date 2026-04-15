@@ -982,10 +982,9 @@ annotate_masses <-
     log_complete(ctx, n_annotations = nrow(df_final), n_edges = nrow(edges))
 
     rm(edges, df_final)
-    return(
-      c(
-        "annotations" = output_annotations[[1L]],
-        "edges" = output_edges[[1L]]
-      )
+
+    c(
+      "annotations" = output_annotations[[1L]],
+      "edges" = output_edges[[1L]]
     )
   }

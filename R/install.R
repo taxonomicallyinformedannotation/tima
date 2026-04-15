@@ -174,7 +174,7 @@ check_or_install_python <- function() {
   }
 
   log_info("Using Miniconda Python at: %s", python_path)
-  return(python_path)
+  python_path
 }
 
 #' Setup Python Virtual Environment
@@ -431,7 +431,7 @@ try_install_package <- function(
     },
     error = function(e) {
       log_error("Installation failed: %s", e$message)
-      return(FALSE)
+      FALSE
     }
   )
 }

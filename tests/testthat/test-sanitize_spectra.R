@@ -27,7 +27,7 @@ create_test_spectra_object <- function(
 
   spectra <- Spectra::Spectra(object = spectra_data)
   spectra@backend@peaksData <- peaks_data
-  return(spectra)
+  spectra
 }
 
 ## Input Validation Tests ----

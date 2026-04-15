@@ -255,7 +255,7 @@ harmonize_spectra <- function(
 
   log_complete(ctx, n_harmonized = nrow(spectra_harmonized))
 
-  return(spectra_harmonized)
+  spectra_harmonized
 }
 
 # Helper Functions ----

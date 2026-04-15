@@ -317,5 +317,5 @@ create_edges_spectra <- function(
 
   log_complete(ctx, n_edges = n_edges)
 
-  return(output[[1L]])
+  output[[1L]]
 }

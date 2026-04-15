@@ -285,7 +285,7 @@ is_logging_initialized <- function() {
     logical(1)
   ))
 
-  return(has_file)
+  has_file
 }
 
 #' Ensure logging is initialized (lazy initialization)
