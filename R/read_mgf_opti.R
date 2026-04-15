@@ -178,7 +178,7 @@ read_mgf_opti <- function(
   con <- file(f, "r")
   on.exit(close(con), add = TRUE) # Ensure the file is closed on exit
 
-  while (TRUE) {
+  repeat {
     line <- readLines(con, n = 1L, warn = FALSE)
 
     if (length(line) == 0L) {
