@@ -57,12 +57,12 @@ class MillisecondFormatter(logging.Formatter):
     def formatTime(self, record, datefmt=None):
         """Override formatTime to include milliseconds.
 
-Parameters
-----------
-record : Any
-    Record.
-datefmt : Any
-    None. Default is None.
+        Parameters
+        ----------
+        record : Any
+            Record.
+        datefmt : Any
+            None. Default is None.
         """
         import datetime
 
@@ -88,19 +88,19 @@ __all__ = [
 def get_logger(name: str = __name__, level: int = DEFAULT_LOG_LEVEL) -> logging.Logger:
     """Create or retrieve a configured logger.
 
-    This avoids global side effects and allows dependency injection for tests.
+        This avoids global side effects and allows dependency injection for tests.
 
-Parameters
-----------
-name : str
-    Default is __name__.
-level : int
-    DEFAULT_LOG_LEVEL. Default is DEFAULT_LOG_LEVEL.
+    Parameters
+    ----------
+    name : str
+        Default is __name__.
+    level : int
+        DEFAULT_LOG_LEVEL. Default is DEFAULT_LOG_LEVEL.
 
-Returns
--------
-logging.Logger
-    Return value produced by get logger.
+    Returns
+    -------
+    logging.Logger
+        Retrieved logger.
     """
     logger = logging.getLogger(name)
     logger.setLevel(level)
@@ -200,23 +200,23 @@ def validate_processing_params(
 def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
     """Process a single molecule to extract chemical properties.
 
-    **Output Format:**
-    - SMILES: Canonical with isotope notation preserved (e.g., [13C], [2H])
-    - InChIKey: Isotope-aware
-    - Formula: Isotopes shown separated (e.g., C2[13C]4H12O6, [2H]4C)
-    - Exact mass: RDKit automatically uses isotope atomic masses
+        **Output Format:**
+        - SMILES: Canonical with isotope notation preserved (e.g., [13C], [2H])
+        - InChIKey: Isotope-aware
+        - Formula: Isotopes shown separated (e.g., C2[13C]4H12O6, [2H]4C)
+        - Exact mass: RDKit automatically uses isotope atomic masses
 
-Parameters
-----------
-mol : Any
-    Mol.
-original_smiles : str
-    Original smiles.
+    Parameters
+    ----------
+    mol : Any
+        Mol.
+    original_smiles : str
+        Original smiles.
 
-Returns
--------
-Optional[List[Any]]
-    Return value produced by process molecule.
+    Returns
+    -------
+    Optional[List[Any]]
+        Result process molecule.
     """
 
     if mol is None:
@@ -253,10 +253,10 @@ Optional[List[Any]]
 def open_output_file(output_file: Path):
     """Open output file with appropriate compression if needed.
 
-Parameters
-----------
-output_file : Path
-    Output file.
+    Parameters
+    ----------
+    output_file : Path
+        Output file.
     """
     if str(output_file).endswith(".gz"):
         return gzip.open(output_file, "wt", newline="", encoding="utf-8")
@@ -266,15 +266,15 @@ output_file : Path
 def _process_molecule_wrapper(args: Tuple[Any, str]) -> Optional[List[Any]]:
     """Wrapper for process_molecule to work with map parallelization.
 
-Parameters
-----------
-args : Tuple[Any, str]
-    Args.
+    Parameters
+    ----------
+    args : Tuple[Any, str]
+        Args.
 
-Returns
--------
-Optional[List[Any]]
-    Return value produced by  process molecule wrapper.
+    Returns
+    -------
+    Optional[List[Any]]
+        Result process molecule wrapper.
     """
     mol, smiles = args
     return process_molecule(mol, smiles)
@@ -297,27 +297,27 @@ def process_batch(
 ) -> int:
     """Process a batch of molecules in parallel and write results.
 
-Parameters
-----------
-executor : ThreadPoolExecutor
-    Executor.
-batch : Iterable[Any]
-    Batch.
-original_smiles_list : Iterable[str]
-    Original smiles list.
-writer : csv.writer
-    Writer.
-current_count : int
-    Current count.
-progress_interval : int
-    Progress interval.
-_logger : Optional[logging.Logger]
-    None. Default is None.
+    Parameters
+    ----------
+    executor : ThreadPoolExecutor
+        Executor.
+    batch : Iterable[Any]
+        Batch.
+    original_smiles_list : Iterable[str]
+        Original smiles list.
+    writer : csv.writer
+        Writer.
+    current_count : int
+        Current count.
+    progress_interval : int
+        Progress interval.
+    _logger : Optional[logging.Logger]
+        None. Default is None.
 
-Returns
--------
-int
-    Return value produced by process batch.
+    Returns
+    -------
+    int
+        Numeric value for process batch.
     """
     log = _logger or logger
     batch_processed = 0
@@ -357,28 +357,28 @@ def process_smiles(
 ) -> int:
     """Process SMILES file to compute molecular properties.
 
-    This function reads a SMILES file, processes molecules in parallel batches,
-    and outputs molecular properties to a CSV file.
+        This function reads a SMILES file, processes molecules in parallel batches,
+        and outputs molecular properties to a CSV file.
 
-Parameters
-----------
-input_smi_file : str
-    Input smi file.
-output_csv_file : str
-    Output csv file.
-num_workers : Optional[int]
-    DEFAULT_MAX_WORKERS. Default is DEFAULT_MAX_WORKERS.
-batch_size : int
-    DEFAULT_BATCH_SIZE. Default is DEFAULT_BATCH_SIZE.
-progress_interval : int
-    DEFAULT_PROGRESS_INTERVAL. Default is DEFAULT_PROGRESS_INTERVAL.
-_logger : Optional[logging.Logger]
-    None. Default is None.
+    Parameters
+    ----------
+    input_smi_file : str
+        Input smi file.
+    output_csv_file : str
+        Output csv file.
+    num_workers : Optional[int]
+        DEFAULT_MAX_WORKERS. Default is DEFAULT_MAX_WORKERS.
+    batch_size : int
+        DEFAULT_BATCH_SIZE. Default is DEFAULT_BATCH_SIZE.
+    progress_interval : int
+        DEFAULT_PROGRESS_INTERVAL. Default is DEFAULT_PROGRESS_INTERVAL.
+    _logger : Optional[logging.Logger]
+        None. Default is None.
 
-Returns
--------
-int
-    Return value produced by process smiles.
+    Returns
+    -------
+    int
+        Numeric value for process smiles.
     """
     log = _logger or logger
     log.info("Starting SMILES processing pipeline")
@@ -452,17 +452,17 @@ int
 def main(argv: Optional[List[str]] = None) -> int:
     """CLI entry point.
 
-    Returns an exit code for easier testing.
+        Returns an exit code for easier testing.
 
-Parameters
-----------
-argv : Optional[List[str]]
-    None. Default is None.
+    Parameters
+    ----------
+    argv : Optional[List[str]]
+        None. Default is None.
 
-Returns
--------
-int
-    Return value produced by main.
+    Returns
+    -------
+    int
+        Numeric value for main.
     """
     import argparse
 
