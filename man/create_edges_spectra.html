@@ -681,7 +681,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   dalton = get_params(step = "create_edges_spectra")\$ms\$tolerances\$mass\$dalton\$ms2,
   cutoff = get_params(step = "create_edges_spectra")\$ms\$thresholds\$ms2\$intensity,
   min_fragments = get_params(step =
-    "create_edges_spectra")\$ms\$thresholds\$ms2\$min_fragments %||% 2L,
+    "create_edges_spectra")\$ms\$thresholds\$ms2\$min_fragments,
   qutoff = deprecated()
 )
 </code></pre>
@@ -774,7 +774,7 @@ numeric Intensity cutoff below which MS2 fragments are removed. Non-negative num
 <code id="min_fragments">min_fragments</code>
 </td>
 <td>
-integer Minimum number of fragment peaks a spectrum must have after cleaning to be retained (default: 2).
+integer Minimum number of fragment peaks a spectrum must have after cleaning to be retained
 </td>
 </tr>
 <tr>
