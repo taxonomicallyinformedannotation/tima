@@ -149,6 +149,8 @@ create_empty_sop_library <- function() {
 #'
 #' @param input [character] Character vector of file paths containing spectral
 #'     data.
+#' @param min_fragments [integer] Minimum number of fragment peaks a spectrum
+#'     must have after cleaning to be retained (default: 2).
 #' @param nam_lib [character] Character library name for metadata.
 #' @param col_ad [character] Name of the adduct column in MGF.
 #' @param col_ce [character] Name of the collision energy column in MGF.
@@ -184,6 +186,9 @@ prepare_libraries_spectra <-
     input = get_params(
       step = "prepare_libraries_spectra"
     )$files$libraries$spectral$raw,
+    min_fragments = get_params(
+      step = "prepare_libraries_spectra"
+    )$ms$thresholds$ms2$min_fragments,
     nam_lib = get_params(step = "prepare_libraries_spectra")$names$libraries,
     col_ad = get_params(step = "prepare_libraries_spectra")$names$mgf$adduct,
     col_ce = get_params(
@@ -265,7 +270,12 @@ prepare_libraries_spectra <-
     } else {
       # Import and extract ----
       log_metadata(ctx, phase = "importing", n_files = length(input))
-      spectra <- purrr::map(.x = input, .f = import_spectra, combine = FALSE)
+      spectra <- purrr::map(
+        .x = input,
+        .f = import_spectra,
+        min_fragments = min_fragments,
+        combine = FALSE
+      )
 
       log_metadata(ctx, phase = "extracting")
       spectra_extracted <- purrr::map(.x = spectra, .f = extract_spectra)

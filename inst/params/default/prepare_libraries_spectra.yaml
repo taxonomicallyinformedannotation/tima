@@ -9,6 +9,15 @@ files:
       raw:
         - data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf
 
+#' MS related parameters.
+ms:
+  #' Thresholds related parameters.
+  thresholds:
+    #' MS2 related parameters.
+    ms2:
+      #' Minimum number of fragment peaks to keep a spectrum. INTEGER
+      min_fragments: 2
+
 #' Names of the different variables in the input files.
 names:
   #' Names of the prepared libraries. STRING

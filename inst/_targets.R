@@ -303,6 +303,7 @@ list(
         command = {
           prepare_libraries_spectra(
             input = par_pre_lib_spe$files$libraries$spectral$raw,
+            min_fragments = par_pre_lib_spe$ms$thresholds$ms2$min_fragments,
             nam_lib = par_pre_lib_spe$names$libraries,
             col_ad = par_pre_lib_spe$names$mgf$adduct,
             col_ce = par_pre_lib_spe$names$mgf$collision_energy,

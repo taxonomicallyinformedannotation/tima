@@ -2,12 +2,13 @@ You can use this script with the following example:
 Rscript inst/scripts/prepare_libraries_spectra.R --fil-lib-spe-raw data/source/libraries/spectra/exp/spectral_lib_mini_with_rt.mgf --names-lib internal --ms-pol pos
 
 Usage:
-  prepare_libraries_spectra.R [--fil-lib-spe-raw=<fil-lib-spe-raw>] [--names-lib=<names-lib>] [--ms-pol=<ms-pol>] [--names-mgf-ce=<names-mgf-ce>] [--names-mgf-ci=<names-mgf-ci>] [--names-mgf-em=<names-mgf-em>] [--names-mgf-in=<names-mgf-in>] [--names-mgf-io=<names-mgf-io>] [--names-mgf-ik=<names-mgf-ik>] [--names-mgf-il=<names-mgf-il>] [--names-mgf-mf=<names-mgf-mf>] [--names-mgf-na=<names-mgf-na>] [--names-mgf-po=<names-mgf-po>] [--names-mgf-sm=<names-mgf-sm>] [--names-mgf-sn=<names-mgf-sn>] [--names-mgf-si=<names-mgf-si>] [--names-mgf-sp=<names-mgf-sp>] [--names-mgf-sy=<names-mgf-sy>] [--names-mgf-xl=<names-mgf-xl>] [--names-precursor=<names-precursor>] [--names-rt-lib=<names-rt-lib>] [--names-source=<names-source>] [--names-target=<names-target>] [--names-taxon=<names-taxon>]
+  prepare_libraries_spectra.R [--fil-lib-spe-raw=<fil-lib-spe-raw>] [--names-lib=<names-lib>] [--ms-pol=<ms-pol>] [--ms-thr-ms2-min-fragments=<ms-thr-ms2-min-fragments>] [--names-mgf-ce=<names-mgf-ce>] [--names-mgf-ci=<names-mgf-ci>] [--names-mgf-em=<names-mgf-em>] [--names-mgf-in=<names-mgf-in>] [--names-mgf-io=<names-mgf-io>] [--names-mgf-ik=<names-mgf-ik>] [--names-mgf-il=<names-mgf-il>] [--names-mgf-mf=<names-mgf-mf>] [--names-mgf-na=<names-mgf-na>] [--names-mgf-po=<names-mgf-po>] [--names-mgf-sm=<names-mgf-sm>] [--names-mgf-sn=<names-mgf-sn>] [--names-mgf-si=<names-mgf-si>] [--names-mgf-sp=<names-mgf-sp>] [--names-mgf-sy=<names-mgf-sy>] [--names-mgf-xl=<names-mgf-xl>] [--names-precursor=<names-precursor>] [--names-rt-lib=<names-rt-lib>] [--names-source=<names-source>] [--names-target=<names-target>] [--names-taxon=<names-taxon>]
 
 Arguments:
   fil-lib-spe-raw            List of experimental raw spectral libraries. STRING
 
   ms-pol                     Polarity used. Must be "pos" or "neg". STRING
+  ms-thr-ms2-min-fragments   Minimum number of fragment peaks to keep a spectrum. INTEGER
 
   names-lib                  Metadata to identify the library. STRING
   names-mgf-ad               Name of "adduct" in MGF. STRING

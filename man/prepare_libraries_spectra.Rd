@@ -6,6 +6,8 @@
 \usage{
 prepare_libraries_spectra(
   input = get_params(step = "prepare_libraries_spectra")$files$libraries$spectral$raw,
+  min_fragments = get_params(step =
+    "prepare_libraries_spectra")$ms$thresholds$ms2$min_fragments,
   nam_lib = get_params(step = "prepare_libraries_spectra")$names$libraries,
   col_ad = get_params(step = "prepare_libraries_spectra")$names$mgf$adduct,
   col_ce = get_params(step = "prepare_libraries_spectra")$names$mgf$collision_energy,
@@ -27,6 +29,9 @@ prepare_libraries_spectra(
 \arguments{
 \item{input}{\link{character} Character vector of file paths containing spectral
 data.}
+
+\item{min_fragments}{\link{integer} Minimum number of fragment peaks a spectrum
+must have after cleaning to be retained (default: 2).}
 
 \item{nam_lib}{\link{character} Character library name for metadata.}
 

@@ -589,6 +589,8 @@ prepare_params <- function(
   ## prepare_libraries_spectra
   yamls_params$prepare_libraries_spectra$files$libraries$spectral$raw <-
     fil_lib_spe_raw
+  yamls_params$prepare_libraries_spectra$ms$thresholds$ms2$min_fragments <-
+    ms_thr_ms2_min_fragments
   yamls_params$prepare_libraries_spectra$names$libraries <-
     names_libraries
   yamls_params$prepare_libraries_spectra$names$mgf$adduct <-
