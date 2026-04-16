@@ -670,6 +670,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <pre><code class="language-R">prepare_libraries_spectra(
   input = get_params(step = "prepare_libraries_spectra")\$files\$libraries\$spectral\$raw,
+  min_fragments = get_params(step =
+    "prepare_libraries_spectra")\$ms\$thresholds\$ms2\$min_fragments,
   nam_lib = get_params(step = "prepare_libraries_spectra")\$names\$libraries,
   col_ad = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$adduct,
   col_ce = get_params(step = "prepare_libraries_spectra")\$names\$mgf\$collision_energy,
@@ -698,6 +700,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </td>
 <td>
 character Character vector of file paths containing spectral data.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="min_fragments">min_fragments</code>
+</td>
+<td>
+integer Minimum number of fragment peaks a spectrum must have after cleaning to be retained (default: 2).
 </td>
 </tr>
 <tr>
