@@ -22,6 +22,7 @@ files:
       #' List of negative spectral libraries. STRING
       neg:
         - data/interim/libraries/spectra/exp/gnps_11566051_neg.rds
+        - data/interim/libraries/spectra/exp/isdbnormansusdat_14854025_neg.rds
         - data/interim/libraries/spectra/exp/massbank_2025051_neg.rds
         - data/interim/libraries/spectra/exp/merlin_13911806_neg.rds
         - data/interim/libraries/spectra/is/wikidata_5607185_neg.rds
@@ -29,6 +30,7 @@ files:
       #' List of positive spectral libraries. STRING
       pos:
         - data/interim/libraries/spectra/exp/gnps_11566051_pos.rds
+        - data/interim/libraries/spectra/exp/isdbnormansusdat_14854025_pos.rds
         - data/interim/libraries/spectra/exp/massbank_2025051_pos.rds
         - data/interim/libraries/spectra/exp/merlin_13911806_pos.rds
         - data/interim/libraries/spectra/is/wikidata_5607185_pos.rds

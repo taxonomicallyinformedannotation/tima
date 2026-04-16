@@ -168,6 +168,38 @@ list(
   list(
     ## 4.1 In silico spectral libraries
     list(
+      ## Norman Suspect List
+      tar_target(
+        name = lib_spe_is_nor_pre_pos,
+        command = {
+          get_file(
+            url = paths$urls$spectra$pos$nor,
+            export = paths$data$interim$libraries$spectra$is$pos$nor
+          )
+        },
+        format = "file"
+      ),
+      tar_target(
+        name = lib_spe_is_nor_pre_neg,
+        command = {
+          get_file(
+            url = paths$urls$spectra$neg$nor,
+            export = paths$data$interim$libraries$spectra$is$neg$nor
+          )
+        },
+        format = "file"
+      ),
+      tar_target(
+        name = lib_spe_is_nor_pre_sop,
+        command = {
+          get_file(
+            url = paths$urls$sop$nor,
+            export = paths$data$interim$libraries$sop$nor
+          )
+        },
+        format = "file"
+      ),
+      ## Wikidata
       tar_target(
         name = lib_spe_is_wik_pre_pos,
         command = {
@@ -783,6 +815,7 @@ list(
                 lib_spe_exp_gnp_pre_sop,
                 lib_spe_exp_mb_pre_sop,
                 lib_spe_exp_mer_pre_sop,
+                lib_spe_is_nor_pre_sop,
                 lib_spe_is_wik_pre_sop
               ),
               filter = par_pre_lib_sop_mer$organisms$filter$mode,
@@ -950,6 +983,7 @@ list(
             annotate_spectra(
               input = input_spectra,
               libraries = c(
+                lib_spe_is_nor_pre_pos,
                 lib_spe_is_wik_pre_pos,
                 ## TODO add is hmdb
                 lib_spe_exp_int_pre_pos,
@@ -980,6 +1014,7 @@ list(
             annotate_spectra(
               input = input_spectra,
               libraries = c(
+                lib_spe_is_nor_pre_neg,
                 lib_spe_is_wik_pre_neg,
                 ## TODO add is hmdb
                 lib_spe_exp_int_pre_neg,

@@ -17,6 +17,7 @@
 * Added [BiGG](http://bigg.ucsd.edu/) as SOP library
 * Added basic isotopologues handling
 * Added external identifiers to the final results (#142)
+* Added NORMAN SUSPECT LIST DATA in silico spectral libraries
 * Added multiple new sub-libraries and a new `tag` column
 * Added mzmine annotation support
 * Added Sirius spectral results support

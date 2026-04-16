@@ -15,6 +15,8 @@ files:
         gnps: data/interim/libraries/sop/gnps_11566051_prepared.tsv.gz
         #' HMDB prepared structure organism pairs library. STRING
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
+        #' ISDB NormanSusDat prepared structure organism pairs library. STRING
+        isdbnormansusdat: data/interim/libraries/sop/isdbnormansusdat_14854025_prepared.tsv.gz
         #' CSF Metabolome prepared structure organism pairs library. STRING
         csfmetabolome: data/interim/libraries/sop/csfmetabolome_prepared.tsv.gz
         #' Fecal Metabolome prepared structure organism pairs library. STRING

@@ -202,6 +202,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 -   MassBank: <https://doi.org/10.5281/zenodo.3378723>
 -   Merlin: <https://doi.org/10.5281/zenodo.13911806>
 -   NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
+-   ISDB-NormanSusDat: <https://zenodo.org/records/14854025>
 
 ## Additional software credits
 

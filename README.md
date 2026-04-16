@@ -226,39 +226,40 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 - MassBank: <https://doi.org/10.5281/zenodo.3378723>
 - Merlin: <https://doi.org/10.5281/zenodo.13911806>
 - NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
+- ISDB-NormanSusDat: <https://zenodo.org/records/14854025>
 
 ## Additional software credits
 
 | Package | Version | Citation |
 |:---|:---|:---|
-| archive | 1.1.12.1 | Hester and Csárdi (2025) |
+| archive | 1.1.13 | Hester and Csárdi (2025) |
 | base | 4.5.3 | R Core Team (2025) |
 | BiocManager | 1.30.27 | Morgan and Ramos (2025) |
 | BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
 | classyfireR | 0.3.8 | Y et al. (2016) |
-| docopt | 0.7.2 | de Jonge (2025) |
-| fs | 1.6.7 | Hester, Wickham, and Csárdi (2025) |
+| docopt | 0.7.2 | <span class="nocase">de Jonge</span> (2025) |
+| fs | 2.0.1 | Hester et al. (2025) |
 | httr2 | 1.2.2 | Wickham (2025) |
-| igraph | 2.2.2 | Csárdi and Nepusz (2006); Antonov et al. (2023); (**igraph2026?**) |
+| igraph | 2.2.3 | Csárdi and Nepusz (2006); Antonov et al. (2023); (**igraph2026?**) |
 | IRanges | 2.44.0 | Lawrence et al. (2013) |
 | knitr | 1.51 | Xie (2014); Xie (2015); Xie (2025) |
 | lgr | 0.5.2 | Fleck (2025) |
 | lifecycle | 1.0.5 | (**lifecycle?**) |
 | MetaboCoreUtils | 1.18.1 | Rainer et al. (2022a) |
-| MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
+| MsBackendMgf | 1.18.0 | Gatto et al. (2025) |
 | MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
 | MsCoreUtils | 1.22.1 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
 | R.utils | 2.13.0 | Bengtsson (2025) |
-| reticulate | 1.45.0 | Ushey, Allaire, and Tang (2025) |
-| rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
-| rotl | 3.1.1 | Michonneau, Brown, and Winter (2016); OpenTreeOfLife et al. (2019) |
+| reticulate | 1.46.0 | Ushey et al. (2025) |
+| rmarkdown | 2.31 | Xie et al. (2018); Xie et al. (2020); (**rmarkdown2026?**) |
+| rotl | 3.1.1 | Michonneau et al. (2016); OpenTreeOfLife et al. (2019) |
 | shiny | 1.13.0 | Chang et al. (2025) |
 | shinyhelper | 0.3.2 | Mason-Thom (2019) |
 | shinyjs | 2.1.1 | Attali (2021) |
 | shinytest2 | 0.5.1 | Schloerke (2025) |
-| shinyvalidate | 0.1.3 | Sievert, Iannone, and Cheng (2023) |
+| shinyvalidate | 0.1.3 | Sievert et al. (2023) |
 | Spectra | 1.20.1 | Rainer et al. (2022d) |
 | stringi | 1.8.7 | Gagolewski (2022) |
 | targets | 1.12.0 | Landau (2021) |
@@ -267,28 +268,18 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
 | tima | 2.12.0.9000 | Rutz et al. (2019); Rutz and Allard (2025) |
+| tools | 4.5.3 | (**tools?**) |
 | withr | 3.0.2 | Hester et al. (2024) |
 | yaml | 2.3.12 | Stephens and Simonov (2025) |
 
-<div id="refs" class="references csl-bib-body hanging-indent"
-entry-spacing="0">
-
-<div id="ref-rmarkdown2025" class="csl-entry">
-
-Allaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier
-Luraschi, Kevin Ushey, Aron Atkins, et al. 2025.
-*<span class="nocase">rmarkdown</span>: Dynamic Documents for r*.
-<https://github.com/rstudio/rmarkdown>.
-
-</div>
+<div id="refs" class="references csl-bib-body hanging-indent">
 
 <div id="ref-igraph2023" class="csl-entry">
 
-Antonov, Michael, Gábor Csárdi, Szabolcs Horvát, Kirill Müller, Tamás
-Nepusz, Daniel Noom, Maëlle Salmon, Vincent Traag, Brooke Foucault
-Welles, and Fabio Zanini. 2023. “Igraph Enables Fast and Robust Network
-Analysis Across Programming Languages.” *arXiv Preprint
-arXiv:2311.10260*. <https://doi.org/10.48550/arXiv.2311.10260>.
+Antonov, Michael, Gábor Csárdi, Szabolcs Horvát, et al. 2023. “Igraph
+Enables Fast and Robust Network Analysis Across Programming Languages.”
+*arXiv Preprint arXiv:2311.10260*, ahead of print.
+<https://doi.org/10.48550/arXiv.2311.10260>.
 
 </div>
 
@@ -309,8 +300,7 @@ Programming Utilities*. <https://doi.org/10.32614/CRAN.package.R.utils>.
 
 <div id="ref-shiny" class="csl-entry">
 
-Chang, Winston, Joe Cheng, JJ Allaire, Carson Sievert, Barret Schloerke,
-Garrick Aden-Buie, Yihui Xie, et al. 2025.
+Chang, Winston, Joe Cheng, JJ Allaire, et al. 2025.
 *<span class="nocase">shiny</span>: Web Application Framework for r*.
 <https://doi.org/10.32614/CRAN.package.shiny>.
 
@@ -326,9 +316,9 @@ Complex Network Research.” *InterJournal* Complex Systems: 1695.
 
 <div id="ref-docopt" class="csl-entry">
 
-de Jonge, Edwin. 2025. *<span class="nocase">docopt</span>: Command-Line
-Interface Specification Language*.
-<https://doi.org/10.32614/CRAN.package.docopt>.
+<span class="nocase">de Jonge, Edwin</span>. 2025.
+*<span class="nocase">docopt</span>: Command-Line Interface
+Specification Language*. <https://doi.org/10.32614/CRAN.package.docopt>.
 
 </div>
 
@@ -408,11 +398,9 @@ High-Performance Computing.” *Journal of Open Source Software* 6 (57):
 
 <div id="ref-IRanges" class="csl-entry">
 
-Lawrence, Michael, Wolfgang Huber, Hervé Pagès, Patrick Aboyoun, Marc
-Carlson, Robert Gentleman, Martin Morgan, and Vincent Carey. 2013.
-“Software for Computing and Annotating Genomic Ranges.” *PLoS
-Computational Biology* 9.
-<https://doi.org/10.1371/journal.pcbi.1003118>.
+Lawrence, Michael, Wolfgang Huber, Hervé Pagès, et al. 2013. “Software
+for Computing and Annotating Genomic Ranges.” *PLoS Computational
+Biology* 9. <https://doi.org/10.1371/journal.pcbi.1003118>.
 
 </div>
 
@@ -458,9 +446,8 @@ Bioconductor Project Package Repository*.
 
 <div id="ref-rotl2019" class="csl-entry">
 
-OpenTreeOfLife, Benjamin Redelings, Luna Luisa Sanchez Reyes, Karen A.
-Cranston, Jim Allman, Mark T. Holder, and Emily Jane McTavish. 2019.
-“Open Tree of Life Synthetic Tree.” Zenodo.
+OpenTreeOfLife, Benjamin Redelings, Luna Luisa Sanchez Reyes, et al.
+2019. *Open Tree of Life Synthetic Tree*. Version 12.3. Zenodo.
 <https://doi.org/10.5281/zenodo.3937741>.
 
 </div>
@@ -468,41 +455,40 @@ Cranston, Jim Allman, Mark T. Holder, and Emily Jane McTavish. 2019.
 <div id="ref-base" class="csl-entry">
 
 R Core Team. 2025. *R: A Language and Environment for Statistical
-Computing*. Vienna, Austria: R Foundation for Statistical Computing.
+Computing*. R Foundation for Statistical Computing.
 <https://www.R-project.org/>.
 
 </div>
 
 <div id="ref-MetaboCoreUtils" class="csl-entry">
 
-Rainer, Johannes, Andrea Vicini, Liesa Salzer, Jan Stanstrup, Josep M.
-Badia, Steffen Neumann, Michael A. Stravs, et al. 2022a. “A Modular and
-Expandable Ecosystem for Metabolomics Data Annotation in r.”
+Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al. 2022a. “A Modular
+and Expandable Ecosystem for Metabolomics Data Annotation in r.”
 *Metabolites* 12: 173. <https://doi.org/10.3390/metabo12020173>.
 
 </div>
 
 <div id="ref-MsBackendMsp" class="csl-entry">
 
-———, et al. 2022b. “A Modular and Expandable Ecosystem for Metabolomics
-Data Annotation in r.” *Metabolites* 12: 173.
-<https://doi.org/10.3390/metabo12020173>.
+Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al. 2022b. “A Modular
+and Expandable Ecosystem for Metabolomics Data Annotation in r.”
+*Metabolites* 12: 173. <https://doi.org/10.3390/metabo12020173>.
 
 </div>
 
 <div id="ref-MsCoreUtils" class="csl-entry">
 
-———, et al. 2022c. “A Modular and Expandable Ecosystem for Metabolomics
-Data Annotation in r.” *Metabolites* 12: 173.
-<https://doi.org/10.3390/metabo12020173>.
+Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al. 2022c. “A Modular
+and Expandable Ecosystem for Metabolomics Data Annotation in r.”
+*Metabolites* 12: 173. <https://doi.org/10.3390/metabo12020173>.
 
 </div>
 
 <div id="ref-Spectra" class="csl-entry">
 
-———, et al. 2022d. “A Modular and Expandable Ecosystem for Metabolomics
-Data Annotation in r.” *Metabolites* 12: 173.
-<https://doi.org/10.3390/metabo12020173>.
+Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al. 2022d. “A Modular
+and Expandable Ecosystem for Metabolomics Data Annotation in r.”
+*Metabolites* 12: 173. <https://doi.org/10.3390/metabo12020173>.
 
 </div>
 
@@ -516,9 +502,7 @@ Annotation*. <https://doi.org/10.5281/zenodo.5797920>.
 
 <div id="ref-tima2019" class="csl-entry">
 
-Rutz, Adriano, Miwa Dounoue-Kubo, Simon Ollivier, Jonathan Bisson,
-Mohsen Bagheri, Tongchai Saesong, Samad Nejad Ebrahimi, Kornkanok
-Ingkaninan, Jean-Luc Wolfender, and Pierre-Marie Allard. 2019.
+Rutz, Adriano, Miwa Dounoue-Kubo, Simon Ollivier, et al. 2019.
 “Taxonomically Informed Scoring Enhances Confidence in Natural Products
 Annotation.” *Frontiers in Plant Science* 10.
 <https://doi.org/10.3389/FPLS.2019.01329>.
@@ -575,17 +559,16 @@ Started with Testing.” *The R Journal* 3: 5–10.
 
 <div id="ref-httr2" class="csl-entry">
 
-———. 2025. *Httr2: Perform HTTP Requests and Process the Responses*.
-<https://doi.org/10.32614/CRAN.package.httr2>.
+Wickham, Hadley. 2025. *Httr2: Perform HTTP Requests and Process the
+Responses*. <https://doi.org/10.32614/CRAN.package.httr2>.
 
 </div>
 
 <div id="ref-tidyverse" class="csl-entry">
 
-Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy
-D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019.
-“Welcome to the <span class="nocase">tidyverse</span>.” *Journal of Open
-Source Software* 4 (43): 1686. <https://doi.org/10.21105/joss.01686>.
+Wickham, Hadley, Mara Averick, Jennifer Bryan, et al. 2019. “Welcome to
+the <span class="nocase">tidyverse</span>.” *Journal of Open Source
+Software* 4 (43): 1686. <https://doi.org/10.21105/joss.01686>.
 
 </div>
 
@@ -600,22 +583,22 @@ and Roger D. Peng. Chapman; Hall/CRC.
 
 <div id="ref-knitr2015" class="csl-entry">
 
-———. 2015. *Dynamic Documents with R and Knitr*. 2nd ed. Boca Raton,
-Florida: Chapman; Hall/CRC. <https://yihui.org/knitr/>.
+Xie, Yihui. 2015. *Dynamic Documents with R and Knitr*. 2nd ed. Chapman;
+Hall/CRC. <https://yihui.org/knitr/>.
 
 </div>
 
 <div id="ref-knitr2025" class="csl-entry">
 
-———. 2025. *<span class="nocase">knitr</span>: A General-Purpose Package
-for Dynamic Report Generation in R*. <https://yihui.org/knitr/>.
+Xie, Yihui. 2025. *<span class="nocase">knitr</span>: A General-Purpose
+Package for Dynamic Report Generation in R*. <https://yihui.org/knitr/>.
 
 </div>
 
 <div id="ref-rmarkdown2018" class="csl-entry">
 
 Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. *R Markdown: The
-Definitive Guide*. Boca Raton, Florida: Chapman; Hall/CRC.
+Definitive Guide*. Chapman; Hall/CRC.
 <https://bookdown.org/yihui/rmarkdown>.
 
 </div>
@@ -623,17 +606,17 @@ Definitive Guide*. Boca Raton, Florida: Chapman; Hall/CRC.
 <div id="ref-rmarkdown2020" class="csl-entry">
 
 Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. *R Markdown
-Cookbook*. Boca Raton, Florida: Chapman; Hall/CRC.
+Cookbook*. Chapman; Hall/CRC.
 <https://bookdown.org/yihui/rmarkdown-cookbook>.
 
 </div>
 
 <div id="ref-classyfireR" class="csl-entry">
 
-Y, Djoumbou Feunang, Eisner R, Knox C, Chepelev L, Hastings J, Owen G,
-Fahy E, et al. 2016. *ClassyFire: Automated Chemical Classification with
-a Comprehensive, Computable Taxonomy*. *Journal of Cheminformatics*.
-Vol. 8:61. <https://doi.org/10.1186/s13321-016-0174-y>.
+Y, Djoumbou Feunang, Eisner R, Knox C, et al. 2016. *ClassyFire:
+Automated Chemical Classification with a Comprehensive, Computable
+Taxonomy*. In *Journal of Cheminformatics*, 8:61.
+<https://doi.org/10.1186/s13321-016-0174-y>.
 
 </div>
 
