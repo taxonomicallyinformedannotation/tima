@@ -197,6 +197,9 @@ import_spectra <- function(
   if ("PrecursorMZ" %in% spec_cols) {
     spectra$precursorMz <- as.numeric(spectra$PrecursorMZ)
   }
+  if ("PrecursorMz" %in% spec_cols) {
+    spectra$precursorMz <- as.numeric(spectra$PrecursorMz)
+  }
   if ("spectrum_id" %in% spec_cols) {
     spectra$spectrum_id <- as.character(spectra$spectrum_id)
   }
