@@ -47,7 +47,7 @@ removed.
 Non-negative numeric or NULL for dynamic thresholding.}
 
 \item{min_fragments}{\link{integer} Minimum number of fragment peaks a spectrum
-must have after cleaning to be retained (default: 2).}
+must have after cleaning to be retained}
 
 \item{qutoff}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{cutoff} instead.}
 }

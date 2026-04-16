@@ -23,7 +23,7 @@
 #'     removed.
 #'     Non-negative numeric or NULL for dynamic thresholding.
 #' @param min_fragments [integer] Minimum number of fragment peaks a spectrum
-#'     must have after cleaning to be retained (default: 2).
+#'     must have after cleaning to be retained
 #' @param qutoff `r lifecycle::badge("deprecated")` Use `cutoff` instead.
 #'
 #' @return Character string path to the created spectral edges file

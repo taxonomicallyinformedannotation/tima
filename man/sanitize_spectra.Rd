@@ -8,7 +8,7 @@ sanitize_spectra(
   spectra,
   cutoff = NULL,
   dalton = 0.01,
-  min_fragments = 3L,
+  min_fragments = 2L,
   ppm = 10
 )
 }
@@ -22,7 +22,7 @@ based on each spectrum's intensity distribution will be used.}
 \item{dalton}{\link{numeric} Dalton tolerance for peak matching (default: 0.01)}
 
 \item{min_fragments}{\link{integer} Minimum number of fragment peaks a spectrum
-must have after cleaning to be retained (default: 3). Spectra with
+must have after cleaning to be retained (default: 2). Spectra with
 fewer peaks are discarded.}
 
 \item{ppm}{\link{numeric} PPM tolerance for peak matching (default: 10)}

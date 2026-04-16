@@ -11,7 +11,7 @@
 #' @param cutoff Numeric absolute minimal intensity threshold (default: NULL)
 #' @param dalton Numeric Dalton tolerance for peak matching (default: 0.01)
 #' @param min_fragments Integer minimum number of fragment peaks required to
-#'     keep a spectrum after sanitization (default: 3)
+#'     keep a spectrum after sanitization (default: 2)
 #' @param polarity Character string for polarity filtering: "pos", "neg", or NA
 #'     to keep all (default: NA)
 #' @param ppm Numeric PPM tolerance for peak matching (default: 10)
@@ -42,7 +42,7 @@ import_spectra <- function(
   file,
   cutoff = NULL,
   dalton = 0.01,
-  min_fragments = 3L,
+  min_fragments = 2L,
   polarity = NA,
   ppm = 10,
   sanitize = TRUE,

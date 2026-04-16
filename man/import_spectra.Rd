@@ -8,7 +8,7 @@ import_spectra(
   file,
   cutoff = NULL,
   dalton = 0.01,
-  min_fragments = 3L,
+  min_fragments = 2L,
   polarity = NA,
   ppm = 10,
   sanitize = TRUE,
@@ -23,7 +23,7 @@ import_spectra(
 \item{dalton}{Numeric Dalton tolerance for peak matching (default: 0.01)}
 
 \item{min_fragments}{Integer minimum number of fragment peaks required to
-keep a spectrum after sanitization (default: 3)}
+keep a spectrum after sanitization (default: 2)}
 
 \item{polarity}{Character string for polarity filtering: "pos", "neg", or NA
 to keep all (default: NA)}

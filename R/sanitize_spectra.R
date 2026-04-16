@@ -10,7 +10,7 @@
 #'     based on each spectrum's intensity distribution will be used.
 #' @param dalton [numeric] Dalton tolerance for peak matching (default: 0.01)
 #' @param min_fragments [integer] Minimum number of fragment peaks a spectrum
-#'     must have after cleaning to be retained (default: 3). Spectra with
+#'     must have after cleaning to be retained (default: 2). Spectra with
 #'     fewer peaks are discarded.
 #' @param ppm [numeric] PPM tolerance for peak matching (default: 10)
 #'
@@ -31,7 +31,7 @@ sanitize_spectra <- function(
   spectra,
   cutoff = NULL,
   dalton = 0.01,
-  min_fragments = 3L,
+  min_fragments = 2L,
   ppm = 10
 ) {
   # TODO(M6): Replace @backend@peaksData slot access with Spectra::peaksData()
