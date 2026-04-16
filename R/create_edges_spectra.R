@@ -66,8 +66,7 @@ create_edges_spectra <- function(
   )$ms$thresholds$ms2$intensity,
   min_fragments = get_params(
     step = "create_edges_spectra"
-  )$ms$thresholds$ms2$min_fragments %||%
-    2L,
+  )$ms$thresholds$ms2$min_fragments,
   qutoff = deprecated()
 ) {
   # Handle deprecated qutoff parameter

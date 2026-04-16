@@ -49,7 +49,7 @@ ms:
       #' Intensity threshold for MS2. FLOAT
       intensity: 0.0
       #' Minimum number of fragment peaks to keep a spectrum. INTEGER
-      min_fragments: 2
+      min_fragments: 3
 
   #' Polarity used. Must be "pos" or "neg". STRING
   polarity: pos
