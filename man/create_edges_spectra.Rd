@@ -18,7 +18,7 @@ create_edges_spectra(
   dalton = get_params(step = "create_edges_spectra")$ms$tolerances$mass$dalton$ms2,
   cutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity,
   min_fragments = get_params(step =
-    "create_edges_spectra")$ms$thresholds$ms2$min_fragments \%||\% 2L,
+    "create_edges_spectra")$ms$thresholds$ms2$min_fragments,
   qutoff = deprecated()
 )
 }
