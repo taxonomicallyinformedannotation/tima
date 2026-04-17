@@ -2,9 +2,9 @@
 % Please edit documentation in R/weights_utils.R
 \name{compute_weighted_sum}
 \alias{compute_weighted_sum}
-\title{Compute normalized weighted sum (row-wise for data frames)}
+\title{Compute confidence-aware weighted sum (row-wise for data frames)}
 \usage{
-compute_weighted_sum(..., weights)
+compute_weighted_sum(..., weights, coverage_floor = 0.5)
 }
 \arguments{
 \item{...}{\link{numeric} Numeric columns/vectors of component values (passed as
@@ -12,16 +12,33 @@ separate arguments).}
 
 \item{weights}{\link{numeric} Numeric vector of non-negative weights (one per
 component).}
+
+\item{coverage_floor}{\link{numeric} Minimum coverage multiplier (0-1). Controls
+how much missing evidence dimensions penalize the score. Default 0.5
+means a single-dimension score is discounted to at most 50-100\% of
+its value depending on how many dimensions are missing. Set to 1.0
+to disable the coverage discount (pure renormalization).}
 }
 \value{
-Numeric vector: row-wise weighted sum with normalized weights.
+Numeric vector: row-wise weighted sum with per-row weight
+renormalization and evidence coverage discount.
+Returns NA for rows where all components are NA.
 }
 \description{
-Compute normalized weighted sum (row-wise for data frames)
+Compute confidence-aware weighted sum (row-wise for data frames)
 }
 \details{
-Original formula: (w1\emph{v1 + w2}v2 + ...) / (w1 + w2 + ...)
-where w are weights and v are value columns. Weights are normalized to sum to
-1.
+Two-step computation:
+\enumerate{
+\item \strong{Renormalized weighted average}: weights are rescaled per row over
+non-NA components so missing data doesn't contribute zero.
+\item \strong{Coverage discount}: the average is multiplied by a factor reflecting
+what fraction of total weight was available. With \code{coverage_floor = 0.5},
+a row with all components gets factor 1.0, while a row with only 1/3 of
+total weight available gets factor ~0.67.
+}
+
+Formula: \verb{result = weighted_avg × (floor + (1 - floor) × coverage)}
+where \code{coverage = sum(available_weights) / sum(all_weights)}.
 }
 \keyword{internal}
