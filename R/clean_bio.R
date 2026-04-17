@@ -197,25 +197,25 @@ clean_bio <- function(
   defaults <- list(
     feature_pred_tax_cla_01kin_val = "empty",
     consistency_structure_cla_kin = 1,
-    feature_pred_tax_cla_01kin_score = 0,
+    feature_pred_tax_cla_01kin_score = NA_real_,
     feature_pred_tax_npc_01pat_val = "empty",
     consistency_structure_npc_pat = 1,
-    feature_pred_tax_npc_01pat_score = 0,
+    feature_pred_tax_npc_01pat_score = NA_real_,
     feature_pred_tax_cla_02sup_val = "empty",
     consistency_structure_cla_sup = 1,
-    feature_pred_tax_cla_02sup_score = 0,
+    feature_pred_tax_cla_02sup_score = NA_real_,
     feature_pred_tax_npc_02sup_val = "empty",
     consistency_structure_npc_sup = 1,
-    feature_pred_tax_npc_02sup_score = 0,
+    feature_pred_tax_npc_02sup_score = NA_real_,
     feature_pred_tax_cla_03cla_val = "empty",
     consistency_structure_cla_cla = 1,
-    feature_pred_tax_cla_03cla_score = 0,
+    feature_pred_tax_cla_03cla_score = NA_real_,
     feature_pred_tax_npc_03cla_val = "empty",
     consistency_structure_npc_cla = 1,
-    feature_pred_tax_npc_03cla_score = 0,
+    feature_pred_tax_npc_03cla_score = NA_real_,
     feature_pred_tax_cla_04dirpar_val = "empty",
     consistency_structure_cla_par = 1,
-    feature_pred_tax_cla_04dirpar_score = 0
+    feature_pred_tax_cla_04dirpar_score = NA_real_
   )
 
   n_rows <- nrow(df)
@@ -253,25 +253,25 @@ clean_bio <- function(
     tidytable::mutate(
       feature_pred_tax_cla_01kin_val = "empty",
       consistency_structure_cla_kin = 1,
-      feature_pred_tax_cla_01kin_score = 0,
+      feature_pred_tax_cla_01kin_score = NA_real_,
       feature_pred_tax_npc_01pat_val = "empty",
       consistency_structure_npc_pat = 1,
-      feature_pred_tax_npc_01pat_score = 0,
+      feature_pred_tax_npc_01pat_score = NA_real_,
       feature_pred_tax_cla_02sup_val = "empty",
       consistency_structure_cla_sup = 1,
-      feature_pred_tax_cla_02sup_score = 0,
+      feature_pred_tax_cla_02sup_score = NA_real_,
       feature_pred_tax_npc_02sup_val = "empty",
       consistency_structure_npc_sup = 1,
-      feature_pred_tax_npc_02sup_score = 0,
+      feature_pred_tax_npc_02sup_score = NA_real_,
       feature_pred_tax_cla_03cla_val = "empty",
       consistency_structure_cla_cla = 1,
-      feature_pred_tax_cla_03cla_score = 0,
+      feature_pred_tax_cla_03cla_score = NA_real_,
       feature_pred_tax_npc_03cla_val = "empty",
       consistency_structure_npc_cla = 1,
-      feature_pred_tax_npc_03cla_score = 0,
+      feature_pred_tax_npc_03cla_score = NA_real_,
       feature_pred_tax_cla_04dirpar_val = "empty",
       consistency_structure_cla_par = 1,
-      feature_pred_tax_cla_04dirpar_score = 0
+      feature_pred_tax_cla_04dirpar_score = NA_real_
     )
 }
 

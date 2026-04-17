@@ -535,7 +535,6 @@ weight_bio <- function(
         score_biological_09,
         # score_biological_09_1,
         score_biological_10,
-        0,
         na.rm = TRUE
       )
     ) |>
@@ -614,13 +613,6 @@ weight_bio <- function(
         "sample_organism_name",
         "candidate_organism_name"
       )
-    ) |>
-    tidytable::mutate(
-      score_biological = tidytable::if_else(
-        condition = is.na(score_biological),
-        true = 0,
-        false = score_biological
-      )
     )
   rm(df1)
 
@@ -656,13 +648,6 @@ weight_bio <- function(
       by = c(
         "candidate_structure_inchikey_connectivity_layer",
         "sample_organism_name"
-      )
-    ) |>
-    tidytable::mutate(
-      score_biological = tidytable::if_else(
-        is.na(score_biological),
-        0,
-        score_biological
       )
     ) |>
     tidytable::select(
