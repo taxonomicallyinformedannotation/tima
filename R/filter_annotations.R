@@ -137,20 +137,32 @@ validate_filter_annotations_inputs <- function(
 
 #' Filter MS1 Annotations
 #'
-#' @description Internal helper to remove MS1 annotations that have spectral
-#'     matches.
+#' @description Internal helper to remove MS1 annotations that have
+#'     quality spectral matches. Only suppresses MS1 when the spectral
+#'     evidence is genuinely informative (similarity > threshold and
+#'     at least `min_peaks` matched peaks). Experimental library matches
+#'     (e.g. GNPS) suppress MS1 more readily than in-silico matches
+#'     (e.g. SIRIUS).
 #'
 #' @param annotation_tables_list Named list of annotation tables
+#' @param similarity_threshold Minimum spectral similarity for a spectral
+#'     match to suppress the corresponding MS1 annotation (default 0.3)
+#' @param min_peaks Minimum matched peaks for a spectral match to suppress
+#'     the corresponding MS1 annotation (default 2)
 #'
 #' @return Data frame with filtered annotations
 #' @keywords internal
-filter_ms1_redundancy <- function(annotation_tables_list) {
+filter_ms1_redundancy <- function(
+  annotation_tables_list,
+  similarity_threshold = 0.3,
+  min_peaks = 2L
+) {
   if (!"ms1" %in% names(annotation_tables_list)) {
     log_debug("No MS1 annotations to filter, combining all annotations")
     return(tidytable::bind_rows(annotation_tables_list))
   }
 
-  log_info("Removing MS1 annotations superseded by spectral matches")
+  log_info("Removing MS1 annotations superseded by quality spectral matches")
 
   # Extract spectral annotations (all non-MS1)
   spectral_names <- names(annotation_tables_list)[
@@ -171,7 +183,40 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
     c("feature_id", "candidate_structure_inchikey_connectivity_layer")
   }
 
-  spectral_keys <- annotations_tables_spectral |>
+  # Quality gate: only consider spectral matches that are genuinely
+
+  # informative. This prevents a noisy spectral hit from killing a valid
+
+  # MS1 annotation backed by accurate mass.
+  has_similarity <- "candidate_score_similarity" %in%
+    names(annotations_tables_spectral)
+  has_peaks <- "candidate_count_similarity_peaks_matched" %in%
+    names(annotations_tables_spectral)
+
+  quality_spectral <- annotations_tables_spectral
+  if (has_similarity) {
+    quality_spectral <- quality_spectral |>
+      tidytable::filter(
+        is.na(candidate_score_similarity) |
+          as.numeric(candidate_score_similarity) >= similarity_threshold
+      )
+  }
+  if (has_peaks) {
+    quality_spectral <- quality_spectral |>
+      tidytable::filter(
+        is.na(candidate_count_similarity_peaks_matched) |
+          as.integer(candidate_count_similarity_peaks_matched) >= min_peaks
+      )
+  }
+
+  n_quality <- nrow(quality_spectral)
+  log_debug(
+    "Quality-gated spectral annotations for MS1 suppression: %d / %d",
+    n_quality,
+    n_spectral
+  )
+
+  spectral_keys <- quality_spectral |>
     tidytable::distinct(tidyselect::any_of(anti_join_cols))
 
   n_ms1_before <- nrow(annotation_tables_list[["ms1"]])
@@ -192,27 +237,20 @@ filter_ms1_redundancy <- function(annotation_tables_list) {
 
 #' Apply RT Filtering
 #'
-#' @description Internal helper to filter annotations by RT tolerance.
+#' @description Internal helper to join RT library information onto
+#'     annotations. Computes the RT error but does NOT apply a hard cutoff;
+#'     the downstream scoring system uses a sigmoid penalty to handle RT
+#'     deviations gracefully, avoiding information-destroying discontinuities.
 #'
 #' @param features_annotated_table Data frame with features and annotations
 #' @param rt_table Data frame with RT standards
-#' @param tolerance_rt Numeric RT tolerance in minutes
+#' @param tolerance_rt Numeric RT tolerance in minutes (used only for
+#'     deduplication of multiple RT matches for the same compound)
 #'
-#' @return Filtered data frame
+#' @return Data frame with `candidate_structure_error_rt` column added
 #' @keywords internal
 apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
-  apply_tolerance <- is.finite(tolerance_rt)
-
-  if (apply_tolerance) {
-    log_info(
-      "Filtering annotations outside %f min RT tolerance",
-      tolerance_rt
-    )
-  } else {
-    log_info(
-      "RT tolerance is Inf: joining RT library without filtering"
-    )
-  }
+  log_info("Joining RT library and computing RT errors")
 
   joined <- features_annotated_table |>
     tidytable::left_join(
@@ -224,40 +262,41 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
         as.numeric(rt_target)
     )
 
-  # Deduplication by best RT match is only meaningful when a tolerance
-  # cutoff will actually be applied. With tolerance = Inf every row would
-  # pass anyway, so the arrange + distinct just silently drops rows from
-  # compounds that appear more than once.
-  if (apply_tolerance) {
-    n_before_dedup <- nrow(joined)
+  # When a compound has multiple RT library entries, keep only the
+
+  # best-matching one per (feature, compound, library) triplet.
+  n_before_dedup <- nrow(joined)
+  dedup_cols <- intersect(
+    c(
+      "feature_id",
+      "candidate_structure_inchikey_connectivity_layer",
+      "candidate_library"
+    ),
+    names(joined)
+  )
+
+  # Only deduplicate when there are actual duplicate RT matches
+  if (length(dedup_cols) > 0L) {
     joined <- joined |>
       tidytable::arrange(abs(candidate_structure_error_rt)) |>
       tidytable::distinct(
-        -candidate_structure_error_rt,
-        -rt_target,
+        tidyselect::all_of(dedup_cols),
         .keep_all = TRUE
       )
-    n_dedup <- n_before_dedup - nrow(joined)
-    if (n_dedup > 0L) {
-      log_info(
-        "Removed %d duplicate RT library matches (keeping best match per annotation)",
-        n_dedup
-      )
-    }
+  }
 
-    n_before_filter <- nrow(joined)
-    joined <- joined |>
-      tidytable::filter(
-        abs(candidate_structure_error_rt) <=
-          abs(tolerance_rt) + .Machine$double.eps |
-          is.na(candidate_structure_error_rt)
-      )
-    n_filtered <- n_before_filter - nrow(joined)
+  n_dedup <- n_before_dedup - nrow(joined)
+  if (n_dedup > 0L) {
     log_info(
-      "Removed %d annotations outside RT tolerance",
-      n_filtered
+      "Removed %d duplicate RT library matches (keeping best match per annotation)",
+      n_dedup
     )
   }
+
+  log_info(
+    "RT errors computed for %d annotations (no hard cutoff applied; scoring handles RT penalty)",
+    sum(!is.na(joined$candidate_structure_error_rt))
+  )
 
   joined |>
     tidytable::select(-tidyselect::any_of(x = c("rt_target", "type")))
@@ -266,8 +305,10 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
 #' @title Filter annotations
 #'
 #' @description This function filters initial annotations by removing MS1-only
-#'     annotations that also have spectral matches, and optionally filtering by
-#'     retention time tolerance when RT libraries are available.
+#'     annotations that also have quality spectral matches (gated on similarity
+#'     and matched peaks), and joins retention time library data when available.
+#'     RT errors are computed but no hard cutoff is applied; the downstream
+#'     scoring system uses a sigmoid penalty to handle RT deviations gracefully.
 #'
 #' @include get_params.R
 #' @include safe_fread.R
@@ -280,7 +321,8 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
 #' @param rts Character string path to prepared retention time library
 #'     (optional)
 #' @param output Character string path for filtered annotations output
-#' @param tolerance_rt Numeric RT tolerance in minutes for library matching
+#' @param tolerance_rt Numeric RT tolerance in minutes (used for deduplication
+#'     of multiple RT library matches; no hard cutoff is applied)
 #'
 #' @return Character string path to the filtered annotations file
 #'
@@ -400,7 +442,7 @@ filter_annotations <- function(
 
   n_total_annotations <- nrow(annotation_table)
   log_info(
-    "Total annotations before RT filtering: %d",
+    "Total annotations after MS1 deduplication: %d",
     n_total_annotations
   )
 
@@ -459,12 +501,14 @@ filter_annotations <- function(
       tidytable::mutate(candidate_structure_error_rt = NA)
   }
 
-  n_removed_rt <- nrow(features_annotated_table_1) -
+  n_dedup_rt <- nrow(features_annotated_table_1) -
     nrow(features_annotated_table_2)
-  log_info(
-    "Removed %d annotations based on retention time tolerance",
-    n_removed_rt
-  )
+  if (n_dedup_rt > 0L) {
+    log_info(
+      "Removed %d duplicate RT library matches during join",
+      n_dedup_rt
+    )
+  }
   rm(features_annotated_table_1)
 
   ## in case some features had a single filtered annotation

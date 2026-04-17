@@ -337,21 +337,23 @@ test_that("validate_filter_annotations_inputs accepts valid character vector ann
   )
 })
 
-test_that("filter_ms1_redundancy filters correctly", {
+test_that("filter_ms1_redundancy filters correctly with quality gate", {
   skip_if_not_installed("tidytable")
 
   ms1_data <- tidytable::tidytable(
-    feature_id = c("F1", "F2", "F3"),
-    candidate_structure_inchikey_connectivity_layer = c("A", "B", "C"),
-    candidate_library = c("ms1", "ms1", "ms1"),
-    score = c(0.5, 0.6, 0.7)
+    feature_id = c("F1", "F2", "F3", "F4"),
+    candidate_structure_inchikey_connectivity_layer = c("A", "B", "C", "D"),
+    candidate_library = c("ms1", "ms1", "ms1", "ms1"),
+    score = c(0.5, 0.6, 0.7, 0.8)
   )
 
   spectral_data <- tidytable::tidytable(
-    feature_id = c("F1", "F2"),
-    candidate_structure_inchikey_connectivity_layer = c("A", "B"),
-    candidate_library = c("spectral", "spectral"),
-    score = c(0.8, 0.9)
+    feature_id = c("F1", "F2", "F4"),
+    candidate_structure_inchikey_connectivity_layer = c("A", "B", "D"),
+    candidate_library = c("spectral", "spectral", "spectral"),
+    score = c(0.8, 0.9, 0.3),
+    candidate_score_similarity = c("0.8", "0.9", "0.1"),
+    candidate_count_similarity_peaks_matched = c("3", "5", "0")
   )
 
   ann_list <- list(
@@ -361,20 +363,18 @@ test_that("filter_ms1_redundancy filters correctly", {
 
   result <- filter_ms1_redundancy(ann_list)
 
-  # F1 and F2 should be removed from MS1 (superseded by spectral)
-  # Only F3 from MS1 should remain, plus F1 and F2 from spectral
-  expect_equal(nrow(result), 3)
-
-  # Check that spectral annotations are present
-  spectral_results <- result |>
-    tidytable::filter(candidate_library == "spectral")
-  expect_equal(nrow(spectral_results), 2)
-
-  # Check that only non-redundant MS1 annotation remains
+  # F1, F2: high-quality spectral → MS1 suppressed
+  # F3: no spectral match → MS1 kept
+  # F4: low-quality spectral (sim=0.1, peaks=0) → MS1 NOT suppressed
   ms1_results <- result |>
     tidytable::filter(candidate_library == "ms1")
-  expect_equal(nrow(ms1_results), 1)
-  expect_true("F3" %in% ms1_results$feature_id)
+  expect_equal(nrow(ms1_results), 2)
+  expect_true(all(c("F3", "F4") %in% ms1_results$feature_id))
+
+  # All spectral annotations preserved regardless of quality
+  spectral_results <- result |>
+    tidytable::filter(candidate_library == "spectral")
+  expect_equal(nrow(spectral_results), 3)
 })
 
 test_that("filter_ms1_redundancy handles no MS1 annotations", {
@@ -409,7 +409,7 @@ test_that("filter_ms1_redundancy handles no MS1 annotations", {
 #   expect_true(all(result$candidate_library == "ms1"))
 # })
 
-test_that("apply_rt_filter filters annotations by RT tolerance", {
+test_that("apply_rt_filter computes RT errors without hard cutoff", {
   skip_if_not_installed("tidytable")
 
   features_ann <- tidytable::tidytable(
@@ -425,11 +425,16 @@ test_that("apply_rt_filter filters annotations by RT tolerance", {
 
   result <- apply_rt_filter(features_ann, rt_lib, tolerance_rt = 0.1)
 
-  # F1 (diff=0.02) and F3 (diff=0.01) should pass, F2 (diff=0.5) should fail
-  expect_equal(nrow(result), 2)
-  expect_true("F1" %in% result$feature_id)
-  expect_true("F3" %in% result$feature_id)
-  expect_false("F2" %in% result$feature_id)
+  # All rows should be kept (no hard cutoff); RT errors are computed
+
+  expect_equal(nrow(result), 3)
+  expect_true("candidate_structure_error_rt" %in% names(result))
+  # F1: error = -0.02, F2: error = -0.5, F3: error = -0.01
+  expect_true(!anyNA(result$candidate_structure_error_rt))
+  # F2 has the largest error
+  expect_true(
+    abs(result$candidate_structure_error_rt[result$feature_id == "F2"]) > 0.4
+  )
 })
 
 test_that("apply_rt_filter keeps annotations without RT target", {
@@ -508,7 +513,7 @@ test_that("validate_filter_annotations_inputs rejects missing RT library files",
   )
 })
 
-test_that("apply_rt_filter with Inf keeps duplicate RT matches", {
+test_that("apply_rt_filter deduplicates multiple RT matches to best one", {
   skip_if_not_installed("tidytable")
 
   features_ann <- tidytable::tidytable(
@@ -525,8 +530,10 @@ test_that("apply_rt_filter with Inf keeps duplicate RT matches", {
 
   result <- apply_rt_filter(features_ann, rt_lib, tolerance_rt = Inf)
 
-  expect_equal(nrow(result), 2L)
+  # Should deduplicate to best match (error = 0.0)
+  expect_equal(nrow(result), 1L)
   expect_true("candidate_structure_error_rt" %in% names(result))
+  expect_equal(result$candidate_structure_error_rt[[1L]], 0.0)
 })
 
 test_that("apply_rt_filter deduplicates to best RT match when tolerance is finite", {

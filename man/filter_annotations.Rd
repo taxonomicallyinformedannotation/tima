@@ -26,15 +26,18 @@ if absent, RT filtering is skipped even when an RT library is provided.}
 
 \item{output}{Character string path for filtered annotations output}
 
-\item{tolerance_rt}{Numeric RT tolerance in minutes for library matching}
+\item{tolerance_rt}{Numeric RT tolerance in minutes (used for deduplication
+of multiple RT library matches; no hard cutoff is applied)}
 }
 \value{
 Character string path to the filtered annotations file
 }
 \description{
 This function filters initial annotations by removing MS1-only
-annotations that also have spectral matches, and optionally filtering by
-retention time tolerance when RT libraries are available.
+annotations that also have quality spectral matches (gated on similarity
+and matched peaks), and joins retention time library data when available.
+RT errors are computed but no hard cutoff is applied; the downstream
+scoring system uses a sigmoid penalty to handle RT deviations gracefully.
 }
 \examples{
 \dontrun{
