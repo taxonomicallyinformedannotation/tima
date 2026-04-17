@@ -4,16 +4,30 @@
 \alias{filter_ms1_redundancy}
 \title{Filter MS1 Annotations}
 \usage{
-filter_ms1_redundancy(annotation_tables_list)
+filter_ms1_redundancy(
+  annotation_tables_list,
+  similarity_threshold = 0.3,
+  min_peaks = 2L
+)
 }
 \arguments{
 \item{annotation_tables_list}{Named list of annotation tables}
+
+\item{similarity_threshold}{Minimum spectral similarity for a spectral
+match to suppress the corresponding MS1 annotation (default 0.3)}
+
+\item{min_peaks}{Minimum matched peaks for a spectral match to suppress
+the corresponding MS1 annotation (default 2)}
 }
 \value{
 Data frame with filtered annotations
 }
 \description{
-Internal helper to remove MS1 annotations that have spectral
-matches.
+Internal helper to remove MS1 annotations that have
+quality spectral matches. Only suppresses MS1 when the spectral
+evidence is genuinely informative (similarity > threshold and
+at least \code{min_peaks} matched peaks). Experimental library matches
+(e.g. GNPS) suppress MS1 more readily than in-silico matches
+(e.g. SIRIUS).
 }
 \keyword{internal}

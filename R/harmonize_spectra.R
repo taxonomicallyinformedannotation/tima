@@ -162,7 +162,9 @@ harmonize_spectra <- function(
 
   # Ensure mz/intensity remain list columns even for single-peak spectra
   for (.col in c("mz", "intensity")) {
-    if (.col %in% names(spectra_filtered) && !is.list(spectra_filtered[[.col]])) {
+    if (
+      .col %in% names(spectra_filtered) && !is.list(spectra_filtered[[.col]])
+    ) {
       spectra_filtered[[.col]] <- as.list(spectra_filtered[[.col]])
     }
   }
@@ -248,7 +250,11 @@ harmonize_spectra <- function(
 
   # Ensure mz/intensity remain list columns after data.frame conversion
   for (.col in c("mz", "intensity")) {
-    if (.col %in% names(spectra_harmonized) && !is.list(spectra_harmonized[[.col]])) {
+    if (
+      .col %in%
+        names(spectra_harmonized) &&
+        !is.list(spectra_harmonized[[.col]])
+    ) {
       spectra_harmonized[[.col]] <- as.list(spectra_harmonized[[.col]])
     }
   }

@@ -11,12 +11,16 @@ apply_rt_filter(features_annotated_table, rt_table, tolerance_rt)
 
 \item{rt_table}{Data frame with RT standards}
 
-\item{tolerance_rt}{Numeric RT tolerance in minutes}
+\item{tolerance_rt}{Numeric RT tolerance in minutes (used only for
+deduplication of multiple RT matches for the same compound)}
 }
 \value{
-Filtered data frame
+Data frame with \code{candidate_structure_error_rt} column added
 }
 \description{
-Internal helper to filter annotations by RT tolerance.
+Internal helper to join RT library information onto
+annotations. Computes the RT error but does NOT apply a hard cutoff;
+the downstream scoring system uses a sigmoid penalty to handle RT
+deviations gracefully, avoiding information-destroying discontinuities.
 }
 \keyword{internal}
