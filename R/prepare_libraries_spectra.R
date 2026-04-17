@@ -64,9 +64,15 @@ harmonize_spectra_polarity <- function(
   ) |>
     purrr::map(
       .f = function(x) {
-        x |>
+        df <- x |>
           tidytable::rename(precursor_mz = precursorMz) |>
-          data.frame()
+          data.frame(check.names = FALSE)
+        for (.col in c("mz", "intensity")) {
+          if (.col %in% names(df) && !is.list(df[[.col]])) {
+            df[[.col]] <- as.list(df[[.col]])
+          }
+        }
+        df
       }
     ) |>
     purrr::list_rbind()

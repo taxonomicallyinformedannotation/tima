@@ -157,8 +157,17 @@ harmonize_spectra <- function(
   }
 
   spectra_filtered <- spectra |>
-    data.frame() |>
-    tidytable::as_tidytable() |>
+    data.frame(check.names = FALSE) |>
+    tidytable::as_tidytable()
+
+  # Ensure mz/intensity remain list columns even for single-peak spectra
+  for (.col in c("mz", "intensity")) {
+    if (.col %in% names(spectra_filtered) && !is.list(spectra_filtered[[.col]])) {
+      spectra_filtered[[.col]] <- as.list(spectra_filtered[[.col]])
+    }
+  }
+
+  spectra_filtered <- spectra_filtered |>
     tidytable::filter(
       grepl(
         pattern = mode,
@@ -235,7 +244,15 @@ harmonize_spectra <- function(
           as.character()
       )
     ) |>
-    data.frame()
+    data.frame(check.names = FALSE)
+
+  # Ensure mz/intensity remain list columns after data.frame conversion
+  for (.col in c("mz", "intensity")) {
+    if (.col %in% names(spectra_harmonized) && !is.list(spectra_harmonized[[.col]])) {
+      spectra_harmonized[[.col]] <- as.list(spectra_harmonized[[.col]])
+    }
+  }
+
   smiles_harmonized <- spectra_harmonized |>
     process_smiles(smiles_colname = "smiles")
   colnames(smiles_harmonized) <- c(

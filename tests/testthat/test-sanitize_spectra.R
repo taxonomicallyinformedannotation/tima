@@ -164,7 +164,7 @@ test_that("sanitize_spectra removes spectra below default min_fragments", {
   )
 
   peaks_list <- list(
-    cbind(mz = 100, intensity = 100), # 1 peak - below default min_fragments=2
+    cbind(mz = 100, intensity = 100), # 1 peak - kept with default min_fragments=1
     cbind(mz = c(100, 200), intensity = c(100, 200)) # 2 peaks - kept
   )
 
@@ -172,7 +172,7 @@ test_that("sanitize_spectra removes spectra below default min_fragments", {
   spectra@backend@peaksData <- peaks_list
   result <- sanitize_spectra(spectra, cutoff = 0)
 
-  expect_equal(length(result), 1)
+  expect_equal(length(result), 2)
 })
 
 test_that("sanitize_spectra respects custom min_fragments", {
@@ -246,8 +246,8 @@ test_that("sanitize_spectra removes spectra with NaN values", {
   result <- sanitize_spectra(spectra)
 
   # SPEC1 loses NaN peak (200) and peak at 300 (>= precursorMz 150),
-  # leaving only 1 peak which is below the minimum threshold
-  expect_equal(length(result), 1)
+  # leaving only 1 peak which passes default min_fragments=1
+  expect_equal(length(result), 2)
   expect_true(!any(is.nan(Spectra::peaksData(object = result)[[1L]])))
 })
 

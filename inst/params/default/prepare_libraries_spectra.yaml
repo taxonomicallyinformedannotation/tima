@@ -16,7 +16,7 @@ ms:
     #' MS2 related parameters.
     ms2:
       #' Minimum number of fragment peaks to keep a spectrum. INTEGER
-      min_fragments: 2
+      min_fragments: 1
 
 #' Names of the different variables in the input files.
 names:
