@@ -663,7 +663,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="filter-annotations">Filter annotations</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function filters initial annotations by removing MS1-only annotations that also have spectral matches, and optionally filtering by retention time tolerance when RT libraries are available.</p>
+<p>This function filters initial annotations by removing MS1-only annotations that also have quality spectral matches (gated on similarity and matched peaks), and joins retention time library data when available. RT errors are computed but no hard cutoff is applied; the downstream scoring system uses a sigmoid penalty to handle RT deviations gracefully.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -717,7 +717,7 @@ Character string path for filtered annotations output
 <code id="tolerance_rt">tolerance_rt</code>
 </td>
 <td>
-Numeric RT tolerance in minutes for library matching
+Numeric RT tolerance in minutes (used for deduplication of multiple RT library matches; no hard cutoff is applied)
 </td>
 </tr>
 </tbody></table>
