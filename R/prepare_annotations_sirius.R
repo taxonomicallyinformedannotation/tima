@@ -523,11 +523,13 @@ merge_sirius_structures_with_spectral <- function(
     optional_keys %in% names(x) & optional_keys %in% names(y)
   ]
 
-  for (k in optional_keys) {
-    if (.has_overlap_non_na(x, y, k)) {
-      keys <- c(keys, k)
-    }
-  }
+  keys <- c(
+    keys,
+    Filter(
+      function(k) .has_overlap_non_na(x, y, k),
+      optional_keys
+    )
+  )
 
   unique(keys)
 }

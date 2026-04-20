@@ -67,8 +67,8 @@ harmonize_spectra_polarity <- function(
         df <- x |>
           tidytable::rename(precursor_mz = precursorMz) |>
           data.frame(check.names = FALSE)
-        for (.col in c("mz", "intensity")) {
-          if (.col %in% names(df) && !is.list(df[[.col]])) {
+        for (.col in intersect(c("mz", "intensity"), names(df))) {
+          if (!is.list(df[[.col]])) {
             df[[.col]] <- as.list(df[[.col]])
           }
         }

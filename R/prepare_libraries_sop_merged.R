@@ -255,6 +255,27 @@ export_library_tables <- function(
   )
 }
 
+#' Apply column mapping to a data frame
+#' @description Renames columns based on a mapping list. For each target name,
+#'   tries possible source names in order and renames the first match found.
+#' @param df Data frame to rename columns in
+#' @param col_mapping Named list: names are target col names, values are
+#'   character vectors of possible source names (tried in order)
+#' @return Data frame with renamed columns
+#' @keywords internal
+.apply_col_mapping <- function(df, col_mapping) {
+  df_names <- names(df)
+  targets_needed <- setdiff(names(col_mapping), df_names)
+  for (target in targets_needed) {
+    src <- intersect(col_mapping[[target]], df_names)
+    if (length(src) > 0L) {
+      df_names[df_names == src[[1L]]] <- target
+    }
+  }
+  names(df) <- df_names
+  df
+}
+
 #' Enrich Taxonomy from Additional Cache
 #'
 #' @description Internal helper to supplement taxonomy tables with entries
@@ -319,21 +340,7 @@ enrich_taxonomy_from_cache <- function(
 
   # Apply column mapping if provided
   if (!is.null(col_mapping)) {
-    for (internal_name in names(col_mapping)) {
-      # Skip if internal name already exists in cache
-      if (internal_name %in% names(cache_data)) {
-        next
-      }
-
-      # Try each possible cache name in order
-      possible_names <- col_mapping[[internal_name]]
-      for (cache_name in possible_names) {
-        if (cache_name %in% names(cache_data)) {
-          names(cache_data)[names(cache_data) == cache_name] <- internal_name
-          break
-        }
-      }
-    }
+    cache_data <- .apply_col_mapping(cache_data, col_mapping)
   }
 
   # Normalize chemontid values to prevent duplicates from inconsistent
@@ -455,10 +462,9 @@ enrich_taxonomy_from_cache <- function(
   }
 
   # Select only matching columns, filling missing with NA
-  for (col in expected_cols) {
-    if (!col %in% names(cache_supplement)) {
-      cache_supplement[[col]] <- NA_character_
-    }
+  missing_cols <- setdiff(expected_cols, names(cache_supplement))
+  for (col in missing_cols) {
+    cache_supplement[[col]] <- NA_character_
   }
   cache_supplement <- cache_supplement |>
     tidytable::select(tidyselect::all_of(expected_cols)) |>

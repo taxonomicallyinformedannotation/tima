@@ -219,18 +219,23 @@ clean_bio <- function(
   )
 
   n_rows <- nrow(df)
-  for (col in names(defaults)) {
-    default <- defaults[[col]]
+  missing_cols <- setdiff(names(defaults), names(df))
+  existing_cols <- intersect(names(defaults), names(df))
 
-    if (!col %in% names(df)) {
-      df[[col]] <- rep(default, n_rows)
-    } else {
-      values <- df[[col]]
-      na_idx <- is.na(values)
-      if (any(na_idx)) {
-        values[na_idx] <- default
-        df[[col]] <- values
-      }
+  # Add missing columns with defaults
+  if (length(missing_cols) > 0L) {
+    for (col in missing_cols) {
+      df[[col]] <- rep(defaults[[col]], n_rows)
+    }
+  }
+
+  # Fill NAs in existing columns
+  for (col in existing_cols) {
+    values <- df[[col]]
+    na_idx <- is.na(values)
+    if (any(na_idx)) {
+      values[na_idx] <- defaults[[col]]
+      df[[col]] <- values
     }
   }
 

@@ -176,13 +176,14 @@ sanitize_spectra <- function(
       seq_len(min(10L, length(unique(intensities))))
     ]
 
-    for (intensity_val in smallest_10) {
-      n_at_intensity <- sum(intensities == intensity_val)
-      if (n_at_intensity > 5L) {
-        keep_idx <- intensities != intensity_val
-        peak_matrix <- peak_matrix[keep_idx, , drop = FALSE]
-        intensities <- intensities[keep_idx]
-      }
+    # Remove intensity values that appear more than 5 times (noise artifacts)
+    noise_vals <- smallest_10[
+      vapply(smallest_10, function(v) sum(intensities == v) > 5L, logical(1L))
+    ]
+    if (length(noise_vals) > 0L) {
+      keep_idx <- !intensities %in% noise_vals
+      peak_matrix <- peak_matrix[keep_idx, , drop = FALSE]
+      intensities <- intensities[keep_idx]
     }
 
     if (nrow(peak_matrix) > 0L) {
