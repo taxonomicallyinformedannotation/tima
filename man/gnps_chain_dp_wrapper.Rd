@@ -31,8 +31,11 @@ gnps_chain_dp_wrapper(
 matched-peak count, otherwise return score only.}
 }
 \value{
-A numeric vector of length 1 by default (score), or length 2 when
-\code{matchedPeaksCount = TRUE} (\code{c(score, matched_peaks)}).
+A numeric vector of length 1 by default (score), or length 4 when
+\code{matchedPeaksCount = TRUE}
+(\code{c(score, matched_peaks, score_forward, score_reverse)}).
+Forward uses all query peaks (normalized by all query + matched library).
+Reverse uses all library peaks (normalized by matched query + all library).
 }
 \description{
 Fused GNPS join + score in a single C call. Performs
@@ -61,6 +64,8 @@ result <- gnps_chain_dp_wrapper(
 )
 print(result\[1\])  # score
 print(result\[2\])  # matches
+print(result\[3\])  # forward score
+print(result\[4\])  # reverse score
 }
 }
 \keyword{internal}

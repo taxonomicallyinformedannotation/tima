@@ -231,12 +231,18 @@ static int kp_cmp(const void *a, const void *b) {
 
 /* ── SEXP result builder ─────────────────────────────────────────────────── */
 
-/* Returns a plain numeric vector of length 2: c(score, matches)
- * Index 0 = score, Index 1 = matches (as double for type consistency) */
-static SEXP make_result(double score, int matches) {
-  SEXP r = PROTECT(allocVector(REALSXP, 2));
+/* Returns a plain numeric vector of length 4:
+ *   c(score, matches, score_forward, score_reverse)
+ * score = main GNPS score (same as forward)
+ * score_forward = normalized by ALL query + ALL library intensities
+ * score_reverse = normalized by MATCHED query + ALL library intensities */
+static SEXP make_result(double score, int matches,
+                        double score_fwd, double score_rev) {
+  SEXP r = PROTECT(allocVector(REALSXP, 4));
   REAL(r)[0] = score;
   REAL(r)[1] = (double)matches;
+  REAL(r)[2] = score_fwd;
+  REAL(r)[3] = score_rev;
   UNPROTECT(1);
   return r;
 }
@@ -281,7 +287,8 @@ static double score_matched(
     double inv_sx, double inv_sy,
     double pdiff, int do_shift,
     double tol, double ppm_val,
-    int *out_matched)
+    int *out_matched,
+    double *out_matched_xsum, double *out_matched_ysum)
 {
   /* Single allocation for all workspace: dm[nx] sm[nx] bd[ny] */
   size_t int_need  = (size_t)(nx + nx + ny);
@@ -409,6 +416,7 @@ static double score_matched(
 
   double total = 0.0;
   int matched = 0;
+  double matched_xsum = 0.0, matched_ysum = 0.0;
 
   /* Identify the conflict cluster using bitsets over x and y indices.
    *
@@ -452,7 +460,11 @@ static double score_matched(
       if (dm < 0 && sm < 0) continue;
       double ds = (dm >= 0) ? score_pair(x_int[i], y_int[dm], inv_sx, inv_sy) : 0.0;
       double ss = (sm >= 0) ? score_pair(x_int[i], y_int[sm], inv_sx, inv_sy) : 0.0;
-      total += (ds >= ss) ? ds : ss;
+      if (ds >= ss) {
+        total += ds; matched_xsum += x_int[i]; matched_ysum += y_int[dm];
+      } else {
+        total += ss; matched_xsum += x_int[i]; matched_ysum += y_int[sm];
+      }
       matched++;
     }
   } else {
@@ -466,25 +478,31 @@ static double score_matched(
       if (dm < 0 && sm < 0) continue;
       double ds = (dm >= 0) ? score_pair(x_int[i], y_int[dm], inv_sx, inv_sy) : 0.0;
       double ss = (sm >= 0) ? score_pair(x_int[i], y_int[sm], inv_sx, inv_sy) : 0.0;
-      total += (ds >= ss) ? ds : ss;
+      if (ds >= ss) {
+        total += ds; matched_xsum += x_int[i]; matched_ysum += y_int[dm];
+      } else {
+        total += ss; matched_xsum += x_int[i]; matched_ysum += y_int[sm];
+      }
       matched++;
     }
 
     /* Build Hungarian ONLY for dirty peaks */
     int n_xm = 0, n_ym = 0;
     int *xi_map = (int *)xmalloc((size_t)nx * sizeof(int));
+    int *xi_rmap = (int *)xmalloc((size_t)nx * sizeof(int)); /* reverse: row→x idx */
     memset(xi_map, 0xFF, (size_t)nx * sizeof(int));
     for (int i = 0; i < nx; i++)
-      if (BS_TEST(x_dirty, (unsigned)i)) xi_map[i] = n_xm++;
+      if (BS_TEST(x_dirty, (unsigned)i)) { xi_rmap[n_xm] = i; xi_map[i] = n_xm++; }
 
     int *yi_map = (int *)xmalloc((size_t)ny * sizeof(int));
+    int *yi_rmap = (int *)xmalloc((size_t)ny * sizeof(int)); /* reverse: col→y idx */
     memset(yi_map, 0xFF, (size_t)ny * sizeof(int));
     for (int i = 0; i < nx; i++) {
       if (!BS_TEST(x_dirty, (unsigned)i)) continue;
       if (dm_arr[i] >= 0 && BS_TEST(y_dirty, (unsigned)dm_arr[i]) &&
-          yi_map[dm_arr[i]] < 0) yi_map[dm_arr[i]] = n_ym++;
+          yi_map[dm_arr[i]] < 0) { yi_rmap[n_ym] = dm_arr[i]; yi_map[dm_arr[i]] = n_ym++; }
       if (sm_arr[i] >= 0 && BS_TEST(y_dirty, (unsigned)sm_arr[i]) &&
-          yi_map[sm_arr[i]] < 0) yi_map[sm_arr[i]] = n_ym++;
+          yi_map[sm_arr[i]] < 0) { yi_rmap[n_ym] = sm_arr[i]; yi_map[sm_arr[i]] = n_ym++; }
     }
 
     int N = (n_xm > n_ym) ? n_xm : n_ym;
@@ -554,17 +572,24 @@ static double score_matched(
 
       for (int j = 1; j <= N; j++) {
         double sc = smat[(size_t)(hp[j]-1) * (size_t)N + (size_t)(j-1)];
-        if (sc > 0.0) { total += sc; matched++; }
+        if (sc > 0.0) {
+          total += sc; matched++;
+          if (hp[j]-1 < n_xm) matched_xsum += x_int[xi_rmap[hp[j]-1]];
+          if (j-1 < n_ym) matched_ysum += y_int[yi_rmap[j-1]];
+        }
       }
       free(hbuf); free(smat);
     }
     free(xi_map); free(yi_map);
+    free(xi_rmap); free(yi_rmap);
   }
 
   free(x_dirty); free(y_dirty);
   free(buf);
 
   *out_matched = matched;
+  *out_matched_xsum = matched_xsum;
+  *out_matched_ysum = matched_ysum;
   return total;
 }
 
@@ -599,13 +624,13 @@ SEXP C_gnps_chain_dp(SEXP x, SEXP y,
   double x_pre = asReal(xPrecursorMz), y_pre = asReal(yPrecursorMz);
   double tol = asReal(tolerance), ppm_val = asReal(ppm);
 
-  if (nx == 0 || ny == 0) return make_result(0.0, 0);
+  if (nx == 0 || ny == 0) return make_result(0.0, 0, 0.0, 0.0);
 
   /* intensity sums (sanitized → no duplicates) */
   double xsum = 0.0, ysum = 0.0;
   for (int i = 0; i < nx; i++) xsum += x_int[i];
   for (int i = 0; i < ny; i++) ysum += y_int[i];
-  if (xsum == 0.0 || ysum == 0.0) return make_result(0.0, 0);
+  if (xsum == 0.0 || ysum == 0.0) return make_result(0.0, 0, 0.0, 0.0);
 
   double inv_sx = 1.0 / sqrt(xsum), inv_sy = 1.0 / sqrt(ysum);
 
@@ -650,10 +675,35 @@ SEXP C_gnps_chain_dp(SEXP x, SEXP y,
   }
 
   int matched = 0;
+  double matched_xsum = 0.0, matched_ysum = 0.0;
   double score = score_matched(x_mz, x_int, nx, y_mz, y_int, ny,
                                 inv_sx, inv_sy, pdiff, do_shift,
-                                tol, ppm_val, &matched);
-  return make_result(score, matched);
+                                tol, ppm_val, &matched,
+                                &matched_xsum, &matched_ysum);
+
+  /* Forward score (query perspective): only query peaks matter.
+   *   Normalized by ALL query intensities and MATCHED library intensities.
+   *   Unmatched library peaks are ignored.
+   *   forward = dot / (sqrt(xsum) * sqrt(matched_ysum))
+   *           = score * sqrt(ysum) / sqrt(matched_ysum)
+   *
+   * Reverse score (library perspective): only library peaks matter.
+   *   Normalized by MATCHED query intensities and ALL library intensities.
+   *   Unmatched query peaks are ignored.
+   *   reverse = dot / (sqrt(matched_xsum) * sqrt(ysum))
+   *           = score * sqrt(xsum) / sqrt(matched_xsum)                    */
+  double score_fwd = 0.0;
+  double score_rev = 0.0;
+  if (matched_ysum > 0.0) {
+    score_fwd = score * sqrt(ysum) / sqrt(matched_ysum);
+    if (score_fwd > 1.0) score_fwd = 1.0;
+  }
+  if (matched_xsum > 0.0) {
+    score_rev = score * sqrt(xsum) / sqrt(matched_xsum);
+    if (score_rev > 1.0) score_rev = 1.0;
+  }
+
+  return make_result(score, matched, score_fwd, score_rev);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ *
@@ -703,13 +753,13 @@ SEXP C_gnps(SEXP x, SEXP y)
     if (i == 0 || buf[i].key != buf[i - 1].key) ys_sum += yin[buf[i].pos];
   free(buf);
 
-  if (xs_sum == 0.0 || ys_sum == 0.0) return make_result(0.0, 0);
+  if (xs_sum == 0.0 || ys_sum == 0.0) return make_result(0.0, 0, 0.0, 0.0);
 
   /* build kept arrays */
   int l = 0;
   for (int i = 0; i < n; i++)
     if (!ISNA(xmz[i]) && !ISNA(ymz[i])) l++;
-  if (!l) return make_result(0.0, 0);
+  if (!l) return make_result(0.0, 0, 0.0, 0.0);
 
   double *keep_xmz = (double *)xmalloc((size_t)l * sizeof(double));
   double *keep_ymz = (double *)xmalloc((size_t)l * sizeof(double));
@@ -758,7 +808,7 @@ SEXP C_gnps(SEXP x, SEXP y)
   if (N == 0) {
     free(x_fac); free(y_fac);
     free(keep_xmz); free(keep_ymz); free(keep_xin); free(keep_yin);
-    return make_result(0.0, 0);
+    return make_result(0.0, 0, 0.0, 0.0);
   }
 
   /* score matrix */
@@ -826,7 +876,8 @@ SEXP C_gnps(SEXP x, SEXP y)
     }
 
     free(hbuf); free(sm);
-    return make_result(total, matched);
+    /* Pre-aligned matrices: forward and reverse are the same as total */
+    return make_result(total, matched, total, total);
   }
 }
 

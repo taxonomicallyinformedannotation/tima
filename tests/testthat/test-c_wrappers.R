@@ -7,15 +7,19 @@ sp_a <- cbind(mz = c(100.000, 150.000, 200.000), intensity = c(100, 50, 25))
 sp_b <- cbind(mz = c(100.005, 149.995, 300.000), intensity = c(90, 45, 10))
 pmz <- 500.0
 
-test_that("gnps_wrapper returns numeric score and match count", {
+test_that("gnps_wrapper returns numeric score, match count, forward and reverse", {
   res <- gnps_wrapper(sp_a, sp_b)
   expect_type(res, "double")
-  expect_length(res, 2L)
+  expect_length(res, 4L)
   expect_true(is.finite(res[1L]))
   expect_true(is.finite(res[2L]))
   expect_gte(res[1L], 0)
   expect_lte(res[1L], 1)
   expect_gte(res[2L], 0)
+  expect_gte(res[3L], 0)
+  expect_lte(res[3L], 1)
+  expect_gte(res[4L], 0)
+  expect_lte(res[4L], 1)
 })
 
 test_that("gnps_wrapper gives maximal similarity for identical spectra", {
@@ -58,7 +62,7 @@ test_that("gnps_chain_dp_wrapper returns score only by default", {
   expect_lte(score, 1)
 })
 
-test_that("gnps_chain_dp_wrapper returns score and matches when requested", {
+test_that("gnps_chain_dp_wrapper returns score, matches, forward and reverse when requested", {
   res <- gnps_chain_dp_wrapper(
     x = sp_a,
     y = sp_b,
@@ -70,10 +74,16 @@ test_that("gnps_chain_dp_wrapper returns score and matches when requested", {
   )
 
   expect_type(res, "double")
-  expect_length(res, 2L)
+  expect_length(res, 4L)
   expect_gte(res[1L], 0)
   expect_lte(res[1L], 1)
   expect_gte(res[2L], 0)
+  # forward >= score (uses matched library only, so unmatched lib doesn't dilute)
+  expect_gte(res[3L], res[1L] - 1e-12)
+  expect_lte(res[3L], 1)
+  # reverse >= score (uses matched query only, so unmatched query doesn't dilute)
+  expect_gte(res[4L], res[1L] - 1e-12)
+  expect_lte(res[4L], 1)
 })
 
 test_that("gnps_chain_dp_wrapper gives maximal similarity for identical spectra", {
@@ -130,7 +140,7 @@ test_that("gnps_wrapper handles pre-joined matrices with NA peaks", {
   y_joined <- cbind(mz = c(100, 150, NA), intensity = c(45, 20, NA))
 
   res <- gnps_wrapper(x_joined, y_joined)
-  expect_length(res, 2L)
+  expect_length(res, 4L)
   expect_true(is.finite(res[1L]))
 })
 
@@ -150,4 +160,59 @@ test_that("gnps_chain_dp_wrapper validates matrix-like inputs", {
 
 test_that("gnps_wrapper validates matrix-like inputs", {
   expect_error(gnps_wrapper(c(1, 2, 3), sp_b))
+})
+
+# ---- forward / reverse dot product tests ------------------------------------
+
+test_that("identical spectra yield forward = reverse = 1", {
+  res <- gnps_chain_dp_wrapper(
+    x = sp_a,
+    y = sp_a,
+    xPrecursorMz = pmz,
+    yPrecursorMz = pmz,
+    tolerance = 0.01,
+    ppm = 10,
+    matchedPeaksCount = TRUE
+  )
+  expect_equal(res[3L], 1.0, tolerance = 1e-6)
+  expect_equal(res[4L], 1.0, tolerance = 1e-6)
+})
+
+test_that("reverse > forward when query has more unmatched peaks than library", {
+  # query has 4 peaks, library has 2 matching peaks + 1 non-matching
+  # query has 2 unmatched, library has 1 unmatched
+  # reverse ignores unmatched query (2 peaks) -> bigger boost
+  # forward ignores unmatched library (1 peak) -> smaller boost
+  q <- cbind(mz = c(100, 200, 300, 400), intensity = c(100, 50, 25, 10))
+  l <- cbind(mz = c(100.005, 200.005, 900), intensity = c(90, 45, 30))
+  res <- gnps_chain_dp_wrapper(
+    x = q,
+    y = l,
+    xPrecursorMz = pmz,
+    yPrecursorMz = pmz,
+    tolerance = 0.01,
+    ppm = 10,
+    matchedPeaksCount = TRUE
+  )
+  # Both should be >= score
+  expect_gte(res[3L], res[1L] - 1e-12)
+  expect_gte(res[4L], res[1L] - 1e-12)
+  # reverse > forward because query has more unmatched peaks
+  expect_gt(res[4L], res[3L])
+})
+
+test_that("forward and reverse are 0 when no peaks match", {
+  q <- cbind(mz = c(100, 200), intensity = c(50, 50))
+  l <- cbind(mz = c(500, 600), intensity = c(50, 50))
+  res <- gnps_chain_dp_wrapper(
+    x = q,
+    y = l,
+    xPrecursorMz = pmz,
+    yPrecursorMz = pmz,
+    tolerance = 0.01,
+    ppm = 10,
+    matchedPeaksCount = TRUE
+  )
+  expect_equal(res[3L], 0.0)
+  expect_equal(res[4L], 0.0)
 })

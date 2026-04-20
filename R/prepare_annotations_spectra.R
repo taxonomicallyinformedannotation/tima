@@ -150,6 +150,8 @@ prepare_annotations_spectra <- function(
     ## downstream.
     "candidate_structure_smiles_no_stereo",
     "candidate_score_similarity",
+    "candidate_score_similarity_forward",
+    "candidate_score_similarity_reverse",
     "candidate_count_similarity_peaks_matched"
   )
 

@@ -21,9 +21,11 @@
 #' @param y Numeric matrix with matched peaks from target spectrum.
 #'     Must have columns for mz and intensity.
 #'
-#' @return A numeric vector of length 2:
+#' @return A numeric vector of length 4:
 #'   \item{\[1\]}{Numeric similarity score (0-1)}
 #'   \item{\[2\]}{Numeric count of matched peaks}
+#'   \item{\[3\]}{Numeric forward score (0-1)}
+#'   \item{\[4\]}{Numeric reverse score (0-1)}
 #'
 #' @examples
 #' \dontrun{
@@ -111,8 +113,11 @@ join_gnps_wrapper <- function(
 #' @param matchedPeaksCount Logical flag; if `TRUE`, return both score and
 #'   matched-peak count, otherwise return score only.
 #'
-#' @return A numeric vector of length 1 by default (score), or length 2 when
-#'   `matchedPeaksCount = TRUE` (`c(score, matched_peaks)`).
+#' @return A numeric vector of length 1 by default (score), or length 4 when
+#'   `matchedPeaksCount = TRUE`
+#'   (`c(score, matched_peaks, score_forward, score_reverse)`).
+#'   Forward uses all query peaks (normalized by all query + matched library).
+#'   Reverse uses all library peaks (normalized by matched query + all library).
 #'
 #' @keywords internal
 #'
@@ -130,6 +135,8 @@ join_gnps_wrapper <- function(
 #' )
 #' print(result\[1\])  # score
 #' print(result\[2\])  # matches
+#' print(result\[3\])  # forward score
+#' print(result\[4\])  # reverse score
 #' }
 gnps_chain_dp_wrapper <- function(
   x,

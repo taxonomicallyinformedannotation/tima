@@ -46,6 +46,8 @@ test_that("calculate_entropy_and_similarity returns a data frame with expected c
   expect_s3_class(out, "data.frame")
   expect_true("feature_id" %in% names(out))
   expect_true("candidate_score_similarity" %in% names(out))
+  expect_true("candidate_score_similarity_forward" %in% names(out))
+  expect_true("candidate_score_similarity_reverse" %in% names(out))
   expect_true("candidate_spectrum_entropy" %in% names(out))
   expect_true("candidate_count_similarity_peaks_matched" %in% names(out))
 })
@@ -221,4 +223,59 @@ test_that("degenerate library spectra are ignored even at zero threshold", {
 
   expect_s3_class(out, "data.frame")
   expect_true(all(is.na(out$candidate_score_similarity)))
+})
+
+# ---- forward / reverse score tests ------------------------------------------
+
+test_that("identical spectra yield forward = reverse = similarity = 1 (gnps)", {
+  out <- call_ces(
+    method = "gnps",
+    query_sp = list(sp_ethane),
+    lib_sp = list(sp_ethane),
+    query_pmz = 30.05,
+    lib_pmz = 30.05
+  )
+  expect_equal(out$candidate_score_similarity_forward[1], 1.0, tolerance = 1e-6)
+  expect_equal(out$candidate_score_similarity_reverse[1], 1.0, tolerance = 1e-6)
+})
+
+test_that("forward and reverse >= score when spectra partially match (gnps)", {
+  out <- calculate_entropy_and_similarity(
+    lib_ids = 1L,
+    lib_precursors = 61.0,
+    lib_spectra = list(sp_acetic), # 2 peaks
+    query_ids = 1L,
+    query_precursors = 61.0,
+    query_spectra = list(sp_ethane), # 5 peaks, only some match
+    method = "gnps",
+    dalton = 0.5,
+    ppm = 10,
+    threshold = 0.0,
+    approx = TRUE
+  )
+  if (nrow(out) > 0L && !is.na(out$candidate_score_similarity[1])) {
+    expect_gte(
+      out$candidate_score_similarity_forward[1],
+      out$candidate_score_similarity[1] - 1e-12
+    )
+    expect_gte(
+      out$candidate_score_similarity_reverse[1],
+      out$candidate_score_similarity[1] - 1e-12
+    )
+  }
+})
+
+test_that("forward/reverse columns present for entropy method", {
+  out <- call_ces(
+    method = "entropy",
+    query_sp = list(sp_ethane),
+    lib_sp = list(sp_ethane),
+    query_pmz = 30.05,
+    lib_pmz = 30.05
+  )
+  expect_true("candidate_score_similarity_forward" %in% names(out))
+  expect_true("candidate_score_similarity_reverse" %in% names(out))
+  # For identical spectra, forward and reverse should both be 1
+  expect_equal(out$candidate_score_similarity_forward[1], 1.0, tolerance = 1e-6)
+  expect_equal(out$candidate_score_similarity_reverse[1], 1.0, tolerance = 1e-6)
 })

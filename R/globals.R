@@ -72,6 +72,8 @@ utils::globalVariables(
     "candidate_organism_10_varietas",
     "candidate_score_pseudo_initial",
     "candidate_score_similarity",
+    "candidate_score_similarity_forward",
+    "candidate_score_similarity_reverse",
     "candidate_score_sirius_csi",
     "candidate_score_sirius_csi_tmp",
     "candidate_score_sirius_confidence",

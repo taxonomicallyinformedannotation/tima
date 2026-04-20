@@ -670,6 +670,8 @@ coerce_score_columns <- function(annot_table_wei_chemo) {
     "score_weighted_chemo",
     "candidate_score_pseudo_initial",
     "candidate_score_similarity",
+    "candidate_score_similarity_forward",
+    "candidate_score_similarity_reverse",
     "candidate_score_sirius_csi",
     "candidate_score_sirius_confidence"
   )

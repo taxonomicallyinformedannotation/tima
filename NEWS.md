@@ -12,6 +12,7 @@
 
 ## New features
 
+* `annotate_spectra()` now reports forward and reverse dot product scores (`candidate_score_similarity_forward`, `candidate_score_similarity_reverse`) alongside the main similarity score. Forward considers only query peaks (normalized by all query and matched library intensities); reverse considers only library peaks (normalized by matched query and all library intensities). Both are computed in C for consistency with the GNPS scoring engine.
 * Added support for additional NPClassifier and ClassyFire taxonomy caches in `prepare_libraries_sop_merged()`, allowing structures missing taxonomy in the merged libraries to be enriched from external cache files. Caches grow over time as library entries are written back.
 * Added a new validation helper, see <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html>
 * Added [BiGG](http://bigg.ucsd.edu/) as SOP library

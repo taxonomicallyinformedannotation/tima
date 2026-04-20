@@ -605,6 +605,12 @@ finalize_results <- function(
   df_sim$candidate_score_similarity <- as.numeric(
     df_sim$candidate_score_similarity
   )
+  df_sim$candidate_score_similarity_forward <- as.numeric(
+    df_sim$candidate_score_similarity_forward
+  )
+  df_sim$candidate_score_similarity_reverse <- as.numeric(
+    df_sim$candidate_score_similarity_reverse
+  )
   df_sim$candidate_count_similarity_peaks_matched <- as.integer(
     df_sim$candidate_count_similarity_peaks_matched
   )
@@ -634,6 +640,8 @@ finalize_results <- function(
           "candidate_structure_smiles_no_stereo",
           "candidate_spectrum_entropy",
           "candidate_score_similarity",
+          "candidate_score_similarity_forward",
+          "candidate_score_similarity_reverse",
           "candidate_count_similarity_peaks_matched"
         )
       )

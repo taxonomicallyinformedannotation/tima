@@ -232,6 +232,8 @@ calculate_entropy_and_similarity <- function(
       scores <- rep(NA_real_, n_candidates)
       entropies <- rep(NA_real_, n_candidates)
       matched_counts <- integer(n_candidates)
+      scores_forward <- rep(NA_real_, n_candidates)
+      scores_reverse <- rep(NA_real_, n_candidates)
       use_gnps <- (method == "gnps")
       q_mz <- current_spectrum[, 1L]
 
@@ -260,6 +262,8 @@ calculate_entropy_and_similarity <- function(
           )
           scores[[pos_idx]] <- as.numeric(res[[1L]])
           matched_counts[[pos_idx]] <- as.integer(res[[2L]])
+          scores_forward[[pos_idx]] <- as.numeric(res[[3L]])
+          scores_reverse[[pos_idx]] <- as.numeric(res[[4L]])
         } else {
           scores[[pos_idx]] <- as.numeric(calculate_similarity(
             method = method,
@@ -276,6 +280,19 @@ calculate_entropy_and_similarity <- function(
             dalton,
             ppm
           )
+          # For non-GNPS methods, compute forward/reverse via the C GNPS
+          # engine to ensure consistent scoring
+          fwd_rev <- call_gnps(
+            current_spectrum,
+            lib_spectrum,
+            current_precursor,
+            target_precursor,
+            dalton,
+            ppm,
+            matchedPeaksCount = TRUE
+          )
+          scores_forward[[pos_idx]] <- as.numeric(fwd_rev[[3L]])
+          scores_reverse[[pos_idx]] <- as.numeric(fwd_rev[[4L]])
         }
 
         entropies[[pos_idx]] <- lib_entropy[[lib_idx]]
@@ -291,6 +308,8 @@ calculate_entropy_and_similarity <- function(
             target_id = lib_ids[lib_indices_sub[valid_indices]],
             candidate_spectrum_entropy = entropies[valid_indices],
             candidate_score_similarity = scores[valid_indices],
+            candidate_score_similarity_forward = scores_forward[valid_indices],
+            candidate_score_similarity_reverse = scores_reverse[valid_indices],
             candidate_count_similarity_peaks_matched = matched_counts[
               valid_indices
             ]
@@ -328,6 +347,8 @@ calculate_entropy_and_similarity <- function(
       candidate_spectrum_id = NA,
       candidate_spectrum_entropy = NA_real_,
       candidate_score_similarity = NA_real_,
+      candidate_score_similarity_forward = NA_real_,
+      candidate_score_similarity_reverse = NA_real_,
       candidate_count_similarity_peaks_matched = NA_integer_
     )
   } else {

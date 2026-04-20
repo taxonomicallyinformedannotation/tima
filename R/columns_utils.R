@@ -81,7 +81,9 @@ columns_model <- function() {
     "candidate_spectrum_id",
     "candidate_adduct",
     "candidate_count_similarity_peaks_matched",
-    "candidate_score_similarity"
+    "candidate_score_similarity",
+    "candidate_score_similarity_forward",
+    "candidate_score_similarity_reverse"
   )
 
   # Chemical structure metadata and taxonomy ----
@@ -287,6 +289,8 @@ fake_annotations_columns <- function() {
     candidate_adduct = NA_character_,
     candidate_library = NA_character_,
     candidate_score_similarity = NA_real_,
+    candidate_score_similarity_forward = NA_real_,
+    candidate_score_similarity_reverse = NA_real_,
     candidate_count_similarity_peaks_matched = NA_integer_,
     candidate_structure_tag = NA_character_,
     candidate_structure_tax_npc_01pat = NA_character_,

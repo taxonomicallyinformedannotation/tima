@@ -14,9 +14,11 @@ Must have columns for mz and intensity.}
 Must have columns for mz and intensity.}
 }
 \value{
-A numeric vector of length 2:
+A numeric vector of length 4:
 \item{[1]}{Numeric similarity score (0-1)}
 \item{[2]}{Numeric count of matched peaks}
+\item{[3]}{Numeric forward score (0-1)}
+\item{[4]}{Numeric reverse score (0-1)}
 }
 \description{
 Calculates GNPS-style spectral similarity score between
