@@ -39,7 +39,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: >
           sudo apt-get update && sudo apt-get install -y --no-install-recommends
-          libarchive-dev libcurl4-openssl-dev libfribidi-dev libharfbuzz-dev \
+          libarchive-dev libcurl4-openssl-dev libfribidi-dev libharfbuzz-dev libuv1-dev \
 
           && sudo apt-get clean \
 
