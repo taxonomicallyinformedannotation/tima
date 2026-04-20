@@ -151,13 +151,14 @@ summarize_results <- function(
 
   # Start from annotation rows and add compact per-feature metadata.
   df_joined <- df |>
-    tidytable::left_join(y = features_min, by = "feature_id") |>
+    tidytable::right_join(y = features_min, by = "feature_id") |>
     tidytable::left_join(y = components_min, by = "feature_id") |>
     tidytable::select(tidyselect::any_of(x = select_cols)) |>
     tidytable::distinct() |>
     tidytable::left_join(
       y = organism_lookup,
       by = c(
+        "feature_id",
         "candidate_structure_inchikey_connectivity_layer",
         "candidate_structure_organism_occurrence_closest"
       )
@@ -293,7 +294,8 @@ summarize_results <- function(
   total_features <- length(unique(results$feature_id))
   annotated_features <- length(unique(
     results$feature_id[
-      !is.na(results$candidate_structure_inchikey_connectivity_layer)
+      !is.na(results$candidate_structure_inchikey_connectivity_layer) &
+        results$candidate_structure_inchikey_connectivity_layer != ""
     ]
   ))
   pct_annotated <- if (total_features > 0L) {
@@ -327,6 +329,7 @@ summarize_results <- function(
     tidytable::inner_join(
       y = df |>
         tidytable::distinct(
+          feature_id,
           candidate_structure_organism_occurrence_closest,
           candidate_structure_inchikey_connectivity_layer
         ),
@@ -355,12 +358,14 @@ summarize_results <- function(
           organism_taxonomy_10varietas
     ) |>
     tidytable::distinct(
+      feature_id,
       candidate_structure_inchikey_connectivity_layer,
       candidate_structure_organism_occurrence_closest,
       candidate_structure_organism_occurrence_reference = reference_doi,
       .keep_all = TRUE
     ) |>
     tidytable::group_by(
+      feature_id,
       candidate_structure_inchikey_connectivity_layer,
       candidate_structure_organism_occurrence_closest
     ) |>

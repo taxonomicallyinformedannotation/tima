@@ -1119,13 +1119,13 @@ clean_chemo <- function(
   remove_ties,
   summarize,
   # Explicit taxonomy weights (0-1)
-  score_chemical_cla_kingdom = 0.1,
-  score_chemical_cla_superclass = 0.2,
-  score_chemical_cla_class = 0.3,
-  score_chemical_cla_parent = 0.4,
-  score_chemical_npc_pathway = 0.3,
-  score_chemical_npc_superclass = 0.2,
-  score_chemical_npc_class = 0.1,
+  score_chemical_cla_kingdom = 0.2,
+  score_chemical_cla_superclass = 0.4,
+  score_chemical_cla_class = 0.6,
+  score_chemical_cla_parent = 0.8,
+  score_chemical_npc_pathway = 0.25,
+  score_chemical_npc_superclass = 0.5,
+  score_chemical_npc_class = 0.75,
   max_per_score = 7L,
   xrefs_table = NULL
 ) {
