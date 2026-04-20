@@ -1,17 +1,3 @@
-#' @title Harmonize adduct notations
-#'
-#' @description Standardizes adduct notations in a dataframe by replacing
-#'     various forms with canonical representations. Uses a translation
-#'     table for efficient batch replacement.
-#'
-#' @details Common adduct variations like "M+H", "\[M+H\]", and "(M+H)+" are
-#'     standardized to a consistent format (e.g., "\[M+H\]+"). This ensures
-#'     compatibility across different MS tools and databases.
-#'
-#' @include adducts_utils.R
-#' @include validations_utils.R
-#'
-
 # Pre-computed formula normalization patterns (avoid re-creating each call)
 .FORMULA_SUBS_PATTERNS <- c(
   "\\+NH4",
@@ -38,6 +24,19 @@
   "-H2O-H]"
 )
 
+#' @title Harmonize adduct notations
+#'
+#' @description Standardizes adduct notations in a dataframe by replacing
+#'     various forms with canonical representations. Uses a translation
+#'     table for efficient batch replacement.
+#'
+#' @details Common adduct variations like "M+H", "\[M+H\]", and "(M+H)+" are
+#'     standardized to a consistent format (e.g., "\[M+H\]+"). This ensures
+#'     compatibility across different MS tools and databases.
+#'
+#' @include adducts_utils.R
+#' @include validations_utils.R
+#'
 #' @param df Data frame or tibble containing adduct column
 #' @param adducts_colname Character string name of the adduct column
 #'     (default: "adduct")
