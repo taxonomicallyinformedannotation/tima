@@ -121,12 +121,12 @@ test_that("clean_bio handles empty edges table", {
   expect_equal(nrow(result), nrow(annotations))
   expect_s3_class(result, "data.frame")
 
-  # Should have feature_pred_tax columns with "empty" values
+  # Should have feature_pred_tax columns with NA values
   expect_true("feature_pred_tax_cla_01kin_val" %in% colnames(result))
   expect_true("consistency_structure_cla_kin" %in% colnames(result))
 
-  # All features should be marked as "empty" (no network)
-  expect_true(all(result$feature_pred_tax_cla_01kin_val == "empty"))
+  # All features should be marked as NA (no network)
+  expect_true(all(is.na(result$feature_pred_tax_cla_01kin_val)))
 })
 
 test_that("clean_bio handles features with only 1 neighbor", {
@@ -157,7 +157,7 @@ test_that("clean_bio handles features with only 1 neighbor", {
   expect_s3_class(result, "data.frame")
   expect_equal(nrow(result), nrow(annotations))
 
-  # F1 should have "empty" values (only 1 neighbor)
+  # F1 should have NA values (only 1 neighbor)
   # F2 should have calculated values (>=2 neighbors)
   expect_true("feature_pred_tax_cla_01kin_val" %in% colnames(result))
 })
@@ -449,7 +449,7 @@ test_that("clean_bio filters out classifications below minimal_consistency", {
     # With high minimal_consistency and low agreement, should be notConsistent
     expect_true(any(
       f1_results$feature_pred_tax_npc_01pat_val == "notConsistent" |
-        f1_results$feature_pred_tax_npc_01pat_val == "empty"
+        is.na(f1_results$feature_pred_tax_npc_01pat_val)
     ))
   }
 })

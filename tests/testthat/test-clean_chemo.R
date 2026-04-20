@@ -91,43 +91,43 @@ make_clean_chemo_fixture <- function(
     annot_table_wei_chemo <- annot_table_wei_chemo |>
       tidytable::mutate(
         feature_pred_tax_cla_01kin_val = sample(
-          c("Organic compounds", "Lipids", "empty", NA),
+          c("Organic compounds", "Lipids", NA, NA),
           n(),
           replace = TRUE
         ),
         feature_pred_tax_cla_01kin_score = runif(n(), 0, 1),
         feature_pred_tax_cla_02sup_val = sample(
-          c("Flavonoids", "Alkaloids", "empty", NA),
+          c("Flavonoids", "Alkaloids", NA, NA),
           n(),
           replace = TRUE
         ),
         feature_pred_tax_cla_02sup_score = runif(n(), 0, 1),
         feature_pred_tax_cla_03cla_val = sample(
-          c("Class1", "Class2", "empty", NA),
+          c("Class1", "Class2", NA, NA),
           n(),
           replace = TRUE
         ),
         feature_pred_tax_cla_03cla_score = runif(n(), 0, 1),
         feature_pred_tax_cla_04dirpar_val = sample(
-          c("Parent1", "Parent2", "empty", NA),
+          c("Parent1", "Parent2", NA, NA),
           n(),
           replace = TRUE
         ),
         feature_pred_tax_cla_04dirpar_score = runif(n(), 0, 1),
         feature_pred_tax_npc_01pat_val = sample(
-          c("Pathway1", "Pathway2", "empty", NA),
+          c("Pathway1", "Pathway2", NA, NA),
           n(),
           replace = TRUE
         ),
         feature_pred_tax_npc_01pat_score = runif(n(), 0, 1),
         feature_pred_tax_npc_02sup_val = sample(
-          c("NPCSuper1", "NPCSuper2", "empty", NA),
+          c("NPCSuper1", "NPCSuper2", NA, NA),
           n(),
           replace = TRUE
         ),
         feature_pred_tax_npc_02sup_score = runif(n(), 0, 1),
         feature_pred_tax_npc_03cla_val = sample(
-          c("NPCClass1", "NPCClass2", "empty", NA),
+          c("NPCClass1", "NPCClass2", NA, NA),
           n(),
           replace = TRUE
         ),
@@ -585,7 +585,7 @@ test_that("compute_classyfire_taxonomy filters empty labels", {
 
   df_pred_tax <- tidytable::tidytable(
     feature_id = c("F1", "F2"),
-    feature_pred_tax_cla_01kin_val = c("Kingdom1", "empty"),
+    feature_pred_tax_cla_01kin_val = c("Kingdom1", NA_character_),
     feature_pred_tax_cla_01kin_score = c("0.8", "0.9"),
     feature_pred_tax_cla_02sup_val = c(NA, NA),
     feature_pred_tax_cla_02sup_score = c(NA, NA),
@@ -597,7 +597,7 @@ test_that("compute_classyfire_taxonomy filters empty labels", {
 
   result <- compute_classyfire_taxonomy(df_pred_tax, weights)
 
-  # Only F1 should remain (F2 has "empty" label)
+  # Only F1 should remain (F2 has NA label)
   expect_equal(nrow(result), 1)
   expect_equal(result$feature_id, "F1")
 })

@@ -127,9 +127,9 @@ decorate_chemo <- function(
     df |>
       tidytable::filter(score_chemical >= score_threshold) |>
       tidytable::filter(
-        !!as.name(col_name) != "notAnnotated" &
-          !!as.name(col_name) != "notConsistent" &
-          !!as.name(col_name) != "empty"
+        !is.na(!!as.name(col_name)) &
+          !!as.name(col_name) != "notAnnotated" &
+          !!as.name(col_name) != "notConsistent"
       )
   }
 

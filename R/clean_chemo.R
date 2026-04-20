@@ -372,17 +372,13 @@ compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
   df_pred_tax |>
     tidytable::mutate(
       cla_kin_valid = !is.na(feature_pred_tax_cla_01kin_val) &
-        feature_pred_tax_cla_01kin_val != "notClassified" &
-        feature_pred_tax_cla_01kin_val != "empty",
+        feature_pred_tax_cla_01kin_val != "notClassified",
       cla_sup_valid = !is.na(feature_pred_tax_cla_02sup_val) &
-        feature_pred_tax_cla_02sup_val != "notClassified" &
-        feature_pred_tax_cla_02sup_val != "empty",
+        feature_pred_tax_cla_02sup_val != "notClassified",
       cla_cla_valid = !is.na(feature_pred_tax_cla_03cla_val) &
-        feature_pred_tax_cla_03cla_val != "notClassified" &
-        feature_pred_tax_cla_03cla_val != "empty",
+        feature_pred_tax_cla_03cla_val != "notClassified",
       cla_par_valid = !is.na(feature_pred_tax_cla_04dirpar_val) &
-        feature_pred_tax_cla_04dirpar_val != "notClassified" &
-        feature_pred_tax_cla_04dirpar_val != "empty",
+        feature_pred_tax_cla_04dirpar_val != "notClassified",
       # Compute weighted score for each level
       ws_kin = tidytable::if_else(
         cla_kin_valid,
@@ -428,7 +424,6 @@ compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
     ) |>
     tidytable::filter(
       !is.na(label_classyfire_predicted),
-      label_classyfire_predicted != "empty",
       label_classyfire_predicted != "notClassified"
     ) |>
     tidytable::select(
@@ -453,14 +448,11 @@ compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
   df_pred_tax |>
     tidytable::mutate(
       npc_pat_valid = !is.na(feature_pred_tax_npc_01pat_val) &
-        feature_pred_tax_npc_01pat_val != "notClassified" &
-        feature_pred_tax_npc_01pat_val != "empty",
+        feature_pred_tax_npc_01pat_val != "notClassified",
       npc_sup_valid = !is.na(feature_pred_tax_npc_02sup_val) &
-        feature_pred_tax_npc_02sup_val != "notClassified" &
-        feature_pred_tax_npc_02sup_val != "empty",
+        feature_pred_tax_npc_02sup_val != "notClassified",
       npc_cla_valid = !is.na(feature_pred_tax_npc_03cla_val) &
-        feature_pred_tax_npc_03cla_val != "notClassified" &
-        feature_pred_tax_npc_03cla_val != "empty",
+        feature_pred_tax_npc_03cla_val != "notClassified",
       # Compute weighted score for each level
       ws_pat = tidytable::if_else(
         npc_pat_valid,
@@ -498,7 +490,6 @@ compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
     ) |>
     tidytable::filter(
       !is.na(label_npclassifier_predicted),
-      label_npclassifier_predicted != "empty",
       label_npclassifier_predicted != "notClassified"
     ) |>
     tidytable::select(
