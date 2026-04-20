@@ -11,6 +11,33 @@
 #' @include adducts_utils.R
 #' @include validations_utils.R
 #'
+
+# Pre-computed formula normalization patterns (avoid re-creating each call)
+.FORMULA_SUBS_PATTERNS <- c(
+  "\\+NH4",
+  "\\+2NH4",
+  "\\+NH3",
+  "\\-NH3",
+  "\\+H\\-H2O\\]",
+  "\\+H\\-H4O2\\]",
+  "\\+H\\-H6O3\\]",
+  "\\+Na\\-H2O\\]",
+  "\\+K\\-H2O\\]",
+  "\\-H\\-H2O\\]"
+)
+.FORMULA_SUBS_REPLACEMENTS <- c(
+  "+H4N",
+  "+2H4N",
+  "+H3N",
+  "-H3N",
+  "-H2O+H]",
+  "-H4O2+H]",
+  "-H6O3+H]",
+  "-H2O+Na]",
+  "-H2O+K]",
+  "-H2O-H]"
+)
+
 #' @param df Data frame or tibble containing adduct column
 #' @param adducts_colname Character string name of the adduct column
 #'     (default: "adduct")
@@ -35,8 +62,6 @@ harmonize_adducts <- function(
   adducts_colname = "adduct",
   adducts_translations
 ) {
-  ctx <- log_operation("harmonize_adducts", n_rows = nrow(df))
-
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
   validate_character(
@@ -44,6 +69,11 @@ harmonize_adducts <- function(
     param_name = "adducts_colname",
     allow_empty = FALSE
   )
+
+  do_log <- nrow(df) >= 1000L
+  if (do_log) {
+    ctx <- log_operation("harmonize_adducts", n_rows = nrow(df))
+  }
 
   # Early Exits ----
 
@@ -75,63 +105,40 @@ harmonize_adducts <- function(
   # Normalize internal spaces (e.g., "[M + K]+" -> "[M+K]+")
   df[[adducts_colname]] <- gsub("\\s+", "", df[[adducts_colname]])
 
-  .escape_regex <- function(x) {
-    stringi::stri_replace_all_regex(
-      x,
-      pattern = "([\\^$.|?*+()\\[\\]{}])",
-      replacement = "\\\\$1"
-    )
+  # Fast exact-match lookup via match()
+  idx <- match(df[[adducts_colname]], names(adducts_translations))
+  matched <- !is.na(idx)
+  if (any(matched)) {
+    df[[adducts_colname]][matched] <- adducts_translations[idx[matched]]
   }
-  patterns <- names(adducts_translations)
-  patterns_escaped <- .escape_regex(patterns)
-  repls <- adducts_translations
-
-  patterns_anchored <- paste0("^", patterns_escaped, "$")
-
-  df[[adducts_colname]] <- stringi::stri_replace_all_regex(
-    str = df[[adducts_colname]],
-    pattern = patterns_anchored,
-    replacement = repls,
-    vectorize_all = FALSE
-  )
 
   # Second pass: substring-level formula normalization
   # Handles all combinations (dimers, losses, clusters) at once
-  formula_subs <- c(
-    "\\+NH4" = "+H4N",
-    "\\+2NH4" = "+2H4N",
-    "\\+NH3" = "+H3N",
-    "\\-NH3" = "-H3N",
-    "\\+H\\-H2O\\]" = "-H2O+H]",
-    "\\+H\\-H4O2\\]" = "-H4O2+H]",
-    "\\+H\\-H6O3\\]" = "-H6O3+H]",
-    "\\+Na\\-H2O\\]" = "-H2O+Na]",
-    "\\+K\\-H2O\\]" = "-H2O+K]",
-    "\\-H\\-H2O\\]" = "-H2O-H]"
-  )
   df[[adducts_colname]] <- stringi::stri_replace_all_regex(
     str = df[[adducts_colname]],
-    pattern = names(formula_subs),
-    replacement = unname(formula_subs),
+    pattern = .FORMULA_SUBS_PATTERNS,
+    replacement = .FORMULA_SUBS_REPLACEMENTS,
     vectorize_all = FALSE
   )
 
   n_unique_after <- count_unique_values(df[[adducts_colname]])
 
-  # Log reduction in unique forms (indicates successful harmonization)
-  if (n_unique_before != n_unique_after) {
-    log_debug(
-      "Harmonized: %d -> %d unique adduct forms",
-      n_unique_before,
-      n_unique_after
+  if (do_log) {
+    # Log reduction in unique forms (indicates successful harmonization)
+    if (n_unique_before != n_unique_after) {
+      log_debug(
+        "Harmonized: %d -> %d unique adduct forms",
+        n_unique_before,
+        n_unique_after
+      )
+    }
+
+    log_complete(
+      ctx,
+      n_unique_before = n_unique_before,
+      n_unique_after = n_unique_after
     )
   }
-
-  log_complete(
-    ctx,
-    n_unique_before = n_unique_before,
-    n_unique_after = n_unique_after
-  )
 
   df
 }

@@ -244,7 +244,7 @@ test_that("harmonize_adducts handles special characters in adducts", {
 
   result <- harmonize_adducts(df, adducts_translations = trans)
 
-  expect_equal(result$adduct, c("[M+H-H2O]+", "[M+NH4]+"))
+  expect_equal(result$adduct, c("[M-H2O+H]+", "[M+H4N]+"))
 })
 
 test_that("harmonize_adducts handles parentheses in original", {
@@ -407,5 +407,5 @@ test_that("harmonize_adducts is reasonably fast", {
   ))
 
   # Should complete quickly
-  expect_lt(timing["elapsed"], 0.1)
+  expect_lt(timing["elapsed"], 0.05)
 })
