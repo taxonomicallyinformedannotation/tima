@@ -462,6 +462,10 @@ annotate_masses <-
 
     #  "Calculating delta mz for single charge adducts and clusters"
     # )
+    ## Build a lookup of adduct -> adduct_mass for directionality correction
+    adduct_mass_lookup <- add_clu_table |>
+      tidytable::distinct(adduct, adduct_mass)
+
     differences <-
       dist_groups(
         d = stats::dist(x = add_clu_table$adduct_mass),
@@ -479,6 +483,27 @@ annotate_masses <-
           gsub(pattern = ".* and ", replacement = "")
       ) |>
       tidytable::select(-Item1, -Item2, -Label) |>
+      ## Ensure Group1 has the LOWER adduct_mass (matches lower m/z feature)
+      ## and Group2 has the HIGHER adduct_mass (matches higher m/z feature).
+      ## dist_groups orders by factor level (alphabetical), not by mass,
+      ## so we must correct directionality here.
+      tidytable::left_join(
+        y = adduct_mass_lookup |>
+          tidytable::rename(mass1 = adduct_mass),
+        by = stats::setNames("adduct", "Group1")
+      ) |>
+      tidytable::left_join(
+        y = adduct_mass_lookup |>
+          tidytable::rename(mass2 = adduct_mass),
+        by = stats::setNames("adduct", "Group2")
+      ) |>
+      tidytable::mutate(
+        swap = mass1 > mass2,
+        Group1_new = tidytable::if_else(swap, Group2, Group1),
+        Group2_new = tidytable::if_else(swap, Group1, Group2)
+      ) |>
+      tidytable::mutate(Group1 = Group1_new, Group2 = Group2_new) |>
+      tidytable::select(-mass1, -mass2, -swap, -Group1_new, -Group2_new) |>
       ## remove redundancy among clusters
       ## Keep proton first
       tidytable::mutate(l = stringi::stri_length(str = Group1)) |>
@@ -489,6 +514,8 @@ annotate_masses <-
       tidytable::filter(
         Distance >= tolerance_ppm * 1E-6 * max(df_fea_min$mz)
       )
+
+    rm(adduct_mass_lookup)
 
     neutral_losses <- neutral_losses_list |>
       tidytable::tidytable() |>
@@ -596,7 +623,8 @@ annotate_masses <-
                 perl = TRUE
               ),
             "-",
-            loss,
+            loss |>
+              gsub(pattern = " .*", replacement = ""),
             adduct |>
               gsub(
                 pattern = ".*M(?![a-z])",
@@ -638,7 +666,12 @@ annotate_masses <-
     df_addlossed_rdy <- df_addlossed_min_1 |>
       tidytable::bind_rows(df_addlossed_min_2) |>
       tidytable::select(-loss) |>
-      tidytable::distinct()
+      ## Deduplicate adducts that compute to the same neutral mass
+      ## (e.g., [M-H2O-H2O+H]+ vs [M-H4O2+H]+), keeping simplest form
+      tidytable::mutate(adduct_len = nchar(adduct)) |>
+      tidytable::arrange(adduct_len) |>
+      tidytable::distinct(feature_id, mz, mass, .keep_all = TRUE) |>
+      tidytable::select(-adduct_len)
     rm(
       df_addlossed,
       df_addlossed_min,
@@ -939,6 +972,33 @@ annotate_masses <-
     }
 
     rm(structure_organism_pairs_table, df_annotated_final)
+
+    # Log breakdown of annotated adduct species
+    if (nrow(df_final) > 0L && "candidate_adduct" %in% colnames(df_final)) {
+      adduct_breakdown <- df_final[
+        !is.na(candidate_adduct),
+        .N,
+        by = .(adduct = candidate_adduct)
+      ] |>
+        tidytable::arrange(
+          N |>
+            tidytable::desc()
+        )
+      if (nrow(adduct_breakdown) > 0L) {
+        log_info(
+          "Breakdown of the annotated adduct species:"
+        )
+        log_info(
+          "\n%s",
+          paste(
+            utils::capture.output(
+              print.data.frame(x = adduct_breakdown, row.names = FALSE)
+            ),
+            collapse = "\n"
+          )
+        )
+      }
+    }
 
     df_final |>
       decorate_masses()

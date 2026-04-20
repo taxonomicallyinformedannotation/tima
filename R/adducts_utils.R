@@ -1,13 +1,13 @@
 adducts_forbidden <- c(
-  "[M-H2O (water)+H2O-H]-",
-  "[M-H3O4P (phosphoric)+H3O4P-H]-",
-  "[M-H3N (ammonia)+C2H7N-H]-",
-  "[M-H3N (ammonia)+C2H3N-H]-",
-  "[M-H3N (ammonia)+H4N]+",
-  "[M-H2O (water)+H2O+H]+",
-  "[M-H3O4P (phosphoric)+H3O4P+H]+",
-  "[M-H3N (ammonia)+C2H7N+H]+",
-  "[M-H3N (ammonia)+C2H3N+H]+"
+  "[M-H2O+H2O-H]-",
+  "[M-H3O4P+H3O4P-H]-",
+  "[M-H3N+C2H7N-H]-",
+  "[M-H3N+C2H3N-H]-",
+  "[M-H3N+H4N]+",
+  "[M-H2O+H2O+H]+",
+  "[M-H3O4P+H3O4P+H]+",
+  "[M-H3N+C2H7N+H]+",
+  "[M-H3N+C2H3N+H]+"
 )
 
 adducts_translations <-
@@ -16,13 +16,31 @@ adducts_translations <-
     # cliqueMS
     "-3H" = "-H3",
     # cliqueMS
-    "-2H2O" = "-H4O2 (2xH2O)",
+    "-2H2O" = "-H4O2",
     # mzmine
-    "-3H2O" = "-H6O3 (3xH2O)",
+    "-3H2O" = "-H6O3",
     # mzmine
-    "-4H2O" = "-H8O4 (4xH2O)",
+    "-4H2O" = "-H8O4",
     # mzmine
-    "-5H2O" = "-H10O5 (5xH2O)",
+    "-5H2O" = "-H10O5",
+    # mzmine
+    "[M+H-H2O]+" = "[M-H2O+H]+",
+    # mzmine (reorder: loss before addition)
+    "[M+H-2H2O]+" = "[M-H4O2+H]+",
+    # mzmine
+    "[M+H-3H2O]+" = "[M-H6O3+H]+",
+    # mzmine
+    "[M+Na-H2O]+" = "[M-H2O+Na]+",
+    # mzmine
+    "[M+K-H2O]+" = "[M-H2O+K]+",
+    # mzmine
+    "[M-H-H2O]-" = "[M-H2O-H]-",
+    # mzmine
+    "[M+NH4-H2O]+" = "[M-H2O+H4N]+",
+    # mzmine
+    "[M+NH4]+" = "[M+H4N]+",
+    # mzmine
+    "[M+2NH4]2+" = "[M+2H4N]2+",
     # mzmine
     "-NH3" = "+H3N",
     # mzmine

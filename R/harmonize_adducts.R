@@ -95,6 +95,27 @@ harmonize_adducts <- function(
     vectorize_all = FALSE
   )
 
+  # Second pass: substring-level formula normalization
+  # Handles all combinations (dimers, losses, clusters) at once
+  formula_subs <- c(
+    "\\+NH4" = "+H4N",
+    "\\+2NH4" = "+2H4N",
+    "\\+NH3" = "+H3N",
+    "\\-NH3" = "-H3N",
+    "\\+H\\-H2O\\]" = "-H2O+H]",
+    "\\+H\\-H4O2\\]" = "-H4O2+H]",
+    "\\+H\\-H6O3\\]" = "-H6O3+H]",
+    "\\+Na\\-H2O\\]" = "-H2O+Na]",
+    "\\+K\\-H2O\\]" = "-H2O+K]",
+    "\\-H\\-H2O\\]" = "-H2O-H]"
+  )
+  df[[adducts_colname]] <- stringi::stri_replace_all_regex(
+    str = df[[adducts_colname]],
+    pattern = names(formula_subs),
+    replacement = unname(formula_subs),
+    vectorize_all = FALSE
+  )
+
   n_unique_after <- count_unique_values(df[[adducts_colname]])
 
   # Log reduction in unique forms (indicates successful harmonization)
