@@ -141,11 +141,11 @@ DEFAULT_PROGRESS_INTERVAL <- 10000
 
 #' Default minimum biological score threshold for high-confidence filter
 #' @keywords internal
-DEFAULT_HC_SCORE_BIO_MIN <- 0.85
+DEFAULT_HC_SCORE_BIO_MIN <- 0.8
 
 #' Default minimum initial (pseudo) score threshold for high-confidence filter
 #' @keywords internal
-DEFAULT_HC_SCORE_INITIAL_MIN <- 0.95
+DEFAULT_HC_SCORE_INITIAL_MIN <- 0.9
 
 #' Default minimum final (weighted chemical) score threshold for high-confidence
 #'     filter

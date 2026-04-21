@@ -9,8 +9,8 @@
 #'
 #' @param df Data frame containing annotation results with score columns
 #' @param score_bio_min Numeric minimum biological score threshold (default:
-#'     0.85). Range: 0-1
-#' @param score_ini_min Numeric minimum initial score threshold (default: 0.95).
+#'     0.8). Range: 0-1
+#' @param score_ini_min Numeric minimum initial score threshold (default: 0.9).
 #'     Range: 0-1
 #' @param score_final_min Numeric minimum final (chemical) score threshold
 #'     (default: 0.75). Range: 0-1
@@ -79,8 +79,8 @@
 #' # Filter to high-confidence annotations only
 #' high_conf <- filter_high_confidence_only(
 #'   df = annotations,
-#'   score_bio_min = 0.85,
-#'   score_ini_min = 0.95,
+#'   score_bio_min = 0.8,
+#'   score_ini_min = 0.9,
 #'   score_final_min = 0.75,
 #'   error_rt_max = 0.05,
 #'   context = "final_filtered"
