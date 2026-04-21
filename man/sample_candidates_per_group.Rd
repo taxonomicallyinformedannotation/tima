@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_chemo.R
 \name{sample_candidates_per_group}
 \alias{sample_candidates_per_group}
-\title{Sample Candidates Per Group with RT Error Priority}
+\title{Resolve tied candidates via cross-feature neutral-mass anchors}
 \usage{
 sample_candidates_per_group(df, max_per_score, seed = 42L)
 }
@@ -16,16 +16,20 @@ sample_candidates_per_group(df, max_per_score, seed = 42L)
 \value{
 List with three elements:
 \describe{
-\item{df}{Filtered data frame with sampled candidates}
-\item{n_sampled_features}{Number of features affected by sampling}
+\item{df}{Filtered data frame with sampled / collapsed candidates}
+\item{n_sampled_features}{Number of features whose tied groups
+required sampling (n > max_per_score)}
 \item{annotation_notes}{Per-group annotation notes (anchor / sampling)}
 }
 }
 \description{
-Internal helper to sample candidates per (feature_id,
-candidate_adduct, rank_final) group, prioritizing those with non-NA
-candidate_structure_error_rt values. Also applies cross-adduct /
-cross-rank anchor propagation using InChIKey and neutral-mass M keys
-inferred from unambiguous groups of the same feature.
+Splits candidates per (feature_id, candidate_adduct,
+rank_final) into untied rows (always kept) and tied rows. A tied
+group is collapsed to just the candidates whose InChIKey matches
+a rank-1 InChIKey of ANOTHER feature at the same neutral mass
+(within tolerance). Tied groups with NO cross-feature anchor are
+NOT dropped: they are kept as-is if \code{.n_per_group <= max_per_score},
+otherwise sampled down to \code{max_per_score} (RT-error candidates
+prioritized when the column is available).
 }
 \keyword{internal}
