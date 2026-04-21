@@ -1237,7 +1237,7 @@ test_that("build_mini_results_table appends xrefs and renames id columns", {
   )
 
   local_mocked_bindings(
-    .add_xrefs_to_df = function(df, xrefs) {
+    .add_xrefs_to_df = function(df) {
       df$candidate_structure_id_pubchem <- "12345"
       df
     }
@@ -1300,4 +1300,100 @@ test_that("build_mini_taxonomy_table falls back to predicted labels when structu
   expect_equal(out$label_npclassifier[[1L]], "Alkaloids")
   expect_true(!is.na(out$score_classyfire[[1L]]))
   expect_true(!is.na(out$score_npclassifier[[1L]]))
+})
+
+test_that("build_mini_taxonomy_table keeps labels from highest-scoring structure candidate (pmax)", {
+  # IK_UGLY has score 0.2, IK_GOOD has score 0.9 → IK_GOOD labels should win
+  df_percentile <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    score_weighted_chemo = c(0.2, 0.9),
+    candidate_score_pseudo_initial = c(0.2, 0.9),
+    candidate_structure_inchikey_connectivity_layer = c("IK_UGLY", "IK_GOOD"),
+    candidate_structure_tax_cla_01kin = c("KinUgly", "KinGood"),
+    candidate_structure_tax_cla_02sup = c("SupUgly", "SupGood"),
+    candidate_structure_tax_cla_03cla = c("ClaUgly", "ClaGood"),
+    candidate_structure_tax_cla_04dirpar = c("ParentUgly", "ParentGood"),
+    candidate_structure_tax_npc_01pat = c("PathUgly", "PathGood"),
+    candidate_structure_tax_npc_02sup = c("NpcSupUgly", "NpcSupGood"),
+    candidate_structure_tax_npc_03cla = c("NpcClaUgly", "NpcClaGood"),
+    feature_pred_tax_cla_01kin_val = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_01kin_score = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_02sup_val = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_02sup_score = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_03cla_val = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_03cla_score = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_04dirpar_val = c(NA_character_, NA_character_),
+    feature_pred_tax_cla_04dirpar_score = c(NA_character_, NA_character_),
+    feature_pred_tax_npc_01pat_val = c(NA_character_, NA_character_),
+    feature_pred_tax_npc_01pat_score = c(NA_character_, NA_character_),
+    feature_pred_tax_npc_02sup_val = c(NA_character_, NA_character_),
+    feature_pred_tax_npc_02sup_score = c(NA_character_, NA_character_),
+    feature_pred_tax_npc_03cla_val = c(NA_character_, NA_character_),
+    feature_pred_tax_npc_03cla_score = c(NA_character_, NA_character_)
+  )
+
+  out <- build_mini_taxonomy_table(
+    df_percentile = df_percentile,
+    score_chemical_cla_kingdom = 0.1,
+    score_chemical_cla_superclass = 0.2,
+    score_chemical_cla_class = 0.3,
+    score_chemical_cla_parent = 0.4,
+    score_chemical_npc_pathway = 0.3,
+    score_chemical_npc_superclass = 0.2,
+    score_chemical_npc_class = 0.1
+  )
+
+  expect_equal(out$label_classyfire[[1L]], "ParentGood")
+  expect_equal(out$label_npclassifier[[1L]], "NpcClaGood")
+  expect_true(is.na(out$score_classyfire[[1L]]))
+  expect_true(is.na(out$score_npclassifier[[1L]]))
+})
+
+test_that("build_mini_taxonomy_table predicted label beats low-scoring structure label via pmax", {
+  # Structure candidate has score_weighted_chemo = 0.1
+  # Predicted label score_classyfire = 0.95 * 0.4 (weight) = 0.38 > 0.1 → predicted wins
+  df_percentile <- tidytable::tidytable(
+    feature_id = "F1",
+    score_weighted_chemo = 0.1,
+    candidate_score_pseudo_initial = 0.1,
+    candidate_structure_inchikey_connectivity_layer = "IK_UGLY",
+    candidate_structure_tax_cla_01kin = "KinUgly",
+    candidate_structure_tax_cla_02sup = "SupUgly",
+    candidate_structure_tax_cla_03cla = "ClaUgly",
+    candidate_structure_tax_cla_04dirpar = "ParentUgly",
+    candidate_structure_tax_npc_01pat = "PathUgly",
+    candidate_structure_tax_npc_02sup = "NpcSupUgly",
+    candidate_structure_tax_npc_03cla = "NpcClaUgly",
+    feature_pred_tax_cla_01kin_val = NA_character_,
+    feature_pred_tax_cla_01kin_score = NA_character_,
+    feature_pred_tax_cla_02sup_val = "GoodSuperclass",
+    feature_pred_tax_cla_02sup_score = "0.95",
+    feature_pred_tax_cla_03cla_val = NA_character_,
+    feature_pred_tax_cla_03cla_score = NA_character_,
+    feature_pred_tax_cla_04dirpar_val = NA_character_,
+    feature_pred_tax_cla_04dirpar_score = NA_character_,
+    feature_pred_tax_npc_01pat_val = "GoodPathway",
+    feature_pred_tax_npc_01pat_score = "0.92",
+    feature_pred_tax_npc_02sup_val = NA_character_,
+    feature_pred_tax_npc_02sup_score = NA_character_,
+    feature_pred_tax_npc_03cla_val = NA_character_,
+    feature_pred_tax_npc_03cla_score = NA_character_
+  )
+
+  out <- build_mini_taxonomy_table(
+    df_percentile = df_percentile,
+    score_chemical_cla_kingdom = 0.2,
+    score_chemical_cla_superclass = 0.4,
+    score_chemical_cla_class = 0.6,
+    score_chemical_cla_parent = 0.8,
+    score_chemical_npc_pathway = 0.25,
+    score_chemical_npc_superclass = 0.5,
+    score_chemical_npc_class = 0.75
+  )
+
+  # weighted predicted classyfire score = 0.95 * 0.4 = 0.38 > 0.1 → predicted wins
+  expect_equal(out$label_classyfire[[1L]], "GoodSuperclass")
+  expect_equal(out$label_npclassifier[[1L]], "GoodPathway")
+  expect_false(is.na(out$score_classyfire[[1L]]))
+  expect_false(is.na(out$score_npclassifier[[1L]]))
 })

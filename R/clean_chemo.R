@@ -761,39 +761,58 @@ build_mini_taxonomy_table <- function(
     vals
   }
 
-  df_structure_tax <- df_percentile |>
-    tidytable::select(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      tidyselect::starts_with(match = "candidate_structure_tax_cla"),
-      tidyselect::starts_with(match = "candidate_structure_tax_npc")
-    ) |>
-    tidytable::distinct(feature_id, .keep_all = TRUE) |>
+  # Prepare all candidates with their structure taxonomy scored by
+  # score_weighted_chemo so they compete on equal footing with predicted labels.
+  df_all <- df_percentile |>
     tidytable::mutate(
+      score_weighted_chemo = as.numeric(score_weighted_chemo),
+      has_inchikey = !is.na(candidate_structure_inchikey_connectivity_layer),
       tidytable::across(
         .cols = tidyselect::starts_with(match = "candidate_structure_tax_"),
         .fns = normalize_tax_label
       ),
-      label_classyfire_structure = tidytable::coalesce(
+      .label_cla_str = tidytable::coalesce(
         candidate_structure_tax_cla_04dirpar,
         candidate_structure_tax_cla_03cla,
         candidate_structure_tax_cla_02sup,
         candidate_structure_tax_cla_01kin
       ),
-      label_npclassifier_structure = tidytable::coalesce(
+      .label_npc_str = tidytable::coalesce(
         candidate_structure_tax_npc_03cla,
         candidate_structure_tax_npc_02sup,
         candidate_structure_tax_npc_01pat
-      ),
-      has_inchikey = !is.na(candidate_structure_inchikey_connectivity_layer)
-    ) |>
-    tidytable::select(
-      feature_id,
-      has_inchikey,
-      label_classyfire_structure,
-      label_npclassifier_structure
+      )
     )
 
+  # has_inchikey flag at feature level
+  df_has_ik <- df_all |>
+    tidytable::summarize(
+      has_inchikey = any(has_inchikey, na.rm = TRUE),
+      .by = feature_id
+    )
+
+  # Best structure label per feature (highest score_weighted_chemo wins)
+  df_str_cla <- df_all |>
+    tidytable::filter(!is.na(.label_cla_str)) |>
+    tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
+    tidytable::distinct(feature_id, .keep_all = TRUE) |>
+    tidytable::select(
+      feature_id,
+      label_classyfire_str = .label_cla_str,
+      score_cla_str = score_weighted_chemo
+    )
+
+  df_str_npc <- df_all |>
+    tidytable::filter(!is.na(.label_npc_str)) |>
+    tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
+    tidytable::distinct(feature_id, .keep_all = TRUE) |>
+    tidytable::select(
+      feature_id,
+      label_npclassifier_str = .label_npc_str,
+      score_npc_str = score_weighted_chemo
+    )
+
+  # Best predicted label per feature (highest prediction score wins)
   df_pred_tax <- df_percentile |>
     tidytable::select(
       tidyselect::contains(match = c("feature_id", "feature_pred"))
@@ -816,43 +835,64 @@ build_mini_taxonomy_table <- function(
       w_npc_cla = score_chemical_npc_class
     )
 
-    df_cla <- compute_classyfire_taxonomy(df_pred_tax, weights)
-    df_npc <- compute_npclassifier_taxonomy(df_pred_tax, weights)
+    df_pred_cla <- compute_classyfire_taxonomy(df_pred_tax, weights) |>
+      tidytable::arrange(tidytable::desc(score_classyfire)) |>
+      tidytable::distinct(feature_id, .keep_all = TRUE)
 
-    df_pred_tax <- df_cla |>
-      tidytable::left_join(y = df_npc)
+    df_pred_npc <- compute_npclassifier_taxonomy(df_pred_tax, weights) |>
+      tidytable::arrange(tidytable::desc(score_npclassifier)) |>
+      tidytable::distinct(feature_id, .keep_all = TRUE)
   } else {
-    df_pred_tax <- tidytable::tidytable(
+    df_pred_cla <- tidytable::tidytable(
       feature_id = character(0),
       label_classyfire_predicted = character(0),
+      score_classyfire = numeric(0)
+    )
+    df_pred_npc <- tidytable::tidytable(
+      feature_id = character(0),
       label_npclassifier_predicted = character(0),
-      score_classyfire = numeric(0),
       score_npclassifier = numeric(0)
     )
   }
 
-  df_structure_tax |>
-    tidytable::left_join(y = df_pred_tax) |>
+  # pmax across both pools: structure label wins when its score_weighted_chemo
+  # >= prediction score, otherwise the predicted label wins.
+  df_has_ik |>
+    tidytable::left_join(y = df_str_cla) |>
+    tidytable::left_join(y = df_str_npc) |>
+    tidytable::left_join(y = df_pred_cla) |>
+    tidytable::left_join(y = df_pred_npc) |>
     tidytable::mutate(
-      use_structure_cla = has_inchikey & !is.na(label_classyfire_structure),
-      use_structure_npc = has_inchikey & !is.na(label_npclassifier_structure),
-      label_classyfire = tidytable::coalesce(
-        label_classyfire_structure,
-        label_classyfire_predicted
+      label_classyfire = tidytable::case_when(
+        !is.na(score_cla_str) &
+          !is.na(score_classyfire) &
+          score_cla_str >= score_classyfire ~ label_classyfire_str,
+        !is.na(score_classyfire) ~ label_classyfire_predicted,
+        !is.na(label_classyfire_str) ~ label_classyfire_str,
+        TRUE ~ NA_character_
       ),
-      label_npclassifier = tidytable::coalesce(
-        label_npclassifier_structure,
-        label_npclassifier_predicted
+      # No uncertainty score when label comes from a confirmed InChIKey structure
+      score_classyfire = tidytable::case_when(
+        !is.na(score_cla_str) &
+          !is.na(score_classyfire) &
+          score_cla_str >= score_classyfire ~ NA_real_,
+        !is.na(score_classyfire) ~ score_classyfire,
+        TRUE ~ NA_real_
       ),
-      score_classyfire = tidytable::if_else(
-        use_structure_cla,
-        NA_real_,
-        score_classyfire
+      label_npclassifier = tidytable::case_when(
+        !is.na(score_npc_str) &
+          !is.na(score_npclassifier) &
+          score_npc_str >= score_npclassifier ~ label_npclassifier_str,
+        !is.na(score_npclassifier) ~ label_npclassifier_predicted,
+        !is.na(label_npclassifier_str) ~ label_npclassifier_str,
+        TRUE ~ NA_character_
       ),
-      score_npclassifier = tidytable::if_else(
-        use_structure_npc,
-        NA_real_,
-        score_npclassifier
+      score_npclassifier = tidytable::case_when(
+        !is.na(score_npc_str) &
+          !is.na(score_npclassifier) &
+          score_npc_str >= score_npclassifier ~ NA_real_,
+        !is.na(score_npclassifier) ~ score_npclassifier,
+        TRUE ~ NA_real_
       )
     ) |>
     tidytable::select(
@@ -863,13 +903,7 @@ build_mini_taxonomy_table <- function(
       score_classyfire,
       score_npclassifier
     ) |>
-    tidytable::distinct() |>
-    tidytable::filter(
-      score_classyfire != 0 |
-        score_npclassifier != 0 |
-        is.na(score_classyfire) |
-        is.na(score_npclassifier)
-    )
+    tidytable::distinct()
 }
 
 #' Build mini-tier result table
