@@ -716,7 +716,10 @@ prepare_ranked_candidates <- function(
   )
 
   df_ranked <- sampling_result$df
-  df_percentile <- apply_percentile_filter(df_ranked, best_percentile)
+  df_percentile <- apply_percentile_filter(
+    df = df_ranked,
+    best_percentile = best_percentile
+  )
 
   list(
     df_ranked = df_ranked,

@@ -211,9 +211,9 @@ ui <- shiny::fluidPage(
           shiny::sliderInput(
             inputId = "ann_can_bes",
             label = "Best percentile threshold for candidates",
-            min = 0.5,
+            min = 0.0,
             max = 1.0,
-            value = 0.9,
+            value = 0.0,
             step = 0.05,
             ticks = FALSE
           ) |>
@@ -222,7 +222,7 @@ ui <- shiny::fluidPage(
               content = c(
                 "Percentile threshold for selecting top candidates within each feature.",
                 "Keeps candidates with scores >= percentile * max_score.",
-                "Default 0.9 keeps candidates with scores >= 90% of the maximum score (top 10%).",
+                "0.9 keeps candidates with scores >= 90% of the maximum score (top 10%).",
                 "This ensures mini and filtered outputs have the same row counts.",
                 "Lower values (e.g., 0.8) = more candidates, higher values (e.g., 0.95) = fewer candidates."
               )
