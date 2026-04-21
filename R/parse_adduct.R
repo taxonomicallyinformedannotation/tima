@@ -5,6 +5,7 @@
 #'     charge state, and charge sign. It handles complex adducts with multiple
 #'     additions/losses.
 #'
+#' @include adducts_utils.R
 #' @include constants.R
 #' @include validations_utils.R
 #'
@@ -236,11 +237,9 @@ validate_adduct_string <- function(adduct_string) {
 #' Match adduct string against regex pattern
 #' @keywords internal
 match_adduct_regex <- function(adduct_string, regex) {
-  # Remove comments first (they rely on space before parens to be detected)
-  adduct_string <- remove_comments(adduct_string)
-  # Then strip all remaining whitespace (internal spaces cause mismatches
-  # like [M + K]+ vs [M+K]+)
-  adduct_string <- gsub("\\s+", "", adduct_string)
+  # Apply all pre-parse normalizations (whitespace, comments, aliases,
+  # radical markers, trailing charge reordering) in one place.
+  adduct_string <- normalize_adduct_string(adduct_string)
 
   matches <- tryCatch(
     {
@@ -274,6 +273,106 @@ match_adduct_regex <- function(adduct_string, regex) {
   }
 
   list(valid = TRUE, matches = matches)
+}
+
+# Pre-computed substring aliases for solvents / common groups. Built from
+# `adducts_translations` at package load time: we keep entries whose name is
+# a pure `+Alias` or `-Alias` fragment (not a whole adduct like `[M+H]+`).
+# Sorted by decreasing pattern length so longer aliases win over shorter
+# ones (e.g. "+IsoProp" before "+H").
+.SOLVENT_ALIAS_TABLES <- local({
+  tab <- adducts_translations
+  keys <- names(tab)
+  mask <- grepl("^[+-][A-Za-z]", keys) & !grepl("\\[|\\]", keys)
+  if (!any(mask)) {
+    list(patterns = character(0L), replacements = character(0L))
+  } else {
+    patterns <- keys[mask]
+    replacements <- unname(tab[mask])
+    ord <- order(nchar(patterns), decreasing = TRUE)
+    patterns <- patterns[ord]
+    replacements <- replacements[ord]
+    # Build regex patterns that preserve an optional multiplicity prefix,
+    # e.g. "+2ACN" -> "+2C2H3N" instead of "+ACN" -> "+C2H3N" only.
+    # Pattern:       ([+-])(\d*)<alias_body>
+    # Replacement:   $1$2<formula_body> (stringi backref syntax)
+    patterns_re <- vapply(
+      patterns,
+      function(p) {
+        sign_char <- substr(p, 1L, 1L)
+        body <- substring(p, 2L)
+        # No regex metacharacters in aliases (alphanumeric only).
+        paste0("(\\", sign_char, ")(\\d*)", body)
+      },
+      character(1L)
+    )
+    repl <- vapply(
+      replacements,
+      function(r) paste0("$1$2", substring(r, 2L)),
+      character(1L)
+    )
+    list(patterns = unname(patterns_re), replacements = unname(repl))
+  }
+})
+
+#' Normalize an adduct string before regex parsing
+#'
+#' @description Applies whitespace/comment cleanup plus a suite of
+#'     source-specific notation fixes so that adduct strings emitted by
+#'     databases (GNPS, MassBank, mzmine, cliqueMS, MoNA, ...) can be parsed
+#'     by a single canonical regex:
+#'     \itemize{
+#'       \item comments in parens are removed;
+#'       \item internal whitespace is stripped;
+#'       \item trailing radical marker `*` (e.g. `[M]+*`) is removed;
+#'       \item non-standard trailing charge `]+2` is rewritten to `]2+`;
+#'       \item solvent aliases (`+ACN`, `+IsoProp`, `+MeOH`, `+DMSO`, `+FA`,
+#'         `+HAc`, `+CH3COO`, `+NH4`, ...) are expanded to element formulas
+#'         via \code{adducts_translations}.
+#'     }
+#'
+#' @param adduct_string Scalar character adduct notation
+#'
+#' @return Normalized adduct string (scalar character)
+#' @keywords internal
+normalize_adduct_string <- function(adduct_string) {
+  if (is.null(adduct_string) || is.na(adduct_string)) {
+    return(adduct_string)
+  }
+
+  # Remove parenthetical comments (rely on space before parens to detect).
+  adduct_string <- remove_comments(adduct_string)
+  # Strip all remaining whitespace (internal spaces cause mismatches like
+  # "[M + K]+" vs "[M+K]+").
+  adduct_string <- gsub("\\s+", "", adduct_string)
+
+  # Strip trailing radical/odd-electron markers such as `*` or `.`, which
+  # appear in MassBank / NIST notation e.g. "[M]+*", "[M+Li]+*".
+  adduct_string <- sub(
+    pattern = "([+-])[*.]+$",
+    replacement = "\\1",
+    x = adduct_string
+  )
+
+  # Normalize non-standard trailing charge notation: "]+2" / "]-2" produced
+  # by some databases -> canonical "]2+" / "]2-".
+  adduct_string <- sub(
+    pattern = "\\]([+-])(\\d+)$",
+    replacement = "]\\2\\1",
+    x = adduct_string
+  )
+
+  # Expand solvent / common-group aliases (+ACN, +IsoProp, +MeOH, +DMSO, ...).
+  if (length(.SOLVENT_ALIAS_TABLES$patterns) > 0L) {
+    adduct_string <- stringi::stri_replace_all_regex(
+      str = adduct_string,
+      pattern = .SOLVENT_ALIAS_TABLES$patterns,
+      replacement = .SOLVENT_ALIAS_TABLES$replacements,
+      vectorize_all = FALSE
+    )
+  }
+
+  adduct_string
 }
 
 #' Extract multimer count from regex match

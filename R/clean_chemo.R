@@ -500,20 +500,93 @@ compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
     tidytable::distinct()
 }
 
-#' Sample Candidates Per Group with RT Error Priority
+#' Compute neutral mass (M) per candidate row
 #'
-#' @description Internal helper to sample candidates per (feature_id,
-#'     rank_final)
-#' group, prioritizing those with non-NA candidate_structure_error_rt values.
+#' @description Vectorised, silent wrapper around
+#'     \code{\link{calculate_mass_of_m}} used to build a cross-adduct
+#'     propagation key. Returns \code{NA_real_} for any row whose adduct or
+#'     m/z cannot be parsed / converted, so callers can safely \code{round()}
+#'     the result.
+#'
+#' @param mz Numeric vector of feature m/z values
+#' @param adduct_string Character vector of adduct strings, same length as mz
+#'
+#' @return Numeric vector of neutral masses, NA where conversion failed
+#' @keywords internal
+compute_candidate_M <- function(mz, adduct_string) {
+  n <- length(mz)
+  if (n == 0L) {
+    return(numeric(0))
+  }
+  mz_num <- as.numeric(mz)
+  out <- rep(NA_real_, n)
+
+  usable <- !is.na(mz_num) &
+    is.finite(mz_num) &
+    mz_num > 0 &
+    !is.na(adduct_string) &
+    nzchar(adduct_string)
+  if (!any(usable)) {
+    return(out)
+  }
+
+  # Group by unique adduct string: parse once per unique string, then apply
+  # the neutral-mass formula as vectorised arithmetic. This avoids O(N)
+  # calls into the validator-heavy `calculate_mass_of_m` and scales with
+  # the (typically small) number of distinct adducts rather than rows.
+  unique_adducts <- unique(adduct_string[usable])
+  for (add in unique_adducts) {
+    parsed <- tryCatch(
+      suppressWarnings(parse_adduct(add)),
+      error = function(...) NULL
+    )
+    if (is.null(parsed) || all(parsed == 0)) {
+      next
+    }
+    n_charges <- parsed[["n_charges"]]
+    n_mer <- parsed[["n_mer"]]
+    n_iso <- parsed[["n_iso"]]
+    mass_mods <- parsed[["los_add_clu"]]
+    if (n_mer == 0L || n_charges == 0L) {
+      next
+    }
+
+    idx <- which(usable & adduct_string == add)
+    if (!length(idx)) {
+      next
+    }
+    mz_vec <- mz_num[idx]
+    iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
+    m_vec <- (n_charges * (mz_vec - iso_shift) - mass_mods) / n_mer
+    m_vec[!is.finite(m_vec) | m_vec == 0] <- NA_real_
+    valid <- !is.na(m_vec)
+    out[idx[valid]] <- m_vec[valid]
+  }
+
+  out
+}
+
+#' Resolve tied candidates via cross-feature neutral-mass anchors
+#'
+#' @description Splits candidates per (feature_id, candidate_adduct,
+#'     rank_final) into untied rows (always kept) and tied rows. A tied
+#'     group is collapsed to just the candidates whose InChIKey matches
+#'     a rank-1 InChIKey of ANOTHER feature at the same neutral mass
+#'     (within tolerance). Tied groups with NO cross-feature anchor are
+#'     NOT dropped: they are kept as-is if `.n_per_group <= max_per_score`,
+#'     otherwise sampled down to `max_per_score` (RT-error candidates
+#'     prioritized when the column is available).
 #'
 #' @param df Data frame with ranked candidates
 #' @param max_per_score Integer, maximum candidates to keep per group
 #' @param seed Integer, random seed for reproducibility
 #'
-#' @return List with two elements:
+#' @return List with three elements:
 #'   \describe{
-#'     \item{df}{Filtered data frame with sampled candidates}
-#'     \item{n_sampled_features}{Number of features affected by sampling}
+#'     \item{df}{Filtered data frame with sampled / collapsed candidates}
+#'     \item{n_sampled_features}{Number of features whose tied groups
+#'         required sampling (n > max_per_score)}
+#'     \item{annotation_notes}{Per-group annotation notes (anchor / sampling)}
 #'   }
 #' @keywords internal
 sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
@@ -528,24 +601,192 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
       .by = c(feature_id, candidate_adduct, rank_final)
     )
 
-  # Count features that need sampling
+  has_ik_col <- "candidate_structure_inchikey_connectivity_layer" %in% names(df)
+  has_M_cols <- "mz" %in% names(df) && "candidate_adduct" %in% names(df)
+  has_rt_feature_col <- "rt" %in% names(df)
+
+  # Derive per-row neutral mass M from (feature mz, candidate_adduct). Rows
+  # from DIFFERENT features whose M values match within a small tolerance
+  # are interpretations of the same molecular entity under different
+  # adducts (e.g. `[M+NH4]+` on feature X and `[2M+Na]+` on feature Y).
+  if (has_M_cols) {
+    df <- df |>
+      tidytable::mutate(
+        .candidate_M = compute_candidate_M(mz, candidate_adduct)
+      )
+  }
+
+  # Cross-feature anchor lookup: (M, RT, IK, feature_id) tuples sourced
+  # from rank=1 rows that are THEMSELVES UNAMBIGUOUS (`.n_per_group == 1`)
+  # — a tied sibling is not real evidence and cannot anchor anything.
+  # Matching requires:
+  #   (a) anchor_fid != row_fid (another feature),
+  #   (b) same IK,
+  #   (c) same neutral mass M within NEUTRAL_MASS_MATCH_TOLERANCE_DA,
+  #   (d) same retention time within DEFAULT_HC_MAX_RT_ERROR_MIN.
+  # Without the RT gate, unrelated co-mass features at different RTs can
+  # cross-anchor each of a tied group's IKs individually, leaving every
+  # tied row flagged and nothing collapsed. Sorted by M for fast lookup.
+  anchor_M_vec <- numeric(0)
+  anchor_IK_vec <- character(0)
+  anchor_fid_vec <- character(0)
+  anchor_rt_vec <- numeric(0)
+
+  if (has_ik_col && has_M_cols) {
+    anchor_tbl_base <- df |>
+      tidytable::filter(
+        rank_final == 1L,
+        .n_per_group == 1L,
+        !is.na(candidate_structure_inchikey_connectivity_layer),
+        !is.na(.candidate_M)
+      ) |>
+      tidytable::arrange(.candidate_M)
+
+    anchor_tbl <- if (has_rt_feature_col) {
+      anchor_tbl_base |>
+        tidytable::select(
+          .candidate_M,
+          .anchor_IK = candidate_structure_inchikey_connectivity_layer,
+          .anchor_fid = feature_id,
+          .anchor_rt = rt
+        )
+    } else {
+      anchor_tbl_base |>
+        tidytable::select(
+          .candidate_M,
+          .anchor_IK = candidate_structure_inchikey_connectivity_layer,
+          .anchor_fid = feature_id
+        )
+    }
+
+    if (nrow(anchor_tbl) > 0L) {
+      anchor_M_vec <- anchor_tbl$.candidate_M
+      anchor_IK_vec <- anchor_tbl$.anchor_IK
+      anchor_fid_vec <- as.character(anchor_tbl$.anchor_fid)
+      anchor_rt_vec <- if (has_rt_feature_col) {
+        as.numeric(anchor_tbl$.anchor_rt)
+      } else {
+        rep(NA_real_, nrow(anchor_tbl))
+      }
+    }
+  }
+
+  # Count features that will need sampling (> max_per_score tied rows).
   n_sampled_features <- df |>
     tidytable::filter(.n_per_group > max_per_score) |>
     tidytable::distinct(feature_id) |>
     nrow()
 
-  # Groups that do NOT need sampling
-  df_keep_all <- df |>
-    tidytable::filter(.n_per_group <= max_per_score)
+  # Split: untied rows pass through. Tied rows go through anchor + (optional)
+  # sampling. Anchor collapse runs at EVERY tied size — even groups below
+  # max_per_score are collapsed when a cross-feature anchor exists.
+  df_untied <- df |>
+    tidytable::filter(.n_per_group == 1L)
 
-  # Groups that DO need sampling - prioritize RT error candidates
+  df_tied <- df |>
+    tidytable::filter(.n_per_group >= 2L)
+
   has_rt_col <- "candidate_structure_error_rt" %in% names(df)
 
-  df_needs_sampling <- df |>
+  df_anchor_kept <- tidytable::tidytable()
+  df_needs_sampling <- df_tied
+
+  if (
+    nrow(df_tied) > 0L &&
+      has_ik_col &&
+      length(anchor_M_vec) > 0L
+  ) {
+    row_M <- df_tied$.candidate_M
+    row_IK <- df_tied$candidate_structure_inchikey_connectivity_layer
+    row_fid <- as.character(df_tied$feature_id)
+    row_rt <- if (has_rt_feature_col) {
+      as.numeric(df_tied$rt)
+    } else {
+      rep(NA_real_, nrow(df_tied))
+    }
+    tol <- NEUTRAL_MASS_MATCH_TOLERANCE_DA
+    rt_tol <- DEFAULT_HC_MAX_RT_ERROR_MIN
+
+    lo <- findInterval(row_M - tol, anchor_M_vec)
+    hi <- findInterval(row_M + tol, anchor_M_vec)
+
+    anchor_match <- logical(length(row_M))
+    for (i in seq_along(row_M)) {
+      if (is.na(row_M[[i]]) || is.na(row_IK[[i]])) {
+        next
+      }
+      from <- lo[[i]] + 1L
+      to <- hi[[i]]
+      if (from > to) {
+        next
+      }
+      rng <- from:to
+      hit <- anchor_IK_vec[rng] == row_IK[[i]] &
+        anchor_fid_vec[rng] != row_fid[[i]]
+      # RT co-elution gate: the anchor feature must elute at (within
+      # DEFAULT_HC_MAX_RT_ERROR_MIN of) the tied row's feature RT.
+      # Without this, any unrelated feature sharing M acts as an anchor.
+      if (has_rt_feature_col && !is.na(row_rt[[i]])) {
+        rt_diff <- abs(anchor_rt_vec[rng] - row_rt[[i]])
+        rt_ok <- is.na(rt_diff) | rt_diff <= rt_tol
+        hit <- hit & rt_ok
+      }
+      if (any(hit, na.rm = TRUE)) {
+        anchor_match[[i]] <- TRUE
+      }
+    }
+
+    df_tied <- df_tied |>
+      tidytable::mutate(.anchor_match = anchor_match)
+
+    anchor_group_keys <- df_tied |>
+      tidytable::filter(.anchor_match) |>
+      tidytable::distinct(feature_id, candidate_adduct, rank_final)
+
+    if (nrow(anchor_group_keys) > 0L) {
+      # Tied groups with at least one anchor match -> keep ONLY the
+      # anchor-matching rows (no max_per_score cap: cross-feature evidence
+      # is stronger than the arbitrary cap).
+      df_anchor_kept <- df_tied |>
+        tidytable::inner_join(
+          y = anchor_group_keys,
+          by = c("feature_id", "candidate_adduct", "rank_final")
+        ) |>
+        tidytable::filter(.anchor_match) |>
+        tidytable::arrange(
+          feature_id,
+          candidate_adduct,
+          rank_final,
+          tidytable::desc(score_weighted_chemo),
+          tidytable::desc(candidate_score_pseudo_initial)
+        ) |>
+        tidytable::mutate(
+          annotation_note = paste0(
+            "Kept candidate matching best-supported InChIKey from sibling ",
+            "feature with same neutral mass (different adduct)"
+          )
+        )
+
+      # Tied groups without any anchor match fall through to the sampling
+      # step below (kept as-is if small, sampled if oversized).
+      df_needs_sampling <- df_tied |>
+        tidytable::anti_join(
+          y = anchor_group_keys,
+          by = c("feature_id", "candidate_adduct", "rank_final")
+        )
+    }
+  }
+
+  # Tied groups without an anchor: keep as-is when below the cap, sample
+  # down when above. We NEVER drop them — losing every tied candidate
+  # when no sibling evidence exists would erase valid annotations.
+  df_keep_remaining <- df_needs_sampling |>
+    tidytable::filter(.n_per_group <= max_per_score)
+
+  df_needs_sampling <- df_needs_sampling |>
     tidytable::filter(.n_per_group > max_per_score)
 
   if (nrow(df_needs_sampling) > 0L && has_rt_col) {
-    # Add priority flag: TRUE for candidates with RT error
     df_needs_sampling <- df_needs_sampling |>
       tidytable::mutate(.rt_priority = !is.na(candidate_structure_error_rt))
 
@@ -567,7 +808,6 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
       ) |>
       tidytable::select(-.rt_priority)
   } else if (nrow(df_needs_sampling) > 0L) {
-    # No RT column, just sample randomly
     set.seed(seed)
     df_sampled <- df_needs_sampling |>
       tidytable::slice_sample(
@@ -587,9 +827,19 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
     df_sampled <- tidytable::tidytable()
   }
 
-  # Combine back
-  df_result <- tidytable::bind_rows(df_keep_all, df_sampled) |>
-    tidytable::select(-.n_per_group)
+  df_result <- tidytable::bind_rows(
+    df_untied,
+    df_keep_remaining,
+    df_anchor_kept,
+    df_sampled
+  ) |>
+    tidytable::select(
+      -tidyselect::any_of(c(
+        ".n_per_group",
+        ".anchor_match",
+        ".candidate_M"
+      ))
+    )
 
   # Extract annotation_note as a separate lookup table
   # annotation_note is per (feature_id, adduct, rank_final) group
@@ -753,6 +1003,10 @@ build_mini_taxonomy_table <- function(
   score_chemical_npc_superclass,
   score_chemical_npc_class
 ) {
+  if (!"score_weighted_chemo" %in% names(df_percentile)) {
+    df_percentile$score_weighted_chemo <- NA_real_
+  }
+
   normalize_tax_label <- function(x) {
     vals <- trimws(as.character(x))
     vals[
@@ -1057,7 +1311,10 @@ build_mini_results_table <- function(
 #'     feature).
 #'
 #' @include add_xrefs_to_annotations.R
+#' @include calculate_mass_of_m.R
+#' @include constants.R
 #' @include filter_high_confidence_only.R
+#' @include parse_adduct.R
 #' @include summarize_results.R
 #'
 #' @param annot_table_wei_chemo Data frame with chemically weighted annotations.
@@ -1218,6 +1475,26 @@ clean_chemo <- function(
   # Ensure Score Columns are Numeric ----
 
   annot_table_wei_chemo <- coerce_score_columns(annot_table_wei_chemo)
+
+  # Ensure feature-level `rt` and `mz` are present on every candidate row:
+  # `sample_candidates_per_group` uses them for the cross-feature M + RT
+  # anchor. If upstream scoring dropped them, left-join from features_table.
+  .ft_cols <- intersect(c("feature_id", "rt", "mz"), names(features_table))
+  .missing_feature_cols <- setdiff(
+    c("rt", "mz"),
+    names(annot_table_wei_chemo)
+  )
+  if (
+    length(.missing_feature_cols) > 0L && all(c("feature_id") %in% .ft_cols)
+  ) {
+    annot_table_wei_chemo <- annot_table_wei_chemo |>
+      tidytable::left_join(
+        y = features_table |>
+          tidytable::select(tidyselect::any_of(.ft_cols)) |>
+          tidytable::distinct(feature_id, .keep_all = TRUE),
+        by = "feature_id"
+      )
+  }
 
   # Precompute feature-level consensus metadata once to avoid repeated
   # full-table coercion inside summarize_results for each output tier.

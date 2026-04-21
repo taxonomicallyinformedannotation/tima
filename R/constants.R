@@ -49,6 +49,25 @@ MIN_MASS_DALTONS <- 0
 #' @keywords internal
 MAX_MASS_DALTONS <- 5000
 
+#' Number of decimals to use when grouping neutral masses for cross-adduct
+#' candidate propagation.
+#' @description 4 decimals corresponds to 0.1 mDa resolution, which is
+#'     sufficient to distinguish distinct monoisotopic neutral masses of small
+#'     molecules while tolerating floating-point drift introduced by adduct
+#'     inversion.
+#' @keywords internal
+NEUTRAL_MASS_GROUP_DECIMALS <- 4L
+
+#' Absolute tolerance (Da) for matching neutral masses across features when
+#' propagating anchor InChIKeys.
+#' @description 5 mDa ≈ 10-15 ppm at typical small-molecule masses, which
+#'     comfortably absorbs the accumulated error of inverting multiple
+#'     adduct formulas (e.g. `[M+NH4]+` vs `[2M+Na]+`) while remaining
+#'     tight enough to keep distinct monoisotopic neutral masses in
+#'     separate groups.
+#' @keywords internal
+NEUTRAL_MASS_MATCH_TOLERANCE_DA <- 5E-3
+
 # Regular Expression Patterns ----
 
 #' Regular expression pattern for parsing adduct notation

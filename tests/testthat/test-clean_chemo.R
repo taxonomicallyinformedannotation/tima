@@ -1054,6 +1054,60 @@ test_that("prepare_ranked_candidates returns expected objects", {
   expect_true(is.data.frame(out$annotation_notes_lookup))
   expect_type(out$n_sampled_features, "integer")
 })
+test_that("prepare_ranked_candidates emits cross-feature M-anchor note end-to-end", {
+  # Real-world scenario: the same molecular entity is detected as TWO
+  # features under different adducts (F1 as [M+H]+, F2 as [M+Na]+).
+  # F1 has a clear winner IK_A; F2's tied [M+Na]+ group must inherit
+  # IK_A via the cross-feature neutral-mass anchor.
+  mz_F1 <- 200
+  M_target <- suppressWarnings(calculate_mass_of_m(mz_F1, "[M+H]+"))
+  mz_F2 <- suppressWarnings(calculate_mz_from_mass(M_target, "[M+Na]+"))
+
+  ann <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F2", "F2"),
+    mz = c(mz_F1, mz_F2, mz_F2, mz_F2),
+    candidate_adduct = c("[M+H]+", "[M+Na]+", "[M+Na]+", "[M+Na]+"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_A",
+      "IK_A",
+      "IK_B",
+      "IK_C"
+    ),
+    candidate_structure_name = c("A", "A", "B", "C"),
+    score_weighted_chemo = c(0.9, 0.7, 0.7, 0.7),
+    candidate_score_pseudo_initial = c(0.9, 0.7, 0.7, 0.7),
+    score_biological = rep(0.5, 4L),
+    score_chemical = rep(0.5, 4L),
+    candidate_score_similarity = rep(0.8, 4L),
+    candidate_score_sirius_csi = rep(NA_real_, 4L)
+  )
+
+  out <- prepare_ranked_candidates(
+    annot_table_wei_chemo = ann,
+    minimal_ms1_bio = 0,
+    minimal_ms1_chemo = 0,
+    minimal_ms1_condition = "OR",
+    best_percentile = 0,
+    max_per_score = 1L
+  )
+
+  notes <- out$annotation_notes_lookup
+  expect_true(nrow(notes) >= 1L)
+  expect_true(any(grepl(
+    "sibling feature",
+    notes$annotation_note
+  )))
+
+  # Only IK_A must survive in F2's tied group.
+  f2_rows <- out$df_ranked |>
+    tidytable::filter(feature_id == "F2")
+  expect_equal(nrow(f2_rows), 1L)
+  expect_equal(
+    f2_rows$candidate_structure_inchikey_connectivity_layer[[1L]],
+    "IK_A"
+  )
+})
+
 test_that("build_mini_taxonomy_table returns mini taxonomy columns", {
   fixture <- make_clean_chemo_fixture(n_features = 2, n_candidates = 4)
   ann <- coerce_score_columns(fixture$annot_table_wei_chemo)
@@ -1204,6 +1258,194 @@ test_that("sample_candidates_per_group returns empty result for empty input", {
   out <- sample_candidates_per_group(df = df, max_per_score = 1L)
   expect_equal(nrow(out$df), 0L)
   expect_equal(out$n_sampled_features, 0L)
+})
+
+test_that("sample_candidates_per_group keeps cross-feature M-anchor InChIKey", {
+  # Two DIFFERENT features represent the same molecular entity under
+  # different adducts (same neutral mass M). F1 has an unambiguous winner
+  # IK_BEST; F2's tied [M+Na]+ group must inherit IK_BEST via M-anchor.
+  mz_F1 <- 200
+  M_target <- suppressWarnings(calculate_mass_of_m(mz_F1, "[M+H]+"))
+  mz_F2 <- suppressWarnings(calculate_mz_from_mass(M_target, "[M+Na]+"))
+
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F2"),
+    mz = c(mz_F1, mz_F2, mz_F2),
+    candidate_adduct = c("[M+H]+", "[M+Na]+", "[M+Na]+"),
+    rank_final = c(1L, 1L, 1L),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_BEST",
+      "IK_BEST",
+      "IK_OTHER"
+    ),
+    score_weighted_chemo = c(0.95, 0.7, 0.7),
+    candidate_score_pseudo_initial = c(0.9, 0.7, 0.7)
+  )
+
+  out <- sample_candidates_per_group(df = df, max_per_score = 1L, seed = 42L)
+
+  kept_f2 <- out$df |>
+    tidytable::filter(feature_id == "F2")
+
+  expect_equal(nrow(kept_f2), 1L)
+  expect_equal(
+    kept_f2$candidate_structure_inchikey_connectivity_layer[[1L]],
+    "IK_BEST"
+  )
+  expect_true(any(grepl(
+    "sibling feature",
+    out$annotation_notes$annotation_note
+  )))
+})
+
+test_that("sample_candidates_per_group isolates anchors per neutral mass", {
+  # Two independent M-groups: (F1, F2) share M_A; (F3, F4) share M_B.
+  # Each M-group's winner propagates only within its own M-group.
+  mz_F1 <- 200
+  M_A <- suppressWarnings(calculate_mass_of_m(mz_F1, "[M+H]+"))
+  mz_F2 <- suppressWarnings(calculate_mz_from_mass(M_A, "[M+Na]+"))
+  mz_F3 <- 350
+  M_B <- suppressWarnings(calculate_mass_of_m(mz_F3, "[M+H]+"))
+  mz_F4 <- suppressWarnings(calculate_mz_from_mass(M_B, "[M+Na]+"))
+
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F2", "F3", "F4", "F4"),
+    mz = c(mz_F1, mz_F2, mz_F2, mz_F3, mz_F4, mz_F4),
+    candidate_adduct = c(
+      "[M+H]+",
+      "[M+Na]+",
+      "[M+Na]+",
+      "[M+H]+",
+      "[M+Na]+",
+      "[M+Na]+"
+    ),
+    rank_final = rep(1L, 6L),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_A",
+      "IK_A",
+      "IK_X",
+      "IK_B",
+      "IK_B",
+      "IK_Y"
+    ),
+    score_weighted_chemo = c(0.95, 0.7, 0.7, 0.95, 0.7, 0.7),
+    candidate_score_pseudo_initial = rep(0.8, 6L)
+  )
+
+  out <- sample_candidates_per_group(df = df, max_per_score = 1L, seed = 42L)
+
+  kept_tied <- out$df |>
+    tidytable::filter(candidate_adduct == "[M+Na]+") |>
+    tidytable::arrange(feature_id)
+
+  expect_equal(nrow(kept_tied), 2L)
+  expect_equal(
+    kept_tied$candidate_structure_inchikey_connectivity_layer,
+    c("IK_A", "IK_B")
+  )
+})
+
+test_that("sample_candidates_per_group falls back to sampling without cross-feature anchor", {
+  # Single feature, tied candidates, no sibling feature sharing the M ->
+  # no anchor can fire; must fall back to random / RT-priority sampling
+  # and emit the "Sampled" note. Rows are NOT dropped.
+  df <- tidytable::tidytable(
+    feature_id = rep("F1", 4L),
+    mz = rep(200, 4L),
+    candidate_adduct = rep("[M+H]+", 4L),
+    rank_final = rep(1L, 4L),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_A",
+      "IK_B",
+      "IK_C",
+      "IK_D"
+    ),
+    score_weighted_chemo = rep(0.9, 4L),
+    candidate_score_pseudo_initial = rep(0.8, 4L)
+  )
+
+  out <- sample_candidates_per_group(df = df, max_per_score = 2L, seed = 42L)
+
+  expect_equal(nrow(out$df), 2L)
+  expect_true(any(grepl("^Sampled ", out$annotation_notes$annotation_note)))
+  expect_false(any(grepl(
+    "sibling feature",
+    out$annotation_notes$annotation_note
+  )))
+})
+
+test_that("sample_candidates_per_group resolves tied group using another feature's unambiguous adduct (F151/F154 scenario)", {
+  # Real-world F151/F154: F1 has an UNAMBIGUOUS rank-1 winner (IK_A) for
+  # adduct [M+H4N]+. F2 has 3 tied rank-1 candidates (IK_A, IK_B, IK_C)
+  # for adduct [2M+Na]+. Both features map to the same neutral mass M
+  # (within tolerance). The anchor from F1 must collapse F2's tie to IK_A,
+  # leaving F1 untouched (it's untied).
+  mz_F1 <- 360.1495517
+  mz_F2 <- 707.2199918
+
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F2", "F2"),
+    mz = c(mz_F1, mz_F2, mz_F2, mz_F2),
+    candidate_adduct = c(
+      "[M+H4N]+",
+      "[2M+Na]+",
+      "[2M+Na]+",
+      "[2M+Na]+"
+    ),
+    rank_final = rep(1L, 4L),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_A",
+      "IK_A",
+      "IK_B",
+      "IK_C"
+    ),
+    score_weighted_chemo = c(0.98, 0.84, 0.84, 0.84),
+    candidate_score_pseudo_initial = c(0.9, 0.8, 0.8, 0.8)
+  )
+
+  # max_per_score = 5 so F2 would not be sampled on size alone; the anchor
+  # must still collapse its tie to IK_A.
+  out <- sample_candidates_per_group(df = df, max_per_score = 5L, seed = 42L)
+
+  kept <- out$df |>
+    tidytable::arrange(feature_id) |>
+    tidytable::select(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer
+    )
+  expect_equal(nrow(kept), 2L)
+  expect_equal(
+    kept$candidate_structure_inchikey_connectivity_layer,
+    c("IK_A", "IK_A")
+  )
+  expect_true(any(grepl(
+    "sibling feature",
+    out$annotation_notes$annotation_note
+  )))
+})
+
+test_that("sample_candidates_per_group handles malformed adduct strings", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F1"),
+    mz = c(145.03, 145.03, 145.03),
+    candidate_adduct = c("[M+H]+", "not_a_valid_adduct", "not_a_valid_adduct"),
+    rank_final = c(1L, 1L, 1L),
+    candidate_structure_inchikey_connectivity_layer = c("IK_A", "IK_B", "IK_C"),
+    score_weighted_chemo = c(0.95, 0.8, 0.8),
+    candidate_score_pseudo_initial = c(0.9, 0.7, 0.7)
+  )
+
+  out <- suppressMessages(suppressWarnings(
+    sample_candidates_per_group(df = df, max_per_score = 1L, seed = 42L)
+  ))
+
+  tied <- out$df |>
+    tidytable::filter(candidate_adduct == "not_a_valid_adduct")
+
+  expect_equal(nrow(tied), 1L)
+  expect_false(
+    ".candidate_M" %in% names(out$df)
+  )
 })
 
 test_that("build_mini_results_table appends xrefs and renames id columns", {

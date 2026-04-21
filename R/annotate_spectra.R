@@ -32,6 +32,7 @@
 #'   libraries. Repeated metadata extraction uses a single vectorized helper.
 #'
 #' @include adducts_utils.R
+#' @include calculate_mass_of_m.R
 #' @include columns_utils.R
 #' @include logs_utils.R
 #' @include validations_utils.R
@@ -232,10 +233,14 @@ annotate_spectra <- function(
   log_library_stats(spectral_library)
 
   query_precursors <- get_precursors(query_sp)
+  query_adducts <- get_adducts(query_sp)
   if (!approx) {
+    lib_adducts <- get_adducts(spectral_library)
     spectral_library <- reduce_library_by_precursor(
       lib_sp = spectral_library,
       query_precursors = query_precursors,
+      query_adducts = query_adducts,
+      lib_adducts = lib_adducts,
       dalton = dalton,
       ppm = ppm
     )
@@ -263,7 +268,9 @@ annotate_spectra <- function(
     dalton = dalton,
     ppm = ppm,
     threshold = threshold,
-    approx = approx
+    approx = approx,
+    query_adducts = query_adducts,
+    lib_adducts = get_adducts(spectral_library)
   )
   if (nrow(sim_raw) == 0L) {
     return(
@@ -540,22 +547,110 @@ get_precursors <- function(sp) {
 }
 
 #' @keywords internal
+get_adducts <- function(sp) {
+  n <- length(sp)
+  if (!methods::is(sp, "Spectra") || is.null(sp@backend@spectraData)) {
+    return(rep(NA_character_, n))
+  }
+  extract_vector(
+    obj = sp,
+    field = c("adduct", "precursor_type"),
+    len = n,
+    fill = NA_character_
+  )
+}
+
+#' @keywords internal
+convert_precursor_for_matching <- function(precursors, adducts) {
+  if (length(precursors) == 0L) {
+    return(precursors)
+  }
+
+  if (is.null(adducts) || length(adducts) != length(precursors)) {
+    return(precursors)
+  }
+
+  precursors_num <- as.numeric(precursors)
+
+  # Fast exit: nothing usable.
+  usable <- !is.na(precursors_num) &
+    !is.na(adducts) &
+    nzchar(adducts)
+  if (!any(usable)) {
+    return(precursors_num)
+  }
+
+  # Group by unique adduct string, parse once per unique string, then apply
+  # the neutral-mass formula as vectorised arithmetic over all precursors
+  # sharing that adduct. This collapses what used to be O(N) R-level calls
+  # into O(unique(adducts)) parser calls — orders of magnitude faster on
+  # real libraries where the same ~10-50 adduct strings repeat for 10^5+
+  # spectra.
+  out <- precursors_num
+  unique_adducts <- unique(adducts[usable])
+
+  for (add in unique_adducts) {
+    parsed <- tryCatch(
+      suppressWarnings(parse_adduct(add)),
+      error = function(...) NULL
+    )
+    if (is.null(parsed) || all(parsed == 0)) {
+      next
+    }
+    n_charges <- parsed[["n_charges"]]
+    n_mer <- parsed[["n_mer"]]
+    n_iso <- parsed[["n_iso"]]
+    mass_mods <- parsed[["los_add_clu"]]
+    if (n_mer == 0L || n_charges == 0L) {
+      next
+    }
+
+    idx <- which(usable & adducts == add)
+    if (!length(idx)) {
+      next
+    }
+    mz_vec <- precursors_num[idx]
+    iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
+    m_vec <- (n_charges * (mz_vec - iso_shift) - mass_mods) / n_mer
+    m_vec[!is.finite(m_vec) | m_vec <= 0] <- NA_real_
+    valid <- !is.na(m_vec)
+    out[idx[valid]] <- m_vec[valid]
+  }
+
+  out
+}
+
+#' @keywords internal
 reduce_library_by_precursor <- function(
   lib_sp,
   query_precursors,
+  query_adducts = NULL,
+  lib_adducts = NULL,
   dalton,
   ppm
 ) {
+  # NOTE: Spectral (MS2) matching relies on matching the same adduct /
+  # charge species because fragmentation patterns differ per adduct. We
+  # therefore match raw precursor m/z directly here. Adduct-aware neutral
+  # mass propagation is handled earlier at the MS1 candidate layer (see
+  # sample_candidates_per_group in R/clean_chemo.R). Forcing M-space
+  # matching here caused significant loss of true matches when either
+  # side had partial adduct metadata (asymmetric conversion). The
+  # `convert_precursor_for_matching()` helper and its tests are kept for
+  # future opt-in use and unit testing.
   lib_prec <- get_precursors(lib_sp)
-  minimal <- pmin(lib_prec - dalton, lib_prec * (1 - (1E-6 * ppm)))
-  maximal <- pmax(lib_prec + dalton, lib_prec * (1 + (1E-6 * ppm)))
+  query_prec_match <- as.numeric(query_precursors)
+  lib_prec_match <- as.numeric(lib_prec)
+
+  minimal <- pmin(lib_prec_match - dalton, lib_prec_match * (1 - (1E-6 * ppm)))
+  maximal <- pmax(lib_prec_match + dalton, lib_prec_match * (1 + (1E-6 * ppm)))
   df_idx <- dplyr::inner_join(
-    x = tidytable::tidytable(minimal, maximal, lib_precursors = lib_prec),
-    y = tidytable::tidytable(val = unique(query_precursors)),
+    x = tidytable::tidytable(minimal, maximal, lib_precursors = lib_prec_match),
+    y = tidytable::tidytable(val = unique(query_prec_match)),
     by = dplyr::join_by(minimal <= val, maximal >= val)
   ) |>
     tidytable::distinct(lib_precursors, .keep_all = TRUE)
-  lib_sp[lib_prec %in% df_idx$lib_precursors]
+  lib_sp[lib_prec_match %in% df_idx$lib_precursors]
 }
 
 #' @keywords internal
@@ -566,17 +661,24 @@ compute_similarity_safe <- function(
   dalton,
   ppm,
   threshold,
-  approx
+  approx,
+  query_adducts = NULL,
+  lib_adducts = NULL
 ) {
+  # See note in reduce_library_by_precursor(): spectral similarity requires
+  # same-adduct matching, so we use raw precursor m/z here.
   query_prec <- query_sp@backend@spectraData$precursorMz
   lib_prec <- get_precursors(lib_sp)
+  query_prec_match <- as.numeric(query_prec)
+  lib_prec_match <- as.numeric(lib_prec)
+
   tryCatch(
     calculate_entropy_and_similarity(
       lib_ids = seq_along(lib_sp),
-      lib_precursors = lib_prec,
+      lib_precursors = lib_prec_match,
       lib_spectra = lib_sp@backend@peaksData,
       query_ids = get_spectra_ids(query_sp),
-      query_precursors = query_prec,
+      query_precursors = query_prec_match,
       query_spectra = query_sp@backend@peaksData,
       method = method,
       dalton = dalton,

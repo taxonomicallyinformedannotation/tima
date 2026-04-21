@@ -899,6 +899,8 @@ test_that("annotate_spectra returns empty template when precursor reduction remo
     reduce_library_by_precursor = function(
       lib_sp,
       query_precursors,
+      query_adducts,
+      lib_adducts,
       dalton,
       ppm
     ) {
@@ -1056,6 +1058,30 @@ test_that("compute_similarity_safe returns empty table on calculation error", {
   )
 
   expect_equal(nrow(out), 0L)
+})
+
+test_that("convert_precursor_for_matching converts known adducts to neutral mass", {
+  expected_1 <- calculate_mass_of_m(mz = 123.4567, adduct_string = "[M+H]+")
+  expected_2 <- calculate_mass_of_m(mz = 145.4421, adduct_string = "[M+Na]+")
+
+  out <- convert_precursor_for_matching(
+    precursors = c(123.4567, 145.4421),
+    adducts = c("[M+H]+", "[M+Na]+")
+  )
+
+  expect_equal(out[[1L]], expected_1, tolerance = 1e-8)
+  expect_equal(out[[2L]], expected_2, tolerance = 1e-8)
+  expect_true(all(is.finite(out)))
+})
+
+test_that("convert_precursor_for_matching falls back to precursor m/z when adduct is missing", {
+  prec <- c(100.1, 200.2)
+  out <- convert_precursor_for_matching(
+    precursors = prec,
+    adducts = c(NA_character_, "")
+  )
+
+  expect_equal(out, prec)
 })
 
 test_that("annotate_spectra_handle_empty_result persists params and returns path", {

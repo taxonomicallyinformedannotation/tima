@@ -609,3 +609,55 @@ test_that("parse_adduct works via apply", {
   expect_length(results, 4)
   expect_true(all(sapply(results, function(x) !all(x == 0))))
 })
+
+test_that("parse_adduct handles non-standard trailing charge [M+2H]+2", {
+  # Some databases emit charge as "]+2" instead of canonical "]2+".
+  res <- parse_adduct("[M+2H]+2")
+  expect_equal(unname(res["n_charges"]), 2L)
+  expect_equal(unname(res["charge"]), 1L)
+})
+
+test_that("parse_adduct handles radical marker [M]+*", {
+  # MassBank / NIST style odd-electron markers.
+  for (a in c("[M]+*", "[M+Li]+*", "[M-H+Na]+*")) {
+    res <- parse_adduct(a)
+    expect_false(
+      all(res == 0),
+      info = paste0("Failed on radical adduct: ", a)
+    )
+  }
+})
+
+test_that("parse_adduct expands solvent aliases (ACN, IsoProp, DMSO, MeOH, DMF)", {
+  cases <- c(
+    "[M+ACN+H]+",
+    "[M+IsoProp+H]+",
+    "[M+DMSO+H]+",
+    "[M+MeOH+H]+",
+    "[M+DMF+H]+",
+    "[M+ACN+Na]+",
+    "[M+ACN+NH4]+"
+  )
+  for (a in cases) {
+    res <- parse_adduct(a)
+    expect_false(
+      all(res == 0),
+      info = paste0("Failed on solvent adduct: ", a)
+    )
+  }
+})
+
+test_that("parse_adduct handles multiplicity-prefixed solvent aliases (+2ACN)", {
+  res <- parse_adduct("[M+2ACN+2H]2+")
+  expect_false(all(res == 0))
+  expect_equal(unname(res["n_charges"]), 2L)
+  expect_equal(unname(res["charge"]), 1L)
+})
+
+test_that("normalize_adduct_string is idempotent on canonical input", {
+  skip_if_not(exists("normalize_adduct_string", envir = asNamespace("tima")))
+  norm <- getFromNamespace("normalize_adduct_string", "tima")
+  for (a in c("[M+H]+", "[M-H]-", "[2M+Na]+", "[M+2H]2+")) {
+    expect_equal(norm(a), a)
+  }
+})

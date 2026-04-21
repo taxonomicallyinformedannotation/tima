@@ -14,15 +14,18 @@ sample_candidates_per_group(df, max_per_score, seed = 42L)
 \item{seed}{Integer, random seed for reproducibility}
 }
 \value{
-List with two elements:
+List with three elements:
 \describe{
 \item{df}{Filtered data frame with sampled candidates}
 \item{n_sampled_features}{Number of features affected by sampling}
+\item{annotation_notes}{Per-group annotation notes (anchor / sampling)}
 }
 }
 \description{
 Internal helper to sample candidates per (feature_id,
-rank_final)
-group, prioritizing those with non-NA candidate_structure_error_rt values.
+candidate_adduct, rank_final) group, prioritizing those with non-NA
+candidate_structure_error_rt values. Also applies cross-adduct /
+cross-rank anchor propagation using InChIKey and neutral-mass M keys
+inferred from unambiguous groups of the same feature.
 }
 \keyword{internal}

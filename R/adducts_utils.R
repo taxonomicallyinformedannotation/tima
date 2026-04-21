@@ -72,6 +72,14 @@ adducts_translations <-
     # mzmine
     "+MeOH" = "+CH4O",
     # mzmine
+    "+EtOH" = "+C2H6O",
+    # extra
+    "+DMSO" = "+C2H6OS",
+    # extra (dimethyl sulfoxide)
+    "+DMF" = "+C3H7NO",
+    # extra (dimethylformamide)
+    "+MeCN" = "+C2H3N",
+    # extra (alias of ACN)
     "+NH4" = "+H4N",
     # mzmine
     "+TFA" = "+C2HF3O2",

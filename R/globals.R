@@ -22,6 +22,8 @@ utils::globalVariables(
     ".enr_candidate_structure_xlogp",
     ".formula_rank",
     ".input_smiles",
+    "label_cla_str",
+    "label_npc_str",
     ".lk_exact_mass",
     ".lk_molecular_formula",
     ".lk_name",
