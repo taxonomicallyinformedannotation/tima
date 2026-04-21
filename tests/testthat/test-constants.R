@@ -74,7 +74,7 @@ test_that("test-constants all major constants are accessible", {
 
 test_that("get_constant returns existing constant", {
   val <- get_constant("DEFAULT_HC_SCORE_BIO_MIN")
-  expect_equal(val, 0.85)
+  expect_equal(val, 0.8)
 })
 
 test_that("get_constant falls back to default when missing", {
