@@ -1236,8 +1236,14 @@ test_that("build_mini_results_table appends xrefs and renames id columns", {
     score_weighted_chemo = 0.9
   )
 
+  xrefs_table <- tidytable::tidytable(
+    inchikey = "IK1",
+    prefix = "pubchem",
+    id = "12345"
+  )
+
   local_mocked_bindings(
-    .add_xrefs_to_df = function(df) {
+    .add_xrefs_to_df = function(df, xrefs) {
       df$candidate_structure_id_pubchem <- "12345"
       df
     }
@@ -1248,11 +1254,7 @@ test_that("build_mini_results_table appends xrefs and renames id columns", {
     df_classes_mini = df_classes_mini,
     results_filtered = results_filtered,
     df_filtered = df_filtered,
-    xrefs_table = tidytable::tidytable(
-      inchikey = "IK1",
-      prefix = "pubchem",
-      id = "12345"
-    )
+    xrefs_table = xrefs_table
   )
 
   expect_true("id_pubchem" %in% names(out))
