@@ -50,11 +50,11 @@ parse_adduct("[2M1-C6H12O6 (hexose)+NaCl+H]2+") # Complex modification
 }
 }
 \seealso{
-Other mass-spectrometry: 
-\code{\link{calculate_mass_of_m}()},
-\code{\link{calculate_mz_from_mass}()},
-\code{\link{calculate_similarity}()},
-\code{\link{harmonize_adducts}()},
-\code{\link{import_spectra}()}
+Other mass-spectrometry:
+\code{\link[=calculate_mass_of_m]{calculate_mass_of_m()}},
+\code{\link[=calculate_mz_from_mass]{calculate_mz_from_mass()}},
+\code{\link[=calculate_similarity]{calculate_similarity()}},
+\code{\link[=harmonize_adducts]{harmonize_adducts()}},
+\code{\link[=import_spectra]{import_spectra()}}
 }
 \concept{mass-spectrometry}

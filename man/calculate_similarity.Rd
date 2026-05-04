@@ -84,11 +84,11 @@ calculate_similarity(
 )
 }
 \seealso{
-Other mass-spectrometry: 
-\code{\link{calculate_mass_of_m}()},
-\code{\link{calculate_mz_from_mass}()},
-\code{\link{harmonize_adducts}()},
-\code{\link{import_spectra}()},
-\code{\link{parse_adduct}()}
+Other mass-spectrometry:
+\code{\link[=calculate_mass_of_m]{calculate_mass_of_m()}},
+\code{\link[=calculate_mz_from_mass]{calculate_mz_from_mass()}},
+\code{\link[=harmonize_adducts]{harmonize_adducts()}},
+\code{\link[=import_spectra]{import_spectra()}},
+\code{\link[=parse_adduct]{parse_adduct()}}
 }
 \concept{mass-spectrometry}

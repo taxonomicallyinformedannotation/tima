@@ -57,16 +57,16 @@ run_tima()
 \seealso{
 \code{\link{run_tima}} for the current function
 
-Other workflow: 
-\code{\link{change_params_small}()},
-\code{\link{create_components}()},
-\code{\link{create_edges}()},
-\code{\link{create_edges_spectra}()},
-\code{\link{go_to_cache}()},
-\code{\link{install}()},
-\code{\link{install_tima}()},
-\code{\link{run_app}()},
-\code{\link{run_tima}()},
-\code{\link{validate_inputs}()}
+Other workflow:
+\code{\link[=change_params_small]{change_params_small()}},
+\code{\link[=create_components]{create_components()}},
+\code{\link[=create_edges]{create_edges()}},
+\code{\link[=create_edges_spectra]{create_edges_spectra()}},
+\code{\link[=go_to_cache]{go_to_cache()}},
+\code{\link[=install]{install()}},
+\code{\link[=install_tima]{install_tima()}},
+\code{\link[=run_app]{run_app()}},
+\code{\link[=run_tima]{run_tima()}},
+\code{\link[=validate_inputs]{validate_inputs()}}
 }
 \concept{workflow}

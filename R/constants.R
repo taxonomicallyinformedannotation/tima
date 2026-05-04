@@ -1,14 +1,3 @@
-#' @title Physical and Chemical Constants
-#'
-#' @description This module contains centralized physical and chemical constants
-#'     used throughout the TIMA package. Centralizing these values ensures
-#' consistency, facilitates maintenance, and makes the code self-documenting.
-#'
-#' @name constants
-#' @keywords internal
-
-# Physical Constants ----
-
 #' Electron mass in Daltons (CODATA 2018 recommended value)
 #' @keywords internal
 ELECTRON_MASS_DALTONS <- 5.485799E-4

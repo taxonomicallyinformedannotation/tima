@@ -6,6 +6,8 @@
 \alias{tima-package}
 \title{tima: Taxonomically Informed Metabolite Annotation}
 \description{
+\if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
+
 TIMA provides a reproducible workflow for taxonomically informed metabolite annotation from feature tables, MS/MS spectra, and optional external resources such as SIRIUS and GNPS outputs. It combines mass, spectral, taxonomic, and structural evidence into a transparent scoring framework that can be inspected step-by-step. The package targets metabolomics practitioners who need configurable, scriptable, and documented annotation pipelines for research and production settings.
 }
 \seealso{
@@ -20,6 +22,11 @@ Useful links:
 }
 \author{
 \strong{Maintainer}: Adriano Rutz \email{adafede@gmail.com} (\href{https://orcid.org/0000-0003-0443-9902}{ORCID})
+
+Authors:
+\itemize{
+  \item Adriano Rutz \email{adafede@gmail.com} (\href{https://orcid.org/0000-0003-0443-9902}{ORCID})
+}
 
 Other contributors:
 \itemize{

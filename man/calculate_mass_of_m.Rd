@@ -62,11 +62,11 @@ calculate_mass_of_m(mz = 62.2311, adduct_string = "[M+2H]2+")
 # Expected: ~122.45 Da
 }
 \seealso{
-Other mass-spectrometry: 
-\code{\link{calculate_mz_from_mass}()},
-\code{\link{calculate_similarity}()},
-\code{\link{harmonize_adducts}()},
-\code{\link{import_spectra}()},
-\code{\link{parse_adduct}()}
+Other mass-spectrometry:
+\code{\link[=calculate_mz_from_mass]{calculate_mz_from_mass()}},
+\code{\link[=calculate_similarity]{calculate_similarity()}},
+\code{\link[=harmonize_adducts]{harmonize_adducts()}},
+\code{\link[=import_spectra]{import_spectra()}},
+\code{\link[=parse_adduct]{parse_adduct()}}
 }
 \concept{mass-spectrometry}

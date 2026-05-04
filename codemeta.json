@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/taxonomicallyinformedannotation/tima",
   "issueTracker": "https://github.com/taxonomicallyinformedannotation/tima/issues",
   "license": "https://spdx.org/licenses/AGPL-3.0",
-  "version": "2.12.0.9000",
+  "version": "2.12.0.9001",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.5.3 (2026-03-11)",
+  "runtimePlatform": "R version 4.6.0 (2026-04-24)",
   "author": [
     {
       "@type": "Person",
@@ -47,7 +47,7 @@
       "@type": "SoftwareApplication",
       "identifier": "altdoc",
       "name": "altdoc",
-      "version": ">= 0.7.0",
+      "version": ">= 0.7.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -60,7 +60,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocManager",
       "name": "BiocManager",
-      "version": ">= 1.30.26",
+      "version": ">= 1.30.27",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -73,7 +73,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocVersion",
       "name": "BiocVersion",
-      "version": ">= 3.20.0",
+      "version": ">= 3.22.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -99,7 +99,7 @@
       "@type": "SoftwareApplication",
       "identifier": "knitr",
       "name": "knitr",
-      "version": ">= 1.50",
+      "version": ">= 1.51",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -112,7 +112,7 @@
       "@type": "SoftwareApplication",
       "identifier": "pkgload",
       "name": "pkgload",
-      "version": ">= 1.4.1",
+      "version": ">= 1.5.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -138,7 +138,7 @@
       "@type": "SoftwareApplication",
       "identifier": "shiny",
       "name": "shiny",
-      "version": ">= 1.12.0",
+      "version": ">= 1.13.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -164,7 +164,7 @@
       "@type": "SoftwareApplication",
       "identifier": "shinyjs",
       "name": "shinyjs",
-      "version": ">= 2.1.0",
+      "version": ">= 2.1.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -177,7 +177,7 @@
       "@type": "SoftwareApplication",
       "identifier": "shinytest2",
       "name": "shinytest2",
-      "version": ">= 0.4.1",
+      "version": ">= 0.5.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -216,7 +216,7 @@
       "@type": "SoftwareApplication",
       "identifier": "testthat",
       "name": "testthat",
-      "version": ">= 3.3.0",
+      "version": ">= 3.3.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -263,7 +263,7 @@
       "@type": "SoftwareApplication",
       "identifier": "archive",
       "name": "archive",
-      "version": ">= 1.1.12",
+      "version": ">= 1.1.13",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -276,7 +276,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocParallel",
       "name": "BiocParallel",
-      "version": ">= 1.40.2",
+      "version": ">= 1.44.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -289,7 +289,7 @@
       "@type": "SoftwareApplication",
       "identifier": "cli",
       "name": "cli",
-      "version": ">= 3.6.5",
+      "version": ">= 3.6.6",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -315,7 +315,7 @@
       "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
-      "version": ">= 1.1.4",
+      "version": ">= 1.2.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -328,7 +328,7 @@
       "@type": "SoftwareApplication",
       "identifier": "fs",
       "name": "fs",
-      "version": ">= 1.6.6",
+      "version": ">= 2.1.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -341,7 +341,7 @@
       "@type": "SoftwareApplication",
       "identifier": "httr",
       "name": "httr",
-      "version": ">= 1.4.7",
+      "version": ">= 1.4.8",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -354,7 +354,7 @@
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
-      "version": ">= 1.2.1",
+      "version": ">= 1.2.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -367,7 +367,7 @@
       "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
-      "version": ">= 2.1.4",
+      "version": ">= 2.3.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -380,7 +380,7 @@
       "@type": "SoftwareApplication",
       "identifier": "IRanges",
       "name": "IRanges",
-      "version": ">= 2.40.1",
+      "version": ">= 2.44.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -406,7 +406,7 @@
       "@type": "SoftwareApplication",
       "identifier": "lgr",
       "name": "lgr",
-      "version": ">= 0.5.0",
+      "version": ">= 0.5.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -419,7 +419,7 @@
       "@type": "SoftwareApplication",
       "identifier": "lifecycle",
       "name": "lifecycle",
-      "version": ">= 1.0.4",
+      "version": ">= 1.0.5",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -437,7 +437,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MetaboCoreUtils",
       "name": "MetaboCoreUtils",
-      "version": ">= 1.14.0",
+      "version": ">= 1.18.1",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -450,7 +450,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
-      "version": ">= 1.14.0",
+      "version": ">= 1.18.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -463,7 +463,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMsp",
       "name": "MsBackendMsp",
-      "version": ">= 1.10.0",
+      "version": ">= 1.14.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -476,7 +476,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsCoreUtils",
       "name": "MsCoreUtils",
-      "version": ">= 1.18.0",
+      "version": ">= 1.22.1",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -502,7 +502,7 @@
       "@type": "SoftwareApplication",
       "identifier": "purrr",
       "name": "purrr",
-      "version": ">= 1.2.0",
+      "version": ">= 1.2.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -528,7 +528,7 @@
       "@type": "SoftwareApplication",
       "identifier": "reticulate",
       "name": "reticulate",
-      "version": ">= 1.44.1",
+      "version": ">= 1.46.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -541,7 +541,7 @@
       "@type": "SoftwareApplication",
       "identifier": "rlang",
       "name": "rlang",
-      "version": ">= 1.1.6",
+      "version": ">= 1.2.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -554,7 +554,7 @@
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
-      "version": ">= 3.1.0",
+      "version": ">= 3.1.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -567,7 +567,7 @@
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
-      "version": ">= 1.16.1",
+      "version": ">= 1.20.1",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -598,7 +598,7 @@
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
-      "version": ">= 1.11.4",
+      "version": ">= 1.12.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -642,7 +642,7 @@
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
-      "version": ">= 2.3.10",
+      "version": ">= 2.3.12",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -651,10 +651,10 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=yaml"
     },
-    "SystemRequirements": "\n    python (>= 3.10, < 3.15)"
+    "SystemRequirements": "\n    python (>= 3.12, < 3.15)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome", "lc-msms", "metabolite-annotation", "metabolomics", "natural-products", "scoring-system", "taxonomy", "specialized-metabolome", "r"],
-  "fileSize": "4793.309KB",
+  "fileSize": "4854.688KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

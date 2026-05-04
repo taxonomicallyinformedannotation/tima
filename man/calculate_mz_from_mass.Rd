@@ -37,11 +37,11 @@ mass_back <- calculate_mass_of_m(mz, adduct)
 all.equal(mass, mass_back) # Should be TRUE
 }
 \seealso{
-Other mass-spectrometry: 
-\code{\link{calculate_mass_of_m}()},
-\code{\link{calculate_similarity}()},
-\code{\link{harmonize_adducts}()},
-\code{\link{import_spectra}()},
-\code{\link{parse_adduct}()}
+Other mass-spectrometry:
+\code{\link[=calculate_mass_of_m]{calculate_mass_of_m()}},
+\code{\link[=calculate_similarity]{calculate_similarity()}},
+\code{\link[=harmonize_adducts]{harmonize_adducts()}},
+\code{\link[=import_spectra]{import_spectra()}},
+\code{\link[=parse_adduct]{parse_adduct()}}
 }
 \concept{mass-spectrometry}

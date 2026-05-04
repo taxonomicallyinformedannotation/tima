@@ -67,9 +67,9 @@ unlink("data", recursive = TRUE)
 }
 }
 \seealso{
-Other annotation: 
-\code{\link{annotate_masses}()},
-\code{\link{annotate_spectra}()},
-\code{\link{weight_annotations}()}
+Other annotation:
+\code{\link[=annotate_masses]{annotate_masses()}},
+\code{\link[=annotate_spectra]{annotate_spectra()}},
+\code{\link[=weight_annotations]{weight_annotations()}}
 }
 \concept{annotation}

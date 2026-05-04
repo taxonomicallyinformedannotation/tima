@@ -13,7 +13,7 @@ sanitize_spectra(
 )
 }
 \arguments{
-\item{spectra}{\link[Spectra:Spectra]{Spectra::Spectra} Spectra object from the Spectra package}
+\item{spectra}{\link[Spectra:Spectra]{Spectra} Spectra object from the Spectra package}
 
 \item{cutoff}{\link{numeric} Absolute minimal intensity threshold (default: NULL).
 Peaks below this intensity are removed. If NULL, a dynamic threshold
