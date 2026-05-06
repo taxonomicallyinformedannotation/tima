@@ -603,7 +603,7 @@ annotate_masses <-
     ## regardless of whether an adduct was already supplied upstream.
     ## Removing the old anti_join(y = already_assigned): even features that
     ## already carry a pre-assigned adduct benefit from also testing the
-    ## protonated / deprotonated form — the library hit may only appear under
+    ## protonated / deprotonated form, the library hit may only appear under
     ## that form, and the pre-assignment could be wrong.
     df_add_enforced <- df_fea_min |>
       tidytable::distinct(feature_id) |>
@@ -680,7 +680,7 @@ annotate_masses <-
           "%d feature(s) produced an undefined neutral mass from their adduct ",
           "annotation (NA / non-finite / zero). ",
           "These were recovered and defaulted to the (de)protonated form. ",
-          "This usually indicates an unsupported adduct notation — ",
+          "This usually indicates an unsupported adduct notation, ",
           "extend adducts_translations if needed."
         ),
         nrow(df_addlossed_min_2)
