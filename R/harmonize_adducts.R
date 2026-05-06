@@ -120,6 +120,14 @@ harmonize_adducts <- function(
     vectorize_all = FALSE
   )
 
+  # Third pass: collapse canceling +/- terms and map known forbidden forms.
+  df[[adducts_colname]] <- vapply(
+    X = df[[adducts_colname]],
+    FUN = canonicalize_adduct_notation,
+    FUN.VALUE = character(1L),
+    USE.NAMES = FALSE
+  )
+
   n_unique_after <- count_unique_values(df[[adducts_colname]])
 
   if (do_log) {
@@ -173,4 +181,102 @@ validate_adduct_translations <- function(translations) {
 #' @keywords internal
 count_unique_values <- function(x) {
   length(unique(x[!is.na(x)]))
+}
+
+#' Canonicalize one adduct string
+#' @keywords internal
+canonicalize_adduct_notation <- function(adduct) {
+  if (length(adduct) == 0L || is.na(adduct) || !nzchar(adduct)) {
+    return(adduct)
+  }
+
+  adduct <- gsub("\\s+", "", adduct)
+
+  # Prefer explicit remediation for known unstable patterns.
+  if (adduct %in% names(adducts_forbidden_translations)) {
+    adduct <- unname(adducts_forbidden_translations[[adduct]])
+  }
+
+  m <- regexec("^\\[(.*)\\](\\d*[+-])$", adduct, perl = TRUE)
+  g <- regmatches(adduct, m)[[1L]]
+  if (length(g) == 0L) {
+    return(adduct)
+  }
+
+  inner <- g[[2L]]
+  suffix <- g[[3L]]
+
+  # Split core (up to M/isotope part) from formula modifications.
+  mod_start <- regexpr("[+-]\\d*[A-Za-z]", inner, perl = TRUE)
+  if (mod_start[[1L]] == -1L) {
+    return(adduct)
+  }
+
+  core <- substr(inner, 1L, mod_start[[1L]] - 1L)
+  mods <- substr(inner, mod_start[[1L]], nchar(inner))
+
+  tok_re <- "([+-])(\\d*)([A-Za-z][A-Za-z0-9]*)"
+  tok_matches <- gregexpr(tok_re, mods, perl = TRUE)
+  tokens <- regmatches(mods, tok_matches)[[1L]]
+  if (length(tokens) == 0L) {
+    return(adduct)
+  }
+
+  remainder <- gsub(tok_re, "", mods, perl = TRUE)
+  if (!identical(remainder, "")) {
+    return(adduct)
+  }
+
+  parsed <- do.call(
+    rbind,
+    lapply(tokens, function(tok) {
+      tg <- regmatches(tok, regexec(tok_re, tok, perl = TRUE))[[1L]]
+      sign <- if (tg[[2L]] == "+") 1L else -1L
+      mult <- if (nzchar(tg[[3L]])) as.integer(tg[[3L]]) else 1L
+      data.frame(
+        formula = tg[[4L]],
+        signed_n = sign * mult,
+        stringsAsFactors = FALSE
+      )
+    })
+  )
+
+  net <- stats::aggregate(signed_n ~ formula, data = parsed, FUN = sum)
+  net <- net[net$signed_n != 0L, , drop = FALSE]
+
+  rebuild_terms <- character(0L)
+  if (nrow(net) > 0L) {
+    neg <- net[net$signed_n < 0L, , drop = FALSE]
+    pos <- net[net$signed_n > 0L, , drop = FALSE]
+    if (nrow(neg) > 0L) {
+      neg <- neg[order(neg$formula), , drop = FALSE]
+      rebuild_terms <- c(
+        rebuild_terms,
+        vapply(
+          seq_len(nrow(neg)),
+          function(i) {
+            n <- abs(neg$signed_n[[i]])
+            paste0("-", if (n > 1L) n else "", neg$formula[[i]])
+          },
+          character(1L)
+        )
+      )
+    }
+    if (nrow(pos) > 0L) {
+      pos <- pos[order(pos$formula), , drop = FALSE]
+      rebuild_terms <- c(
+        rebuild_terms,
+        vapply(
+          seq_len(nrow(pos)),
+          function(i) {
+            n <- pos$signed_n[[i]]
+            paste0("+", if (n > 1L) n else "", pos$formula[[i]])
+          },
+          character(1L)
+        )
+      )
+    }
+  }
+
+  paste0("[", core, paste0(rebuild_terms, collapse = ""), "]", suffix)
 }

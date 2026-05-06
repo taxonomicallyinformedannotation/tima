@@ -409,3 +409,30 @@ test_that("harmonize_adducts is reasonably fast", {
   # Should complete quickly
   expect_lt(timing["elapsed"], 0.05)
 })
+
+test_that("harmonize_adducts canonicalizes forbidden/canceling adduct forms", {
+  df <- data.frame(
+    adduct = c(
+      "[M-H2O+H2O-H]-",
+      "[M-H3O4P+H3O4P-H]-",
+      "[M-H2O+H2O]+",
+      "[M-H2O+H2O+H]+"
+    )
+  )
+
+  result <- harmonize_adducts(df, adducts_translations = adducts_translations)
+
+  expect_equal(
+    result$adduct,
+    c("[M-H]-", "[M-H]-", "[M]+", "[M+H]+")
+  )
+})
+
+test_that("harmonize_adducts collapses generic canceling additive/loss terms", {
+  df <- data.frame(adduct = c("[M-H2O+H2O]+", "[M-CO2+CO2-H]-"))
+
+  result <- harmonize_adducts(df, adducts_translations = adducts_translations)
+
+  expect_equal(result$adduct[[1L]], "[M]+")
+  expect_equal(result$adduct[[2L]], "[M-H]-")
+})

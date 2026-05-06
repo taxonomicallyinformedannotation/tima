@@ -10,6 +10,22 @@ adducts_forbidden <- c(
   "[M-H3N+C2H3N+H]+"
 )
 
+# Canonical replacements for adducts that arise from canceling terms or
+# unstable source-side notation. These are applied before filtering.
+adducts_forbidden_translations <- c(
+  "[M-H2O+H2O-H]-" = "[M-H]-",
+  "[M-H3O4P+H3O4P-H]-" = "[M-H]-",
+  "[M-H3N+C2H7N-H]-" = "[M+C2H4-H]-",
+  # "[M-H3N+C2H3N-H]-" = "[M+C2-H]-",
+  "[M-H3N+H4N]+" = "[M+H]+",
+  "[M-H2O+H2O+H]+" = "[M+H]+",
+  "[M-H3O4P+H3O4P+H]+" = "[M+H]+",
+  "[M-H3N+C2H7N+H]+" = "[M+C2H4+H]+",
+  # "[M-H3N+C2H3N+H]+" = "[M+C2+H]+",
+  "[M-H2O+H2O]+" = "[M]+",
+  "[M-H3O4P+H3O4P]+" = "[M]+"
+)
+
 adducts_translations <-
   c(
     "-2H" = "-H2",

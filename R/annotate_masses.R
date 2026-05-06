@@ -296,7 +296,12 @@ annotate_masses <-
       tidytable::distinct(feature_id, adduct) |>
       tidytable::filter(!is.na(adduct))
     log_info(
-      "Already %d adducts previously detected",
+      paste0(
+        "Already %d adducts previously detected. ",
+        "These will be kept as explicit annotation hypotheses ",
+        "alongside the [M+H]+/[M-H]- baseline (non-strict precedence): ",
+        "a wrong pre-assignment can never fully block annotation."
+      ),
       nrow(already_assigned)
     )
     features_table <- features_table |>
@@ -423,6 +428,7 @@ annotate_masses <-
           false = adduct
         )
       ) |>
+      harmonize_adducts(adducts_translations = adducts_translations) |>
       # Single charge monomers only
       tidytable::filter(grepl(
         pattern = "[M",
@@ -548,22 +554,14 @@ annotate_masses <-
         y = differences,
         by = dplyr::join_by(delta_min <= Distance, delta_max >= Distance)
       ) |>
-      tidytable::filter(!is.na(Group1)) |>
       tidytable::mutate(tidytable::across(
         .cols = "rt",
         .fns = as.character
       )) |>
+      # COMMENT: we always consider alternatives to pre-assigned adducts
       tidytable::mutate(
-        adduct = tidytable::if_else(
-          condition = is.na(adduct),
-          true = as.character(Group1),
-          false = adduct
-        ),
-        adduct_dest = tidytable::if_else(
-          condition = is.na(adduct_dest),
-          true = as.character(Group2),
-          false = adduct_dest
-        )
+        adduct = Group1,
+        adduct_dest = Group2
       ) |>
       tidytable::distinct(
         feature_id,
@@ -571,6 +569,9 @@ annotate_masses <-
         adduct_dest,
         !!as.name(paste("feature_id", "dest", sep = "_"))
       )
+
+    df_nl <- df_nl |>
+      tidytable::anti_join(df_add)
     rm(df_couples_diff, differences)
 
     df_nl_min <- df_nl |>
@@ -589,18 +590,36 @@ annotate_masses <-
         adduct = adduct_dest
       )
 
-    ## Always considering [M+H]+ and [M-H]- ions for unassigned features
+    ## Propagate externally-supplied adducts (e.g. from cliqueMS, CAMERA, SIRIUS)
+    ## as explicit annotation hypotheses.  These are NOT hard constraints:
+    ## the (de)protonated baseline is also tested for every feature (see below).
+    ## This means a wrong pre-assignment never silently blocks annotation.
+    df_add_preassigned <- already_assigned |>
+      tidytable::select(feature_id, adduct) |>
+      tidytable::distinct()
+    rm(already_assigned)
+
+    ## [M+H]+/[M-H]- is the universal baseline hypothesis for EVERY feature,
+    ## regardless of whether an adduct was already supplied upstream.
+    ## Removing the old anti_join(y = already_assigned): even features that
+    ## already carry a pre-assigned adduct benefit from also testing the
+    ## protonated / deprotonated form — the library hit may only appear under
+    ## that form, and the pre-assignment could be wrong.
     df_add_enforced <- df_fea_min |>
       tidytable::distinct(feature_id) |>
-      tidytable::anti_join(y = already_assigned) |>
       tidytable::mutate(
         adduct = switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
       )
-    rm(already_assigned)
 
-    df_add_full <- tidytable::bind_rows(df_add_a, df_add_b, df_add_enforced) |>
-      tidytable::distinct()
-    rm(df_add_a, df_add_b, df_add_enforced)
+    df_add_full <- tidytable::bind_rows(
+      df_add_a,
+      df_add_b,
+      df_add_preassigned,
+      df_add_enforced
+    ) |>
+      tidytable::distinct() |>
+      harmonize_adducts(adducts_translations = adducts_translations)
+    rm(df_add_a, df_add_b, df_add_preassigned, df_add_enforced)
 
     df_adducted <- df_fea_min |>
       tidytable::distinct(feature_id, rt, mz) |>
@@ -634,7 +653,8 @@ annotate_masses <-
           ),
           false = adduct
         )
-      )
+      ) |>
+      harmonize_adducts(adducts_translations = adducts_translations)
     rm(df_adducted, df_nl_min)
 
     df_addlossed_min <- df_addlossed |>
@@ -644,15 +664,26 @@ annotate_masses <-
 
     ## Safety
     df_addlossed_min_1 <- df_addlossed_min |>
-      tidytable::filter(mass != mz) |>
+      tidytable::filter(!is.na(mass)) |>
+      tidytable::filter(is.finite(mass)) |>
       tidytable::filter(mass != 0)
 
     df_addlossed_min_2 <- df_addlossed_min |>
-      tidytable::filter(mass == mz | mass == 0)
+      tidytable::right_join(
+        df_fea_min |> tidytable::distinct(feature_id, rt, mz)
+      ) |>
+      tidytable::filter(is.na(mass) | !is.finite(mass) | mass == 0)
 
     if (nrow(df_addlossed_min_2) != 0) {
       log_warn(
-        "Some adducts were unproperly detected, defaulting to (de)protonated"
+        paste0(
+          "%d feature(s) produced an undefined neutral mass from their adduct ",
+          "annotation (NA / non-finite / zero). ",
+          "These were recovered and defaulted to the (de)protonated form. ",
+          "This usually indicates an unsupported adduct notation — ",
+          "extend adducts_translations if needed."
+        ),
+        nrow(df_addlossed_min_2)
       )
       df_addlossed_min_2 <- df_addlossed_min_2 |>
         tidytable::mutate(
@@ -790,7 +821,7 @@ annotate_masses <-
           mass_max >= mass
         )
       )
-    rm(df_fea_min, df_multi, neutral_losses, df_addlossed_rdy)
+    rm(df_multi, neutral_losses, df_addlossed_rdy)
 
     #   "Joining within given mz tol and filtering possible adducts"
     # )
@@ -1015,19 +1046,31 @@ annotate_masses <-
       df_nl |>
         tidytable::mutate(label = paste0(loss, " loss")) |>
         tidytable::select(
-          !!as.name(name_source) := feature_id,
-          !!as.name(name_target) := feature_id_dest,
+          ## Neutral loss: the precursor (higher m/z, feature_id_dest) is the
+          ## source and the product (lower m/z, feature_id) is the target.
+          ## This is opposite to the adduct convention above.
+          !!as.name(name_source) := feature_id_dest,
+          !!as.name(name_target) := feature_id,
           label
         ) |>
         tidytable::distinct()
     )
-    rm(df_nl, df_add)
+    df_fea_mis <- df_fea_min |>
+      tidytable::filter(!feature_id %in% edges[[name_source]]) |>
+      tidytable::filter(!feature_id %in% edges[[name_target]]) |>
+      tidytable::mutate(!!as.name(name_target) := feature_id) |>
+      tidytable::rename(!!as.name(name_source) := feature_id) |>
+      tidytable::distinct(!!as.name(name_source), !!as.name(name_target))
+
+    edges_fin <- edges |>
+      tidytable::bind_rows(df_fea_mis)
+    rm(df_fea_min, df_nl, df_add)
 
     export_params(
       parameters = get_params(step = "annotate_masses"),
       step = "annotate_masses"
     )
-    export_output(x = edges, file = output_edges[[1L]])
+    export_output(x = edges_fin, file = output_edges[[1L]])
     export_output(
       x = df_final |>
         select_annotations_columns(
@@ -1041,7 +1084,7 @@ annotate_masses <-
 
     log_complete(ctx, n_annotations = nrow(df_final), n_edges = nrow(edges))
 
-    rm(edges, df_final)
+    rm(edges, edges_fin, df_final)
 
     c(
       "annotations" = output_annotations[[1L]],

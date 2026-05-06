@@ -29,3 +29,16 @@ test_that("adducts_translations and adducts_forbidden share no keys", {
   overlap <- intersect(names(adducts_translations), adducts_forbidden)
   expect_length(overlap, 0L)
 })
+
+test_that("adducts_forbidden_translations is a named character vector", {
+  expect_type(adducts_forbidden_translations, "character")
+  expect_named(adducts_forbidden_translations)
+  expect_true(length(adducts_forbidden_translations) > 0L)
+})
+
+test_that("forbidden adducts map to canonical forms", {
+  expect_equal(adducts_forbidden_translations[["[M-H2O+H2O-H]-"]], "[M-H]-")
+  expect_equal(adducts_forbidden_translations[["[M-H3O4P+H3O4P-H]-"]], "[M-H]-")
+  expect_equal(adducts_forbidden_translations[["[M-H2O+H2O]+"]], "[M]+")
+  expect_equal(adducts_forbidden_translations[["[M-H2O+H2O+H]+"]], "[M+H]+")
+})
