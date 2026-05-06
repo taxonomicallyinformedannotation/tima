@@ -712,6 +712,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="bug-fixes" class="level2">
 <h2 class="anchored" data-anchor-id="bug-fixes">Bug fixes</h2>
 <ul>
+<li>Fixed adduct annotation bug and harmonization</li>
 <li>Fixed <code>split_tables_sop()</code> collapsing numerically identical exact masses into <code>"mass1 $ mass2"</code> strings due to <code>clean_collapse()</code> treating them as different character values; now uses <code>resolve_numeric_or_na()</code> with floating-point tolerance</li>
 <li>Removed xlogp from the structure metadata (<code>str_met</code>) table: xlogp is stereo-sensitive (Crippen atom-typing can differ between stereoisomers), so it is no longer collapsed by <code>inchikey_no_stereo</code>; the per-SMILES value computed by <code>process_smiles()</code> in the annotation pipeline is used instead</li>
 </ul>
