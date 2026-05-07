@@ -899,8 +899,6 @@ test_that("annotate_spectra returns empty template when precursor reduction remo
     reduce_library_by_precursor = function(
       lib_sp,
       query_precursors,
-      query_adducts,
-      lib_adducts,
       dalton,
       ppm
     ) {
@@ -1124,6 +1122,46 @@ test_that("extract_vector uses fill when field is missing", {
   )
 
   expect_equal(out, rep("missing", 3L))
+})
+
+test_that("get_precursors extracts precursorMz when available", {
+  skip_if_not_installed("Spectra")
+
+  sp <- Spectra::Spectra(data.frame(
+    precursorMz = c(123.4, 234.5),
+    mz = I(list(c(50, 100), c(60, 120))),
+    intensity = I(list(c(1, 2), c(3, 4)))
+  ))
+
+  out <- get_precursors(sp)
+  expect_equal(out, c(123.4, 234.5))
+})
+
+test_that("get_precursors falls back to precursor_mz alias", {
+  skip_if_not_installed("Spectra")
+
+  sp <- Spectra::Spectra(data.frame(
+    precursor_mz = c(111.1, 222.2),
+    mz = I(list(c(40, 80), c(55, 110))),
+    intensity = I(list(c(2, 4), c(3, 6)))
+  ))
+
+  out <- get_precursors(sp)
+  expect_equal(out, c(111.1, 222.2))
+})
+
+test_that("strip_backend_rownames removes backend rownames", {
+  skip_if_not_installed("Spectra")
+
+  sp <- Spectra::Spectra(data.frame(
+    precursorMz = c(100, 200),
+    mz = I(list(c(50, 100), c(80, 120))),
+    intensity = I(list(c(10, 20), c(30, 40)))
+  ))
+  rownames(sp@backend@spectraData) <- c("r1", "r2")
+
+  out <- strip_backend_rownames(sp)
+  expect_equal(rownames(out@backend@spectraData), c("1", "2"))
 })
 
 test_that("extract_vector resolves alias names with exact and case-insensitive matching", {

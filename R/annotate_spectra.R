@@ -413,7 +413,19 @@ import_and_clean_library_collection <- function(paths, dalton, polarity, ppm) {
       BPPARAM = BiocParallel::SerialParam()
     ) |>
     purrr::map(.f = remove_empty_peak_spectra) |>
+    purrr::map(.f = strip_backend_rownames) |>
     Spectra::concatenateSpectra()
+}
+
+#' @keywords internal
+strip_backend_rownames <- function(sp) {
+  if (!methods::is(sp, "Spectra") || is.null(sp@backend@spectraData)) {
+    return(sp)
+  }
+  sd <- sp@backend@spectraData
+  rownames(sd) <- NULL
+  sp@backend@spectraData <- sd
+  sp
 }
 
 remove_empty_peak_spectra <- function(sp) {
