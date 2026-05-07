@@ -108,14 +108,19 @@ references:
   - specialized metabolome
   doi: 10.3389/FPLS.2019.01329
   issn: 1664-462X
+  identifiers:
+  - type: doi
+    value: 10.3389/fpls.2019.01329
 - type: software
   title: 'R: A Language and Environment for Statistical Computing'
   notes: Depends
   url: https://www.R-project.org/
   authors:
   - name: R Core Team
+    website: https://ror.org/02zz1nj61
   institution:
-    name: 'R Foundation for Statistical Computing (ROR: <https://ror.org/05qewa988>)'
+    name: R Foundation for Statistical Computing
+    website: https://ror.org/05qewa988
     address: Vienna, Austria
   year: '2026'
   doi: 10.32614/R.manuals
@@ -190,32 +195,6 @@ references:
   year: '2026'
   doi: 10.32614/CRAN.package.docopt
   version: '>= 0.7.2'
-- type: software
-  title: dplyr
-  abstract: 'dplyr: A Grammar of Data Manipulation'
-  notes: Imports
-  url: https://dplyr.tidyverse.org
-  repository: https://CRAN.R-project.org/package=dplyr
-  authors:
-  - family-names: Wickham
-    given-names: Hadley
-    email: hadley@posit.co
-    orcid: https://orcid.org/0000-0003-4757-117X
-  - family-names: François
-    given-names: Romain
-    orcid: https://orcid.org/0000-0002-2444-4226
-  - family-names: Henry
-    given-names: Lionel
-  - family-names: Müller
-    given-names: Kirill
-    orcid: https://orcid.org/0000-0002-1416-3412
-  - family-names: Vaughan
-    given-names: Davis
-    email: davis@posit.co
-    orcid: https://orcid.org/0000-0003-4777-038X
-  year: '2026'
-  doi: 10.32614/CRAN.package.dplyr
-  version: '>= 1.2.1'
 - type: software
   title: fs
   abstract: 'fs: Cross-Platform File System Operations Based on ''libuv'''
@@ -369,8 +348,10 @@ references:
   notes: Imports
   authors:
   - name: R Core Team
+    website: https://ror.org/02zz1nj61
   institution:
-    name: 'R Foundation for Statistical Computing (ROR: <https://ror.org/05qewa988>)'
+    name: R Foundation for Statistical Computing
+    website: https://ror.org/05qewa988
     address: Vienna, Austria
   year: '2026'
   doi: 10.32614/R.manuals
@@ -617,8 +598,10 @@ references:
   notes: Imports
   authors:
   - name: R Core Team
+    website: https://ror.org/02zz1nj61
   institution:
-    name: 'R Foundation for Statistical Computing (ROR: <https://ror.org/05qewa988>)'
+    name: R Foundation for Statistical Computing
+    website: https://ror.org/05qewa988
     address: Vienna, Austria
   year: '2026'
   doi: 10.32614/R.manuals
@@ -685,8 +668,10 @@ references:
   notes: Imports
   authors:
   - name: R Core Team
+    website: https://ror.org/02zz1nj61
   institution:
-    name: 'R Foundation for Statistical Computing (ROR: <https://ror.org/05qewa988>)'
+    name: R Foundation for Statistical Computing
+    website: https://ror.org/05qewa988
     address: Vienna, Austria
   year: '2026'
   doi: 10.32614/R.manuals
