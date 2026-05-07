@@ -99,36 +99,56 @@ harmonize_adducts <- function(
   )]
 
   # Harmonize Adducts ----
-  n_unique_before <- count_unique_values(df[[adducts_colname]])
-
-  # Normalize internal spaces (e.g., "[M + K]+" -> "[M+K]+")
-  df[[adducts_colname]] <- gsub("\\s+", "", df[[adducts_colname]])
-
-  # Fast exact-match lookup via match()
-  idx <- match(df[[adducts_colname]], names(adducts_translations))
-  matched <- !is.na(idx)
-  if (any(matched)) {
-    df[[adducts_colname]][matched] <- adducts_translations[idx[matched]]
+  adducts <- df[[adducts_colname]]
+  if (is.factor(adducts)) {
+    adducts <- as.character(adducts)
   }
+  n_unique_before <- count_unique_values(adducts)
 
-  # Second pass: substring-level formula normalization
-  # Handles all combinations (dimers, losses, clusters) at once
-  df[[adducts_colname]] <- stringi::stri_replace_all_regex(
-    str = df[[adducts_colname]],
-    pattern = .FORMULA_SUBS_PATTERNS,
-    replacement = .FORMULA_SUBS_REPLACEMENTS,
-    vectorize_all = FALSE
-  )
+  if (length(adducts) == 0L) {
+    n_unique_after <- 0L
+  } else {
+    unique_adducts <- unique(adducts)
+    inverse_idx <- match(adducts, unique_adducts)
+    non_missing_unique <- !is.na(unique_adducts)
 
-  # Third pass: collapse canceling +/- terms and map known forbidden forms.
-  df[[adducts_colname]] <- vapply(
-    X = df[[adducts_colname]],
-    FUN = canonicalize_adduct_notation,
-    FUN.VALUE = character(1L),
-    USE.NAMES = FALSE
-  )
+    if (any(non_missing_unique)) {
+      unique_non_missing <- unique_adducts[non_missing_unique]
 
-  n_unique_after <- count_unique_values(df[[adducts_colname]])
+      # Normalize internal spaces (e.g., "[M + K]+" -> "[M+K]+")
+      unique_non_missing <- gsub("\\s+", "", unique_non_missing)
+
+      # Fast exact-match lookup via match()
+      idx <- match(unique_non_missing, names(adducts_translations))
+      matched <- !is.na(idx)
+      if (any(matched)) {
+        unique_non_missing[matched] <- adducts_translations[idx[matched]]
+      }
+
+      # Second pass: substring-level formula normalization
+      # Handles all combinations (dimers, losses, clusters) at once
+      unique_non_missing <- stringi::stri_replace_all_regex(
+        str = unique_non_missing,
+        pattern = .FORMULA_SUBS_PATTERNS,
+        replacement = .FORMULA_SUBS_REPLACEMENTS,
+        vectorize_all = FALSE
+      )
+
+      # Third pass: collapse canceling +/- terms and map known forbidden forms.
+      unique_non_missing <- vapply(
+        X = unique_non_missing,
+        FUN = canonicalize_adduct_notation,
+        FUN.VALUE = character(1L),
+        USE.NAMES = FALSE
+      )
+
+      unique_adducts[non_missing_unique] <- unique_non_missing
+    }
+
+    adducts <- unique_adducts[inverse_idx]
+    df[[adducts_colname]] <- adducts
+    n_unique_after <- count_unique_values(adducts)
+  }
 
   if (do_log) {
     # Log reduction in unique forms (indicates successful harmonization)
