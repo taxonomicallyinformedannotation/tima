@@ -233,14 +233,10 @@ annotate_spectra <- function(
   log_library_stats(spectral_library)
 
   query_precursors <- get_precursors(query_sp)
-  query_adducts <- get_adducts(query_sp)
   if (!approx) {
-    lib_adducts <- get_adducts(spectral_library)
     spectral_library <- reduce_library_by_precursor(
       lib_sp = spectral_library,
       query_precursors = query_precursors,
-      query_adducts = query_adducts,
-      lib_adducts = lib_adducts,
       dalton = dalton,
       ppm = ppm
     )
@@ -268,9 +264,7 @@ annotate_spectra <- function(
     dalton = dalton,
     ppm = ppm,
     threshold = threshold,
-    approx = approx,
-    query_adducts = query_adducts,
-    lib_adducts = get_adducts(spectral_library)
+    approx = approx
   )
   if (nrow(sim_raw) == 0L) {
     return(
@@ -530,20 +524,16 @@ build_library_metadata <- function(lib_sp, lib_precursors) {
 
 #' @keywords internal
 get_precursors <- function(sp) {
-  sp@backend@spectraData |>
-    tidytable::transmute(
-      precursor = tidytable::coalesce(
-        tidytable::across(
-          .cols = tidyselect::any_of(
-            x = c(
-              "precursorMz",
-              "precursor_mz"
-            )
-          )
-        )
-      )
-    ) |>
-    tidytable::pull()
+  sd <- sp@backend@spectraData
+  nm <- names(sd)
+  col <- if ("precursorMz" %in% nm) {
+    sd[["precursorMz"]]
+  } else if ("precursor_mz" %in% nm) {
+    sd[["precursor_mz"]]
+  } else {
+    NULL
+  }
+  col %||% rep(NA_real_, length(sp))
 }
 
 #' @keywords internal
@@ -624,8 +614,6 @@ convert_precursor_for_matching <- function(precursors, adducts) {
 reduce_library_by_precursor <- function(
   lib_sp,
   query_precursors,
-  query_adducts = NULL,
-  lib_adducts = NULL,
   dalton,
   ppm
 ) {
@@ -661,9 +649,7 @@ compute_similarity_safe <- function(
   dalton,
   ppm,
   threshold,
-  approx,
-  query_adducts = NULL,
-  lib_adducts = NULL
+  approx
 ) {
   # See note in reduce_library_by_precursor(): spectral similarity requires
   # same-adduct matching, so we use raw precursor m/z here.
@@ -764,8 +750,20 @@ log_library_stats <- function(lib_sp) {
   if (!"library" %in% names(sd)) {
     return(invisible(NULL))
   }
-  df <- sd |>
-    data.frame() |>
+  # Only extract the columns needed for stats — avoids copying the full wide
+  # spectraData (which may contain dozens of metadata columns).
+  need_cols <- c(
+    "library",
+    "smiles_no_stereo",
+    "smiles",
+    "inchikey",
+    "compound_id"
+  )
+  avail_cols <- intersect(need_cols, names(sd))
+  df <- as.data.frame(sd[, avail_cols, drop = FALSE])
+  rownames(df) <- NULL
+  df <- df |>
+    tidytable::as_tidytable() |>
     tidytable::filter(!is.na(library))
 
   # Build a reliable structure identity column using coalesce
