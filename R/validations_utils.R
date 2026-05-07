@@ -255,8 +255,8 @@ validate_dataframe_structure <- function(
           paste(
             sprintf(
               "  - '%s' instead of '%s'?",
-              sapply(suggestions, `[[`, "suggestion"),
-              sapply(suggestions, `[[`, "missing")
+              vapply(suggestions, `[[`, character(1L), "suggestion"),
+              vapply(suggestions, `[[`, character(1L), "missing")
             ),
             collapse = "\n"
           )
