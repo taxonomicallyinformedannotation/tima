@@ -47,7 +47,7 @@ dist_get <- function(d, idx1, idx2) {
     )
   }
 
-  # Calculate Distance (Vectorized) ----
+  # Calculate Distance ----
   # Map to lower triangle indices
   i <- pmin(idx1, idx2)
   j <- pmax(idx1, idx2)

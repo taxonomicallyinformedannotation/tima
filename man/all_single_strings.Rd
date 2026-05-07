@@ -13,7 +13,7 @@ all_single_strings(x_list)
 Named logical vector indicating which elements are single strings
 }
 \description{
-Vectorized check for lists of parameters that should all be
+Check for lists of parameters that should all be
 single character strings. More efficient than repeated individual checks.
 }
 \examples{

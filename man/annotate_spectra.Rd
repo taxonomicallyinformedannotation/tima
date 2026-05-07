@@ -94,7 +94,7 @@ File existence is checked early; similarity computation is wrapped in a
 
 Library precursor reduction (when \code{approx = FALSE}) limits similarity
 computation to precursor-tolerant spectra, reducing complexity for large
-libraries. Repeated metadata extraction uses a single vectorized helper.
+libraries.
 }
 
 \examples{

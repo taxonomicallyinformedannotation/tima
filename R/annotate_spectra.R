@@ -29,7 +29,7 @@
 #' @section Performance:
 #'   Library precursor reduction (when `approx = FALSE`) limits similarity
 #'   computation to precursor-tolerant spectra, reducing complexity for large
-#'   libraries. Repeated metadata extraction uses a single vectorized helper.
+#'   libraries.
 #'
 #' @include adducts_utils.R
 #' @include calculate_mass_of_m.R

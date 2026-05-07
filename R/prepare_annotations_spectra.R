@@ -82,7 +82,7 @@ prepare_annotations_spectra <- function(
     )
   }
 
-  # Vectorized file existence check
+  # File existence check
   missing_files <- input[!file.exists(input)]
   if (length(missing_files) > 0L) {
     cli::cli_abort(

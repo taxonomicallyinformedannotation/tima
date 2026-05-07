@@ -10,10 +10,10 @@
   # Sort library m/z for binary search
   lib_mz_sorted <- sort(lib_mz)
 
-  # Vectorized approach: calculate tolerances for all query peaks at once
+  # Calculate tolerances for all query peaks at once
   tolerances <- pmax(dalton, ppm * query_mz * 1E-6)
 
-  # Use findInterval for fast binary search - fully vectorized
+  # Use findInterval for fast binary search
   lower_bounds <- query_mz - tolerances
   upper_bounds <- query_mz + tolerances
   low_idx <- findInterval(lower_bounds, lib_mz_sorted)

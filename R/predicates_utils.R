@@ -34,7 +34,7 @@ is_single_string <- function(x) {
 
 #' Check if all elements in a list are single character strings
 #'
-#' @description Vectorized check for lists of parameters that should all be
+#' @description Check for lists of parameters that should all be
 #'     single character strings. More efficient than repeated individual checks.
 #'
 #' @param x_list [list] Named list of values to check

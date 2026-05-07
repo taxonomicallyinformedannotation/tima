@@ -49,7 +49,7 @@
 #' # Transform with custom parameters
 #' transform_score_sirius_csi(csi_score = -100, K = 100, scale = 20)
 #'
-#' # Vectorized transformation
+#' # Transformation
 #' scores <- c(-300, -100, -10, -1, 0)
 #' transform_score_sirius_csi(csi_score = scores)
 #'

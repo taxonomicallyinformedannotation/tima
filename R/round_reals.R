@@ -86,7 +86,7 @@ find_matching_columns <- function(column_names, patterns) {
     grep(pattern, column_names, fixed = TRUE, value = TRUE)
   }
 
-  # Vectorized: create regex pattern from all search patterns
+  # Create regex pattern from all search patterns
   # This is faster than looping for many columns
   all_matches <- unlist(
     lapply(X = patterns, FUN = .find_pattern_matches),
