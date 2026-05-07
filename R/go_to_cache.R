@@ -91,7 +91,7 @@ ensure_cache_exists <- function(cache) {
 change_to_cache <- function(cache) {
   tryCatch(
     {
-      setwd(dir = cache)
+      setwd(dir = cache) # nolint: undesirable_function_linter
       log_info("Working directory: %s", cache)
     },
     error = function(e) {

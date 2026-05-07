@@ -167,8 +167,8 @@ change_params_small <- function(
   } else {
     # Set working directory to cache_dir for the duration of this function
     old_wd <- getwd()
-    on.exit(setwd(old_wd), add = TRUE)
-    setwd(cache_dir)
+    on.exit(setwd(old_wd), add = TRUE) # nolint: undesirable_function_linter
+    setwd(cache_dir) # nolint: undesirable_function_linter
   }
 
   paths <- get_default_paths()
