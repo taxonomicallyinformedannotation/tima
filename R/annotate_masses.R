@@ -436,8 +436,8 @@ annotate_masses <-
         fixed = TRUE
       )) |>
       tidytable::filter(grepl(pattern = "](\\+|\\-)", x = adduct)) |>
-      tidytable::mutate_rowwise(
-        adduct_mass = -1 * calculate_mass_of_m(adduct_string = adduct, mz = 0)
+      tidytable::mutate(
+        adduct_mass = -1 * calculate_mass_of_m_batch(adducts = adduct, mzs = 0)
       )
 
     rm(clusters_table)
@@ -658,8 +658,8 @@ annotate_masses <-
     rm(df_adducted, df_nl_min)
 
     df_addlossed_min <- df_addlossed |>
-      tidytable::mutate_rowwise(
-        mass = calculate_mass_of_m(adduct_string = adduct, mz = mz)
+      tidytable::mutate(
+        mass = calculate_mass_of_m_batch(adducts = adduct, mzs = as.numeric(mz))
       )
 
     ## Safety
@@ -689,8 +689,11 @@ annotate_masses <-
         tidytable::mutate(
           adduct = switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
         ) |>
-        tidytable::mutate_rowwise(
-          mass = calculate_mass_of_m(adduct_string = adduct, mz = mz)
+        tidytable::mutate(
+          mass = calculate_mass_of_m_batch(
+            adducts = adduct,
+            mzs = as.numeric(mz)
+          )
         )
     }
 
@@ -786,8 +789,11 @@ annotate_masses <-
         tidytable::select(-adduct) |>
         tidytable::mutate(join = "x") |>
         tidytable::left_join(y = adducts_table_multi) |>
-        tidytable::mutate_rowwise(
-          value = calculate_mass_of_m(adduct_string = adduct, mz = mz)
+        tidytable::mutate(
+          value = calculate_mass_of_m_batch(
+            adducts = adduct,
+            mzs = as.numeric(mz)
+          )
         ) |>
         tidytable::mutate(
           mass_min = value - (1E-6 * tolerance_ppm * value),

@@ -175,6 +175,60 @@ calculate_mass_of_m <- function(
   neutral_mass
 }
 
+#' @title Batch-calculate neutral mass from adduct + m/z vectors
+#'
+#' @description Vectorized version of [calculate_mass_of_m()] that parses each
+#'     unique adduct string only once and applies the neutral-mass formula as
+#'     vectorized arithmetic over all rows sharing that adduct.  This is orders
+#'     of magnitude faster than calling `calculate_mass_of_m()` row-by-row when
+#'     a large feature table has low adduct cardinality (typically <100 unique
+#'     adducts for millions of rows).
+#'
+#' @param adducts [character] Vector of adduct notation strings.
+#' @param mzs [numeric] Observed m/z values (same length as \code{adducts}, or
+#'     scalar 0 for adduct-mass computation).
+#' @param electron_mass [numeric] Electron mass in Daltons.
+#'
+#' @return Numeric vector of neutral masses (NA for unparseable adducts or
+#'     non-finite results).
+#'
+#' @keywords internal
+calculate_mass_of_m_batch <- function(
+  adducts,
+  mzs,
+  electron_mass = ELECTRON_MASS_DALTONS
+) {
+  n <- length(adducts)
+  if (length(mzs) == 1L) {
+    mzs <- rep(as.numeric(mzs), n)
+  } else {
+    mzs <- as.numeric(mzs)
+  }
+  out <- rep(NA_real_, n)
+
+  unique_adducts <- unique(adducts[!is.na(adducts)])
+  for (a in unique_adducts) {
+    parsed <- tryCatch(parse_adduct(a), error = function(e) NULL)
+    if (is.null(parsed) || all(parsed == 0L)) {
+      next
+    }
+    n_charges <- parsed[["n_charges"]]
+    n_mer <- parsed[["n_mer"]]
+    n_iso <- parsed[["n_iso"]]
+    mass_mods <- parsed[["los_add_clu"]]
+    if (n_mer == 0L || n_charges == 0L) {
+      next
+    }
+
+    idx <- which(!is.na(adducts) & adducts == a)
+    mz_sub <- mzs[idx]
+    iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
+    masses <- (n_charges * (mz_sub - iso_shift) - mass_mods) / n_mer
+    out[idx] <- masses
+  }
+  out
+}
+
 # Helper Functions ----
 
 #' Validate m/z value

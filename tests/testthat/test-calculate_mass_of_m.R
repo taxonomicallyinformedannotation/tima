@@ -378,6 +378,37 @@ test_that("calculate_mass_of_m is fast for batch processing", {
   expect_equal(length(masses), 1000)
 })
 
+test_that("calculate_mass_of_m_batch matches scalar implementation", {
+  adducts <- c(
+    "[M+H]+",
+    "[M+Na]+",
+    "[M+H]+",
+    "[M-H]-",
+    "[M+Na]+"
+  )
+  mzs <- c(123.4567, 145.4421, 200.2, 199.0, 180.0634 + Na_MASS)
+
+  expected <- vapply(
+    seq_along(adducts),
+    function(i) calculate_mass_of_m(mz = mzs[[i]], adduct_string = adducts[[i]]),
+    numeric(1L)
+  )
+  actual <- calculate_mass_of_m_batch(adducts = adducts, mzs = mzs)
+
+  expect_equal(actual, expected, tolerance = 1e-10)
+})
+
+test_that("calculate_mass_of_m_batch handles scalar mz and unparseable adducts", {
+  adducts <- c("[M+H]+", "invalid", NA_character_, "[M+Na]+")
+  out <- calculate_mass_of_m_batch(adducts = adducts, mzs = 0)
+
+  expect_equal(length(out), length(adducts))
+  expect_true(is.finite(out[[1L]]))
+  expect_true(is.na(out[[2L]]))
+  expect_true(is.na(out[[3L]]))
+  expect_true(is.finite(out[[4L]]))
+})
+
 # Test Suite: calculate_mz_from_mass ----
 
 ## Basic m/z calculation ----
