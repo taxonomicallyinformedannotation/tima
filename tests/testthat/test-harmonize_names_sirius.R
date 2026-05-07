@@ -169,7 +169,7 @@ test_that("harmonize_names_sirius works with real SIRIUS output", {
   expect_true(grepl("ppm\\)", result[11]))
 })
 
-test_that("harmonize_names_sirius can be used with dplyr rename", {
+test_that("harmonize_names_sirius can be used with rename", {
   # Simulate renaming columns
   old_names <- c("1_name", "2_id", "3_score")
   new_names <- sapply(old_names, harmonize_names_sirius, USE.NAMES = FALSE)

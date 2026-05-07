@@ -31,7 +31,6 @@ Imports:
     BiocParallel (>= 1.44.0),
     cli (>= 3.6.6),
     docopt (>= 0.7.2),
-    dplyr (>= 1.2.1),
     fs (>= 2.1.0),
     httr (>= 1.4.8),
     httr2 (>= 1.2.2),

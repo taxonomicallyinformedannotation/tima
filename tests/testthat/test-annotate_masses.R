@@ -594,3 +594,50 @@ test_that("annotate_masses correctly handles isotopes [M1+H]+ and [M2+H]+", {
     expect_equal(unique_structures[[1L]], "WQZGKKKJIJFFOK-GASJEMHNSA-N")
   }
 })
+
+test_that("join_couples_with_neutral_losses preserves neutral-loss mass values", {
+  df_couples_diff <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M+H]+",
+    feature_id_dest = "F2",
+    adduct_dest = "[M+Na]+",
+    delta_min = 17.9,
+    delta_max = 18.1
+  )
+  neutral_losses <- tidytable::tidytable(
+    loss = c("H2O loss", "NH3 loss"),
+    mass = c(18.010565, 17.026549)
+  )
+
+  out <- join_couples_with_neutral_losses(df_couples_diff, neutral_losses)
+
+  expect_equal(nrow(out), 1L)
+  expect_equal(out$loss[[1L]], "H2O loss")
+  expect_equal(out$mass[[1L]], 18.010565, tolerance = 1e-8)
+})
+
+test_that("join_multi_with_addlossed preserves observed matched mass", {
+  df_multi <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[2M+Na]+",
+    rt = 5,
+    mz = 500,
+    rt_min = 4.9,
+    rt_max = 5.1,
+    mass_min = 100,
+    mass_max = 110
+  )
+  df_addlossed_rdy <- tidytable::tidytable(
+    feature_id = "X",
+    rt = 5.0,
+    mz = 250,
+    adduct = "[M+H]+",
+    mass = 105.4321
+  )
+
+  out <- join_multi_with_addlossed(df_multi, df_addlossed_rdy)
+
+  expect_equal(nrow(out), 1L)
+  expect_equal(out$feature_id[[1L]], "F1")
+  expect_equal(out$mass[[1L]], 105.4321, tolerance = 1e-8)
+})

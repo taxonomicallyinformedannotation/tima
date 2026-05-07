@@ -313,19 +313,6 @@
     },
     "6": {
       "@type": "SoftwareApplication",
-      "identifier": "dplyr",
-      "name": "dplyr",
-      "version": ">= 1.2.1",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=dplyr"
-    },
-    "7": {
-      "@type": "SoftwareApplication",
       "identifier": "fs",
       "name": "fs",
       "version": ">= 2.1.0",
@@ -337,7 +324,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=fs"
     },
-    "8": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "httr",
       "name": "httr",
@@ -350,7 +337,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr"
     },
-    "9": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
@@ -363,7 +350,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "10": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
@@ -376,7 +363,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=igraph"
     },
-    "11": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "IRanges",
       "name": "IRanges",
@@ -389,7 +376,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/IRanges.html"
     },
-    "12": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -402,7 +389,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "13": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "lgr",
       "name": "lgr",
@@ -415,7 +402,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=lgr"
     },
-    "14": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "lifecycle",
       "name": "lifecycle",
@@ -428,12 +415,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=lifecycle"
     },
-    "15": {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "methods",
       "name": "methods"
     },
-    "16": {
+    "15": {
       "@type": "SoftwareApplication",
       "identifier": "MetaboCoreUtils",
       "name": "MetaboCoreUtils",
@@ -446,7 +433,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MetaboCoreUtils.html"
     },
-    "17": {
+    "16": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
@@ -459,7 +446,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
     },
-    "18": {
+    "17": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMsp",
       "name": "MsBackendMsp",
@@ -472,7 +459,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMsp.html"
     },
-    "19": {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "MsCoreUtils",
       "name": "MsCoreUtils",
@@ -485,7 +472,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsCoreUtils.html"
     },
-    "20": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "msentropy",
       "name": "msentropy",
@@ -498,7 +485,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=msentropy"
     },
-    "21": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "purrr",
       "name": "purrr",
@@ -511,7 +498,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=purrr"
     },
-    "22": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "R.utils",
       "name": "R.utils",
@@ -524,7 +511,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=R.utils"
     },
-    "23": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "reticulate",
       "name": "reticulate",
@@ -537,7 +524,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=reticulate"
     },
-    "24": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "rlang",
       "name": "rlang",
@@ -550,7 +537,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rlang"
     },
-    "25": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
@@ -563,7 +550,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "26": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -576,12 +563,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "27": {
+    "26": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "28": {
+    "27": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -594,7 +581,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "29": {
+    "28": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -607,7 +594,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "30": {
+    "29": {
       "@type": "SoftwareApplication",
       "identifier": "tidyselect",
       "name": "tidyselect",
@@ -620,7 +607,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyselect"
     },
-    "31": {
+    "30": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -633,12 +620,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "32": {
+    "31": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "33": {
+    "32": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",

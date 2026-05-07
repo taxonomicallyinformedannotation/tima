@@ -189,7 +189,7 @@ test_that("pre_harmonize_names_sirius can be chained with harmonize_names_sirius
   expect_equal(step2, "name")
 })
 
-test_that("pre_harmonize_names_sirius can be used with dplyr rename", {
+test_that("pre_harmonize_names_sirius can be used with rename", {
   # Simulate renaming columns
   old_names <- c("name/suffix", "id/type", "score/raw")
   new_names <- pre_harmonize_names_sirius(old_names)

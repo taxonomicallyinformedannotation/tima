@@ -233,23 +233,23 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | Package | Version | Citation |
 |:---|:---|:---|
 | archive | 1.1.13 | Hester and Csárdi (2025) |
-| base | 4.5.3 | R Core Team (2025) |
+| base | 4.6.0 | R Core Team (2025) |
 | BiocManager | 1.30.27 | Morgan and Ramos (2025) |
-| BiocParallel | 1.44.0 | Wang et al. (2025) |
-| BiocVersion | 3.22.0 | Morgan (2025) |
+| BiocParallel | 1.46.0 | Wang et al. (2025) |
+| BiocVersion | 3.23.1 | Morgan (2025) |
 | classyfireR | 0.3.8 | Y et al. (2016) |
 | docopt | 0.7.2 | <span class="nocase">de Jonge</span> (2025) |
-| fs | 2.0.1 | Hester et al. (2025) |
+| fs | 2.1.0 | Hester et al. (2025) |
 | httr2 | 1.2.2 | Wickham (2025) |
-| igraph | 2.2.3 | Csárdi and Nepusz (2006); Antonov et al. (2023); (**igraph2026?**) |
-| IRanges | 2.44.0 | Lawrence et al. (2013) |
+| igraph | 2.3.1 | Csárdi and Nepusz (2006); Antonov et al. (2023); (**igraph2026?**) |
+| IRanges | 2.46.0 | Lawrence et al. (2013) |
 | knitr | 1.51 | Xie (2014); Xie (2015); Xie (2025) |
 | lgr | 0.5.2 | Fleck (2025) |
 | lifecycle | 1.0.5 | (**lifecycle?**) |
-| MetaboCoreUtils | 1.18.1 | Rainer et al. (2022a) |
-| MsBackendMgf | 1.18.0 | Gatto et al. (2025) |
-| MsBackendMsp | 1.14.0 | Rainer et al. (2022b) |
-| MsCoreUtils | 1.22.1 | Rainer et al. (2022c) |
+| MetaboCoreUtils | 1.20.1 | Rainer et al. (2022a) |
+| MsBackendMgf | 1.20.0 | Gatto et al. (2025) |
+| MsBackendMsp | 1.16.0 | Rainer et al. (2022b) |
+| MsCoreUtils | 1.24.0 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
 | R.utils | 2.13.0 | Bengtsson (2025) |
 | reticulate | 1.46.0 | Ushey et al. (2025) |
@@ -260,15 +260,15 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | shinyjs | 2.1.1 | Attali (2021) |
 | shinytest2 | 0.5.1 | Schloerke (2025) |
 | shinyvalidate | 0.1.3 | Sievert et al. (2023) |
-| Spectra | 1.20.1 | Rainer et al. (2022d) |
+| Spectra | 1.22.0 | Rainer et al. (2022d) |
 | stringi | 1.8.7 | Gagolewski (2022) |
 | targets | 1.12.0 | Landau (2021) |
 | testthat | 3.3.2 | Wickham (2011) |
 | tidyselect | 1.2.1 | Henry and Wickham (2024) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
-| tima | 2.12.0.9000 | Rutz et al. (2019); Rutz and Allard (2025) |
-| tools | 4.5.3 | (**tools?**) |
+| tima | 2.12.0.9001 | Rutz et al. (2019); Rutz and Allard (2025) |
+| tools | 4.6.0 | (**tools?**) |
 | withr | 3.0.2 | Hester et al. (2024) |
 | yaml | 2.3.12 | Stephens and Simonov (2025) |
 

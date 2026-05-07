@@ -198,6 +198,8 @@ calculate_mass_of_m_batch <- function(
   mzs,
   electron_mass = ELECTRON_MASS_DALTONS
 ) {
+  # Kept for API symmetry with calculate_mass_of_m(); correction is negligible.
+  force(electron_mass)
   n <- length(adducts)
   if (length(mzs) == 1L) {
     mzs <- rep(as.numeric(mzs), n)

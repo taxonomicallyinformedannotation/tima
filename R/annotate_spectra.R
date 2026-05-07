@@ -644,11 +644,18 @@ reduce_library_by_precursor <- function(
 
   minimal <- pmin(lib_prec_match - dalton, lib_prec_match * (1 - (1E-6 * ppm)))
   maximal <- pmax(lib_prec_match + dalton, lib_prec_match * (1 + (1E-6 * ppm)))
-  df_idx <- dplyr::inner_join(
-    x = tidytable::tidytable(minimal, maximal, lib_precursors = lib_prec_match),
-    y = tidytable::tidytable(val = unique(query_prec_match)),
-    by = dplyr::join_by(minimal <= val, maximal >= val)
-  ) |>
+  lib_windows <- tidytable::tidytable(
+    minimal,
+    maximal,
+    lib_precursors = lib_prec_match
+  )
+  query_vals <- tidytable::tidytable(val = unique(query_prec_match))
+  df_idx <- lib_windows[
+    query_vals,
+    on = .(minimal <= val, maximal >= val),
+    nomatch = 0L,
+    allow.cartesian = TRUE
+  ] |>
     tidytable::distinct(lib_precursors, .keep_all = TRUE)
   lib_sp[lib_prec_match %in% df_idx$lib_precursors]
 }
@@ -796,7 +803,7 @@ log_library_stats <- function(lib_sp) {
 
   stats <- df |>
     tidytable::group_by(library) |>
-    tidytable::summarise(
+    tidytable::summarize(
       spectra = tidytable::n(),
       unique_structures = tidytable::n_distinct(
         .structure_id,
