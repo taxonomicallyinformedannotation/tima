@@ -390,7 +390,9 @@ test_that("calculate_mass_of_m_batch matches scalar implementation", {
 
   expected <- vapply(
     seq_along(adducts),
-    function(i) calculate_mass_of_m(mz = mzs[[i]], adduct_string = adducts[[i]]),
+    function(i) {
+      calculate_mass_of_m(mz = mzs[[i]], adduct_string = adducts[[i]])
+    },
     numeric(1L)
   )
   actual <- calculate_mass_of_m_batch(adducts = adducts, mzs = mzs)
