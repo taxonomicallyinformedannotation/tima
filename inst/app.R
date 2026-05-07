@@ -2521,7 +2521,7 @@ server <- function(input, output) {
       )
     }
 
-    results <- tail(
+    results <- utils::tail(
       list.files(
         path = "data/processed",
         pattern = ".tsv",
