@@ -70,9 +70,9 @@ extract_spectra <- function(object) {
 
   # Extract Spectra Metadata ----
 
-  spectra <- object@backend@spectraData |>
-    data.frame() |>
-    tidytable::as_tidytable()
+  spectra <- as.data.frame(object@backend@spectraData)
+  rownames(spectra) <- NULL
+  spectra <- tidytable::as_tidytable(spectra)
 
   # Extract Peak Data ----
 

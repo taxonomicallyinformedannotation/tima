@@ -148,9 +148,9 @@ prepare_libraries_rt <- function(
   rts_from_mgf <- function(mgf) {
     # Helper: extract spectra data as tidytable
     .extract_spectra_data <- function(spectra_obj) {
-      spectra_obj@backend@spectraData |>
-        data.frame() |>
-        tidytable::as_tidytable()
+      df <- as.data.frame(spectra_obj@backend@spectraData)
+      rownames(df) <- NULL
+      tidytable::as_tidytable(df)
     }
 
     spectra <- mgf |>
