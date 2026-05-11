@@ -107,11 +107,10 @@ data:
     spectra: data/source/example_spectra.mgf
     benchmark:
       path: data/source/benchmark
-      cleaned: data/interim/benchmark/cleaned_libraries_matchms/results_library_cleaning/cleaned_spectra.mgf
+      cleaned: data/interim/benchmark/cleaned_gnps_library.mgf
       mgf:
         neg: data/interim/benchmark/benchmark_neg.mgf
         pos: data/interim/benchmark/benchmark_pos.mgf
-      zip: data/source/benchmark/cleaned_libraries_matchms.zip
     libraries:
       path: data/source/libraries
       rt:
@@ -239,7 +238,7 @@ tests:
   mode: no
   path: tests
 urls:
-  benchmarking_set: https://zenodo.org/records/10160791/files/cleaned_libraries_matchms.zip?download=1
+  benchmarking_set: https://zenodo.org/records/11566051/files/cleaned_gnps_library.mgf?download=1
   examples:
     features: https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_features.csv
     lib_mini:

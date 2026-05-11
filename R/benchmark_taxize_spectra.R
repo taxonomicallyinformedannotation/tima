@@ -97,6 +97,7 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
     ) |>
     tidytable::select(
       feature_id,
+      sample_organism_name = organism_name,
       sample_organism_01_domain = organism_taxonomy_01domain,
       sample_organism_02_kingdom = organism_taxonomy_02kingdom,
       sample_organism_03_phylum = organism_taxonomy_03phylum,

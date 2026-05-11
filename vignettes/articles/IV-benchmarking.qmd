@@ -39,37 +39,48 @@ resource_files:
   - benchmark_comparison_neg.svg
 ---
 
-This vignette simply shows the actual performance of TIMA.
+This vignette summarizes benchmark outputs for TIMA and clarifies what is being measured.
 
-The benchmarking dataset was built using [https://zenodo.org/record/5186176](https://zenodo.org/record/5186176).
+The benchmarking dataset was built using <https://zenodo.org/record/11566051>.
 
 It contained positive and negative MS^2^ spectra of multiple ion species ([M+H]^+^, [M+Na]^+^, [M+H~4~N]^+^, ...) coming from different mass spectrometers.
 
 In positive mode,
-It was filtered to 27,789 spectra, representing 17,822 structures without stereo.
-Of those, only 15,005 spectra (54.0%) corresponded to structures present in the library we used to annotate.
+It was filtered to 27,468 spectra, representing 17,822 structures without stereo.
+Of those, only 15,005 spectra (54.0%) corresponded to structures present in the libraries we used to annotate (except GNPS itself).
 
 In negative mode,
 It was filtered to 12,060 spectra, representing 9,112 structures without stereo.
-Of those, only 6,282 spectra (52.1%) corresponded to structures present in the library we used to annotate.
+Of those, only 6,282 spectra (52.1%) corresponded to structures present in the libraries we used to annotate  (except GNPS itself).
+
+## Evaluation notes
+
+- The curves below are **top-k hit-rate** curves.
+- Positive class is exact InChIKey connectivity-layer recovery.
+- The benchmark includes out-of-library structures, so we report both:
+  - all-query behavior (realistic throughput), and
+  - in-library behavior (recoverable subset).
+- MCC-based summaries are produced by the targets pipeline in:
+  - `data/interim/benchmark/benchmark_metrics_pos.tsv.gz`
+  - `data/interim/benchmark/benchmark_metrics_neg.tsv.gz`
 
 ## Best 100 candidates
 ### Positive
 
-![Benchmark ROC curves (positive mode)](./benchmark_full_pos.svg)\
+![Benchmark top-k hit-rate curves (positive mode)](./benchmark_full_pos.svg)\
 
 ### Negative
 
-![Benchmark ROC curves (negative mode)](./benchmark_full_neg.svg)\
+![Benchmark top-k hit-rate curves (negative mode)](./benchmark_full_neg.svg)\
 
 ## Best 25 candidates (zoomed)
 ### Positive
 
-![Benchmark ROC curves zoomed on the first 25 candidates (positive mode)](./benchmark_zoomed_pos.svg)\
+![Benchmark top-k hit-rate curves zoomed on the first 25 candidates (positive mode)](./benchmark_zoomed_pos.svg)\
 
 ### Negative
 
-![Benchmark ROC curves zoomed on the first 25 candidates (negative mode)](./benchmark_zoomed_neg.svg)\
+![Benchmark top-k hit-rate curves zoomed on the first 25 candidates (negative mode)](./benchmark_zoomed_neg.svg)\
 
 ## Candidates distribution
 ### Positive
@@ -79,3 +90,38 @@ Of those, only 6,282 spectra (52.1%) corresponded to structures present in the l
 ### Negative
 
 ![Benchmark comparison (negative mode)](./benchmark_comparison_neg.svg)\
+
+## MCC snapshot from targets outputs
+
+Top-k rows in the metrics snapshot are now interpreted at the candidate-row
+level: `tp/tn/fp/fn` are computed from whether each candidate is inside the
+top-*k* window and whether it is the correct answer.
+
+```{r}
+read_metrics <- function(path) {
+  if (!file.exists(path)) {
+    return(NULL)
+  }
+  utils::read.delim(path, sep = "\t", stringsAsFactors = FALSE)
+}
+
+metrics_pos <- read_metrics("~/.tima/data/interim/benchmark/benchmark_metrics_pos.tsv.gz")
+metrics_neg <- read_metrics("~/.tima/data/interim/benchmark/benchmark_metrics_neg.tsv.gz")
+
+print_mcc <- function(df, mode_label) {
+  if (is.null(df) || nrow(df) == 0L) {
+    cat(sprintf("%s: metrics file not available in this build context.\n", mode_label))
+    return(invisible(NULL))
+  }
+
+  cat(sprintf("\n%s: top-k MCC\n", mode_label))
+  print(subset(df, metric_family == "top_k", select = c(prediction, k, mcc, hit_rate_all, hit_rate_truth)))
+
+  cat(sprintf("\n%s: score-threshold MCC\n", mode_label))
+  print(subset(df, metric_family == "score_threshold", select = c(prediction, threshold, mcc, tp, tn, fp, fn)))
+}
+
+print_mcc(metrics_pos, "Positive mode")
+print_mcc(metrics_neg, "Negative mode")
+```
+

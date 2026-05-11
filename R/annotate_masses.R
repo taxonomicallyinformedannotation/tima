@@ -307,6 +307,13 @@ annotate_masses <-
     features_table <- features_table |>
       harmonize_adducts(adducts_translations = adducts_translations)
 
+    if (!"sample" %in% colnames(features_table)) {
+      log_debug(
+        "No 'sample' column found in features table; adding a placeholder"
+      )
+      features_table$sample <- "all"
+    }
+
     df_fea_min <- features_table |>
       tidytable::mutate(tidytable::across(
         .cols = "mz",

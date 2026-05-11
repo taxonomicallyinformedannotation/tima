@@ -102,6 +102,7 @@ Collate:
     'annotate_masses.R'
     'columns_utils.R'
     'annotate_spectra.R'
+    'benchmark_metrics_utils.R'
     'benchmark_taxize_spectra.R'
     'c_wrappers.R'
     'sanitize_spectrum_matrix.R'

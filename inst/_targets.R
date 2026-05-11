@@ -1292,27 +1292,9 @@ list(
       }
     ),
     tar_target(
-      name = benchmark_zip,
-      command = {
-        get_file(
-          url = benchmark_path_url,
-          export = benchmark_path_zip
-        )
-        return(benchmark_path_zip)
-      },
-      format = "file"
-    ),
-    tar_target(
       name = benchmark_file,
       command = {
-        utils::unzip(zipfile = benchmark_zip)
-        dir.create(dirname(benchmark_path_file), recursive = TRUE)
-        file.copy(
-          from = "cleaned_libraries_matchms/results_library_cleaning/cleaned_spectra.mgf",
-          to = benchmark_path_file
-        )
-        unlink("cleaned_libraries_matchms", recursive = TRUE)
-        return(benchmark_path_file)
+        c(lib_spe_exp_gnp_pre_pos, lib_spe_exp_gnp_pre_neg)
       },
       format = "file"
     ),
@@ -1320,12 +1302,16 @@ list(
       name = benchmark_converted,
       command = {
         sp <- benchmark_file |>
-          import_spectra()
+          tima:::import_and_clean_library_collection(
+            dalton = 0.01,
+            polarity = NA,
+            ppm = 10
+          )
         sp |>
           Spectra::filterEmptySpectra() |>
-          extract_spectra() |>
-          data.frame() |>
-          saveRDS(file = "data/interim/benchmark/benchmark_spectra.rds")
+          tima:::export_spectra_rds(
+            file = "data/interim/benchmark/benchmark_spectra.rds"
+          )
         return("data/interim/benchmark/benchmark_spectra.rds")
       },
       format = "file"
@@ -1334,20 +1320,19 @@ list(
       name = benchmark_prepared,
       command = {
         sp <- benchmark_converted |>
-          import_spectra()
+          import_spectra(sanitize = FALSE)
 
         sp@backend@spectraData$precursorMz <-
-          sp@backend@spectraData$PRECURSOR_MZ |>
+          sp@backend@spectraData$precursor_mz |>
           as.numeric()
 
-        log_trace("Imported")
+        tima:::log_trace("Imported")
         sp_clean <- sp
 
-        log_trace("Cleaned")
+        tima:::log_trace("Cleaned")
         df_meta <- tidytable::tidytable(
-          adduct = sp_clean$ADDUCT,
-          inchikey = sp_clean$INCHIKEY,
-          instrument = sp_clean$INSTRUMENT_TYPE,
+          adduct = sp_clean$adduct,
+          inchikey = sp_clean$inchikey,
           fragments = purrr::map(
             .x = sp_clean@backend@peaksData,
             .f = length
@@ -1356,10 +1341,10 @@ list(
             as.numeric() /
             2,
           precursorMz = sp_clean$precursorMz,
-          smiles = sp_clean$SMILES,
-          ccmslib = sp_clean$SPECTRUM_ID,
+          smiles = sp_clean$smiles,
+          ccmslib = sp_clean$spectrum_id,
           charge = sp_clean$precursorCharge,
-          name = sp_clean$COMPOUND_NAME
+          name = sp_clean$name
         ) |>
           tidytable::mutate(
             tidytable::across(
@@ -1370,18 +1355,18 @@ list(
             )
           )
 
-        log_trace("Framed")
+        tima:::log_trace("Framed")
         df_clean <- df_meta |>
           tidytable::filter(!is.na(inchikey)) |>
           tidytable::filter(fragments >= 5) |>
           tidytable::filter(fragments <= 250) |>
-          tidytable::filter(
-            !grepl(
-              pattern = "QQQ",
-              x = instrument,
-              fixed = TRUE
-            )
-          ) |>
+          # tidytable::filter(
+          #   !grepl(
+          #     pattern = "QQQ",
+          #     x = instrument,
+          #     fixed = TRUE
+          #   )
+          # ) |>
           ## fragments are nominal mass
           tidytable::filter(
             !grepl(
@@ -1451,20 +1436,20 @@ list(
           ))
 
         sp_pos <-
-          sp_clean[sp_clean$SPECTRUM_ID %in% df_clean_pos$ccmslib]
+          sp_clean[sp_clean$spectrum_id %in% df_clean_pos$ccmslib]
         sp_neg <-
-          sp_clean[sp_clean$SPECTRUM_ID %in% df_clean_neg$ccmslib]
+          sp_clean[sp_clean$spectrum_id %in% df_clean_neg$ccmslib]
 
         extract_benchmark_spectra <- function(x, mode) {
           df <- x |>
-            extract_spectra() |>
+            tima:::extract_spectra() |>
             tidytable::mutate(acquisitionNum = tidytable::row_number()) |>
             tidytable::mutate(spectrum_id = acquisitionNum) |>
             tidytable::mutate(
               short_ik = gsub(
                 pattern = "-.*",
                 replacement = "",
-                INCHIKEY,
+                inchikey,
                 perl = TRUE
               )
             ) |>
@@ -1479,19 +1464,20 @@ list(
                 false = as.integer(-1)
               )
             ) |>
+            tidytable::mutate(MS_LEVEL = 2L) |>
             tidytable::select(
               acquisitionNum,
               precursorCharge,
               precursorMz,
               MS_LEVEL,
               rtime,
-              name = COMPOUND_NAME,
-              smiles = SMILES,
-              inchi = INCHI,
-              inchikey = INCHIKEY,
-              adduct = ADDUCT,
-              instrument = INSTRUMENT_TYPE,
-              ccmslib = SPECTRUM_ID,
+              name = name,
+              smiles = smiles,
+              inchi = inchi,
+              inchikey = inchikey,
+              adduct = adduct,
+              # instrument = INSTRUMENT_TYPE,
+              ccmslib = spectrum_id,
               spectrum_id = acquisitionNum,
               mz,
               intensity
@@ -1511,7 +1497,7 @@ list(
             tidytable::select(
               adduct,
               inchikey,
-              instrument,
+              # instrument,
               smiles,
               ccmslib,
               charge = precursorCharge,
@@ -1550,9 +1536,9 @@ list(
             file = benchmark_path_mgf_neg
           )
         df_clean_pos |>
-          export_output("data/interim/benchmark/benchmark_meta_pos.tsv")
+          tima:::export_output("data/interim/benchmark/benchmark_meta_pos.tsv")
         df_clean_neg |>
-          export_output("data/interim/benchmark/benchmark_meta_neg.tsv")
+          tima:::export_output("data/interim/benchmark/benchmark_meta_neg.tsv")
 
         return(
           c(
@@ -1835,7 +1821,11 @@ list(
         annotate_spectra(
           input = benchmark_pre_mgf_pos,
           libraries = c(
+            lib_spe_is_nor_pre_pos,
             lib_spe_is_wik_pre_pos,
+            ## TODO add is hmdb
+            lib_spe_exp_int_pre_pos,
+            # lib_spe_exp_gnp_pre_pos,
             lib_spe_exp_mb_pre_pos,
             lib_spe_exp_mer_pre_pos
           ),
@@ -1857,7 +1847,11 @@ list(
         annotate_spectra(
           input = benchmark_pre_mgf_neg,
           libraries = c(
+            lib_spe_is_nor_pre_neg,
             lib_spe_is_wik_pre_neg,
+            ## TODO add is hmdb
+            lib_spe_exp_int_pre_neg,
+            # lib_spe_exp_gnp_pre_neg,
             lib_spe_exp_mb_pre_neg,
             lib_spe_exp_mer_pre_neg
           ),
