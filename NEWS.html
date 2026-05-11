@@ -680,18 +680,25 @@ ul.task-list li input[type="checkbox"] {
 <section id="new-features" class="level2">
 <h2 class="anchored" data-anchor-id="new-features">New features</h2>
 <ul>
-<li><code>annotate_spectra()</code> now reports forward and reverse dot product scores (<code>candidate_score_similarity_forward</code>, <code>candidate_score_similarity_reverse</code>) alongside the main similarity score. Forward considers only query peaks (normalized by all query and matched library intensities); reverse considers only library peaks (normalized by matched query and all library intensities). Both are computed in C for consistency with the GNPS scoring engine.</li>
-<li>Added support for additional NPClassifier and ClassyFire taxonomy caches in <code>prepare_libraries_sop_merged()</code>, allowing structures missing taxonomy in the merged libraries to be enriched from external cache files. Caches grow over time as library entries are written back.</li>
-<li>Added a new validation helper, see <a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html" class="uri">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html</a></li>
-<li>Added <a href="http://bigg.ucsd.edu/">BiGG</a> as SOP library</li>
-<li>Added basic isotopologues handling</li>
-<li>Added external identifiers to the final results (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/142">#142</a>)</li>
-<li>Added NORMAN SUSPECT LIST DATA in silico spectral libraries</li>
-<li>Added multiple new sub-libraries and a new <code>tag</code> column</li>
-<li>Added mzmine annotation support</li>
-<li>Added Sirius spectral results support</li>
-<li>Added special “Biota” superdomain handling for shared core metabolism</li>
-<li>Enhanced <code>sanitize_spectra()</code> with adaptive noise filtering:
+<li><p>Added full mzTab-M support across import, preparation, and export:</p>
+<ul>
+<li><code>read_mztab()</code> imports mzTab-M into TIMA feature/spectra/metadata files</li>
+<li><code>prepare_annotations_mztab()</code> maps mzTab structural annotations to TIMA schema</li>
+<li><code>write_mztab()</code> exports TIMA weighted annotations to mzTab-M (including merge mode)</li>
+</ul></li>
+<li><p>Added mzTab-M validation hardening with schema-backed required columns and strict SME checks</p></li>
+<li><p><code>annotate_spectra()</code> now reports forward and reverse dot product scores (<code>candidate_score_similarity_forward</code>, <code>candidate_score_similarity_reverse</code>) alongside the main similarity score. Forward considers only query peaks (normalized by all query and matched library intensities); reverse considers only library peaks (normalized by matched query and all library intensities). Both are computed in C for consistency with the GNPS scoring engine.</p></li>
+<li><p>Added support for additional NPClassifier and ClassyFire taxonomy caches in <code>prepare_libraries_sop_merged()</code>, allowing structures missing taxonomy in the merged libraries to be enriched from external cache files. Caches grow over time as library entries are written back.</p></li>
+<li><p>Added a new validation helper, see <a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html" class="uri">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html</a></p></li>
+<li><p>Added <a href="http://bigg.ucsd.edu/">BiGG</a> as SOP library</p></li>
+<li><p>Added basic isotopologues handling</p></li>
+<li><p>Added external identifiers to the final results (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/142">#142</a>)</p></li>
+<li><p>Added NORMAN SUSPECT LIST DATA in silico spectral libraries</p></li>
+<li><p>Added multiple new sub-libraries and a new <code>tag</code> column</p></li>
+<li><p>Added mzmine annotation support</p></li>
+<li><p>Added Sirius spectral results support</p></li>
+<li><p>Added special “Biota” superdomain handling for shared core metabolism</p></li>
+<li><p>Enhanced <code>sanitize_spectra()</code> with adaptive noise filtering:</p>
 <ul>
 <li>Dynamic intensity thresholds (MAD-based, now default when <code>cutoff = NULL</code>)</li>
 <li>Low noise removal targets repetitive instrumental artifacts</li>
@@ -713,6 +720,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="bug-fixes">Bug fixes</h2>
 <ul>
 <li>Fixed adduct annotation bug and harmonization</li>
+<li>Fixed recognition of uncommon negative charges</li>
 <li>Fixed <code>split_tables_sop()</code> collapsing numerically identical exact masses into <code>"mass1 $ mass2"</code> strings due to <code>clean_collapse()</code> treating them as different character values; now uses <code>resolve_numeric_or_na()</code> with floating-point tolerance</li>
 <li>Removed xlogp from the structure metadata (<code>str_met</code>) table: xlogp is stereo-sensitive (Crippen atom-typing can differ between stereoisomers), so it is no longer collapsed by <code>inchikey_no_stereo</code>; the per-SMILES value computed by <code>process_smiles()</code> in the annotation pipeline is used instead</li>
 </ul>
