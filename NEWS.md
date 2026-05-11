@@ -12,6 +12,12 @@
 
 ## New features
 
+* Added full mzTab-M support across import, preparation, and export:
+    - `read_mztab()` imports mzTab-M into TIMA feature/spectra/metadata files
+    - `prepare_annotations_mztab()` maps mzTab structural annotations to TIMA schema
+    - `write_mztab()` exports TIMA weighted annotations to mzTab-M (including merge mode)
+* Added mzTab-M validation hardening with schema-backed required columns and strict SME checks
+
 * `annotate_spectra()` now reports forward and reverse dot product scores (`candidate_score_similarity_forward`, `candidate_score_similarity_reverse`) alongside the main similarity score. Forward considers only query peaks (normalized by all query and matched library intensities); reverse considers only library peaks (normalized by matched query and all library intensities). Both are computed in C for consistency with the GNPS scoring engine.
 * Added support for additional NPClassifier and ClassyFire taxonomy caches in `prepare_libraries_sop_merged()`, allowing structures missing taxonomy in the merged libraries to be enriched from external cache files. Caches grow over time as library entries are written back.
 * Added a new validation helper, see <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html>
@@ -39,6 +45,7 @@
 ## Bug fixes
 
 * Fixed adduct annotation bug and harmonization
+* Fixed recognition of uncommon negative charges
 * Fixed `split_tables_sop()` collapsing numerically identical exact masses into `"mass1 $ mass2"` strings due to `clean_collapse()` treating them as different character values; now uses `resolve_numeric_or_na()` with floating-point tolerance
 * Removed xlogp from the structure metadata (`str_met`) table: xlogp is stereo-sensitive (Crippen atom-typing can differ between stereoisomers), so it is no longer collapsed by `inchikey_no_stereo`; the per-SMILES value computed by `process_smiles()` in the annotation pipeline is used instead
 

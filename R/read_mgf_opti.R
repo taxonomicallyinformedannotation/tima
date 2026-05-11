@@ -54,12 +54,17 @@
 
 #' Format MGF charge string into an integer compatible format.
 #'
+#' Handles both the trailing-sign convention used by Mascot (`"1+"`, `"1-"`)
+#' and the leading-sign convention used by some tools (`"-1"`, `"1"`).
+#'
 #' @param x [character] `character`
 #' @return `character`, charge without +/- at the end but - as prefix if needed
 #' @noRd
 .format_charge <- function(x) {
-  res <- sub("[+-]", "", x, perl = TRUE)
-  negs <- which(endsWith(x, "-"))
+  # Detect negative before stripping: trailing "-" OR leading "-"
+  negs <- which(endsWith(x, "-") | startsWith(x, "-"))
+  # Strip any leading or trailing +/-
+  res <- gsub("(^[+-])|([+-]$)", "", x, perl = TRUE)
   if (length(negs)) {
     res[negs] <- paste0("-", res[negs])
   }

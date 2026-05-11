@@ -89,6 +89,18 @@ test_that("read_mgf_opti prefixes negative charge with minus", {
   }
 })
 
+test_that("read_mgf_opti handles leading-minus charge convention", {
+  skip_if_mgf_unavailable()
+
+  tf <- write_mgf(minimal_block(charge = "-1"))
+  on.exit(unlink(tf))
+
+  res <- read_mgf_opti(f = tf)
+  if ("CHARGE" %in% colnames(res)) {
+    expect_equal(as.character(res$CHARGE[[1L]]), "-1")
+  }
+})
+
 # ---- PEPMASS without intensity -----------------------------------------------
 
 test_that("read_mgf_opti handles PEPMASS without intensity column", {
