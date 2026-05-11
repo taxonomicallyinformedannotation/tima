@@ -46,12 +46,12 @@ The benchmarking dataset was built using <https://zenodo.org/record/11566051>.
 It contained positive and negative MS^2^ spectra of multiple ion species ([M+H]^+^, [M+Na]^+^, [M+H~4~N]^+^, ...) coming from different mass spectrometers.
 
 In positive mode,
-It was filtered to 27,468 spectra, representing 17,822 structures without stereo.
-Of those, only 15,005 spectra (54.0%) corresponded to structures present in the libraries we used to annotate (except GNPS itself).
+It was filtered to 27,468 spectra, representing 17,897 structures without stereo.
+Of those, only around half corresponded to structures present in the libraries we used to annotate (except GNPS itself).
 
 In negative mode,
-It was filtered to 12,060 spectra, representing 9,112 structures without stereo.
-Of those, only 6,282 spectra (52.1%) corresponded to structures present in the libraries we used to annotate  (except GNPS itself).
+It was filtered to 11,760 spectra, representing 8,883 structures without stereo.
+Of those, only around half corresponded to structures present in the libraries we used to annotate  (except GNPS itself).
 
 ## Evaluation notes
 
@@ -90,38 +90,3 @@ Of those, only 6,282 spectra (52.1%) corresponded to structures present in the l
 ### Negative
 
 ![Benchmark comparison (negative mode)](./benchmark_comparison_neg.svg)\
-
-## MCC snapshot from targets outputs
-
-Top-k rows in the metrics snapshot are now interpreted at the candidate-row
-level: `tp/tn/fp/fn` are computed from whether each candidate is inside the
-top-*k* window and whether it is the correct answer.
-
-```{r}
-read_metrics <- function(path) {
-  if (!file.exists(path)) {
-    return(NULL)
-  }
-  utils::read.delim(path, sep = "\t", stringsAsFactors = FALSE)
-}
-
-metrics_pos <- read_metrics("~/.tima/data/interim/benchmark/benchmark_metrics_pos.tsv.gz")
-metrics_neg <- read_metrics("~/.tima/data/interim/benchmark/benchmark_metrics_neg.tsv.gz")
-
-print_mcc <- function(df, mode_label) {
-  if (is.null(df) || nrow(df) == 0L) {
-    cat(sprintf("%s: metrics file not available in this build context.\n", mode_label))
-    return(invisible(NULL))
-  }
-
-  cat(sprintf("\n%s: top-k MCC\n", mode_label))
-  print(subset(df, metric_family == "top_k", select = c(prediction, k, mcc, hit_rate_all, hit_rate_truth)))
-
-  cat(sprintf("\n%s: score-threshold MCC\n", mode_label))
-  print(subset(df, metric_family == "score_threshold", select = c(prediction, threshold, mcc, tp, tn, fp, fn)))
-}
-
-print_mcc(metrics_pos, "Positive mode")
-print_mcc(metrics_neg, "Negative mode")
-```
-
