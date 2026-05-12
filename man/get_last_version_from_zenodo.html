@@ -668,7 +668,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">get_last_version_from_zenodo(doi, pattern, path)
+<pre><code class="language-R">get_last_version_from_zenodo(doi, pattern, path, timeout_s = 90)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -696,6 +696,14 @@ Character. Pattern to identify the specific file to download
 </td>
 <td>
 Character. Local path where the file should be saved
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="timeout_s">timeout_s</code>
+</td>
+<td>
+Numeric. Metadata request timeout in seconds (default: 90)
 </td>
 </tr>
 </tbody></table>
