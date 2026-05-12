@@ -4,7 +4,7 @@
 \alias{validate_zenodo_inputs}
 \title{Validate Zenodo Function Inputs}
 \usage{
-validate_zenodo_inputs(doi, pattern, path)
+validate_zenodo_inputs(doi, pattern, path, timeout_s)
 }
 \arguments{
 \item{doi}{Character DOI string}
@@ -12,6 +12,8 @@ validate_zenodo_inputs(doi, pattern, path)
 \item{pattern}{Character pattern string}
 
 \item{path}{Character path string}
+
+\item{timeout_s}{Numeric timeout in seconds for Zenodo metadata requests}
 }
 \value{
 NULL (stops on validation error)

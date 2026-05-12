@@ -4,12 +4,14 @@
 \alias{fetch_zenodo_record}
 \title{Fetch Zenodo Record Metadata}
 \usage{
-fetch_zenodo_record(record, doi)
+fetch_zenodo_record(record, doi, timeout_s)
 }
 \arguments{
 \item{record}{Character record ID}
 
 \item{doi}{Character DOI (for error messages)}
+
+\item{timeout_s}{Numeric timeout in seconds for Zenodo metadata requests}
 }
 \value{
 httr2 response object
