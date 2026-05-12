@@ -98,6 +98,20 @@ ms:
       - "[2M+Na]+"
       - "[2M+K]+"
 
+    #' Adduct consistency related parameters.
+    consistency:
+      #' Consistency strategy for adduct attribution.
+      #' Choices: off, conditional, strict. STRING
+      type: conditional
+
+      #' In conditional mode, minimum local graph degree at which consistency
+      #' checks are activated. INTEGER
+      min_degree: 3
+
+      #' Minimal number of independent neighbors supporting an adduct assignment.
+      #' INTEGER
+      min_support: 2
+
   #' List of clusters to be used.
   clusters:
     #' List of clusters to be used in negative. STRING
@@ -220,6 +234,7 @@ ms:
     rt:
       #' Retention time tolerance for adducts in minutes. FLOAT
       adducts: 0.02
+
 
 #' Names of the different variables in the input files.
 names:

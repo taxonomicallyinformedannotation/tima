@@ -641,3 +641,211 @@ test_that("join_multi_with_addlossed preserves observed matched mass", {
   expect_equal(out$feature_id[[1L]], "F1")
   expect_equal(out$mass[[1L]], 105.4321, tolerance = 1e-8)
 })
+
+test_that("build_adduct_pair_differences preserves multiple adduct mappings for same delta", {
+  add_clu_table <- tidytable::tidytable(
+    adduct = c("A", "B", "C"),
+    adduct_mass = c(0, 10, 20)
+  )
+
+  out <- build_adduct_pair_differences(
+    add_clu_table = add_clu_table,
+    tolerance_ppm = 1,
+    max_mz = 1000
+  )
+
+  delta_10 <- out |>
+    tidytable::filter(abs(Distance - 10) < 1e-10)
+
+  expect_equal(nrow(delta_10), 2L)
+  expect_true(any(delta_10$Group1 == "A" & delta_10$Group2 == "B"))
+  expect_true(any(delta_10$Group1 == "B" & delta_10$Group2 == "C"))
+})
+
+test_that("apply_adduct_consistency_filter keeps sparse single-hypothesis edges in conditional mode", {
+  df_add <- tidytable::tidytable(
+    feature_id = c("F1"),
+    adduct = c("[M+H]+"),
+    adduct_dest = c("[M+Na]+"),
+    feature_id_dest = c("F2")
+  )
+
+  out <- apply_adduct_consistency_filter(
+    df_add = df_add,
+    adduct_consistency = "conditional",
+    adduct_min_support = 2L,
+    adduct_consistency_min_degree = 3L
+  )
+
+  expect_equal(nrow(out), 1L)
+})
+
+test_that("apply_adduct_consistency_filter prunes ambiguous unsupported edges", {
+  df_add <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F1", "F2", "F3", "F2"),
+    adduct = c("A", "X", "A", "A", "A", "A"),
+    adduct_dest = c("B", "Y", "B", "B", "B", "B"),
+    feature_id_dest = c("F2", "F2", "F3", "F4", "F4", "F4")
+  )
+
+  out <- apply_adduct_consistency_filter(
+    df_add = df_add,
+    adduct_consistency = "conditional",
+    adduct_min_support = 2L,
+    adduct_consistency_min_degree = 3L
+  )
+
+  expect_true(any(out$feature_id == "F1" & out$adduct == "A"))
+  expect_false(any(out$feature_id == "F1" & out$adduct == "X"))
+})
+
+test_that("enforce_graph_adduct_consistency removes impossible combinations", {
+  df_add <- tidytable::tidytable(
+    feature_id = c("1879", "1884", "1911", "1879"),
+    adduct = c("[M]+", "[M+H]+", "[M+H2O+Na]+", "[M-H2+Fe+H2O]+"),
+    adduct_dest = c(
+      "[M+Na+NaCl]+",
+      "[M+H2O+Na]+",
+      "[M+H2O+K]+",
+      "[M+K+NaCl]+"
+    ),
+    feature_id_dest = c("1889", "1911", "1889", "1884")
+  )
+
+  out <- enforce_graph_adduct_consistency(df_add)
+
+  expect_lte(nrow(out), 2L)
+
+  node_states <- tidytable::bind_rows(
+    out |>
+      tidytable::transmute(feature_id, adduct),
+    out |>
+      tidytable::transmute(feature_id = feature_id_dest, adduct = adduct_dest)
+  ) |>
+    tidytable::distinct() |>
+    tidytable::count(feature_id, name = "n_states")
+
+  expect_true(all(node_states$n_states <= 1L))
+})
+
+test_that("enforce_graph_adduct_consistency keeps exotic edge when it is consistent", {
+  df_add <- tidytable::tidytable(
+    feature_id = c("A"),
+    adduct = c("[M-H2+Fe+H2O]+"),
+    adduct_dest = c("[M+K+NaCl]+"),
+    feature_id_dest = c("B")
+  )
+
+  out <- enforce_graph_adduct_consistency(df_add)
+
+  expect_equal(nrow(out), 1L)
+  expect_equal(out$adduct[[1L]], "[M-H2+Fe+H2O]+")
+  expect_equal(out$adduct_dest[[1L]], "[M+K+NaCl]+")
+})
+
+test_that("enforce_graph_adduct_consistency removes impossible combinations in larger graphs", {
+  # 5-node cycle where each node also gets a conflicting alternative state.
+  df_add <- tidytable::tidytable(
+    feature_id = c(
+      "A",
+      "B",
+      "C",
+      "D",
+      "E", # coherent cycle
+      "A",
+      "B",
+      "C",
+      "D",
+      "E" # conflicting alternatives
+    ),
+    adduct = c(
+      "[M]+",
+      "[M+H]+",
+      "[M+Na]+",
+      "[M+K]+",
+      "[M+H4N]+",
+      "[M+Cu]+",
+      "[M+H+H2O]+",
+      "[M+Na+NaCl]+",
+      "[M-H2+Fe+H2O]+",
+      "[M+H2O+K]+"
+    ),
+    adduct_dest = c(
+      "[M+H]+",
+      "[M+Na]+",
+      "[M+K]+",
+      "[M+H4N]+",
+      "[M]+",
+      "[M+Na]+",
+      "[M+K]+",
+      "[M+H4N]+",
+      "[M]+",
+      "[M+H]+"
+    ),
+    feature_id_dest = c(
+      "B",
+      "C",
+      "D",
+      "E",
+      "A",
+      "C",
+      "D",
+      "E",
+      "A",
+      "B"
+    )
+  )
+
+  out <- enforce_graph_adduct_consistency(df_add)
+
+  node_states <- tidytable::bind_rows(
+    out |>
+      tidytable::transmute(feature_id, adduct),
+    out |>
+      tidytable::transmute(feature_id = feature_id_dest, adduct = adduct_dest)
+  ) |>
+    tidytable::distinct() |>
+    tidytable::count(feature_id, name = "n_states")
+
+  # Strong invariant: no feature can keep more than one adduct state.
+  expect_true(all(node_states$n_states <= 1L))
+})
+
+test_that("enforce_graph_adduct_consistency exposes audit metadata", {
+  df_add <- tidytable::tidytable(
+    feature_id = c("X", "X"),
+    adduct = c("[M]+", "[M+Cu]+"),
+    adduct_dest = c("[M+H]+", "[M+H]+"),
+    feature_id_dest = c("Y", "Y")
+  )
+
+  out <- enforce_graph_adduct_consistency(df_add)
+  audit <- attr(out, "consistency_audit")
+
+  expect_true(is.list(audit))
+  expect_true(all(c("n_input", "n_kept", "n_dropped") %in% names(audit)))
+  expect_equal(audit$n_input, 2L)
+  expect_equal(audit$n_kept + audit$n_dropped, audit$n_input)
+})
+
+test_that("enforce_graph_adduct_consistency does not split equivalent H2O text forms", {
+  df_add <- tidytable::tidytable(
+    feature_id = c("A", "B"),
+    adduct = c("[M+H2O+H]+", "[M+H+H2O]+"),
+    adduct_dest = c("[M+H+H2O]+", "[M+H2O+Na]+"),
+    feature_id_dest = c("B", "C")
+  )
+
+  out <- enforce_graph_adduct_consistency(df_add)
+
+  expect_equal(nrow(out), 2L)
+})
+
+test_that("build_adduct_state_key_map canonicalizes summed loss/cluster text order", {
+  mapped <- build_adduct_state_key_map(c(
+    "[M-C3H6O3+H2O+H4N]+",
+    "[M+H4N+H2O-C3H6O3]+"
+  ))
+
+  expect_equal(length(unique(mapped$state_key)), 1L)
+})

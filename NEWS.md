@@ -29,6 +29,7 @@
 * Added mzmine annotation support
 * Added Sirius spectral results support
 * Added special "Biota" superdomain handling for shared core metabolism
+* `annotate_masses()` now enforces graph-level adduct consistency across connected edge hypotheses (removing globally impossible combinations while preserving consistent exotic states) and canonicalizes adduct states by parsed/net summed modifications so reordered loss/cluster text forms are treated as equivalent
 * Enhanced `sanitize_spectra()` with adaptive noise filtering:
     - Dynamic intensity thresholds (MAD-based, now default when `cutoff = NULL`)
     - Low noise removal targets repetitive instrumental artifacts

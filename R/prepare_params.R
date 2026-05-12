@@ -165,6 +165,9 @@ prepare_params <- function(
   # Extract MS parameters
   ms_add_neg <- params_advanced$ms$adducts$neg
   ms_add_pos <- params_advanced$ms$adducts$pos
+  ms_add_con_type <- params_advanced$ms$adducts$consistency$type
+  ms_add_con_min_degree <- params_advanced$ms$adducts$consistency$min_degree
+  ms_add_con_min_support <- params_advanced$ms$adducts$consistency$min_support
   ms_clu_neg <- params_advanced$ms$clusters$neg
   ms_clu_pos <- params_advanced$ms$clusters$pos
   ms_neu <- params_advanced$ms$neutral_losses
@@ -307,6 +310,12 @@ prepare_params <- function(
     ms_add_neg
   yamls_params$annotate_masses$ms$adducts$pos <-
     ms_add_pos
+  yamls_params$annotate_masses$ms$adducts$consistency$type <-
+    ms_add_con_type
+  yamls_params$annotate_masses$ms$adducts$consistency$min_degree <-
+    ms_add_con_min_degree
+  yamls_params$annotate_masses$ms$adducts$consistency$min_support <-
+    ms_add_con_min_support
   yamls_params$annotate_masses$ms$clusters$neg <-
     ms_clu_neg
   yamls_params$annotate_masses$ms$clusters$pos <-

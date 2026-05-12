@@ -216,6 +216,18 @@ parse_cli_params <- function(arguments, parameters) {
     gnps_workflow = list(path = c("gnps", "workflow"), type = as.character),
     ms_add_neg = list(path = c("ms", "adducts", "neg"), type = as.character),
     ms_add_pos = list(path = c("ms", "adducts", "pos"), type = as.character),
+    ms_add_con_type = list(
+      path = c("ms", "adducts", "consistency", "type"),
+      type = as.character
+    ),
+    ms_add_con_min_degree = list(
+      path = c("ms", "adducts", "consistency", "min_degree"),
+      type = as.integer
+    ),
+    ms_add_con_min_support = list(
+      path = c("ms", "adducts", "consistency", "min_support"),
+      type = as.integer
+    ),
     ms_clu_neg = list(path = c("ms", "clusters", "neg"), type = as.character),
     ms_clu_pos = list(path = c("ms", "clusters", "pos"), type = as.character),
     ms_neu = list(path = c("ms", "neutral_losses"), type = as.character),

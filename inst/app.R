@@ -657,6 +657,43 @@ ui <- shiny::fluidPage(
                 )
               )
             ),
+          shiny::selectInput(
+            inputId = "ms_add_con_type",
+            label = "Adduct consistency strategy",
+            choices = c("off", "conditional", "strict"),
+            selected = "conditional"
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = c(
+                "Controls if/when consistency checks are applied to adduct hypotheses.",
+                "`conditional` applies checks in ambiguous/high-degree regions only."
+              )
+            ),
+          shiny::numericInput(
+            inputId = "ms_add_con_min_degree",
+            label = "Adduct consistency min degree (conditional mode)",
+            min = 1,
+            max = 20,
+            value = 3,
+            step = 1
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = "Minimum local degree at which support checks are activated in conditional mode."
+            ),
+          shiny::numericInput(
+            inputId = "ms_add_con_min_support",
+            label = "Adduct consistency min support",
+            min = 1,
+            max = 20,
+            value = 2,
+            step = 1
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = "Minimum number of independent neighbors supporting an adduct assignment."
+            ),
           shiny::checkboxGroupInput(
             inputId = "ms_clu_pos",
             label = "List of clusters to be used in positive",
@@ -2171,6 +2208,12 @@ ui <- shiny::fluidPage(
     shiny::isolate(input$ms_add_neg)
   yaml_advanced$ms$adducts$pos <-
     shiny::isolate(input$ms_add_pos)
+  yaml_advanced$ms$adducts$consistency$type <-
+    shiny::isolate(input$ms_add_con_type)
+  yaml_advanced$ms$adducts$consistency$min_degree <-
+    shiny::isolate(input$ms_add_con_min_degree)
+  yaml_advanced$ms$adducts$consistency$min_support <-
+    shiny::isolate(input$ms_add_con_min_support)
   yaml_advanced$ms$clusters$neg <-
     shiny::isolate(input$ms_clu_neg)
   yaml_advanced$ms$clusters$pos <-

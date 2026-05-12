@@ -61,3 +61,21 @@ test_that("parse_cli_params maps SIRIUS analog mz-error CLI argument", {
     0.005
   )
 })
+
+test_that("parse_cli_params maps adduct consistency CLI arguments", {
+  local_test_project(copy = TRUE)
+  params <- get_params(step = "prepare_params_advanced")
+
+  result <- parse_cli_params(
+    arguments = list(
+      ms_add_con_type = "strict",
+      ms_add_con_min_degree = 5L,
+      ms_add_con_min_support = 3L
+    ),
+    parameters = params
+  )
+
+  expect_equal(result$ms$adducts$consistency$type, "strict")
+  expect_equal(result$ms$adducts$consistency$min_degree, 5L)
+  expect_equal(result$ms$adducts$consistency$min_support, 3L)
+})

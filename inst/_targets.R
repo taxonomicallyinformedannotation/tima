@@ -921,7 +921,10 @@ list(
             neutral_losses_list = par_ann_mas$ms$neutral_losses,
             ms_mode = par_ann_mas$ms$polarity,
             tolerance_ppm = par_ann_mas$ms$tolerances$mass$ppm$ms1,
-            tolerance_rt = par_ann_mas$ms$tolerances$rt$adducts
+            tolerance_rt = par_ann_mas$ms$tolerances$rt$adducts,
+            adduct_consistency = par_ann_mas$ms$adducts$consistency$type,
+            adduct_min_support = par_ann_mas$ms$adducts$consistency$min_support,
+            adduct_consistency_min_degree = par_ann_mas$ms$adducts$consistency$min_degree
           )
         },
         format = "file"
@@ -966,6 +969,21 @@ list(
           prepare_annotations_mzmine(
             input = par_pre_ann_mzm$files$annotations$raw$spectral$mzmine,
             output = par_pre_ann_mzm$files$annotations$prepared$structural$mzmine,
+            str_stereo = lib_mer_str_stereo,
+            str_met = lib_mer_str_met,
+            str_tax_cla = lib_mer_str_tax_cla,
+            str_tax_npc = lib_mer_str_tax_npc
+          )
+        },
+        format = "file"
+      ),
+      ## mztab
+      tar_target(
+        name = ann_spe_exp_mzt_pre,
+        command = {
+          prepare_annotations_mztab(
+            input = par_pre_ann_mzt$files$mztab$raw,
+            output = par_pre_ann_mzt$files$annotations$prepared$structural$mztab,
             str_stereo = lib_mer_str_stereo,
             str_met = lib_mer_str_met,
             str_tax_cla = lib_mer_str_tax_cla,
@@ -1174,7 +1192,7 @@ list(
         name_filename = par_pre_tax$names$filename,
         extension = par_pre_tax$names$extension,
         colname = par_pre_tax$names$taxon,
-        metadata = par_pre_tax$files$metadata$raw,
+        metadata = input_metadata,
         org_tax_ott = lib_mer_org_tax_ott,
         output = par_pre_tax$files$metadata$prepared,
         taxon = par_pre_tax$organisms$taxon
@@ -1189,6 +1207,7 @@ list(
         annotations = c(
           "gnps" = ann_spe_exp_gnp_pre,
           "mzmine" = ann_spe_exp_mzm_pre,
+          "mztab" = ann_spe_exp_mzt_pre,
           "spectral" = ann_spe_pre,
           "sirius" = ann_sir_pre_str,
           "ms1" = ann_ms1_pre_ann
@@ -1259,26 +1278,102 @@ list(
     },
     format = "file"
   ),
+  tar_target(
+    name = exp_mzt,
+    command = {
+      .null_or <- function(x, default) {
+        if (is.null(x) || (length(x) == 1L && is.na(x))) default else x
+      }
+
+      # Resolve optional xrefs file: use pipeline-computed xrefs when the
+      # parameter is missing/null, falling back to the lib_xrefs target.
+      mzt_xrefs <- tryCatch(par_exp_mzt$files$xrefs, error = function(e) NULL)
+      if (is.null(mzt_xrefs) || !nzchar(.null_or(mzt_xrefs, ""))) {
+        mzt_xrefs <- lib_xrefs
+      }
+
+      # Build optional contact list (omit if all fields are blank).
+      mzt_contact <- tryCatch(par_exp_mzt$contact, error = function(e) NULL)
+      if (
+        !is.null(mzt_contact) &&
+          all(vapply(
+            mzt_contact,
+            function(x) !nzchar(.null_or(x, "")),
+            logical(1L)
+          ))
+      ) {
+        mzt_contact <- NULL
+      }
+
+      # Resolve base mzTab for merge mode: prefer the parameter-supplied file
+      # when it is non-null and exists on disk.
+      base_mzt <- if (!is.null(par_exp_mzt$files$mztab$raw)) {
+        raw_path <- par_exp_mzt$files$mztab$raw
+        if (
+          is.character(raw_path) &&
+            nzchar(raw_path) &&
+            raw_path != "null" &&
+            file.exists(raw_path)
+        ) {
+          raw_path
+        } else {
+          NULL
+        }
+      } else {
+        NULL
+      }
+
+      write_mztab(
+        input = ann_wei,
+        output = par_exp_mzt$files$output$mztab,
+        ms_run_location = .null_or(
+          tryCatch(par_exp_mzt$ms$run_location, error = function(e) NULL),
+          "null"
+        ),
+        ms_run_format = .null_or(
+          tryCatch(par_exp_mzt$ms$run_format, error = function(e) NULL),
+          "null"
+        ),
+        ms_run_id_format = .null_or(
+          tryCatch(par_exp_mzt$ms$run_id_format, error = function(e) NULL),
+          "null"
+        ),
+        polarity = tryCatch(
+          par_exp_mzt$ms$polarity,
+          error = function(e) NULL
+        ),
+        instrument = .null_or(
+          tryCatch(par_exp_mzt$ms$instrument, error = function(e) NULL),
+          NULL
+        ),
+        title = .null_or(
+          tryCatch(par_exp_mzt$study$title, error = function(e) NULL),
+          "TIMA annotation results"
+        ),
+        description = .null_or(
+          tryCatch(par_exp_mzt$study$description, error = function(e) NULL),
+          paste0(
+            "Annotation results produced by Taxonomically Informed ",
+            "Metabolomics Annotation (TIMA)."
+          )
+        ),
+        sample_name = .null_or(
+          tryCatch(par_exp_mzt$study$sample_name, error = function(e) NULL),
+          NULL
+        ),
+        publication = .null_or(
+          tryCatch(par_exp_mzt$study$publication, error = function(e) NULL),
+          NULL
+        ),
+        contact = mzt_contact,
+        xrefs_file = mzt_xrefs,
+        base_mztab = base_mzt
+      )
+    },
+    format = "file"
+  ),
   list(
     ## Benchmark
-    tar_target(
-      name = benchmark_path_url,
-      command = {
-        paths$urls$benchmarking$set
-      }
-    ),
-    tar_target(
-      name = benchmark_path_zip,
-      command = {
-        paths$data$source$benchmark$zip
-      }
-    ),
-    tar_target(
-      name = benchmark_path_file,
-      command = {
-        paths$data$source$benchmark$cleaned
-      }
-    ),
     tar_target(
       name = benchmark_path_mgf_neg,
       command = {
@@ -1583,7 +1678,7 @@ list(
       name = benchmark_taxed_pos,
       command = {
         benchmark_pre_meta_pos |>
-          benchmark_taxize_spectra(
+          tima:::benchmark_taxize_spectra(
             keys = lib_mer_key,
             org_tax_ott = lib_mer_org_tax_ott,
             output = "data/interim/benchmark/benchmark_taxed_pos.tsv.gz"
@@ -1595,7 +1690,7 @@ list(
       name = benchmark_taxed_neg,
       command = {
         benchmark_pre_meta_neg |>
-          benchmark_taxize_spectra(
+          tima:::benchmark_taxize_spectra(
             keys = lib_mer_key,
             org_tax_ott = lib_mer_org_tax_ott,
             output = "data/interim/benchmark/benchmark_taxed_neg.tsv.gz"
@@ -1632,7 +1727,10 @@ list(
           neutral_losses_list = par_ann_mas$ms$neutral_losses,
           ms_mode = "pos",
           tolerance_ppm = benchmark_def_ann_mas$ms$tolerances$mass$ppm$ms1,
-          tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$adducts
+          tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$adducts,
+          adduct_consistency = benchmark_def_ann_mas$ms$adducts$consistency$type,
+          adduct_min_support = benchmark_def_ann_mas$ms$adducts$consistency$min_support,
+          adduct_consistency_min_degree = benchmark_def_ann_mas$ms$adducts$consistency$min_degree
         )
       },
       format = "file"
@@ -1656,7 +1754,10 @@ list(
           neutral_losses_list = par_ann_mas$ms$neutral_losses,
           ms_mode = "neg",
           tolerance_ppm = benchmark_def_ann_mas$ms$tolerances$mass$ppm$ms1,
-          tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$adducts
+          tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$adducts,
+          adduct_consistency = benchmark_def_ann_mas$ms$adducts$consistency$type,
+          adduct_min_support = benchmark_def_ann_mas$ms$adducts$consistency$min_support,
+          adduct_consistency_min_degree = benchmark_def_ann_mas$ms$adducts$consistency$min_degree
         )
       },
       format = "file"
