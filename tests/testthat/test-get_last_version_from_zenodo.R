@@ -122,6 +122,11 @@ test_that("test-get_last_version_from_zenodo requires all parameters", {
 test_that("test-get_last_version_from_zenodo handles invalid DOI gracefully", {
   skip_on_cran()
   skip_if_offline()
+  withr::local_options(list(
+    tima.zenodo.max_attempts = 1L,
+    tima.zenodo.req_retry_max_tries = 1L,
+    tima.zenodo.backoff_cap_s = 0
+  ))
 
   output <- tempfile(fileext = ".txt")
 
@@ -129,7 +134,8 @@ test_that("test-get_last_version_from_zenodo handles invalid DOI gracefully", {
     get_last_version_from_zenodo(
       doi = "10.5281/zenodo.999999999",
       pattern = "*.txt",
-      path = output
+      path = output,
+      timeout_s = 1
     ),
     "failed to retrieve Zenodo record|Zenodo record not found",
     class = "tima_error"
@@ -187,6 +193,12 @@ test_that("get_last_version_from_zenodo validates all inputs", {
 })
 
 test_that("get_last_version_from_zenodo validates DOI format", {
+  withr::local_options(list(
+    tima.zenodo.max_attempts = 1L,
+    tima.zenodo.req_retry_max_tries = 1L,
+    tima.zenodo.backoff_cap_s = 0
+  ))
+
   expect_error(
     get_last_version_from_zenodo(
       doi = "invalid-doi",
@@ -201,7 +213,8 @@ test_that("get_last_version_from_zenodo validates DOI format", {
     get_last_version_from_zenodo(
       doi = "10.1234/zenodo.123",
       pattern = "data.csv",
-      path = "output/data.csv"
+      path = "output/data.csv",
+      timeout_s = 1
     ),
     "invalid Zenodo DOI format|failed to retrieve Zenodo record|Zenodo record not found",
     class = "tima_error"
@@ -272,18 +285,34 @@ test_that("get_last_version_from_zenodo rejects invalid types", {
     ),
     "path must be a single non-empty character string"
   )
+
+  expect_error(
+    get_last_version_from_zenodo(
+      doi = "10.5281/zenodo.1234567",
+      pattern = "data.csv",
+      path = "output/data.csv",
+      timeout_s = 0
+    ),
+    "timeout_s must be a single positive numeric value"
+  )
 })
 
 test_that("get_last_version_from_zenodo handles network errors gracefully", {
   skip_if_offline()
   skip_on_cran()
+  withr::local_options(list(
+    tima.zenodo.max_attempts = 1L,
+    tima.zenodo.req_retry_max_tries = 1L,
+    tima.zenodo.backoff_cap_s = 0
+  ))
 
   # Use invalid record that doesn't exist
   expect_error(
     get_last_version_from_zenodo(
       doi = "10.5281/zenodo.9999999999",
       pattern = "test",
-      path = temp_test_path("test.txt")
+      path = temp_test_path("test.txt"),
+      timeout_s = 1
     ),
     "Zenodo record not found|Failed to retrieve"
   )
@@ -352,10 +381,12 @@ test_that("get_last_version_from_zenodo maintains backward compatibility", {
   # Ensure function signature hasn't changed
   params <- names(formals(get_last_version_from_zenodo))
 
-  expect_equal(length(params), 3)
+  expect_equal(length(params), 4)
   expect_true("doi" %in% params)
   expect_true("pattern" %in% params)
   expect_true("path" %in% params)
+  expect_true("timeout_s" %in% params)
+  expect_equal(formals(get_last_version_from_zenodo)$timeout_s, 90)
 })
 
 test_that("get_last_version_from_zenodo returns path invisibly", {
@@ -451,14 +482,14 @@ test_that("get_last_version_from_zenodo success", {
   withr::local_dir(new = tmp)
   expect_no_error(
     get_last_version_from_zenodo(
-      doi = "10.5281/zenodo.7534071",
+      doi = "10.5281/zenodo.5794106",
       pattern = "frozen.csv.gz",
       path = file.path(tmp, "frozen.csv.gz")
     )
   )
   expect_no_error(
     get_last_version_from_zenodo(
-      doi = "10.5281/zenodo.7534071",
+      doi = "10.5281/zenodo.5794106",
       pattern = "frozen.csv.gz",
       path = file.path(tmp, "frozen.csv.gz")
     )

@@ -4,7 +4,7 @@
 \alias{get_last_version_from_zenodo}
 \title{Get Latest Version from Zenodo}
 \usage{
-get_last_version_from_zenodo(doi, pattern, path)
+get_last_version_from_zenodo(doi, pattern, path, timeout_s = 90)
 }
 \arguments{
 \item{doi}{Character. Zenodo DOI (e.g., "10.5281/zenodo.5794106")}
@@ -12,6 +12,8 @@ get_last_version_from_zenodo(doi, pattern, path)
 \item{pattern}{Character. Pattern to identify the specific file to download}
 
 \item{path}{Character. Local path where the file should be saved}
+
+\item{timeout_s}{Numeric. Metadata request timeout in seconds (default: 90)}
 }
 \value{
 Character path to the downloaded (or existing) file

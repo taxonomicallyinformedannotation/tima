@@ -6,10 +6,11 @@
 #' @param doi Character DOI string
 #' @param pattern Character pattern string
 #' @param path Character path string
+#' @param timeout_s Numeric timeout in seconds for Zenodo metadata requests
 #'
 #' @return NULL (stops on validation error)
 #' @keywords internal
-validate_zenodo_inputs <- function(doi, pattern, path) {
+validate_zenodo_inputs <- function(doi, pattern, path, timeout_s) {
   if (
     missing(doi) || !is.character(doi) || length(doi) != 1L || nchar(doi) == 0L
   ) {
@@ -59,6 +60,20 @@ validate_zenodo_inputs <- function(doi, pattern, path) {
     )
   }
 
+  if (
+    missing(timeout_s) ||
+      !is.numeric(timeout_s) ||
+      length(timeout_s) != 1L ||
+      is.na(timeout_s) ||
+      timeout_s <= 0
+  ) {
+    cli::cli_abort(
+      "timeout_s must be a single positive numeric value",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+
   invisible(NULL)
 }
 
@@ -85,24 +100,39 @@ extract_zenodo_record_id <- function(doi) {
 #'
 #' @param record Character record ID
 #' @param doi Character DOI (for error messages)
+#' @param timeout_s Numeric timeout in seconds for Zenodo metadata requests
 #'
 #' @return httr2 response object
 #' @keywords internal
-fetch_zenodo_record <- function(record, doi) {
-  base_url <- "https://zenodo.org/records/"
-  url <- paste0(base_url, record, "/latest")
+fetch_zenodo_record <- function(record, doi, timeout_s) {
+  base_url <- "https://zenodo.org/api/records/"
+  url <- paste0(base_url, record, "/versions/latest")
 
   log_debug("Fetching metadata from: %s", url)
 
-  max_attempts <- 5L
+  max_attempts <- as.integer(getOption("tima.zenodo.max_attempts", 5L))
+  if (is.na(max_attempts) || max_attempts < 1L) {
+    max_attempts <- 1L
+  }
+  req_retry_max_tries <- as.integer(getOption(
+    "tima.zenodo.req_retry_max_tries",
+    2L
+  ))
+  if (is.na(req_retry_max_tries) || req_retry_max_tries < 1L) {
+    req_retry_max_tries <- 1L
+  }
+  backoff_cap_s <- as.numeric(getOption("tima.zenodo.backoff_cap_s", 8))
+  if (is.na(backoff_cap_s) || backoff_cap_s < 0) {
+    backoff_cap_s <- 0
+  }
   last_error <- NULL
 
   fetch_attempt <- function(attempt) {
     response <- tryCatch(
       {
         httr2::request(base_url = url) |>
-          httr2::req_timeout(seconds = 90) |>
-          httr2::req_retry(max_tries = 2L) |>
+          httr2::req_timeout(seconds = timeout_s) |>
+          httr2::req_retry(max_tries = req_retry_max_tries) |>
           httr2::req_perform()
       },
       httr2_http_404 = function(e) {
@@ -131,7 +161,7 @@ fetch_zenodo_record <- function(record, doi) {
     }
 
     if (attempt < max_attempts) {
-      Sys.sleep(min(2^(attempt - 1L), 8L))
+      Sys.sleep(min(2^(attempt - 1L), backoff_cap_s))
       log_debug(
         "Retrying Zenodo metadata fetch (attempt %d/%d)",
         attempt + 1L,
@@ -143,6 +173,7 @@ fetch_zenodo_record <- function(record, doi) {
     cli::cli_abort(
       c(
         "failed to retrieve Zenodo record",
+        "i" = "Failed to retrieve Zenodo record after retries",
         "x" = conditionMessage(last_error)
       ),
       class = c("tima_runtime_error", "tima_error"),
@@ -287,6 +318,7 @@ is_download_needed <- function(path, zenodo_size) {
 #' @param doi Character. Zenodo DOI (e.g., "10.5281/zenodo.5794106")
 #' @param pattern Character. Pattern to identify the specific file to download
 #' @param path Character. Local path where the file should be saved
+#' @param timeout_s Numeric. Metadata request timeout in seconds (default: 90)
 #'
 #' @return Character path to the downloaded (or existing) file
 #'
@@ -310,9 +342,14 @@ is_download_needed <- function(path, zenodo_size) {
 #'   path = "data/source/libraries/sop/lotus.csv.gz"
 #' )
 #' }
-get_last_version_from_zenodo <- function(doi, pattern, path) {
+get_last_version_from_zenodo <- function(doi, pattern, path, timeout_s = 90) {
   # Input Validation ----
-  validate_zenodo_inputs(doi = doi, pattern = pattern, path = path)
+  validate_zenodo_inputs(
+    doi = doi,
+    pattern = pattern,
+    path = path,
+    timeout_s = timeout_s
+  )
 
   log_info("Retrieving latest version from Zenodo: %s", doi)
 
@@ -321,23 +358,89 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
   log_debug("Record ID: %s", record)
 
   # Fetch Record Metadata ----
-  record_response <- fetch_zenodo_record(record = record, doi = doi)
-
-  # Construct API URL ----
-  base_url_api <- "https://zenodo.org/api/records/"
-  record_id <- gsub(
-    pattern = ".*/",
-    replacement = "",
-    x = record_response$url,
-    perl = TRUE
+  record_response <- fetch_zenodo_record(
+    record = record,
+    doi = doi,
+    timeout_s = timeout_s
   )
-  api_url <- paste0(base_url_api, record_id)
 
   # Parse API Response ----
-  content <- parse_zenodo_content(api_url)
+  content <- tryCatch(
+    httr2::resp_body_json(record_response),
+    error = function(e) {
+      cli::cli_abort(
+        c(
+          "failed to parse Zenodo API response",
+          "x" = conditionMessage(e),
+          "i" = "the API format may have changed"
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
+    }
+  )
 
   # Find Matching File ----
-  filenames <- content$files$key
+  files <- content$files
+  resolved_record <- if (!is.null(content$recid) && nzchar(content$recid)) {
+    content$recid
+  } else if (!is.null(content$id) && nzchar(as.character(content$id))) {
+    as.character(content$id)
+  } else {
+    record
+  }
+  if (is.null(files) || length(files) == 0L) {
+    filenames <- character(0)
+    file_urls <- character(0)
+    file_sizes <- numeric(0)
+  } else if (is.data.frame(files)) {
+    filenames <- files$key
+    if ("links.download" %in% names(files)) {
+      file_urls <- files$links.download
+    } else if ("links.self" %in% names(files)) {
+      file_urls <- files$links.self
+    } else {
+      file_urls <- rep(NA_character_, nrow(files))
+    }
+    file_sizes <- files$size
+  } else if (is.list(files) && !is.null(files$key)) {
+    filenames <- files$key
+    file_urls <- if (!is.null(files$links$download)) {
+      files$links$download
+    } else {
+      files$links$self
+    }
+    file_sizes <- files$size
+  } else {
+    filenames <- vapply(
+      X = files,
+      FUN = function(x) {
+        if (is.list(x) && !is.null(x$key)) x$key else NA_character_
+      },
+      FUN.VALUE = character(1)
+    )
+    file_urls <- vapply(
+      X = files,
+      FUN = function(x) {
+        if (is.list(x) && is.list(x$links) && !is.null(x$links$download)) {
+          x$links$download
+        } else if (is.list(x) && is.list(x$links) && !is.null(x$links$self)) {
+          x$links$self
+        } else {
+          NA_character_
+        }
+      },
+      FUN.VALUE = character(1)
+    )
+    file_sizes <- vapply(
+      X = files,
+      FUN = function(x) {
+        if (is.list(x) && !is.null(x$size)) as.numeric(x$size) else NA_real_
+      },
+      FUN.VALUE = numeric(1)
+    )
+  }
+
   match_idx <- find_matching_file(
     filenames = filenames,
     pattern = pattern,
@@ -345,8 +448,17 @@ get_last_version_from_zenodo <- function(doi, pattern, path) {
   )
 
   filename <- filenames[match_idx]
-  file_url <- paste0(record_response$url, "/files/", filename)
-  zenodo_size <- content$files$size[match_idx]
+  file_url <- file_urls[match_idx]
+  if (is.null(file_url) || is.na(file_url) || !nzchar(file_url)) {
+    file_url <- paste0(
+      "https://zenodo.org/api/records/",
+      resolved_record,
+      "/files/",
+      filename,
+      "/content"
+    )
+  }
+  zenodo_size <- file_sizes[match_idx]
 
   log_debug("Found file: %s (%.0f bytes)", filename, zenodo_size)
 
