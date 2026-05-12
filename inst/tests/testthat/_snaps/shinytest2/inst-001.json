@@ -65,6 +65,9 @@
     "lib_spe_mgf": null,
     "lib_tmp_exp_csv": null,
     "lib_tmp_is_csv": null,
+    "ms_add_con_min_degree": 3,
+    "ms_add_con_min_support": 2,
+    "ms_add_con_type": "conditional",
     "ms_add_neg": [
       "[M-H2]2-",
       "[M-H]-",

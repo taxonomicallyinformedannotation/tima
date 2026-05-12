@@ -58,6 +58,7 @@ utils::globalVariables(
     "adduct_dest",
     "adduct_len",
     "adduct_mass",
+    "adduct_support",
     "annotation_note",
     "call_gnps",
     "candidate_adduct",
