@@ -128,7 +128,9 @@ prepare_libraries_sop_bigg <- function(
             inchikeys,
             ceiling(seq_along(inchikeys) / batch_size)
           )
-          purrr::map_dfr(.x = batches, .f = query_pubchem_batch)
+          batches |>
+            purrr::map(.f = query_pubchem_batch) |>
+            tidytable::bind_rows()
         }
 
         # Main processing
@@ -310,16 +312,15 @@ prepare_libraries_sop_bigg <- function(
           )
 
         # Process metabolites for each organism
-        metabolites_by_organism <- purrr::map_dfr(
-          .x = organism_tables,
-          .f = function(org_table) {
+        metabolites_by_organism <- organism_tables |>
+          purrr::map(.f = function(org_table) {
             metabolites_prefinal |>
               tidytable::inner_join(org_table) |>
               select_sop_columns() |>
               round_reals() |>
               tidytable::distinct()
-          }
-        )
+          }) |>
+          tidytable::bind_rows()
 
         metabolites_biota <- metabolites_prefinal |>
           tidytable::group_by(structure_inchikey) |>
