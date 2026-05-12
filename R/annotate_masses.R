@@ -1184,7 +1184,7 @@ annotate_masses <-
       enforced_breakdown <- df_final[
         !is.na(candidate_adduct) & candidate_adduct_origin == "enforced",
         .(
-          N_features = data.table::uniqueN(feature_id),
+          N_features = tidytable::n_distinct(feature_id),
           N_annotations = .N
         ),
         by = .(adduct = candidate_adduct)
