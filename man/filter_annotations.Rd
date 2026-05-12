@@ -36,7 +36,7 @@ Character string path to the filtered annotations file
 This function filters initial annotations by removing MS1-only
 annotations that also have quality spectral matches (gated on similarity
 and matched peaks), and joins retention time library data when available.
-RT errors are computed but no hard cutoff is applied; the downstream
+RT deltas are computed but no hard cutoff is applied; the downstream
 scoring system uses a sigmoid penalty to handle RT deviations gracefully.
 }
 \examples{

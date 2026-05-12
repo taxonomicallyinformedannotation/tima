@@ -250,7 +250,7 @@ filter_ms1_redundancy <- function(
 #' @return Data frame with `candidate_structure_error_rt` column added
 #' @keywords internal
 apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
-  log_info("Joining RT library and computing RT errors")
+  log_info("Joining RT library and computing RT deltas")
 
   joined <- features_annotated_table |>
     tidytable::left_join(
@@ -294,7 +294,7 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
   }
 
   log_info(
-    "RT errors computed for %d annotations (no hard cutoff applied; scoring handles RT penalty)",
+    "RT deltas computed for %d annotations (no hard cutoff applied; scoring handles RT penalty)",
     sum(!is.na(joined$candidate_structure_error_rt))
   )
 
@@ -307,7 +307,7 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
 #' @description This function filters initial annotations by removing MS1-only
 #'     annotations that also have quality spectral matches (gated on similarity
 #'     and matched peaks), and joins retention time library data when available.
-#'     RT errors are computed but no hard cutoff is applied; the downstream
+#'     RT deltas are computed but no hard cutoff is applied; the downstream
 #'     scoring system uses a sigmoid penalty to handle RT deviations gracefully.
 #'
 #' @include get_params.R
