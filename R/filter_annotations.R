@@ -449,7 +449,7 @@ filter_annotations <- function(
   # Apply RT Filtering if Library Available ----
 
   features_annotated_table_1 <- features_table |>
-    tidytable::left_join(y = annotation_table, by = "feature_id")
+    tidytable::left_join(y = annotation_table)
   rm(annotation_table)
 
   if (!is.null(rts) && !has_rt) {

@@ -151,8 +151,8 @@ summarize_results <- function(
 
   # Start from annotation rows and add compact per-feature metadata.
   df_joined <- df |>
-    tidytable::right_join(y = features_min, by = "feature_id") |>
-    tidytable::left_join(y = components_min, by = "feature_id") |>
+    tidytable::right_join(y = features_min) |>
+    tidytable::left_join(y = components_min) |>
     tidytable::select(tidyselect::any_of(x = select_cols)) |>
     tidytable::distinct() |>
     tidytable::left_join(
@@ -390,6 +390,8 @@ summarize_results <- function(
       tidyselect::any_of(
         x = c(
           model$features_columns,
+          "rt",
+          "mz",
           model$features_calculated_columns,
           model$components_columns,
           "annotation_note"

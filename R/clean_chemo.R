@@ -1491,8 +1491,7 @@ clean_chemo <- function(
       tidytable::left_join(
         y = features_table |>
           tidytable::select(tidyselect::any_of(.ft_cols)) |>
-          tidytable::distinct(feature_id, .keep_all = TRUE),
-        by = "feature_id"
+          tidytable::distinct(feature_id, .keep_all = TRUE)
       )
   }
 
