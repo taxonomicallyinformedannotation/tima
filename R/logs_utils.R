@@ -425,6 +425,7 @@ log_similarity_distribution <- function(scores, title) {
   tab <- table(bins)
   counts <- as.integer(tab[lvl])
   dist <- data.frame(bin = lvl, N = counts, stringsAsFactors = FALSE)
+  dist <- add_percentage_column(dist, count_col = "N", out_col = "Pct")
   log_info(title)
   log_info(
     "\n%s",
@@ -434,6 +435,30 @@ log_similarity_distribution <- function(scores, title) {
     )
   )
   invisible(NULL)
+}
+
+#' @keywords internal
+#' @title Add percentage column to count tables
+#' @description Add a formatted percentage column from a count column.
+#' @param df Data frame containing count-like values.
+#' @param count_col Name of the count column to use as denominator.
+#' @param out_col Name of the output percentage column.
+#' @return Data frame with a new percentage column (formatted as xx.xx%).
+add_percentage_column <- function(df, count_col, out_col = "Pct") {
+  if (!is.data.frame(df) || !count_col %in% names(df)) {
+    return(df)
+  }
+
+  counts <- suppressWarnings(as.numeric(df[[count_col]]))
+  total <- sum(counts, na.rm = TRUE)
+  pct <- if (is.finite(total) && total > 0) {
+    100 * counts / total
+  } else {
+    rep(0, length(counts))
+  }
+
+  df[[out_col]] <- sprintf("%.2f%%", pct)
+  df
 }
 
 #' @keywords internal
@@ -483,6 +508,7 @@ log_similarity_distribution_counts <- function(counts, title) {
     N = as.integer(counts),
     stringsAsFactors = FALSE
   )
+  dist <- add_percentage_column(dist, count_col = "N", out_col = "Pct")
   log_info(title)
   log_info(
     "\n%s",

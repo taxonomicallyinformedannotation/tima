@@ -811,6 +811,11 @@ log_library_stats <- function(lib_sp) {
       )
     ) |>
     tidytable::arrange(tidytable::desc(x = spectra))
+  stats <- add_percentage_column(
+    stats,
+    count_col = "spectra",
+    out_col = "Pct_spectra"
+  )
   log_info(
     "\n%s",
     paste(

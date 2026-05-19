@@ -526,6 +526,23 @@ test_that("log_similarity_distribution creates proper binning", {
   expect_no_error(log_similarity_distribution(scores, "Even distribution"))
 })
 
+## add_percentage_column ----
+
+test_that("add_percentage_column appends formatted percentage values", {
+  df <- data.frame(bin = c("a", "b"), N = c(1L, 3L), stringsAsFactors = FALSE)
+  out <- add_percentage_column(df, count_col = "N", out_col = "Pct")
+
+  expect_true("Pct" %in% names(out))
+  expect_equal(out$Pct, c("25.00%", "75.00%"))
+})
+
+test_that("add_percentage_column handles zero total", {
+  df <- data.frame(n = c(0L, 0L), stringsAsFactors = FALSE)
+  out <- add_percentage_column(df, count_col = "n", out_col = "Pct")
+
+  expect_equal(out$Pct, c("0.00%", "0.00%"))
+})
+
 ## log_metadata ----
 
 test_that("log_metadata validates context object", {

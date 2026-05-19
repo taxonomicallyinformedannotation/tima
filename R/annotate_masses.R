@@ -432,6 +432,11 @@ annotate_masses <-
             tidytable::desc()
         ) |>
         tidytable::slice_head(n = 10L)
+      bins <- add_percentage_column(
+        bins,
+        count_col = "N",
+        out_col = "Pct"
+      )
       log_info(
         "Here are the top 10 observed m/z differences inside the RT windows:"
       )
@@ -1166,6 +1171,16 @@ annotate_masses <-
           N_annotations |>
             tidytable::desc()
         )
+      adduct_breakdown <- add_percentage_column(
+        adduct_breakdown,
+        count_col = "N_features",
+        out_col = "Pct_features"
+      )
+      adduct_breakdown <- add_percentage_column(
+        adduct_breakdown,
+        count_col = "N_annotations",
+        out_col = "Pct_annotations"
+      )
       if (nrow(adduct_breakdown) > 0L) {
         log_info(
           "Breakdown of the annotated adduct species:"

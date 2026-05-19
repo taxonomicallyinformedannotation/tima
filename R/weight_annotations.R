@@ -407,6 +407,12 @@ log_annotation_stats <- function(annotation_table) {
     tidytable::count() |>
     tidytable::arrange(tidytable::desc(x = n))
 
+  annotation_stats <- add_percentage_column(
+    annotation_stats,
+    count_col = "n",
+    out_col = "Pct"
+  )
+
   log_info(
     "\n%s",
     paste(
