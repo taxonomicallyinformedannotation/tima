@@ -259,9 +259,9 @@ static int kp_cmp(const void *a, const void *b) {
 
 /* Returns a plain numeric vector of length 4:
  *   c(score, matches, score_forward, score_reverse)
- * score = main GNPS score (same as forward)
- * score_forward = normalized by ALL query + ALL library intensities
- * score_reverse = normalized by MATCHED query + ALL library intensities */
+ * score = main GNPS score (matched query + matched library normalization)
+ * score_forward = normalized by ALL query + matched library
+ * score_reverse = normalized by matched query + ALL library */
 #if GNPS_HAS_R_API
 static SEXP make_result(double score, int matches,
                         double score_fwd, double score_rev) {
