@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Restore Buildx cache
         uses: actions/cache@v5
         with:
@@ -23,6 +24,7 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
+          lookup-only: true
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v6
@@ -55,8 +57,10 @@ jobs:
       - name: Export digest
         run: |
           mkdir -p /tmp/digests
-          digest="${{ steps.build.outputs.digest }}"
+          digest="${STEPS_BUILD_OUTPUTS_DIGEST}"
           touch "/tmp/digests/${digest#sha256:}"
+        env:
+          STEPS_BUILD_OUTPUTS_DIGEST: ${{ steps.build.outputs.digest }}
       - name: Upload digest
         uses: actions/upload-artifact@v7
         with:
@@ -70,6 +74,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Restore Buildx cache
         uses: actions/cache@v5
         with:
@@ -77,6 +82,7 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
+          lookup-only: true
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v6
@@ -105,8 +111,10 @@ jobs:
       - name: Export digest
         run: |
           mkdir -p /tmp/digests
-          digest="${{ steps.build.outputs.digest }}"
+          digest="${STEPS_BUILD_OUTPUTS_DIGEST}"
           touch "/tmp/digests/${digest#sha256:}"
+        env:
+          STEPS_BUILD_OUTPUTS_DIGEST: ${{ steps.build.outputs.digest }}
       - name: Upload digest
         uses: actions/upload-artifact@v7
         with:
@@ -141,11 +149,15 @@ jobs:
         working-directory: /tmp/digests
         run: |
           docker buildx imagetools create \
-            -t ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }} \
+            -t ${{ env.REGISTRY_IMAGE }}:${STEPS_META_OUTPUTS_VERSION} \
             -t ${{ env.REGISTRY_IMAGE }}:latest \
             $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
+        env:
+          STEPS_META_OUTPUTS_VERSION: ${{ steps.meta.outputs.version }}
       - name: Inspect images
         run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}
+          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${STEPS_META_OUTPUTS_VERSION}
           docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:latest
+        env:
+          STEPS_META_OUTPUTS_VERSION: ${{ steps.meta.outputs.version }}
