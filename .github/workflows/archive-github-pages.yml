@@ -30,4 +30,4 @@ jobs:
     name: Run Waystation
     runs-on: ubuntu-latest
     steps:
-      - uses: caltechlibrary/waystation@main
+      - uses: caltechlibrary/waystation@d2d129d8b3dc12d2a1957f342215388c71998520

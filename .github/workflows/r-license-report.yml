@@ -20,4 +20,4 @@ jobs:
         with:
           persist-credentials: false
       - name: License Report
-        uses: insightsengineering/r-license-report@v1
+        uses: insightsengineering/r-license-report@6b011d92e042fb70b5670a49021d397fd9f1ee4e
