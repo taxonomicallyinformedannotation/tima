@@ -458,7 +458,8 @@ annotate_masses <-
 
     adducts_table <- adducts |>
       tidytable::tidytable() |>
-      tidytable::rename(adduct = 1)
+      tidytable::rename(adduct = 1) |>
+      harmonize_adducts(adducts_translations = adducts_translations)
     clusters_table <- clusters |>
       tidytable::tidytable() |>
       tidytable::rename(cluster = 1)
@@ -928,6 +929,7 @@ annotate_masses <-
         tidytable::select(-adduct) |>
         tidytable::mutate(join = "x") |>
         tidytable::left_join(y = adducts_table_multi) |>
+        harmonize_adducts(adducts_translations = adducts_translations) |>
         tidytable::mutate(
           value = calculate_mass_of_m_batch(
             adducts = adduct,
@@ -1146,8 +1148,24 @@ annotate_masses <-
           y = df_adduct_origin,
           by = c("feature_id", "candidate_library" = "adduct")
         )
+      candidate_adduct <- df_final$candidate_library
+      non_missing <- !is.na(candidate_adduct)
+      if (any(non_missing)) {
+        candidate_library_unique <- unique(candidate_adduct[non_missing])
+        candidate_adduct_unique <- vapply(
+          X = candidate_library_unique,
+          FUN = canonicalize_adduct_notation,
+          FUN.VALUE = character(1L),
+          USE.NAMES = FALSE
+        )
+        candidate_adduct[non_missing] <- candidate_adduct_unique[
+          match(candidate_adduct[non_missing], candidate_library_unique)
+        ]
+      }
       df_final <- df_final |>
-        tidytable::mutate(candidate_adduct = candidate_library) |>
+        tidytable::mutate(
+          candidate_adduct = candidate_adduct
+        ) |>
         tidytable::mutate(candidate_library = "TIMA MS1")
     }
 

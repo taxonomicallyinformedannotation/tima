@@ -436,3 +436,24 @@ test_that("harmonize_adducts collapses generic canceling additive/loss terms", {
   expect_equal(result$adduct[[1L]], "[M]+")
   expect_equal(result$adduct[[2L]], "[M-H]-")
 })
+
+test_that("harmonize_adducts unifies reordered-modification adducts (regression: [M+Fe-H2]+ vs [M-H2+Fe]+)", {
+  # Both notations represent the same chemical modification; they must produce
+  # the same canonical string so they are never counted as different adducts.
+  df <- data.frame(
+    adduct = c(
+      "[M+Fe-H2]+",
+      "[M-H2+Fe]+",
+      "[M+Na-H2O]+",
+      "[M-H2O+Na]+",
+      "[M+H-H2O]+",
+      "[M-H2O+H]+"
+    )
+  )
+
+  result <- harmonize_adducts(df, adducts_translations = adducts_translations)
+
+  expect_equal(result$adduct[[1L]], result$adduct[[2L]])
+  expect_equal(result$adduct[[3L]], result$adduct[[4L]])
+  expect_equal(result$adduct[[5L]], result$adduct[[6L]])
+})
