@@ -116,7 +116,7 @@ ms:
   clusters:
     #' List of clusters to be used in negative. STRING
     neg:
-      - "H2O" # (water)
+      # - "H2O" # (water)
       - "CH2O2" # (formic)
       - "NaCl" # (sodium chloride)
       - "C2H4O2" # (acetic)
@@ -125,7 +125,7 @@ ms:
 
     #' List of clusters to be used in positive. STRING
     pos:
-      - "H2O" # (water)
+      # - "H2O" # (water)
       # - CH4O # (methanol)
       - "C2H3N" # (acetonitrile)
       # - C2H7N # (ethylamine)
