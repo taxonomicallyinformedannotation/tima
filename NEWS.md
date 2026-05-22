@@ -1,6 +1,4 @@
 
-# tima 2.12.0.9000 (development)
-
 # tima 2.13.0
 
 ## Breaking changes
