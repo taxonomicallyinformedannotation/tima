@@ -1911,7 +1911,7 @@ calculate_net_mod_mass_from_text <- function(adduct) {
 
   total <- 0
   for (tok in tokens) {
-    sign <- if (substr(tok, 1L, 1L) == "+") 1 else -1
+    sign <- if (startsWith(tok, "+")) 1 else -1
     body <- substr(tok, 2L, nchar(tok))
     coef_match <- regmatches(body, regexpr("^[0-9]+", body, perl = TRUE))
     coef <- if (length(coef_match) == 0L || coef_match[[1L]] == "") {
