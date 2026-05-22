@@ -4,7 +4,7 @@
 \alias{run_app}
 \title{Run TIMA Shiny app}
 \usage{
-run_app(host = "127.0.0.1", port = 3838, browser = TRUE)
+run_app(host = "127.0.0.1", port = 3838, browser = TRUE, reinstall = TRUE)
 }
 \arguments{
 \item{host}{\link{character} Host/IP address to listen on.
@@ -16,6 +16,9 @@ connections.}
 
 \item{browser}{\link{logical} Whether to automatically launch a web browser when
 starting the app. Default: TRUE. Automatically set to FALSE in Docker.}
+
+\item{reinstall}{\link{logical} Whether to automatically reinstall TIMA.
+Default: TRUE.}
 }
 \value{
 NULL (invisibly). Launches the Shiny app as a side effect.

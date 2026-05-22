@@ -15,6 +15,9 @@
 #' @param browser [logical] Whether to automatically launch a web browser when
 #'     starting the app. Default: TRUE. Automatically set to FALSE in Docker.
 #'
+#' @param reinstall [logical] Whether to automatically reinstall TIMA.
+#'     Default: TRUE.
+#'
 #' @return NULL (invisibly). Launches the Shiny app as a side effect.
 #'
 #' @family workflow
@@ -32,7 +35,12 @@
 #' # Allow external connections (useful in Docker)
 #' run_app(host = "0.0.0.0", port = 3838)
 #' }
-run_app <- function(host = "127.0.0.1", port = 3838, browser = TRUE) {
+run_app <- function(
+  host = "127.0.0.1",
+  port = 3838,
+  browser = TRUE,
+  reinstall = TRUE
+) {
   # Input Validation ----
   validate_character(host, param_name = "host", allow_empty = FALSE)
   validate_numeric_range(
@@ -58,7 +66,9 @@ run_app <- function(host = "127.0.0.1", port = 3838, browser = TRUE) {
   log_info("Starting TIMA Shiny app on %s:%d", host, port)
 
   # Ensure Dependencies ----
-  install_tima()
+  if (reinstall) {
+    install_tima()
+  }
 
   # Launch Shiny App ----
   app_path <- get_app_path()
