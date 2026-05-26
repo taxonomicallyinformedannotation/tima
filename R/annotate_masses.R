@@ -305,7 +305,9 @@ annotate_masses <- function(
     annotations = annotations,
     baseline_adduct = baseline_adduct
   )
-  coverage_file <- derive_annotate_masses_coverage_path(output_annotations[[1L]])
+  coverage_file <- derive_annotate_masses_coverage_path(output_annotations[[
+    1L
+  ]])
 
   export_output(
     x = annotations |>
@@ -656,7 +658,10 @@ build_annotate_masses_annotations <- function(
 #'   3) For features with no constraining edge evidence, keep all rows (broadest
 #'      coverage under uncertainty).
 #' @keywords internal
-enforce_non_conflicting_annotation_states <- function(annotations, adduct_edges) {
+enforce_non_conflicting_annotation_states <- function(
+  annotations,
+  adduct_edges
+) {
   if (nrow(annotations) == 0L || nrow(adduct_edges) == 0L) {
     return(annotations)
   }
@@ -702,7 +707,8 @@ enforce_non_conflicting_annotation_states <- function(annotations, adduct_edges)
     ) |>
     tidytable::left_join(assigned_states, by = "feature_id") |>
     tidytable::mutate(
-      keep = is.na(assigned_state_key) | (adduct_state_key == assigned_state_key)
+      keep = is.na(assigned_state_key) |
+        (adduct_state_key == assigned_state_key)
     )
 
   dropped <- out |>
@@ -872,7 +878,10 @@ derive_annotate_masses_coverage_path <- function(output_annotations) {
 
 #' Build a feature-level coverage report for annotate_masses
 #' @keywords internal
-build_annotate_masses_coverage_report <- function(annotations, baseline_adduct) {
+build_annotate_masses_coverage_report <- function(
+  annotations,
+  baseline_adduct
+) {
   if (nrow(annotations) == 0L) {
     return(tidytable::tidytable(
       coverage_scope = c("best", "any"),
@@ -903,34 +912,54 @@ build_annotate_masses_coverage_report <- function(annotations, baseline_adduct) 
     length(baseline_adduct) >= 1L &&
     !is.na(baseline_adduct[[1L]]) &&
     nzchar(baseline_adduct[[1L]])
-  baseline_label <- if (baseline_active) baseline_adduct[[1L]] else NA_character_
+  baseline_label <- if (baseline_active) {
+    baseline_adduct[[1L]]
+  } else {
+    NA_character_
+  }
 
   support_ranked[, has_structure_match := !is.na(candidate_structure_error_mz)]
-  support_ranked[, has_pairwise_support := source %in% c("pair", "preassigned", "preassigned_propagated")]
-  support_ranked[, has_modifier_pairwise_support := source %in% c("cluster", "loss")]
+  support_ranked[,
+    has_pairwise_support := source %in%
+      c("pair", "preassigned", "preassigned_propagated")
+  ]
+  support_ranked[,
+    has_modifier_pairwise_support := source %in% c("cluster", "loss")
+  ]
   support_ranked[, has_multicharge_evidence := source %in% c("multi")]
   support_ranked[, has_evidence_support := source %in% c("evidence")]
-  support_ranked[, has_baseline_fallback := baseline_active & !is.na(adduct) & adduct == baseline_label]
-  support_ranked[, coverage_class := data.table::fcase(
-    has_structure_match, "structure_matched",
-      has_pairwise_support, "pairwise_supported",
-      has_multicharge_evidence, "evidence_multicharge_supported",
-      has_modifier_pairwise_support, "modifier_pairwise_supported",
-      has_evidence_support, "evidence_supported",
-    has_baseline_fallback, "baseline_fallback",
-    default = "adduct_only"
-  )]
-  support_ranked[, coverage_tier := data.table::fcase(
-    coverage_class == "structure_matched", 1L,
-    coverage_class == "pairwise_supported", 2L,
-    coverage_class == "evidence_multicharge_supported", 3L,
-    coverage_class == "modifier_pairwise_supported", 4L,
-    coverage_class == "evidence_supported", 5L,
-    coverage_class == "baseline_fallback", 6L,
-    default = 7L
-  )]
+  support_ranked[,
+    has_baseline_fallback := baseline_active &
+      !is.na(adduct) &
+      adduct == baseline_label
+  ]
+  support_ranked[,
+    coverage_class := data.table::fcase(
+      has_structure_match           , "structure_matched"              ,
+      has_pairwise_support          , "pairwise_supported"             ,
+      has_multicharge_evidence      , "evidence_multicharge_supported" ,
+      has_modifier_pairwise_support , "modifier_pairwise_supported"    ,
+      has_evidence_support          , "evidence_supported"             ,
+      has_baseline_fallback         , "baseline_fallback"              ,
+      default = "adduct_only"
+    )
+  ]
+  support_ranked[,
+    coverage_tier := data.table::fcase(
+      coverage_class == "structure_matched"              , 1L ,
+      coverage_class == "pairwise_supported"             , 2L ,
+      coverage_class == "evidence_multicharge_supported" , 3L ,
+      coverage_class == "modifier_pairwise_supported"    , 4L ,
+      coverage_class == "evidence_supported"             , 5L ,
+      coverage_class == "baseline_fallback"              , 6L ,
+      default = 7L
+    )
+  ]
 
-  feature_annotation_counts <- support_ranked[, .(N_annotations = .N), by = feature_id]
+  feature_annotation_counts <- support_ranked[,
+    .(N_annotations = .N),
+    by = feature_id
+  ]
 
   best_feature_class <- data.table::copy(support_ranked)
   data.table::setorder(
@@ -948,16 +977,25 @@ build_annotate_masses_coverage_report <- function(annotations, baseline_adduct) 
   )
   best_feature_class <- best_feature_class[, .SD[1L], by = feature_id]
 
-  best_summary <- best_feature_class[feature_annotation_counts, on = "feature_id"]
-  best_summary <- best_summary[, .(
-    N_features = .N,
-    N_annotations = sum(N_annotations, na.rm = TRUE)
-  ), by = .(coverage_class, coverage_tier)]
+  best_summary <- best_feature_class[
+    feature_annotation_counts,
+    on = "feature_id"
+  ]
+  best_summary <- best_summary[,
+    .(
+      N_features = .N,
+      N_annotations = sum(N_annotations, na.rm = TRUE)
+    ),
+    by = .(coverage_class, coverage_tier)
+  ]
 
-  any_summary <- support_ranked[, .(
-    N_features = data.table::uniqueN(feature_id),
-    N_annotations = .N
-  ), by = .(coverage_class, coverage_tier)]
+  any_summary <- support_ranked[,
+    .(
+      N_features = data.table::uniqueN(feature_id),
+      N_annotations = .N
+    ),
+    by = .(coverage_class, coverage_tier)
+  ]
 
   all_features <- data.table::uniqueN(support_ranked$feature_id)
   all_annotations <- nrow(support_ranked)
@@ -1787,7 +1825,12 @@ filter_modifier_evidence_by_pairwise_support <- function(
 
   kept_hyps <- kept_hyps |>
     tidytable::filter(keep) |>
-    tidytable::select(-evidence_requires_pairwise, -adduct_state_key, -pairwise_supported, -keep)
+    tidytable::select(
+      -evidence_requires_pairwise,
+      -adduct_state_key,
+      -pairwise_supported,
+      -keep
+    )
 
   if (nrow(evidence_signal$edges) == 0L) {
     return(list(hypotheses = kept_hyps, edges = evidence_signal$edges))
@@ -1861,13 +1904,16 @@ evidence_adduct_requires_pairwise_support <- function(adduct) {
     return(FALSE)
   }
   parsed <- parse_modification_components(mods)
-  if (is.null(parsed) || !isTRUE(parsed$valid) || length(parsed$elements) == 0L) {
+  if (
+    is.null(parsed) || !isTRUE(parsed$valid) || length(parsed$elements) == 0L
+  ) {
     return(FALSE)
   }
   elems <- parsed$elements
-  carrier_like <- elems %in% names(CARRIER_INTRINSIC_CHARGE) |
+  carrier_like <- elems %in%
+    names(CARRIER_INTRINSIC_CHARGE) |
     grepl("^H[0-9]*$", elems)
-  any(!carrier_like)
+  !all(carrier_like)
 }
 
 #' Generate multi-adduct hypotheses constrained by node-inferred neutral masses

@@ -498,7 +498,11 @@ test_that("annotate_masses produces expected output structure", {
   edges <- tidytable::fread(result["edges"], colClasses = "character")
   expect_s3_class(edges, "data.frame")
 
-  coverage_file <- sub("\\.tsv(\\.gz)?$", "_coverage.tsv\\1", result["annotations"])
+  coverage_file <- sub(
+    "\\.tsv(\\.gz)?$",
+    "_coverage.tsv\\1",
+    result["annotations"]
+  )
   expect_true(file.exists(coverage_file))
   coverage <- tidytable::fread(coverage_file, colClasses = "character")
   expect_required_columns(
@@ -529,12 +533,28 @@ test_that("coverage report distinguishes feature-level tiers and scopes", {
     baseline_adduct = "[M+H]+"
   )
 
-  expect_true(all(c("coverage_scope", "coverage_class", "coverage_tier") %in% names(report)))
-  expect_true(any(report$coverage_scope == "best" & report$coverage_class == "structure_matched"))
-  expect_true(any(report$coverage_scope == "best" & report$coverage_class == "evidence_multicharge_supported"))
-  expect_true(any(report$coverage_scope == "best" & report$coverage_class == "baseline_fallback"))
-  expect_true(any(report$coverage_scope == "any" & report$coverage_class == "modifier_pairwise_supported"))
-  expect_true(any(report$coverage_scope == "best" & report$coverage_class == "all"))
+  expect_true(all(
+    c("coverage_scope", "coverage_class", "coverage_tier") %in% names(report)
+  ))
+  expect_true(any(
+    report$coverage_scope == "best" &
+      report$coverage_class == "structure_matched"
+  ))
+  expect_true(any(
+    report$coverage_scope == "best" &
+      report$coverage_class == "evidence_multicharge_supported"
+  ))
+  expect_true(any(
+    report$coverage_scope == "best" &
+      report$coverage_class == "baseline_fallback"
+  ))
+  expect_true(any(
+    report$coverage_scope == "any" &
+      report$coverage_class == "modifier_pairwise_supported"
+  ))
+  expect_true(any(
+    report$coverage_scope == "best" & report$coverage_class == "all"
+  ))
 })
 
 test_that("annotate_masses respects tolerance_ppm correctly", {

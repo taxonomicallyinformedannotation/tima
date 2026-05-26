@@ -267,4 +267,3 @@ test_that("evidence engine does not share support across samples", {
   expect_equal(nrow(baseline_s2), 1L)
   expect_equal(baseline_s2$evidence_score, 0L)
 })
-

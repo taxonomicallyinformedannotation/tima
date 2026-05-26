@@ -654,7 +654,9 @@ build_evidence_supported_hypotheses <- function(
       },
       by = .(sample, mass_cluster)
     ]
-    hyps[, evidence_cluster := paste(sample, mass_cluster, rt_cluster, sep = "|")]
+    hyps[,
+      evidence_cluster := paste(sample, mass_cluster, rt_cluster, sep = "|")
+    ]
     log_debug(
       "RT clustering: %d evidence clusters in %.2fs",
       tidytable::n_distinct(hyps$evidence_cluster),
