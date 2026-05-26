@@ -169,6 +169,7 @@ annotate_adduct_universe_metadata <- function(universe, polarity) {
   common_clusters <- c("H2O", "C2H3N")
 
   out <- tidytable::as_tidytable(universe)
+  out <- data.table::copy(out)
   carrier_names <- lapply(out$carriers, names)
   loss_names <- lapply(out$losses, names)
   cluster_names <- lapply(out$clusters, names)
@@ -367,6 +368,7 @@ build_evidence_supported_hypotheses <- function(
   n_feat <- length(feature_ids)
   if (is.infinite(max_hypotheses_per_feature)) {
     cap_eff <- Inf
+    cap_in <- Inf
   } else {
     cap_in <- suppressWarnings(as.integer(max_hypotheses_per_feature))
     if (is.na(cap_in) || cap_in < 1L) {
@@ -374,9 +376,22 @@ build_evidence_supported_hypotheses <- function(
     }
     cap_adaptive <- as.integer(max(
       8L,
-      min(64L, floor(1.5e6 / max(1L, n_feat)))
+      floor(1.5e6 / max(1L, n_feat))
     ))
     cap_eff <- min(cap_in, cap_adaptive)
+  }
+
+  if (is.finite(cap_in) && is.finite(cap_eff) && cap_eff < cap_in) {
+    log_warn(
+      paste0(
+        "Evidence engine reduced max_hypotheses_per_feature from %d to %d ",
+        "for scale control (~1.5M candidate-row target). If you suspect rare ",
+        "ion species are being truncated, rerun on smaller batches or disable ",
+        "the cap explicitly."
+      ),
+      as.integer(cap_in),
+      as.integer(cap_eff)
+    )
   }
 
   log_info(
@@ -563,7 +578,11 @@ build_evidence_supported_hypotheses <- function(
     return(empty_evidence_table())
   }
 
-  hyps[, rt := feature_rts[feat_idx]]
+  hyps <- data.table::copy(hyps)
+  hyps[, `:=`(
+    rt = feature_rts[feat_idx],
+    sample = feature_samples[feat_idx]
+  )]
 
   if (use_library_prefilter) {
     t_mc <- Sys.time()
@@ -590,7 +609,7 @@ build_evidence_supported_hypotheses <- function(
     )
 
     t_rt <- Sys.time()
-    hyps <- hyps |> tidytable::arrange(matched_exact_mass_idx, rt)
+    hyps <- hyps |> tidytable::arrange(sample, matched_exact_mass_idx, rt)
     hyps[,
       rt_cluster := {
         pv <- c(NA_real_, utils::head(rt, -1L))
@@ -601,13 +620,13 @@ build_evidence_supported_hypotheses <- function(
             (rt - pv) > tolerance_rt
         )
       },
-      by = matched_exact_mass_idx
+      by = .(sample, matched_exact_mass_idx)
     ]
     hyps[,
       evidence_cluster := ifelse(
         is.na(matched_exact_mass_idx),
-        NA_real_,
-        matched_exact_mass_idx * 1e6 + rt_cluster
+        NA_character_,
+        paste(sample, matched_exact_mass_idx, rt_cluster, sep = "|")
       )
     ]
     log_debug(
@@ -627,15 +646,15 @@ build_evidence_supported_hypotheses <- function(
     )
 
     t_rt <- Sys.time()
-    hyps <- hyps |> tidytable::arrange(mass_cluster, rt)
+    hyps <- hyps |> tidytable::arrange(sample, mass_cluster, rt)
     hyps[,
       rt_cluster := {
         pv <- c(NA_real_, utils::head(rt, -1L))
         cumsum(is.na(pv) | is.na(rt) | (rt - pv) > tolerance_rt)
       },
-      by = mass_cluster
+      by = .(sample, mass_cluster)
     ]
-    hyps[, evidence_cluster := mass_cluster * 1e9 + rt_cluster]
+    hyps[, evidence_cluster := paste(sample, mass_cluster, rt_cluster, sep = "|")]
     log_debug(
       "RT clustering: %d evidence clusters in %.2fs",
       tidytable::n_distinct(hyps$evidence_cluster),

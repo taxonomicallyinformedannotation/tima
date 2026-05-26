@@ -209,3 +209,62 @@ test_that("exotic Cu/loss hypotheses are pruned without stronger core-supported 
   expect_true("[M+H-H2O]+" %in% hyps$adduct)
   expect_false(any(grepl("Cu", hyps$adduct, fixed = TRUE)))
 })
+
+test_that("evidence engine honors requested hypothesis cap above 64 on small inputs", {
+  feats <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    rt = c(1, 1),
+    mz = c(101.007276, 101.007276),
+    sample = c("S", "S")
+  )
+
+  universe <- tidytable::tidytable(
+    adduct = c("[M+H]+", paste0("HYP_", seq_len(69L))),
+    n_mer = rep(1L, 70L),
+    n_iso = rep(0L, 70L),
+    z = rep(1L, 70L),
+    adduct_mass = rep(1.007276, 70L),
+    adduct_mass_per_monomer = rep(0, 70L),
+    carriers = rep(list(c(H = 1L)), 70L),
+    clusters = rep(list(integer()), 70L),
+    losses = rep(list(integer()), 70L)
+  )
+
+  hyps <- build_evidence_supported_hypotheses(
+    df_fea_min = feats,
+    universe = universe,
+    tolerance_ppm = 10,
+    tolerance_rt = 0.05,
+    ms_mode = "pos",
+    exact_masses = 100,
+    max_hypotheses_per_feature = 70L
+  )
+
+  expect_equal(length(unique(hyps$adduct)), 70L)
+  expect_equal(nrow(hyps), 140L)
+})
+
+test_that("evidence engine does not share support across samples", {
+  feats <- tidytable::tidytable(
+    feature_id = c("S1_H", "S2_NA"),
+    rt = c(5, 5),
+    mz = c(181.0707, 203.0526),
+    sample = c("Sample_1", "Sample_2")
+  )
+  u <- .mini_universe()
+
+  hyps <- build_evidence_supported_hypotheses(
+    df_fea_min = feats,
+    universe = u,
+    tolerance_ppm = 10,
+    tolerance_rt = 0.05,
+    ms_mode = "pos"
+  )
+
+  s2_na <- hyps[hyps$feature_id == "S2_NA" & hyps$adduct == "[M+Na]+", ]
+  expect_equal(nrow(s2_na), 0L)
+  baseline_s2 <- hyps[hyps$feature_id == "S2_NA" & hyps$adduct == "[M+H]+", ]
+  expect_equal(nrow(baseline_s2), 1L)
+  expect_equal(baseline_s2$evidence_score, 0L)
+})
+

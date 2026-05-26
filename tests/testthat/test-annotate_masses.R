@@ -346,12 +346,21 @@ test_that("annotate_masses returns empty outputs for an empty features table", {
     unname(result),
     c("annotations.tsv", "edges.tsv")
   )
-  expect_length(seen$exports, 2L)
+  expect_length(seen$exports, 3L)
   expect_identical(seen$exports[[1L]]$file, "annotations.tsv")
   expect_identical(seen$exports[[2L]]$file, "edges.tsv")
+  expect_identical(seen$exports[[3L]]$file, "annotations_coverage.tsv")
   expect_equal(nrow(seen$exports[[1L]]$x), 0L)
   expect_true(all(
     c("CLUSTERID1", "CLUSTERID2", "label") %in% names(seen$exports[[2L]]$x)
+  ))
+  expect_true(all(
+    c("coverage_class", "N_features", "N_annotations") %in%
+      names(seen$exports[[3L]]$x)
+  ))
+  expect_true(all(
+    c("coverage_scope", "coverage_tier") %in%
+      names(seen$exports[[3L]]$x)
   ))
 })
 
@@ -488,6 +497,44 @@ test_that("annotate_masses produces expected output structure", {
   # Load and verify edges
   edges <- tidytable::fread(result["edges"], colClasses = "character")
   expect_s3_class(edges, "data.frame")
+
+  coverage_file <- sub("\\.tsv(\\.gz)?$", "_coverage.tsv\\1", result["annotations"])
+  expect_true(file.exists(coverage_file))
+  coverage <- tidytable::fread(coverage_file, colClasses = "character")
+  expect_required_columns(
+    coverage,
+    c(
+      "coverage_scope",
+      "coverage_class",
+      "coverage_tier",
+      "N_features",
+      "N_annotations",
+      "Pct_features",
+      "Pct_annotations"
+    )
+  )
+})
+
+test_that("coverage report distinguishes feature-level tiers and scopes", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F_STR", "F_PAIR", "F_MULTI", "F_BASE", "F_MOD"),
+    adduct = c("[M+H]+", "[M+Na]+", "[M+2H]2+", "[M+H]+", "[M+H+H2O]+"),
+    source = c("pair", "pair", "multi", "baseline", "loss"),
+    candidate_structure_error_mz = c(0.01, NA, NA, NA, NA),
+    adduct_support = c(3L, 2L, 2L, 0L, 1L)
+  )
+
+  report <- build_annotate_masses_coverage_report(
+    annotations = annotations,
+    baseline_adduct = "[M+H]+"
+  )
+
+  expect_true(all(c("coverage_scope", "coverage_class", "coverage_tier") %in% names(report)))
+  expect_true(any(report$coverage_scope == "best" & report$coverage_class == "structure_matched"))
+  expect_true(any(report$coverage_scope == "best" & report$coverage_class == "evidence_multicharge_supported"))
+  expect_true(any(report$coverage_scope == "best" & report$coverage_class == "baseline_fallback"))
+  expect_true(any(report$coverage_scope == "any" & report$coverage_class == "modifier_pairwise_supported"))
+  expect_true(any(report$coverage_scope == "best" & report$coverage_class == "all"))
 })
 
 test_that("annotate_masses respects tolerance_ppm correctly", {
@@ -1216,4 +1263,201 @@ test_that("build_adduct_state_key_map canonicalizes summed loss/cluster text ord
   ))
 
   expect_equal(length(unique(mapped$state_key)), 1L)
+})
+
+test_that("discover_evidence_adduct_signal recovers multicharged ion species", {
+  M <- 400
+  features <- tidytable::tidytable(
+    feature_id = c("F_SINGLE", "F_DOUBLE"),
+    sample = c("S1", "S1"),
+    rt = c(5, 5),
+    mz = c(M + 1.007276, (M + (2 * 1.007276)) / 2)
+  )
+
+  out <- discover_evidence_adduct_signal(
+    features_table = features,
+    adducts = c("[M+H]+", "[M+2H]2+"),
+    clusters = character(),
+    neutral_losses = character(),
+    ms_mode = "pos",
+    tolerance_ppm = 10,
+    tolerance_rt = 0.02,
+    exact_masses = M
+  )
+
+  expect_true(any(
+    out$hypotheses$feature_id == "F_DOUBLE" &
+      out$hypotheses$adduct == "[M+2H]2+"
+  ))
+  expect_true(any(
+    out$edges$feature_id == "F_DOUBLE" |
+      out$edges$feature_id_dest == "F_DOUBLE"
+  ))
+})
+
+test_that("pairwise-support filter removes modifier-bearing evidence-only adducts", {
+  features <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    mz = c(100, 122),
+    rt = c(1, 1),
+    sample = c("S", "S")
+  )
+  universe <- build_adduct_universe(
+    adducts_list = list(pos = c("[M+H]+", "[M+C2H3N+Na]+"), neg = c("[M-H]-")),
+    clusters_list = list(pos = c("C2H3N"), neg = c("CH2O2")),
+    neutral_losses_list = character(),
+    polarity = "pos"
+  )
+  evidence_signal <- list(
+    hypotheses = tidytable::tidytable(
+      feature_id = c("F1", "F2", "F2"),
+      adduct = c("[M+H]+", "[M+C2H3N+Na]+", "[M+2H]2+"),
+      source = c("evidence", "evidence", "evidence"),
+      is_preassigned = c(FALSE, FALSE, FALSE),
+      adduct_support = c(2L, 2L, 2L)
+    ),
+    edges = tidytable::tidytable(
+      feature_id = c("F1", "F1"),
+      adduct = c("[M+H]+", "[M+H]+"),
+      feature_id_dest = c("F2", "F2"),
+      adduct_dest = c("[M+C2H3N+Na]+", "[M+2H]2+")
+    )
+  )
+
+  out <- filter_modifier_evidence_by_pairwise_support(
+    evidence_signal = evidence_signal,
+    universe = universe,
+    adduct_edges = tidytable::tidytable(
+      feature_id = character(),
+      adduct = character(),
+      adduct_dest = character(),
+      feature_id_dest = character()
+    ),
+    cluster_edges = tidytable::tidytable(
+      feature_id = character(),
+      cluster = character(),
+      mass = numeric(),
+      feature_id_dest = character()
+    ),
+    loss_edges = tidytable::tidytable(
+      feature_id = character(),
+      loss = character(),
+      mass = numeric(),
+      feature_id_dest = character()
+    ),
+    baseline_adduct = "[M+H]+",
+    features_table = features
+  )
+
+  expect_false("[M+C2H3N+Na]+" %in% out$hypotheses$adduct)
+  expect_true("[M+2H]2+" %in% out$hypotheses$adduct)
+  expect_false(any(out$edges$adduct_dest == "[M+C2H3N+Na]+"))
+  expect_true(any(out$edges$adduct_dest == "[M+2H]2+"))
+})
+
+test_that("conflict-resolution filter removes edge-conflicting annotation states", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F2"),
+    adduct = c("[M+H]+", "[M+Na]+", "[M+Na]+", "[M+K]+"),
+    source = c("pair", "pair", "pair", "pair")
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2"),
+    adduct = c("[M+H]+", "[M+Na]+", "[M+Na]+"),
+    adduct_dest = c("[M+Na]+", "[M+K]+", "[M+H]+"),
+    feature_id_dest = c("F2", "F2", "F3")
+  )
+
+  out <- enforce_non_conflicting_annotation_states(
+    annotations = annotations,
+    adduct_edges = adduct_edges
+  )
+
+  expect_true(any(out$feature_id == "F1" & out$adduct == "[M+H]+"))
+  expect_false(any(out$feature_id == "F1" & out$adduct == "[M+Na]+"))
+  expect_true(any(out$feature_id == "F2" & out$adduct == "[M+Na]+"))
+  expect_false(any(out$feature_id == "F2" & out$adduct == "[M+K]+"))
+})
+
+test_that("conflict-resolution filter keeps broad coverage for unconstrained features", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "ISO"),
+    adduct = c("[M+H]+", "[M+Na]+", "[M+K]+"),
+    source = c("pair", "pair", "evidence")
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M+H]+",
+    adduct_dest = "[M+Na]+",
+    feature_id_dest = "F2"
+  )
+
+  out <- enforce_non_conflicting_annotation_states(
+    annotations = annotations,
+    adduct_edges = adduct_edges
+  )
+
+  expect_true(any(out$feature_id == "ISO" & out$adduct == "[M+K]+"))
+})
+
+test_that("annotate_masses recovers doubly charged species through evidence discovery", {
+  local_quiet_logging()
+
+  M <- 180.0634
+  env <- prepare_annotation_fixture_env(
+    feature_fixture = "features_small.csv",
+    library_fixture = "library_isotope.csv"
+  )
+
+  withr::local_dir(new = env$dirs$root)
+
+  features_multicharge <- tidytable::tidytable(
+    feature_id = c("FT_SINGLE", "FT_DOUBLE"),
+    mz = c(M + 1.007276, (M + (2 * 1.007276)) / 2),
+    rt = c(2.5, 2.5),
+    sample = c("Sample001", "Sample001"),
+    adduct = c(NA_character_, NA_character_)
+  )
+  utils::write.table(
+    x = features_multicharge,
+    file = env$features,
+    sep = ",",
+    row.names = FALSE,
+    col.names = TRUE,
+    quote = FALSE
+  )
+
+  result <- annotate_masses(
+    features = env$features,
+    library = env$library,
+    str_stereo = env$str_stereo,
+    str_met = env$str_met,
+    str_tax_cla = env$str_tax_cla,
+    str_tax_npc = env$str_tax_npc,
+    adducts_list = list(
+      pos = c("[M+H]+", "[M+2H]2+"),
+      neg = c("[M-H]-")
+    ),
+    clusters_list = list(pos = c("H2O"), neg = c("CH2O2")),
+    neutral_losses_list = character(),
+    ms_mode = "pos",
+    tolerance_ppm = 10,
+    tolerance_rt = 0.02,
+    output_annotations = env$output_annotations,
+    output_edges = env$output_edges
+  )
+
+  annotations <- tidytable::fread(
+    result[["annotations"]],
+    colClasses = "character"
+  )
+  edges <- tidytable::fread(result[["edges"]], colClasses = "character")
+
+  ft_double <- annotations |>
+    tidytable::filter(feature_id == "FT_DOUBLE")
+  expect_true("[M+2H]2+" %in% ft_double$candidate_adduct)
+  expect_true(any(
+    (edges$CLUSTERID1 == "FT_DOUBLE" | edges$CLUSTERID2 == "FT_DOUBLE") &
+      grepl("\\[M\\+2H\\]2\\+|\\[M\\+H\\]\\+", edges$label)
+  ))
 })
