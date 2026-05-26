@@ -1420,6 +1420,33 @@ test_that("conflict-resolution filter keeps broad coverage for unconstrained fea
   expect_true(any(out$feature_id == "ISO" & out$adduct == "[M+K]+"))
 })
 
+test_that("best-supported conflict-free mode keeps strongest unconstrained support", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("ISO", "ISO", "ISO", "F1", "F2"),
+    adduct = c("[M+H]+", "[M+2H]2+", "[M+Na]+", "[M+H]+", "[M+Na]+"),
+    source = c("baseline", "multi", "pair", "pair", "pair"),
+    adduct_support = c(0L, 1L, 3L, 1L, 1L),
+    candidate_structure_error_mz = c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_)
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M+H]+",
+    adduct_dest = "[M+Na]+",
+    feature_id_dest = "F2"
+  )
+
+  out <- enforce_non_conflicting_annotation_states(
+    annotations = annotations,
+    adduct_edges = adduct_edges,
+    baseline_adduct = "[M+H]+",
+    coverage_mode = "best_supported_conflict_free"
+  )
+
+  iso <- out |> tidytable::filter(feature_id == "ISO")
+  expect_equal(nrow(iso), 1L)
+  expect_identical(iso$adduct[[1L]], "[M+Na]+")
+})
+
 test_that("annotate_masses recovers doubly charged species through evidence discovery", {
   local_quiet_logging()
 

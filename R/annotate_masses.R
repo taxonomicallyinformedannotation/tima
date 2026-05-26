@@ -169,6 +169,7 @@ annotate_masses <- function(
     adduct_min_support = adduct_min_support,
     adduct_consistency_min_degree = adduct_consistency_min_degree
   )
+  coverage_mode <- "best_supported_conflict_free"
   baseline_adduct <- switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
 
   # ---- Step 1: load features -------------------------------------------
@@ -262,7 +263,8 @@ annotate_masses <- function(
     structure_table = lib$structures,
     tolerance_ppm = tolerance_ppm,
     adduct_edges = adduct_edges_combined,
-    baseline_adduct = baseline_adduct
+    baseline_adduct = baseline_adduct,
+    coverage_mode = coverage_mode
   )
 
   coverage_audit <- attr(annotations, "coverage_audit")
@@ -606,7 +608,8 @@ build_annotate_masses_annotations <- function(
   structure_table,
   tolerance_ppm,
   adduct_edges,
-  baseline_adduct
+  baseline_adduct,
+  coverage_mode = "best_supported_conflict_free"
 ) {
   matched <- match_candidates_to_library(
     candidates = node_hypotheses,
@@ -644,7 +647,9 @@ build_annotate_masses_annotations <- function(
 
   enforce_non_conflicting_annotation_states(
     annotations = annotations,
-    adduct_edges = adduct_edges
+    adduct_edges = adduct_edges,
+    baseline_adduct = baseline_adduct,
+    coverage_mode = coverage_mode
   )
 }
 
@@ -655,12 +660,15 @@ build_annotate_masses_annotations <- function(
 #'      via [enforce_graph_adduct_consistency()].
 #'   2) For features represented in that constrained graph, keep only annotation
 #'      rows whose adduct state key matches the assigned graph-consistent state.
-#'   3) For features with no constraining edge evidence, keep all rows (broadest
-#'      coverage under uncertainty).
+#'   3) For features with no constraining edge evidence, either keep broad rows
+#'      (`broad_conflict_free`) or keep only best-supported rows
+#'      (`best_supported_conflict_free`).
 #' @keywords internal
 enforce_non_conflicting_annotation_states <- function(
   annotations,
-  adduct_edges
+  adduct_edges,
+  baseline_adduct = NULL,
+  coverage_mode = "best_supported_conflict_free"
 ) {
   if (nrow(annotations) == 0L || nrow(adduct_edges) == 0L) {
     return(annotations)
@@ -711,6 +719,62 @@ enforce_non_conflicting_annotation_states <- function(
         (adduct_state_key == assigned_state_key)
     )
 
+  coverage_mode <- resolve_annotate_masses_coverage_mode(coverage_mode)
+  if (coverage_mode == "best_supported_conflict_free") {
+    if (!"source" %in% colnames(out)) {
+      out$source <- NA_character_
+    }
+    if (!"candidate_structure_error_mz" %in% colnames(out)) {
+      out$candidate_structure_error_mz <- NA_real_
+    }
+    if (!"adduct_support" %in% colnames(out)) {
+      out$adduct_support <- 0L
+    }
+    baseline_on <- !is.null(baseline_adduct) &&
+      length(baseline_adduct) >= 1L &&
+      !is.na(baseline_adduct[[1L]]) &&
+      nzchar(baseline_adduct[[1L]])
+    baseline_label <- if (baseline_on) baseline_adduct[[1L]] else NA_character_
+
+    out <- out |>
+      tidytable::mutate(
+        support_class_rank = tidytable::case_when(
+          !is.na(candidate_structure_error_mz) ~ 1L,
+          source %in% c("pair", "preassigned", "preassigned_propagated") ~ 2L,
+          source == "multi" ~ 3L,
+          source %in% c("cluster", "loss") ~ 4L,
+          source == "evidence" ~ 5L,
+          baseline_on & !is.na(adduct) & adduct == baseline_label ~ 6L,
+          TRUE ~ 7L
+        ),
+        support_strength = tidytable::if_else(
+          is.na(adduct_support),
+          0L,
+          as.integer(adduct_support)
+        )
+      ) |>
+      tidytable::group_by(feature_id) |>
+      tidytable::mutate(
+        feature_is_unconstrained = all(is.na(assigned_state_key)),
+        best_rank = ifelse(
+          any(keep),
+          min(support_class_rank[keep], na.rm = TRUE),
+          min(support_class_rank, na.rm = TRUE)
+        ),
+        best_support = ifelse(
+          any(keep & support_class_rank == best_rank),
+          max(
+            support_strength[keep & support_class_rank == best_rank],
+            na.rm = TRUE
+          ),
+          max(support_strength[support_class_rank == best_rank], na.rm = TRUE)
+        ),
+        keep = keep & (!feature_is_unconstrained |
+          (support_class_rank == best_rank & support_strength == best_support))
+      ) |>
+      tidytable::ungroup()
+  }
+
   dropped <- out |>
     tidytable::filter(!keep)
   if (nrow(dropped) > 0L) {
@@ -744,7 +808,18 @@ enforce_non_conflicting_annotation_states <- function(
 
   out <- out |>
     tidytable::filter(keep) |>
-    tidytable::select(-adduct_state_key, -assigned_state_key, -keep)
+    tidytable::select(
+      -adduct_state_key,
+      -assigned_state_key,
+      -keep,
+      -tidyselect::any_of(c(
+        "support_class_rank",
+        "support_strength",
+        "feature_is_unconstrained",
+        "best_rank",
+        "best_support"
+      ))
+    )
 
   attr(out, "coverage_audit") <- list(
     n_input = nrow(annotations),
@@ -764,6 +839,25 @@ enforce_non_conflicting_annotation_states <- function(
 # ============================================================
 #                       STEP HELPERS
 # ============================================================
+
+#' Resolve annotate_masses coverage mode
+#' @keywords internal
+resolve_annotate_masses_coverage_mode <- function(coverage_mode) {
+  mode <- coverage_mode
+  if (is.null(mode) || (length(mode) == 1L && is.na(mode))) {
+    mode <- "best_supported_conflict_free"
+  }
+  mode <- tolower(as.character(mode[[1L]]))
+  allowed <- c("best_supported_conflict_free", "broad_conflict_free")
+  if (!mode %in% allowed) {
+    log_warn(
+      "Invalid coverage_mode='%s', falling back to 'best_supported_conflict_free'",
+      mode
+    )
+    mode <- "best_supported_conflict_free"
+  }
+  mode
+}
 
 #' Resolve `adduct_consistency*` config defaults
 #' @keywords internal
