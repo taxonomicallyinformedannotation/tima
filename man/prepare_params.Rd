@@ -42,6 +42,7 @@ param_files <- prepare_params(
 Other preparation:
 \code{\link[=prepare_annotations_gnps]{prepare_annotations_gnps()}},
 \code{\link[=prepare_annotations_mzmine]{prepare_annotations_mzmine()}},
+\code{\link[=prepare_annotations_mztab]{prepare_annotations_mztab()}},
 \code{\link[=prepare_annotations_sirius]{prepare_annotations_sirius()}},
 \code{\link[=prepare_annotations_spectra]{prepare_annotations_spectra()}},
 \code{\link[=prepare_features_components]{prepare_features_components()}},
@@ -55,6 +56,7 @@ Other preparation:
 \code{\link[=prepare_libraries_sop_lotus]{prepare_libraries_sop_lotus()}},
 \code{\link[=prepare_libraries_sop_merged]{prepare_libraries_sop_merged()}},
 \code{\link[=prepare_libraries_spectra]{prepare_libraries_spectra()}},
-\code{\link[=prepare_taxa]{prepare_taxa()}}
+\code{\link[=prepare_taxa]{prepare_taxa()}},
+\code{\link[=read_mztab]{read_mztab()}}
 }
 \concept{preparation}

@@ -179,7 +179,7 @@ annotate_masses <- function(
   )
 
   if (nrow(features_table) == 0L) {
-    log_warn("Empty features table provided - no annotations to perform")
+    log_info("Empty features table provided - no annotations to perform")
     return(write_empty_annotate_masses_outputs(
       output_annotations = output_annotations,
       output_edges = output_edges
@@ -597,7 +597,7 @@ extract_preassigned_adducts <- function(features_table) {
   if (!"candidate_adduct" %in% colnames(features_table)) {
     features_table$candidate_adduct <- NA_character_
   }
-  features_table |>
+  pre_raw <- features_table |>
     tidytable::mutate(
       adduct = tidytable::if_else(
         is.na(adduct) | !nzchar(adduct),
@@ -605,13 +605,24 @@ extract_preassigned_adducts <- function(features_table) {
         adduct
       )
     ) |>
-    tidytable::mutate(
-      adduct = strsplit(as.character(adduct), "[|/]", perl = TRUE)
-    ) |>
-    tidyr::unnest(adduct) |>
-    tidytable::mutate(adduct = trimws(adduct)) |>
-    tidytable::distinct(feature_id, adduct) |>
+    tidytable::distinct(feature_id, adduct)
+
+  adduct_chr <- as.character(pre_raw$adduct)
+  adduct_chr[is.na(adduct_chr)] <- ""
+  parts <- strsplit(adduct_chr, "[|/]", perl = TRUE)
+  lens <- lengths(parts)
+  if (sum(lens) == 0L) {
+    return(tidytable::tidytable(feature_id = character(), adduct = character()))
+  }
+
+  expanded <- tidytable::tidytable(
+    feature_id = rep(pre_raw$feature_id, lens),
+    adduct = trimws(unlist(parts, use.names = FALSE))
+  )
+
+  expanded |>
     tidytable::filter(!is.na(adduct) & nzchar(adduct)) |>
+    tidytable::distinct(feature_id, adduct) |>
     harmonize_adducts(adducts_translations = adducts_translations)
 }
 
@@ -905,7 +916,7 @@ match_pairs_to_mass_diffs <- function(pairs, diffs, diff_col) {
 #'   - `cluster`: a cluster edge implies a `+cluster` suffix on the dest node
 #'   - `loss`: a neutral-loss edge implies a `-loss` suffix on the precursor
 #'   - `preassigned`: an upstream tool assigned this feature this adduct
-#'   - `baseline`: every feature is always tested under [M+H]+ / [M-H]-
+#'   - `baseline`: every feature is always tested under `[M+H]+` / `[M-H]-`
 #'
 #' @keywords internal
 collect_node_adduct_hypotheses <- function(
@@ -1284,19 +1295,28 @@ prune_candidates_by_network_consensus <- function(
     adduct_edges$adduct_dest
   )))
 
+  safe_max_support <- function(x) {
+    if (length(x) == 0L || all(is.na(x))) {
+      return(0L)
+    }
+    as.integer(max(x, na.rm = TRUE))
+  }
+
   support <- compute_feature_adduct_support(adduct_edges) |>
     tidytable::left_join(
       state_map |>
         tidytable::rename(adduct_state_key = state_key),
       by = "adduct"
     ) |>
-    tidytable::mutate(adduct_state_key = tidytable::if_else(
-      is.na(adduct_state_key),
-      adduct,
-      adduct_state_key
-    )) |>
+    tidytable::mutate(
+      adduct_state_key = tidytable::if_else(
+        is.na(adduct_state_key),
+        adduct,
+        adduct_state_key
+      )
+    ) |>
     tidytable::summarize(
-      adduct_support = max(adduct_support, na.rm = TRUE),
+      adduct_support = safe_max_support(adduct_support),
       .by = c(feature_id, adduct_state_key)
     ) |>
     tidytable::rename(net_support = adduct_support)
@@ -1307,11 +1327,13 @@ prune_candidates_by_network_consensus <- function(
         tidytable::rename(adduct_state_key = state_key),
       by = "adduct"
     ) |>
-    tidytable::mutate(adduct_state_key = tidytable::if_else(
-      is.na(adduct_state_key),
-      adduct,
-      adduct_state_key
-    )) |>
+    tidytable::mutate(
+      adduct_state_key = tidytable::if_else(
+        is.na(adduct_state_key),
+        adduct,
+        adduct_state_key
+      )
+    ) |>
     tidytable::left_join(support, by = c("feature_id", "adduct_state_key")) |>
     tidytable::mutate(
       is_preassigned = tidytable::if_else(
@@ -1866,12 +1888,14 @@ enforce_annotation_edge_adduct_agreement <- function(
 
   out |>
     tidytable::filter(keep) |>
-    tidytable::select(-tidyselect::any_of(c(
-      "adduct_state_key",
-      "edge_supported",
-      "feature_has_edge_support",
-      "keep"
-    )))
+    tidytable::select(
+      -tidyselect::any_of(c(
+        "adduct_state_key",
+        "edge_supported",
+        "feature_has_edge_support",
+        "keep"
+      ))
+    )
 }
 
 #' Build the output edges table from the three edge sets

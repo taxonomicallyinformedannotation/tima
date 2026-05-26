@@ -70,6 +70,19 @@ prepare_features_tables <- function(
   features_raw <- .load_features_file(features)
   log_debug("Loaded %d features", nrow(features_raw))
 
+  # Resolve configured column names against common aliases (e.g. mzTab fields).
+  resolved_names <- .resolve_feature_column_names(
+    tbl = features_raw,
+    name_features = name_features,
+    name_rt = name_rt,
+    name_mz = name_mz,
+    name_adduct = name_adduct
+  )
+  name_features <- resolved_names$name_features
+  name_rt <- resolved_names$name_rt
+  name_mz <- resolved_names$name_mz
+  name_adduct <- resolved_names$name_adduct
+
   # Format and Filter ----
   features_selected <- .select_intensity_columns(
     features_raw,
@@ -217,17 +230,53 @@ prepare_features_tables <- function(
   name_mz,
   name_adduct
 ) {
+  core_cols <- c(name_features, name_rt, name_mz, name_adduct)
+
   # Detect and select columns for mzmine (Peak area/height), SLAW (quant_),
   # SIRIUS
   selected <- tbl |>
     tidytable::select(
-      tidyselect::any_of(x = c(name_features, name_rt, name_mz, name_adduct)),
+      tidyselect::any_of(x = core_cols),
       tidyselect::matches(match = " Peak area"),
       tidyselect::matches(match = ":area"),
       tidyselect::matches(match = "quant_"),
       tidyselect::matches(match = " Peak height")
     ) |>
     tidytable::select(-tidyselect::matches(match = "quant_peaktable"))
+
+  # Fallback for mzTab-derived tables where sample columns are plain names.
+  selected_non_core <- setdiff(colnames(selected), core_cols)
+  if (length(selected_non_core) == 0L) {
+    candidate_cols <- setdiff(colnames(tbl), core_cols)
+
+    is_numeric_like <- function(x) {
+      vals <- as.character(x)
+      vals <- vals[!is.na(vals) & nzchar(vals)]
+      if (length(vals) == 0L) {
+        return(FALSE)
+      }
+      ratio_numeric <- mean(!is.na(suppressWarnings(as.numeric(vals))))
+      ratio_numeric >= 0.8
+    }
+
+    numeric_like_cols <- candidate_cols[vapply(
+      X = tbl[, ..candidate_cols],
+      FUN = is_numeric_like,
+      FUN.VALUE = logical(1L)
+    )]
+
+    if (length(numeric_like_cols) > 0L) {
+      log_info(
+        "No standard intensity patterns found; using %d numeric-like column(s) as intensities",
+        length(numeric_like_cols)
+      )
+      selected <- tbl |>
+        tidytable::select(
+          tidyselect::any_of(x = core_cols),
+          tidyselect::all_of(numeric_like_cols)
+        )
+    }
+  }
 
   # When both Peak area and Peak height are present for the same samples,
   # prefer Peak area and drop Peak height duplicates
@@ -346,4 +395,86 @@ prepare_features_tables <- function(
       )
     ) |>
     tidytable::arrange(feature_id |> as.numeric())
+}
+
+#' Resolve feature-table column names from configured values or aliases
+#' @keywords internal
+.resolve_feature_column_names <- function(
+  tbl,
+  name_features,
+  name_rt,
+  name_mz,
+  name_adduct
+) {
+  cols <- colnames(tbl)
+
+  resolve_one <- function(
+    requested,
+    aliases,
+    required = TRUE,
+    label = requested
+  ) {
+    if (requested %in% cols) {
+      return(requested)
+    }
+
+    candidates <- unique(c(aliases, requested))
+    matched <- candidates[candidates %in% cols]
+    if (length(matched) > 0L) {
+      chosen <- matched[[1L]]
+      log_warn(
+        "Column '%s' not found; using '%s' for %s",
+        requested,
+        chosen,
+        label
+      )
+      return(chosen)
+    }
+
+    if (required) {
+      cli::cli_abort(
+        c(
+          sprintf("Required column '%s' is missing", requested),
+          i = sprintf("Tried aliases: %s", paste(candidates, collapse = ", ")),
+          i = sprintf("Available columns: %s", paste(cols, collapse = ", "))
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
+    }
+
+    requested
+  }
+
+  list(
+    name_features = resolve_one(
+      requested = name_features,
+      aliases = c("feature_id", "row ID", "SML_ID", "SMF_ID", "id"),
+      required = TRUE,
+      label = "feature IDs"
+    ),
+    name_rt = resolve_one(
+      requested = name_rt,
+      aliases = c(
+        "rt",
+        "row retention time",
+        "retention_time_in_minutes",
+        "retention_time_in_seconds"
+      ),
+      required = FALSE,
+      label = "retention time"
+    ),
+    name_mz = resolve_one(
+      requested = name_mz,
+      aliases = c("mz", "row m/z", "exp_mass_to_charge", "precursor_mz"),
+      required = TRUE,
+      label = "precursor m/z"
+    ),
+    name_adduct = resolve_one(
+      requested = name_adduct,
+      aliases = c("adduct", "best ion", "adduct_ion", "adduct_ions"),
+      required = FALSE,
+      label = "adduct"
+    )
+  )
 }

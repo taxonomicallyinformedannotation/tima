@@ -194,6 +194,43 @@ test_that("create_edges_spectra creates output file", {
   expect_match(output, "\\.tsv$")
 })
 
+test_that("create_edges_spectra keeps feature IDs from FEATURE_ID (mzTab proxy MGF style)", {
+  withr::local_dir(new = temp_test_dir("create_edges_spectra_feature_ids"))
+  mgf_file <- tempfile(fileext = ".mgf")
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "TITLE=1",
+      "FEATURE_ID=1",
+      "PEPMASS=100",
+      "CHARGE=1+",
+      "50 10",
+      "75 20",
+      "END IONS",
+      "",
+      "BEGIN IONS",
+      "TITLE=2",
+      "FEATURE_ID=2",
+      "PEPMASS=101",
+      "CHARGE=1+",
+      "50 12",
+      "75 18",
+      "END IONS"
+    ),
+    mgf_file
+  )
+
+  output <- create_edges_spectra(
+    input = mgf_file,
+    threshold = 0.0,
+    matched_peaks = 1
+  )
+
+  df <- tidytable::fread(output)
+  expect_true(all(c("CLUSTERID1", "CLUSTERID2") %in% colnames(df)))
+  expect_true(any(df$CLUSTERID1 == "1" | df$CLUSTERID2 == "2"))
+})
+
 test_that("create_edges_spectra() creates edges from two spectra with entropy", {
   skip_if_not_installed("Spectra")
   withr::local_dir(new = temp_test_dir("create_edges_spectra_entropy"))
@@ -280,7 +317,7 @@ test_that("create_edges_spectra handles empty MGF file", {
   # Should handle gracefully
   expect_error(
     create_edges_spectra(input = mgf_file),
-    "Spectra': 'data' must be of a vector type, was 'NULL'"
+    "No usable spectra found in input"
   )
 })
 
@@ -291,7 +328,7 @@ test_that("create_edges_spectra handles invalid MGF format", {
 
   expect_error(
     create_edges_spectra(input = mgf_file),
-    "Spectra': 'data' must be of a vector type, was 'NULL'"
+    "No usable spectra found in input"
   )
 })
 

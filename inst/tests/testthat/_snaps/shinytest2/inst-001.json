@@ -42,6 +42,7 @@
         "0.tsv"
       ]
     },
+    "fil_mzt_raw": null,
     "fil_pat": "example",
     "fil_spe_raw": {
       "name": [
@@ -87,9 +88,10 @@
       "C2H4O2"
     ],
     "ms_clu_pos": [
-      "H2O",
       "C2H3N",
-      "NaCl"
+      "C2H7N",
+      "NaCl",
+      "C2H6OS"
     ],
     "ms_neu": [
       "O",

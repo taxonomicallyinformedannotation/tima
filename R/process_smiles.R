@@ -69,9 +69,6 @@ process_smiles <- function(
 
   log_info("Processing SMILES with RDKit")
 
-  # Load Python Processor ----
-  load_python_smiles_processor()
-
   # Extract Unique SMILES ----
   table_smiles <- extract_unique_smiles(df, smiles_colname)
 
@@ -109,6 +106,10 @@ process_smiles <- function(
         )
     )
   }
+
+  # Load Python Processor only when new SMILES actually require RDKit.
+  # This avoids repeated expensive Python startup for cached-only calls.
+  load_python_smiles_processor()
 
   # Create temporary files for Python processing
   input_smi_file <- tempfile(fileext = ".smi")

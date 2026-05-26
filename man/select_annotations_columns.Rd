@@ -10,7 +10,8 @@ select_annotations_columns(
   str_met,
   str_tax_cla,
   str_tax_npc,
-  cache = NULL
+  cache = NULL,
+  recompute_smiles = TRUE
 )
 }
 \arguments{
@@ -29,6 +30,10 @@ candidate information}
 \item{cache}{(character or NULL) Optional path to a SMILES processing cache
 file (e.g. \code{processed.csv.gz}). When \code{NULL} (default), the cache path
 is auto-derived from \code{dirname(str_stereo)/processed.csv.gz}.}
+
+\item{recompute_smiles}{\link{logical} If \code{TRUE} (default), recompute structure
+fields from SMILES via RDKit. Set to \code{FALSE} to skip RDKit and keep the
+provided structure fields as-is (faster for large batch runs).}
 }
 \value{
 Data frame with standardized annotation columns, cleaned values,

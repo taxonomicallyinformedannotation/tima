@@ -57,12 +57,28 @@ archive_log_file <- function(log_file, timestamp) {
 #'
 #' @return Invisible NULL
 #' @keywords internal
-execute_targets_pipeline <- function(target_pattern = "^ann_wei$") {
+execute_targets_pipeline <- function(target_pattern = "^(ann_wei|exp_mzt)$") {
   log_info("Executing targets pipeline (pattern: %s)...", target_pattern)
+
+  targets_script <- "_targets.R"
+  if (!file.exists(targets_script)) {
+    cli::cli_abort(
+      c(
+        "tima workflow pipeline failed",
+        "x" = "_targets.R was not found in the current working directory",
+        "i" = "run from a TIMA workspace root or create a local _targets.R"
+      ),
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
+    )
+  }
 
   tryCatch(
     {
-      targets::tar_make(names = tidyselect::matches(match = target_pattern))
+      targets::tar_make(
+        names = tidyselect::matches(match = target_pattern),
+        script = targets_script
+      )
       log_success("Targets pipeline completed successfully")
     },
     error = function(e) {
@@ -100,7 +116,7 @@ execute_targets_pipeline <- function(target_pattern = "^ann_wei$") {
 #' \itemize{
 #'   \item Initializes logging and timing
 #'   \item Navigates to cache directory
-#'   \item Executes the targets pipeline (annotation preparation)
+#'   \item Executes the targets pipeline (annotation preparation + mzTab export)
 #'   \item Archives timestamped logs to data/processed/
 #' }
 #'
@@ -108,7 +124,7 @@ execute_targets_pipeline <- function(target_pattern = "^ann_wei$") {
 #' @include logs_utils.R
 #'
 #' @param target_pattern [character] Regex pattern for target selection.
-#'     Default: "^ann_wei$" (annotation preparation target)
+#'     Default: "^(ann_wei|exp_mzt)$" (annotation preparation + mzTab export)
 #' @param log_file [character] Path to log file. Default: "tima.log"
 #' @param clean_old_logs [logical] Remove old log file before starting.
 #'     Default: TRUE
@@ -150,7 +166,7 @@ execute_targets_pipeline <- function(target_pattern = "^ann_wei$") {
 #' )
 #' }
 run_tima <- function(
-  target_pattern = "^ann_wei$",
+  target_pattern = "^(ann_wei|exp_mzt)$",
   log_file = "tima.log",
   clean_old_logs = TRUE,
   log_level = "info"
@@ -308,14 +324,14 @@ run_tima <- function(
 #'
 #' \strong{Migration Guide:}
 #' \itemize{
-#'   \item Old: \code{tima_full(target_pattern = "^ann_wei$")}
-#'   \item New: \code{run_tima(target_pattern = "^ann_wei$")}
+#'   \item Old: \code{tima_full(target_pattern = "^(ann_wei|exp_mzt)$")}
+#'   \item New: \code{run_tima(target_pattern = "^(ann_wei|exp_mzt)$")}
 #' }
 #'
 #' All parameters and behavior are identical between the two functions.
 #'
 #' @param target_pattern Character. Regex pattern for target selection.
-#'     Default: "^ann_wei$"
+#'     Default: "^(ann_wei|exp_mzt)$"
 #' @param log_file Character. Path to log file. Default: "tima.log"
 #' @param clean_old_logs Logical. Remove old log file before starting.
 #'     Default: TRUE
@@ -339,7 +355,7 @@ run_tima <- function(
 #' run_tima()
 #' }
 tima_full <- function(
-  target_pattern = "^ann_wei$",
+  target_pattern = "^(ann_wei|exp_mzt)$",
   log_file = "tima.log",
   clean_old_logs = TRUE,
   log_level = "info"

@@ -405,11 +405,7 @@ get_last_version_from_zenodo <- function(doi, pattern, path, timeout_s = 90) {
     file_sizes <- files$size
   } else if (is.list(files) && !is.null(files$key)) {
     filenames <- files$key
-    file_urls <- if (!is.null(files$links$download)) {
-      files$links$download
-    } else {
-      files$links$self
-    }
+    file_urls <- files$links$download %||% files$links$self
     file_sizes <- files$size
   } else {
     filenames <- vapply(

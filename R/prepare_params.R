@@ -83,6 +83,8 @@ prepare_params <- function(
   # params_advanced$files$annotations$prepared$structural$ms1
   fil_ann_pre_str_mzm <-
     params_advanced$files$annotations$prepared$structural$mzmine
+  fil_ann_pre_str_mzt <-
+    params_advanced$files$annotations$prepared$structural$mztab
   fil_ann_pre_str_sir <-
     params_advanced$files$annotations$prepared$structural$sirius
   fil_ann_pre_str_spe <-
@@ -262,6 +264,10 @@ prepare_params <- function(
   fil_fea_raw <- params_small$files$features$raw
   fil_met_raw <- params_small$files$metadata$raw
   fil_spe_raw <- params_small$files$spectral$raw
+  fil_mzt_raw <- tryCatch(
+    params_small$files$mztab$raw,
+    error = function(...) NULL
+  )
   fil_ann_raw_mzm <- params_small$files$annotations$raw$spectral$mzmine
   fil_ann_raw_sir <- params_small$files$annotations$raw$sirius
   ms_pol <- params_small$ms$polarity
@@ -273,6 +279,7 @@ prepare_params <- function(
   yamls_params$`prepare_params_advanced`$files$features$raw <- fil_fea_raw
   yamls_params$`prepare_params_advanced`$files$metadata$raw <- fil_met_raw
   yamls_params$`prepare_params_advanced`$files$spectral$raw <- fil_spe_raw
+  yamls_params$`prepare_params_advanced`$files$mztab$raw <- fil_mzt_raw
   yamls_params$`prepare_params_advanced`$files$annotations$raw$spectral$mzmine <- fil_ann_raw_mzm
   yamls_params$`prepare_params_advanced`$files$annotations$raw$sirius <-
     fil_ann_raw_sir
@@ -431,6 +438,20 @@ prepare_params <- function(
   yamls_params$prepare_annotations_mzmine$files$libraries$sop$merged$structures$taxonomies$cla <-
     fil_lib_sop_mer_str_tax_cla
   yamls_params$prepare_annotations_mzmine$files$libraries$sop$merged$structures$taxonomies$npc <-
+    fil_lib_sop_mer_str_tax_npc
+
+  ## prepare_annotations_mztab
+  yamls_params$prepare_annotations_mztab$files$mztab$raw <-
+    fil_mzt_raw
+  yamls_params$prepare_annotations_mztab$files$annotations$prepared$structural$mztab <-
+    fil_ann_pre_str_mzt
+  yamls_params$prepare_annotations_mztab$files$libraries$sop$merged$structures$stereo <-
+    fil_lib_sop_mer_str_ste
+  yamls_params$prepare_annotations_mztab$files$libraries$sop$merged$structures$metadata <-
+    fil_lib_sop_mer_str_met
+  yamls_params$prepare_annotations_mztab$files$libraries$sop$merged$structures$taxonomies$cla <-
+    fil_lib_sop_mer_str_tax_cla
+  yamls_params$prepare_annotations_mztab$files$libraries$sop$merged$structures$taxonomies$npc <-
     fil_lib_sop_mer_str_tax_npc
 
   ## prepare_annotations_sirius
@@ -750,6 +771,19 @@ prepare_params <- function(
     opt_rem_tie
   yamls_params$weight_annotations$options$summarize <-
     opt_sum
+
+  ## write_mztab
+  yamls_params$write_mztab$files$mztab$raw <-
+    fil_mzt_raw
+  yamls_params$write_mztab$files$annotations$processed <-
+    yamls_params$weight_annotations$files$annotations$processed
+  yamls_params$write_mztab$files$output$mztab <-
+    sub(
+      "\\.[ct]sv(\\.gz)?$",
+      ".mztab",
+      yamls_params$weight_annotations$files$annotations$processed[[1L]],
+      ignore.case = TRUE
+    )
 
   ## annotate_masses
   yamls_params$annotate_masses$files$annotations$prepared$structural <-

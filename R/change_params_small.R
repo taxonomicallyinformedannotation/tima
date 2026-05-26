@@ -103,6 +103,7 @@ create_yaml_null_handler <- function() {
 #' @param fil_sir_raw Character. Path to SIRIUS annotations directory/zip
 #' @param fil_spe_raw Character. Path to spectra file (MGF format with MS1/MS2)
 #' @param fil_ann_mzm Character. Path to mzmine annotations file
+#' @param fil_mzt_raw Character. Path to an mzTab-M file to import/merge
 #' @param ms_pol Character. MS polarity: "pos" or "neg"
 #' @param org_tax Character. Scientific name for single-taxon experiments
 #' @param hig_con Logical. Filter for high confidence candidates only
@@ -136,6 +137,7 @@ create_yaml_null_handler <- function() {
 #'   fil_sir_raw = "data/raw/sirius_output.zip",
 #'   fil_spe_raw = "data/raw/spectra.mgf",
 #'   fil_ann_mzm = "data/raw/mzmine_annotations.csv",
+#'   fil_mzt_raw = "data/raw/annotations.mztab",
 #'   ms_pol = "pos",
 #'   org_tax = "Gentiana lutea",
 #'   hig_con = TRUE,
@@ -149,6 +151,7 @@ change_params_small <- function(
   fil_sir_raw = NULL,
   fil_spe_raw = NULL,
   fil_ann_mzm = NULL,
+  fil_mzt_raw = NULL,
   ms_pol = NULL,
   org_tax = NULL,
   hig_con = NULL,
@@ -229,6 +232,17 @@ change_params_small <- function(
       file_path = fil_ann_mzm,
       target_dir = paths_data_interim_annotations,
       file_description = "mzmine annotations"
+    )
+  }
+
+  if (!is.null(fil_mzt_raw)) {
+    if (is.null(yaml_small$files$mztab) || !is.list(yaml_small$files$mztab)) {
+      yaml_small$files$mztab <- list(raw = NA)
+    }
+    yaml_small$files$mztab$raw <- copy_file_to_target(
+      file_path = fil_mzt_raw,
+      target_dir = paths_data_source,
+      file_description = "mzTab"
     )
   }
 

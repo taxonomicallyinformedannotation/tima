@@ -1,0 +1,567 @@
+MTD	mzTab-version	2.0.0-M
+MTD	mzTab-ID	1
+MTD	publication[1]	doi:10.1139/cjb-2022-0048
+MTD	instrument[1]-name	[MS, MS:1003005, Bruker Daltonics' timsTOF Pro, ]
+MTD	instrument[1]-source	[MS, MS:1000073, Electrospray Ionization, ]
+MTD	instrument[1]-analyzer[1]	[MS, MS:1000081, quadrupole, ]
+MTD	quantification_method	[MS, MS:1002019, label free raw feature quantitation, ]
+MTD	sample[1]-species[1]	[NCBITaxon, NCBITaxon:139838, Radula complanata, ]
+MTD	sample_processing[1]	[CHMO, CHMO:0001050, reversed-phase liquid chromatography, ]
+MTD	software[1]	[, , LipidDataAnalyzer, 2.11.1]
+MTD	software[1]-setting[1]	isotope_pattern_checked
+MTD	ms_run[1]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/AA1-1-auto-MS-MS-neg_13_1_1476.chrom
+MTD	ms_run[1]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[1]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[1]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[1]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[2]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/AA1-2-auto-MS-MS-neg_9_1_1472.chrom
+MTD	ms_run[2]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[2]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[2]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[2]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[3]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/AA1-3-auto-MS-MS-neg_6_1_1468.chrom
+MTD	ms_run[3]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[3]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[3]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[3]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[4]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/AA10-1-auto-MS-MS-neg_10_1_1473.chrom
+MTD	ms_run[4]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[4]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[4]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[4]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[5]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/AA10-2-auto-MS-MS-neg_8_1_1470.chrom
+MTD	ms_run[5]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[5]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[5]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[5]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[6]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/AA10-3-auto-MS-MS-neg_3_1_1465.chrom
+MTD	ms_run[6]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[6]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[6]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[6]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[7]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/BAP1-1-auto-MS-MS-neg_1_1_1463.chrom
+MTD	ms_run[7]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[7]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[7]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[7]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[8]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/BAP1-2-auto-MS-MS-neg_26_1_1491.chrom
+MTD	ms_run[8]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[8]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[8]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[8]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[9]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/BAP1-3-auto-MS-MS-neg_24_1_1488.chrom
+MTD	ms_run[9]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[9]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[9]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[9]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[10]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/BAP10-1-auto-MS-MS-neg_28_1_1493.chrom
+MTD	ms_run[10]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[10]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[10]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[10]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[11]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/BAP10-2-auto-MS-MS-neg_22_1_1486.chrom
+MTD	ms_run[11]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[11]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[11]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[11]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[12]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/BAP10-3-auto-MS-MS-neg_16_1_1479.chrom
+MTD	ms_run[12]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[12]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[12]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[12]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[13]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/G-Control-1-auto-MS-MS-neg_35_1_1501.chrom
+MTD	ms_run[13]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[13]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[13]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[13]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[14]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/G-Control-2-auto-MS-MS-neg_4_1_1466.chrom
+MTD	ms_run[14]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[14]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[14]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[14]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[15]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/G-Control-3-auto-MS-MS-neg_23_1_1487.chrom
+MTD	ms_run[15]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[15]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[15]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[15]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[16]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/JA1-1-auto-MS-MS-neg_30_1_1495.chrom
+MTD	ms_run[16]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[16]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[16]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[16]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[17]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/JA1-2-auto-MS-MS-neg_5_1_1467.chrom
+MTD	ms_run[17]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[17]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[17]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[17]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[18]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/JA1-3-auto-MS-MS-neg_21_1_1485.chrom
+MTD	ms_run[18]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[18]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[18]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[18]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[19]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/JA10-1-auto-MS-MS-neg_33_1_1499.chrom
+MTD	ms_run[19]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[19]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[19]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[19]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[20]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/JA10-2-auto-MS-MS-neg_36_1_1502.chrom
+MTD	ms_run[20]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[20]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[20]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[20]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[21]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/JA10-3-auto-MS-MS-neg_14_1_1477.chrom
+MTD	ms_run[21]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[21]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[21]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[21]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[22]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/NAA1-1-auto-MS-MS-neg_18_1_1482.chrom
+MTD	ms_run[22]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[22]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[22]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[22]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[23]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/NAA1-2-auto-MS-MS-neg_20_1_1484.chrom
+MTD	ms_run[23]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[23]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[23]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[23]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[24]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/NAA1-3-auto-MS-MS-neg_2_1_1464.chrom
+MTD	ms_run[24]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[24]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[24]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[24]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[25]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/NAA10-1-auto-MS-MS-neg_7_1_1469.chrom
+MTD	ms_run[25]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[25]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[25]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[25]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[26]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/NAA10-2-auto-MS-MS-neg_19_1_1483.chrom
+MTD	ms_run[26]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[26]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[26]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[26]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[27]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/NAA10-3-auto-MS-MS-neg_15_1_1478.chrom
+MTD	ms_run[27]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[27]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[27]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[27]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[28]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/S-Control-1-auto-MS-MS-neg_17_1_1481.chrom
+MTD	ms_run[28]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[28]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[28]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[28]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[29]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/S-Control-2-auto-MS-MS-neg_12_1_1475.chrom
+MTD	ms_run[29]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[29]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[29]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[29]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[30]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/S-Control-3-auto-MS-MS-neg_32_1_1497.chrom
+MTD	ms_run[30]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[30]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[30]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[30]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[31]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/SA1-1-auto-MS-MS-neg_27_1_1492.chrom
+MTD	ms_run[31]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[31]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[31]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[31]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[32]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/SA1-2-auto-MS-MS-neg_31_1_1496.chrom
+MTD	ms_run[32]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[32]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[32]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[32]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[33]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/SA1-3-auto-MS-MS-neg_34_1_1500.chrom
+MTD	ms_run[33]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[33]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[33]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[33]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[34]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/SA10-1-auto-MS-MS-neg_11_1_1474.chrom
+MTD	ms_run[34]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[34]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[34]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[34]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[35]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/SA10-2-auto-MS-MS-neg_29_1_1494.chrom
+MTD	ms_run[35]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[35]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[35]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[35]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[36]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/NEG/SA10-3-auto-MS-MS-neg_25_1_1490.chrom
+MTD	ms_run[36]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[36]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[36]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[36]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[37]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/AA1-1-auto-MS-MS-pos_13_1_1383.chrom
+MTD	ms_run[37]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[37]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[37]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[37]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[38]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/AA1-2-auto-MS-MS-pos_9_1_1379.chrom
+MTD	ms_run[38]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[38]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[38]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[38]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[39]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/AA1-3-auto-MS-MS-pos_6_1_1375.chrom
+MTD	ms_run[39]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[39]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[39]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[39]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[40]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/AA10-1-auto-MS-MS-pos_10_1_1380.chrom
+MTD	ms_run[40]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[40]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[40]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[40]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[41]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/AA10-2-auto-MS-MS-pos_8_1_1377.chrom
+MTD	ms_run[41]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[41]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[41]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[41]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[42]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/AA10-3-auto-MS-MS-pos_3_1_1372.chrom
+MTD	ms_run[42]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[42]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[42]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[42]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[43]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/BAP1-1-auto-MS-MS-pos_1_1_1370.chrom
+MTD	ms_run[43]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[43]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[43]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[43]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[44]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/BAP1-2-auto-MS-MS-pos_26_1_1398.chrom
+MTD	ms_run[44]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[44]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[44]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[44]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[45]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/BAP1-3-auto-MS-MS-pos_24_1_1395.chrom
+MTD	ms_run[45]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[45]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[45]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[45]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[46]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/BAP10-1-auto-MS-MS-pos_28_1_1400.chrom
+MTD	ms_run[46]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[46]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[46]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[46]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[47]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/BAP10-2-auto-MS-MS-pos_22_1_1393.chrom
+MTD	ms_run[47]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[47]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[47]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[47]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[48]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/BAP10-3-auto-MS-MS-pos_16_1_1386.chrom
+MTD	ms_run[48]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[48]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[48]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[48]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[49]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/G-Control-1-auto-MS-MS-pos_35_1_1408.chrom
+MTD	ms_run[49]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[49]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[49]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[49]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[50]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/G-Control-2-auto-MS-MS-pos_4_1_1373.chrom
+MTD	ms_run[50]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[50]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[50]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[50]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[51]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/G-Control-3-auto-MS-MS-pos_23_1_1394.chrom
+MTD	ms_run[51]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[51]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[51]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[51]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[52]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/JA1-1-auto-MS-MS-pos_30_1_1402.chrom
+MTD	ms_run[52]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[52]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[52]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[52]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[53]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/JA1-2-auto-MS-MS-pos_5_1_1374.chrom
+MTD	ms_run[53]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[53]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[53]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[53]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[54]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/JA1-3-auto-MS-MS-pos_21_1_1392.chrom
+MTD	ms_run[54]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[54]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[54]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[54]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[55]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/JA10-1-auto-MS-MS-pos_33_1_1406.chrom
+MTD	ms_run[55]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[55]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[55]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[55]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[56]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/JA10-2-auto-MS-MS-pos_36_1_1409.chrom
+MTD	ms_run[56]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[56]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[56]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[56]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[57]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/JA10-3-auto-MS-MS-pos_14_1_1384.chrom
+MTD	ms_run[57]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[57]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[57]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[57]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[58]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/NAA1-1-auto-MS-MS-pos_18_1_1389.chrom
+MTD	ms_run[58]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[58]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[58]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[58]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[59]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/NAA1-2-auto-MS-MS-pos_20_1_1391.chrom
+MTD	ms_run[59]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[59]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[59]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[59]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[60]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/NAA1-3-auto-MS-MS-pos_2_1_1371.chrom
+MTD	ms_run[60]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[60]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[60]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[60]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[61]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/NAA10-1-auto-MS-MS-pos_7_1_1376.chrom
+MTD	ms_run[61]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[61]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[61]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[61]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[62]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/NAA10-2-auto-MS-MS-pos_19_1_1390.chrom
+MTD	ms_run[62]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[62]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[62]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[62]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[63]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/NAA10-3-auto-MS-MS-pos_15_1_1385.chrom
+MTD	ms_run[63]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[63]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[63]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[63]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[64]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/S-Control-1-auto-MS-MS-pos_17_1_1388.chrom
+MTD	ms_run[64]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[64]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[64]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[64]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[65]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/S-Control-2-auto-MS-MS-pos_12_1_1382.chrom
+MTD	ms_run[65]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[65]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[65]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[65]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[66]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/S-Control-3-auto-MS-MS-pos-inj2_96_1_1659.chrom
+MTD	ms_run[66]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[66]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[66]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[66]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[67]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/SA1-1-auto-MS-MS-pos_27_1_1399.chrom
+MTD	ms_run[67]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[67]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[67]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[67]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[68]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/SA1-2-auto-MS-MS-pos_31_1_1403.chrom
+MTD	ms_run[68]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[68]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[68]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[68]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[69]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/SA1-3-auto-MS-MS-pos_34_1_1407.chrom
+MTD	ms_run[69]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[69]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[69]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[69]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[70]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/SA10-1-auto-MS-MS-pos_11_1_1381.chrom
+MTD	ms_run[70]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[70]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[70]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[70]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[71]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/SA10-2-auto-MS-MS-pos_29_1_1401.chrom
+MTD	ms_run[71]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[71]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[71]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[71]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	ms_run[72]-location	file://C:/mzTab/other/RAW_FILES/DERIVED_FILES/POS/SA10-3-auto-MS-MS-pos_25_1_1397.chrom
+MTD	ms_run[72]-hash_method	[MS, MS:1000569, SHA-1, ]
+MTD	ms_run[72]-format	[MS, MS:1002966, The Lipid Data Analyzer native chrom format., ]
+MTD	ms_run[72]-scan_polarity[1]	[MS, MS:1000130, positive scan, ]
+MTD	ms_run[72]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
+MTD	assay[1]-ms_run_ref	ms_run[1]
+MTD	assay[2]-ms_run_ref	ms_run[2]
+MTD	assay[3]-ms_run_ref	ms_run[3]
+MTD	assay[4]-ms_run_ref	ms_run[4]
+MTD	assay[5]-ms_run_ref	ms_run[5]
+MTD	assay[6]-ms_run_ref	ms_run[6]
+MTD	assay[7]-ms_run_ref	ms_run[7]
+MTD	assay[8]-ms_run_ref	ms_run[8]
+MTD	assay[9]-ms_run_ref	ms_run[9]
+MTD	assay[10]-ms_run_ref	ms_run[10]
+MTD	assay[11]-ms_run_ref	ms_run[11]
+MTD	assay[12]-ms_run_ref	ms_run[12]
+MTD	assay[13]-ms_run_ref	ms_run[13]
+MTD	assay[14]-ms_run_ref	ms_run[14]
+MTD	assay[15]-ms_run_ref	ms_run[15]
+MTD	assay[16]-ms_run_ref	ms_run[16]
+MTD	assay[17]-ms_run_ref	ms_run[17]
+MTD	assay[18]-ms_run_ref	ms_run[18]
+MTD	assay[19]-ms_run_ref	ms_run[19]
+MTD	assay[20]-ms_run_ref	ms_run[20]
+MTD	assay[21]-ms_run_ref	ms_run[21]
+MTD	assay[22]-ms_run_ref	ms_run[22]
+MTD	assay[23]-ms_run_ref	ms_run[23]
+MTD	assay[24]-ms_run_ref	ms_run[24]
+MTD	assay[25]-ms_run_ref	ms_run[25]
+MTD	assay[26]-ms_run_ref	ms_run[26]
+MTD	assay[27]-ms_run_ref	ms_run[27]
+MTD	assay[28]-ms_run_ref	ms_run[28]
+MTD	assay[29]-ms_run_ref	ms_run[29]
+MTD	assay[30]-ms_run_ref	ms_run[30]
+MTD	assay[31]-ms_run_ref	ms_run[31]
+MTD	assay[32]-ms_run_ref	ms_run[32]
+MTD	assay[33]-ms_run_ref	ms_run[33]
+MTD	assay[34]-ms_run_ref	ms_run[34]
+MTD	assay[35]-ms_run_ref	ms_run[35]
+MTD	assay[36]-ms_run_ref	ms_run[36]
+MTD	assay[37]-ms_run_ref	ms_run[37]
+MTD	assay[38]-ms_run_ref	ms_run[38]
+MTD	assay[39]-ms_run_ref	ms_run[39]
+MTD	assay[40]-ms_run_ref	ms_run[40]
+MTD	assay[41]-ms_run_ref	ms_run[41]
+MTD	assay[42]-ms_run_ref	ms_run[42]
+MTD	assay[43]-ms_run_ref	ms_run[43]
+MTD	assay[44]-ms_run_ref	ms_run[44]
+MTD	assay[45]-ms_run_ref	ms_run[45]
+MTD	assay[46]-ms_run_ref	ms_run[46]
+MTD	assay[47]-ms_run_ref	ms_run[47]
+MTD	assay[48]-ms_run_ref	ms_run[48]
+MTD	assay[49]-ms_run_ref	ms_run[49]
+MTD	assay[50]-ms_run_ref	ms_run[50]
+MTD	assay[51]-ms_run_ref	ms_run[51]
+MTD	assay[52]-ms_run_ref	ms_run[52]
+MTD	assay[53]-ms_run_ref	ms_run[53]
+MTD	assay[54]-ms_run_ref	ms_run[54]
+MTD	assay[55]-ms_run_ref	ms_run[55]
+MTD	assay[56]-ms_run_ref	ms_run[56]
+MTD	assay[57]-ms_run_ref	ms_run[57]
+MTD	assay[58]-ms_run_ref	ms_run[58]
+MTD	assay[59]-ms_run_ref	ms_run[59]
+MTD	assay[60]-ms_run_ref	ms_run[60]
+MTD	assay[61]-ms_run_ref	ms_run[61]
+MTD	assay[62]-ms_run_ref	ms_run[62]
+MTD	assay[63]-ms_run_ref	ms_run[63]
+MTD	assay[64]-ms_run_ref	ms_run[64]
+MTD	assay[65]-ms_run_ref	ms_run[65]
+MTD	assay[66]-ms_run_ref	ms_run[66]
+MTD	assay[67]-ms_run_ref	ms_run[67]
+MTD	assay[68]-ms_run_ref	ms_run[68]
+MTD	assay[69]-ms_run_ref	ms_run[69]
+MTD	assay[70]-ms_run_ref	ms_run[70]
+MTD	assay[71]-ms_run_ref	ms_run[71]
+MTD	assay[72]-ms_run_ref	ms_run[72]
+MTD	study_variable[1]	neg
+MTD	study_variable[1]-description	neg
+MTD	study_variable[1]-average_function	[MS, MS:1002962, The arithmetic mean, ]
+MTD	study_variable[1]-variation_function	[MS, MS:1002963, The coefficient of variation, ]
+MTD	study_variable[1]-assay_refs	assay[1]|assay[2]|assay[3]|assay[4]|assay[5]|assay[6]|assay[7]|assay[8]|assay[9]|assay[10]|assay[11]|assay[12]|assay[13]|assay[14]|assay[15]|assay[16]|assay[17]|assay[18]|assay[19]|assay[20]|assay[21]|assay[22]|assay[23]|assay[24]|assay[25]|assay[26]|assay[27]|assay[28]|assay[29]|assay[30]|assay[31]|assay[32]|assay[33]|assay[34]|assay[35]|assay[36]
+MTD	study_variable[2]	pos
+MTD	study_variable[2]-description	pos
+MTD	study_variable[2]-average_function	[MS, MS:1002962, The arithmetic mean, ]
+MTD	study_variable[2]-variation_function	[MS, MS:1002963, The coefficient of variation, ]
+MTD	study_variable[2]-assay_refs	assay[37]|assay[38]|assay[39]|assay[40]|assay[41]|assay[42]|assay[43]|assay[44]|assay[45]|assay[46]|assay[47]|assay[48]|assay[49]|assay[50]|assay[51]|assay[52]|assay[53]|assay[54]|assay[55]|assay[56]|assay[57]|assay[58]|assay[59]|assay[60]|assay[61]|assay[62]|assay[63]|assay[64]|assay[65]|assay[66]|assay[67]|assay[68]|assay[69]|assay[70]|assay[71]|assay[72]
+MTD	cv[1]-label	MS
+MTD	cv[1]-uri	https://www.ebi.ac.uk/ols/ontologies/ms
+MTD	cv[1]-version	20-06-2018
+MTD	cv[1]-full_name	PSI-MS controlled vocabulary
+MTD	cv[2]-label	PRIDE
+MTD	cv[2]-uri	https://www.ebi.ac.uk/ols/ontologies/pride
+MTD	cv[2]-version	14-06-2018
+MTD	cv[2]-full_name	PRIDE PRoteomics IDEntifications (PRIDE) database controlled vocabulary
+MTD	cv[3]-label	CHMO
+MTD	cv[3]-uri	http://purl.obolibrary.org/obo/chmo.owl
+MTD	cv[3]-version	14-11-2019
+MTD	cv[3]-full_name	Chemical Methods Ontology
+MTD	cv[4]-label	NCBITaxon
+MTD	cv[4]-uri	https://www.ebi.ac.uk/ols/ontologies/ncbitaxon
+MTD	cv[4]-version	2018-03-02
+MTD	cv[4]-full_name	NCBI organismal classification
+MTD	small_molecule-quantification_unit	[PRIDE, PRIDE:0000330, Arbitrary quantification unit, ]
+MTD	small_molecule_feature-quantification_unit	[PRIDE, PRIDE:0000330, Arbitrary quantification unit, ]
+MTD	small_molecule-identification_reliability	[MS, MS:1002896, compound identification confidence level, ]
+MTD	database[1]	[, , LipidDataAnalyzer2, lda2]
+MTD	database[1]-prefix	lda2
+MTD	database[1]-uri	https://github.com/ThallingerLab/LDA2
+MTD	database[1]-version	2.11.1
+MTD	id_confidence_measure[1]	[MS, MS:1002890, fragmentation score, ]
+
+SMH	SML_ID	SMF_ID_REFS	database_identifier	chemical_formula	smiles	inchi	chemical_name	uri	theoretical_neutral_mass	adduct_ions	reliability	best_id_confidence_measure	best_id_confidence_value	abundance_assay[1]	abundance_assay[2]	abundance_assay[3]	abundance_assay[4]	abundance_assay[5]	abundance_assay[6]	abundance_assay[7]	abundance_assay[8]	abundance_assay[9]	abundance_assay[10]	abundance_assay[11]	abundance_assay[12]	abundance_assay[13]	abundance_assay[14]	abundance_assay[15]	abundance_assay[16]	abundance_assay[17]	abundance_assay[18]	abundance_assay[19]	abundance_assay[20]	abundance_assay[21]	abundance_assay[22]	abundance_assay[23]	abundance_assay[24]	abundance_assay[25]	abundance_assay[26]	abundance_assay[27]	abundance_assay[28]	abundance_assay[29]	abundance_assay[30]	abundance_assay[31]	abundance_assay[32]	abundance_assay[33]	abundance_assay[34]	abundance_assay[35]	abundance_assay[36]	abundance_assay[37]	abundance_assay[38]	abundance_assay[39]	abundance_assay[40]	abundance_assay[41]	abundance_assay[42]	abundance_assay[43]	abundance_assay[44]	abundance_assay[45]	abundance_assay[46]	abundance_assay[47]	abundance_assay[48]	abundance_assay[49]	abundance_assay[50]	abundance_assay[51]	abundance_assay[52]	abundance_assay[53]	abundance_assay[54]	abundance_assay[55]	abundance_assay[56]	abundance_assay[57]	abundance_assay[58]	abundance_assay[59]	abundance_assay[60]	abundance_assay[61]	abundance_assay[62]	abundance_assay[63]	abundance_assay[64]	abundance_assay[65]	abundance_assay[66]	abundance_assay[67]	abundance_assay[68]	abundance_assay[69]	abundance_assay[70]	abundance_assay[71]	abundance_assay[72]	abundance_study_variable[1]	abundance_study_variable[2]	abundance_variation_study_variable[1]	abundance_variation_study_variable[2]	opt_global_lipid_species	opt_global_lipid_lda_species
+SML	1	1	lda2:MET 4-(3-Methyl-2-butenyl)-5- phenethylbenzene-1,3-diol	C19H22O2	null	null	MET 4-(3-Methyl-2-butenyl)-5- phenethylbenzene-1,3-diol	null	282.1619800299999	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	339922.82421875	405710.6484375	332679.51171875	null	null	null	null	null	null	50181.77783203125	null	66080.3662109375	null	68078.9892578125	79449.6064453125	74375.5810546875	58916.1142578125	55938.65234375	227610.05859375	99155.1044921875	90842.9306640625	null	null	null	110156.873046875	129813.431640625	26757.8759765625	115125.17578125	145835.66015625	149014.76171875	210225.78125	207986.5859375	68209.9306640625	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	141457.64734996448	0.0	0.7381935176886084	NaN	MET 4-(3-Methyl-2-butenyl)-5- phenethylbenzene-1,3-diol	MET 4-(3-Methyl-2-butenyl)-5- phenethylbenzene-1,3-diol_10.31
+SML	2	2	lda2:MET 4-(3-Methyl-2-butenyl)-5- phenethylbenzene-1,3-diol	C19H22O2	null	null	MET 4-(3-Methyl-2-butenyl)-5- phenethylbenzene-1,3-diol	null	282.1619800299999	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	3683465.203125	3173967.4453125	2679514.93359375	2844257.43359375	4177087.890625	4384673.1875	2161030.62109375	3526893.1484375	4492726.6796875	5229474.8046875	3510716.90625	6295308.734375	4968347.578125	5624746.15625	4881048.8515625	1242459.37890625	6060308.390625	4693889.171875	7672370.984375	5176137.734375	5444934.9375	6078975.2890625	5399436.4375	4451279.59375	981694.46875	2827353.87890625	3400623.078125	5513561.8671875	6910905.40625	2009946.38671875	5014448.8046875	4837215.015625	4224334.140625	2971698.3828125	5017305.8984375	3796715.0546875	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	4315523.71875	0.0	0.35236926830073645	NaN	MET 4-(3-Methyl-2-butenyl)-5- phenethylbenzene-1,3-diol	MET 4-(3-Methyl-2-butenyl)-5- phenethylbenzene-1,3-diol_10.67
+SML	3	3	lda2:MET Amorphrutin A	C21H24O4	null	null	MET Amorphrutin A	null	340.16745935999984	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	49766.32339477539	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	49766.32339477539	0.0	NaN	NaN	MET Amorphrutin A	MET Amorphrutin A_4.57
+SML	4	4	lda2:MET Amorphrutin A	C21H24O4	null	null	MET Amorphrutin A	null	340.16745935999984	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	38143.70947265625	null	null	1007505.21875	885780.984375	605074.3046875	30053.29248046875	48768.45166015625	48545.27197265625	136122.599609375	71490.3544921875	193831.42578125	66448.7578125	280366.69140625	696334.828125	null	902214.765625	544849.234375	387820.8984375	513933.4140625	569488.453125	84130.6884765625	120828.671875	369083.7890625	null	20802.81396484375	null	425679.46875	471388.0234375	88047.2255859375	747639.578125	774231.890625	321833.45703125	808466.421875	733472.046875	523234.7578125	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	403729.4028950353	0.0	0.7695202894545569	NaN	MET Amorphrutin A	MET Amorphrutin A_11.03
+SML	5	5	lda2:MET Amorphrutin A	C21H24O4	null	null	MET Amorphrutin A	null	340.16745935999984	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	679543.76171875	560232.0673828125	635941.720703125	3698184.8828125	4254940.65625	3083520.046875	468762.2080078125	718994.591796875	556576.80859375	1036773.537109375	760905.568359375	953829.546875	821318.619140625	1439093.26171875	1404123.5234375	1550011.3642578125	2603069.109375	2680979.5	1687396.63671875	2057204.18359375	2361581.40234375	854571.736328125	998042.451171875	1723046.96484375	27524.322509765625	125644.13720703125	252475.95458984375	3819307.59375	3140623.9453125	1445940.80859375	2759775.15625	2892492.1171875	2363664.31640625	3382491.4140625	3289525.078125	1749458.6953125	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	1745487.9913533528	0.0	0.6733352802593399	NaN	MET Amorphrutin A	MET Amorphrutin A_12.47
+SML	6	6	lda2:MET 4-prenyldihydropinosylvin	C19H22O2	null	null	MET 4-prenyldihydropinosylvin	null	282.1619800299999	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	474034.1796875	483193.73046875	188122.154296875	146903.919921875	179264.09765625	632340.8203125	539881.8828125	785721.1953125	412413.61328125	708528.984375	407438.1796875	531732.7890625	609867.578125	732992.8828125	741543.296875	572440.0	778137.8828125	336002.8828125	776945.75	687350.5703125	206856.71875	null	318272.5	460595.2578125	774825.2578125	512471.9921875	282868.2109375	487723.41796875	512125.21875	2251552.1875	733278.1484375	285868.734375	504444.25	235590.48828125	318758.98046875	1046253.828125	0.0	561609.7594866072	NaN	0.6487516462307501	MET 4-prenyldihydropinosylvin	MET 4-prenyldihydropinosylvin_3.81
+SML	7	7	lda2:MET 4-prenyldihydropinosylvin	C19H22O2	null	null	MET 4-prenyldihydropinosylvin	null	282.1619800299999	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	346001.74609375	412740.0263671875	339209.87744140625	null	null	null	null	null	null	50678.041107177734	null	67059.85961914062	null	68711.49084472656	80622.15014648438	75231.68151855469	59831.65393066406	57096.716064453125	230723.7373046875	101257.28759765625	92306.68237304688	null	null	null	112065.39123535156	132097.07421875	27152.952697753906	116892.57055664062	148172.05834960938	151319.27587890625	213769.59619140625	210403.75561523438	69168.54333496094	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	143750.5531130704	0.0	0.7395300624924943	NaN	MET 4-prenyldihydropinosylvin	MET 4-prenyldihydropinosylvin_10.31
+SML	8	8	lda2:MET 4-prenyldihydropinosylvin	C19H22O2	null	null	MET 4-prenyldihydropinosylvin	null	282.1619800299999	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	3683465.203125	3173967.4453125	2679514.93359375	2844257.43359375	4177087.890625	4384673.1875	2161030.62109375	3526893.1484375	4492726.6796875	5229027.8046875	3510716.90625	6295308.734375	4968347.578125	5624746.15625	4881048.8515625	1242459.37890625	6060308.390625	4693889.171875	7672370.984375	5176137.734375	5444934.9375	6078975.2890625	5399436.4375	4451279.59375	981694.46875	2827353.87890625	3400623.078125	5513561.8671875	6910905.40625	2009946.38671875	5014448.8046875	4837215.015625	4224334.140625	2971698.3828125	5017305.8984375	3796715.0546875	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	4315511.302083333	0.0	0.35236850387860597	NaN	MET 4-prenyldihydropinosylvin	MET 4-prenyldihydropinosylvin_10.67
+SML	9	9	lda2:MET BAP	C12H11N5	null	null	MET BAP	null	225.10144539499998	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	92816.4931640625	83791.41064453125	113501.0830078125	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	0.0	96702.99560546875	NaN	0.1575067744428061	MET BAP	MET BAP_13.46
+SML	10	10	lda2:MET 1,3-dimethoxy-5-(2-phenylethyl)benzene	C16H18O2	null	null	MET 1,3-dimethoxy-5-(2-phenylethyl)benzene	null	242.13067988999995	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	210293.1171875	204808.80859375	330117.203125	558546.0859375	737569.3046875	474761.5234375	253287.90625	159271.98046875	198246.388671875	263574.0546875	197759.982421875	318277.6015625	186336.712890625	374293.82421875	211051.6796875	351100.375	767305.1796875	717798.34375	512503.734375	490939.1953125	612789.359375	416673.9296875	353146.39453125	337066.484375	null	38973.39599609375	129568.53515625	702771.859375	330861.97265625	227371.568359375	563221.0390625	656257.9375	364698.67578125	623151.15625	710218.3046875	204510.443359375	0.0	393974.9730887277	NaN	0.5167535382434292	MET 1,3-dimethoxy-5-(2-phenylethyl)benzene	MET 1,3-dimethoxy-5-(2-phenylethyl)benzene_11.59
+SML	11	11	lda2:MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol	C24H30O3	null	null	MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol	null	366.21949493999983	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	571152.484375	354115.53125	371431.1328125	964160.671875	1088450.484375	1112152.53125	371459.3828125	509496.90625	472276.2890625	818695.8125	573728.71875	729228.6875	444932.46875	957192.859375	453410.375	535761.4453125	1237510.90625	887999.40625	964231.90625	789799.984375	962243.046875	279756.37890625	496168.7890625	782079.109375	14682.79443359375	52649.7509765625	114375.466796875	1487275.4375	1588937.03125	696493.609375	1402035.03125	1055154.875	955400.453125	1038940.640625	1272357.59375	992906.75	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	761073.4650743273	0.0	0.5206900205706909	NaN	MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol	MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol_10.09
+SML	12	12	lda2:MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol	C24H30O3	null	null	MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol	null	366.21949493999983	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	425446.8984375	236457.01953125	256162.625	988948.921875	1038703.53125	1111113.015625	276023.3984375	386070.46875	342388.546875	633201.90625	449746.34375	521135.859375	342978.375	856754.0	329605.59375	364046.1484375	1300826.15625	656068.7265625	803278.78125	703689.09375	904999.109375	219996.578125	417125.2734375	654922.8984375	6567.3330078125	29398.6328125	72860.146484375	1308647.375	1439582.53125	511973.0234375	1369453.3125	1052512.90625	967041.4375	1068725.234375	1241639.25	794603.4375	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	668963.719156901	0.0	0.6092529892787166	NaN	MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol	MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol_10.31
+SML	13	13	lda2:MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol	C24H30O3	null	null	MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol	null	366.21949493999983	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	210994.515625	208443.6015625	281096.595703125	null	null	null	13905.1904296875	null	12343.66064453125	20559.30810546875	78526.5625	26867.9755859375	null	141723.74609375	171945.451171875	67588.93359375	72280.271484375	117096.74609375	19643.27734375	25163.181640625	31936.6240234375	null	null	null	486496.578125	254235.23046875	94107.30078125	353435.658203125	175935.125	252353.890625	394611.46875	192872.73046875	110279.89453125	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	152577.7407421875	0.0	0.8489071458767108	NaN	MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol	MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol_10.63
+SML	14	14	lda2:MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol	C24H30O3	null	null	MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol	null	366.21949493999983	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	256255.48486328125	167780.50390625	166904.32177734375	599128.341796875	606335.63671875	512894.361328125	150228.24658203125	211403.7177734375	177883.576171875	327750.4560546875	245491.708984375	274588.54150390625	170826.80419921875	438774.2197265625	190577.98046875	355439.396484375	735495.73046875	438430.484375	414033.3701171875	403927.4296875	505331.2646484375	110341.85473632812	204356.50439453125	339830.2099609375	3498.1104125976562	17160.69256591797	41627.88977050781	818218.30859375	772961.794921875	267832.48095703125	763332.6171875	544276.5048828125	468917.4072265625	651693.740234375	705654.111328125	451252.6142578125	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	375289.9005296495	0.0	0.6085733999851218	NaN	MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol	MET 2,4-Bis(3-methyl-2- butenyl)-5-(4- hydroxyphenethyl)resorcinol_11.58
+SML	15	15	lda2:MET Biochanin A	C16H12O5	null	null	MET Biochanin A	null	284.06847357	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	4427569.46875	3700311.63671875	2531923.5703125	2626183.2890625	2292511.53125	4402157.3828125	4657950.546875	5631993.2734375	5527200.3046875	6357090.578125	5195577.7734375	5953824.015625	6328581.6328125	6245224.765625	5079130.71875	3659535.0625	4519708.296875	3389572.28515625	4302577.5078125	3258447.0546875	3126299.72265625	2708551.609375	3337966.09375	3709271.89453125	3410401.58203125	3849376.8671875	3779035.94921875	4064412.8984375	6339165.015625	4268988.2109375	4235761.859375	3435556.71484375	3746231.9375	2351123.6796875	3428841.34765625	4897303.4609375	3057608.53125	3156337.90234375	2559038.1640625	1715493.671875	1370665.2890625	2901902.8125	3692506.015625	4470419.53125	4394857.3046875	4859590.0	4004710.1796875	4235130.734375	5289648.09375	5517272.0078125	4050457.3671875	2691037.796875	3547247.57421875	2615271.55859375	2875396.90625	2252287.23828125	1982258.6640625	2078937.59375	2510891.4296875	2839085.91796875	3197700.8046875	3097650.82421875	2681826.34375	2260920.49609375	2908802.85546875	5719943.7109375	2645638.15234375	2516209.42578125	2483427.74609375	1432186.484375	2468011.953125	2982935.37109375	4188204.431640625	3140647.4014756945	0.2813176030687533	0.34806654682352894	MET Biochanin A	MET Biochanin A_9.16
+SML	16	16	lda2:MET GDPhexose	C16H25N5O16P2	null	null	MET GDPhexose	null	605.0771539649996	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	7808.867919921875	5069.296691894531	5804.892517089844	null	2849.0360717773438	2691.8616790771484	null	8146.357666015625	7334.424865722656	6573.164978027344	null	null	9974.92626953125	10487.4599609375	null	null	null	6713.259094238281	null	null	null	15372.921752929688	12286.2109375	12265.34619140625	3650.04150390625	13082.716552734375	22979.21923828125	null	null	null	null	null	null	null	4708.9515380859375	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	8766.60863494873	0.0	0.5821060989574344	NaN	MET GDPhexose	MET GDPhexose_3.16
+SML	17	17	lda2:MET Radulannin L	C19H20O3	null	null	MET Radulannin L	null	296.14124458999987	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	65096.3857421875	61232.3330078125	59184.5791015625	416478.578125	364393.33984375	294300.1171875	47728.69091796875	null	92163.814453125	139562.634765625	82200.93359375	241538.7421875	129869.923828125	153106.244140625	137229.673828125	29435.12939453125	322701.73046875	283986.08984375	333005.9140625	272423.5703125	291125.83984375	206799.69921875	130778.517578125	null	null	null	null	460705.7890625	377008.1953125	null	326157.23828125	315612.0078125	173095.654296875	329913.11328125	433663.421875	168043.361328125	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	224618.04208984374	0.0	0.5704295823730291	NaN	MET Radulannin L	MET Radulannin L_9.28
+SML	18	18	lda2:MET Radulannin L	C19H20O3	null	null	MET Radulannin L	null	296.14124458999987	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	5590104.2578125	5302715.90625	4998381.46875	1.252953146875E7	1.327529409375E7	1.37115828125E7	4263036.2578125	6328207.515625	8218592.90625	9321982.078125	7786730.71875	1.082639934375E7	1.002231884375E7	1.04326315E7	1.0842817875E7	1490943.5234375	1.2468407E7	1.188572815625E7	1.34191096875E7	1.17533285625E7	1.16966910625E7	1.111072109375E7	1.0582929625E7	9682400.1875	1679264.5546875	4546106.0703125	5399809.3671875	1.27692483125E7	1.404776334375E7	9815092.8125	1.292080103125E7	1.269257884375E7	1.257127215625E7	1.218085025E7	1.296500315625E7	1.16347510625E7	3533353.6875	3935954.8359375	4811736.015625	1.09027916875E7	1.139739375E7	1.16570415625E7	3004131.765625	4517282.59375	6287139.1875	7498340.484375	5822307.5234375	8826953.234375	8377161.703125	9372054.34375	8929977.328125	1046223.970703125	1.1252620875E7	1.06925066875E7	1.101737040625E7	9737020.03125	9875924.34375	9522242.78125	9005226.65625	8028793.265625	1272163.87109375	3140181.6796875	3278210.4296875	1.06087191875E7	1.01107905625E7	1.141680653125E7	1.07138536875E7	1.107906646875E7	1.026777040625E7	1.04468373125E7	1.1426268375E7	9009346.03125	9743420.191840278	8106154.535101997	0.36214925154655464	0.4000996887811949	MET Radulannin L	MET Radulannin L_9.89
+SML	19	19	lda2:MET Radulannin H	C20H20O4	null	null	MET Radulannin H	null	324.13615921999985	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	60798.974609375	65015.283203125	81461.7626953125	278300.09375	329040.3203125	288208.3046875	28570.100219726562	46505.21875	82042.099609375	111934.4111328125	46241.599609375	165461.3671875	148564.00390625	221066.484375	195342.25390625	18128.083862304688	211361.9140625	395533.6484375	192282.08203125	269487.3203125	168990.751953125	80950.8154296875	115424.8828125	148002.84375	9731.345703125	53981.3173828125	29865.14892578125	312981.59375	249642.23828125	331569.45703125	289699.49609375	244724.31640625	172752.18359375	269574.8671875	215929.078125	151135.806640625	0.0	168897.26304796006	NaN	0.62383043571674	MET Radulannin H	MET Radulannin H_7.78
+SML	20	20	lda2:MET Radulannin H	C20H20O4	null	null	MET Radulannin H	null	324.13615921999985	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	8127.7889404296875	11489.53076171875	null	73211.7421875	134988.521484375	24068.095458984375	31565.252685546875	null	null	null	null	null	null	46149.93115234375	null	19020.32763671875	46317.599609375	95366.0146484375	null	null	71033.9111328125	22528.396240234375	32194.1708984375	72714.173828125	null	null	null	120024.9375	45035.95166015625	59684.59228515625	48406.89453125	66375.47119140625	34166.80126953125	127896.982421875	79017.205078125	null	0.0	57699.28602738814	NaN	0.6355073279790311	MET Radulannin H	MET Radulannin H_8.09
+SML	21	21	lda2:MET Radulannin H	C20H20O4	null	null	MET Radulannin H	null	324.13615921999985	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	14188.367919921875	18135.756591796875	104435.4013671875	158326.974609375	108988.1396484375	22009.4990234375	null	21258.220092773438	24766.472778320312	null	51663.23779296875	39948.48095703125	63664.20751953125	30249.771240234375	null	62212.896484375	136261.1689453125	39669.711669921875	52535.20068359375	55190.35302734375	20066.038696289062	41096.15625	48516.007080078125	null	null	null	141980.8388671875	76848.6376953125	101080.3935546875	85897.6875	97423.05078125	62462.86669921875	133286.00390625	94692.17724609375	34871.78564453125	0.0	66956.05187146417	NaN	0.6210646563634515	MET Radulannin H	MET Radulannin H_8.40
+SML	22	22	lda2:MET Radulannin H	C20H20O4	null	null	MET Radulannin H	null	324.13615921999985	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	8496.325439453125	null	17711.650634765625	132116.5546875	132783.9609375	94440.6064453125	64600.12890625	20103.075805664062	25612.419677734375	25322.466796875	22662.385498046875	57751.97216796875	41569.04736328125	103882.75390625	45308.818359375	11345.559204101562	128392.6328125	131191.81640625	54172.3046875	57005.314453125	103773.5703125	35813.51318359375	75021.6865234375	102897.060546875	null	null	8348.848693847656	217294.640625	89990.4501953125	168456.564453125	116246.1875	134423.822265625	87403.5546875	177408.373046875	148350.373046875	54769.79931640625	0.0	81656.61329049776	NaN	0.672132849498836	MET Radulannin H	MET Radulannin H_8.73
+SML	23	23	lda2:MET Radulannin H	C20H20O4	null	null	MET Radulannin H	null	324.13615921999985	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	20159.535400390625	null	null	238658.4765625	255920.98828125	163080.38671875	29026.68017578125	null	18151.585693359375	null	null	67876.02099609375	37530.11376953125	126621.98828125	55150.125	null	239298.60546875	183971.75	105111.76171875	97982.8037109375	185026.388671875	27571.708984375	44531.435791015625	69322.755859375	null	11668.473388671875	null	238586.453125	90081.4013671875	86931.625	212462.68359375	217549.412109375	104072.1171875	292274.9140625	223392.392578125	74508.4296875	0.0	125590.03618512835	NaN	0.693013837766496	MET Radulannin H	MET Radulannin H_9.14
+SML	24	24	lda2:MET Radulannin H	C20H20O4	null	null	MET Radulannin H	null	324.13615921999985	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	106119.013671875	177852.77734375	106271.01171875	null	32146.7900390625	null	31603.98828125	null	null	39178.11328125	115350.646484375	35759.4482421875	null	98193.2578125	115597.5078125	36309.8349609375	70353.65234375	101564.875	17817.897705078125	58576.3212890625	208587.42578125	null	null	null	225046.890625	242805.0859375	128619.34765625	148157.185546875	114900.228515625	153721.453125	198765.22265625	117913.8125	65318.333984375	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	35238.7998046875	201802.359375	180598.65625	null	null	null	null	null	84301.671875	null	null	null	228970.859375	null	null	186937.3515625	195152.640625	null	220972.796875	206933.02734375	null	109861.20489257813	171212.01812065972	0.5877053422338437	0.3861868260182374	MET Radulannin H	MET Radulannin H_9.66
+SML	25	25	lda2:MET Radulannin H	C20H20O4	null	null	MET Radulannin H	null	324.13615921999985	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	33795.2900390625	32333.552978515625	null	null	null	33858.080078125	18756.080322265625	40801.1708984375	null	47947.76806640625	29895.62109375	null	51731.0849609375	35074.93017578125	null	19171.310546875	29390.624755859375	null	null	27192.52294921875	null	null	null	49155.0654296875	null	null	43273.46484375	41171.138916015625	20978.335693359375	38381.04052734375	37515.298583984375	null	0.0	35023.46560329861	NaN	0.28088675965408283	MET Radulannin H	MET Radulannin H_9.89
+SML	26	26	lda2:MET Radulannin H	C20H20O4	null	null	MET Radulannin H	null	324.13615921999985	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	23015.42431640625	null	13177.138916015625	null	null	null	18602.240112304688	null	22579.05682373047	20408.78662109375	22076.223876953125	17019.932495117188	null	null	17275.672729492188	44532.935546875	20187.364990234375	29080.369140625	30944.066040039062	28446.020141601562	10541.732421875	null	7574.5809326171875	28635.21630859375	null	null	5364.980712890625	24979.40771484375	12992.87109375	null	15030.848388671875	23758.05078125	14161.96240234375	null	24762.41748046875	null	0.0	20658.578260338825	NaN	0.4195373965110618	MET Radulannin H	MET Radulannin H_10.48
+SML	27	27	lda2:MET Radulannin H	C20H20O4	null	null	MET Radulannin H	null	324.13615921999985	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	321247.109375	207903.15234375	289100.6640625	1053649.5625	1135326.78125	356215.140625	182599.38671875	397483.2109375	285514.203125	622067.65625	381999.53125	550484.5859375	209735.765625	521359.0390625	276546.28515625	804604.859375	831791.203125	693817.703125	393813.71875	488886.90625	669402.5625	138716.693359375	235214.91796875	514816.9765625	4228.985046386719	36407.5478515625	61800.697265625	1484353.875	1030075.328125	402578.171875	703714.78125	855164.09375	386777.6484375	865327.53125	929344.34375	360173.0078125	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	518951.21185133193	0.0	0.6606731052768264	NaN	MET Radulannin H	MET Radulannin H_11.32
+SML	28	28	lda2:MET Radulannin H	C20H20O4	null	null	MET Radulannin H	null	324.13615921999985	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	18753.49169921875	321348.99609375	14344.081298828125	170426.888671875	81471.578125	161874.66015625	9074.299560546875	17448.80712890625	66365.2685546875	57972.5029296875	31316.03759765625	89717.3740234375	149904.265625	110631.3515625	256568.3046875	259057.1796875	247086.953125	935057.421875	103751.962890625	64917.6328125	100840.5703125	218102.91796875	136212.033203125	93279.380859375	86697.978515625	99368.537109375	130852.798828125	234526.6171875	349914.8515625	80484.0	487644.2265625	257049.66015625	764105.921875	89976.83203125	201394.1796875	98809.6875	7881.807373046875	7829.45751953125	13489.19384765625	19351.626953125	null	18812.332763671875	11737.372680664062	10650.31591796875	7274.757080078125	14974.199584960938	10312.87451171875	14499.19482421875	17801.26220703125	40641.0361328125	14450.7763671875	27292.607421875	31656.515625	27665.74658203125	13413.438720703125	19762.056640625	22360.13671875	null	null	null	null	null	null	27710.529052734375	null	null	28126.168701171875	33585.8818359375	null	31881.16796875	31877.474609375	10230.17919921875	183231.92365180122	19818.004263070914	1.0685902029245458	0.47886466404301364	MET Radulannin H	MET Radulannin H_11.98
+SML	29	29	lda2:MET 3-Methoxy-5-(2-phenylethyl)-2-prenylphenol	C20H24O2	null	null	MET 3-Methoxy-5-(2-phenylethyl)-2-prenylphenol	null	296.1776300999999	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	1572375.8798828125	1786965.8833007812	1698497.82421875	930123.2573242188	1173458.3725585938	1313458.09765625	1520131.5693359375	2091436.5458984375	1525029.9111328125	1605627.552734375	1093172.8095703125	1144608.142578125	1362428.0146484375	2207572.69140625	1432969.1787109375	1622162.4404296875	2000776.2705078125	1414492.9326171875	1392975.583984375	1352143.15625	1007819.4853515625	896206.4365234375	1007959.009765625	1128450.96484375	125673.1826171875	449327.92431640625	537933.3828125	1290519.314453125	1214285.3740234375	916470.0874023438	1048524.615234375	1372227.357421875	1111806.8671875	949180.9541015625	1239435.3798828125	658079.6450195312	0.0	1255397.391547309	NaN	0.34970215356569706	MET 3-Methoxy-5-(2-phenylethyl)-2-prenylphenol	MET 3-Methoxy-5-(2-phenylethyl)-2-prenylphenol_12.14
+SML	30	30	lda2:MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl	C21H24O4	null	null	MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl	null	340.16745935999984	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	4422.987548828125	10438.4375	null	16526.392333984375	null	null	null	null	null	null	null	null	16499.419921875	null	15131.87158203125	22364.24853515625	17824.48388671875	null	null	12019.527465820312	null	null	8209.752075195312	null	null	null	17999.3046875	17009.424560546875	null	15166.239990234375	18275.265625	9614.003173828125	15506.26416015625	19299.458984375	null	0.0	14769.192626953125	NaN	0.3152454607461176	MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl	MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl_10.38
+SML	31	31	lda2:MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl	C21H24O4	null	null	MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl	null	340.16745935999984	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	38143.70947265625	null	null	1007505.21875	885780.984375	605074.3046875	30053.29248046875	48768.45166015625	48545.27197265625	136122.599609375	71490.3544921875	193831.42578125	66448.7578125	280366.69140625	696334.828125	null	902214.765625	544849.234375	387820.8984375	513933.4140625	569488.453125	84130.6884765625	120828.671875	369083.7890625	null	20802.81396484375	null	425679.46875	471388.0234375	88047.2255859375	747639.578125	774231.890625	321833.45703125	808466.421875	733472.046875	523234.7578125	19597.40625	24370.775146484375	30721.88623046875	60956.3955078125	117674.875	98392.3212890625	null	56731.515625	53367.78515625	55019.451171875	32345.05615234375	45613.99462890625	89729.611328125	153613.16015625	61306.8916015625	17586.628173828125	122768.845703125	124094.087890625	65643.96875	73656.470703125	null	53378.3046875	146231.935546875	188646.75390625	null	34366.71875	39904.7734375	134978.818359375	103726.787109375	200313.84765625	104906.888671875	133241.099609375	104420.38671875	88414.21875	105979.8515625	43657.3740234375	403729.4028950353	84404.81470466382	0.7695202894545569	0.5717582070137782	MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl	MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl_11.06
+SML	32	32	lda2:MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl	C21H24O4	null	null	MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl	null	340.16745935999984	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	4798.2091064453125	9366.850830078125	15020.953857421875	14570.521728515625	null	9590.345886230469	11034.611572265625	8487.880249023438	null	6985.2958984375	19438.669189453125	39508.435546875	null	null	34895.96923828125	33391.17626953125	15448.05224609375	15713.178833007812	15500.402099609375	13015.280883789062	56012.3759765625	66203.48046875	null	null	null	29815.369384765625	25528.783203125	45859.107421875	22209.65087890625	39125.71533203125	16783.544555664062	15379.022827148438	31043.892578125	8042.1959228515625	0.0	23065.517480920862	NaN	0.6812766477986385	MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl	MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl_11.99
+SML	33	33	lda2:MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl	C21H24O4	null	null	MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl	null	340.16745935999984	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	660886.9765625	546019.40625	617884.484375	3599589.5625	4141192.25	3000740.4375	456147.2734375	699367.953125	541540.5390625	1008076.78125	739574.25	927999.65625	799649.171875	1399417.46875	1366348.65625	1518959.9775390625	2534714.75	2610297.96875	1642023.3125	2002370.28125	2297223.59375	831529.21875	970630.109375	1675813.4375	26260.65673828125	122365.021484375	248855.82421875	3716403.1875	3055533.0	1407393.65625	2685763.3125	2816434.4375	2300762.84375	3290091.0	3202548.9375	1700623.25	22277.31591796875	18516.681762695312	37361.14013671875	167441.640625	204386.12890625	138206.0	null	35840.693359375	24434.818115234375	35986.74609375	30492.796875	26585.6240234375	27988.1376953125	83522.25390625	40799.79443359375	69429.34375	75344.6240234375	90006.7080078125	72166.1650390625	102238.294921875	99238.90625	49261.43798828125	33092.19482421875	72069.91796875	null	null	null	133703.091796875	66466.1171875	111350.7158203125	112505.37109375	128403.810546875	101783.103515625	154200.78125	153430.91015625	51479.484375	1698917.573445638	80312.83594894409	0.6732448830212323	0.6163855984671183	MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl	MET 3,5-dihydroxy-6-carbomethoxy-2-(3-methyl-2-butenyl)bibenzyl_12.47
+SML	34	34	lda2:MET IAA-L-Ala	C13H14N2O3	null	null	MET IAA-L-Ala	null	246.100442384	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	1489.7440643310547	null	null	null	2904.816162109375	1476.9852905273438	2652.4293823242188	null	8746.207275390625	3102.4776611328125	null	3473.7031860351562	2517.470977783203	null	2487.3050842285156	2403.057647705078	1571.6111450195312	1449.8469848632812	2562.311553955078	null	null	1013.4529266357422	null	3643.0533447265625	null	982.731201171875	2002.7293243408203	6330.31201171875	4526.780731201172	3811.203125	null	1939.4120025634766	null	1894.4482421875	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	2862.8222420432353	0.0	0.6327478917247006	NaN	MET IAA-L-Ala	MET IAA-L-Ala_4.88
+SML	35	35	lda2:MET IAA-L-Ala	C13H14N2O3	null	null	MET IAA-L-Ala	null	246.100442384	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	797886.7556152344	818215.365234375	545560.5002441406	395306.900390625	312423.37255859375	824717.2216796875	929390.8227539062	1269835.52734375	1182216.392578125	1396895.322265625	1008480.37109375	1178596.537109375	1580237.51953125	1641051.599609375	386168.87255859375	628257.4340820312	754678.4174804688	616564.1044921875	644413.7915039062	534374.294921875	484914.6162109375	465826.70166015625	592199.9487304688	601755.7822265625	872919.8959960938	743350.1572265625	709532.3984375	612775.5258789062	835542.48046875	1739504.65234375	683067.6772460938	562233.505859375	629067.3706054688	312574.0031738281	603324.5146484375	606893.3100585938	0.0	791687.6017727322	NaN	0.46192732061108027	MET IAA-L-Ala	MET IAA-L-Ala_5.69
+SML	36	36	lda2:MET IAA-L-Ala	C13H14N2O3	null	null	MET IAA-L-Ala	null	246.100442384	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	47646.274169921875	78054.73095703125	56997.900390625	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	0.0	60899.63517252604	NaN	0.2557516435714464	MET IAA-L-Ala	MET IAA-L-Ala_9.31
+SML	37	37	lda2:MET 2-(3,7-Dimethylocta-2,6-dienyl)-5-(2-phenylethyl)benzene-1,3-diol	C24H30O2	null	null	MET 2-(3,7-Dimethylocta-2,6-dienyl)-5-(2-phenylethyl)benzene-1,3-diol	null	350.22458030999985	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	4580271.625	4045044.484375	3898091.3203125	1.05672043125E7	1.162204128125E7	1.059553996875E7	4578823.0	4472531.3125	4361183.6484375	5616918.109375	4372929.765625	6188937.59375	5887552.765625	8563532.09375	7206326.765625	5094845.171875	1.05395645625E7	1.0654588125E7	9079350.0	8717183.84375	9738806.59375	6163309.65625	7525829.171875	7617746.484375	240928.69287109375	1836049.96875	2269747.8046875	1.2025092875E7	1.142110284375E7	7939735.46875	1.062995428125E7	1.04701068125E7	9695812.28125	1.049440371875E7	1.071190578125E7	8343056.53125	2268006.328125	2779056.8984375	3461218.125	7313633.828125	8587469.5	7414534.234375	3298968.9765625	2996864.3984375	2871394.484375	3735603.5390625	2824034.1953125	3424052.9609375	4139973.078125	6855433.84375	4453309.4609375	3257468.4140625	8165005.90625	8168769.671875	5895140.3125	6220611.078125	6203605.34375	4374023.65625	5174951.0	4842685.453125	241542.90112304688	1366593.30078125	1047136.0625	8212585.640625	5889753.5	8734690.625	7464531.28125	8161203.25	6474784.640625	7418781.828125	8514244.71875	4377132.453125	7437945.797675239	5184133.1913723415	0.42092001821630154	0.4645260724867048	MET 2-(3,7-Dimethylocta-2,6-dienyl)-5-(2-phenylethyl)benzene-1,3-diol	MET 2-(3,7-Dimethylocta-2,6-dienyl)-5-(2-phenylethyl)benzene-1,3-diol_12.63
+SML	38	38	lda2:MET 3,3""-4-trimethoxybibenzyl	C17H20O3	null	null	MET 3,3""-4-trimethoxybibenzyl	null	272.1412445899999	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	33645.237060546875	41032.2646484375	33896.89599609375	36468.72900390625	null	72648.6123046875	32908.68212890625	74757.419921875	51019.32470703125	87503.4345703125	42204.15576171875	53497.736328125	68776.0166015625	77993.55078125	65713.474609375	45197.30615234375	75876.1669921875	45142.671875	37824.012939453125	55238.557861328125	29725.27587890625	null	44541.97314453125	39219.385009765625	52858.53076171875	null	26004.880615234375	67318.34521484375	59000.1787109375	143376.09619140625	54704.456298828125	34898.639892578125	52687.802734375	26180.396728515625	null	57830.2958984375	0.0	53740.328353881836	NaN	0.4311605422429321	MET 3,3""-4-trimethoxybibenzyl	MET 3,3""-4-trimethoxybibenzyl_5.29
+SML	39	39	lda2:MET Kinetin	C10H9N5O	null	null	MET Kinetin	null	215.080709955	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	78423.5107421875	100641.38671875	55115.873046875	51602.226806640625	37469.094482421875	83821.06103515625	136087.53515625	172975.33203125	102567.8310546875	115411.0478515625	120328.25	79830.947265625	107116.2138671875	130230.4990234375	50792.89794921875	102115.4287109375	65578.14392089844	39357.86853027344	58426.500244140625	35404.3642578125	38063.23547363281	34173.544677734375	50295.17919921875	58655.80224609375	134589.2294921875	184492.6328125	91347.482421875	108322.685546875	99809.14233398438	108298.716796875	65660.41943359375	50187.53271484375	69529.43603515625	42404.802978515625	50922.7197265625	66784.51171875	999660.703125	1233163.84375	742441.1328125	658397.109375	523212.58984375	1136620.03125	1650360.046875	2031270.65625	1188399.578125	1469173.25	1286582.453125	1106575.0703125	1420641.40625	1942870.390625	1283329.3125	1224105.5625	949670.2890625	641649.9609375	764181.96875	467344.7421875	559297.8515625	436289.77734375	610498.4765625	792024.296875	1417775.96875	2038422.0625	963167.3046875	1531463.5	1032253.1796875	2262966.953125	850924.796875	720966.8984375	893120.0546875	585110.0	738620.1875	768521.3359375	82689.80795288086	1081140.9095052083	0.46778898697650223	0.4420434241348101	MET Kinetin	MET Kinetin_3.62
+SML	40	40	lda2:MET Kinetin	C10H9N5O	null	null	MET Kinetin	null	215.080709955	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	36164.112548828125	25741.46875	63645.7705078125	null	null	null	null	null	null	null	null	null	null	67357.78564453125	41064.31494140625	null	null	29474.5927734375	null	null	null	null	null	null	null	49040.48303222656	149664.8896484375	51726.4716796875	59245.7373046875	53040.5595703125	null	46735.103271484375	null	0.0	56075.10747273763	NaN	0.5732926923840843	MET Kinetin	MET Kinetin_9.76
+SML	41	41	lda2:MET Radulannin A	C19H20O2	null	null	MET Radulannin A	null	280.1463299599999	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	15178.947021484375	7251.102294921875	6961.822601318359	28825.64208984375	33651.2216796875	58678.2021484375	10045.069580078125	null	12497.176513671875	21659.785888671875	12522.253967285156	32516.40234375	19255.9521484375	43308.79736328125	34855.56103515625	7328.196868896484	25001.19287109375	20128.421630859375	22128.04541015625	19646.37158203125	24939.189453125	16126.096313476562	34364.7841796875	40582.63037109375	1854.65478515625	4275.9202880859375	3657.215118408203	30347.919677734375	43619.81201171875	18283.84619140625	32627.0546875	29381.5107421875	42236.533203125	21477.07958984375	39228.66162109375	53571.4482421875	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	24800.4149004255	0.0	0.5809051468439307	NaN	MET Radulannin A	MET Radulannin A_10.52
+SML	42	42	lda2:MET Radulannin A	C19H20O2	null	null	MET Radulannin A	null	280.1463299599999	[M+H]+	3	[MS, MS:1002890, fragmentation score, ]	null	128863.099609375	118704.11328125	101630.9375	1025589.375	993477.484375	1433747.671875	95934.0224609375	195312.5234375	288509.09765625	387221.8515625	212410.9375	556057.375	429988.84375	584645.9140625	654140.515625	97728.88671875	990658.546875	779882.234375	1001229.15625	639967.453125	707000.28125	638974.6640625	384285.96875	403238.0078125	5763.041076660156	31828.17724609375	64053.5283203125	1316973.8125	1576372.4375	370990.7265625	1117736.296875	993170.3125	1017453.125	921447.765625	1131426.140625	559710.4453125	727621.5	787058.203125	1180774.234375	2672766.529296875	2810999.1875	3081261.4375	691728.0390625	1114488.046875	1229031.09375	1742637.59375	1120832.984375	1782741.34375	1697458.46875	2674641.1875	1952993.6875	1069028.296875	3632394.75	3070180.875	2472582.0625	2260917.96875	2167358.21875	1827303.4375	1409180.9375	1563517.9375	108858.1796875	267219.3515625	304598.21484375	3180941.5	2136827.78125	3013115.0625	2933635.46875	3297297.375	2545362.34375	2673991.53125	3515687.25	1487959.875	609892.3547515869	1950138.6654188368	0.7141202487765075	0.5039247632967896	MET Radulannin A	MET Radulannin A_11.22
+
+SFH	SMF_ID	SME_ID_REFS	SME_ID_REF_ambiguity_code	adduct_ion	isotopomer	exp_mass_to_charge	charge	retention_time_in_seconds	retention_time_in_seconds_start	retention_time_in_seconds_end	abundance_assay[1]	abundance_assay[2]	abundance_assay[3]	abundance_assay[4]	abundance_assay[5]	abundance_assay[6]	abundance_assay[7]	abundance_assay[8]	abundance_assay[9]	abundance_assay[10]	abundance_assay[11]	abundance_assay[12]	abundance_assay[13]	abundance_assay[14]	abundance_assay[15]	abundance_assay[16]	abundance_assay[17]	abundance_assay[18]	abundance_assay[19]	abundance_assay[20]	abundance_assay[21]	abundance_assay[22]	abundance_assay[23]	abundance_assay[24]	abundance_assay[25]	abundance_assay[26]	abundance_assay[27]	abundance_assay[28]	abundance_assay[29]	abundance_assay[30]	abundance_assay[31]	abundance_assay[32]	abundance_assay[33]	abundance_assay[34]	abundance_assay[35]	abundance_assay[36]	abundance_assay[37]	abundance_assay[38]	abundance_assay[39]	abundance_assay[40]	abundance_assay[41]	abundance_assay[42]	abundance_assay[43]	abundance_assay[44]	abundance_assay[45]	abundance_assay[46]	abundance_assay[47]	abundance_assay[48]	abundance_assay[49]	abundance_assay[50]	abundance_assay[51]	abundance_assay[52]	abundance_assay[53]	abundance_assay[54]	abundance_assay[55]	abundance_assay[56]	abundance_assay[57]	abundance_assay[58]	abundance_assay[59]	abundance_assay[60]	abundance_assay[61]	abundance_assay[62]	abundance_assay[63]	abundance_assay[64]	abundance_assay[65]	abundance_assay[66]	abundance_assay[67]	abundance_assay[68]	abundance_assay[69]	abundance_assay[70]	abundance_assay[71]	abundance_assay[72]
+SMF	1	null	null	[M+H]+	null	281.1509964405764	1	618.5768355234196	610.2449951171875	624.6519775390625	null	null	null	339922.8125	405710.65625	332679.5	null	null	null	null	null	null	50181.77734375	null	66080.3671875	null	68078.9921875	79449.609375	74375.578125	58916.11328125	55938.65234375	227610.046875	99155.1015625	90842.9296875	null	null	null	110156.875	129813.4296875	26757.875	115125.171875	145835.65625	149014.765625	210225.78125	207986.59375	68209.9296875	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	2	null	null	[M+H]+	null	281.15109153574696	1	640.5264003945053	633.1820068359375	647.3389892578125	3683465.25	3173967.25	2679515.0	2844257.5	4177088.0	4384673.0	2161030.5	3526893.25	4492726.5	5229474.5	3510717.0	6295308.5	4968348.0	5624746.0	4881049.0	1242459.375	6060308.5	4693889.0	7672371.0	5176138.0	5444935.0	6078975.0	5399436.5	4451279.5	981694.5	2827354.0	3400623.0	5513562.0	6910905.5	2009946.375	5014449.0	4837215.5	4224334.5	2971698.5	5017306.0	3796715.0	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	3	null	null	[M+H]+	null	339.1669921875	1	274.3970031738281	267.22601318359375	279.2239990234375	null	null	null	null	null	null	49766.32421875	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	4	null	null	[M+H]+	null	339.1560514258112	1	662.7065077836266	654.781005859375	669.2349853515625	38143.7109375	null	null	1007505.25	885781.0	605074.3125	30053.29296875	48768.453125	48545.2734375	136122.59375	71490.3515625	193831.421875	66448.7578125	280366.6875	696334.8125	null	902214.75	544849.25	387820.90625	513933.40625	569488.4375	84130.6875	120828.671875	369083.78125	null	20802.814453125	null	425679.46875	471388.03125	88047.2265625	747639.5625	774231.875	321833.46875	808466.4375	733472.0625	523234.75	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	5	null	null	[M+H]+	null	339.15604156107	1	747.9131494476337	740.4829711914062	761.4869995117188	679543.8125	560232.0625	635941.75	3698184.75	4254940.5	3083520.0	468762.21875	718994.5625	556576.8125	1036773.5	760905.5625	953829.5	821318.625	1439093.25	1404123.5	1550011.3203125	2603069.0	2680979.5	1687396.625	2057204.125	2361581.25	854571.6875	998042.4375	1723047.0	27524.322265625	125644.140625	252475.953125	3819307.75	3140624.0	1445940.75	2759775.0	2892492.25	2363664.25	3382491.5	3289525.25	1749458.75	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	6	null	null	[M+H]+	null	283.1714057177747	1	229.1516561292259	221.21600341796875	236.05499267578125	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	474034.1875	483193.71875	188122.15625	146903.921875	179264.09375	632340.8125	539881.875	785721.1875	412413.625	708529.0	407438.1875	531732.8125	609867.5625	732992.875	741543.3125	572440.0	778137.875	336002.875	776945.75	687350.5625	206856.71875	null	318272.5	460595.25	774825.25	512472.0	282868.21875	487723.40625	512125.21875	2251552.25	733278.125	285868.75	504444.25	235590.484375	318758.96875	1046253.8125
+SMF	7	null	null	[M+H]+	null	281.1505284064859	1	618.5760683021158	610.2449951171875	624.6519775390625	null	null	null	346001.75	412740.03125	339209.875	null	null	null	null	null	null	50678.0390625	null	67059.859375	null	68711.4921875	80622.15625	75231.6796875	59831.65234375	57096.71484375	230723.71875	101257.28125	92306.6796875	null	null	null	112065.390625	132097.078125	27152.951171875	116892.5703125	148172.046875	151319.28125	213769.59375	210403.765625	69168.5390625	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	8	null	null	[M+H]+	null	281.1502258976118	1	640.526401595432	633.1820068359375	647.3389892578125	3683465.25	3173967.25	2679515.0	2844257.5	4177088.0	4384673.0	2161030.5	3526893.25	4492726.5	5229027.5	3510717.0	6295308.5	4968348.0	5624746.0	4881049.0	1242459.375	6060308.5	4693889.0	7672371.0	5176138.0	5444935.0	6078975.0	5399436.5	4451279.5	981694.5	2827354.0	3400623.0	5513562.0	6910905.5	2009946.375	5014449.0	4837215.5	4224334.5	2971698.5	5017306.0	3796715.0	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	9	null	null	[M+H]+	null	226.1046076913306	1	807.3091171690586	797.4979858398438	817.2230224609375	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	92816.4921875	83791.4140625	113501.0859375	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	10	null	null	[M+H]+	null	243.13400268554688	1	696.1457426129922	688.5549926757812	702.7999877929688	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	210293.125	204808.8125	330117.1875	558546.0625	737569.3125	474761.53125	253287.90625	159271.984375	198246.390625	263574.0625	197759.984375	318277.59375	186336.71875	374293.8125	211051.6875	351100.375	767305.1875	717798.375	512503.75	490939.1875	612789.375	416673.9375	353146.40625	337066.5	null	38973.39453125	129568.53125	702771.875	330861.96875	227371.5625	563221.0625	656257.9375	364698.6875	623151.125	710218.3125	204510.4375
+SMF	11	null	null	[M+H]+	null	365.20921247752494	1	606.284256183058	598.7269897460938	611.6799926757812	571152.5	354115.53125	371431.125	964160.6875	1088450.5	1112152.5	371459.375	509496.90625	472276.28125	818695.8125	573728.75	729228.6875	444932.46875	957192.875	453410.375	535761.4375	1237510.875	887999.375	964231.875	789800.0	962243.0625	279756.375	496168.78125	782079.125	14682.794921875	52649.75	114375.46875	1487275.5	1588937.0	696493.625	1402035.0	1055154.875	955400.4375	1038940.625	1272357.625	992906.75	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	12	null	null	[M+H]+	null	365.2091172066039	1	618.4004861079021	610.780029296875	627.8389892578125	425446.90625	236457.015625	256162.625	988948.9375	1038703.5	1111113.0	276023.40625	386070.46875	342388.5625	633201.875	449746.34375	521135.875	342978.375	856754.0	329605.59375	364046.15625	1300826.125	656068.75	803278.75	703689.125	904999.125	219996.578125	417125.28125	654922.875	6567.3330078125	29398.6328125	72860.1484375	1308647.375	1439582.5	511973.03125	1369453.25	1052512.875	967041.4375	1068725.25	1241639.25	794603.4375	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	13	null	null	[M+H]+	null	365.2090420297551	1	637.8296163657486	628.1890258789062	653.93701171875	null	null	null	210994.515625	208443.59375	281096.6015625	null	null	null	13905.1904296875	null	12343.66015625	20559.30859375	78526.5625	26867.9765625	null	141723.75	171945.453125	67588.9375	72280.2734375	117096.75	19643.27734375	25163.181640625	31936.625	null	null	null	486496.5625	254235.234375	94107.296875	353435.65625	175935.125	252353.890625	394611.46875	192872.734375	110279.890625	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	14	null	null	[M+H]+	null	365.20854407839454	1	695.5810641583302	687.8619995117188	703.198974609375	256255.484375	167780.5	166904.3125	599128.3125	606335.625	512894.375	150228.234375	211403.71875	177883.578125	327750.4375	245491.703125	274588.53125	170826.8125	438774.21875	190577.984375	355439.375	735495.75	438430.5	414033.375	403927.40625	505331.25	110341.859375	204356.5	339830.21875	3498.1103515625	17160.69140625	41627.890625	818218.3125	772961.8125	267832.46875	763332.625	544276.5	468917.40625	651693.75	705654.125	451252.625	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	15	null	null	[M+H]+	null	283.9213452810711	1	550.0902548948329	542.0250244140625	557.6690063476562	4427569.5	3700311.75	2531923.5	2626183.25	2292511.5	4402157.5	4657950.5	5631993.5	5527200.5	6357091.0	5195577.5	5953824.0	6328582.0	6245224.5	5079131.0	3659535.0	4519708.0	3389572.25	4302577.5	3258447.25	3126299.75	2708551.75	3337966.0	3709272.0	3410401.5	3849377.0	3779036.0	4064412.75	6339165.0	4268988.0	4235762.0	3435556.75	3746232.0	2351123.75	3428841.5	4897303.5	3057608.5	3156338.0	2559038.25	1715493.625	1370665.25	2901903.0	3692506.0	4470419.5	4394857.0	4859590.0	4004710.0	4235131.0	5289648.0	5517272.0	4050457.5	2691037.75	3547247.75	2615271.5	2875397.0	2252287.25	1982258.75	2078937.5	2510891.5	2839085.75	3197700.75	3097650.75	2681826.25	2260920.5	2908803.0	5719943.5	2645638.25	2516209.5	2483427.75	1432186.5	2468012.0	2982935.5
+SMF	16	null	null	[M+H]+	null	604.0654908170775	1	189.45695599151716	175.21800231933594	212.89500427246094	7808.8681640625	5069.296875	5804.892578125	null	2849.0361328125	2691.861572265625	null	8146.357421875	7334.4248046875	6573.1650390625	null	null	9974.92578125	10487.4599609375	null	null	null	6713.25927734375	null	null	null	15372.921875	12286.2109375	12265.345703125	3650.04150390625	13082.716796875	22979.21875	null	null	null	null	null	null	null	4708.95166015625	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	17	null	null	[M+H]+	null	295.1297136205636	1	557.3319001477937	550.5150146484375	565.0679931640625	65096.38671875	61232.33203125	59184.578125	416478.5625	364393.34375	294300.125	47728.69140625	null	92163.8125	139562.640625	82200.9375	241538.75	129869.921875	153106.25	137229.671875	29435.12890625	322701.71875	283986.09375	333005.90625	272423.5625	291125.84375	206799.703125	130778.515625	null	null	null	null	460705.78125	377008.1875	null	326157.25	315612.0	173095.65625	329913.125	433663.4375	168043.359375	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	18	null	null	[M+H]+	null	296.0454383206219	1	593.1707096814024	585.2550048828125	601.2329711914062	5590104.0	5302716.0	4998381.0	1.2529531E7	1.3275294E7	1.3711583E7	4263036.0	6328207.5	8218593.0	9321983.0	7786730.5	1.08264E7	1.0022318E7	1.0432632E7	1.0842818E7	1490943.5	1.2468407E7	1.1885728E7	1.341911E7	1.1753329E7	1.1696691E7	1.1110721E7	1.0582929E7	9682400.0	1679264.5	4546106.0	5399809.5	1.2769249E7	1.4047763E7	9815093.0	1.2920802E7	1.2692579E7	1.2571272E7	1.218085E7	1.2965004E7	1.1634751E7	3533353.75	3935955.0	4811736.0	1.0902792E7	1.1397393E7	1.1657042E7	3004131.75	4517282.5	6287139.5	7498340.5	5822307.5	8826953.0	8377161.5	9372054.0	8929978.0	1046224.0	1.1252621E7	1.0692507E7	1.1017371E7	9737020.0	9875924.0	9522243.0	9005226.0	8028793.0	1272163.875	3140181.5	3278210.25	1.060872E7	1.0110791E7	1.1416807E7	1.0713854E7	1.1079066E7	1.026777E7	1.0446838E7	1.1426268E7	9009347.0
+SMF	19	null	null	[M+H]+	null	325.1399826077103	1	466.59697627736205	457.6499938964844	473.2929992675781	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	60798.9765625	65015.28125	81461.765625	278300.09375	329040.3125	288208.3125	28570.099609375	46505.21875	82042.1015625	111934.4140625	46241.6015625	165461.375	148564.0	221066.484375	195342.25	18128.083984375	211361.90625	395533.65625	192282.078125	269487.3125	168990.75	80950.8125	115424.8828125	148002.84375	9731.345703125	53981.31640625	29865.1484375	312981.59375	249642.234375	331569.46875	289699.5	244724.3125	172752.1875	269574.875	215929.078125	151135.8125
+SMF	20	null	null	[M+H]+	null	325.13973405902044	1	486.07957161640434	472.3080139160156	493.7460021972656	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	8127.7890625	11489.53125	null	73211.7421875	134988.515625	24068.095703125	31565.251953125	null	null	null	null	null	null	46149.9296875	null	19020.328125	46317.6015625	95366.015625	null	null	71033.9140625	22528.396484375	32194.171875	72714.171875	null	null	null	120024.9375	45035.953125	59684.59375	48406.89453125	66375.46875	34166.80078125	127896.984375	79017.203125	null
+SMF	21	null	null	[M+H]+	null	325.1399110523848	1	504.13577880498724	493.16400146484375	514.4450073242188	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	14188.3681640625	18135.755859375	104435.3984375	158326.96875	108988.140625	22009.5	null	21258.220703125	24766.47265625	null	51663.23828125	39948.48046875	63664.20703125	30249.771484375	null	62212.8984375	136261.171875	39669.7109375	52535.19921875	55190.3515625	20066.0390625	41096.15625	48516.0078125	null	null	null	141980.84375	76848.640625	101080.390625	85897.6875	97423.046875	62462.8671875	133286.0	94692.1796875	34871.78515625
+SMF	22	null	null	[M+H]+	null	325.1401478694589	1	523.9972723070266	515.197998046875	531.6270141601562	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	8496.3251953125	null	17711.650390625	132116.5625	132783.96875	94440.609375	64600.12890625	20103.076171875	25612.419921875	25322.466796875	22662.384765625	57751.97265625	41569.046875	103882.75	45308.8203125	11345.5595703125	128392.6328125	131191.8125	54172.3046875	57005.3125	103773.5703125	35813.51171875	75021.6875	102897.0625	null	null	8348.8486328125	217294.640625	89990.453125	168456.5625	116246.1875	134423.828125	87403.5546875	177408.375	148350.375	54769.80078125
+SMF	23	null	null	[M+H]+	null	325.13997959416633	1	548.5247967127044	531.322021484375	559.323974609375	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	20159.53515625	null	null	238658.46875	255920.984375	163080.390625	29026.6796875	null	18151.5859375	null	null	67876.0234375	37530.11328125	126621.984375	55150.125	null	239298.609375	183971.75	105111.765625	97982.8046875	185026.390625	27571.708984375	44531.4375	69322.7578125	null	11668.4736328125	null	238586.453125	90081.3984375	86931.625	212462.6875	217549.40625	104072.1171875	292274.90625	223392.390625	74508.4296875
+SMF	24	null	null	[M+H]+	null	323.8487039241472	1	579.5464093809904	565.7880249023438	587.8920288085938	null	null	null	106119.015625	177852.78125	106271.015625	null	32146.7890625	null	31603.98828125	null	null	39178.11328125	115350.6484375	35759.44921875	null	98193.2578125	115597.5078125	36309.8359375	70353.65625	101564.875	17817.8984375	58576.3203125	208587.421875	null	null	null	225046.890625	242805.09375	128619.34375	148157.1875	114900.2265625	153721.453125	198765.21875	117913.8125	65318.3359375	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	35238.80078125	201802.359375	180598.65625	null	null	null	null	null	84301.671875	null	null	null	228970.859375	null	null	186937.34375	195152.640625	null	220972.796875	206933.03125	null
+SMF	25	null	null	[M+H]+	null	325.13991372914467	1	593.4886069653807	585.0339965820312	604.0360107421875	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	33795.2890625	32333.552734375	null	null	null	33858.078125	18756.080078125	40801.171875	null	47947.76953125	29895.62109375	null	51731.0859375	35074.9296875	null	19171.310546875	29390.625	null	null	27192.5234375	null	null	null	49155.06640625	null	null	43273.46484375	41171.140625	20978.3359375	38381.0390625	37515.296875	null
+SMF	26	null	null	[M+H]+	null	325.13938371885166	1	628.9358189080431	620.9310302734375	645.8519897460938	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	23015.423828125	null	13177.138671875	null	null	null	18602.240234375	null	22579.056640625	20408.787109375	22076.224609375	17019.931640625	null	null	17275.671875	44532.9375	20187.365234375	29080.369140625	30944.06640625	28446.01953125	10541.732421875	null	7574.5810546875	28635.216796875	null	null	5364.98046875	24979.408203125	12992.87109375	null	15030.8486328125	23758.05078125	14161.962890625	null	24762.41796875	null
+SMF	27	null	null	[M+H]+	null	323.1245905448427	1	679.360048597511	671.5419921875	687.3109741210938	321247.125	207903.15625	289100.65625	1053649.5	1135326.75	356215.125	182599.390625	397483.21875	285514.1875	622067.625	381999.53125	550484.5625	209735.765625	521359.03125	276546.28125	804604.875	831791.1875	693817.6875	393813.71875	488886.90625	669402.5625	138716.6875	235214.921875	514816.96875	4228.98486328125	36407.546875	61800.6953125	1484353.875	1030075.3125	402578.1875	703714.75	855164.125	386777.65625	865327.5	929344.375	360173.0	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	28	null	null	[M+H]+	null	323.270468960158	1	718.9784018102303	700.7559814453125	727.4769897460938	18753.4921875	321349.0	14344.0810546875	170426.890625	81471.578125	161874.65625	9074.2998046875	17448.806640625	66365.265625	57972.50390625	31316.037109375	89717.375	149904.265625	110631.3515625	256568.3125	259057.1875	247086.953125	935057.4375	103751.9609375	64917.6328125	100840.5703125	218102.921875	136212.03125	93279.3828125	86697.9765625	99368.5390625	130852.796875	234526.625	349914.84375	80484.0	487644.21875	257049.65625	764105.9375	89976.828125	201394.1875	98809.6875	7881.8076171875	7829.45751953125	13489.193359375	19351.626953125	null	18812.33203125	11737.373046875	10650.31640625	7274.7568359375	14974.19921875	10312.875	14499.1953125	17801.26171875	40641.03515625	14450.7763671875	27292.607421875	31656.515625	27665.74609375	13413.4384765625	19762.056640625	22360.13671875	null	null	null	null	null	null	27710.529296875	null	null	28126.16796875	33585.8828125	null	31881.16796875	31877.474609375	10230.1796875
+SMF	29	null	null	[M+H]+	null	297.18098916004567	1	728.3113819757016	716.9949951171875	738.844970703125	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	1572375.875	1786966.0	1698497.8125	930123.28125	1173458.359375	1313458.109375	1520131.46875	2091436.5	1525029.875	1605627.5	1093172.8125	1144608.09375	1362427.96875	2207572.75	1432969.1875	1622162.5625	2000776.3125	1414492.9375	1392975.59375	1352143.15625	1007819.5	896206.421875	1007958.96875	1128451.0	125673.1796875	449327.921875	537933.375	1290519.3125	1214285.375	916470.0625	1048524.625	1372227.3125	1111806.84375	949180.953125	1239435.375	658079.65625
+SMF	30	null	null	[M+H]+	null	341.17141280674645	1	623.0701849625626	614.1710205078125	629.5560302734375	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	4422.9873046875	10438.4375	null	16526.392578125	null	null	null	null	null	null	null	null	16499.419921875	null	15131.87109375	22364.248046875	17824.484375	null	null	12019.52734375	null	null	8209.751953125	null	null	null	17999.3046875	17009.423828125	null	15166.240234375	18275.265625	9614.0029296875	15506.263671875	19299.458984375	null
+SMF	31	null	null	[M+H]+	null	339.5234291447152	1	663.3853067141497	654.781005859375	673.8250122070312	38143.7109375	null	null	1007505.25	885781.0	605074.3125	30053.29296875	48768.453125	48545.2734375	136122.59375	71490.3515625	193831.421875	66448.7578125	280366.6875	696334.8125	null	902214.75	544849.25	387820.90625	513933.40625	569488.4375	84130.6875	120828.671875	369083.78125	null	20802.814453125	null	425679.46875	471388.03125	88047.2265625	747639.5625	774231.875	321833.46875	808466.4375	733472.0625	523234.75	19597.40625	24370.775390625	30721.88671875	60956.39453125	117674.875	98392.3203125	null	56731.515625	53367.78515625	55019.453125	32345.056640625	45613.99609375	89729.609375	153613.15625	61306.890625	17586.62890625	122768.84375	124094.0859375	65643.96875	73656.46875	null	53378.3046875	146231.9375	188646.75	null	34366.71875	39904.7734375	134978.8125	103726.7890625	200313.84375	104906.890625	133241.09375	104420.390625	88414.21875	105979.8515625	43657.375
+SMF	32	null	null	[M+H]+	null	341.1716370294538	1	719.7424325481898	713.6209716796875	727.4539794921875	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	4798.208984375	9366.8505859375	15020.9541015625	14570.521484375	null	9590.345703125	11034.611328125	8487.8798828125	null	6985.2958984375	19438.669921875	39508.4375	null	null	34895.96875	33391.17578125	15448.052734375	15713.1787109375	15500.40234375	13015.28125	56012.375	66203.484375	null	null	null	29815.369140625	25528.783203125	45859.109375	22209.650390625	39125.71484375	16783.544921875	15379.0224609375	31043.892578125	8042.19580078125
+SMF	33	null	null	[M+H]+	null	339.2379681809505	1	747.9195491193054	740.4829711914062	761.4869995117188	660887.0	546019.375	617884.5	3599589.5	4141192.25	3000740.5	456147.28125	699367.9375	541540.5625	1008076.75	739574.25	927999.625	799649.1875	1399417.5	1366348.625	1518959.9453125	2534714.75	2610298.0	1642023.25	2002370.25	2297223.5	831529.25	970630.125	1675813.5	26260.65625	122365.0234375	248855.828125	3716403.25	3055533.0	1407393.625	2685763.25	2816434.5	2300762.75	3290091.0	3202549.0	1700623.25	22277.31640625	18516.681640625	37361.140625	167441.640625	204386.125	138206.0	null	35840.6953125	24434.818359375	35986.74609375	30492.796875	26585.625	27988.13671875	83522.25	40799.79296875	69429.34375	75344.625	90006.7109375	72166.1640625	102238.296875	99238.90625	49261.4375	33092.1953125	72069.921875	null	null	null	133703.09375	66466.1171875	111350.71875	112505.375	128403.8125	101783.1015625	154200.78125	153430.90625	51479.484375
+SMF	34	null	null	[M+H]+	null	247.11464492173056	1	293.5502936561951	284.2439880371094	303.1499938964844	null	1489.7440185546875	null	null	null	2904.816162109375	1476.9853515625	2652.429443359375	null	8746.20703125	3102.4775390625	null	3473.703125	2517.470947265625	null	2487.30517578125	2403.0576171875	1571.611083984375	1449.846923828125	2562.3115234375	null	null	1013.4529418945312	null	3643.05322265625	null	982.731201171875	2002.7293701171875	6330.31201171875	4526.78076171875	3811.203125	null	1939.4119873046875	null	1894.4482421875	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	35	null	null	[M+H]+	null	247.10400390625	1	341.67148745328296	333.6809997558594	347.22900390625	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	797886.75	818215.375	545560.5	395306.90625	312423.3671875	824717.25	929390.8125	1269835.625	1182216.5	1396895.375	1008480.375	1178596.625	1580237.5	1641051.625	386168.875	628257.4375	754678.4375	616564.125	644413.75	534374.3125	484914.625	465826.6875	592199.9375	601755.8125	872919.875	743350.1875	709532.375	612775.5	835542.5	1739504.625	683067.625	562233.5	629067.375	312574.0	603324.5	606893.3125
+SMF	36	null	null	[M+H]+	null	247.12599182128906	1	558.81442551007	548.6959838867188	572.3109741210938	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	47646.2734375	78054.734375	56997.8984375	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	37	null	null	[M+H]+	null	350.0412299739833	1	757.5193684827275	750.1480102539062	764.427001953125	4580271.5	4045044.5	3898091.25	1.0567205E7	1.1622041E7	1.059554E7	4578823.0	4472531.5	4361183.5	5616918.5	4372930.0	6188937.5	5887553.0	8563532.0	7206327.0	5094845.5	1.0539565E7	1.0654588E7	9079350.0	8717184.0	9738807.0	6163310.0	7525829.0	7617746.5	240928.703125	1836050.0	2269747.75	1.2025093E7	1.1421103E7	7939735.5	1.0629954E7	1.0470107E7	9695813.0	1.0494403E7	1.0711906E7	8343056.5	2268006.5	2779057.0	3461218.25	7313634.0	8587470.0	7414534.0	3298969.0	2996864.5	2871394.5	3735603.5	2824034.25	3424053.0	4139973.0	6855433.5	4453309.5	3257468.25	8165006.0	8168769.5	5895140.0	6220611.0	6203605.5	4374023.5	5174951.0	4842685.5	241542.890625	1366593.25	1047136.0625	8212586.0	5889753.5	8734691.0	7464531.5	8161203.0	6474784.5	7418782.0	8514245.0	4377132.5
+SMF	38	null	null	[M+H]+	null	273.1644892099168	1	317.12983211707524	304.5190124511719	332.9460144042969	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	33645.23828125	41032.265625	33896.89453125	36468.73046875	null	72648.609375	32908.68359375	74757.421875	51019.32421875	87503.4375	42204.15625	53497.734375	68776.015625	77993.546875	65713.4765625	45197.3046875	75876.1640625	45142.671875	37824.01171875	55238.55859375	29725.275390625	null	44541.97265625	39219.38671875	52858.53125	null	26004.880859375	67318.34375	59000.1796875	143376.09375	54704.45703125	34898.640625	52687.8046875	26180.396484375	null	57830.296875
+SMF	39	null	null	[M+H]+	null	215.9421891562353	1	217.94519697221975	209.6580047607422	223.63299560546875	78423.5078125	100641.390625	55115.875	51602.2265625	37469.09375	83821.0625	136087.53125	172975.328125	102567.828125	115411.046875	120328.25	79830.9453125	107116.2109375	130230.5	50792.8984375	102115.4296875	65578.140625	39357.8671875	58426.5	35404.36328125	38063.234375	34173.54296875	50295.1796875	58655.80078125	134589.234375	184492.625	91347.484375	108322.6875	99809.140625	108298.71875	65660.421875	50187.53125	69529.4375	42404.8046875	50922.71875	66784.515625	999660.6875	1233163.875	742441.125	658397.125	523212.59375	1136620.0	1650360.0	2031270.625	1188399.625	1469173.25	1286582.5	1106575.125	1420641.375	1942870.375	1283329.25	1224105.5	949670.3125	641649.9375	764182.0	467344.75	559297.875	436289.78125	610498.5	792024.3125	1417776.0	2038422.0	963167.3125	1531463.5	1032253.1875	2262967.0	850924.8125	720966.875	893120.0625	585110.0	738620.1875	768521.3125
+SMF	40	null	null	[M+H]+	null	216.08463503135695	1	586.3145180068152	578.1519775390625	592.9039916992188	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	36164.11328125	25741.46875	63645.76953125	null	null	null	null	null	null	null	null	null	null	67357.7890625	41064.31640625	null	null	29474.59375	null	null	null	null	null	null	null	49040.484375	149664.890625	51726.47265625	59245.73828125	53040.55859375	null	46735.1015625	null
+SMF	41	null	null	[M+H]+	null	279.13478108485504	1	631.5755920864182	624.5349731445312	638.906005859375	15178.947265625	7251.1025390625	6961.82275390625	28825.642578125	33651.22265625	58678.203125	10045.0693359375	null	12497.1767578125	21659.78515625	12522.25390625	32516.40234375	19255.953125	43308.796875	34855.5625	7328.19677734375	25001.193359375	20128.421875	22128.044921875	19646.37109375	24939.189453125	16126.0966796875	34364.78515625	40582.62890625	1854.65478515625	4275.92041015625	3657.215087890625	30347.919921875	43619.8125	18283.845703125	32627.0546875	29381.51171875	42236.53125	21477.080078125	39228.66015625	53571.44921875	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null	null
+SMF	42	null	null	[M+H]+	null	280.6701206351512	1	673.2348580064191	666.0960083007812	691.3090209960938	128863.1015625	118704.109375	101630.9375	1025589.375	993477.5	1433747.625	95934.0234375	195312.53125	288509.09375	387221.84375	212410.9375	556057.375	429988.84375	584645.9375	654140.5	97728.890625	990658.5625	779882.25	1001229.125	639967.4375	707000.25	638974.6875	384285.96875	403238.0	5763.041015625	31828.177734375	64053.52734375	1316973.75	1576372.5	370990.71875	1117736.25	993170.3125	1017453.125	921447.75	1131426.125	559710.4375	727621.5	787058.1875	1180774.25	2672766.46875	2810999.25	3081261.5	691728.0625	1114488.0	1229031.125	1742637.625	1120833.0	1782741.375	1697458.5	2674641.25	1952993.75	1069028.25	3632394.75	3070181.0	2472582.0	2260918.0	2167358.25	1827303.5	1409181.0	1563518.0	108858.1796875	267219.34375	304598.21875	3180941.5	2136827.75	3013115.0	2933635.5	3297297.5	2545362.25	2673991.5	3515687.25	1487959.875
+
+SEH	SME_ID	evidence_input_id	database_identifier	chemical_formula	smiles	inchi	chemical_name	uri	derivatized_form	adduct_ion	exp_mass_to_charge	charge	theoretical_mass_to_charge	spectra_ref	identification_method	ms_level	id_confidence_measure[1]	rank

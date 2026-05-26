@@ -32,7 +32,7 @@
 #' \dontrun{
 #' props <- c("P231", "P592", "P683", "P715")
 #' result_path <- get_compounds_xrefs(props)
-#' head(tidytable::fread(result_path))
+#' utils::head(tidytable::fread(result_path))
 #' }
 get_compounds_xrefs <- function(
   props = c(

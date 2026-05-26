@@ -40,7 +40,7 @@
 #' spectra_df <- extract_spectra(spectra_object)
 #'
 #' # Access metadata and peaks
-#' head(spectra_df)
+#' utils::head(spectra_df)
 #' peaks <- spectra_df$mz[[1L]] # First spectrum peaks
 #' }
 extract_spectra <- function(object) {

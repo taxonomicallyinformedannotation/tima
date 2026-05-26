@@ -10,7 +10,8 @@ create_temp_test_files <- function(base_dir = tempdir()) {
     features = file.path(base_dir, "features.csv"),
     metadata = file.path(base_dir, "metadata.tsv"),
     sirius = file.path(base_dir, "sirius.zip"),
-    spectra = file.path(base_dir, "spectra.mgf")
+    spectra = file.path(base_dir, "spectra.mgf"),
+    mztab = file.path(base_dir, "annotations.mztab")
   )
 
   # Create dummy files
@@ -23,6 +24,7 @@ create_temp_test_files <- function(base_dir = tempdir()) {
   )
   writeLines("dummy_sirius", files$sirius)
   writeLines("dummy_mgf", files$spectra)
+  writeLines("MTD\tmzTab-version\t2.0.0-M", files$mztab)
 
   files
 }
@@ -85,6 +87,14 @@ test_that("change_params_small errors on missing spectra file", {
   expect_error(
     change_params_small(fil_spe_raw = "nonexistent_spectra.mgf"),
     "Spectra file does not exist"
+  )
+})
+
+test_that("change_params_small errors on missing mzTab file", {
+  skip_on_ci()
+  expect_error(
+    change_params_small(fil_mzt_raw = "nonexistent_annotations.mztab"),
+    "mzTab file does not exist"
   )
 })
 
@@ -190,7 +200,8 @@ test_that("change_params_small updates all file parameters", {
     features = file.path(source_dir, "new_features.csv"),
     metadata = file.path(source_dir, "new_metadata.tsv"),
     sirius = file.path(source_dir, "new_sirius.zip"),
-    spectra = file.path(source_dir, "new_spectra.mgf")
+    spectra = file.path(source_dir, "new_spectra.mgf"),
+    mztab = file.path(source_dir, "new_annotations.mztab")
   )
 
   invisible(vapply(
@@ -209,6 +220,7 @@ test_that("change_params_small updates all file parameters", {
     fil_met_raw = new_files$metadata,
     fil_sir_raw = new_files$sirius,
     fil_spe_raw = new_files$spectra,
+    fil_mzt_raw = new_files$mztab,
     ms_pol = "neg",
     cache_dir = tmpdir
   )
@@ -221,6 +233,115 @@ test_that("change_params_small updates all file parameters", {
   expect_equal(params$ms$polarity, "neg")
   # Files are copied to data/source
   expect_true(grepl("new_features.csv", params$files$features$raw))
+  expect_true(grepl("new_annotations.mztab", params$files$mztab$raw))
+})
+
+test_that("change_params_small supports mzTab-only update while keeping existing core files", {
+  skip_if_not_installed("yaml")
+  skip_on_ci()
+
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  minimal_params <- list(
+    ms = list(polarity = "pos"),
+    files = list(
+      pattern = "old",
+      mztab = list(raw = "null"),
+      features = list(raw = "data/source/old_features.csv"),
+      metadata = list(raw = "data/source/old_metadata.tsv"),
+      annotations = list(
+        raw = list(sirius = "data/interim/annotations/old_sirius.zip")
+      ),
+      spectral = list(raw = "data/source/old_spectra.mgf")
+    )
+  )
+
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params.yaml")
+  )
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params_advanced.yaml")
+  )
+
+  source_dir <- file.path(tmpdir, "test_source")
+  dir.create(source_dir, recursive = TRUE)
+  mztab_path <- file.path(source_dir, "input_only.mztab")
+  writeLines("MTD\tmzTab-version\t2.0.0-M", mztab_path)
+
+  expect_no_error(change_params_small(
+    fil_mzt_raw = mztab_path,
+    cache_dir = tmpdir
+  ))
+
+  params <- yaml::read_yaml(file.path(tmpdir, "params/prepare_params.yaml"))
+  expect_true(grepl("input_only.mztab", params$files$mztab$raw))
+  expect_identical(params$files$features$raw, "data/source/old_features.csv")
+  expect_identical(params$files$spectral$raw, "data/source/old_spectra.mgf")
+  expect_identical(params$files$metadata$raw, "data/source/old_metadata.tsv")
+})
+
+test_that("change_params_small accepts mzTab with explicit overlays for features/metadata/spectra", {
+  skip_if_not_installed("yaml")
+  skip_on_ci()
+
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  minimal_params <- list(
+    ms = list(polarity = "pos"),
+    files = list(
+      pattern = "old",
+      mztab = list(raw = "null"),
+      features = list(raw = "data/source/old_features.csv"),
+      metadata = list(raw = "data/source/old_metadata.tsv"),
+      annotations = list(
+        raw = list(sirius = "data/interim/annotations/old_sirius.zip")
+      ),
+      spectral = list(raw = "data/source/old_spectra.mgf")
+    )
+  )
+
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params.yaml")
+  )
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params_advanced.yaml")
+  )
+
+  source_dir <- file.path(tmpdir, "test_source")
+  dir.create(source_dir, recursive = TRUE)
+  mztab_path <- file.path(source_dir, "input_overlay.mztab")
+  fea_path <- file.path(source_dir, "overlay_features.csv")
+  met_path <- file.path(source_dir, "overlay_metadata.tsv")
+  spe_path <- file.path(source_dir, "overlay_spectra.mgf")
+
+  writeLines("MTD\tmzTab-version\t2.0.0-M", mztab_path)
+  write.csv(data.frame(a = 1), fea_path, row.names = FALSE)
+  write.table(data.frame(b = 1), met_path, sep = "\t", row.names = FALSE)
+  writeLines("BEGIN IONS\nEND IONS", spe_path)
+
+  expect_no_error(change_params_small(
+    fil_mzt_raw = mztab_path,
+    fil_fea_raw = fea_path,
+    fil_met_raw = met_path,
+    fil_spe_raw = spe_path,
+    cache_dir = tmpdir
+  ))
+
+  params <- yaml::read_yaml(file.path(tmpdir, "params/prepare_params.yaml"))
+  expect_true(grepl("input_overlay.mztab", params$files$mztab$raw))
+  expect_true(grepl("overlay_features.csv", params$files$features$raw))
+  expect_true(grepl("overlay_metadata.tsv", params$files$metadata$raw))
+  expect_true(grepl("overlay_spectra.mgf", params$files$spectral$raw))
 })
 
 ## Internal Helper Tests ----
@@ -667,4 +788,108 @@ test_that("create_yaml_null_handler creates proper function", {
   expect_equal(handler("test"), "test")
   expect_equal(handler(42), 42)
   expect_equal(handler(TRUE), TRUE)
+})
+
+test_that("prepare_params propagates mzTab paths into mzTab workflow step YAMLs", {
+  skip_if_not_installed("yaml")
+
+  repo_root <- Sys.getenv("PWD", unset = "")
+  skip_if(!nzchar(repo_root), "PWD is not available for locating repo root")
+  repo_root <- normalizePath(repo_root, winslash = "/", mustWork = TRUE)
+  default_dir <- file.path(repo_root, "inst", "params", "default")
+  default_files <- list.files(
+    default_dir,
+    pattern = "\\.yaml$",
+    full.names = TRUE
+  )
+
+  yamls <- lapply(default_files, yaml::read_yaml)
+  names(yamls) <- sub("\\.yaml$", "", basename(default_files))
+  yamls$prepare_params <- yaml::read_yaml(file.path(
+    repo_root,
+    "inst",
+    "params",
+    "prepare_params.yaml"
+  ))
+  yamls$prepare_params_advanced <- yaml::read_yaml(file.path(
+    repo_root,
+    "inst",
+    "params",
+    "prepare_params_advanced.yaml"
+  ))
+
+  fake_yaml_files <- c(
+    default_files,
+    file.path(repo_root, "inst", "params", "prepare_params.yaml"),
+    file.path(repo_root, "inst", "params", "prepare_params_advanced.yaml")
+  )
+  fake_yaml_names <- c(
+    sub("\\.yaml$", "", basename(default_files)),
+    "prepare_params",
+    "prepare_params_advanced"
+  )
+
+  captured <- new.env(parent = emptyenv())
+
+  testthat::local_mocked_bindings(
+    load_yaml_files = function() {
+      list(
+        yamls_params = yamls,
+        yaml_files = fake_yaml_files,
+        yaml_names = fake_yaml_names
+      )
+    },
+    create_dir = function(...) invisible(NULL),
+    .package = "tima"
+  )
+
+  testthat::local_mocked_bindings(
+    write_yaml = function(x, file, ...) {
+      assign(basename(file), x, envir = captured)
+      invisible(NULL)
+    },
+    .package = "yaml"
+  )
+
+  params_small <- yaml::read_yaml(file.path(
+    repo_root,
+    "inst",
+    "params",
+    "prepare_params.yaml"
+  ))
+  params_advanced <- yaml::read_yaml(file.path(
+    repo_root,
+    "inst",
+    "params",
+    "prepare_params_advanced.yaml"
+  ))
+  params_small$files$mztab$raw <- "data/source/example_input.mztab"
+  params_advanced$files$mztab$raw <- "data/source/example_input.mztab"
+
+  prepare_params(
+    params_small = params_small,
+    params_advanced = params_advanced,
+    step = "prepare_annotations_mztab"
+  )
+  mztab_step <- get("prepare_annotations_mztab.yaml", envir = captured)
+  expect_identical(
+    mztab_step$files$mztab$raw,
+    "data/source/example_input.mztab"
+  )
+  expect_true(
+    "mztab" %in% names(mztab_step$files$annotations$prepared$structural)
+  )
+
+  prepare_params(
+    params_small = params_small,
+    params_advanced = params_advanced,
+    step = "write_mztab"
+  )
+  write_step <- get("write_mztab.yaml", envir = captured)
+  expect_identical(
+    write_step$files$mztab$raw,
+    "data/source/example_input.mztab"
+  )
+  expect_true(nzchar(write_step$files$output$mztab))
+  expect_match(write_step$files$output$mztab, "\\.mztab$")
 })

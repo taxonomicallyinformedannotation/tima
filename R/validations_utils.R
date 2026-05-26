@@ -749,6 +749,85 @@ validate_adduct_list <- function(
     )
   }
 
+  # Structured adduct schema is valid too:
+  #   adducts: { M, charge_carriers, charges, ... }
+  # and can be consumed by build_adduct_universe().
+  is_structured_adduct_schema <-
+    identical(list_name, "adducts_list") &&
+    any(c("M", "charge_carriers", "charges") %in% names(adducts_list))
+  if (is_structured_adduct_schema) {
+    carriers <- adducts_list$charge_carriers
+    charges <- adducts_list$charges
+    if (!is.list(carriers) || is.null(carriers[[ms_mode]])) {
+      msg <- format_error(
+        problem = paste0(
+          "Missing '",
+          ms_mode,
+          "' mode in ",
+          list_name,
+          "$charge_carriers"
+        ),
+        expected = paste0("List entry for '", ms_mode, "' mode"),
+        received = paste0(
+          "Available modes: ",
+          paste(names(carriers), collapse = ", ")
+        ),
+        context = "Structured adduct schema requires mode-specific charge carriers",
+        fix = paste0(
+          "Add charge carriers for '",
+          ms_mode,
+          "' mode under ",
+          list_name,
+          "$charge_carriers"
+        )
+      )
+      tima_abort_message(
+        msg,
+        class = c("tima_validation_error", "tima_error")
+      )
+    }
+    if (!is.list(charges) || is.null(charges[[ms_mode]])) {
+      msg <- format_error(
+        problem = paste0(
+          "Missing '",
+          ms_mode,
+          "' mode in ",
+          list_name,
+          "$charges"
+        ),
+        expected = paste0("List entry for '", ms_mode, "' mode"),
+        received = paste0(
+          "Available modes: ",
+          paste(names(charges), collapse = ", ")
+        ),
+        context = "Structured adduct schema requires mode-specific charges",
+        fix = paste0(
+          "Add charges for '",
+          ms_mode,
+          "' mode under ",
+          list_name,
+          "$charges"
+        )
+      )
+      tima_abort_message(
+        msg,
+        class = c("tima_validation_error", "tima_error")
+      )
+    }
+    if (length(carriers[[ms_mode]]) == 0L || length(charges[[ms_mode]]) == 0L) {
+      msg <- paste0(
+        "[WARNING] ",
+        list_name,
+        " structured schema has empty charge_carriers/charges for '",
+        ms_mode,
+        "' mode."
+      )
+      warning(msg, call. = FALSE)
+      log_warn(msg)
+    }
+    return(invisible(TRUE))
+  }
+
   if (is.null(adducts_list[[ms_mode]])) {
     available_modes <- names(adducts_list)
     msg <- format_error(

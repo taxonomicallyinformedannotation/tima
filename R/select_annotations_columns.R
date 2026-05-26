@@ -21,6 +21,9 @@
 #' @param cache (character or NULL) Optional path to a SMILES processing cache
 #'     file (e.g. `processed.csv.gz`). When `NULL` (default), the cache path
 #'     is auto-derived from `dirname(str_stereo)/processed.csv.gz`.
+#' @param recompute_smiles [logical] If `TRUE` (default), recompute structure
+#'   fields from SMILES via RDKit. Set to `FALSE` to skip RDKit and keep the
+#'   provided structure fields as-is (faster for large batch runs).
 #'
 #' @return Data frame with standardized annotation columns, cleaned values,
 #'     and complemented metadata
@@ -43,7 +46,8 @@ select_annotations_columns <- function(
   str_met,
   str_tax_cla,
   str_tax_npc,
-  cache = NULL
+  cache = NULL,
+  recompute_smiles = TRUE
 ) {
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
@@ -109,12 +113,16 @@ select_annotations_columns <- function(
   }
 
   # Recompute all structure properties from SMILES ----
-  # When a SMILES is available from annotation sources, use process_smiles()
-  # to recompute ALL derived fields (canonical SMILES, SMILES no stereo,
-  # InChIKey, InChIKey connectivity layer, InChIKey no stereo, formula,
-  # exact_mass, xlogp) in one shot.  Each unique SMILES is converted once
-  # thanks to the caching inside process_smiles().
-  df <- recompute_structure_fields_from_smiles(df, cache = cache)
+  if (isTRUE(recompute_smiles)) {
+    # When a SMILES is available from annotation sources, use process_smiles()
+    # to recompute ALL derived fields (canonical SMILES, SMILES no stereo,
+    # InChIKey, InChIKey connectivity layer, InChIKey no stereo, formula,
+    # exact_mass, xlogp) in one shot. Each unique SMILES is converted once
+    # thanks to caching inside process_smiles().
+    df <- recompute_structure_fields_from_smiles(df, cache = cache)
+  } else {
+    log_info("Skipping RDKit SMILES recomputation (recompute_smiles=FALSE)")
+  }
 
   df <- df |>
     # Round numeric values

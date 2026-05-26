@@ -286,9 +286,23 @@ canonicalize_adduct_notation <- function(adduct) {
       # Keep charge carriers last in positive modifiers so canonical forms read
       # as neutrals/clusters then carrier, e.g. [M+H2O+H]+ (not [M+H+H2O]+).
       carrier_formulas <- c(
-        "H", "H2", "H3", "H4N", "Na", "K", "Li", "Mg", "Ca", "Fe", "Cu"
+        "H",
+        "H2",
+        "H3",
+        "H4N",
+        "Na",
+        "K",
+        "Li",
+        "Mg",
+        "Ca",
+        "Fe",
+        "Cu"
       )
-      pos <- pos[order(pos$formula %in% carrier_formulas, pos$formula), , drop = FALSE]
+      pos <- pos[
+        order(pos$formula %in% carrier_formulas, pos$formula),
+        ,
+        drop = FALSE
+      ]
       rebuild_terms <- c(
         rebuild_terms,
         vapply(

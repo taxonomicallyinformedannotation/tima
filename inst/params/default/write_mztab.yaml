@@ -1,0 +1,59 @@
+---
+#' Files for write_mztab step.
+files:
+  #' Input TIMA results file produced by weight_annotations. STRING
+  annotations:
+    processed: annotations.tsv
+
+  #' Optional existing mzTab-M to be complemented by TIMA results. STRING|null
+  mztab:
+    raw: null
+
+  #' Output mzTab-M file. STRING
+  output:
+    mztab: annotations.mztab
+
+  #' Optional cross-references file from get_compounds_xrefs().
+  #' When set, URIs and additional database[n] blocks are populated. STRING|null
+  xrefs: null
+
+  #' Optional edge table (e.g. data/interim edges) embedded into mzTab COM lines.
+  #' Keep null to disable edge embedding. STRING|null
+  #' Example:
+  #' files:
+  #'   edges: data/interim/edges.tsv
+  edges: null
+
+#' Mass spectrometry run metadata.
+ms:
+  #' Raw data file location (URI or path) written to ms_run[1]-location. STRING
+  run_location: null
+
+  #' Raw file format CV Param, e.g. "[MS, MS:1000584, mzML file, ]".
+  #' Leave as null when unknown. STRING|null
+  run_format: null
+
+  #' Spectrum native-ID format CV Param.
+  #' e.g. "[MS, MS:1000776, scan number only nativeID format, ]". STRING|null
+  run_id_format: null
+
+  #' Ionisation polarity of the MS run: "positive", "negative", or null.
+  polarity: null
+
+  #' Optional instrument model CV Param, e.g. "[MS, MS:1001742, LTQ Orbitrap Velos, ]".
+  instrument: null
+
+#' Free-text study metadata.
+study:
+  title: null
+  description: "Annotation results produced by Taxonomically Informed Metabolomics Annotation (TIMA)."
+  #' Optional sample display name for sample[1]-description.
+  sample_name: null
+  #' Publication reference (DOI or URL) for publication[1].
+  publication: null
+
+#' Optional contact information (leave sub-fields blank to omit).
+contact:
+  name: null
+  email: null
+  affiliation: null

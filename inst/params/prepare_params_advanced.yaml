@@ -46,6 +46,11 @@ files:
   #' Pattern to identify the files. STRING
   pattern: example
 
+  #' mzTab input file.
+  mztab:
+    #' Optional top-level mzTab-M source file (data/source). STRING
+    raw: null
+
   #' Annotations files.
   annotations:
     #' Raw annotations files.
@@ -85,6 +90,9 @@ files:
         
         #' Prepared mzmine structural annotations. STRING
         mzmine: data/interim/annotations/example_mzminePrepared.tsv.gz
+
+        #' Prepared mzTab structural annotations. STRING
+        mztab: data/interim/annotations/example_mztabPrepared.tsv.gz
 
         #' Prepared SIRIUS structural annotations. STRING
         sirius: data/interim/annotations/example_siriusPrepared.tsv.gz
@@ -481,13 +489,13 @@ ms:
     #' List of clusters to be used in positive. STRING
     pos:
       # - "H2O" # (water)
-      # - CH4O # (methanol)
+      # - "CH4O" # (methanol)
       - "C2H3N" # (acetonitrile)
-      # - C2H7N # (ethylamine)
-      # - C2H6O # (ethanol)
+      - "C2H7N" # (ethylamine)
+      # - "C2H6O" # (ethanol)
       - "NaCl" # (sodium chloride)
-      # - C3H8O # (isopropanol)
-      # - C2H6OS # (dmso)
+      # - "C3H8O" # (isopropanol)
+      - "C2H6OS" # (dmso)
 
   #' List of neutral losses to be used. STRING
   neutral_losses:

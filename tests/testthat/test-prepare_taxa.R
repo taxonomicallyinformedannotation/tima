@@ -335,3 +335,102 @@ test_that("prepare_taxa handles pipe-separated organisms", {
   # Should have collapsed multiple organisms
   expect_true(grepl("Org1|Org2", df$sample_organism_name[1]))
 })
+
+test_that("prepare_taxa falls back to ATTRIBUTE_species when requested taxon column is missing", {
+  input <- temp_test_path("features.tsv")
+  ott <- temp_test_path("ott.tsv")
+  metadata <- temp_test_path("metadata.tsv")
+  output <- temp_test_path("output.tsv")
+
+  writeLines(
+    "feature_id\trt\tmz\tsample\nFT001\t1.5\t200\tfile1\nFT002\t2.0\t300\tfile2",
+    input
+  )
+
+  writeLines(
+    paste0(
+      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
+      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
+      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
+      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
+      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
+      "organism_taxonomy_10varietas\n",
+      "Arabidopsis thaliana\t309275\tEukaryota\tPlantae\tStreptophyta\t",
+      "Magnoliopsida\tBrassicales\tBrassicaceae\tNA\tArabidopsis\tArabidopsis thaliana\tNA\n",
+      "Oryza sativa\t4530\tEukaryota\tPlantae\tStreptophyta\t",
+      "Magnoliopsida\tPoales\tPoaceae\tNA\tOryza\tOryza sativa\tNA"
+    ),
+    ott
+  )
+
+  # No 'organism' column on purpose, only ATTRIBUTE_species.
+  writeLines(
+    "filename\tATTRIBUTE_species\nfile1\tArabidopsis thaliana\nfile2\tOryza sativa",
+    metadata
+  )
+
+  expect_no_error(
+    prepare_taxa(
+      input = input,
+      org_tax_ott = ott,
+      taxon = NULL,
+      metadata = metadata,
+      name_filename = "filename",
+      colname = "organism",
+      output = output,
+      extension = FALSE
+    )
+  )
+
+  df <- tidytable::fread(output)
+  expect_equal(nrow(df), 2L)
+  expect_true("Arabidopsis thaliana" %in% df$sample_organism_name)
+  expect_true("Oryza sativa" %in% df$sample_organism_name)
+})
+
+test_that("prepare_taxa exports ND taxonomy when metadata lacks organism values", {
+  input <- temp_test_path("features.tsv")
+  ott <- temp_test_path("ott.tsv")
+  metadata <- temp_test_path("metadata.tsv")
+  output <- temp_test_path("output.tsv")
+
+  writeLines(
+    "feature_id\trt\tmz\tsample\nFT001\t1.5\t200\tfile1\nFT002\t2.0\t300\tfile2",
+    input
+  )
+
+  # OTT file exists (validated early), but should not be required for ND fallback.
+  writeLines(
+    paste0(
+      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
+      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
+      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
+      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
+      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
+      "organism_taxonomy_10varietas\n",
+      "dummy\t1\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA"
+    ),
+    ott
+  )
+
+  # No organism-like columns at all.
+  writeLines("filename\tbatch\nfile1\tA\nfile2\tB", metadata)
+
+  expect_no_error(
+    prepare_taxa(
+      input = input,
+      org_tax_ott = ott,
+      taxon = NULL,
+      metadata = metadata,
+      name_filename = "filename",
+      colname = "organism",
+      output = output,
+      extension = FALSE
+    )
+  )
+
+  df <- tidytable::fread(output)
+  expect_equal(nrow(df), 2L)
+  expect_true(all(df$sample_organism_name == "ND"))
+  expect_true(all(df$sample_organism_01_domain == "ND"))
+})

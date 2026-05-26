@@ -76,6 +76,24 @@ prepare_taxa <- function(
 ) {
   ctx <- log_operation("prepare_taxa", taxon = taxon)
 
+  .make_nd_taxa_table <- function(feature_ids) {
+    feature_ids <- unique(as.character(feature_ids))
+    tidytable::tidytable(
+      feature_id = feature_ids,
+      sample_organism_name = "ND",
+      sample_organism_01_domain = "ND",
+      sample_organism_02_kingdom = "ND",
+      sample_organism_03_phylum = "ND",
+      sample_organism_04_class = "ND",
+      sample_organism_05_order = "ND",
+      sample_organism_06_family = "ND",
+      sample_organism_07_tribe = "ND",
+      sample_organism_08_genus = "ND",
+      sample_organism_09_species = "ND",
+      sample_organism_10_varietas = "ND"
+    )
+  }
+
   # Validate file paths
   validate_character(input, param_name = "input", allow_empty = FALSE)
   validate_file_exists(
@@ -152,6 +170,53 @@ prepare_taxa <- function(
   if (!is.null(taxon)) {
     metadata_table <- data.frame(taxon)
     colnames(metadata_table) <- colname
+  } else {
+    # Resolve taxon column name with compatibility fallback.
+    if (!colname %in% names(metadata_table)) {
+      fallback_taxon <- setdiff(c("ATTRIBUTE_species", "organism"), colname)
+      fallback_taxon <- fallback_taxon[
+        fallback_taxon %in% names(metadata_table)
+      ]
+      if (length(fallback_taxon) > 0L) {
+        colname <- fallback_taxon[[1L]]
+        log_warn(
+          "Metadata column '%s' not found; using '%s' instead",
+          get_params(step = "prepare_taxa")$names$taxon,
+          colname
+        )
+      } else {
+        log_warn(
+          "No organism column found in metadata; exporting ND taxonomy for all features"
+        )
+        taxed_features_table <- .make_nd_taxa_table(feature_table_0$feature_id)
+        log_complete(ctx, n_features = nrow(taxed_features_table))
+        export_params(
+          parameters = get_params(step = "prepare_taxa"),
+          step = "prepare_taxa"
+        )
+        export_output(x = taxed_features_table, file = output)
+        return(output)
+      }
+    }
+
+    has_organism <- any(
+      !is.na(metadata_table[[colname]]) &
+        nzchar(trimws(metadata_table[[colname]]))
+    )
+    if (!has_organism) {
+      log_warn(
+        "Metadata column '%s' has no organism values; exporting ND taxonomy for all features",
+        colname
+      )
+      taxed_features_table <- .make_nd_taxa_table(feature_table_0$feature_id)
+      log_complete(ctx, n_features = nrow(taxed_features_table))
+      export_params(
+        parameters = get_params(step = "prepare_taxa"),
+        step = "prepare_taxa"
+      )
+      export_output(x = taxed_features_table, file = output)
+      return(output)
+    }
   }
 
   organism_table <- metadata_table |>
@@ -163,17 +228,55 @@ prepare_taxa <- function(
 
   #  "Retrieving already computed Open Tree of Life Taxonomy"
   # )
+  ott_table <- safe_fread(
+    file = org_tax_ott,
+    file_type = "organism taxonomy (OTT)",
+    na.strings = c("", "NA"),
+    colClasses = "character"
+  )
+
+  # Validate OTT table has required columns
+  required_ott_cols <- c(
+    "organism_name",
+    "organism_taxonomy_ottid",
+    "organism_taxonomy_01domain",
+    "organism_taxonomy_02kingdom",
+    "organism_taxonomy_03phylum",
+    "organism_taxonomy_04class",
+    "organism_taxonomy_05order",
+    "organism_taxonomy_06family",
+    "organism_taxonomy_07tribe",
+    "organism_taxonomy_08genus",
+    "organism_taxonomy_09species",
+    "organism_taxonomy_10varietas"
+  )
+
+  missing_cols <- setdiff(required_ott_cols, names(ott_table))
+  if (length(missing_cols) > 0L) {
+    cli::cli_abort(
+      c(
+        "OTT (Open Tree of Life) taxonomy file is missing required columns",
+        "x" = sprintf(
+          "Missing columns: %s",
+          paste(missing_cols, collapse = ", ")
+        ),
+        "i" = sprintf(
+          "File has columns: %s",
+          paste(names(ott_table), collapse = ", ")
+        ),
+        "!" = "Please ensure your OTT file has the standard TIMA taxonomy columns"
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+
   organism_table_filled <- organism_table |>
     tidytable::left_join(
-      y = safe_fread(
-        file = org_tax_ott,
-        file_type = "organism taxonomy (OTT)",
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      ),
+      y = ott_table,
       by = c("organism" = "organism_name")
     )
-  rm(organism_table)
+  rm(organism_table, ott_table)
 
   organism_table_missing <- organism_table_filled |>
     tidytable::filter(is.na(organism_taxonomy_ottid))
@@ -225,6 +328,41 @@ prepare_taxa <- function(
     ) |>
       tidytable::select(-join)
   } else {
+    # Validate join keys exist in their respective tables
+    if (!"sample" %in% names(feature_table_0)) {
+      cli::cli_abort(
+        c(
+          "Features file does not contain the 'sample' column",
+          "i" = sprintf(
+            "Found columns: %s",
+            paste(names(feature_table_0), collapse = ", ")
+          ),
+          "x" = "Features file must have a 'sample' column for metadata mapping"
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
+    }
+
+    if (!name_filename %in% names(metadata_table)) {
+      cli::cli_abort(
+        c(
+          "Metadata file does not contain the filename column",
+          "i" = sprintf(
+            "Expected column '%s' as specified in 'names$filename' parameter",
+            name_filename
+          ),
+          "x" = sprintf(
+            "Found columns: %s",
+            paste(names(metadata_table), collapse = ", ")
+          ),
+          "!" = "Please ensure the 'names$filename' parameter matches a column in your metadata file"
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
+    }
+
     metadata_table_joined <-
       tidytable::left_join(
         x = feature_table_0,
@@ -237,19 +375,69 @@ prepare_taxa <- function(
         tidyselect::everything()
       ) |>
       tidytable::separate_rows(organismOriginal, sep = "\\|")
+
+    if (nrow(metadata_table_joined) == 0L) {
+      log_warn(
+        "No metadata rows matched features by sample name; exporting ND taxonomy for all features"
+      )
+      taxed_features_table <- .make_nd_taxa_table(feature_table_0$feature_id)
+      log_complete(ctx, n_features = nrow(taxed_features_table))
+      export_params(
+        parameters = get_params(step = "prepare_taxa"),
+        step = "prepare_taxa"
+      )
+      export_output(x = taxed_features_table, file = output)
+      return(output)
+    }
   }
   rm(feature_table_0, metadata_table)
 
   # Split organismOriginal to match the split organism_name in
   # biological_metadata
-  taxed_features_table <-
-    metadata_table_joined |>
+  joined_data <- metadata_table_joined |>
     tidytable::mutate(organismOriginal = trimws(organismOriginal)) |>
     tidytable::left_join(
       y = biological_metadata,
       by = c("organismOriginal" = "organism_name")
     ) |>
-    tidytable::distinct() |>
+    tidytable::distinct()
+
+  # Validate that we have the required taxonomy columns for selection
+  expected_cols <- c(
+    "feature_id",
+    "organismOriginal",
+    "organism_taxonomy_01domain",
+    "organism_taxonomy_02kingdom",
+    "organism_taxonomy_03phylum",
+    "organism_taxonomy_04class",
+    "organism_taxonomy_05order",
+    "organism_taxonomy_06family",
+    "organism_taxonomy_07tribe",
+    "organism_taxonomy_08genus",
+    "organism_taxonomy_09species",
+    "organism_taxonomy_10varietas"
+  )
+  missing_select_cols <- setdiff(expected_cols, names(joined_data))
+  if (length(missing_select_cols) > 0L) {
+    cli::cli_abort(
+      c(
+        "Failed to prepare taxa: missing expected columns after joining with OTT taxonomy",
+        "x" = sprintf(
+          "Missing columns: %s",
+          paste(missing_select_cols, collapse = ", ")
+        ),
+        "i" = sprintf(
+          "Available columns: %s",
+          paste(names(joined_data), collapse = ", ")
+        ),
+        "!" = "This may indicate: (1) empty organism list, (2) mismatched organism names, or (3) corrupted OTT file"
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+
+  taxed_features_table <- joined_data |>
     tidytable::select(
       feature_id,
       sample_organism_name = organismOriginal,

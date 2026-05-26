@@ -133,8 +133,14 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
           if (!any(grepl("^PEPMASS=", first_spec, ignore.case = TRUE))) {
             issues <- c(issues, "First MS2 spectrum missing PEPMASS field")
           }
+          # NOTE: Spectra with no peak data are silently skipped during import,
+          # not treated as validation errors. This allows for MPF files with
+          # placeholder entries that will be removed by sanitize_spectra().
           if (!any(grepl("^[0-9]", first_spec))) {
-            issues <- c(issues, "First MS2 spectrum missing peak data")
+            log_debug(
+              "First MS2 spectrum (#%d) has no fragment peaks - will be removed during import",
+              first_idx
+            )
           }
         }
       }

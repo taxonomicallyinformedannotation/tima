@@ -8,7 +8,7 @@ log_trace(
 log_trace("Authors: AR, PMA")
 log_trace("Contributors: ...")
 
-targets::tar_make(names = tidyselect::matches("^ann_wei$"))
+targets::tar_make(names = tidyselect::matches("^(ann_wei|exp_mzt)$"))
 
 end <- Sys.time()
 

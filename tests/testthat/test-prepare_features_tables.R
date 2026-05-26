@@ -146,6 +146,40 @@ test_that("prepare_features_tables handles missing RT column", {
   )
 })
 
+test_that("prepare_features_tables resolves mzTab-style core column names", {
+  withr::local_dir(new = temp_test_dir("prep_feat_tables_mztab"))
+  paths <- local_test_project(copy = TRUE)
+
+  mztab_features <- tidytable::tidytable(
+    feature_id = c("101", "102"),
+    mz = c(123.456, 234.567),
+    rt = c(1.5, 2.0),
+    adduct = c("[M+H]+", "[M+Na]+"),
+    sampleA = c(1000, 2000),
+    sampleB = c(1500, 1000)
+  )
+
+  dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
+  test_file <- file.path("data", "source", "mztab_features.tsv")
+  tidytable::fwrite(x = mztab_features, file = test_file)
+
+  output_file <- file.path("data", "interim", "features", "prepared.tsv.gz")
+
+  expect_no_error(
+    prepare_features_tables(
+      features = test_file,
+      output = output_file,
+      candidates = 1
+    )
+  )
+
+  prepared <- tidytable::fread(output_file)
+  expect_true(all(
+    c("feature_id", "mz", "rt", "adduct", "sample") %in% colnames(prepared)
+  ))
+  expect_equal(nrow(prepared), 2)
+})
+
 ## Sample Selection ----
 
 test_that("prepare_features_tables retains top intensity samples", {

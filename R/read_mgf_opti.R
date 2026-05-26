@@ -202,8 +202,20 @@ read_mgf_opti <- function(
 
       if (length(current_spectrum) > 0L) {
         spectrum_data <- unlist(current_spectrum, use.names = FALSE)
-        sp_list[[chunk_id]] <- .extract_mgf_spectrum(spectrum_data)
-        chunk_id <- chunk_id + 1L
+        spectrum_result <- .extract_mgf_spectrum(spectrum_data)
+
+        # Skip spectra with no fragment peaks (empty mz/intensity vectors)
+        if (!is.null(spectrum_result) && nrow(spectrum_result) > 0L) {
+          mz_vec <- spectrum_result$mz[[1L]]
+          if (length(mz_vec) > 0L) {
+            sp_list[[chunk_id]] <- spectrum_result
+            chunk_id <- chunk_id + 1L
+          } else {
+            log_debug(
+              "Skipping spectrum with no fragment peaks (BEGIN/END IONS only)"
+            )
+          }
+        }
       }
 
       total_processed <- total_processed + 1L
@@ -224,6 +236,23 @@ read_mgf_opti <- function(
   }
 
   log_info("Total spectra read: %s", total_processed)
+
+  # Guard: when all spectra were skipped (e.g. every entry lacked fragment peaks),
+  # MsCoreUtils::rbindFill(list()) crashes with a cryptic NULL error.  Return an
+  # empty DataFrame that Spectra::Spectra() accepts gracefully.
+  if (length(sp_list) == 0L) {
+    log_warn(
+      "No spectra with fragment peaks found in file; returning empty result"
+    )
+    empty <- S4Vectors::DataFrame(
+      mz = IRanges::NumericList(compress = FALSE),
+      intensity = IRanges::NumericList(compress = FALSE),
+      msLevel = integer(0L),
+      dataOrigin = character(0L)
+    )
+    return(empty)
+  }
+
   res <- MsCoreUtils::rbindFill(sp_list)
 
   # Format charge field if present

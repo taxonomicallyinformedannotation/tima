@@ -1,0 +1,129 @@
+COM Example demonstrating the new study_variable_group design (mzTab-M 2.1)
+COM This file shows how to use study variable groups for complex multi-factorial experimental designs
+
+MTD mzTab-version	2.1.0-M
+MTD mzTab-ID	EXAMPLE_SV_GROUP_001
+MTD title	Multi-factorial design with sex and timepoint factors
+MTD description	Example dataset demonstrating the use of study_variable_group for complex experimental designs
+
+COM Study Variable Groups Definition
+COM sex group - nominal type (categorical without ordering)
+MTD study_variable_group[1]	[,,sex,]
+MTD study_variable_group[1]-description	Sex of the individual
+MTD study_variable_group[1]-type	[STATO, STATO:0000252, categorical variable]
+MTD study_variable_group[1]-datatype	xsd:string
+
+COM timepoint group - ordinal type (ordered categories) with unit
+MTD study_variable_group[2]	[,,timepoint,]
+MTD study_variable_group[2]-description	Time after treatment in days
+MTD study_variable_group[2]-type	[STATO, STATO:0000228, ordinal variable]
+MTD study_variable_group[2]-datatype	xsd:integer
+MTD study_variable_group[2]-unit	[UO, UO:0000033, day, ]
+
+COM genotype group - categorical type
+MTD study_variable_group[3]	[,,genotype, ]
+MTD study_variable_group[3]-description	Genetic background of samples
+MTD study_variable_group[3]-type	[STATO, STATO:0000252, categorical variable]
+MTD study_variable_group[3]-datatype	xsd:string
+
+COM Study Variables Definition
+COM Female control at 0 days
+MTD study_variable[1]	Female_0day_WT
+MTD study_variable[1]-description	Female, wildtype, control timepoint
+MTD study_variable[1]-group_ref	study_variable_group[1]
+MTD study_variable[1]-assay_refs	assay[1]|assay[2]|assay[3]
+
+COM Female control at 24 hours
+MTD study_variable[2]	Female_1day_WT
+MTD study_variable[2]-description	Female, wildtype, 1 day post-treatment
+MTD study_variable[2]-group_ref	study_variable_group[1]
+MTD study_variable[2]-assay_refs	assay[4]|assay[5]|assay[6]
+
+COM Female control at 48 hours
+MTD study_variable[3]	Female_2day_WT
+MTD study_variable[3]-description	Female, wildtype, 2 days post-treatment
+MTD study_variable[3]-group_ref	study_variable_group[1]
+MTD study_variable[3]-assay_refs	assay[7]|assay[8]|assay[9]
+
+COM Male control at 0 days
+MTD study_variable[4]	Male_0day_WT
+MTD study_variable[4]-description	Male, wildtype, control timepoint
+MTD study_variable[4]-group_ref	study_variable_group[1]
+MTD study_variable[4]-assay_refs	assay[10]|assay[11]|assay[12]
+
+COM Male control at 24 hours
+MTD study_variable[5]	Male_1day_WT
+MTD study_variable[5]-description	Male, wildtype, 1 day post-treatment
+MTD study_variable[5]-group_ref	study_variable_group[1]
+MTD study_variable[5]-assay_refs	assay[13]|assay[14]|assay[15]
+
+COM Male control at 48 hours
+MTD study_variable[6]	Male_2day_WT
+MTD study_variable[6]-description	Male, wildtype, 2 days post-treatment
+MTD study_variable[6]-group_ref	study_variable_group[1]
+MTD study_variable[6]-assay_refs	assay[16]|assay[17]|assay[18]
+
+COM Female mutant at 0 days
+MTD study_variable[7]	Female_0day_MUT
+MTD study_variable[7]-description	Female, mutant, control timepoint
+MTD study_variable[7]-group_ref	study_variable_group[1]
+MTD study_variable[7]-assay_refs	assay[19]|assay[20]|assay[21]
+
+COM Female mutant at 24 hours
+MTD study_variable[8]	Female_1day_MUT
+MTD study_variable[8]-description	Female, mutant, 1 day post-treatment
+MTD study_variable[8]-group_ref	study_variable_group[1]
+MTD study_variable[8]-assay_refs	assay[22]|assay[23]|assay[24]
+
+COM Female mutant at 48 hours
+MTD study_variable[9]	Female_2day_MUT
+MTD study_variable[9]-description	Female, mutant, 2 days post-treatment
+MTD study_variable[9]-group_ref	study_variable_group[1]
+MTD study_variable[9]-assay_refs	assay[25]|assay[26]|assay[27]
+
+COM Male mutant at 0 days
+MTD study_variable[10]	Male_0day_MUT
+MTD study_variable[10]-description	Male, mutant, control timepoint
+MTD study_variable[10]-group_ref	study_variable_group[1]
+MTD study_variable[10]-assay_refs	assay[28]|assay[29]|assay[30]
+
+COM Male mutant at 24 hours
+MTD study_variable[11]	Male_1day_MUT
+MTD study_variable[11]-description	Male, mutant, 1 day post-treatment
+MTD study_variable[11]-group_ref	study_variable_group[1]
+MTD study_variable[11]-assay_refs	assay[31]|assay[32]|assay[33]
+
+COM Male mutant at 48 hours
+MTD study_variable[12]	Male_2day_MUT
+MTD study_variable[12]-description	Male, mutant, 2 days post-treatment
+MTD study_variable[12]-group_ref	study_variable_group[1]
+MTD study_variable[12]-assay_refs	assay[34]|assay[35]|assay[36]
+
+COM Metadata
+MTD quantification_method	[MS, MS:1001834, LC-MS label-free quantitation analysis, ]
+MTD small_molecule-quantification_unit	[MS, MS:1002887, Progenesis QI normalised abundance, ]
+MTD software[1]	[MS, MS:1002879, Progenesis QI, 3.0]
+MTD database[1]	[MIRIAM, MIR:00100079, HMDB, ]
+MTD database[1]-prefix	hmdb
+MTD database[1]-version	3.6
+MTD database[1]-uri	http://www.hmdb.ca/
+
+COM Assays (abbreviated - would be fully defined in real file)
+MTD assay[1]	Assay_1
+MTD assay[1]-ms_run_ref	ms_run[1]
+
+MTD cv[1]-label	MS
+MTD cv[1]-full_name	PSI-MS controlled vocabulary
+MTD cv[1]-version	4.1.11
+MTD cv[1]-uri	https://purl.obolibrary.org/obo/ms.obo
+
+MTD cv[2]-label	UO
+MTD cv[2]-full_name	Unit Ontology
+MTD cv[2]-version	2021-11-08
+MTD cv[2]-uri	https://purl.obolibrary.org/obo/uo.obo
+
+COM Small Molecule section (minimal example)
+SMH	SML_ID	SMF_ID_REFS	database_identifier	chemical_formula	smiles	inchi	chemical_name	uri	theoretical_neutral_mass	adduct_ions	reliability	best_id_confidence_measure	best_id_confidence_value	abundance_assay[1]	abundance_study_variable[1]	abundance_variation_study_variable[1]
+
+SML	1	null	hmdb:HMDB0000043	C6H12O6	C([C@@H]1[C@H]([C@@H]([C@H](C(=O)O1)O)O)O)O	InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2	D-Gluconic acid	http://www.hmdb.ca/metabolites/HMDB0000043	196.0423	[M-H]1-	2	[MS, MS:1002888, SpectraScore, ]	0.85	1.5	1.2	0.1
+

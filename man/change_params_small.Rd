@@ -11,6 +11,7 @@ change_params_small(
   fil_sir_raw = NULL,
   fil_spe_raw = NULL,
   fil_ann_mzm = NULL,
+  fil_mzt_raw = NULL,
   ms_pol = NULL,
   org_tax = NULL,
   hig_con = NULL,
@@ -32,6 +33,8 @@ taxon)}
 \item{fil_spe_raw}{Character. Path to spectra file (MGF format with MS1/MS2)}
 
 \item{fil_ann_mzm}{Character. Path to mzmine annotations file}
+
+\item{fil_mzt_raw}{Character. Path to an mzTab-M file to import/merge}
 
 \item{ms_pol}{Character. MS polarity: "pos" or "neg"}
 
@@ -75,6 +78,7 @@ change_params_small(
   fil_sir_raw = "data/raw/sirius_output.zip",
   fil_spe_raw = "data/raw/spectra.mgf",
   fil_ann_mzm = "data/raw/mzmine_annotations.csv",
+  fil_mzt_raw = "data/raw/annotations.mztab",
   ms_pol = "pos",
   org_tax = "Gentiana lutea",
   hig_con = TRUE,

@@ -1,0 +1,2448 @@
+{
+  "metadata" : {
+    "prefix" : "MTD",
+    "mzTab-version" : "2.2.0-M",
+    "mzTab-ID" : "JetBike Test",
+    "title" : null,
+    "description" : null,
+    "contact" : null,
+    "publication" : null,
+    "uri" : null,
+    "external_study_uri" : null,
+    "instrument" : null,
+    "quantification_method" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1001834",
+      "name" : "LC-MS label-free quantitation analysis",
+      "value" : null
+    },
+    "sample" : [ {
+      "id" : 1,
+      "name" : "3injections_POS",
+      "custom" : null,
+      "species" : null,
+      "tissue" : null,
+      "cell_type" : null,
+      "disease" : null,
+      "description" : null
+    }, {
+      "id" : 2,
+      "name" : "3samples_sampl1_POS",
+      "custom" : null,
+      "species" : null,
+      "tissue" : null,
+      "cell_type" : null,
+      "disease" : null,
+      "description" : null
+    }, {
+      "id" : 3,
+      "name" : "3samples_sampl2_POS",
+      "custom" : null,
+      "species" : null,
+      "tissue" : null,
+      "cell_type" : null,
+      "disease" : null,
+      "description" : null
+    }, {
+      "id" : 4,
+      "name" : "3samples_sampl3_POS",
+      "custom" : null,
+      "species" : null,
+      "tissue" : null,
+      "cell_type" : null,
+      "disease" : null,
+      "description" : null
+    } ],
+    "sample_processing" : null,
+    "software" : [ {
+      "id" : 1,
+      "parameter" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1002879",
+        "name" : "Progenesis QI",
+        "value" : "2.4.6505.48857"
+      },
+      "setting" : null
+    } ],
+    "derivatization_agent" : null,
+    "ms_run" : [ {
+      "id" : 1,
+      "name" : null,
+      "location" : "file:///D:/Data%20Sets/Metabolomics/MTBLS263/3injections_inj1_POS.mzML",
+      "instrument_ref" : null,
+      "format" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000584",
+        "name" : "mzML file",
+        "value" : null
+      },
+      "id_format" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000768",
+        "name" : "Thermo nativeID format",
+        "value" : null
+      },
+      "fragmentation_method" : null,
+      "scan_polarity" : [ {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000130",
+        "name" : "positive scan",
+        "value" : null
+      } ],
+      "hash" : null,
+      "hash_method" : null
+    }, {
+      "id" : 2,
+      "name" : null,
+      "location" : "file:///D:/Data%20Sets/Metabolomics/MTBLS263/3injections_inj2_POS.mzML",
+      "instrument_ref" : null,
+      "format" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000584",
+        "name" : "mzML file",
+        "value" : null
+      },
+      "id_format" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000768",
+        "name" : "Thermo nativeID format",
+        "value" : null
+      },
+      "fragmentation_method" : null,
+      "scan_polarity" : [ {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000130",
+        "name" : "positive scan",
+        "value" : null
+      } ],
+      "hash" : null,
+      "hash_method" : null
+    }, {
+      "id" : 3,
+      "name" : null,
+      "location" : "file:///D:/Data%20Sets/Metabolomics/MTBLS263/3injections_inj3_POS.mzML",
+      "instrument_ref" : null,
+      "format" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000584",
+        "name" : "mzML file",
+        "value" : null
+      },
+      "id_format" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000768",
+        "name" : "Thermo nativeID format",
+        "value" : null
+      },
+      "fragmentation_method" : null,
+      "scan_polarity" : [ {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000130",
+        "name" : "positive scan",
+        "value" : null
+      } ],
+      "hash" : null,
+      "hash_method" : null
+    }, {
+      "id" : 4,
+      "name" : null,
+      "location" : "file:///D:/Data%20Sets/Metabolomics/MTBLS263/3samples_sampl1_POS.mzML",
+      "instrument_ref" : null,
+      "format" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000584",
+        "name" : "mzML file",
+        "value" : null
+      },
+      "id_format" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000768",
+        "name" : "Thermo nativeID format",
+        "value" : null
+      },
+      "fragmentation_method" : null,
+      "scan_polarity" : [ {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000130",
+        "name" : "positive scan",
+        "value" : null
+      } ],
+      "hash" : null,
+      "hash_method" : null
+    }, {
+      "id" : 5,
+      "name" : null,
+      "location" : "file:///D:/Data%20Sets/Metabolomics/MTBLS263/3samples_sampl2_POS.mzML",
+      "instrument_ref" : null,
+      "format" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000584",
+        "name" : "mzML file",
+        "value" : null
+      },
+      "id_format" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000768",
+        "name" : "Thermo nativeID format",
+        "value" : null
+      },
+      "fragmentation_method" : null,
+      "scan_polarity" : [ {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000130",
+        "name" : "positive scan",
+        "value" : null
+      } ],
+      "hash" : null,
+      "hash_method" : null
+    }, {
+      "id" : 6,
+      "name" : null,
+      "location" : "file:///D:/Data%20Sets/Metabolomics/MTBLS263/3samples_sampl3_POS.mzML",
+      "instrument_ref" : null,
+      "format" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000584",
+        "name" : "mzML file",
+        "value" : null
+      },
+      "id_format" : {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000768",
+        "name" : "Thermo nativeID format",
+        "value" : null
+      },
+      "fragmentation_method" : null,
+      "scan_polarity" : [ {
+        "id" : null,
+        "cv_label" : "MS",
+        "cv_accession" : "MS:1000130",
+        "name" : "positive scan",
+        "value" : null
+      } ],
+      "hash" : null,
+      "hash_method" : null
+    } ],
+    "assay" : [ {
+      "id" : 1,
+      "name" : "3injections_inj1_POS",
+      "custom" : null,
+      "external_uri" : null,
+      "sample_ref" : 1,
+      "ms_run_ref" : [ 1 ]
+    }, {
+      "id" : 2,
+      "name" : "3injections_inj2_POS",
+      "custom" : null,
+      "external_uri" : null,
+      "sample_ref" : 1,
+      "ms_run_ref" : [ 2 ]
+    }, {
+      "id" : 3,
+      "name" : "3injections_inj3_POS",
+      "custom" : null,
+      "external_uri" : null,
+      "sample_ref" : 1,
+      "ms_run_ref" : [ 3 ]
+    }, {
+      "id" : 4,
+      "name" : "3samples_sampl1_POS",
+      "custom" : null,
+      "external_uri" : null,
+      "sample_ref" : 2,
+      "ms_run_ref" : [ 4 ]
+    }, {
+      "id" : 5,
+      "name" : "3samples_sampl2_POS",
+      "custom" : null,
+      "external_uri" : null,
+      "sample_ref" : 3,
+      "ms_run_ref" : [ 5 ]
+    }, {
+      "id" : 6,
+      "name" : "3samples_sampl3_POS",
+      "custom" : null,
+      "external_uri" : null,
+      "sample_ref" : 4,
+      "ms_run_ref" : [ 6 ]
+    } ],
+    "study_variable" : [ {
+      "id" : 1,
+      "name" : "Replicates",
+      "assay_refs" : [ 1, 2, 3 ],
+      "average_function" : null,
+      "variation_function" : null,
+      "description" : "Replicates",
+      "factors" : null
+    }, {
+      "id" : 2,
+      "name" : "Samples",
+      "assay_refs" : [ 4, 5, 6 ],
+      "average_function" : null,
+      "variation_function" : null,
+      "description" : "Samples",
+      "factors" : null
+    } ],
+    "custom" : null,
+    "cv" : [ {
+      "id" : 1,
+      "label" : "MS",
+      "full_name" : "PSI-MS controlled vocabulary",
+      "version" : "4.0.9",
+      "uri" : "https://raw.githubusercontent.com/HUPO-PSI/psi-ms-CV/master/psi-ms.obo"
+    } ],
+    "small_molecule-quantification_unit" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis QI Normalised Abundance",
+      "value" : null
+    },
+    "small_molecule_feature-quantification_unit" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis QI Normalised Abundance",
+      "value" : null
+    },
+    "small_molecule-identification_reliability" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002896",
+      "name" : "compound identification confidence level",
+      "value" : null
+    },
+    "database" : [ {
+      "id" : 1,
+      "param" : {
+        "id" : null,
+        "cv_label" : "",
+        "cv_accession" : "",
+        "name" : "no database",
+        "value" : "null"
+      },
+      "prefix" : "null",
+      "version" : "Unknown",
+      "uri" : null
+    }, {
+      "id" : 2,
+      "param" : {
+        "id" : null,
+        "cv_label" : "",
+        "cv_accession" : "",
+        "name" : "Local CHEBI copy",
+        "value" : null
+      },
+      "prefix" : "CHEBI",
+      "version" : "Unknown",
+      "uri" : "file:///E:/Projects/MTBLS263/MTLBS263.sdf"
+    } ],
+    "id_confidence_measure" : [ {
+      "id" : 1,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    }, {
+      "id" : 2,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002890",
+      "name" : "fragmentation score",
+      "value" : null
+    }, {
+      "id" : 3,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002891",
+      "name" : "isotopic fit score",
+      "value" : null
+    } ],
+    "colunit-small_molecule" : null,
+    "colunit-small_molecule_feature" : null,
+    "colunit-small_molecule_evidence" : null
+  },
+  "smallMoleculeSummary" : [ {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 469,
+    "smf_id_refs" : [ 6, 937 ],
+    "database_identifier" : [ "CHEBI:16737" ],
+    "chemical_formula" : [ "C4H7N3O" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Creatinine" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 113.0589 ],
+    "adduct_ions" : [ "[M+H]+", "[M+Na]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 56.4424,
+    "abundance_assay" : [ 5.980975462E7, 6.377329122E7, 6.163063837E7, 5.913112943E7, 6.387474795E7, 6.632070884E7 ],
+    "abundance_study_variable" : [ 1.852136842E8, 1.893265862E8 ],
+    "abundance_variation_study_variable" : [ 3.2135, 5.7923 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "6.90_113.0582n"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 495,
+    "smf_id_refs" : [ 782 ],
+    "database_identifier" : [ "CHEBI:17368" ],
+    "chemical_formula" : [ "C5H4N4O" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Hypoxanthine" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 136.0385 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 44.0249,
+    "abundance_assay" : [ 1164487.316, 1376477.974, 1531498.698, 1398304.361, 1633581.631, 2129396.512 ],
+    "abundance_study_variable" : [ 4072463.988, 5161282.504 ],
+    "abundance_variation_study_variable" : [ 13.5722, 21.6925 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "7.34_137.0452m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 528,
+    "smf_id_refs" : [ 13 ],
+    "database_identifier" : [ "CHEBI:25017" ],
+    "chemical_formula" : [ "C6H13NO2" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Leucine" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 131.0946 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 48.2759,
+    "abundance_assay" : [ 6.554388346E7, 6.547529035E7, 6.769464759E7, 5.923765135E7, 5.607756147E7, 5.420740541E7 ],
+    "abundance_study_variable" : [ 1.987138214E8, 1.695226182E8 ],
+    "abundance_variation_study_variable" : [ 1.9053, 4.4995 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "8.06_132.1014m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 546,
+    "smf_id_refs" : [ 117 ],
+    "database_identifier" : [ "CHEBI:16811" ],
+    "chemical_formula" : [ "C5H11NO2S" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Methionine" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 149.051 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 47.6054,
+    "abundance_assay" : [ 8419806.046, 7954686.919, 8318226.561, 8007517.592, 7319791.067, 7367477.802 ],
+    "abundance_study_variable" : [ 2.469271953E7, 2.269478646E7 ],
+    "abundance_variation_study_variable" : [ 2.9711, 5.0765 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "8.56_150.0578m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 598,
+    "smf_id_refs" : [ 18 ],
+    "database_identifier" : [ "CHEBI:27266" ],
+    "chemical_formula" : [ "C5H11NO2" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Valine" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 117.079 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 48.7105,
+    "abundance_assay" : [ 2.177540556E7, 2.353222257E7, 2.485018303E7, 1.884115212E7, 2.28926602E7, 2.176073943E7 ],
+    "abundance_study_variable" : [ 7.015781117E7, 6.349455176E7 ],
+    "abundance_variation_study_variable" : [ 6.5963, 9.877 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "9.74_118.0857m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 615,
+    "smf_id_refs" : [ 7 ],
+    "database_identifier" : [ "CHEBI:26271" ],
+    "chemical_formula" : [ "C5H9NO2" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Proline" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 115.0633 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 45.8868,
+    "abundance_assay" : [ 5.91345523E7, 5.746195247E7, 6.00695356E7, 5.565778122E7, 5.699885239E7, 6.083720027E7 ],
+    "abundance_study_variable" : [ 1.766660404E8, 1.734938339E8 ],
+    "abundance_variation_study_variable" : [ 2.2433, 4.6483 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "10.13_116.0699m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 643,
+    "smf_id_refs" : [ 153 ],
+    "database_identifier" : [ "CHEBI:17775" ],
+    "chemical_formula" : [ "C5H4N4O3" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Urate" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 168.0283 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 44.5238,
+    "abundance_assay" : [ 6594546.767, 6679574.386, 6147241.614, 6238970.002, 6287508.483, 7032912.143 ],
+    "abundance_study_variable" : [ 1.942136277E7, 1.955939063E7 ],
+    "abundance_variation_study_variable" : [ 4.4174, 6.8259 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "10.90_169.0349m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 723,
+    "smf_id_refs" : [ 49 ],
+    "database_identifier" : [ "CHEBI:26986" ],
+    "chemical_formula" : [ "C4H9NO3" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Threonine" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 119.0582 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 49.3092,
+    "abundance_assay" : [ 8652081.298, 8068845.038, 8480535.291, 7567115.792, 9299021.427, 8807513.566 ],
+    "abundance_study_variable" : [ 2.520146163E7, 2.567365079E7 ],
+    "abundance_variation_study_variable" : [ 3.5682, 10.4293 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "11.74_120.0649m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 735,
+    "smf_id_refs" : [ 774 ],
+    "database_identifier" : [ "CHEBI:15891" ],
+    "chemical_formula" : [ "C2H7NO3S" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Taurine" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 125.0147 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 52.8515,
+    "abundance_assay" : [ 5928286.936, 5417515.329, 5820192.77, 6318313.442, 7358851.543, 6698599.786 ],
+    "abundance_study_variable" : [ 1.716599503E7, 2.037576477E7 ],
+    "abundance_variation_study_variable" : [ 4.7042, 7.752 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "11.92_126.0217m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 738,
+    "smf_id_refs" : [ 102 ],
+    "database_identifier" : [ "CHEBI:39033" ],
+    "chemical_formula" : [ "C8H18N2O6S2" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "PIPES [M-H]-" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 302.0606 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 47.6212,
+    "abundance_assay" : [ 8552283.828, 7430405.095, 8442646.234, 1.053009476E7, 1.032839476E7, 1.204193318E7 ],
+    "abundance_study_variable" : [ 2.442533516E7, 3.290042269E7 ],
+    "abundance_variation_study_variable" : [ 7.5966, 8.5397 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "11.95_303.0674m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 767,
+    "smf_id_refs" : [ 780 ],
+    "database_identifier" : [ "CHEBI:22653" ],
+    "chemical_formula" : [ "C4H8N2O3" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Asparagine" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 132.0535 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 50.7965,
+    "abundance_assay" : [ 2465240.29, 2312034.279, 2478860.339, 1261327.834, 1504831.482, 1670066.495 ],
+    "abundance_study_variable" : [ 7256134.907, 4436225.812 ],
+    "abundance_variation_study_variable" : [ 3.83, 13.9047 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "12.23_133.0602m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 768,
+    "smf_id_refs" : [ 17 ],
+    "database_identifier" : [ "CHEBI:28300" ],
+    "chemical_formula" : [ "C5H10N2O3" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Glutamine" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 146.0691 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 47.4401,
+    "abundance_assay" : [ 2.788043727E7, 2.838975904E7, 2.79132603E7, 3.981666353E7, 4.410127659E7, 4.341166229E7 ],
+    "abundance_study_variable" : [ 8.418345661E7, 1.273296024E8 ],
+    "abundance_variation_study_variable" : [ 1.0158, 5.4205 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "12.26_147.0758m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 793,
+    "smf_id_refs" : [ 956 ],
+    "database_identifier" : [ "CHEBI:17270" ],
+    "chemical_formula" : [ "C3H9O6P" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Glycerol-2-phosphate" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 172.0137 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 46.7956,
+    "abundance_assay" : [ 202854.8011, 194138.2384, 164949.5227, 160047.3574, 25984.5007, 54558.2681 ],
+    "abundance_study_variable" : [ 561942.5623, 240590.1263 ],
+    "abundance_variation_study_variable" : [ 10.5986, 88.0499 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "12.57_173.0206m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 806,
+    "smf_id_refs" : [ 513 ],
+    "database_identifier" : [ "CHEBI:16695" ],
+    "chemical_formula" : [ "C9H13N2O9P" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "UMP" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 324.0359 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 53.3957,
+    "abundance_assay" : [ 1321073.961, 1417953.149, 1424344.249, 0.0, 0.0, 0.0 ],
+    "abundance_study_variable" : [ 4163371.36, 0.0 ],
+    "abundance_variation_study_variable" : [ 4.1697, "NaN" ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "12.82_325.0424m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 905,
+    "smf_id_refs" : [ 1067 ],
+    "database_identifier" : [ "CHEBI:17268" ],
+    "chemical_formula" : [ "C6H12O6" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "myo-Inositol" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 180.0634 ],
+    "adduct_ions" : [ "[M+Na]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 52.483,
+    "abundance_assay" : [ 16328.8018, 48297.9894, 23143.935, 148990.3794, 143027.0298, 170512.9603 ],
+    "abundance_study_variable" : [ 87770.7262, 462530.3694 ],
+    "abundance_variation_study_variable" : [ 57.5538, 9.3778 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "14.42_203.0520m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 949,
+    "smf_id_refs" : [ 566 ],
+    "database_identifier" : [ "CHEBI:17552" ],
+    "chemical_formula" : [ "C10H15N5O11P2" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "GDP" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 443.0243 ],
+    "adduct_ions" : [ "[M+H]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 53.0289,
+    "abundance_assay" : [ 776953.5136, 826544.0499, 809552.8948, 555138.3365, 726945.9204, 682375.6149 ],
+    "abundance_study_variable" : [ 2413050.458, 1964459.872 ],
+    "abundance_variation_study_variable" : [ 3.1331, 13.6155 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "15.32_444.0304m/z"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SML",
+    "header_prefix" : "SMH",
+    "sml_id" : 1022,
+    "smf_id_refs" : [ 79, 523 ],
+    "database_identifier" : [ "CHEBI:25094" ],
+    "chemical_formula" : [ "C6H14N2O2" ],
+    "smiles" : [ ],
+    "inchi" : [ ],
+    "chemical_name" : [ "Lysine" ],
+    "uri" : [ ],
+    "theoretical_neutral_mass" : [ 146.1055 ],
+    "adduct_ions" : [ "[M+H]+", "[M+Na]+" ],
+    "reliability" : "2",
+    "best_id_confidence_measure" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1002889",
+      "name" : "Progenesis MetaScope score",
+      "value" : null
+    },
+    "best_id_confidence_value" : 53.8925,
+    "abundance_assay" : [ 1.944034469E7, 1.951410863E7, 1.769636421E7, 1.147722132E7, 1.372667161E7, 1.501370684E7 ],
+    "abundance_study_variable" : [ 5.665081752E7, 4.021759977E7 ],
+    "abundance_variation_study_variable" : [ 5.4483, 13.3519 ],
+    "opt" : [ {
+      "identifier" : "global_Progenesis_identifier",
+      "param" : null,
+      "value" : "21.37_146.1049n"
+    } ],
+    "comment" : null
+  } ],
+  "smallMoleculeFeature" : [ {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 6,
+    "sme_id_refs" : [ 1 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "[M+H]+",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 114.0654,
+    "charge" : 1,
+    "retention_time_in_seconds" : 413.81,
+    "retention_time_in_seconds_start" : 393.55,
+    "retention_time_in_seconds_end" : 447.87,
+    "abundance_assay" : [ 5.957914067E7, 6.354569819E7, 6.139368089E7, 5.913112943E7, 6.36937693E7, 6.630806578E7 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 7,
+    "sme_id_refs" : [ 7 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 116.0699,
+    "charge" : 1,
+    "retention_time_in_seconds" : 607.75,
+    "retention_time_in_seconds_start" : 587.39,
+    "retention_time_in_seconds_end" : 648.11,
+    "abundance_assay" : [ 5.91345523E7, 5.746195247E7, 6.00695356E7, 5.565778122E7, 5.699885239E7, 6.083720027E7 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 13,
+    "sme_id_refs" : [ 4 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 132.1014,
+    "charge" : 1,
+    "retention_time_in_seconds" : 483.77,
+    "retention_time_in_seconds_start" : 455.72,
+    "retention_time_in_seconds_end" : 541.07,
+    "abundance_assay" : [ 6.554388346E7, 6.547529035E7, 6.769464759E7, 5.923765135E7, 5.607756147E7, 5.420740541E7 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 17,
+    "sme_id_refs" : [ 13 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 147.0758,
+    "charge" : 1,
+    "retention_time_in_seconds" : 735.86,
+    "retention_time_in_seconds_start" : 719.74,
+    "retention_time_in_seconds_end" : 768.94,
+    "abundance_assay" : [ 2.788043727E7, 2.838975904E7, 2.79132603E7, 3.981666353E7, 4.410127659E7, 4.341166229E7 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 18,
+    "sme_id_refs" : [ 6 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 118.0857,
+    "charge" : 1,
+    "retention_time_in_seconds" : 584.32,
+    "retention_time_in_seconds_start" : 558.3,
+    "retention_time_in_seconds_end" : 621.66,
+    "abundance_assay" : [ 2.177540556E7, 2.353222257E7, 2.485018303E7, 1.884115212E7, 2.28926602E7, 2.176073943E7 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 49,
+    "sme_id_refs" : [ 9 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 120.0649,
+    "charge" : 1,
+    "retention_time_in_seconds" : 704.42,
+    "retention_time_in_seconds_start" : 691.29,
+    "retention_time_in_seconds_end" : 719.74,
+    "abundance_assay" : [ 8652081.298, 8068845.038, 8480535.291, 7567115.792, 9299021.427, 8807513.566 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 79,
+    "sme_id_refs" : [ 18 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "[M+H]+",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 147.1122,
+    "charge" : 1,
+    "retention_time_in_seconds" : 1282.28,
+    "retention_time_in_seconds_start" : 1240.7,
+    "retention_time_in_seconds_end" : 1327.7,
+    "abundance_assay" : [ 1.830021671E7, 1.83867573E7, 1.658446696E7, 1.06643528E7, 1.272456973E7, 1.399440578E7 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 102,
+    "sme_id_refs" : [ 11 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 303.0674,
+    "charge" : 1,
+    "retention_time_in_seconds" : 717.05,
+    "retention_time_in_seconds_start" : 702.2,
+    "retention_time_in_seconds_end" : 727.4,
+    "abundance_assay" : [ 8552283.828, 7430405.095, 8442646.234, 1.053009476E7, 1.032839476E7, 1.204193318E7 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 117,
+    "sme_id_refs" : [ 5 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 150.0578,
+    "charge" : 1,
+    "retention_time_in_seconds" : 513.76,
+    "retention_time_in_seconds_start" : 496.87,
+    "retention_time_in_seconds_end" : 555.22,
+    "abundance_assay" : [ 8419806.046, 7954686.919, 8318226.561, 8007517.592, 7319791.067, 7367477.802 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 153,
+    "sme_id_refs" : [ 8 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 169.0349,
+    "charge" : 1,
+    "retention_time_in_seconds" : 653.98,
+    "retention_time_in_seconds_start" : 630.69,
+    "retention_time_in_seconds_end" : 667.64,
+    "abundance_assay" : [ 6594546.767, 6679574.386, 6147241.614, 6238970.002, 6287508.483, 7032912.143 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 513,
+    "sme_id_refs" : [ 15 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 325.0424,
+    "charge" : 1,
+    "retention_time_in_seconds" : 768.94,
+    "retention_time_in_seconds_start" : 757.1,
+    "retention_time_in_seconds_end" : 777.81,
+    "abundance_assay" : [ 1321073.961, 1417953.149, 1424344.249, 0.0, 0.0, 0.0 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 523,
+    "sme_id_refs" : [ 19 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "[M+Na]+",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 169.0943,
+    "charge" : 1,
+    "retention_time_in_seconds" : 1279.2,
+    "retention_time_in_seconds_start" : 1261.83,
+    "retention_time_in_seconds_end" : 1314.56,
+    "abundance_assay" : [ 1140127.98, 1127351.323, 1111897.25, 812868.519, 1002101.884, 1019301.062 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 566,
+    "sme_id_refs" : [ 17 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 444.0304,
+    "charge" : 1,
+    "retention_time_in_seconds" : 919.02,
+    "retention_time_in_seconds_start" : 910.32,
+    "retention_time_in_seconds_end" : 930.76,
+    "abundance_assay" : [ 776953.5136, 826544.0499, 809552.8948, 555138.3365, 726945.9204, 682375.6149 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 774,
+    "sme_id_refs" : [ 10 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 126.0217,
+    "charge" : 1,
+    "retention_time_in_seconds" : 714.99,
+    "retention_time_in_seconds_start" : 704.42,
+    "retention_time_in_seconds_end" : 727.4,
+    "abundance_assay" : [ 5928286.936, 5417515.329, 5820192.77, 6318313.442, 7358851.543, 6698599.786 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 780,
+    "sme_id_refs" : [ 12 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 133.0602,
+    "charge" : 1,
+    "retention_time_in_seconds" : 733.64,
+    "retention_time_in_seconds_start" : 722.81,
+    "retention_time_in_seconds_end" : 757.1,
+    "abundance_assay" : [ 2465240.29, 2312034.279, 2478860.339, 1261327.834, 1504831.482, 1670066.495 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 782,
+    "sme_id_refs" : [ 3 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 137.0452,
+    "charge" : 1,
+    "retention_time_in_seconds" : 440.1,
+    "retention_time_in_seconds_start" : 429.32,
+    "retention_time_in_seconds_end" : 455.72,
+    "abundance_assay" : [ 1164487.316, 1376477.974, 1531498.698, 1398304.361, 1633581.631, 2129396.512 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 937,
+    "sme_id_refs" : [ 2 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "[M+Na]+",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 136.0475,
+    "charge" : 1,
+    "retention_time_in_seconds" : 413.81,
+    "retention_time_in_seconds_start" : 402.83,
+    "retention_time_in_seconds_end" : 419.78,
+    "abundance_assay" : [ 230613.9561, 227593.0281, 236957.4883, 0.0, 180978.6531, 12643.0648 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 956,
+    "sme_id_refs" : [ 14 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 173.0206,
+    "charge" : 1,
+    "retention_time_in_seconds" : 754.37,
+    "retention_time_in_seconds_start" : 751.31,
+    "retention_time_in_seconds_end" : 760.07,
+    "abundance_assay" : [ 202854.8011, 194138.2384, 164949.5227, 160047.3574, 25984.5007, 54558.2681 ],
+    "opt" : null,
+    "comment" : null
+  }, {
+    "prefix" : "SMF",
+    "header_prefix" : "SFH",
+    "smf_id" : 1067,
+    "sme_id_refs" : [ 16 ],
+    "sme_id_ref_ambiguity_code" : null,
+    "adduct_ion" : "null",
+    "isotopomer" : null,
+    "exp_mass_to_charge" : 203.052,
+    "charge" : 1,
+    "retention_time_in_seconds" : 865.23,
+    "retention_time_in_seconds_start" : 859.25,
+    "retention_time_in_seconds_end" : 871.52,
+    "abundance_assay" : [ 16328.8018, 48297.9894, 23143.935, 148990.3794, 143027.0298, 170512.9603 ],
+    "opt" : null,
+    "comment" : null
+  } ],
+  "smallMoleculeEvidence" : [ {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 1,
+    "evidence_input_id" : "413.81_114.0654m/z",
+    "database_identifier" : "CHEBI:16737",
+    "chemical_formula" : "C4H7N3O",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Creatinine",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 114.0654,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 114.0662,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=274"
+    }, {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=290"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=274"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=290"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=270"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=288"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=268"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=284"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=266"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=282"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=266"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=282"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 56.4424, 0.0, 99.6059 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "413.81"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "414"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 2,
+    "evidence_input_id" : "413.81_136.0475m/z",
+    "database_identifier" : "CHEBI:16737",
+    "chemical_formula" : "C4H7N3O",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Creatinine",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+Na]+",
+    "exp_mass_to_charge" : 136.0475,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 136.0481,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=281"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=277"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=279"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=273"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=271"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=271"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "1"
+    },
+    "id_confidence_measure" : [ 56.4424, 0.0, 99.6059 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "413.81"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "414"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 3,
+    "evidence_input_id" : "440.10_137.0452m/z",
+    "database_identifier" : "CHEBI:17368",
+    "chemical_formula" : "C5H4N4O",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Hypoxanthine",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 137.0452,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 137.0458,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=301"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=297"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=299"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=291"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=289"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=289"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "1"
+    },
+    "id_confidence_measure" : [ 44.0249, 0.0, 93.1371 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "440.1"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "444"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 4,
+    "evidence_input_id" : "483.77_132.1014m/z",
+    "database_identifier" : "CHEBI:25017",
+    "chemical_formula" : "C6H13NO2",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Leucine",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 132.1014,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 132.1019,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=326"
+    }, {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=342"
+    }, {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=362"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=324"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=342"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=360"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=324"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=340"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=360"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=320"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=342"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=312"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=328"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=344"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=314"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=330"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=346"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 48.2759, 0.0, 98.8384 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "483.77"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "486"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 5,
+    "evidence_input_id" : "513.76_150.0578m/z",
+    "database_identifier" : "CHEBI:16811",
+    "chemical_formula" : "C5H11NO2S",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Methionine",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 150.0578,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 150.0583,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=354"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=352"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=352"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=346"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=340"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=344"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 47.6054, 0.0, 93.7529 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "513.76"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "516"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 6,
+    "evidence_input_id" : "584.32_118.0857m/z",
+    "database_identifier" : "CHEBI:27266",
+    "chemical_formula" : "C5H11NO2",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Valine",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 118.0857,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 118.0863,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=400"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=400"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=400"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=394"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=386"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=386"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 48.7105, 0.0, 98.9488 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "584.32"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "582"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 7,
+    "evidence_input_id" : "607.75_116.0699m/z",
+    "database_identifier" : "CHEBI:26271",
+    "chemical_formula" : "C5H9NO2",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Proline",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 116.0699,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 116.0706,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=416"
+    }, {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=432"
+    }, {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=448"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=416"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=432"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=416"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=432"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=406"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=422"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=402"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=418"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=402"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=418"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 45.8868, 0.0, 99.7575 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "607.75"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "612"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 8,
+    "evidence_input_id" : "653.98_169.0349m/z",
+    "database_identifier" : "CHEBI:17775",
+    "chemical_formula" : "C5H4N4O3",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Urate",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 169.0349,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 169.0356,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=456"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=456"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=458"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=436"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=430"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=432"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 44.5238, 0.0, 97.0874 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "653.98"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "648"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 9,
+    "evidence_input_id" : "704.42_120.0649m/z",
+    "database_identifier" : "CHEBI:26986",
+    "chemical_formula" : "C4H9NO3",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Threonine",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 120.0649,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 120.0655,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=491"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=489"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=489"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=477"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=475"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=473"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "1"
+    },
+    "id_confidence_measure" : [ 49.3092, 0.0, 98.2503 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "704.42"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "702"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 10,
+    "evidence_input_id" : "714.99_126.0217m/z",
+    "database_identifier" : "CHEBI:15891",
+    "chemical_formula" : "C2H7NO3S",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Taurine",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 126.0217,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 126.0219,
+    "spectra_ref" : [ {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=502"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 52.8515, 0.0, 91.8689 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "714.99"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "714"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 11,
+    "evidence_input_id" : "717.05_303.0674m/z",
+    "database_identifier" : "CHEBI:39033",
+    "chemical_formula" : "C8H18N2O6S2",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "PIPES [M-H]-",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 303.0674,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 303.0679,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=498"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=504"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=502"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=482"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=480"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 47.6212, 0.0, 91.4395 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "717.05"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "714"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 12,
+    "evidence_input_id" : "733.64_133.0602m/z",
+    "database_identifier" : "CHEBI:22653",
+    "chemical_formula" : "C4H8N2O3",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Asparagine",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 133.0602,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 133.0608,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=515"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=513"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=513"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=501"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=497"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=497"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "1"
+    },
+    "id_confidence_measure" : [ 50.7965, 0.0, 94.3454 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "733.64"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "732"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 13,
+    "evidence_input_id" : "735.86_147.0758m/z",
+    "database_identifier" : "CHEBI:28300",
+    "chemical_formula" : "C5H10N2O3",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Glutamine",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 147.0758,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 147.0764,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=512"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=514"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=514"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=498"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=514"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=494"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=510"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=492"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 47.4401, 0.0, 98.2785 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "735.86"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "732"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 14,
+    "evidence_input_id" : "754.37_173.0206m/z",
+    "database_identifier" : "CHEBI:17270",
+    "chemical_formula" : "C3H9O6P",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Glycerol-2-phosphate",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 173.0206,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 173.021,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=531"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=529"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=529"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=515"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=511"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=511"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "1"
+    },
+    "id_confidence_measure" : [ 46.7956, 0.0, 95.3687 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "754.37"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "750"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 15,
+    "evidence_input_id" : "768.94_325.0424m/z",
+    "database_identifier" : "CHEBI:16695",
+    "chemical_formula" : "C9H13N2O9P",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "UMP",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 325.0424,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 325.0431,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=540"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=538"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=542"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 53.3957, 0.0, 92.7484 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "768.94"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "768"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 16,
+    "evidence_input_id" : "865.23_203.0520m/z",
+    "database_identifier" : "CHEBI:17268",
+    "chemical_formula" : "C6H12O6",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "myo-Inositol",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+Na]+",
+    "exp_mass_to_charge" : 203.052,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 203.0526,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=607"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=605"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=607"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=589"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=585"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=585"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "1"
+    },
+    "id_confidence_measure" : [ 52.483, 0.0, 92.3456 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "865.23"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "864"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 17,
+    "evidence_input_id" : "919.02_444.0304m/z",
+    "database_identifier" : "CHEBI:17552",
+    "chemical_formula" : "C10H15N5O11P2",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "GDP",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 444.0304,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 444.0316,
+    "spectra_ref" : [ {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=644"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 53.0289, 0.0, 89.9483 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "919.02"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "918"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 18,
+    "evidence_input_id" : "1282.28_147.1122m/z",
+    "database_identifier" : "CHEBI:25094",
+    "chemical_formula" : "C6H14N2O2",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Lysine",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+H]+",
+    "exp_mass_to_charge" : 147.1122,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 147.1128,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=856"
+    }, {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=872"
+    }, {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=886"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=856"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=872"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=888"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=862"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=876"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=890"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=836"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=850"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=864"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=836"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=850"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=864"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=834"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=848"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=862"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 53.8925, 0.0, 98.898 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "1282.28"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "1284"
+    } ],
+    "comment" : null
+  }, {
+    "prefix" : "SME",
+    "header_prefix" : "SEH",
+    "sme_id" : 19,
+    "evidence_input_id" : "1279.20_169.0943m/z",
+    "database_identifier" : "CHEBI:25094",
+    "chemical_formula" : "C6H14N2O2",
+    "smiles" : "null",
+    "inchi" : "null",
+    "chemical_name" : "Lysine",
+    "uri" : null,
+    "derivatized_form" : null,
+    "adduct_ion" : "[M+Na]+",
+    "exp_mass_to_charge" : 169.0943,
+    "charge" : 1,
+    "theoretical_mass_to_charge" : 169.0947,
+    "spectra_ref" : [ {
+      "ms_run" : 1,
+      "reference" : "controllerType=0 controllerNumber=1 scan=882"
+    }, {
+      "ms_run" : 2,
+      "reference" : "controllerType=0 controllerNumber=1 scan=870"
+    }, {
+      "ms_run" : 3,
+      "reference" : "controllerType=0 controllerNumber=1 scan=872"
+    }, {
+      "ms_run" : 4,
+      "reference" : "controllerType=0 controllerNumber=1 scan=846"
+    }, {
+      "ms_run" : 5,
+      "reference" : "controllerType=0 controllerNumber=1 scan=846"
+    }, {
+      "ms_run" : 6,
+      "reference" : "controllerType=0 controllerNumber=1 scan=854"
+    } ],
+    "identification_method" : {
+      "id" : null,
+      "cv_label" : "",
+      "cv_accession" : "",
+      "name" : "Progenesis MetaScope",
+      "value" : null
+    },
+    "ms_level" : {
+      "id" : null,
+      "cv_label" : "MS",
+      "cv_accession" : "MS:1000511",
+      "name" : "ms level",
+      "value" : "2"
+    },
+    "id_confidence_measure" : [ 53.8925, 0.0, 98.898 ],
+    "rank" : 1,
+    "opt" : [ {
+      "identifier" : "global_retention_time_in_seconds",
+      "param" : null,
+      "value" : "1279.2"
+    }, {
+      "identifier" : "global_retention_time_in_seconds_database",
+      "param" : null,
+      "value" : "1284"
+    } ],
+    "comment" : null
+  } ],
+  "comment" : null
+}

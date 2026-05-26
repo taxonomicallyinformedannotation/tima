@@ -1,22 +1,33 @@
 #' @title Get Spectra IDs
 #'
-#' @description This function extracts spectrum identifiers from a Spectra
-#'     object.
-#'     Since different data sources use different field names for spectrum IDs,
-#'     this function checks multiple common field names in priority order.
+#' @description Extracts spectrum identifiers from a [Spectra::Spectra()] object.
+#'   Different data sources use different field names for spectrum IDs; this
+#'   function checks multiple common field names in priority order.
 #'
-#' @details Checks for ID fields in this order: SLAW_ID, FEATURE_ID,
-#'     acquisitionNum, spectrum_id. Returns the first valid field found.
+#' @details Checks for ID fields in the following order:
+#' 1. `SLAW_ID` — SLAW-format export.
+#' 2. `FEATURE_ID` — TIMA mzTab-M proxy / embedded MGF export, MZmine, etc.
+#' 3. `acquisitionNum` — mzML / open-access raw-file formats.
+#' 4. `spectrum_id` — generic Spectra ID field.
+#' 5. `TITLE` field, parsed for the pattern `id:<digits>` (e.g.
+#'    `"id:42, rt:168.84, mz:293.1762, energy:nan, ..."` from newer masster
+#'    variants).  Patterns like `uid:`, `scan_id:`, and `_id:` are explicitly
+#'    excluded by the negative look-behind.
 #'
-#' @param spectra Spectra object from the Spectra package
+#' @note When the TITLE fallback is triggered a warning is logged.  The
+#'   preferred approach is for the MGF writer to emit a dedicated `FEATURE_ID=`
+#'   field (which [.extract_embedded_mgf()] and [.write_proxy_mgf()] both do).
 #'
-#' @return Character vector of spectrum IDs, or NULL if no valid ID field found
+#' @param spectra [Spectra::Spectra()] object.
+#'
+#' @return Character vector of spectrum IDs (one per spectrum), or `NULL` if no
+#'   recognised ID field is found.
 #'
 #' @keywords internal
 #'
 #' @examples
 #' \dontrun{
-#' # Extract IDs from Spectra object
+#' # Extract IDs from a Spectra object
 #' spec_ids <- get_spectra_ids(my_spectra)
 #' }
 get_spectra_ids <- function(spectra) {
@@ -29,24 +40,46 @@ get_spectra_ids <- function(spectra) {
     )
   }
 
-  # Priority order of ID field names to check
-  # Note: Different data sources use different naming conventions
+  # Safe accessor: works across different Spectra backend generations
+  spec_data <- spectra@backend@spectraData
+
+  # Priority order of dedicated ID field names
   possible_ids <- c("SLAW_ID", "FEATURE_ID", "acquisitionNum", "spectrum_id")
 
   # Find the first valid ID field
   valid_field <- purrr::detect(
     possible_ids,
-    ~ !is.null(spectra@backend@spectraData[[.x]]) &&
-      length(spectra@backend@spectraData[[.x]]) > 0L
+    ~ !is.null(spec_data[[.x]]) && length(spec_data[[.x]]) > 0L
   )
 
   if (!is.null(valid_field)) {
-    spectra@backend@spectraData[[valid_field]]
-  } else {
-    log_warn(
-      "No valid spectrum ID field found. Checked fields: %s",
-      paste(possible_ids, collapse = ", ")
-    )
-    NULL
+    return(spec_data[[valid_field]])
   }
+
+  # Last-resort: parse "id:<N>" from TITLE field.
+  # Handles newer masster variants that embed the feature ID in TITLE as
+  # "id:42, rt:168.84, mz:293.1762, energy:nan, ...".
+  # The negative look-behind excludes "uid:", "scan_id:", "_id:", etc.
+  if (!is.null(spec_data[["TITLE"]])) {
+    titles <- spec_data[["TITLE"]]
+    parsed <- stringi::stri_match_first_regex(
+      titles,
+      "(?<![_a-zA-Z])id:(\\d+)"
+    )[, 2L]
+    if (!all(is.na(parsed))) {
+      log_warn(
+        paste0(
+          "No dedicated ID field found; extracted feature IDs from TITLE. ",
+          "Consider adding FEATURE_ID= to the MGF writer."
+        )
+      )
+      return(as.character(parsed))
+    }
+  }
+
+  log_warn(
+    "No valid spectrum ID field found. Checked fields: %s, TITLE",
+    paste(possible_ids, collapse = ", ")
+  )
+  NULL
 }

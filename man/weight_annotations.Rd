@@ -301,6 +301,7 @@ annotate_masses weight_bio weight_chemo
 Other annotation:
 \code{\link[=annotate_masses]{annotate_masses()}},
 \code{\link[=annotate_spectra]{annotate_spectra()}},
-\code{\link[=filter_annotations]{filter_annotations()}}
+\code{\link[=filter_annotations]{filter_annotations()}},
+\code{\link[=write_mztab]{write_mztab()}}
 }
 \concept{annotation}

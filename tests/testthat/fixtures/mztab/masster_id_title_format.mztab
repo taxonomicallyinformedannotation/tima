@@ -1,0 +1,23 @@
+COM	masster-style mzTab with newer "id:" title format (no opt_global_mgf_index)
+
+MTD	mzTab-version	2.2.0-M
+MTD	mzTab-id	masster_id_title_test
+
+MTD	sample[1]	test_sample_B
+MTD	ms_run[1]-location	file://unknown
+MTD	assay[1]	Assay_1
+MTD	assay[1]-sample_ref	sample[1]
+MTD	assay[1]-ms_run_ref	ms_run[1]
+
+SMH	SML_ID	SMF_ID_REFS	database_identifier	adduct_ions	abundance_assay[1]
+SML	42	42	null	[M-H]-	5000.0
+SML	43	43	null	[M-H]-	3000.0
+
+SFH	SMF_ID	SML_ID_REFS	exp_mass_to_charge	charge	retention_time_in_seconds	adduct_ion
+SMF	42	42	293.1762	-1	10130.4	[M-H]-
+SMF	43	43	347.2219	-1	14670.0	[M-H]-
+
+COM	MGH	mgf_id	prec_id	prec_rt	prec_mz	prec_int	energy	level	title	spec_tic	spec_len	spec_mz	spec_int
+COM	MGF	42	abcdef01	10130.4	293.1762	null	30.0	2	id:42, rt:168.84, mz:293.1762, energy:nan, sample_id:18, scan_id:2513, 2026_04_13_Fellay032_18611_NEG	45000	4	147.0608|175.0557|248.0715|293.1762	12000|5000|2300|25700
+COM	MGF	43	abcdef02	14670.0	347.2219	null	30.0	2	id:43, rt:244.50, mz:347.2219, energy:nan, sample_id:18, scan_id:3080, 2026_04_13_Fellay032_18611_NEG	30000	3	136.0706|201.0557|347.2219	8000|3500|18500
+

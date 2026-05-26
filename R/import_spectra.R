@@ -204,6 +204,24 @@ import_spectra <- function(
     spectra$spectrum_id <- as.character(spectra$spectrum_id)
   }
 
+  # Parse feature ID from TITLE field (e.g. "id:42, rt:168.84, mz:293.1762, ...")
+  # Only if no dedicated ID field is already present.
+  if (
+    "TITLE" %in% spec_cols && !any(c("FEATURE_ID", "SLAW_ID") %in% spec_cols)
+  ) {
+    parsed_ids <- stringi::stri_match_first_regex(
+      spectra@backend@spectraData$TITLE,
+      "(?<![_a-zA-Z])id:(\\d+)"
+    )[, 2L]
+    if (!all(is.na(parsed_ids))) {
+      log_debug(
+        "Extracted FEATURE_ID from TITLE field for %d spectra",
+        sum(!is.na(parsed_ids))
+      )
+      spectra$FEATURE_ID <- parsed_ids
+    }
+  }
+
   # Filter Spectra ----
 
   # Filter to MS2 spectra only if msLevel available

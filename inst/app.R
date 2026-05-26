@@ -64,7 +64,7 @@ ui <- shiny::fluidPage(
           shiny::div(
             shiny::fileInput(
               inputId = "fil_spe_raw",
-              label = .label_mandatory("MGF file"),
+              label = "MGF file (optional if mzTab is provided)",
               accept = ".mgf"
             ),
             shiny::downloadButton(
@@ -84,7 +84,7 @@ ui <- shiny::fluidPage(
           shiny::div(
             shiny::fileInput(
               inputId = "fil_fea_raw",
-              label = .label_mandatory("Features table"),
+              label = "Features table (optional if mzTab is provided)",
               accept = c(
                 ".csv",
                 ".tsv",
@@ -160,6 +160,24 @@ ui <- shiny::fluidPage(
                 "The compressed directory containing the SIRIUS project space.",
                 "Should be located in `data/interim`.",
                 "Reason therefore is to find it in the future."
+              )
+            ),
+          shiny::fileInput(
+            inputId = "fil_mzt_raw",
+            label = "mzTab-M file (optional - replaces features, spectra, and metadata)",
+            accept = c(".mztab", ".json")
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = c(
+                "An mzTab-M (v2.0.0) file with quantification and/or annotation data.",
+                "Accepted formats: plain-text .mztab and JSON (.json for rmzTabM,",
+                "Progenesis QI, and MetaboScape exports).",
+                "When provided, the feature table, spectra, and metadata are",
+                "automatically derived from this file.",
+                "Additional files uploaded above override the corresponding",
+                "mzTab-M-derived output (e.g. a custom MGF overrides proxy spectra).",
+                "Should be placed in `data/source` for reproducibility."
               )
             ),
           shiny::selectInput(
@@ -1914,6 +1932,12 @@ ui <- shiny::fluidPage(
         "Download full results"
       )
     ),
+    shinyjs::hidden(
+      shiny::downloadButton(
+        outputId = "results_mztab",
+        "Download mzTab"
+      )
+    ),
     shinyjs::hidden(shiny::actionButton(inputId = "close", label = "Close")),
     shinyjs::hidden(shiny::div(id = "job_msg", shiny::h3("Job is running!"))),
     shinyjs::hidden(shiny::div(id = "job_end", shiny::h3("Job finished!")))
@@ -1936,14 +1960,25 @@ ui <- shiny::fluidPage(
   prefil_fea_raw <- shiny::isolate(input$fil_fea_raw)
   prefil_spe_raw <- shiny::isolate(input$fil_spe_raw)
   prefil_met_raw <- shiny::isolate(input$fil_met_raw)
-  prefil_mzm_raw <- shiny::isolate(input$fil_mzm_raw)
-  # prefil_mzt_raw <- shiny::isolate(input$fil_mzt_raw)
+  prefil_mzm_raw <- shiny::isolate(input$fil_ann_raw_mzm)
+  prefil_mzt_raw <- shiny::isolate(input$fil_mzt_raw)
   prefil_sir_raw <- shiny::isolate(input$fil_ann_raw_sir)
   lib_tmp_exp_csv <- shiny::isolate(input$lib_tmp_exp_csv)
   lib_tmp_is_csv <- shiny::isolate(input$lib_tmp_is_csv)
 
-  prefil_fea_raw_1 <- file.path(paths_data_source, prefil_fea_raw[[1L]])
-  prefil_spe_raw_1 <- file.path(paths_data_source, prefil_spe_raw[[1L]])
+  prefil_fea_raw_1 <- NULL
+  prefil_spe_raw_1 <- NULL
+  prefil_met_raw_1 <- NULL
+  prefil_mzm_raw_1 <- NULL
+  prefil_mzt_raw_1 <- NULL
+  prefil_sir_raw_1 <- NULL
+
+  if (!is.null(prefil_fea_raw)) {
+    prefil_fea_raw_1 <- file.path(paths_data_source, prefil_fea_raw[[1L]])
+  }
+  if (!is.null(prefil_spe_raw)) {
+    prefil_spe_raw_1 <- file.path(paths_data_source, prefil_spe_raw[[1L]])
+  }
   if (!is.null(prefil_met_raw)) {
     prefil_met_raw_1 <- file.path(paths_data_source, prefil_met_raw[[1L]])
   }
@@ -1953,19 +1988,22 @@ ui <- shiny::fluidPage(
       prefil_mzm_raw[[1L]]
     )
   }
+  if (!is.null(prefil_mzt_raw)) {
+    prefil_mzt_raw_1 <- file.path(paths_data_source, prefil_mzt_raw[[1L]])
+  }
   if (!is.null(prefil_sir_raw)) {
     prefil_sir_raw_1 <-
       file.path(paths_data_interim_annotations, prefil_sir_raw[[1L]])
   }
 
-  if (!file.exists(prefil_fea_raw_1)) {
+  if (!is.null(prefil_fea_raw) && !file.exists(prefil_fea_raw_1)) {
     fs::file_copy(
       path = prefil_fea_raw[[4L]],
       new_path = file.path(prefil_fea_raw_1),
       overwrite = TRUE
     )
   }
-  if (!file.exists(prefil_spe_raw_1)) {
+  if (!is.null(prefil_spe_raw) && !file.exists(prefil_spe_raw_1)) {
     fs::file_copy(
       path = prefil_spe_raw[[4L]],
       new_path = file.path(prefil_spe_raw_1),
@@ -1996,6 +2034,17 @@ ui <- shiny::fluidPage(
   } else {
     prefil_mzm_raw_1 <- NULL
   }
+  if (!is.null(prefil_mzt_raw)) {
+    if (!file.exists(prefil_mzt_raw_1)) {
+      ## safety
+      tima:::create_dir(paths_data_source)
+      fs::file_copy(
+        path = prefil_mzt_raw[[4L]],
+        new_path = file.path(prefil_mzt_raw_1),
+        overwrite = TRUE
+      )
+    }
+  }
   if (!is.null(prefil_sir_raw)) {
     if (!file.exists(prefil_sir_raw_1)) {
       ## safety
@@ -2008,6 +2057,48 @@ ui <- shiny::fluidPage(
     }
   } else {
     prefil_sir_raw_1 <- NULL
+  }
+
+  # If mzTab is provided, derive missing core inputs so launch is possible.
+  if (
+    !is.null(prefil_mzt_raw_1) &&
+      (is.null(prefil_fea_raw_1) ||
+        is.null(prefil_spe_raw_1) ||
+        is.null(prefil_met_raw_1))
+  ) {
+    mztab_plan <- tima:::plan_mztab_app_outputs(
+      mztab_path = prefil_mzt_raw_1,
+      data_source_path = paths_data_source,
+      features_path = prefil_fea_raw_1,
+      spectra_path = prefil_spe_raw_1,
+      metadata_path = prefil_met_raw_1
+    )
+
+    prefil_fea_raw_1 <- mztab_plan$resolved$features
+    prefil_spe_raw_1 <- mztab_plan$resolved$spectra
+    prefil_met_raw_1 <- mztab_plan$resolved$metadata
+
+    if (mztab_plan$needs_read) {
+      tima:::log_trace("Rebuilding missing mzTab-derived source files ...")
+      mztab_outputs <- tima::read_mztab(
+        input = prefil_mzt_raw_1,
+        output_features = mztab_plan$write$features,
+        output_spectra = mztab_plan$write$spectra,
+        output_metadata = mztab_plan$write$metadata
+      )
+
+      if (is.null(prefil_fea_raw_1)) {
+        prefil_fea_raw_1 <- mztab_outputs$features
+      }
+      if (is.null(prefil_spe_raw_1)) {
+        prefil_spe_raw_1 <- mztab_outputs$spectra
+      }
+      if (is.null(prefil_met_raw_1)) {
+        prefil_met_raw_1 <- mztab_outputs$metadata
+      }
+    } else {
+      tima:::log_trace("Reusing cached mzTab-derived source files")
+    }
   }
   if (!is.null(lib_tmp_exp_csv)) {
     if (!file.exists(lib_tmp_exp_csv)) {
@@ -2036,6 +2127,7 @@ ui <- shiny::fluidPage(
   fil_spe_raw <- prefil_spe_raw_1
   fil_met_raw <- prefil_met_raw_1
   fil_mzm_raw <- prefil_mzm_raw_1
+  fil_mzt_raw <- prefil_mzt_raw_1
   fil_sir_raw <- prefil_sir_raw_1
 
   fil_pat <- shiny::isolate(input$fil_pat)
@@ -2060,6 +2152,7 @@ ui <- shiny::fluidPage(
   yaml_small$files$features$raw <- fil_fea_raw
   yaml_small$files$metadata$raw <- fil_met_raw
   yaml_small$files$annotations$raw$mzmine <- fil_mzm_raw
+  yaml_small$files$mztab$raw <- fil_mzt_raw
   yaml_small$files$annotations$raw$sirius <- fil_sir_raw
   yaml_small$files$spectral$raw <- fil_spe_raw
   yaml_small$ms$polarity <- ms_pol
@@ -2102,6 +2195,7 @@ ui <- shiny::fluidPage(
   yaml_advanced$files$annotations$raw$spectral$spectral <-
     yaml_advanced$files$annotations$raw$spectral$spectral |>
     tima:::replace_id()
+  yaml_advanced$files$mztab$raw <- fil_mzt_raw
   # yaml_advanced$files$annotations$raw$sirius <-
   #   yaml_advanced$files$annotations$raw$sirius |>
   #   tima:::replace_id()
@@ -2440,29 +2534,25 @@ server <- function(input, output) {
     }
   )
 
-  ## Mandatory fields
-  fields_mandatory <- c("fil_fea_raw", "fil_spe_raw", "fil_pat")
-
-  ## Enable the Submit button when all mandatory fields are filled out
+  ## Enable Save/Launch depending on input mode:
+  ## - classic mode: features + spectra (+ metadata or taxon)
+  ## - mzTab mode: mzTab alone is enough; other files are optional overlays
   shiny::observe(x = {
-    mandatory_filled <-
-      vapply(
-        X = fields_mandatory,
-        FUN = function(x) {
-          any(!is.null(input[[x]]), input[[x]] != "")
-        },
-        FUN.VALUE = logical(1)
-      ) |>
-      all()
-
-    taxon_filled <- {
-      taxon_fil <- input[["fil_met_raw"]][1]
-      taxon_man <- input[["org_tax"]]
-      (!is.null(taxon_fil) && taxon_fil != "") ||
-        (!is.null(taxon_man) && taxon_man != "")
+    .has_upload <- function(upload) {
+      !is.null(upload) && length(upload[[1L]]) > 0L && nzchar(upload[[1L]])
     }
 
-    all_conditions <- mandatory_filled && taxon_filled
+    has_mztab <- .has_upload(input[["fil_mzt_raw"]])
+    has_features <- .has_upload(input[["fil_fea_raw"]])
+    has_spectra <- .has_upload(input[["fil_spe_raw"]])
+    has_metadata <- .has_upload(input[["fil_met_raw"]])
+    has_taxon <- !is.null(input[["org_tax"]]) &&
+      nzchar(trimws(input[["org_tax"]]))
+    has_pattern <- !is.null(input[["fil_pat"]]) &&
+      nzchar(trimws(input[["fil_pat"]]))
+
+    classic_ready <- has_features && has_spectra && (has_metadata || has_taxon)
+    all_conditions <- has_pattern && (has_mztab || classic_ready)
 
     shinyjs::toggleState(id = "save", condition = all_conditions)
     shinyjs::toggleState(id = "launch", condition = input$save >= 1)
@@ -2471,6 +2561,9 @@ server <- function(input, output) {
   ## Special check for taxon name
   iv <- shinyvalidate::InputValidator$new()
   iv$add_rule("org_tax", function(taxon) {
+    if (is.null(taxon) || !nzchar(trimws(taxon))) {
+      return(NULL)
+    }
     if (
       !grepl(
         pattern = "^[[:upper:]]",
@@ -2482,6 +2575,9 @@ server <- function(input, output) {
     }
   })
   iv$add_rule("org_tax", function(taxon) {
+    if (is.null(taxon) || !nzchar(trimws(taxon))) {
+      return(NULL)
+    }
     if (
       anyNA(
         stringi::stri_split_fixed(str = taxon, pattern = "|") |>
@@ -2511,6 +2607,7 @@ server <- function(input, output) {
     shinyjs::hide("results_mini")
     shinyjs::hide("results_filtered")
     shinyjs::hide("results_full")
+    shinyjs::hide("results_mztab")
     shinyjs::hide("close")
 
     ## Save the data (show an error message in case of error)
@@ -2537,6 +2634,7 @@ server <- function(input, output) {
         shinyjs::hide("results_mini")
         shinyjs::hide("results_filtered")
         shinyjs::hide("results_full")
+        shinyjs::hide("results_mztab")
         shinyjs::hide("close")
       }
     )
@@ -2552,16 +2650,17 @@ server <- function(input, output) {
     shinyjs::hide("results_mini")
     shinyjs::hide("results_filtered")
     shinyjs::hide("results_full")
+    shinyjs::hide("results_mztab")
     shinyjs::hide("close")
     ## For shinylive, see
     ## https://github.com/taxonomicallyinformedannotation/tima-shinylive/pull/7
     if (R.Version()$os != "emscripten") {
       targets::tar_make(
-        names = tidyselect::matches("^ann_wei$")
+        names = tidyselect::matches("^(ann_wei|exp_mzt)$")
       )
     } else {
       targets::tar_make(
-        names = tidyselect::matches("^ann_wei$"),
+        names = tidyselect::matches("^(ann_wei|exp_mzt)$"),
         callr_function = NULL
       )
     }
@@ -2576,6 +2675,7 @@ server <- function(input, output) {
       n = 3L
     )
     names(results) <- c("filtered", "mini", "full")
+    results_mztab <- targets::tar_read(exp_mzt)
     observe({
       shiny::invalidateLater(millis = 5000)
       shinyjs::hide("job_msg")
@@ -2596,6 +2696,20 @@ server <- function(input, output) {
         )
         shinyjs::show(paste0("results_", name))
       })
+      output[["results_mztab"]] <- downloadHandler(
+        filename = basename(results_mztab),
+        content = function(file) {
+          ok <- file.copy(results_mztab, file, overwrite = TRUE)
+          if (!ok) {
+            cli::cli_abort(
+              "failed to copy result file {.file {results_mztab}}",
+              class = c("tima_runtime_error", "tima_error"),
+              call = NULL
+            )
+          }
+        }
+      )
+      shinyjs::show("results_mztab")
       shinyjs::show("close")
       shiny::observeEvent(eventExpr = input$close, handlerExpr = {
         shiny::stopApp()

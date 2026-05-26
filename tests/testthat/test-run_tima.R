@@ -69,9 +69,13 @@ test_that("run_tima function exists and has correct signature", {
 test_that("run_tima has sensible defaults", {
   params <- formals(run_tima)
 
-  expect_equal(params$target_pattern, "^ann_wei$")
+  expect_equal(params$target_pattern, "^(ann_wei|exp_mzt)$")
   expect_equal(params$log_file, "tima.log")
   expect_equal(params$clean_old_logs, TRUE)
+  expect_equal(
+    formals(tima:::execute_targets_pipeline)$target_pattern,
+    "^(ann_wei|exp_mzt)$"
+  )
 })
 
 # Input Validation Tests ----

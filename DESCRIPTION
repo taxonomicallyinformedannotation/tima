@@ -1,6 +1,6 @@
 Package: tima
 Title: Taxonomically Informed Metabolite Annotation
-Version: 2.13.0
+Version: 2.13.0.9000
 Authors@R: c(
     person(given = "Adriano",
            family = "Rutz",
@@ -36,6 +36,7 @@ Imports:
     httr2 (>= 1.2.2),
     igraph (>= 2.3.0),
     IRanges (>= 2.44.0),
+    S4Vectors (>= 0.48.0),
     jsonlite (>= 2.0.0),
     lgr (>= 0.5.2),
     lifecycle (>= 1.0.5),
@@ -86,6 +87,8 @@ Collate:
     'validations_utils.R'
     'safe_fread.R'
     'add_xrefs_to_annotations.R'
+    'constants.R'
+    'adduct_universe.R'
     'adducts_utils.R'
     'round_reals.R'
     'harmonize_adducts.R'
@@ -96,7 +99,6 @@ Collate:
     'get_params.R'
     'dists_utils.R'
     'decorate_masses.R'
-    'constants.R'
     'parse_adduct.R'
     'calculate_mass_of_m.R'
     'annotate_masses.R'
@@ -128,6 +130,7 @@ Collate:
     'create_edges_spectra.R'
     'decorate_bio.R'
     'decorate_chemo.R'
+    'evidence_validation_utils.R'
     'export_output.R'
     'export_params.R'
     'export_spectra_rds.R'
@@ -148,12 +151,21 @@ Collate:
     'harmonize_names_sirius.R'
     'harmonize_spectra.R'
     'install.R'
+    'mass_consistency.R'
+    'mass_evidence.R'
+    'mass_pair_edges.R'
     'move_file_safely.R'
+    'mztab_app_utils.R'
+    'mztab_schema_utils.R'
+    'mztab_parser.R'
+    'mztab_validate.R'
     'pre_harmonize_names_sirius.R'
     'process_smiles.R'
     'select_annotations_columns.R'
     'prepare_annotations_gnps.R'
     'prepare_annotations_mzmine.R'
+    'read_mztab.R'
+    'prepare_annotations_mztab.R'
     'select_sirius_columns.R'
     'read_from_sirius_zip.R'
     'prepare_annotations_sirius.R'
@@ -186,6 +198,7 @@ Collate:
     'weight_chemo.R'
     'weight_bio.R'
     'weight_annotations.R'
+    'write_mztab.R'
 Config/roxygen2/markdown: TRUE
 Config/roxygen2/version: 8.0.0
 Config/testthat/edition: 3
