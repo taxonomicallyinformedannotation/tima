@@ -1426,7 +1426,13 @@ test_that("best-supported conflict-free mode keeps strongest unconstrained suppo
     adduct = c("[M+H]+", "[M+2H]2+", "[M+Na]+", "[M+H]+", "[M+Na]+"),
     source = c("baseline", "multi", "pair", "pair", "pair"),
     adduct_support = c(0L, 1L, 3L, 1L, 1L),
-    candidate_structure_error_mz = c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_)
+    candidate_structure_error_mz = c(
+      NA_real_,
+      NA_real_,
+      NA_real_,
+      NA_real_,
+      NA_real_
+    )
   )
   adduct_edges <- tidytable::tidytable(
     feature_id = "F1",

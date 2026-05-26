@@ -769,8 +769,10 @@ enforce_non_conflicting_annotation_states <- function(
           ),
           max(support_strength[support_class_rank == best_rank], na.rm = TRUE)
         ),
-        keep = keep & (!feature_is_unconstrained |
-          (support_class_rank == best_rank & support_strength == best_support))
+        keep = keep &
+          (!feature_is_unconstrained |
+            (support_class_rank == best_rank &
+              support_strength == best_support))
       ) |>
       tidytable::ungroup()
   }
