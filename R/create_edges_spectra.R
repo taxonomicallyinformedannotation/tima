@@ -198,8 +198,21 @@ create_edges_spectra <- function(
       ppm = ppm
     )
 
-  # Early exit if only one or no spectra
-  if (length(spectra) <= 1L) {
+  # Fail fast when no usable spectra were parsed from input.
+  if (length(spectra) == 0L) {
+    cli::cli_abort(
+      c(
+        "No usable spectra found in input",
+        "x" = "All spectra were empty, malformed, or removed by filtering",
+        "i" = "Check MGF formatting and ensure at least one MS2 spectrum has fragment peaks"
+      ),
+      class = c("tima_runtime_error", "tima_error"),
+      call = NULL
+    )
+  }
+
+  # Early exit if only one spectrum
+  if (length(spectra) == 1L) {
     log_warn(
       "Only %d spectrum found - need at least 2 for network edges",
       length(spectra)

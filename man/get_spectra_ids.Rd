@@ -7,24 +7,38 @@
 get_spectra_ids(spectra)
 }
 \arguments{
-\item{spectra}{Spectra object from the Spectra package}
+\item{spectra}{\code{\link[Spectra:Spectra]{Spectra::Spectra()}} object.}
 }
 \value{
-Character vector of spectrum IDs, or NULL if no valid ID field found
+Character vector of spectrum IDs (one per spectrum), or \code{NULL} if no
+recognised ID field is found.
 }
 \description{
-This function extracts spectrum identifiers from a Spectra
-object.
-Since different data sources use different field names for spectrum IDs,
-this function checks multiple common field names in priority order.
+Extracts spectrum identifiers from a \code{\link[Spectra:Spectra]{Spectra::Spectra()}} object.
+Different data sources use different field names for spectrum IDs; this
+function checks multiple common field names in priority order.
 }
 \details{
-Checks for ID fields in this order: SLAW_ID, FEATURE_ID,
-acquisitionNum, spectrum_id. Returns the first valid field found.
+Checks for ID fields in the following order:
+\enumerate{
+\item \code{SLAW_ID} — SLAW-format export.
+\item \code{FEATURE_ID} — TIMA mzTab-M proxy / embedded MGF export, MZmine, etc.
+\item \code{acquisitionNum} — mzML / open-access raw-file formats.
+\item \code{spectrum_id} — generic Spectra ID field.
+\item \code{TITLE} field, parsed for the pattern \verb{id:<digits>} (e.g.
+\code{"id:42, rt:168.84, mz:293.1762, energy:nan, ..."} from newer masster
+variants).  Patterns like \verb{uid:}, \verb{scan_id:}, and \verb{_id:} are explicitly
+excluded by the negative look-behind.
+}
+}
+\note{
+When the TITLE fallback is triggered a warning is logged.  The
+preferred approach is for the MGF writer to emit a dedicated \verb{FEATURE_ID=}
+field (which \code{\link[=.extract_embedded_mgf]{.extract_embedded_mgf()}} and \code{\link[=.write_proxy_mgf]{.write_proxy_mgf()}} both do).
 }
 \examples{
 \dontrun{
-# Extract IDs from Spectra object
+# Extract IDs from a Spectra object
 spec_ids <- get_spectra_ids(my_spectra)
 }
 }

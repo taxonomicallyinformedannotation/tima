@@ -1,10 +1,47 @@
 #' @title Annotate masses
 #'
-#' @description This function annotates a feature table based on exact mass
-#' match. It requires a structural library, its metadata, and lists of adducts,
-#' clusters, and neutral losses to be considered. The polarity has to be `pos`
-#' or `neg` and retention time and mass tolerances should be given. The feature
-#' table is expected to be pre-formatted.
+#' @description Mass-based MS1 annotation. The pipeline is a sequence of
+#'     clearly-bounded steps; each step is documented inline. In short:
+#'
+#'     1. **Pairs in RT windows.** For every feature, find all other features
+#'        in the same RT tolerance window (per sample) and compute the m/z
+#'        delta. The pair is always oriented `(lower_mz, higher_mz)` so that
+#'        `delta = mz_higher - mz_lower >= 0`.
+#'
+#'     2. **Adduct edges.** Match each pair's `delta` against the table of
+#'        precomputed pairwise differences between known mode-specific
+#'        adducts. A match labels the edge `adduct_low _ adduct_high` and
+#'        tentatively assigns the corresponding adduct to each endpoint.
+#'
+#'     3. **Cluster edges.** Match `delta` against cluster masses (e.g. ACN,
+#'        MeOH, Na). A cluster adds mass to the *higher* m/z peak, so the
+#'        cluster suffix `+<cluster>` is attached to the **dest** node's
+#'        adduct hypotheses.
+#'
+#'     4. **Neutral-loss edges.** Match `delta` against neutral-loss masses
+#'        (e.g. H2O, CO2). For an NL pair, the **higher** m/z peak is the
+#'        precursor and the **lower** m/z peak is the product. The loss
+#'        suffix `-<loss>` is attached to the precursor's adduct hypotheses
+#'        (so the same neutral M is inferred from both peaks).
+#'
+#'     5. **Node hypotheses.** Gather, per feature, **all** plausible adduct
+#'        labels: (a) what we inferred from adduct/cluster/loss edges, (b)
+#'        any adduct supplied upstream by the preprocessing tool, and
+#'        (c) the universal baseline `[M+H]+` / `[M-H]-`. Hypotheses are
+#'        never dropped at this stage.
+#'
+#'     6. **Library match.** For every `(feature, candidate_adduct)` pair,
+#'        compute the implied neutral mass M and look it up in the library
+#'        within the ppm tolerance.
+#'
+#'     7. **Network-consensus pruning.** If a feature ends up with several
+#'        library hits, drop only the candidates whose adduct has *zero*
+#'        support in the adduct edge graph **and** whose drop still leaves a
+#'        supported alternative. Ties are kept and drops are logged.
+#'
+#'     8. **Keep unmatched adducts.** Adduct hypotheses are exported even
+#'        when no library structure matches, so downstream tools still see
+#'        the adduct annotation.
 #'
 #' @include adducts_utils.R
 #' @include calculate_mass_of_m.R
@@ -39,7 +76,7 @@
 #' @param adduct_consistency_min_degree In `conditional` mode, minimum local
 #'   graph degree at which support filtering is activated
 #'
-#' @return The path to the files containing MS1 annotations and edges
+#' @return Named character of paths to the annotations and edges files.
 #'
 #' @family annotation
 #'
@@ -47,1259 +84,1901 @@
 #'
 #' @examples
 #' \dontrun{
-#' copy_backbone()
-#' go_to_cache()
-#' github <- "https://raw.githubusercontent.com/"
-#' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
-#' data_interim <- "data/interim/"
-#' dir <- paste0(github, repo)
-#' dir <- paste0(dir, data_interim)
-#' dir_sop_mer <- paste0(dir, "libraries/sop/merged/")
-#' dir_str <- paste0(dir_sop_mer, "structures/")
-#' dir_tax <- paste0(dir_str, "taxonomies/")
-#' annotate_masses(
-#'   features = paste0(dir, "features/example_features.tsv"),
-#'   library = paste0(dir_sop_mer, "keys.tsv"),
-#'   str_stereo = paste0(dir_str, "stereo.tsv"),
-#'   str_met = paste0(dir_str, "metadata.tsv"),
-#'   str_tax_cla = paste0(dir_tax, "classyfire.tsv"),
-#'   str_tax_npc = paste0(dir_tax, "npc.tsv")
-#' )
-#' unlink("data", recursive = TRUE)
+#' annotate_masses()
 #' }
-annotate_masses <-
-  function(
-    features = get_params(step = "annotate_masses")$files$features$prepared,
-    output_annotations = get_params(
-      step = "annotate_masses"
-    )$files$annotations$prepared$structural$ms1,
-    output_edges = get_params(
-      step = "annotate_masses"
-    )$files$networks$spectral$edges$raw$ms1,
-    name_source = get_params(step = "annotate_masses")$names$source,
-    name_target = get_params(step = "annotate_masses")$names$target,
-    library = get_params(
-      step = "annotate_masses"
-    )$files$libraries$sop$merged$keys,
-    str_stereo = get_params(
-      step = "annotate_masses"
-    )$files$libraries$sop$merged$structures$stereo,
-    str_met = get_params(
-      step = "annotate_masses"
-    )$files$libraries$sop$merged$structures$metadata,
-    str_tax_cla = get_params(
-      step = "annotate_masses"
-    )$files$libraries$sop$merged$structures$taxonomies$cla,
-    str_tax_npc = get_params(
-      step = "annotate_masses"
-    )$files$libraries$sop$merged$structures$taxonomies$npc,
-    adducts_list = get_params(step = "annotate_masses")$ms$adducts,
-    clusters_list = get_params(step = "annotate_masses")$ms$clusters,
-    neutral_losses_list = get_params(
-      step = "annotate_masses"
-    )$ms$neutral_losses,
-    ms_mode = get_params(step = "annotate_masses")$ms$polarity,
-    tolerance_ppm = get_params(
-      step = "annotate_masses"
-    )$ms$tolerances$mass$ppm$ms1,
-    tolerance_rt = get_params(
-      step = "annotate_masses"
-    )$ms$tolerances$rt$adducts,
-    adduct_consistency = get_params(
-      step = "annotate_masses"
-    )$ms$adducts$consistency$type,
-    adduct_min_support = get_params(
-      step = "annotate_masses"
-    )$ms$adducts$consistency$min_support,
-    adduct_consistency_min_degree = get_params(
-      step = "annotate_masses"
-    )$ms$adducts$consistency$min_degree
-  ) {
-    # Start operation logging
-    ctx <- log_operation(
-      "annotate_masses",
-      ms_mode = ms_mode,
-      tolerance_ppm = tolerance_ppm,
-      tolerance_rt = tolerance_rt
+annotate_masses <- function(
+  features = get_params(step = "annotate_masses")$files$features$prepared,
+  output_annotations = get_params(
+    step = "annotate_masses"
+  )$files$annotations$prepared$structural$ms1,
+  output_edges = get_params(
+    step = "annotate_masses"
+  )$files$networks$spectral$edges$raw$ms1,
+  name_source = get_params(step = "annotate_masses")$names$source,
+  name_target = get_params(step = "annotate_masses")$names$target,
+  library = get_params(
+    step = "annotate_masses"
+  )$files$libraries$sop$merged$keys,
+  str_stereo = get_params(
+    step = "annotate_masses"
+  )$files$libraries$sop$merged$structures$stereo,
+  str_met = get_params(
+    step = "annotate_masses"
+  )$files$libraries$sop$merged$structures$metadata,
+  str_tax_cla = get_params(
+    step = "annotate_masses"
+  )$files$libraries$sop$merged$structures$taxonomies$cla,
+  str_tax_npc = get_params(
+    step = "annotate_masses"
+  )$files$libraries$sop$merged$structures$taxonomies$npc,
+  adducts_list = get_params(step = "annotate_masses")$ms$adducts,
+  clusters_list = get_params(step = "annotate_masses")$ms$clusters,
+  neutral_losses_list = get_params(
+    step = "annotate_masses"
+  )$ms$neutral_losses,
+  ms_mode = get_params(step = "annotate_masses")$ms$polarity,
+  tolerance_ppm = get_params(
+    step = "annotate_masses"
+  )$ms$tolerances$mass$ppm$ms1,
+  tolerance_rt = get_params(
+    step = "annotate_masses"
+  )$ms$tolerances$rt$adducts,
+  adduct_consistency = get_params(
+    step = "annotate_masses"
+  )$ms$adducts$consistency$type,
+  adduct_min_support = get_params(
+    step = "annotate_masses"
+  )$ms$adducts$consistency$min_support,
+  adduct_consistency_min_degree = get_params(
+    step = "annotate_masses"
+  )$ms$adducts$consistency$min_degree
+) {
+  ctx <- log_operation(
+    "annotate_masses",
+    ms_mode = ms_mode,
+    tolerance_ppm = tolerance_ppm,
+    tolerance_rt = tolerance_rt
+  )
+  log_info("Starting mass-based annotation")
+
+  # ---- Step 0: input validation ----------------------------------------
+  sanitize_all_inputs(features_file = features)
+  validate_ms_mode(ms_mode)
+  validate_tolerances(
+    tolerance_ppm = tolerance_ppm,
+    tolerance_rt = tolerance_rt,
+    max_ppm = 20,
+    max_rt = 0.05,
+    context = "mass annotation"
+  )
+  validate_adduct_list(adducts_list, ms_mode, "adducts_list")
+  validate_adduct_list(clusters_list, ms_mode, "clusters_list")
+  validate_file_existence(list(
+    features = features,
+    library = library,
+    str_stereo = str_stereo,
+    str_met = str_met,
+    str_tax_cla = str_tax_cla,
+    str_tax_npc = str_tax_npc
+  ))
+
+  cfg <- resolve_adduct_consistency_config(
+    adduct_consistency = adduct_consistency,
+    adduct_min_support = adduct_min_support,
+    adduct_consistency_min_degree = adduct_consistency_min_degree
+  )
+  baseline_adduct <- switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
+
+  # ---- Step 1: load features -------------------------------------------
+  features_table <- safe_fread(
+    file = features,
+    file_type = "features table",
+    required_cols = "feature_id",
+    na.strings = c("", "NA"),
+    colClasses = "character"
+  )
+
+  if (nrow(features_table) == 0L) {
+    log_warn("Empty features table provided - no annotations to perform")
+    return(write_empty_annotate_masses_outputs(
+      output_annotations = output_annotations,
+      output_edges = output_edges
+    ))
+  }
+  log_info("Processing %d features for annotation", nrow(features_table))
+
+  features_table <- prepare_features_table(features_table, tolerance_rt)
+  already_assigned <- extract_preassigned_adducts(features_table)
+  log_info(
+    paste0(
+      "Pre-assigned adducts kept as hypotheses alongside the %s baseline: %d"
+    ),
+    baseline_adduct,
+    nrow(already_assigned)
+  )
+
+  # ---- Step 2: load structural library (with ppm windows) --------------
+  lib <- load_structural_library(
+    library = library,
+    str_stereo = str_stereo,
+    str_met = str_met,
+    str_tax_cla = str_tax_cla,
+    str_tax_npc = str_tax_npc,
+    tolerance_ppm = tolerance_ppm
+  )
+
+  # ---- Step 3: feature pairs inside RT windows -------------------------
+  pairs <- build_feature_pairs_within_rt(
+    df_rt_tol = features_table,
+    df_fea_min = features_table,
+    tolerance_ppm = tolerance_ppm
+  )
+  log_top_pair_deltas(pairs)
+
+  adducts <- adducts_list[[ms_mode]]
+  clusters <- clusters_list[[ms_mode]]
+  adducts_table <- adducts |>
+    tidytable::tidytable() |>
+    tidytable::rename(adduct = 1) |>
+    harmonize_adducts(adducts_translations = adducts_translations)
+  monocharged_adducts <- adducts_table |>
+    tidytable::filter(grepl("[M", adduct, fixed = TRUE)) |>
+    tidytable::filter(grepl("](\\+|\\-)", adduct)) |>
+    tidytable::mutate(
+      adduct_mass = -1 * calculate_mass_of_m_batch(adducts = adduct, mzs = 0)
     )
-
-    # Input Validation ----
-    log_info("Starting mass-based annotation")
-
-    # Pre-flight data sanitizing (catch issues early)
-    log_debug("Running pre-flight data checks...")
-    sanitize_all_inputs(features_file = features)
-
-    # Validate MS mode (cheapest check first)
-    validate_ms_mode(ms_mode)
-
-    # Validate tolerances
-    validate_tolerances(
-      tolerance_ppm = tolerance_ppm,
-      tolerance_rt = tolerance_rt,
-      max_ppm = 20,
-      max_rt = 0.05,
-      context = "mass annotation"
+  if (nrow(monocharged_adducts) == 0L) {
+    log_error(
+      "No valid monocharged adducts for mode '%s'. Aborting.",
+      ms_mode
     )
+    cli::cli_abort(
+      c(
+        "no valid monocharged adducts or clusters found",
+        "x" = paste0("mode: ", ms_mode),
+        "i" = "check adduct and cluster configuration"
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
 
-    # Validate mode-specific lists
-    validate_adduct_list(adducts_list, ms_mode, "adducts_list")
-    validate_adduct_list(clusters_list, ms_mode, "clusters_list")
+  # ---- Step 4: classify each pair --------------------------------------
+  # (a) adduct edges - same neutral M, two different ionizations
+  adduct_diffs <- build_adduct_pair_differences(
+    add_clu_table = monocharged_adducts,
+    tolerance_ppm = tolerance_ppm,
+    max_mz = max(features_table$mz, na.rm = TRUE)
+  )
+  adduct_edges <- match_pairs_to_adduct_diffs(pairs, adduct_diffs)
 
-    # Validate file existence
-    validate_file_existence(
-      list(
-        features = features,
-        library = library,
+  # Optional consistency filtering on adduct edges
+  adduct_edges <- apply_adduct_consistency_filter(
+    df_add = adduct_edges,
+    adduct_consistency = cfg$adduct_consistency,
+    adduct_min_support = cfg$adduct_min_support,
+    adduct_consistency_min_degree = cfg$adduct_consistency_min_degree
+  )
+  if (cfg$adduct_consistency == "strict" && nrow(adduct_edges) > 0L) {
+    adduct_edges <- enforce_graph_adduct_consistency(df_add = adduct_edges)
+    log_consistency_audit(attr(adduct_edges, "consistency_audit"))
+  } else if (cfg$adduct_consistency == "conditional") {
+    log_debug(
+      paste0(
+        "Adduct consistency mode is 'conditional': applying local support ",
+        "filter only (graph-level single-state enforcement is skipped)."
+      )
+    )
+  }
+
+  # (b) cluster edges - dest = higher mz peak carries the +cluster term
+  clusters_table <- clusters |>
+    tidytable::tidytable() |>
+    tidytable::rename(cluster = 1) |>
+    tidytable::mutate_rowwise(
+      mass = suppressWarnings(MetaboCoreUtils::calculateMass(cluster))
+    ) |>
+    tidytable::filter(!is.na(mass) & is.finite(mass) & mass > 0)
+  cluster_edges <- match_pairs_to_mass_diffs(
+    pairs = pairs,
+    diffs = clusters_table,
+    diff_col = "cluster"
+  )
+
+  # (c) neutral-loss edges - dest = precursor (higher mz), src = product
+  neutral_losses_table <- neutral_losses_list |>
+    tidytable::tidytable() |>
+    tidytable::rename(loss = 1) |>
+    tidytable::mutate_rowwise(
+      mass = suppressWarnings(
+        MetaboCoreUtils::calculateMass(gsub(" .*", "", loss))
+      )
+    ) |>
+    tidytable::filter(!is.na(mass) & is.finite(mass) & mass > 0)
+  loss_edges <- match_pairs_to_mass_diffs(
+    pairs = pairs,
+    diffs = neutral_losses_table,
+    diff_col = "loss"
+  )
+
+  # ---- Step 5: per-feature node-level adduct hypotheses ----------------
+  node_hypotheses <- collect_node_adduct_hypotheses(
+    adduct_edges = adduct_edges,
+    cluster_edges = cluster_edges,
+    loss_edges = loss_edges,
+    preassigned = already_assigned,
+    baseline_adduct = baseline_adduct,
+    features_table = features_table
+  )
+
+  # Keep the list of multi-charge / n-mer adducts for a later, constrained
+  # expansion step (after we infer plausible neutral masses per node).
+  multi_adducts <- adducts_table |>
+    tidytable::filter(!adduct %in% monocharged_adducts$adduct) |>
+    tidytable::distinct(adduct)
+
+  # ---- Step 6: compute neutral mass for each hypothesis ----------------
+  node_hypotheses <- node_hypotheses |>
+    tidytable::mutate(
+      mass = calculate_mass_of_m_batch(
+        adducts = adduct,
+        mzs = as.numeric(mz)
+      )
+    )
+  bad_mass <- node_hypotheses |>
+    tidytable::filter(is.na(mass) | !is.finite(mass) | mass <= 0)
+  if (nrow(bad_mass) > 0L) {
+    log_warn(
+      paste0(
+        "%d candidate adduct hypotheses produced an invalid neutral mass ",
+        "(NA/non-finite/<=0) and will be dropped. Consider extending ",
+        "adducts_translations if you see unexpected adduct strings."
+      ),
+      nrow(bad_mass)
+    )
+  }
+  node_hypotheses <- node_hypotheses |>
+    tidytable::filter(!is.na(mass) & is.finite(mass) & mass > 0)
+
+  # ---- Step 6b: constrained multi-adduct expansion ----------------------
+  # Only test multi adducts whose implied neutral mass agrees with at least one
+  # already-inferred M for the same feature (within ppm tolerance).
+  if (nrow(multi_adducts) > 0L && nrow(node_hypotheses) > 0L) {
+    multi_hypotheses <- generate_multi_hypotheses_from_node_masses(
+      node_hypotheses = node_hypotheses,
+      multi_adducts = multi_adducts,
+      tolerance_ppm = tolerance_ppm
+    )
+    if (nrow(multi_hypotheses) > 0L) {
+      node_hypotheses <- tidytable::bind_rows(
+        node_hypotheses,
+        multi_hypotheses
+      ) |>
+        dedupe_node_hypotheses()
+      log_info(
+        "Constrained multi-adduct expansion kept %d hypothesis row(s)",
+        nrow(multi_hypotheses)
+      )
+    }
+  }
+
+  # ---- Step 7: library match by neutral mass ---------------------------
+  matched <- match_candidates_to_library(
+    candidates = node_hypotheses,
+    library_em = lib$em_windows,
+    tolerance_ppm = tolerance_ppm
+  )
+
+  # ---- Step 8: network-consensus pruning -------------------------------
+  matched <- prune_candidates_by_network_consensus(
+    matched = matched,
+    adduct_edges = adduct_edges,
+    baseline_adduct = baseline_adduct
+  )
+
+  # ---- Step 9: keep unmatched adduct hypotheses too --------------------
+  unmatched <- node_hypotheses |>
+    tidytable::anti_join(
+      matched |> tidytable::distinct(feature_id, adduct),
+      by = c("feature_id", "adduct")
+    ) |>
+    tidytable::mutate(
+      structure_exact_mass = NA_real_,
+      error_mz = NA_real_
+    )
+  combined <- tidytable::bind_rows(matched, unmatched)
+
+  # ---- Step 10: enrich with structural metadata ------------------------
+  annotations <- enrich_with_structure_metadata(
+    combined = combined,
+    structure_table = lib$structures
+  )
+
+  # ---- Step 10a: loss formula compatibility filter ----------------------
+  # Structural matches are kept only when atoms removed in the adduct (e.g.
+  # -H2O, -C6H10O5) are actually available in candidate molecular formula.
+  # Incompatible rows are demoted to unmatched adduct hypotheses.
+  # annotations <- enforce_loss_formula_compatibility(annotations)
+
+  # ---- Step 10b: enforce annotation/edge adduct agreement ---------------
+  annotations <- enforce_annotation_edge_adduct_agreement(
+    annotations = annotations,
+    adduct_edges = adduct_edges,
+    baseline_adduct = baseline_adduct
+  )
+
+  decorate_masses(annotations)
+  log_adduct_breakdown(annotations)
+
+  # ---- Step 11: edges file ---------------------------------------------
+  edges_out <- build_output_edges(
+    adduct_edges = adduct_edges,
+    loss_edges = loss_edges,
+    cluster_edges = cluster_edges,
+    features_table = features_table,
+    name_source = name_source,
+    name_target = name_target
+  )
+
+  # ---- Step 12: write outputs ------------------------------------------
+  export_params(
+    parameters = get_params(step = "annotate_masses"),
+    step = "annotate_masses"
+  )
+  export_output(x = edges_out, file = output_edges[[1L]])
+  export_output(
+    x = annotations |>
+      # Rename 'adduct' to the canonical output column name expected by
+      # downstream tools (select_annotations_columns, weight_annotations, etc.)
+      tidytable::rename(candidate_adduct = adduct) |>
+      select_annotations_columns(
         str_stereo = str_stereo,
         str_met = str_met,
         str_tax_cla = str_tax_cla,
         str_tax_npc = str_tax_npc
-      )
-    )
-
-    log_debug(
-      "Configuration: {ms_mode} mode, {tolerance_ppm} ppm, {tolerance_rt} min RT"
-    )
-
-    if (is.null(adduct_consistency) || is.na(adduct_consistency)) {
-      adduct_consistency <- get_params(
-        step = "annotate_masses"
-      )$ms$adduct_consistency
-    }
-    if (is.null(adduct_consistency) || is.na(adduct_consistency)) {
-      adduct_consistency <- "conditional"
-    }
-    adduct_consistency <- tolower(as.character(adduct_consistency[[1L]]))
-    if (!adduct_consistency %in% c("off", "conditional", "strict")) {
-      log_warn(
-        "Invalid adduct_consistency='%s', falling back to 'conditional'",
-        adduct_consistency
-      )
-      adduct_consistency <- "conditional"
-    }
-
-    if (is.null(adduct_min_support) || is.na(adduct_min_support)) {
-      adduct_min_support <- get_params(
-        step = "annotate_masses"
-      )$ms$adduct_min_support
-    }
-    if (is.null(adduct_min_support) || is.na(adduct_min_support)) {
-      adduct_min_support <- 2L
-    }
-    adduct_min_support <- as.integer(adduct_min_support[[1L]])
-    if (!is.finite(adduct_min_support) || adduct_min_support < 1L) {
-      log_warn(
-        "Invalid adduct_min_support='%s', falling back to 2",
-        as.character(adduct_min_support)
-      )
-      adduct_min_support <- 2L
-    }
-
-    if (
-      is.null(adduct_consistency_min_degree) ||
-        is.na(adduct_consistency_min_degree)
-    ) {
-      adduct_consistency_min_degree <-
-        get_params(step = "annotate_masses")$ms$adduct_consistency_min_degree
-    }
-    if (
-      is.null(adduct_consistency_min_degree) ||
-        is.na(adduct_consistency_min_degree)
-    ) {
-      adduct_consistency_min_degree <- 3L
-    }
-    adduct_consistency_min_degree <- as.integer(adduct_consistency_min_degree[[
-      1L
-    ]])
-    if (
-      !is.finite(adduct_consistency_min_degree) ||
-        adduct_consistency_min_degree < 1L
-    ) {
-      log_warn(
-        "Invalid adduct_consistency_min_degree='%s', falling back to 3",
-        as.character(adduct_consistency_min_degree)
-      )
-      adduct_consistency_min_degree <- 3L
-    }
-
-    ## Load and Validate Features ----
-
-    features_table <- safe_fread(
-      file = features,
-      file_type = "features table",
-      required_cols = "feature_id",
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    )
-
-    n_features <- nrow(features_table)
-    if (n_features == 0L) {
-      log_warn(
-        "Empty features table provided - no annotations to perform"
-      )
-
-      # Return empty results with proper structure
-      ann_cols <- c(
-        "feature_id",
-        "candidate_structure_error_mz",
-        "candidate_structure_name",
-        "candidate_structure_inchikey_connectivity_layer",
-        "candidate_structure_smiles_no_stereo",
-        "candidate_structure_molecular_formula",
-        "candidate_structure_exact_mass",
-        "candidate_structure_xlogp",
-        "candidate_structure_tag",
-        "candidate_library",
-        "candidate_structure_tax_npc_01pat",
-        "candidate_structure_tax_npc_02sup",
-        "candidate_structure_tax_npc_03cla",
-        "candidate_structure_tax_cla_chemontid",
-        "candidate_structure_tax_cla_01kin",
-        "candidate_structure_tax_cla_02sup",
-        "candidate_structure_tax_cla_03cla",
-        "candidate_structure_tax_cla_04dirpar",
-        "candidate_adduct"
-      )
-      empty_annotations <- as.data.frame(matrix(
-        ncol = length(ann_cols),
-        nrow = 0
-      ))
-      colnames(empty_annotations) <- ann_cols
-
-      edge_cols <- c("CLUSTERID1", "CLUSTERID2", "label")
-      empty_edges <- as.data.frame(matrix(ncol = length(edge_cols), nrow = 0))
-      colnames(empty_edges) <- edge_cols
-
-      # Write empty outputs
-      export_output(x = empty_annotations, file = output_annotations)
-      export_output(x = empty_edges, file = output_edges)
-
-      return(c(
-        "annotations" = output_annotations[[1L]],
-        "edges" = output_edges[[1L]]
-      ))
-    }
-
-    log_info("Processing %d features for annotation", n_features)
-
-    # Select Mode-Specific Adducts and Clusters ----
-
-    # Direct assignment is faster than conditional blocks
-    adducts <- adducts_list[[ms_mode]]
-    clusters <- clusters_list[[ms_mode]]
-
-    # Load and Join Library Tables ----
-
-    library_table <- safe_fread(
-      file = library,
-      file_type = "structure library",
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    )
-
-    # Load all supplementary files
-    supp_files <- list(str_stereo, str_met, str_tax_cla, str_tax_npc)
-    supp_names <- c(
-      "stereochemistry",
-      "metadata",
-      "ClassyFire taxonomy",
-      "NPClassifier taxonomy"
-    )
-
-    supp_tables <- purrr::map2(
-      .x = supp_files,
-      .y = supp_names,
-      .f = ~ safe_fread(
-        file = .x,
-        file_type = .y,
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )
-    )
-
-    # Single reduce operation for all joins
-    joined_table <- purrr::reduce(
-      .x = c(list(library_table), supp_tables),
-      .f = tidytable::left_join
-    )
-
-    # Filter and prepare structure-organism pairs
-    structure_organism_pairs_table <- joined_table |>
-      tidytable::filter(!is.na(structure_exact_mass)) |>
-      tidytable::mutate(tidytable::across(
-        .cols = "structure_exact_mass",
-        .fns = as.numeric
-      ))
-
-    # Add structure_inchikey_connectivity_layer if not present
-    if (
-      !"structure_inchikey_connectivity_layer" %in%
-        colnames(structure_organism_pairs_table)
-    ) {
-      structure_organism_pairs_table <- structure_organism_pairs_table |>
-        tidytable::mutate(
-          structure_inchikey_connectivity_layer = stringi::stri_sub(
-            str = structure_inchikey,
-            from = 1L,
-            to = 14L
-          )
-        )
-    }
-
-    structure_organism_pairs_table <- round_reals(
-      structure_organism_pairs_table
-    )
-
-    df_add_em <- structure_organism_pairs_table |>
-      tidytable::filter(!is.na(structure_exact_mass)) |>
-      tidytable::distinct(exact_mass = structure_exact_mass) |>
-      tidytable::mutate(tidytable::across(
-        .cols = "exact_mass",
-        .fns = as.numeric
-      )) |>
-      tidytable::mutate(
-        value_min = exact_mass - (1E-6 * tolerance_ppm * exact_mass),
-        value_max = exact_mass + (1E-6 * tolerance_ppm * exact_mass)
-      ) |>
-      tidytable::filter(!is.na(value_min)) |>
-      tidytable::filter(value_min > 0)
-
-    if (!"adduct" %in% colnames(features_table)) {
-      features_table$adduct <- NA_character_
-    }
-    already_assigned <- features_table |>
-      tidytable::distinct(feature_id, adduct) |>
-      tidytable::filter(!is.na(adduct))
-    log_info(
-      paste0(
-        "Already %d adducts previously detected. ",
-        "These will be kept as explicit annotation hypotheses ",
-        "alongside the [M+H]+/[M-H]- baseline (non-strict precedence): ",
-        "a wrong pre-assignment can never fully block annotation."
       ),
-      nrow(already_assigned)
+    file = output_annotations[[1L]]
+  )
+
+  log_complete(
+    ctx,
+    n_annotations = nrow(annotations),
+    n_edges = nrow(edges_out)
+  )
+
+  c(
+    "annotations" = output_annotations[[1L]],
+    "edges" = output_edges[[1L]]
+  )
+}
+
+# ============================================================
+#                       STEP HELPERS
+# ============================================================
+
+#' Resolve `adduct_consistency*` config defaults
+#' @keywords internal
+resolve_adduct_consistency_config <- function(
+  adduct_consistency,
+  adduct_min_support,
+  adduct_consistency_min_degree
+) {
+  ac <- adduct_consistency
+  if (is.null(ac) || (length(ac) == 1L && is.na(ac))) {
+    ac <- "conditional"
+  }
+  ac <- tolower(as.character(ac[[1L]]))
+  if (!ac %in% c("off", "conditional", "strict")) {
+    log_warn(
+      "Invalid adduct_consistency='%s', falling back to 'conditional'",
+      ac
     )
-    features_table <- features_table |>
-      harmonize_adducts(adducts_translations = adducts_translations)
+    ac <- "conditional"
+  }
 
-    if (!"sample" %in% colnames(features_table)) {
-      log_debug(
-        "No 'sample' column found in features table; adding a placeholder"
+  ms <- adduct_min_support
+  if (is.null(ms) || (length(ms) == 1L && is.na(ms))) {
+    ms <- 2L
+  }
+  ms <- suppressWarnings(as.integer(ms[[1L]]))
+  if (is.na(ms) || !is.finite(ms) || ms < 1L) {
+    ms <- 2L
+  }
+
+  md <- adduct_consistency_min_degree
+  if (is.null(md) || (length(md) == 1L && is.na(md))) {
+    md <- 3L
+  }
+  md <- suppressWarnings(as.integer(md[[1L]]))
+  if (is.na(md) || !is.finite(md) || md < 1L) {
+    md <- 3L
+  }
+
+  list(
+    adduct_consistency = ac,
+    adduct_min_support = ms,
+    adduct_consistency_min_degree = md
+  )
+}
+
+#' Write the empty-output sentinel files
+#' @keywords internal
+write_empty_annotate_masses_outputs <- function(
+  output_annotations,
+  output_edges
+) {
+  ann_cols <- c(
+    "feature_id",
+    "candidate_structure_error_mz",
+    "candidate_structure_name",
+    "candidate_structure_inchikey_connectivity_layer",
+    "candidate_structure_smiles_no_stereo",
+    "candidate_structure_molecular_formula",
+    "candidate_structure_exact_mass",
+    "candidate_structure_xlogp",
+    "candidate_structure_tag",
+    "candidate_library",
+    "candidate_structure_tax_npc_01pat",
+    "candidate_structure_tax_npc_02sup",
+    "candidate_structure_tax_npc_03cla",
+    "candidate_structure_tax_cla_chemontid",
+    "candidate_structure_tax_cla_01kin",
+    "candidate_structure_tax_cla_02sup",
+    "candidate_structure_tax_cla_03cla",
+    "candidate_structure_tax_cla_04dirpar",
+    "candidate_adduct"
+  )
+  empty_annotations <- as.data.frame(
+    matrix(ncol = length(ann_cols), nrow = 0L)
+  )
+  colnames(empty_annotations) <- ann_cols
+
+  edge_cols <- c("CLUSTERID1", "CLUSTERID2", "label")
+  empty_edges <- as.data.frame(matrix(ncol = length(edge_cols), nrow = 0L))
+  colnames(empty_edges) <- edge_cols
+
+  export_output(x = empty_annotations, file = output_annotations)
+  export_output(x = empty_edges, file = output_edges)
+  c(
+    "annotations" = output_annotations[[1L]],
+    "edges" = output_edges[[1L]]
+  )
+}
+
+#' Coerce, harmonize, and prepare the features table for downstream steps
+#' @keywords internal
+prepare_features_table <- function(features_table, tolerance_rt) {
+  if (!"adduct" %in% colnames(features_table)) {
+    features_table$adduct <- NA_character_
+  }
+  if ("candidate_adduct" %in% colnames(features_table)) {
+    features_table$adduct <- ifelse(
+      is.na(features_table$adduct) | !nzchar(features_table$adduct),
+      features_table$candidate_adduct,
+      features_table$adduct
+    )
+  }
+  features_table <- features_table |>
+    harmonize_adducts(adducts_translations = adducts_translations)
+
+  if (!"sample" %in% colnames(features_table)) {
+    log_debug("No 'sample' column; using 'all'")
+    features_table$sample <- "all"
+  }
+  if (!"rt" %in% colnames(features_table)) {
+    log_warn("No 'rt' column; using sequential numbering as RT proxy")
+    features_table$rt <- seq_len(nrow(features_table))
+  }
+
+  features_table |>
+    tidytable::mutate(
+      mz = as.numeric(mz),
+      rt = as.numeric(rt)
+    ) |>
+    tidytable::distinct(feature_id, sample, .keep_all = TRUE) |>
+    tidytable::mutate(
+      rt_min = rt - tolerance_rt,
+      rt_max = rt + tolerance_rt
+    )
+}
+
+#' Extract any non-NA pre-assigned adducts as explicit hypotheses
+#' @keywords internal
+extract_preassigned_adducts <- function(features_table) {
+  if (
+    !"adduct" %in% colnames(features_table) &&
+      !"candidate_adduct" %in% colnames(features_table)
+  ) {
+    return(tidytable::tidytable(feature_id = character(), adduct = character()))
+  }
+  if (!"adduct" %in% colnames(features_table)) {
+    features_table$adduct <- NA_character_
+  }
+  if (!"candidate_adduct" %in% colnames(features_table)) {
+    features_table$candidate_adduct <- NA_character_
+  }
+  features_table |>
+    tidytable::mutate(
+      adduct = tidytable::if_else(
+        is.na(adduct) | !nzchar(adduct),
+        candidate_adduct,
+        adduct
       )
-      features_table$sample <- "all"
-    }
+    ) |>
+    tidytable::mutate(
+      adduct = strsplit(as.character(adduct), "[|/]", perl = TRUE)
+    ) |>
+    tidyr::unnest(adduct) |>
+    tidytable::mutate(adduct = trimws(adduct)) |>
+    tidytable::distinct(feature_id, adduct) |>
+    tidytable::filter(!is.na(adduct) & nzchar(adduct)) |>
+    harmonize_adducts(adducts_translations = adducts_translations)
+}
 
-    df_fea_min <- features_table |>
-      tidytable::mutate(tidytable::across(
-        .cols = "mz",
-        .fns = as.numeric
-      )) |>
-      tidytable::distinct(feature_id, sample, .keep_all = TRUE)
+#' Propagate pre-assigned adduct labels through adduct edges in both directions
+#'
+#' If an edge hypothesis says `(feature_id, adduct) -> (feature_id_dest,
+#' adduct_dest)`, and one side is pre-assigned upstream, the opposite side gets
+#' the corresponding propagated pre-assignment candidate.
+#' @keywords internal
+propagate_preassigned_over_adduct_edges <- function(adduct_edges, preassigned) {
+  if (nrow(adduct_edges) == 0L || nrow(preassigned) == 0L) {
+    return(tidytable::tidytable(feature_id = character(), adduct = character()))
+  }
+  pre <- preassigned |>
+    tidytable::distinct(feature_id, adduct) |>
+    tidytable::filter(!is.na(adduct) & nzchar(adduct))
+  if (nrow(pre) == 0L) {
+    return(tidytable::tidytable(feature_id = character(), adduct = character()))
+  }
 
-    if (any(names(features_table) == "rt")) {
-      df_fea_min <- df_fea_min |>
-        tidytable::mutate(tidytable::across(
-          .cols = "rt",
-          .fns = as.numeric
-        ))
-    } else {
-      log_warn(
-        "No 'rt' column found, using sequential numbering as RT proxy"
-      )
-      df_fea_min$rt <- seq_len(nrow(df_fea_min))
-    }
+  forward <- adduct_edges |>
+    tidytable::inner_join(pre, by = c("feature_id", "adduct")) |>
+    tidytable::transmute(feature_id = feature_id_dest, adduct = adduct_dest)
 
-    df_rt_tol <- df_fea_min |>
+  reverse <- adduct_edges |>
+    tidytable::inner_join(
+      pre,
+      by = c("feature_id_dest" = "feature_id", "adduct_dest" = "adduct")
+    ) |>
+    tidytable::transmute(feature_id, adduct)
+
+  tidytable::bind_rows(forward, reverse) |>
+    tidytable::distinct() |>
+    harmonize_adducts(adducts_translations = adducts_translations)
+}
+
+#' Load the structural library, join supplementary tables, and build the
+#' ppm-window table for neutral-mass lookups
+#' @keywords internal
+load_structural_library <- function(
+  library,
+  str_stereo,
+  str_met,
+  str_tax_cla,
+  str_tax_npc,
+  tolerance_ppm
+) {
+  library_table <- safe_fread(
+    file = library,
+    file_type = "structure library",
+    na.strings = c("", "NA"),
+    colClasses = "character"
+  )
+  supp_files <- list(str_stereo, str_met, str_tax_cla, str_tax_npc)
+  supp_names <- c(
+    "stereochemistry",
+    "metadata",
+    "ClassyFire taxonomy",
+    "NPClassifier taxonomy"
+  )
+  supp_tables <- purrr::map2(
+    .x = supp_files,
+    .y = supp_names,
+    .f = ~ safe_fread(
+      file = .x,
+      file_type = .y,
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    )
+  )
+  joined <- purrr::reduce(
+    .x = c(list(library_table), supp_tables),
+    .f = tidytable::left_join
+  )
+
+  structures <- joined |>
+    tidytable::filter(!is.na(structure_exact_mass)) |>
+    tidytable::mutate(
+      structure_exact_mass = as.numeric(structure_exact_mass)
+    )
+  if (!"structure_inchikey_connectivity_layer" %in% colnames(structures)) {
+    structures <- structures |>
       tidytable::mutate(
-        rt_min = as.numeric(rt - tolerance_rt),
-        rt_max = as.numeric(rt + tolerance_rt)
+        structure_inchikey_connectivity_layer = stringi::stri_sub(
+          str = structure_inchikey,
+          from = 1L,
+          to = 14L
+        )
       )
+  }
+  structures <- round_reals(structures)
 
-    df_couples_diff <- build_feature_pairs_within_rt(
-      df_rt_tol = df_rt_tol,
-      df_fea_min = df_fea_min,
-      tolerance_ppm = tolerance_ppm
+  em_windows <- structures |>
+    tidytable::distinct(exact_mass = structure_exact_mass) |>
+    tidytable::filter(!is.na(exact_mass) & exact_mass > 0) |>
+    tidytable::mutate(
+      value_min = exact_mass - (1E-6 * tolerance_ppm * exact_mass),
+      value_max = exact_mass + (1E-6 * tolerance_ppm * exact_mass)
     )
 
-    if (nrow(df_couples_diff) > 0) {
-      bins <- df_couples_diff[,
-        .N,
-        by = .(bin = cut(delta, breaks = 10000L))
-      ] |>
-        tidytable::arrange(
-          N |>
-            tidytable::desc()
-        ) |>
-        tidytable::slice_head(n = 10L)
-      bins <- add_percentage_column(
-        bins,
-        count_col = "N",
-        out_col = "Pct"
+  list(structures = structures, em_windows = em_windows)
+}
+
+#' Log the top observed pair-delta bins for QC
+#' @keywords internal
+log_top_pair_deltas <- function(pairs) {
+  if (nrow(pairs) == 0L) {
+    return(invisible(NULL))
+  }
+  bins <- pairs[, .N, by = .(bin = cut(delta, breaks = 10000L))] |>
+    tidytable::arrange(tidytable::desc(N)) |>
+    tidytable::slice_head(n = 10L)
+  bins <- add_percentage_column(bins, count_col = "N", out_col = "Pct")
+  log_info(
+    "Here are the top 10 observed m/z differences inside the RT windows:"
+  )
+  log_info(
+    "\n%s",
+    paste(
+      utils::capture.output(print.data.frame(bins, row.names = FALSE)),
+      collapse = "\n"
+    )
+  )
+  invisible(NULL)
+}
+
+#' Log the per-adduct annotation breakdown table
+#'
+#' Produces the classic "Breakdown of the annotated adduct species" table
+#' (N_features / N_annotations / Pct) that was present in the original
+#' monolithic \code{annotate_masses()} implementation.
+#'
+#' @param annotations Data frame returned by \code{enrich_with_structure_metadata()}.
+#'   Expected to have at minimum \code{feature_id} and \code{adduct} columns.
+#'   When a \code{source} column is present the "baseline / enforced" fallback
+#'   rows are reported separately.
+#' @keywords internal
+log_adduct_breakdown <- function(annotations) {
+  if (nrow(annotations) == 0L || !"adduct" %in% colnames(annotations)) {
+    return(invisible(NULL))
+  }
+
+  # ---- library-matched adduct breakdown (main breakdown) ------------------
+  # Only count rows that have an actual library hit (error_mz not NA).
+  # Unmatched hypotheses retained for downstream use are excluded here to
+  # avoid inflating counts with speculative cross-join candidates.
+  has_error_col <- "candidate_structure_error_mz" %in% colnames(annotations)
+  matched_ann <- if (has_error_col) {
+    annotations |> tidytable::filter(!is.na(candidate_structure_error_mz))
+  } else {
+    annotations |> tidytable::filter(!is.na(adduct))
+  }
+
+  if (nrow(matched_ann) > 0L) {
+    adduct_bd <- matched_ann |>
+      tidytable::filter(!is.na(adduct)) |>
+      tidytable::summarise(
+        N_features = tidytable::n_distinct(feature_id),
+        N_annotations = .N,
+        .by = adduct
+      ) |>
+      tidytable::arrange(
+        tidytable::desc(N_features),
+        tidytable::desc(N_annotations)
       )
+    adduct_bd <- add_percentage_column(
+      adduct_bd,
+      count_col = "N_features",
+      out_col = "Pct_features"
+    )
+    adduct_bd <- add_percentage_column(
+      adduct_bd,
+      count_col = "N_annotations",
+      out_col = "Pct_annotations"
+    )
+    log_info("Breakdown of the annotated adduct species (library-matched):")
+    log_info(
+      "\n%s",
+      paste(
+        utils::capture.output(
+          print.data.frame(x = adduct_bd, row.names = FALSE)
+        ),
+        collapse = "\n"
+      )
+    )
+  }
+
+  # ---- retained-but-unmatched adduct hypotheses --------------------------
+  # These are adducts kept in the output even though no library structure
+  # matched; they still carry adduct-network evidence and are useful for
+  # downstream tools.  Log a compact summary grouped by source.
+  if (has_error_col && "source" %in% colnames(annotations)) {
+    unmatched_ann <- annotations |>
+      tidytable::filter(
+        !is.na(adduct) & is.na(candidate_structure_error_mz)
+      )
+    if (nrow(unmatched_ann) > 0L) {
+      unmatched_bd <- unmatched_ann |>
+        tidytable::summarise(
+          N_features = tidytable::n_distinct(feature_id),
+          N_adduct_types = tidytable::n_distinct(adduct),
+          .by = source
+        ) |>
+        tidytable::arrange(tidytable::desc(N_features))
       log_info(
-        "Here are the top 10 observed m/z differences inside the RT windows:"
+        "Adduct hypotheses retained without library match (by source):"
       )
       log_info(
         "\n%s",
         paste(
-          utils::capture.output(print.data.frame(x = bins, row.names = FALSE)),
-          collapse = "\n"
-        )
-      )
-      log_info(
-        "These differences may help identify potential preprocessing issues"
-      )
-      rm(bins)
-    }
-    df_couples_diff <- df_couples_diff |>
-      tidytable::select(-delta)
-    rm(df_rt_tol, features_table)
-
-    adducts_table <- adducts |>
-      tidytable::tidytable() |>
-      tidytable::rename(adduct = 1) |>
-      harmonize_adducts(adducts_translations = adducts_translations)
-    clusters_table <- clusters |>
-      tidytable::tidytable() |>
-      tidytable::rename(cluster = 1)
-
-    add_clu_table <- adducts_table |>
-      tidytable::mutate(join = "x") |>
-      tidytable::left_join(
-        y = clusters_table |>
-          tidytable::mutate(join = "x")
-      ) |>
-      tidytable::bind_rows(adducts_table) |>
-      tidytable::mutate(
-        adduct = tidytable::if_else(
-          condition = !is.na(cluster),
-          true = paste0(
-            adduct |>
-              gsub(
-                pattern = "M(?![a-z]).*",
-                replacement = "M",
-                perl = TRUE
-              ),
-            "+",
-            cluster,
-            adduct |>
-              gsub(
-                pattern = ".*M(?![a-z])",
-                replacement = "",
-                perl = TRUE
-              )
-          ),
-          false = adduct
-        )
-      ) |>
-      harmonize_adducts(adducts_translations = adducts_translations) |>
-      # Single charge monomers only
-      tidytable::filter(grepl(
-        pattern = "[M",
-        x = adduct,
-        fixed = TRUE
-      )) |>
-      tidytable::filter(grepl(pattern = "](\\+|\\-)", x = adduct)) |>
-      tidytable::mutate(
-        adduct_mass = -1 * calculate_mass_of_m_batch(adducts = adduct, mzs = 0)
-      )
-
-    rm(clusters_table)
-
-    # Validate that we have monocharged adducts/clusters to work with
-    if (nrow(add_clu_table) == 0L) {
-      log_error(
-        "No valid monocharged adducts or clusters found for mode %s.
-        Cannot proceed with mass annotation.
-        Please check your adducts and clusters configuration.",
-        ms_mode
-      )
-      cli::cli_abort(
-        c(
-          "no valid monocharged adducts or clusters found",
-          "x" = paste0("mode: ", ms_mode),
-          "i" = "check adduct and cluster configuration"
-        ),
-        class = c("tima_validation_error", "tima_error"),
-        call = NULL
-      )
-    }
-
-    log_debug(
-      "Found %d monocharged adducts/clusters for processing",
-      nrow(add_clu_table)
-    )
-
-    #  "Calculating delta mz for single charge adducts and clusters"
-    # )
-    differences <- build_adduct_pair_differences(
-      add_clu_table = add_clu_table,
-      tolerance_ppm = tolerance_ppm,
-      max_mz = max(df_fea_min$mz)
-    )
-
-    neutral_losses <- neutral_losses_list |>
-      tidytable::tidytable() |>
-      tidytable::rename(loss = 1) |>
-      tidytable::mutate_rowwise(
-        mass = loss |>
-          gsub(pattern = " .*", replacement = "") |>
-          MetaboCoreUtils::calculateMass()
-      )
-
-    #  "Joining within given delta mz tolerance (neutral losses)"
-    # )
-    df_nl <- join_couples_with_neutral_losses(
-      df_couples_diff = df_couples_diff,
-      neutral_losses = neutral_losses
-    )
-
-    cd_src_add <- tidytable::as_tidytable(df_couples_diff)[,
-      .(
-        feature_id,
-        feature_id_dest,
-        delta_min,
-        delta_max
-      )
-    ]
-    diff_win <- tidytable::as_tidytable(differences)[,
-      .(
-        Distance,
-        Group1,
-        Group2
-      )
-    ]
-    df_add <- diff_win[
-      cd_src_add,
-      on = .(Distance >= delta_min, Distance <= delta_max),
-      nomatch = 0L,
-      allow.cartesian = TRUE
-    ][,
-      .(
-        feature_id,
-        adduct = Group1,
-        adduct_dest = Group2,
-        feature_id_dest
-      )
-    ] |>
-      unique() |>
-      tidytable::as_tidytable()
-
-    df_add <- apply_adduct_consistency_filter(
-      df_add = df_add,
-      adduct_consistency = adduct_consistency,
-      adduct_min_support = adduct_min_support,
-      adduct_consistency_min_degree = adduct_consistency_min_degree
-    )
-
-    if (adduct_consistency != "off") {
-      # Keep only edge labels that can coexist in a globally coherent
-      # node->adduct assignment. This removes impossible chains/cycles while
-      # retaining exotic adducts when they are consistent.
-      df_add <- enforce_graph_adduct_consistency(df_add = df_add)
-
-      add_audit <- attr(df_add, "consistency_audit")
-      if (!is.null(add_audit)) {
-        log_debug(
-          "Adduct consistency audit: kept=%d, dropped=%d",
-          add_audit$n_kept,
-          add_audit$n_dropped
-        )
-        if (
-          !is.null(add_audit$dropped_reason_counts) &&
-            nrow(add_audit$dropped_reason_counts) > 0L
-        ) {
-          log_debug(
-            "Dropped edge hypotheses by reason:\n%s",
-            paste(
-              utils::capture.output(
-                print.data.frame(
-                  add_audit$dropped_reason_counts,
-                  row.names = FALSE
-                )
-              ),
-              collapse = "\n"
-            )
-          )
-        }
-      }
-    }
-
-    df_add_support <- compute_feature_adduct_support(df_add)
-
-    df_nl <- df_nl |>
-      tidytable::anti_join(df_add)
-    rm(df_couples_diff, differences)
-
-    df_nl_min <- df_nl |>
-      tidytable::distinct(feature_id, loss, mass)
-
-    df_add_a <- df_add |>
-      tidytable::distinct(feature_id, adduct) |>
-      tidytable::mutate(source = "pair")
-
-    df_add_b <- df_add |>
-      tidytable::distinct(
-        !!as.name(paste("feature_id", "dest", sep = "_")),
-        adduct_dest
-      ) |>
-      tidytable::select(
-        feature_id := !!as.name(paste("feature_id", "dest", sep = "_")),
-        adduct = adduct_dest
-      ) |>
-      tidytable::mutate(source = "pair")
-
-    ## Propagate externally-supplied adducts (e.g. from cliqueMS, CAMERA, SIRIUS)
-    ## as explicit annotation hypotheses.  These are NOT hard constraints:
-    ## the (de)protonated baseline is also tested for every feature (see below).
-    ## This means a wrong pre-assignment never silently blocks annotation.
-    df_add_preassigned <- already_assigned |>
-      tidytable::select(feature_id, adduct) |>
-      tidytable::distinct() |>
-      tidytable::mutate(source = "preassigned")
-    rm(already_assigned)
-
-    ## [M+H]+/[M-H]- is the universal baseline hypothesis for EVERY feature,
-    ## regardless of whether an adduct was already supplied upstream.
-    ## Removing the old anti_join(y = already_assigned): even features that
-    ## already carry a pre-assigned adduct benefit from also testing the
-    ## protonated / deprotonated form, the library hit may only appear under
-    ## that form, and the pre-assignment could be wrong.
-    df_add_enforced <- df_fea_min |>
-      tidytable::distinct(feature_id) |>
-      tidytable::mutate(
-        adduct = switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-"),
-        source = "baseline"
-      )
-
-    df_add_full <- tidytable::bind_rows(
-      df_add_a,
-      df_add_b,
-      df_add_preassigned,
-      df_add_enforced
-    ) |>
-      tidytable::distinct() |>
-      tidytable::left_join(
-        y = df_add_support,
-        by = c("feature_id", "adduct")
-      ) |>
-      tidytable::mutate(
-        adduct_support = tidytable::if_else(
-          condition = is.na(adduct_support),
-          true = 0L,
-          false = as.integer(adduct_support)
-        )
-      ) |>
-      tidytable::mutate(
-        source_rank = tidytable::case_when(
-          source == "pair" ~ 1L,
-          source == "preassigned" ~ 2L,
-          TRUE ~ 3L
-        )
-      ) |>
-      tidytable::arrange(source_rank) |>
-      tidytable::distinct(feature_id, adduct, .keep_all = TRUE) |>
-      tidytable::select(-source_rank) |>
-      harmonize_adducts(adducts_translations = adducts_translations)
-
-    df_adduct_origin <- df_add_full |>
-      tidytable::mutate(
-        candidate_adduct_origin = tidytable::if_else(
-          source == "baseline" & adduct_support == 0L,
-          "enforced",
-          "supported"
-        )
-      ) |>
-      tidytable::distinct(feature_id, adduct, candidate_adduct_origin)
-
-    baseline_origin <- df_adduct_origin |>
-      tidytable::filter(
-        adduct == switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
-      ) |>
-      tidytable::count(candidate_adduct_origin, name = "N")
-    if (nrow(baseline_origin) > 0L) {
-      log_debug(
-        "Baseline adduct origin (%s):\n%s",
-        switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-"),
-        paste(
           utils::capture.output(
-            print.data.frame(x = baseline_origin, row.names = FALSE)
+            print.data.frame(x = unmatched_bd, row.names = FALSE)
           ),
           collapse = "\n"
         )
       )
     }
+  }
 
-    rm(
-      df_add_a,
-      df_add_b,
-      df_add_preassigned,
-      df_add_enforced,
-      df_add_support
+  invisible(NULL)
+}
+
+#' Match feature pairs against pairwise adduct-mass differences
+#' @keywords internal
+match_pairs_to_adduct_diffs <- function(pairs, adduct_diffs) {
+  if (nrow(pairs) == 0L || nrow(adduct_diffs) == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      adduct = character(),
+      adduct_dest = character(),
+      feature_id_dest = character()
+    ))
+  }
+  pairs_t <- tidytable::as_tidytable(pairs)[,
+    .(feature_id, feature_id_dest, delta_min, delta_max)
+  ]
+  diffs_t <- tidytable::as_tidytable(adduct_diffs)[,
+    .(Distance, Group1, Group2)
+  ]
+  diffs_t[
+    pairs_t,
+    on = .(Distance >= delta_min, Distance <= delta_max),
+    nomatch = NA_real_,
+    allow.cartesian = TRUE
+  ][,
+    .(
+      feature_id,
+      adduct = Group1,
+      adduct_dest = Group2,
+      feature_id_dest
+    )
+  ] |>
+    unique() |>
+    tidytable::as_tidytable() |>
+    tidytable::filter(!is.na(adduct))
+}
+
+#' Match feature pairs against a single-mass diffs table (clusters or losses).
+#'
+#' Implementation note: `join_couples_with_neutral_losses()` is used as a
+#' generic delta matcher. The output columns are renamed so that whatever
+#' `diff_col` is (`loss` or `cluster`) appears as a column of that name.
+#' @keywords internal
+match_pairs_to_mass_diffs <- function(pairs, diffs, diff_col) {
+  if (nrow(pairs) == 0L || nrow(diffs) == 0L) {
+    return(
+      tidytable::tidytable(
+        feature_id = character(),
+        mass = numeric(),
+        feature_id_dest = character()
+      ) |>
+        tidytable::mutate(!!as.name(diff_col) := character())
+    )
+  }
+  diffs_norm <- diffs |>
+    tidytable::rename(loss = !!as.name(diff_col))
+  out <- join_couples_with_neutral_losses(
+    df_couples_diff = pairs,
+    neutral_losses = diffs_norm
+  )
+  if (diff_col != "loss") {
+    out <- out |> tidytable::rename(!!as.name(diff_col) := loss)
+  }
+  out
+}
+
+#' Build the per-feature adduct hypotheses from the edge sets
+#'
+#' Hypotheses come from four sources, in priority order:
+#'   - `pair`: an adduct edge directly named this feature with this adduct
+#'   - `cluster`: a cluster edge implies a `+cluster` suffix on the dest node
+#'   - `loss`: a neutral-loss edge implies a `-loss` suffix on the precursor
+#'   - `preassigned`: an upstream tool assigned this feature this adduct
+#'   - `baseline`: every feature is always tested under [M+H]+ / [M-H]-
+#'
+#' @keywords internal
+collect_node_adduct_hypotheses <- function(
+  adduct_edges,
+  cluster_edges,
+  loss_edges,
+  preassigned,
+  baseline_adduct,
+  features_table
+) {
+  # (a) pair-derived hypotheses (both endpoints)
+  pair_a <- adduct_edges |>
+    tidytable::distinct(feature_id, adduct)
+  pair_b <- adduct_edges |>
+    tidytable::distinct(feature_id_dest, adduct_dest) |>
+    tidytable::rename(
+      feature_id = feature_id_dest,
+      adduct = adduct_dest
+    )
+  pair_hyps <- tidytable::bind_rows(pair_a, pair_b) |>
+    tidytable::distinct() |>
+    tidytable::mutate(source = "pair", is_preassigned = FALSE)
+
+  # (b) preassigned (upstream tools)
+  pre_propagated <- propagate_preassigned_over_adduct_edges(
+    adduct_edges = adduct_edges,
+    preassigned = preassigned
+  )
+  pre_hyps <- preassigned |>
+    tidytable::distinct(feature_id, adduct) |>
+    tidytable::mutate(source = "preassigned", is_preassigned = TRUE)
+  pre_prop_hyps <- pre_propagated |>
+    tidytable::distinct(feature_id, adduct) |>
+    tidytable::mutate(source = "preassigned_propagated", is_preassigned = TRUE)
+
+  # (c) baseline - always tested for every feature
+  baseline_hyps <- features_table |>
+    tidytable::distinct(feature_id) |>
+    tidytable::mutate(
+      adduct = baseline_adduct,
+      source = "baseline",
+      is_preassigned = FALSE
     )
 
-    df_adducted <- df_fea_min |>
-      tidytable::distinct(feature_id, rt, mz) |>
-      tidytable::left_join(y = df_add_full)
-    rm(df_add_full)
+  base_hyps <- tidytable::bind_rows(
+    pair_hyps,
+    pre_hyps,
+    pre_prop_hyps,
+    baseline_hyps
+  ) |>
+    tidytable::distinct() |>
+    harmonize_adducts(adducts_translations = adducts_translations)
 
-    df_addlossed <- df_adducted |>
-      tidytable::left_join(y = df_nl_min) |>
-      tidytable::bind_rows(df_adducted) |>
-      tidytable::filter(!is.na(adduct)) |>
-      tidytable::distinct() |>
-      tidytable::mutate(
-        adduct = tidytable::if_else(
-          condition = !is.na(loss),
-          true = paste0(
-            adduct |>
-              gsub(
-                pattern = "M(?![a-z]).*",
-                replacement = "M",
-                perl = TRUE
-              ),
-            "-",
-            loss |>
-              gsub(pattern = " .*", replacement = ""),
-            adduct |>
-              gsub(
-                pattern = ".*M(?![a-z])",
-                replacement = "",
-                perl = TRUE
-              )
-          ),
-          false = adduct
-        )
-      ) |>
-      harmonize_adducts(adducts_translations = adducts_translations)
-    rm(df_adducted, df_nl_min)
-
-    df_addlossed_min <- df_addlossed |>
-      tidytable::mutate(
-        mass = calculate_mass_of_m_batch(adducts = adduct, mzs = as.numeric(mz))
+  # Attach support count
+  support <- compute_feature_adduct_support(adduct_edges)
+  base_hyps <- base_hyps |>
+    tidytable::left_join(support, by = c("feature_id", "adduct")) |>
+    tidytable::mutate(
+      is_preassigned = tidytable::if_else(
+        is.na(is_preassigned),
+        FALSE,
+        is_preassigned
+      ),
+      adduct_support = tidytable::if_else(
+        is.na(adduct_support),
+        0L,
+        as.integer(adduct_support)
       )
-
-    ## Safety
-    df_addlossed_min_1 <- df_addlossed_min |>
-      tidytable::filter(!is.na(mass)) |>
-      tidytable::filter(is.finite(mass)) |>
-      tidytable::filter(mass != 0)
-
-    df_addlossed_min_2 <- df_addlossed_min |>
-      tidytable::right_join(
-        df_fea_min |> tidytable::distinct(feature_id, rt, mz)
-      ) |>
-      tidytable::filter(is.na(mass) | !is.finite(mass) | mass == 0)
-
-    if (nrow(df_addlossed_min_2) != 0) {
-      log_warn(
-        paste0(
-          "%d feature(s) produced an undefined neutral mass from their adduct ",
-          "annotation (NA / non-finite / zero). ",
-          "These were recovered and defaulted to the (de)protonated form. ",
-          "This usually indicates an unsupported adduct notation, ",
-          "extend adducts_translations if needed."
-        ),
-        nrow(df_addlossed_min_2)
-      )
-      df_addlossed_min_2 <- df_addlossed_min_2 |>
-        tidytable::mutate(
-          adduct = switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
-        ) |>
-        tidytable::mutate(
-          mass = calculate_mass_of_m_batch(
-            adducts = adduct,
-            mzs = as.numeric(mz)
-          )
-        )
-    }
-
-    df_addlossed_rdy <- df_addlossed_min_1 |>
-      tidytable::bind_rows(df_addlossed_min_2) |>
-      tidytable::select(-loss) |>
-      ## Deduplicate adducts that compute to the same neutral mass
-      ## (e.g., [M-H2O-H2O+H]+ vs [M-H4O2+H]+), keeping simplest form
-      ## and preferring adducts with stronger pairwise support.
-      tidytable::mutate(adduct_len = nchar(adduct)) |>
-      tidytable::arrange(tidytable::desc(adduct_support), adduct_len) |>
-      tidytable::distinct(feature_id, mz, mass, .keep_all = TRUE) |>
-      tidytable::select(-adduct_len)
-    rm(
-      df_addlossed,
-      df_addlossed_min,
-      df_addlossed_min_1,
-      df_addlossed_min_2
     )
 
-    addloss_src <- tidytable::as_tidytable(df_addlossed_rdy)[,
+  # (d) cluster expansion - suffix +cluster onto the DEST node's hypotheses.
+  cluster_hyps <- expand_with_modifier(
+    base_hyps = base_hyps,
+    edges = cluster_edges,
+    edge_feature_col = "feature_id_dest",
+    mod_col = "cluster",
+    mod_sign = "+"
+  )
+
+  # (e) loss expansion - suffix -loss onto the PRECURSOR's hypotheses.
+  loss_hyps <- expand_with_modifier(
+    base_hyps = base_hyps,
+    edges = loss_edges,
+    edge_feature_col = "feature_id_dest",
+    mod_col = "loss",
+    mod_sign = "-",
+    strip_label = TRUE
+  )
+
+  all_hyps <- tidytable::bind_rows(
+    base_hyps,
+    cluster_hyps,
+    loss_hyps
+  ) |>
+    tidytable::mutate(adduct = trimws(adduct)) |>
+    tidytable::filter(!is.na(adduct) & nzchar(adduct)) |>
+    tidytable::filter(!(adduct %in% adducts_forbidden))
+
+  fea_meta <- features_table |>
+    tidytable::distinct(feature_id, mz, rt)
+  all_hyps |>
+    tidytable::left_join(fea_meta, by = "feature_id") |>
+    dedupe_node_hypotheses()
+}
+
+#' Add +mod or -mod suffix to existing adduct strings on selected features
+#' @keywords internal
+expand_with_modifier <- function(
+  base_hyps,
+  edges,
+  edge_feature_col,
+  mod_col,
+  mod_sign,
+  strip_label = FALSE
+) {
+  if (nrow(edges) == 0L || nrow(base_hyps) == 0L) {
+    return(base_hyps[0L, ])
+  }
+  targets <- edges |>
+    tidytable::distinct(
+      feature_id = !!as.name(edge_feature_col),
+      !!as.name(mod_col)
+    )
+  if (strip_label) {
+    targets <- targets |>
+      tidytable::mutate(
+        !!as.name(mod_col) := gsub(" .*", "", !!as.name(mod_col))
+      )
+  }
+  out <- base_hyps |>
+    tidytable::inner_join(targets, by = "feature_id") |>
+    tidytable::mutate(
+      adduct = paste0(
+        gsub("M(?![a-z]).*", "M", adduct, perl = TRUE),
+        mod_sign,
+        !!as.name(mod_col),
+        gsub(".*M(?![a-z])", "", adduct, perl = TRUE)
+      ),
+      source = if (mod_sign == "+") "cluster" else "loss"
+    )
+  if (identical(mod_col, "loss")) {
+    out <- out |>
+      tidytable::mutate(loss_term = as.character(!!as.name(mod_col)))
+  }
+  out |>
+    tidytable::select(-tidyselect::all_of(mod_col)) |>
+    harmonize_adducts(adducts_translations = adducts_translations)
+}
+
+#' Resolve duplicate hypotheses for the same (feature, adduct), keeping the
+#' highest-priority source and the maximum support count.
+#'
+#' Source priority (lower = higher priority):
+#'   pair < cluster/loss < preassigned < baseline < multi
+#' @keywords internal
+dedupe_node_hypotheses <- function(node_hypotheses) {
+  if (nrow(node_hypotheses) == 0L) {
+    return(node_hypotheses)
+  }
+  ranks <- c(
+    pair = 1L,
+    cluster = 2L,
+    loss = 2L,
+    preassigned = 3L,
+    preassigned_propagated = 3L,
+    baseline = 4L,
+    multi = 5L
+  )
+  node_hypotheses |>
+    tidytable::mutate(
+      is_preassigned = tidytable::if_else(
+        is.na(is_preassigned),
+        FALSE,
+        is_preassigned
+      ),
+      source_rank = unname(ranks[source]),
+      source_rank = tidytable::if_else(
+        is.na(source_rank),
+        99L,
+        source_rank
+      ),
+      adduct_support = tidytable::if_else(
+        is.na(adduct_support),
+        0L,
+        as.integer(adduct_support)
+      )
+    ) |>
+    tidytable::arrange(source_rank, tidytable::desc(adduct_support)) |>
+    tidytable::group_by(feature_id, adduct) |>
+    tidytable::mutate(is_preassigned = any(is_preassigned)) |>
+    tidytable::ungroup() |>
+    tidytable::distinct(feature_id, adduct, .keep_all = TRUE) |>
+    tidytable::select(-source_rank)
+}
+
+#' Generate multi-adduct hypotheses constrained by node-inferred neutral masses
+#'
+#' Expands `(feature, adduct)` only for multi adducts whose implied neutral mass
+#' is within `tolerance_ppm` of at least one neutral mass already inferred for
+#' that same feature from non-multi hypotheses.
+#' @keywords internal
+generate_multi_hypotheses_from_node_masses <- function(
+  node_hypotheses,
+  multi_adducts,
+  tolerance_ppm
+) {
+  empty_out <- tidytable::tidytable(
+    feature_id = character(),
+    adduct = character(),
+    source = character(),
+    is_preassigned = logical(),
+    adduct_support = integer(),
+    mz = numeric(),
+    rt = numeric(),
+    mass = numeric()
+  )
+  if (nrow(node_hypotheses) == 0L || nrow(multi_adducts) == 0L) {
+    return(empty_out)
+  }
+
+  base_mass_by_feature <- node_hypotheses |>
+    tidytable::filter(source != "multi") |>
+    tidytable::filter(!is.na(mass) & is.finite(mass) & mass > 0) |>
+    tidytable::distinct(feature_id, neutral_mass_ref = mass)
+  if (nrow(base_mass_by_feature) == 0L) {
+    return(empty_out)
+  }
+
+  feature_meta <- node_hypotheses |>
+    tidytable::distinct(feature_id, mz, rt)
+
+  multi_candidates <- feature_meta |>
+    tidytable::cross_join(multi_adducts |> tidytable::distinct(adduct)) |>
+    tidytable::mutate(
+      source = "multi",
+      adduct_support = 0L,
+      mass = calculate_mass_of_m_batch(adducts = adduct, mzs = as.numeric(mz))
+    ) |>
+    tidytable::filter(!is.na(mass) & is.finite(mass) & mass > 0)
+  if (nrow(multi_candidates) == 0L) {
+    return(empty_out)
+  }
+
+  kept <- multi_candidates |>
+    tidytable::inner_join(base_mass_by_feature, by = "feature_id") |>
+    tidytable::mutate(
+      ppm = abs(mass - neutral_mass_ref) * 1E6 / neutral_mass_ref
+    ) |>
+    tidytable::filter(is.finite(ppm) & ppm <= tolerance_ppm) |>
+    tidytable::select(
+      feature_id,
+      adduct,
+      source,
+      adduct_support,
+      mz,
+      rt,
+      mass
+    ) |>
+    tidytable::distinct()
+
+  if (nrow(kept) == 0L) {
+    return(empty_out)
+  }
+  kept
+}
+
+#' Match candidate (feature, adduct, mass) rows against the library
+#' @keywords internal
+match_candidates_to_library <- function(candidates, library_em, tolerance_ppm) {
+  invisible(tolerance_ppm)
+  empty_out <- tidytable::tidytable(
+    feature_id = character(),
+    rt = numeric(),
+    mz = numeric(),
+    adduct = character(),
+    mass = numeric(),
+    source = character(),
+    adduct_support = integer(),
+    loss_term = character(),
+    structure_exact_mass = numeric(),
+    error_mz = numeric()
+  )
+  if (nrow(candidates) == 0L || nrow(library_em) == 0L) {
+    return(empty_out)
+  }
+  has_loss_term <- "loss_term" %in% colnames(candidates)
+  has_is_preassigned <- "is_preassigned" %in% colnames(candidates)
+  if (!has_is_preassigned) {
+    candidates <- candidates |>
+      tidytable::mutate(is_preassigned = FALSE)
+  }
+  if (has_loss_term) {
+    cand_t <- tidytable::as_tidytable(candidates)[,
       .(
         src_feature_id = feature_id,
         src_rt = rt,
         src_mz = mz,
         src_adduct = adduct,
-        src_mass = mass
+        src_mass = mass,
+        src_source = source,
+        src_is_preassigned = is_preassigned,
+        src_support = adduct_support,
+        src_loss_term = loss_term
       )
     ]
-    em_windows <- tidytable::as_tidytable(df_add_em)
-    df_addlossed_em <- em_windows[
-      addloss_src,
-      on = .(value_min <= src_mass, value_max >= src_mass),
-      nomatch = 0L,
-      allow.cartesian = TRUE
-    ][,
+  } else {
+    cand_t <- tidytable::as_tidytable(candidates)[,
       .(
-        feature_id = src_feature_id,
-        rt = src_rt,
-        mz = src_mz,
-        adduct = src_adduct,
-        mass = value_min,
-        exact_mass
+        src_feature_id = feature_id,
+        src_rt = rt,
+        src_mz = mz,
+        src_adduct = adduct,
+        src_mass = mass,
+        src_source = source,
+        src_is_preassigned = is_preassigned,
+        src_support = adduct_support,
+        src_loss_term = NA_character_
       )
-    ] |>
-      tidytable::as_tidytable() |>
-      tidytable::mutate(error_mz = exact_mass - mass) |>
-      tidytable::mutate(library = adduct) |>
-      tidytable::select(
-        feature_id,
-        rt,
-        mz,
-        library,
-        error_mz,
-        exact_mass
-      ) |>
-      tidytable::distinct()
-
-    df_em_mf <- structure_organism_pairs_table |>
-      tidytable::distinct(
-        tidyselect::any_of(
-          x = c(
-            "structure_exact_mass",
-            "structure_molecular_formula"
-          )
-        )
-      )
-
-    # Select only columns that exist in the table
-    available_cols <- colnames(structure_organism_pairs_table)
-    required_cols <- c(
-      "structure_name",
-      "structure_inchikey_connectivity_layer",
-      "structure_inchikey_no_stereo",
-      "structure_smiles_no_stereo",
-      "structure_molecular_formula",
-      "structure_exact_mass"
+    ]
+  }
+  em_t <- tidytable::as_tidytable(library_em)
+  # Non-equi join: after the join, the i-side `src_mass` is no longer in
+  # scope as a column name; data.table exposes it via the join columns
+  # `value_min` / `value_max` (both equal to the matched src_mass for the
+  # surviving rows). We pick `value_min` to recover the original mass.
+  em_t[
+    cand_t,
+    on = .(value_min <= src_mass, value_max >= src_mass),
+    nomatch = NA_real_,
+    allow.cartesian = TRUE
+  ][
+    !is.na(exact_mass),
+    .(
+      feature_id = src_feature_id,
+      rt = src_rt,
+      mz = src_mz,
+      adduct = src_adduct,
+      mass = value_min,
+      source = src_source,
+      is_preassigned = src_is_preassigned,
+      adduct_support = src_support,
+      loss_term = src_loss_term,
+      structure_exact_mass = exact_mass,
+      error_mz = exact_mass - value_min
     )
-    cols_to_select <- intersect(required_cols, available_cols)
+  ] |>
+    tidytable::as_tidytable() |>
+    tidytable::distinct()
+}
 
-    df_str_unique <- structure_organism_pairs_table |>
-      tidytable::distinct(tidyselect::any_of(x = cols_to_select)) |>
-      ## Avoid SMILES redundancy
-      tidytable::distinct(
-        tidyselect::any_of(
-          x = c(
-            "structure_inchikey_connectivity_layer",
-            "structure_molecular_formula",
-            "structure_exact_mass"
-          )
-        ),
-        .keep_all = TRUE
-      ) |>
-      tidytable::mutate(tidytable::across(
-        .cols = tidyselect::where(fn = is.numeric),
-        .fns = as.character
-      ))
+#' Network-consensus pruning of multi-candidate annotations.
+#'
+#' When a feature has several library hits, drop only those whose adduct has
+#' zero adduct-graph support, *provided* at least one supported alternative
+#' survives. Ties (both supported, both unsupported) are kept. Drops are
+#' logged.
+#'
+#' Pre-assigned and baseline hypotheses are always kept regardless of support,
+#' so a wrong pre-assignment cannot silently block annotation.
+#' @keywords internal
+prune_candidates_by_network_consensus <- function(
+  matched,
+  adduct_edges,
+  baseline_adduct = NULL
+) {
+  if (nrow(matched) == 0L) {
+    return(matched)
+  }
+  if (!"is_preassigned" %in% colnames(matched)) {
+    matched <- matched |>
+      tidytable::mutate(is_preassigned = FALSE)
+  }
+  state_map <- build_adduct_state_key_map(unique(c(
+    matched$adduct,
+    adduct_edges$adduct,
+    adduct_edges$adduct_dest
+  )))
 
-    df_annotated_1 <- tidytable::left_join(
-      x = df_addlossed_em,
-      y = df_em_mf,
-      by = stats::setNames(object = "structure_exact_mass", nm = "exact_mass")
+  support <- compute_feature_adduct_support(adduct_edges) |>
+    tidytable::left_join(
+      state_map |>
+        tidytable::rename(adduct_state_key = state_key),
+      by = "adduct"
     ) |>
-      tidytable::filter(!(library %in% adducts_forbidden)) |>
-      tidytable::distinct()
-    rm(df_addlossed_em)
+    tidytable::mutate(adduct_state_key = tidytable::if_else(
+      is.na(adduct_state_key),
+      adduct,
+      adduct_state_key
+    )) |>
+    tidytable::summarize(
+      adduct_support = max(adduct_support, na.rm = TRUE),
+      .by = c(feature_id, adduct_state_key)
+    ) |>
+    tidytable::rename(net_support = adduct_support)
 
-    adducts_table_multi <- adducts_table |>
-      tidytable::filter(!adduct %in% add_clu_table$adduct) |>
-      tidytable::mutate(join = "x")
-    rm(adducts_table, add_clu_table)
-
-    if (nrow(adducts_table_multi) != 0) {
-      df_multi <- df_fea_min |>
-        tidytable::select(-adduct) |>
-        tidytable::mutate(join = "x") |>
-        tidytable::left_join(y = adducts_table_multi) |>
-        harmonize_adducts(adducts_translations = adducts_translations) |>
-        tidytable::mutate(
-          value = calculate_mass_of_m_batch(
-            adducts = adduct,
-            mzs = as.numeric(mz)
-          )
-        ) |>
-        tidytable::mutate(
-          mass_min = value - (1E-6 * tolerance_ppm * value),
-          mass_max = value + (1E-6 * tolerance_ppm * value),
-          rt_min = rt - tolerance_rt,
-          rt_max = rt + tolerance_rt
-        ) |>
-        tidytable::distinct()
-    } else {
-      df_multi <- tidytable::tidytable(
-        "feature_id" = NA_real_,
-        "adduct" = NA_character_,
-        "rt" = NA_real_,
-        "rt_min" = NA_real_,
-        "rt_max" = NA_real_,
-        "mass_min" = NA_real_,
-        "mass_max" = NA_real_,
-        "mz" = NA_real_
+  scored <- matched |>
+    tidytable::left_join(
+      state_map |>
+        tidytable::rename(adduct_state_key = state_key),
+      by = "adduct"
+    ) |>
+    tidytable::mutate(adduct_state_key = tidytable::if_else(
+      is.na(adduct_state_key),
+      adduct,
+      adduct_state_key
+    )) |>
+    tidytable::left_join(support, by = c("feature_id", "adduct_state_key")) |>
+    tidytable::mutate(
+      is_preassigned = tidytable::if_else(
+        is.na(is_preassigned),
+        FALSE,
+        is_preassigned
+      ),
+      net_support = tidytable::if_else(
+        is.na(net_support),
+        0L,
+        as.integer(net_support)
       )
-    }
-
-    rm(adducts_table_multi)
-
-    df_multi_nl <- join_multi_with_addlossed(
-      df_multi = df_multi,
-      df_addlossed_rdy = df_addlossed_rdy
-    )
-    rm(df_multi, neutral_losses, df_addlossed_rdy)
-
-    #   "Joining within given mz tol and filtering possible adducts"
-    # )
-    multi_nl_dt <- df_multi_nl
-    em_windows <- tidytable::as_tidytable(df_add_em)
-    df_multi_nl_em <- em_windows[
-      multi_nl_dt,
-      on = .(value_min <= mass, value_max >= mass),
-      nomatch = 0L,
-      allow.cartesian = TRUE
-    ][,
-      .(
-        feature_id,
-        rt,
-        mz,
-        library_name = adduct,
-        exact_mass,
-        error_mz = exact_mass - value_min
-      )
-    ] |>
-      tidytable::as_tidytable() |>
-      tidytable::distinct(
-        feature_id,
-        rt,
-        mz,
-        exact_mass,
-        library_name,
-        error_mz
-      )
-    rm(df_add_em, df_multi_nl)
-
-    df_annotated_2 <-
-      tidytable::left_join(
-        x = df_multi_nl_em,
-        y = df_em_mf,
-        by = stats::setNames(object = "structure_exact_mass", nm = "exact_mass")
-      ) |>
-      tidytable::select(
-        tidyselect::any_of(x = "structure_molecular_formula"),
-        library = library_name,
-        tidyselect::everything(),
-        -exact_mass,
-      ) |>
-      tidytable::filter(!(library %in% adducts_forbidden)) |>
-      tidytable::mutate(library = as.character(library)) |>
-      tidytable::distinct()
-    rm(df_em_mf, df_multi_nl_em)
-
-    #   "Joining single adducts, in source dimers, and multicharged"
-    # )
-    df_annotated_combined <- tidytable::bind_rows(
-      df_annotated_1,
-      df_annotated_2
     )
 
-    # Find common columns for join
-    common_cols <- intersect(
-      colnames(df_annotated_combined),
-      colnames(df_str_unique)
+  per_feature_max <- scored |>
+    tidytable::summarize(
+      max_support = max(net_support, na.rm = TRUE),
+      n_candidates = tidytable::n_distinct(adduct),
+      .by = feature_id
     )
 
-    # Only join if there are common columns
-    if (length(common_cols) > 0) {
-      df_annotated_final <- df_annotated_combined |>
-        tidytable::left_join(y = df_str_unique, by = common_cols) |>
-        tidytable::filter(!is.na(structure_inchikey_connectivity_layer))
-    } else {
-      # No common columns, just use combined data
-      df_annotated_final <- df_annotated_combined
-    }
+  # Flag features that have at least one non-"multi" library hit.
+  # "multi" candidates (exotic multi-charge / dimer adducts assigned via cross-
+  # join with NO pairwise evidence) are dropped whenever a more parsimonious
+  # alternative (pair, cluster, loss, preassigned, baseline) already matched the
+  # library for the same feature. This prevents [2M+Fe]2+, [M+Ca]2+, etc. from
+  # crowding out sensible annotations for isolated features.
+  per_feature_sources <- scored |>
+    tidytable::summarize(
+      has_non_multi = any(source != "multi"),
+      .by = feature_id
+    )
 
-    df_annotated_final <- df_annotated_final |>
-      tidytable::select(
-        tidyselect::any_of(
-          x = c(
-            "feature_id",
-            "error_mz",
-            "structure_name",
-            "structure_inchikey_connectivity_layer",
-            "structure_inchikey_no_stereo",
-            "structure_smiles_no_stereo",
-            "library"
-          )
-        )
-      ) |>
-      tidytable::rename(
-        candidate_structure_error_mz = tidyselect::any_of(x = "error_mz"),
-        candidate_structure_name = tidyselect::any_of(x = "structure_name"),
-        candidate_structure_inchikey_connectivity_layer = tidyselect::any_of(
-          x = "structure_inchikey_connectivity_layer"
-        ),
-        candidate_structure_inchikey_no_stereo = tidyselect::any_of(
-          x = "structure_inchikey_no_stereo"
-        ),
-        candidate_structure_smiles_no_stereo = tidyselect::any_of(
-          x = "structure_smiles_no_stereo"
-        ),
-        candidate_library = tidyselect::any_of(x = "library")
-      ) |>
-      tidytable::distinct()
+  scored <- scored |>
+    tidytable::left_join(per_feature_max, by = "feature_id") |>
+    tidytable::left_join(per_feature_sources, by = "feature_id") |>
+    tidytable::mutate(
+      has_non_multi = tidytable::if_else(
+        is.na(has_non_multi),
+        FALSE,
+        has_non_multi
+      ),
+      # A candidate is "safe" (never dropped) when:
+      #   - it is the baseline adduct,
+      #   - it was pre-assigned upstream,
+      #   - it has network edge support,
+      #   - or it is the sole type of candidate for this feature *and* it is
+      #     not a speculative "multi" hypothesis that has a better alternative.
+      is_safe = (!is.null(baseline_adduct) & adduct == baseline_adduct) |
+        is_preassigned |
+        source %in% c("preassigned", "baseline") |
+        net_support > 0L |
+        (max_support == 0L & !(source == "multi" & has_non_multi)),
+      drop = !is_safe & n_candidates > 1L
+    )
 
-    rm(df_annotated_1, df_annotated_2, df_str_unique)
-
-    taxonomy_table <- structure_organism_pairs_table |>
-      tidytable::distinct(
-        tidyselect::any_of(
-          x = c(
-            "structure_inchikey_connectivity_layer",
-            "structure_smiles_no_stereo",
-            "structure_tax_npc_01pat",
-            "structure_tax_npc_02sup",
-            "structure_tax_npc_03cla",
-            "structure_tax_cla_chemontid",
-            "structure_tax_cla_01kin",
-            "structure_tax_cla_02sup",
-            "structure_tax_cla_03cla",
-            "structure_tax_cla_04dirpar"
-          )
-        )
-      ) |>
-      tidytable::rename(
-        candidate_structure_inchikey_connectivity_layer = tidyselect::any_of(
-          x = "structure_inchikey_connectivity_layer"
-        ),
-        candidate_structure_smiles_no_stereo = tidyselect::any_of(
-          x = "structure_smiles_no_stereo"
-        ),
-        candidate_structure_tax_npc_01pat = tidyselect::any_of(
-          x = "structure_tax_npc_01pat"
-        ),
-        candidate_structure_tax_npc_02sup = tidyselect::any_of(
-          x = "structure_tax_npc_02sup"
-        ),
-        candidate_structure_tax_npc_03cla = tidyselect::any_of(
-          x = "structure_tax_npc_03cla"
-        ),
-        candidate_structure_tax_cla_chemontid = tidyselect::any_of(
-          x = "structure_tax_cla_chemontid"
-        ),
-        candidate_structure_tax_cla_01kin = tidyselect::any_of(
-          x = "structure_tax_cla_01kin"
-        ),
-        candidate_structure_tax_cla_02sup = tidyselect::any_of(
-          x = "structure_tax_cla_02sup"
-        ),
-        candidate_structure_tax_cla_03cla = tidyselect::any_of(
-          x = "structure_tax_cla_03cla"
-        ),
-        candidate_structure_tax_cla_04dirpar = tidyselect::any_of(
-          x = "structure_tax_cla_04dirpar"
-        )
+  dropped <- scored |> tidytable::filter(drop)
+  if (nrow(dropped) > 0L) {
+    by_adduct <- dropped |>
+      tidytable::distinct(feature_id, adduct) |>
+      tidytable::count(adduct, name = "N") |>
+      tidytable::arrange(tidytable::desc(N))
+    n_unique <- nrow(dropped |> tidytable::distinct(feature_id, adduct))
+    log_info(
+      paste0(
+        "Network-consensus pruning dropped %d (feature, adduct) ",
+        "candidate(s) with zero adduct-graph support when a supported ",
+        "alternative existed."
+      ),
+      n_unique
+    )
+    log_info(
+      "\n%s",
+      paste(
+        utils::capture.output(print.data.frame(by_adduct, row.names = FALSE)),
+        collapse = "\n"
       )
-
-    # Find common columns for taxonomy join
-    tax_common_cols <- intersect(
-      colnames(df_annotated_final),
-      colnames(taxonomy_table)
-    )
-
-    # Only join if there are common columns
-    if (length(tax_common_cols) > 0) {
-      df_final <- tidytable::left_join(
-        x = df_annotated_final,
-        y = taxonomy_table,
-        by = tax_common_cols
-      )
-    } else {
-      df_final <- df_annotated_final
-    }
-
-    df_final <- df_final |>
-      tidytable::mutate(tidytable::across(
-        .cols = tidyselect::where(fn = is.character),
-        .fns = function(x) {
-          tidytable::na_if(x = x, y = "")
-        }
-      ))
-
-    # Add candidate_adduct and update candidate_library if they exist
-    if ("candidate_library" %in% colnames(df_final)) {
-      df_final <- df_final |>
-        tidytable::left_join(
-          y = df_adduct_origin,
-          by = c("feature_id", "candidate_library" = "adduct")
-        )
-      candidate_adduct <- df_final$candidate_library
-      non_missing <- !is.na(candidate_adduct)
-      if (any(non_missing)) {
-        candidate_library_unique <- unique(candidate_adduct[non_missing])
-        candidate_adduct_unique <- vapply(
-          X = candidate_library_unique,
-          FUN = canonicalize_adduct_notation,
-          FUN.VALUE = character(1L),
-          USE.NAMES = FALSE
-        )
-        candidate_adduct[non_missing] <- candidate_adduct_unique[
-          match(candidate_adduct[non_missing], candidate_library_unique)
-        ]
-      }
-      df_final <- df_final |>
-        tidytable::mutate(
-          candidate_adduct = candidate_adduct
-        ) |>
-        tidytable::mutate(candidate_library = "TIMA MS1")
-    }
-
-    rm(structure_organism_pairs_table, df_annotated_final, df_adduct_origin)
-
-    # Log supported adduct breakdown and summarize enforced baseline fallback.
-    if (nrow(df_final) > 0L && "candidate_adduct" %in% colnames(df_final)) {
-      adduct_breakdown <- df_final[
-        !is.na(candidate_adduct) &
-          (is.na(candidate_adduct_origin) |
-            candidate_adduct_origin == "supported"),
-        .(
-          N_features = tidytable::n_distinct(feature_id),
-          N_annotations = .N
-        ),
-        by = .(adduct = candidate_adduct)
-      ] |>
-        tidytable::arrange(
-          N_features |>
-            tidytable::desc(),
-          N_annotations |>
-            tidytable::desc()
-        )
-      adduct_breakdown <- add_percentage_column(
-        adduct_breakdown,
-        count_col = "N_features",
-        out_col = "Pct_features"
-      )
-      adduct_breakdown <- add_percentage_column(
-        adduct_breakdown,
-        count_col = "N_annotations",
-        out_col = "Pct_annotations"
-      )
-      if (nrow(adduct_breakdown) > 0L) {
-        log_info(
-          "Breakdown of the annotated adduct species:"
-        )
-        log_info(
-          "\n%s",
-          paste(
-            utils::capture.output(
-              print.data.frame(x = adduct_breakdown, row.names = FALSE)
-            ),
-            collapse = "\n"
-          )
-        )
-      }
-
-      enforced_breakdown <- df_final[
-        !is.na(candidate_adduct) & candidate_adduct_origin == "enforced",
-        .(
-          N_features = tidytable::n_distinct(feature_id),
-          N_annotations = .N
-        ),
-        by = .(adduct = candidate_adduct)
-      ]
-      if (nrow(enforced_breakdown) > 0L) {
-        log_info(
-          "Enforced adduct annotations: %s",
-          paste(
-            sprintf(
-              "%s (N_features=%d, N_annotations=%d)",
-              enforced_breakdown$adduct,
-              enforced_breakdown$N_features,
-              enforced_breakdown$N_annotations
-            ),
-            collapse = "; "
-          )
-        )
-      }
-    }
-
-    df_final |>
-      decorate_masses()
-
-    edges <- tidytable::bind_rows(
-      df_add |>
-        tidytable::mutate(label = paste0(adduct, " _ ", adduct_dest)) |>
-        tidytable::select(
-          !!as.name(name_source) := feature_id,
-          !!as.name(name_target) := feature_id_dest,
-          label
-        ) |>
-        tidytable::distinct(),
-      df_nl |>
-        tidytable::mutate(label = paste0(loss, " loss")) |>
-        tidytable::select(
-          ## Neutral loss: the precursor (higher m/z, feature_id_dest) is the
-          ## source and the product (lower m/z, feature_id) is the target.
-          ## This is opposite to the adduct convention above.
-          !!as.name(name_source) := feature_id_dest,
-          !!as.name(name_target) := feature_id,
-          label
-        ) |>
-        tidytable::distinct()
-    )
-    df_fea_mis <- df_fea_min |>
-      tidytable::filter(!feature_id %in% edges[[name_source]]) |>
-      tidytable::filter(!feature_id %in% edges[[name_target]]) |>
-      tidytable::mutate(!!as.name(name_target) := feature_id) |>
-      tidytable::rename(!!as.name(name_source) := feature_id) |>
-      tidytable::distinct(!!as.name(name_source), !!as.name(name_target))
-
-    edges_fin <- edges |>
-      tidytable::bind_rows(df_fea_mis)
-    rm(df_fea_min, df_nl, df_add)
-
-    export_params(
-      parameters = get_params(step = "annotate_masses"),
-      step = "annotate_masses"
-    )
-    export_output(x = edges_fin, file = output_edges[[1L]])
-    export_output(
-      x = df_final |>
-        select_annotations_columns(
-          str_stereo = str_stereo,
-          str_met = str_met,
-          str_tax_cla = str_tax_cla,
-          str_tax_npc = str_tax_npc
-        ),
-      file = output_annotations[[1L]]
-    )
-
-    log_complete(ctx, n_annotations = nrow(df_final), n_edges = nrow(edges))
-
-    rm(edges, edges_fin, df_final)
-
-    c(
-      "annotations" = output_annotations[[1L]],
-      "edges" = output_edges[[1L]]
     )
   }
 
-#' Build feature pairs inside RT windows
+  scored |>
+    tidytable::filter(!drop) |>
+    tidytable::select(
+      -drop,
+      -is_safe,
+      -has_non_multi,
+      -max_support,
+      -n_candidates,
+      -net_support,
+      -adduct_state_key
+    )
+}
+
+#' Decorate annotation rows with structural / taxonomic metadata
+#' @keywords internal
+enrich_with_structure_metadata <- function(combined, structure_table) {
+  if (nrow(combined) == 0L) {
+    return(
+      tidytable::tidytable(
+        feature_id = character(),
+        candidate_structure_error_mz = numeric(),
+        candidate_structure_name = character(),
+        candidate_structure_inchikey_connectivity_layer = character(),
+        candidate_structure_smiles_no_stereo = character(),
+        candidate_library = character(),
+        candidate_adduct = character()
+      )
+    )
+  }
+  struct_cols <- c(
+    "structure_name",
+    "structure_inchikey_connectivity_layer",
+    "structure_inchikey_no_stereo",
+    "structure_smiles_no_stereo",
+    "structure_molecular_formula",
+    "structure_exact_mass",
+    "structure_xlogp"
+  )
+  struct_unique <- structure_table |>
+    tidytable::distinct(tidyselect::any_of(struct_cols)) |>
+    tidytable::distinct(
+      tidyselect::any_of(c(
+        "structure_inchikey_connectivity_layer",
+        "structure_molecular_formula",
+        "structure_exact_mass"
+      )),
+      .keep_all = TRUE
+    ) |>
+    tidytable::mutate(tidytable::across(
+      .cols = tidyselect::where(is.numeric),
+      .fns = as.character
+    ))
+
+  enriched <- combined |>
+    tidytable::mutate(
+      structure_exact_mass = as.character(structure_exact_mass)
+    )
+  join_keys <- intersect(colnames(enriched), colnames(struct_unique))
+  if (length(join_keys) > 0L) {
+    enriched <- enriched |>
+      tidytable::left_join(struct_unique, by = join_keys)
+  }
+
+  tax_cols <- c(
+    "structure_inchikey_connectivity_layer",
+    "structure_smiles_no_stereo",
+    "structure_tax_npc_01pat",
+    "structure_tax_npc_02sup",
+    "structure_tax_npc_03cla",
+    "structure_tax_cla_chemontid",
+    "structure_tax_cla_01kin",
+    "structure_tax_cla_02sup",
+    "structure_tax_cla_03cla",
+    "structure_tax_cla_04dirpar"
+  )
+  if (any(tax_cols %in% colnames(structure_table))) {
+    taxonomy_table <- structure_table |>
+      tidytable::distinct(tidyselect::any_of(tax_cols))
+    tax_keys <- intersect(colnames(enriched), colnames(taxonomy_table))
+    if (length(tax_keys) > 0L) {
+      enriched <- enriched |>
+        tidytable::left_join(taxonomy_table, by = tax_keys)
+    }
+  }
+
+  # canonical_adduct <- vapply(
+  #   X = enriched$adduct,
+  #   FUN = function(a) {
+  #     if (is.na(a)) NA_character_ else canonicalize_adduct_notation(a)
+  #   },
+  #   FUN.VALUE = character(1L),
+  #   USE.NAMES = FALSE
+  # )
+
+  enriched |>
+    tidytable::mutate(
+      # candidate_adduct = canonical_adduct,
+      candidate_library = "TIMA MS1",
+      candidate_structure_error_mz = as.numeric(error_mz)
+    ) |>
+    tidytable::rename(
+      candidate_structure_name = tidyselect::any_of("structure_name"),
+      candidate_structure_inchikey_connectivity_layer = tidyselect::any_of(
+        "structure_inchikey_connectivity_layer"
+      ),
+      candidate_structure_inchikey_no_stereo = tidyselect::any_of(
+        "structure_inchikey_no_stereo"
+      ),
+      candidate_structure_smiles_no_stereo = tidyselect::any_of(
+        "structure_smiles_no_stereo"
+      ),
+      candidate_structure_molecular_formula = tidyselect::any_of(
+        "structure_molecular_formula"
+      ),
+      candidate_structure_xlogp = tidyselect::any_of("structure_xlogp"),
+      candidate_structure_tax_npc_01pat = tidyselect::any_of(
+        "structure_tax_npc_01pat"
+      ),
+      candidate_structure_tax_npc_02sup = tidyselect::any_of(
+        "structure_tax_npc_02sup"
+      ),
+      candidate_structure_tax_npc_03cla = tidyselect::any_of(
+        "structure_tax_npc_03cla"
+      ),
+      candidate_structure_tax_cla_chemontid = tidyselect::any_of(
+        "structure_tax_cla_chemontid"
+      ),
+      candidate_structure_tax_cla_01kin = tidyselect::any_of(
+        "structure_tax_cla_01kin"
+      ),
+      candidate_structure_tax_cla_02sup = tidyselect::any_of(
+        "structure_tax_cla_02sup"
+      ),
+      candidate_structure_tax_cla_03cla = tidyselect::any_of(
+        "structure_tax_cla_03cla"
+      ),
+      candidate_structure_tax_cla_04dirpar = tidyselect::any_of(
+        "structure_tax_cla_04dirpar"
+      )
+    ) |>
+    tidytable::distinct()
+}
+
+#' Extract per-element atom requirements implied by a loss formula token
+#'
+#' Parses loss tokens (e.g. `H2O`, `2C6H10O5`, `C6H10O5 (hexose)`) and returns
+#' a named integer vector with required atom counts.
+#' @keywords internal
+loss_term_atom_requirements <- function(loss_term) {
+  if (is.null(loss_term) || is.na(loss_term) || !nzchar(loss_term)) {
+    return(integer())
+  }
+  req <- integer()
+  loss_term <- gsub("\n", " ", as.character(loss_term))
+  loss_term <- trimws(sub(" .*", "", loss_term))
+  coef_match <- regmatches(
+    loss_term,
+    regexpr("^[0-9]+", loss_term, perl = TRUE)
+  )
+  coef <- if (length(coef_match) == 0L || !nzchar(coef_match)) {
+    1L
+  } else {
+    as.integer(coef_match)
+  }
+  formula <- sub("^[0-9]+", "", loss_term, perl = TRUE)
+  parsed <- tryCatch(
+    parse_atomic_formula(formula),
+    error = function(.err) {
+      invisible(.err)
+      NULL
+    }
+  )
+  if (is.null(parsed) || length(parsed) == 0L) {
+    return(integer())
+  }
+  for (el in names(parsed)) {
+    req[el] <- (if (is.na(req[el])) 0L else req[el]) +
+      as.integer(parsed[[el]] * coef)
+  }
+  req
+}
+
+#' Backwards-compatible alias for older tests / callers
+#' @keywords internal
+adduct_loss_atom_requirements <- function(adduct) {
+  if (is.null(adduct) || is.na(adduct) || !nzchar(adduct)) {
+    return(integer())
+  }
+  adduct_norm <- tryCatch(
+    normalize_adduct_string(adduct),
+    error = function(.err) {
+      invisible(.err)
+      as.character(adduct)
+    }
+  )
+  inner <- sub("^\\[(.*)\\][0-9]*[+-]+$", "\\1", adduct_norm, perl = TRUE)
+  if (!nzchar(inner) || identical(inner, adduct_norm)) {
+    return(loss_term_atom_requirements(adduct_norm))
+  }
+  toks <- regmatches(
+    inner,
+    gregexpr("[+-][0-9]*[A-Za-z][A-Za-z0-9]*", inner, perl = TRUE)
+  )[[1L]]
+  toks <- toks[nzchar(toks)]
+  if (length(toks) == 0L) {
+    return(integer())
+  }
+  req <- integer()
+  for (tok in toks) {
+    if (startsWith(tok, "-")) {
+      tok_req <- loss_term_atom_requirements(substring(tok, 2L))
+      for (el in names(tok_req)) {
+        req[el] <- (if (is.na(req[el])) 0L else req[el]) + tok_req[[el]]
+      }
+    }
+  }
+  req
+}
+
+#' Check whether formula contains all atoms required by adduct losses
+#' @keywords internal
+formula_satisfies_loss_requirements <- function(formula, loss_requirements) {
+  if (length(loss_requirements) == 0L) {
+    return(TRUE)
+  }
+  if (is.null(formula) || is.na(formula) || !nzchar(formula)) {
+    return(NA)
+  }
+  parsed <- tryCatch(
+    parse_atomic_formula(formula),
+    error = function(.err) {
+      invisible(.err)
+      NULL
+    }
+  )
+  if (is.null(parsed) || length(parsed) == 0L) {
+    return(NA)
+  }
+  for (el in names(loss_requirements)) {
+    if (!el %in% names(parsed) || parsed[[el]] < loss_requirements[[el]]) {
+      return(FALSE)
+    }
+  }
+  TRUE
+}
+
+#' Demote structural matches whose adduct-loss atoms are absent from formula
+#'
+#' Rows that fail this check keep the adduct hypothesis but lose structure-level
+#' fields (treated as unmatched).
+#' @keywords internal
+enforce_loss_formula_compatibility <- function(annotations) {
+  if (nrow(annotations) == 0L) {
+    return(annotations)
+  }
+  required_cols <- c(
+    "adduct",
+    "candidate_structure_molecular_formula",
+    "candidate_structure_error_mz"
+  )
+  if (!all(required_cols %in% colnames(annotations))) {
+    return(annotations)
+  }
+
+  has_source <- "source" %in% colnames(annotations)
+  has_loss_term <- "loss_term" %in% colnames(annotations)
+  idx_check <- which(
+    !is.na(annotations$candidate_structure_error_mz) &
+      !is.na(annotations$adduct) &
+      ((has_source & annotations$source == "loss") |
+        (has_loss_term & !is.na(annotations$loss_term)))
+  )
+  if (length(idx_check) == 0L) {
+    return(annotations)
+  }
+
+  keep_struct <- vapply(
+    X = idx_check,
+    FUN = function(i) {
+      req <- if (has_loss_term && !is.na(annotations$loss_term[[i]])) {
+        loss_term_atom_requirements(annotations$loss_term[[i]])
+      } else {
+        adduct_loss_atom_requirements(annotations$adduct[[i]])
+      }
+      fs <- formula_satisfies_loss_requirements(
+        formula = annotations$candidate_structure_molecular_formula[[i]],
+        loss_requirements = req
+      )
+      if (is.na(fs)) TRUE else fs
+    },
+    FUN.VALUE = logical(1L)
+  )
+  idx_drop <- idx_check[!keep_struct]
+  if (length(idx_drop) == 0L) {
+    return(annotations)
+  }
+
+  out <- tidytable::as_tidytable(annotations)
+  struct_cols <- unique(c(
+    grep("^candidate_structure_", colnames(out), value = TRUE),
+    intersect(
+      colnames(out),
+      c("candidate_library", "structure_exact_mass", "error_mz")
+    )
+  ))
+  for (cc in struct_cols) {
+    out[idx_drop, (cc) := NA]
+  }
+  out <- out |> tidytable::distinct()
+
+  dropped <- annotations[idx_drop, , drop = FALSE]
+  dropped_bd <- dropped |>
+    tidytable::distinct(feature_id, adduct) |>
+    tidytable::count(adduct, name = "N") |>
+    tidytable::arrange(tidytable::desc(N))
+  log_info(
+    paste0(
+      "Loss/formula filter demoted %d structural match row(s) where the actual ",
+      "loss-edge term was not contained in the candidate formula."
+    ),
+    length(idx_drop)
+  )
+  log_info(
+    "\n%s",
+    paste(
+      utils::capture.output(print.data.frame(dropped_bd, row.names = FALSE)),
+      collapse = "\n"
+    )
+  )
+
+  out
+}
+
+#' Keep only annotation adducts that agree with edge evidence
+#'
+#' Agreement is evaluated per feature. For pair-derived adducts,
+#' `(feature_id, adduct)` must be present in the adduct-edge endpoint set.
+#' Loss/cluster-derived hypotheses are considered edge-backed by construction
+#' (their `source` originates from those edge tables). Explicit user-guided
+#' hypotheses are also preserved (`baseline`, `preassigned`,
+#' `preassigned_propagated`).
+#' @keywords internal
+enforce_annotation_edge_adduct_agreement <- function(
+  annotations,
+  adduct_edges,
+  baseline_adduct = NULL
+) {
+  if (nrow(annotations) == 0L) {
+    return(annotations)
+  }
+  required <- c("feature_id", "adduct")
+  if (!all(required %in% colnames(annotations))) {
+    return(annotations)
+  }
+
+  adduct_key_map <- build_adduct_state_key_map(unique(c(
+    annotations$adduct,
+    adduct_edges$adduct,
+    adduct_edges$adduct_dest
+  )))
+  if (!"adduct" %in% colnames(adduct_key_map)) {
+    adduct_key_map$adduct <- character(nrow(adduct_key_map))
+  }
+  if (!"state_key" %in% colnames(adduct_key_map)) {
+    adduct_key_map$state_key <- adduct_key_map$adduct
+  }
+  adduct_key_map <- adduct_key_map |>
+    tidytable::mutate(adduct_state_key = state_key) |>
+    tidytable::select(adduct, adduct_state_key)
+  key_lookup <- stats::setNames(
+    object = adduct_key_map$adduct_state_key,
+    nm = adduct_key_map$adduct
+  )
+
+  edge_supported <- if (nrow(adduct_edges) > 0L) {
+    tidytable::bind_rows(
+      adduct_edges |>
+        tidytable::transmute(feature_id, adduct),
+      adduct_edges |>
+        tidytable::transmute(feature_id = feature_id_dest, adduct = adduct_dest)
+    ) |>
+      tidytable::mutate(adduct_state_key = unname(key_lookup[adduct])) |>
+      tidytable::filter(!is.na(adduct_state_key)) |>
+      tidytable::distinct(feature_id, adduct_state_key)
+  } else {
+    tidytable::tidytable(
+      feature_id = character(),
+      adduct_state_key = character()
+    )
+  }
+
+  has_source <- "source" %in% colnames(annotations)
+  has_is_preassigned <- "is_preassigned" %in% colnames(annotations)
+  has_origin <- "candidate_adduct_origin" %in% colnames(annotations)
+  preassigned_safe <- if (has_is_preassigned) {
+    annotations$is_preassigned
+  } else {
+    rep(FALSE, nrow(annotations))
+  }
+  origin_safe <- if (has_origin) {
+    annotations$candidate_adduct_origin %in% c("enforced", "preassigned")
+  } else {
+    rep(FALSE, nrow(annotations))
+  }
+  baseline_safe <- if (!is.null(baseline_adduct)) {
+    annotations$adduct == baseline_adduct
+  } else {
+    rep(FALSE, nrow(annotations))
+  }
+
+  out <- annotations |>
+    tidytable::mutate(adduct_state_key = unname(key_lookup[adduct])) |>
+    tidytable::left_join(
+      edge_supported |>
+        tidytable::mutate(edge_supported = TRUE),
+      by = c("feature_id", "adduct_state_key")
+    ) |>
+    tidytable::mutate(
+      edge_supported = tidytable::if_else(
+        is.na(edge_supported),
+        FALSE,
+        edge_supported
+      )
+    ) |>
+    tidytable::group_by(feature_id) |>
+    tidytable::mutate(feature_has_edge_support = any(edge_supported)) |>
+    tidytable::ungroup() |>
+    tidytable::mutate(
+      keep = edge_supported |
+        (!feature_has_edge_support & !(has_source & source == "multi")) |
+        (has_source & source %in% c("loss", "cluster")) |
+        preassigned_safe |
+        origin_safe |
+        baseline_safe |
+        (has_source &
+          source %in%
+            c(
+              "baseline",
+              "preassigned",
+              "preassigned_propagated"
+            ))
+    )
+
+  dropped <- out |> tidytable::filter(!keep)
+  if (nrow(dropped) > 0L) {
+    if ("adduct" %in% colnames(dropped)) {
+      dropped_n <- nrow(dropped |> tidytable::distinct(feature_id, adduct))
+      dropped_bd <- dropped |>
+        tidytable::distinct(feature_id, adduct) |>
+        tidytable::count(adduct, name = "N") |>
+        tidytable::arrange(tidytable::desc(N))
+    } else {
+      dropped_n <- nrow(dropped |> tidytable::distinct(feature_id))
+      dropped_bd <- dropped |>
+        tidytable::count(name = "N")
+    }
+    log_info(
+      paste0(
+        "Annotation/edge adduct agreement removed %d unsupported ",
+        "(feature, adduct) assignment(s)."
+      ),
+      dropped_n
+    )
+    log_info(
+      "\n%s",
+      paste(
+        utils::capture.output(print.data.frame(dropped_bd, row.names = FALSE)),
+        collapse = "\n"
+      )
+    )
+  }
+
+  out |>
+    tidytable::filter(keep) |>
+    tidytable::select(-tidyselect::any_of(c(
+      "adduct_state_key",
+      "edge_supported",
+      "feature_has_edge_support",
+      "keep"
+    )))
+}
+
+#' Build the output edges table from the three edge sets
+#' @keywords internal
+build_output_edges <- function(
+  adduct_edges,
+  loss_edges,
+  cluster_edges,
+  features_table,
+  name_source,
+  name_target
+) {
+  parts <- list()
+  if (nrow(adduct_edges) > 0L) {
+    parts[[length(parts) + 1L]] <- adduct_edges |>
+      tidytable::mutate(label = paste0(adduct, " _ ", adduct_dest)) |>
+      tidytable::select(
+        !!as.name(name_source) := feature_id,
+        !!as.name(name_target) := feature_id_dest,
+        label
+      ) |>
+      tidytable::distinct()
+  }
+  if (nrow(loss_edges) > 0L) {
+    parts[[length(parts) + 1L]] <- loss_edges |>
+      tidytable::mutate(label = paste0(loss, " loss")) |>
+      tidytable::select(
+        # NL convention: precursor (higher mz, feature_id_dest) -> product
+        !!as.name(name_source) := feature_id_dest,
+        !!as.name(name_target) := feature_id,
+        label
+      ) |>
+      tidytable::distinct()
+  }
+  if (nrow(cluster_edges) > 0L) {
+    parts[[length(parts) + 1L]] <- cluster_edges |>
+      tidytable::mutate(label = paste0("+", cluster, " cluster")) |>
+      tidytable::select(
+        # cluster: lower mz -> higher mz (which carries the cluster)
+        !!as.name(name_source) := feature_id,
+        !!as.name(name_target) := feature_id_dest,
+        label
+      ) |>
+      tidytable::distinct()
+  }
+  edges <- if (length(parts) > 0L) {
+    tidytable::bind_rows(parts)
+  } else {
+    tidytable::tidytable(
+      !!as.name(name_source) := character(),
+      !!as.name(name_target) := character(),
+      label = character()
+    )
+  }
+
+  # Self-loops for isolated features so downstream graph processing keeps them
+  isolated <- features_table |>
+    tidytable::filter(
+      !feature_id %in% edges[[name_source]] &
+        !feature_id %in% edges[[name_target]]
+    ) |>
+    tidytable::mutate(!!as.name(name_target) := feature_id) |>
+    tidytable::rename(!!as.name(name_source) := feature_id) |>
+    tidytable::distinct(!!as.name(name_source), !!as.name(name_target))
+
+  tidytable::bind_rows(edges, isolated)
+}
+
+#' Log the consistency-audit attribute attached by
+#' `enforce_graph_adduct_consistency()`.
+#' @keywords internal
+log_consistency_audit <- function(audit) {
+  if (is.null(audit)) {
+    return(invisible(NULL))
+  }
+  log_debug(
+    "Adduct consistency audit: kept=%d, dropped=%d",
+    audit$n_kept,
+    audit$n_dropped
+  )
+  if (
+    !is.null(audit$dropped_reason_counts) &&
+      nrow(audit$dropped_reason_counts) > 0L
+  ) {
+    log_debug(
+      "Dropped edge hypotheses by reason:\n%s",
+      paste(
+        utils::capture.output(
+          print.data.frame(audit$dropped_reason_counts, row.names = FALSE)
+        ),
+        collapse = "\n"
+      )
+    )
+  }
+  invisible(NULL)
+}
+
+# ============================================================
+#                LOWER-LEVEL HELPERS (kept stable
+#               because tests import these by name)
+# ============================================================
+
+#' Build feature pairs inside RT windows.
+#'
+#' For every pair `(src, dest)` of features in the same RT tolerance window
+#' (and same sample), with `mz_dest >= mz_src`, returns `delta = mz_dest -
+#' mz_src` together with `delta_min/delta_max` widened by the ppm tolerance.
 #' @keywords internal
 build_feature_pairs_within_rt <- function(
   df_rt_tol,
@@ -1326,7 +2005,6 @@ build_feature_pairs_within_rt <- function(
       sample
     )
   ]
-
   matches <- dest[
     src,
     on = .(sample, rt_dest >= rt_min, rt_dest <= rt_max),
@@ -1344,13 +2022,11 @@ build_feature_pairs_within_rt <- function(
       adduct_dest
     )
   ]
-
   if (nrow(matches) == 0L) {
     return(tidytable::as_tidytable(matches)[,
       `:=`(delta = numeric(), delta_min = numeric(), delta_max = numeric())
     ])
   }
-
   matches <- unique(matches)
   matches[, delta := mz_dest - mz]
   matches[,
@@ -1359,11 +2035,11 @@ build_feature_pairs_within_rt <- function(
       delta_max = delta + (1E-6 * tolerance_ppm * (mz + mz_dest) / 2)
     )
   ]
-
-  tidytable::as_tidytable(matches)
+  tidytable::as_tidytable(matches) |>
+    tidytable::select(-adduct, -adduct_dest)
 }
 
-#' Build all ordered adduct-pair differences for single-charge adducts
+#' Build all ordered adduct-pair differences for single-charge adducts.
 #' @keywords internal
 build_adduct_pair_differences <- function(
   add_clu_table,
@@ -1374,26 +2050,22 @@ build_adduct_pair_differences <- function(
     tidytable::distinct(adduct, adduct_mass) |>
     tidytable::rename(Group1 = adduct, mass1 = adduct_mass) |>
     tidytable::mutate(join = "x")
-
   add_dest <- add_clu_table |>
     tidytable::distinct(adduct, adduct_mass) |>
     tidytable::rename(Group2 = adduct, mass2 = adduct_mass) |>
     tidytable::mutate(join = "x")
-
   add_src |>
     tidytable::left_join(y = add_dest, by = "join") |>
     tidytable::filter(Group1 != Group2) |>
     tidytable::filter(mass1 < mass2) |>
     tidytable::mutate(Distance = mass2 - mass1) |>
-    ## Keep all adduct mappings with matching deltas; only remove exact
-    ## duplicates from repeated adduct entries.
     tidytable::distinct(Group1, Group2, Distance) |>
-    ## Using max because ppm tolerance tends to be overconfident
     tidytable::filter(Distance >= tolerance_ppm * 1E-6 * max_mz) |>
     tidytable::select(Distance, Group1, Group2)
 }
 
-#' Compute support count for each feature/adduct assignment from adduct edges
+#' Count, for each (feature, adduct), how many distinct neighbours in the
+#' adduct graph independently support that label.
 #' @keywords internal
 compute_feature_adduct_support <- function(df_add) {
   if (nrow(df_add) == 0L) {
@@ -1403,7 +2075,6 @@ compute_feature_adduct_support <- function(df_add) {
       adduct_support = integer()
     ))
   }
-
   tidytable::bind_rows(
     df_add |>
       tidytable::transmute(
@@ -1423,7 +2094,7 @@ compute_feature_adduct_support <- function(df_add) {
     tidytable::mutate(adduct_support = as.integer(adduct_support))
 }
 
-#' Apply optional support-based adduct consistency filtering
+#' Apply optional support-based adduct consistency filtering.
 #' @keywords internal
 apply_adduct_consistency_filter <- function(
   df_add,
@@ -1434,10 +2105,8 @@ apply_adduct_consistency_filter <- function(
   if (nrow(df_add) == 0L || adduct_consistency == "off") {
     return(df_add)
   }
-
   pair_hyp <- df_add |>
     tidytable::count(feature_id, feature_id_dest, name = "pair_hypotheses")
-
   feature_degree <- tidytable::bind_rows(
     df_add |>
       tidytable::transmute(feature_id, neighbor = feature_id_dest),
@@ -1446,21 +2115,18 @@ apply_adduct_consistency_filter <- function(
   ) |>
     tidytable::distinct(feature_id, neighbor) |>
     tidytable::count(feature_id, name = "feature_degree")
-
   support <- compute_feature_adduct_support(df_add)
-
   scored <- df_add |>
     tidytable::left_join(
-      y = pair_hyp,
+      pair_hyp,
       by = c("feature_id", "feature_id_dest")
     ) |>
     tidytable::left_join(
-      y = support |>
-        tidytable::rename(src_support = adduct_support),
+      support |> tidytable::rename(src_support = adduct_support),
       by = c("feature_id", "adduct")
     ) |>
     tidytable::left_join(
-      y = support |>
+      support |>
         tidytable::rename(
           feature_id_dest = feature_id,
           adduct_dest = adduct,
@@ -1469,12 +2135,11 @@ apply_adduct_consistency_filter <- function(
       by = c("feature_id_dest", "adduct_dest")
     ) |>
     tidytable::left_join(
-      y = feature_degree |>
-        tidytable::rename(src_degree = feature_degree),
+      feature_degree |> tidytable::rename(src_degree = feature_degree),
       by = "feature_id"
     ) |>
     tidytable::left_join(
-      y = feature_degree |>
+      feature_degree |>
         tidytable::rename(
           feature_id_dest = feature_id,
           dest_degree = feature_degree
@@ -1508,7 +2173,6 @@ apply_adduct_consistency_filter <- function(
         as.integer(dest_degree)
       )
     )
-
   if (adduct_consistency == "strict") {
     return(
       scored |>
@@ -1518,7 +2182,6 @@ apply_adduct_consistency_filter <- function(
         tidytable::distinct()
     )
   }
-
   scored |>
     tidytable::mutate(
       need_check = pair_hypotheses > 1L |
@@ -1540,21 +2203,18 @@ enforce_graph_adduct_consistency <- function(df_add) {
   if (nrow(df_add) == 0L) {
     return(df_add)
   }
-
   support <- compute_feature_adduct_support(df_add)
   state_map <- build_adduct_state_key_map(unique(c(
     df_add$adduct,
     df_add$adduct_dest
   )))
-
   scored <- df_add |>
     tidytable::left_join(
-      y = support |>
-        tidytable::rename(src_support = adduct_support),
+      support |> tidytable::rename(src_support = adduct_support),
       by = c("feature_id", "adduct")
     ) |>
     tidytable::left_join(
-      y = support |>
+      support |>
         tidytable::rename(
           feature_id_dest = feature_id,
           adduct_dest = adduct,
@@ -1577,17 +2237,16 @@ enforce_graph_adduct_consistency <- function(df_add) {
       edge_complexity = nchar(adduct) + nchar(adduct_dest)
     ) |>
     tidytable::left_join(
-      y = state_map |>
-        tidytable::rename(adduct_state_key = state_key),
-      by = c("adduct")
+      state_map |> tidytable::rename(adduct_state_key = state_key),
+      by = "adduct"
     ) |>
     tidytable::left_join(
-      y = state_map |>
+      state_map |>
         tidytable::rename(
           adduct_dest = adduct,
           adduct_dest_state_key = state_key
         ),
-      by = c("adduct_dest")
+      by = "adduct_dest"
     ) |>
     tidytable::mutate(
       adduct_state_key = tidytable::coalesce(adduct_state_key, adduct),
@@ -1597,7 +2256,6 @@ enforce_graph_adduct_consistency <- function(df_add) {
       )
     )
 
-  # Build connected components on the undirected feature graph.
   undirected <- tidytable::bind_rows(
     scored |>
       tidytable::transmute(src = feature_id, dest = feature_id_dest),
@@ -1610,7 +2268,6 @@ enforce_graph_adduct_consistency <- function(df_add) {
   neighbors <- split(undirected$dest, undirected$src)
   visited <- stats::setNames(rep(FALSE, length(nodes)), nodes)
   components <- list()
-
   for (node in nodes) {
     if (isTRUE(visited[[node]])) {
       next
@@ -1618,17 +2275,14 @@ enforce_graph_adduct_consistency <- function(df_add) {
     queue <- c(node)
     visited[[node]] <- TRUE
     comp_nodes <- character()
-
     while (length(queue) > 0L) {
       current <- queue[[1L]]
       queue <- queue[-1L]
       comp_nodes <- c(comp_nodes, current)
-
       next_nodes <- neighbors[[current]]
       if (is.null(next_nodes)) {
         next
       }
-
       for (nxt in next_nodes) {
         if (!isTRUE(visited[[nxt]])) {
           visited[[nxt]] <- TRUE
@@ -1636,23 +2290,19 @@ enforce_graph_adduct_consistency <- function(df_add) {
         }
       }
     }
-
     components[[length(components) + 1L]] <- unique(comp_nodes)
   }
 
   component_results <- vector("list", length(components))
-
   for (ci in seq_along(components)) {
     comp_nodes <- components[[ci]]
     sub <- scored |>
       tidytable::filter(
         feature_id %in% comp_nodes & feature_id_dest %in% comp_nodes
       )
-
     if (nrow(sub) == 0L) {
       next
     }
-
     node_candidates <- tidytable::bind_rows(
       sub |>
         tidytable::transmute(
@@ -1666,7 +2316,6 @@ enforce_graph_adduct_consistency <- function(df_add) {
         )
     ) |>
       tidytable::distinct()
-
     node_priors <- tidytable::bind_rows(
       sub |>
         tidytable::transmute(
@@ -1682,14 +2331,11 @@ enforce_graph_adduct_consistency <- function(df_add) {
         )
     ) |>
       tidytable::summarize(prior = sum(prior), .by = c(feature, state_key))
-
     assignments <- node_priors |>
       tidytable::arrange(feature, tidytable::desc(prior), nchar(state_key)) |>
       tidytable::distinct(feature, .keep_all = TRUE) |>
       tidytable::select(feature, state_key)
-
     assign_map <- stats::setNames(assignments$state_key, assignments$feature)
-
     max_iter <- 20L
     for (iter in seq_len(max_iter)) {
       changed <- FALSE
@@ -1700,7 +2346,6 @@ enforce_graph_adduct_consistency <- function(df_add) {
         if (length(candidates_f) <= 1L) {
           next
         }
-
         cand_scores <- rep(0, length(candidates_f))
         for (k in seq_along(candidates_f)) {
           cand <- candidates_f[[k]]
@@ -1715,7 +2360,6 @@ enforce_graph_adduct_consistency <- function(df_add) {
                 ]
               )
           }
-
           contrib_dest <- sub |>
             tidytable::filter(
               feature_id_dest == f,
@@ -1730,7 +2374,6 @@ enforce_graph_adduct_consistency <- function(df_add) {
                 ]
               )
           }
-
           prior_val <- node_priors |>
             tidytable::filter(feature == f, state_key == cand) |>
             tidytable::pull(prior)
@@ -1738,25 +2381,19 @@ enforce_graph_adduct_consistency <- function(df_add) {
             cand_scores[[k]] <- cand_scores[[k]] + (0.01 * prior_val[[1L]])
           }
         }
-
         best_idx <- which(cand_scores == max(cand_scores))
         if (length(best_idx) > 1L) {
           lens <- nchar(candidates_f[best_idx])
           best_idx <- best_idx[which.min(lens)]
         }
         best_cand <- candidates_f[[best_idx[[1L]]]]
-
         if (!identical(assign_map[[f]], best_cand)) {
           assign_map[[f]] <- best_cand
           changed <- TRUE
         }
       }
-
-      if (!changed) {
-        break
-      }
+      if (!changed) break
     }
-
     kept <- sub |>
       tidytable::filter(
         adduct_state_key == unname(assign_map[feature_id]) &
@@ -1769,15 +2406,12 @@ enforce_graph_adduct_consistency <- function(df_add) {
         edge_complexity
       ) |>
       tidytable::distinct(feature_id, feature_id_dest, .keep_all = TRUE)
-
     component_results[[ci]] <- kept
   }
-
   kept_all <- tidytable::bind_rows(component_results) |>
     tidytable::select(feature_id, adduct, adduct_dest, feature_id_dest) |>
     tidytable::distinct()
 
-  # Build lightweight diagnostics of which hypotheses were removed and why.
   scored_min <- scored |>
     tidytable::select(
       feature_id,
@@ -1788,13 +2422,11 @@ enforce_graph_adduct_consistency <- function(df_add) {
       edge_complexity
     ) |>
     tidytable::distinct()
-
   dropped <- scored_min |>
     tidytable::anti_join(
       kept_all,
       by = c("feature_id", "adduct", "adduct_dest", "feature_id_dest")
     )
-
   if (nrow(dropped) > 0L) {
     pair_best <- scored_min |>
       tidytable::arrange(
@@ -1810,7 +2442,6 @@ enforce_graph_adduct_consistency <- function(df_add) {
         best_adduct = adduct,
         best_adduct_dest = adduct_dest
       )
-
     dropped <- dropped |>
       tidytable::left_join(
         pair_best,
@@ -1824,7 +2455,6 @@ enforce_graph_adduct_consistency <- function(df_add) {
         )
       )
   }
-
   dropped_reason_counts <- if (nrow(dropped) > 0L) {
     dropped |>
       tidytable::count(drop_reason, name = "n") |>
@@ -1832,14 +2462,12 @@ enforce_graph_adduct_consistency <- function(df_add) {
   } else {
     tidytable::tidytable(drop_reason = character(), n = integer())
   }
-
   attr(kept_all, "consistency_audit") <- list(
     n_input = nrow(scored_min),
     n_kept = nrow(kept_all),
     n_dropped = nrow(dropped),
     dropped_reason_counts = dropped_reason_counts
   )
-
   kept_all
 }
 
@@ -1851,20 +2479,24 @@ build_adduct_state_key_map <- function(adducts) {
   if (length(adducts) == 0L) {
     return(tidytable::tidytable(adduct = character(), state_key = character()))
   }
-
   state_key <- vapply(
     X = adducts,
     FUN = adduct_to_state_key,
     FUN.VALUE = character(1)
   )
-
   tidytable::tidytable(adduct = adducts, state_key = state_key)
 }
 
 #' Convert adduct notation to a canonical state key
 #' @keywords internal
 adduct_to_state_key <- function(adduct) {
-  parsed <- tryCatch(parse_adduct(adduct), error = function(e) NULL)
+  parsed <- tryCatch(
+    parse_adduct(adduct),
+    error = function(.err) {
+      invisible(.err)
+      NULL
+    }
+  )
   if (!is.null(parsed) && !is_parse_failed(parsed)) {
     return(sprintf(
       "z:%d|m:%d|i:%d|d:%.6f",
@@ -1874,14 +2506,10 @@ adduct_to_state_key <- function(adduct) {
       parsed[["los_add_clu"]]
     ))
   }
-
-  # Fallback for rare non-standard notations: sum +/- mass terms so textual
-  # reordering (e.g. +H2O-H2O+H4N variants) does not create fake conflicts.
   mod_mass <- calculate_net_mod_mass_from_text(adduct)
   if (is.finite(mod_mass)) {
     return(paste0("fallback-d:", sprintf("%.6f", mod_mass)))
   }
-
   paste0("raw:", adduct)
 }
 
@@ -1892,23 +2520,18 @@ calculate_net_mod_mass_from_text <- function(adduct) {
   if (is.na(adduct) || !nzchar(adduct)) {
     return(NA_real_)
   }
-
   inner <- sub("^\\[(.*)\\][0-9]*[+-]+$", "\\1", adduct, perl = TRUE)
   if (!nzchar(inner) || identical(inner, adduct)) {
     return(NA_real_)
   }
-
-  # Drop leading multimer/isotope M token, keep only +/- formula modifications.
   mods <- sub("^[0-9]*M[0-9]*", "", inner, perl = TRUE)
   if (!nzchar(mods)) {
     return(0)
   }
-
   tokens <- regmatches(mods, gregexpr("[+-][^+-]+", mods, perl = TRUE))[[1L]]
   if (length(tokens) == 0L) {
     return(NA_real_)
   }
-
   total <- 0
   for (tok in tokens) {
     sign <- if (startsWith(tok, "+")) 1 else -1
@@ -1923,14 +2546,12 @@ calculate_net_mod_mass_from_text <- function(adduct) {
     if (!nzchar(formula)) {
       return(NA_real_)
     }
-
     mass <- suppressWarnings(MetaboCoreUtils::calculateMass(formula))
     if (!is.finite(mass)) {
       return(NA_real_)
     }
     total <- total + (sign * coef * mass)
   }
-
   total
 }
 
@@ -1940,9 +2561,7 @@ join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
   cd_src <- tidytable::as_tidytable(df_couples_diff)[,
     .(
       src_feature_id = feature_id,
-      src_adduct = adduct,
       src_feature_id_dest = feature_id_dest,
-      src_adduct_dest = adduct_dest,
       delta_min,
       delta_max
     )
@@ -1951,7 +2570,6 @@ join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
     !is.na(loss),
     .(loss, loss_mass = mass, loss_mass_keep = mass)
   ]
-
   nl_win[
     cd_src,
     on = .(loss_mass >= delta_min, loss_mass <= delta_max),
@@ -1960,18 +2578,17 @@ join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
   ][,
     .(
       feature_id = src_feature_id,
-      adduct = src_adduct,
       loss,
       mass = loss_mass_keep,
-      feature_id_dest = src_feature_id_dest,
-      adduct_dest = src_adduct_dest
+      feature_id_dest = src_feature_id_dest
     )
   ] |>
     unique() |>
     tidytable::as_tidytable()
 }
 
-#' Join multi-adduct candidates with add/loss inferred masses
+#' Join multi-adduct candidates with add/loss inferred masses (kept for
+#' backward compatibility with downstream callers and tests).
 #' @keywords internal
 join_multi_with_addlossed <- function(df_multi, df_addlossed_rdy) {
   multi_src <- tidytable::as_tidytable(df_multi)[,
@@ -1994,7 +2611,6 @@ join_multi_with_addlossed <- function(df_multi, df_addlossed_rdy) {
       mass_obs_keep = mass
     )
   ]
-
   addloss_win[
     multi_src,
     on = .(

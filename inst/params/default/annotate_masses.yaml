@@ -126,13 +126,13 @@ ms:
     #' List of clusters to be used in positive. STRING
     pos:
       # - "H2O" # (water)
-      # - CH4O # (methanol)
+      # - "CH4O" # (methanol)
       - "C2H3N" # (acetonitrile)
-      # - C2H7N # (ethylamine)
-      # - C2H6O # (ethanol)
+      - "C2H7N" # (ethylamine)
+      # - "C2H6O" # (ethanol)
       - "NaCl" # (sodium chloride)
-      # - C3H8O # (isopropanol)
-      # - C2H6OS # (dmso)
+      # - "C3H8O" # (isopropanol)
+      - "C2H6OS" # (dmso)
 
   #' List of neutral losses to be used. STRING
   neutral_losses:

@@ -524,10 +524,18 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
     colClasses = "character"
   )
 
-  # Verify only one match within 5 ppm tolerance
-  # 199.091500 is 0.000675 Da away (within 5 ppm of 199.092175)
-  # 199.094000 is 0.001825 Da away (outside 5 ppm tolerance)
-  expect_equal(nrow(annotations_tight), 1L)
+  # New behaviour: adduct hypotheses are kept even when no library structure
+  # matches. So we filter on actual library hits (= rows with a structure).
+  library_hits <- annotations_tight |>
+    tidytable::filter(
+      !is.na(candidate_structure_inchikey_connectivity_layer) &
+        nzchar(candidate_structure_inchikey_connectivity_layer)
+    )
+
+  # Verify only one structural match within 5 ppm tolerance
+  # 199.092500 is 0.000224 Da away (within 5 ppm of implied M)
+  # 199.095000 is 0.002276 Da away (outside 5 ppm tolerance)
+  expect_equal(nrow(library_hits), 1L)
 })
 
 ## Isotopologues ----
@@ -616,6 +624,39 @@ test_that("join_couples_with_neutral_losses preserves neutral-loss mass values",
   expect_equal(out$mass[[1L]], 18.010565, tolerance = 1e-8)
 })
 
+test_that("annotate_masses keeps neutral-loss edges even when adduct-pair edge exists", {
+  local_quiet_logging()
+
+  env <- prepare_annotation_fixture_env(
+    feature_fixture = "features_overlap_adduct_nh3.csv",
+    library_fixture = "library_overlap_adduct_nh3.csv"
+  )
+
+  withr::local_dir(new = env$dirs$root)
+
+  result <- annotate_masses(
+    features = env$features,
+    library = env$library,
+    str_stereo = env$str_stereo,
+    str_met = env$str_met,
+    str_tax_cla = env$str_tax_cla,
+    str_tax_npc = env$str_tax_npc,
+    adducts_list = list(pos = c("[M+H]+", "[M+NH4]+"), neg = c("[M-H]-")),
+    clusters_list = list(pos = c("[M]"), neg = c("[M]")),
+    neutral_losses_list = c("NH3"),
+    ms_mode = "pos",
+    tolerance_ppm = 10,
+    tolerance_rt = 0.02,
+    output_annotations = env$output_annotations,
+    output_edges = env$output_edges
+  )
+
+  edges <- tidytable::fread(result[["edges"]], colClasses = "character")
+
+  expect_true(any(edges$label == "[M+H]+ _ [M+H4N]+"))
+  expect_true(any(edges$label == "NH3 loss"))
+})
+
 test_that("join_multi_with_addlossed preserves observed matched mass", {
   df_multi <- tidytable::tidytable(
     feature_id = "F1",
@@ -660,6 +701,333 @@ test_that("build_adduct_pair_differences preserves multiple adduct mappings for 
   expect_equal(nrow(delta_10), 2L)
   expect_true(any(delta_10$Group1 == "A" & delta_10$Group2 == "B"))
   expect_true(any(delta_10$Group1 == "B" & delta_10$Group2 == "C"))
+})
+
+test_that("canonicalize_adduct_notation keeps carrier terms last", {
+  out <- canonicalize_adduct_notation("[M+H+H2O]+")
+  expect_equal(out, "[M+H2O+H]+")
+})
+
+test_that("propagate_preassigned_over_adduct_edges propagates in both directions", {
+  adduct_edges <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M+H]+", "[M+Na]+"),
+    adduct_dest = c("[M+Na]+", "[M+K]+"),
+    feature_id_dest = c("F2", "F3")
+  )
+  preassigned <- tidytable::tidytable(
+    feature_id = c("F1", "F3"),
+    adduct = c("[M+H]+", "[M+K]+")
+  )
+
+  out <- propagate_preassigned_over_adduct_edges(adduct_edges, preassigned)
+
+  expect_true(any(out$feature_id == "F2" & out$adduct == "[M+Na]+"))
+  expect_equal(
+    nrow(out |> tidytable::filter(feature_id == "F2", adduct == "[M+Na]+")),
+    1L
+  )
+})
+
+test_that("extract_preassigned_adducts accepts upstream candidate_adduct values", {
+  features_table <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_adduct = c("[M+H]+", NA_character_)
+  )
+
+  out <- extract_preassigned_adducts(features_table)
+
+  expect_true(any(out$feature_id == "F1" & out$adduct == "[M+H]+"))
+})
+
+test_that("extract_preassigned_adducts expands multi-valued adduct cells", {
+  features_table <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_adduct = c("[M+H]+|[M+Na]+", "[M+K]+/[M+H]+"),
+    adduct = c(NA_character_, NA_character_)
+  )
+
+  out <- extract_preassigned_adducts(features_table)
+
+  f1 <- out |> tidytable::filter(feature_id == "F1")
+  f2 <- out |> tidytable::filter(feature_id == "F2")
+  expect_true("[M+H]+" %in% f1$adduct)
+  expect_true("[M+Na]+" %in% f1$adduct)
+  expect_true("[M+K]+" %in% f2$adduct)
+  expect_true("[M+H]+" %in% f2$adduct)
+})
+
+test_that("dedupe_node_hypotheses keeps preassigned provenance even if pair source wins", {
+  hyps <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    adduct = c("[M+H]+", "[M+H]+"),
+    source = c("pair", "preassigned"),
+    is_preassigned = c(FALSE, TRUE),
+    adduct_support = c(2L, 0L)
+  )
+
+  out <- dedupe_node_hypotheses(hyps)
+
+  expect_equal(nrow(out), 1L)
+  expect_true(isTRUE(out$is_preassigned[[1L]]))
+  expect_equal(out$source[[1L]], "pair")
+})
+
+test_that("prune_candidates_by_network_consensus keeps rows flagged as preassigned", {
+  matched <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    rt = c(1, 1),
+    mz = c(100, 100),
+    adduct = c("[M+H]+", "[M+Na]+"),
+    mass = c(99, 99),
+    source = c("pair", "pair"),
+    is_preassigned = c(TRUE, FALSE),
+    adduct_support = c(0L, 0L),
+    structure_exact_mass = c(99, 99),
+    error_mz = c(0, 0)
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M+Na]+",
+    adduct_dest = "[M+K]+",
+    feature_id_dest = "F2"
+  )
+
+  out <- prune_candidates_by_network_consensus(
+    matched = matched,
+    adduct_edges = adduct_edges,
+    baseline_adduct = "[M+H]+"
+  )
+
+  expect_true(any(out$adduct == "[M+H]+"))
+  expect_true(any(out$adduct == "[M+Na]+"))
+})
+
+test_that("prune_candidates_by_network_consensus matches support by adduct state key", {
+  matched <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    rt = c(1, 1),
+    mz = c(100, 100),
+    adduct = c("[M+H+H2O]+", "[M+K]+"),
+    mass = c(99, 99),
+    source = c("pair", "pair"),
+    is_preassigned = c(FALSE, FALSE),
+    adduct_support = c(0L, 0L),
+    structure_exact_mass = c(99, 99),
+    error_mz = c(0, 0)
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M+H2O+H]+",
+    adduct_dest = "[M+Na]+",
+    feature_id_dest = "F2"
+  )
+
+  out <- prune_candidates_by_network_consensus(
+    matched = matched,
+    adduct_edges = adduct_edges,
+    baseline_adduct = "[M+H]+"
+  )
+
+  expect_true(any(out$adduct == "[M+H+H2O]+"))
+  expect_false(any(out$adduct == "[M+K]+"))
+})
+
+test_that("enforce_annotation_edge_adduct_agreement keeps enforced-origin rows", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M+H]+", "[2M+Fe]2+"),
+    candidate_adduct_origin = c("enforced", "supported"),
+    source = c("baseline", "multi")
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = character(),
+    adduct = character(),
+    adduct_dest = character(),
+    feature_id_dest = character()
+  )
+
+  out <- enforce_annotation_edge_adduct_agreement(
+    annotations = annotations,
+    adduct_edges = adduct_edges,
+    baseline_adduct = "[M+H]+"
+  )
+
+  expect_true(any(out$feature_id == "F1" & out$adduct == "[M+H]+"))
+  expect_false(any(out$feature_id == "F2" & out$adduct == "[2M+Fe]2+"))
+})
+
+test_that("enforce_annotation_edge_adduct_agreement keeps preassigned-origin rows", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M+H]+", "[2M+Fe]2+"),
+    candidate_adduct_origin = c("preassigned", "supported"),
+    source = c("preassigned", "multi")
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = character(),
+    adduct = character(),
+    adduct_dest = character(),
+    feature_id_dest = character()
+  )
+
+  out <- enforce_annotation_edge_adduct_agreement(
+    annotations = annotations,
+    adduct_edges = adduct_edges,
+    baseline_adduct = "[M+H]+"
+  )
+
+  expect_true(any(out$feature_id == "F1" & out$adduct == "[M+H]+"))
+  expect_false(any(out$feature_id == "F2" & out$adduct == "[2M+Fe]2+"))
+})
+
+test_that("enforce_annotation_edge_adduct_agreement keeps edge-supported and safe adducts", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F3", "F4"),
+    adduct = c("[M+H]+", "[M+Na]+", "[2M+Fe]2+", "[M+K]+"),
+    source = c("pair", "baseline", "multi", "preassigned")
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M+H]+",
+    adduct_dest = "[M+Na]+",
+    feature_id_dest = "F5"
+  )
+
+  out <- enforce_annotation_edge_adduct_agreement(
+    annotations = annotations,
+    adduct_edges = adduct_edges,
+    baseline_adduct = "[M+H]+"
+  )
+
+  expect_true(any(out$feature_id == "F1" & out$adduct == "[M+H]+"))
+  expect_true(any(out$feature_id == "F2" & out$adduct == "[M+Na]+"))
+  expect_true(any(out$feature_id == "F4" & out$adduct == "[M+K]+"))
+  expect_false(any(out$feature_id == "F3" & out$adduct == "[2M+Fe]2+"))
+})
+
+test_that("enforce_annotation_edge_adduct_agreement matches equivalent adduct orderings", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M+H+H2O]+", "[2M+Fe]2+"),
+    source = c("pair", "multi")
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M+H2O+H]+",
+    adduct_dest = "[M+Na]+",
+    feature_id_dest = "F9"
+  )
+
+  out <- enforce_annotation_edge_adduct_agreement(
+    annotations = annotations,
+    adduct_edges = adduct_edges,
+    baseline_adduct = "[M+H]+"
+  )
+
+  expect_true(any(out$feature_id == "F1" & out$adduct == "[M+H+H2O]+"))
+  expect_false(any(out$feature_id == "F2" & out$adduct == "[2M+Fe]2+"))
+})
+
+test_that("enforce_annotation_edge_adduct_agreement keeps neutral-loss-derived adducts", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M-C6H10O5+H]+", "[2M+Fe]2+"),
+    source = c("loss", "multi")
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = character(),
+    adduct = character(),
+    adduct_dest = character(),
+    feature_id_dest = character()
+  )
+
+  out <- enforce_annotation_edge_adduct_agreement(
+    annotations = annotations,
+    adduct_edges = adduct_edges,
+    baseline_adduct = "[M+H]+"
+  )
+
+  expect_true(any(out$feature_id == "F1" & out$adduct == "[M-C6H10O5+H]+"))
+  expect_false(any(out$feature_id == "F2" & out$adduct == "[2M+Fe]2+"))
+})
+
+test_that("enforce_annotation_edge_adduct_agreement keeps candidates when feature has no edge support", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    adduct = c("[M+Na]+", "[M+K]+"),
+    source = c("pair", "pair")
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = character(),
+    adduct = character(),
+    adduct_dest = character(),
+    feature_id_dest = character()
+  )
+
+  out <- enforce_annotation_edge_adduct_agreement(
+    annotations = annotations,
+    adduct_edges = adduct_edges,
+    baseline_adduct = "[M+H]+"
+  )
+
+  expect_equal(nrow(out), 2L)
+  expect_true("[M+Na]+" %in% out$adduct)
+  expect_true("[M+K]+" %in% out$adduct)
+})
+
+test_that("enforce_loss_formula_compatibility demotes incompatible loss-based structural matches", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M-C6H10O5+H]+", "[M-H2O+H]+"),
+    candidate_structure_molecular_formula = c("C5H12O6", "C10H20O5"),
+    candidate_structure_error_mz = c("0.001", "0.002"),
+    candidate_structure_name = c("hexose", "hydrated"),
+    candidate_library = c("TIMA MS1", "TIMA MS1"),
+    source = c("loss", "loss"),
+    loss_term = c("C6H10O5", "H2O")
+  )
+
+  out <- enforce_loss_formula_compatibility(annotations)
+
+  row_f1 <- out |> tidytable::filter(feature_id == "F1")
+  row_f2 <- out |> tidytable::filter(feature_id == "F2")
+  expect_true(is.na(row_f1$candidate_structure_error_mz[[1L]]))
+  expect_true(is.na(row_f1$candidate_structure_name[[1L]]))
+  expect_true(is.na(row_f1$candidate_library[[1L]]))
+  expect_false(is.na(row_f2$candidate_structure_error_mz[[1L]]))
+})
+
+test_that("enforce_loss_formula_compatibility keeps rows when formula is unavailable", {
+  annotations <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M-H2O+H]+",
+    candidate_structure_molecular_formula = NA_character_,
+    candidate_structure_error_mz = "0.001",
+    candidate_structure_name = "unknown_formula",
+    candidate_library = "TIMA MS1",
+    source = "loss",
+    loss_term = "H2O"
+  )
+
+  out <- enforce_loss_formula_compatibility(annotations)
+
+  expect_false(is.na(out$candidate_structure_error_mz[[1L]]))
+  expect_false(is.na(out$candidate_structure_name[[1L]]))
+  expect_false(is.na(out$candidate_library[[1L]]))
+})
+
+test_that("loss_term_atom_requirements extracts multiplicities correctly", {
+  req <- loss_term_atom_requirements("2H2O")
+  expect_equal(unname(req["H"]), 4L)
+  expect_equal(unname(req["O"]), 2L)
+})
+
+test_that("adduct_loss_atom_requirements remains a backwards-compatible alias", {
+  req <- adduct_loss_atom_requirements("[M-C6H10O5+H]+")
+  expect_equal(unname(req["C"]), 6L)
+  expect_equal(unname(req["H"]), 10L)
+  expect_equal(unname(req["O"]), 5L)
 })
 
 test_that("apply_adduct_consistency_filter keeps sparse single-hypothesis edges in conditional mode", {

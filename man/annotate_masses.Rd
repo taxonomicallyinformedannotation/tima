@@ -77,36 +77,56 @@ for an adduct assignment in consistency-filtered regions}
 graph degree at which support filtering is activated}
 }
 \value{
-The path to the files containing MS1 annotations and edges
+Named character of paths to the annotations and edges files.
 }
 \description{
-This function annotates a feature table based on exact mass
-match. It requires a structural library, its metadata, and lists of adducts,
-clusters, and neutral losses to be considered. The polarity has to be \code{pos}
-or \code{neg} and retention time and mass tolerances should be given. The feature
-table is expected to be pre-formatted.
+Mass-based MS1 annotation. The pipeline is a sequence of
+clearly-bounded steps; each step is documented inline. In short:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{1. **Pairs in RT windows.** For every feature, find all other features
+   in the same RT tolerance window (per sample) and compute the m/z
+   delta. The pair is always oriented `(lower_mz, higher_mz)` so that
+   `delta = mz_higher - mz_lower >= 0`.
+
+2. **Adduct edges.** Match each pair's `delta` against the table of
+   precomputed pairwise differences between known mode-specific
+   adducts. A match labels the edge `adduct_low _ adduct_high` and
+   tentatively assigns the corresponding adduct to each endpoint.
+
+3. **Cluster edges.** Match `delta` against cluster masses (e.g. ACN,
+   MeOH, Na). A cluster adds mass to the *higher* m/z peak, so the
+   cluster suffix `+<cluster>` is attached to the **dest** node's
+   adduct hypotheses.
+
+4. **Neutral-loss edges.** Match `delta` against neutral-loss masses
+   (e.g. H2O, CO2). For an NL pair, the **higher** m/z peak is the
+   precursor and the **lower** m/z peak is the product. The loss
+   suffix `-<loss>` is attached to the precursor's adduct hypotheses
+   (so the same neutral M is inferred from both peaks).
+
+5. **Node hypotheses.** Gather, per feature, **all** plausible adduct
+   labels: (a) what we inferred from adduct/cluster/loss edges, (b)
+   any adduct supplied upstream by the preprocessing tool, and
+   (c) the universal baseline `[M+H]+` / `[M-H]-`. Hypotheses are
+   never dropped at this stage.
+
+6. **Library match.** For every `(feature, candidate_adduct)` pair,
+   compute the implied neutral mass M and look it up in the library
+   within the ppm tolerance.
+
+7. **Network-consensus pruning.** If a feature ends up with several
+   library hits, drop only the candidates whose adduct has *zero*
+   support in the adduct edge graph **and** whose drop still leaves a
+   supported alternative. Ties are kept and drops are logged.
+
+8. **Keep unmatched adducts.** Adduct hypotheses are exported even
+   when no library structure matches, so downstream tools still see
+   the adduct annotation.
+}\if{html}{\out{</div>}}
 }
 \examples{
 \dontrun{
-copy_backbone()
-go_to_cache()
-github <- "https://raw.githubusercontent.com/"
-repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
-data_interim <- "data/interim/"
-dir <- paste0(github, repo)
-dir <- paste0(dir, data_interim)
-dir_sop_mer <- paste0(dir, "libraries/sop/merged/")
-dir_str <- paste0(dir_sop_mer, "structures/")
-dir_tax <- paste0(dir_str, "taxonomies/")
-annotate_masses(
-  features = paste0(dir, "features/example_features.tsv"),
-  library = paste0(dir_sop_mer, "keys.tsv"),
-  str_stereo = paste0(dir_str, "stereo.tsv"),
-  str_met = paste0(dir_str, "metadata.tsv"),
-  str_tax_cla = paste0(dir_tax, "classyfire.tsv"),
-  str_tax_npc = paste0(dir_tax, "npc.tsv")
-)
-unlink("data", recursive = TRUE)
+annotate_masses()
 }
 }
 \seealso{
