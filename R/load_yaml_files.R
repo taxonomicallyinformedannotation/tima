@@ -24,22 +24,31 @@
 #' param_names <- params$yaml_names
 #' }
 load_yaml_files <- function() {
+  paths <- get_default_paths()
+  load_yaml_files_from_paths(paths = paths)
+}
+
+#' @keywords internal
+load_yaml_files_from_paths <- function(
+  paths,
+  path_resolver = get_path,
+  list_files_fn = list.files,
+  read_yaml_fn = yaml::read_yaml
+) {
   # Get Paths and List Files ----
 
-  paths <- get_default_paths()
-
   # Resolve paths using get_path() to handle inst/ prefix properly
-  default_path <- get_path(paths$params$default$path)
-  user_path <- get_path(paths$params$user$path)
+  default_path <- path_resolver(paths$params$default$path)
+  user_path <- path_resolver(paths$params$user$path)
 
   # Get file lists once for efficiency
-  default_files <- list.files(
+  default_files <- list_files_fn(
     path = default_path,
     pattern = "\\.yaml$",
     full.names = TRUE
   )
 
-  user_files <- list.files(
+  user_files <- list_files_fn(
     path = user_path,
     pattern = "\\.yaml$",
     full.names = TRUE
@@ -63,8 +72,8 @@ load_yaml_files <- function() {
   # Combine with prepare_params files (also need to resolve these paths)
   yaml_files <- c(
     param_files,
-    get_path(paths$params$prepare_params),
-    get_path(paths$params$prepare_params_advanced)
+    path_resolver(paths$params$prepare_params),
+    path_resolver(paths$params$prepare_params_advanced)
   )
 
   # Extract clean parameter names from file paths
@@ -81,7 +90,7 @@ load_yaml_files <- function() {
   # Load all YAML files with error handling
   yamls_parsed <- tryCatch(
     {
-      purrr::map(.x = yaml_files, .f = yaml::read_yaml)
+      purrr::map(.x = yaml_files, .f = read_yaml_fn)
     },
     error = function(e) {
       cli::cli_abort(
