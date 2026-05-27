@@ -174,12 +174,12 @@ test_that("copy_backbone integrates with get_default_paths", {
   copy_backbone(cache_dir = cache_path)
 
   # Should be able to get paths after copying backbone
-  expect_no_error(paths <- get_default_paths())
+  paths <- get_default_paths()
 })
 
 test_that("copy_backbone supports local_test_project workflow", {
   # This tests the integration used throughout the test suite
-  expect_no_error(paths <- local_test_project(copy = TRUE))
+  paths <- local_test_project(copy = TRUE)
 
   expect_type(paths, "list")
 })

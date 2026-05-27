@@ -121,8 +121,10 @@ test_that("summarize_results rejects non-logical summarize", {
 
 test_that("summarize_results warns and returns empty df with tag column on empty input", {
   d <- make_sop_df()
+  empty_input <- d
+  empty_input$df <- empty_input$df[0L, ]
   expect_warning(
-    out <- call_sr(d |> within(df <- df[0L, ])),
+    out <- call_sr(empty_input),
     "Empty results"
   )
   expect_equal(nrow(out), 0L)
@@ -155,7 +157,7 @@ test_that("summarize_results works when SOP has no tag column", {
 test_that("summarize_results works when SOP has no reference_doi column", {
   d <- make_sop_df()
   d$sop$reference_doi <- NULL
-  expect_no_error(out <- call_sr(d))
+  out <- call_sr(d)
   expect_s3_class(out, "data.frame")
 })
 

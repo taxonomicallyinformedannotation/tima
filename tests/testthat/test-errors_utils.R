@@ -23,7 +23,7 @@ test_that("format_error includes expected, received, location when provided", {
 })
 
 test_that("format_error works with only the problem argument", {
-  expect_no_error(msg <- format_error(problem = "Oops"))
+  msg <- format_error(problem = "Oops")
   expect_true(grepl("Oops", msg))
 })
 

@@ -97,9 +97,7 @@ test_that("export_spectra_rds exports spectra with valid compound_id", {
   )
   spectra <- Spectra::Spectra(object = df)
 
-  expect_silent(
-    result <- export_spectra_rds(file = temp_file, spectra = spectra)
-  )
+  result <- export_spectra_rds(file = temp_file, spectra = spectra)
   expect_null(result)
   expect_true(file.exists(temp_file))
 

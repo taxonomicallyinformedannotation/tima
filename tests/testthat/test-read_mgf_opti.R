@@ -108,7 +108,7 @@ test_that("read_mgf_opti handles PEPMASS without intensity column", {
   tf <- write_mgf(minimal_block(pepmass = "123.456"))
   on.exit(unlink(tf))
 
-  expect_no_error(res <- read_mgf_opti(f = tf))
+  res <- read_mgf_opti(f = tf)
   expect_s4_class(res, "DataFrame")
   expect_equal(nrow(res), 1L)
 })

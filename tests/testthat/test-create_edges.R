@@ -242,18 +242,17 @@ test_that("create_edges handles empty spectra", {
   )
   precs <- c(100, 100)
 
-  expect_no_error(
-    result <- create_edges(
-      frags = frags,
-      nspecs = 2L,
-      precs = precs,
-      method = "cosine",
-      ms2_tolerance = 0.01,
-      ppm_tolerance = 10,
-      threshold = 0.0,
-      matched_peaks = 0L
-    )
+  result <- create_edges(
+    frags = frags,
+    nspecs = 2L,
+    precs = precs,
+    method = "cosine",
+    ms2_tolerance = 0.01,
+    ppm_tolerance = 10,
+    threshold = 0.0,
+    matched_peaks = 0L
   )
+  expect_s3_class(result, "data.frame")
 })
 
 ## Performance & Scalability ----

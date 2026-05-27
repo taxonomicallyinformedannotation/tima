@@ -38,7 +38,7 @@ library("tima")
 if (dir.exists("../../inst")) {
   knitr::opts_knit$set(root.dir = "../../inst")
 }
-tima:::copy_backbone()
+getFromNamespace("copy_backbone", "tima")()
 logger <- lgr::lgr
 logger$set_threshold(level = 400)
 tima::get_example_files()

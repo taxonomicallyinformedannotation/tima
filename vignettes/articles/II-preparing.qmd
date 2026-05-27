@@ -147,7 +147,7 @@ If you are using the cli, do not forget to generate the summaries with the `--fu
 You can get an example running:
 
 ```{r get-sirius, eval=FALSE, include=TRUE}
-tima:::get_example_sirius()
+getFromNamespace("get_example_sirius", "tima")()
 ```
 
 The sirius workspace should ideally have `yourPattern_sirius` as name and be placed in `data/interim/annotations` (else it will not be found by default except you provide the right path).

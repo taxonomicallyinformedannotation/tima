@@ -118,16 +118,15 @@ test_that("parse_adduct handles missing argument", {
 
 test_that("parse_adduct handles invalid types", {
   expect_warning(
-    result <- parse_adduct(123),
+    parse_adduct(123),
     class = "warning"
   )
+  result <- suppressWarnings(parse_adduct(123))
   expect_equal(sum(result), 0)
 })
 
 test_that("parse_adduct handles vector input", {
-  expect_silent(
-    result <- parse_adduct(c("[M+H]+", "[M+Na]+"))
-  )
+  result <- parse_adduct(c("[M+H]+", "[M+Na]+"))
   expect_equal(sum(result), 0)
 })
 

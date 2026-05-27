@@ -36,7 +36,7 @@ test_that("dist_get converts matrix to dist", {
   x <- matrix(c(0, 1, 2, 1, 0, 3, 2, 3, 0), nrow = 3)
 
   # Should work with matrix input (not just dist object)
-  expect_no_error(result <- dist_get(x, 1, 2))
+  result <- dist_get(x, 1, 2)
   expect_equal(result, 1)
 })
 
