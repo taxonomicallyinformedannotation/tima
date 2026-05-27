@@ -15,6 +15,16 @@
 #' * n omitted when n_mer == 1
 #' * |z| omitted when |z| == 1
 #'
+#' @param n_mer Integer multimer count.
+#' @param carriers Named integer vector of carrier counts/signs (e.g. H, Na).
+#' @param clusters Named integer vector of neutral cluster additions.
+#' @param losses Named integer vector of neutral losses.
+#' @param z Integer signed charge.
+#' @param loss_inside_multimer Logical; place losses inside `n(M...)` when TRUE.
+#' @param cluster_inside_multimer Logical; place clusters inside `n(M...)` when TRUE.
+#'
+#' @return Canonical adduct string.
+#'
 #' @export
 adduct_to_string <- function(
   n_mer,

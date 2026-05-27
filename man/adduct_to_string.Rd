@@ -14,6 +14,24 @@ adduct_to_string(
   cluster_inside_multimer = FALSE
 )
 }
+\arguments{
+\item{n_mer}{Integer multimer count.}
+
+\item{carriers}{Named integer vector of carrier counts/signs (e.g. H, Na).}
+
+\item{clusters}{Named integer vector of neutral cluster additions.}
+
+\item{losses}{Named integer vector of neutral losses.}
+
+\item{z}{Integer signed charge.}
+
+\item{loss_inside_multimer}{Logical; place losses inside \code{n(M...)} when TRUE.}
+
+\item{cluster_inside_multimer}{Logical; place clusters inside \code{n(M...)} when TRUE.}
+}
+\value{
+Canonical adduct string.
+}
 \description{
 Format (outside-multimer, default):
 \verb{[<n>M<carriers><+clusters><-losses>]<|z|><sign>}
