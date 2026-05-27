@@ -1046,7 +1046,7 @@ build_annotate_masses_coverage_report <- function(
     )
 
   feature_annotation_counts <- support_ranked |>
-    tidytable::summarize(N_annotations = .N, by = feature_id)
+    tidytable::summarize(N_annotations = .N, .by = feature_id)
 
   best_feature_class <- support_ranked |>
     tidytable::arrange(
@@ -1068,14 +1068,14 @@ build_annotate_masses_coverage_report <- function(
     tidytable::summarize(
       N_features = .N,
       N_annotations = sum(N_annotations, na.rm = TRUE),
-      by = c("coverage_class", "coverage_tier")
+      .by = c(coverage_class, coverage_tier)
     )
 
   any_summary <- support_ranked |>
     tidytable::summarize(
       N_features = tidytable::n_distinct(feature_id),
       N_annotations = .N,
-      by = c("coverage_class", "coverage_tier")
+      .by = c(coverage_class, coverage_tier)
     )
 
   all_features <- tidytable::n_distinct(support_ranked$feature_id)

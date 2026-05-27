@@ -615,7 +615,7 @@ build_evidence_supported_hypotheses <- function(
               (rt - pv) > tolerance_rt
           )
         },
-        by = c("sample", "matched_exact_mass_idx")
+        .by = c(sample, matched_exact_mass_idx)
       ) |>
       tidytable::mutate(
         evidence_cluster = ifelse(
@@ -651,7 +651,7 @@ build_evidence_supported_hypotheses <- function(
           pv <- c(NA_real_, utils::head(rt, -1L))
           cumsum(is.na(pv) | is.na(rt) | (rt - pv) > tolerance_rt)
         },
-        by = c("sample", "mass_cluster")
+        .by = c(sample, mass_cluster)
       ) |>
       tidytable::mutate(
         evidence_cluster = paste(sample, mass_cluster, rt_cluster, sep = "|")
@@ -673,7 +673,10 @@ build_evidence_supported_hypotheses <- function(
   pair_counts <- hyps |>
     tidytable::filter(!is.na(evidence_cluster)) |>
     tidytable::distinct(evidence_cluster, feat_idx) |>
-    tidytable::summarize(n_evidence_features_pair = .N, by = evidence_cluster)
+    tidytable::summarize(
+      n_evidence_features_pair = .N,
+      .by = evidence_cluster
+    )
   hyps <- hyps |>
     tidytable::left_join(pair_counts, by = "evidence_cluster") |>
     tidytable::mutate(
@@ -697,7 +700,7 @@ build_evidence_supported_hypotheses <- function(
     tidytable::summarize(
       cluster_has_core = any(core_v[adduct_idx]),
       cluster_n_adducts = tidytable::n_distinct(adduct_idx),
-      by = evidence_cluster
+      .by = evidence_cluster
     )
   hyps <- hyps |>
     tidytable::left_join(cluster_meta, by = "evidence_cluster") |>
