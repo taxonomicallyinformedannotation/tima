@@ -1172,3 +1172,55 @@ test_that("load_sirius_tables v6 keeps only formulaRank 1 when ranks are charact
   expect_equal(out$canopus$formulaRank[[1L]], "1")
   expect_equal(out$formulas$formulaRank[[1L]], "1")
 })
+
+test_that("read_sirius_internal_file reads from archive stream when available", {
+  local_mocked_bindings(
+    archive_read = function(archive, file) {
+      force(archive)
+      force(file)
+      textConnection("colA\tcolB\n1\tx\n")
+    },
+    .package = "archive"
+  )
+
+  out <- read_sirius_internal_file("dummy.zip", "internal.tsv")
+  expect_true(tidytable::is_tidytable(out))
+  expect_equal(nrow(out), 1L)
+  expect_equal(out$colA[[1L]], "1")
+})
+
+test_that("read_sirius_internal_file falls back to directory path when archive read fails", {
+  local_mocked_bindings(
+    archive_read = function(archive, file) {
+      force(archive)
+      force(file)
+      stop("archive unavailable", call. = FALSE)
+    },
+    .package = "archive"
+  )
+
+  tmp <- temp_test_dir("read_sirius_internal_file_fallback")
+  f <- file.path(tmp, "internal.tsv")
+  writeLines(c("a\tb", "2\ty"), f)
+
+  out <- read_sirius_internal_file(tmp, "internal.tsv")
+  expect_true(tidytable::is_tidytable(out))
+  expect_equal(nrow(out), 1L)
+  expect_equal(out$a[[1L]], "2")
+})
+
+test_that("read_sirius_internal_file returns empty tidytable for missing fallback file", {
+  local_mocked_bindings(
+    archive_read = function(archive, file) {
+      force(archive)
+      force(file)
+      stop("archive unavailable", call. = FALSE)
+    },
+    .package = "archive"
+  )
+
+  tmp <- temp_test_dir("read_sirius_internal_file_missing")
+  out <- read_sirius_internal_file(tmp, "does_not_exist.tsv")
+  expect_true(tidytable::is_tidytable(out))
+  expect_equal(nrow(out), 0L)
+})

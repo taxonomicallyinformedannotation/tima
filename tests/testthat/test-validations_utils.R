@@ -25,6 +25,7 @@ validate_dataframe <- get("validate_dataframe", ns)
 validate_numeric_range <- get("validate_numeric_range", ns)
 validate_weights <- get("validate_weights", ns)
 validate_choice <- get("validate_choice", ns)
+validate_adduct_list <- get("validate_adduct_list", ns)
 validate_character <- get("validate_character", ns)
 validate_logical <- get("validate_logical", ns)
 validate_list_or_vector <- get("validate_list_or_vector", ns)
@@ -47,6 +48,17 @@ test_that("validate_file_existence detects missing and accepts existing files", 
 
     files_missing <- list(a = paths[1], b = tempfile())
     expect_error(validate_file_existence(files_missing), "not found")
+  })
+})
+
+test_that("validate_file_existence respects allow_null for optional files", {
+  with_temp_files(1L, function(paths) {
+    files <- list(required = paths[1], optional = NULL)
+    expect_error(
+      validate_file_existence(files, allow_null = FALSE),
+      "Required file\\(s\\) not found|NULL"
+    )
+    expect_invisible(validate_file_existence(files, allow_null = TRUE))
   })
 })
 
@@ -144,6 +156,54 @@ test_that("validate_choice enforces allowed set", {
     validate_choice("X", c("OR", "AND"), param_name = "condition"),
     "Fix: Choose one of: OR, AND",
     fixed = TRUE
+  )
+})
+
+# validate_adduct_list ----
+test_that("validate_adduct_list supports structured adduct schema", {
+  structured <- list(
+    M = c(1L, 2L),
+    charge_carriers = list(pos = c("H", "Na"), neg = c("H")),
+    charges = list(pos = c(1L), neg = c(-1L))
+  )
+
+  expect_invisible(validate_adduct_list(structured, ms_mode = "pos"))
+})
+
+test_that("validate_adduct_list errors on structured schema missing mode entries", {
+  structured_missing_carriers <- list(
+    M = c(1L),
+    charge_carriers = list(neg = c("H")),
+    charges = list(pos = c(1L), neg = c(-1L))
+  )
+  expect_error(
+    validate_adduct_list(structured_missing_carriers, ms_mode = "pos"),
+    "charge_carriers",
+    class = "tima_validation_error"
+  )
+
+  structured_missing_charges <- list(
+    M = c(1L),
+    charge_carriers = list(pos = c("H"), neg = c("H")),
+    charges = list(neg = c(-1L))
+  )
+  expect_error(
+    validate_adduct_list(structured_missing_charges, ms_mode = "pos"),
+    "\\$charges",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("validate_adduct_list warns when structured schema mode entries are empty", {
+  structured_empty <- list(
+    M = c(1L),
+    charge_carriers = list(pos = character(), neg = c("H")),
+    charges = list(pos = integer(), neg = c(-1L))
+  )
+
+  expect_warning(
+    validate_adduct_list(structured_empty, ms_mode = "pos"),
+    "empty charge_carriers/charges"
   )
 })
 
