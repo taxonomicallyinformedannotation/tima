@@ -169,7 +169,6 @@ annotate_adduct_universe_metadata <- function(universe, polarity) {
   common_clusters <- c("H2O", "C2H3N")
 
   out <- tidytable::as_tidytable(universe)
-  out <- data.table::copy(out)
   carrier_names <- lapply(out$carriers, names)
   loss_names <- lapply(out$losses, names)
   cluster_names <- lapply(out$clusters, names)
@@ -578,7 +577,7 @@ build_evidence_supported_hypotheses <- function(
     return(empty_evidence_table())
   }
 
-  hyps <- data.table::copy(hyps)
+  hyps <- tidytable::as_tidytable(hyps)
   hyps[, `:=`(
     rt = feature_rts[feat_idx],
     sample = feature_samples[feat_idx]
