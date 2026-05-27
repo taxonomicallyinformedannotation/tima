@@ -992,16 +992,16 @@ build_annotate_masses_coverage_report <- function(
 
   support_ranked <- tidytable::as_tidytable(annotations)
   if (!"source" %in% names(support_ranked)) {
-    support_ranked[, source := NA_character_]
+    support_ranked$source <- NA_character_
   }
   if (!"adduct" %in% names(support_ranked)) {
-    support_ranked[, adduct := NA_character_]
+    support_ranked$adduct <- NA_character_
   }
   if (!"candidate_structure_error_mz" %in% names(support_ranked)) {
-    support_ranked[, candidate_structure_error_mz := NA_real_]
+    support_ranked$candidate_structure_error_mz <- NA_real_
   }
   if (!"adduct_support" %in% names(support_ranked)) {
-    support_ranked[, adduct_support := 0L]
+    support_ranked$adduct_support <- 0L
   }
 
   baseline_active <- !is.null(baseline_adduct) &&
@@ -1014,48 +1014,39 @@ build_annotate_masses_coverage_report <- function(
     NA_character_
   }
 
-  support_ranked[, has_structure_match := !is.na(candidate_structure_error_mz)]
-  support_ranked[,
-    has_pairwise_support := source %in%
-      c("pair", "preassigned", "preassigned_propagated")
-  ]
-  support_ranked[,
-    has_modifier_pairwise_support := source %in% c("cluster", "loss")
-  ]
-  support_ranked[, has_multicharge_evidence := source %in% c("multi")]
-  support_ranked[, has_evidence_support := source %in% c("evidence")]
-  support_ranked[,
-    has_baseline_fallback := baseline_active &
-      !is.na(adduct) &
-      adduct == baseline_label
-  ]
-  support_ranked[,
-    coverage_class := tidytable::case_when(
-      has_structure_match ~ "structure_matched",
-      has_pairwise_support ~ "pairwise_supported",
-      has_multicharge_evidence ~ "evidence_multicharge_supported",
-      has_modifier_pairwise_support ~ "modifier_pairwise_supported",
-      has_evidence_support ~ "evidence_supported",
-      has_baseline_fallback ~ "baseline_fallback",
-      TRUE ~ "adduct_only"
+  support_ranked <- support_ranked |>
+    tidytable::mutate(
+      has_structure_match = !is.na(candidate_structure_error_mz),
+      has_pairwise_support = source %in%
+        c("pair", "preassigned", "preassigned_propagated"),
+      has_modifier_pairwise_support = source %in% c("cluster", "loss"),
+      has_multicharge_evidence = source %in% c("multi"),
+      has_evidence_support = source %in% c("evidence"),
+      has_baseline_fallback = baseline_active &
+        !is.na(adduct) &
+        adduct == baseline_label,
+      coverage_class = tidytable::case_when(
+        has_structure_match ~ "structure_matched",
+        has_pairwise_support ~ "pairwise_supported",
+        has_multicharge_evidence ~ "evidence_multicharge_supported",
+        has_modifier_pairwise_support ~ "modifier_pairwise_supported",
+        has_evidence_support ~ "evidence_supported",
+        has_baseline_fallback ~ "baseline_fallback",
+        TRUE ~ "adduct_only"
+      ),
+      coverage_tier = tidytable::case_when(
+        coverage_class == "structure_matched" ~ 1L,
+        coverage_class == "pairwise_supported" ~ 2L,
+        coverage_class == "evidence_multicharge_supported" ~ 3L,
+        coverage_class == "modifier_pairwise_supported" ~ 4L,
+        coverage_class == "evidence_supported" ~ 5L,
+        coverage_class == "baseline_fallback" ~ 6L,
+        TRUE ~ 7L
+      )
     )
-  ]
-  support_ranked[,
-    coverage_tier := tidytable::case_when(
-      coverage_class == "structure_matched" ~ 1L,
-      coverage_class == "pairwise_supported" ~ 2L,
-      coverage_class == "evidence_multicharge_supported" ~ 3L,
-      coverage_class == "modifier_pairwise_supported" ~ 4L,
-      coverage_class == "evidence_supported" ~ 5L,
-      coverage_class == "baseline_fallback" ~ 6L,
-      TRUE ~ 7L
-    )
-  ]
 
-  feature_annotation_counts <- support_ranked[,
-    .(N_annotations = .N),
-    by = feature_id
-  ]
+  feature_annotation_counts <- support_ranked |>
+    tidytable::summarize(N_annotations = .N, by = feature_id)
 
   best_feature_class <- support_ranked |>
     tidytable::arrange(
@@ -1072,25 +1063,20 @@ build_annotate_masses_coverage_report <- function(
     )
   best_feature_class <- best_feature_class[, .SD[1L], by = feature_id]
 
-  best_summary <- best_feature_class[
-    feature_annotation_counts,
-    on = "feature_id"
-  ]
-  best_summary <- best_summary[,
-    .(
+  best_summary <- best_feature_class |>
+    tidytable::left_join(feature_annotation_counts, by = "feature_id") |>
+    tidytable::summarize(
       N_features = .N,
-      N_annotations = sum(N_annotations, na.rm = TRUE)
-    ),
-    by = .(coverage_class, coverage_tier)
-  ]
+      N_annotations = sum(N_annotations, na.rm = TRUE),
+      by = c("coverage_class", "coverage_tier")
+    )
 
-  any_summary <- support_ranked[,
-    .(
+  any_summary <- support_ranked |>
+    tidytable::summarize(
       N_features = tidytable::n_distinct(feature_id),
-      N_annotations = .N
-    ),
-    by = .(coverage_class, coverage_tier)
-  ]
+      N_annotations = .N,
+      by = c("coverage_class", "coverage_tier")
+    )
 
   all_features <- tidytable::n_distinct(support_ranked$feature_id)
   all_annotations <- nrow(support_ranked)
