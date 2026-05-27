@@ -173,48 +173,36 @@ annotate_adduct_universe_metadata <- function(universe, polarity) {
   loss_names <- lapply(out$losses, names)
   cluster_names <- lapply(out$clusters, names)
 
-  out[, n_carrier_terms := lengths(carrier_names)]
-  out[, n_loss_terms := lengths(loss_names)]
-  out[, n_cluster_terms := lengths(cluster_names)]
-  out[, has_cluster := n_cluster_terms > 0L]
-  out[, has_loss := n_loss_terms > 0L]
-  out[,
-    has_only_common_carriers := vapply(
-      X = carrier_names,
-      function(x) {
-        if (length(x) == 0L) {
-          return(TRUE)
-        }
-        all(x %in% common_carriers)
-      },
-      logical(1L)
-    )
-  ]
-  out[,
-    has_only_common_losses := vapply(
-      X = loss_names,
-      function(x) {
-        if (length(x) == 0L) {
-          return(TRUE)
-        }
-        all(x %in% common_losses)
-      },
-      logical(1L)
-    )
-  ]
-  out[,
-    has_only_common_clusters := vapply(
-      X = cluster_names,
-      function(x) {
-        if (length(x) == 0L) {
-          return(TRUE)
-        }
-        all(x %in% common_clusters)
-      },
-      logical(1L)
-    )
-  ]
-  out[, has_exotic_carrier := !has_only_common_carriers]
+  has_only_common_carriers <- vapply(
+    X = carrier_names,
+    FUN = function(x) {
+      if (length(x) == 0L) {
+        return(TRUE)
+      }
+      all(x %in% common_carriers)
+    },
+    FUN.VALUE = logical(1L)
+  )
+  has_only_common_losses <- vapply(
+    X = loss_names,
+    FUN = function(x) {
+      if (length(x) == 0L) {
+        return(TRUE)
+      }
+      all(x %in% common_losses)
+    },
+    FUN.VALUE = logical(1L)
+  )
+  has_only_common_clusters <- vapply(
+    X = cluster_names,
+    FUN = function(x) {
+      if (length(x) == 0L) {
+        return(TRUE)
+      }
+      all(x %in% common_clusters)
+    },
+    FUN.VALUE = logical(1L)
+  )
 
   baseline_name <- switch(
     polarity,
@@ -222,53 +210,60 @@ annotate_adduct_universe_metadata <- function(universe, polarity) {
     neg = "[M-H]-",
     NA_character_
   )
-  out[, is_baseline := adduct == baseline_name]
-
-  out[,
-    adduct_tier := as.integer(
-      ifelse(
-        is_baseline,
-        0L,
+  out <- out |>
+    tidytable::mutate(
+      n_carrier_terms = lengths(carrier_names),
+      n_loss_terms = lengths(loss_names),
+      n_cluster_terms = lengths(cluster_names),
+      has_cluster = n_cluster_terms > 0L,
+      has_loss = n_loss_terms > 0L,
+      has_only_common_carriers = has_only_common_carriers,
+      has_only_common_losses = has_only_common_losses,
+      has_only_common_clusters = has_only_common_clusters,
+      has_exotic_carrier = !has_only_common_carriers,
+      is_baseline = adduct == baseline_name,
+      adduct_tier = as.integer(
         ifelse(
-          !has_loss &
-            !has_cluster &
-            has_only_common_carriers &
-            abs(z) == 1L &
-            n_mer <= 2L,
-          1L,
+          is_baseline,
+          0L,
           ifelse(
-            !has_cluster &
+            !has_loss &
+              !has_cluster &
               has_only_common_carriers &
-              has_only_common_losses &
-              n_loss_terms <= 1L &
-              abs(z) <= 2L &
+              abs(z) == 1L &
               n_mer <= 2L,
-            2L,
+            1L,
             ifelse(
-              !has_exotic_carrier &
-                n_loss_terms <= 2L &
-                n_cluster_terms <= 1L &
+              !has_cluster &
+                has_only_common_carriers &
+                has_only_common_losses &
+                n_loss_terms <= 1L &
                 abs(z) <= 2L &
-                n_mer <= 3L,
-              3L,
-              4L
+                n_mer <= 2L,
+              2L,
+              ifelse(
+                !has_exotic_carrier &
+                  n_loss_terms <= 2L &
+                  n_cluster_terms <= 1L &
+                  abs(z) <= 2L &
+                  n_mer <= 3L,
+                3L,
+                4L
+              )
             )
           )
         )
-      )
+      ),
+      requires_core_support = adduct_tier >= 2L,
+      min_cluster_support = as.integer(
+        ifelse(
+          adduct_tier <= 1L,
+          1L,
+          ifelse(adduct_tier == 2L, 2L, ifelse(adduct_tier == 3L, 3L, 4L))
+        )
+      ),
+      is_core_adduct = adduct_tier <= 1L
     )
-  ]
-  out[, requires_core_support := adduct_tier >= 2L]
-  out[,
-    min_cluster_support := as.integer(
-      ifelse(
-        adduct_tier <= 1L,
-        1L,
-        ifelse(adduct_tier == 2L, 2L, ifelse(adduct_tier == 3L, 3L, 4L))
-      )
-    )
-  ]
-  out[, is_core_adduct := adduct_tier <= 1L]
   out
 }
 
@@ -325,7 +320,7 @@ build_evidence_supported_hypotheses <- function(
 
   uni_dt <- annotate_adduct_universe_metadata(universe, polarity = ms_mode)
   if (!"adduct_mass_per_monomer" %in% colnames(uni_dt)) {
-    uni_dt[, adduct_mass_per_monomer := 0]
+    uni_dt <- uni_dt |> tidytable::mutate(adduct_mass_per_monomer = 0)
   }
   uni_dt <- uni_dt[,
     .(
@@ -577,30 +572,30 @@ build_evidence_supported_hypotheses <- function(
     return(empty_evidence_table())
   }
 
-  hyps <- tidytable::as_tidytable(hyps)
-  hyps[, `:=`(
-    rt = feature_rts[feat_idx],
-    sample = feature_samples[feat_idx]
-  )]
+  hyps <- tidytable::as_tidytable(hyps) |>
+    tidytable::mutate(
+      rt = feature_rts[feat_idx],
+      sample = feature_samples[feat_idx]
+    )
 
   if (use_library_prefilter) {
     t_mc <- Sys.time()
-    hyps[,
-      nearest_mass_error_ppm := .nearest_exact_mass_ppm(
-        implied_M,
-        exact_masses_sorted
+    hyps <- hyps |>
+      tidytable::mutate(
+        nearest_mass_error_ppm = .nearest_exact_mass_ppm(
+          implied_M,
+          exact_masses_sorted
+        ),
+        matched_exact_mass_idx = .nearest_exact_mass_index(
+          implied_M,
+          exact_masses_sorted
+        ),
+        matched_exact_mass_idx = ifelse(
+          nearest_mass_error_ppm > tol_ppm_num,
+          NA_integer_,
+          matched_exact_mass_idx
+        )
       )
-    ]
-    hyps[,
-      matched_exact_mass_idx := .nearest_exact_mass_index(
-        implied_M,
-        exact_masses_sorted
-      )
-    ]
-    hyps[
-      nearest_mass_error_ppm > tol_ppm_num,
-      matched_exact_mass_idx := NA_integer_
-    ]
     log_debug(
       "Exact-mass anchoring: %d matched targets in %.2fs",
       tidytable::n_distinct(stats::na.omit(hyps$matched_exact_mass_idx)),
@@ -609,25 +604,26 @@ build_evidence_supported_hypotheses <- function(
 
     t_rt <- Sys.time()
     hyps <- hyps |> tidytable::arrange(sample, matched_exact_mass_idx, rt)
-    hyps[,
-      rt_cluster := {
-        pv <- c(NA_real_, utils::head(rt, -1L))
-        cumsum(
-          is.na(matched_exact_mass_idx) |
-            is.na(pv) |
-            is.na(rt) |
-            (rt - pv) > tolerance_rt
+    hyps <- hyps |>
+      tidytable::mutate(
+        rt_cluster = {
+          pv <- c(NA_real_, utils::head(rt, -1L))
+          cumsum(
+            is.na(matched_exact_mass_idx) |
+              is.na(pv) |
+              is.na(rt) |
+              (rt - pv) > tolerance_rt
+          )
+        },
+        by = c("sample", "matched_exact_mass_idx")
+      ) |>
+      tidytable::mutate(
+        evidence_cluster = ifelse(
+          is.na(matched_exact_mass_idx),
+          NA_character_,
+          paste(sample, matched_exact_mass_idx, rt_cluster, sep = "|")
         )
-      },
-      by = .(sample, matched_exact_mass_idx)
-    ]
-    hyps[,
-      evidence_cluster := ifelse(
-        is.na(matched_exact_mass_idx),
-        NA_character_,
-        paste(sample, matched_exact_mass_idx, rt_cluster, sep = "|")
       )
-    ]
     log_debug(
       "RT clustering on exact-mass anchors: %d evidence clusters in %.2fs",
       tidytable::n_distinct(stats::na.omit(hyps$evidence_cluster)),
@@ -637,7 +633,8 @@ build_evidence_supported_hypotheses <- function(
     # Fallback without library exact masses: cluster by implied neutral mass.
     t_mc <- Sys.time()
     hyps <- hyps |> tidytable::arrange(implied_M)
-    hyps[, mass_cluster := .ppm_cluster_sorted(implied_M, tolerance_ppm)]
+    hyps <- hyps |>
+      tidytable::mutate(mass_cluster = .ppm_cluster_sorted(implied_M, tolerance_ppm))
     log_debug(
       "Mass clustering: %d clusters in %.2fs",
       tidytable::n_distinct(hyps$mass_cluster),
@@ -646,16 +643,17 @@ build_evidence_supported_hypotheses <- function(
 
     t_rt <- Sys.time()
     hyps <- hyps |> tidytable::arrange(sample, mass_cluster, rt)
-    hyps[,
-      rt_cluster := {
-        pv <- c(NA_real_, utils::head(rt, -1L))
-        cumsum(is.na(pv) | is.na(rt) | (rt - pv) > tolerance_rt)
-      },
-      by = .(sample, mass_cluster)
-    ]
-    hyps[,
-      evidence_cluster := paste(sample, mass_cluster, rt_cluster, sep = "|")
-    ]
+    hyps <- hyps |>
+      tidytable::mutate(
+        rt_cluster = {
+          pv <- c(NA_real_, utils::head(rt, -1L))
+          cumsum(is.na(pv) | is.na(rt) | (rt - pv) > tolerance_rt)
+        },
+        by = c("sample", "mass_cluster")
+      ) |>
+      tidytable::mutate(
+        evidence_cluster = paste(sample, mass_cluster, rt_cluster, sep = "|")
+      )
     log_debug(
       "RT clustering: %d evidence clusters in %.2fs",
       tidytable::n_distinct(hyps$evidence_cluster),
@@ -670,52 +668,50 @@ build_evidence_supported_hypotheses <- function(
   # and tier/core constraints are met. Set min_degree (in conditional mode) to
   # activate stricter support requirements in high-connectivity regions.
   t_score <- Sys.time()
-  pair_counts <- unique(hyps[
-    !is.na(evidence_cluster),
-    .(evidence_cluster, feat_idx)
-  ])[,
-    .N,
-    by = evidence_cluster
-  ]
-  if ("N" %in% colnames(pair_counts)) {
-    colnames(pair_counts)[colnames(pair_counts) == "N"] <- "n_evidence_features"
-  }
-  hyps[, n_evidence_features := 1L]
-  hyps[
-    pair_counts,
-    on = "evidence_cluster",
-    n_evidence_features := i.n_evidence_features
-  ]
+  pair_counts <- hyps |>
+    tidytable::filter(!is.na(evidence_cluster)) |>
+    tidytable::distinct(evidence_cluster, feat_idx) |>
+    tidytable::summarize(n_evidence_features_pair = .N, by = evidence_cluster)
+  hyps <- hyps |>
+    tidytable::left_join(pair_counts, by = "evidence_cluster") |>
+    tidytable::mutate(
+      n_evidence_features = ifelse(
+        is.na(n_evidence_features_pair),
+        1L,
+        n_evidence_features_pair
+      )
+    ) |>
+    tidytable::select(-n_evidence_features_pair)
   rm(pair_counts)
   # evidence_count = number of independent PEER features supporting this
   # hypothesis (cluster size minus one self feature).
-  hyps[, evidence_count := as.integer(pmax.int(0L, n_evidence_features - 1L))]
-
-  cluster_meta <- hyps[
-    !is.na(evidence_cluster),
-    .(
-      cluster_has_core = any(core_v[adduct_idx]),
-      cluster_n_adducts = tidytable::n_distinct(adduct_idx)
-    ),
-    by = evidence_cluster
-  ]
-  hyps[, `:=`(cluster_has_core = FALSE, cluster_n_adducts = 1L)]
-  hyps[
-    cluster_meta,
-    on = "evidence_cluster",
-    `:=`(
-      cluster_has_core = i.cluster_has_core,
-      cluster_n_adducts = i.cluster_n_adducts
+  hyps <- hyps |>
+    tidytable::mutate(
+      evidence_count = as.integer(pmax.int(0L, n_evidence_features - 1L))
     )
-  ]
+
+  cluster_meta <- hyps |>
+    tidytable::filter(!is.na(evidence_cluster)) |>
+    tidytable::summarize(
+      cluster_has_core = any(core_v[adduct_idx]),
+      cluster_n_adducts = tidytable::n_distinct(adduct_idx),
+      by = evidence_cluster
+    )
+  hyps <- hyps |>
+    tidytable::left_join(cluster_meta, by = "evidence_cluster") |>
+    tidytable::mutate(
+      cluster_has_core = ifelse(is.na(cluster_has_core), FALSE, cluster_has_core),
+      cluster_n_adducts = ifelse(is.na(cluster_n_adducts), 1L, cluster_n_adducts)
+    )
 
   keep_mask <-
     adduct_v[hyps$adduct_idx] == baseline_adduct |
     (hyps$evidence_count >= 1L &
       (!req_core_v[hyps$adduct_idx] | hyps$cluster_has_core) &
       (tier_v[hyps$adduct_idx] <= 3L | hyps$cluster_n_adducts >= 2L))
-  hyps <- hyps[keep_mask]
-  hyps[, c("cluster_has_core", "cluster_n_adducts") := NULL]
+  hyps <- hyps |>
+    tidytable::filter(keep_mask) |>
+    tidytable::select(-cluster_has_core, -cluster_n_adducts)
   rm(cluster_meta, keep_mask)
   log_debug(
     "Evidence counting: max count %d in %.2fs",
@@ -725,35 +721,32 @@ build_evidence_supported_hypotheses <- function(
 
   # Finally join the string/derived columns from the compact lookup tables.
   t_finalize <- Sys.time()
-  hyps[, ":="(
-    feature_id = feature_ids[feat_idx],
-    mz = feature_mzs[feat_idx],
-    sample = feature_samples[feat_idx],
-    adduct = adduct_v[adduct_idx],
-    n_mer = n_mer_v[adduct_idx],
-    z = z_v[adduct_idx],
-    adduct_mass = am_v[adduct_idx],
-    n_iso = niso_v[adduct_idx],
-    adduct_tier = tier_v[adduct_idx]
-  )]
-  hyps[, evidence_cluster := as.character(evidence_cluster)]
-  hyps[,
-    candidate_adduct_origin := ifelse(
-      evidence_count >= 1L | adduct != baseline_adduct,
-      "supported",
-      "enforced"
-    )
-  ]
-  hyps[,
-    source := ifelse(
-      candidate_adduct_origin == "enforced",
-      "baseline",
-      "evidence"
-    )
-  ]
-  # Backward-compatible alias used by some downstream tests/callers.
-  hyps[, evidence_score := as.integer(evidence_count)]
-  hyps[, c("feat_idx", "adduct_idx") := NULL]
+  hyps <- hyps |>
+    tidytable::mutate(
+      feature_id = feature_ids[feat_idx],
+      mz = feature_mzs[feat_idx],
+      sample = feature_samples[feat_idx],
+      adduct = adduct_v[adduct_idx],
+      n_mer = n_mer_v[adduct_idx],
+      z = z_v[adduct_idx],
+      adduct_mass = am_v[adduct_idx],
+      n_iso = niso_v[adduct_idx],
+      adduct_tier = tier_v[adduct_idx],
+      evidence_cluster = as.character(evidence_cluster),
+      candidate_adduct_origin = ifelse(
+        evidence_count >= 1L | adduct != baseline_adduct,
+        "supported",
+        "enforced"
+      ),
+      source = ifelse(
+        candidate_adduct_origin == "enforced",
+        "baseline",
+        "evidence"
+      ),
+      # Backward-compatible alias used by some downstream tests/callers.
+      evidence_score = as.integer(evidence_count)
+    ) |>
+    tidytable::select(-feat_idx, -adduct_idx)
   log_debug(
     "Finalize join: %d rows in %.2fs",
     nrow(hyps),
