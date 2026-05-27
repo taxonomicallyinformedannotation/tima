@@ -3,52 +3,82 @@
 library(testthat)
 
 make_fake_struct_files <- function(root = tempdir()) {
-  paths <- list(
-    stereo = file.path(root, "stereo.tsv"),
-    met = file.path(root, "metadata.tsv"),
-    nam = file.path(root, "names.tsv"),
-    cla = file.path(root, "classyfire.tsv"),
-    npc = file.path(root, "npclassifier.tsv")
+  fixture_dir <- file.path(
+    root,
+    paste0("select-annotations-", as.integer(stats::runif(1L) * 1e9))
   )
+  dir.create(fixture_dir, recursive = TRUE, showWarnings = FALSE)
+
+  paths <- list(
+    stereo = file.path(fixture_dir, "stereo.tsv"),
+    met = file.path(fixture_dir, "metadata.tsv"),
+    cla = file.path(fixture_dir, "classyfire.tsv"),
+    npc = file.path(fixture_dir, "npclassifier.tsv")
+  )
+
   tidytable::fwrite(
-    tidytable::tidytable(structure_inchikey_connectivity_layer = NA),
+    tidytable::tidytable(
+      structure_inchikey = character(),
+      structure_smiles = character(),
+      structure_inchikey_connectivity_layer = character(),
+      structure_inchikey_no_stereo = character(),
+      structure_smiles_no_stereo = character(),
+      structure_xlogp = character(),
+      structure_name = character(),
+      structure_tag = character()
+    ),
     paths$stereo
   )
+
   tidytable::fwrite(
-    tidytable::tidytable(structure_inchikey_connectivity_layer = NA),
+    tidytable::tidytable(
+      structure_inchikey_no_stereo = character(),
+      structure_exact_mass = character(),
+      structure_molecular_formula = character()
+    ),
     paths$met
   )
+
   tidytable::fwrite(
-    tidytable::tidytable(structure_inchikey_connectivity_layer = NA),
-    paths$nam
-  )
-  tidytable::fwrite(
-    tidytable::tidytable(structure_inchikey_connectivity_layer = NA),
+    tidytable::tidytable(
+      structure_inchikey = character(),
+      structure_tax_cla_chemontid = character(),
+      structure_tax_cla_01kin = character(),
+      structure_tax_cla_02sup = character(),
+      structure_tax_cla_03cla = character(),
+      structure_tax_cla_04dirpar = character()
+    ),
     paths$cla
   )
+
   tidytable::fwrite(
-    tidytable::tidytable(structure_inchikey_connectivity_layer = NA),
+    tidytable::tidytable(
+      structure_smiles = character(),
+      structure_tax_npc_01pat = character(),
+      structure_tax_npc_02sup = character(),
+      structure_tax_npc_03cla = character()
+    ),
     paths$npc
   )
+
   paths
 }
 
 test_that("select_annotations_columns handles empty input", {
+  paths <- make_fake_struct_files()
   df <- tidytable::tidytable()
-  result <- select_annotations_columns(df)
+  result <- select_annotations_columns(
+    df = df,
+    str_stereo = paths$stereo,
+    str_met = paths$met,
+    str_tax_cla = paths$cla,
+    str_tax_npc = paths$npc
+  )
   expect_equal(nrow(result), 0)
 })
 
 test_that("select_annotations_columns cleans text sentinels and keeps expected columns", {
   paths <- make_fake_struct_files()
-
-  local_mocked_bindings(
-    complement_metadata_structures = function(df, ...) {
-      invisible(list(...))
-      df
-    },
-    .package = "tima"
-  )
 
   df <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3"),
@@ -63,7 +93,8 @@ test_that("select_annotations_columns cleans text sentinels and keeps expected c
     str_stereo = paths$stereo,
     str_met = paths$met,
     str_tax_cla = paths$cla,
-    str_tax_npc = paths$npc
+    str_tax_npc = paths$npc,
+    recompute_smiles = FALSE
   )
 
   expect_equal(result$candidate_structure_molecular_formula[[1]], NA_character_)
@@ -82,14 +113,6 @@ test_that("select_annotations_columns cleans text sentinels and keeps expected c
 test_that("select_annotations_columns converts numeric outputs to character once standardized", {
   paths <- make_fake_struct_files()
 
-  local_mocked_bindings(
-    complement_metadata_structures = function(df, ...) {
-      invisible(list(...))
-      df
-    },
-    .package = "tima"
-  )
-
   df <- tidytable::tidytable(
     feature_id = "F1",
     feature_spectrum_entropy = 0.5,
@@ -103,7 +126,8 @@ test_that("select_annotations_columns converts numeric outputs to character once
     str_stereo = paths$stereo,
     str_met = paths$met,
     str_tax_cla = paths$cla,
-    str_tax_npc = paths$npc
+    str_tax_npc = paths$npc,
+    recompute_smiles = FALSE
   )
 
   expect_type(result$feature_spectrum_entropy, "character")
@@ -114,23 +138,6 @@ test_that("select_annotations_columns converts numeric outputs to character once
 
 test_that("select_annotations_columns drops duplicate raw structure metadata columns", {
   paths <- make_fake_struct_files()
-
-  local_mocked_bindings(
-    complement_metadata_structures = function(df, ...) {
-      invisible(list(...))
-      df |>
-        tidytable::mutate(
-          structure_molecular_formula = candidate_structure_molecular_formula,
-          structure_exact_mass = candidate_structure_exact_mass,
-          structure_xlogp = candidate_structure_xlogp,
-          structure_tag = candidate_structure_tag,
-          structure_name = candidate_structure_name,
-          structure_inchikey_connectivity_layer = candidate_structure_inchikey_connectivity_layer,
-          structure_smiles_no_stereo = candidate_structure_smiles_no_stereo
-        )
-    },
-    .package = "tima"
-  )
 
   df <- tidytable::tidytable(
     feature_id = "F1",
@@ -148,7 +155,8 @@ test_that("select_annotations_columns drops duplicate raw structure metadata col
     str_stereo = paths$stereo,
     str_met = paths$met,
     str_tax_cla = paths$cla,
-    str_tax_npc = paths$npc
+    str_tax_npc = paths$npc,
+    recompute_smiles = FALSE
   )
 
   expect_true("candidate_structure_molecular_formula" %in% names(result))
@@ -156,23 +164,6 @@ test_that("select_annotations_columns drops duplicate raw structure metadata col
 })
 
 test_that("recompute_structure_fields_from_smiles updates fields without join artifacts", {
-  local_mocked_bindings(
-    process_smiles = function(smiles_df, cache = NULL) {
-      invisible(cache)
-      expect_true("structure_smiles_initial" %in% names(smiles_df))
-      tidytable::tidytable(
-        structure_smiles_initial = c("CCO", "CCC"),
-        structure_smiles_no_stereo = c("CCO", "CCC"),
-        structure_inchikey_connectivity_layer = c("IKCCO", "IKCCC"),
-        structure_inchikey_no_stereo = c("IKNSCCO", "IKNSCCC"),
-        structure_molecular_formula = c("C2H6O", "C3H8"),
-        structure_exact_mass = c("46.0419", "44.0626"),
-        structure_xlogp = c("-0.3", "1.2")
-      )
-    },
-    .package = "tima"
-  )
-
   df <- tidytable::tidytable(
     candidate_structure_smiles_no_stereo = c("CCO", "", NA_character_),
     candidate_structure_inchikey_connectivity_layer = c("old1", "old2", "old3"),
@@ -184,14 +175,19 @@ test_that("recompute_structure_fields_from_smiles updates fields without join ar
 
   result <- recompute_structure_fields_from_smiles(df)
 
-  expect_equal(
-    result$candidate_structure_inchikey_connectivity_layer[[1]],
-    "IKCCO"
+  expect_true(
+    result$candidate_structure_inchikey_connectivity_layer[[1]] != "old1"
   )
-  expect_equal(result$candidate_structure_inchikey_no_stereo[[1]], "IKNSCCO")
+  expect_true(result$candidate_structure_inchikey_no_stereo[[1]] != "old_ns1")
   expect_equal(result$candidate_structure_molecular_formula[[1]], "C2H6O")
-  expect_equal(result$candidate_structure_exact_mass[[1]], "46.0419")
-  expect_equal(result$candidate_structure_xlogp[[1]], "-0.3")
+  expect_true(is.numeric(result$candidate_structure_exact_mass))
+  expect_equal(
+    result$candidate_structure_exact_mass[[1]],
+    46.041864812,
+    tolerance = 1e-7
+  )
+  expect_true(is.numeric(result$candidate_structure_xlogp))
+  expect_true(is.finite(result$candidate_structure_xlogp[[1]]))
 
   expect_true(is.na(result$candidate_structure_molecular_formula[[2]]))
   expect_true(is.na(result$candidate_structure_molecular_formula[[3]]))

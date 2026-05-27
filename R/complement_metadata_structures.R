@@ -304,14 +304,16 @@ complement_metadata_structures <- function(
       "structure_tax_cla_04dirpar"
     )
   ) |>
-    .ensure_columns(cols = c(
-      "structure_inchikey",
-      "structure_tax_cla_chemontid",
-      "structure_tax_cla_01kin",
-      "structure_tax_cla_02sup",
-      "structure_tax_cla_03cla",
-      "structure_tax_cla_04dirpar"
-    )) |>
+    .ensure_columns(
+      cols = c(
+        "structure_inchikey",
+        "structure_tax_cla_chemontid",
+        "structure_tax_cla_01kin",
+        "structure_tax_cla_02sup",
+        "structure_tax_cla_03cla",
+        "structure_tax_cla_04dirpar"
+      )
+    ) |>
     tidytable::mutate(
       structure_tax_cla_chemontid = normalize_chemontid(
         structure_tax_cla_chemontid
@@ -347,12 +349,14 @@ complement_metadata_structures <- function(
       "structure_tax_npc_03cla"
     )
   ) |>
-    .ensure_columns(cols = c(
-      "structure_smiles",
-      "structure_tax_npc_01pat",
-      "structure_tax_npc_02sup",
-      "structure_tax_npc_03cla"
-    )) |>
+    .ensure_columns(
+      cols = c(
+        "structure_smiles",
+        "structure_tax_npc_01pat",
+        "structure_tax_npc_02sup",
+        "structure_tax_npc_03cla"
+      )
+    ) |>
     tidytable::select(
       candidate_structure_smiles = structure_smiles,
       candidate_structure_tax_npc_01pat_s = structure_tax_npc_01pat,

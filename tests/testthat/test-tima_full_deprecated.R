@@ -7,23 +7,22 @@ test_that("tima_full exists and is exported", {
 })
 
 test_that("tima_full issues deprecation warning", {
-  # The function should issue a deprecation warning
-  # Mock run_tima to avoid actually running the workflow
-  with_mocked_bindings(
-    {
-      expect_warning(
-        tima_full(
-          target_pattern = "^test$",
-          log_file = tempfile(fileext = ".log"),
-          clean_old_logs = FALSE,
-          log_level = "warn"
-        ),
-        regexp = "deprecated.*run_tima",
-        ignore.case = TRUE
-      )
-    },
-    run_tima = function(...) invisible(NULL),
-    .package = "tima"
+  withr::local_options(list(
+    tima.tima_full_runner = function(...) {
+      invisible(list(...))
+      invisible(NULL)
+    }
+  ))
+
+  expect_warning(
+    tima_full(
+      target_pattern = "^test$",
+      log_file = tempfile(fileext = ".log"),
+      clean_old_logs = FALSE,
+      log_level = "warn"
+    ),
+    regexp = "deprecated.*run_tima",
+    ignore.case = TRUE
   )
 })
 
@@ -55,17 +54,15 @@ test_that("tima_full has same parameters as run_tima", {
 })
 
 test_that("tima_full deprecation message is clear", {
-  # Capture the deprecation warning
+  withr::local_options(list(
+    tima.tima_full_runner = function(...) {
+      invisible(list(...))
+      invisible(NULL)
+    }
+  ))
+
   expect_warning(
-    {
-      with_mocked_bindings(
-        {
-          tima_full()
-        },
-        run_tima = function(...) invisible(NULL),
-        .package = "tima"
-      )
-    },
+    tima_full(),
     regexp = "run_tima"
   )
 })
@@ -93,26 +90,23 @@ test_that("tima_full documentation mentions deprecation", {
 })
 
 test_that("tima_full calls run_tima with correct arguments", {
-  # Mock run_tima to capture arguments
   called_args <- NULL
 
-  with_mocked_bindings(
-    {
-      suppressWarnings({
-        tima_full(
-          target_pattern = "^custom$",
-          log_file = "custom.log",
-          clean_old_logs = FALSE,
-          log_level = "debug"
-        )
-      })
-    },
-    run_tima = function(...) {
+  withr::local_options(list(
+    tima.tima_full_runner = function(...) {
       called_args <<- list(...)
       invisible(NULL)
-    },
-    .package = "tima"
-  )
+    }
+  ))
+
+  suppressWarnings({
+    tima_full(
+      target_pattern = "^custom$",
+      log_file = "custom.log",
+      clean_old_logs = FALSE,
+      log_level = "debug"
+    )
+  })
 
   # Verify arguments were passed through correctly
   expect_equal(called_args$target_pattern, "^custom$")
