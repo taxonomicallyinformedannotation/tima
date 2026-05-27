@@ -2,7 +2,7 @@ start <- Sys.time()
 
 library(tima)
 
-paths <- tima:::get_default_paths()
+paths <- getFromNamespace("get_default_paths", "tima")()
 
 log_trace(
   "This script downloads HMDB structures."

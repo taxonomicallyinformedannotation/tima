@@ -12,7 +12,7 @@ targets_section_architecture <- function() {
     tar_target(
       name = paths,
       command = {
-        tima:::get_default_paths(yaml = yaml_paths)
+        getFromNamespace("get_default_paths", "tima")(yaml = yaml_paths)
       },
       format = "rds"
     )

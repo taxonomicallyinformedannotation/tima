@@ -250,11 +250,11 @@ targets_section_libraries <- function() {
                 )
               },
               error = function(e) {
-                tima:::log_warn(
+                getFromNamespace("log_warn", "tima")(
                   "ECMDB download failed: %s",
                   conditionMessage(e)
                 )
-                tima:::fake_ecmdb(
+                getFromNamespace("fake_ecmdb", "tima")(
                   export = paths$data$source$libraries$sop$ecmdb
                 )
               },
@@ -276,19 +276,26 @@ targets_section_libraries <- function() {
                 )
               },
               warning = function(w) {
-                tima:::log_warn(
+                getFromNamespace("log_warn", "tima")(
                   "HMDB download warning: %s",
                   conditionMessage(w)
                 )
-                tima:::log_warn(
+                getFromNamespace("log_warn", "tima")(
                   "HMDB download failed partially, returning empty file instead"
                 )
                 unlink(paths$data$source$libraries$sop$hmdb)
-                tima:::fake_hmdb(export = paths$data$source$libraries$sop$hmdb)
+                getFromNamespace("fake_hmdb", "tima")(
+                  export = paths$data$source$libraries$sop$hmdb
+                )
               },
               error = function(e) {
-                tima:::log_warn("HMDB download failed: %s", conditionMessage(e))
-                tima:::fake_hmdb(export = paths$data$source$libraries$sop$hmdb)
+                getFromNamespace("log_warn", "tima")(
+                  "HMDB download failed: %s",
+                  conditionMessage(e)
+                )
+                getFromNamespace("fake_hmdb", "tima")(
+                  export = paths$data$source$libraries$sop$hmdb
+                )
               },
               finally = {
                 paths$data$source$libraries$sop$hmdb
@@ -313,11 +320,11 @@ targets_section_libraries <- function() {
                     )
                   },
                   error = function(e) {
-                    tima:::log_warn(
+                    getFromNamespace("log_warn", "tima")(
                       "HMDB family download failed: %s",
                       conditionMessage(e)
                     )
-                    tima:::fake_hmdb(export = output_file)
+                    getFromNamespace("fake_hmdb", "tima")(export = output_file)
                   }
                 )
                 output_file
@@ -340,11 +347,11 @@ targets_section_libraries <- function() {
                 )
               },
               error = function(e) {
-                tima:::log_warn(
+                getFromNamespace("log_warn", "tima")(
                   "LOTUS download failed: %s",
                   conditionMessage(e)
                 )
-                tima:::fake_lotus(
+                getFromNamespace("fake_lotus", "tima")(
                   export = paths$data$source$libraries$sop$lotus
                 )
               },
@@ -529,7 +536,7 @@ targets_section_libraries <- function() {
                 ) {
                   input_file <- paths$data$source$libraries$sop[[lib_name]]
                 }
-                tima:::prepare_libraries_sop_hmdb_like(
+                getFromNamespace("prepare_libraries_sop_hmdb_like", "tima")(
                   input = input_file,
                   output = paths$data$interim$libraries$sop[[lib_name]],
                   source_name = toupper(lib_name),

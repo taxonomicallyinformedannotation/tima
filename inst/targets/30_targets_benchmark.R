@@ -18,13 +18,13 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_converted,
       command = {
-        sp <- tima:::import_and_clean_library_collection(
+        sp <- getFromNamespace("import_and_clean_library_collection", "tima")(
           benchmark_file,
           dalton = 0.01,
           polarity = NA,
           ppm = 10
         )
-        tima:::export_spectra_rds(
+        getFromNamespace("export_spectra_rds", "tima")(
           Spectra::filterEmptySpectra(sp),
           file = "data/interim/benchmark/benchmark_spectra.rds"
         )
@@ -39,9 +39,9 @@ targets_section_benchmark <- function() {
         sp@backend@spectraData$precursorMz <- as.numeric(
           sp@backend@spectraData$precursor_mz
         )
-        tima:::log_trace("Imported")
+        getFromNamespace("log_trace", "tima")("Imported")
         sp_clean <- sp
-        tima:::log_trace("Cleaned")
+        getFromNamespace("log_trace", "tima")("Cleaned")
         df_meta <- tidytable::mutate(
           tidytable::tidytable(
             adduct = sp_clean$adduct,
@@ -64,7 +64,7 @@ targets_section_benchmark <- function() {
             }
           )
         )
-        tima:::log_trace("Framed")
+        getFromNamespace("log_trace", "tima")("Framed")
         df_clean <- tidytable::mutate(
           tidytable::mutate(
             tidytable::distinct(
@@ -155,7 +155,7 @@ targets_section_benchmark <- function() {
                   tidytable::mutate(
                     tidytable::mutate(
                       tidytable::mutate(
-                        tima:::extract_spectra(x),
+                        getFromNamespace("extract_spectra", "tima")(x),
                         acquisitionNum = tidytable::row_number()
                       ),
                       spectrum_id = acquisitionNum
@@ -237,11 +237,11 @@ targets_section_benchmark <- function() {
           backend = MsBackendMgf::MsBackendMgf(),
           file = benchmark_path_mgf_neg
         )
-        tima:::export_output(
+        getFromNamespace("export_output", "tima")(
           df_clean_pos,
           "data/interim/benchmark/benchmark_meta_pos.tsv"
         )
-        tima:::export_output(
+        getFromNamespace("export_output", "tima")(
           df_clean_neg,
           "data/interim/benchmark/benchmark_meta_neg.tsv"
         )
@@ -285,7 +285,7 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_taxed_pos,
       command = {
-        tima:::benchmark_taxize_spectra(
+        getFromNamespace("benchmark_taxize_spectra", "tima")(
           benchmark_pre_meta_pos,
           keys = lib_mer_key,
           org_tax_ott = lib_mer_org_tax_ott,
@@ -297,7 +297,7 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_taxed_neg,
       command = {
-        tima:::benchmark_taxize_spectra(
+        getFromNamespace("benchmark_taxize_spectra", "tima")(
           benchmark_pre_meta_neg,
           keys = lib_mer_key,
           org_tax_ott = lib_mer_org_tax_ott,
@@ -309,7 +309,10 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_def_ann_mas,
       command = {
-        tima:::parse_yaml_params(def = par_def_ann_mas, usr = par_def_ann_mas)
+        getFromNamespace("parse_yaml_params", "tima")(
+          def = par_def_ann_mas,
+          usr = par_def_ann_mas
+        )
       },
       format = "rds"
     ),
@@ -370,7 +373,7 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_def_cre_edg_spe,
       command = {
-        tima:::parse_yaml_params(
+        getFromNamespace("parse_yaml_params", "tima")(
           def = par_def_cre_edg_spe,
           usr = par_def_cre_edg_spe
         )
@@ -414,7 +417,7 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_def_pre_fea_edg,
       command = {
-        tima:::parse_yaml_params(
+        getFromNamespace("parse_yaml_params", "tima")(
           def = par_def_pre_fea_edg,
           usr = par_def_pre_fea_edg
         )
@@ -454,7 +457,10 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_def_cre_edg_com,
       command = {
-        tima:::parse_yaml_params(def = par_def_cre_com, usr = par_def_cre_com)
+        getFromNamespace("parse_yaml_params", "tima")(
+          def = par_def_cre_com,
+          usr = par_def_cre_com
+        )
       },
       format = "rds"
     ),
@@ -481,7 +487,7 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_def_pre_fea_com,
       command = {
-        tima:::parse_yaml_params(
+        getFromNamespace("parse_yaml_params", "tima")(
           def = par_def_pre_fea_com,
           usr = par_def_pre_fea_com
         )
@@ -511,7 +517,10 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_def_ann_spe,
       command = {
-        tima:::parse_yaml_params(def = par_def_ann_spe, usr = par_def_ann_spe)
+        getFromNamespace("parse_yaml_params", "tima")(
+          def = par_def_ann_spe,
+          usr = par_def_ann_spe
+        )
       },
       format = "rds"
     ),
@@ -566,7 +575,7 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_def_pre_ann_spe,
       command = {
-        tima:::parse_yaml_params(
+        getFromNamespace("parse_yaml_params", "tima")(
           def = par_def_pre_ann_spe,
           usr = par_def_pre_ann_spe
         )
@@ -604,7 +613,7 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_def_pre_ann_sir,
       command = {
-        tima:::parse_yaml_params(
+        getFromNamespace("parse_yaml_params", "tima")(
           def = par_def_pre_ann_sir,
           usr = par_def_pre_ann_sir
         )
@@ -652,7 +661,10 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_def_fil_ann,
       command = {
-        tima:::parse_yaml_params(def = par_def_fil_ann, usr = par_def_fil_ann)
+        getFromNamespace("parse_yaml_params", "tima")(
+          def = par_def_fil_ann,
+          usr = par_def_fil_ann
+        )
       },
       format = "rds"
     ),
@@ -751,7 +763,10 @@ targets_section_benchmark <- function() {
     tar_target(
       name = benchmark_def_wei_ann,
       command = {
-        tima:::parse_yaml_params(def = par_def_wei_ann, usr = par_def_wei_ann)
+        getFromNamespace("parse_yaml_params", "tima")(
+          def = par_def_wei_ann,
+          usr = par_def_wei_ann
+        )
       },
       format = "rds"
     ),

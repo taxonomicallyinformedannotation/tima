@@ -25,7 +25,7 @@ targets_section_parameters <- function() {
       ),
       tar_target(
         name = par_fin_par,
-        command = tima:::parse_yaml_params(
+        command = getFromNamespace("parse_yaml_params", "tima")(
           def = par_pre_par,
           usr = par_pre_par
         ),
@@ -33,7 +33,7 @@ targets_section_parameters <- function() {
       ),
       tar_target(
         name = par_fin_par2,
-        command = tima:::parse_yaml_params(
+        command = getFromNamespace("parse_yaml_params", "tima")(
           def = par_pre_par2,
           usr = par_pre_par2
         ),
@@ -58,7 +58,10 @@ targets_section_parameters <- function() {
       tar_target_raw(
         name = paste0("par_", abbrev),
         command = substitute(
-          tima:::parse_yaml_params(def = def_sym, usr = usr_sym[[1L]]),
+          getFromNamespace("parse_yaml_params", "tima")(
+            def = def_sym,
+            usr = usr_sym[[1L]]
+          ),
           list(
             def_sym = as.symbol(paste0("par_def_", abbrev)),
             usr_sym = as.symbol(paste0("par_usr_", abbrev))

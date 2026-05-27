@@ -6,8 +6,8 @@ require(
 )
 
 step <- "params"
-paths <- tima:::get_default_paths()
-params <- tima:::get_params(step = step)
+paths <- getFromNamespace("get_default_paths", "tima")()
+params <- getFromNamespace("get_params", "tima")(step = step)
 
 log_trace(
   "This script is a test script"

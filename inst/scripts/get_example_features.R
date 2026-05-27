@@ -9,8 +9,8 @@ log_trace("Authors: AR")
 log_trace("Contributors: ...")
 
 get_file(
-  url = tima:::get_default_paths()$urls$examples$features,
-  export = tima:::get_default_paths()$data$source$features
+  url = getFromNamespace("get_default_paths", "tima")()$urls$examples$features,
+  export = getFromNamespace("get_default_paths", "tima")()$data$source$features
 )
 
 end <- Sys.time()

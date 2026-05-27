@@ -5,7 +5,7 @@ require(
   quietly = TRUE
 )
 
-paths <- tima:::get_default_paths()
+paths <- getFromNamespace("get_default_paths", "tima")()
 
 log_trace(
   "This script downloads benchmarking set from matchms work on GNPS dataset."
