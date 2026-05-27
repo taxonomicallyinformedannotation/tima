@@ -71,7 +71,7 @@ NULL
 .mztab_validate_metadata_semantics <- function(metadata_df, strict) {
   version <- .mztab_get_metadata_value(metadata_df, "mzTab-version")
   parsed <- .mztab_parse_version(version)
-  if (is.null(parsed) || any(is.na(parsed))) {
+  if (is.null(parsed) || anyNA(parsed)) {
     tima_abort(
       problem = paste0("Invalid mzTab-version format: ", version),
       fix = "Use semantic mzTab-M version format, e.g. 2.1.0-M",
