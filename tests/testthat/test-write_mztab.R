@@ -636,6 +636,26 @@ test_that("write_mztab embeds optional edges table as COM extension lines", {
   expect_true(any(grepl('"score":"0.91"', edge_lines, fixed = TRUE)))
 })
 
+test_that("write_mztab emits COM ambiguity cardinality summary", {
+  local_test_project(copy = TRUE)
+
+  tmpdir <- withr::local_tempdir()
+  results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 2L)
+  out <- file.path(tmpdir, "ambiguity_com.mztab")
+
+  write_mztab(input = results, output = out)
+
+  lines <- readLines(out, warn = FALSE)
+  amb <- grep("^COM\tTIMA ambiguity\t", lines, value = TRUE)
+  expect_length(amb, 2L)
+  expect_true(grepl("features=2", amb[[1L]], fixed = TRUE))
+  expect_true(grepl("candidate_rows=4", amb[[1L]], fixed = TRUE))
+  expect_true(grepl("1-candidate=0", amb[[1L]], fixed = TRUE))
+  expect_true(grepl("2-candidate=2", amb[[1L]], fixed = TRUE))
+  expect_true(grepl("3+-candidate=0", amb[[1L]], fixed = TRUE))
+  expect_true(grepl("aligned_fields=database_identifier|chemical_formula|smiles|inchi|chemical_name|uri|adduct_ions", amb[[2L]], fixed = TRUE))
+})
+
 test_that("write_mztab embeds optional edges table in JSON exports", {
   local_test_project(copy = TRUE)
 

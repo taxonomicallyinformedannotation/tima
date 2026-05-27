@@ -372,6 +372,7 @@ write_mztab <- function(
     con <- file(output, open = "wt", encoding = "UTF-8")
     on.exit(close(con), add = TRUE)
     export_comments <- .mztab_build_export_comments(results)
+    ambiguity_comments <- .mztab_build_ambiguity_comments(results)
     edge_comments <- .mztab_build_edges_comments(edges_file)
 
     if (length(passthrough_lines) > 0L) {
@@ -386,6 +387,14 @@ write_mztab <- function(
 
     if (length(export_comments) > 0L) {
       writeLines(export_comments, con)
+      writeLines("", con)
+    }
+
+    if (
+      length(ambiguity_comments) > 0L &&
+        !any(grepl("^COM\tTIMA ambiguity\t", passthrough_lines))
+    ) {
+      writeLines(ambiguity_comments, con)
       writeLines("", con)
     }
 
@@ -2155,6 +2164,98 @@ write_mztab <- function(
         )
       },
       FUN.VALUE = character(1L)
+    )
+  )
+}
+
+#' Build COM lines summarizing ambiguity cardinalities in SML output
+#' @keywords internal
+.mztab_build_ambiguity_comments <- function(results) {
+  if (!is.data.frame(results) || nrow(results) == 0L) {
+    return(character(0))
+  }
+
+  results <- .mztab_expand_summarized(results)
+  if (!"feature_id" %in% colnames(results)) {
+    return(character(0))
+  }
+
+  feature_ids <- as.character(results$feature_id)
+  feature_ids <- feature_ids[!is.na(feature_ids) & nzchar(feature_ids)]
+  if (length(feature_ids) == 0L) {
+    return(character(0))
+  }
+
+  counts <- table(feature_ids)
+  aligned_cols <- c(
+    "database_identifier",
+    "chemical_formula",
+    "smiles",
+    "inchi",
+    "chemical_name",
+    "uri",
+    "adduct_ions"
+  )
+
+  candidate_counts <- vapply(
+    names(counts),
+    function(fid) {
+      idx <- which(feature_ids == fid)
+      if (length(idx) == 0L) {
+        return(0L)
+      }
+      grp <- results[idx, , drop = FALSE]
+      if (!all(aligned_cols %in% colnames(grp))) {
+        return(length(idx))
+      }
+
+      norm <- function(x) {
+        x <- as.character(x)
+        x[is.na(x) | !nzchar(x)] <- "null"
+        x
+      }
+      tuple_key <- do.call(
+        paste,
+        c(
+          lapply(aligned_cols, function(col) norm(grp[[col]])),
+          list(sep = "||")
+        )
+      )
+      length(unique(tuple_key))
+    },
+    FUN.VALUE = integer(1L)
+  )
+
+  bins <- c(
+    `1` = sum(counts == 1L),
+    `2` = sum(counts == 2L),
+    `3+` = sum(counts >= 3L)
+  )
+
+  c(
+    paste0(
+      "COM\tTIMA ambiguity\tfeatures=",
+      length(counts),
+      "; candidate_rows=",
+      length(feature_ids),
+      "; 1-candidate=",
+      unname(bins[["1"]]),
+      "; 2-candidate=",
+      unname(bins[["2"]]),
+      "; 3+-candidate=",
+      unname(bins[["3+"]]),
+      "; max-candidate=",
+      if (length(candidate_counts) > 0L) max(candidate_counts, na.rm = TRUE) else 0L
+    ),
+    paste0(
+      "COM\tTIMA ambiguity\taligned_fields=",
+      paste(aligned_cols, collapse = "|"),
+      "; cardinality_verified=",
+      if (length(candidate_counts) > 0L) {
+        all(candidate_counts %in% c(1L, 2L, 3L, 4L, 5L, 6L, 7L))
+      } else {
+        TRUE
+      }
     )
   )
 }
