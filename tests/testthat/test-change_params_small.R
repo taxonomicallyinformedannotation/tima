@@ -793,10 +793,9 @@ test_that("create_yaml_null_handler creates proper function", {
 test_that("prepare_params propagates mzTab paths into mzTab workflow step YAMLs", {
   skip_if_not_installed("yaml")
 
-  repo_root <- Sys.getenv("PWD", unset = "")
-  skip_if(!nzchar(repo_root), "PWD is not available for locating repo root")
-  repo_root <- normalizePath(repo_root, winslash = "/", mustWork = TRUE)
-  default_dir <- file.path(repo_root, "inst", "params", "default")
+  params_root <- system.file("params", package = "tima")
+  skip_if(!nzchar(params_root), "Could not locate installed tima params directory")
+  default_dir <- file.path(params_root, "default")
   default_files <- list.files(
     default_dir,
     pattern = "\\.yaml$",
@@ -805,23 +804,18 @@ test_that("prepare_params propagates mzTab paths into mzTab workflow step YAMLs"
 
   yamls <- lapply(default_files, yaml::read_yaml)
   names(yamls) <- sub("\\.yaml$", "", basename(default_files))
-  yamls$prepare_params <- yaml::read_yaml(file.path(
-    repo_root,
-    "inst",
-    "params",
-    "prepare_params.yaml"
-  ))
-  yamls$prepare_params_advanced <- yaml::read_yaml(file.path(
-    repo_root,
-    "inst",
-    "params",
+  prepare_params_path <- file.path(params_root, "prepare_params.yaml")
+  prepare_params_advanced_path <- file.path(
+    params_root,
     "prepare_params_advanced.yaml"
-  ))
+  )
+  yamls$prepare_params <- yaml::read_yaml(prepare_params_path)
+  yamls$prepare_params_advanced <- yaml::read_yaml(prepare_params_advanced_path)
 
   fake_yaml_files <- c(
     default_files,
-    file.path(repo_root, "inst", "params", "prepare_params.yaml"),
-    file.path(repo_root, "inst", "params", "prepare_params_advanced.yaml")
+    prepare_params_path,
+    prepare_params_advanced_path
   )
   fake_yaml_names <- c(
     sub("\\.yaml$", "", basename(default_files)),
@@ -851,18 +845,8 @@ test_that("prepare_params propagates mzTab paths into mzTab workflow step YAMLs"
     .package = "yaml"
   )
 
-  params_small <- yaml::read_yaml(file.path(
-    repo_root,
-    "inst",
-    "params",
-    "prepare_params.yaml"
-  ))
-  params_advanced <- yaml::read_yaml(file.path(
-    repo_root,
-    "inst",
-    "params",
-    "prepare_params_advanced.yaml"
-  ))
+  params_small <- yaml::read_yaml(prepare_params_path)
+  params_advanced <- yaml::read_yaml(prepare_params_advanced_path)
   params_small$files$mztab$raw <- "data/source/example_input.mztab"
   params_advanced$files$mztab$raw <- "data/source/example_input.mztab"
 
