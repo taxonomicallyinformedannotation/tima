@@ -202,6 +202,57 @@ test_that("write_mztab emits ontology-aligned experiment metadata defaults", {
     "small_molecule-identification_reliability\\t\\[MS, MS:1000932, identification reliability, \\]",
     mtd
   )))
+  expect_true(any(grepl("^MTD\\tcv\\[1\\]-label\\tMS$", mtd)))
+  expect_true(any(grepl("^MTD\\tcv\\[2\\]-label\\tUO$", mtd)))
+  expect_true(any(grepl("^MTD\\tcv\\[3\\]-label\\tSTATO$", mtd)))
+  expect_true(any(grepl("^MTD\\tcv\\[4\\]-label\\tTIMA$", mtd)))
+  expect_true(any(grepl(
+    "small_molecule_feature-quantification_unit\\t\\[MS, MS:1001113, peak area, \\]",
+    mtd
+  )))
+  expect_true(any(grepl(
+    "small_molecule-quantification_unit\\t\\[MS, MS:1001113, peak area, \\]",
+    mtd
+  )))
+})
+
+test_that("write_mztab writes SMF evidence references and ambiguity code", {
+  local_test_project(copy = TRUE)
+
+  tmpdir <- withr::local_tempdir()
+  in_path <- file.path(tmpdir, "ambiguity.tsv")
+  out <- file.path(tmpdir, "ambiguity.mztab")
+
+  df <- data.frame(
+    feature_id = c("F1", "F1"),
+    feature_mz = c("120.0", "120.0"),
+    feature_rt = c("1.0", "1.0"),
+    candidate_structure_name = c("CmpdA", "CmpdB"),
+    candidate_structure_inchikey_connectivity_layer = c("AAAAAAAAAAAAAA", "BBBBBBBBBBBBBB"),
+    candidate_structure_molecular_formula = c("C5H10O", "C6H12O"),
+    candidate_adduct = c("[M+H]+", "[M+H]+"),
+    candidate_library = c("spectral", "spectral"),
+    score_final = c("0.8", "0.7"),
+    rank_final = c("1", "2"),
+    stringsAsFactors = FALSE
+  )
+  write.table(df, in_path, sep = "\t", row.names = FALSE, quote = FALSE)
+
+  write_mztab(input = in_path, output = out)
+  lines <- readLines(out, warn = FALSE)
+
+  sfh <- lines[grep("^SFH\\t", lines)[[1L]]]
+  smf <- lines[grep("^SMF\\t", lines)[[1L]]]
+  sfh_cols <- strsplit(sfh, "\t", fixed = TRUE)[[1L]][-1L]
+  smf_vals <- strsplit(smf, "\t", fixed = TRUE)[[1L]][-1L]
+
+  pos_refs <- which(sfh_cols == "SME_ID_REFS")
+  pos_amb <- which(sfh_cols == "SME_ID_REF_ambiguity_code")
+
+  expect_equal(length(pos_refs), 1L)
+  expect_equal(length(pos_amb), 1L)
+  expect_match(smf_vals[[pos_refs]], "^[0-9]+\\|[0-9]+$")
+  expect_identical(smf_vals[[pos_amb]], "1")
 })
 
 test_that("write_mztab emits publication and instrument metadata when provided", {

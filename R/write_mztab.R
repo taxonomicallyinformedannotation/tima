@@ -331,6 +331,9 @@ write_mztab <- function(
     sme_table <- merged$sme
   }
 
+  # Keep SMF -> SME evidence links explicit in the exported table.
+  smf_table <- .mztab_refresh_smf_sme_refs(smf = smf_table, sme = sme_table)
+
   # ── Write file ────────────────────────────────────────────────────────────
 
   metadata_table <- .mztab_build_metadata_table(
@@ -573,6 +576,8 @@ write_mztab <- function(
     tidytable::transmute(
       SMF_ID = as.character(SMF_ID),
       SML_ID_REFS = NA_character_, # filled later
+      SME_ID_REFS = NA_character_, # filled later from SME feature links
+      SME_ID_REF_ambiguity_code = "null",
       exp_mass_to_charge = if ("feature_mz" %in% colnames(smf)) {
         feature_mz
       } else {
@@ -1147,6 +1152,8 @@ write_mztab <- function(
     c(
       "SMF_ID",
       "SML_ID_REFS",
+      "SME_ID_REFS",
+      "SME_ID_REF_ambiguity_code",
       "exp_mass_to_charge",
       "charge",
       "retention_time_in_seconds"
@@ -1486,6 +1493,85 @@ write_mztab <- function(
   smf
 }
 
+#' Refresh SMF SME_ID_REFS and ambiguity code from SME definitions
+#' @keywords internal
+.mztab_refresh_smf_sme_refs <- function(smf, sme) {
+  if (nrow(smf) == 0L) {
+    return(smf)
+  }
+  if (nrow(sme) == 0L) {
+    smf$SME_ID_REFS <- rep("null", nrow(smf))
+    smf$SME_ID_REF_ambiguity_code <- rep("null", nrow(smf))
+    return(smf)
+  }
+
+  if (!"SME_ID_REFS" %in% colnames(smf)) {
+    smf$SME_ID_REFS <- "null"
+  }
+  if (!"SME_ID_REF_ambiguity_code" %in% colnames(smf)) {
+    smf$SME_ID_REF_ambiguity_code <- "null"
+  }
+
+  smf_df <- as.data.frame(smf, stringsAsFactors = FALSE, check.names = FALSE)
+  sme_df <- as.data.frame(sme, stringsAsFactors = FALSE, check.names = FALSE)
+
+  smf_df$SME_ID_REFS <- "null"
+  smf_df$SME_ID_REF_ambiguity_code <- "null"
+
+  for (i in seq_len(nrow(smf_df))) {
+    fid <- smf_df$feature_id[[i]]
+    if (length(fid) > 1L) {
+      fid <- fid[[1L]]
+    }
+    if (length(fid) == 0L) {
+      next
+    }
+    fid <- as.character(fid)
+    if (isTRUE(is.na(fid)) || !nzchar(fid)) {
+      next
+    }
+    idx <- which(sme_df$feature_id == fid)
+    if (length(idx) == 0L) {
+      next
+    }
+
+    refs <- unique(as.character(sme_df$SME_ID[idx]))
+    refs <- refs[!is.na(refs) & nzchar(refs) & refs != "null"]
+    if (length(refs) == 0L) {
+      next
+    }
+
+    smf_df$SME_ID_REFS[[i]] <- paste(refs, collapse = "|")
+
+    if (length(refs) <= 1L) {
+      smf_df$SME_ID_REF_ambiguity_code[[i]] <- "null"
+      next
+    }
+
+    db_vals <- unique(as.character(sme_df$database_identifier[idx]))
+    db_vals <- db_vals[!is.na(db_vals) & nzchar(db_vals) & db_vals != "null"]
+    method_vals <- unique(as.character(sme_df$identification_method[idx]))
+    method_vals <- method_vals[
+      !is.na(method_vals) & nzchar(method_vals) & method_vals != "null"
+    ]
+
+    n_db <- length(db_vals)
+    n_method <- length(method_vals)
+    ambiguity_code <- if (n_db > 1L && n_method > 1L) {
+      "3"
+    } else if (n_db > 1L) {
+      "1"
+    } else if (n_method > 1L) {
+      "2"
+    } else {
+      "1"
+    }
+    smf_df$SME_ID_REF_ambiguity_code[[i]] <- ambiguity_code
+  }
+
+  tidytable::as_tidytable(smf_df)
+}
+
 #' Split reference list encoded with pipe separator
 #' @keywords internal
 .mztab_split_ref_ids <- function(x) {
@@ -1636,6 +1722,36 @@ write_mztab <- function(
   meta <- add_default(meta, "title", .mztab_escape(title))
   meta <- add_default(meta, "description", .mztab_escape(description))
 
+  # ── Controlled vocabulary registry ───────────────────────────────────────
+  meta <- add_default(meta, "cv[1]-label", "MS")
+  meta <- add_default(meta, "cv[1]-full_name", "PSI-MS controlled vocabulary")
+  meta <- add_default(meta, "cv[1]-version", "4.1.11")
+  meta <- add_default(meta, "cv[1]-uri", "https://purl.obolibrary.org/obo/ms.obo")
+
+  meta <- add_default(meta, "cv[2]-label", "UO")
+  meta <- add_default(meta, "cv[2]-full_name", "Units of Measurement Ontology")
+  meta <- add_default(meta, "cv[2]-version", "unknown")
+  meta <- add_default(meta, "cv[2]-uri", "https://purl.obolibrary.org/obo/uo.obo")
+
+  meta <- add_default(meta, "cv[3]-label", "STATO")
+  meta <- add_default(meta, "cv[3]-full_name", "The Statistical Methods Ontology")
+  meta <- add_default(meta, "cv[3]-version", "unknown")
+  meta <- add_default(meta, "cv[3]-uri", "https://purl.obolibrary.org/obo/stato.obo")
+
+  # TIMA scores are user-namespace Params; register the namespace explicitly.
+  meta <- add_default(meta, "cv[4]-label", "TIMA")
+  meta <- add_default(
+    meta,
+    "cv[4]-full_name",
+    "Taxonomically Informed Metabolite Annotation user vocabulary"
+  )
+  meta <- add_default(meta, "cv[4]-version", as.character(software_version))
+  meta <- add_default(
+    meta,
+    "cv[4]-uri",
+    "https://github.com/taxonomicallyinformedannotation/tima"
+  )
+
   if (!is.null(publication) && nzchar(publication) && publication != "null") {
     meta <- add_default(meta, "publication[1]", .mztab_escape(publication))
   }
@@ -1718,6 +1834,16 @@ write_mztab <- function(
     meta,
     "quantification_method",
     "[MS, MS:1001834, LC-MS label-free quantitation analysis, ]"
+  )
+  meta <- add_default(
+    meta,
+    "small_molecule-quantification_unit",
+    "[MS, MS:1001113, peak area, ]"
+  )
+  meta <- add_default(
+    meta,
+    "small_molecule_feature-quantification_unit",
+    "[MS, MS:1001113, peak area, ]"
   )
   meta <- add_default(meta, "sample[1]", "[, , metabolomics sample, ]")
   meta <- add_default(
