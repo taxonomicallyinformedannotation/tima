@@ -57,4 +57,3 @@ get_example_sirius <- function(
 adjust_sirius_v6_export_path <- function(path) {
   gsub(pattern = "_6", replacement = "", x = path, fixed = TRUE)
 }
-
