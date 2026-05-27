@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -76,10 +76,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-974cd1eca6c341781bb9097d0a970668.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-ac4f3035aaefba67f71efa6bcf1f9bc8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -662,7 +662,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="annotate-masses">Annotate masses</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>This function annotates a feature table based on exact mass match. It requires a structural library, its metadata, and lists of adducts, clusters, and neutral losses to be considered. The polarity has to be <code>pos</code> or <code>neg</code> and retention time and mass tolerances should be given. The feature table is expected to be pre-formatted.</p>
+<p>Mass-based MS1 annotation. The pipeline is a sequence of clearly-bounded steps; each step is documented inline. In short:</p>
+<div class="sourceCode">
+<pre>1. **Pairs in RT windows.** For every feature, find all other features
+   in the same RT tolerance window (per sample) and compute the m/z
+   delta. The pair is always oriented `(lower_mz, higher_mz)` so that
+   `delta = mz_higher - mz_lower &gt;= 0`.
+
+2. **Adduct edges.** Match each pair's `delta` against the table of
+   precomputed pairwise differences between known mode-specific
+   adducts. A match labels the edge `adduct_low _ adduct_high` and
+   tentatively assigns the corresponding adduct to each endpoint.
+
+3. **Cluster edges.** Match `delta` against cluster masses (e.g. ACN,
+   MeOH, Na). A cluster adds mass to the *higher* m/z peak, so the
+   cluster suffix `+&lt;cluster&gt;` is attached to the **dest** node's
+   adduct hypotheses.
+
+4. **Neutral-loss edges.** Match `delta` against neutral-loss masses
+   (e.g. H2O, CO2). For an NL pair, the **higher** m/z peak is the
+   precursor and the **lower** m/z peak is the product. The loss
+   suffix `-&lt;loss&gt;` is attached to the precursor's adduct hypotheses
+   (so the same neutral M is inferred from both peaks).
+
+5. **Node hypotheses.** Gather, per feature, **all** plausible adduct
+   labels: (a) what we inferred from adduct/cluster/loss edges, (b)
+   any adduct supplied upstream by the preprocessing tool, and
+   (c) the universal baseline `[M+H]+` / `[M-H]-`. Hypotheses are
+   never dropped at this stage.
+
+6. **Library match.** For every `(feature, candidate_adduct)` pair,
+   compute the implied neutral mass M and look it up in the library
+   within the ppm tolerance.
+
+7. **Network-consensus pruning.** If a feature ends up with several
+   library hits, drop only the candidates whose adduct has *zero*
+   support in the adduct edge graph **and** whose drop still leaves a
+   supported alternative. Ties are kept and drops are logged.
+
+8. **Keep unmatched adducts.** Adduct hypotheses are exported even
+   when no library structure matches, so downstream tools still see
+   the adduct annotation.
+</pre>
+</div>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -856,36 +898,18 @@ In <code>conditional</code> mode, minimum local graph degree at which support fi
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>The path to the files containing MS1 annotations and edges</p>
+<p>Named character of paths to the annotations and edges files.</p>
 </section>
 <section id="see-also" class="level3">
 <h3 class="anchored" data-anchor-id="see-also">See Also</h3>
-<p>Other annotation: <code>annotate_spectra()</code>, <code>filter_annotations()</code>, <code>weight_annotations()</code></p>
+<p>Other annotation: <code>annotate_spectra()</code>, <code>filter_annotations()</code>, <code>weight_annotations()</code>, <code>write_mztab()</code></p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">copy_backbone</span>()</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">go_to_cache</span>()</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>github <span class="ot">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/"</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>repo <span class="ot">&lt;-</span> <span class="st">"taxonomicallyinformedannotation/tima-example-files/main/"</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>data_interim <span class="ot">&lt;-</span> <span class="st">"data/interim/"</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(github, repo)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir, data_interim)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>dir_sop_mer <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir, <span class="st">"libraries/sop/merged/"</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>dir_str <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir_sop_mer, <span class="st">"structures/"</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>dir_tax <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dir_str, <span class="st">"taxonomies/"</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">annotate_masses</span>(</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="fu">paste0</span>(dir, <span class="st">"features/example_features.tsv"</span>),</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">library =</span> <span class="fu">paste0</span>(dir_sop_mer, <span class="st">"keys.tsv"</span>),</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_stereo =</span> <span class="fu">paste0</span>(dir_str, <span class="st">"stereo.tsv"</span>),</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_met =</span> <span class="fu">paste0</span>(dir_str, <span class="st">"metadata.tsv"</span>),</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_cla =</span> <span class="fu">paste0</span>(dir_tax, <span class="st">"classyfire.tsv"</span>),</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">str_tax_npc =</span> <span class="fu">paste0</span>(dir_tax, <span class="st">"npc.tsv"</span>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">annotate_masses</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 

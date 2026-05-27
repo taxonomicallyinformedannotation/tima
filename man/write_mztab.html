@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>prepare_annotations_sirius – tima</title>
+<title>write_mztab – tima</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -68,8 +68,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../man/prepare_annotations_spectra.html" rel="next">
-<link href="../man/prepare_annotations_gnps.html" rel="prev">
 <link href="../man/figures/logo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -194,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Functions</li><li class="breadcrumb-item">Prepare</li><li class="breadcrumb-item"><a href="../man/prepare_annotations_gnps.html">Annotations</a></li><li class="breadcrumb-item"><a href="../man/prepare_annotations_sirius.html">prepare_annotations_sirius</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -418,22 +416,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
  <span class="menu-text">Prepare</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
  <span class="menu-text">Annotations</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../man/prepare_annotations_gnps.html" class="sidebar-item-text sidebar-link">
@@ -442,7 +440,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/prepare_annotations_sirius.html" class="sidebar-item-text sidebar-link active">
+  <a href="../man/prepare_annotations_sirius.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">prepare_annotations_sirius</span></a>
   </div>
 </li>
@@ -641,7 +639,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#prepare-annotations-sirius" id="toc-prepare-annotations-sirius" class="nav-link active" data-scroll-target="#prepare-annotations-sirius">Prepare annotations SIRIUS</a>
+  <li><a href="#write-tima-results-as-mztab-m" id="toc-write-tima-results-as-mztab-m" class="nav-link active" data-scroll-target="#write-tima-results-as-mztab-m">Write TIMA results as mzTab-M</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -655,39 +653,51 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Functions</li><li class="breadcrumb-item">Prepare</li><li class="breadcrumb-item"><a href="../man/prepare_annotations_gnps.html">Annotations</a></li><li class="breadcrumb-item"><a href="../man/prepare_annotations_sirius.html">prepare_annotations_sirius</a></li></ol></nav></header>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
 <script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-<section id="prepare-annotations-sirius" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="prepare-annotations-sirius">Prepare annotations SIRIUS</h2>
+<section id="write-tima-results-as-mztab-m" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="write-tima-results-as-mztab-m">Write TIMA results as mzTab-M</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>Prepares SIRIUS annotation results (structure predictions, CANOPUS chemical classifications, and formula predictions) by harmonizing formats across SIRIUS versions (v5/v6), standardizing column names, and integrating with structure metadata.</p>
+<p>Exports TIMA weighted-annotation results to mzTab-M 2.0.0 plain-text format. The output is a conformant mzTab-M file containing:</p>
+<ul>
+<li>
+<p><strong>MTD</strong> – metadata (software, database, instrument, confidence measures, ms_run, sample, assay, study_variable).</p>
+</li>
+<li>
+<p><strong>SMF</strong> – one row per chromatographic feature (feature_id, m/z, RT).</p>
+</li>
+<li>
+<p><strong>SME</strong> – one row per identification evidence (candidate annotation).</p>
+</li>
+<li>
+<p><strong>SML</strong> – one row per unique compound, linking all associated SMF and SME rows.</p>
+</li>
+</ul>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">prepare_annotations_sirius(
-  input_directory = get_params(step =
-    "prepare_annotations_sirius")\$files\$annotations\$raw\$sirius,
-  output_ann = get_params(step =
-    "prepare_annotations_sirius")\$files\$annotations\$prepared\$structural\$sirius,
-  output_can = get_params(step =
-    "prepare_annotations_sirius")\$files\$annotations\$prepared\$canopus,
-  output_for = get_params(step =
-    "prepare_annotations_sirius")\$files\$annotations\$prepared\$formula,
-  sirius_version = get_params(step = "prepare_annotations_sirius")\$tools\$sirius\$version,
-  str_stereo = get_params(step =
-    "prepare_annotations_sirius")\$files\$libraries\$sop\$merged\$structures\$stereo,
-  str_met = get_params(step =
-    "prepare_annotations_sirius")\$files\$libraries\$sop\$merged\$structures\$metadata,
-  str_tax_cla = get_params(step =
-    "prepare_annotations_sirius")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$cla,
-  str_tax_npc = get_params(step =
-    "prepare_annotations_sirius")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$npc,
-  max_analog_abs_mz_error = get_params(step =
-    "prepare_annotations_sirius")\$tools\$sirius\$max_analog_abs_mz_error
+<pre><code class="language-R">write_mztab(
+  input = get_params(step = "write_mztab")\$files\$annotations\$processed,
+  output = get_params(step = "write_mztab")\$files\$output\$mztab,
+  ms_run_location = "null",
+  ms_run_format = "null",
+  ms_run_id_format = "null",
+  polarity = NULL,
+  instrument = NULL,
+  sample_name = NULL,
+  publication = NULL,
+  title = "TIMA annotation results",
+  description = paste0("Annotation results produced by Taxonomically Informed ",
+    "Metabolomics Annotation (TIMA)."),
+  software_version = as.character(utils::packageVersion("tima")),
+  contact = NULL,
+  xrefs_file = NULL,
+  edges_file = NULL,
+  base_mztab = NULL
 )
 </code></pre>
 </section>
@@ -696,128 +706,238 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table role="presentation">
 <tbody><tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="input_directory">input_directory</code>
+<code id="input">input</code>
 </td>
 <td>
-character Character path to directory or zip file containing SIRIUS results.
+<code>character</code> Path to TIMA results file produced by <code>weight_annotations()</code>.
 </td>
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="output_ann">output_ann</code>
+<code id="output">output</code>
 </td>
 <td>
-character Character path for prepared structure annotation output.
+<code>character</code> Destination path for the mzTab-M file (<code>.mztab</code> extension recommended).
 </td>
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="output_can">output_can</code>
+<code id="ms_run_location">ms_run_location</code>
 </td>
 <td>
-character Character path for prepared CANOPUS output.
+<code>character</code> URI/path to the originating raw data file (used in <code style="white-space: pre;">MTD ms_run[1]-location</code>). Defaults to <code>“null”</code>.
 </td>
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="output_for">output_for</code>
+<code id="ms_run_format">ms_run_format</code>
 </td>
 <td>
-character Character path for prepared formula output.
+<code>character</code> CV Param string for the raw file format, e.g.&nbsp;<code>“[MS, MS:1000584, mzML file, ]”</code>. Defaults to <code>“null”</code> when not known.
 </td>
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="sirius_version">sirius_version</code>
+<code id="ms_run_id_format">ms_run_id_format</code>
 </td>
 <td>
-character Character SIRIUS version ("5" or "6").
+<code>character</code> CV Param string for the spectrum native-ID format, e.g. <code>“[MS, MS:1000776, scan number only nativeID format, ]”</code>. Defaults to <code>“null”</code>.
 </td>
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_stereo">str_stereo</code>
+<code id="polarity">polarity</code>
 </td>
 <td>
-character Character path to structure stereochemistry file.
+<code>character | NULL</code> Scan polarity of the MS run. One of <code>“positive”</code>, <code>“negative”</code>, or <code>NULL</code>/<code>“null”</code> (unknown / data-dependent). Used to populate <code>ms_run[1]-scan_polarity</code> with the correct PSI-MS CV term (<code>MS:1000130</code> positive, <code>MS:1000129</code> negative).
 </td>
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_met">str_met</code>
+<code id="instrument">instrument</code>
 </td>
 <td>
-character Character path to structure metadata file.
+<code>character | NULL</code> CV Param string for the mass spectrometer model, e.g.&nbsp;<code>“[MS, MS:1001742, LTQ Orbitrap Velos, ]”</code>. When <code>NULL</code> the <code>instrument[1]</code> block is omitted.
 </td>
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_tax_cla">str_tax_cla</code>
+<code id="sample_name">sample_name</code>
 </td>
 <td>
-character Character path to ClassyFire taxonomy file.
+<code>character | NULL</code> Free-text sample name written to <code>sample[1]-description</code>. When <code>NULL</code>, a generic metabolomics description is used.
 </td>
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="str_tax_npc">str_tax_npc</code>
+<code id="publication">publication</code>
 </td>
 <td>
-character Character path to NPClassifier taxonomy file.
+<code>character | NULL</code> Bibliographic reference for the study (PubMed URL or DOI). When provided, emitted as <code style="white-space: pre;">MTD publication[1]</code>.
 </td>
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="max_analog_abs_mz_error">max_analog_abs_mz_error</code>
+<code id="title">title</code>
 </td>
 <td>
-numeric Maximum allowed absolute m/z deviation (Da) for keeping SIRIUS spectral analog hits.
+<code>character</code> Free-text study title written to <code style="white-space: pre;">MTD title</code>.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="description">description</code>
+</td>
+<td>
+<code>character</code> Free-text experiment description written to <code style="white-space: pre;">MTD description</code>.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="software_version">software_version</code>
+</td>
+<td>
+<code>character</code> Version string for the software entry. Defaults to the installed TIMA package version.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="contact">contact</code>
+</td>
+<td>
+<code>list | NULL</code> Optional contact information list with fields <code>name</code>, <code>email</code>, and optionally <code>affiliation</code>. When supplied, the corresponding <code style="white-space: pre;">MTD contact[1]-*</code> lines are emitted.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="xrefs_file">xrefs_file</code>
+</td>
+<td>
+<code>character | NULL</code> Optional path to a cross-references TSV produced by <code>get_compounds_xrefs()</code>. When provided, the <code>uri</code> fields in SME/SML are enriched with external database URLs (Wikidata preferred), and additional <code style="white-space: pre;">MTD database[n]</code> blocks are registered for each unique xref prefix found in the data.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="edges_file">edges_file</code>
+</td>
+<td>
+<code>character | NULL</code> Optional path to an edge table (for example from <code>data/interim</code>). When provided, all edge rows are embedded in the mzTab text export as <code>COM</code> extension lines (<code style="white-space: pre;">TIMA edges</code>) so graph information lives in the same artifact.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="base_mztab">base_mztab</code>
+</td>
+<td>
+<code>character | NULL</code> Optional existing mzTab-M file to complement. Existing SML/SMF/SME rows are preserved and new TIMA rows are appended without duplication. Non-managed lines/sections are passed through unchanged.
 </td>
 </tr>
 </tbody></table>
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>This function:</p>
+<p>The function intentionally writes in <strong>Summary</strong> mode because TIMA is an annotation/prioritization tool and does not guarantee complete quantification matrices. Fields that have no TIMA equivalent (e.g. full InChI, spectra_ref) are written as <code>null</code>.</p>
+<p>TIMA columns are mapped to canonical mzTab fields where a direct equivalent exists; only truly unmapped columns fall back to <code style="white-space: pre;">opt_global_*</code> to keep downstream consumers happy:</p>
 <ul>
 <li>
-<p>Validates inputs (version, paths, file existence).</p>
+<p><strong>SME section</strong> – candidate-level columns with no canonical field (e.g.&nbsp;SIRIUS subscores, similarity forward/reverse, m/z error) become <code style="white-space: pre;">opt_global_*</code>. Feature-level columns are <strong>not</strong> repeated here; they belong to the SMF section.</p>
 </li>
 <li>
-<p>Loads SIRIUS output files (CANOPUS, formulas, structures, denovo, spectral matches).</p>
-</li>
-<li>
-<p>Harmonizes column names across SIRIUS v5 and v6.</p>
-</li>
-<li>
-<p>Joins with structure metadata (stereochemistry, names, taxonomy).</p>
-</li>
-<li>
-<p>Splits results into three output files: annotations, CANOPUS, formulas.</p>
-</li>
-<li>
-<p>Exports parameters and results.</p>
+<p><strong>SMF section</strong> – all <code style="white-space: pre;">feature_<em></em></code><em> columns beyond <code>feature_mz</code> and <code>feature_rt</code> (spectrum entropy, spectrum peaks, predicted taxonomy class/NPC scores …) are exported as <code style="white-space: pre;">opt_global_</code></em> in the SMF row, making them available without polluting SME.</p>
 </li>
 </ul>
-<p>If the input directory does not exist, returns an empty template with expected columns to ensure downstream compatibility.</p>
+<h4 class="anchored">
+mzTab-M reliability mapping
+</h4>
+<p>Reliability levels follow the Metabolomics Standards Initiative (MSI) scale:</p>
+<ul>
+<li>
+<p><strong>1</strong> – confirmed (score ≥ 0.7 with spectral library evidence)</p>
+</li>
+<li>
+<p><strong>2</strong> – probable (score ≥ 0.5; or spectral match, any score)</p>
+</li>
+<li>
+<p><strong>3</strong> – putative (score ≥ 0.2)</p>
+</li>
+<li>
+<p><strong>4</strong> – unambiguous compound class only (everything else)</p>
+</li>
+</ul>
+<h4 class="anchored">
+id_confidence_measure columns
+</h4>
+<p>Four TIMA-specific confidence measures are exported as <code style="white-space: pre;">id_confidence_measure[1..4]</code> in the MTD section and as additional columns in the SME section. All use the <code>TIMA</code> user-controlled CV namespace (no PSI-MS accession exists for these composite scores):</p>
+<ul>
+<li>
+<p><code style="white-space: pre;">[1]</code> – <code>score_final</code> (combined TIMA score; <code>TIMA:001</code>)</p>
+</li>
+<li>
+<p><code style="white-space: pre;">[2]</code> – <code>score_biological</code> (taxonomic score; <code>TIMA:002</code>)</p>
+</li>
+<li>
+<p><code style="white-space: pre;">[3]</code> – <code>score_chemical</code> (chemical consistency; <code>TIMA:003</code>)</p>
+</li>
+<li>
+<p><code style="white-space: pre;">[4]</code> – <code>candidate_score_similarity</code> (spectral similarity; <code>TIMA:004</code>; omitted when no spectral evidence is present)</p>
+</li>
+</ul>
+<h4 class="anchored">
+Ontology alignment
+</h4>
+<ul>
+<li>
+<p><code>ms_level</code> uses PSI-MS accessions <code>MS:1000579</code> (MS1) and <code>MS:1000580</code> (MS2).</p>
+</li>
+<li>
+<p><code>scan_polarity</code> uses <code>MS:1000130</code> (positive) and <code>MS:1000129</code> (negative) when <code>polarity</code> is supplied.</p>
+</li>
+<li>
+<p><code>retention_time_in_seconds</code> is declared in <code>colunit-small_molecule_feature</code> with UO accession <code>UO:0000010</code>.</p>
+</li>
+<li>
+<p><code>theoretical_neutral_mass</code> is declared with <code>UO:0000221</code> (dalton).</p>
+</li>
+<li>
+<p><code>spectra_ref</code> is formatted as <code>ms_run[1]:{spectrum_native_id}</code>.</p>
+</li>
+<li>
+<p><code>instrument[1]</code> is populated from the <code>instrument</code> parameter using a PSI-MS CV Param when provided.</p>
+</li>
+<li>
+<p><code>quantification_method</code> is set to <code style="white-space: pre;">[MS, MS:1001834, LC-MS label-free quantitation analysis, ]</code> for untargeted metabolomics (per PSI-MS ontology).</p>
+</li>
+<li>
+<p><code>assay[1]-quantification_reagent</code> is set to <code style="white-space: pre;">[MS, MS:1002038, unlabeled sample, ]</code> (no labelling used by TIMA).</p>
+</li>
+<li>
+<p><code>sample[1]</code> defaults to a metabolite mixture Param; can be overridden via the <code>sample_name</code> parameter.</p>
+</li>
+<li>
+<p><code>publication</code> emits a formatted citation when <code>publication</code> is supplied.</p>
+</li>
+<li>
+<p>The software entry includes the TIMA repository URL as a <code>software[1]-setting</code> for machine-readable provenance.</p>
+</li>
+</ul>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Character path to the prepared SIRIUS annotations file (invisible).</p>
+<p>Character path to the written mzTab-M file (invisibly).</p>
 </section>
 <section id="see-also" class="level3">
 <h3 class="anchored" data-anchor-id="see-also">See Also</h3>
-<p>Other preparation: <code>prepare_annotations_gnps()</code>, <code>prepare_annotations_mzmine()</code>, <code>prepare_annotations_mztab()</code>, <code>prepare_annotations_spectra()</code>, <code>prepare_features_components()</code>, <code>prepare_features_edges()</code>, <code>prepare_features_tables()</code>, <code>prepare_libraries_rt()</code>, <code>prepare_libraries_sop_bigg()</code>, <code>prepare_libraries_sop_closed()</code>, <code>prepare_libraries_sop_ecmdb()</code>, <code>prepare_libraries_sop_hmdb()</code>, <code>prepare_libraries_sop_lotus()</code>, <code>prepare_libraries_sop_merged()</code>, <code>prepare_libraries_spectra()</code>, <code>prepare_params()</code>, <code>prepare_taxa()</code>, <code>read_mztab()</code></p>
+<p>Other annotation: <code>annotate_masses()</code>, <code>annotate_spectra()</code>, <code>filter_annotations()</code>, <code>weight_annotations()</code></p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tima"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">copy_backbone</span>()</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">go_to_cache</span>()</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">prepare_annotations_sirius</span>()</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"data"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_mztab</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">input  =</span> <span class="st">"annotations.tsv"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">output =</span> <span class="st">"annotations.mztab"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
@@ -1225,18 +1345,6 @@ numeric Maximum allowed absolute m/z deviation (Da) for keeping SIRIUS spectral 
     }
   });
   </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../man/prepare_annotations_gnps.html" class="pagination-link" aria-label="prepare_annotations_gnps">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">prepare_annotations_gnps</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../man/prepare_annotations_spectra.html" class="pagination-link" aria-label="prepare_annotations_spectra">
-        <span class="nav-page-text">prepare_annotations_spectra</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 
 
