@@ -127,14 +127,14 @@ verify_directory_writable <- function(dir_path) {
 
   write_ok <- tryCatch(
     {
-      writeLines("test", test_file)
+      suppressWarnings(writeLines("test", test_file))
       unlink(test_file, force = TRUE)
       TRUE
     },
     error = function(e) {
       log_warn(
-        "Directory exists but may not be writable: {dir_path}. ",
-        "This may cause failures in Docker/restricted environments."
+        "Directory exists but may not be writable: %s. This may cause failures in Docker/restricted environments.",
+        dir_path
       )
       log_debug("Write test error: %s", conditionMessage(e))
       FALSE
