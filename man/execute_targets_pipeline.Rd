@@ -4,7 +4,7 @@
 \alias{execute_targets_pipeline}
 \title{Execute TIMA Targets Pipeline}
 \usage{
-execute_targets_pipeline(target_pattern = "^ann_wei$")
+execute_targets_pipeline(target_pattern = "^(ann_wei|exp_mzt)$")
 }
 \arguments{
 \item{target_pattern}{\link{character} Character regex pattern to match target

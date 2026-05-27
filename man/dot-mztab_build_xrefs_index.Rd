@@ -14,6 +14,6 @@ Named list of data.frames, or \code{NULL} when no valid file is provided.
 }
 \description{
 Loads the cross-references file from \code{\link[=get_compounds_xrefs]{get_compounds_xrefs()}} and indexes it
-by InChIKey connectivity layer so per-compound look-up is O(1).
+by the InChIKey connectivity layer fragment so per-compound look-up is O(1).
 }
 \keyword{internal}

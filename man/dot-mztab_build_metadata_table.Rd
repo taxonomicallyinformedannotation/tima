@@ -5,6 +5,7 @@
 \title{Build mzTab-M metadata table}
 \usage{
 .mztab_build_metadata_table(
+  mztab_id,
   title,
   description,
   software_version,

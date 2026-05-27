@@ -2,11 +2,12 @@
 % Please edit documentation in R/write_mztab.R
 \name{.mztab_build_sml}
 \alias{.mztab_build_sml}
-\title{Build SML (Small Molecule Summary) table – one row per unique compound}
+\title{Build SML (Small Molecule Summary) table.}
 \usage{
 .mztab_build_sml(results, smf_table, sme_table, xrefs_index = NULL)
 }
 \description{
-Build SML (Small Molecule Summary) table – one row per unique compound
+SML rows are emitted per feature and retain multi-candidate ambiguity using
+pipe-aligned values across identifier columns.
 }
 \keyword{internal}

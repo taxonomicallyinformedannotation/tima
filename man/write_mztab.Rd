@@ -91,7 +91,7 @@ unchanged.}
 Character path to the written mzTab-M file (invisibly).
 }
 \description{
-Exports TIMA weighted-annotation results to mzTab-M 2.0.0
+Exports TIMA weighted-annotation results to mzTab-M 2.1.0
 plain-text format.  The output is a conformant mzTab-M file containing:
 \itemize{
 \item \strong{MTD} – metadata (software, database, instrument, confidence measures,

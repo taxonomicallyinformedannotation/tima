@@ -5,7 +5,7 @@
 \title{Run Complete TIMA Workflow (DEPRECATED)}
 \usage{
 tima_full(
-  target_pattern = "^ann_wei$",
+  target_pattern = "^(ann_wei|exp_mzt)$",
   log_file = "tima.log",
   clean_old_logs = TRUE,
   log_level = "info"
@@ -13,7 +13,7 @@ tima_full(
 }
 \arguments{
 \item{target_pattern}{Character. Regex pattern for target selection.
-Default: "^ann_wei$"}
+Default: "^(ann_wei|exp_mzt)$"}
 
 \item{log_file}{Character. Path to log file. Default: "tima.log"}
 
@@ -39,8 +39,8 @@ but issues a deprecation warning.
 
 \strong{Migration Guide:}
 \itemize{
-\item Old: \code{tima_full(target_pattern = "^ann_wei$")}
-\item New: \code{run_tima(target_pattern = "^ann_wei$")}
+\item Old: \code{tima_full(target_pattern = "^(ann_wei|exp_mzt)$")}
+\item New: \code{run_tima(target_pattern = "^(ann_wei|exp_mzt)$")}
 }
 
 All parameters and behavior are identical between the two functions.

@@ -5,7 +5,7 @@
 \title{Run Complete TIMA Workflow}
 \usage{
 run_tima(
-  target_pattern = "^ann_wei$",
+  target_pattern = "^(ann_wei|exp_mzt)$",
   log_file = "tima.log",
   clean_old_logs = TRUE,
   log_level = "info"
@@ -13,7 +13,7 @@ run_tima(
 }
 \arguments{
 \item{target_pattern}{\link{character} Regex pattern for target selection.
-Default: "^ann_wei$" (annotation preparation target)}
+Default: "^(ann_wei|exp_mzt)$" (annotation preparation + mzTab export)}
 
 \item{log_file}{\link{character} Path to log file. Default: "tima.log"}
 
@@ -43,7 +43,7 @@ The workflow performs the following steps:
 \itemize{
 \item Initializes logging and timing
 \item Navigates to cache directory
-\item Executes the targets pipeline (annotation preparation)
+\item Executes the targets pipeline (annotation preparation + mzTab export)
 \item Archives timestamped logs to data/processed/
 }
 }

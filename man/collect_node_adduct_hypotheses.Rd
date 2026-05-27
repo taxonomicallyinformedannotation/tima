@@ -8,6 +8,7 @@ collect_node_adduct_hypotheses(
   adduct_edges,
   cluster_edges,
   loss_edges,
+  evidence_hypotheses,
   preassigned,
   baseline_adduct,
   features_table
