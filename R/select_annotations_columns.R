@@ -221,13 +221,12 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
     return(df)
   }
 
-  # Build a lookup keyed by the original (input) SMILES
+  # Build a lookup keyed by original (input) SMILES.
   lookup <- processed |>
     tidytable::select(
       tidyselect::any_of(c(
         ".input_smiles" = "structure_smiles_initial",
         ".recomputed_smiles_no_stereo" = "structure_smiles_no_stereo",
-        ".recomputed_inchikey" = "structure_inchikey",
         ".recomputed_inchikey_connectivity_layer" = "structure_inchikey_connectivity_layer",
         ".recomputed_inchikey_no_stereo" = "structure_inchikey_no_stereo",
         ".recomputed_molecular_formula" = "structure_molecular_formula",
@@ -237,11 +236,7 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
     ) |>
     tidytable::distinct(.input_smiles, .keep_all = TRUE)
 
-  # Join and overwrite computable fields
-  # Ensure target columns exist before coalescing (they may not exist yet
-
-  # if this is the first time they are being computed, e.g., from
-  # annotate_spectra output)
+  # Ensure target columns exist before overwrite/coalesce.
   ensure_cols <- c(
     "candidate_structure_inchikey_connectivity_layer",
     "candidate_structure_inchikey_no_stereo",
@@ -255,49 +250,30 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
     }
   }
 
-  df <- df |>
-    tidytable::left_join(
-      lookup,
-      by = stats::setNames(".input_smiles", smiles_col)
-    ) |>
-    tidytable::mutate(
-      candidate_structure_smiles_no_stereo = tidytable::coalesce(
-        .recomputed_smiles_no_stereo,
-        candidate_structure_smiles_no_stereo
-      ),
-      candidate_structure_inchikey_connectivity_layer = tidytable::coalesce(
-        .recomputed_inchikey_connectivity_layer,
-        candidate_structure_inchikey_connectivity_layer
-      ),
-      candidate_structure_molecular_formula = .recomputed_molecular_formula,
-      candidate_structure_exact_mass = .recomputed_exact_mass,
-      candidate_structure_xlogp = .recomputed_xlogp
-    )
+  idx <- match(as.character(df[[smiles_col]]), lookup$.input_smiles)
 
-  # Only overwrite InChIKey no-stereo if we have a recomputed value
-  if (".recomputed_inchikey_no_stereo" %in% names(df)) {
-    df <- df |>
-      tidytable::mutate(
-        candidate_structure_inchikey_no_stereo = tidytable::coalesce(
-          .recomputed_inchikey_no_stereo,
-          candidate_structure_inchikey_no_stereo
-        )
-      )
-  }
+  recomputed_smiles <- lookup$.recomputed_smiles_no_stereo[idx]
+  recomputed_ik_conn <- lookup$.recomputed_inchikey_connectivity_layer[idx]
+  recomputed_ik_no_stereo <- lookup$.recomputed_inchikey_no_stereo[idx]
+  recomputed_formula <- lookup$.recomputed_molecular_formula[idx]
+  recomputed_exact_mass <- lookup$.recomputed_exact_mass[idx]
+  recomputed_xlogp <- lookup$.recomputed_xlogp[idx]
 
-  # Drop temporary columns
-  df <- df |>
-    tidytable::select(
-      -tidyselect::any_of(c(
-        ".recomputed_smiles_no_stereo",
-        ".recomputed_inchikey",
-        ".recomputed_inchikey_connectivity_layer",
-        ".recomputed_inchikey_no_stereo",
-        ".recomputed_molecular_formula",
-        ".recomputed_exact_mass",
-        ".recomputed_xlogp"
-      ))
-    )
+  df$candidate_structure_smiles_no_stereo <- tidytable::coalesce(
+    recomputed_smiles,
+    df$candidate_structure_smiles_no_stereo
+  )
+  df$candidate_structure_inchikey_connectivity_layer <- tidytable::coalesce(
+    recomputed_ik_conn,
+    df$candidate_structure_inchikey_connectivity_layer
+  )
+  df$candidate_structure_inchikey_no_stereo <- tidytable::coalesce(
+    recomputed_ik_no_stereo,
+    df$candidate_structure_inchikey_no_stereo
+  )
+  df$candidate_structure_molecular_formula <- recomputed_formula
+  df$candidate_structure_exact_mass <- recomputed_exact_mass
+  df$candidate_structure_xlogp <- recomputed_xlogp
 
   df
 }

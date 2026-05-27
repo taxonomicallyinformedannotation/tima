@@ -155,6 +155,49 @@ test_that("select_annotations_columns drops duplicate raw structure metadata col
   expect_false(any(grepl("^structure_", names(result))))
 })
 
+test_that("recompute_structure_fields_from_smiles updates fields without join artifacts", {
+  local_mocked_bindings(
+    process_smiles = function(smiles_df, cache = NULL) {
+      invisible(cache)
+      expect_true("structure_smiles_initial" %in% names(smiles_df))
+      tidytable::tidytable(
+        structure_smiles_initial = c("CCO", "CCC"),
+        structure_smiles_no_stereo = c("CCO", "CCC"),
+        structure_inchikey_connectivity_layer = c("IKCCO", "IKCCC"),
+        structure_inchikey_no_stereo = c("IKNSCCO", "IKNSCCC"),
+        structure_molecular_formula = c("C2H6O", "C3H8"),
+        structure_exact_mass = c("46.0419", "44.0626"),
+        structure_xlogp = c("-0.3", "1.2")
+      )
+    },
+    .package = "tima"
+  )
+
+  df <- tidytable::tidytable(
+    candidate_structure_smiles_no_stereo = c("CCO", "", NA_character_),
+    candidate_structure_inchikey_connectivity_layer = c("old1", "old2", "old3"),
+    candidate_structure_inchikey_no_stereo = c("old_ns1", "old_ns2", "old_ns3"),
+    candidate_structure_molecular_formula = c("old_f1", "old_f2", "old_f3"),
+    candidate_structure_exact_mass = c("old_m1", "old_m2", "old_m3"),
+    candidate_structure_xlogp = c("old_x1", "old_x2", "old_x3")
+  )
+
+  result <- recompute_structure_fields_from_smiles(df)
+
+  expect_equal(
+    result$candidate_structure_inchikey_connectivity_layer[[1]],
+    "IKCCO"
+  )
+  expect_equal(result$candidate_structure_inchikey_no_stereo[[1]], "IKNSCCO")
+  expect_equal(result$candidate_structure_molecular_formula[[1]], "C2H6O")
+  expect_equal(result$candidate_structure_exact_mass[[1]], "46.0419")
+  expect_equal(result$candidate_structure_xlogp[[1]], "-0.3")
+
+  expect_true(is.na(result$candidate_structure_molecular_formula[[2]]))
+  expect_true(is.na(result$candidate_structure_molecular_formula[[3]]))
+  expect_false(any(grepl("^\\.recomputed_", names(result))))
+})
+
 # test_that(
 #   skip("Not implemented")
 # )
