@@ -79,17 +79,51 @@ get_example_files <- function(
     paste(example, collapse = ", ")
   )
 
+  paths <- get_default_paths()
+
+  download_example_files_impl(
+    example = example,
+    in_cache = in_cache,
+    paths = paths,
+    download_file = function(url, export) {
+      get_file(url = url, export = export)
+    },
+    download_sirius = function() {
+      get_example_sirius(
+        url = paths$urls$examples$sirius,
+        export = paths$data$interim$annotations$example_sirius
+      )
+    },
+    enter_cache = function() {
+      go_to_cache()
+    }
+  )
+
+  log_info("Downloaded %d example file(s)", length(example))
+  invisible(NULL)
+}
+
+#' Download selected example files using injected dependencies
+#' @keywords internal
+download_example_files_impl <- function(
+  example,
+  in_cache,
+  paths,
+  download_file,
+  download_sirius,
+  enter_cache
+) {
   # Navigate to cache if requested
   if (in_cache) {
-    go_to_cache()
+    enter_cache()
   }
 
   # Download each requested example file
   if ("features" %in% example) {
     log_debug("Downloading features example")
-    get_file(
-      url = get_default_paths()$urls$examples$features,
-      export = get_default_paths()$data$source$features
+    download_file(
+      url = paths$urls$examples$features,
+      export = paths$data$source$features
     )
   }
   # if ("hmdb_is" %in% example) {
@@ -101,34 +135,33 @@ get_example_files <- function(
   # }
   if ("metadata" %in% example) {
     log_debug("Downloading metadata example")
-    get_file(
-      url = get_default_paths()$urls$examples$metadata,
-      export = get_default_paths()$data$source$metadata
+    download_file(
+      url = paths$urls$examples$metadata,
+      export = paths$data$source$metadata
     )
   }
 
   if ("sirius" %in% example) {
     log_debug("Downloading SIRIUS examples")
-    get_example_sirius()
+    download_sirius()
   }
 
   if ("spectra" %in% example) {
     log_debug("Downloading spectra example")
-    get_file(
-      url = get_default_paths()$urls$examples$spectra,
+    download_file(
+      url = paths$urls$examples$spectra,
       # url = get_default_paths()$urls$examples$spectra_mini,
-      export = get_default_paths()$data$source$spectra
+      export = paths$data$source$spectra
     )
   }
 
   if ("spectral_lib_with_rt" %in% example) {
     log_debug("Downloading spectral library with retention times")
-    get_file(
-      url = get_default_paths()$urls$examples$spectral_lib_mini$with_rt,
-      export = get_default_paths()$data$source$libraries$spectra$exp$with_rt
+    download_file(
+      url = paths$urls$examples$spectral_lib_mini$with_rt,
+      export = paths$data$source$libraries$spectra$exp$with_rt
     )
   }
 
-  log_info("Downloaded %d example file(s)", length(example))
   invisible(NULL)
 }
