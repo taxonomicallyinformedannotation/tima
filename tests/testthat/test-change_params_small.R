@@ -794,7 +794,10 @@ test_that("prepare_params propagates mzTab paths into mzTab workflow step YAMLs"
   skip_if_not_installed("yaml")
 
   params_root <- system.file("params", package = "tima")
-  skip_if(!nzchar(params_root), "Could not locate installed tima params directory")
+  skip_if(
+    !nzchar(params_root),
+    "Could not locate installed tima params directory"
+  )
   default_dir <- file.path(params_root, "default")
   default_files <- list.files(
     default_dir,
