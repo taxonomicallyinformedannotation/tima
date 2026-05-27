@@ -21,7 +21,11 @@ test_that("validate_install_inputs rejects invalid package values", {
 
 test_that("validate_install_inputs rejects invalid repos and dependencies", {
   expect_error(validate_install_inputs("tima", character(0), TRUE))
-  expect_error(validate_install_inputs("tima", c("https://cran.r-project.org", ""), TRUE))
+  expect_error(validate_install_inputs(
+    "tima",
+    c("https://cran.r-project.org", ""),
+    TRUE
+  ))
   expect_error(validate_install_inputs("tima", 123, TRUE))
   expect_error(validate_install_inputs("tima", .make_repos(), "yes"))
   expect_error(validate_install_inputs("tima", .make_repos(), c(TRUE, FALSE)))

@@ -105,7 +105,9 @@ test_that("get_example_files enters cache mode before downloading", {
     example = "features",
     in_cache = TRUE,
     paths = list(
-      urls = list(examples = list(features = "https://example.test/features.csv")),
+      urls = list(
+        examples = list(features = "https://example.test/features.csv")
+      ),
       data = list(source = list(features = "data/source/features.csv"))
     ),
     download_file = function(url, export) {
@@ -194,7 +196,9 @@ test_that("get_example_files handles a single example file", {
     example = "features",
     in_cache = FALSE,
     paths = list(
-      urls = list(examples = list(features = "https://example.test/features.csv")),
+      urls = list(
+        examples = list(features = "https://example.test/features.csv")
+      ),
       data = list(source = list(features = "data/source/features.csv"))
     ),
     download_file = function(url, export) {

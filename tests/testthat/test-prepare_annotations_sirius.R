@@ -937,26 +937,48 @@ test_that("load_sirius_tables filters formulaRank and loads denovo/spectral when
     utils::write.table(x, path, sep = "\t", row.names = FALSE, quote = FALSE)
   }
 
-  write_tsv(file.path(tmp, "canopus_formula_summary_all.tsv"), data.frame(
-    mappingFeatureId = c("F1", "F2"),
-    formulaRank = c(1L, 2L)
-  ))
-  write_tsv(file.path(tmp, "formula_identifications_all.tsv"), data.frame(
-    mappingFeatureId = c("F1", "F2"),
-    formulaRank = c(1L, 3L)
-  ))
-  write_tsv(file.path(tmp, "structure_identifications_all.tsv"), data.frame(
-    mappingFeatureId = c("F1", "F2")
-  ))
-  write_tsv(file.path(tmp, "denovo_structure_identifications_all.tsv"), data.frame(
-    mappingFeatureId = c("F1", "F2")
-  ))
-  write_tsv(file.path(tmp, "spectral_matches_all.tsv"), data.frame(
-    mappingFeatureId = "F1", similarity = "0.8", sharedPeaks = "10"
-  ))
-  write_tsv(file.path(tmp, "spectral_matches_analog_all.tsv"), data.frame(
-    mappingFeatureId = "F2", similarity = "0.7", sharedPeaks = "8"
-  ))
+  write_tsv(
+    file.path(tmp, "canopus_formula_summary_all.tsv"),
+    data.frame(
+      mappingFeatureId = c("F1", "F2"),
+      formulaRank = c(1L, 2L)
+    )
+  )
+  write_tsv(
+    file.path(tmp, "formula_identifications_all.tsv"),
+    data.frame(
+      mappingFeatureId = c("F1", "F2"),
+      formulaRank = c(1L, 3L)
+    )
+  )
+  write_tsv(
+    file.path(tmp, "structure_identifications_all.tsv"),
+    data.frame(
+      mappingFeatureId = c("F1", "F2")
+    )
+  )
+  write_tsv(
+    file.path(tmp, "denovo_structure_identifications_all.tsv"),
+    data.frame(
+      mappingFeatureId = c("F1", "F2")
+    )
+  )
+  write_tsv(
+    file.path(tmp, "spectral_matches_all.tsv"),
+    data.frame(
+      mappingFeatureId = "F1",
+      similarity = "0.8",
+      sharedPeaks = "10"
+    )
+  )
+  write_tsv(
+    file.path(tmp, "spectral_matches_analog_all.tsv"),
+    data.frame(
+      mappingFeatureId = "F2",
+      similarity = "0.7",
+      sharedPeaks = "8"
+    )
+  )
 
   old <- getwd()
   on.exit(setwd(old), add = TRUE)
@@ -991,15 +1013,26 @@ test_that("load_sirius_tables v6 leaves spectral template when no spectral files
     utils::write.table(x, path, sep = "\t", row.names = FALSE, quote = FALSE)
   }
 
-  write_tsv(file.path(tmp, "canopus_formula_summary_all.tsv"), data.frame(
-    mappingFeatureId = "F1", formulaRank = 1L
-  ))
-  write_tsv(file.path(tmp, "formula_identifications_all.tsv"), data.frame(
-    mappingFeatureId = "F1", formulaRank = 1L
-  ))
-  write_tsv(file.path(tmp, "structure_identifications_all.tsv"), data.frame(
-    mappingFeatureId = "F1"
-  ))
+  write_tsv(
+    file.path(tmp, "canopus_formula_summary_all.tsv"),
+    data.frame(
+      mappingFeatureId = "F1",
+      formulaRank = 1L
+    )
+  )
+  write_tsv(
+    file.path(tmp, "formula_identifications_all.tsv"),
+    data.frame(
+      mappingFeatureId = "F1",
+      formulaRank = 1L
+    )
+  )
+  write_tsv(
+    file.path(tmp, "structure_identifications_all.tsv"),
+    data.frame(
+      mappingFeatureId = "F1"
+    )
+  )
 
   old <- getwd()
   on.exit(setwd(old), add = TRUE)
