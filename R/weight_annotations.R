@@ -1,3 +1,174 @@
+#' @title Weight annotations
+#'
+#' @description This function weights annotations.
+#'
+#' @include clean_bio.R
+#' @include clean_chemo.R
+#' @include columns_utils.R
+#' @include decorate_bio.R
+#' @include decorate_chemo.R
+#' @include get_default_paths.R
+#' @include get_params.R
+#' @include weight_bio.R
+#' @include weight_chemo.R
+#'
+#' @param library Library containing the keys
+#' @param org_tax_ott File containing organisms taxonomy (OTT)
+#' @param str_stereo File containing structures stereo
+#' @param annotations Prepared annotations file
+#' @param canopus Prepared canopus file
+#' @param formula Prepared formula file
+#' @param components Prepared components file
+#' @param edges Prepared edges file
+#' @param taxa Prepared taxed features file
+#' @param output Output file
+#' @param candidates_neighbors Number of neighbors candidates to keep
+#' @param candidates_final Number of final candidates to keep
+#' @param best_percentile Numeric percentile threshold (0-1) for selecting top
+#'     candidates within each feature (default: 0.9). Used for consistent
+#'     filtering between mini and filtered outputs.
+#' @param weight_spectral Weight for the spectral score
+#' @param weight_chemical Weight for the biological score
+#' @param weight_biological Weight for the chemical consistency score
+#' @param score_biological_domain Score for a `domain` match
+#' (should be lower than `kingdom`)
+#' @param score_biological_kingdom Score for a `kingdom` match
+#' (should be lower than `phylum`)
+#' @param score_biological_phylum Score for a `phylum` match
+#' (should be lower than `class`)
+#' @param score_biological_class Score for a `class` match
+#' (should be lower than `order`)
+#' @param score_biological_order Score for a `order` match
+#' (should be lower than `infraorder`)
+#' @param score_biological_infraorder Score for a `infraorder` match
+#' (should be lower than `order`)
+#' @param score_biological_family Score for a `family` match
+#' (should be lower than `subfamily`)
+#' @param score_biological_subfamily Score for a `subfamily` match
+#' (should be lower than `family`)
+#' @param score_biological_tribe Score for a `tribe` match
+#' (should be lower than `subtribe`)
+#' @param score_biological_subtribe Score for a `subtribe` match
+#' (should be lower than `genus`)
+#' @param score_biological_genus Score for a `genus` match
+#' (should be lower than `subgenus`)
+#' @param score_biological_subgenus Score for a `subgenus` match
+#' (should be lower than `species`)
+#' @param score_biological_species Score for a `species` match
+#' (should be lower than `subspecies`)
+#' @param score_biological_subspecies Score for a `subspecies` match
+#' (should be lower than `variety`)
+#' @param score_biological_variety Score for a `variety` match
+#' (should be the highest)
+#' @param score_biological_biota Score for a `Biota` match
+#' (should be the highest, special)
+#' @param score_chemical_cla_kingdom Score for a `Classyfire kingdom` match
+#' (should be lower than ` Classyfire superclass`)
+#' @param score_chemical_cla_superclass
+#' Score for a `Classyfire superclass` match
+#' (should be lower than `Classyfire class`)
+#' @param score_chemical_cla_class Score for a `Classyfire class` match
+#' (should be lower than `Classyfire parent`)
+#' @param score_chemical_cla_parent Score for a `Classyfire parent` match
+#' (should be the highest)
+#' @param score_chemical_npc_pathway Score for a `NPC pathway` match
+#' (should be lower than ` NPC superclass`)
+#' @param score_chemical_npc_superclass Score for a `NPC superclass`
+#' match (should be lower than `NPC class`)
+#' @param score_chemical_npc_class Score for a `NPC class` match
+#' (should be the highest)
+#' @param force Force parameters. Use it at your own risk
+#' @param minimal_consistency Minimal consistency score for a class. FLOAT
+#' @param minimal_ms1_bio Minimal biological score to keep MS1 based annotation
+#' @param minimal_ms1_chemo Minimal chemical score to keep MS1 based annotation
+#' @param minimal_ms1_condition Condition to be used. Must be "OR" or "AND".
+#' @param ms1_only Keep only MS1 annotations. BOOLEAN
+#' @param compounds_names Report compounds names. Can be very large. BOOLEAN
+#' @param high_confidence Report high confidence candidates only. BOOLEAN
+#' @param remove_ties Remove ties. BOOLEAN
+#' @param summarize Summarize results (1 row per feature). BOOLEAN
+#' @param pattern Pattern to identify your job. STRING
+#' @param xrefs_file Optional character path to xrefs file from
+#'     [get_compounds_xrefs()].
+#'     If provided, external database identifiers will be added to results.
+#'
+#' @return The path to the weighted annotations
+#'
+#' @family annotation
+#'
+#' @export
+#'
+#' @seealso annotate_masses weight_bio weight_chemo
+#'
+#' @examples
+#' \dontrun{
+#' copy_backbone()
+#' go_to_cache()
+#' github <- "https://raw.githubusercontent.com/"
+#' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+#' dir <- paste0(github, repo)
+#' library <- get_params(step =
+#'     "weight_annotations")$files$libraries$sop$merged$keys |>
+#'   gsub(
+#'     pattern = ".gz",
+#'     replacement = "",
+#'     fixed = TRUE
+#'   )
+#' org_tax_ott <- paste0(
+#'   "data/interim/libraries/",
+#'   "sop/merged/organisms/taxonomies/ott.tsv"
+#' )
+#' str_stereo <- paste0(
+#'   "data/interim/libraries/",
+#'   "sop/merged/structures/stereo.tsv"
+#' )
+#' annotations <- paste0(
+#'   "data/interim/annotations/",
+#'   "example_annotationsFiltered.tsv"
+#' )
+#' canopus <- paste0(
+#'   "data/interim/annotations/",
+#'   "example_canopusPrepared.tsv"
+#' )
+#' formula <- paste0(
+#'   "data/interim/annotations/",
+#'   "example_formulaPrepared.tsv"
+#' )
+#' components <- paste0(
+#'   "data/interim/features/",
+#'   "example_componentsPrepared.tsv"
+#' )
+#' edges <- paste0(
+#'   "data/interim/features/",
+#'   "example_edges.tsv"
+#' )
+#' taxa <- paste0(
+#'   "data/interim/taxa/",
+#'   "example_taxed.tsv"
+#' )
+#' get_file(url = paste0(dir, library), export = library)
+#' get_file(url = paste0(dir, org_tax_ott), export = org_tax_ott)
+#' get_file(url = paste0(dir, str_stereo), export = str_stereo)
+#' get_file(url = paste0(dir, annotations), export = annotations)
+#' get_file(url = paste0(dir, canopus), export = canopus)
+#' get_file(url = paste0(dir, formula), export = formula)
+#' get_file(url = paste0(dir, components), export = components)
+#' get_file(url = paste0(dir, edges), export = edges)
+#' get_file(url = paste0(dir, taxa), export = taxa)
+#' weight_annotations(
+#'   library = library,
+#'   org_tax_ott = org_tax_ott,
+#'   str_stereo = str_stereo,
+#'   annotations = annotations,
+#'   canopus = canopus,
+#'   formula = formula,
+#'   components = components,
+#'   edges = edges,
+#'   taxa = taxa
+#' )
+#' unlink("data", recursive = TRUE)
+#' }
+
 weight_annotations <- function(
   library = get_params(
     step = "weight_annotations"

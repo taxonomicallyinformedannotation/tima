@@ -276,23 +276,3 @@ carrier_token_mass <- function(parsed_carrier) {
   )
   paste(parts, collapse = "")
 }
-
-#' Build the canonical adduct string from typed components.
-#'
-#' Format (outside-multimer, default):
-#'   `[<n>M<carriers><+clusters><-losses>]<|z|><sign>`
-#' Format (inside-multimer, when `loss_inside_multimer` or
-#' `cluster_inside_multimer` is `TRUE` and `n_mer >= 2`):
-#'   `[<n>(M<inside-clusters><inside-losses>)<carriers><+outside-clusters><-outside-losses>]<|z|><sign>`
-#'
-#' The "inside" variant captures the chemistry where each monomer carries
-#' the cluster/loss BEFORE the multimer assembles, e.g. `[2(M-H2O)+H]+`
-#' (two M-H2O monomers dimerize, then protonate) or `[2(M+NaCl)+H]+` (each
-#' M binds NaCl first, then dimerizes). These have *different* implied
-#' neutral masses than their outside-multimer counterparts.
-#'
-#' * n omitted when n_mer == 1
-#' * |z| omitted when |z| == 1
-#'
-#' @export
-#' @keywords internal

@@ -535,25 +535,3 @@ validate_tolerance_ppm <- function(
     }
   )
 }
-
-#' Validate that files exist
-#'
-#' @description Checks that one or more file paths exist on the filesystem.
-#'     Provides detailed error messages indicating which files are missing.
-#'
-#' @param file_list [list] Named list of file paths to validate. Names are used
-#'     in error messages to identify which file is missing.
-#' @param allow_null [logical] Logical, if TRUE, NULL values are allowed
-#'     (default: FALSE)
-#'
-#' @return Invisible TRUE if all files exist, stops with error otherwise
-#'
-#' @keywords internal
-#'
-#' @examples
-#' \dontrun{
-#' validate_file_existence(list(
-#'   features = "data/features.tsv",
-#'   library = "data/library.tsv"
-#' ))
-#' }

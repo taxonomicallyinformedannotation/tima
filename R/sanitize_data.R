@@ -1,3 +1,35 @@
+#' Sanitize All Input Data
+#'
+#' @description Comprehensive validation of all input data before starting
+#'     expensive processing. Reports issues immediately to save time.
+#'
+#' @param features_file [character] Character path to features CSV/TSV
+#'     (optional)
+#' @param mgf_file [character] Character path to MGF file (optional)
+#' @param metadata_file [character] Character path to metadata file (optional)
+#' @param sirius_dir [character] Character path to SIRIUS output directory or
+#'     ZIP (optional)
+#' @param filename_col [character] Character name of filename column (default:
+#'     "filename")
+#' @param organism_col [character] Character name of organism column (default:
+#'     "organism")
+#' @param feature_col [character] Character name of feature ID column (default:
+#'     "feature_id")
+#'
+#' @return Invisible TRUE if all validations pass, stops with error otherwise
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' # Validate all inputs before starting pipeline
+#' sanitize_all_inputs(
+#'   features_file = "data/features.csv",
+#'   mgf_file = "data/spectra.mgf",
+#'   metadata_file = "data/metadata.tsv",
+#'   sirius_dir = "data/sirius_output"
+#' )
+#' }
+
 sanitize_all_inputs <- function(
   features_file = NULL,
   mgf_file = NULL,

@@ -1,3 +1,22 @@
+#' Build the evidence-supported hypothesis table (scalable).
+#'
+#' @param df_fea_min tidytable with columns `feature_id`, `rt`, `mz`, `sample`.
+#' @param universe typed universe returned by [build_adduct_universe()].
+#' @param tolerance_ppm numeric mass tolerance (ppm).
+#' @param tolerance_rt numeric RT tolerance.
+#' @param ms_mode "pos" or "neg".
+#' @param min_neutral_mass,max_neutral_mass plausibility bounds.
+#' @param exact_masses optional numeric vector of library exact masses. When
+#'   provided, only hypotheses whose implied neutral mass is within
+#'   `tolerance_ppm` of at least one library mass are retained. This is the
+#'   primary memory-control lever.
+#' @param max_hypotheses_per_feature integer cap per feature (excluding the
+#'   baseline adduct, which is always retained). Set to `Inf` to disable.
+#'
+#' @return tidytable with one row per supported (feature, adduct) hypothesis.
+#'
+#' @keywords internal
+
 build_evidence_supported_hypotheses <- function(
   df_fea_min,
   universe,

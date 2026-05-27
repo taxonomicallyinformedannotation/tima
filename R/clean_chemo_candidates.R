@@ -1,3 +1,27 @@
+#' Resolve tied candidates via cross-feature neutral-mass anchors
+#'
+#' @description Splits candidates per (feature_id, candidate_adduct,
+#'     rank_final) into untied rows (always kept) and tied rows. A tied
+#'     group is collapsed to just the candidates whose InChIKey matches
+#'     a rank-1 InChIKey of ANOTHER feature at the same neutral mass
+#'     (within tolerance). Tied groups with NO cross-feature anchor are
+#'     NOT dropped: they are kept as-is if `.n_per_group <= max_per_score`,
+#'     otherwise sampled down to `max_per_score` (RT-error candidates
+#'     prioritized when the column is available).
+#'
+#' @param df Data frame with ranked candidates
+#' @param max_per_score Integer, maximum candidates to keep per group
+#' @param seed Integer, random seed for reproducibility
+#'
+#' @return List with three elements:
+#'   \describe{
+#'     \item{df}{Filtered data frame with sampled / collapsed candidates}
+#'     \item{n_sampled_features}{Number of features whose tied groups
+#'         required sampling (n > max_per_score)}
+#'     \item{annotation_notes}{Per-group annotation notes (anchor / sampling)}
+#'   }
+#' @keywords internal
+
 sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
   if (nrow(df) == 0L) {
     return(list(df = df, n_sampled_features = 0L))

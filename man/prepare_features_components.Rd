@@ -47,6 +47,7 @@ Other preparation:
 \code{\link[=prepare_annotations_gnps]{prepare_annotations_gnps()}},
 \code{\link[=prepare_annotations_mzmine]{prepare_annotations_mzmine()}},
 \code{\link[=prepare_annotations_mztab]{prepare_annotations_mztab()}},
+\code{\link[=prepare_annotations_sirius]{prepare_annotations_sirius()}},
 \code{\link[=prepare_annotations_spectra]{prepare_annotations_spectra()}},
 \code{\link[=prepare_features_edges]{prepare_features_edges()}},
 \code{\link[=prepare_features_tables]{prepare_features_tables()}},

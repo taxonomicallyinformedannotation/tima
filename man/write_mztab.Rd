@@ -184,6 +184,7 @@ write_mztab(
 Other annotation:
 \code{\link[=annotate_masses]{annotate_masses()}},
 \code{\link[=annotate_spectra]{annotate_spectra()}},
-\code{\link[=filter_annotations]{filter_annotations()}}
+\code{\link[=filter_annotations]{filter_annotations()}},
+\code{\link[=weight_annotations]{weight_annotations()}}
 }
 \concept{annotation}
