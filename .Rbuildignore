@@ -31,3 +31,4 @@ CITATION.cff
 ^.*\.log$
 ^\.lintr$
 ^dev$
+^_targets\.yaml$
