@@ -372,8 +372,11 @@ tima_full <- function(
     )
   )
 
+  # Allow tests to inject a lightweight runner while preserving default behavior.
+  runner <- getOption("tima.tima_full_runner", run_tima)
+
   # Call the new function with all arguments
-  run_tima(
+  runner(
     target_pattern = target_pattern,
     log_file = log_file,
     clean_old_logs = clean_old_logs,
