@@ -5,7 +5,7 @@ library(testthat)
 # Helper: write minimal files
 make_tsv <- function(df) {
   f <- tempfile(fileext = ".tsv")
-  data.table::fwrite(x = df, file = f, sep = "\t")
+  tidytable::fwrite(x = df, file = f, sep = "\t")
   f
 }
 

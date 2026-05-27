@@ -102,6 +102,98 @@ execute_targets_pipeline <- function(target_pattern = "^(ann_wei|exp_mzt)$") {
   invisible(NULL)
 }
 
+.abort_run_tima_validation <- function(message) {
+  cli::cli_abort(message, class = "tima_validation_error")
+}
+
+.parse_run_tima_log_level <- function(log_level) {
+  valid_levels <- c("trace", "debug", "info", "warn", "error", "fatal")
+  level_map <- c(
+    trace = 600L,
+    debug = 500L,
+    info = 400L,
+    warn = 300L,
+    error = 200L,
+    fatal = 100L
+  )
+  valid_numeric <- unname(level_map)
+
+  if (is.character(log_level)) {
+    if (length(log_level) != 1L) {
+      .abort_run_tima_validation("{.arg log_level} must be a single value")
+    }
+
+    log_level_lower <- tolower(log_level)
+    if (!log_level_lower %in% valid_levels) {
+      .abort_run_tima_validation(
+        paste0(
+          "{.arg log_level} must be one of: ",
+          paste(valid_levels, collapse = ", "),
+          " (got {.val ",
+          log_level,
+          "})"
+        )
+      )
+    }
+
+    return(list(
+      input = log_level,
+      threshold = unname(level_map[[log_level_lower]])
+    ))
+  }
+
+  if (is.numeric(log_level)) {
+    if (length(log_level) != 1L) {
+      .abort_run_tima_validation("{.arg log_level} must be a single value")
+    }
+
+    if (!log_level %in% valid_numeric) {
+      .abort_run_tima_validation(
+        paste0(
+          "{.arg log_level} must be one of: ",
+          paste(valid_numeric, collapse = ", "),
+          " (got {.val ",
+          log_level,
+          "})"
+        )
+      )
+    }
+
+    return(list(input = log_level, threshold = as.integer(log_level)))
+  }
+
+  .abort_run_tima_validation(
+    "{.arg log_level} must be character (e.g., {.val info}) or numeric (e.g., {.val 400})"
+  )
+}
+
+.validate_run_tima_inputs <- function(
+  target_pattern,
+  log_file,
+  clean_old_logs,
+  log_level
+) {
+  if (!is.character(target_pattern) || length(target_pattern) != 1L) {
+    .abort_run_tima_validation(
+      "{.arg target_pattern} must be a single character string"
+    )
+  }
+
+  if (!is.character(log_file) || length(log_file) != 1L) {
+    .abort_run_tima_validation(
+      "{.arg log_file} must be a single character string"
+    )
+  }
+
+  if (!is.logical(clean_old_logs) || length(clean_old_logs) != 1L) {
+    .abort_run_tima_validation(
+      "{.arg clean_old_logs} must be a single logical value"
+    )
+  }
+
+  .parse_run_tima_log_level(log_level)
+}
+
 #' @title Run Complete TIMA Workflow
 #'
 #' @description Executes the full Taxonomically Informed Metabolite Annotation
@@ -172,78 +264,13 @@ run_tima <- function(
   log_level = "info"
 ) {
   # Input Validation ----
-  if (!is.character(target_pattern) || length(target_pattern) != 1L) {
-    cli::cli_abort(
-      "{.arg target_pattern} must be a single character string",
-      class = "tima_validation_error"
-    )
-  }
-
-  if (!is.character(log_file) || length(log_file) != 1L) {
-    cli::cli_abort(
-      "{.arg log_file} must be a single character string",
-      class = "tima_validation_error"
-    )
-  }
-
-  if (!is.logical(clean_old_logs) || length(clean_old_logs) != 1L) {
-    cli::cli_abort(
-      "{.arg clean_old_logs} must be a single logical value",
-      class = "tima_validation_error"
-    )
-  }
-
-  # Validate and convert log_level
-  if (is.character(log_level)) {
-    if (length(log_level) != 1L) {
-      cli::cli_abort(
-        "{.arg log_level} must be a single value",
-        class = "tima_validation_error"
-      )
-    }
-
-    valid_levels <- c("trace", "debug", "info", "warn", "error", "fatal")
-    log_level_lower <- tolower(log_level)
-
-    if (!log_level_lower %in% valid_levels) {
-      cli::cli_abort(
-        "{.arg log_level} must be one of: {.or {.val {valid_levels}}} (got {.val {log_level}})",
-        class = "tima_validation_error"
-      )
-    }
-
-    # Convert to numeric threshold for lgr
-    level_map <- list(
-      trace = 600,
-      debug = 500,
-      info = 400,
-      warn = 300,
-      error = 200,
-      fatal = 100
-    )
-    log_threshold <- level_map[[log_level_lower]]
-  } else if (is.numeric(log_level)) {
-    if (length(log_level) != 1L) {
-      cli::cli_abort(
-        "{.arg log_level} must be a single value",
-        class = "tima_validation_error"
-      )
-    }
-
-    valid_numeric <- c(600, 500, 400, 300, 200, 100)
-    if (!log_level %in% valid_numeric) {
-      cli::cli_abort(
-        "{.arg log_level} must be one of: {.or {.val {valid_numeric}}} (got {.val {log_level}})",
-        class = "tima_validation_error"
-      )
-    }
-    log_threshold <- as.integer(log_level)
-  } else {
-    cli::cli_abort(
-      "{.arg log_level} must be character (e.g., {.val info}) or numeric (e.g., {.val 400})",
-      class = "tima_validation_error"
-    )
-  }
+  parsed_log_level <- .validate_run_tima_inputs(
+    target_pattern = target_pattern,
+    log_file = log_file,
+    clean_old_logs = clean_old_logs,
+    log_level = log_level
+  )
+  log_threshold <- parsed_log_level$threshold
 
   # Initialize ----
   start_time <- Sys.time()
@@ -255,14 +282,14 @@ run_tima <- function(
     log_level = log_level
   )
 
-  # Setup logger with specified threshold
-  setup_logger(filename = log_file, threshold = log_threshold)
-
   # Clean up previous log file if requested
   if (isTRUE(clean_old_logs) && file.exists(log_file)) {
     log_debug("Removing old log file: %s", log_file)
     file.remove(log_file)
   }
+
+  # Setup logger with specified threshold
+  setup_logger(filename = log_file, threshold = log_threshold)
 
   log_info("=" |> rep(60) |> paste(collapse = ""))
   log_info("Starting Complete TIMA Annotation Workflow")

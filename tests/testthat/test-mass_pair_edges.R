@@ -8,7 +8,7 @@ join_multi_with_addlossed <- join_multi_with_addlossed
 # ── build_feature_pairs_within_rt ─────────────────────────────────────────────
 
 test_that("build_feature_pairs_within_rt returns empty for no RT overlaps", {
-  df_rt_tol <- data.table::data.table(
+  df_rt_tol <- tidytable::tidytable(
     feature_id = "F1",
     rt = 1.0,
     mz = 100.0,
@@ -17,7 +17,7 @@ test_that("build_feature_pairs_within_rt returns empty for no RT overlaps", {
     rt_min = 0.9,
     rt_max = 1.1
   )
-  df_fea_min <- data.table::data.table(
+  df_fea_min <- tidytable::tidytable(
     feature_id = "F2",
     rt = 5.0, # completely outside RT window
     mz = 200.0,
@@ -34,7 +34,7 @@ test_that("build_feature_pairs_within_rt returns empty for no RT overlaps", {
 })
 
 test_that("build_feature_pairs_within_rt finds pairs within RT window", {
-  df_rt_tol <- data.table::data.table(
+  df_rt_tol <- tidytable::tidytable(
     feature_id = "F1",
     rt = 1.0,
     mz = 100.0,
@@ -44,7 +44,7 @@ test_that("build_feature_pairs_within_rt finds pairs within RT window", {
     rt_max = 1.2
   )
   # F2 is within RT window and has higher mz
-  df_fea_min <- data.table::data.table(
+  df_fea_min <- tidytable::tidytable(
     feature_id = "F2",
     rt = 1.05,
     mz = 122.0,
@@ -65,7 +65,7 @@ test_that("build_feature_pairs_within_rt finds pairs within RT window", {
 })
 
 test_that("build_feature_pairs_within_rt excludes same-feature pairs", {
-  df <- data.table::data.table(
+  df <- tidytable::tidytable(
     feature_id = "F1",
     rt = 1.0,
     mz = 100.0,
@@ -75,7 +75,7 @@ test_that("build_feature_pairs_within_rt excludes same-feature pairs", {
     rt_max = 1.2
   )
   # df_fea_min also contains F1 — should be excluded
-  df_fea_min <- data.table::data.table(
+  df_fea_min <- tidytable::tidytable(
     feature_id = c("F1", "F2"),
     rt = c(1.0, 1.1),
     mz = c(100.0, 150.0),
@@ -93,7 +93,7 @@ test_that("build_feature_pairs_within_rt excludes same-feature pairs", {
 })
 
 test_that("build_feature_pairs_within_rt computes correct delta values", {
-  df_rt_tol <- data.table::data.table(
+  df_rt_tol <- tidytable::tidytable(
     feature_id = "F1",
     rt = 1.0,
     mz = 100.0,
@@ -102,7 +102,7 @@ test_that("build_feature_pairs_within_rt computes correct delta values", {
     rt_min = 0.9,
     rt_max = 1.1
   )
-  df_fea_min <- data.table::data.table(
+  df_fea_min <- tidytable::tidytable(
     feature_id = "F2",
     rt = 1.0,
     mz = 122.0,
@@ -152,7 +152,7 @@ test_that("build_adduct_pair_differences excludes identical adducts", {
 test_that("join_couples_with_neutral_losses matches neutral loss in delta window", {
   # couples_diff: feature pair with a delta window
   h2o_mass <- 18.010565
-  df_couples_diff <- data.table::data.table(
+  df_couples_diff <- tidytable::tidytable(
     feature_id = "F1",
     adduct = "[M+H]+",
     feature_id_dest = "F2",
@@ -160,7 +160,7 @@ test_that("join_couples_with_neutral_losses matches neutral loss in delta window
     delta_min = h2o_mass - 0.01,
     delta_max = h2o_mass + 0.01
   )
-  neutral_losses <- data.table::data.table(
+  neutral_losses <- tidytable::tidytable(
     loss = "H2O",
     mass = h2o_mass
   )
@@ -171,7 +171,7 @@ test_that("join_couples_with_neutral_losses matches neutral loss in delta window
 })
 
 test_that("join_couples_with_neutral_losses returns empty when no match", {
-  df_couples_diff <- data.table::data.table(
+  df_couples_diff <- tidytable::tidytable(
     feature_id = "F1",
     adduct = "[M+H]+",
     feature_id_dest = "F2",
@@ -179,7 +179,7 @@ test_that("join_couples_with_neutral_losses returns empty when no match", {
     delta_min = 0.0,
     delta_max = 1.0
   )
-  neutral_losses <- data.table::data.table(
+  neutral_losses <- tidytable::tidytable(
     loss = "H2O",
     mass = 18.01
   )
@@ -192,7 +192,7 @@ test_that("join_couples_with_neutral_losses returns empty when no match", {
 
 test_that("join_multi_with_addlossed joins when mass and RT are in window", {
   target_mass <- 180.063
-  df_multi <- data.table::data.table(
+  df_multi <- tidytable::tidytable(
     feature_id = "F1",
     adduct = "[M+H]+",
     rt = 1.0,
@@ -202,7 +202,7 @@ test_that("join_multi_with_addlossed joins when mass and RT are in window", {
     mass_min = target_mass - 0.02,
     mass_max = target_mass + 0.02
   )
-  df_addlossed <- data.table::data.table(
+  df_addlossed <- tidytable::tidytable(
     rt = 1.05,
     mass = target_mass
   )
@@ -214,7 +214,7 @@ test_that("join_multi_with_addlossed joins when mass and RT are in window", {
 })
 
 test_that("join_multi_with_addlossed returns empty when outside window", {
-  df_multi <- data.table::data.table(
+  df_multi <- tidytable::tidytable(
     feature_id = "F1",
     adduct = "[M+H]+",
     rt = 1.0,
@@ -224,7 +224,7 @@ test_that("join_multi_with_addlossed returns empty when outside window", {
     mass_min = 179.0,
     mass_max = 181.0
   )
-  df_addlossed <- data.table::data.table(
+  df_addlossed <- tidytable::tidytable(
     rt = 5.0, # outside RT window
     mass = 180.0
   )

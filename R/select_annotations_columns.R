@@ -66,34 +66,19 @@ select_annotations_columns <- function(
     str_tax_npc = str_tax_npc
   ))
 
-  # Derive SMILES cache path from str_stereo if not explicitly provided
-  if (is.null(cache)) {
-    cache <- file.path(dirname(str_stereo), "processed.csv.gz")
-    if (!file.exists(cache)) {
-      log_debug("SMILES cache not found at: %s", cache)
-      cache <- NULL
-    }
-  }
+  cache <- .resolve_smiles_cache_path(str_stereo = str_stereo, cache = cache)
 
   log_debug("Input: %d rows, %d columns", nrow(df), ncol(df))
 
   # Get column model
   model <- columns_model()
 
+  projection_columns <- .annotation_projection_columns(model)
+
   # Select relevant columns
   df <- df |>
     tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          "feature_id",
-          model$features_calculated_columns,
-          model$candidates_calculated_columns,
-          model$candidates_sirius_for_columns,
-          model$candidates_sirius_str_columns,
-          model$candidates_spectra_columns,
-          model$candidates_structures_columns
-        )
-      )
+      tidyselect::any_of(x = projection_columns)
     )
 
   # Normalize adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
@@ -140,17 +125,7 @@ select_annotations_columns <- function(
       str_tax_npc = str_tax_npc
     ) |>
     tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          "feature_id",
-          model$features_calculated_columns,
-          model$candidates_calculated_columns,
-          model$candidates_sirius_for_columns,
-          model$candidates_sirius_str_columns,
-          model$candidates_spectra_columns,
-          model$candidates_structures_columns
-        )
-      )
+      tidyselect::any_of(x = projection_columns)
     )
 
   df
@@ -160,6 +135,32 @@ select_annotations_columns <- function(
   vals <- trimws(x)
   vals[vals %in% c("N/A", "null", "")] <- NA_character_
   vals
+}
+
+.annotation_projection_columns <- function(model) {
+  c(
+    "feature_id",
+    model$features_calculated_columns,
+    model$candidates_calculated_columns,
+    model$candidates_sirius_for_columns,
+    model$candidates_sirius_str_columns,
+    model$candidates_spectra_columns,
+    model$candidates_structures_columns
+  )
+}
+
+.resolve_smiles_cache_path <- function(str_stereo, cache) {
+  if (!is.null(cache)) {
+    return(cache)
+  }
+
+  derived <- file.path(dirname(str_stereo), "processed.csv.gz")
+  if (!file.exists(derived)) {
+    log_debug("SMILES cache not found at: %s", derived)
+    return(NULL)
+  }
+
+  derived
 }
 
 #' @title Recompute structure fields from SMILES

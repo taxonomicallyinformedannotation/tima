@@ -1,10 +1,20 @@
 suppressPackageStartupMessages(library(testthat))
-# Load package code once for all tests; internal helpers become directly callable.
-suppressPackageStartupMessages(devtools::load_all(
-  path = ".",
-  export_all = TRUE,
-  quiet = TRUE
-))
+
+# Keep setup compatible with both load-all style and testthat::test_package().
+# test_package() runs against an installed namespace.
+if (!isTRUE(requireNamespace("tima", quietly = TRUE))) {
+  if (isTRUE(requireNamespace("pkgload", quietly = TRUE))) {
+    suppressPackageStartupMessages(pkgload::load_all(
+      path = ".",
+      export_all = TRUE,
+      quiet = TRUE
+    ))
+  } else {
+    stop(
+      "Neither installed package 'tima' nor 'pkgload' is available for test setup."
+    )
+  }
+}
 
 # Provide a reproducible temp root for this session's tests
 .test_root <- file.path(tempdir(), sprintf("tima-tests-%s", Sys.getpid()))

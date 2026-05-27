@@ -9,7 +9,7 @@ log_annotation_stats <- log_annotation_stats
 # Helper: write a minimal TSV file and return its path
 make_tsv <- function(df, ...) {
   f <- tempfile(...)
-  data.table::fwrite(x = df, file = f, sep = "\t")
+  tidytable::fwrite(x = df, file = f, sep = "\t")
   f
 }
 
