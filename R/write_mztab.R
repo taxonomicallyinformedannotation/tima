@@ -2245,7 +2245,11 @@ write_mztab <- function(
       "; 3+-candidate=",
       unname(bins[["3+"]]),
       "; max-candidate=",
-      if (length(candidate_counts) > 0L) max(candidate_counts, na.rm = TRUE) else 0L
+      if (length(candidate_counts) > 0L) {
+        max(candidate_counts, na.rm = TRUE)
+      } else {
+        0L
+      }
     ),
     paste0(
       "COM\tTIMA ambiguity\taligned_fields=",
@@ -2695,7 +2699,7 @@ write_mztab <- function(
       }
     }
 
-      # Fallback to first available mapped prefix:id.
+    # Fallback to first available mapped prefix:id.
     for (i in seq_len(nrow(rows))) {
       pfx <- as.character(rows$prefix[[i]])
       id <- as.character(rows$id[[i]])
@@ -2766,4 +2770,3 @@ write_mztab <- function(
   x[is.na(x) | !nzchar(x)] <- NA_character_
   substr(x, 1L, 14L)
 }
-

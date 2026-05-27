@@ -653,7 +653,11 @@ test_that("write_mztab emits COM ambiguity cardinality summary", {
   expect_true(grepl("1-candidate=0", amb[[1L]], fixed = TRUE))
   expect_true(grepl("2-candidate=2", amb[[1L]], fixed = TRUE))
   expect_true(grepl("3+-candidate=0", amb[[1L]], fixed = TRUE))
-  expect_true(grepl("aligned_fields=database_identifier|chemical_formula|smiles|inchi|chemical_name|uri|adduct_ions", amb[[2L]], fixed = TRUE))
+  expect_true(grepl(
+    "aligned_fields=database_identifier|chemical_formula|smiles|inchi|chemical_name|uri|adduct_ions",
+    amb[[2L]],
+    fixed = TRUE
+  ))
 })
 
 test_that("write_mztab embeds optional edges table in JSON exports", {
