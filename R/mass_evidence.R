@@ -168,7 +168,9 @@ annotate_adduct_universe_metadata <- function(universe, polarity) {
   common_losses <- c("H2O", "H4O2", "H6O3", "H8O4", "NH3", "H3N", "CO", "CO2")
   common_clusters <- c("H2O", "C2H3N")
 
-  out <- tidytable::as_tidytable(universe)
+  out <- tidytable::as_tidytable(
+    as.data.frame(universe, stringsAsFactors = FALSE)
+  )
   carrier_names <- lapply(out$carriers, names)
   loss_names <- lapply(out$losses, names)
   cluster_names <- lapply(out$clusters, names)

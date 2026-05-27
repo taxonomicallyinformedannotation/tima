@@ -990,7 +990,9 @@ build_annotate_masses_coverage_report <- function(
     ))
   }
 
-  support_ranked <- tidytable::as_tidytable(annotations)
+  support_ranked <- tidytable::as_tidytable(
+    as.data.frame(annotations, stringsAsFactors = FALSE)
+  )
   if (!"source" %in% names(support_ranked)) {
     support_ranked$source <- NA_character_
   }
