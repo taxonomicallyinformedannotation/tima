@@ -119,7 +119,6 @@ unlink("data", recursive = TRUE)
 Other annotation:
 \code{\link[=annotate_masses]{annotate_masses()}},
 \code{\link[=filter_annotations]{filter_annotations()}},
-\code{\link[=weight_annotations]{weight_annotations()}},
 \code{\link[=write_mztab]{write_mztab()}}
 }
 \concept{annotation}
