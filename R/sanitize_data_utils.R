@@ -1,0 +1,792 @@
+#' Data Sanitizing and Validation
+#'
+#' @description Pre-flight checks for input data to catch issues early
+#'     before expensive operations like library downloads. Validates file
+#'     formats, counts records, checks metadata consistency, and verifies
+#'     SIRIUS output completeness.
+#'
+#' @name sanitize_data
+#' @keywords internal
+NULL
+
+#' Sanitize and Validate MGF File
+#'
+#' @description Validates MGF (Mascot Generic Format) file structure and
+#'     reports the number of spectra found.
+#'
+#' @param file [character] Character path to MGF file
+#' @param file_type [character] Character description for error messages
+#'
+#' @return List with validation results:
+#'   - valid: Logical, TRUE if file is valid
+#'   - n_spectra: Integer, number of spectra found
+#'   - issues: Character vector of issues found (if any)
+#'
+#' @keywords internal
+sanitize_mgf <- function(file, file_type = "MGF file") {
+  issues <- character(0)
+  n_spectra <- 0L
+
+  if (!file.exists(file)) {
+    return(list(
+      valid = FALSE,
+      n_spectra = 0L,
+      issues = paste0(file_type, " not found: ", file)
+    ))
+  }
+
+  mgf_error <- tryCatch(
+    {
+      lines <- readLines(file, warn = FALSE)
+      n_lines <- length(lines)
+
+      begin_ions <- grep("^BEGIN IONS", lines, ignore.case = TRUE)
+      end_ions <- grep("^END IONS", lines, ignore.case = TRUE)
+      total_spectra <- length(begin_ions)
+
+      if (total_spectra == 0L) {
+        issues <- c(issues, "No spectra found (no BEGIN IONS markers)")
+      }
+      if (length(begin_ions) != length(end_ions)) {
+        issues <- c(
+          issues,
+          sprintf(
+            "Mismatched BEGIN IONS (%d) and END IONS (%d)",
+            length(begin_ions),
+            length(end_ions)
+          )
+        )
+      }
+
+      # Vectorised MS2 detection - no per-spectrum loop needed.
+      # Build a logical vector "which line belongs to which spectrum" is not
+      # necessary: instead, mark lines that carry MSLEVEL=2 or look like peaks
+      # (start with a digit), then for each spectrum check presence via
+      # findInterval on pre-computed global grep results.
+      if (total_spectra > 0L) {
+        end_ions_capped <- if (length(end_ions) >= total_spectra) {
+          end_ions[seq_len(total_spectra)]
+        } else {
+          c(end_ions, rep(n_lines, total_spectra - length(end_ions)))
+        }
+
+        # Global positions of MSLEVEL=2 and digit-starting (peak) lines
+        mslevel2_lines <- grep("^MSLEVEL=2$", lines, ignore.case = TRUE)
+        peak_lines <- grep("^[0-9]", lines)
+
+        # For each spectrum i, its line range is [begin_ions[i], end_ions[i]].
+        # A line L belongs to spectrum i iff begin_ions[i] <= L <= end_ions[i],
+        # i.e., findInterval(L, begin_ions) == i and L <= end_ions[i].
+        .lines_in_spectrum <- function(target_lines, starts, ends) {
+          # spectrum index (0 = before first)
+          idx <- findInterval(target_lines, starts)
+          in_range <- idx >= 1L & target_lines <= ends[idx]
+          idx[in_range] # spectrum indices that contain a matching line
+        }
+
+        ms2_by_level <- unique(.lines_in_spectrum(
+          mslevel2_lines,
+          begin_ions,
+          end_ions_capped
+        ))
+        # Spectra with no MSLEVEL tag at all (treat as MS2 if they have peaks)
+        has_mslevel_line <- grep("^MSLEVEL=", lines, ignore.case = TRUE)
+        spectra_with_mslevel <- unique(findInterval(
+          has_mslevel_line,
+          begin_ions
+        ))
+        spectra_without_mslevel <- setdiff(
+          seq_len(total_spectra),
+          spectra_with_mslevel
+        )
+        spectra_with_peaks <- unique(.lines_in_spectrum(
+          peak_lines,
+          begin_ions,
+          end_ions_capped
+        ))
+        ms2_by_peaks <- intersect(spectra_without_mslevel, spectra_with_peaks)
+
+        ms2_indices <- sort(unique(c(ms2_by_level, ms2_by_peaks)))
+        n_ms2 <- length(ms2_indices)
+        n_spectra <- n_ms2
+
+        if (n_ms2 == 0L && total_spectra > 0L) {
+          issues <- c(
+            issues,
+            sprintf(
+              paste(
+                "No MS2 spectra found",
+                "(%d total spectra, but all are MS1 or empty)"
+              ),
+              total_spectra
+            )
+          )
+        }
+
+        # Check first MS2 spectrum for required fields
+        if (n_ms2 > 0L) {
+          first_idx <- ms2_indices[[1L]]
+          first_start <- begin_ions[[first_idx]]
+          first_end <- end_ions_capped[[first_idx]]
+          first_spec <- lines[first_start:first_end]
+
+          if (!any(grepl("^PEPMASS=", first_spec, ignore.case = TRUE))) {
+            issues <- c(issues, "First MS2 spectrum missing PEPMASS field")
+          }
+          # NOTE: Spectra with no peak data are silently skipped during import,
+          # not treated as validation errors. This allows for MPF files with
+          # placeholder entries that will be removed by sanitize_spectra().
+          if (!any(grepl("^[0-9]", first_spec))) {
+            log_debug(
+              "First MS2 spectrum (#%d) has no fragment peaks - will be removed during import",
+              first_idx
+            )
+          }
+        }
+      }
+
+      NULL
+    },
+    error = function(e) {
+      conditionMessage(e)
+    }
+  )
+  if (!is.null(mgf_error)) {
+    issues <- c(issues, paste0("Failed to parse MGF: ", mgf_error))
+  }
+
+  list(
+    valid = length(issues) == 0L,
+    n_spectra = n_spectra,
+    issues = issues
+  )
+}
+
+#' Sanitize and Validate CSV/TSV File
+#'
+#' @description Validates CSV/TSV file structure and reports record count.
+#'
+#' @param file [character] Character path to CSV/TSV file
+#' @param file_type [character] Character description for error messages
+#' @param required_cols [character] Character vector of required column names
+#'     (optional)
+#' @param feature_col [character] Character name of feature ID column (default:
+#'     "feature_id")
+#'
+#' @return List with validation results:
+#'   - valid: Logical, TRUE if file is valid
+#'   - n_rows: Integer, number of rows (excluding header)
+#'   - n_cols: Integer, number of columns
+#'   - columns: Character vector of column names
+#'   - issues: Character vector of issues found (if any)
+#'
+#' @keywords internal
+sanitize_csv <- function(
+  file,
+  file_type = "CSV file",
+  required_cols = NULL,
+  feature_col = "feature_id"
+) {
+  issues <- character(0)
+  n_rows <- 0L
+  n_cols <- 0L
+  columns <- character(0)
+
+  # Basic file validation
+  if (!file.exists(file)) {
+    return(list(
+      valid = FALSE,
+      n_rows = 0L,
+      n_cols = 0L,
+      columns = character(0),
+      issues = paste0(file_type, " not found: ", file)
+    ))
+  }
+
+  # Try to read and validate
+  read_result <- tryCatch(
+    {
+      list(
+        data = safe_fread(
+          file = file,
+          file_type = file_type,
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        ),
+        error = NULL
+      )
+    },
+    error = function(e) {
+      list(data = tidytable::tidytable(), error = conditionMessage(e))
+    }
+  )
+  df <- read_result$data
+  if (!is.null(read_result$error)) {
+    issues <- c(issues, paste0("Failed to read file: ", read_result$error))
+  }
+
+  n_rows <- nrow(df)
+  n_cols <- ncol(df)
+  columns <- names(df)
+
+  # Check for empty file
+  if (n_rows == 0L && length(issues) == 0L) {
+    issues <- c(issues, paste0(file_type, " is empty (0 rows)"))
+  }
+
+  if (n_cols == 0L && length(issues) == 0L) {
+    issues <- c(issues, paste0(file_type, " has no columns)"))
+  }
+
+  # Check for required columns
+  if (!is.null(required_cols) && n_cols > 0L) {
+    # Replace generic "feature_id" with actual feature_col if present
+    required_cols_actual <- gsub("^feature_id$", feature_col, required_cols)
+    missing_cols <- setdiff(required_cols_actual, columns)
+    if (length(missing_cols) > 0L) {
+      issues <- c(
+        issues,
+        sprintf(
+          "Missing required columns: %s",
+          paste(missing_cols, collapse = ", ")
+        )
+      )
+    }
+  }
+
+  list(
+    valid = length(issues) == 0L,
+    n_rows = n_rows,
+    n_cols = n_cols,
+    columns = columns,
+    issues = issues
+  )
+}
+
+#' Sanitize and Validate Metadata Consistency
+#'
+#' @description Checks that filenames in feature table match those in metadata,
+#'     and validates that metadata contains organism information.
+#'
+#' @param metadata_file [character] Character path to metadata file
+#' @param features_file [character] Character path to features file (optional)
+#' @param filename_col [character] Character name of column containing filenames
+#'     in both files
+#' @param organism_col [character] Character name of organism column in metadata
+#'     (default: "organism")
+#'
+#' @return List with validation results:
+#'   - valid: Logical, TRUE if metadata is consistent
+#'   - n_samples: Integer, number of samples in metadata
+#'   - n_with_organism: Integer, number of samples with organism info
+#'   - filenames_match: Logical, TRUE if features/metadata filenames match
+#'   - n_matched: Integer, number of matched filenames (if features provided)
+#' - n_unmatched: Integer, number of unmatched filenames (if features provided)
+#'   - unmatched_files: Character vector of unmatched filenames
+#'   - issues: Character vector of issues found (if any)
+#'
+#' @keywords internal
+sanitize_metadata <- function(
+  metadata_file,
+  features_file = NULL,
+  filename_col = "filename",
+  organism_col = "organism"
+) {
+  issues <- character(0)
+  n_samples <- 0L
+  n_with_organism <- 0L
+  filenames_match <- NA
+  n_matched <- 0L
+  n_unmatched <- 0L
+  unmatched_files <- character(0)
+
+  # Validate metadata file exists
+  if (!file.exists(metadata_file)) {
+    return(list(
+      valid = FALSE,
+      n_samples = 0L,
+      n_with_organism = 0L,
+      filenames_match = FALSE,
+      n_matched = 0L,
+      n_unmatched = 0L,
+      unmatched_files = character(0),
+      issues = paste0("Metadata file not found: ", metadata_file)
+    ))
+  }
+
+  # Read metadata
+  metadata_result <- tryCatch(
+    {
+      list(
+        data = safe_fread(
+          file = metadata_file,
+          file_type = "metadata",
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        ),
+        error = NULL
+      )
+    },
+    error = function(e) {
+      list(data = tidytable::tidytable(), error = conditionMessage(e))
+    }
+  )
+  metadata <- metadata_result$data
+  if (!is.null(metadata_result$error)) {
+    issues <- c(
+      issues,
+      paste0("Failed to read metadata: ", metadata_result$error)
+    )
+  }
+
+  n_samples <- nrow(metadata)
+
+  # If we couldn't read the file, return early
+  if (n_samples == 0L && length(issues) > 0L) {
+    return(list(
+      valid = FALSE,
+      n_samples = 0L,
+      n_with_organism = 0L,
+      filenames_match = FALSE,
+      n_matched = 0L,
+      n_unmatched = 0L,
+      unmatched_files = character(0),
+      issues = issues
+    ))
+  }
+
+  meta_cols <- names(metadata)
+
+  # Check for filename column (try common variants)
+  possible_filename_cols <- c(
+    filename_col,
+    "file",
+    "sample",
+    "sample_id",
+    "sampleID"
+  )
+  filename_matches <- possible_filename_cols[
+    possible_filename_cols %in% meta_cols
+  ]
+  filename_col_actual <- if (length(filename_matches) > 0L) {
+    filename_matches[[1L]]
+  } else {
+    NULL
+  }
+
+  if (is.null(filename_col_actual)) {
+    issues <- c(
+      issues,
+      sprintf(
+        "Filename column not found (tried: %s)",
+        paste(possible_filename_cols, collapse = ", ")
+      )
+    )
+  }
+
+  # Check for organism column (try common variants, starting with the provided
+  # one)
+  possible_organism_cols <- unique(c(
+    organism_col,
+    "ATTRIBUTE_species",
+    "organism",
+    "organism_name",
+    "species",
+    "taxon",
+    "taxonomy"
+  ))
+  organism_matches <- possible_organism_cols[
+    possible_organism_cols %in% meta_cols
+  ]
+  organism_col_actual <- if (length(organism_matches) > 0L) {
+    organism_matches[[1L]]
+  } else {
+    NULL
+  }
+
+  if (is.null(organism_col_actual)) {
+    # Organism column not required, just note it
+    log_debug(
+      "Note: No organism column found in metadata (tried: %s)",
+      paste(possible_organism_cols, collapse = ", ")
+    )
+  } else {
+    # Count samples with organism info
+    organisms <- metadata[[organism_col_actual]]
+    n_with_organism <- sum(
+      !is.na(organisms) & nchar(trimws(as.character(organisms))) > 0
+    )
+
+    if (n_with_organism == 0L) {
+      issues <- c(
+        issues,
+        sprintf(
+          "No organism information in column '%s' (all values empty or NA)",
+          organism_col_actual
+        )
+      )
+    } else if (n_with_organism < n_samples) {
+      log_debug(
+        "Only %d/%d samples have organism information in column '%s'",
+        n_with_organism,
+        n_samples,
+        organism_col_actual
+      )
+    }
+  }
+
+  # If features file provided, check filename consistency
+  if (
+    !is.null(features_file) &&
+      file.exists(features_file) &&
+      !is.null(filename_col_actual)
+  ) {
+    features_error <- tryCatch(
+      {
+        features <- safe_fread(
+          file = features_file,
+          file_type = "features table"
+        )
+
+        feature_cols <- names(features)
+
+        # Get metadata filenames
+        metadata_filenames <- unique(metadata[[filename_col_actual]])
+        metadata_filenames <- metadata_filenames[!is.na(metadata_filenames)]
+        metadata_filenames <- as.character(metadata_filenames)
+
+        # Remove file extensions from metadata filenames for matching
+        metadata_basenames <- gsub("\\.[^.]*$", "", metadata_filenames)
+
+        # Check if metadata filenames (without extension) are PART OF feature
+        # column names
+        basename_found <- vapply(
+          X = metadata_basenames,
+          FUN = function(basename) {
+            any(grepl(basename, feature_cols, fixed = TRUE))
+          },
+          FUN.VALUE = logical(1L)
+        )
+
+        matched_files <- metadata_basenames[basename_found]
+        missing_files <- metadata_basenames[!basename_found]
+
+        n_matched <- length(matched_files)
+        n_unmatched <- length(missing_files)
+        unmatched_files <- missing_files
+
+        if (n_matched == 0L && length(metadata_basenames) > 0L) {
+          # ERROR: None matched
+          issues <- c(
+            issues,
+            sprintf(
+              paste(
+                "No metadata filenames (without extension)",
+                "found in features columns",
+                "(checked %d filenames)"
+              ),
+              length(metadata_basenames)
+            )
+          )
+          filenames_match <- FALSE
+        } else if (length(missing_files) > 0L) {
+          # WARNING: Some matched, some didn't
+          log_warn(
+            "Metadata filenames not found in features columns: %d/%d missing",
+            length(missing_files),
+            length(metadata_basenames)
+          )
+          if (length(missing_files) <= 5L) {
+            log_warn("  Missing: %s", paste(missing_files, collapse = ", "))
+          } else {
+            log_warn(
+              "  Missing: %s, ... and %d more",
+              paste(utils::head(missing_files, 5), collapse = ", "),
+              length(missing_files) - 5L
+            )
+          }
+          filenames_match <- TRUE # Still valid, just a warning
+        } else if (length(metadata_basenames) > 0L) {
+          filenames_match <- TRUE
+          log_debug(
+            paste(
+              "All %d metadata filenames",
+              "(without extension) found in features columns"
+            ),
+            n_matched
+          )
+        }
+
+        NULL
+      },
+      error = function(e) {
+        conditionMessage(e)
+      }
+    )
+    if (!is.null(features_error)) {
+      issues <- c(
+        issues,
+        paste0("Failed to read features file: ", features_error)
+      )
+    }
+  }
+
+  list(
+    valid = length(issues) == 0L,
+    n_samples = n_samples,
+    n_with_organism = n_with_organism,
+    filenames_match = filenames_match,
+    n_matched = n_matched,
+    n_unmatched = n_unmatched,
+    unmatched_files = unmatched_files,
+    issues = issues
+  )
+}
+
+#' Sanitize and Validate SIRIUS Output
+#'
+#' @description Checks that SIRIUS output directory or ZIP file contains all
+#'     necessary files for TIMA processing. Handles both extracted directories
+#'     and ZIP archives. Supports SIRIUS v5 and v6 formats.
+#'
+#' @param sirius_dir [character] Character path to SIRIUS output directory or
+#'     ZIP file
+#'
+#' @return List with validation results:
+#'   - valid: Logical, TRUE if all required files present
+#'   - has_formula: Logical, formula identifications file found
+#'   - has_canopus: Logical, canopus summary file found
+#'   - has_structure: Logical, structure identifications file found
+#' - n_features: Integer, number of UNIQUE ANNOTATIONS (rows in structure file)
+#'   - is_zip: Logical, TRUE if input was a ZIP file
+#'   - sirius_version: Character, detected version ("5", "6", or "unknown")
+#'   - issues: Character vector of issues found (if any)
+#'
+#' @keywords internal
+sanitize_sirius <- function(sirius_dir) {
+  issues <- character(0)
+  has_formula <- FALSE
+  has_canopus <- FALSE
+  has_structure <- FALSE
+  n_features <- 0L
+  is_zip <- FALSE
+  cleanup_temp <- FALSE
+  temp_dir <- NULL
+
+  # Check if input exists (file or directory)
+  if (!file.exists(sirius_dir)) {
+    return(list(
+      valid = FALSE,
+      has_formula = FALSE,
+      has_canopus = FALSE,
+      has_structure = FALSE,
+      n_features = 0L,
+      is_zip = FALSE,
+      issues = paste0("SIRIUS path not found: ", sirius_dir)
+    ))
+  }
+
+  # Handle ZIP files
+  if (file.exists(sirius_dir) && !dir.exists(sirius_dir)) {
+    # It's a file, check if it's a ZIP
+    if (grepl("\\.zip$", sirius_dir, ignore.case = TRUE)) {
+      is_zip <- TRUE
+      log_debug("SIRIUS input is a ZIP file, will check contents...")
+
+      # Create temp directory for checking
+      temp_dir <- tempfile(pattern = "sirius_check_")
+      dir.create(temp_dir, recursive = TRUE)
+      cleanup_temp <- TRUE
+
+      unzip_error <- tryCatch(
+        {
+          utils::unzip(sirius_dir, exdir = temp_dir)
+
+          # Find the actual SIRIUS directory (might be nested)
+          extracted_items <- list.files(temp_dir, full.names = TRUE)
+          if (length(extracted_items) == 1 && dir.exists(extracted_items[1])) {
+            # Single directory extracted, use it
+            sirius_dir <- extracted_items[1]
+          } else {
+            # Multiple items or files, use temp_dir
+            sirius_dir <- temp_dir
+          }
+
+          NULL
+        },
+        error = function(e) {
+          conditionMessage(e)
+        }
+      )
+      if (!is.null(unzip_error)) {
+        issues <- c(issues, paste0("Failed to extract ZIP: ", unzip_error))
+        if (cleanup_temp && dir.exists(temp_dir)) {
+          unlink(temp_dir, recursive = TRUE)
+        }
+      }
+    } else {
+      return(list(
+        valid = FALSE,
+        has_formula = FALSE,
+        has_canopus = FALSE,
+        has_structure = FALSE,
+        n_features = 0L,
+        is_zip = FALSE,
+        issues = paste0(
+          "Path exists but is not a directory or ZIP file: ",
+          sirius_dir
+        )
+      ))
+    }
+  }
+
+  # Now check directory (either original or extracted from ZIP)
+  if (!dir.exists(sirius_dir)) {
+    if (cleanup_temp && !is.null(temp_dir) && dir.exists(temp_dir)) {
+      unlink(temp_dir, recursive = TRUE)
+    }
+    return(list(
+      valid = FALSE,
+      has_formula = FALSE,
+      has_canopus = FALSE,
+      has_structure = FALSE,
+      n_features = 0L,
+      is_zip = is_zip,
+      issues = c(issues, "Could not access SIRIUS directory")
+    ))
+  }
+
+  # Check for required summary files (try both SIRIUS v5 and v6 names)
+  # SIRIUS v5 names
+  formula_file_v5 <- file.path(sirius_dir, "formula_identifications.tsv")
+  canopus_file_v5 <- file.path(sirius_dir, "canopus_summary.tsv")
+  structure_file_v5 <- file.path(sirius_dir, "compound_identifications.tsv")
+
+  # SIRIUS v6 names (with _all suffix)
+  formula_file_v6 <- file.path(sirius_dir, "formula_identifications_all.tsv")
+  canopus_file_v6 <- file.path(sirius_dir, "canopus_formula_summary_all.tsv")
+  structure_file_v6 <- file.path(
+    sirius_dir,
+    "structure_identifications_all.tsv"
+  )
+
+  # Check which files exist
+  has_formula <- file.exists(formula_file_v5) || file.exists(formula_file_v6)
+  has_canopus <- file.exists(canopus_file_v5) || file.exists(canopus_file_v6)
+  has_structure <- file.exists(structure_file_v5) ||
+    file.exists(structure_file_v6)
+
+  # Detect SIRIUS version
+  sirius_version <- if (
+    file.exists(formula_file_v6) || file.exists(canopus_file_v6)
+  ) {
+    "6"
+  } else if (file.exists(formula_file_v5) || file.exists(canopus_file_v5)) {
+    "5"
+  } else {
+    "unknown"
+  }
+
+  if (!has_formula) {
+    issues <- c(
+      issues,
+      "Missing formula identifications file (tried v5 and v6 names)"
+    )
+  }
+
+  if (!has_canopus) {
+    issues <- c(issues, "Missing CANOPUS summary file (tried v5 and v6 names)")
+  }
+
+  if (!has_structure) {
+    issues <- c(
+      issues,
+      "Missing structure identifications file (tried v5 and v6 names)"
+    )
+  }
+
+  # Count UNIQUE ANNOTATIONS from structure identifications file
+  n_features <- 0L
+  tryCatch(
+    {
+      # Determine which structure file exists
+      structure_file_to_read <- NULL
+      if (file.exists(structure_file_v6)) {
+        structure_file_to_read <- structure_file_v6
+      } else if (file.exists(structure_file_v5)) {
+        structure_file_to_read <- structure_file_v5
+      }
+
+      if (!is.null(structure_file_to_read)) {
+        # Read structure identifications and count UNIQUE annotations
+        structure_data <- safe_fread(
+          file = structure_file_to_read,
+          file_type = "SIRIUS structure identifications",
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        )
+
+        # Count unique structure annotations (unique InChIKeys or structure IDs)
+        # Each row is an annotation, count total rows for unique annotations
+        n_features <- nrow(structure_data)
+
+        log_debug(
+          "Counted %d unique annotations from %s",
+          n_features,
+          basename(structure_file_to_read)
+        )
+      }
+    },
+    error = function(e) {
+      log_debug("Could not count SIRIUS annotations: %s", conditionMessage(e))
+    }
+  )
+
+  # Cleanup temp directory if we created one
+  if (cleanup_temp && !is.null(temp_dir) && dir.exists(temp_dir)) {
+    unlink(temp_dir, recursive = TRUE)
+  }
+
+  list(
+    valid = length(issues) == 0L,
+    has_formula = has_formula,
+    has_canopus = has_canopus,
+    has_structure = has_structure,
+    n_features = n_features,
+    is_zip = is_zip,
+    sirius_version = sirius_version,
+    issues = issues
+  )
+}
+
+#' Sanitize All Input Data
+#'
+#' @description Comprehensive validation of all input data before starting
+#'     expensive processing. Reports issues immediately to save time.
+#'
+#' @param features_file [character] Character path to features CSV/TSV
+#'     (optional)
+#' @param mgf_file [character] Character path to MGF file (optional)
+#' @param metadata_file [character] Character path to metadata file (optional)
+#' @param sirius_dir [character] Character path to SIRIUS output directory or
+#'     ZIP (optional)
+#' @param filename_col [character] Character name of filename column (default:
+#'     "filename")
+#' @param organism_col [character] Character name of organism column (default:
+#'     "organism")
+#' @param feature_col [character] Character name of feature ID column (default:
+#'     "feature_id")
+#'
+#' @return Invisible TRUE if all validations pass, stops with error otherwise
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' # Validate all inputs before starting pipeline
+#' sanitize_all_inputs(
+#'   features_file = "data/features.csv",
+#'   mgf_file = "data/spectra.mgf",
+#'   metadata_file = "data/metadata.tsv",
+#'   sirius_dir = "data/sirius_output"
+#' )
+#' }
