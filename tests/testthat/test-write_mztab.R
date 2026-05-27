@@ -214,6 +214,11 @@ test_that("write_mztab emits ontology-aligned experiment metadata defaults", {
     "small_molecule-quantification_unit\\t\\[MS, MS:1001113, peak area, \\]",
     mtd
   )))
+  expect_true(any(grepl("^MTD\\tmzTab-ID\\tmetadata_defaults$", mtd)))
+  expect_true(any(grepl(
+    "^MTD\\turi\\[1\\]\\thttps://github.com/taxonomicallyinformedannotation/tima$",
+    mtd
+  )))
 })
 
 test_that("write_mztab writes SMF evidence references and ambiguity code", {
@@ -228,7 +233,10 @@ test_that("write_mztab writes SMF evidence references and ambiguity code", {
     feature_mz = c("120.0", "120.0"),
     feature_rt = c("1.0", "1.0"),
     candidate_structure_name = c("CmpdA", "CmpdB"),
-    candidate_structure_inchikey_connectivity_layer = c("AAAAAAAAAAAAAA", "BBBBBBBBBBBBBB"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "AAAAAAAAAAAAAA",
+      "BBBBBBBBBBBBBB"
+    ),
     candidate_structure_molecular_formula = c("C5H10O", "C6H12O"),
     candidate_adduct = c("[M+H]+", "[M+H]+"),
     candidate_library = c("spectral", "spectral"),
@@ -1078,6 +1086,55 @@ test_that("write_mztab xrefs adds additional database[n] blocks for ChEBI", {
     info = "Expected database[2] registration for ChEBI"
   )
   expect_true(any(grepl("ChEBI|chebi|CHEBI", mtd, ignore.case = TRUE)))
+})
+
+test_that("write_mztab prefers prefixed database_identifier from xrefs and preserves source InChIKey", {
+  local_test_project(copy = TRUE)
+
+  tmpdir <- withr::local_tempdir()
+  in_path <- file.path(tmpdir, "dbid_ann.tsv")
+  out <- file.path(tmpdir, "dbid_prefixed.mztab")
+  xrefs_tsv <- file.path(tmpdir, "dbid_xrefs.tsv")
+
+  df <- data.frame(
+    feature_id = "F1",
+    feature_mz = "181.1",
+    feature_rt = "1.0",
+    candidate_structure_name = "Caffeine",
+    candidate_structure_inchikey_connectivity_layer = "RYYVLZVUVIJVGH",
+    candidate_structure_molecular_formula = "C8H10N4O2",
+    candidate_adduct = "[M+H]+",
+    candidate_library = "spectral",
+    score_final = "0.9",
+    rank_final = "1",
+    stringsAsFactors = FALSE
+  )
+  write.table(df, in_path, sep = "\t", row.names = FALSE, quote = FALSE)
+
+  xrefs_df <- data.frame(
+    inchikey = "RYYVLZVUVIJVGH",
+    prefix = "chebi",
+    id = "27732",
+    stringsAsFactors = FALSE
+  )
+  write.table(xrefs_df, xrefs_tsv, sep = "\t", row.names = FALSE, quote = FALSE)
+
+  write_mztab(input = in_path, output = out, xrefs_file = xrefs_tsv)
+  lines <- readLines(out, warn = FALSE)
+
+  seh <- lines[grep("^SEH\\t", lines)[[1L]]]
+  sme <- lines[grep("^SME\\t", lines)[[1L]]]
+  seh_cols <- strsplit(seh, "\t", fixed = TRUE)[[1L]][-1L]
+  sme_vals <- strsplit(sme, "\t", fixed = TRUE)[[1L]][-1L]
+
+  db_pos <- which(seh_cols == "database_identifier")
+  ik_pos <- which(
+    seh_cols == "opt_global_candidate_structure_inchikey_connectivity_layer"
+  )
+  expect_length(db_pos, 1L)
+  expect_length(ik_pos, 1L)
+  expect_identical(sme_vals[[db_pos]], "CHEBI:27732")
+  expect_identical(sme_vals[[ik_pos]], "RYYVLZVUVIJVGH")
 })
 
 test_that(".mztab_build_xrefs_index returns NULL for missing file", {

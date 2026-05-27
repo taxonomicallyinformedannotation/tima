@@ -337,6 +337,7 @@ write_mztab <- function(
   # ── Write file ────────────────────────────────────────────────────────────
 
   metadata_table <- .mztab_build_metadata_table(
+    mztab_id = tools::file_path_sans_ext(basename(output)),
     title = title,
     description = description,
     software_version = software_version,
@@ -774,13 +775,26 @@ write_mztab <- function(
     )
   }
 
+  # Prefer prefixed database identifiers (e.g. CHEBI:12345) when xrefs are
+  # available; otherwise fall back to the connectivity-layer InChIKey.
+  database_identifier_col <- inchikey_col
+  if (!is.null(xrefs_index) && length(xrefs_index) > 0L) {
+    database_identifier_col <- vapply(
+      X = inchikey_col,
+      FUN = function(ik) {
+        .mztab_pick_best_database_identifier(
+          rows = xrefs_index[[ik]],
+          fallback = ik
+        )
+      },
+      FUN.VALUE = character(1L)
+    )
+  }
+
   sme <- tidytable::tidytable(
     SME_ID = as.character(seq_len(nrow(ann))),
     evidence_input_id = id_lookup[.mztab_pluck(ann, "feature_id")],
-    database_identifier = .mztab_pluck_na(
-      ann,
-      "candidate_structure_inchikey_connectivity_layer"
-    ),
+    database_identifier = database_identifier_col,
     chemical_formula = .mztab_pluck_na(
       ann,
       "candidate_structure_molecular_formula"
@@ -828,7 +842,6 @@ write_mztab <- function(
   consumed_cols <- c(
     # ── canonical SME mappings ───────────────────────────────────────────────
     "feature_id",
-    "candidate_structure_inchikey_connectivity_layer",
     "candidate_structure_molecular_formula",
     "candidate_structure_smiles_no_stereo",
     "candidate_structure_inchi",
@@ -854,6 +867,14 @@ write_mztab <- function(
       colnames(ann)
     )
   )
+  # When xrefs drive canonical database_identifier, still preserve the original
+  # TIMA InChIKey source column as opt_global_* for full reporting parity.
+  if (is.null(xrefs_index) || length(xrefs_index) == 0L) {
+    consumed_cols <- c(
+      consumed_cols,
+      "candidate_structure_inchikey_connectivity_layer"
+    )
+  }
   extra_cols <- setdiff(colnames(ann), consumed_cols)
   if (length(extra_cols) > 0L) {
     used_names <- colnames(sme)
@@ -1032,7 +1053,7 @@ write_mztab <- function(
       smf_id_refs <- "null"
     }
 
-    sme_id_refs_all <- sme_table$SME_ID[sme_table$database_identifier == ckey]
+    sme_id_refs_all <- sme_table$SME_ID[sme_table$feature_id %in% feat_ids]
     sme_id_refs_all <- sme_id_refs_all[!is.na(sme_id_refs_all)]
     sme_id_refs <- if (length(sme_id_refs_all) > 0L) {
       paste(unique(sme_id_refs_all), collapse = "|")
@@ -1054,7 +1075,16 @@ write_mztab <- function(
       SML_ID = as.character(j),
       SMF_ID_REFS = smf_id_refs,
       SME_ID_REFS = sme_id_refs,
-      database_identifier = ckey,
+      database_identifier = if (
+        !is.null(xrefs_index) && length(xrefs_index) > 0L
+      ) {
+        .mztab_pick_best_database_identifier(
+          rows = xrefs_index[[ckey]],
+          fallback = ckey
+        )
+      } else {
+        ckey
+      },
       chemical_formula = .mztab_pluck_na(
         row,
         "candidate_structure_molecular_formula"
@@ -1674,6 +1704,7 @@ write_mztab <- function(
 #'
 #' @keywords internal
 .mztab_build_metadata_table <- function(
+  mztab_id,
   title,
   description,
   software_version,
@@ -1719,24 +1750,46 @@ write_mztab <- function(
   meta <- add_default(meta, "mzTab-version", "2.1.0-M")
   meta <- add_default(meta, "mzTab-mode", "Summary")
   meta <- add_default(meta, "mzTab-type", "Identification")
+  meta <- add_default(meta, "mzTab-ID", .mztab_escape(mztab_id))
   meta <- add_default(meta, "title", .mztab_escape(title))
   meta <- add_default(meta, "description", .mztab_escape(description))
+  meta <- add_default(
+    meta,
+    "uri[1]",
+    "https://github.com/taxonomicallyinformedannotation/tima"
+  )
 
   # ── Controlled vocabulary registry ───────────────────────────────────────
   meta <- add_default(meta, "cv[1]-label", "MS")
   meta <- add_default(meta, "cv[1]-full_name", "PSI-MS controlled vocabulary")
   meta <- add_default(meta, "cv[1]-version", "4.1.11")
-  meta <- add_default(meta, "cv[1]-uri", "https://purl.obolibrary.org/obo/ms.obo")
+  meta <- add_default(
+    meta,
+    "cv[1]-uri",
+    "https://purl.obolibrary.org/obo/ms.obo"
+  )
 
   meta <- add_default(meta, "cv[2]-label", "UO")
   meta <- add_default(meta, "cv[2]-full_name", "Units of Measurement Ontology")
   meta <- add_default(meta, "cv[2]-version", "unknown")
-  meta <- add_default(meta, "cv[2]-uri", "https://purl.obolibrary.org/obo/uo.obo")
+  meta <- add_default(
+    meta,
+    "cv[2]-uri",
+    "https://purl.obolibrary.org/obo/uo.obo"
+  )
 
   meta <- add_default(meta, "cv[3]-label", "STATO")
-  meta <- add_default(meta, "cv[3]-full_name", "The Statistical Methods Ontology")
+  meta <- add_default(
+    meta,
+    "cv[3]-full_name",
+    "The Statistical Methods Ontology"
+  )
   meta <- add_default(meta, "cv[3]-version", "unknown")
-  meta <- add_default(meta, "cv[3]-uri", "https://purl.obolibrary.org/obo/stato.obo")
+  meta <- add_default(
+    meta,
+    "cv[3]-uri",
+    "https://purl.obolibrary.org/obo/stato.obo"
+  )
 
   # TIMA scores are user-namespace Params; register the namespace explicitly.
   meta <- add_default(meta, "cv[4]-label", "TIMA")
@@ -1865,7 +1918,11 @@ write_mztab <- function(
   # mzTab-M 2.1 introduces study_variable_group and removes
   # study_variable[*]-factors. Emit a minimal default group so the generated
   # file remains explicit and machine-readable for simple one-factor exports.
-  meta <- add_default(meta, "study_variable_group[1]", "[, , annotation_group, ]")
+  meta <- add_default(
+    meta,
+    "study_variable_group[1]",
+    "[, , annotation_group, ]"
+  )
   meta <- add_default(
     meta,
     "study_variable_group[1]-description",
@@ -1877,7 +1934,11 @@ write_mztab <- function(
     "[STATO, STATO:0000252, categorical variable, ]"
   )
   meta <- add_default(meta, "study_variable_group[1]-datatype", "xsd:string")
-  meta <- add_default(meta, "study_variable[1]-group_ref", "study_variable_group[1]")
+  meta <- add_default(
+    meta,
+    "study_variable[1]-group_ref",
+    "study_variable_group[1]"
+  )
   meta <- add_default(meta, "study_variable[1]-assay_refs", "assay[1]")
   meta <- add_default(
     meta,
@@ -2519,6 +2580,58 @@ write_mztab <- function(
   "null"
 }
 
+#' Select the best database_identifier value as prefix:id.
+#'
+#' Prefers identifiers that align with registered database blocks and
+#' identifiers.org-compatible prefixes.
+#'
+#' @param rows data.frame with columns `prefix`, `id` (or NULL).
+#' @param fallback fallback identifier when no mapped xref is available.
+#' @return Single database_identifier string.
+#' @keywords internal
+.mztab_pick_best_database_identifier <- function(rows, fallback = "null") {
+  if (is.null(rows) || nrow(rows) == 0L) {
+    fb <- as.character(fallback)[[1L]]
+    if (is.na(fb) || !nzchar(fb)) "null" else fb
+  } else {
+    priority_prefixes <- c(
+      "chebi",
+      "pubchem.compound",
+      "hmdb",
+      "chembl.compound",
+      "kegg",
+      "cas",
+      "lipidmaps",
+      "knapsack",
+      "wikidata"
+    )
+
+    for (pfx in priority_prefixes) {
+      match_rows <- rows[rows$prefix == pfx, , drop = FALSE]
+      if (nrow(match_rows) > 0L) {
+        id <- as.character(match_rows$id[[1L]])
+        info <- .XREF_KNOWN_PREFIXES[[pfx]]
+        if (!is.null(info) && !is.na(id) && nzchar(id)) {
+          return(paste0(info$prefix, ":", id))
+        }
+      }
+    }
+
+    # Fallback to first available mapped prefix:id.
+    for (i in seq_len(nrow(rows))) {
+      pfx <- as.character(rows$prefix[[i]])
+      id <- as.character(rows$id[[i]])
+      info <- .XREF_KNOWN_PREFIXES[[pfx]]
+      if (!is.null(info) && !is.na(id) && nzchar(id)) {
+        return(paste0(info$prefix, ":", id))
+      }
+    }
+
+    fb <- as.character(fallback)[[1L]]
+    if (is.na(fb) || !nzchar(fb)) "null" else fb
+  }
+}
+
 #' Derive additional database[n] metadata blocks from xrefs index.
 #'
 #' Collects all unique `prefix` values found across the entire xrefs index and
@@ -2541,6 +2654,7 @@ write_mztab <- function(
 
   # Priority order for database[n] registration (wikidata is for URIs only)
   ordered_prefixes <- c(
+    "wikidata",
     "chebi",
     "pubchem.compound",
     "hmdb",
