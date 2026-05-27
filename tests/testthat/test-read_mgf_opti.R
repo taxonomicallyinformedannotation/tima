@@ -8,7 +8,6 @@ skip_if_mgf_unavailable <- function() {
   testthat::skip_if_not_installed("Spectra")
   testthat::skip_if_not_installed("MsBackendMgf")
   testthat::skip_if_not_installed("MsCoreUtils")
-  testthat::skip_if_not_installed("IRanges")
 }
 
 write_mgf <- function(blocks) {

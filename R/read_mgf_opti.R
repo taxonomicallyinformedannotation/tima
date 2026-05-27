@@ -238,18 +238,23 @@ read_mgf_opti <- function(
   log_info("Total spectra read: %s", total_processed)
 
   # Guard: when all spectra were skipped (e.g. every entry lacked fragment peaks),
-  # MsCoreUtils::rbindFill(list()) crashes with a cryptic NULL error.  Return an
-  # empty DataFrame that Spectra::Spectra() accepts gracefully.
+  # MsCoreUtils::rbindFill(list()) crashes with a cryptic NULL error. Build an
+  # empty result by parsing a tiny in-memory prototype and slicing it to 0 rows.
   if (length(sp_list) == 0L) {
     log_warn(
       "No spectra with fragment peaks found in file; returning empty result"
     )
-    empty <- S4Vectors::DataFrame(
-      mz = IRanges::NumericList(compress = FALSE),
-      intensity = IRanges::NumericList(compress = FALSE),
-      msLevel = integer(0L),
-      dataOrigin = character(0L)
-    )
+    prototype <- .extract_mgf_spectrum(c(
+      "TITLE=EMPTY_PROTOTYPE",
+      "PEPMASS=0 0",
+      "0 0"
+    ))
+    empty <- MsCoreUtils::rbindFill(list(prototype))
+    empty <- methods::as(object = empty, Class = "DataFrame")
+    empty$mz <- methods::as(object = empty$mz, Class = "NumericList")
+    empty <- empty[0, , drop = FALSE]
+    empty$msLevel <- integer(0L)
+    empty$dataOrigin <- character(0L)
     return(empty)
   }
 
@@ -304,7 +309,7 @@ read_mgf_opti <- function(
 
   # Convert to DataFrame and set up peak lists
   res <- methods::as(object = res, Class = "DataFrame")
-  res$mz <- IRanges::NumericList(res$mz, compress = FALSE)
+  res$mz <- methods::as(object = res$mz, Class = "NumericList")
   res$dataOrigin <- f
 
   if (!"msLevel" %in% colnames(res)) {

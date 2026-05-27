@@ -35,8 +35,6 @@ Imports:
     httr (>= 1.4.8),
     httr2 (>= 1.2.2),
     igraph (>= 2.3.0),
-    IRanges (>= 2.44.0),
-    S4Vectors (>= 0.48.0),
     jsonlite (>= 2.0.0),
     lgr (>= 0.5.2),
     lifecycle (>= 1.0.5),
