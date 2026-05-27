@@ -46,18 +46,7 @@ jobs:
           && sudo apt-get clean \
 
           && sudo rm -rf /var/lib/apt/lists/*
-      - name: Install (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: >
-          install.packages("tima", repos =
-          c("https://taxonomicallyinformedannotation.r-universe.dev",
-          "https://bioc.r-universe.dev", "https://cloud.r-project.org"), type =
-          "source")
-
-          tima::install_tima()
-        shell: Rscript {0}
-      - name: Install (MacOS and Windows)
-        if: matrix.os != 'ubuntu-latest'
+      - name: Install
         run: >
           install.packages("tima", repos =
           c("https://taxonomicallyinformedannotation.r-universe.dev",
