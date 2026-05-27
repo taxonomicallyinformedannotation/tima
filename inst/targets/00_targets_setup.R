@@ -2,7 +2,7 @@
 
 library(targets)
 
-tar_config_set(script = "inst/_targets.R")
+tar_config_set(script = file.path(.inst_dir, "_targets.R"))
 
 tar_option_set(
   packages = "tima",

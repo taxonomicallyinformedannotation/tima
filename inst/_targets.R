@@ -1,18 +1,31 @@
 # Pipeline graph body composed from section modules.
 
-source("inst/targets/00_targets_setup.R")
-source("inst/targets/01_targets_architecture.R")
-source("inst/targets/02_targets_parameters.R")
-source("inst/targets/10_targets_inputs.R")
-source("inst/targets/11_targets_libraries.R")
-source("inst/targets/12_targets_xrefs.R")
-source("inst/targets/13_targets_annotations.R")
-source("inst/targets/14_targets_features.R")
-source("inst/targets/15_targets_benchmark.R")
-source("inst/targets/16_targets_filtering.R")
-source("inst/targets/17_targets_weighting.R")
-source("inst/targets/20_targets_export_mztab.R")
-source("inst/targets/30_targets_benchmark.R")
+# Detect this script's own directory so section paths are portable
+# regardless of working directory or installation location.
+.inst_dir <- local({
+  frames <- sys.frames()
+  ofiles <- Filter(Negate(is.null), lapply(frames, `[[`, "ofile"))
+  if (length(ofiles) > 0L) {
+    dirname(normalizePath(ofiles[[length(ofiles)]], mustWork = FALSE))
+  } else {
+    system.file(package = "tima")
+  }
+})
+.targets_dir <- file.path(.inst_dir, "targets")
+
+source(file.path(.targets_dir, "00_targets_setup.R"))
+source(file.path(.targets_dir, "01_targets_architecture.R"))
+source(file.path(.targets_dir, "02_targets_parameters.R"))
+source(file.path(.targets_dir, "10_targets_inputs.R"))
+source(file.path(.targets_dir, "11_targets_libraries.R"))
+source(file.path(.targets_dir, "12_targets_xrefs.R"))
+source(file.path(.targets_dir, "13_targets_annotations.R"))
+source(file.path(.targets_dir, "14_targets_features.R"))
+source(file.path(.targets_dir, "15_targets_benchmark.R"))
+source(file.path(.targets_dir, "16_targets_filtering.R"))
+source(file.path(.targets_dir, "17_targets_weighting.R"))
+source(file.path(.targets_dir, "20_targets_export_mztab.R"))
+source(file.path(.targets_dir, "30_targets_benchmark.R"))
 
 list(
   targets_section_architecture(),
