@@ -8,7 +8,7 @@ message: 'To cite package "tima" in publications use:'
 type: software
 license: AGPL-3.0-or-later
 title: 'tima: Taxonomically Informed Metabolite Annotation'
-version: 2.12.0.9001
+version: 2.13.0.9001
 doi: 10.5281/zenodo.5797920
 identifiers:
 - type: url
@@ -36,8 +36,8 @@ preferred-citation:
     given-names: Pierre-Marie
     email: pierre-marie.allard@unifr.ch
     orcid: https://orcid.org/0000-0003-3389-2191
-  year: '2025'
-  notes: R package, version 2.11.0
+  year: '2026'
+  notes: R package, version 2.13.0
   doi: 10.5281/zenodo.5797920
 repository: https://bioconductor.org/
 repository-code: https://github.com/taxonomicallyinformedannotation/tima

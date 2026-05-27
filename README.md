@@ -237,12 +237,11 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | BiocManager | 1.30.27 | Morgan and Ramos (2025) |
 | BiocParallel | 1.46.0 | Wang et al. (2025) |
 | BiocVersion | 3.23.1 | Morgan (2025) |
-| classyfireR | 0.3.8 | Y et al. (2016) |
+| devtools | 2.5.2 | (**devtools?**) |
 | docopt | 0.7.2 | <span class="nocase">de Jonge</span> (2025) |
 | fs | 2.1.0 | Hester et al. (2025) |
 | httr2 | 1.2.2 | Wickham (2025) |
 | igraph | 2.3.1 | Csárdi and Nepusz (2006); Antonov et al. (2023); (**igraph2026?**) |
-| IRanges | 2.46.0 | Lawrence et al. (2013) |
 | knitr | 1.51 | Xie (2014); Xie (2015); Xie (2025) |
 | lgr | 0.5.2 | Fleck (2025) |
 | lifecycle | 1.0.5 | (**lifecycle?**) |
@@ -267,7 +266,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 | tidyselect | 1.2.1 | Henry and Wickham (2024) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
-| tima | 2.12.0.9001 | Rutz et al. (2019); Rutz and Allard (2025) |
+| tima | 2.13.0.9000 | Rutz et al. (2019); Rutz and Allard (2025) |
 | tools | 4.6.0 | (**tools?**) |
 | withr | 3.0.2 | Hester et al. (2024) |
 | yaml | 2.3.12 | Stephens and Simonov (2025) |
@@ -393,14 +392,6 @@ Landau, William Michael. 2021. “The Targets r Package: A Dynamic
 Make-Like Function-Oriented Pipeline Toolkit for Reproducibility and
 High-Performance Computing.” *Journal of Open Source Software* 6 (57):
 2959. <https://doi.org/10.21105/joss.02959>.
-
-</div>
-
-<div id="ref-IRanges" class="csl-entry">
-
-Lawrence, Michael, Wolfgang Huber, Hervé Pagès, et al. 2013. “Software
-for Computing and Annotating Genomic Ranges.” *PLoS Computational
-Biology* 9. <https://doi.org/10.1371/journal.pcbi.1003118>.
 
 </div>
 
@@ -608,15 +599,6 @@ Definitive Guide*. Chapman; Hall/CRC.
 Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. *R Markdown
 Cookbook*. Chapman; Hall/CRC.
 <https://bookdown.org/yihui/rmarkdown-cookbook>.
-
-</div>
-
-<div id="ref-classyfireR" class="csl-entry">
-
-Y, Djoumbou Feunang, Eisner R, Knox C, et al. 2016. *ClassyFire:
-Automated Chemical Classification with a Comprehensive, Computable
-Taxonomy*. In *Journal of Cheminformatics*, 8:61.
-<https://doi.org/10.1186/s13321-016-0174-y>.
 
 </div>
 
