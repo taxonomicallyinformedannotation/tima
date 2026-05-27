@@ -2,17 +2,6 @@
 # Resets on package load. Prevents flooding billions of warnings in hot loops.
 .tima_sanitize_env <- new.env(parent = emptyenv())
 
-#' @title Reset sanitization warnings
-#'
-#' @description Resets the "warn once" flags so that subsequent unsanitized
-#'     spectra will trigger a warning again. Useful between pipeline runs.
-#'
-#' @keywords internal
-reset_sanitize_warnings <- function() {
-  .tima_sanitize_env$warned_query <- FALSE
-  .tima_sanitize_env$warned_target <- FALSE
-  invisible(NULL)
-}
 
 #' @title Check if a spectrum matrix is sanitized
 #'

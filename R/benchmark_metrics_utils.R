@@ -87,6 +87,7 @@ NULL
 }
 
 #' @keywords internal
+# jarl-ignore unused_function: benchmark evaluation utility kept for future CLI use
 benchmark_evaluate_predictions <- function(
   truth_file,
   prediction_files,

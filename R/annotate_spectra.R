@@ -548,19 +548,6 @@ get_precursors <- function(sp) {
   col %||% rep(NA_real_, length(sp))
 }
 
-#' @keywords internal
-get_adducts <- function(sp) {
-  n <- length(sp)
-  if (!methods::is(sp, "Spectra") || is.null(sp@backend@spectraData)) {
-    return(rep(NA_character_, n))
-  }
-  extract_vector(
-    obj = sp,
-    field = c("adduct", "precursor_type"),
-    len = n,
-    fill = NA_character_
-  )
-}
 
 #' @keywords internal
 convert_precursor_for_matching <- function(precursors, adducts) {

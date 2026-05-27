@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_last_version_from_zenodo.R
 \name{find_matching_file}
 \alias{find_matching_file}
-\title{Find Matching File in Zenodo Record}
+\title{Parse Zenodo API Response}
 \usage{
 find_matching_file(filenames, pattern, doi)
 }
@@ -17,6 +17,9 @@ find_matching_file(filenames, pattern, doi)
 Integer index of first matching file
 }
 \description{
+Internal helper to parse JSON content from Zenodo API.
+Find Matching File in Zenodo Record
+
 Internal helper to find a file matching the pattern in Zenodo
 record.
 }

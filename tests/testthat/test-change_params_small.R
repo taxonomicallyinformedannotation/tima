@@ -2,32 +2,6 @@
 
 library(testthat)
 
-## Setup ----
-
-# Create temporary test files
-create_temp_test_files <- function(base_dir = tempdir()) {
-  files <- list(
-    features = file.path(base_dir, "features.csv"),
-    metadata = file.path(base_dir, "metadata.tsv"),
-    sirius = file.path(base_dir, "sirius.zip"),
-    spectra = file.path(base_dir, "spectra.mgf"),
-    mztab = file.path(base_dir, "annotations.mztab")
-  )
-
-  # Create dummy files
-  write.csv(data.frame(a = 1:3), files$features, row.names = FALSE)
-  write.table(
-    data.frame(b = 4:6),
-    files$metadata,
-    sep = "\t",
-    row.names = FALSE
-  )
-  writeLines("dummy_sirius", files$sirius)
-  writeLines("dummy_mgf", files$spectra)
-  writeLines("MTD\tmzTab-version\t2.0.0-M", files$mztab)
-
-  files
-}
 
 ## Input Validation Tests ----
 

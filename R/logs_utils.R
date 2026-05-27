@@ -322,6 +322,7 @@ ensure_logging_initialized <- function() {
 NULL
 
 #' @rdname logging_wrappers
+# jarl-ignore unused_function: complete logging-level API kept for future use
 log_trace <- function(msg, ...) {
   ensure_logging_initialized()
   if (...length() > 0) {
@@ -372,6 +373,7 @@ log_error <- function(msg, ...) {
 }
 
 #' @rdname logging_wrappers
+# jarl-ignore unused_function: complete logging-level API kept for future use
 log_fatal <- function(msg, ...) {
   ensure_logging_initialized()
   if (...length() > 0) {

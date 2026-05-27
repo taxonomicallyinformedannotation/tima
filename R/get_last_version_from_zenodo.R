@@ -187,31 +187,6 @@ fetch_zenodo_record <- function(record, doi, timeout_s) {
 #' Parse Zenodo API Response
 #'
 #' @description Internal helper to parse JSON content from Zenodo API.
-#'
-#' @param api_url Character URL to Zenodo API endpoint
-#'
-#' @return List with parsed JSON content
-#' @keywords internal
-parse_zenodo_content <- function(api_url) {
-  log_debug("Parsing API response from: %s", api_url)
-
-  tryCatch(
-    {
-      jsonlite::fromJSON(txt = api_url)
-    },
-    error = function(e) {
-      cli::cli_abort(
-        c(
-          "failed to parse Zenodo API response",
-          "x" = conditionMessage(e),
-          "i" = "the API format may have changed"
-        ),
-        class = c("tima_runtime_error", "tima_error"),
-        call = NULL
-      )
-    }
-  )
-}
 
 #' Find Matching File in Zenodo Record
 #'

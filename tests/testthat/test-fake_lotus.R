@@ -2,7 +2,6 @@
 
 library(testthat)
 
-.test_path <- function(...) file.path(temp_dir, ...)
 
 test_that("fake_lotus creates file with correct structure", {
   temp_file <- tempfile(fileext = ".tsv.gz")

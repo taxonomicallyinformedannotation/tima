@@ -556,59 +556,6 @@ build_evidence_supported_hypotheses <- function(
   tidytable::as_tidytable(hyps)
 }
 
-#' Inject baseline rows for any feature missing the baseline adduct after the
-#' library prefilter. Without this, features whose baseline implied mass is
-#' not in the library would lose their fallback hypothesis.
-#' @keywords internal
-.ensure_baseline_rows <- function(
-  hyps,
-  feature_ids,
-  feature_rts,
-  feature_mzs,
-  feature_samples,
-  universe,
-  baseline_adduct,
-  exact_masses_sorted
-) {
-  base_row <- universe[adduct == baseline_adduct][1L]
-  if (nrow(base_row) == 0L) {
-    return(hyps)
-  }
-  have_baseline <- unique(hyps$feature_id[hyps$adduct == baseline_adduct])
-  missing_mask <- !(feature_ids %in% have_baseline)
-  if (!any(missing_mask)) {
-    return(hyps)
-  }
-  iso_shift <- base_row$n_iso * EVIDENCE_ISOTOPE_SHIFT_DA
-  implied <- (abs(base_row$z) *
-    (feature_mzs[missing_mask] - iso_shift) -
-    base_row$adduct_mass) /
-    base_row$n_mer
-  ok <- is.finite(implied) & implied > 0
-  if (!any(ok)) {
-    return(hyps)
-  }
-  if (length(exact_masses_sorted) > 0L) {
-    ppm_err <- .nearest_exact_mass_ppm(implied[ok], exact_masses_sorted)
-  } else {
-    ppm_err <- rep(NA_real_, sum(ok))
-  }
-  idx <- which(missing_mask)[ok]
-  add_rows <- tidytable::tidytable(
-    feature_id = feature_ids[idx],
-    rt = feature_rts[idx],
-    mz = feature_mzs[idx],
-    sample = feature_samples[idx],
-    adduct = baseline_adduct,
-    n_mer = base_row$n_mer,
-    z = base_row$z,
-    adduct_mass = base_row$adduct_mass,
-    n_iso = base_row$n_iso,
-    implied_M = implied[ok],
-    nearest_mass_error_ppm = ppm_err
-  )
-  tidytable::bind_rows(hyps, add_rows)
-}
 
 #' Empty hypothesis table with the canonical schema.
 #' @keywords internal
