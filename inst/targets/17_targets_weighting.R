@@ -1,0 +1,62 @@
+# Weighting targets section.
+
+targets_section_weighting <- function() {
+  tar_target(
+    name = ann_wei,
+    command = {
+      weight_annotations(
+        library = lib_mer_key,
+        org_tax_ott = lib_mer_org_tax_ott,
+        str_stereo = lib_mer_str_stereo,
+        annotations = ann_fil,
+        canopus = ann_sir_pre_can,
+        formula = ann_sir_pre_for,
+        components = fea_com_pre,
+        edges = fea_edg_pre,
+        taxa = tax_pre,
+        output = par_wei_ann$files$annotations$processed,
+        candidates_final = par_wei_ann$annotations$candidates$final,
+        best_percentile = par_wei_ann$annotations$candidates$best_percentile,
+        candidates_neighbors = par_wei_ann$annotations$candidates$neighbors,
+        weight_spectral = par_wei_ann$weights$global$spectral,
+        weight_chemical = par_wei_ann$weights$global$chemical,
+        weight_biological = par_wei_ann$weights$global$biological,
+        score_biological_domain = par_wei_ann$weights$biological$domain,
+        score_biological_kingdom = par_wei_ann$weights$biological$kingdom,
+        score_biological_phylum = par_wei_ann$weights$biological$phylum,
+        score_biological_class = par_wei_ann$weights$biological$class,
+        score_biological_order = par_wei_ann$weights$biological$order,
+        score_biological_infraorder = par_wei_ann$weights$biological$infraorder,
+        score_biological_family = par_wei_ann$weights$biological$family,
+        score_biological_subfamily = par_wei_ann$weights$biological$subfamily,
+        score_biological_tribe = par_wei_ann$weights$biological$tribe,
+        score_biological_subtribe = par_wei_ann$weights$biological$subtribe,
+        score_biological_genus = par_wei_ann$weights$biological$genus,
+        score_biological_subgenus = par_wei_ann$weights$biological$subgenus,
+        score_biological_species = par_wei_ann$weights$biological$species,
+        score_biological_subspecies = par_wei_ann$weights$biological$subspecies,
+        score_biological_variety = par_wei_ann$weights$biological$variety,
+        score_chemical_cla_kingdom = par_wei_ann$weights$chemical$cla$kingdom,
+        score_chemical_cla_superclass = par_wei_ann$weights$chemical$cla$superclass,
+        score_chemical_cla_class = par_wei_ann$weights$chemical$cla$class,
+        score_chemical_cla_parent = par_wei_ann$weights$chemical$cla$parent,
+        score_chemical_npc_pathway = par_wei_ann$weights$chemical$npc$pathway,
+        score_chemical_npc_superclass = par_wei_ann$weights$chemical$npc$superclass,
+        score_chemical_npc_class = par_wei_ann$weights$chemical$npc$class,
+        minimal_consistency = par_wei_ann$annotations$thresholds$consistency,
+        minimal_ms1_bio = par_wei_ann$annotations$thresholds$ms1$biological,
+        minimal_ms1_chemo = par_wei_ann$annotations$thresholds$ms1$chemical,
+        minimal_ms1_condition = par_wei_ann$annotations$thresholds$ms1$condition,
+        ms1_only = par_wei_ann$annotations$ms1only,
+        compounds_names = par_wei_ann$options$compounds_names,
+        high_confidence = par_wei_ann$options$high_confidence,
+        remove_ties = par_wei_ann$options$remove_ties,
+        summarize = par_wei_ann$options$summarize,
+        pattern = par_wei_ann$files$pattern,
+        force = par_wei_ann$options$force,
+        xrefs_file = lib_xrefs
+      )
+    },
+    format = "file"
+  )
+}

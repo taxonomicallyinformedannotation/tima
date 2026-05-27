@@ -66,7 +66,7 @@ execute_targets_pipeline <- function(target_pattern = "^(ann_wei|exp_mzt)$") {
       c(
         "tima workflow pipeline failed",
         "x" = "_targets.R was not found in the current working directory",
-        "i" = "run from a TIMA workspace root or create a local _targets.R"
+        "i" = "run from a TIMA workspace root with the bundled targets scripts"
       ),
       class = c("tima_runtime_error", "tima_error"),
       call = NULL
