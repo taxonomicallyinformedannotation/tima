@@ -142,7 +142,7 @@ test_that("write_mztab produces valid MTD section", {
   lines <- readLines(out, warn = FALSE)
   mtd <- grep("^MTD\t", lines, value = TRUE)
 
-  expect_true(any(grepl("mzTab-version\t2\\.0\\.0-M", mtd)))
+  expect_true(any(grepl("mzTab-version\t2\\.1\\.0-M", mtd)))
   expect_true(any(grepl("mzTab-mode\tSummary", mtd)))
   expect_true(any(grepl("mzTab-type\tIdentification", mtd)))
   # id_confidence_measure uses TIMA user-namespace Param syntax
@@ -188,6 +188,18 @@ test_that("write_mztab emits ontology-aligned experiment metadata defaults", {
   )))
   expect_true(any(grepl(
     "study_variable\\[1\\]-assay_refs\\tassay\\[1\\]",
+    mtd
+  )))
+  expect_true(any(grepl(
+    "study_variable_group\\[1\\]\\t\\[, , annotation_group, \\]",
+    mtd
+  )))
+  expect_true(any(grepl(
+    "study_variable\\[1\\]-group_ref\\tstudy_variable_group\\[1\\]",
+    mtd
+  )))
+  expect_true(any(grepl(
+    "small_molecule-identification_reliability\\t\\[MS, MS:1000932, identification reliability, \\]",
     mtd
   )))
 })

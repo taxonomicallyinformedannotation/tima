@@ -1,6 +1,6 @@
 #' @title Write TIMA results as mzTab-M
 #'
-#' @description Exports TIMA weighted-annotation results to mzTab-M 2.0.0
+#' @description Exports TIMA weighted-annotation results to mzTab-M 2.1.0
 #' plain-text format.  The output is a conformant mzTab-M file containing:
 #'
 #' * **MTD** – metadata (software, database, instrument, confidence measures,
@@ -1630,7 +1630,7 @@ write_mztab <- function(
   }
 
   # ── Mandatory header fields ──────────────────────────────────────────────
-  meta <- add_default(meta, "mzTab-version", "2.0.0-M")
+  meta <- add_default(meta, "mzTab-version", "2.1.0-M")
   meta <- add_default(meta, "mzTab-mode", "Summary")
   meta <- add_default(meta, "mzTab-type", "Identification")
   meta <- add_default(meta, "title", .mztab_escape(title))
@@ -1736,6 +1736,22 @@ write_mztab <- function(
     "assay[1]-quantification_reagent",
     "[MS, MS:1002038, unlabeled sample, ]"
   )
+  # mzTab-M 2.1 introduces study_variable_group and removes
+  # study_variable[*]-factors. Emit a minimal default group so the generated
+  # file remains explicit and machine-readable for simple one-factor exports.
+  meta <- add_default(meta, "study_variable_group[1]", "[, , annotation_group, ]")
+  meta <- add_default(
+    meta,
+    "study_variable_group[1]-description",
+    "TIMA default study variable group"
+  )
+  meta <- add_default(
+    meta,
+    "study_variable_group[1]-type",
+    "[STATO, STATO:0000252, categorical variable, ]"
+  )
+  meta <- add_default(meta, "study_variable_group[1]-datatype", "xsd:string")
+  meta <- add_default(meta, "study_variable[1]-group_ref", "study_variable_group[1]")
   meta <- add_default(meta, "study_variable[1]-assay_refs", "assay[1]")
   meta <- add_default(
     meta,
@@ -1822,6 +1838,11 @@ write_mztab <- function(
       "[TIMA, TIMA:004, TIMA spectral similarity score, ]"
     )
   }
+  meta <- add_default(
+    meta,
+    "small_molecule-identification_reliability",
+    "[MS, MS:1000932, identification reliability, ]"
+  )
 
   # ── Column unit declarations ───────────────────────────────────────────────
   # SMF retention time (UO:0000010 = second)
