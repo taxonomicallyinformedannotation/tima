@@ -703,11 +703,11 @@ test_that("write_mztab produces SME section with one row per annotation", {
   expect_length(sme_idx, n_feat * n_cand)
 })
 
-test_that("write_mztab produces SML section with correct compound grouping", {
+test_that("write_mztab produces SML section with feature-level ambiguity grouping", {
   local_test_project(copy = TRUE)
 
   tmpdir <- withr::local_tempdir()
-  # 2 features × 2 candidates = 4 unique InChIKeys
+  # 2 features, each with 2 candidates -> 2 ambiguity-aware SML rows.
   results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 2L)
   out <- file.path(tmpdir, "out.mztab")
 
@@ -718,8 +718,60 @@ test_that("write_mztab produces SML section with correct compound grouping", {
   sml_idx <- grep("^SML\t", lines)
 
   expect_length(smh_idx, 1L)
-  # 2 features × 2 candidates = 4 unique compounds in this fixture
-  expect_length(sml_idx, 4L)
+  expect_length(sml_idx, 2L)
+})
+
+test_that("write_mztab encodes aligned multi-candidate SML identifier fields", {
+  local_test_project(copy = TRUE)
+
+  tmpdir <- withr::local_tempdir()
+  in_path <- file.path(tmpdir, "sml_multicandidate.tsv")
+  out <- file.path(tmpdir, "sml_multicandidate.mztab")
+
+  df <- data.frame(
+    feature_id = c("F1", "F1"),
+    feature_mz = c("250.123", "250.123"),
+    feature_rt = c("2.0", "2.0"),
+    candidate_structure_name = c("CmpdA", "CmpdB"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "AAAAAAAAAAAAAA",
+      "BBBBBBBBBBBBBB"
+    ),
+    candidate_structure_molecular_formula = c("C10H12O2", "C11H14O2"),
+    candidate_structure_smiles_no_stereo = c("CC1", "CC2"),
+    candidate_adduct = c("[M+H]+", "[M+Na]+"),
+    candidate_library = c("spectral", "TIMA MS1"),
+    score_final = c("0.92", "0.41"),
+    rank_final = c("1", "2"),
+    stringsAsFactors = FALSE
+  )
+  write.table(df, in_path, sep = "\t", row.names = FALSE, quote = FALSE)
+
+  write_mztab(input = in_path, output = out)
+  lines <- readLines(out, warn = FALSE)
+
+  smh_line <- lines[grep("^SMH\\t", lines)[[1L]]]
+  smh_cols <- strsplit(smh_line, "\t", fixed = TRUE)[[1L]][-1L]
+  sml_line <- lines[grep("^SML\\t", lines)[[1L]]]
+  sml_vals <- strsplit(sml_line, "\t", fixed = TRUE)[[1L]][-1L]
+
+  db_val <- sml_vals[[which(smh_cols == "database_identifier")]]
+  formula_val <- sml_vals[[which(smh_cols == "chemical_formula")]]
+  smiles_val <- sml_vals[[which(smh_cols == "smiles")]]
+  adduct_val <- sml_vals[[which(smh_cols == "adduct_ions")]]
+
+  expect_identical(db_val, "AAAAAAAAAAAAAA|BBBBBBBBBBBBBB")
+  expect_identical(formula_val, "C10H12O2|C11H14O2")
+  expect_identical(smiles_val, "CC1|CC2")
+  expect_identical(adduct_val, "[M+H]+|[M+Na]+")
+
+  n_db <- length(strsplit(db_val, "|", fixed = TRUE)[[1L]])
+  n_formula <- length(strsplit(formula_val, "|", fixed = TRUE)[[1L]])
+  n_smiles <- length(strsplit(smiles_val, "|", fixed = TRUE)[[1L]])
+  n_adduct <- length(strsplit(adduct_val, "|", fixed = TRUE)[[1L]])
+  expect_identical(n_db, n_formula)
+  expect_identical(n_db, n_smiles)
+  expect_identical(n_db, n_adduct)
 })
 
 test_that("write_mztab uses 'null' for missing optional fields", {
@@ -1316,7 +1368,7 @@ test_that("write_mztab writes JSON mzTab output that round-trips through the par
   expect_true(nrow(tabs$metadata) > 0L)
   expect_equal(nrow(tabs$smf), 2L)
   expect_equal(nrow(tabs$sme), 4L)
-  expect_equal(nrow(tabs$sml), 4L)
+  expect_equal(nrow(tabs$sml), 2L)
 })
 
 test_that("write_mztab JSON merge mode is idempotent and avoids duplicate rows", {
@@ -1420,7 +1472,7 @@ test_that("write_mztab JSON round-trip with TIMA annotation fixture preserves SM
 
   expect_equal(nrow(tabs2$smf), 2L)
   expect_equal(nrow(tabs2$sme), 4L)
-  expect_equal(nrow(tabs2$sml), 4L)
+  expect_equal(nrow(tabs2$sml), 2L)
   expect_true(all(nzchar(as.character(tabs2$sme$identification_method))))
   expect_true(all(nzchar(as.character(tabs2$sme$ms_level))))
 })

@@ -156,3 +156,23 @@ test_that("validate_mztab_tables strict mode enforces SMF ambiguity code formali
     class = "tima_validation_error"
   )
 })
+
+test_that("validate_mztab_tables strict mode enforces SML pipe-aligned ambiguity fields", {
+  mztab_file <- resolve_fixture_path("mztab/manual_null_null_lipidomics.mztab")
+  tabs <- read_mztab_tables(mztab_file)
+  expect_gt(nrow(tabs$sml), 0L)
+
+  tabs$sml$database_identifier[[1L]] <- "CHEBI:1|HMDB:2"
+  tabs$sml$chemical_formula[[1L]] <- "C1H2"
+  tabs$sml$smiles[[1L]] <- "CC|CO"
+  tabs$sml$inchi[[1L]] <- "null|null"
+  tabs$sml$chemical_name[[1L]] <- "a|b"
+  tabs$sml$uri[[1L]] <- "https://example.org/a|https://example.org/b"
+  tabs$sml$adduct_ions[[1L]] <- "[M+H]+|[M+Na]+"
+
+  expect_error(
+    validate_mztab_tables(tabs, strict = TRUE),
+    regexp = "ambiguity alignment",
+    class = "tima_validation_error"
+  )
+})

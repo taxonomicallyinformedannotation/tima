@@ -901,7 +901,10 @@ write_mztab <- function(
   sme
 }
 
-#' Build SML (Small Molecule Summary) table – one row per unique compound
+#' Build SML (Small Molecule Summary) table.
+#'
+#' SML rows are emitted per feature and retain multi-candidate ambiguity using
+#' pipe-aligned values across identifier columns.
 #' @keywords internal
 .mztab_build_sml <- function(
   results,
@@ -929,197 +932,171 @@ write_mztab <- function(
     ))
   }
 
-  inchikey_col <- .mztab_pluck_na(
+  results_src <- as.data.frame(
     results,
-    "candidate_structure_inchikey_connectivity_layer"
+    stringsAsFactors = FALSE,
+    check.names = FALSE
   )
-  unique_compounds <- unique(inchikey_col[inchikey_col != "null"])
+  sme_src <- as.data.frame(
+    sme_table,
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
 
-  # Sparse-case fallback when no InChIKey exists: group on SME identity.
-  if (length(unique_compounds) == 0L) {
-    sme_src <- as.data.frame(
-      sme_table,
-      stringsAsFactors = FALSE,
-      check.names = FALSE
-    )
-    key <- ifelse(
-      !is.na(sme_src$database_identifier) &
-        nzchar(sme_src$database_identifier) &
-        sme_src$database_identifier != "null",
-      sme_src$database_identifier,
-      paste(
-        sme_src$chemical_name,
-        sme_src$chemical_formula,
-        sme_src$adduct_ion,
-        sep = "||"
-      )
-    )
-
-    rows <- lapply(seq_along(unique(key)), function(j) {
-      k <- unique(key)[[j]]
-      idx <- which(key == k)
-      best_scores <- suppressWarnings(as.numeric(sme_src[[
-        "id_confidence_measure[1]"
-      ]][idx]))
-      best_i <- idx[[1L]]
-      if (length(best_scores) > 0L && any(is.finite(best_scores))) {
-        best_i <- idx[[which.max(best_scores)]]
-      }
-
-      feat_ids <- unique(sme_src$feature_id[idx])
-      feat_ids <- feat_ids[!is.na(feat_ids) & nzchar(feat_ids)]
-      smf_id_refs <- paste(
-        smf_table$SMF_ID[smf_table$feature_id %in% feat_ids],
-        collapse = "|"
-      )
-      if (!nzchar(smf_id_refs)) {
-        smf_id_refs <- "null"
-      }
-
-      sme_id_refs <- paste(unique(sme_src$SME_ID[idx]), collapse = "|")
-      if (!nzchar(sme_id_refs)) {
-        sme_id_refs <- "null"
-      }
-
-      best_score <- suppressWarnings(as.numeric(sme_src[[
-        "id_confidence_measure[1]"
-      ]][[best_i]]))
-      score_val <- if (!is.na(best_score)) {
-        as.character(round(best_score, 6))
-      } else {
-        "null"
-      }
-
-      tidytable::tidytable(
-        SML_ID = as.character(j),
-        SMF_ID_REFS = smf_id_refs,
-        SME_ID_REFS = sme_id_refs,
-        database_identifier = .mztab_pluck_na(
-          sme_src[best_i, , drop = FALSE],
-          "database_identifier"
-        ),
-        chemical_formula = .mztab_pluck_na(
-          sme_src[best_i, , drop = FALSE],
-          "chemical_formula"
-        ),
-        smiles = .mztab_pluck_na(sme_src[best_i, , drop = FALSE], "smiles"),
-        inchi = .mztab_pluck_na(sme_src[best_i, , drop = FALSE], "inchi"),
-        chemical_name = .mztab_pluck_na(
-          sme_src[best_i, , drop = FALSE],
-          "chemical_name"
-        ),
-        uri = .mztab_pluck_na(sme_src[best_i, , drop = FALSE], "uri"),
-        theoretical_neutral_mass = "null",
-        adduct_ions = .mztab_pluck_na(
-          sme_src[best_i, , drop = FALSE],
-          "adduct_ion"
-        ),
-        reliability = as.character(.mztab_score_to_reliability(best_score, "")),
-        best_id_confidence_measure = "id_confidence_measure[1]",
-        best_id_confidence_value = score_val
-      )
-    })
-
-    return(tidytable::bind_rows(rows))
+  .mztab_norm_scalar <- function(x) {
+    x <- as.character(x)
+    x[is.na(x) | !nzchar(x)] <- "null"
+    x
   }
 
-  score_col <- suppressWarnings(as.numeric(.mztab_pluck_na(
-    results,
-    "score_final"
-  )))
+  .mztab_join_aligned <- function(df, row_order, col) {
+    vals <- .mztab_norm_scalar(df[[col]][row_order])
+    if (length(vals) == 0L) {
+      return("null")
+    }
+    paste(vals, collapse = "|")
+  }
 
-  sml_rows <- lapply(seq_along(unique_compounds), function(j) {
-    ckey <- unique_compounds[j]
-    idx <- which(inchikey_col == ckey)
+  smf_id_lookup <- stats::setNames(
+    as.character(smf_table$SMF_ID),
+    as.character(smf_table$feature_id)
+  )
 
-    best_score <- suppressWarnings(max(score_col[idx], na.rm = TRUE))
+  feature_ids <- unique(as.character(sme_src$feature_id))
+  feature_ids <- feature_ids[
+    !is.na(feature_ids) & nzchar(feature_ids) & feature_ids != "null"
+  ]
+  if (length(feature_ids) == 0L) {
+    return(tidytable::tidytable(
+      SML_ID = character(0),
+      SMF_ID_REFS = character(0),
+      SME_ID_REFS = character(0),
+      database_identifier = character(0),
+      chemical_formula = character(0),
+      smiles = character(0),
+      inchi = character(0),
+      chemical_name = character(0),
+      uri = character(0),
+      theoretical_neutral_mass = character(0),
+      adduct_ions = character(0),
+      reliability = character(0),
+      best_id_confidence_measure = character(0),
+      best_id_confidence_value = character(0)
+    ))
+  }
+
+  sml_rows <- lapply(seq_along(feature_ids), function(j) {
+    fid <- feature_ids[[j]]
+    idx <- which(as.character(sme_src$feature_id) == fid)
+    grp <- sme_src[idx, , drop = FALSE]
+
+    rank_num <- suppressWarnings(as.numeric(grp$rank))
+    rank_num[is.na(rank_num)] <- Inf
+    score_num <- suppressWarnings(as.numeric(grp[["id_confidence_measure[1]"]]))
+    score_num[!is.finite(score_num)] <- -Inf
+    sme_num <- suppressWarnings(as.integer(grp$SME_ID))
+    sme_num[is.na(sme_num)] <- .Machine$integer.max
+
+    order_idx <- order(rank_num, -score_num, sme_num)
+    if (length(order_idx) == 0L) {
+      order_idx <- seq_len(nrow(grp))
+    }
+
+    # Deduplicate identical candidate tuples while keeping a deterministic order.
+    tuple_cols <- c(
+      "database_identifier",
+      "chemical_formula",
+      "smiles",
+      "inchi",
+      "chemical_name",
+      "uri",
+      "adduct_ion"
+    )
+    tuple_parts <- lapply(tuple_cols, function(col) {
+      .mztab_norm_scalar(grp[[col]])
+    })
+    tuple_key <- do.call(paste, c(tuple_parts, list(sep = "||")))
+    tuple_key <- tuple_key[order_idx]
+    order_idx <- order_idx[!duplicated(tuple_key)]
+    if (length(order_idx) == 0L) {
+      order_idx <- 1L
+    }
+
+    best_local <- order_idx[[1L]]
+    best_score <- suppressWarnings(as.numeric(grp[[
+      "id_confidence_measure[1]"
+    ]][[best_local]]))
     if (!is.finite(best_score)) {
       best_score <- NA_real_
     }
-    best_i <- idx[which.max(score_col[idx])]
-    if (length(best_i) == 0L) {
-      best_i <- idx[1L]
-    }
-
-    row <- results[best_i, , drop = FALSE]
-
-    feat_ids <- unique(results$feature_id[idx])
-    feat_ids <- feat_ids[!is.na(feat_ids)]
-    smf_id_refs <- paste(
-      smf_table$SMF_ID[smf_table$feature_id %in% feat_ids],
-      collapse = "|"
-    )
-    if (!nzchar(smf_id_refs)) {
-      smf_id_refs <- "null"
-    }
-
-    sme_id_refs_all <- sme_table$SME_ID[sme_table$feature_id %in% feat_ids]
-    sme_id_refs_all <- sme_id_refs_all[!is.na(sme_id_refs_all)]
-    sme_id_refs <- if (length(sme_id_refs_all) > 0L) {
-      paste(unique(sme_id_refs_all), collapse = "|")
-    } else {
-      "null"
-    }
-
     score_val <- if (!is.na(best_score)) {
       as.character(round(best_score, 6))
     } else {
       "null"
     }
-    reliability <- .mztab_score_to_reliability(
-      score = best_score,
-      library = .mztab_pluck_na(row, "candidate_library")
-    )
+
+    best_method <- .mztab_norm_scalar(grp$identification_method[[best_local]])
+    reliability <- as.character(.mztab_score_to_reliability(
+      best_score,
+      best_method
+    ))
+
+    smf_id <- as.character(smf_id_lookup[[fid]])
+    if (is.null(smf_id) || is.na(smf_id) || !nzchar(smf_id)) {
+      smf_id <- "null"
+    }
+
+    sme_ids <- unique(.mztab_norm_scalar(grp$SME_ID[order_idx]))
+    sme_ids <- sme_ids[sme_ids != "null"]
+    sme_id_refs <- if (length(sme_ids) > 0L) {
+      paste(sme_ids, collapse = "|")
+    } else {
+      "null"
+    }
+
+    theoretical_neutral_mass <- "null"
+    if (
+      nrow(results_src) > 0L &&
+        "feature_id" %in% colnames(results_src) &&
+        "candidate_structure_exact_mass" %in% colnames(results_src)
+    ) {
+      ridx <- which(as.character(results_src$feature_id) == fid)
+      if (length(ridx) > 0L) {
+        if ("score_final" %in% colnames(results_src)) {
+          rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))
+          rs[is.na(rs)] <- -Inf
+          ridx <- ridx[order(-rs)]
+        }
+        em <- suppressWarnings(as.numeric(results_src$candidate_structure_exact_mass[ridx[[
+          1L
+        ]]]))
+        if (length(em) == 1L && is.finite(em)) {
+          theoretical_neutral_mass <- as.character(round(em, 6))
+        }
+      }
+    }
 
     tidytable::tidytable(
       SML_ID = as.character(j),
-      SMF_ID_REFS = smf_id_refs,
+      SMF_ID_REFS = smf_id,
       SME_ID_REFS = sme_id_refs,
-      database_identifier = if (
-        !is.null(xrefs_index) && length(xrefs_index) > 0L
-      ) {
-        .mztab_pick_best_database_identifier(
-          rows = xrefs_index[[ckey]],
-          fallback = ckey
-        )
-      } else {
-        ckey
-      },
-      chemical_formula = .mztab_pluck_na(
-        row,
-        "candidate_structure_molecular_formula"
+      database_identifier = .mztab_join_aligned(
+        grp,
+        order_idx,
+        "database_identifier"
       ),
-      smiles = .mztab_pluck_na(row, "candidate_structure_smiles_no_stereo"),
-      inchi = .mztab_pluck_na(row, "candidate_structure_inchi"),
-      chemical_name = .mztab_pluck_na(row, "candidate_structure_name"),
-      uri = {
-        # Prefer xrefs-resolved URI over the raw candidate_structure_uri field.
-        raw_uri <- .mztab_pluck_na(row, "candidate_structure_uri")
-        if (!is.null(xrefs_index) && length(xrefs_index) > 0L) {
-          xref_rows <- xrefs_index[[ckey]]
-          if (!is.null(xref_rows) && nrow(xref_rows) > 0L) {
-            xref_uri <- .mztab_pick_best_uri(xref_rows)
-            ifelse(raw_uri == "null" | is.na(raw_uri), xref_uri, raw_uri)
-          } else {
-            raw_uri
-          }
-        } else {
-          raw_uri
-        }
-      },
-      theoretical_neutral_mass = {
-        em <- suppressWarnings(as.numeric(.mztab_pluck_na(
-          row,
-          "candidate_structure_exact_mass"
-        )))
-        if (length(em) == 1L && !is.na(em) && is.finite(em)) {
-          as.character(round(em, 6))
-        } else {
-          "null"
-        }
-      },
-      adduct_ions = .mztab_pluck_na(row, "candidate_adduct"),
-      reliability = as.character(reliability),
+      chemical_formula = .mztab_join_aligned(
+        grp,
+        order_idx,
+        "chemical_formula"
+      ),
+      smiles = .mztab_join_aligned(grp, order_idx, "smiles"),
+      inchi = .mztab_join_aligned(grp, order_idx, "inchi"),
+      chemical_name = .mztab_join_aligned(grp, order_idx, "chemical_name"),
+      uri = .mztab_join_aligned(grp, order_idx, "uri"),
+      theoretical_neutral_mass = theoretical_neutral_mass,
+      adduct_ions = .mztab_join_aligned(grp, order_idx, "adduct_ion"),
+      reliability = reliability,
       best_id_confidence_measure = "id_confidence_measure[1]",
       best_id_confidence_value = score_val
     )

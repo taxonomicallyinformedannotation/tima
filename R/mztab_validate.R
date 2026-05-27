@@ -156,6 +156,18 @@ NULL
 }
 
 #' @keywords internal
+.mztab_split_pipe_values <- function(x) {
+  one <- as.character(x)[[1L]]
+  if (is.na(one) || !nzchar(one)) {
+    return("null")
+  }
+  parts <- strsplit(one, "|", fixed = TRUE)[[1L]]
+  parts <- trimws(parts)
+  parts[!nzchar(parts)] <- "null"
+  parts
+}
+
+#' @keywords internal
 .mztab_validate_reference_integrity <- function(mztab_tables, strict) {
   sml <- mztab_tables$sml
   smf <- mztab_tables$smf
@@ -208,6 +220,65 @@ NULL
         tima_abort(
           problem = msg,
           fix = "Ensure SMF SME_ID_REFS only contains SME_ID values present in SME",
+          class = c("tima_validation_error", "tima_error")
+        )
+      }
+      log_warn("%s", msg)
+    }
+  }
+
+  if (
+    nrow(sml) > 0L &&
+      all(
+        c(
+          "database_identifier",
+          "chemical_formula",
+          "smiles",
+          "inchi",
+          "chemical_name",
+          "uri",
+          "adduct_ions"
+        ) %in%
+          names(sml)
+      )
+  ) {
+    aligned_cols <- c(
+      "database_identifier",
+      "chemical_formula",
+      "smiles",
+      "inchi",
+      "chemical_name",
+      "uri",
+      "adduct_ions"
+    )
+
+    bad_rows <- which(vapply(
+      X = seq_len(nrow(sml)),
+      FUN = function(i) {
+        n_parts <- vapply(
+          X = aligned_cols,
+          FUN = function(col) {
+            length(.mztab_split_pipe_values(sml[[col]][[i]]))
+          },
+          FUN.VALUE = integer(1L)
+        )
+        max(n_parts) > 1L && length(unique(n_parts)) > 1L
+      },
+      FUN.VALUE = logical(1L)
+    ))
+
+    if (length(bad_rows) > 0L) {
+      msg <- paste0(
+        "Invalid SML multi-candidate ambiguity alignment: ",
+        "pipe-separated identifier fields must be cardinality-aligned"
+      )
+      if (isTRUE(strict)) {
+        tima_abort(
+          problem = msg,
+          fix = paste0(
+            "Align pipe-separated counts across ",
+            paste(aligned_cols, collapse = ", ")
+          ),
           class = c("tima_validation_error", "tima_error")
         )
       }
