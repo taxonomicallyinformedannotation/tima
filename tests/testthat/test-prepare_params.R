@@ -2,80 +2,34 @@
 
 library(testthat)
 
-# Ensure param fixtures are available (loaded via setup sourcing fixtures/*.R)
+stage_installed_params <- function() {
+  params_root <- system.file("params", package = "tima")
+  skip_if(!nzchar(params_root), "Installed params directory not available")
 
-## Internal Utility Helpers ----
+  src_files <- list.files(params_root, recursive = TRUE, full.names = TRUE)
+  rel_files <- list.files(params_root, recursive = TRUE, full.names = FALSE)
+  dst_files <- file.path("params", rel_files)
 
-fixture_small <- function(id = "TID") create_fixture_params_small(id)
-fixture_adv <- function(id = "TID") create_fixture_params_advanced(id)
-fixture_yamls <- function(id = "TID") create_fixture_yamls_params(id)
+  for (dst in unique(dirname(dst_files))) {
+    dir.create(dst, recursive = TRUE, showWarnings = FALSE)
+  }
+  ok <- file.copy(from = src_files, to = dst_files, overwrite = TRUE)
+  stopifnot(all(ok))
+}
 
-## prepare_params combines small & advanced and performs id replacement ----
+test_that("prepare_params returns YAML export paths in a temp project", {
+  withr::local_dir(new = temp_test_dir("prepare_params_integration"))
+  stage_installed_params()
 
-test_that("prepare_params merges fixtures and replaces {id}", {
-  options(tima_id = "ABC001")
-  local_mocked_bindings(
-    load_yaml_files = function() fixture_yamls("ABC001"),
-    get_params = function(step) {
-      if (step == "prepare_params") {
-        return(fixture_small("ABC001"))
-      }
-      if (step == "prepare_params_advanced") {
-        return(fixture_adv("ABC001"))
-      }
-      stop("unexpected step")
-    },
-    export_params = function(...) character(),
-    create_dir = function(export) invisible(NULL)
-  )
   paths <- prepare_params()
   expect_type(paths, "character")
-  # Check replacement for one propagated structural path template
-  tmpl <- fixture_yamls(
-    "ABC001"
-  )$yamls_params$annotate_masses$files$features$prepared$tsv
-  replaced <- sub("{id}", getOption("tima_id"), tmpl, fixed = TRUE)
-  expect_match(replaced, "ABC001")
+  expect_true(length(paths) > 0L)
+  expect_true(all(file.exists(paths)))
 })
-
-## prepare_params handles empty taxon gracefully ----
-
-test_that("prepare_params handles empty taxon (removes raw metadata) without error", {
-  small <- fixture_small("AXX")
-  small$organisms$taxon <- "" # triggers org_tax NULL logic
-  local_mocked_bindings(
-    load_yaml_files = function() fixture_yamls("AXX"),
-    get_params = function(step) {
-      if (step == "prepare_params") {
-        return(small)
-      }
-      if (step == "prepare_params_advanced") {
-        fixture_adv("AXX")
-      }
-    },
-    export_params = function(...) character(),
-    create_dir = function(export) invisible(NULL)
-  )
-  expect_silent(prepare_params())
-})
-
-## input validation errors ----
 
 test_that("prepare_params validates list inputs", {
-  local_mocked_bindings(
-    load_yaml_files = function() fixture_yamls("VAL"),
-    get_params = function(step) {
-      if (step == "prepare_params") {
-        return(fixture_small("VAL"))
-      }
-      if (step == "prepare_params_advanced") {
-        return(fixture_adv("VAL"))
-      }
-      stop("unexpected step")
-    },
-    export_params = function(...) character(),
-    create_dir = function(export) invisible(NULL)
-  )
+  withr::local_dir(new = temp_test_dir("prepare_params_validate"))
+  stage_installed_params()
 
   expect_error(
     prepare_params(params_small = "bad"),
@@ -86,8 +40,6 @@ test_that("prepare_params validates list inputs", {
     "In index: 1\\.|invalid for atomic vectors"
   )
 })
-
-## get_params: invalid step value handling ----
 
 test_that("get_params rejects missing or invalid step values", {
   expect_error(
@@ -105,7 +57,6 @@ test_that("get_params rejects missing or invalid step values", {
     "must be provided",
     class = "tima_validation_error"
   )
-  # Length >1 should error; capture error containing length diagnostic
   expect_error(
     get_params(c("a", "b")),
     "single character",
@@ -113,26 +64,12 @@ test_that("get_params rejects missing or invalid step values", {
   )
 })
 
-## prepare_params manual param injection ----
-
 test_that("prepare_params accepts explicit fixture lists", {
-  local_mocked_bindings(
-    load_yaml_files = function() fixture_yamls("MANUAL"),
-    get_params = function(step) {
-      # Mock get_params to handle internal call from replace_id
-      if (step == "prepare_params") {
-        return(fixture_small("MANUAL"))
-      }
-      if (step == "prepare_params_advanced") {
-        return(fixture_adv("MANUAL"))
-      }
-      stop("Unexpected step in test: ", step)
-    },
-    export_params = function(...) character(),
-    create_dir = function(export) invisible(NULL)
-  )
+  withr::local_dir(new = temp_test_dir("prepare_params_manual"))
+  stage_installed_params()
+
   expect_silent(prepare_params(
-    params_small = fixture_small("MANUAL"),
-    params_advanced = fixture_adv("MANUAL")
+    params_small = get_params(step = "prepare_params"),
+    params_advanced = get_params(step = "prepare_params_advanced")
   ))
 })

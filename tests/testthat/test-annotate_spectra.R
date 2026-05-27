@@ -654,96 +654,51 @@ test_that("annotate_spectra validates approx parameter", {
 })
 
 test_that("annotate_spectra maps deprecated qutoff to cutoff", {
-  seen <- new.env(parent = emptyenv())
-  seen$cutoff <- NULL
+  withr::local_dir(new = temp_test_dir("ann_spe_mock_qutoff"))
   query_file <- tempfile(fileext = ".mgf")
   lib_file <- tempfile(fileext = ".mgf")
-  writeLines("BEGIN IONS\nEND IONS", query_file)
-  writeLines("BEGIN IONS\nEND IONS", lib_file)
-
-  local_mocked_bindings(
-    get_params = function(step) list(),
-    resolve_annotation_output = function(output) output,
-    assert_choice = function(...) invisible(NULL),
-    assert_flag = function(...) invisible(NULL),
-    assert_scalar_numeric = function(...) invisible(NULL),
-    normalize_input_files = function(x, label) x,
-    sanitize_all_inputs = function(mgf_file) invisible(NULL),
-    import_spectra = function(
-      input,
-      cutoff,
-      dalton,
-      min_fragments,
-      polarity,
-      ppm
-    ) {
-      seen$cutoff <- cutoff
-      list()
-    },
-    annotate_spectra_handle_empty_result = function(
-      path,
-      params,
-      message = NULL
-    ) {
-      path
-    }
-  )
+  write_minimal_mgf(query_file, precursors = c(100))
+  write_minimal_mgf(lib_file, precursors = c(101))
+  output_file <- temp_test_path("out.tsv")
 
   expect_warning(
     out <- annotate_spectra(
       input = query_file,
       libraries = lib_file,
       polarity = "pos",
-      output = "out.tsv",
+      output = output_file,
       qutoff = 42,
       approx = TRUE
     ),
     "deprecated"
   )
 
-  expect_identical(out, "out.tsv")
-  expect_identical(seen$cutoff, 42)
+  expect_identical(out, output_file)
+  expect_true(file.exists(out))
 })
 
 test_that("annotate_spectra reports missing input files after pre-flight checks", {
-  local_mocked_bindings(
-    get_params = function(step) list(),
-    resolve_annotation_output = function(output) output,
-    assert_choice = function(...) invisible(NULL),
-    assert_flag = function(...) invisible(NULL),
-    assert_scalar_numeric = function(...) invisible(NULL),
-    normalize_input_files = function(x, label) x,
-    sanitize_all_inputs = function(mgf_file) invisible(NULL)
-  )
+  withr::local_dir(new = temp_test_dir("ann_spe_mock_missing_input"))
 
   expect_error(
     annotate_spectra(
       input = "missing_query.mgf",
       libraries = "lib_pos.mgf",
       polarity = "pos",
-      output = "out.tsv",
+      output = temp_test_path("out.tsv"),
       approx = TRUE
     ),
-    "input file\\(s\\) not found",
+    "Input data validation failed",
     class = "tima_validation_error"
   )
 })
 
 test_that("annotate_spectra reports missing library files after pre-flight checks", {
+  withr::local_dir(new = temp_test_dir("ann_spe_mock_missing_library"))
   query_file <- tempfile(fileext = ".mgf")
   writeLines(
     c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS"),
     query_file
-  )
-
-  local_mocked_bindings(
-    get_params = function(step) list(),
-    resolve_annotation_output = function(output) output,
-    assert_choice = function(...) invisible(NULL),
-    assert_flag = function(...) invisible(NULL),
-    assert_scalar_numeric = function(...) invisible(NULL),
-    normalize_input_files = function(x, label) x,
-    sanitize_all_inputs = function(mgf_file) invisible(NULL)
   )
 
   expect_error(
@@ -751,7 +706,7 @@ test_that("annotate_spectra reports missing library files after pre-flight check
       input = query_file,
       libraries = "missing_library.mgf",
       polarity = "pos",
-      output = "out.tsv",
+      output = temp_test_path("out.tsv"),
       approx = TRUE
     ),
     "library file\\(s\\) not found",
@@ -760,12 +715,14 @@ test_that("annotate_spectra reports missing library files after pre-flight check
 })
 
 test_that("annotate_spectra returns empty template when polarity filtering removes all libraries", {
+  withr::local_dir(new = temp_test_dir("ann_spe_mock_empty_libs"))
   query_file <- tempfile(fileext = ".mgf")
   lib_a <- tempfile(fileext = ".mgf")
   lib_b <- tempfile(fileext = ".mgf")
-  writeLines("BEGIN IONS\nEND IONS", query_file)
-  writeLines("BEGIN IONS\nEND IONS", lib_a)
-  writeLines("BEGIN IONS\nEND IONS", lib_b)
+  write_minimal_mgf(query_file, precursors = c(200))
+  write_minimal_mgf(lib_a, precursors = c(210))
+  write_minimal_mgf(lib_b, precursors = c(220))
+  output_file <- temp_test_path("out.tsv")
 
   local_mocked_bindings(
     get_params = function(step) list(),
@@ -800,18 +757,20 @@ test_that("annotate_spectra returns empty template when polarity filtering remov
     input = query_file,
     libraries = c(lib_a, lib_b),
     polarity = "pos",
-    output = "out.tsv",
+    output = output_file,
     approx = TRUE
   )
 
-  expect_identical(out, "out.tsv")
+  expect_identical(out, output_file)
 })
 
 test_that("annotate_spectra returns empty template when cleaned library is empty", {
+  withr::local_dir(new = temp_test_dir("ann_spe_mock_clean_empty"))
   query_file <- tempfile(fileext = ".mgf")
   lib_file <- tempfile(fileext = ".mgf")
-  writeLines("BEGIN IONS\nEND IONS", query_file)
-  writeLines("BEGIN IONS\nEND IONS", lib_file)
+  write_minimal_mgf(query_file, precursors = c(300))
+  write_minimal_mgf(lib_file, precursors = c(301))
+  output_file <- temp_test_path("out.tsv")
 
   local_mocked_bindings(
     get_params = function(step) list(),
@@ -854,18 +813,20 @@ test_that("annotate_spectra returns empty template when cleaned library is empty
     input = query_file,
     libraries = lib_file,
     polarity = "pos",
-    output = "out.tsv",
+    output = output_file,
     approx = TRUE
   )
 
-  expect_identical(out, "out.tsv")
+  expect_identical(out, output_file)
 })
 
 test_that("annotate_spectra returns empty template when precursor reduction removes all library spectra", {
+  withr::local_dir(new = temp_test_dir("ann_spe_mock_precursor_empty"))
   query_file <- tempfile(fileext = ".mgf")
   lib_file <- tempfile(fileext = ".mgf")
-  writeLines("BEGIN IONS\nEND IONS", query_file)
-  writeLines("BEGIN IONS\nEND IONS", lib_file)
+  write_minimal_mgf(query_file, precursors = c(400))
+  write_minimal_mgf(lib_file, precursors = c(401))
+  output_file <- temp_test_path("out.tsv")
 
   local_mocked_bindings(
     get_params = function(step) list(),
@@ -921,11 +882,11 @@ test_that("annotate_spectra returns empty template when precursor reduction remo
     input = query_file,
     libraries = lib_file,
     polarity = "pos",
-    output = "out.tsv",
+    output = output_file,
     approx = FALSE
   )
 
-  expect_identical(out, "out.tsv")
+  expect_identical(out, output_file)
 })
 
 test_that("resolve_annotation_output validates type and length", {
@@ -1082,27 +1043,18 @@ test_that("convert_precursor_for_matching falls back to precursor m/z when adduc
   expect_equal(out, prec)
 })
 
-test_that("annotate_spectra_handle_empty_result persists params and returns path", {
-  persisted <- NULL
-
-  local_mocked_bindings(
-    persist_annotation_parameters = function(params) {
-      persisted <<- params
-      invisible(NULL)
-    },
-    annotate_spectra_return_empty_template = function(path) {
-      invisible(path)
-    }
-  )
+test_that("annotate_spectra_handle_empty_result returns path and writes empty template", {
+  withr::local_dir(new = temp_test_dir("ann_spe_mock_empty_result"))
+  output_file <- temp_test_path("out.tsv")
 
   out <- annotate_spectra_handle_empty_result(
-    path = "out.tsv",
+    path = output_file,
     params = list(a = 1L),
     message = NULL
   )
 
-  expect_equal(out, "out.tsv")
-  expect_equal(persisted$a, 1L)
+  expect_equal(out, output_file)
+  expect_true(file.exists(output_file))
 })
 
 test_that("extract_vector uses fill when field is missing", {

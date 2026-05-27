@@ -305,62 +305,33 @@ test_that("annotate_masses validates file existence", {
 
 ## Edge Cases and Empty Input Tests ----
 
-test_that("annotate_masses returns empty outputs for an empty features table", {
-  seen <- new.env(parent = emptyenv())
-  seen$exports <- list()
+test_that("write_empty_annotate_masses_outputs writes deterministic empty files", {
+  out_dir <- withr::local_tempdir()
+  ann_file <- file.path(out_dir, "annotations.tsv")
+  edge_file <- file.path(out_dir, "edges.tsv")
 
-  local_mocked_bindings(
-    log_operation = function(...) list(id = "annotate_masses_ctx"),
-    sanitize_all_inputs = function(features_file = NULL, ...) invisible(NULL),
-    validate_ms_mode = function(ms_mode) invisible(NULL),
-    validate_tolerances = function(...) invisible(NULL),
-    validate_adduct_list = function(...) invisible(NULL),
-    validate_file_existence = function(...) invisible(NULL),
-    safe_fread = function(file, file_type, required_cols = NULL, ...) {
-      data.frame(feature_id = character())
-    },
-    export_output = function(x, file) {
-      seen$exports[[length(seen$exports) + 1L]] <- list(x = x, file = file)
-      invisible(file)
-    }
+  result <- write_empty_annotate_masses_outputs(
+    output_annotations = ann_file,
+    output_edges = edge_file
   )
 
-  result <- annotate_masses(
-    features = "features.tsv",
-    library = "library.tsv",
-    str_stereo = "stereo.tsv",
-    str_met = "metadata.tsv",
-    str_tax_cla = "cla.tsv",
-    str_tax_npc = "npc.tsv",
-    output_annotations = "annotations.tsv",
-    output_edges = "edges.tsv",
-    adducts_list = list(pos = c("[M+H]+")),
-    clusters_list = list(pos = c("[M]")),
-    neutral_losses_list = c("H2O"),
-    ms_mode = "pos",
-    tolerance_ppm = 10,
-    tolerance_rt = 0.02
-  )
+  coverage_file <- derive_annotate_masses_coverage_path(ann_file)
 
-  expect_identical(
-    unname(result),
-    c("annotations.tsv", "edges.tsv")
-  )
-  expect_length(seen$exports, 3L)
-  expect_identical(seen$exports[[1L]]$file, "annotations.tsv")
-  expect_identical(seen$exports[[2L]]$file, "edges.tsv")
-  expect_identical(seen$exports[[3L]]$file, "annotations_coverage.tsv")
-  expect_equal(nrow(seen$exports[[1L]]$x), 0L)
+  expect_identical(unname(result), c(ann_file, edge_file))
+  expect_true(file.exists(ann_file))
+  expect_true(file.exists(edge_file))
+  expect_true(file.exists(coverage_file))
+
+  ann <- tidytable::fread(ann_file, colClasses = "character")
+  edges <- tidytable::fread(edge_file, colClasses = "character")
+  coverage <- tidytable::fread(coverage_file, colClasses = "character")
+
+  expect_equal(nrow(ann), 0L)
+  expect_equal(nrow(edges), 0L)
+  expect_true(all(c("CLUSTERID1", "CLUSTERID2", "label") %in% names(edges)))
   expect_true(all(
-    c("CLUSTERID1", "CLUSTERID2", "label") %in% names(seen$exports[[2L]]$x)
-  ))
-  expect_true(all(
-    c("coverage_class", "N_features", "N_annotations") %in%
-      names(seen$exports[[3L]]$x)
-  ))
-  expect_true(all(
-    c("coverage_scope", "coverage_tier") %in%
-      names(seen$exports[[3L]]$x)
+    c("coverage_scope", "coverage_class", "coverage_tier") %in%
+      names(coverage)
   ))
 })
 

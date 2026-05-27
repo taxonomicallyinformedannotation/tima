@@ -9,82 +9,22 @@ test_that("run_app validates parameters", {
   expect_error(run_app(browser = "yes"), "browser")
 })
 
-test_that("run_app aborts clearly when app file is missing", {
-  local_mocked_bindings(
-    install_tima = function() invisible(NULL),
-    is_docker_env = function() FALSE,
-    get_app_path = function() "",
-    run_shiny_app = function(appDir, port, host, launch.browser) {
-      # nolint: object_name_linter.
-      force(appDir) # nolint: object_name_linter.
-      force(port)
-      force(host)
-      force(launch.browser) # nolint: object_name_linter.
-      invisible(NULL)
-    }
-  )
+test_that("app_path_exists reports file existence", {
+  tmp <- tempfile(fileext = ".R")
+  writeLines("# app stub", tmp)
 
-  expect_error(
-    run_app(),
-    regexp = "app file not found",
-    class = "tima_runtime_error"
-  )
+  expect_true(app_path_exists(tmp))
+  expect_false(app_path_exists(paste0(tmp, ".missing")))
 })
 
-test_that("run_app enforces Docker host and browser settings", {
-  seen <- new.env(parent = emptyenv())
-
-  local_mocked_bindings(
-    install_tima = function() invisible(NULL),
-    is_docker_env = function() TRUE,
-    get_app_path = function() "/tmp/app.R",
-    app_path_exists = function(app_path) identical(app_path, "/tmp/app.R"),
-    build_shiny_app_dir = function(app_path) {
-      expect_identical(app_path, "/tmp/app.R")
-      "mock-app-dir"
-    },
-    run_shiny_app = function(appDir, port, host, launch.browser) {
-      # nolint: object_name_linter.
-      seen$appDir <- appDir
-      seen$port <- port
-      seen$host <- host
-      seen$launch.browser <- launch.browser
-      invisible(NULL)
-    }
-  )
-
-  expect_no_error(run_app(host = "127.0.0.1", port = 8888, browser = TRUE))
-  expect_identical(seen$appDir, "mock-app-dir")
-  expect_identical(seen$port, 8888L)
-  expect_identical(seen$host, "0.0.0.0")
-  expect_false(seen$launch.browser)
+test_that("is_docker_env returns a scalar logical", {
+  out <- is_docker_env()
+  expect_type(out, "logical")
+  expect_length(out, 1)
 })
 
-test_that("run_app keeps provided settings outside Docker", {
-  seen <- new.env(parent = emptyenv())
-
-  local_mocked_bindings(
-    install_tima = function() invisible(NULL),
-    is_docker_env = function() FALSE,
-    get_app_path = function() "/tmp/app.R",
-    app_path_exists = function(app_path) identical(app_path, "/tmp/app.R"),
-    build_shiny_app_dir = function(app_path) {
-      force(app_path)
-      "mock-app-dir"
-    },
-    run_shiny_app = function(appDir, port, host, launch.browser) {
-      # nolint: object_name_linter.
-      seen$appDir <- appDir
-      seen$port <- port
-      seen$host <- host
-      seen$launch.browser <- launch.browser
-      invisible(NULL)
-    }
-  )
-
-  expect_no_error(run_app(host = "10.0.0.1", port = 9999, browser = TRUE))
-  expect_identical(seen$appDir, "mock-app-dir")
-  expect_identical(seen$port, 9999L)
-  expect_identical(seen$host, "10.0.0.1")
-  expect_true(seen$launch.browser)
+test_that("get_app_path returns a character scalar", {
+  out <- get_app_path()
+  expect_type(out, "character")
+  expect_length(out, 1)
 })

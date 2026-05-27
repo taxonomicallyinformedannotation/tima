@@ -930,50 +930,51 @@ test_that("join_sirius_annotation_tables fills de novo error_mz despite adduct f
 })
 
 test_that("load_sirius_tables filters formulaRank and loads denovo/spectral when present", {
-  local_mocked_bindings(
-    read_from_sirius_zip = function(input_directory, file) {
-      if (grepl("canopus_formula_summary", file)) {
-        return(tidytable::tidytable(formulaRank = c(1L, 2L), x = c("a", "b")))
-      }
-      if (grepl("formula_identifications", file)) {
-        return(tidytable::tidytable(formulaRank = c(1L, 3L), y = c("c", "d")))
-      }
-      if (grepl("structure_identifications", file) && !grepl("denovo", file)) {
-        return(tidytable::tidytable(id = 1:2))
-      }
-      if (grepl("denovo_structure_identifications", file)) {
-        return(tidytable::tidytable(mappingFeatureId = c("F1", "F2")))
-      }
-      tidytable::tidytable()
-    },
-    read_sirius_internal_file = function(input_directory, internal_file) {
-      force(input_directory)
-      tidytable::tidytable(
-        mappingFeatureId = "F_spec",
-        analogHit = grepl("analog", internal_file),
-        similarity = "0.8",
-        sharedPeaks = "10"
-      )
-    },
-    .package = "tima"
-  )
-  local_mocked_bindings(
-    unzip = function(zipfile, list = FALSE, ...) {
-      if (isTRUE(list)) {
-        return(data.frame(
-          Name = c(
-            "denovo_structure_identifications_all.tsv",
-            "spectral_matches_all.tsv",
-            "spectral_matches_analog_all.tsv"
-          )
-        ))
-      }
-      invisible(NULL)
-    },
-    .package = "utils"
+  tmp <- temp_test_dir("sirius_tables_v6_full")
+  zip_path <- file.path(tmp, "sirius.zip")
+
+  write_tsv <- function(path, x) {
+    utils::write.table(x, path, sep = "\t", row.names = FALSE, quote = FALSE)
+  }
+
+  write_tsv(file.path(tmp, "canopus_formula_summary_all.tsv"), data.frame(
+    mappingFeatureId = c("F1", "F2"),
+    formulaRank = c(1L, 2L)
+  ))
+  write_tsv(file.path(tmp, "formula_identifications_all.tsv"), data.frame(
+    mappingFeatureId = c("F1", "F2"),
+    formulaRank = c(1L, 3L)
+  ))
+  write_tsv(file.path(tmp, "structure_identifications_all.tsv"), data.frame(
+    mappingFeatureId = c("F1", "F2")
+  ))
+  write_tsv(file.path(tmp, "denovo_structure_identifications_all.tsv"), data.frame(
+    mappingFeatureId = c("F1", "F2")
+  ))
+  write_tsv(file.path(tmp, "spectral_matches_all.tsv"), data.frame(
+    mappingFeatureId = "F1", similarity = "0.8", sharedPeaks = "10"
+  ))
+  write_tsv(file.path(tmp, "spectral_matches_analog_all.tsv"), data.frame(
+    mappingFeatureId = "F2", similarity = "0.7", sharedPeaks = "8"
+  ))
+
+  old <- getwd()
+  on.exit(setwd(old), add = TRUE)
+  setwd(tmp)
+  utils::zip(
+    zipfile = basename(zip_path),
+    files = c(
+      "canopus_formula_summary_all.tsv",
+      "formula_identifications_all.tsv",
+      "structure_identifications_all.tsv",
+      "denovo_structure_identifications_all.tsv",
+      "spectral_matches_all.tsv",
+      "spectral_matches_analog_all.tsv"
+    ),
+    flags = "-j"
   )
 
-  out <- load_sirius_tables(input_directory = "dummy.zip", version = "6")
+  out <- load_sirius_tables(input_directory = zip_path, version = "6")
 
   expect_equal(nrow(out$canopus), 1L)
   expect_equal(nrow(out$formulas), 1L)
@@ -983,114 +984,114 @@ test_that("load_sirius_tables filters formulaRank and loads denovo/spectral when
 })
 
 test_that("load_sirius_tables v6 leaves spectral template when no spectral files", {
-  local_mocked_bindings(
-    read_from_sirius_zip = function(input_directory, file) {
-      force(input_directory)
-      if (grepl("canopus_formula_summary", file)) {
-        return(tidytable::tidytable(formulaRank = 1L, x = "a"))
-      }
-      if (grepl("formula_identifications", file)) {
-        return(tidytable::tidytable(formulaRank = 1L, y = "b"))
-      }
-      if (grepl("structure_identifications", file) && !grepl("denovo", file)) {
-        return(tidytable::tidytable(id = 1L))
-      }
-      tidytable::tidytable()
-    },
-    .package = "tima"
+  tmp <- temp_test_dir("sirius_tables_v6_no_spectral")
+  zip_path <- file.path(tmp, "sirius.zip")
+
+  write_tsv <- function(path, x) {
+    utils::write.table(x, path, sep = "\t", row.names = FALSE, quote = FALSE)
+  }
+
+  write_tsv(file.path(tmp, "canopus_formula_summary_all.tsv"), data.frame(
+    mappingFeatureId = "F1", formulaRank = 1L
+  ))
+  write_tsv(file.path(tmp, "formula_identifications_all.tsv"), data.frame(
+    mappingFeatureId = "F1", formulaRank = 1L
+  ))
+  write_tsv(file.path(tmp, "structure_identifications_all.tsv"), data.frame(
+    mappingFeatureId = "F1"
+  ))
+
+  old <- getwd()
+  on.exit(setwd(old), add = TRUE)
+  setwd(tmp)
+  utils::zip(
+    zipfile = basename(zip_path),
+    files = c(
+      "canopus_formula_summary_all.tsv",
+      "formula_identifications_all.tsv",
+      "structure_identifications_all.tsv"
+    ),
+    flags = "-j"
   )
 
-  local_mocked_bindings(
-    unzip = function(zipfile, list = FALSE, ...) {
-      force(zipfile)
-      invisible(list(...))
-      if (isTRUE(list)) {
-        return(data.frame(Name = c("structure_identifications_all.tsv")))
-      }
-      invisible(NULL)
-    },
-    .package = "utils"
-  )
-
-  out <- load_sirius_tables(input_directory = "dummy.zip", version = "6")
+  out <- load_sirius_tables(input_directory = zip_path, version = "6")
 
   expect_equal(nrow(out$spectral), 1L)
   expect_true(all(is.na(out$spectral$mappingFeatureId)))
 })
 
 test_that("load_sirius_summaries returns empty when no summary files", {
-  local_mocked_bindings(
-    unzip = function(zipfile, list = FALSE, ...) {
-      if (isTRUE(list)) {
-        return(data.frame(Name = c("other.tsv")))
-      }
-      invisible(NULL)
-    },
-    .package = "utils"
-  )
+  tmp <- temp_test_dir("sirius_summaries_none")
+  zip_path <- file.path(tmp, "sirius.zip")
+  writeLines("x", file.path(tmp, "other.tsv"))
 
-  out <- load_sirius_summaries("dummy.zip")
+  old <- getwd()
+  on.exit(setwd(old), add = TRUE)
+  setwd(tmp)
+  utils::zip(zipfile = basename(zip_path), files = "other.tsv", flags = "-j")
+
+  out <- load_sirius_summaries(zip_path)
   expect_equal(nrow(out), 0L)
 })
 
 test_that("load_sirius_summaries loads and binds discovered summary files", {
-  local_mocked_bindings(
-    unzip = function(zipfile, list = FALSE, ...) {
-      if (isTRUE(list)) {
-        return(data.frame(
-          Name = c(
-            "dummy/feat1/structure_candidates.tsv",
-            "dummy/feat2/structure_candidates.tsv"
-          )
-        ))
-      }
-      invisible(NULL)
-    },
-    .package = "utils"
+  tmp <- temp_test_dir("sirius_summaries_full")
+  dir.create(file.path(tmp, "feat1"), recursive = TRUE, showWarnings = FALSE)
+  dir.create(file.path(tmp, "feat2"), recursive = TRUE, showWarnings = FALSE)
+  zip_path <- file.path(tmp, "sirius.zip")
+
+  utils::write.table(
+    data.frame(score = 0.9),
+    file.path(tmp, "feat1", "structure_candidates.tsv"),
+    sep = "\t",
+    row.names = FALSE,
+    quote = FALSE
   )
-  local_mocked_bindings(
-    read_from_sirius_zip = function(input_directory, file) {
-      if (grepl("feat1", file)) {
-        return(tidytable::tidytable(score = 0.9))
-      }
-      tidytable::tidytable(score = 0.8)
-    },
-    .package = "tima"
+  utils::write.table(
+    data.frame(score = 0.8),
+    file.path(tmp, "feat2", "structure_candidates.tsv"),
+    sep = "\t",
+    row.names = FALSE,
+    quote = FALSE
   )
 
-  out <- load_sirius_summaries("dummy.zip")
+  old <- getwd()
+  on.exit(setwd(old), add = TRUE)
+  setwd(tmp)
+  utils::zip(
+    zipfile = basename(zip_path),
+    files = c(
+      file.path("feat1", "structure_candidates.tsv"),
+      file.path("feat2", "structure_candidates.tsv")
+    )
+  )
+
+  out <- load_sirius_summaries(zip_path)
   expect_true("feature_id" %in% names(out))
   expect_equal(nrow(out), 2L)
 })
 
 test_that("load_sirius_summaries returns empty when all discovered summaries are empty", {
-  local_mocked_bindings(
-    unzip = function(zipfile, list = FALSE, ...) {
-      force(zipfile)
-      invisible(list(...))
-      if (isTRUE(list)) {
-        return(data.frame(
-          Name = c(
-            "dummy/feat1/structure_candidates.tsv",
-            "dummy/feat2/structure_candidates.tsv"
-          )
-        ))
-      }
-      invisible(NULL)
-    },
-    .package = "utils"
+  tmp <- temp_test_dir("sirius_summaries_empty")
+  dir.create(file.path(tmp, "feat1"), recursive = TRUE, showWarnings = FALSE)
+  dir.create(file.path(tmp, "feat2"), recursive = TRUE, showWarnings = FALSE)
+  zip_path <- file.path(tmp, "sirius.zip")
+
+  writeLines("score", file.path(tmp, "feat1", "structure_candidates.tsv"))
+  writeLines("score", file.path(tmp, "feat2", "structure_candidates.tsv"))
+
+  old <- getwd()
+  on.exit(setwd(old), add = TRUE)
+  setwd(tmp)
+  utils::zip(
+    zipfile = basename(zip_path),
+    files = c(
+      file.path("feat1", "structure_candidates.tsv"),
+      file.path("feat2", "structure_candidates.tsv")
+    )
   )
 
-  local_mocked_bindings(
-    read_from_sirius_zip = function(input_directory, file) {
-      force(input_directory)
-      force(file)
-      tidytable::tidytable()
-    },
-    .package = "tima"
-  )
-
-  out <- load_sirius_summaries("dummy.zip")
+  out <- load_sirius_summaries(zip_path)
   expect_true(tidytable::is_tidytable(out))
   expect_equal(nrow(out), 0L)
 })

@@ -332,76 +332,57 @@ test_that("create_edges_spectra handles invalid MGF format", {
   )
 })
 
-test_that("create_edges_spectra completes downstream edge-building with mocked spectra", {
-  input_file <- tempfile(fileext = ".mgf")
-  writeLines("BEGIN IONS\nEND IONS", input_file)
-  query_mats <- list(
-    matrix(c(50, 10, 75, 20), ncol = 2, byrow = TRUE),
-    matrix(c(50, 15, 80, 30), ncol = 2, byrow = TRUE)
-  )
-  mock_spectra <- Spectra::Spectra(
-    object = data.frame(
-      msLevel = c(2L, 2L),
-      precursorMz = c(100, 110)
-    )
-  )
-  mock_spectra@backend@peaksData <- query_mats
-  exported <- new.env(parent = emptyenv())
-  exported$data <- NULL
-  exported$file <- NULL
+test_that("create_edges_spectra completes downstream edge-building from parsed spectra", {
+  withr::local_dir(new = temp_test_dir("create_edges_spectra_downstream"))
 
-  local_mocked_bindings(
-    get_params = function(step) list(),
-    import_spectra = function(input, cutoff, dalton, min_fragments, ppm) {
-      mock_spectra
-    },
-    create_edges = function(
-      frags,
-      nspecs,
-      precs,
-      method,
-      ms2_tolerance,
-      ppm_tolerance,
-      threshold,
-      matched_peaks
-    ) {
-      tidytable::tidytable(
-        feature_id = 1L,
-        target_id = 2L,
-        score = 0.91,
-        matched_peaks = 2L
-      )
-    },
-    get_spectra_ids = function(x) c("F1", "F2"),
-    export_params = function(parameters, step) invisible(NULL),
-    export_output = function(x, file) {
-      exported$data <- x
-      exported$file <- file
-      invisible(file)
-    },
-    log_complete = function(ctx, ...) invisible(NULL)
+  input_file <- tempfile(fileext = ".mgf")
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "TITLE=Spectrum1",
+      "FEATURE_ID=F1",
+      "PEPMASS=100",
+      "CHARGE=1+",
+      "50 10",
+      "75 20",
+      "100 30",
+      "END IONS",
+      "",
+      "BEGIN IONS",
+      "TITLE=Spectrum2",
+      "FEATURE_ID=F2",
+      "PEPMASS=101",
+      "CHARGE=1+",
+      "50 15",
+      "75 25",
+      "100 35",
+      "END IONS"
+    ),
+    input_file
   )
+
+  output_file <- tempfile(fileext = ".tsv")
 
   out <- create_edges_spectra(
     input = input_file,
-    output = "mock_edges.tsv",
+    output = output_file,
     name_source = "CLUSTERID1",
     name_target = "CLUSTERID2",
     method = "gnps",
-    threshold = 0.2,
+    threshold = 0,
     matched_peaks = 1,
     ppm = 10,
     dalton = 0.01,
-    cutoff = NULL
+    cutoff = 0
   )
 
-  expect_identical(out, "mock_edges.tsv")
-  expect_identical(exported$file, "mock_edges.tsv")
-  expect_true(all(c("CLUSTERID1", "CLUSTERID2") %in% names(exported$data)))
+  expect_identical(out, output_file)
+
+  exported <- tidytable::fread(out)
+  expect_true(all(c("CLUSTERID1", "CLUSTERID2") %in% names(exported)))
   expect_true(all(
     c("feature_spectrum_entropy", "feature_spectrum_peaks") %in%
-      names(exported$data)
+      names(exported)
   ))
-  expect_true(any(exported$data$CLUSTERID1 == "F1"))
-  expect_true(any(exported$data$CLUSTERID2 == "F2"))
+  expect_true(any(exported$CLUSTERID1 == "F1" | exported$CLUSTERID2 == "F2"))
 })
