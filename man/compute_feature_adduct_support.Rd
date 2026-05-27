@@ -3,7 +3,7 @@
 %   R/mass_consistency.R
 \name{compute_feature_adduct_support}
 \alias{compute_feature_adduct_support}
-\title{Count, for each (feature, adduct), how many distinct neighbours in the
+\title{Count, for each (feature, adduct), how many distinct neighbors in the
 adduct graph independently support that label.}
 \usage{
 compute_feature_adduct_support(df_add)
@@ -11,7 +11,7 @@ compute_feature_adduct_support(df_add)
 compute_feature_adduct_support(df_add)
 }
 \description{
-Count, for each (feature, adduct), how many distinct neighbours in the
+Count, for each (feature, adduct), how many distinct neighbors in the
 adduct graph independently support that label.
 
 Compute support count for each feature/adduct assignment from adduct edges

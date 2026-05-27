@@ -16,8 +16,6 @@
 #' * |z| omitted when |z| == 1
 #'
 #' @export
-#' @keywords internal
-
 adduct_to_string <- function(
   n_mer,
   carriers,
@@ -437,5 +435,3 @@ generate_adduct_hypotheses <- function(
   out <- tidytable::distinct(out, adduct, .keep_all = TRUE)
   out
 }
-
-#' @keywords internal

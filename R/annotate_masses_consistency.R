@@ -91,7 +91,7 @@ build_adduct_pair_differences <- function(
     tidytable::select(Distance, Group1, Group2)
 }
 
-#' Count, for each (feature, adduct), how many distinct neighbours in the
+#' Count, for each (feature, adduct), how many distinct neighbors in the
 #' adduct graph independently support that label.
 #' @keywords internal
 compute_feature_adduct_support <- function(df_add) {

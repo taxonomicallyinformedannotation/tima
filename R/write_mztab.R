@@ -1,7 +1,7 @@
 #' @title Write TIMA results as mzTab-M
 #'
 #' @description Exports TIMA weighted-annotation results to mzTab-M 2.1.0
-#' plain-text format.  The output is a conformant mzTab-M file containing:
+#' plain-text format.  The output is a compliant mzTab-M file containing:
 #'
 #' * **MTD** – metadata (software, database, instrument, confidence measures,
 #'   ms_run, sample, assay, study_variable).
@@ -246,7 +246,7 @@ write_mztab <- function(
     polarity <- tolower(trimws(polarity))
     if (!polarity %in% c("positive", "negative", "pos", "neg")) {
       log_warn(
-        "Unrecognised polarity '%s'; treating as unknown",
+        "Unrecognized polarity '%s'; treating as unknown",
         polarity
       )
       polarity <- NULL

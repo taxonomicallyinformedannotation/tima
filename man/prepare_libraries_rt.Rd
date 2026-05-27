@@ -42,7 +42,7 @@ output}
 
 \item{col_ik}{\link{character} Character string name of InChIKey column in MGF}
 
-\item{col_na}{\link{character} Character string name of chompound name column in
+\item{col_na}{\link{character} Character string name of compound name column in
 MGF}
 
 \item{col_rt}{\link{character} Character string name of retention time column in

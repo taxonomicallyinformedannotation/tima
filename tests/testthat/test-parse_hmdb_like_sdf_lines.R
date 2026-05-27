@@ -224,7 +224,7 @@ test_that("parse_hmdb_like_sdf_lines returns NA for absent fields", {
 
 # ---- unknown fields are silently ignored ------------------------------------
 
-test_that("parse_hmdb_like_sdf_lines ignores unrecognised field tags", {
+test_that("parse_hmdb_like_sdf_lines ignores unrecognized field tags", {
   block <- c(
     "  mol",
     "  prog",

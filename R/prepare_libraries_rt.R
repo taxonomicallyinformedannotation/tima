@@ -23,7 +23,7 @@
 #'     output
 #' @param output_sop [character] Character string path for pseudo SOP output
 #' @param col_ik [character] Character string name of InChIKey column in MGF
-#' @param col_na [character] Character string name of chompound name column in
+#' @param col_na [character] Character string name of compound name column in
 #'     MGF
 #' @param col_rt [character] Character string name of retention time column in
 #'     MGF

@@ -11,7 +11,7 @@ get_spectra_ids(spectra)
 }
 \value{
 Character vector of spectrum IDs (one per spectrum), or \code{NULL} if no
-recognised ID field is found.
+recognized ID field is found.
 }
 \description{
 Extracts spectrum identifiers from a \code{\link[Spectra:Spectra]{Spectra::Spectra()}} object.

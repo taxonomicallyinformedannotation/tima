@@ -11,9 +11,9 @@ merge_sirius_structures_with_spectral(
 )
 }
 \arguments{
-\item{structures_prepared}{\link{data.frame} Standardised structure candidates.}
+\item{structures_prepared}{\link{data.frame} Standardized structure candidates.}
 
-\item{spectral_prepared}{\link{data.frame} Standardised spectral-match candidates.}
+\item{spectral_prepared}{\link{data.frame} Standardized spectral-match candidates.}
 }
 \value{
 data.frame with merged and unmatched rows combined.

@@ -21,7 +21,7 @@
 #' @param spectra [Spectra::Spectra()] object.
 #'
 #' @return Character vector of spectrum IDs (one per spectrum), or `NULL` if no
-#'   recognised ID field is found.
+#'   recognized ID field is found.
 #'
 #' @keywords internal
 #'

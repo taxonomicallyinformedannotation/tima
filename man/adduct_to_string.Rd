@@ -32,4 +32,3 @@ neutral masses than their outside-multimer counterparts.
 \item |z| omitted when |z| == 1
 }
 }
-\keyword{internal}

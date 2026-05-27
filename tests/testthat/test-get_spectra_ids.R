@@ -81,7 +81,7 @@ test_that("get_spectra_ids prioritizes SLAW_ID over other fields", {
 })
 
 test_that("get_spectra_ids returns NULL when no ID field found", {
-  # Create spectra without any recognised ID fields or TITLE
+  # Create spectra without any recognized ID fields or TITLE
   sp_data <- data.frame(
     precursorMz = c(100, 200, 300),
     msLevel = rep(2L, 3)

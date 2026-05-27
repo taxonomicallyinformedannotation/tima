@@ -351,8 +351,8 @@ split_sirius_results <- function(table) {
 #'     SMILES does not appear in the structure table are kept as standalone
 #'     candidate rows.
 #'
-#' @param structures_prepared [data.frame] Standardised structure candidates.
-#' @param spectral_prepared [data.frame] Standardised spectral-match candidates.
+#' @param structures_prepared [data.frame] Standardized structure candidates.
+#' @param spectral_prepared [data.frame] Standardized spectral-match candidates.
 #'
 #' @return data.frame with merged and unmatched rows combined.
 #' @keywords internal
