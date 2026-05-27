@@ -556,6 +556,5 @@ build_evidence_supported_hypotheses <- function(
   tidytable::as_tidytable(hyps)
 }
 
-
 #' Empty hypothesis table with the canonical schema.
 #' @keywords internal

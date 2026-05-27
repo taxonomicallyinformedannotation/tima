@@ -764,9 +764,7 @@ create_features_with_edges <- function(
 }
 
 
-
 ## Extended Fixtures ----
-
 
 # Param fixtures for prepare_params / get_params tests
 # These mimic the structure expected by internal functions but are lightweight.
