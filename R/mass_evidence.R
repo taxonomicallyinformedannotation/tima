@@ -634,7 +634,9 @@ build_evidence_supported_hypotheses <- function(
     t_mc <- Sys.time()
     hyps <- hyps |> tidytable::arrange(implied_M)
     hyps <- hyps |>
-      tidytable::mutate(mass_cluster = .ppm_cluster_sorted(implied_M, tolerance_ppm))
+      tidytable::mutate(
+        mass_cluster = .ppm_cluster_sorted(implied_M, tolerance_ppm)
+      )
     log_debug(
       "Mass clustering: %d clusters in %.2fs",
       tidytable::n_distinct(hyps$mass_cluster),
@@ -700,8 +702,16 @@ build_evidence_supported_hypotheses <- function(
   hyps <- hyps |>
     tidytable::left_join(cluster_meta, by = "evidence_cluster") |>
     tidytable::mutate(
-      cluster_has_core = ifelse(is.na(cluster_has_core), FALSE, cluster_has_core),
-      cluster_n_adducts = ifelse(is.na(cluster_n_adducts), 1L, cluster_n_adducts)
+      cluster_has_core = ifelse(
+        is.na(cluster_has_core),
+        FALSE,
+        cluster_has_core
+      ),
+      cluster_n_adducts = ifelse(
+        is.na(cluster_n_adducts),
+        1L,
+        cluster_n_adducts
+      )
     )
 
   keep_mask <-
