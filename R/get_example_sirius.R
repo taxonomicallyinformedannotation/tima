@@ -46,10 +46,15 @@ get_example_sirius <- function(
   get_file(url = url$v5, export = export$v5)
 
   # Download SIRIUS v6 example (with path adjustment)
-  v6_export <- export$v6 |>
-    gsub(pattern = "_6", replacement = "", fixed = TRUE)
+  v6_export <- adjust_sirius_v6_export_path(export$v6)
   get_file(url = url$v6, export = v6_export)
 
   log_info("Downloaded SIRIUS examples")
   invisible(NULL)
 }
+
+#' @keywords internal
+adjust_sirius_v6_export_path <- function(path) {
+  gsub(pattern = "_6", replacement = "", x = path, fixed = TRUE)
+}
+
