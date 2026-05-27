@@ -195,6 +195,7 @@ Collate:
     'prepare_libraries_sop_lotus.R'
     'split_tables_sop.R'
     'prepare_libraries_sop_merged.R'
+    'prepare_libraries_sop_merged_utils.R'
     'prepare_libraries_spectra.R'
     'prepare_params.R'
     'prepare_taxa.R'

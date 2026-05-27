@@ -1,17 +1,27 @@
 # Pipeline graph body composed from section modules.
 
-# Detect this script's own directory so section paths are portable
-# regardless of working directory or installation location.
-.inst_dir <- local({
+# Resolve the directory containing this file's sibling "targets/" folder.
+# Works when sourced interactively, via targets, or from an installed package.
+.targets_dir <- local({
+  # 1. Inspect source() frames for an _targets.R path and validate candidates.
   frames <- sys.frames()
   ofiles <- Filter(Negate(is.null), lapply(frames, `[[`, "ofile"))
-  if (length(ofiles) > 0L) {
-    dirname(normalizePath(ofiles[[length(ofiles)]], mustWork = FALSE))
-  } else {
-    system.file(package = "tima")
+  for (f in rev(ofiles)) {
+    candidate <- file.path(
+      dirname(normalizePath(f, mustWork = FALSE)),
+      "targets"
+    )
+    if (dir.exists(candidate)) return(candidate)
   }
+  # 2. Installed package path.
+  pkg <- system.file("targets", package = "tima")
+  if (nzchar(pkg) && dir.exists(pkg)) {
+    return(pkg)
+  }
+  # 3. Dev fallback when wd is repository root.
+  file.path("inst", "targets")
 })
-.targets_dir <- file.path(.inst_dir, "targets")
+.inst_dir <- dirname(.targets_dir)
 
 source(file.path(.targets_dir, "00_targets_setup.R"))
 source(file.path(.targets_dir, "01_targets_architecture.R"))
