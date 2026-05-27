@@ -1,4 +1,3 @@
-
 # save the results to a file
 .save_input <- function(input) {
   paths_data_source <- tima:::get_default_paths()$data$source$path
@@ -772,4 +771,3 @@ server <- function(input, output) {
     })
   })
 }
-
