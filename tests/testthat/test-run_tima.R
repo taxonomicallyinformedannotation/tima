@@ -73,7 +73,7 @@ test_that("run_tima has sensible defaults", {
   expect_equal(params$log_file, "tima.log")
   expect_equal(params$clean_old_logs, TRUE)
   expect_equal(
-    formals(tima:::execute_targets_pipeline)$target_pattern,
+    formals(execute_targets_pipeline)$target_pattern,
     "^(ann_wei|exp_mzt)$"
   )
 })

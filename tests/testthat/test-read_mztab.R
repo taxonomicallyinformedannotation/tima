@@ -2,24 +2,24 @@ library(testthat)
 
 test_that(".parse_mztab_cv_name extracts third element from CV term", {
   expect_equal(
-    tima:::.parse_mztab_cv_name("[NCBITaxon, NCBITaxon:9606, Homo sapiens, ]"),
+    .parse_mztab_cv_name("[NCBITaxon, NCBITaxon:9606, Homo sapiens, ]"),
     "Homo sapiens"
   )
   expect_equal(
-    tima:::.parse_mztab_cv_name("[BTO, BTO:0000131, blood plasma, ]"),
+    .parse_mztab_cv_name("[BTO, BTO:0000131, blood plasma, ]"),
     "blood plasma"
   )
-  expect_true(is.na(tima:::.parse_mztab_cv_name(NA_character_)))
-  expect_true(is.na(tima:::.parse_mztab_cv_name("[only, two]")))
+  expect_true(is.na(.parse_mztab_cv_name(NA_character_)))
+  expect_true(is.na(.parse_mztab_cv_name("[only, two]")))
   expect_equal(
-    tima:::.parse_mztab_cv_name("Homo sapiens"),
+    .parse_mztab_cv_name("Homo sapiens"),
     "Homo sapiens"
   )
 })
 
 test_that(".parse_mztab_cv_name handles escaped commas in Param values", {
   x <- "[NCBITaxon, NCBITaxon:9606, Homo sapiens, liver\\, plasma]"
-  expect_equal(tima:::.parse_mztab_cv_name(x), "Homo sapiens")
+  expect_equal(.parse_mztab_cv_name(x), "Homo sapiens")
 })
 
 test_that(".mztab_sample_species_map extracts Homo sapiens from lipidcompass fixture", {
@@ -27,7 +27,7 @@ test_that(".mztab_sample_species_map extracts Homo sapiens from lipidcompass fix
     "mztab/lipidcompass-script_226ea96_MTD_SML_LCS-00001-01.mztab"
   )
   tabs <- read_mztab_tables(mztab_file)
-  species_map <- tima:::.mztab_sample_species_map(tabs$metadata)
+  species_map <- .mztab_sample_species_map(tabs$metadata)
 
   expect_true(length(species_map) > 0L)
   expect_true(all(species_map == "Homo sapiens"))
@@ -39,7 +39,7 @@ test_that(".mztab_sample_species_map supports sample-organism plain-text fields"
     key = c("sample[1]", "sample[1]-organism"),
     value = c("sample_a", "Homo sapiens")
   )
-  species_map <- tima:::.mztab_sample_species_map(meta)
+  species_map <- .mztab_sample_species_map(meta)
   expect_identical(unname(species_map[["sample[1]"]]), "Homo sapiens")
 })
 
@@ -246,7 +246,7 @@ test_that(".write_proxy_mgf skips features with zero or non-finite m/z", {
   )
   tmp <- temp_test_path("proxy_mz_edge.mgf")
 
-  tima:::.write_proxy_mgf(features, tmp, "feature_id", "mz")
+  .write_proxy_mgf(features, tmp, "feature_id", "mz")
 
   lines <- readLines(tmp, warn = FALSE)
   # Only feature A should produce an entry

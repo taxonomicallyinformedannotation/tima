@@ -414,7 +414,7 @@ test_that("write_mztab retains TIMA result columns as canonical or opt_global fi
     !vapply(
       src_cols,
       function(col) {
-        opt <- tima:::.mztab_opt_colname(col)
+        opt <- .mztab_opt_colname(col)
         canonical <- if (col %in% names(canonical_map)) {
           canonical_map[[col]]
         } else {
@@ -584,7 +584,7 @@ test_that("write_mztab covers full final-results schema and emits provenance COM
     !vapply(
       final_cols,
       function(col) {
-        opt <- tima:::.mztab_opt_colname(col)
+        opt <- .mztab_opt_colname(col)
         canonical <- if (col %in% names(canonical_map)) {
           canonical_map[[col]]
         } else {
@@ -857,7 +857,7 @@ test_that("write_mztab reliability scoring follows MSI levels", {
 })
 
 test_that(".mztab_library_to_identification_method returns proper Param syntax", {
-  fmt <- function(lib) tima:::.mztab_library_to_identification_method(lib)
+  fmt <- function(lib) .mztab_library_to_identification_method(lib)
 
   # All results must be Param strings
   expect_match(fmt("spectral"), "^\\[.*,.*,.*,.*\\]$")
@@ -1214,8 +1214,8 @@ test_that("write_mztab prefers prefixed database_identifier from xrefs and prese
 })
 
 test_that(".mztab_build_xrefs_index returns NULL for missing file", {
-  expect_null(tima:::.mztab_build_xrefs_index(NULL))
-  expect_null(tima:::.mztab_build_xrefs_index("nonexistent_file.tsv"))
+  expect_null(.mztab_build_xrefs_index(NULL))
+  expect_null(.mztab_build_xrefs_index("nonexistent_file.tsv"))
 })
 
 test_that(".mztab_pick_best_uri prefers Wikidata over ChEBI", {
@@ -1224,7 +1224,7 @@ test_that(".mztab_pick_best_uri prefers Wikidata over ChEBI", {
     id = c("12345", "Q99999"),
     stringsAsFactors = FALSE
   )
-  uri <- tima:::.mztab_pick_best_uri(rows)
+  uri <- .mztab_pick_best_uri(rows)
   expect_match(uri, "wikidata", ignore.case = TRUE)
 })
 
@@ -1234,7 +1234,7 @@ test_that(".mztab_pick_best_uri handles single row correctly", {
     id = "HMDB0000001",
     stringsAsFactors = FALSE
   )
-  uri <- tima:::.mztab_pick_best_uri(rows)
+  uri <- .mztab_pick_best_uri(rows)
   expect_match(uri, "hmdb", ignore.case = TRUE)
   expect_match(uri, "HMDB0000001")
 })
