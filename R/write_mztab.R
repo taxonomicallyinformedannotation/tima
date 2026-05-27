@@ -277,7 +277,7 @@ write_mztab <- function(
     )
   }
 
-  # Resolve xrefs index (InChIKey connectivity layer → list of prefix+id rows)
+  # Resolve xrefs index (connectivity-layer InChIKey only → list of prefix+id rows)
   xrefs_index <- .mztab_build_xrefs_index(xrefs_file)
 
   ctx <- log_operation(
@@ -785,7 +785,7 @@ write_mztab <- function(
   }
 
   # Prefer prefixed database identifiers (e.g. CHEBI:12345) when xrefs are
-  # available; otherwise fall back to the connectivity-layer InChIKey.
+  # available; otherwise fall back to the connectivity-layer InChIKey fragment.
   database_identifier_col <- inchikey_col
   if (!is.null(xrefs_index) && length(xrefs_index) > 0L) {
     database_identifier_col <- vapply(
@@ -1939,7 +1939,7 @@ write_mztab <- function(
     "database[1]",
     "[, , LOTUS natural-product database, ]"
   )
-  # The connectivity-layer InChIKey used as database_identifier has no
+  # The connectivity-layer InChIKey fragment used as database_identifier has no
   # database-specific prefix; null is the correct mzTab-M value.
   meta <- add_default(meta, "database[1]-prefix", "null")
   meta <- add_default(meta, "database[1]-version", "Unknown")
@@ -2560,7 +2560,7 @@ write_mztab <- function(
 #' Build a named list (InChIKey → data.frame) for fast xrefs look-up.
 #'
 #' Loads the cross-references file from [get_compounds_xrefs()] and indexes it
-#' by InChIKey connectivity layer so per-compound look-up is O(1).
+#' by the InChIKey connectivity layer fragment so per-compound look-up is O(1).
 #'
 #' @param xrefs_file Character file path, or `NULL`.
 #' @return Named list of data.frames, or `NULL` when no valid file is provided.
@@ -2609,8 +2609,8 @@ write_mztab <- function(
   xrefs_df$prefix <- as.character(xrefs_df$prefix)
   xrefs_df$id <- as.character(xrefs_df$id)
 
-  # Index by InChIKey connectivity layer (first 14 characters).
-  xrefs_df$ik14 <- substr(xrefs_df$inchikey, 1L, 14L)
+  # Index by the InChIKey connectivity layer fragment (first 14 characters).
+  xrefs_df$ik14 <- .mztab_connectivity_layer_key(xrefs_df$inchikey)
   split(xrefs_df, xrefs_df$ik14)
 }
 
@@ -2695,7 +2695,7 @@ write_mztab <- function(
       }
     }
 
-    # Fallback to first available mapped prefix:id.
+      # Fallback to first available mapped prefix:id.
     for (i in seq_len(nrow(rows))) {
       pfx <- as.character(rows$prefix[[i]])
       id <- as.character(rows$id[[i]])
@@ -2758,3 +2758,12 @@ write_mztab <- function(
 
   Filter(Negate(is.null), out)
 }
+
+#' Normalize an InChIKey value to its connectivity-layer fragment.
+#' @keywords internal
+.mztab_connectivity_layer_key <- function(x) {
+  x <- as.character(x)
+  x[is.na(x) | !nzchar(x)] <- NA_character_
+  substr(x, 1L, 14L)
+}
+
