@@ -655,8 +655,8 @@ test_that("parse_adduct handles multiplicity-prefixed solvent aliases (+2ACN)", 
 })
 
 test_that("normalize_adduct_string is idempotent on canonical input", {
-  skip_if_not(exists("normalize_adduct_string", envir = asNamespace("tima")))
-  norm <- getFromNamespace("normalize_adduct_string", "tima")
+  skip_if_not(exists("normalize_adduct_string", inherits = TRUE))
+  norm <- normalize_adduct_string
   for (a in c("[M+H]+", "[M-H]-", "[2M+Na]+", "[M+2H]2+")) {
     expect_equal(norm(a), a)
   }

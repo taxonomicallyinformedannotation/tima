@@ -1,9 +1,7 @@
 library(testthat)
-library(tima)
 
-ns <- asNamespace("tima")
-validate_sop_merged_inputs <- get("validate_sop_merged_inputs", ns)
-apply_taxonomic_filter <- get("apply_taxonomic_filter", ns)
+validate_sop_merged_inputs <- validate_sop_merged_inputs
+apply_taxonomic_filter <- apply_taxonomic_filter
 
 # Helper: standard output paths
 std_outputs <- function() {

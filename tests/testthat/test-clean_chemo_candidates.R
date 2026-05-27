@@ -1,10 +1,7 @@
 library(testthat)
-library(tima)
-
-ns <- asNamespace("tima")
-sample_candidates_per_group <- get("sample_candidates_per_group", ns)
-remove_compound_names <- get("remove_compound_names", ns)
-coerce_score_columns <- get("coerce_score_columns", ns)
+sample_candidates_per_group <- sample_candidates_per_group
+remove_compound_names <- remove_compound_names
+coerce_score_columns <- coerce_score_columns
 
 # ── sample_candidates_per_group ───────────────────────────────────────────────
 

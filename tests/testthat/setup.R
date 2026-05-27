@@ -1,5 +1,10 @@
 suppressPackageStartupMessages(library(testthat))
-suppressPackageStartupMessages(library(tima))
+# Load package code once for all tests; internal helpers become directly callable.
+suppressPackageStartupMessages(devtools::load_all(
+  path = ".",
+  export_all = TRUE,
+  quiet = TRUE
+))
 
 # Provide a reproducible temp root for this session's tests
 .test_root <- file.path(tempdir(), sprintf("tima-tests-%s", Sys.getpid()))

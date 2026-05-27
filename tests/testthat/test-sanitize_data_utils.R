@@ -1,11 +1,9 @@
 library(testthat)
-library(tima)
 
-ns <- asNamespace("tima")
-sanitize_mgf <- get("sanitize_mgf", ns)
-sanitize_csv <- get("sanitize_csv", ns)
-sanitize_metadata <- get("sanitize_metadata", ns)
-sanitize_sirius <- get("sanitize_sirius", ns)
+sanitize_mgf <- sanitize_mgf
+sanitize_csv <- sanitize_csv
+sanitize_metadata <- sanitize_metadata
+sanitize_sirius <- sanitize_sirius
 
 # ── sanitize_mgf ──────────────────────────────────────────────────────────────
 

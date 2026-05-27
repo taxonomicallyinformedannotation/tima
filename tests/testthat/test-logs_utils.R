@@ -355,30 +355,14 @@ test_that("init_logging is case-insensitive for log level", {
 
 test_that("lazy logging initialization works", {
   # Test that logging functions are available
-  expect_true(exists("log_info", where = asNamespace("tima"), inherits = FALSE))
-  expect_true(exists(
-    "log_debug",
-    where = asNamespace("tima"),
-    inherits = FALSE
-  ))
-  expect_true(exists("log_warn", where = asNamespace("tima"), inherits = FALSE))
-  expect_true(exists(
-    "log_error",
-    where = asNamespace("tima"),
-    inherits = FALSE
-  ))
+  expect_true(exists("log_info", inherits = TRUE))
+  expect_true(exists("log_debug", inherits = TRUE))
+  expect_true(exists("log_warn", inherits = TRUE))
+  expect_true(exists("log_error", inherits = TRUE))
 
   # Test that helper functions exist
-  expect_true(exists(
-    "ensure_logging_initialized",
-    where = asNamespace("tima"),
-    inherits = FALSE
-  ))
-  expect_true(exists(
-    "is_logging_initialized",
-    where = asNamespace("tima"),
-    inherits = FALSE
-  ))
+  expect_true(exists("ensure_logging_initialized", inherits = TRUE))
+  expect_true(exists("is_logging_initialized", inherits = TRUE))
 })
 
 test_that("logging does not create file on package load", {
@@ -386,8 +370,10 @@ test_that("logging does not create file on package load", {
   # In actual usage, we can't test this directly, but we can verify
   # the .onLoad function doesn't call init_logging
 
+  skip_if_not(exists(".onLoad", inherits = TRUE))
+
   # Get the .onLoad function
-  onLoad <- get(".onLoad", envir = asNamespace("tima")) # nolint: object_name_linter.
+  onLoad <- get(".onLoad") # nolint: object_name_linter.
 
   # Convert to character to check it doesn't contain init_logging call
   onLoad_body <- deparse(body(onLoad)) # nolint: object_name_linter.
@@ -398,7 +384,6 @@ test_that("logging does not create file on package load", {
 
 test_that("logging functions use sprintf-style formatting", {
   # Test that our logging wrappers exist and work with sprintf format
-  ns <- asNamespace("tima")
 
   # Test with temp log file
   temp_log <- tempfile(fileext = ".log")

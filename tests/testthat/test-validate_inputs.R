@@ -1,7 +1,4 @@
 library(testthat)
-library(tima)
-
-ns <- asNamespace("tima")
 
 # validate_inputs is an exported wrapper around sanitize_all_inputs
 

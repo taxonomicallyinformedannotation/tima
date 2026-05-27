@@ -1,15 +1,13 @@
 library(testthat)
-library(tima)
 
-ns <- asNamespace("tima")
-implied_neutral_mass <- get("implied_neutral_mass", ns)
-has_library_match <- get(".has_library_match_within_ppm", ns)
-nearest_ppm <- get(".nearest_exact_mass_ppm", ns)
-nearest_idx <- get(".nearest_exact_mass_index", ns)
-ppm_cluster <- get(".ppm_cluster_sorted", ns)
-annotate_universe_meta <- get("annotate_adduct_universe_metadata", ns)
-EVIDENCE_ISOTOPE_SHIFT_DA <- get("EVIDENCE_ISOTOPE_SHIFT_DA", ns)
-build_adduct_universe <- get("build_adduct_universe", ns)
+implied_neutral_mass <- implied_neutral_mass
+has_library_match <- .has_library_match_within_ppm
+nearest_ppm <- .nearest_exact_mass_ppm
+nearest_idx <- .nearest_exact_mass_index
+ppm_cluster <- .ppm_cluster_sorted
+annotate_universe_meta <- annotate_adduct_universe_metadata
+EVIDENCE_ISOTOPE_SHIFT_DA <- EVIDENCE_ISOTOPE_SHIFT_DA
+build_adduct_universe <- build_adduct_universe
 
 # implied_neutral_mass ----
 test_that("implied_neutral_mass computes basic [M+H]+ case correctly", {

@@ -1,16 +1,14 @@
 library(testthat)
-library(tima)
 
-ns <- asNamespace("tima")
-build_export_comments <- get(".mztab_build_export_comments", ns)
-build_ambiguity_comments <- get(".mztab_build_ambiguity_comments", ns)
-build_edges_comments <- get(".mztab_build_edges_comments", ns)
-library_to_method <- get(".mztab_library_to_identification_method", ns)
-mztab_escape <- get(".mztab_escape", ns)
-charge_from_adduct <- get(".mztab_charge_from_adduct", ns)
-pick_best_uri <- get(".mztab_pick_best_uri", ns)
-pick_best_db_id <- get(".mztab_pick_best_database_identifier", ns)
-connectivity_key <- get(".mztab_connectivity_layer_key", ns)
+build_export_comments <- .mztab_build_export_comments
+build_ambiguity_comments <- .mztab_build_ambiguity_comments
+build_edges_comments <- .mztab_build_edges_comments
+library_to_method <- .mztab_library_to_identification_method
+mztab_escape <- .mztab_escape
+charge_from_adduct <- .mztab_charge_from_adduct
+pick_best_uri <- .mztab_pick_best_uri
+pick_best_db_id <- .mztab_pick_best_database_identifier
+connectivity_key <- .mztab_connectivity_layer_key
 
 # .mztab_build_export_comments ----
 test_that(".mztab_build_export_comments returns empty for no non-classical cols", {

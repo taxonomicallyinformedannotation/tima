@@ -1,12 +1,10 @@
 library(testthat)
-library(tima)
 
-ns <- asNamespace("tima")
-build_meta <- get(".mztab_build_metadata_table", ns)
-write_meta <- get(".mztab_write_metadata", ns)
-write_section <- get(".mztab_write_section", ns)
-mtd <- get(".mtd", ns)
-opt_colname <- get(".mztab_opt_colname", ns)
+build_meta <- .mztab_build_metadata_table
+write_meta <- .mztab_write_metadata
+write_section <- .mztab_write_section
+mtd <- .mtd
+opt_colname <- .mztab_opt_colname
 
 test_that(".mtd builds tab-separated metadata line", {
   expect_equal(mtd("mzTab-version", "2.1.0-M"), "MTD\tmzTab-version\t2.1.0-M")

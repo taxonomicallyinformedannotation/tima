@@ -1,8 +1,4 @@
 library(testthat)
-library(tima)
-
-ns <- asNamespace("tima")
-move_file_safely <- get("move_file_safely", ns)
 
 test_that("move_file_safely returns FALSE for non-existent source", {
   result <- move_file_safely(from = tempfile("nonexistent_"), to = tempfile())

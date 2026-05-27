@@ -1,11 +1,9 @@
 library(testthat)
-library(tima)
 
-ns <- asNamespace("tima")
-build_feature_pairs_within_rt <- get("build_feature_pairs_within_rt", ns)
-build_adduct_pair_differences <- get("build_adduct_pair_differences", ns)
-join_couples_with_neutral_losses <- get("join_couples_with_neutral_losses", ns)
-join_multi_with_addlossed <- get("join_multi_with_addlossed", ns)
+build_feature_pairs_within_rt <- build_feature_pairs_within_rt
+build_adduct_pair_differences <- build_adduct_pair_differences
+join_couples_with_neutral_losses <- join_couples_with_neutral_losses
+join_multi_with_addlossed <- join_multi_with_addlossed
 
 # ── build_feature_pairs_within_rt ─────────────────────────────────────────────
 

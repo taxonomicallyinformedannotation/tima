@@ -1,15 +1,13 @@
 library(testthat)
-library(tima)
 
-ns <- asNamespace("tima")
-validate_clean_chemo_inputs <- get("validate_clean_chemo_inputs", ns)
-filter_ms1_annotations <- get("filter_ms1_annotations", ns)
-rank_and_deduplicate <- get("rank_and_deduplicate", ns)
-apply_percentile_filter <- get("apply_percentile_filter", ns)
-count_candidates <- get("count_candidates", ns)
-compute_classyfire_taxonomy <- get("compute_classyfire_taxonomy", ns)
-compute_npclassifier_taxonomy <- get("compute_npclassifier_taxonomy", ns)
-compute_candidate_M <- get("compute_candidate_M", ns)
+validate_clean_chemo_inputs <- validate_clean_chemo_inputs
+filter_ms1_annotations <- filter_ms1_annotations
+rank_and_deduplicate <- rank_and_deduplicate
+apply_percentile_filter <- apply_percentile_filter
+count_candidates <- count_candidates
+compute_classyfire_taxonomy <- compute_classyfire_taxonomy
+compute_npclassifier_taxonomy <- compute_npclassifier_taxonomy
+compute_candidate_M <- compute_candidate_M
 
 base_annot <- function() {
   tidytable::tidytable(

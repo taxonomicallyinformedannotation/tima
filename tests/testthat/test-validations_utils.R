@@ -1,9 +1,6 @@
 # Unit tests for validate_utils.R
 
 library(testthat)
-library(tima)
-
-ns <- asNamespace("tima")
 
 # Helper: temporary files
 with_temp_files <- function(n = 2L, expr) {
@@ -18,22 +15,22 @@ with_temp_files <- function(n = 2L, expr) {
 }
 
 # validate_file_existence ----
-validate_file_existence <- get("validate_file_existence", ns)
-validate_ms_mode <- get("validate_ms_mode", ns)
-validate_tolerances <- get("validate_tolerances", ns)
-validate_dataframe <- get("validate_dataframe", ns)
-validate_numeric_range <- get("validate_numeric_range", ns)
-validate_weights <- get("validate_weights", ns)
-validate_choice <- get("validate_choice", ns)
-validate_adduct_list <- get("validate_adduct_list", ns)
-validate_character <- get("validate_character", ns)
-validate_logical <- get("validate_logical", ns)
-validate_list_or_vector <- get("validate_list_or_vector", ns)
-assert_flag <- get("assert_flag", ns)
-assert_positive_integer <- get("assert_positive_integer", ns)
-assert_scalar_numeric <- get("assert_scalar_numeric", ns)
-MAX_TOLERANCE_PPM <- get("MAX_TOLERANCE_PPM", ns)
-MAX_TOLERANCE_RT_ADDUCTS <- get("MAX_TOLERANCE_RT_ADDUCTS", ns)
+validate_file_existence <- validate_file_existence
+validate_ms_mode <- validate_ms_mode
+validate_tolerances <- validate_tolerances
+validate_dataframe <- validate_dataframe
+validate_numeric_range <- validate_numeric_range
+validate_weights <- validate_weights
+validate_choice <- validate_choice
+validate_adduct_list <- validate_adduct_list
+validate_character <- validate_character
+validate_logical <- validate_logical
+validate_list_or_vector <- validate_list_or_vector
+assert_flag <- assert_flag
+assert_positive_integer <- assert_positive_integer
+assert_scalar_numeric <- assert_scalar_numeric
+MAX_TOLERANCE_PPM <- MAX_TOLERANCE_PPM
+MAX_TOLERANCE_RT_ADDUCTS <- MAX_TOLERANCE_RT_ADDUCTS
 
 # validate_file_existence ----
 test_that("validate_file_existence errors on non-list and empty list", {
