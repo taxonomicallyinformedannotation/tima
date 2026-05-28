@@ -62,6 +62,56 @@
 #'   ppm = 10.0,
 #'   return_matched_peaks = TRUE
 #' )
+.entropy_similarity_call <- function(query_spectrum, target_spectrum, dalton, ppm) {
+  msentropy::calculate_entropy_similarity(
+    peaks_a = query_spectrum,
+    peaks_b = target_spectrum,
+    min_mz = 0,
+    max_mz = 5000,
+    noise_threshold = 0,
+    ms2_tolerance_in_da = dalton,
+    ms2_tolerance_in_ppm = ppm,
+    max_peak_num = -1,
+    clean_spectra = TRUE
+  )
+}
+
+.gnps_chain_dp_call <- function(
+    query_spectrum,
+    target_spectrum,
+    query_precursor,
+    target_precursor,
+    dalton,
+    ppm
+) {
+  gnps_chain_dp_wrapper(
+    x = query_spectrum,
+    y = target_spectrum,
+    xPrecursorMz = query_precursor,
+    yPrecursorMz = target_precursor,
+    tolerance = dalton,
+    ppm = ppm,
+    matchedPeaksCount = TRUE
+  )
+}
+
+.join_spectra_call <- function(query_spectrum, target_spectrum, dalton, ppm, ...) {
+  MsCoreUtils::join(
+    x = query_spectrum[, 1L],
+    y = target_spectrum[, 1L],
+    tolerance = dalton,
+    ppm = ppm,
+    ...
+  )
+}
+
+.gnps_score_call <- function(query_spectrum, target_spectrum, map) {
+  gnps_wrapper(
+    x = query_spectrum[map[[1L]], , drop = FALSE],
+    y = target_spectrum[map[[2L]], , drop = FALSE]
+  )
+}
+
 calculate_similarity <- function(
   method,
   query_spectrum,
@@ -100,17 +150,7 @@ calculate_similarity <- function(
   # ---- Method: Entropy ----
   if (method == "entropy") {
     result <- tryCatch(
-      msentropy::calculate_entropy_similarity(
-        peaks_a = query_spectrum,
-        peaks_b = target_spectrum,
-        min_mz = 0,
-        max_mz = 5000,
-        noise_threshold = 0,
-        ms2_tolerance_in_da = dalton,
-        ms2_tolerance_in_ppm = ppm,
-        max_peak_num = -1,
-        clean_spectra = TRUE
-      ),
+      .entropy_similarity_call(query_spectrum, target_spectrum, dalton, ppm),
       error = function(e) {
         log_warn("Entropy calculation failed: %s", e$message)
         if (return_matched_peaks) c(0.0, 0) else 0.0
@@ -123,14 +163,13 @@ calculate_similarity <- function(
   if (method == "gnps") {
     # Fused join + score in a single C call, O(n+m) chain-DP.
     result <- tryCatch(
-      gnps_chain_dp_wrapper(
-        x = query_spectrum,
-        y = target_spectrum,
-        xPrecursorMz = query_precursor,
-        yPrecursorMz = target_precursor,
-        tolerance = dalton,
-        ppm = ppm,
-        matchedPeaksCount = TRUE
+      .gnps_chain_dp_call(
+        query_spectrum = query_spectrum,
+        target_spectrum = target_spectrum,
+        query_precursor = query_precursor,
+        target_precursor = target_precursor,
+        dalton = dalton,
+        ppm = ppm
       ),
       error = function(e) {
         log_warn("GNPS computation failed: %s", e$message)
@@ -142,13 +181,7 @@ calculate_similarity <- function(
 
   # Cosine: two-step join + score
   map <- tryCatch(
-    MsCoreUtils::join(
-      x = query_spectrum[, 1L],
-      y = target_spectrum[, 1L],
-      tolerance = dalton,
-      ppm = ppm,
-      ...
-    ),
+    .join_spectra_call(query_spectrum, target_spectrum, dalton, ppm, ...),
     error = function(e) {
       log_warn("Peak matching failed: %s", e$message)
       list(integer(0L), integer(0L))
@@ -156,10 +189,7 @@ calculate_similarity <- function(
   )
 
   result <- tryCatch(
-    gnps_wrapper(
-      x = query_spectrum[map[[1L]], , drop = FALSE],
-      y = target_spectrum[map[[2L]], , drop = FALSE]
-    ),
+    .gnps_score_call(query_spectrum, target_spectrum, map),
     error = function(e) {
       log_warn("Similarity calculation failed: %s", e$message)
       c(0.0, 0, 0.0, 0.0)
