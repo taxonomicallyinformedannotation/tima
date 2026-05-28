@@ -103,6 +103,110 @@ test_that("calculate_similarity rejects negative tolerances", {
   )
 })
 
+test_that("calculate_similarity validates matrix inputs and column counts", {
+  expect_error(
+    calculate_similarity(
+      method = "cosine",
+      query_spectrum = as.list(TEST_QUERY),
+      target_spectrum = TEST_TARGET,
+      query_precursor = 1,
+      target_precursor = 2,
+      dalton = 0.01,
+      ppm = 10
+    ),
+    "must be matrices"
+  )
+
+  one_col <- matrix(c(100, 200), ncol = 1)
+  expect_error(
+    calculate_similarity(
+      method = "cosine",
+      query_spectrum = one_col,
+      target_spectrum = TEST_TARGET,
+      query_precursor = 1,
+      target_precursor = 2,
+      dalton = 0.01,
+      ppm = 10
+    ),
+    "at least 2 columns"
+  )
+})
+
+test_that("calculate_similarity returns safe fallbacks when backends error", {
+  expect_equal(
+    with_mocked_bindings(
+      .entropy_similarity_call = function(...) stop("entropy fail"),
+      log_warn = function(...) invisible(NULL),
+      calculate_similarity(
+        method = "entropy",
+        query_spectrum = TEST_QUERY,
+        target_spectrum = TEST_TARGET,
+        query_precursor = 250,
+        target_precursor = 300,
+        dalton = 0.01,
+        ppm = 10
+      )
+    ),
+    0
+  )
+
+  expect_equal(
+    with_mocked_bindings(
+      .gnps_chain_dp_call = function(...) stop("gnps fail"),
+      log_warn = function(...) invisible(NULL),
+      calculate_similarity(
+        method = "gnps",
+        query_spectrum = TEST_QUERY,
+        target_spectrum = TEST_TARGET,
+        query_precursor = 250,
+        target_precursor = 300,
+        dalton = 0.01,
+        ppm = 10,
+        return_matched_peaks = TRUE
+      )
+    ),
+    c(0, 0, 0, 0)
+  )
+
+  expect_equal(
+    with_mocked_bindings(
+      .join_spectra_call = function(...) stop("join fail"),
+      .gnps_score_call = function(query_spectrum, target_spectrum, map) c(0.75, 2, 0.7, 0.8),
+      log_warn = function(...) invisible(NULL),
+      calculate_similarity(
+        method = "cosine",
+        query_spectrum = TEST_QUERY,
+        target_spectrum = TEST_TARGET,
+        query_precursor = 250,
+        target_precursor = 300,
+        dalton = 0.01,
+        ppm = 10,
+        return_matched_peaks = TRUE
+      )
+    ),
+    c(0.75, 2, 0.7, 0.8)
+  )
+
+  expect_equal(
+    with_mocked_bindings(
+      .join_spectra_call = function(...) list(c(1L, 2L), c(1L, 2L)),
+      .gnps_score_call = function(query_spectrum, target_spectrum, map) stop("score fail"),
+      log_warn = function(...) invisible(NULL),
+      calculate_similarity(
+        method = "cosine",
+        query_spectrum = TEST_QUERY,
+        target_spectrum = TEST_TARGET,
+        query_precursor = 250,
+        target_precursor = 300,
+        dalton = 0.01,
+        ppm = 10,
+        return_matched_peaks = TRUE
+      )
+    ),
+    c(0, 0, 0, 0)
+  )
+})
+
 # test_that(
 #   skip("Not implemented")
 # )
