@@ -171,6 +171,121 @@ test_that("test-prepare_annotations_sirius validates numeric version", {
   )
 })
 
+test_that("test-prepare_annotations_sirius uses populated input branch when directory exists", {
+  s <- stage_structure_fixtures()
+  input_dir <- temp_test_dir("sirius_present")
+  out_ann <- file.path(input_dir, "ann.tsv")
+  out_can <- file.path(input_dir, "can.tsv")
+  out_for <- file.path(input_dir, "for.tsv")
+  exported <- list()
+
+  res <- with_mocked_bindings(
+    .prepare_sirius_annotations_table = function(...) {
+      tidytable::tidytable(feature_id = "F1")
+    },
+    split_sirius_results = function(table) {
+      list(
+        canopus = tidytable::tidytable(feature_id = table$feature_id),
+        formula = tidytable::tidytable(feature_id = table$feature_id),
+        structures = table
+      )
+    },
+    .export_sirius_outputs = function(splits, output_can, output_for, output_ann) {
+      exported[["can"]] <<- output_can
+      exported[["for"]] <<- output_for
+      exported[["ann"]] <<- output_ann
+      invisible(NULL)
+    },
+    log_operation = function(...) "ctx",
+    log_debug = function(...) invisible(NULL),
+    log_complete = function(...) invisible(NULL),
+    prepare_annotations_sirius(
+      input_directory = input_dir,
+      output_ann = out_ann,
+      output_can = out_can,
+      output_for = out_for,
+      sirius_version = "5",
+      str_stereo = s$stereo,
+      str_met = s$met,
+      str_tax_cla = s$cla,
+      str_tax_npc = s$npc
+    )
+  )
+
+  expect_identical(unname(res), c(out_can, out_for, out_ann))
+  expect_identical(exported$can, out_can)
+  expect_identical(exported[["for"]], out_for)
+  expect_identical(exported$ann, out_ann)
+})
+
+test_that("normalize and component helpers for SIRIUS annotations behave as expected", {
+  expect_identical(.normalize_sirius_input_directory(NULL), "Th1sd1rw0nt3x1st")
+  expect_identical(.normalize_sirius_input_directory("path"), "path")
+
+  tables <- list(
+    canopus = tidytable::tidytable(feature_id = "F1", raw = "can"),
+    formulas = tidytable::tidytable(feature_id = "F1", raw = "for"),
+    structures = tidytable::tidytable(id = "raw_id", mappingFeatureId = "F1"),
+    denovo = tidytable::tidytable(mappingFeatureId = "F1"),
+    spectral = tidytable::tidytable(feature_id = "F1")
+  )
+  summaries <- tidytable::tidytable(feature_id = "SUM1")
+
+  out <- with_mocked_bindings(
+    select_sirius_columns_canopus = function(x, sirius_version) tidytable::mutate(x, version = sirius_version),
+    select_sirius_columns_formulas = function(x, sirius_version) tidytable::mutate(x, version = sirius_version),
+    select_sirius_columns_structures = function(x, sirius_version) {
+      tidytable::select(x, tidytable::any_of(c("feature_id", "mappingFeatureId"))) |>
+        tidytable::mutate(version = sirius_version)
+    },
+    select_sirius_columns_spectral = function(x, sirius_version) tidytable::mutate(x, version = sirius_version),
+    harmonize_names_sirius = function(x) paste0("harm_", x),
+    .prepare_sirius_table_components(tables, summaries, sirius_version = "5")
+  )
+
+  expect_true(all(c("canopus", "formulas", "structures", "denovo", "spectral") %in% names(out)))
+  expect_true(any(out$structures$feature_id == "SUM1"))
+  expect_true(any(out$structures$feature_id == "harm_raw_id"))
+  expect_identical(out$denovo$feature_id, "F1")
+})
+
+test_that("prepare_sirius_annotations_table orchestrates joins and metadata selection", {
+  result <- with_mocked_bindings(
+    load_sirius_tables = function(input_directory, version) list(dummy = version),
+    load_sirius_summaries = function(input_directory) tidytable::tidytable(feature_id = "F1"),
+    .prepare_sirius_table_components = function(tables, summaries, sirius_version) {
+      list(
+        canopus = tidytable::tidytable(feature_id = "F1"),
+        formulas = tidytable::tidytable(feature_id = "F1"),
+        structures = tidytable::tidytable(feature_id = "F1"),
+        denovo = tidytable::tidytable(feature_id = "F1"),
+        spectral = tidytable::tidytable(feature_id = "F1")
+      )
+    },
+    join_sirius_annotation_tables = function(structures_prepared, formulas_prepared, canopus_prepared, denovo_prepared) {
+      tidytable::tidytable(feature_id = "F1")
+    },
+    merge_sirius_structures_with_spectral = function(structures_enriched, spectral, max_analog_abs_mz_error) {
+      tidytable::tidytable(feature_id = "F1", merged = TRUE)
+    },
+    select_annotations_columns = function(table, str_stereo, str_met, str_tax_cla, str_tax_npc) table,
+    log_debug = function(...) invisible(NULL),
+    .prepare_sirius_annotations_table(
+      input_directory = "dummy.zip",
+      sirius_version = "6",
+      max_analog_abs_mz_error = 0.01,
+      str_stereo = "stereo.tsv",
+      str_met = "metadata.tsv",
+      str_tax_cla = "cla.tsv",
+      str_tax_npc = "npc.tsv"
+    )
+  )
+
+  expect_true("candidate_structure_tax_cla_chemontid" %in% names(result))
+  expect_true("candidate_structure_tax_cla_01kin" %in% names(result))
+  expect_true(isTRUE(result$merged[[1L]]))
+})
+
 ## Internal Helper Tests ----
 
 test_that("validate_sirius_inputs validates version correctly", {
