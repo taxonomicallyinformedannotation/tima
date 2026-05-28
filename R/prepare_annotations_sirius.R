@@ -111,9 +111,7 @@ prepare_annotations_sirius <-
 
     log_debug("SIRIUS version: %s", sirius_version)
     # Handle missing input ----
-    if (is.null(input_directory)) {
-      input_directory <- "Th1sd1rw0nt3x1st"
-    }
+    input_directory <- .normalize_sirius_input_directory(input_directory)
     log_debug("SIRIUS directory: %s", input_directory)
     if (!file.exists(input_directory)) {
       log_warn(
@@ -121,77 +119,15 @@ prepare_annotations_sirius <-
       )
       table <- create_empty_sirius_annotations()
     } else {
-      # Load SIRIUS results ----
-      tables <- load_sirius_tables(input_directory, version = sirius_version)
-      summaries <- load_sirius_summaries(input_directory)
-      # Prepare tables ----
-      log_debug(
-        "Preparing CANOPUS, formulas, structures for version %s",
-        sirius_version
+      table <- .prepare_sirius_annotations_table(
+        input_directory = input_directory,
+        sirius_version = sirius_version,
+        max_analog_abs_mz_error = max_analog_abs_mz_error,
+        str_stereo = str_stereo,
+        str_met = str_met,
+        str_tax_cla = str_tax_cla,
+        str_tax_npc = str_tax_npc
       )
-      canopus_prepared <- tables$canopus |>
-        select_sirius_columns_canopus(sirius_version = sirius_version)
-      formulas_prepared <- tables$formulas |>
-        select_sirius_columns_formulas(sirius_version = sirius_version)
-      structures_prepared_summary <- summaries |>
-        select_sirius_columns_structures(sirius_version = sirius_version)
-      structures_prepared_main <- tables$structures |>
-        tidytable::mutate(
-          feature_id = switch(
-            sirius_version,
-            "5" = harmonize_names_sirius(id),
-            "6" = mappingFeatureId
-          )
-        ) |>
-        select_sirius_columns_structures(sirius_version = sirius_version)
-      structures_prepared <- tidytable::bind_rows(
-        structures_prepared_summary,
-        structures_prepared_main
-      ) |>
-        tidytable::distinct()
-      denovo_prepared <- tables$denovo |>
-        tidytable::mutate(feature_id = mappingFeatureId) |>
-        select_sirius_columns_structures(sirius_version = sirius_version)
-      spectral_prepared <- tables$spectral |>
-        select_sirius_columns_spectral(sirius_version = sirius_version)
-      log_debug("Joining SIRIUS results")
-
-      structures_enriched <- join_sirius_annotation_tables(
-        structures_prepared = structures_prepared,
-        formulas_prepared = formulas_prepared,
-        canopus_prepared = canopus_prepared,
-        denovo_prepared = denovo_prepared
-      )
-
-      merged_structures <- merge_sirius_structures_with_spectral(
-        structures_enriched,
-        spectral_prepared,
-        max_analog_abs_mz_error = max_analog_abs_mz_error
-      )
-      table <- merged_structures |>
-        tidytable::mutate(
-          candidate_structure_tax_cla_chemontid = NA_character_,
-          candidate_structure_tax_cla_01kin = NA_character_
-        )
-      rm(
-        canopus_prepared,
-        formulas_prepared,
-        structures_prepared,
-        structures_enriched,
-        merged_structures,
-        denovo_prepared,
-        spectral_prepared,
-        tables,
-        summaries
-      )
-      log_debug("Selecting annotation columns and integrating metadata")
-      table <- table |>
-        select_annotations_columns(
-          str_stereo = str_stereo,
-          str_met = str_met,
-          str_tax_cla = str_tax_cla,
-          str_tax_npc = str_tax_npc
-        )
     }
     # Split and export ----
     log_debug(
@@ -206,13 +142,12 @@ prepare_annotations_sirius <-
       n_structures = nrow(splits$structures)
     )
 
-    export_params(
-      parameters = get_params(step = "prepare_annotations_sirius"),
-      step = "prepare_annotations_sirius"
+    .export_sirius_outputs(
+      splits = splits,
+      output_can = output_can,
+      output_for = output_for,
+      output_ann = output_ann
     )
-    export_output(x = splits$canopus, file = output_can)
-    export_output(x = splits$formula, file = output_for)
-    export_output(x = splits$structures, file = output_ann[[1L]])
 
     invisible(c(
       "canopus" = output_can,
@@ -221,19 +156,143 @@ prepare_annotations_sirius <-
     ))
   }
 
+.normalize_sirius_input_directory <- function(input_directory) {
+  if (is.null(input_directory)) {
+    return("Th1sd1rw0nt3x1st")
+  }
+  input_directory
+}
+
+.prepare_sirius_annotations_table <- function(
+  input_directory,
+  sirius_version,
+  max_analog_abs_mz_error,
+  str_stereo,
+  str_met,
+  str_tax_cla,
+  str_tax_npc
+) {
+  tables <- load_sirius_tables(input_directory, version = sirius_version)
+  summaries <- load_sirius_summaries(input_directory)
+
+  log_debug(
+    "Preparing CANOPUS, formulas, structures for version %s",
+    sirius_version
+  )
+
+  prepared <- .prepare_sirius_table_components(
+    tables = tables,
+    summaries = summaries,
+    sirius_version = sirius_version
+  )
+
+  log_debug("Joining SIRIUS results")
+  structures_enriched <- join_sirius_annotation_tables(
+    structures_prepared = prepared$structures,
+    formulas_prepared = prepared$formulas,
+    canopus_prepared = prepared$canopus,
+    denovo_prepared = prepared$denovo
+  )
+
+  merged_structures <- merge_sirius_structures_with_spectral(
+    structures_enriched,
+    prepared$spectral,
+    max_analog_abs_mz_error = max_analog_abs_mz_error
+  )
+
+  table <- merged_structures |>
+    tidytable::mutate(
+      candidate_structure_tax_cla_chemontid = NA_character_,
+      candidate_structure_tax_cla_01kin = NA_character_
+    )
+
+  log_debug("Selecting annotation columns and integrating metadata")
+  select_annotations_columns(
+    table,
+    str_stereo = str_stereo,
+    str_met = str_met,
+    str_tax_cla = str_tax_cla,
+    str_tax_npc = str_tax_npc
+  )
+}
+
+.prepare_sirius_table_components <- function(
+  tables,
+  summaries,
+  sirius_version
+) {
+  canopus_prepared <- tables$canopus |>
+    select_sirius_columns_canopus(sirius_version = sirius_version)
+
+  formulas_prepared <- tables$formulas |>
+    select_sirius_columns_formulas(sirius_version = sirius_version)
+
+  structures_prepared_summary <- summaries |>
+    select_sirius_columns_structures(sirius_version = sirius_version)
+
+  structures_prepared_main <- tables$structures |>
+    tidytable::mutate(
+      feature_id = switch(
+        sirius_version,
+        "5" = harmonize_names_sirius(id),
+        "6" = mappingFeatureId
+      )
+    ) |>
+    select_sirius_columns_structures(sirius_version = sirius_version)
+
+  structures_prepared <- tidytable::bind_rows(
+    structures_prepared_summary,
+    structures_prepared_main
+  ) |>
+    tidytable::distinct()
+
+  denovo_prepared <- tables$denovo |>
+    tidytable::mutate(feature_id = mappingFeatureId) |>
+    select_sirius_columns_structures(sirius_version = sirius_version)
+
+  spectral_prepared <- tables$spectral |>
+    select_sirius_columns_spectral(sirius_version = sirius_version)
+
+  list(
+    canopus = canopus_prepared,
+    formulas = formulas_prepared,
+    structures = structures_prepared,
+    denovo = denovo_prepared,
+    spectral = spectral_prepared
+  )
+}
+
+.export_sirius_outputs <- function(splits, output_can, output_for, output_ann) {
+  export_params(
+    parameters = get_params(step = "prepare_annotations_sirius"),
+    step = "prepare_annotations_sirius"
+  )
+  export_output(x = splits$canopus, file = output_can)
+  export_output(x = splits$formula, file = output_for)
+  export_output(x = splits$structures, file = output_ann[[1L]])
+}
+
+.read_sirius_tabular <- function(con) {
+  utils::read.delim(
+    con,
+    quote = "",
+    na.strings = c("", "NA"),
+    colClasses = "character",
+    stringsAsFactors = FALSE
+  ) |>
+    tidytable::tidytable()
+}
+
 read_sirius_internal_file <- function(input_directory, internal_file) {
   from_zip <- tryCatch(
     {
       archive::archive_read(archive = input_directory, file = internal_file) |>
-        utils::read.delim(
-          quote = "",
-          na.strings = c("", "NA"),
-          colClasses = "character",
-          stringsAsFactors = FALSE
-        ) |>
-        tidytable::tidytable()
+        .read_sirius_tabular()
     },
-    error = function(e) NULL
+    error = function(e) {
+      invisible(e)
+      NULL
+    }
   )
 
   if (!is.null(from_zip)) {
@@ -245,12 +304,5 @@ read_sirius_internal_file <- function(input_directory, internal_file) {
     return(tidytable::tidytable())
   }
 
-  utils::read.delim(
-    file = path,
-    quote = "",
-    na.strings = c("", "NA"),
-    colClasses = "character",
-    stringsAsFactors = FALSE
-  ) |>
-    tidytable::tidytable()
+  .read_sirius_tabular(path)
 }

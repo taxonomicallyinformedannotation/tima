@@ -151,6 +151,7 @@ load_sirius_tables <- function(input_directory, version) {
   files <- tryCatch(
     utils::unzip(zipfile = input_directory, list = TRUE),
     error = function(e) {
+      invisible(e)
       out <- list()
       out$Name <- list.files(input_directory, recursive = TRUE)
       out
@@ -205,7 +206,8 @@ load_sirius_tables <- function(input_directory, version) {
 load_sirius_summaries <- function(input_directory) {
   zip_list <- tryCatch(
     utils::unzip(zipfile = input_directory, list = TRUE),
-    error = function(...) {
+    error = function(e) {
+      invisible(e)
       out <- list()
       out$Name <- list.files(input_directory)
       out
@@ -441,6 +443,26 @@ merge_sirius_structures_with_spectral <- function(
       !is.na(candidate_structure_smiles_no_stereo)
     )
 
+  structure_keys <- structures_keyed |>
+    tidytable::select(tidyselect::any_of(join_key)) |>
+    tidytable::distinct()
+
+  spectral_overlap_keyed <- spectral_keyed |>
+    tidytable::semi_join(structure_keys, by = join_key)
+
+  spectral_non_overlap_keyed <- spectral_keyed |>
+    tidytable::anti_join(structure_keys, by = join_key)
+
+  spectral_overlap_keyed <- .reduce_sirius_spectral_candidates(
+    spectral_overlap_keyed,
+    join_key = join_key
+  )
+
+  spectral_keyed <- tidytable::bind_rows(
+    spectral_overlap_keyed,
+    spectral_non_overlap_keyed
+  )
+
   spectral_no_key <- spectral_typed |>
     tidytable::filter(
       is.na(feature_id) | is.na(candidate_structure_smiles_no_stereo)
@@ -548,7 +570,76 @@ merge_sirius_structures_with_spectral <- function(
     tidytable::select(tidyselect::any_of(c(by, new_cols))) |>
     tidytable::distinct()
 
+  # Prevent join fan-out when payload has multiple rows for the same key.
+  y_reduced <- y_reduced |>
+    tidytable::distinct(tidyselect::any_of(by), .keep_all = TRUE)
+
   tidytable::left_join(x, y_reduced, by = by)
+}
+
+.reduce_sirius_spectral_candidates <- function(spectral_keyed, join_key) {
+  if (nrow(spectral_keyed) == 0L) {
+    return(spectral_keyed)
+  }
+
+  join_syms <- rlang::syms(join_key)
+
+  spectral_keyed |>
+    tidytable::mutate(
+      .sim_rank = tidytable::if_else(
+        is.na(candidate_score_similarity),
+        -Inf,
+        candidate_score_similarity
+      ),
+      .peak_rank = tidytable::if_else(
+        is.na(candidate_count_similarity_peaks_matched),
+        -Inf,
+        as.numeric(candidate_count_similarity_peaks_matched)
+      )
+    ) |>
+    tidytable::arrange(
+      !!!join_syms,
+      tidytable::desc(.sim_rank),
+      tidytable::desc(.peak_rank)
+    ) |>
+    tidytable::distinct(
+      !!!join_syms,
+      .keep_all = TRUE
+    ) |>
+    tidytable::select(-.sim_rank, -.peak_rank)
+}
+
+.build_formula_error_fallback <- function(formulas_prepared) {
+  formulas_prepared |>
+    tidytable::filter(!is.na(feature_id)) |>
+    tidytable::mutate(
+      candidate_structure_error_mz = as.numeric(candidate_structure_error_mz)
+    ) |>
+    tidytable::filter(!is.na(candidate_structure_error_mz)) |>
+    tidytable::arrange(feature_id, abs(candidate_structure_error_mz)) |>
+    tidytable::distinct(feature_id, .keep_all = TRUE) |>
+    tidytable::select(
+      feature_id,
+      candidate_structure_error_mz_fallback = candidate_structure_error_mz
+    )
+}
+
+.apply_candidate_error_mz_fallback <- function(df, formula_error_fallback) {
+  if (!"candidate_structure_error_mz" %in% names(df)) {
+    df <- df |>
+      tidytable::mutate(candidate_structure_error_mz = NA_real_)
+  }
+
+  df |>
+    tidytable::left_join(formula_error_fallback, by = "feature_id") |>
+    tidytable::mutate(
+      candidate_structure_error_mz = ifelse(
+        is.na(as.numeric(candidate_structure_error_mz)),
+        candidate_structure_error_mz_fallback,
+        as.numeric(candidate_structure_error_mz)
+      )
+    ) |>
+    tidytable::select(-candidate_structure_error_mz_fallback)
 }
 
 join_sirius_annotation_tables <- function(
@@ -638,53 +729,19 @@ join_sirius_annotation_tables <- function(
 
   # Build fallback mz error from formula-level data (best match per feature)
   # This is used for both de novo and structure candidates that lack mz_error.
-  formula_error_fallback <- formulas_prepared |>
-    tidytable::filter(!is.na(feature_id)) |>
-    tidytable::mutate(
-      candidate_structure_error_mz = as.numeric(candidate_structure_error_mz)
-    ) |>
-    tidytable::filter(!is.na(candidate_structure_error_mz)) |>
-    tidytable::arrange(feature_id, abs(candidate_structure_error_mz)) |>
-    tidytable::distinct(feature_id, .keep_all = TRUE) |>
-    tidytable::select(
-      feature_id,
-      candidate_structure_error_mz_fallback = candidate_structure_error_mz
-    )
+  formula_error_fallback <- .build_formula_error_fallback(formulas_prepared)
 
-  # Apply fallback to structures that are missing mz_error
-  if (!"candidate_structure_error_mz" %in% names(structures_enriched)) {
-    structures_enriched <- structures_enriched |>
-      tidytable::mutate(candidate_structure_error_mz = NA_real_)
-  }
-
-  structures_with_fallback <- structures_enriched |>
-    tidytable::left_join(formula_error_fallback, by = "feature_id") |>
-    tidytable::mutate(
-      candidate_structure_error_mz = ifelse(
-        is.na(as.numeric(candidate_structure_error_mz)),
-        candidate_structure_error_mz_fallback,
-        as.numeric(candidate_structure_error_mz)
-      )
-    ) |>
-    tidytable::select(-candidate_structure_error_mz_fallback)
+  structures_with_fallback <- .apply_candidate_error_mz_fallback(
+    structures_enriched,
+    formula_error_fallback
+  )
 
   # Some de novo candidates can miss adduct/formula keys and therefore bypass
   # strict formula joins; backfill mz error from the formula-level feature row.
-  if (!"candidate_structure_error_mz" %in% names(denovo_only_enriched)) {
-    denovo_only_enriched <- denovo_only_enriched |>
-      tidytable::mutate(candidate_structure_error_mz = NA_real_)
-  }
-
-  denovo_only_enriched <- denovo_only_enriched |>
-    tidytable::left_join(formula_error_fallback, by = "feature_id") |>
-    tidytable::mutate(
-      candidate_structure_error_mz = ifelse(
-        is.na(as.numeric(candidate_structure_error_mz)),
-        candidate_structure_error_mz_fallback,
-        as.numeric(candidate_structure_error_mz)
-      )
-    ) |>
-    tidytable::select(-candidate_structure_error_mz_fallback)
+  denovo_only_enriched <- .apply_candidate_error_mz_fallback(
+    denovo_only_enriched,
+    formula_error_fallback
+  )
 
   tidytable::bind_rows(structures_with_fallback, denovo_only_enriched) |>
     tidytable::distinct()

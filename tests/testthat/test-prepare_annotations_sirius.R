@@ -691,6 +691,37 @@ test_that("merge_sirius_structures_with_spectral can keep high-error analogs whe
   expect_true(any(out$candidate_library == "SIRIUS spectral (analog)"))
 })
 
+test_that("merge_sirius_structures_with_spectral collapses duplicate keyed spectral hits", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_library = "SIRIUS",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
+    candidate_structure_smiles_no_stereo = "CCO"
+  )
+
+  spectral_prepared <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    candidate_library = c("SIRIUS spectral", "SIRIUS spectral"),
+    candidate_adduct = c("[M+H]+", "[M+H]+"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "ABCDEFGHIJKLMN",
+      "ABCDEFGHIJKLMN"
+    ),
+    candidate_structure_smiles_no_stereo = c("CCO", "CCO"),
+    candidate_score_similarity = c("0.81", "0.92"),
+    candidate_count_similarity_peaks_matched = c("10", "8")
+  )
+
+  out <- merge_sirius_structures_with_spectral(
+    structures_prepared,
+    spectral_prepared
+  )
+
+  expect_equal(nrow(out), 1L)
+  expect_equal(as.numeric(out$candidate_score_similarity[[1L]]), 0.92)
+})
+
 test_that("join_sirius_annotation_tables keeps formula mz error on structure rows", {
   structures_prepared <- tidytable::tidytable(
     feature_id = "F1",
@@ -734,6 +765,37 @@ test_that("join_sirius_annotation_tables keeps formula mz error on structure row
   expect_equal(nrow(out), 1L)
   expect_equal(as.numeric(out$candidate_structure_error_mz[[1L]]), 0.0012)
   expect_equal(out$feature_pred_tax_npc_01pat_val[[1L]], "Alkaloids")
+})
+
+test_that("join_sirius_annotation_tables does not fan out on duplicate formula keys", {
+  structures_prepared <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_adduct = "[M+H]+",
+    candidate_structure_molecular_formula = "C10H12N2",
+    candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
+    candidate_score_sirius_csi = "-25"
+  )
+
+  formulas_prepared <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    candidate_adduct = c("[M+H]+", "[M+H]+"),
+    candidate_structure_molecular_formula = c("C10H12N2", "C10H12N2"),
+    candidate_structure_error_mz = c(0.0012, 0.0045),
+    candidate_score_sirius_sirius = c(15, 12)
+  )
+
+  canopus_prepared <- tidytable::tidytable(feature_id = "F1")
+  denovo_prepared <- tidytable::tidytable(feature_id = character())
+
+  out <- join_sirius_annotation_tables(
+    structures_prepared = structures_prepared,
+    formulas_prepared = formulas_prepared,
+    canopus_prepared = canopus_prepared,
+    denovo_prepared = denovo_prepared
+  )
+
+  expect_equal(nrow(out), 1L)
+  expect_equal(out$feature_id[[1L]], "F1")
 })
 
 test_that("join_sirius_annotation_tables retains de novo-only candidates", {
