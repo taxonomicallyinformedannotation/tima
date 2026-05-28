@@ -94,3 +94,58 @@ test_that("plan_mztab_app_outputs preserves explicit core files", {
     file.path(data_source, "study_metadata.tsv")
   )
 })
+
+test_that("plan_mztab_app_outputs returns existing files unchanged when mztab is missing", {
+  plan <- plan_mztab_app_outputs(
+    mztab_path = "",
+    data_source_path = tempdir(),
+    features_path = "features.tsv",
+    spectra_path = "spectra.mgf",
+    metadata_path = "metadata.tsv"
+  )
+
+  expect_false(plan$needs_read)
+  expect_false(plan$all_cached)
+  expect_identical(plan$resolved$features, "features.tsv")
+  expect_identical(plan$resolved$spectra, "spectra.mgf")
+  expect_identical(plan$resolved$metadata, "metadata.tsv")
+  expect_null(plan$write$features)
+  expect_null(plan$write$spectra)
+  expect_null(plan$write$metadata)
+  expect_null(plan$outputs$features)
+  expect_null(plan$outputs$spectra)
+  expect_null(plan$outputs$metadata)
+})
+
+test_that("plan_mztab_app_outputs requests all outputs when nothing is cached", {
+  tmpdir <- tempfile("mztab_app_utils_missing_")
+  dir.create(tmpdir)
+  data_source <- file.path(tmpdir, "data", "source")
+  dir.create(data_source, recursive = TRUE, showWarnings = FALSE)
+
+  mztab <- file.path(data_source, "study.mztab")
+  file.create(mztab)
+
+  plan <- plan_mztab_app_outputs(
+    mztab_path = mztab,
+    data_source_path = data_source
+  )
+
+  expect_true(plan$needs_read)
+  expect_false(plan$all_cached)
+  expect_null(plan$resolved$features)
+  expect_null(plan$resolved$spectra)
+  expect_null(plan$resolved$metadata)
+  expect_identical(
+    plan$write$features,
+    file.path(data_source, "study_features.tsv")
+  )
+  expect_identical(
+    plan$write$spectra,
+    file.path(data_source, "study_spectra.mgf")
+  )
+  expect_identical(
+    plan$write$metadata,
+    file.path(data_source, "study_metadata.tsv")
+  )
+})

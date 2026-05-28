@@ -159,3 +159,24 @@ test_that("count_if with complex predicates", {
   expect_equal(count_if(vals, is.null), 1L)
   expect_equal(count_if(vals, is.logical), 1L)
 })
+
+test_that("is_null_or_proportion validates NULL and probabilities", {
+  expect_true(is_null_or_proportion(NULL))
+  expect_true(is_null_or_proportion(0))
+  expect_true(is_null_or_proportion(0.5))
+  expect_true(is_null_or_proportion(1))
+
+  expect_false(is_null_or_proportion(-0.1))
+  expect_false(is_null_or_proportion(1.1))
+  expect_false(is_null_or_proportion("0.5"))
+  expect_false(is_null_or_proportion(c(0.2, 0.3)))
+  expect_false(is_null_or_proportion(NA_real_))
+})
+
+test_that("validate_all_with_predicate rejects unnamed inputs", {
+  expect_error(
+    validate_all_with_predicate("not a list", is_single_string),
+    "must be a named list",
+    class = "tima_validation_error"
+  )
+})

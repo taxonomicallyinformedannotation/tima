@@ -64,28 +64,37 @@ test_that("fake_ecmdb handles zip creation failures gracefully", {
 test_that("fake_ecmdb calls fallback zip when system zip command fails", {
   withr::local_dir(tempdir())
   temp_file <- withr::local_tempfile(fileext = ".json.zip")
-  fallback_called <- FALSE
-
-  with_mocked_bindings(
-    .fake_zip_cmd = function(export, fake_export) 1L,
-    .fake_zip_fallback = function(export, fake_export) {
-      fallback_called <<- TRUE
-      file.create(basename(export))
-      invisible(NULL)
-    },
-    .fake_archive_exists = function(export) TRUE,
-    move_file_safely = function(from, to) {
-      file.create(to)
-      TRUE
-    },
-    log_warn = function(...) invisible(NULL),
-    log_debug = function(...) invisible(NULL),
-    {
-      expect_equal(fake_ecmdb(export = temp_file), temp_file)
-    }
+  shim_dir <- tempfile(pattern = "fake_zip_shim_")
+  dir.create(shim_dir)
+  shim_zip <- file.path(shim_dir, "zip")
+  writeLines(
+    c(
+      "#!/bin/sh",
+      "first=\"$1\"",
+      "case \"$first\" in",
+      "  -*)",
+      "    zipfile=\"\"",
+      "    for arg in \"$@\"; do",
+      "      case \"$arg\" in",
+      "        -*) continue ;;",
+      "        *) zipfile=\"$arg\"; break ;;",
+      "      esac",
+      "    done",
+      "    : > \"$zipfile\"",
+      "    exit 0",
+      "    ;;",
+      "  *)",
+      "    exit 1",
+      "    ;;",
+      "esac"
+    ),
+    shim_zip
   )
+  Sys.chmod(shim_zip, mode = "0755")
+  withr::local_envvar(PATH = paste(shim_dir, Sys.getenv("PATH"), sep = ":"))
 
-  expect_true(fallback_called)
+  expect_equal(fake_ecmdb(export = temp_file), temp_file)
+  expect_true(file.exists(temp_file))
 })
 
 test_that("fake_ecmdb errors when temporary archive cannot be moved", {

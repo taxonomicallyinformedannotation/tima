@@ -43,6 +43,26 @@ test_that("compute_weighted_sum matches original formula at full coverage", {
   expect_equal(result, expected)
 })
 
+test_that("compute_weighted_sum rejects invalid inputs", {
+  expect_error(
+    compute_weighted_sum(1, 2, weights = c(1)),
+    "number of value vectors must equal number of weights",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    compute_weighted_sum(1, "x", weights = c(1, 1)),
+    "all value vectors must be numeric",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    compute_weighted_sum(1, 2, weights = c(1, -1)),
+    "weights must be numeric and non-negative",
+    class = "tima_validation_error"
+  )
+})
+
 test_that("compute_weighted_sum applies coverage discount for NA", {
   # When one component is NA, weights renormalize AND coverage discount applies
   v1 <- c(0.8, NA, 0.9) # biological score
@@ -72,6 +92,12 @@ test_that("compute_weighted_sum returns NA for all-NA rows", {
 
   expect_true(is.na(result[1]))
   expect_equal(result[2], (0.8 * 0.5 + 0.6 * 0.5) / (0.5 + 0.5))
+})
+
+test_that("compute_weighted_sum returns NA when all weights are zero", {
+  result <- compute_weighted_sum(c(1, 2), c(3, 4), weights = c(0, 0))
+
+  expect_true(all(is.na(result)))
 })
 
 test_that("compute_weighted_sum MS1-only scores lower than full evidence", {

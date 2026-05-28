@@ -291,6 +291,22 @@ test_that("ensure_cache_exists handles existing directory", {
   unlink(cache_path, recursive = TRUE)
 })
 
+test_that("ensure_cache_exists errors when cache path cannot be created", {
+  with_temp_wd({
+    parent_file <- tempfile(pattern = "cache_parent_")
+    writeLines("not a directory", parent_file)
+    bad_cache <- file.path(parent_file, "child")
+
+    expect_error(
+      ensure_cache_exists(bad_cache),
+      "cannot create cache directory",
+      class = "tima_runtime_error"
+    )
+
+    unlink(parent_file)
+  })
+})
+
 test_that("change_to_cache changes directory", {
   with_temp_wd({
     test_dir <- file.path(tempdir(), paste0("test_change_", Sys.getpid()))
