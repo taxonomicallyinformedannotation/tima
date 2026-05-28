@@ -17,15 +17,18 @@ from chembl_structure_pipeline import standardizer
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import List, Optional, Tuple, Any, Iterable
-from rdkit import RDLogger
+from rdkit import rdBase
 from rdkit.Chem import (
     MolToSmiles,
     MolToInchiKey,
     RemoveStereochemistry,
     SmilesMolSupplier,
 )
-from rdkit.Chem.Descriptors import ExactMolWt, MolLogP
-from rdkit.Chem.rdMolDescriptors import CalcMolFormula
+from rdkit.Chem.rdMolDescriptors import (
+    CalcCrippenDescriptors,
+    CalcExactMolWt,
+    CalcMolFormula,
+)
 
 
 # =====================================================================================
@@ -102,22 +105,22 @@ def get_logger(name: str = __name__, level: int = DEFAULT_LOG_LEVEL) -> logging.
     logging.Logger
         Retrieved logger.
     """
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    if not logger.handlers:
+    configured_logger = logging.getLogger(name)
+    configured_logger.setLevel(level)
+    if not configured_logger.handlers:
         console_handler = logging.StreamHandler(sys.stderr)
         formatter = MillisecondFormatter(LOG_FORMAT, datefmt=LOG_DATE_FORMAT)
         console_handler.setFormatter(formatter)
         console_handler.setLevel(level)
-        logger.addHandler(console_handler)
-    return logger
+        configured_logger.addHandler(console_handler)
+    return configured_logger
 
 
 # Use module-level logger but allow injection into functions
 logger = get_logger()
 
 # Silence RDKit warnings (can be re-enabled by tests if needed)
-RDLogger.DisableLog("rdApp.warning")
+rdBase.DisableLog("rdApp.warning")
 
 
 # =====================================================================================
@@ -229,8 +232,8 @@ def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
         smiles = MolToSmiles(m)
         inchikey = MolToInchiKey(m)
         formula = CalcMolFormula(m, separateIsotopes=True)
-        exact_mass = ExactMolWt(m)
-        xlogp = MolLogP(m)
+        exact_mass = CalcExactMolWt(m)
+        xlogp, _ = CalcCrippenDescriptors(m)
 
         # Create stereo-removed version without copying the original molecule
         RemoveStereochemistry(m)
@@ -289,7 +292,7 @@ def process_batch(
     executor: ThreadPoolExecutor,
     batch: Iterable[Any],
     original_smiles_list: Iterable[str],
-    writer: csv.writer,
+    writer: Any,
     current_count: int,
     progress_interval: int,
     *,
