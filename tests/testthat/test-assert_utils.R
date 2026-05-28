@@ -57,6 +57,11 @@ test_that("assert_positive_integer errors on zero by default", {
 test_that("assert_positive_integer errors on negative values", {
   expect_error(assert_positive_integer(-1L), class = "tima_error")
   expect_error(assert_positive_integer(-100), class = "tima_error")
+  expect_error(
+    assert_positive_integer(-1L, allow_zero = TRUE),
+    ">= 0",
+    class = "tima_error"
+  )
 })
 
 test_that("assert_positive_integer errors on non-integer values", {

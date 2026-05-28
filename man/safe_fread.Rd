@@ -4,7 +4,13 @@
 \alias{safe_fread}
 \title{Safe Data Loading with Error Messages}
 \usage{
-safe_fread(file, file_type = "data file", required_cols = NULL, ...)
+safe_fread(
+  file,
+  file_type = "data file",
+  required_cols = NULL,
+  .reader = .safe_fread_read,
+  ...
+)
 }
 \arguments{
 \item{file}{\link{character} Character path to file}

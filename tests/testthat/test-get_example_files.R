@@ -2,6 +2,31 @@
 
 library(testthat)
 
+with_overridden_tima_bindings <- function(bindings, code) {
+  ns <- asNamespace("tima")
+  old <- list()
+
+  for (nm in names(bindings)) {
+    old[[nm]] <- get(nm, envir = ns)
+    unlockBinding(nm, ns)
+    assign(nm, bindings[[nm]], envir = ns)
+    lockBinding(nm, ns)
+  }
+
+  on.exit(
+    {
+      for (nm in names(old)) {
+        unlockBinding(nm, ns)
+        assign(nm, old[[nm]], envir = ns)
+        lockBinding(nm, ns)
+      }
+    },
+    add = TRUE
+  )
+
+  force(code)
+}
+
 test_that("get_example_files validates inputs", {
   expect_error(
     get_example_files(example = numeric()),
@@ -22,6 +47,48 @@ test_that("get_example_files validates inputs", {
     get_example_files(in_cache = "yes"),
     "in_cache.*single logical value"
   )
+})
+
+test_that("get_example_files orchestrates wrapper dependencies", {
+  skip_on_covr()
+
+  calls <- new.env(parent = emptyenv())
+  calls$get_file <- 0L
+  calls$get_example_sirius <- 0L
+  calls$go_to_cache <- 0L
+
+  out <- with_overridden_tima_bindings(
+    bindings = list(
+      get_file = function(url, export) {
+        force(url)
+        force(export)
+        calls$get_file <- calls$get_file + 1L
+        invisible(export)
+      },
+      get_example_sirius = function(url, export) {
+        force(url)
+        force(export)
+        calls$get_example_sirius <- calls$get_example_sirius + 1L
+        invisible(export)
+      },
+      go_to_cache = function(...) {
+        calls$go_to_cache <- calls$go_to_cache + 1L
+        invisible("~/.tima")
+      },
+      log_debug = function(...) invisible(NULL),
+      log_info = function(...) invisible(NULL)
+    ),
+    code = withVisible(get_example_files(
+      example = "features",
+      in_cache = FALSE
+    ))
+  )
+
+  expect_false(out$visible)
+  expect_null(out$value)
+  expect_equal(calls$get_file, 1L)
+  expect_equal(calls$get_example_sirius, 0L)
+  expect_equal(calls$go_to_cache, 0L)
 })
 
 test_that("get_example_files dispatches requested downloads without cache", {
