@@ -13,6 +13,40 @@ library(testthat)
   generate_adduct_hypotheses(spec, polarity = "pos")
 }
 
+test_that("empty_evidence_table returns the expected typed schema", {
+  out <- empty_evidence_table()
+
+  expect_s3_class(out, "data.frame")
+  expect_equal(nrow(out), 0L)
+  expect_named(
+    out,
+    c(
+      "feature_id",
+      "rt",
+      "mz",
+      "sample",
+      "adduct",
+      "n_mer",
+      "z",
+      "adduct_mass",
+      "n_iso",
+      "implied_M",
+      "nearest_mass_error_ppm",
+      "mass_cluster",
+      "rt_cluster",
+      "evidence_cluster",
+      "n_evidence_features",
+      "evidence_count",
+      "evidence_score",
+      "candidate_adduct_origin",
+      "source"
+    )
+  )
+  expect_type(out$feature_id, "character")
+  expect_type(out$rt, "double")
+  expect_type(out$n_mer, "integer")
+})
+
 test_that("implied_neutral_mass inverts m/z for canonical adducts", {
   M <- 180.0634
   u <- .mini_universe()
@@ -150,6 +184,36 @@ test_that("evidence edges connect coadducted features", {
   ))
   # Edges are directional: lower-mz feature is source
   expect_true(all(edges$feature_id == "A"))
+})
+
+test_that("build_evidence_edges returns an empty edge table for empty input", {
+  edges <- build_evidence_edges(empty_evidence_table())
+
+  expect_s3_class(edges, "data.frame")
+  expect_equal(nrow(edges), 0L)
+  expect_named(
+    edges,
+    c("feature_id", "adduct", "feature_id_dest", "adduct_dest")
+  )
+})
+
+test_that("build_evidence_edges returns an empty edge table when no clusters are present", {
+  hyps <- tidytable::tidytable(
+    feature_id = c("A", "B"),
+    mz = c(100, 200),
+    adduct = c("[M+H]+", "[M+Na]+"),
+    evidence_cluster = c(NA_character_, NA_character_),
+    evidence_count = c(1L, 2L)
+  )
+
+  edges <- build_evidence_edges(hyps)
+
+  expect_s3_class(edges, "data.frame")
+  expect_equal(nrow(edges), 0L)
+  expect_named(
+    edges,
+    c("feature_id", "adduct", "feature_id_dest", "adduct_dest")
+  )
 })
 
 test_that("baseline hypothesis is enforced even without peer evidence", {

@@ -53,4 +53,3 @@ test_that("get_default_paths creates missing nested nodes for override", {
 
   expect_identical(paths$data$interim$params$path, "generated/path")
 })
-

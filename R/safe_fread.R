@@ -131,4 +131,3 @@ safe_fread <- function(
 .safe_fread_read <- function(file, ...) {
   tidytable::fread(file = file, ...)
 }
-

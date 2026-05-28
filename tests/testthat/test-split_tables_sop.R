@@ -29,8 +29,8 @@ library(testthat)
         "C2H6O"
       ),
       structure_exact_mass = tidytable::coalesce(
-        as.character(structure_exact_mass),
-        "46.0419"
+        structure_exact_mass,
+        46.0419
       )
     ) |>
     tidytable::select(
@@ -242,7 +242,10 @@ test_that("split_tables_sop handles cache parameter", {
 
       # With cache path (file doesn't need to exist)
       cache_file <- file.path(tempdir(), "test_cache.tsv")
-      result_with_cache <- split_tables_sop(table = sop_table, cache = cache_file)
+      result_with_cache <- split_tables_sop(
+        table = sop_table,
+        cache = cache_file
+      )
       expect_type(result_with_cache, "list")
     }
   )
@@ -302,7 +305,7 @@ test_that("split_tables_sop collapses multi-source structure names and taxonomy"
           structure_inchikey = "AAAAAAAAAAAAAA-BBBBBBBBBB-N",
           structure_inchikey_connectivity_layer = "AAAAAAAAAAAAAA",
           structure_molecular_formula = "C3H8O",
-          structure_exact_mass = "60.0575",
+          structure_exact_mass = 60.0575,
           structure_xlogp = c("1.0", NA_character_)
         ) |>
         tidytable::select(
@@ -353,7 +356,7 @@ test_that("split_tables_sop handles missing optional structure columns", {
           structure_inchikey = "CCCCCCCCCCCCCC-DDDDDDDDDD-N",
           structure_inchikey_connectivity_layer = "CCCCCCCCCCCCCC",
           structure_molecular_formula = "C2H6O",
-          structure_exact_mass = "46.0419"
+          structure_exact_mass = 46.0419
         ) |>
         tidytable::select(
           structure_smiles_initial,
