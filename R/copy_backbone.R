@@ -1,3 +1,11 @@
+.copy_backbone_dir_create <- function(path) {
+  fs::dir_create(path = path)
+}
+
+.copy_backbone_dir_copy <- function(path, new_path, overwrite = TRUE) {
+  fs::dir_copy(path = path, new_path = new_path, overwrite = overwrite)
+}
+
 #' @title Copy backbone
 #'
 #' @description This function copies the package backbone (default directory
@@ -68,7 +76,7 @@ copy_backbone <- function(
   # Create cache directory
   tryCatch(
     {
-      fs::dir_create(path = cache_dir)
+      .copy_backbone_dir_create(path = cache_dir)
     },
     error = function(e) {
       log_error("Failed to create cache directory: %s", e$message)
@@ -86,7 +94,7 @@ copy_backbone <- function(
   # Copy package structure to cache
   tryCatch(
     {
-      fs::dir_copy(
+      .copy_backbone_dir_copy(
         path = pkg_path,
         new_path = cache_dir,
         overwrite = TRUE

@@ -1,3 +1,20 @@
+.fake_zip_cmd <- function(export, fake_export) {
+  system2(
+    "zip",
+    args = c(basename(export), fake_export),
+    stdout = FALSE,
+    stderr = FALSE
+  )
+}
+
+.fake_zip_fallback <- function(export, fake_export) {
+  utils::zip(zipfile = basename(export), files = fake_export)
+}
+
+.fake_archive_exists <- function(export) {
+  file.exists(basename(export))
+}
+
 #' @title Fake ECMDB
 #'
 #' @description This function creates a minimal fake ECMDB JSON file when the
@@ -56,20 +73,15 @@ fake_ecmdb <- function(export) {
   writeLines(fake_json, fake_export)
 
   # Create zip archive
-  zip_result <- system2(
-    "zip",
-    args = c(basename(export), fake_export),
-    stdout = FALSE,
-    stderr = FALSE
-  )
+  zip_result <- .fake_zip_cmd(export = export, fake_export = fake_export)
 
   if (zip_result != 0) {
     log_warn("Failed to create zip file, trying alternative method")
-    utils::zip(zipfile = basename(export), files = fake_export)
+    .fake_zip_fallback(export = export, fake_export = fake_export)
   }
 
   # Move to final location (handles cross-device moves in Docker)
-  if (file.exists(basename(export))) {
+  if (.fake_archive_exists(export)) {
     moved <- move_file_safely(basename(export), export)
     if (!isTRUE(moved)) {
       cli::cli_abort(

@@ -40,7 +40,7 @@ safe_fread <- function(
   # Try to read the file
   df <- tryCatch(
     {
-      tidytable::fread(file = file, ...)
+      .safe_fread_read(file = file, ...)
     },
     error = function(e) {
       error_msg <- conditionMessage(e)
@@ -126,3 +126,9 @@ safe_fread <- function(
 
   df
 }
+
+# Internal wrapper to make error branches easy to test without brittle FS setup.
+.safe_fread_read <- function(file, ...) {
+  tidytable::fread(file = file, ...)
+}
+

@@ -276,28 +276,6 @@ export_library_tables <- function(
   df
 }
 
-#' Enrich Taxonomy from Additional Cache
-#'
-#' @description Internal helper to supplement taxonomy tables with entries
-#'   from additional external cache files. For structures present in the
-#'   stereo/canonical tables but absent from the taxonomy table, matching
-#'   rows from the cache are appended.
-#'
-#' @param taxonomy_table Existing taxonomy table (NPC or ClassyFire)
-#' @param cache_path Path to additional cache file (TSV/TSV.gz)
-#' @param key_col Column name used as key for matching (e.g., "structure_smiles"
-#'   for NPC, "structure_inchikey" for ClassyFire)
-#' @param all_keys Character vector of all keys present in the library
-#'   (e.g., all unique SMILES or InChIKeys)
-#' @param col_mapping Named list mapping internal column names to a character
-#'   vector of possible cache column names. The first matching name found in
-#'   the cache is used. Example:
-#' `list("structure_tax_npc_01pat" = c("pathway",
-#'     "structure_taxonomy_npclassifier_01pathway"))`
-#' @param taxonomy_name Name for logging (e.g., "NPClassifier", "ClassyFire")
-#'
-#' @return Enriched taxonomy table
-#' @keywords internal
 # Helper function: Normalize chemontid values to prevent duplicates
 .normalize_chemontid_in_tables <- function(
   cache_data,
@@ -528,6 +506,29 @@ export_library_tables <- function(
     }
   )
 }
+
+#' Enrich Taxonomy from Additional Cache
+#'
+#' @description Internal helper to supplement taxonomy tables with entries
+#'   from additional external cache files. For structures present in the
+#'   stereo/canonical tables but absent from the taxonomy table, matching
+#'   rows from the cache are appended.
+#'
+#' @param taxonomy_table Existing taxonomy table (NPC or ClassyFire)
+#' @param cache_path Path to additional cache file (TSV/TSV.gz)
+#' @param key_col Column name used as key for matching (e.g., "structure_smiles"
+#'   for NPC, "structure_inchikey" for ClassyFire)
+#' @param all_keys Character vector of all keys present in the library
+#'   (e.g., all unique SMILES or InChIKeys)
+#' @param col_mapping Named list mapping internal column names to a character
+#'   vector of possible cache column names. The first matching name found in
+#'   the cache is used. Example:
+#' `list("structure_tax_npc_01pat" = c("pathway",
+#'     "structure_taxonomy_npclassifier_01pathway"))`
+#' @param taxonomy_name Name for logging (e.g., "NPClassifier", "ClassyFire")
+#'
+#' @return Enriched taxonomy table
+#' @keywords internal
 
 enrich_taxonomy_from_cache <- function(
   taxonomy_table,

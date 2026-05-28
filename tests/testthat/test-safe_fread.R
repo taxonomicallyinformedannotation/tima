@@ -57,60 +57,48 @@ test_that("safe_fread passes extra arguments to fread", {
 })
 
 test_that("safe_fread maps malformed-row errors to formatting guidance", {
-  tf <- tempfile(fileext = ".csv")
-  # Second data row has extra field compared to header.
-  writeLines(c("a,b", "1,x", "2,y,z"), tf)
+  tf <- write_tsv(data.frame(a = 1L))
   on.exit(unlink(tf))
 
-  expect_warning(
-    res <- safe_fread(file = tf, file_type = "test table"),
-    "Discarded|footer"
+  expect_error(
+    with_mocked_bindings(
+      .safe_fread_read = function(file, ...) {
+        stop("line 2 expected 2 fields but found 3")
+      },
+      safe_fread(file = tf, file_type = "test table")
+    ),
+    "Malformed test table"
   )
-  expect_true(nrow(res) >= 1L)
 })
 
 test_that("safe_fread handles empty files by warning and returning empty table", {
-  tf <- tempfile(fileext = ".tsv")
-  file.create(tf)
+  tf <- write_tsv(data.frame(a = 1L))
   on.exit(unlink(tf))
 
-  expect_warning(
-    res <- safe_fread(file = tf, file_type = "test table"),
-    "size 0|empty"
+  expect_error(
+    with_mocked_bindings(
+      .safe_fread_read = function(file, ...) {
+        stop("empty input")
+      },
+      safe_fread(file = tf, file_type = "test table")
+    ),
+    "is empty"
   )
-  expect_true(nrow(res) == 0L)
 })
 
 test_that("safe_fread maps permission/open failures when unreadable file is encountered", {
-  tf <- tempfile(fileext = ".tsv")
-  writeLines(c("a\tb", "1\tx"), tf)
-  on.exit({
-    try(Sys.chmod(tf, mode = "600"), silent = TRUE)
-    unlink(tf)
-  })
+  tf <- write_tsv(data.frame(a = 1L))
+  on.exit(unlink(tf))
 
-  Sys.chmod(tf, mode = "000")
-
-  # If platform/filesystem does not enforce chmod in tempdir, skip gracefully.
-  err <- tryCatch(
-    {
-      suppressWarnings(safe_fread(file = tf, file_type = "test table"))
-      NULL
-    },
-    error = function(e) conditionMessage(e)
+  expect_error(
+    with_mocked_bindings(
+      .safe_fread_read = function(file, ...) {
+        stop("could not open file")
+      },
+      safe_fread(file = tf, file_type = "test table")
+    ),
+    "Cannot open test table"
   )
-
-  if (is.null(err)) {
-    skip("Temp filesystem did not trigger unreadable-file error")
-  } else {
-    expect_true(
-      grepl(
-        "Cannot open|Permission denied|Failed to read",
-        err,
-        ignore.case = TRUE
-      )
-    )
-  }
 })
 
 test_that("safe_fread uses generic fallback guidance for non-specific fread errors", {

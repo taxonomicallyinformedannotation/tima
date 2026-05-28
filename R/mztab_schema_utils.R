@@ -45,9 +45,19 @@ MZTAB_REQUIRED_FALLBACK <- list(
 }
 
 #' @keywords internal
+.mztab_path_exists <- function(path) {
+  file.exists(path)
+}
+
+#' @keywords internal
+.mztab_read_yaml <- function(path) {
+  yaml::read_yaml(path)
+}
+
+#' @keywords internal
 .load_mztab_schema <- function() {
   schema_path <- .get_mztab_schema_path()
-  if (!nzchar(schema_path) || !file.exists(schema_path)) {
+  if (!nzchar(schema_path) || !.mztab_path_exists(schema_path)) {
     log_warn(
       "Bundled mzTab-M OpenAPI schema not found, using fallback requirements"
     )
@@ -55,7 +65,7 @@ MZTAB_REQUIRED_FALLBACK <- list(
   }
 
   tryCatch(
-    yaml::read_yaml(schema_path),
+    .mztab_read_yaml(schema_path),
     error = function(e) {
       log_warn(
         "Failed to parse mzTab-M OpenAPI schema: %s",

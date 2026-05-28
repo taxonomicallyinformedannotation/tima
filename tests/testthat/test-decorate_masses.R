@@ -42,3 +42,11 @@ test_that("decorate_masses filters NA and notAnnotated", {
   # Should return input unchanged - function just logs statistics
   expect_identical(result, test_df)
 })
+
+test_that("decorate_masses returns input unchanged when required column is missing", {
+  test_df <- tidytable::tidytable(feature_id = c("FT001", "FT002"))
+
+  result <- decorate_masses(annotation_table_ms1 = test_df)
+
+  expect_identical(result, test_df)
+})

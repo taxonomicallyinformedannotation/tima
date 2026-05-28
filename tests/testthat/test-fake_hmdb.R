@@ -68,3 +68,46 @@ test_that("fake_hmdb handles zip creation failures gracefully", {
   expect_no_error(fake_hmdb(export = temp_file))
   expect_true(file.exists(temp_file))
 })
+
+test_that("fake_hmdb calls fallback zip when system zip command fails", {
+  withr::local_dir(tempdir())
+  temp_file <- withr::local_tempfile(fileext = ".sdf.zip")
+  fallback_called <- FALSE
+
+  with_mocked_bindings(
+    .fake_hmdb_zip_cmd = function(export, fake_export) 1L,
+    .fake_hmdb_zip_fallback = function(export, fake_export) {
+      fallback_called <<- TRUE
+      file.create(basename(export))
+      invisible(NULL)
+    },
+    .fake_hmdb_archive_exists = function(export) TRUE,
+    move_file_safely = function(from, to) {
+      file.create(to)
+      TRUE
+    },
+    log_warn = function(...) invisible(NULL),
+    log_debug = function(...) invisible(NULL),
+    {
+      expect_equal(fake_hmdb(export = temp_file), temp_file)
+    }
+  )
+
+  expect_true(fallback_called)
+})
+
+test_that("fake_hmdb errors when temporary archive cannot be moved", {
+  withr::local_dir(tempdir())
+  temp_file <- withr::local_tempfile(fileext = ".sdf.zip")
+
+  expect_error(
+    with_mocked_bindings(
+      .fake_hmdb_zip_cmd = function(export, fake_export) 0L,
+      .fake_hmdb_archive_exists = function(export) TRUE,
+      move_file_safely = function(from, to) FALSE,
+      log_warn = function(...) invisible(NULL),
+      fake_hmdb(export = temp_file)
+    ),
+    class = "tima_runtime_error"
+  )
+})

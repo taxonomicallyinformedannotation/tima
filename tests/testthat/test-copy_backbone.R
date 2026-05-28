@@ -220,3 +220,29 @@ test_that("copy_backbone can be called multiple times with different paths", {
   expect_true(dir.exists(cache1), info = "First cache should exist")
   expect_true(dir.exists(cache2), info = "Second cache should exist")
 })
+
+test_that("copy_backbone surfaces cache directory creation failures", {
+  expect_error(
+    with_mocked_bindings(
+      .copy_backbone_dir_create = function(path) stop("mkdir failed"),
+      log_info = function(...) invisible(NULL),
+      log_error = function(...) invisible(NULL),
+      copy_backbone(cache_dir = tempdir())
+    ),
+    class = "tima_runtime_error"
+  )
+})
+
+test_that("copy_backbone surfaces package copy failures", {
+  expect_error(
+    with_mocked_bindings(
+      .copy_backbone_dir_copy = function(path, new_path, overwrite = TRUE) {
+        stop("copy failed")
+      },
+      log_info = function(...) invisible(NULL),
+      log_error = function(...) invisible(NULL),
+      copy_backbone(cache_dir = tempdir())
+    ),
+    class = "tima_runtime_error"
+  )
+})

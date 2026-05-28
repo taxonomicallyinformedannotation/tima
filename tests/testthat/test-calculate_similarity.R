@@ -152,6 +152,24 @@ test_that("calculate_similarity returns safe fallbacks when backends error", {
 
   expect_equal(
     with_mocked_bindings(
+      .entropy_similarity_call = function(...) stop("entropy fail"),
+      log_warn = function(...) invisible(NULL),
+      calculate_similarity(
+        method = "entropy",
+        query_spectrum = TEST_QUERY,
+        target_spectrum = TEST_TARGET,
+        query_precursor = 250,
+        target_precursor = 300,
+        dalton = 0.01,
+        ppm = 10,
+        return_matched_peaks = TRUE
+      )
+    ),
+    c(0, 0)
+  )
+
+  expect_equal(
+    with_mocked_bindings(
       .gnps_chain_dp_call = function(...) stop("gnps fail"),
       log_warn = function(...) invisible(NULL),
       calculate_similarity(

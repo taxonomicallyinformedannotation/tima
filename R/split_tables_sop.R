@@ -80,7 +80,7 @@ split_tables_sop <- function(table, cache) {
   table_structural <- table_structural_initial |>
     tidytable::select(
       structure_smiles_initial,
-      structure_name,
+      tidyselect::any_of("structure_name"),
       tidyselect::contains(match = "_tag"),
       tidyselect::contains(match = "_tax")
     ) |>

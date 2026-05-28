@@ -3,11 +3,11 @@ library(testthat)
 
 test_that("benchmark MCC handles regular and degenerate confusion matrices", {
   expect_equal(
-    tima:::.benchmark_compute_mcc(tp = 1, tn = 1, fp = 0, fn = 0),
+    .benchmark_compute_mcc(tp = 1, tn = 1, fp = 0, fn = 0),
     1
   )
 
-  expect_true(is.na(tima:::.benchmark_compute_mcc(
+  expect_true(is.na(.benchmark_compute_mcc(
     tp = 0,
     tn = 0,
     fp = 0,
@@ -17,25 +17,25 @@ test_that("benchmark MCC handles regular and degenerate confusion matrices", {
 
 
 test_that("benchmark split and pad helpers handle empty, null-like and vector inputs", {
-  expect_equal(tima:::.benchmark_split_multivalue("a|b|c"), c("a", "b", "c"))
+  expect_equal(.benchmark_split_multivalue("a|b|c"), c("a", "b", "c"))
   expect_equal(
-    tima:::.benchmark_split_multivalue(c("x|y", "z")),
+    .benchmark_split_multivalue(c("x|y", "z")),
     c("x", "y", "z")
   )
-  expect_true(is.na(tima:::.benchmark_split_multivalue("")))
-  expect_true(is.na(tima:::.benchmark_split_multivalue("NULL")))
+  expect_true(is.na(.benchmark_split_multivalue("")))
+  expect_true(is.na(.benchmark_split_multivalue("NULL")))
 
   expect_equal(
-    tima:::.benchmark_pad_to(c("a", "b"), 4),
+    .benchmark_pad_to(c("a", "b"), 4),
     c("a", "b", NA_character_, NA_character_)
   )
-  expect_equal(tima:::.benchmark_pad_to(c("a", "b", "c"), 2), c("a", "b"))
+  expect_equal(.benchmark_pad_to(c("a", "b", "c"), 2), c("a", "b"))
 })
 
 
 test_that("benchmark expand predictions returns empty table when required columns missing", {
   bad_df <- tidytable::tidytable(feature_id = "F1")
-  expanded <- tima:::.benchmark_expand_predictions(bad_df, pred_name = "demo")
+  expanded <- .benchmark_expand_predictions(bad_df, pred_name = "demo")
 
   expect_s3_class(expanded, "data.frame")
   expect_equal(nrow(expanded), 0)
@@ -53,7 +53,7 @@ test_that("benchmark expand predictions normalizes values and supports scalar ra
     score_final = c("0.9|0.4", "0.7")
   )
 
-  expanded <- tima:::.benchmark_expand_predictions(df, pred_name = "predA")
+  expanded <- .benchmark_expand_predictions(df, pred_name = "predA")
 
   expect_true(all(
     c("feature_id", "candidate_ik", "prediction") %in% names(expanded)
@@ -76,7 +76,7 @@ test_that("benchmark evaluate predictions handles missing prediction files", {
   tidytable::fwrite(truth, truth_file, sep = "\t")
 
   result <- suppressWarnings(
-    tima:::benchmark_evaluate_predictions(
+    benchmark_evaluate_predictions(
       truth_file = truth_file,
       prediction_files = c(predA = temp_test_path("does_not_exist.tsv")),
       output_file = output_file,
@@ -113,7 +113,7 @@ test_that("benchmark evaluate predictions computes top-k and threshold metrics",
   tidytable::fwrite(truth, truth_file, sep = "\t")
   tidytable::fwrite(preds, pred_file, sep = "\t")
 
-  result <- tima:::benchmark_evaluate_predictions(
+  result <- benchmark_evaluate_predictions(
     truth_file = truth_file,
     prediction_files = c(predA = pred_file),
     output_file = output_file,

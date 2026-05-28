@@ -41,6 +41,11 @@ test_that("round_reals returns df unchanged when no columns match", {
   expect_equal(round_reals(df), df)
 })
 
+test_that("round_reals returns df unchanged when cols is empty", {
+  df <- data.frame(structure_exact_mass = 1.23456789)
+  expect_equal(round_reals(df, cols = character(0)), df)
+})
+
 test_that("round_reals rejects invalid dig", {
   df <- data.frame(structure_exact_mass = 1.0)
   expect_error(
