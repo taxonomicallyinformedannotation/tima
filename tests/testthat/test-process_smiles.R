@@ -131,7 +131,7 @@ test_that("process_smiles handles 15N isotope with correct mass shift", {
   skip_if_not(require("tima"), "tima package required")
 
   # Test 15N isotope
-  # 15N - 14N ≈ 0.9964 Da
+  # 15N - 14N ~ 0.9964 Da
   # Use aniline where N is explicit: Nc1ccccc1
   aniline_natural <- "Nc1ccccc1"
   # COMMENT: Explicit H is required for isotopes
@@ -156,7 +156,7 @@ test_that("process_smiles handles 15N isotope with correct mass shift", {
       mass_labeled <- result$structure_exact_mass[[idx_lab[1]]]
       mass_diff <- mass_labeled - mass_natural
 
-      # 15N shift ≈ 0.9964 Da
+      # 15N shift ~ 0.9964 Da
       # Allow ±0.01 Da tolerance
       expect_true(
         mass_diff > 0.98 && mass_diff < 1.01,
@@ -173,7 +173,7 @@ test_that("process_smiles handles 18O isotope with correct mass shift", {
   skip_if_not(require("tima"), "tima package required")
 
   # Test 18O isotope
-  # 18O - 16O ≈ 2.0043 Da
+  # 18O - 16O ~ 2.0043 Da
   # Use water: O (natural) vs [18O] (labeled)
   water_natural <- "O"
   # COMMENT: Explicit H is required for isotopes
@@ -194,7 +194,7 @@ test_that("process_smiles handles 18O isotope with correct mass shift", {
     mass_labeled <- result$structure_exact_mass[[2L]]
     mass_diff <- mass_labeled - mass_natural
 
-    # 18O shift ≈ 2.0043 Da
+    # 18O shift ~ 2.0043 Da
     # Allow ±0.005 Da tolerance (stricter because it's larger mass difference)
     expect_true(
       mass_diff > 1.99 && mass_diff < 2.02,
@@ -209,7 +209,7 @@ test_that("process_smiles handles 18O isotope with correct mass shift", {
 test_that("process_smiles handles deuterium [2H] notation", {
   # Test deuterium (2H) isotope on explicit hydrogens
   # [2H]C([2H])([2H])[2H] = fully deuterated methane
-  # 2H - 1H ≈ 1.0078 Da per atom
+  # 2H - 1H ~ 1.0078 Da per atom
 
   methane_natural <- "C"
   methane_deuterated <- "[2H]C([2H])([2H])[2H]"
@@ -229,7 +229,7 @@ test_that("process_smiles handles deuterium [2H] notation", {
     mass_deuterated <- result$structure_exact_mass[[2L]]
     mass_diff <- mass_deuterated - mass_natural
 
-    # 4× deuterium ≈ 4 × 1.0078 = 4.0312 Da
+    # 4× deuterium ~ 4 × 1.0078 = 4.0312 Da
     expect_true(
       mass_diff > 4.02 && mass_diff < 4.04,
       info = sprintf(
@@ -411,7 +411,7 @@ test_that("process_smiles handles multiple different isotope types", {
     mass_diff <- mass_labeled - mass_natural
 
     # With 5× 13C and 1× 15N:
-    # Expected: 5*1.00335 + 0.9964 = 5.99475 + 0.9964 ≈ 6.991 Da
+    # Expected: 5*1.00335 + 0.9964 = 5.99475 + 0.9964 ~ 6.991 Da
     expect_true(
       mass_diff > 6.9 && mass_diff < 7.0,
       info = sprintf(

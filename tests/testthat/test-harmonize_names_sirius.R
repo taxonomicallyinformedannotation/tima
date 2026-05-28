@@ -115,7 +115,12 @@ test_that("harmonize_names_sirius handles very long names", {
 
 test_that("harmonize_names_sirius works element-wise on vectors", {
   input <- c("1_name", "2_id", "3_score")
-  result <- sapply(input, harmonize_names_sirius, USE.NAMES = FALSE)
+  result <- vapply(
+    input,
+    harmonize_names_sirius,
+    character(1L),
+    USE.NAMES = FALSE
+  )
 
   expect_equal(result, c("name", "id", "score"))
   expect_length(result, 3)
@@ -123,7 +128,12 @@ test_that("harmonize_names_sirius works element-wise on vectors", {
 
 test_that("harmonize_names_sirius handles mixed patterns in vector", {
   input <- c("1_name", "noprefix", "2_3_id", "_value")
-  result <- sapply(input, harmonize_names_sirius, USE.NAMES = FALSE)
+  result <- vapply(
+    input,
+    harmonize_names_sirius,
+    character(1L),
+    USE.NAMES = FALSE
+  )
 
   expect_equal(result, c("name", "noprefix", "id", "value"))
 })
@@ -159,7 +169,12 @@ test_that("harmonize_names_sirius works with real SIRIUS output", {
     "11_medianAbsoluteMassErrorFragmentPeaks(ppm)"
   )
 
-  result <- sapply(sirius_cols, harmonize_names_sirius, USE.NAMES = FALSE)
+  result <- vapply(
+    sirius_cols,
+    harmonize_names_sirius,
+    character(1L),
+    USE.NAMES = FALSE
+  )
 
   expect_equal(result[1], "id")
   expect_equal(result[2], "molecularFormula")
@@ -172,7 +187,12 @@ test_that("harmonize_names_sirius works with real SIRIUS output", {
 test_that("harmonize_names_sirius can be used with rename", {
   # Simulate renaming columns
   old_names <- c("1_name", "2_id", "3_score")
-  new_names <- sapply(old_names, harmonize_names_sirius, USE.NAMES = FALSE)
+  new_names <- vapply(
+    old_names,
+    harmonize_names_sirius,
+    character(1L),
+    USE.NAMES = FALSE
+  )
 
   expect_equal(new_names, c("name", "id", "score"))
   expect_false(any(grepl("^[0-9]+_", new_names)))

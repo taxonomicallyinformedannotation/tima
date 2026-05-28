@@ -606,7 +606,7 @@ test_that("parse_adduct works via apply", {
   results <- lapply(adducts, parse_adduct)
 
   expect_length(results, 4)
-  expect_true(all(sapply(results, function(x) !all(x == 0))))
+  expect_true(all(vapply(results, function(x) !all(x == 0), logical(1L))))
 })
 
 test_that("parse_adduct handles non-standard trailing charge [M+2H]+2", {

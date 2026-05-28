@@ -610,6 +610,8 @@ test_that("change_params_small uses go_to_cache when cache_dir is NULL", {
 
   local_mocked_bindings(
     go_to_cache = function() {
+      old_wd <- getwd()
+      on.exit(setwd(old_wd), add = TRUE)
       setwd(tmp)
       invisible(NULL)
     },

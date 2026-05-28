@@ -298,54 +298,12 @@ export_library_tables <- function(
 #'
 #' @return Enriched taxonomy table
 #' @keywords internal
-enrich_taxonomy_from_cache <- function(
+# Helper function: Normalize chemontid values to prevent duplicates
+.normalize_chemontid_in_tables <- function(
+  cache_data,
   taxonomy_table,
-  cache_path,
-  key_col,
-  all_keys,
-  col_mapping = NULL,
-  taxonomy_name = "taxonomy"
+  chemontid_col = "structure_tax_cla_chemontid"
 ) {
-  if (is.null(cache_path) || !nzchar(cache_path) || !file.exists(cache_path)) {
-    return(taxonomy_table)
-  }
-
-  log_info(
-    "Enriching %s taxonomy from additional cache: %s",
-    taxonomy_name,
-    cache_path
-  )
-
-  cache_data <- tryCatch(
-    safe_fread(
-      file = cache_path,
-      file_type = paste(taxonomy_name, "additional cache"),
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    ),
-    error = function(e) {
-      log_warn(
-        "Failed to read additional %s cache: %s",
-        taxonomy_name,
-        conditionMessage(e)
-      )
-      taxonomy_table
-    }
-  )
-
-  if (is.null(cache_data) || nrow(cache_data) == 0) {
-    log_info("Additional %s cache is empty", taxonomy_name)
-    return(taxonomy_table)
-  }
-
-  # Apply column mapping if provided
-  if (!is.null(col_mapping)) {
-    cache_data <- .apply_col_mapping(cache_data, col_mapping)
-  }
-
-  # Normalize chemontid values to prevent duplicates from inconsistent
-  # formatting (e.g., "2011" vs "0002011" vs "CHEMONTID:0002011")
-  chemontid_col <- "structure_tax_cla_chemontid"
   if (chemontid_col %in% names(cache_data)) {
     cache_data[[chemontid_col]] <- normalize_chemontid(
       cache_data[[chemontid_col]]
@@ -360,18 +318,16 @@ enrich_taxonomy_from_cache <- function(
       taxonomy_table[[chemontid_col]]
     )
   }
+  list(cache_data = cache_data, taxonomy_table = taxonomy_table)
+}
 
-  # Determine expected columns for the cache
-  expected_cols <- if (!is.null(taxonomy_table) && ncol(taxonomy_table) > 0) {
-    names(taxonomy_table)
-  } else {
-    intersect(names(cache_data), names(cache_data))
-  }
-
-  # Normalize cache file on disk: harmonize column names, drop extra columns,
-  # strip "notClassified", and normalize chemontid. This runs on every read so
-  # the cache file converges to a clean internal format even when no enrichment
-  # is needed (i.e., before early returns).
+# Helper function: Normalize and write cache file
+.normalize_and_write_cache <- function(
+  cache_data,
+  cache_path,
+  expected_cols,
+  taxonomy_name
+) {
   tryCatch(
     {
       cache_clean <- cache_data |>
@@ -407,6 +363,7 @@ enrich_taxonomy_from_cache <- function(
         nrow(cache_clean),
         cache_path
       )
+      TRUE
     },
     error = function(e) {
       log_warn(
@@ -414,29 +371,30 @@ enrich_taxonomy_from_cache <- function(
         taxonomy_name,
         conditionMessage(e)
       )
+      FALSE
     }
   )
+}
 
-  # Verify key column exists in cache
-
-  if (!key_col %in% names(cache_data)) {
-    log_warn(
-      "Key column '%s' not found in additional %s cache. Available: %s",
-      key_col,
-      taxonomy_name,
-      paste(names(cache_data), collapse = ", ")
-    )
-    return(taxonomy_table)
-  }
-
-  # Identify keys already covered by existing taxonomy
-  existing_keys <- if (!is.null(taxonomy_table) && nrow(taxonomy_table) > 0) {
+# Helper function: Get existing keys from taxonomy table
+.get_existing_keys <- function(taxonomy_table, key_col) {
+  if (!is.null(taxonomy_table) && nrow(taxonomy_table) > 0) {
     taxonomy_table[[key_col]]
   } else {
     character(0)
   }
+}
 
-  # Keep only cache entries for keys present in the library but missing taxonomy
+# Helper function: Prepare cache supplement
+.prepare_cache_supplement <- function(
+  cache_data,
+  key_col,
+  all_keys,
+  existing_keys,
+  expected_cols,
+  taxonomy_name
+) {
+  # Keep only cache entries for keys present in library but missing taxonomy
   missing_keys <- setdiff(all_keys, existing_keys)
   missing_keys <- missing_keys[!is.na(missing_keys)]
 
@@ -446,7 +404,7 @@ enrich_taxonomy_from_cache <- function(
       length(all_keys),
       taxonomy_name
     )
-    return(taxonomy_table)
+    return(NULL)
   }
 
   cache_supplement <- cache_data |>
@@ -458,7 +416,7 @@ enrich_taxonomy_from_cache <- function(
       taxonomy_name,
       length(missing_keys)
     )
-    return(taxonomy_table)
+    return(NULL)
   }
 
   # Select only matching columns, filling missing with NA
@@ -470,28 +428,24 @@ enrich_taxonomy_from_cache <- function(
     tidytable::select(tidyselect::all_of(expected_cols)) |>
     tidytable::distinct()
 
-  enriched <- tidytable::bind_rows(taxonomy_table, cache_supplement) |>
-    tidytable::distinct()
+  cache_supplement
+}
 
-  n_added <- nrow(enriched) - nrow(taxonomy_table)
-  log_info(
-    "Enriched %s taxonomy with %d entries from additional cache (%d missing keys matched)",
-    taxonomy_name,
-    n_added,
-    nrow(cache_supplement)
-  )
-
-  # Write back the full enriched taxonomy to the additional cache so it
-  # grows over time. Entries already present in the library but absent from
-  # the cache are appended, making subsequent runs faster and richer.
+# Helper function: Write back enriched taxonomy to cache
+.write_enriched_taxonomy_to_cache <- function(
+  enriched,
+  cache_path,
+  expected_cols,
+  col_mapping,
+  taxonomy_name
+) {
   tryCatch(
     {
       cache_to_write <- enriched |>
         tidytable::select(tidyselect::all_of(expected_cols)) |>
         tidytable::distinct()
 
-      # Read existing cache again (may have entries for keys NOT in this
-      # library)
+      # Read existing cache again (may have entries for keys NOT in this library)
       existing_cache <- tryCatch(
         safe_fread(
           file = cache_path,
@@ -572,6 +526,126 @@ enrich_taxonomy_from_cache <- function(
         conditionMessage(e)
       )
     }
+  )
+}
+
+enrich_taxonomy_from_cache <- function(
+  taxonomy_table,
+  cache_path,
+  key_col,
+  all_keys,
+  col_mapping = NULL,
+  taxonomy_name = "taxonomy"
+) {
+  # Early return if cache is not available
+  if (is.null(cache_path) || !nzchar(cache_path) || !file.exists(cache_path)) {
+    return(taxonomy_table)
+  }
+
+  log_info(
+    "Enriching %s taxonomy from additional cache: %s",
+    taxonomy_name,
+    cache_path
+  )
+
+  # Read cache data
+  cache_data <- tryCatch(
+    safe_fread(
+      file = cache_path,
+      file_type = paste(taxonomy_name, "additional cache"),
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    ),
+    error = function(e) {
+      log_warn(
+        "Failed to read additional %s cache: %s",
+        taxonomy_name,
+        conditionMessage(e)
+      )
+      taxonomy_table
+    }
+  )
+
+  if (is.null(cache_data) || nrow(cache_data) == 0) {
+    log_info("Additional %s cache is empty", taxonomy_name)
+    return(taxonomy_table)
+  }
+
+  # Apply column mapping if provided
+  if (!is.null(col_mapping)) {
+    cache_data <- .apply_col_mapping(cache_data, col_mapping)
+  }
+
+  # Normalize chemontid values
+  chemontid_normalized <- .normalize_chemontid_in_tables(
+    cache_data,
+    taxonomy_table
+  )
+  cache_data <- chemontid_normalized$cache_data
+  taxonomy_table <- chemontid_normalized$taxonomy_table
+
+  # Determine expected columns
+  expected_cols <- if (!is.null(taxonomy_table) && ncol(taxonomy_table) > 0) {
+    names(taxonomy_table)
+  } else {
+    intersect(names(cache_data), names(cache_data))
+  }
+
+  # Normalize cache file on disk
+  .normalize_and_write_cache(
+    cache_data,
+    cache_path,
+    expected_cols,
+    taxonomy_name
+  )
+
+  # Verify key column exists in cache
+  if (!key_col %in% names(cache_data)) {
+    log_warn(
+      "Key column '%s' not found in additional %s cache. Available: %s",
+      key_col,
+      taxonomy_name,
+      paste(names(cache_data), collapse = ", ")
+    )
+    return(taxonomy_table)
+  }
+
+  # Get existing keys
+  existing_keys <- .get_existing_keys(taxonomy_table, key_col)
+
+  # Prepare cache supplement
+  cache_supplement <- .prepare_cache_supplement(
+    cache_data,
+    key_col,
+    all_keys,
+    existing_keys,
+    expected_cols,
+    taxonomy_name
+  )
+
+  if (is.null(cache_supplement)) {
+    return(taxonomy_table)
+  }
+
+  # Combine enriched taxonomy
+  enriched <- tidytable::bind_rows(taxonomy_table, cache_supplement) |>
+    tidytable::distinct()
+
+  n_added <- nrow(enriched) - nrow(taxonomy_table)
+  log_info(
+    "Enriched %s taxonomy with %d entries from additional cache (%d missing keys matched)",
+    taxonomy_name,
+    n_added,
+    nrow(cache_supplement)
+  )
+
+  # Write back the full enriched taxonomy to cache for persistence
+  .write_enriched_taxonomy_to_cache(
+    enriched,
+    cache_path,
+    expected_cols,
+    col_mapping,
+    taxonomy_name
   )
 
   enriched

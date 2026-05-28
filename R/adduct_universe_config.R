@@ -241,180 +241,23 @@ generate_adduct_hypotheses <- function(
   loss_mass <- vapply(loss_parsed, formula_mass, numeric(1L))
 
   n_carriers <- length(parsed_carriers)
-  carrier_idx <- seq_len(n_carriers)
-  mz_low <- as.numeric(plausible_mz_range[[1L]])
-
-  rows <- list()
-  row_i <- 0L
-
-  for (m_val in m_vals) {
-    for (z_val in charges_polarity) {
-      z_abs <- abs(z_val)
-      if (z_abs < 1L || z_abs > 6L) {
-        next
-      }
-      # Enumerate carrier MULTISETS of size z_abs (compositions of z_abs
-      # into n_carriers non-negative integer parts).
-      comp <- .compositions(z_abs, n_carriers)
-      for (ri in seq_len(nrow(comp))) {
-        counts <- comp[ri, ]
-        if (sum(counts) != z_abs) {
-          next
-        } # safety
-        # Net charge contribution
-        z_net <- as.integer(sum(counts * carrier_zcontrib))
-        if (z_net != z_val) {
-          next
-        }
-        # Expand slot counts into per-atom signed counts.
-        per_atom <- integer()
-        base_carrier_offset <- 0
-        for (slot in carrier_idx) {
-          if (counts[[slot]] == 0L) {
-            next
-          }
-          token_symbols <- parsed_carriers[[slot]]$symbols
-          for (sym in names(token_symbols)) {
-            inc <- counts[[slot]] * token_symbols[[sym]]
-            per_atom[sym] <- (if (is.na(per_atom[sym])) 0L else per_atom[sym]) +
-              inc
-          }
-          base_carrier_offset <- base_carrier_offset +
-            counts[[slot]] * carrier_mass[[slot]]
-        }
-        per_atom <- per_atom[per_atom != 0L]
-        carriers_named <- if (length(per_atom) == 0L) integer() else per_atom
-        # Now expand 0..max clusters and 0..max losses (multiplicities of a
-        # single cluster/loss formula stay at 0 or 1 here to bound the
-        # combinatorial blowup; users can add specific multi-water entries
-        # like "H4O2" to the loss list if needed).
-        cluster_choices <- c(list(NULL), as.list(seq_along(cluster_parsed)))
-        if (max_clusters_per_adduct < 1L) {
-          cluster_choices <- list(NULL)
-        }
-        loss_choices <- c(list(NULL), as.list(seq_along(loss_parsed)))
-        if (max_losses_per_adduct < 1L) {
-          loss_choices <- list(NULL)
-        }
-        for (ci in cluster_choices) {
-          for (li in loss_choices) {
-            clusters_named <- integer()
-            losses_named <- integer()
-            cluster_mass_val <- 0
-            loss_mass_val <- 0
-            if (!is.null(ci)) {
-              clusters_named <- 1L
-              names(clusters_named) <- cluster_formulas[[ci]]
-              cluster_mass_val <- cluster_mass[[ci]]
-            }
-            if (!is.null(li)) {
-              losses_named <- 1L
-              names(losses_named) <- loss_formulas[[li]]
-              loss_mass_val <- loss_mass[[li]]
-            }
-            outside_neutral_mass <- cluster_mass_val - loss_mass_val
-            carrier_offset_signed <- base_carrier_offset -
-              (z_val * ELECTRON_MASS_DA)
-
-            # Enumerate the "scope" of the cluster/loss attachment:
-            #   * "outside"          — current default; the cluster/loss is
-            #     applied to the assembled multimer (e.g. [2M-H2O+H]+).
-            #   * "loss_inside"      — each monomer lost the group before
-            #     multimerization (e.g. [2(M-H2O)+H]+).
-            #   * "cluster_inside"   — each monomer bound the cluster before
-            #     multimerization (e.g. [2(M+NaCl)+H]+).
-            #   * "both_inside"      — both attach per-monomer.
-            # For n_mer == 1 the inside/outside split is mathematically a
-            # no-op so we only emit the outside row.
-            scopes <- list(list(loss = FALSE, cluster = FALSE))
-            if (m_val >= 2L) {
-              has_loss <- !is.null(li)
-              has_cluster <- !is.null(ci)
-              if (has_loss) {
-                scopes[[length(scopes) + 1L]] <- list(
-                  loss = TRUE,
-                  cluster = FALSE
-                )
-              }
-              if (has_cluster) {
-                scopes[[length(scopes) + 1L]] <- list(
-                  loss = FALSE,
-                  cluster = TRUE
-                )
-              }
-              if (has_loss && has_cluster) {
-                scopes[[length(scopes) + 1L]] <- list(
-                  loss = TRUE,
-                  cluster = TRUE
-                )
-              }
-            }
-
-            for (scope in scopes) {
-              # Split neutral mass between "outside" (applied once, to the
-              # assembled species) and "per-monomer" (applied to each of the
-              # n_mer monomers BEFORE assembly).
-              per_monomer_mass <- 0
-              outside_mass <- 0
-              if (isTRUE(scope$cluster)) {
-                per_monomer_mass <- per_monomer_mass + cluster_mass_val
-              } else {
-                outside_mass <- outside_mass + cluster_mass_val
-              }
-              if (isTRUE(scope$loss)) {
-                per_monomer_mass <- per_monomer_mass - loss_mass_val
-              } else {
-                outside_mass <- outside_mass - loss_mass_val
-              }
-
-              # adduct_mass = "once" component: applied OUTSIDE the n_mer
-              # multiplication when computing m/z. The per-monomer term is
-              # tracked separately so the implied-mass formula can subtract
-              # it from M.
-              adduct_mass <- carrier_offset_signed + outside_mass
-
-              # Discard hypotheses that are physically impossible: there must
-              # exist *some* observed m/z in the plausible range that yields a
-              # positive implied neutral mass. Equivalently, the implied M at
-              # the HIGH end of the plausible m/z range must be positive. The
-              # previous low-end check rejected legitimate cluster hypotheses
-              # (e.g. [M+NaCl+H]+) whose minimal observable m/z is necessarily
-              # above mz_low.
-              mz_high <- as.numeric(plausible_mz_range[[2L]])
-              neutral_high <- (z_abs * mz_high - adduct_mass) /
-                m_val -
-                per_monomer_mass
-              if (!is.finite(neutral_high) || neutral_high <= 0) {
-                next
-              }
-
-              adduct <- adduct_to_string(
-                n_mer = m_val,
-                carriers = carriers_named,
-                clusters = clusters_named,
-                losses = losses_named,
-                z = z_val,
-                loss_inside_multimer = isTRUE(scope$loss),
-                cluster_inside_multimer = isTRUE(scope$cluster)
-              )
-              row_i <- row_i + 1L
-              rows[[row_i]] <- list(
-                adduct = adduct,
-                n_mer = as.integer(m_val),
-                n_iso = 0L,
-                z = as.integer(z_val),
-                adduct_mass = as.numeric(adduct_mass),
-                adduct_mass_per_monomer = as.numeric(per_monomer_mass),
-                carriers = list(carriers_named),
-                clusters = list(clusters_named),
-                losses = list(losses_named)
-              )
-            }
-          }
-        }
-      }
-    }
-  }
+  rows <- .generate_structured_adduct_rows(
+    m_vals = m_vals,
+    charges_polarity = charges_polarity,
+    n_carriers = n_carriers,
+    parsed_carriers = parsed_carriers,
+    carrier_mass = carrier_mass,
+    carrier_zcontrib = carrier_zcontrib,
+    cluster_parsed = cluster_parsed,
+    cluster_formulas = cluster_formulas,
+    cluster_mass = cluster_mass,
+    loss_parsed = loss_parsed,
+    loss_formulas = loss_formulas,
+    loss_mass = loss_mass,
+    max_clusters_per_adduct = max_clusters_per_adduct,
+    max_losses_per_adduct = max_losses_per_adduct,
+    plausible_mz_range = plausible_mz_range
+  )
 
   if (length(rows) == 0L) {
     return(empty_adduct_universe())
@@ -444,4 +287,227 @@ generate_adduct_hypotheses <- function(
   # Deduplicate on canonical string (safety; should be unique already).
   out <- tidytable::distinct(out, adduct, .keep_all = TRUE)
   out
+}
+
+.generate_structured_adduct_rows <- function(
+  m_vals,
+  charges_polarity,
+  n_carriers,
+  parsed_carriers,
+  carrier_mass,
+  carrier_zcontrib,
+  cluster_parsed,
+  cluster_formulas,
+  cluster_mass,
+  loss_parsed,
+  loss_formulas,
+  loss_mass,
+  max_clusters_per_adduct,
+  max_losses_per_adduct,
+  plausible_mz_range
+) {
+  carrier_idx <- seq_len(n_carriers)
+  rows <- list()
+  row_i <- 0L
+
+  for (m_val in m_vals) {
+    for (z_val in charges_polarity) {
+      z_abs <- abs(z_val)
+      if (z_abs < 1L || z_abs > 6L) {
+        next
+      }
+      comp <- .compositions(z_abs, n_carriers)
+      for (ri in seq_len(nrow(comp))) {
+        counts <- comp[ri, ]
+        if (sum(counts) != z_abs) {
+          next
+        }
+        z_net <- as.integer(sum(counts * carrier_zcontrib))
+        if (z_net != z_val) {
+          next
+        }
+
+        carrier_state <- .adduct_carrier_state(
+          counts = counts,
+          carrier_idx = carrier_idx,
+          parsed_carriers = parsed_carriers,
+          carrier_mass = carrier_mass
+        )
+
+        rows_out <- .enumerate_cluster_loss_scope_rows(
+          m_val = m_val,
+          z_val = z_val,
+          z_abs = z_abs,
+          carriers_named = carrier_state$carriers_named,
+          base_carrier_offset = carrier_state$base_carrier_offset,
+          cluster_parsed = cluster_parsed,
+          cluster_formulas = cluster_formulas,
+          cluster_mass = cluster_mass,
+          loss_parsed = loss_parsed,
+          loss_formulas = loss_formulas,
+          loss_mass = loss_mass,
+          max_clusters_per_adduct = max_clusters_per_adduct,
+          max_losses_per_adduct = max_losses_per_adduct,
+          plausible_mz_range = plausible_mz_range
+        )
+
+        if (length(rows_out) > 0L) {
+          for (row in rows_out) {
+            row_i <- row_i + 1L
+            rows[[row_i]] <- row
+          }
+        }
+      }
+    }
+  }
+
+  rows
+}
+
+.adduct_carrier_state <- function(
+  counts,
+  carrier_idx,
+  parsed_carriers,
+  carrier_mass
+) {
+  per_atom <- integer()
+  base_carrier_offset <- 0
+  for (slot in carrier_idx) {
+    if (counts[[slot]] == 0L) {
+      next
+    }
+    token_symbols <- parsed_carriers[[slot]]$symbols
+    for (sym in names(token_symbols)) {
+      inc <- counts[[slot]] * token_symbols[[sym]]
+      per_atom[sym] <- (if (is.na(per_atom[sym])) 0L else per_atom[sym]) + inc
+    }
+    base_carrier_offset <- base_carrier_offset +
+      counts[[slot]] * carrier_mass[[slot]]
+  }
+  per_atom <- per_atom[per_atom != 0L]
+  carriers_named <- if (length(per_atom) == 0L) integer() else per_atom
+  list(
+    carriers_named = carriers_named,
+    base_carrier_offset = base_carrier_offset
+  )
+}
+
+.enumerate_cluster_loss_scope_rows <- function(
+  m_val,
+  z_val,
+  z_abs,
+  carriers_named,
+  base_carrier_offset,
+  cluster_parsed,
+  cluster_formulas,
+  cluster_mass,
+  loss_parsed,
+  loss_formulas,
+  loss_mass,
+  max_clusters_per_adduct,
+  max_losses_per_adduct,
+  plausible_mz_range
+) {
+  out <- list()
+  out_i <- 0L
+
+  cluster_choices <- c(list(NULL), as.list(seq_along(cluster_parsed)))
+  if (max_clusters_per_adduct < 1L) {
+    cluster_choices <- list(NULL)
+  }
+  loss_choices <- c(list(NULL), as.list(seq_along(loss_parsed)))
+  if (max_losses_per_adduct < 1L) {
+    loss_choices <- list(NULL)
+  }
+
+  for (ci in cluster_choices) {
+    for (li in loss_choices) {
+      clusters_named <- integer()
+      losses_named <- integer()
+      cluster_mass_val <- 0
+      loss_mass_val <- 0
+      if (!is.null(ci)) {
+        clusters_named <- 1L
+        names(clusters_named) <- cluster_formulas[[ci]]
+        cluster_mass_val <- cluster_mass[[ci]]
+      }
+      if (!is.null(li)) {
+        losses_named <- 1L
+        names(losses_named) <- loss_formulas[[li]]
+        loss_mass_val <- loss_mass[[li]]
+      }
+
+      carrier_offset_signed <- base_carrier_offset - (z_val * ELECTRON_MASS_DA)
+      scopes <- .adduct_scope_options(
+        m_val = m_val,
+        has_loss = !is.null(li),
+        has_cluster = !is.null(ci)
+      )
+
+      for (scope in scopes) {
+        per_monomer_mass <- 0
+        outside_mass <- 0
+        if (isTRUE(scope$cluster)) {
+          per_monomer_mass <- per_monomer_mass + cluster_mass_val
+        } else {
+          outside_mass <- outside_mass + cluster_mass_val
+        }
+        if (isTRUE(scope$loss)) {
+          per_monomer_mass <- per_monomer_mass - loss_mass_val
+        } else {
+          outside_mass <- outside_mass - loss_mass_val
+        }
+
+        adduct_mass <- carrier_offset_signed + outside_mass
+        mz_high <- as.numeric(plausible_mz_range[[2L]])
+        neutral_high <- (z_abs * mz_high - adduct_mass) /
+          m_val -
+          per_monomer_mass
+        if (!is.finite(neutral_high) || neutral_high <= 0) {
+          next
+        }
+
+        adduct <- adduct_to_string(
+          n_mer = m_val,
+          carriers = carriers_named,
+          clusters = clusters_named,
+          losses = losses_named,
+          z = z_val,
+          loss_inside_multimer = isTRUE(scope$loss),
+          cluster_inside_multimer = isTRUE(scope$cluster)
+        )
+
+        out_i <- out_i + 1L
+        out[[out_i]] <- list(
+          adduct = adduct,
+          n_mer = as.integer(m_val),
+          n_iso = 0L,
+          z = as.integer(z_val),
+          adduct_mass = as.numeric(adduct_mass),
+          adduct_mass_per_monomer = as.numeric(per_monomer_mass),
+          carriers = list(carriers_named),
+          clusters = list(clusters_named),
+          losses = list(losses_named)
+        )
+      }
+    }
+  }
+
+  out
+}
+
+.adduct_scope_options <- function(m_val, has_loss, has_cluster) {
+  scopes <- list(list(loss = FALSE, cluster = FALSE))
+  if (m_val >= 2L) {
+    if (has_loss) {
+      scopes[[length(scopes) + 1L]] <- list(loss = TRUE, cluster = FALSE)
+    }
+    if (has_cluster) {
+      scopes[[length(scopes) + 1L]] <- list(loss = FALSE, cluster = TRUE)
+    }
+    if (has_loss && has_cluster) {
+      scopes[[length(scopes) + 1L]] <- list(loss = TRUE, cluster = TRUE)
+    }
+  }
+  scopes
 }

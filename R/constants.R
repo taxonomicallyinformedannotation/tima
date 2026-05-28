@@ -49,7 +49,7 @@ NEUTRAL_MASS_GROUP_DECIMALS <- 4L
 
 #' Absolute tolerance (Da) for matching neutral masses across features when
 #' propagating anchor InChIKeys.
-#' @description 5 mDa ≈ 10-15 ppm at typical small-molecule masses, which
+#' @description 5 mDa ~ 10-15 ppm at typical small-molecule masses, which
 #'     comfortably absorbs the accumulated error of inverting multiple
 #'     adduct formulas (e.g. `[M+NH4]+` vs `[2M+Na]+`) while remaining
 #'     tight enough to keep distinct monoisotopic neutral masses in

@@ -555,7 +555,7 @@
 #' * `ms_run[1]-scan_polarity` is populated with `MS:1000130` (positive) or
 #'   `MS:1000129` (negative) when `polarity` is known.
 #' * When `xrefs_index` contains data, additional `database[n]` blocks are
-#'   emitted (n ≥ 2) for every unique xref prefix found in the annotation set.
+#'   emitted (n >= 2) for every unique xref prefix found in the annotation set.
 #' * The TIMA repository URL is registered as `software[1]-setting[1]` for
 #'   machine-readable software provenance.
 #' * `colunit-small_molecule_feature` declares seconds (UO:0000010).

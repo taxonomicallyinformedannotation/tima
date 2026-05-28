@@ -4,7 +4,7 @@
  *
  * Computes the GNPS modified cosine score between two mass spectra, matching
  * the existing MsCoreUtils::gnps / MsCoreUtils::join_gnps numerically
- * (≤ 2.2e-16 on all tested pairs when using identical join semantics).
+ * (<=2.2e-16 on all tested pairs when using identical join semantics).
  *
  * ═══════════════════════════════════════════════════════════════════════════
  * PREREQUISITES - spectra MUST be sanitized before calling these functions.
@@ -66,7 +66,7 @@
  *     x[1]=100.001 →  y[0]=100.001  (CONFLICT: both want y[0])
  *
  *   This breaks the chain structure → need full Hungarian algorithm
- *   Result: O(n³) instead of O(n+m)
+ *   Result: O(n^3) instead of O(n+m)
  *
  * ─────────────────────────────────────────────────────────────────────────
  *
@@ -87,7 +87,7 @@
  *   Result: Each peak has AT MOST ONE shifted match:
  *     sm_arr[i] = j  (x[i]+pdiff matches y[j])  or  -1 (no match)
  *
- *   Skipped when |pdiff| ≤ tol + ppm * max(x_pre, y_pre) * 1e-6
+ *   Skipped when |pdiff| <= tol + ppm * max(x_pre, y_pre) * 1e-6
  *   (pdiff is within measurement noise, no meaningful neutral loss)
  *
  * CRITICAL PROPERTY - Why This Forms Chains:
@@ -111,7 +111,7 @@
  *
  * ─────────────────────────────────────────────────────────────────────────
  *
- * Step 3 - Optimal scoring  [O(n) typical, O(n + k³) worst]
+ * Step 3 - Optimal scoring  [O(n) typical, O(n + k^3) worst]
  *
  *   A "conflict" occurs when x[i]'s shifted match targets a y[j] that is
  *   ALREADY directly matched by a different x[k]:
@@ -127,19 +127,19 @@
  *   3b. Conflicts exist (~1% of pairs):
  *       ✗ One or more conflict clusters exist (small local breakages).
  *       ✓ Score all non-conflict peaks greedily (safe - no overlap).
- *       ✓ Build a k×k score matrix for the conflict cluster only (k ≈ 3–5).
+ *       ✓ Build a kxk score matrix for the conflict cluster only (k ~ 3–5).
  *       ✓ Solve with exact shortest-augmenting-path Hungarian.
- *       ✓ O(k³) with k ≈ 3–5 means ~27–125 inner-loop iterations (negligible).
+ *       ✓ O(k^3) with k ~ 3–5 means ~27–125 inner-loop iterations (negligible).
  *
- * Overall complexity: O(n+m) for matching + O(n) for scoring + O(k³) conflicts.
- * The O(k³) Hungarian fallback fires rarely and on tiny matrices.
+ * Overall complexity: O(n+m) for matching + O(n) for scoring + O(k^3) conflicts.
+ * The O(k^3) Hungarian fallback fires rarely and on tiny matrices.
  *
  * ═══════════════════════════════════════════════════════════════════════════
  * SCORING FORMULA (matches MsCoreUtils::gnps exactly)
  * ═══════════════════════════════════════════════════════════════════════════
  *
  *   score(i,j) = sqrt(x_int[i]) / sqrt(Σ unique x_int)
- *              × sqrt(y_int[j]) / sqrt(Σ unique y_int)
+ *              x sqrt(y_int[j]) / sqrt(Σ unique y_int)
  *
  *   total = Σ score(i,j) over all optimally assigned (i,j) pairs
  *
@@ -149,12 +149,12 @@
  *
  *   gnps_chain_dp(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
  *     Fused join + score from raw peak matrices.  Hot path.
- *     x, y: n×2 numeric matrices [mz, intensity], sorted by mz.
+ *     x, y: nx2 numeric matrices [mz, intensity], sorted by mz.
  *     Returns list(score = double, matches = int).
  *
  *   gnps(x, y)
  *     Score pre-aligned matrices (backward compat).
- *     x, y: n×2 matrices from an outer join (may contain NAs).
+ *     x, y: nx2 matrices from an outer join (may contain NAs).
  *     Builds full score matrix, solves with Hungarian.
  *     Returns list(score = double, matches = int).
  *
@@ -337,7 +337,7 @@ static double score_matched(
    *
    * Replicate join(x, y, type="outer") closest one-to-one semantics.
    * For each y[j] (in sorted order), find the closest x[i] within
-   * per-element tolerance:  |x[i] - y[j]| ≤ tol + ppm·x[i]·1e-6
+    * per-element tolerance:  |x[i] - y[j]| <= tol + ppm·x[i]·1e-6
    * + sqrt(DBL_EPSILON).  When two y's compete for the same x, the closer
    * one wins and the loser is released.
    *
@@ -423,7 +423,7 @@ static double score_matched(
     }
   }
 
-  /* ── Step 3: optimal scoring  [O(n) typical, O(n + k³) worst] ───────── *
+  /* ── Step 3: optimal scoring  [O(n) typical, O(n + k^3) worst] ───────── *
    *                                                                       *
    * Conflict detection: x[i]'s shifted match sm_arr[i] = j, but y[j] is  *
    * already directly matched by a different x[k] (bd_arr[j] = k ≠ i).    *
@@ -436,10 +436,10 @@ static double score_matched(
    * 3b. Conflicts exist (~1% of pairs):                                   *
    *     Mark a "dirty" cluster: the two competing x's, the contested y,   *
    *     and all their other match targets.  Score everything OUTSIDE the   *
-   *     cluster greedily (safe - no overlap).  Build a k×k score matrix   *
-   *     for the dirty cluster (k ≈ 3–5) and solve with exact Hungarian.   *
-   *     This reduces the Hungarian matrix from ~25×25 (all matched peaks) *
-   *     to ~5×5 (conflict cluster only) - a ~125× reduction in O(k³).    *
+   *     cluster greedily (safe - no overlap).  Build a kxk score matrix   *
+   *     for the dirty cluster (k ~ 3–5) and solve with exact Hungarian.   *
+   *     This reduces the Hungarian matrix from ~25x25 (all matched peaks) *
+   *     to ~5x5 (conflict cluster only) - a ~125x reduction in O(k^3).    *
    * ───────────────────────────────────────────────────────────────────── */
 
   double total = 0.0;
@@ -455,7 +455,7 @@ static double score_matched(
    *     because the Hungarian needs the full picture of what each dirty x
    *     can be assigned to.
    *
-   * The dirty cluster is typically very small (k ≈ 3–5 peaks total).      */
+   * The dirty cluster is typically very small (k ~ 3–5 peaks total).      */
   size_t x_bs = (size_t)(((unsigned)nx + 7u) >> 3);
   size_t y_bs = (size_t)(((unsigned)ny + 7u) >> 3);
   unsigned char *x_dirty = (unsigned char *)xcalloc(x_bs, 1);
@@ -1019,7 +1019,7 @@ int gnps_join_core_api(
  * sanitized (sorted, unique m/z, no NAs).                                    *
  *                                                                            *
  * Parameters:                                                                *
- *   x, y           - n×2 numeric matrices [mz, intensity]                    *
+ *   x, y           - nx2 numeric matrices [mz, intensity]                    *
  *   xPrecursorMz   - precursor m/z of x (scalar)                             *
  *   yPrecursorMz   - precursor m/z of y (scalar)                             *
  *   tolerance      - absolute tolerance in Da                                *
@@ -1058,17 +1058,17 @@ SEXP C_gnps_chain_dp(SEXP x, SEXP y,
 /* ══════════════════════════════════════════════════════════════════════════ *
  * gnps - score pre-aligned matrices (backward compat)                        *
  *                                                                            *
- * Accepts the output of join_gnps: two n×2 matrices where row i represents   *
+ * Accepts the output of join_gnps: two nx2 matrices where row i represents   *
  * a matched pair (NA if unmatched on one side).  Builds a full score         *
  * matrix indexed by unique m/z groups, then solves with exact shortest-      *
  * augmenting-path Hungarian (maximize via negation).                         *
  *                                                                            *
- * O(n³) where n = max(unique x groups, unique y groups), but n is small      *
+ * O(n^3) where n = max(unique x groups, unique y groups), but n is small      *
  * because the input is already filtered to matched peaks.                    *
  * Single allocation for all Hungarian workspace.                             *
  *                                                                            *
  * Parameters:                                                                *
- *   x, y - n×2 numeric matrices [mz, intensity] from an outer join           *
+ *   x, y - nx2 numeric matrices [mz, intensity] from an outer join           *
  *                                                                            *
  * Returns: list(score = double, matches = int)                               *
  * ══════════════════════════════════════════════════════════════════════════ */

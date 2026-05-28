@@ -8,7 +8,7 @@ propagating anchor InChIKeys.}
 NEUTRAL_MASS_MATCH_TOLERANCE_DA
 }
 \description{
-5 mDa ≈ 10-15 ppm at typical small-molecule masses, which
+5 mDa ~ 10-15 ppm at typical small-molecule masses, which
 comfortably absorbs the accumulated error of inverting multiple
 adduct formulas (e.g. \verb{[M+NH4]+} vs \verb{[2M+Na]+}) while remaining
 tight enough to keep distinct monoisotopic neutral masses in

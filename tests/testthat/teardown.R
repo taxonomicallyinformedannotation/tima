@@ -34,9 +34,13 @@ all_items <- list.files(testthat_root, all.files = FALSE, no.. = TRUE)
 
 # Filter to unexpected items
 unexpected <- all_items[
-  !sapply(all_items, function(item) {
-    any(sapply(allowed_patterns, function(pat) grepl(pat, item)))
-  })
+  !vapply(
+    all_items,
+    function(item) {
+      any(vapply(allowed_patterns, function(pat) grepl(pat, item), logical(1L)))
+    },
+    logical(1L)
+  )
 ]
 
 # Warn about unexpected items (but don't fail - just inform)

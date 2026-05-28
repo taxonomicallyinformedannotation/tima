@@ -33,9 +33,9 @@
 #'
 #' Reliability levels follow the Metabolomics Standards Initiative (MSI) scale:
 #'
-#' * **1** – confirmed (score ≥ 0.7 with spectral library evidence)
-#' * **2** – probable (score ≥ 0.5; or spectral match, any score)
-#' * **3** – putative (score ≥ 0.2)
+#' * **1** – confirmed (score >= 0.7 with spectral library evidence)
+#' * **2** – probable (score >= 0.5; or spectral match, any score)
+#' * **3** – putative (score >= 0.2)
 #' * **4** – unambiguous compound class only (everything else)
 #'
 #' ## id_confidence_measure columns

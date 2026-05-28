@@ -554,7 +554,7 @@ read_mztab <- function(
 #' @details The function emits a `FEATURE_ID=` field in each MGF entry so that
 #'   [get_spectra_ids()] can later map spectra back to TIMA feature IDs.
 #'   Feature IDs are resolved in this priority order:
-#'   1. Reverse-lookup from `opt_global_mgf_index` column (masster ≥ 0.5) — the
+#'   1. Reverse-lookup from `opt_global_mgf_index` column (masster >= 0.5) — the
 #'      SML table stores a comma-separated list of `mgf_id` values per feature,
 #'      giving the authoritative bi-directional mapping.
 #'   2. Parse the `id:<N>` key from the TITLE string (newer masster variants that

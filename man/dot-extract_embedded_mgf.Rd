@@ -21,7 +21,7 @@ The function emits a \verb{FEATURE_ID=} field in each MGF entry so that
 \code{\link[=get_spectra_ids]{get_spectra_ids()}} can later map spectra back to TIMA feature IDs.
 Feature IDs are resolved in this priority order:
 \enumerate{
-\item Reverse-lookup from \code{opt_global_mgf_index} column (masster ≥ 0.5) — the
+\item Reverse-lookup from \code{opt_global_mgf_index} column (masster >= 0.5) — the
 SML table stores a comma-separated list of \code{mgf_id} values per feature,
 giving the authoritative bi-directional mapping.
 \item Parse the \verb{id:<N>} key from the TITLE string (newer masster variants that

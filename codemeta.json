@@ -627,11 +627,11 @@
     "SystemRequirements": "\n    python (>= 3.12, < 3.15)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome", "lc-msms", "metabolite-annotation", "metabolomics", "natural-products", "scoring-system", "taxonomy", "specialized-metabolome", "r"],
-  "fileSize": "43304.938KB",
+  "fileSize": "43269.863KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
-      "datePublished": "2025",
+      "datePublished": "2026",
       "author": [
         {
           "@type": "Person",
@@ -643,7 +643,7 @@
       ],
       "name": "tima: Taxonomically Informed Metabolite Annotation",
       "identifier": "10.5281/zenodo.5797920",
-      "description": "R package, version 2.11.0",
+      "description": "R package, version 2.13.0",
       "@id": "https://doi.org/10.5281/zenodo.5797920",
       "sameAs": "https://doi.org/10.5281/zenodo.5797920"
     },

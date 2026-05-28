@@ -34,38 +34,13 @@ sanitize_spectra <- function(
   min_fragments = 1L,
   ppm = 10
 ) {
-  # TODO(M6): Replace @backend@peaksData slot access with Spectra::peaksData()
-
-  # accessor where possible. Write-back has no clean API equivalent yet.
-  if (!inherits(spectra, "Spectra")) {
-    cli::cli_abort(
-      "input must be a Spectra object from the Spectra package",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-  if (!is.null(cutoff) && (!is.numeric(cutoff) || cutoff < 0)) {
-    cli::cli_abort(
-      "cutoff intensity must be non-negative or NULL, got {.val {cutoff}}",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-  if (!is.numeric(dalton) || dalton <= 0 || !is.numeric(ppm) || ppm <= 0) {
-    cli::cli_abort(
-      "tolerance values must be positive (dalton: {.val {dalton}}, ppm: {.val {ppm}})",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-  min_fragments <- as.integer(min_fragments)
-  if (is.na(min_fragments) || min_fragments < 1L) {
-    cli::cli_abort(
-      "min_fragments must be a positive integer, got {.val {min_fragments}}",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
+  min_fragments <- .validate_sanitize_spectra_inputs(
+    spectra = spectra,
+    cutoff = cutoff,
+    dalton = dalton,
+    ppm = ppm,
+    min_fragments = min_fragments
+  )
 
   n_initial <- length(spectra)
   if (n_initial == 0L) {
@@ -79,52 +54,21 @@ sanitize_spectra <- function(
     ifelse(is.null(cutoff), "dynamic", as.character(cutoff))
   )
 
-  if (is.null(cutoff)) {
+  dynamic_cutoff_used <- is.null(cutoff)
+  dynamic_thresholds <- if (dynamic_cutoff_used) {
     log_debug("Calculating dynamic intensity thresholds")
-    peaks_data <- spectra@backend@peaksData
-    dynamic_thresholds <- vapply(
-      peaks_data,
-      function(peak_matrix) {
-        if (is.null(peak_matrix) || nrow(peak_matrix) == 0L) {
-          return(0)
-        }
-        intensities <- peak_matrix[, 2L]
-        intensities <- intensities[!is.nan(intensities)]
-        if (length(intensities) == 0L) {
-          return(0)
-        }
-        med_intensity <- median(intensities, na.rm = TRUE)
-        mad_intensity <- median(abs(intensities - med_intensity), na.rm = TRUE)
-        if (!is.na(mad_intensity) && mad_intensity > 0) {
-          threshold <- max(0, med_intensity - 2 * mad_intensity)
-        } else {
-          threshold <- quantile(intensities, 0.05, names = FALSE, na.rm = TRUE)
-        }
-        threshold
-      },
-      numeric(1L),
-      USE.NAMES = FALSE
-    )
-    dynamic_cutoff_used <- TRUE
+    .compute_dynamic_thresholds(spectra@backend@peaksData)
   } else {
-    dynamic_cutoff_used <- FALSE
+    NULL
   }
 
   n_before <- length(spectra)
 
   log_debug("Pre-filtering NaN values from peak matrices")
-  peaks_data <- spectra@backend@peaksData
-  peaks_data_clean <- lapply(peaks_data, function(peak_matrix) {
-    if (is.null(peak_matrix) || nrow(peak_matrix) == 0L) {
-      return(peak_matrix)
-    }
-    has_nan <- is.nan(peak_matrix[, 1]) | is.nan(peak_matrix[, 2])
-    if (any(has_nan)) {
-      peak_matrix <- peak_matrix[!has_nan, , drop = FALSE]
-    }
-    peak_matrix
-  })
-  spectra@backend@peaksData <- peaks_data_clean
+  spectra@backend@peaksData <- lapply(
+    spectra@backend@peaksData,
+    .strip_nan_peak_rows
+  )
 
   spectra <- spectra |>
     Spectra::dropNaSpectraVariables() |>
@@ -139,17 +83,10 @@ sanitize_spectra <- function(
 
   if (dynamic_cutoff_used) {
     log_debug("Applying dynamic intensity thresholds")
-    peaks_data <- spectra@backend@peaksData
-    filtered_peaks <- lapply(seq_along(peaks_data), function(i) {
-      peak_matrix <- peaks_data[[i]]
-      if (is.null(peak_matrix) || nrow(peak_matrix) == 0L) {
-        return(peak_matrix)
-      }
-      threshold <- dynamic_thresholds[i]
-      keep_idx <- peak_matrix[, 2L] >= threshold
-      peak_matrix[keep_idx, , drop = FALSE]
-    })
-    spectra@backend@peaksData <- filtered_peaks
+    spectra@backend@peaksData <- .apply_dynamic_thresholds(
+      spectra@backend@peaksData,
+      dynamic_thresholds
+    )
   } else {
     spectra <- spectra |>
       Spectra::filterIntensity(intensity = c(cutoff, Inf))
@@ -160,58 +97,9 @@ sanitize_spectra <- function(
     Spectra::applyProcessing()
 
   n_before_noise <- length(spectra)
-  peaks_data <- spectra@backend@peaksData
-  cleaned_peaks <- lapply(peaks_data, function(peak_matrix) {
-    if (is.null(peak_matrix) || nrow(peak_matrix) == 0L) {
-      return(peak_matrix)
-    }
-
-    intensities <- peak_matrix[, 2L]
-    n_peaks <- length(intensities)
-    if (n_peaks < 10L) {
-      return(peak_matrix)
-    }
-
-    smallest_10 <- sort(unique(intensities))[
-      seq_len(min(10L, length(unique(intensities))))
-    ]
-
-    # Remove intensity values that appear more than 5 times (noise artifacts)
-    noise_vals <- smallest_10[
-      vapply(smallest_10, function(v) sum(intensities == v) > 5L, logical(1L))
-    ]
-    if (length(noise_vals) > 0L) {
-      keep_idx <- !intensities %in% noise_vals
-      peak_matrix <- peak_matrix[keep_idx, , drop = FALSE]
-      intensities <- intensities[keep_idx]
-    }
-
-    if (nrow(peak_matrix) > 0L) {
-      total_intensity <- sum(peak_matrix[, 2L])
-      if (total_intensity > 0) {
-        peak_matrix[, 2L] <- peak_matrix[, 2L] / total_intensity
-      }
-    }
-
-    peak_matrix
-  })
-  spectra@backend@peaksData <- cleaned_peaks
-
-  n_affected_noise <- sum(vapply(
-    seq_along(peaks_data),
-    function(i) {
-      old_n <- nrow(peaks_data[[i]])
-      new_n <- nrow(cleaned_peaks[[i]])
-      if (is.null(old_n)) {
-        old_n <- 0L
-      }
-      if (is.null(new_n)) {
-        new_n <- 0L
-      }
-      old_n != new_n
-    },
-    logical(1L)
-  ))
+  noise_cleanup <- .remove_low_noise_and_normalize(spectra@backend@peaksData)
+  spectra@backend@peaksData <- noise_cleanup$peaks
+  n_affected_noise <- noise_cleanup$n_affected
 
   if (n_affected_noise > 0L) {
     pct_affected <- round(100 * n_affected_noise / n_before_noise, 1)
@@ -222,13 +110,7 @@ sanitize_spectra <- function(
     )
   }
 
-  n_peaks <- vapply(
-    spectra@backend@peaksData,
-    function(x) if (is.null(x)) 0L else nrow(x),
-    integer(1L),
-    USE.NAMES = FALSE
-  )
-  spectra <- spectra[n_peaks >= min_fragments]
+  spectra <- .filter_spectra_min_fragments(spectra, min_fragments)
   n_removed_peaks <- n_before - length(spectra)
   if (n_removed_peaks > 0L) {
     pct_removed <- round(100 * n_removed_peaks / n_before, 1)
@@ -240,7 +122,6 @@ sanitize_spectra <- function(
     )
   }
 
-  .has_nan_values <- function(x) any(is.nan(x))
   has_nan <- vapply(
     X = spectra@backend@peaksData,
     FUN = .has_nan_values,
@@ -289,3 +170,149 @@ sanitize_spectra <- function(
 
   spectra
 }
+
+.validate_sanitize_spectra_inputs <- function(
+  spectra,
+  cutoff,
+  dalton,
+  ppm,
+  min_fragments
+) {
+  if (!inherits(spectra, "Spectra")) {
+    cli::cli_abort(
+      "input must be a Spectra object from the Spectra package",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+  if (!is.null(cutoff) && (!is.numeric(cutoff) || cutoff < 0)) {
+    cli::cli_abort(
+      "cutoff intensity must be non-negative or NULL, got {.val {cutoff}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+  if (!is.numeric(dalton) || dalton <= 0 || !is.numeric(ppm) || ppm <= 0) {
+    cli::cli_abort(
+      "tolerance values must be positive (dalton: {.val {dalton}}, ppm: {.val {ppm}})",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+  min_fragments <- as.integer(min_fragments)
+  if (is.na(min_fragments) || min_fragments < 1L) {
+    cli::cli_abort(
+      "min_fragments must be a positive integer, got {.val {min_fragments}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+  min_fragments
+}
+
+.compute_dynamic_thresholds <- function(peaks_data) {
+  vapply(
+    peaks_data,
+    function(peak_matrix) {
+      if (is.null(peak_matrix) || nrow(peak_matrix) == 0L) {
+        return(0)
+      }
+      intensities <- peak_matrix[, 2L]
+      intensities <- intensities[!is.nan(intensities)]
+      if (length(intensities) == 0L) {
+        return(0)
+      }
+      med_intensity <- median(intensities, na.rm = TRUE)
+      mad_intensity <- median(abs(intensities - med_intensity), na.rm = TRUE)
+      if (!is.na(mad_intensity) && mad_intensity > 0) {
+        return(max(0, med_intensity - 2 * mad_intensity))
+      }
+      quantile(intensities, 0.05, names = FALSE, na.rm = TRUE)
+    },
+    numeric(1L),
+    USE.NAMES = FALSE
+  )
+}
+
+.strip_nan_peak_rows <- function(peak_matrix) {
+  if (is.null(peak_matrix) || nrow(peak_matrix) == 0L) {
+    return(peak_matrix)
+  }
+  has_nan <- is.nan(peak_matrix[, 1]) | is.nan(peak_matrix[, 2])
+  if (any(has_nan)) {
+    return(peak_matrix[!has_nan, , drop = FALSE])
+  }
+  peak_matrix
+}
+
+.apply_dynamic_thresholds <- function(peaks_data, dynamic_thresholds) {
+  lapply(seq_along(peaks_data), function(i) {
+    peak_matrix <- peaks_data[[i]]
+    if (is.null(peak_matrix) || nrow(peak_matrix) == 0L) {
+      return(peak_matrix)
+    }
+    keep_idx <- peak_matrix[, 2L] >= dynamic_thresholds[[i]]
+    peak_matrix[keep_idx, , drop = FALSE]
+  })
+}
+
+.clean_noise_peak_matrix <- function(peak_matrix) {
+  if (is.null(peak_matrix) || nrow(peak_matrix) == 0L) {
+    return(peak_matrix)
+  }
+
+  intensities <- peak_matrix[, 2L]
+  if (length(intensities) >= 10L) {
+    smallest_10 <- sort(unique(intensities))[
+      seq_len(min(10L, length(unique(intensities))))
+    ]
+    noise_vals <- smallest_10[
+      vapply(smallest_10, function(v) sum(intensities == v) > 5L, logical(1L))
+    ]
+    if (length(noise_vals) > 0L) {
+      keep_idx <- !intensities %in% noise_vals
+      peak_matrix <- peak_matrix[keep_idx, , drop = FALSE]
+    }
+  }
+
+  if (nrow(peak_matrix) > 0L) {
+    total_intensity <- sum(peak_matrix[, 2L])
+    if (total_intensity > 0) {
+      peak_matrix[, 2L] <- peak_matrix[, 2L] / total_intensity
+    }
+  }
+
+  peak_matrix
+}
+
+.remove_low_noise_and_normalize <- function(peaks_data) {
+  cleaned_peaks <- lapply(peaks_data, .clean_noise_peak_matrix)
+  n_affected <- sum(vapply(
+    seq_along(peaks_data),
+    function(i) {
+      old_n <- nrow(peaks_data[[i]])
+      new_n <- nrow(cleaned_peaks[[i]])
+      if (is.null(old_n)) {
+        old_n <- 0L
+      }
+      if (is.null(new_n)) {
+        new_n <- 0L
+      }
+      old_n != new_n
+    },
+    logical(1L)
+  ))
+  list(peaks = cleaned_peaks, n_affected = n_affected)
+}
+
+.filter_spectra_min_fragments <- function(spectra, min_fragments) {
+  n_peaks <- vapply(
+    spectra@backend@peaksData,
+    function(x) if (is.null(x)) 0L else nrow(x),
+    integer(1L),
+    USE.NAMES = FALSE
+  )
+  spectra[n_peaks >= min_fragments]
+}
+
+.has_nan_values <- function(x) any(is.nan(x))

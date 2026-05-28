@@ -369,9 +369,13 @@ test_that("calculate_mass_of_m is fast for batch processing", {
   mz_values <- runif(1000, 100, 1000)
 
   start_time <- Sys.time()
-  masses <- sapply(mz_values, function(mz) {
-    calculate_mass_of_m(mz = mz, adduct_string = "[M+H]+")
-  })
+  masses <- vapply(
+    mz_values,
+    function(mz) {
+      calculate_mass_of_m(mz = mz, adduct_string = "[M+H]+")
+    },
+    numeric(1L)
+  )
   elapsed <- as.numeric(Sys.time() - start_time, units = "secs")
 
   expect_true(elapsed < 1.0)

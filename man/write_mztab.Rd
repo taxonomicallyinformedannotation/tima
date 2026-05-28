@@ -125,9 +125,9 @@ making them available without polluting SME.
 
 Reliability levels follow the Metabolomics Standards Initiative (MSI) scale:
 \itemize{
-\item \strong{1} – confirmed (score ≥ 0.7 with spectral library evidence)
-\item \strong{2} – probable (score ≥ 0.5; or spectral match, any score)
-\item \strong{3} – putative (score ≥ 0.2)
+\item \strong{1} – confirmed (score >= 0.7 with spectral library evidence)
+\item \strong{2} – probable (score >= 0.5; or spectral match, any score)
+\item \strong{3} – putative (score >= 0.2)
 \item \strong{4} – unambiguous compound class only (everything else)
 }
 }
