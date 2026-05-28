@@ -61,11 +61,12 @@ test_that("safe_fread maps malformed-row errors to formatting guidance", {
   on.exit(unlink(tf))
 
   expect_error(
-    with_mocked_bindings(
-      .safe_fread_read = function(file, ...) {
+    safe_fread(
+      file = tf,
+      file_type = "test table",
+      .reader = function(file, ...) {
         stop("line 2 expected 2 fields but found 3")
-      },
-      safe_fread(file = tf, file_type = "test table")
+      }
     ),
     "Malformed test table"
   )
@@ -76,11 +77,12 @@ test_that("safe_fread handles empty files by warning and returning empty table",
   on.exit(unlink(tf))
 
   expect_error(
-    with_mocked_bindings(
-      .safe_fread_read = function(file, ...) {
+    safe_fread(
+      file = tf,
+      file_type = "test table",
+      .reader = function(file, ...) {
         stop("empty input")
-      },
-      safe_fread(file = tf, file_type = "test table")
+      }
     ),
     "is empty"
   )
@@ -91,11 +93,12 @@ test_that("safe_fread maps permission/open failures when unreadable file is enco
   on.exit(unlink(tf))
 
   expect_error(
-    with_mocked_bindings(
-      .safe_fread_read = function(file, ...) {
+    safe_fread(
+      file = tf,
+      file_type = "test table",
+      .reader = function(file, ...) {
         stop("could not open file")
-      },
-      safe_fread(file = tf, file_type = "test table")
+      }
     ),
     "Cannot open test table"
   )

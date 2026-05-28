@@ -3,20 +3,25 @@
 
 library(testthat)
 
+ns <- asNamespace("tima")
+mztab_pluck <- get(".mztab_pluck", envir = ns)
+mztab_pluck_na <- get(".mztab_pluck_na", envir = ns)
+mztab_expand_summarized <- get(".mztab_expand_summarized", envir = ns)
+
 # ── .mztab_pluck ─────────────────────────────────────────────────────────────
 
 test_that(".mztab_pluck returns column as character when present", {
   df <- data.frame(a = c(1, 2), b = c("x", "y"), stringsAsFactors = FALSE)
-  result <- tima:::.mztab_pluck(df, "a")
+  result <- mztab_pluck(df, "a")
   expect_equal(result, c("1", "2"))
 
-  result_b <- tima:::.mztab_pluck(df, "b")
+  result_b <- mztab_pluck(df, "b")
   expect_equal(result_b, c("x", "y"))
 })
 
 test_that(".mztab_pluck returns 'null' vector when column absent", {
   df <- data.frame(a = c(1, 2), stringsAsFactors = FALSE)
-  result <- tima:::.mztab_pluck(df, "missing_col")
+  result <- mztab_pluck(df, "missing_col")
   expect_equal(result, c("null", "null"))
   expect_length(result, 2L)
 })
@@ -28,13 +33,13 @@ test_that(".mztab_pluck_na replaces NA and empty with 'null'", {
     a = c("hello", NA_character_, "", "null", "world"),
     stringsAsFactors = FALSE
   )
-  result <- tima:::.mztab_pluck_na(df, "a")
+  result <- mztab_pluck_na(df, "a")
   expect_equal(result, c("hello", "null", "null", "null", "world"))
 })
 
 test_that(".mztab_pluck_na returns all 'null' for absent column", {
   df <- data.frame(a = 1:3)
-  result <- tima:::.mztab_pluck_na(df, "b")
+  result <- mztab_pluck_na(df, "b")
   expect_equal(result, rep("null", 3L))
 })
 
@@ -46,7 +51,7 @@ test_that(".mztab_expand_summarized returns unchanged df when no pipe-sep column
     candidate_score = c("0.8", "0.7"),
     stringsAsFactors = FALSE
   )
-  result <- tima:::.mztab_expand_summarized(df)
+  result <- mztab_expand_summarized(df)
   expect_equal(nrow(result), 2L)
   expect_equal(result$feature_id, c("f1", "f2"))
 })
@@ -58,7 +63,7 @@ test_that(".mztab_expand_summarized expands pipe-separated candidate columns", {
     rank_1 = c("1|2"),
     stringsAsFactors = FALSE
   )
-  result <- tima:::.mztab_expand_summarized(df)
+  result <- mztab_expand_summarized(df)
   expect_equal(nrow(result), 2L)
   expect_equal(result$feature_id, c("f1", "f1"))
   expect_equal(trimws(result$candidate_smiles), c("CC", "CCC"))
@@ -70,7 +75,7 @@ test_that(".mztab_expand_summarized handles rows with and without pipe", {
     candidate_smiles = c("CC|CCC", "CCC"),
     stringsAsFactors = FALSE
   )
-  result <- tima:::.mztab_expand_summarized(df)
+  result <- mztab_expand_summarized(df)
   expect_equal(nrow(result), 3L)
 })
 
@@ -80,7 +85,7 @@ test_that(".mztab_expand_summarized returns df unchanged when no candidate/rank/
     mz = c(100.0),
     stringsAsFactors = FALSE
   )
-  result <- tima:::.mztab_expand_summarized(df)
+  result <- mztab_expand_summarized(df)
   expect_equal(nrow(result), 1L)
   expect_equal(result$feature_id, "f1")
 })

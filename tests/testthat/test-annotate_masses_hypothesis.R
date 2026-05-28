@@ -3,20 +3,6 @@
 
 library(testthat)
 
-# Helper to create minimal adduct edge tables
-.make_adduct_edges <- function(
-  fid1 = "f1",
-  adduct1 = "[M+H]+",
-  fid2 = "f2",
-  adduct2 = "[M+Na]+"
-) {
-  tidytable::tidytable(
-    feature_id = fid1,
-    adduct = adduct1,
-    feature_id_dest = fid2,
-    adduct_dest = adduct2
-  )
-}
 
 # ── match_pairs_to_adduct_diffs ───────────────────────────────────────────────
 

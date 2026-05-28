@@ -836,7 +836,7 @@ prune_candidates_by_network_consensus <- function(
       #   - it has network edge support,
       #   - or it is the sole type of candidate for this feature *and* it is
       #     not a speculative "multi" hypothesis that has a better alternative.
-      is_safe = (!is.null(baseline_adduct) & adduct == baseline_adduct) |
+      is_safe = (if (is.null(baseline_adduct)) FALSE else adduct == baseline_adduct) |
         is_preassigned |
         source %in% c("preassigned", "baseline") |
         net_support > 0L |

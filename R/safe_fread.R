@@ -28,6 +28,7 @@ safe_fread <- function(
   file,
   file_type = "data file",
   required_cols = NULL,
+  .reader = .safe_fread_read,
   ...
 ) {
   # Validate file exists first
@@ -40,7 +41,7 @@ safe_fread <- function(
   # Try to read the file
   df <- tryCatch(
     {
-      .safe_fread_read(file = file, ...)
+      .reader(file = file, ...)
     },
     error = function(e) {
       error_msg <- conditionMessage(e)
