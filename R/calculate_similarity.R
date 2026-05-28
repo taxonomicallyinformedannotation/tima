@@ -62,7 +62,12 @@
 #'   ppm = 10.0,
 #'   return_matched_peaks = TRUE
 #' )
-.entropy_similarity_call <- function(query_spectrum, target_spectrum, dalton, ppm) {
+.entropy_similarity_call <- function(
+  query_spectrum,
+  target_spectrum,
+  dalton,
+  ppm
+) {
   msentropy::calculate_entropy_similarity(
     peaks_a = query_spectrum,
     peaks_b = target_spectrum,
@@ -77,12 +82,12 @@
 }
 
 .gnps_chain_dp_call <- function(
-    query_spectrum,
-    target_spectrum,
-    query_precursor,
-    target_precursor,
-    dalton,
-    ppm
+  query_spectrum,
+  target_spectrum,
+  query_precursor,
+  target_precursor,
+  dalton,
+  ppm
 ) {
   gnps_chain_dp_wrapper(
     x = query_spectrum,
@@ -95,7 +100,13 @@
   )
 }
 
-.join_spectra_call <- function(query_spectrum, target_spectrum, dalton, ppm, ...) {
+.join_spectra_call <- function(
+  query_spectrum,
+  target_spectrum,
+  dalton,
+  ppm,
+  ...
+) {
   MsCoreUtils::join(
     x = query_spectrum[, 1L],
     y = target_spectrum[, 1L],

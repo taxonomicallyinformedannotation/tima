@@ -54,7 +54,12 @@ test_that("run_app launches shiny app in standard mode", {
       invisible(NULL)
     },
     {
-      expect_null(run_app(host = "127.0.0.1", port = 3838, browser = TRUE, reinstall = FALSE))
+      expect_null(run_app(
+        host = "127.0.0.1",
+        port = 3838,
+        browser = TRUE,
+        reinstall = FALSE
+      ))
     }
   )
 
@@ -81,11 +86,21 @@ test_that("run_app enforces Docker host/browser overrides and reinstall", {
     app_path_exists = function(path) identical(path, "dummy/app.R"),
     build_shiny_app_dir = function(app_path) app_path,
     run_shiny_app = function(appDir, port, host, launch.browser) {
-      calls$run <- list(appDir = appDir, port = port, host = host, launch.browser = launch.browser)
+      calls$run <- list(
+        appDir = appDir,
+        port = port,
+        host = host,
+        launch.browser = launch.browser
+      )
       invisible(NULL)
     },
     {
-      expect_null(run_app(host = "127.0.0.1", port = 9999, browser = TRUE, reinstall = TRUE))
+      expect_null(run_app(
+        host = "127.0.0.1",
+        port = 9999,
+        browser = TRUE,
+        reinstall = TRUE
+      ))
     }
   )
 
@@ -109,4 +124,3 @@ test_that("run_app aborts when app file is missing", {
     }
   )
 })
-

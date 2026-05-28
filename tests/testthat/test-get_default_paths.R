@@ -43,4 +43,3 @@ test_that("get_default_paths honors interim params override option", {
 
   expect_identical(paths$data$interim$params$path, "new/path")
 })
-

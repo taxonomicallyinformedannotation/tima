@@ -171,7 +171,9 @@ test_that("calculate_similarity returns safe fallbacks when backends error", {
   expect_equal(
     with_mocked_bindings(
       .join_spectra_call = function(...) stop("join fail"),
-      .gnps_score_call = function(query_spectrum, target_spectrum, map) c(0.75, 2, 0.7, 0.8),
+      .gnps_score_call = function(query_spectrum, target_spectrum, map) {
+        c(0.75, 2, 0.7, 0.8)
+      },
       log_warn = function(...) invisible(NULL),
       calculate_similarity(
         method = "cosine",
@@ -190,7 +192,9 @@ test_that("calculate_similarity returns safe fallbacks when backends error", {
   expect_equal(
     with_mocked_bindings(
       .join_spectra_call = function(...) list(c(1L, 2L), c(1L, 2L)),
-      .gnps_score_call = function(query_spectrum, target_spectrum, map) stop("score fail"),
+      .gnps_score_call = function(query_spectrum, target_spectrum, map) {
+        stop("score fail")
+      },
       log_warn = function(...) invisible(NULL),
       calculate_similarity(
         method = "cosine",

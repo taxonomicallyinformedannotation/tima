@@ -7,13 +7,21 @@ test_that("benchmark MCC handles regular and degenerate confusion matrices", {
     1
   )
 
-  expect_true(is.na(tima:::.benchmark_compute_mcc(tp = 0, tn = 0, fp = 0, fn = 0)))
+  expect_true(is.na(tima:::.benchmark_compute_mcc(
+    tp = 0,
+    tn = 0,
+    fp = 0,
+    fn = 0
+  )))
 })
 
 
 test_that("benchmark split and pad helpers handle empty, null-like and vector inputs", {
   expect_equal(tima:::.benchmark_split_multivalue("a|b|c"), c("a", "b", "c"))
-  expect_equal(tima:::.benchmark_split_multivalue(c("x|y", "z")), c("x", "y", "z"))
+  expect_equal(
+    tima:::.benchmark_split_multivalue(c("x|y", "z")),
+    c("x", "y", "z")
+  )
   expect_true(is.na(tima:::.benchmark_split_multivalue("")))
   expect_true(is.na(tima:::.benchmark_split_multivalue("NULL")))
 
@@ -47,7 +55,9 @@ test_that("benchmark expand predictions normalizes values and supports scalar ra
 
   expanded <- tima:::.benchmark_expand_predictions(df, pred_name = "predA")
 
-  expect_true(all(c("feature_id", "candidate_ik", "prediction") %in% names(expanded)))
+  expect_true(all(
+    c("feature_id", "candidate_ik", "prediction") %in% names(expanded)
+  ))
   expect_equal(unique(expanded$prediction), "predA")
   expect_true(any(expanded$candidate_ik == "AAAAAAAAAAAAAA"))
   expect_true(any(expanded$candidate_ik == "BBBBBBBBBBBBBB"))
@@ -120,7 +130,3 @@ test_that("benchmark evaluate predictions computes top-k and threshold metrics",
   expect_true(all(metrics$prediction == "predA"))
   expect_true(any(is.finite(metrics$mcc) | is.na(metrics$mcc)))
 })
-
-
-
-

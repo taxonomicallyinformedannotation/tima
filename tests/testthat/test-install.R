@@ -209,7 +209,9 @@ test_that("verify_package_installation handles broken install states", {
   expect_false(
     with_mocked_bindings(
       .require_namespace = function(package, quietly = TRUE) TRUE,
-      .find_package_paths = function(package, quiet = TRUE) c("/bad/a", "/bad/b"),
+      .find_package_paths = function(package, quiet = TRUE) {
+        c("/bad/a", "/bad/b")
+      },
       .path_exists = function(path) FALSE,
       log_error = function(...) invisible(NULL),
       verify_package_installation("brokenpkg")
@@ -234,7 +236,9 @@ test_that("verify_package_installation handles DESCRIPTION and namespace failure
       .require_namespace = function(package, quietly = TRUE) TRUE,
       .find_package_paths = function(package, quiet = TRUE) "/good/pkg",
       .path_exists = function(path) TRUE,
-      .read_description_dcf = function(path) structure(matrix("x", nrow = 1), class = "matrix"),
+      .read_description_dcf = function(path) {
+        structure(matrix("x", nrow = 1), class = "matrix")
+      },
       .load_namespace = function(package) stop("namespace load failed"),
       log_error = function(...) invisible(NULL),
       verify_package_installation("brokenpkg")
@@ -326,7 +330,12 @@ test_that("install_tima orchestrates installation workflow", {
       log_debug = function(...) invisible(NULL),
       check_or_install_python = function() "/usr/bin/python3",
       .install_packages = function(package, repos, dependencies, type, ...) {
-        calls$install <- list(package = package, repos = repos, dependencies = dependencies, type = type)
+        calls$install <- list(
+          package = package,
+          repos = repos,
+          dependencies = dependencies,
+          type = type
+        )
         invisible(NULL)
       },
       .require_namespace = function(package, quietly = TRUE) TRUE,
@@ -346,7 +355,11 @@ test_that("install_tima orchestrates installation workflow", {
         calls$destroyed <- calls$destroyed + 1L
         invisible(NULL)
       },
-      install_tima(package = "tima", repos = .make_repos(), dependencies = FALSE)
+      install_tima(
+        package = "tima",
+        repos = .make_repos(),
+        dependencies = FALSE
+      )
     )
   )
 
@@ -366,7 +379,11 @@ test_that("install_tima surfaces installation failures and missing namespace", {
       log_error = function(...) invisible(NULL),
       check_or_install_python = function() "/usr/bin/python3",
       .install_packages = function(...) stop("cannot install"),
-      install_tima(package = "tima", repos = .make_repos(), dependencies = FALSE)
+      install_tima(
+        package = "tima",
+        repos = .make_repos(),
+        dependencies = FALSE
+      )
     ),
     class = "tima_runtime_error"
   )
@@ -378,9 +395,12 @@ test_that("install_tima surfaces installation failures and missing namespace", {
       check_or_install_python = function() "/usr/bin/python3",
       .install_packages = function(...) invisible(NULL),
       .require_namespace = function(package, quietly = TRUE) FALSE,
-      install_tima(package = "tima", repos = .make_repos(), dependencies = FALSE)
+      install_tima(
+        package = "tima",
+        repos = .make_repos(),
+        dependencies = FALSE
+      )
     ),
     class = "tima_runtime_error"
   )
 })
-

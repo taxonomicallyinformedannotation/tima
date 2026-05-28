@@ -79,4 +79,3 @@ test_that("move_file_safely returns FALSE when copy fallback fails", {
   expect_true(file.exists(src))
   expect_false(file.exists(dst))
 })
-

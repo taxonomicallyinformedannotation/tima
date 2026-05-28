@@ -50,7 +50,10 @@ test_that("get_example_sirius downloads v5 and adjusted v6 paths", {
     log_info = function(...) invisible(NULL),
     {
       result <- get_example_sirius(
-        url = list(v5 = "https://example.org/v5.zip", v6 = "https://example.org/v6.zip"),
+        url = list(
+          v5 = "https://example.org/v5.zip",
+          v6 = "https://example.org/v6.zip"
+        ),
         export = list(v5 = "example_sirius_5.zip", v6 = "example_sirius_6.zip")
       )
 
@@ -63,4 +66,3 @@ test_that("get_example_sirius downloads v5 and adjusted v6 paths", {
     }
   )
 })
-

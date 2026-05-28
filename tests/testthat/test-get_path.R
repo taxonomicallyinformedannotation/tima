@@ -28,11 +28,17 @@ test_that("get_path resolves by removing inst prefix", {
 
 test_that("get_path resolves against installed package directory", {
   pkg_dir <- system.file(package = "tima")
-  skip_if(pkg_dir == "", "Installed package path unavailable in this test context")
+  skip_if(
+    pkg_dir == "",
+    "Installed package path unavailable in this test context"
+  )
 
   withr::local_dir(temp_test_dir("get_path_pkg_dir"))
   expected <- file.path(pkg_dir, "paths.yaml")
-  skip_if_not(file.exists(expected), "paths.yaml not available in installed package path")
+  skip_if_not(
+    file.exists(expected),
+    "paths.yaml not available in installed package path"
+  )
 
   expect_identical(get_path("inst/paths.yaml"), expected)
 })

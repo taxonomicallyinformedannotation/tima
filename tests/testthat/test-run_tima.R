@@ -263,9 +263,15 @@ test_that(".parse_run_tima_log_level parses valid inputs", {
 })
 
 test_that(".parse_run_tima_log_level rejects invalid inputs", {
-  expect_error(.parse_run_tima_log_level("nope"), class = "tima_validation_error")
+  expect_error(
+    .parse_run_tima_log_level("nope"),
+    class = "tima_validation_error"
+  )
   expect_error(.parse_run_tima_log_level(999), class = "tima_validation_error")
-  expect_error(.parse_run_tima_log_level(c("info", "warn")), class = "tima_validation_error")
+  expect_error(
+    .parse_run_tima_log_level(c("info", "warn")),
+    class = "tima_validation_error"
+  )
   expect_error(.parse_run_tima_log_level(TRUE), class = "tima_validation_error")
 })
 
