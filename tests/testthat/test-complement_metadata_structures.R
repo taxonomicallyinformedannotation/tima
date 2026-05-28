@@ -652,3 +652,82 @@ test_that("complement_metadata_structures converts placeholder existing values t
   expect_true(is.na(out$candidate_structure_tag[[1L]]))
   expect_true(is.na(out$candidate_structure_name[[1L]]))
 })
+
+test_that("complement_metadata_structures does not fan out rows when lookup inputs contain duplicates", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c("IK_DUP", "IK_DUP"),
+    candidate_structure_smiles_no_stereo = c("CCO", "CCO")
+  )
+
+  st_file <- temp_test_path("st_dup.tsv")
+  met_file <- temp_test_path("met_dup.tsv")
+  cla_file <- temp_test_path("cla_dup.tsv")
+  npc_file <- temp_test_path("npc_dup.tsv")
+
+  full_inchikey <- "IK_DUP-AAAAAAAAAA-N"
+  inchikey_no_stereo <- "IK_DUP-N"
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey = c(full_inchikey, full_inchikey),
+      structure_inchikey_connectivity_layer = c("IK_DUP", "IK_DUP"),
+      structure_inchikey_no_stereo = c(inchikey_no_stereo, inchikey_no_stereo),
+      structure_smiles = c("CCO", "CCO"),
+      structure_smiles_no_stereo = c("CCO", "CCO"),
+      structure_xlogp = c("-0.3", "-0.3"),
+      structure_name = c("ethanol", "ETHANOL"),
+      structure_tag = c("ref", "ref")
+    ),
+    st_file,
+    sep = "\t"
+  )
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_no_stereo = c(inchikey_no_stereo, inchikey_no_stereo),
+      structure_exact_mass = c("46.0419", "46.0419"),
+      structure_molecular_formula = c("C2H6O", "C2H6O")
+    ),
+    met_file,
+    sep = "\t"
+  )
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey = c(full_inchikey, full_inchikey),
+      structure_tax_cla_chemontid = c("CHEMONTID:0000000", "CHEMONTID:0000000"),
+      structure_tax_cla_01kin = c("Organic compounds", "Organic compounds"),
+      structure_tax_cla_02sup = c("Alcohols", "Alcohols"),
+      structure_tax_cla_03cla = c("Primary alcohols", "Primary alcohols"),
+      structure_tax_cla_04dirpar = c("Ethanol", "Ethanol")
+    ),
+    cla_file,
+    sep = "\t"
+  )
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_smiles = c("CCO", "CCO"),
+      structure_tax_npc_01pat = c("Pathway", "Pathway"),
+      structure_tax_npc_02sup = c("Superclass", "Superclass"),
+      structure_tax_npc_03cla = c("Class", "Class")
+    ),
+    npc_file,
+    sep = "\t"
+  )
+
+  out <- complement_metadata_structures(
+    df,
+    str_stereo = st_file,
+    str_met = met_file,
+    str_tax_cla = cla_file,
+    str_tax_npc = npc_file
+  )
+
+  expect_equal(nrow(out), nrow(df))
+  expect_equal(out$feature_id, df$feature_id)
+  expect_true(all(out$candidate_structure_molecular_formula == "C2H6O"))
+  expect_true(all(out$candidate_structure_name == "ethanol"))
+})
+
