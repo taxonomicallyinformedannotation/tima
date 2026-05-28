@@ -730,4 +730,3 @@ test_that("complement_metadata_structures does not fan out rows when lookup inpu
   expect_true(all(out$candidate_structure_molecular_formula == "C2H6O"))
   expect_true(all(out$candidate_structure_name == "ethanol"))
 })
-

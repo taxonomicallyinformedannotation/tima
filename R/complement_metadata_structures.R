@@ -427,7 +427,8 @@ complement_metadata_structures <- function(
 
 .resolve_structure_identifiers <- function(df, stereo_i_conn, stereo_s) {
   if (
-    "candidate_structure_inchikey_connectivity_layer" %in% names(df) &&
+    "candidate_structure_inchikey_connectivity_layer" %in%
+      names(df) &&
       nrow(stereo_i_conn) > 0L
   ) {
     df <- df |>
@@ -452,8 +453,7 @@ complement_metadata_structures <- function(
   }
 
   if (
-    "candidate_structure_smiles_no_stereo" %in% names(df) &&
-      nrow(stereo_s) > 0L
+    "candidate_structure_smiles_no_stereo" %in% names(df) && nrow(stereo_s) > 0L
   ) {
     df <- df |>
       tidytable::left_join(
