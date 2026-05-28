@@ -45,3 +45,38 @@ test_that("move_file_safely overwrites existing destination", {
   expect_false(file.exists(src))
   expect_equal(readLines(dst), "new content")
 })
+
+test_that("move_file_safely falls back to copy plus delete when rename fails", {
+  src <- tempfile(pattern = "tima-mfs-src-")
+  dst <- tempfile(pattern = "tima-mfs-dst-")
+  writeLines("fallback content", src)
+  on.exit(unlink(c(src, dst)), add = TRUE)
+
+  result <- with_mocked_bindings(
+    .move_file_rename = function(from, to) FALSE,
+    move_file_safely(from = src, to = dst)
+  )
+
+  expect_true(result)
+  expect_true(file.exists(dst))
+  expect_false(file.exists(src))
+  expect_equal(readLines(dst), "fallback content")
+})
+
+test_that("move_file_safely returns FALSE when copy fallback fails", {
+  src <- tempfile(pattern = "tima-mfs-src-")
+  dst <- tempfile(pattern = "tima-mfs-dst-")
+  writeLines("cannot move", src)
+  on.exit(unlink(c(src, dst)), add = TRUE)
+
+  result <- with_mocked_bindings(
+    .move_file_rename = function(from, to) FALSE,
+    .move_file_copy = function(from, to, overwrite = TRUE) FALSE,
+    move_file_safely(from = src, to = dst)
+  )
+
+  expect_false(result)
+  expect_true(file.exists(src))
+  expect_false(file.exists(dst))
+})
+

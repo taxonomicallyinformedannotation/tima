@@ -252,6 +252,101 @@ test_that("run_tima rejects invalid log_level values", {
   )
 })
 
+test_that(".parse_run_tima_log_level parses valid inputs", {
+  parsed_chr <- .parse_run_tima_log_level("debug")
+  expect_identical(parsed_chr$input, "debug")
+  expect_identical(parsed_chr$threshold, 500L)
+
+  parsed_num <- .parse_run_tima_log_level(300)
+  expect_identical(parsed_num$input, 300)
+  expect_identical(parsed_num$threshold, 300L)
+})
+
+test_that(".parse_run_tima_log_level rejects invalid inputs", {
+  expect_error(.parse_run_tima_log_level("nope"), class = "tima_validation_error")
+  expect_error(.parse_run_tima_log_level(999), class = "tima_validation_error")
+  expect_error(.parse_run_tima_log_level(c("info", "warn")), class = "tima_validation_error")
+  expect_error(.parse_run_tima_log_level(TRUE), class = "tima_validation_error")
+})
+
+test_that(".validate_run_tima_inputs returns parsed log level", {
+  parsed <- .validate_run_tima_inputs(
+    target_pattern = "^ann_",
+    log_file = "tima.log",
+    clean_old_logs = TRUE,
+    log_level = "warn"
+  )
+
+  expect_identical(parsed$threshold, 300L)
+  expect_identical(parsed$input, "warn")
+})
+
+test_that("run_tima orchestrates workflow steps", {
+  tmp <- temp_test_dir("run_tima_orchestration")
+  withr::local_dir(tmp)
+  log_file <- "tima.log"
+  writeLines("old log", log_file)
+
+  calls <- new.env(parent = emptyenv())
+  calls$setup <- NULL
+  calls$pattern <- NULL
+  calls$archived <- NULL
+
+  with_mocked_bindings(
+    log_operation = function(...) "ctx",
+    setup_logger = function(filename, threshold) {
+      calls$setup <- list(filename = filename, threshold = threshold)
+      invisible(NULL)
+    },
+    log_info = function(...) invisible(NULL),
+    log_debug = function(...) invisible(NULL),
+    log_success = function(...) invisible(NULL),
+    log_complete = function(ctx) invisible(ctx),
+    go_to_cache = function() invisible(NULL),
+    execute_targets_pipeline = function(target_pattern) {
+      calls$pattern <- target_pattern
+      invisible(NULL)
+    },
+    archive_log_file = function(log_file, timestamp) {
+      calls$archived <- list(log_file = log_file, timestamp = timestamp)
+      TRUE
+    },
+    {
+      expect_invisible(
+        run_tima(
+          target_pattern = "^demo$",
+          log_file = log_file,
+          clean_old_logs = TRUE,
+          log_level = "warn"
+        )
+      )
+    }
+  )
+
+  expect_false(file.exists(log_file))
+  expect_identical(calls$setup$filename, log_file)
+  expect_identical(calls$setup$threshold, 300L)
+  expect_identical(calls$pattern, "^demo$")
+  expect_identical(calls$archived$log_file, log_file)
+})
+
+test_that("run_tima reports cache navigation errors", {
+  with_mocked_bindings(
+    log_operation = function(...) "ctx",
+    setup_logger = function(...) invisible(NULL),
+    log_info = function(...) invisible(NULL),
+    log_debug = function(...) invisible(NULL),
+    log_success = function(...) invisible(NULL),
+    go_to_cache = function() stop("cache unavailable"),
+    {
+      expect_error(
+        run_tima(log_level = "info"),
+        class = "tima_runtime_error"
+      )
+    }
+  )
+})
+
 # Error Recovery Tests ----
 
 ## COMMENT: Too long for now
