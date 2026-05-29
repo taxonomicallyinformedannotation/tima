@@ -1,4 +1,12 @@
 
+# tima 2.13.0.9000 (unreleased)
+
+## New features
+
+* Expanded MS1 loss defaults for better fluorinated chemistry coverage:
+    - Added PFAS-relevant neutral losses (`HF`, `CF2`, `CF2O`, `CF3`, `CHF2`, `C2F2`, `C2F4`, `C3F6`, `CF2O`, `C2F3O`)
+    - Added common high-value losses (`SO2`, `SO3`)
+
 # tima 2.13.0
 
 ## Breaking changes

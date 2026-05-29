@@ -165,8 +165,32 @@ annotate_adduct_universe_metadata <- function(universe, polarity) {
     neg = c("H", "F", "Cl", "Br"),
     character()
   )
-  common_losses <- c("H2O", "H4O2", "H6O3", "H8O4", "NH3", "H3N", "CO", "CO2")
-  common_clusters <- c("H2O", "C2H3N")
+  common_losses <- c(
+    "H2O",
+    "H4O2",
+    "H6O3",
+    "H8O4",
+    "NH3",
+    "H3N",
+    "CO",
+    "CO2",
+    "SO2",
+    "SO3",
+    "HF",
+    "CF2",
+    "CF2O",
+    "CF3",
+    "CHF2",
+    "C2F2",
+    "C2F4",
+    "C3F6"
+  )
+  common_clusters <- c(
+    "C2H3N",
+    "C2H7N",
+    "NaCl",
+    "C2H6OS"
+  )
 
   out <- tidytable::as_tidytable(
     as.data.frame(universe, stringsAsFactors = FALSE)
