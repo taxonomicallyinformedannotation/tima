@@ -495,3 +495,247 @@ test_that("get_last_version_from_zenodo success", {
     )
   )
 })
+
+tima_ns_fn <- function(name) {
+  get(name, envir = asNamespace("tima"), inherits = FALSE)
+}
+
+make_zenodo_response <- function(json_text) {
+  httr2::response(
+    headers = list(`Content-Type` = "application/json"),
+    body = charToRaw(json_text)
+  )
+}
+
+test_that("validate_zenodo_inputs enforces timeout and accepts valid values", {
+  validate_zenodo_inputs <- tima_ns_fn("validate_zenodo_inputs")
+
+  expect_no_error(
+    validate_zenodo_inputs(
+      doi = "10.5281/zenodo.123456",
+      pattern = "file.txt",
+      path = "out/file.txt",
+      timeout_s = 1
+    )
+  )
+
+  expect_error(
+    validate_zenodo_inputs(
+      doi = "10.5281/zenodo.123456",
+      pattern = "file.txt",
+      path = "out/file.txt",
+      timeout_s = 0
+    ),
+    "timeout_s must be a single positive numeric value",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    validate_zenodo_inputs(
+      doi = "10.5281/zenodo.123456",
+      pattern = "file.txt",
+      path = "out/file.txt",
+      timeout_s = NA_real_
+    ),
+    "timeout_s must be a single positive numeric value",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("extract_zenodo_record_id strips DOI prefix case-insensitively", {
+  extract_zenodo_record_id <- tima_ns_fn("extract_zenodo_record_id")
+
+  expect_identical(
+    extract_zenodo_record_id("10.5281/zenodo.987654"),
+    "987654"
+  )
+
+  expect_identical(
+    extract_zenodo_record_id("10.5281/ZENODO.42"),
+    "42"
+  )
+})
+
+test_that("find_matching_file returns first match and errors on invalid pools", {
+  find_matching_file <- tima_ns_fn("find_matching_file")
+
+  expect_identical(
+    find_matching_file(
+      filenames = c("a.txt", "target.csv", "target.csv.gz"),
+      pattern = "target",
+      doi = "10.5281/zenodo.1"
+    ),
+    2L
+  )
+
+  expect_error(
+    find_matching_file(
+      filenames = character(0),
+      pattern = "target",
+      doi = "10.5281/zenodo.1"
+    ),
+    "no files found in Zenodo record",
+    class = "tima_runtime_error"
+  )
+
+  expect_error(
+    find_matching_file(
+      filenames = c("a.txt", "b.txt"),
+      pattern = "target",
+      doi = "10.5281/zenodo.1"
+    ),
+    "no files matching pattern found in Zenodo record",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("is_download_needed handles missing, mismatched, and matching file sizes", {
+  is_download_needed <- tima_ns_fn("is_download_needed")
+
+  missing_path <- tempfile(fileext = ".txt")
+  expect_true(is_download_needed(path = missing_path, zenodo_size = 10))
+
+  local_path <- tempfile(fileext = ".txt")
+  writeLines("abcdef", con = local_path)
+
+  expect_false(
+    is_download_needed(path = local_path, zenodo_size = file.size(local_path))
+  )
+  expect_true(
+    is_download_needed(
+      path = local_path,
+      zenodo_size = file.size(local_path) + 1
+    )
+  )
+})
+
+test_that("get_last_version_from_zenodo wraps JSON parse failures", {
+  testthat::with_mocked_bindings(
+    fetch_zenodo_record = function(record, doi, timeout_s) {
+      list(not = "an httr2 response")
+    },
+    {
+      expect_error(
+        get_last_version_from_zenodo(
+          doi = "10.5281/zenodo.123456",
+          pattern = "target.txt",
+          path = temp_test_path("zenodo-parse-fail.txt"),
+          timeout_s = 1
+        ),
+        "failed to parse Zenodo API response",
+        class = "tima_runtime_error"
+      )
+    },
+    .package = "tima"
+  )
+})
+
+test_that("get_last_version_from_zenodo errors when record has no files", {
+  no_files_response <- make_zenodo_response('{"id":"123456"}')
+
+  testthat::with_mocked_bindings(
+    fetch_zenodo_record = function(record, doi, timeout_s) {
+      no_files_response
+    },
+    {
+      expect_error(
+        get_last_version_from_zenodo(
+          doi = "10.5281/zenodo.123456",
+          pattern = "target.txt",
+          path = temp_test_path("zenodo-no-files.txt"),
+          timeout_s = 1
+        ),
+        "no files found in Zenodo record",
+        class = "tima_runtime_error"
+      )
+    },
+    .package = "tima"
+  )
+})
+
+test_that("get_last_version_from_zenodo builds fallback URL and calls download helpers", {
+  response_obj <- make_zenodo_response(
+    paste0(
+      '{"id":"7654321","metadata":{"title":"Demo"},"files":',
+      '[{"key":"target.txt","size":7,"links":{}}]}'
+    )
+  )
+
+  tmp_path <- temp_test_path("zenodo-fallback-download.txt")
+  writeLines("old", con = tmp_path)
+
+  captured_url <- NULL
+  captured_export <- NULL
+  created_dir <- FALSE
+
+  testthat::with_mocked_bindings(
+    fetch_zenodo_record = function(record, doi, timeout_s) {
+      response_obj
+    },
+    is_download_needed = function(path, zenodo_size) {
+      TRUE
+    },
+    create_dir = function(export) {
+      created_dir <<- TRUE
+      invisible(export)
+    },
+    get_file = function(url, export) {
+      captured_url <<- url
+      captured_export <<- export
+      invisible(export)
+    },
+    {
+      result <- get_last_version_from_zenodo(
+        doi = "10.5281/zenodo.123456",
+        pattern = "target.txt",
+        path = tmp_path,
+        timeout_s = 1
+      )
+
+      expect_identical(result, tmp_path)
+      expect_true(created_dir)
+      expect_identical(captured_export, tmp_path)
+      expect_identical(
+        captured_url,
+        "https://zenodo.org/api/records/7654321/files/target.txt/content"
+      )
+    },
+    .package = "tima"
+  )
+})
+
+test_that("get_last_version_from_zenodo skips download when local file is current", {
+  response_obj <- make_zenodo_response(
+    paste0(
+      '{"recid":"888","files":',
+      '[{"key":"target.txt","size":11,"links":{"download":"https://example/target.txt"}}]}'
+    )
+  )
+
+  testthat::with_mocked_bindings(
+    fetch_zenodo_record = function(record, doi, timeout_s) {
+      response_obj
+    },
+    is_download_needed = function(path, zenodo_size) {
+      FALSE
+    },
+    create_dir = function(export) {
+      stop("create_dir should not be called when download is skipped")
+    },
+    get_file = function(url, export) {
+      stop("get_file should not be called when download is skipped")
+    },
+    {
+      expect_identical(
+        get_last_version_from_zenodo(
+          doi = "10.5281/zenodo.123456",
+          pattern = "target.txt",
+          path = temp_test_path("zenodo-skip.txt"),
+          timeout_s = 1
+        ),
+        temp_test_path("zenodo-skip.txt")
+      )
+    },
+    .package = "tima"
+  )
+})

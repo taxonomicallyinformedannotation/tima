@@ -1255,3 +1255,197 @@ test_that("build_library_metadata extracts SMILES-based metadata aliases (2)", {
   expect_false("target_inchikey" %in% names(meta))
   expect_false("target_formula" %in% names(meta))
 })
+
+test_that("strip_backend_rownames returns non-Spectra inputs unchanged", {
+  x <- list(a = 1)
+  expect_identical(strip_backend_rownames(x), x)
+})
+
+test_that("extract_vector handles empty fields and length reconciliation branches", {
+  skip_if_not_installed("Spectra")
+
+  obj_one <- Spectra::Spectra(data.frame(
+    precursorMz = 123.4,
+    name = "n1",
+    mz = I(list(c(50, 100))),
+    intensity = I(list(c(1, 2)))
+  ))
+
+  expect_equal(
+    extract_vector(obj_one, field = character(0), len = 3L, fill = "x"),
+    c("x", "x", "x")
+  )
+
+  expect_equal(
+    extract_vector(obj_one, field = "name", len = 3L, fill = NA_character_),
+    c("n1", "n1", "n1")
+  )
+
+  obj_two <- Spectra::Spectra(data.frame(
+    precursorMz = c(100, 200),
+    name = c("A", "B"),
+    mz = I(list(c(50, 80), c(60, 90))),
+    intensity = I(list(c(1, 2), c(3, 4)))
+  ))
+
+  expect_equal(
+    extract_vector(obj_two, field = "name", len = 3L, fill = "pad"),
+    c("A", "B", "pad")
+  )
+
+  expect_equal(
+    extract_vector(obj_two, field = "name", len = 1L, fill = "pad"),
+    "A"
+  )
+})
+
+test_that("get_precursors returns NA vector when precursor columns are missing", {
+  skip_if_not_installed("Spectra")
+
+  sp <- Spectra::Spectra(data.frame(
+    spectrum_id = c("s1", "s2"),
+    mz = I(list(c(40, 80), c(60, 90))),
+    intensity = I(list(c(2, 4), c(3, 6)))
+  ))
+
+  out <- get_precursors(sp)
+  expect_equal(length(out), 2L)
+  expect_true(all(is.na(out)))
+})
+
+test_that("convert_precursor_for_matching handles guard and invalid-conversion branches", {
+  expect_equal(
+    convert_precursor_for_matching(numeric(0), character(0)),
+    numeric(0)
+  )
+
+  expect_equal(
+    convert_precursor_for_matching(c(100, 200), c("[M+H]+")),
+    c(100, 200)
+  )
+
+  expect_equal(
+    convert_precursor_for_matching(c(100, 200), c("", NA_character_)),
+    c(100, 200)
+  )
+
+  local_mocked_bindings(
+    parse_adduct = function(x) {
+      force(x)
+      list(n_charges = 0L, n_mer = 1L, n_iso = 0L, los_add_clu = 0)
+    }
+  )
+  expect_equal(
+    convert_precursor_for_matching(c(100), c("[M+H]+")),
+    100
+  )
+
+  local_mocked_bindings(
+    parse_adduct = function(x) {
+      force(x)
+      list(n_charges = 1L, n_mer = 1L, n_iso = 0L, los_add_clu = 200)
+    }
+  )
+  out <- convert_precursor_for_matching(c(100), c("[M+H]+"))
+  expect_equal(out[[1L]], 100)
+})
+
+test_that("reduce_library_by_precursor keeps only overlapping precursor windows", {
+  skip_if_not_installed("Spectra")
+
+  lib_sp <- Spectra::Spectra(data.frame(
+    precursorMz = c(100, 200, 300),
+    mz = I(list(c(50, 90), c(60, 120), c(80, 140))),
+    intensity = I(list(c(10, 20), c(30, 40), c(50, 60)))
+  ))
+
+  kept <- reduce_library_by_precursor(
+    lib_sp = lib_sp,
+    query_precursors = 200.01,
+    dalton = 0.05,
+    ppm = 5
+  )
+  expect_equal(length(kept), 1L)
+  expect_equal(get_precursors(kept), 200)
+
+  none <- reduce_library_by_precursor(
+    lib_sp = lib_sp,
+    query_precursors = 500,
+    dalton = 0.01,
+    ppm = 1
+  )
+  expect_equal(length(none), 0L)
+})
+
+test_that("compute_similarity_safe returns calculation output on success", {
+  skip_if_not_installed("Spectra")
+
+  query_sp <- Spectra::Spectra(data.frame(
+    precursorMz = 100,
+    spectrum_id = "q1",
+    mz = I(list(c(50, 80))),
+    intensity = I(list(c(10, 20)))
+  ))
+  lib_sp <- Spectra::Spectra(data.frame(
+    precursorMz = 100,
+    mz = I(list(c(50, 80))),
+    intensity = I(list(c(10, 20)))
+  ))
+
+  local_mocked_bindings(
+    calculate_entropy_and_similarity = function(...) {
+      tidytable::tidytable(target_id = 1L, feature_id = "q1")
+    }
+  )
+
+  out <- compute_similarity_safe(
+    lib_sp = lib_sp,
+    query_sp = query_sp,
+    method = "entropy",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0,
+    approx = TRUE
+  )
+
+  expect_equal(nrow(out), 1L)
+  expect_true(all(c("target_id", "feature_id") %in% names(out)))
+})
+
+test_that("log_library_stats handles spectra without library metadata", {
+  skip_if_not_installed("Spectra")
+
+  lib_sp <- Spectra::Spectra(data.frame(
+    precursorMz = c(100, 200),
+    mz = I(list(c(50, 80), c(60, 90))),
+    intensity = I(list(c(10, 20), c(30, 40)))
+  ))
+
+  expect_null(log_library_stats(lib_sp))
+})
+
+test_that("annotate_spectra_handle_empty_result logs warnings when message is provided", {
+  withr::local_dir(new = temp_test_dir("ann_spe_empty_with_msg"))
+  output_file <- temp_test_path("out_with_message.tsv")
+  saw_warn <- new.env(parent = emptyenv())
+  saw_warn$called <- FALSE
+
+  local_mocked_bindings(
+    log_warn = function(message) {
+      if (identical(message, "nothing left")) {
+        saw_warn$called <- TRUE
+      }
+      invisible(NULL)
+    }
+  )
+
+  out <- annotate_spectra_handle_empty_result(
+    path = output_file,
+    params = list(a = 1L),
+    message = "nothing left"
+  )
+
+  expect_true(saw_warn$called)
+  expect_identical(out, output_file)
+  expect_true(file.exists(output_file))
+})

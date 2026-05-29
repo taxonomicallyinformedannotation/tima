@@ -434,3 +434,203 @@ test_that("prepare_taxa exports ND taxonomy when metadata lacks organism values"
   expect_true(all(df$sample_organism_name == "ND"))
   expect_true(all(df$sample_organism_01_domain == "ND"))
 })
+
+test_that("prepare_taxa treats empty taxon string as metadata mode", {
+  input <- temp_test_path("features-empty-taxon.tsv")
+  ott <- temp_test_path("ott-empty-taxon.tsv")
+  metadata <- temp_test_path("metadata-empty-taxon.tsv")
+  output <- temp_test_path("output-empty-taxon.tsv")
+
+  writeLines(
+    "feature_id\trt\tmz\tsample\nFT001\t1.5\t200\tfile1",
+    input
+  )
+
+  writeLines(
+    paste0(
+      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
+      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
+      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
+      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
+      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
+      "organism_taxonomy_10varietas\n",
+      "Arabidopsis thaliana\t309275\tEukaryota\tPlantae\tStreptophyta\t",
+      "Magnoliopsida\tBrassicales\tBrassicaceae\tNA\tArabidopsis\tArabidopsis thaliana\tNA"
+    ),
+    ott
+  )
+
+  writeLines("filename\torganism\nfile1\tArabidopsis thaliana", metadata)
+
+  expect_no_error(
+    prepare_taxa(
+      input = input,
+      org_tax_ott = ott,
+      taxon = "",
+      metadata = metadata,
+      name_filename = "filename",
+      colname = "organism",
+      output = output,
+      extension = FALSE
+    )
+  )
+
+  df <- tidytable::fread(output)
+  expect_equal(nrow(df), 1L)
+  expect_identical(df$sample_organism_name[[1]], "Arabidopsis thaliana")
+})
+
+test_that("prepare_taxa errors when OTT table misses required schema", {
+  input <- temp_test_path("features-bad-ott.tsv")
+  ott <- temp_test_path("ott-bad-schema.tsv")
+
+  writeLines("feature_id\trt\tmz\nFT001\t1.5\t200", input)
+  writeLines(
+    "organism_name\torganism_taxonomy_ottid\nHomo sapiens\t770309",
+    ott
+  )
+
+  expect_error(
+    prepare_taxa(
+      input = input,
+      org_tax_ott = ott,
+      taxon = "Homo sapiens",
+      output = temp_test_path("out-bad-ott.tsv")
+    ),
+    "missing required columns",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("prepare_taxa errors when features sample column is missing", {
+  input <- temp_test_path("features-no-sample.tsv")
+  ott <- temp_test_path("ott-no-sample.tsv")
+  metadata <- temp_test_path("metadata-no-sample.tsv")
+
+  writeLines("feature_id\trt\tmz\nFT001\t1.5\t200", input)
+  writeLines(
+    paste0(
+      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
+      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
+      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
+      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
+      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
+      "organism_taxonomy_10varietas\n",
+      "Arabidopsis thaliana\t309275\tEukaryota\tPlantae\tStreptophyta\t",
+      "Magnoliopsida\tBrassicales\tBrassicaceae\tNA\tArabidopsis\tArabidopsis thaliana\tNA"
+    ),
+    ott
+  )
+  writeLines("filename\torganism\nfile1\tArabidopsis thaliana", metadata)
+
+  expect_error(
+    prepare_taxa(
+      input = input,
+      org_tax_ott = ott,
+      taxon = NULL,
+      metadata = metadata,
+      name_filename = "filename",
+      colname = "organism",
+      output = temp_test_path("out-no-sample.tsv"),
+      extension = FALSE
+    ),
+    "does not contain the 'sample' column",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("prepare_taxa errors when metadata filename key is missing", {
+  input <- temp_test_path("features-no-filename-key.tsv")
+  ott <- temp_test_path("ott-no-filename-key.tsv")
+  metadata <- temp_test_path("metadata-no-filename-key.tsv")
+
+  writeLines("feature_id\trt\tmz\tsample\nFT001\t1.5\t200\tfile1", input)
+  writeLines(
+    paste0(
+      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
+      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
+      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
+      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
+      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
+      "organism_taxonomy_10varietas\n",
+      "Arabidopsis thaliana\t309275\tEukaryota\tPlantae\tStreptophyta\t",
+      "Magnoliopsida\tBrassicales\tBrassicaceae\tNA\tArabidopsis\tArabidopsis thaliana\tNA"
+    ),
+    ott
+  )
+  writeLines("wrong_key\torganism\nfile1\tArabidopsis thaliana", metadata)
+
+  expect_error(
+    prepare_taxa(
+      input = input,
+      org_tax_ott = ott,
+      taxon = NULL,
+      metadata = metadata,
+      name_filename = "filename",
+      colname = "organism",
+      output = temp_test_path("out-no-filename-key.tsv"),
+      extension = TRUE
+    ),
+    "does not contain the filename column",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("prepare_taxa strips known MS file extensions when extension is FALSE", {
+  input <- temp_test_path("features-extension-strip.tsv")
+  ott <- temp_test_path("ott-extension-strip.tsv")
+  metadata <- temp_test_path("metadata-extension-strip.tsv")
+  output <- temp_test_path("output-extension-strip.tsv")
+
+  writeLines(
+    paste(
+      "feature_id\trt\tmz\tsample",
+      "FT001\t1.5\t200\tfileA",
+      "FT002\t2.0\t300\tfileB",
+      sep = "\n"
+    ),
+    input
+  )
+
+  writeLines(
+    paste0(
+      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
+      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
+      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
+      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
+      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
+      "organism_taxonomy_10varietas\n",
+      "Org1\t1001\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus1\tOrg1\tNA\n",
+      "Org2\t1002\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus2\tOrg2\tNA"
+    ),
+    ott
+  )
+
+  writeLines(
+    paste(
+      "filename\torganism",
+      "fileA.mzML\tOrg1",
+      "fileB.mzxML\tOrg2",
+      sep = "\n"
+    ),
+    metadata
+  )
+
+  expect_no_error(
+    prepare_taxa(
+      input = input,
+      org_tax_ott = ott,
+      taxon = NULL,
+      metadata = metadata,
+      name_filename = "filename",
+      colname = "organism",
+      output = output,
+      extension = FALSE
+    )
+  )
+
+  df <- tidytable::fread(output)
+  expect_equal(nrow(df), 2L)
+  expect_true("Org1" %in% df$sample_organism_name)
+  expect_true("Org2" %in% df$sample_organism_name)
+})

@@ -660,3 +660,94 @@ test_that("normalize_adduct_string is idempotent on canonical input", {
     expect_equal(norm(a), a)
   }
 })
+
+test_that("parse_adduct helper branches handle failures and normalization", {
+  failed <- get("create_failed_parse_result", envir = asNamespace("tima"))
+  validate <- get("validate_adduct_string", envir = asNamespace("tima"))
+  remove_comments <- get("remove_comments", envir = asNamespace("tima"))
+  extract_multimer_count <- get(
+    "extract_multimer_count",
+    envir = asNamespace("tima")
+  )
+  extract_isotope_shift <- get(
+    "extract_isotope_shift",
+    envir = asNamespace("tima")
+  )
+  extract_charge_info <- get("extract_charge_info", envir = asNamespace("tima"))
+  parse_mods <- get(
+    "parse_modification_components",
+    envir = asNamespace("tima")
+  )
+  calc_mods <- get("calculate_modification_masses", envir = asNamespace("tima"))
+  is_parseable <- get(".is_parseable_adduct", envir = asNamespace("tima"))
+
+  expect_identical(unname(failed()), c(0, 0, 0, 0, 0))
+
+  expect_false(validate(123)$valid)
+  expect_false(validate(character(0))$valid)
+  expect_false(validate("")$valid)
+  expect_true(validate("[M+H]+")$valid)
+
+  expect_identical(
+    remove_comments("[M-C6H10O4 (methylpentose/desoxyhexose-H2O)+H]+"),
+    "[M-C6H10O4+H]+"
+  )
+  expect_identical(extract_multimer_count(NA_character_), 1L)
+  expect_identical(extract_multimer_count(""), 1L)
+  expect_identical(extract_multimer_count("3"), 3L)
+  expect_identical(extract_isotope_shift(NA_character_), 0L)
+  expect_identical(extract_isotope_shift(""), 0L)
+  expect_identical(extract_isotope_shift("+2"), 2L)
+  expect_identical(extract_isotope_shift("-2"), 2L)
+  expect_identical(
+    extract_charge_info(NA_character_, NA_character_),
+    list(n_charges = 1L, charge_sign = 1L)
+  )
+  expect_identical(
+    extract_charge_info("2", "-"),
+    list(n_charges = 2L, charge_sign = -1L)
+  )
+
+  expect_false(parse_mods(NA_character_)$valid)
+  expect_false(parse_mods("")$valid)
+  expect_false(parse_mods("foo")$valid)
+
+  expect_true(suppressWarnings(
+    calc_mods(c("NO_SUCH_ELEMENT"), c(1L), c(1L))$valid
+  ))
+
+  expect_true(is_parseable("[M+H]+", ADDUCT_REGEX_PATTERN, failed(), "[M+H]+"))
+  expect_false(is_parseable("[bad]", ADDUCT_REGEX_PATTERN, failed(), "[bad]"))
+})
+
+test_that("parse_adduct handles invalid inputs without crashing", {
+  expect_silent(parse_adduct("invalid-adduct"))
+  expect_warning(parse_adduct(123))
+})
+
+test_that("parse_adduct alternative parsing returns first valid branch", {
+  result <- parse_adduct("[bad]|[M+H]+")
+  expect_equal(result[["n_mer"]], 1L)
+  expect_equal(result[["n_charges"]], 1L)
+  expect_equal(result[["charge"]], 1L)
+})
+
+test_that("parse_adduct returns failure for fully invalid alternatives", {
+  result <- parse_adduct("[bad]/[also-bad]")
+  expect_identical(unname(result), c(0, 0, 0, 0, 0))
+})
+
+test_that("normalize_adduct_string handles comments, whitespace, radicals, and aliases", {
+  norm <- get("normalize_adduct_string", envir = asNamespace("tima"))
+
+  expect_identical(norm("[M + H]+"), "[M+H]+")
+  expect_identical(norm("[M]+*"), "[M]+")
+  expect_identical(norm("[M+2H]+2"), "[M+2H]2+")
+  expect_identical(norm("[M+ACN+H]+"), "[M+C2H3N+H]+")
+})
+
+test_that("parse_adduct preserves deterministic output for equivalent notations", {
+  res1 <- parse_adduct("[M + H]+")
+  res2 <- parse_adduct("[M+H]+")
+  expect_identical(res1, res2)
+})

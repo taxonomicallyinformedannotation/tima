@@ -655,6 +655,8 @@ test_that("change_params_small uses go_to_cache when cache_dir is NULL", {
       )
     },
     copy_file_to_target = function(file_path, target_dir, file_description) {
+      force(file_path)
+      force(target_dir)
       force(file_description)
       file.path(target_dir, basename(file_path))
     },
@@ -662,9 +664,7 @@ test_that("change_params_small uses go_to_cache when cache_dir is NULL", {
   )
 
   local_mocked_bindings(
-    write_yaml = function(x, file, handlers = NULL) {
-      force(file)
-      force(handlers)
+    write_yaml = function(x, file, ...) {
       captured_yaml <<- x
       invisible(NULL)
     },
@@ -855,4 +855,101 @@ test_that("prepare_params propagates mzTab paths into mzTab workflow step YAMLs"
   )
   expect_true(nzchar(write_step$files$output$mztab))
   expect_match(write_step$files$output$mztab, "\\.mztab$")
+})
+
+test_that("change_params_small initializes missing mztab entry and updates optional fields", {
+  tmp <- withr::local_tempdir()
+  old_wd <- getwd()
+  on.exit(setwd(old_wd), add = TRUE)
+  setwd(tmp)
+
+  dir.create(file.path(tmp, "params"), recursive = TRUE, showWarnings = FALSE)
+  dir.create(
+    file.path(tmp, "data", "source"),
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+  dir.create(
+    file.path(tmp, "data", "interim", "annotations"),
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+  writeLines("MTD\tmzTab-version\t2.0.0-M", file.path(tmp, "input.mztab"))
+
+  captured <- NULL
+
+  local_mocked_bindings(
+    go_to_cache = function() {
+      invisible(NULL)
+    },
+    get_default_paths = function() {
+      list(
+        data = list(
+          source = list(path = file.path(tmp, "data", "source")),
+          interim = list(
+            annotations = list(
+              path = file.path(tmp, "data", "interim", "annotations")
+            )
+          )
+        ),
+        params = list(
+          prepare_params = file.path(tmp, "params", "prepare_params.yaml")
+        )
+      )
+    },
+    create_dir = function(path) {
+      dir.create(path, recursive = TRUE, showWarnings = FALSE)
+      invisible(NULL)
+    },
+    load_yaml_files = function() {
+      list(
+        yamls_params = list(
+          prepare_params = list(
+            files = list(
+              pattern = "keep",
+              features = list(raw = "features.csv"),
+              metadata = list(raw = "metadata.tsv"),
+              annotations = list(raw = list(sirius = "sirius.zip")),
+              spectral = list(raw = "spectra.mgf")
+            ),
+            ms = list(polarity = "pos"),
+            organisms = list(taxon = "existing taxon"),
+            options = list(high_confidence = FALSE, summarize = FALSE)
+          )
+        )
+      )
+    },
+    copy_file_to_target = function(file_path, target_dir, file_description) {
+      force(file_path)
+      force(target_dir)
+      force(file_description)
+      file.path(target_dir, basename(file_path))
+    },
+    .package = "tima"
+  )
+
+  local_mocked_bindings(
+    write_yaml = function(x, file, ...) {
+      captured <<- x
+      invisible(NULL)
+    },
+    .package = "yaml"
+  )
+
+  expect_no_error(change_params_small(
+    fil_mzt_raw = file.path(tmp, "input.mztab"),
+    hig_con = TRUE,
+    summarize = TRUE,
+    org_tax = NULL,
+    cache_dir = NULL
+  ))
+
+  expect_true(is.list(captured$files$mztab))
+  expect_identical(
+    captured$files$mztab$raw,
+    file.path(tmp, "data", "source", "input.mztab")
+  )
+  expect_identical(captured$organisms$taxon, NA)
+  expect_identical(captured$options$high_confidence, TRUE)
+  expect_identical(captured$options$summarize, TRUE)
 })

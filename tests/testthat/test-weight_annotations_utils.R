@@ -177,6 +177,140 @@ test_that("validate_weight_annotations_inputs errors on negative weight", {
   ))
 })
 
+test_that("validate_weight_annotations_inputs rejects invalid weights and thresholds", {
+  lib <- make_tsv(data.frame(a = 1))
+  com <- make_tsv(data.frame(a = 1))
+  edg <- make_tsv(data.frame(a = 1))
+  tax <- make_tsv(data.frame(a = 1))
+  ann <- make_tsv(data.frame(a = 1))
+  on.exit(unlink(c(lib, com, edg, tax, ann)))
+
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = lib,
+      components = com,
+      edges = edg,
+      taxa = tax,
+      annotations = ann,
+      minimal_ms1_condition = "OR",
+      weight_spectral = "bad",
+      weight_chemical = 1 / 3,
+      weight_biological = 1 / 3,
+      minimal_consistency = 0.2,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = TRUE,
+      force = FALSE,
+      candidates_neighbors = 5L,
+      candidates_final = 1L
+    ),
+    "must be numeric",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = lib,
+      components = com,
+      edges = edg,
+      taxa = tax,
+      annotations = ann,
+      minimal_ms1_condition = "OR",
+      weight_spectral = -0.1,
+      weight_chemical = 0.6,
+      weight_biological = 0.5,
+      minimal_consistency = 1.2,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = TRUE,
+      force = FALSE,
+      candidates_neighbors = 5L,
+      candidates_final = 1L
+    ),
+    "must be non-negative|sum to 1|minimal_consistency",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("validate_weight_annotations_inputs warns on missing optional files", {
+  lib <- make_tsv(data.frame(a = 1))
+  com <- make_tsv(data.frame(a = 1))
+  edg <- make_tsv(data.frame(a = 1))
+  tax <- make_tsv(data.frame(a = 1))
+  ann <- make_tsv(data.frame(a = 1))
+  on.exit(unlink(c(lib, com, edg, tax, ann)))
+
+  expect_no_error(validate_weight_annotations_inputs(
+    library = lib,
+    components = com,
+    edges = edg,
+    taxa = tax,
+    annotations = ann,
+    str_stereo = "missing.tsv",
+    org_tax_ott = "missing.tsv",
+    canopus = "missing.tsv",
+    formula = "missing.tsv",
+    minimal_ms1_condition = "OR",
+    weight_spectral = 1 / 3,
+    weight_chemical = 1 / 3,
+    weight_biological = 1 / 3,
+    minimal_consistency = 0.2,
+    minimal_ms1_bio = 0.5,
+    minimal_ms1_chemo = 0.5,
+    ms1_only = FALSE,
+    compounds_names = TRUE,
+    high_confidence = FALSE,
+    remove_ties = FALSE,
+    summarize = TRUE,
+    force = FALSE,
+    candidates_neighbors = 5L,
+    candidates_final = 1L
+  ))
+})
+
+test_that("validate_weight_annotations_inputs errors on missing annotation file", {
+  lib <- make_tsv(data.frame(a = 1))
+  com <- make_tsv(data.frame(a = 1))
+  edg <- make_tsv(data.frame(a = 1))
+  tax <- make_tsv(data.frame(a = 1))
+  on.exit(unlink(c(lib, com, edg, tax)))
+
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = lib,
+      components = com,
+      edges = edg,
+      taxa = tax,
+      annotations = c("missing-a.tsv", "missing-b.tsv"),
+      minimal_ms1_condition = "OR",
+      weight_spectral = 1 / 3,
+      weight_chemical = 1 / 3,
+      weight_biological = 1 / 3,
+      minimal_consistency = 0.2,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = TRUE,
+      force = FALSE,
+      candidates_neighbors = 5L,
+      candidates_final = 1L
+    ),
+    "Annotation file\\(s\\) not found",
+    class = "tima_validation_error"
+  )
+})
+
 # ── load_annotation_tables ────────────────────────────────────────────────────
 
 test_that("load_annotation_tables loads and binds multiple files", {
@@ -207,6 +341,37 @@ test_that("load_annotation_tables filters MS1-only when requested", {
   # ms1_only keeps only rows where both similarity AND sirius_csi are NA
   expect_equal(nrow(result_ms1), 1L)
   expect_equal(as.character(result_ms1$feature_id[[1]]), "F1")
+})
+
+test_that("load_annotation_tables warns when MS1-only filtering removes all rows", {
+  df <- data.frame(
+    feature_id = c("F1", "F2"),
+    candidate_score_similarity = c(0.9, 0.8),
+    candidate_score_sirius_csi = c(0.1, 0.2)
+  )
+  f <- make_tsv(df)
+  on.exit(unlink(f))
+
+  result <- load_annotation_tables(f, ms1_only = TRUE)
+  expect_equal(nrow(result), 0L)
+})
+
+test_that("load_annotation_tables handles confidence-column absent and error path", {
+  df <- data.frame(
+    feature_id = c("F1", "F2"),
+    candidate_score_similarity = c(NA_real_, NA_real_)
+  )
+  f <- make_tsv(df)
+  on.exit(unlink(f))
+
+  result <- load_annotation_tables(f, ms1_only = TRUE)
+  expect_equal(nrow(result), 2L)
+
+  expect_error(
+    load_annotation_tables("missing_annotation.tsv", ms1_only = FALSE),
+    "Failed to load annotation files|Failed to read file",
+    class = "tima_runtime_error"
+  )
 })
 
 # ── load_edges_table ──────────────────────────────────────────────────────────
@@ -250,6 +415,35 @@ test_that("load_structure_organism_pairs loads library and joins optional files"
   expect_true(
     "candidate_structure_inchikey_connectivity_layer" %in% names(result)
   )
+})
+
+test_that("load_structure_organism_pairs joins optional stereo and taxonomy tables", {
+  lib_df <- data.frame(
+    inchikey = c("AAAAAAAAAAAAAA", "BBBBBBBBBBBBBB"),
+    structure_name = c("A", "B"),
+    stringsAsFactors = FALSE
+  )
+  lib <- make_tsv(lib_df)
+  stereo <- make_tsv(data.frame(
+    inchikey = "AAAAAAAAAAAAAA",
+    stereo_name = "stereo-A",
+    stringsAsFactors = FALSE
+  ))
+  tax <- make_tsv(data.frame(
+    inchikey = "BBBBBBBBBBBBBB",
+    organism_name = "Org-B",
+    stringsAsFactors = FALSE
+  ))
+  on.exit(unlink(c(lib, stereo, tax)))
+
+  result <- load_structure_organism_pairs(
+    lib,
+    str_stereo = stereo,
+    org_tax_ott = tax
+  )
+  expect_equal(nrow(result), 2L)
+  expect_true("stereo_name" %in% names(result))
+  expect_true("organism_name" %in% names(result))
 })
 
 # ── log_annotation_stats ──────────────────────────────────────────────────────

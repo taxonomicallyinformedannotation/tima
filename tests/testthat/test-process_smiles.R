@@ -423,3 +423,102 @@ test_that("process_smiles handles multiple different isotope types", {
 })
 ##
 ## This approach ensures accurate annotation of isotope-labeled natural products
+
+test_that("process_smiles validates cache helper output template", {
+  tmpl <- get("create_empty_smiles_template", envir = asNamespace("tima"))(
+    "smiles_col"
+  )
+  expect_true("smiles_col" %in% names(tmpl))
+  expect_true(all(
+    c(
+      "structure_smiles",
+      "structure_inchikey",
+      "structure_molecular_formula",
+      "structure_exact_mass",
+      "structure_smiles_no_stereo",
+      "structure_xlogp"
+    ) %in%
+      names(tmpl)
+  ))
+})
+
+test_that("process_smiles load_smiles_cache falls back to empty template on read failure", {
+  load_smiles_cache <- get("load_smiles_cache", envir = asNamespace("tima"))
+
+  result <- testthat::with_mocked_bindings(
+    safe_fread = function(...) stop("cache read failed"),
+    load_smiles_cache(NULL, "structure_smiles_initial"),
+    .package = "tima"
+  )
+
+  expect_true("structure_smiles_initial" %in% names(result))
+  expect_equal(nrow(result), 1L)
+  expect_true(is.na(result$structure_smiles_initial[[1]]))
+})
+
+test_that("process_smiles returns input when no valid SMILES remain after extraction", {
+  input <- tidytable::tidytable(
+    structure_smiles_initial = c(NA_character_, NA_character_)
+  )
+
+  out <- testthat::with_mocked_bindings(
+    extract_unique_smiles = function(df, smiles_colname) {
+      tidytable::tidytable(structure_smiles_initial = character(0))
+    },
+    process_smiles(input),
+    .package = "tima"
+  )
+
+  expect_identical(out, input)
+})
+
+test_that("process_smiles returns cached-only result when all SMILES already cached", {
+  input <- tidytable::tidytable(
+    structure_smiles_initial = c("C", "CC")
+  )
+  cached <- tidytable::tidytable(
+    structure_smiles_initial = c("C", "CC"),
+    structure_smiles = c("C", "CC"),
+    structure_inchikey = c("AAAAAAAAAAAAAA-A", "BBBBBBBBBBBBBB-B"),
+    structure_molecular_formula = c("CH4", "C2H6"),
+    structure_exact_mass = c(16, 30),
+    structure_smiles_no_stereo = c("C", "CC"),
+    structure_xlogp = c(0, 0)
+  )
+
+  out <- testthat::with_mocked_bindings(
+    load_smiles_cache = function(cache, smiles_colname) cached,
+    extract_unique_smiles = function(df, smiles_colname) {
+      tidytable::tidytable(structure_smiles_initial = c("C", "CC"))
+    },
+    process_smiles(input, cache = "cache.tsv"),
+    .package = "tima"
+  )
+
+  expect_equal(nrow(out), 2L)
+  expect_true(all(
+    c(
+      "structure_inchikey_connectivity_layer",
+      "structure_inchikey_no_stereo"
+    ) %in%
+      names(out)
+  ))
+  expect_identical(
+    out$structure_inchikey_connectivity_layer[[1]],
+    "AAAAAAAAAAAAAA"
+  )
+  expect_identical(out$structure_inchikey_no_stereo[[1]], "AAAAAAAAAAAAAA-A")
+})
+
+test_that("extract_unique_smiles keeps distinct non-NA rows", {
+  extract_unique_smiles <- get(
+    "extract_unique_smiles",
+    envir = asNamespace("tima")
+  )
+  df <- tidytable::tidytable(
+    structure_smiles_initial = c("C", "C", NA_character_, "CC")
+  )
+  out <- extract_unique_smiles(df, "structure_smiles_initial")
+  expect_equal(nrow(out), 2L)
+  expect_true(!anyNA(out$structure_smiles_initial))
+})

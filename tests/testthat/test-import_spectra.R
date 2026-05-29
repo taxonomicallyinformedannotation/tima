@@ -69,3 +69,129 @@ test_that("import_spectra validates tolerances and missing files", {
     class = "tima_validation_error"
   )
 })
+
+make_test_spectra <- function(df) {
+  Spectra::Spectra(df)
+}
+
+test_that("import_spectra rejects unsupported file extensions", {
+  bad_file <- withr::local_tempfile(fileext = ".txt")
+  writeLines("not a spectra file", con = bad_file)
+
+  expect_error(
+    import_spectra(file = bad_file),
+    "unsupported file format",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("import_spectra wraps malformed RDS import errors", {
+  bad_rds <- withr::local_tempfile(fileext = ".rds")
+  writeLines("this is not an RDS payload", con = bad_rds)
+
+  expect_error(
+    import_spectra(file = bad_rds),
+    "failed to import spectra",
+    class = "tima_runtime_error"
+  )
+})
+
+test_that("import_spectra returns early for empty spectra files", {
+  empty_rds <- withr::local_tempfile(fileext = ".rds")
+  base::saveRDS(make_test_spectra(data.frame()), file = empty_rds)
+
+  result <- import_spectra(file = empty_rds, sanitize = FALSE, combine = FALSE)
+  expect_s4_class(result, "Spectra")
+  expect_equal(length(result), 0L)
+})
+
+test_that("import_spectra parses FEATURE_ID from TITLE when missing explicit IDs", {
+  spec_rds <- withr::local_tempfile(fileext = ".rds")
+  spectra <- make_test_spectra(data.frame(
+    TITLE = "id:42, rt:12.3, mz:123.45",
+    precursorMz = 123.45,
+    precursorCharge = 1L,
+    mz = I(list(c(50, 75, 100))),
+    intensity = I(list(c(10, 20, 30)))
+  ))
+  base::saveRDS(spectra, file = spec_rds)
+
+  result <- import_spectra(file = spec_rds, sanitize = FALSE, combine = FALSE)
+  expect_equal(length(result), 1L)
+  expect_true("FEATURE_ID" %in% colnames(result@backend@spectraData))
+  expect_identical(result$FEATURE_ID[[1]], "42")
+})
+
+test_that("import_spectra filters by polarity when requested", {
+  spec_rds <- withr::local_tempfile(fileext = ".rds")
+  spectra <- make_test_spectra(data.frame(
+    precursorMz = c(111.1, 222.2),
+    precursorCharge = c(1L, -1L),
+    mz = I(list(c(10, 20), c(30, 40))),
+    intensity = I(list(c(100, 200), c(150, 250)))
+  ))
+  base::saveRDS(spectra, file = spec_rds)
+
+  pos <- import_spectra(
+    file = spec_rds,
+    polarity = "pos",
+    sanitize = FALSE,
+    combine = FALSE
+  )
+  neg <- import_spectra(
+    file = spec_rds,
+    polarity = "neg",
+    sanitize = FALSE,
+    combine = FALSE
+  )
+
+  expect_equal(length(pos), 1L)
+  expect_equal(length(neg), 1L)
+  expect_identical(pos$precursorCharge[[1]], 1L)
+  expect_identical(neg$precursorCharge[[1]], -1L)
+})
+
+test_that("import_spectra validates non-negative cutoff", {
+  tmp <- withr::local_tempfile(fileext = ".rds")
+  base::saveRDS(make_test_spectra(data.frame()), file = tmp)
+
+  expect_error(
+    import_spectra(file = tmp, cutoff = -1),
+    "cutoff intensity must be non-negative",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("import_spectra calls sanitize_spectra when sanitize is TRUE", {
+  spec_rds <- withr::local_tempfile(fileext = ".rds")
+  spectra <- make_test_spectra(data.frame(
+    precursorMz = 111.1,
+    precursorCharge = 1L,
+    mz = I(list(c(10, 20, 30))),
+    intensity = I(list(c(100, 80, 60)))
+  ))
+  base::saveRDS(spectra, file = spec_rds)
+
+  called <- FALSE
+  observed_min_fragments <- NULL
+
+  testthat::with_mocked_bindings(
+    sanitize_spectra = function(spectra, cutoff, dalton, min_fragments, ppm) {
+      called <<- TRUE
+      observed_min_fragments <<- min_fragments
+      spectra
+    },
+    {
+      out <- import_spectra(
+        file = spec_rds,
+        sanitize = TRUE,
+        combine = FALSE,
+        min_fragments = 3L
+      )
+      expect_s4_class(out, "Spectra")
+      expect_true(called)
+      expect_identical(observed_min_fragments, 3L)
+    },
+    .package = "tima"
+  )
+})

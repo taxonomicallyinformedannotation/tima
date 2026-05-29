@@ -176,3 +176,139 @@ test_that("validate_mztab_tables strict mode enforces SML pipe-aligned ambiguity
     class = "tima_validation_error"
   )
 })
+
+test_that("validate_required_cols returns early for empty data frames", {
+  fn <- get(".validate_required_cols", envir = asNamespace("tima"))
+  expect_invisible(fn(tidytable::tidytable(), c("a", "b"), "SML"))
+})
+
+test_that("mztab metadata helpers handle missing and malformed values", {
+  get_meta <- get(".mztab_get_metadata_value", envir = asNamespace("tima"))
+  parse_ver <- get(".mztab_parse_version", envir = asNamespace("tima"))
+
+  meta <- tidytable::tidytable(
+    key = c("mzTab-version", "cv[1]-label"),
+    value = c("2.1.0-M", "TEST")
+  )
+
+  expect_identical(get_meta(meta, "mzTab-version"), "2.1.0-M")
+  expect_true(is.na(get_meta(meta, "missing-key")))
+  expect_null(parse_ver(NA_character_))
+  expect_null(parse_ver(""))
+  expect_null(parse_ver("2.1-M"))
+  expect_identical(parse_ver("2.1.0-M"), c(major = 2L, minor = 1L, patch = 0L))
+})
+
+test_that("mztab metadata semantics warn on missing recommended fields", {
+  fn <- get(".mztab_validate_metadata_semantics", envir = asNamespace("tima"))
+  meta <- tidytable::tidytable(
+    key = c("mzTab-version", "mzTab-mode"),
+    value = c("2.1.0-M", "Summary")
+  )
+
+  expect_no_error(fn(meta, strict = FALSE))
+})
+
+test_that("mztab cv registry helper is a no-op when no labels exist", {
+  fn <- get(".mztab_validate_cv_registry", envir = asNamespace("tima"))
+  meta <- tidytable::tidytable(
+    key = c("mzTab-version", "mzTab-mode"),
+    value = c("2.1.0-M", "Summary")
+  )
+  expect_no_error(fn(meta, strict = TRUE))
+})
+
+test_that("mztab cv registry helper warns in non-strict mode", {
+  fn <- get(".mztab_validate_cv_registry", envir = asNamespace("tima"))
+  meta <- tidytable::tidytable(
+    key = c("cv[1]-label", "cv[1]-full_name"),
+    value = c("TEST", "Test Name")
+  )
+
+  expect_no_error(fn(meta, strict = FALSE))
+})
+
+test_that("mztab reference helpers filter nulls and split pipe values", {
+  miss <- get(".mztab_missing_ref_ids", envir = asNamespace("tima"))
+  split_pipe <- get(".mztab_split_pipe_values", envir = asNamespace("tima"))
+
+  expect_identical(miss(c("1|2", "null", NA_character_, ""), c("1", "3")), "2")
+  expect_identical(split_pipe("a|b| c "), c("a", "b", "c"))
+  expect_identical(split_pipe(NA_character_), "null")
+  expect_identical(split_pipe(""), "null")
+})
+
+test_that("mztab reference integrity helper warns in non-strict mode", {
+  fn <- get(".mztab_validate_reference_integrity", envir = asNamespace("tima"))
+
+  tabs <- list(
+    sml = tidytable::tidytable(
+      SMF_ID_REFS = "999",
+      SME_ID_REFS = "888",
+      database_identifier = "CHEBI:1",
+      chemical_formula = "C1H2",
+      smiles = "CC",
+      inchi = "null",
+      chemical_name = "name",
+      uri = "uri",
+      adduct_ions = "[M+H]+"
+    ),
+    smf = tidytable::tidytable(
+      SMF_ID = "1",
+      SME_ID_REFS = "888"
+    ),
+    sme = tidytable::tidytable(SME_ID = "1")
+  )
+
+  expect_no_error(fn(tabs, strict = FALSE))
+})
+
+test_that("validate_mztab_tables rejects missing mzTab-version before deeper checks", {
+  tabs <- list(
+    metadata = tidytable::tidytable(
+      key = "mzTab-type",
+      value = "Quantification"
+    ),
+    sml = tidytable::tidytable(SML_ID = "1"),
+    smf = tidytable::tidytable(SMF_ID = "1"),
+    sme = tidytable::tidytable()
+  )
+
+  expect_error(
+    validate_mztab_tables(tabs),
+    regexp = "Missing required mzTab metadata field: mzTab-version",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("validate_mztab_tables rejects empty SML and SMF sections", {
+  tabs <- list(
+    metadata = tidytable::tidytable(
+      key = c("mzTab-version", "mzTab-type"),
+      value = c("2.1.0-M", "Quantification")
+    ),
+    sml = tidytable::tidytable(),
+    smf = tidytable::tidytable(),
+    sme = tidytable::tidytable()
+  )
+
+  expect_error(
+    validate_mztab_tables(tabs),
+    regexp = "must contain SML and/or SMF rows",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("validate_mztab_tables non-strict mode warns on missing SME columns", {
+  tabs <- list(
+    metadata = tidytable::tidytable(
+      key = c("mzTab-version", "mzTab-type"),
+      value = c("2.1.0-M", "Quantification")
+    ),
+    sml = tidytable::tidytable(SML_ID = "1"),
+    smf = tidytable::tidytable(SMF_ID = "1", exp_mass_to_charge = "100"),
+    sme = tidytable::tidytable(SME_ID = "1")
+  )
+
+  expect_no_error(validate_mztab_tables(tabs, strict = FALSE))
+})

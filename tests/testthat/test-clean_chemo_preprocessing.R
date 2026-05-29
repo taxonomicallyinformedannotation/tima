@@ -161,3 +161,263 @@ test_that("compute_candidate_M returns numeric(0) for empty input", {
   out <- compute_candidate_M(numeric(0), character(0))
   expect_equal(out, numeric(0))
 })
+
+test_that("validate_clean_chemo_inputs rejects invalid parameter branches", {
+  expect_error(
+    validate_clean_chemo_inputs(
+      annot_table_wei_chemo = base_annot(),
+      candidates_final = 0,
+      best_percentile = 0.8,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      minimal_ms1_condition = "OR",
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = TRUE,
+      max_per_score = 10,
+      score_chemical_cla_kingdom = NULL,
+      score_chemical_cla_superclass = NULL,
+      score_chemical_cla_class = NULL,
+      score_chemical_cla_parent = NULL,
+      score_chemical_npc_pathway = NULL,
+      score_chemical_npc_superclass = NULL,
+      score_chemical_npc_class = NULL
+    ),
+    "candidates_final must be a positive integer",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    validate_clean_chemo_inputs(
+      annot_table_wei_chemo = base_annot(),
+      candidates_final = 1,
+      best_percentile = 1.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      minimal_ms1_condition = "OR",
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = TRUE,
+      max_per_score = 10,
+      score_chemical_cla_kingdom = NULL,
+      score_chemical_cla_superclass = NULL,
+      score_chemical_cla_class = NULL,
+      score_chemical_cla_parent = NULL,
+      score_chemical_npc_pathway = NULL,
+      score_chemical_npc_superclass = NULL,
+      score_chemical_npc_class = NULL
+    ),
+    "best_percentile must be between 0 and 1",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    validate_clean_chemo_inputs(
+      annot_table_wei_chemo = base_annot(),
+      candidates_final = 1,
+      best_percentile = 0.8,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      minimal_ms1_condition = "XOR",
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = TRUE,
+      max_per_score = 10,
+      score_chemical_cla_kingdom = NULL,
+      score_chemical_cla_superclass = NULL,
+      score_chemical_cla_class = NULL,
+      score_chemical_cla_parent = NULL,
+      score_chemical_npc_pathway = NULL,
+      score_chemical_npc_superclass = NULL,
+      score_chemical_npc_class = NULL
+    ),
+    "minimal_ms1_condition must be 'OR' or 'AND'",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    validate_clean_chemo_inputs(
+      annot_table_wei_chemo = base_annot(),
+      candidates_final = 1,
+      best_percentile = 0.8,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      minimal_ms1_condition = "OR",
+      compounds_names = "TRUE",
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = TRUE,
+      max_per_score = 10,
+      score_chemical_cla_kingdom = NULL,
+      score_chemical_cla_superclass = NULL,
+      score_chemical_cla_class = NULL,
+      score_chemical_cla_parent = NULL,
+      score_chemical_npc_pathway = NULL,
+      score_chemical_npc_superclass = NULL,
+      score_chemical_npc_class = NULL
+    ),
+    "must be logical",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    validate_clean_chemo_inputs(
+      annot_table_wei_chemo = base_annot(),
+      candidates_final = 1,
+      best_percentile = 0.8,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      minimal_ms1_condition = "OR",
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = TRUE,
+      max_per_score = 0,
+      score_chemical_cla_kingdom = NULL,
+      score_chemical_cla_superclass = NULL,
+      score_chemical_cla_class = NULL,
+      score_chemical_cla_parent = NULL,
+      score_chemical_npc_pathway = NULL,
+      score_chemical_npc_superclass = NULL,
+      score_chemical_npc_class = NULL
+    ),
+    "max_per_score must be a positive integer",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    validate_clean_chemo_inputs(
+      annot_table_wei_chemo = base_annot(),
+      candidates_final = 1,
+      best_percentile = 0.8,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      minimal_ms1_condition = "OR",
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = TRUE,
+      max_per_score = 10,
+      score_chemical_cla_kingdom = "bad",
+      score_chemical_cla_superclass = NULL,
+      score_chemical_cla_class = NULL,
+      score_chemical_cla_parent = NULL,
+      score_chemical_npc_pathway = NULL,
+      score_chemical_npc_superclass = NULL,
+      score_chemical_npc_class = NULL
+    ),
+    "taxonomy weight parameters must be numeric",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    validate_clean_chemo_inputs(
+      annot_table_wei_chemo = base_annot(),
+      candidates_final = 1,
+      best_percentile = 0.8,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      minimal_ms1_condition = "OR",
+      compounds_names = TRUE,
+      high_confidence = FALSE,
+      remove_ties = FALSE,
+      summarize = TRUE,
+      max_per_score = 10,
+      score_chemical_cla_kingdom = 1.2,
+      score_chemical_cla_superclass = NULL,
+      score_chemical_cla_class = NULL,
+      score_chemical_cla_parent = NULL,
+      score_chemical_npc_pathway = NULL,
+      score_chemical_npc_superclass = NULL,
+      score_chemical_npc_class = NULL
+    ),
+    "taxonomy weights must be within \\[0,1\\]",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("filter_ms1_annotations works when confidence column is absent", {
+  df <- base_annot() |> tidytable::select(-candidate_score_sirius_confidence)
+  out <- filter_ms1_annotations(
+    df,
+    minimal_ms1_bio = 0.7,
+    minimal_ms1_chemo = 0.7,
+    minimal_ms1_condition = "AND"
+  )
+  expect_true(nrow(out) >= 1L)
+})
+
+test_that("count_candidates keeps evaluated counts when percentile table is empty", {
+  ranked <- rank_and_deduplicate(base_annot())
+  empty_best <- ranked |> tidytable::slice(0)
+  counts <- count_candidates(ranked, empty_best)
+
+  expect_true(!anyNA(counts$candidates_evaluated))
+  expect_true(all(is.na(counts$candidates_best)))
+})
+
+test_that("compute_classyfire_taxonomy drops notClassified-only rows", {
+  df <- tidytable::tidytable(
+    feature_id = "F1",
+    feature_pred_tax_cla_01kin_val = "notClassified",
+    feature_pred_tax_cla_01kin_score = 0.9,
+    feature_pred_tax_cla_02sup_val = "notClassified",
+    feature_pred_tax_cla_02sup_score = 0.9,
+    feature_pred_tax_cla_03cla_val = "notClassified",
+    feature_pred_tax_cla_03cla_score = 0.9,
+    feature_pred_tax_cla_04dirpar_val = "notClassified",
+    feature_pred_tax_cla_04dirpar_score = 0.9
+  )
+  out <- compute_classyfire_taxonomy(
+    df,
+    list(w_cla_kin = 1, w_cla_sup = 1, w_cla_cla = 1, w_cla_par = 1)
+  )
+  expect_equal(nrow(out), 0L)
+})
+
+test_that("compute_npclassifier_taxonomy drops notClassified-only rows", {
+  df <- tidytable::tidytable(
+    feature_id = "F1",
+    feature_pred_tax_npc_01pat_val = "notClassified",
+    feature_pred_tax_npc_01pat_score = 0.9,
+    feature_pred_tax_npc_02sup_val = "notClassified",
+    feature_pred_tax_npc_02sup_score = 0.9,
+    feature_pred_tax_npc_03cla_val = "notClassified",
+    feature_pred_tax_npc_03cla_score = 0.9
+  )
+  out <- compute_npclassifier_taxonomy(
+    df,
+    list(w_npc_pat = 1, w_npc_sup = 1, w_npc_cla = 1)
+  )
+  expect_equal(nrow(out), 0L)
+})
+
+test_that(".validate_features_dataframe validates type and feature_id column", {
+  validator <- get(".validate_features_dataframe", envir = asNamespace("tima"))
+
+  expect_error(
+    validator(list(feature_id = "F1")),
+    "must be data frames",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    validator(data.frame(x = 1)),
+    "must contain feature_id",
+    class = "tima_validation_error"
+  )
+
+  expect_no_error(validator(data.frame(feature_id = "F1")))
+})
+
+test_that("compute_candidate_M returns NA vector when inputs are unusable", {
+  out <- compute_candidate_M(
+    mz = c(NA, -10, 0),
+    adduct_string = c("[M+H]+", "[M+Na]+", "")
+  )
+  expect_length(out, 3L)
+  expect_true(all(is.na(out)))
+})

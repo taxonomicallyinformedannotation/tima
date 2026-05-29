@@ -115,6 +115,25 @@ test_that("validate_sop_merged_inputs errors when value not a single string", {
   )
 })
 
+test_that("validate_sop_merged_inputs errors on invalid output paths", {
+  expect_error(
+    validate_sop_merged_inputs(
+      files = "a.tsv",
+      filter = FALSE,
+      level = "genus",
+      value = "Homo",
+      output_key = c("a.tsv", "b.tsv"),
+      output_org_tax_ott = tempfile(fileext = ".tsv"),
+      output_str_can = tempfile(fileext = ".tsv"),
+      output_str_stereo = tempfile(fileext = ".tsv"),
+      output_str_met = tempfile(fileext = ".tsv"),
+      output_str_tax_cla = tempfile(fileext = ".tsv"),
+      output_str_tax_npc = tempfile(fileext = ".tsv")
+    ),
+    class = "tima_validation_error"
+  )
+})
+
 # ── apply_taxonomic_filter ─────────────────────────────────────────────────────
 
 test_that("apply_taxonomic_filter filters correctly by genus column", {
@@ -156,4 +175,78 @@ test_that("apply_taxonomic_filter errors on missing level column", {
     apply_taxonomic_filter(table_keys, table_org_tax_ott, "genus", "Homo"),
     class = "tima_validation_error"
   )
+})
+
+test_that("apply_taxonomic_filter errors when no rows match value", {
+  table_keys <- tidytable::tidytable(
+    structure_inchikey = c("IK1", "IK2"),
+    structure_smiles_no_stereo = c("C1", "C2"),
+    organism_name = c("Homo sapiens", "Mus musculus"),
+    reference_doi = c("10.1/a", "10.1/b")
+  )
+  table_org_tax_ott <- tidytable::tidytable(
+    organism_name = c("Homo sapiens", "Mus musculus"),
+    organism_taxonomy_08genus = c("Homo", "Mus")
+  )
+
+  expect_error(
+    apply_taxonomic_filter(table_keys, table_org_tax_ott, "genus", "Pan"),
+    class = "tima_validation_error"
+  )
+})
+
+test_that(".apply_col_mapping renames the first matching source column", {
+  df <- data.frame(old_a = 1, old_b = 2, keep = 3)
+  apply_col_mapping <- getFromNamespace(".apply_col_mapping", "tima")
+  mapped <- apply_col_mapping(
+    df,
+    list(target = c("missing", "old_b", "old_a"))
+  )
+
+  expect_true("target" %in% names(mapped))
+  expect_false("old_b" %in% names(mapped))
+  expect_true("old_a" %in% names(mapped))
+  expect_true("keep" %in% names(mapped))
+})
+
+test_that(".normalize_chemontid_in_tables normalizes both cache and taxonomy tables", {
+  cache_data <- data.frame(
+    structure_tax_cla_chemontid = c("CHEMONT:0002011", "2011"),
+    stringsAsFactors = FALSE
+  )
+  taxonomy_table <- data.frame(
+    structure_tax_cla_chemontid = c("CHEMONTID:0002011", NA_character_),
+    stringsAsFactors = FALSE
+  )
+
+  normalize_chemontid_in_tables <- getFromNamespace(
+    ".normalize_chemontid_in_tables",
+    "tima"
+  )
+  result <- normalize_chemontid_in_tables(cache_data, taxonomy_table)
+
+  expect_identical(
+    result$cache_data$structure_tax_cla_chemontid,
+    c("CHEMONTID:0002011", "CHEMONTID:0002011")
+  )
+  expect_identical(
+    result$taxonomy_table$structure_tax_cla_chemontid,
+    c("CHEMONTID:0002011", NA_character_)
+  )
+})
+
+test_that("enrich_taxonomy_from_cache returns early when cache file is absent", {
+  taxonomy_table <- data.frame(
+    structure_inchikey = "IK1",
+    stringsAsFactors = FALSE
+  )
+
+  result <- enrich_taxonomy_from_cache(
+    taxonomy_table = taxonomy_table,
+    cache_path = tempfile(pattern = "missing-cache-", fileext = ".tsv"),
+    key_col = "structure_inchikey",
+    all_keys = c("IK1", "IK2")
+  )
+
+  expect_identical(result, taxonomy_table)
 })

@@ -53,3 +53,24 @@ test_that("get_default_paths creates missing nested nodes for override", {
 
   expect_identical(paths$data$interim$params$path, "generated/path")
 })
+
+test_that("get_default_paths ignores invalid override option values", {
+  yml <- temp_test_path("paths_ignore_override.yaml")
+  writeLines(
+    c(
+      "data:",
+      "  interim:",
+      "    params:",
+      "      path: keep/me"
+    ),
+    yml
+  )
+
+  withr::local_options(tima.test.interim_params_dir = 123)
+  paths_num <- get_default_paths(yaml = yml)
+  expect_identical(paths_num$data$interim$params$path, "keep/me")
+
+  withr::local_options(tima.test.interim_params_dir = c("a", "b"))
+  paths_vec <- get_default_paths(yaml = yml)
+  expect_identical(paths_vec$data$interim$params$path, "keep/me")
+})

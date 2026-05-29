@@ -51,6 +51,22 @@ test_that(".mztab_build_export_comments chunks extra columns", {
   expect_true(length(result) >= 5L)
 })
 
+test_that(".mztab_build_export_comments handles chunk size and no-op inputs", {
+  expect_equal(build_export_comments(NULL), character(0))
+  expect_equal(build_export_comments(list()), character(0))
+
+  df <- data.frame(
+    feature_id = "1",
+    extra_col_1 = "x",
+    extra_col_2 = "y",
+    extra_col_3 = "z",
+    stringsAsFactors = FALSE
+  )
+  result <- build_export_comments(df, chunk_size = 2L)
+  expect_true(length(result) >= 2L)
+  expect_true(any(grepl("opt columns\\[1\\]", result)))
+})
+
 # .mztab_build_ambiguity_comments ----
 test_that(".mztab_build_ambiguity_comments returns empty for empty df", {
   expect_equal(build_ambiguity_comments(data.frame()), character(0))
@@ -77,6 +93,29 @@ test_that(".mztab_build_ambiguity_comments produces summary COM lines", {
   result <- build_ambiguity_comments(df)
   expect_true(length(result) >= 1L)
   expect_true(any(grepl("TIMA ambiguity", result)))
+})
+
+test_that(".mztab_build_ambiguity_comments handles empty and malformed groups", {
+  expect_equal(build_ambiguity_comments(data.frame()), character(0))
+  expect_equal(build_ambiguity_comments(data.frame(x = 1:3)), character(0))
+
+  df <- data.frame(
+    feature_id = c("F1", "F1", "F2"),
+    database_identifier = c("CHEBI:1", "CHEBI:2", "CHEBI:3"),
+    chemical_formula = c("C6H12O6", "C6H12O6", "C2H4O2"),
+    smiles = c("OCC", "OCC", "CC(=O)O"),
+    inchi = c("InChI=1/A", "InChI=1/B", "InChI=1/C"),
+    chemical_name = c("Glucose", "Fructose", "AcOH"),
+    uri = c("http://a", "http://b", "http://c"),
+    adduct_ions = c("[M+H]+", "[M+H]+", "[M+H]+"),
+    stringsAsFactors = FALSE
+  )
+  result <- build_ambiguity_comments(df)
+  expect_true(any(grepl("TIMA ambiguity", result)))
+
+  df2 <- df
+  df2$feature_id <- NA_character_
+  expect_equal(build_ambiguity_comments(df2), character(0))
 })
 
 # .mztab_library_to_identification_method ----
@@ -219,4 +258,134 @@ test_that(".mztab_connectivity_layer_key handles NA", {
 test_that(".mztab_connectivity_layer_key handles empty string", {
   result <- connectivity_key("")
   expect_true(is.na(result))
+})
+
+test_that(".mztab_build_edges_comments handles empty, chunked, and missing-file branches", {
+  expect_equal(build_edges_comments(NULL), character(0))
+  expect_equal(build_edges_comments(""), character(0))
+  expect_equal(build_edges_comments(123), character(0))
+
+  tmp <- tempfile(fileext = ".tsv")
+  writeLines("a\tb\n1\t2", tmp)
+  on.exit(unlink(tmp))
+
+  single <- build_edges_comments(tmp, chunk_size = 10L)
+  expect_true(any(grepl("TIMA edges", single)))
+  expect_true(any(grepl("TIMA edge", single)))
+
+  empty <- tempfile(fileext = ".tsv")
+  writeLines("a\tb", empty)
+  on.exit(unlink(empty), add = TRUE)
+  result_empty <- build_edges_comments(empty)
+  expect_true(any(grepl("present but empty", result_empty)))
+})
+
+test_that("JSON helpers handle nullish values and path detection", {
+  is_json_path <- get(".mztab_is_json_path", envir = asNamespace("tima"))
+  json_cell <- get(".mztab_json_cell", envir = asNamespace("tima"))
+  meta_to_json <- get(".mztab_metadata_to_json", envir = asNamespace("tima"))
+  tbl_to_json_rows <- get(
+    ".mztab_table_to_json_rows",
+    envir = asNamespace("tima")
+  )
+  edges_json_rows <- get(".mztab_edges_json_rows", envir = asNamespace("tima"))
+
+  expect_true(is_json_path("file.json"))
+  expect_false(is_json_path("file.tsv"))
+  expect_false(is_json_path(c("a.json", "b.json")))
+
+  expect_true(is.na(json_cell(NA_character_)))
+  expect_true(is.na(json_cell("")))
+  expect_true(is.na(json_cell("null")))
+  expect_identical(json_cell("value"), "value")
+
+  meta <- tidytable::tidytable(
+    key = c("mzTab-version", "mzTab-mode"),
+    value = c("2.1.0-M", NA_character_)
+  )
+  meta_json <- meta_to_json(meta)
+  expect_true(is.list(meta_json))
+  expect_true(is.na(meta_json[["mzTab-mode"]]))
+
+  rows <- tbl_to_json_rows(tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    value = c("x", NA_character_)
+  ))
+  expect_length(rows, 2L)
+  expect_true(is.list(rows[[1L]]))
+
+  edge_file <- tempfile(fileext = ".tsv")
+  writeLines("edge_id\tvalue\n1\ta", edge_file)
+  on.exit(unlink(edge_file), add = TRUE)
+  expect_length(edges_json_rows(edge_file), 1L)
+})
+
+test_that(".mztab_write_json creates JSON payload and includes edges when present", {
+  write_json <- get(".mztab_write_json", envir = asNamespace("tima"))
+  tmp <- tempfile(fileext = ".json")
+  edge_file <- tempfile(fileext = ".tsv")
+  writeLines("edge_id\tvalue\n1\ta", edge_file)
+  on.exit({
+    unlink(tmp)
+    unlink(edge_file)
+  })
+
+  metadata <- tidytable::tidytable(
+    key = c("mzTab-version", "mzTab-mode"),
+    value = c("2.1.0-M", "Summary")
+  )
+  sml <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_name = "Foo"
+  )
+  smf <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_name = "Foo"
+  )
+  sme <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_name = "Foo"
+  )
+
+  expect_no_error(write_json(
+    tmp,
+    metadata,
+    sml,
+    smf,
+    sme,
+    edges_file = edge_file
+  ))
+  payload <- jsonlite::read_json(tmp, simplifyVector = TRUE)
+  expect_true("metadata" %in% names(payload))
+  expect_true("tima_edges" %in% names(payload))
+})
+
+test_that("xref helpers handle empty and priority selection branches", {
+  build_index <- get(".mztab_build_xrefs_index", envir = asNamespace("tima"))
+  best_uri <- get(".mztab_pick_best_uri", envir = asNamespace("tima"))
+  best_id <- get(
+    ".mztab_pick_best_database_identifier",
+    envir = asNamespace("tima")
+  )
+  xref_blocks <- get(".mztab_xref_database_blocks", envir = asNamespace("tima"))
+  conn_key <- get(".mztab_connectivity_layer_key", envir = asNamespace("tima"))
+
+  expect_null(build_index(NULL))
+  expect_equal(
+    best_uri(data.frame(prefix = character(), id = character())),
+    "null"
+  )
+  expect_equal(best_id(NULL, fallback = "HMDB:12345"), "HMDB:12345")
+  expect_equal(best_id(NULL, fallback = NA_character_), "null")
+  expect_equal(xref_blocks(NULL), list())
+  expect_true(is.na(conn_key(NA_character_)))
+  expect_true(is.na(conn_key("")))
+
+  rows <- data.frame(
+    prefix = c("wikidata", "chebi"),
+    id = c("Q1", "123"),
+    stringsAsFactors = FALSE
+  )
+  expect_true(grepl("wikidata", best_uri(rows)))
+  expect_true(grepl("CHEBI", best_id(rows)))
 })
