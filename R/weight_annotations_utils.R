@@ -234,21 +234,53 @@ load_annotation_tables <- function(annotations, ms1_only) {
     n_before <- nrow(annotation_table)
     has_sirius_confidence <- "candidate_score_sirius_confidence" %in%
       names(annotation_table)
+    has_similarity <- "candidate_score_similarity" %in% names(annotation_table)
+    has_sirius_csi <- "candidate_score_sirius_csi" %in% names(annotation_table)
 
     if (has_sirius_confidence) {
-      annotation_table <- annotation_table |>
-        tidytable::filter(
-          is.na(candidate_score_similarity) &
+      if (has_similarity && has_sirius_csi) {
+        annotation_table <- annotation_table |>
+          tidytable::filter(
+            is.na(candidate_score_similarity) &
+              is.na(candidate_score_sirius_csi) &
+              (is.na(candidate_score_sirius_confidence) |
+                as.numeric(candidate_score_sirius_confidence) == 0)
+          )
+      } else if (has_similarity) {
+        annotation_table <- annotation_table |>
+          tidytable::filter(
+            is.na(candidate_score_similarity) &
+              (is.na(candidate_score_sirius_confidence) |
+                as.numeric(candidate_score_sirius_confidence) == 0)
+          )
+      } else if (has_sirius_csi) {
+        annotation_table <- annotation_table |>
+          tidytable::filter(
             is.na(candidate_score_sirius_csi) &
-            (is.na(candidate_score_sirius_confidence) |
-              as.numeric(candidate_score_sirius_confidence) == 0)
-        )
+              (is.na(candidate_score_sirius_confidence) |
+                as.numeric(candidate_score_sirius_confidence) == 0)
+          )
+      } else {
+        annotation_table <- annotation_table |>
+          tidytable::filter(
+            is.na(candidate_score_sirius_confidence) |
+              as.numeric(candidate_score_sirius_confidence) == 0
+          )
+      }
     } else {
-      annotation_table <- annotation_table |>
-        tidytable::filter(
-          is.na(candidate_score_similarity) &
-            is.na(candidate_score_sirius_csi)
-        )
+      if (has_similarity && has_sirius_csi) {
+        annotation_table <- annotation_table |>
+          tidytable::filter(
+            is.na(candidate_score_similarity) &
+              is.na(candidate_score_sirius_csi)
+          )
+      } else if (has_similarity) {
+        annotation_table <- annotation_table |>
+          tidytable::filter(is.na(candidate_score_similarity))
+      } else if (has_sirius_csi) {
+        annotation_table <- annotation_table |>
+          tidytable::filter(is.na(candidate_score_sirius_csi))
+      }
     }
 
     log_debug(
