@@ -100,7 +100,7 @@ test_that("get_params reports missing default parameter files", {
   with_mocked_bindings(
     get_default_paths = function() mocked_paths,
     get_path = function(path) path,
-    system.file = function(..., package = NULL) {
+    pkg_system_file = function(..., package = NULL) {
       force(package)
       pieces <- c(...)
       if (length(pieces) == 0L) {
@@ -140,7 +140,7 @@ test_that("get_params reports missing docopt files", {
   with_mocked_bindings(
     get_default_paths = function() mocked_paths,
     get_path = function(path) path,
-    system.file = function(..., package = NULL) {
+    pkg_system_file = function(..., package = NULL) {
       force(package)
       pieces <- c(...)
       if (length(pieces) == 0L) {
@@ -172,7 +172,7 @@ test_that("get_params wraps docopt file read failures", {
   with_mocked_bindings(
     get_default_paths = function() mocked_paths,
     get_path = function(path) path,
-    system.file = function(..., package = NULL) {
+    pkg_system_file = function(..., package = NULL) {
       force(package)
       pieces <- c(...)
       if (length(pieces) == 0L) {
@@ -202,7 +202,7 @@ test_that("get_params errors when parsed parameters are empty", {
   with_mocked_bindings(
     get_default_paths = function() mocked_paths,
     get_path = function(path) path,
-    system.file = function(..., package = NULL) {
+    pkg_system_file = function(..., package = NULL) {
       force(package)
       pieces <- c(...)
       if (length(pieces) == 0L) {
@@ -249,7 +249,7 @@ test_that("get_params uses user yaml and falls back when CLI parsing fails", {
   out <- with_mocked_bindings(
     get_default_paths = function() mocked_paths,
     get_path = function(path) path,
-    system.file = function(..., package = NULL) {
+    pkg_system_file = function(..., package = NULL) {
       force(package)
       pieces <- c(...)
       if (length(pieces) == 0L) {

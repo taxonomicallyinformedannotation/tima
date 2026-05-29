@@ -7,6 +7,7 @@
 #'
 #' @include get_default_paths.R
 #' @include get_path.R
+#' @include pkg_system_file.R
 #' @include parse_cli_params.R
 #' @include parse_yaml_params.R
 #'
@@ -58,7 +59,7 @@ get_params <- function(step) {
 
   # Get list of available steps (once)
   available_steps <- list.files(
-    path = system.file("scripts/docopt", package = "tima")
+    path = pkg_system_file("scripts/docopt")
   ) |>
     stringi::stri_replace_all_fixed(
       pattern = ".txt",
@@ -92,17 +93,17 @@ get_params <- function(step) {
   # Determine default parameter file path based on step type
   default_param_path <- if (step == "prepare_params") {
     file.path(
-      system.file(package = "tima"),
+      pkg_system_file(),
       get_path(file.path(paths$params$prepare_params))
     )
   } else if (step == "prepare_params_advanced") {
     file.path(
-      system.file(package = "tima"),
+      pkg_system_file(),
       get_path(file.path(paths$params$prepare_params_advanced))
     )
   } else {
     file.path(
-      system.file(package = "tima"),
+      pkg_system_file(),
       get_path(file.path(paths$params$default$path, paste0(step, ".yaml")))
     )
   }
@@ -124,7 +125,7 @@ get_params <- function(step) {
 
   # Get docopt documentation path
   docopt_path <- file.path(
-    system.file("scripts/docopt", package = "tima"),
+    pkg_system_file("scripts/docopt"),
     paste0(step_normalized, ".txt")
   )
 

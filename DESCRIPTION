@@ -95,6 +95,7 @@ Collate:
     'harmonize_adducts.R'
     'parse_yaml_params.R'
     'parse_cli_params.R'
+    'pkg_system_file.R'
     'get_default_paths.R'
     'get_path.R'
     'get_params.R'
