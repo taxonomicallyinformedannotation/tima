@@ -19,6 +19,7 @@ data:
         closed: data/interim/libraries/sop/closed_prepared.tsv.gz
         gnps: data/interim/libraries/sop/gnps_11566051_prepared.tsv.gz
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
+        pubchemlite: data/interim/libraries/sop/pubchemlite_prepared.tsv.gz
         hmdb_minimal: data/interim/libraries/sop/hmdb_minimal.tsv.gz
         csfmetabolome: data/interim/libraries/sop/csfmetabolome_prepared.tsv.gz
         fecalmetabolome: data/interim/libraries/sop/fecalmetabolome_prepared.tsv.gz
@@ -121,6 +122,7 @@ data:
         closed: ../lotus-processor/data/processed/230224_closed_metadata.csv.gz
         ecmdb: data/source/libraries/sop/ecmdb.json.zip
         hmdb: data/source/libraries/sop/hmdb/structures.zip
+        pubchemlite: data/source/libraries/sop/pubchemlite.csv
         csfmetabolome: data/source/libraries/sop/csfmetabolome/structures.zip
         fecalmetabolome: data/source/libraries/sop/fecalmetabolome/structures.zip
         salivametabolome: data/source/libraries/sop/salivametabolome/structures.zip
@@ -189,6 +191,7 @@ params:
           closed: params/default/prepare_libraries_sop_closed.yaml
           ecmdb: params/default/prepare_libraries_sop_ecmdb.yaml
           hmdb: params/default/prepare_libraries_sop_hmdb.yaml
+          pubchemlite: params/default/prepare_libraries_sop_pubchemlite.yaml
           lotus: params/default/prepare_libraries_sop_lotus.yaml
           merged: params/default/prepare_libraries_sop_merged.yaml
         spectra: params/default/prepare_libraries_spectra.yaml
@@ -224,6 +227,7 @@ params:
           closed: params/user/prepare_libraries_sop_closed.yaml
           ecmdb: params/user/prepare_libraries_sop_ecmdb.yaml
           hmdb: params/user/prepare_libraries_sop_hmdb.yaml
+          pubchemlite: params/user/prepare_libraries_sop_pubchemlite.yaml
           lotus: params/user/prepare_libraries_sop_lotus.yaml
           merged: params/user/prepare_libraries_sop_merged.yaml
         spectra: params/user/prepare_libraries_spectra.yaml
@@ -264,6 +268,8 @@ urls:
     spectra:
       predicted: https://hmdb.ca/system/downloads/current/spectral_data/spectra_xml/hmdb_predicted_msms_spectra.zip
     structures: https://hmdb.ca/system/downloads/current/structures.zip
+  pubchemlite:
+    csv: https://zenodo.org/records/20439802/files/PubChemLite_CCSbase_20260529.csv?download=1
   hmdb_family:
     csfmetabolome: https://www.csfmetabolome.ca/system/downloads/current/csf_metabolites_structures.zip
     fecalmetabolome: https://www.fecalmetabolome.ca/system/downloads/current/feces_metabolites_structures.zip

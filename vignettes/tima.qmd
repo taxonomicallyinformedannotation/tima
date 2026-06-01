@@ -173,6 +173,11 @@ metabolites present in all model organisms are assigned to the special "Biota" o
 - `organism_taxonomy_01domain = "Biota"`
 - `organism_taxonomy_ottid = 0`
 
+Note: this Biota placeholder is different from the PubChem Lite exposomics
+placeholder used for xenobiotics (`organism_taxonomy_ottid = "93302", cellular organisms`), which
+is only a label for that library source and should not be interpreted as the
+Biota superdomain.
+
 During biological weighting, any candidate from the Biota domain receives the maximal biological score.
 This ensures that core metabolic pathways are never inappropriately filtered out due to taxonomic mismatches,
 while still maintaining the taxonomic prioritization for organism-specific specialized metabolism.

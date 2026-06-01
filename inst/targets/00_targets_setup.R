@@ -32,6 +32,7 @@ PARAM_STEPS <- c(
   pre_lib_sop_clo = "prepare_libraries_sop_closed",
   pre_lib_sop_ecm = "prepare_libraries_sop_ecmdb",
   pre_lib_sop_hmd = "prepare_libraries_sop_hmdb",
+  pre_lib_sop_pub = "prepare_libraries_sop_pubchemlite",
   pre_lib_sop_lot = "prepare_libraries_sop_lotus",
   pre_lib_sop_mer = "prepare_libraries_sop_merged",
   pre_lib_spe = "prepare_libraries_spectra",

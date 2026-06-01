@@ -100,12 +100,14 @@ prepare_params <- function(
   fil_lib_sop_raw_clo <- params_advanced$files$libraries$sop$raw$closed
   fil_lib_sop_raw_ecm <- params_advanced$files$libraries$sop$raw$ecmdb
   fil_lib_sop_raw_hmd <- params_advanced$files$libraries$sop$raw$hmdb
+  fil_lib_sop_raw_pub <- params_advanced$files$libraries$sop$raw$pubchemlite
   fil_lib_sop_raw_lot <- params_advanced$files$libraries$sop$raw$lotus
   fil_lib_sop_pre <- params_advanced$files$libraries$sop$prepared
   fil_lib_sop_pre_big <- params_advanced$files$libraries$sop$prepared$bigg
   fil_lib_sop_pre_clo <- params_advanced$files$libraries$sop$prepared$closed
   fil_lib_sop_pre_ecm <- params_advanced$files$libraries$sop$prepared$ecmdb
   fil_lib_sop_pre_hmd <- params_advanced$files$libraries$sop$prepared$hmdb
+  fil_lib_sop_pre_pub <- params_advanced$files$libraries$sop$prepared$pubchemlite
   fil_lib_sop_pre_lot <- params_advanced$files$libraries$sop$prepared$lotus
   fil_lib_sop_pre_rt <- params_advanced$files$libraries$sop$prepared$rt
   # fil_lib_sop_pre_spe <- params_advanced$files$libraries$sop$prepared$spectral
@@ -266,7 +268,10 @@ prepare_params <- function(
   fil_spe_raw <- params_small$files$spectral$raw
   fil_mzt_raw <- tryCatch(
     params_small$files$mztab$raw,
-    error = function(...) NULL
+    error = function(e) {
+      force(e)
+      NULL
+    }
   )
   fil_ann_raw_mzm <- params_small$files$annotations$raw$spectral$mzmine
   fil_ann_raw_sir <- params_small$files$annotations$raw$sirius
@@ -577,6 +582,12 @@ prepare_params <- function(
     fil_lib_sop_raw_hmd
   yamls_params$prepare_libraries_sop_hmdb$files$libraries$sop$prepared$hmdb <-
     fil_lib_sop_pre_hmd
+
+  ## prepare_libraries_sop_pubchemlite
+  yamls_params$prepare_libraries_sop_pubchemlite$files$libraries$sop$raw$pubchemlite <-
+    fil_lib_sop_raw_pub
+  yamls_params$prepare_libraries_sop_pubchemlite$files$libraries$sop$prepared$pubchemlite <-
+    fil_lib_sop_pre_pub
 
   ## prepare_libraries_sop_lotus
   yamls_params$prepare_libraries_sop_lotus$files$libraries$sop$raw$lotus <-

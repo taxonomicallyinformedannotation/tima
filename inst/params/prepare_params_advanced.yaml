@@ -177,6 +177,9 @@ files:
         #' Cannabis Database structure organism pairs library. STRING
         cannabisdatabase: data/source/libraries/sop/cannabisdatabase/compounds.sdf
 
+        #' PubChem Lite structure organism pairs library. STRING
+        pubchemlite: data/source/libraries/sop/pubchemlite.csv
+
         #' Lotus raw structure organism pairs library. STRING
         lotus: data/source/libraries/sop/lotus.csv.gz
 
@@ -196,7 +199,10 @@ files:
         
         #' HMDB prepared structure organism pairs library. STRING
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
-        
+
+        #' PubChem Lite prepared structure organism pairs library. STRING
+        pubchemlite: data/interim/libraries/sop/pubchemlite_prepared.tsv.gz
+
         #' ISDB NormanSusDat prepared structure organism pairs library. STRING
         isdbnormansusdat: data/interim/libraries/sop/isdbnormansusdat_14854025_prepared.tsv.gz
 

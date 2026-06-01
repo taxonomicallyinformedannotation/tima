@@ -48,6 +48,7 @@ Other preparation:
 \code{\link[=prepare_libraries_sop_ecmdb]{prepare_libraries_sop_ecmdb()}},
 \code{\link[=prepare_libraries_sop_lotus]{prepare_libraries_sop_lotus()}},
 \code{\link[=prepare_libraries_sop_merged]{prepare_libraries_sop_merged()}},
+\code{\link[=prepare_libraries_sop_pubchemlite]{prepare_libraries_sop_pubchemlite()}},
 \code{\link[=prepare_libraries_spectra]{prepare_libraries_spectra()}},
 \code{\link[=prepare_params]{prepare_params()}},
 \code{\link[=prepare_taxa]{prepare_taxa()}},

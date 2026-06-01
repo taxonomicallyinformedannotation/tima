@@ -305,6 +305,53 @@ targets_section_libraries <- function() {
           format = "file"
         ),
         tar_target(
+          name = lib_sop_pub,
+          command = {
+            pub_url <- paths$urls$pubchemlite$csv
+            if (
+              is.null(pub_url) || !is.character(pub_url) || !nzchar(pub_url)
+            ) {
+              pub_url <- paste0(
+                "https://zenodo.org/records/20439802/files/",
+                "PubChemLite_CCSbase_20260529.csv?download=1"
+              )
+            }
+
+            pub_export <- paths$data$source$libraries$sop$pubchemlite
+            if (
+              is.null(pub_export) ||
+                !is.character(pub_export) ||
+                length(pub_export) != 1L ||
+                !nzchar(pub_export)
+            ) {
+              pub_export <- "data/source/libraries/sop/pubchemlite.csv"
+            }
+
+            tryCatch(
+              expr = {
+                get_file(
+                  url = pub_url,
+                  export = pub_export
+                )
+              },
+              error = function(e) {
+                getFromNamespace("log_warn", "tima")(
+                  "PubChem Lite download failed: %s",
+                  conditionMessage(e)
+                )
+                unlink(pub_export)
+                getFromNamespace("fake_pubchemlite", "tima")(
+                  export = pub_export
+                )
+              },
+              finally = {
+                pub_export
+              }
+            )
+          },
+          format = "file"
+        ),
+        tar_target(
           name = lib_sop_hmd_fam_raw,
           command = {
             hmdb_family_names <- names(paths$urls$hmdb_family)
@@ -399,6 +446,23 @@ targets_section_libraries <- function() {
             prepare_libraries_sop_hmdb(
               input = lib_sop_hmd,
               output = par_pre_lib_sop_hmd$files$libraries$sop$prepared$hmdb
+            )
+          },
+          format = "file"
+        ),
+        tar_target(
+          name = lib_sop_pub_pre,
+          command = {
+            pub_prepared <- tryCatch(
+              par_pre_lib_sop_pub$files$libraries$sop$prepared$pubchemlite,
+              error = function(e) {
+                invisible(e)
+                "data/interim/libraries/sop/pubchemlite_prepared.tsv.gz"
+              }
+            )
+            getFromNamespace("prepare_libraries_sop_pubchemlite", "tima")(
+              input = lib_sop_pub,
+              output = pub_prepared
             )
           },
           format = "file"
@@ -605,6 +669,7 @@ targets_section_libraries <- function() {
                 lib_sop_clo_pre,
                 lib_sop_ecm_pre,
                 lib_sop_hmd_pre,
+                lib_sop_pub_pre,
                 lib_sop_hmd_fam_pre,
                 lib_sop_lot_pre,
                 lib_rt_sop,
