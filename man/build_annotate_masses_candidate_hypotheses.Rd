@@ -13,7 +13,8 @@ build_annotate_masses_candidate_hypotheses(
   baseline_adduct,
   features_table,
   multi_adducts,
-  tolerance_ppm
+  tolerance_ppm,
+  tolerance_dalton
 )
 }
 \description{

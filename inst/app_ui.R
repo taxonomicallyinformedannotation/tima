@@ -568,7 +568,7 @@ ui <- shiny::fluidPage(
             label = "Retention time tolerance for adducts annotation in minutes",
             min = 0.005,
             max = 0.1,
-            value = 0.02,
+            value = 0.05,
             ticks = FALSE
           ) |>
             shinyhelper::helper(
@@ -720,16 +720,24 @@ ui <- shiny::fluidPage(
               "CH4O", # (methanol)
               "C2H3N", # (acetonitrile)
               "C2H7N", # (ethylamine)
+              "NH3", # (ammonia)
+              "CH2O2", # (formic acid)
+              "C2H4O2", # (acetic acid)
               "C2H6O", # (ethanol)
               "NaCl", # (sodium chloride)
+              "KCl", # (potassium chloride)
               "C3H8O", # (isopropanol)
               "C2H6OS" # (dmso)
             ),
             selected = list(
-              # "H2O", # (water)
+              "H2O", # (water)
               "C2H3N", # (acetonitrile)
               "C2H7N", # (ethylamine)
+              "NH3", # (ammonia)
+              "CH2O2", # (formic acid)
+              "C2H4O2", # (acetic acid)
               "NaCl", # (sodium chloride)
+              "KCl", # (potassium chloride)
               "C2H6OS" # (dmso)
             )
           ) |>
@@ -784,6 +792,8 @@ ui <- shiny::fluidPage(
             label = "List of neutral losses to be used",
             choices = list(
               "HN",
+              # "H2 (dihydrogen)",
+              "CH2 (methylene)",
               "CH3",
               "O",
               "H3N (ammonia)",
@@ -795,26 +805,30 @@ ui <- shiny::fluidPage(
               "C2H4 (ethene)",
               "CH3N (methanimine)",
               "C2H5 (ethyl radical)",
+              "NO (nitric oxide)",
               "H2O2 (dioxygen-dihydrogen)",
-              "CH2O",
+              "CH2O (formaldehyde)",
               "H2S (dihydrosulphur)",
               "H5ON (H2O-H3N)",
               "H4O2 (2xH2O)",
               "C2H2O (ethenone)",
+              "C2H4O (acetaldehyde)",
               "C3H6 (propene)",
               "CHON",
               "CO2",
               "SO3 (sulfur trioxide)",
-              "CF2 (perfluoroalkyl unit)",
+              "HPO3 (metaphosphoric)",
+              "CF2 (perfluoroalkyl)",
               "CF2O (carbonyl difluoride)",
               "CF3 (trifluoromethyl)",
-              "C2F4 (perfluoroalkyl unit)",
-              "C3F6 (perfluoroalkyl unit)",
+              "C2F4 (perfluoroalkyl)",
+              "C3F6 (perfluoroalkyl)",
               "CHF2 (difluoromethyl unit)",
-              "C2F2 (fluorocarbon unsaturation unit)",
+              "C2F2 (fluorocarbon)",
               "CHO2",
               "H6O3 (3xH2O)",
               "C2O2 (2xCO)",
+              "C3H4O (acrolein)",
               "CH6O3 (combination)",
               "H8O4 (4xH2O)",
               "C2H2O3 (CH2O-CO2)",
@@ -854,12 +868,16 @@ ui <- shiny::fluidPage(
               "C10H8O3 (feruloyl)",
               "C6H13NO5 (hexose-H2N)",
               "C6H12O6 (hexose)",
+              "C5H14NO4P (phosphocholine-head)",
               "C7H12O6 (quinoyl)",
               "C6H15NO6 (hexose-H2N-H2O)",
               "C6H14O7 (hexose-H2O)",
               "C8H12O6 (acetylhexose-H2O)",
               "C11H10O4 (sinapoyl)",
-              "C16H30O (pamitoyl)",
+              "C16H30O (palmitoyl)",
+              "C18H32O (linoleoyl)",
+              "C18H34O (oleoyl)",
+              "C18H36O (stearoyl)",
               "C9H12O8 (malonylhexose)",
               "C13H14O6 (benzoylhexose)",
               "C12H20O8 (2xmethylpentose/desoxyhexose-H2O)",
@@ -872,45 +890,61 @@ ui <- shiny::fluidPage(
               "C18H30O15 (3xhexose-H2O)"
             ),
             selected = list(
+              # Matches annotate_masses.yaml enabled losses
+              # "H2 (dihydrogen)",
+              "CH2 (methylene)",
+              "CH3",
               "O",
               "H3N (ammonia)",
               "H2O (water)",
               "HF (hydrogen fluoride)",
-              "CHF2 (difluoromethyl unit)",
-              "C2F2 (fluorocarbon unsaturation unit)",
               "CO",
-              "SO2 (sulfur dioxide)",
+              "C2H4 (ethene)",
               "C2H5 (ethyl radical)",
+              "NO (nitric oxide)",
+              "CH2O (formaldehyde)",
+              "H5ON (H2O-H3N)",
               "H4O2 (2xH2O)",
+              "C2H2O (ethenone)",
               "CO2",
-              "SO3 (sulfur trioxide)",
-              "CF2 (perfluoroalkyl unit)",
-              "CF2O (carbonyl difluoride)",
-              "CF3 (trifluoromethyl)",
-              "C2F4 (perfluoroalkyl unit)",
-              "C3F6 (perfluoroalkyl unit)",
+              "C2H4O (acetaldehyde)",
               "CHO2",
+              "CF2 (perfluoroalkyl)",
+              "CHF2 (difluoromethyl unit)",
               "H6O3 (3xH2O)",
               "C2O2 (2xCO)",
+              "C3H4O (acrolein)",
+              "C2F2 (fluorocarbon)",
+              "SO2 (sulfur dioxide)",
+              "CF2O (carbonyl difluoride)",
               "CH6O3 (combination)",
-              "H8O4 (4xH2O)",
               "C4H4O (furan)",
+              "CF3 (trifluoromethyl)",
+              "H8O4 (4xH2O)",
+              "SO3 (sulfur trioxide)",
+              "HPO3 (metaphosphoric)",
               "C3H6O3 (sugar)",
               "H2O4S (sulfuric)",
               "H3O4P (phosphoric)",
+              "C2F4 (perfluoroalkyl)",
               "C4H8O4 (sugar)",
               "C6H6O3 (HRF)",
               "C5H8O4 (pentose-H2O)",
               "C8H8O2 (RDA-1)",
               "C6H8O4 (HRF)",
               "C6H10O4 (methylpentose/desoxyhexose-H2O)",
+              "C3F6 (perfluoroalkyl)",
               "C8H8O3 (RDA-2)",
               "C6H10O5 (hexose-H2O)",
               "C8H8O4 (RDA-3)",
               "C8H10O4 (RDA-2-H2O)",
               "C6H12O6 (hexose)",
+              "C5H14NO4P (phosphocholine-head)",
               "C11H10O4 (sinapoyl)",
-              "C16H30O (pamitoyl)",
+              "C16H30O (palmitoyl)",
+              "C18H32O (linoleoyl)",
+              "C18H34O (oleoyl)",
+              "C18H36O (stearoyl)",
               "C12H20O8 (2xmethylpentose/desoxyhexose-H2O)",
               "C12H20O10 (2xhexose-H2O)"
             )

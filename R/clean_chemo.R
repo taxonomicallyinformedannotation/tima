@@ -215,7 +215,8 @@ clean_chemo <- function(
     minimal_ms1_chemo = minimal_ms1_chemo,
     minimal_ms1_condition = minimal_ms1_condition,
     best_percentile = best_percentile,
-    max_per_score = max_per_score
+    max_per_score = max_per_score,
+    components_table = components_table
   )
 
   df_ranked <- candidate_tables$df_ranked
@@ -243,6 +244,11 @@ clean_chemo <- function(
   df_filtered <- df_percentile |>
     filter_high_confidence_only(context = "filtered") |>
     tidytable::filter(rank_final <= candidates_final)
+
+  df_filtered <- retain_promoted_rank1_in_filtered(
+    df_filtered = df_filtered,
+    annotation_notes_lookup = annotation_notes_lookup
+  )
 
   if (!is.null(xrefs_table) && nrow(xrefs_table) > 0L) {
     df_filtered <- .add_xrefs_to_df(df_filtered, xrefs_table)
@@ -366,4 +372,59 @@ clean_chemo <- function(
   )
 
   results_list
+}
+
+#' Keep only rank-1 rows in filtered tier when cluster consensus promoted rank 1
+#' @keywords internal
+retain_promoted_rank1_in_filtered <- function(
+  df_filtered,
+  annotation_notes_lookup
+) {
+  if (
+    nrow(df_filtered) == 0L ||
+      is.null(annotation_notes_lookup) ||
+      nrow(annotation_notes_lookup) == 0L ||
+      !all(c("feature_id", "rank_final") %in% names(df_filtered)) ||
+      !"annotation_note" %in% names(annotation_notes_lookup)
+  ) {
+    return(df_filtered)
+  }
+
+  promoted_features <- annotation_notes_lookup |>
+    tidytable::filter(
+      !is.na(annotation_note),
+      grepl("^Promoted to rank 1:", annotation_note)
+    ) |>
+    tidytable::distinct(feature_id)
+
+  if (nrow(promoted_features) == 0L) {
+    return(df_filtered)
+  }
+
+  before_n <- nrow(df_filtered)
+  out <- df_filtered |>
+    tidytable::left_join(
+      y = promoted_features |>
+        tidytable::mutate(.promoted_feature = TRUE),
+      by = "feature_id"
+    ) |>
+    tidytable::mutate(
+      .promoted_feature = tidytable::if_else(
+        is.na(.promoted_feature),
+        FALSE,
+        .promoted_feature
+      )
+    ) |>
+    tidytable::filter(!.promoted_feature | rank_final == 1L) |>
+    tidytable::select(-.promoted_feature)
+
+  dropped_n <- before_n - nrow(out)
+  if (dropped_n > 0L) {
+    log_info(
+      "Filtered-tier promotion gate removed %d non-rank1 row(s) for promoted features",
+      dropped_n
+    )
+  }
+
+  out
 }

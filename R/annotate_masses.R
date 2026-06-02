@@ -70,6 +70,7 @@
 #' @param neutral_losses_list List of neutral losses to be used
 #' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
 #' @param tolerance_ppm Tolerance to perform annotation. Should be <= 20 ppm
+#' @param tolerance_dalton Absolute mass tolerance in Daltons for annotation
 #' @param tolerance_rt Tolerance to group adducts. Should be <= 0.05 minutes
 #' @param adduct_consistency Consistency mode for adduct edge filtering: one of
 #'   `off`, `conditional`, `strict`
@@ -122,6 +123,9 @@ annotate_masses <- function(
   tolerance_ppm = get_params(
     step = "annotate_masses"
   )$ms$tolerances$mass$ppm$ms1,
+  tolerance_dalton = get_params(
+    step = "annotate_masses"
+  )$ms$tolerances$mass$dalton$ms1,
   tolerance_rt = get_params(
     step = "annotate_masses"
   )$ms$tolerances$rt$adducts,
@@ -139,6 +143,7 @@ annotate_masses <- function(
     "annotate_masses",
     ms_mode = ms_mode,
     tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton,
     tolerance_rt = tolerance_rt
   )
   log_info("Starting mass-based annotation")
@@ -253,7 +258,8 @@ annotate_masses <- function(
     baseline_adduct = baseline_adduct,
     features_table = features_table,
     multi_adducts = multi_adducts,
-    tolerance_ppm = tolerance_ppm
+    tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton
   )
 
   # ---- Step 7: library match by neutral mass ---------------------------
@@ -262,9 +268,16 @@ annotate_masses <- function(
     library_em = lib$em_windows,
     structure_table = lib$structures,
     tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton,
     adduct_edges = adduct_edges_combined,
     baseline_adduct = baseline_adduct,
     coverage_mode = coverage_mode
+  )
+
+  # ---- Step 8: propagate annotations across M-cliques ----------------------
+  annotations <- propagate_annotations_across_m_cliques(
+    annotations = annotations,
+    node_hypotheses = node_hypotheses
   )
 
   coverage_audit <- attr(annotations, "coverage_audit")
@@ -545,7 +558,8 @@ build_annotate_masses_candidate_hypotheses <- function(
   baseline_adduct,
   features_table,
   multi_adducts,
-  tolerance_ppm
+  tolerance_ppm,
+  tolerance_dalton
 ) {
   node_hypotheses <- collect_node_adduct_hypotheses(
     adduct_edges = adduct_edges,
@@ -554,7 +568,9 @@ build_annotate_masses_candidate_hypotheses <- function(
     evidence_hypotheses = evidence_hypotheses,
     preassigned = preassigned,
     baseline_adduct = baseline_adduct,
-    features_table = features_table
+    features_table = features_table,
+    tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton
   ) |>
     tidytable::mutate(
       mass = calculate_mass_of_m_batch(
@@ -582,7 +598,8 @@ build_annotate_masses_candidate_hypotheses <- function(
     multi_hypotheses <- generate_multi_hypotheses_from_node_masses(
       node_hypotheses = node_hypotheses,
       multi_adducts = multi_adducts,
-      tolerance_ppm = tolerance_ppm
+      tolerance_ppm = tolerance_ppm,
+      tolerance_dalton = tolerance_dalton
     )
     if (nrow(multi_hypotheses) > 0L) {
       node_hypotheses <- tidytable::bind_rows(
@@ -607,6 +624,7 @@ build_annotate_masses_annotations <- function(
   library_em,
   structure_table,
   tolerance_ppm,
+  tolerance_dalton,
   adduct_edges,
   baseline_adduct,
   coverage_mode = "best_supported_conflict_free"
@@ -614,7 +632,8 @@ build_annotate_masses_annotations <- function(
   matched <- match_candidates_to_library(
     candidates = node_hypotheses,
     library_em = library_em,
-    tolerance_ppm = tolerance_ppm
+    tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton
   ) |>
     prune_candidates_by_network_consensus(
       adduct_edges = adduct_edges,
@@ -837,3 +856,4 @@ enforce_non_conflicting_annotation_states <- function(
   )
   out
 }
+

@@ -62,6 +62,228 @@ match_pairs_to_mass_diffs <- function(pairs, diffs, diff_col) {
   out
 }
 
+#' Solve M-consistency constraints in adduct edges
+#'
+#' For each adduct edge, the two endpoints must have the same neutral mass M.
+#' This function:
+#' 1. Builds a constraint graph where edges connect features that share adduct relationships
+#' 2. For each connected component, solves for consistent M assignments
+#' 3. Returns only edges where the implied M values are consistent
+#' 4. Also returns the inferred M value for each feature in each component
+#'
+#' @details The consistency check accepts an edge if EITHER the ppm tolerance OR the
+#' dalton tolerance is satisfied (whichever is less restrictive at that mass range).
+#'
+#' @keywords internal
+solve_consistent_adduct_assignments <- function(
+  adduct_edges,
+  features_table,
+  tolerance_ppm,
+  tolerance_dalton = NULL
+) {
+  if (nrow(adduct_edges) == 0L || nrow(features_table) == 0L) {
+    return(list(
+      consistent_edges = adduct_edges[0L, ],
+      feature_m_map = tidytable::tidytable(
+        feature_id = character(),
+        neutral_mass = numeric(),
+        component_id = character()
+      ),
+      component_membership = tidytable::tidytable(
+        feature_id = character(),
+        component_id = character()
+      )
+    ))
+  }
+
+  # Add mz values to edges
+  features_min <- features_table |>
+    tidytable::distinct(feature_id, mz)
+  edges <- adduct_edges |>
+    tidytable::left_join(
+      features_min,
+      by = c("feature_id")
+    ) |>
+    tidytable::rename(mz_src = mz) |>
+    tidytable::left_join(
+      features_min |> tidytable::rename(feature_id_dest = feature_id, mz_dest = mz),
+      by = c("feature_id_dest")
+    ) |>
+    tidytable::filter(!is.na(mz_src) & !is.na(mz_dest))
+
+  if (nrow(edges) == 0L) {
+    return(list(
+      consistent_edges = adduct_edges[0L, ],
+      feature_m_map = tidytable::tidytable(
+        feature_id = character(),
+        neutral_mass = numeric(),
+        component_id = character()
+      ),
+      component_membership = tidytable::tidytable(
+        feature_id = character(),
+        component_id = character()
+      )
+    ))
+  }
+
+  # Calculate implied M for each edge endpoint
+  edges <- edges |>
+    tidytable::mutate(
+      m_src = calculate_mass_of_m_batch(
+        adducts = adduct,
+        mzs = as.numeric(mz_src)
+      ),
+      m_dest = calculate_mass_of_m_batch(
+        adducts = adduct_dest,
+        mzs = as.numeric(mz_dest)
+      ),
+      m_diff = abs(m_src - m_dest),
+      ppm_consistent = m_diff <= (tolerance_ppm * 1e-6 * pmax(m_src, m_dest, na.rm = TRUE)),
+      dalton_consistent = if (is.null(tolerance_dalton)) FALSE else (m_diff <= tolerance_dalton),
+      m_consistent = ppm_consistent | dalton_consistent
+    )
+
+  # Keep only consistent edges
+  consistent <- edges |>
+    tidytable::filter(m_consistent) |>
+    tidytable::select(feature_id, adduct, feature_id_dest, adduct_dest)
+
+  # Build undirected graph for connected components
+  undirected <- tidytable::bind_rows(
+    consistent |>
+      tidytable::transmute(src = feature_id, dest = feature_id_dest),
+    consistent |>
+      tidytable::transmute(src = feature_id_dest, dest = feature_id)
+  ) |>
+    tidytable::distinct()
+
+  # Find connected components using BFS
+  all_nodes <- unique(c(undirected$src, undirected$dest))
+  if (length(all_nodes) == 0L) {
+    return(list(
+      consistent_edges = consistent[0L, ],
+      feature_m_map = tidytable::tidytable(
+        feature_id = character(),
+        neutral_mass = numeric(),
+        component_id = character()
+      )
+    ))
+  }
+
+  neighbors <- split(undirected$dest, undirected$src)
+  visited <- stats::setNames(rep(FALSE, length(all_nodes)), all_nodes)
+  components <- list()
+
+  for (node in all_nodes) {
+    if (isTRUE(visited[[node]])) next
+    queue <- c(node)
+    visited[[node]] <- TRUE
+    comp_nodes <- character()
+    while (length(queue) > 0L) {
+      current <- queue[[1L]]
+      queue <- queue[-1L]
+      comp_nodes <- c(comp_nodes, current)
+      next_nodes <- neighbors[[current]]
+      if (!is.null(next_nodes)) {
+        for (nxt in next_nodes) {
+          if (!isTRUE(visited[[nxt]])) {
+            visited[[nxt]] <- TRUE
+            queue <- c(queue, nxt)
+          }
+        }
+      }
+    }
+    components[[length(components) + 1L]] <- unique(comp_nodes)
+  }
+
+  # For each component, compute consistent M assignments
+  all_m_maps <- list()
+  for (ci in seq_along(components)) {
+    comp_nodes <- components[[ci]]
+    comp_id <- paste0("comp_", ci)
+
+    # Get all edges in this component
+    comp_edges <- consistent |>
+      tidytable::filter(
+        feature_id %in% comp_nodes & feature_id_dest %in% comp_nodes
+      )
+
+    # Add mz info for M calculation
+    comp_edges <- comp_edges |>
+      tidytable::left_join(
+        features_min,
+        by = c("feature_id")
+      ) |>
+      tidytable::rename(mz_src = mz) |>
+      tidytable::left_join(
+        features_min |> tidytable::rename(feature_id_dest = feature_id, mz_dest = mz),
+        by = c("feature_id_dest")
+      )
+
+    # Calculate M for each feature from its edges
+    m_values <- tidytable::bind_rows(
+      comp_edges |>
+        tidytable::transmute(
+          feature_id,
+          neutral_mass = calculate_mass_of_m_batch(
+            adducts = adduct,
+            mzs = as.numeric(mz_src)
+          )
+        ),
+      comp_edges |>
+        tidytable::transmute(
+          feature_id = feature_id_dest,
+          neutral_mass = calculate_mass_of_m_batch(
+            adducts = adduct_dest,
+            mzs = as.numeric(mz_dest)
+          )
+        )
+    ) |>
+      tidytable::filter(!is.na(neutral_mass)) |>
+      tidytable::group_by(feature_id) |>
+      tidytable::mutate(
+        m_med = stats::median(neutral_mass, na.rm = TRUE),
+        m_mean = mean(neutral_mass, na.rm = TRUE),
+        m_sd = stats::sd(neutral_mass, na.rm = TRUE),
+        m_sd = tidytable::if_else(is.na(m_sd), 0, m_sd)
+      ) |>
+      tidytable::distinct(feature_id, .keep_all = TRUE) |>
+      tidytable::ungroup() |>
+      tidytable::select(feature_id, neutral_mass = m_med)
+
+    # For nodes with no edges, use baseline M (e.g., [M+H]+)
+    missing_nodes <- setdiff(comp_nodes, m_values$feature_id)
+    if (length(missing_nodes) > 0L) {
+      baseline_m <- features_table |>
+        tidytable::filter(feature_id %in% missing_nodes) |>
+        tidytable::transmute(
+          feature_id,
+          neutral_mass = calculate_mass_of_m_batch(
+            adducts = "[M+H]+",
+            mzs = as.numeric(mz)
+          )
+        )
+      m_values <- tidytable::bind_rows(m_values, baseline_m)
+    }
+
+    m_values <- m_values |>
+      tidytable::mutate(component_id = comp_id)
+    all_m_maps[[ci]] <- m_values
+  }
+
+  feature_m_map <- tidytable::bind_rows(all_m_maps)
+  
+  # Build component_membership map (feature_id -> component_id)
+  component_membership <- feature_m_map |>
+    tidytable::distinct(feature_id, component_id)
+
+  list(
+    consistent_edges = consistent,
+    feature_m_map = feature_m_map,
+    component_membership = component_membership
+  )
+}
+
 #' Build the per-feature adduct hypotheses from the edge sets
 #'
 #' Hypotheses come from four sources, in priority order:
@@ -71,6 +293,11 @@ match_pairs_to_mass_diffs <- function(pairs, diffs, diff_col) {
 #'   - `preassigned`: an upstream tool assigned this feature this adduct
 #'   - `baseline`: every feature is always tested under `[M+H]+` / `[M-H]-`
 #'
+#' IMPORTANT: This version ensures M-consistency by:
+#' 1. First solving for consistent M assignments across adduct edges
+#' 2. Only collecting hypotheses that correspond to inferred M values
+#' 3. Expanding clusters/losses only on M-consistent base adducts
+#'
 #' @keywords internal
 collect_node_adduct_hypotheses <- function(
   adduct_edges,
@@ -79,12 +306,25 @@ collect_node_adduct_hypotheses <- function(
   evidence_hypotheses,
   preassigned,
   baseline_adduct,
-  features_table
+  features_table,
+  tolerance_ppm = 5,
+  tolerance_dalton = NULL
 ) {
-  # (a) pair-derived hypotheses (both endpoints)
-  pair_a <- adduct_edges |>
+  # STEP 1: Solve for consistent M assignments across adduct edges
+  consistency_result <- solve_consistent_adduct_assignments(
+    adduct_edges = adduct_edges,
+    features_table = features_table,
+    tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton
+  )
+  consistent_edges <- consistency_result$consistent_edges
+  feature_m_map <- consistency_result$feature_m_map
+  component_membership <- consistency_result$component_membership
+
+  # (a) pair-derived hypotheses - ONLY from consistent edges
+  pair_a <- consistent_edges |>
     tidytable::distinct(feature_id, adduct)
-  pair_b <- adduct_edges |>
+  pair_b <- consistent_edges |>
     tidytable::distinct(feature_id_dest, adduct_dest) |>
     tidytable::rename(
       feature_id = feature_id_dest,
@@ -94,9 +334,9 @@ collect_node_adduct_hypotheses <- function(
     tidytable::distinct() |>
     tidytable::mutate(source = "pair", is_preassigned = FALSE)
 
-  # (b) preassigned (upstream tools)
+  # (b) preassigned (upstream tools) - ONLY if compatible with inferred M
   pre_propagated <- propagate_preassigned_over_adduct_edges(
-    adduct_edges = adduct_edges,
+    adduct_edges = consistent_edges,
     preassigned = preassigned
   )
   pre_hyps <- preassigned |>
@@ -105,6 +345,37 @@ collect_node_adduct_hypotheses <- function(
   pre_prop_hyps <- pre_propagated |>
     tidytable::distinct(feature_id, adduct) |>
     tidytable::mutate(source = "preassigned_propagated", is_preassigned = TRUE)
+
+  # Filter preassigned to be compatible with inferred M values
+  if (nrow(pre_hyps) > 0L && nrow(feature_m_map) > 0L) {
+    pre_hyps <- pre_hyps |>
+      tidytable::left_join(features_table |> tidytable::distinct(feature_id, mz), by = "feature_id") |>
+      tidytable::left_join(feature_m_map |> tidytable::select(feature_id, neutral_mass), by = "feature_id") |>
+      tidytable::mutate(
+        implied_m = calculate_mass_of_m_batch(
+          adducts = adduct,
+          mzs = as.numeric(mz)
+        ),
+        compatible = is.na(neutral_mass) | abs(implied_m - neutral_mass) <= (5e-6 * neutral_mass)
+      ) |>
+      tidytable::filter(compatible) |>
+      tidytable::select(feature_id, adduct, source, is_preassigned)
+  }
+
+  if (nrow(pre_prop_hyps) > 0L && nrow(feature_m_map) > 0L) {
+    pre_prop_hyps <- pre_prop_hyps |>
+      tidytable::left_join(features_table |> tidytable::distinct(feature_id, mz), by = "feature_id") |>
+      tidytable::left_join(feature_m_map |> tidytable::select(feature_id, neutral_mass), by = "feature_id") |>
+      tidytable::mutate(
+        implied_m = calculate_mass_of_m_batch(
+          adducts = adduct,
+          mzs = as.numeric(mz)
+        ),
+        compatible = is.na(neutral_mass) | abs(implied_m - neutral_mass) <= (5e-6 * neutral_mass)
+      ) |>
+      tidytable::filter(compatible) |>
+      tidytable::select(feature_id, adduct, source, is_preassigned)
+  }
 
   # (d) evidence-derived adducts from typed-universe inference.
   if (missing(evidence_hypotheses) || is.null(evidence_hypotheses)) {
@@ -129,14 +400,22 @@ collect_node_adduct_hypotheses <- function(
       tidytable::mutate(adduct_support = 0L)
   }
 
-  # (c) baseline - always tested for every feature
+  # (c) baseline - test for every feature, but check M-compatibility
   baseline_hyps <- features_table |>
-    tidytable::distinct(feature_id) |>
+    tidytable::distinct(feature_id, mz) |>
+    tidytable::left_join(feature_m_map |> tidytable::select(feature_id, neutral_mass), by = "feature_id") |>
     tidytable::mutate(
       adduct = baseline_adduct,
+      implied_m = calculate_mass_of_m_batch(
+        adducts = baseline_adduct,
+        mzs = as.numeric(mz)
+      ),
+      compatible = is.na(neutral_mass) | abs(implied_m - neutral_mass) <= (5e-6 * neutral_mass),
       source = "baseline",
       is_preassigned = FALSE
-    )
+    ) |>
+    tidytable::filter(compatible) |>
+    tidytable::select(feature_id, adduct, source, is_preassigned)
 
   base_hyps <- tidytable::bind_rows(
     pair_hyps,
@@ -149,8 +428,8 @@ collect_node_adduct_hypotheses <- function(
     tidytable::distinct() |>
     harmonize_adducts(adducts_translations = adducts_translations)
 
-  # Attach support count
-  support <- compute_feature_adduct_support(adduct_edges)
+  # Attach support count - compute from CONSISTENT edges only
+  support <- compute_feature_adduct_support(consistent_edges)
   base_hyps <- base_hyps |>
     tidytable::left_join(support, by = c("feature_id", "adduct")) |>
     tidytable::mutate(
@@ -166,7 +445,8 @@ collect_node_adduct_hypotheses <- function(
       )
     )
 
-  # (d) cluster expansion - suffix +cluster onto the DEST node's hypotheses.
+  # (e) cluster expansion - suffix +cluster onto the DEST node's hypotheses.
+  # Only expand base hypotheses that are M-consistent
   cluster_hyps <- expand_with_modifier(
     base_hyps = base_hyps,
     edges = cluster_edges,
@@ -175,7 +455,8 @@ collect_node_adduct_hypotheses <- function(
     mod_sign = "+"
   )
 
-  # (e) loss expansion - suffix -loss onto the PRECURSOR's hypotheses.
+  # (f) loss expansion - suffix -loss onto the PRECURSOR's hypotheses.
+  # Only expand base hypotheses that are M-consistent
   loss_hyps <- expand_with_modifier(
     base_hyps = base_hyps,
     edges = loss_edges,
@@ -196,9 +477,15 @@ collect_node_adduct_hypotheses <- function(
 
   fea_meta <- features_table |>
     tidytable::distinct(feature_id, mz, rt)
-  all_hyps |>
+  result <- all_hyps |>
     tidytable::left_join(fea_meta, by = "feature_id") |>
     dedupe_node_hypotheses()
+  
+  # Store component membership as attribute for annotation propagation
+  attr(result, "component_membership") <- component_membership
+  attr(result, "feature_m_map") <- feature_m_map
+  
+  result
 }
 
 #' Add +mod or -mod suffix to existing adduct strings on selected features
@@ -575,7 +862,8 @@ evidence_adduct_requires_pairwise_support <- function(adduct) {
 generate_multi_hypotheses_from_node_masses <- function(
   node_hypotheses,
   multi_adducts,
-  tolerance_ppm
+  tolerance_ppm,
+  tolerance_dalton = NULL
 ) {
   empty_out <- tidytable::tidytable(
     feature_id = character(),
@@ -617,9 +905,13 @@ generate_multi_hypotheses_from_node_masses <- function(
   kept <- multi_candidates |>
     tidytable::inner_join(base_mass_by_feature, by = "feature_id") |>
     tidytable::mutate(
-      ppm = abs(mass - neutral_mass_ref) * 1E6 / neutral_mass_ref
+      ppm = abs(mass - neutral_mass_ref) * 1E6 / neutral_mass_ref,
+      dalton_diff = abs(mass - neutral_mass_ref),
+      ppm_pass = is.finite(ppm) & ppm <= tolerance_ppm,
+      dalton_pass = if (is.null(tolerance_dalton)) FALSE else (dalton_diff <= tolerance_dalton),
+      passes_tolerance = ppm_pass | dalton_pass
     ) |>
-    tidytable::filter(is.finite(ppm) & ppm <= tolerance_ppm) |>
+    tidytable::filter(passes_tolerance) |>
     tidytable::select(
       feature_id,
       adduct,
@@ -639,8 +931,8 @@ generate_multi_hypotheses_from_node_masses <- function(
 
 #' Match candidate (feature, adduct, mass) rows against the library
 #' @keywords internal
-match_candidates_to_library <- function(candidates, library_em, tolerance_ppm) {
-  invisible(tolerance_ppm)
+match_candidates_to_library <- function(candidates, library_em, tolerance_ppm, tolerance_dalton = NULL) {
+  invisible(c(tolerance_ppm, tolerance_dalton))
   empty_out <- tidytable::tidytable(
     feature_id = character(),
     rt = numeric(),
@@ -877,3 +1169,113 @@ prune_candidates_by_network_consensus <- function(
       -adduct_state_key
     )
 }
+
+#' Propagate annotations across M-consistent cliques
+#'
+#' When a feature in an M-consistent clique receives a library match, propagate
+#' that annotation to all other features in the same clique. This ensures that
+#' if one feature is confidently annotated to a structure, the same structure is
+#' suggested for all linked features with the same neutral mass.
+#'
+#' @param annotations Annotation table with structure_exact_mass, feature_id, etc.
+#' @param node_hypotheses Node hypotheses table (should have component_membership
+#'   and feature_m_map as attributes)
+#'
+#' @return Updated annotation table with propagated rows
+#'
+#' @keywords internal
+propagate_annotations_across_m_cliques <- function(
+  annotations,
+  node_hypotheses
+) {
+  # Early exit if no matched annotations or no clique info
+  if (nrow(annotations) == 0L) {
+    return(annotations)
+  }
+  
+  component_membership <- attr(node_hypotheses, "component_membership")
+  feature_m_map <- attr(node_hypotheses, "feature_m_map")
+  
+  if (is.null(component_membership) || nrow(component_membership) == 0L) {
+    return(annotations)
+  }
+  
+  # Find matched (library) annotations
+  matched <- annotations |>
+    tidytable::filter(!is.na(structure_exact_mass))
+  
+  if (nrow(matched) == 0L) {
+    return(annotations)
+  }
+  
+  # For each matched annotation, propagate to clique members
+  propagated_list <- list()
+  for (i in seq_len(nrow(matched))) {
+    matched_row <- matched[i, , drop = FALSE]
+    source_feature <- matched_row$feature_id[[1]]
+    
+    # Find component of source feature
+    src_component <- component_membership |>
+      tidytable::filter(feature_id == source_feature) |>
+      tidytable::pull(component_id)
+    
+    if (length(src_component) == 0L) next
+    
+    # Find all features in the same component
+    clique_features <- component_membership |>
+      tidytable::filter(component_id == src_component[[1]]) |>
+      tidytable::pull(feature_id)
+    
+    # Get target features (exclude the source feature)
+    target_features <- setdiff(clique_features, source_feature)
+    
+    if (length(target_features) == 0L) next
+    
+    # Get the inferred M values for targets
+    target_m_values <- feature_m_map |>
+      tidytable::filter(feature_id %in% target_features) |>
+      tidytable::select(feature_id, neutral_mass)
+    
+    # Get metadata for target features from node_hypotheses
+    target_meta <- node_hypotheses |>
+      tidytable::filter(feature_id %in% target_features) |>
+      tidytable::distinct(feature_id, mz, rt)
+    
+    # Create propagated rows for each target
+    for (target_fid in target_features) {
+      target_m <- target_m_values |>
+        tidytable::filter(feature_id == target_fid) |>
+        tidytable::pull(neutral_mass)
+      
+      if (length(target_m) == 0L) next
+      
+      target_meta_row <- target_meta |>
+        tidytable::filter(feature_id == target_fid)
+      
+      if (nrow(target_meta_row) == 0L) next
+      
+      propagated_row <- matched_row |>
+        tidytable::mutate(
+          feature_id = target_fid,
+          mz = target_meta_row$mz[[1]],
+          rt = target_meta_row$rt[[1]],
+          mass = target_m[[1]],
+          error_mz = structure_exact_mass - target_m[[1]],
+          source = "propagated_clique"
+        )
+      propagated_list[[length(propagated_list) + 1L]] <- propagated_row
+    }
+  }
+  
+  # Combine original annotations with propagated ones
+  if (length(propagated_list) > 0L) {
+    propagated_annotations <- tidytable::bind_rows(propagated_list)
+    result <- tidytable::bind_rows(annotations, propagated_annotations) |>
+      tidytable::distinct()
+  } else {
+    result <- annotations
+  }
+  
+  result
+}
+

@@ -11,7 +11,9 @@ collect_node_adduct_hypotheses(
   evidence_hypotheses,
   preassigned,
   baseline_adduct,
-  features_table
+  features_table,
+  tolerance_ppm = 5,
+  tolerance_dalton = NULL
 )
 }
 \description{
@@ -22,6 +24,14 @@ Hypotheses come from four sources, in priority order:
 \item \code{loss}: a neutral-loss edge implies a \code{-loss} suffix on the precursor
 \item \code{preassigned}: an upstream tool assigned this feature this adduct
 \item \code{baseline}: every feature is always tested under \verb{[M+H]+} / \verb{[M-H]-}
+}
+}
+\details{
+IMPORTANT: This version ensures M-consistency by:
+\enumerate{
+\item First solving for consistent M assignments across adduct edges
+\item Only collecting hypotheses that correspond to inferred M values
+\item Expanding clusters/losses only on M-consistent base adducts
 }
 }
 \keyword{internal}

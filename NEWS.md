@@ -8,6 +8,16 @@
     - Added common high-value losses (`SO2`, `SO3`)
 * Added PubChem Lite as a new exposomics library, prepared through the same HMDB-like workflow as other SOP sources and flagged as `xenobiotic` (`Q409205`)
 
+## Internal / performance
+
+* **MS1 adduct annotation improvements** in `annotate_masses()`:
+  - Enforced tier-aware minimum support thresholds in evidence discovery: exotic adducts (tier 3+) now require stronger peer evidence (≥2 independent supporting neighbors) while common adducts (tier ≤1) are always inferred
+  - Added hybrid evidence recovery fallback: when library exact-mass anchoring is restrictive, supplemental evidence pass recovers supported adduct hypotheses for previously unanchored features, improving coverage without sacrificing specificity
+  - Added adduct-delta match quality metrics (`delta_error_da`, `delta_error_ppm`, `edge_match_score`) in pairwise matching to weight edges by mass accuracy
+  - Replaced single-chain evidence-edge linking with sparse k-nearest m/z linking per cluster, improving triangulation signal while preserving O(n*k) scalability
+  - Re-enabled structural plausibility filter: loss-based annotations are now demoted to unmatched when the formula cannot satisfy required atoms (e.g., `[M-H2O]` on a formula lacking oxygen)
+  - Upgraded graph-level consistency enforcement from single-pass greedy to multi-start neighbor-aware optimization: assigns adduct states to maximize coverage-aware objectives (edge satisfaction, neighbor agreement, prior support) and favors states consistent across multiple neighbors over isolated high-scoring alternatives
+
 # tima 2.13.0
 
 ## Breaking changes

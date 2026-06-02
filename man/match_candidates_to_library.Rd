@@ -4,7 +4,8 @@
 \alias{match_candidates_to_library}
 \title{Match candidate (feature, adduct, mass) rows against the library}
 \usage{
-match_candidates_to_library(candidates, library_em, tolerance_ppm)
+match_candidates_to_library(candidates, library_em, tolerance_ppm,
+  tolerance_dalton = NULL)
 }
 \description{
 Match candidate (feature, adduct, mass) rows against the library

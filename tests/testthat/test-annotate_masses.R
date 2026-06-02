@@ -1370,25 +1370,30 @@ test_that("conflict-resolution filter removes edge-conflicting annotation states
   expect_false(any(out$feature_id == "F2" & out$adduct == "[M+K]+"))
 })
 
-test_that("conflict-resolution filter keeps broad coverage for unconstrained features", {
+test_that("conflict-resolution filter always keeps preassigned adducts even if not best-supported", {
   annotations <- tidytable::tidytable(
-    feature_id = c("F1", "F1", "ISO"),
+    feature_id = c("F1", "F1", "F1"),
     adduct = c("[M+H]+", "[M+Na]+", "[M+K]+"),
-    source = c("pair", "pair", "evidence")
+    source = c("pair", "pair", "preassigned"),
+    is_preassigned = c(FALSE, FALSE, TRUE),
+    adduct_support = c(5L, 5L, 0L),
+    candidate_structure_error_mz = c(NA_real_, NA_real_, NA_real_)
   )
   adduct_edges <- tidytable::tidytable(
-    feature_id = "F1",
-    adduct = "[M+H]+",
-    adduct_dest = "[M+Na]+",
-    feature_id_dest = "F2"
+    feature_id = character(),
+    adduct = character(),
+    adduct_dest = character(),
+    feature_id_dest = character()
   )
 
   out <- enforce_non_conflicting_annotation_states(
     annotations = annotations,
-    adduct_edges = adduct_edges
+    adduct_edges = adduct_edges,
+    coverage_mode = "best_supported_conflict_free"
   )
 
-  expect_true(any(out$feature_id == "ISO" & out$adduct == "[M+K]+"))
+  # Preassigned adduct should NOT be dropped even though it has zero support
+  expect_true(any(out$feature_id == "F1" & out$adduct == "[M+K]+"))
 })
 
 test_that("best-supported conflict-free mode keeps strongest unconstrained support", {

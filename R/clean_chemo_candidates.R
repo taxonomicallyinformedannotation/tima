@@ -1,5 +1,9 @@
 #' Resolve tied candidates via cross-feature neutral-mass anchors
 #'
+#' @include clean_chemo_preprocessing.R
+#' @include constants.R
+#' @include logs_utils.R
+#'
 #' @description Splits candidates per (feature_id, candidate_adduct,
 #'     rank_final) into untied rows (always kept) and tied rows. A tied
 #'     group is collapsed to just the candidates whose InChIKey matches
@@ -372,6 +376,7 @@ coerce_score_columns <- function(annot_table_wei_chemo) {
 #' @param minimal_ms1_condition Character filter mode ("OR" or "AND")
 #' @param best_percentile Numeric percentile threshold
 #' @param max_per_score Integer max candidates per score group
+#' @param components_table Optional data frame with feature_id and component_id
 #'
 #' @return Named list with ranked/percentile tables and candidate counts
 #' @keywords internal
@@ -381,7 +386,8 @@ prepare_ranked_candidates <- function(
   minimal_ms1_chemo,
   minimal_ms1_condition,
   best_percentile,
-  max_per_score
+  max_per_score,
+  components_table = NULL
 ) {
   df_base <- filter_ms1_annotations(
     annot_table_wei_chemo = annot_table_wei_chemo,
@@ -391,6 +397,11 @@ prepare_ranked_candidates <- function(
   )
 
   df_ranked <- rank_and_deduplicate(df_base)
+
+  # Enforce cluster-level entity consensus if components_table is provided
+  if (!is.null(components_table) && nrow(components_table) > 0L) {
+    df_ranked <- enforce_cluster_entity_consensus(df_ranked, components_table)
+  }
 
   sampling_result <- sample_candidates_per_group(
     df = df_ranked,
@@ -732,4 +743,247 @@ build_mini_results_table <- function(
   }
 
   results_mini
+}
+
+#' Enforce cluster-level entity consensus
+#'
+#' @description Ensures that all features within the same MS1 component/cluster
+#'     with the same neutral mass M must agree on their best InChIKey candidate.
+#'     This is a fundamental design constraint: if multiple features form an
+#'     MS1-based cluster via adduct/loss edges, they should all resolve to the
+#'     same chemical entity.
+#'
+#'     For each (component_id, neutral_M) group:
+#'     - Identify the best-ranked feature by score_weighted_chemo
+#'     - Extract its best InChIKey from rank_final == 1
+#'     - All other features in the group reorder their rank=1 candidates
+#'       such that the anchoring InChIKey becomes rank=1 (if present)
+#'
+#' @param df_ranked Data frame with ranked candidates
+#' @param components_table Data frame with feature_id and component_id columns
+#'
+#' @return df_ranked with cluster-consensus-enforced rankings
+#' @keywords internal
+enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
+  if (nrow(df_ranked) == 0L) {
+    return(df_ranked)
+  }
+
+  # Check if required columns exist
+  has_component_col <- "component_id" %in% names(components_table)
+  has_rank_col <- "rank_final" %in% names(df_ranked)
+  has_ik_col <- "candidate_structure_inchikey_connectivity_layer" %in%
+    names(df_ranked)
+  has_score_col <- "score_weighted_chemo" %in% names(df_ranked)
+  has_mz_col <- "mz" %in% names(df_ranked)
+  has_adduct_col <- "candidate_adduct" %in% names(df_ranked)
+
+  if (
+    !all(c(
+      has_component_col,
+      has_rank_col,
+      has_ik_col,
+      has_score_col,
+      has_mz_col,
+      has_adduct_col
+    ))
+  ) {
+    log_debug(
+      "Skipping cluster entity consensus (missing required columns: %s)",
+      paste(
+        c("component_id", "rank_final", "InChIKey", "score", "mz", "adduct")[
+          !c(
+            has_component_col,
+            has_rank_col,
+            has_ik_col,
+            has_score_col,
+            has_mz_col,
+            has_adduct_col
+          )
+        ],
+        collapse = ", "
+      )
+    )
+    return(df_ranked)
+  }
+
+  # Add component_id and neutral mass to ranked candidates
+  df_with_comp <- df_ranked |>
+    tidytable::left_join(
+      y = components_table |> tidytable::distinct(feature_id, component_id),
+      by = "feature_id"
+    )
+
+  has_similarity_col <- "candidate_score_similarity" %in% names(df_with_comp)
+  has_sirius_csi_col <- "candidate_score_sirius_csi" %in% names(df_with_comp)
+  has_sirius_conf_col <- "candidate_score_sirius_confidence" %in%
+    names(df_with_comp)
+
+  # Prefer anchors with direct MS2 evidence when available so consensus does
+  # not systematically promote MS1-only rows to rank 1.
+  df_with_comp <- df_with_comp |>
+    tidytable::mutate(
+      .has_ms2_evidence = (if (has_similarity_col) {
+        !is.na(candidate_score_similarity)
+      } else {
+        FALSE
+      }) |
+        (if (has_sirius_csi_col) {
+          !is.na(candidate_score_sirius_csi)
+        } else {
+          FALSE
+        }) |
+        (if (has_sirius_conf_col) {
+          !is.na(candidate_score_sirius_confidence) &
+            as.numeric(candidate_score_sirius_confidence) > 0
+        } else {
+          FALSE
+        })
+    )
+
+  # Compute neutral mass M from mz and adduct
+  df_with_comp <- df_with_comp |>
+    tidytable::mutate(
+      .candidate_M = compute_candidate_M(mz, candidate_adduct)
+    )
+
+  # For each (component_id, .candidate_M) group with rank_final == 1
+  # identify the anchor InChIKey from the best-scored feature
+  anchor_lookup <- df_with_comp |>
+    tidytable::filter(
+      rank_final == 1L,
+      !is.na(component_id),
+      !is.na(.candidate_M),
+      !is.na(candidate_structure_inchikey_connectivity_layer)
+    ) |>
+    tidytable::arrange(
+      component_id,
+      .candidate_M,
+      tidytable::desc(.has_ms2_evidence),
+      tidytable::desc(score_weighted_chemo)
+    ) |>
+    tidytable::distinct(component_id, .candidate_M, .keep_all = TRUE) |>
+    tidytable::select(
+      component_id,
+      .candidate_M,
+      .anchor_ik = candidate_structure_inchikey_connectivity_layer
+    )
+
+  n_anchor_groups <- nrow(anchor_lookup)
+
+  if (n_anchor_groups == 0L) {
+    log_debug("No cluster entity consensus groups to enforce")
+    return(df_ranked |> tidytable::select(-tidyselect::any_of(".candidate_M")))
+  }
+
+  # For each feature in a consensus group, if it has a different rank=1 candidate
+  # than the anchor, and the anchor is present in its candidates, reorder to make
+  # the anchor the rank=1
+  df_to_reorder <- df_with_comp |>
+    tidytable::left_join(
+      y = anchor_lookup,
+      by = c("component_id", ".candidate_M")
+    ) |>
+    tidytable::filter(
+      !is.na(.anchor_ik),
+      rank_final == 1L,
+      candidate_structure_inchikey_connectivity_layer != .anchor_ik
+    )
+
+  if (nrow(df_to_reorder) > 0L) {
+    # Check if anchor is present as a candidate (any rank) for these features
+    reorder_fids <- df_to_reorder$feature_id
+
+    df_anchored <- df_with_comp |>
+      tidytable::left_join(
+        y = anchor_lookup,
+        by = c("component_id", ".candidate_M")
+      ) |>
+      tidytable::filter(feature_id %in% reorder_fids) |>
+      # For each feature in reorder set, check if it HAS the anchor IK
+      tidytable::mutate(
+        .has_anchor_ik = candidate_structure_inchikey_connectivity_layer ==
+          .anchor_ik
+      )
+
+    # Identify which (feature_id, component_id, .candidate_M) groups actually
+    # have the anchor InChIKey as a candidate
+    groups_with_anchor <- df_anchored |>
+      tidytable::filter(.has_anchor_ik) |>
+      tidytable::distinct(feature_id, component_id, .candidate_M)
+
+    if (nrow(groups_with_anchor) > 0L) {
+      # Reorder: make the anchor IK == rank_final 1, shift others down
+      has_annotation_note <- "annotation_note" %in% names(df_anchored)
+      df_part_reorder <- df_anchored |>
+        tidytable::inner_join(
+          y = groups_with_anchor,
+          by = c("feature_id", "component_id", ".candidate_M")
+        ) |>
+        tidytable::arrange(
+          feature_id,
+          .candidate_M,
+          tidytable::desc(.has_anchor_ik),
+          rank_final
+        ) |>
+        tidytable::mutate(
+          rank_final = tidytable::row_number(),
+          .by = c(feature_id, component_id, .candidate_M),
+          .existing_note = if (has_annotation_note) {
+            annotation_note
+          } else {
+            NA_character_
+          },
+          annotation_note = tidytable::if_else(
+            condition = .has_anchor_ik & rank_final == 1L,
+            true = "Promoted to rank 1: cluster entity consensus (same M across component)",
+            false = .existing_note
+          )
+        ) |>
+        tidytable::select(
+          -tidyselect::all_of(c(
+            ".candidate_M",
+            ".has_anchor_ik",
+            ".anchor_ik",
+            ".existing_note",
+            ".has_ms2_evidence"
+          ))
+        )
+
+      # Combine reordered with unchanged rows
+      df_unchanged <- df_with_comp |>
+        tidytable::anti_join(
+          y = groups_with_anchor,
+          by = c("feature_id", "component_id", ".candidate_M")
+        ) |>
+        tidytable::select(
+          -tidyselect::all_of(c(
+            ".candidate_M",
+            "component_id",
+            ".has_ms2_evidence"
+          ))
+        )
+
+      df_result <- df_part_reorder |>
+        tidytable::bind_rows(df_unchanged) |>
+        tidytable::arrange(feature_id, rank_final)
+
+      log_info(
+        "Enforced cluster entity consensus for %d features (anchor InChIKey promoted to rank 1)",
+        tidytable::n_distinct(groups_with_anchor$feature_id)
+      )
+
+      return(df_result)
+    }
+  }
+
+  # No reordering needed; clean up temporary columns
+  df_with_comp |>
+    tidytable::select(
+      -tidyselect::any_of(c(
+        ".candidate_M",
+        "component_id",
+        ".has_ms2_evidence"
+      ))
+    )
 }

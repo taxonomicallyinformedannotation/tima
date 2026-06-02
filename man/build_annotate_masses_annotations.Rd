@@ -9,6 +9,7 @@ build_annotate_masses_annotations(
   library_em,
   structure_table,
   tolerance_ppm,
+  tolerance_dalton,
   adduct_edges,
   baseline_adduct,
   coverage_mode = "best_supported_conflict_free"

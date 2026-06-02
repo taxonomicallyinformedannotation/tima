@@ -26,6 +26,8 @@ annotate_masses(
   neutral_losses_list = get_params(step = "annotate_masses")$ms$neutral_losses,
   ms_mode = get_params(step = "annotate_masses")$ms$polarity,
   tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
+  tolerance_dalton = get_params(step =
+    "annotate_masses")$ms$tolerances$mass$dalton$ms1,
   tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$adducts,
   adduct_consistency = get_params(step = "annotate_masses")$ms$adducts$consistency$type,
   adduct_min_support = get_params(step =
@@ -64,6 +66,8 @@ annotate_masses(
 \item{ms_mode}{Ionization mode. Must be 'pos' or 'neg'}
 
 \item{tolerance_ppm}{Tolerance to perform annotation. Should be <= 20 ppm}
+
+\item{tolerance_dalton}{Absolute mass tolerance in Daltons for annotation}
 
 \item{tolerance_rt}{Tolerance to group adducts. Should be <= 0.05 minutes}
 

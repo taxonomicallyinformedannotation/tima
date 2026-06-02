@@ -4,6 +4,11 @@
   "\\+2NH4",
   "\\+NH3",
   "\\-NH3",
+  "\\-2NH3",
+  "\\-2H2O",
+  "\\-3H2O",
+  "\\-4H2O",
+  "\\-5H2O",
   "\\+H\\-H2O\\]",
   "\\+H\\-H4O2\\]",
   "\\+H\\-H6O3\\]",
@@ -13,9 +18,14 @@
 )
 .FORMULA_SUBS_REPLACEMENTS <- c(
   "+H4N",
-  "+2H4N",
+  "+H8N2",
   "+H3N",
   "-H3N",
+  "-H6N2",
+  "-H4O2",
+  "-H6O3",
+  "-H8O4",
+  "-H10O5",
   "-H2O+H]",
   "-H4O2+H]",
   "-H6O3+H]",
@@ -261,8 +271,13 @@ canonicalize_adduct_notation <- function(adduct) {
     })
   )
 
-  net <- stats::aggregate(signed_n ~ formula, data = parsed, FUN = sum)
-  net <- net[net$signed_n != 0L, , drop = FALSE]
+  net_sums <- tapply(parsed$signed_n, parsed$formula, sum, simplify = TRUE)
+  nonzero <- net_sums[net_sums != 0L]
+  net <- data.frame(
+    formula = names(nonzero),
+    signed_n = as.integer(nonzero),
+    stringsAsFactors = FALSE
+  )
 
   rebuild_terms <- character(0L)
   if (nrow(net) > 0L) {
