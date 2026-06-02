@@ -148,6 +148,31 @@ solve_consistent_adduct_assignments <- function(
     tidytable::filter(m_consistent) |>
     tidytable::select(feature_id, adduct, feature_id_dest, adduct_dest)
 
+  # IMPORTANT: Enforce global M-consistency
+  # This removes edges that cause conflicts when a feature has multiple edges
+  # Example: F2 cannot be both M+Na (M≈100) and M-H2O (M≈200) simultaneously
+  consistent <- enforce_global_m_consistency(
+    consistent_edges = consistent,
+    features_table = features_table,
+    tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton
+  )
+
+  if (nrow(consistent) == 0L) {
+    return(list(
+      consistent_edges = consistent[0L, ],
+      feature_m_map = tidytable::tidytable(
+        feature_id = character(),
+        neutral_mass = numeric(),
+        component_id = character()
+      ),
+      component_membership = tidytable::tidytable(
+        feature_id = character(),
+        component_id = character()
+      )
+    ))
+  }
+
   # Build undirected graph for connected components
   undirected <- tidytable::bind_rows(
     consistent |>
@@ -282,6 +307,127 @@ solve_consistent_adduct_assignments <- function(
     feature_m_map = feature_m_map,
     component_membership = component_membership
   )
+}
+
+#' Enforce global M-consistency: all edges incident to a feature must agree on M
+#'
+#' This ensures that when multiple edges share a feature, they all imply the same
+#' neutral mass M for that feature (within tolerance). If a feature has conflicting
+#' M values from different edges, those conflicting edges are identified and removed,
+#' which may split connected components into smaller consistent subcomponents.
+#'
+#' Algorithm:
+#' 1. For each feature in each component, collect all implied M values from incident edges
+#' 2. Check if all M values for that feature agree within tolerance
+#' 3. If not, identify edges whose M conflicts with the consensus M
+#' 4. Remove conflicting edges and rebuild components
+#' 5. Repeat until global consistency is achieved
+#'
+#' @keywords internal
+enforce_global_m_consistency <- function(
+  consistent_edges,
+  features_table,
+  tolerance_ppm,
+  tolerance_dalton = NULL
+) {
+  if (nrow(consistent_edges) == 0L) {
+    return(consistent_edges)
+  }
+
+  # Build full edge table with M calculations
+  features_min <- features_table |>
+    tidytable::distinct(feature_id, mz)
+  
+  edge_with_m <- consistent_edges |>
+    tidytable::left_join(
+      features_min,
+      by = c("feature_id")
+    ) |>
+    tidytable::rename(mz_src = mz) |>
+    tidytable::left_join(
+      features_min |> tidytable::rename(feature_id_dest = feature_id, mz_dest = mz),
+      by = c("feature_id_dest")
+    ) |>
+    tidytable::filter(!is.na(mz_src) & !is.na(mz_dest))
+  
+  # Add edge IDs
+  edge_with_m <- edge_with_m |>
+    tidytable::mutate(
+      m_src = calculate_mass_of_m_batch(
+        adducts = adduct,
+        mzs = as.numeric(mz_src)
+      ),
+      m_dest = calculate_mass_of_m_batch(
+        adducts = adduct_dest,
+        mzs = as.numeric(mz_dest)
+      )
+    ) |>
+    tidytable::as_tidytable()
+  
+  # Add edge_id column using row numbers
+  edge_with_m$edge_id <- seq_len(nrow(edge_with_m))
+
+  # Iteratively filter until global consistency achieved
+  prev_n_edges <- nrow(edge_with_m) + 1L
+  iteration <- 0L
+  max_iterations <- 10L
+
+  while (nrow(edge_with_m) > 0L && nrow(edge_with_m) < prev_n_edges && iteration < max_iterations) {
+    iteration <- iteration + 1L
+    prev_n_edges <- nrow(edge_with_m)
+
+    # Collect all implied M values for each feature
+    m_values_src <- edge_with_m |>
+      tidytable::select(feature_id, m_value = m_src, edge_id)
+    m_values_dest <- edge_with_m |>
+      tidytable::select(feature_id = feature_id_dest, m_value = m_dest, edge_id)
+    all_m_values <- tidytable::bind_rows(m_values_src, m_values_dest) |>
+      tidytable::filter(!is.na(m_value))
+
+    if (nrow(all_m_values) == 0L) break
+
+    # For each feature, find consensus M and check consistency
+    feature_consistency <- all_m_values |>
+      tidytable::group_by(feature_id) |>
+      tidytable::mutate(
+        m_median = stats::median(m_value, na.rm = TRUE),
+        m_iqr = stats::IQR(m_value, na.rm = TRUE),
+        m_sd = stats::sd(m_value, na.rm = TRUE),
+        m_sd = tidytable::if_else(is.na(m_sd), 0, m_sd),
+        # Check if this edge's M is within tolerance of consensus
+        ppm_tol = tolerance_ppm * 1e-6 * m_median,
+        dalton_tol = if (is.null(tolerance_dalton)) 1e10 else tolerance_dalton,
+        ppm_consistent = abs(m_value - m_median) <= ppm_tol,
+        dalton_consistent = abs(m_value - m_median) <= dalton_tol,
+        is_consistent = ppm_consistent | dalton_consistent
+      ) |>
+      tidytable::ungroup()
+
+    # Identify edges to remove (those whose M conflicts with consensus for either endpoint)
+    edges_to_remove <- feature_consistency |>
+      tidytable::filter(!is_consistent) |>
+      tidytable::pull(edge_id) |>
+      unique()
+
+    if (length(edges_to_remove) == 0L) {
+      # All features have consistent M values
+      break
+    }
+
+    # Remove conflicting edges and recalculate
+    edge_with_m <- edge_with_m |>
+      tidytable::filter(!(edge_id %in% edges_to_remove))
+  }
+
+  # Return cleaned edges (drop calculation columns, keep original structure)
+  edge_with_m |>
+    tidytable::select(
+      feature_id,
+      adduct,
+      feature_id_dest,
+      adduct_dest
+    ) |>
+    tidytable::distinct()
 }
 
 #' Build the per-feature adduct hypotheses from the edge sets
