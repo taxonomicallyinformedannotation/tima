@@ -40,7 +40,12 @@ build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
     ))
   }
 
-  dt <- tidytable::as_tidytable(hyps)[,
+  hyps <- tidytable::as_tidytable(hyps)
+  if (!"implied_M" %in% colnames(hyps)) {
+    hyps$implied_M <- NA_real_
+  }
+
+  dt <- hyps[,
     .(feature_id, mz, adduct, evidence_cluster, evidence_count, implied_M)
   ]
   dt <- dt[!is.na(evidence_cluster)]
@@ -84,7 +89,7 @@ build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
         m_diff <- abs(implied_M - implied_M_dest)
         m_max <- pmax(implied_M, implied_M_dest, na.rm = TRUE)
         ppm_tol <- tolerance_ppm * 1e-6 * m_max
-        (m_diff <= ppm_tol) | is.na(implied_M_dest)
+        (m_diff <= ppm_tol) | is.na(implied_M) | is.na(implied_M_dest)
       }
     )
 
