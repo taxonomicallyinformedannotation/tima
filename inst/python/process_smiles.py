@@ -49,7 +49,27 @@ OUTPUT_COLUMNS: List[str] = [
     "structure_xlogp",
 ]
 
-DEFAULT_LOG_LEVEL = logging.INFO
+
+def _resolve_log_level_from_env(default: int = logging.INFO) -> int:
+    """Resolve TIMA log level from environment."""
+    level_name = os.getenv("TIMA_LOG_LEVEL", "INFO")
+    if not isinstance(level_name, str):
+        return default
+    level_name = level_name.strip().upper()
+    level_map = {
+        "TRACE": logging.DEBUG,
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARN": logging.WARNING,
+        "WARNING": logging.WARNING,
+        "ERROR": logging.ERROR,
+        "FATAL": logging.CRITICAL,
+        "CRITICAL": logging.CRITICAL,
+    }
+    return level_map.get(level_name, default)
+
+
+DEFAULT_LOG_LEVEL = _resolve_log_level_from_env()
 LOG_FORMAT = "[%(asctime)s] [%(levelname)-5s] %(message)s"
 LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
