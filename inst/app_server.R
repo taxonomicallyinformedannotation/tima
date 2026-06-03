@@ -202,7 +202,7 @@
   if (org_tax == "") {
     org_tax <- NULL
   }
-  hig_con <- shiny::isolate(input$high_confidence)
+  hig_evi <- shiny::isolate(input$high_evidence)
   ms_pol <- shiny::isolate(input$ms_pol)
   summarize <- shiny::isolate(input$summarize)
 
@@ -218,7 +218,7 @@
   yaml_small$files$spectral$raw <- fil_spe_raw
   yaml_small$ms$polarity <- ms_pol
   yaml_small$organisms$taxon <- org_tax
-  yaml_small$options$high_confidence <- hig_con
+  yaml_small$options$high_evidence <- hig_evi
   yaml_small$options$summarize <- summarize
   .create_dir("params")
   yaml::write_yaml(
@@ -542,7 +542,7 @@
     shiny::isolate(input$wei_che_14)
   yaml_advanced$options$compounds_names <-
     shiny::isolate(input$compounds_names)
-  yaml_advanced$options$high_confidence <- hig_con
+  yaml_advanced$options$high_evidence <- hig_evi
   yaml_advanced$options$force <-
     shiny::isolate(input$force)
   yaml_advanced$options$remove_ties <-

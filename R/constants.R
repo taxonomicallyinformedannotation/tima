@@ -1,6 +1,6 @@
 #' Electron mass in Daltons (CODATA 2018 recommended value)
 #' @keywords internal
-ELECTRON_MASS_DALTONS <- 5.485799E-4
+ELECTRON_MASS_DALTONS <- 0.000548579909065
 
 #' Isotope mass shift in Daltons
 #' @description Represents the average mass difference between isotopes,
@@ -145,38 +145,38 @@ DEFAULT_BATCH_SIZE <- 1000
 #' @keywords internal
 DEFAULT_PROGRESS_INTERVAL <- 10000
 
-# High-Confidence Filtering Defaults ----
+# High-Evidence Filtering Defaults ----
 
-#' Default minimum biological score threshold for high-confidence filter
+#' Default minimum biological score threshold for high-evidence filter
 #' @keywords internal
-DEFAULT_HC_SCORE_BIO_MIN <- 0.8
+DEFAULT_HE_SCORE_BIO_MIN <- 0.8
 
-#' Default minimum initial (pseudo) score threshold for high-confidence filter
+#' Default minimum initial (pseudo) score threshold for high-evidence filter
 #' @keywords internal
-DEFAULT_HC_SCORE_INITIAL_MIN <- 0.9
+DEFAULT_HE_SCORE_INITIAL_MIN <- 0.9
 
-#' Default minimum final (weighted chemical) score threshold for high-confidence
+#' Default minimum final (weighted chemical) score threshold for high-evidence
 #'     filter
 #' @keywords internal
-DEFAULT_HC_SCORE_FINAL_MIN <- 0.75
+DEFAULT_HE_SCORE_FINAL_MIN <- 0.75
 
-#' Default minimum SIRIUS confidence score threshold for high-confidence filter
+#' Default minimum SIRIUS confidence score threshold for high-evidence filter
 #' @keywords internal
-DEFAULT_HC_SCORE_SIRIUS_MIN <- 0.4
+DEFAULT_HE_SCORE_SIRIUS_MIN <- 0.4
 
-#' Default minimum spectral similarity score threshold for high-confidence
+#' Default minimum spectral similarity score threshold for high-evidence
 #'     filter
 #' @keywords internal
-DEFAULT_HC_SCORE_SPECTRAL_MIN <- 0.4
+DEFAULT_HE_SCORE_SPECTRAL_MIN <- 0.4
 
-#' Default minimum number of matched peaks for high-confidence filter
+#' Default minimum number of matched peaks for high-evidence filter
 #' @keywords internal
-DEFAULT_HC_SCORE_MIN_PEAKS <- 2L
+DEFAULT_HE_SCORE_MIN_PEAKS <- 2L
 
-#' Default maximum allowed retention time error (minutes) for high-confidence
+#' Default maximum allowed retention time error (minutes) for high-evidence
 #'     filter
 #' @keywords internal
-DEFAULT_HC_MAX_RT_ERROR_MIN <- 0.15
+DEFAULT_HE_MAX_RT_ERROR_MIN <- 0.15
 
 # InChI Patterns ----
 

@@ -37,7 +37,7 @@ organisms:
   #' Example: "Homo sapiens". STRING
   taxon: null
 options:
-  #' Filter high confidence candidates only. BOOLEAN
-  high_confidence: false
+  #' Filter high evidence candidates only. BOOLEAN
+  high_evidence: false
   #' Summarize all candidates per feature to a single row. BOOLEAN
   summarize: false

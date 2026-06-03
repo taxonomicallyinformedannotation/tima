@@ -94,7 +94,7 @@ Character path to the written mzTab-M file (invisibly).
 Exports TIMA weighted-annotation results to mzTab-M 2.1.0
 plain-text format.  The output is a compliant mzTab-M file containing:
 \itemize{
-\item \strong{MTD} – metadata (software, database, instrument, confidence measures,
+\item \strong{MTD} – metadata (software, database, instrument, evidence measures,
 ms_run, sample, assay, study_variable).
 \item \strong{SMF} – one row per chromatographic feature (feature_id, m/z, RT).
 \item \strong{SME} – one row per identification evidence (candidate annotation).
@@ -134,7 +134,7 @@ Reliability levels follow the Metabolomics Standards Initiative (MSI) scale:
 
 \subsection{id_confidence_measure columns}{
 
-Four TIMA-specific confidence measures are exported as
+Four TIMA-specific evidence measures are exported as
 \verb{id_confidence_measure[1..4]} in the MTD section and as additional
 columns in the SME section.  All use the \code{TIMA} user-controlled CV
 namespace (no PSI-MS accession exists for these composite scores):

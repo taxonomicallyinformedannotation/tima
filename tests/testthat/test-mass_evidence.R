@@ -2,7 +2,7 @@
 
 library(testthat)
 
-# Build a tiny universe covering [M+H]+ / [M+Na]+ / [M+2H]2+ / [2M+H]+ / [M+H-H2O]+
+# Build a tiny universe covering [M+H]+ / [M+Na]+ / [M+2H]2+ / [2M+H]+ / [M-H2O+H]+
 .mini_universe <- function() {
   spec <- list(
     M = c(1L, 2L),
@@ -136,7 +136,7 @@ test_that("evidence engine discovers multicharged ([M+H]+ vs [M+2H]2+)", {
   expect_identical(singly$evidence_cluster, doubly$evidence_cluster)
 })
 
-test_that("evidence engine discovers neutral-loss adducts ([M+H]+ vs [M+H-H2O]+)", {
+test_that("evidence engine discovers neutral-loss adducts ([M+H]+ vs [M-H2O+H]+)", {
   M <- 180.0634
   mz_plain <- M + 1.007276
   mz_loss <- M - 18.010565 + 1.007276
@@ -155,7 +155,7 @@ test_that("evidence engine discovers neutral-loss adducts ([M+H]+ vs [M+H-H2O]+)
     ms_mode = "pos"
   )
   intact <- hyps[hyps$feature_id == "INTACT" & hyps$adduct == "[M+H]+", ]
-  loss <- hyps[hyps$feature_id == "LOSS" & hyps$adduct == "[M+H-H2O]+", ]
+  loss <- hyps[hyps$feature_id == "LOSS" & hyps$adduct == "[M-H2O+H]+", ]
   expect_equal(nrow(intact), 1L)
   expect_equal(nrow(loss), 1L)
   expect_identical(intact$evidence_cluster, loss$evidence_cluster)
@@ -270,7 +270,7 @@ test_that("exotic Cu/loss hypotheses are pruned without stronger core-supported 
   )
 
   expect_true("[M+H]+" %in% hyps$adduct)
-  expect_true("[M+H-H2O]+" %in% hyps$adduct)
+  expect_true("[M-H2O+H]+" %in% hyps$adduct)
   expect_false(any(grepl("Cu", hyps$adduct, fixed = TRUE)))
 })
 

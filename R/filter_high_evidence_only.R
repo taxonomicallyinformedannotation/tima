@@ -1,8 +1,8 @@
-#' @title Filter high confidence only
+#' @title Filter high evidence only
 #' `r lifecycle::badge("experimental")`
 #'
 #' @description This function filters annotation results to retain only
-#'     high-confidence candidates based on multiple scoring criteria
+#'     high-evidence candidates based on multiple scoring criteria
 #'     (biological, initial, chemical) and retention time accuracy.
 #'
 #' @include validations_utils.R
@@ -18,7 +18,7 @@
 #'     0.05). Must be > 0
 #' @param confidence_sirius_min Numeric minimum SIRIUS confidence score
 #'     threshold (optional).
-#' Range: 0-1. If provided, candidates WITH a confidence score below this
+#' Range: 0-1. If provided, candidates WITH a evidence score below this
 #'     threshold
 #'     are filtered out, but candidates with NA/missing scores are retained.
 #' @param similarity_spectral_min Numeric minimum spectral similarity threshold
@@ -37,7 +37,7 @@
 #'     (e.g.,
 #'     "mini+filtered" or "full"). Defaults to NULL (no tag).
 #'
-#' @return Data frame containing only high-confidence annotations that meet
+#' @return Data frame containing only high-evidence annotations that meet
 #'     at least one score threshold and pass RT error filtering
 #'
 #' @details
@@ -76,8 +76,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Filter to high-confidence annotations only
-#' high_conf <- filter_high_confidence_only(
+#' # Filter to high-evidence annotations only
+#' high_evi <- filter_high_evidence_only(
 #'   df = annotations,
 #'   score_bio_min = 0.8,
 #'   score_ini_min = 0.9,
@@ -87,25 +87,25 @@
 #' )
 #'
 #' # With SIRIUS confidence threshold
-#' high_conf <- filter_high_confidence_only(
+#' high_evi <- filter_high_evidence_only(
 #'   df = annotations,
 #'   confidence_sirius_min = 0.8,
 #'   similarity_spectral_min = 0.7
 #' )
 #' }
-filter_high_confidence_only <- function(
+filter_high_evidence_only <- function(
   df,
-  score_bio_min = DEFAULT_HC_SCORE_BIO_MIN,
-  score_ini_min = DEFAULT_HC_SCORE_INITIAL_MIN,
-  score_final_min = DEFAULT_HC_SCORE_FINAL_MIN,
-  error_rt_max = DEFAULT_HC_MAX_RT_ERROR_MIN,
-  confidence_sirius_min = DEFAULT_HC_SCORE_SIRIUS_MIN,
-  similarity_spectral_min = DEFAULT_HC_SCORE_SPECTRAL_MIN,
-  matched_peaks_min = DEFAULT_HC_SCORE_MIN_PEAKS,
+  score_bio_min = DEFAULT_HE_SCORE_BIO_MIN,
+  score_ini_min = DEFAULT_HE_SCORE_INITIAL_MIN,
+  score_final_min = DEFAULT_HE_SCORE_FINAL_MIN,
+  error_rt_max = DEFAULT_HE_MAX_RT_ERROR_MIN,
+  confidence_sirius_min = DEFAULT_HE_SCORE_SIRIUS_MIN,
+  similarity_spectral_min = DEFAULT_HE_SCORE_SPECTRAL_MIN,
+  matched_peaks_min = DEFAULT_HE_SCORE_MIN_PEAKS,
   context = NULL
 ) {
   ctx <- log_operation(
-    "filter_high_confidence",
+    "filter_high_evidence",
     n_input = nrow(df),
     context = rlang::`%||%`(context, "default")
   )
@@ -202,6 +202,86 @@ filter_high_confidence_only <- function(
       .score_final = as.numeric(.data[["score_weighted_chemo"]]),
       .rt_err_min = rt_err_vec
     )
+
+  # If a rank-1 row was promoted via cluster consensus, let it inherit the
+  # anchor's evidence-bearing fields before any high-evidence filtering is
+  # applied. This preserves the parent decision for the child row while still
+  # letting the child keep its own non-evidence metadata.
+  has_consensus_cols <- all(
+    c(
+      "cluster_consensus_promoted_from_anchor",
+      "cluster_consensus_group_id",
+      "cluster_consensus_anchor_feature_id",
+      "rank_final"
+    ) %in%
+      names(df_work)
+  )
+  if (has_consensus_cols) {
+    inherit_cols <- intersect(
+      c(
+        "score_biological",
+        "candidate_score_pseudo_initial",
+        "score_weighted_chemo",
+        "candidate_structure_error_rt",
+        "candidate_score_sirius_confidence",
+        "candidate_similarity",
+        "candidate_score_similarity",
+        "candidate_score_similarity_forward",
+        "candidate_score_similarity_reverse",
+        "candidate_count_similarity_peaks_matched",
+        "candidate_adduct_origin",
+        "candidate_annotation_level",
+        "candidate_evidence_tier",
+        "adduct_support",
+        "annotation_note"
+      ),
+      names(df_work)
+    )
+
+    if (length(inherit_cols) > 0L) {
+      anchor_lookup <- df_work |>
+        tidytable::filter(
+          !is.na(cluster_consensus_group_id),
+          rank_final == 1L,
+          feature_id == cluster_consensus_anchor_feature_id
+        ) |>
+        tidytable::distinct(cluster_consensus_group_id, .keep_all = TRUE) |>
+        tidytable::select(
+          cluster_consensus_group_id,
+          tidyselect::any_of(inherit_cols)
+        )
+
+      if (nrow(anchor_lookup) > 0L) {
+        anchor_lookup <- anchor_lookup |>
+          tidytable::rename_with(
+            ~ paste0(".anchor_", .x),
+            .cols = tidyselect::all_of(inherit_cols)
+          )
+
+        df_work <- df_work |>
+          tidytable::left_join(
+            anchor_lookup,
+            by = "cluster_consensus_group_id"
+          ) |>
+          tidytable::mutate(
+            .promoted_rank1 = !is.na(cluster_consensus_group_id) &
+              cluster_consensus_promoted_from_anchor %in% TRUE &
+              rank_final == 1L
+          )
+
+        for (col in inherit_cols) {
+          anchor_col <- paste0(".anchor_", col)
+          if (anchor_col %in% names(df_work)) {
+            df_work[[col]] <- tidytable::if_else(
+              df_work$.promoted_rank1,
+              tidytable::coalesce(df_work[[anchor_col]], df_work[[col]]),
+              df_work[[col]]
+            )
+          }
+        }
+      }
+    }
+  }
 
   n_before <- nrow(df_work)
 
@@ -309,7 +389,7 @@ filter_high_confidence_only <- function(
   }
 
   # Enforce parent-following semantics for cluster-consensus-promoted children.
-  # Promoted rank-1 rows inherit the high-confidence pass/fail of their anchor.
+  # Promoted rank-1 rows inherit the high-evidence pass/fail of their anchor.
   has_consensus_cols <- all(
     c(
       "cluster_consensus_promoted_from_anchor",
@@ -379,6 +459,8 @@ filter_high_confidence_only <- function(
   df_filtered <- df_filtered |>
     tidytable::select(
       -tidyselect::any_of(".row_id"),
+      -tidyselect::any_of(".promoted_rank1"),
+      -tidyselect::starts_with(match = ".anchor_"),
       -tidyselect::starts_with(match = ".score_"),
       -tidyselect::starts_with(match = ".rt_err_")
     )
@@ -395,14 +477,14 @@ filter_high_confidence_only <- function(
   }
 
   log_info(
-    "%s Removed %d low-confidence candidates (%s%% of %d total)",
+    "%s Removed %d low-evidence candidates (%s%% of %d total)",
     tag,
     n_removed,
     percent_removed,
     n_before
   )
   log_info(
-    "%s %d high-confidence candidates remaining (%s%%)",
+    "%s %d high-evidence candidates remaining (%s%%)",
     tag,
     n_after,
     round(100 * n_after / n_before, 1)
@@ -412,3 +494,6 @@ filter_high_confidence_only <- function(
 
   df_filtered
 }
+
+# Backwards-compatible alias used by existing callers/tests.
+filter_high_evidence_only <- filter_high_evidence_only

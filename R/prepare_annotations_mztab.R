@@ -138,7 +138,7 @@ prepare_annotations_mztab <- function(
 
   score_primary <- .mztab_pick_col(
     src,
-    c("id_confidence_measure[1]", "best_id_confidence_value", "reliability")
+    c("id_confidence_measure[1]", "best_id_evidence_value", "reliability")
   )
   lib_col <- .mztab_pick_col(
     src,

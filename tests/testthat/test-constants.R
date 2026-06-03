@@ -6,7 +6,7 @@ library(testthat)
 
 test_that("test-constants ELECTRON_MASS_DALTONS is correct", {
   # CODATA 2018 recommended value
-  expect_equal(ELECTRON_MASS_DALTONS, 5.485799E-4)
+  expect_equal(ELECTRON_MASS_DALTONS, 0.000548579909065)
   expect_type(ELECTRON_MASS_DALTONS, "double")
   expect_true(ELECTRON_MASS_DALTONS > 0)
 })
@@ -73,7 +73,7 @@ test_that("test-constants all major constants are accessible", {
 })
 
 test_that("get_constant returns existing constant", {
-  val <- get_constant("DEFAULT_HC_SCORE_BIO_MIN")
+  val <- get_constant("DEFAULT_HE_SCORE_BIO_MIN")
   expect_equal(val, 0.8)
 })
 

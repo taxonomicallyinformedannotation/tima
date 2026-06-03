@@ -631,7 +631,7 @@ test_that("enforce_ms1_adduct_semantics drops incompatible non-MS1 adducts and k
     candidate_library = c("TIMA MS1", "spectral", "spectral"),
     candidate_adduct = c("[M+NH4]+", "[M+H]+", "[M+NH4]+"),
     candidate_annotation_level = c("primary", NA, NA),
-    candidate_confidence_tier = c("supported_strong", NA, NA)
+    candidate_evidence_tier = c("supported_strong", NA, NA)
   )
 
   out <- enforce_ms1_adduct_semantics(df)
@@ -657,7 +657,7 @@ test_that("enforce_ms1_adduct_semantics tags neutral-mass rescue as m_delta_resc
     candidate_library = c("TIMA MS1", "spectral"),
     candidate_adduct = c("[M+NH4]+", "[M+H]+"),
     candidate_annotation_level = c("primary", NA),
-    candidate_confidence_tier = c("supported_strong", NA)
+    candidate_evidence_tier = c("supported_strong", NA)
   )
 
   out <- enforce_ms1_adduct_semantics(df)

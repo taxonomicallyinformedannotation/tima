@@ -39,7 +39,7 @@
 #'
 #' # Complex adducts
 #' parse_adduct("[2M+Na]+") # Dimer with sodium
-#' parse_adduct("[M+H-H2O]+") # Protonated with water loss
+#' parse_adduct("[M-H2O+H]+") # Protonated with water loss
 #'
 #' \dontrun{
 #' # Advanced cases
@@ -327,7 +327,7 @@ match_adduct_regex <- function(adduct_string, regex) {
 #'       \item trailing radical marker `*` (e.g. `[M]+*`) is removed;
 #'       \item non-standard trailing charge `]+2` is rewritten to `]2+`;
 #'       \item solvent aliases (`+ACN`, `+IsoProp`, `+MeOH`, `+DMSO`, `+FA`,
-#'         `+HAc`, `+CH3COO`, `+NH4`, ...) are expanded to element formulas
+#'         `+HAc`, `+CH3COO`, `+NH4` → `+H4N`, ...) are expanded to element formulas
 #'         via \code{adducts_translations}.
 #'     }
 #'

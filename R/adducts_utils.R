@@ -58,7 +58,7 @@ adducts_translations <-
     # mzmine
     "[M+2NH4]2+" = "[M+2H4N]2+",
     # mzmine
-    "-NH3" = "+H3N",
+    "-NH3" = "-H3N",
     # mzmine
     "+2H" = "+H2",
     # mzmine

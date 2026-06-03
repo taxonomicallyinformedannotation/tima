@@ -10,10 +10,10 @@ collect_node_adduct_hypotheses(
   loss_edges,
   evidence_hypotheses,
   preassigned,
-  baseline_adduct,
+  baseline_adducts,
   features_table,
   tolerance_ppm = 5,
-  tolerance_dalton = NULL
+  tolerance_dalton = 0.005
 )
 }
 \description{

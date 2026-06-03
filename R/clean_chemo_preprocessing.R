@@ -1,4 +1,4 @@
-# Helper Functions ----
+## Helper Functions ----
 
 #' Validate data frame with feature_id column
 #' @keywords internal
@@ -33,7 +33,7 @@
 #' @param minimal_ms1_chemo Numeric (0-1)
 #' @param minimal_ms1_condition Character: "OR" or "AND"
 #' @param compounds_names Logical
-#' @param high_confidence Logical
+#' @param high_evidence Logical
 #' @param remove_ties Logical
 #' @param summarize Logical
 #' @param max_per_score Integer
@@ -48,7 +48,7 @@ validate_clean_chemo_inputs <- function(
   minimal_ms1_chemo,
   minimal_ms1_condition,
   compounds_names,
-  high_confidence,
+  high_evidence,
   remove_ties,
   summarize,
   max_per_score,
@@ -151,7 +151,7 @@ validate_clean_chemo_inputs <- function(
   # Validate logical parameters
   logical_params <- list(
     compounds_names = compounds_names,
-    high_confidence = high_confidence,
+    high_evidence = high_evidence,
     remove_ties = remove_ties,
     summarize = summarize
   )
@@ -247,17 +247,29 @@ filter_ms1_annotations <- function(
   # spectral annotation runs).
   has_confidence_col <- "candidate_score_sirius_confidence" %in%
     names(annot_table_wei_chemo)
+  has_csi_col <- "candidate_score_sirius_csi" %in%
+    names(annot_table_wei_chemo)
 
-  if (has_confidence_col) {
+  if (has_confidence_col && has_csi_col) {
     has_ms2 <- quote(
       !is.na(candidate_score_similarity) |
         !is.na(candidate_score_sirius_csi) |
         (!is.na(candidate_score_sirius_confidence) &
           as.numeric(candidate_score_sirius_confidence) > 0)
     )
-  } else {
+  } else if (has_confidence_col && !has_csi_col) {
+    has_ms2 <- quote(
+      !is.na(candidate_score_similarity) |
+        (!is.na(candidate_score_sirius_confidence) &
+          as.numeric(candidate_score_sirius_confidence) > 0)
+    )
+  } else if (!has_confidence_col && has_csi_col) {
     has_ms2 <- quote(
       !is.na(candidate_score_similarity) | !is.na(candidate_score_sirius_csi)
+    )
+  } else {
+    has_ms2 <- quote(
+      !is.na(candidate_score_similarity)
     )
   }
 
@@ -317,16 +329,41 @@ rank_and_deduplicate <- function(df) {
 #' @return Filtered data frame
 #' @keywords internal
 apply_percentile_filter <- function(df, best_percentile) {
+  has_rank_col <- "rank_final" %in% names(df)
+  has_consensus_col <- "cluster_consensus_promoted_from_anchor" %in% names(df)
+
   df |>
     tidytable::mutate(
       score_weighted_chemo = as.numeric(score_weighted_chemo)
     ) |>
     tidytable::group_by(feature_id) |>
-    tidytable::filter(
-      score_weighted_chemo >=
-        best_percentile * max(score_weighted_chemo, na.rm = TRUE)
+    tidytable::mutate(
+      .score_max = suppressWarnings(max(score_weighted_chemo, na.rm = TRUE)),
+      .keep_by_percentile = score_weighted_chemo >=
+        best_percentile * .score_max,
+      .keep_by_rank = if (has_rank_col) {
+        rank_final == 1L
+      } else {
+        FALSE
+      },
+      .keep_by_consensus = if (has_consensus_col) {
+        cluster_consensus_promoted_from_anchor %in% TRUE
+      } else {
+        FALSE
+      }
     ) |>
-    tidytable::ungroup()
+    tidytable::filter(
+      .keep_by_percentile | .keep_by_rank | .keep_by_consensus
+    ) |>
+    tidytable::ungroup() |>
+    tidytable::select(
+      -tidyselect::any_of(c(
+        ".score_max",
+        ".keep_by_percentile",
+        ".keep_by_rank",
+        ".keep_by_consensus"
+      ))
+    )
 }
 
 #' Count Evaluated and Best Candidates
@@ -538,7 +575,10 @@ compute_candidate_M <- function(mz, adduct_string) {
   for (add in unique_adducts) {
     parsed <- tryCatch(
       suppressWarnings(parse_adduct(add)),
-      error = function(...) NULL
+      error = function(.err) {
+        invisible(.err)
+        NULL
+      }
     )
     if (is.null(parsed) || all(parsed == 0)) {
       next
@@ -547,6 +587,7 @@ compute_candidate_M <- function(mz, adduct_string) {
     n_mer <- parsed[["n_mer"]]
     n_iso <- parsed[["n_iso"]]
     mass_mods <- parsed[["los_add_clu"]]
+    charge_sign <- parsed[["charge"]]
     if (n_mer == 0L || n_charges == 0L) {
       next
     }
@@ -557,7 +598,12 @@ compute_candidate_M <- function(mz, adduct_string) {
     }
     mz_vec <- mz_num[idx]
     iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
-    m_vec <- (n_charges * (mz_vec - iso_shift) - mass_mods) / n_mer
+    z_signed <- n_charges * charge_sign
+    m_vec <- (n_charges *
+      (mz_vec - iso_shift) -
+      mass_mods +
+      z_signed * ELECTRON_MASS_DALTONS) /
+      n_mer
     m_vec[!is.finite(m_vec) | m_vec == 0] <- NA_real_
     valid <- !is.na(m_vec)
     out[idx[valid]] <- m_vec[valid]

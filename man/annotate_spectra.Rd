@@ -16,6 +16,7 @@ annotate_spectra(
   cutoff = get_params(step = "annotate_spectra")$ms$thresholds$ms2$intensity,
   min_fragments = get_params(step = "annotate_spectra")$ms$thresholds$ms2$min_fragments,
   approx = get_params(step = "annotate_spectra")$annotations$ms2approx,
+  ms1_annotations = NULL,
   qutoff = deprecated()
 )
 }
@@ -51,6 +52,11 @@ must have after cleaning to be retained (default: 2).}
 \item{approx}{\link{logical} If TRUE perform matching ignoring precursor masses
 (broader, slower); if FALSE restrict library to precursor-tolerant
 spectra first.}
+
+\item{ms1_annotations}{Optional path or data frame containing
+\code{annotate_masses()} output. When provided, query adducts are taken from
+the MS1 primary assignment (preferably \code{primary} + \code{supported_strong}) by
+\code{feature_id}, and MGF adduct metadata is used only as fallback.}
 
 \item{qutoff}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{cutoff} instead.}
 }

@@ -116,27 +116,27 @@ ms:
   clusters:
     #' List of clusters to be used in negative. STRING
     neg:
-      # - "H2O"        # (water)                        ~18.011
+      - "H2O"        # (water)                          ~18.011
       - "CH2O2"        # (formic acid)                  ~46.006
       - "NaCl"         # (sodium chloride)              ~57.959
-      - "C2H4O2"       # (acetic acid)                  ~60.021
+      # - "C2H4O2"       # (acetic acid)                ~60.021
       # - "H2PO4"      # (phosphoric)                   ~96.969
       # - "C2HF3O2"    # (tfa)                          ~113.993
 
     #' List of clusters to be used in positive. STRING
     pos:
+      - "NH3"          # (ammonia)                      ~17.027
       - "H2O"          # (water)                        ~18.011
       # - "CH4O"       # (methanol)                     ~32.026
-      # - "C2H6O"      # (ethanol)                      ~46.042
       - "C2H3N"        # (acetonitrile)                 ~41.053
-      - "C2H7N"        # (ethylamine)                   ~45.058
-      - "NH3"          # (ammonia)                      ~17.027
+      - "C2H7N"        # (ethylamine from ACN)          ~45.058
       - "CH2O2"        # (formic acid)                  ~46.006
-      - "C2H4O2"       # (acetic acid)                  ~60.021
+      # - "C2H6O"      # (ethanol)                      ~46.042
       - "NaCl"         # (sodium chloride)              ~57.959
-      - "KCl"          # (potassium chloride)           ~73.933
+      # - "C2H4O2"       # (acetic acid)                ~60.021
       # - "C3H8O"      # (isopropanol)                  ~60.058
-      - "C2H6OS"       # (dmso)                         ~78.014
+      # - "KCl"          # (potassium chloride)         ~73.933
+      # - "C2H6OS"       # (dmso)                       ~78.014
 
   #' List of neutral losses to be used. STRING
   neutral_losses:

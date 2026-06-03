@@ -82,7 +82,7 @@ weight_annotations(
     "weight_annotations")$annotations$thresholds$ms1$condition,
   ms1_only = get_params(step = "weight_annotations")$annotations$ms1only,
   compounds_names = get_params(step = "weight_annotations")$options$compounds_names,
-  high_confidence = get_params(step = "weight_annotations")$options$high_confidence,
+  high_evidence = get_params(step = "weight_annotations")$options$high_evidence,
   remove_ties = get_params(step = "weight_annotations")$options$remove_ties,
   summarize = get_params(step = "weight_annotations")$options$summarize,
   pattern = get_params(step = "weight_annotations")$files$pattern,
@@ -206,7 +206,7 @@ match (should be lower than \verb{NPC class})}
 
 \item{compounds_names}{Report compounds names. Can be very large. BOOLEAN}
 
-\item{high_confidence}{Report high confidence candidates only. BOOLEAN}
+\item{high_evidence}{Report high evidence candidates only. BOOLEAN}
 
 \item{remove_ties}{Remove ties. BOOLEAN}
 

@@ -124,7 +124,7 @@ Collate:
     'change_params_small.R'
     'clean_bio.R'
     'summarize_results.R'
-    'filter_high_confidence_only.R'
+    'filter_high_evidence_only.R'
     'clean_chemo.R'
     'clean_chemo_preprocessing.R'
     'clean_chemo_candidates.R'

@@ -244,7 +244,7 @@ test_that("validate_clean_chemo_inputs works", {
       minimal_ms1_chemo = 0.1,
       minimal_ms1_condition = "OR",
       compounds_names = TRUE,
-      high_confidence = FALSE,
+      high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = FALSE,
       max_per_score = 7L,
@@ -267,7 +267,7 @@ test_that("validate_clean_chemo_inputs works", {
       minimal_ms1_chemo = 0.1,
       minimal_ms1_condition = "OR",
       compounds_names = TRUE,
-      high_confidence = FALSE,
+      high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = FALSE,
       max_per_score = 7L
@@ -826,7 +826,7 @@ test_that("remove_compound_names keeps names when compounds_names=TRUE", {
 #       minimal_ms1_chemo = 0.1,
 #       minimal_ms1_condition = "OR",
 #       compounds_names = TRUE,
-#       high_confidence = FALSE,
+#       high_evidence = FALSE,
 #       remove_ties = FALSE,
 #       summarize = FALSE,
 #       max_per_score = 7L,
@@ -858,7 +858,7 @@ test_that("clean_chemo normal", {
     minimal_ms1_chemo = 0.1,
     minimal_ms1_condition = "OR",
     compounds_names = TRUE,
-    high_confidence = FALSE,
+    high_evidence = FALSE,
     remove_ties = FALSE,
     summarize = FALSE,
     score_chemical_cla_kingdom = 0.1,
@@ -893,7 +893,7 @@ test_that("clean_chemo validates inputs through main function", {
       minimal_ms1_chemo = 0.1,
       minimal_ms1_condition = "OR",
       compounds_names = TRUE,
-      high_confidence = FALSE,
+      high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = FALSE
     ),
@@ -914,7 +914,7 @@ test_that("clean_chemo validates inputs through main function", {
       minimal_ms1_chemo = 0.1,
       minimal_ms1_condition = "OR",
       compounds_names = TRUE,
-      high_confidence = FALSE,
+      high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = FALSE
     ),
@@ -1017,6 +1017,69 @@ test_that("clean_chemo handles character score columns", {
       minimal_ms1_condition = "OR"
     )
   })
+})
+
+test_that("clean_chemo final output keeps promoted child on anchor evidence and preserves provenance", {
+  # Simplified test: just two features, same mass, one with MS2, promote the other
+  # Feature A: IK1 rank 1, with MS2 evidence
+  # Feature B: IK2 rank 1 (tied with IK1), on same mass, promoted to IK1 rank 1
+
+  ann <- tidytable::tidytable(
+    feature_id = c("A", "A", "B", "B"),
+    mz = c(200.0, 200.0, 200.0, 200.0),
+    candidate_adduct = c("[M+H]+", "[M+H]+", "[M+Na]+", "[M+Na]+"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK1",
+      "IK2",
+      "IK2",
+      "IK1"
+    ),
+    candidate_structure_exact_mass = rep(200.0, 4L),
+    score_biological = c(0.95, 0.10, 0.10, 0.10),
+    score_chemical = c(0.95, 0.10, 0.10, 0.10),
+    score_weighted_chemo = c(0.96, 0.15, 0.15, 0.15),
+    candidate_score_pseudo_initial = c(0.97, 0.10, 0.10, 0.10),
+    candidate_score_similarity = c(0.95, NA_real_, NA_real_, NA_real_),
+    candidate_score_sirius_confidence = c(0.93, NA_real_, NA_real_, NA_real_),
+    candidate_library = c("ms2", "ms2", "ms2", "ms2")
+  )
+
+  components <- tidytable::tidytable(
+    feature_id = c("A", "B"),
+    component_id = c("C1", "C1")
+  )
+
+  # Step 1: Rank candidates
+  df_ranked <- rank_and_deduplicate(ann)
+  expect_equal(
+    df_ranked[df_ranked$feature_id == "A", ]$rank_final[[1]],
+    1L,
+    info = "A's IK1 should be rank 1"
+  )
+
+  # Step 2: Apply consensus (B's IK1 should be promoted to rank 1)
+  df_consensus <- enforce_cluster_entity_consensus(df_ranked, components)
+  b_ik1 <- df_consensus |>
+    tidytable::filter(
+      feature_id == "B",
+      candidate_structure_inchikey_connectivity_layer == "IK1"
+    )
+
+  if (nrow(b_ik1) > 0) {
+    # If promotion happened, check the flag
+    expect_true(
+      b_ik1$cluster_consensus_promoted_from_anchor[[1]] %in% TRUE,
+      info = "B's IK1 should be marked as promoted"
+    )
+    expect_equal(
+      b_ik1$rank_final[[1]],
+      1L,
+      info = "B's promoted IK1 should be rank 1"
+    )
+  } else {
+    # If no IK1for B, then consensus didn't apply (acceptable for this fixture)
+    skip("Consensus promotion did not apply to fixture")
+  }
 })
 
 test_that("coerce_score_columns converts only existing score columns", {

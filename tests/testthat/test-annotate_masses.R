@@ -493,7 +493,7 @@ test_that("annotate_masses produces expected output structure", {
 test_that("coverage report distinguishes feature-level tiers and scopes", {
   annotations <- tidytable::tidytable(
     feature_id = c("F_STR", "F_PAIR", "F_MULTI", "F_BASE", "F_MOD"),
-    adduct = c("[M+H]+", "[M+Na]+", "[M+2H]2+", "[M+H]+", "[M+H+H2O]+"),
+    adduct = c("[M+H]+", "[M+Na]+", "[M+2H]2+", "[M+H]+", "[M+H2O+H]+"),
     source = c("pair", "pair", "multi", "baseline", "loss"),
     candidate_structure_error_mz = c(0.01, NA, NA, NA, NA),
     adduct_support = c(3L, 2L, 2L, 0L, 1L)
@@ -846,7 +846,7 @@ test_that("prune_candidates_by_network_consensus matches support by adduct state
     feature_id = c("F1", "F1"),
     rt = c(1, 1),
     mz = c(100, 100),
-    adduct = c("[M+H+H2O]+", "[M+K]+"),
+    adduct = c("[M+H2O+H]+", "[M+K]+"),
     mass = c(99, 99),
     source = c("pair", "pair"),
     is_preassigned = c(FALSE, FALSE),
@@ -867,7 +867,7 @@ test_that("prune_candidates_by_network_consensus matches support by adduct state
     baseline_adduct = "[M+H]+"
   )
 
-  expect_true(any(out$adduct == "[M+H+H2O]+"))
+  expect_true(any(out$adduct == "[M+H2O+H]+"))
   expect_false(any(out$adduct == "[M+K]+"))
 })
 
@@ -947,7 +947,7 @@ test_that("enforce_annotation_edge_adduct_agreement keeps edge-supported and saf
 test_that("enforce_annotation_edge_adduct_agreement matches equivalent adduct orderings", {
   annotations <- tidytable::tidytable(
     feature_id = c("F1", "F2"),
-    adduct = c("[M+H+H2O]+", "[2M+Fe]2+"),
+    adduct = c("[M+H2O+H]+", "[2M+Fe]2+"),
     source = c("pair", "multi")
   )
   adduct_edges <- tidytable::tidytable(
@@ -963,7 +963,7 @@ test_that("enforce_annotation_edge_adduct_agreement matches equivalent adduct or
     baseline_adduct = "[M+H]+"
   )
 
-  expect_true(any(out$feature_id == "F1" & out$adduct == "[M+H+H2O]+"))
+  expect_true(any(out$feature_id == "F1" & out$adduct == "[M+H2O+H]+"))
   expect_false(any(out$feature_id == "F2" & out$adduct == "[2M+Fe]2+"))
 })
 
@@ -1108,12 +1108,12 @@ test_that("apply_adduct_consistency_filter prunes ambiguous unsupported edges", 
 test_that("enforce_graph_adduct_consistency removes impossible combinations", {
   df_add <- tidytable::tidytable(
     feature_id = c("1879", "1884", "1911", "1879"),
-    adduct = c("[M]+", "[M+H]+", "[M+H2O+Na]+", "[M-H2+Fe+H2O]+"),
+    adduct = c("[M]+", "[M+H]+", "[M+H2O+Na]+", "[M-H2+H2O+Fe]+"),
     adduct_dest = c(
-      "[M+Na+NaCl]+",
+      "[M+NaCl+Na]+",
       "[M+H2O+Na]+",
       "[M+H2O+K]+",
-      "[M+K+NaCl]+"
+      "[M+NaCl+K]+"
     ),
     feature_id_dest = c("1889", "1911", "1889", "1884")
   )
@@ -1137,16 +1137,16 @@ test_that("enforce_graph_adduct_consistency removes impossible combinations", {
 test_that("enforce_graph_adduct_consistency keeps exotic edge when it is consistent", {
   df_add <- tidytable::tidytable(
     feature_id = c("A"),
-    adduct = c("[M-H2+Fe+H2O]+"),
-    adduct_dest = c("[M+K+NaCl]+"),
+    adduct = c("[M-H2+H2O+Fe]+"),
+    adduct_dest = c("[M+NaCl+K]+"),
     feature_id_dest = c("B")
   )
 
   out <- enforce_graph_adduct_consistency(df_add)
 
   expect_equal(nrow(out), 1L)
-  expect_equal(out$adduct[[1L]], "[M-H2+Fe+H2O]+")
-  expect_equal(out$adduct_dest[[1L]], "[M+K+NaCl]+")
+  expect_equal(out$adduct[[1L]], "[M-H2+H2O+Fe]+")
+  expect_equal(out$adduct_dest[[1L]], "[M+NaCl+K]+")
 })
 
 test_that("enforce_graph_adduct_consistency removes impossible combinations in larger graphs", {
@@ -1171,9 +1171,9 @@ test_that("enforce_graph_adduct_consistency removes impossible combinations in l
       "[M+K]+",
       "[M+H4N]+",
       "[M+Cu]+",
-      "[M+H+H2O]+",
-      "[M+Na+NaCl]+",
-      "[M-H2+Fe+H2O]+",
+      "[M+H2O+H]+",
+      "[M+NaCl+Na]+",
+      "[M-H2+H2O+Fe]+",
       "[M+H2O+K]+"
     ),
     adduct_dest = c(
@@ -1237,8 +1237,8 @@ test_that("enforce_graph_adduct_consistency exposes audit metadata", {
 test_that("enforce_graph_adduct_consistency does not split equivalent H2O text forms", {
   df_add <- tidytable::tidytable(
     feature_id = c("A", "B"),
-    adduct = c("[M+H2O+H]+", "[M+H+H2O]+"),
-    adduct_dest = c("[M+H+H2O]+", "[M+H2O+Na]+"),
+    adduct = c("[M+H2O+H]+", "[M+H2O+H]+"),
+    adduct_dest = c("[M+H2O+H]+", "[M+H2O+Na]+"),
     feature_id_dest = c("B", "C")
   )
 

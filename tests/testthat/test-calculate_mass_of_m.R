@@ -49,26 +49,27 @@ expect_round_trip <- function(original_mass, adduct, tolerance = 0.0001) {
 
 ## Basic mass calculation ----
 
-# Define mass constants for strict accuracy
+# Define neutral atomic/group masses then derive charge-corrected ion offsets.
 ADDUCT_MASSES <- list(
-  H = 1.00783,
-  Li = 7.01600,
-  NH4 = 18.03437,
-  Na = 22.98977,
-  Mg = 23.98504,
-  Cl = 34.96885,
-  K = 38.96371,
-  Ca = 39.96259,
-  HCOO = 44.99765, # Formate
-  Fe = 55.93494,
-  CH3COO = 59.01330, # Acetate
-  Br = 78.91834,
-  CF3COO = 112.98504 # Trifluoroacetate
+  H = ATOMIC_MONOISOTOPIC_MASS[["H"]],
+  Li = ATOMIC_MONOISOTOPIC_MASS[["Li"]],
+  H4N = 4 * ATOMIC_MONOISOTOPIC_MASS[["H"]] + ATOMIC_MONOISOTOPIC_MASS[["N"]],
+  Na = ATOMIC_MONOISOTOPIC_MASS[["Na"]],
+  Mg = ATOMIC_MONOISOTOPIC_MASS[["Mg"]],
+  Cl = ATOMIC_MONOISOTOPIC_MASS[["Cl"]],
+  K = ATOMIC_MONOISOTOPIC_MASS[["K"]],
+  Ca = ATOMIC_MONOISOTOPIC_MASS[["Ca"]],
+  HCOO = formula_mass(parse_atomic_formula("CHO2")),
+  Fe = ATOMIC_MONOISOTOPIC_MASS[["Fe"]],
+  CH3COO = formula_mass(parse_atomic_formula("C2H3O2")),
+  Br = ATOMIC_MONOISOTOPIC_MASS[["Br"]],
+  CF3COO = formula_mass(parse_atomic_formula("C2HF3O2"))
 )
-H_MASS <- ADDUCT_MASSES$H
-Na_MASS <- ADDUCT_MASSES$Na # nolint: object_name_linter.
-K_MASS <- ADDUCT_MASSES$K
-NH4_MASS <- ADDUCT_MASSES$NH4
+# Positive-carrier ion mass offsets include electron removal.
+H_MASS <- ADDUCT_MASSES$H - ELECTRON_MASS_DALTONS
+Na_MASS <- ADDUCT_MASSES$Na - ELECTRON_MASS_DALTONS # nolint: object_name_linter.
+K_MASS <- ADDUCT_MASSES$K - ELECTRON_MASS_DALTONS
+NH4_MASS <- ADDUCT_MASSES$H4N - ELECTRON_MASS_DALTONS
 H2O_LOSS <- 18.010565 # Water loss (exact)
 NH3_LOSS <- 17.026549 # Ammonia loss (exact)
 
@@ -78,7 +79,7 @@ test_that("calculate_mass_of_m calculates mass from [M+H]+", {
 
   expect_type(mass, "double")
   expect_true(mass > 0)
-  expect_mass_equal(mass, 194.079875)
+  expect_mass_equal(mass, 195.0877 - H_MASS)
 })
 
 test_that("calculate_mass_of_m calculates mass from [M-H]-", {
@@ -86,14 +87,14 @@ test_that("calculate_mass_of_m calculates mass from [M-H]-", {
   mass <- calculate_mass_of_m(mz = mz, adduct_string = "[M-H]-")
 
   expect_true(mass > 0)
-  expect_mass_equal(mass, 200.007825)
+  expect_mass_equal(mass, 199.0 + H_MASS)
 })
 
 test_that("calculate_mass_of_m calculates mass from [M+Na]+", {
   mz <- 223.0
   mass <- calculate_mass_of_m(mz = mz, adduct_string = "[M+Na]+")
 
-  expect_mass_equal(mass, 200.0102307)
+  expect_mass_equal(mass, 223.0 - Na_MASS)
 })
 
 ## Required parameters validation ----
@@ -357,9 +358,9 @@ test_that("calculate_mass_of_m works with caffeine", {
 
 test_that("calculate_mass_of_m works with cholesterol", {
   cholesterol_mass <- 386.3549
-  cholesterol_mz <- cholesterol_mass + NH4_MASS # [M+NH4]+
+  cholesterol_mz <- cholesterol_mass + NH4_MASS # [M+H4N]+
 
-  mass <- calculate_mass_of_m(mz = cholesterol_mz, adduct_string = "[M+NH4]+")
+  mass <- calculate_mass_of_m(mz = cholesterol_mz, adduct_string = "[M+H4N]+")
   expect_mass_equal(mass, cholesterol_mass)
 })
 
@@ -710,7 +711,7 @@ test_that("calculate_mz_from_mass works with cholesterol", {
 
   mz <- calculate_mz_from_mass(
     neutral_mass = cholesterol_mass,
-    adduct_string = "[M+NH4]+"
+    adduct_string = "[M+H4N]+"
   )
   expect_mz_equal(mz, expected_mz)
 })

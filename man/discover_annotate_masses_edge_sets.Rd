@@ -14,6 +14,7 @@ discover_annotate_masses_edge_sets(
   ms_mode,
   tolerance_ppm,
   tolerance_rt,
+  tolerance_dalton,
   cfg,
   exact_masses
 )

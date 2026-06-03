@@ -257,7 +257,7 @@ prepare_params <- function(
   wei_che_23 <- params_advanced$weights$chemical$npc$class
   wei_che_14 <- params_advanced$weights$chemical$cla$parent
   opt_cpd_nam <- params_advanced$options$compounds_names
-  # opt_hig_con <- params_advanced$options$high_confidence
+  # opt_hig_evi <- params_advanced$options$high_evidence
   opt_for <- params_advanced$options$force
   opt_rem_tie <- params_advanced$options$remove_ties
   # opt_sum <- params_advanced$options$summarize
@@ -277,7 +277,7 @@ prepare_params <- function(
   fil_ann_raw_sir <- params_small$files$annotations$raw$sirius
   ms_pol <- params_small$ms$polarity
   org_tax <- params_small$organisms$taxon
-  opt_hig_con <- params_small$options$high_confidence
+  opt_hig_evi <- params_small$options$high_evidence
   opt_sum <- params_small$options$summarize
 
   yamls_params$`prepare_params_advanced`$files$pattern <- fil_pat
@@ -290,7 +290,7 @@ prepare_params <- function(
     fil_ann_raw_sir
   yamls_params$`prepare_params_advanced`$ms$polarity <- ms_pol
   yamls_params$`prepare_params_advanced`$organisms$taxon <- org_tax
-  yamls_params$`prepare_params_advanced`$options$high_confidence <- opt_hig_con
+  yamls_params$`prepare_params_advanced`$options$high_evidence <- opt_hig_evi
   yamls_params$`prepare_params_advanced`$options$summarize <- opt_sum
 
   if (!is.null(org_tax)) {
@@ -776,8 +776,8 @@ prepare_params <- function(
     opt_cpd_nam
   yamls_params$weight_annotations$options$force <-
     opt_for
-  yamls_params$weight_annotations$options$high_confidence <-
-    opt_hig_con
+  yamls_params$weight_annotations$options$high_evidence <-
+    opt_hig_evi
   yamls_params$weight_annotations$options$remove_ties <-
     opt_rem_tie
   yamls_params$weight_annotations$options$summarize <-

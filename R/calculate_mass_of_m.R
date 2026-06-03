@@ -5,14 +5,14 @@
 #'     isotopes, and adduct modifications.
 #'
 #'     The calculation follows the formula:
-#'     M = ((z * (m/z + iso) - modifications - (z * sign * e_mass)) / n_mer)
+#'     M = (|z| * (m/z - iso_shift) - modifications + z * e_mass) / n_mer
 #'
 #'     where:
-#'     - z = number of charges
+#'     - |z| = absolute number of charges
+#'     - z = signed charge (`|z| * polarity`)
 #'     - m/z = observed mass-to-charge ratio
-#'     - iso = isotope shift (mass units)
-#'     - modifications = total mass change from adduct modifications
-#'     - sign = charge polarity (+1 or -1)
+#'     - iso_shift = `n_iso * ISOTOPE_MASS_SHIFT_DALTONS`
+#'     - modifications = total neutral mass change from adduct modifications
 #'     - e_mass = electron mass
 #'     - n_mer = multimer count
 #'
@@ -46,7 +46,7 @@
 #' # Expected: ~122.45 Da
 #'
 #' # Complex adduct with water loss
-#' calculate_mass_of_m(mz = 105.4467, adduct_string = "[M+H-H2O]+")
+#' calculate_mass_of_m(mz = 105.4467, adduct_string = "[M-H2O+H]+")
 #' # Expected: ~122.45 Da
 #'
 #' # Dimer
@@ -97,6 +97,7 @@ calculate_mass_of_m <- function(
 
   # Extract parsed components with descriptive names
   n_charges <- parsed_adduct["n_charges"][[1L]]
+  charge_sign <- parsed_adduct["charge"][[1L]]
   n_mer <- parsed_adduct["n_mer"][[1L]]
   n_iso <- parsed_adduct["n_iso"][[1L]]
   mass_modifications <- parsed_adduct["los_add_clu"][[1L]]
@@ -123,14 +124,15 @@ calculate_mass_of_m <- function(
   }
 
   # Calculate neutral mass using the adduct formula
-  # Formula: M = ((z * (m/z + iso) - modifications - (z * sign * e_mass)) /
-  # n_mer)
+  # Formula: M = (|z| * (m/z - iso_shift) - modifications + z * e_mass) / n_mer
   neutral_mass <- calculate_neutral_mass_formula(
     mz = mz,
     n_charges = n_charges,
+    charge_sign = charge_sign,
     n_iso = n_iso,
     mass_modifications = mass_modifications,
-    n_mer = n_mer
+    n_mer = n_mer,
+    electron_mass = electron_mass
   )
 
   # Validate result
@@ -198,8 +200,7 @@ calculate_mass_of_m_batch <- function(
   mzs,
   electron_mass = ELECTRON_MASS_DALTONS
 ) {
-  # Kept for API symmetry with calculate_mass_of_m(); correction is negligible.
-  force(electron_mass)
+  validate_electron_mass(electron_mass)
   n <- length(adducts)
   if (length(mzs) == 1L) {
     mzs <- rep(as.numeric(mzs), n)
@@ -210,11 +211,12 @@ calculate_mass_of_m_batch <- function(
 
   unique_adducts <- unique(adducts[!is.na(adducts)])
   for (a in unique_adducts) {
-    parsed <- tryCatch(parse_adduct(a), error = function(e) NULL)
+    parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
     if (is.null(parsed) || all(parsed == 0L)) {
       next
     }
     n_charges <- parsed[["n_charges"]]
+    charge_sign <- parsed[["charge"]]
     n_mer <- parsed[["n_mer"]]
     n_iso <- parsed[["n_iso"]]
     mass_mods <- parsed[["los_add_clu"]]
@@ -225,7 +227,12 @@ calculate_mass_of_m_batch <- function(
     idx <- which(!is.na(adducts) & adducts == a)
     mz_sub <- mzs[idx]
     iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
-    masses <- (n_charges * (mz_sub - iso_shift) - mass_mods) / n_mer
+    z_signed <- n_charges * charge_sign
+    masses <- (n_charges *
+      (mz_sub - iso_shift) -
+      mass_mods +
+      z_signed * electron_mass) /
+      n_mer
     out[idx] <- masses
   }
   out
@@ -311,21 +318,22 @@ is_parse_failed <- function(parsed_adduct) {
 calculate_neutral_mass_formula <- function(
   mz,
   n_charges,
+  charge_sign,
   n_iso,
   mass_modifications,
-  n_mer
+  n_mer,
+  electron_mass
 ) {
-  # Apply the neutral mass calculation formula
-  # M = ((z * (m/z - iso_shift) - modifications) / n_mer)
-  # Note: isotope shift is SUBTRACTED because isotope peaks are at HIGHER m/z
-  # Example: [M1+H]+ at 182.07 m/z -> subtract 1.0033548 to get back to
-  # monoisotopic mass
+  # Physically-correct neutral mass inversion with signed electron correction:
+  # m/z = (n_mer * M + mass_modifications - z * m_e) / |z| + isotope_shift
+  # z = charge_sign * n_charges
+  # => M = (|z| * (m/z - isotope_shift) - mass_modifications + z * m_e) / n_mer
 
-  # Calculate actual isotope mass shift (n_iso * isotope unit)
   isotope_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
+  z_signed <- n_charges * charge_sign
 
   charged_mass <- n_charges * (mz - isotope_shift)
-  corrected_mass <- charged_mass - mass_modifications
+  corrected_mass <- charged_mass - mass_modifications + z_signed * electron_mass
   neutral_mass <- corrected_mass / n_mer
 
   neutral_mass
@@ -378,8 +386,8 @@ calculate_mz_from_mass <- function(
     param_name = "neutral_mass"
   )
 
-  # electron_mass kept for API compatibility (negligible correction)
-  force(electron_mass)
+  # Validate electron mass
+  validate_electron_mass(electron_mass)
 
   # Parse adduct
   parsed_adduct <- parse_adduct(adduct_string)
@@ -393,6 +401,7 @@ calculate_mz_from_mass <- function(
 
   # Extract components
   n_charges <- parsed_adduct["n_charges"][[1L]]
+  charge_sign <- parsed_adduct["charge"][[1L]]
   n_mer <- parsed_adduct["n_mer"][[1L]]
   n_iso <- parsed_adduct["n_iso"][[1L]]
   mass_modifications <- parsed_adduct["los_add_clu"][[1L]]
@@ -403,15 +412,17 @@ calculate_mz_from_mass <- function(
     return(0)
   }
 
-  # Calculate m/z using inverse formula
-  # Inverse of: M = ((z * (m/z - iso_shift) - modifications) / n_mer)
-  # Therefore: m/z = ((M * n_mer + modifications) / z) + iso_shift
-  # Note: isotope shift is ADDED because isotope peaks appear at HIGHER m/z
+  # Calculate m/z using inverse formula with signed electron correction.
+  # m/z = (n_mer * M + mass_modifications - z * m_e) / |z| + isotope_shift
+  # with z = charge_sign * n_charges.
 
-  # Calculate actual isotope mass shift (n_iso * isotope unit)
   isotope_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
+  z_signed <- n_charges * charge_sign
 
-  total_mass <- neutral_mass * n_mer + mass_modifications
+  total_mass <- neutral_mass *
+    n_mer +
+    mass_modifications -
+    z_signed * electron_mass
   mz <- (total_mass / n_charges) + isotope_shift
 
   mz

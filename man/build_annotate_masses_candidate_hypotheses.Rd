@@ -10,7 +10,7 @@ build_annotate_masses_candidate_hypotheses(
   loss_edges,
   evidence_hypotheses,
   preassigned,
-  baseline_adduct,
+  baseline_adducts,
   features_table,
   multi_adducts,
   tolerance_ppm,

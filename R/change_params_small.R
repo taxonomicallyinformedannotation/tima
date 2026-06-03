@@ -106,7 +106,7 @@ create_yaml_null_handler <- function() {
 #' @param fil_mzt_raw Character. Path to an mzTab-M file to import/merge
 #' @param ms_pol Character. MS polarity: "pos" or "neg"
 #' @param org_tax Character. Scientific name for single-taxon experiments
-#' @param hig_con Logical. Filter for high confidence candidates only
+#' @param hig_evi Logical. Filter for high evidence candidates only
 #' @param summarize Logical. Summarize all candidates per feature to single row
 #' @param cache_dir Character. Cache directory path (for testing; uses
 #'     go_to_cache() if NULL)
@@ -140,7 +140,7 @@ create_yaml_null_handler <- function() {
 #'   fil_mzt_raw = "data/raw/annotations.mztab",
 #'   ms_pol = "pos",
 #'   org_tax = "Gentiana lutea",
-#'   hig_con = TRUE,
+#'   hig_evi = TRUE,
 #'   summarize = FALSE
 #' )
 #' }
@@ -154,7 +154,7 @@ change_params_small <- function(
   fil_mzt_raw = NULL,
   ms_pol = NULL,
   org_tax = NULL,
-  hig_con = NULL,
+  hig_evi = NULL,
   summarize = NULL,
   cache_dir = NULL
 ) {
@@ -259,9 +259,9 @@ change_params_small <- function(
     yaml_small$organisms$taxon <- NA
   }
 
-  if (!is.null(hig_con)) {
-    log_debug("Setting high confidence filter: %s", hig_con)
-    yaml_small$options$high_confidence <- hig_con
+  if (!is.null(hig_evi)) {
+    log_debug("Setting high evidence filter: %s", hig_evi)
+    yaml_small$options$high_evidence <- hig_evi
   }
 
   if (!is.null(summarize)) {

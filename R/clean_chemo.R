@@ -3,14 +3,14 @@
 #' @description Cleans and filters chemically weighted annotation results
 #'     through
 #' a multi-tier pipeline. Applies MS1 score thresholds, percentile filtering,
-#' ranking, and optional high-confidence filtering. Returns three-tier output:
+#' ranking, and optional high-evidence filtering. Returns three-tier output:
 #' full (comprehensive), filtered (top candidates), and mini (one row per
 #'     feature).
 #'
 #' @include add_xrefs_to_annotations.R
 #' @include calculate_mass_of_m.R
 #' @include constants.R
-#' @include filter_high_confidence_only.R
+#' @include filter_high_evidence_only.R
 #' @include parse_adduct.R
 #' @include summarize_results.R
 #'
@@ -43,7 +43,7 @@
 #'     "AND" = keep if bio >= threshold AND chem >= threshold
 #' @param compounds_names Logical, include compound names in output (may
 #'     increase size)
-#' @param high_confidence Logical, apply strict high-confidence filters
+#' @param high_evidence Logical, apply strict high-evidence filters
 #' @param remove_ties Logical, remove tied scores (keep only highest-ranked)
 #' @param summarize Logical, collapse results to one row per feature
 #' @param max_per_score Integer, max candidates to keep per feature per score.
@@ -68,13 +68,13 @@
 #'
 #' @return Named list with three data frames:
 #'   \describe{
-#'     \item{full}{All annotations (optionally high-confidence filtered)}
+#'     \item{full}{All annotations (optionally high-evidence filtered)}
 #'     \item{filtered}{Top candidates meeting percentile + rank thresholds}
 #'     \item{mini}{One row per feature with best compound/taxonomy}
 #'   }
 #'
 #' @seealso \code{\link{weight_chemo}},
-#'     \code{\link{filter_high_confidence_only}},
+#'     \code{\link{filter_high_evidence_only}},
 #'     \code{\link{summarize_results}}
 #'
 #' @examples
@@ -90,7 +90,7 @@
 #'   minimal_ms1_chemo = 0.5,
 #'   minimal_ms1_condition = "OR",
 #'   compounds_names = TRUE,
-#'   high_confidence = FALSE,
+#'   high_evidence = FALSE,
 #'   remove_ties = FALSE,
 #'   summarize = FALSE
 #' )
@@ -106,7 +106,7 @@ clean_chemo <- function(
   minimal_ms1_chemo,
   minimal_ms1_condition,
   compounds_names,
-  high_confidence,
+  high_evidence,
   remove_ties,
   summarize,
   # Explicit taxonomy weights (0-1)
@@ -125,7 +125,7 @@ clean_chemo <- function(
     "clean_chemo",
     n_annotations = nrow(annot_table_wei_chemo),
     candidates_final = candidates_final,
-    high_confidence = high_confidence
+    high_evidence = high_evidence
   )
 
   # Input Validation ----
@@ -138,7 +138,7 @@ clean_chemo <- function(
     minimal_ms1_chemo = minimal_ms1_chemo,
     minimal_ms1_condition = minimal_ms1_condition,
     compounds_names = compounds_names,
-    high_confidence = high_confidence,
+    high_evidence = high_evidence,
     remove_ties = remove_ties,
     summarize = summarize,
     max_per_score = max_per_score,
@@ -238,11 +238,11 @@ clean_chemo <- function(
 
   # Three-Tier Output Generation ----
 
-  # Apply High-Confidence Filter for Filtered and Full Tiers ----
+  # Apply High-Evidence Filter for Filtered and Full Tiers ----
 
-  # Apply filter_high_confidence_only for filtered tier
+  # Apply filter_high_evidence_only for filtered tier
   df_filtered <- df_percentile |>
-    filter_high_confidence_only(context = "filtered") |>
+    filter_high_evidence_only(context = "filtered") |>
     tidytable::filter(rank_final <= candidates_final)
 
   df_filtered <- retain_promoted_rank1_in_filtered(
@@ -266,17 +266,24 @@ clean_chemo <- function(
       feature_consensus_table = feature_consensus_table,
       organism_lookup = organism_lookup
     ) |>
-    tidytable::left_join(y = results_candidates) |>
-    tidytable::mutate(
-      # Set candidates_best to NA when no inchikey
-      candidates_best = tidytable::if_else(
-        is.na(candidate_structure_inchikey_connectivity_layer),
-        NA_integer_,
-        candidates_best
-      )
-    )
+    tidytable::left_join(y = results_candidates)
 
-  # Tier 1: MINI - Extract from df_percentile BEFORE high-confidence filter
+  # Only set candidates_best if the inchikey column exists
+  if (
+    "candidate_structure_inchikey_connectivity_layer" %in%
+      names(results_filtered)
+  ) {
+    results_filtered <- results_filtered |>
+      tidytable::mutate(
+        candidates_best = tidytable::if_else(
+          is.na(candidate_structure_inchikey_connectivity_layer),
+          NA_integer_,
+          candidates_best
+        )
+      )
+  }
+
+  # Tier 1: MINI - Extract from df_percentile BEFORE high-evidence filter
   # This ensures we get predicted taxonomy for features without inchikey
 
   df_classes_mini <- build_mini_taxonomy_table(
@@ -302,10 +309,10 @@ clean_chemo <- function(
   rm(df_classes_mini, df_filtered, df_percentile)
   invisible(gc(verbose = FALSE))
 
-  # Tier 3: FULL - Optionally apply high-confidence filter
-  df_full <- if (high_confidence) {
+  # Tier 3: FULL - Optionally apply high-evidence filter
+  df_full <- if (high_evidence) {
     df_ranked |>
-      filter_high_confidence_only(context = "full")
+      filter_high_evidence_only(context = "full")
   } else {
     df_ranked
   }
@@ -326,15 +333,22 @@ clean_chemo <- function(
       feature_consensus_table = feature_consensus_table,
       organism_lookup = organism_lookup
     ) |>
-    tidytable::left_join(y = results_candidates) |>
-    tidytable::mutate(
-      # Set candidates_best to NA when no inchikey
-      candidates_best = tidytable::if_else(
-        is.na(candidate_structure_inchikey_connectivity_layer),
-        NA_integer_,
-        candidates_best
+    tidytable::left_join(y = results_candidates)
+
+  # Only set candidates_best if the inchikey column exists
+  if (
+    "candidate_structure_inchikey_connectivity_layer" %in%
+      names(results_full)
+  ) {
+    results_full <- results_full |>
+      tidytable::mutate(
+        candidates_best = tidytable::if_else(
+          is.na(candidate_structure_inchikey_connectivity_layer),
+          NA_integer_,
+          candidates_best
+        )
       )
-    )
+  }
 
   rm(df_full, df_ranked)
   invisible(gc(verbose = FALSE))

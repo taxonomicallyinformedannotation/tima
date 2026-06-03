@@ -5,7 +5,7 @@
 \title{Build adduct co-occurrence edges from an evidence-supported hypothesis
 table.}
 \usage{
-build_evidence_edges(hyps)
+build_evidence_edges(hyps, tolerance_ppm = 5)
 }
 \description{
 To remain scalable, each (evidence_cluster, feature) is reduced to one

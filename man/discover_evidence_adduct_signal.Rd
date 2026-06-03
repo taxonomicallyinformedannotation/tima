@@ -11,6 +11,7 @@ discover_evidence_adduct_signal(
   neutral_losses,
   ms_mode,
   tolerance_ppm,
+  tolerance_dalton = NULL,
   tolerance_rt,
   exact_masses
 )

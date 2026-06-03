@@ -176,3 +176,48 @@ test_that("test-prepare_annotations_spectra deduplicates repeated rows across in
   df <- tidytable::fread(out)
   expect_equal(nrow(df), 1L)
 })
+
+test_that("test-prepare_annotations_spectra preserves spectral rescue provenance columns", {
+  s <- stage_structure_fixtures()
+  out <- temp_test_path("spectra_provenance.tsv")
+
+  tbl <- tidytable::tidytable(
+    feature_id = c("F1"),
+    candidate_adduct = c("[M+Na]+"),
+    candidate_query_adduct = c("[M+H]+"),
+    candidate_adduct_match_mode = c("m_delta_rescued"),
+    annotation_note = c(
+      "Spectral match rescued in neutral-mass space: observed adduct [M+H]+, library adduct [M+Na]+"
+    ),
+    candidate_library = c("spectral_lib"),
+    candidate_spectrum_id = c("id1"),
+    candidate_spectrum_entropy = c("1.0"),
+    candidate_structure_error_mz = c("0.0"),
+    candidate_structure_name = c("Cmpd"),
+    candidate_structure_smiles_no_stereo = c("C"),
+    candidate_score_similarity = c("0.9"),
+    candidate_score_similarity_forward = c("0.85"),
+    candidate_score_similarity_reverse = c("0.88"),
+    candidate_count_similarity_peaks_matched = c("10")
+  )
+  ann1 <- temp_test_path("ann_provenance.tsv")
+  tidytable::fwrite(x = tbl, file = ann1, sep = "\t")
+
+  res <- prepare_annotations_spectra(
+    input = c(ann1),
+    output = out,
+    str_stereo = s$stereo,
+    str_met = s$met,
+    str_tax_cla = s$cla,
+    str_tax_npc = s$npc
+  )
+
+  expect_equal(res, out)
+  df <- tidytable::fread(out)
+  expect_true("candidate_query_adduct" %in% names(df))
+  expect_true("candidate_adduct_match_mode" %in% names(df))
+  expect_true("annotation_note" %in% names(df))
+  expect_equal(df$candidate_query_adduct[[1L]], "[M+H]+")
+  expect_equal(df$candidate_adduct_match_mode[[1L]], "m_delta_rescued")
+  expect_match(df$annotation_note[[1L]], "neutral-mass space")
+})

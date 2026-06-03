@@ -94,6 +94,7 @@ targets_section_annotations <- function() {
           command = {
             annotate_spectra(
               input = input_spectra,
+              ms1_annotations = ann_ms1_pre_ann,
               libraries = c(
                 lib_spe_is_nor_pre_pos,
                 lib_spe_is_wik_pre_pos,
@@ -124,6 +125,7 @@ targets_section_annotations <- function() {
           command = {
             annotate_spectra(
               input = input_spectra,
+              ms1_annotations = ann_ms1_pre_ann,
               libraries = c(
                 lib_spe_is_nor_pre_neg,
                 lib_spe_is_wik_pre_neg,

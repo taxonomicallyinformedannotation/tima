@@ -29,7 +29,7 @@
 #' @param minimal_ms1_chemo Numeric (0-1), min chemical score for MS1.
 #' @param ms1_only Logical, filter for MS1-only annotations.
 #' @param compounds_names Logical, include compound names.
-#' @param high_confidence Logical, report high-confidence candidates only.
+#' @param high_evidence Logical, report high-confidence candidates only.
 #' @param remove_ties Logical, remove tied candidates.
 #' @param summarize Logical, summarize to one row per feature.
 #' @param force Logical, force execution (override warnings).
@@ -57,7 +57,7 @@ validate_weight_annotations_inputs <- function(
   minimal_ms1_chemo,
   ms1_only,
   compounds_names,
-  high_confidence,
+  high_evidence,
   remove_ties,
   summarize,
   force,
@@ -178,7 +178,7 @@ validate_weight_annotations_inputs <- function(
   # Validate logical flags
   assert_flag(ms1_only, "ms1_only")
   assert_flag(compounds_names, "compounds_names")
-  assert_flag(high_confidence, "high_confidence")
+  assert_flag(high_evidence, "high_evidence")
   assert_flag(remove_ties, "remove_ties")
   assert_flag(summarize, "summarize")
   assert_flag(force, "force")

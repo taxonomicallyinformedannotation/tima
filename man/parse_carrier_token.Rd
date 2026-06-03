@@ -2,7 +2,7 @@
 % Please edit documentation in R/adduct_universe_formula.R
 \name{parse_carrier_token}
 \alias{parse_carrier_token}
-\title{Parse a single carrier token like "H", "Na", "NH4" or compound forms
+\title{Parse a single carrier token like "H", "Na", "H4N" or compound forms
 like "Na-2H", "Fe-2H", "K-2H" into:
 list(symbols = c(symbol = signed_count, ...), z_contribution = integer)}
 \usage{

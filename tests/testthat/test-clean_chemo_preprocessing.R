@@ -32,7 +32,7 @@ test_that("validate_clean_chemo_inputs accepts valid parameters", {
     minimal_ms1_chemo = 0.5,
     minimal_ms1_condition = "OR",
     compounds_names = TRUE,
-    high_confidence = FALSE,
+    high_evidence = FALSE,
     remove_ties = FALSE,
     summarize = TRUE,
     max_per_score = 10,
@@ -57,7 +57,7 @@ test_that("validate_clean_chemo_inputs errors on missing required columns", {
       minimal_ms1_chemo = 0.5,
       minimal_ms1_condition = "OR",
       compounds_names = TRUE,
-      high_confidence = FALSE,
+      high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = TRUE,
       max_per_score = 10,
@@ -97,6 +97,22 @@ test_that("apply_percentile_filter keeps top candidates per feature", {
   top <- apply_percentile_filter(ranked, best_percentile = 0.9)
   expect_true(nrow(top) > 0)
   expect_true(all(top$score_weighted_chemo <= 1))
+})
+
+test_that("apply_percentile_filter keeps rank_final==1 even below percentile cutoff", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F2"),
+    score_weighted_chemo = c(0.40, 0.95, 0.30, 0.90),
+    rank_final = c(1L, 2L, 1L, 2L),
+    cluster_consensus_promoted_from_anchor = c(TRUE, FALSE, FALSE, FALSE)
+  )
+
+  out <- apply_percentile_filter(df, best_percentile = 0.9)
+
+  # High-scoring rows pass percentile; rank-1 rows are preserved as anchors.
+  expect_true(any(out$feature_id == "F1" & out$rank_final == 1L))
+  expect_true(any(out$feature_id == "F1" & out$score_weighted_chemo == 0.95))
+  expect_true(any(out$feature_id == "F2" & out$rank_final == 1L))
 })
 
 test_that("count_candidates returns evaluated and best counts", {
@@ -172,7 +188,7 @@ test_that("validate_clean_chemo_inputs rejects invalid parameter branches", {
       minimal_ms1_chemo = 0.5,
       minimal_ms1_condition = "OR",
       compounds_names = TRUE,
-      high_confidence = FALSE,
+      high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = TRUE,
       max_per_score = 10,
@@ -197,7 +213,7 @@ test_that("validate_clean_chemo_inputs rejects invalid parameter branches", {
       minimal_ms1_chemo = 0.5,
       minimal_ms1_condition = "OR",
       compounds_names = TRUE,
-      high_confidence = FALSE,
+      high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = TRUE,
       max_per_score = 10,
@@ -222,7 +238,7 @@ test_that("validate_clean_chemo_inputs rejects invalid parameter branches", {
       minimal_ms1_chemo = 0.5,
       minimal_ms1_condition = "XOR",
       compounds_names = TRUE,
-      high_confidence = FALSE,
+      high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = TRUE,
       max_per_score = 10,
@@ -247,7 +263,7 @@ test_that("validate_clean_chemo_inputs rejects invalid parameter branches", {
       minimal_ms1_chemo = 0.5,
       minimal_ms1_condition = "OR",
       compounds_names = "TRUE",
-      high_confidence = FALSE,
+      high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = TRUE,
       max_per_score = 10,
@@ -272,7 +288,7 @@ test_that("validate_clean_chemo_inputs rejects invalid parameter branches", {
       minimal_ms1_chemo = 0.5,
       minimal_ms1_condition = "OR",
       compounds_names = TRUE,
-      high_confidence = FALSE,
+      high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = TRUE,
       max_per_score = 0,
@@ -297,7 +313,7 @@ test_that("validate_clean_chemo_inputs rejects invalid parameter branches", {
       minimal_ms1_chemo = 0.5,
       minimal_ms1_condition = "OR",
       compounds_names = TRUE,
-      high_confidence = FALSE,
+      high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = TRUE,
       max_per_score = 10,
@@ -322,7 +338,7 @@ test_that("validate_clean_chemo_inputs rejects invalid parameter branches", {
       minimal_ms1_chemo = 0.5,
       minimal_ms1_condition = "OR",
       compounds_names = TRUE,
-      high_confidence = FALSE,
+      high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = TRUE,
       max_per_score = 10,

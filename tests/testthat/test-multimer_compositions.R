@@ -33,7 +33,7 @@ test_that("adduct_to_string renders inside-multimer losses with parentheses", {
   )
   # Canonical ordering inside the brackets: M, then carriers, then clusters,
   # then losses. Inside-multimer wraps M+inside-bits in parentheses.
-  expect_equal(s_outside, "[2M+H-H2O]+")
+  expect_equal(s_outside, "[2M-H2O+H]+")
   expect_equal(s_inside, "[2(M-H2O)+H]+")
 })
 
@@ -53,7 +53,7 @@ test_that("adduct_to_string renders inside-multimer clusters with parentheses", 
     z = 1L,
     cluster_inside_multimer = TRUE
   )
-  expect_equal(s_outside, "[2M+H+NaCl]+")
+  expect_equal(s_outside, "[2M+NaCl+H]+")
   expect_equal(s_inside, "[2(M+NaCl)+H]+")
 })
 
@@ -68,7 +68,7 @@ test_that("adduct_to_string ignores the inside flag for monomers (no-op)", {
   )
   # For a monomer, "inside" and "outside" are mathematically identical,
   # so we render the plain canonical form.
-  expect_equal(s, "[M+H-H2O]+")
+  expect_equal(s, "[M-H2O+H]+")
 })
 
 # ---------------------------------------------------------------------------
@@ -150,11 +150,11 @@ test_that("typed universe emits both inside- and outside-multimer loss rows", {
     neutral_losses_list = c("H2O"),
     polarity = "pos"
   )
-  expect_true("[2M+H-H2O]+" %in% uni$adduct)
+  expect_true("[2M-H2O+H]+" %in% uni$adduct)
   expect_true("[2(M-H2O)+H]+" %in% uni$adduct)
 
   # And the per-monomer term is correctly populated for the inside variant.
-  outside <- uni[uni$adduct == "[2M+H-H2O]+", ]
+  outside <- uni[uni$adduct == "[2M-H2O+H]+", ]
   inside <- uni[uni$adduct == "[2(M-H2O)+H]+", ]
   expect_equal(outside$adduct_mass_per_monomer, 0)
   h2o <- 2 * ATOMIC_MONOISOTOPIC_MASS[["H"]] + ATOMIC_MONOISOTOPIC_MASS[["O"]]
@@ -172,10 +172,10 @@ test_that("typed universe emits both inside- and outside-multimer cluster rows",
     neutral_losses_list = character(),
     polarity = "pos"
   )
-  expect_true("[2M+H+NaCl]+" %in% uni$adduct)
+  expect_true("[2M+NaCl+H]+" %in% uni$adduct)
   expect_true("[2(M+NaCl)+H]+" %in% uni$adduct)
 
-  outside <- uni[uni$adduct == "[2M+H+NaCl]+", ]
+  outside <- uni[uni$adduct == "[2M+NaCl+H]+", ]
   inside <- uni[uni$adduct == "[2(M+NaCl)+H]+", ]
   expect_equal(outside$adduct_mass_per_monomer, 0)
   nacl <- ATOMIC_MONOISOTOPIC_MASS[["Na"]] + ATOMIC_MONOISOTOPIC_MASS[["Cl"]]
@@ -283,7 +283,7 @@ test_that("outside- and inside-variants both round-trip distinct m/z values", {
     polarity = "pos"
   )
 
-  out_row <- uni[uni$adduct == "[2M+H-H2O]+", ]
+  out_row <- uni[uni$adduct == "[2M-H2O+H]+", ]
   in_row <- uni[uni$adduct == "[2(M-H2O)+H]+", ]
 
   mz_out <- calculate_mz_from_neutral_mass(

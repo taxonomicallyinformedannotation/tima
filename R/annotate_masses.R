@@ -178,7 +178,7 @@ annotate_masses <- function(
   baseline_adduct <- switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
   baseline_adducts <- switch(
     ms_mode,
-    "pos" = c("[M+H]+", "[M+Na]+", "[M+NH4]+"),
+    "pos" = c("[M+H]+", "[M+Na]+", "[M+H4N]+"),
     "neg" = c("[M-H]-", "[M+COOH-H]-")
   )
 
@@ -370,7 +370,7 @@ annotate_masses <- function(
       tidytable::rename(
         candidate_adduct = adduct,
         candidate_annotation_level = annotation_level,
-        candidate_confidence_tier = confidence_tier
+        candidate_evidence_tier = evidence_tier
       ) |>
       select_annotations_columns(
         str_stereo = str_stereo,
@@ -428,15 +428,15 @@ derive_primary_secondary_annotations <- function(
 
   out <- out |>
     tidytable::mutate(
-      confidence_tier = tidytable::case_when(
+      evidence_tier = tidytable::case_when(
         candidate_adduct_origin == "supported" ~ "supported_strong",
         candidate_adduct_origin == "supported_weak" ~ "supported_weak",
         TRUE ~ "baseline"
       ),
       has_structure = !is.na(structure_exact_mass),
       support_rank = tidytable::case_when(
-        confidence_tier == "supported_strong" ~ 1L,
-        confidence_tier == "supported_weak" ~ 2L,
+        evidence_tier == "supported_strong" ~ 1L,
+        evidence_tier == "supported_weak" ~ 2L,
         TRUE ~ 3L
       ),
       source_rank = tidytable::case_when(
@@ -695,7 +695,7 @@ retain_supported_single_m_edges <- function(
       feature_id,
       adduct,
       annotation_level,
-      confidence_tier,
+      evidence_tier,
       source,
       candidate_adduct_origin,
       mass,
@@ -703,12 +703,12 @@ retain_supported_single_m_edges <- function(
     ) |>
     tidytable::mutate(
       annotation_level = tidytable::coalesce(annotation_level, "primary"),
-      confidence_tier = tidytable::coalesce(
-        confidence_tier,
+      evidence_tier = tidytable::coalesce(
+        evidence_tier,
         "supported_strong"
       ),
       is_supported = annotation_level == "primary" &
-        confidence_tier == "supported_strong"
+        evidence_tier == "supported_strong"
     )
 
   supported_nodes <- selected |>

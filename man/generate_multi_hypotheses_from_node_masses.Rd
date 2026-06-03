@@ -8,7 +8,7 @@ generate_multi_hypotheses_from_node_masses(
   node_hypotheses,
   multi_adducts,
   tolerance_ppm,
-  tolerance_dalton = NULL
+  tolerance_dalton
 )
 }
 \description{

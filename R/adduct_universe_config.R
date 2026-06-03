@@ -1,10 +1,10 @@
 #' Build the canonical adduct string from typed components.
 #'
-#' Format (outside-multimer, default):
-#'   `[<n>M<carriers><+clusters><-losses>]<|z|><sign>`
+#' Format (outside-multimer, canonical):
+#'   `[<n>M<-losses><-carrier-losses><+clusters><+carriers>]<|z|><sign>`
 #' Format (inside-multimer, when `loss_inside_multimer` or
 #' `cluster_inside_multimer` is `TRUE` and `n_mer >= 2`):
-#'   `[<n>(M<inside-clusters><inside-losses>)<carriers><+outside-clusters><-outside-losses>]<|z|><sign>`
+#'   `[<n>(M<inside-losses><inside-clusters>)<outside-losses><outside-clusters><carriers>]<|z|><sign>`
 #'
 #' The "inside" variant captures the chemistry where each monomer carries
 #' the cluster/loss BEFORE the multimer assembles, e.g. `[2(M-H2O)+H]+`
@@ -43,7 +43,10 @@ adduct_to_string <- function(
   if (!is.finite(z) || z == 0L) {
     stop("z must be a non-zero integer")
   }
-  carrier_part <- .format_carriers(carriers)
+  # Split carriers into negative (deprotonations) and positive (cations)
+  carriers_neg <- carriers[carriers < 0L]
+  carriers_pos <- carriers[carriers > 0L]
+
   # Inside-multimer wrapping only makes sense for n_mer >= 2.
   use_inside <- (n_mer >= 2L) &&
     (isTRUE(loss_inside_multimer) || isTRUE(cluster_inside_multimer))
@@ -74,27 +77,28 @@ adduct_to_string <- function(
       inside_clusters <- clusters
       outside_clusters <- integer()
     }
+    # Canonical body inside parentheses: losses first, then clusters
     inside_body <- paste0(
       "M",
-      .format_neutrals(inside_clusters, "+"),
-      .format_neutrals(inside_losses, "-")
+      .format_neutrals(inside_losses, "-"),
+      .format_neutrals(inside_clusters, "+")
     )
+    # Canonical body outside: losses + neg carriers → clusters → pos carriers
     body <- paste0(
       n_mer,
       "(",
       inside_body,
       ")",
-      carrier_part,
-      .format_neutrals(outside_clusters, "+"),
-      .format_neutrals(outside_losses, "-")
+      .format_neg_terms(outside_losses, carriers_neg),
+      .format_pos_terms(outside_clusters, carriers_pos)
     )
   } else {
     m_prefix <- if (n_mer == 1L) "M" else paste0(n_mer, "M")
+    # Canonical ordering: losses + neg carriers → clusters → pos carriers
     body <- paste0(
       m_prefix,
-      carrier_part,
-      .format_neutrals(clusters, "+"),
-      .format_neutrals(losses, "-")
+      .format_neg_terms(losses, carriers_neg),
+      .format_pos_terms(clusters, carriers_pos)
     )
   }
   z_abs <- abs(z)

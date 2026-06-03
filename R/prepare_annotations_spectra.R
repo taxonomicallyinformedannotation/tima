@@ -139,6 +139,9 @@ prepare_annotations_spectra <- function(
   annotation_cols <- c(
     "feature_id",
     "candidate_adduct",
+    "candidate_query_adduct",
+    "candidate_adduct_match_mode",
+    "annotation_note",
     "candidate_library",
     "candidate_spectrum_id",
     "candidate_spectrum_entropy",

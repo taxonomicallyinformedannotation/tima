@@ -1,23 +1,24 @@
-# Test Suite: filter_high_confidence_only ----
+# Test Suite: filter_high_evidence_only ----
 
 library(testthat)
 
-test_that("filter_high_confidence_only handles empty input", {
+filter_high_evidence_only <- filter_high_evidence_only
+test_that("filter_high_evidence_only handles empty input", {
   empty <- tidytable::tidytable()
-  result <- filter_high_confidence_only(empty)
+  result <- filter_high_evidence_only(empty)
   expect_s3_class(result, "data.frame")
   expect_equal(nrow(result), 0L)
 })
 
 # Basic score-based filtering across primary thresholds
-test_that("filter_high_confidence_only keeps rows meeting any primary threshold", {
+test_that("filter_high_evidence_only keeps rows meeting any primary threshold", {
   df <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3"),
     score_biological = c(0.9, 0.1, 0.1),
     candidate_score_pseudo_initial = c(0.1, 0.96, 0.1),
     score_weighted_chemo = c(0.1, 0.1, 0.8)
   )
-  res <- filter_high_confidence_only(
+  res <- filter_high_evidence_only(
     df,
     score_bio_min = 0.85,
     score_ini_min = 0.95,
@@ -29,7 +30,7 @@ test_that("filter_high_confidence_only keeps rows meeting any primary threshold"
   expect_setequal(res$feature_id, c("F1", "F2", "F3"))
 })
 
-test_that("filter_high_confidence_only validates threshold ranges", {
+test_that("filter_high_evidence_only validates threshold ranges", {
   df <- tidytable::tidytable(
     feature_id = "F1",
     score_biological = 0.9,
@@ -37,26 +38,26 @@ test_that("filter_high_confidence_only validates threshold ranges", {
     score_weighted_chemo = 0.9
   )
   expect_error(
-    filter_high_confidence_only(df, score_bio_min = -0.1),
+    filter_high_evidence_only(df, score_bio_min = -0.1),
     "between 0 and 1"
   )
   expect_error(
-    filter_high_confidence_only(df, score_ini_min = 1.1),
+    filter_high_evidence_only(df, score_ini_min = 1.1),
     "between 0 and 1"
   )
   expect_error(
-    filter_high_confidence_only(df, score_final_min = 2),
+    filter_high_evidence_only(df, score_final_min = 2),
     "between 0 and 1"
   )
   expect_error(
-    filter_high_confidence_only(df, error_rt_max = 0),
+    filter_high_evidence_only(df, error_rt_max = 0),
     "positive",
     class = "tima_validation_error"
   )
 })
 
 # RT error filter (error in minutes). NA allowed
-test_that("filter_high_confidence_only applies RT error filter (minutes)", {
+test_that("filter_high_evidence_only applies RT error filter (minutes)", {
   df <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3"),
     score_biological = c(0.9, 0.1, 0.1),
@@ -64,7 +65,7 @@ test_that("filter_high_confidence_only applies RT error filter (minutes)", {
     score_weighted_chemo = c(0.1, 0.1, 0.8),
     candidate_structure_error_rt = c(0.05, 0.2, NA_real_)
   )
-  result <- filter_high_confidence_only(
+  result <- filter_high_evidence_only(
     df,
     score_bio_min = 0.85,
     score_ini_min = 0.95,
@@ -79,7 +80,7 @@ test_that("filter_high_confidence_only applies RT error filter (minutes)", {
 })
 
 # Optional SIRIUS confidence and spectral similarity filters (OR logic)
-test_that("filter_high_confidence_only applies confidence and similarity with OR logic", {
+test_that("filter_high_evidence_only applies confidence and similarity with OR logic", {
   df <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3", "F4", "F5"),
     score_biological = c(0.2, 0.2, 0.2, 0.2, 0.2),
@@ -93,7 +94,7 @@ test_that("filter_high_confidence_only applies confidence and similarity with OR
   # F3: conf=0.99 ✓ OR sim=0.6 ✗ → PASS (SIRIUS passes, uses OR)
   # F4: conf=NA ✓, sim=NA ✓ → PASS (both NA allowed)
   # F5: conf=0.95 ✓, sim=NA ✓ → PASS (SIRIUS passes, spectral NA allowed)
-  res <- filter_high_confidence_only(
+  res <- filter_high_evidence_only(
     df,
     confidence_sirius_min = 0.9,
     similarity_spectral_min = 0.75
@@ -102,7 +103,7 @@ test_that("filter_high_confidence_only applies confidence and similarity with OR
   expect_setequal(res$feature_id, c("F1", "F2", "F3", "F4", "F5"))
 })
 
-test_that("filter_high_confidence_only allows NA SIRIUS confidence when threshold set", {
+test_that("filter_high_evidence_only allows NA SIRIUS confidence when threshold set", {
   df <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3"),
     score_biological = c(0.2, 0.2, 0.2),
@@ -111,7 +112,7 @@ test_that("filter_high_confidence_only allows NA SIRIUS confidence when threshol
     candidate_score_sirius_confidence = c(0.95, 0.5, NA_real_)
   )
 
-  res <- filter_high_confidence_only(
+  res <- filter_high_evidence_only(
     df,
     confidence_sirius_min = 0.8,
     similarity_spectral_min = NULL,
@@ -124,7 +125,7 @@ test_that("filter_high_confidence_only allows NA SIRIUS confidence when threshol
   expect_setequal(res$feature_id, c("F1", "F3"))
 })
 
-test_that("filter_high_confidence_only allows NA spectral similarity when threshold set", {
+test_that("filter_high_evidence_only allows NA spectral similarity when threshold set", {
   df <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3"),
     score_biological = c(0.2, 0.2, 0.2),
@@ -132,7 +133,7 @@ test_that("filter_high_confidence_only allows NA spectral similarity when thresh
     candidate_score_pseudo_initial = c(0.85, 0.4, NA_real_)
   )
 
-  res <- filter_high_confidence_only(
+  res <- filter_high_evidence_only(
     df,
     similarity_spectral_min = 0.7,
     confidence_sirius_min = NULL,
@@ -145,7 +146,7 @@ test_that("filter_high_confidence_only allows NA spectral similarity when thresh
   expect_setequal(res$feature_id, c("F1", "F3"))
 })
 
-test_that("filter_high_confidence_only filters out spectral similarity = 0", {
+test_that("filter_high_evidence_only filters out spectral similarity = 0", {
   # Spectral similarity = 0 is always filtered (invalid MS2 data)
   df <- tidytable::tidytable(
     feature_id = c("Spec0", "SpecNA", "SpecValid"),
@@ -154,7 +155,7 @@ test_that("filter_high_confidence_only filters out spectral similarity = 0", {
     candidate_score_pseudo_initial = c(0, NA_real_, 0.85)
   )
 
-  result <- filter_high_confidence_only(
+  result <- filter_high_evidence_only(
     df,
     similarity_spectral_min = 0.5
   )
@@ -166,7 +167,7 @@ test_that("filter_high_confidence_only filters out spectral similarity = 0", {
   expect_false("Spec0" %in% result$feature_id)
 })
 
-test_that("filter_high_confidence_only SIRIUS OR spectral both fail", {
+test_that("filter_high_evidence_only SIRIUS OR spectral both fail", {
   # When both SIRIUS and spectral are below threshold, candidate fails
   df <- tidytable::tidytable(
     feature_id = c("BothLow"),
@@ -176,7 +177,7 @@ test_that("filter_high_confidence_only SIRIUS OR spectral both fail", {
     candidate_score_pseudo_initial = c(0.5)
   )
 
-  result <- filter_high_confidence_only(
+  result <- filter_high_evidence_only(
     df,
     confidence_sirius_min = 0.8,
     similarity_spectral_min = 0.8
@@ -188,7 +189,7 @@ test_that("filter_high_confidence_only SIRIUS OR spectral both fail", {
 
 ## MS1-only hits handling ----
 
-test_that("filter_high_confidence_only retains MS1-only hits with NA initial score", {
+test_that("filter_high_evidence_only retains MS1-only hits with NA initial score", {
   # MS1-only candidates have candidate_score_pseudo_initial = NA (not 0, which means invalid)
   # They should be kept if they pass biological or final score thresholds
   df <- tidytable::tidytable(
@@ -198,7 +199,7 @@ test_that("filter_high_confidence_only retains MS1-only hits with NA initial sco
     score_weighted_chemo = c(0.1, 0.8, 0.1, 0.1)
   )
 
-  result <- filter_high_confidence_only(
+  result <- filter_high_evidence_only(
     df,
     score_bio_min = 0.85,
     score_ini_min = 0.95,
@@ -213,7 +214,7 @@ test_that("filter_high_confidence_only retains MS1-only hits with NA initial sco
   expect_false("MS1_none" %in% result$feature_id)
 })
 
-test_that("filter_high_confidence_only removes candidates with initial score = 0 (invalid)", {
+test_that("filter_high_evidence_only removes candidates with initial score = 0 (invalid)", {
   # Score = 0 is considered invalid/missing data and should be filtered out
   df <- tidytable::tidytable(
     feature_id = c("Score0_invalid", "Score0_lowbio", "ScoreNA_MS1"),
@@ -222,7 +223,7 @@ test_that("filter_high_confidence_only removes candidates with initial score = 0
     score_weighted_chemo = c(0.1, 0.1, 0.1)
   )
 
-  result <- filter_high_confidence_only(
+  result <- filter_high_evidence_only(
     df,
     score_bio_min = 0.85,
     score_ini_min = 0.95,
@@ -239,7 +240,7 @@ test_that("filter_high_confidence_only removes candidates with initial score = 0
   expect_false("Score0_lowbio" %in% result$feature_id)
 })
 
-test_that("filter_high_confidence_only: MS1-only hits fail when no score passes", {
+test_that("filter_high_evidence_only: MS1-only hits fail when no score passes", {
   # MS1-only candidate with score=NA, and no other score passes threshold
   df <- tidytable::tidytable(
     feature_id = c("MS1_only"),
@@ -248,7 +249,7 @@ test_that("filter_high_confidence_only: MS1-only hits fail when no score passes"
     score_weighted_chemo = c(0.5)
   )
 
-  result <- filter_high_confidence_only(
+  result <- filter_high_evidence_only(
     df,
     score_bio_min = 0.85,
     score_ini_min = 0.95,
@@ -259,7 +260,7 @@ test_that("filter_high_confidence_only: MS1-only hits fail when no score passes"
   expect_equal(nrow(result), 0L)
 })
 
-test_that("filter_high_confidence_only makes promoted children follow parent decision", {
+test_that("filter_high_evidence_only makes promoted children follow parent decision", {
   df <- tidytable::tidytable(
     feature_id = c("A", "B", "C", "D"),
     rank_final = c(1L, 1L, 1L, 1L),
@@ -271,7 +272,7 @@ test_that("filter_high_confidence_only makes promoted children follow parent dec
     cluster_consensus_promoted_from_anchor = c(FALSE, TRUE, FALSE, TRUE)
   )
 
-  out <- filter_high_confidence_only(
+  out <- filter_high_evidence_only(
     df,
     score_bio_min = 0.85,
     score_ini_min = 0.95,
@@ -287,7 +288,7 @@ test_that("filter_high_confidence_only makes promoted children follow parent dec
 
   # Now make second anchor fail; child must fail too.
   df$score_weighted_chemo[df$feature_id == "C"] <- 0.10
-  out2 <- filter_high_confidence_only(
+  out2 <- filter_high_evidence_only(
     df,
     score_bio_min = 0.85,
     score_ini_min = 0.95,
@@ -300,7 +301,51 @@ test_that("filter_high_confidence_only makes promoted children follow parent dec
   expect_false(any(c("C", "D") %in% out2$feature_id))
 })
 
-test_that("filter_high_confidence_only removes candidates with 0 matched peaks", {
+test_that("filter_high_evidence_only lets promoted children inherit anchor evidence fields", {
+  df <- tidytable::tidytable(
+    feature_id = c("A", "B"),
+    rank_final = c(1L, 1L),
+    score_biological = c(0.95, 0.10),
+    candidate_score_pseudo_initial = c(0.97, 0.10),
+    score_weighted_chemo = c(0.96, 0.10),
+    candidate_structure_error_rt = c(0.01, 0.30),
+    candidate_score_sirius_confidence = c(0.92, 0.10),
+    candidate_count_similarity_peaks_matched = c(5L, 1L),
+    candidate_adduct_origin = c("supported", "baseline"),
+    candidate_annotation_level = c("primary", "secondary"),
+    candidate_evidence_tier = c("supported_strong", "baseline"),
+    adduct_support = c(3L, 0L),
+    cluster_consensus_group_id = c("G1", "G1"),
+    cluster_consensus_anchor_feature_id = c("A", "A"),
+    cluster_consensus_promoted_from_anchor = c(FALSE, TRUE)
+  )
+
+  out <- filter_high_evidence_only(
+    df,
+    score_bio_min = 0.85,
+    score_ini_min = 0.95,
+    score_final_min = 0.75,
+    confidence_sirius_min = 0.9,
+    similarity_spectral_min = 0.9,
+    matched_peaks_min = 3
+  )
+
+  expect_equal(nrow(out), 2L)
+  child <- out |> tidytable::filter(feature_id == "B")
+
+  expect_equal(child$score_biological[[1L]], 0.95)
+  expect_equal(child$candidate_score_pseudo_initial[[1L]], 0.97)
+  expect_equal(child$score_weighted_chemo[[1L]], 0.96)
+  expect_equal(child$candidate_structure_error_rt[[1L]], 0.01)
+  expect_equal(child$candidate_score_sirius_confidence[[1L]], 0.92)
+  expect_equal(child$candidate_count_similarity_peaks_matched[[1L]], 5L)
+  expect_equal(child$candidate_adduct_origin[[1L]], "supported")
+  expect_equal(child$candidate_annotation_level[[1L]], "primary")
+  expect_equal(child$candidate_evidence_tier[[1L]], "supported_strong")
+  expect_equal(child$adduct_support[[1L]], 3L)
+})
+
+test_that("filter_high_evidence_only removes candidates with 0 matched peaks", {
   # Candidates with 0 matched peaks are invalid (no peaks matched)
   df <- tidytable::tidytable(
     feature_id = c("Peaks0", "PeaksNA_nodata", "Peaks5"),
@@ -310,7 +355,7 @@ test_that("filter_high_confidence_only removes candidates with 0 matched peaks",
     candidate_count_similarity_peaks_matched = c(0, NA_integer_, 5)
   )
 
-  result <- filter_high_confidence_only(
+  result <- filter_high_evidence_only(
     df,
     matched_peaks_min = 1 # Require at least 1 peak
   )
@@ -322,7 +367,7 @@ test_that("filter_high_confidence_only removes candidates with 0 matched peaks",
   expect_false("Peaks0" %in% result$feature_id)
 })
 
-test_that("filter_high_confidence_only allows NA matched peaks when threshold set", {
+test_that("filter_high_evidence_only allows NA matched peaks when threshold set", {
   df <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3"),
     score_biological = c(0.2, 0.2, 0.2),
@@ -331,7 +376,7 @@ test_that("filter_high_confidence_only allows NA matched peaks when threshold se
     candidate_count_similarity_peaks_matched = c(12, 5, NA_integer_)
   )
 
-  res <- filter_high_confidence_only(
+  res <- filter_high_evidence_only(
     df,
     matched_peaks_min = 10,
     confidence_sirius_min = NULL,
@@ -344,7 +389,7 @@ test_that("filter_high_confidence_only allows NA matched peaks when threshold se
   expect_setequal(res$feature_id, c("F1", "F3"))
 })
 
-test_that("filter_high_confidence_only filters matched peaks correctly", {
+test_that("filter_high_evidence_only filters matched peaks correctly", {
   df <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3", "F4"),
     score_biological = c(0.2, 0.2, 0.2, 0.2),
@@ -353,7 +398,7 @@ test_that("filter_high_confidence_only filters matched peaks correctly", {
     candidate_count_similarity_peaks_matched = c(15, 8, 6, NA_integer_)
   )
 
-  res <- filter_high_confidence_only(
+  res <- filter_high_evidence_only(
     df,
     matched_peaks_min = 10
   )
@@ -366,7 +411,7 @@ test_that("filter_high_confidence_only filters matched peaks correctly", {
   expect_equal(nrow(res), 2L)
 })
 
-test_that("filter_high_confidence_only allows zero matched peaks threshold", {
+test_that("filter_high_evidence_only allows zero matched peaks threshold", {
   df <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3"),
     score_biological = c(0.2, 0.2, 0.2),
@@ -375,7 +420,7 @@ test_that("filter_high_confidence_only allows zero matched peaks threshold", {
     candidate_count_similarity_peaks_matched = c(3, 0, NA_integer_)
   )
 
-  res <- filter_high_confidence_only(
+  res <- filter_high_evidence_only(
     df,
     matched_peaks_min = 0
   )
@@ -387,7 +432,7 @@ test_that("filter_high_confidence_only allows zero matched peaks threshold", {
   expect_equal(nrow(res), 2L)
 })
 
-test_that("filter_high_confidence_only validates matched peaks threshold", {
+test_that("filter_high_evidence_only validates matched peaks threshold", {
   df <- tidytable::tidytable(
     feature_id = "F1",
     score_biological = 0.9,
@@ -397,20 +442,20 @@ test_that("filter_high_confidence_only validates matched peaks threshold", {
 
   # Negative threshold should error
   expect_error(
-    filter_high_confidence_only(df, matched_peaks_min = -1),
+    filter_high_evidence_only(df, matched_peaks_min = -1),
     "non-negative",
     class = "tima_validation_error"
   )
 
   # Non-numeric should error
   expect_error(
-    filter_high_confidence_only(df, matched_peaks_min = "five"),
+    filter_high_evidence_only(df, matched_peaks_min = "five"),
     "non-negative",
     class = "tima_validation_error"
   )
 })
 
-test_that("filter_high_confidence_only with all optional filters combined (OR logic)", {
+test_that("filter_high_evidence_only with all optional filters combined (OR logic)", {
   df <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3", "F4", "F5", "F6"),
     score_biological = c(0.2, 0.2, 0.2, 0.2, 0.2, 0.2),
@@ -441,7 +486,7 @@ test_that("filter_high_confidence_only with all optional filters combined (OR lo
     ))
   )
 
-  res <- filter_high_confidence_only(
+  res <- filter_high_evidence_only(
     df,
     confidence_sirius_min = 0.9,
     similarity_spectral_min = 0.75,

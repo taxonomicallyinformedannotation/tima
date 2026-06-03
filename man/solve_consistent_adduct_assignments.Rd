@@ -8,7 +8,7 @@ solve_consistent_adduct_assignments(
   adduct_edges,
   features_table,
   tolerance_ppm,
-  tolerance_dalton = NULL
+  tolerance_dalton
 )
 }
 \description{
@@ -20,5 +20,9 @@ This function:
 \item Returns only edges where the implied M values are consistent
 \item Also returns the inferred M value for each feature in each component
 }
+}
+\details{
+The consistency check accepts an edge if EITHER the ppm tolerance OR the
+dalton tolerance is satisfied (whichever is less restrictive at that mass range).
 }
 \keyword{internal}

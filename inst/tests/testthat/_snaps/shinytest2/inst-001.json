@@ -61,7 +61,7 @@
     "force": false,
     "gnps_id": "",
     "gnps_workflow": "fbmn",
-    "high_confidence": true,
+    "high_evidence": true,
     "launch": 0,
     "lib_spe_mgf": null,
     "lib_tmp_exp_csv": null,

@@ -15,7 +15,7 @@ clean_chemo(
   minimal_ms1_chemo,
   minimal_ms1_condition,
   compounds_names,
-  high_confidence,
+  high_evidence,
   remove_ties,
   summarize,
   score_chemical_cla_kingdom = 0.2,
@@ -69,7 +69,7 @@ annotations}
 \item{compounds_names}{Logical, include compound names in output (may
 increase size)}
 
-\item{high_confidence}{Logical, apply strict high-confidence filters}
+\item{high_evidence}{Logical, apply strict high-evidence filters}
 
 \item{remove_ties}{Logical, remove tied scores (keep only highest-ranked)}
 
@@ -106,7 +106,7 @@ summarization.}
 \value{
 Named list with three data frames:
 \describe{
-\item{full}{All annotations (optionally high-confidence filtered)}
+\item{full}{All annotations (optionally high-evidence filtered)}
 \item{filtered}{Top candidates meeting percentile + rank thresholds}
 \item{mini}{One row per feature with best compound/taxonomy}
 }
@@ -115,7 +115,7 @@ Named list with three data frames:
 Cleans and filters chemically weighted annotation results
 through
 a multi-tier pipeline. Applies MS1 score thresholds, percentile filtering,
-ranking, and optional high-confidence filtering. Returns three-tier output:
+ranking, and optional high-evidence filtering. Returns three-tier output:
 full (comprehensive), filtered (top candidates), and mini (one row per
 feature).
 }
@@ -132,7 +132,7 @@ results <- clean_chemo(
   minimal_ms1_chemo = 0.5,
   minimal_ms1_condition = "OR",
   compounds_names = TRUE,
-  high_confidence = FALSE,
+  high_evidence = FALSE,
   remove_ties = FALSE,
   summarize = FALSE
 )
@@ -140,6 +140,6 @@ results <- clean_chemo(
 }
 \seealso{
 \code{\link{weight_chemo}},
-\code{\link{filter_high_confidence_only}},
+\code{\link{filter_high_evidence_only}},
 \code{\link{summarize_results}}
 }

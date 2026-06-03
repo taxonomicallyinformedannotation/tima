@@ -113,8 +113,8 @@ NULL
   }
 
   header_line <- gsub(
-    "best_id_confidence_measurebest_id_confidence_value",
-    "best_id_confidence_measure\\tbest_id_confidence_value",
+    "best_id_confidence_measurebest_id_evidence_value",
+    "best_id_confidence_measure\\tbest_id_evidence_value",
     header_lines[[1L]],
     fixed = TRUE
   )

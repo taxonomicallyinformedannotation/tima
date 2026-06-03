@@ -71,7 +71,6 @@ CARRIER_INTRINSIC_CHARGE <- c(
   Na = 1L,
   K = 1L,
   Li = 1L,
-  NH4 = 1L,
   H4N = 1L,
   Ca = 2L,
   Mg = 2L,
@@ -88,7 +87,7 @@ CARRIER_INTRINSIC_CHARGE <- c(
 
 #' Electron rest mass (Da), CODATA 2018.
 #' @keywords internal
-ELECTRON_MASS_DA <- 0.000548579909065
+ELECTRON_MASS_DA <- ELECTRON_MASS_DALTONS
 
 # ---------------------------------------------------------------------------
 # Formula and carrier parsing (regex used ONLY on atomic-formula tokens, never
@@ -131,7 +130,7 @@ formula_mass <- function(formula_vec) {
   sum(ATOMIC_MONOISOTOPIC_MASS[names(formula_vec)] * formula_vec)
 }
 
-#' Parse a single carrier token like "H", "Na", "NH4" or compound forms
+#' Parse a single carrier token like "H", "Na", "H4N" or compound forms
 #' like "Na-2H", "Fe-2H", "K-2H" into:
 #'   list(symbols = c(symbol = signed_count, ...), z_contribution = integer)
 #'
@@ -175,9 +174,9 @@ parse_carrier_token <- function(token) {
     if (!nzchar(sym)) {
       return(NULL)
     }
-    # Normalise NH4 / H4N to a canonical symbol so charge lookup works.
+    # Normalise NH4 → H4N (IUPAC Hill order) so charge lookup works.
     if (sym == "NH4") {
-      sym <- "NH4"
+      sym <- "H4N"
     }
     if (!sym %in% names(CARRIER_INTRINSIC_CHARGE)) {
       return(NULL)
@@ -190,7 +189,7 @@ parse_carrier_token <- function(token) {
 }
 
 #' Compute the neutral monoisotopic mass of a (possibly compound) carrier
-#' token. For "NH4" we use H4N as the formula; for "Na-2H" we add Na and
+#' token. For "H4N" (ammonium) we sum 4*H + N; for "Na-2H" we add Na and
 #' subtract 2*H, etc.
 #' @keywords internal
 carrier_token_mass <- function(parsed_carrier) {
@@ -200,8 +199,8 @@ carrier_token_mass <- function(parsed_carrier) {
   total <- 0
   for (sym in names(parsed_carrier$symbols)) {
     cnt <- parsed_carrier$symbols[[sym]]
-    if (sym == "NH4") {
-      # H4N
+    if (sym == "H4N") {
+      # ammonium: 4*H + N
       total <- total +
         cnt *
           (4 *
@@ -219,38 +218,6 @@ carrier_token_mass <- function(parsed_carrier) {
 # ---------------------------------------------------------------------------
 # Canonical string serialisation
 # ---------------------------------------------------------------------------
-
-#' Format the carrier section of a canonical adduct string.
-#'
-#' Carriers are emitted in a deterministic order: sorted by decreasing
-#' absolute count, ties broken alphabetically by symbol.
-#'
-#' @keywords internal
-.format_carriers <- function(carriers) {
-  if (length(carriers) == 0L) {
-    return("")
-  }
-  # Drop zero counts.
-  carriers <- carriers[carriers != 0L]
-  if (length(carriers) == 0L) {
-    return("")
-  }
-  ord <- order(-abs(carriers), names(carriers))
-  carriers <- carriers[ord]
-  parts <- vapply(
-    seq_along(carriers),
-    function(i) {
-      cnt <- carriers[[i]]
-      sym <- names(carriers)[[i]]
-      sign <- if (cnt < 0L) "-" else "+"
-      acnt <- abs(cnt)
-      coef <- if (acnt == 1L) "" else as.character(acnt)
-      paste0(sign, coef, sym)
-    },
-    character(1L)
-  )
-  paste(parts, collapse = "")
-}
 
 #' Format a cluster or loss component vector (always positive counts).
 #' `sign_char` is "+" for clusters, "-" for losses.
@@ -274,5 +241,99 @@ carrier_token_mass <- function(parsed_carrier) {
     },
     character(1L)
   )
+  paste(parts, collapse = "")
+}
+
+#' Format all negative modification terms (neutral losses + negative carrier
+#' components) in canonical order: alphabetical by formula name.
+#'
+#' Canonical ordering rule: all negatives come FIRST in the adduct body.
+#'
+#' @param losses Named integer vector of neutral-loss counts (positive values).
+#' @param neg_carriers Named integer vector of carrier atoms with negative
+#'   signed counts (e.g. `c(H = -2L)` for deprotonation).
+#'
+#' @return Collapsed character string like `"-H2O-2H"`.
+#' @keywords internal
+.format_neg_terms <- function(losses, neg_carriers) {
+  # Collect: neutral losses (stored as positive count) + abs of neg carriers
+  terms <- integer()
+  if (length(losses) > 0L) {
+    terms <- c(terms, losses[losses > 0L])
+  }
+  if (length(neg_carriers) > 0L) {
+    terms <- c(terms, abs(neg_carriers))
+  }
+  if (length(terms) == 0L) {
+    return("")
+  }
+  # Sort alphabetically by formula name (matches canonicalize_adduct_notation)
+  terms <- terms[order(names(terms))]
+  paste(
+    vapply(
+      seq_along(terms),
+      function(i) {
+        n <- as.integer(terms[[i]])
+        coef <- if (n == 1L) "" else as.character(n)
+        paste0("-", coef, names(terms)[[i]])
+      },
+      character(1L)
+    ),
+    collapse = ""
+  )
+}
+
+#' Format all positive modification terms (neutral clusters then positive
+#' carrier components) in canonical order.
+#'
+#' Canonical ordering rule: neutral cluster additions come BEFORE charge
+#' carriers (matching \code{canonicalize_adduct_notation()}).
+#'
+#' @param clusters Named integer vector of neutral cluster counts.
+#' @param pos_carriers Named integer vector of carrier atoms with positive
+#'   signed counts (e.g. `c(H = 1L, Na = 1L)`).
+#'
+#' @return Collapsed character string like `"+H2O+H"`.
+#' @keywords internal
+.format_pos_terms <- function(clusters, pos_carriers) {
+  parts <- character(0L)
+  # Neutral clusters first, alphabetical
+  cl <- if (length(clusters) > 0L) clusters[clusters > 0L] else integer()
+  if (length(cl) > 0L) {
+    cl <- cl[order(names(cl))]
+    parts <- c(
+      parts,
+      vapply(
+        seq_along(cl),
+        function(i) {
+          n <- as.integer(cl[[i]])
+          coef <- if (n == 1L) "" else as.character(n)
+          paste0("+", coef, names(cl)[[i]])
+        },
+        character(1L)
+      )
+    )
+  }
+  # Positive carriers last, alphabetical
+  ca <- if (length(pos_carriers) > 0L) {
+    pos_carriers[pos_carriers > 0L]
+  } else {
+    integer()
+  }
+  if (length(ca) > 0L) {
+    ca <- ca[order(names(ca))]
+    parts <- c(
+      parts,
+      vapply(
+        seq_along(ca),
+        function(i) {
+          n <- as.integer(ca[[i]])
+          coef <- if (n == 1L) "" else as.character(n)
+          paste0("+", coef, names(ca)[[i]])
+        },
+        character(1L)
+      )
+    )
+  }
   paste(parts, collapse = "")
 }

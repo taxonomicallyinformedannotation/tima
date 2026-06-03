@@ -88,7 +88,7 @@ Main output fields to inspect:
 - `candidate_adduct`
 - `candidate_adduct_origin` (`supported`, `supported_weak`, `baseline`)
 - `candidate_annotation_level` (`primary`, `secondary`)
-- `candidate_confidence_tier` (`supported_strong`, `supported_weak`, `baseline`)
+- `candidate_evidence_tier` (`supported_strong`, `supported_weak`, `baseline`)
 
 ### Spectral
 

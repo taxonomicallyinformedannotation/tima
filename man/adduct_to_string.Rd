@@ -33,11 +33,11 @@ adduct_to_string(
 Canonical adduct string.
 }
 \description{
-Format (outside-multimer, default):
-\verb{[<n>M<carriers><+clusters><-losses>]<|z|><sign>}
+Format (outside-multimer, canonical):
+\verb{[<n>M<-losses><-carrier-losses><+clusters><+carriers>]<|z|><sign>}
 Format (inside-multimer, when \code{loss_inside_multimer} or
 \code{cluster_inside_multimer} is \code{TRUE} and \code{n_mer >= 2}):
-\verb{[<n>(M<inside-clusters><inside-losses>)<carriers><+outside-clusters><-outside-losses>]<|z|><sign>}
+\verb{[<n>(M<inside-losses><inside-clusters>)<outside-losses><outside-clusters><carriers>]<|z|><sign>}
 }
 \details{
 The "inside" variant captures the chemistry where each monomer carries

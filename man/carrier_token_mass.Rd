@@ -3,14 +3,14 @@
 \name{carrier_token_mass}
 \alias{carrier_token_mass}
 \title{Compute the neutral monoisotopic mass of a (possibly compound) carrier
-token. For "NH4" we use H4N as the formula; for "Na-2H" we add Na and
-subtract 2*H, etc.}
+token. For "H4N" (ammonium) we sum 4\emph{H + N; for "Na-2H" we add Na and
+subtract 2}H, etc.}
 \usage{
 carrier_token_mass(parsed_carrier)
 }
 \description{
 Compute the neutral monoisotopic mass of a (possibly compound) carrier
-token. For "NH4" we use H4N as the formula; for "Na-2H" we add Na and
-subtract 2*H, etc.
+token. For "H4N" (ammonium) we sum 4\emph{H + N; for "Na-2H" we add Na and
+subtract 2}H, etc.
 }
 \keyword{internal}

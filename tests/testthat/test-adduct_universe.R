@@ -34,12 +34,12 @@ test_that("adduct_to_string formats canonical strings correctly", {
     "[M-2H+Fe]+"
   )
   expect_equal(
-    adduct_to_string(1, c(NH4 = 1), integer(), integer(), 1),
-    "[M+NH4]+"
+    adduct_to_string(1, c(H4N = 1), integer(), integer(), 1),
+    "[M+H4N]+"
   )
   expect_equal(
     adduct_to_string(1, c(H = 1), c(H2O = 1), integer(), 1),
-    "[M+H+H2O]+"
+    "[M+H2O+H]+"
   )
 })
 
@@ -56,7 +56,7 @@ test_that("parse_carrier_token decomposes compound carriers", {
   expect_equal(as.list(pc$symbols), list(Fe = 1L, H = -2L))
   expect_equal(pc$z_contribution, 1L)
 
-  pc <- parse_carrier_token("NH4")
+  pc <- parse_carrier_token("H4N")
   expect_equal(pc$z_contribution, 1L)
 })
 
@@ -74,8 +74,8 @@ test_that("generate_adduct_hypotheses returns expected rows for a small spec", {
   expect_true("[2M+H]+" %in% u$adduct)
   expect_true("[M+2H]2+" %in% u$adduct)
   expect_true("[M+H+Na]2+" %in% u$adduct)
-  expect_true("[M+H+H2O]+" %in% u$adduct)
-  expect_true("[M+H-H2O]+" %in% u$adduct)
+  expect_true("[M+H2O+H]+" %in% u$adduct)
+  expect_true("[M-H2O+H]+" %in% u$adduct)
 
   u_neg <- generate_adduct_hypotheses(spec, polarity = "neg")
   expect_true("[M-H]-" %in% u_neg$adduct)
@@ -129,7 +129,7 @@ test_that("calculate_neutral_mass round-trips canonical adducts", {
     "[M+H+Na]2+",
     "[M+3H]3+",
     "[2M+Na]+",
-    "[M+NH4]+"
+    "[M+H4N]+"
   )
   for (a in test_set) {
     expect_true(

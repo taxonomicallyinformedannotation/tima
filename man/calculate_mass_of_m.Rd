@@ -28,14 +28,14 @@ m/z value and adduct notation. It accounts for charge, multimers,
 isotopes, and adduct modifications.
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{The calculation follows the formula:
-M = ((z * (m/z + iso) - modifications - (z * sign * e_mass)) / n_mer)
+M = (|z| * (m/z - iso_shift) - modifications + z * e_mass) / n_mer
 
 where:
-- z = number of charges
+- |z| = absolute number of charges
+- z = signed charge (`|z| * polarity`)
 - m/z = observed mass-to-charge ratio
-- iso = isotope shift (mass units)
-- modifications = total mass change from adduct modifications
-- sign = charge polarity (+1 or -1)
+- iso_shift = `n_iso * ISOTOPE_MASS_SHIFT_DALTONS`
+- modifications = total neutral mass change from adduct modifications
 - e_mass = electron mass
 - n_mer = multimer count
 }\if{html}{\out{</div>}}
@@ -50,7 +50,7 @@ calculate_mass_of_m(mz = 145.4421, adduct_string = "[M+Na]+")
 # Expected: ~122.45 Da
 
 # Complex adduct with water loss
-calculate_mass_of_m(mz = 105.4467, adduct_string = "[M+H-H2O]+")
+calculate_mass_of_m(mz = 105.4467, adduct_string = "[M-H2O+H]+")
 # Expected: ~122.45 Da
 
 # Dimer

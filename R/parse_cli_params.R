@@ -509,8 +509,8 @@ parse_cli_params <- function(arguments, parameters) {
       type = as.logical
     ),
     force = list(path = c("options", "force"), type = as.logical),
-    high_confidence = list(
-      path = c("options", "high_confidence"),
+    high_evidence = list(
+      path = c("options", "high_evidence"),
       type = as.logical
     ),
     remove_ties = list(path = c("options", "remove_ties"), type = as.logical),

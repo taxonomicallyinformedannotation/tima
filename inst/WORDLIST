@@ -18,6 +18,7 @@ BiocParallel
 BiocVersion
 Bioregistry
 Biota
+CCSbase
 CFM
 CLI
 CMD
@@ -118,6 +119,7 @@ Ollivier
 OpenAPI
 OpenTreeOfLife
 PEPMASS
+PFAS
 POSIXct
 Param
 Peng
@@ -182,6 +184,7 @@ backoff
 benchmarking
 bioconductor
 bioregistry
+canonicalization
 canonicalizes
 canopus
 chemontid
@@ -199,8 +202,11 @@ de
 deduplication
 denovo
 deprotonated
+deprotonation
+deprotonations
 dest
 devtools
+df
 dimerize
 dimerizes
 dimers
@@ -210,11 +216,13 @@ dp
 dr
 et
 etabolite
+exposomics
 expr
 fastverse
 fbmn
 filesystem
 filesystems
+fluorinated
 fn
 fread
 fs
@@ -293,12 +301,14 @@ rds
 renormalization
 renv
 reranked
+reranking
 reticulate
 retryable
 rmarkdown
 rmzTabM
 rotl
 sanitization
+scalability
 scalable
 scriptable
 shinyhelper
@@ -314,6 +324,7 @@ stereochemistry
 stereoisomers
 stoichiometric
 stringi
+subcomponents
 subgraphs
 subscores
 summarization
@@ -330,6 +341,7 @@ tidyverse
 tl
 trinomial
 tsv
+unanchored
 unmapped
 unparseable
 untargeted
@@ -344,6 +356,8 @@ wei
 withr
 workspaces
 xLogP
+xenobiotic
+xenobiotics
 xlogp
 yaml
 zenodo

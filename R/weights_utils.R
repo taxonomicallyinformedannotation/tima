@@ -1,4 +1,4 @@
-#' Compute confidence-aware weighted sum (row-wise for data frames)
+#' Compute evidence-aware weighted sum (row-wise for data frames)
 #'
 #' @param ... [numeric] Numeric columns/vectors of component values (passed as
 #'     separate arguments).

@@ -23,7 +23,7 @@ by a single canonical regex:
 \item trailing radical marker \code{*} (e.g. \verb{[M]+*}) is removed;
 \item non-standard trailing charge \verb{]+2} is rewritten to \verb{]2+};
 \item solvent aliases (\code{+ACN}, \code{+IsoProp}, \code{+MeOH}, \code{+DMSO}, \code{+FA},
-\code{+HAc}, \code{+CH3COO}, \code{+NH4}, ...) are expanded to element formulas
+\code{+HAc}, \code{+CH3COO}, \code{+NH4} → \code{+H4N}, ...) are expanded to element formulas
 via \code{adducts_translations}.
 }
 }

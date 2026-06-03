@@ -649,7 +649,7 @@ test_that("change_params_small uses go_to_cache when cache_dir is NULL", {
             ),
             ms = list(polarity = "pos"),
             organisms = list(taxon = "Old taxon"),
-            options = list(high_confidence = FALSE, summarize = FALSE)
+            options = list(high_evidence = FALSE, summarize = FALSE)
           )
         )
       )
@@ -914,7 +914,7 @@ test_that("change_params_small initializes missing mztab entry and updates optio
             ),
             ms = list(polarity = "pos"),
             organisms = list(taxon = "existing taxon"),
-            options = list(high_confidence = FALSE, summarize = FALSE)
+            options = list(high_evidence = FALSE, summarize = FALSE)
           )
         )
       )
@@ -938,7 +938,7 @@ test_that("change_params_small initializes missing mztab entry and updates optio
 
   expect_no_error(change_params_small(
     fil_mzt_raw = file.path(tmp, "input.mztab"),
-    hig_con = TRUE,
+    hig_evi = TRUE,
     summarize = TRUE,
     org_tax = NULL,
     cache_dir = NULL
@@ -950,6 +950,6 @@ test_that("change_params_small initializes missing mztab entry and updates optio
     file.path(tmp, "data", "source", "input.mztab")
   )
   expect_identical(captured$organisms$taxon, NA)
-  expect_identical(captured$options$high_confidence, TRUE)
+  expect_identical(captured$options$high_evidence, TRUE)
   expect_identical(captured$options$summarize, TRUE)
 })

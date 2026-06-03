@@ -340,7 +340,7 @@ read_mztab <- function(
     "adduct_ions",
     "reliability",
     "best_id_confidence_measure",
-    "best_id_confidence_value"
+    "best_id_evidence_value"
   )
   # opt_* columns: any optional column the upstream tool added.
   opt_cols <- grep("^opt_", names(src), value = TRUE)

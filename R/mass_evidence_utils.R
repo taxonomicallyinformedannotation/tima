@@ -17,7 +17,7 @@
 #'   * adduct switches    (`[M+H]+` vs `[M+Na]+`)
 #'   * multimers          (`[M+H]+` vs `[2M+H]+`)
 #'   * multicharged       (`[M+H]+` vs `[M+2H]2+`)
-#'   * neutral losses     (`[M+H]+` vs `[M+H-H2O]+`)
+#'   * neutral losses     (`[M+H]+` vs `[M-H2O+H]+`)
 #'   * isotopologues      (`[M+H]+` vs `[M1+H]+`)
 #'
 #' Memory/time scaling: NO feature×universe Cartesian materialization. For
@@ -161,16 +161,14 @@ implied_neutral_mass <- function(
 annotate_adduct_universe_metadata <- function(universe, polarity) {
   common_carriers <- switch(
     polarity,
-    pos = c("H", "Na", "K", "NH4", "Mg", "Ca"),
+    pos = c("H", "Na", "K", "H4N", "Mg", "Ca"),
     neg = c("H", "F", "Cl", "Br"),
     character()
   )
   common_losses <- c(
     "H2O",
     "H4O2",
-    "H6O3",
     "H8O4",
-    "NH3",
     "H3N",
     "CO",
     "CO2",

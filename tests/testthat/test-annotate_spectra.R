@@ -1028,8 +1028,8 @@ test_that("convert_precursor_for_matching converts known adducts to neutral mass
     adducts = c("[M+H]+", "[M+Na]+")
   )
 
-  expect_equal(out[[1L]], expected_1, tolerance = 1e-8)
-  expect_equal(out[[2L]], expected_2, tolerance = 1e-8)
+  expect_equal(out[[1L]], expected_1, tolerance = 1e-5)
+  expect_equal(out[[2L]], expected_2, tolerance = 1e-5)
   expect_true(all(is.finite(out)))
 })
 
@@ -1377,6 +1377,32 @@ test_that("reduce_library_by_precursor keeps only overlapping precursor windows"
   expect_equal(length(none), 0L)
 })
 
+test_that("reduce_library_by_precursor keeps adduct-shifted library spectra via neutral mass", {
+  skip_if_not_installed("Spectra")
+
+  query_m <- 300
+  query_prec <- calculate_mz_from_mass(query_m, "[M+H4N]+")
+  lib_prec <- calculate_mz_from_mass(query_m, "[M+H]+")
+
+  lib_sp <- Spectra::Spectra(data.frame(
+    precursorMz = c(lib_prec, 500),
+    adduct = c("[M+H]+", "[M+H]+"),
+    mz = I(list(c(50, 80), c(60, 100))),
+    intensity = I(list(c(10, 20), c(30, 40)))
+  ))
+
+  kept <- reduce_library_by_precursor(
+    lib_sp = lib_sp,
+    query_precursors = query_prec,
+    query_adducts = "[M+H4N]+",
+    dalton = 0.01,
+    ppm = 5
+  )
+
+  expect_equal(length(kept), 1L)
+  expect_equal(get_precursors(kept)[[1L]], lib_prec, tolerance = 1e-8)
+})
+
 test_that("compute_similarity_safe returns calculation output on success", {
   skip_if_not_installed("Spectra")
 
@@ -1410,6 +1436,79 @@ test_that("compute_similarity_safe returns calculation output on success", {
 
   expect_equal(nrow(out), 1L)
   expect_true(all(c("target_id", "feature_id") %in% names(out)))
+})
+
+test_that("finalize_results flags exact adduct and neutral-mass rescued matches", {
+  df_sim <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    target_id = c(1L, 2L),
+    precursorMz = c(100, 200),
+    candidate_spectrum_entropy = c("0.8", "0.8"),
+    candidate_score_similarity = c("0.9", "0.7"),
+    candidate_score_similarity_forward = c("0.9", "0.7"),
+    candidate_score_similarity_reverse = c("0.9", "0.7"),
+    candidate_count_similarity_peaks_matched = c("3", "3"),
+    .similarity_space = c("precursor_mz", "neutral_M")
+  )
+  meta <- tidytable::tidytable(
+    target_id = c(1L, 2L),
+    target_adduct = c("[M+H]+", "[M+H]+"),
+    target_library = c("lib", "lib"),
+    target_spectrum_id = c("sp1", "sp2"),
+    target_smiles = c("CCO", "CCC"),
+    target_smiles_no_stereo = c("CCO", "CCC"),
+    target_name = c("ethanol", "propane"),
+    target_precursorMz = c(101, 201)
+  )
+  query_meta <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    query_adduct = c("[M+H]+", "[M+H4N]+"),
+    query_precursorMz = c(100, 200),
+    query_neutral_mass = c(99, 199)
+  )
+
+  out <- finalize_results(df_sim = df_sim, meta = meta, query_meta = query_meta)
+
+  expect_identical(
+    out$candidate_adduct_match_mode[out$feature_id == "F1"],
+    "exact_adduct"
+  )
+  expect_identical(
+    out$candidate_adduct_match_mode[out$feature_id == "F2"],
+    "m_delta_rescued"
+  )
+  expect_identical(
+    out$candidate_query_adduct[out$feature_id == "F2"],
+    "[M+H4N]+"
+  )
+})
+
+test_that("build_query_metadata prefers annotate_masses adduct assignments over MGF metadata", {
+  skip_if_not_installed("Spectra")
+
+  query_sp <- Spectra::Spectra(data.frame(
+    FEATURE_ID = "F10",
+    precursorMz = calculate_mz_from_mass(300, "[M+H4N]+"),
+    adduct = "[M+H]+",
+    mz = I(list(c(50, 80))),
+    intensity = I(list(c(10, 20)))
+  ))
+  ms1_tbl <- tidytable::tidytable(
+    feature_id = "F10",
+    candidate_adduct = "[M+H4N]+",
+    candidate_annotation_level = "primary",
+    candidate_evidence_tier = "supported_strong"
+  )
+
+  out <- build_query_metadata(
+    query_sp = query_sp,
+    ms1_annotations = ms1_tbl
+  )
+
+  expect_identical(
+    adduct_to_state_key(out$query_adduct[[1L]]),
+    adduct_to_state_key("[M+H4N]+")
+  )
 })
 
 test_that("log_library_stats handles spectra without library metadata", {

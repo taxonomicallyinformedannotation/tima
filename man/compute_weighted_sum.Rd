@@ -2,7 +2,7 @@
 % Please edit documentation in R/weights_utils.R
 \name{compute_weighted_sum}
 \alias{compute_weighted_sum}
-\title{Compute confidence-aware weighted sum (row-wise for data frames)}
+\title{Compute evidence-aware weighted sum (row-wise for data frames)}
 \usage{
 compute_weighted_sum(..., weights, coverage_floor = 0.5)
 }
@@ -25,7 +25,7 @@ renormalization and evidence coverage discount.
 Returns NA for rows where all components are NA.
 }
 \description{
-Compute confidence-aware weighted sum (row-wise for data frames)
+Compute evidence-aware weighted sum (row-wise for data frames)
 }
 \details{
 Two-step computation:

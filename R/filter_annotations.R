@@ -354,14 +354,14 @@ enforce_ms1_adduct_semantics <- function(
   has_ms1_semantics <- all(
     c(
       "candidate_annotation_level",
-      "candidate_confidence_tier"
+      "candidate_evidence_tier"
     ) %in%
       names(out)
   )
   if (has_ms1_semantics) {
     is_ms1_row <- is_ms1_row |
       (!is.na(out$candidate_annotation_level) |
-        !is.na(out$candidate_confidence_tier))
+        !is.na(out$candidate_evidence_tier))
   }
 
   strong_ms1 <- out |>
@@ -370,14 +370,14 @@ enforce_ms1_adduct_semantics <- function(
 
   if (
     all(
-      c("candidate_annotation_level", "candidate_confidence_tier") %in%
+      c("candidate_annotation_level", "candidate_evidence_tier") %in%
         names(strong_ms1)
     )
   ) {
     strong_ms1 <- strong_ms1 |>
       tidytable::filter(
         candidate_annotation_level == "primary",
-        candidate_confidence_tier == "supported_strong"
+        candidate_evidence_tier == "supported_strong"
       )
   }
 

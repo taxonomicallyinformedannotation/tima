@@ -163,6 +163,57 @@ test_that("select_annotations_columns drops duplicate raw structure metadata col
   expect_false(any(grepl("^structure_", names(result))))
 })
 
+test_that("select_annotations_columns preserves annotation provenance columns", {
+  paths <- make_fake_struct_files()
+
+  df <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_adduct = "[M+Na]+",
+    candidate_query_adduct = "[M+H]+",
+    candidate_adduct_match_mode = "m_delta_rescued",
+    candidate_adduct_origin = "supported",
+    candidate_annotation_level = "primary",
+    candidate_evidence_tier = "supported_strong",
+    adduct_support = 3L,
+    annotation_note = paste(
+      "Spectral match rescued in neutral-mass space:",
+      "observed adduct [M+H]+, library adduct [M+Na]+"
+    ),
+    candidate_library = "spectral_lib",
+    candidate_structure_inchikey_connectivity_layer = "IK1",
+    candidate_structure_smiles_no_stereo = "C"
+  )
+
+  result <- select_annotations_columns(
+    df = df,
+    str_stereo = paths$stereo,
+    str_met = paths$met,
+    str_tax_cla = paths$cla,
+    str_tax_npc = paths$npc,
+    recompute_smiles = FALSE
+  )
+
+  expect_true(all(
+    c(
+      "candidate_query_adduct",
+      "candidate_adduct_match_mode",
+      "candidate_adduct_origin",
+      "candidate_annotation_level",
+      "candidate_evidence_tier",
+      "adduct_support",
+      "annotation_note"
+    ) %in%
+      names(result)
+  ))
+  expect_equal(result$candidate_query_adduct[[1L]], "[M+H]+")
+  expect_equal(result$candidate_adduct_match_mode[[1L]], "m_delta_rescued")
+  expect_equal(result$candidate_adduct_origin[[1L]], "supported")
+  expect_equal(result$candidate_annotation_level[[1L]], "primary")
+  expect_equal(result$candidate_evidence_tier[[1L]], "supported_strong")
+  expect_equal(result$adduct_support[[1L]], "3")
+  expect_match(result$annotation_note[[1L]], "neutral-mass space")
+})
+
 test_that("recompute_structure_fields_from_smiles updates fields without join artifacts", {
   df <- tidytable::tidytable(
     candidate_structure_smiles_no_stereo = c("CCO", "", NA_character_),

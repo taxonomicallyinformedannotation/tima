@@ -720,7 +720,7 @@ ui <- shiny::fluidPage(
               "CH4O", # (methanol)
               "C2H3N", # (acetonitrile)
               "C2H7N", # (ethylamine)
-              "NH3", # (ammonia)
+              "H3N", # (ammonia)
               "CH2O2", # (formic acid)
               "C2H4O2", # (acetic acid)
               "C2H6O", # (ethanol)
@@ -732,13 +732,13 @@ ui <- shiny::fluidPage(
             selected = list(
               "H2O", # (water)
               "C2H3N", # (acetonitrile)
-              "C2H7N", # (ethylamine)
-              "NH3", # (ammonia)
+              "C2H7N", # (ethylamine from ACN)
+              "H3N", # (ammonia)
               "CH2O2", # (formic acid)
-              "C2H4O2", # (acetic acid)
-              "NaCl", # (sodium chloride)
-              "KCl", # (potassium chloride)
-              "C2H6OS" # (dmso)
+              # "C2H4O2", # (acetic acid)
+              "NaCl" # (sodium chloride)
+              # "KCl", # (potassium chloride)
+              # "C2H6OS" # (dmso)
             )
           ) |>
             shinyhelper::helper(
@@ -769,8 +769,8 @@ ui <- shiny::fluidPage(
             selected = list(
               "H2O", # (water)
               "CH2O2", # (formic)
-              "NaCl", # (sodium chloride)
-              "C2H4O2" # (acetic)
+              "NaCl" # (sodium chloride)
+              # "C2H4O2" # (acetic)
             )
           ) |>
             shinyhelper::helper(
@@ -1768,14 +1768,14 @@ ui <- shiny::fluidPage(
               )
             ),
           shiny::checkboxInput(
-            inputId = "high_confidence",
-            label = "High confidence only",
+            inputId = "high_evidence",
+            label = "High evidence only",
             value = TRUE
           ) |>
             shinyhelper::helper(
               type = "inline",
               content = c(
-                "If ticked, only compounds with high confidence will be reported.",
+                "If ticked, only compounds with high evidence will be reported.",
                 "This is an important filter. Do not hesitate removing it for more coverage."
               )
             ),

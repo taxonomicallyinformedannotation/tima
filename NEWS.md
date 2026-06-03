@@ -1,4 +1,3 @@
-
 # tima 2.13.0.9000 (unreleased)
 
 ## New features
@@ -17,6 +16,21 @@
   - Replaced single-chain evidence-edge linking with sparse k-nearest m/z linking per cluster, improving triangulation signal while preserving O(n*k) scalability
   - Re-enabled structural plausibility filter: loss-based annotations are now demoted to unmatched when the formula cannot satisfy required atoms (e.g., `[M-H2O]` on a formula lacking oxygen)
   - Upgraded graph-level consistency enforcement from single-pass greedy to multi-start neighbor-aware optimization: assigns adduct states to maximize coverage-aware objectives (edge satisfaction, neighbor agreement, prior support) and favors states consistent across multiple neighbors over isolated high-scoring alternatives
+
+* **Adduct canonicalization alignment**:
+  - Unified canonical adduct string ordering across structured universe generation (`adduct_to_string()`) and text harmonization (`canonicalize_adduct_notation()`)
+  - Canonical order is now chemically consistent and deterministic: negative terms first (losses / deprotonations), then neutral cluster additions, then positive charge carriers
+  - Updated regression tests to use canonical forms (e.g., `[M-H2O+H]+`, `[M+H2O+H]+`, `[M+NaCl+K]+`)
+
+* **Electron-mass correctness in legacy neutral-mass math**:
+  - `calculate_mass_of_m()`, `calculate_mz_from_mass()`, and `calculate_mass_of_m_batch()` now apply signed electron-mass correction (`z * m_e`) consistently
+  - Legacy inversion/forward formulas are now physically aligned with typed-universe mass arithmetic
+  - Consolidated electron-mass precision to a single CODATA 2018 value (`ELECTRON_MASS_DALTONS = 0.000548579909065`) and reused it as `ELECTRON_MASS_DA`
+
+* **Cross-stage adduct coupling (MS1 ↔ MS2 ↔ reranking)**:
+  - Reinforced the bridge from MS1 adduct attribution to spectral annotation matching and final candidate reranking
+  - Final percentile filtering now preserves rank-1/consensus-promoted entities, so cluster-consensus adduct attribution decisions are not lost when raw chemical scores are lower
+  - This keeps adduct-consistent entities available for downstream spectral agreement and final ranking outputs
 
 # tima 2.13.0
 

@@ -93,7 +93,7 @@
       "adduct_ions",
       "reliability",
       "best_id_confidence_measure",
-      "best_id_confidence_value"
+      "best_id_evidence_value"
     )
   )
 
@@ -523,7 +523,7 @@
 
 #' Convert a TIMA score to MSI reliability level (1-4)
 #'
-#' The mapping is intentionally conservative to avoid overstating confidence:
+#' The mapping is intentionally conservative to avoid overstating evidence:
 #' * 1 – confirmed by spectral library match AND score >= 0.7
 #' * 2 – probable structure; spectral evidence or score >= 0.5
 #' * 3 – putative annotation; score >= 0.2

@@ -91,7 +91,12 @@ write_empty_annotate_masses_outputs <- function(
     "candidate_structure_tax_cla_02sup",
     "candidate_structure_tax_cla_03cla",
     "candidate_structure_tax_cla_04dirpar",
-    "candidate_adduct"
+    "candidate_adduct",
+    "candidate_adduct_origin",
+    "candidate_annotation_level",
+    "candidate_evidence_tier",
+    "adduct_support",
+    "annotation_note"
   )
   empty_annotations <- as.data.frame(
     matrix(ncol = length(ann_cols), nrow = 0L)

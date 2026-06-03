@@ -84,7 +84,7 @@
 #' @param minimal_ms1_condition Condition to be used. Must be "OR" or "AND".
 #' @param ms1_only Keep only MS1 annotations. BOOLEAN
 #' @param compounds_names Report compounds names. Can be very large. BOOLEAN
-#' @param high_confidence Report high confidence candidates only. BOOLEAN
+#' @param high_evidence Report high evidence candidates only. BOOLEAN
 #' @param remove_ties Remove ties. BOOLEAN
 #' @param summarize Summarize results (1 row per feature). BOOLEAN
 #' @param pattern Pattern to identify your job. STRING
@@ -299,9 +299,9 @@ weight_annotations <- function(
   compounds_names = get_params(
     step = "weight_annotations"
   )$options$compounds_names,
-  high_confidence = get_params(
+  high_evidence = get_params(
     step = "weight_annotations"
-  )$options$high_confidence,
+  )$options$high_evidence,
   remove_ties = get_params(step = "weight_annotations")$options$remove_ties,
   summarize = get_params(step = "weight_annotations")$options$summarize,
   pattern = get_params(step = "weight_annotations")$files$pattern,
@@ -337,7 +337,7 @@ weight_annotations <- function(
     minimal_ms1_chemo = minimal_ms1_chemo,
     ms1_only = ms1_only,
     compounds_names = compounds_names,
-    high_confidence = high_confidence,
+    high_evidence = high_evidence,
     remove_ties = remove_ties,
     summarize = summarize,
     force = force,
@@ -359,9 +359,9 @@ weight_annotations <- function(
     best_percentile
   )
   log_debug(
-    "MS1-only mode: %s, High confidence: %s",
+    "MS1-only mode: %s, High evidence: %s",
     ms1_only,
-    high_confidence
+    high_evidence
   )
 
   ctx <- log_operation(
@@ -550,7 +550,7 @@ weight_annotations <- function(
       minimal_ms1_chemo = minimal_ms1_chemo,
       minimal_ms1_condition = minimal_ms1_condition,
       compounds_names = compounds_names,
-      high_confidence = high_confidence,
+      high_evidence = high_evidence,
       remove_ties = remove_ties,
       summarize = summarize,
       score_chemical_cla_kingdom = score_chemical_cla_kingdom,

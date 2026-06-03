@@ -314,6 +314,28 @@ summarize_results <- function(
 }
 
 .build_organism_lookup <- function(structure_organism_pairs_table, df) {
+  # Check if the required columns exist in df
+  has_organism_col <- "candidate_structure_organism_occurrence_closest" %in%
+    names(df)
+
+  if (!has_organism_col) {
+    # Return empty data frame with expected columns if organism column is missing
+    return(
+      structure_organism_pairs_table[0L, ] |>
+        tidytable::select(
+          candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
+          reference_doi,
+          tidyselect::contains(match = "organism_taxonomy_"),
+          -tidyselect::any_of("organism_taxonomy_ottid")
+        ) |>
+        tidytable::mutate(
+          feature_id = character(),
+          candidate_structure_organism_occurrence_closest = character(),
+          candidate_structure_organism_occurrence_reference = character()
+        )
+    )
+  }
+
   structure_organism_pairs_table |>
     tidytable::filter(
       structure_inchikey_connectivity_layer %in%
@@ -323,7 +345,7 @@ summarize_results <- function(
       candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
       reference_doi,
       tidyselect::contains(match = "organism_taxonomy_"),
-      -organism_taxonomy_ottid
+      -tidyselect::any_of("organism_taxonomy_ottid")
     ) |>
     tidytable::distinct() |>
     tidytable::inner_join(

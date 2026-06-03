@@ -780,7 +780,7 @@ create_fixture_params_small <- function(id = "TESTID") {
     ),
     ms = list(polarity = "pos"),
     organisms = list(taxon = "Gentiana lutea"),
-    options = list(high_confidence = TRUE, summarize = FALSE)
+    options = list(high_evidence = TRUE, summarize = FALSE)
   )
 }
 

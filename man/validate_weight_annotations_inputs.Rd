@@ -23,7 +23,7 @@ validate_weight_annotations_inputs(
   minimal_ms1_chemo,
   ms1_only,
   compounds_names,
-  high_confidence,
+  high_evidence,
   remove_ties,
   summarize,
   force,
@@ -68,7 +68,7 @@ validate_weight_annotations_inputs(
 
 \item{compounds_names}{Logical, include compound names.}
 
-\item{high_confidence}{Logical, report high-confidence candidates only.}
+\item{high_evidence}{Logical, report high-confidence candidates only.}
 
 \item{remove_ties}{Logical, remove tied candidates.}
 

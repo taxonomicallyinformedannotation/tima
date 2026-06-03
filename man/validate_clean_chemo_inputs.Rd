@@ -12,7 +12,7 @@ validate_clean_chemo_inputs(
   minimal_ms1_chemo,
   minimal_ms1_condition,
   compounds_names,
-  high_confidence,
+  high_evidence,
   remove_ties,
   summarize,
   max_per_score,
@@ -40,7 +40,7 @@ validate_clean_chemo_inputs(
 
 \item{compounds_names}{Logical}
 
-\item{high_confidence}{Logical}
+\item{high_evidence}{Logical}
 
 \item{remove_ties}{Logical}
 

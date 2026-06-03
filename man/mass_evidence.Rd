@@ -21,7 +21,7 @@ Discovers uniformly:
 \item adduct switches    (\verb{[M+H]+} vs \verb{[M+Na]+})
 \item multimers          (\verb{[M+H]+} vs \verb{[2M+H]+})
 \item multicharged       (\verb{[M+H]+} vs \verb{[M+2H]2+})
-\item neutral losses     (\verb{[M+H]+} vs \verb{[M+H-H2O]+})
+\item neutral losses     (\verb{[M+H]+} vs \verb{[M-H2O+H]+})
 \item isotopologues      (\verb{[M+H]+} vs \verb{[M1+H]+})
 }
 

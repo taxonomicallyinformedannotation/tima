@@ -41,7 +41,7 @@ parse_adduct("[M+Na]+") # Sodium adduct
 
 # Complex adducts
 parse_adduct("[2M+Na]+") # Dimer with sodium
-parse_adduct("[M+H-H2O]+") # Protonated with water loss
+parse_adduct("[M-H2O+H]+") # Protonated with water loss
 
 \dontrun{
 # Advanced cases

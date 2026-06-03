@@ -7,7 +7,7 @@
 .mztab_score_to_reliability(score, library)
 }
 \description{
-The mapping is intentionally conservative to avoid overstating confidence:
+The mapping is intentionally conservative to avoid overstating evidence:
 \itemize{
 \item 1 – confirmed by spectral library match AND score >= 0.7
 \item 2 – probable structure; spectral evidence or score >= 0.5

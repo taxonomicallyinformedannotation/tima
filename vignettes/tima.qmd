@@ -150,7 +150,7 @@ tima::change_params_small(
   fil_spe_raw = "myBeautifulSpectra.mgf",
   ms_pol = "pos",
   org_tax = "Gentiana lutea",
-  hig_con = TRUE,
+  hig_evi = TRUE,
   summarize = FALSE
 )
 ```

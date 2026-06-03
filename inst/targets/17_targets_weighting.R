@@ -49,7 +49,7 @@ targets_section_weighting <- function() {
         minimal_ms1_condition = par_wei_ann$annotations$thresholds$ms1$condition,
         ms1_only = par_wei_ann$annotations$ms1only,
         compounds_names = par_wei_ann$options$compounds_names,
-        high_confidence = par_wei_ann$options$high_confidence,
+        high_evidence = par_wei_ann$options$high_evidence,
         remove_ties = par_wei_ann$options$remove_ties,
         summarize = par_wei_ann$options$summarize,
         pattern = par_wei_ann$files$pattern,

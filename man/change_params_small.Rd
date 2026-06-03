@@ -14,7 +14,7 @@ change_params_small(
   fil_mzt_raw = NULL,
   ms_pol = NULL,
   org_tax = NULL,
-  hig_con = NULL,
+  hig_evi = NULL,
   summarize = NULL,
   cache_dir = NULL
 )
@@ -40,7 +40,7 @@ taxon)}
 
 \item{org_tax}{Character. Scientific name for single-taxon experiments}
 
-\item{hig_con}{Logical. Filter for high confidence candidates only}
+\item{hig_evi}{Logical. Filter for high evidence candidates only}
 
 \item{summarize}{Logical. Summarize all candidates per feature to single row}
 
@@ -81,7 +81,7 @@ change_params_small(
   fil_mzt_raw = "data/raw/annotations.mztab",
   ms_pol = "pos",
   org_tax = "Gentiana lutea",
-  hig_con = TRUE,
+  hig_evi = TRUE,
   summarize = FALSE
 )
 }

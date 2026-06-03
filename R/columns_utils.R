@@ -59,7 +59,8 @@ columns_model <- function() {
     "candidate_spectrum_entropy",
     "candidate_adduct_origin",
     "candidate_annotation_level",
-    "candidate_confidence_tier"
+    "candidate_evidence_tier",
+    "adduct_support"
   )
 
   # SIRIUS formula-level columns ----
@@ -85,6 +86,9 @@ columns_model <- function() {
     "candidate_library",
     "candidate_spectrum_id",
     "candidate_adduct",
+    "candidate_query_adduct",
+    "candidate_adduct_match_mode",
+    "annotation_note",
     "candidate_count_similarity_peaks_matched",
     "candidate_score_similarity",
     "candidate_score_similarity_forward",
@@ -292,6 +296,13 @@ fake_annotations_columns <- function() {
     candidate_structure_exact_mass = NA_real_,
     candidate_structure_xlogp = NA_real_,
     candidate_adduct = NA_character_,
+    candidate_query_adduct = NA_character_,
+    candidate_adduct_match_mode = NA_character_,
+    annotation_note = NA_character_,
+    candidate_adduct_origin = NA_character_,
+    candidate_annotation_level = NA_character_,
+    candidate_evidence_tier = NA_character_,
+    adduct_support = NA_integer_,
     candidate_library = NA_character_,
     candidate_score_similarity = NA_real_,
     candidate_score_similarity_forward = NA_real_,

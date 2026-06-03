@@ -516,7 +516,7 @@
       adduct_ions = "null",
       reliability = "null",
       best_id_confidence_measure = "id_confidence_measure[1]",
-      best_id_confidence_value = "null"
+      best_id_evidence_value = "null"
     ))
   }
 
@@ -569,7 +569,7 @@
       adduct_ions = character(0),
       reliability = character(0),
       best_id_confidence_measure = character(0),
-      best_id_confidence_value = character(0)
+      best_id_evidence_value = character(0)
     ))
   }
 
@@ -686,7 +686,7 @@
       adduct_ions = .mztab_join_aligned(grp, order_idx, "adduct_ion"),
       reliability = reliability,
       best_id_confidence_measure = "id_confidence_measure[1]",
-      best_id_confidence_value = score_val
+      best_id_evidence_value = score_val
     )
   })
 

@@ -805,7 +805,7 @@ targets_section_benchmark <- function() {
         minimal_ms1_chemo = benchmark_def_wei_ann$annotations$thresholds$ms1$chemical,
         minimal_ms1_condition = benchmark_def_wei_ann$annotations$thresholds$ms1$condition,
         compounds_names = benchmark_def_wei_ann$options$compounds_names,
-        high_confidence = FALSE,
+        high_evidence = FALSE,
         remove_ties = benchmark_def_wei_ann$options$remove_ties,
         summarize = benchmark_def_wei_ann$options$summarize,
         pattern = benchmark_def_wei_ann$files$pattern,
