@@ -2,258 +2,258 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/NEWS.html</loc>
-    <lastmod>2026-06-03T15:44:51.931Z</lastmod>
+    <lastmod>2026-06-03T21:10:49.752Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html</loc>
-    <lastmod>2026-06-03T15:46:06.472Z</lastmod>
+    <lastmod>2026-06-03T21:11:53.423Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html</loc>
-    <lastmod>2026-06-03T15:46:06.472Z</lastmod>
+    <lastmod>2026-06-03T21:11:53.423Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/vignettes/tima.html</loc>
-    <lastmod>2026-06-03T15:46:06.473Z</lastmod>
+    <lastmod>2026-06-03T21:11:53.424Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/change_params_small.html</loc>
-    <lastmod>2026-06-03T15:45:00.607Z</lastmod>
+    <lastmod>2026-06-03T21:10:56.940Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_libraries_sop_ecmdb.html</loc>
-    <lastmod>2026-06-03T15:45:44.482Z</lastmod>
+    <lastmod>2026-06-03T21:11:33.299Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/copy_backbone.html</loc>
-    <lastmod>2026-06-03T15:45:03.805Z</lastmod>
+    <lastmod>2026-06-03T21:10:59.257Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/clean_chemo.html</loc>
-    <lastmod>2026-06-03T15:45:02.104Z</lastmod>
+    <lastmod>2026-06-03T21:10:58.172Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/import_spectra.html</loc>
-    <lastmod>2026-06-03T15:45:25.847Z</lastmod>
+    <lastmod>2026-06-03T21:11:17.199Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/filter_annotations.html</loc>
-    <lastmod>2026-06-03T15:45:12.241Z</lastmod>
+    <lastmod>2026-06-03T21:11:06.480Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/weight_annotations.html</loc>
-    <lastmod>2026-06-03T15:46:03.573Z</lastmod>
+    <lastmod>2026-06-03T21:11:51.207Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_annotations_mzmine.html</loc>
-    <lastmod>2026-06-03T15:45:32.604Z</lastmod>
+    <lastmod>2026-06-03T21:11:23.429Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/validate_inputs.html</loc>
-    <lastmod>2026-06-03T15:46:01.911Z</lastmod>
+    <lastmod>2026-06-03T21:11:49.775Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/calculate_mz_from_mass.html</loc>
-    <lastmod>2026-06-03T15:44:58.929Z</lastmod>
+    <lastmod>2026-06-03T21:10:55.840Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_params.html</loc>
-    <lastmod>2026-06-03T15:45:51.620Z</lastmod>
+    <lastmod>2026-06-03T21:11:39.338Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_libraries_rt.html</loc>
-    <lastmod>2026-06-03T15:45:41.086Z</lastmod>
+    <lastmod>2026-06-03T21:11:30.236Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/harmonize_adducts.html</loc>
-    <lastmod>2026-06-03T15:45:24.425Z</lastmod>
+    <lastmod>2026-06-03T21:11:15.998Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/create_components.html</loc>
-    <lastmod>2026-06-03T15:45:05.045Z</lastmod>
+    <lastmod>2026-06-03T21:11:00.353Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/go_to_cache.html</loc>
-    <lastmod>2026-06-03T15:45:23.124Z</lastmod>
+    <lastmod>2026-06-03T21:11:14.866Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_libraries_sop_closed.html</loc>
-    <lastmod>2026-06-03T15:45:43.256Z</lastmod>
+    <lastmod>2026-06-03T21:11:32.382Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/get_gnps_tables.html</loc>
-    <lastmod>2026-06-03T15:45:18.748Z</lastmod>
+    <lastmod>2026-06-03T21:11:11.962Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/install.html</loc>
-    <lastmod>2026-06-03T15:45:28.107Z</lastmod>
+    <lastmod>2026-06-03T21:11:19.482Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/read_mztab.html</loc>
-    <lastmod>2026-06-03T15:45:55.632Z</lastmod>
+    <lastmod>2026-06-03T21:11:43.039Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/get_organism_taxonomy_ott.html</loc>
-    <lastmod>2026-06-03T15:45:21.544Z</lastmod>
+    <lastmod>2026-06-03T21:11:13.850Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_libraries_sop_lotus.html</loc>
-    <lastmod>2026-06-03T15:45:46.742Z</lastmod>
+    <lastmod>2026-06-03T21:11:35.182Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/write_mztab.html</loc>
-    <lastmod>2026-06-03T15:46:05.136Z</lastmod>
+    <lastmod>2026-06-03T21:11:52.633Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_taxa.html</loc>
-    <lastmod>2026-06-03T15:45:53.112Z</lastmod>
+    <lastmod>2026-06-03T21:11:40.550Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/get_compounds_xrefs.html</loc>
-    <lastmod>2026-06-03T15:45:13.807Z</lastmod>
+    <lastmod>2026-06-03T21:11:07.903Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/get_file.html</loc>
-    <lastmod>2026-06-03T15:45:17.221Z</lastmod>
+    <lastmod>2026-06-03T21:11:10.840Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/get_last_version_from_zenodo.html</loc>
-    <lastmod>2026-06-03T15:45:20.204Z</lastmod>
+    <lastmod>2026-06-03T21:11:12.884Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/annotate_spectra.html</loc>
-    <lastmod>2026-06-03T15:44:55.558Z</lastmod>
+    <lastmod>2026-06-03T21:10:52.769Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/LICENSE.html</loc>
-    <lastmod>2026-06-03T15:44:51.942Z</lastmod>
+    <lastmod>2026-06-03T21:10:49.763Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/index.html</loc>
-    <lastmod>2026-06-03T15:44:51.958Z</lastmod>
+    <lastmod>2026-06-03T21:10:49.780Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/CITATION.html</loc>
-    <lastmod>2026-06-03T15:44:52.010Z</lastmod>
+    <lastmod>2026-06-03T21:10:49.834Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_libraries_sop_hmdb.html</loc>
-    <lastmod>2026-06-03T15:45:45.716Z</lastmod>
+    <lastmod>2026-06-03T21:11:34.266Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/get_example_sirius.html</loc>
-    <lastmod>2026-06-03T15:45:16.023Z</lastmod>
+    <lastmod>2026-06-03T21:11:09.999Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/create_edges.html</loc>
-    <lastmod>2026-06-03T15:45:07.852Z</lastmod>
+    <lastmod>2026-06-03T21:11:02.304Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/calculate_similarity.html</loc>
-    <lastmod>2026-06-03T15:44:59.387Z</lastmod>
+    <lastmod>2026-06-03T21:10:56.126Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/run_app.html</loc>
-    <lastmod>2026-06-03T15:45:57.147Z</lastmod>
+    <lastmod>2026-06-03T21:11:44.495Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_features_tables.html</loc>
-    <lastmod>2026-06-03T15:45:39.845Z</lastmod>
+    <lastmod>2026-06-03T21:11:29.095Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/tima_full.html</loc>
-    <lastmod>2026-06-03T15:45:59.836Z</lastmod>
+    <lastmod>2026-06-03T21:11:47.932Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_annotations_sirius.html</loc>
-    <lastmod>2026-06-03T15:45:35.044Z</lastmod>
+    <lastmod>2026-06-03T21:11:25.318Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_annotations_mztab.html</loc>
-    <lastmod>2026-06-03T15:45:33.794Z</lastmod>
+    <lastmod>2026-06-03T21:11:24.373Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/parse_adduct.html</loc>
-    <lastmod>2026-06-03T15:45:29.808Z</lastmod>
+    <lastmod>2026-06-03T21:11:21.099Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/process_smiles.html</loc>
-    <lastmod>2026-06-03T15:45:54.290Z</lastmod>
+    <lastmod>2026-06-03T21:11:41.849Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/create_edges_spectra.html</loc>
-    <lastmod>2026-06-03T15:45:06.330Z</lastmod>
+    <lastmod>2026-06-03T21:11:01.291Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_libraries_sop_bigg.html</loc>
-    <lastmod>2026-06-03T15:45:42.219Z</lastmod>
+    <lastmod>2026-06-03T21:11:31.194Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/transform_score_sirius_csi.html</loc>
-    <lastmod>2026-06-03T15:46:00.222Z</lastmod>
+    <lastmod>2026-06-03T21:11:48.161Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_features_edges.html</loc>
-    <lastmod>2026-06-03T15:45:38.611Z</lastmod>
+    <lastmod>2026-06-03T21:11:28.104Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_annotations_spectra.html</loc>
-    <lastmod>2026-06-03T15:45:36.313Z</lastmod>
+    <lastmod>2026-06-03T21:11:26.439Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/annotate_masses.html</loc>
-    <lastmod>2026-06-03T15:44:54.253Z</lastmod>
+    <lastmod>2026-06-03T21:10:51.577Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/get_example_files.html</loc>
-    <lastmod>2026-06-03T15:45:14.924Z</lastmod>
+    <lastmod>2026-06-03T21:11:09.082Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_features_components.html</loc>
-    <lastmod>2026-06-03T15:45:37.417Z</lastmod>
+    <lastmod>2026-06-03T21:11:27.358Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_annotations_gnps.html</loc>
-    <lastmod>2026-06-03T15:45:31.423Z</lastmod>
+    <lastmod>2026-06-03T21:11:22.442Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_libraries_sop_pubchemlite.html</loc>
-    <lastmod>2026-06-03T15:45:49.206Z</lastmod>
+    <lastmod>2026-06-03T21:11:37.458Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/run_tima.html</loc>
-    <lastmod>2026-06-03T15:45:58.245Z</lastmod>
+    <lastmod>2026-06-03T21:11:46.021Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/calculate_mass_of_m.html</loc>
-    <lastmod>2026-06-03T15:44:57.660Z</lastmod>
+    <lastmod>2026-06-03T21:10:54.694Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_libraries_spectra.html</loc>
-    <lastmod>2026-06-03T15:45:50.516Z</lastmod>
+    <lastmod>2026-06-03T21:11:38.210Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/adduct_to_string.html</loc>
-    <lastmod>2026-06-03T15:44:52.615Z</lastmod>
+    <lastmod>2026-06-03T21:10:50.460Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/install_tima.html</loc>
-    <lastmod>2026-06-03T15:45:26.986Z</lastmod>
+    <lastmod>2026-06-03T21:11:18.364Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/man/prepare_libraries_sop_merged.html</loc>
-    <lastmod>2026-06-03T15:45:48.071Z</lastmod>
+    <lastmod>2026-06-03T21:11:36.338Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html</loc>
-    <lastmod>2026-06-03T15:46:06.472Z</lastmod>
+    <lastmod>2026-06-03T21:11:53.423Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html</loc>
-    <lastmod>2026-06-03T15:46:06.472Z</lastmod>
+    <lastmod>2026-06-03T21:11:53.423Z</lastmod>
   </url>
   <url>
     <loc>https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html</loc>
-    <lastmod>2026-06-03T15:46:06.472Z</lastmod>
+    <lastmod>2026-06-03T21:11:53.423Z</lastmod>
   </url>
 </urlset>
