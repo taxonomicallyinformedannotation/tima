@@ -431,7 +431,11 @@ enforce_ms1_adduct_semantics <- function(
     tidytable::mutate(
       .is_ms1_row = is_ms1_row,
       .is_spectral_row = if ("candidate_library" %in% names(out)) {
-        grepl("spectral", tolower(as.character(candidate_library)), fixed = TRUE)
+        grepl(
+          "spectral",
+          tolower(as.character(candidate_library)),
+          fixed = TRUE
+        )
       } else {
         !.is_ms1_row
       },
@@ -460,7 +464,9 @@ enforce_ms1_adduct_semantics <- function(
         mz = as.numeric(out$mz[idx_m]),
         adduct_string = as.character(out$candidate_adduct[idx_m])
       )
-      out$.mass_diff[idx_m] <- abs(out$.candidate_M[idx_m] - out$.strong_M[idx_m])
+      out$.mass_diff[idx_m] <- abs(
+        out$.candidate_M[idx_m] - out$.strong_M[idx_m]
+      )
       out$.ppm_window[idx_m] <- tolerance_ppm *
         1e-6 *
         pmax(abs(out$.candidate_M[idx_m]), abs(out$.strong_M[idx_m]))
@@ -703,7 +709,10 @@ filter_annotations <- function(
   features_annotated_table_1 <- enforce_ms1_adduct_semantics(
     features_annotated_table_1
   )
-  adduct_semantics_audit <- attr(features_annotated_table_1, "adduct_semantics_audit")
+  adduct_semantics_audit <- attr(
+    features_annotated_table_1,
+    "adduct_semantics_audit"
+  )
   n_after_adduct_semantics <- nrow(features_annotated_table_1)
   n_removed_adduct_semantics <- max(
     0L,
