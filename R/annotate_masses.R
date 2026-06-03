@@ -239,6 +239,7 @@ annotate_masses <- function(
     ms_mode = ms_mode,
     tolerance_ppm = tolerance_ppm,
     tolerance_rt = tolerance_rt,
+    tolerance_dalton = tolerance_dalton,
     cfg = cfg,
     exact_masses = lib$em_windows$exact_mass
   )
@@ -447,6 +448,7 @@ discover_annotate_masses_edge_sets <- function(
   ms_mode,
   tolerance_ppm,
   tolerance_rt,
+  tolerance_dalton,
   cfg,
   exact_masses
 ) {
@@ -856,4 +858,3 @@ enforce_non_conflicting_annotation_states <- function(
   )
   out
 }
-

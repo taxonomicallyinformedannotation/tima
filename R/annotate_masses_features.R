@@ -185,12 +185,12 @@ log_top_pair_deltas <- function(pairs) {
   if (nrow(pairs) == 0L) {
     return(invisible(NULL))
   }
-  bins <- pairs[, .N, by = .(bin = cut(delta, breaks = 10000L))] |>
+  bins <- pairs[, .N, by = .(bin = cut(delta, breaks = 100000L))] |>
     tidytable::arrange(tidytable::desc(N)) |>
-    tidytable::slice_head(n = 10L)
+    tidytable::slice_head(n = 16L)
   bins <- add_percentage_column(bins, count_col = "N", out_col = "Pct")
   log_info(
-    "Here are the top 10 observed m/z differences inside the RT windows:"
+    "Here are the top 16 observed m/z differences inside the RT windows:"
   )
   log_info(
     "\n%s",

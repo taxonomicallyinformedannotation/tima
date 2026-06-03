@@ -30,7 +30,7 @@ empty_evidence_table <- function() {
 #' an m/z chain inside the cluster — O(n) edges per cluster instead of O(n^2).
 #'
 #' @keywords internal
-build_evidence_edges <- function(hyps) {
+build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
   if (nrow(hyps) == 0L) {
     return(tidytable::tidytable(
       feature_id = character(),
@@ -41,7 +41,7 @@ build_evidence_edges <- function(hyps) {
   }
 
   dt <- tidytable::as_tidytable(hyps)[,
-    .(feature_id, mz, adduct, evidence_cluster, evidence_count)
+    .(feature_id, mz, adduct, evidence_cluster, evidence_count, implied_M)
   ]
   dt <- dt[!is.na(evidence_cluster)]
   if (nrow(dt) == 0L) {
@@ -72,9 +72,24 @@ build_evidence_edges <- function(hyps) {
     adduct_dest := c(as.character(adduct[-1L]), NA_character_),
     by = evidence_cluster
   ]
+  reps[,
+    implied_M_dest := c(as.numeric(implied_M[-1L]), NA_real_),
+    by = evidence_cluster
+  ]
+
+  # Only link sequential features if their implied M values are compatible
+  reps <- reps |>
+    tidytable::mutate(
+      m_compatible = {
+        m_diff <- abs(implied_M - implied_M_dest)
+        m_max <- pmax(implied_M, implied_M_dest, na.rm = TRUE)
+        ppm_tol <- tolerance_ppm * 1e-6 * m_max
+        (m_diff <= ppm_tol) | is.na(implied_M_dest)
+      }
+    )
 
   out <- reps[
-    !is.na(feature_id_dest),
+    !is.na(feature_id_dest) & m_compatible,
     .(feature_id, adduct, feature_id_dest, adduct_dest)
   ]
   out <- unique(out)
