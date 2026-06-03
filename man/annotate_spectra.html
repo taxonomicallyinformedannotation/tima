@@ -682,6 +682,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   cutoff = get_params(step = "annotate_spectra")\$ms\$thresholds\$ms2\$intensity,
   min_fragments = get_params(step = "annotate_spectra")\$ms\$thresholds\$ms2\$min_fragments,
   approx = get_params(step = "annotate_spectra")\$annotations\$ms2approx,
+  ms1_annotations = NULL,
   qutoff = deprecated()
 )
 </code></pre>
@@ -775,6 +776,14 @@ integer Minimum number of fragment peaks a spectrum must have after cleaning to 
 </td>
 <td>
 logical If TRUE perform matching ignoring precursor masses (broader, slower); if FALSE restrict library to precursor-tolerant spectra first.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="ms1_annotations">ms1_annotations</code>
+</td>
+<td>
+Optional path or data frame containing <code>annotate_masses()</code> output. When provided, query adducts are taken from the MS1 primary assignment (preferably <code>primary</code> + <code>supported_strong</code>) by <code>feature_id</code>, and MGF adduct metadata is used only as fallback.
 </td>
 </tr>
 <tr>

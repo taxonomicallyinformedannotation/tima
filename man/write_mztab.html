@@ -665,7 +665,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Exports TIMA weighted-annotation results to mzTab-M 2.1.0 plain-text format. The output is a compliant mzTab-M file containing:</p>
 <ul>
 <li>
-<p><strong>MTD</strong> – metadata (software, database, instrument, confidence measures, ms_run, sample, assay, study_variable).</p>
+<p><strong>MTD</strong> – metadata (software, database, instrument, evidence measures, ms_run, sample, assay, study_variable).</p>
 </li>
 <li>
 <p><strong>SMF</strong> – one row per chromatographic feature (feature_id, m/z, RT).</p>
@@ -867,7 +867,7 @@ mzTab-M reliability mapping
 <h4 class="anchored">
 id_confidence_measure columns
 </h4>
-<p>Four TIMA-specific confidence measures are exported as <code style="white-space: pre;">id_confidence_measure[1..4]</code> in the MTD section and as additional columns in the SME section. All use the <code>TIMA</code> user-controlled CV namespace (no PSI-MS accession exists for these composite scores):</p>
+<p>Four TIMA-specific evidence measures are exported as <code style="white-space: pre;">id_confidence_measure[1..4]</code> in the MTD section and as additional columns in the SME section. All use the <code>TIMA</code> user-controlled CV namespace (no PSI-MS accession exists for these composite scores):</p>
 <ul>
 <li>
 <p><code style="white-space: pre;">[1]</code> – <code>score_final</code> (combined TIMA score; <code>TIMA:001</code>)</p>

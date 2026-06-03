@@ -661,7 +661,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="clean-chemical-annotations">Clean Chemical Annotations</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>Cleans and filters chemically weighted annotation results through a multi-tier pipeline. Applies MS1 score thresholds, percentile filtering, ranking, and optional high-confidence filtering. Returns three-tier output: full (comprehensive), filtered (top candidates), and mini (one row per feature).</p>
+<p>Cleans and filters chemically weighted annotation results through a multi-tier pipeline. Applies MS1 score thresholds, percentile filtering, ranking, and optional high-evidence filtering. Returns three-tier output: full (comprehensive), filtered (top candidates), and mini (one row per feature).</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -676,7 +676,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   minimal_ms1_chemo,
   minimal_ms1_condition,
   compounds_names,
-  high_confidence,
+  high_evidence,
   remove_ties,
   summarize,
   score_chemical_cla_kingdom = 0.2,
@@ -776,10 +776,10 @@ Logical, include compound names in output (may increase size)
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="high_confidence">high_confidence</code>
+<code id="high_evidence">high_evidence</code>
 </td>
 <td>
-Logical, apply strict high-confidence filters
+Logical, apply strict high-evidence filters
 </td>
 </tr>
 <tr>
@@ -880,7 +880,7 @@ Optional data frame with columns inchikey/prefix/id from get_compounds_xrefs(), 
 full
 </dt>
 <dd>
-All annotations (optionally high-confidence filtered)
+All annotations (optionally high-evidence filtered)
 </dd>
 <dt>
 filtered
@@ -898,7 +898,7 @@ One row per feature with best compound/taxonomy
 </section>
 <section id="see-also" class="level3">
 <h3 class="anchored" data-anchor-id="see-also">See Also</h3>
-<p><code>weight_chemo</code>, <code>filter_high_confidence_only</code>, <code>summarize_results</code></p>
+<p><code>weight_chemo</code>, <code>filter_high_evidence_only</code>, <code>summarize_results</code></p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
@@ -916,7 +916,7 @@ One row per feature with best compound/taxonomy
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">minimal_ms1_chemo =</span> <span class="fl">0.5</span>,</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">minimal_ms1_condition =</span> <span class="st">"OR"</span>,</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">compounds_names =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">high_confidence =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">high_evidence =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">remove_ties =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">summarize =</span> <span class="cn">FALSE</span></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>

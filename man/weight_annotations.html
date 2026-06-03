@@ -744,7 +744,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "weight_annotations")\$annotations\$thresholds\$ms1\$condition,
   ms1_only = get_params(step = "weight_annotations")\$annotations\$ms1only,
   compounds_names = get_params(step = "weight_annotations")\$options\$compounds_names,
-  high_confidence = get_params(step = "weight_annotations")\$options\$high_confidence,
+  high_evidence = get_params(step = "weight_annotations")\$options\$high_evidence,
   remove_ties = get_params(step = "weight_annotations")\$options\$remove_ties,
   summarize = get_params(step = "weight_annotations")\$options\$summarize,
   pattern = get_params(step = "weight_annotations")\$files\$pattern,
@@ -1118,10 +1118,10 @@ Report compounds names. Can be very large. BOOLEAN
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="high_confidence">high_confidence</code>
+<code id="high_evidence">high_evidence</code>
 </td>
 <td>
-Report high confidence candidates only. BOOLEAN
+Report high evidence candidates only. BOOLEAN
 </td>
 </tr>
 <tr>

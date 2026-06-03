@@ -607,12 +607,13 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#tima-2.13.0.9000-unreleased" id="toc-tima-2.13.0.9000-unreleased" class="nav-link active" data-scroll-target="#tima-2.13.0.9000-unreleased">tima 2.13.0.9000 (unreleased)</a>
   <ul class="collapse">
   <li><a href="#new-features" id="toc-new-features" class="nav-link" data-scroll-target="#new-features">New features</a></li>
+  <li><a href="#internal-performance" id="toc-internal-performance" class="nav-link" data-scroll-target="#internal-performance">Internal / performance</a></li>
   </ul></li>
   <li><a href="#tima-2.13.0" id="toc-tima-2.13.0" class="nav-link" data-scroll-target="#tima-2.13.0">tima 2.13.0</a>
   <ul class="collapse">
   <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link" data-scroll-target="#breaking-changes">Breaking changes</a></li>
   <li><a href="#new-features-1" id="toc-new-features-1" class="nav-link" data-scroll-target="#new-features-1">New features</a></li>
-  <li><a href="#internal-performance" id="toc-internal-performance" class="nav-link" data-scroll-target="#internal-performance">Internal / performance</a></li>
+  <li><a href="#internal-performance-1" id="toc-internal-performance-1" class="nav-link" data-scroll-target="#internal-performance-1">Internal / performance</a></li>
   <li><a href="#bug-fixes" id="toc-bug-fixes" class="nav-link" data-scroll-target="#bug-fixes">Bug fixes</a></li>
   <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
   <li><a href="#data-updates" id="toc-data-updates" class="nav-link" data-scroll-target="#data-updates">Data updates</a></li>
@@ -622,7 +623,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#breaking-changes-1" id="toc-breaking-changes-1" class="nav-link" data-scroll-target="#breaking-changes-1">Breaking changes</a></li>
   <li><a href="#new-features-2" id="toc-new-features-2" class="nav-link" data-scroll-target="#new-features-2">New features</a></li>
   <li><a href="#bug-fixes-1" id="toc-bug-fixes-1" class="nav-link" data-scroll-target="#bug-fixes-1">Bug fixes</a></li>
-  <li><a href="#internal-performance-1" id="toc-internal-performance-1" class="nav-link" data-scroll-target="#internal-performance-1">Internal / performance</a></li>
+  <li><a href="#internal-performance-2" id="toc-internal-performance-2" class="nav-link" data-scroll-target="#internal-performance-2">Internal / performance</a></li>
   <li><a href="#documentation-1" id="toc-documentation-1" class="nav-link" data-scroll-target="#documentation-1">Documentation</a></li>
   <li><a href="#data-updates-1" id="toc-data-updates-1" class="nav-link" data-scroll-target="#data-updates-1">Data updates</a></li>
   </ul></li>
@@ -681,6 +682,38 @@ ul.task-list li input[type="checkbox"] {
 <li>Added PubChem Lite as a new exposomics library, prepared through the same HMDB-like workflow as other SOP sources and flagged as <code>xenobiotic</code> (<code>Q409205</code>)</li>
 </ul>
 </section>
+<section id="internal-performance" class="level2">
+<h2 class="anchored" data-anchor-id="internal-performance">Internal / performance</h2>
+<ul>
+<li><strong>MS1 adduct annotation improvements</strong> in <code>annotate_masses()</code>:
+<ul>
+<li>Enforced tier-aware minimum support thresholds in evidence discovery: exotic adducts (tier 3+) now require stronger peer evidence (≥2 independent supporting neighbors) while common adducts (tier ≤1) are always inferred</li>
+<li>Added hybrid evidence recovery fallback: when library exact-mass anchoring is restrictive, supplemental evidence pass recovers supported adduct hypotheses for previously unanchored features, improving coverage without sacrificing specificity</li>
+<li>Added adduct-delta match quality metrics (<code>delta_error_da</code>, <code>delta_error_ppm</code>, <code>edge_match_score</code>) in pairwise matching to weight edges by mass accuracy</li>
+<li>Replaced single-chain evidence-edge linking with sparse k-nearest m/z linking per cluster, improving triangulation signal while preserving O(n*k) scalability</li>
+<li>Re-enabled structural plausibility filter: loss-based annotations are now demoted to unmatched when the formula cannot satisfy required atoms (e.g., <code>[M-H2O]</code> on a formula lacking oxygen)</li>
+<li>Upgraded graph-level consistency enforcement from single-pass greedy to multi-start neighbor-aware optimization: assigns adduct states to maximize coverage-aware objectives (edge satisfaction, neighbor agreement, prior support) and favors states consistent across multiple neighbors over isolated high-scoring alternatives</li>
+</ul></li>
+<li><strong>Adduct canonicalization alignment</strong>:
+<ul>
+<li>Unified canonical adduct string ordering across structured universe generation (<code>adduct_to_string()</code>) and text harmonization (<code>canonicalize_adduct_notation()</code>)</li>
+<li>Canonical order is now chemically consistent and deterministic: negative terms first (losses / deprotonations), then neutral cluster additions, then positive charge carriers</li>
+<li>Updated regression tests to use canonical forms (e.g., <code>[M-H2O+H]+</code>, <code>[M+H2O+H]+</code>, <code>[M+NaCl+K]+</code>)</li>
+</ul></li>
+<li><strong>Electron-mass correctness in legacy neutral-mass math</strong>:
+<ul>
+<li><code>calculate_mass_of_m()</code>, <code>calculate_mz_from_mass()</code>, and <code>calculate_mass_of_m_batch()</code> now apply signed electron-mass correction (<code>z * m_e</code>) consistently</li>
+<li>Legacy inversion/forward formulas are now physically aligned with typed-universe mass arithmetic</li>
+<li>Consolidated electron-mass precision to a single CODATA 2018 value (<code>ELECTRON_MASS_DALTONS = 0.000548579909065</code>) and reused it as <code>ELECTRON_MASS_DA</code></li>
+</ul></li>
+<li><strong>Cross-stage adduct coupling (MS1 ↔︎ MS2 ↔︎ reranking)</strong>:
+<ul>
+<li>Reinforced the bridge from MS1 adduct attribution to spectral annotation matching and final candidate reranking</li>
+<li>Final percentile filtering now preserves rank-1/consensus-promoted entities, so cluster-consensus adduct attribution decisions are not lost when raw chemical scores are lower</li>
+<li>This keeps adduct-consistent entities available for downstream spectral agreement and final ranking outputs</li>
+</ul></li>
+</ul>
+</section>
 </section>
 <section id="tima-2.13.0" class="level1">
 <h1>tima 2.13.0</h1>
@@ -724,8 +757,8 @@ ul.task-list li input[type="checkbox"] {
 </ul></li>
 </ul>
 </section>
-<section id="internal-performance" class="level2">
-<h2 class="anchored" data-anchor-id="internal-performance">Internal / performance</h2>
+<section id="internal-performance-1" class="level2">
+<h2 class="anchored" data-anchor-id="internal-performance-1">Internal / performance</h2>
 <ul>
 <li>Improved log and error messages</li>
 <li>More in-depth molecular sanitization</li>
@@ -786,8 +819,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Fixed memory crashes in case of large number of ties, limiting to 7 with note (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/216">#216</a>)</li>
 </ul>
 </section>
-<section id="internal-performance-1" class="level2">
-<h2 class="anchored" data-anchor-id="internal-performance-1">Internal / performance</h2>
+<section id="internal-performance-2" class="level2">
+<h2 class="anchored" data-anchor-id="internal-performance-2">Internal / performance</h2>
 <ul>
 <li>Externalized spectral libraries preparation to <a href="https://github.com/Adafede/SpectRalLibRaRies">SpectRalLibRaRies</a></li>
 <li>Implemented GNPS similarity method in C</li>

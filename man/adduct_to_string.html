@@ -625,7 +625,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="unnumbered anchored" data-anchor-id="build-the-canonical-adduct-string-from-typed-components.">Build the canonical adduct string from typed components.</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>Format (outside-multimer, default): <code style="white-space: pre;">[&lt;n&gt;M&lt;carriers&gt;&lt;+clusters&gt;&lt;-losses&gt;]&lt;|z|&gt;&lt;sign&gt;</code> Format (inside-multimer, when <code>loss_inside_multimer</code> or <code>cluster_inside_multimer</code> is <code>TRUE</code> and <code>n_mer &gt;= 2</code>): <code style="white-space: pre;">[&lt;n&gt;(M&lt;inside-clusters&gt;&lt;inside-losses&gt;)&lt;carriers&gt;&lt;+outside-clusters&gt;&lt;-outside-losses&gt;]&lt;|z|&gt;&lt;sign&gt;</code></p>
+<p>Format (outside-multimer, canonical): <code style="white-space: pre;">[&lt;n&gt;M&lt;-losses&gt;&lt;-carrier-losses&gt;&lt;+clusters&gt;&lt;+carriers&gt;]&lt;|z|&gt;&lt;sign&gt;</code> Format (inside-multimer, when <code>loss_inside_multimer</code> or <code>cluster_inside_multimer</code> is <code>TRUE</code> and <code>n_mer &gt;= 2</code>): <code style="white-space: pre;">[&lt;n&gt;(M&lt;inside-losses&gt;&lt;inside-clusters&gt;)&lt;outside-losses&gt;&lt;outside-clusters&gt;&lt;carriers&gt;]&lt;|z|&gt;&lt;sign&gt;</code></p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
