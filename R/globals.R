@@ -554,7 +554,7 @@ utils::globalVariables(
     ".has_ms2_evidence",
     ".has_strong",
     ".is_anchor_feature",
-    ".is_ms1_row"
+    ".is_ms1_row",
     ".is_spectral_row",
     ".keep_by_consensus",
     ".keep_by_percentile",
@@ -631,7 +631,7 @@ utils::globalVariables(
     "support_rank",
     "target_adduct",
     "target_library",
-    "target_name"
+    "target_name",
     "target_spectrum_id"
   )
 )
