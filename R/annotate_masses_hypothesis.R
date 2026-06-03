@@ -1476,7 +1476,9 @@ prune_candidates_by_network_consensus <- function(
 #' @keywords internal
 propagate_annotations_across_m_cliques <- function(
   annotations,
-  node_hypotheses
+  node_hypotheses,
+  tolerance_ppm = 10,
+  tolerance_dalton = 0.005
 ) {
   # Early exit if no matched annotations or no clique info
   if (nrow(annotations) == 0L) {
@@ -1498,11 +1500,22 @@ propagate_annotations_across_m_cliques <- function(
     return(annotations)
   }
 
-  # For each matched annotation, propagate to clique members
+  # For each matched annotation, propagate only to targets that are compatible
+  # with the same adduct state and neutral mass window.
   propagated_list <- list()
   for (i in seq_len(nrow(matched))) {
     matched_row <- matched[i, , drop = FALSE]
     source_feature <- matched_row$feature_id[[1]]
+    source_adduct <- if ("adduct" %in% names(matched_row)) {
+      matched_row$adduct[[1]]
+    } else {
+      NA_character_
+    }
+    source_mass <- if ("mass" %in% names(matched_row)) {
+      as.numeric(matched_row$mass[[1]])
+    } else {
+      NA_real_
+    }
 
     # Find component of source feature
     src_component <- component_membership |>
@@ -1552,14 +1565,49 @@ propagate_annotations_across_m_cliques <- function(
         next
       }
 
+      # Require explicit adduct compatibility in target hypotheses.
+      target_hyp <- node_hypotheses |>
+        tidytable::filter(
+          feature_id == target_fid,
+          !is.na(adduct),
+          adduct == source_adduct
+        )
+
+      if (nrow(target_hyp) == 0L) {
+        next
+      }
+
+      target_mass_candidates <- as.numeric(target_hyp$mass)
+      target_mass_candidates <- target_mass_candidates[
+        is.finite(target_mass_candidates) & target_mass_candidates > 0
+      ]
+      if (length(target_mass_candidates) == 0L) {
+        next
+      }
+
+      target_m_val <- as.numeric(target_m[[1]])
+      best_target_mass <- target_mass_candidates[[which.min(abs(
+        target_mass_candidates - target_m_val
+      ))]]
+
+      if (is.finite(source_mass) && source_mass > 0) {
+        mass_diff <- abs(best_target_mass - source_mass)
+        ppm_window <- tolerance_ppm * 1e-6 * max(source_mass, best_target_mass)
+        dalton_ok <- is.finite(tolerance_dalton) && mass_diff <= tolerance_dalton
+        if (!(mass_diff <= ppm_window || dalton_ok)) {
+          next
+        }
+      }
+
       propagated_row <- matched_row |>
         tidytable::mutate(
           feature_id = target_fid,
           mz = target_meta_row$mz[[1]],
           rt = target_meta_row$rt[[1]],
-          mass = target_m[[1]],
-          error_mz = as.numeric(structure_exact_mass) - target_m[[1]],
-          source = "propagated_clique"
+          adduct = source_adduct,
+          mass = best_target_mass,
+          error_mz = as.numeric(structure_exact_mass) - best_target_mass,
+          source = "propagated_clique_supported"
         )
       propagated_list[[length(propagated_list) + 1L]] <- propagated_row
     }

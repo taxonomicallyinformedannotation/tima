@@ -301,7 +301,9 @@ annotate_masses <- function(
   # ---- Step 9: propagate annotations across M-cliques ---------------------
   annotations <- propagate_annotations_across_m_cliques(
     annotations = annotations,
-    node_hypotheses = node_hypotheses
+    node_hypotheses = node_hypotheses,
+    tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton
   )
 
   supported_graph <- retain_supported_single_m_edges(
