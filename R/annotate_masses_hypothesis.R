@@ -1593,7 +1593,8 @@ propagate_annotations_across_m_cliques <- function(
       if (is.finite(source_mass) && source_mass > 0) {
         mass_diff <- abs(best_target_mass - source_mass)
         ppm_window <- tolerance_ppm * 1e-6 * max(source_mass, best_target_mass)
-        dalton_ok <- is.finite(tolerance_dalton) && mass_diff <= tolerance_dalton
+        dalton_ok <- is.finite(tolerance_dalton) &&
+          mass_diff <= tolerance_dalton
         if (!(mass_diff <= ppm_window || dalton_ok)) {
           next
         }

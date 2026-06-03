@@ -175,3 +175,41 @@ test_that("log_consistency_audit is safe for null and populated audits", {
   expect_no_error(log_consistency_audit(NULL))
   expect_no_error(log_consistency_audit(list(n_kept = 1L, n_dropped = 2L)))
 })
+
+test_that("propagate_annotations_across_m_cliques only propagates to adduct-compatible targets", {
+  annotations <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M+NH4]+",
+    mass = 300,
+    mz = calculate_mz_from_mass(300, "[M+NH4]+"),
+    rt = 1,
+    structure_exact_mass = 300,
+    source = "pair"
+  )
+
+  node_hypotheses <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F2"),
+    adduct = c("[M+NH4]+", "[M+H]+", "[M+Na]+"),
+    mass = c(300, 300, 300),
+    mz = c(
+      calculate_mz_from_mass(300, "[M+NH4]+"),
+      calculate_mz_from_mass(300, "[M+H]+"),
+      calculate_mz_from_mass(300, "[M+Na]+")
+    ),
+    rt = c(1, 1, 1)
+  )
+  attr(node_hypotheses, "component_membership") <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    component_id = c("C1", "C1")
+  )
+  attr(node_hypotheses, "feature_m_map") <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    component_id = c("C1", "C1"),
+    neutral_mass = c(300, 300)
+  )
+
+  out <- propagate_annotations_across_m_cliques(annotations, node_hypotheses)
+
+  # F2 has no [M+NH4]+ hypothesis, so no propagated row should be created.
+  expect_false(any(out$feature_id == "F2"))
+})

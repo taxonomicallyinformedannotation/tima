@@ -259,6 +259,47 @@ test_that("filter_high_confidence_only: MS1-only hits fail when no score passes"
   expect_equal(nrow(result), 0L)
 })
 
+test_that("filter_high_confidence_only makes promoted children follow parent decision", {
+  df <- tidytable::tidytable(
+    feature_id = c("A", "B", "C", "D"),
+    rank_final = c(1L, 1L, 1L, 1L),
+    score_biological = c(0.95, 0.10, 0.10, 0.95),
+    candidate_score_pseudo_initial = c(0.10, 0.10, 0.10, 0.10),
+    score_weighted_chemo = c(0.10, 0.10, 0.95, 0.10),
+    cluster_consensus_group_id = c("G1", "G1", "G2", "G2"),
+    cluster_consensus_anchor_feature_id = c("A", "A", "C", "C"),
+    cluster_consensus_promoted_from_anchor = c(FALSE, TRUE, FALSE, TRUE)
+  )
+
+  out <- filter_high_confidence_only(
+    df,
+    score_bio_min = 0.85,
+    score_ini_min = 0.95,
+    score_final_min = 0.75,
+    confidence_sirius_min = NULL,
+    similarity_spectral_min = NULL,
+    matched_peaks_min = NULL
+  )
+
+  # G1: anchor A passes, promoted child B must be retained.
+  # G2: anchor C passes as well, promoted child D retained.
+  expect_true(all(c("A", "B", "C", "D") %in% out$feature_id))
+
+  # Now make second anchor fail; child must fail too.
+  df$score_weighted_chemo[df$feature_id == "C"] <- 0.10
+  out2 <- filter_high_confidence_only(
+    df,
+    score_bio_min = 0.85,
+    score_ini_min = 0.95,
+    score_final_min = 0.75,
+    confidence_sirius_min = NULL,
+    similarity_spectral_min = NULL,
+    matched_peaks_min = NULL
+  )
+  expect_true(all(c("A", "B") %in% out2$feature_id))
+  expect_false(any(c("C", "D") %in% out2$feature_id))
+})
+
 test_that("filter_high_confidence_only removes candidates with 0 matched peaks", {
   # Candidates with 0 matched peaks are invalid (no peaks matched)
   df <- tidytable::tidytable(

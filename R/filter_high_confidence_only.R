@@ -196,6 +196,7 @@ filter_high_confidence_only <- function(
 
   df_work <- df |>
     tidytable::mutate(
+      .row_id = tidytable::row_number(),
       .score_bio = as.numeric(.data[["score_biological"]]),
       .score_ini = as.numeric(.data[["candidate_score_pseudo_initial"]]),
       .score_final = as.numeric(.data[["score_weighted_chemo"]]),
@@ -307,9 +308,77 @@ filter_high_confidence_only <- function(
       )
   }
 
+  # Enforce parent-following semantics for cluster-consensus-promoted children.
+  # Promoted rank-1 rows inherit the high-confidence pass/fail of their anchor.
+  has_consensus_cols <- all(
+    c(
+      "cluster_consensus_promoted_from_anchor",
+      "cluster_consensus_group_id",
+      "cluster_consensus_anchor_feature_id",
+      "rank_final"
+    ) %in%
+      names(df_work)
+  )
+  if (has_consensus_cols) {
+    promoted_rank1 <- df_work |>
+      tidytable::filter(
+        !is.na(cluster_consensus_group_id),
+        cluster_consensus_promoted_from_anchor %in% TRUE,
+        rank_final == 1L
+      ) |>
+      tidytable::select(.row_id, cluster_consensus_group_id)
+
+    if (nrow(promoted_rank1) > 0L) {
+      anchor_rank1 <- df_work |>
+        tidytable::filter(
+          !is.na(cluster_consensus_group_id),
+          feature_id == cluster_consensus_anchor_feature_id,
+          rank_final == 1L
+        ) |>
+        tidytable::distinct(cluster_consensus_group_id, .row_id)
+
+      anchor_pass <- anchor_rank1 |>
+        tidytable::mutate(
+          .anchor_pass = .row_id %in% df_filtered$.row_id
+        ) |>
+        tidytable::summarize(
+          .anchor_pass = any(.anchor_pass),
+          .by = cluster_consensus_group_id
+        )
+
+      promoted_rank1 <- promoted_rank1 |>
+        tidytable::left_join(anchor_pass, by = "cluster_consensus_group_id") |>
+        tidytable::mutate(
+          .anchor_pass = tidytable::coalesce(.anchor_pass, FALSE)
+        )
+
+      keep_child_row_ids <- promoted_rank1 |>
+        tidytable::filter(.anchor_pass) |>
+        tidytable::pull(.row_id)
+      drop_child_row_ids <- promoted_rank1 |>
+        tidytable::filter(!.anchor_pass) |>
+        tidytable::pull(.row_id)
+
+      df_filtered <- df_filtered |>
+        tidytable::filter(!(.row_id %in% drop_child_row_ids))
+
+      add_back <- df_work |>
+        tidytable::filter(.row_id %in% keep_child_row_ids) |>
+        tidytable::anti_join(
+          df_filtered |> tidytable::select(.row_id),
+          by = ".row_id"
+        )
+
+      if (nrow(add_back) > 0L) {
+        df_filtered <- tidytable::bind_rows(df_filtered, add_back)
+      }
+    }
+  }
+
   # Drop helper columns
   df_filtered <- df_filtered |>
     tidytable::select(
+      -tidyselect::any_of(".row_id"),
       -tidyselect::starts_with(match = ".score_"),
       -tidyselect::starts_with(match = ".rt_err_")
     )

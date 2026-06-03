@@ -866,7 +866,15 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     tidytable::select(
       component_id,
       .candidate_M,
+      .anchor_feature_id = feature_id,
       .anchor_ik = candidate_structure_inchikey_connectivity_layer
+    ) |>
+    tidytable::mutate(
+      cluster_consensus_group_id = paste(
+        component_id,
+        sprintf("%.6f", .candidate_M),
+        sep = "::"
+      )
     )
 
   n_anchor_groups <- nrow(anchor_lookup)
@@ -903,7 +911,8 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
       # For each feature in reorder set, check if it HAS the anchor IK
       tidytable::mutate(
         .has_anchor_ik = candidate_structure_inchikey_connectivity_layer ==
-          .anchor_ik
+          .anchor_ik,
+        .is_anchor_feature = feature_id == .anchor_feature_id
       )
 
     # Identify which (feature_id, component_id, .candidate_M) groups actually
@@ -929,13 +938,23 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
         tidytable::mutate(
           rank_final = tidytable::row_number(),
           .by = c(feature_id, component_id, .candidate_M),
+          cluster_consensus_group_id = tidytable::coalesce(
+            cluster_consensus_group_id,
+            paste(component_id, sprintf("%.6f", .candidate_M), sep = "::")
+          ),
+          cluster_consensus_anchor_feature_id = .anchor_feature_id,
+          cluster_consensus_anchor_inchikey = .anchor_ik,
+          cluster_consensus_applied = TRUE,
+          cluster_consensus_promoted_from_anchor = .has_anchor_ik &
+            rank_final == 1L &
+            !.is_anchor_feature,
           .existing_note = if (has_annotation_note) {
             annotation_note
           } else {
             NA_character_
           },
           annotation_note = tidytable::if_else(
-            condition = .has_anchor_ik & rank_final == 1L,
+            condition = cluster_consensus_promoted_from_anchor,
             true = "Promoted to rank 1: cluster entity consensus (same M across component)",
             false = .existing_note
           )
@@ -944,7 +963,9 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
           -tidyselect::all_of(c(
             ".candidate_M",
             ".has_anchor_ik",
+            ".is_anchor_feature",
             ".anchor_ik",
+            ".anchor_feature_id",
             ".existing_note",
             ".has_ms2_evidence"
           ))
@@ -955,6 +976,10 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
         tidytable::anti_join(
           y = groups_with_anchor,
           by = c("feature_id", "component_id", ".candidate_M")
+        ) |>
+        tidytable::mutate(
+          cluster_consensus_applied = FALSE,
+          cluster_consensus_promoted_from_anchor = FALSE
         ) |>
         tidytable::select(
           -tidyselect::all_of(c(
@@ -979,6 +1004,10 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
 
   # No reordering needed; clean up temporary columns
   df_with_comp |>
+    tidytable::mutate(
+      cluster_consensus_applied = FALSE,
+      cluster_consensus_promoted_from_anchor = FALSE
+    ) |>
     tidytable::select(
       -tidyselect::any_of(c(
         ".candidate_M",

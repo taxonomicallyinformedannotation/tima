@@ -623,3 +623,47 @@ test_that("filter_annotations accepts RT libraries already using rt_target", {
 
   expect_true(file.exists(res))
 })
+
+test_that("enforce_ms1_adduct_semantics drops incompatible non-MS1 adducts and keeps exact matches", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F1"),
+    mz = c(200, 200, 200),
+    candidate_library = c("TIMA MS1", "spectral", "spectral"),
+    candidate_adduct = c("[M+NH4]+", "[M+H]+", "[M+NH4]+"),
+    candidate_annotation_level = c("primary", NA, NA),
+    candidate_confidence_tier = c("supported_strong", NA, NA)
+  )
+
+  out <- enforce_ms1_adduct_semantics(df)
+
+  # Non-MS1 [M+H]+ is incompatible with strong [M+NH4]+ at same m/z and must drop.
+  expect_false(any(
+    out$candidate_library == "spectral" & out$candidate_adduct == "[M+H]+"
+  ))
+  expect_true(any(
+    out$candidate_library == "spectral" & out$candidate_adduct == "[M+NH4]+"
+  ))
+  expect_true(any(out$candidate_adduct_match_mode == "exact_adduct"))
+})
+
+test_that("enforce_ms1_adduct_semantics tags neutral-mass rescue as m_delta_rescued", {
+  m_ref <- 300
+  mz_ms1 <- calculate_mz_from_mass(m_ref, "[M+NH4]+")
+  mz_spec <- calculate_mz_from_mass(m_ref, "[M+H]+")
+
+  df <- tidytable::tidytable(
+    feature_id = c("F2", "F2"),
+    mz = c(mz_ms1, mz_spec),
+    candidate_library = c("TIMA MS1", "spectral"),
+    candidate_adduct = c("[M+NH4]+", "[M+H]+"),
+    candidate_annotation_level = c("primary", NA),
+    candidate_confidence_tier = c("supported_strong", NA)
+  )
+
+  out <- enforce_ms1_adduct_semantics(df)
+  rescued <- out |>
+    tidytable::filter(candidate_library == "spectral")
+
+  expect_equal(nrow(rescued), 1L)
+  expect_identical(rescued$candidate_adduct_match_mode[[1L]], "m_delta_rescued")
+})

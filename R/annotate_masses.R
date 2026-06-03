@@ -531,15 +531,23 @@ append_component_weak_hypotheses <- function(
   }
 
   component_m <- feature_m_map |>
-    tidytable::filter(!is.na(neutral_mass) & is.finite(neutral_mass) & neutral_mass > 0) |>
-    tidytable::summarize(component_mass = stats::median(neutral_mass), .by = component_id)
+    tidytable::filter(
+      !is.na(neutral_mass) & is.finite(neutral_mass) & neutral_mass > 0
+    ) |>
+    tidytable::summarize(
+      component_mass = stats::median(neutral_mass),
+      .by = component_id
+    )
   if (nrow(component_m) == 0L) {
     return(node_hypotheses)
   }
 
   supported_features <- node_hypotheses |>
     tidytable::mutate(
-      candidate_adduct_origin = tidytable::coalesce(candidate_adduct_origin, "supported")
+      candidate_adduct_origin = tidytable::coalesce(
+        candidate_adduct_origin,
+        "supported"
+      )
     ) |>
     tidytable::filter(candidate_adduct_origin == "supported") |>
     tidytable::distinct(feature_id)
@@ -610,12 +618,19 @@ append_component_weak_hypotheses <- function(
     base_candidates[0L, ]
   }
 
-  weak_all <- tidytable::bind_rows(base_candidates, loss_candidates, cluster_candidates) |>
+  weak_all <- tidytable::bind_rows(
+    base_candidates,
+    loss_candidates,
+    cluster_candidates
+  ) |>
     harmonize_adducts(adducts_translations = adducts_translations) |>
     tidytable::mutate(
       mz_expected = mapply(
         FUN = function(m, ad) {
-          calculate_mz_from_mass(neutral_mass = as.numeric(m), adduct_string = ad)
+          calculate_mz_from_mass(
+            neutral_mass = as.numeric(m),
+            adduct_string = ad
+          )
         },
         m = component_mass,
         ad = adduct,
@@ -688,7 +703,10 @@ retain_supported_single_m_edges <- function(
     ) |>
     tidytable::mutate(
       annotation_level = tidytable::coalesce(annotation_level, "primary"),
-      confidence_tier = tidytable::coalesce(confidence_tier, "supported_strong"),
+      confidence_tier = tidytable::coalesce(
+        confidence_tier,
+        "supported_strong"
+      ),
       is_supported = annotation_level == "primary" &
         confidence_tier == "supported_strong"
     )
@@ -787,7 +805,10 @@ retain_supported_single_m_edges <- function(
     tidytable::inner_join(comp_members, by = "feature_id") |>
     tidytable::inner_join(
       comp_members |>
-        tidytable::rename(feature_id_dest = feature_id, component_id_dest = component_id),
+        tidytable::rename(
+          feature_id_dest = feature_id,
+          component_id_dest = component_id
+        ),
       by = "feature_id_dest"
     ) |>
     tidytable::filter(component_id == component_id_dest) |>
@@ -798,7 +819,10 @@ retain_supported_single_m_edges <- function(
     tidytable::inner_join(comp_members, by = "feature_id") |>
     tidytable::inner_join(
       comp_members |>
-        tidytable::rename(feature_id_dest = feature_id, component_id_dest = component_id),
+        tidytable::rename(
+          feature_id_dest = feature_id,
+          component_id_dest = component_id
+        ),
       by = "feature_id_dest"
     ) |>
     tidytable::filter(component_id == component_id_dest) |>

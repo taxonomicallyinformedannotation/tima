@@ -143,3 +143,41 @@ test_that("coerce_score_columns handles all expected score column names", {
     expect_true(is.numeric(result[[col]]), info = col)
   }
 })
+
+test_that("enforce_cluster_entity_consensus annotates promoted children with anchor metadata", {
+  df_ranked <- tidytable::tidytable(
+    feature_id = c("A", "A", "B", "B"),
+    mz = c(101.0, 101.0, 101.0, 101.0),
+    candidate_adduct = c("[M+H]+", "[M+H]+", "[M+H]+", "[M+H]+"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK1",
+      "IK2",
+      "IK2",
+      "IK1"
+    ),
+    score_weighted_chemo = c(0.95, 0.60, 0.99, 0.40),
+    rank_final = c(1L, 2L, 1L, 2L)
+  )
+  components <- tidytable::tidytable(
+    feature_id = c("A", "B"),
+    component_id = c("C1", "C1")
+  )
+
+  out <- enforce_cluster_entity_consensus(df_ranked, components)
+
+  top <- out |>
+    tidytable::filter(rank_final == 1L)
+
+  expect_equal(nrow(top), 2L)
+  expect_true("cluster_consensus_group_id" %in% names(out))
+  expect_true("cluster_consensus_anchor_feature_id" %in% names(out))
+  expect_true("cluster_consensus_promoted_from_anchor" %in% names(out))
+
+  promoted <- out |>
+    tidytable::filter(cluster_consensus_promoted_from_anchor %in% TRUE)
+  expect_true(nrow(promoted) >= 1L)
+
+  promoted_anchor <- promoted |>
+    tidytable::distinct(cluster_consensus_anchor_feature_id)
+  expect_equal(nrow(promoted_anchor), 1L)
+})

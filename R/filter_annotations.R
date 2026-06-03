@@ -302,6 +302,253 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
     tidytable::select(-tidyselect::any_of(x = c("rt_target", "type")))
 }
 
+#' Enforce strong MS1 adduct semantics on non-MS1 annotations
+#'
+#' @description If a feature has a strong primary MS1 adduct assignment,
+#' non-MS1 candidates are constrained to either the same adduct state
+#' (`exact_adduct`) or a neutral-mass-consistent rescue (`m_delta_rescued`).
+#'
+#' @param features_annotated_table Data frame resulting from feature/annotation join
+#' @param tolerance_ppm Numeric ppm tolerance for neutral-mass rescue
+#' @param tolerance_dalton Numeric absolute tolerance for neutral-mass rescue
+#'
+#' @return Filtered data frame with `candidate_adduct_match_mode`
+#' @keywords internal
+enforce_ms1_adduct_semantics <- function(
+  features_annotated_table,
+  tolerance_ppm = 10,
+  tolerance_dalton = 0.005
+) {
+  if (nrow(features_annotated_table) == 0L) {
+    return(features_annotated_table)
+  }
+
+  required <- c("feature_id", "candidate_adduct")
+  if (!all(required %in% names(features_annotated_table))) {
+    return(features_annotated_table)
+  }
+
+  out <- features_annotated_table
+  if (!"candidate_adduct_match_mode" %in% names(out)) {
+    out$candidate_adduct_match_mode <- NA_character_
+  }
+  if (!"annotation_note" %in% names(out)) {
+    out$annotation_note <- NA_character_
+  }
+
+  # Parse adduct text once per unique adduct to avoid O(n) parser calls on
+  # large annotation tables.
+  adduct_values <- unique(stats::na.omit(as.character(out$candidate_adduct)))
+  adduct_state_map <- build_adduct_state_key_map(adduct_values) |>
+    tidytable::rename(
+      candidate_adduct = adduct,
+      adduct_state_key = state_key
+    )
+
+  is_ms1_row <- if ("candidate_library" %in% names(out)) {
+    grepl("ms1", tolower(as.character(out$candidate_library)), fixed = TRUE)
+  } else {
+    rep(FALSE, nrow(out))
+  }
+
+  has_ms1_semantics <- all(
+    c(
+      "candidate_annotation_level",
+      "candidate_confidence_tier"
+    ) %in%
+      names(out)
+  )
+  if (has_ms1_semantics) {
+    is_ms1_row <- is_ms1_row |
+      (!is.na(out$candidate_annotation_level) |
+        !is.na(out$candidate_confidence_tier))
+  }
+
+  strong_ms1 <- out |>
+    tidytable::filter(is_ms1_row) |>
+    tidytable::filter(!is.na(candidate_adduct) & nzchar(candidate_adduct))
+
+  if (
+    all(
+      c("candidate_annotation_level", "candidate_confidence_tier") %in%
+        names(strong_ms1)
+    )
+  ) {
+    strong_ms1 <- strong_ms1 |>
+      tidytable::filter(
+        candidate_annotation_level == "primary",
+        candidate_confidence_tier == "supported_strong"
+      )
+  }
+
+  if (!"mz" %in% names(strong_ms1) || nrow(strong_ms1) == 0L) {
+    out$candidate_adduct_match_mode <- tidytable::coalesce(
+      out$candidate_adduct_match_mode,
+      tidytable::if_else(is_ms1_row, "ms1_reference", "unconstrained")
+    )
+    return(out)
+  }
+
+  if (!"candidate_structure_error_mz" %in% names(strong_ms1)) {
+    strong_ms1$candidate_structure_error_mz <- NA_real_
+  }
+  strong_map <- strong_ms1 |>
+    tidytable::left_join(adduct_state_map, by = "candidate_adduct") |>
+    tidytable::mutate(
+      .strong_state_key = tidytable::coalesce(
+        adduct_state_key,
+        candidate_adduct
+      ),
+      .strong_M = compute_candidate_M(
+        mz = as.numeric(mz),
+        adduct_string = as.character(candidate_adduct)
+      )
+    ) |>
+    tidytable::arrange(
+      feature_id,
+      abs(as.numeric(candidate_structure_error_mz))
+    ) |>
+    tidytable::distinct(feature_id, .keep_all = TRUE) |>
+    tidytable::select(
+      feature_id,
+      .strong_adduct = candidate_adduct,
+      .strong_state_key,
+      .strong_M
+    )
+
+  if (nrow(strong_map) == 0L) {
+    out$candidate_adduct_match_mode <- tidytable::coalesce(
+      out$candidate_adduct_match_mode,
+      tidytable::if_else(is_ms1_row, "ms1_reference", "unconstrained")
+    )
+    return(out)
+  }
+
+  n_rows <- nrow(out)
+  out <- out |>
+    tidytable::left_join(strong_map, by = "feature_id") |>
+    tidytable::left_join(adduct_state_map, by = "candidate_adduct") |>
+    tidytable::mutate(
+      .is_ms1_row = is_ms1_row,
+      .is_spectral_row = if ("candidate_library" %in% names(out)) {
+        grepl("spectral", tolower(as.character(candidate_library)), fixed = TRUE)
+      } else {
+        !.is_ms1_row
+      },
+      .has_strong = !is.na(.strong_state_key),
+      .candidate_state_key = tidytable::coalesce(
+        adduct_state_key,
+        candidate_adduct
+      ),
+      .exact_adduct_match = !is.na(.candidate_state_key) &
+        !is.na(.strong_state_key) &
+        .candidate_state_key == .strong_state_key,
+      .needs_m_check = !.is_ms1_row &
+        .has_strong &
+        !is.na(candidate_adduct) &
+        !.exact_adduct_match,
+      .candidate_M = rep(NA_real_, n_rows),
+      .mass_diff = NA_real_,
+      .ppm_window = NA_real_,
+      .m_delta_rescued = FALSE
+    )
+
+  if ("mz" %in% names(out)) {
+    idx_m <- which(out$.needs_m_check)
+    if (length(idx_m) > 0L) {
+      out$.candidate_M[idx_m] <- compute_candidate_M(
+        mz = as.numeric(out$mz[idx_m]),
+        adduct_string = as.character(out$candidate_adduct[idx_m])
+      )
+      out$.mass_diff[idx_m] <- abs(out$.candidate_M[idx_m] - out$.strong_M[idx_m])
+      out$.ppm_window[idx_m] <- tolerance_ppm *
+        1e-6 *
+        pmax(abs(out$.candidate_M[idx_m]), abs(out$.strong_M[idx_m]))
+      out$.m_delta_rescued[idx_m] <- !is.na(out$.candidate_M[idx_m]) &
+        !is.na(out$.strong_M[idx_m]) &
+        (out$.mass_diff[idx_m] <= out$.ppm_window[idx_m] |
+          out$.mass_diff[idx_m] <= tolerance_dalton)
+    }
+  }
+
+  out <- out |>
+    tidytable::mutate(
+      .keep_row = .is_ms1_row |
+        !.has_strong |
+        is.na(candidate_adduct) |
+        .exact_adduct_match |
+        .m_delta_rescued,
+      candidate_adduct_match_mode = tidytable::if_else(
+        is.na(candidate_adduct_match_mode),
+        tidytable::case_when(
+          .is_ms1_row ~ "ms1_reference",
+          !.has_strong ~ "unconstrained",
+          .exact_adduct_match ~ "exact_adduct",
+          .m_delta_rescued ~ "m_delta_rescued",
+          TRUE ~ "incompatible"
+        ),
+        candidate_adduct_match_mode
+      ),
+      annotation_note = tidytable::if_else(
+        !.is_ms1_row & .m_delta_rescued,
+        tidytable::coalesce(
+          annotation_note,
+          "Adduct differs from strong MS1 state; retained by neutral-mass delta consistency"
+        ),
+        annotation_note
+      )
+    )
+
+  dropped_n <- out |>
+    tidytable::filter(!.keep_row) |>
+    nrow()
+  dropped_spectral_n <- out |>
+    tidytable::filter(!.keep_row, .is_spectral_row) |>
+    nrow()
+  if (dropped_n > 0L) {
+    log_info(
+      "Removed %d non-MS1 annotation row(s) incompatible with strong MS1 adduct assignments",
+      dropped_n
+    )
+  }
+  if (dropped_spectral_n > 0L) {
+    log_info(
+      "Removed %d spectral annotation row(s) due to adduct mismatch with strong MS1 assignments",
+      dropped_spectral_n
+    )
+  }
+
+  out_filtered <- out |>
+    tidytable::filter(.keep_row) |>
+    tidytable::select(
+      -tidyselect::any_of(c(
+        ".strong_adduct",
+        ".strong_state_key",
+        ".strong_M",
+        ".is_ms1_row",
+        ".is_spectral_row",
+        ".has_strong",
+        ".candidate_state_key",
+        "adduct_state_key",
+        ".needs_m_check",
+        ".candidate_M",
+        ".mass_diff",
+        ".ppm_window",
+        ".exact_adduct_match",
+        ".m_delta_rescued",
+        ".keep_row"
+      ))
+    )
+
+  attr(out_filtered, "adduct_semantics_audit") <- list(
+    n_input = nrow(out),
+    n_removed = dropped_n,
+    n_removed_spectral = dropped_spectral_n,
+    n_output = nrow(out_filtered)
+  )
+  out_filtered
+}
+
 #' @title Filter annotations
 #'
 #' @description This function filters initial annotations by removing MS1-only
@@ -451,6 +698,35 @@ filter_annotations <- function(
   features_annotated_table_1 <- features_table |>
     tidytable::left_join(y = annotation_table)
   rm(annotation_table)
+
+  n_before_adduct_semantics <- nrow(features_annotated_table_1)
+  features_annotated_table_1 <- enforce_ms1_adduct_semantics(
+    features_annotated_table_1
+  )
+  adduct_semantics_audit <- attr(features_annotated_table_1, "adduct_semantics_audit")
+  n_after_adduct_semantics <- nrow(features_annotated_table_1)
+  n_removed_adduct_semantics <- max(
+    0L,
+    n_before_adduct_semantics - n_after_adduct_semantics
+  )
+  n_removed_spectral_adduct_mismatch <- if (
+    is.list(adduct_semantics_audit) &&
+      !is.null(adduct_semantics_audit$n_removed_spectral)
+  ) {
+    as.integer(adduct_semantics_audit$n_removed_spectral)
+  } else {
+    0L
+  }
+  log_info(
+    paste0(
+      "Adduct-semantics filter: before=%d, removed_total=%d, ",
+      "removed_spectral_mismatch=%d, after=%d"
+    ),
+    n_before_adduct_semantics,
+    n_removed_adduct_semantics,
+    n_removed_spectral_adduct_mismatch,
+    n_after_adduct_semantics
+  )
 
   if (!is.null(rts) && !has_rt) {
     log_warn(
