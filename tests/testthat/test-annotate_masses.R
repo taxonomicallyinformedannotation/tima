@@ -1272,6 +1272,7 @@ test_that("discover_evidence_adduct_signal recovers multicharged ion species", {
     neutral_losses = character(),
     ms_mode = "pos",
     tolerance_ppm = 10,
+    tolerance_dalton = 0.01,
     tolerance_rt = 0.02,
     exact_masses = M
   )

@@ -176,6 +176,11 @@ annotate_masses <- function(
   )
   coverage_mode <- "best_supported_conflict_free"
   baseline_adduct <- switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
+  baseline_adducts <- switch(
+    ms_mode,
+    "pos" = c("[M+H]+", "[M+Na]+", "[M+NH4]+"),
+    "neg" = c("[M-H]-", "[M+COOH-H]-")
+  )
 
   # ---- Step 1: load features -------------------------------------------
   features_table <- safe_fread(
@@ -256,9 +261,21 @@ annotate_masses <- function(
     loss_edges = loss_edges,
     evidence_hypotheses = evidence_signal$hypotheses,
     preassigned = already_assigned,
-    baseline_adduct = baseline_adduct,
+    baseline_adducts = baseline_adducts,
     features_table = features_table,
     multi_adducts = multi_adducts,
+    tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton
+  )
+
+  # Recover weak but M-coherent modifier states for unresolved nodes in
+  # supported components without relaxing strict primary graph semantics.
+  node_hypotheses <- append_component_weak_hypotheses(
+    node_hypotheses = node_hypotheses,
+    features_table = features_table,
+    neutral_losses_list = neutral_losses_list,
+    clusters = clusters,
+    baseline_adducts = baseline_adducts,
     tolerance_ppm = tolerance_ppm,
     tolerance_dalton = tolerance_dalton
   )
@@ -275,11 +292,30 @@ annotate_masses <- function(
     coverage_mode = coverage_mode
   )
 
-  # ---- Step 8: propagate annotations across M-cliques ----------------------
+  # ---- Step 8: derive primary/secondary per-feature ion species -----------
+  annotations <- derive_primary_secondary_annotations(
+    annotations = annotations,
+    baseline_adducts = baseline_adducts
+  )
+
+  # ---- Step 9: propagate annotations across M-cliques ---------------------
   annotations <- propagate_annotations_across_m_cliques(
     annotations = annotations,
     node_hypotheses = node_hypotheses
   )
+
+  supported_graph <- retain_supported_single_m_edges(
+    adduct_edges = adduct_edges_combined,
+    cluster_edges = cluster_edges,
+    loss_edges = loss_edges,
+    annotations = annotations,
+    tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton
+  )
+  adduct_edges_combined <- supported_graph$adduct_edges
+  cluster_edges <- supported_graph$cluster_edges
+  loss_edges <- supported_graph$loss_edges
+  annotations <- supported_graph$annotations
 
   coverage_audit <- attr(annotations, "coverage_audit")
   if (is.list(coverage_audit)) {
@@ -329,7 +365,11 @@ annotate_masses <- function(
     x = annotations |>
       # Rename 'adduct' to the canonical output column name expected by
       # downstream tools (select_annotations_columns, weight_annotations, etc.)
-      tidytable::rename(candidate_adduct = adduct) |>
+      tidytable::rename(
+        candidate_adduct = adduct,
+        candidate_annotation_level = annotation_level,
+        candidate_confidence_tier = confidence_tier
+      ) |>
       select_annotations_columns(
         str_stereo = str_stereo,
         str_met = str_met,
@@ -350,6 +390,434 @@ annotate_masses <- function(
   c(
     "annotations" = output_annotations[[1L]],
     "edges" = output_edges[[1L]]
+  )
+}
+
+#' Enforce one primary ion species per feature while keeping non-conflicting
+#' secondary alternatives.
+#' @keywords internal
+derive_primary_secondary_annotations <- function(
+  annotations,
+  baseline_adducts
+) {
+  if (nrow(annotations) == 0L) {
+    return(annotations)
+  }
+  out <- annotations
+  if (!"source" %in% colnames(out)) {
+    out$source <- NA_character_
+  }
+  if (!"adduct_support" %in% colnames(out)) {
+    out$adduct_support <- 0L
+  }
+  if (!"error_mz" %in% colnames(out)) {
+    out$error_mz <- NA_real_
+  }
+  if (!"candidate_adduct_origin" %in% colnames(out)) {
+    out <- out |>
+      tidytable::mutate(
+        candidate_adduct_origin = tidytable::if_else(
+          source == "baseline" | adduct %in% baseline_adducts,
+          "baseline",
+          "supported"
+        )
+      )
+  }
+
+  out <- out |>
+    tidytable::mutate(
+      confidence_tier = tidytable::case_when(
+        candidate_adduct_origin == "supported" ~ "supported_strong",
+        candidate_adduct_origin == "supported_weak" ~ "supported_weak",
+        TRUE ~ "baseline"
+      ),
+      has_structure = !is.na(structure_exact_mass),
+      support_rank = tidytable::case_when(
+        confidence_tier == "supported_strong" ~ 1L,
+        confidence_tier == "supported_weak" ~ 2L,
+        TRUE ~ 3L
+      ),
+      source_rank = tidytable::case_when(
+        source == "pair" ~ 1L,
+        source == "evidence" ~ 2L,
+        source == "loss" ~ 3L,
+        source == "cluster" ~ 4L,
+        source == "preassigned" ~ 5L,
+        source == "preassigned_propagated" ~ 6L,
+        source == "multi" ~ 7L,
+        source == "baseline" ~ 8L,
+        source == "weak_component" ~ 9L,
+        source == "weak_component_loss" ~ 10L,
+        source == "weak_component_cluster" ~ 11L,
+        TRUE ~ 12L
+      ),
+      abs_error = abs(as.numeric(error_mz))
+    )
+
+  picked <- out |>
+    tidytable::summarize(
+      any_structure = any(has_structure, na.rm = TRUE),
+      max_support = max(adduct_support, na.rm = TRUE),
+      best_support_rank = min(support_rank, na.rm = TRUE),
+      best_source_rank = min(source_rank, na.rm = TRUE),
+      min_abs_error = suppressWarnings(min(abs_error, na.rm = TRUE)),
+      .by = c(feature_id, adduct)
+    ) |>
+    tidytable::mutate(
+      min_abs_error = tidytable::if_else(
+        !is.finite(min_abs_error),
+        Inf,
+        min_abs_error
+      )
+    ) |>
+    tidytable::arrange(
+      feature_id,
+      tidytable::desc(any_structure),
+      best_support_rank,
+      tidytable::desc(max_support),
+      best_source_rank,
+      min_abs_error,
+      adduct
+    ) |>
+    tidytable::distinct(feature_id, .keep_all = TRUE) |>
+    tidytable::select(feature_id, primary_adduct = adduct)
+
+  out |>
+    tidytable::left_join(picked, by = "feature_id") |>
+    tidytable::mutate(
+      annotation_level = tidytable::if_else(
+        adduct == primary_adduct,
+        "primary",
+        "secondary"
+      )
+    ) |>
+    tidytable::select(
+      -has_structure,
+      -support_rank,
+      -source_rank,
+      -abs_error,
+      -primary_adduct
+    )
+}
+
+#' Recover weak (component-M coherent) hypotheses for unresolved nodes
+#' @keywords internal
+append_component_weak_hypotheses <- function(
+  node_hypotheses,
+  features_table,
+  neutral_losses_list,
+  clusters,
+  baseline_adducts,
+  tolerance_ppm,
+  tolerance_dalton
+) {
+  if (nrow(node_hypotheses) == 0L) {
+    return(node_hypotheses)
+  }
+  component_membership <- attr(node_hypotheses, "component_membership")
+  feature_m_map <- attr(node_hypotheses, "feature_m_map")
+  if (is.null(component_membership) || nrow(component_membership) == 0L) {
+    return(node_hypotheses)
+  }
+  if (is.null(feature_m_map) || nrow(feature_m_map) == 0L) {
+    return(node_hypotheses)
+  }
+
+  baseline_adducts <- unique(stats::na.omit(as.character(baseline_adducts)))
+  if (length(baseline_adducts) == 0L) {
+    return(node_hypotheses)
+  }
+
+  component_m <- feature_m_map |>
+    tidytable::filter(!is.na(neutral_mass) & is.finite(neutral_mass) & neutral_mass > 0) |>
+    tidytable::summarize(component_mass = stats::median(neutral_mass), .by = component_id)
+  if (nrow(component_m) == 0L) {
+    return(node_hypotheses)
+  }
+
+  supported_features <- node_hypotheses |>
+    tidytable::mutate(
+      candidate_adduct_origin = tidytable::coalesce(candidate_adduct_origin, "supported")
+    ) |>
+    tidytable::filter(candidate_adduct_origin == "supported") |>
+    tidytable::distinct(feature_id)
+
+  unresolved <- component_membership |>
+    tidytable::anti_join(supported_features, by = "feature_id") |>
+    tidytable::left_join(component_m, by = "component_id") |>
+    tidytable::left_join(
+      features_table |>
+        tidytable::distinct(feature_id, mz, rt),
+      by = "feature_id"
+    ) |>
+    tidytable::filter(!is.na(component_mass) & !is.na(mz) & is.finite(mz))
+  if (nrow(unresolved) == 0L) {
+    return(node_hypotheses)
+  }
+
+  build_modified_adduct <- function(adduct, modifier, sign) {
+    paste0(
+      gsub("M(?![a-z]).*", "M", adduct, perl = TRUE),
+      sign,
+      modifier,
+      gsub(".*M(?![a-z])", "", adduct, perl = TRUE)
+    )
+  }
+
+  base_candidates <- unresolved |>
+    tidytable::cross_join(tidytable::tidytable(adduct = baseline_adducts)) |>
+    tidytable::mutate(source = "weak_component")
+
+  loss_terms <- unique(gsub(" .*", "", as.character(neutral_losses_list)))
+  loss_terms <- loss_terms[!is.na(loss_terms) & nzchar(loss_terms)]
+  loss_candidates <- if (length(loss_terms) > 0L) {
+    base_candidates |>
+      tidytable::cross_join(tidytable::tidytable(modifier = loss_terms)) |>
+      tidytable::mutate(
+        adduct = mapply(
+          FUN = build_modified_adduct,
+          adduct = adduct,
+          modifier = modifier,
+          MoreArgs = list(sign = "-"),
+          USE.NAMES = FALSE
+        ),
+        source = "weak_component_loss"
+      ) |>
+      tidytable::select(-modifier)
+  } else {
+    base_candidates[0L, ]
+  }
+
+  cluster_terms <- unique(as.character(clusters))
+  cluster_terms <- cluster_terms[!is.na(cluster_terms) & nzchar(cluster_terms)]
+  cluster_candidates <- if (length(cluster_terms) > 0L) {
+    base_candidates |>
+      tidytable::cross_join(tidytable::tidytable(modifier = cluster_terms)) |>
+      tidytable::mutate(
+        adduct = mapply(
+          FUN = build_modified_adduct,
+          adduct = adduct,
+          modifier = modifier,
+          MoreArgs = list(sign = "+"),
+          USE.NAMES = FALSE
+        ),
+        source = "weak_component_cluster"
+      ) |>
+      tidytable::select(-modifier)
+  } else {
+    base_candidates[0L, ]
+  }
+
+  weak_all <- tidytable::bind_rows(base_candidates, loss_candidates, cluster_candidates) |>
+    harmonize_adducts(adducts_translations = adducts_translations) |>
+    tidytable::mutate(
+      mz_expected = mapply(
+        FUN = function(m, ad) {
+          calculate_mz_from_mass(neutral_mass = as.numeric(m), adduct_string = ad)
+        },
+        m = component_mass,
+        ad = adduct,
+        USE.NAMES = FALSE
+      ),
+      mz_diff = abs(as.numeric(mz) - as.numeric(mz_expected)),
+      ppm_diff = mz_diff * 1e6 / pmax(as.numeric(mz), as.numeric(mz_expected)),
+      ppm_ok = is.finite(ppm_diff) & ppm_diff <= tolerance_ppm,
+      dalton_ok = if (is.null(tolerance_dalton)) {
+        FALSE
+      } else {
+        mz_diff <= tolerance_dalton
+      }
+    ) |>
+    tidytable::filter(ppm_ok | dalton_ok) |>
+    tidytable::transmute(
+      feature_id,
+      adduct,
+      source,
+      is_preassigned = FALSE,
+      adduct_support = 0L,
+      candidate_adduct_origin = "supported_weak",
+      mz = as.numeric(mz),
+      rt = as.numeric(rt),
+      mass = as.numeric(component_mass)
+    ) |>
+    tidytable::distinct()
+
+  if (nrow(weak_all) == 0L) {
+    return(node_hypotheses)
+  }
+
+  out <- tidytable::bind_rows(node_hypotheses, weak_all) |>
+    dedupe_node_hypotheses()
+  attr(out, "component_membership") <- component_membership
+  attr(out, "feature_m_map") <- feature_m_map
+  out
+}
+
+#' Keep only supported edges that are coherent with a single neutral M
+#' @keywords internal
+retain_supported_single_m_edges <- function(
+  adduct_edges,
+  cluster_edges,
+  loss_edges,
+  annotations,
+  tolerance_ppm,
+  tolerance_dalton
+) {
+  invisible(tolerance_dalton)
+  if (nrow(annotations) == 0L) {
+    return(list(
+      adduct_edges = adduct_edges[0L, ],
+      cluster_edges = cluster_edges[0L, ],
+      loss_edges = loss_edges[0L, ],
+      annotations = annotations
+    ))
+  }
+
+  selected <- annotations |>
+    tidytable::distinct(
+      feature_id,
+      adduct,
+      annotation_level,
+      confidence_tier,
+      source,
+      candidate_adduct_origin,
+      mass,
+      mz
+    ) |>
+    tidytable::mutate(
+      annotation_level = tidytable::coalesce(annotation_level, "primary"),
+      confidence_tier = tidytable::coalesce(confidence_tier, "supported_strong"),
+      is_supported = annotation_level == "primary" &
+        confidence_tier == "supported_strong"
+    )
+
+  supported_nodes <- selected |>
+    tidytable::filter(is_supported)
+  if (nrow(supported_nodes) == 0L) {
+    return(list(
+      adduct_edges = adduct_edges[0L, ],
+      cluster_edges = cluster_edges[0L, ],
+      loss_edges = loss_edges[0L, ],
+      annotations = annotations
+    ))
+  }
+
+  adduct_kept <- adduct_edges |>
+    tidytable::inner_join(
+      supported_nodes |>
+        tidytable::select(feature_id, adduct, mass_src = mass),
+      by = c("feature_id", "adduct")
+    ) |>
+    tidytable::inner_join(
+      supported_nodes |>
+        tidytable::select(
+          feature_id_dest = feature_id,
+          adduct_dest = adduct,
+          mass_dest = mass
+        ),
+      by = c("feature_id_dest", "adduct_dest")
+    ) |>
+    tidytable::mutate(
+      mass_diff = abs(mass_src - mass_dest),
+      ppm_ok = mass_diff <= (tolerance_ppm * 1e-6 * pmax(mass_src, mass_dest)),
+      dalton_ok = if (is.null(tolerance_dalton)) {
+        FALSE
+      } else {
+        mass_diff <= tolerance_dalton
+      }
+    ) |>
+    tidytable::filter(ppm_ok | dalton_ok) |>
+    tidytable::select(feature_id, adduct, feature_id_dest, adduct_dest) |>
+    tidytable::distinct()
+
+  if (nrow(adduct_kept) == 0L) {
+    return(list(
+      adduct_edges = adduct_kept,
+      cluster_edges = cluster_edges[0L, ],
+      loss_edges = loss_edges[0L, ],
+      annotations = annotations
+    ))
+  }
+
+  undirected <- tidytable::bind_rows(
+    adduct_kept |>
+      tidytable::transmute(src = feature_id, dest = feature_id_dest),
+    adduct_kept |>
+      tidytable::transmute(src = feature_id_dest, dest = feature_id)
+  ) |>
+    tidytable::distinct()
+  all_nodes <- unique(c(undirected$src, undirected$dest))
+  neighbors <- split(undirected$dest, undirected$src)
+  visited <- stats::setNames(rep(FALSE, length(all_nodes)), all_nodes)
+  comp_members_list <- list()
+  comp_i <- 0L
+  for (node in all_nodes) {
+    if (isTRUE(visited[[node]])) {
+      next
+    }
+    comp_i <- comp_i + 1L
+    queue <- c(node)
+    visited[[node]] <- TRUE
+    comp_nodes <- character()
+    while (length(queue) > 0L) {
+      current <- queue[[1L]]
+      queue <- queue[-1L]
+      comp_nodes <- c(comp_nodes, current)
+      nxt <- neighbors[[current]]
+      if (is.null(nxt)) {
+        next
+      }
+      for (nn in nxt) {
+        if (!isTRUE(visited[[nn]])) {
+          visited[[nn]] <- TRUE
+          queue <- c(queue, nn)
+        }
+      }
+    }
+    comp_members_list[[length(comp_members_list) + 1L]] <- tidytable::tidytable(
+      feature_id = unique(comp_nodes),
+      component_id = paste0("M_", comp_i)
+    )
+  }
+  comp_members <- tidytable::bind_rows(comp_members_list)
+
+  cluster_kept <- cluster_edges |>
+    tidytable::inner_join(comp_members, by = "feature_id") |>
+    tidytable::inner_join(
+      comp_members |>
+        tidytable::rename(feature_id_dest = feature_id, component_id_dest = component_id),
+      by = "feature_id_dest"
+    ) |>
+    tidytable::filter(component_id == component_id_dest) |>
+    tidytable::select(feature_id, cluster, mass, feature_id_dest) |>
+    tidytable::distinct()
+
+  loss_kept <- loss_edges |>
+    tidytable::inner_join(comp_members, by = "feature_id") |>
+    tidytable::inner_join(
+      comp_members |>
+        tidytable::rename(feature_id_dest = feature_id, component_id_dest = component_id),
+      by = "feature_id_dest"
+    ) |>
+    tidytable::filter(component_id == component_id_dest) |>
+    tidytable::select(feature_id, loss, mass, feature_id_dest) |>
+    tidytable::distinct()
+
+  annotations <- annotations |>
+    tidytable::left_join(comp_members, by = "feature_id") |>
+    tidytable::mutate(
+      component_id = tidytable::if_else(
+        is.na(component_id),
+        paste0("M_singleton_", feature_id),
+        component_id
+      )
+    )
+
+  list(
+    adduct_edges = adduct_kept,
+    cluster_edges = cluster_kept,
+    loss_edges = loss_kept,
+    annotations = annotations
   )
 }
 
@@ -452,6 +920,7 @@ discover_annotate_masses_edge_sets <- function(
   cfg,
   exact_masses
 ) {
+  invisible(tolerance_dalton)
   adduct_diffs <- build_adduct_pair_differences(
     add_clu_table = monocharged_adducts,
     tolerance_ppm = tolerance_ppm,
@@ -511,6 +980,7 @@ discover_annotate_masses_edge_sets <- function(
     neutral_losses = neutral_losses_list,
     ms_mode = ms_mode,
     tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton,
     tolerance_rt = tolerance_rt,
     exact_masses = exact_masses
   ) |>
@@ -557,7 +1027,7 @@ build_annotate_masses_candidate_hypotheses <- function(
   loss_edges,
   evidence_hypotheses,
   preassigned,
-  baseline_adduct,
+  baseline_adducts,
   features_table,
   multi_adducts,
   tolerance_ppm,
@@ -569,7 +1039,7 @@ build_annotate_masses_candidate_hypotheses <- function(
     loss_edges = loss_edges,
     evidence_hypotheses = evidence_hypotheses,
     preassigned = preassigned,
-    baseline_adduct = baseline_adduct,
+    baseline_adducts = baseline_adducts,
     features_table = features_table,
     tolerance_ppm = tolerance_ppm,
     tolerance_dalton = tolerance_dalton
@@ -597,13 +1067,17 @@ build_annotate_masses_candidate_hypotheses <- function(
     tidytable::filter(!is.na(mass) & is.finite(mass) & mass > 0)
 
   if (nrow(multi_adducts) > 0L && nrow(node_hypotheses) > 0L) {
+    multi_seed <- node_hypotheses |>
+      tidytable::filter(candidate_adduct_origin == "supported")
     multi_hypotheses <- generate_multi_hypotheses_from_node_masses(
-      node_hypotheses = node_hypotheses,
+      node_hypotheses = multi_seed,
       multi_adducts = multi_adducts,
       tolerance_ppm = tolerance_ppm,
       tolerance_dalton = tolerance_dalton
     )
     if (nrow(multi_hypotheses) > 0L) {
+      multi_hypotheses <- multi_hypotheses |>
+        tidytable::mutate(candidate_adduct_origin = "supported")
       node_hypotheses <- tidytable::bind_rows(
         node_hypotheses,
         multi_hypotheses

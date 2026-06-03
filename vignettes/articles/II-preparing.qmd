@@ -74,6 +74,22 @@ Try to really restrict the adduct list and structure-organism pairs you want to 
 tima::annotate_masses()
 ```
 
+#### How MS1 adduct attribution works
+
+`annotate_masses()` uses two levels:
+
+- **Primary (strict graph):** each `feature_id` gets one primary ion species. Edges are kept only when both nodes are strongly supported, and consistent with the same neutral mass `M`.
+- **Secondary (coverage):** additional non-conflicting ion-species hypotheses are kept as secondary.
+
+For unresolved nodes in a supported component, TIMA also tests direct forms from the component mass `M` (for example `[M +/- loss + carrier]`) and keeps valid ones as weak support.
+
+Main output fields to inspect:
+
+- `candidate_adduct`
+- `candidate_adduct_origin` (`supported`, `supported_weak`, `baseline`)
+- `candidate_annotation_level` (`primary`, `secondary`)
+- `candidate_confidence_tier` (`supported_strong`, `supported_weak`, `baseline`)
+
 ### Spectral
 
 ```{r annotate-spectra-1, eval=FALSE, include=TRUE}

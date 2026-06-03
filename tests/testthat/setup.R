@@ -3,7 +3,10 @@ suppressPackageStartupMessages(library(testthat))
 # Minimize logging noise in tests (including lazy logger initialization)
 Sys.setenv(
   TIMA_LOG_LEVEL = "ERROR",
-  TIMA_LOG_FILE = file.path(tempdir(), sprintf("tima-test-%s.log", Sys.getpid()))
+  TIMA_LOG_FILE = file.path(
+    tempdir(),
+    sprintf("tima-test-%s.log", Sys.getpid())
+  )
 )
 
 # Keep setup compatible with both load-all style and testthat::test_package().
@@ -34,7 +37,7 @@ lgr::lgr$set_threshold(200)
 
 # Ensure lazy-init logger stays quiet and does not emit to console.
 if (isTRUE(requireNamespace("tima", quietly = TRUE))) {
-  tima:::init_logging()
+  getFromNamespace("init_logging", "tima")()
   appenders <- lgr::lgr$appenders
   is_file <- vapply(appenders, inherits, logical(1), what = "AppenderFile")
   lgr::lgr$set_appenders(appenders[is_file])

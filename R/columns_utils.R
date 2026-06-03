@@ -55,7 +55,12 @@ columns_model <- function() {
   )
 
   # Calculated candidate-level properties ----
-  candidates_calculated_columns <- "candidate_spectrum_entropy"
+  candidates_calculated_columns <- c(
+    "candidate_spectrum_entropy",
+    "candidate_adduct_origin",
+    "candidate_annotation_level",
+    "candidate_confidence_tier"
+  )
 
   # SIRIUS formula-level columns ----
   candidates_sirius_for_columns <- c(

@@ -467,11 +467,15 @@ collect_node_adduct_hypotheses <- function(
   loss_edges,
   evidence_hypotheses,
   preassigned,
-  baseline_adduct,
+  baseline_adducts,
   features_table,
   tolerance_ppm = 5,
   tolerance_dalton = 0.005
 ) {
+  if (length(baseline_adducts) == 0L || all(is.na(baseline_adducts))) {
+    baseline_adducts <- "[M+H]+"
+  }
+  baseline_adducts <- unique(stats::na.omit(as.character(baseline_adducts)))
   # STEP 1: Solve for consistent M assignments across adduct edges
   consistency_result <- solve_consistent_adduct_assignments(
     adduct_edges = adduct_edges,
@@ -494,7 +498,11 @@ collect_node_adduct_hypotheses <- function(
     )
   pair_hyps <- tidytable::bind_rows(pair_a, pair_b) |>
     tidytable::distinct() |>
-    tidytable::mutate(source = "pair", is_preassigned = FALSE)
+    tidytable::mutate(
+      source = "pair",
+      is_preassigned = FALSE,
+      candidate_adduct_origin = "supported"
+    )
 
   # (b) preassigned (upstream tools) - ONLY if compatible with inferred M
   pre_propagated <- propagate_preassigned_over_adduct_edges(
@@ -503,10 +511,18 @@ collect_node_adduct_hypotheses <- function(
   )
   pre_hyps <- preassigned |>
     tidytable::distinct(feature_id, adduct) |>
-    tidytable::mutate(source = "preassigned", is_preassigned = TRUE)
+    tidytable::mutate(
+      source = "preassigned",
+      is_preassigned = TRUE,
+      candidate_adduct_origin = "supported"
+    )
   pre_prop_hyps <- pre_propagated |>
     tidytable::distinct(feature_id, adduct) |>
-    tidytable::mutate(source = "preassigned_propagated", is_preassigned = TRUE)
+    tidytable::mutate(
+      source = "preassigned_propagated",
+      is_preassigned = TRUE,
+      candidate_adduct_origin = "supported"
+    )
 
   # Filter preassigned to be compatible with inferred M values
   if (nrow(pre_hyps) > 0L && nrow(feature_m_map) > 0L) {
@@ -528,7 +544,13 @@ collect_node_adduct_hypotheses <- function(
           abs(implied_m - neutral_mass) <= (5e-6 * neutral_mass)
       ) |>
       tidytable::filter(compatible) |>
-      tidytable::select(feature_id, adduct, source, is_preassigned)
+      tidytable::select(
+        feature_id,
+        adduct,
+        source,
+        is_preassigned,
+        candidate_adduct_origin
+      )
   }
 
   if (nrow(pre_prop_hyps) > 0L && nrow(feature_m_map) > 0L) {
@@ -550,7 +572,13 @@ collect_node_adduct_hypotheses <- function(
           abs(implied_m - neutral_mass) <= (5e-6 * neutral_mass)
       ) |>
       tidytable::filter(compatible) |>
-      tidytable::select(feature_id, adduct, source, is_preassigned)
+      tidytable::select(
+        feature_id,
+        adduct,
+        source,
+        is_preassigned,
+        candidate_adduct_origin
+      )
   }
 
   # (d) evidence-derived adducts from typed-universe inference.
@@ -575,34 +603,67 @@ collect_node_adduct_hypotheses <- function(
     evidence_hypotheses <- evidence_hypotheses |>
       tidytable::mutate(adduct_support = 0L)
   }
+  if (!"candidate_adduct_origin" %in% colnames(evidence_hypotheses)) {
+    evidence_hypotheses <- evidence_hypotheses |>
+      tidytable::mutate(candidate_adduct_origin = "supported")
+  }
 
-  # (c) baseline - test for every feature, but check M-compatibility
-  baseline_hyps <- features_table |>
+  # (c) baseline - only for nodes still unsupported after evidence/pair/preassigned
+  supported_seed <- tidytable::bind_rows(
+    pair_hyps,
+    evidence_hypotheses |>
+      tidytable::distinct(
+        feature_id,
+        adduct,
+        source,
+        is_preassigned,
+        candidate_adduct_origin
+      ) |>
+      tidytable::filter(candidate_adduct_origin == "supported"),
+    pre_hyps,
+    pre_prop_hyps
+  ) |>
+    tidytable::distinct()
+
+  unsupported_features <- features_table |>
     tidytable::distinct(feature_id, mz) |>
+    tidytable::anti_join(
+      supported_seed |>
+        tidytable::distinct(feature_id),
+      by = "feature_id"
+    )
+
+  baseline_hyps <- unsupported_features |>
+    tidytable::cross_join(
+      tidytable::tidytable(adduct = baseline_adducts)
+    ) |>
     tidytable::left_join(
       feature_m_map |> tidytable::select(feature_id, neutral_mass),
       by = "feature_id"
     ) |>
     tidytable::mutate(
-      adduct = baseline_adduct,
       implied_m = calculate_mass_of_m_batch(
-        adducts = baseline_adduct,
+        adducts = adduct,
         mzs = as.numeric(mz)
       ),
       compatible = is.na(neutral_mass) |
-        abs(implied_m - neutral_mass) <= (5e-6 * neutral_mass),
+        abs(implied_m - neutral_mass) <=
+          pmax(5e-6 * neutral_mass, tolerance_dalton %||% 0),
       source = "baseline",
-      is_preassigned = FALSE
+      is_preassigned = FALSE,
+      candidate_adduct_origin = "baseline"
     ) |>
     tidytable::filter(compatible) |>
-    tidytable::select(feature_id, adduct, source, is_preassigned)
+    tidytable::select(
+      feature_id,
+      adduct,
+      source,
+      is_preassigned,
+      candidate_adduct_origin
+    )
 
   base_hyps <- tidytable::bind_rows(
-    pair_hyps,
-    evidence_hypotheses |>
-      tidytable::distinct(feature_id, adduct, source, is_preassigned),
-    pre_hyps,
-    pre_prop_hyps,
+    supported_seed,
     baseline_hyps
   ) |>
     tidytable::distinct() |>
@@ -622,29 +683,39 @@ collect_node_adduct_hypotheses <- function(
         is.na(adduct_support),
         0L,
         as.integer(adduct_support)
+      ),
+      candidate_adduct_origin = tidytable::if_else(
+        is.na(candidate_adduct_origin),
+        "supported",
+        candidate_adduct_origin
       )
     )
 
   # (e) cluster expansion - suffix +cluster onto the DEST node's hypotheses.
   # Only expand base hypotheses that are M-consistent
+  support_base <- base_hyps |>
+    tidytable::filter(candidate_adduct_origin == "supported")
+
   cluster_hyps <- expand_with_modifier(
-    base_hyps = base_hyps,
+    base_hyps = support_base,
     edges = cluster_edges,
     edge_feature_col = "feature_id_dest",
     mod_col = "cluster",
     mod_sign = "+"
-  )
+  ) |>
+    tidytable::mutate(candidate_adduct_origin = "supported")
 
   # (f) loss expansion - suffix -loss onto the PRECURSOR's hypotheses.
   # Only expand base hypotheses that are M-consistent
   loss_hyps <- expand_with_modifier(
-    base_hyps = base_hyps,
+    base_hyps = support_base,
     edges = loss_edges,
     edge_feature_col = "feature_id_dest",
     mod_col = "loss",
     mod_sign = "-",
     strip_label = TRUE
-  )
+  ) |>
+    tidytable::mutate(candidate_adduct_origin = "supported")
 
   all_hyps <- tidytable::bind_rows(
     base_hyps,
@@ -722,6 +793,10 @@ dedupe_node_hypotheses <- function(node_hypotheses) {
   if (nrow(node_hypotheses) == 0L) {
     return(node_hypotheses)
   }
+  if (!"candidate_adduct_origin" %in% colnames(node_hypotheses)) {
+    node_hypotheses <- node_hypotheses |>
+      tidytable::mutate(candidate_adduct_origin = "supported")
+  }
   ranks <- c(
     pair = 1L,
     evidence = 1L,
@@ -749,11 +824,23 @@ dedupe_node_hypotheses <- function(node_hypotheses) {
         is.na(adduct_support),
         0L,
         as.integer(adduct_support)
+      ),
+      candidate_adduct_origin = tidytable::if_else(
+        is.na(candidate_adduct_origin),
+        "supported",
+        candidate_adduct_origin
       )
     ) |>
     tidytable::arrange(source_rank, tidytable::desc(adduct_support)) |>
     tidytable::group_by(feature_id, adduct) |>
-    tidytable::mutate(is_preassigned = any(is_preassigned)) |>
+    tidytable::mutate(
+      is_preassigned = any(is_preassigned),
+      candidate_adduct_origin = tidytable::case_when(
+        any(candidate_adduct_origin == "supported") ~ "supported",
+        any(candidate_adduct_origin == "supported_weak") ~ "supported_weak",
+        TRUE ~ "baseline"
+      )
+    ) |>
     tidytable::ungroup() |>
     tidytable::distinct(feature_id, adduct, .keep_all = TRUE) |>
     tidytable::select(-source_rank)
@@ -772,9 +859,11 @@ discover_evidence_adduct_signal <- function(
   neutral_losses,
   ms_mode,
   tolerance_ppm,
+  tolerance_dalton = NULL,
   tolerance_rt,
   exact_masses
 ) {
+  invisible(tolerance_dalton)
   empty_hyp <- tidytable::tidytable(
     feature_id = character(),
     adduct = character(),
@@ -825,6 +914,7 @@ discover_evidence_adduct_signal <- function(
       adduct,
       source = "evidence",
       is_preassigned = FALSE,
+      candidate_adduct_origin = "supported",
       adduct_support = as.integer(evidence_count)
     ) |>
     tidytable::distinct()
@@ -889,7 +979,7 @@ filter_modifier_evidence_by_pairwise_support <- function(
       feature_id = character(),
       adduct = character()
     ),
-    baseline_adduct = baseline_adduct,
+    baseline_adducts = baseline_adduct,
     features_table = features_table
   ) |>
     tidytable::filter(source %in% c("pair", "cluster", "loss")) |>
@@ -1142,9 +1232,14 @@ match_candidates_to_library <- function(
   }
   has_loss_term <- "loss_term" %in% colnames(candidates)
   has_is_preassigned <- "is_preassigned" %in% colnames(candidates)
+  has_origin <- "candidate_adduct_origin" %in% colnames(candidates)
   if (!has_is_preassigned) {
     candidates <- candidates |>
       tidytable::mutate(is_preassigned = FALSE)
+  }
+  if (!has_origin) {
+    candidates <- candidates |>
+      tidytable::mutate(candidate_adduct_origin = "supported")
   }
   if (has_loss_term) {
     cand_t <- tidytable::as_tidytable(candidates)[,
@@ -1156,6 +1251,7 @@ match_candidates_to_library <- function(
         src_mass = mass,
         src_source = source,
         src_is_preassigned = is_preassigned,
+        src_origin = candidate_adduct_origin,
         src_support = adduct_support,
         src_loss_term = loss_term
       )
@@ -1170,6 +1266,7 @@ match_candidates_to_library <- function(
         src_mass = mass,
         src_source = source,
         src_is_preassigned = is_preassigned,
+        src_origin = candidate_adduct_origin,
         src_support = adduct_support,
         src_loss_term = NA_character_
       )
@@ -1195,6 +1292,7 @@ match_candidates_to_library <- function(
       mass = value_min,
       source = src_source,
       is_preassigned = src_is_preassigned,
+      candidate_adduct_origin = src_origin,
       adduct_support = src_support,
       loss_term = src_loss_term,
       structure_exact_mass = exact_mass,
@@ -1460,7 +1558,7 @@ propagate_annotations_across_m_cliques <- function(
           mz = target_meta_row$mz[[1]],
           rt = target_meta_row$rt[[1]],
           mass = target_m[[1]],
-          error_mz = structure_exact_mass - target_m[[1]],
+          error_mz = as.numeric(structure_exact_mass) - target_m[[1]],
           source = "propagated_clique"
         )
       propagated_list[[length(propagated_list) + 1L]] <- propagated_row
