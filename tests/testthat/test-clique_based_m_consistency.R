@@ -254,8 +254,8 @@ test_that("feature_m_map shows consistent M per component", {
 
   # Component 1: f1, f2 should have ~same M (~99)
   comp1 <- m_map %>%
-    dplyr::filter(feature_id %in% c('f1', 'f2')) %>%
-    dplyr::pull(neutral_mass)
+    tidytable::filter(feature_id %in% c('f1', 'f2')) %>%
+    tidytable::pull(neutral_mass)
 
   if (length(comp1) == 2) {
     diff1 <- abs(comp1[1] - comp1[2])
@@ -264,8 +264,8 @@ test_that("feature_m_map shows consistent M per component", {
 
   # Component 2: f3, f4 should have ~same M (~150)
   comp2 <- m_map %>%
-    dplyr::filter(feature_id %in% c('f3', 'f4')) %>%
-    dplyr::pull(neutral_mass)
+    tidytable::filter(feature_id %in% c('f3', 'f4')) %>%
+    tidytable::pull(neutral_mass)
 
   if (length(comp2) == 2) {
     diff2 <- abs(comp2[1] - comp2[2])
@@ -376,7 +376,7 @@ test_that("global consistency preserves original edge structure", {
     row <- result[i, ]
     # Check that this edge exists in original edges
     matches <- edges %>%
-      dplyr::filter(
+      tidytable::filter(
         feature_id == row$feature_id,
         feature_id_dest == row$feature_id_dest,
         adduct == row$adduct,
