@@ -322,7 +322,6 @@ ensure_logging_initialized <- function() {
 NULL
 
 #' @rdname logging_wrappers
-# jarl-ignore unused_function: complete logging-level API kept for future use
 log_trace <- function(msg, ...) {
   ensure_logging_initialized()
   if (...length() > 0) {
@@ -373,7 +372,6 @@ log_error <- function(msg, ...) {
 }
 
 #' @rdname logging_wrappers
-# jarl-ignore unused_function: complete logging-level API kept for future use
 log_fatal <- function(msg, ...) {
   ensure_logging_initialized()
   if (...length() > 0) {
@@ -569,6 +567,7 @@ log_operation <- function(operation_name, ...) {
     "(no parameters)"
   }
 
+  log_trace("> Context: %s [%s]", operation_name, param_str)
   log_info("> Starting: %s [%s]", operation_name, param_str)
 
   invisible(ctx)
@@ -647,13 +646,23 @@ log_failed <- function(ctx, error, ...) {
     ""
   }
 
-  log_error(
-    "[FAIL] Failed: %s - %s%s (%s)",
-    ctx$operation,
-    error_msg,
-    extra_str,
-    format_time(elapsed)
-  )
+  if (inherits(error, "tima_fatal_error")) {
+    log_fatal(
+      "[FAIL] Failed: %s - %s%s (%s)",
+      ctx$operation,
+      error_msg,
+      extra_str,
+      format_time(elapsed)
+    )
+  } else {
+    log_error(
+      "[FAIL] Failed: %s - %s%s (%s)",
+      ctx$operation,
+      error_msg,
+      extra_str,
+      format_time(elapsed)
+    )
+  }
 
   invisible(ctx)
 }
