@@ -81,14 +81,18 @@ build_adduct_universe_from_legacy <- function(adducts, clusters, polarity) {
   }
 
   # Expand each adduct with each cluster (+ a "no cluster" version).
-  expanded <- character()
-  for (a in adducts) {
-    expanded <- c(expanded, a)
-    for (cl in clusters) {
+  if (length(clusters) == 0L) {
+    expanded <- adducts
+  } else {
+    # Build expanded adducts using vectorized operations
+    # For each adduct, create versions with each cluster
+    expanded_list <- lapply(adducts, function(a) {
       inner <- sub("^\\[(.*)\\][0-9]*[+-]+$", "\\1", a, perl = TRUE)
       tail <- sub("^.*\\]", "]", a, perl = TRUE)
-      expanded <- c(expanded, paste0("[", inner, "+", cl, tail))
-    }
+      # Create all cluster versions for this adduct at once
+      c(a, paste0("[", inner, "+", clusters, tail))
+    })
+    expanded <- unlist(expanded_list, use.names = FALSE)
   }
   expanded <- unique(expanded)
 

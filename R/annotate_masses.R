@@ -406,6 +406,8 @@ derive_primary_secondary_annotations <- function(
     return(annotations)
   }
   out <- annotations
+
+  # Ensure all required columns exist efficiently
   if (!"source" %in% colnames(out)) {
     out$source <- NA_character_
   }
@@ -426,6 +428,7 @@ derive_primary_secondary_annotations <- function(
       )
   }
 
+  # Single comprehensive mutation pass with all ranking logic
   out <- out |>
     tidytable::mutate(
       evidence_tier = tidytable::case_when(
@@ -456,6 +459,7 @@ derive_primary_secondary_annotations <- function(
       abs_error = abs(as.numeric(error_mz))
     )
 
+  # Single aggregation pass for all statistics per feature-adduct pair
   picked <- out |>
     tidytable::summarize(
       any_structure = any(has_structure, na.rm = TRUE),
@@ -484,6 +488,7 @@ derive_primary_secondary_annotations <- function(
     tidytable::distinct(feature_id, .keep_all = TRUE) |>
     tidytable::select(feature_id, primary_adduct = adduct)
 
+  # Final annotation level assignment with cleanup
   out |>
     tidytable::left_join(picked, by = "feature_id") |>
     tidytable::mutate(

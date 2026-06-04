@@ -226,8 +226,9 @@ solve_consistent_adduct_assignments <- function(
         }
       }
     }
-    components[[length(components) + 1L]] <- unique(comp_nodes)
-  }
+     # comp_nodes is already unique by construction (visited check ensures no duplicates)
+     components[[length(components) + 1L]] <- comp_nodes
+   }
 
   # For each component, compute consistent M assignments
   all_m_maps <- list()
@@ -752,32 +753,37 @@ expand_with_modifier <- function(
   if (nrow(edges) == 0L || nrow(base_hyps) == 0L) {
     return(base_hyps[0L, ])
   }
+
   targets <- edges |>
     tidytable::distinct(
       feature_id = !!as.name(edge_feature_col),
       !!as.name(mod_col)
     )
+
   if (strip_label) {
     targets <- targets |>
       tidytable::mutate(
         !!as.name(mod_col) := gsub(" .*", "", !!as.name(mod_col))
       )
   }
+
   out <- base_hyps |>
     tidytable::inner_join(targets, by = "feature_id") |>
     tidytable::mutate(
-      adduct = paste0(
-        gsub("M(?![a-z]).*", "M", adduct, perl = TRUE),
-        mod_sign,
-        !!as.name(mod_col),
-        gsub(".*M(?![a-z])", "", adduct, perl = TRUE)
-      ),
-      source = if (mod_sign == "+") "cluster" else "loss"
+      # Extract base adduct (M part) and suffix (post-M part)
+      .base_part = sub("M(?![a-z]).*", "M", adduct, perl = TRUE),
+      .char_part = sub(".*M(?![a-z])", "", adduct, perl = TRUE),
+      adduct = paste0(.base_part, mod_sign, !!as.name(mod_col), .char_part),
+      source = if (mod_sign == "+") "cluster" else "loss",
+      .base_part = NULL,
+      .char_part = NULL
     )
+
   if (identical(mod_col, "loss")) {
     out <- out |>
       tidytable::mutate(loss_term = as.character(!!as.name(mod_col)))
   }
+
   out |>
     tidytable::select(-tidyselect::all_of(mod_col)) |>
     harmonize_adducts(adducts_translations = adducts_translations)
@@ -1222,6 +1228,8 @@ match_candidates_to_library <- function(
     adduct = character(),
     mass = numeric(),
     source = character(),
+    is_preassigned = logical(),
+    candidate_adduct_origin = character(),
     adduct_support = integer(),
     loss_term = character(),
     structure_exact_mass = numeric(),
@@ -1230,9 +1238,12 @@ match_candidates_to_library <- function(
   if (nrow(candidates) == 0L || nrow(library_em) == 0L) {
     return(empty_out)
   }
+
+  # Ensure all required columns exist (single pass)
   has_loss_term <- "loss_term" %in% colnames(candidates)
   has_is_preassigned <- "is_preassigned" %in% colnames(candidates)
   has_origin <- "candidate_adduct_origin" %in% colnames(candidates)
+
   if (!has_is_preassigned) {
     candidates <- candidates |>
       tidytable::mutate(is_preassigned = FALSE)
@@ -1241,42 +1252,31 @@ match_candidates_to_library <- function(
     candidates <- candidates |>
       tidytable::mutate(candidate_adduct_origin = "supported")
   }
-  if (has_loss_term) {
-    cand_t <- tidytable::as_tidytable(candidates)[,
-      .(
-        src_feature_id = feature_id,
-        src_rt = rt,
-        src_mz = mz,
-        src_adduct = adduct,
-        src_mass = mass,
-        src_source = source,
-        src_is_preassigned = is_preassigned,
-        src_origin = candidate_adduct_origin,
-        src_support = adduct_support,
-        src_loss_term = loss_term
-      )
-    ]
-  } else {
-    cand_t <- tidytable::as_tidytable(candidates)[,
-      .(
-        src_feature_id = feature_id,
-        src_rt = rt,
-        src_mz = mz,
-        src_adduct = adduct,
-        src_mass = mass,
-        src_source = source,
-        src_is_preassigned = is_preassigned,
-        src_origin = candidate_adduct_origin,
-        src_support = adduct_support,
-        src_loss_term = NA_character_
-      )
-    ]
+  if (!has_loss_term) {
+    candidates <- candidates |>
+      tidytable::mutate(loss_term = NA_character_)
   }
-  em_t <- tidytable::as_tidytable(library_em)
-  # Non-equi join: after the join, the i-side `src_mass` is no longer in
-  # scope as a column name; data.table exposes it via the join columns
-  # `value_min` / `value_max` (both equal to the matched src_mass for the
-  # surviving rows). We pick `value_min` to recover the original mass.
+
+  cand_t <- tidytable::as_tidytable(candidates)[,
+    .(
+      src_feature_id = feature_id,
+      src_rt = rt,
+      src_mz = mz,
+      src_adduct = adduct,
+      src_mass = mass,
+      src_source = source,
+      src_is_preassigned = is_preassigned,
+      src_origin = candidate_adduct_origin,
+      src_support = adduct_support,
+      src_loss_term = loss_term
+    )
+  ]
+
+  em_t <- tidytable::as_tidytable(library_em)[,
+    .(value_min, value_max, exact_mass)
+  ]
+
+  # Single efficient non-equi join with direct output formatting
   em_t[
     cand_t,
     on = .(value_min <= src_mass, value_max >= src_mass),
@@ -1480,7 +1480,7 @@ propagate_annotations_across_m_cliques <- function(
   tolerance_ppm = 10,
   tolerance_dalton = 0.005
 ) {
-  # Early exit if no matched annotations or no clique info
+  # Early exits
   if (nrow(annotations) == 0L) {
     return(annotations)
   }
@@ -1492,136 +1492,157 @@ propagate_annotations_across_m_cliques <- function(
     return(annotations)
   }
 
-  # Find matched (library) annotations
+  # Get matched annotations with structures
   matched <- annotations |>
-    tidytable::filter(!is.na(structure_exact_mass))
+    tidytable::filter(!is.na(structure_exact_mass)) |>
+    tidytable::select(
+      feature_id,
+      mz,
+      rt,
+      adduct,
+      mass,
+      structure_exact_mass
+    )
 
   if (nrow(matched) == 0L) {
     return(annotations)
   }
 
-  # For each matched annotation, propagate only to targets that are compatible
-  # with the same adduct state and neutral mass window.
-  propagated_list <- list()
-  for (i in seq_len(nrow(matched))) {
-    matched_row <- matched[i, , drop = FALSE]
-    source_feature <- matched_row$feature_id[[1]]
-    source_adduct <- if ("adduct" %in% names(matched_row)) {
-      matched_row$adduct[[1]]
-    } else {
-      NA_character_
-    }
-    source_mass <- if ("mass" %in% names(matched_row)) {
-      as.numeric(matched_row$mass[[1]])
-    } else {
-      NA_real_
-    }
+  # Matched annotations with their components
+  matched_with_component <- matched |>
+    tidytable::left_join(
+      component_membership |>
+        tidytable::rename(source_component = component_id),
+      by = "feature_id"
+    ) |>
+    tidytable::filter(!is.na(source_component))
 
-    # Find component of source feature
-    src_component <- component_membership |>
-      tidytable::filter(feature_id == source_feature) |>
-      tidytable::pull(component_id)
-
-    if (length(src_component) == 0L) {
-      next
-    }
-
-    # Find all features in the same component
-    clique_features <- component_membership |>
-      tidytable::filter(component_id == src_component[[1]]) |>
-      tidytable::pull(feature_id)
-
-    # Get target features (exclude the source feature)
-    target_features <- setdiff(clique_features, source_feature)
-
-    if (length(target_features) == 0L) {
-      next
-    }
-
-    # Get the inferred M values for targets
-    target_m_values <- feature_m_map |>
-      tidytable::filter(feature_id %in% target_features) |>
-      tidytable::select(feature_id, neutral_mass)
-
-    # Get metadata for target features from node_hypotheses
-    target_meta <- node_hypotheses |>
-      tidytable::filter(feature_id %in% target_features) |>
-      tidytable::distinct(feature_id, mz, rt)
-
-    # Create propagated rows for each target
-    for (target_fid in target_features) {
-      target_m <- target_m_values |>
-        tidytable::filter(feature_id == target_fid) |>
-        tidytable::pull(neutral_mass)
-
-      if (length(target_m) == 0L) {
-        next
-      }
-
-      target_meta_row <- target_meta |>
-        tidytable::filter(feature_id == target_fid)
-
-      if (nrow(target_meta_row) == 0L) {
-        next
-      }
-
-      # Require explicit adduct compatibility in target hypotheses.
-      target_hyp <- node_hypotheses |>
-        tidytable::filter(
-          feature_id == target_fid,
-          !is.na(adduct),
-          adduct == source_adduct
-        )
-
-      if (nrow(target_hyp) == 0L) {
-        next
-      }
-
-      target_mass_candidates <- as.numeric(target_hyp$mass)
-      target_mass_candidates <- target_mass_candidates[
-        is.finite(target_mass_candidates) & target_mass_candidates > 0
-      ]
-      if (length(target_mass_candidates) == 0L) {
-        next
-      }
-
-      target_m_val <- as.numeric(target_m[[1]])
-      best_target_mass <- target_mass_candidates[[which.min(abs(
-        target_mass_candidates - target_m_val
-      ))]]
-
-      if (is.finite(source_mass) && source_mass > 0) {
-        mass_diff <- abs(best_target_mass - source_mass)
-        ppm_window <- tolerance_ppm * 1e-6 * max(source_mass, best_target_mass)
-        dalton_ok <- is.finite(tolerance_dalton) &&
-          mass_diff <= tolerance_dalton
-        if (!(mass_diff <= ppm_window || dalton_ok)) {
-          next
-        }
-      }
-
-      propagated_row <- matched_row |>
-        tidytable::mutate(
-          feature_id = target_fid,
-          mz = target_meta_row$mz[[1]],
-          rt = target_meta_row$rt[[1]],
-          adduct = source_adduct,
-          mass = best_target_mass,
-          error_mz = as.numeric(structure_exact_mass) - best_target_mass,
-          source = "propagated_clique_supported"
-        )
-      propagated_list[[length(propagated_list) + 1L]] <- propagated_row
-    }
+  if (nrow(matched_with_component) == 0L) {
+    return(annotations)
   }
 
-  # Combine original annotations with propagated ones
-  if (length(propagated_list) > 0L) {
-    propagated_annotations <- tidytable::bind_rows(propagated_list)
-    result <- tidytable::bind_rows(annotations, propagated_annotations) |>
-      tidytable::distinct()
-  } else {
-    result <- annotations
+  # Get all features in same components (targets for propagation)
+  component_features <- component_membership |>
+    tidytable::left_join(
+      matched_with_component |>
+        tidytable::select(source_component) |>
+        tidytable::distinct() |>
+        tidytable::rename(component_id = source_component),
+      by = c("component_id")
+    ) |>
+    tidytable::filter(!is.na(component_id))
+
+  if (nrow(component_features) == 0L) {
+    return(annotations)
   }
+
+  # Create source->target mapping with single cross_join
+  propagation_map <- matched_with_component |>
+    tidytable::select(feature_id, source_component, adduct) |>
+    tidytable::rename(source_feature = feature_id) |>
+    tidytable::cross_join(
+      component_features |>
+        tidytable::rename(target_feature = feature_id)
+    ) |>
+    tidytable::filter(
+      source_component == component_id &
+        source_feature != target_feature
+    ) |>
+    tidytable::select(source_feature, target_feature, source_component, adduct)
+
+  if (nrow(propagation_map) == 0L) {
+    return(annotations)
+  }
+
+  # Get target metadata and M values in single operations
+  target_meta <- node_hypotheses |>
+    tidytable::distinct(feature_id, mz, rt) |>
+    tidytable::rename(
+      target_feature = feature_id,
+      target_mz = mz,
+      target_rt = rt
+    )
+
+  target_m_map <- feature_m_map |>
+    tidytable::rename(target_feature = feature_id) |>
+    tidytable::select(
+      target_feature,
+      source_component = component_id,
+      neutral_mass
+    )
+
+  # Get target adduct hypotheses for compatibility check
+  target_hyp <- node_hypotheses |>
+    tidytable::select(feature_id, adduct, mass) |>
+    tidytable::rename(target_feature = feature_id, target_mass = mass)
+
+  # Combine all data in single join operation
+  propagation_combined <- propagation_map |>
+    tidytable::left_join(
+      matched |>
+        tidytable::select(feature_id, mz, rt, mass, structure_exact_mass) |>
+        tidytable::rename(source_feature = feature_id),
+      by = "source_feature"
+    ) |>
+    tidytable::left_join(target_meta, by = "target_feature") |>
+    tidytable::left_join(
+      target_m_map,
+      by = c("target_feature", "source_component")
+    ) |>
+    tidytable::left_join(
+      target_hyp,
+      by = c("target_feature", "adduct")
+    ) |>
+    tidytable::filter(!is.na(target_mass))
+
+  if (nrow(propagation_combined) == 0L) {
+    return(annotations)
+  }
+
+  # Mass compatibility check
+  propagation_combined <- propagation_combined |>
+    tidytable::mutate(
+      mass_diff = abs(target_mass - mass),
+      ppm_window = tolerance_ppm * 1e-6 * mass,
+      dalton_ok = if (is.null(tolerance_dalton)) {
+        FALSE
+      } else {
+        mass_diff <= tolerance_dalton
+      },
+      mass_compatible = (mass_diff <= ppm_window) | dalton_ok
+    ) |>
+    tidytable::filter(mass_compatible) |>
+    tidytable::select(
+      -mass_diff,
+      -ppm_window,
+      -dalton_ok,
+      -mass_compatible
+    )
+
+  if (nrow(propagation_combined) == 0L) {
+    return(annotations)
+  }
+
+  # Create propagated annotation rows
+  propagated_annotations <- propagation_combined |>
+    tidytable::transmute(
+      feature_id = target_feature,
+      rt = target_rt,
+      mz = target_mz,
+      adduct = adduct,
+      mass = target_mass,
+      structure_exact_mass = structure_exact_mass,
+      error_mz = structure_exact_mass - target_mass,
+      source = "propagated_clique_supported",
+      is_preassigned = FALSE,
+      candidate_adduct_origin = "supported",
+      adduct_support = 0L
+    ) |>
+    tidytable::distinct()
+
+  # Combine with original annotations
+  result <- tidytable::bind_rows(annotations, propagated_annotations) |>
+    tidytable::distinct()
 
   result
 }

@@ -1,6 +1,3 @@
-#               because tests import these by name)
-# ============================================================
-
 #' Build feature pairs inside RT windows.
 #'
 #' For every pair `(src, dest)` of features in the same RT tolerance window
@@ -12,12 +9,24 @@ build_feature_pairs_within_rt <- function(
   df_fea_min,
   tolerance_ppm
 ) {
+  if (nrow(df_rt_tol) == 0L || nrow(df_fea_min) == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      rt = numeric(),
+      mz = numeric(),
+      feature_id_dest = character(),
+      mz_dest = numeric(),
+      delta = numeric(),
+      delta_min = numeric(),
+      delta_max = numeric()
+    ))
+  }
+
   src <- tidytable::as_tidytable(df_rt_tol)[,
     .(
-      src_feature_id = feature_id,
-      src_rt = rt,
-      src_mz = mz,
-      src_adduct = adduct,
+      feature_id,
+      rt,
+      mz,
       sample,
       rt_min,
       rt_max
@@ -28,42 +37,47 @@ build_feature_pairs_within_rt <- function(
       feature_id_dest = feature_id,
       rt_dest = rt,
       mz_dest = mz,
-      adduct_dest = adduct,
       sample
     )
   ]
+
   matches <- dest[
     src,
     on = .(sample, rt_dest >= rt_min, rt_dest <= rt_max),
     nomatch = 0L,
     allow.cartesian = TRUE
   ][
-    src_feature_id != feature_id_dest & mz_dest >= src_mz,
-    .(
-      feature_id = src_feature_id,
-      rt = src_rt,
-      mz = src_mz,
-      adduct = src_adduct,
-      feature_id_dest,
-      mz_dest,
-      adduct_dest
-    )
+    feature_id != feature_id_dest & mz_dest >= mz
+  ][,
+    .(feature_id, rt, mz, feature_id_dest, mz_dest)
   ]
+
   if (nrow(matches) == 0L) {
-    return(tidytable::as_tidytable(matches)[,
-      `:=`(delta = numeric(), delta_min = numeric(), delta_max = numeric())
-    ])
+    return(tidytable::tidytable(
+      feature_id = character(),
+      rt = numeric(),
+      mz = numeric(),
+      feature_id_dest = character(),
+      mz_dest = numeric(),
+      delta = numeric(),
+      delta_min = numeric(),
+      delta_max = numeric()
+    ))
   }
-  matches <- unique(matches)
-  matches[, delta := mz_dest - mz]
+
   matches[,
     `:=`(
-      delta_min = delta - (1E-6 * tolerance_ppm * (mz + mz_dest) / 2),
-      delta_max = delta + (1E-6 * tolerance_ppm * (mz + mz_dest) / 2)
+      delta = mz_dest - mz,
+      tolerance_term = (tolerance_ppm * 1e-6 * (mz + mz_dest) / 2)
     )
-  ]
-  tidytable::as_tidytable(matches) |>
-    tidytable::select(-adduct, -adduct_dest)
+  ][,
+    `:=`(
+      delta_min = delta - tolerance_term,
+      delta_max = delta + tolerance_term,
+      tolerance_term = NULL
+    )
+  ] |>
+    tidytable::as_tidytable()
 }
 
 #' Build all ordered adduct-pair differences for single-charge adducts.
@@ -73,21 +87,34 @@ build_adduct_pair_differences <- function(
   tolerance_ppm,
   max_mz
 ) {
+  if (nrow(add_clu_table) == 0L) {
+    return(tidytable::tidytable(
+      Distance = numeric(),
+      Group1 = character(),
+      Group2 = character()
+    ))
+  }
+
+  min_distance <- tolerance_ppm * 1e-6 * max_mz
+
   add_src <- add_clu_table |>
     tidytable::distinct(adduct, adduct_mass) |>
-    tidytable::rename(Group1 = adduct, mass1 = adduct_mass) |>
-    tidytable::mutate(join = "x")
+    tidytable::rename(Group1 = adduct, mass1 = adduct_mass)
+
   add_dest <- add_clu_table |>
     tidytable::distinct(adduct, adduct_mass) |>
-    tidytable::rename(Group2 = adduct, mass2 = adduct_mass) |>
-    tidytable::mutate(join = "x")
+    tidytable::rename(Group2 = adduct, mass2 = adduct_mass)
+
+  # Direct cross join
   add_src |>
-    tidytable::left_join(y = add_dest, by = "join") |>
-    tidytable::filter(Group1 != Group2) |>
-    tidytable::filter(mass1 < mass2) |>
+    tidytable::cross_join(add_dest) |>
     tidytable::mutate(Distance = mass2 - mass1) |>
+    tidytable::filter(
+      Group1 != Group2 &
+        mass1 < mass2 &
+        Distance >= min_distance
+    ) |>
     tidytable::distinct(Group1, Group2, Distance) |>
-    tidytable::filter(Distance >= tolerance_ppm * 1E-6 * max_mz) |>
     tidytable::select(Distance, Group1, Group2)
 }
 
@@ -102,20 +129,24 @@ compute_feature_adduct_support <- function(df_add) {
       adduct_support = integer()
     ))
   }
-  tidytable::bind_rows(
-    df_add |>
-      tidytable::transmute(
-        feature_id,
-        adduct,
-        neighbor = feature_id_dest
-      ),
-    df_add |>
-      tidytable::transmute(
-        feature_id = feature_id_dest,
-        adduct = adduct_dest,
-        neighbor = feature_id
-      )
-  ) |>
+
+  # Combine both directions efficiently
+  src_direction <- df_add |>
+    tidytable::transmute(
+      feature_id,
+      adduct,
+      neighbor = feature_id_dest
+    )
+
+  dest_direction <- df_add |>
+    tidytable::transmute(
+      feature_id = feature_id_dest,
+      adduct = adduct_dest,
+      neighbor = feature_id
+    )
+
+  # Single grouped count operation
+  tidytable::bind_rows(src_direction, dest_direction) |>
     tidytable::distinct(feature_id, adduct, neighbor) |>
     tidytable::count(feature_id, adduct, name = "adduct_support") |>
     tidytable::mutate(adduct_support = as.integer(adduct_support))
@@ -330,6 +361,8 @@ enforce_graph_adduct_consistency <- function(df_add) {
     if (nrow(sub) == 0L) {
       next
     }
+
+    # Pre-compute node candidates efficiently
     node_candidates <- tidytable::bind_rows(
       sub |>
         tidytable::transmute(
@@ -343,6 +376,8 @@ enforce_graph_adduct_consistency <- function(df_add) {
         )
     ) |>
       tidytable::distinct()
+
+    # Vectorized prior computation
     node_priors <- tidytable::bind_rows(
       sub |>
         tidytable::transmute(
@@ -358,13 +393,28 @@ enforce_graph_adduct_consistency <- function(df_add) {
         )
     ) |>
       tidytable::summarize(prior = sum(prior), .by = c(feature, state_key))
+
+    # Initial assignment
     assignments <- node_priors |>
       tidytable::arrange(feature, tidytable::desc(prior), nchar(state_key)) |>
       tidytable::distinct(feature, .keep_all = TRUE) |>
       tidytable::select(feature, state_key)
     assign_map <- stats::setNames(assignments$state_key, assignments$feature)
+
+    # Early termination detection & reduced iterations
     max_iter <- 20L
+    prev_map <- NULL
+    unchanged_count <- 0L
     for (iter in seq_len(max_iter)) {
+      # Store previous to detect convergence
+      if (identical(prev_map, assign_map)) {
+        unchanged_count <- unchanged_count + 1L
+        if (unchanged_count >= 2L) break # Early exit if no changes for 2 iterations
+      } else {
+        unchanged_count <- 0L
+      }
+      prev_map <- assign_map
+
       changed <- FALSE
       for (f in names(assign_map)) {
         candidates_f <- node_candidates |>
@@ -373,6 +423,7 @@ enforce_graph_adduct_consistency <- function(df_add) {
         if (length(candidates_f) <= 1L) {
           next
         }
+
         cand_scores <- rep(0, length(candidates_f))
         for (k in seq_along(candidates_f)) {
           cand <- candidates_f[[k]]
@@ -401,6 +452,7 @@ enforce_graph_adduct_consistency <- function(df_add) {
                 ]
               )
           }
+          # Add prior score
           prior_val <- node_priors |>
             tidytable::filter(feature == f, state_key == cand) |>
             tidytable::pull(prior)
@@ -408,6 +460,8 @@ enforce_graph_adduct_consistency <- function(df_add) {
             cand_scores[[k]] <- cand_scores[[k]] + (0.01 * prior_val[[1L]])
           }
         }
+
+        # Select best candidate
         best_idx <- which(cand_scores == max(cand_scores))
         if (length(best_idx) > 1L) {
           lens <- nchar(candidates_f[best_idx])
@@ -421,6 +475,8 @@ enforce_graph_adduct_consistency <- function(df_add) {
       }
       if (!changed) break
     }
+
+    # Final filtering with assignment map
     kept <- sub |>
       tidytable::filter(
         adduct_state_key == unname(assign_map[feature_id]) &
@@ -435,6 +491,7 @@ enforce_graph_adduct_consistency <- function(df_add) {
       tidytable::distinct(feature_id, feature_id_dest, .keep_all = TRUE)
     component_results[[ci]] <- kept
   }
+
   kept_all <- tidytable::bind_rows(component_results) |>
     tidytable::select(feature_id, adduct, adduct_dest, feature_id_dest) |>
     tidytable::distinct()

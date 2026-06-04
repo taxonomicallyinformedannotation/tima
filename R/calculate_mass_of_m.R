@@ -210,7 +210,14 @@ calculate_mass_of_m_batch <- function(
   out <- rep(NA_real_, n)
 
   unique_adducts <- unique(adducts[!is.na(adducts)])
-  for (a in unique_adducts) {
+
+  # Pre-compute index mapping instead of using which() for each adduct
+  # which() is O(n), and doing it for each unique adduct is O(n·k) where k = unique count
+  # Using match() gives us O(n) total
+  adduct_idx_map <- match(adducts, unique_adducts)
+
+  for (i in seq_along(unique_adducts)) {
+    a <- unique_adducts[[i]]
     parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
     if (is.null(parsed) || all(parsed == 0L)) {
       next
@@ -224,7 +231,11 @@ calculate_mass_of_m_batch <- function(
       next
     }
 
-    idx <- which(!is.na(adducts) & adducts == a)
+    # Use pre-computed index map (O(n) instead of O(n²))
+    idx <- which(adduct_idx_map == i & !is.na(adducts))
+    if (length(idx) == 0L) {
+      next
+    }
     mz_sub <- mzs[idx]
     iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
     z_signed <- n_charges * charge_sign
