@@ -266,18 +266,26 @@ enforce_graph_adduct_consistency <- function(df_add) {
     df_add$adduct,
     df_add$adduct_dest
   )))
+  # Prepare lookup tables to consolidate joins
+  support_src <- support |> tidytable::rename(src_support = adduct_support)
+  support_dest <- support |>
+    tidytable::rename(
+      feature_id_dest = feature_id,
+      adduct_dest = adduct,
+      dest_support = adduct_support
+    )
+  state_adduct <- state_map |> tidytable::rename(adduct_state_key = state_key)
+  state_dest <- state_map |>
+    tidytable::rename(
+      adduct_dest = adduct,
+      adduct_dest_state_key = state_key
+    )
+
+  # Consolidate all joins and subsequent mutate into single pipeline
   scored <- df_add |>
+    tidytable::left_join(support_src, by = c("feature_id", "adduct")) |>
     tidytable::left_join(
-      support |> tidytable::rename(src_support = adduct_support),
-      by = c("feature_id", "adduct")
-    ) |>
-    tidytable::left_join(
-      support |>
-        tidytable::rename(
-          feature_id_dest = feature_id,
-          adduct_dest = adduct,
-          dest_support = adduct_support
-        ),
+      support_dest,
       by = c("feature_id_dest", "adduct_dest")
     ) |>
     tidytable::mutate(
@@ -294,18 +302,8 @@ enforce_graph_adduct_consistency <- function(df_add) {
       edge_score = src_support + dest_support,
       edge_complexity = nchar(adduct) + nchar(adduct_dest)
     ) |>
-    tidytable::left_join(
-      state_map |> tidytable::rename(adduct_state_key = state_key),
-      by = "adduct"
-    ) |>
-    tidytable::left_join(
-      state_map |>
-        tidytable::rename(
-          adduct_dest = adduct,
-          adduct_dest_state_key = state_key
-        ),
-      by = "adduct_dest"
-    ) |>
+    tidytable::left_join(state_adduct, by = "adduct") |>
+    tidytable::left_join(state_dest, by = "adduct_dest") |>
     tidytable::mutate(
       adduct_state_key = tidytable::coalesce(adduct_state_key, adduct),
       adduct_dest_state_key = tidytable::coalesce(

@@ -71,12 +71,11 @@ build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
 
   # Combine multiple assignments into single data.table operation
   reps[,
-    c("feature_id_dest", "adduct_dest", "implied_M_dest") :=
-      list(
-        c(as.character(feature_id[-1L]), NA_character_),
-        c(as.character(adduct[-1L]), NA_character_),
-        c(as.numeric(implied_M[-1L]), NA_real_)
-      ),
+    c("feature_id_dest", "adduct_dest", "implied_M_dest") := list(
+      c(as.character(feature_id[-1L]), NA_character_),
+      c(as.character(adduct[-1L]), NA_character_),
+      c(as.numeric(implied_M[-1L]), NA_real_)
+    ),
     by = evidence_cluster
   ]
 

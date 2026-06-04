@@ -632,6 +632,20 @@ utils::globalVariables(
     "target_adduct",
     "target_library",
     "target_name",
-    "target_spectrum_id"
+    "target_spectrum_id",
+    ".base_part",
+    ".char_part",
+    ".mz_exp_num",
+    ".mz_num",
+    "aggregate",
+    "mass_compatible",
+    "ppm_window",
+    "source_component",
+    "source_feature",
+    "target_feature",
+    "target_mass",
+    "target_mz",
+    "target_rt",
+    "tolerance_term"
   )
 )

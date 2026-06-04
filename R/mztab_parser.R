@@ -33,7 +33,7 @@ NULL
 
   chars <- strsplit(x, "", fixed = TRUE)[[1L]]
   fields <- character(0)
-  current <- character(0)  # Use vector accumulation instead of string
+  current <- character(0) # Use vector accumulation instead of string
   escaped <- FALSE
 
   for (ch in chars) {

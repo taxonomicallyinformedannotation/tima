@@ -106,18 +106,20 @@ extract_spectra <- function(object) {
 
   # Harmonize column types
   spectra <- spectra |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::any_of(x = incoherent_logical),
-      .fns = as.logical
-    )) |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::any_of(x = incoherent_integer),
-      .fns = as.integer
-    )) |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::any_of(x = incoherent_numeric),
-      .fns = as.numeric
-    ))
+    tidytable::mutate(
+      tidytable::across(
+        .cols = tidyselect::any_of(x = incoherent_logical),
+        .fns = as.logical
+      ),
+      tidytable::across(
+        .cols = tidyselect::any_of(x = incoherent_integer),
+        .fns = as.integer
+      ),
+      tidytable::across(
+        .cols = tidyselect::any_of(x = incoherent_numeric),
+        .fns = as.numeric
+      )
+    )
 
   # Harmonize Column Names ----
 

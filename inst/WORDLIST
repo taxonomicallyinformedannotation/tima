@@ -47,6 +47,7 @@ Deduplicate
 Dervieux
 Dounoue
 ECMDB
+Enveda
 FBMN
 FingerID
 FingerId
@@ -71,6 +72,7 @@ InChIKey
 InChIKeys
 InterJournal
 JJ
+Jeroen
 Jiefei
 Jonge
 Kirill
@@ -116,6 +118,7 @@ ORCID
 OTT
 Obenchain
 Ollivier
+Ooms
 OpenAPI
 OpenTreeOfLife
 PEPMASS
@@ -162,6 +165,7 @@ Tamás
 Taxonomically
 Thom
 Tidytable
+Traag
 Turaga
 UHFFFAOYSA
 UO
@@ -205,7 +209,6 @@ deprotonated
 deprotonation
 deprotonations
 dest
-devtools
 df
 dimerize
 dimerizes
@@ -291,6 +294,7 @@ params
 parens
 pblapply
 pbmclapply
+pkgload
 pos
 pre
 prefilter

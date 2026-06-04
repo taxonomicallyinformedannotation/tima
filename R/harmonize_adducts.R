@@ -301,7 +301,7 @@ canonicalize_adduct_notation <- local({
       })
     )
 
-    net_agg <- aggregate(parsed$signed_n ~ parsed$formula, FUN = sum)
+    net_agg <- stats::aggregate(parsed$signed_n ~ parsed$formula, FUN = sum)
     net <- data.frame(
       formula = net_agg[[1L]],
       signed_n = as.integer(net_agg[[2L]]),

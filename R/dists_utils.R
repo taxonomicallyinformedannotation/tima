@@ -96,7 +96,7 @@ dist_get <- function(d, idx1, idx2) {
 #' result <- dist_groups(d, groups)
 #'
 #' # Analyze within vs between group distances
-#' aggregate(Distance ~ Label, data = result, FUN = mean)
+#' stats::aggregate(Distance ~ Label, data = result, FUN = mean)
 #' }
 dist_groups <- function(d, g) {
   # Input Validation ----
