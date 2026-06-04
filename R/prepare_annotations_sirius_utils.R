@@ -494,20 +494,13 @@ merge_sirius_structures_with_spectral <- function(
       tidytable::select(-tidyselect::any_of(c(col_x, col_y)))
   }
 
+  # Convert columns directly via assignment (faster than piped mutates)
   if ("candidate_score_similarity" %in% names(merged_keyed)) {
-    merged_keyed <- merged_keyed |>
-      tidytable::mutate(
-        candidate_score_similarity = as.numeric(candidate_score_similarity)
-      )
+    merged_keyed$candidate_score_similarity <- as.numeric(merged_keyed$candidate_score_similarity)
   }
 
   if ("candidate_count_similarity_peaks_matched" %in% names(merged_keyed)) {
-    merged_keyed <- merged_keyed |>
-      tidytable::mutate(
-        candidate_count_similarity_peaks_matched = as.integer(
-          candidate_count_similarity_peaks_matched
-        )
-      )
+    merged_keyed$candidate_count_similarity_peaks_matched <- as.integer(merged_keyed$candidate_count_similarity_peaks_matched)
   }
 
   tidytable::bind_rows(

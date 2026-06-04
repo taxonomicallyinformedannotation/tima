@@ -175,6 +175,7 @@ test_that("copy_backbone integrates with get_default_paths", {
 
   # Should be able to get paths after copying backbone
   paths <- get_default_paths()
+  expect_success()
 })
 
 test_that("copy_backbone supports local_test_project workflow", {

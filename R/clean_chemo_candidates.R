@@ -556,11 +556,14 @@ build_mini_taxonomy_table <- function(
 
   # pmax across both pools: structure label wins when its score_weighted_chemo
   # >= prediction score, otherwise the predicted label wins.
-  df_has_ik |>
-    tidytable::left_join(y = df_str_cla) |>
-    tidytable::left_join(y = df_str_npc) |>
-    tidytable::left_join(y = df_pred_cla) |>
-    tidytable::left_join(y = df_pred_npc) |>
+  # Combine all joins into single operation to avoid multiple table scans
+  joined <- purrr::reduce(
+    .x = list(df_str_cla, df_str_npc, df_pred_cla, df_pred_npc),
+    .init = df_has_ik,
+    .f = function(acc, tbl) tidytable::left_join(x = acc, y = tbl)
+  )
+
+  joined |>
     tidytable::mutate(
       label_classyfire = tidytable::case_when(
         !is.na(score_cla_str) &
@@ -622,11 +625,11 @@ build_mini_results_table <- function(
   df_filtered,
   xrefs_table = NULL
 ) {
-  results_mini <- features_table |>
-    tidytable::left_join(y = df_classes_mini) |>
-    tidytable::left_join(y = results_filtered) |>
-    tidytable::left_join(
-      y = df_filtered |>
+  results_mini <- purrr::reduce(
+    .x = list(
+      df_classes_mini,
+      results_filtered,
+      df_filtered |>
         tidytable::select(
           tidyselect::any_of(c(
             "feature_id",
@@ -642,7 +645,10 @@ build_mini_results_table <- function(
             "score_weighted_chemo"
           ))
         )
-    ) |>
+    ),
+    .init = features_table,
+    .f = function(acc, tbl) tidytable::left_join(x = acc, y = tbl)
+  ) |>
     tidytable::rename(
       label_compound = candidate_structure_name,
       adduct = candidate_adduct,

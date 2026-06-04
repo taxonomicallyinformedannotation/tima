@@ -128,8 +128,11 @@ dist_groups <- function(d, g) {
   # Create Comparison Labels ----
 
   # Create descriptive labels for within/between group comparisons
-  level1 <- levels(g)[pmin(as.numeric(group1), as.numeric(group2))]
-  level2 <- levels(g)[pmax(as.numeric(group1), as.numeric(group2))]
+  # Cache numeric conversions to avoid duplicate conversions
+  g1_num <- as.numeric(group1)
+  g2_num <- as.numeric(group2)
+  level1 <- levels(g)[pmin(g1_num, g2_num)]
+  level2 <- levels(g)[pmax(g1_num, g2_num)]
 
   comparison_labels <- ifelse(
     test = level1 == level2,

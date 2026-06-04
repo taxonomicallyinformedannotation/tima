@@ -33,12 +33,12 @@ NULL
 
   chars <- strsplit(x, "", fixed = TRUE)[[1L]]
   fields <- character(0)
-  current <- ""
+  current <- character(0)  # Use vector accumulation instead of string
   escaped <- FALSE
 
   for (ch in chars) {
     if (escaped) {
-      current <- paste0(current, ch)
+      current <- c(current, ch)
       escaped <- FALSE
       next
     }
@@ -47,13 +47,13 @@ NULL
       next
     }
     if (identical(ch, ",")) {
-      fields <- c(fields, trimws(current))
-      current <- ""
+      fields <- c(fields, trimws(paste(current, collapse = "")))
+      current <- character(0)
       next
     }
-    current <- paste0(current, ch)
+    current <- c(current, ch)
   }
-  fields <- c(fields, trimws(current))
+  fields <- c(fields, trimws(paste(current, collapse = "")))
 
   fields
 }

@@ -138,18 +138,20 @@ complete_organism_taxonomy <- function(table_keys, table_org_tax_ott) {
     tidytable::bind_rows(
       table_org_tax_ott_full |>
         tidytable::as_tidytable() |>
-        tidytable::mutate(tidytable::across(
-          .cols = tidyselect::where(fn = is.numeric),
-          .fns = as.character
-        )) |>
-        tidytable::mutate(tidytable::across(
-          .cols = tidyselect::where(fn = is.list),
-          .fns = as.character
-        )) |>
-        tidytable::mutate(tidytable::across(
-          .cols = tidyselect::where(fn = is.logical),
-          .fns = as.character
-        ))
+        tidytable::mutate(
+          tidytable::across(
+            .cols = tidyselect::where(fn = is.numeric),
+            .fns = as.character
+          ),
+          tidytable::across(
+            .cols = tidyselect::where(fn = is.list),
+            .fns = as.character
+          ),
+          tidytable::across(
+            .cols = tidyselect::where(fn = is.logical),
+            .fns = as.character
+          )
+        )
     )
 }
 

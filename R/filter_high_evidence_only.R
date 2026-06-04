@@ -432,12 +432,10 @@ filter_high_evidence_only <- function(
           .anchor_pass = tidytable::coalesce(.anchor_pass, FALSE)
         )
 
-      keep_child_row_ids <- promoted_rank1 |>
-        tidytable::filter(.anchor_pass) |>
-        tidytable::pull(.row_id)
-      drop_child_row_ids <- promoted_rank1 |>
-        tidytable::filter(!.anchor_pass) |>
-        tidytable::pull(.row_id)
+      # Combine filter + pull operations into single pass
+      keep_mask <- promoted_rank1$.anchor_pass
+      keep_child_row_ids <- promoted_rank1$.row_id[keep_mask]
+      drop_child_row_ids <- promoted_rank1$.row_id[!keep_mask]
 
       df_filtered <- df_filtered |>
         tidytable::filter(!(.row_id %in% drop_child_row_ids))

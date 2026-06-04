@@ -268,7 +268,3 @@ test_that("prepare_features_tables handles empty file", {
     class = "tima_validation_error"
   )
 })
-
-test_that("prepare_features_tables handles large feature tables", {
-  skip("Large data test - run manually")
-})

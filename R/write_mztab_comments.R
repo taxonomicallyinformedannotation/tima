@@ -586,13 +586,25 @@
     }
 
     # Fallback to first available mapped prefix:id.
-    for (i in seq_len(nrow(rows))) {
-      pfx <- as.character(rows$prefix[[i]])
-      id <- as.character(rows$id[[i]])
-      info <- .XREF_KNOWN_PREFIXES[[pfx]]
-      if (!is.null(info) && !is.na(id) && nzchar(id)) {
-        return(paste0(info$prefix, ":", id))
-      }
+    # Find first valid entry instead of looping
+    pfx_vec <- as.character(rows$prefix)
+    id_vec <- as.character(rows$id)
+
+    # Find indices of valid entries
+    valid_idx <- which(
+      !is.na(id_vec) &
+        nzchar(id_vec) &
+        !vapply(
+          pfx_vec,
+          function(p) is.null(.XREF_KNOWN_PREFIXES[[p]]),
+          logical(1L)
+        )
+    )
+
+    if (length(valid_idx) > 0L) {
+      i <- valid_idx[[1L]]
+      info <- .XREF_KNOWN_PREFIXES[[pfx_vec[[i]]]]
+      return(paste0(info$prefix, ":", id_vec[[i]]))
     }
 
     fb <- as.character(fallback)[[1L]]

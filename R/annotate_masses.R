@@ -641,8 +641,11 @@ append_component_weak_hypotheses <- function(
         ad = adduct,
         USE.NAMES = FALSE
       ),
-      mz_diff = abs(as.numeric(mz) - as.numeric(mz_expected)),
-      ppm_diff = mz_diff * 1e6 / pmax(as.numeric(mz), as.numeric(mz_expected)),
+      # Cache numeric conversions to avoid repeated conversions
+      .mz_num = as.numeric(mz),
+      .mz_exp_num = as.numeric(mz_expected),
+      mz_diff = abs(.mz_num - .mz_exp_num),
+      ppm_diff = mz_diff * 1e6 / pmax(.mz_num, .mz_exp_num),
       ppm_ok = is.finite(ppm_diff) & ppm_diff <= tolerance_ppm,
       dalton_ok = if (is.null(tolerance_dalton)) {
         FALSE

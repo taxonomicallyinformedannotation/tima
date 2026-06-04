@@ -71,9 +71,7 @@ test_that("read_mgf_opti strips trailing + from charge", {
   on.exit(unlink(tf))
 
   res <- read_mgf_opti(f = tf)
-  if ("CHARGE" %in% colnames(res)) {
-    expect_equal(as.character(res$CHARGE[[1L]]), "2")
-  }
+  expect_equal(as.character(res$CHARGE[[1L]]), "2")
 })
 
 test_that("read_mgf_opti prefixes negative charge with minus", {
@@ -83,9 +81,7 @@ test_that("read_mgf_opti prefixes negative charge with minus", {
   on.exit(unlink(tf))
 
   res <- read_mgf_opti(f = tf)
-  if ("CHARGE" %in% colnames(res)) {
-    expect_equal(as.character(res$CHARGE[[1L]]), "-1")
-  }
+  expect_equal(as.character(res$CHARGE[[1L]]), "-1")
 })
 
 test_that("read_mgf_opti handles leading-minus charge convention", {
@@ -95,9 +91,7 @@ test_that("read_mgf_opti handles leading-minus charge convention", {
   on.exit(unlink(tf))
 
   res <- read_mgf_opti(f = tf)
-  if ("CHARGE" %in% colnames(res)) {
-    expect_equal(as.character(res$CHARGE[[1L]]), "-1")
-  }
+  expect_equal(as.character(res$CHARGE[[1L]]), "-1")
 })
 
 # ---- PEPMASS without intensity -----------------------------------------------

@@ -1,0 +1,2 @@
+main:
+  script: /Library/Frameworks/R.framework/Versions/4.6/Resources/library/tima/_targets.R

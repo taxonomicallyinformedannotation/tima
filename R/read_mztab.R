@@ -524,17 +524,16 @@ read_mztab <- function(
       next
     }
 
+    # Format mz once and reuse
+    mz_str <- format(mz, scientific = FALSE, trim = TRUE)
     writeLines(
       c(
         "BEGIN IONS",
         paste0("TITLE=", fid),
         paste0("FEATURE_ID=", fid),
-        paste0("PEPMASS=", format(mz, scientific = FALSE, trim = TRUE)),
+        paste0("PEPMASS=", mz_str),
         "CHARGE=1+",
-        paste0(
-          format(mz, scientific = FALSE, trim = TRUE),
-          " 1"
-        ),
+        paste0(mz_str, " 1"),
         "END IONS",
         ""
       ),
