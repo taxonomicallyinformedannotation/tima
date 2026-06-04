@@ -277,32 +277,34 @@ split_tables_sop <- function(table, cache) {
   }
   rm(singletons, multi)
 
-  # str_met: Stereo-invariant properties keyed by inchikey_no_stereo
-  ## formula and exact_mass are deterministically derived from SMILES via
-  ## process_smiles() and are stereo-invariant (same connectivity + protonation
-  ## = same formula = same mass). No group_by + summarize needed — distinct()
-  ## is sufficient since values are deterministic.
-  table_structures_metadata <- table_structural |>
-    tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_molecular_formula)) |>
-    tidytable::filter(!is.na(structure_exact_mass)) |>
-    tidytable::mutate(
-      structure_inchikey_no_stereo = tidytable::if_else(
-        !is.na(structure_inchikey) & nchar(structure_inchikey) >= 27L,
-        paste0(
-          stringi::stri_sub(str = structure_inchikey, from = 1L, to = 14L),
-          "-",
-          stringi::stri_sub(str = structure_inchikey, from = -1L, to = -1L)
-        ),
-        NA_character_
-      )
-    ) |>
-    tidytable::select(
-      structure_inchikey_no_stereo,
-      structure_molecular_formula,
-      structure_exact_mass
-    ) |>
-    tidytable::distinct(structure_inchikey_no_stereo, .keep_all = TRUE)
+   # str_met: Stereo-invariant properties keyed by inchikey_no_stereo
+   ## formula and exact_mass are deterministically derived from SMILES via
+   ## process_smiles() and are stereo-invariant (same connectivity + protonation
+   ## = same formula = same mass). No group_by + summarize needed — distinct()
+   ## is sufficient since values are deterministic.
+   table_structures_metadata <- table_structural |>
+     tidytable::filter(
+       !is.na(structure_inchikey) &
+         !is.na(structure_molecular_formula) &
+         !is.na(structure_exact_mass)
+     ) |>
+     tidytable::mutate(
+       structure_inchikey_no_stereo = tidytable::if_else(
+         !is.na(structure_inchikey) & nchar(structure_inchikey) >= 27L,
+         paste0(
+           stringi::stri_sub(str = structure_inchikey, from = 1L, to = 14L),
+           "-",
+           stringi::stri_sub(str = structure_inchikey, from = -1L, to = -1L)
+         ),
+         NA_character_
+       )
+     ) |>
+     tidytable::select(
+       structure_inchikey_no_stereo,
+       structure_molecular_formula,
+       structure_exact_mass
+     ) |>
+     tidytable::distinct(structure_inchikey_no_stereo, .keep_all = TRUE)
 
   # str_tax_npc: keyed by canonical SMILES with stereo
   table_structures_taxonomy_npc <- table_structural |>
