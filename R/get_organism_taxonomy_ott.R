@@ -67,14 +67,16 @@
   # Helper: combine taxon info with lineage for a single OTT ID
   .combine_single_taxon <- function(idx, taxon_info, taxon_lineage, ott_ids) {
     tidytable::bind_rows(
-      data.frame(
+      tidytable::tidytable(
         id = ott_ids[idx],
         rank = taxon_info[[idx]]$rank,
         name = taxon_info[[idx]]$name,
         unique_name = taxon_info[[idx]]$unique_name,
         ott_id = as.character(taxon_info[[idx]]$ott_id)
       ),
-      data.frame(id = ott_ids[idx], taxon_lineage[[idx]])
+      tidytable::as_tidytable(
+        data.frame(id = ott_ids[idx], taxon_lineage[[idx]])
+      )
     )
   }
 
@@ -88,9 +90,10 @@
     )
 
   tidytable::bind_rows(list_df) |>
-    tidytable::mutate(ott_id = as.integer(ott_id)) |>
-    # Sort by reverse row number for proper hierarchy
-    tidytable::mutate(n = tidytable::row_number()) |>
+    tidytable::mutate(
+      ott_id = as.integer(ott_id),
+      n = tidytable::row_number()
+    ) |>
     tidytable::arrange(tidytable::desc(x = n)) |>
     tidytable::select(-n)
 }

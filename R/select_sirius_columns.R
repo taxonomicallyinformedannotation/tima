@@ -260,14 +260,18 @@ select_sirius_columns_structures <- function(df, sirius_version) {
     "massErrorPrecursor.ppm." = "massErrorPrecursor(ppm)"
   )
 
+  # Cache column names to avoid repeated lookups
+  existing_cols <- names(df)
   for (target in names(alias_map)) {
-    if (target %in% names(df)) {
+    if (target %in% existing_cols) {
       next
     }
     src <- alias_map[[target]]
-    src <- src[src %in% names(df)]
+    src <- src[src %in% existing_cols]
     if (length(src) > 0L) {
       names(df)[names(df) == src[[1L]]] <- target
+      # Update cache after rename
+      existing_cols <- names(df)
     }
   }
 

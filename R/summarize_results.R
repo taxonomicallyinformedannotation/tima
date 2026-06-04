@@ -241,13 +241,10 @@ summarize_results <- function(
     tidytable::mutate(
       tidytable::across(
         .cols = tidyselect::all_of(x = text_cols),
-        .fns = as.character
-      )
-    ) |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidyselect::all_of(x = text_cols),
-        .fns = ~ tidytable::na_if(x = trimws(.x), y = "")
+        .fns = ~ tidytable::na_if(
+          x = trimws(as.character(.x)),
+          y = ""
+        )
       )
     ) |>
     tidytable::select(tidyselect::any_of(x = final_select_cols))

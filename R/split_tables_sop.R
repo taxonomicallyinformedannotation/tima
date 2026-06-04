@@ -377,8 +377,10 @@ split_tables_sop <- function(table, cache) {
 
   # str_tax_cla: keyed by full inchikey
   table_structures_taxonomy_cla <- table_structural |>
-    tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_tax_cla_chemontid)) |>
+    tidytable::filter(
+      !is.na(structure_inchikey) &
+        !is.na(structure_tax_cla_chemontid)
+    ) |>
     tidytable::select(
       structure_inchikey,
       structure_tax_cla_chemontid,

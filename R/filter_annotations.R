@@ -505,12 +505,17 @@ enforce_ms1_adduct_semantics <- function(
       )
     )
 
-  dropped_n <- out |>
-    tidytable::filter(!.keep_row) |>
-    nrow()
-  dropped_spectral_n <- out |>
-    tidytable::filter(!.keep_row, .is_spectral_row) |>
-    nrow()
+  # Get dropped rows count info before filtering
+  dropped_rows <- out |>
+    tidytable::filter(!.keep_row)
+  dropped_n <- nrow(dropped_rows)
+  dropped_spectral_n <- if (dropped_n > 0L) {
+    nrow(dropped_rows |> tidytable::filter(.is_spectral_row))
+  } else {
+    0L
+  }
+  rm(dropped_rows)
+
   if (dropped_n > 0L) {
     log_info(
       "Removed %d non-MS1 annotation row(s) incompatible with strong MS1 adduct assignments",

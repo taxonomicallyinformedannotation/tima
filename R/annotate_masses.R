@@ -1353,10 +1353,16 @@ enforce_non_conflicting_annotation_states <- function(
     n_input = nrow(annotations),
     n_kept = nrow(out),
     n_dropped = nrow(dropped),
-    n_input_features = nrow(annotations |> tidytable::distinct(feature_id)),
-    n_kept_features = nrow(out |> tidytable::distinct(feature_id)),
+    n_input_features = annotations |>
+      tidytable::distinct(feature_id) |>
+      nrow(),
+    n_kept_features = out |>
+      tidytable::distinct(feature_id) |>
+      nrow(),
     n_dropped_features = if (nrow(dropped) > 0L) {
-      nrow(dropped |> tidytable::distinct(feature_id))
+      dropped |>
+        tidytable::distinct(feature_id) |>
+        nrow()
     } else {
       0L
     }
