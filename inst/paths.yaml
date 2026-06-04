@@ -42,6 +42,7 @@ data:
         # markerdb: data/interim/libraries/sop/markerdb_prepared.tsv.gz
         ymdb: data/interim/libraries/sop/ymdb_prepared.tsv.gz
         cannabisdatabase: data/interim/libraries/sop/cannabisdatabase_prepared.tsv.gz
+        enveda: data/interim/libraries/sop/enveda180_prepared.tsv.gz
         lotus: data/interim/libraries/sop/lotus_prepared.tsv.gz
         massbank: data/interim/libraries/sop/massbank_202510_prepared.tsv.gz
         merlin: data/interim/libraries/sop/merlin_16984129_prepared.tsv.gz
@@ -73,11 +74,13 @@ data:
         exp:
           path: data/interim/libraries/spectra/exp
           pos:
+            enveda: data/interim/libraries/spectra/exp/enveda180_pos.rds
             gnps: data/interim/libraries/spectra/exp/gnps_11566051_pos.rds
             massbank: data/interim/libraries/spectra/exp/massbank_202510_pos.rds
             merlin: data/interim/libraries/spectra/exp/merlin_16984129_pos.rds
             mona: data/interim/libraries/spectra/exp/mona_pos.rds
           neg:
+            enveda: data/interim/libraries/spectra/exp/enveda180_neg.rds
             gnps: data/interim/libraries/spectra/exp/gnps_11566051_neg.rds
             massbank: data/interim/libraries/spectra/exp/massbank_202510_neg.rds
             merlin: data/interim/libraries/spectra/exp/merlin_16984129_neg.rds
@@ -301,6 +304,7 @@ urls:
       references: reference_metadata.tsv.gz
       structures: structure_metadata.tsv.gz
   sop:
+    enveda: https://github.com/Adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/sop/enveda180_prepared.tsv.gz
     gnps: https://github.com/Adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/sop/gnps_11566051_prepared.tsv.gz
     massbank: https://github.com/Adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/sop/massbank_202510_prepared.tsv.gz
     merlin: https://github.com/Adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/sop/merlin_16984129_prepared.tsv.gz
@@ -308,12 +312,14 @@ urls:
     nor: https://github.com/Adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/sop/isdbnormansusdat_14854025_prepared.tsv.gz
   spectra:
     pos:
+      enveda: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/enveda180_pos.rds
       gnps: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/gnps_11566051_pos.rds
       massbank: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/massbank_202510_pos.rds
       merlin: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/merlin_16984129_pos.rds
       isdb: https://github.com/taxonomicallyinformedannotation/tima-isdb-pos/raw/main/wikidata_5607185_pos.rds
       nor: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/isdbnormansusdat_14854025_pos.rds
     neg:
+      enveda: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/enveda180_neg.rds
       gnps: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/gnps_11566051_neg.rds
       massbank: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/massbank_202510_neg.rds
       merlin: https://github.com/adafede/SpectRalLibRaRies/raw/main/data/interim/libraries/spectra/exp/merlin_16984129_neg.rds

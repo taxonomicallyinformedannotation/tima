@@ -194,6 +194,9 @@ files:
         #' ECMDB prepared structure organism pairs library. STRING
         ecmdb: data/interim/libraries/sop/ecmdb_prepared.tsv.gz
 
+        #' ENVEDA prepared structure organism pairs library. STRING
+        enveda: data/interim/libraries/sop/enveda180_prepared.tsv.gz
+
         #' GNPS prepared structure organism pairs library. STRING
         gnps: data/interim/libraries/sop/gnps_11566051_prepared.tsv.gz
         
@@ -321,6 +324,7 @@ files:
     spectral:
       #' List of negative spectral libraries. STRING
       neg:
+        - data/interim/libraries/spectra/exp/enveda180_neg.rds
         - data/interim/libraries/spectra/exp/gnps_11566051_neg.rds
         - data/interim/libraries/spectra/exp/isdbnormansusdat_14854025_neg.rds
         - data/interim/libraries/spectra/exp/massbank_2025051_neg.rds
@@ -329,6 +333,7 @@ files:
 
       #' List of positive spectral libraries. STRING
       pos:
+        - data/interim/libraries/spectra/exp/enveda180_pos.rds
         - data/interim/libraries/spectra/exp/gnps_11566051_pos.rds
         - data/interim/libraries/spectra/exp/isdbnormansusdat_14854025_pos.rds
         - data/interim/libraries/spectra/exp/massbank_2025051_pos.rds

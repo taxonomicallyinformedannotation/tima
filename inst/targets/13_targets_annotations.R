@@ -98,6 +98,7 @@ targets_section_annotations <- function() {
               libraries = c(
                 lib_spe_is_nor_pre_pos,
                 lib_spe_is_wik_pre_pos,
+                lib_spe_exp_env_pre_pos,
                 lib_spe_exp_int_pre_pos,
                 lib_spe_exp_gnp_pre_pos,
                 lib_spe_exp_mb_pre_pos,
@@ -129,6 +130,7 @@ targets_section_annotations <- function() {
               libraries = c(
                 lib_spe_is_nor_pre_neg,
                 lib_spe_is_wik_pre_neg,
+                lib_spe_exp_env_pre_neg,
                 lib_spe_exp_int_pre_neg,
                 lib_spe_exp_gnp_pre_neg,
                 lib_spe_exp_mb_pre_neg,

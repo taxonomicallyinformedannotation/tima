@@ -66,6 +66,36 @@ targets_section_libraries <- function() {
     ),
     list(
       tar_target(
+        name = lib_spe_exp_env_pre_pos,
+        command = {
+          get_file(
+            url = paths$urls$spectra$pos$enveda,
+            export = paths$data$interim$libraries$spectra$exp$pos$enveda
+          )
+        },
+        format = "file"
+      ),
+      tar_target(
+        name = lib_spe_exp_env_pre_neg,
+        command = {
+          get_file(
+            url = paths$urls$spectra$neg$enveda,
+            export = paths$data$interim$libraries$spectra$exp$neg$enveda
+          )
+        },
+        format = "file"
+      ),
+      tar_target(
+        name = lib_spe_exp_env_pre_sop,
+        command = {
+          get_file(
+            url = paths$urls$sop$enveda,
+            export = paths$data$interim$libraries$sop$enveda
+          )
+        },
+        format = "file"
+      ),
+      tar_target(
         name = lib_spe_exp_gnp_pre_pos,
         command = {
           get_file(
@@ -673,6 +703,7 @@ targets_section_libraries <- function() {
                 lib_sop_hmd_fam_pre,
                 lib_sop_lot_pre,
                 lib_rt_sop,
+                lib_spe_exp_env_pre_sop,
                 lib_spe_exp_int_pre_sop,
                 lib_spe_exp_gnp_pre_sop,
                 lib_spe_exp_mb_pre_sop,
