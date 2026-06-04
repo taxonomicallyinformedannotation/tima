@@ -223,6 +223,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
   <!-- -   MiMeDB 2.0: <https://doi.org/10.1093/nar/gkaf1272> -->
 - T3DB: <https://doi.org/10.1093/nar/gku1004>
 - YMDB 2.0: <https://doi.org/10.1093/nar/gkw1058>
+- Enveda-180: <https://doi.org/10.5281/zenodo.20436851>
 - MassBank: <https://doi.org/10.5281/zenodo.3378723>
 - Merlin: <https://doi.org/10.5281/zenodo.13911806>
 - NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
@@ -232,46 +233,55 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 
 | Package | Version | Citation |
 |:---|:---|:---|
-| archive | 1.1.13 | Hester and Csárdi (2025) |
-| base | 4.6.0 | R Core Team (2025) |
+| archive | 1.1.13 | Hester and Csárdi (2026) |
+| base | 4.6.0 | R Core Team (2026a) |
 | BiocManager | 1.30.27 | Morgan and Ramos (2025) |
-| BiocParallel | 1.46.0 | Wang et al. (2025) |
+| BiocParallel | 1.46.0 | Wang et al. (2026) |
 | BiocVersion | 3.23.1 | Morgan (2025) |
-| devtools | 2.5.2 | (**devtools?**) |
 | docopt | 0.7.2 | <span class="nocase">de Jonge</span> (2025) |
-| fs | 2.1.0 | Hester et al. (2025) |
+| fs | 2.1.0 | Hester et al. (2026) |
 | httr2 | 1.2.2 | Wickham (2025) |
-| igraph | 2.3.1 | Csárdi and Nepusz (2006); Antonov et al. (2023); (**igraph2026?**) |
+| igraph | 2.3.2 | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2026) |
 | knitr | 1.51 | Xie (2014); Xie (2015); Xie (2025) |
-| lgr | 0.5.2 | Fleck (2025) |
-| lifecycle | 1.0.5 | (**lifecycle?**) |
+| lgr | 0.5.2 | Fleck (2026) |
+| lifecycle | 1.0.5 | Henry and Wickham (2026) |
 | MetaboCoreUtils | 1.20.1 | Rainer et al. (2022a) |
-| MsBackendMgf | 1.20.0 | Gatto et al. (2025) |
+| MsBackendMgf | 1.20.0 | Gatto et al. (2026) |
 | MsBackendMsp | 1.16.0 | Rainer et al. (2022b) |
 | MsCoreUtils | 1.24.0 | Rainer et al. (2022c) |
 | msentropy | 0.1.4 | Li (2023) |
+| pkgload | 1.5.2 | Wickham et al. (2026) |
 | R.utils | 2.13.0 | Bengtsson (2025) |
-| reticulate | 1.46.0 | Ushey et al. (2025) |
-| rmarkdown | 2.31 | Xie et al. (2018); Xie et al. (2020); (**rmarkdown2026?**) |
+| reticulate | 1.46.0 | Ushey et al. (2026) |
+| rmarkdown | 2.31 | Xie et al. (2018); Xie et al. (2020); Allaire et al. (2026) |
 | rotl | 3.1.1 | Michonneau et al. (2016); OpenTreeOfLife et al. (2019) |
-| shiny | 1.13.0 | Chang et al. (2025) |
+| shiny | 1.13.0 | Chang et al. (2026) |
 | shinyhelper | 0.3.2 | Mason-Thom (2019) |
-| shinyjs | 2.1.1 | Attali (2021) |
-| shinytest2 | 0.5.1 | Schloerke (2025) |
+| shinyjs | 2.1.1 | Attali (2026) |
+| shinytest2 | 0.5.1 | Schloerke (2026) |
 | shinyvalidate | 0.1.3 | Sievert et al. (2023) |
 | Spectra | 1.22.0 | Rainer et al. (2022d) |
+| spelling | 2.3.2 | Ooms and Hester (2025) |
 | stringi | 1.8.7 | Gagolewski (2022) |
 | targets | 1.12.0 | Landau (2021) |
 | testthat | 3.3.2 | Wickham (2011) |
 | tidyselect | 1.2.1 | Henry and Wickham (2024) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
-| tima | 2.13.0.9000 | Rutz et al. (2019); Rutz and Allard (2025) |
-| tools | 4.6.0 | (**tools?**) |
+| tima | 2.13.0.9000 | Rutz et al. (2019); Rutz and Allard (2026) |
+| tools | 4.6.0 | R Core Team (2026b) |
 | withr | 3.0.2 | Hester et al. (2024) |
 | yaml | 2.3.12 | Stephens and Simonov (2025) |
 
 <div id="refs" class="references csl-bib-body hanging-indent">
+
+<div id="ref-rmarkdown2026" class="csl-entry">
+
+Allaire, JJ, Yihui Xie, Christophe Dervieux, et al. 2026.
+*<span class="nocase">rmarkdown</span>: Dynamic Documents for r*.
+<https://github.com/rstudio/rmarkdown>.
+
+</div>
 
 <div id="ref-igraph2023" class="csl-entry">
 
@@ -284,7 +294,7 @@ Enables Fast and Robust Network Analysis Across Programming Languages.”
 
 <div id="ref-shinyjs" class="csl-entry">
 
-Attali, Dean. 2021. *<span class="nocase">shinyjs</span>: Easily Improve
+Attali, Dean. 2026. *<span class="nocase">shinyjs</span>: Easily Improve
 the User Experience of Your Shiny Apps in Seconds*.
 <https://doi.org/10.32614/CRAN.package.shinyjs>.
 
@@ -299,7 +309,7 @@ Programming Utilities*. <https://doi.org/10.32614/CRAN.package.R.utils>.
 
 <div id="ref-shiny" class="csl-entry">
 
-Chang, Winston, Joe Cheng, JJ Allaire, et al. 2025.
+Chang, Winston, Joe Cheng, JJ Allaire, et al. 2026.
 *<span class="nocase">shiny</span>: Web Application Framework for r*.
 <https://doi.org/10.32614/CRAN.package.shiny>.
 
@@ -310,6 +320,14 @@ Chang, Winston, Joe Cheng, JJ Allaire, et al. 2025.
 Csárdi, Gábor, and Tamás Nepusz. 2006. “The Igraph Software Package for
 Complex Network Research.” *InterJournal* Complex Systems: 1695.
 <https://igraph.org>.
+
+</div>
+
+<div id="ref-igraph2026" class="csl-entry">
+
+Csárdi, Gábor, Tamás Nepusz, Vincent Traag, et al. 2026.
+*<span class="nocase">igraph</span>: Network Analysis and Visualization
+in r*. <https://doi.org/10.5281/zenodo.7682609>.
 
 </div>
 
@@ -331,7 +349,7 @@ Interface to “<span class="nocase">data.table</span>”*.
 
 <div id="ref-lgr" class="csl-entry">
 
-Fleck, Stefan. 2025. *<span class="nocase">lgr</span>: A Fully Featured
+Fleck, Stefan. 2026. *<span class="nocase">lgr</span>: A Fully Featured
 Logging Framework*. <https://doi.org/10.32614/CRAN.package.lgr>.
 
 </div>
@@ -346,7 +364,7 @@ Software* 103 (2): 1–59. <https://doi.org/10.18637/jss.v103.i02>.
 
 <div id="ref-MsBackendMgf" class="csl-entry">
 
-Gatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2025.
+Gatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2026.
 *MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
 (Mgf) Files*. <https://doi.org/10.18129/B9.bioc.MsBackendMgf>.
 
@@ -360,9 +378,17 @@ Henry, Lionel, and Hadley Wickham. 2024.
 
 </div>
 
+<div id="ref-lifecycle" class="csl-entry">
+
+Henry, Lionel, and Hadley Wickham. 2026.
+*<span class="nocase">lifecycle</span>: Manage the Life Cycle of Your
+Package Functions*. <https://doi.org/10.32614/CRAN.package.lifecycle>.
+
+</div>
+
 <div id="ref-archive" class="csl-entry">
 
-Hester, Jim, and Gábor Csárdi. 2025.
+Hester, Jim, and Gábor Csárdi. 2026.
 *<span class="nocase">archive</span>: Multi-Format Archive and
 Compression Support*. <https://doi.org/10.32614/CRAN.package.archive>.
 
@@ -379,7 +405,7 @@ and Winston Chang. 2024. *<span class="nocase">withr</span>: Run Code
 
 <div id="ref-fs" class="csl-entry">
 
-Hester, Jim, Hadley Wickham, and Gábor Csárdi. 2025.
+Hester, Jim, Hadley Wickham, and Gábor Csárdi. 2026.
 *<span class="nocase">fs</span>: Cross-Platform File System Operations
 Based on “<span class="nocase">libuv</span>”*.
 <https://doi.org/10.32614/CRAN.package.fs>.
@@ -423,7 +449,7 @@ Open Tree of Life Data.” *Methods in Ecology and Evolution* 7 (12):
 <div id="ref-BiocVersion" class="csl-entry">
 
 Morgan, Martin. 2025. *BiocVersion: Set the Appropriate Version of
-Bioconductor Packages*. <https://doi.org/10.18129/B9.bioc.BiocVersion>.
+Bioconductor Packages*.
 
 </div>
 
@@ -432,6 +458,14 @@ Bioconductor Packages*. <https://doi.org/10.18129/B9.bioc.BiocVersion>.
 Morgan, Martin, and Marcel Ramos. 2025. *BiocManager: Access the
 Bioconductor Project Package Repository*.
 <https://doi.org/10.32614/CRAN.package.BiocManager>.
+
+</div>
+
+<div id="ref-spelling" class="csl-entry">
+
+Ooms, Jeroen, and Jim Hester. 2025.
+*<span class="nocase">spelling</span>: Tools for Spell Checking in r*.
+<https://doi.org/10.32614/CRAN.package.spelling>.
 
 </div>
 
@@ -445,9 +479,17 @@ OpenTreeOfLife, Benjamin Redelings, Luna Luisa Sanchez Reyes, et al.
 
 <div id="ref-base" class="csl-entry">
 
-R Core Team. 2025. *R: A Language and Environment for Statistical
+R Core Team. 2026a. *R: A Language and Environment for Statistical
 Computing*. R Foundation for Statistical Computing.
-<https://www.R-project.org/>.
+<https://doi.org/10.32614/R.manuals>.
+
+</div>
+
+<div id="ref-tools" class="csl-entry">
+
+R Core Team. 2026b. *R: A Language and Environment for Statistical
+Computing*. R Foundation for Statistical Computing.
+<https://doi.org/10.32614/R.manuals>.
 
 </div>
 
@@ -483,9 +525,9 @@ and Expandable Ecosystem for Metabolomics Data Annotation in r.”
 
 </div>
 
-<div id="ref-tima2025" class="csl-entry">
+<div id="ref-tima2026" class="csl-entry">
 
-Rutz, Adriano, and Pierre-Marie Allard. 2025.
+Rutz, Adriano, and Pierre-Marie Allard. 2026.
 *<span class="nocase">tima</span>: Taxonomically Informed Metabolite
 Annotation*. <https://doi.org/10.5281/zenodo.5797920>.
 
@@ -502,7 +544,7 @@ Annotation.” *Frontiers in Plant Science* 10.
 
 <div id="ref-shinytest2" class="csl-entry">
 
-Schloerke, Barret. 2025. *Shinytest2: Testing for Shiny Applications*.
+Schloerke, Barret. 2026. *Shinytest2: Testing for Shiny Applications*.
 <https://doi.org/10.32614/CRAN.package.shinytest2>.
 
 </div>
@@ -525,7 +567,7 @@ Back*. <https://doi.org/10.32614/CRAN.package.yaml>.
 
 <div id="ref-reticulate" class="csl-entry">
 
-Ushey, Kevin, JJ Allaire, and Yuan Tang. 2025.
+Ushey, Kevin, JJ Allaire, and Yuan Tang. 2026.
 *<span class="nocase">reticulate</span>: Interface to “Python”*.
 <https://doi.org/10.32614/CRAN.package.reticulate>.
 
@@ -534,7 +576,7 @@ Ushey, Kevin, JJ Allaire, and Yuan Tang. 2025.
 <div id="ref-BiocParallel" class="csl-entry">
 
 Wang, Jiefei, Martin Morgan, Valerie Obenchain, Michel Lang, Ryan
-Thompson, and Nitesh Turaga. 2025. *BiocParallel: Bioconductor
+Thompson, and Nitesh Turaga. 2026. *BiocParallel: Bioconductor
 Facilities for Parallel Evaluation*.
 <https://doi.org/10.18129/B9.bioc.BiocParallel>.
 
@@ -560,6 +602,14 @@ Responses*. <https://doi.org/10.32614/CRAN.package.httr2>.
 Wickham, Hadley, Mara Averick, Jennifer Bryan, et al. 2019. “Welcome to
 the <span class="nocase">tidyverse</span>.” *Journal of Open Source
 Software* 4 (43): 1686. <https://doi.org/10.21105/joss.01686>.
+
+</div>
+
+<div id="ref-pkgload" class="csl-entry">
+
+Wickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2026.
+*<span class="nocase">pkgload</span>: Simulate Package Installation and
+Attach*. <https://doi.org/10.32614/CRAN.package.pkgload>.
 
 </div>
 
@@ -589,16 +639,14 @@ Package for Dynamic Report Generation in R*. <https://yihui.org/knitr/>.
 <div id="ref-rmarkdown2018" class="csl-entry">
 
 Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. *R Markdown: The
-Definitive Guide*. Chapman; Hall/CRC.
-<https://bookdown.org/yihui/rmarkdown>.
+Definitive Guide*. Chapman; Hall/CRC. <https://yihui.org/rmarkdown/>.
 
 </div>
 
 <div id="ref-rmarkdown2020" class="csl-entry">
 
 Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. *R Markdown
-Cookbook*. Chapman; Hall/CRC.
-<https://bookdown.org/yihui/rmarkdown-cookbook>.
+Cookbook*. Chapman; Hall/CRC. <https://yihui.org/rmarkdown-cookbook>.
 
 </div>
 

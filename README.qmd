@@ -199,6 +199,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 <!-- -   MiMeDB 2.0: <https://doi.org/10.1093/nar/gkaf1272> -->
 -   T3DB: <https://doi.org/10.1093/nar/gku1004>
 -   YMDB 2.0: <https://doi.org/10.1093/nar/gkw1058>
+-   Enveda-180: <https://doi.org/10.5281/zenodo.20436851>
 -   MassBank: <https://doi.org/10.5281/zenodo.3378723>
 -   Merlin: <https://doi.org/10.5281/zenodo.13911806>
 -   NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
