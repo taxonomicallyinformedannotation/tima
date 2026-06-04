@@ -226,9 +226,9 @@ solve_consistent_adduct_assignments <- function(
         }
       }
     }
-     # comp_nodes is already unique by construction (visited check ensures no duplicates)
-     components[[length(components) + 1L]] <- comp_nodes
-   }
+    # comp_nodes is already unique by construction (visited check ensures no duplicates)
+    components[[length(components) + 1L]] <- comp_nodes
+  }
 
   # For each component, compute consistent M assignments
   all_m_maps <- list()

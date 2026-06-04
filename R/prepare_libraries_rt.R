@@ -344,8 +344,8 @@ prepare_libraries_rt <- function(
     empty_df
   }
 
-   df_rts <- tidytable::bind_rows(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2) |>
-     tidytable::filter(!is.na(as.numeric(rt)) & !is.na(structure_inchikey))
+  df_rts <- tidytable::bind_rows(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2) |>
+    tidytable::filter(!is.na(as.numeric(rt)) & !is.na(structure_inchikey))
 
   # Free memory
   rm(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2)

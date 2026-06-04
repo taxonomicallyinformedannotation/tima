@@ -566,11 +566,11 @@ merge_sirius_structures_with_spectral <- function(
     return(x)
   }
 
-   # Prevent join fan-out when payload has multiple rows for the same key.
-   # Keep only one row per key, preferring the first occurrence
-   y_reduced <- y |>
-     tidytable::select(tidyselect::any_of(c(by, new_cols))) |>
-     tidytable::distinct(tidyselect::any_of(by), .keep_all = TRUE)
+  # Prevent join fan-out when payload has multiple rows for the same key.
+  # Keep only one row per key, preferring the first occurrence
+  y_reduced <- y |>
+    tidytable::select(tidyselect::any_of(c(by, new_cols))) |>
+    tidytable::distinct(tidyselect::any_of(by), .keep_all = TRUE)
 
   tidytable::left_join(x, y_reduced, by = by)
 }

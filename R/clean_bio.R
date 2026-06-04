@@ -133,17 +133,17 @@ clean_bio <- function(
     df1b <- df1 |>
       tidytable::select(-tidyselect::contains(match = "feature_pred_tax"))
 
-     # Get feature_ids that have predictions to exclude from the main set
-     # Using anti_join is more efficient than %in% for large vectors
-     df2 <- annotations_distinct |>
-       tidytable::select(
-         -tidyselect::contains(match = "feature_pred_tax")
-       ) |>
-       tidytable::anti_join(
-         df1b |> tidytable::distinct(feature_id),
-         by = "feature_id"
-       ) |>
-       tidytable::bind_rows(df1b)
+    # Get feature_ids that have predictions to exclude from the main set
+    # Using anti_join is more efficient than %in% for large vectors
+    df2 <- annotations_distinct |>
+      tidytable::select(
+        -tidyselect::contains(match = "feature_pred_tax")
+      ) |>
+      tidytable::anti_join(
+        df1b |> tidytable::distinct(feature_id),
+        by = "feature_id"
+      ) |>
+      tidytable::bind_rows(df1b)
   } else {
     df1 <- tidytable::tidytable()
     df1b <- tidytable::tidytable()
@@ -170,13 +170,13 @@ clean_bio <- function(
     return(annot_table_wei_bio_preclean)
   }
 
-   # Replace features that should be cleaned with their precomputed versions
-   annot_table_wei_bio_clean <- annot_table_wei_bio_preclean |>
-     tidytable::anti_join(
-       df1b |> tidytable::distinct(feature_id),
-       by = "feature_id"
-     ) |>
-     tidytable::bind_rows(df1)
+  # Replace features that should be cleaned with their precomputed versions
+  annot_table_wei_bio_clean <- annot_table_wei_bio_preclean |>
+    tidytable::anti_join(
+      df1b |> tidytable::distinct(feature_id),
+      by = "feature_id"
+    ) |>
+    tidytable::bind_rows(df1)
 
   rm(
     annot_table_wei_bio_preclean,
