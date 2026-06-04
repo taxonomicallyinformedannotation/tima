@@ -415,13 +415,16 @@ generate_adduct_hypotheses <- function(
   out <- list()
   out_i <- 0L
 
-  cluster_choices <- c(list(NULL), as.list(seq_along(cluster_parsed)))
-  if (max_clusters_per_adduct < 1L) {
-    cluster_choices <- list(NULL)
+  # Determine available cluster and loss choices early
+  cluster_choices <- if (max_clusters_per_adduct < 1L) {
+    list(NULL)
+  } else {
+    c(list(NULL), as.list(seq_along(cluster_parsed)))
   }
-  loss_choices <- c(list(NULL), as.list(seq_along(loss_parsed)))
-  if (max_losses_per_adduct < 1L) {
-    loss_choices <- list(NULL)
+  loss_choices <- if (max_losses_per_adduct < 1L) {
+    list(NULL)
+  } else {
+    c(list(NULL), as.list(seq_along(loss_parsed)))
   }
 
   for (ci in cluster_choices) {

@@ -44,7 +44,7 @@ build_evidence_supported_hypotheses <- function(
     return(empty_evidence_table())
   }
 
-  # Pre-extract feature columns to plain vectors for vectorized math.
+  # Pre-extract feature columns to plain vectors.
   feature_ids <- as.character(feats_dt$feature_id)
   feature_rts <- as.numeric(feats_dt$rt)
   feature_mzs <- as.numeric(feats_dt$mz)
@@ -128,7 +128,7 @@ build_evidence_supported_hypotheses <- function(
     ifelse(is.finite(cap_eff), as.character(cap_eff), "Inf")
   )
 
-  # Streaming, vectorized hypothesis generation per adduct row.
+  # Hypothesis generation per adduct row.
   # Hot path uses a CHEAP inclusion check (two findIntervals) — no nearest
   # distance computation. The actual ppm error is computed in ONE batched
   # call after the loop, on the (much smaller) kept set.

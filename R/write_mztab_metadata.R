@@ -379,7 +379,7 @@
   header_vals <- c(header_prefix, write_cols)
   writeLines(paste(header_vals, collapse = "\t"), con)
 
-  # ── Data rows (vectorized) ──
+  # ── Data rows ──
   # Convert table to data.frame for efficient column access
   tbl_df <- as.data.frame(tbl, stringsAsFactors = FALSE, check.names = FALSE)
 
@@ -391,7 +391,7 @@
     v
   })
 
-  # Build all rows at once (vectorized)
+  # Build all rows at once
   rows_list <- lapply(seq_len(nrow(tbl)), function(i) {
     row_vals <- vapply(row_data, function(col_vec) col_vec[[i]], character(1L))
     paste(c(row_prefix, row_vals), collapse = "\t")

@@ -129,7 +129,7 @@ implied_neutral_mass <- function(
 #' Greedy ppm-tolerance clustering of a sorted numeric vector. NA values
 #' each get their own singleton cluster.
 #'
-#' Fully vectorized: with sorted ascending values, single-link clustering at a
+#' Sorted ascending values, single-link clustering at a
 #' relative tolerance reduces to consecutive-pair gap tests + cumsum.
 #'
 #' @keywords internal

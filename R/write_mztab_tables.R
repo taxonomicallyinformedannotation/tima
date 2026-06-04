@@ -1,6 +1,6 @@
 # ── Internal helpers ──────────────────────────────────────────────────────────
 
-#' Safely extract a column or return "null" vector (vectorized utility)
+#' Safely extract a column or return "null" vector
 #' @keywords internal
 .mztab_pluck <- function(df, col) {
   if (col %in% colnames(df)) {
@@ -10,7 +10,7 @@
   }
 }
 
-#' Safely extract a column, replacing NA/null with "null" (vectorized utility)
+#' Safely extract a column, replacing NA/null with "null"
 #' @keywords internal
 .mztab_pluck_na <- function(df, col) {
   x <- .mztab_pluck(df, col)
@@ -57,7 +57,7 @@
 
   id_cols <- setdiff(colnames(results), multi_cols)
 
-  # Pre-compute the number of values per row (vectorized)
+  # Pre-compute the number of values per row
   n_vals_per_row <- vapply(
     seq_len(nrow(results)),
     function(i) {
@@ -181,7 +181,7 @@
   if (length(extra_feat_cols) > 0L) {
     used_names <- colnames(smf_canonical)
 
-    # Build all opt_global column names first (vectorized)
+    # Build all opt_global column names first
     opt_col_mapping <- lapply(extra_feat_cols, function(col) {
       base_name <- .mztab_opt_colname(col)
       out_name <- base_name
@@ -467,20 +467,30 @@
   if (length(extra_cols) > 0L) {
     used_names <- colnames(sme)
 
-    # Build all opt_global column names first (vectorized)
-    opt_col_mapping <- lapply(extra_cols, function(col) {
-      base_name <- .mztab_opt_colname(col)
-      out_name <- base_name
-      i <- 1L
-      while (out_name %in% used_names) {
-        i <- i + 1L
-        out_name <- paste0(base_name, "_", i)
-      }
-      used_names <<- c(used_names, out_name)
-      list(col = col, out_name = out_name)
-    })
+    # Generate base names for all extra columns
+    base_names <- vapply(
+      extra_cols,
+      .mztab_opt_colname,
+      character(1L),
+      USE.NAMES = FALSE
+    )
 
-    # Vectorized extraction and assignment
+    # Use make.unique to efficiently handle name collisions with existing columns
+    all_candidate_names <- c(used_names, base_names)
+    unique_mapping <- make.unique(all_candidate_names, sep = "_")
+
+    # Extract the final unique names (skip the used_names prefix)
+    final_names <- unique_mapping[seq_along(base_names) + length(used_names)]
+
+    # Build mapping list
+    opt_col_mapping <- mapply(
+      function(col, out_name) list(col = col, out_name = out_name),
+      extra_cols,
+      final_names,
+      SIMPLIFY = FALSE
+    )
+
+    # Extraction and assignment
     for (mapping in opt_col_mapping) {
       sme[[mapping$out_name]] <- .mztab_pluck_na(ann, mapping$col)
     }

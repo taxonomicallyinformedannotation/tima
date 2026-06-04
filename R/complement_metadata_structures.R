@@ -753,7 +753,7 @@ complement_metadata_structures <- function(
 
 
 .resolve_numeric_or_na <- function(x, tolerance = 1e-8) {
-  nums <- as.numeric(stats::na.omit(as.character(x)))
+  nums <- stats::na.omit(as.numeric(x))
   nums <- nums[is.finite(nums)]
 
   if (length(nums) == 0L) {

@@ -216,34 +216,36 @@
   new_keys <- .mztab_smf_key(smf_new)
   match_idx <- match(new_keys, base_keys)
 
-  # Map duplicates and collect new rows to add
-  new_rows_to_add <- list()
-  id_offset <- 0L
+  # Map duplicates and collect new row indices
+  new_row_indices <- which(is.na(match_idx))
+  new_rows_count <- length(new_row_indices)
 
-  for (i in seq_len(nrow(smf_new))) {
-    old_id <- smf_new$SMF_ID[[i]]
-
-    if (!is.na(match_idx[[i]])) {
-      # Duplicate found in base
+  if (new_rows_count > 0L) {
+    # Process duplicates first
+    dup_idx <- !is.na(match_idx)
+    for (i in which(dup_idx)) {
+      old_id <- smf_new$SMF_ID[[i]]
       id_map[[old_id]] <- smf_all$SMF_ID[[match_idx[[i]]]]
-    } else {
-      # New entry
-      row <- smf_new[i, , drop = FALSE]
-      new_id <- as.character(next_id + id_offset)
-      row$SMF_ID <- new_id
-      row$SML_ID_REFS <- "null"
-      new_rows_to_add[[length(new_rows_to_add) + 1L]] <- row
-      id_map[[old_id]] <- new_id
-      id_offset <- id_offset + 1L
     }
-  }
 
-  # Batch append all new rows
-  if (length(new_rows_to_add) > 0L) {
-    smf_all <- tidytable::bind_rows(
-      smf_all,
-      tidytable::bind_rows(new_rows_to_add)
-    )
+    # Prepare new rows with batch ID assignment
+    new_rows <- smf_new[new_row_indices, , drop = FALSE]
+    new_rows$SMF_ID <- as.character(next_id + seq_len(new_rows_count) - 1L)
+    new_rows$SML_ID_REFS <- "null"
+
+    # Map new row IDs and append
+    for (j in seq_len(new_rows_count)) {
+      old_id <- smf_new$SMF_ID[[new_row_indices[j]]]
+      id_map[[old_id]] <- new_rows$SMF_ID[[j]]
+    }
+
+    smf_all <- tidytable::bind_rows(smf_all, new_rows)
+  } else {
+    # Process duplicates only
+    for (i in which(!is.na(match_idx))) {
+      old_id <- smf_new$SMF_ID[[i]]
+      id_map[[old_id]] <- smf_all$SMF_ID[[match_idx[[i]]]]
+    }
   }
 
   list(smf = smf_all, id_map = id_map)
@@ -266,33 +268,35 @@
   new_keys <- .mztab_sme_key(sme_new)
   match_idx <- match(new_keys, base_keys)
 
-  # Map duplicates and collect new rows to add
-  new_rows_to_add <- list()
-  id_offset <- 0L
+  # Map duplicates and collect new row indices
+  new_row_indices <- which(is.na(match_idx))
+  new_rows_count <- length(new_row_indices)
 
-  for (i in seq_len(nrow(sme_new))) {
-    old_id <- sme_new$SME_ID[[i]]
-
-    if (!is.na(match_idx[[i]])) {
-      # Duplicate found in base
+  if (new_rows_count > 0L) {
+    # Process duplicates first
+    dup_idx <- !is.na(match_idx)
+    for (i in which(dup_idx)) {
+      old_id <- sme_new$SME_ID[[i]]
       id_map[[old_id]] <- sme_all$SME_ID[[match_idx[[i]]]]
-    } else {
-      # New entry
-      row <- sme_new[i, , drop = FALSE]
-      new_id <- as.character(next_id + id_offset)
-      row$SME_ID <- new_id
-      new_rows_to_add[[length(new_rows_to_add) + 1L]] <- row
-      id_map[[old_id]] <- new_id
-      id_offset <- id_offset + 1L
     }
-  }
 
-  # Batch append all new rows
-  if (length(new_rows_to_add) > 0L) {
-    sme_all <- tidytable::bind_rows(
-      sme_all,
-      tidytable::bind_rows(new_rows_to_add)
-    )
+    # Prepare new rows with batch ID assignment
+    new_rows <- sme_new[new_row_indices, , drop = FALSE]
+    new_rows$SME_ID <- as.character(next_id + seq_len(new_rows_count) - 1L)
+
+    # Map new row IDs and append
+    for (j in seq_len(new_rows_count)) {
+      old_id <- sme_new$SME_ID[[new_row_indices[j]]]
+      id_map[[old_id]] <- new_rows$SME_ID[[j]]
+    }
+
+    sme_all <- tidytable::bind_rows(sme_all, new_rows)
+  } else {
+    # Process duplicates only
+    for (i in which(!is.na(match_idx))) {
+      old_id <- sme_new$SME_ID[[i]]
+      id_map[[old_id]] <- sme_all$SME_ID[[match_idx[[i]]]]
+    }
   }
 
   list(sme = sme_all, id_map = id_map)
@@ -315,41 +319,32 @@
   new_keys <- .mztab_sml_key(sml_new)
   match_idx <- match(new_keys, base_keys)
 
-  # Separate duplicates and new entries
-  new_rows_to_add <- list()
-  id_offset <- 0L
+  # Separate new entries from duplicates
+  new_row_indices <- which(is.na(match_idx))
+  new_rows_count <- length(new_row_indices)
 
-  for (i in seq_len(nrow(sml_new))) {
-    idx <- match_idx[[i]]
-
-    if (!is.na(idx)) {
-      # Duplicate found - merge references
-      sml_all$SMF_ID_REFS[[idx]] <- .mztab_union_ref_ids(
-        sml_all$SMF_ID_REFS[[idx]],
-        sml_new$SMF_ID_REFS[[i]]
-      )
-      sml_all$SME_ID_REFS[[idx]] <- .mztab_union_ref_ids(
-        sml_all$SME_ID_REFS[[idx]],
-        sml_new$SME_ID_REFS[[i]]
-      )
-      sml_all$adduct_ions[[idx]] <- .mztab_union_ref_ids(
-        sml_all$adduct_ions[[idx]],
-        sml_new$adduct_ions[[i]]
-      )
-    } else {
-      # New entry
-      row <- sml_new[i, , drop = FALSE]
-      row$SML_ID <- as.character(next_id + id_offset)
-      new_rows_to_add[[length(new_rows_to_add) + 1L]] <- row
-      id_offset <- id_offset + 1L
-    }
+  if (new_rows_count > 0L) {
+    # Prepare new rows with batch ID assignment
+    new_rows <- sml_new[new_row_indices, , drop = FALSE]
+    new_rows$SML_ID <- as.character(next_id + seq_len(new_rows_count) - 1L)
+    sml_all <- tidytable::bind_rows(sml_all, new_rows)
   }
 
-  # Batch append all new rows
-  if (length(new_rows_to_add) > 0L) {
-    sml_all <- tidytable::bind_rows(
-      sml_all,
-      tidytable::bind_rows(new_rows_to_add)
+  # Process duplicates: merge references
+  dup_idx <- which(!is.na(match_idx))
+  for (i in dup_idx) {
+    base_idx <- match_idx[[i]]
+    sml_all$SMF_ID_REFS[[base_idx]] <- .mztab_union_ref_ids(
+      sml_all$SMF_ID_REFS[[base_idx]],
+      sml_new$SMF_ID_REFS[[i]]
+    )
+    sml_all$SME_ID_REFS[[base_idx]] <- .mztab_union_ref_ids(
+      sml_all$SME_ID_REFS[[base_idx]],
+      sml_new$SME_ID_REFS[[i]]
+    )
+    sml_all$adduct_ions[[base_idx]] <- .mztab_union_ref_ids(
+      sml_all$adduct_ions[[base_idx]],
+      sml_new$adduct_ions[[i]]
     )
   }
 
@@ -366,17 +361,20 @@
   # Initialize all references as "null"
   refs <- stats::setNames(rep("null", nrow(smf)), smf$SMF_ID)
 
-  # Vectorized approach: process all SML rows to accumulate references
-  for (i in seq_len(nrow(sml))) {
-    sml_id <- sml$SML_ID[[i]]
-    smf_ids <- .mztab_split_ref_ids(sml$SMF_ID_REFS[[i]])
+  # Process all SML rows to accumulate references
+  for (sml_row in seq_len(nrow(sml))) {
+    sml_id <- sml$SML_ID[[sml_row]]
+    smf_ids <- .mztab_split_ref_ids(sml$SMF_ID_REFS[[sml_row]])
 
-    # Update all matching SMF_IDs vectorized
+    # Update matching SMF_IDs by name lookup
     if (length(smf_ids) > 0L) {
-      for (sid in smf_ids) {
-        if (sid %in% names(refs)) {
-          refs[[sid]] <- .mztab_union_ref_ids(refs[[sid]], sml_id)
-        }
+      valid_ids <- smf_ids[smf_ids %in% names(refs)]
+      if (length(valid_ids) > 0L) {
+        refs[valid_ids] <- vapply(
+          refs[valid_ids],
+          function(ref) .mztab_union_ref_ids(ref, sml_id),
+          character(1L)
+        )
       }
     }
   }
@@ -407,6 +405,38 @@
   smf_df <- as.data.frame(smf, stringsAsFactors = FALSE, check.names = FALSE)
   sme_df <- as.data.frame(sme, stringsAsFactors = FALSE, check.names = FALSE)
 
+  # Pre-compute unique feature_ids to reduce lookups
+  unique_fids <- unique(as.character(stats::na.omit(smf_df$feature_id)))
+
+  # Build lookup tables for all features once
+  feature_lookup <- list()
+  for (fid in unique_fids) {
+    idx <- which(sme_df$feature_id == fid)
+    if (length(idx) > 0L) {
+      refs <- unique(as.character(sme_df$SME_ID[idx]))
+      refs <- refs[!is.na(refs) & nzchar(refs) & refs != "null"]
+
+      if (length(refs) > 0L) {
+        db_vals <- unique(as.character(sme_df$database_identifier[idx]))
+        db_vals <- db_vals[
+          !is.na(db_vals) & nzchar(db_vals) & db_vals != "null"
+        ]
+        method_vals <- unique(as.character(sme_df$identification_method[idx]))
+        method_vals <- method_vals[
+          !is.na(method_vals) & nzchar(method_vals) & method_vals != "null"
+        ]
+
+        feature_lookup[[fid]] <- list(
+          refs = refs,
+          refs_str = paste(refs, collapse = "|"),
+          n_db = length(db_vals),
+          n_method = length(method_vals)
+        )
+      }
+    }
+  }
+
+  # Apply to each row
   smf_df$SME_ID_REFS <- "null"
   smf_df$SME_ID_REF_ambiguity_code <- "null"
 
@@ -418,47 +448,33 @@
     if (length(fid) == 0L) {
       next
     }
-    fid <- as.character(fid)
-    if (isTRUE(is.na(fid)) || !nzchar(fid)) {
-      next
-    }
-    idx <- which(sme_df$feature_id == fid)
-    if (length(idx) == 0L) {
-      next
-    }
-
-    refs <- unique(as.character(sme_df$SME_ID[idx]))
-    refs <- refs[!is.na(refs) & nzchar(refs) & refs != "null"]
-    if (length(refs) == 0L) {
+    fid_char <- as.character(fid)
+    # Check carefully for NA and empty strings
+    if (
+      is.na(fid_char) ||
+        !nzchar(fid_char) ||
+        !(fid_char %in% names(feature_lookup))
+    ) {
       next
     }
 
-    smf_df$SME_ID_REFS[[i]] <- paste(refs, collapse = "|")
+    feature_data <- feature_lookup[[fid_char]]
+    smf_df$SME_ID_REFS[[i]] <- feature_data$refs_str
 
-    if (length(refs) <= 1L) {
-      smf_df$SME_ID_REF_ambiguity_code[[i]] <- "null"
-      next
+    if (length(feature_data$refs) > 1L) {
+      n_db <- feature_data$n_db
+      n_method <- feature_data$n_method
+      ambiguity_code <- if (n_db > 1L && n_method > 1L) {
+        "3"
+      } else if (n_db > 1L) {
+        "1"
+      } else if (n_method > 1L) {
+        "2"
+      } else {
+        "1"
+      }
+      smf_df$SME_ID_REF_ambiguity_code[[i]] <- ambiguity_code
     }
-
-    db_vals <- unique(as.character(sme_df$database_identifier[idx]))
-    db_vals <- db_vals[!is.na(db_vals) & nzchar(db_vals) & db_vals != "null"]
-    method_vals <- unique(as.character(sme_df$identification_method[idx]))
-    method_vals <- method_vals[
-      !is.na(method_vals) & nzchar(method_vals) & method_vals != "null"
-    ]
-
-    n_db <- length(db_vals)
-    n_method <- length(method_vals)
-    ambiguity_code <- if (n_db > 1L && n_method > 1L) {
-      "3"
-    } else if (n_db > 1L) {
-      "1"
-    } else if (n_method > 1L) {
-      "2"
-    } else {
-      "1"
-    }
-    smf_df$SME_ID_REF_ambiguity_code[[i]] <- ambiguity_code
   }
 
   tidytable::as_tidytable(smf_df)

@@ -84,7 +84,7 @@ build_adduct_universe_from_legacy <- function(adducts, clusters, polarity) {
   if (length(clusters) == 0L) {
     expanded <- adducts
   } else {
-    # Build expanded adducts using vectorized operations
+    # Build expanded adducts
     # For each adduct, create versions with each cluster
     expanded_list <- lapply(adducts, function(a) {
       inner <- sub("^\\[(.*)\\][0-9]*[+-]+$", "\\1", a, perl = TRUE)
