@@ -133,7 +133,7 @@ summarize_results <- function(
     candidate_id_cols,
     model$rank_columns,
     model$score_columns,
-    # TODO
+    # Include annotation notes (if available from sampling/filtering operations)
     "annotation_note"
   ))
 

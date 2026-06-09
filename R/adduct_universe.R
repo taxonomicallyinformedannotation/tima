@@ -181,9 +181,10 @@ calculate_neutral_mass <- function(
     }
   }
   if (is.null(n_mer) || is.null(z) || is.null(adduct_mass)) {
-    stop(
-      "calculate_neutral_mass(): supply (n_mer, z, adduct_mass) or ",
-      "(universe, adduct)"
+    cli::cli_abort(
+      "calculate_neutral_mass(): supply (n_mer, z, adduct_mass) or (universe, adduct)",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
   if (is.null(adduct_mass_per_monomer)) {

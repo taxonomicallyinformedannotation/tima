@@ -161,7 +161,7 @@ clean_bio <- function(
   ) |>
     tidytable::select(feature_id, tidyselect::everything())
 
-  annot_table_wei_bio_preclean <- .apply_prediction_defaults(
+  annot_table_wei_bio_preclean <- .add_default_prediction_columns(
     annot_table_wei_bio_preclean
   )
   rm(df2, supp_tables)
@@ -191,7 +191,18 @@ clean_bio <- function(
 
 # Internal Helper Functions ----
 
-.apply_prediction_defaults <- function(df) {
+#' Add or fill default prediction columns in data frame
+#'
+#' @description
+#' Ensures all taxonomy prediction columns exist with appropriate defaults.
+#' Adds missing columns and fills NA values using clean vectorized approach.
+#'
+#' @param df Data frame to process
+#'
+#' @return Data frame with all prediction columns properly initialized
+#'
+#' @keywords internal
+.add_default_prediction_columns <- function(df) {
   defaults <- list(
     feature_pred_tax_cla_01kin_val = NA_character_,
     consistency_structure_cla_kin = 1,
@@ -216,12 +227,13 @@ clean_bio <- function(
     feature_pred_tax_cla_04dirpar_score = NA_real_
   )
 
-  n_rows <- nrow(df)
+  # Identify missing and existing columns
   missing_cols <- setdiff(names(defaults), names(df))
   existing_cols <- intersect(names(defaults), names(df))
 
-  # Add missing columns with defaults
+  # Add missing columns
   if (length(missing_cols) > 0L) {
+    n_rows <- nrow(df)
     for (col in missing_cols) {
       df[[col]] <- rep(defaults[[col]], n_rows)
     }
@@ -229,54 +241,15 @@ clean_bio <- function(
 
   # Fill NAs in existing columns
   for (col in existing_cols) {
-    values <- df[[col]]
-    na_idx <- is.na(values)
+    na_idx <- is.na(df[[col]])
     if (any(na_idx)) {
-      values[na_idx] <- defaults[[col]]
-      df[[col]] <- values
+      df[[col]][na_idx] <- defaults[[col]]
     }
   }
 
   tidytable::as_tidytable(df)
 }
 
-#' Add default prediction columns to annotation table
-#'
-#' @description
-#' Adds default (empty) taxonomy prediction columns when no consistency
-#' calculation is possible (e.g., no edges or no neighbors).
-#'
-#' @param df Data frame to add columns to
-#'
-#' @return Data frame with default prediction columns added
-#'
-#' @keywords internal
-.add_default_prediction_columns <- function(df) {
-  df |>
-    tidytable::mutate(
-      feature_pred_tax_cla_01kin_val = NA_character_,
-      consistency_structure_cla_kin = 1,
-      feature_pred_tax_cla_01kin_score = NA_real_,
-      feature_pred_tax_npc_01pat_val = NA_character_,
-      consistency_structure_npc_pat = 1,
-      feature_pred_tax_npc_01pat_score = NA_real_,
-      feature_pred_tax_cla_02sup_val = NA_character_,
-      consistency_structure_cla_sup = 1,
-      feature_pred_tax_cla_02sup_score = NA_real_,
-      feature_pred_tax_npc_02sup_val = NA_character_,
-      consistency_structure_npc_sup = 1,
-      feature_pred_tax_npc_02sup_score = NA_real_,
-      feature_pred_tax_cla_03cla_val = NA_character_,
-      consistency_structure_cla_cla = 1,
-      feature_pred_tax_cla_03cla_score = NA_real_,
-      feature_pred_tax_npc_03cla_val = NA_character_,
-      consistency_structure_npc_cla = 1,
-      feature_pred_tax_npc_03cla_score = NA_real_,
-      feature_pred_tax_cla_04dirpar_val = NA_character_,
-      consistency_structure_cla_par = 1,
-      feature_pred_tax_cla_04dirpar_score = NA_real_
-    )
-}
 
 #' Extract distinct structure-taxonomy pairs from annotations
 #'

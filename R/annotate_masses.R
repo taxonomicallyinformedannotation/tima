@@ -216,10 +216,17 @@ annotate_masses <- function(
   lib <- loaded_inputs$lib
 
   # ---- Step 3: feature pairs inside RT windows -------------------------
+  start_time_pairs <- Sys.time()
   pairs <- build_feature_pairs_within_rt(
     df_rt_tol = features_table,
     df_fea_min = features_table,
     tolerance_ppm = tolerance_ppm
+  )
+  elapsed_pairs <- difftime(Sys.time(), start_time_pairs, units = "secs")
+  log_info(
+    "Built %d feature pairs in %.2f seconds",
+    nrow(pairs),
+    as.numeric(elapsed_pairs)
   )
   log_top_pair_deltas(pairs)
 
@@ -232,8 +239,14 @@ annotate_masses <- function(
   clusters <- ion_tables$clusters
   monocharged_adducts <- ion_tables$monocharged_adducts
   multi_adducts <- ion_tables$multi_adducts
+  log_debug(
+    "Adduct universe: %d adducts, %d clusters",
+    nrow(adducts),
+    nrow(clusters)
+  )
 
   # ---- Step 4: classify each pair --------------------------------------
+  start_time_edges <- Sys.time()
   edge_sets <- discover_annotate_masses_edge_sets(
     pairs = pairs,
     features_table = features_table,
@@ -248,13 +261,23 @@ annotate_masses <- function(
     cfg = cfg,
     exact_masses = lib$em_windows$exact_mass
   )
+  elapsed_edges <- difftime(Sys.time(), start_time_edges, units = "secs")
   adduct_edges <- edge_sets$adduct_edges
   adduct_edges_combined <- edge_sets$adduct_edges_combined
   cluster_edges <- edge_sets$cluster_edges
   loss_edges <- edge_sets$loss_edges
   evidence_signal <- edge_sets$evidence_signal
 
+  log_info(
+    "Edge classification complete in %.2f seconds: %d adduct edges, %d cluster edges, %d loss edges",
+    as.numeric(elapsed_edges),
+    nrow(adduct_edges),
+    nrow(cluster_edges),
+    nrow(loss_edges)
+  )
+
   # ---- Step 5: per-feature node-level adduct hypotheses ----------------
+  start_time_hyp <- Sys.time()
   node_hypotheses <- build_annotate_masses_candidate_hypotheses(
     adduct_edges = adduct_edges_combined,
     cluster_edges = cluster_edges,
@@ -267,6 +290,8 @@ annotate_masses <- function(
     tolerance_ppm = tolerance_ppm,
     tolerance_dalton = tolerance_dalton
   )
+  elapsed_hyp <- difftime(Sys.time(), start_time_hyp, units = "secs")
+  log_info("Generated node hypotheses in %.2f seconds", as.numeric(elapsed_hyp))
 
   # Recover weak but M-coherent modifier states for unresolved nodes in
   # supported components without relaxing strict primary graph semantics.
@@ -281,6 +306,7 @@ annotate_masses <- function(
   )
 
   # ---- Step 7: library match by neutral mass ---------------------------
+  start_time_lib <- Sys.time()
   annotations <- build_annotate_masses_annotations(
     node_hypotheses = node_hypotheses,
     library_em = lib$em_windows,
@@ -290,6 +316,12 @@ annotate_masses <- function(
     adduct_edges = adduct_edges_combined,
     baseline_adduct = baseline_adduct,
     coverage_mode = coverage_mode
+  )
+  elapsed_lib <- difftime(Sys.time(), start_time_lib, units = "secs")
+  log_info(
+    "Library matching complete in %.2f seconds: %d annotations",
+    as.numeric(elapsed_lib),
+    nrow(annotations)
   )
 
   # ---- Step 8: derive primary/secondary per-feature ion species -----------
@@ -339,6 +371,7 @@ annotate_masses <- function(
   log_adduct_breakdown(annotations)
 
   # ---- Step 11: edges file ---------------------------------------------
+  start_time_export <- Sys.time()
   edges_out <- build_output_edges(
     adduct_edges = adduct_edges_combined,
     loss_edges = loss_edges,
@@ -347,6 +380,7 @@ annotate_masses <- function(
     name_source = name_source,
     name_target = name_target
   )
+  log_debug("Built edges output with %d edges", nrow(edges_out))
 
   # ---- Step 12: write outputs ------------------------------------------
   export_params(
@@ -354,6 +388,7 @@ annotate_masses <- function(
     step = "annotate_masses"
   )
   export_output(x = edges_out, file = output_edges[[1L]])
+  log_file_op("Exported edges", output_edges[[1L]], n_rows = nrow(edges_out))
 
   coverage_report <- build_annotate_masses_coverage_report(
     annotations = annotations,
@@ -380,8 +415,16 @@ annotate_masses <- function(
       ),
     file = output_annotations[[1L]]
   )
+  log_file_op(
+    "Exported annotations",
+    output_annotations[[1L]],
+    n_rows = nrow(annotations)
+  )
+
   export_output(x = coverage_report, file = coverage_file)
-  log_info("Coverage summary written to: %s", coverage_file)
+  log_file_op("Exported coverage report", coverage_file)
+  elapsed_export <- difftime(Sys.time(), start_time_export, units = "secs")
+  log_info("All outputs exported in %.2f seconds", as.numeric(elapsed_export))
 
   log_complete(
     ctx,

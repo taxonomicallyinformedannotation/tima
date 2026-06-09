@@ -38,10 +38,18 @@ adduct_to_string <- function(
   n_mer <- as.integer(n_mer)
   z <- as.integer(z)
   if (!is.finite(n_mer) || n_mer < 1L) {
-    stop("n_mer must be a positive integer")
+    cli::cli_abort(
+      "n_mer must be a positive integer, got: {.val {n_mer}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
   if (!is.finite(z) || z == 0L) {
-    stop("z must be a non-zero integer")
+    cli::cli_abort(
+      "z must be a non-zero integer, got: {.val {z}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
   # Split carriers into negative (deprotonations) and positive (cations)
   carriers_neg <- carriers[carriers < 0L]
@@ -182,9 +190,10 @@ generate_adduct_hypotheses <- function(
   carriers_polarity <- spec$charge_carriers[[polarity]] %||% character()
   charges_polarity <- as.integer(spec$charges[[polarity]] %||% integer())
   if (length(carriers_polarity) == 0L || length(charges_polarity) == 0L) {
-    stop(
-      "generate_adduct_hypotheses(): empty charge_carriers/charges for ",
-      polarity
+    cli::cli_abort(
+      "generate_adduct_hypotheses(): empty charge_carriers/charges for {.val {polarity}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
 
@@ -216,11 +225,10 @@ generate_adduct_hypotheses <- function(
   names(parsed_carriers) <- carriers_polarity
   bad <- vapply(parsed_carriers, is.null, logical(1L))
   if (any(bad)) {
-    stop(
-      "Unparseable charge carrier token(s) for ",
-      polarity,
-      ": ",
-      paste(carriers_polarity[bad], collapse = ", ")
+    cli::cli_abort(
+      "Unparseable charge carrier token(s) for {.val {polarity}}: {.val {carriers_polarity[bad]}}",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
     )
   }
   carrier_mass <- vapply(parsed_carriers, carrier_token_mass, numeric(1L))

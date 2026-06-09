@@ -273,6 +273,7 @@ annotate_spectra <- function(
     length(spectral_library)
   )
 
+  start_time_sim <- Sys.time()
   sim_raw <- compute_similarity_safe(
     lib_sp = spectral_library,
     query_sp = query_sp,
@@ -283,6 +284,12 @@ annotate_spectra <- function(
     threshold = threshold,
     approx = approx
   )
+  elapsed_sim <- difftime(Sys.time(), start_time_sim, units = "secs")
+  log_info(
+    "Similarity computation complete in %.2f seconds",
+    as.numeric(elapsed_sim)
+  )
+
   if (nrow(sim_raw) == 0L) {
     return(
       annotate_spectra_handle_empty_result(
@@ -295,6 +302,8 @@ annotate_spectra <- function(
 
   lib_precursors <- get_precursors(spectral_library)
   meta <- build_library_metadata(spectral_library, lib_precursors)
+
+  start_time_finalize <- Sys.time()
   df_final <- finalize_results(
     df_sim = tidytable::as_tidytable(x = sim_raw),
     meta = meta,
@@ -302,6 +311,12 @@ annotate_spectra <- function(
     dalton = dalton,
     ppm = ppm
   )
+  elapsed_finalize <- difftime(Sys.time(), start_time_finalize, units = "secs")
+  log_debug(
+    "Results finalization complete in %.2f seconds",
+    as.numeric(elapsed_finalize)
+  )
+
   if (nrow(df_final) == 0L) {
     return(
       annotate_spectra_handle_empty_result(
@@ -340,6 +355,7 @@ annotate_spectra <- function(
 
   persist_annotation_parameters(params)
   export_output(x = df_final, file = output_path)
+  log_file_op("Exported annotations", output_path, n_rows = nrow(df_final))
   invisible(output_path)
 }
 

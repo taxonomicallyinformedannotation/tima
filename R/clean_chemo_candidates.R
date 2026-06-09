@@ -399,9 +399,15 @@ prepare_ranked_candidates <- function(
   df_ranked <- rank_and_deduplicate(df_base)
 
   # Enforce cluster-level entity consensus if components_table is provided
+  # This ensures that features within the same connected component agree on
+  # their candidate structures, improving annotation coherence.
   ## TODO Not fully correct for now
   # if (!is.null(components_table) && nrow(components_table) > 0L) {
-  #   df_ranked <- enforce_cluster_entity_consensus(df_ranked, components_table)
+  #   df_ranked <- enforce_cluster_entity_consensus(
+  #     df_ranked,
+  #     components_table
+  #   )
+  #   log_debug("Applied cluster-level entity consensus filtering")
   # }
 
   sampling_result <- sample_candidates_per_group(
