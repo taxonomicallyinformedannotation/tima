@@ -19,7 +19,7 @@ files:
 names:
   #' Name of "adduct" variable in the feature table. STRING
   adduct: best ion
-  
+
   #' Name of "feature IDs" variable in the input. STRING
   features: row ID
 
@@ -27,6 +27,6 @@ names:
   precursor: row m/z
 
   #' Name of "retention time" variable.
-  rt: 
+  rt:
     #' Name of "retention time" variable in the feature table. STRING
     features: row retention time

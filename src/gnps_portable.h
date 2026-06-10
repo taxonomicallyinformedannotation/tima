@@ -62,4 +62,3 @@ void gnps_free_ptr(void *ptr);
 #endif
 
 #endif
-

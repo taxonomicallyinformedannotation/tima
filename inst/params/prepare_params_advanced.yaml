@@ -59,7 +59,7 @@ files:
       spectral:
         #' GNPS spectral matching annotations. STRING
         gnps: data/interim/annotations/example_gnps.tsv
-        
+
         #' The optional file containing the mzmine annotations. STRING
         mzmine: data/interim/annotations/mzmine_annotations.csv
 
@@ -87,7 +87,7 @@ files:
 
         #' Prepared MS1 structural annotations. STRING
         ms1: data/interim/annotations/example_ms1Prepared.tsv.gz
-        
+
         #' Prepared mzmine structural annotations. STRING
         mzmine: data/interim/annotations/example_mzminePrepared.tsv.gz
 
@@ -199,7 +199,7 @@ files:
 
         #' GNPS prepared structure organism pairs library. STRING
         gnps: data/interim/libraries/sop/gnps_11566051_prepared.tsv.gz
-        
+
         #' HMDB prepared structure organism pairs library. STRING
         hmdb: data/interim/libraries/sop/hmdb_prepared.tsv.gz
 

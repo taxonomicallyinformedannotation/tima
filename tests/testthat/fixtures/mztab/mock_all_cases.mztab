@@ -11,7 +11,7 @@ MTD	ms_run[1]-id_format	[MS, MS:1000776, scan number only nativeID format, ]
 MTD	ms_run[1]-scan_polarity	[MS, MS:1000130, positive scan, ]
 MTD	sample[1]	M11081707
 MTD	sample[1]-species[1]	[NCBITaxon, NCBITaxon:139838, Radula complanata, ]
-MTD	sample[1]-description	Sphingolipids with concentration reported as picomolar per mg of protein, abundances are reported after calibration correction.																		
+MTD	sample[1]-description	Sphingolipids with concentration reported as picomolar per mg of protein, abundances are reported after calibration correction.
 MTD	assay[1]	Assay for M11081707
 MTD	assay[1]-sample_ref	sample[1]
 MTD	assay[1]-ms_run_ref	ms_run[1]
@@ -25,7 +25,7 @@ MTD	id_confidence_measure[2]	[,, Retention time similarity, ]
 MTD	id_confidence_measure[3]	[,, Retention index similarity, ]
 MTD	id_confidence_measure[4]	[,, Total spectrum similarity, ]
 MTD	colunit-small_molecule	retention_time=[UO, UO:0000031, minute, ]
-MTD	colunit-small_molecule_evidence	opt_global_mass_error=[UO, UO:0000169, parts per million, ]																		
+MTD	colunit-small_molecule_evidence	opt_global_mass_error=[UO, UO:0000169, parts per million, ]
 MTD	mzTab-ID	1
 MTD	instrument[1]-name	[MS, MS:1003005, Bruker Daltonics' timsTOF Pro, ]
 MTD	instrument[1]-source	[MS, MS:1000073, Electrospray Ionization, ]
@@ -8573,42 +8573,42 @@ MTD	assay[359]-ms_run_ref	ms_run[359]
 MTD	study_variable[1]-factors	[NCIT, NCIT:C16564, Ethnic Group, Indian]
 MTD	study_variable[2]-factors	[NCIT, NCIT:C16564, Ethnic Group, Chinese]
 MTD	study_variable[3]-factors	[NCIT, NCIT:C16564, Ethnic Group, Malay]
-MTD	sample_processing[2]	[MS, MS:1000831, sample preparation, "A constant amount of two internal standards (10 nmol of HEPES, 4-(2-hydroxyethyl)-1-piperazineethanesulfonic acid, and PIPES, piperazine-N,N′-bis(2-ethanesulfonic acid) was added to each sample. After brief vortexing, samples were transferred to Amicon Ultra 10-kDa cut-off filter (Millipore, Billerica, MA, USA) to remove proteins and cell debris. Following sample concentration by vacuum evaporation, each sample was resuspended in 40 μl of 50% acetonitrile and 1 μl (equivalent to 5 μl of initial sample) was used for each injection into the LC-MS system."]																														
-MTD	sample_processing[3]	[CHMO, CHMO:0001000, chromatography, "LC-MS data were obtained using a Paradigm MS4 HPLC system (Michrom Bioresources, Auburn, CA, USA) coupled to an LTQ Orbitrap mass spectrometer (Thermo Fisher Scientific, Waltham, MA, USA), as described previously[1]. Briefly, metabolites were separated on a ZIC-pHILIC column (Merck SeQuant, Sweden; 150 x 2.1 mm, 5 µm particle size) using acetonitrile (A) and 10 mM ammonium carbonate buffer, pH 9.3 (B) as the mobile phase, with gradient elution from 80% A to 20% A in 30 min, at a flow rate of 100 µl/min. Sample injection volume was 1 µl per run. </p> Ref:</br> [1] Pluskal T, Nakamura T, Villar-Briones A, Yanagida M (2010) Metabolic profiling of the fission yeast S. pombe: quantification of compounds under different temperatures and genetic perturbation. Mol Biosyst 6:182–198. doi: 10.1039/b908784b PMID:20024080</br>"]																														
-MTD	sample_processing[4]	[CHMO, CHMO:0000470, mass spectrometry, "The LTQ Orbitrap mass spectrometer (Thermo Fisher Scientific, Waltham, MA, USA) was operated in full scan mode with the scan range of 100-1,000 m/z. Each sample was analyzed twice, once in negative and once in positive ionization mode."]																														
-MTD	sample_processing[5]	[OBI, OBI:0200000, data transform, "Peak areas of metabolites of interest, within the raw LC-MS data, were measured using the MZmine 2.10 software and normalized using the peak areas of HEPES and PIPES. The complete workflow and processing parameters are summarized in the publication."]																														
-MTD	sample_processing[6]	[MI, MI:2131, metabolite identification, "Metabolites were identified by comparing their m/z values and retention times with authentic pure standards. If no standard was available, metabolites were assigned by analysis of MS/MS spectra (MS/MS), as described in the publication. In cases where no standard compound or MS/MS spectrum was available, compounds were identified by generating chemical formulae using m/z values in MZmine 2.10 module and given MS status."]																														
-MTD	instrument[1]-analyzer	[MS, MS:1000484, orbitrap,]																														
-MTD	contact[3]-name	Mitsuhiro Yanagida																														
-MTD	contact[4]-name	Itsuo Murakami																														
-MTD	contact[5]-name	Junko Takada																														
-MTD	contact[3]-affiliation	"G0 Cell Unit, Okinawa Institute of Science and Technology Graduate University (OIST)"																														
-MTD	contact[4]-affiliation	"Graduate School of Medicine, Kyoto University"																														
-MTD	contact[5]-affiliation	"G0 Cell Unit, Okinawa Institute of Science and Technology Graduate University (OIST)"																														
-MTD	contact[3]-email	myanagid@gmail.com																														
-MTD	contact[4]-email	attitude0712@gmail.com																														
-MTD	contact[5]-email	junko.takada@oist.jp																														
-MTD	uri[1]	https://www.ebi.ac.uk/metabolights/MTBLS263																														
-MTD	study_variable[4]	4																														
-MTD	study_variable[4]-description	Preparation replicate																														
-MTD	study_variable[4]-assay_refs	assay[6] | assay[12]																														
+MTD	sample_processing[2]	[MS, MS:1000831, sample preparation, "A constant amount of two internal standards (10 nmol of HEPES, 4-(2-hydroxyethyl)-1-piperazineethanesulfonic acid, and PIPES, piperazine-N,N′-bis(2-ethanesulfonic acid) was added to each sample. After brief vortexing, samples were transferred to Amicon Ultra 10-kDa cut-off filter (Millipore, Billerica, MA, USA) to remove proteins and cell debris. Following sample concentration by vacuum evaporation, each sample was resuspended in 40 μl of 50% acetonitrile and 1 μl (equivalent to 5 μl of initial sample) was used for each injection into the LC-MS system."]
+MTD	sample_processing[3]	[CHMO, CHMO:0001000, chromatography, "LC-MS data were obtained using a Paradigm MS4 HPLC system (Michrom Bioresources, Auburn, CA, USA) coupled to an LTQ Orbitrap mass spectrometer (Thermo Fisher Scientific, Waltham, MA, USA), as described previously[1]. Briefly, metabolites were separated on a ZIC-pHILIC column (Merck SeQuant, Sweden; 150 x 2.1 mm, 5 µm particle size) using acetonitrile (A) and 10 mM ammonium carbonate buffer, pH 9.3 (B) as the mobile phase, with gradient elution from 80% A to 20% A in 30 min, at a flow rate of 100 µl/min. Sample injection volume was 1 µl per run. </p> Ref:</br> [1] Pluskal T, Nakamura T, Villar-Briones A, Yanagida M (2010) Metabolic profiling of the fission yeast S. pombe: quantification of compounds under different temperatures and genetic perturbation. Mol Biosyst 6:182–198. doi: 10.1039/b908784b PMID:20024080</br>"]
+MTD	sample_processing[4]	[CHMO, CHMO:0000470, mass spectrometry, "The LTQ Orbitrap mass spectrometer (Thermo Fisher Scientific, Waltham, MA, USA) was operated in full scan mode with the scan range of 100-1,000 m/z. Each sample was analyzed twice, once in negative and once in positive ionization mode."]
+MTD	sample_processing[5]	[OBI, OBI:0200000, data transform, "Peak areas of metabolites of interest, within the raw LC-MS data, were measured using the MZmine 2.10 software and normalized using the peak areas of HEPES and PIPES. The complete workflow and processing parameters are summarized in the publication."]
+MTD	sample_processing[6]	[MI, MI:2131, metabolite identification, "Metabolites were identified by comparing their m/z values and retention times with authentic pure standards. If no standard was available, metabolites were assigned by analysis of MS/MS spectra (MS/MS), as described in the publication. In cases where no standard compound or MS/MS spectrum was available, compounds were identified by generating chemical formulae using m/z values in MZmine 2.10 module and given MS status."]
+MTD	instrument[1]-analyzer	[MS, MS:1000484, orbitrap,]
+MTD	contact[3]-name	Mitsuhiro Yanagida
+MTD	contact[4]-name	Itsuo Murakami
+MTD	contact[5]-name	Junko Takada
+MTD	contact[3]-affiliation	"G0 Cell Unit, Okinawa Institute of Science and Technology Graduate University (OIST)"
+MTD	contact[4]-affiliation	"Graduate School of Medicine, Kyoto University"
+MTD	contact[5]-affiliation	"G0 Cell Unit, Okinawa Institute of Science and Technology Graduate University (OIST)"
+MTD	contact[3]-email	myanagid@gmail.com
+MTD	contact[4]-email	attitude0712@gmail.com
+MTD	contact[5]-email	junko.takada@oist.jp
+MTD	uri[1]	https://www.ebi.ac.uk/metabolights/MTBLS263
+MTD	study_variable[4]	4
+MTD	study_variable[4]-description	Preparation replicate
+MTD	study_variable[4]-assay_refs	assay[6] | assay[12]
 MTD	custom[1]	[, , blood metabolome, ]
 MTD	custom[2]	[CHMO, CHMO:0000575, tandem mass spectrometry, ]
-MTD	custom[3]	[CHMO, CHMO:0000796, high-performance liquid chromatography-mass spectrometry, ]																												
-MTD	custom[4]	[CHMO, NCIT:C25713, Variation, ]			
-MTD	custom[5]	[, , untargeted metabolites, ]																																																										
-MTD	instrument[1]-analyzer[2]	[MS, MS:1000484, orbitrap, ]																		
-MTD	software[1]-setting[2]	CycleTime: 2 s																		
-MTD	software[2]-setting[1]	MSMSmassrange: (50.0, 1800.0)																		
-MTD	database[2]	[,, LipidMaps, ]																		
-MTD	database[2]-prefix	LM																		
-MTD	database[2]-version	2017-12																		
-MTD	database[2]-uri	http://www.lipidmaps.org/																		
-MTD	database[3]	[,, LipidCreator Transitions, ]																		
-MTD	database[3]-prefix	LCTR																		
-MTD	database[3]-version	2018-07																		
-MTD	database[3]-uri	https://lifs.isas.de/lipidcreator																		
-MTD	external_study_uri[1]	file:///C:/data/prm.sky.zip																		
+MTD	custom[3]	[CHMO, CHMO:0000796, high-performance liquid chromatography-mass spectrometry, ]
+MTD	custom[4]	[CHMO, NCIT:C25713, Variation, ]
+MTD	custom[5]	[, , untargeted metabolites, ]
+MTD	instrument[1]-analyzer[2]	[MS, MS:1000484, orbitrap, ]
+MTD	software[1]-setting[2]	CycleTime: 2 s
+MTD	software[2]-setting[1]	MSMSmassrange: (50.0, 1800.0)
+MTD	database[2]	[,, LipidMaps, ]
+MTD	database[2]-prefix	LM
+MTD	database[2]-version	2017-12
+MTD	database[2]-uri	http://www.lipidmaps.org/
+MTD	database[3]	[,, LipidCreator Transitions, ]
+MTD	database[3]-prefix	LCTR
+MTD	database[3]-version	2018-07
+MTD	database[3]-uri	https://lifs.isas.de/lipidcreator
+MTD	external_study_uri[1]	file:///C:/data/prm.sky.zip
 MTD	instrument[2]-name	[MS, MS:1000031, Instrument model, name of the instrument not included in the CV]
 MTD	instrument[2]-source	[MS, MS:1000598, ETD, ]
 MTD	instrument[2]-analyzer	[MS, MS:1000484, orbitrap, ]

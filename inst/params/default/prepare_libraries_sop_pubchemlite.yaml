@@ -14,4 +14,3 @@ files:
       prepared:
         #' PubChem Lite prepared structure organism pair library. STRING
         pubchemlite: data/interim/libraries/sop/pubchemlite_prepared.tsv.gz
-

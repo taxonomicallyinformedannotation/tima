@@ -2,4 +2,3 @@ structure_inchikey_connectivity_layer,organism_name,organism_taxonomy_ottid,orga
 AAAAAAAAAAAAAA,Gentiana lutea,123456,Eukaryota,Plantae,Tracheophyta,Magnoliopsida,Gentianales,Gentianaceae,Gentianeae,Gentiana,lutea,10.123/4567
 BBBBBBBBBBBBBB,Arabidopsis thaliana,234567,Eukaryota,Plantae,Tracheophyta,Magnoliopsida,Brassicales,Brassicaceae,Arabideae,Arabidopsis,thaliana,10.123/4567
 CCCCCCCCCCCCCC,Solanum tuberosum,345678,Eukaryota,Plantae,Tracheophyta,Magnoliopsida,Solanales,Solanaceae,Solaneae,Solanum,tuberosum,10.123/4567
-

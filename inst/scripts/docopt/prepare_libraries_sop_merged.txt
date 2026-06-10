@@ -7,7 +7,7 @@ Usage:
 Arguments:
   fil-lib-sop-pre            List of prepared structure organism pairs libraries. STRING
   fil-lib-sop-mer            Merged structure organism pairs library. STRING
-  
+
   org-fil-mod                Filter library to restrict it to a portion of organisms only. BOOLEAN
   org-fil-lev                Level at which the library will be filtered. Must be one of "domain", "phylum", "class", "order", "family", "tribe", "genus", "species", "varietas" . STRING
   org-fil-val                Value to be applied for filtering. "OR" can be used as "|". Example: "Simaroubaceae|Gentianaceae". STRING

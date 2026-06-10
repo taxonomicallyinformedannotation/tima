@@ -36,4 +36,3 @@ files:
 
             #' NPClassifier structures taxonomy. STRING
             npc: data/interim/libraries/sop/merged/structures/taxonomies/npc.tsv.gz
-

@@ -65,7 +65,7 @@ names:
     smiles: SMILES
 
   #' Name of "retention time" variable.
-  rt: 
+  rt:
     #' Name of "retention time" variable in the library. STRING
     library: rt
 

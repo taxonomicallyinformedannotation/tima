@@ -2,4 +2,3 @@ structure_inchikey,structure_inchikey_connectivity_layer,structure_smiles_no_ste
 AAAAAAAAAAAAA,AAAAAAAAAAAAA,CCC,PlantSpecies1,123,Eukaryota,Plantae,Tracheophyta,NA,NA,NA,NA,NA,NA,NA,10.1000/test1
 BBBBBBBBBBBBB,BBBBBBBBBBBBB,CCCC,PlantSpecies2,456,Eukaryota,Plantae,Tracheophyta,NA,NA,NA,NA,NA,NA,NA,10.1000/test2
 CCCCCCCCCCCCC,CCCCCCCCCCCCC,CCCCC,BacteriumSpecies1,789,Bacteria,Bacteria,Proteobacteria,NA,NA,NA,NA,NA,NA,NA,10.1000/test3
-

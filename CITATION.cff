@@ -2,7 +2,7 @@
 # CITATION file created with {cffr} R package
 # See also: https://docs.ropensci.org/cffr/
 # --------------------------------------------
- 
+
 cff-version: 1.2.0
 message: 'To cite package "tima" in publications use:'
 type: software
@@ -981,4 +981,3 @@ references:
   year: '2026'
   doi: 10.32614/CRAN.package.withr
   version: '>= 3.0.2'
-

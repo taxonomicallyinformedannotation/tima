@@ -246,8 +246,8 @@ tima::prepare_taxa()
 
 This step allows you to filter out the annotation of all the tools used,
 based on your own internal (experimental or predicted) retention times library.
-It is optional. 
-If you do not have one, it will simply group the annotations of all tools. 
+It is optional.
+If you do not have one, it will simply group the annotations of all tools.
 
 ```{r filter-annotations, eval=FALSE, include=TRUE}
 tima::filter_annotations()

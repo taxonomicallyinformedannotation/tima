@@ -1,5 +1,5 @@
 ---
-format: 
+format:
   gfm: default
   html: default
 bibliography: ../grateful-refs.bib

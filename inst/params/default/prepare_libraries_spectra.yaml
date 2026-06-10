@@ -21,7 +21,7 @@ ms:
 #' Names of the different variables in the input files.
 names:
   #' Names of the prepared libraries. STRING
-  libraries: 
+  libraries:
     - internal
 
   #' Name of fields present in the MGF.

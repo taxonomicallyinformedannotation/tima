@@ -20,4 +20,3 @@ SMF	43	43	347.2219	-1	14670.0	[M-H]-
 COM	MGH	mgf_id	prec_id	prec_rt	prec_mz	prec_int	energy	level	title	spec_tic	spec_len	spec_mz	spec_int
 COM	MGF	42	abcdef01	10130.4	293.1762	null	30.0	2	id:42, rt:168.84, mz:293.1762, energy:nan, sample_id:18, scan_id:2513, 2026_04_13_Fellay032_18611_NEG	45000	4	147.0608|175.0557|248.0715|293.1762	12000|5000|2300|25700
 COM	MGF	43	abcdef02	14670.0	347.2219	null	30.0	2	id:43, rt:244.50, mz:347.2219, energy:nan, sample_id:18, scan_id:3080, 2026_04_13_Fellay032_18611_NEG	30000	3	136.0706|201.0557|347.2219	8000|3500|18500
-

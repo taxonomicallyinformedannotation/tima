@@ -126,4 +126,3 @@ COM Small Molecule section (minimal example)
 SMH	SML_ID	SMF_ID_REFS	database_identifier	chemical_formula	smiles	inchi	chemical_name	uri	theoretical_neutral_mass	adduct_ions	reliability	best_id_confidence_measure	best_id_confidence_value	abundance_assay[1]	abundance_study_variable[1]	abundance_variation_study_variable[1]
 
 SML	1	null	hmdb:HMDB0000043	C6H12O6	C([C@@H]1[C@H]([C@@H]([C@H](C(=O)O1)O)O)O)O	InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2	D-Gluconic acid	http://www.hmdb.ca/metabolites/HMDB0000043	196.0423	[M-H]1-	2	[MS, MS:1002888, SpectraScore, ]	0.85	1.5	1.2	0.1
-

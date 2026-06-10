@@ -15,7 +15,7 @@ Check any of the following which apply:
 * [ ]  This change requires new dependencies (please list)
 
 *If you make changes to the R code*
-  
+
 * [ ]  My code passes the [testthat](https://testthat.r-lib.org/) check, I can receive warnings about tests, documentation or both
 
 ## Testing
