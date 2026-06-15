@@ -8,7 +8,7 @@ each get their own singleton cluster.}
 .ppm_cluster_sorted(values, tolerance_ppm)
 }
 \description{
-Fully vectorized: with sorted ascending values, single-link clustering at a
+Sorted ascending values, single-link clustering at a
 relative tolerance reduces to consecutive-pair gap tests + cumsum.
 }
 \keyword{internal}

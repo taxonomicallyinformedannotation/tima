@@ -18,14 +18,14 @@
   yamls_params <- list$yamls_params
 
   ## This allows to keep files correctly placed in `data/source` clean
-  prefil_fea_raw <- shiny::isolate(input$fil_fea_raw)
-  prefil_spe_raw <- shiny::isolate(input$fil_spe_raw)
-  prefil_met_raw <- shiny::isolate(input$fil_met_raw)
-  prefil_mzm_raw <- shiny::isolate(input$fil_ann_raw_mzm)
-  prefil_mzt_raw <- shiny::isolate(input$fil_mzt_raw)
-  prefil_sir_raw <- shiny::isolate(input$fil_ann_raw_sir)
-  lib_tmp_exp_csv <- shiny::isolate(input$lib_tmp_exp_csv)
-  lib_tmp_is_csv <- shiny::isolate(input$lib_tmp_is_csv)
+  prefil_fea_raw <- input$fil_fea_raw
+  prefil_spe_raw <- input$fil_spe_raw
+  prefil_met_raw <- input$fil_met_raw
+  prefil_mzm_raw <- input$fil_ann_raw_mzm
+  prefil_mzt_raw <- input$fil_mzt_raw
+  prefil_sir_raw <- input$fil_ann_raw_sir
+  lib_tmp_exp_csv <- input$lib_tmp_exp_csv
+  lib_tmp_is_csv <- input$lib_tmp_is_csv
 
   prefil_fea_raw_1 <- NULL
   prefil_spe_raw_1 <- NULL
@@ -191,20 +191,20 @@
   fil_mzt_raw <- prefil_mzt_raw_1
   fil_sir_raw <- prefil_sir_raw_1
 
-  fil_pat <- shiny::isolate(input$fil_pat)
+  fil_pat <- input$fil_pat
 
-  gnps_job_id <- shiny::isolate(input$gnps_id)
+  gnps_job_id <- input$gnps_id
   if (gnps_job_id == "") {
     gnps_job_id <- NULL
   }
 
-  org_tax <- shiny::isolate(input$org_tax)
+  org_tax <- input$org_tax
   if (org_tax == "") {
     org_tax <- NULL
   }
-  hig_evi <- shiny::isolate(input$high_evidence)
-  ms_pol <- shiny::isolate(input$ms_pol)
-  summarize <- shiny::isolate(input$summarize)
+  hig_evi <- input$high_evidence
+  ms_pol <- input$ms_pol
+  summarize <- input$summarize
 
   .log_trace("Changing parameters ...")
   .log_trace("... Small")
@@ -229,25 +229,25 @@
   .log_trace("... Advanced")
   yaml_advanced <- yamls_params[["prepare_params_advanced"]]
   yaml_advanced$annotations$candidates$final <-
-    shiny::isolate(input$ann_can_fin)
+    input$ann_can_fin
   yaml_advanced$annotations$candidates$neighbors <-
-    shiny::isolate(input$ann_can_nei)
+    input$ann_can_nei
   yaml_advanced$annotations$candidates$samples <-
-    shiny::isolate(input$ann_can_sam)
+    input$ann_can_sam
   yaml_advanced$annotations$candidates$best_percentile <-
-    shiny::isolate(input$ann_can_bes)
+    input$ann_can_bes
   yaml_advanced$annotations$ms1only <-
-    shiny::isolate(input$ann_ms1only)
+    input$ann_ms1only
   yaml_advanced$annotations$ms2approx <-
-    shiny::isolate(input$ann_ms2_app)
+    input$ann_ms2_app
   yaml_advanced$annotations$thresholds$consistency <-
-    shiny::isolate(input$ann_thr_con)
+    input$ann_thr_con
   yaml_advanced$annotations$thresholds$ms1$biological <-
-    shiny::isolate(input$ann_thr_ms1_bio)
+    input$ann_thr_ms1_bio
   yaml_advanced$annotations$thresholds$ms1$chemical <-
-    shiny::isolate(input$ann_thr_ms1_che)
+    input$ann_thr_ms1_che
   yaml_advanced$annotations$thresholds$ms1$condition <-
-    shiny::isolate(input$ann_thr_ms1_con)
+    input$ann_thr_ms1_con
   yaml_advanced$files$pattern <- fil_pat
   yaml_advanced$files$annotations$raw$spectral$gnps <-
     yaml_advanced$files$annotations$raw$spectral$gnps |>
@@ -292,52 +292,52 @@
     .replace_id()
   # TODO
   # yaml_advanced$files$libraries$sop$raw$closed <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$raw$ecmdb <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$raw$hmdb <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$raw$lotus <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$prepared$closed <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$prepared$ecmdb <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$prepared$hmdb <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$prepared$lotus <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$prepared$rt <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$prepared$spectral <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$merged$keys <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$merged$organisms$names <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$merged$organisms$taxonomies$ott <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$merged$structures$processed <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$merged$structures$stereo <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$merged$structures$metadata <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$merged$structures$names <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$merged$structures$taxonomies$cla <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   # yaml_advanced$files$libraries$sop$merged$structures$taxonomies$npc <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   yaml_advanced$files$libraries$spectral$raw <-
-    shiny::isolate(input$lib_spe_mgf)
+    input$lib_spe_mgf
   yaml_advanced$files$libraries$temporal$exp$csv <- lib_tmp_exp_csv
   yaml_advanced$files$libraries$temporal$is$csv <- lib_tmp_is_csv
   # TODO
   # other relative paths, not necessary
   # TODO
   # yaml_advanced$files$libraries$temporal$prepared <-
-  #   shiny::isolate(input$todo)
+  #   input$todo
   yaml_advanced$files$networks$spectral$edges$raw$ms1 <-
     yaml_advanced$files$networks$spectral$edges$raw$ms1 |>
     .replace_id()
@@ -360,193 +360,193 @@
   yaml_advanced$files$spectral$raw <- fil_spe_raw
   yaml_advanced$gnps$id <- gnps_job_id
   yaml_advanced$gnps$workflow <-
-    shiny::isolate(input$gnps_workflow)
+    input$gnps_workflow
   yaml_advanced$ms$adducts$neg <-
-    shiny::isolate(input$ms_add_neg)
+    input$ms_add_neg
   yaml_advanced$ms$adducts$pos <-
-    shiny::isolate(input$ms_add_pos)
+    input$ms_add_pos
   yaml_advanced$ms$adducts$consistency$type <-
-    shiny::isolate(input$ms_add_con_type)
+    input$ms_add_con_type
   yaml_advanced$ms$adducts$consistency$min_degree <-
-    shiny::isolate(input$ms_add_con_min_degree)
+    input$ms_add_con_min_degree
   yaml_advanced$ms$adducts$consistency$min_support <-
-    shiny::isolate(input$ms_add_con_min_support)
+    input$ms_add_con_min_support
   yaml_advanced$ms$clusters$neg <-
-    shiny::isolate(input$ms_clu_neg)
+    input$ms_clu_neg
   yaml_advanced$ms$clusters$pos <-
-    shiny::isolate(input$ms_clu_pos)
+    input$ms_clu_pos
   yaml_advanced$ms$neutral_losses <-
-    shiny::isolate(input$ms_neu)
+    input$ms_neu
   yaml_advanced$ms$polarity <- ms_pol
   yaml_advanced$ms$thresholds$ms2$intensity <-
-    shiny::isolate(input$ms_thr_ms2_int)
+    input$ms_thr_ms2_int
   yaml_advanced$ms$thresholds$ms2$min_fragments <-
-    shiny::isolate(input$ms_thr_ms2_min_fragments)
+    input$ms_thr_ms2_min_fragments
   yaml_advanced$ms$tolerances$mass$ppm$ms1 <-
-    shiny::isolate(input$ms_tol_mas_ppm_ms1)
+    input$ms_tol_mas_ppm_ms1
   yaml_advanced$ms$tolerances$mass$ppm$ms2 <-
-    shiny::isolate(input$ms_tol_mas_ppm_ms2)
+    input$ms_tol_mas_ppm_ms2
   yaml_advanced$ms$tolerances$mass$dalton$ms1 <-
-    shiny::isolate(input$ms_tol_mas_dal_ms1)
+    input$ms_tol_mas_dal_ms1
   yaml_advanced$ms$tolerances$mass$dalton$ms2 <-
-    shiny::isolate(input$ms_tol_mas_dal_ms2)
+    input$ms_tol_mas_dal_ms2
   yaml_advanced$ms$tolerances$rt$adducts <-
-    shiny::isolate(input$ms_tol_rt_add)
+    input$ms_tol_rt_add
   yaml_advanced$ms$tolerances$rt$library <-
-    shiny::isolate(input$ms_tol_rt_lib)
+    input$ms_tol_rt_lib
   yaml_advanced$names$adduct <-
-    shiny::isolate(input$names_adduct)
+    input$names_adduct
   yaml_advanced$names$compound_name <-
-    shiny::isolate(input$names_compound_name)
+    input$names_compound_name
   yaml_advanced$names$extension <-
-    shiny::isolate(input$names_extension)
+    input$names_extension
   yaml_advanced$names$features <-
-    shiny::isolate(input$names_features)
+    input$names_features
   yaml_advanced$names$filename <-
-    shiny::isolate(input$names_filename)
+    input$names_filename
   yaml_advanced$names$inchikey <-
-    shiny::isolate(input$names_inchikey)
+    input$names_inchikey
   yaml_advanced$names$libraries <-
-    shiny::isolate(input$names_libraries)
+    input$names_libraries
   yaml_advanced$names$mgf$adduct <-
-    shiny::isolate(input$names_mgf_ad)
+    input$names_mgf_ad
   yaml_advanced$names$mgf$collision_energy <-
-    shiny::isolate(input$names_mgf_ce)
+    input$names_mgf_ce
   yaml_advanced$names$mgf$compound_id <-
-    shiny::isolate(input$names_mgf_ci)
+    input$names_mgf_ci
   yaml_advanced$names$mgf$inchi <-
-    shiny::isolate(input$names_mgf_in)
+    input$names_mgf_in
   yaml_advanced$names$mgf$inchi_no_stereo <-
-    shiny::isolate(input$names_mgf_io)
+    input$names_mgf_io
   yaml_advanced$names$mgf$inchikey <-
-    shiny::isolate(input$names_mgf_ik)
+    input$names_mgf_ik
   yaml_advanced$names$mgf$inchikey_connectivity_layer <-
-    shiny::isolate(input$names_mgf_il)
+    input$names_mgf_il
   yaml_advanced$names$mgf$name <-
-    shiny::isolate(input$names_mgf_na)
+    input$names_mgf_na
   yaml_advanced$names$mgf$polarity <-
-    shiny::isolate(input$names_mgf_po)
+    input$names_mgf_po
   yaml_advanced$names$mgf$retention_time <-
-    shiny::isolate(input$names_mgf_rt)
+    input$names_mgf_rt
   yaml_advanced$names$mgf$smiles <-
-    shiny::isolate(input$names_mgf_sm)
+    input$names_mgf_sm
   yaml_advanced$names$mgf$smiles_no_stereo <-
-    shiny::isolate(input$names_mgf_sn)
+    input$names_mgf_sn
   yaml_advanced$names$mgf$spectrum_id <-
-    shiny::isolate(input$names_mgf_si)
+    input$names_mgf_si
   yaml_advanced$names$mgf$splash <-
-    shiny::isolate(input$names_mgf_sp)
+    input$names_mgf_sp
   yaml_advanced$names$mgf$synonyms <-
-    shiny::isolate(input$names_mgf_sy)
+    input$names_mgf_sy
   yaml_advanced$names$precursor <-
-    shiny::isolate(input$names_precursor)
+    input$names_precursor
   yaml_advanced$names$rt$features <-
-    shiny::isolate(input$names_rt)
+    input$names_rt
   yaml_advanced$names$rt$library <-
-    shiny::isolate(input$names_rt_2)
+    input$names_rt_2
   yaml_advanced$names$smiles <-
-    shiny::isolate(input$names_smiles)
+    input$names_smiles
   yaml_advanced$names$source <-
-    shiny::isolate(input$names_source)
+    input$names_source
   yaml_advanced$names$target <-
-    shiny::isolate(input$names_target)
+    input$names_target
   yaml_advanced$names$taxon <-
-    shiny::isolate(input$names_taxon)
+    input$names_taxon
   yaml_advanced$organisms$filter$mode <-
-    shiny::isolate(input$org_fil_mod)
+    input$org_fil_mod
   yaml_advanced$organisms$filter$level <-
-    shiny::isolate(input$org_fil_lev)
+    input$org_fil_lev
   yaml_advanced$organisms$filter$value <-
-    shiny::isolate(input$org_fil_val)
+    input$org_fil_val
   yaml_advanced$organisms$taxon <-
     org_tax
   yaml_advanced$similarities$methods$annotations <-
-    shiny::isolate(input$sim_met_ann)
+    input$sim_met_ann
   yaml_advanced$similarities$methods$edges <-
-    shiny::isolate(input$sim_met_edg)
+    input$sim_met_edg
   yaml_advanced$similarities$thresholds$annotations <-
-    shiny::isolate(input$sim_thr_ann)
+    input$sim_thr_ann
   yaml_advanced$similarities$thresholds$edges <-
-    shiny::isolate(input$sim_thr_edg)
+    input$sim_thr_edg
   yaml_advanced$similarities$thresholds$matched_peaks <-
-    shiny::isolate(input$sim_thr_mat)
+    input$sim_thr_mat
   # TODO
   # yaml_advanced$tools$metadata <-
-  #   shiny::isolate(input$too_x)
+  #   input$too_x
   # yaml_advanced$tools$networks$spectral$components <-
-  #   shiny::isolate(input$too_x)
+  #   input$too_x
   # yaml_advanced$tools$networks$spectral$edges <-
-  #   shiny::isolate(input$too_x)
+  #   input$too_x
   yaml_advanced$tools$sirius$version <-
-    shiny::isolate(input$too_sir_ver)
+    input$too_sir_ver
   yaml_advanced$tools$sirius$max_analog_abs_mz_error <-
-    shiny::isolate(input$too_sir_max_analog_abs_mz_error)
+    input$too_sir_max_analog_abs_mz_error
   # TODO
   # yaml_advanced$tools$taxonomies$biological <-
-  #   shiny::isolate(input$too_x)
+  #   input$too_x
   # yaml_advanced$tools$taxonomies$chemical <-
-  #   shiny::isolate(input$too_x)
+  #   input$too_x
   yaml_advanced$units$rt <-
-    shiny::isolate(input$uni_rt)
+    input$uni_rt
   yaml_advanced$weights$global$biological <-
-    shiny::isolate(input$wei_glo_bio)
+    input$wei_glo_bio
   yaml_advanced$weights$global$chemical <-
-    shiny::isolate(input$wei_glo_che)
+    input$wei_glo_che
   yaml_advanced$weights$global$spectral <-
-    shiny::isolate(input$wei_glo_spe)
+    input$wei_glo_spe
   yaml_advanced$weights$biological$domain <-
-    shiny::isolate(input$wei_bio_01)
+    input$wei_bio_01
   yaml_advanced$weights$biological$kingdom <-
-    shiny::isolate(input$wei_bio_02)
+    input$wei_bio_02
   yaml_advanced$weights$biological$phylum <-
-    shiny::isolate(input$wei_bio_03)
+    input$wei_bio_03
   yaml_advanced$weights$biological$class <-
-    shiny::isolate(input$wei_bio_04)
+    input$wei_bio_04
   yaml_advanced$weights$biological$order <-
-    shiny::isolate(input$wei_bio_05)
+    input$wei_bio_05
   yaml_advanced$weights$biological$infraorder <-
-    shiny::isolate(input$wei_bio_06)
+    input$wei_bio_06
   yaml_advanced$weights$biological$family <-
-    shiny::isolate(input$wei_bio_07)
+    input$wei_bio_07
   yaml_advanced$weights$biological$subfamily <-
-    shiny::isolate(input$wei_bio_08)
+    input$wei_bio_08
   yaml_advanced$weights$biological$tribe <-
-    shiny::isolate(input$wei_bio_09)
+    input$wei_bio_09
   yaml_advanced$weights$biological$subtribe <-
-    shiny::isolate(input$wei_bio_10)
+    input$wei_bio_10
   yaml_advanced$weights$biological$genus <-
-    shiny::isolate(input$wei_bio_11)
+    input$wei_bio_11
   yaml_advanced$weights$biological$subgenus <-
-    shiny::isolate(input$wei_bio_12)
+    input$wei_bio_12
   yaml_advanced$weights$biological$species <-
-    shiny::isolate(input$wei_bio_13)
+    input$wei_bio_13
   yaml_advanced$weights$biological$subspecies <-
-    shiny::isolate(input$wei_bio_14)
+    input$wei_bio_14
   yaml_advanced$weights$biological$variety <-
-    shiny::isolate(input$wei_bio_15)
+    input$wei_bio_15
   yaml_advanced$weights$biological$biota <-
-    shiny::isolate(input$wei_bio_16)
+    input$wei_bio_16
   yaml_advanced$weights$chemical$cla$kingdom <-
-    shiny::isolate(input$wei_che_11)
+    input$wei_che_11
   yaml_advanced$weights$chemical$npc$pathway <-
-    shiny::isolate(input$wei_che_21)
+    input$wei_che_21
   yaml_advanced$weights$chemical$cla$superclass <-
-    shiny::isolate(input$wei_che_12)
+    input$wei_che_12
   yaml_advanced$weights$chemical$npc$superclass <-
-    shiny::isolate(input$wei_che_22)
+    input$wei_che_22
   yaml_advanced$weights$chemical$cla$class <-
-    shiny::isolate(input$wei_che_13)
+    input$wei_che_13
   yaml_advanced$weights$chemical$npc$class <-
-    shiny::isolate(input$wei_che_23)
+    input$wei_che_23
   yaml_advanced$weights$chemical$cla$parent <-
-    shiny::isolate(input$wei_che_14)
+    input$wei_che_14
   yaml_advanced$options$compounds_names <-
-    shiny::isolate(input$compounds_names)
+    input$compounds_names
   yaml_advanced$options$high_evidence <- hig_evi
   yaml_advanced$options$force <-
-    shiny::isolate(input$force)
+    input$force
   yaml_advanced$options$remove_ties <-
-    shiny::isolate(input$remove_ties)
+    input$remove_ties
   yaml_advanced$options$summarize <- summarize
   if (!is.null(prefil_met_raw)) {
     yamls_params$prepare_taxa$files$metadata$raw <- fil_met_raw

@@ -593,7 +593,7 @@ ui <- shiny::fluidPage(
           shiny::checkboxGroupInput(
             inputId = "ms_add_pos",
             label = "List of adducts to be used in positive",
-            choices = list(
+            choices = c(
               "[M+H3]3+",
               "[M+H2Na]3+",
               "[M+HNa2]3+",
@@ -610,8 +610,8 @@ ui <- shiny::fluidPage(
               "[M+H4N]+",
               "[M+Na]+",
               "[M+K]+",
-              "[M+Fe-H2]+",
-              "[M+Fe-H]+",
+              "[M-H2+Fe]+",
+              "[M-H+Fe]+",
               "[M+Cu]+",
               "[2M+Mg]2+",
               "[2M+Ca]2+",
@@ -621,7 +621,7 @@ ui <- shiny::fluidPage(
               "[2M+Na]+",
               "[2M+K]+"
             ),
-            selected = list(
+            selected = c(
               "[M+H2]2+",
               "[M+H]+",
               "[M+H4N]+",
@@ -646,20 +646,26 @@ ui <- shiny::fluidPage(
           shiny::checkboxGroupInput(
             inputId = "ms_add_neg",
             label = "List of adducts to be used in negative",
-            choices = list(
+            choices = c(
               "[M-H3]3-",
               "[M-H2]2-",
               "[M]-",
               "[M-H]-",
               "[M+F]-",
-              "[M+Na-H2]-",
+              "[M-H2+Na]-",
               "[M+Cl]-",
-              "[M+K-H2]-",
+              "[M-H2+K]-",
               "[M+Br]-",
               "[2M-H]-",
               "[3M-H]-"
             ),
-            selected = list("[M-H2]2-", "[M-H]-", "[2M-H]-")
+            selected = c(
+              "[M-H2]2-",
+              "[M-H]-",
+              "[M+CHO2]-",
+              "[M-H2+Na]-",
+              "[2M-H]-"
+            )
           ) |>
             shinyhelper::helper(
               type = "inline",
@@ -715,7 +721,7 @@ ui <- shiny::fluidPage(
           shiny::checkboxGroupInput(
             inputId = "ms_clu_pos",
             label = "List of clusters to be used in positive",
-            choices = list(
+            choices = c(
               "H2O", # (water)
               "CH4O", # (methanol)
               "C2H3N", # (acetonitrile)
@@ -724,21 +730,20 @@ ui <- shiny::fluidPage(
               "CH2O2", # (formic acid)
               "C2H4O2", # (acetic acid)
               "C2H6O", # (ethanol)
+              "NH4Cl", # (ammonium chloride)
               "NaCl", # (sodium chloride)
               "KCl", # (potassium chloride)
               "C3H8O", # (isopropanol)
               "C2H6OS" # (dmso)
             ),
-            selected = list(
+            selected = c(
               "H2O", # (water)
               "C2H3N", # (acetonitrile)
               "C2H7N", # (ethylamine from ACN)
               "H3N", # (ammonia)
               "CH2O2", # (formic acid)
-              # "C2H4O2", # (acetic acid)
+              "NH4Cl", # (ammonium chloride)
               "NaCl" # (sodium chloride)
-              # "KCl", # (potassium chloride)
-              # "C2H6OS" # (dmso)
             )
           ) |>
             shinyhelper::helper(
@@ -758,19 +763,21 @@ ui <- shiny::fluidPage(
           shiny::checkboxGroupInput(
             inputId = "ms_clu_neg",
             label = "List of clusters to be used in negative",
-            choices = list(
+            choices = c(
               "H2O", # (water)
               "CH2O2", # (formic)
+              "NH4Cl", # (ammonium chloride)
               "NaCl", # (sodium chloride)
               "C2H4O2", # (acetic)
               "H2PO4", # (phosphoric)
               "C2HF3O2" # (tfa)
             ),
-            selected = list(
+            selected = c(
               "H2O", # (water)
               "CH2O2", # (formic)
-              "NaCl" # (sodium chloride)
-              # "C2H4O2" # (acetic)
+              "NH4Cl", # (ammonium chloride)
+              "NaCl", # (sodium chloride)
+              "C2HF3O2" # (tfa)
             )
           ) |>
             shinyhelper::helper(
@@ -790,7 +797,7 @@ ui <- shiny::fluidPage(
           shiny::checkboxGroupInput(
             inputId = "ms_neu",
             label = "List of neutral losses to be used",
-            choices = list(
+            choices = c(
               "HN",
               # "H2 (dihydrogen)",
               "CH2 (methylene)",
@@ -889,7 +896,7 @@ ui <- shiny::fluidPage(
               "C17H20O9 (sinapoylhexose)",
               "C18H30O15 (3xhexose-H2O)"
             ),
-            selected = list(
+            selected = c(
               # Matches annotate_masses.yaml enabled losses
               # "H2 (dihydrogen)",
               "CH2 (methylene)",

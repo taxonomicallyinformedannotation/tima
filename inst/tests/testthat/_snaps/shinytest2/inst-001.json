@@ -72,6 +72,7 @@
     "ms_add_neg": [
       "[M-H2]2-",
       "[M-H]-",
+      "[M-H2+Na]-",
       "[2M-H]-"
     ],
     "ms_add_pos": [
@@ -84,7 +85,9 @@
     "ms_clu_neg": [
       "H2O",
       "CH2O2",
-      "NaCl"
+      "NH4Cl",
+      "NaCl",
+      "C2HF3O2"
     ],
     "ms_clu_pos": [
       "H2O",
@@ -92,6 +95,7 @@
       "C2H7N",
       "H3N",
       "CH2O2",
+      "NH4Cl",
       "NaCl"
     ],
     "ms_neu": [

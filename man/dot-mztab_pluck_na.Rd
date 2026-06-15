@@ -2,11 +2,11 @@
 % Please edit documentation in R/write_mztab_tables.R
 \name{.mztab_pluck_na}
 \alias{.mztab_pluck_na}
-\title{Safely extract a column, replacing NA/null with "null" (vectorized utility)}
+\title{Safely extract a column, replacing NA/null with "null"}
 \usage{
 .mztab_pluck_na(df, col)
 }
 \description{
-Safely extract a column, replacing NA/null with "null" (vectorized utility)
+Safely extract a column, replacing NA/null with "null"
 }
 \keyword{internal}

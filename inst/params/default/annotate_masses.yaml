@@ -62,9 +62,9 @@ ms:
       - "[M]-"
       - "[M-H]-"
       - "[M+F]-"
-      - "[M+Na-H2]-"
+      - "[M-H2+Na]-"
       - "[M+Cl]-"
-      - "[M+K-H2]-"
+      - "[M-H2+K]-"
       - "[M+Br]-"
       - "[2M-H]-"
       - "[3M-H]-"
@@ -87,8 +87,8 @@ ms:
       - "[M+H4N]+"
       - "[M+Na]+"
       - "[M+K]+"
-      - "[M+Fe-H2]+"
-      - "[M+Fe-H]+"
+      - "[M-H2+Fe]+"
+      - "[M-H+Fe]+"
       - "[M+Cu]+"
       - "[2M+Mg]2+"
       - "[2M+Ca]2+"
@@ -118,10 +118,11 @@ ms:
     neg:
       - "H2O"        # (water)                          ~18.011
       - "CH2O2"        # (formic acid)                  ~46.006
+      - "H4ClN"        # (ammonium chloride)            ~53.003
       - "NaCl"         # (sodium chloride)              ~57.959
       # - "C2H4O2"       # (acetic acid)                ~60.021
       # - "H2PO4"      # (phosphoric)                   ~96.969
-      # - "C2HF3O2"    # (tfa)                          ~113.993
+      - "C2HF3O2"      # (tfa)                          ~113.993
 
     #' List of clusters to be used in positive. STRING
     pos:
@@ -131,6 +132,7 @@ ms:
       - "C2H3N"        # (acetonitrile)                 ~41.053
       - "C2H7N"        # (ethylamine from ACN)          ~45.058
       - "CH2O2"        # (formic acid)                  ~46.006
+      - "H4ClN"        # (ammonium chloride)            ~53.003
       # - "C2H6O"      # (ethanol)                      ~46.042
       - "NaCl"         # (sodium chloride)              ~57.959
       # - "C2H4O2"       # (acetic acid)                ~60.021

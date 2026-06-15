@@ -10,6 +10,7 @@ CITATION.cff
 ^\.idea$
 ^\.lintr$
 ^\.quarto$
+^\.pre-commit-config\.yaml$
 ^\.vscode$
 ^_pkgdown\.yml$
 ^_quarto$

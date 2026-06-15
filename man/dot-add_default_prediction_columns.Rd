@@ -2,18 +2,18 @@
 % Please edit documentation in R/clean_bio.R
 \name{.add_default_prediction_columns}
 \alias{.add_default_prediction_columns}
-\title{Add default prediction columns to annotation table}
+\title{Add or fill default prediction columns in data frame}
 \usage{
 .add_default_prediction_columns(df)
 }
 \arguments{
-\item{df}{Data frame to add columns to}
+\item{df}{Data frame to process}
 }
 \value{
-Data frame with default prediction columns added
+Data frame with all prediction columns properly initialized
 }
 \description{
-Adds default (empty) taxonomy prediction columns when no consistency
-calculation is possible (e.g., no edges or no neighbors).
+Ensures all taxonomy prediction columns exist with appropriate defaults.
+Adds missing columns and fills NA values using clean vectorized approach.
 }
 \keyword{internal}

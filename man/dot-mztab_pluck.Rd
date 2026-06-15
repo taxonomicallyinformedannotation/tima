@@ -2,11 +2,11 @@
 % Please edit documentation in R/write_mztab_tables.R
 \name{.mztab_pluck}
 \alias{.mztab_pluck}
-\title{Safely extract a column or return "null" vector (vectorized utility)}
+\title{Safely extract a column or return "null" vector}
 \usage{
 .mztab_pluck(df, col)
 }
 \description{
-Safely extract a column or return "null" vector (vectorized utility)
+Safely extract a column or return "null" vector
 }
 \keyword{internal}

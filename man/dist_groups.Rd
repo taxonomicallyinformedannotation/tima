@@ -37,7 +37,7 @@ d <- dist(data)
 result <- dist_groups(d, groups)
 
 # Analyze within vs between group distances
-aggregate(Distance ~ Label, data = result, FUN = mean)
+stats::aggregate(Distance ~ Label, data = result, FUN = mean)
 }
 }
 \keyword{internal}
