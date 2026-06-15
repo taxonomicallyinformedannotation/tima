@@ -692,12 +692,22 @@ collect_node_adduct_hypotheses <- function(
       )
     )
 
-  # (e) cluster expansion - suffix +cluster onto the DEST node's hypotheses.
-  # Only expand base hypotheses that are M-consistent
+  # (e) cluster expansion — two complementary propagation directions:
+  #
+  # (e1) DEST-based: take the DESTINATION feature's current hypothesis + cluster.
+  #      Handles simple cases, e.g. [M-H]- + CH2O2 → [M+CHO2]- (formate).
+  #
+  # (e2) SRC-to-DEST: propagate the SOURCE feature's hypothesis to the
+  #      DESTINATION with +cluster applied.  Handles multi-step cases, e.g.
+  #      source [M-H2+Na]- with cluster CH2O2 → dest gets [M+CO2+Na]-,
+  #      which cannot be reached by (e1) alone when the dest has only a
+  #      baseline [M-H]- hypothesis.
+  #
+  # Only expand "supported" base hypotheses in both directions.
   support_base <- base_hyps |>
     tidytable::filter(candidate_adduct_origin == "supported")
 
-  cluster_hyps <- expand_with_modifier(
+  cluster_hyps_dest <- expand_with_modifier(
     base_hyps = support_base,
     edges = cluster_edges,
     edge_feature_col = "feature_id_dest",
@@ -706,17 +716,48 @@ collect_node_adduct_hypotheses <- function(
   ) |>
     tidytable::mutate(candidate_adduct_origin = "supported")
 
-  # (f) loss expansion - suffix -loss onto the PRECURSOR's hypotheses.
-  # Only expand base hypotheses that are M-consistent
-  loss_hyps <- expand_with_modifier(
+  cluster_hyps_src <- propagate_modifier_src_to_dest(
     base_hyps = support_base,
-    edges = loss_edges,
-    edge_feature_col = "feature_id_dest",
-    mod_col = "loss",
-    mod_sign = "-",
-    strip_label = TRUE
+    edges = cluster_edges,
+    mod_col = "cluster",
+    mod_sign = "+"
   ) |>
     tidytable::mutate(candidate_adduct_origin = "supported")
+
+  cluster_hyps <- tidytable::bind_rows(cluster_hyps_dest, cluster_hyps_src)
+
+  # (f) loss expansion — two complementary propagation directions:
+  #
+  # (f1) PRECURSOR-to-PRODUCT: propagate the higher-mz precursor hypothesis to
+  #      the lower-mz product with -loss applied.
+  #
+  # (f2) PRODUCT-to-PRECURSOR: propagate the lower-mz product hypothesis back
+  #      to the precursor with +loss applied, allowing informative product-side
+  #      adduct assignments to recover the corresponding intact precursor state.
+  #
+  # This mirrors the bidirectional cluster strategy and lets surrounding adduct
+  # evidence decide which interpretation survives downstream.
+  loss_hyps_product <- propagate_modifier_dest_to_src(
+    base_hyps = support_base,
+    edges = loss_edges,
+    mod_col = "loss",
+    mod_sign = "-",
+    strip_label = TRUE,
+    source_label = "loss"
+  ) |>
+    tidytable::mutate(candidate_adduct_origin = "supported")
+
+  loss_hyps_precursor <- propagate_modifier_src_to_dest(
+    base_hyps = support_base,
+    edges = loss_edges,
+    mod_col = "loss",
+    mod_sign = "+",
+    strip_label = TRUE,
+    source_label = "loss"
+  ) |>
+    tidytable::mutate(candidate_adduct_origin = "supported")
+
+  loss_hyps <- tidytable::bind_rows(loss_hyps_product, loss_hyps_precursor)
 
   all_hyps <- tidytable::bind_rows(
     base_hyps,
@@ -738,6 +779,293 @@ collect_node_adduct_hypotheses <- function(
   attr(result, "feature_m_map") <- feature_m_map
 
   result
+}
+
+#' Simplify adduct strings produced by cluster/loss expansion while preserving
+#' the conceptual split between charge carriers and modifiers.
+#'
+#' Carrier terms (H/H2/H3/H4N and metal carriers) are kept as explicit tokens.
+#' Non-carrier modifiers are aggregated atomically (Hill order) per sign.
+#'
+#' Example: [M-H2+CH2O2+Na]- remains carrier-distinct as [M-H2+CH2O2+Na]-.
+#' Example: [M-H2O+H]+ remains [M-H2O+H]+ (and not [M-HO]+).
+#'
+#' Returns the original string unchanged if parsing fails.
+#' @keywords internal
+.simplify_adduct_after_modifier <- function(adduct_strings) {
+  vapply(
+    adduct_strings,
+    function(adduct) {
+      if (is.na(adduct) || !nzchar(adduct)) {
+        return(adduct)
+      }
+
+      m <- regexec("^\\[(.*)\\](\\d*[+-])$", adduct, perl = TRUE)
+      g <- regmatches(adduct, m)[[1L]]
+      if (length(g) == 0L) {
+        return(adduct)
+      }
+
+      inner <- g[[2L]]
+      suffix <- g[[3L]]
+
+      mod_start <- regexpr("[+-]\\d*[A-Za-z]", inner, perl = TRUE)
+      if (mod_start[[1L]] == -1L) {
+        return(adduct)
+      }
+
+      core <- substr(inner, 1L, mod_start[[1L]] - 1L)
+      mods <- substr(inner, mod_start[[1L]], nchar(inner))
+
+      tok_re <- "([+-])(\\d*)([A-Za-z][A-Za-z0-9]*)"
+      tokens <- regmatches(mods, gregexpr(tok_re, mods, perl = TRUE))[[1L]]
+      if (length(tokens) == 0L) {
+        return(adduct)
+      }
+
+      remainder <- gsub(tok_re, "", mods, perl = TRUE)
+      if (!identical(remainder, "")) {
+        return(adduct)
+      }
+
+      # Keep charge-carrier tokens separate from modifier chemistry.
+      carriers <- c(
+        "H",
+        "H2",
+        "H3",
+        "H4N",
+        "Na",
+        "K",
+        "Li",
+        "Mg",
+        "Ca",
+        "Fe",
+        "Cu",
+        "Zn",
+        "Mn",
+        "Al"
+      )
+      has_pos_h4n <- any(grepl("^\\+[0-9]*H4N$", tokens, perl = TRUE))
+
+      carrier_net <- list()
+      modifier_atomic_net <- list()
+
+      for (tok in tokens) {
+        tg <- regmatches(tok, regexec(tok_re, tok, perl = TRUE))[[1L]]
+        sign <- if (tg[[2L]] == "+") 1L else -1L
+        mult <- if (nzchar(tg[[3L]])) as.integer(tg[[3L]]) else 1L
+        formula <- tg[[4L]]
+
+        # Keep NH3 explicit in presence of NH4 so harmonize_adducts can reduce
+        # (-H3N,+H4N) pairs to +H instead of hiding NH3 in atomic collapse.
+        if (formula %in% carriers || (has_pos_h4n && formula == "H3N")) {
+          prev <- carrier_net[[formula]] %||% 0L
+          carrier_net[[formula]] <- prev + sign * mult
+        } else {
+          atoms <- parse_atomic_formula(formula)
+          if (is.null(atoms) || length(atoms) == 0L) {
+            return(adduct)
+          }
+          for (el in names(atoms)) {
+            prev <- modifier_atomic_net[[el]] %||% 0L
+            modifier_atomic_net[[el]] <- prev +
+              sign * mult * as.integer(atoms[[el]])
+          }
+        }
+      }
+
+      # Hill formula builder
+      hill_formula <- function(counts) {
+        counts <- Filter(function(x) x > 0L, counts)
+        if (length(counts) == 0L) {
+          return("")
+        }
+        els <- names(counts)
+        ord <- order(
+          ifelse(els == "C", 0L, ifelse(els == "H", 1L, 2L)),
+          els
+        )
+        paste0(
+          vapply(
+            els[ord],
+            function(el) {
+              n <- as.integer(counts[[el]])
+              paste0(el, if (n > 1L) as.character(n) else "")
+            },
+            character(1L)
+          ),
+          collapse = ""
+        )
+      }
+
+      new_mods <- character()
+
+      # Negative atomic term (loss)
+      neg_atoms <- Filter(function(x) x < 0L, modifier_atomic_net)
+      if (length(neg_atoms) > 0L) {
+        f <- hill_formula(lapply(neg_atoms, abs))
+        if (nzchar(f)) new_mods <- c(new_mods, paste0("-", f))
+      }
+
+      # Negative carrier terms
+      neg_carriers <- Filter(function(x) x < 0L, carrier_net)
+      for (nm in sort(names(neg_carriers))) {
+        n <- abs(neg_carriers[[nm]])
+        new_mods <- c(new_mods, paste0("-", if (n > 1L) n else "", nm))
+      }
+
+      # Positive atomic term (addition)
+      pos_atoms <- Filter(function(x) x > 0L, modifier_atomic_net)
+      if (length(pos_atoms) > 0L) {
+        f <- hill_formula(pos_atoms)
+        if (nzchar(f)) new_mods <- c(new_mods, paste0("+", f))
+      }
+
+      # Positive carrier terms
+      pos_carriers <- Filter(function(x) x > 0L, carrier_net)
+      for (nm in sort(names(pos_carriers))) {
+        n <- pos_carriers[[nm]]
+        new_mods <- c(new_mods, paste0("+", if (n > 1L) n else "", nm))
+      }
+
+      paste0("[", core, paste0(new_mods, collapse = ""), "]", suffix)
+    },
+    character(1L),
+    USE.NAMES = FALSE
+  )
+}
+
+#' Propagate a modifier from the SOURCE feature's hypothesis to the DESTINATION
+#' feature, creating a new hypothesis for the destination.
+#'
+#' Unlike `expand_with_modifier` (which appends the modifier to the destination
+#' feature's EXISTING hypothesis), this function takes the SOURCE feature's
+#' hypothesis, appends the modifier, and assigns the result to the DESTINATION.
+#'
+#' This handles multi-hop cases such as:
+#'   source [M-H2+Na]-  + cluster CH2O2  →  destination gets [M+CO2+Na]-
+#'
+#' @keywords internal
+propagate_modifier_src_to_dest <- function(
+  base_hyps,
+  edges,
+  mod_col,
+  mod_sign,
+  strip_label = FALSE,
+  source_label = NULL
+) {
+  if (nrow(edges) == 0L || nrow(base_hyps) == 0L) {
+    return(base_hyps[0L, ])
+  }
+
+  src_dest <- edges |>
+    tidytable::distinct(
+      feature_id,
+      feature_id_dest,
+      !!as.name(mod_col)
+    )
+
+  if (strip_label) {
+    src_dest <- src_dest |>
+      tidytable::mutate(
+        !!as.name(mod_col) := gsub(" .*", "", !!as.name(mod_col))
+      )
+  }
+
+  if (is.null(source_label)) {
+    source_label <- if (mod_sign == "+") "cluster" else "loss"
+  }
+
+  # Join on the SOURCE feature, then rename feature_id_dest → feature_id
+  out <- base_hyps |>
+    tidytable::inner_join(src_dest, by = "feature_id") |>
+    tidytable::mutate(
+      feature_id = feature_id_dest,
+      .base_part = sub("M(?![a-z]).*", "M", adduct, perl = TRUE),
+      .char_part = sub(".*M(?![a-z])", "", adduct, perl = TRUE),
+      adduct = .simplify_adduct_after_modifier(
+        paste0(.base_part, mod_sign, !!as.name(mod_col), .char_part)
+      ),
+      source = source_label,
+      .base_part = NULL,
+      .char_part = NULL,
+      feature_id_dest = NULL
+    )
+
+  if (identical(mod_col, "loss")) {
+    out <- out |>
+      tidytable::mutate(loss_term = as.character(!!as.name(mod_col)))
+  }
+
+  out |>
+    tidytable::select(-tidyselect::all_of(mod_col)) |>
+    harmonize_adducts(adducts_translations = adducts_translations)
+}
+
+#' Propagate a modifier from the DESTINATION feature's hypothesis back to the
+#' SOURCE feature.
+#'
+#' This is the natural complement of `propagate_modifier_src_to_dest()` for
+#' edge types whose chemically informative endpoint sits in `feature_id_dest`,
+#' such as neutral-loss edges where the precursor is the higher-m/z node.
+#' @keywords internal
+propagate_modifier_dest_to_src <- function(
+  base_hyps,
+  edges,
+  mod_col,
+  mod_sign,
+  strip_label = FALSE,
+  source_label = NULL
+) {
+  if (nrow(edges) == 0L || nrow(base_hyps) == 0L) {
+    return(base_hyps[0L, ])
+  }
+
+  if (is.null(source_label)) {
+    source_label <- if (mod_sign == "+") "cluster" else "loss"
+  }
+
+  dest_src <- edges |>
+    tidytable::distinct(
+      feature_id,
+      feature_id_dest,
+      !!as.name(mod_col)
+    ) |>
+    tidytable::rename(
+      feature_id_src = feature_id,
+      feature_id = feature_id_dest
+    )
+
+  if (strip_label) {
+    dest_src <- dest_src |>
+      tidytable::mutate(
+        !!as.name(mod_col) := gsub(" .*", "", !!as.name(mod_col))
+      )
+  }
+
+  out <- base_hyps |>
+    tidytable::inner_join(dest_src, by = "feature_id") |>
+    tidytable::mutate(
+      feature_id = feature_id_src,
+      .base_part = sub("M(?![a-z]).*", "M", adduct, perl = TRUE),
+      .char_part = sub(".*M(?![a-z])", "", adduct, perl = TRUE),
+      adduct = .simplify_adduct_after_modifier(
+        paste0(.base_part, mod_sign, !!as.name(mod_col), .char_part)
+      ),
+      source = source_label,
+      .base_part = NULL,
+      .char_part = NULL,
+      feature_id_src = NULL
+    )
+
+  if (identical(mod_col, "loss")) {
+    out <- out |>
+      tidytable::mutate(loss_term = as.character(!!as.name(mod_col)))
+  }
+
+  out |>
+    tidytable::select(-tidyselect::all_of(mod_col)) |>
+    harmonize_adducts(adducts_translations = adducts_translations)
 }
 
 #' Add +mod or -mod suffix to existing adduct strings on selected features
@@ -773,7 +1101,9 @@ expand_with_modifier <- function(
       # Extract base adduct (M part) and suffix (post-M part)
       .base_part = sub("M(?![a-z]).*", "M", adduct, perl = TRUE),
       .char_part = sub(".*M(?![a-z])", "", adduct, perl = TRUE),
-      adduct = paste0(.base_part, mod_sign, !!as.name(mod_col), .char_part),
+      adduct = .simplify_adduct_after_modifier(
+        paste0(.base_part, mod_sign, !!as.name(mod_col), .char_part)
+      ),
       source = if (mod_sign == "+") "cluster" else "loss",
       .base_part = NULL,
       .char_part = NULL

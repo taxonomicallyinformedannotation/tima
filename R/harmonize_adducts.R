@@ -213,6 +213,125 @@ count_unique_values <- function(x) {
   length(unique(x[!is.na(x)]))
 }
 
+#' Rebuild a Hill-order atomic formula string from named counts
+#' @keywords internal
+rebuild_hill_formula <- function(atom_counts) {
+  atom_counts <- atom_counts[atom_counts > 0L]
+  if (length(atom_counts) == 0L) {
+    return("")
+  }
+  els <- names(atom_counts)
+  ord <- order(ifelse(els == "C", 0L, ifelse(els == "H", 1L, 2L)), els)
+  paste0(
+    vapply(
+      els[ord],
+      function(el) {
+        n <- as.integer(atom_counts[[el]])
+        paste0(el, if (n > 1L) as.character(n) else "")
+      },
+      character(1L)
+    ),
+    collapse = ""
+  )
+}
+
+#' Subtract one formula from another, returning the residual formula string
+#' @keywords internal
+subtract_atomic_formula <- function(formula, sub_formula = "H3N") {
+  formula_atoms <- tryCatch(
+    parse_atomic_formula(formula),
+    error = function(.err) {
+      invisible(.err)
+      NULL
+    }
+  )
+  sub_atoms <- tryCatch(
+    parse_atomic_formula(sub_formula),
+    error = function(.err) {
+      invisible(.err)
+      NULL
+    }
+  )
+  if (is.null(formula_atoms) || is.null(sub_atoms)) {
+    return(NULL)
+  }
+  for (el in names(sub_atoms)) {
+    if (
+      !el %in% names(formula_atoms) || formula_atoms[[el]] < sub_atoms[[el]]
+    ) {
+      return(NULL)
+    }
+    formula_atoms[[el]] <- as.integer(formula_atoms[[el]] - sub_atoms[[el]])
+  }
+  formula_atoms <- Filter(function(x) x > 0L, formula_atoms)
+  rebuild_hill_formula(unlist(formula_atoms))
+}
+
+#' Reduce (+H4N, -loss-containing-H3N) pairs to proton-plus-residual-loss form
+#' @keywords internal
+reduce_ammonium_loss_pairs <- function(net) {
+  if (!any(net$formula == "H4N" & net$signed_n > 0L)) {
+    return(net)
+  }
+
+  add_or_increment <- function(df, formula, delta) {
+    if (!nzchar(formula) || delta == 0L) {
+      return(df)
+    }
+    idx <- match(formula, df$formula)
+    if (is.na(idx)) {
+      df <- rbind(
+        df,
+        data.frame(
+          formula = formula,
+          signed_n = as.integer(delta),
+          stringsAsFactors = FALSE
+        )
+      )
+    } else {
+      df$signed_n[[idx]] <- as.integer(df$signed_n[[idx]] + delta)
+    }
+    df
+  }
+
+  ammonium_idx <- match("H4N", net$formula)
+  while (!is.na(ammonium_idx) && net$signed_n[[ammonium_idx]] > 0L) {
+    neg_idx <- which(net$signed_n < 0L)
+    if (length(neg_idx) == 0L) {
+      break
+    }
+
+    reducible_idx <- NA_integer_
+    reducible_residual <- NULL
+    for (i in neg_idx) {
+      residual <- subtract_atomic_formula(net$formula[[i]], "H3N")
+      if (!is.null(residual)) {
+        reducible_idx <- i
+        reducible_residual <- residual
+        break
+      }
+    }
+    if (is.na(reducible_idx)) {
+      break
+    }
+
+    net$signed_n[[reducible_idx]] <- as.integer(
+      net$signed_n[[reducible_idx]] + 1L
+    )
+    net$signed_n[[ammonium_idx]] <- as.integer(
+      net$signed_n[[ammonium_idx]] - 1L
+    )
+    net <- add_or_increment(net, "H", 1L)
+    if (!is.null(reducible_residual) && nzchar(reducible_residual)) {
+      net <- add_or_increment(net, reducible_residual, -1L)
+    }
+    net <- net[net$signed_n != 0L, , drop = FALSE]
+    ammonium_idx <- match("H4N", net$formula)
+  }
+
+  net[net$signed_n != 0L, , drop = FALSE]
+}
+
 #' Canonicalize one adduct string
 #' @keywords internal
 canonicalize_adduct_notation <- local({
@@ -308,6 +427,7 @@ canonicalize_adduct_notation <- local({
       stringsAsFactors = FALSE
     )
     net <- net[net$signed_n != 0L, ]
+    net <- reduce_ammonium_loss_pairs(net)
 
     rebuild_terms <- character(0L)
     if (nrow(net) > 0L) {

@@ -746,6 +746,62 @@ test_that("canonicalize_adduct_notation keeps carrier terms last", {
   expect_equal(out, "[M+H2O+H]+")
 })
 
+test_that("propagate_modifier_dest_to_src transfers precursor loss hypotheses to product", {
+  base_hyps <- tidytable::tidytable(
+    feature_id = "PREC",
+    adduct = "[M+H]+",
+    source = "pair",
+    is_preassigned = FALSE,
+    candidate_adduct_origin = "supported"
+  )
+  loss_edges <- tidytable::tidytable(
+    feature_id = "PROD",
+    feature_id_dest = "PREC",
+    loss = "H2O"
+  )
+
+  out <- propagate_modifier_dest_to_src(
+    base_hyps = base_hyps,
+    edges = loss_edges,
+    mod_col = "loss",
+    mod_sign = "-",
+    strip_label = TRUE,
+    source_label = "loss"
+  )
+
+  expect_equal(out$feature_id[[1L]], "PROD")
+  expect_equal(out$adduct[[1L]], "[M-H2O+H]+")
+  expect_equal(out$source[[1L]], "loss")
+})
+
+test_that("propagate_modifier_src_to_dest can recover precursor from product-side loss hypothesis", {
+  base_hyps <- tidytable::tidytable(
+    feature_id = "PROD",
+    adduct = "[M-H2O+H]+",
+    source = "pair",
+    is_preassigned = FALSE,
+    candidate_adduct_origin = "supported"
+  )
+  loss_edges <- tidytable::tidytable(
+    feature_id = "PROD",
+    feature_id_dest = "PREC",
+    loss = "H2O"
+  )
+
+  out <- propagate_modifier_src_to_dest(
+    base_hyps = base_hyps,
+    edges = loss_edges,
+    mod_col = "loss",
+    mod_sign = "+",
+    strip_label = TRUE,
+    source_label = "loss"
+  )
+
+  expect_equal(out$feature_id[[1L]], "PREC")
+  expect_equal(out$adduct[[1L]], "[M+H]+")
+  expect_equal(out$source[[1L]], "loss")
+})
+
 test_that("propagate_preassigned_over_adduct_edges propagates in both directions", {
   adduct_edges <- tidytable::tidytable(
     feature_id = c("F1", "F2"),
@@ -1490,4 +1546,201 @@ test_that("annotate_masses recovers doubly charged species through evidence disc
     (edges$CLUSTERID1 == "FT_DOUBLE" | edges$CLUSTERID2 == "FT_DOUBLE") &
       grepl("\\[M\\+2H\\]2\\+|\\[M\\+H\\]\\+", edges$label)
   ))
+})
+
+test_that("hypothesis scoring can prefer H2O loss over H2O cluster on the same pair", {
+  cluster_edges <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "X1"),
+    cluster = c("H2O", "CH3OH", "H2O"),
+    mass = c(18.0106, 32.0262, 18.0106),
+    feature_id_dest = c("F2", "F3", "X2")
+  )
+  loss_edges <- tidytable::tidytable(
+    feature_id = c("F1", "Y1", "Z1"),
+    loss = c("H2O", "CO2", "H2O"),
+    mass = c(18.0106, 43.9898, 18.0106),
+    feature_id_dest = c("F2", "Y2", "F2")
+  )
+
+  node_hypotheses <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F3", "X1", "X2"),
+    adduct = c("[M-H2O+H]+", "[M+H]+", "[M+CH3OH+H]+", "[M+H]+", "[M+H]+"),
+    source = c("loss", "pair", "cluster", "baseline", "baseline"),
+    candidate_adduct_origin = c(
+      "supported",
+      "supported",
+      "supported",
+      "baseline",
+      "baseline"
+    ),
+    adduct_support = c(3L, 2L, 1L, 0L, 0L)
+  )
+
+  out <- resolve_competing_cluster_loss_edges_by_hypotheses(
+    cluster_edges = cluster_edges,
+    loss_edges = loss_edges,
+    node_hypotheses = node_hypotheses,
+    ms_mode = "pos"
+  )
+
+  expect_false(any(
+    out$cluster_edges$feature_id == "F1" &
+      out$cluster_edges$feature_id_dest == "F2" &
+      out$cluster_edges$cluster == "H2O"
+  ))
+  expect_true(any(
+    out$cluster_edges$feature_id == "F1" &
+      out$cluster_edges$feature_id_dest == "F3" &
+      out$cluster_edges$cluster == "CH3OH"
+  ))
+  expect_true(any(
+    out$cluster_edges$feature_id == "X1" &
+      out$cluster_edges$feature_id_dest == "X2" &
+      out$cluster_edges$cluster == "H2O"
+  ))
+  expect_true(any(
+    out$loss_edges$feature_id == "F1" &
+      out$loss_edges$feature_id_dest == "F2" &
+      out$loss_edges$loss == "H2O"
+  ))
+  expect_equal(out$n_cluster_dropped, 1L)
+  expect_equal(out$n_loss_dropped, 0L)
+})
+
+test_that("hypothesis scoring can prefer NH3 cluster over H3N loss aliases on the same pair", {
+  cluster_edges <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    cluster = c("NH3", "NH3"),
+    mass = c(17.0265, 17.0265),
+    feature_id_dest = c("F2", "Z2")
+  )
+  loss_edges <- tidytable::tidytable(
+    feature_id = "F1",
+    loss = "H3N (ammonia)",
+    mass = 17.0265,
+    feature_id_dest = "F2"
+  )
+  node_hypotheses <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M+H]+", "[M+H3N+H]+"),
+    source = c("pair", "cluster"),
+    candidate_adduct_origin = c("supported", "supported"),
+    adduct_support = c(2L, 2L)
+  )
+
+  out <- resolve_competing_cluster_loss_edges_by_hypotheses(
+    cluster_edges = cluster_edges,
+    loss_edges = loss_edges,
+    node_hypotheses = node_hypotheses,
+    ms_mode = "pos"
+  )
+
+  expect_equal(nrow(out$cluster_edges), 2L)
+  expect_equal(nrow(out$loss_edges), 0L)
+  expect_equal(out$n_cluster_dropped, 0L)
+  expect_equal(out$n_loss_dropped, 1L)
+})
+
+test_that("ambiguous modifier edges are kept when annotation context is inconclusive", {
+  cluster_edges <- tidytable::tidytable(
+    feature_id = "F1",
+    cluster = "H2O",
+    mass = 18.0106,
+    feature_id_dest = "F2"
+  )
+  loss_edges <- tidytable::tidytable(
+    feature_id = "F1",
+    loss = "H2O",
+    mass = 18.0106,
+    feature_id_dest = "F2"
+  )
+  node_hypotheses <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M+Na]+", "[M+K]+"),
+    source = c("baseline", "baseline"),
+    candidate_adduct_origin = c("baseline", "baseline"),
+    adduct_support = c(0L, 0L)
+  )
+
+  out <- resolve_competing_cluster_loss_edges_by_hypotheses(
+    cluster_edges = cluster_edges,
+    loss_edges = loss_edges,
+    node_hypotheses = node_hypotheses,
+    ms_mode = "pos"
+  )
+
+  expect_equal(nrow(out$cluster_edges), 1L)
+  expect_equal(nrow(out$loss_edges), 1L)
+  expect_equal(out$n_cluster_dropped, 0L)
+  expect_equal(out$n_loss_dropped, 0L)
+})
+
+test_that("filter_modifier_edges_by_assigned_adducts drops unsupported cluster/loss edges", {
+  assigned <- tidytable::tidytable(
+    feature_id = c("A", "B", "C", "D"),
+    adduct = c("[M+H]+", "[M+H2O+H]+", "[M-H2O+H]+", "[M+Na]+")
+  )
+  cluster_edges <- tidytable::tidytable(
+    feature_id = c("A", "A"),
+    cluster = c("H2O", "H2O"),
+    mass = c(18.0106, 18.0106),
+    feature_id_dest = c("B", "D")
+  )
+  loss_edges <- tidytable::tidytable(
+    feature_id = c("C", "D"),
+    loss = c("H2O", "H2O"),
+    mass = c(18.0106, 18.0106),
+    feature_id_dest = c("A", "B")
+  )
+
+  out <- filter_modifier_edges_by_assigned_adducts(
+    cluster_edges = cluster_edges,
+    loss_edges = loss_edges,
+    assigned_nodes = assigned
+  )
+
+  expect_true(any(
+    out$cluster_edges$feature_id == "A" &
+      out$cluster_edges$feature_id_dest == "B"
+  ))
+  expect_false(any(
+    out$cluster_edges$feature_id == "A" &
+      out$cluster_edges$feature_id_dest == "D"
+  ))
+  expect_true(any(
+    out$loss_edges$feature_id == "C" &
+      out$loss_edges$feature_id_dest == "A"
+  ))
+  expect_false(any(
+    out$loss_edges$feature_id == "D" &
+      out$loss_edges$feature_id_dest == "B"
+  ))
+})
+
+test_that("filter_modifier_edges_by_assigned_adducts keeps edges when endpoint assignments are missing", {
+  assigned <- tidytable::tidytable(
+    feature_id = "A",
+    adduct = "[M+H]+"
+  )
+  cluster_edges <- tidytable::tidytable(
+    feature_id = "A",
+    cluster = "H2O",
+    mass = 18.0106,
+    feature_id_dest = "X"
+  )
+  loss_edges <- tidytable::tidytable(
+    feature_id = "X",
+    loss = "H2O",
+    mass = 18.0106,
+    feature_id_dest = "A"
+  )
+
+  out <- filter_modifier_edges_by_assigned_adducts(
+    cluster_edges = cluster_edges,
+    loss_edges = loss_edges,
+    assigned_nodes = assigned
+  )
+
+  expect_equal(nrow(out$cluster_edges), 1L)
+  expect_equal(nrow(out$loss_edges), 1L)
 })

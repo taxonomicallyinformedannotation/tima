@@ -457,3 +457,17 @@ test_that("harmonize_adducts unifies reordered-modification adducts (regression:
   expect_equal(result$adduct[[3L]], result$adduct[[4L]])
   expect_equal(result$adduct[[5L]], result$adduct[[6L]])
 })
+
+test_that("harmonize_adducts semantically reduces ammonium-plus-loss combinations", {
+  df <- data.frame(
+    adduct = c(
+      "[M-H5NO+H4N]+",
+      "[M-H3N+H4N]+"
+    )
+  )
+
+  result <- harmonize_adducts(df, adducts_translations = adducts_translations)
+
+  expect_equal(result$adduct[[1L]], "[M-H2O+H]+")
+  expect_equal(result$adduct[[2L]], "[M+H]+")
+})

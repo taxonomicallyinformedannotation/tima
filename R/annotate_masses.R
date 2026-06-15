@@ -305,6 +305,54 @@ annotate_masses <- function(
     tolerance_dalton = tolerance_dalton
   )
 
+  modifier_resolution <- resolve_competing_cluster_loss_edges_by_hypotheses(
+    cluster_edges = cluster_edges,
+    loss_edges = loss_edges,
+    node_hypotheses = node_hypotheses,
+    ms_mode = ms_mode
+  )
+  cluster_edges <- modifier_resolution$cluster_edges
+  loss_edges <- modifier_resolution$loss_edges
+
+  if (
+    modifier_resolution$n_cluster_dropped > 0L ||
+      modifier_resolution$n_loss_dropped > 0L
+  ) {
+    start_time_refine <- Sys.time()
+    node_hypotheses <- build_annotate_masses_candidate_hypotheses(
+      adduct_edges = adduct_edges_combined,
+      cluster_edges = cluster_edges,
+      loss_edges = loss_edges,
+      evidence_hypotheses = evidence_signal$hypotheses,
+      preassigned = already_assigned,
+      baseline_adducts = baseline_adducts,
+      features_table = features_table,
+      multi_adducts = multi_adducts,
+      tolerance_ppm = tolerance_ppm,
+      tolerance_dalton = tolerance_dalton
+    )
+
+    node_hypotheses <- append_component_weak_hypotheses(
+      node_hypotheses = node_hypotheses,
+      features_table = features_table,
+      neutral_losses_list = neutral_losses_list,
+      clusters = clusters,
+      baseline_adducts = baseline_adducts,
+      tolerance_ppm = tolerance_ppm,
+      tolerance_dalton = tolerance_dalton
+    )
+
+    log_info(
+      paste0(
+        "Refined node hypotheses after resolving %d ambiguous cluster edge(s) ",
+        "and %d ambiguous loss edge(s) in %.2f seconds"
+      ),
+      modifier_resolution$n_cluster_dropped,
+      modifier_resolution$n_loss_dropped,
+      as.numeric(difftime(Sys.time(), start_time_refine, units = "secs"))
+    )
+  }
+
   # ---- Step 7: library match by neutral mass ---------------------------
   start_time_lib <- Sys.time()
   annotations <- build_annotate_masses_annotations(
@@ -880,6 +928,16 @@ retain_supported_single_m_edges <- function(
     tidytable::select(feature_id, loss, mass, feature_id_dest) |>
     tidytable::distinct()
 
+  # Keep modifier edges aligned with currently assigned primary supported adducts
+  # whenever both endpoints have such assignments; otherwise keep the edge.
+  modifier_filtered <- filter_modifier_edges_by_assigned_adducts(
+    cluster_edges = cluster_kept,
+    loss_edges = loss_kept,
+    assigned_nodes = supported_nodes
+  )
+  cluster_kept <- modifier_filtered$cluster_edges
+  loss_kept <- modifier_filtered$loss_edges
+
   annotations <- annotations |>
     tidytable::left_join(comp_members, by = "feature_id") |>
     tidytable::mutate(
@@ -896,6 +954,116 @@ retain_supported_single_m_edges <- function(
     loss_edges = loss_kept,
     annotations = annotations
   )
+}
+
+#' Keep only modifier edges coherent with assigned primary supported adducts
+#'
+#' An edge is kept if:
+#' - one or both endpoints lack assigned nodes (insufficient evidence to reject), or
+#' - at least one assigned adduct combination supports the modifier relation.
+#' @keywords internal
+filter_modifier_edges_by_assigned_adducts <- function(
+  cluster_edges,
+  loss_edges,
+  assigned_nodes
+) {
+  assigned_nodes <- assigned_nodes |>
+    tidytable::distinct(feature_id, adduct)
+
+  edge_supported_any_combo <- function(
+    src_adducts,
+    dest_adducts,
+    modifier,
+    relation
+  ) {
+    src_adducts <- unique(stats::na.omit(as.character(src_adducts)))
+    dest_adducts <- unique(stats::na.omit(as.character(dest_adducts)))
+    if (length(src_adducts) == 0L || length(dest_adducts) == 0L) {
+      return(TRUE)
+    }
+    modifier <- normalize_modifier_formula_term(modifier)
+    if (is.na(modifier) || !nzchar(modifier)) {
+      return(TRUE)
+    }
+
+    if (identical(relation, "cluster")) {
+      expected_dest <- unique(apply_modifier_to_adducts(
+        src_adducts,
+        modifier,
+        "+"
+      ))
+      state_map <- build_adduct_state_key_map(unique(c(
+        expected_dest,
+        dest_adducts
+      )))
+      key_lookup <- stats::setNames(state_map$state_key, state_map$adduct)
+      return(any(
+        unname(key_lookup[expected_dest]) %in% unname(key_lookup[dest_adducts])
+      ))
+    }
+
+    if (identical(relation, "loss")) {
+      expected_product <- unique(apply_modifier_to_adducts(
+        dest_adducts,
+        modifier,
+        "-"
+      ))
+      state_map <- build_adduct_state_key_map(unique(c(
+        expected_product,
+        src_adducts
+      )))
+      key_lookup <- stats::setNames(state_map$state_key, state_map$adduct)
+      return(any(
+        unname(key_lookup[expected_product]) %in%
+          unname(key_lookup[src_adducts])
+      ))
+    }
+
+    TRUE
+  }
+
+  filter_edges <- function(edges, relation, modifier_col) {
+    if (nrow(edges) == 0L || nrow(assigned_nodes) == 0L) {
+      return(edges)
+    }
+
+    src_map <- split(assigned_nodes$adduct, assigned_nodes$feature_id)
+    keep_flag <- vapply(
+      seq_len(nrow(edges)),
+      function(i) {
+        src_id <- edges$feature_id[[i]]
+        dest_id <- edges$feature_id_dest[[i]]
+        src_adducts <- src_map[[src_id]]
+        dest_adducts <- src_map[[dest_id]]
+        if (is.null(src_adducts) || is.null(dest_adducts)) {
+          return(TRUE)
+        }
+        modifier <- edges[[modifier_col]][[i]]
+        edge_supported_any_combo(
+          src_adducts = src_adducts,
+          dest_adducts = dest_adducts,
+          modifier = modifier,
+          relation = relation
+        )
+      },
+      logical(1L)
+    )
+
+    edges[keep_flag, , drop = FALSE]
+  }
+
+  cluster_kept <- filter_edges(
+    cluster_edges,
+    relation = "cluster",
+    modifier_col = "cluster"
+  )
+  loss_kept <- filter_edges(
+    loss_edges,
+    relation = "loss",
+    modifier_col = "loss"
+  )
+
+  list(cluster_edges = cluster_kept, loss_edges = loss_kept)
 }
 
 #' Load prepared features and structural library for annotate_masses
@@ -1093,6 +1261,407 @@ discover_annotate_masses_edge_sets <- function(
     cluster_edges = cluster_edges,
     loss_edges = loss_edges,
     evidence_signal = evidence_signal
+  )
+}
+
+#' Normalize a cluster/loss term to a canonical atomic formula key
+#' @keywords internal
+normalize_modifier_formula_term <- function(term) {
+  if (is.null(term) || is.na(term) || !nzchar(term)) {
+    return(NA_character_)
+  }
+  term <- trimws(sub(" .*", "", as.character(term)))
+  if (!nzchar(term)) {
+    return(NA_character_)
+  }
+  parsed <- tryCatch(
+    parse_atomic_formula(term),
+    error = function(.err) {
+      invisible(.err)
+      NULL
+    }
+  )
+  if (is.null(parsed) || length(parsed) == 0L) {
+    return(term)
+  }
+  els <- names(parsed)
+  ord <- order(ifelse(els == "C", 0L, ifelse(els == "H", 1L, 2L)), els)
+  paste0(
+    vapply(
+      els[ord],
+      function(el) {
+        n <- as.integer(parsed[[el]])
+        paste0(el, if (n > 1L) as.character(n) else "")
+      },
+      character(1L)
+    ),
+    collapse = ""
+  )
+}
+
+#' Apply a modifier formula to adduct strings and simplify notation
+#' @keywords internal
+apply_modifier_to_adducts <- function(adducts, modifier, sign) {
+  if (length(adducts) == 0L) {
+    return(character())
+  }
+  base_part <- sub("M(?![a-z]).*", "M", adducts, perl = TRUE)
+  char_part <- sub(".*M(?![a-z])", "", adducts, perl = TRUE)
+  simplified <- .simplify_adduct_after_modifier(
+    paste0(base_part, sign, modifier, char_part)
+  )
+  vapply(
+    X = simplified,
+    FUN = canonicalize_adduct_notation,
+    FUN.VALUE = character(1L),
+    USE.NAMES = FALSE
+  )
+}
+
+#' Score a node-level hypothesis row for modifier-interpretation support
+#' @keywords internal
+score_modifier_hypothesis_row <- function(
+  source,
+  candidate_adduct_origin,
+  adduct_support
+) {
+  source <- tidytable::coalesce(as.character(source), "")
+  candidate_adduct_origin <- tidytable::coalesce(
+    as.character(candidate_adduct_origin),
+    "baseline"
+  )
+  adduct_support <- ifelse(
+    is.na(adduct_support),
+    0L,
+    as.integer(adduct_support)
+  )
+
+  origin_weight <- dplyr::case_when(
+    candidate_adduct_origin == "supported" ~ 100L,
+    candidate_adduct_origin == "supported_weak" ~ 25L,
+    TRUE ~ 0L
+  )
+  source_weight <- dplyr::case_when(
+    source %in% c("pair", "evidence") ~ 40L,
+    source %in% c("preassigned", "preassigned_propagated") ~ 35L,
+    source %in% c("cluster", "loss") ~ 25L,
+    source %in% c("weak_component_cluster", "weak_component_loss") ~ 10L,
+    source == "weak_component" ~ 5L,
+    source == "baseline" ~ 0L,
+    TRUE ~ 0L
+  )
+
+  as.integer(origin_weight + source_weight + pmax(adduct_support, 0L))
+}
+
+#' Score how well node hypotheses support one modifier interpretation
+#' @keywords internal
+score_modifier_relation_from_hypotheses <- function(
+  src_hypotheses,
+  dest_hypotheses,
+  modifier,
+  relation
+) {
+  if (nrow(src_hypotheses) == 0L || nrow(dest_hypotheses) == 0L) {
+    return(0L)
+  }
+  modifier <- normalize_modifier_formula_term(modifier)
+  if (is.na(modifier) || !nzchar(modifier)) {
+    return(0L)
+  }
+
+  src_hypotheses <- src_hypotheses |>
+    tidytable::mutate(
+      .row_weight = score_modifier_hypothesis_row(
+        source = source,
+        candidate_adduct_origin = candidate_adduct_origin,
+        adduct_support = adduct_support
+      )
+    )
+  dest_hypotheses <- dest_hypotheses |>
+    tidytable::mutate(
+      .row_weight = score_modifier_hypothesis_row(
+        source = source,
+        candidate_adduct_origin = candidate_adduct_origin,
+        adduct_support = adduct_support
+      )
+    )
+
+  if (identical(relation, "cluster")) {
+    expected <- apply_modifier_to_adducts(src_hypotheses$adduct, modifier, "+")
+    state_map <- build_adduct_state_key_map(unique(c(
+      expected,
+      dest_hypotheses$adduct
+    )))
+    key_lookup <- stats::setNames(state_map$state_key, state_map$adduct)
+
+    src_keys <- unname(key_lookup[expected])
+    dest_keys <- unname(key_lookup[dest_hypotheses$adduct])
+  } else if (identical(relation, "loss")) {
+    expected <- apply_modifier_to_adducts(dest_hypotheses$adduct, modifier, "-")
+    state_map <- build_adduct_state_key_map(unique(c(
+      expected,
+      src_hypotheses$adduct
+    )))
+    key_lookup <- stats::setNames(state_map$state_key, state_map$adduct)
+
+    src_keys <- unname(key_lookup[src_hypotheses$adduct])
+    dest_keys <- unname(key_lookup[expected])
+  } else {
+    return(0L)
+  }
+
+  src_scored <- tidytable::tidytable(
+    state_key = src_keys,
+    row_weight = src_hypotheses$.row_weight
+  ) |>
+    tidytable::filter(!is.na(state_key)) |>
+    tidytable::summarize(src_score = max(row_weight), .by = state_key)
+
+  dest_scored <- tidytable::tidytable(
+    state_key = dest_keys,
+    row_weight = dest_hypotheses$.row_weight
+  ) |>
+    tidytable::filter(!is.na(state_key)) |>
+    tidytable::summarize(dest_score = max(row_weight), .by = state_key)
+
+  matched <- src_scored |>
+    tidytable::inner_join(dest_scored, by = "state_key")
+  if (nrow(matched) == 0L) {
+    return(0L)
+  }
+
+  as.integer(sum(matched$src_score + matched$dest_score, na.rm = TRUE))
+}
+
+#' Resolve competing cluster/loss interpretations using node hypotheses
+#'
+#' For pairs that match both a cluster and a neutral-loss explanation with the
+#' same underlying modifier formula, score both interpretations directly from the
+#' current node hypotheses. Neighboring same-modifier edges are used only as a
+#' fallback tie-breaker when hypothesis scores are equal or absent.
+#' @keywords internal
+resolve_competing_cluster_loss_edges_by_hypotheses <- function(
+  cluster_edges,
+  loss_edges,
+  node_hypotheses,
+  ms_mode
+) {
+  if (
+    nrow(cluster_edges) == 0L ||
+      nrow(loss_edges) == 0L ||
+      nrow(node_hypotheses) == 0L
+  ) {
+    return(list(
+      cluster_edges = cluster_edges,
+      loss_edges = loss_edges,
+      n_cluster_dropped = 0L,
+      n_loss_dropped = 0L
+    ))
+  }
+
+  hyp_min <- node_hypotheses |>
+    tidytable::mutate(
+      candidate_adduct_origin = tidytable::coalesce(
+        candidate_adduct_origin,
+        "baseline"
+      ),
+      source = tidytable::coalesce(source, "baseline"),
+      adduct_support = tidytable::if_else(
+        is.na(adduct_support),
+        0L,
+        as.integer(adduct_support)
+      )
+    ) |>
+    tidytable::distinct(
+      feature_id,
+      adduct,
+      source,
+      candidate_adduct_origin,
+      adduct_support
+    )
+
+  cluster_cmp <- cluster_edges |>
+    tidytable::mutate(
+      .modifier_key = vapply(
+        X = cluster,
+        FUN = normalize_modifier_formula_term,
+        FUN.VALUE = character(1L)
+      )
+    )
+  loss_cmp <- loss_edges |>
+    tidytable::mutate(
+      .modifier_key = vapply(
+        X = loss,
+        FUN = normalize_modifier_formula_term,
+        FUN.VALUE = character(1L)
+      )
+    )
+
+  ambiguous_pairs <- cluster_cmp |>
+    tidytable::select(feature_id, feature_id_dest, .modifier_key) |>
+    tidytable::distinct() |>
+    tidytable::inner_join(
+      loss_cmp |>
+        tidytable::select(feature_id, feature_id_dest, .modifier_key) |>
+        tidytable::distinct(),
+      by = c("feature_id", "feature_id_dest", ".modifier_key")
+    )
+
+  if (nrow(ambiguous_pairs) == 0L) {
+    return(list(
+      cluster_edges = cluster_edges,
+      loss_edges = loss_edges,
+      n_cluster_dropped = 0L,
+      n_loss_dropped = 0L
+    ))
+  }
+
+  hyp_by_feature <- split(hyp_min, hyp_min$feature_id)
+  decisions <- lapply(seq_len(nrow(ambiguous_pairs)), function(i) {
+    pair_i <- ambiguous_pairs[i, ]
+    src_id <- pair_i$feature_id[[1L]]
+    dest_id <- pair_i$feature_id_dest[[1L]]
+    modifier_key <- pair_i$.modifier_key[[1L]]
+    src_hypotheses <- hyp_by_feature[[src_id]]
+    dest_hypotheses <- hyp_by_feature[[dest_id]]
+    if (is.null(src_hypotheses)) {
+      src_hypotheses <- hyp_min[0L, ]
+    }
+    if (is.null(dest_hypotheses)) {
+      dest_hypotheses <- hyp_min[0L, ]
+    }
+
+    cluster_score <- score_modifier_relation_from_hypotheses(
+      src_hypotheses = src_hypotheses,
+      dest_hypotheses = dest_hypotheses,
+      modifier = modifier_key,
+      relation = "cluster"
+    )
+    loss_score <- score_modifier_relation_from_hypotheses(
+      src_hypotheses = src_hypotheses,
+      dest_hypotheses = dest_hypotheses,
+      modifier = modifier_key,
+      relation = "loss"
+    )
+
+    cluster_neighbor_score <- sum(
+      cluster_cmp$.modifier_key == modifier_key &
+        cluster_cmp$feature_id == src_id &
+        cluster_cmp$feature_id_dest != dest_id,
+      na.rm = TRUE
+    ) +
+      sum(
+        cluster_cmp$.modifier_key == modifier_key &
+          cluster_cmp$feature_id_dest == dest_id &
+          cluster_cmp$feature_id != src_id,
+        na.rm = TRUE
+      )
+
+    loss_neighbor_score <- sum(
+      loss_cmp$.modifier_key == modifier_key &
+        loss_cmp$feature_id == src_id &
+        loss_cmp$feature_id_dest != dest_id,
+      na.rm = TRUE
+    ) +
+      sum(
+        loss_cmp$.modifier_key == modifier_key &
+          loss_cmp$feature_id_dest == dest_id &
+          loss_cmp$feature_id != src_id,
+        na.rm = TRUE
+      )
+
+    if (cluster_score > loss_score) {
+      keep_cluster <- TRUE
+      keep_loss <- FALSE
+    } else if (loss_score > cluster_score) {
+      keep_cluster <- FALSE
+      keep_loss <- TRUE
+    } else if (cluster_neighbor_score > loss_neighbor_score) {
+      keep_cluster <- TRUE
+      keep_loss <- FALSE
+    } else if (loss_neighbor_score > cluster_neighbor_score) {
+      keep_cluster <- FALSE
+      keep_loss <- TRUE
+    } else {
+      keep_cluster <- TRUE
+      keep_loss <- TRUE
+    }
+
+    tidytable::tidytable(
+      feature_id = src_id,
+      feature_id_dest = dest_id,
+      .modifier_key = modifier_key,
+      cluster_score = cluster_score,
+      loss_score = loss_score,
+      keep_cluster = keep_cluster,
+      keep_loss = keep_loss
+    )
+  })
+  decisions <- tidytable::bind_rows(decisions)
+
+  n_cluster_only <- sum(
+    decisions$keep_cluster & !decisions$keep_loss,
+    na.rm = TRUE
+  )
+  n_loss_only <- sum(
+    !decisions$keep_cluster & decisions$keep_loss,
+    na.rm = TRUE
+  )
+  n_unresolved <- sum(
+    decisions$keep_cluster & decisions$keep_loss,
+    na.rm = TRUE
+  )
+
+  log_info(
+    paste0(
+      "Modifier ambiguity resolution: %d pair(s)%s; ",
+      "cluster=%d, loss=%d, unresolved=%d"
+    ),
+    nrow(ambiguous_pairs),
+    if (identical(ms_mode, "pos")) " in positive mode" else "",
+    n_cluster_only,
+    n_loss_only,
+    n_unresolved
+  )
+
+  cluster_edges_kept <- cluster_cmp |>
+    tidytable::left_join(
+      decisions,
+      by = c("feature_id", "feature_id_dest", ".modifier_key")
+    ) |>
+    tidytable::mutate(keep_cluster = tidytable::coalesce(keep_cluster, TRUE)) |>
+    tidytable::filter(keep_cluster) |>
+    tidytable::select(-.modifier_key, -keep_cluster, -keep_loss)
+
+  loss_edges_kept <- loss_cmp |>
+    tidytable::left_join(
+      decisions,
+      by = c("feature_id", "feature_id_dest", ".modifier_key")
+    ) |>
+    tidytable::mutate(keep_loss = tidytable::coalesce(keep_loss, TRUE)) |>
+    tidytable::filter(keep_loss) |>
+    tidytable::select(-.modifier_key, -keep_cluster, -keep_loss)
+
+  n_cluster_dropped <- nrow(cluster_edges) - nrow(cluster_edges_kept)
+  n_loss_dropped <- nrow(loss_edges) - nrow(loss_edges_kept)
+  if (n_cluster_dropped > 0L || n_loss_dropped > 0L) {
+    log_info(
+      paste0(
+        "Resolved %d ambiguous cluster edge(s) and %d ambiguous loss edge(s) ",
+        "using hypothesis-level modifier scoring%s."
+      ),
+      n_cluster_dropped,
+      n_loss_dropped,
+      if (identical(ms_mode, "pos")) " in positive mode" else ""
+    )
+  }
+
+  list(
+    cluster_edges = cluster_edges_kept,
+    loss_edges = loss_edges_kept,
+    n_cluster_dropped = n_cluster_dropped,
+    n_loss_dropped = n_loss_dropped
   )
 }
 

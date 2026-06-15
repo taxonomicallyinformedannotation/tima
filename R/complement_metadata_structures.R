@@ -30,6 +30,88 @@
 #'   str_tax_npc = "data/str_tax_npclassifier.tsv"
 #' )
 #' }
+# Process-level cache: keyed on (str_stereo, str_met, str_tax_cla, str_tax_npc).
+# Avoids re-reading the large reference tables on every annotator call.
+.complement_metadata_ref_cache <- local({
+  .env <- new.env(hash = TRUE, parent = emptyenv())
+
+  load_refs <- function(str_stereo, str_met, str_tax_cla, str_tax_npc) {
+    cache_key <- paste(str_stereo, str_met, str_tax_cla, str_tax_npc, sep = "|")
+    cached <- get0(cache_key, envir = .env)
+    if (!is.null(cached)) {
+      return(cached)
+    }
+
+    stereo_cols <- .schema_stereo_cols()
+    stereo_full <- .safe_fread_selected(
+      file = str_stereo,
+      file_type = "stereochemistry data",
+      selected_cols = stereo_cols
+    ) |>
+      .ensure_columns(cols = stereo_cols)
+
+    if (
+      all(is.na(stereo_full$structure_inchikey_no_stereo)) &&
+        nrow(stereo_full) > 0L
+    ) {
+      stereo_full <- stereo_full |>
+        tidytable::mutate(
+          structure_inchikey_no_stereo = tidytable::if_else(
+            !is.na(structure_inchikey) & nchar(structure_inchikey) >= 27L,
+            paste0(
+              stringi::stri_sub(str = structure_inchikey, from = 1L, to = 14L),
+              "-",
+              stringi::stri_sub(str = structure_inchikey, from = -1L, to = -1L)
+            ),
+            NA_character_
+          )
+        )
+    }
+
+    met_cols <- .schema_metadata_cols()
+    met_full <- .safe_fread_selected(
+      file = str_met,
+      file_type = "structure metadata",
+      selected_cols = met_cols
+    ) |>
+      .ensure_columns(cols = met_cols)
+
+    tax_cla_full <- safe_fread(
+      file = str_tax_cla,
+      file_type = "ClassyFire taxonomy",
+      na.strings = c("", "NA"),
+      colClasses = "character",
+      select = .schema_classyfire_cols()
+    ) |>
+      .ensure_columns(cols = .schema_classyfire_cols()) |>
+      tidytable::mutate(
+        structure_tax_cla_chemontid = normalize_chemontid(
+          structure_tax_cla_chemontid
+        )
+      )
+
+    tax_npc_full <- safe_fread(
+      file = str_tax_npc,
+      file_type = "NPClassifier taxonomy",
+      na.strings = c("", "NA"),
+      colClasses = "character",
+      select = .schema_npc_cols()
+    ) |>
+      .ensure_columns(cols = .schema_npc_cols())
+
+    result <- list(
+      stereo_full = stereo_full,
+      met_full = met_full,
+      tax_cla_full = tax_cla_full,
+      tax_npc_full = tax_npc_full
+    )
+    assign(cache_key, result, envir = .env)
+    result
+  }
+
+  list(load_refs = load_refs)
+})
+
 complement_metadata_structures <- function(
   df,
   str_stereo,
@@ -64,14 +146,16 @@ complement_metadata_structures <- function(
     return(.ensure_structure_placeholders(df))
   }
 
-  # Load stereochemistry data (now includes name, tag, xlogp)
-  stereo_cols <- .schema_stereo_cols()
-  stereo <- .safe_fread_selected(
-    file = str_stereo,
-    file_type = "stereochemistry data",
-    selected_cols = stereo_cols
-  ) |>
-    .ensure_columns(cols = stereo_cols) |>
+  # Load (or retrieve from cache) all four reference tables once per session.
+  refs <- .complement_metadata_ref_cache$load_refs(
+    str_stereo,
+    str_met,
+    str_tax_cla,
+    str_tax_npc
+  )
+
+  # Filter stereo to keys present in this annotation batch.
+  stereo <- refs$stereo_full |>
     tidytable::filter(
       structure_inchikey_connectivity_layer %in%
         keys$inchikey |
@@ -79,22 +163,6 @@ complement_metadata_structures <- function(
     ) |>
     tidytable::distinct()
   log_debug("Stereo loaded: %d rows after filtering", nrow(stereo))
-
-  # Derive structure_inchikey_no_stereo from full inchikey if not in file
-  if (all(is.na(stereo$structure_inchikey_no_stereo)) && nrow(stereo) > 0L) {
-    stereo <- stereo |>
-      tidytable::mutate(
-        structure_inchikey_no_stereo = tidytable::if_else(
-          !is.na(structure_inchikey) & nchar(structure_inchikey) >= 27L,
-          paste0(
-            stringi::stri_sub(str = structure_inchikey, from = 1L, to = 14L),
-            "-",
-            stringi::stri_sub(str = structure_inchikey, from = -1L, to = -1L)
-          ),
-          NA_character_
-        )
-      )
-  }
 
   if (
     nrow(stereo) > 0L &&
@@ -166,14 +234,9 @@ complement_metadata_structures <- function(
 
   # Load metadata (formula + mass only, keyed by inchikey_no_stereo)
   met_cols <- .schema_metadata_cols()
-  met_2d <- .safe_fread_selected(
-    file = str_met,
-    file_type = "structure metadata",
-    selected_cols = met_cols
-  )
   if (
     !"structure_inchikey_no_stereo" %in%
-      attr(met_2d, "selected_cols")
+      attr(refs$met_full, "selected_cols")
   ) {
     log_warn(
       paste(
@@ -183,7 +246,7 @@ complement_metadata_structures <- function(
     )
   }
 
-  met_2d <- met_2d |>
+  met_2d <- refs$met_full |>
     .ensure_columns(cols = met_cols) |>
     tidytable::filter(
       structure_inchikey_no_stereo %in%
@@ -260,20 +323,8 @@ complement_metadata_structures <- function(
   rm(nam_base, singletons_nam, multi_nam)
   log_debug("Names/tag/xlogp lookup: %d unique keys", nrow(nam_lookup))
 
-  # ClassyFire taxonomy — keyed by full inchikey
-  tax_cla <- safe_fread(
-    file = str_tax_cla,
-    file_type = "ClassyFire taxonomy",
-    na.strings = c("", "NA"),
-    colClasses = "character",
-    select = .schema_classyfire_cols()
-  ) |>
-    .ensure_columns(cols = .schema_classyfire_cols()) |>
-    tidytable::mutate(
-      structure_tax_cla_chemontid = normalize_chemontid(
-        structure_tax_cla_chemontid
-      )
-    ) |>
+  # ClassyFire taxonomy — keyed by full inchikey (filter to batch keys)
+  tax_cla <- refs$tax_cla_full |>
     tidytable::select(
       candidate_structure_inchikey = structure_inchikey,
       candidate_structure_tax_cla_chemontid_i = structure_tax_cla_chemontid,
@@ -292,14 +343,7 @@ complement_metadata_structures <- function(
   log_debug("ClassyFire taxonomy: %d rows", nrow(tax_cla))
 
   # NPClassifier taxonomy — keyed by canonical SMILES with stereo
-  tax_npc <- safe_fread(
-    file = str_tax_npc,
-    file_type = "NPClassifier taxonomy",
-    na.strings = c("", "NA"),
-    colClasses = "character",
-    select = .schema_npc_cols()
-  ) |>
-    .ensure_columns(cols = .schema_npc_cols()) |>
+  tax_npc <- refs$tax_npc_full |>
     tidytable::select(
       candidate_structure_smiles = structure_smiles,
       candidate_structure_tax_npc_01pat_s = structure_tax_npc_01pat,
