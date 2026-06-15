@@ -646,6 +646,11 @@ utils::globalVariables(
     "target_mass",
     "target_mz",
     "target_rt",
-    "tolerance_term"
+    "tolerance_term",
+    ".modifier_key",
+    "feature_id_src",
+    "keep_cluster",
+    "keep_loss",
+    "row_weight"
   )
 )

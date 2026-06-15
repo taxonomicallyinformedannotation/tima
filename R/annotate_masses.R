@@ -1336,12 +1336,12 @@ score_modifier_hypothesis_row <- function(
     as.integer(adduct_support)
   )
 
-  origin_weight <- dplyr::case_when(
+  origin_weight <- tidytable::case_when(
     candidate_adduct_origin == "supported" ~ 100L,
     candidate_adduct_origin == "supported_weak" ~ 25L,
     TRUE ~ 0L
   )
-  source_weight <- dplyr::case_when(
+  source_weight <- tidytable::case_when(
     source %in% c("pair", "evidence") ~ 40L,
     source %in% c("preassigned", "preassigned_propagated") ~ 35L,
     source %in% c("cluster", "loss") ~ 25L,
