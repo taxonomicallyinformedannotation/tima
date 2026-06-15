@@ -36,7 +36,34 @@
   .env <- new.env(hash = TRUE, parent = emptyenv())
 
   load_refs <- function(str_stereo, str_met, str_tax_cla, str_tax_npc) {
-    cache_key <- paste(str_stereo, str_met, str_tax_cla, str_tax_npc, sep = "|")
+    # Include file mtime so cache invalidates when any reference file is replaced.
+    mtime_key <- paste(
+      vapply(
+        c(
+          str_stereo[[1L]],
+          str_met[[1L]],
+          str_tax_cla[[1L]],
+          str_tax_npc[[1L]]
+        ),
+        function(f) {
+          mt <- tryCatch(
+            as.character(file.info(f)$mtime),
+            error = function(.e) "?"
+          )
+          mt %||% "?"
+        },
+        character(1L)
+      ),
+      collapse = "|"
+    )
+    cache_key <- paste(
+      str_stereo,
+      str_met,
+      str_tax_cla,
+      str_tax_npc,
+      mtime_key,
+      sep = "|"
+    )
     cached <- get0(cache_key, envir = .env)
     if (!is.null(cached)) {
       return(cached)
@@ -98,6 +125,22 @@
       select = .schema_npc_cols()
     ) |>
       .ensure_columns(cols = .schema_npc_cols())
+
+    # Validate stereo completeness at load time before caching.
+    if (
+      nrow(stereo_full) > 0L &&
+        (!"structure_smiles_no_stereo" %in% colnames(stereo_full) ||
+          all(is.na(stereo_full$structure_smiles_no_stereo)))
+    ) {
+      cli::cli_abort(
+        paste(
+          "stereochemistry data must contain",
+          "structure_inchikey_connectivity_layer and structure_smiles_no_stereo"
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
+    }
 
     result <- list(
       stereo_full = stereo_full,
@@ -163,21 +206,6 @@ complement_metadata_structures <- function(
     ) |>
     tidytable::distinct()
   log_debug("Stereo loaded: %d rows after filtering", nrow(stereo))
-
-  if (
-    nrow(stereo) > 0L &&
-      (all(is.na(stereo$structure_inchikey_connectivity_layer)) ||
-        all(is.na(stereo$structure_smiles_no_stereo)))
-  ) {
-    cli::cli_abort(
-      paste(
-        "stereochemistry data must contain",
-        "structure_inchikey_connectivity_layer and structure_smiles_no_stereo"
-      ),
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
 
   stereo_k <- stereo |>
     tidytable::select(
