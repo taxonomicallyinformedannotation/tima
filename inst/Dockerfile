@@ -16,7 +16,7 @@ USER tima-user
 WORKDIR /home/tima-user
 
 # Install R dependencies
-RUN Rscript -e "devtools::install_github('taxonomicallyinformedannotation/tima')" && \
+RUN Rscript -e "pak::pak('taxonomicallyinformedannotation/tima')" && \
     Rscript -e "tima::install_tima()"
 
 # Expose the necessary ports for Shiny
