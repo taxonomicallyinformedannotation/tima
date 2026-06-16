@@ -626,6 +626,7 @@ ui <- shiny::fluidPage(
               "[M+H]+",
               "[M+H4N]+",
               "[M+Na]+",
+              "[M+K]+",
               "[2M+H]+"
             )
           ) |>
@@ -662,8 +663,8 @@ ui <- shiny::fluidPage(
             selected = c(
               "[M-H2]2-",
               "[M-H]-",
-              "[M+CHO2]-",
               "[M-H2+Na]-",
+              "[M-H2+K]-",
               "[2M-H]-"
             )
           ) |>
