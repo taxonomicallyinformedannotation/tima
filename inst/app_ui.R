@@ -783,162 +783,222 @@ ui <- shiny::fluidPage(
             inputId = "ms_neu",
             label = "List of neutral losses to be used",
             choices = c(
-              "HN",
-              # "H2 (dihydrogen)",
-              "CH2 (methylene)",
-              "CH3",
-              "O",
-              "H3N (ammonia)",
-              "H2O (water)",
-              "HF (hydrogen fluoride)",
-              "CHN",
-              "CO",
-              "SO2 (sulfur dioxide)",
-              "C2H4 (ethene)",
-              "CH3N (methanimine)",
-              "C2H5 (ethyl radical)",
-              "NO (nitric oxide)",
-              "H2O2 (dioxygen-dihydrogen)",
-              "CH2O (formaldehyde)",
-              "H2S (dihydrosulphur)",
-              "H5ON (H2O-H3N)",
-              "H4O2 (2xH2O)",
-              "C2H2O (ethenone)",
-              "C2H4O (acetaldehyde)",
-              "C3H6 (propene)",
-              "CHON",
-              "CO2",
-              "SO3 (sulfur trioxide)",
-              "HPO3 (metaphosphoric)",
-              "CF2 (perfluoroalkyl)",
-              "CF2O (carbonyl difluoride)",
-              "CF3 (trifluoromethyl)",
-              "C2F4 (perfluoroalkyl)",
-              "C3F6 (perfluoroalkyl)",
-              "CHF2 (difluoromethyl unit)",
-              "C2F2 (fluorocarbon)",
-              "CHO2",
-              "H6O3 (3xH2O)",
-              "C2O2 (2xCO)",
-              "C3H4O (acrolein)",
-              "CH6O3 (combination)",
-              "H8O4 (4xH2O)",
-              "C2H2O3 (CH2O-CO2)",
-              "C3H6O2 (CH3-CH2-COOH)",
-              "C3O3 (3xCO)",
-              "C4H4O (furan)",
-              "C4H9NO (combination)",
-              "C2O4 (2xCO2)",
-              "C3H4O3 (pyruvic)",
-              "C4H8O2 (butyric)",
-              "C3H7NO2 (alanine)",
-              "C3H6O3 (sugar)",
-              "H2O4S (sulfuric)",
-              "H3O4P (phosphoric)",
-              "C5H10O2 (valeric)",
-              "C3H4O4 (malonic)",
-              "C2H2O5 (CO2-CO2-H2O)",
-              "C3H8O4 (combination)",
-              "C5H9NO2 (proline)",
-              "C4O4H6 (CO2-CO2-CH3-CH3)",
-              "C4H8O4 (sugar)",
-              "C2H4O6 (CO2-CO2-H2O-H2O)",
-              "C6H6O3 (HRF)",
-              "C5H8O4 (pentose-H2O)",
-              "C8H8O2 (RDA-1)",
-              "C6H8O4 (HRF)",
-              "C9H6O2 (coumaroyl)",
-              "C6H10O4 (methylpentose/desoxyhexose-H2O)",
-              "C9H8O2 (cinnamoyl)",
-              "C7H4O4 (galloyl)",
-              "C8H8O3 (RDA-2)",
-              "C9H6O3 (caffeoyl)",
-              "C6H10O5 (hexose-H2O)",
-              "C8H8O4 (RDA-3)",
-              "C8H10O4 (RDA-2-H2O)",
-              "C6H8O6 (glucuronic-H2O)",
-              "C10H8O3 (feruloyl)",
-              "C6H13NO5 (hexose-H2N)",
-              "C6H12O6 (hexose)",
-              "C5H14NO4P (phosphocholine-head)",
-              "C7H12O6 (quinoyl)",
-              "C6H15NO6 (hexose-H2N-H2O)",
-              "C6H14O7 (hexose-H2O)",
-              "C8H12O6 (acetylhexose-H2O)",
-              "C11H10O4 (sinapoyl)",
-              "C16H30O (palmitoyl)",
-              "C18H32O (linoleoyl)",
-              "C18H34O (oleoyl)",
-              "C18H36O (stearoyl)",
-              "C9H12O8 (malonylhexose)",
-              "C13H14O6 (benzoylhexose)",
-              "C12H20O8 (2xmethylpentose/desoxyhexose-H2O)",
-              "C15H16O7 (coumaroylhexose)",
-              "C13H14O9 (galloylhexose)",
-              "C15H16O8 (caffeoylhexose)",
-              "C12H20O10 (2xhexose-H2O)",
-              "C16H18O8 (feruloylhexose)",
-              "C17H20O9 (sinapoylhexose)",
-              "C18H30O15 (3xhexose-H2O)"
+              "H2 (dihydrogen)",                                # ~2.016
+              "CH2 (methylene)",                                # ~14.016
+              "O",                                              # ~15.995
+              "H3N (ammonia)",                                  # ~17.027
+              "H2O (water)",                                    # ~18.011
+              "HF (hydrogen fluoride)",                         # ~20.006
+              "CO",                                             # ~27.995
+              "C2H4 (ethene)",                                  # ~28.031
+              "C2H5 (ethyl radical)",                           # ~29.039
+              "NO (nitric oxide)",                              # ~29.998
+              "CH2O (formaldehyde)",                            # ~30.011
+              "H5ON (H2O-H3N)",                                 # ~35.037
+              "H4O2 (2xH2O)",                                   # ~36.021
+              "C2H2O (ethenone)",                               # ~42.011
+              "CO2",                                            # ~43.990
+              "C2H4O (acetaldehyde)",                           # ~44.026
+              "CHO2",                                           # ~44.998
+              "H6O3 (3xH2O)",                                   # ~54.032
+              "C2O2 (2xCO)",                                    # ~55.990
+              "C3H4O (acrolein)",                               # ~56.026
+              "SO2 (sulfur dioxide)",                           # ~63.962
+              "CF2O (carbonyl difluoride)",                     # ~65.992
+              "CH6O3 (combination)",                            # ~66.032
+              "C4H4O (furan)",                                  # ~68.026
+              "H8O4 (4xH2O)",                                   # ~72.042
+              "C3H5O2 (glycerol backbone)",                     # ~73.029
+              "SO3 (sulfur trioxide)",                          # ~79.957
+              "HPO3 (metaphosphoric)",                          # ~79.966
+              "C3H6O3 (sugar)",                                 # ~90.032
+              "C3H8O3 (glycerol)",                              # ~92.047
+              "H2O4S (sulfuric)",                               # ~97.967
+              "H3O4P (phosphoric)",                             # ~97.977
+              "C4H8O4 (sugar)",                                 # ~120.042
+              "C6H6O3 (HRF)",                                   # ~126.032
+              "C5H8O4 (pentose-H2O)",                           # ~132.042
+              "C8H8O2 (RDA-1)",                                 # ~136.052
+              "C6H8O4 (HRF)",                                   # ~144.042
+              "C6H10O4 (methylpentose/desoxyhexose-H2O)",       # ~146.058
+              "C8H8O3 (RDA-2)",                                 # ~152.047
+              "C6H10O5 (hexose-H2O)",                           # ~162.053
+              "C8H8O4 (RDA-3)",                                 # ~168.042
+              "C8H10O4 (RDA-2-H2O)",                            # ~170.058
+              "C6H8O6 (glucuronic-H2O)",                        # ~176.032
+              "C6H12O6 (hexose)",                               # ~180.063
+              "C5H14NO4P (phosphocholine-head)",                # ~183.066
+              "C11H10O4 (sinapoyl)",                            # ~206.058
+              "C14H28O (myristoyl)",                            # ~212.214
+              "C16H30O (palmitoyl)",                            # ~238.230
+              "C16H32O (palmitoyl-sat)",                        # ~240.245
+              "C18H32O (linoleoyl)",                            # ~264.245
+              "C18H34O (oleoyl)",                               # ~266.261
+              "C18H36O (stearoyl)",                             # ~268.277
+              "C20H32O (arachidonyl)",                          # ~288.245
+              "C20H34O (eicosadienoyl)",                        # ~290.261
+              "C12H20O8 (2xmethylpentose/desoxyhexose-H2O)",    # ~292.116
+              "C22H32O (DHA acyl)",                             # ~312.245
+              "C22H34O (EPA acyl)",                             # ~314.261
+              "C22H36O (docosadienoyl)",                        # ~316.277
+              "C12H20O10 (2xhexose-H2O)",                       # ~324.106
+              "C18H30O15 (3xhexose-H2O)",                       # ~486.169
+              # less common ones
+              "CH3N (methanimine)",                             # ~29.027
+              "H2S (dihydrosulphur)",                           # ~33.988
+              "H2O2",                                           # ~33.997
+              "C3H6 (propene)",                                 # ~42.047
+              "CHON",                                           # ~43.006
+              "CHN",                                            # ~27.011
+              "HN",                                             # ~15.011
+              "C3H6O2 (propionic)",                             # ~74.037
+              "C2H2O3 (CH2O-CO2)",                              # ~74.000
+              "H2O3S (sulfate)",                                # ~81.972
+              "C3O3 (3xCO)",                                    # ~83.985
+              "C4H9NO",                                         # ~87.068
+              "C2O4 (2xCO2)",                                   # ~87.980
+              "C3H4O3 (pyruvic)",                               # ~88.016
+              "C4H8O2 (butyric)",                               # ~88.052
+              "C3H7NO2 (alanine)",                              # ~89.048
+              "C5H10O2 (valeric)",                              # ~102.068
+              "C3H4O4 (malonic)",                               # ~104.011
+              "C2H2O5 (CO2-CO2-H2O)",                           # ~105.986
+              "C3H8O4 (combination)",                           # ~108.042
+              "C5H9NO2 (proline)",                              # ~115.063
+              "C4O4H6 (CO2-CO2-CH3-CH3)",                       # ~118.027
+              "C2H4O6 (CO2-CO2-H2O-H2O)",                       # ~123.981
+              # Plants-related
+              "C9H6O2 (coumaroyl)",                             # ~146.037
+              "C9H8O2 (cinnamoyl)",                             # ~148.052
+              "C7H4O4 (galloyl)",                               # ~152.011
+              "C9H6O3 (caffeoyl)",                              # ~162.032
+              "C10H8O3 (feruloyl)",                             # ~176.047
+              "C6H13NO5 (hexose-H2N)",                          # ~179.079
+              "C7H12O6 (quinoyl)",                              # ~192.063
+              "C6H15NO6 (hexose-H2N-H2O)",                      # ~197.090
+              "C6H14O7 (hexose-H2O)",                           # ~198.074
+              "C8H12O6 (acetylhexose-H2O)",                     # ~204.074
+              "C9H12O8 (malonylhexose)",                        # ~264.058
+              "C13H14O6 (benzoylhexose)",                       # ~266.079
+              "C15H16O7 (coumaroylhexose)",                     # ~324.085
+              "C13H14O9 (galloylhexose)",                       # ~330.058
+              "C15H16O8 (caffeoylhexose)",                      # ~340.080
+              "C16H18O8 (feruloylhexose)",                      # ~354.095
+              "C17H20O9 (sinapoylhexose)",                      # ~384.106
+              # PFAS-related
+              "SO2F (sulfonyl fluoride)",                       # ~82.960
+              "CF2 (perfluoroalkyl)",                           # ~49.997
+              "CHF2 (difluoromethyl)",                          # ~51.005
+              "C2F2 (fluorocarbon)",                            # ~61.997
+              "CF3 (trifluoromethyl)",                          # ~68.995
+              "C2F4 (perfluoroalkyl)",                          # ~99.994
+              "C3F6 (perfluoroalkyl)",                          # ~149.990
+              "C4F8 (perfluoroalkyl)",                          # ~199.987
+              "C5F10 (perfluoroalkyl)",                         # ~249.984
+              "C6F12 (perfluoroalkyl)",                         # ~299.981
+              # Animal-related
+              "C5H12N (choline)",                               # ~86.097
+              "C3H8O4P (glycerophosphate)",                     # ~139.016
+              "C2H5NO (sphingosine)",                           # ~59.037
+              "C8H14O (cholesterol side chain)",                # ~126.104
+              "C9H16O (cholesterol side chain + CH2)"           # ~140.120
             ),
             selected = c(
               # Matches annotate_masses.yaml enabled losses
-              # "H2 (dihydrogen)",
-              "CH2 (methylene)",
-              "CH3",
-              "O",
-              "H3N (ammonia)",
-              "H2O (water)",
-              "HF (hydrogen fluoride)",
-              "CO",
-              "C2H4 (ethene)",
-              "C2H5 (ethyl radical)",
-              "NO (nitric oxide)",
-              "CH2O (formaldehyde)",
-              "H5ON (H2O-H3N)",
-              "H4O2 (2xH2O)",
-              "C2H2O (ethenone)",
-              "CO2",
-              "C2H4O (acetaldehyde)",
-              "CHO2",
-              "CF2 (perfluoroalkyl)",
-              "CHF2 (difluoromethyl unit)",
-              "H6O3 (3xH2O)",
-              "C2O2 (2xCO)",
-              "C3H4O (acrolein)",
-              "C2F2 (fluorocarbon)",
-              "SO2 (sulfur dioxide)",
-              "CF2O (carbonyl difluoride)",
-              "CH6O3 (combination)",
-              "C4H4O (furan)",
-              "CF3 (trifluoromethyl)",
-              "H8O4 (4xH2O)",
-              "SO3 (sulfur trioxide)",
-              "HPO3 (metaphosphoric)",
-              "C3H6O3 (sugar)",
-              "H2O4S (sulfuric)",
-              "H3O4P (phosphoric)",
-              "C2F4 (perfluoroalkyl)",
-              "C4H8O4 (sugar)",
-              "C6H6O3 (HRF)",
-              "C5H8O4 (pentose-H2O)",
-              "C8H8O2 (RDA-1)",
-              "C6H8O4 (HRF)",
-              "C6H10O4 (methylpentose/desoxyhexose-H2O)",
-              "C3F6 (perfluoroalkyl)",
-              "C8H8O3 (RDA-2)",
-              "C6H10O5 (hexose-H2O)",
-              "C8H8O4 (RDA-3)",
-              "C8H10O4 (RDA-2-H2O)",
-              "C6H12O6 (hexose)",
-              "C5H14NO4P (phosphocholine-head)",
-              "C11H10O4 (sinapoyl)",
-              "C16H30O (palmitoyl)",
-              "C18H32O (linoleoyl)",
-              "C18H34O (oleoyl)",
-              "C18H36O (stearoyl)",
-              "C12H20O8 (2xmethylpentose/desoxyhexose-H2O)",
-              "C12H20O10 (2xhexose-H2O)"
+              "CH2 (methylene)",                                # ~14.016
+              "O",                                              # ~15.995
+              "H3N (ammonia)",                                  # ~17.027
+              "H2O (water)",                                    # ~18.011
+              "HF (hydrogen fluoride)",                         # ~20.006
+              "CO",                                             # ~27.995
+              "C2H4 (ethene)",                                  # ~28.031
+              "C2H5 (ethyl radical)",                           # ~29.039
+              "NO (nitric oxide)",                              # ~29.998
+              "CH2O (formaldehyde)",                            # ~30.011
+              "H5ON (H2O-H3N)",                                 # ~35.037
+              "H4O2 (2xH2O)",                                   # ~36.021
+              "C2H2O (ethenone)",                               # ~42.011
+              "CO2",                                            # ~43.990
+              "C2H4O (acetaldehyde)",                           # ~44.026
+              "CHO2",                                           # ~44.998
+              "H6O3 (3xH2O)",                                   # ~54.032
+              "C2O2 (2xCO)",                                    # ~55.990
+              "C3H4O (acrolein)",                               # ~56.026
+              "SO2 (sulfur dioxide)",                           # ~63.962
+              "CF2O (carbonyl difluoride)",                     # ~65.992
+              "CH6O3 (combination)",                            # ~66.032
+              "C4H4O (furan)",                                  # ~68.026
+              "H8O4 (4xH2O)",                                   # ~72.042
+              "C3H5O2 (glycerol backbone)",                     # ~73.029
+              "SO3 (sulfur trioxide)",                          # ~79.957
+              "HPO3 (metaphosphoric)",                          # ~79.966
+              "C3H6O3 (sugar)",                                 # ~90.032
+              "C3H8O3 (glycerol)",                              # ~92.047
+              "H2O4S (sulfuric)",                               # ~97.967
+              "H3O4P (phosphoric)",                             # ~97.977
+              "C4H8O4 (sugar)",                                 # ~120.042
+              "C6H6O3 (HRF)",                                   # ~126.032
+              "C5H8O4 (pentose-H2O)",                           # ~132.042
+              "C8H8O2 (RDA-1)",                                 # ~136.052
+              "C6H8O4 (HRF)",                                   # ~144.042
+              "C6H10O4 (methylpentose/desoxyhexose-H2O)",       # ~146.058
+              "C8H8O3 (RDA-2)",                                 # ~152.047
+              "C6H10O5 (hexose-H2O)",                           # ~162.053
+              "C8H8O4 (RDA-3)",                                 # ~168.042
+              "C8H10O4 (RDA-2-H2O)",                            # ~170.058
+              "C6H8O6 (glucuronic-H2O)",                        # ~176.032
+              "C6H12O6 (hexose)",                               # ~180.063
+              "C5H14NO4P (phosphocholine-head)",                # ~183.066
+              "C11H10O4 (sinapoyl)",                            # ~206.058
+              "C14H28O (myristoyl)",                            # ~212.214
+              "C16H30O (palmitoyl)",                            # ~238.230
+              "C16H32O (palmitoyl-sat)",                        # ~240.245
+              "C18H32O (linoleoyl)",                            # ~264.245
+              "C18H34O (oleoyl)",                               # ~266.261
+              "C18H36O (stearoyl)",                             # ~268.277
+              "C20H32O (arachidonyl)",                          # ~288.245
+              "C20H34O (eicosadienoyl)",                        # ~290.261
+              "C12H20O8 (2xmethylpentose/desoxyhexose-H2O)",    # ~292.116
+              "C22H32O (DHA acyl)",                             # ~312.245
+              "C22H34O (EPA acyl)",                             # ~314.261
+              "C22H36O (docosadienoyl)",                        # ~316.277
+              "C12H20O10 (2xhexose-H2O)",                       # ~324.106
+              "C18H30O15 (3xhexose-H2O)",                       # ~486.169
+              # Plants-related
+              "C9H6O2 (coumaroyl)",                             # ~146.037
+              "C9H8O2 (cinnamoyl)",                             # ~148.052
+              "C7H4O4 (galloyl)",                               # ~152.011
+              "C9H6O3 (caffeoyl)",                              # ~162.032
+              "C10H8O3 (feruloyl)",                             # ~176.047
+              "C6H13NO5 (hexose-H2N)",                          # ~179.079
+              "C7H12O6 (quinoyl)",                              # ~192.063
+              "C6H15NO6 (hexose-H2N-H2O)",                      # ~197.090
+              "C6H14O7 (hexose-H2O)",                           # ~198.074
+              "C8H12O6 (acetylhexose-H2O)",                     # ~204.074
+              "C9H12O8 (malonylhexose)",                        # ~264.058
+              "C13H14O6 (benzoylhexose)",                       # ~266.079
+              "C15H16O7 (coumaroylhexose)",                     # ~324.085
+              "C13H14O9 (galloylhexose)",                       # ~330.058
+              "C15H16O8 (caffeoylhexose)",                      # ~340.080
+              "C16H18O8 (feruloylhexose)",                      # ~354.095
+              "C17H20O9 (sinapoylhexose)",                      # ~384.106
+              # PFAS-related
+              "SO2F (sulfonyl fluoride)",                       # ~82.960
+              "CF2 (perfluoroalkyl)",                           # ~49.997
+              "CHF2 (difluoromethyl)",                          # ~51.005
+              "C2F2 (fluorocarbon)",                            # ~61.997
+              "CF3 (trifluoromethyl)",                          # ~68.995
+              "C2F4 (perfluoroalkyl)",                          # ~99.994
+              "C3F6 (perfluoroalkyl)",                          # ~149.990
+              "C4F8 (perfluoroalkyl)",                          # ~199.987
+              "C5F10 (perfluoroalkyl)",                         # ~249.984
+              "C6F12 (perfluoroalkyl)",                         # ~299.981
+              # Animal-related
+              "C5H12N (choline)",                               # ~86.097
+              "C3H8O4P (glycerophosphate)",                     # ~139.016
+              "C2H5NO (sphingosine)",                           # ~59.037
+              "C8H14O (cholesterol side chain)",                # ~126.104
+              "C9H16O (cholesterol side chain + CH2)"          # ~140.120
             )
           ) |>
             shinyhelper::helper(
