@@ -4,7 +4,12 @@
 \alias{build_annotate_masses_ion_tables}
 \title{Resolve adduct tables used by annotate_masses ion discovery}
 \usage{
-build_annotate_masses_ion_tables(adducts_list, clusters_list, ms_mode)
+build_annotate_masses_ion_tables(
+  adducts_list,
+  clusters_list,
+  solvents_list,
+  ms_mode
+)
 }
 \description{
 Resolve adduct tables used by annotate_masses ion discovery

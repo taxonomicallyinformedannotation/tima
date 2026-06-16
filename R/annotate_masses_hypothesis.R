@@ -787,8 +787,8 @@ collect_node_adduct_hypotheses <- function(
 #' Carrier terms (H/H2/H3/H4N and metal carriers) are kept as explicit tokens.
 #' Non-carrier modifiers are aggregated atomically (Hill order) per sign.
 #'
-#' Example: [M-H2+CH2O2+Na]- remains carrier-distinct as [M-H2+CH2O2+Na]-.
-#' Example: [M-H2O+H]+ remains [M-H2O+H]+ (and not [M-HO]+).
+#' Example: \[M-H2+CH2O2+Na\]- remains carrier-distinct as \[M-H2+CH2O2+Na\]-.
+#' Example: \[M-H2O+H\]+ remains \[M-H2O+H\]+ (and not \[M-HO\]+).
 #'
 #' Returns the original string unchanged if parsing fails.
 #' @keywords internal
@@ -943,7 +943,7 @@ collect_node_adduct_hypotheses <- function(
 #' hypothesis, appends the modifier, and assigns the result to the DESTINATION.
 #'
 #' This handles multi-hop cases such as:
-#'   source [M-H2+Na]-  + cluster CH2O2  →  destination gets [M+CO2+Na]-
+#'   source \[M-H2+Na\]-  + cluster CH2O2  →  destination gets \[M+CO2+Na\]-
 #'
 #' @keywords internal
 propagate_modifier_src_to_dest <- function(

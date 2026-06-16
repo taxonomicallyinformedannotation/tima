@@ -17,7 +17,7 @@
   - Replaced single-chain evidence-edge linking with sparse k-nearest m/z linking per cluster, improving triangulation signal while preserving O(n*k) scalability
   - Re-enabled structural plausibility filter: loss-based annotations are now demoted to unmatched when the formula cannot satisfy required atoms (e.g., `[M-H2O]` on a formula lacking oxygen)
   - Upgraded graph-level consistency enforcement from single-pass greedy to multi-start neighbor-aware optimization: assigns adduct states to maximize coverage-aware objectives (edge satisfaction, neighbor agreement, prior support) and favors states consistent across multiple neighbors over isolated high-scoring alternatives
-  - Added bidirectional cluster and neutral-loss propagations to mirror cluster propagation
+  - Added bidirectional cluster and neutral-loss propagation to mirror cluster propagation
   - Reworked cluster-vs-loss ambiguity resolution to use hypothesis-level scoring (with neighboring-edge fallback tie-breaks) and added compact audit logging of resolved vs unresolved ambiguous modifier pairs
   - Added assignment-aware modifier-edge pruning so outdated cluster/loss links are removed when they contradict assigned adduct states, while retaining explicitly tagged contaminant edges
 
@@ -33,7 +33,7 @@
   - Consolidated electron-mass precision to a single CODATA 2018 value (`ELECTRON_MASS_DALTONS = 0.000548579909065`) and reused it as `ELECTRON_MASS_DA`
 
 * **Metadata enrichment cache robustness**:
-  - `complement_metadata_structures()` reference cache now keys on both file path and file modification time (mtime), preventing stale cache reuse when temporary/updated reference files are rewritten during the same R session
+  - `complement_metadata_structures()` reference cache now keys on both file path and file modification time, preventing stale cache reuse when temporary/updated reference files are rewritten during the same R session
   - Stereo required-column validation now occurs at reference-load time before cache insertion
 
 * **Cross-stage adduct coupling (MS1 ↔ MS2 ↔ reranking)**:

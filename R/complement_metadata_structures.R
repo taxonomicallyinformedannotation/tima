@@ -32,129 +32,6 @@
 #' }
 # Process-level cache: keyed on (str_stereo, str_met, str_tax_cla, str_tax_npc).
 # Avoids re-reading the large reference tables on every annotator call.
-.complement_metadata_ref_cache <- local({
-  .env <- new.env(hash = TRUE, parent = emptyenv())
-
-  load_refs <- function(str_stereo, str_met, str_tax_cla, str_tax_npc) {
-    # Include file mtime so cache invalidates when any reference file is replaced.
-    mtime_key <- paste(
-      vapply(
-        c(
-          str_stereo[[1L]],
-          str_met[[1L]],
-          str_tax_cla[[1L]],
-          str_tax_npc[[1L]]
-        ),
-        function(f) {
-          mt <- tryCatch(
-            as.character(file.info(f)$mtime),
-            error = function(.e) "?"
-          )
-          mt %||% "?"
-        },
-        character(1L)
-      ),
-      collapse = "|"
-    )
-    cache_key <- paste(
-      str_stereo,
-      str_met,
-      str_tax_cla,
-      str_tax_npc,
-      mtime_key,
-      sep = "|"
-    )
-    cached <- get0(cache_key, envir = .env)
-    if (!is.null(cached)) {
-      return(cached)
-    }
-
-    stereo_cols <- .schema_stereo_cols()
-    stereo_full <- .safe_fread_selected(
-      file = str_stereo,
-      file_type = "stereochemistry data",
-      selected_cols = stereo_cols
-    ) |>
-      .ensure_columns(cols = stereo_cols)
-
-    if (
-      all(is.na(stereo_full$structure_inchikey_no_stereo)) &&
-        nrow(stereo_full) > 0L
-    ) {
-      stereo_full <- stereo_full |>
-        tidytable::mutate(
-          structure_inchikey_no_stereo = tidytable::if_else(
-            !is.na(structure_inchikey) & nchar(structure_inchikey) >= 27L,
-            paste0(
-              stringi::stri_sub(str = structure_inchikey, from = 1L, to = 14L),
-              "-",
-              stringi::stri_sub(str = structure_inchikey, from = -1L, to = -1L)
-            ),
-            NA_character_
-          )
-        )
-    }
-
-    met_cols <- .schema_metadata_cols()
-    met_full <- .safe_fread_selected(
-      file = str_met,
-      file_type = "structure metadata",
-      selected_cols = met_cols
-    ) |>
-      .ensure_columns(cols = met_cols)
-
-    tax_cla_full <- safe_fread(
-      file = str_tax_cla,
-      file_type = "ClassyFire taxonomy",
-      na.strings = c("", "NA"),
-      colClasses = "character",
-      select = .schema_classyfire_cols()
-    ) |>
-      .ensure_columns(cols = .schema_classyfire_cols()) |>
-      tidytable::mutate(
-        structure_tax_cla_chemontid = normalize_chemontid(
-          structure_tax_cla_chemontid
-        )
-      )
-
-    tax_npc_full <- safe_fread(
-      file = str_tax_npc,
-      file_type = "NPClassifier taxonomy",
-      na.strings = c("", "NA"),
-      colClasses = "character",
-      select = .schema_npc_cols()
-    ) |>
-      .ensure_columns(cols = .schema_npc_cols())
-
-    # Validate stereo completeness at load time before caching.
-    if (
-      nrow(stereo_full) > 0L &&
-        (!"structure_smiles_no_stereo" %in% colnames(stereo_full) ||
-          all(is.na(stereo_full$structure_smiles_no_stereo)))
-    ) {
-      cli::cli_abort(
-        paste(
-          "stereochemistry data must contain",
-          "structure_inchikey_connectivity_layer and structure_smiles_no_stereo"
-        ),
-        class = c("tima_validation_error", "tima_error"),
-        call = NULL
-      )
-    }
-
-    result <- list(
-      stereo_full = stereo_full,
-      met_full = met_full,
-      tax_cla_full = tax_cla_full,
-      tax_npc_full = tax_npc_full
-    )
-    assign(cache_key, result, envir = .env)
-    result
-  }
-
-  list(load_refs = load_refs)
-})
-
 complement_metadata_structures <- function(
   df,
   str_stereo,
@@ -462,6 +339,129 @@ complement_metadata_structures <- function(
 
   table_final
 }
+
+.complement_metadata_ref_cache <- local({
+  .env <- new.env(hash = TRUE, parent = emptyenv())
+
+  load_refs <- function(str_stereo, str_met, str_tax_cla, str_tax_npc) {
+    # Include file modification time so cache invalidates when any reference file is replaced.
+    mtime_key <- paste(
+      vapply(
+        c(
+          str_stereo[[1L]],
+          str_met[[1L]],
+          str_tax_cla[[1L]],
+          str_tax_npc[[1L]]
+        ),
+        function(f) {
+          mt <- tryCatch(
+            as.character(file.info(f)$mtime),
+            error = function(.e) "?"
+          )
+          mt %||% "?"
+        },
+        character(1L)
+      ),
+      collapse = "|"
+    )
+    cache_key <- paste(
+      str_stereo,
+      str_met,
+      str_tax_cla,
+      str_tax_npc,
+      mtime_key,
+      sep = "|"
+    )
+    cached <- get0(cache_key, envir = .env)
+    if (!is.null(cached)) {
+      return(cached)
+    }
+
+    stereo_cols <- .schema_stereo_cols()
+    stereo_full <- .safe_fread_selected(
+      file = str_stereo,
+      file_type = "stereochemistry data",
+      selected_cols = stereo_cols
+    ) |>
+      .ensure_columns(cols = stereo_cols)
+
+    if (
+      all(is.na(stereo_full$structure_inchikey_no_stereo)) &&
+        nrow(stereo_full) > 0L
+    ) {
+      stereo_full <- stereo_full |>
+        tidytable::mutate(
+          structure_inchikey_no_stereo = tidytable::if_else(
+            !is.na(structure_inchikey) & nchar(structure_inchikey) >= 27L,
+            paste0(
+              stringi::stri_sub(str = structure_inchikey, from = 1L, to = 14L),
+              "-",
+              stringi::stri_sub(str = structure_inchikey, from = -1L, to = -1L)
+            ),
+            NA_character_
+          )
+        )
+    }
+
+    met_cols <- .schema_metadata_cols()
+    met_full <- .safe_fread_selected(
+      file = str_met,
+      file_type = "structure metadata",
+      selected_cols = met_cols
+    ) |>
+      .ensure_columns(cols = met_cols)
+
+    tax_cla_full <- safe_fread(
+      file = str_tax_cla,
+      file_type = "ClassyFire taxonomy",
+      na.strings = c("", "NA"),
+      colClasses = "character",
+      select = .schema_classyfire_cols()
+    ) |>
+      .ensure_columns(cols = .schema_classyfire_cols()) |>
+      tidytable::mutate(
+        structure_tax_cla_chemontid = normalize_chemontid(
+          structure_tax_cla_chemontid
+        )
+      )
+
+    tax_npc_full <- safe_fread(
+      file = str_tax_npc,
+      file_type = "NPClassifier taxonomy",
+      na.strings = c("", "NA"),
+      colClasses = "character",
+      select = .schema_npc_cols()
+    ) |>
+      .ensure_columns(cols = .schema_npc_cols())
+
+    # Validate stereo completeness at load time before caching.
+    if (
+      nrow(stereo_full) > 0L &&
+        (!"structure_smiles_no_stereo" %in% colnames(stereo_full) ||
+          all(is.na(stereo_full$structure_smiles_no_stereo)))
+    ) {
+      cli::cli_abort(
+        paste(
+          "stereochemistry data must contain",
+          "structure_inchikey_connectivity_layer and structure_smiles_no_stereo"
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
+    }
+
+    result <- list(
+      stereo_full = stereo_full,
+      met_full = met_full,
+      tax_cla_full = tax_cla_full,
+      tax_npc_full = tax_npc_full
+    )
+    assign(cache_key, result, envir = .env)
+    result
+  }
+
+  list(load_refs = load_refs)
+})
 
 .extract_structure_keys <- function(df) {
   inchikey_cols <- c(

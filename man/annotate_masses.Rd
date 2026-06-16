@@ -23,6 +23,7 @@ annotate_masses(
     "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$npc,
   adducts_list = get_params(step = "annotate_masses")$ms$adducts,
   clusters_list = get_params(step = "annotate_masses")$ms$clusters,
+  solvents_list = get_params(step = "annotate_masses")$ms$solvents,
   neutral_losses_list = get_params(step = "annotate_masses")$ms$neutral_losses,
   ms_mode = get_params(step = "annotate_masses")$ms$polarity,
   tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
@@ -60,6 +61,8 @@ annotate_masses(
 
 \item{clusters_list}{List of clusters to be used}
 
+\item{solvents_list}{List of solvents to be used}
+
 \item{neutral_losses_list}{List of neutral losses to be used}
 
 \item{ms_mode}{Ionization mode. Must be 'pos' or 'neg'}
@@ -96,10 +99,10 @@ clearly-bounded steps; each step is documented inline. In short:
    adducts. A match labels the edge `adduct_low _ adduct_high` and
    tentatively assigns the corresponding adduct to each endpoint.
 
-3. **Cluster edges.** Match `delta` against cluster masses (e.g. ACN,
-   MeOH, Na). A cluster adds mass to the *higher* m/z peak, so the
-   cluster suffix `+<cluster>` is attached to the **dest** node's
-   adduct hypotheses.
+3. **Cluster / solvent edges.** Match `delta` against modifier masses
+   (e.g. salts, solvents, ACN, MeOH, Na). A modifier adds mass to the
+   *higher* m/z peak, so the modifier suffix `+<modifier>` is attached
+   to the **dest** node's adduct hypotheses.
 
 4. **Neutral-loss edges.** Match `delta` against neutral-loss masses
    (e.g. H2O, CO2). For an NL pair, the **higher** m/z peak is the

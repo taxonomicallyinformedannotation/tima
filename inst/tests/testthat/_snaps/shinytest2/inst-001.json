@@ -85,11 +85,12 @@
     "ms_clu": [
       "H4ClN",
       "NaCl",
-      "C2H4O2",
+      "ClK",
+      "CH2O2",
       "CH5NO2",
       "CHNaO2",
-      "ClK",
-      "CHKO2"
+      "CHKO2",
+      "C2HF3O2"
     ],
     "ms_neu": [
       "CH2 (methylene)",
@@ -184,11 +185,11 @@
       "C8H14O (cholesterol side chain)",
       "C9H16O (cholesterol side chain + CH2)"
     ],
+    "ms_pol": "pos",
     "ms_sol": [
       "H2O",
       "C2H3N"
     ],
-    "ms_pol": "pos",
     "ms_thr_ms2_int": 0,
     "ms_thr_ms2_min_fragments": 2,
     "ms_tol_mas_dal_ms1": 0.01,
