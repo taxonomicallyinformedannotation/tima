@@ -178,8 +178,8 @@ annotate_masses <- function(
   baseline_adduct <- switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
   baseline_adducts <- switch(
     ms_mode,
-    "pos" = c("[M+H]+", "[M+Na]+", "[M+H4N]+"),
-    "neg" = c("[M-H]-", "[M+CHO2]-", "[M-H2+Na]-")
+    "pos" = c("[M+H]+", "[M+H4N]+", "[M+Na]+", "[M+K]+"),
+    "neg" = c("[M-H]-", "[M-H2+Na]-", "[M-H2+K]-", "[M-H+CH2O2]-")
   )
 
   # ---- Step 1: load features -------------------------------------------
