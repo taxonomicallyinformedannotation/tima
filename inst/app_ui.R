@@ -595,23 +595,20 @@ ui <- shiny::fluidPage(
             label = "List of adducts to be used in positive",
             choices = c(
               "[M+H3]3+",
-              "[M+H2Na]3+",
-              "[M+HNa2]3+",
-              "[M+Na3]3+",
+              "[M+Fe]3+",
               "[M+H2]2+",
-              "[M+HNa]2+",
-              "[M+Mg]2+",
-              "[M+HK]2+",
-              "[M+Ca]2+",
+              "[M+H8N2]2+",
               "[M+Na2]2+",
+              "[M+K2]2+",
+              "[M+Cu2]2+",
+              "[M+Mg]2+",
+              "[M+Ca]2+",
               "[M+Fe]2+",
               "[M]+",
               "[M+H]+",
               "[M+H4N]+",
               "[M+Na]+",
               "[M+K]+",
-              "[M-H2+Fe]+",
-              "[M-H+Fe]+",
               "[M+Cu]+",
               "[2M+Mg]2+",
               "[2M+Ca]2+",
@@ -619,7 +616,8 @@ ui <- shiny::fluidPage(
               "[2M+H]+",
               "[2M+H4N]+",
               "[2M+Na]+",
-              "[2M+K]+"
+              "[2M+K]+",
+              "[2M+Cu]+"
             ),
             selected = c(
               "[M+H2]2+",
@@ -653,9 +651,7 @@ ui <- shiny::fluidPage(
               "[M]-",
               "[M-H]-",
               "[M+F]-",
-              "[M-H2+Na]-",
               "[M+Cl]-",
-              "[M-H2+K]-",
               "[M+Br]-",
               "[2M-H]-",
               "[3M-H]-"
@@ -663,8 +659,6 @@ ui <- shiny::fluidPage(
             selected = c(
               "[M-H2]2-",
               "[M-H]-",
-              "[M-H2+Na]-",
-              "[M-H2+K]-",
               "[2M-H]-"
             )
           ) |>
@@ -720,31 +714,32 @@ ui <- shiny::fluidPage(
               content = "Minimum number of independent neighbors supporting an adduct assignment."
             ),
           shiny::checkboxGroupInput(
-            inputId = "ms_clu_pos",
-            label = "List of clusters to be used in positive",
+            inputId = "ms_clu",
+            label = "List of clusters to be used",
             choices = c(
-              "H2O", # (water)
-              "CH4O", # (methanol)
-              "C2H3N", # (acetonitrile)
-              "C2H7N", # (ethylamine)
-              "H3N", # (ammonia)
-              "CH2O2", # (formic acid)
-              "C2H4O2", # (acetic acid)
-              "C2H6O", # (ethanol)
-              "NH4Cl", # (ammonium chloride)
-              "NaCl", # (sodium chloride)
-              "KCl", # (potassium chloride)
-              "C3H8O", # (isopropanol)
-              "C2H6OS" # (dmso)
+              "H4ClN", # (ammonium chloride)            ~53.003
+              "NaCl", # (sodium chloride)              ~57.959
+              "ClK", # (potassium chloride)           ~73.933
+              "CH2O2", # (formic acid)                  ~46.006
+              "CH5NO2", # (ammonium formate)             ~63.032
+              "CHNaO2", # (sodium formate)               ~67.987
+              "CHKO2", # (potassium formate)            ~83.961
+              "C2H4O2", # (acetic acid)                  ~60.021
+              "C2H7NO2", # (ammonium acetate)             ~77.046
+              "C2H3NaO2", # (sodium acetate)               ~82.003
+              "C2H3KO2", # (potassium acetate)            ~97.977
+              "H2PO4", # (phosphoric acid)              ~96.969
+              "C2HF3O2" # (trifluoroacetic acid)         ~78.014
             ),
             selected = c(
-              "H2O", # (water)
-              "C2H3N", # (acetonitrile)
-              "C2H7N", # (ethylamine from ACN)
-              "H3N", # (ammonia)
-              "CH2O2", # (formic acid)
-              "NH4Cl", # (ammonium chloride)
-              "NaCl" # (sodium chloride)
+              "H4ClN", # (ammonium chloride)            ~53.003
+              "NaCl", # (sodium chloride)              ~57.959
+              "ClK", # (potassium chloride)           ~73.933
+              "CH2O2", # (formic acid)                  ~46.006
+              "CH5NO2", # (ammonium formate)             ~63.032
+              "CHNaO2", # (sodium formate)               ~67.987
+              "CHKO2", # (potassium formate)            ~83.961
+              "C2HF3O2" # (trifluoroacetic acid)         ~78.014
             )
           ) |>
             shinyhelper::helper(
@@ -762,37 +757,26 @@ ui <- shiny::fluidPage(
               )
             ),
           shiny::checkboxGroupInput(
-            inputId = "ms_clu_neg",
-            label = "List of clusters to be used in negative",
+            inputId = "ms_sol",
+            label = "List of solvents to be used",
             choices = c(
-              "H2O", # (water)
-              "CH2O2", # (formic)
-              "NH4Cl", # (ammonium chloride)
-              "NaCl", # (sodium chloride)
-              "C2H4O2", # (acetic)
-              "H2PO4", # (phosphoric)
-              "C2HF3O2" # (tfa)
+              "H2O", # (water)                        ~18.011
+              "CH4O", # (methanol)                     ~32.026
+              "C2H3N", # (acetonitrile)                 ~41.053
+              "C2H6O", # (ethanol)                      ~46.042
+              "C3H8O", # (isopropanol)                  ~60.058
+              "C2H6OS" # (dmso)                         ~78.014
             ),
             selected = c(
-              "H2O", # (water)
-              "CH2O2", # (formic)
-              "NH4Cl", # (ammonium chloride)
-              "NaCl", # (sodium chloride)
-              "C2HF3O2" # (tfa)
+              "H2O", # (water)                        ~18.011
+              "C2H3N" # (acetonitrile)                 ~41.053
             )
           ) |>
             shinyhelper::helper(
               type = "inline",
               content = c(
-                "Choose wisely.",
-                "If a very important cluster everyone should have is missing,",
-                "please open an issue at:",
-                as.character(
-                  shiny::tags$a(
-                    "https://github.com/taxonomicallyinformedannotation/tima/issues",
-                    href = "https://github.com/taxonomicallyinformedannotation/tima/issues"
-                  )
-                )
+                "Solvent modifiers are configured separately from cluster modifiers.",
+                "Keep this list aligned with the annotate_masses YAML defaults."
               )
             ),
           shiny::checkboxGroupInput(

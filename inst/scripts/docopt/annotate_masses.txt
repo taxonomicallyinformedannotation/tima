@@ -2,7 +2,7 @@ You can use this script with the following example:
   Rscript inst/scripts/annotate_masses.R
 
 Usage:
-  annotate_masses.R [--fil-ann-pre-str=<fil-ann-pre-str>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-lib-add-neg=<fil-lib-add-neg>] [--fil-lib-add-pos=<fil-lib-add-pos>] [--fil-lib-add-pro=<fil-lib-add-pro>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>]  [--ms-add-con-type=<ms-add-con-type>] [--ms-add-con-min-degree=<ms-add-con-min-degree>] [--ms-add-con-min-support=<ms-add-con-min-support>] [--ms-clu-neg=<ms-clu-neg>] [--ms-clu-pos=<ms-clu-pos>] [--ms-neu=<ms-neu>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-add=<ms-tol-rt-add>] [--force=<force>]
+  annotate_masses.R [--fil-ann-pre-str=<fil-ann-pre-str>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-lib-add-neg=<fil-lib-add-neg>] [--fil-lib-add-pos=<fil-lib-add-pos>] [--fil-lib-add-pro=<fil-lib-add-pro>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>]  [--ms-add-con-type=<ms-add-con-type>] [--ms-add-con-min-degree=<ms-add-con-min-degree>] [--ms-add-con-min-support=<ms-add-con-min-support>] [--ms-clu=<ms-clu>] [--ms-sol=<ms-sol>] [--ms-neu=<ms-neu>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-add=<ms-tol-rt-add>] [--force=<force>]
 
 Arguments:
   fil-ann-pre-str            List of prepared structural annotations. STRING
@@ -17,8 +17,8 @@ Arguments:
   ms-add-con-type            Adduct consistency strategy. Must be one of: off, conditional, strict. STRING
   ms-add-con-min-degree      Minimum feature degree threshold to trigger consistency checks in conditional mode. INTEGER
   ms-add-con-min-support     Minimum number of independent neighbor supports for an adduct assignment. INTEGER
-  ms-clu-neg                 List of clusters to be used in negative. STRING
-  ms-clu-pos                 List of clusters to be used in positive. STRING
+  ms-clu                     List of clusters to be used. Comma-separated STRING
+  ms-sol                     List of solvents to be used. Comma-separated STRING
   ms-neu                     List of neutral losses to be used. STRING
   ms-pol                     Polarity used. Must be "pos" or "neg". STRING
   ms-tol-mas-ppm-ms1         Relative mass tolerance for MS1 in ppm. FLOAT

@@ -6,6 +6,7 @@
     - Added PFAS-relevant neutral losses (`HF`, `CF2`, `CF2O`, `CF3`, `CHF2`, `C2F2`, `C2F4`, `C3F6`, `CF2O`, `C2F3O`)
     - Added common high-value losses (`SO2`, `SO3`)
 * Added PubChem Lite as a new exposomics library, prepared through the same HMDB-like workflow as other SOP sources and flagged as `xenobiotic` (`Q409205`)
+* Flattened `annotate_masses` modifier defaults so `clusters` and `solvents` are now single lists (no mode split), and threaded the flat schema through `prepare_params()`, the Shiny app, CLI parsing, and the annotation targets
 
 ## Internal / performance
 

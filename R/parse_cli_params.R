@@ -228,8 +228,18 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("ms", "adducts", "consistency", "min_support"),
       type = as.integer
     ),
-    ms_clu_neg = list(path = c("ms", "clusters", "neg"), type = as.character),
-    ms_clu_pos = list(path = c("ms", "clusters", "pos"), type = as.character),
+    ms_clu = list(
+      path = c("ms", "clusters"),
+      type = function(x) {
+        unique(trimws(unlist(strsplit(as.character(x), ",", fixed = TRUE))))
+      }
+    ),
+    ms_sol = list(
+      path = c("ms", "solvents"),
+      type = function(x) {
+        unique(trimws(unlist(strsplit(as.character(x), ",", fixed = TRUE))))
+      }
+    ),
     ms_neu = list(path = c("ms", "neutral_losses"), type = as.character),
     ms_pol = list(path = c("ms", "polarity"), type = as.character),
     ms_thr_ms2_int = list(

@@ -19,6 +19,7 @@ targets_section_annotations <- function() {
             str_tax_npc = lib_mer_str_tax_npc,
             adducts_list = par_ann_mas$ms$adducts,
             clusters_list = par_ann_mas$ms$clusters,
+            solvents_list = par_ann_mas$ms$solvents,
             neutral_losses_list = par_ann_mas$ms$neutral_losses,
             ms_mode = par_ann_mas$ms$polarity,
             tolerance_ppm = par_ann_mas$ms$tolerances$mass$ppm$ms1,

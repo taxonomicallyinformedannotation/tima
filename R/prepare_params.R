@@ -172,8 +172,8 @@ prepare_params <- function(
   ms_add_con_type <- params_advanced$ms$adducts$consistency$type
   ms_add_con_min_degree <- params_advanced$ms$adducts$consistency$min_degree
   ms_add_con_min_support <- params_advanced$ms$adducts$consistency$min_support
-  ms_clu_neg <- params_advanced$ms$clusters$neg
-  ms_clu_pos <- params_advanced$ms$clusters$pos
+  ms_clu <- unique(as.character(params_advanced$ms$clusters))
+  ms_sol <- unique(as.character(params_advanced$ms$solvents))
   ms_neu <- params_advanced$ms$neutral_losses
   # ms_pol <- params_advanced$ms$polarity
   ms_thr_ms2_int <- params_advanced$ms$thresholds$ms2$intensity
@@ -328,10 +328,8 @@ prepare_params <- function(
     ms_add_con_min_degree
   yamls_params$annotate_masses$ms$adducts$consistency$min_support <-
     ms_add_con_min_support
-  yamls_params$annotate_masses$ms$clusters$neg <-
-    ms_clu_neg
-  yamls_params$annotate_masses$ms$clusters$pos <-
-    ms_clu_pos
+  yamls_params$annotate_masses$ms$clusters <- ms_clu
+  yamls_params$annotate_masses$ms$solvents <- ms_sol
   yamls_params$annotate_masses$ms$neutral_losses <-
     ms_neu
   yamls_params$annotate_masses$ms$polarity <-

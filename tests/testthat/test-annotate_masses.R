@@ -257,10 +257,9 @@ test_that("annotate_masses validates adducts_list structure", {
   fixtures$cleanup()
 })
 
-test_that("annotate_masses validates clusters_list structure", {
+test_that("annotate_masses accepts flat clusters_list and solvents_list", {
   fixtures <- setup_minimal_fixtures()
-  # Missing mode in clusters_list should error
-  expect_error(
+  expect_no_error(
     annotate_masses(
       features = fixtures$features,
       library = fixtures$library,
@@ -269,14 +268,12 @@ test_that("annotate_masses validates clusters_list structure", {
       str_tax_cla = fixtures$str_tax_cla,
       str_tax_npc = fixtures$str_tax_npc,
       adducts_list = list(pos = c("[M+H]+")),
-      clusters_list = list(neg = c("[M]")),
+      clusters_list = c("[M]"),
+      solvents_list = c("H2O"),
       ms_mode = "pos",
       tolerance_ppm = 10,
       tolerance_rt = 0.02
-    ),
-    "Fix: Add adduct definitions for 'pos' mode to your configuration",
-    class = "tima_validation_error",
-    fixed = TRUE
+    )
   )
   fixtures$cleanup()
 })

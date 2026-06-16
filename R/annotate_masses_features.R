@@ -251,12 +251,18 @@ log_adduct_breakdown <- function(annotations) {
       count_col = "N_annotations",
       out_col = "Pct_annotations"
     )
-    log_info("Breakdown of the annotated adduct species (library-matched):")
+    log_info(
+      "Breakdown of the (top 64) annotated adduct species (library-matched):"
+    )
     log_info(
       "\n%s",
       paste(
         utils::capture.output(
-          print.data.frame(x = adduct_bd, row.names = FALSE)
+          print.data.frame(
+            x = adduct_bd |>
+              tidytable::slice_head(n = 64L),
+            row.names = FALSE
+          )
         ),
         collapse = "\n"
       )

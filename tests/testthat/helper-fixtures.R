@@ -834,6 +834,17 @@ create_fixture_params_advanced <- function(id = "TESTID") {
     ms = list(
       adducts = list(pos = "[M+H]+", neg = "[M-H]-"),
       tolerances = list(mass = list(ppm = list(ms1 = 5, ms2 = 10))),
+      clusters = c(
+        "CH2O2",
+        "H4ClN",
+        "NaCl",
+        "CH5NO2",
+        "CHNaO2",
+        "ClK",
+        "CHKO2",
+        "C2HF3O2"
+      ),
+      solvents = c("H2O", "C2H3N"),
       neutral_losses = "H2O"
     ),
     annotations = list(
@@ -864,6 +875,7 @@ create_fixture_yamls_params <- function(id = "TESTID") {
     yamls_params = list(
       prepare_params_advanced = create_fixture_params_advanced(id = id),
       annotate_masses = list(
+        ms = list(clusters = c("CH2O2"), solvents = c("H2O")),
         files = list(
           features = list(
             prepared = list(tsv = sprintf("feat_pre_%s.tsv", id))

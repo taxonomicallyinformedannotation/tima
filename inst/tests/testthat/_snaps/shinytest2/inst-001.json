@@ -72,8 +72,6 @@
     "ms_add_neg": [
       "[M-H2]2-",
       "[M-H]-",
-      "[M-H2+Na]-",
-      "[M-H2+K]-",
       "[2M-H]-"
     ],
     "ms_add_pos": [
@@ -85,20 +83,32 @@
       "[2M+H]+"
     ],
     "ms_clu_neg": [
-      "H2O",
-      "CH2O2",
-      "NH4Cl",
-      "NaCl",
-      "C2HF3O2"
-    ],
-    "ms_clu_pos": [
+      "NH3",
       "H2O",
       "C2H3N",
       "C2H7N",
-      "H3N",
       "CH2O2",
-      "NH4Cl",
-      "NaCl"
+      "H4ClN",
+      "NaCl",
+      "C2H4O2",
+      "CH5NO2",
+      "CHNaO2",
+      "ClK",
+      "CHKO2"
+    ],
+    "ms_clu_pos": [
+      "NH3",
+      "H2O",
+      "C2H3N",
+      "C2H7N",
+      "CH2O2",
+      "H4ClN",
+      "NaCl",
+      "C2H4O2",
+      "CH5NO2",
+      "CHNaO2",
+      "ClK",
+      "CHKO2"
     ],
     "ms_neu": [
       "CH2 (methylene)",

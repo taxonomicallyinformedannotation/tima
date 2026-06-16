@@ -13,10 +13,10 @@
 #'        adducts. A match labels the edge `adduct_low _ adduct_high` and
 #'        tentatively assigns the corresponding adduct to each endpoint.
 #'
-#'     3. **Cluster edges.** Match `delta` against cluster masses (e.g. ACN,
-#'        MeOH, Na). A cluster adds mass to the *higher* m/z peak, so the
-#'        cluster suffix `+<cluster>` is attached to the **dest** node's
-#'        adduct hypotheses.
+#'     3. **Cluster / solvent edges.** Match `delta` against modifier masses
+#'        (e.g. salts, solvents, ACN, MeOH, Na). A modifier adds mass to the
+#'        *higher* m/z peak, so the modifier suffix `+<modifier>` is attached
+#'        to the **dest** node's adduct hypotheses.
 #'
 #'     4. **Neutral-loss edges.** Match `delta` against neutral-loss masses
 #'        (e.g. H2O, CO2). For an NL pair, the **higher** m/z peak is the
@@ -67,6 +67,7 @@
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param adducts_list List of adducts to be used
 #' @param clusters_list List of clusters to be used
+#' @param solvents_list List of solvents to be used
 #' @param neutral_losses_list List of neutral losses to be used
 #' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
 #' @param tolerance_ppm Tolerance to perform annotation. Should be <= 20 ppm
@@ -116,6 +117,7 @@ annotate_masses <- function(
   )$files$libraries$sop$merged$structures$taxonomies$npc,
   adducts_list = get_params(step = "annotate_masses")$ms$adducts,
   clusters_list = get_params(step = "annotate_masses")$ms$clusters,
+  solvents_list = get_params(step = "annotate_masses")$ms$solvents,
   neutral_losses_list = get_params(
     step = "annotate_masses"
   )$ms$neutral_losses,
@@ -159,7 +161,8 @@ annotate_masses <- function(
     context = "mass annotation"
   )
   validate_adduct_list(adducts_list, ms_mode, "adducts_list")
-  validate_adduct_list(clusters_list, ms_mode, "clusters_list")
+  validate_list_or_vector(clusters_list, param_name = "clusters_list")
+  validate_list_or_vector(solvents_list, param_name = "solvents_list")
   validate_file_existence(list(
     features = features,
     library = library,
@@ -178,13 +181,21 @@ annotate_masses <- function(
   baseline_adduct <- switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
   baseline_adducts <- switch(
     ms_mode,
-    "pos" = c("[M+H2]2+", "[M+H]+", "[M+H4N]+", "[M+Na]+", "[M+K]+", "[2M+H]+"),
+    "pos" = c(
+      "[M+H2]2+",
+      "[M+H]+",
+      "[M+H4N]+",
+      "[M+Na]+",
+      "[M+K]+",
+      "[2M+H]+"
+    ),
     "neg" = c(
       "[M-H2]2-",
       "[M-H]-",
-      "[M-H2+Na]-",
-      "[M-H2+K]-",
       "[M-H+CH2O2]-",
+      "[M-H+CH5NO2]-",
+      "[M-H+CHNaO2]-",
+      "[M-H+CHKO2]-",
       "[2M-H]-"
     )
   )
@@ -240,6 +251,7 @@ annotate_masses <- function(
   ion_tables <- build_annotate_masses_ion_tables(
     adducts_list = adducts_list,
     clusters_list = clusters_list,
+    solvents_list = solvents_list,
     ms_mode = ms_mode
   )
   adducts <- ion_tables$adducts
@@ -1115,10 +1127,13 @@ load_annotate_masses_runtime_inputs <- function(
 build_annotate_masses_ion_tables <- function(
   adducts_list,
   clusters_list,
+  solvents_list,
   ms_mode
 ) {
   adducts <- adducts_list[[ms_mode]]
-  clusters <- clusters_list[[ms_mode]]
+  clusters <- normalize_modifier_terms(clusters_list)
+  solvents <- normalize_modifier_terms(solvents_list)
+  clusters <- unique(c(clusters, solvents))
   adducts_table <- adducts |>
     tidytable::tidytable() |>
     tidytable::rename(adduct = 1) |>
@@ -1154,6 +1169,20 @@ build_annotate_masses_ion_tables <- function(
     monocharged_adducts = monocharged_adducts,
     multi_adducts = multi_adducts
   )
+}
+
+#' Normalize modifier terms to a flat character vector
+#' @keywords internal
+normalize_modifier_terms <- function(x) {
+  if (is.null(x)) {
+    return(character())
+  }
+  if (is.list(x)) {
+    x <- unlist(x, recursive = TRUE, use.names = FALSE)
+  }
+  x <- unique(as.character(x))
+  x <- x[!is.na(x) & nzchar(x)]
+  x
 }
 
 #' Discover all edge classes used by annotate_masses

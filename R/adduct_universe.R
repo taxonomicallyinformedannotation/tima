@@ -45,7 +45,13 @@ build_adduct_universe <- function(
   }
   build_adduct_universe_from_legacy(
     adducts = resolved$spec,
-    clusters = clusters_list[[polarity]],
+    clusters = if (
+      is.list(clusters_list) && !is.null(clusters_list[[polarity]])
+    ) {
+      clusters_list[[polarity]]
+    } else {
+      clusters_list
+    },
     polarity = polarity
   )
 }

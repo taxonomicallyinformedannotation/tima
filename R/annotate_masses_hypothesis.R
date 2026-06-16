@@ -1219,7 +1219,7 @@ discover_evidence_adduct_signal <- function(
 
   universe <- build_adduct_universe(
     adducts_list = list(pos = adducts, neg = adducts),
-    clusters_list = list(pos = clusters, neg = clusters),
+    clusters_list = clusters,
     neutral_losses_list = neutral_losses,
     polarity = ms_mode
   )
@@ -1236,7 +1236,7 @@ discover_evidence_adduct_signal <- function(
     tolerance_rt = tolerance_rt,
     ms_mode = ms_mode,
     exact_masses = exact_masses,
-    max_hypotheses_per_feature = nrow(universe)
+    max_hypotheses_per_feature = Inf
   )
   if (nrow(hyps) == 0L) {
     return(list(hypotheses = empty_hyp, edges = empty_edges))
@@ -1356,10 +1356,6 @@ filter_modifier_evidence_by_pairwise_support <- function(
   dropped_hyps <- kept_hyps |>
     tidytable::filter(!keep)
   if (nrow(dropped_hyps) > 0L) {
-    dropped_bd <- dropped_hyps |>
-      tidytable::distinct(feature_id, adduct) |>
-      tidytable::count(adduct, name = "N") |>
-      tidytable::arrange(tidytable::desc(N))
     log_info(
       paste0(
         "Pairwise-support filter removed %d modifier-bearing evidence ",
@@ -1762,10 +1758,6 @@ prune_candidates_by_network_consensus <- function(
 
   dropped <- scored |> tidytable::filter(drop)
   if (nrow(dropped) > 0L) {
-    by_adduct <- dropped |>
-      tidytable::distinct(feature_id, adduct) |>
-      tidytable::count(adduct, name = "N") |>
-      tidytable::arrange(tidytable::desc(N))
     n_unique <- nrow(dropped |> tidytable::distinct(feature_id, adduct))
     log_info(
       paste0(

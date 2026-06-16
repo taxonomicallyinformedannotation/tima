@@ -209,9 +209,10 @@ generate_adduct_hypotheses <- function(
   }
 
   # Clusters and losses can be embedded in the spec or supplied separately.
-  cluster_formulas <- spec$clusters[[polarity]] %||%
-    clusters_list[[polarity]] %||%
-    character()
+  cluster_formulas <- spec$clusters %||% clusters_list %||% character()
+  if (is.list(cluster_formulas)) {
+    cluster_formulas <- cluster_formulas[[polarity]] %||% character()
+  }
   loss_formulas <- spec$neutral_losses %||% neutral_losses_list %||% character()
   # Strip "(comment)" suffixes from formulas, e.g. "H2O (water)".
   cluster_formulas <- trimws(sub(" .*", "", cluster_formulas))
