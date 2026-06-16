@@ -1,5 +1,5 @@
 # Use the Bioconductor base image
-FROM bioconductor/bioconductor_docker:RELEASE_3_22-R-4.5.2
+FROM bioconductor/bioconductor_docker:RELEASE_3_23-R-4.6.0
 
 # Add a non-root user and set up the R library directory
 RUN useradd -m tima-user && \
@@ -17,7 +17,16 @@ WORKDIR /home/tima-user
 
 # Install R dependencies
 RUN Rscript -e "install.packages('pak')" && \
-    Rscript -e "pak::pak(pkg = 'taxonomicallyinformedannotation/tima', upgrade = TRUE, ask = FALSE)" && \
+    Rscript -e "
+      options(
+        timeout = 30
+      );
+      pak::pak(
+        pkg = 'taxonomicallyinformedannotation/tima',
+        upgrade = TRUE,
+        ask = FALSE
+      )
+    " && \
     Rscript -e "tima::install_tima()"
 
 # Expose the necessary ports for Shiny
