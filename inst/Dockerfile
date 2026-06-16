@@ -17,16 +17,7 @@ WORKDIR /home/tima-user
 
 # Install R dependencies
 RUN Rscript -e "install.packages('pak')" && \
-    Rscript -e "
-      options(
-        timeout = 30
-      );
-      pak::pak(
-        pkg = 'taxonomicallyinformedannotation/tima',
-        upgrade = TRUE,
-        ask = FALSE
-      )
-    " && \
+    Rscript -e "options(timeout = 30); pak::pak(pkg = 'taxonomicallyinformedannotation/tima', upgrade = TRUE, ask = FALSE)" && \
     Rscript -e "tima::install_tima()"
 
 # Expose the necessary ports for Shiny
