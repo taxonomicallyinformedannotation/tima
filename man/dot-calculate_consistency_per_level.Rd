@@ -5,7 +5,9 @@
 \title{Calculate consistency per taxonomic level}
 \usage{
 .calculate_consistency_per_level(
-  df,
+  edges_filtered,
+  annotations_for_join,
+  total_targets_per_source,
   candidates,
   consistency_name,
   feature_score_name,
@@ -14,7 +16,14 @@
 )
 }
 \arguments{
-\item{df}{Data frame with joined edges and annotations}
+\item{edges_filtered}{Data frame with unique (feature_source, feature_target)
+pairs already filtered for min-neighbor requirement}
+
+\item{annotations_for_join}{Data frame with (feature_id, taxonomy_cols…,
+score_weighted_bio) — the pool of candidate annotations}
+
+\item{total_targets_per_source}{Data frame with (feature_source, n_targets)
+pre-computed denominator: total distinct target features per source}
 
 \item{candidates}{Character name of the candidate taxonomy column}
 
@@ -31,6 +40,9 @@ Data frame with consistency scores for this level
 }
 \description{
 Calculates chemical consistency scores for a single taxonomic level by
-comparing classifications across network neighbors.
+comparing classifications across network neighbors. Avoids materialising
+the full (edges × all_annotations) join; instead it builds a compact
+per-target summary for the single taxonomy column requested and then joins
+with the edge list, keeping peak memory O(edges × distinct_taxonomies).
 }
 \keyword{internal}

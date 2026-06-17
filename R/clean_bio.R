@@ -403,11 +403,14 @@ clean_bio <- function(
     !!as.name(feature_score_name) := numeric(0L)
   )
 
-  # Step 1: compact summary — one row per (target_feature, taxonomy_val)
-  # with the best annotation score for that pair.  Much smaller than the
-  # full annotations_for_join because many annotations share the same
-  # taxonomy value for a given feature.
-  target_taxonomy <- annotations_for_join |>
+  # Step 1: compact summary — one row per (feature, taxonomy_val) with the
+  # best annotation score for that pair.  This table is reused twice: once
+  # to count how many neighbours support each taxonomy value (joined on
+  # feature_target) and once to score the *source* feature itself (joined on
+  # feature_source).  Using the source's own score instead of the neighbours'
+  # max avoids the "same score for every feature" collapse that occurs when
+  # neighbours share a common max score (e.g. popular Biota matches).
+  taxonomy_scores <- annotations_for_join |>
     tidytable::select(feature_id, !!as.name(candidates), score_weighted_bio) |>
     tidytable::summarize(
       score_weighted_bio = max(score_weighted_bio, na.rm = TRUE),
@@ -418,7 +421,7 @@ clean_bio <- function(
   # rows: (feature_source, feature_target, taxonomy_val, best_score)
   df_level <- edges_filtered |>
     tidytable::inner_join(
-      target_taxonomy,
+      taxonomy_scores,
       by = c("feature_target" = "feature_id")
     )
 
@@ -440,20 +443,20 @@ clean_bio <- function(
     return(empty_result)
   }
 
-  # Step 4: best score per (source, taxonomy_val)
-  score_per_group <- df_level |>
-    tidytable::summarize(
-      score_weighted_bio = max(score_weighted_bio, na.rm = TRUE),
-      .by = c("feature_source", candidates)
-    )
+  # Step 4: source feature's own best score for the predicted taxonomy value.
+  # Joining taxonomy_scores on feature_source (not feature_target) gives each
+  # source its own annotation-derived score for that taxonomy class, making
+  # the final feature_pred_tax_*_score discriminative across sources.  When a
+  # source has no annotation for a given taxonomy value the join yields NA,
+  # which sorts last and is never selected as the top-ranked class.
 
   # Step 5: compute consistency and pick the top-ranked taxonomy value per source
   count_per_group |>
     tidytable::left_join(total_targets_per_source, by = "feature_source") |>
     tidytable::mutate(!!as.name(consistency_name) := count / n_targets) |>
     tidytable::left_join(
-      score_per_group,
-      by = c("feature_source", candidates)
+      taxonomy_scores,
+      by = c("feature_source" = "feature_id", candidates)
     ) |>
     tidytable::mutate(
       !!as.name(feature_score_name) := !!as.name(consistency_name) *
