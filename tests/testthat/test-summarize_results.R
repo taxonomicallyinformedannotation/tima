@@ -182,3 +182,44 @@ test_that("summarize=TRUE collapses to one row per feature", {
     expect_equal(nrow(out), length(unique(out$feature_id)))
   }
 })
+
+# ---- optional annot_table_wei_chemo -----------------------------------------
+
+test_that("summarize_results works when annot_table_wei_chemo is NULL but feature_consensus_table is provided", {
+  d <- make_sop_df()
+  # Build feature_consensus_table via the internal helper (same path as clean_chemo).
+  # Internal functions are accessible within package tests.
+  fct <- .build_feature_consensus_table(
+    annot_table_wei_chemo = d$chemo,
+    model = columns_model()
+  )
+  out <- summarize_results(
+    df = d$df,
+    features_table = d$features,
+    components_table = d$components,
+    structure_organism_pairs_table = d$sop,
+    annot_table_wei_chemo = NULL,
+    remove_ties = FALSE,
+    summarize = FALSE,
+    feature_consensus_table = fct
+  )
+  expect_s3_class(out, "data.frame")
+  expect_true("feature_id" %in% names(out))
+})
+
+test_that("summarize_results errors when both annot_table_wei_chemo and feature_consensus_table are NULL", {
+  d <- make_sop_df()
+  expect_error(
+    summarize_results(
+      df = d$df,
+      features_table = d$features,
+      components_table = d$components,
+      structure_organism_pairs_table = d$sop,
+      annot_table_wei_chemo = NULL,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      feature_consensus_table = NULL
+    ),
+    class = "tima_validation_error"
+  )
+})

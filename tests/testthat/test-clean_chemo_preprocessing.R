@@ -80,6 +80,62 @@ test_that("filter_ms1_annotations honors OR and AND modes", {
   expect_true(nrow(out_or) >= nrow(out_and))
 })
 
+test_that("filter_ms1_annotations drops MS1-only candidates when feature has MS2", {
+  # F1: one MS2 candidate (IK1, similarity=0.9) + one MS1 candidate (IK2, no similarity)
+  # F2: no MS2 candidates (all MS1-only)
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK1", "IK2", "IK3", "IK4"
+    ),
+    score_biological = c(0.9, 0.9, 0.9, 0.9),
+    score_chemical = c(0.9, 0.9, 0.9, 0.9),
+    score_weighted_chemo = c(0.9, 0.5, 0.6, 0.8),
+    candidate_score_pseudo_initial = c(0.9, NA, NA, NA),
+    candidate_score_similarity = c(0.9, NA, NA, NA),
+    candidate_score_sirius_csi = c(NA, NA, NA, NA),
+    candidate_score_sirius_confidence = c(NA, NA, NA, NA)
+  )
+  out <- filter_ms1_annotations(df, 0.5, 0.5, "OR")
+  # F1: IK1 has MS2 so it is kept; IK2 (MS1-only) must be dropped because F1
+  # has at least one MS2 candidate.
+  expect_false(
+    any(out$feature_id == "F1" &
+      out$candidate_structure_inchikey_connectivity_layer == "IK2")
+  )
+  # IK1 (MS2) must still be present
+  expect_true(
+    any(out$feature_id == "F1" &
+      out$candidate_structure_inchikey_connectivity_layer == "IK1")
+  )
+  # F2 has no MS2 candidates so its MS1-only candidates are kept (both pass
+  # the bio/chemo threshold)
+  expect_true(
+    any(out$feature_id == "F2" &
+      out$candidate_structure_inchikey_connectivity_layer == "IK3")
+  )
+  expect_true(
+    any(out$feature_id == "F2" &
+      out$candidate_structure_inchikey_connectivity_layer == "IK4")
+  )
+})
+
+test_that("filter_ms1_annotations preserves all MS1-only rows when no feature has MS2", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+    score_biological = c(0.9, 0.9),
+    score_chemical = c(0.9, 0.9),
+    score_weighted_chemo = c(0.8, 0.7),
+    candidate_score_pseudo_initial = c(NA, NA),
+    candidate_score_similarity = c(NA, NA),
+    candidate_score_sirius_csi = c(NA, NA),
+    candidate_score_sirius_confidence = c(NA, NA)
+  )
+  out <- filter_ms1_annotations(df, 0.5, 0.5, "OR")
+  expect_equal(nrow(out), 2L)
+})
+
 test_that("rank_and_deduplicate creates rank columns and deduplicates IK per feature", {
   df <- base_annot() |>
     tidytable::bind_rows(base_annot()[1, ])

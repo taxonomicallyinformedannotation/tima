@@ -14,8 +14,12 @@
 #'     assignments
 #' @param structure_organism_pairs_table [data.frame] Data frame with
 #'     structure-organism pairs
-#' @param annot_table_wei_chemo [data.frame] Data frame with chemically weighted
-#'     annotations
+#' @param annot_table_wei_chemo [data.frame] Optional data frame with chemically
+#'     weighted annotations. Required only when `feature_consensus_table` is
+#'     NULL, to build feature-level consensus metadata. When
+#'     `feature_consensus_table` is already supplied (the recommended path from
+#'     `clean_chemo`), this may be NULL, allowing the caller to free the table
+#'     from memory before calling this function.
 #' @param remove_ties [logical] Logical whether to remove tied scores (keep only
 #'     highest)
 #' @param summarize [logical] Logical whether to collapse to 1 row per feature
@@ -41,7 +45,7 @@ summarize_results <- function(
   features_table,
   components_table,
   structure_organism_pairs_table,
-  annot_table_wei_chemo,
+  annot_table_wei_chemo = NULL,
   remove_ties,
   summarize,
   annotation_notes_lookup = NULL,
@@ -56,10 +60,12 @@ summarize_results <- function(
     structure_organism_pairs_table,
     param_name = "structure_organism_pairs_table"
   )
-  validate_dataframe(
-    annot_table_wei_chemo,
-    param_name = "annot_table_wei_chemo"
-  )
+  if (!is.null(annot_table_wei_chemo)) {
+    validate_dataframe(
+      annot_table_wei_chemo,
+      param_name = "annot_table_wei_chemo"
+    )
+  }
   validate_logical(remove_ties, param_name = "remove_ties")
   validate_logical(summarize, param_name = "summarize")
 
@@ -77,6 +83,16 @@ summarize_results <- function(
 
   model <- columns_model()
   if (is.null(feature_consensus_table)) {
+    if (is.null(annot_table_wei_chemo)) {
+      cli::cli_abort(
+        paste0(
+          "Either `feature_consensus_table` or `annot_table_wei_chemo` must ",
+          "be provided when `feature_consensus_table` is NULL"
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
+    }
     feature_consensus_table <- .build_feature_consensus_table(
       annot_table_wei_chemo = annot_table_wei_chemo,
       model = model

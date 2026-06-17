@@ -223,6 +223,13 @@ clean_chemo <- function(
   df_percentile <- candidate_tables$df_percentile
   results_candidates <- candidate_tables$results_candidates
   annotation_notes_lookup <- candidate_tables$annotation_notes_lookup
+
+  # Free the full annotation table now: feature_consensus_table and
+  # organism_lookup are already built, and summarize_results no longer needs
+  # annot_table_wei_chemo when feature_consensus_table is pre-supplied.
+  rm(annot_table_wei_chemo)
+  invisible(gc())
+
   organism_lookup <- .build_organism_lookup(
     structure_organism_pairs_table = structure_organism_pairs_table,
     df = df_ranked
@@ -259,7 +266,6 @@ clean_chemo <- function(
       features_table = features_table,
       components_table = components_table,
       structure_organism_pairs_table = structure_organism_pairs_table,
-      annot_table_wei_chemo = annot_table_wei_chemo,
       remove_ties = remove_ties,
       summarize = summarize,
       annotation_notes_lookup = annotation_notes_lookup,
@@ -325,7 +331,6 @@ clean_chemo <- function(
       features_table = features_table,
       components_table = components_table,
       structure_organism_pairs_table = structure_organism_pairs_table,
-      annot_table_wei_chemo = annot_table_wei_chemo,
       remove_ties = remove_ties,
       summarize = summarize,
       annotation_notes_lookup = annotation_notes_lookup,
@@ -373,7 +378,6 @@ clean_chemo <- function(
 
   # Clean up intermediate objects
   rm(
-    annot_table_wei_chemo,
     results_candidates,
     features_table,
     components_table,
