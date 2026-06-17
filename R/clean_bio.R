@@ -99,24 +99,30 @@ clean_bio <- function(
 
   # Join Edges with Annotations ----
 
-  # Join edges with annotations
+  # Memory optimization: select only required columns before join
+  # to reduce intermediate object size dramatically
+  annotations_for_join <- annotations_distinct |>
+    tidytable::select(
+      feature_id,
+      candidate_structure_tax_cla_01kin,
+      candidate_structure_tax_npc_01pat,
+      candidate_structure_tax_cla_02sup,
+      candidate_structure_tax_npc_02sup,
+      candidate_structure_tax_cla_03cla,
+      candidate_structure_tax_npc_03cla,
+      candidate_structure_tax_cla_04dirpar,
+      score_weighted_bio
+    ) |>
+    tidytable::distinct()
+
   df3 <- tidytable::right_join(
     x = edges_filtered,
-    y = annotations_distinct |>
-      tidytable::distinct(
-        feature_id,
-        candidate_structure_tax_cla_01kin,
-        candidate_structure_tax_npc_01pat,
-        candidate_structure_tax_cla_02sup,
-        candidate_structure_tax_npc_02sup,
-        candidate_structure_tax_cla_03cla,
-        candidate_structure_tax_npc_03cla,
-        candidate_structure_tax_cla_04dirpar,
-        score_weighted_bio
-      ),
+    y = annotations_for_join,
     by = stats::setNames(object = "feature_id", nm = "feature_target")
   ) |>
     tidytable::filter(!is.na(feature_source))
+
+  rm(annotations_for_join, edges_filtered)
 
   # Calculate Consistency Scores ----
 
@@ -153,18 +159,18 @@ clean_bio <- function(
 
   supp_tables <- consistency_results
 
-  annot_table_wei_bio_preclean <- purrr::reduce(
-    .x = supp_tables,
-    .init = df2,
-    .f = tidytable::left_join,
-    by = stats::setNames(object = "feature_source", nm = "feature_id")
-  ) |>
-    tidytable::select(feature_id, tidyselect::everything())
+  # Memory-efficient approach: merge all consistency results at once
+  # instead of sequential purrr::reduce operations
+  annot_table_wei_bio_preclean <- .merge_consistency_tables(
+    base_df = df2,
+    consistency_list = supp_tables
+  )
+
+  rm(df2, supp_tables)
 
   annot_table_wei_bio_preclean <- .add_default_prediction_columns(
     annot_table_wei_bio_preclean
   )
-  rm(df2, supp_tables)
 
   if (nrow(df1b) == 0L) {
     return(annot_table_wei_bio_preclean)
@@ -190,6 +196,39 @@ clean_bio <- function(
 }
 
 # Internal Helper Functions ----
+
+#' Merge consistency tables efficiently for large datasets
+#'
+#' @description
+#' Combines all consistency result tables into base dataframe using batch
+#' operations to minimize memory overhead from sequential joins.
+#'
+#' @param base_df Data frame to which consistency data will be added
+#' @param consistency_list List of consistency result data frames
+#'
+#' @return Merged dataframe with all consistency columns
+#'
+#' @keywords internal
+.merge_consistency_tables <- function(base_df, consistency_list) {
+  if (length(consistency_list) == 0L) {
+    return(base_df)
+  }
+
+  # Use Reduce with base::identity to minimize intermediate allocations
+  result <- Reduce(
+    function(left_df, right_df) {
+      tidytable::left_join(
+        left_df,
+        right_df,
+        by = stats::setNames(object = "feature_source", nm = "feature_id")
+      )
+    },
+    consistency_list,
+    init = base_df
+  )
+
+  result |> tidytable::select(feature_id, tidyselect::everything())
+}
 
 #' Add or fill default prediction columns in data frame
 #'
@@ -353,13 +392,15 @@ clean_bio <- function(
   feature_val_name,
   minimal_consistency
 ) {
+  # Memory optimization: select only needed columns upfront
   df |>
-    tidytable::distinct(
+    tidytable::select(
       feature_source,
       feature_target,
       !!as.name(candidates),
       score_weighted_bio
     ) |>
+    tidytable::distinct() |>
     tidytable::mutate(
       count = tidytable::n_distinct(feature_target),
       .by = c(feature_source, !!as.name(candidates))

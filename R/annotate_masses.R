@@ -286,6 +286,7 @@ annotate_masses <- function(
   cluster_edges <- edge_sets$cluster_edges
   loss_edges <- edge_sets$loss_edges
   evidence_signal <- edge_sets$evidence_signal
+  rm(edge_sets)
 
   log_info(
     "Edge classification complete in %.2f seconds: %d adduct edges, %d cluster edges, %d loss edges",

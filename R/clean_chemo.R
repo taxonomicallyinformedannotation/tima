@@ -307,7 +307,6 @@ clean_chemo <- function(
   )
 
   rm(df_classes_mini, df_filtered, df_percentile)
-  invisible(gc(verbose = FALSE))
 
   # Tier 3: FULL - Optionally apply high-evidence filter
   df_full <- if (high_evidence) {
@@ -351,7 +350,6 @@ clean_chemo <- function(
   }
 
   rm(df_full, df_ranked)
-  invisible(gc(verbose = FALSE))
 
   # Optionally Remove Compound Names (After All Processing) ----
 
