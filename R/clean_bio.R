@@ -97,10 +97,9 @@ clean_bio <- function(
     return(.add_default_prediction_columns(annot_table_wei_bio))
   }
 
-  # Join Edges with Annotations ----
+  # Prepare annotations for consistency scoring ----
 
-  # Memory optimization: select only required columns before join
-  # to reduce intermediate object size dramatically
+  # Select only required columns for consistency calculation
   annotations_for_join <- annotations_distinct |>
     tidytable::select(
       feature_id,
@@ -115,22 +114,17 @@ clean_bio <- function(
     ) |>
     tidytable::distinct()
 
-  df3 <- tidytable::right_join(
-    x = edges_filtered,
-    y = annotations_for_join,
-    by = stats::setNames(object = "feature_id", nm = "feature_target")
-  ) |>
-    tidytable::filter(!is.na(feature_source))
-
-  rm(annotations_for_join, edges_filtered)
-
   # Calculate Consistency Scores ----
 
-  # Calculate consistency scores for each taxonomic level
+  # Pass edges and annotations separately to avoid materialising a huge
+  # (edges × all_annotations) join that causes OOM on memory-limited runners.
   consistency_results <- .calculate_consistency_all_levels(
-    df3,
-    minimal_consistency
+    edges_filtered = edges_filtered,
+    annotations_for_join = annotations_for_join,
+    minimal_consistency = minimal_consistency
   )
+
+  rm(annotations_for_join, edges_filtered)
 
   if ("feature_pred_tax_cla_02sup_val" %in% colnames(annotations_distinct)) {
     df1 <- annotations_distinct |>
@@ -372,9 +366,17 @@ clean_bio <- function(
 #'
 #' @description
 #' Calculates chemical consistency scores for a single taxonomic level by
-#' comparing classifications across network neighbors.
+#' comparing classifications across network neighbors. Avoids materialising
+#' the full (edges × all_annotations) join; instead it builds a compact
+#' per-target summary for the single taxonomy column requested and then joins
+#' with the edge list, keeping peak memory O(edges × distinct_taxonomies).
 #'
-#' @param df Data frame with joined edges and annotations
+#' @param edges_filtered Data frame with unique (feature_source, feature_target)
+#'     pairs already filtered for min-neighbor requirement
+#' @param annotations_for_join Data frame with (feature_id, taxonomy_cols…,
+#'     score_weighted_bio) — the pool of candidate annotations
+#' @param total_targets_per_source Data frame with (feature_source, n_targets)
+#'     pre-computed denominator: total distinct target features per source
 #' @param candidates Character name of the candidate taxonomy column
 #' @param consistency_name Character name for output consistency column
 #' @param feature_score_name Character name for output score column
@@ -385,40 +387,70 @@ clean_bio <- function(
 #'
 #' @keywords internal
 .calculate_consistency_per_level <- function(
-  df,
+  edges_filtered,
+  annotations_for_join,
+  total_targets_per_source,
   candidates,
   consistency_name,
   feature_score_name,
   feature_val_name,
   minimal_consistency
 ) {
-  # Memory optimization: select only needed columns upfront
-  df |>
-    tidytable::select(
-      feature_source,
-      feature_target,
-      !!as.name(candidates),
-      score_weighted_bio
-    ) |>
-    tidytable::distinct() |>
+  empty_result <- tidytable::tidytable(
+    feature_source = character(0L),
+    !!as.name(feature_val_name) := character(0L),
+    !!as.name(consistency_name) := numeric(0L),
+    !!as.name(feature_score_name) := numeric(0L)
+  )
+
+  # Step 1: compact summary — one row per (target_feature, taxonomy_val)
+  # with the best annotation score for that pair.  Much smaller than the
+  # full annotations_for_join because many annotations share the same
+  # taxonomy value for a given feature.
+  target_taxonomy <- annotations_for_join |>
+    tidytable::select(feature_id, !!as.name(candidates), score_weighted_bio) |>
+    tidytable::summarize(
+      score_weighted_bio = max(score_weighted_bio, na.rm = TRUE),
+      .by = c("feature_id", candidates)
+    )
+
+  # Step 2: join edges with compact target taxonomies
+  # rows: (feature_source, feature_target, taxonomy_val, best_score)
+  df_level <- edges_filtered |>
+    tidytable::inner_join(target_taxonomy, by = c("feature_target" = "feature_id"))
+
+  if (nrow(df_level) == 0L) {
+    return(empty_result)
+  }
+
+  # Step 3: numerator — distinct target features per (source, taxonomy_val).
+  # Because edges_filtered has unique (source, target) pairs and target_taxonomy
+  # is unique per (feature_id, taxonomy_val), each df_level row is already
+  # distinct, so n() == n_distinct(feature_target) here.
+  count_per_group <- df_level |>
+    tidytable::summarize(
+      count = tidytable::n(),
+      .by = c("feature_source", candidates)
+    )
+
+  if (nrow(count_per_group) == 0L) {
+    return(empty_result)
+  }
+
+  # Step 4: best score per (source, taxonomy_val)
+  score_per_group <- df_level |>
+    tidytable::summarize(
+      score_weighted_bio = max(score_weighted_bio, na.rm = TRUE),
+      .by = c("feature_source", candidates)
+    )
+
+  # Step 5: compute consistency and pick the top-ranked taxonomy value per source
+  count_per_group |>
+    tidytable::left_join(total_targets_per_source, by = "feature_source") |>
+    tidytable::mutate(!!as.name(consistency_name) := count / n_targets) |>
+    tidytable::left_join(score_per_group, by = c("feature_source", candidates)) |>
     tidytable::mutate(
-      count = tidytable::n_distinct(feature_target),
-      .by = c(feature_source, !!as.name(candidates))
-    ) |>
-    tidytable::mutate(
-      !!as.name(consistency_name) := count /
-        tidytable::n_distinct(feature_target),
-      .by = feature_source
-    ) |>
-    tidytable::distinct(
-      feature_source,
-      !!as.name(candidates),
-      .keep_all = TRUE
-    ) |>
-    tidytable::mutate(
-      !!as.name(feature_score_name) := !!as.name(consistency_name) *
-        score_weighted_bio,
-      .by = c(feature_source, !!as.name(candidates))
+      !!as.name(feature_score_name) := !!as.name(consistency_name) * score_weighted_bio
     ) |>
     tidytable::arrange(-!!as.name(feature_score_name)) |>
     tidytable::distinct(feature_source, .keep_all = TRUE) |>
@@ -441,15 +473,37 @@ clean_bio <- function(
 #'
 #' @description
 #' Wrapper function that calculates consistency scores across all taxonomic
-#' levels (ClassyFire and NPC hierarchies).
+#' levels (ClassyFire and NPC hierarchies). Pre-computes the denominator
+#' (total distinct target features per source) once, then dispatches each
+#' level to \code{.calculate_consistency_per_level}.
 #'
-#' @param df3 Data frame with joined edges and annotations
+#' @param edges_filtered Data frame with unique (feature_source, feature_target)
+#'     pairs already filtered for min-neighbor requirement
+#' @param annotations_for_join Data frame with (feature_id, taxonomy_cols…,
+#'     score_weighted_bio)
 #' @param minimal_consistency Numeric minimum consistency threshold (0-1)
 #'
 #' @return List of data frames with consistency scores for each level
 #'
 #' @keywords internal
-.calculate_consistency_all_levels <- function(df3, minimal_consistency) {
+.calculate_consistency_all_levels <- function(
+  edges_filtered,
+  annotations_for_join,
+  minimal_consistency
+) {
+  # Pre-compute denominator once — avoids repeating this inside every level.
+  # Only count target features that have at least one annotation, matching the
+  # semantics of the original right_join + filter(!is.na(feature_source)).
+  annotated_target_ids <- annotations_for_join |>
+    tidytable::distinct(feature_id)
+
+  total_targets_per_source <- edges_filtered |>
+    tidytable::inner_join(annotated_target_ids, by = c("feature_target" = "feature_id")) |>
+    tidytable::summarize(
+      n_targets = tidytable::n_distinct(feature_target),
+      .by = "feature_source"
+    )
+
   # Define taxonomic levels to process
   levels <- list(
     list(
@@ -499,7 +553,9 @@ clean_bio <- function(
   # Helper to calculate consistency for a single taxonomic level
   .process_level_consistency <- function(level) {
     .calculate_consistency_per_level(
-      df3,
+      edges_filtered = edges_filtered,
+      annotations_for_join = annotations_for_join,
+      total_targets_per_source = total_targets_per_source,
       candidates = level$col,
       consistency_name = level$consistency,
       feature_score_name = level$score,
