@@ -1761,6 +1761,7 @@ build_annotate_masses_candidate_hypotheses <- function(
   # expansion can produce adducts that map to a different M than the one the
   # network has determined; removing these prevents inflated candidate counts.
   if (!is.null(feature_m_map) && nrow(feature_m_map) > 0L) {
+    .tol_da <- if (!is.null(tolerance_dalton)) tolerance_dalton else 0
     node_hypotheses <- node_hypotheses |>
       tidytable::left_join(
         feature_m_map |> tidytable::select(feature_id, .consensus_m = neutral_mass),
@@ -1769,10 +1770,7 @@ build_annotate_masses_candidate_hypotheses <- function(
       tidytable::filter(
         is.na(.consensus_m) |
           abs(mass - .consensus_m) <=
-            pmax(
-              tolerance_ppm * 1e-6 * .consensus_m,
-              if (!is.null(tolerance_dalton)) tolerance_dalton else 0
-            )
+            pmax(tolerance_ppm * 1e-6 * .consensus_m, .tol_da)
       ) |>
       tidytable::select(-tidyselect::any_of(".consensus_m"))
   }

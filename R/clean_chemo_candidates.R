@@ -1089,27 +1089,6 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
           tidytable::arrange(feature_id, rank_final)
       }
 
-      if (length(affected_fids) > 0L) {
-        df_affected <- df_result |>
-          tidytable::filter(feature_id %in% affected_fids) |>
-          tidytable::arrange(
-            feature_id,
-            tidytable::desc(cluster_consensus_promoted_from_anchor),
-            rank_final
-          ) |>
-          tidytable::mutate(
-            rank_final = tidytable::row_number(),
-            .by = feature_id
-          )
-        df_unaffected <- df_result |>
-          tidytable::filter(!feature_id %in% affected_fids)
-        df_result <- tidytable::bind_rows(df_affected, df_unaffected) |>
-          tidytable::arrange(feature_id, rank_final)
-      } else {
-        df_result <- df_result |>
-          tidytable::arrange(feature_id, rank_final)
-      }
-
       log_info(
         "Enforced cluster entity consensus for %d features (anchor InChIKey promoted to rank 1)",
         tidytable::n_distinct(groups_with_anchor$feature_id)
