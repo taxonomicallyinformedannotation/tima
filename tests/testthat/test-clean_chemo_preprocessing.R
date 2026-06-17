@@ -96,6 +96,7 @@ test_that("filter_ms1_annotations drops MS1-only candidates when feature has MS2
     candidate_score_sirius_csi = c(NA, NA, NA, NA),
     candidate_score_sirius_confidence = c(NA, NA, NA, NA)
   )
+  # minimal_ms1_bio=0.5, minimal_ms1_chemo=0.5, combined via "OR" mode
   out <- filter_ms1_annotations(df, 0.5, 0.5, "OR")
   # F1: IK1 has MS2 so it is kept; IK2 (MS1-only) must be dropped because F1
   # has at least one MS2 candidate.
@@ -132,6 +133,7 @@ test_that("filter_ms1_annotations preserves all MS1-only rows when no feature ha
     candidate_score_sirius_csi = c(NA, NA),
     candidate_score_sirius_confidence = c(NA, NA)
   )
+  # minimal_ms1_bio=0.5, minimal_ms1_chemo=0.5, combined via "OR" mode
   out <- filter_ms1_annotations(df, 0.5, 0.5, "OR")
   expect_equal(nrow(out), 2L)
 })

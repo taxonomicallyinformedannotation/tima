@@ -85,10 +85,7 @@ summarize_results <- function(
   if (is.null(feature_consensus_table)) {
     if (is.null(annot_table_wei_chemo)) {
       cli::cli_abort(
-        paste0(
-          "Either `feature_consensus_table` or `annot_table_wei_chemo` must ",
-          "be provided when `feature_consensus_table` is NULL"
-        ),
+        "Either `feature_consensus_table` or `annot_table_wei_chemo` must be provided.",
         class = c("tima_validation_error", "tima_error"),
         call = NULL
       )

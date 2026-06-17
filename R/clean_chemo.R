@@ -228,7 +228,6 @@ clean_chemo <- function(
   # organism_lookup are already built, and summarize_results no longer needs
   # annot_table_wei_chemo when feature_consensus_table is pre-supplied.
   rm(annot_table_wei_chemo)
-  invisible(gc())
 
   organism_lookup <- .build_organism_lookup(
     structure_organism_pairs_table = structure_organism_pairs_table,
