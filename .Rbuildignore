@@ -9,8 +9,8 @@ CITATION.cff
 ^\.github$
 ^\.idea$
 ^\.lintr$
-^\.quarto$
 ^\.pre-commit-config\.yaml$
+^\.quarto$
 ^\.vscode$
 ^_pkgdown\.yml$
 ^_quarto$
