@@ -401,14 +401,13 @@ prepare_ranked_candidates <- function(
   # Enforce cluster-level entity consensus if components_table is provided
   # This ensures that features within the same connected component agree on
   # their candidate structures, improving annotation coherence.
-  ## TODO Not fully correct for now
-  # if (!is.null(components_table) && nrow(components_table) > 0L) {
-  #   df_ranked <- enforce_cluster_entity_consensus(
-  #     df_ranked,
-  #     components_table
-  #   )
-  #   log_debug("Applied cluster-level entity consensus filtering")
-  # }
+  if (!is.null(components_table) && nrow(components_table) > 0L) {
+    df_ranked <- enforce_cluster_entity_consensus(
+      df_ranked,
+      components_table
+    )
+    log_debug("Applied cluster-level entity consensus filtering")
+  }
 
   sampling_result <- sample_candidates_per_group(
     df = df_ranked,
@@ -1039,7 +1038,12 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
           ))
         )
 
-      # Combine reordered with unchanged rows
+      # Combine reordered with unchanged rows.
+      # After grouped row_number() inside df_part_reorder, a feature with
+      # candidates for multiple M values may have duplicate rank_final values
+      # (each M group was ranked independently 1, 2, 3, ...).
+      # Re-rank globally per feature so that promoted anchor rows sort first,
+      # followed by the remaining candidates in their current order.
       df_unchanged <- df_with_comp |>
         tidytable::anti_join(
           y = groups_with_anchor,
@@ -1060,9 +1064,51 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
           ))
         )
 
-      df_result <- df_part_reorder |>
-        tidytable::bind_rows(df_unchanged) |>
-        tidytable::arrange(feature_id, rank_final)
+      affected_fids <- unique(df_part_reorder$feature_id)
+
+      df_result <- tidytable::bind_rows(df_part_reorder, df_unchanged)
+
+      if (length(affected_fids) > 0L) {
+        df_affected <- df_result |>
+          tidytable::filter(feature_id %in% affected_fids) |>
+          tidytable::arrange(
+            feature_id,
+            tidytable::desc(cluster_consensus_promoted_from_anchor),
+            rank_final
+          ) |>
+          tidytable::mutate(
+            rank_final = tidytable::row_number(),
+            .by = feature_id
+          )
+        df_unaffected <- df_result |>
+          tidytable::filter(!feature_id %in% affected_fids)
+        df_result <- tidytable::bind_rows(df_affected, df_unaffected) |>
+          tidytable::arrange(feature_id, rank_final)
+      } else {
+        df_result <- df_result |>
+          tidytable::arrange(feature_id, rank_final)
+      }
+
+      if (length(affected_fids) > 0L) {
+        df_affected <- df_result |>
+          tidytable::filter(feature_id %in% affected_fids) |>
+          tidytable::arrange(
+            feature_id,
+            tidytable::desc(cluster_consensus_promoted_from_anchor),
+            rank_final
+          ) |>
+          tidytable::mutate(
+            rank_final = tidytable::row_number(),
+            .by = feature_id
+          )
+        df_unaffected <- df_result |>
+          tidytable::filter(!feature_id %in% affected_fids)
+        df_result <- tidytable::bind_rows(df_affected, df_unaffected) |>
+          tidytable::arrange(feature_id, rank_final)
+      } else {
+        df_result <- df_result |>
+          tidytable::arrange(feature_id, rank_final)
+      }
 
       log_info(
         "Enforced cluster entity consensus for %d features (anchor InChIKey promoted to rank 1)",

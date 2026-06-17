@@ -14,12 +14,9 @@
 #'     assignments
 #' @param structure_organism_pairs_table [data.frame] Data frame with
 #'     structure-organism pairs
-#' @param annot_table_wei_chemo [data.frame] Optional data frame with chemically
-#'     weighted annotations. Required only when `feature_consensus_table` is
-#'     NULL, to build feature-level consensus metadata. When
-#'     `feature_consensus_table` is already supplied (the recommended path from
-#'     `clean_chemo`), this may be NULL, allowing the caller to free the table
-#'     from memory before calling this function.
+#' @param annot_table_wei_chemo [data.frame] Data frame with chemically weighted
+#'     annotations. Used to build feature-level consensus metadata for features
+#'     without candidate structures.
 #' @param remove_ties [logical] Logical whether to remove tied scores (keep only
 #'     highest)
 #' @param summarize [logical] Logical whether to collapse to 1 row per feature
@@ -45,12 +42,10 @@ summarize_results <- function(
   features_table,
   components_table,
   structure_organism_pairs_table,
-  annot_table_wei_chemo = NULL,
+  annot_table_wei_chemo,
   remove_ties,
   summarize,
-  annotation_notes_lookup = NULL,
-  feature_consensus_table = NULL,
-  organism_lookup = NULL
+  annotation_notes_lookup = NULL
 ) {
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
@@ -82,19 +77,10 @@ summarize_results <- function(
   log_debug("Remove ties: %s, Summarize: %s", remove_ties, summarize)
 
   model <- columns_model()
-  if (is.null(feature_consensus_table)) {
-    if (is.null(annot_table_wei_chemo)) {
-      cli::cli_abort(
-        "Either `feature_consensus_table` or `annot_table_wei_chemo` must be provided.",
-        class = c("tima_validation_error", "tima_error"),
-        call = NULL
-      )
-    }
-    feature_consensus_table <- .build_feature_consensus_table(
-      annot_table_wei_chemo = annot_table_wei_chemo,
-      model = model
-    )
-  }
+  feature_consensus_table <- .build_feature_consensus_table(
+    annot_table_wei_chemo = annot_table_wei_chemo,
+    model = model
+  )
   candidate_id_cols <- grep(
     pattern = "^candidate_structure_id_",
     x = names(df),
@@ -106,12 +92,10 @@ summarize_results <- function(
       tidytable::mutate(reference_doi = NA_character_)
   }
 
-  if (is.null(organism_lookup)) {
-    organism_lookup <- .build_organism_lookup(
-      structure_organism_pairs_table = structure_organism_pairs_table,
-      df = df
-    )
-  }
+  organism_lookup <- .build_organism_lookup(
+    structure_organism_pairs_table = structure_organism_pairs_table,
+    df = df
+  )
 
   # Define columns to select
   select_cols <- c(

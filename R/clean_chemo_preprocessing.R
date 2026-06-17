@@ -286,34 +286,11 @@ filter_ms1_annotations <- function(
     )
   }
 
-  # Step 1: apply per-row pre-filter (keep MS2 rows OR MS1 rows that meet
+  # Apply per-row pre-filter (keep MS2 rows OR MS1 rows that meet
   # score thresholds). This removes low-quality MS1 candidates that are not
   # backed by any biological/chemical evidence.
   result <- annot_table_wei_chemo |>
-    tidytable::mutate(.has_ms2 = !!has_ms2) |>
-    tidytable::filter(.has_ms2 | !!ms1_condition)
-
-  # Step 2: for features that have at least one MS2-annotated candidate, drop
-  # all MS1-only candidates. MS2 evidence (spectral or SIRIUS) is always
-  # superior to MS1-only mass-match evidence for the same feature.
-  n_before <- nrow(result)
-  result <- result |>
-    tidytable::mutate(
-      .any_ms2_in_feature = any(.has_ms2, na.rm = TRUE),
-      .by = feature_id
-    ) |>
-    tidytable::filter(!.any_ms2_in_feature | .has_ms2) |>
-    tidytable::select(
-      -tidyselect::any_of(c(".has_ms2", ".any_ms2_in_feature"))
-    )
-
-  n_dropped <- n_before - nrow(result)
-  if (n_dropped > 0L) {
-    log_debug(
-      "Dropped %d MS1-only candidate(s) for feature(s) that also have MS2 annotations",
-      n_dropped
-    )
-  }
+    tidytable::filter(!!has_ms2 | !!ms1_condition)
 
   result
 }

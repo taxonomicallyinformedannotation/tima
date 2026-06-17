@@ -1726,7 +1726,13 @@ build_annotate_masses_candidate_hypotheses <- function(
     features_table = features_table,
     tolerance_ppm = tolerance_ppm,
     tolerance_dalton = tolerance_dalton
-  ) |>
+  )
+
+  # Save attributes before chaining (tidytable operations drop custom attrs)
+  feature_m_map <- attr(node_hypotheses, "feature_m_map")
+  component_membership <- attr(node_hypotheses, "component_membership")
+
+  node_hypotheses <- node_hypotheses |>
     tidytable::mutate(
       mass = calculate_mass_of_m_batch(
         adducts = adduct,
@@ -1749,6 +1755,32 @@ build_annotate_masses_candidate_hypotheses <- function(
   node_hypotheses <- node_hypotheses |>
     tidytable::filter(!is.na(mass) & is.finite(mass) & mass > 0)
 
+  # Enforce M-consistency: for features with a consensus M from adduct-edge
+  # evidence, discard any hypothesis whose implied neutral mass does not agree
+  # with that consensus within the configured tolerance. Cluster and loss
+  # expansion can produce adducts that map to a different M than the one the
+  # network has determined; removing these prevents inflated candidate counts.
+  if (!is.null(feature_m_map) && nrow(feature_m_map) > 0L) {
+    node_hypotheses <- node_hypotheses |>
+      tidytable::left_join(
+        feature_m_map |> tidytable::select(feature_id, .consensus_m = neutral_mass),
+        by = "feature_id"
+      ) |>
+      tidytable::filter(
+        is.na(.consensus_m) |
+          abs(mass - .consensus_m) <=
+            pmax(
+              tolerance_ppm * 1e-6 * .consensus_m,
+              if (!is.null(tolerance_dalton)) tolerance_dalton else 0
+            )
+      ) |>
+      tidytable::select(-tidyselect::any_of(".consensus_m"))
+  }
+
+  # Restore custom attributes lost through tidytable operations
+  attr(node_hypotheses, "feature_m_map") <- feature_m_map
+  attr(node_hypotheses, "component_membership") <- component_membership
+
   if (nrow(multi_adducts) > 0L && nrow(node_hypotheses) > 0L) {
     multi_seed <- node_hypotheses |>
       tidytable::filter(candidate_adduct_origin == "supported")
@@ -1766,6 +1798,9 @@ build_annotate_masses_candidate_hypotheses <- function(
         multi_hypotheses
       ) |>
         dedupe_node_hypotheses()
+      # Restore attributes that bind_rows/dedupe may have dropped
+      attr(node_hypotheses, "feature_m_map") <- feature_m_map
+      attr(node_hypotheses, "component_membership") <- component_membership
       log_info(
         "Constrained multi-adduct expansion kept %d hypothesis row(s)",
         nrow(multi_hypotheses)

@@ -183,16 +183,25 @@ test_that("summarize=TRUE collapses to one row per feature", {
   }
 })
 
-# ---- optional annot_table_wei_chemo -----------------------------------------
+# ---- annot_table_wei_chemo is always used -----------------------------------
 
-test_that("summarize_results works when annot_table_wei_chemo is NULL but feature_consensus_table is provided", {
+test_that("summarize_results uses annot_table_wei_chemo to build feature metadata", {
   d <- make_sop_df()
-  # Build feature_consensus_table via the internal helper (same path as clean_chemo).
-  # Internal functions are accessible within package tests.
-  fct <- .build_feature_consensus_table(
+  out <- summarize_results(
+    df = d$df,
+    features_table = d$features,
+    components_table = d$components,
+    structure_organism_pairs_table = d$sop,
     annot_table_wei_chemo = d$chemo,
-    model = columns_model()
+    remove_ties = FALSE,
+    summarize = FALSE
   )
+  expect_s3_class(out, "data.frame")
+  expect_true("feature_id" %in% names(out))
+})
+
+test_that("summarize_results with NULL annot_table_wei_chemo still returns a data frame (uses empty consensus)", {
+  d <- make_sop_df()
   out <- summarize_results(
     df = d$df,
     features_table = d$features,
@@ -200,26 +209,8 @@ test_that("summarize_results works when annot_table_wei_chemo is NULL but featur
     structure_organism_pairs_table = d$sop,
     annot_table_wei_chemo = NULL,
     remove_ties = FALSE,
-    summarize = FALSE,
-    feature_consensus_table = fct
+    summarize = FALSE
   )
   expect_s3_class(out, "data.frame")
   expect_true("feature_id" %in% names(out))
-})
-
-test_that("summarize_results errors when both annot_table_wei_chemo and feature_consensus_table are NULL", {
-  d <- make_sop_df()
-  expect_error(
-    summarize_results(
-      df = d$df,
-      features_table = d$features,
-      components_table = d$components,
-      structure_organism_pairs_table = d$sop,
-      annot_table_wei_chemo = NULL,
-      remove_ties = FALSE,
-      summarize = FALSE,
-      feature_consensus_table = NULL
-    ),
-    class = "tima_validation_error"
-  )
 })
