@@ -417,7 +417,10 @@ clean_bio <- function(
   # Step 2: join edges with compact target taxonomies
   # rows: (feature_source, feature_target, taxonomy_val, best_score)
   df_level <- edges_filtered |>
-    tidytable::inner_join(target_taxonomy, by = c("feature_target" = "feature_id"))
+    tidytable::inner_join(
+      target_taxonomy,
+      by = c("feature_target" = "feature_id")
+    )
 
   if (nrow(df_level) == 0L) {
     return(empty_result)
@@ -448,9 +451,13 @@ clean_bio <- function(
   count_per_group |>
     tidytable::left_join(total_targets_per_source, by = "feature_source") |>
     tidytable::mutate(!!as.name(consistency_name) := count / n_targets) |>
-    tidytable::left_join(score_per_group, by = c("feature_source", candidates)) |>
+    tidytable::left_join(
+      score_per_group,
+      by = c("feature_source", candidates)
+    ) |>
     tidytable::mutate(
-      !!as.name(feature_score_name) := !!as.name(consistency_name) * score_weighted_bio
+      !!as.name(feature_score_name) := !!as.name(consistency_name) *
+        score_weighted_bio
     ) |>
     tidytable::arrange(-!!as.name(feature_score_name)) |>
     tidytable::distinct(feature_source, .keep_all = TRUE) |>
@@ -498,7 +505,10 @@ clean_bio <- function(
     tidytable::distinct(feature_id)
 
   total_targets_per_source <- edges_filtered |>
-    tidytable::inner_join(annotated_target_ids, by = c("feature_target" = "feature_id")) |>
+    tidytable::inner_join(
+      annotated_target_ids,
+      by = c("feature_target" = "feature_id")
+    ) |>
     tidytable::summarize(
       n_targets = tidytable::n_distinct(feature_target),
       .by = "feature_source"

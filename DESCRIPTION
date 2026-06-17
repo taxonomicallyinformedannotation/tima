@@ -227,3 +227,4 @@ Language: en-US
 LazyData: TRUE
 biocViews: metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome
 X-schema.org-keywords: metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome
+RoxygenNote: 7.3.1
