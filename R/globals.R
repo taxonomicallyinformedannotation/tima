@@ -676,6 +676,10 @@ utils::globalVariables(
     "mz_slope",
     "src_assigned_key",
     "src_mass_out",
-    "src_score"
+    "src_score",
+    ".note_present",
+    ".rank_num",
+    ".score_num",
+    ".score_present"
   )
 )
