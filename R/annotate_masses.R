@@ -963,100 +963,12 @@ filter_modifier_edges_by_assigned_adducts <- function(
     return(list(cluster_edges = cluster_labeled, loss_edges = loss_labeled))
   }
 
-  edge_supported_any_combo <- function(
-    src_adducts,
-    dest_adducts,
-    modifier,
-    relation
-  ) {
-    src_adducts <- unique(stats::na.omit(as.character(src_adducts)))
-    dest_adducts <- unique(stats::na.omit(as.character(dest_adducts)))
-    if (length(src_adducts) == 0L || length(dest_adducts) == 0L) {
-      return(TRUE)
-    }
-    modifier <- normalize_modifier_formula_term(modifier)
-    if (is.na(modifier) || !nzchar(modifier)) {
-      return(TRUE)
-    }
-
-    if (identical(relation, "cluster")) {
-      expected_dest <- unique(apply_modifier_to_adducts(
-        src_adducts,
-        modifier,
-        "+"
-      ))
-      state_map <- build_adduct_state_key_map(unique(c(
-        expected_dest,
-        dest_adducts
-      )))
-      key_lookup <- stats::setNames(state_map$state_key, state_map$adduct)
-      return(any(
-        unname(key_lookup[expected_dest]) %in% unname(key_lookup[dest_adducts])
-      ))
-    }
-
-    if (identical(relation, "loss")) {
-      expected_product <- unique(apply_modifier_to_adducts(
-        dest_adducts,
-        modifier,
-        "-"
-      ))
-      state_map <- build_adduct_state_key_map(unique(c(
-        expected_product,
-        src_adducts
-      )))
-      key_lookup <- stats::setNames(state_map$state_key, state_map$adduct)
-      return(any(
-        unname(key_lookup[expected_product]) %in%
-          unname(key_lookup[src_adducts])
-      ))
-    }
-
-    TRUE
-  }
-
-  filter_edges <- function(edges, relation, modifier_col) {
-    if (nrow(edges) == 0L || nrow(assigned_nodes) == 0L) {
-      return(edges)
-    }
-
-    src_map <- split(assigned_nodes$adduct, assigned_nodes$feature_id)
-    keep_flag <- vapply(
-      seq_len(nrow(edges)),
-      function(i) {
-        src_id <- edges$feature_id[[i]]
-        dest_id <- edges$feature_id_dest[[i]]
-        src_adducts <- src_map[[src_id]]
-        dest_adducts <- src_map[[dest_id]]
-        if (is.null(src_adducts) || is.null(dest_adducts)) {
-          return(TRUE)
-        }
-        modifier <- edges[[modifier_col]][[i]]
-        edge_supported_any_combo(
-          src_adducts = src_adducts,
-          dest_adducts = dest_adducts,
-          modifier = modifier,
-          relation = relation
-        )
-      },
-      logical(1L)
-    )
-
-    edges[keep_flag, , drop = FALSE]
-  }
-
-  cluster_kept <- filter_edges(
-    cluster_edges,
-    relation = "cluster",
-    modifier_col = "cluster"
+  # Unlabeled modifier edges (no adduct/adduct_dest columns) come from direct
+  # delta matching and should not be pruned against assigned adduct states.
+  list(
+    cluster_edges = cluster_edges |> tidytable::distinct(),
+    loss_edges = loss_edges |> tidytable::distinct()
   )
-  loss_kept <- filter_edges(
-    loss_edges,
-    relation = "loss",
-    modifier_col = "loss"
-  )
-
-  list(cluster_edges = cluster_kept, loss_edges = loss_kept)
 }
 
 #' Load prepared features and structural library for annotate_masses

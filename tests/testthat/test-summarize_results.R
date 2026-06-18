@@ -182,3 +182,31 @@ test_that("summarize=TRUE collapses to one row per feature", {
     expect_equal(nrow(out), length(unique(out$feature_id)))
   }
 })
+
+test_that("no-structure rows are not duplicated by mixed annotation notes", {
+  d <- make_sop_df(n_features = 2L, n_cand = 2L)
+
+  d$df <- d$df |>
+    tidytable::filter(feature_id == "FT1") |>
+    tidytable::mutate(
+      candidate_structure_inchikey_connectivity_layer = NA_character_,
+      rank_final = 1L
+    )
+
+  d$chemo <- data.frame(
+    feature_id = c("FT1", "FT1"),
+    annotation_note = c(
+      "Spectral match rescued in neutral-mass space: observed adduct [M+K]+, library adduct [M+H]+",
+      NA_character_
+    ),
+    stringsAsFactors = FALSE
+  )
+
+  out <- call_sr(d, summarize = FALSE)
+  out_ft1 <- out[out$feature_id == "FT1", , drop = FALSE]
+
+  expect_equal(nrow(out_ft1), 1L)
+  if ("annotation_note" %in% names(out_ft1)) {
+    expect_true(grepl("neutral-mass space", out_ft1$annotation_note[[1L]]))
+  }
+})

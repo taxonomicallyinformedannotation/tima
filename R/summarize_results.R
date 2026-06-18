@@ -262,8 +262,9 @@ summarize_results <- function(
         x = c(
           model$features_columns,
           model$features_calculated_columns,
-          model$components_columns,
-          "annotation_note"
+          model$components_columns
+          ## Do not keep it if no structure
+          # "annotation_note"
         )
       )
     ) |>
@@ -400,24 +401,49 @@ summarize_results <- function(
 }
 
 .build_feature_consensus_table <- function(annot_table_wei_chemo, model) {
-  annot_table_wei_chemo |>
+  base_cols <- c(
+    model$features_columns,
+    "rt",
+    "mz",
+    model$features_calculated_columns,
+    model$components_columns,
+    "annotation_note"
+  )
+
+  consensus_src <- annot_table_wei_chemo |>
     tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          model$features_columns,
-          "rt",
-          "mz",
-          model$features_calculated_columns,
-          model$components_columns,
-          "annotation_note"
-        )
-      )
-    ) |>
+      tidyselect::any_of(c(base_cols, "score_weighted_chemo", "rank_final"))
+    )
+  if (!"annotation_note" %in% names(consensus_src)) {
+    consensus_src$annotation_note <- NA_character_
+  }
+  if (!"score_weighted_chemo" %in% names(consensus_src)) {
+    consensus_src$score_weighted_chemo <- NA_character_
+  }
+  if (!"rank_final" %in% names(consensus_src)) {
+    consensus_src$rank_final <- NA_character_
+  }
+
+  consensus_src |>
     tidytable::mutate(
       tidytable::across(
         .cols = tidyselect::everything(),
         .fns = as.character
-      )
+      ),
+      .note_present = !is.na(annotation_note) & nzchar(trimws(annotation_note)),
+      .score_num = suppressWarnings(as.numeric(score_weighted_chemo)),
+      .rank_num = suppressWarnings(as.numeric(rank_final)),
+      .score_present = !is.na(.score_num)
     ) |>
-    tidytable::distinct()
+    tidytable::arrange(
+      feature_id,
+      tidytable::desc(.note_present),
+      tidytable::desc(.score_present),
+      tidytable::desc(.score_num),
+      .rank_num
+    ) |>
+    tidytable::group_by(feature_id) |>
+    tidytable::slice_head(n = 1L) |>
+    tidytable::ungroup() |>
+    tidytable::select(tidyselect::any_of(base_cols))
 }

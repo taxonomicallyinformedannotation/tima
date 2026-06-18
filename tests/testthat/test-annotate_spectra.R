@@ -795,8 +795,14 @@ test_that("annotate_spectra returns empty template when cleaned library is empty
       libs_vec,
       dalton,
       polarity,
-      ppm
+      ppm,
+      approx = TRUE,
+      query_precursors = NULL,
+      query_adducts = NULL
     ) {
+      invisible(approx)
+      invisible(query_precursors)
+      invisible(query_adducts)
       list()
     },
     annotate_spectra_handle_empty_result = function(
@@ -851,20 +857,25 @@ test_that("annotate_spectra returns empty template when precursor reduction remo
       libs_vec,
       dalton,
       polarity,
-      ppm
+      ppm,
+      approx = TRUE,
+      query_precursors = NULL,
+      query_adducts = NULL
     ) {
-      list("lib")
+      invisible(libs_vec)
+      invisible(dalton)
+      invisible(polarity)
+      invisible(ppm)
+      invisible(query_precursors)
+      invisible(query_adducts)
+      if (isTRUE(approx)) {
+        list("lib")
+      } else {
+        list()
+      }
     },
     log_library_stats = function(spectral_library) invisible(NULL),
     get_precursors = function(x) 100,
-    reduce_library_by_precursor = function(
-      lib_sp,
-      query_precursors,
-      dalton,
-      ppm
-    ) {
-      list()
-    },
     annotate_spectra_handle_empty_result = function(
       path,
       params,

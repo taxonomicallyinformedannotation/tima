@@ -187,7 +187,8 @@ prepare_annotations_spectra <- function(
       str_met = str_met,
       str_tax_cla = str_tax_cla,
       str_tax_npc = str_tax_npc
-    )
+    ) |>
+    tidytable::filter(!is.na(candidate_structure_inchikey_connectivity_layer))
 
   export_params(
     parameters = get_params(step = "prepare_annotations_spectra"),

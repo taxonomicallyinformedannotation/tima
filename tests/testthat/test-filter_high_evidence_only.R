@@ -86,7 +86,9 @@ test_that("filter_high_evidence_only applies confidence and similarity with OR l
     score_biological = c(0.2, 0.2, 0.2, 0.2, 0.2),
     score_weighted_chemo = c(0.9, 0.9, 0.9, 0.9, 0.9),
     candidate_score_sirius_confidence = c(0.95, 0.7, 0.99, NA_real_, 0.94),
-    candidate_score_pseudo_initial = c(0.8, 0.95, 0.6, NA_real_, NA_real_)
+    candidate_score_pseudo_initial = c(0.8, 0.95, 0.6, NA_real_, NA_real_),
+    candidate_score_similarity_forward = c(0.8, 0.95, 0.6, NA_real_, NA_real_),
+    candidate_score_similarity_reverse = c(0.8, 0.95, 0.6, NA_real_, NA_real_)
   )
   # With confidence >= 0.9 and similarity >= 0.75 (OR logic):
   # F1: conf=0.95 ✓ OR sim=0.8 ✓ → PASS (both pass)
@@ -174,7 +176,9 @@ test_that("filter_high_evidence_only SIRIUS OR spectral both fail", {
     score_biological = c(0.2),
     score_weighted_chemo = c(0.9),
     candidate_score_sirius_confidence = c(0.5),
-    candidate_score_pseudo_initial = c(0.5)
+    candidate_score_pseudo_initial = c(0.5),
+    candidate_score_similarity_forward = c(0.5),
+    candidate_score_similarity_reverse = c(0.5)
   )
 
   result <- filter_high_evidence_only(
@@ -310,6 +314,8 @@ test_that("filter_high_evidence_only lets promoted children inherit anchor evide
     score_weighted_chemo = c(0.96, 0.10),
     candidate_structure_error_rt = c(0.01, 0.30),
     candidate_score_sirius_confidence = c(0.92, 0.10),
+    candidate_score_similarity_forward = c(0.92, 0.10),
+    candidate_score_similarity_reverse = c(0.92, 0.10),
     candidate_count_similarity_peaks_matched = c(5L, 1L),
     candidate_adduct_origin = c("supported", "baseline"),
     candidate_annotation_level = c("primary", "secondary"),
@@ -469,6 +475,22 @@ test_that("filter_high_evidence_only with all optional filters combined (OR logi
       0.5
     )),
     candidate_score_pseudo_initial = as.numeric(c(
+      0.8,
+      0.95,
+      0.6,
+      0.85,
+      NA,
+      0.6
+    )),
+    candidate_score_similarity_forward = as.numeric(c(
+      0.8,
+      0.95,
+      0.6,
+      0.85,
+      NA,
+      0.6
+    )),
+    candidate_score_similarity_reverse = as.numeric(c(
       0.8,
       0.95,
       0.6,

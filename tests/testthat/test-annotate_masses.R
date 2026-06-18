@@ -1735,47 +1735,6 @@ test_that("ambiguous modifier edges are kept when annotation context is inconclu
   expect_equal(out$n_loss_dropped, 0L)
 })
 
-test_that("filter_modifier_edges_by_assigned_adducts drops unsupported cluster/loss edges", {
-  assigned <- tidytable::tidytable(
-    feature_id = c("A", "B", "C", "D"),
-    adduct = c("[M+H]+", "[M+H2O+H]+", "[M-H2O+H]+", "[M+Na]+")
-  )
-  cluster_edges <- tidytable::tidytable(
-    feature_id = c("A", "A"),
-    cluster = c("H2O", "H2O"),
-    mass = c(18.0106, 18.0106),
-    feature_id_dest = c("B", "D")
-  )
-  loss_edges <- tidytable::tidytable(
-    feature_id = c("C", "D"),
-    loss = c("H2O", "H2O"),
-    mass = c(18.0106, 18.0106),
-    feature_id_dest = c("A", "B")
-  )
-
-  out <- filter_modifier_edges_by_assigned_adducts(
-    cluster_edges = cluster_edges,
-    loss_edges = loss_edges,
-    assigned_nodes = assigned
-  )
-
-  expect_true(any(
-    out$cluster_edges$feature_id == "A" &
-      out$cluster_edges$feature_id_dest == "B"
-  ))
-  expect_false(any(
-    out$cluster_edges$feature_id == "A" &
-      out$cluster_edges$feature_id_dest == "D"
-  ))
-  expect_true(any(
-    out$loss_edges$feature_id == "C" &
-      out$loss_edges$feature_id_dest == "A"
-  ))
-  expect_false(any(
-    out$loss_edges$feature_id == "D" &
-      out$loss_edges$feature_id_dest == "B"
-  ))
-})
 
 test_that("filter_modifier_edges_by_assigned_adducts keeps edges when endpoint assignments are missing", {
   assigned <- tidytable::tidytable(

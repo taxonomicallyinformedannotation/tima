@@ -231,41 +231,27 @@ annotate_spectra <- function(
     libs_vec,
     dalton = dalton,
     polarity = polarity,
-    ppm = ppm
+    ppm = ppm,
+    approx = approx,
+    query_precursors = query_precursors,
+    query_adducts = query_meta$query_adduct
   )
   if (length(spectral_library) == 0L) {
+    empty_reason <- if (isTRUE(approx)) {
+      "No spectra left in library after cleaning"
+    } else {
+      "No spectra remain after precursor-based reduction"
+    }
     return(
       annotate_spectra_handle_empty_result(
         output_path,
         params,
-        "No spectra left in library after cleaning"
+        empty_reason
       )
     )
   }
 
   log_library_stats(spectral_library)
-
-  if (!approx) {
-    reduce_args <- list(
-      lib_sp = spectral_library,
-      query_precursors = query_precursors,
-      dalton = dalton,
-      ppm = ppm
-    )
-    if ("query_adducts" %in% names(formals(reduce_library_by_precursor))) {
-      reduce_args$query_adducts <- query_meta$query_adduct
-    }
-    spectral_library <- do.call(reduce_library_by_precursor, reduce_args)
-    if (length(spectral_library) == 0L) {
-      return(
-        annotate_spectra_handle_empty_result(
-          output_path,
-          params,
-          "No spectra remain after precursor-based reduction"
-        )
-      )
-    }
-  }
 
   log_debug(
     "Annotating %d query spectra against %d library references",
@@ -433,24 +419,100 @@ filter_library_paths_by_polarity <- function(paths, polarity) {
 }
 
 #' @keywords internal
-import_and_clean_library_collection <- function(paths, dalton, polarity, ppm) {
-  paths |>
-    purrr::map(
-      import_spectra,
+import_and_clean_library_collection <- function(
+  paths,
+  dalton,
+  polarity,
+  ppm,
+  approx = TRUE,
+  query_precursors = NULL,
+  query_adducts = NULL
+) {
+  if (length(paths) == 0L) {
+    return(Spectra::Spectra())
+  }
+
+  cleaned <- vector("list", length(paths))
+  keep_i <- 0L
+
+  for (i in seq_along(paths)) {
+    pth <- paths[[i]]
+    t0 <- Sys.time()
+
+    sp <- import_spectra(
+      file = pth,
       cutoff = 0,
       dalton = dalton,
       polarity = polarity,
       ppm = ppm,
       sanitize = FALSE,
       combine = FALSE
-    ) |>
-    purrr::map(
-      Spectra::applyProcessing,
-      BPPARAM = BiocParallel::SerialParam()
-    ) |>
-    purrr::map(.f = remove_empty_peak_spectra) |>
-    purrr::map(.f = strip_backend_rownames) |>
-    Spectra::concatenateSpectra()
+    )
+
+    if (needs_apply_processing(sp)) {
+      sp <- Spectra::applyProcessing(
+        sp,
+        BPPARAM = BiocParallel::SerialParam()
+      )
+    }
+
+    sp <- remove_empty_peak_spectra(sp)
+    sp <- strip_backend_rownames(sp)
+
+    if (!approx && length(sp) > 0L) {
+      sp <- reduce_library_by_precursor(
+        lib_sp = sp,
+        query_precursors = query_precursors,
+        query_adducts = query_adducts,
+        dalton = dalton,
+        ppm = ppm
+      )
+    }
+
+    if (length(sp) > 0L) {
+      keep_i <- keep_i + 1L
+      cleaned[[keep_i]] <- sp
+    }
+
+    log_debug(
+      "Library %d/%d processed (%s): %d spectra kept in %.2f seconds",
+      i,
+      length(paths),
+      basename(pth),
+      length(sp),
+      as.numeric(difftime(Sys.time(), t0, units = "secs"))
+    )
+
+    rm(sp)
+    if (i %% 2L == 0L) {
+      invisible(gc(verbose = FALSE))
+    }
+  }
+
+  if (keep_i == 0L) {
+    return(Spectra::Spectra())
+  }
+  cleaned <- cleaned[seq_len(keep_i)]
+  if (keep_i == 1L) {
+    return(cleaned[[1L]])
+  }
+
+  Spectra::concatenateSpectra(cleaned)
+}
+
+#' @keywords internal
+needs_apply_processing <- function(sp) {
+  if (!methods::is(sp, "Spectra")) {
+    return(FALSE)
+  }
+  q <- tryCatch(
+    sp@backend@processingQueue,
+    error = function(.e) {
+      invisible(.e)
+      NULL
+    }
+  )
+  !is.null(q) && length(q) > 0L
 }
 
 #' @keywords internal
@@ -459,6 +521,9 @@ strip_backend_rownames <- function(sp) {
     return(sp)
   }
   sd <- sp@backend@spectraData
+  if (is.null(rownames(sd))) {
+    return(sp)
+  }
   rownames(sd) <- NULL
   sp@backend@spectraData <- sd
   sp
@@ -768,7 +833,13 @@ convert_precursor_for_matching <- function(precursors, adducts) {
     }
     mz_vec <- precursors_num[idx]
     iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
-    m_vec <- (n_charges * (mz_vec - iso_shift) - mass_mods) / n_mer
+    m_vec <- (n_charges *
+      (mz_vec -
+        iso_shift -
+        ATOMIC_MONOISOTOPIC_MASS[["H"]] +
+        ELECTRON_MASS_DA) -
+      mass_mods) /
+      n_mer
     m_vec[!is.finite(m_vec) | m_vec <= 0] <- NA_real_
     valid <- !is.na(m_vec)
     out[idx[valid]] <- m_vec[valid]
