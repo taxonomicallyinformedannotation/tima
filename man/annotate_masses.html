@@ -674,10 +674,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    adducts. A match labels the edge `adduct_low _ adduct_high` and
    tentatively assigns the corresponding adduct to each endpoint.
 
-3. **Cluster edges.** Match `delta` against cluster masses (e.g. ACN,
-   MeOH, Na). A cluster adds mass to the *higher* m/z peak, so the
-   cluster suffix `+&lt;cluster&gt;` is attached to the **dest** node's
-   adduct hypotheses.
+3. **Cluster / solvent edges.** Match `delta` against modifier masses
+   (e.g. salts, solvents, ACN, MeOH, Na). A modifier adds mass to the
+   *higher* m/z peak, so the modifier suffix `+&lt;modifier&gt;` is attached
+   to the **dest** node's adduct hypotheses.
 
 4. **Neutral-loss edges.** Match `delta` against neutral-loss masses
    (e.g. H2O, CO2). For an NL pair, the **higher** m/z peak is the
@@ -727,16 +727,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$npc,
   adducts_list = get_params(step = "annotate_masses")\$ms\$adducts,
   clusters_list = get_params(step = "annotate_masses")\$ms\$clusters,
+  solvents_list = get_params(step = "annotate_masses")\$ms\$solvents,
   neutral_losses_list = get_params(step = "annotate_masses")\$ms\$neutral_losses,
   ms_mode = get_params(step = "annotate_masses")\$ms\$polarity,
   tolerance_ppm = get_params(step = "annotate_masses")\$ms\$tolerances\$mass\$ppm\$ms1,
   tolerance_dalton = get_params(step = "annotate_masses")\$ms\$tolerances\$mass\$dalton\$ms1,
-  tolerance_rt = get_params(step = "annotate_masses")\$ms\$tolerances\$rt\$adducts,
-  adduct_consistency = get_params(step = "annotate_masses")\$ms\$adducts\$consistency\$type,
-  adduct_min_support = get_params(step =
-    "annotate_masses")\$ms\$adducts\$consistency\$min_support,
-  adduct_consistency_min_degree = get_params(step =
-    "annotate_masses")\$ms\$adducts\$consistency\$min_degree
+  tolerance_rt = get_params(step = "annotate_masses")\$ms\$tolerances\$rt\$adducts
 )
 </code></pre>
 </section>
@@ -841,6 +837,14 @@ List of clusters to be used
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="solvents_list">solvents_list</code>
+</td>
+<td>
+List of solvents to be used
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
 <code id="neutral_losses_list">neutral_losses_list</code>
 </td>
 <td>
@@ -877,30 +881,6 @@ Absolute mass tolerance in Daltons for annotation
 </td>
 <td>
 Tolerance to group adducts. Should be &lt;= 0.05 minutes
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="adduct_consistency">adduct_consistency</code>
-</td>
-<td>
-Consistency mode for adduct edge filtering: one of <code>off</code>, <code>conditional</code>, <code>strict</code>
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="adduct_min_support">adduct_min_support</code>
-</td>
-<td>
-Minimum number of independent supporting neighbors for an adduct assignment in consistency-filtered regions
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="adduct_consistency_min_degree">adduct_consistency_min_degree</code>
-</td>
-<td>
-In <code>conditional</code> mode, minimum local graph degree at which support filtering is activated
 </td>
 </tr>
 </tbody></table>

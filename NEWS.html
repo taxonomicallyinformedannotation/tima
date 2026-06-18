@@ -680,6 +680,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Added common high-value losses (<code>SO2</code>, <code>SO3</code>)</li>
 </ul></li>
 <li>Added PubChem Lite as a new exposomics library, prepared through the same HMDB-like workflow as other SOP sources and flagged as <code>xenobiotic</code> (<code>Q409205</code>)</li>
+<li>Flattened <code>annotate_masses</code> modifier defaults so <code>clusters</code> and <code>solvents</code> are now single lists (no mode split), and threaded the flat schema through <code>prepare_params()</code>, the Shiny app, CLI parsing, and the annotation targets</li>
 </ul>
 </section>
 <section id="internal-performance" class="level2">
@@ -693,18 +694,27 @@ ul.task-list li input[type="checkbox"] {
 <li>Replaced single-chain evidence-edge linking with sparse k-nearest m/z linking per cluster, improving triangulation signal while preserving O(n*k) scalability</li>
 <li>Re-enabled structural plausibility filter: loss-based annotations are now demoted to unmatched when the formula cannot satisfy required atoms (e.g., <code>[M-H2O]</code> on a formula lacking oxygen)</li>
 <li>Upgraded graph-level consistency enforcement from single-pass greedy to multi-start neighbor-aware optimization: assigns adduct states to maximize coverage-aware objectives (edge satisfaction, neighbor agreement, prior support) and favors states consistent across multiple neighbors over isolated high-scoring alternatives</li>
+<li>Added bidirectional cluster and neutral-loss propagation to mirror cluster propagation</li>
+<li>Reworked cluster-vs-loss ambiguity resolution to use hypothesis-level scoring (with neighboring-edge fallback tie-breaks) and added compact audit logging of resolved vs unresolved ambiguous modifier pairs</li>
+<li>Added assignment-aware modifier-edge pruning so outdated cluster/loss links are removed when they contradict assigned adduct states, while retaining explicitly tagged contaminant edges</li>
 </ul></li>
 <li><strong>Adduct canonicalization alignment</strong>:
 <ul>
 <li>Unified canonical adduct string ordering across structured universe generation (<code>adduct_to_string()</code>) and text harmonization (<code>canonicalize_adduct_notation()</code>)</li>
 <li>Canonical order is now chemically consistent and deterministic: negative terms first (losses / deprotonations), then neutral cluster additions, then positive charge carriers</li>
 <li>Updated regression tests to use canonical forms (e.g., <code>[M-H2O+H]+</code>, <code>[M+H2O+H]+</code>, <code>[M+NaCl+K]+</code>)</li>
+<li>Improved ammonium/loss semantic reduction in harmonization (e.g., <code>[M-H5NO+H4N]+ -&gt; [M-H2O+H]+</code>, <code>[M-H3N+C2H7N+H4N]+ -&gt; [M+C2H7N+H]+</code>) to reduce duplicated/over-complex carrier notation</li>
 </ul></li>
 <li><strong>Electron-mass correctness in legacy neutral-mass math</strong>:
 <ul>
 <li><code>calculate_mass_of_m()</code>, <code>calculate_mz_from_mass()</code>, and <code>calculate_mass_of_m_batch()</code> now apply signed electron-mass correction (<code>z * m_e</code>) consistently</li>
 <li>Legacy inversion/forward formulas are now physically aligned with typed-universe mass arithmetic</li>
 <li>Consolidated electron-mass precision to a single CODATA 2018 value (<code>ELECTRON_MASS_DALTONS = 0.000548579909065</code>) and reused it as <code>ELECTRON_MASS_DA</code></li>
+</ul></li>
+<li><strong>Metadata enrichment cache robustness</strong>:
+<ul>
+<li><code>complement_metadata_structures()</code> reference cache now keys on both file path and file modification time, preventing stale cache reuse when temporary/updated reference files are rewritten during the same R session</li>
+<li>Stereo required-column validation now occurs at reference-load time before cache insertion</li>
 </ul></li>
 <li><strong>Cross-stage adduct coupling (MS1 ↔︎ MS2 ↔︎ reranking)</strong>:
 <ul>
