@@ -1262,6 +1262,7 @@ discover_evidence_adduct_signal <- function(
   features_table,
   universe = NULL,
   adducts,
+  candidate_adducts = NULL,
   clusters,
   neutral_losses,
   ms_mode,
@@ -1271,6 +1272,8 @@ discover_evidence_adduct_signal <- function(
   exact_masses
 ) {
   invisible(tolerance_dalton)
+  invisible(clusters)
+  invisible(neutral_losses)
   empty_hyp <- tidytable::tidytable(
     feature_id = character(),
     adduct = character(),
@@ -1288,11 +1291,22 @@ discover_evidence_adduct_signal <- function(
     return(list(hypotheses = empty_hyp, edges = empty_edges))
   }
 
+  if (is.null(candidate_adducts)) {
+    candidate_adducts <- adducts
+  }
+  candidate_adducts <- unique(as.character(candidate_adducts))
+  candidate_adducts <- candidate_adducts[
+    !is.na(candidate_adducts) & nzchar(candidate_adducts)
+  ]
+  if (length(candidate_adducts) == 0L) {
+    return(list(hypotheses = empty_hyp, edges = empty_edges))
+  }
+
   if (is.null(universe)) {
     universe <- build_adduct_universe(
-      adducts_list = list(pos = adducts, neg = adducts),
-      clusters_list = clusters,
-      neutral_losses_list = neutral_losses,
+      adducts_list = list(pos = candidate_adducts, neg = candidate_adducts),
+      clusters_list = list(pos = character(), neg = character()),
+      neutral_losses_list = character(),
       polarity = ms_mode
     )
   }
@@ -1716,6 +1730,29 @@ match_candidates_to_library <- function(
     )
   ] |>
     tidytable::as_tidytable() |>
+    tidytable::mutate(
+      .abs_error = abs(as.numeric(error_mz)),
+      .ppm_error = .abs_error *
+        1e6 /
+        pmax(
+          as.numeric(structure_exact_mass),
+          as.numeric(mass)
+        ),
+      .ppm_ok = if (is.null(tolerance_ppm) || !is.finite(tolerance_ppm)) {
+        TRUE
+      } else {
+        is.finite(.ppm_error) & .ppm_error <= as.numeric(tolerance_ppm)
+      },
+      .dalton_ok = if (
+        is.null(tolerance_dalton) || !is.finite(tolerance_dalton)
+      ) {
+        TRUE
+      } else {
+        is.finite(.abs_error) & .abs_error <= as.numeric(tolerance_dalton)
+      }
+    ) |>
+    tidytable::filter(.ppm_ok & .dalton_ok) |>
+    tidytable::select(-.abs_error, -.ppm_error, -.ppm_ok, -.dalton_ok) |>
     tidytable::distinct()
 }
 

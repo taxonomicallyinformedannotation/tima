@@ -476,6 +476,42 @@ build_output_edges <- function(
       tidytable::distinct()
   }
   if (nrow(loss_edges) > 0L) {
+    loss_edges <- loss_edges |>
+      tidytable::mutate(
+        .drop_redundant = vapply(
+          seq_len(nrow(loss_edges)),
+          function(i) {
+            if (!all(c("adduct", "adduct_dest") %in% colnames(adduct_edges))) {
+              return(FALSE)
+            }
+            same_pair <- adduct_edges |>
+              tidytable::filter(
+                feature_id == loss_edges$feature_id[[i]] &
+                  feature_id_dest == loss_edges$feature_id_dest[[i]]
+              )
+            if (nrow(same_pair) == 0L) {
+              return(FALSE)
+            }
+            loss_formula <- loss_edges$loss[[i]]
+            any(vapply(
+              seq_len(nrow(same_pair)),
+              function(j) {
+                adduct_has_explicit_loss(same_pair$adduct[[j]], loss_formula) &&
+                  adduct_has_explicit_loss(
+                    same_pair$adduct_dest[[j]],
+                    loss_formula
+                  )
+              },
+              logical(1L)
+            ))
+          },
+          logical(1L)
+        )
+      ) |>
+      tidytable::filter(!.drop_redundant) |>
+      tidytable::select(-.drop_redundant)
+  }
+  if (nrow(loss_edges) > 0L) {
     parts[[length(parts) + 1L]] <- loss_edges |>
       tidytable::mutate(label = paste0(loss, " loss")) |>
       tidytable::select(

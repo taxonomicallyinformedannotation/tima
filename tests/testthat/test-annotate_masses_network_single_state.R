@@ -17,7 +17,9 @@ test_that("annotate_masses keeps precise single-state identities in modifier cha
     tidytable::mutate(
       mz = vapply(
         expected_adduct,
-        function(x) calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = x),
+        function(x) {
+          calculate_mz_from_mass(neutral_mass = neutral_mass, adduct_string = x)
+        },
         numeric(1L)
       ),
       rt = 5,
@@ -90,10 +92,17 @@ test_that("annotate_masses keeps precise single-state identities in modifier cha
     observed$feature_id
   )
   expected_keys <- stats::setNames(
-    vapply(feature_adduct_map$expected_adduct, adduct_to_state_key, character(1L)),
+    vapply(
+      feature_adduct_map$expected_adduct,
+      adduct_to_state_key,
+      character(1L)
+    ),
     feature_adduct_map$feature_id
   )
-  expect_equal(unname(observed_keys[names(expected_keys)]), unname(expected_keys))
+  expect_equal(
+    unname(observed_keys[names(expected_keys)]),
+    unname(expected_keys)
+  )
 
   edge_f1_f2 <- edges |>
     tidytable::filter((src == "f1" & dst == "f2") | (src == "f2" & dst == "f1"))
@@ -103,4 +112,3 @@ test_that("annotate_masses keeps precise single-state identities in modifier cha
   expect_false(any(grepl("loss", edge_f1_f2$label, ignore.case = TRUE)))
   expect_false(any(grepl("cluster", edge_f1_f2$label, ignore.case = TRUE)))
 })
-

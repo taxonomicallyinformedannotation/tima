@@ -163,7 +163,6 @@ annotate_masses <- function(
   validate_file_existence(files_to_check)
 
   baseline_adduct <- switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
-  baseline_adducts <- baseline_adduct
 
   features_table <- safe_fread(
     file = features,
@@ -212,16 +211,18 @@ annotate_masses <- function(
     neutral_losses_list = neutral_losses_list,
     ms_mode = ms_mode
   )
-  universe <- ion_tables$universe
-  adduct_lookup <- ion_tables$adduct_lookup
   adducts <- ion_tables$adducts
   clusters <- ion_tables$clusters
   multi_adducts <- ion_tables$multi_adducts
   baseline_adducts <- ion_tables$baseline_adducts
   log_debug(
-    "Adduct universe: %d typed ion states, %d clusters",
-    nrow(universe),
-    nrow(clusters)
+    paste0(
+      "Adduct delta tables ready: %d adduct deltas, %d modifier deltas, ",
+      "%d neutral-loss deltas"
+    ),
+    nrow(ion_tables$adduct_diffs),
+    nrow(ion_tables$cluster_transitions),
+    nrow(ion_tables$loss_transitions)
   )
 
   # ---- Step 4: classify each pair --------------------------------------
@@ -229,13 +230,13 @@ annotate_masses <- function(
   edge_sets <- discover_annotate_masses_edge_sets(
     pairs = pairs,
     features_table = features_table,
-    universe = universe,
     transition_tables = list(
       adduct_diffs = ion_tables$adduct_diffs,
       cluster_transitions = ion_tables$cluster_transitions,
       loss_transitions = ion_tables$loss_transitions
     ),
     adducts = adducts,
+    evidence_seed_adducts = ion_tables$evidence_seed_adducts,
     clusters = clusters,
     neutral_losses_list = neutral_losses_list,
     ms_mode = ms_mode,
@@ -250,6 +251,17 @@ annotate_masses <- function(
   cluster_edges <- edge_sets$cluster_edges
   loss_edges <- edge_sets$loss_edges
   evidence_signal <- edge_sets$evidence_signal
+  lookup_adducts <- unique(stats::na.omit(c(
+    baseline_adducts,
+    multi_adducts$adduct,
+    already_assigned$adduct,
+    adduct_edges_combined$adduct,
+    adduct_edges_combined$adduct_dest,
+    evidence_signal$hypotheses$adduct,
+    evidence_signal$edges$adduct,
+    evidence_signal$edges$adduct_dest
+  )))
+  adduct_lookup <- build_adduct_lookup_from_strings(lookup_adducts)
 
   log_info(
     "Edge classification complete in %.2f seconds: %d adduct edges, %d cluster edges, %d loss edges",
@@ -1140,105 +1152,160 @@ build_annotate_masses_ion_tables <- function(
   neutral_losses_list,
   ms_mode
 ) {
-  adducts <- if (is.list(adducts_list) && !is.null(adducts_list[[ms_mode]])) {
-    adducts_list[[ms_mode]]
-  } else {
-    adducts_list
-  }
-  clusters <- if (is.list(clusters_list) && !is.null(clusters_list[[ms_mode]])) {
-    clusters_list[[ms_mode]]
-  } else {
-    clusters_list
-  }
-  solvents <- if (is.list(solvents_list) && !is.null(solvents_list[[ms_mode]])) {
-    solvents_list[[ms_mode]]
-  } else {
-    solvents_list
-  }
+  adducts <- resolve_annotate_masses_mode_terms(adducts_list, ms_mode)
+  adducts <- harmonize_adduct_vector(adducts)
+  clusters <- resolve_annotate_masses_mode_terms(clusters_list, ms_mode)
+  solvents <- resolve_annotate_masses_mode_terms(solvents_list, ms_mode)
   clusters <- normalize_modifier_terms(clusters)
   solvents <- normalize_modifier_terms(solvents)
   cluster_terms <- unique(c(clusters, solvents))
+  neutral_losses_mode <- resolve_annotate_masses_mode_terms(
+    neutral_losses_list,
+    ms_mode
+  )
 
   single_adducts <- select_single_charge_monomer_adducts(adducts, ms_mode)
   single_adduct_table <- build_single_legacy_adduct_mass_table(single_adducts)
+  parsed_adducts <- build_parsed_legacy_adduct_table(adducts)
+  multi_adducts <- parsed_adducts |>
+    tidytable::filter(n_iso == 0L) |>
+    tidytable::filter(n_mer != 1L | abs(z) != 1L) |>
+    tidytable::distinct(adduct)
   adduct_diffs <- build_single_adduct_pairwise_deltas(single_adduct_table)
-
   cluster_transitions <- build_modifier_mass_table(
     modifiers = cluster_terms,
     out_col = "cluster",
     strip_label = FALSE
   )
-
-  neutral_losses_mode <- if (
-    is.list(neutral_losses_list) && !is.null(neutral_losses_list[[ms_mode]])
-  ) {
-    neutral_losses_list[[ms_mode]]
-  } else {
-    neutral_losses_list
-  }
   loss_transitions <- build_modifier_mass_table(
     modifiers = normalize_modifier_terms(neutral_losses_mode),
     out_col = "loss",
     strip_label = TRUE
   )
-
-  universe <- build_adduct_universe(
-    adducts_list = adducts_list,
-    clusters_list = list(pos = cluster_terms, neg = cluster_terms),
-    neutral_losses_list = neutral_losses_list,
-    polarity = ms_mode
-  )
-  if (nrow(universe) == 0L) {
-    log_error(
-      "No valid typed adduct universe for mode '%s'. Aborting.",
-      ms_mode
-    )
-    cli::cli_abort(
-      c(
-        "no valid adduct universe rows found",
-        "x" = paste0("mode: ", ms_mode),
-        "i" = "check adduct, cluster, solvent, and neutral-loss configuration"
-      ),
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-  universe <- universe |>
-    harmonize_adducts(adducts_translations = adducts_translations)
-  universe_meta <- annotate_adduct_universe_metadata(
-    universe,
-    polarity = ms_mode
-  )
-  adduct_lookup <- build_adduct_lookup(universe_meta)
-
-  baseline_adducts <- universe_meta |>
-    tidytable::filter(n_iso == 0L) |>
-    tidytable::filter(!has_loss) |>
-    tidytable::filter(adduct_tier <= 2L) |>
-    tidytable::arrange(adduct_tier, abs(z), n_mer, adduct) |>
-    tidytable::distinct(adduct) |>
-    tidytable::pull(adduct)
-  if (length(baseline_adducts) == 0L) {
-    baseline_adducts <- switch(ms_mode, pos = "[M+H]+", neg = "[M-H]-")
-  }
-
-  multi_adducts <- universe_meta |>
-    tidytable::filter(n_iso == 0L) |>
-    tidytable::filter(lengths(clusters) == 0L & lengths(losses) == 0L) |>
-    tidytable::filter(n_mer != 1L | abs(z) != 1L) |>
-    tidytable::distinct(adduct)
+  baseline_adducts <- switch(ms_mode, pos = "[M+H]+", neg = "[M-H]-")
 
   list(
-    universe = universe_meta,
-    adduct_lookup = adduct_lookup,
     adducts = adducts,
     clusters = cluster_terms,
     baseline_adducts = baseline_adducts,
     multi_adducts = multi_adducts,
+    evidence_seed_adducts = unique(c(adducts, baseline_adducts)),
     adduct_diffs = adduct_diffs,
     cluster_transitions = cluster_transitions,
     loss_transitions = loss_transitions
   )
+}
+
+#' Harmonize a plain adduct vector to canonical notation
+#' @keywords internal
+harmonize_adduct_vector <- function(adducts) {
+  adducts <- unique(as.character(adducts))
+  adducts <- adducts[!is.na(adducts) & nzchar(adducts)]
+  if (length(adducts) == 0L) {
+    return(character())
+  }
+  tidytable::tidytable(adduct = adducts) |>
+    harmonize_adducts(adducts_translations = adducts_translations) |>
+    tidytable::pull(adduct) |>
+    unique()
+}
+
+#' Resolve a mode-specific config entry to a flat character vector
+#' @keywords internal
+resolve_annotate_masses_mode_terms <- function(x, ms_mode) {
+  if (is.list(x) && !is.null(x[[ms_mode]])) {
+    x <- x[[ms_mode]]
+  }
+  x <- unique(as.character(x))
+  x[!is.na(x) & nzchar(x)]
+}
+
+#' Parse configured adduct strings into a minimal lookup-ready table
+#' @keywords internal
+build_parsed_legacy_adduct_table <- function(adducts) {
+  adducts <- harmonize_adduct_vector(adducts)
+  if (length(adducts) == 0L) {
+    return(tidytable::tidytable(
+      adduct = character(),
+      n_mer = integer(),
+      n_iso = integer(),
+      z = integer(),
+      adduct_mass = numeric()
+    ))
+  }
+  rows <- lapply(adducts, .parse_single_legacy_adduct_row)
+  rows <- rows[!vapply(rows, is.null, logical(1L))]
+  if (length(rows) == 0L) {
+    return(tidytable::tidytable(
+      adduct = character(),
+      n_mer = integer(),
+      n_iso = integer(),
+      z = integer(),
+      adduct_mass = numeric()
+    ))
+  }
+  tidytable::as_tidytable(do.call(
+    rbind,
+    lapply(rows, function(r) {
+      data.frame(
+        adduct = r$adduct,
+        n_mer = as.integer(r$n_mer),
+        n_iso = as.integer(r$n_iso),
+        z = as.integer(r$z),
+        adduct_mass = as.numeric(r$adduct_mass),
+        stringsAsFactors = FALSE
+      )
+    })
+  )) |>
+    tidytable::distinct(adduct, .keep_all = TRUE)
+}
+
+#' Build an adduct lookup directly from attributed adduct strings
+#' @keywords internal
+build_adduct_lookup_from_strings <- function(adducts) {
+  parsed <- build_parsed_legacy_adduct_table(adducts)
+  if (nrow(parsed) == 0L) {
+    return(tidytable::tidytable(
+      adduct = character(),
+      n_mer = integer(),
+      z = integer(),
+      n_iso = integer(),
+      adduct_mass = numeric(),
+      adduct_mass_per_monomer = numeric(),
+      mz_slope = numeric(),
+      mz_offset = numeric(),
+      carrier_key = character(),
+      cluster_key = character(),
+      loss_key = character()
+    ))
+  }
+  isotope_shift <- get0(
+    x = "EVIDENCE_ISOTOPE_SHIFT_DA",
+    ifnotfound = ISOTOPE_MASS_SHIFT_DALTONS,
+    inherits = TRUE
+  )
+  parsed |>
+    tidytable::mutate(
+      adduct_mass_per_monomer = 0,
+      mz_slope = n_mer / abs(z),
+      mz_offset = adduct_mass / abs(z) + n_iso * isotope_shift,
+      carrier_key = "",
+      cluster_key = "",
+      loss_key = ""
+    ) |>
+    tidytable::select(
+      adduct,
+      n_mer,
+      z,
+      n_iso,
+      adduct_mass,
+      adduct_mass_per_monomer,
+      mz_slope,
+      mz_offset,
+      carrier_key,
+      cluster_key,
+      loss_key
+    )
 }
 
 #' Keep only single-charge adduct strings used for delta matching
@@ -1259,6 +1326,7 @@ select_single_charge_monomer_adducts <- function(adducts, ms_mode) {
 #' Parse legacy adduct rows and keep valid single-charge monomers
 #' @keywords internal
 build_single_legacy_adduct_mass_table <- function(adducts) {
+  adducts <- harmonize_adduct_vector(adducts)
   if (length(adducts) == 0L) {
     return(tidytable::tidytable(adduct = character(), adduct_mass = numeric()))
   }
@@ -1314,8 +1382,10 @@ build_modifier_mass_table <- function(modifiers, out_col, strip_label = FALSE) {
   if (length(modifiers) == 0L) {
     out <- tidytable::tidytable(mass = numeric())
     out[[out_col]] <- character()
-    return(out |>
-      tidytable::select(!!as.name(out_col), mass))
+    return(
+      out |>
+        tidytable::select(!!as.name(out_col), mass)
+    )
   }
   formula <- trimws(sub(" .*", "", modifiers))
   labels <- if (isTRUE(strip_label)) formula else modifiers
@@ -1354,14 +1424,97 @@ normalize_modifier_terms <- function(x) {
   x
 }
 
+#' Return TRUE when an adduct string explicitly carries a given neutral loss term
+#' @keywords internal
+adduct_has_explicit_loss <- function(adduct, loss_formula) {
+  adduct <- as.character(adduct)
+  loss_formula <- trimws(sub(" .*", "", as.character(loss_formula)))
+  if (
+    is.na(adduct) ||
+      !nzchar(adduct) ||
+      is.na(loss_formula) ||
+      !nzchar(loss_formula)
+  ) {
+    return(FALSE)
+  }
+  inner <- sub("^\\[(.*)\\][0-9]*[+-]+$", "\\1", adduct, perl = TRUE)
+  if (!nzchar(inner) || identical(inner, adduct)) {
+    return(FALSE)
+  }
+  mods <- sub("^[0-9]*M[0-9]*", "", inner, perl = TRUE)
+  if (!nzchar(mods)) {
+    return(FALSE)
+  }
+  tokens <- regmatches(mods, gregexpr("[+-][^+-]+", mods, perl = TRUE))[[1L]]
+  if (length(tokens) == 0L) {
+    return(FALSE)
+  }
+  loss_norm <- normalize_modifier_formula_term(loss_formula)
+  loss_parsed <- tryCatch(
+    parse_atomic_formula(loss_norm),
+    error = function(.err) {
+      invisible(.err)
+      NULL
+    }
+  )
+  any(vapply(
+    X = tokens,
+    FUN = function(tok) {
+      if (!startsWith(tok, "-")) {
+        return(FALSE)
+      }
+      body <- substr(tok, 2L, nchar(tok))
+      formula <- sub("^[0-9]+", "", body, perl = TRUE)
+      formula_norm <- normalize_modifier_formula_term(formula)
+      if (identical(formula_norm, loss_norm)) {
+        return(TRUE)
+      }
+      token_parsed <- tryCatch(
+        parse_atomic_formula(formula_norm),
+        error = function(.err) {
+          invisible(.err)
+          NULL
+        }
+      )
+      if (
+        is.null(loss_parsed) ||
+          length(loss_parsed) == 0L ||
+          is.null(token_parsed) ||
+          length(token_parsed) == 0L
+      ) {
+        return(FALSE)
+      }
+      all_names <- sort(unique(c(names(loss_parsed), names(token_parsed))))
+      loss_full <- stats::setNames(numeric(length(all_names)), all_names)
+      token_full <- stats::setNames(numeric(length(all_names)), all_names)
+      loss_full[names(loss_parsed)] <- as.numeric(loss_parsed)
+      token_full[names(token_parsed)] <- as.numeric(token_parsed)
+      if (
+        any(loss_full <= 0) ||
+          any(token_full < 0) ||
+          any(token_full == 0 & loss_full > 0)
+      ) {
+        return(FALSE)
+      }
+      ratios <- token_full[loss_full > 0] / loss_full[loss_full > 0]
+      length(ratios) > 0L &&
+        all(is.finite(ratios)) &&
+        all(abs(ratios - round(ratios)) < 1e-8) &&
+        length(unique(round(ratios))) == 1L &&
+        unique(round(ratios)) >= 1L
+    },
+    FUN.VALUE = logical(1L)
+  ))
+}
+
 #' Discover all edge classes used by annotate_masses
 #' @keywords internal
 discover_annotate_masses_edge_sets <- function(
   pairs,
   features_table,
-  universe,
   transition_tables,
   adducts,
+  evidence_seed_adducts,
   clusters,
   neutral_losses_list,
   ms_mode,
@@ -1387,10 +1540,16 @@ discover_annotate_masses_edge_sets <- function(
     diff_col = "loss"
   )
 
+  evidence_candidate_adducts <- unique(stats::na.omit(c(
+    evidence_seed_adducts,
+    adduct_edges$adduct,
+    adduct_edges$adduct_dest
+  )))
+
   evidence_signal <- discover_evidence_adduct_signal(
     features_table = features_table,
-    universe = universe,
     adducts = adducts,
+    candidate_adducts = evidence_candidate_adducts,
     clusters = clusters,
     neutral_losses = neutral_losses_list,
     ms_mode = ms_mode,
@@ -1400,7 +1559,7 @@ discover_annotate_masses_edge_sets <- function(
     exact_masses = exact_masses
   ) |>
     filter_modifier_evidence_by_pairwise_support(
-      universe = universe,
+      universe = NULL,
       adduct_edges = adduct_edges,
       cluster_edges = cluster_edges,
       loss_edges = loss_edges,
@@ -2261,19 +2420,22 @@ enforce_non_conflicting_annotation_states <- function(
       tidytable::group_by(feature_id) |>
       tidytable::mutate(
         feature_is_unconstrained = all(is.na(assigned_state_key)),
-        best_rank = ifelse(
-          any(keep),
-          min(support_class_rank[keep], na.rm = TRUE),
-          min(support_class_rank, na.rm = TRUE)
-        ),
-        best_support = ifelse(
-          any(keep & support_class_rank == best_rank),
-          max(
-            support_strength[keep & support_class_rank == best_rank],
-            na.rm = TRUE
-          ),
-          max(support_strength[support_class_rank == best_rank], na.rm = TRUE)
-        ),
+        best_rank = {
+          any_keep <- any(keep, na.rm = TRUE)
+          if (isTRUE(any_keep)) {
+            min(support_class_rank[keep], na.rm = TRUE)
+          } else {
+            min(support_class_rank, na.rm = TRUE)
+          }
+        },
+        best_support = {
+          keep_at_best <- keep & support_class_rank == best_rank
+          if (isTRUE(any(keep_at_best, na.rm = TRUE))) {
+            max(support_strength[keep_at_best], na.rm = TRUE)
+          } else {
+            max(support_strength[support_class_rank == best_rank], na.rm = TRUE)
+          }
+        },
         keep = keep &
           (!feature_is_unconstrained |
             (support_class_rank == best_rank &
