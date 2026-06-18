@@ -6,7 +6,9 @@
 \usage{
 discover_evidence_adduct_signal(
   features_table,
+  universe = NULL,
   adducts,
+  candidate_adducts = NULL,
   clusters,
   neutral_losses,
   ms_mode,

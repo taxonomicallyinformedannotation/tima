@@ -3,12 +3,16 @@
 \name{build_adduct_universe_from_legacy}
 \alias{build_adduct_universe_from_legacy}
 \title{Legacy adapter: take a flat list of adduct strings + optional clusters and
-produce a typed universe by parsing each string.}
+produce a typed universe.}
 \usage{
-build_adduct_universe_from_legacy(adducts, clusters, polarity)
+build_adduct_universe_from_legacy(adducts, clusters, neutral_losses, polarity)
 }
 \description{
-Legacy adapter: take a flat list of adduct strings + optional clusters and
-produce a typed universe by parsing each string.
+Base adducts are parsed \strong{once}. Modifier rows are derived from the
+already-parsed base rows via mass arithmetic and string synthesis — no
+re-parsing of expanded strings. The \code{clusters} and \code{losses} list-columns
+are populated for modifier rows (matching the structured-path schema),
+so callers can distinguish base rows from modifier rows with
+\code{lengths(clusters) == 0L & lengths(losses) == 0L}.
 }
 \keyword{internal}

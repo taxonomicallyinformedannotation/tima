@@ -4,12 +4,7 @@
 \alias{apply_adduct_consistency_filter}
 \title{Apply optional support-based adduct consistency filtering.}
 \usage{
-apply_adduct_consistency_filter(
-  df_add,
-  adduct_consistency = "conditional",
-  adduct_min_support = 2L,
-  adduct_consistency_min_degree = 3L
-)
+apply_adduct_consistency_filter(df_add)
 }
 \description{
 Apply optional support-based adduct consistency filtering.

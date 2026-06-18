@@ -8,7 +8,8 @@ enforce_global_m_consistency(
   consistent_edges,
   features_table,
   tolerance_ppm,
-  tolerance_dalton
+  tolerance_dalton,
+  adduct_lookup = NULL
 )
 }
 \description{

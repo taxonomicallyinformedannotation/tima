@@ -8,7 +8,8 @@ solve_consistent_adduct_assignments(
   adduct_edges,
   features_table,
   tolerance_ppm,
-  tolerance_dalton
+  tolerance_dalton,
+  adduct_lookup = NULL
 )
 }
 \description{

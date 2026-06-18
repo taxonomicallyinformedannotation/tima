@@ -26,5 +26,7 @@ Filtered data frame
 \description{
 Internal helper to filter MS1-only annotations based on
 biological and chemical score thresholds with OR/AND logic.
+When a feature has at least one MS2-annotated candidate, all MS1-only
+candidates for that feature are dropped: MS2 evidence supersedes MS1.
 }
 \keyword{internal}

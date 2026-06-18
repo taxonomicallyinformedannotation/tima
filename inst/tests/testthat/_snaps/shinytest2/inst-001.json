@@ -182,9 +182,7 @@
       "C9H16O (cholesterol side chain + CH2)"
     ],
     "ms_pol": "pos",
-    "ms_sol": [
-      "C2H3N"
-    ],
+    "ms_sol": "C2H3N",
     "ms_thr_ms2_int": 0,
     "ms_thr_ms2_min_fragments": 2,
     "ms_tol_mas_dal_ms1": 0.01,

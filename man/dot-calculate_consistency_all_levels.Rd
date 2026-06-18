@@ -4,10 +4,18 @@
 \alias{.calculate_consistency_all_levels}
 \title{Calculate consistency scores for all taxonomic levels}
 \usage{
-.calculate_consistency_all_levels(df3, minimal_consistency)
+.calculate_consistency_all_levels(
+  edges_filtered,
+  annotations_for_join,
+  minimal_consistency
+)
 }
 \arguments{
-\item{df3}{Data frame with joined edges and annotations}
+\item{edges_filtered}{Data frame with unique (feature_source, feature_target)
+pairs already filtered for min-neighbor requirement}
+
+\item{annotations_for_join}{Data frame with (feature_id, taxonomy_cols…,
+score_weighted_bio)}
 
 \item{minimal_consistency}{Numeric minimum consistency threshold (0-1)}
 }
@@ -16,6 +24,8 @@ List of data frames with consistency scores for each level
 }
 \description{
 Wrapper function that calculates consistency scores across all taxonomic
-levels (ClassyFire and NPC hierarchies).
+levels (ClassyFire and NPC hierarchies). Pre-computes the denominator
+(total distinct target features per source) once, then dispatches each
+level to \code{.calculate_consistency_per_level}.
 }
 \keyword{internal}

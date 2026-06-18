@@ -12,6 +12,7 @@ collect_node_adduct_hypotheses(
   preassigned,
   baseline_adducts,
   features_table,
+  adduct_lookup = NULL,
   tolerance_ppm = 5,
   tolerance_dalton = 0.005
 )

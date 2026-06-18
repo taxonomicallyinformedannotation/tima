@@ -11,9 +11,11 @@ load_annotate_masses_runtime_inputs(
   library,
   str_stereo,
   str_met,
+  str_nam,
   str_tax_cla,
   str_tax_npc,
-  tolerance_ppm
+  tolerance_ppm,
+  tolerance_dalton
 )
 }
 \description{

@@ -17,6 +17,7 @@ annotate_masses(
     "annotate_masses")$files$libraries$sop$merged$structures$stereo,
   str_met = get_params(step =
     "annotate_masses")$files$libraries$sop$merged$structures$metadata,
+  str_nam = NULL,
   str_tax_cla = get_params(step =
     "annotate_masses")$files$libraries$sop$merged$structures$taxonomies$cla,
   str_tax_npc = get_params(step =
@@ -47,6 +48,8 @@ annotate_masses(
 \item{str_stereo}{File containing structures stereo}
 
 \item{str_met}{File containing structures metadata}
+
+\item{str_nam}{Optional file containing structures names}
 
 \item{str_tax_cla}{File containing Classyfire taxonomy}
 

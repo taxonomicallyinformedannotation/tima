@@ -8,6 +8,7 @@ build_annotate_masses_ion_tables(
   adducts_list,
   clusters_list,
   solvents_list,
+  neutral_losses_list,
   ms_mode
 )
 }

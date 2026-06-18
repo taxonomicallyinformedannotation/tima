@@ -10,6 +10,7 @@ append_component_weak_hypotheses(
   neutral_losses_list,
   clusters,
   baseline_adducts,
+  adduct_lookup,
   tolerance_ppm,
   tolerance_dalton
 )

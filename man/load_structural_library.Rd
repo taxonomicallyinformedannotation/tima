@@ -9,9 +9,11 @@ load_structural_library(
   library,
   str_stereo,
   str_met,
+  str_nam = NULL,
   str_tax_cla,
   str_tax_npc,
-  tolerance_ppm
+  tolerance_ppm,
+  tolerance_dalton = NULL
 )
 }
 \description{

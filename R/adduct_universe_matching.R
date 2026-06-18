@@ -1,10 +1,3 @@
-#' Internal utilities for matching features to adduct universe
-#' @include mass_evidence_utils.R
-#' @include calculate_mass_of_m.R
-#' @include adduct_universe.R
-#' @keywords internal
-#' @noRd
-
 #' Canonical key for a named integer component vector
 #' @keywords internal
 component_count_key <- function(x) {

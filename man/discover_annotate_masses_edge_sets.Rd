@@ -7,15 +7,15 @@
 discover_annotate_masses_edge_sets(
   pairs,
   features_table,
-  monocharged_adducts,
+  transition_tables,
   adducts,
+  evidence_seed_adducts,
   clusters,
   neutral_losses_list,
   ms_mode,
   tolerance_ppm,
   tolerance_rt,
   tolerance_dalton,
-  cfg,
   exact_masses
 )
 }

@@ -12,9 +12,7 @@ summarize_results(
   annot_table_wei_chemo,
   remove_ties,
   summarize,
-  annotation_notes_lookup = NULL,
-  feature_consensus_table = NULL,
-  organism_lookup = NULL
+  annotation_notes_lookup = NULL
 )
 }
 \arguments{
@@ -30,7 +28,8 @@ assignments}
 structure-organism pairs}
 
 \item{annot_table_wei_chemo}{\link{data.frame} Data frame with chemically weighted
-annotations}
+annotations. Used to build feature-level consensus metadata for features
+without candidate structures.}
 
 \item{remove_ties}{\link{logical} Logical whether to remove tied scores (keep only
 highest)}
