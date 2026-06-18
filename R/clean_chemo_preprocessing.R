@@ -218,6 +218,8 @@ validate_clean_chemo_inputs <- function(
 #'
 #' @description Internal helper to filter MS1-only annotations based on
 #'     biological and chemical score thresholds with OR/AND logic.
+#'     When a feature has at least one MS2-annotated candidate, all MS1-only
+#'     candidates for that feature are dropped: MS2 evidence supersedes MS1.
 #'
 #' @param annot_table_wei_chemo Data frame with annotations
 #' @param minimal_ms1_bio Numeric minimum biological score
@@ -284,8 +286,13 @@ filter_ms1_annotations <- function(
     )
   }
 
-  annot_table_wei_chemo |>
+  # Apply per-row pre-filter (keep MS2 rows OR MS1 rows that meet
+  # score thresholds). This removes low-quality MS1 candidates that are not
+  # backed by any biological/chemical evidence.
+  result <- annot_table_wei_chemo |>
     tidytable::filter(!!has_ms2 | !!ms1_condition)
+
+  result
 }
 
 #' Rank and Deduplicate Annotations

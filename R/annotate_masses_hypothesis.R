@@ -50,6 +50,32 @@ match_pairs_to_mass_diffs <- function(pairs, diffs, diff_col) {
         tidytable::mutate(!!as.name(diff_col) := character())
     )
   }
+  if (all(c("mass", "adduct", "adduct_dest") %in% colnames(diffs))) {
+    pairs_t <- tidytable::as_tidytable(pairs)[,
+      .(feature_id, feature_id_dest, delta_min, delta_max)
+    ]
+    diffs_t <- tidytable::as_tidytable(diffs)
+    out <- diffs_t[
+      pairs_t,
+      on = .(mass >= delta_min, mass <= delta_max),
+      nomatch = NA_real_,
+      allow.cartesian = TRUE
+    ][,
+      .(
+        feature_id,
+        mass,
+        feature_id_dest,
+        adduct,
+        adduct_dest,
+        modifier = get(diff_col)
+      )
+    ] |>
+      tidytable::as_tidytable() |>
+      tidytable::filter(!is.na(modifier)) |>
+      tidytable::rename(!!as.name(diff_col) := modifier) |>
+      tidytable::distinct()
+    return(out)
+  }
   diffs_norm <- diffs |>
     tidytable::rename(loss = !!as.name(diff_col))
   out <- join_couples_with_neutral_losses(
@@ -79,7 +105,8 @@ solve_consistent_adduct_assignments <- function(
   adduct_edges,
   features_table,
   tolerance_ppm,
-  tolerance_dalton
+  tolerance_dalton,
+  adduct_lookup = NULL
 ) {
   if (nrow(adduct_edges) == 0L || nrow(features_table) == 0L) {
     return(list(
@@ -130,13 +157,15 @@ solve_consistent_adduct_assignments <- function(
   # Calculate implied M for each edge endpoint
   edges <- edges |>
     tidytable::mutate(
-      m_src = calculate_mass_of_m_batch(
+      m_src = calculate_neutral_mass_from_lookup(
+        mzs = as.numeric(mz_src),
         adducts = adduct,
-        mzs = as.numeric(mz_src)
+        adduct_lookup = adduct_lookup
       ),
-      m_dest = calculate_mass_of_m_batch(
+      m_dest = calculate_neutral_mass_from_lookup(
+        mzs = as.numeric(mz_dest),
         adducts = adduct_dest,
-        mzs = as.numeric(mz_dest)
+        adduct_lookup = adduct_lookup
       ),
       m_diff = abs(m_src - m_dest),
       ppm_consistent = m_diff <=
@@ -161,7 +190,8 @@ solve_consistent_adduct_assignments <- function(
     consistent_edges = consistent,
     features_table = features_table,
     tolerance_ppm = tolerance_ppm,
-    tolerance_dalton = tolerance_dalton
+    tolerance_dalton = tolerance_dalton,
+    adduct_lookup = adduct_lookup
   )
 
   if (nrow(consistent) == 0L) {
@@ -260,17 +290,19 @@ solve_consistent_adduct_assignments <- function(
       comp_edges |>
         tidytable::transmute(
           feature_id,
-          neutral_mass = calculate_mass_of_m_batch(
+          neutral_mass = calculate_neutral_mass_from_lookup(
+            mzs = as.numeric(mz_src),
             adducts = adduct,
-            mzs = as.numeric(mz_src)
+            adduct_lookup = adduct_lookup
           )
         ),
       comp_edges |>
         tidytable::transmute(
           feature_id = feature_id_dest,
-          neutral_mass = calculate_mass_of_m_batch(
+          neutral_mass = calculate_neutral_mass_from_lookup(
+            mzs = as.numeric(mz_dest),
             adducts = adduct_dest,
-            mzs = as.numeric(mz_dest)
+            adduct_lookup = adduct_lookup
           )
         )
     ) |>
@@ -293,9 +325,10 @@ solve_consistent_adduct_assignments <- function(
         tidytable::filter(feature_id %in% missing_nodes) |>
         tidytable::transmute(
           feature_id,
-          neutral_mass = calculate_mass_of_m_batch(
+          neutral_mass = calculate_neutral_mass_from_lookup(
+            mzs = as.numeric(mz),
             adducts = "[M+H]+",
-            mzs = as.numeric(mz)
+            adduct_lookup = adduct_lookup
           )
         )
       m_values <- tidytable::bind_rows(m_values, baseline_m)
@@ -338,7 +371,8 @@ enforce_global_m_consistency <- function(
   consistent_edges,
   features_table,
   tolerance_ppm,
-  tolerance_dalton
+  tolerance_dalton,
+  adduct_lookup = NULL
 ) {
   if (nrow(consistent_edges) == 0L) {
     return(consistent_edges)
@@ -364,13 +398,15 @@ enforce_global_m_consistency <- function(
   # Add edge IDs
   edge_with_m <- edge_with_m |>
     tidytable::mutate(
-      m_src = calculate_mass_of_m_batch(
+      m_src = calculate_neutral_mass_from_lookup(
+        mzs = as.numeric(mz_src),
         adducts = adduct,
-        mzs = as.numeric(mz_src)
+        adduct_lookup = adduct_lookup
       ),
-      m_dest = calculate_mass_of_m_batch(
+      m_dest = calculate_neutral_mass_from_lookup(
+        mzs = as.numeric(mz_dest),
         adducts = adduct_dest,
-        mzs = as.numeric(mz_dest)
+        adduct_lookup = adduct_lookup
       )
     ) |>
     tidytable::as_tidytable()
@@ -470,6 +506,7 @@ collect_node_adduct_hypotheses <- function(
   preassigned,
   baseline_adducts,
   features_table,
+  adduct_lookup = NULL,
   tolerance_ppm = 5,
   tolerance_dalton = 0.005
 ) {
@@ -482,7 +519,8 @@ collect_node_adduct_hypotheses <- function(
     adduct_edges = adduct_edges,
     features_table = features_table,
     tolerance_ppm = tolerance_ppm,
-    tolerance_dalton = tolerance_dalton
+    tolerance_dalton = tolerance_dalton,
+    adduct_lookup = adduct_lookup
   )
   consistent_edges <- consistency_result$consistent_edges
   feature_m_map <- consistency_result$feature_m_map
@@ -536,41 +574,49 @@ collect_node_adduct_hypotheses <- function(
         feature_m_map |> tidytable::select(feature_id, neutral_mass),
         by = "feature_id"
       ) |>
-      tidytable::mutate(
-        implied_m = calculate_mass_of_m_batch(
-          adducts = adduct,
-          mzs = as.numeric(mz)
-        ),
-        compatible = is.na(neutral_mass) |
-          abs(implied_m - neutral_mass) <= (5e-6 * neutral_mass)
-      ) |>
-      tidytable::filter(compatible) |>
-      tidytable::select(
-        feature_id,
-        adduct,
-        source,
-        is_preassigned,
-        candidate_adduct_origin
-      )
-  }
+       tidytable::mutate(
+         implied_m = calculate_neutral_mass_from_lookup(
+           mzs = as.numeric(mz),
+           adducts = adduct,
+           adduct_lookup = adduct_lookup
+         ),
+         compatible = is.na(neutral_mass) |
+           abs(implied_m - neutral_mass) <= pmax(
+             tolerance_ppm * 1e-6 * neutral_mass,
+             tolerance_dalton %||% 0
+           )
+       ) |>
+       tidytable::filter(compatible) |>
+       tidytable::select(
+         feature_id,
+         adduct,
+         source,
+         is_preassigned,
+         candidate_adduct_origin
+       )
+   }
 
-  if (nrow(pre_prop_hyps) > 0L && nrow(feature_m_map) > 0L) {
-    pre_prop_hyps <- pre_prop_hyps |>
-      tidytable::left_join(
-        features_table |> tidytable::distinct(feature_id, mz),
-        by = "feature_id"
-      ) |>
-      tidytable::left_join(
-        feature_m_map |> tidytable::select(feature_id, neutral_mass),
-        by = "feature_id"
-      ) |>
-      tidytable::mutate(
-        implied_m = calculate_mass_of_m_batch(
-          adducts = adduct,
-          mzs = as.numeric(mz)
-        ),
-        compatible = is.na(neutral_mass) |
-          abs(implied_m - neutral_mass) <= (5e-6 * neutral_mass)
+   if (nrow(pre_prop_hyps) > 0L && nrow(feature_m_map) > 0L) {
+     pre_prop_hyps <- pre_prop_hyps |>
+       tidytable::left_join(
+         features_table |> tidytable::distinct(feature_id, mz),
+         by = "feature_id"
+       ) |>
+       tidytable::left_join(
+         feature_m_map |> tidytable::select(feature_id, neutral_mass),
+         by = "feature_id"
+       ) |>
+       tidytable::mutate(
+         implied_m = calculate_neutral_mass_from_lookup(
+           mzs = as.numeric(mz),
+           adducts = adduct,
+           adduct_lookup = adduct_lookup
+         ),
+         compatible = is.na(neutral_mass) |
+           abs(implied_m - neutral_mass) <= pmax(
+             tolerance_ppm * 1e-6 * neutral_mass,
+             tolerance_dalton %||% 0
+           )
       ) |>
       tidytable::filter(compatible) |>
       tidytable::select(
@@ -642,26 +688,27 @@ collect_node_adduct_hypotheses <- function(
       feature_m_map |> tidytable::select(feature_id, neutral_mass),
       by = "feature_id"
     ) |>
-    tidytable::mutate(
-      implied_m = calculate_mass_of_m_batch(
-        adducts = adduct,
-        mzs = as.numeric(mz)
-      ),
-      compatible = is.na(neutral_mass) |
-        abs(implied_m - neutral_mass) <=
-          pmax(5e-6 * neutral_mass, tolerance_dalton %||% 0),
-      source = "baseline",
-      is_preassigned = FALSE,
-      candidate_adduct_origin = "baseline"
-    ) |>
-    tidytable::filter(compatible) |>
-    tidytable::select(
-      feature_id,
-      adduct,
-      source,
-      is_preassigned,
-      candidate_adduct_origin
-    )
+     tidytable::mutate(
+       implied_m = calculate_neutral_mass_from_lookup(
+         mzs = as.numeric(mz),
+         adducts = adduct,
+         adduct_lookup = adduct_lookup
+       ),
+       compatible = is.na(neutral_mass) |
+         abs(implied_m - neutral_mass) <=
+           pmax(tolerance_ppm * 1e-6 * neutral_mass, tolerance_dalton %||% 0),
+       source = "baseline",
+       is_preassigned = FALSE,
+       candidate_adduct_origin = "baseline"
+     ) |>
+     tidytable::filter(compatible) |>
+     tidytable::select(
+       feature_id,
+       adduct,
+       source,
+       is_preassigned,
+       candidate_adduct_origin
+     )
 
   base_hyps <- tidytable::bind_rows(
     supported_seed,
@@ -692,72 +739,92 @@ collect_node_adduct_hypotheses <- function(
       )
     )
 
-  # (e) cluster expansion — two complementary propagation directions:
-  #
-  # (e1) DEST-based: take the DESTINATION feature's current hypothesis + cluster.
-  #      Handles simple cases, e.g. [M-H]- + CH2O2 → [M+CHO2]- (formate).
-  #
-  # (e2) SRC-to-DEST: propagate the SOURCE feature's hypothesis to the
-  #      DESTINATION with +cluster applied.  Handles multi-step cases, e.g.
-  #      source [M-H2+Na]- with cluster CH2O2 → dest gets [M+CO2+Na]-,
-  #      which cannot be reached by (e1) alone when the dest has only a
-  #      baseline [M-H]- hypothesis.
-  #
-  # Only expand "supported" base hypotheses in both directions.
-  support_base <- base_hyps |>
-    tidytable::filter(candidate_adduct_origin == "supported")
+  cluster_hyps <- if (all(c("adduct", "adduct_dest") %in% colnames(cluster_edges))) {
+    tidytable::bind_rows(
+      cluster_edges |>
+        tidytable::transmute(
+          feature_id,
+          adduct,
+          source = "cluster",
+          is_preassigned = FALSE,
+          candidate_adduct_origin = "supported"
+        ),
+      cluster_edges |>
+        tidytable::transmute(
+          feature_id = feature_id_dest,
+          adduct = adduct_dest,
+          source = "cluster",
+          is_preassigned = FALSE,
+          candidate_adduct_origin = "supported"
+        )
+    ) |>
+      tidytable::distinct()
+  } else {
+    support_base <- base_hyps |>
+      tidytable::filter(candidate_adduct_origin == "supported")
+    tidytable::bind_rows(
+      expand_with_modifier(
+        base_hyps = support_base,
+        edges = cluster_edges,
+        edge_feature_col = "feature_id_dest",
+        mod_col = "cluster",
+        mod_sign = "+"
+      ),
+      propagate_modifier_src_to_dest(
+        base_hyps = support_base,
+        edges = cluster_edges,
+        mod_col = "cluster",
+        mod_sign = "+"
+      )
+    ) |>
+      tidytable::mutate(candidate_adduct_origin = "supported")
+  }
 
-  cluster_hyps_dest <- expand_with_modifier(
-    base_hyps = support_base,
-    edges = cluster_edges,
-    edge_feature_col = "feature_id_dest",
-    mod_col = "cluster",
-    mod_sign = "+"
-  ) |>
-    tidytable::mutate(candidate_adduct_origin = "supported")
-
-  cluster_hyps_src <- propagate_modifier_src_to_dest(
-    base_hyps = support_base,
-    edges = cluster_edges,
-    mod_col = "cluster",
-    mod_sign = "+"
-  ) |>
-    tidytable::mutate(candidate_adduct_origin = "supported")
-
-  cluster_hyps <- tidytable::bind_rows(cluster_hyps_dest, cluster_hyps_src)
-
-  # (f) loss expansion — two complementary propagation directions:
-  #
-  # (f1) PRECURSOR-to-PRODUCT: propagate the higher-mz precursor hypothesis to
-  #      the lower-mz product with -loss applied.
-  #
-  # (f2) PRODUCT-to-PRECURSOR: propagate the lower-mz product hypothesis back
-  #      to the precursor with +loss applied, allowing informative product-side
-  #      adduct assignments to recover the corresponding intact precursor state.
-  #
-  # This mirrors the bidirectional cluster strategy and lets surrounding adduct
-  # evidence decide which interpretation survives downstream.
-  loss_hyps_product <- propagate_modifier_dest_to_src(
-    base_hyps = support_base,
-    edges = loss_edges,
-    mod_col = "loss",
-    mod_sign = "-",
-    strip_label = TRUE,
-    source_label = "loss"
-  ) |>
-    tidytable::mutate(candidate_adduct_origin = "supported")
-
-  loss_hyps_precursor <- propagate_modifier_src_to_dest(
-    base_hyps = support_base,
-    edges = loss_edges,
-    mod_col = "loss",
-    mod_sign = "+",
-    strip_label = TRUE,
-    source_label = "loss"
-  ) |>
-    tidytable::mutate(candidate_adduct_origin = "supported")
-
-  loss_hyps <- tidytable::bind_rows(loss_hyps_product, loss_hyps_precursor)
+  loss_hyps <- if (all(c("adduct", "adduct_dest") %in% colnames(loss_edges))) {
+    tidytable::bind_rows(
+      loss_edges |>
+        tidytable::transmute(
+          feature_id,
+          adduct,
+          source = "loss",
+          is_preassigned = FALSE,
+          candidate_adduct_origin = "supported",
+          loss_term = loss
+        ),
+      loss_edges |>
+        tidytable::transmute(
+          feature_id = feature_id_dest,
+          adduct = adduct_dest,
+          source = "loss",
+          is_preassigned = FALSE,
+          candidate_adduct_origin = "supported",
+          loss_term = loss
+        )
+    ) |>
+      tidytable::distinct()
+  } else {
+    support_base <- base_hyps |>
+      tidytable::filter(candidate_adduct_origin == "supported")
+    tidytable::bind_rows(
+      propagate_modifier_dest_to_src(
+        base_hyps = support_base,
+        edges = loss_edges,
+        mod_col = "loss",
+        mod_sign = "-",
+        strip_label = TRUE,
+        source_label = "loss"
+      ),
+      propagate_modifier_src_to_dest(
+        base_hyps = support_base,
+        edges = loss_edges,
+        mod_col = "loss",
+        mod_sign = "+",
+        strip_label = TRUE,
+        source_label = "loss"
+      )
+    ) |>
+      tidytable::mutate(candidate_adduct_origin = "supported")
+  }
 
   all_hyps <- tidytable::bind_rows(
     base_hyps,
@@ -1190,6 +1257,7 @@ dedupe_node_hypotheses <- function(node_hypotheses) {
 #' @keywords internal
 discover_evidence_adduct_signal <- function(
   features_table,
+  universe = NULL,
   adducts,
   clusters,
   neutral_losses,
@@ -1217,12 +1285,14 @@ discover_evidence_adduct_signal <- function(
     return(list(hypotheses = empty_hyp, edges = empty_edges))
   }
 
-  universe <- build_adduct_universe(
-    adducts_list = list(pos = adducts, neg = adducts),
-    clusters_list = clusters,
-    neutral_losses_list = neutral_losses,
-    polarity = ms_mode
-  )
+  if (is.null(universe)) {
+    universe <- build_adduct_universe(
+      adducts_list = list(pos = adducts, neg = adducts),
+      clusters_list = clusters,
+      neutral_losses_list = neutral_losses,
+      polarity = ms_mode
+    )
+  }
   if (nrow(universe) == 0L) {
     return(list(hypotheses = empty_hyp, edges = empty_edges))
   }
@@ -1288,12 +1358,23 @@ filter_modifier_evidence_by_pairwise_support <- function(
   }
   invisible(universe)
 
-  hyps <- evidence_signal$hypotheses |>
+  adduct_requires_pairwise_map <- tidytable::tidytable(
+    adduct = unique(evidence_signal$hypotheses$adduct)
+  ) |>
     tidytable::mutate(
       evidence_requires_pairwise = vapply(
         X = adduct,
         FUN = evidence_adduct_requires_pairwise_support,
         FUN.VALUE = logical(1L)
+      )
+    )
+
+  hyps <- evidence_signal$hypotheses |>
+    tidytable::left_join(adduct_requires_pairwise_map, by = "adduct") |>
+    tidytable::mutate(
+      evidence_requires_pairwise = tidytable::coalesce(
+        evidence_requires_pairwise,
+        FALSE
       )
     )
   if (!any(hyps$evidence_requires_pairwise)) {
@@ -1467,6 +1548,7 @@ evidence_adduct_requires_pairwise_support <- function(adduct) {
 generate_multi_hypotheses_from_node_masses <- function(
   node_hypotheses,
   multi_adducts,
+  adduct_lookup = NULL,
   tolerance_ppm,
   tolerance_dalton
 ) {
@@ -1500,7 +1582,11 @@ generate_multi_hypotheses_from_node_masses <- function(
     tidytable::mutate(
       source = "multi",
       adduct_support = 0L,
-      mass = calculate_mass_of_m_batch(adducts = adduct, mzs = as.numeric(mz))
+      mass = calculate_neutral_mass_from_lookup(
+        mzs = as.numeric(mz),
+        adducts = adduct,
+        adduct_lookup = adduct_lookup
+      )
     ) |>
     tidytable::filter(!is.na(mass) & is.finite(mass) & mass > 0)
   if (nrow(multi_candidates) == 0L) {
@@ -1615,14 +1701,14 @@ match_candidates_to_library <- function(
       rt = src_rt,
       mz = src_mz,
       adduct = src_adduct,
-      mass = value_min,
+      mass = src_mass,
       source = src_source,
       is_preassigned = src_is_preassigned,
       candidate_adduct_origin = src_origin,
       adduct_support = src_support,
       loss_term = src_loss_term,
       structure_exact_mass = exact_mass,
-      error_mz = exact_mass - value_min
+      error_mz = exact_mass - src_mass
     )
   ] |>
     tidytable::as_tidytable() |>
@@ -1915,7 +2001,12 @@ propagate_annotations_across_m_cliques <- function(
       target_hyp,
       by = c("target_feature", "adduct")
     ) |>
-    tidytable::filter(!is.na(target_mass))
+    tidytable::mutate(
+      target_mass = suppressWarnings(as.numeric(target_mass)),
+      mass = suppressWarnings(as.numeric(mass)),
+      structure_exact_mass = suppressWarnings(as.numeric(structure_exact_mass))
+    ) |>
+    tidytable::filter(!is.na(target_mass) & !is.na(mass) & !is.na(structure_exact_mass))
 
   if (nrow(propagation_combined) == 0L) {
     return(annotations)

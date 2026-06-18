@@ -192,13 +192,6 @@ clean_chemo <- function(
       )
   }
 
-  # Precompute feature-level consensus metadata once to avoid repeated
-  # full-table coercion inside summarize_results for each output tier.
-  feature_consensus_table <- .build_feature_consensus_table(
-    annot_table_wei_chemo = annot_table_wei_chemo,
-    model = columns_model()
-  )
-
   # Core Filtering Pipeline ----
   log_metadata(
     ctx,
@@ -223,10 +216,6 @@ clean_chemo <- function(
   df_percentile <- candidate_tables$df_percentile
   results_candidates <- candidate_tables$results_candidates
   annotation_notes_lookup <- candidate_tables$annotation_notes_lookup
-  organism_lookup <- .build_organism_lookup(
-    structure_organism_pairs_table = structure_organism_pairs_table,
-    df = df_ranked
-  )
 
   if (candidate_tables$n_sampled_features > 0L) {
     log_info(
@@ -262,9 +251,7 @@ clean_chemo <- function(
       annot_table_wei_chemo = annot_table_wei_chemo,
       remove_ties = remove_ties,
       summarize = summarize,
-      annotation_notes_lookup = annotation_notes_lookup,
-      feature_consensus_table = feature_consensus_table,
-      organism_lookup = organism_lookup
+      annotation_notes_lookup = annotation_notes_lookup
     ) |>
     tidytable::left_join(y = results_candidates)
 
@@ -329,9 +316,7 @@ clean_chemo <- function(
       annot_table_wei_chemo = annot_table_wei_chemo,
       remove_ties = remove_ties,
       summarize = summarize,
-      annotation_notes_lookup = annotation_notes_lookup,
-      feature_consensus_table = feature_consensus_table,
-      organism_lookup = organism_lookup
+      annotation_notes_lookup = annotation_notes_lookup
     ) |>
     tidytable::left_join(y = results_candidates)
 
@@ -375,14 +360,12 @@ clean_chemo <- function(
 
   # Clean up intermediate objects
   rm(
-    annot_table_wei_chemo,
     results_candidates,
     features_table,
     components_table,
     structure_organism_pairs_table,
     candidate_tables,
-    feature_consensus_table,
-    organism_lookup
+    annot_table_wei_chemo
   )
 
   results_list

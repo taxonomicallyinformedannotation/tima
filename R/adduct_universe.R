@@ -52,6 +52,7 @@ build_adduct_universe <- function(
     } else {
       clusters_list
     },
+    neutral_losses = neutral_losses_list,
     polarity = polarity
   )
 }
@@ -60,7 +61,12 @@ build_adduct_universe <- function(
 #' produce a typed universe by parsing each string.
 #'
 #' @keywords internal
-build_adduct_universe_from_legacy <- function(adducts, clusters, polarity) {
+build_adduct_universe_from_legacy <- function(
+  adducts,
+  clusters,
+  neutral_losses,
+  polarity
+) {
   adducts <- unique(as.character(adducts))
   adducts <- adducts[!is.na(adducts) & nzchar(adducts)]
   if (length(adducts) == 0L) {
@@ -86,21 +92,63 @@ build_adduct_universe_from_legacy <- function(adducts, clusters, polarity) {
     clusters <- character()
   }
 
-  # Expand each adduct with each cluster (+ a "no cluster" version).
-  if (length(clusters) == 0L) {
-    expanded <- adducts
+  if (length(neutral_losses) > 0L) {
+    loss_clean <- trimws(sub(" .*", "", as.character(neutral_losses)))
+    loss_clean <- loss_clean[nzchar(loss_clean)]
+    loss_ok <- !vapply(
+      loss_clean,
+      function(f) {
+        is.null(parse_atomic_formula(f)) ||
+          length(parse_atomic_formula(f)) == 0L
+      },
+      logical(1L)
+    )
+    neutral_losses <- loss_clean[loss_ok]
   } else {
-    # Build expanded adducts
-    # For each adduct, create versions with each cluster
-    expanded_list <- lapply(adducts, function(a) {
-      inner <- sub("^\\[(.*)\\][0-9]*[+-]+$", "\\1", a, perl = TRUE)
-      tail <- sub("^.*\\]", "]", a, perl = TRUE)
-      # Create all cluster versions for this adduct at once
-      c(a, paste0("[", inner, "+", clusters, tail))
-    })
-    expanded <- unlist(expanded_list, use.names = FALSE)
+    neutral_losses <- character()
   }
-  expanded <- unique(expanded)
+
+  expanded <- adducts
+  if (length(clusters) > 0L) {
+    expanded <- c(
+      expanded,
+      unlist(
+        lapply(clusters, function(cluster) {
+          apply_modifier_to_adducts(adducts, cluster, "+")
+        }),
+        use.names = FALSE
+      )
+    )
+  }
+  if (length(neutral_losses) > 0L) {
+    expanded <- c(
+      expanded,
+      unlist(
+        lapply(neutral_losses, function(loss) {
+          apply_modifier_to_adducts(adducts, loss, "-")
+        }),
+        use.names = FALSE
+      )
+    )
+  }
+  if (length(clusters) > 0L && length(neutral_losses) > 0L) {
+    expanded <- c(
+      expanded,
+      unlist(
+        lapply(neutral_losses, function(loss) {
+          loss_first <- apply_modifier_to_adducts(adducts, loss, "-")
+          unlist(
+            lapply(clusters, function(cluster) {
+              apply_modifier_to_adducts(loss_first, cluster, "+")
+            }),
+            use.names = FALSE
+          )
+        }),
+        use.names = FALSE
+      )
+    )
+  }
+  expanded <- unique(expanded[!is.na(expanded) & nzchar(expanded)])
 
   # Parse each adduct via the canonical parser (silencing legacy warnings on
   # idiosyncratic notations) and compute adduct_mass at m/z = 0.
@@ -108,7 +156,7 @@ build_adduct_universe_from_legacy <- function(adducts, clusters, polarity) {
   for (a in expanded) {
     parsed <- tryCatch(
       suppressWarnings(parse_adduct(a)),
-      error = function(e) NULL
+      error = function(...) NULL
     )
     if (is.null(parsed) || is_parse_failed(parsed)) {
       next

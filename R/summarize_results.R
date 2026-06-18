@@ -15,7 +15,8 @@
 #' @param structure_organism_pairs_table [data.frame] Data frame with
 #'     structure-organism pairs
 #' @param annot_table_wei_chemo [data.frame] Data frame with chemically weighted
-#'     annotations
+#'     annotations. Used to build feature-level consensus metadata for features
+#'     without candidate structures.
 #' @param remove_ties [logical] Logical whether to remove tied scores (keep only
 #'     highest)
 #' @param summarize [logical] Logical whether to collapse to 1 row per feature
@@ -44,9 +45,7 @@ summarize_results <- function(
   annot_table_wei_chemo,
   remove_ties,
   summarize,
-  annotation_notes_lookup = NULL,
-  feature_consensus_table = NULL,
-  organism_lookup = NULL
+  annotation_notes_lookup = NULL
 ) {
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
@@ -56,10 +55,12 @@ summarize_results <- function(
     structure_organism_pairs_table,
     param_name = "structure_organism_pairs_table"
   )
-  validate_dataframe(
-    annot_table_wei_chemo,
-    param_name = "annot_table_wei_chemo"
-  )
+  if (!is.null(annot_table_wei_chemo)) {
+    validate_dataframe(
+      annot_table_wei_chemo,
+      param_name = "annot_table_wei_chemo"
+    )
+  }
   validate_logical(remove_ties, param_name = "remove_ties")
   validate_logical(summarize, param_name = "summarize")
 
@@ -76,12 +77,10 @@ summarize_results <- function(
   log_debug("Remove ties: %s, Summarize: %s", remove_ties, summarize)
 
   model <- columns_model()
-  if (is.null(feature_consensus_table)) {
-    feature_consensus_table <- .build_feature_consensus_table(
-      annot_table_wei_chemo = annot_table_wei_chemo,
-      model = model
-    )
-  }
+  feature_consensus_table <- .build_feature_consensus_table(
+    annot_table_wei_chemo = annot_table_wei_chemo,
+    model = model
+  )
   candidate_id_cols <- grep(
     pattern = "^candidate_structure_id_",
     x = names(df),
@@ -93,12 +92,10 @@ summarize_results <- function(
       tidytable::mutate(reference_doi = NA_character_)
   }
 
-  if (is.null(organism_lookup)) {
-    organism_lookup <- .build_organism_lookup(
-      structure_organism_pairs_table = structure_organism_pairs_table,
-      df = df
-    )
-  }
+  organism_lookup <- .build_organism_lookup(
+    structure_organism_pairs_table = structure_organism_pairs_table,
+    df = df
+  )
 
   # Define columns to select
   select_cols <- c(
@@ -149,34 +146,36 @@ summarize_results <- function(
     ) |>
     tidytable::distinct(feature_id, .keep_all = TRUE)
 
-  # Start from annotation rows and add compact per-feature metadata.
-  df_joined <- df |>
-    tidytable::right_join(y = features_min) |>
-    tidytable::left_join(y = components_min) |>
-    tidytable::select(tidyselect::any_of(x = select_cols)) |>
-    tidytable::distinct() |>
-    tidytable::left_join(
-      y = organism_lookup,
-      by = c(
-        "feature_id",
-        "candidate_structure_inchikey_connectivity_layer",
-        "candidate_structure_organism_occurrence_closest"
-      )
-    ) |>
-    tidytable::select(tidyselect::any_of(x = final_select_cols)) |>
-    tidytable::arrange(rank_final)
+   # Start from annotation rows and add compact per-feature metadata.
+   df_joined <- df |>
+     tidytable::right_join(y = features_min) |>
+     tidytable::left_join(y = components_min) |>
+     tidytable::select(tidyselect::any_of(x = select_cols)) |>
+     tidytable::distinct() |>
+     tidytable::left_join(
+       y = organism_lookup,
+       by = c(
+         "feature_id",
+         "candidate_structure_inchikey_connectivity_layer",
+         "candidate_structure_organism_occurrence_closest"
+       )
+     ) |>
+     tidytable::select(tidyselect::any_of(x = final_select_cols)) |>
+     tidytable::arrange(rank_final)
 
-  # Add annotation_note from lookup table at the very end
-  if (!is.null(annotation_notes_lookup) && nrow(annotation_notes_lookup) > 0) {
-    df_joined <- df_joined |>
-      tidytable::left_join(
-        y = annotation_notes_lookup,
-        by = c("feature_id", "candidate_adduct", "rank_final")
-      )
-  }
+   # Add annotation_note from lookup table at the very end
+   # Note: annotation_notes_lookup has been pre-collapsed to ensure
+   # one note per (feature_id, candidate_adduct, rank_final) group
+   if (!is.null(annotation_notes_lookup) && nrow(annotation_notes_lookup) > 0) {
+     df_joined <- df_joined |>
+       tidytable::left_join(
+         y = annotation_notes_lookup,
+         by = c("feature_id", "candidate_adduct", "rank_final")
+       )
+   }
+
 
   rm(df, organism_lookup)
-  # gc()
 
   # Remove ties if requested
   if (remove_ties) {
@@ -227,8 +226,6 @@ summarize_results <- function(
     df_final <- df_joined
     rm(df_joined)
   }
-
-  # gc()
 
   # Trim only character/factor fields to avoid full-table coercion copies.
   text_cols <- colnames(df_final)[vapply(

@@ -341,6 +341,7 @@ utils::globalVariables(
     "n_iso",
     "n_loss_terms",
     "n_mer",
+    "n_targets",
     "Name",
     "name",
     "nearest_mass_error_ppm",

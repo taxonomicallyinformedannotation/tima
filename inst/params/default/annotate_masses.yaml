@@ -270,12 +270,12 @@ ms:
       #' Absolute in Dalton.
       dalton:
         #' Absolute mass tolerance for MS1 in Dalton. FLOAT
-        ms1: 0.01
+        ms1: 0.005
 
     #' For retention time.
     rt:
       #' Retention time tolerance for adducts in minutes. FLOAT
-      adducts: 0.05
+      adducts: 0.02
 
 
 #' Names of the different variables in the input files.
