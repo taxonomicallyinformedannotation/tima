@@ -960,7 +960,7 @@ filter_modifier_edges_by_assigned_adducts <- function(
   assigned_nodes <- assigned_nodes |>
     tidytable::distinct(feature_id, adduct)
 
-   state_map <- build_adduct_state_key_map(unique(c(
+  state_map <- build_adduct_state_key_map(unique(c(
     assigned_nodes$adduct,
     cluster_edges$adduct,
     cluster_edges$adduct_dest,
@@ -1004,17 +1004,17 @@ filter_modifier_edges_by_assigned_adducts <- function(
       tidytable::filter(
         is.na(src_assigned_key) |
           is.na(dest_assigned_key) |
-          (
-            adduct_state_key == src_assigned_key &
-              adduct_dest_state_key == dest_assigned_key
-          )
+          (adduct_state_key == src_assigned_key &
+            adduct_dest_state_key == dest_assigned_key)
       ) |>
-      tidytable::select(-tidyselect::any_of(c(
-        "adduct_state_key",
-        "adduct_dest_state_key",
-        "src_assigned_key",
-        "dest_assigned_key"
-      )))
+      tidytable::select(
+        -tidyselect::any_of(c(
+          "adduct_state_key",
+          "adduct_dest_state_key",
+          "src_assigned_key",
+          "dest_assigned_key"
+        ))
+      )
   }
 
   cluster_labeled <- filter_state_labeled_edges(cluster_edges)
@@ -1199,7 +1199,10 @@ build_annotate_masses_ion_tables <- function(
   }
   universe <- universe |>
     harmonize_adducts(adducts_translations = adducts_translations)
-  universe_meta <- annotate_adduct_universe_metadata(universe, polarity = ms_mode)
+  universe_meta <- annotate_adduct_universe_metadata(
+    universe,
+    polarity = ms_mode
+  )
   adduct_lookup <- build_adduct_lookup(universe_meta)
   transition_tables <- build_universe_transition_tables(universe_meta)
 
@@ -1557,7 +1560,10 @@ resolve_competing_cluster_loss_edges_by_hypotheses <- function(
           adduct_support = adduct_support
         )
       ) |>
-      tidytable::summarize(.row_weight = max(.row_weight), .by = c(feature_id, adduct))
+      tidytable::summarize(
+        .row_weight = max(.row_weight),
+        .by = c(feature_id, adduct)
+      )
 
     score_edges <- function(edges, relation_col) {
       if (nrow(edges) == 0L) {
@@ -1594,10 +1600,20 @@ resolve_competing_cluster_loss_edges_by_hypotheses <- function(
     loss_scored <- score_edges(loss_edges, "loss")
 
     decisions <- cluster_scored |>
-      tidytable::select(feature_id, feature_id_dest, .modifier_key, cluster_score = .edge_score) |>
+      tidytable::select(
+        feature_id,
+        feature_id_dest,
+        .modifier_key,
+        cluster_score = .edge_score
+      ) |>
       tidytable::left_join(
         loss_scored |>
-          tidytable::select(feature_id, feature_id_dest, .modifier_key, loss_score = .edge_score),
+          tidytable::select(
+            feature_id,
+            feature_id_dest,
+            .modifier_key,
+            loss_score = .edge_score
+          ),
         by = c("feature_id", "feature_id_dest", ".modifier_key")
       ) |>
       tidytable::mutate(
@@ -1606,37 +1622,56 @@ resolve_competing_cluster_loss_edges_by_hypotheses <- function(
         keep_cluster = cluster_score >= loss_score,
         keep_loss = loss_score >= cluster_score
       ) |>
-      tidytable::distinct(feature_id, feature_id_dest, .modifier_key, .keep_all = TRUE)
+      tidytable::distinct(
+        feature_id,
+        feature_id_dest,
+        .modifier_key,
+        .keep_all = TRUE
+      )
 
     cluster_edges_kept <- cluster_scored |>
       tidytable::left_join(
         decisions |>
-          tidytable::select(feature_id, feature_id_dest, .modifier_key, keep_cluster),
+          tidytable::select(
+            feature_id,
+            feature_id_dest,
+            .modifier_key,
+            keep_cluster
+          ),
         by = c("feature_id", "feature_id_dest", ".modifier_key")
       ) |>
       tidytable::filter(tidytable::coalesce(keep_cluster, TRUE)) |>
-      tidytable::select(-tidyselect::any_of(c(
-        "src_score",
-        "dest_score",
-        ".modifier_key",
-        ".edge_score",
-        "keep_cluster"
-      )))
+      tidytable::select(
+        -tidyselect::any_of(c(
+          "src_score",
+          "dest_score",
+          ".modifier_key",
+          ".edge_score",
+          "keep_cluster"
+        ))
+      )
 
     loss_edges_kept <- loss_scored |>
       tidytable::left_join(
         decisions |>
-          tidytable::select(feature_id, feature_id_dest, .modifier_key, keep_loss),
+          tidytable::select(
+            feature_id,
+            feature_id_dest,
+            .modifier_key,
+            keep_loss
+          ),
         by = c("feature_id", "feature_id_dest", ".modifier_key")
       ) |>
       tidytable::filter(tidytable::coalesce(keep_loss, TRUE)) |>
-      tidytable::select(-tidyselect::any_of(c(
-        "src_score",
-        "dest_score",
-        ".modifier_key",
-        ".edge_score",
-        "keep_loss"
-      )))
+      tidytable::select(
+        -tidyselect::any_of(c(
+          "src_score",
+          "dest_score",
+          ".modifier_key",
+          ".edge_score",
+          "keep_loss"
+        ))
+      )
 
     return(list(
       cluster_edges = cluster_edges_kept,
@@ -1914,11 +1949,9 @@ build_annotate_masses_candidate_hypotheses <- function(
   # network has determined; removing these prevents inflated candidate counts.
   if (!is.null(feature_m_map) && nrow(feature_m_map) > 0L) {
     .tol_ppm <- suppressWarnings(as.numeric(tolerance_ppm))
-    .tol_da <- suppressWarnings(as.numeric(if (!is.null(tolerance_dalton)) {
-      tolerance_dalton
-    } else {
-      0
-    }))
+    .tol_da <- suppressWarnings(as.numeric(
+      tolerance_dalton %||% 0
+    ))
 
     if (!is.finite(.tol_ppm) || !is.finite(.tol_da)) {
       log_warn(
@@ -1932,10 +1965,13 @@ build_annotate_masses_candidate_hypotheses <- function(
     } else {
       node_hypotheses <- node_hypotheses |>
         tidytable::left_join(
-          feature_m_map |> tidytable::select(feature_id, .consensus_m = neutral_mass),
+          feature_m_map |>
+            tidytable::select(feature_id, .consensus_m = neutral_mass),
           by = "feature_id"
         ) |>
-        tidytable::mutate(.consensus_m = suppressWarnings(as.numeric(.consensus_m))) |>
+        tidytable::mutate(
+          .consensus_m = suppressWarnings(as.numeric(.consensus_m))
+        ) |>
         tidytable::filter(
           is.na(.consensus_m) |
             abs(mass - .consensus_m) <=

@@ -91,9 +91,9 @@ build_adduct_lookup <- function(universe) {
     tidytable::mutate(
       adduct_mass_per_monomer = tidytable::coalesce(adduct_mass_per_monomer, 0),
       mz_slope = n_mer / abs(z),
-      mz_offset = (
-        n_mer * adduct_mass_per_monomer + adduct_mass
-      ) / abs(z) + n_iso * isotope_shift,
+      mz_offset = (n_mer * adduct_mass_per_monomer + adduct_mass) /
+        abs(z) +
+        n_iso * isotope_shift,
       carrier_key = vapply(carriers, component_count_key, character(1L)),
       cluster_key = vapply(clusters, component_count_key, character(1L)),
       loss_key = vapply(losses, component_count_key, character(1L))
@@ -177,7 +177,8 @@ calculate_mz_from_lookup <- function(
         z = rows$z,
         adduct_mass = rows$adduct_mass,
         adduct_mass_per_monomer = rows$adduct_mass_per_monomer
-      ) + rows$n_iso * isotope_shift
+      ) +
+        rows$n_iso * isotope_shift
     }
     if (!fallback || all(matched)) {
       return(out)
@@ -258,7 +259,9 @@ build_universe_transition_tables <- function(universe) {
         next
       }
       row_j <- lookup[j, ]
-      if (!isTRUE(all.equal(row_i$mz_slope, row_j$mz_slope, tolerance = 1e-12))) {
+      if (
+        !isTRUE(all.equal(row_i$mz_slope, row_j$mz_slope, tolerance = 1e-12))
+      ) {
         next
       }
       delta <- as.numeric(row_j$mz_offset - row_i$mz_offset)
@@ -356,4 +359,3 @@ build_universe_transition_tables <- function(universe) {
       tidytable::distinct(adduct, adduct_dest, loss, mass)
   )
 }
-

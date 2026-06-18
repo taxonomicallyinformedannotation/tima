@@ -574,49 +574,51 @@ collect_node_adduct_hypotheses <- function(
         feature_m_map |> tidytable::select(feature_id, neutral_mass),
         by = "feature_id"
       ) |>
-       tidytable::mutate(
-         implied_m = calculate_neutral_mass_from_lookup(
-           mzs = as.numeric(mz),
-           adducts = adduct,
-           adduct_lookup = adduct_lookup
-         ),
-         compatible = is.na(neutral_mass) |
-           abs(implied_m - neutral_mass) <= pmax(
-             tolerance_ppm * 1e-6 * neutral_mass,
-             tolerance_dalton %||% 0
-           )
-       ) |>
-       tidytable::filter(compatible) |>
-       tidytable::select(
-         feature_id,
-         adduct,
-         source,
-         is_preassigned,
-         candidate_adduct_origin
-       )
-   }
+      tidytable::mutate(
+        implied_m = calculate_neutral_mass_from_lookup(
+          mzs = as.numeric(mz),
+          adducts = adduct,
+          adduct_lookup = adduct_lookup
+        ),
+        compatible = is.na(neutral_mass) |
+          abs(implied_m - neutral_mass) <=
+            pmax(
+              tolerance_ppm * 1e-6 * neutral_mass,
+              tolerance_dalton %||% 0
+            )
+      ) |>
+      tidytable::filter(compatible) |>
+      tidytable::select(
+        feature_id,
+        adduct,
+        source,
+        is_preassigned,
+        candidate_adduct_origin
+      )
+  }
 
-   if (nrow(pre_prop_hyps) > 0L && nrow(feature_m_map) > 0L) {
-     pre_prop_hyps <- pre_prop_hyps |>
-       tidytable::left_join(
-         features_table |> tidytable::distinct(feature_id, mz),
-         by = "feature_id"
-       ) |>
-       tidytable::left_join(
-         feature_m_map |> tidytable::select(feature_id, neutral_mass),
-         by = "feature_id"
-       ) |>
-       tidytable::mutate(
-         implied_m = calculate_neutral_mass_from_lookup(
-           mzs = as.numeric(mz),
-           adducts = adduct,
-           adduct_lookup = adduct_lookup
-         ),
-         compatible = is.na(neutral_mass) |
-           abs(implied_m - neutral_mass) <= pmax(
-             tolerance_ppm * 1e-6 * neutral_mass,
-             tolerance_dalton %||% 0
-           )
+  if (nrow(pre_prop_hyps) > 0L && nrow(feature_m_map) > 0L) {
+    pre_prop_hyps <- pre_prop_hyps |>
+      tidytable::left_join(
+        features_table |> tidytable::distinct(feature_id, mz),
+        by = "feature_id"
+      ) |>
+      tidytable::left_join(
+        feature_m_map |> tidytable::select(feature_id, neutral_mass),
+        by = "feature_id"
+      ) |>
+      tidytable::mutate(
+        implied_m = calculate_neutral_mass_from_lookup(
+          mzs = as.numeric(mz),
+          adducts = adduct,
+          adduct_lookup = adduct_lookup
+        ),
+        compatible = is.na(neutral_mass) |
+          abs(implied_m - neutral_mass) <=
+            pmax(
+              tolerance_ppm * 1e-6 * neutral_mass,
+              tolerance_dalton %||% 0
+            )
       ) |>
       tidytable::filter(compatible) |>
       tidytable::select(
@@ -688,27 +690,27 @@ collect_node_adduct_hypotheses <- function(
       feature_m_map |> tidytable::select(feature_id, neutral_mass),
       by = "feature_id"
     ) |>
-     tidytable::mutate(
-       implied_m = calculate_neutral_mass_from_lookup(
-         mzs = as.numeric(mz),
-         adducts = adduct,
-         adduct_lookup = adduct_lookup
-       ),
-       compatible = is.na(neutral_mass) |
-         abs(implied_m - neutral_mass) <=
-           pmax(tolerance_ppm * 1e-6 * neutral_mass, tolerance_dalton %||% 0),
-       source = "baseline",
-       is_preassigned = FALSE,
-       candidate_adduct_origin = "baseline"
-     ) |>
-     tidytable::filter(compatible) |>
-     tidytable::select(
-       feature_id,
-       adduct,
-       source,
-       is_preassigned,
-       candidate_adduct_origin
-     )
+    tidytable::mutate(
+      implied_m = calculate_neutral_mass_from_lookup(
+        mzs = as.numeric(mz),
+        adducts = adduct,
+        adduct_lookup = adduct_lookup
+      ),
+      compatible = is.na(neutral_mass) |
+        abs(implied_m - neutral_mass) <=
+          pmax(tolerance_ppm * 1e-6 * neutral_mass, tolerance_dalton %||% 0),
+      source = "baseline",
+      is_preassigned = FALSE,
+      candidate_adduct_origin = "baseline"
+    ) |>
+    tidytable::filter(compatible) |>
+    tidytable::select(
+      feature_id,
+      adduct,
+      source,
+      is_preassigned,
+      candidate_adduct_origin
+    )
 
   base_hyps <- tidytable::bind_rows(
     supported_seed,
@@ -739,7 +741,9 @@ collect_node_adduct_hypotheses <- function(
       )
     )
 
-  cluster_hyps <- if (all(c("adduct", "adduct_dest") %in% colnames(cluster_edges))) {
+  cluster_hyps <- if (
+    all(c("adduct", "adduct_dest") %in% colnames(cluster_edges))
+  ) {
     tidytable::bind_rows(
       cluster_edges |>
         tidytable::transmute(
@@ -2006,7 +2010,9 @@ propagate_annotations_across_m_cliques <- function(
       mass = suppressWarnings(as.numeric(mass)),
       structure_exact_mass = suppressWarnings(as.numeric(structure_exact_mass))
     ) |>
-    tidytable::filter(!is.na(target_mass) & !is.na(mass) & !is.na(structure_exact_mass))
+    tidytable::filter(
+      !is.na(target_mass) & !is.na(mass) & !is.na(structure_exact_mass)
+    )
 
   if (nrow(propagation_combined) == 0L) {
     return(annotations)

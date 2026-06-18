@@ -61,4 +61,3 @@ test_that("cluster transitions scale modifier delta by charge state", {
   expect_equal(nrow(cluster_edges), 1L)
   expect_equal(cluster_edges$mass, h2o / 2, tolerance = 1e-9)
 })
-

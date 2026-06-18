@@ -146,34 +146,33 @@ summarize_results <- function(
     ) |>
     tidytable::distinct(feature_id, .keep_all = TRUE)
 
-   # Start from annotation rows and add compact per-feature metadata.
-   df_joined <- df |>
-     tidytable::right_join(y = features_min) |>
-     tidytable::left_join(y = components_min) |>
-     tidytable::select(tidyselect::any_of(x = select_cols)) |>
-     tidytable::distinct() |>
-     tidytable::left_join(
-       y = organism_lookup,
-       by = c(
-         "feature_id",
-         "candidate_structure_inchikey_connectivity_layer",
-         "candidate_structure_organism_occurrence_closest"
-       )
-     ) |>
-     tidytable::select(tidyselect::any_of(x = final_select_cols)) |>
-     tidytable::arrange(rank_final)
+  # Start from annotation rows and add compact per-feature metadata.
+  df_joined <- df |>
+    tidytable::right_join(y = features_min) |>
+    tidytable::left_join(y = components_min) |>
+    tidytable::select(tidyselect::any_of(x = select_cols)) |>
+    tidytable::distinct() |>
+    tidytable::left_join(
+      y = organism_lookup,
+      by = c(
+        "feature_id",
+        "candidate_structure_inchikey_connectivity_layer",
+        "candidate_structure_organism_occurrence_closest"
+      )
+    ) |>
+    tidytable::select(tidyselect::any_of(x = final_select_cols)) |>
+    tidytable::arrange(rank_final)
 
-   # Add annotation_note from lookup table at the very end
-   # Note: annotation_notes_lookup has been pre-collapsed to ensure
-   # one note per (feature_id, candidate_adduct, rank_final) group
-   if (!is.null(annotation_notes_lookup) && nrow(annotation_notes_lookup) > 0) {
-     df_joined <- df_joined |>
-       tidytable::left_join(
-         y = annotation_notes_lookup,
-         by = c("feature_id", "candidate_adduct", "rank_final")
-       )
-   }
-
+  # Add annotation_note from lookup table at the very end
+  # Note: annotation_notes_lookup has been pre-collapsed to ensure
+  # one note per (feature_id, candidate_adduct, rank_final) group
+  if (!is.null(annotation_notes_lookup) && nrow(annotation_notes_lookup) > 0) {
+    df_joined <- df_joined |>
+      tidytable::left_join(
+        y = annotation_notes_lookup,
+        by = c("feature_id", "candidate_adduct", "rank_final")
+      )
+  }
 
   rm(df, organism_lookup)
 
