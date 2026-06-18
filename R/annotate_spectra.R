@@ -835,8 +835,7 @@ convert_precursor_for_matching <- function(precursors, adducts) {
     iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
     m_vec <- (n_charges *
       (mz_vec -
-        iso_shift -
-        ATOMIC_MONOISOTOPIC_MASS[["H"]] +
+        iso_shift +
         ELECTRON_MASS_DA) -
       mass_mods) /
       n_mer
@@ -1140,13 +1139,17 @@ finalize_results <- function(
       candidate_library = target_library,
       candidate_spectrum_id = target_spectrum_id,
       candidate_structure_name = target_name,
-      candidate_structure_error_mz = target_precursorMz - precursorMz,
       candidate_adduct_match_mode = tidytable::case_when(
         !is.na(candidate_query_adduct) &
           !is.na(candidate_adduct) &
           query_adduct_state_key == target_adduct_state_key ~ "exact_adduct",
         .similarity_space == "neutral_M" ~ "m_delta_rescued",
         TRUE ~ "precursor_mz"
+      ),
+      # Take into account the adduct space used for matching
+      candidate_structure_error_mz = tidytable::case_when(
+        candidate_adduct_match_mode == "m_delta_rescued" ~ target_neutral_mass - query_neutral_mass,
+        TRUE ~ target_precursorMz - query_precursorMz
       ),
       annotation_note = tidytable::case_when(
         candidate_adduct_match_mode == "m_delta_rescued" ~
