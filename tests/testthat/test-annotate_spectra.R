@@ -967,10 +967,17 @@ test_that("finalize_results uses SMILES for deduplication", {
     target_smiles = "CCO",
     target_smiles_no_stereo = NA_character_,
     target_name = "ethanol",
-    target_precursorMz = 101
+    target_precursorMz = 101,
+    target_neutral_mass = 100
+  )
+  query_meta <- tidytable::tidytable(
+    feature_id = "F1",
+    query_adduct = "[M+H]+",
+    query_precursorMz = 100,
+    query_neutral_mass = 99
   )
 
-  out <- finalize_results(df_sim = df_sim, meta = meta)
+  out <- finalize_results(df_sim = df_sim, meta = meta, query_meta = query_meta)
 
   expect_equal(out$candidate_structure_smiles_no_stereo, "CCO")
   expect_false(
@@ -1199,10 +1206,17 @@ test_that("finalize_results outputs SMILES-based structure identification only",
     target_smiles = "CCO",
     target_smiles_no_stereo = "CCO",
     target_name = "ethanol",
-    target_precursorMz = 101
+    target_precursorMz = 101,
+    target_neutral_mass = 100
+  )
+  query_meta <- tidytable::tidytable(
+    feature_id = "F1",
+    query_adduct = "[M+H]+",
+    query_precursorMz = 100,
+    query_neutral_mass = 99
   )
 
-  out <- finalize_results(df_sim = df_sim, meta = meta)
+  out <- finalize_results(df_sim = df_sim, meta = meta, query_meta = query_meta)
 
   expect_equal(out$candidate_structure_smiles_no_stereo, "CCO")
   ## InChIKey columns are no longer derived in finalize_results;
@@ -1469,7 +1483,8 @@ test_that("finalize_results flags exact adduct and neutral-mass rescued matches"
     target_smiles = c("CCO", "CCC"),
     target_smiles_no_stereo = c("CCO", "CCC"),
     target_name = c("ethanol", "propane"),
-    target_precursorMz = c(101, 201)
+    target_precursorMz = c(101, 201),
+    target_neutral_mass = c(100, 200)
   )
   query_meta <- tidytable::tidytable(
     feature_id = c("F1", "F2"),
