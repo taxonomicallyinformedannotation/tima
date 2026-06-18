@@ -43,27 +43,36 @@ Our main goals were **flexibility** and **reproducibility**.
 
 ### Flexibility
 
-To ensure flexibility, we tried to split the process in as much tiny parts as needed.
-So you can decide whether to skip an optional part, add your own processing, etc.
-We tried to cover most use cases, but of course they are not exhaustive.
-If you feel like something useful to other users is missing, please fill an [issue](https://github.com/taxonomicallyinformedannotation/tima/issues).
+To ensure flexibility, we tried to split the process in as much tiny parts as
+needed. So you can decide whether to skip an optional part, add your own
+processing, etc. We tried to cover most use cases, but of course they are not
+exhaustive. If you feel like something useful to other users is missing, please
+fill an [issue](https://github.com/taxonomicallyinformedannotation/tima/issues).
 
 ### Reproducibility
 
-After some time using TIMA, you will probably wonder:
-"*What was the parameters I used to generate this file?*" ...
-Or a collaborator might ask you to share your data and parameters.
-Writing them down each time might be time-consuming and not really in line with modern computational approaches.
-Therefore, we chose to implement all parameters of all steps (almost...) as YAML files.
-They are human-readable and can be used in batches.
-If you do not like YAML, parameters of each step can also be given as command line arguments.
-They will then be saved as YAML you will be able to share.
+After some time using TIMA, you will probably wonder: "*What was the parameters
+I used to generate this file?*" ... Or a collaborator might ask you to share
+your data and parameters. Writing them down each time might be time-consuming
+and not really in line with modern computational approaches. Therefore, we chose
+to implement all parameters of all steps (almost...) as YAML files. They are
+human-readable and can be used in batches. If you do not like YAML, parameters
+of each step can also be given as command line arguments. They will then be
+saved as YAML you will be able to share.
 
-To ensure optimal reproducibility and avoiding re-computing endlessly steps that did not change, we decided to build a [{targets}](https://books.ropensci.org/targets/) pipeline.
-Each step of the whole pipeline will be described next.
+To ensure optimal reproducibility and avoiding re-computing endlessly steps that
+did not change, we decided to build a
+[{targets}](https://books.ropensci.org/targets/) pipeline. Each step of the
+whole pipeline will be described next.
 
+```{r}
+#| label: targets
+#| echo: false
+#| eval: false
+#| message: false
+#| warning: false
+#| out-width: "100%"
 
-```{r targets, echo=FALSE, eval=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
 try(
   expr = {
     library(targets)
@@ -90,7 +99,11 @@ try(
 
 All coming steps admit you already installed `tima`:
 
-```{r install, eval=FALSE, include=TRUE}
+```{r}
+#| label: install
+#| eval: false
+#| include: true
+
 install.packages(
   "tima",
   repos = c(
@@ -105,7 +118,8 @@ tima::get_example_files()
 
 We now recommend you to read the following vignettes:
 
-- <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html> **Start here!** Validate your data before running the pipeline
+- <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html>
+  **Start here!** Validate your data before running the pipeline
 - <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html>
 - <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html>
 - <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html>
@@ -115,7 +129,11 @@ We now recommend you to read the following vignettes:
 
 **Important:** Always validate your data to catch issues early!
 
-```{r validate_first, eval=FALSE, include=TRUE}
+```{r}
+#| label: validate_first
+#| eval: false
+#| include: true
+
 validate_inputs(
   features = "data/source/example_features.csv",
   spectra = "data/source/example_spectra.mgf",
@@ -129,19 +147,32 @@ validate_inputs(
 
 If you do not feel like going through all the steps, then just do 🚀:
 
-```{r run_app, eval=FALSE, include=TRUE}
+```{r}
+#| label: run_app
+#| eval: false
+#| include: true
+
 tima::run_app()
 ```
 
 If you do not even need a GUI ☠️:
 
-```{r run_tima, eval=FALSE, include=TRUE}
+```{r}
+#| label: run_tima
+#| eval: false
+#| include: true
+
 tima::run_tima()
 ```
 
-In case you just want to change some small parameters between jobs, a convenience function is available:
+In case you just want to change some small parameters between jobs, a
+convenience function is available:
 
-```{r change_params, eval=FALSE, include=TRUE}
+```{r}
+#| label: change_params
+#| eval: false
+#| include: true
+
 tima::change_params_small(
   fil_pat = "myExamplePattern",
   fil_fea_raw = "myExampleDir/myExampleFeatures.csv",
@@ -155,29 +186,33 @@ tima::change_params_small(
 )
 ```
 
-
 ## Biological Weighting and Core Metabolism
 
-TIMA's core principle is that candidates that are close to your sample's taxonomic origin receive higher biological scores.
-For example, if you are analyzing a plant extract (*Gentiana lutea*),
-metabolites reported from plants will score higher than those only reported from bacteria or animals.
+TIMA's core principle is that candidates that are close to your sample's
+taxonomic origin receive higher biological scores. For example, if you are
+analyzing a plant extract (*Gentiana lutea*), metabolites reported from plants
+will score higher than those only reported from bacteria or animals.
 
 ### The Special Case: "Biota" Superdomain
 
-However, some metabolites are *universal*, they are part of the shared core metabolism found across all domains of life.
-To ensure these universal metabolites are always considered in annotations regardless of sample taxonomy,
-TIMA implements a special `"Biota" Superdomain`.
-When preparing structure-organism pair libraries (e.g., from BiGG metabolic models),
-metabolites present in all model organisms are assigned to the special "Biota" organism with:
+However, some metabolites are *universal*, they are part of the shared core
+metabolism found across all domains of life. To ensure these universal
+metabolites are always considered in annotations regardless of sample taxonomy,
+TIMA implements a special `"Biota" Superdomain`. When preparing
+structure-organism pair libraries (e.g., from BiGG metabolic models),
+metabolites present in all model organisms are assigned to the special "Biota"
+organism with:
 
 - `organism_taxonomy_01domain = "Biota"`
 - `organism_taxonomy_ottid = 0`
 
 Note: this Biota placeholder is different from the PubChem Lite exposomics
-placeholder used for xenobiotics (`organism_taxonomy_ottid = "93302", cellular organisms`), which
-is only a label for that library source and should not be interpreted as the
-Biota superdomain.
+placeholder used for xenobiotics
+(`organism_taxonomy_ottid = "93302", cellular organisms`), which is only a label
+for that library source and should not be interpreted as the Biota superdomain.
 
-During biological weighting, any candidate from the Biota domain receives the maximal biological score.
-This ensures that core metabolic pathways are never inappropriately filtered out due to taxonomic mismatches,
-while still maintaining the taxonomic prioritization for organism-specific specialized metabolism.
+During biological weighting, any candidate from the Biota domain receives the
+maximal biological score. This ensures that core metabolic pathways are never
+inappropriately filtered out due to taxonomic mismatches, while still
+maintaining the taxonomic prioritization for organism-specific specialized
+metabolism.

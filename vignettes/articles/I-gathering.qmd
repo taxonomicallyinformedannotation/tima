@@ -32,7 +32,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r tima, include = FALSE}
+```{r}
+#| label: tima
+#| include: false
+
 library("tima")
 if (dir.exists("../../inst")) {
   knitr::opts_knit$set(root.dir = "../../inst")
@@ -41,21 +44,23 @@ if (dir.exists("../../inst")) {
 
 This vignette describes...
 
-* All parameters you need
-* All inputs you need
+- All parameters you need
+- All inputs you need
 
 ## Parameters
 
-All steps require parameters.
-Some default parameters are available and can be accessed in the `params/default` directory.
-If you prefer accessing them through the GUI, you can do so.
-Each parameter contains a small help menu, you can click on, as illustrated below.
+All steps require parameters. Some default parameters are available and can be
+accessed in the `params/default` directory. If you prefer accessing them through
+the GUI, you can do so. Each parameter contains a small help menu, you can click
+on, as illustrated below.
 
 ![Screenshot showing where the help menu is](./figures/screenshot-1.svg)\
 
-![Screenshot showing how the help menu looks like when opened](./figures/screenshot-2.svg)\
+![Screenshot showing how the help menu looks like when
+opened](./figures/screenshot-2.svg)\
 
-For example, if you want to have an output compatible with Cytoscape, with multiple annotations per features:
+For example, if you want to have an output compatible with Cytoscape, with
+multiple annotations per features:
 
 ![Screenshot showing an example box ticked](./figures/screenshot-3.svg)\
 
@@ -65,10 +70,14 @@ All parameters will be saved and reported at the end of your analysis.
 
 ### Your own files
 
-You should provide your own files in the main menu.
-For this tutorial, we will use some example files you can get running:
+You should provide your own files in the main menu. For this tutorial, we will
+use some example files you can get running:
 
-```{r get-files, eval=FALSE, include=TRUE}
+```{r}
+#| label: get-files
+#| eval: false
+#| include: true
+
 tima::get_example_files()
 ```
 
@@ -82,22 +91,32 @@ As a first step, you need spectral libraries to perform MS^2^-based annotation.
 
 ##### Experimental
 
-You can of course use your own experimental spectral library to perform MS^2^ annotation.
-We currently support spectral libraries in MSP or MGF format.
+You can of course use your own experimental spectral library to perform MS^2^
+annotation. We currently support spectral libraries in MSP or MGF format.
 
 To get a small example:
 
-```{r spectra-rt, eval=FALSE, include=TRUE}
+```{r}
+#| label: spectra-rt
+#| eval: false
+#| include: true
+
 tima::get_example_files("spectral_lib_with_rt")
 ```
 
 ###### GNPS, MassBank & MERLIN
 
-GNPS, MassBank & MERLIN are downloaded and used by default, for more info about them, see <https://github.com/Adafede/SpectRalLibRaRies>.
+GNPS, MassBank & MERLIN are downloaded and used by default, for more info about
+them, see <https://github.com/Adafede/SpectRalLibRaRies>.
 
-In case you want to format your own spectral library to use it for spectral matching, adapt it the same way.
+In case you want to format your own spectral library to use it for spectral
+matching, adapt it the same way.
 
-```{r spectra-mb, eval=FALSE, include=TRUE}
+```{r}
+#| label: spectra-mb
+#| eval: false
+#| include: true
+
 targets::tar_make(
   names = tidyselect::matches("lib_spe_exp")
 )
@@ -105,60 +124,80 @@ targets::tar_make(
 
 ##### *In silico*
 
-As the availability of experimental spectra is limited, we can take advantage of *in silico* generated spectra.
+As the availability of experimental spectra is limited, we can take advantage of
+*in silico* generated spectra.
 
 #### Wikidata
 
-We generated an *in silico* spectral library of the structures found in Wikidata using [CFM4](https://doi.org/10.1021/acs.analchem.1c01465).
-For more info, see <https://doi.org/10.5281/zenodo.5607185>.
-It is made available in both polarities.
+We generated an *in silico* spectral library of the structures found in Wikidata
+using [CFM4](https://doi.org/10.1021/acs.analchem.1c01465). For more info, see
+<https://doi.org/10.5281/zenodo.5607185>. It is made available in both
+polarities.
 
-```{r get-isdb-wikidata, eval=FALSE, include=TRUE}
+```{r}
+#| label: get-isdb-wikidata
+#| eval: false
+#| include: true
+
 targets::tar_make(
   names = tidyselect::matches("lib_spe_is_wik")
 )
 ```
 
-```{r prepare-isdb-wikidata-1,  eval=FALSE, include=TRUE}
+```{r}
+#| label: prepare-isdb-wikidata-1
+#| eval: false
+#| include: true
+
 targets::tar_make(
   names = tidyselect::matches("lib_spe_is_wik_pre")
 )
 ```
 
-You can also complement with the in silico spectra from HMDB (not running by default as quite long):
+You can also complement with the in silico spectra from HMDB (not running by
+default as quite long):
 
 #### HMDB
 
-```{r get-isdb-hmdb, eval=FALSE, include=TRUE}
+```{r}
+#| label: get-isdb-hmdb
+#| eval: false
+#| include: true
+
 tima::get_example_files("hmdb_is")
 ```
 
 #### Retention times
 
-This library is **optional**.
-As no standard LC method is shared (for now) among laboratories, this library
-will be heavily laboratory-dependent.
-It could also be a library of in silico predicted retention times.
-If you want to prepare you own library, have a look at `params/user/prepare_libraries_rt.yaml`.
+This library is **optional**. As no standard LC method is shared (for now) among
+laboratories, this library will be heavily laboratory-dependent. It could also
+be a library of in silico predicted retention times. If you want to prepare you
+own library, have a look at `params/user/prepare_libraries_rt.yaml`.
 
 #### Structure-Organism Pairs
 
 ##### LOTUS
 
-As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more informations, see <https://doi.org/10.7554/eLife.70780>] with
-**T**axonomically
-**I**nformed
-**M**etabolite
-**A**nnotation in mind,
-we provide it here as a starting point for your structure-organism pairs library.
+As we developed [LOTUS](https://lotusnprod.github.io/lotus-manuscript)^[For more
+informations, see <https://doi.org/10.7554/eLife.70780>] with **T**axonomically
+**I**nformed **M**etabolite **A**nnotation in mind, we provide it here as a
+starting point for your structure-organism pairs library.
 
-```{r get-lotus, eval=FALSE, include=TRUE}
+```{r}
+#| label: get-lotus
+#| eval: false
+#| include: true
+
 targets::tar_make(
   names = tidyselect::matches("lib_sop_lot$")
 )
 ```
 
-```{r prepare-lotus-2, eval=FALSE, include=TRUE}
+```{r}
+#| label: prepare-lotus-2
+#| eval: false
+#| include: true
+
 targets::tar_make(
   names = tidyselect::matches("lib_sop_lot_pre")
 )
@@ -166,7 +205,13 @@ targets::tar_make(
 
 The process to download LOTUS looks like this:
 
-```{r prepare-lotus-3, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+```{r}
+#| label: prepare-lotus-3
+#| echo: false
+#| message: false
+#| warning: false
+#| out-width: "100%"
+
 targets::tar_visnetwork(
   names = tidyselect::matches("lib_sop_lot"),
   exclude = targets::contains(
@@ -182,15 +227,20 @@ targets::tar_visnetwork(
 )
 ```
 
-As you can see, the targets seem outdated.
-In reality, we force it to search if a new version of LOTUS exists each time.
-If a newer version exists, it will fetch it and re-run needed steps accordingly.
+As you can see, the targets seem outdated. In reality, we force it to search if
+a new version of LOTUS exists each time. If a newer version exists, it will
+fetch it and re-run needed steps accordingly.
 
 ##### BiGG
 
-By default, we also complement LOTUS pairs with the ones coming from [BiGG](http://bigg.ucsd.edu/).
+By default, we also complement LOTUS pairs with the ones coming from
+[BiGG](http://bigg.ucsd.edu/).
 
-```{r prepare-bigg-1, eval=FALSE, include=TRUE}
+```{r}
+#| label: prepare-bigg-1
+#| eval: false
+#| include: true
+
 targets::tar_make(
   names = tidyselect::matches("lib_sop_big_pre")
 )
@@ -200,7 +250,11 @@ targets::tar_make(
 
 And the ones from [ECMDB](https://ecmdb.ca/).
 
-```{r prepare-ecmdb-1, eval=FALSE, include=TRUE}
+```{r}
+#| label: prepare-ecmdb-1
+#| eval: false
+#| include: true
+
 targets::tar_make(
   names = tidyselect::matches("lib_sop_ecm_pre")
 )
@@ -210,33 +264,50 @@ targets::tar_make(
 
 And we do the same with the ones coming from [HMDB](https://hmdb.ca/).
 
-```{r prepare-hmdb, eval=FALSE, include=TRUE}
+```{r}
+#| label: prepare-hmdb
+#| eval: false
+#| include: true
+
 targets::tar_make(
   names = tidyselect::matches("lib_sop_hmd_pre")
 )
 ```
 
-For these first steps, you do not need to change any parameters as they are implemented *by default*.
+For these first steps, you do not need to change any parameters as they are
+implemented *by default*.
 
 ##### Other libraries
 
 As we want our tool to be flexible, you can also add your own library to LOTUS.
-You just need to format it in order to be compatible.
-As example, we prepared some ways too format closed, *in house* libraries.
-If you need help formatting your library or would like to share it with us for it to be implemented, feel free to contact us.
-Before running the corresponding code, do not forget to modify `params/user/prepare_libraries_sop_closed.yaml`.
+You just need to format it in order to be compatible. As example, we prepared
+some ways too format closed, *in house* libraries. If you need help formatting
+your library or would like to share it with us for it to be implemented, feel
+free to contact us. Before running the corresponding code, do not forget to
+modify `params/user/prepare_libraries_sop_closed.yaml`.
 
 ##### Merging
 
-Once all sub-libraries are ready, they are then merged in a single file that will be used for the next steps.
+Once all sub-libraries are ready, they are then merged in a single file that
+will be used for the next steps.
 
-```{r libraries-sop-1, eval=FALSE, include=TRUE}
+```{r}
+#| label: libraries-sop-1
+#| eval: false
+#| include: true
+
 targets::tar_make(
   names = tidyselect::matches("lib_sop_mer")
 )
 ```
 
-```{r libraries-sop-2, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+```{r}
+#| label: libraries-sop-2
+#| echo: false
+#| message: false
+#| warning: false
+#| out-width: "100%"
+
 targets::tar_visnetwork(
   names = starts_with("lib_sop"),
   exclude = targets::contains(
@@ -252,4 +323,5 @@ targets::tar_visnetwork(
 )
 ```
 
-We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html).
+We now recommend you to read the [next
+vignette](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html).

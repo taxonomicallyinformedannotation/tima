@@ -1,5 +1,3 @@
-
-
 <!-- README.md is generated from README.qmd. Please edit that file -->
 
 # tima <img src="https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/logo.svg" align="right" height="139"/>
@@ -19,9 +17,8 @@ badge](https://taxonomicallyinformedannotation.r-universe.dev/tima/badges/versio
 
 <!-- badges: end -->
 
-The initial work is available at
-<https://doi.org/10.3389/fpls.2019.01329>, with many improvements made
-since then. The workflow is illustrated below.
+The initial work is available at <https://doi.org/10.3389/fpls.2019.01329>, with
+many improvements made since then. The workflow is illustrated below.
 
 ![Workflow](https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/tima.svg)
 
@@ -34,14 +31,12 @@ This repository contains everything needed to perform **T**axonomically
 
 Here is what you *minimally* need:
 
-- **Feature quantification table** (.csv/.tsv) - Peak areas/heights
-  across samples
+- **Feature quantification table** (.csv/.tsv) - Peak areas/heights across
+  samples
   ([example](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_features.csv))
-  - Must contain: feature ID, retention time, m/z, and sample intensity
-    columns
+  - Must contain: feature ID, retention time, m/z, and sample intensity columns
   - **Column names are customizable**
-- **MS/MS spectra file** (.mgf) - Fragment spectra for each or some
-  features
+- **MS/MS spectra file** (.mgf) - Fragment spectra for each or some features
   ([example](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_spectra_mini.mgf))
 - **Sample metadata** (.csv/.tsv) - Links samples to organisms
   ([example](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_metadata.tsv))
@@ -50,21 +45,19 @@ Here is what you *minimally* need:
 ### Optional Additions
 
 - **Structure-organism pairs library** - We provide
-  [**LOTUS**](https://lotusnprod.github.io/lotus-manuscript/) (\>650k
-  pairs) as default
+  [**LOTUS**](https://lotusnprod.github.io/lotus-manuscript/) (\>650k pairs) as
+  default
 - **External annotations** - SIRIUS (v5/v6), GNPS-FBMN results
 - **Custom spectral libraries** - For in-house compound matching
 
-**Tip**: All column names and file paths are customizable through the
-Shiny app interface or YAML/CLI parameters - no need to rename your
-files!
+**Tip**: All column names and file paths are customizable through the Shiny app
+interface or YAML/CLI parameters - no need to rename your files!
 
 ## Installation
 
-As the package is not (yet) available on CRAN, you will need to install
-with:
+As the package is not (yet) available on CRAN, you will need to install with:
 
-``` r
+```r
 install.packages(
   "tima",
   repos = c(
@@ -77,24 +70,23 @@ install.packages(
 
 Then, you should be able to install the rest with:
 
-``` r
+```r
 tima::install_tima()
 ```
 
 Normally, everything you need should then be installed (as tested in
 [here](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/external-use.yaml)).
-If for some reason, some packages were not installed, try to install
-them manually. To avoid such issues, we offer a containerized version
-(see [Docker](#docker)).
+If for some reason, some packages were not installed, try to install them
+manually. To avoid such issues, we offer a containerized version (see
+[Docker](#docker)).
 
 Once installed, you are ready to go through our
 [documentation](https://taxonomicallyinformedannotation.github.io/tima/articles/),
 with the major steps detailed.
 
-In case you do not have your data ready, you can obtain some example
-data using:
+In case you do not have your data ready, you can obtain some example data using:
 
-``` r
+```r
 tima::get_example_files()
 ```
 
@@ -105,7 +97,7 @@ tima::get_example_files()
 **Start by validating your input files** to catch issues early and save
 debugging time:
 
-``` r
+```r
 # Check if your data is matches expectations before processing
 validate_inputs(
   features = "data/source/example_features.csv",
@@ -127,10 +119,10 @@ This will:
 
 ### Run the Pipeline
 
-Once you are done, you can open a small GUI to adapt your parameters and
-launch your job:
+Once you are done, you can open a small GUI to adapt your parameters and launch
+your job:
 
-``` r
+```r
 tima::run_app()
 ```
 
@@ -138,15 +130,15 @@ This command will open a small app in your default browser.
 
 ### Docker
 
-A container is also available, together with a small compose file. Main
-commands are below:
+A container is also available, together with a small compose file. Main commands
+are below:
 
-``` bash
+```bash
 docker pull adafede/tima-r
 # docker build inst/. -t adafede/tima-r --no-cache
 ```
 
-``` bash
+```bash
 docker run \
 --user tima-user \
 --memory="12g" \
@@ -163,13 +155,13 @@ adafede/tima-r
 ```
 
 Adapt the memory limit as needed. The app will be available at
-<http://localhost:3838/>. Results will be written to `.tima/data` (your
-mounted folder).
+<http://localhost:3838/>. Results will be written to `.tima/data` (your mounted
+folder).
 
 ## Main Citations
 
-According to which steps you used, please give credit to the authors of
-the tools/resources used.
+According to which steps you used, please give credit to the authors of the
+tools/resources used.
 
 ### TIMA
 
@@ -231,47 +223,47 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 
 ## Additional software credits
 
-| Package | Version | Citation |
-|:---|:---|:---|
-| archive | 1.1.13 | Hester and Csárdi (2026) |
-| base | 4.6.0 | R Core Team (2026a) |
-| BiocManager | 1.30.27 | Morgan and Ramos (2025) |
-| BiocParallel | 1.46.0 | Wang et al. (2026) |
-| BiocVersion | 3.23.1 | Morgan (2025) |
-| docopt | 0.7.2 | <span class="nocase">de Jonge</span> (2025) |
-| fs | 2.1.0 | Hester et al. (2026) |
-| httr2 | 1.2.2 | Wickham (2025) |
-| igraph | 2.3.2 | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2026) |
-| knitr | 1.51 | Xie (2014); Xie (2015); Xie (2025) |
-| lgr | 0.5.2 | Fleck (2026) |
-| lifecycle | 1.0.5 | Henry and Wickham (2026) |
-| MetaboCoreUtils | 1.20.1 | Rainer et al. (2022a) |
-| MsBackendMgf | 1.20.0 | Gatto et al. (2026) |
-| MsBackendMsp | 1.16.0 | Rainer et al. (2022b) |
-| MsCoreUtils | 1.24.0 | Rainer et al. (2022c) |
-| msentropy | 0.1.4 | Li (2023) |
-| pkgload | 1.5.2 | Wickham et al. (2026) |
-| R.utils | 2.13.0 | Bengtsson (2025) |
-| reticulate | 1.46.0 | Ushey et al. (2026) |
-| rmarkdown | 2.31 | Xie et al. (2018); Xie et al. (2020); Allaire et al. (2026) |
-| rotl | 3.1.1 | Michonneau et al. (2016); OpenTreeOfLife et al. (2019) |
-| shiny | 1.13.0 | Chang et al. (2026) |
-| shinyhelper | 0.3.2 | Mason-Thom (2019) |
-| shinyjs | 2.1.1 | Attali (2026) |
-| shinytest2 | 0.5.1 | Schloerke (2026) |
-| shinyvalidate | 0.1.3 | Sievert et al. (2023) |
-| Spectra | 1.22.0 | Rainer et al. (2022d) |
-| spelling | 2.3.2 | Ooms and Hester (2025) |
-| stringi | 1.8.7 | Gagolewski (2022) |
-| targets | 1.12.0 | Landau (2021) |
-| testthat | 3.3.2 | Wickham (2011) |
-| tidyselect | 1.2.1 | Henry and Wickham (2024) |
-| tidytable | 0.11.2 | Fairbanks (2024) |
-| tidyverse | 2.0.0 | Wickham et al. (2019) |
-| tima | 2.13.0.9000 | Rutz et al. (2019); Rutz and Allard (2026) |
-| tools | 4.6.0 | R Core Team (2026b) |
-| withr | 3.0.2 | Hester et al. (2024) |
-| yaml | 2.3.12 | Stephens and Simonov (2025) |
+  | Package         | Version     | Citation                                                              |
+  | :-------------- | :---------- | :-------------------------------------------------------------------- |
+  | archive         | 1.1.13      | Hester and Csárdi (2026)                                              |
+  | base            | 4.6.0       | R Core Team (2026a)                                                   |
+  | BiocManager     | 1.30.27     | Morgan and Ramos (2025)                                               |
+  | BiocParallel    | 1.46.0      | Wang et al. (2026)                                                    |
+  | BiocVersion     | 3.23.1      | Morgan (2025)                                                         |
+  | docopt          | 0.7.2       | <span class="nocase">de Jonge</span> (2025)                           |
+  | fs              | 2.1.0       | Hester et al. (2026)                                                  |
+  | httr2           | 1.2.2       | Wickham (2025)                                                        |
+  | igraph          | 2.3.2       | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2026) |
+  | knitr           | 1.51        | Xie (2014); Xie (2015); Xie (2025)                                    |
+  | lgr             | 0.5.2       | Fleck (2026)                                                          |
+  | lifecycle       | 1.0.5       | Henry and Wickham (2026)                                              |
+  | MetaboCoreUtils | 1.20.1      | Rainer et al. (2022a)                                                 |
+  | MsBackendMgf    | 1.20.0      | Gatto et al. (2026)                                                   |
+  | MsBackendMsp    | 1.16.0      | Rainer et al. (2022b)                                                 |
+  | MsCoreUtils     | 1.24.0      | Rainer et al. (2022c)                                                 |
+  | msentropy       | 0.1.4       | Li (2023)                                                             |
+  | pkgload         | 1.5.2       | Wickham et al. (2026)                                                 |
+  | R.utils         | 2.13.0      | Bengtsson (2025)                                                      |
+  | reticulate      | 1.46.0      | Ushey et al. (2026)                                                   |
+  | rmarkdown       | 2.31        | Xie et al. (2018); Xie et al. (2020); Allaire et al. (2026)           |
+  | rotl            | 3.1.1       | Michonneau et al. (2016); OpenTreeOfLife et al. (2019)                |
+  | shiny           | 1.13.0      | Chang et al. (2026)                                                   |
+  | shinyhelper     | 0.3.2       | Mason-Thom (2019)                                                     |
+  | shinyjs         | 2.1.1       | Attali (2026)                                                         |
+  | shinytest2      | 0.5.1       | Schloerke (2026)                                                      |
+  | shinyvalidate   | 0.1.3       | Sievert et al. (2023)                                                 |
+  | Spectra         | 1.22.0      | Rainer et al. (2022d)                                                 |
+  | spelling        | 2.3.2       | Ooms and Hester (2025)                                                |
+  | stringi         | 1.8.7       | Gagolewski (2022)                                                     |
+  | targets         | 1.12.0      | Landau (2021)                                                         |
+  | testthat        | 3.3.2       | Wickham (2011)                                                        |
+  | tidyselect      | 1.2.1       | Henry and Wickham (2024)                                              |
+  | tidytable       | 0.11.2      | Fairbanks (2024)                                                      |
+  | tidyverse       | 2.0.0       | Wickham et al. (2019)                                                 |
+  | tima            | 2.13.0.9000 | Rutz et al. (2019); Rutz and Allard (2026)                            |
+  | tools           | 4.6.0       | R Core Team (2026b)                                                   |
+  | withr           | 3.0.2       | Hester et al. (2024)                                                  |
+  | yaml            | 2.3.12      | Stephens and Simonov (2025)                                           |
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 

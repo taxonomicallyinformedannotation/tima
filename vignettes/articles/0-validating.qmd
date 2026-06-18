@@ -32,7 +32,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r}
+#| label: setup
+#| include: false
+
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -42,12 +45,15 @@ knitr::opts_chunk$set(
 ## Why Validate Your Data First?
 
 Before starting the TIMA pipeline, it's recommended to validate your input data.
-This **pre-flight check** saves you time by catching issues immediately
-instead of discovering them after expensive operations like library downloads.
+This **pre-flight check** saves you time by catching issues immediately instead
+of discovering them after expensive operations like library downloads.
 
 ## Quick Start
 
-```{r validate_example, eval=FALSE}
+```{r}
+#| label: validate_example
+#| eval: false
+
 library(tima)
 
 # Validate all inputs before starting
@@ -90,55 +96,48 @@ Data validation complete. Ready to proceed.
 
 ### MGF Files (Mass Spectra)
 
-Checks for:
-- File exists and is readable
-- Contains valid spectra (BEGIN IONS markers)
-- Each spectrum has PEPMASS field
-- Peak data is present
-- BEGIN IONS/END IONS are balanced
+Checks for: - File exists and is readable - Contains valid spectra (BEGIN IONS
+markers) - Each spectrum has PEPMASS field - Peak data is present - BEGIN
+IONS/END IONS are balanced
 
-**Reports:**
-- Number of spectra found
-- Specific issues if any
+**Reports:** - Number of spectra found - Specific issues if any
 
-```{r validate_mgf, eval=FALSE}
+```{r}
+#| label: validate_mgf
+#| eval: false
+
 # Validate just the MGF file
 validate_inputs(spectra = "data/spectra.mgf")
 ```
 
 ### Features Files (CSV/TSV)
 
-Checks for:
-- File exists and is readable
-- Not empty (has rows and columns)
-- Required columns present (e.g., `feature_id`)
-- Valid CSV/TSV format
+Checks for: - File exists and is readable - Not empty (has rows and columns) -
+Required columns present (e.g., `feature_id`) - Valid CSV/TSV format
 
-**Reports:**
-- Number of rows (features)
-- Number of columns
-- Column names
-- Missing required columns
+**Reports:** - Number of rows (features) - Number of columns - Column names -
+Missing required columns
 
-```{r validate_features, eval=FALSE}
+```{r}
+#| label: validate_features
+#| eval: false
+
 # Validate features file
 validate_inputs(features = "data/features.csv")
 ```
 
 ### Metadata Consistency
 
-Checks for:
-- Metadata file exists
-- Filename column present
-- Files referenced in metadata actually exist
-- No broken file references
+Checks for: - Metadata file exists - Filename column present - Files referenced
+in metadata actually exist - No broken file references
 
-**Reports:**
-- Number of files in metadata
-- Number of files found on disk
-- List of missing files
+**Reports:** - Number of files in metadata - Number of files found on disk -
+List of missing files
 
-```{r validate_metadata, eval=FALSE}
+```{r}
+#| label: validate_metadata
+#| eval: false
+
 # Validate metadata consistency
 validate_inputs(
   metadata = "data/metadata.tsv",
@@ -149,31 +148,32 @@ validate_inputs(
 
 ### SIRIUS Output Completeness
 
-Checks for:
-- SIRIUS directory exists
-- Required summary files present:
-  - `formula_identifications_all.tsv`
-  - `canopus_formula_summary_all.tsv`
-  - `compound/structure_identifications_all.tsv`
-- Feature directories exist
+Checks for: - SIRIUS directory exists - Required summary files present: -
+`formula_identifications_all.tsv` - `canopus_formula_summary_all.tsv` -
+`compound/structure_identifications_all.tsv` - Feature directories exist
 
-**Reports:**
-- Presence of each required file
-- Number of feature directories
-- Specific missing files
+**Reports:** - Presence of each required file - Number of feature directories -
+Specific missing files
 
-```{r validate_sirius, eval=FALSE}
+```{r}
+#| label: validate_sirius
+#| eval: false
+
 # Validate SIRIUS output
 validate_inputs(sirius = "output/sirius")
 ```
 
 ## Integration with Pipeline
 
-The validation functions are **automatically integrated** into the main TIMA functions:
+The validation functions are **automatically integrated** into the main TIMA
+functions:
 
 ### Automatic Validation
 
-```{r automatic_validation, eval=FALSE}
+```{r}
+#| label: automatic_validation
+#| eval: false
+
 # These functions automatically validate inputs
 annotate_masses(...) # Validates features file first
 annotate_spectra(...) # Validates MGF files first
@@ -183,7 +183,10 @@ annotate_spectra(...) # Validates MGF files first
 
 For full control, validate manually before running the pipeline:
 
-```{r manual_validation, eval=FALSE}
+```{r}
+#| label: manual_validation
+#| eval: false
+
 # 1. Validate everything first
 validate_inputs(
   features = "data/features.csv",
@@ -207,7 +210,7 @@ run_tima()
 
 **Fix:** Check if the file is actually in MGF format and contains spectra.
 
----
+--------------------------------------------------------------------------------
 
 **Issue:** Mismatched markers
 ```
@@ -217,7 +220,7 @@ run_tima()
 
 **Fix:** One spectrum is missing an END IONS marker. Check the file structure.
 
----
+--------------------------------------------------------------------------------
 
 **Issue:** Missing required fields
 ```
@@ -237,7 +240,7 @@ run_tima()
 
 **Fix:** Ensure the file contains actual feature data, not just a header.
 
----
+--------------------------------------------------------------------------------
 
 **Issue:** Missing columns
 ```
@@ -263,7 +266,7 @@ run_tima()
 
 **Fix:** Ensure all files listed in metadata are present in the data directory.
 
----
+--------------------------------------------------------------------------------
 
 **Issue:** Wrong column name
 ```
@@ -286,7 +289,7 @@ run_tima()
 **Fix:** Re-run SIRIUS with the correct output options enabled, or check that
 the output directory path is correct.
 
----
+--------------------------------------------------------------------------------
 
 **Issue:** Empty output
 ```
@@ -302,7 +305,10 @@ the output directory path is correct.
 
 For scripts and pipelines, you can capture validation results:
 
-```{r programmatic, eval=FALSE}
+```{r}
+#| label: programmatic
+#| eval: false
+
 # The function returns TRUE on success or stops with error
 tryCatch(
   {
@@ -321,7 +327,10 @@ tryCatch(
 
 Validate multiple datasets in a loop:
 
-```{r batch_validation, eval=FALSE}
+```{r}
+#| label: batch_validation
+#| eval: false
+
 datasets <- c("dataset1", "dataset2", "dataset3")
 
 for (dataset in datasets) {
@@ -348,7 +357,10 @@ for (dataset in datasets) {
 
 Make validation the **first step** in your workflow:
 
-```{r best_practice_1, eval=FALSE}
+```{r}
+#| label: best_practice_1
+#| eval: false
+
 # Good practice
 validate_inputs(features = "data/features.csv")
 run_tima()
@@ -361,7 +373,10 @@ run_tima() # Might fail after 10+ minutes
 
 If you convert data formats (e.g., mzML to MGF), validate the output:
 
-```{r best_practice_2, eval=FALSE}
+```{r}
+#| label: best_practice_2
+#| eval: false
+
 # Convert data
 # convert_mzml_to_mgf("raw_data/", "processed/spectra.mgf")
 
@@ -373,7 +388,10 @@ validate_inputs(spectra = "processed/spectra.mgf")
 
 Add validation to your automated workflows:
 
-```{r best_practice_3, eval=FALSE}
+```{r}
+#| label: best_practice_3
+#| eval: false
+
 # Snakemake, Nextflow, or targets pipeline
 validate_inputs(...) # Fails fast if data is bad
 run_tima() # Only runs if validation passes
@@ -383,7 +401,10 @@ run_tima() # Only runs if validation passes
 
 Keep a record of validation results:
 
-```{r best_practice_4, eval=FALSE}
+```{r}
+#| label: best_practice_4
+#| eval: false
+
 # Capture output to log file
 sink("validation_log.txt")
 validate_inputs(
@@ -405,14 +426,22 @@ Data validation with `validate_inputs()`:
 - **Preventive** - Stops before expensive operations
 - **Informative** - Reports row counts, spectra counts, file lists
 
-**Always validate your data first!** It's the best way to ensure a smooth
-TIMA experience.
+**Always validate your data first!** It's the best way to ensure a smooth TIMA
+experience.
 
 ## Next Steps
 
 Now that your data is validated:
 
-- [I. Gathering](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html) - Collect your data
-- [II. Preparing](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html) - Prepare your libraries
-- [III. Processing](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html) - Run the annotation pipeline
-- [IV. Benchmarking](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html) - Evaluate your results
+- [I.
+  Gathering](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html) -
+  Collect your data
+- [II.
+  Preparing](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html) -
+  Prepare your libraries
+- [III.
+  Processing](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html) -
+  Run the annotation pipeline
+- [IV.
+  Benchmarking](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html) -
+  Evaluate your results

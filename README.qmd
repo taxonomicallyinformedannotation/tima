@@ -11,22 +11,27 @@ bibliography: ../grateful-refs.bib
 
 <!-- badges: start -->
 
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- [![CRAN status](https://www.r-pkg.org/badges/version/tima)](https://CRAN.R-project.org/package=tima) -->
 [![R-CMD-check](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima)
-[![r-universe badge](https://taxonomicallyinformedannotation.r-universe.dev/tima/badges/version?&color=blue&style=classic)](https://taxonomicallyinformedannotation.r-universe.dev/tima)
+[![Codecov test
+coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima)
+[![r-universe
+badge](https://taxonomicallyinformedannotation.r-universe.dev/tima/badges/version?&color=blue&style=classic)](https://taxonomicallyinformedannotation.r-universe.dev/tima)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5797920.svg)](https://doi.org/10.5281/zenodo.5797920)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/adafede/tima-r/)
 
-
 <!-- badges: end -->
 
-The initial work is available at <https://doi.org/10.3389/fpls.2019.01329>, with many improvements made since then. The workflow is illustrated below.
+The initial work is available at <https://doi.org/10.3389/fpls.2019.01329>, with
+many improvements made since then. The workflow is illustrated below.
 
-![Workflow](https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/tima.svg)\
+![Workflow](https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/tima.svg)
+\
 
-This repository contains everything needed to perform **T**axonomically **I**nformed **M**etabolite **A**nnotation.
+This repository contains everything needed to perform **T**axonomically
+**I**nformed **M**etabolite **A**nnotation.
 
 ## Requirements
 
@@ -34,26 +39,33 @@ This repository contains everything needed to perform **T**axonomically **I**nfo
 
 Here is what you *minimally* need:
 
--   **Feature quantification table** (.csv/.tsv) - Peak areas/heights across samples ([example](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_features.csv))
-    - Must contain: feature ID, retention time, m/z, and sample intensity columns
-    - **Column names are customizable**
--   **MS/MS spectra file** (.mgf) - Fragment spectra for each or some features ([example](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_spectra_mini.mgf))
--   **Sample metadata** (.csv/.tsv) - Links samples to organisms ([example](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_metadata.tsv))
-    - Optional if analyzing only a single organism
+- **Feature quantification table** (.csv/.tsv) - Peak areas/heights across
+  samples
+  ([example](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_features.csv))
+  - Must contain: feature ID, retention time, m/z, and sample intensity columns
+  - **Column names are customizable**
+- **MS/MS spectra file** (.mgf) - Fragment spectra for each or some features
+  ([example](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_spectra_mini.mgf))
+- **Sample metadata** (.csv/.tsv) - Links samples to organisms
+  ([example](https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_metadata.tsv))
+  - Optional if analyzing only a single organism
 
 ### Optional Additions
 
--   **Structure-organism pairs library** - We provide [**LOTUS**](https://lotusnprod.github.io/lotus-manuscript/) (>650k pairs) as default
--   **External annotations** - SIRIUS (v5/v6), GNPS-FBMN results
--   **Custom spectral libraries** - For in-house compound matching
+- **Structure-organism pairs library** - We provide
+  [**LOTUS**](https://lotusnprod.github.io/lotus-manuscript/) (>650k pairs) as
+  default
+- **External annotations** - SIRIUS (v5/v6), GNPS-FBMN results
+- **Custom spectral libraries** - For in-house compound matching
 
-**Tip**: All column names and file paths are customizable through the Shiny app interface or YAML/CLI parameters - no need to rename your files!
+**Tip**: All column names and file paths are customizable through the Shiny app
+interface or YAML/CLI parameters - no need to rename your files!
 
 ## Installation
 
 As the package is not (yet) available on CRAN, you will need to install with:
 
-``` r
+```r
 install.packages(
   "tima",
   repos = c(
@@ -66,17 +78,23 @@ install.packages(
 
 Then, you should be able to install the rest with:
 
-``` r
+```r
 tima::install_tima()
 ```
 
-Normally, everything you need should then be installed (as tested in [here](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/external-use.yaml)). If for some reason, some packages were not installed, try to install them manually. To avoid such issues, we offer a containerized version (see [Docker](#docker)).
+Normally, everything you need should then be installed (as tested in
+[here](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/external-use.yaml)).
+If for some reason, some packages were not installed, try to install them
+manually. To avoid such issues, we offer a containerized version (see
+[Docker](#docker)).
 
-Once installed, you are ready to go through our [documentation](https://taxonomicallyinformedannotation.github.io/tima/articles/), with the major steps detailed.
+Once installed, you are ready to go through our
+[documentation](https://taxonomicallyinformedannotation.github.io/tima/articles/),
+with the major steps detailed.
 
 In case you do not have your data ready, you can obtain some example data using:
 
-``` r
+```r
 tima::get_example_files()
 ```
 
@@ -84,10 +102,10 @@ tima::get_example_files()
 
 ### Validate Your Data
 
-**Start by validating your input files** to catch issues early
-and save debugging time:
+**Start by validating your input files** to catch issues early and save
+debugging time:
 
-``` r
+```r
 # Check if your data is matches expectations before processing
 validate_inputs(
   features = "data/source/example_features.csv",
@@ -109,9 +127,10 @@ This will:
 
 ### Run the Pipeline
 
-Once you are done, you can open a small GUI to adapt your parameters and launch your job:
+Once you are done, you can open a small GUI to adapt your parameters and launch
+your job:
 
-``` r
+```r
 tima::run_app()
 ```
 
@@ -119,14 +138,15 @@ This command will open a small app in your default browser.
 
 ### Docker {#docker}
 
-A container is also available, together with a small compose file. Main commands are below:
+A container is also available, together with a small compose file. Main commands
+are below:
 
-``` bash
+```bash
 docker pull adafede/tima-r
 # docker build inst/. -t adafede/tima-r --no-cache
 ```
 
-``` bash
+```bash
 docker run \
 --user tima-user \
 --memory="12g" \
@@ -142,31 +162,35 @@ adafede/tima-r
 # adafede/tima-r
 ```
 
-Adapt the memory limit as needed.
-The app will be available at <http://localhost:3838/>.
-Results will be written to `.tima/data` (your mounted folder).
+Adapt the memory limit as needed. The app will be available at
+<http://localhost:3838/>. Results will be written to `.tima/data` (your mounted
+folder).
 
 ## Main Citations
 
-According to which steps you used, please give credit to the authors of the tools/resources used.
+According to which steps you used, please give credit to the authors of the
+tools/resources used.
 
 ### TIMA
 
 General: <https://doi.org/10.3389/fpls.2019.01329>
 
-⚠️ Do not forget to cite which version you used: <https://doi.org/10.5281/zenodo.5797920>
+⚠️ Do not forget to cite which version you used:
+<https://doi.org/10.5281/zenodo.5797920>
 
 ### LOTUS
 
 General: <https://doi.org/10.7554/eLife.70780>
 
-⚠️ Do not forget to cite which version you used: <https://doi.org/10.5281/zenodo.5794106>
+⚠️ Do not forget to cite which version you used:
+<https://doi.org/10.5281/zenodo.5794106>
 
 ### ISDB
 
 General: <https://doi.org/10.1021/acs.analchem.5b04804>
 
-⚠️ Do not forget to cite which version you used: <https://doi.org/10.5281/zenodo.5607185>
+⚠️ Do not forget to cite which version you used:
+<https://doi.org/10.5281/zenodo.5607185>
 
 ### GNPS
 
@@ -176,38 +200,42 @@ General: <https://doi.org/10.1038/nbt.3597>
 
 General: <https://doi.org/10.1038/s41592-019-0344-8>
 
--   *CSI:FingerId*: <https://doi.org/10.1073/pnas.1509788112>
--   *ZODIAC*: <https://doi.org/10.1038/s42256-020-00234-6>
--   *CANOPUS*: <https://doi.org/10.1038/s41587-020-0740-8>
--   *COSMIC*: <https://doi.org/10.1038/s41587-021-01045-9>
+- *CSI:FingerId*: <https://doi.org/10.1073/pnas.1509788112>
+- *ZODIAC*: <https://doi.org/10.1038/s42256-020-00234-6>
+- *CANOPUS*: <https://doi.org/10.1038/s41587-020-0740-8>
+- *COSMIC*: <https://doi.org/10.1038/s41587-021-01045-9>
 
 ### Others
 
--   BiGG: <https://doi.org/10.1093/nar/gkv1049>
--   BMDB: <https://doi.org/10.3390/metabo10060233>
--   Cannabis DB: <https://doi.org/10.1021/acs.jafc.3c06616>
--   ECMDB 2.0: <https://doi.org/10.1093/nar/gkv1060>
--   HMDB 5.0: <https://doi.org/10.1093/nar/gkab1062>
-    - CSF: <https://doi.org/10.1016/j.jchromb.2008.05.001>
-    - Fecal: <https://doi.org/10.1016/j.aca.2018.05.031>
-    - Saliva: <https://doi.org/10.1007/s11306-015-0840-5>
-    - Serum: <https://doi.org/10.1371/journal.pone.0016957>
-    - Sweat:
-    - Urine: <https://doi.org/10.1371/journal.pone.0073076>
--   MCDB: <https://doi.org/10.1021/acs.jafc.9b00204>
--   SMPDB 2.0: <https://doi.org/10.1093/nar/gkt1067>
-<!-- -   MiMeDB 2.0: <https://doi.org/10.1093/nar/gkaf1272> -->
--   T3DB: <https://doi.org/10.1093/nar/gku1004>
--   YMDB 2.0: <https://doi.org/10.1093/nar/gkw1058>
--   Enveda-180: <https://doi.org/10.5281/zenodo.20436851>
--   MassBank: <https://doi.org/10.5281/zenodo.3378723>
--   Merlin: <https://doi.org/10.5281/zenodo.13911806>
--   NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
--   ISDB-NormanSusDat: <https://zenodo.org/records/14854025>
+- BiGG: <https://doi.org/10.1093/nar/gkv1049>
+- BMDB: <https://doi.org/10.3390/metabo10060233>
+- Cannabis DB: <https://doi.org/10.1021/acs.jafc.3c06616>
+- ECMDB 2.0: <https://doi.org/10.1093/nar/gkv1060>
+- HMDB 5.0: <https://doi.org/10.1093/nar/gkab1062>
+  - CSF: <https://doi.org/10.1016/j.jchromb.2008.05.001>
+  - Fecal: <https://doi.org/10.1016/j.aca.2018.05.031>
+  - Saliva: <https://doi.org/10.1007/s11306-015-0840-5>
+  - Serum: <https://doi.org/10.1371/journal.pone.0016957>
+  - Sweat:
+  - Urine: <https://doi.org/10.1371/journal.pone.0073076>
+- MCDB: <https://doi.org/10.1021/acs.jafc.9b00204>
+- SMPDB 2.0: <https://doi.org/10.1093/nar/gkt1067>
+  <!-- -   MiMeDB 2.0: <https://doi.org/10.1093/nar/gkaf1272> -->
+- T3DB: <https://doi.org/10.1093/nar/gku1004>
+- YMDB 2.0: <https://doi.org/10.1093/nar/gkw1058>
+- Enveda-180: <https://doi.org/10.5281/zenodo.20436851>
+- MassBank: <https://doi.org/10.5281/zenodo.3378723>
+- Merlin: <https://doi.org/10.5281/zenodo.13911806>
+- NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
+- ISDB-NormanSusDat: <https://zenodo.org/records/14854025>
 
 ## Additional software credits
 
-```{r, "deps", echo = FALSE, message = FALSE}
+```{r}
+#| label: "deps"
+#| echo: false
+#| message: false
+
 # Check if DESCRIPTION is in current dir
 # Else `altdoc` will not find the dependencies
 desc_path <- if (file.exists("DESCRIPTION")) {

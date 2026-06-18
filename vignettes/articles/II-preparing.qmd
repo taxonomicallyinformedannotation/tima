@@ -32,7 +32,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+```{r}
+#| label: tima
+#| results: "hide"
+#| message: false
+#| warning: false
+#| include: false
+
 library("tima")
 if (dir.exists("../../inst")) {
   knitr::opts_knit$set(root.dir = "../../inst")
@@ -48,29 +54,44 @@ This vignette describes the main steps of the annotation process.
 For the moment, we support 3 different types of annotations:
 
 <!-- * [GNPS](https://gnps.ucsd.edu) -->
-* Internal MS^1^ exact mass-based library search
-* Internal MS^2^ library search (experimental and in silico)
-* [SIRIUS](https://bio.informatik.uni-jena.de/software/sirius)
 
-If needed, you can get an example of what your minimal feature table should look like by running:
+- Internal MS^1^ exact mass-based library search
+- Internal MS^2^ library search (experimental and in silico)
+- [SIRIUS](https://bio.informatik.uni-jena.de/software/sirius)
 
-```{r get-features, eval=FALSE, include=TRUE}
+If needed, you can get an example of what your minimal feature table should look
+like by running:
+
+```{r}
+#| label: get-features
+#| eval: false
+#| include: true
+
 tima::get_example_files(example = "features")
 ```
 
 Then, you can prepare your features for the next steps:
 
-```{r prepare-features, eval=FALSE, include=TRUE}
+```{r}
+#| label: prepare-features
+#| eval: false
+#| include: true
+
 tima::prepare_features_tables()
 ```
 
 ### MS^1^-based
 
-These annotations are of the lowest possible quality.
-However, they allow to annotate unusual adducts, in-source fragments thanks to different small tricks implemented.
-Try to really restrict the adduct list and structure-organism pairs you want to consider as possibilities explode rapidly.
+These annotations are of the lowest possible quality. However, they allow to
+annotate unusual adducts, in-source fragments thanks to different small tricks
+implemented. Try to really restrict the adduct list and structure-organism pairs
+you want to consider as possibilities explode rapidly.
 
-```{r annotate-masses-1, eval=FALSE, include=TRUE}
+```{r}
+#| label: annotate-masses-1
+#| eval: false
+#| include: true
+
 tima::annotate_masses()
 ```
 
@@ -78,10 +99,15 @@ tima::annotate_masses()
 
 `annotate_masses()` uses two levels:
 
-- **Primary (strict graph):** each `feature_id` gets one primary ion species. Edges are kept only when both nodes are strongly supported, and consistent with the same neutral mass `M`.
-- **Secondary (coverage):** additional non-conflicting ion-species hypotheses are kept as secondary.
+- **Primary (strict graph):** each `feature_id` gets one primary ion species.
+  Edges are kept only when both nodes are strongly supported, and consistent
+  with the same neutral mass `M`.
+- **Secondary (coverage):** additional non-conflicting ion-species hypotheses
+  are kept as secondary.
 
-For unresolved nodes in a supported component, TIMA also tests direct forms from the component mass `M` (for example `[M +/- loss + carrier]`) and keeps valid ones as weak support.
+For unresolved nodes in a supported component, TIMA also tests direct forms from
+the component mass `M` (for example `[M +/- loss + carrier]`) and keeps valid
+ones as weak support.
 
 Main output fields to inspect:
 
@@ -92,18 +118,27 @@ Main output fields to inspect:
 
 ### Spectral
 
-```{r annotate-spectra-1, eval=FALSE, include=TRUE}
+```{r}
+#| label: annotate-spectra-1
+#| eval: false
+#| include: true
+
 tima::annotate_spectra()
 tima::prepare_annotations_spectra()
 ```
 
-There are multiple similarities available, including `spectral entropy` from <https://doi.org/10.1038/s41592-021-01331-z> for matching.
+There are multiple similarities available, including `spectral entropy` from
+<https://doi.org/10.1038/s41592-021-01331-z> for matching.
 
 #### GNPS
 
 Optional
 
-```{r prepare-gnps-1, eval=FALSE, include=TRUE}
+```{r}
+#| label: prepare-gnps-1
+#| eval: false
+#| include: true
+
 tima::prepare_annotations_gnps()
 ```
 
@@ -111,11 +146,16 @@ tima::prepare_annotations_gnps()
 
 #### Sirius
 
-As SIRIUS jobs are long to perform, we provide example SIRIUS workspaces (both SIRIUS 5 and 6).
-Note that spectral matches from SIRIUS are not supported for now.
-They have been generated on the 20 first lines of the example MGF with the following command:
+As SIRIUS jobs are long to perform, we provide example SIRIUS workspaces (both
+SIRIUS 5 and 6). Note that spectral matches from SIRIUS are not supported for
+now. They have been generated on the 20 first lines of the example MGF with the
+following command:
 
-```{bash run-sirius, eval=FALSE, include=TRUE}
+```{bash}
+#| label: run-sirius
+#| eval: false
+#| include: true
+
 # this is run on SIRIUS 6
 sirius \
 --noCite \
@@ -158,24 +198,43 @@ write-summaries \
 --full-summary
 ```
 
-These parameters were not optimized and were only used to give an example output.
-If you are using the cli, do not forget to generate the summaries with the `--full-summary` option, or if you use the gui, generate them by clicking the corresponding icon.
-You can get an example running:
+These parameters were not optimized and were only used to give an example
+output. If you are using the cli, do not forget to generate the summaries with
+the `--full-summary` option, or if you use the gui, generate them by clicking
+the corresponding icon. You can get an example running:
 
-```{r get-sirius, eval=FALSE, include=TRUE}
+```{r}
+#| label: get-sirius
+#| eval: false
+#| include: true
+
 getFromNamespace("get_example_sirius", "tima")()
 ```
 
-The sirius workspace should ideally have `yourPattern_sirius` as name and be placed in `data/interim/annotations` (else it will not be found by default except you provide the right path).
+The sirius workspace should ideally have `yourPattern_sirius` as name and be
+placed in `data/interim/annotations` (else it will not be found by default
+except you provide the right path).
 
-```{r prepare-sirius, eval=FALSE, include=TRUE}
+```{r}
+#| label: prepare-sirius
+#| eval: false
+#| include: true
+
 tima::prepare_annotations_sirius()
 ```
 
-If you want to know how we attempt to combine the CSI score with other ones, see [R/transform_score_sirius_csi.R](https://github.com/taxonomicallyinformedannotation/tima/blob/main/R/transform_score_sirius_csi.R)
-Note that starting from SIRIUS 6, the _approx_ confidence score is the one considered, and not the exact one.
+If you want to know how we attempt to combine the CSI score with other ones, see
+[R/transform_score_sirius_csi.R](https://github.com/taxonomicallyinformedannotation/tima/blob/main/R/transform_score_sirius_csi.R)
+Note that starting from SIRIUS 6, the *approx* confidence score is the one
+considered, and not the exact one.
 
-```{r annotations-all, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+```{r}
+#| label: annotations-all
+#| echo: false
+#| message: false
+#| warning: false
+#| out-width: "100%"
+
 targets::tar_visnetwork(
   names = starts_with("ann_s"),
   exclude = targets::contains(
@@ -192,70 +251,111 @@ targets::tar_visnetwork(
 )
 ```
 
-Annotations are now prepared and can be used for further processing.
-Your features are not only informed with structural information but also, chemical class information.
-The latter might be corresponding **or not** to the chemical class of your annotated structure, depending on the consistency of your annotations.
+Annotations are now prepared and can be used for further processing. Your
+features are not only informed with structural information but also, chemical
+class information. The latter might be corresponding **or not** to the chemical
+class of your annotated structure, depending on the consistency of your
+annotations.
 
 ## Chemical class annotation of your features
 
-Within our workflow, we offer a new way to attribute chemical classes to your features.
-It is analog to [Network Annotation Propagation](https://ccms-ucsd.github.io/GNPSDocumentation/nap/), but uses the edges of your network instead of the clusters.
-This makes more sense in our view, as also recently illustrated by [CANOPUS](https://doi.org/10.1038/s41587-020-0740-8).
+Within our workflow, we offer a new way to attribute chemical classes to your
+features. It is analog to [Network Annotation
+Propagation](https://ccms-ucsd.github.io/GNPSDocumentation/nap/), but uses the
+edges of your network instead of the clusters. This makes more sense in our
+view, as also recently illustrated by
+[CANOPUS](https://doi.org/10.1038/s41587-020-0740-8).
 
 <!-- All steps can take both manual inputs or GNPS metadata directly from your GNPS job ID. -->
 
-We are currently also working on CANOPUS integration for chemical class annotation but this implies way heavier computations and we want to offer our users a **fast** solution.
+We are currently also working on CANOPUS integration for chemical class
+annotation but this implies way heavier computations and we want to offer our
+users a **fast** solution.
 
 ### Generating a network
 
-A network is generated during the process.
-The edges are created based on the `spectral entropy similarity` calculated between your spectra (see <https://doi.org/10.1038/s41592-021-01331-z>).
+A network is generated during the process. The edges are created based on the
+`spectral entropy similarity` calculated between your spectra (see
+<https://doi.org/10.1038/s41592-021-01331-z>).
 
-```{r create-edges, eval=FALSE, include=TRUE}
+```{r}
+#| label: create-edges
+#| eval: false
+#| include: true
+
 tima::create_edges_spectra()
 ```
 
 Prepare the edges:
 
-```{r prepare-edges, eval=FALSE, include=TRUE}
+```{r}
+#| label: prepare-edges
+#| eval: false
+#| include: true
+
 tima::prepare_features_edges()
 ```
 
 Create and prepare the components:
 
-```{r create-components, eval=FALSE, include=TRUE}
+```{r}
+#| label: create-components
+#| eval: false
+#| include: true
+
 tima::create_components()
 ```
 
-```{r prepare-components, eval=FALSE, include=TRUE}
+```{r}
+#| label: prepare-components
+#| eval: false
+#| include: true
+
 tima::prepare_features_components()
 ```
 
 ## Biological source annotation
 
-This step allows you to attribute biological source information to your features.
-If all your features come from a single extract, it will attribute the biological source of your extract to all your features.
-If you have multiple extracts aligned, it will take the *n* (according to your parameters) highest intensities of your aligned feature table and attribute the biological source of corresponding extracts.
+This step allows you to attribute biological source information to your
+features. If all your features come from a single extract, it will attribute the
+biological source of your extract to all your features. If you have multiple
+extracts aligned, it will take the *n* (according to your parameters) highest
+intensities of your aligned feature table and attribute the biological source of
+corresponding extracts.
 <!-- It can take both manual inputs or GNPS metadata directly from your GNPS job ID. -->
 
-```{r prepare-taxa, eval=FALSE, include=TRUE}
+```{r}
+#| label: prepare-taxa
+#| eval: false
+#| include: true
+
 tima::prepare_taxa()
 ```
 
 ## Filter annotations (based on retention time)
 
-This step allows you to filter out the annotation of all the tools used,
-based on your own internal (experimental or predicted) retention times library.
-It is optional.
-If you do not have one, it will simply group the annotations of all tools.
+This step allows you to filter out the annotation of all the tools used, based
+on your own internal (experimental or predicted) retention times library. It is
+optional. If you do not have one, it will simply group the annotations of all
+tools.
 
-```{r filter-annotations, eval=FALSE, include=TRUE}
+```{r}
+#| label: filter-annotations
+#| eval: false
+#| include: true
+
 tima::filter_annotations()
 ```
 
 You are almost there! See already all the steps accomplished!
 
-```{r features-all, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+```{r}
+#| label: features-all
+#| echo: false
+#| message: false
+#| warning: false
+#| out-width: "100%"
+
 targets::tar_visnetwork(
   names = tidyselect::matches("^ann_fil"),
   exclude = targets::contains(
@@ -272,4 +372,5 @@ targets::tar_visnetwork(
 )
 ```
 
-We now recommend you to read the [next vignette](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html).
+We now recommend you to read the [next
+vignette](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html).

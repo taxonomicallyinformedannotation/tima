@@ -33,7 +33,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r tima, results="hide", message=FALSE, warning=FALSE, include = FALSE}
+```{r}
+#| label: tima
+#| results: "hide"
+#| message: false
+#| warning: false
+#| include: false
+
 library("tima")
 if (dir.exists("../../inst")) {
   knitr::opts_knit$set(root.dir = "../../inst")
@@ -44,15 +50,22 @@ logger$set_threshold(level = 400)
 tima::get_example_files()
 ```
 
-This vignette describes how **T**axonomically **I**nformed **M**etabolite **A**nnotation is performed.
-If you followed all previous steps successfully, this should be a piece of cake, you deserve it!
+This vignette describes how **T**axonomically **I**nformed **M**etabolite
+**A**nnotation is performed. If you followed all previous steps successfully,
+this should be a piece of cake, you deserve it!
 
-```{r weight-all, warning=FALSE}
+```{r}
+#| label: weight-all
+#| warning: false
+
 tima::run_tima()
 ```
 
-The final exported file is formatted in order to be easily imported in [Cytoscape](https://cytoscape.org/) to further explore your data!
+The final exported file is formatted in order to be easily imported in
+[Cytoscape](https://cytoscape.org/) to further explore your data!
 
 We hope you enjoyed using **TIMA** and are pleased to hear from you!
 
-For any remark or suggestion, please  [fill an issue](https://github.com/taxonomicallyinformedannotation/tima/issues) or feel free to contact us directly.
+For any remark or suggestion, please [fill an
+issue](https://github.com/taxonomicallyinformedannotation/tima/issues) or feel
+free to contact us directly.
