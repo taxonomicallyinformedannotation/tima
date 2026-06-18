@@ -330,7 +330,7 @@ weight_chemo <- function(
       score_name = "score_chemical_7"
     )
 
-  # Merge scores efficiently using batch operations instead of sequential joins
+  # Merge scores and keep the best chemical score across levels
   supp_tables <- list(
     step_cla_kin,
     step_npc_pat,
@@ -350,11 +350,25 @@ weight_chemo <- function(
     step_cla_par
   )
 
-  # Memory-efficient merge: combine all tables at once
-  annot_table_wei_chemo_init <- .merge_chemical_scores(
-    base_df = df2,
-    score_tables = supp_tables
-  )
+  annot_table_wei_chemo_init <- purrr::reduce(
+    .x = supp_tables,
+    .init = df2,
+    .f = tidytable::left_join
+  ) |>
+    tidytable::mutate(
+      score_chemical = pmax(
+        score_chemical_1,
+        score_chemical_2,
+        score_chemical_3,
+        score_chemical_4,
+        score_chemical_5,
+        score_chemical_6,
+        score_chemical_7,
+        0,
+        na.rm = TRUE
+      )
+    ) |>
+    tidytable::select(-tidyselect::contains(match = "score_chemical_"))
   rm(df2, supp_tables)
 
   annot_table_wei_chemo_interim <- annot_table_wei_chemo_init |>
@@ -376,33 +390,4 @@ weight_chemo <- function(
   log_complete(ctx, n_weighted = nrow(annot_table_wei_chemo))
 
   annot_table_wei_chemo
-}
-
-#' @keywords internal
-.merge_chemical_scores <- function(base_df, score_tables) {
-  # Merge all 7 score tables efficiently
-  result <- Reduce(
-    function(left_df, right_df) {
-      tidytable::left_join(left_df, right_df)
-    },
-    score_tables,
-    init = base_df
-  )
-
-  # Calculate final chemical score from all levels
-  result |>
-    tidytable::mutate(
-      score_chemical = pmax(
-        score_chemical_1,
-        score_chemical_2,
-        score_chemical_3,
-        score_chemical_4,
-        score_chemical_5,
-        score_chemical_6,
-        score_chemical_7,
-        0,
-        na.rm = TRUE
-      )
-    ) |>
-    tidytable::select(-tidyselect::contains(match = "score_chemical_"))
 }
