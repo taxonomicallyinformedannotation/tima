@@ -187,28 +187,6 @@ load_structural_library <- function(
   list(structures = structures, em_windows = em_windows)
 }
 
-#' Log the top observed pair-delta bins for QC
-#' @keywords internal
-log_top_pair_deltas <- function(pairs) {
-  if (nrow(pairs) == 0L) {
-    return(invisible(NULL))
-  }
-  bins <- pairs[, .N, by = .(bin = cut(delta, breaks = 100000L))] |>
-    tidytable::arrange(tidytable::desc(N)) |>
-    tidytable::slice_head(n = 16L)
-  bins <- add_percentage_column(bins, count_col = "N", out_col = "Pct")
-  log_info(
-    "Here are the top 16 observed m/z differences inside the RT windows:"
-  )
-  log_info(
-    "\n%s",
-    paste(
-      utils::capture.output(print.data.frame(bins, row.names = FALSE)),
-      collapse = "\n"
-    )
-  )
-  invisible(NULL)
-}
 
 #' Log the per-adduct annotation breakdown table
 #'

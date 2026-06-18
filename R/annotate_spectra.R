@@ -509,16 +509,6 @@ extract_vector <- function(obj, field, len, fill = NA) {
   v[seq_len(len)]
 }
 
-#' @keywords internal
-harmonize_adduct_vector <- function(adducts, colname = "adduct") {
-  tmp <- tidytable::tidytable(tmp_adduct = as.character(adducts))
-  names(tmp)[[1L]] <- colname
-  harmonize_adducts(
-    tmp,
-    adducts_colname = colname,
-    adducts_translations = adducts_translations
-  )[[colname]]
-}
 
 #' @keywords internal
 build_library_metadata <- function(lib_sp, lib_precursors) {

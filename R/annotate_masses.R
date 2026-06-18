@@ -225,7 +225,6 @@ annotate_masses <- function(
     nrow(ion_tables$loss_transitions)
   )
 
-  # ---- Step 4: classify each pair --------------------------------------
   start_time_edges <- Sys.time()
   edge_sets <- discover_annotate_masses_edge_sets(
     pairs = pairs,
@@ -365,13 +364,11 @@ annotate_masses <- function(
     nrow(annotations)
   )
 
-  # ---- Step 8: derive primary/secondary per-feature ion species -----------
   annotations <- derive_primary_secondary_annotations(
     annotations = annotations,
     baseline_adducts = baseline_adducts
   )
 
-  # ---- Step 9: propagate annotations across M-cliques ---------------------
   annotations <- propagate_annotations_across_m_cliques(
     annotations = annotations,
     node_hypotheses = node_hypotheses,
@@ -411,7 +408,6 @@ annotate_masses <- function(
   decorate_masses(annotations)
   log_adduct_breakdown(annotations)
 
-  # ---- Step 11: edges file ---------------------------------------------
   start_time_export <- Sys.time()
   edges_out <- build_output_edges(
     adduct_edges = adduct_edges_combined,
@@ -749,8 +745,12 @@ retain_supported_single_m_edges <- function(
   tolerance_ppm,
   tolerance_dalton
 ) {
-  invisible(tolerance_dalton)
-  if (nrow(annotations) == 0L) {
+  invisible(c(tolerance_ppm, tolerance_dalton))
+  if (
+    nrow(adduct_edges) == 0L &&
+      nrow(cluster_edges) == 0L &&
+      nrow(loss_edges) == 0L
+  ) {
     return(list(
       adduct_edges = adduct_edges[0L, ],
       cluster_edges = cluster_edges[0L, ],
@@ -758,72 +758,22 @@ retain_supported_single_m_edges <- function(
       annotations = annotations
     ))
   }
+  adduct_kept <- enforce_graph_adduct_consistency(adduct_edges) |>
+    tidytable::distinct(feature_id, adduct, feature_id_dest, adduct_dest)
 
-  selected <- annotations |>
-    tidytable::distinct(
-      feature_id,
-      adduct,
-      annotation_level,
-      evidence_tier,
-      source,
-      candidate_adduct_origin,
-      mass,
-      mz
-    ) |>
-    tidytable::mutate(
-      annotation_level = tidytable::coalesce(annotation_level, "primary"),
-      evidence_tier = tidytable::coalesce(
-        evidence_tier,
-        "supported_strong"
-      ),
-      is_supported = annotation_level == "primary" &
-        evidence_tier == "supported_strong"
-    )
-
-  supported_nodes <- selected |>
-    tidytable::filter(is_supported)
-  if (nrow(supported_nodes) == 0L) {
-    return(list(
-      adduct_edges = adduct_edges[0L, ],
-      cluster_edges = cluster_edges[0L, ],
-      loss_edges = loss_edges[0L, ],
-      annotations = annotations
-    ))
-  }
-
-  adduct_kept <- adduct_edges |>
-    tidytable::inner_join(
-      supported_nodes |>
-        tidytable::select(feature_id, adduct, mass_src = mass),
-      by = c("feature_id", "adduct")
-    ) |>
-    tidytable::inner_join(
-      supported_nodes |>
-        tidytable::select(
-          feature_id_dest = feature_id,
-          adduct_dest = adduct,
-          mass_dest = mass
-        ),
-      by = c("feature_id_dest", "adduct_dest")
-    ) |>
-    tidytable::mutate(
-      mass_diff = abs(mass_src - mass_dest),
-      ppm_ok = mass_diff <= (tolerance_ppm * 1e-6 * pmax(mass_src, mass_dest)),
-      dalton_ok = if (is.null(tolerance_dalton)) {
-        FALSE
-      } else {
-        mass_diff <= tolerance_dalton
-      }
-    ) |>
-    tidytable::filter(ppm_ok | dalton_ok) |>
-    tidytable::select(feature_id, adduct, feature_id_dest, adduct_dest) |>
+  assigned_nodes <- tidytable::bind_rows(
+    adduct_kept |>
+      tidytable::transmute(feature_id, adduct),
+    adduct_kept |>
+      tidytable::transmute(feature_id = feature_id_dest, adduct = adduct_dest)
+  ) |>
     tidytable::distinct()
 
   if (nrow(adduct_kept) == 0L) {
     modifier_filtered <- filter_modifier_edges_by_assigned_adducts(
       cluster_edges = cluster_edges,
       loss_edges = loss_edges,
-      assigned_nodes = supported_nodes
+      assigned_nodes = assigned_nodes
     )
     return(list(
       adduct_edges = adduct_kept,
@@ -875,32 +825,12 @@ retain_supported_single_m_edges <- function(
   }
   comp_members <- tidytable::bind_rows(comp_members_list)
 
+  # Keep directly matched modifier edges; avoid over-pruning by adduct-component
+  # membership and enforce coherence with assigned adduct states below.
   cluster_kept <- cluster_edges |>
-    tidytable::inner_join(comp_members, by = "feature_id") |>
-    tidytable::inner_join(
-      comp_members |>
-        tidytable::rename(
-          feature_id_dest = feature_id,
-          component_id_dest = component_id
-        ),
-      by = "feature_id_dest"
-    ) |>
-    tidytable::filter(component_id == component_id_dest) |>
-    tidytable::select(feature_id, cluster, mass, feature_id_dest) |>
     tidytable::distinct()
 
   loss_kept <- loss_edges |>
-    tidytable::inner_join(comp_members, by = "feature_id") |>
-    tidytable::inner_join(
-      comp_members |>
-        tidytable::rename(
-          feature_id_dest = feature_id,
-          component_id_dest = component_id
-        ),
-      by = "feature_id_dest"
-    ) |>
-    tidytable::filter(component_id == component_id_dest) |>
-    tidytable::select(feature_id, loss, mass, feature_id_dest) |>
     tidytable::distinct()
 
   # Keep modifier edges aligned with currently assigned primary supported adducts
@@ -908,7 +838,7 @@ retain_supported_single_m_edges <- function(
   modifier_filtered <- filter_modifier_edges_by_assigned_adducts(
     cluster_edges = cluster_kept,
     loss_edges = loss_kept,
-    assigned_nodes = supported_nodes
+    assigned_nodes = assigned_nodes
   )
   cluster_kept <- modifier_filtered$cluster_edges
   loss_kept <- modifier_filtered$loss_edges
@@ -1158,7 +1088,7 @@ build_annotate_masses_ion_tables <- function(
   ms_mode
 ) {
   adducts <- resolve_annotate_masses_mode_terms(adducts_list, ms_mode)
-  adducts <- harmonize_adduct_vector(adducts)
+  adducts <- unique(harmonize_adduct_vector(adducts))
   clusters <- resolve_annotate_masses_mode_terms(clusters_list, ms_mode)
   solvents <- resolve_annotate_masses_mode_terms(solvents_list, ms_mode)
   clusters <- normalize_modifier_terms(clusters)
@@ -1187,7 +1117,26 @@ build_annotate_masses_ion_tables <- function(
     out_col = "loss",
     strip_label = TRUE
   )
-  baseline_adducts <- switch(ms_mode, pos = "[M+H]+", neg = "[M-H]-")
+  baseline_adducts <- switch(
+    ms_mode,
+    "pos" = c(
+      "[M+H2]2+",
+      "[M+H]+",
+      "[M+H4N]+",
+      "[M+Na]+",
+      "[M+K]+",
+      "[2M+H]+"
+    ),
+    "neg" = c(
+      "[M-H2]2-",
+      "[M-H]-",
+      "[M-H+CH2O2]-",
+      "[M-H+CH5NO2]-",
+      "[M-H+CHNaO2]-",
+      "[M-H+CHKO2]-",
+      "[2M-H]-"
+    )
+  )
 
   list(
     adducts = adducts,
@@ -1201,18 +1150,21 @@ build_annotate_masses_ion_tables <- function(
   )
 }
 
-#' Harmonize a plain adduct vector to canonical notation
+#' Harmonize a plain adduct vector to canonical notation.
+#' Length-preserving: returns one harmonized string per input element.
 #' @keywords internal
-harmonize_adduct_vector <- function(adducts) {
-  adducts <- unique(as.character(adducts))
-  adducts <- adducts[!is.na(adducts) & nzchar(adducts)]
+harmonize_adduct_vector <- function(adducts, colname = "adduct") {
+  adducts <- as.character(adducts)
   if (length(adducts) == 0L) {
     return(character())
   }
-  tidytable::tidytable(adduct = adducts) |>
-    harmonize_adducts(adducts_translations = adducts_translations) |>
-    tidytable::pull(adduct) |>
-    unique()
+  tmp <- tidytable::tidytable(tmp__ = adducts)
+  names(tmp)[[1L]] <- colname
+  harmonize_adducts(
+    tmp,
+    adducts_colname = colname,
+    adducts_translations = adducts_translations
+  )[[colname]]
 }
 
 #' Resolve a mode-specific config entry to a flat character vector
@@ -1228,7 +1180,7 @@ resolve_annotate_masses_mode_terms <- function(x, ms_mode) {
 #' Parse configured adduct strings into a minimal lookup-ready table
 #' @keywords internal
 build_parsed_legacy_adduct_table <- function(adducts) {
-  adducts <- harmonize_adduct_vector(adducts)
+  adducts <- unique(harmonize_adduct_vector(adducts))
   if (length(adducts) == 0L) {
     return(tidytable::tidytable(
       adduct = character(),
@@ -1331,7 +1283,7 @@ select_single_charge_monomer_adducts <- function(adducts, ms_mode) {
 #' Parse legacy adduct rows and keep valid single-charge monomers
 #' @keywords internal
 build_single_legacy_adduct_mass_table <- function(adducts) {
-  adducts <- harmonize_adduct_vector(adducts)
+  adducts <- unique(harmonize_adduct_vector(adducts))
   if (length(adducts) == 0L) {
     return(tidytable::tidytable(adduct = character(), adduct_mass = numeric()))
   }

@@ -692,49 +692,73 @@ test_that("annotate_masses keeps neutral-loss edges even when adduct-pair edge e
   expect_true(any(edges$label == "NH3 loss"))
 })
 
-test_that("retain_supported_single_m_edges keeps direct modifier edges even without adduct edges", {
-  annotations <- tidytable::tidytable(
-    feature_id = c("F1", "F2"),
-    adduct = c("[M+H]+", "[M+H]+"),
-    annotation_level = c("primary", "primary"),
-    evidence_tier = c("supported_strong", "supported_strong"),
-    source = c("pair", "pair"),
-    candidate_adduct_origin = c("supported", "supported"),
-    mass = c(100, 118.010565),
-    mz = c(100, 118.010565)
+
+test_that("annotate_masses keeps direct modifier edges when adduct-pair edges are absent", {
+  local_quiet_logging()
+
+  temp_dir <- tempfile("annotate_masses_modifier_only_")
+  dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
+  on.exit(unlink(temp_dir, recursive = TRUE, force = TRUE), add = TRUE)
+  on.exit(unlink("data", recursive = TRUE, force = TRUE), add = TRUE)
+
+  mz_base <- calculate_mz_from_mass(200, "[M+H]+")
+  mz_loss <- mz_base + MetaboCoreUtils::calculateMass("H2O")
+  mz_cluster <- mz_base + MetaboCoreUtils::calculateMass("Na")
+
+  features <- tidytable::tidytable(
+    feature_id = c("F_BASE", "F_LOSS", "F_CLUSTER"),
+    mz = c(mz_base, mz_loss, mz_cluster),
+    rt = c(5, 5, 5),
+    sample = c("S1", "S1", "S1")
   )
 
-  out <- tima:::retain_supported_single_m_edges(
-    adduct_edges = tidytable::tidytable(
-      feature_id = character(),
-      adduct = character(),
-      feature_id_dest = character(),
-      adduct_dest = character()
-    ),
-    cluster_edges = tidytable::tidytable(
-      feature_id = "F1",
-      cluster = "H2O",
-      mass = 18.010565,
-      feature_id_dest = "F2",
-      adduct = "[M+H]+",
-      adduct_dest = "[M+H]+"
-    ),
-    loss_edges = tidytable::tidytable(
-      feature_id = "F2",
-      loss = "H2O",
-      mass = 18.010565,
-      feature_id_dest = "F1",
-      adduct = "[M+H]+",
-      adduct_dest = "[M+H]+"
-    ),
-    annotations = annotations,
+  features_file <- file.path(temp_dir, "features.tsv")
+  tidytable::fwrite(features, features_file, sep = "\t")
+
+  library_file <- copy_fixture_to(
+    "library_minimal.csv",
+    file.path(temp_dir, "library.tsv")
+  )
+  str_stereo <- copy_fixture_to(
+    "structures_stereo.csv",
+    file.path(temp_dir, "structures_stereo.tsv")
+  )
+  str_met <- copy_fixture_to(
+    "structures_metadata_minimal.csv",
+    file.path(temp_dir, "structures_metadata.tsv")
+  )
+  str_tax_cla <- copy_fixture_to(
+    "structures_taxonomy_cla_minimal.csv",
+    file.path(temp_dir, "structures_taxonomy_cla.tsv")
+  )
+  str_tax_npc <- copy_fixture_to(
+    "structures_taxonomy_npc_minimal.csv",
+    file.path(temp_dir, "structures_taxonomy_npc.tsv")
+  )
+
+  result <- suppressWarnings(annotate_masses(
+    features = features_file,
+    library = library_file,
+    str_stereo = str_stereo,
+    str_met = str_met,
+    str_tax_cla = str_tax_cla,
+    str_tax_npc = str_tax_npc,
+    adducts_list = list(pos = c("[M+H]+"), neg = c("[M-H]-")),
+    clusters_list = list(pos = c("Na"), neg = character()),
+    solvents_list = list(pos = character(), neg = character()),
+    neutral_losses_list = c("H2O"),
+    ms_mode = "pos",
     tolerance_ppm = 10,
-    tolerance_dalton = 0.01
-  )
+    tolerance_rt = 0.02,
+    output_annotations = file.path(temp_dir, "annotations.tsv"),
+    output_edges = file.path(temp_dir, "edges.tsv")
+  ))
 
-  expect_equal(nrow(out$adduct_edges), 0L)
-  expect_equal(nrow(out$cluster_edges), 1L)
-  expect_equal(nrow(out$loss_edges), 1L)
+  edges <- tidytable::fread(result[["edges"]], colClasses = "character")
+
+  expect_true(any(edges$label == "H2O loss"))
+  expect_true(any(edges$label == "+Na cluster"))
+  expect_false(any(grepl(" _ ", edges$label, fixed = TRUE)))
 })
 
 test_that("join_multi_with_addlossed preserves observed matched mass", {
