@@ -721,6 +721,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$stereo,
   str_met = get_params(step =
     "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$metadata,
+  str_nam = NULL,
   str_tax_cla = get_params(step =
     "annotate_masses")\$files\$libraries\$sop\$merged\$structures\$taxonomies\$cla,
   str_tax_npc = get_params(step =
@@ -801,6 +802,14 @@ File containing structures stereo
 </td>
 <td>
 File containing structures metadata
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="str_nam">str_nam</code>
+</td>
+<td>
+Optional file containing structures names
 </td>
 </tr>
 <tr>
