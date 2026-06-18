@@ -66,9 +66,6 @@
     "lib_spe_mgf": null,
     "lib_tmp_exp_csv": null,
     "lib_tmp_is_csv": null,
-    "ms_add_con_min_degree": 3,
-    "ms_add_con_min_support": 2,
-    "ms_add_con_type": "conditional",
     "ms_add_neg": [
       "[M-H2]2-",
       "[M-H]-",
@@ -95,7 +92,6 @@
     "ms_neu": [
       "CH2 (methylene)",
       "O",
-      "H3N (ammonia)",
       "H2O (water)",
       "HF (hydrogen fluoride)",
       "CO",
@@ -187,7 +183,6 @@
     ],
     "ms_pol": "pos",
     "ms_sol": [
-      "H2O",
       "C2H3N"
     ],
     "ms_thr_ms2_int": 0,

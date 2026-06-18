@@ -155,12 +155,14 @@ compute_feature_adduct_support <- function(df_add) {
 #' Apply optional support-based adduct consistency filtering.
 #' @keywords internal
 apply_adduct_consistency_filter <- function(
-  df_add,
-  adduct_consistency = "conditional",
-  adduct_min_support = 2L,
-  adduct_consistency_min_degree = 3L
+  df_add
 ) {
-  if (nrow(df_add) == 0L || adduct_consistency == "off") {
+  # Fixed consistency policy for legacy helper callers.
+  mode <- "conditional"
+  support_minimum <- 2L
+  degree_minimum <- 3L
+
+  if (nrow(df_add) == 0L) {
     return(df_add)
   }
   pair_hyp <- df_add |>
@@ -231,11 +233,11 @@ apply_adduct_consistency_filter <- function(
         as.integer(dest_degree)
       )
     )
-  if (adduct_consistency == "strict") {
+  if (mode == "strict") {
     return(
       scored |>
-        tidytable::filter(src_support >= adduct_min_support) |>
-        tidytable::filter(dest_support >= adduct_min_support) |>
+        tidytable::filter(src_support >= support_minimum) |>
+        tidytable::filter(dest_support >= support_minimum) |>
         tidytable::select(feature_id, adduct, adduct_dest, feature_id_dest) |>
         tidytable::distinct()
     )
@@ -243,13 +245,13 @@ apply_adduct_consistency_filter <- function(
   scored |>
     tidytable::mutate(
       need_check = pair_hypotheses > 1L |
-        src_degree >= adduct_consistency_min_degree |
-        dest_degree >= adduct_consistency_min_degree
+        src_degree >= degree_minimum |
+        dest_degree >= degree_minimum
     ) |>
     tidytable::filter(
       !need_check |
-        src_support >= adduct_min_support |
-        dest_support >= adduct_min_support
+        src_support >= support_minimum |
+        dest_support >= support_minimum
     ) |>
     tidytable::select(feature_id, adduct, adduct_dest, feature_id_dest) |>
     tidytable::distinct()

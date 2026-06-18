@@ -169,9 +169,6 @@ prepare_params <- function(
   # Extract MS parameters
   ms_add_neg <- params_advanced$ms$adducts$neg
   ms_add_pos <- params_advanced$ms$adducts$pos
-  ms_add_con_type <- params_advanced$ms$adducts$consistency$type
-  ms_add_con_min_degree <- params_advanced$ms$adducts$consistency$min_degree
-  ms_add_con_min_support <- params_advanced$ms$adducts$consistency$min_support
   ms_clu <- unique(as.character(params_advanced$ms$clusters))
   ms_sol <- unique(as.character(params_advanced$ms$solvents))
   ms_neu <- params_advanced$ms$neutral_losses
@@ -322,12 +319,6 @@ prepare_params <- function(
     ms_add_neg
   yamls_params$annotate_masses$ms$adducts$pos <-
     ms_add_pos
-  yamls_params$annotate_masses$ms$adducts$consistency$type <-
-    ms_add_con_type
-  yamls_params$annotate_masses$ms$adducts$consistency$min_degree <-
-    ms_add_con_min_degree
-  yamls_params$annotate_masses$ms$adducts$consistency$min_support <-
-    ms_add_con_min_support
   yamls_params$annotate_masses$ms$clusters <- ms_clu
   yamls_params$annotate_masses$ms$solvents <- ms_sol
   yamls_params$annotate_masses$ms$neutral_losses <-

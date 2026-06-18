@@ -336,10 +336,7 @@ targets_section_benchmark <- function() {
           neutral_losses_list = par_ann_mas$ms$neutral_losses,
           ms_mode = "pos",
           tolerance_ppm = benchmark_def_ann_mas$ms$tolerances$mass$ppm$ms1,
-          tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$adducts,
-          adduct_consistency = benchmark_def_ann_mas$ms$adducts$consistency$type,
-          adduct_min_support = benchmark_def_ann_mas$ms$adducts$consistency$min_support,
-          adduct_consistency_min_degree = benchmark_def_ann_mas$ms$adducts$consistency$min_degree
+          tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$adducts
         )
       },
       format = "file"
@@ -364,10 +361,7 @@ targets_section_benchmark <- function() {
           neutral_losses_list = par_ann_mas$ms$neutral_losses,
           ms_mode = "neg",
           tolerance_ppm = benchmark_def_ann_mas$ms$tolerances$mass$ppm$ms1,
-          tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$adducts,
-          adduct_consistency = benchmark_def_ann_mas$ms$adducts$consistency$type,
-          adduct_min_support = benchmark_def_ann_mas$ms$adducts$consistency$min_support,
-          adduct_consistency_min_degree = benchmark_def_ann_mas$ms$adducts$consistency$min_degree
+          tolerance_rt = benchmark_def_ann_mas$ms$tolerances$rt$adducts
         )
       },
       format = "file"

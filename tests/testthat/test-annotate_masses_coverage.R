@@ -21,25 +21,6 @@ test_that("resolve_annotate_masses_coverage_mode applies defaults and fallback",
   )
 })
 
-test_that("resolve_adduct_consistency_config normalizes invalid values", {
-  cfg <- resolve_adduct_consistency_config(
-    adduct_consistency = NULL,
-    adduct_min_support = NULL,
-    adduct_consistency_min_degree = NULL
-  )
-  expect_identical(cfg$adduct_consistency, "conditional")
-  expect_identical(cfg$adduct_min_support, 2L)
-  expect_identical(cfg$adduct_consistency_min_degree, 3L)
-
-  cfg_invalid <- resolve_adduct_consistency_config(
-    adduct_consistency = "bad",
-    adduct_min_support = "not-int",
-    adduct_consistency_min_degree = 0
-  )
-  expect_identical(cfg_invalid$adduct_consistency, "conditional")
-  expect_identical(cfg_invalid$adduct_min_support, 2L)
-  expect_identical(cfg_invalid$adduct_consistency_min_degree, 3L)
-})
 
 test_that("derive_annotate_masses_coverage_path handles common path shapes", {
   expect_identical(

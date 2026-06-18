@@ -1130,10 +1130,7 @@ test_that("apply_adduct_consistency_filter keeps sparse single-hypothesis edges 
   )
 
   out <- apply_adduct_consistency_filter(
-    df_add = df_add,
-    adduct_consistency = "conditional",
-    adduct_min_support = 2L,
-    adduct_consistency_min_degree = 3L
+    df_add = df_add
   )
 
   expect_equal(nrow(out), 1L)
@@ -1148,10 +1145,7 @@ test_that("apply_adduct_consistency_filter prunes ambiguous unsupported edges", 
   )
 
   out <- apply_adduct_consistency_filter(
-    df_add = df_add,
-    adduct_consistency = "conditional",
-    adduct_min_support = 2L,
-    adduct_consistency_min_degree = 3L
+    df_add = df_add
   )
 
   expect_true(any(out$feature_id == "F1" & out$adduct == "A"))

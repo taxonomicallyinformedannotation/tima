@@ -119,9 +119,11 @@ load_structural_library <- function(
   library,
   str_stereo,
   str_met,
+  str_nam = NULL,
   str_tax_cla,
   str_tax_npc,
-  tolerance_ppm
+  tolerance_ppm,
+  tolerance_dalton = NULL
 ) {
   library_table <- safe_fread(
     file = library,
@@ -129,13 +131,14 @@ load_structural_library <- function(
     na.strings = c("", "NA"),
     colClasses = "character"
   )
-  supp_files <- list(str_stereo, str_met, str_tax_cla, str_tax_npc)
-  supp_names <- c(
-    "stereochemistry",
-    "metadata",
-    "ClassyFire taxonomy",
-    "NPClassifier taxonomy"
-  )
+  supp_files <- list(str_stereo, str_met)
+  supp_names <- c("stereochemistry", "metadata")
+  if (!is.null(str_nam)) {
+    supp_files <- c(supp_files, list(str_nam))
+    supp_names <- c(supp_names, "names")
+  }
+  supp_files <- c(supp_files, list(str_tax_cla, str_tax_npc))
+  supp_names <- c(supp_names, "ClassyFire taxonomy", "NPClassifier taxonomy")
   supp_tables <- purrr::map2(
     .x = supp_files,
     .y = supp_names,
@@ -172,8 +175,13 @@ load_structural_library <- function(
     tidytable::distinct(exact_mass = structure_exact_mass) |>
     tidytable::filter(!is.na(exact_mass) & exact_mass > 0) |>
     tidytable::mutate(
-      value_min = exact_mass - (1E-6 * tolerance_ppm * exact_mass),
-      value_max = exact_mass + (1E-6 * tolerance_ppm * exact_mass)
+      # Use the less restrictive of ppm and Dalton windows.
+      mass_tol = pmax(
+        1E-6 * tolerance_ppm * exact_mass,
+        if (is.null(tolerance_dalton)) 0 else as.numeric(tolerance_dalton)
+      ),
+      value_min = exact_mass - mass_tol,
+      value_max = exact_mass + mass_tol
     )
 
   list(structures = structures, em_windows = em_windows)

@@ -58,7 +58,7 @@ match_pairs_to_mass_diffs <- function(pairs, diffs, diff_col) {
     out <- diffs_t[
       pairs_t,
       on = .(mass >= delta_min, mass <= delta_max),
-      nomatch = NA_real_,
+      nomatch = 0L,
       allow.cartesian = TRUE
     ][,
       .(
@@ -71,7 +71,6 @@ match_pairs_to_mass_diffs <- function(pairs, diffs, diff_col) {
       )
     ] |>
       tidytable::as_tidytable() |>
-      tidytable::filter(!is.na(modifier)) |>
       tidytable::rename(!!as.name(diff_col) := modifier) |>
       tidytable::distinct()
     return(out)
@@ -1680,6 +1679,7 @@ match_candidates_to_library <- function(
       src_mz = mz,
       src_adduct = adduct,
       src_mass = mass,
+      src_mass_out = mass,
       src_source = source,
       src_is_preassigned = is_preassigned,
       src_origin = candidate_adduct_origin,
@@ -1705,14 +1705,14 @@ match_candidates_to_library <- function(
       rt = src_rt,
       mz = src_mz,
       adduct = src_adduct,
-      mass = src_mass,
+      mass = src_mass_out,
       source = src_source,
       is_preassigned = src_is_preassigned,
       candidate_adduct_origin = src_origin,
       adduct_support = src_support,
       loss_term = src_loss_term,
       structure_exact_mass = exact_mass,
-      error_mz = exact_mass - src_mass
+      error_mz = exact_mass - src_mass_out
     )
   ] |>
     tidytable::as_tidytable() |>

@@ -63,6 +63,7 @@
 #' @param library Library containing the keys
 #' @param str_stereo File containing structures stereo
 #' @param str_met File containing structures metadata
+#' @param str_nam Optional file containing structures names
 #' @param str_tax_cla File containing Classyfire taxonomy
 #' @param str_tax_npc File containing NPClassifier taxonomy
 #' @param adducts_list List of adducts to be used
@@ -73,12 +74,6 @@
 #' @param tolerance_ppm Tolerance to perform annotation. Should be <= 20 ppm
 #' @param tolerance_dalton Absolute mass tolerance in Daltons for annotation
 #' @param tolerance_rt Tolerance to group adducts. Should be <= 0.05 minutes
-#' @param adduct_consistency Consistency mode for adduct edge filtering: one of
-#'   `off`, `conditional`, `strict`
-#' @param adduct_min_support Minimum number of independent supporting neighbors
-#'   for an adduct assignment in consistency-filtered regions
-#' @param adduct_consistency_min_degree In `conditional` mode, minimum local
-#'   graph degree at which support filtering is activated
 #'
 #' @return Named character of paths to the annotations and edges files.
 #'
@@ -109,6 +104,7 @@ annotate_masses <- function(
   str_met = get_params(
     step = "annotate_masses"
   )$files$libraries$sop$merged$structures$metadata,
+  str_nam = NULL,
   str_tax_cla = get_params(
     step = "annotate_masses"
   )$files$libraries$sop$merged$structures$taxonomies$cla,
@@ -130,16 +126,7 @@ annotate_masses <- function(
   )$ms$tolerances$mass$dalton$ms1,
   tolerance_rt = get_params(
     step = "annotate_masses"
-  )$ms$tolerances$rt$adducts,
-  adduct_consistency = get_params(
-    step = "annotate_masses"
-  )$ms$adducts$consistency$type,
-  adduct_min_support = get_params(
-    step = "annotate_masses"
-  )$ms$adducts$consistency$min_support,
-  adduct_consistency_min_degree = get_params(
-    step = "annotate_masses"
-  )$ms$adducts$consistency$min_degree
+  )$ms$tolerances$rt$adducts
 ) {
   ctx <- log_operation(
     "annotate_masses",
@@ -148,9 +135,8 @@ annotate_masses <- function(
     tolerance_dalton = tolerance_dalton,
     tolerance_rt = tolerance_rt
   )
-  log_info("Starting mass-based annotation")
+  log_info("Starting mass-based annotation (streaming network-first path)")
 
-  # ---- Step 0: input validation ----------------------------------------
   sanitize_all_inputs(features_file = features)
   validate_ms_mode(ms_mode)
   validate_tolerances(
@@ -163,25 +149,22 @@ annotate_masses <- function(
   validate_adduct_list(adducts_list, ms_mode, "adducts_list")
   validate_list_or_vector(clusters_list, param_name = "clusters_list")
   validate_list_or_vector(solvents_list, param_name = "solvents_list")
-  validate_file_existence(list(
+  files_to_check <- list(
     features = features,
     library = library,
     str_stereo = str_stereo,
     str_met = str_met,
     str_tax_cla = str_tax_cla,
     str_tax_npc = str_tax_npc
-  ))
-
-  cfg <- resolve_adduct_consistency_config(
-    adduct_consistency = adduct_consistency,
-    adduct_min_support = adduct_min_support,
-    adduct_consistency_min_degree = adduct_consistency_min_degree
   )
-  coverage_mode <- "best_supported_conflict_free"
+  if (!is.null(str_nam) && length(str_nam) > 0L && nzchar(str_nam[[1L]])) {
+    files_to_check$str_nam <- str_nam
+  }
+  validate_file_existence(files_to_check)
+
   baseline_adduct <- switch(ms_mode, "pos" = "[M+H]+", "neg" = "[M-H]-")
   baseline_adducts <- baseline_adduct
 
-  # ---- Step 1: load features -------------------------------------------
   features_table <- safe_fread(
     file = features,
     file_type = "features table",
@@ -189,7 +172,6 @@ annotate_masses <- function(
     na.strings = c("", "NA"),
     colClasses = "character"
   )
-
   if (nrow(features_table) == 0L) {
     log_info("Empty features table provided - no annotations to perform")
     return(write_empty_annotate_masses_outputs(
@@ -206,28 +188,22 @@ annotate_masses <- function(
     library = library,
     str_stereo = str_stereo,
     str_met = str_met,
+    str_nam = str_nam,
     str_tax_cla = str_tax_cla,
     str_tax_npc = str_tax_npc,
-    tolerance_ppm = tolerance_ppm
+    tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton
   )
   features_table <- loaded_inputs$features_table
   already_assigned <- loaded_inputs$already_assigned
   lib <- loaded_inputs$lib
 
-  # ---- Step 3: feature pairs inside RT windows -------------------------
-  start_time_pairs <- Sys.time()
   pairs <- build_feature_pairs_within_rt(
     df_rt_tol = features_table,
     df_fea_min = features_table,
     tolerance_ppm = tolerance_ppm
   )
-  elapsed_pairs <- difftime(Sys.time(), start_time_pairs, units = "secs")
-  log_info(
-    "Built %d feature pairs in %.2f seconds",
-    nrow(pairs),
-    as.numeric(elapsed_pairs)
-  )
-  log_top_pair_deltas(pairs)
+  log_info("Built %d RT-window pair(s)", nrow(pairs))
 
   ion_tables <- build_annotate_masses_ion_tables(
     adducts_list = adducts_list,
@@ -266,7 +242,6 @@ annotate_masses <- function(
     tolerance_ppm = tolerance_ppm,
     tolerance_rt = tolerance_rt,
     tolerance_dalton = tolerance_dalton,
-    cfg = cfg,
     exact_masses = lib$em_windows$exact_mass
   )
   elapsed_edges <- difftime(Sys.time(), start_time_edges, units = "secs")
@@ -284,8 +259,6 @@ annotate_masses <- function(
     nrow(loss_edges)
   )
 
-  # ---- Step 5: per-feature node-level adduct hypotheses ----------------
-  start_time_hyp <- Sys.time()
   node_hypotheses <- build_annotate_masses_candidate_hypotheses(
     adduct_edges = adduct_edges_combined,
     cluster_edges = cluster_edges,
@@ -299,8 +272,6 @@ annotate_masses <- function(
     tolerance_ppm = tolerance_ppm,
     tolerance_dalton = tolerance_dalton
   )
-  elapsed_hyp <- difftime(Sys.time(), start_time_hyp, units = "secs")
-  log_info("Generated node hypotheses in %.2f seconds", as.numeric(elapsed_hyp))
 
   # Recover weak but M-coherent modifier states for unresolved nodes in
   # supported components without relaxing strict primary graph semantics.
@@ -365,7 +336,6 @@ annotate_masses <- function(
     )
   }
 
-  # ---- Step 7: library match by neutral mass ---------------------------
   start_time_lib <- Sys.time()
   annotations <- build_annotate_masses_annotations(
     node_hypotheses = node_hypotheses,
@@ -374,8 +344,7 @@ annotate_masses <- function(
     tolerance_ppm = tolerance_ppm,
     tolerance_dalton = tolerance_dalton,
     adduct_edges = adduct_edges_combined,
-    baseline_adduct = baseline_adduct,
-    coverage_mode = coverage_mode
+    baseline_adduct = baseline_adduct
   )
   elapsed_lib <- difftime(Sys.time(), start_time_lib, units = "secs")
   log_info(
@@ -442,7 +411,6 @@ annotate_masses <- function(
   )
   log_debug("Built edges output with %d edges", nrow(edges_out))
 
-  # ---- Step 12: write outputs ------------------------------------------
   export_params(
     parameters = get_params(step = "annotate_masses"),
     step = "annotate_masses"
@@ -1131,9 +1099,11 @@ load_annotate_masses_runtime_inputs <- function(
   library,
   str_stereo,
   str_met,
+  str_nam,
   str_tax_cla,
   str_tax_npc,
-  tolerance_ppm
+  tolerance_ppm,
+  tolerance_dalton
 ) {
   features_table <- prepare_features_table(features_table, tolerance_rt)
   already_assigned <- extract_preassigned_adducts(features_table)
@@ -1148,9 +1118,11 @@ load_annotate_masses_runtime_inputs <- function(
     library = library,
     str_stereo = str_stereo,
     str_met = str_met,
+    str_nam = str_nam,
     str_tax_cla = str_tax_cla,
     str_tax_npc = str_tax_npc,
-    tolerance_ppm = tolerance_ppm
+    tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton
   )
   list(
     features_table = features_table,
@@ -1173,12 +1145,46 @@ build_annotate_masses_ion_tables <- function(
   } else {
     adducts_list
   }
-  clusters <- normalize_modifier_terms(clusters_list)
-  solvents <- normalize_modifier_terms(solvents_list)
-  clusters <- unique(c(clusters, solvents))
+  clusters <- if (is.list(clusters_list) && !is.null(clusters_list[[ms_mode]])) {
+    clusters_list[[ms_mode]]
+  } else {
+    clusters_list
+  }
+  solvents <- if (is.list(solvents_list) && !is.null(solvents_list[[ms_mode]])) {
+    solvents_list[[ms_mode]]
+  } else {
+    solvents_list
+  }
+  clusters <- normalize_modifier_terms(clusters)
+  solvents <- normalize_modifier_terms(solvents)
+  cluster_terms <- unique(c(clusters, solvents))
+
+  single_adducts <- select_single_charge_monomer_adducts(adducts, ms_mode)
+  single_adduct_table <- build_single_legacy_adduct_mass_table(single_adducts)
+  adduct_diffs <- build_single_adduct_pairwise_deltas(single_adduct_table)
+
+  cluster_transitions <- build_modifier_mass_table(
+    modifiers = cluster_terms,
+    out_col = "cluster",
+    strip_label = FALSE
+  )
+
+  neutral_losses_mode <- if (
+    is.list(neutral_losses_list) && !is.null(neutral_losses_list[[ms_mode]])
+  ) {
+    neutral_losses_list[[ms_mode]]
+  } else {
+    neutral_losses_list
+  }
+  loss_transitions <- build_modifier_mass_table(
+    modifiers = normalize_modifier_terms(neutral_losses_mode),
+    out_col = "loss",
+    strip_label = TRUE
+  )
+
   universe <- build_adduct_universe(
     adducts_list = adducts_list,
-    clusters_list = list(pos = clusters, neg = clusters),
+    clusters_list = list(pos = cluster_terms, neg = cluster_terms),
     neutral_losses_list = neutral_losses_list,
     polarity = ms_mode
   )
@@ -1204,7 +1210,6 @@ build_annotate_masses_ion_tables <- function(
     polarity = ms_mode
   )
   adduct_lookup <- build_adduct_lookup(universe_meta)
-  transition_tables <- build_universe_transition_tables(universe_meta)
 
   baseline_adducts <- universe_meta |>
     tidytable::filter(n_iso == 0L) |>
@@ -1227,13 +1232,112 @@ build_annotate_masses_ion_tables <- function(
     universe = universe_meta,
     adduct_lookup = adduct_lookup,
     adducts = adducts,
-    clusters = clusters,
+    clusters = cluster_terms,
     baseline_adducts = baseline_adducts,
     multi_adducts = multi_adducts,
-    adduct_diffs = transition_tables$adduct_diffs,
-    cluster_transitions = transition_tables$cluster_transitions,
-    loss_transitions = transition_tables$loss_transitions
+    adduct_diffs = adduct_diffs,
+    cluster_transitions = cluster_transitions,
+    loss_transitions = loss_transitions
   )
+}
+
+#' Keep only single-charge adduct strings used for delta matching
+#' @keywords internal
+select_single_charge_monomer_adducts <- function(adducts, ms_mode) {
+  adducts <- unique(as.character(adducts))
+  adducts <- adducts[!is.na(adducts) & nzchar(adducts)]
+  if (length(adducts) == 0L) {
+    return(character())
+  }
+  charge_tag <- if (identical(ms_mode, "neg")) "]-" else "]+"
+  adducts[
+    grepl(pattern = "[M", x = adducts, fixed = TRUE) &
+      grepl(pattern = charge_tag, x = adducts, fixed = TRUE)
+  ]
+}
+
+#' Parse legacy adduct rows and keep valid single-charge monomers
+#' @keywords internal
+build_single_legacy_adduct_mass_table <- function(adducts) {
+  if (length(adducts) == 0L) {
+    return(tidytable::tidytable(adduct = character(), adduct_mass = numeric()))
+  }
+  rows <- lapply(adducts, .parse_single_legacy_adduct_row)
+  rows <- rows[!vapply(rows, is.null, logical(1L))]
+  if (length(rows) == 0L) {
+    return(tidytable::tidytable(adduct = character(), adduct_mass = numeric()))
+  }
+  tab <- tidytable::as_tidytable(do.call(
+    rbind,
+    lapply(rows, function(r) {
+      data.frame(
+        adduct = r$adduct,
+        adduct_mass = as.numeric(r$adduct_mass),
+        n_mer = as.integer(r$n_mer),
+        z = as.integer(r$z),
+        stringsAsFactors = FALSE
+      )
+    })
+  ))
+  tab |>
+    tidytable::filter(n_mer == 1L, abs(z) == 1L) |>
+    tidytable::select(adduct, adduct_mass) |>
+    tidytable::distinct()
+}
+
+#' Build pairwise positive deltas between parsed adduct masses
+#' @keywords internal
+build_single_adduct_pairwise_deltas <- function(single_adduct_table) {
+  if (nrow(single_adduct_table) == 0L) {
+    return(tidytable::tidytable(
+      Distance = numeric(),
+      Group1 = character(),
+      Group2 = character()
+    ))
+  }
+  src <- single_adduct_table |>
+    tidytable::rename(Group1 = adduct, mass1 = adduct_mass)
+  dest <- single_adduct_table |>
+    tidytable::rename(Group2 = adduct, mass2 = adduct_mass)
+  src |>
+    tidytable::cross_join(dest) |>
+    tidytable::mutate(Distance = mass2 - mass1) |>
+    tidytable::filter(Group1 != Group2, Distance > 0) |>
+    tidytable::distinct(Distance, Group1, Group2)
+}
+
+#' Compute direct mass-diff table from cluster/solvent/loss formulas
+#' @keywords internal
+build_modifier_mass_table <- function(modifiers, out_col, strip_label = FALSE) {
+  modifiers <- unique(as.character(modifiers))
+  modifiers <- modifiers[!is.na(modifiers) & nzchar(modifiers)]
+  if (length(modifiers) == 0L) {
+    out <- tidytable::tidytable(mass = numeric())
+    out[[out_col]] <- character()
+    return(out |>
+      tidytable::select(!!as.name(out_col), mass))
+  }
+  formula <- trimws(sub(" .*", "", modifiers))
+  labels <- if (isTRUE(strip_label)) formula else modifiers
+  mass <- vapply(
+    X = formula,
+    FUN = function(f) {
+      suppressWarnings(tryCatch(
+        MetaboCoreUtils::calculateMass(f),
+        error = function(.err) {
+          invisible(.err)
+          NA_real_
+        }
+      ))
+    },
+    FUN.VALUE = numeric(1L)
+  )
+  out <- tidytable::tidytable(mass = as.numeric(mass))
+  out[[out_col]] <- as.character(labels)
+  out |>
+    tidytable::filter(!is.na(mass) & is.finite(mass) & mass > 0) |>
+    tidytable::select(!!as.name(out_col), mass) |>
+    tidytable::distinct()
 }
 
 #' Normalize modifier terms to a flat character vector
@@ -1264,29 +1368,12 @@ discover_annotate_masses_edge_sets <- function(
   tolerance_ppm,
   tolerance_rt,
   tolerance_dalton,
-  cfg,
   exact_masses
 ) {
   invisible(tolerance_dalton)
   adduct_diffs <- transition_tables$adduct_diffs
   adduct_edges <- match_pairs_to_adduct_diffs(pairs, adduct_diffs)
-  adduct_edges <- apply_adduct_consistency_filter(
-    df_add = adduct_edges,
-    adduct_consistency = cfg$adduct_consistency,
-    adduct_min_support = cfg$adduct_min_support,
-    adduct_consistency_min_degree = cfg$adduct_consistency_min_degree
-  )
-  if (cfg$adduct_consistency == "strict" && nrow(adduct_edges) > 0L) {
-    adduct_edges <- enforce_graph_adduct_consistency(df_add = adduct_edges)
-    log_consistency_audit(attr(adduct_edges, "consistency_audit"))
-  } else if (cfg$adduct_consistency == "conditional") {
-    log_debug(
-      paste0(
-        "Adduct consistency mode is 'conditional': applying local support ",
-        "filter only (graph-level single-state enforcement is skipped)."
-      )
-    )
-  }
+  adduct_edges <- apply_adduct_consistency_filter(df_add = adduct_edges)
 
   cluster_edges <- match_pairs_to_mass_diffs(
     pairs = pairs,

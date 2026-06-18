@@ -57,8 +57,98 @@ build_adduct_universe <- function(
   )
 }
 
+#' Validate and clean a vector of atomic formula modifier tokens.
+#'
+#' Keeps only tokens parseable as bare atomic formulas (e.g. "H2O", "C2H3N").
+#' Strips comment suffixes ("H2O (water)" -> "H2O") and drops anything
+#' unparseable, returning a clean character vector.
+#'
+#' @keywords internal
+.validate_formula_tokens <- function(x) {
+  if (length(x) == 0L) {
+    return(character())
+  }
+  clean <- trimws(sub(" .*", "", as.character(x)))
+  clean <- clean[nzchar(clean)]
+  if (length(clean) == 0L) {
+    return(character())
+  }
+  ok <- !vapply(
+    clean,
+    function(f) {
+      pf <- parse_atomic_formula(f)
+      is.null(pf) || length(pf) == 0L
+    },
+    logical(1L)
+  )
+  clean[ok]
+}
+
+#' Parse a single legacy adduct string to a base row list.
+#'
+#' Returns NULL if the string cannot be parsed or has zero n_mer/charges.
+#' @keywords internal
+.parse_single_legacy_adduct_row <- function(a) {
+  parsed <- tryCatch(
+    suppressWarnings(parse_adduct(a)),
+    error = function(...) NULL
+  )
+  if (is.null(parsed) || is_parse_failed(parsed)) {
+    return(NULL)
+  }
+  n_mer <- parsed[["n_mer"]]
+  n_charges <- parsed[["n_charges"]]
+  n_iso <- parsed[["n_iso"]]
+  if (n_mer == 0L || n_charges == 0L) {
+    return(NULL)
+  }
+  sign_char <- regmatches(a, regexpr("[+-]+$", a))
+  sign_char <- if (length(sign_char) == 0L) "+" else sign_char[[1L]]
+  z_sign <- if (startsWith(sign_char, "-")) -1L else 1L
+  z <- z_sign * as.integer(n_charges)
+  # Physically correct electron correction.
+  adduct_mass <- parsed[["los_add_clu"]] - (z * ELECTRON_MASS_DA)
+  list(
+    adduct = a,
+    n_mer = as.integer(n_mer),
+    n_iso = as.integer(n_iso),
+    z = z,
+    adduct_mass = as.numeric(adduct_mass),
+    clusters = integer(),
+    losses = integer()
+  )
+}
+
+#' Assemble a typed universe tidytable from a flat list of row lists.
+#' @keywords internal
+.assemble_legacy_universe <- function(rows) {
+  if (length(rows) == 0L) {
+    return(empty_adduct_universe())
+  }
+  n <- length(rows)
+  tidytable::tidytable(
+    adduct = vapply(rows, function(r) r$adduct, character(1L)),
+    n_mer = vapply(rows, function(r) r$n_mer, integer(1L)),
+    n_iso = vapply(rows, function(r) r$n_iso, integer(1L)),
+    z = vapply(rows, function(r) r$z, integer(1L)),
+    adduct_mass = vapply(rows, function(r) r$adduct_mass, numeric(1L)),
+    adduct_mass_per_monomer = rep(0, n),
+    carriers = rep(list(integer()), n),
+    clusters = lapply(rows, function(r) r$clusters),
+    losses = lapply(rows, function(r) r$losses)
+  ) |>
+    tidytable::distinct(adduct, .keep_all = TRUE)
+}
+
 #' Legacy adapter: take a flat list of adduct strings + optional clusters and
-#' produce a typed universe by parsing each string.
+#' produce a typed universe.
+#'
+#' Base adducts are parsed **once**. Modifier rows are derived from the
+#' already-parsed base rows via mass arithmetic and string synthesis — no
+#' re-parsing of expanded strings. The `clusters` and `losses` list-columns
+#' are populated for modifier rows (matching the structured-path schema),
+#' so callers can distinguish base rows from modifier rows with
+#' `lengths(clusters) == 0L & lengths(losses) == 0L`.
 #'
 #' @keywords internal
 build_adduct_universe_from_legacy <- function(
@@ -73,129 +163,121 @@ build_adduct_universe_from_legacy <- function(
     return(empty_adduct_universe())
   }
 
-  # Pre-validate clusters: only keep tokens that are parseable as bare atomic
-  # formulas (e.g. "H2O", "C2H3N"). Tokens like "[M]" or comments are dropped
-  # silently to avoid bogus adduct strings downstream.
-  if (length(clusters) > 0L) {
-    cl_clean <- trimws(sub(" .*", "", as.character(clusters)))
-    cl_clean <- cl_clean[nzchar(cl_clean)]
-    cl_ok <- !vapply(
-      cl_clean,
-      function(f) {
-        is.null(parse_atomic_formula(f)) ||
-          length(parse_atomic_formula(f)) == 0L
-      },
-      logical(1L)
-    )
-    clusters <- cl_clean[cl_ok]
-  } else {
-    clusters <- character()
-  }
+  # Validate modifier formula tokens (both kinds).
+  clusters <- .validate_formula_tokens(clusters)
+  neutral_losses <- .validate_formula_tokens(neutral_losses)
 
-  if (length(neutral_losses) > 0L) {
-    loss_clean <- trimws(sub(" .*", "", as.character(neutral_losses)))
-    loss_clean <- loss_clean[nzchar(loss_clean)]
-    loss_ok <- !vapply(
-      loss_clean,
-      function(f) {
-        is.null(parse_atomic_formula(f)) ||
-          length(parse_atomic_formula(f)) == 0L
-      },
-      logical(1L)
-    )
-    neutral_losses <- loss_clean[loss_ok]
-  } else {
-    neutral_losses <- character()
-  }
-
-  expanded <- adducts
-  if (length(clusters) > 0L) {
-    expanded <- c(
-      expanded,
-      unlist(
-        lapply(clusters, function(cluster) {
-          apply_modifier_to_adducts(adducts, cluster, "+")
-        }),
-        use.names = FALSE
-      )
-    )
-  }
-  if (length(neutral_losses) > 0L) {
-    expanded <- c(
-      expanded,
-      unlist(
-        lapply(neutral_losses, function(loss) {
-          apply_modifier_to_adducts(adducts, loss, "-")
-        }),
-        use.names = FALSE
-      )
-    )
-  }
-  if (length(clusters) > 0L && length(neutral_losses) > 0L) {
-    expanded <- c(
-      expanded,
-      unlist(
-        lapply(neutral_losses, function(loss) {
-          loss_first <- apply_modifier_to_adducts(adducts, loss, "-")
-          unlist(
-            lapply(clusters, function(cluster) {
-              apply_modifier_to_adducts(loss_first, cluster, "+")
-            }),
-            use.names = FALSE
-          )
-        }),
-        use.names = FALSE
-      )
-    )
-  }
-  expanded <- unique(expanded[!is.na(expanded) & nzchar(expanded)])
-
-  # Parse each adduct via the canonical parser (silencing legacy warnings on
-  # idiosyncratic notations) and compute adduct_mass at m/z = 0.
-  rows <- list()
-  for (a in expanded) {
-    parsed <- tryCatch(
-      suppressWarnings(parse_adduct(a)),
-      error = function(...) NULL
-    )
-    if (is.null(parsed) || is_parse_failed(parsed)) {
-      next
+  # --- Parse base adducts ONCE ---
+  base_rows <- list()
+  for (a in adducts) {
+    row <- .parse_single_legacy_adduct_row(a)
+    if (!is.null(row)) {
+      base_rows[[length(base_rows) + 1L]] <- row
     }
-    n_mer <- parsed[["n_mer"]]
-    n_charges <- parsed[["n_charges"]]
-    n_iso <- parsed[["n_iso"]]
-    if (n_mer == 0L || n_charges == 0L) {
-      next
-    }
-    sign_char <- regmatches(a, regexpr("[+-]+$", a))
-    sign_char <- if (length(sign_char) == 0L) "+" else sign_char[[1L]]
-    z_sign <- if (startsWith(sign_char, "-")) -1L else 1L
-    z <- z_sign * as.integer(n_charges)
-    # Keep legacy parse path but apply physically correct electron correction.
-    adduct_mass <- parsed[["los_add_clu"]] - (z * ELECTRON_MASS_DA)
-    rows[[length(rows) + 1L]] <- list(
-      adduct = a,
-      n_mer = as.integer(n_mer),
-      n_iso = as.integer(n_iso),
-      z = z,
-      adduct_mass = as.numeric(adduct_mass)
-    )
   }
-  if (length(rows) == 0L) {
+  if (length(base_rows) == 0L) {
     return(empty_adduct_universe())
   }
-  tidytable::tidytable(
-    adduct = vapply(rows, function(r) r$adduct, character(1L)),
-    n_mer = vapply(rows, function(r) r$n_mer, integer(1L)),
-    n_iso = vapply(rows, function(r) r$n_iso, integer(1L)),
-    z = vapply(rows, function(r) r$z, integer(1L)),
-    adduct_mass = vapply(rows, function(r) r$adduct_mass, numeric(1L)),
-    adduct_mass_per_monomer = rep(0, length(rows)),
-    carriers = rep(list(integer()), length(rows)),
-    clusters = rep(list(integer()), length(rows)),
-    losses = rep(list(integer()), length(rows))
-  ) |>
-    tidytable::distinct(adduct, .keep_all = TRUE)
+
+  # Canonical adduct strings for the base (for vectorised modifier application).
+  base_adducts <- vapply(base_rows, function(r) r$adduct, character(1L))
+
+  # --- Pre-compute modifier masses ONCE (not per base row) ---
+  cluster_masses <- vapply(
+    clusters,
+    function(f) formula_mass(parse_atomic_formula(f)),
+    numeric(1L)
+  )
+  loss_masses <- vapply(
+    neutral_losses,
+    function(f) formula_mass(parse_atomic_formula(f)),
+    numeric(1L)
+  )
+
+  # --- Collect all rows: base first, then modifier expansions ---
+  all_rows <- base_rows
+
+  # Cluster-only modifier rows
+  for (ci in seq_along(clusters)) {
+    cl <- clusters[[ci]]
+    cl_mass <- cluster_masses[[ci]]
+    cl_named <- stats::setNames(1L, cl)
+    new_strings <- apply_modifier_to_adducts(base_adducts, cl, "+")
+    for (ri in seq_along(base_rows)) {
+      new_a <- new_strings[[ri]]
+      if (is.na(new_a) || !nzchar(new_a)) {
+        next
+      }
+      br <- base_rows[[ri]]
+      all_rows[[length(all_rows) + 1L]] <- list(
+        adduct = new_a,
+        n_mer = br$n_mer,
+        n_iso = br$n_iso,
+        z = br$z,
+        adduct_mass = br$adduct_mass + cl_mass,
+        clusters = cl_named,
+        losses = integer()
+      )
+    }
+  }
+
+  # Loss-only modifier rows
+  for (li in seq_along(neutral_losses)) {
+    lo <- neutral_losses[[li]]
+    lo_mass <- loss_masses[[li]]
+    lo_named <- stats::setNames(1L, lo)
+    new_strings <- apply_modifier_to_adducts(base_adducts, lo, "-")
+    for (ri in seq_along(base_rows)) {
+      new_a <- new_strings[[ri]]
+      if (is.na(new_a) || !nzchar(new_a)) {
+        next
+      }
+      br <- base_rows[[ri]]
+      all_rows[[length(all_rows) + 1L]] <- list(
+        adduct = new_a,
+        n_mer = br$n_mer,
+        n_iso = br$n_iso,
+        z = br$z,
+        adduct_mass = br$adduct_mass - lo_mass,
+        clusters = integer(),
+        losses = lo_named
+      )
+    }
+  }
+
+  # Cluster + loss combo rows (apply loss first, then cluster)
+  if (length(clusters) > 0L && length(neutral_losses) > 0L) {
+    for (li in seq_along(neutral_losses)) {
+      lo <- neutral_losses[[li]]
+      lo_mass <- loss_masses[[li]]
+      lo_named <- stats::setNames(1L, lo)
+      loss_strings <- apply_modifier_to_adducts(base_adducts, lo, "-")
+      for (ci in seq_along(clusters)) {
+        cl <- clusters[[ci]]
+        cl_mass <- cluster_masses[[ci]]
+        cl_named <- stats::setNames(1L, cl)
+        new_strings <- apply_modifier_to_adducts(loss_strings, cl, "+")
+        for (ri in seq_along(base_rows)) {
+          new_a <- new_strings[[ri]]
+          if (is.na(new_a) || !nzchar(new_a)) {
+            next
+          }
+          br <- base_rows[[ri]]
+          all_rows[[length(all_rows) + 1L]] <- list(
+            adduct = new_a,
+            n_mer = br$n_mer,
+            n_iso = br$n_iso,
+            z = br$z,
+            adduct_mass = br$adduct_mass + cl_mass - lo_mass,
+            clusters = cl_named,
+            losses = lo_named
+          )
+        }
+      }
+    }
+  }
+
+  .assemble_legacy_universe(all_rows)
 }
 
 #' Vectorized neutral mass calculation from observed m/z + typed universe rows.

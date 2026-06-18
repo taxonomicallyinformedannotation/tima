@@ -365,12 +365,6 @@
     input$ms_add_neg
   yaml_advanced$ms$adducts$pos <-
     input$ms_add_pos
-  yaml_advanced$ms$adducts$consistency$type <-
-    input$ms_add_con_type
-  yaml_advanced$ms$adducts$consistency$min_degree <-
-    input$ms_add_con_min_degree
-  yaml_advanced$ms$adducts$consistency$min_support <-
-    input$ms_add_con_min_support
   yaml_advanced$ms$clusters <- unique(as.character(input$ms_clu))
   yaml_advanced$ms$solvents <- unique(as.character(input$ms_sol))
   yaml_advanced$ms$neutral_losses <-

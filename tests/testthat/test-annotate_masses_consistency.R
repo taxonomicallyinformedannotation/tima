@@ -140,29 +140,13 @@ test_that("apply_adduct_consistency_filter respects off, strict and conditional 
     )
   )
 
-  off <- apply_adduct_consistency_filter(df_add, adduct_consistency = "off")
-  expect_identical(off, df_add)
-
-  strict <- apply_adduct_consistency_filter(
-    df_add,
-    adduct_consistency = "strict",
-    adduct_min_support = 2L
-  )
-  expect_true(nrow(strict) < nrow(df_add))
-  expect_false(any(strict$feature_id == "A" & strict$feature_id_dest == "D"))
-  expect_true(any(strict$feature_id == "A" & strict$feature_id_dest == "B"))
-
-  conditional <- apply_adduct_consistency_filter(
-    df_add,
-    adduct_consistency = "conditional",
-    adduct_min_support = 2L,
-    adduct_consistency_min_degree = 3L
-  )
-  expect_s3_class(conditional, "data.frame")
-  expect_true(nrow(conditional) > 0L)
+  filtered <- apply_adduct_consistency_filter(df_add)
+  expect_s3_class(filtered, "data.frame")
+  expect_true(nrow(filtered) > 0L)
+  expect_true(nrow(filtered) <= nrow(df_add))
   expect_true(all(
     c("feature_id", "adduct", "adduct_dest", "feature_id_dest") %in%
-      names(conditional)
+      names(filtered)
   ))
 })
 

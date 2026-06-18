@@ -21,50 +21,6 @@ resolve_annotate_masses_coverage_mode <- function(coverage_mode) {
   mode
 }
 
-#' Resolve `adduct_consistency*` config defaults
-#' @keywords internal
-resolve_adduct_consistency_config <- function(
-  adduct_consistency,
-  adduct_min_support,
-  adduct_consistency_min_degree
-) {
-  ac <- adduct_consistency
-  if (is.null(ac) || (length(ac) == 1L && is.na(ac))) {
-    ac <- "conditional"
-  }
-  ac <- tolower(as.character(ac[[1L]]))
-  if (!ac %in% c("off", "conditional", "strict")) {
-    log_warn(
-      "Invalid adduct_consistency='%s', falling back to 'conditional'",
-      ac
-    )
-    ac <- "conditional"
-  }
-
-  ms <- adduct_min_support
-  if (is.null(ms) || (length(ms) == 1L && is.na(ms))) {
-    ms <- 2L
-  }
-  ms <- suppressWarnings(as.integer(ms[[1L]]))
-  if (is.na(ms) || !is.finite(ms) || ms < 1L) {
-    ms <- 2L
-  }
-
-  md <- adduct_consistency_min_degree
-  if (is.null(md) || (length(md) == 1L && is.na(md))) {
-    md <- 3L
-  }
-  md <- suppressWarnings(as.integer(md[[1L]]))
-  if (is.na(md) || !is.finite(md) || md < 1L) {
-    md <- 3L
-  }
-
-  list(
-    adduct_consistency = ac,
-    adduct_min_support = ms,
-    adduct_consistency_min_degree = md
-  )
-}
 
 #' Write the empty-output sentinel files
 #' @keywords internal

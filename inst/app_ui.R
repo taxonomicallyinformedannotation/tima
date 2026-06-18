@@ -676,43 +676,6 @@ ui <- shiny::fluidPage(
                 )
               )
             ),
-          shiny::selectInput(
-            inputId = "ms_add_con_type",
-            label = "Adduct consistency strategy",
-            choices = c("off", "conditional", "strict"),
-            selected = "conditional"
-          ) |>
-            shinyhelper::helper(
-              type = "inline",
-              content = c(
-                "Controls if/when consistency checks are applied to adduct hypotheses.",
-                "`conditional` applies checks in ambiguous/high-degree regions only."
-              )
-            ),
-          shiny::numericInput(
-            inputId = "ms_add_con_min_degree",
-            label = "Adduct consistency min degree (conditional mode)",
-            min = 1,
-            max = 20,
-            value = 3,
-            step = 1
-          ) |>
-            shinyhelper::helper(
-              type = "inline",
-              content = "Minimum local degree at which support checks are activated in conditional mode."
-            ),
-          shiny::numericInput(
-            inputId = "ms_add_con_min_support",
-            label = "Adduct consistency min support",
-            min = 1,
-            max = 20,
-            value = 2,
-            step = 1
-          ) |>
-            shinyhelper::helper(
-              type = "inline",
-              content = "Minimum number of independent neighbors supporting an adduct assignment."
-            ),
           shiny::checkboxGroupInput(
             inputId = "ms_clu",
             label = "List of clusters to be used",
@@ -768,7 +731,6 @@ ui <- shiny::fluidPage(
               "C2H6OS" # (dmso)                         ~78.014
             ),
             selected = c(
-              "H2O", # (water)                        ~18.011
               "C2H3N" # (acetonitrile)                 ~41.053
             )
           ) |>
@@ -907,7 +869,6 @@ ui <- shiny::fluidPage(
               # Matches annotate_masses.yaml enabled losses
               "CH2 (methylene)", # ~14.016
               "O", # ~15.995
-              "H3N (ammonia)", # ~17.027
               "H2O (water)", # ~18.011
               "HF (hydrogen fluoride)", # ~20.006
               "CO", # ~27.995

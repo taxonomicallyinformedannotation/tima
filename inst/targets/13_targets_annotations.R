@@ -23,10 +23,7 @@ targets_section_annotations <- function() {
             neutral_losses_list = par_ann_mas$ms$neutral_losses,
             ms_mode = par_ann_mas$ms$polarity,
             tolerance_ppm = par_ann_mas$ms$tolerances$mass$ppm$ms1,
-            tolerance_rt = par_ann_mas$ms$tolerances$rt$adducts,
-            adduct_consistency = par_ann_mas$ms$adducts$consistency$type,
-            adduct_min_support = par_ann_mas$ms$adducts$consistency$min_support,
-            adduct_consistency_min_degree = par_ann_mas$ms$adducts$consistency$min_degree
+            tolerance_rt = par_ann_mas$ms$tolerances$rt$adducts
           )
         },
         format = "file"

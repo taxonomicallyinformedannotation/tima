@@ -94,19 +94,6 @@ ms:
       - "[2M+K]+"
       - "[2M+Cu]+"
 
-    #' Adduct consistency related parameters.
-    consistency:
-      #' Consistency strategy for adduct attribution.
-      #' Choices: off, conditional, strict. STRING
-      type: conditional
-
-      #' In conditional mode, minimum local graph degree at which consistency
-      #' checks are activated. INTEGER
-      min_degree: 3
-
-      #' Minimal number of independent neighbors supporting an adduct assignment.
-      #' INTEGER
-      min_support: 2
 
   #' List of clusters to be used. STRING
   clusters:
@@ -126,7 +113,7 @@ ms:
 
   #' List of solvents to be used. STRING
   solvents:
-    - "H2O"          # (water)                        ~18.011
+    # - "H2O"          # (water)                        ~18.011
     # - "CH4O"         # (methanol)                     ~32.026
     - "C2H3N"        # (acetonitrile)                 ~41.053
     # - "C2H6O"        # (ethanol)                      ~46.042
@@ -138,7 +125,7 @@ ms:
     # - "H2 (dihydrogen)"                                # ~2.016
     - "CH2 (methylene)"                                # ~14.016
     - "O"                                              # ~15.995
-    - "H3N (ammonia)"                                  # ~17.027
+    # - "H3N (ammonia)"                                  # ~17.027
     - "H2O (water)"                                    # ~18.011
     - "HF (hydrogen fluoride)"                         # ~20.006
     - "CO"                                             # ~27.995

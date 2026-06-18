@@ -28,12 +28,7 @@ annotate_masses(
   ms_mode = get_params(step = "annotate_masses")$ms$polarity,
   tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
   tolerance_dalton = get_params(step = "annotate_masses")$ms$tolerances$mass$dalton$ms1,
-  tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$adducts,
-  adduct_consistency = get_params(step = "annotate_masses")$ms$adducts$consistency$type,
-  adduct_min_support = get_params(step =
-    "annotate_masses")$ms$adducts$consistency$min_support,
-  adduct_consistency_min_degree = get_params(step =
-    "annotate_masses")$ms$adducts$consistency$min_degree
+  tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$adducts
 )
 }
 \arguments{
@@ -72,15 +67,6 @@ annotate_masses(
 \item{tolerance_dalton}{Absolute mass tolerance in Daltons for annotation}
 
 \item{tolerance_rt}{Tolerance to group adducts. Should be <= 0.05 minutes}
-
-\item{adduct_consistency}{Consistency mode for adduct edge filtering: one of
-\code{off}, \code{conditional}, \code{strict}}
-
-\item{adduct_min_support}{Minimum number of independent supporting neighbors
-for an adduct assignment in consistency-filtered regions}
-
-\item{adduct_consistency_min_degree}{In \code{conditional} mode, minimum local
-graph degree at which support filtering is activated}
 }
 \value{
 Named character of paths to the annotations and edges files.
