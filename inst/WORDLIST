@@ -292,6 +292,7 @@ parallelization
 param
 params
 parens
+parseable
 pblapply
 pbmclapply
 pkgload

@@ -116,7 +116,7 @@ clean_bio <- function(
 
   # Calculate Consistency Scores ----
 
-  # Pass edges and annotations separately to avoid materialising a huge
+  # Pass edges and annotations separately to avoid materializing a huge
   # (edges × all_annotations) join that causes OOM on memory-limited runners.
   consistency_results <- .calculate_consistency_all_levels(
     edges_filtered = edges_filtered,
@@ -366,7 +366,7 @@ clean_bio <- function(
 #'
 #' @description
 #' Calculates chemical consistency scores for a single taxonomic level by
-#' comparing classifications across network neighbors. Avoids materialising
+#' comparing classifications across network neighbors. Avoids materializing
 #' the full (edges × all_annotations) join; instead it builds a compact
 #' per-target summary for the single taxonomy column requested and then joins
 #' with the edge list, keeping peak memory O(edges × distinct_taxonomies).

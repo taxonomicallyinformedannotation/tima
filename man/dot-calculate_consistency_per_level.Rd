@@ -40,7 +40,7 @@ Data frame with consistency scores for this level
 }
 \description{
 Calculates chemical consistency scores for a single taxonomic level by
-comparing classifications across network neighbors. Avoids materialising
+comparing classifications across network neighbors. Avoids materializing
 the full (edges × all_annotations) join; instead it builds a compact
 per-target summary for the single taxonomy column requested and then joins
 with the edge list, keeping peak memory O(edges × distinct_taxonomies).
