@@ -692,6 +692,51 @@ test_that("annotate_masses keeps neutral-loss edges even when adduct-pair edge e
   expect_true(any(edges$label == "NH3 loss"))
 })
 
+test_that("retain_supported_single_m_edges keeps direct modifier edges even without adduct edges", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M+H]+", "[M+H]+"),
+    annotation_level = c("primary", "primary"),
+    evidence_tier = c("supported_strong", "supported_strong"),
+    source = c("pair", "pair"),
+    candidate_adduct_origin = c("supported", "supported"),
+    mass = c(100, 118.010565),
+    mz = c(100, 118.010565)
+  )
+
+  out <- tima:::retain_supported_single_m_edges(
+    adduct_edges = tidytable::tidytable(
+      feature_id = character(),
+      adduct = character(),
+      feature_id_dest = character(),
+      adduct_dest = character()
+    ),
+    cluster_edges = tidytable::tidytable(
+      feature_id = "F1",
+      cluster = "H2O",
+      mass = 18.010565,
+      feature_id_dest = "F2",
+      adduct = "[M+H]+",
+      adduct_dest = "[M+H]+"
+    ),
+    loss_edges = tidytable::tidytable(
+      feature_id = "F2",
+      loss = "H2O",
+      mass = 18.010565,
+      feature_id_dest = "F1",
+      adduct = "[M+H]+",
+      adduct_dest = "[M+H]+"
+    ),
+    annotations = annotations,
+    tolerance_ppm = 10,
+    tolerance_dalton = 0.01
+  )
+
+  expect_equal(nrow(out$adduct_edges), 0L)
+  expect_equal(nrow(out$cluster_edges), 1L)
+  expect_equal(nrow(out$loss_edges), 1L)
+})
+
 test_that("join_multi_with_addlossed preserves observed matched mass", {
   df_multi <- tidytable::tidytable(
     feature_id = "F1",

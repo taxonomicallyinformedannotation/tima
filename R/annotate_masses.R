@@ -820,10 +820,15 @@ retain_supported_single_m_edges <- function(
     tidytable::distinct()
 
   if (nrow(adduct_kept) == 0L) {
+    modifier_filtered <- filter_modifier_edges_by_assigned_adducts(
+      cluster_edges = cluster_edges,
+      loss_edges = loss_edges,
+      assigned_nodes = supported_nodes
+    )
     return(list(
       adduct_edges = adduct_kept,
-      cluster_edges = cluster_edges[0L, ],
-      loss_edges = loss_edges[0L, ],
+      cluster_edges = modifier_filtered$cluster_edges,
+      loss_edges = modifier_filtered$loss_edges,
       annotations = annotations
     ))
   }
