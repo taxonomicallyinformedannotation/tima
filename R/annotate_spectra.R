@@ -1148,7 +1148,8 @@ finalize_results <- function(
       ),
       # Take into account the adduct space used for matching
       candidate_structure_error_mz = tidytable::case_when(
-        candidate_adduct_match_mode == "m_delta_rescued" ~ target_neutral_mass - query_neutral_mass,
+        candidate_adduct_match_mode == "m_delta_rescued" ~ target_neutral_mass -
+          query_neutral_mass,
         TRUE ~ target_precursorMz - query_precursorMz
       ),
       annotation_note = tidytable::case_when(
