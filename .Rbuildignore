@@ -10,7 +10,6 @@ CITATION.cff
 ^\.idea$
 ^\.lintr$
 ^\.quarto$
-^\.pre-commit-config\.yaml$
 ^\.vscode$
 ^_pkgdown\.yml$
 ^_quarto$
@@ -24,6 +23,7 @@ CITATION.cff
 ^docs$
 ^grateful-refs\.bib$
 ^pkgdown$
+^prek[.]toml$
 ^renv$
 ^renv\.lock$
 ^tima\.Rproj$

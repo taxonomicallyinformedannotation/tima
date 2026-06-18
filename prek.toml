@@ -1,0 +1,83 @@
+# Configuration file for `prek`, a git hook framework written in Rust.
+# See https://prek.j178.dev for more information.
+#:schema https://www.schemastore.org/prek.json
+
+ci = { autoupdate_schedule = "monthly" }
+
+[[repos]]
+repo = "https://github.com/posit-dev/air-pre-commit"
+rev = "0.8.2"
+hooks = [
+  { id = "air-format" }
+]
+
+[[repos]]
+repo = "https://github.com/lorenzwalthert/precommit"
+rev = "v0.4.3.9025"
+hooks = [
+  { id = "use-tidy-description" },
+  { id = "parsable-R" },
+  { id = "no-browser-statement" },
+  { id = "no-print-statement" },
+  { id = "no-debug-statement" },
+  {
+    id = "deps-in-desc",
+    additional_dependencies = ["taxonomicallyinformedannotation/tima"]
+  },
+  { id = "readme-rmd-rendered" }
+]
+
+[[repos]]
+repo = "https://github.com/pre-commit/pre-commit-hooks"
+rev = "v6.0.0"
+hooks = [
+  {
+    id = "check-added-large-files",
+    args = ["--maxkb=200"]
+  },
+  {
+    id = "file-contents-sorter",
+    files = '^\.Rbuildignore$'
+  },
+  { id = "check-case-conflict" },
+  { id = "check-merge-conflict" },
+  { id = "check-shebang-scripts-are-executable" },
+  { id = "check-symlinks" },
+  { id = "check-toml" },
+  { id = "check-xml" },
+  { id = "check-yaml" },
+  { id = "mixed-line-ending" },
+  {
+    id = "end-of-file-fixer",
+    exclude = '\.Rd'
+  },
+  { id = "trailing-whitespace" }
+]
+
+[[repos]]
+repo = "https://github.com/jolars/panache-pre-commit"
+rev = "v2.43.1"
+hooks = [
+  { id = "panache-format" },
+  { id = "panache-lint" }
+]
+
+[[repos]]
+repo = "https://github.com/etiennebacher/jarl-pre-commit"
+rev = "0.4.0"
+hooks = [
+  { id = "jarl-check" }
+]
+
+[[repos]]
+repo = "local"
+hooks = [
+  {
+    id = "forbid-r-artifacts",
+    name = "Don't commit R workspace files",
+    entry = "Cannot commit .Rhistory, .RData, .Rds or .rds.",
+    language = "fail",
+    files = '\.(Rhistory|RData|Rds|rds)$',
+    exclude = '^inst/extdata/.*\.rds$'
+  }
+]
