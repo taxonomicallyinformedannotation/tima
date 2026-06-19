@@ -9,7 +9,9 @@
 
 /* Function declarations */
 extern SEXP C_join_gnps(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+
 extern SEXP C_gnps(SEXP, SEXP);
+
 extern SEXP C_gnps_chain_dp(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 #endif /* end of TIMA_H */
