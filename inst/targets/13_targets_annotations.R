@@ -100,7 +100,8 @@ targets_section_annotations <- function() {
                 lib_spe_exp_int_pre_pos,
                 lib_spe_exp_gnp_pre_pos,
                 lib_spe_exp_mb_pre_pos,
-                lib_spe_exp_mer_pre_pos
+                lib_spe_exp_mer_pre_pos,
+                lib_spe_exp_mul_pre_pos
               ),
               polarity = "pos",
               output = gsub(
@@ -132,7 +133,8 @@ targets_section_annotations <- function() {
                 lib_spe_exp_int_pre_neg,
                 lib_spe_exp_gnp_pre_neg,
                 lib_spe_exp_mb_pre_neg,
-                lib_spe_exp_mer_pre_neg
+                lib_spe_exp_mer_pre_neg,
+                lib_spe_exp_mul_pre_neg
               ),
               polarity = "neg",
               output = gsub(

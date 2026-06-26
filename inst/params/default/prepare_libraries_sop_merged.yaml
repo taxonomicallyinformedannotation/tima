@@ -64,6 +64,8 @@ files:
         massbank: data/interim/libraries/sop/massbank_202510_prepared.tsv.gz
         #' Merlin spectral prepared structure organism pairs library. STRING
         merlin: data/interim/libraries/sop/merlin_16984129_prepared.tsv.gz
+        #' MultiMS2 spectral prepared structure organism pairs library. STRING
+        multims2: data/interim/libraries/sop/multims2_17417089_prepared.tsv.gz
         #' Wikidata spectral prepared structure organism pairs library. STRING
         wikidata: data/interim/libraries/sop/wikidata_5607185_prepared.tsv.gz
 

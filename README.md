@@ -218,6 +218,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 - Enveda-180: <https://doi.org/10.5281/zenodo.20436851>
 - MassBank: <https://doi.org/10.5281/zenodo.3378723>
 - Merlin: <https://doi.org/10.5281/zenodo.13911806>
+- MultiMS2: <https://doi.org/10.5281/zenodo.17417088>
 - NPClassifier: <https://doi.org/10.1021/acs.jnatprod.1c00399>
 - ISDB-NormanSusDat: <https://zenodo.org/records/14854025>
 
@@ -232,7 +233,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
   | BiocVersion     | 3.23.1      | Morgan (2025)                                                         |
   | docopt          | 0.7.2       | <span class="nocase">de Jonge</span> (2025)                           |
   | fs              | 2.1.0       | Hester et al. (2026)                                                  |
-  | httr2           | 1.2.2       | Wickham (2025)                                                        |
+  | httr2           | 1.2.3       | Wickham (2025)                                                        |
   | igraph          | 2.3.2       | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2026) |
   | knitr           | 1.51        | Xie (2014); Xie (2015); Xie (2025)                                    |
   | lgr             | 0.5.2       | Fleck (2026)                                                          |
@@ -242,17 +243,17 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
   | MsBackendMsp    | 1.16.0      | Rainer et al. (2022b)                                                 |
   | MsCoreUtils     | 1.24.0      | Rainer et al. (2022c)                                                 |
   | msentropy       | 0.1.4       | Li (2023)                                                             |
-  | pkgload         | 1.5.2       | Wickham et al. (2026)                                                 |
+  | pkgload         | 1.5.3       | Wickham et al. (2026)                                                 |
   | R.utils         | 2.13.0      | Bengtsson (2025)                                                      |
   | reticulate      | 1.46.0      | Ushey et al. (2026)                                                   |
   | rmarkdown       | 2.31        | Xie et al. (2018); Xie et al. (2020); Allaire et al. (2026)           |
   | rotl            | 3.1.1       | Michonneau et al. (2016); OpenTreeOfLife et al. (2019)                |
-  | shiny           | 1.13.0      | Chang et al. (2026)                                                   |
+  | shiny           | 1.14.0      | Chang et al. (2026)                                                   |
   | shinyhelper     | 0.3.2       | Mason-Thom (2019)                                                     |
   | shinyjs         | 2.1.1       | Attali (2026)                                                         |
   | shinytest2      | 0.5.1       | Schloerke (2026)                                                      |
   | shinyvalidate   | 0.1.3       | Sievert et al. (2023)                                                 |
-  | Spectra         | 1.22.0      | Rainer et al. (2022d)                                                 |
+  | Spectra         | 1.22.2      | Rainer et al. (2022d)                                                 |
   | spelling        | 2.3.2       | Ooms and Hester (2025)                                                |
   | stringi         | 1.8.7       | Gagolewski (2022)                                                     |
   | targets         | 1.12.0      | Landau (2021)                                                         |
@@ -262,7 +263,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
   | tidyverse       | 2.0.0       | Wickham et al. (2019)                                                 |
   | tima            | 2.13.0.9000 | Rutz et al. (2019); Rutz and Allard (2026)                            |
   | tools           | 4.6.0       | R Core Team (2026b)                                                   |
-  | withr           | 3.0.2       | Hester et al. (2024)                                                  |
+  | withr           | 3.0.3       | Hester et al. (2024)                                                  |
   | yaml            | 2.3.12      | Stephens and Simonov (2025)                                           |
 
 <div id="refs" class="references csl-bib-body hanging-indent">

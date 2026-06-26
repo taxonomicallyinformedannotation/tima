@@ -2,9 +2,9 @@
 
 ## Description
 
-> Please include a summary of the change, relevant motivation and context. > If
-possible and applicable, include before and after screenshots and a URL where
-the changes can be seen.
+> Please include a summary of the change, relevant motivation and context. If
+> possible and applicable, include before and after screenshots and a URL where
+> the changes can be seen.
 
 ## Caveats
 

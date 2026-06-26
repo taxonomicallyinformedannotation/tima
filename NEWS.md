@@ -13,6 +13,11 @@
   now single lists (no mode split), and threaded the flat schema through
   `prepare_params()`, the Shiny app, CLI parsing, and the annotation targets
 
+## New libraries
+
+- Added Enveda180 spectral library
+- Added MultiMS2 spectral library
+
 ## Internal / performance
 
 - **MS1 adduct annotation improvements** in `annotate_masses()`:

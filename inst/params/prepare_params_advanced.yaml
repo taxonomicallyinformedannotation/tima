@@ -272,6 +272,9 @@ files:
         #' Merlin spectral prepared structure organism pairs library. STRING
         merlin: data/interim/libraries/sop/merlin_16984129_prepared.tsv.gz
 
+        #' MultiMS2 spectral prepared structure organism pairs library. STRING
+        multims2: data/interim/libraries/sop/multims2_17417089_prepared.tsv.gz
+
         #' Wikidata spectral prepared structure organism pairs library. STRING
         wikidata: data/interim/libraries/sop/wikidata_5607185_prepared.tsv.gz
 
@@ -328,6 +331,7 @@ files:
         - data/interim/libraries/spectra/exp/gnps_11566051_neg.rds
         - data/interim/libraries/spectra/exp/massbank_202510_neg.rds
         - data/interim/libraries/spectra/exp/merlin_16984129_neg.rds
+        - data/interim/libraries/spectra/exp/multims2_17417089_neg.rds
         - data/interim/libraries/spectra/is/isdbnormansusdat_14854025_neg.rds
         - data/interim/libraries/spectra/is/wikidata_5607185_neg.rds
 
@@ -337,6 +341,7 @@ files:
         - data/interim/libraries/spectra/exp/gnps_11566051_pos.rds
         - data/interim/libraries/spectra/exp/massbank_202510_pos.rds
         - data/interim/libraries/spectra/exp/merlin_16984129_pos.rds
+        - data/interim/libraries/spectra/exp/multims2_17417089_pos.rds
         - data/interim/libraries/spectra/is/isdbnormansusdat_14854025_pos.rds
         - data/interim/libraries/spectra/is/wikidata_5607185_pos.rds
 

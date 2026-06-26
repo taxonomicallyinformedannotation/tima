@@ -269,7 +269,7 @@ view, as also recently illustrated by
 <!-- All steps can take both manual inputs or GNPS metadata directly from your GNPS job ID. -->
 
 We are currently also working on CANOPUS integration for chemical class
-annotation but this implies way heavier computations and we want to offer our
+annotation but this implies way heavier computations, and we want to offer our
 users a **fast** solution.
 
 ### Generating a network
@@ -319,9 +319,9 @@ tima::prepare_features_components()
 This step allows you to attribute biological source information to your
 features. If all your features come from a single extract, it will attribute the
 biological source of your extract to all your features. If you have multiple
-extracts aligned, it will take the *n* (according to your parameters) highest
-intensities of your aligned feature table and attribute the biological source of
-corresponding extracts.
+extracts aligned, it will take the *n* highest intensities of your aligned
+feature table and attribute the biological source of corresponding extracts
+(according to your parameters).
 <!-- It can take both manual inputs or GNPS metadata directly from your GNPS job ID. -->
 
 ```{r}

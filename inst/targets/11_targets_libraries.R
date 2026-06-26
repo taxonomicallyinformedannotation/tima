@@ -184,6 +184,36 @@ targets_section_libraries <- function() {
           )
         },
         format = "file"
+      ),
+      tar_target(
+        name = lib_spe_exp_mul_pre_pos,
+        command = {
+          get_file(
+            url = paths$urls$spectra$pos$multims2,
+            export = paths$data$interim$libraries$spectra$exp$pos$multims2
+          )
+        },
+        format = "file"
+      ),
+      tar_target(
+        name = lib_spe_exp_mul_pre_neg,
+        command = {
+          get_file(
+            url = paths$urls$spectra$neg$multims2,
+            export = paths$data$interim$libraries$spectra$exp$neg$multims2
+          )
+        },
+        format = "file"
+      ),
+      tar_target(
+        name = lib_spe_exp_mul_pre_sop,
+        command = {
+          get_file(
+            url = paths$urls$sop$multims2,
+            export = paths$data$interim$libraries$sop$multims2
+          )
+        },
+        format = "file"
       )
     ),
     list(
@@ -708,6 +738,7 @@ targets_section_libraries <- function() {
                 lib_spe_exp_gnp_pre_sop,
                 lib_spe_exp_mb_pre_sop,
                 lib_spe_exp_mer_pre_sop,
+                lib_spe_exp_mul_pre_sop,
                 lib_spe_is_nor_pre_sop,
                 lib_spe_is_wik_pre_sop
               ),
