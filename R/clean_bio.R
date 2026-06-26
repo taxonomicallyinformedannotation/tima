@@ -414,7 +414,7 @@ clean_bio <- function(
     tidytable::select(feature_id, !!as.name(candidates), score_weighted_bio) |>
     tidytable::summarize(
       score_weighted_bio = max(score_weighted_bio, na.rm = TRUE),
-      .by = c("feature_id", candidates)
+      .by = tidyselect::all_of(c("feature_id", candidates))
     )
 
   # Step 2: join edges with compact target taxonomies
@@ -436,7 +436,7 @@ clean_bio <- function(
   count_per_group <- df_level |>
     tidytable::summarize(
       count = tidytable::n(),
-      .by = c("feature_source", candidates)
+      .by = tidyselect::all_of(c("feature_source", candidates))
     )
 
   if (nrow(count_per_group) == 0L) {
