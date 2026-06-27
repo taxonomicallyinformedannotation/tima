@@ -607,6 +607,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#tima-2.13.0.9000-unreleased" id="toc-tima-2.13.0.9000-unreleased" class="nav-link active" data-scroll-target="#tima-2.13.0.9000-unreleased">tima 2.13.0.9000 (unreleased)</a>
   <ul class="collapse">
   <li><a href="#new-features" id="toc-new-features" class="nav-link" data-scroll-target="#new-features">New features</a></li>
+  <li><a href="#new-libraries" id="toc-new-libraries" class="nav-link" data-scroll-target="#new-libraries">New libraries</a></li>
   <li><a href="#internal-performance" id="toc-internal-performance" class="nav-link" data-scroll-target="#internal-performance">Internal / performance</a></li>
   </ul></li>
   <li><a href="#tima-2.13.0" id="toc-tima-2.13.0" class="nav-link" data-scroll-target="#tima-2.13.0">tima 2.13.0</a>
@@ -681,6 +682,13 @@ ul.task-list li input[type="checkbox"] {
 </ul></li>
 <li>Added PubChem Lite as a new exposomics library, prepared through the same HMDB-like workflow as other SOP sources and flagged as <code>xenobiotic</code> (<code>Q409205</code>)</li>
 <li>Flattened <code>annotate_masses</code> modifier defaults so <code>clusters</code> and <code>solvents</code> are now single lists (no mode split), and threaded the flat schema through <code>prepare_params()</code>, the Shiny app, CLI parsing, and the annotation targets</li>
+</ul>
+</section>
+<section id="new-libraries" class="level2">
+<h2 class="anchored" data-anchor-id="new-libraries">New libraries</h2>
+<ul>
+<li>Added Enveda180 spectral library</li>
+<li>Added MultiMS2 spectral library</li>
 </ul>
 </section>
 <section id="internal-performance" class="level2">
