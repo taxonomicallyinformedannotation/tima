@@ -44,7 +44,7 @@ jobs:
           git add man/\* NAMESPACE
           git commit -m 'Document'
 
-      - uses: r-lib/actions/pr-push@a51a8012b0aab7c32ef9d19bf54da93f3254335e
+      - uses: r-lib/actions/pr-push@d3c5be51b12e724e68f33216ca3c148b66d5f0b6
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -80,6 +80,6 @@ jobs:
           git add \*.R
           git commit -m 'Style'
 
-      - uses: r-lib/actions/pr-push@a51a8012b0aab7c32ef9d19bf54da93f3254335e
+      - uses: r-lib/actions/pr-push@d3c5be51b12e724e68f33216ca3c148b66d5f0b6
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
