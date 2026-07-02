@@ -346,12 +346,12 @@ filter_high_evidence_only <- function(
           # threshold (forward)
           (!is.na(.data[["candidate_score_similarity_forward"]]) &
             as.numeric(.data[["candidate_score_similarity_forward"]]) >=
-              similarity_spectral_min) |
+              2 * similarity_spectral_min) |
           # OR spectral is valid (not NA, already filtered >0) AND meets
-          # threshold (reverse
+          # threshold (reverse)
           (!is.na(.data[["candidate_score_similarity_reverse"]]) &
             as.numeric(.data[["candidate_score_similarity_reverse"]]) >=
-              similarity_spectral_min) |
+              2 * similarity_spectral_min) |
           # OR both are NA (no MS2 data at all)
           (is.na(.data[["candidate_score_sirius_confidence"]]) &
             is.na(.data[["candidate_score_pseudo_initial"]]))
