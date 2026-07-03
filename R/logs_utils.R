@@ -205,11 +205,17 @@ setup_logger <- function(filename = "tima.log", threshold = 600) {
   # Clear any existing appenders first (lgr has a console appender by default)
   lgr::lgr$set_appenders(list())
 
-  # Set up appenders to write to both console and file
-  lgr::lgr$add_appender(
-    appender = lgr::AppenderConsole$new(layout = custom_layout),
-    name = "console"
+  log_to_console <- !identical(
+    tolower(Sys.getenv("TIMA_LOG_CONSOLE", unset = "TRUE")),
+    "false"
   )
+  if (log_to_console) {
+    lgr::lgr$add_appender(
+      appender = lgr::AppenderConsole$new(layout = custom_layout),
+      name = "console"
+    )
+  }
+
   lgr::lgr$add_appender(
     appender = lgr::AppenderFile$new(file = filename, layout = custom_layout),
     name = "file"

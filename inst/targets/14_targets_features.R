@@ -11,11 +11,8 @@ targets_section_features <- function() {
           name_source = par_cre_edg_spe$names$source,
           name_target = par_cre_edg_spe$names$target,
           method = par_cre_edg_spe$similarities$methods$edges,
-          threshold = par_cre_edg_spe$similarities$thresholds$edges,
-          matched_peaks = par_cre_edg_spe$similarities$thresholds$matched_peaks,
           ppm = par_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
-          dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
-          cutoff = par_cre_edg_spe$ms$thresholds$ms2$intensity
+          dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2
         )
       },
       format = "file"

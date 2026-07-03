@@ -11,15 +11,14 @@ create_edges_spectra(
   name_source = get_params(step = "create_edges_spectra")$names$source,
   name_target = get_params(step = "create_edges_spectra")$names$target,
   method = get_params(step = "create_edges_spectra")$similarities$methods$edges,
-  threshold = get_params(step = "create_edges_spectra")$similarities$thresholds$edges,
-  matched_peaks = get_params(step =
-    "create_edges_spectra")$similarities$thresholds$matched_peaks,
   ppm = get_params(step = "create_edges_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(step = "create_edges_spectra")$ms$tolerances$mass$dalton$ms2,
   cutoff = get_params(step = "create_edges_spectra")$ms$thresholds$ms2$intensity,
   min_fragments = get_params(step =
     "create_edges_spectra")$ms$thresholds$ms2$min_fragments,
-  qutoff = deprecated()
+  resolution = 0.1,
+  n_iterations = 2L,
+  seed = NULL
 )
 }
 \arguments{
@@ -34,10 +33,6 @@ containing spectra}
 
 \item{method}{\link{character} Similarity method to use}
 
-\item{threshold}{\link{numeric} Minimum similarity threshold (0-1) to report edge}
-
-\item{matched_peaks}{\link{integer} Minimum number of matched peaks required}
-
 \item{ppm}{\link{numeric} Relative mass tolerance in ppm}
 
 \item{dalton}{\link{numeric} Absolute mass tolerance in Daltons}
@@ -49,15 +44,25 @@ Non-negative numeric or NULL for dynamic thresholding.}
 \item{min_fragments}{\link{integer} Minimum number of fragment peaks a spectrum
 must have after cleaning to be retained}
 
-\item{qutoff}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{cutoff} instead.}
+\item{resolution}{\link{numeric} Resolution parameter for the Leiden/Louvain algorithm
+(higher values -> more, smaller communities). Default: 0.1.}
+
+\item{n_iterations}{\link{integer} Number of iterations for the Leiden algorithm.
+Ignored for Louvain. Default: 2.}
+
+\item{seed}{\link{integer} Random seed for reproducible clustering. If \code{NULL},
+a random seed is used. Default: NULL.}
 }
 \value{
-Character string path to the created spectral edges file
+Character string path to the created spectral edges file.
 }
 \description{
 This function creates molecular network edges based on MS2
 fragmentation spectra similarity. Compares all spectra against each
 other using spectral similarity metrics to identify related features.
+It annotates the resulting edges with community labels derived from
+the similarity network and retains only intra-community edges, so the
+edge file itself carries the community structure.
 }
 \examples{
 \dontrun{

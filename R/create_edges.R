@@ -18,8 +18,10 @@
 #' @param method Similarity method ("entropy", "gnps", or "cosine")
 #' @param ms2_tolerance MS2 tolerance in Daltons
 #' @param ppm_tolerance PPM tolerance
-#' @param threshold Minimum similarity score threshold
-#' @param matched_peaks Minimum number of matched peaks required
+#' @param threshold Minimum similarity score threshold. Set to `NULL` to disable
+#'     similarity thresholding and retain all pairwise comparisons.
+#' @param matched_peaks Minimum number of matched peaks required. Set to `NULL`
+#'     to disable matched-peak filtering.
 #'
 #' @return Data frame with columns: feature_id, target_id, score, matched_peaks.
 #'     Returns empty data frame with NA values if no edges pass thresholds.
@@ -48,8 +50,8 @@ create_edges <- function(
   method,
   ms2_tolerance,
   ppm_tolerance,
-  threshold,
-  matched_peaks
+  threshold = NULL,
+  matched_peaks = NULL
 ) {
   empty_result <- tidytable::tidytable(
     feature_id = NA_integer_,
@@ -69,6 +71,35 @@ create_edges <- function(
 
   # Input Validation ----
   validate_choice(method, VALID_SIMILARITY_METHODS, param_name = "method")
+
+  if (
+    !is.null(threshold) &&
+      (!is.numeric(threshold) ||
+        length(threshold) != 1L ||
+        !is.finite(threshold) ||
+        threshold < 0 ||
+        threshold > 1)
+  ) {
+    cli::cli_abort(
+      "threshold must be NULL or a numeric value between 0 and 1",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+
+  if (
+    !is.null(matched_peaks) &&
+      (!is.numeric(matched_peaks) ||
+        length(matched_peaks) != 1L ||
+        !is.finite(matched_peaks) ||
+        matched_peaks < 0)
+  ) {
+    cli::cli_abort(
+      "matched_peaks must be NULL or a non-negative integer",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
 
   if (nspecs < 2L) {
     log_complete(ctx, n_edges = 0, note = "Less than 2 spectra")
@@ -189,7 +220,15 @@ create_edges <- function(
         bin_counts[bin + 1L] <<- bin_counts[bin + 1L] + 1L
       }
 
-      if (isTRUE(sc >= threshold) && isTRUE(mp >= matched_peaks)) {
+      keep_edge <- TRUE
+      if (!is.null(threshold)) {
+        keep_edge <- keep_edge && isTRUE(sc >= threshold)
+      }
+      if (!is.null(matched_peaks)) {
+        keep_edge <- keep_edge && isTRUE(mp >= matched_peaks)
+      }
+
+      if (keep_edge) {
         c(i, j, sc, mp)
       }
     })
@@ -225,7 +264,7 @@ create_edges <- function(
   names(bin_counts) <- bin_labels
   log_similarity_distribution_counts(
     counts = bin_counts,
-    title = "Here is the distribution of edge similarity scores (0.1 bins) BEFORE filtering:"
+    title = "Here is the distribution of edge similarity scores (0.1 bins):"
   )
 
   # Combine all query results into one matrix, then to tidytable ----

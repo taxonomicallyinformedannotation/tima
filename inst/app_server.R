@@ -458,10 +458,6 @@
     input$sim_met_edg
   yaml_advanced$similarities$thresholds$annotations <-
     input$sim_thr_ann
-  yaml_advanced$similarities$thresholds$edges <-
-    input$sim_thr_edg
-  yaml_advanced$similarities$thresholds$matched_peaks <-
-    input$sim_thr_mat
   # TODO
   # yaml_advanced$tools$metadata <-
   #   input$too_x

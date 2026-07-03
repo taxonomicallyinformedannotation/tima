@@ -384,8 +384,6 @@ targets_section_benchmark <- function() {
           output = "data/interim/benchmark/benchmark_edges_spe_pos.tsv.gz",
           name_source = benchmark_def_cre_edg_spe$names$source,
           name_target = benchmark_def_cre_edg_spe$names$target,
-          threshold = benchmark_def_cre_edg_spe$similarities$thresholds$edges,
-          matched_peaks = benchmark_def_cre_edg_spe$similarities$thresholds$matched_peaks,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           cutoff = 0
@@ -401,8 +399,6 @@ targets_section_benchmark <- function() {
           output = "data/interim/benchmark/benchmark_edges_spe_neg.tsv.gz",
           name_source = benchmark_def_cre_edg_spe$names$source,
           name_target = benchmark_def_cre_edg_spe$names$target,
-          threshold = benchmark_def_cre_edg_spe$similarities$thresholds$edges,
-          matched_peaks = benchmark_def_cre_edg_spe$similarities$thresholds$matched_peaks,
           ppm = benchmark_def_cre_edg_spe$ms$tolerances$mass$ppm$ms2,
           dalton = benchmark_def_cre_edg_spe$ms$tolerances$mass$dalton$ms2,
           cutoff = 0

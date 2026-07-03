@@ -42,10 +42,14 @@ go_to_cache()
 github <- "https://raw.githubusercontent.com/"
 repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 dir <- paste0(github, repo)
-input_1 <- get_params(step =
-    "prepare_features_edges")$files$networks$spectral$edges$raw$ms1
-input_2 <- get_params(step =
-    "prepare_features_edges")$files$networks$spectral$edges$raw$spectral
+input_1 <- get_params(
+  step =
+    "prepare_features_edges"
+)$files$networks$spectral$edges$raw$ms1
+input_2 <- get_params(
+  step =
+    "prepare_features_edges"
+)$files$networks$spectral$edges$raw$spectral
 get_file(url = paste0(dir, input_1), export = input_1)
 get_file(url = paste0(dir, input_2), export = input_2)
 prepare_features_edges(

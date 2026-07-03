@@ -11,8 +11,8 @@ create_edges(
   method,
   ms2_tolerance,
   ppm_tolerance,
-  threshold,
-  matched_peaks
+  threshold = NULL,
+  matched_peaks = NULL
 )
 }
 \arguments{
@@ -28,9 +28,11 @@ create_edges(
 
 \item{ppm_tolerance}{PPM tolerance}
 
-\item{threshold}{Minimum similarity score threshold}
+\item{threshold}{Minimum similarity score threshold. Set to \code{NULL} to disable
+similarity thresholding and retain all pairwise comparisons.}
 
-\item{matched_peaks}{Minimum number of matched peaks required}
+\item{matched_peaks}{Minimum number of matched peaks required. Set to \code{NULL}
+to disable matched-peak filtering.}
 }
 \value{
 Data frame with columns: feature_id, target_id, score, matched_peaks.

@@ -14,36 +14,33 @@ test_that("create_edges_spectra validates input parameter", {
   )
 })
 
-test_that("create_edges_spectra validates threshold parameter", {
+test_that("create_edges_spectra uses the full similarity graph by default", {
   mgf_file <- tempfile(fileext = ".mgf")
-  mgf <- c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS")
+  mgf <- c(
+    "BEGIN IONS",
+    "TITLE=Spectrum1",
+    "FEATURE_ID=1",
+    "PEPMASS=100",
+    "CHARGE=1+",
+    "50 10",
+    "75 20",
+    "100 30",
+    "END IONS",
+    "",
+    "BEGIN IONS",
+    "TITLE=Spectrum2",
+    "FEATURE_ID=2",
+    "PEPMASS=101",
+    "CHARGE=1+",
+    "50 15",
+    "75 25",
+    "100 35",
+    "END IONS"
+  )
   writeLines(mgf, mgf_file)
 
-  expect_error(
-    create_edges_spectra(input = mgf_file, threshold = -0.1),
-    "threshold"
-  )
-
-  expect_error(
-    create_edges_spectra(input = mgf_file, threshold = 1.5),
-    "threshold"
-  )
-})
-
-test_that("create_edges_spectra validates matched_peaks parameter", {
-  mgf_file <- tempfile(fileext = ".mgf")
-  mgf <- c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS")
-  writeLines(mgf, mgf_file)
-
-  expect_error(
-    create_edges_spectra(input = mgf_file, matched_peaks = 0),
-    "matched_peaks"
-  )
-
-  expect_error(
-    create_edges_spectra(input = mgf_file, matched_peaks = -5),
-    "matched_peaks"
-  )
+  output <- create_edges_spectra(input = mgf_file)
+  expect_true(file.exists(output))
 })
 
 test_that("create_edges_spectra validates ppm parameter", {
@@ -145,10 +142,9 @@ test_that("create_edges_spectra handles single spectrum", {
 
   output <- create_edges_spectra(
     input = mgf_file,
-    threshold = 0.0,
-    matched_peaks = 1,
     ppm = 10,
-    dalton = 0.01
+    dalton = 0.01,
+    min_fragments = 1L
   )
 
   expect_true(file.exists(output))
@@ -185,13 +181,83 @@ test_that("create_edges_spectra creates output file", {
   writeLines(mgf, mgf_file)
 
   output <- create_edges_spectra(
-    input = mgf_file,
-    threshold = 0.0,
-    matched_peaks = 1
+    input = mgf_file
   )
 
   expect_true(file.exists(output))
   expect_match(output, "\\.tsv$")
+
+  df <- tidytable::fread(output)
+  expect_false("componentindex" %in% colnames(df))
+  expect_false("score" %in% colnames(df))
+  expect_false("matched_peaks" %in% colnames(df))
+  expect_true("candidate_score_similarity" %in% colnames(df))
+  expect_true("candidate_count_similarity_peaks_matched" %in% colnames(df))
+})
+
+test_that("create_edges_spectra ignores thresholds and uses the full graph", {
+  withr::local_dir(new = temp_test_dir("create_edges_spectra_no_threshold"))
+  mgf_file <- tempfile(fileext = ".mgf")
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "TITLE=Spectrum1",
+      "FEATURE_ID=1",
+      "PEPMASS=100",
+      "CHARGE=1+",
+      "50 10",
+      "75 20",
+      "100 30",
+      "END IONS",
+      "",
+      "BEGIN IONS",
+      "TITLE=Spectrum2",
+      "FEATURE_ID=2",
+      "PEPMASS=101",
+      "CHARGE=1+",
+      "50 15",
+      "75 25",
+      "100 35",
+      "END IONS"
+    ),
+    mgf_file
+  )
+
+  out <- create_edges_spectra(
+    input = mgf_file
+  )
+
+  exported <- tidytable::fread(out)
+  expect_true(nrow(exported) >= 1)
+})
+
+test_that("create_edges_spectra attributes edges by Louvain community", {
+  edges <- tidytable::tidytable(
+    feature_source = c("A", "B", "C", "D", "E", "F", "A"),
+    feature_target = c("B", "C", "A", "E", "F", "D", "D"),
+    weight = c(0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.05)
+  )
+
+  result <- build_components_from_edges(
+    edges = edges,
+    name_source = "feature_source",
+    name_target = "feature_target",
+    resolution = 0.1,
+    n_iterations = 50L,
+    seed = 42,
+    label_column = "componentindex",
+    cut_to_communities = TRUE
+  )
+
+  expect_equal(length(unique(result$components_table$componentindex)), 2)
+  expect_equal(nrow(result$edges), 6)
+  expect_false(any(
+    result$edges$feature_source == "A" & result$edges$feature_target == "D"
+  ))
+  expect_false(any(
+    result$edges$feature_source == "D" & result$edges$feature_target == "A"
+  ))
+  expect_false("componentindex" %in% names(result$edges))
 })
 
 test_that("create_edges_spectra keeps feature IDs from FEATURE_ID (mzTab proxy MGF style)", {
@@ -221,9 +287,7 @@ test_that("create_edges_spectra keeps feature IDs from FEATURE_ID (mzTab proxy M
   )
 
   output <- create_edges_spectra(
-    input = mgf_file,
-    threshold = 0.0,
-    matched_peaks = 1
+    input = mgf_file
   )
 
   df <- tidytable::fread(output)
@@ -261,9 +325,7 @@ test_that("create_edges_spectra() creates edges from two spectra with entropy", 
   )
   out <- create_edges_spectra(
     input = mgf_file,
-    method = "entropy",
-    threshold = 0.0,
-    matched_peaks = 1
+    method = "entropy"
   )
   expect_true(file.exists(out))
   df <- tidytable::fread(out)
@@ -302,9 +364,7 @@ test_that("create_edges_spectra() runs with cosine method", {
   )
   out <- create_edges_spectra(
     input = mgf_file,
-    method = "cosine",
-    threshold = 0.0,
-    matched_peaks = 1
+    method = "cosine"
   )
   expect_true(file.exists(out))
 })
@@ -369,8 +429,6 @@ test_that("create_edges_spectra completes downstream edge-building from parsed s
     name_source = "CLUSTERID1",
     name_target = "CLUSTERID2",
     method = "gnps",
-    threshold = 0,
-    matched_peaks = 1,
     ppm = 10,
     dalton = 0.01,
     cutoff = 0

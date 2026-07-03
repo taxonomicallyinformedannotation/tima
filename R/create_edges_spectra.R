@@ -3,6 +3,9 @@
 #' @description This function creates molecular network edges based on MS2
 #'     fragmentation spectra similarity. Compares all spectra against each
 #'     other using spectral similarity metrics to identify related features.
+#'     It annotates the resulting edges with community labels derived from
+#'     the similarity network and retains only intra-community edges, so the
+#'     edge file itself carries the community structure.
 #'
 #' @include create_edges.R
 #' @include get_params.R
@@ -15,8 +18,6 @@
 #' @param name_source [character] Name of source feature column
 #' @param name_target [character] Name of target feature column
 #' @param method [character] Similarity method to use
-#' @param threshold [numeric] Minimum similarity threshold (0-1) to report edge
-#' @param matched_peaks [integer] Minimum number of matched peaks required
 #' @param ppm [numeric] Relative mass tolerance in ppm
 #' @param dalton [numeric] Absolute mass tolerance in Daltons
 #' @param cutoff [numeric] Intensity cutoff below which MS2 fragments are
@@ -24,9 +25,14 @@
 #'     Non-negative numeric or NULL for dynamic thresholding.
 #' @param min_fragments [integer] Minimum number of fragment peaks a spectrum
 #'     must have after cleaning to be retained
-#' @param qutoff `r lifecycle::badge("deprecated")` Use `cutoff` instead.
+#' @param resolution [numeric] Resolution parameter for the Leiden/Louvain algorithm
+#'    (higher values -> more, smaller communities). Default: 0.1.
+#' @param n_iterations [integer] Number of iterations for the Leiden algorithm.
+#'    Ignored for Louvain. Default: 2.
+#' @param seed [integer] Random seed for reproducible clustering. If `NULL`,
+#'    a random seed is used. Default: NULL.
 #'
-#' @return Character string path to the created spectral edges file
+#' @return Character string path to the created spectral edges file.
 #'
 #' @family workflow
 #'
@@ -51,12 +57,6 @@ create_edges_spectra <- function(
   name_source = get_params(step = "create_edges_spectra")$names$source,
   name_target = get_params(step = "create_edges_spectra")$names$target,
   method = get_params(step = "create_edges_spectra")$similarities$methods$edges,
-  threshold = get_params(
-    step = "create_edges_spectra"
-  )$similarities$thresholds$edges,
-  matched_peaks = get_params(
-    step = "create_edges_spectra"
-  )$similarities$thresholds$matched_peaks,
   ppm = get_params(step = "create_edges_spectra")$ms$tolerances$mass$ppm$ms2,
   dalton = get_params(
     step = "create_edges_spectra"
@@ -67,22 +67,13 @@ create_edges_spectra <- function(
   min_fragments = get_params(
     step = "create_edges_spectra"
   )$ms$thresholds$ms2$min_fragments,
-  qutoff = deprecated()
+  resolution = 0.1,
+  n_iterations = 2L,
+  seed = NULL
 ) {
-  # Handle deprecated qutoff parameter
-  if (lifecycle::is_present(qutoff)) {
-    lifecycle::deprecate_warn(
-      "2.13.0",
-      "create_edges_spectra(qutoff)",
-      "create_edges_spectra(cutoff)"
-    )
-    cutoff <- qutoff
-  }
-
   ctx <- log_operation(
     "create_edges_spectra",
     method = method,
-    threshold = threshold,
     n_input_files = length(input)
   )
 
@@ -95,18 +86,48 @@ create_edges_spectra <- function(
   }
 
   # Input Validation ----
-
-  # Validate numeric parameters first (cheap checks)
-  if (!is.numeric(threshold) || threshold < 0 || threshold > 1) {
+  if (
+    !is.numeric(cutoff) ||
+      length(cutoff) != 1L ||
+      !is.finite(cutoff) ||
+      cutoff < 0
+  ) {
     cli::cli_abort(
-      "{.arg threshold} must be between 0 and 1, got {.val {threshold}}",
+      "{.arg cutoff} must be a non-negative number, got {.val {cutoff}}",
       class = "tima_validation_error"
     )
   }
 
-  if (!is.numeric(matched_peaks) || matched_peaks < 1) {
+  if (
+    !is.numeric(resolution) ||
+      length(resolution) != 1L ||
+      !is.finite(resolution) ||
+      resolution <= 0
+  ) {
     cli::cli_abort(
-      "{.arg matched_peaks} must be a positive integer, got {.val {matched_peaks}}",
+      "{.arg resolution} must be a positive number, got {.val {resolution}}",
+      class = "tima_validation_error"
+    )
+  }
+
+  if (
+    !is.numeric(n_iterations) ||
+      length(n_iterations) != 1L ||
+      !is.finite(n_iterations) ||
+      n_iterations < 1
+  ) {
+    cli::cli_abort(
+      "{.arg n_iterations} must be a positive integer, got {.val {n_iterations}}",
+      class = "tima_validation_error"
+    )
+  }
+
+  if (
+    !is.null(seed) &&
+      (!is.numeric(seed) || length(seed) != 1L || !is.finite(seed))
+  ) {
+    cli::cli_abort(
+      "{.arg seed} must be NULL or a single numeric value, got {.val {seed}}",
       class = "tima_validation_error"
     )
   }
@@ -121,13 +142,6 @@ create_edges_spectra <- function(
   if (!is.numeric(dalton) || dalton <= 0) {
     cli::cli_abort(
       "{.arg dalton} must be a positive number, got {.val {dalton}}",
-      class = "tima_validation_error"
-    )
-  }
-
-  if (!is.null(cutoff) && (!is.numeric(cutoff) || cutoff < 0)) {
-    cli::cli_abort(
-      "{.arg cutoff} must be non-negative or NULL, got {.val {cutoff}}",
       class = "tima_validation_error"
     )
   }
@@ -186,7 +200,7 @@ create_edges_spectra <- function(
   # Import and Process Spectra ----
 
   log_info("Creating spectral similarity network edges")
-  log_debug("Parameters - Threshold: %.2f, Method: %s", threshold, method)
+  log_debug("Parameters - Method: %s", method)
   log_debug("Tolerances - PPM: %.2f, Dalton: %.2f", ppm, dalton)
 
   # Import spectra with specified parameters
@@ -240,17 +254,19 @@ create_edges_spectra <- function(
   fragz <- spectra@backend@peaksData
   precz <- spectra@backend@spectraData$precursorMz
 
-  # Create edges
-  edges <- create_edges(
+  # Compute the full pairwise similarity graph once and reuse it for both
+  # community detection and the exported edge list.
+  all_edges <- create_edges(
     frags = fragz,
     nspecs = nspecz,
     precs = precz,
     method = method,
     ms2_tolerance = dalton,
-    ppm_tolerance = ppm,
-    threshold = threshold,
-    matched_peaks = matched_peaks
+    ppm_tolerance = ppm
   )
+
+  edges <- all_edges
+  community_edges <- all_edges
 
   # Calculate spectral entropy
   entropy <- vapply(
@@ -266,24 +282,27 @@ create_edges_spectra <- function(
   )
   rm(nspecz, fragz)
 
-  edges <- edges |>
-    tidytable::select(
-      !!as.name(name_source) := "feature_id",
-      !!as.name(name_target) := "target_id",
-      tidyselect::everything()
-    )
-
   idz <- spectra |>
     get_spectra_ids()
   rm(spectra)
 
-  # Ensure consistent typing for IDs - keep as-is from source
-  # This prevents type mismatch in the later join
-  edges <- edges |>
-    tidytable::mutate(
-      !!as.name(name_source) := idz[!!as.name(name_source)],
-      !!as.name(name_target) := idz[!!as.name(name_target)]
-    )
+  normalize_edge_table <- function(edge_table) {
+    edge_table |>
+      tidytable::select(
+        !!as.name(name_source) := "feature_id",
+        !!as.name(name_target) := "target_id",
+        tidyselect::everything()
+      ) |>
+      tidytable::mutate(
+        !!as.name(name_source) := idz[!!as.name(name_source)],
+        !!as.name(name_target) := idz[!!as.name(name_target)]
+      ) |>
+      tidytable::filter(!is.na(!!as.name(name_source)))
+  }
+
+  edges <- normalize_edge_table(edges)
+
+  community_edges <- normalize_edge_table(community_edges)
 
   entropy_df <- tidytable::tidytable(entropy) |>
     tidytable::mutate(
@@ -302,23 +321,6 @@ create_edges_spectra <- function(
   rm(entropy, npeaks, idz)
 
   edges <- edges |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          name_source,
-          name_target,
-          "candidate_score_similarity" = "score",
-          "candidate_count_similarity_peaks_matched" = "matched_peaks"
-        )
-      )
-    )
-
-  # Drop placeholder NA row(s) from create_edges; threshold already applied
-  # upstream
-  edges <- edges |>
-    tidytable::filter(!is.na(!!as.name(name_source)))
-
-  edges <- edges |>
     tidytable::full_join(y = entropy_df) |>
     tidytable::mutate(
       !!as.name(name_target) := tidytable::coalesce(
@@ -326,18 +328,118 @@ create_edges_spectra <- function(
         !!as.name(name_source)
       )
     )
+
+  drop_legacy_similarity_columns <- function(edge_table) {
+    legacy_columns <- intersect(c("score", "matched_peaks"), names(edge_table))
+    if (length(legacy_columns) > 0L) {
+      edge_table <- edge_table |>
+        tidytable::select(-tidyselect::any_of(legacy_columns))
+    }
+    edge_table
+  }
+
+  if (
+    !"candidate_score_similarity" %in% names(edges) && "score" %in% names(edges)
+  ) {
+    edges <- edges |>
+      tidytable::mutate(
+        candidate_score_similarity = as.numeric(score)
+      )
+  }
+
+  if (
+    !"candidate_count_similarity_peaks_matched" %in% names(edges) &&
+      "matched_peaks" %in% names(edges)
+  ) {
+    edges <- edges |>
+      tidytable::mutate(
+        candidate_count_similarity_peaks_matched = as.integer(matched_peaks)
+      )
+  }
+
+  edges <- drop_legacy_similarity_columns(edges)
+
   rm(entropy_df)
 
-  export_params(
-    parameters = get_params(step = "create_edges_spectra"),
-    step = "create_edges_spectra"
+  edges_before_community_cut <- edges
+
+  community_result <- .build_components_from_edges(
+    edges = community_edges,
+    name_source = name_source,
+    name_target = name_target,
+    resolution = resolution,
+    n_iterations = n_iterations,
+    seed = seed,
+    label_column = "community_id",
+    cut_to_communities = FALSE
   )
 
-  n_edges <- nrow(edges)
-  export_output(x = edges, file = output[[1L]])
-  rm(edges)
+  if (nrow(edges) > 0L && length(community_result$component_membership) > 0L) {
+    edges <- .prune_intra_community_edges(
+      edges = edges,
+      component_membership = community_result$component_membership,
+      name_source = name_source,
+      name_target = name_target
+    )
 
-  log_complete(ctx, n_edges = n_edges)
+    if (nrow(edges) == 0L) {
+      log_warn(
+        "No intra-community edges remained after community cut; keeping only isolated features"
+      )
+      edges <- edges_before_community_cut[0L, , drop = FALSE]
+    }
 
-  output[[1L]]
+    retained_features <- unique(c(edges[[name_source]], edges[[name_target]]))
+    all_features <- unique(c(
+      edges_before_community_cut[[name_source]],
+      edges_before_community_cut[[name_target]]
+    ))
+    isolated_features <- setdiff(all_features, retained_features)
+
+    if (length(isolated_features) > 0L) {
+      isolated_edges <- tidytable::tidytable(
+        !!as.name(name_source) := isolated_features,
+        !!as.name(name_target) := isolated_features,
+        candidate_score_similarity = NA_real_,
+        candidate_count_similarity_peaks_matched = NA_integer_
+      )
+      edges <- tidytable::bind_rows(edges, isolated_edges) |>
+        tidytable::distinct()
+    }
+  }
+
+  if (nrow(edges) > 0L) {
+    log_info(
+      "Found %d communities using %s",
+      length(unique(community_result$component_membership)),
+      community_result$method_used
+    )
+
+    pre_cut_features <- unique(c(
+      edges_before_community_cut[[name_source]],
+      edges_before_community_cut[[name_target]]
+    ))
+    retained_features <- unique(c(edges[[name_source]], edges[[name_target]]))
+    dropped_features <- setdiff(pre_cut_features, retained_features)
+
+    if (length(dropped_features) > 0L) {
+      log_info(
+        "Community cut removed %d feature(s) that had no intra-community edges; %d feature(s) remain in the exported edge graph",
+        length(dropped_features),
+        length(retained_features)
+      )
+    }
+  } else {
+    log_info("No edges found for community detection")
+  }
+
+  export_output(x = edges, file = output)
+  log_info("Edges written to: %s", output)
+
+  log_complete(
+    ctx,
+    n_edges = nrow(edges),
+    n_features = length(unique(c(edges[[name_source]], edges[[name_target]])))
+  )
+  invisible(output)
 }

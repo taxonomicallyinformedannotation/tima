@@ -119,6 +119,36 @@ test_that("test-create_components handles disconnected components", {
   expect_true(n_components >= 1)
 })
 
+test_that("build_components_from_edges uses canonical similarity weights", {
+  edges <- tidytable::tidytable(
+    feature_source = c("A", "A", "C"),
+    feature_target = c("B", "C", "D"),
+    candidate_score_similarity = c(0.95, 0.1, 0.9),
+    candidate_count_similarity_peaks_matched = c(8, 1, 7)
+  )
+
+  result <- build_components_from_edges(
+    edges = edges,
+    name_source = "feature_source",
+    name_target = "feature_target",
+    resolution = 0.1,
+    n_iterations = 10L,
+    seed = 1,
+    label_column = "componentindex",
+    cut_to_communities = TRUE
+  )
+
+  expect_equal(nrow(result$edges), 2)
+  expect_true(all(
+    c("A", "B") %in%
+      unlist(result$edges[, c("feature_source", "feature_target")])
+  ))
+  expect_true(all(
+    c("C", "D") %in%
+      unlist(result$edges[, c("feature_source", "feature_target")])
+  ))
+})
+
 test_that("test-create_components filters NA values", {
   edges <- tidytable::tidytable(
     feature_source = c("F1", NA, "F3"),

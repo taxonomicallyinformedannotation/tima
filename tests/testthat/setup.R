@@ -6,7 +6,8 @@ Sys.setenv(
   TIMA_LOG_FILE = file.path(
     tempdir(),
     sprintf("tima-test-%s.log", Sys.getpid())
-  )
+  ),
+  TIMA_LOG_CONSOLE = "FALSE"
 )
 
 # Keep setup compatible with both load-all style and testthat::test_package().

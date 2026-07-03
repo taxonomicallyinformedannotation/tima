@@ -631,7 +631,7 @@ ms:
       #' Intensity threshold for MS2. FLOAT
       intensity: 0.0
       #' Minimum number of fragment peaks to keep a spectrum. INTEGER
-      min_fragments: 1
+      min_fragments: 2
 
   #' Tolerances.
   tolerances:
@@ -794,12 +794,6 @@ similarities:
   thresholds:
     #' For annotations. FLOAT
     annotations: 0.0
-
-    #' For edges. FLOAT
-    edges: 0.7
-
-    #' Matched peaks. INTEGER
-    matched_peaks: 6
 
 #' Tools used for each step.
 tools:

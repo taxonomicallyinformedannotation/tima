@@ -281,6 +281,59 @@ test_that("prepare_features_edges standardizes column names", {
   # unlink(temp_output)
 })
 
+test_that("prepare_features_edges standardizes legacy similarity columns", {
+  local_test_project(copy = TRUE)
+
+  temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
+  temp_spectral <- withr::local_tempfile(fileext = ".tsv")
+
+  ms1_data <- data.frame(
+    ID1 = c("FT001"),
+    ID2 = c("FT002"),
+    stringsAsFactors = FALSE
+  )
+  write.table(ms1_data, temp_ms1, sep = "\t", row.names = FALSE, quote = FALSE)
+
+  spectral_data <- data.frame(
+    ID1 = c("FT001"),
+    ID2 = c("FT002"),
+    score = c("0.91"),
+    matched_peaks = c("2"),
+    stringsAsFactors = FALSE
+  )
+  write.table(
+    spectral_data,
+    temp_spectral,
+    sep = "\t",
+    row.names = FALSE,
+    quote = FALSE
+  )
+
+  temp_output <- withr::local_tempfile(fileext = ".tsv")
+
+  result <- prepare_features_edges(
+    input = list("ms1" = temp_ms1, "spectral" = temp_spectral),
+    output = temp_output,
+    name_source = "ID1",
+    name_target = "ID2"
+  )
+
+  output_data <- tidytable::fread(temp_output)
+  expect_false("score" %in% colnames(output_data))
+  expect_false("matched_peaks" %in% colnames(output_data))
+  expect_true("candidate_score_similarity" %in% colnames(output_data))
+  expect_true(
+    "candidate_count_similarity_peaks_matched" %in% colnames(output_data)
+  )
+  expect_equal(as.numeric(output_data$candidate_score_similarity[[1]]), 0.91)
+  expect_equal(
+    as.integer(output_data$candidate_count_similarity_peaks_matched[[1]]),
+    2L
+  )
+
+  expect_equal(result, temp_output)
+})
+
 test_that("prepare_features_edges handles empty input files", {
   local_test_project(copy = TRUE)
 

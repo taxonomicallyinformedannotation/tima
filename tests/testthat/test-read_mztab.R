@@ -283,9 +283,7 @@ test_that("end-to-end: mzTab → features + embedded MGF → edges work together
   # Step 2: Create edges from the spectra
   edges <- create_edges_spectra(
     input = paths$spectra,
-    output = out_edges,
-    threshold = 0.0,
-    matched_peaks = 1
+    output = out_edges
   )
 
   expect_true(file.exists(edges))

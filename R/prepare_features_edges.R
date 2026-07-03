@@ -151,13 +151,49 @@ prepare_features_edges <- function(
 
   # Extract Entropy Information ----
 
+  drop_legacy_similarity_columns <- function(edge_table) {
+    legacy_columns <- intersect(c("score", "matched_peaks"), names(edge_table))
+    if (length(legacy_columns) > 0L) {
+      edge_table <- edge_table |>
+        tidytable::select(-tidyselect::any_of(legacy_columns))
+    }
+    edge_table
+  }
+
+  standardize_spectral_similarity_columns <- function(edge_table) {
+    if (
+      !"candidate_score_similarity" %in% names(edge_table) &&
+        "score" %in% names(edge_table)
+    ) {
+      edge_table <- edge_table |>
+        tidytable::mutate(candidate_score_similarity = as.numeric(score))
+    }
+
+    if (
+      !"candidate_count_similarity_peaks_matched" %in% names(edge_table) &&
+        "matched_peaks" %in% names(edge_table)
+    ) {
+      edge_table <- edge_table |>
+        tidytable::mutate(
+          candidate_count_similarity_peaks_matched = as.integer(matched_peaks)
+        )
+    }
+
+    edge_table
+  }
+
+  edges_ms2 <- standardize_spectral_similarity_columns(edges_ms2)
+
+  entropy_columns <- c(
+    name_source,
+    "feature_spectrum_entropy",
+    "feature_spectrum_peaks"
+  )
+  entropy_columns <- entropy_columns[entropy_columns %in% names(edges_ms2)]
+
   # Extract entropy information from spectral edges
   features_entropy <- edges_ms2 |>
-    tidytable::select(
-      tidyselect::all_of(x = name_source),
-      feature_spectrum_entropy,
-      feature_spectrum_peaks
-    ) |>
+    tidytable::select(tidyselect::any_of(entropy_columns)) |>
     tidytable::distinct()
 
   # Combine and Format Edges ----
@@ -172,7 +208,8 @@ prepare_features_edges <- function(
     tidytable::mutate(
       feature_target = tidytable::coalesce(feature_target, feature_source)
     ) |>
-    tidytable::distinct()
+    tidytable::distinct() |>
+    drop_legacy_similarity_columns()
 
   log_complete(ctx, n_edges = nrow(edges_table_treated))
 

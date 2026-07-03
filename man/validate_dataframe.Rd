@@ -36,8 +36,10 @@ for required columns and minimum row count
 }
 \examples{
 \dontrun{
-validate_dataframe(df, param_name = "features", required_cols =
-    c("feature_id", "mz"))
+validate_dataframe(df,
+  param_name = "features", required_cols =
+    c("feature_id", "mz")
+)
 }
 }
 \keyword{internal}

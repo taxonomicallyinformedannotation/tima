@@ -82,6 +82,7 @@ Leisch
 Levenshtein
 Liesa
 Lifecycle
+Louvain
 MCC
 MCDB
 MGF
@@ -244,6 +245,7 @@ inbo
 inborutils
 inchikey
 interpretability
+intra
 io
 iso
 isotopically

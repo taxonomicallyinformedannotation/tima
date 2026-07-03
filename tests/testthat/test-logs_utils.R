@@ -187,6 +187,30 @@ test_that("setup_logger creates log file", {
   expect_true(file.exists(log_file))
 })
 
+test_that("setup_logger can silence console output", {
+  log_file <- tempfile(fileext = ".log")
+
+  withr::local_envvar(TIMA_LOG_CONSOLE = "FALSE")
+  expect_silent(setup_logger(filename = log_file, threshold = 400))
+
+  appenders <- lgr::lgr$appenders
+  has_console <- any(vapply(
+    appenders,
+    inherits,
+    logical(1),
+    what = "AppenderConsole"
+  ))
+  has_file <- any(vapply(
+    appenders,
+    inherits,
+    logical(1),
+    what = "AppenderFile"
+  ))
+
+  expect_false(has_console)
+  expect_true(has_file)
+})
+
 test_that("setup_logger sets threshold correctly", {
   log_file <- tempfile(fileext = ".log")
 

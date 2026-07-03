@@ -12,6 +12,13 @@
 - Flattened `annotate_masses` modifier defaults so `clusters` and `solvents` are
   now single lists (no mode split), and threaded the flat schema through
   `prepare_params()`, the Shiny app, CLI parsing, and the annotation targets
+- Refined spectral network construction in `create_edges_spectra()` to build
+  community-aware edge graphs from the full spectral similarity network using
+  weighted Louvain/Leiden-style clustering, retain isolated features, and avoid
+  the old threshold-based edge filtering path.
+- Exposed `build_components_from_edges()` as a public helper for reusable
+  community detection and removed stale edge-threshold settings from the
+  advanced parameter configuration.
 
 ## New libraries
 

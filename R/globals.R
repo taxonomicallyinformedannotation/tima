@@ -680,6 +680,7 @@ utils::globalVariables(
     ".note_present",
     ".rank_num",
     ".score_num",
-    ".score_present"
+    ".score_present",
+    "matched_peaks"
   )
 )
