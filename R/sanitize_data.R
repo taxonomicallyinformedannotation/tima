@@ -29,7 +29,6 @@
 #'   sirius_dir = "data/sirius_output"
 #' )
 #' }
-
 sanitize_all_inputs <- function(
   features_file = NULL,
   mgf_file = NULL,

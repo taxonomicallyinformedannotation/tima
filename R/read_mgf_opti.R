@@ -310,6 +310,7 @@ read_mgf_opti <- function(
   # Convert to DataFrame and set up peak lists
   res <- methods::as(object = res, Class = "DataFrame")
   res$mz <- methods::as(object = res$mz, Class = "NumericList")
+  res$intensity <- methods::as(object = res$intensity, Class = "NumericList")
   res$dataOrigin <- f
 
   if (!"msLevel" %in% colnames(res)) {

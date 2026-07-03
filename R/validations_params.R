@@ -19,7 +19,6 @@
 #'   library = "data/library.tsv"
 #' ))
 #' }
-
 validate_file_existence <- function(file_list, allow_null = FALSE) {
   if (!is.list(file_list)) {
     tima_abort(
@@ -362,8 +361,10 @@ validate_adduct_list <- function(
 #'
 #' @examples
 #' \dontrun{
-#' validate_dataframe(df, param_name = "features", required_cols =
-#'     c("feature_id", "mz"))
+#' validate_dataframe(df,
+#'   param_name = "features", required_cols =
+#'     c("feature_id", "mz")
+#' )
 #' }
 validate_dataframe <- function(
   df,

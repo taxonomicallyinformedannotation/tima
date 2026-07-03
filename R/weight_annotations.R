@@ -107,8 +107,10 @@
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 #' dir <- paste0(github, repo)
-#' library <- get_params(step =
-#'     "weight_annotations")$files$libraries$sop$merged$keys |>
+#' library <- get_params(
+#'   step =
+#'     "weight_annotations"
+#' )$files$libraries$sop$merged$keys |>
 #'   gsub(
 #'     pattern = ".gz",
 #'     replacement = "",
@@ -168,7 +170,6 @@
 #' )
 #' unlink("data", recursive = TRUE)
 #' }
-
 weight_annotations <- function(
   library = get_params(
     step = "weight_annotations"

@@ -59,7 +59,6 @@
 #' prepare_annotations_sirius()
 #' unlink("data", recursive = TRUE)
 #' }
-
 prepare_annotations_sirius <-
   function(
     input_directory = get_params(

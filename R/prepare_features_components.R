@@ -28,8 +28,10 @@
 #' github <- "https://raw.githubusercontent.com/"
 #' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
 #' dir <- paste0(github, repo)
-#' input <- get_params(step =
-#'     "prepare_features_components")$files$networks$spectral$components$raw
+#' input <- get_params(
+#'   step =
+#'     "prepare_features_components"
+#' )$files$networks$spectral$components$raw
 #' get_file(url = paste0(dir, input), export = input)
 #' prepare_features_components(input = input)
 #' unlink("data", recursive = TRUE)
