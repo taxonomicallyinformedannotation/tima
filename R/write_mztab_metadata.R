@@ -21,24 +21,34 @@
   has_spectral <- "id_confidence_measure[4]" %in% colnames(sme_table)
 
   add_default <- function(meta, key, value) {
-    if (nrow(meta) == 0L || !any(meta$key == key, na.rm = TRUE)) {
-      tidytable::bind_rows(
-        meta,
-        tidytable::tidytable(key = key, value = value)
-      )
+    if (is.list(meta) && all(c("keys", "values") %in% names(meta))) {
+      keys <- meta$keys
+      values <- meta$values
     } else {
-      meta
+      keys <- character(0)
+      values <- character(0)
     }
+
+    if (length(keys) == 0L || !any(keys == key, na.rm = TRUE)) {
+      keys <- c(keys, key)
+      values <- c(values, value)
+    }
+
+    list(keys = keys, values = values)
   }
 
   meta <- if (is.null(existing_metadata)) {
-    tidytable::tidytable(key = character(0), value = character(0))
+    list(keys = character(0), values = character(0))
   } else {
-    tidytable::as_tidytable(existing_metadata)
-  }
-
-  if (!all(c("key", "value") %in% colnames(meta))) {
-    meta <- tidytable::tidytable(key = character(0), value = character(0))
+    existing_df <- tidytable::as_tidytable(existing_metadata)
+    if (all(c("key", "value") %in% colnames(existing_df))) {
+      list(
+        keys = as.character(existing_df$key),
+        values = as.character(existing_df$value)
+      )
+    } else {
+      list(keys = character(0), values = character(0))
+    }
   }
 
   software_version <- if (
@@ -346,7 +356,10 @@
     catalog$terms$metadata_defaults[["colunit-small_molecule_evidence"]]
   )
 
-  meta
+  tidytable::tidytable(
+    key = as.character(meta$keys),
+    value = as.character(meta$values)
+  )
 }
 
 #' Write mzTab-M metadata section
