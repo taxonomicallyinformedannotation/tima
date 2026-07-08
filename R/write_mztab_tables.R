@@ -215,6 +215,7 @@
 #' Build SME (Small Molecule Evidence) table – one row per evidence
 #' @keywords internal
 .mztab_build_sme <- function(results, smf_table, xrefs_index = NULL) {
+  ann <- as.data.frame(results, stringsAsFactors = FALSE, check.names = FALSE)
   ann_signal_cols <- unique(c(
     grep("^candidate_", colnames(results), value = TRUE),
     intersect(
@@ -583,9 +584,24 @@
     ))
   }
 
+  feature_groups <- split(seq_len(nrow(sme_src)), as.character(sme_src$feature_id))
+  feature_groups <- feature_groups[feature_ids]
+
+  results_feature_groups <- NULL
+  if (
+    nrow(results_src) > 0L &&
+      "feature_id" %in% colnames(results_src) &&
+      "candidate_structure_exact_mass" %in% colnames(results_src)
+  ) {
+    results_feature_groups <- split(
+      seq_len(nrow(results_src)),
+      as.character(results_src$feature_id)
+    )
+  }
+
   sml_rows <- lapply(seq_along(feature_ids), function(j) {
     fid <- feature_ids[[j]]
-    idx <- which(as.character(sme_src$feature_id) == fid)
+    idx <- feature_groups[[fid]]
     grp <- sme_src[idx, , drop = FALSE]
 
     rank_num <- suppressWarnings(as.numeric(grp$rank))
@@ -653,12 +669,8 @@
     }
 
     theoretical_neutral_mass <- "null"
-    if (
-      nrow(results_src) > 0L &&
-        "feature_id" %in% colnames(results_src) &&
-        "candidate_structure_exact_mass" %in% colnames(results_src)
-    ) {
-      ridx <- which(as.character(results_src$feature_id) == fid)
+    if (!is.null(results_feature_groups)) {
+      ridx <- results_feature_groups[[fid]]
       if (length(ridx) > 0L) {
         if ("score_final" %in% colnames(results_src)) {
           rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))

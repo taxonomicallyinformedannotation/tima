@@ -248,15 +248,15 @@ MZTAB_TERM_FALLBACKS <- list(
   } else {
     catalog$cv_registry
   }
-  catalog$metadata_defaults <- if (!is.null(rendered$metadata_defaults)) {
-    rendered$metadata_defaults
-  } else {
+  catalog$metadata_defaults <- if (is.null(rendered$metadata_defaults)) {
     catalog$metadata_defaults
-  }
-  catalog$metadata_entries <- if (!is.null(rendered$metadata_entries)) {
-    rendered$metadata_entries
   } else {
+    rendered$metadata_defaults
+  }
+  catalog$metadata_entries <- if (is.null(rendered$metadata_entries)) {
     catalog$metadata_entries
+  } else {
+    rendered$metadata_entries
   }
   catalog
 }

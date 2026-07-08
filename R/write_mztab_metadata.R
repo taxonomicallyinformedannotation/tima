@@ -387,14 +387,14 @@
     v[is.na(v) | !nzchar(v)] <- "null"
     v
   })
-
-  # Build all rows at once
-  rows_list <- lapply(seq_len(nrow(tbl)), function(i) {
-    row_vals <- vapply(row_data, function(col_vec) col_vec[[i]], character(1L))
-    paste(c(row_prefix, row_vals), collapse = "\t")
-  })
-
-  writeLines(unlist(rows_list), con)
+  if (length(row_data) == 0L) {
+    rows <- rep(row_prefix, nrow(tbl))
+  } else {
+    row_matrix <- do.call(cbind, row_data)
+    row_matrix[is.na(row_matrix)] <- "null"
+    rows <- apply(row_matrix, 1L, paste, collapse = "\t")
+  }
+  writeLines(paste(row_prefix, rows, sep = "\t"), con)
   writeLines("", con)
 }
 
