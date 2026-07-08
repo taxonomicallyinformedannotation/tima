@@ -99,3 +99,17 @@ test_that("get mzTab required columns uses schema values and deduplicates", {
   expect_identical(req$SMF, c("SMF_ID", "exp_mass_to_charge"))
   expect_identical(req$SME, c("SME_ID", "rank"))
 })
+
+test_that("mzTab schema catalog exposes shared defaults and ontology terms", {
+  catalog <- .mztab_schema_catalog()
+
+  expect_true("required_columns" %in% names(catalog))
+  expect_identical(catalog$metadata$required, MZTAB_METADATA_REQUIRED_FALLBACK)
+  expect_identical(
+    catalog$terms$params$polarity$positive,
+    MZTAB_TERM_FALLBACKS$params$polarity$positive
+  )
+  expect_true(any(vapply(catalog$terms$cv_registry, function(entry) {
+    identical(entry$label, "TIMA")
+  }, logical(1))))
+})

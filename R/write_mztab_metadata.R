@@ -41,10 +41,17 @@
     meta <- tidytable::tidytable(key = character(0), value = character(0))
   }
 
+  catalog <- .mztab_schema_catalog()
+  software_version <- if (is.null(software_version) || !nzchar(as.character(software_version))) {
+    "unknown"
+  } else {
+    as.character(software_version)
+  }
+
   # ── Mandatory header fields ──────────────────────────────────────────────
-  meta <- add_default(meta, "mzTab-version", "2.1.0-M")
-  meta <- add_default(meta, "mzTab-mode", "Summary")
-  meta <- add_default(meta, "mzTab-type", "Identification")
+  meta <- add_default(meta, "mzTab-version", catalog$terms$metadata$mzTab_version)
+  meta <- add_default(meta, "mzTab-mode", catalog$terms$metadata$mzTab_mode)
+  meta <- add_default(meta, "mzTab-type", catalog$terms$metadata$mzTab_type)
   meta <- add_default(meta, "mzTab-ID", .mztab_escape(mztab_id))
   meta <- add_default(meta, "title", .mztab_escape(title))
   meta <- add_default(meta, "description", .mztab_escape(description))
@@ -55,50 +62,14 @@
   )
 
   # ── Controlled vocabulary registry ───────────────────────────────────────
-  meta <- add_default(meta, "cv[1]-label", "MS")
-  meta <- add_default(meta, "cv[1]-full_name", "PSI-MS controlled vocabulary")
-  meta <- add_default(meta, "cv[1]-version", "4.1.11")
-  meta <- add_default(
-    meta,
-    "cv[1]-uri",
-    "https://purl.obolibrary.org/obo/ms.obo"
-  )
-
-  meta <- add_default(meta, "cv[2]-label", "UO")
-  meta <- add_default(meta, "cv[2]-full_name", "Units of Measurement Ontology")
-  meta <- add_default(meta, "cv[2]-version", "unknown")
-  meta <- add_default(
-    meta,
-    "cv[2]-uri",
-    "https://purl.obolibrary.org/obo/uo.obo"
-  )
-
-  meta <- add_default(meta, "cv[3]-label", "STATO")
-  meta <- add_default(
-    meta,
-    "cv[3]-full_name",
-    "The Statistical Methods Ontology"
-  )
-  meta <- add_default(meta, "cv[3]-version", "unknown")
-  meta <- add_default(
-    meta,
-    "cv[3]-uri",
-    "https://purl.obolibrary.org/obo/stato.obo"
-  )
-
-  # TIMA scores are user-namespace Params; register the namespace explicitly.
-  meta <- add_default(meta, "cv[4]-label", "TIMA")
-  meta <- add_default(
-    meta,
-    "cv[4]-full_name",
-    "Taxonomically Informed Metabolite Annotation user vocabulary"
-  )
-  meta <- add_default(meta, "cv[4]-version", as.character(software_version))
-  meta <- add_default(
-    meta,
-    "cv[4]-uri",
-    "https://github.com/taxonomicallyinformedannotation/tima"
-  )
+  cv_registry <- catalog$terms$cv_registry
+  for (i in seq_along(cv_registry)) {
+    entry <- cv_registry[[i]]
+    meta <- add_default(meta, paste0("cv[", i, "]-label"), entry$label)
+    meta <- add_default(meta, paste0("cv[", i, "]-full_name"), entry$full_name)
+    meta <- add_default(meta, paste0("cv[", i, "]-version"), entry$version)
+    meta <- add_default(meta, paste0("cv[", i, "]-uri"), entry$uri)
+  }
 
   if (!is.null(publication) && nzchar(publication) && publication != "null") {
     meta <- add_default(meta, "publication[1]", .mztab_escape(publication))
@@ -168,8 +139,8 @@
   if (!is.null(polarity) && nzchar(polarity) && polarity != "null") {
     polarity_param <- switch(
       tolower(polarity),
-      positive = "[MS, MS:1000130, positive scan, ]",
-      negative = "[MS, MS:1000129, negative scan, ]",
+      positive = catalog$terms$params$polarity$positive,
+      negative = catalog$terms$params$polarity$negative,
       NULL
     )
     if (!is.null(polarity_param)) {
@@ -181,19 +152,19 @@
   meta <- add_default(
     meta,
     "quantification_method",
-    "[MS, MS:1001834, LC-MS label-free quantitation analysis, ]"
+    catalog$terms$params$quantification$label_free
   )
   meta <- add_default(
     meta,
     "small_molecule-quantification_unit",
-    "[MS, MS:1001113, peak area, ]"
+    catalog$terms$params$quantification$peak_area
   )
   meta <- add_default(
     meta,
     "small_molecule_feature-quantification_unit",
-    "[MS, MS:1001113, peak area, ]"
+    catalog$terms$params$quantification$peak_area
   )
-  meta <- add_default(meta, "sample[1]", "[, , metabolomics sample, ]")
+  meta <- add_default(meta, "sample[1]", catalog$terms$params$sample)
   meta <- add_default(
     meta,
     "sample[1]-description",
@@ -208,7 +179,7 @@
   meta <- add_default(
     meta,
     "assay[1]-quantification_reagent",
-    "[MS, MS:1002038, unlabeled sample, ]"
+    catalog$terms$params$assay_quantification_reagent
   )
   # mzTab-M 2.1 introduces study_variable_group and removes
   # study_variable[*]-factors. Emit a minimal default group so the generated
@@ -216,7 +187,7 @@
   meta <- add_default(
     meta,
     "study_variable_group[1]",
-    "[, , annotation_group, ]"
+    catalog$terms$params$study_variable_group
   )
   meta <- add_default(
     meta,
@@ -246,7 +217,7 @@
   meta <- add_default(
     meta,
     "database[1]",
-    "[, , LOTUS natural-product database, ]"
+    catalog$terms$params$default_database
   )
   # The connectivity-layer InChIKey fragment used as database_identifier has no
   # database-specific prefix; null is the correct mzTab-M value.

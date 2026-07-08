@@ -58,6 +58,29 @@ test_that(".mztab_build_metadata_table respects existing metadata entries", {
   expect_equal(meta$value[meta$key == "title"][1], "Existing Title")
 })
 
+test_that(".mztab_build_metadata_table uses shared mzTab term defaults", {
+  sme <- tidytable::tidytable(`id_confidence_measure[1]` = "0.9")
+  meta <- build_meta(
+    mztab_id = "id",
+    title = "Title",
+    description = "Desc",
+    software_version = "1.0.0",
+    ms_run_location = "file://x",
+    xrefs_index = NULL,
+    sme_table = sme,
+    existing_metadata = NULL
+  )
+
+  expect_equal(
+    meta$value[meta$key == "quantification_method"][1],
+    MZTAB_TERM_FALLBACKS$params$quantification$label_free
+  )
+  expect_equal(
+    meta$value[meta$key == "sample[1]"][1],
+    MZTAB_TERM_FALLBACKS$params$sample
+  )
+})
+
 test_that(".mztab_write_metadata writes null for NA values", {
   meta <- tidytable::tidytable(
     key = c("a", "b"),

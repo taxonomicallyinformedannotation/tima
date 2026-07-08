@@ -14,9 +14,22 @@ NULL
     return(x)
   }
   x <- trimws(x)
-  # In mzTab, only `null` is the canonical missing token; keep literal "NA" values.
   x[x %in% c("", "null", "NULL")] <- NA_character_
   x
+}
+
+#' @keywords internal
+.mztab_split_tsv <- function(x) {
+  if (is.null(x) || length(x) == 0L || is.na(x)) {
+    return(character(0))
+  }
+
+  parts <- strsplit(as.character(x), "\t", fixed = TRUE)[[1L]]
+  if (length(parts) == 1L && !nzchar(parts[[1L]])) {
+    return(character(0))
+  }
+
+  parts
 }
 
 #' Split a comma-separated mzTab Param payload while respecting escapes.
@@ -60,12 +73,27 @@ NULL
 
 #' @keywords internal
 .normalize_mztab_prefix_sep <- function(lines) {
-  gsub(
-    pattern = "^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)[[:space:]]+",
-    replacement = paste0("\\1", "\t"),
-    x = lines,
-    perl = TRUE
-  )
+  if (length(lines) == 0L) {
+    return(character(0))
+  }
+
+  vapply(lines, function(line) {
+    if (is.na(line) || !nzchar(trimws(line))) {
+      return(line)
+    }
+
+    line <- sub("^\\ufeff", "", line)
+    if (!(grepl("^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)([[:space:]]|$)", line, perl = TRUE, ignore.case = TRUE))) {
+      return(line)
+    }
+
+    prefix <- sub("^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)([[:space:]]+).*$", "\\1", line, perl = TRUE, ignore.case = TRUE)
+    rest <- sub("^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)[[:space:]]+", "", line, perl = TRUE, ignore.case = TRUE)
+    if (is.na(rest) || !nzchar(rest)) {
+      return(prefix)
+    }
+    paste0(prefix, "\t", rest)
+  }, FUN.VALUE = character(1L))
 }
 
 #' @keywords internal
@@ -76,17 +104,31 @@ NULL
   }
 
   rows <- lapply(mtd_lines, function(line) {
-    parts <- strsplit(line, "\\t", fixed = FALSE)[[1L]]
-    if (length(parts) < 3L) {
+    parts <- .mztab_split_tsv(line)
+    if (length(parts) < 2L) {
       return(NULL)
     }
-    tidytable::tidytable(
-      key = parts[[2L]],
-      value = paste(parts[3:length(parts)], collapse = "\t")
-    )
+
+    key <- trimws(parts[[2L]])
+    if (!nzchar(key)) {
+      return(NULL)
+    }
+
+    value <- if (length(parts) >= 3L) {
+      paste(parts[3:length(parts)], collapse = "\t")
+    } else {
+      NA_character_
+    }
+
+    tidytable::tidytable(key = key, value = value)
   })
 
-  out <- tidytable::bind_rows(Filter(Negate(is.null), rows))
+  rows <- Filter(Negate(is.null), rows)
+  if (length(rows) == 0L) {
+    return(tidytable::tidytable(key = character(0), value = character(0)))
+  }
+
+  out <- tidytable::bind_rows(rows)
   if (nrow(out) > 0L) {
     out$value <- .normalize_mztab_value(out$value)
   }
@@ -114,17 +156,24 @@ NULL
 
   header_line <- gsub(
     "best_id_confidence_measurebest_id_evidence_value",
-    "best_id_confidence_measure\\tbest_id_evidence_value",
+    "best_id_confidence_measure\tbest_id_evidence_value",
     header_lines[[1L]],
     fixed = TRUE
   )
-  col_names <- strsplit(header_line, "\\t", fixed = FALSE)[[1L]]
+  col_names <- .mztab_split_tsv(header_line)
+  if (length(col_names) < 2L) {
+    return(tidytable::tidytable())
+  }
   col_names <- col_names[-1L]
 
   row_splits <- lapply(row_lines, function(line) {
-    vals <- strsplit(line, "\\t", fixed = FALSE)[[1L]]
+    vals <- .mztab_split_tsv(line)
+    if (length(vals) < 2L) {
+      return(character(0))
+    }
     vals[-1L]
   })
+
   max_len <- max(lengths(row_splits), 0L)
   if (max_len > length(col_names)) {
     col_names <- c(
@@ -140,11 +189,10 @@ NULL
   col_names <- make.unique(col_names, sep = "_dup")
 
   rows <- lapply(row_splits, function(vals) {
-    # Pad short rows with NA to keep rectangular structure.
     if (length(vals) < length(col_names)) {
       vals <- c(vals, rep(NA_character_, length(col_names) - length(vals)))
     }
-    vals <- vals[seq_along(col_names)]
+    vals <- vals[seq_len(length(col_names))]
 
     df <- as.list(vals)
     names(df) <- col_names
@@ -302,7 +350,21 @@ NULL
 
 #' @keywords internal
 .read_mztab_json_tables <- function(input) {
-  json <- jsonlite::fromJSON(input, simplifyVector = FALSE)
+  json <- tryCatch(
+    jsonlite::fromJSON(input, simplifyVector = FALSE),
+    error = function(e) {
+      NULL
+    }
+  )
+
+  if (!is.list(json)) {
+    return(list(
+      metadata = tidytable::tidytable(key = character(0), value = character(0)),
+      sml = tidytable::tidytable(),
+      smf = tidytable::tidytable(),
+      sme = tidytable::tidytable()
+    ))
+  }
 
   meta <- .mztab_json_pick(json, c("metadata", "Metadata"))
   sml <- .mztab_json_pick(
@@ -331,9 +393,16 @@ read_mztab_tables <- function(input) {
   validate_character(input, param_name = "input")
   validate_file_exists(input, file_type = "mzTab-M file", param_name = "input")
 
-  lines <- readLines(input, warn = FALSE, encoding = "UTF-8")
+  lines <- tryCatch(
+    readLines(input, warn = FALSE, encoding = "UTF-8"),
+    error = function(e) {
+      character(0)
+    }
+  )
   if (length(lines) > 0L) {
-    lines[[1L]] <- sub("^\ufeff", "", lines[[1L]])
+    lines <- vapply(lines, function(line) {
+      sub("^\ufeff", "", line)
+    }, FUN.VALUE = character(1L))
   }
 
   first_nonblank <- ""

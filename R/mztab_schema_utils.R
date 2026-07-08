@@ -40,8 +40,124 @@ MZTAB_REQUIRED_FALLBACK <- list(
 )
 
 #' @keywords internal
+MZTAB_METADATA_REQUIRED_FALLBACK <- c("mzTab-version")
+
+#' @keywords internal
+MZTAB_METADATA_RECOMMENDED_FALLBACK <- c("mzTab-mode", "mzTab-type")
+
+#' @keywords internal
+MZTAB_CV_REGISTRY_FALLBACK <- list(
+  list(
+    label = "MS",
+    full_name = "PSI-MS controlled vocabulary",
+    version = "4.1.11",
+    uri = "https://purl.obolibrary.org/obo/ms.obo"
+  ),
+  list(
+    label = "UO",
+    full_name = "Units of Measurement Ontology",
+    version = "unknown",
+    uri = "https://purl.obolibrary.org/obo/uo.obo"
+  ),
+  list(
+    label = "STATO",
+    full_name = "The Statistical Methods Ontology",
+    version = "unknown",
+    uri = "https://purl.obolibrary.org/obo/stato.obo"
+  )
+)
+
+#' @keywords internal
+MZTAB_TERM_FALLBACKS <- list(
+  metadata = list(
+    mzTab_version = "2.1.0-M",
+    mzTab_mode = "Summary",
+    mzTab_type = "Identification"
+  ),
+  params = list(
+    polarity = list(
+      positive = "[MS, MS:1000130, positive scan, ]",
+      negative = "[MS, MS:1000129, negative scan, ]"
+    ),
+    quantification = list(
+      label_free = "[MS, MS:1001834, LC-MS label-free quantitation analysis, ]",
+      peak_area = "[MS, MS:1001113, peak area, ]"
+    ),
+    sample = "[, , metabolomics sample, ]",
+    assay_quantification_reagent = "[MS, MS:1002038, unlabeled sample, ]",
+    study_variable_group = "[, , annotation_group, ]",
+    default_database = "[, , LOTUS natural-product database, ]"
+  )
+)
+
+#' @keywords internal
 .get_mztab_schema_path <- function() {
   system.file("contracts", "mzTab_m_openapi.yml", package = "tima")
+}
+
+#' @keywords internal
+.mztab_normalize_column_name <- function(x) {
+  if (length(x) == 0L) {
+    return(character(0))
+  }
+
+  out <- trimws(as.character(x))
+  out[is.na(out) | !nzchar(out)] <- NA_character_
+  out <- gsub("-", "_", out, fixed = TRUE)
+  out <- gsub(" ", "_", out, fixed = TRUE)
+  out <- gsub("[^A-Za-z0-9]+", "_", out, perl = TRUE)
+  out <- gsub("^_+|_+$", "", out, perl = TRUE)
+  out <- tolower(out)
+  out <- gsub("^sml_id$", "SML_ID", out)
+  out <- gsub("^smf_id$", "SMF_ID", out)
+  out <- gsub("^sme_id$", "SME_ID", out)
+  out <- gsub("^sml_id_refs$", "SML_ID_REFS", out)
+  out <- gsub("^smf_id_refs$", "SMF_ID_REFS", out)
+  out <- gsub("^sme_id_refs$", "SME_ID_REFS", out)
+  out
+}
+
+#' @keywords internal
+.mztab_default_cv_registry <- function(software_version = NULL) {
+  version <- if (is.null(software_version) || !nzchar(as.character(software_version))) {
+    "unknown"
+  } else {
+    as.character(software_version)
+  }
+
+  registry <- MZTAB_CV_REGISTRY_FALLBACK
+  registry[[length(registry) + 1L]] <- list(
+    label = "TIMA",
+    full_name = "Taxonomically Informed Metabolite Annotation user vocabulary",
+    version = version,
+    uri = "https://github.com/taxonomicallyinformedannotation/tima"
+  )
+  registry
+}
+
+#' @keywords internal
+.mztab_default_term_catalog <- function(software_version = NULL) {
+  list(
+    metadata = MZTAB_TERM_FALLBACKS$metadata,
+    cv_registry = .mztab_default_cv_registry(software_version),
+    params = MZTAB_TERM_FALLBACKS$params
+  )
+}
+
+#' @keywords internal
+.mztab_schema_catalog <- function() {
+  schema <- .load_mztab_schema()
+  required_columns <- get_mztab_required_columns()
+
+  list(
+    schema = schema,
+    required_columns = required_columns,
+    metadata = list(
+      required = MZTAB_METADATA_REQUIRED_FALLBACK,
+      recommended = MZTAB_METADATA_RECOMMENDED_FALLBACK
+    ),
+    terms = .mztab_default_term_catalog()
+  )
 }
 
 #' @keywords internal
@@ -87,8 +203,7 @@ MZTAB_REQUIRED_FALLBACK <- list(
     return(character(0))
   }
 
-  # Preserve schema case so checks match parsed mzTab headers exactly.
-  gsub("-", "_", required, fixed = TRUE)
+  .mztab_normalize_column_name(required)
 }
 
 #' @keywords internal

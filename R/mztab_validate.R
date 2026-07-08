@@ -8,17 +8,28 @@
 NULL
 
 #' @keywords internal
+.mztab_table_or_empty <- function(x) {
+  if (is.null(x)) {
+    return(tidytable::tidytable())
+  }
+  if (is.data.frame(x)) {
+    return(x)
+  }
+  if (is.list(x) && length(x) > 0L) {
+    return(tidytable::as_tidytable(x))
+  }
+  tidytable::tidytable()
+}
+
+#' @keywords internal
 .validate_required_cols <- function(df, required, section) {
+  df <- .mztab_table_or_empty(df)
   if (nrow(df) == 0L) {
     return(invisible(TRUE))
   }
 
-  normalize <- function(x) {
-    tolower(gsub("-", "_", x, fixed = TRUE))
-  }
-
-  required_norm <- normalize(required)
-  names_norm <- normalize(names(df))
+  required_norm <- .mztab_normalize_column_name(required)
+  names_norm <- .mztab_normalize_column_name(names(df))
 
   missing_idx <- which(!(required_norm %in% names_norm))
   missing <- required[missing_idx]
@@ -38,6 +49,7 @@ NULL
 
 #' @keywords internal
 .mztab_get_metadata_value <- function(metadata_df, key) {
+  metadata_df <- .mztab_table_or_empty(metadata_df)
   if (nrow(metadata_df) == 0L) {
     return(NA_character_)
   }
@@ -69,6 +81,7 @@ NULL
 
 #' @keywords internal
 .mztab_validate_metadata_semantics <- function(metadata_df, strict) {
+  metadata_df <- .mztab_table_or_empty(metadata_df)
   version <- .mztab_get_metadata_value(metadata_df, "mzTab-version")
   parsed <- .mztab_parse_version(version)
   if (is.null(parsed) || anyNA(parsed)) {
@@ -86,8 +99,9 @@ NULL
     )
   }
 
-  required_meta <- c("mzTab-mode", "mzTab-type")
-  missing_meta <- required_meta[!(required_meta %in% metadata_df$key)]
+  catalog <- .mztab_schema_catalog()
+  recommended_meta <- catalog$metadata$recommended
+  missing_meta <- recommended_meta[!(recommended_meta %in% metadata_df$key)]
   if (length(missing_meta) > 0L) {
     msg <- paste(
       "Missing recommended metadata fields:",
@@ -99,6 +113,11 @@ NULL
 
 #' @keywords internal
 .mztab_validate_cv_registry <- function(metadata_df, strict) {
+  metadata_df <- .mztab_table_or_empty(metadata_df)
+  if (!"key" %in% names(metadata_df)) {
+    return(invisible(TRUE))
+  }
+
   cv_labels <- grep("^cv\\[[0-9]+\\]-label$", metadata_df$key, value = TRUE)
   if (length(cv_labels) == 0L) {
     return(invisible(TRUE))
@@ -169,9 +188,9 @@ NULL
 
 #' @keywords internal
 .mztab_validate_reference_integrity <- function(mztab_tables, strict) {
-  sml <- mztab_tables$sml
-  smf <- mztab_tables$smf
-  sme <- mztab_tables$sme
+  sml <- .mztab_table_or_empty(mztab_tables$sml)
+  smf <- .mztab_table_or_empty(mztab_tables$smf)
+  sme <- .mztab_table_or_empty(mztab_tables$sme)
 
   if (nrow(sml) > 0L && nrow(smf) > 0L && "SMF_ID_REFS" %in% names(sml)) {
     bad <- .mztab_missing_ref_ids(sml$SMF_ID_REFS, smf$SMF_ID)
@@ -340,8 +359,12 @@ validate_mztab_tables <- function(mztab_tables, strict = FALSE) {
   )
 
   required <- get_mztab_required_columns()
+  metadata <- .mztab_table_or_empty(mztab_tables$metadata)
+  sml <- .mztab_table_or_empty(mztab_tables$sml)
+  smf <- .mztab_table_or_empty(mztab_tables$smf)
+  sme <- .mztab_table_or_empty(mztab_tables$sme)
 
-  if (nrow(mztab_tables$metadata) == 0L) {
+  if (nrow(metadata) == 0L) {
     tima_abort(
       problem = "Missing metadata section (MTD)",
       fix = "Ensure the mzTab file contains MTD lines",
@@ -349,7 +372,7 @@ validate_mztab_tables <- function(mztab_tables, strict = FALSE) {
     )
   }
 
-  has_version <- any(mztab_tables$metadata$key == "mzTab-version", na.rm = TRUE)
+  has_version <- any(metadata$key == "mzTab-version", na.rm = TRUE)
   if (!has_version) {
     tima_abort(
       problem = "Missing required mzTab metadata field: mzTab-version",
@@ -357,8 +380,8 @@ validate_mztab_tables <- function(mztab_tables, strict = FALSE) {
     )
   }
 
-  has_sml <- nrow(mztab_tables$sml) > 0L
-  has_smf <- nrow(mztab_tables$smf) > 0L
+  has_sml <- nrow(sml) > 0L
+  has_smf <- nrow(smf) > 0L
 
   if (!has_sml && !has_smf) {
     tima_abort(
@@ -369,25 +392,22 @@ validate_mztab_tables <- function(mztab_tables, strict = FALSE) {
   }
 
   .mztab_validate_metadata_semantics(
-    metadata_df = mztab_tables$metadata,
+    metadata_df = metadata,
     strict = strict
   )
   .mztab_validate_cv_registry(
-    metadata_df = mztab_tables$metadata,
+    metadata_df = metadata,
     strict = strict
   )
 
-  .validate_required_cols(mztab_tables$sml, required$SML, "SML")
-  .validate_required_cols(mztab_tables$smf, required$SMF, "SMF")
+  .validate_required_cols(sml, required$SML, "SML")
+  .validate_required_cols(smf, required$SMF, "SMF")
 
   if (strict) {
-    .validate_required_cols(mztab_tables$sme, required$SME, "SME")
-  } else if (nrow(mztab_tables$sme) > 0L) {
-    normalize <- function(x) {
-      tolower(gsub("-", "_", x, fixed = TRUE))
-    }
-    required_sme_norm <- normalize(required$SME)
-    names_sme_norm <- normalize(names(mztab_tables$sme))
+    .validate_required_cols(sme, required$SME, "SME")
+  } else if (nrow(sme) > 0L) {
+    required_sme_norm <- .mztab_normalize_column_name(required$SME)
+    names_sme_norm <- .mztab_normalize_column_name(names(sme))
     missing_sme <- required$SME[!(required_sme_norm %in% names_sme_norm)]
     if (length(missing_sme) > 0L) {
       log_warn(
@@ -398,7 +418,7 @@ validate_mztab_tables <- function(mztab_tables, strict = FALSE) {
   }
 
   .mztab_validate_reference_integrity(
-    mztab_tables = mztab_tables,
+    mztab_tables = list(sml = sml, smf = smf, sme = sme),
     strict = strict
   )
 

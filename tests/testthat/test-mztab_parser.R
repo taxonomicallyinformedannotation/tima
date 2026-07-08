@@ -134,3 +134,33 @@ test_that("read_mztab_tables reads json and plain-text files", {
   expect_identical(txt_out$metadata$key, "mzTab-version")
   expect_true(nrow(txt_out$sml) >= 1L)
 })
+
+test_that("read_mztab_tables handles malformed and empty input defensively", {
+  empty_file <- tempfile(fileext = ".mztab")
+  writeLines(character(0), empty_file)
+  on.exit(unlink(empty_file), add = TRUE)
+
+  empty_out <- read_mztab_tables(empty_file)
+  expect_equal(nrow(empty_out$metadata), 0L)
+  expect_equal(nrow(empty_out$sml), 0L)
+  expect_equal(nrow(empty_out$smf), 0L)
+  expect_equal(nrow(empty_out$sme), 0L)
+
+  malformed_file <- tempfile(fileext = ".mztab")
+  writeLines(
+    c(
+      "MTD\tmzTab-version\t2.1.0-M",
+      "MTD\tcomment",
+      "SMH\tSML_ID\tname",
+      "SML\t1\tAlpha",
+      "SML\t2"
+    ),
+    malformed_file
+  )
+  on.exit(unlink(malformed_file), add = TRUE)
+
+  malformed_out <- read_mztab_tables(malformed_file)
+  expect_equal(nrow(malformed_out$metadata), 2L)
+  expect_identical(malformed_out$metadata$value[[2L]], NA_character_)
+  expect_equal(nrow(malformed_out$sml), 2L)
+})
