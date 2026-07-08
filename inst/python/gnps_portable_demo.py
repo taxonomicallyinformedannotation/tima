@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Small ctypes demo for the portable GNPS C API."""
 
 from __future__ import annotations
