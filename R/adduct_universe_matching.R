@@ -178,21 +178,17 @@ calculate_mz_from_lookup <- function(
     }
     unmatched <- !matched & !is.na(adducts)
     if (any(unmatched)) {
-      out[unmatched] <- mapply(
-        FUN = calculate_mz_from_mass,
-        neutral_mass = neutral_mass[unmatched],
-        adduct_string = adducts[unmatched],
-        USE.NAMES = FALSE
+      out[unmatched] <- calculate_mz_from_mass_batch(
+        neutral_masses = neutral_mass[unmatched],
+        adducts = adducts[unmatched]
       )
     }
     return(out)
   }
 
-  mapply(
-    FUN = calculate_mz_from_mass,
-    neutral_mass = neutral_mass,
-    adduct_string = adducts,
-    USE.NAMES = FALSE
+  calculate_mz_from_mass_batch(
+    neutral_masses = neutral_mass,
+    adducts = adducts
   )
 }
 

@@ -26,6 +26,26 @@ test_that("typed adduct lookup recovers inside-multimer neutral mass", {
   expect_equal(recovered, M, tolerance = 1e-7)
 })
 
+test_that("calculate_mz_from_lookup falls back to batch conversion for unmatched adducts", {
+  lookup <- build_adduct_lookup(empty_adduct_universe())
+
+  neutral_mass <- c(122.45, 145.44)
+  adducts <- c("[M+H]+", "[M+Na]+")
+  expected <- c(
+    calculate_mz_from_mass(122.45, "[M+H]+"),
+    calculate_mz_from_mass(145.44, "[M+Na]+")
+  )
+
+  recovered <- calculate_mz_from_lookup(
+    neutral_mass = neutral_mass,
+    adducts = adducts,
+    adduct_lookup = lookup,
+    fallback = TRUE
+  )
+
+  expect_equal(recovered, expected, tolerance = 1e-9)
+})
+
 test_that("direct adduct transitions exclude dimer deltas that depend on neutral mass", {
   uni <- build_adduct_universe(
     adducts_list = list(pos = c("[M+H]+", "[2M+H]+"), neg = c("[M-H]-")),

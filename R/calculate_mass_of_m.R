@@ -249,6 +249,79 @@ calculate_mass_of_m_batch <- function(
   out
 }
 
+#' @title Batch-calculate m/z from neutral mass + adduct vectors
+#'
+#' @description Vectorized version of [calculate_mz_from_mass()] that parses each
+#'     unique adduct string only once and applies the inverse mass formula over
+#'     all rows sharing that adduct.
+#'
+#' @param neutral_masses [numeric] Neutral mass values (same length as
+#'     \code{adducts}).
+#' @param adducts [character] Vector of adduct notation strings.
+#' @param electron_mass [numeric] Electron mass in Daltons.
+#'
+#' @return Numeric vector of m/z values.
+#'
+#' @keywords internal
+calculate_mz_from_mass_batch <- function(
+  neutral_masses,
+  adducts,
+  electron_mass = ELECTRON_MASS_DALTONS
+) {
+  validate_electron_mass(electron_mass)
+  n <- length(neutral_masses)
+  if (length(adducts) == 1L) {
+    adducts <- rep(adducts, n)
+  } else {
+    adducts <- as.character(adducts)
+  }
+  out <- rep(NA_real_, n)
+
+  valid_idx <- !is.na(neutral_masses) & !is.na(adducts)
+  valid_idx[is.na(valid_idx)] <- FALSE
+  if (!any(valid_idx)) {
+    return(out)
+  }
+
+  neutral_vals <- as.numeric(neutral_masses[valid_idx])
+  adduct_vals <- adducts[valid_idx]
+  unique_adducts <- unique(adduct_vals[
+    !is.na(adduct_vals) & nzchar(adduct_vals)
+  ])
+  adduct_idx_map <- match(adduct_vals, unique_adducts)
+
+  for (i in seq_along(unique_adducts)) {
+    a <- unique_adducts[[i]]
+    parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
+    if (is.null(parsed) || all(parsed == 0L)) {
+      next
+    }
+    n_charges <- parsed[["n_charges"]]
+    charge_sign <- parsed[["charge"]]
+    n_mer <- parsed[["n_mer"]]
+    n_iso <- parsed[["n_iso"]]
+    mass_mods <- parsed[["los_add_clu"]]
+    if (n_charges == 0L) {
+      next
+    }
+
+    idx <- which(adduct_idx_map == i)
+    if (length(idx) == 0L) {
+      next
+    }
+    mz_sub <- (neutral_vals[idx] *
+      n_mer +
+      mass_mods -
+      (n_charges * charge_sign) * electron_mass) /
+      n_charges +
+      n_iso * ISOTOPE_MASS_SHIFT_DALTONS
+    out_valid <- out[valid_idx]
+    out_valid[idx] <- mz_sub
+    out[valid_idx] <- out_valid
+  }
+  out
+}
+
 # Helper Functions ----
 
 #' Validate m/z value

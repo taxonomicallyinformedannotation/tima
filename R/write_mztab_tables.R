@@ -216,36 +216,8 @@
 #' @keywords internal
 .mztab_build_sme <- function(results, smf_table, xrefs_index = NULL) {
   ann <- as.data.frame(results, stringsAsFactors = FALSE, check.names = FALSE)
-  ann_signal_cols <- unique(c(
-    grep("^candidate_", colnames(results), value = TRUE),
-    intersect(
-      c(
-        "rank_initial",
-        "rank_final",
-        "score_initial",
-        "score_biological",
-        "score_chemical",
-        "score_final",
-        "annotation_note"
-      ),
-      colnames(results)
-    )
-  ))
-
-  has_annotation <- if (length(ann_signal_cols) == 0L) {
-    rep(FALSE, nrow(results))
-  } else {
-    Reduce(
-      `|`,
-      lapply(ann_signal_cols, function(col) {
-        x <- as.character(results[[col]])
-        !(is.na(x) | x == "NA" | x == "null" | x == "NULL" | !nzchar(x))
-      })
-    )
-  }
-
-  if (!any(has_annotation)) {
-    # No candidates at all – return a minimal empty SME
+  n_rows <- nrow(ann)
+  if (n_rows == 0L) {
     return(tidytable::tidytable(
       SME_ID = character(0),
       evidence_input_id = character(0),
@@ -272,79 +244,126 @@
     ))
   }
 
-  ann <- results[has_annotation, , drop = FALSE]
+  ann_signal_cols <- unique(c(
+    grep("^candidate_", colnames(ann), value = TRUE),
+    intersect(
+      c(
+        "rank_initial",
+        "rank_final",
+        "score_initial",
+        "score_biological",
+        "score_chemical",
+        "score_final",
+        "annotation_note"
+      ),
+      colnames(ann)
+    )
+  ))
 
-  # Map feature_id -> SMF_ID
+  has_annotation <- if (length(ann_signal_cols) == 0L) {
+    rep(FALSE, n_rows)
+  } else {
+    any_col <- lapply(ann_signal_cols, function(col) {
+      x <- ann[[col]]
+      x <- as.character(x)
+      !(is.na(x) | x == "NA" | x == "null" | x == "NULL" | !nzchar(x))
+    })
+    Reduce(`|`, any_col)
+  }
+
+  if (!any(has_annotation)) {
+    return(tidytable::tidytable(
+      SME_ID = character(0),
+      evidence_input_id = character(0),
+      database_identifier = character(0),
+      chemical_formula = character(0),
+      smiles = character(0),
+      inchi = character(0),
+      chemical_name = character(0),
+      uri = character(0),
+      derivatized_form = character(0),
+      adduct_ion = character(0),
+      exp_mass_to_charge = character(0),
+      charge = character(0),
+      theoretical_mass_to_charge = character(0),
+      spectra_ref = character(0),
+      identification_method = character(0),
+      ms_level = character(0),
+      rank = character(0),
+      "id_confidence_measure[1]" = character(0),
+      "id_confidence_measure[2]" = character(0),
+      "id_confidence_measure[3]" = character(0),
+      "id_confidence_measure[4]" = character(0),
+      feature_id = character(0)
+    ))
+  }
+
+  ann <- ann[has_annotation, , drop = FALSE]
+
   id_lookup <- stats::setNames(
     as.character(smf_table$SMF_ID),
     smf_table$feature_id
   )
 
-  # Compute theoretical m/z from neutral mass + adduct when possible.
-  # Vectorized approach: process all rows at once
-  exact_mass_raw <- suppressWarnings(as.numeric(.mztab_pluck(
-    ann,
-    "candidate_structure_exact_mass"
-  )))
-  adduct_raw <- .mztab_pluck(ann, "candidate_adduct")
-
-  theo_mz <- mapply(
-    function(m, ads) {
-      if (!is.na(m) && m > 0 && !is.na(ads) && ads != "null" && nzchar(ads)) {
-        val <- tryCatch(
-          calculate_mz_from_mass(neutral_mass = m, adduct_string = ads),
-          error = function(...) NA_real_ # mute: harmless calculation error
-        )
-        if (!is.na(val) && val > 0) {
-          return(as.character(round(val, 6)))
-        }
+  .mztab_safe_scalar <- function(x, n = NULL) {
+    if (is.null(x) || length(x) == 0L) {
+      if (is.null(n)) {
+        n <- nrow(ann)
       }
-      "null"
-    },
-    exact_mass_raw,
-    adduct_raw,
-    SIMPLIFY = TRUE,
-    USE.NAMES = FALSE
+      return(rep("null", n))
+    }
+
+    x <- as.character(x)
+    if (!is.null(n) && length(x) != n) {
+      x <- rep(x, length.out = n)
+    }
+    x[is.na(x) | !nzchar(x)] <- "null"
+    x
+  }
+
+  exact_mass_raw <- suppressWarnings(as.numeric(.mztab_safe_scalar(ann[[
+    "candidate_structure_exact_mass"
+  ]])))
+  adduct_raw <- .mztab_safe_scalar(ann[["candidate_adduct"]])
+  theo_mz <- rep("null", length(exact_mass_raw))
+  valid_idx <- !is.na(exact_mass_raw) &
+    exact_mass_raw > 0 &
+    adduct_raw != "null" &
+    nzchar(adduct_raw)
+  if (any(valid_idx)) {
+    theo_vals <- calculate_mz_from_mass_batch(
+      neutral_masses = exact_mass_raw[valid_idx],
+      adducts = adduct_raw[valid_idx]
+    )
+    theo_vals[!is.finite(theo_vals)] <- NA_real_
+    theo_vals <- suppressWarnings(as.character(round(theo_vals, 6)))
+    theo_vals[is.na(theo_vals) | !nzchar(theo_vals)] <- "null"
+    theo_mz[valid_idx] <- theo_vals
+  }
+
+  lib_col <- .mztab_safe_scalar(ann[["candidate_library"]])
+  charge_from_adduct <- .mztab_charge_from_adduct(adduct_raw)
+  ms_level_val <- ifelse(
+    grepl("MS1|ms1|TIMA MS1", lib_col, ignore.case = TRUE),
+    "[MS, MS:1000579, MS1 spectrum, ]",
+    "[MS, MS:1000580, MS2 spectrum, ]"
   )
 
-  # Determine ms_level from candidate_library
-  lib_col <- .mztab_pluck(ann, "candidate_library")
-  charge_from_adduct <- .mztab_charge_from_adduct(.mztab_pluck(
-    ann,
-    "candidate_adduct"
-  ))
-  ms_level_val <- tidytable::case_when(
-    grepl("MS1|ms1|TIMA MS1", lib_col, ignore.case = TRUE) ~
-      "[MS, MS:1000579, MS1 spectrum, ]",
-    grepl(
-      "MS2|ms2|spectral|gnps|mztab|sirius|mzmine|mzMine",
-      lib_col,
-      ignore.case = TRUE
-    ) ~
-      "[MS, MS:1000580, MS2 spectrum, ]",
-    TRUE ~ "[MS, MS:1000580, MS2 spectrum, ]"
-  )
-
-  # Format spectra_ref as ms_run[1]:{spectrum_native_id}.
-  # The mzTab-M spec requires this prefix so downstream tools can locate
-  # spectra back to the declared ms_run[1] block.
-  raw_spectra_ref <- .mztab_pluck_na(ann, "candidate_spectrum_id")
+  raw_spectra_ref <- .mztab_safe_scalar(ann[["candidate_spectrum_id"]])
   spectra_ref_formatted <- ifelse(
     raw_spectra_ref == "null" | is.na(raw_spectra_ref),
     "null",
     paste0("ms_run[1]:", raw_spectra_ref)
   )
 
-  # Resolve URIs from xrefs (prefer Wikidata, then ChEBI, then first available)
-  inchikey_col <- .mztab_pluck_na(
-    ann,
+  inchikey_col <- .mztab_safe_scalar(ann[[
     "candidate_structure_inchikey_connectivity_layer"
-  )
-  uri_col <- .mztab_pluck_na(ann, "candidate_structure_uri")
+  ]])
+  uri_col <- .mztab_safe_scalar(ann[["candidate_structure_uri"]])
   if (!is.null(xrefs_index) && length(xrefs_index) > 0L) {
     uri_from_xrefs <- vapply(
-      X = inchikey_col,
-      FUN = function(ik) {
+      inchikey_col,
+      function(ik) {
         if (is.na(ik) || ik == "null" || !nzchar(ik)) {
           return("null")
         }
@@ -354,9 +373,8 @@
         }
         .mztab_pick_best_uri(rows)
       },
-      FUN.VALUE = character(1L)
+      character(1L)
     )
-    # Override bare "null" from original uri with xref-resolved URIs
     uri_col <- ifelse(
       uri_col == "null" | is.na(uri_col),
       uri_from_xrefs,
@@ -364,72 +382,59 @@
     )
   }
 
-  # Prefer prefixed database identifiers (e.g. CHEBI:12345) when xrefs are
-  # available; otherwise fall back to the connectivity-layer InChIKey fragment.
   database_identifier_col <- inchikey_col
   if (!is.null(xrefs_index) && length(xrefs_index) > 0L) {
     database_identifier_col <- vapply(
-      X = inchikey_col,
-      FUN = function(ik) {
+      inchikey_col,
+      function(ik) {
         .mztab_pick_best_database_identifier(
           rows = xrefs_index[[ik]],
           fallback = ik
         )
       },
-      FUN.VALUE = character(1L)
+      character(1L)
     )
   }
 
-  sme <- tidytable::tidytable(
-    SME_ID = as.character(seq_len(nrow(ann))),
-    evidence_input_id = id_lookup[.mztab_pluck(ann, "feature_id")],
+  feature_ids <- .mztab_safe_scalar(ann[["feature_id"]])
+  evidence_input_id <- id_lookup[feature_ids]
+  evidence_input_id[is.na(evidence_input_id)] <- "null"
+
+  sme <- list(
+    SME_ID = seq_len(nrow(ann)),
+    evidence_input_id = evidence_input_id,
     database_identifier = database_identifier_col,
-    chemical_formula = .mztab_pluck_na(
-      ann,
+    chemical_formula = .mztab_safe_scalar(ann[[
       "candidate_structure_molecular_formula"
-    ),
-    smiles = .mztab_pluck_na(ann, "candidate_structure_smiles_no_stereo"),
-    inchi = .mztab_pluck_na(ann, "candidate_structure_inchi"),
-    chemical_name = .mztab_pluck_na(ann, "candidate_structure_name"),
+    ]]),
+    smiles = .mztab_safe_scalar(ann[["candidate_structure_smiles_no_stereo"]]),
+    inchi = .mztab_safe_scalar(ann[["candidate_structure_inchi"]]),
+    chemical_name = .mztab_safe_scalar(ann[["candidate_structure_name"]]),
     uri = uri_col,
-    derivatized_form = "null",
-    adduct_ion = .mztab_pluck_na(ann, "candidate_adduct"),
-    exp_mass_to_charge = .mztab_pluck_na(ann, "feature_mz"),
+    derivatized_form = rep("null", nrow(ann)),
+    adduct_ion = adduct_raw,
+    exp_mass_to_charge = .mztab_safe_scalar(ann[["feature_mz"]]),
     charge = charge_from_adduct,
     theoretical_mass_to_charge = theo_mz,
     spectra_ref = spectra_ref_formatted,
-    identification_method = .mztab_library_to_identification_method(.mztab_pluck(
-      ann,
-      "candidate_library"
-    )),
+    identification_method = .mztab_library_to_identification_method(lib_col),
     ms_level = ms_level_val,
-    rank = .mztab_pluck_na(ann, "rank_final"),
-    "id_confidence_measure[1]" = .mztab_pluck_na(ann, "score_final"),
-    "id_confidence_measure[2]" = .mztab_pluck_na(ann, "score_biological"),
-    "id_confidence_measure[3]" = .mztab_pluck_na(ann, "score_chemical"),
-    # [4] spectral similarity – TIMA user-namespace (TIMA:004).
-    # No PSI-MS accession covers composite metabolomics similarity scores;
-    # using the TIMA user-CV keeps the namespace consistent with measures 1-3.
-    "id_confidence_measure[4]" = .mztab_pluck_na(
-      ann,
+    rank = .mztab_safe_scalar(ann[["rank_final"]]),
+    "id_confidence_measure[1]" = .mztab_safe_scalar(ann[["score_final"]]),
+    "id_confidence_measure[2]" = .mztab_safe_scalar(ann[["score_biological"]]),
+    "id_confidence_measure[3]" = .mztab_safe_scalar(ann[["score_chemical"]]),
+    "id_confidence_measure[4]" = .mztab_safe_scalar(ann[[
       "candidate_score_similarity"
-    ),
-    feature_id = .mztab_pluck(ann, "feature_id")
+    ]]),
+    feature_id = feature_ids
   )
+  sme <- as.data.frame(sme, stringsAsFactors = FALSE, check.names = FALSE)
 
-  # Drop [4] column when no spectral similarity data is present to keep the
-  # metadata section in sync (declared only when the column is non-trivial).
   if (all(sme[["id_confidence_measure[4]"]] == "null", na.rm = TRUE)) {
     sme[["id_confidence_measure[4]"]] <- NULL
   }
 
-  # Append opt_global_* columns for unmapped candidate-level metadata
-  # Columns directly mapped to canonical mzTab SME fields or that belong
-  # semantically to the SMF (feature) level rather than SME (evidence) level.
-  # Feature-level columns are attached to the SMF section instead – they must
-  # not appear as opt_global_* in SME to avoid redundancy and consumer confusion.
   consumed_cols <- c(
-    # ── canonical SME mappings ───────────────────────────────────────────────
     "feature_id",
     "candidate_structure_molecular_formula",
     "candidate_structure_smiles_no_stereo",
@@ -445,19 +450,13 @@
     "score_final",
     "score_biological",
     "score_chemical",
-    # [4] spectral similarity → id_confidence_measure[4]
     "candidate_score_similarity",
-    # ── feature-level columns that belong in SMF, not SME ───────────────────
-    # Matched by prefix so future feature_* columns are automatically excluded.
     grep("^feature_", colnames(ann), value = TRUE),
-    # TIMA feature-level summary columns exported to SMF as opt_global_*.
     intersect(
       c("component_id", "candidates_evaluated", "candidates_best"),
       colnames(ann)
     )
   )
-  # When xrefs drive canonical database_identifier, still preserve the original
-  # TIMA InChIKey source column as opt_global_* for full reporting parity.
   if (is.null(xrefs_index) || length(xrefs_index) == 0L) {
     consumed_cols <- c(
       consumed_cols,
@@ -466,38 +465,21 @@
   }
   extra_cols <- setdiff(colnames(ann), consumed_cols)
   if (length(extra_cols) > 0L) {
-    used_names <- colnames(sme)
-
-    # Generate base names for all extra columns
     base_names <- vapply(
       extra_cols,
       .mztab_opt_colname,
       character(1L),
       USE.NAMES = FALSE
     )
-
-    # Use make.unique to efficiently handle name collisions with existing columns
-    all_candidate_names <- c(used_names, base_names)
-    unique_mapping <- make.unique(all_candidate_names, sep = "_")
-
-    # Extract the final unique names (skip the used_names prefix)
-    final_names <- unique_mapping[seq_along(base_names) + length(used_names)]
-
-    # Build mapping list
-    opt_col_mapping <- mapply(
-      function(col, out_name) list(col = col, out_name = out_name),
-      extra_cols,
-      final_names,
-      SIMPLIFY = FALSE
-    )
-
-    # Extraction and assignment
-    for (mapping in opt_col_mapping) {
-      sme[[mapping$out_name]] <- .mztab_pluck_na(ann, mapping$col)
+    final_names <- make.unique(c(colnames(sme), base_names), sep = "_")[
+      (length(colnames(sme)) + 1L):(length(colnames(sme)) + length(base_names))
+    ]
+    for (i in seq_along(extra_cols)) {
+      sme[[final_names[[i]]]] <- .mztab_safe_scalar(ann[[extra_cols[[i]]]])
     }
   }
 
-  sme
+  tidytable::as_tidytable(sme)
 }
 
 #' Build SML (Small Molecule Summary) table.
