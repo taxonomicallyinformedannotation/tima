@@ -77,23 +77,46 @@ NULL
     return(character(0))
   }
 
-  vapply(lines, function(line) {
-    if (is.na(line) || !nzchar(trimws(line))) {
-      return(line)
-    }
+  vapply(
+    lines,
+    function(line) {
+      if (is.na(line) || !nzchar(trimws(line))) {
+        return(line)
+      }
 
-    line <- sub("^\\ufeff", "", line)
-    if (!(grepl("^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)([[:space:]]|$)", line, perl = TRUE, ignore.case = TRUE))) {
-      return(line)
-    }
+      line <- sub("^\\ufeff", "", line)
+      if (
+        !(grepl(
+          "^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)([[:space:]]|$)",
+          line,
+          perl = TRUE,
+          ignore.case = TRUE
+        ))
+      ) {
+        return(line)
+      }
 
-    prefix <- sub("^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)([[:space:]]+).*$", "\\1", line, perl = TRUE, ignore.case = TRUE)
-    rest <- sub("^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)[[:space:]]+", "", line, perl = TRUE, ignore.case = TRUE)
-    if (is.na(rest) || !nzchar(rest)) {
-      return(prefix)
-    }
-    paste0(prefix, "\t", rest)
-  }, FUN.VALUE = character(1L))
+      prefix <- sub(
+        "^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)([[:space:]]+).*$",
+        "\\1",
+        line,
+        perl = TRUE,
+        ignore.case = TRUE
+      )
+      rest <- sub(
+        "^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)[[:space:]]+",
+        "",
+        line,
+        perl = TRUE,
+        ignore.case = TRUE
+      )
+      if (is.na(rest) || !nzchar(rest)) {
+        return(prefix)
+      }
+      paste0(prefix, "\t", rest)
+    },
+    FUN.VALUE = character(1L)
+  )
 }
 
 #' @keywords internal
@@ -400,9 +423,13 @@ read_mztab_tables <- function(input) {
     }
   )
   if (length(lines) > 0L) {
-    lines <- vapply(lines, function(line) {
-      sub("^\ufeff", "", line)
-    }, FUN.VALUE = character(1L))
+    lines <- vapply(
+      lines,
+      function(line) {
+        sub("^\ufeff", "", line)
+      },
+      FUN.VALUE = character(1L)
+    )
   }
 
   first_nonblank <- ""

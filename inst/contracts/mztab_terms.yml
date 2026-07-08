@@ -1,0 +1,54 @@
+metadata:
+  mzTab_version: "2.1.0-M"
+  mzTab_mode: "Summary"
+  mzTab_type: "Identification"
+
+metadata_defaults:
+  "mzTab-version": "2.1.0-M"
+  "mzTab-mode": "Summary"
+  "mzTab-type": "Identification"
+  "uri[1]": "https://github.com/taxonomicallyinformedannotation/tima"
+  "software[1]": "[, , TIMA, {{software_version}}]"
+  "software[1]-setting[1]": "https://github.com/taxonomicallyinformedannotation/tima"
+  "sample[1]-description": "TIMA metabolomics sample"
+  "study_variable_group[1]-description": "TIMA default study variable group"
+  "study_variable_group[1]-type": "[STATO, STATO:0000252, categorical variable, ]"
+  "study_variable_group[1]-datatype": "xsd:string"
+  "study_variable[1]-description": "TIMA annotation study variable"
+  "database[1]-prefix": "null"
+  "database[1]-version": "Unknown"
+  "database[1]-uri": "https://lotus.naturalproducts.net"
+  "id_confidence_measure[1]": "[TIMA, TIMA:001, TIMA combined annotation score, ]"
+  "id_confidence_measure[2]": "[TIMA, TIMA:002, TIMA biological (taxonomic context) score, ]"
+  "id_confidence_measure[3]": "[TIMA, TIMA:003, TIMA chemical (structural consistency) score, ]"
+  "id_confidence_measure[4]": "[TIMA, TIMA:004, TIMA spectral similarity score, ]"
+  "small_molecule-identification_reliability": "[MS, MS:1000932, identification reliability, ]"
+  "colunit-small_molecule": "theoretical_neutral_mass=[UO, UO:0000221, dalton, ]"
+  "colunit-small_molecule_feature": "retention_time_in_seconds=[UO, UO:0000010, second, ]"
+  "colunit-small_molecule_evidence": "id_confidence_measure[1]=[TIMA, TIMA:001, TIMA combined annotation score, ]"
+
+params:
+  polarity:
+    positive: "[MS, MS:1000130, positive scan, ]"
+    negative: "[MS, MS:1000129, negative scan, ]"
+  quantification:
+    label_free: "[MS, MS:1001834, LC-MS label-free quantitation analysis, ]"
+    peak_area: "[MS, MS:1001113, peak area, ]"
+  sample: "[, , metabolomics sample, ]"
+  assay_quantification_reagent: "[MS, MS:1002038, unlabeled sample, ]"
+  study_variable_group: "[, , annotation_group, ]"
+  default_database: "[, , LOTUS natural-product database, ]"
+
+cv_registry:
+  - label: MS
+    full_name: PSI-MS controlled vocabulary
+    version: "4.1.11"
+    uri: https://purl.obolibrary.org/obo/ms.obo
+  - label: UO
+    full_name: Units of Measurement Ontology
+    version: unknown
+    uri: https://purl.obolibrary.org/obo/uo.obo
+  - label: STATO
+    full_name: The Statistical Methods Ontology
+    version: unknown
+    uri: https://purl.obolibrary.org/obo/stato.obo

@@ -96,6 +96,11 @@ MZTAB_TERM_FALLBACKS <- list(
 }
 
 #' @keywords internal
+.get_mztab_terms_path <- function() {
+  system.file("contracts", "mztab_terms.yml", package = "tima")
+}
+
+#' @keywords internal
 .mztab_normalize_column_name <- function(x) {
   if (length(x) == 0L) {
     return(character(0))
@@ -118,8 +123,149 @@ MZTAB_TERM_FALLBACKS <- list(
 }
 
 #' @keywords internal
+.mztab_render_templates <- function(x, values) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+
+  if (is.atomic(x) && length(x) == 1L && is.character(x)) {
+    text <- x[[1L]]
+    if (!is.na(text) && nzchar(text)) {
+      pattern <- "\\{\\{([A-Za-z0-9_]+)\\}\\}"
+      matches <- gregexpr(pattern, text, perl = TRUE)
+      match_positions <- as.integer(matches[[1L]])
+      match_lengths <- attr(matches[[1L]], "match.length")
+
+      if (length(match_positions) > 0L && match_positions[[1L]] != -1L) {
+        parts <- character()
+        cursor <- 1L
+
+        for (i in seq_along(match_positions)) {
+          start <- match_positions[[i]]
+          length_ <- match_lengths[[i]]
+          if (start > cursor) {
+            parts <- c(parts, substr(text, cursor, start - 1L))
+          }
+
+          token <- substr(text, start, start + length_ - 1L)
+          key <- sub("^\\{\\{([A-Za-z0-9_]+)\\}\\}$", "\\1", token)
+          value <- values[[key]]
+          replacement <- if (
+            !is.null(value) && length(value) == 1L && !is.na(value)
+          ) {
+            as.character(value)
+          } else {
+            token
+          }
+          parts <- c(parts, replacement)
+          cursor <- start + length_
+        }
+
+        if (cursor <= nchar(text)) {
+          parts <- c(parts, substr(text, cursor, nchar(text)))
+        }
+
+        return(paste(parts, collapse = ""))
+      }
+    }
+    return(text)
+  }
+
+  if (is.list(x)) {
+    out <- lapply(x, .mztab_render_templates, values = values)
+    names(out) <- names(x)
+    return(out)
+  }
+
+  x
+}
+
+#' @keywords internal
+.mztab_read_term_catalog <- function(software_version = NULL) {
+  terms_path <- .get_mztab_terms_path()
+  if (!nzchar(terms_path) || !file.exists(terms_path)) {
+    return(.mztab_default_term_catalog(software_version))
+  }
+
+  terms <- tryCatch(
+    yaml::read_yaml(terms_path),
+    error = function(e) {
+      NULL
+    }
+  )
+  if (is.null(terms)) {
+    return(.mztab_default_term_catalog(software_version))
+  }
+
+  values <- list(
+    software_version = if (
+      is.null(software_version) || !nzchar(as.character(software_version))
+    ) {
+      "unknown"
+    } else {
+      as.character(software_version)
+    }
+  )
+
+  catalog <- .mztab_default_term_catalog(software_version)
+  if (!is.list(terms)) {
+    return(catalog)
+  }
+
+  rendered <- .mztab_render_templates(terms, values)
+  catalog$metadata <- utils::modifyList(
+    catalog$metadata,
+    rendered$metadata,
+    keep.null = TRUE
+  )
+  catalog$params <- utils::modifyList(
+    catalog$params,
+    rendered$params,
+    keep.null = TRUE
+  )
+  catalog$cv_registry <- if (
+    !is.null(rendered$cv_registry) && length(rendered$cv_registry) > 0L
+  ) {
+    registry <- rendered$cv_registry
+    has_tima <- any(vapply(
+      registry,
+      function(entry) {
+        !is.null(entry$label) && identical(entry$label, "TIMA")
+      },
+      logical(1)
+    ))
+
+    if (!has_tima) {
+      registry[[length(registry) + 1L]] <- list(
+        label = "TIMA",
+        full_name = "Taxonomically Informed Metabolite Annotation user vocabulary",
+        version = values$software_version,
+        uri = "https://github.com/taxonomicallyinformedannotation/tima"
+      )
+    }
+
+    registry
+  } else {
+    catalog$cv_registry
+  }
+  catalog$metadata_defaults <- if (!is.null(rendered$metadata_defaults)) {
+    rendered$metadata_defaults
+  } else {
+    catalog$metadata_defaults
+  }
+  catalog$metadata_entries <- if (!is.null(rendered$metadata_entries)) {
+    rendered$metadata_entries
+  } else {
+    catalog$metadata_entries
+  }
+  catalog
+}
+
+#' @keywords internal
 .mztab_default_cv_registry <- function(software_version = NULL) {
-  version <- if (is.null(software_version) || !nzchar(as.character(software_version))) {
+  version <- if (
+    is.null(software_version) || !nzchar(as.character(software_version))
+  ) {
     "unknown"
   } else {
     as.character(software_version)
@@ -139,13 +285,19 @@ MZTAB_TERM_FALLBACKS <- list(
 .mztab_default_term_catalog <- function(software_version = NULL) {
   list(
     metadata = MZTAB_TERM_FALLBACKS$metadata,
+    metadata_defaults = list(
+      `mzTab-version` = MZTAB_TERM_FALLBACKS$metadata$mzTab_version,
+      `mzTab-mode` = MZTAB_TERM_FALLBACKS$metadata$mzTab_mode,
+      `mzTab-type` = MZTAB_TERM_FALLBACKS$metadata$mzTab_type
+    ),
+    metadata_entries = list(),
     cv_registry = .mztab_default_cv_registry(software_version),
     params = MZTAB_TERM_FALLBACKS$params
   )
 }
 
 #' @keywords internal
-.mztab_schema_catalog <- function() {
+.mztab_schema_catalog <- function(software_version = NULL) {
   schema <- .load_mztab_schema()
   required_columns <- get_mztab_required_columns()
 
@@ -156,7 +308,7 @@ MZTAB_TERM_FALLBACKS <- list(
       required = MZTAB_METADATA_REQUIRED_FALLBACK,
       recommended = MZTAB_METADATA_RECOMMENDED_FALLBACK
     ),
-    terms = .mztab_default_term_catalog()
+    terms = .mztab_read_term_catalog(software_version)
   )
 }
 

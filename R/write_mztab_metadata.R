@@ -41,24 +41,38 @@
     meta <- tidytable::tidytable(key = character(0), value = character(0))
   }
 
-  catalog <- .mztab_schema_catalog()
-  software_version <- if (is.null(software_version) || !nzchar(as.character(software_version))) {
+  software_version <- if (
+    is.null(software_version) || !nzchar(as.character(software_version))
+  ) {
     "unknown"
   } else {
     as.character(software_version)
   }
+  catalog <- .mztab_schema_catalog(software_version)
 
   # ── Mandatory header fields ──────────────────────────────────────────────
-  meta <- add_default(meta, "mzTab-version", catalog$terms$metadata$mzTab_version)
-  meta <- add_default(meta, "mzTab-mode", catalog$terms$metadata$mzTab_mode)
-  meta <- add_default(meta, "mzTab-type", catalog$terms$metadata$mzTab_type)
+  meta <- add_default(
+    meta,
+    "mzTab-version",
+    catalog$terms$metadata_defaults[["mzTab-version"]]
+  )
+  meta <- add_default(
+    meta,
+    "mzTab-mode",
+    catalog$terms$metadata_defaults[["mzTab-mode"]]
+  )
+  meta <- add_default(
+    meta,
+    "mzTab-type",
+    catalog$terms$metadata_defaults[["mzTab-type"]]
+  )
   meta <- add_default(meta, "mzTab-ID", .mztab_escape(mztab_id))
   meta <- add_default(meta, "title", .mztab_escape(title))
   meta <- add_default(meta, "description", .mztab_escape(description))
   meta <- add_default(
     meta,
     "uri[1]",
-    "https://github.com/taxonomicallyinformedannotation/tima"
+    catalog$terms$metadata_defaults[["uri[1]"]]
   )
 
   # ── Controlled vocabulary registry ───────────────────────────────────────
@@ -80,14 +94,14 @@
   meta <- add_default(
     meta,
     "software[1]",
-    paste0("[, , TIMA, ", software_version, "]")
+    catalog$terms$metadata_defaults[["software[1]"]]
   )
   # Emit the canonical repository URL as a software setting so consumers can
   # look up algorithm details without relying on free-text fields.
   meta <- add_default(
     meta,
     "software[1]-setting[1]",
-    "https://github.com/taxonomicallyinformedannotation/tima"
+    catalog$terms$metadata_defaults[["software[1]-setting[1]"]]
   )
 
   if (!is.null(instrument) && nzchar(instrument) && instrument != "null") {
@@ -171,7 +185,7 @@
     if (!is.null(sample_name) && nzchar(sample_name) && sample_name != "null") {
       .mztab_escape(sample_name)
     } else {
-      "TIMA metabolomics sample"
+      catalog$terms$metadata_defaults[["sample[1]-description"]]
     }
   )
   meta <- add_default(meta, "assay[1]", "sample[1]")
@@ -192,14 +206,18 @@
   meta <- add_default(
     meta,
     "study_variable_group[1]-description",
-    "TIMA default study variable group"
+    catalog$terms$metadata_defaults[["study_variable_group[1]-description"]]
   )
   meta <- add_default(
     meta,
     "study_variable_group[1]-type",
-    "[STATO, STATO:0000252, categorical variable, ]"
+    catalog$terms$metadata_defaults[["study_variable_group[1]-type"]]
   )
-  meta <- add_default(meta, "study_variable_group[1]-datatype", "xsd:string")
+  meta <- add_default(
+    meta,
+    "study_variable_group[1]-datatype",
+    catalog$terms$metadata_defaults[["study_variable_group[1]-datatype"]]
+  )
   meta <- add_default(
     meta,
     "study_variable[1]-group_ref",
@@ -209,7 +227,7 @@
   meta <- add_default(
     meta,
     "study_variable[1]-description",
-    "TIMA annotation study variable"
+    catalog$terms$metadata_defaults[["study_variable[1]-description"]]
   )
 
   # ── database[1]: primary natural-product reference ────────────────────────
@@ -221,12 +239,20 @@
   )
   # The connectivity-layer InChIKey fragment used as database_identifier has no
   # database-specific prefix; null is the correct mzTab-M value.
-  meta <- add_default(meta, "database[1]-prefix", "null")
-  meta <- add_default(meta, "database[1]-version", "Unknown")
+  meta <- add_default(
+    meta,
+    "database[1]-prefix",
+    catalog$terms$metadata_defaults[["database[1]-prefix"]]
+  )
+  meta <- add_default(
+    meta,
+    "database[1]-version",
+    catalog$terms$metadata_defaults[["database[1]-version"]]
+  )
   meta <- add_default(
     meta,
     "database[1]-uri",
-    "https://lotus.naturalproducts.net"
+    catalog$terms$metadata_defaults[["database[1]-uri"]]
   )
 
   # ── Additional databases from xrefs (database[2], [3], …) ────────────────
@@ -265,20 +291,20 @@
   meta <- add_default(
     meta,
     "id_confidence_measure[1]",
-    "[TIMA, TIMA:001, TIMA combined annotation score, ]"
+    catalog$terms$metadata_defaults[["id_confidence_measure[1]"]]
   )
   if (has_bio) {
     meta <- add_default(
       meta,
       "id_confidence_measure[2]",
-      "[TIMA, TIMA:002, TIMA biological (taxonomic context) score, ]"
+      catalog$terms$metadata_defaults[["id_confidence_measure[2]"]]
     )
   }
   if (has_chemo) {
     meta <- add_default(
       meta,
       "id_confidence_measure[3]",
-      "[TIMA, TIMA:003, TIMA chemical (structural consistency) score, ]"
+      catalog$terms$metadata_defaults[["id_confidence_measure[3]"]]
     )
   }
   if (has_spectral) {
@@ -288,13 +314,15 @@
     meta <- add_default(
       meta,
       "id_confidence_measure[4]",
-      "[TIMA, TIMA:004, TIMA spectral similarity score, ]"
+      catalog$terms$metadata_defaults[["id_confidence_measure[4]"]]
     )
   }
   meta <- add_default(
     meta,
     "small_molecule-identification_reliability",
-    "[MS, MS:1000932, identification reliability, ]"
+    catalog$terms$metadata_defaults[[
+      "small_molecule-identification_reliability"
+    ]]
   )
 
   # ── Column unit declarations ───────────────────────────────────────────────
@@ -302,22 +330,20 @@
   meta <- add_default(
     meta,
     "colunit-small_molecule_feature",
-    "retention_time_in_seconds=[UO, UO:0000010, second, ]"
+    catalog$terms$metadata_defaults[["colunit-small_molecule_feature"]]
   )
   # SML theoretical neutral mass (UO:0000221 = dalton)
   meta <- add_default(
     meta,
     "colunit-small_molecule",
-    "theoretical_neutral_mass=[UO, UO:0000221, dalton, ]"
+    catalog$terms$metadata_defaults[["colunit-small_molecule"]]
   )
   # SME id_confidence_measure columns are dimensionless scores (0–1).
   # We document them so consumers know the scale without reading the paper.
   meta <- add_default(
     meta,
     "colunit-small_molecule_evidence",
-    paste0(
-      "id_confidence_measure[1]=[TIMA, TIMA:001, TIMA combined annotation score, ]"
-    )
+    catalog$terms$metadata_defaults[["colunit-small_molecule_evidence"]]
   )
 
   meta

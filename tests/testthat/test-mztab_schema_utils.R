@@ -106,10 +106,32 @@ test_that("mzTab schema catalog exposes shared defaults and ontology terms", {
   expect_true("required_columns" %in% names(catalog))
   expect_identical(catalog$metadata$required, MZTAB_METADATA_REQUIRED_FALLBACK)
   expect_identical(
+    catalog$terms$metadata_defaults[["mzTab-version"]],
+    MZTAB_TERM_FALLBACKS$metadata$mzTab_version
+  )
+  expect_identical(
     catalog$terms$params$polarity$positive,
     MZTAB_TERM_FALLBACKS$params$polarity$positive
   )
-  expect_true(any(vapply(catalog$terms$cv_registry, function(entry) {
-    identical(entry$label, "TIMA")
-  }, logical(1))))
+  expect_true(any(vapply(
+    catalog$terms$cv_registry,
+    function(entry) {
+      identical(entry$label, "TIMA")
+    },
+    logical(1)
+  )))
+})
+
+
+test_that("mzTab template rendering replaces catalog placeholders", {
+  rendered <- .mztab_render_templates(
+    list(
+      software = "[, , TIMA, {{software_version}}]",
+      nested = list(description = "Built with {{software_version}}")
+    ),
+    list(software_version = "1.2.3")
+  )
+
+  expect_identical(rendered$software, "[, , TIMA, 1.2.3]")
+  expect_identical(rendered$nested$description, "Built with 1.2.3")
 })
