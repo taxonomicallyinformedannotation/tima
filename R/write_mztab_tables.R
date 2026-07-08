@@ -361,39 +361,20 @@
   ]])
   uri_col <- .mztab_safe_scalar(ann[["candidate_structure_uri"]])
   if (!is.null(xrefs_index) && length(xrefs_index) > 0L) {
-    uri_from_xrefs <- vapply(
-      inchikey_col,
-      function(ik) {
-        if (is.na(ik) || ik == "null" || !nzchar(ik)) {
-          return("null")
-        }
-        rows <- xrefs_index[[ik]]
-        if (is.null(rows) || nrow(rows) == 0L) {
-          return("null")
-        }
-        .mztab_pick_best_uri(rows)
-      },
-      character(1L)
+    xref_resolved <- .mztab_resolve_xref_fields(
+      inchikeys = inchikey_col,
+      xrefs_index = xrefs_index,
+      fallback = inchikey_col
     )
+    uri_from_xrefs <- xref_resolved$uri
+    database_identifier_col <- xref_resolved$database_identifier
     uri_col <- ifelse(
       uri_col == "null" | is.na(uri_col),
       uri_from_xrefs,
       uri_col
     )
-  }
-
-  database_identifier_col <- inchikey_col
-  if (!is.null(xrefs_index) && length(xrefs_index) > 0L) {
-    database_identifier_col <- vapply(
-      inchikey_col,
-      function(ik) {
-        .mztab_pick_best_database_identifier(
-          rows = xrefs_index[[ik]],
-          fallback = ik
-        )
-      },
-      character(1L)
-    )
+  } else {
+    database_identifier_col <- inchikey_col
   }
 
   feature_ids <- .mztab_safe_scalar(ann[["feature_id"]])

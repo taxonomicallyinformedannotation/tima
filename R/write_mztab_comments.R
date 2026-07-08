@@ -444,8 +444,35 @@
     name = "KNApSAcK",
     uri = "http://www.knapsackfamily.com/knapsack_core/information.php?word=",
     prefix = "C"
+  ),
+  drugbank = list(
+    name = "DrugBank",
+    uri = "https://go.drugbank.com/drugs/",
+    prefix = "DB"
+  ),
+  chemspider = list(
+    name = "ChemSpider",
+    uri = "https://www.chemspider.com/Chemical-Structure-",
+    prefix = "CSID"
+  ),
+  surechembl = list(
+    name = "SureChEMBL",
+    uri = "https://www.surechembl.org/compound/",
+    prefix = "SCHEMBL"
   )
 )
+#' Normalize an xref prefix into the canonical internal form used by mzTab export.
+#' @keywords internal
+.mztab_normalize_xref_prefix <- function(prefix) {
+  x <- as.character(prefix)
+  x[is.na(x)] <- ""
+  x <- trimws(tolower(x))
+  x <- sub("^pubchem$", "pubchem.compound", x)
+  x <- sub("^chembl$", "chembl.compound", x)
+  x <- sub("^pubchem\\.compound$", "pubchem.compound", x)
+  x <- sub("^chembl\\.compound$", "chembl.compound", x)
+  x
+}
 
 #' Build a named list (InChIKey → data.frame) for fast xrefs look-up.
 #'
@@ -496,12 +523,93 @@
     check.names = FALSE
   )
   xrefs_df$inchikey <- as.character(xrefs_df$inchikey)
-  xrefs_df$prefix <- as.character(xrefs_df$prefix)
+  xrefs_df$prefix <- .mztab_normalize_xref_prefix(xrefs_df$prefix)
   xrefs_df$id <- as.character(xrefs_df$id)
 
-  # Index by the InChIKey connectivity layer fragment (first 14 characters).
+  # Deduplicate by connectivity-key / prefix / id to keep the index compact.
+  xrefs_df <- xrefs_df[
+    !is.na(xrefs_df$inchikey) & nzchar(xrefs_df$inchikey),
+    ,
+    drop = FALSE
+  ]
   xrefs_df$ik14 <- .mztab_connectivity_layer_key(xrefs_df$inchikey)
+  xrefs_df <- xrefs_df[
+    !is.na(xrefs_df$ik14) & nzchar(xrefs_df$ik14),
+    ,
+    drop = FALSE
+  ]
+  xrefs_df <- xrefs_df[
+    !duplicated(xrefs_df[, c("ik14", "prefix", "id")]),
+    ,
+    drop = FALSE
+  ]
+
   split(xrefs_df, xrefs_df$ik14)
+}
+
+#' Resolve xref-derived URI and database identifier values for a vector of InChIKeys.
+#'
+#' This is a memoized, vectorized wrapper around the single-row helpers so
+#' mzTab export only performs one xref lookup per unique connectivity-layer key.
+#'
+#' @param inchikeys Character vector of InChIKey connectivity-layer fragments.
+#' @param xrefs_index Named list of xref rows created by
+#'   [.mztab_build_xrefs_index()].
+#' @param fallback Optional fallback identifier vector.
+#' @return Named list with `uri` and `database_identifier` character vectors.
+#' @keywords internal
+.mztab_resolve_xref_fields <- function(
+  inchikeys,
+  xrefs_index,
+  fallback = NULL
+) {
+  inchikeys <- as.character(inchikeys)
+  n <- length(inchikeys)
+  if (n == 0L) {
+    return(list(uri = character(0), database_identifier = character(0)))
+  }
+
+  if (is.null(fallback)) {
+    fallback <- inchikeys
+  }
+  fallback <- as.character(fallback)
+  if (length(fallback) != n) {
+    fallback <- rep(fallback, length.out = n)
+  }
+
+  uri_out <- rep("null", n)
+  db_out <- rep("null", n)
+  if (is.null(xrefs_index) || length(xrefs_index) == 0L) {
+    return(list(uri = uri_out, database_identifier = db_out))
+  }
+
+  valid_idx <- !is.na(inchikeys) & nzchar(inchikeys) & inchikeys != "null"
+  if (!any(valid_idx)) {
+    return(list(uri = uri_out, database_identifier = db_out))
+  }
+
+  keys <- .mztab_connectivity_layer_key(inchikeys)
+  unique_keys <- unique(keys[valid_idx])
+  uri_lookup <- stats::setNames(rep("null", length(unique_keys)), unique_keys)
+  db_lookup <- stats::setNames(rep("null", length(unique_keys)), unique_keys)
+
+  for (key in unique_keys) {
+    rows <- xrefs_index[[key]]
+    if (is.null(rows) || nrow(rows) == 0L) {
+      next
+    }
+    row_idx <- which(keys == key)[[1L]]
+    fallback_val <- if (length(row_idx) > 0L) fallback[[row_idx]] else "null"
+    uri_lookup[[key]] <- .mztab_pick_best_uri(rows)
+    db_lookup[[key]] <- .mztab_pick_best_database_identifier(
+      rows,
+      fallback = fallback_val
+    )
+  }
+
+  uri_out[valid_idx] <- uri_lookup[match(keys[valid_idx], unique_keys)]
+  db_out[valid_idx] <- db_lookup[match(keys[valid_idx], unique_keys)]
+  list(uri = uri_out, database_identifier = db_out)
 }
 
 #' Select the "best" URI from a set of xref rows for a single compound.
@@ -518,6 +626,9 @@
     "pubchem.compound",
     "hmdb",
     "chembl.compound",
+    "drugbank",
+    "chemspider",
+    "surechembl",
     "kegg",
     "cas",
     "lipidmaps",
@@ -567,6 +678,9 @@
       "pubchem.compound",
       "hmdb",
       "chembl.compound",
+      "drugbank",
+      "chemspider",
+      "surechembl",
       "kegg",
       "cas",
       "lipidmaps",
@@ -639,6 +753,9 @@
     "pubchem.compound",
     "hmdb",
     "chembl.compound",
+    "drugbank",
+    "chemspider",
+    "surechembl",
     "kegg",
     "cas",
     "lipidmaps",
