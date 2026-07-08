@@ -584,7 +584,10 @@
     ))
   }
 
-  feature_groups <- split(seq_len(nrow(sme_src)), as.character(sme_src$feature_id))
+  feature_groups <- split(
+    seq_len(nrow(sme_src)),
+    as.character(sme_src$feature_id)
+  )
   feature_groups <- feature_groups[feature_ids]
 
   results_feature_groups <- NULL
