@@ -67,12 +67,15 @@
   }
 
   feature_ids <- as.character(results$feature_id)
-  feature_ids <- feature_ids[!is.na(feature_ids) & nzchar(feature_ids)]
+  feature_ids <- feature_ids[
+    !is.na(feature_ids) & nzchar(feature_ids) & feature_ids != "null"
+  ]
   if (length(feature_ids) == 0L) {
     return(character(0))
   }
 
-  counts <- table(feature_ids)
+  row_groups <- split(seq_len(length(feature_ids)), feature_ids)
+  counts <- lengths(row_groups)
   aligned_cols <- c(
     "database_identifier",
     "chemical_formula",
@@ -84,15 +87,11 @@
   )
 
   candidate_counts <- vapply(
-    names(counts),
-    function(fid) {
-      idx <- which(feature_ids == fid)
-      if (length(idx) == 0L) {
-        return(0L)
-      }
+    row_groups,
+    function(idx) {
       grp <- results[idx, , drop = FALSE]
       if (!all(aligned_cols %in% colnames(grp))) {
-        return(length(idx))
+        return(nrow(grp))
       }
 
       norm <- function(x) {

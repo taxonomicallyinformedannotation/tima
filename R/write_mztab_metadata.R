@@ -371,7 +371,9 @@
   }
 
   lines <- paste("MTD", meta$key, meta$value, sep = "\t")
-  writeLines(lines, con)
+  if (length(lines) > 0L) {
+    writeLines(lines, con)
+  }
   writeLines("", con)
 }
 
@@ -390,24 +392,31 @@
   writeLines(paste(header_vals, collapse = "\t"), con)
 
   # ── Data rows ──
-  # Convert table to data.frame for efficient column access
   tbl_df <- as.data.frame(tbl, stringsAsFactors = FALSE, check.names = FALSE)
-
-  # Pre-process all columns: replace NA/empty with "null"
-  row_data <- lapply(write_cols, function(col) {
-    v <- tbl_df[[col]]
-    v <- as.character(v)
-    v[is.na(v) | !nzchar(v)] <- "null"
-    v
-  })
-  if (length(row_data) == 0L) {
+  if (length(write_cols) == 0L) {
     rows <- rep(row_prefix, nrow(tbl))
   } else {
+    for (col in write_cols) {
+      if (!col %in% colnames(tbl_df)) {
+        tbl_df[[col]] <- "null"
+      }
+    }
+
+    row_data <- lapply(write_cols, function(col) {
+      v <- tbl_df[[col]]
+      v <- as.character(v)
+      v[is.na(v) | !nzchar(v)] <- "null"
+      v
+    })
+
     row_matrix <- do.call(cbind, row_data)
     row_matrix[is.na(row_matrix)] <- "null"
     rows <- apply(row_matrix, 1L, paste, collapse = "\t")
   }
-  writeLines(paste(row_prefix, rows, sep = "\t"), con)
+
+  if (length(rows) > 0L) {
+    writeLines(paste(row_prefix, rows, sep = "\t"), con)
+  }
   writeLines("", con)
 }
 

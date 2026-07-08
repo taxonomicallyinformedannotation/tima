@@ -109,21 +109,37 @@
 #' Build SMF (Small Molecule Feature) table – one row per feature_id
 #' @keywords internal
 .mztab_build_smf <- function(results) {
-  # Assign sequential integer SMF_ID to each unique feature_id.
-  feature_ids <- unique(results$feature_id[!is.na(results$feature_id)])
-
-  smf <- tidytable::tidytable(
-    SMF_ID = seq_along(feature_ids),
-    feature_id = feature_ids
+  results <- as.data.frame(
+    results,
+    stringsAsFactors = FALSE,
+    check.names = FALSE
   )
 
-  # Canonical feature columns that become proper mzTab-M SMF fields.
-  canonical_feat_cols <- c("feature_id", "feature_mz", "feature_rt")
+  feature_id_vals <- as.character(results$feature_id)
+  valid_feature <- !is.na(feature_id_vals) &
+    nzchar(feature_id_vals) &
+    feature_id_vals != "null"
+  feature_ids <- unique(feature_id_vals[valid_feature])
 
-  # All feature_* columns present in results (beyond the canonical three) are
-  # surfaced as opt_global_* in the SMF section.  They are feature-level data
-  # and must not land in the per-evidence SME section.
-  # TIMA summary columns below are also feature-level and must survive export.
+  if (length(feature_ids) == 0L) {
+    return(data.frame(
+      SMF_ID = character(0),
+      SML_ID_REFS = character(0),
+      SME_ID_REFS = character(0),
+      SME_ID_REF_ambiguity_code = character(0),
+      exp_mass_to_charge = character(0),
+      charge = character(0),
+      retention_time_in_seconds = character(0),
+      feature_id = character(0),
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    ))
+  }
+
+  first_idx <- match(feature_ids, feature_id_vals)
+  first_rows <- results[first_idx, , drop = FALSE]
+
+  canonical_feat_cols <- c("feature_id", "feature_mz", "feature_rt")
   feature_level_passthrough <- intersect(
     c("component_id", "candidates_evaluated", "candidates_best"),
     colnames(results)
@@ -136,77 +152,45 @@
     canonical_feat_cols
   )
 
-  # Attach mz, rt and any extra feature metadata from the first occurrence per
-  # feature_id in results.
-  feat_meta_cols <- c(canonical_feat_cols, extra_feat_cols)
-  feat_meta <- results |>
-    tidytable::distinct(feature_id, .keep_all = TRUE) |>
-    tidytable::select(
-      tidyselect::any_of(feat_meta_cols)
-    )
+  smf_canonical <- data.frame(
+    SMF_ID = as.character(seq_along(feature_ids)),
+    SML_ID_REFS = NA_character_,
+    SME_ID_REFS = NA_character_,
+    SME_ID_REF_ambiguity_code = "null",
+    exp_mass_to_charge = if ("feature_mz" %in% colnames(first_rows)) {
+      as.character(first_rows$feature_mz)
+    } else {
+      rep("null", length(feature_ids))
+    },
+    charge = "null",
+    retention_time_in_seconds = if ("feature_rt" %in% colnames(first_rows)) {
+      suppressWarnings(as.character(as.numeric(first_rows$feature_rt) * 60))
+    } else {
+      rep("null", length(feature_ids))
+    },
+    feature_id = feature_ids,
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
 
-  smf <- smf |>
-    tidytable::left_join(feat_meta, by = "feature_id")
-
-  # Convert RT to seconds for mzTab-M.
-  if ("feature_rt" %in% colnames(smf)) {
-    smf <- smf |>
-      tidytable::mutate(
-        retention_time_in_seconds = suppressWarnings(
-          as.character(as.numeric(feature_rt) * 60)
-        )
-      )
-  } else {
-    smf$retention_time_in_seconds <- "null"
-  }
-
-  # Build canonical portion of SMF.
-  smf_canonical <- smf |>
-    tidytable::transmute(
-      SMF_ID = as.character(SMF_ID),
-      SML_ID_REFS = NA_character_, # filled later
-      SME_ID_REFS = NA_character_, # filled later from SME feature links
-      SME_ID_REF_ambiguity_code = "null",
-      exp_mass_to_charge = if ("feature_mz" %in% colnames(smf)) {
-        feature_mz
-      } else {
-        "null"
-      },
-      charge = "null",
-      retention_time_in_seconds,
-      feature_id = feature_id
-    )
-
-  # Append opt_global_* columns for extra feature-level metadata.
-  if (length(extra_feat_cols) > 0L) {
-    used_names <- colnames(smf_canonical)
-
-    # Build all opt_global column names first
-    opt_col_mapping <- lapply(extra_feat_cols, function(col) {
-      base_name <- .mztab_opt_colname(col)
-      out_name <- base_name
-      idx <- 1L
-      while (out_name %in% used_names) {
-        idx <- idx + 1L
-        out_name <- paste0(base_name, "_", idx)
-      }
-      used_names <<- c(used_names, out_name)
-      list(col = col, out_name = out_name)
-    })
-
-    # Vectorized extraction and assignment
-    for (mapping in opt_col_mapping) {
-      col <- mapping$col
-      out_name <- mapping$out_name
-      val <- if (col %in% colnames(smf)) {
-        v <- as.character(smf[[col]])
-        v[is.na(v) | !nzchar(v) | v == "NA"] <- "null"
-        v
-      } else {
-        rep("null", nrow(smf_canonical))
-      }
-      smf_canonical[[out_name]] <- val
+  for (col in extra_feat_cols) {
+    if (col %in% colnames(first_rows)) {
+      val <- as.character(first_rows[[col]])
+      val[
+        is.na(val) | !nzchar(val) | val == "NA" | val == "null" | val == "NULL"
+      ] <- "null"
+    } else {
+      val <- rep("null", length(feature_ids))
     }
+
+    base_name <- .mztab_opt_colname(col)
+    out_name <- base_name
+    idx <- 1L
+    while (out_name %in% colnames(smf_canonical)) {
+      idx <- idx + 1L
+      out_name <- paste0(base_name, "_", idx)
+    }
+    smf_canonical[[out_name]] <- val
   }
 
   smf_canonical
@@ -565,10 +549,81 @@
     )
   }
 
-  sml_rows <- lapply(seq_along(feature_ids), function(j) {
+  sml_rows <- vector("list", length(feature_ids))
+  for (j in seq_along(feature_ids)) {
     fid <- feature_ids[[j]]
     idx <- feature_groups[[fid]]
     grp <- sme_src[idx, , drop = FALSE]
+
+    if (nrow(grp) == 1L) {
+      order_idx <- 1L
+      best_local <- 1L
+      best_score <- suppressWarnings(as.numeric(grp[[
+        "id_confidence_measure[1]"
+      ]][[1L]]))
+      if (!is.finite(best_score)) {
+        best_score <- NA_real_
+      }
+      score_val <- if (!is.na(best_score)) {
+        as.character(round(best_score, 6))
+      } else {
+        "null"
+      }
+
+      best_method <- .mztab_norm_scalar(grp$identification_method[[1L]])
+      reliability <- as.character(.mztab_score_to_reliability(
+        best_score,
+        best_method
+      ))
+
+      smf_id <- as.character(smf_id_lookup[[fid]])
+      if (is.null(smf_id) || is.na(smf_id) || !nzchar(smf_id)) {
+        smf_id <- "null"
+      }
+
+      sme_ids <- .mztab_norm_scalar(grp$SME_ID[[1L]])
+      sme_id_refs <- if (length(sme_ids) > 0L && sme_ids != "null") {
+        sme_ids
+      } else {
+        "null"
+      }
+
+      theoretical_neutral_mass <- "null"
+      if (!is.null(results_feature_groups)) {
+        ridx <- results_feature_groups[[fid]]
+        if (length(ridx) > 0L) {
+          if ("score_final" %in% colnames(results_src)) {
+            rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))
+            rs[is.na(rs)] <- -Inf
+            ridx <- ridx[order(-rs)]
+          }
+          em <- suppressWarnings(as.numeric(results_src$candidate_structure_exact_mass[ridx[[
+            1L
+          ]]]))
+          if (length(em) == 1L && is.finite(em)) {
+            theoretical_neutral_mass <- as.character(round(em, 6))
+          }
+        }
+      }
+
+      sml_rows[[j]] <- list(
+        SML_ID = as.character(j),
+        SMF_ID_REFS = smf_id,
+        SME_ID_REFS = sme_id_refs,
+        database_identifier = .mztab_norm_scalar(grp$database_identifier[[1L]]),
+        chemical_formula = .mztab_norm_scalar(grp$chemical_formula[[1L]]),
+        smiles = .mztab_norm_scalar(grp$smiles[[1L]]),
+        inchi = .mztab_norm_scalar(grp$inchi[[1L]]),
+        chemical_name = .mztab_norm_scalar(grp$chemical_name[[1L]]),
+        uri = .mztab_norm_scalar(grp$uri[[1L]]),
+        theoretical_neutral_mass = theoretical_neutral_mass,
+        adduct_ions = .mztab_norm_scalar(grp$adduct_ion[[1L]]),
+        reliability = reliability,
+        best_id_confidence_measure = "id_confidence_measure[1]",
+        best_id_evidence_value = score_val
+      )
+      next
+    }
 
     rank_num <- suppressWarnings(as.numeric(grp$rank))
     rank_num[is.na(rank_num)] <- Inf
@@ -582,7 +637,6 @@
       order_idx <- seq_len(nrow(grp))
     }
 
-    # Deduplicate identical candidate tuples while keeping a deterministic order.
     tuple_cols <- c(
       "database_identifier",
       "chemical_formula",
@@ -652,7 +706,7 @@
       }
     }
 
-    tidytable::tidytable(
+    sml_rows[[j]] <- list(
       SML_ID = as.character(j),
       SMF_ID_REFS = smf_id,
       SME_ID_REFS = sme_id_refs,
@@ -676,9 +730,10 @@
       best_id_confidence_measure = "id_confidence_measure[1]",
       best_id_evidence_value = score_val
     )
-  })
+  }
 
-  tidytable::bind_rows(sml_rows)
+  out <- data.table::rbindlist(sml_rows, use.names = TRUE, fill = TRUE)
+  as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
 }
 
 #' Read base mzTab while preserving unmanaged lines

@@ -405,76 +405,88 @@
   smf_df <- as.data.frame(smf, stringsAsFactors = FALSE, check.names = FALSE)
   sme_df <- as.data.frame(sme, stringsAsFactors = FALSE, check.names = FALSE)
 
-  # Pre-compute unique feature_ids to reduce lookups
-  unique_fids <- unique(as.character(stats::na.omit(smf_df$feature_id)))
+  smf_feature_ids <- as.character(smf_df$feature_id)
+  smf_feature_ids[
+    is.na(smf_feature_ids) |
+      !nzchar(smf_feature_ids) |
+      smf_feature_ids == "null"
+  ] <- NA_character_
 
-  # Build lookup tables for all features once
-  feature_lookup <- list()
-  for (fid in unique_fids) {
-    idx <- which(sme_df$feature_id == fid)
-    if (length(idx) > 0L) {
+  sme_feature_ids <- as.character(sme_df$feature_id)
+  sme_feature_ids[
+    is.na(sme_feature_ids) |
+      !nzchar(sme_feature_ids) |
+      sme_feature_ids == "null"
+  ] <- NA_character_
+  valid_sme_ids <- unique(sme_feature_ids[!is.na(sme_feature_ids)])
+
+  feature_lookup <- if (length(valid_sme_ids) == 0L) {
+    list()
+  } else {
+    valid_sme_idx <- which(!is.na(sme_feature_ids))
+    groups <- split(
+      valid_sme_idx,
+      factor(sme_feature_ids[valid_sme_idx], levels = valid_sme_ids)
+    )
+    lapply(groups, function(idx) {
       refs <- unique(as.character(sme_df$SME_ID[idx]))
       refs <- refs[!is.na(refs) & nzchar(refs) & refs != "null"]
 
-      if (length(refs) > 0L) {
-        db_vals <- unique(as.character(sme_df$database_identifier[idx]))
-        db_vals <- db_vals[
-          !is.na(db_vals) & nzchar(db_vals) & db_vals != "null"
-        ]
-        method_vals <- unique(as.character(sme_df$identification_method[idx]))
-        method_vals <- method_vals[
-          !is.na(method_vals) & nzchar(method_vals) & method_vals != "null"
-        ]
-
-        feature_lookup[[fid]] <- list(
-          refs = refs,
-          refs_str = paste(refs, collapse = "|"),
-          n_db = length(db_vals),
-          n_method = length(method_vals)
-        )
+      if (length(refs) == 0L) {
+        return(NULL)
       }
-    }
-  }
 
-  # Apply to each row
+      db_vals <- unique(as.character(sme_df$database_identifier[idx]))
+      db_vals <- db_vals[!is.na(db_vals) & nzchar(db_vals) & db_vals != "null"]
+      method_vals <- unique(as.character(sme_df$identification_method[idx]))
+      method_vals <- method_vals[
+        !is.na(method_vals) & nzchar(method_vals) & method_vals != "null"
+      ]
+
+      list(
+        refs = refs,
+        refs_str = paste(refs, collapse = "|"),
+        n_db = length(db_vals),
+        n_method = length(method_vals)
+      )
+    })
+  }
+  names(feature_lookup) <- valid_sme_ids
+
   smf_df$SME_ID_REFS <- "null"
   smf_df$SME_ID_REF_ambiguity_code <- "null"
 
-  for (i in seq_len(nrow(smf_df))) {
-    fid <- smf_df$feature_id[[i]]
-    if (length(fid) > 1L) {
-      fid <- fid[[1L]]
-    }
-    if (length(fid) == 0L) {
-      next
-    }
-    fid_char <- as.character(fid)
-    # Check carefully for NA and empty strings
-    if (
-      is.na(fid_char) ||
-        !nzchar(fid_char) ||
-        !(fid_char %in% names(feature_lookup))
-    ) {
-      next
-    }
+  matched_positions <- match(smf_feature_ids, names(feature_lookup))
+  has_lookup <- !is.na(matched_positions)
 
-    feature_data <- feature_lookup[[fid_char]]
-    smf_df$SME_ID_REFS[[i]] <- feature_data$refs_str
+  if (any(has_lookup)) {
+    feature_rows <- feature_lookup[matched_positions[has_lookup]]
+    smf_df$SME_ID_REFS[has_lookup] <- vapply(
+      feature_rows,
+      function(feature_data) {
+        if (is.null(feature_data)) "null" else feature_data$refs_str
+      },
+      character(1L)
+    )
 
-    if (length(feature_data$refs) > 1L) {
-      n_db <- feature_data$n_db
-      n_method <- feature_data$n_method
-      ambiguity_code <- if (n_db > 1L && n_method > 1L) {
-        "3"
-      } else if (n_db > 1L) {
-        "1"
-      } else if (n_method > 1L) {
-        "2"
-      } else {
-        "1"
-      }
-      smf_df$SME_ID_REF_ambiguity_code[[i]] <- ambiguity_code
-    }
+    ambiguity_codes <- vapply(
+      feature_rows,
+      function(feature_data) {
+        if (is.null(feature_data) || length(feature_data$refs) <= 1L) {
+          "null"
+        } else if (feature_data$n_db > 1L && feature_data$n_method > 1L) {
+          "3"
+        } else if (feature_data$n_db > 1L) {
+          "1"
+        } else if (feature_data$n_method > 1L) {
+          "2"
+        } else {
+          "1"
+        }
+      },
+      character(1L)
+    )
+    smf_df$SME_ID_REF_ambiguity_code[has_lookup] <- ambiguity_codes
   }
 
   tidytable::as_tidytable(smf_df)
@@ -546,18 +558,31 @@
 #' * 4 – unambiguous compound class only
 #' @keywords internal
 .mztab_score_to_reliability <- function(score, library) {
+  if (length(score) == 0L) {
+    return(integer(0))
+  }
+
+  if (length(library) != length(score)) {
+    library <- rep(library, length.out = length(score))
+  }
+
   is_spectral <- grepl(
     "spectral|gnps|sirius|mzmine|mztab",
     library,
     ignore.case = TRUE
   )
   score <- suppressWarnings(as.numeric(score))
-  tidytable::case_when(
-    is_spectral & !is.na(score) & score >= 0.7 ~ 1L,
-    is_spectral | (!is.na(score) & score >= 0.5) ~ 2L,
-    !is.na(score) & score >= 0.2 ~ 3L,
-    TRUE ~ 4L
-  )
+  is_na_score <- is.na(score)
+
+  out <- rep(4L, length(score))
+  cond1 <- is_spectral & !is_na_score & score >= 0.7
+  cond2 <- is_spectral | (!is_na_score & score >= 0.5)
+  cond3 <- !is_na_score & score >= 0.2
+
+  out[cond1] <- 1L
+  out[!cond1 & cond2] <- 2L
+  out[!cond1 & !cond2 & cond3] <- 3L
+  out
 }
 
 #' Build mzTab-M metadata table
