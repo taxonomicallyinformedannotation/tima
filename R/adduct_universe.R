@@ -179,8 +179,16 @@ build_adduct_universe_from_legacy <- function(
     return(empty_adduct_universe())
   }
 
-  # Canonical adduct strings for the base (for vectorised modifier application).
+  # Canonical adduct strings and base-row vectors for modifier expansion.
   base_adducts <- vapply(base_rows, function(r) r$adduct, character(1L))
+  base_n_mer <- vapply(base_rows, function(r) as.integer(r$n_mer), integer(1L))
+  base_n_iso <- vapply(base_rows, function(r) as.integer(r$n_iso), integer(1L))
+  base_z <- vapply(base_rows, function(r) as.integer(r$z), integer(1L))
+  base_adduct_mass <- vapply(
+    base_rows,
+    function(r) as.numeric(r$adduct_mass),
+    numeric(1L)
+  )
 
   # --- Pre-compute modifier masses ONCE (not per base row) ---
   cluster_masses <- vapply(
@@ -195,7 +203,16 @@ build_adduct_universe_from_legacy <- function(
   )
 
   # --- Collect all rows: base first, then modifier expansions ---
-  all_rows <- base_rows
+  n_total_rows <- length(base_rows) +
+    length(clusters) * length(base_rows) +
+    length(neutral_losses) * length(base_rows) +
+    length(clusters) * length(neutral_losses) * length(base_rows)
+  all_rows <- vector("list", n_total_rows)
+  row_idx <- 1L
+  for (ri in seq_along(base_rows)) {
+    all_rows[[row_idx]] <- base_rows[[ri]]
+    row_idx <- row_idx + 1L
+  }
 
   # Cluster-only modifier rows
   for (ci in seq_along(clusters)) {
@@ -203,21 +220,23 @@ build_adduct_universe_from_legacy <- function(
     cl_mass <- cluster_masses[[ci]]
     cl_named <- stats::setNames(1L, cl)
     new_strings <- apply_modifier_to_adducts(base_adducts, cl, "+")
-    for (ri in seq_along(base_rows)) {
-      new_a <- new_strings[[ri]]
-      if (is.na(new_a) || !nzchar(new_a)) {
-        next
-      }
-      br <- base_rows[[ri]]
-      all_rows[[length(all_rows) + 1L]] <- list(
-        adduct = new_a,
-        n_mer = br$n_mer,
-        n_iso = br$n_iso,
-        z = br$z,
-        adduct_mass = br$adduct_mass + cl_mass,
+    ok <- !is.na(new_strings) & nzchar(new_strings)
+    if (!any(ok)) {
+      next
+    }
+    base_idx <- which(ok)
+    for (ri in seq_along(base_idx)) {
+      br_idx <- base_idx[[ri]]
+      all_rows[[row_idx]] <- list(
+        adduct = new_strings[[br_idx]],
+        n_mer = base_n_mer[[br_idx]],
+        n_iso = base_n_iso[[br_idx]],
+        z = base_z[[br_idx]],
+        adduct_mass = base_adduct_mass[[br_idx]] + cl_mass,
         clusters = cl_named,
         losses = integer()
       )
+      row_idx <- row_idx + 1L
     }
   }
 
@@ -227,21 +246,23 @@ build_adduct_universe_from_legacy <- function(
     lo_mass <- loss_masses[[li]]
     lo_named <- stats::setNames(1L, lo)
     new_strings <- apply_modifier_to_adducts(base_adducts, lo, "-")
-    for (ri in seq_along(base_rows)) {
-      new_a <- new_strings[[ri]]
-      if (is.na(new_a) || !nzchar(new_a)) {
-        next
-      }
-      br <- base_rows[[ri]]
-      all_rows[[length(all_rows) + 1L]] <- list(
-        adduct = new_a,
-        n_mer = br$n_mer,
-        n_iso = br$n_iso,
-        z = br$z,
-        adduct_mass = br$adduct_mass - lo_mass,
+    ok <- !is.na(new_strings) & nzchar(new_strings)
+    if (!any(ok)) {
+      next
+    }
+    base_idx <- which(ok)
+    for (ri in seq_along(base_idx)) {
+      br_idx <- base_idx[[ri]]
+      all_rows[[row_idx]] <- list(
+        adduct = new_strings[[br_idx]],
+        n_mer = base_n_mer[[br_idx]],
+        n_iso = base_n_iso[[br_idx]],
+        z = base_z[[br_idx]],
+        adduct_mass = base_adduct_mass[[br_idx]] - lo_mass,
         clusters = integer(),
         losses = lo_named
       )
+      row_idx <- row_idx + 1L
     }
   }
 
@@ -257,21 +278,23 @@ build_adduct_universe_from_legacy <- function(
         cl_mass <- cluster_masses[[ci]]
         cl_named <- stats::setNames(1L, cl)
         new_strings <- apply_modifier_to_adducts(loss_strings, cl, "+")
-        for (ri in seq_along(base_rows)) {
-          new_a <- new_strings[[ri]]
-          if (is.na(new_a) || !nzchar(new_a)) {
-            next
-          }
-          br <- base_rows[[ri]]
-          all_rows[[length(all_rows) + 1L]] <- list(
-            adduct = new_a,
-            n_mer = br$n_mer,
-            n_iso = br$n_iso,
-            z = br$z,
-            adduct_mass = br$adduct_mass + cl_mass - lo_mass,
+        ok <- !is.na(new_strings) & nzchar(new_strings)
+        if (!any(ok)) {
+          next
+        }
+        base_idx <- which(ok)
+        for (ri in seq_along(base_idx)) {
+          br_idx <- base_idx[[ri]]
+          all_rows[[row_idx]] <- list(
+            adduct = new_strings[[br_idx]],
+            n_mer = base_n_mer[[br_idx]],
+            n_iso = base_n_iso[[br_idx]],
+            z = base_z[[br_idx]],
+            adduct_mass = base_adduct_mass[[br_idx]] + cl_mass - lo_mass,
             clusters = cl_named,
             losses = lo_named
           )
+          row_idx <- row_idx + 1L
         }
       }
     }

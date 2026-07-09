@@ -193,6 +193,20 @@ test_that("build_adduct_universe handles legacy flat list", {
   expect_true(any(grepl("H2O", u$adduct, fixed = TRUE)))
 })
 
+test_that("build_adduct_universe_from_legacy preserves modifier expansions", {
+  u <- build_adduct_universe_from_legacy(
+    adducts = "[M+H]+",
+    clusters = "H2O",
+    neutral_losses = "CO2",
+    polarity = "positive"
+  )
+
+  expect_true("[M+H]+" %in% u$adduct)
+  expect_true(any(grepl("H2O", u$adduct, fixed = TRUE)))
+  expect_true(any(grepl("CO", u$adduct, fixed = TRUE)))
+  expect_equal(nrow(u), 4L)
+})
+
 test_that("build_adduct_universe handles structured form", {
   u <- build_adduct_universe(
     adducts_list = list(

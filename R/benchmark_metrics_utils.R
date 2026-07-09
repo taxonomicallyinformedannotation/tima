@@ -29,7 +29,7 @@ NULL
   out <- vector("list", length(x))
   out[invalid] <- list(NA_character_)
 
-  if (any(!invalid)) {
+  if (!all(invalid)) {
     out[!invalid] <- lapply(x[!invalid], function(value) {
       parts <- strsplit(value, "|", fixed = TRUE)[[1L]]
       parts[nzchar(parts) & parts != "null" & parts != "NULL"]
