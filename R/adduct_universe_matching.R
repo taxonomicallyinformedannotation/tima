@@ -222,129 +222,147 @@ build_universe_transition_tables <- function(universe) {
     ))
   }
 
-  rows_to_table <- function(rows, template) {
-    if (length(rows) == 0L) {
-      return(template)
-    }
-    tidytable::as_tidytable(do.call(
-      rbind,
-      lapply(rows, function(x) {
-        as.data.frame(x, stringsAsFactors = FALSE)
-      })
-    ))
-  }
-
-  adduct_rows <- list()
-  cluster_rows <- list()
-  loss_rows <- list()
-  adduct_i <- 0L
-  cluster_i <- 0L
-  loss_i <- 0L
-
-  for (i in seq_len(nrow(lookup))) {
-    row_i <- lookup[i, ]
-    for (j in seq_len(nrow(lookup))) {
-      if (i == j) {
-        next
-      }
-      row_j <- lookup[j, ]
-      if (
-        !isTRUE(all.equal(row_i$mz_slope, row_j$mz_slope, tolerance = 1e-12))
-      ) {
-        next
-      }
-      delta <- as.numeric(row_j$mz_offset - row_i$mz_offset)
-      if (!is.finite(delta) || delta <= 0) {
-        next
-      }
-
-      if (
-        identical(row_i$cluster_key[[1L]], row_j$cluster_key[[1L]]) &&
-          identical(row_i$loss_key[[1L]], row_j$loss_key[[1L]])
-      ) {
-        adduct_i <- adduct_i + 1L
-        adduct_rows[[adduct_i]] <- list(
-          Distance = delta,
-          Group1 = row_i$adduct[[1L]],
-          Group2 = row_j$adduct[[1L]]
-        )
-      }
-
-      if (
-        row_i$n_mer[[1L]] == row_j$n_mer[[1L]] &&
-          row_i$z[[1L]] == row_j$z[[1L]] &&
-          row_i$n_iso[[1L]] == row_j$n_iso[[1L]] &&
-          identical(row_i$carrier_key[[1L]], row_j$carrier_key[[1L]]) &&
-          identical(row_i$loss_key[[1L]], row_j$loss_key[[1L]])
-      ) {
-        cluster_label <- single_component_increment(
-          from = row_i$clusters[[1L]],
-          to = row_j$clusters[[1L]]
-        )
-        if (!is.na(cluster_label) && nzchar(cluster_label)) {
-          cluster_i <- cluster_i + 1L
-          cluster_rows[[cluster_i]] <- list(
-            cluster = cluster_label,
-            mass = delta,
-            adduct = row_i$adduct[[1L]],
-            adduct_dest = row_j$adduct[[1L]]
-          )
-        }
-      }
-
-      if (
-        row_i$n_mer[[1L]] == row_j$n_mer[[1L]] &&
-          row_i$z[[1L]] == row_j$z[[1L]] &&
-          row_i$n_iso[[1L]] == row_j$n_iso[[1L]] &&
-          identical(row_i$carrier_key[[1L]], row_j$carrier_key[[1L]]) &&
-          identical(row_i$cluster_key[[1L]], row_j$cluster_key[[1L]])
-      ) {
-        loss_label <- single_component_increment(
-          from = row_j$losses[[1L]],
-          to = row_i$losses[[1L]]
-        )
-        if (!is.na(loss_label) && nzchar(loss_label)) {
-          loss_i <- loss_i + 1L
-          loss_rows[[loss_i]] <- list(
-            loss = loss_label,
-            mass = delta,
-            adduct = row_i$adduct[[1L]],
-            adduct_dest = row_j$adduct[[1L]]
-          )
-        }
-      }
-    }
-  }
-
-  list(
-    adduct_diffs = rows_to_table(
-      adduct_rows,
-      tidytable::tidytable(
+  pair_idx <- t(combn(seq_len(nrow(lookup)), 2L))
+  if (is.null(dim(pair_idx)) || nrow(pair_idx) == 0L) {
+    return(list(
+      adduct_diffs = tidytable::tidytable(
         Distance = numeric(),
         Group1 = character(),
         Group2 = character()
+      ),
+      cluster_transitions = tidytable::tidytable(
+        cluster = character(),
+        mass = numeric(),
+        adduct = character(),
+        adduct_dest = character()
+      ),
+      loss_transitions = tidytable::tidytable(
+        loss = character(),
+        mass = numeric(),
+        adduct = character(),
+        adduct_dest = character()
       )
-    ) |>
-      tidytable::distinct(Group1, Group2, Distance),
-    cluster_transitions = rows_to_table(
-      cluster_rows,
+    ))
+  }
+
+  left_idx <- pair_idx[, 1L]
+  right_idx <- pair_idx[, 2L]
+  left_rows <- lookup[left_idx, , drop = FALSE]
+  right_rows <- lookup[right_idx, , drop = FALSE]
+
+  delta <- as.numeric(right_rows$mz_offset - left_rows$mz_offset)
+  valid_delta <- is.finite(delta) & delta > 0
+  same_slope <- abs(left_rows$mz_slope - right_rows$mz_slope) <= 1e-12
+
+  adduct_keep <- valid_delta & same_slope &
+    left_rows$cluster_key == right_rows$cluster_key &
+    left_rows$loss_key == right_rows$loss_key
+  adduct_diffs <- if (any(adduct_keep)) {
+    tidytable::tidytable(
+      Distance = delta[adduct_keep],
+      Group1 = left_rows$adduct[adduct_keep],
+      Group2 = right_rows$adduct[adduct_keep]
+    )
+  } else {
+    tidytable::tidytable(
+      Distance = numeric(),
+      Group1 = character(),
+      Group2 = character()
+    )
+  }
+
+  cluster_keep <- valid_delta & same_slope &
+    left_rows$n_mer == right_rows$n_mer &
+    left_rows$z == right_rows$z &
+    left_rows$n_iso == right_rows$n_iso &
+    left_rows$carrier_key == right_rows$carrier_key &
+    left_rows$loss_key == right_rows$loss_key
+  cluster_rows <- if (any(cluster_keep)) {
+    cluster_idx <- which(cluster_keep)
+    cluster_labels <- vapply(
+      cluster_idx,
+      function(i) {
+        single_component_increment(
+          from = left_rows$clusters[[i]],
+          to = right_rows$clusters[[i]]
+        )
+      },
+      character(1L)
+    )
+    keep_labels <- !is.na(cluster_labels) & nzchar(cluster_labels)
+    if (any(keep_labels)) {
+      tidytable::tidytable(
+        cluster = cluster_labels[keep_labels],
+        mass = delta[cluster_idx[keep_labels]],
+        adduct = left_rows$adduct[cluster_idx[keep_labels]],
+        adduct_dest = right_rows$adduct[cluster_idx[keep_labels]]
+      )
+    } else {
       tidytable::tidytable(
         cluster = character(),
         mass = numeric(),
         adduct = character(),
         adduct_dest = character()
       )
-    ) |>
-      tidytable::distinct(adduct, adduct_dest, cluster, mass),
-    loss_transitions = rows_to_table(
-      loss_rows,
+    }
+  } else {
+    tidytable::tidytable(
+      cluster = character(),
+      mass = numeric(),
+      adduct = character(),
+      adduct_dest = character()
+    )
+  }
+
+  loss_keep <- valid_delta & same_slope &
+    left_rows$n_mer == right_rows$n_mer &
+    left_rows$z == right_rows$z &
+    left_rows$n_iso == right_rows$n_iso &
+    left_rows$carrier_key == right_rows$carrier_key &
+    left_rows$cluster_key == right_rows$cluster_key
+  loss_rows <- if (any(loss_keep)) {
+    loss_idx <- which(loss_keep)
+    loss_labels <- vapply(
+      loss_idx,
+      function(i) {
+        single_component_increment(
+          from = right_rows$losses[[i]],
+          to = left_rows$losses[[i]]
+        )
+      },
+      character(1L)
+    )
+    keep_labels <- !is.na(loss_labels) & nzchar(loss_labels)
+    if (any(keep_labels)) {
+      tidytable::tidytable(
+        loss = loss_labels[keep_labels],
+        mass = delta[loss_idx[keep_labels]],
+        adduct = left_rows$adduct[loss_idx[keep_labels]],
+        adduct_dest = right_rows$adduct[loss_idx[keep_labels]]
+      )
+    } else {
       tidytable::tidytable(
         loss = character(),
         mass = numeric(),
         adduct = character(),
         adduct_dest = character()
       )
-    ) |>
+    }
+  } else {
+    tidytable::tidytable(
+      loss = character(),
+      mass = numeric(),
+      adduct = character(),
+      adduct_dest = character()
+    )
+  }
+
+  list(
+    adduct_diffs = adduct_diffs |>
+      tidytable::distinct(Group1, Group2, Distance),
+    cluster_transitions = cluster_rows |>
+      tidytable::distinct(adduct, adduct_dest, cluster, mass),
+    loss_transitions = loss_rows |>
       tidytable::distinct(adduct, adduct_dest, loss, mass)
   )
 }
