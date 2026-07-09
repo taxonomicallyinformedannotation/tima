@@ -218,7 +218,7 @@ complement_metadata_structures <- function(
 
   stereo_bridge <- .build_stereo_bridge(stereo_k)
 
-  key_lookup <- .build_structure_key_lookup(
+  key_lookup <- .build_structure_key_lookup_fast(
     structure_keys = structure_keys,
     met_lookup = met_lookup,
     nam_lookup = nam_lookup,
@@ -228,7 +228,7 @@ complement_metadata_structures <- function(
   )
 
   log_debug("Key lookup: %d rows; starting final join", nrow(key_lookup))
-  table_final <- .apply_structure_enrichment(df = df, key_lookup = key_lookup)
+  table_final <- .apply_structure_enrichment_fast(df = df, key_lookup = key_lookup)
   rm(
     structure_keys,
     met_lookup,
@@ -499,6 +499,13 @@ complement_metadata_structures <- function(
 }
 
 .build_structure_keys <- function(df) {
+  if (nrow(df) == 0L) {
+    return(tidytable::tidytable(
+      candidate_structure_inchikey_no_stereo = character(0),
+      candidate_structure_inchikey_connectivity_layer = character(0)
+    ))
+  }
+
   df |>
     tidytable::distinct(
       candidate_structure_inchikey_no_stereo,
@@ -522,7 +529,22 @@ complement_metadata_structures <- function(
     )
 }
 
-.build_structure_key_lookup <- function(
+.make_structure_lookup_key <- function(no_stereo, connectivity_layer) {
+  no_stereo <- as.character(no_stereo)
+  connectivity_layer <- as.character(connectivity_layer)
+  key_sep <- "\u001f"
+
+  no_stereo[is.na(no_stereo) | !nzchar(no_stereo) | no_stereo %in% c("NA", "null")] <- NA_character_
+  connectivity_layer[is.na(connectivity_layer) | !nzchar(connectivity_layer) | connectivity_layer %in% c("NA", "null")] <- NA_character_
+
+  ifelse(
+    is.na(no_stereo) | is.na(connectivity_layer),
+    NA_character_,
+    paste0(no_stereo, key_sep, connectivity_layer)
+  )
+}
+
+.build_structure_key_lookup_fast <- function(
   structure_keys,
   met_lookup,
   nam_lookup,
@@ -530,109 +552,242 @@ complement_metadata_structures <- function(
   tax_cla,
   tax_npc
 ) {
-  structure_keys |>
-    tidytable::left_join(
-      y = met_lookup,
-      by = "candidate_structure_inchikey_no_stereo"
-    ) |>
-    tidytable::left_join(
-      y = nam_lookup,
-      by = "candidate_structure_inchikey_no_stereo"
-    ) |>
-    tidytable::left_join(
-      y = stereo_bridge,
-      by = "candidate_structure_inchikey_connectivity_layer"
-    ) |>
-    tidytable::left_join(
-      y = tax_cla,
-      by = c(".bridge_inchikey" = "candidate_structure_inchikey")
-    ) |>
-    tidytable::left_join(
-      y = tax_npc,
-      by = c(".bridge_smiles" = "candidate_structure_smiles")
-    ) |>
-    tidytable::select(-.bridge_inchikey, -.bridge_smiles) |>
-    tidytable::rename(
-      .enr_candidate_structure_molecular_formula = .lk_molecular_formula,
-      .enr_candidate_structure_exact_mass = .lk_exact_mass,
-      .enr_candidate_structure_tag = .lk_tag,
-      .enr_candidate_structure_name = .lk_name,
-      .enr_candidate_structure_xlogp = .lk_xlogp,
-      .enr_candidate_structure_tax_npc_01pat = candidate_structure_tax_npc_01pat_s,
-      .enr_candidate_structure_tax_npc_02sup = candidate_structure_tax_npc_02sup_s,
-      .enr_candidate_structure_tax_npc_03cla = candidate_structure_tax_npc_03cla_s,
-      .enr_candidate_structure_tax_cla_chemontid = candidate_structure_tax_cla_chemontid_i,
-      .enr_candidate_structure_tax_cla_01kin = candidate_structure_tax_cla_01kin_i,
-      .enr_candidate_structure_tax_cla_02sup = candidate_structure_tax_cla_02sup_i,
-      .enr_candidate_structure_tax_cla_03cla = candidate_structure_tax_cla_03cla_i,
-      .enr_candidate_structure_tax_cla_04dirpar = candidate_structure_tax_cla_04dirpar_i
+  if (nrow(structure_keys) == 0L) {
+    return(tidytable::tidytable(
+      candidate_structure_inchikey_no_stereo = character(0),
+      candidate_structure_inchikey_connectivity_layer = character(0),
+      .structure_key = character(0)
+    ))
+  }
+
+  lookup_tbl <- structure_keys |>
+    tidytable::mutate(
+      .structure_key = .make_structure_lookup_key(
+        candidate_structure_inchikey_no_stereo,
+        candidate_structure_inchikey_connectivity_layer
+      )
     )
+
+  if (nrow(met_lookup) > 0L) {
+    met_map_formula <- stats::setNames(
+      met_lookup$.lk_molecular_formula,
+      met_lookup$candidate_structure_inchikey_no_stereo
+    )
+    met_map_mass <- stats::setNames(
+      met_lookup$.lk_exact_mass,
+      met_lookup$candidate_structure_inchikey_no_stereo
+    )
+    lookup_tbl$.enr_candidate_structure_molecular_formula <- met_map_formula[
+      match(structure_keys$candidate_structure_inchikey_no_stereo, names(met_map_formula))
+    ]
+    lookup_tbl$.enr_candidate_structure_exact_mass <- met_map_mass[
+      match(structure_keys$candidate_structure_inchikey_no_stereo, names(met_map_mass))
+    ]
+  } else {
+    lookup_tbl$.enr_candidate_structure_molecular_formula <- NA_character_
+    lookup_tbl$.enr_candidate_structure_exact_mass <- NA_character_
+  }
+
+  if (nrow(nam_lookup) > 0L) {
+    nam_map_name <- stats::setNames(
+      nam_lookup$.lk_name,
+      nam_lookup$candidate_structure_inchikey_no_stereo
+    )
+    nam_map_tag <- stats::setNames(
+      nam_lookup$.lk_tag,
+      nam_lookup$candidate_structure_inchikey_no_stereo
+    )
+    nam_map_xlogp <- stats::setNames(
+      nam_lookup$.lk_xlogp,
+      nam_lookup$candidate_structure_inchikey_no_stereo
+    )
+    lookup_tbl$.enr_candidate_structure_tag <- nam_map_tag[
+      match(structure_keys$candidate_structure_inchikey_no_stereo, names(nam_map_tag))
+    ]
+    lookup_tbl$.enr_candidate_structure_name <- nam_map_name[
+      match(structure_keys$candidate_structure_inchikey_no_stereo, names(nam_map_name))
+    ]
+    lookup_tbl$.enr_candidate_structure_xlogp <- nam_map_xlogp[
+      match(structure_keys$candidate_structure_inchikey_no_stereo, names(nam_map_xlogp))
+    ]
+  } else {
+    lookup_tbl$.enr_candidate_structure_tag <- NA_character_
+    lookup_tbl$.enr_candidate_structure_name <- NA_character_
+    lookup_tbl$.enr_candidate_structure_xlogp <- NA_character_
+  }
+
+  if (nrow(stereo_bridge) > 0L) {
+    bridge_inchikey_map <- stats::setNames(
+      stereo_bridge$.bridge_inchikey,
+      stereo_bridge$candidate_structure_inchikey_connectivity_layer
+    )
+    bridge_smiles_map <- stats::setNames(
+      stereo_bridge$.bridge_smiles,
+      stereo_bridge$candidate_structure_inchikey_connectivity_layer
+    )
+    lookup_tbl$.bridge_inchikey <- bridge_inchikey_map[
+      match(structure_keys$candidate_structure_inchikey_connectivity_layer, names(bridge_inchikey_map))
+    ]
+    lookup_tbl$.bridge_smiles <- bridge_smiles_map[
+      match(structure_keys$candidate_structure_inchikey_connectivity_layer, names(bridge_smiles_map))
+    ]
+  } else {
+    lookup_tbl$.bridge_inchikey <- NA_character_
+    lookup_tbl$.bridge_smiles <- NA_character_
+  }
+
+  if (nrow(tax_cla) > 0L && "candidate_structure_inchikey" %in% names(tax_cla)) {
+    tax_cla_map_chemontid <- stats::setNames(
+      tax_cla$candidate_structure_tax_cla_chemontid_i,
+      tax_cla$candidate_structure_inchikey
+    )
+    tax_cla_map_01kin <- stats::setNames(
+      tax_cla$candidate_structure_tax_cla_01kin_i,
+      tax_cla$candidate_structure_inchikey
+    )
+    tax_cla_map_02sup <- stats::setNames(
+      tax_cla$candidate_structure_tax_cla_02sup_i,
+      tax_cla$candidate_structure_inchikey
+    )
+    tax_cla_map_03cla <- stats::setNames(
+      tax_cla$candidate_structure_tax_cla_03cla_i,
+      tax_cla$candidate_structure_inchikey
+    )
+    tax_cla_map_04dirpar <- stats::setNames(
+      tax_cla$candidate_structure_tax_cla_04dirpar_i,
+      tax_cla$candidate_structure_inchikey
+    )
+    lookup_tbl$.enr_candidate_structure_tax_cla_chemontid <- tax_cla_map_chemontid[
+      match(lookup_tbl$.bridge_inchikey, names(tax_cla_map_chemontid))
+    ]
+    lookup_tbl$.enr_candidate_structure_tax_cla_01kin <- tax_cla_map_01kin[
+      match(lookup_tbl$.bridge_inchikey, names(tax_cla_map_01kin))
+    ]
+    lookup_tbl$.enr_candidate_structure_tax_cla_02sup <- tax_cla_map_02sup[
+      match(lookup_tbl$.bridge_inchikey, names(tax_cla_map_02sup))
+    ]
+    lookup_tbl$.enr_candidate_structure_tax_cla_03cla <- tax_cla_map_03cla[
+      match(lookup_tbl$.bridge_inchikey, names(tax_cla_map_03cla))
+    ]
+    lookup_tbl$.enr_candidate_structure_tax_cla_04dirpar <- tax_cla_map_04dirpar[
+      match(lookup_tbl$.bridge_inchikey, names(tax_cla_map_04dirpar))
+    ]
+  } else {
+    lookup_tbl$.enr_candidate_structure_tax_cla_chemontid <- NA_character_
+    lookup_tbl$.enr_candidate_structure_tax_cla_01kin <- NA_character_
+    lookup_tbl$.enr_candidate_structure_tax_cla_02sup <- NA_character_
+    lookup_tbl$.enr_candidate_structure_tax_cla_03cla <- NA_character_
+    lookup_tbl$.enr_candidate_structure_tax_cla_04dirpar <- NA_character_
+  }
+
+  if (nrow(tax_npc) > 0L && "candidate_structure_smiles" %in% names(tax_npc)) {
+    tax_npc_map_01pat <- stats::setNames(
+      tax_npc$candidate_structure_tax_npc_01pat_s,
+      tax_npc$candidate_structure_smiles
+    )
+    tax_npc_map_02sup <- stats::setNames(
+      tax_npc$candidate_structure_tax_npc_02sup_s,
+      tax_npc$candidate_structure_smiles
+    )
+    tax_npc_map_03cla <- stats::setNames(
+      tax_npc$candidate_structure_tax_npc_03cla_s,
+      tax_npc$candidate_structure_smiles
+    )
+    lookup_tbl$.enr_candidate_structure_tax_npc_01pat <- tax_npc_map_01pat[
+      match(lookup_tbl$.bridge_smiles, names(tax_npc_map_01pat))
+    ]
+    lookup_tbl$.enr_candidate_structure_tax_npc_02sup <- tax_npc_map_02sup[
+      match(lookup_tbl$.bridge_smiles, names(tax_npc_map_02sup))
+    ]
+    lookup_tbl$.enr_candidate_structure_tax_npc_03cla <- tax_npc_map_03cla[
+      match(lookup_tbl$.bridge_smiles, names(tax_npc_map_03cla))
+    ]
+  } else {
+    lookup_tbl$.enr_candidate_structure_tax_npc_01pat <- NA_character_
+    lookup_tbl$.enr_candidate_structure_tax_npc_02sup <- NA_character_
+    lookup_tbl$.enr_candidate_structure_tax_npc_03cla <- NA_character_
+  }
+
+  lookup_tbl
 }
 
-.apply_structure_enrichment <- function(df, key_lookup) {
-  df |>
-    tidytable::left_join(
-      y = key_lookup,
-      by = c(
-        "candidate_structure_inchikey_no_stereo",
-        "candidate_structure_inchikey_connectivity_layer"
-      )
-    ) |>
-    tidytable::mutate(
-      candidate_structure_molecular_formula = .pick_enrichment(
-        .enr_candidate_structure_molecular_formula,
-        candidate_structure_molecular_formula
-      ),
-      candidate_structure_exact_mass = .pick_enrichment(
-        .enr_candidate_structure_exact_mass,
-        candidate_structure_exact_mass
-      ),
-      candidate_structure_xlogp = .pick_enrichment(
-        .enr_candidate_structure_xlogp,
-        candidate_structure_xlogp
-      ),
-      candidate_structure_tag = .pick_enrichment(
-        .enr_candidate_structure_tag,
-        candidate_structure_tag
-      ),
-      candidate_structure_name = .pick_enrichment(
-        .enr_candidate_structure_name,
-        candidate_structure_name
-      ),
-      candidate_structure_tax_npc_01pat = .pick_enrichment(
-        .enr_candidate_structure_tax_npc_01pat,
-        candidate_structure_tax_npc_01pat
-      ),
-      candidate_structure_tax_npc_02sup = .pick_enrichment(
-        .enr_candidate_structure_tax_npc_02sup,
-        candidate_structure_tax_npc_02sup
-      ),
-      candidate_structure_tax_npc_03cla = .pick_enrichment(
-        .enr_candidate_structure_tax_npc_03cla,
-        candidate_structure_tax_npc_03cla
-      ),
-      candidate_structure_tax_cla_chemontid = .pick_enrichment(
-        .enr_candidate_structure_tax_cla_chemontid,
-        candidate_structure_tax_cla_chemontid
-      ),
-      candidate_structure_tax_cla_01kin = .pick_enrichment(
-        .enr_candidate_structure_tax_cla_01kin,
-        candidate_structure_tax_cla_01kin
-      ),
-      candidate_structure_tax_cla_02sup = .pick_enrichment(
-        .enr_candidate_structure_tax_cla_02sup,
-        candidate_structure_tax_cla_02sup
-      ),
-      candidate_structure_tax_cla_03cla = .pick_enrichment(
-        .enr_candidate_structure_tax_cla_03cla,
-        candidate_structure_tax_cla_03cla
-      ),
-      candidate_structure_tax_cla_04dirpar = .pick_enrichment(
-        .enr_candidate_structure_tax_cla_04dirpar,
-        candidate_structure_tax_cla_04dirpar
-      )
-    ) |>
-    tidytable::select(-tidyselect::starts_with(".enr_"))
+.apply_structure_enrichment_fast <- function(df, key_lookup) {
+  if (nrow(df) == 0L) {
+    return(df)
+  }
+
+  row_keys <- .make_structure_lookup_key(
+    df$candidate_structure_inchikey_no_stereo,
+    df$candidate_structure_inchikey_connectivity_layer
+  )
+  idx <- match(row_keys, key_lookup$.structure_key)
+
+  out <- df
+  enrichment_map <- list(
+    candidate_structure_molecular_formula = c(
+      ".enr_candidate_structure_molecular_formula",
+      "candidate_structure_molecular_formula"
+    ),
+    candidate_structure_exact_mass = c(
+      ".enr_candidate_structure_exact_mass",
+      "candidate_structure_exact_mass"
+    ),
+    candidate_structure_xlogp = c(
+      ".enr_candidate_structure_xlogp",
+      "candidate_structure_xlogp"
+    ),
+    candidate_structure_tag = c(
+      ".enr_candidate_structure_tag",
+      "candidate_structure_tag"
+    ),
+    candidate_structure_name = c(
+      ".enr_candidate_structure_name",
+      "candidate_structure_name"
+    ),
+    candidate_structure_tax_npc_01pat = c(
+      ".enr_candidate_structure_tax_npc_01pat",
+      "candidate_structure_tax_npc_01pat"
+    ),
+    candidate_structure_tax_npc_02sup = c(
+      ".enr_candidate_structure_tax_npc_02sup",
+      "candidate_structure_tax_npc_02sup"
+    ),
+    candidate_structure_tax_npc_03cla = c(
+      ".enr_candidate_structure_tax_npc_03cla",
+      "candidate_structure_tax_npc_03cla"
+    ),
+    candidate_structure_tax_cla_chemontid = c(
+      ".enr_candidate_structure_tax_cla_chemontid",
+      "candidate_structure_tax_cla_chemontid"
+    ),
+    candidate_structure_tax_cla_01kin = c(
+      ".enr_candidate_structure_tax_cla_01kin",
+      "candidate_structure_tax_cla_01kin"
+    ),
+    candidate_structure_tax_cla_02sup = c(
+      ".enr_candidate_structure_tax_cla_02sup",
+      "candidate_structure_tax_cla_02sup"
+    ),
+    candidate_structure_tax_cla_03cla = c(
+      ".enr_candidate_structure_tax_cla_03cla",
+      "candidate_structure_tax_cla_03cla"
+    ),
+    candidate_structure_tax_cla_04dirpar = c(
+      ".enr_candidate_structure_tax_cla_04dirpar",
+      "candidate_structure_tax_cla_04dirpar"
+    )
+  )
+
+  for (target_col in names(enrichment_map)) {
+    enrich_col <- enrichment_map[[target_col]][[1L]]
+    existing_col <- enrichment_map[[target_col]][[2L]]
+    out[[target_col]] <- .pick_enrichment(
+      key_lookup[[enrich_col]][idx],
+      out[[existing_col]]
+    )
+  }
+
+  out
 }
 
 .ensure_structure_placeholders <- function(df) {
