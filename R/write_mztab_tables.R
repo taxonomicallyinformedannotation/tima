@@ -48,7 +48,7 @@
     return(results)
   }
 
-  # safe_fread() may return a data.table; convert once
+  # convert once
   results <- as.data.frame(
     results,
     stringsAsFactors = FALSE,
@@ -811,7 +811,11 @@
     )
   }
 
-  out <- data.table::rbindlist(sml_rows, use.names = TRUE, fill = TRUE)
+  out <- if (length(sml_rows) == 0L) {
+    data.frame()
+  } else {
+    do.call(rbind, sml_rows)
+  }
   as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
 }
 

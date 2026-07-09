@@ -69,7 +69,7 @@ build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
   reps <- reps |>
     tidytable::arrange(evidence_cluster, mz, feature_id)
 
-  # Combine multiple assignments into single data.table operation
+  # Combine multiple assignments into single operation
   reps[,
     c("feature_id_dest", "adduct_dest", "implied_M_dest") := list(
       c(as.character(feature_id[-1L]), NA_character_),

@@ -222,7 +222,7 @@ build_universe_transition_tables <- function(universe) {
     ))
   }
 
-  pair_idx <- t(combn(seq_len(nrow(lookup)), 2L))
+  pair_idx <- t(utils::combn(seq_len(nrow(lookup)), 2L))
   if (is.null(dim(pair_idx)) || nrow(pair_idx) == 0L) {
     return(list(
       adduct_diffs = tidytable::tidytable(

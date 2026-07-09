@@ -7,7 +7,7 @@
 ## usethis namespace: end
 NULL
 
-.datatable.aware <- TRUE # nolint: object_name_linter. data.table convention.
+.datatable.aware <- TRUE # nolint: object_name_linter. datatable convention.
 
 .onLoad <- function(libname, pkgname) {
   # Hints/operators to appease R CMD check and lazy loading quirks

@@ -26,6 +26,98 @@
 #'   }
 #' @keywords internal
 
+.match_tied_rows_to_anchors <- function(
+  df_tied,
+  anchor_tbl,
+  tol,
+  rt_tol,
+  has_rt_feature_col
+) {
+  if (nrow(df_tied) == 0L || nrow(anchor_tbl) == 0L) {
+    return(rep(FALSE, nrow(df_tied)))
+  }
+
+  row_dt <- data.frame(
+    row_id = seq_len(nrow(df_tied)),
+    row_IK = as.character(
+      df_tied$candidate_structure_inchikey_connectivity_layer
+    ),
+    row_fid = as.character(df_tied$feature_id),
+    row_rt = if (has_rt_feature_col) {
+      as.numeric(df_tied$rt)
+    } else {
+      NA_real_
+    },
+    row_mass = as.numeric(df_tied$.candidate_M),
+    row_lower = as.numeric(df_tied$.candidate_M) - tol,
+    row_upper = as.numeric(df_tied$.candidate_M) + tol,
+    stringsAsFactors = FALSE
+  )
+
+  anchor_dt <- data.frame(
+    anchor_IK = as.character(
+      anchor_tbl$candidate_structure_inchikey_connectivity_layer
+    ),
+    anchor_fid = as.character(anchor_tbl$feature_id),
+    anchor_rt = if (has_rt_feature_col) {
+      as.numeric(anchor_tbl$rt)
+    } else {
+      NA_real_
+    },
+    anchor_mass = as.numeric(anchor_tbl$.candidate_M),
+    stringsAsFactors = FALSE
+  )
+
+  row_dt <- row_dt[!is.na(row_dt$row_mass), ]
+  anchor_dt <- anchor_dt[
+    !is.na(anchor_dt$anchor_mass) & !is.na(anchor_dt$anchor_IK),
+  ]
+
+  if (nrow(row_dt) == 0L || nrow(anchor_dt) == 0L) {
+    return(rep(FALSE, nrow(df_tied)))
+  }
+
+  anchor_match <- rep(FALSE, nrow(row_dt))
+  for (ri in seq_len(nrow(row_dt))) {
+    if (is.na(row_dt$row_mass[[ri]]) || is.na(row_dt$row_IK[[ri]])) {
+      next
+    }
+
+    candidate_anchors <- which(
+      anchor_dt$anchor_IK == row_dt$row_IK[[ri]] &
+        anchor_dt$anchor_mass >= row_dt$row_lower[[ri]] &
+        anchor_dt$anchor_mass <= row_dt$row_upper[[ri]] &
+        anchor_dt$anchor_fid != row_dt$row_fid[[ri]]
+    )
+
+    if (length(candidate_anchors) == 0L) {
+      next
+    }
+
+    if (has_rt_feature_col && !is.na(row_dt$row_rt[[ri]])) {
+      rt_ok <- vapply(
+        candidate_anchors,
+        function(ai) {
+          rt_val <- anchor_dt$anchor_rt[[ai]]
+          is.na(rt_val) ||
+            is.na(row_dt$row_rt[[ri]]) ||
+            abs(rt_val - row_dt$row_rt[[ri]]) <= rt_tol
+        },
+        logical(1L)
+      )
+      candidate_anchors <- candidate_anchors[rt_ok]
+    }
+
+    if (length(candidate_anchors) > 0L) {
+      anchor_match[[ri]] <- TRUE
+    }
+  }
+
+  out <- rep(FALSE, nrow(df_tied))
+  out[row_dt$row_id] <- anchor_match
+  out
+}
+
 sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
   if (nrow(df) == 0L) {
     return(list(df = df, n_sampled_features = 0L))
@@ -64,10 +156,7 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
   # Without the RT gate, unrelated co-mass features at different RTs can
   # cross-anchor each of a tied group's IKs individually, leaving every
   # tied row flagged and nothing collapsed. Sorted by M for fast lookup.
-  anchor_M_vec <- numeric(0)
-  anchor_IK_vec <- character(0)
-  anchor_fid_vec <- character(0)
-  anchor_rt_vec <- numeric(0)
+  anchor_tbl <- tidytable::tidytable()
 
   if (has_ik_col && has_M_cols) {
     anchor_tbl_base <- df |>
@@ -83,28 +172,17 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
       anchor_tbl_base |>
         tidytable::select(
           .candidate_M,
-          .anchor_IK = candidate_structure_inchikey_connectivity_layer,
-          .anchor_fid = feature_id,
-          .anchor_rt = rt
+          candidate_structure_inchikey_connectivity_layer,
+          feature_id,
+          rt
         )
     } else {
       anchor_tbl_base |>
         tidytable::select(
           .candidate_M,
-          .anchor_IK = candidate_structure_inchikey_connectivity_layer,
-          .anchor_fid = feature_id
+          candidate_structure_inchikey_connectivity_layer,
+          feature_id
         )
-    }
-
-    if (nrow(anchor_tbl) > 0L) {
-      anchor_M_vec <- anchor_tbl$.candidate_M
-      anchor_IK_vec <- anchor_tbl$.anchor_IK
-      anchor_fid_vec <- as.character(anchor_tbl$.anchor_fid)
-      anchor_rt_vec <- if (has_rt_feature_col) {
-        as.numeric(anchor_tbl$.anchor_rt)
-      } else {
-        rep(NA_real_, nrow(anchor_tbl))
-      }
     }
   }
 
@@ -131,47 +209,18 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
   if (
     nrow(df_tied) > 0L &&
       has_ik_col &&
-      length(anchor_M_vec) > 0L
+      nrow(anchor_tbl) > 0L
   ) {
-    row_M <- df_tied$.candidate_M
-    row_IK <- df_tied$candidate_structure_inchikey_connectivity_layer
-    row_fid <- as.character(df_tied$feature_id)
-    row_rt <- if (has_rt_feature_col) {
-      as.numeric(df_tied$rt)
-    } else {
-      rep(NA_real_, nrow(df_tied))
-    }
     tol <- NEUTRAL_MASS_MATCH_TOLERANCE_DA
     rt_tol <- DEFAULT_HE_MAX_RT_ERROR_MIN
 
-    lo <- findInterval(row_M - tol, anchor_M_vec)
-    hi <- findInterval(row_M + tol, anchor_M_vec)
-
-    anchor_match <- logical(length(row_M))
-    for (i in seq_along(row_M)) {
-      if (is.na(row_M[[i]]) || is.na(row_IK[[i]])) {
-        next
-      }
-      from <- lo[[i]] + 1L
-      to <- hi[[i]]
-      if (from > to) {
-        next
-      }
-      rng <- from:to
-      hit <- anchor_IK_vec[rng] == row_IK[[i]] &
-        anchor_fid_vec[rng] != row_fid[[i]]
-      # RT co-elution gate: the anchor feature must elute at (within
-      # DEFAULT_HE_MAX_RT_ERROR_MIN of) the tied row's feature RT.
-      # Without this, any unrelated feature sharing M acts as an anchor.
-      if (has_rt_feature_col && !is.na(row_rt[[i]])) {
-        rt_diff <- abs(anchor_rt_vec[rng] - row_rt[[i]])
-        rt_ok <- is.na(rt_diff) | rt_diff <= rt_tol
-        hit <- hit & rt_ok
-      }
-      if (any(hit, na.rm = TRUE)) {
-        anchor_match[[i]] <- TRUE
-      }
-    }
+    anchor_match <- .match_tied_rows_to_anchors(
+      df_tied = df_tied,
+      anchor_tbl = anchor_tbl,
+      tol = tol,
+      rt_tol = rt_tol,
+      has_rt_feature_col = has_rt_feature_col
+    )
 
     df_tied <- df_tied |>
       tidytable::mutate(.anchor_match = anchor_match)

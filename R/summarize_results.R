@@ -192,33 +192,54 @@ summarize_results <- function(
       perl = TRUE
     )]
 
-    # Optimization: Use more efficient collapse function
-    collapse_fn <- function(x) {
-      gsub(
-        pattern = "\\bNA\\b",
-        replacement = "",
-        x = paste(x, collapse = "|"),
-        perl = TRUE
-      )
-    }
-
-    # Summarize all fields in one grouped pass to avoid materializing
-    # an additional wide distinct table and joining it back.
+    # Aggregate each group directly to avoid the generic
+    # tidytable across/summarize machinery on every column.
     keep_cols <- setdiff(colnames(df_joined), c("feature_id", collapse_cols))
 
-    df_final <- df_joined |>
-      tidytable::group_by(feature_id) |>
-      tidytable::summarize(
-        tidytable::across(
-          .cols = tidyselect::all_of(x = collapse_cols),
-          .fns = collapse_fn
-        ),
-        tidytable::across(
-          .cols = tidyselect::all_of(x = keep_cols),
-          .fns = .first_non_missing
+    collapse_groups <- split(seq_len(nrow(df_joined)), df_joined$feature_id)
+    collapse_res <- lapply(collapse_groups, function(idx) {
+      row_group <- df_joined[idx, , drop = FALSE]
+      stats::setNames(
+        lapply(collapse_cols, function(col) {
+          .collapse_group_values(row_group[[col]])
+        }),
+        collapse_cols
+      )
+    })
+
+    collapse_df <- do.call(
+      rbind,
+      lapply(collapse_res, function(x) {
+        as.data.frame(x, stringsAsFactors = FALSE)
+      })
+    )
+    row.names(collapse_df) <- NULL
+
+    if (length(keep_cols) > 0L) {
+      keep_groups <- lapply(collapse_groups, function(idx) {
+        row_group <- df_joined[idx, , drop = FALSE]
+        stats::setNames(
+          lapply(keep_cols, function(col) {
+            .first_non_missing(row_group[[col]])
+          }),
+          keep_cols
         )
-      ) |>
-      tidytable::ungroup()
+      })
+      keep_df <- do.call(
+        rbind,
+        lapply(keep_groups, function(x) {
+          as.data.frame(x, stringsAsFactors = FALSE)
+        })
+      )
+      row.names(keep_df) <- NULL
+      feature_ids <- names(collapse_groups)
+      collapse_df <- cbind(feature_id = feature_ids, collapse_df, keep_df)
+    } else {
+      feature_ids <- names(collapse_groups)
+      collapse_df <- cbind(feature_id = feature_ids, collapse_df)
+    }
+
+    df_final <- as.data.frame(collapse_df, stringsAsFactors = FALSE)
 
     rm(df_joined)
   } else {
@@ -389,6 +410,17 @@ summarize_results <- function(
       cols = "candidate_structure_organism_occurrence_reference"
     ) |>
     tidytable::ungroup()
+}
+
+.collapse_group_values <- function(x) {
+  x <- as.character(x)
+  x[is.na(x)] <- ""
+  gsub(
+    pattern = "\\bNA\\b",
+    replacement = "",
+    x = paste(x, collapse = "|"),
+    perl = TRUE
+  )
 }
 
 .first_non_missing <- function(x) {

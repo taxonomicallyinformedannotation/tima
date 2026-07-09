@@ -228,7 +228,10 @@ complement_metadata_structures <- function(
   )
 
   log_debug("Key lookup: %d rows; starting final join", nrow(key_lookup))
-  table_final <- .apply_structure_enrichment_fast(df = df, key_lookup = key_lookup)
+  table_final <- .apply_structure_enrichment_fast(
+    df = df,
+    key_lookup = key_lookup
+  )
   rm(
     structure_keys,
     met_lookup,
@@ -534,8 +537,14 @@ complement_metadata_structures <- function(
   connectivity_layer <- as.character(connectivity_layer)
   key_sep <- "\u001f"
 
-  no_stereo[is.na(no_stereo) | !nzchar(no_stereo) | no_stereo %in% c("NA", "null")] <- NA_character_
-  connectivity_layer[is.na(connectivity_layer) | !nzchar(connectivity_layer) | connectivity_layer %in% c("NA", "null")] <- NA_character_
+  no_stereo[
+    is.na(no_stereo) | !nzchar(no_stereo) | no_stereo %in% c("NA", "null")
+  ] <- NA_character_
+  connectivity_layer[
+    is.na(connectivity_layer) |
+      !nzchar(connectivity_layer) |
+      connectivity_layer %in% c("NA", "null")
+  ] <- NA_character_
 
   ifelse(
     is.na(no_stereo) | is.na(connectivity_layer),
@@ -578,10 +587,16 @@ complement_metadata_structures <- function(
       met_lookup$candidate_structure_inchikey_no_stereo
     )
     lookup_tbl$.enr_candidate_structure_molecular_formula <- met_map_formula[
-      match(structure_keys$candidate_structure_inchikey_no_stereo, names(met_map_formula))
+      match(
+        structure_keys$candidate_structure_inchikey_no_stereo,
+        names(met_map_formula)
+      )
     ]
     lookup_tbl$.enr_candidate_structure_exact_mass <- met_map_mass[
-      match(structure_keys$candidate_structure_inchikey_no_stereo, names(met_map_mass))
+      match(
+        structure_keys$candidate_structure_inchikey_no_stereo,
+        names(met_map_mass)
+      )
     ]
   } else {
     lookup_tbl$.enr_candidate_structure_molecular_formula <- NA_character_
@@ -602,13 +617,22 @@ complement_metadata_structures <- function(
       nam_lookup$candidate_structure_inchikey_no_stereo
     )
     lookup_tbl$.enr_candidate_structure_tag <- nam_map_tag[
-      match(structure_keys$candidate_structure_inchikey_no_stereo, names(nam_map_tag))
+      match(
+        structure_keys$candidate_structure_inchikey_no_stereo,
+        names(nam_map_tag)
+      )
     ]
     lookup_tbl$.enr_candidate_structure_name <- nam_map_name[
-      match(structure_keys$candidate_structure_inchikey_no_stereo, names(nam_map_name))
+      match(
+        structure_keys$candidate_structure_inchikey_no_stereo,
+        names(nam_map_name)
+      )
     ]
     lookup_tbl$.enr_candidate_structure_xlogp <- nam_map_xlogp[
-      match(structure_keys$candidate_structure_inchikey_no_stereo, names(nam_map_xlogp))
+      match(
+        structure_keys$candidate_structure_inchikey_no_stereo,
+        names(nam_map_xlogp)
+      )
     ]
   } else {
     lookup_tbl$.enr_candidate_structure_tag <- NA_character_
@@ -626,17 +650,25 @@ complement_metadata_structures <- function(
       stereo_bridge$candidate_structure_inchikey_connectivity_layer
     )
     lookup_tbl$.bridge_inchikey <- bridge_inchikey_map[
-      match(structure_keys$candidate_structure_inchikey_connectivity_layer, names(bridge_inchikey_map))
+      match(
+        structure_keys$candidate_structure_inchikey_connectivity_layer,
+        names(bridge_inchikey_map)
+      )
     ]
     lookup_tbl$.bridge_smiles <- bridge_smiles_map[
-      match(structure_keys$candidate_structure_inchikey_connectivity_layer, names(bridge_smiles_map))
+      match(
+        structure_keys$candidate_structure_inchikey_connectivity_layer,
+        names(bridge_smiles_map)
+      )
     ]
   } else {
     lookup_tbl$.bridge_inchikey <- NA_character_
     lookup_tbl$.bridge_smiles <- NA_character_
   }
 
-  if (nrow(tax_cla) > 0L && "candidate_structure_inchikey" %in% names(tax_cla)) {
+  if (
+    nrow(tax_cla) > 0L && "candidate_structure_inchikey" %in% names(tax_cla)
+  ) {
     tax_cla_map_chemontid <- stats::setNames(
       tax_cla$candidate_structure_tax_cla_chemontid_i,
       tax_cla$candidate_structure_inchikey
