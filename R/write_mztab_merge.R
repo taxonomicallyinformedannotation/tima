@@ -217,35 +217,32 @@
   match_idx <- match(new_keys, base_keys)
 
   # Map duplicates and collect new row indices
+  dup_idx <- which(!is.na(match_idx))
   new_row_indices <- which(is.na(match_idx))
   new_rows_count <- length(new_row_indices)
 
-  if (new_rows_count > 0L) {
-    # Process duplicates first
-    dup_idx <- !is.na(match_idx)
-    for (i in which(dup_idx)) {
-      old_id <- smf_new$SMF_ID[[i]]
-      id_map[[old_id]] <- smf_all$SMF_ID[[match_idx[[i]]]]
-    }
+  if (length(dup_idx) > 0L) {
+    old_ids <- smf_new$SMF_ID[dup_idx]
+    mapped_ids <- smf_all$SMF_ID[match_idx[dup_idx]]
+    id_map <- stats::setNames(as.list(mapped_ids), old_ids)
+  }
 
+  if (new_rows_count > 0L) {
     # Prepare new rows with batch ID assignment
     new_rows <- smf_new[new_row_indices, , drop = FALSE]
     new_rows$SMF_ID <- as.character(next_id + seq_len(new_rows_count) - 1L)
     new_rows$SML_ID_REFS <- "null"
 
     # Map new row IDs and append
-    for (j in seq_len(new_rows_count)) {
-      old_id <- smf_new$SMF_ID[[new_row_indices[j]]]
-      id_map[[old_id]] <- new_rows$SMF_ID[[j]]
+    new_old_ids <- smf_new$SMF_ID[new_row_indices]
+    new_mapped_ids <- new_rows$SMF_ID
+    if (length(id_map) > 0L) {
+      id_map <- c(id_map, stats::setNames(as.list(new_mapped_ids), new_old_ids))
+    } else {
+      id_map <- stats::setNames(as.list(new_mapped_ids), new_old_ids)
     }
 
     smf_all <- tidytable::bind_rows(smf_all, new_rows)
-  } else {
-    # Process duplicates only
-    for (i in which(!is.na(match_idx))) {
-      old_id <- smf_new$SMF_ID[[i]]
-      id_map[[old_id]] <- smf_all$SMF_ID[[match_idx[[i]]]]
-    }
   }
 
   list(smf = smf_all, id_map = id_map)
@@ -269,34 +266,31 @@
   match_idx <- match(new_keys, base_keys)
 
   # Map duplicates and collect new row indices
+  dup_idx <- which(!is.na(match_idx))
   new_row_indices <- which(is.na(match_idx))
   new_rows_count <- length(new_row_indices)
 
-  if (new_rows_count > 0L) {
-    # Process duplicates first
-    dup_idx <- !is.na(match_idx)
-    for (i in which(dup_idx)) {
-      old_id <- sme_new$SME_ID[[i]]
-      id_map[[old_id]] <- sme_all$SME_ID[[match_idx[[i]]]]
-    }
+  if (length(dup_idx) > 0L) {
+    old_ids <- sme_new$SME_ID[dup_idx]
+    mapped_ids <- sme_all$SME_ID[match_idx[dup_idx]]
+    id_map <- stats::setNames(as.list(mapped_ids), old_ids)
+  }
 
+  if (new_rows_count > 0L) {
     # Prepare new rows with batch ID assignment
     new_rows <- sme_new[new_row_indices, , drop = FALSE]
     new_rows$SME_ID <- as.character(next_id + seq_len(new_rows_count) - 1L)
 
     # Map new row IDs and append
-    for (j in seq_len(new_rows_count)) {
-      old_id <- sme_new$SME_ID[[new_row_indices[j]]]
-      id_map[[old_id]] <- new_rows$SME_ID[[j]]
+    new_old_ids <- sme_new$SME_ID[new_row_indices]
+    new_mapped_ids <- new_rows$SME_ID
+    if (length(id_map) > 0L) {
+      id_map <- c(id_map, stats::setNames(as.list(new_mapped_ids), new_old_ids))
+    } else {
+      id_map <- stats::setNames(as.list(new_mapped_ids), new_old_ids)
     }
 
     sme_all <- tidytable::bind_rows(sme_all, new_rows)
-  } else {
-    # Process duplicates only
-    for (i in which(!is.na(match_idx))) {
-      old_id <- sme_new$SME_ID[[i]]
-      id_map[[old_id]] <- sme_all$SME_ID[[match_idx[[i]]]]
-    }
   }
 
   list(sme = sme_all, id_map = id_map)
@@ -332,19 +326,28 @@
 
   # Process duplicates: merge references
   dup_idx <- which(!is.na(match_idx))
-  for (i in dup_idx) {
-    base_idx <- match_idx[[i]]
-    sml_all$SMF_ID_REFS[[base_idx]] <- .mztab_union_ref_ids(
-      sml_all$SMF_ID_REFS[[base_idx]],
-      sml_new$SMF_ID_REFS[[i]]
+  if (length(dup_idx) > 0L) {
+    base_idx <- match_idx[dup_idx]
+    sml_all$SMF_ID_REFS[base_idx] <- mapply(
+      .mztab_union_ref_ids,
+      sml_all$SMF_ID_REFS[base_idx],
+      sml_new$SMF_ID_REFS[dup_idx],
+      SIMPLIFY = TRUE,
+      USE.NAMES = FALSE
     )
-    sml_all$SME_ID_REFS[[base_idx]] <- .mztab_union_ref_ids(
-      sml_all$SME_ID_REFS[[base_idx]],
-      sml_new$SME_ID_REFS[[i]]
+    sml_all$SME_ID_REFS[base_idx] <- mapply(
+      .mztab_union_ref_ids,
+      sml_all$SME_ID_REFS[base_idx],
+      sml_new$SME_ID_REFS[dup_idx],
+      SIMPLIFY = TRUE,
+      USE.NAMES = FALSE
     )
-    sml_all$adduct_ions[[base_idx]] <- .mztab_union_ref_ids(
-      sml_all$adduct_ions[[base_idx]],
-      sml_new$adduct_ions[[i]]
+    sml_all$adduct_ions[base_idx] <- mapply(
+      .mztab_union_ref_ids,
+      sml_all$adduct_ions[base_idx],
+      sml_new$adduct_ions[dup_idx],
+      SIMPLIFY = TRUE,
+      USE.NAMES = FALSE
     )
   }
 
@@ -362,9 +365,7 @@
   refs <- stats::setNames(rep("null", nrow(smf)), smf$SMF_ID)
 
   if (nrow(sml) > 0L) {
-    smf_id_lists <- lapply(seq_len(nrow(sml)), function(i) {
-      .mztab_split_ref_ids(sml$SMF_ID_REFS[[i]])
-    })
+    smf_id_lists <- lapply(sml$SMF_ID_REFS, .mztab_split_ref_ids)
     row_counts <- lengths(smf_id_lists)
     if (any(row_counts > 0L)) {
       row_ids <- rep(seq_len(nrow(sml)), row_counts)
@@ -384,10 +385,12 @@
           },
           character(1L)
         )
-        refs[names(grouped_refs)] <- vapply(
-          names(grouped_refs),
-          function(id) .mztab_union_ref_ids(refs[[id]], grouped_refs[[id]]),
-          character(1L)
+        refs[names(grouped_refs)] <- mapply(
+          .mztab_union_ref_ids,
+          refs[names(grouped_refs)],
+          grouped_refs,
+          SIMPLIFY = TRUE,
+          USE.NAMES = FALSE
         )
       }
     }
@@ -531,10 +534,18 @@
 #' Remap pipe-separated references according to id map
 #' @keywords internal
 .mztab_remap_ref_ids <- function(x, id_map) {
+  split_ids <- lapply(x, function(one) {
+    if (is.na(one) || !nzchar(one) || one == "null") {
+      return(character(0))
+    }
+    ids <- strsplit(one, "|", fixed = TRUE)[[1L]]
+    ids <- ids[nzchar(ids) & ids != "null"]
+    unique(ids)
+  })
+
   vapply(
-    X = x,
-    FUN = function(one) {
-      ids <- .mztab_split_ref_ids(one)
+    X = split_ids,
+    FUN = function(ids) {
       if (length(ids) == 0L) {
         return("null")
       }
