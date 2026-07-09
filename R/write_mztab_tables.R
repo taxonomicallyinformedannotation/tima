@@ -495,6 +495,12 @@
     x
   }
 
+  .mztab_norm_scalar_vec <- function(x) {
+    x <- as.character(x)
+    x[is.na(x) | !nzchar(x)] <- "null"
+    x
+  }
+
   .mztab_join_aligned <- function(df, row_order, col) {
     vals <- .mztab_norm_scalar(df[[col]][row_order])
     if (length(vals) == 0L) {
@@ -536,6 +542,7 @@
     as.character(sme_src$feature_id)
   )
   feature_groups <- feature_groups[feature_ids]
+  group_sizes <- lengths(feature_groups)
 
   results_feature_groups <- NULL
   if (
@@ -547,6 +554,86 @@
       seq_len(nrow(results_src)),
       as.character(results_src$feature_id)
     )
+  }
+
+  if (all(group_sizes == 1L)) {
+    row_idx <- unlist(feature_groups[feature_ids], use.names = FALSE)
+    grp <- sme_src[row_idx, , drop = FALSE]
+    grp_feature_ids <- feature_ids
+
+    best_score <- suppressWarnings(as.numeric(grp[["id_confidence_measure[1]"]]))
+    best_score[!is.finite(best_score)] <- NA_real_
+    score_val <- ifelse(
+      is.na(best_score),
+      "null",
+      as.character(round(best_score, 6))
+    )
+
+    best_method <- .mztab_norm_scalar_vec(grp$identification_method)
+    reliability <- vapply(
+      seq_along(best_score),
+      function(i) {
+        as.character(.mztab_score_to_reliability(best_score[[i]], best_method[[i]]))
+      },
+      FUN.VALUE = character(1L)
+    )
+
+    smf_ids <- vapply(
+      grp_feature_ids,
+      function(fid) {
+        smf_id <- as.character(smf_id_lookup[[fid]])
+        if (is.null(smf_id) || is.na(smf_id) || !nzchar(smf_id)) {
+          smf_id <- "null"
+        }
+        smf_id
+      },
+      FUN.VALUE = character(1L)
+    )
+
+    sme_ids <- .mztab_norm_scalar_vec(grp$SME_ID)
+    sme_id_refs <- ifelse(sme_ids != "null", sme_ids, "null")
+
+    theoretical_neutral_mass <- rep("null", length(grp_feature_ids))
+    if (!is.null(results_feature_groups)) {
+      for (i in seq_along(grp_feature_ids)) {
+        fid <- grp_feature_ids[[i]]
+        ridx <- results_feature_groups[[fid]]
+        if (length(ridx) > 0L) {
+          if ("score_final" %in% colnames(results_src)) {
+            rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))
+            rs[is.na(rs)] <- -Inf
+            ridx <- ridx[order(-rs)]
+          }
+          em <- suppressWarnings(as.numeric(results_src$candidate_structure_exact_mass[ridx[[1L]]]))
+          if (length(em) == 1L && is.finite(em)) {
+            theoretical_neutral_mass[[i]] <- as.character(round(em, 6))
+          }
+        }
+      }
+    }
+
+    return(as.data.frame(
+      data.frame(
+        SML_ID = as.character(seq_along(grp_feature_ids)),
+        SMF_ID_REFS = smf_ids,
+        SME_ID_REFS = sme_id_refs,
+        database_identifier = .mztab_norm_scalar_vec(grp$database_identifier),
+        chemical_formula = .mztab_norm_scalar_vec(grp$chemical_formula),
+        smiles = .mztab_norm_scalar_vec(grp$smiles),
+        inchi = .mztab_norm_scalar_vec(grp$inchi),
+        chemical_name = .mztab_norm_scalar_vec(grp$chemical_name),
+        uri = .mztab_norm_scalar_vec(grp$uri),
+        theoretical_neutral_mass = theoretical_neutral_mass,
+        adduct_ions = .mztab_norm_scalar_vec(grp$adduct_ion),
+        reliability = reliability,
+        best_id_confidence_measure = "id_confidence_measure[1]",
+        best_id_evidence_value = score_val,
+        stringsAsFactors = FALSE,
+        check.names = FALSE
+      ),
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    ))
   }
 
   sml_rows <- vector("list", length(feature_ids))

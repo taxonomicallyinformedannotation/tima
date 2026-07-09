@@ -61,7 +61,37 @@
     return(character(0))
   }
 
-  results <- .mztab_expand_summarized(results)
+  has_multivalue <- FALSE
+  if (all(c(
+    "database_identifier",
+    "chemical_formula",
+    "smiles",
+    "inchi",
+    "chemical_name",
+    "uri",
+    "adduct_ions"
+  ) %in% colnames(results))) {
+    has_multivalue <- any(vapply(
+      c(
+        "database_identifier",
+        "chemical_formula",
+        "smiles",
+        "inchi",
+        "chemical_name",
+        "uri",
+        "adduct_ions"
+      ),
+      function(col) {
+        any(grepl("\\|", as.character(results[[col]]), fixed = TRUE))
+      },
+      FUN.VALUE = logical(1L)
+    ))
+  }
+
+  if (has_multivalue) {
+    results <- .mztab_expand_summarized(results)
+  }
+
   if (!"feature_id" %in% colnames(results)) {
     return(character(0))
   }
