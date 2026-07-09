@@ -154,23 +154,44 @@
       all_features
     )
 
-    for (i in seq_len(nrow(edges))) {
-      edge_label <- edges[[label_column]][[i]]
-      if (is.na(edge_label) || identical(edge_label, "")) {
-        next
-      }
-      source_feature <- edges[[name_source]][[i]]
-      target_feature <- edges[[name_target]][[i]]
-      if (
-        !is.na(source_feature) && is.na(component_membership[[source_feature]])
-      ) {
-        component_membership[[source_feature]] <- as.character(edge_label)
-      }
-      if (
-        !is.na(target_feature) && is.na(component_membership[[target_feature]])
-      ) {
-        component_membership[[target_feature]] <- as.character(edge_label)
-      }
+    edge_label_values <- as.character(edges[[label_column]])
+    edge_label_values[
+      is.na(edge_label_values) | identical(edge_label_values, "")
+    ] <- NA_character_
+
+    source_features <- as.character(edges[[name_source]])
+    target_features <- as.character(edges[[name_target]])
+
+    feature_rows <- data.frame(
+      feature = c(source_features, target_features),
+      label = c(edge_label_values, edge_label_values),
+      edge_order = rep(seq_len(nrow(edges)), each = 2L),
+      side_order = rep(c(1L, 2L), times = nrow(edges)),
+      stringsAsFactors = FALSE,
+      row.names = NULL
+    )
+    feature_rows <- feature_rows[
+      !is.na(feature_rows$feature) & nzchar(feature_rows$feature),
+      ,
+      drop = FALSE
+    ]
+    feature_rows <- feature_rows[
+      !is.na(feature_rows$label) & nzchar(feature_rows$label),
+      ,
+      drop = FALSE
+    ]
+    if (nrow(feature_rows) > 0L) {
+      feature_rows <- feature_rows[
+        order(feature_rows$edge_order, feature_rows$side_order),
+        ,
+        drop = FALSE
+      ]
+      feature_rows <- feature_rows[
+        !duplicated(feature_rows$feature),
+        ,
+        drop = FALSE
+      ]
+      component_membership[feature_rows$feature] <- feature_rows$label
     }
 
     component_membership <- component_membership[!is.na(component_membership)]

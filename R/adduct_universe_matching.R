@@ -254,7 +254,8 @@ build_universe_transition_tables <- function(universe) {
   valid_delta <- is.finite(delta) & delta > 0
   same_slope <- abs(left_rows$mz_slope - right_rows$mz_slope) <= 1e-12
 
-  adduct_keep <- valid_delta & same_slope &
+  adduct_keep <- valid_delta &
+    same_slope &
     left_rows$cluster_key == right_rows$cluster_key &
     left_rows$loss_key == right_rows$loss_key
   adduct_diffs <- if (any(adduct_keep)) {
@@ -271,7 +272,8 @@ build_universe_transition_tables <- function(universe) {
     )
   }
 
-  cluster_keep <- valid_delta & same_slope &
+  cluster_keep <- valid_delta &
+    same_slope &
     left_rows$n_mer == right_rows$n_mer &
     left_rows$z == right_rows$z &
     left_rows$n_iso == right_rows$n_iso &
@@ -314,7 +316,8 @@ build_universe_transition_tables <- function(universe) {
     )
   }
 
-  loss_keep <- valid_delta & same_slope &
+  loss_keep <- valid_delta &
+    same_slope &
     left_rows$n_mer == right_rows$n_mer &
     left_rows$z == right_rows$z &
     left_rows$n_iso == right_rows$n_iso &

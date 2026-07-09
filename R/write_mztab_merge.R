@@ -361,18 +361,32 @@
   # Initialize all references as "null"
   refs <- stats::setNames(rep("null", nrow(smf)), smf$SMF_ID)
 
-  # Process all SML rows to accumulate references
-  for (sml_row in seq_len(nrow(sml))) {
-    sml_id <- sml$SML_ID[[sml_row]]
-    smf_ids <- .mztab_split_ref_ids(sml$SMF_ID_REFS[[sml_row]])
-
-    # Update matching SMF_IDs by name lookup
-    if (length(smf_ids) > 0L) {
-      valid_ids <- smf_ids[smf_ids %in% names(refs)]
-      if (length(valid_ids) > 0L) {
-        refs[valid_ids] <- vapply(
-          refs[valid_ids],
-          function(ref) .mztab_union_ref_ids(ref, sml_id),
+  if (nrow(sml) > 0L) {
+    smf_id_lists <- lapply(seq_len(nrow(sml)), function(i) {
+      .mztab_split_ref_ids(sml$SMF_ID_REFS[[i]])
+    })
+    row_counts <- lengths(smf_id_lists)
+    if (any(row_counts > 0L)) {
+      row_ids <- rep(seq_len(nrow(sml)), row_counts)
+      smf_ids <- unlist(smf_id_lists, use.names = FALSE)
+      valid_mask <- smf_ids %in% names(refs)
+      if (any(valid_mask)) {
+        valid_smf_ids <- smf_ids[valid_mask]
+        valid_row_ids <- row_ids[valid_mask]
+        grouped_sml_ids <- split(
+          sml$SML_ID[valid_row_ids],
+          factor(valid_smf_ids, levels = unique(valid_smf_ids))
+        )
+        grouped_refs <- vapply(
+          grouped_sml_ids,
+          function(ids) {
+            paste(unique(ids), collapse = "|")
+          },
+          character(1L)
+        )
+        refs[names(grouped_refs)] <- vapply(
+          names(grouped_refs),
+          function(id) .mztab_union_ref_ids(refs[[id]], grouped_refs[[id]]),
           character(1L)
         )
       }
