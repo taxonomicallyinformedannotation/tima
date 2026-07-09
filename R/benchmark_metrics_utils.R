@@ -19,22 +19,37 @@ NULL
   (tp * tn - fp * fn) / den
 }
 
+.benchmark_split_values <- function(x) {
+  x <- as.character(x)
+  if (length(x) == 0L) {
+    return(list(NA_character_))
+  }
+
+  invalid <- is.na(x) | !nzchar(x) | x %in% c("NA", "null", "NULL")
+  out <- vector("list", length(x))
+  out[invalid] <- list(NA_character_)
+
+  if (any(!invalid)) {
+    out[!invalid] <- lapply(x[!invalid], function(value) {
+      parts <- strsplit(value, "|", fixed = TRUE)[[1L]]
+      parts[nzchar(parts) & parts != "null" & parts != "NULL"]
+    })
+  }
+
+  out
+}
+
 .benchmark_split_multivalue <- function(x) {
   if (length(x) == 0L) {
     return(NA_character_)
   }
 
-  x <- as.character(x)
-
-  if (length(x) > 1L) {
-    return(unlist(lapply(x, .benchmark_split_multivalue), use.names = FALSE))
+  split_vals <- .benchmark_split_values(x)
+  if (length(split_vals) == 1L) {
+    return(split_vals[[1L]])
   }
 
-  if (is.na(x) || !nzchar(x) || x %in% c("NA", "null", "NULL")) {
-    return(NA_character_)
-  }
-
-  strsplit(x, "|", fixed = TRUE)[[1L]]
+  unlist(split_vals, use.names = FALSE)
 }
 
 .benchmark_pad_to <- function(x, n) {
@@ -52,34 +67,46 @@ NULL
     return(tidytable::tidytable())
   }
 
-  out <- lapply(seq_len(nrow(df)), function(i) {
-    ik <- .benchmark_split_multivalue(df$candidate_structure_inchikey_connectivity_layer[[
-      i
-    ]])
-    rk <- if ("rank_final" %in% colnames(df)) {
-      .benchmark_split_multivalue(df$rank_final[[i]])
-    } else {
-      NA_character_
-    }
-    sc <- if ("score_final" %in% colnames(df)) {
-      .benchmark_split_multivalue(df$score_final[[i]])
-    } else {
-      NA_character_
-    }
+  ik_parts <- .benchmark_split_values(
+    df$candidate_structure_inchikey_connectivity_layer
+  )
+  rk_parts <- if ("rank_final" %in% colnames(df)) {
+    .benchmark_split_values(df$rank_final)
+  } else {
+    rep(list(NA_character_), nrow(df))
+  }
+  sc_parts <- if ("score_final" %in% colnames(df)) {
+    .benchmark_split_values(df$score_final)
+  } else {
+    rep(list(NA_character_), nrow(df))
+  }
 
-    n <- max(length(ik), length(rk), length(sc), 1L)
+  n_per_row <- pmax(
+    lengths(ik_parts),
+    lengths(rk_parts),
+    lengths(sc_parts),
+    1L
+  )
 
-    data.frame(
-      feature_id = rep(as.character(df$feature_id[[i]]), n),
-      candidate_ik = .benchmark_pad_to(ik, n),
-      rank_final = .benchmark_pad_to(rk, n),
-      score_final = .benchmark_pad_to(sc, n),
-      prediction = pred_name,
-      stringsAsFactors = FALSE
-    )
-  })
+  out <- data.frame(
+    feature_id = rep(as.character(df$feature_id), times = n_per_row),
+    candidate_ik = unlist(
+      Map(.benchmark_pad_to, ik_parts, n_per_row),
+      use.names = FALSE
+    ),
+    rank_final = unlist(
+      Map(.benchmark_pad_to, rk_parts, n_per_row),
+      use.names = FALSE
+    ),
+    score_final = unlist(
+      Map(.benchmark_pad_to, sc_parts, n_per_row),
+      use.names = FALSE
+    ),
+    prediction = rep(pred_name, sum(n_per_row)),
+    stringsAsFactors = FALSE
+  )
 
-  tidytable::as_tidytable(tidytable::bind_rows(out)) |>
+  tidytable::as_tidytable(out) |>
     tidytable::mutate(
       candidate_ik = gsub("-.*", "", candidate_ik, perl = TRUE),
       candidate_ik = tidytable::na_if(candidate_ik, "")
