@@ -211,40 +211,42 @@ calculate_mass_of_m_batch <- function(
 
   unique_adducts <- unique(adducts[!is.na(adducts)])
 
-  # Pre-compute index mapping instead of using which() for each adduct
-  # which() is O(n), and doing it for each unique adduct is O(n·k) where k = unique count
-  # Using match() gives us O(n) total
-  adduct_idx_map <- match(adducts, unique_adducts)
+  # Pre-compute a compact index mapping once and then use grouped indexing.
+  # This avoids repeatedly scanning the whole vector for each adduct.
+  if (length(unique_adducts) > 0L) {
+    adduct_idx_map <- match(adducts, unique_adducts)
+    valid_idx <- which(!is.na(adducts))
+    idx_groups <- split(valid_idx, adduct_idx_map[valid_idx])
 
-  for (i in seq_along(unique_adducts)) {
-    a <- unique_adducts[[i]]
-    parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
-    if (is.null(parsed) || all(parsed == 0L)) {
-      next
-    }
-    n_charges <- parsed[["n_charges"]]
-    charge_sign <- parsed[["charge"]]
-    n_mer <- parsed[["n_mer"]]
-    n_iso <- parsed[["n_iso"]]
-    mass_mods <- parsed[["los_add_clu"]]
-    if (n_mer == 0L || n_charges == 0L) {
-      next
-    }
+    for (i in seq_along(unique_adducts)) {
+      a <- unique_adducts[[i]]
+      parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
+      if (is.null(parsed) || all(parsed == 0L)) {
+        next
+      }
+      n_charges <- parsed[["n_charges"]]
+      charge_sign <- parsed[["charge"]]
+      n_mer <- parsed[["n_mer"]]
+      n_iso <- parsed[["n_iso"]]
+      mass_mods <- parsed[["los_add_clu"]]
+      if (n_mer == 0L || n_charges == 0L) {
+        next
+      }
 
-    # Use pre-computed index map (O(n) instead of O(n²))
-    idx <- which(adduct_idx_map == i & !is.na(adducts))
-    if (length(idx) == 0L) {
-      next
+      idx <- idx_groups[[i]]
+      if (length(idx) == 0L) {
+        next
+      }
+      mz_sub <- mzs[idx]
+      iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
+      z_signed <- n_charges * charge_sign
+      masses <- (n_charges *
+        (mz_sub - iso_shift) -
+        mass_mods +
+        z_signed * electron_mass) /
+        n_mer
+      out[idx] <- masses
     }
-    mz_sub <- mzs[idx]
-    iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
-    z_signed <- n_charges * charge_sign
-    masses <- (n_charges *
-      (mz_sub - iso_shift) -
-      mass_mods +
-      z_signed * electron_mass) /
-      n_mer
-    out[idx] <- masses
   }
   out
 }
@@ -288,36 +290,39 @@ calculate_mz_from_mass_batch <- function(
   unique_adducts <- unique(adduct_vals[
     !is.na(adduct_vals) & nzchar(adduct_vals)
   ])
-  adduct_idx_map <- match(adduct_vals, unique_adducts)
+  if (length(unique_adducts) > 0L) {
+    adduct_idx_map <- match(adduct_vals, unique_adducts)
+    idx_groups <- split(seq_along(adduct_idx_map), adduct_idx_map)
 
-  for (i in seq_along(unique_adducts)) {
-    a <- unique_adducts[[i]]
-    parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
-    if (is.null(parsed) || all(parsed == 0L)) {
-      next
-    }
-    n_charges <- parsed[["n_charges"]]
-    charge_sign <- parsed[["charge"]]
-    n_mer <- parsed[["n_mer"]]
-    n_iso <- parsed[["n_iso"]]
-    mass_mods <- parsed[["los_add_clu"]]
-    if (n_charges == 0L) {
-      next
-    }
+    for (i in seq_along(unique_adducts)) {
+      a <- unique_adducts[[i]]
+      parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
+      if (is.null(parsed) || all(parsed == 0L)) {
+        next
+      }
+      n_charges <- parsed[["n_charges"]]
+      charge_sign <- parsed[["charge"]]
+      n_mer <- parsed[["n_mer"]]
+      n_iso <- parsed[["n_iso"]]
+      mass_mods <- parsed[["los_add_clu"]]
+      if (n_charges == 0L) {
+        next
+      }
 
-    idx <- which(adduct_idx_map == i)
-    if (length(idx) == 0L) {
-      next
+      idx <- idx_groups[[i]]
+      if (length(idx) == 0L) {
+        next
+      }
+      mz_sub <- (neutral_vals[idx] *
+        n_mer +
+        mass_mods -
+        (n_charges * charge_sign) * electron_mass) /
+        n_charges +
+        n_iso * ISOTOPE_MASS_SHIFT_DALTONS
+      out_valid <- out[valid_idx]
+      out_valid[idx] <- mz_sub
+      out[valid_idx] <- out_valid
     }
-    mz_sub <- (neutral_vals[idx] *
-      n_mer +
-      mass_mods -
-      (n_charges * charge_sign) * electron_mass) /
-      n_charges +
-      n_iso * ISOTOPE_MASS_SHIFT_DALTONS
-    out_valid <- out[valid_idx]
-    out_valid[idx] <- mz_sub
-    out[valid_idx] <- out_valid
   }
   out
 }
