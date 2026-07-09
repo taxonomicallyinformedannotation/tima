@@ -62,15 +62,20 @@
   }
 
   has_multivalue <- FALSE
-  if (all(c(
-    "database_identifier",
-    "chemical_formula",
-    "smiles",
-    "inchi",
-    "chemical_name",
-    "uri",
-    "adduct_ions"
-  ) %in% colnames(results))) {
+  if (
+    all(
+      c(
+        "database_identifier",
+        "chemical_formula",
+        "smiles",
+        "inchi",
+        "chemical_name",
+        "uri",
+        "adduct_ions"
+      ) %in%
+        colnames(results)
+    )
+  ) {
     has_multivalue <- any(vapply(
       c(
         "database_identifier",
@@ -104,6 +109,31 @@
     return(character(0))
   }
 
+  if (!has_multivalue) {
+    counts <- tabulate(factor(feature_ids, levels = unique(feature_ids)))
+    n_features <- length(counts)
+    bins <- c(
+      `1` = sum(counts == 1L),
+      `2` = sum(counts == 2L),
+      `3+` = sum(counts >= 3L)
+    )
+    return(c(
+      paste0(
+        "COM\tTIMA ambiguity\tfeatures=",
+        n_features,
+        "; candidate_rows=",
+        length(feature_ids),
+        "; 1-candidate=",
+        unname(bins[["1"]]),
+        "; 2-candidate=",
+        unname(bins[["2"]]),
+        "; 3+-candidate=",
+        unname(bins[["3+"]]),
+        "; max-candidate=1"
+      ),
+      "COM\tTIMA ambiguity\taligned_fields=database_identifier|chemical_formula|smiles|inchi|chemical_name|uri|adduct_ions; cardinality_verified=TRUE"
+    ))
+  }
   row_groups <- split(seq_len(length(feature_ids)), feature_ids)
   counts <- lengths(row_groups)
   aligned_cols <- c(

@@ -561,7 +561,9 @@
     grp <- sme_src[row_idx, , drop = FALSE]
     grp_feature_ids <- feature_ids
 
-    best_score <- suppressWarnings(as.numeric(grp[["id_confidence_measure[1]"]]))
+    best_score <- suppressWarnings(as.numeric(grp[[
+      "id_confidence_measure[1]"
+    ]]))
     best_score[!is.finite(best_score)] <- NA_real_
     score_val <- ifelse(
       is.na(best_score),
@@ -570,25 +572,13 @@
     )
 
     best_method <- .mztab_norm_scalar_vec(grp$identification_method)
-    reliability <- vapply(
-      seq_along(best_score),
-      function(i) {
-        as.character(.mztab_score_to_reliability(best_score[[i]], best_method[[i]]))
-      },
-      FUN.VALUE = character(1L)
-    )
+    reliability <- as.character(.mztab_score_to_reliability(
+      best_score,
+      best_method
+    ))
 
-    smf_ids <- vapply(
-      grp_feature_ids,
-      function(fid) {
-        smf_id <- as.character(smf_id_lookup[[fid]])
-        if (is.null(smf_id) || is.na(smf_id) || !nzchar(smf_id)) {
-          smf_id <- "null"
-        }
-        smf_id
-      },
-      FUN.VALUE = character(1L)
-    )
+    smf_ids <- as.character(smf_id_lookup[grp_feature_ids])
+    smf_ids[is.na(smf_ids) | !nzchar(smf_ids)] <- "null"
 
     sme_ids <- .mztab_norm_scalar_vec(grp$SME_ID)
     sme_id_refs <- ifelse(sme_ids != "null", sme_ids, "null")
@@ -604,7 +594,9 @@
             rs[is.na(rs)] <- -Inf
             ridx <- ridx[order(-rs)]
           }
-          em <- suppressWarnings(as.numeric(results_src$candidate_structure_exact_mass[ridx[[1L]]]))
+          em <- suppressWarnings(as.numeric(results_src$candidate_structure_exact_mass[ridx[[
+            1L
+          ]]]))
           if (length(em) == 1L && is.finite(em)) {
             theoretical_neutral_mass[[i]] <- as.character(round(em, 6))
           }
