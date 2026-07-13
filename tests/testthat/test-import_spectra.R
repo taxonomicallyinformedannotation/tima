@@ -122,6 +122,37 @@ test_that("import_spectra parses FEATURE_ID from TITLE when missing explicit IDs
   expect_identical(result$FEATURE_ID[[1]], "42")
 })
 
+test_that("import_spectra harmonizes precursor_mz metadata", {
+  spec_rds <- withr::local_tempfile(fileext = ".rds")
+  spectra <- make_test_spectra(data.frame(
+    precursor_mz = 123.45,
+    precursorCharge = 1L,
+    mz = I(list(c(50, 75, 100))),
+    intensity = I(list(c(10, 20, 30)))
+  ))
+  base::saveRDS(spectra, file = spec_rds)
+
+  result <- import_spectra(file = spec_rds, sanitize = FALSE, combine = FALSE)
+  expect_equal(length(result), 1L)
+  expect_identical(as.numeric(result$precursorMz[[1]]), 123.45)
+})
+
+test_that("import_spectra normalizes precursor_mz metadata to precursorMz", {
+  spec_rds <- withr::local_tempfile(fileext = ".rds")
+  spectra <- make_test_spectra(data.frame(
+    precursor_mz = 111.1,
+    precursorCharge = 1L,
+    mz = I(list(c(10, 20, 30))),
+    intensity = I(list(c(100, 80, 60)))
+  ))
+  base::saveRDS(spectra, file = spec_rds)
+
+  result <- import_spectra(file = spec_rds, sanitize = FALSE, combine = FALSE)
+  expect_s4_class(result, "Spectra")
+  expect_true("precursorMz" %in% colnames(result@backend@spectraData))
+  expect_identical(result$precursorMz[[1]], 111.1)
+})
+
 test_that("import_spectra filters by polarity when requested", {
   spec_rds <- withr::local_tempfile(fileext = ".rds")
   spectra <- make_test_spectra(data.frame(
@@ -159,6 +190,35 @@ test_that("import_spectra validates non-negative cutoff", {
     import_spectra(file = tmp, cutoff = -1),
     "cutoff intensity must be non-negative",
     class = "tima_validation_error"
+  )
+})
+
+test_that("import_spectra skips sanitize work for RDS files when disabled", {
+  spec_rds <- withr::local_tempfile(fileext = ".rds")
+  spectra <- make_test_spectra(data.frame(
+    precursorMz = 111.1,
+    precursorCharge = 1L,
+    mz = I(list(c(10, 20, 30))),
+    intensity = I(list(c(100, 80, 60)))
+  ))
+  base::saveRDS(spectra, file = spec_rds)
+
+  called <- FALSE
+  testthat::with_mocked_bindings(
+    sanitize_spectra = function(spectra, cutoff, dalton, min_fragments, ppm) {
+      called <<- TRUE
+      spectra
+    },
+    {
+      out <- import_spectra(
+        file = spec_rds,
+        sanitize = FALSE,
+        combine = FALSE
+      )
+      expect_s4_class(out, "Spectra")
+      expect_false(called)
+    },
+    .package = "tima"
   )
 })
 

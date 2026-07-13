@@ -211,20 +211,26 @@ NULL
   }
   col_names <- make.unique(col_names, sep = "_dup")
 
-  rows <- lapply(row_splits, function(vals) {
-    if (length(vals) < length(col_names)) {
-      vals <- c(vals, rep(NA_character_, length(col_names) - length(vals)))
+  n_cols <- length(col_names)
+  row_matrix <- matrix(NA_character_, nrow = length(row_splits), ncol = n_cols)
+  if (n_cols > 0L) {
+    for (row_idx in seq_along(row_splits)) {
+      vals <- row_splits[[row_idx]]
+      if (length(vals) > 0L) {
+        take_len <- min(length(vals), n_cols)
+        row_matrix[row_idx, seq_len(take_len)] <- vals[seq_len(take_len)]
+      }
     }
-    vals <- vals[seq_len(length(col_names))]
+  }
 
-    df <- as.list(vals)
-    names(df) <- col_names
-    as.data.frame(df, stringsAsFactors = FALSE, check.names = FALSE)
-  })
-
-  out <- tidytable::as_tidytable(tidytable::bind_rows(rows))
+  out <- as.data.frame(
+    row_matrix,
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+  names(out) <- col_names
   out[] <- lapply(out, .normalize_mztab_value)
-  out
+  tidytable::as_tidytable(out)
 }
 
 #' @keywords internal

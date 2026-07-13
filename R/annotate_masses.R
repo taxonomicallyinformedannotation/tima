@@ -813,35 +813,55 @@ retain_supported_single_m_edges <- function(
   ) |>
     tidytable::distinct()
   all_nodes <- unique(c(undirected$src, undirected$dest))
-  neighbors <- split(undirected$dest, undirected$src)
+  neighbors_raw <- split(undirected$dest, undirected$src, drop = TRUE)
+  neighbors <- lapply(all_nodes, function(node) {
+    nxt <- neighbors_raw[[node]]
+    if (is.null(nxt)) {
+      character()
+    } else {
+      unique(as.character(nxt))
+    }
+  })
+  names(neighbors) <- all_nodes
+
   visited <- stats::setNames(rep(FALSE, length(all_nodes)), all_nodes)
-  comp_members_list <- list()
+  comp_members_list <- vector("list", length(all_nodes))
   comp_i <- 0L
   for (node in all_nodes) {
     if (isTRUE(visited[[node]])) {
       next
     }
     comp_i <- comp_i + 1L
-    queue <- c(node)
+    queue <- character(length(all_nodes))
+    head_idx <- 1L
+    tail_idx <- 0L
     visited[[node]] <- TRUE
-    comp_nodes <- character()
-    while (length(queue) > 0L) {
-      current <- queue[[1L]]
-      queue <- queue[-1L]
-      comp_nodes <- c(comp_nodes, current)
+    tail_idx <- tail_idx + 1L
+    queue[[tail_idx]] <- node
+
+    comp_nodes <- character(length(all_nodes))
+    comp_len <- 0L
+    while (head_idx <= tail_idx) {
+      current <- queue[[head_idx]]
+      head_idx <- head_idx + 1L
+      comp_len <- comp_len + 1L
+      comp_nodes[[comp_len]] <- current
+
       nxt <- neighbors[[current]]
-      if (is.null(nxt)) {
+      if (length(nxt) == 0L) {
         next
       }
       for (nn in nxt) {
         if (!isTRUE(visited[[nn]])) {
           visited[[nn]] <- TRUE
-          queue <- c(queue, nn)
+          tail_idx <- tail_idx + 1L
+          queue[[tail_idx]] <- nn
         }
       }
     }
-    comp_members_list[[length(comp_members_list) + 1L]] <- tidytable::tidytable(
-      feature_id = unique(comp_nodes),
+
+    comp_members_list[[comp_i]] <- tidytable::tidytable(
+      feature_id = unique(comp_nodes[seq_len(comp_len)]),
       component_id = paste0("M_", comp_i)
     )
   }

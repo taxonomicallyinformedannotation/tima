@@ -326,17 +326,24 @@ enforce_graph_adduct_consistency <- function(df_add) {
   neighbors <- split(undirected$dest, undirected$src)
   visited <- stats::setNames(rep(FALSE, length(nodes)), nodes)
   components <- list()
+  queue_capacity <- length(nodes)
   for (node in nodes) {
     if (isTRUE(visited[[node]])) {
       next
     }
-    queue <- c(node)
+    queue <- character(queue_capacity)
+    queue_head <- 1L
+    queue_tail <- 1L
+    queue[[queue_tail]] <- node
+    queue_tail <- queue_tail + 1L
     visited[[node]] <- TRUE
-    comp_nodes <- character()
-    while (length(queue) > 0L) {
-      current <- queue[[1L]]
-      queue <- queue[-1L]
-      comp_nodes <- c(comp_nodes, current)
+    comp_nodes <- character(queue_capacity)
+    comp_count <- 0L
+    while (queue_head < queue_tail) {
+      current <- queue[[queue_head]]
+      queue_head <- queue_head + 1L
+      comp_count <- comp_count + 1L
+      comp_nodes[[comp_count]] <- current
       next_nodes <- neighbors[[current]]
       if (is.null(next_nodes)) {
         next
@@ -344,11 +351,14 @@ enforce_graph_adduct_consistency <- function(df_add) {
       for (nxt in next_nodes) {
         if (!isTRUE(visited[[nxt]])) {
           visited[[nxt]] <- TRUE
-          queue <- c(queue, nxt)
+          queue[[queue_tail]] <- nxt
+          queue_tail <- queue_tail + 1L
         }
       }
     }
-    components[[length(components) + 1L]] <- unique(comp_nodes)
+    components[[length(components) + 1L]] <- unique(comp_nodes[seq_len(
+      comp_count
+    )])
   }
 
   component_results <- vector("list", length(components))
@@ -405,6 +415,18 @@ enforce_graph_adduct_consistency <- function(df_add) {
     max_iter <- 20L
     prev_map <- NULL
     unchanged_count <- 0L
+    sub_df <- as.data.frame(sub, stringsAsFactors = FALSE, check.names = FALSE)
+    src_idx <- split(seq_len(nrow(sub_df)), sub_df$feature_id)
+    dest_idx <- split(seq_len(nrow(sub_df)), sub_df$feature_id_dest)
+    candidate_lookup <- split(
+      node_candidates$state_key,
+      node_candidates$feature
+    )
+    prior_lookup <- stats::setNames(
+      node_priors$prior,
+      paste(node_priors$feature, node_priors$state_key, sep = "\u001f")
+    )
+
     for (iter in seq_len(max_iter)) {
       # Store previous to detect convergence
       if (identical(prev_map, assign_map)) {
@@ -417,46 +439,45 @@ enforce_graph_adduct_consistency <- function(df_add) {
 
       changed <- FALSE
       for (f in names(assign_map)) {
-        candidates_f <- node_candidates |>
-          tidytable::filter(feature == f) |>
-          tidytable::pull(state_key)
+        candidates_f <- candidate_lookup[[f]]
         if (length(candidates_f) <= 1L) {
           next
         }
 
         cand_scores <- rep(0, length(candidates_f))
+        src_rows <- sub_df[src_idx[[f]], , drop = FALSE]
+        dest_rows <- sub_df[dest_idx[[f]], , drop = FALSE]
+
+        if (nrow(src_rows) > 0L) {
+          assigned_dest_state <- unname(assign_map[as.character(
+            src_rows$feature_id_dest
+          )])
+          for (k in seq_along(candidates_f)) {
+            cand <- candidates_f[[k]]
+            src_mask <- src_rows$adduct_state_key == cand &
+              src_rows$adduct_dest_state_key == assigned_dest_state
+            cand_scores[[k]] <- cand_scores[[k]] +
+              sum(src_rows$edge_score[src_mask], na.rm = TRUE)
+          }
+        }
+
+        if (nrow(dest_rows) > 0L) {
+          assigned_src_state <- unname(assign_map[as.character(
+            dest_rows$feature_id
+          )])
+          for (k in seq_along(candidates_f)) {
+            cand <- candidates_f[[k]]
+            dest_mask <- dest_rows$adduct_dest_state_key == cand &
+              dest_rows$adduct_state_key == assigned_src_state
+            cand_scores[[k]] <- cand_scores[[k]] +
+              sum(dest_rows$edge_score[dest_mask], na.rm = TRUE)
+          }
+        }
+
         for (k in seq_along(candidates_f)) {
           cand <- candidates_f[[k]]
-          contrib_src <- sub |>
-            tidytable::filter(feature_id == f, adduct_state_key == cand)
-          if (nrow(contrib_src) > 0L) {
-            dest_match <- unname(assign_map[contrib_src$feature_id_dest])
-            cand_scores[[k]] <- cand_scores[[k]] +
-              sum(
-                contrib_src$edge_score[
-                  contrib_src$adduct_dest_state_key == dest_match
-                ]
-              )
-          }
-          contrib_dest <- sub |>
-            tidytable::filter(
-              feature_id_dest == f,
-              adduct_dest_state_key == cand
-            )
-          if (nrow(contrib_dest) > 0L) {
-            src_match <- unname(assign_map[contrib_dest$feature_id])
-            cand_scores[[k]] <- cand_scores[[k]] +
-              sum(
-                contrib_dest$edge_score[
-                  contrib_dest$adduct_state_key == src_match
-                ]
-              )
-          }
-          # Add prior score
-          prior_val <- node_priors |>
-            tidytable::filter(feature == f, state_key == cand) |>
-            tidytable::pull(prior)
-          if (length(prior_val) > 0L) {
+          prior_val <- prior_lookup[[paste(f, cand, sep = "\u001f")]]
+          if (!is.null(prior_val) && length(prior_val) > 0L) {
             cand_scores[[k]] <- cand_scores[[k]] + (0.01 * prior_val[[1L]])
           }
         }

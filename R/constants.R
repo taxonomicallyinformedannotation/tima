@@ -160,6 +160,11 @@ DEFAULT_HE_SCORE_INITIAL_MIN <- 0.9
 #' @keywords internal
 DEFAULT_HE_SCORE_FINAL_MIN <- 0.75
 
+#' Default minimum coverage required when using weighted final score for the
+#'     high-evidence filter
+#' @keywords internal
+DEFAULT_HE_SCORE_FINAL_COVERAGE_MIN <- 0.67
+
 #' Default minimum SIRIUS confidence score threshold for high-evidence filter
 #' @keywords internal
 DEFAULT_HE_SCORE_SIRIUS_MIN <- 0.4

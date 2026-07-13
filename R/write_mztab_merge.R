@@ -152,13 +152,13 @@
 
   opt_cols <- grep("^opt_", colnames(tbl_df), value = TRUE)
 
-  # Vectorized opt signature generation
   opt_sig <- if (length(opt_cols) > 0L) {
-    # Combine all opt columns into a matrix for faster processing
-    opt_matrix <- as.matrix(tbl_df[, opt_cols, drop = FALSE])
-    apply(opt_matrix, 1L, function(x) {
-      paste(ifelse(is.na(x) | !nzchar(x), "null", x), collapse = "|")
+    opt_values <- lapply(tbl_df[, opt_cols, drop = FALSE], function(x) {
+      x <- as.character(x)
+      x[is.na(x) | !nzchar(x)] <- "null"
+      x
     })
+    do.call(paste, c(opt_values, sep = "|"))
   } else {
     rep("null", nrow(tbl_df))
   }
@@ -534,36 +534,51 @@
 #' Remap pipe-separated references according to id map
 #' @keywords internal
 .mztab_remap_ref_ids <- function(x, id_map) {
-  split_ids <- lapply(x, function(one) {
-    if (is.na(one) || !nzchar(one) || one == "null") {
-      return(character(0))
-    }
-    ids <- strsplit(one, "|", fixed = TRUE)[[1L]]
+  if (length(x) == 0L) {
+    return(character(0))
+  }
+
+  valid_mask <- !is.na(x) & nzchar(x) & x != "null"
+  if (!any(valid_mask)) {
+    return(rep("null", length(x)))
+  }
+
+  split_ids <- strsplit(x[valid_mask], "|", fixed = TRUE)
+  split_ids <- lapply(split_ids, function(ids) {
     ids <- ids[nzchar(ids) & ids != "null"]
     unique(ids)
   })
 
-  vapply(
-    X = split_ids,
+  remapped <- lapply(split_ids, function(ids) {
+    if (length(ids) == 0L) {
+      return(character(0))
+    }
+    mapped <- vapply(
+      X = ids,
+      FUN = function(id) {
+        if (!is.null(id_map[[id]]) && nzchar(id_map[[id]])) {
+          id_map[[id]]
+        } else {
+          id
+        }
+      },
+      FUN.VALUE = character(1L)
+    )
+    mapped
+  })
+
+  out <- rep("null", length(x))
+  out[valid_mask] <- vapply(
+    X = remapped,
     FUN = function(ids) {
       if (length(ids) == 0L) {
         return("null")
       }
-      mapped <- vapply(
-        X = ids,
-        FUN = function(id) {
-          if (!is.null(id_map[[id]]) && nzchar(id_map[[id]])) {
-            id_map[[id]]
-          } else {
-            id
-          }
-        },
-        FUN.VALUE = character(1L)
-      )
-      .mztab_union_ref_ids("null", paste(mapped, collapse = "|"))
+      paste(ids, collapse = "|")
     },
     FUN.VALUE = character(1L)
   )
+  out
 }
 
 #' Find next numeric ID from an ID column

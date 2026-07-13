@@ -155,6 +155,27 @@ create_edges_spectra <- function(
     )
   }
 
+  source_col <- if (
+    is.null(name_source) ||
+      length(name_source) != 1L ||
+      !is.character(name_source) ||
+      !nzchar(name_source)
+  ) {
+    "source"
+  } else {
+    as.character(name_source)
+  }
+  target_col <- if (
+    is.null(name_target) ||
+      length(name_target) != 1L ||
+      !is.character(name_target) ||
+      !nzchar(name_target)
+  ) {
+    "target"
+  } else {
+    as.character(name_target)
+  }
+
   # Validate input file paths
   if (is.list(input)) {
     input_vec <- unlist(input)
@@ -232,12 +253,17 @@ create_edges_spectra <- function(
       length(spectra)
     )
     edges <- tidytable::tidytable(
-      !!as.name(name_source) := NA,
-      "feature_spectrum_entropy" = NA,
-      "feature_spectrum_peaks" = NA,
-      !!as.name(name_target) := NA,
-      "candidate_score_similarity" = NA,
-      "candidate_count_similarity_peaks_matched" = NA
+      source = NA,
+      target = NA,
+      feature_spectrum_entropy = NA,
+      feature_spectrum_peaks = NA,
+      candidate_score_similarity = NA,
+      candidate_count_similarity_peaks_matched = NA
+    )
+    names(edges) <- c(
+      source_col,
+      target_col,
+      names(edges)[3:length(names(edges))]
     )
     export_output(x = edges, file = output)
     return(output)
@@ -252,7 +278,7 @@ create_edges_spectra <- function(
   # Extract data (cache for reuse)
   nspecz <- length(spectra)
   fragz <- spectra@backend@peaksData
-  precz <- spectra@backend@spectraData$precursorMz
+  precz <- get_precursors(spectra)
 
   # Compute the full pairwise similarity graph once and reuse it for both
   # community detection and the exported edge list.
@@ -284,51 +310,49 @@ create_edges_spectra <- function(
 
   idz <- spectra |>
     get_spectra_ids()
+  if (is.null(idz) || length(idz) != length(spectra)) {
+    idz <- seq_along(spectra)
+  }
   rm(spectra)
 
   normalize_edge_table <- function(edge_table) {
-    edge_table |>
-      tidytable::select(
-        !!as.name(name_source) := "feature_id",
-        !!as.name(name_target) := "target_id",
-        tidyselect::everything()
-      ) |>
-      tidytable::mutate(
-        !!as.name(name_source) := idz[!!as.name(name_source)],
-        !!as.name(name_target) := idz[!!as.name(name_target)]
-      ) |>
-      tidytable::filter(!is.na(!!as.name(name_source)))
+    if ("feature_id" %in% names(edge_table)) {
+      names(edge_table)[names(edge_table) == "feature_id"] <- source_col
+    }
+    if ("target_id" %in% names(edge_table)) {
+      names(edge_table)[names(edge_table) == "target_id"] <- target_col
+    }
+
+    edge_table[[source_col]] <- idz[edge_table[[source_col]]]
+    edge_table[[target_col]] <- idz[edge_table[[target_col]]]
+
+    edge_table[!is.na(edge_table[[source_col]]), , drop = FALSE]
   }
 
   edges <- normalize_edge_table(edges)
 
   community_edges <- normalize_edge_table(community_edges)
 
-  entropy_df <- tidytable::tidytable(entropy) |>
-    tidytable::mutate(
-      !!as.name(name_source) := tidytable::row_number()
-    ) |>
-    tidytable::mutate(
-      !!as.name(name_source) := idz[!!as.name(name_source)],
-      feature_spectrum_entropy = as.character(entropy),
-      feature_spectrum_peaks = as.character(npeaks)
-    ) |>
-    tidytable::distinct(
-      !!as.name(name_source),
-      feature_spectrum_entropy,
-      feature_spectrum_peaks
-    )
+  entropy_df <- as.data.frame(tidytable::tidytable(
+    source = seq_along(entropy),
+    feature_spectrum_entropy = as.character(entropy),
+    feature_spectrum_peaks = as.character(npeaks)
+  ))
+  names(entropy_df)[names(entropy_df) == "source"] <- source_col
+  entropy_df[[source_col]] <- idz[entropy_df[[source_col]]]
+  entropy_df <- entropy_df[
+    !duplicated(entropy_df[[source_col]]),
+    c(source_col, "feature_spectrum_entropy", "feature_spectrum_peaks"),
+    drop = FALSE
+  ]
   rm(entropy, npeaks, idz)
 
   edges <- edges |>
-    tidytable::full_join(y = entropy_df) |>
-    tidytable::mutate(
-      !!as.name(name_target) := tidytable::coalesce(
-        !!as.name(name_target),
-        !!as.name(name_source)
-      )
-    )
-
+    tidytable::full_join(y = entropy_df)
+  edges[[target_col]] <- tidytable::coalesce(
+    edges[[target_col]],
+    edges[[source_col]]
+  )
   drop_legacy_similarity_columns <- function(edge_table) {
     legacy_columns <- intersect(c("score", "matched_peaks"), names(edge_table))
     if (length(legacy_columns) > 0L) {
@@ -365,8 +389,8 @@ create_edges_spectra <- function(
 
   community_result <- .build_components_from_edges(
     edges = community_edges,
-    name_source = name_source,
-    name_target = name_target,
+    name_source = source_col,
+    name_target = target_col,
     resolution = resolution,
     n_iterations = n_iterations,
     seed = seed,
@@ -378,8 +402,8 @@ create_edges_spectra <- function(
     edges <- .prune_intra_community_edges(
       edges = edges,
       component_membership = community_result$component_membership,
-      name_source = name_source,
-      name_target = name_target
+      name_source = source_col,
+      name_target = target_col
     )
 
     if (nrow(edges) == 0L) {
@@ -389,19 +413,24 @@ create_edges_spectra <- function(
       edges <- edges_before_community_cut[0L, , drop = FALSE]
     }
 
-    retained_features <- unique(c(edges[[name_source]], edges[[name_target]]))
+    retained_features <- unique(c(edges[[source_col]], edges[[target_col]]))
     all_features <- unique(c(
-      edges_before_community_cut[[name_source]],
-      edges_before_community_cut[[name_target]]
+      edges_before_community_cut[[source_col]],
+      edges_before_community_cut[[target_col]]
     ))
     isolated_features <- setdiff(all_features, retained_features)
 
     if (length(isolated_features) > 0L) {
       isolated_edges <- tidytable::tidytable(
-        !!as.name(name_source) := isolated_features,
-        !!as.name(name_target) := isolated_features,
+        source = isolated_features,
+        target = isolated_features,
         candidate_score_similarity = NA_real_,
         candidate_count_similarity_peaks_matched = NA_integer_
+      )
+      names(isolated_edges) <- c(
+        source_col,
+        target_col,
+        names(isolated_edges)[3:length(names(isolated_edges))]
       )
       edges <- tidytable::bind_rows(edges, isolated_edges) |>
         tidytable::distinct()
@@ -416,10 +445,10 @@ create_edges_spectra <- function(
     )
 
     pre_cut_features <- unique(c(
-      edges_before_community_cut[[name_source]],
-      edges_before_community_cut[[name_target]]
+      edges_before_community_cut[[source_col]],
+      edges_before_community_cut[[target_col]]
     ))
-    retained_features <- unique(c(edges[[name_source]], edges[[name_target]]))
+    retained_features <- unique(c(edges[[source_col]], edges[[target_col]]))
     dropped_features <- setdiff(pre_cut_features, retained_features)
 
     if (length(dropped_features) > 0L) {
@@ -439,7 +468,7 @@ create_edges_spectra <- function(
   log_complete(
     ctx,
     n_edges = nrow(edges),
-    n_features = length(unique(c(edges[[name_source]], edges[[name_target]])))
+    n_features = length(unique(c(edges[[source_col]], edges[[target_col]])))
   )
   invisible(output)
 }

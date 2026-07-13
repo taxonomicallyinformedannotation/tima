@@ -608,7 +608,7 @@
 
 #' Resolve xref-derived URI and database identifier values for a vector of InChIKeys.
 #'
-#' This is a memoized, vectorized wrapper around the single-row helpers so
+#' This is a vectorized wrapper around the single-row helpers so
 #' mzTab export only performs one xref lookup per unique connectivity-layer key.
 #'
 #' @param inchikeys Character vector of InChIKey connectivity-layer fragments.

@@ -82,6 +82,50 @@ test_that("threshold > similarity produces empty-row tibble (no NULL error)", {
   expect_true(nrow(out) >= 0L)
 })
 
+test_that("non-GNPS methods skip GNPS forward/reverse pass below threshold", {
+  local_mocked_bindings(
+    gnps_chain_dp_wrapper = function(...) stop("unexpected GNPS call")
+  )
+
+  out <- calculate_entropy_and_similarity(
+    lib_ids = 1L,
+    lib_precursors = 73.0,
+    lib_spectra = list(sp_propane),
+    query_ids = 1L,
+    query_precursors = 61.0,
+    query_spectra = list(sp_acetic),
+    method = "cosine",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0.999,
+    approx = TRUE
+  )
+
+  expect_s3_class(out, "data.frame")
+  expect_true(nrow(out) == 0L || all(is.na(out$candidate_score_similarity)))
+})
+
+test_that("adduct-aware scoring uses neutral-M space when both sides carry adducts", {
+  out <- calculate_entropy_and_similarity(
+    lib_ids = 1L,
+    lib_precursors = 61.0,
+    lib_spectra = list(sp_acetic),
+    query_ids = 1L,
+    query_precursors = 61.0,
+    query_spectra = list(sp_acetic),
+    method = "cosine",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0.0,
+    approx = TRUE,
+    query_adducts = "[M+H]+",
+    lib_adducts = "[M+Na]+"
+  )
+
+  expect_true(nrow(out) >= 1L)
+  expect_equal(out$.similarity_space[1], "neutral_M")
+})
+
 # ---- approx = FALSE precursor filter -----------------------------------------
 
 test_that("approx=FALSE excludes library spectra outside precursor window", {
@@ -265,7 +309,7 @@ test_that("forward and reverse >= score when spectra partially match (gnps)", {
   }
 })
 
-test_that("forward/reverse columns present for entropy method", {
+test_that("entropy computes forward/reverse scores by default for retained matches", {
   out <- call_ces(
     method = "entropy",
     query_sp = list(sp_ethane),
@@ -275,7 +319,56 @@ test_that("forward/reverse columns present for entropy method", {
   )
   expect_true("candidate_score_similarity_forward" %in% names(out))
   expect_true("candidate_score_similarity_reverse" %in% names(out))
-  # For identical spectra, forward and reverse should both be 1
   expect_equal(out$candidate_score_similarity_forward[1], 1.0, tolerance = 1e-6)
   expect_equal(out$candidate_score_similarity_reverse[1], 1.0, tolerance = 1e-6)
+})
+
+test_that("entropy skips forward/reverse work when explicitly disabled", {
+  called <- 0L
+  local_mocked_bindings(
+    gnps_chain_dp_wrapper = function(...) {
+      called <<- called + 1L
+      list(1.0, 1L, 0.5, 0.5)
+    }
+  )
+
+  out <- calculate_entropy_and_similarity(
+    lib_ids = 1L,
+    lib_precursors = 30.05,
+    lib_spectra = list(sp_ethane),
+    query_ids = 1L,
+    query_precursors = 30.05,
+    query_spectra = list(sp_ethane),
+    method = "entropy",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0.0,
+    approx = TRUE,
+    compute_forward_reverse = FALSE
+  )
+
+  expect_equal(called, 0L)
+  expect_true(all(is.na(out$candidate_score_similarity_forward)))
+  expect_true(all(is.na(out$candidate_score_similarity_reverse)))
+})
+
+test_that("entropy can be skipped while keeping forward/reverse scoring", {
+  out <- calculate_entropy_and_similarity(
+    lib_ids = 1L,
+    lib_precursors = 30.05,
+    lib_spectra = list(sp_ethane),
+    query_ids = 1L,
+    query_precursors = 30.05,
+    query_spectra = list(sp_ethane),
+    method = "entropy",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0.0,
+    approx = TRUE,
+    compute_entropy = FALSE
+  )
+
+  expect_true(all(is.na(out$candidate_spectrum_entropy)))
+  expect_true(!all(is.na(out$candidate_score_similarity_forward)))
+  expect_true(!all(is.na(out$candidate_score_similarity_reverse)))
 })

@@ -48,7 +48,6 @@
     return(results)
   }
 
-  # convert once
   results <- as.data.frame(
     results,
     stringsAsFactors = FALSE,
@@ -56,54 +55,63 @@
   )
 
   id_cols <- setdiff(colnames(results), multi_cols)
+  n_rows <- nrow(results)
 
-  # Pre-compute the number of values per row
+  split_values <- lapply(multi_cols, function(col) {
+    values <- as.character(results[[col]])
+    split_values <- strsplit(values, "|", fixed = TRUE)
+    split_values[is.na(values) | !nzchar(values)] <- list(NA_character_)
+    split_values
+  })
+
   n_vals_per_row <- vapply(
-    seq_len(nrow(results)),
+    seq_len(n_rows),
     function(i) {
-      max(
-        vapply(
-          multi_cols,
-          function(col) {
-            v <- results[[col]][i]
-            if (is.na(v) || !nzchar(v)) {
-              1L
-            } else {
-              length(strsplit(v, "|", fixed = TRUE)[[1L]])
-            }
-          },
-          FUN.VALUE = integer(1L)
-        )
-      )
+      max(vapply(
+        split_values,
+        function(parts) {
+          length(parts[[i]])
+        },
+        FUN.VALUE = integer(1L)
+      ))
     },
     FUN.VALUE = integer(1L)
   )
+  n_vals_per_row[n_vals_per_row < 1L] <- 1L
 
-  rows <- lapply(seq_len(nrow(results)), function(i) {
-    n_vals <- n_vals_per_row[i]
-    if (n_vals <= 1L) {
-      return(results[i, , drop = FALSE])
+  row_idx <- rep(seq_len(n_rows), times = n_vals_per_row)
+  out <- vector("list", length(id_cols) + length(multi_cols))
+  names(out) <- c(id_cols, multi_cols)
+
+  for (col in id_cols) {
+    out[[col]] <- results[[col]][row_idx]
+  }
+
+  for (col_idx in seq_along(multi_cols)) {
+    col <- multi_cols[[col_idx]]
+    parts <- split_values[[col_idx]]
+    expanded <- character(sum(n_vals_per_row))
+    offset <- 1L
+
+    for (i in seq_len(n_rows)) {
+      n_vals <- n_vals_per_row[[i]]
+      vals <- parts[[i]]
+      if (length(vals) == 0L || (length(vals) == 1L && is.na(vals[[1L]]))) {
+        expanded[offset:(offset + n_vals - 1L)] <- NA_character_
+      } else {
+        if (length(vals) < n_vals) {
+          vals <- c(vals, rep(NA_character_, n_vals - length(vals)))
+        }
+        expanded[offset:(offset + n_vals - 1L)] <- vals[seq_len(n_vals)]
+      }
+      offset <- offset + n_vals
     }
 
-    base <- results[rep(i, n_vals), id_cols, drop = FALSE]
-    expanded <- lapply(multi_cols, function(col) {
-      v <- results[[col]][i]
-      if (is.na(v) || !nzchar(v)) {
-        return(rep(NA_character_, n_vals))
-      }
-      parts <- strsplit(v, "|", fixed = TRUE)[[1L]]
-      if (length(parts) < n_vals) {
-        parts <- c(parts, rep(NA_character_, n_vals - length(parts)))
-      }
-      parts[seq_len(n_vals)]
-    })
-    names(expanded) <- multi_cols
-    expanded_df <- as.data.frame(expanded, stringsAsFactors = FALSE)
+    out[[col]] <- expanded
+  }
 
-    cbind(base, expanded_df)[, colnames(results), drop = FALSE]
-  })
-
-  tidytable::as_tidytable(tidytable::bind_rows(rows))
+  out_df <- as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
+  out_df[, colnames(results), drop = FALSE]
 }
 
 #' Build SMF (Small Molecule Feature) table – one row per feature_id
@@ -814,7 +822,23 @@
   out <- if (length(sml_rows) == 0L) {
     data.frame()
   } else {
-    do.call(rbind, sml_rows)
+    col_names <- names(sml_rows[[1L]])
+    cols <- lapply(col_names, function(col) {
+      vapply(
+        sml_rows,
+        function(row) {
+          if (is.null(row[[col]])) {
+            NA_character_
+          } else {
+            as.character(row[[col]])
+          }
+        },
+        character(1L),
+        USE.NAMES = FALSE
+      )
+    })
+    names(cols) <- col_names
+    as.data.frame(cols, stringsAsFactors = FALSE, check.names = FALSE)
   }
   as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
 }

@@ -42,6 +42,27 @@ setup_minimal_fixtures <- function() {
   )
 }
 
+test_that("derive_primary_secondary_annotations keeps the best supported structure per feature", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2"),
+    adduct = c("[M+H]+", "[M+Na]+", "[M+H]+"),
+    source = c("pair", "baseline", "pair"),
+    adduct_support = c(3L, 0L, 2L),
+    error_mz = c(0.001, 0.02, 0.002),
+    structure_exact_mass = c(100, 101, 102)
+  )
+
+  out <- derive_primary_secondary_annotations(
+    annotations = annotations,
+    baseline_adducts = "[M+H]+"
+  )
+
+  expect_equal(out$annotation_level, c("primary", "secondary", "primary"))
+  expect_equal(out$adduct[1], "[M+H]+")
+  expect_equal(out$adduct[2], "[M+Na]+")
+  expect_equal(out$adduct[3], "[M+H]+")
+})
+
 ## Input Validation ----
 
 test_that("annotate_masses validates ms_mode correctly", {
@@ -1110,6 +1131,43 @@ test_that("enforce_annotation_edge_adduct_agreement keeps neutral-loss-derived a
 
   expect_true(any(out$feature_id == "F1" & out$adduct == "[M-C6H10O5+H]+"))
   expect_false(any(out$feature_id == "F2" & out$adduct == "[2M+Fe]2+"))
+})
+
+test_that("retain_supported_single_m_edges assigns connected components consistently", {
+  adduct_edges <- tidytable::tidytable(
+    feature_id = c("F1", "F3"),
+    adduct = c("[M+H]+", "[M+H]+"),
+    adduct_dest = c("[M+Na]+", "[M+H]+"),
+    feature_id_dest = c("F2", "F4")
+  )
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F3", "F4", "F5"),
+    adduct = "[M+H]+"
+  )
+
+  out <- retain_supported_single_m_edges(
+    adduct_edges = adduct_edges,
+    cluster_edges = tidytable::tidytable(),
+    loss_edges = tidytable::tidytable(),
+    annotations = annotations,
+    tolerance_ppm = 10,
+    tolerance_dalton = 0.01
+  )
+
+  comp_f1_f2 <- out$annotations$component_id[
+    out$annotations$feature_id %in% c("F1", "F2")
+  ]
+  comp_f3_f4 <- out$annotations$component_id[
+    out$annotations$feature_id %in% c("F3", "F4")
+  ]
+
+  expect_true(length(unique(comp_f1_f2)) == 1L)
+  expect_true(length(unique(comp_f3_f4)) == 1L)
+  expect_false(comp_f1_f2[[1L]] == comp_f3_f4[[1L]])
+  expect_true(any(
+    out$annotations$feature_id == "F5" &
+      out$annotations$component_id == "M_singleton_F5"
+  ))
 })
 
 test_that("enforce_annotation_edge_adduct_agreement keeps candidates when feature has no edge support", {

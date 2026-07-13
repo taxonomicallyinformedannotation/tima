@@ -7,8 +7,12 @@
     return(0L)
   }
 
-  # Sort library m/z for binary search
-  lib_mz_sorted <- sort(lib_mz)
+  # Avoid re-sorting spectra that are already sanitized and m/z-sorted.
+  lib_mz_sorted <- if (is.unsorted(lib_mz, na.rm = FALSE)) {
+    sort(lib_mz)
+  } else {
+    lib_mz
+  }
 
   # Calculate tolerances for all query peaks at once
   tolerances <- pmax(dalton, ppm * query_mz * 1E-6)
@@ -48,6 +52,12 @@
 #' @param approx [logical] Logical whether to perform approximate matching
 #'     without
 #'     precursor mass filtering
+#' @param compute_forward_reverse [logical] Compute forward/reverse GNPS scores
+#'     for retained candidates. Defaults to TRUE for entropy and FALSE for
+#'     other methods.
+#' @param compute_entropy [logical] Compute per-spectrum entropy values for the
+#'     returned candidates. Set to FALSE to skip the entropy pass when the
+#'     caller only needs similarity and forward/reverse scores.
 #'
 #' @return Data frame with spectrum IDs, entropy scores, and similarity scores
 #'
@@ -81,7 +91,11 @@ calculate_entropy_and_similarity <- function(
   dalton,
   ppm,
   threshold,
-  approx
+  approx,
+  query_adducts = NULL,
+  lib_adducts = NULL,
+  compute_forward_reverse = NULL,
+  compute_entropy = TRUE
 ) {
   ctx <- log_operation(
     "calculate_entropy_similarity",
@@ -115,6 +129,32 @@ calculate_entropy_and_similarity <- function(
   assert_scalar_numeric(ppm, "ppm", min = 0, max = Inf)
   assert_scalar_numeric(threshold, "threshold", min = 0, max = 1)
   assert_flag(approx, "approx")
+  if (!is.null(compute_forward_reverse)) {
+    assert_flag(compute_forward_reverse, "compute_forward_reverse")
+  }
+  assert_flag(compute_entropy, "compute_entropy")
+  compute_forward_reverse <- compute_forward_reverse %||% (method == "entropy")
+
+  if (!is.null(query_adducts) && length(query_adducts) != length(query_ids)) {
+    cli::cli_abort(
+      "query_adducts must have the same length as query_ids",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+  if (!is.null(lib_adducts) && length(lib_adducts) != length(lib_ids)) {
+    cli::cli_abort(
+      "lib_adducts must have the same length as lib_ids",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+  if (!is.null(query_adducts)) {
+    query_adducts <- as.character(query_adducts)
+  }
+  if (!is.null(lib_adducts)) {
+    lib_adducts <- as.character(lib_adducts)
+  }
 
   log_info(
     "Calculating entropy and similarity for %d spectra",
@@ -130,8 +170,6 @@ calculate_entropy_and_similarity <- function(
   # Pre-calculate length once for efficiency
   n_queries <- length(query_ids)
 
-  # Lazy sanitize-on-first-use state.
-  # This avoids up-front full scans and only sanitizes spectra that need it.
   n_query <- length(query_spectra)
   n_lib <- length(lib_spectra)
   query_checked <- rep(FALSE, n_query)
@@ -176,7 +214,8 @@ calculate_entropy_and_similarity <- function(
         lib_sanitized[[idx]] <<- TRUE
       }
       if (
-        is.matrix(lib_spectra[[idx]]) &&
+        isTRUE(compute_entropy) &&
+          is.matrix(lib_spectra[[idx]]) &&
           nrow(lib_spectra[[idx]]) > 0L &&
           ncol(lib_spectra[[idx]]) >= 2L
       ) {
@@ -192,6 +231,43 @@ calculate_entropy_and_similarity <- function(
   # Progress and local function alias used in the hot loop closure
   progress_counter <- 0L
   call_gnps <- gnps_chain_dp_wrapper
+  use_gnps <- (method == "gnps")
+
+  has_adduct_metadata <- !is.null(query_adducts) && !is.null(lib_adducts)
+  adduct_cache <- new.env(parent = emptyenv())
+  get_neutral_precursor <- function(precursor, adduct) {
+    if (
+      !is.finite(precursor) ||
+        is.na(precursor) ||
+        is.na(adduct) ||
+        !nzchar(adduct)
+    ) {
+      return(NA_real_)
+    }
+    key <- paste0(
+      adduct,
+      "|",
+      format(precursor, scientific = FALSE, digits = 15)
+    )
+    if (exists(key, envir = adduct_cache, inherits = FALSE)) {
+      return(get(key, envir = adduct_cache, inherits = FALSE))
+    }
+    converted <- convert_precursor_to_neutral_if_possible(
+      precursors = precursor,
+      adducts = adduct
+    )
+    converted_value <- if (
+      length(converted) == 1L &&
+        is.finite(converted) &&
+        converted > 0
+    ) {
+      converted
+    } else {
+      NA_real_
+    }
+    assign(key, converted_value, envir = adduct_cache)
+    converted_value
+  }
 
   results <- lapply(
     X = seq_along(query_spectra),
@@ -232,10 +308,18 @@ calculate_entropy_and_similarity <- function(
       scores <- rep(NA_real_, n_candidates)
       entropies <- rep(NA_real_, n_candidates)
       matched_counts <- integer(n_candidates)
+      compute_entropy_for_candidates <- isTRUE(compute_entropy)
       scores_forward <- rep(NA_real_, n_candidates)
       scores_reverse <- rep(NA_real_, n_candidates)
-      use_gnps <- (method == "gnps")
+      similarity_space <- rep("precursor_mz", n_candidates)
+      query_precursor_values <- rep(NA_real_, n_candidates)
+      target_precursor_values <- rep(NA_real_, n_candidates)
       q_mz <- current_spectrum[, 1L]
+      current_query_adduct <- if (!is.null(query_adducts)) {
+        query_adducts[[spectrum_idx]]
+      } else {
+        NA_character_
+      }
 
       for (pos_idx in seq_len(n_candidates)) {
         lib_idx <- lib_indices_sub[[pos_idx]]
@@ -250,12 +334,51 @@ calculate_entropy_and_similarity <- function(
         }
 
         target_precursor <- lib_precursors[[lib_idx]]
+        target_query_adduct <- if (!is.null(lib_adducts)) {
+          lib_adducts[[lib_idx]]
+        } else {
+          NA_character_
+        }
+        query_precursor_value <- current_precursor
+        target_precursor_value <- target_precursor
+        space_label <- "precursor_mz"
+        if (
+          has_adduct_metadata &&
+            !is.na(current_query_adduct) &&
+            nzchar(current_query_adduct) &&
+            !is.na(target_query_adduct) &&
+            nzchar(target_query_adduct) &&
+            !identical(current_query_adduct, target_query_adduct)
+        ) {
+          query_neutral <- get_neutral_precursor(
+            precursor = current_precursor,
+            adduct = current_query_adduct
+          )
+          target_neutral <- get_neutral_precursor(
+            precursor = target_precursor,
+            adduct = target_query_adduct
+          )
+          if (
+            is.finite(query_neutral) &&
+              is.finite(target_neutral) &&
+              query_neutral > 0 &&
+              target_neutral > 0
+          ) {
+            query_precursor_value <- query_neutral
+            target_precursor_value <- target_neutral
+            space_label <- "neutral_M"
+          }
+        }
+
+        query_precursor_values[[pos_idx]] <- query_precursor_value
+        target_precursor_values[[pos_idx]] <- target_precursor_value
+
         if (use_gnps) {
           res <- call_gnps(
             current_spectrum,
             lib_spectrum,
-            current_precursor,
-            target_precursor,
+            query_precursor_value,
+            target_precursor_value,
             dalton,
             ppm,
             matchedPeaksCount = TRUE
@@ -269,8 +392,8 @@ calculate_entropy_and_similarity <- function(
             method = method,
             query_spectrum = current_spectrum,
             target_spectrum = lib_spectrum,
-            query_precursor = current_precursor,
-            target_precursor = target_precursor,
+            query_precursor = query_precursor_value,
+            target_precursor = target_precursor_value,
             dalton = dalton,
             ppm = ppm
           ))
@@ -280,39 +403,50 @@ calculate_entropy_and_similarity <- function(
             dalton,
             ppm
           )
-          # For non-GNPS methods, compute forward/reverse via the C GNPS
-          # engine to ensure consistent scoring
-          fwd_rev <- call_gnps(
-            current_spectrum,
-            lib_spectrum,
-            current_precursor,
-            target_precursor,
-            dalton,
-            ppm,
-            matchedPeaksCount = TRUE
-          )
-          scores_forward[[pos_idx]] <- as.numeric(fwd_rev[[3L]])
-          scores_reverse[[pos_idx]] <- as.numeric(fwd_rev[[4L]])
+          if (isTRUE(compute_forward_reverse)) {
+            fwd_rev <- call_gnps(
+              current_spectrum,
+              lib_spectrum,
+              query_precursor_value,
+              target_precursor_value,
+              dalton,
+              ppm,
+              matchedPeaksCount = TRUE
+            )
+            scores_forward[[pos_idx]] <- as.numeric(fwd_rev[[3L]])
+            scores_reverse[[pos_idx]] <- as.numeric(fwd_rev[[4L]])
+          }
         }
 
-        entropies[[pos_idx]] <- lib_entropy[[lib_idx]]
+        similarity_space[[pos_idx]] <- space_label
+        if (compute_entropy_for_candidates) {
+          entropies[[pos_idx]] <- lib_entropy[[lib_idx]]
+        }
       }
 
       valid_indices <- which(!is.na(scores) & scores >= threshold)
 
       if (length(valid_indices) > 0L) {
+        row_scores_forward <- scores_forward[valid_indices]
+        row_scores_reverse <- scores_reverse[valid_indices]
+
         return(
           tidytable::tidytable(
-            feature_id = current_id,
-            precursorMz = current_precursor,
+            feature_id = rep(current_id, length(valid_indices)),
+            precursorMz = rep(current_precursor, length(valid_indices)),
             target_id = lib_ids[lib_indices_sub[valid_indices]],
-            candidate_spectrum_entropy = entropies[valid_indices],
+            candidate_spectrum_entropy = if (compute_entropy_for_candidates) {
+              entropies[valid_indices]
+            } else {
+              rep(NA_real_, length(valid_indices))
+            },
             candidate_score_similarity = scores[valid_indices],
-            candidate_score_similarity_forward = scores_forward[valid_indices],
-            candidate_score_similarity_reverse = scores_reverse[valid_indices],
+            candidate_score_similarity_forward = row_scores_forward,
+            candidate_score_similarity_reverse = row_scores_reverse,
             candidate_count_similarity_peaks_matched = matched_counts[
               valid_indices
-            ]
+            ],
+            .similarity_space = similarity_space[valid_indices]
           )
         )
       }
@@ -344,12 +478,12 @@ calculate_entropy_and_similarity <- function(
       feature_id = NA_integer_,
       precursorMz = NA_real_,
       target_id = NA_integer_,
-      candidate_spectrum_id = NA,
       candidate_spectrum_entropy = NA_real_,
       candidate_score_similarity = NA_real_,
       candidate_score_similarity_forward = NA_real_,
       candidate_score_similarity_reverse = NA_real_,
-      candidate_count_similarity_peaks_matched = NA_integer_
+      candidate_count_similarity_peaks_matched = NA_integer_,
+      .similarity_space = NA_character_
     )
   } else {
     result <- tidytable::bind_rows(

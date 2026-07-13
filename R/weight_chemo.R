@@ -367,22 +367,26 @@ weight_chemo <- function(
         0,
         na.rm = TRUE
       )
-    ) |>
-    tidytable::select(-tidyselect::contains(match = "score_chemical_"))
+    )
   rm(df2, supp_tables)
 
   annot_table_wei_chemo_interim <- annot_table_wei_chemo_init |>
     tidytable::right_join(y = annot_table_wei_bio_clean)
   rm(annot_table_wei_chemo_init, annot_table_wei_bio_clean)
 
-  annot_table_wei_chemo <- annot_table_wei_chemo_interim |>
+  annot_table_wei_chemo <- annot_table_wei_chemo_interim
+
+  weighted_chemo <- compute_weighted_components(
+    annot_table_wei_chemo$score_chemical,
+    annot_table_wei_chemo$score_biological,
+    annot_table_wei_chemo$candidate_score_pseudo_initial,
+    weights = c(weight_chemical, weight_biological, weight_spectral)
+  )
+
+  annot_table_wei_chemo <- annot_table_wei_chemo |>
     tidytable::mutate(
-      score_weighted_chemo = compute_weighted_sum(
-        score_chemical,
-        score_biological,
-        candidate_score_pseudo_initial,
-        weights = c(weight_chemical, weight_biological, weight_spectral)
-      )
+      score_weighted_chemo = weighted_chemo$score,
+      score_weighted_chemo_coverage = weighted_chemo$coverage
     )
 
   rm(annot_table_wei_chemo_interim)

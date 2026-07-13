@@ -92,6 +92,73 @@ test_that("rank_and_deduplicate creates rank columns and deduplicates IK per fea
   expect_equal(length(unique(combos)), nrow(ranked))
 })
 
+test_that("rank_and_deduplicate breaks score ties with deterministic tie-breakers", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+    score_weighted_chemo = c(0.8, 0.8),
+    candidate_score_pseudo_initial = c(0.4, 0.7),
+    candidate_score_similarity = c(0.5, 0.6)
+  )
+
+  ranked <- rank_and_deduplicate(df)
+
+  expect_equal(
+    ranked$rank_final[
+      ranked$candidate_structure_inchikey_connectivity_layer == "IK2"
+    ],
+    1L
+  )
+  expect_equal(
+    ranked$rank_initial[
+      ranked$candidate_structure_inchikey_connectivity_layer == "IK2"
+    ],
+    1L
+  )
+})
+
+test_that("rank_and_deduplicate blends coverage into the effective ranking score", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+    score_weighted_chemo = c(0.9, 0.89),
+    score_weighted_chemo_coverage = c(0.3, 0.75),
+    candidate_score_pseudo_initial = c(0.4, 0.4),
+    candidate_score_similarity = c(0.6, 0.6)
+  )
+
+  ranked <- rank_and_deduplicate(df)
+
+  expect_equal(
+    ranked$rank_final[
+      ranked$candidate_structure_inchikey_connectivity_layer == "IK2"
+    ],
+    1L
+  )
+  expect_equal(
+    ranked$rank_final[
+      ranked$candidate_structure_inchikey_connectivity_layer == "IK1"
+    ],
+    2L
+  )
+})
+
+test_that("rank_and_deduplicate shares ranks for identical ranking signatures", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+    score_weighted_chemo = c(0.8, 0.8),
+    score_weighted_chemo_coverage = c(0.5, 0.5),
+    candidate_score_pseudo_initial = c(0.4, 0.4),
+    candidate_score_similarity = c(0.6, 0.6)
+  )
+
+  ranked <- rank_and_deduplicate(df)
+
+  expect_equal(ranked$rank_final, c(1L, 1L))
+  expect_equal(ranked$rank_initial, c(1L, 1L))
+})
+
 test_that("apply_percentile_filter keeps top candidates per feature", {
   ranked <- rank_and_deduplicate(base_annot())
   top <- apply_percentile_filter(ranked, best_percentile = 0.9)

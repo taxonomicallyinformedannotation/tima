@@ -149,6 +149,109 @@ test_that("weight_chemo validates score ranges", {
 
 ## Functional scoring ----
 
+test_that("weight_chemo preserves per-level chemical scores", {
+  annot_table <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN",
+    candidate_structure_tax_cla_01kin = "Organic compounds",
+    candidate_structure_tax_cla_02sup = "Flavonoids",
+    candidate_structure_tax_cla_03cla = "Flavonols",
+    candidate_structure_tax_cla_04dirpar = "Flavones",
+    candidate_structure_tax_npc_01pat = "Terpenoids",
+    candidate_structure_tax_npc_02sup = "Monoterpenoids",
+    candidate_structure_tax_npc_03cla = "Iridoids",
+    feature_pred_tax_cla_01kin_val = "Organic compounds",
+    feature_pred_tax_cla_01kin_score = 0.9,
+    feature_pred_tax_cla_02sup_val = "Flavonoids",
+    feature_pred_tax_cla_02sup_score = 0.9,
+    feature_pred_tax_cla_03cla_val = "Flavonols",
+    feature_pred_tax_cla_03cla_score = 0.9,
+    feature_pred_tax_cla_04dirpar_val = "Flavones",
+    feature_pred_tax_cla_04dirpar_score = 0.9,
+    feature_pred_tax_npc_01pat_val = NA_character_,
+    feature_pred_tax_npc_01pat_score = NA_real_,
+    feature_pred_tax_npc_02sup_val = NA_character_,
+    feature_pred_tax_npc_02sup_score = NA_real_,
+    feature_pred_tax_npc_03cla_val = NA_character_,
+    feature_pred_tax_npc_03cla_score = NA_real_,
+    candidate_score_pseudo_initial = 0,
+    score_biological = 0
+  )
+
+  res <- weight_chemo(
+    annot_table_wei_bio_clean = annot_table,
+    weight_spectral = 0,
+    weight_biological = 0,
+    weight_chemical = 1,
+    score_chemical_cla_kingdom = 0.1,
+    score_chemical_cla_superclass = 0.2,
+    score_chemical_cla_class = 0.3,
+    score_chemical_cla_parent = 0.4,
+    score_chemical_npc_pathway = 0.5,
+    score_chemical_npc_superclass = 0.6,
+    score_chemical_npc_class = 0.7
+  )
+
+  expect_true("score_chemical_1" %in% names(res))
+  expect_true("score_chemical_3" %in% names(res))
+  expect_true("score_chemical_5" %in% names(res))
+  expect_equal(res$score_chemical, 0.4)
+})
+
+test_that("weight_chemo penalizes missing evidence", {
+  annot_table <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "ABCDEFGHIJKLMN",
+      "OPQRSTUVWXYZAB"
+    ),
+    candidate_structure_tax_cla_01kin = c(
+      "Organic compounds",
+      "Organic compounds"
+    ),
+    candidate_structure_tax_cla_02sup = c("Flavonoids", "Flavonoids"),
+    candidate_structure_tax_cla_03cla = c("Flavonols", "Flavonols"),
+    candidate_structure_tax_cla_04dirpar = c("Flavones", "Flavones"),
+    candidate_structure_tax_npc_01pat = c("Terpenoids", "Terpenoids"),
+    candidate_structure_tax_npc_02sup = c("Monoterpenoids", "Monoterpenoids"),
+    candidate_structure_tax_npc_03cla = c("Iridoids", "Iridoids"),
+    feature_pred_tax_cla_01kin_val = c("Organic compounds", NA_character_),
+    feature_pred_tax_cla_01kin_score = c(0.9, NA_real_),
+    feature_pred_tax_cla_02sup_val = c("Flavonoids", NA_character_),
+    feature_pred_tax_cla_02sup_score = c(0.9, NA_real_),
+    feature_pred_tax_cla_03cla_val = c("Flavonols", NA_character_),
+    feature_pred_tax_cla_03cla_score = c(0.9, NA_real_),
+    feature_pred_tax_cla_04dirpar_val = c("Flavones", NA_character_),
+    feature_pred_tax_cla_04dirpar_score = c(0.9, NA_real_),
+    feature_pred_tax_npc_01pat_val = c(NA_character_, NA_character_),
+    feature_pred_tax_npc_01pat_score = c(NA_real_, NA_real_),
+    feature_pred_tax_npc_02sup_val = c(NA_character_, NA_character_),
+    feature_pred_tax_npc_02sup_score = c(NA_real_, NA_real_),
+    feature_pred_tax_npc_03cla_val = c(NA_character_, NA_character_),
+    feature_pred_tax_npc_03cla_score = c(NA_real_, NA_real_),
+    candidate_score_pseudo_initial = c(0.9, NA_real_),
+    score_biological = c(0.9, NA_real_)
+  )
+
+  res <- weight_chemo(
+    annot_table_wei_bio_clean = annot_table,
+    weight_spectral = 0.33,
+    weight_biological = 0.33,
+    weight_chemical = 0.34,
+    score_chemical_cla_kingdom = 0.1,
+    score_chemical_cla_superclass = 0.2,
+    score_chemical_cla_class = 0.3,
+    score_chemical_cla_parent = 0.4,
+    score_chemical_npc_pathway = 0.5,
+    score_chemical_npc_superclass = 0.6,
+    score_chemical_npc_class = 0.7
+  )
+
+  scored <- res[order(res$score_weighted_chemo, decreasing = TRUE), ]
+  expect_equal(scored$feature_id[1L], "F1")
+  expect_lt(scored$score_weighted_chemo[2L], scored$score_weighted_chemo[1L])
+})
+
 test_that("weight_chemo assigns chemical scores from taxonomy matches", {
   # One row where candidate class matches predicted class; others NA
   annot_table <- tidytable::tidytable(

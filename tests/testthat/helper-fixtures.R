@@ -746,7 +746,7 @@ create_features_with_edges <- function(
     n_edges <- max(1L, round(n_possible_edges * edge_density))
 
     # Generate unique pairs
-    pairs <- combn(feature_ids, 2, simplify = FALSE)
+    pairs <- utils::combn(feature_ids, 2, simplify = FALSE)
     selected_pairs <- sample(pairs, min(n_edges, length(pairs)))
 
     edges <- tidytable::tidytable(

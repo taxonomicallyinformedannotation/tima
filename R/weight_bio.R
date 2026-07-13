@@ -705,7 +705,12 @@ weight_bio <- function(
         score_biological,
         candidate_score_pseudo_initial,
         weights = c(weight_biological, weight_spectral)
-      )
+      ),
+      score_weighted_bio_coverage = compute_weighted_components(
+        score_biological,
+        candidate_score_pseudo_initial,
+        weights = c(weight_biological, weight_spectral)
+      )$coverage
     )
 
   rm(annot_table_wei_bio_big)

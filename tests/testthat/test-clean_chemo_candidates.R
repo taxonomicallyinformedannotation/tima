@@ -70,6 +70,41 @@ test_that("sample_candidates_per_group stores annotation notes for sampled group
   expect_true(nrow(result$annotation_notes) >= 1L)
 })
 
+test_that("sample_candidates_per_group prefers the strongest tied rows", {
+  df <- tidytable::tidytable(
+    feature_id = rep("F1", 4L),
+    candidate_adduct = rep("[M+H]+", 4L),
+    rank_final = rep(1L, 4L),
+    score_weighted_chemo = c(0.1, 0.9, 0.2, 0.3),
+    candidate_score_pseudo_initial = c(0.1, 0.2, 0.3, 0.4)
+  )
+  result <- sample_candidates_per_group(df, max_per_score = 2L, seed = 42L)
+
+  expect_equal(nrow(result$df), 2L)
+  expect_true(all(result$df$score_weighted_chemo %in% c(0.9, 0.3)))
+})
+
+test_that("sample_candidates_per_group preserves consensus-promoted rows", {
+  df <- tidytable::tidytable(
+    feature_id = rep("F1", 4L),
+    candidate_adduct = rep("[M+H]+", 4L),
+    rank_final = rep(1L, 4L),
+    score_weighted_chemo = c(0.1, 0.9, 0.8, 0.7),
+    candidate_score_pseudo_initial = c(0.1, 0.2, 0.3, 0.4),
+    cluster_consensus_promoted_from_anchor = c(FALSE, TRUE, FALSE, FALSE)
+  )
+
+  result <- sample_candidates_per_group(df, max_per_score = 2L, seed = 42L)
+
+  expect_equal(nrow(result$df), 2L)
+  expect_true(any(result$df$cluster_consensus_promoted_from_anchor %in% TRUE))
+  expect_true(
+    all(
+      result$df$cluster_consensus_promoted_from_anchor[1:2] %in% c(TRUE, FALSE)
+    )
+  )
+})
+
 # ── remove_compound_names ──────────────────────────────────────────────────────
 
 test_that("remove_compound_names strips name column when compounds_names=FALSE", {
@@ -188,6 +223,13 @@ test_that("enforce_cluster_entity_consensus annotates promoted children with anc
   promoted_anchor <- promoted |>
     tidytable::distinct(cluster_consensus_anchor_feature_id)
   expect_equal(nrow(promoted_anchor), 1L)
+
+  anchor_feature <- out |>
+    tidytable::filter(feature_id == "B", rank_final == 1L)
+  expect_true(all(anchor_feature$cluster_consensus_applied %in% TRUE))
+  expect_false(any(
+    anchor_feature$cluster_consensus_promoted_from_anchor %in% TRUE
+  ))
 })
 
 # ── end-to-end integration: consensus promotion → percentile pass ──────────────
@@ -256,8 +298,6 @@ test_that("prepare_ranked_candidates: consensus-promoted row survives percentile
   #    (promoted from anchor Feature B).
   rank1_A <- df_ranked |>
     tidytable::filter(feature_id == "A", rank_final == 1L)
-  ## TODO not implemented yet
-  skip("TODO not implemented fully yet")
   expect_equal(
     rank1_A$candidate_structure_inchikey_connectivity_layer,
     "IK2"

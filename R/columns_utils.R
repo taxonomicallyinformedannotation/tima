@@ -131,8 +131,12 @@ columns_model <- function() {
   score_columns <- c(
     "score_initial",
     "score_biological",
+    "score_weighted_bio",
+    "score_weighted_bio_coverage",
     # "score_interim",
     "score_chemical",
+    "score_weighted_chemo",
+    "score_weighted_chemo_coverage",
     "score_final"
   )
 
@@ -183,7 +187,12 @@ columns_model <- function() {
 #' }
 clean_collapse <- function(grouped_df, cols = NULL, separator = " $ ") {
   # Input Validation ----
-  validate_dataframe(grouped_df, param_name = "grouped_df")
+  if (!is.data.frame(grouped_df)) {
+    tima_abort(
+      problem = "grouped_df must be a data frame or grouped tidytable",
+      class = c("tima_validation_error", "tima_error")
+    )
+  }
   validate_character(
     separator,
     param_name = "separator",

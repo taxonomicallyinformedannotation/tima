@@ -264,6 +264,30 @@ test_that("filter_high_evidence_only: MS1-only hits fail when no score passes", 
   expect_equal(nrow(result), 0L)
 })
 
+test_that("filter_high_evidence_only requires coverage for weighted final score", {
+  df <- tidytable::tidytable(
+    feature_id = c("FinalCovered", "FinalSparse", "BioPass"),
+    score_biological = c(0.1, 0.1, 0.9),
+    candidate_score_pseudo_initial = c(0.1, 0.1, 0.1),
+    score_weighted_chemo = c(0.8, 0.8, 0.8),
+    score_weighted_chemo_coverage = c(1, 0.5, 0.5)
+  )
+
+  result <- filter_high_evidence_only(
+    df,
+    score_bio_min = 0.85,
+    score_ini_min = 0.95,
+    score_final_min = 0.75,
+    score_final_coverage_min = 0.67,
+    confidence_sirius_min = NULL,
+    similarity_spectral_min = NULL,
+    matched_peaks_min = NULL
+  )
+
+  expect_setequal(result$feature_id, c("FinalCovered", "BioPass"))
+  expect_false("FinalSparse" %in% result$feature_id)
+})
+
 test_that("filter_high_evidence_only makes promoted children follow parent decision", {
   df <- tidytable::tidytable(
     feature_id = c("A", "B", "C", "D"),

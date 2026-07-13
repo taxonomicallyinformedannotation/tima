@@ -26,7 +26,8 @@ clean_chemo(
   score_chemical_npc_superclass = 0.5,
   score_chemical_npc_class = 0.75,
   max_per_score = 7L,
-  xrefs_table = NULL
+  xrefs_table = NULL,
+  enforce_cluster_consensus = TRUE
 )
 }
 \arguments{
@@ -102,6 +103,9 @@ If more exist, they are randomly sampled and a note is added. Default 7.}
 \item{xrefs_table}{Optional data frame with columns inchikey/prefix/id from
 get_compounds_xrefs(), used to add candidate_structure_id_* columns before
 summarization.}
+
+\item{enforce_cluster_consensus}{Logical, apply cluster-consensus promotion
+before candidate sampling and percentile filtering. Default TRUE.}
 }
 \value{
 Named list with three data frames:
@@ -115,9 +119,11 @@ Named list with three data frames:
 Cleans and filters chemically weighted annotation results
 through
 a multi-tier pipeline. Applies MS1 score thresholds, percentile filtering,
-ranking, and optional high-evidence filtering. Returns three-tier output:
-full (comprehensive), filtered (top candidates), and mini (one row per
-feature).
+ranking, and optional high-evidence filtering. Ranking is coverage-aware so
+higher-evidence candidates are preferred, and optional cluster-consensus
+promotion can retain plausible siblings when they are the best coherent
+choices. Returns three-tier output: full (comprehensive), filtered (top
+candidates), and mini (one row per feature).
 }
 \examples{
 \dontrun{

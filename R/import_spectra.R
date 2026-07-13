@@ -172,6 +172,11 @@ import_spectra <- function(
     return(spectra)
   }
 
+  if (file_ext == "rds" && isFALSE(sanitize) && isFALSE(combine)) {
+    log_debug("Using fast RDS import path for already-processed spectra")
+    return(.prepare_rds_spectra_fast(spectra = spectra, polarity = polarity))
+  }
+
   # Harmonize Metadata Fields ----
 
   # Validate precursor charges
@@ -199,6 +204,9 @@ import_spectra <- function(
   }
   if ("PrecursorMz" %in% spec_cols) {
     spectra$precursorMz <- as.numeric(spectra$PrecursorMz)
+  }
+  if ("precursor_mz" %in% spec_cols) {
+    spectra$precursorMz <- as.numeric(spectra$precursor_mz)
   }
   if ("spectrum_id" %in% spec_cols) {
     spectra$spectrum_id <- as.character(spectra$spectrum_id)
@@ -333,6 +341,66 @@ import_spectra <- function(
     "Import complete: %d spectra ready for analysis",
     length(spectra)
   )
+
+  spectra
+}
+
+.prepare_rds_spectra_fast <- function(spectra, polarity) {
+  if (!methods::is(spectra, "Spectra")) {
+    cli::cli_abort(
+      "RDS file did not contain a Spectra object",
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+
+  spec_cols <- colnames(spectra@backend@spectraData)
+
+  if ("MSLEVEL" %in% spec_cols) {
+    spectra$msLevel <- as.integer(spectra$MSLEVEL)
+  }
+  if ("MS_LEVEL" %in% spec_cols) {
+    spectra$msLevel <- as.integer(spectra$MS_LEVEL)
+  }
+  if ("PRECURSOR_MZ" %in% spec_cols) {
+    spectra$precursorMz <- as.numeric(spectra$PRECURSOR_MZ)
+  }
+  if ("PrecursorMZ" %in% spec_cols) {
+    spectra$precursorMz <- as.numeric(spectra$PrecursorMZ)
+  }
+  if ("PrecursorMz" %in% spec_cols) {
+    spectra$precursorMz <- as.numeric(spectra$PrecursorMz)
+  }
+  if ("precursor_mz" %in% spec_cols) {
+    spectra$precursorMz <- as.numeric(spectra$precursor_mz)
+  }
+  if ("spectrum_id" %in% spec_cols) {
+    spectra$spectrum_id <- as.character(spectra$spectrum_id)
+  }
+
+  if (
+    "TITLE" %in% spec_cols && !any(c("FEATURE_ID", "SLAW_ID") %in% spec_cols)
+  ) {
+    parsed_ids <- stringi::stri_match_first_regex(
+      spectra@backend@spectraData$TITLE,
+      "(?<![_a-zA-Z])id:(\\d+)"
+    )[, 2L]
+    if (!all(is.na(parsed_ids))) {
+      spectra$FEATURE_ID <- parsed_ids
+    }
+  }
+
+  if (!is.na(polarity)) {
+    charge_values <- if (polarity == "pos") {
+      c(0L, 1L, 2L, 3L)
+    } else {
+      c(0L, -1L, -2L, -3L)
+    }
+    spectra <- Spectra::filterPrecursorCharge(
+      object = spectra,
+      z = charge_values
+    )
+  }
 
   spectra
 }

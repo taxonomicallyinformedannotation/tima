@@ -517,29 +517,32 @@ read_mztab <- function(
   con <- file(file, open = "wt", encoding = "UTF-8")
   on.exit(close(con), add = TRUE)
 
-  for (i in seq_len(nrow(features))) {
-    fid <- features[[id_col]][[i]]
-    mz <- features[[mz_col]][[i]]
-    if (is.na(mz) || !is.finite(mz) || mz <= 0) {
-      next
-    }
-
-    # Format mz once and reuse
-    mz_str <- format(mz, scientific = FALSE, trim = TRUE)
-    writeLines(
-      c(
-        "BEGIN IONS",
-        paste0("TITLE=", fid),
-        paste0("FEATURE_ID=", fid),
-        paste0("PEPMASS=", mz_str),
-        "CHARGE=1+",
-        paste0(mz_str, " 1"),
-        "END IONS",
-        ""
-      ),
-      con
-    )
+  valid_idx <- which(
+    !is.na(features[[mz_col]]) &
+      is.finite(features[[mz_col]]) &
+      features[[mz_col]] > 0
+  )
+  if (length(valid_idx) == 0L) {
+    return(invisible(file))
   }
+
+  fids <- as.character(features[[id_col]][valid_idx])
+  mz_vals <- as.numeric(features[[mz_col]][valid_idx])
+  mz_str <- format(mz_vals, scientific = FALSE, trim = TRUE)
+
+  n_lines <- 8L * length(valid_idx)
+  lines <- character(n_lines)
+  line_pos <- seq.int(1L, n_lines, by = 8L)
+  lines[line_pos] <- "BEGIN IONS"
+  lines[line_pos + 1L] <- paste0("TITLE=", fids)
+  lines[line_pos + 2L] <- paste0("FEATURE_ID=", fids)
+  lines[line_pos + 3L] <- paste0("PEPMASS=", mz_str)
+  lines[line_pos + 4L] <- "CHARGE=1+"
+  lines[line_pos + 5L] <- paste0(mz_str, " 1")
+  lines[line_pos + 6L] <- "END IONS"
+  lines[line_pos + 7L] <- ""
+
+  writeLines(lines, con)
 
   invisible(file)
 }

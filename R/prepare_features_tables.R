@@ -370,31 +370,126 @@ prepare_features_tables <- function(
   name_mz,
   name_adduct
 ) {
-  tbl |>
+  candidates <- if (is.null(candidates)) 1L else as.integer(candidates)
+  candidates <- max(candidates, 1L)
+
+  core_cols <- c(name_features, name_rt, name_mz, name_adduct)
+  intensity_cols <- setdiff(colnames(tbl), core_cols)
+  if (length(intensity_cols) == 0L) {
+    empty_cols <- c("feature_id", "sample")
+    empty_tbl <- data.frame(
+      feature_id = character(0),
+      sample = character(0),
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+    if (name_rt %in% names(tbl)) {
+      empty_tbl$rt <- vector("list", 0L)
+    }
+    if (name_mz %in% names(tbl)) {
+      empty_tbl$mz <- vector("list", 0L)
+    }
+    if (name_adduct %in% names(tbl)) {
+      empty_tbl$adduct <- vector("list", 0L)
+    }
+    return(empty_tbl)
+  }
+
+  tbl_df <- as.data.frame(tbl)
+  feature_values <- tbl_df[[name_features]]
+  feature_ids <- as.character(feature_values)
+  feature_order <- suppressWarnings(as.numeric(feature_ids))
+  feature_order_is_numeric <- !all(is.na(feature_order))
+
+  extra_cols <- c()
+  if (name_rt %in% names(tbl_df)) {
+    extra_cols <- c(extra_cols, "rt")
+  }
+  if (name_mz %in% names(tbl_df)) {
+    extra_cols <- c(extra_cols, "mz")
+  }
+  if (name_adduct %in% names(tbl_df)) {
+    extra_cols <- c(extra_cols, "adduct")
+  }
+
+  max_keep <- min(candidates, length(intensity_cols))
+  if (max_keep < 1L) {
+    return(tidytable::tidytable())
+  }
+
+  long_tbl <- tidytable::as_tidytable(tbl_df) |>
     tidytable::pivot_longer(
-      cols = !tidyselect::any_of(
-        x = c(name_features, name_rt, name_mz, name_adduct)
-      ),
-      names_to = "sample"
+      cols = tidyselect::all_of(intensity_cols),
+      names_to = "sample",
+      values_to = "value"
     ) |>
-    tidytable::filter(value != 0) |>
     tidytable::mutate(
-      rank = rank(-as.numeric(value)),
-      .by = tidyselect::all_of(x = name_features)
+      feature_id = as.character(.data[[name_features]]),
+      value_num = suppressWarnings(as.numeric(value)),
+      value_num = ifelse(is.na(value_num) | value_num == 0, NA_real_, value_num)
     ) |>
-    tidytable::filter(rank <= candidates) |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          feature_id = name_features,
-          rt = name_rt,
-          mz = name_mz,
-          adduct = name_adduct,
-          "sample"
-        )
-      )
+    tidytable::filter(!is.na(value_num)) |>
+    tidytable::mutate(
+      rank = rank(-value_num, ties.method = "first"),
+      .by = feature_id
     ) |>
-    tidytable::arrange(feature_id |> as.numeric())
+    tidytable::filter(rank <= max_keep) |>
+    tidytable::arrange(feature_id, rank)
+
+  if (nrow(long_tbl) == 0L) {
+    empty_tbl <- data.frame(
+      feature_id = character(0),
+      sample = character(0),
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+    if ("rt" %in% extra_cols) {
+      empty_tbl$rt <- vector("list", 0L)
+    }
+    if ("mz" %in% extra_cols) {
+      empty_tbl$mz <- vector("list", 0L)
+    }
+    if ("adduct" %in% extra_cols) {
+      empty_tbl$adduct <- vector("list", 0L)
+    }
+    return(empty_tbl)
+  }
+
+  out <- data.frame(
+    feature_id = long_tbl$feature_id,
+    sample = long_tbl$sample,
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+
+  if ("rt" %in% extra_cols) {
+    out$rt <- long_tbl[[name_rt]]
+  }
+  if ("mz" %in% extra_cols) {
+    out$mz <- long_tbl[[name_mz]]
+  }
+  if ("adduct" %in% extra_cols) {
+    out$adduct <- long_tbl[[name_adduct]]
+  }
+
+  if (feature_order_is_numeric) {
+    order_idx <- order(
+      feature_order[match(out$feature_id, feature_ids)],
+      as.character(out$feature_id)
+    )
+  } else {
+    order_idx <- order(as.character(out$feature_id))
+  }
+  out <- out[order_idx, , drop = FALSE]
+
+  keep_cols <- intersect(
+    c("feature_id", "rt", "mz", "adduct", "sample"),
+    names(out)
+  )
+  out <- out[, keep_cols, drop = FALSE]
+
+  row.names(out) <- NULL
+  out
 }
 
 #' Resolve feature-table column names from configured values or aliases

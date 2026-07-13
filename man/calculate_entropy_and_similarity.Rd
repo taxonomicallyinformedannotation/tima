@@ -15,7 +15,11 @@ calculate_entropy_and_similarity(
   dalton,
   ppm,
   threshold,
-  approx
+  approx,
+  query_adducts = NULL,
+  lib_adducts = NULL,
+  compute_forward_reverse = NULL,
+  compute_entropy = TRUE
 )
 }
 \arguments{
@@ -46,6 +50,14 @@ mz/intensity)}
 \item{approx}{\link{logical} Logical whether to perform approximate matching
 without
 precursor mass filtering}
+
+\item{compute_forward_reverse}{\link{logical} Compute forward/reverse GNPS scores
+for retained candidates. Defaults to TRUE for entropy and FALSE for
+other methods.}
+
+\item{compute_entropy}{\link{logical} Compute per-spectrum entropy values for the
+returned candidates. Set to FALSE to skip the entropy pass when the
+caller only needs similarity and forward/reverse scores.}
 }
 \value{
 Data frame with spectrum IDs, entropy scores, and similarity scores

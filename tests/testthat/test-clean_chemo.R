@@ -277,6 +277,29 @@ test_that("validate_clean_chemo_inputs works", {
   )
 })
 
+test_that("clean_chemo works without candidate taxonomy columns", {
+  fixture <- make_clean_chemo_fixture(with_taxonomy = FALSE)
+
+  out <- clean_chemo(
+    annot_table_wei_chemo = fixture$annot_table_wei_chemo,
+    components_table = fixture$components_table,
+    features_table = fixture$features_table,
+    structure_organism_pairs_table = fixture$structure_organism_pairs_table,
+    candidates_final = 5L,
+    best_percentile = 0.9,
+    minimal_ms1_bio = 0.1,
+    minimal_ms1_chemo = 0.1,
+    minimal_ms1_condition = "OR",
+    compounds_names = TRUE,
+    high_evidence = FALSE,
+    remove_ties = FALSE,
+    summarize = FALSE
+  )
+
+  expect_true(all(c("full", "filtered", "mini") %in% names(out)))
+  expect_s3_class(out$mini, "data.frame")
+})
+
 # Filtering Tests ----
 test_that("filter_ms1_annotations filters with OR condition", {
   ann <- tidytable::tidytable(

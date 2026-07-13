@@ -430,7 +430,7 @@ complement_metadata_structures <- function(
     character()
   } else {
     unique(stats::na.omit(unlist(
-      tidytable::select(df, tidyselect::all_of(present_inchikey_cols)),
+      as.data.frame(df)[, present_inchikey_cols, drop = FALSE],
       use.names = FALSE
     )))
   }
@@ -439,7 +439,7 @@ complement_metadata_structures <- function(
     character()
   } else {
     unique(stats::na.omit(unlist(
-      tidytable::select(df, tidyselect::all_of(present_smiles_cols)),
+      as.data.frame(df)[, present_smiles_cols, drop = FALSE],
       use.names = FALSE
     )))
   }
@@ -453,49 +453,71 @@ complement_metadata_structures <- function(
       names(df) &&
       nrow(stereo_i_conn) > 0L
   ) {
-    df <- df |>
-      tidytable::left_join(
-        y = stereo_i_conn,
-        by = "candidate_structure_inchikey_connectivity_layer"
-      ) |>
-      tidytable::mutate(
-        candidate_structure_smiles_no_stereo = tidytable::coalesce(
-          candidate_structure_smiles_no_stereo_ic,
-          candidate_structure_smiles_no_stereo
-        ),
-        candidate_structure_inchikey_no_stereo = tidytable::coalesce(
-          candidate_structure_inchikey_no_stereo_ic,
-          candidate_structure_inchikey_no_stereo
-        )
-      ) |>
-      tidytable::select(
-        -candidate_structure_smiles_no_stereo_ic,
-        -candidate_structure_inchikey_no_stereo_ic
-      )
+    conn_lookup <- stats::setNames(
+      stereo_i_conn$candidate_structure_smiles_no_stereo_ic,
+      stereo_i_conn$candidate_structure_inchikey_connectivity_layer
+    )
+    inchikey_lookup <- stats::setNames(
+      stereo_i_conn$candidate_structure_inchikey_no_stereo_ic,
+      stereo_i_conn$candidate_structure_inchikey_connectivity_layer
+    )
+
+    existing_smiles <- df$candidate_structure_smiles_no_stereo
+    existing_inchikey <- df$candidate_structure_inchikey_no_stereo
+    mapped_smiles <- conn_lookup[match(
+      df$candidate_structure_inchikey_connectivity_layer,
+      names(conn_lookup)
+    )]
+    mapped_inchikey <- inchikey_lookup[match(
+      df$candidate_structure_inchikey_connectivity_layer,
+      names(inchikey_lookup)
+    )]
+
+    df$candidate_structure_smiles_no_stereo <- ifelse(
+      is.na(mapped_smiles),
+      existing_smiles,
+      mapped_smiles
+    )
+    df$candidate_structure_inchikey_no_stereo <- ifelse(
+      is.na(mapped_inchikey),
+      existing_inchikey,
+      mapped_inchikey
+    )
   }
 
   if (
     "candidate_structure_smiles_no_stereo" %in% names(df) && nrow(stereo_s) > 0L
   ) {
-    df <- df |>
-      tidytable::left_join(
-        y = stereo_s,
-        by = "candidate_structure_smiles_no_stereo"
-      ) |>
-      tidytable::mutate(
-        candidate_structure_inchikey_connectivity_layer = tidytable::coalesce(
-          candidate_structure_inchikey_connectivity_layer_s,
-          candidate_structure_inchikey_connectivity_layer
-        ),
-        candidate_structure_inchikey_no_stereo = tidytable::coalesce(
-          candidate_structure_inchikey_no_stereo_s,
-          candidate_structure_inchikey_no_stereo
-        )
-      ) |>
-      tidytable::select(
-        -candidate_structure_inchikey_connectivity_layer_s,
-        -candidate_structure_inchikey_no_stereo_s
-      )
+    smiles_lookup <- stats::setNames(
+      stereo_s$candidate_structure_inchikey_connectivity_layer_s,
+      stereo_s$candidate_structure_smiles_no_stereo
+    )
+    inchikey_lookup <- stats::setNames(
+      stereo_s$candidate_structure_inchikey_no_stereo_s,
+      stereo_s$candidate_structure_smiles_no_stereo
+    )
+
+    existing_conn <- df$candidate_structure_inchikey_connectivity_layer
+    existing_inchikey <- df$candidate_structure_inchikey_no_stereo
+    mapped_conn <- smiles_lookup[match(
+      df$candidate_structure_smiles_no_stereo,
+      names(smiles_lookup)
+    )]
+    mapped_inchikey <- inchikey_lookup[match(
+      df$candidate_structure_smiles_no_stereo,
+      names(inchikey_lookup)
+    )]
+
+    df$candidate_structure_inchikey_connectivity_layer <- ifelse(
+      is.na(mapped_conn),
+      existing_conn,
+      mapped_conn
+    )
+    df$candidate_structure_inchikey_no_stereo <- ifelse(
+      is.na(mapped_inchikey),
+      existing_inchikey,
+      mapped_inchikey
+    )
   }
 
   df
@@ -509,27 +531,32 @@ complement_metadata_structures <- function(
     ))
   }
 
-  df |>
-    tidytable::distinct(
-      candidate_structure_inchikey_no_stereo,
-      candidate_structure_inchikey_connectivity_layer
-    )
+  unique(df[,
+    c(
+      "candidate_structure_inchikey_no_stereo",
+      "candidate_structure_inchikey_connectivity_layer"
+    ),
+    drop = FALSE
+  ])
 }
 
 .build_stereo_bridge <- function(stereo_k) {
-  stereo_k |>
-    tidytable::select(
-      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
-      .bridge_inchikey = structure_inchikey,
-      .bridge_smiles = structure_smiles
-    ) |>
-    tidytable::filter(
-      !is.na(candidate_structure_inchikey_connectivity_layer)
-    ) |>
-    tidytable::distinct(
-      candidate_structure_inchikey_connectivity_layer,
-      .keep_all = TRUE
-    )
+  stereo_k <- as.data.frame(stereo_k, stringsAsFactors = FALSE)
+  stereo_k <- stereo_k[
+    !is.na(stereo_k$structure_inchikey_connectivity_layer),
+    c(
+      "structure_inchikey_connectivity_layer",
+      "structure_inchikey",
+      "structure_smiles"
+    ),
+    drop = FALSE
+  ]
+  names(stereo_k) <- c(
+    "candidate_structure_inchikey_connectivity_layer",
+    ".bridge_inchikey",
+    ".bridge_smiles"
+  )
+  unique(stereo_k)
 }
 
 .make_structure_lookup_key <- function(no_stereo, connectivity_layer) {

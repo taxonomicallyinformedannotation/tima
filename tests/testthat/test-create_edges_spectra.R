@@ -444,3 +444,34 @@ test_that("create_edges_spectra completes downstream edge-building from parsed s
   ))
   expect_true(any(exported$CLUSTERID1 == "F1" | exported$CLUSTERID2 == "F2"))
 })
+
+test_that("create_edges_spectra uses precursor_mz metadata when present", {
+  spec_rds <- withr::local_tempfile(fileext = ".rds")
+  output_file <- withr::local_tempfile(fileext = ".tsv")
+
+  spectra <- Spectra::Spectra(
+    data.frame(
+      precursor_mz = c(100.1, 100.2),
+      precursorCharge = c(1L, 1L),
+      mz = I(list(c(10, 20), c(10, 20))),
+      intensity = I(list(c(100, 90), c(100, 90)))
+    )
+  )
+  saveRDS(spectra, file = spec_rds)
+
+  out <- create_edges_spectra(
+    input = spec_rds,
+    output = output_file,
+    method = "cosine",
+    ppm = 10,
+    dalton = 0.01,
+    cutoff = 0,
+    min_fragments = 1L,
+    resolution = 0.1,
+    n_iterations = 1L,
+    seed = 1L
+  )
+
+  expect_identical(out, output_file)
+  expect_true(file.exists(output_file))
+})

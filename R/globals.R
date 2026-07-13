@@ -681,6 +681,15 @@ utils::globalVariables(
     ".rank_num",
     ".score_num",
     ".score_present",
-    "matched_peaks"
+    "matched_peaks",
+    ".candidate_score_pseudo_initial_num",
+    ".rank_final_num",
+    ".score_final_coverage",
+    ".score_weighted_chemo_coverage_num",
+    ".score_weighted_chemo_num",
+    "rank_initial",
+    "score_initial",
+    "score_weighted_chemo_coverage",
+    "value_num"
   )
 )

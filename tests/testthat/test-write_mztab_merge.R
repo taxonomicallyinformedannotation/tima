@@ -10,6 +10,7 @@ mztab_remap_ref_ids <- get(".mztab_remap_ref_ids", envir = ns)
 mztab_next_numeric_id <- get(".mztab_next_numeric_id", envir = ns)
 mztab_score_to_reliability <- get(".mztab_score_to_reliability", envir = ns)
 mztab_ensure_cols <- get(".mztab_ensure_cols", envir = ns)
+mztab_smf_key <- get(".mztab_smf_key", envir = ns)
 
 # ── .mztab_split_ref_ids ──────────────────────────────────────────────────────
 
@@ -163,4 +164,24 @@ test_that(".mztab_ensure_cols orders columns as requested", {
   expect_equal(colnames(result)[1L], "a")
   expect_equal(colnames(result)[2L], "b")
   expect_equal(colnames(result)[3L], "z")
+})
+
+# ── .mztab_smf_key ────────────────────────────────────────────────────────────
+
+test_that(".mztab_smf_key builds vectorized signatures for opt columns", {
+  df <- data.frame(
+    exp_mass_to_charge = c("10", "20"),
+    retention_time_in_seconds = c("100", "200"),
+    charge = c("1", "2"),
+    opt_a = c("x", ""),
+    opt_b = c(NA_character_, "y"),
+    stringsAsFactors = FALSE
+  )
+
+  result <- mztab_smf_key(df)
+
+  expect_equal(
+    result,
+    c("10||100||1||x|null", "20||200||2||null|y")
+  )
 })

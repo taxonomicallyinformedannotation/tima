@@ -16,6 +16,7 @@ Filtered data frame
 }
 \description{
 Internal helper to filter candidates by percentile threshold
-within each feature.
+within each feature while preserving the top-ranked candidate and any
+cluster-consensus-promoted rows that remain the best coherent option.
 }
 \keyword{internal}

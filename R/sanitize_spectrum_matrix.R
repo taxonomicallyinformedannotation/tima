@@ -121,6 +121,16 @@ sanitize_spectrum_matrix <- function(spectrum, tolerance = 0.01, ppm = 10) {
   mz <- mz[ord]
   int <- int[ord]
 
+  if (
+    is_spectrum_sanitized(
+      cbind(mz = mz, intensity = int),
+      tolerance = tolerance,
+      ppm = ppm
+    )
+  ) {
+    return(cbind(mz = mz, intensity = int))
+  }
+
   # 3. Merge peaks within tolerance (greedy: merge consecutive close peaks)
   n <- length(mz)
   if (n <= 1L) {

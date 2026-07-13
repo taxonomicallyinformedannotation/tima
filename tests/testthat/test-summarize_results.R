@@ -146,6 +146,29 @@ test_that("summarize_results includes tag column when SOP has tags", {
   expect_true("candidate_structure_tag" %in% names(out))
 })
 
+test_that("summarize_results joins annotation notes without rank_final", {
+  d <- make_sop_df(n_cand = 2L)
+  notes <- tidytable::tidytable(
+    feature_id = "FT1",
+    candidate_adduct = "[M+H]+",
+    annotation_note = "Kept candidate matching sibling feature"
+  )
+
+  out <- summarize_results(
+    df = d$df,
+    features_table = d$features,
+    components_table = d$components,
+    structure_organism_pairs_table = d$sop,
+    annot_table_wei_chemo = d$chemo,
+    remove_ties = FALSE,
+    summarize = FALSE,
+    annotation_notes_lookup = notes
+  )
+
+  ft1 <- out[out$feature_id == "FT1", , drop = FALSE]
+  expect_true(any(grepl("sibling feature", ft1$annotation_note)))
+})
+
 test_that("summarize_results works when SOP has no tag column", {
   d <- make_sop_df()
   d$sop$tag <- NULL
@@ -181,6 +204,57 @@ test_that("summarize=TRUE collapses to one row per feature", {
   if ("feature_id" %in% names(out)) {
     expect_equal(nrow(out), length(unique(out$feature_id)))
   }
+})
+
+test_that("summarize=TRUE preserves the best-ranked values per feature", {
+  d <- make_sop_df(n_features = 2L, n_cand = 2L)
+  d$df <- d$df |>
+    tidytable::mutate(
+      rank_final = c(1L, 2L, 1L, 2L),
+      candidate_score_pseudo_initial = c(0.2, 0.9, 0.7, 0.6),
+      score_weighted_chemo = c(0.3, 0.8, 0.6, 0.4)
+    )
+
+  out <- call_sr(d, summarize = TRUE)
+
+  ft1 <- out[out$feature_id == "FT1", , drop = FALSE]
+  expect_equal(nrow(ft1), 1L)
+  expect_equal(ft1$rank_final[[1L]], 1L)
+  expect_equal(ft1$score_weighted_chemo[[1L]], 0.6)
+})
+
+test_that("summarize=TRUE breaks score ties with coverage", {
+  d <- make_sop_df(n_features = 1L, n_cand = 2L)
+  d$df <- d$df |>
+    tidytable::mutate(
+      rank_final = c(1L, 1L),
+      candidate_score_pseudo_initial = c(0.2, 0.2),
+      score_weighted_chemo = c(0.8, 0.8),
+      score_weighted_chemo_coverage = c(0.5, 1.0)
+    )
+
+  out <- call_sr(d, summarize = TRUE)
+  expect_equal(nrow(out), 1L)
+  expect_equal(out$score_weighted_chemo_coverage[[1L]], 1.0)
+})
+
+test_that("count_annotated_features uses the full feature table as denominator", {
+  results <- tidytable::tidytable(
+    feature_id = c("FT1", "FT2"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", NA_character_)
+  )
+  features_table <- tidytable::tidytable(feature_id = c("FT1", "FT2", "FT3"))
+
+  coverage <- .count_annotated_features(
+    results = results,
+    features_table = features_table,
+    feature_id_col = "feature_id",
+    annotation_col = "candidate_structure_inchikey_connectivity_layer"
+  )
+
+  expect_equal(coverage$total_features, 3L)
+  expect_equal(coverage$annotated_features, 1L)
+  expect_equal(coverage$pct_annotated, 100 / 3, tolerance = 1e-8)
 })
 
 test_that("no-structure rows are not duplicated by mixed annotation notes", {

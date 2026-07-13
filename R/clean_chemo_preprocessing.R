@@ -295,40 +295,280 @@ filter_ms1_annotations <- function(
   result
 }
 
-#' Rank and Deduplicate Annotations
+#' Assign deterministic rank groups within each feature
 #'
-#' @description Internal helper to rank candidates and keep the best
-#'     structure per feature.
+#' @description Internal helper that assigns integer rank groups within each
+#'   feature using a deterministic signature built from the supplied ranking
+#'   columns. Rows with identical ranking signatures share the same rank,
+#'   which keeps ties stable and avoids spurious rank shifts when the evidence
+#'   scores are effectively equal. Missing values are treated as a shared
+#'   sentinel so they do not make an otherwise identical signature collapse to
+#'   NA.
 #'
-#' @param df Data frame with filtered annotations
+#' @param df Data frame with filtered annotations.
+#' @param rank_col_name Character name of the output rank column.
+#' @param ranking_cols Character vector of columns used to build the ranking
+#'   signature for each row.
 #'
-#' @return Data frame with ranking columns added
+#' @return Data frame with an added rank column.
 #' @keywords internal
+.assign_rank_groups <- function(df, rank_col_name, ranking_cols) {
+  if (nrow(df) == 0L) {
+    return(df)
+  }
+
+  df <- as.data.frame(df, stringsAsFactors = FALSE)
+  df[[rank_col_name]] <- NA_integer_
+
+  feature_ids <- unique(as.character(df[["feature_id"]]))
+  for (feature_id in feature_ids) {
+    idx <- which(as.character(df[["feature_id"]]) == feature_id)
+    if (length(idx) == 0L) {
+      next
+    }
+
+    rank_values <- lapply(ranking_cols, function(col) {
+      if (col %in% names(df)) {
+        values <- suppressWarnings(as.numeric(df[[col]][idx]))
+      } else {
+        values <- rep(NA_real_, length(idx))
+      }
+      values[!is.finite(values)] <- NA_real_
+      values <- round(values, 12)
+      ifelse(is.na(values), "<NA>", sprintf("%.12f", values))
+    })
+
+    if (length(idx) == 1L) {
+      column_values <- df[[rank_col_name]]
+      column_values[idx] <- 1L
+      df[[rank_col_name]] <- column_values
+      next
+    }
+
+    signature <- do.call(paste, c(rank_values, list(sep = "\u001f")))
+    signature_changes <- c(TRUE, signature[-1L] != signature[-length(signature)])
+    column_values <- df[[rank_col_name]]
+    column_values[idx] <- cumsum(signature_changes)
+    df[[rank_col_name]] <- column_values
+  }
+
+  df[[rank_col_name]] <- as.integer(df[[rank_col_name]])
+  df
+}
+
+.rank_candidates_by_evidence <- function(df, initial_rank = FALSE) {
+  if (nrow(df) == 0L) {
+    return(df)
+  }
+
+  # Ranking policy is explicit and deterministic:
+  # 1. weighted evidence score is the primary ranking signal
+  # 2. coverage directly adjusts the effective ranking score so that a lower
+  #    coverage row can be pushed below a higher-coverage row even when the raw
+  #    weighted score is only slightly higher
+  # 3. remaining evidence and error terms are used only as tie-breakers.
+  for (col in c(
+    "score_weighted_chemo_coverage",
+    "candidate_score_pseudo_initial",
+    "candidate_score_similarity",
+    "candidate_score_similarity_forward",
+    "candidate_score_similarity_reverse",
+    "candidate_structure_error_mz",
+    "candidate_structure_error_rt"
+  )) {
+    if (!(col %in% names(df))) {
+      df[[col]] <- NA_real_
+    }
+  }
+
+  score_weighted_chemo <- suppressWarnings(as.numeric(df[[
+    "score_weighted_chemo"
+  ]]))
+  score_weighted_chemo_coverage <- suppressWarnings(as.numeric(
+    df[["score_weighted_chemo_coverage"]]
+  ))
+  candidate_score_pseudo_initial <- suppressWarnings(as.numeric(
+    df[["candidate_score_pseudo_initial"]]
+  ))
+  candidate_score_similarity <- suppressWarnings(as.numeric(
+    df[["candidate_score_similarity"]]
+  ))
+  candidate_score_similarity_forward <- suppressWarnings(as.numeric(
+    df[["candidate_score_similarity_forward"]]
+  ))
+  candidate_score_similarity_reverse <- suppressWarnings(as.numeric(
+    df[["candidate_score_similarity_reverse"]]
+  ))
+  candidate_structure_error_mz <- suppressWarnings(as.numeric(
+    df[["candidate_structure_error_mz"]]
+  ))
+  candidate_structure_error_rt <- suppressWarnings(as.numeric(
+    df[["candidate_structure_error_rt"]]
+  ))
+
+  # Shrink the raw weighted score by coverage so low-coverage rows lose
+  # standing, but high-coverage rows keep most of their original evidence.
+  # This is a conservative, transparent penalty: coverage cannot improve the
+  # score above the raw weighted score, and missing coverage is treated as a
+  # moderate penalty rather than an outright wipeout.
+  coverage_for_rank <- pmin(pmax(score_weighted_chemo_coverage, 0), 1)
+  coverage_for_rank[is.na(coverage_for_rank)] <- 0
+  effective_score <- score_weighted_chemo * (0.5 + 0.5 * coverage_for_rank)
+  effective_score <- pmax(effective_score, 0)
+  effective_score[!is.finite(effective_score)] <- NA_real_
+  df$effective_score <- effective_score
+
+  ord <- if (isTRUE(initial_rank)) {
+    order(
+      as.character(df[["feature_id"]]),
+      -candidate_score_pseudo_initial,
+      -effective_score,
+      -score_weighted_chemo,
+      -score_weighted_chemo_coverage,
+      -candidate_score_similarity,
+      -candidate_score_similarity_forward,
+      -candidate_score_similarity_reverse,
+      candidate_structure_error_mz,
+      candidate_structure_error_rt,
+      as.character(df[["candidate_structure_inchikey_connectivity_layer"]]),
+      na.last = TRUE,
+      method = "radix"
+    )
+  } else {
+    order(
+      as.character(df[["feature_id"]]),
+      -effective_score,
+      -score_weighted_chemo,
+      -score_weighted_chemo_coverage,
+      -candidate_score_pseudo_initial,
+      -candidate_score_similarity,
+      -candidate_score_similarity_forward,
+      -candidate_score_similarity_reverse,
+      candidate_structure_error_mz,
+      candidate_structure_error_rt,
+      as.character(df[["candidate_structure_inchikey_connectivity_layer"]]),
+      na.last = TRUE,
+      method = "radix"
+    )
+  }
+
+  df[ord, , drop = FALSE]
+}
+
 rank_and_deduplicate <- function(df) {
-  df |>
-    tidytable::mutate(
-      score_weighted_chemo = as.numeric(score_weighted_chemo),
-      candidate_score_pseudo_initial = as.numeric(
-        candidate_score_pseudo_initial
-      )
-    ) |>
-    tidytable::arrange(tidytable::desc(x = score_weighted_chemo)) |>
+  df <- as.data.frame(df, stringsAsFactors = FALSE)
+  df$score_weighted_chemo <- as.numeric(df$score_weighted_chemo)
+  if (!"score_weighted_chemo_coverage" %in% names(df)) {
+    df$score_weighted_chemo_coverage <- NA_real_
+  } else {
+    df$score_weighted_chemo_coverage <- as.numeric(
+      df$score_weighted_chemo_coverage
+    )
+  }
+  df$candidate_score_pseudo_initial <- as.numeric(
+    df$candidate_score_pseudo_initial
+  )
+
+  for (col in c(
+    "candidate_score_similarity",
+    "candidate_score_similarity_forward",
+    "candidate_score_similarity_reverse",
+    "candidate_structure_error_mz",
+    "candidate_structure_error_rt"
+  )) {
+    if (col %in% names(df)) {
+      df[[col]] <- suppressWarnings(as.numeric(df[[col]]))
+    } else {
+      df[[col]] <- NA_real_
+    }
+  }
+
+  df <- tidytable::as_tidytable(df)
+  df_ranked <- .rank_candidates_by_evidence(
+    df = as.data.frame(df),
+    initial_rank = TRUE
+  )
+  rank_initial_cols <- c(
+    "candidate_score_pseudo_initial",
+    "effective_score",
+    "score_weighted_chemo",
+    "score_weighted_chemo_coverage",
+    "candidate_score_similarity",
+    "candidate_score_similarity_forward",
+    "candidate_score_similarity_reverse",
+    "candidate_structure_error_mz",
+    "candidate_structure_error_rt"
+  )
+  df_ranked <- .assign_rank_groups(
+    df = df_ranked,
+    rank_col_name = "rank_initial",
+    ranking_cols = rank_initial_cols
+  )
+  df_rank_initial <- tidytable::as_tidytable(df_ranked) |>
     tidytable::distinct(
       feature_id,
       candidate_structure_inchikey_connectivity_layer,
       .keep_all = TRUE
     ) |>
-    tidytable::mutate(
-      rank_initial = tidytable::dense_rank(x = -candidate_score_pseudo_initial),
-      rank_final = tidytable::dense_rank(x = -score_weighted_chemo),
-      .by = feature_id
+    tidytable::select(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer,
+      rank_initial
+    )
+
+  df_ranked_final <- .rank_candidates_by_evidence(
+    df = as.data.frame(df),
+    initial_rank = FALSE
+  )
+  rank_final_cols <- c(
+    "effective_score",
+    "score_weighted_chemo",
+    "score_weighted_chemo_coverage",
+    "candidate_score_pseudo_initial",
+    "candidate_score_similarity",
+    "candidate_score_similarity_forward",
+    "candidate_score_similarity_reverse",
+    "candidate_structure_error_mz",
+    "candidate_structure_error_rt"
+  )
+  df_ranked_final <- .assign_rank_groups(
+    df = df_ranked_final,
+    rank_col_name = "rank_final",
+    ranking_cols = rank_final_cols
+  )
+  df_rank_final <- tidytable::as_tidytable(df_ranked_final) |>
+    tidytable::distinct(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer,
+      .keep_all = TRUE
+    ) |>
+    tidytable::select(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer,
+      rank_final
+    )
+
+  df |>
+    tidytable::left_join(
+      y = df_rank_initial,
+      by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
+    ) |>
+    tidytable::left_join(
+      y = df_rank_final,
+      by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
+    ) |>
+    tidytable::distinct(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer,
+      .keep_all = TRUE
     )
 }
 
 #' Apply Percentile Filter
 #'
 #' @description Internal helper to filter candidates by percentile threshold
-#'     within each feature.
+#'     within each feature while preserving the top-ranked candidate and any
+#'     cluster-consensus-promoted rows that remain the best coherent option.
 #'
 #' @param df Data frame with ranked annotations
 #' @param best_percentile Numeric percentile threshold (0-1)

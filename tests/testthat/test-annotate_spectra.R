@@ -418,6 +418,57 @@ test_that("NA fallback for smiles is applied", {
 
 # Internal helper function tests ----
 
+test_that("compute_similarity_safe uses precursor_mz fallback metadata", {
+  temp_dir <- tempdir()
+  query_path <- file.path(temp_dir, "query_precursor_mz.mgf")
+  lib_path <- file.path(temp_dir, "lib_precursor_mz.mgf")
+  dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
+  write_minimal_mgf(query_path, precursors = c(200))
+  write_minimal_mgf(lib_path, precursors = c(200))
+
+  query_sp <- import_spectra(
+    query_path,
+    cutoff = 0,
+    dalton = 0.01,
+    min_fragments = 1L,
+    polarity = "pos",
+    ppm = 10
+  )
+  lib_sp <- import_spectra(
+    lib_path,
+    cutoff = 0,
+    dalton = 0.01,
+    min_fragments = 1L,
+    polarity = "pos",
+    ppm = 10
+  )
+
+  query_sp@backend@spectraData$precursor_mz <-
+    query_sp@backend@spectraData$precursorMz
+  query_sp@backend@spectraData$precursorMz <- NULL
+  query_sp@backend@spectraData$spectrum_id <- "Q1"
+  lib_sp@backend@spectraData$precursor_mz <- lib_sp@backend@spectraData$precursorMz
+  lib_sp@backend@spectraData$precursorMz <- NULL
+  lib_sp@backend@spectraData$spectrum_id <- "L1"
+
+  out <- compute_similarity_safe(
+    lib_sp = lib_sp,
+    query_sp = query_sp,
+    query_meta = tidytable::tidytable(
+      feature_id = "F1",
+      query_adduct = NA_character_
+    ),
+    method = "cosine",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0,
+    approx = TRUE
+  )
+
+  expect_s3_class(out, "data.frame")
+  expect_true(nrow(out) >= 1L)
+})
+
 test_that("normalize_input_files handles different input types", {
   # Character vector
   result <- normalize_input_files(c("file1.mgf", "file2.mgf"), "Test")
@@ -1188,6 +1239,33 @@ test_that("build_library_metadata extracts SMILES-based metadata aliases", {
   expect_false("target_formula" %in% names(meta))
 })
 
+test_that("resolve_ms1_query_adduct_map selects the best adduct per feature", {
+  ms1_tbl <- data.frame(
+    feature_id = c("A", "A", "B", "C", "C"),
+    candidate_adduct = c("[M+H]+", "[M+Na]+", "[M+H]+", "[M+H]+", "[M+H]+"),
+    candidate_annotation_level = c(
+      "secondary",
+      "primary",
+      "primary",
+      "secondary",
+      "secondary"
+    ),
+    candidate_evidence_tier = c(
+      "baseline",
+      "supported_strong",
+      "supported_weak",
+      "baseline",
+      "supported_weak"
+    ),
+    candidate_structure_error_mz = c(0.2, 0.0, 0.5, 0.3, 0.1)
+  )
+
+  out <- resolve_ms1_query_adduct_map(ms1_tbl)
+
+  expect_equal(out$feature_id, c("A", "B", "C"))
+  expect_equal(out$ms1_query_adduct, c("[M+Na]+", "[M+H]+", "[M+H]+"))
+})
+
 test_that("finalize_results outputs SMILES-based structure identification only", {
   df_sim <- tidytable::tidytable(
     feature_id = "F1",
@@ -1226,6 +1304,42 @@ test_that("finalize_results outputs SMILES-based structure identification only",
   expect_false(
     "candidate_structure_inchikey_connectivity_layer" %in% names(out)
   )
+})
+
+test_that("finalize_results keeps the highest-similarity structure when deduplicating", {
+  df_sim <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    target_id = c(1L, 2L),
+    precursorMz = c(100, 100),
+    candidate_spectrum_entropy = c("0.6", "0.6"),
+    candidate_score_similarity = c("0.40", "0.90"),
+    candidate_score_similarity_forward = c("0.40", "0.90"),
+    candidate_score_similarity_reverse = c("0.40", "0.90"),
+    candidate_count_similarity_peaks_matched = c("3", "3")
+  )
+
+  meta <- tidytable::tidytable(
+    target_id = c(1L, 2L),
+    target_adduct = c("[M+H]+", "[M+Na]+"),
+    target_library = c("lib", "lib"),
+    target_spectrum_id = c("sp1", "sp2"),
+    target_smiles = c("CCO", "CCO"),
+    target_smiles_no_stereo = c("CCO", "CCO"),
+    target_name = c("ethanol", "ethanol"),
+    target_precursorMz = c(101, 123),
+    target_neutral_mass = c(100, 100)
+  )
+  query_meta <- tidytable::tidytable(
+    feature_id = "F1",
+    query_adduct = "[M+H]+",
+    query_precursorMz = 100,
+    query_neutral_mass = 99
+  )
+
+  out <- finalize_results(df_sim = df_sim, meta = meta, query_meta = query_meta)
+
+  expect_identical(out$candidate_spectrum_id[[1L]], "sp2")
+  expect_identical(out$candidate_score_similarity[[1L]], 0.90)
 })
 
 

@@ -213,6 +213,35 @@ test_that("prepare_features_tables retains top intensity samples", {
   expect_lte(length(sample_cols), n_samples)
 })
 
+test_that("prepare_features_tables skips rows without usable intensities", {
+  withr::local_dir(new = temp_test_dir("prep_feat_tables_invalid_vals"))
+  paths <- local_test_project(copy = TRUE)
+
+  features_data <- tidytable::tidytable(
+    "row ID" = 1:2,
+    "row m/z" = c(123.456, 234.567),
+    "row retention time" = c(1.5, 2.0),
+    "sample1.mzML Peak area" = c(0, NA),
+    "sample2.mzML Peak area" = c(NA, 0)
+  )
+
+  dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
+  test_file <- file.path("data", "source", "invalid_values.csv")
+  tidytable::fwrite(x = features_data, file = test_file)
+
+  output_file <- file.path("data", "interim", "features", "prepared.tsv.gz")
+  expect_no_error(
+    prepare_features_tables(
+      features = test_file,
+      output = output_file,
+      candidates = 3
+    )
+  )
+
+  prepared <- tidytable::fread(output_file)
+  expect_equal(nrow(prepared), 0L)
+})
+
 ## Edge Cases ----
 
 test_that("prepare_features_tables handles both Peak area and Peak height", {

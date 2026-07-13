@@ -13,17 +13,15 @@
 #'     otherwise sampled down to `max_per_score` (RT-error candidates
 #'     prioritized when the column is available).
 #'
-#' @param df Data frame with ranked candidates
-#' @param max_per_score Integer, maximum candidates to keep per group
-#' @param seed Integer, random seed for reproducibility
+#' @param df_tied Data frame with the tied candidate rows to evaluate.
+#' @param anchor_tbl Data frame with cross-feature neutral-mass anchor rows.
+#' @param tol Numeric mass tolerance in Daltons for matching anchors.
+#' @param rt_tol Numeric retention-time tolerance in minutes for anchor
+#'   matching when feature RT values are available.
+#' @param has_rt_feature_col Logical, whether the input data frames include an
+#'   RT column that can be used for anchor matching.
 #'
-#' @return List with three elements:
-#'   \describe{
-#'     \item{df}{Filtered data frame with sampled / collapsed candidates}
-#'     \item{n_sampled_features}{Number of features whose tied groups
-#'         required sampling (n > max_per_score)}
-#'     \item{annotation_notes}{Per-group annotation notes (anchor / sampling)}
-#'   }
+#' @return Logical vector marking rows that have a valid cross-feature anchor.
 #' @keywords internal
 
 .match_tied_rows_to_anchors <- function(
@@ -37,6 +35,17 @@
     return(rep(FALSE, nrow(df_tied)))
   }
 
+  row_mass_col <- if (".candidate_anchor_mass" %in% names(df_tied)) {
+    ".candidate_anchor_mass"
+  } else {
+    ".candidate_M"
+  }
+  anchor_mass_col <- if (".candidate_anchor_mass" %in% names(anchor_tbl)) {
+    ".candidate_anchor_mass"
+  } else {
+    ".candidate_M"
+  }
+
   row_dt <- data.frame(
     row_id = seq_len(nrow(df_tied)),
     row_IK = as.character(
@@ -48,9 +57,9 @@
     } else {
       NA_real_
     },
-    row_mass = as.numeric(df_tied$.candidate_M),
-    row_lower = as.numeric(df_tied$.candidate_M) - tol,
-    row_upper = as.numeric(df_tied$.candidate_M) + tol,
+    row_mass = as.numeric(df_tied[[row_mass_col]]),
+    row_lower = as.numeric(df_tied[[row_mass_col]]) - tol,
+    row_upper = as.numeric(df_tied[[row_mass_col]]) + tol,
     stringsAsFactors = FALSE
   )
 
@@ -64,7 +73,7 @@
     } else {
       NA_real_
     },
-    anchor_mass = as.numeric(anchor_tbl$.candidate_M),
+    anchor_mass = as.numeric(anchor_tbl[[anchor_mass_col]]),
     stringsAsFactors = FALSE
   )
 
@@ -78,38 +87,120 @@
   }
 
   anchor_match <- rep(FALSE, nrow(row_dt))
-  for (ri in seq_len(nrow(row_dt))) {
-    if (is.na(row_dt$row_mass[[ri]]) || is.na(row_dt$row_IK[[ri]])) {
+  row_groups <- split(seq_len(nrow(row_dt)), row_dt$row_IK)
+  anchor_groups <- split(seq_len(nrow(anchor_dt)), anchor_dt$anchor_IK)
+
+  for (ik in intersect(names(row_groups), names(anchor_groups))) {
+    row_idx <- row_groups[[ik]]
+    anchor_idx <- anchor_groups[[ik]]
+    if (length(row_idx) == 0L || length(anchor_idx) == 0L) {
       next
     }
 
-    candidate_anchors <- which(
-      anchor_dt$anchor_IK == row_dt$row_IK[[ri]] &
-        anchor_dt$anchor_mass >= row_dt$row_lower[[ri]] &
-        anchor_dt$anchor_mass <= row_dt$row_upper[[ri]] &
-        anchor_dt$anchor_fid != row_dt$row_fid[[ri]]
+    anchor_mass <- anchor_dt$anchor_mass[anchor_idx]
+    anchor_order <- order(anchor_mass)
+    anchor_mass <- anchor_mass[anchor_order]
+    anchor_idx_sorted <- anchor_idx[anchor_order]
+    anchor_fids <- anchor_dt$anchor_fid[anchor_idx_sorted]
+    anchor_rts <- anchor_dt$anchor_rt[anchor_idx_sorted]
+
+    row_mass <- row_dt$row_mass[row_idx]
+    row_lower <- row_dt$row_lower[row_idx]
+    row_upper <- row_dt$row_upper[row_idx]
+    row_fids <- row_dt$row_fid[row_idx]
+    row_rts <- row_dt$row_rt[row_idx]
+
+    valid_rows <- which(
+      is.finite(row_mass) & is.finite(row_lower) & is.finite(row_upper)
     )
-
-    if (length(candidate_anchors) == 0L) {
+    if (length(valid_rows) == 0L) {
       next
     }
 
-    if (has_rt_feature_col && !is.na(row_dt$row_rt[[ri]])) {
-      rt_ok <- vapply(
-        candidate_anchors,
-        function(ai) {
-          rt_val <- anchor_dt$anchor_rt[[ai]]
-          is.na(rt_val) ||
-            is.na(row_dt$row_rt[[ri]]) ||
-            abs(rt_val - row_dt$row_rt[[ri]]) <= rt_tol
-        },
-        logical(1L)
-      )
-      candidate_anchors <- candidate_anchors[rt_ok]
+    row_idx <- row_idx[valid_rows]
+    row_mass <- row_mass[valid_rows]
+    row_lower <- row_lower[valid_rows]
+    row_upper <- row_upper[valid_rows]
+    row_fids <- row_fids[valid_rows]
+    row_rts <- row_rts[valid_rows]
+
+    n_anchor <- length(anchor_mass)
+    start_idx <- findInterval(
+      row_lower,
+      anchor_mass,
+      left.open = TRUE,
+      rightmost.closed = TRUE
+    ) +
+      1L
+    start_idx <- pmin(pmax(start_idx, 1L), n_anchor + 1L)
+    end_idx <- findInterval(
+      row_upper,
+      anchor_mass,
+      left.open = FALSE,
+      rightmost.closed = TRUE
+    )
+    end_idx[!is.finite(end_idx)] <- 0L
+    end_idx[end_idx < 1L] <- 0L
+    end_idx[end_idx > n_anchor] <- n_anchor
+
+    keep_mask <- start_idx <= end_idx & end_idx >= 1L
+    if (!any(keep_mask)) {
+      next
     }
 
-    if (length(candidate_anchors) > 0L) {
-      anchor_match[[ri]] <- TRUE
+    row_idx <- row_idx[keep_mask]
+    row_fids <- row_fids[keep_mask]
+    row_rts <- row_rts[keep_mask]
+    start_idx <- start_idx[keep_mask]
+    end_idx <- end_idx[keep_mask]
+
+    if (has_rt_feature_col) {
+      for (ri in seq_along(row_idx)) {
+        if (is.na(row_rts[[ri]])) {
+          anchor_match[row_idx[[ri]]] <- TRUE
+          next
+        }
+
+        candidate_start <- start_idx[[ri]]
+        candidate_end <- end_idx[[ri]]
+        if (candidate_start > candidate_end) {
+          next
+        }
+
+        anchor_window <- seq.int(candidate_start, candidate_end)
+        candidate_anchor_fids <- anchor_fids[anchor_window]
+        candidate_anchor_rts <- anchor_rts[anchor_window]
+        keep_mask <- candidate_anchor_fids != row_fids[[ri]]
+        candidate_anchor_fids <- candidate_anchor_fids[keep_mask]
+        candidate_anchor_rts <- candidate_anchor_rts[keep_mask]
+
+        if (length(candidate_anchor_fids) == 0L) {
+          next
+        }
+
+        rt_ok <- is.na(candidate_anchor_rts) |
+          abs(candidate_anchor_rts - row_rts[[ri]]) <= rt_tol
+        if (any(rt_ok)) {
+          anchor_match[row_idx[[ri]]] <- TRUE
+        }
+      }
+    } else {
+      for (ri in seq_along(row_idx)) {
+        candidate_start <- start_idx[[ri]]
+        candidate_end <- end_idx[[ri]]
+        if (candidate_start > candidate_end) {
+          next
+        }
+
+        anchor_window <- seq.int(candidate_start, candidate_end)
+        candidate_anchor_fids <- anchor_fids[anchor_window]
+        candidate_anchor_fids <- candidate_anchor_fids[
+          candidate_anchor_fids != row_fids[[ri]]
+        ]
+        if (length(candidate_anchor_fids) > 0L) {
+          anchor_match[row_idx[[ri]]] <- TRUE
+        }
+      }
     }
   }
 
@@ -118,26 +209,46 @@
   out
 }
 
-sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
+#' Sample tied candidates within each feature/adduct group
+#'
+#' @description Keeps the best-supported candidate rows within each
+#'   feature/adduct group, optionally collapsing rank-1 anchors to preserve
+#'   cross-feature consensus candidates before sampling.
+#'
+#' @param df Data frame with ranked candidates.
+#' @param max_per_score Integer, maximum candidates to keep per group.
+#' @param seed Integer, random seed used for reproducibility when sampling.
+#' @param apply_anchor_collapsing Logical, whether to preserve candidates that
+#'   match cross-feature neutral-mass anchors before sampling.
+#'
+#' @return List with the sampled data frame, the number of sampled groups, and
+#'   per-group annotation notes.
+#' @keywords internal
+sample_candidates_per_group <- function(
+  df,
+  max_per_score,
+  seed = 42L,
+  apply_anchor_collapsing = TRUE
+) {
   if (nrow(df) == 0L) {
-    return(list(df = df, n_sampled_features = 0L))
+    return(list(
+      df = df,
+      n_sampled_features = 0L,
+      annotation_notes = tidytable::tidytable()
+    ))
   }
 
-  # Add group sizes per (feature_id, candidate_adduct, rank_final)
   df <- df |>
     tidytable::mutate(
       .n_per_group = tidytable::n(),
-      .by = c(feature_id, candidate_adduct, rank_final)
+      .by = c(feature_id, candidate_adduct),
+      .anchor_match = FALSE
     )
 
   has_ik_col <- "candidate_structure_inchikey_connectivity_layer" %in% names(df)
   has_M_cols <- "mz" %in% names(df) && "candidate_adduct" %in% names(df)
   has_rt_feature_col <- "rt" %in% names(df)
 
-  # Derive per-row neutral mass M from (feature mz, candidate_adduct). Rows
-  # from DIFFERENT features whose M values match within a small tolerance
-  # are interpretations of the same molecular entity under different
-  # adducts (e.g. `[M+NH4]+` on feature X and `[2M+Na]+` on feature Y).
   if (has_M_cols) {
     df <- df |>
       tidytable::mutate(
@@ -145,20 +256,8 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
       )
   }
 
-  # Cross-feature anchor lookup: (M, RT, IK, feature_id) tuples sourced
-  # from rank=1 rows that are THEMSELVES UNAMBIGUOUS (`.n_per_group == 1`)
-  # — a tied sibling is not real evidence and cannot anchor anything.
-  # Matching requires:
-  #   (a) anchor_fid != row_fid (another feature),
-  #   (b) same IK,
-  #   (c) same neutral mass M within NEUTRAL_MASS_MATCH_TOLERANCE_DA,
-  #   (d) same retention time within DEFAULT_HE_MAX_RT_ERROR_MIN.
-  # Without the RT gate, unrelated co-mass features at different RTs can
-  # cross-anchor each of a tied group's IKs individually, leaving every
-  # tied row flagged and nothing collapsed. Sorted by M for fast lookup.
-  anchor_tbl <- tidytable::tidytable()
-
-  if (has_ik_col && has_M_cols) {
+  df_anchor_kept <- tidytable::tidytable()
+  if (apply_anchor_collapsing && has_ik_col && has_M_cols) {
     anchor_tbl_base <- df |>
       tidytable::filter(
         rank_final == 1L,
@@ -184,60 +283,23 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
           feature_id
         )
     }
-  }
 
-  # Count features that will need sampling (> max_per_score tied rows).
-  n_sampled_features <- df |>
-    tidytable::filter(.n_per_group > max_per_score) |>
-    tidytable::distinct(feature_id) |>
-    nrow()
+    if (nrow(anchor_tbl) > 0L) {
+      tol <- NEUTRAL_MASS_MATCH_TOLERANCE_DA
+      rt_tol <- DEFAULT_HE_MAX_RT_ERROR_MIN
+      anchor_match <- .match_tied_rows_to_anchors(
+        df_tied = df,
+        anchor_tbl = anchor_tbl,
+        tol = tol,
+        rt_tol = rt_tol,
+        has_rt_feature_col = has_rt_feature_col
+      )
+      df <- df |>
+        tidytable::mutate(.anchor_match = anchor_match)
 
-  # Split: untied rows pass through. Tied rows go through anchor + (optional)
-  # sampling. Anchor collapse runs at EVERY tied size — even groups below
-  # max_per_score are collapsed when a cross-feature anchor exists.
-  df_untied <- df |>
-    tidytable::filter(.n_per_group == 1L)
-
-  df_tied <- df |>
-    tidytable::filter(.n_per_group >= 2L)
-
-  has_rt_col <- "candidate_structure_error_rt" %in% names(df)
-
-  df_anchor_kept <- tidytable::tidytable()
-  df_needs_sampling <- df_tied
-
-  if (
-    nrow(df_tied) > 0L &&
-      has_ik_col &&
-      nrow(anchor_tbl) > 0L
-  ) {
-    tol <- NEUTRAL_MASS_MATCH_TOLERANCE_DA
-    rt_tol <- DEFAULT_HE_MAX_RT_ERROR_MIN
-
-    anchor_match <- .match_tied_rows_to_anchors(
-      df_tied = df_tied,
-      anchor_tbl = anchor_tbl,
-      tol = tol,
-      rt_tol = rt_tol,
-      has_rt_feature_col = has_rt_feature_col
-    )
-
-    df_tied <- df_tied |>
-      tidytable::mutate(.anchor_match = anchor_match)
-
-    anchor_group_keys <- df_tied |>
-      tidytable::filter(.anchor_match) |>
-      tidytable::distinct(feature_id, candidate_adduct, rank_final)
-
-    if (nrow(anchor_group_keys) > 0L) {
-      # Tied groups with at least one anchor match -> keep ONLY the
-      # anchor-matching rows (no max_per_score cap: cross-feature evidence
-      # is stronger than the arbitrary cap).
-      df_anchor_kept <- df_tied |>
-        tidytable::inner_join(
-          y = anchor_group_keys,
-          by = c("feature_id", "candidate_adduct", "rank_final")
-        ) |>
+      has_consensus_flag <- "cluster_consensus_promoted_from_anchor" %in%
+        names(df)
+      df_anchor_kept <- df |>
         tidytable::filter(.anchor_match) |>
         tidytable::arrange(
           feature_id,
@@ -247,41 +309,106 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
           tidytable::desc(candidate_score_pseudo_initial)
         ) |>
         tidytable::mutate(
+          cluster_consensus_promoted_from_anchor = if (has_consensus_flag) {
+            cluster_consensus_promoted_from_anchor
+          } else {
+            FALSE
+          },
           annotation_note = paste0(
             "Kept candidate matching best-supported InChIKey from sibling ",
             "feature with same neutral mass (different adduct)"
           )
         )
-
-      # Tied groups without any anchor match fall through to the sampling
-      # step below (kept as-is if small, sampled if oversized).
-      df_needs_sampling <- df_tied |>
-        tidytable::anti_join(
-          y = anchor_group_keys,
-          by = c("feature_id", "candidate_adduct", "rank_final")
-        )
     }
   }
 
-  # Tied groups without an anchor: keep as-is when below the cap, sample
-  # down when above. We NEVER drop them — losing every tied candidate
-  # when no sibling evidence exists would erase valid annotations.
-  df_keep_remaining <- df_needs_sampling |>
+  anchor_group_keys <- df |>
+    tidytable::filter(.anchor_match) |>
+    tidytable::distinct(feature_id, candidate_adduct)
+
+  df_remaining <- if (nrow(anchor_group_keys) > 0L) {
+    df |>
+      tidytable::anti_join(
+        y = anchor_group_keys,
+        by = c("feature_id", "candidate_adduct")
+      )
+  } else {
+    df
+  }
+
+  n_sampled_features <- df_remaining |>
+    tidytable::filter(.n_per_group > max_per_score) |>
+    tidytable::distinct(feature_id) |>
+    nrow()
+
+  has_rt_col <- "candidate_structure_error_rt" %in% names(df_remaining)
+  df_untied <- df_remaining |>
+    tidytable::filter(.n_per_group == 1L)
+
+  df_tied <- df_remaining |>
+    tidytable::filter(.n_per_group >= 2L)
+
+  df_keep_remaining <- df_tied |>
     tidytable::filter(.n_per_group <= max_per_score)
 
-  df_needs_sampling <- df_needs_sampling |>
+  df_needs_sampling <- df_tied |>
     tidytable::filter(.n_per_group > max_per_score)
+
+  sort_candidates_for_sampling <- function(tbl, prefer_rt = FALSE) {
+    if (nrow(tbl) == 0L) {
+      return(tbl)
+    }
+
+    order_terms <- list()
+    if (isTRUE(prefer_rt) && ".rt_priority" %in% names(tbl)) {
+      order_terms[[length(order_terms) + 1L]] <- -as.integer(tbl$.rt_priority)
+    }
+
+    if ("cluster_consensus_promoted_from_anchor" %in% names(tbl)) {
+      order_terms[[length(order_terms) + 1L]] <- -as.integer(
+        !is.na(tbl$cluster_consensus_promoted_from_anchor) &
+          tbl$cluster_consensus_promoted_from_anchor
+      )
+    }
+
+    score_columns <- c(
+      "score_weighted_chemo",
+      "score_weighted_chemo_coverage",
+      "candidate_score_pseudo_initial",
+      "candidate_score_similarity",
+      "candidate_score_similarity_forward",
+      "candidate_score_similarity_reverse"
+    )
+    for (score_col in score_columns) {
+      if (score_col %in% names(tbl)) {
+        order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(
+          as.numeric(tbl[[score_col]])
+        )
+      }
+    }
+
+    if (length(order_terms) == 0L) {
+      return(tbl)
+    }
+
+    ord <- do.call(
+      order,
+      c(order_terms, list(na.last = TRUE, method = "radix"))
+    )
+    tbl[ord, , drop = FALSE]
+  }
 
   if (nrow(df_needs_sampling) > 0L && has_rt_col) {
     df_needs_sampling <- df_needs_sampling |>
       tidytable::mutate(.rt_priority = !is.na(candidate_structure_error_rt))
 
-    set.seed(seed)
-    df_sampled <- df_needs_sampling |>
-      tidytable::arrange(tidytable::desc(.rt_priority)) |>
+    df_sampled <- sort_candidates_for_sampling(
+      df_needs_sampling,
+      prefer_rt = TRUE
+    ) |>
       tidytable::slice_head(
         n = max_per_score,
-        by = c(feature_id, candidate_adduct, rank_final)
+        by = c(feature_id, candidate_adduct)
       ) |>
       tidytable::mutate(
         annotation_note = paste0(
@@ -294,11 +421,10 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
       ) |>
       tidytable::select(-.rt_priority)
   } else if (nrow(df_needs_sampling) > 0L) {
-    set.seed(seed)
-    df_sampled <- df_needs_sampling |>
-      tidytable::slice_sample(
+    df_sampled <- sort_candidates_for_sampling(df_needs_sampling) |>
+      tidytable::slice_head(
         n = max_per_score,
-        by = c(feature_id, candidate_adduct, rank_final)
+        by = c(feature_id, candidate_adduct)
       ) |>
       tidytable::mutate(
         annotation_note = paste0(
@@ -320,16 +446,9 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
     df_sampled
   ) |>
     tidytable::select(
-      -tidyselect::any_of(c(
-        ".n_per_group",
-        ".anchor_match",
-        ".candidate_M"
-      ))
+      -tidyselect::any_of(c(".n_per_group", ".anchor_match", ".candidate_M"))
     )
 
-  # Extract annotation_note as a separate lookup table
-  # annotation_note is per (feature_id, adduct, rank_final) group
-  # Collapse multiple notes for the same key to prevent join-induced duplicates
   annotation_notes_lookup <- tidytable::tidytable()
 
   if ("annotation_note" %in% names(df_result)) {
@@ -338,16 +457,14 @@ sample_candidates_per_group <- function(df, max_per_score, seed = 42L) {
       tidytable::distinct(
         feature_id,
         candidate_adduct,
-        rank_final,
         annotation_note
       ) |>
-      tidytable::group_by(feature_id, candidate_adduct, rank_final) |>
+      tidytable::group_by(feature_id, candidate_adduct) |>
       tidytable::summarize(
         annotation_note = paste(unique(annotation_note), collapse = " | "),
         .groups = "drop"
       )
 
-    # Remove annotation_note from main data
     df_result <- df_result |>
       tidytable::select(-tidyselect::any_of("annotation_note"))
   }
@@ -400,7 +517,10 @@ coerce_score_columns <- function(annot_table_wei_chemo) {
   score_columns <- c(
     "score_biological",
     "score_chemical",
+    "score_weighted_bio",
+    "score_weighted_bio_coverage",
     "score_weighted_chemo",
+    "score_weighted_chemo_coverage",
     "candidate_score_pseudo_initial",
     "candidate_score_similarity",
     "candidate_score_similarity_forward",
@@ -432,6 +552,8 @@ coerce_score_columns <- function(annot_table_wei_chemo) {
 #' @param best_percentile Numeric percentile threshold
 #' @param max_per_score Integer max candidates per score group
 #' @param components_table Optional data frame with feature_id and component_id
+#' @param enforce_cluster_consensus Logical, apply cluster-consensus promotion
+#'     before sampling and percentile filtering
 #'
 #' @return Named list with ranked/percentile tables and candidate counts
 #' @keywords internal
@@ -442,7 +564,8 @@ prepare_ranked_candidates <- function(
   minimal_ms1_condition,
   best_percentile,
   max_per_score,
-  components_table = NULL
+  components_table = NULL,
+  enforce_cluster_consensus = TRUE
 ) {
   df_base <- filter_ms1_annotations(
     annot_table_wei_chemo = annot_table_wei_chemo,
@@ -453,10 +576,16 @@ prepare_ranked_candidates <- function(
 
   df_ranked <- rank_and_deduplicate(df_base)
 
-  # Enforce cluster-level entity consensus if components_table is provided
-  # This ensures that features within the same connected component agree on
-  # their candidate structures, improving annotation coherence.
-  if (!is.null(components_table) && nrow(components_table) > 0L) {
+  # Cluster-consensus promotion is enabled by default for the candidate
+  # ranking pipeline. The main clean_chemo workflow can disable it if a caller
+  # needs the legacy behavior, but the promotion path is kept so consensus-
+  # supported candidates survive sampling/percentile filtering when no stronger
+  # local candidate exists.
+  if (
+    enforce_cluster_consensus &&
+      !is.null(components_table) &&
+      nrow(components_table) > 0L
+  ) {
     df_ranked <- enforce_cluster_entity_consensus(
       df_ranked,
       components_table
@@ -467,7 +596,8 @@ prepare_ranked_candidates <- function(
   sampling_result <- sample_candidates_per_group(
     df = df_ranked,
     max_per_score = max_per_score,
-    seed = 42L
+    seed = 42L,
+    apply_anchor_collapsing = TRUE
   )
 
   df_ranked <- sampling_result$df
@@ -510,6 +640,56 @@ build_mini_taxonomy_table <- function(
 ) {
   if (!"score_weighted_chemo" %in% names(df_percentile)) {
     df_percentile$score_weighted_chemo <- NA_real_
+  }
+  required_tax_cols <- c(
+    "candidate_structure_tax_cla_04dirpar",
+    "candidate_structure_tax_cla_03cla",
+    "candidate_structure_tax_cla_02sup",
+    "candidate_structure_tax_cla_01kin",
+    "candidate_structure_tax_npc_03cla",
+    "candidate_structure_tax_npc_02sup",
+    "candidate_structure_tax_npc_01pat"
+  )
+  missing_tax_cols <- setdiff(required_tax_cols, names(df_percentile))
+  if (length(missing_tax_cols) > 0L) {
+    for (col in missing_tax_cols) {
+      df_percentile[[col]] <- NA_character_
+    }
+  }
+  required_pred_tax_cols <- c(
+    "feature_pred_tax_cla_01kin_val",
+    "feature_pred_tax_cla_01kin_score",
+    "feature_pred_tax_cla_02sup_val",
+    "feature_pred_tax_cla_02sup_score",
+    "feature_pred_tax_cla_03cla_val",
+    "feature_pred_tax_cla_03cla_score",
+    "feature_pred_tax_cla_04dirpar_val",
+    "feature_pred_tax_cla_04dirpar_score",
+    "feature_pred_tax_npc_01pat_val",
+    "feature_pred_tax_npc_01pat_score",
+    "feature_pred_tax_npc_02sup_val",
+    "feature_pred_tax_npc_02sup_score",
+    "feature_pred_tax_npc_03cla_val",
+    "feature_pred_tax_npc_03cla_score"
+  )
+  missing_pred_tax_cols <- setdiff(required_pred_tax_cols, names(df_percentile))
+  if (length(missing_pred_tax_cols) > 0L) {
+    missing_pred_val_cols <- grep("_val$", missing_pred_tax_cols, value = TRUE)
+    missing_pred_score_cols <- grep(
+      "_score$",
+      missing_pred_tax_cols,
+      value = TRUE
+    )
+    if (length(missing_pred_val_cols) > 0L) {
+      for (col in missing_pred_val_cols) {
+        df_percentile[[col]] <- NA_character_
+      }
+    }
+    if (length(missing_pred_score_cols) > 0L) {
+      for (col in missing_pred_score_cols) {
+        df_percentile[[col]] <- NA_real_
+      }
+    }
   }
 
   normalize_tax_label <- function(x) {
@@ -994,52 +1174,67 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     return(df_ranked |> tidytable::select(-tidyselect::any_of(".candidate_M")))
   }
 
-  # For each feature in a consensus group, if it has a different rank=1 candidate
-  # than the anchor, and the anchor is present in its candidates, reorder to make
-  # the anchor the rank=1
-  df_to_reorder <- df_with_comp |>
+  # For each feature in the consensus group, carry forward the anchor metadata.
+  # Features whose current rank-1 candidate differs from the consensus anchor
+  # need their rows reordered so the anchor candidate becomes rank 1. Features
+  # that already have the anchor at rank 1 need provenance only.
+  df_with_anchor <- df_with_comp |>
     tidytable::left_join(
       y = anchor_lookup,
       by = c("component_id", ".candidate_M_key")
     ) |>
-    tidytable::filter(
-      !is.na(.anchor_ik),
-      rank_final == 1L,
-      !.has_ms2_evidence,
-      candidate_structure_inchikey_connectivity_layer != .anchor_ik
+    tidytable::mutate(
+      .has_anchor_ik = candidate_structure_inchikey_connectivity_layer ==
+        .anchor_ik,
+      .is_anchor_feature = feature_id == .anchor_feature_id
     )
 
-  if (nrow(df_to_reorder) > 0L) {
-    # Check if anchor is present as a candidate (any rank) for these features
-    reorder_fids <- df_to_reorder$feature_id
+  features_with_anchor <- df_with_anchor |>
+    tidytable::filter(.has_anchor_ik) |>
+    tidytable::distinct(feature_id, component_id, .candidate_M_key)
 
-    df_anchored <- df_with_comp |>
-      tidytable::left_join(
-        y = anchor_lookup,
-        by = c("component_id", ".candidate_M_key")
+  if (nrow(features_with_anchor) > 0L) {
+    has_annotation_note <- "annotation_note" %in% names(df_with_anchor)
+    df_part_reorder <- df_with_anchor |>
+      tidytable::inner_join(
+        y = features_with_anchor,
+        by = c("feature_id", "component_id", ".candidate_M_key")
       ) |>
-      tidytable::filter(feature_id %in% reorder_fids) |>
-      # For each feature in reorder set, check if it HAS the anchor IK
       tidytable::mutate(
-        .has_anchor_ik = candidate_structure_inchikey_connectivity_layer ==
-          .anchor_ik,
-        .is_anchor_feature = feature_id == .anchor_feature_id
+        cluster_consensus_group_id = tidytable::coalesce(
+          cluster_consensus_group_id,
+          paste(
+            component_id,
+            sprintf(
+              "%.*f",
+              NEUTRAL_MASS_GROUP_DECIMALS,
+              .candidate_M_key
+            ),
+            sep = "::"
+          )
+        ),
+        cluster_consensus_anchor_feature_id = .anchor_feature_id,
+        cluster_consensus_anchor_inchikey = .anchor_ik,
+        cluster_consensus_applied = TRUE,
+        .existing_note = if (has_annotation_note) {
+          annotation_note
+        } else {
+          NA_character_
+        }
       )
 
-    # Identify which (feature_id, component_id, .candidate_M_key) groups actually
-    # have the anchor InChIKey as a candidate
-    groups_with_anchor <- df_anchored |>
-      tidytable::filter(.has_anchor_ik) |>
-      tidytable::distinct(feature_id, component_id, .candidate_M_key)
+    reorder_fids <- unique(
+      df_part_reorder$feature_id[
+        df_part_reorder$rank_final == 1L &
+          !df_part_reorder$.has_ms2_evidence &
+          df_part_reorder$candidate_structure_inchikey_connectivity_layer !=
+            df_part_reorder$.anchor_ik
+      ]
+    )
 
-    if (nrow(groups_with_anchor) > 0L) {
-      # Reorder: make the anchor IK == rank_final 1, shift others down
-      has_annotation_note <- "annotation_note" %in% names(df_anchored)
-      df_part_reorder <- df_anchored |>
-        tidytable::inner_join(
-          y = groups_with_anchor,
-          by = c("feature_id", "component_id", ".candidate_M_key")
-        ) |>
+    if (length(reorder_fids) > 0L) {
+      df_reordered <- df_part_reorder |>
+        tidytable::filter(feature_id %in% reorder_fids) |>
         tidytable::arrange(
           feature_id,
           .candidate_M_key,
@@ -1048,109 +1243,96 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
         ) |>
         tidytable::mutate(
           rank_final = tidytable::row_number(),
-          .by = c(feature_id, component_id, .candidate_M_key),
-          cluster_consensus_group_id = tidytable::coalesce(
-            cluster_consensus_group_id,
-            paste(
-              component_id,
-              sprintf(
-                "%.*f",
-                NEUTRAL_MASS_GROUP_DECIMALS,
-                .candidate_M_key
-              ),
-              sep = "::"
-            )
-          ),
-          cluster_consensus_anchor_feature_id = .anchor_feature_id,
-          cluster_consensus_anchor_inchikey = .anchor_ik,
-          cluster_consensus_applied = TRUE,
-          cluster_consensus_promoted_from_anchor = .has_anchor_ik &
-            rank_final == 1L &
-            !.is_anchor_feature,
-          .existing_note = if (has_annotation_note) {
-            annotation_note
-          } else {
-            NA_character_
-          },
-          annotation_note = tidytable::if_else(
-            condition = cluster_consensus_promoted_from_anchor,
-            true = "Promoted to rank 1: cluster entity consensus (same M across component)",
-            false = .existing_note
-          )
-        ) |>
-        tidytable::select(
-          -tidyselect::all_of(c(
-            ".candidate_M",
-            ".candidate_M_exact",
-            ".candidate_M_mz",
-            ".candidate_M_key",
-            ".has_anchor_ik",
-            ".is_anchor_feature",
-            ".anchor_ik",
-            ".anchor_feature_id",
-            ".existing_note",
-            ".has_ms2_evidence"
-          ))
+          .by = c(feature_id, component_id, .candidate_M_key)
         )
 
-      # Combine reordered with unchanged rows.
-      # After grouped row_number() inside df_part_reorder, a feature with
-      # candidates for multiple M values may have duplicate rank_final values
-      # (each M group was ranked independently 1, 2, 3, ...).
-      # Re-rank globally per feature so that promoted anchor rows sort first,
-      # followed by the remaining candidates in their current order.
-      df_unchanged <- df_with_comp |>
-        tidytable::anti_join(
-          y = groups_with_anchor,
-          by = c("feature_id", "component_id", ".candidate_M_key")
-        ) |>
-        tidytable::mutate(
-          cluster_consensus_applied = FALSE,
-          cluster_consensus_promoted_from_anchor = FALSE
-        ) |>
-        tidytable::select(
-          -tidyselect::all_of(c(
-            ".candidate_M",
-            ".candidate_M_exact",
-            ".candidate_M_mz",
-            ".candidate_M_key",
-            "component_id",
-            ".has_ms2_evidence"
-          ))
+      df_not_reordered <- df_part_reorder |>
+        tidytable::filter(!feature_id %in% reorder_fids)
+
+      df_part_reorder <- tidytable::bind_rows(df_reordered, df_not_reordered) |>
+        tidytable::arrange(feature_id, rank_final)
+    }
+
+    df_part_reorder <- df_part_reorder |>
+      tidytable::mutate(
+        cluster_consensus_promoted_from_anchor = .has_anchor_ik &
+          rank_final == 1L &
+          !.is_anchor_feature,
+        annotation_note = tidytable::if_else(
+          condition = cluster_consensus_promoted_from_anchor,
+          true = "Promoted to rank 1: cluster entity consensus (same M across component)",
+          false = .existing_note
         )
-
-      affected_fids <- unique(df_part_reorder$feature_id)
-
-      df_result <- tidytable::bind_rows(df_part_reorder, df_unchanged)
-
-      if (length(affected_fids) > 0L) {
-        df_affected <- df_result |>
-          tidytable::filter(feature_id %in% affected_fids) |>
-          tidytable::arrange(
-            feature_id,
-            tidytable::desc(cluster_consensus_promoted_from_anchor),
-            rank_final
-          ) |>
-          tidytable::mutate(
-            rank_final = tidytable::row_number(),
-            .by = feature_id
-          )
-        df_unaffected <- df_result |>
-          tidytable::filter(!feature_id %in% affected_fids)
-        df_result <- tidytable::bind_rows(df_affected, df_unaffected) |>
-          tidytable::arrange(feature_id, rank_final)
-      } else {
-        df_result <- df_result |>
-          tidytable::arrange(feature_id, rank_final)
-      }
-
-      log_info(
-        "Enforced cluster entity consensus for %d features (anchor InChIKey promoted to rank 1)",
-        tidytable::n_distinct(groups_with_anchor$feature_id)
       )
 
-      return(df_result)
+    # Combine anchored rows with unchanged rows.
+    df_unchanged <- df_with_comp |>
+      tidytable::anti_join(
+        y = features_with_anchor,
+        by = c("feature_id", "component_id", ".candidate_M_key")
+      ) |>
+      tidytable::mutate(
+        cluster_consensus_applied = FALSE,
+        cluster_consensus_promoted_from_anchor = FALSE
+      ) |>
+      tidytable::select(
+        -tidyselect::all_of(c(
+          ".candidate_M",
+          ".candidate_M_exact",
+          ".candidate_M_mz",
+          ".candidate_M_key",
+          "component_id",
+          ".has_ms2_evidence"
+        ))
+      )
+
+    df_part_reorder <- df_part_reorder |>
+      tidytable::select(
+        -tidyselect::all_of(c(
+          ".candidate_M",
+          ".candidate_M_exact",
+          ".candidate_M_mz",
+          ".candidate_M_key",
+          ".has_anchor_ik",
+          ".is_anchor_feature",
+          ".anchor_ik",
+          ".anchor_feature_id",
+          ".existing_note",
+          ".has_ms2_evidence"
+        ))
+      )
+
+    affected_fids <- unique(df_part_reorder$feature_id)
+
+    df_result <- tidytable::bind_rows(df_part_reorder, df_unchanged)
+
+    if (length(affected_fids) > 0L) {
+      df_affected <- df_result |>
+        tidytable::filter(feature_id %in% affected_fids) |>
+        tidytable::arrange(
+          feature_id,
+          tidytable::desc(cluster_consensus_promoted_from_anchor),
+          rank_final
+        ) |>
+        tidytable::mutate(
+          rank_final = tidytable::row_number(),
+          .by = feature_id
+        )
+      df_unaffected <- df_result |>
+        tidytable::filter(!feature_id %in% affected_fids)
+      df_result <- tidytable::bind_rows(df_affected, df_unaffected) |>
+        tidytable::arrange(feature_id, rank_final)
+    } else {
+      df_result <- df_result |>
+        tidytable::arrange(feature_id, rank_final)
     }
+
+    log_info(
+      "Enforced cluster entity consensus for %d features (anchor InChIKey promoted to rank 1)",
+      tidytable::n_distinct(features_with_anchor$feature_id)
+    )
+
+    return(df_result)
   }
 
   # No reordering needed; clean up temporary columns

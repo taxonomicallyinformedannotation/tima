@@ -10,6 +10,7 @@ filter_high_evidence_only(
   score_bio_min = DEFAULT_HE_SCORE_BIO_MIN,
   score_ini_min = DEFAULT_HE_SCORE_INITIAL_MIN,
   score_final_min = DEFAULT_HE_SCORE_FINAL_MIN,
+  score_final_coverage_min = DEFAULT_HE_SCORE_FINAL_COVERAGE_MIN,
   error_rt_max = DEFAULT_HE_MAX_RT_ERROR_MIN,
   confidence_sirius_min = DEFAULT_HE_SCORE_SIRIUS_MIN,
   similarity_spectral_min = DEFAULT_HE_SCORE_SPECTRAL_MIN,
@@ -28,6 +29,10 @@ Range: 0-1}
 
 \item{score_final_min}{Numeric minimum final (chemical) score threshold
 (default: 0.75). Range: 0-1}
+
+\item{score_final_coverage_min}{Numeric minimum coverage required when the
+weighted final score is used to pass the filter (default: 0.67). Range:
+0-1. NA coverage is allowed when the column is absent.}
 
 \item{error_rt_max}{Numeric maximum retention time error in minutes (default:
 0.05). Must be > 0}
@@ -71,6 +76,7 @@ Columns used when present:
 \item score_biological
 \item candidate_score_pseudo_initial
 \item score_weighted_chemo
+\item score_weighted_chemo_coverage
 \item candidate_structure_error_rt (assumed in minutes; NA means unknown and is
 allowed)
 \item candidate_score_sirius_confidence (optional, NA values allowed)
@@ -80,7 +86,9 @@ allowed)
 
 Missing score columns are treated as absent for that criterion and do not
 cause errors; at least one of the three primary scores must satisfy its
-threshold for a row to be retained.
+threshold for a row to be retained. When present, final-score coverage is
+required to be at least \code{score_final_coverage_min} for a row to pass via the
+weighted chemical score.
 
 \strong{NA value handling:}
 \itemize{

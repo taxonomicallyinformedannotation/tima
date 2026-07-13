@@ -92,10 +92,34 @@ summarize_results <- function(
       tidytable::mutate(reference_doi = NA_character_)
   }
 
-  organism_lookup <- .build_organism_lookup(
-    structure_organism_pairs_table = structure_organism_pairs_table,
-    df = df
-  )
+  organism_lookup <- if (
+    nrow(structure_organism_pairs_table) > 0L &&
+      any(
+        c(
+          "candidate_structure_inchikey_connectivity_layer",
+          "candidate_structure_organism_occurrence_closest"
+        ) %in%
+          names(df)
+      )
+  ) {
+    .build_organism_lookup(
+      structure_organism_pairs_table = structure_organism_pairs_table,
+      df = df
+    )
+  } else {
+    structure_organism_pairs_table[0L, ] |>
+      tidytable::select(
+        candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
+        reference_doi,
+        tidyselect::contains(match = "organism_taxonomy_"),
+        -tidyselect::any_of("organism_taxonomy_ottid")
+      ) |>
+      tidytable::mutate(
+        feature_id = character(),
+        candidate_structure_organism_occurrence_closest = character(),
+        candidate_structure_organism_occurrence_reference = character()
+      )
+  }
 
   # Define columns to select
   select_cols <- c(
@@ -114,7 +138,10 @@ summarize_results <- function(
     "score_initial" = "candidate_score_pseudo_initial",
     "score_biological",
     "score_interim" = "score_weighted_bio",
+    "score_weighted_bio_coverage",
     "score_chemical",
+    "score_weighted_chemo",
+    "score_weighted_chemo_coverage",
     "score_final" = "score_weighted_chemo"
   )
 
@@ -130,6 +157,8 @@ summarize_results <- function(
     candidate_id_cols,
     model$rank_columns,
     model$score_columns,
+    "score_weighted_chemo",
+    "score_final",
     # Include annotation notes (if available from sampling/filtering operations)
     "annotation_note"
   ))
@@ -148,30 +177,50 @@ summarize_results <- function(
 
   # Start from annotation rows and add compact per-feature metadata.
   df_joined <- df |>
-    tidytable::right_join(y = features_min) |>
-    tidytable::left_join(y = components_min) |>
-    tidytable::select(tidyselect::any_of(x = select_cols)) |>
-    tidytable::distinct() |>
-    tidytable::left_join(
-      y = organism_lookup,
-      by = c(
-        "feature_id",
-        "candidate_structure_inchikey_connectivity_layer",
-        "candidate_structure_organism_occurrence_closest"
-      )
-    ) |>
-    tidytable::select(tidyselect::any_of(x = final_select_cols)) |>
-    tidytable::arrange(rank_final)
+    tidytable::select(tidyselect::any_of(x = select_cols))
+
+  if (nrow(df_joined) > 0L) {
+    df_joined <- df_joined |>
+      tidytable::left_join(
+        y = features_min,
+        by = "feature_id",
+        suffix = c("", "_feature")
+      ) |>
+      tidytable::left_join(
+        y = components_min,
+        by = "feature_id",
+        suffix = c("", "_component")
+      ) |>
+      tidytable::left_join(
+        y = organism_lookup,
+        by = c(
+          "feature_id",
+          "candidate_structure_inchikey_connectivity_layer",
+          "candidate_structure_organism_occurrence_closest"
+        )
+      ) |>
+      tidytable::select(tidyselect::any_of(x = final_select_cols))
+  } else {
+    df_joined <- df_joined |>
+      tidytable::select(tidyselect::any_of(x = final_select_cols))
+  }
 
   # Add annotation_note from lookup table at the very end
   # Note: annotation_notes_lookup has been pre-collapsed to ensure
   # one note per (feature_id, candidate_adduct, rank_final) group
   if (!is.null(annotation_notes_lookup) && nrow(annotation_notes_lookup) > 0) {
-    df_joined <- df_joined |>
-      tidytable::left_join(
-        y = annotation_notes_lookup,
-        by = c("feature_id", "candidate_adduct", "rank_final")
-      )
+    note_join_cols <- intersect(
+      c("feature_id", "candidate_adduct", "rank_final"),
+      names(annotation_notes_lookup)
+    )
+    note_join_cols <- intersect(note_join_cols, names(df_joined))
+    if (length(note_join_cols) > 0L) {
+      df_joined <- df_joined |>
+        tidytable::left_join(
+          y = annotation_notes_lookup,
+          by = note_join_cols
+        )
+    }
   }
 
   rm(df, organism_lookup)
@@ -185,61 +234,55 @@ summarize_results <- function(
 
   # Summarize if requested
   if (summarize) {
-    # Get column names that match the pattern once.
-    collapse_cols <- colnames(df_joined)[grepl(
-      pattern = "^candidate|^rank|^score",
-      x = colnames(df_joined),
-      perl = TRUE
-    )]
-
-    # Aggregate each group directly to avoid the generic
-    # tidytable across/summarize machinery on every column.
-    keep_cols <- setdiff(colnames(df_joined), c("feature_id", collapse_cols))
-
-    collapse_groups <- split(seq_len(nrow(df_joined)), df_joined$feature_id)
-    collapse_res <- lapply(collapse_groups, function(idx) {
-      row_group <- df_joined[idx, , drop = FALSE]
-      stats::setNames(
-        lapply(collapse_cols, function(col) {
-          .collapse_group_values(row_group[[col]])
-        }),
-        collapse_cols
-      )
-    })
-
-    collapse_df <- do.call(
-      rbind,
-      lapply(collapse_res, function(x) {
-        as.data.frame(x, stringsAsFactors = FALSE)
-      })
-    )
-    row.names(collapse_df) <- NULL
-
-    if (length(keep_cols) > 0L) {
-      keep_groups <- lapply(collapse_groups, function(idx) {
-        row_group <- df_joined[idx, , drop = FALSE]
-        stats::setNames(
-          lapply(keep_cols, function(col) {
-            .first_non_missing(row_group[[col]])
-          }),
-          keep_cols
-        )
-      })
-      keep_df <- do.call(
-        rbind,
-        lapply(keep_groups, function(x) {
-          as.data.frame(x, stringsAsFactors = FALSE)
-        })
-      )
-      row.names(keep_df) <- NULL
-      feature_ids <- names(collapse_groups)
-      collapse_df <- cbind(feature_id = feature_ids, collapse_df, keep_df)
+    if (nrow(df_joined) == 0L) {
+      df_final <- df_joined
     } else {
-      feature_ids <- names(collapse_groups)
-      collapse_df <- cbind(feature_id = feature_ids, collapse_df)
-    }
+      df_final <- df_joined |>
+        tidytable::mutate(
+          .rank_final_num = suppressWarnings(as.integer(rank_final)),
+          .score_weighted_chemo_num = if ("score_final" %in% names(df_joined)) {
+            -suppressWarnings(as.numeric(score_final))
+          } else if ("score_weighted_chemo" %in% names(df_joined)) {
+            -suppressWarnings(as.numeric(score_weighted_chemo))
+          } else {
+            0
+          },
+          .score_weighted_chemo_coverage_num = if (
+            "score_weighted_chemo_coverage" %in% names(df_joined)
+          ) {
+            -suppressWarnings(as.numeric(score_weighted_chemo_coverage))
+          } else {
+            0
+          },
+          .candidate_score_pseudo_initial_num = if (
+            "score_initial" %in% names(df_joined)
+          ) {
+            -suppressWarnings(as.numeric(score_initial))
+          } else if ("candidate_score_pseudo_initial" %in% names(df_joined)) {
+            -suppressWarnings(as.numeric(candidate_score_pseudo_initial))
+          } else {
+            0
+          }
+        ) |>
+        tidytable::arrange(
+          feature_id,
+          .rank_final_num,
+          .score_weighted_chemo_num,
+          .score_weighted_chemo_coverage_num,
+          .candidate_score_pseudo_initial_num
+        ) |>
+        tidytable::distinct(feature_id, .keep_all = TRUE)
 
-    df_final <- as.data.frame(collapse_df, stringsAsFactors = FALSE)
+      df_final <- df_final |>
+        tidytable::select(
+          -tidyselect::any_of(c(
+            ".rank_final_num",
+            ".score_weighted_chemo_num",
+            ".score_weighted_chemo_coverage_num",
+            ".candidate_score_pseudo_initial_num"
+          ))
+        )
+    }
 
     rm(df_joined)
   } else {
@@ -305,27 +348,73 @@ summarize_results <- function(
 
   rm(df_processed)
 
-  # Log percentage of annotated features based on final results
-  total_features <- length(unique(results$feature_id))
-  annotated_features <- length(unique(
-    results$feature_id[
-      !is.na(results$candidate_structure_inchikey_connectivity_layer) &
-        results$candidate_structure_inchikey_connectivity_layer != ""
-    ]
-  ))
+  # Log percentage of annotated features against the full feature universe.
+  # The summarized output is one row per feature and can omit unannotated
+  # features from the intermediate table, so the denominator must come from the
+  # input feature table whenever that is available.
+  annotation_coverage <- .count_annotated_features(
+    results = results,
+    features_table = features_table,
+    feature_id_col = "feature_id",
+    annotation_col = "candidate_structure_inchikey_connectivity_layer"
+  )
+  log_info(
+    "Annotated features: %d/%d (%.1f%%)",
+    annotation_coverage$annotated_features,
+    annotation_coverage$total_features,
+    annotation_coverage$pct_annotated
+  )
+
+  results
+}
+
+.count_annotated_features <- function(
+  results,
+  features_table = NULL,
+  feature_id_col = "feature_id",
+  annotation_col = "candidate_structure_inchikey_connectivity_layer"
+) {
+  total_feature_ids <- if (
+    !is.null(features_table) && nrow(features_table) > 0L
+  ) {
+    as.character(features_table[[feature_id_col]])
+  } else if (!is.null(results) && nrow(results) > 0L) {
+    as.character(results[[feature_id_col]])
+  } else {
+    character(0)
+  }
+  total_features <- length(unique(total_feature_ids))
+
+  annotated_features <- 0L
+  if (!is.null(results) && nrow(results) > 0L) {
+    has_annotation_col <- annotation_col %in% names(results)
+    if (has_annotation_col) {
+      annotated_ids <- results[[feature_id_col]][
+        !is.na(results[[annotation_col]]) &
+          nzchar(trimws(as.character(results[[annotation_col]])))
+      ]
+      if (length(annotated_ids) > 0L) {
+        annotated_ids <- unique(as.character(annotated_ids))
+        if (length(total_feature_ids) > 0L) {
+          annotated_features <- sum(total_feature_ids %in% annotated_ids)
+        } else {
+          annotated_features <- length(annotated_ids)
+        }
+      }
+    }
+  }
+
   pct_annotated <- if (total_features > 0L) {
     100 * annotated_features / total_features
   } else {
     0
   }
-  log_info(
-    "Annotated features: %d/%d (%.1f%%)",
-    annotated_features,
-    total_features,
-    pct_annotated
-  )
 
-  results
+  list(
+    total_features = total_features,
+    annotated_features = annotated_features,
+    pct_annotated = pct_annotated
+  )
 }
 
 .build_organism_lookup <- function(structure_organism_pairs_table, df) {
@@ -412,26 +501,6 @@ summarize_results <- function(
     tidytable::ungroup()
 }
 
-.collapse_group_values <- function(x) {
-  x <- as.character(x)
-  x[is.na(x)] <- ""
-  gsub(
-    pattern = "\\bNA\\b",
-    replacement = "",
-    x = paste(x, collapse = "|"),
-    perl = TRUE
-  )
-}
-
-.first_non_missing <- function(x) {
-  idx <- which(!is.na(x))
-  if (length(idx) == 0L) {
-    return(x[1L])
-  }
-
-  x[idx[1L]]
-}
-
 .build_feature_consensus_table <- function(annot_table_wei_chemo, model) {
   base_cols <- c(
     model$features_columns,
@@ -446,36 +515,47 @@ summarize_results <- function(
     tidytable::select(
       tidyselect::any_of(c(base_cols, "score_weighted_chemo", "rank_final"))
     )
+
   if (!"annotation_note" %in% names(consensus_src)) {
     consensus_src$annotation_note <- NA_character_
   }
   if (!"score_weighted_chemo" %in% names(consensus_src)) {
-    consensus_src$score_weighted_chemo <- NA_character_
+    consensus_src$score_weighted_chemo <- NA_real_
   }
   if (!"rank_final" %in% names(consensus_src)) {
-    consensus_src$rank_final <- NA_character_
+    consensus_src$rank_final <- NA_real_
   }
 
-  consensus_src |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidyselect::everything(),
-        .fns = as.character
-      ),
-      .note_present = !is.na(annotation_note) & nzchar(trimws(annotation_note)),
-      .score_num = suppressWarnings(as.numeric(score_weighted_chemo)),
-      .rank_num = suppressWarnings(as.numeric(rank_final)),
-      .score_present = !is.na(.score_num)
-    ) |>
-    tidytable::arrange(
+  consensus_src$.note_present <- !is.na(consensus_src$annotation_note) &
+    nzchar(trimws(as.character(consensus_src$annotation_note)))
+  consensus_src$.score_num <- suppressWarnings(
+    as.numeric(consensus_src$score_weighted_chemo)
+  )
+  consensus_src$.rank_num <- suppressWarnings(
+    as.numeric(consensus_src$rank_final)
+  )
+  consensus_src$.score_present <- !is.na(consensus_src$.score_num)
+
+  consensus_src <- as.data.frame(consensus_src, stringsAsFactors = FALSE)
+
+  ord <- with(
+    consensus_src,
+    order(
       feature_id,
-      tidytable::desc(.note_present),
-      tidytable::desc(.score_present),
-      tidytable::desc(.score_num),
-      .rank_num
-    ) |>
-    tidytable::group_by(feature_id) |>
-    tidytable::slice_head(n = 1L) |>
-    tidytable::ungroup() |>
-    tidytable::select(tidyselect::any_of(base_cols))
+      -as.integer(.note_present),
+      -as.integer(.score_present),
+      -.score_num,
+      .rank_num,
+      na.last = TRUE
+    )
+  )
+
+  consensus_src <- consensus_src[ord, , drop = FALSE]
+  consensus_src <- consensus_src[
+    !duplicated(consensus_src$feature_id),
+    ,
+    drop = FALSE
+  ]
+
+  consensus_src[, intersect(base_cols, names(consensus_src)), drop = FALSE]
 }

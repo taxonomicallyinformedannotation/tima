@@ -14,6 +14,9 @@
 #'     Range: 0-1
 #' @param score_final_min Numeric minimum final (chemical) score threshold
 #'     (default: 0.75). Range: 0-1
+#' @param score_final_coverage_min Numeric minimum coverage required when the
+#'     weighted final score is used to pass the filter (default: 0.67). Range:
+#'     0-1. NA coverage is allowed when the column is absent.
 #' @param error_rt_max Numeric maximum retention time error in minutes (default:
 #'     0.05). Must be > 0
 #' @param confidence_sirius_min Numeric minimum SIRIUS confidence score
@@ -45,6 +48,7 @@
 #' - score_biological
 #' - candidate_score_pseudo_initial
 #' - score_weighted_chemo
+#' - score_weighted_chemo_coverage
 #' - candidate_structure_error_rt (assumed in minutes; NA means unknown and is
 #'     allowed)
 #' - candidate_score_sirius_confidence (optional, NA values allowed)
@@ -53,7 +57,9 @@
 #'
 #' Missing score columns are treated as absent for that criterion and do not
 #' cause errors; at least one of the three primary scores must satisfy its
-#' threshold for a row to be retained.
+#' threshold for a row to be retained. When present, final-score coverage is
+#' required to be at least `score_final_coverage_min` for a row to pass via the
+#' weighted chemical score.
 #'
 #' **NA value handling:**
 #' - RT error: NA values (unknown RT) are allowed to pass
@@ -98,6 +104,7 @@ filter_high_evidence_only <- function(
   score_bio_min = DEFAULT_HE_SCORE_BIO_MIN,
   score_ini_min = DEFAULT_HE_SCORE_INITIAL_MIN,
   score_final_min = DEFAULT_HE_SCORE_FINAL_MIN,
+  score_final_coverage_min = DEFAULT_HE_SCORE_FINAL_COVERAGE_MIN,
   error_rt_max = DEFAULT_HE_MAX_RT_ERROR_MIN,
   confidence_sirius_min = DEFAULT_HE_SCORE_SIRIUS_MIN,
   similarity_spectral_min = DEFAULT_HE_SCORE_SPECTRAL_MIN,
@@ -133,6 +140,12 @@ filter_high_evidence_only <- function(
   validate_numeric_range(
     score_final_min,
     param_name = "score_final_min",
+    min_value = 0,
+    max_value = 1
+  )
+  validate_numeric_range(
+    score_final_coverage_min,
+    param_name = "score_final_coverage_min",
     min_value = 0,
     max_value = 1
   )
@@ -200,6 +213,13 @@ filter_high_evidence_only <- function(
       .score_bio = as.numeric(.data[["score_biological"]]),
       .score_ini = as.numeric(.data[["candidate_score_pseudo_initial"]]),
       .score_final = as.numeric(.data[["score_weighted_chemo"]]),
+      .score_final_coverage = if (
+        "score_weighted_chemo_coverage" %in% names(df)
+      ) {
+        as.numeric(.data[["score_weighted_chemo_coverage"]])
+      } else {
+        NA_real_
+      },
       .rt_err_min = rt_err_vec
     )
 
@@ -295,7 +315,9 @@ filter_high_evidence_only <- function(
     tidytable::filter(
       (.score_bio >= score_bio_min) |
         (!is.na(.score_ini) & .score_ini > 0 & .score_ini >= score_ini_min) |
-        (.score_final >= score_final_min)
+        (.score_final >= score_final_min &
+          (is.na(.score_final_coverage) |
+            .score_final_coverage >= score_final_coverage_min))
     )
 
   # RT error filter (minutes). Allow NA (unknown) values

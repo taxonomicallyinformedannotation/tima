@@ -233,89 +233,106 @@ solve_consistent_adduct_assignments <- function(
   neighbors <- split(undirected$dest, undirected$src)
   visited <- stats::setNames(rep(FALSE, length(all_nodes)), all_nodes)
   components <- list()
+  component_lookup <- stats::setNames(
+    rep(NA_character_, length(all_nodes)),
+    all_nodes
+  )
+  queue_capacity <- length(all_nodes)
 
   for (node in all_nodes) {
     if (isTRUE(visited[[node]])) {
       next
     }
-    queue <- c(node)
+
+    queue <- character(queue_capacity)
+    queue_head <- 1L
+    queue_tail <- 1L
+    queue[[queue_tail]] <- node
+    queue_tail <- queue_tail + 1L
     visited[[node]] <- TRUE
-    comp_nodes <- character()
-    while (length(queue) > 0L) {
-      current <- queue[[1L]]
-      queue <- queue[-1L]
-      comp_nodes <- c(comp_nodes, current)
+
+    comp_nodes <- character(queue_capacity)
+    comp_count <- 0L
+    while (queue_head < queue_tail) {
+      current <- queue[[queue_head]]
+      queue_head <- queue_head + 1L
+      comp_count <- comp_count + 1L
+      comp_nodes[[comp_count]] <- current
+
       next_nodes <- neighbors[[current]]
       if (!is.null(next_nodes)) {
         for (nxt in next_nodes) {
           if (!isTRUE(visited[[nxt]])) {
             visited[[nxt]] <- TRUE
-            queue <- c(queue, nxt)
+            queue[[queue_tail]] <- nxt
+            queue_tail <- queue_tail + 1L
           }
         }
       }
     }
-    # comp_nodes is already unique by construction (visited check ensures no duplicates)
-    components[[length(components) + 1L]] <- comp_nodes
+
+    component_id <- paste0("comp_", length(components) + 1L)
+    component_nodes <- comp_nodes[seq_len(comp_count)]
+    component_lookup[component_nodes] <- component_id
+    components[[length(components) + 1L]] <- component_nodes
   }
 
   # For each component, compute consistent M assignments
+  feature_mz_map <- stats::setNames(features_min$mz, features_min$feature_id)
   all_m_maps <- list()
   for (ci in seq_along(components)) {
     comp_nodes <- components[[ci]]
     comp_id <- paste0("comp_", ci)
 
-    # Get all edges in this component
-    comp_edges <- consistent |>
-      tidytable::filter(
-        feature_id %in% comp_nodes & feature_id_dest %in% comp_nodes
-      )
+    edge_component_ids <- component_lookup[as.character(consistent$feature_id)]
+    edge_component_dest_ids <- component_lookup[as.character(
+      consistent$feature_id_dest
+    )]
+    comp_edge_mask <- !is.na(edge_component_ids) &
+      !is.na(edge_component_dest_ids) &
+      edge_component_ids == edge_component_dest_ids &
+      edge_component_ids == comp_id
+    comp_edges <- consistent[comp_edge_mask, , drop = FALSE]
 
-    # Add mz info for M calculation
-    comp_edges <- comp_edges |>
-      tidytable::left_join(
-        features_min,
-        by = c("feature_id")
-      ) |>
-      tidytable::rename(mz_src = mz) |>
-      tidytable::left_join(
-        features_min |>
-          tidytable::rename(feature_id_dest = feature_id, mz_dest = mz),
-        by = c("feature_id_dest")
+    if (nrow(comp_edges) == 0L) {
+      m_values <- tidytable::tidytable(
+        feature_id = character(),
+        neutral_mass = numeric()
       )
+    } else {
+      src_mz <- feature_mz_map[as.character(comp_edges$feature_id)]
+      dest_mz <- feature_mz_map[as.character(comp_edges$feature_id_dest)]
 
-    # Calculate M for each feature from its edges
-    m_values <- tidytable::bind_rows(
-      comp_edges |>
-        tidytable::transmute(
-          feature_id,
-          neutral_mass = calculate_neutral_mass_from_lookup(
-            mzs = as.numeric(mz_src),
-            adducts = adduct,
-            adduct_lookup = adduct_lookup
-          )
+      m_values <- tidytable::tidytable(
+        feature_id = c(
+          as.character(comp_edges$feature_id),
+          as.character(comp_edges$feature_id_dest)
         ),
-      comp_edges |>
-        tidytable::transmute(
-          feature_id = feature_id_dest,
-          neutral_mass = calculate_neutral_mass_from_lookup(
-            mzs = as.numeric(mz_dest),
-            adducts = adduct_dest,
+        neutral_mass = c(
+          calculate_neutral_mass_from_lookup(
+            mzs = as.numeric(src_mz),
+            adducts = comp_edges$adduct,
+            adduct_lookup = adduct_lookup
+          ),
+          calculate_neutral_mass_from_lookup(
+            mzs = as.numeric(dest_mz),
+            adducts = comp_edges$adduct_dest,
             adduct_lookup = adduct_lookup
           )
         )
-    ) |>
-      tidytable::filter(!is.na(neutral_mass)) |>
-      tidytable::group_by(feature_id) |>
-      tidytable::mutate(
-        m_med = stats::median(neutral_mass, na.rm = TRUE),
-        m_mean = mean(neutral_mass, na.rm = TRUE),
-        m_sd = stats::sd(neutral_mass, na.rm = TRUE),
-        m_sd = tidytable::if_else(is.na(m_sd), 0, m_sd)
       ) |>
-      tidytable::distinct(feature_id, .keep_all = TRUE) |>
-      tidytable::ungroup() |>
-      tidytable::select(feature_id, neutral_mass = m_med)
+        tidytable::filter(!is.na(neutral_mass)) |>
+        tidytable::group_by(feature_id) |>
+        tidytable::mutate(
+          m_med = stats::median(neutral_mass, na.rm = TRUE),
+          m_mean = mean(neutral_mass, na.rm = TRUE),
+          m_sd = stats::sd(neutral_mass, na.rm = TRUE),
+          m_sd = tidytable::if_else(is.na(m_sd), 0, m_sd)
+        ) |>
+        tidytable::distinct(feature_id, .keep_all = TRUE) |>
+        tidytable::ungroup() |>
+        tidytable::select(feature_id, neutral_mass = m_med)
+    }
 
     # For nodes with no edges, use baseline M (e.g., [M+H]+)
     missing_nodes <- setdiff(comp_nodes, m_values$feature_id)
@@ -426,49 +443,45 @@ enforce_global_m_consistency <- function(
     iteration <- iteration + 1L
     prev_n_edges <- nrow(edge_with_m)
 
-    # Collect all implied M values for each feature
-    m_values_src <- edge_with_m |>
-      tidytable::select(feature_id, m_value = m_src, edge_id)
-    m_values_dest <- edge_with_m |>
-      tidytable::select(feature_id = feature_id_dest, m_value = m_dest, edge_id)
-    all_m_values <- tidytable::bind_rows(m_values_src, m_values_dest) |>
-      tidytable::filter(!is.na(m_value))
+    feature_ids <- c(edge_with_m$feature_id, edge_with_m$feature_id_dest)
+    m_values <- c(edge_with_m$m_src, edge_with_m$m_dest)
+    edge_ids <- c(edge_with_m$edge_id, edge_with_m$edge_id)
 
-    if (nrow(all_m_values) == 0L) {
+    valid <- !is.na(feature_ids) & !is.na(m_values)
+    feature_ids <- feature_ids[valid]
+    m_values <- m_values[valid]
+    edge_ids <- edge_ids[valid]
+
+    if (length(m_values) == 0L) {
       break
     }
 
-    # For each feature, find consensus M and check consistency
-    feature_consistency <- all_m_values |>
-      tidytable::group_by(feature_id) |>
-      tidytable::mutate(
-        m_median = stats::median(m_value, na.rm = TRUE),
-        m_iqr = stats::IQR(m_value, na.rm = TRUE),
-        m_sd = stats::sd(m_value, na.rm = TRUE),
-        m_sd = tidytable::if_else(is.na(m_sd), 0, m_sd),
-        # Check if this edge's M is within tolerance of consensus
-        ppm_tol = tolerance_ppm * 1e-6 * m_median,
-        dalton_tol = tolerance_dalton %||% 0.01,
-        ppm_consistent = abs(m_value - m_median) <= ppm_tol,
-        dalton_consistent = abs(m_value - m_median) <= dalton_tol,
-        is_consistent = ppm_consistent | dalton_consistent
-      ) |>
-      tidytable::ungroup()
+    feature_medians <- stats::ave(
+      m_values,
+      feature_ids,
+      FUN = function(x) stats::median(x, na.rm = TRUE)
+    )
+    abs_diff <- abs(m_values - feature_medians)
+    dalton_tol <- tolerance_dalton %||% 0.01
+    ppm_tol <- if (
+      is.null(tolerance_ppm) || is.na(tolerance_ppm) || tolerance_ppm <= 0
+    ) {
+      0
+    } else {
+      tolerance_ppm * 1e-6 * pmax(abs(feature_medians), 1e-12)
+    }
+    obs_consistent <- abs_diff <= ppm_tol | abs_diff <= dalton_tol
 
-    # Identify edges to remove (those whose M conflicts with consensus for either endpoint)
-    edges_to_remove <- feature_consistency |>
-      tidytable::filter(!is_consistent) |>
-      tidytable::pull(edge_id) |>
-      unique()
-
+    edges_to_remove <- unique(edge_ids[!obs_consistent])
     if (length(edges_to_remove) == 0L) {
-      # All features have consistent M values
       break
     }
 
-    # Remove conflicting edges and recalculate
-    edge_with_m <- edge_with_m |>
-      tidytable::filter(!(edge_id %in% edges_to_remove))
+    edge_with_m <- edge_with_m[
+      !(edge_with_m$edge_id %in% edges_to_remove),
+      ,
+      drop = FALSE
+    ]
   }
 
   # Return cleaned edges (drop calculation columns, keep original structure)

@@ -11,7 +11,8 @@ prepare_ranked_candidates(
   minimal_ms1_condition,
   best_percentile,
   max_per_score,
-  components_table = NULL
+  components_table = NULL,
+  enforce_cluster_consensus = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,9 @@ prepare_ranked_candidates(
 \item{max_per_score}{Integer max candidates per score group}
 
 \item{components_table}{Optional data frame with feature_id and component_id}
+
+\item{enforce_cluster_consensus}{Logical, apply cluster-consensus promotion
+before sampling and percentile filtering}
 }
 \value{
 Named list with ranked/percentile tables and candidate counts
