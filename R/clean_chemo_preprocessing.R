@@ -313,11 +313,12 @@ filter_ms1_annotations <- function(
 #' @return Data frame with an added rank column.
 #' @keywords internal
 .assign_rank_groups <- function(df, rank_col_name, ranking_cols) {
+  df <- as.data.frame(df, stringsAsFactors = FALSE)
   if (nrow(df) == 0L) {
+    df[[rank_col_name]] <- integer(0)
     return(df)
   }
 
-  df <- as.data.frame(df, stringsAsFactors = FALSE)
   df[[rank_col_name]] <- NA_integer_
 
   feature_ids <- unique(as.character(df[["feature_id"]]))
@@ -346,7 +347,10 @@ filter_ms1_annotations <- function(
     }
 
     signature <- do.call(paste, c(rank_values, list(sep = "\u001f")))
-    signature_changes <- c(TRUE, signature[-1L] != signature[-length(signature)])
+    signature_changes <- c(
+      TRUE,
+      signature[-1L] != signature[-length(signature)]
+    )
     column_values <- df[[rank_col_name]]
     column_values[idx] <- cumsum(signature_changes)
     df[[rank_col_name]] <- column_values
@@ -459,7 +463,7 @@ rank_and_deduplicate <- function(df) {
   df <- as.data.frame(df, stringsAsFactors = FALSE)
   df$score_weighted_chemo <- as.numeric(df$score_weighted_chemo)
   if (!"score_weighted_chemo_coverage" %in% names(df)) {
-    df$score_weighted_chemo_coverage <- NA_real_
+    df$score_weighted_chemo_coverage <- rep(NA_real_, nrow(df))
   } else {
     df$score_weighted_chemo_coverage <- as.numeric(
       df$score_weighted_chemo_coverage
@@ -479,7 +483,7 @@ rank_and_deduplicate <- function(df) {
     if (col %in% names(df)) {
       df[[col]] <- suppressWarnings(as.numeric(df[[col]]))
     } else {
-      df[[col]] <- NA_real_
+      df[[col]] <- rep(NA_real_, nrow(df))
     }
   }
 

@@ -159,6 +159,20 @@ test_that("rank_and_deduplicate shares ranks for identical ranking signatures", 
   expect_equal(ranked$rank_initial, c(1L, 1L))
 })
 
+test_that("rank_and_deduplicate handles empty input", {
+  df <- tidytable::tidytable(
+    feature_id = character(),
+    candidate_structure_inchikey_connectivity_layer = character(),
+    score_weighted_chemo = numeric(),
+    candidate_score_pseudo_initial = numeric()
+  )
+
+  ranked <- rank_and_deduplicate(df)
+
+  expect_equal(nrow(ranked), 0L)
+  expect_true(all(c("rank_initial", "rank_final") %in% names(ranked)))
+})
+
 test_that("apply_percentile_filter keeps top candidates per feature", {
   ranked <- rank_and_deduplicate(base_annot())
   top <- apply_percentile_filter(ranked, best_percentile = 0.9)
