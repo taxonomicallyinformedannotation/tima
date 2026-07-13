@@ -77,10 +77,6 @@ summarize_results <- function(
   log_debug("Remove ties: %s, Summarize: %s", remove_ties, summarize)
 
   model <- columns_model()
-  feature_consensus_table <- .build_feature_consensus_table(
-    annot_table_wei_chemo = annot_table_wei_chemo,
-    model = model
-  )
   candidate_id_cols <- grep(
     pattern = "^candidate_structure_id_",
     x = names(df),
@@ -94,6 +90,8 @@ summarize_results <- function(
 
   organism_lookup <- if (
     nrow(structure_organism_pairs_table) > 0L &&
+      nrow(df) > 0L &&
+      "candidate_structure_inchikey_connectivity_layer" %in% names(df) &&
       any(
         c(
           "candidate_structure_inchikey_connectivity_layer",
@@ -318,21 +316,29 @@ summarize_results <- function(
   )
 
   results_with_structure <- df_processed[has_structure, , drop = FALSE]
-  results_without_structure <- df_processed[!has_structure, , drop = FALSE] |>
-    tidytable::distinct(tidyselect::any_of(x = model$features_columns)) |>
-    tidytable::left_join(y = feature_consensus_table) |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          model$features_columns,
-          model$features_calculated_columns,
-          model$components_columns
-          ## Do not keep it if no structure
-          # "annotation_note"
+  results_without_structure <- if (any(!has_structure)) {
+    feature_consensus_table <- .build_feature_consensus_table(
+      annot_table_wei_chemo = annot_table_wei_chemo,
+      model = model
+    )
+    df_processed[!has_structure, , drop = FALSE] |>
+      tidytable::distinct(tidyselect::any_of(x = model$features_columns)) |>
+      tidytable::left_join(y = feature_consensus_table) |>
+      tidytable::select(
+        tidyselect::any_of(
+          x = c(
+            model$features_columns,
+            model$features_calculated_columns,
+            model$components_columns
+            ## Do not keep it if no structure
+            # "annotation_note"
+          )
         )
-      )
-    ) |>
-    tidytable::distinct()
+      ) |>
+      tidytable::distinct()
+  } else {
+    tidytable::tidytable()
+  }
 
   results <- tidytable::bind_rows(
     results_with_structure,
@@ -440,10 +446,29 @@ summarize_results <- function(
     )
   }
 
+  candidate_structure_ids <- unique(
+    na.omit(as.character(df$candidate_structure_inchikey_connectivity_layer))
+  )
+  if (length(candidate_structure_ids) == 0L) {
+    return(
+      structure_organism_pairs_table[0L, ] |>
+        tidytable::select(
+          candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
+          reference_doi,
+          tidyselect::contains(match = "organism_taxonomy_"),
+          -tidyselect::any_of("organism_taxonomy_ottid")
+        ) |>
+        tidytable::mutate(
+          feature_id = character(),
+          candidate_structure_organism_occurrence_closest = character(),
+          candidate_structure_organism_occurrence_reference = character()
+        )
+    )
+  }
+
   structure_organism_pairs_table |>
     tidytable::filter(
-      structure_inchikey_connectivity_layer %in%
-        df$candidate_structure_inchikey_connectivity_layer
+      structure_inchikey_connectivity_layer %in% candidate_structure_ids
     ) |>
     tidytable::select(
       candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
