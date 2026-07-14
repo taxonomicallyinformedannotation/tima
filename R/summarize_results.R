@@ -316,7 +316,7 @@ summarize_results <- function(
   )
 
   results_with_structure <- df_processed[has_structure, , drop = FALSE]
-  results_without_structure <- if (any(!has_structure)) {
+  results_without_structure <- if (!all(has_structure)) {
     feature_consensus_table <- .build_feature_consensus_table(
       annot_table_wei_chemo = annot_table_wei_chemo,
       model = model
@@ -447,7 +447,7 @@ summarize_results <- function(
   }
 
   candidate_structure_ids <- unique(
-    na.omit(as.character(df$candidate_structure_inchikey_connectivity_layer))
+    stats::na.omit(as.character(df$candidate_structure_inchikey_connectivity_layer))
   )
   if (length(candidate_structure_ids) == 0L) {
     return(
