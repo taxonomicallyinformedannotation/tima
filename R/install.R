@@ -10,7 +10,12 @@
 #'
 #' @return NULL (stops on validation error)
 #' @keywords internal
-validate_install_inputs <- function(package, repos, type, dependencies) {
+validate_install_inputs <- function(
+  package,
+  repos,
+  type = "source",
+  dependencies
+) {
   if (!is.character(package) || length(package) != 1L || nchar(package) == 0L) {
     cli::cli_abort(
       "package must be a single non-empty character string, got {.val {if (is.null(package)) 'NULL' else class(package)[1]}}",
@@ -101,7 +106,13 @@ validate_install_inputs <- function(package, repos, type, dependencies) {
   reticulate::py_install(packages = packages)
 }
 
-.install_packages <- function(package, repos, dependencies, type, ...) {
+.install_packages <- function(
+  package,
+  repos,
+  dependencies,
+  type = "source",
+  ...
+) {
   utils::install.packages(
     package,
     repos = repos,

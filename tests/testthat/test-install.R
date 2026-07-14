@@ -32,8 +32,16 @@ test_that("validate_install_inputs rejects invalid repos and dependencies", {
 })
 
 test_that("validate_install_inputs accepts valid inputs", {
-  expect_silent(validate_install_inputs("tima", .make_repos(), TRUE))
-  expect_silent(validate_install_inputs("tima", .make_repos(), FALSE))
+  expect_silent(validate_install_inputs(
+    package = "tima",
+    repos = .make_repos(),
+    dependencies = TRUE
+  ))
+  expect_silent(validate_install_inputs(
+    package = "tima",
+    repos = .make_repos(),
+    dependencies = FALSE
+  ))
 })
 
 # ---- Lightweight helpers ----
@@ -252,8 +260,7 @@ test_that("try_install_package returns FALSE on unreachable repository", {
   result <- try_install_package(
     package = "somepkgthatdoesnotexist",
     repos = "https://invalid.invalid",
-    dependencies = FALSE,
-    from_source = FALSE
+    dependencies = FALSE
   )
   expect_false(result)
 })
