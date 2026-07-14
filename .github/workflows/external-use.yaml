@@ -53,7 +53,8 @@ jobs:
           repos = c(
           "https://taxonomicallyinformedannotation.r-universe.dev",
           "https://bioconductor.org/packages/release/bioc",
-          "https://cloud.r-project.org"
+          "https://cloud.r-project.org",
+          type = "source"
           )
           )
 
