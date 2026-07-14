@@ -155,10 +155,10 @@ build_evidence_supported_hypotheses <- function(
       next
     }
 
+    implied_ok <- implied[ok]
     if (use_library_prefilter) {
-      kept_pos <- which(ok)
       hit <- .has_library_match_within_tolerance(
-        masses = implied[kept_pos],
+        masses = implied_ok,
         exact_masses_sorted = exact_masses_sorted,
         tolerance_ppm = tol_ppm_num,
         tolerance_dalton = tolerance_dalton
@@ -166,7 +166,8 @@ build_evidence_supported_hypotheses <- function(
       if (!any(hit)) {
         next
       }
-      pos <- kept_pos[hit]
+      implied_ok <- implied_ok[hit]
+      pos <- which(ok)[hit]
     } else {
       pos <- which(ok)
     }
@@ -174,7 +175,7 @@ build_evidence_supported_hypotheses <- function(
     filled <- filled + 1L
     kept_feat_idx[[filled]] <- as.integer(pos)
     kept_aidx[[filled]] <- rep.int(ui, length(pos))
-    kept_M[[filled]] <- implied[pos]
+    kept_M[[filled]] <- implied_ok
 
     if (ui %% log_every == 0L) {
       log_debug(
