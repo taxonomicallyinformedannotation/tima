@@ -12,15 +12,15 @@
 > considered before this PR is accepted Check any of the following which apply:
 
 - [ ] Breaking change (fix or feature that would cause existing functionality to
-      not work as expected)
+  not work as expected)
 - [ ] This change requires a documentation update
-      - [ ] I have made corresponding changes to the documentation
+  - [ ] I have made corresponding changes to the documentation
 - [ ] This change requires new dependencies (please list)
 
 *If you make changes to the R code*
 
 - [ ] My code passes the [testthat](https://testthat.r-lib.org/) check, I can
-      receive warnings about tests, documentation or both
+  receive warnings about tests, documentation or both
 
 ## Testing
 
@@ -37,6 +37,6 @@ your test configuration.
 - [ ] My changes generate no new warnings
 - [ ] I have not used code from external sources without attribution
 - [ ] I have considered
-      [accessibility](https://www.w3.org/standards/webdesign/accessibility) in
-      my implementation
+  [accessibility](https://www.w3.org/standards/webdesign/accessibility) in
+  my implementation
 - [ ] There are no remaining debug statements (print, console.log, ...)
