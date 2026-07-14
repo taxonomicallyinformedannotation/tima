@@ -438,16 +438,19 @@ filter_ms1_annotations <- function(
     }
     # Dense rank by effective_score descending, with consensus_promoted as tie-breaker
     eff_scores <- effective_score[idx]
-    # Dense rank by effective_score descending, with consensus_promoted as tie-breaker
-        eff_scores <- effective_score[idx]
-        # Order: descending effective_score, then consensus_promoted (TRUE first), then signature
-        consensus_idx <- consensus_promoted[idx]
-        # Use -consensus_idx for TRUE first (since FALSE=0, TRUE=1, -1 < 0 so TRUE comes first)
-        order_idx <- order(-eff_scores, -consensus_idx, na.last = TRUE, method = "radix")
-        # Signature must include consensus_promoted for proper dense_rank tie-breaking
-        sig <- paste(signature[idx][order_idx], consensus_idx[order_idx], sep = "|")
-        sig_changes <- c(TRUE, sig[-1L] != sig[-length(sig)])
-        df$rank_final[idx[order_idx]] <- cumsum(sig_changes)
+    # Order: descending effective_score, then consensus_promoted (TRUE first), then signature
+    consensus_idx <- consensus_promoted[idx]
+    # Use -consensus_idx for TRUE first (since FALSE=0, TRUE=1, -1 < 0 so TRUE comes first)
+    order_idx <- order(
+      -eff_scores,
+      -consensus_idx,
+      na.last = TRUE,
+      method = "radix"
+    )
+    # Signature must include consensus_promoted for proper dense_rank tie-breaking
+    sig <- paste(signature[idx][order_idx], consensus_idx[order_idx], sep = "|")
+    sig_changes <- c(TRUE, sig[-1L] != sig[-length(sig)])
+    df$rank_final[idx[order_idx]] <- cumsum(sig_changes)
   }
 
   # Sort by feature_id, then by rank_final (which is already by effective_score desc)

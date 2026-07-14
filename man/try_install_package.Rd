@@ -4,12 +4,7 @@
 \alias{try_install_package}
 \title{Attempt Package Installation}
 \usage{
-try_install_package(
-  package,
-  repos,
-  type = "source",
-  dependencies
-)
+try_install_package(package, repos, type = "source", dependencies)
 }
 \arguments{
 \item{package}{Character package name}
