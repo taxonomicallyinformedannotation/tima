@@ -14,8 +14,6 @@ try_install_package(package, repos, type = "source", dependencies)
 \item{type}{\link{character} Type of install ("source", "binary")}
 
 \item{dependencies}{Logical dependencies flag}
-
-\item{from_source}{Logical whether to install from source}
 }
 \value{
 Logical TRUE if successful, FALSE otherwise

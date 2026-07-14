@@ -385,7 +385,6 @@ verify_package_installation <- function(package) {
 #' @param repos Character vector of repositories
 #' @param type [character] Type of install ("source", "binary")
 #' @param dependencies Logical dependencies flag
-#' @param from_source Logical whether to install from source
 #'
 #' @return Logical TRUE if successful, FALSE otherwise
 #' @keywords internal
