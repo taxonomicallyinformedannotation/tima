@@ -274,7 +274,11 @@ export_library_tables <- function(
       df_names[df_names == src[[1L]]] <- target
     }
   }
-  names(df) <- df_names
+  if (inherits(df, "data.table") || inherits(df, "tidytable")) {
+    data.table::setnames(df, df_names)
+  } else {
+    names(df) <- df_names
+  }
   df
 }
 
@@ -445,9 +449,11 @@ export_library_tables <- function(
           possible_names <- col_mapping[[internal_name]]
           for (cache_name in possible_names) {
             if (cache_name %in% names(existing_cache)) {
-              names(existing_cache)[
-                names(existing_cache) == cache_name
-              ] <- internal_name
+              if (inherits(existing_cache, "data.table") || inherits(existing_cache, "tidytable")) {
+                data.table::setnames(existing_cache, cache_name, internal_name)
+              } else {
+                names(existing_cache)[names(existing_cache) == cache_name] <- internal_name
+              }
               break
             }
           }
