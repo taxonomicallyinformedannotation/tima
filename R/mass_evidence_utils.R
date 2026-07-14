@@ -91,8 +91,17 @@ implied_neutral_mass <- function(
 }
 
 # Deprecated alias for backward compatibility
-.has_library_match_within_ppm <- function(masses, exact_masses_sorted, tolerance_ppm) {
-  .has_library_match_within_tolerance(masses, exact_masses_sorted, tolerance_ppm, NULL)
+.has_library_match_within_ppm <- function(
+  masses,
+  exact_masses_sorted,
+  tolerance_ppm
+) {
+  .has_library_match_within_tolerance(
+    masses,
+    exact_masses_sorted,
+    tolerance_ppm,
+    NULL
+  )
 }
 
 #' Minimum ppm error to nearest exact mass for each query mass. Vectorized

@@ -4,7 +4,7 @@
 \alias{validate_install_inputs}
 \title{Validate Install Function Inputs}
 \usage{
-validate_install_inputs(package, repos, type, dependencies)
+validate_install_inputs(package, repos, type = "source", dependencies)
 }
 \arguments{
 \item{package}{\link{character} Single non-empty package name}

@@ -8,6 +8,7 @@ build_evidence_supported_hypotheses(
   df_fea_min,
   universe,
   tolerance_ppm,
+  tolerance_dalton = NULL,
   tolerance_rt,
   ms_mode,
   min_neutral_mass = 1,
@@ -23,6 +24,9 @@ build_evidence_supported_hypotheses(
 
 \item{tolerance_ppm}{numeric mass tolerance (ppm).}
 
+\item{tolerance_dalton}{numeric absolute mass tolerance (Da). When provided,
+the pre-filter uses max(dalton, ppm * mass * 1e-6) per mass.}
+
 \item{tolerance_rt}{numeric RT tolerance.}
 
 \item{ms_mode}{"pos" or "neg".}
@@ -30,9 +34,9 @@ build_evidence_supported_hypotheses(
 \item{min_neutral_mass, max_neutral_mass}{plausibility bounds.}
 
 \item{exact_masses}{optional numeric vector of library exact masses. When
-provided, only hypotheses whose implied neutral mass is within
-\code{tolerance_ppm} of at least one library mass are retained. This is the
-primary memory-control lever.}
+provided, only hypotheses whose implied neutral mass is within the combined
+tolerance of at least one library mass are retained. This is the primary
+memory-control lever.}
 
 \item{max_hypotheses_per_feature}{integer cap per feature (excluding the
 baseline adduct, which is always retained). Set to \code{Inf} to disable.}
