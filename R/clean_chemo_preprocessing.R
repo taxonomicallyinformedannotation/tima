@@ -365,56 +365,69 @@ filter_ms1_annotations <- function(
     return(df)
   }
 
-  # Ranking policy is explicit and deterministic:
-  # 1. weighted evidence score is the primary ranking signal
-  # 2. coverage directly adjusts the effective ranking score so that a lower
-  #    coverage row can be pushed below a higher-coverage row even when the raw
-  #    weighted score is only slightly higher
-  # 3. remaining evidence and error terms are used only as tie-breakers.
+  # Ranking policy is explicit and deterministic, evidence-first:
+  # 1. Evidence tier (candidate_adduct_match_mode): exact_adduct > m_delta_rescued > precursor_mz
+  # 2. Biological score (score_biological): higher = better taxonomic match
+  # 3. Chemical score (score_chemical): higher = better network chemical consistency
+  # 4. Effective weighted score (coverage-adjusted): primary quantitative signal
+  # 5. Raw weighted score: secondary quantitative signal
+  # 6. Coverage: higher coverage preferred
+  # 7. Spectral similarity scores: higher = better MS/MS match
+  # 8. Forward/reverse spectral similarity: directional consistency
+  # 9. Keep ties - all equally-evidenced candidates ranked equally
+  #
+  # INAPPROPRIATE for ranking (removed): inchikey (arbitrary), mz/rt error (already in scores), ppm tolerance (parameter, not evidence)
+
+  # Ensure required columns exist
   for (col in c(
     "score_weighted_chemo_coverage",
     "candidate_score_pseudo_initial",
     "candidate_score_similarity",
     "candidate_score_similarity_forward",
     "candidate_score_similarity_reverse",
-    "candidate_structure_error_mz",
-    "candidate_structure_error_rt"
+    "candidate_adduct_match_mode",
+    "score_biological",
+    "score_chemical"
   )) {
     if (!(col %in% names(df))) {
-      df[[col]] <- NA_real_
+      if (col == "candidate_adduct_match_mode") {
+        df[[col]] <- "precursor_mz" # Default to lowest evidence tier
+      } else {
+        df[[col]] <- NA_real_
+      }
     }
   }
 
   score_weighted_chemo <- suppressWarnings(as.numeric(df[[
     "score_weighted_chemo"
   ]]))
-  score_weighted_chemo_coverage <- suppressWarnings(as.numeric(
-    df[["score_weighted_chemo_coverage"]]
-  ))
-  candidate_score_pseudo_initial <- suppressWarnings(as.numeric(
-    df[["candidate_score_pseudo_initial"]]
-  ))
-  candidate_score_similarity <- suppressWarnings(as.numeric(
-    df[["candidate_score_similarity"]]
-  ))
-  candidate_score_similarity_forward <- suppressWarnings(as.numeric(
-    df[["candidate_score_similarity_forward"]]
-  ))
-  candidate_score_similarity_reverse <- suppressWarnings(as.numeric(
-    df[["candidate_score_similarity_reverse"]]
-  ))
-  candidate_structure_error_mz <- suppressWarnings(as.numeric(
-    df[["candidate_structure_error_mz"]]
-  ))
-  candidate_structure_error_rt <- suppressWarnings(as.numeric(
-    df[["candidate_structure_error_rt"]]
-  ))
+  score_weighted_chemo_coverage <- suppressWarnings(as.numeric(df[[
+    "score_weighted_chemo_coverage"
+  ]]))
+  candidate_score_pseudo_initial <- suppressWarnings(as.numeric(df[[
+    "candidate_score_pseudo_initial"
+  ]]))
+  candidate_score_similarity <- suppressWarnings(as.numeric(df[[
+    "candidate_score_similarity"
+  ]]))
+  candidate_score_similarity_forward <- suppressWarnings(as.numeric(df[[
+    "candidate_score_similarity_forward"
+  ]]))
+  candidate_score_similarity_reverse <- suppressWarnings(as.numeric(df[[
+    "candidate_score_similarity_reverse"
+  ]]))
+  score_biological <- suppressWarnings(as.numeric(df[["score_biological"]]))
+  score_chemical <- suppressWarnings(as.numeric(df[["score_chemical"]]))
+
+  # Evidence tier from adduct match mode (exact_adduct > m_delta_rescued > precursor_mz)
+  adduct_match_mode <- df[["candidate_adduct_match_mode"]]
+  evidence_tier <- rep(3L, nrow(df))
+  evidence_tier[adduct_match_mode == "exact_adduct"] <- 1L
+  evidence_tier[adduct_match_mode == "m_delta_rescued"] <- 2L
+  evidence_tier[is.na(adduct_match_mode)] <- 3L
 
   # Shrink the raw weighted score by coverage so low-coverage rows lose
   # standing, but high-coverage rows keep most of their original evidence.
-  # This is a conservative, transparent penalty: coverage cannot improve the
-  # score above the raw weighted score, and missing coverage is treated as a
-  # moderate penalty rather than an outright wipeout.
   coverage_for_rank <- pmin(pmax(score_weighted_chemo_coverage, 0), 1)
   coverage_for_rank[is.na(coverage_for_rank)] <- 0
   effective_score <- score_weighted_chemo * (0.5 + 0.5 * coverage_for_rank)
@@ -422,39 +435,30 @@ filter_ms1_annotations <- function(
   effective_score[!is.finite(effective_score)] <- NA_real_
   df$effective_score <- effective_score
 
-  ord <- if (isTRUE(initial_rank)) {
-    order(
-      as.character(df[["feature_id"]]),
-      -candidate_score_pseudo_initial,
-      -effective_score,
-      -score_weighted_chemo,
-      -score_weighted_chemo_coverage,
-      -candidate_score_similarity,
-      -candidate_score_similarity_forward,
-      -candidate_score_similarity_reverse,
-      candidate_structure_error_mz,
-      candidate_structure_error_rt,
-      as.character(df[["candidate_structure_inchikey_connectivity_layer"]]),
-      na.last = TRUE,
-      method = "radix"
-    )
-  } else {
-    order(
-      as.character(df[["feature_id"]]),
-      -effective_score,
-      -score_weighted_chemo,
-      -score_weighted_chemo_coverage,
-      -candidate_score_pseudo_initial,
-      -candidate_score_similarity,
-      -candidate_score_similarity_forward,
-      -candidate_score_similarity_reverse,
-      candidate_structure_error_mz,
-      candidate_structure_error_rt,
-      as.character(df[["candidate_structure_inchikey_connectivity_layer"]]),
-      na.last = TRUE,
-      method = "radix"
-    )
-  }
+  # NA handling: put NAs last for descending, first for ascending
+  na_last_desc <- TRUE
+  na_last_asc <- FALSE
+
+  # Evidence-first ordering: tier (1=best) -> bio (desc) -> chem (desc) -> effective (desc)
+  # -> weighted (desc) -> coverage (desc) -> pseudo_initial (desc)
+  # -> spectral similarity (desc) -> forward (desc) -> reverse (desc)
+  # Ties kept: no inchikey, no mz/rt error, no arbitrary tie-breakers
+  ord <- order(
+    as.character(df[["feature_id"]]),
+    evidence_tier, # 1=exact_adduct, 2=m_delta_rescued, 3=precursor_mz (ascending: 1 first)
+    -score_biological, # higher biological score = better taxonomic match
+    -score_chemical, # higher chemical score = better network consistency
+    -effective_score, # coverage-adjusted weighted score (primary signal)
+    -score_weighted_chemo, # raw weighted score (secondary signal)
+    -score_weighted_chemo_coverage, # higher coverage preferred
+    -candidate_score_pseudo_initial, # initial spectral/structural evidence
+    -candidate_score_similarity, # spectral similarity
+    -candidate_score_similarity_forward,
+    -candidate_score_similarity_reverse,
+    as.character(df[["candidate_structure_inchikey_connectivity_layer"]]), # deterministic tie-break only
+    na.last = na_last_desc,
+    method = "radix"
+  )
 
   df[ord, , drop = FALSE]
 }
@@ -477,8 +481,9 @@ rank_and_deduplicate <- function(df) {
     "candidate_score_similarity",
     "candidate_score_similarity_forward",
     "candidate_score_similarity_reverse",
-    "candidate_structure_error_mz",
-    "candidate_structure_error_rt"
+    "candidate_adduct_match_mode",
+    "score_biological",
+    "score_chemical"
   )) {
     if (col %in% names(df)) {
       df[[col]] <- suppressWarnings(as.numeric(df[[col]]))
@@ -493,15 +498,16 @@ rank_and_deduplicate <- function(df) {
     initial_rank = TRUE
   )
   rank_initial_cols <- c(
-    "candidate_score_pseudo_initial",
+    "candidate_adduct_match_mode",
+    "score_biological",
+    "score_chemical",
     "effective_score",
     "score_weighted_chemo",
     "score_weighted_chemo_coverage",
+    "candidate_score_pseudo_initial",
     "candidate_score_similarity",
     "candidate_score_similarity_forward",
-    "candidate_score_similarity_reverse",
-    "candidate_structure_error_mz",
-    "candidate_structure_error_rt"
+    "candidate_score_similarity_reverse"
   )
   df_ranked <- .assign_rank_groups(
     df = df_ranked,
@@ -525,15 +531,16 @@ rank_and_deduplicate <- function(df) {
     initial_rank = FALSE
   )
   rank_final_cols <- c(
+    "candidate_adduct_match_mode",
+    "score_biological",
+    "score_chemical",
     "effective_score",
     "score_weighted_chemo",
     "score_weighted_chemo_coverage",
     "candidate_score_pseudo_initial",
     "candidate_score_similarity",
     "candidate_score_similarity_forward",
-    "candidate_score_similarity_reverse",
-    "candidate_structure_error_mz",
-    "candidate_structure_error_rt"
+    "candidate_score_similarity_reverse"
   )
   df_ranked_final <- .assign_rank_groups(
     df = df_ranked_final,
