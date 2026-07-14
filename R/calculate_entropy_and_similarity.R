@@ -373,6 +373,10 @@ calculate_entropy_and_similarity <- function(
         query_precursor_values[[pos_idx]] <- query_precursor_value
         target_precursor_values[[pos_idx]] <- target_precursor_value
 
+        score_forward <- NA_real_
+        score_reverse <- NA_real_
+        matched_count <- NA_integer_
+
         if (use_gnps) {
           res <- call_gnps(
             current_spectrum,
@@ -383,12 +387,12 @@ calculate_entropy_and_similarity <- function(
             ppm,
             matchedPeaksCount = TRUE
           )
-          scores[[pos_idx]] <- as.numeric(res[[1L]])
-          matched_counts[[pos_idx]] <- as.integer(res[[2L]])
-          scores_forward[[pos_idx]] <- as.numeric(res[[3L]])
-          scores_reverse[[pos_idx]] <- as.numeric(res[[4L]])
+          score <- as.numeric(res[[1L]])
+          matched_count <- as.integer(res[[2L]])
+          score_forward <- as.numeric(res[[3L]])
+          score_reverse <- as.numeric(res[[4L]])
         } else {
-          scores[[pos_idx]] <- as.numeric(calculate_similarity(
+          score <- as.numeric(calculate_similarity(
             method = method,
             query_spectrum = current_spectrum,
             target_spectrum = lib_spectrum,
@@ -397,13 +401,17 @@ calculate_entropy_and_similarity <- function(
             dalton = dalton,
             ppm = ppm
           ))
-          matched_counts[[pos_idx]] <- .count_matched_peaks(
-            q_mz,
-            lib_spectrum[, 1L],
-            dalton,
-            ppm
-          )
-          if (isTRUE(compute_forward_reverse)) {
+          matched_count <- if (score >= threshold) {
+            .count_matched_peaks(
+              q_mz,
+              lib_spectrum[, 1L],
+              dalton,
+              ppm
+            )
+          } else {
+            NA_integer_
+          }
+          if (score >= threshold && isTRUE(compute_forward_reverse)) {
             fwd_rev <- call_gnps(
               current_spectrum,
               lib_spectrum,
@@ -413,11 +421,15 @@ calculate_entropy_and_similarity <- function(
               ppm,
               matchedPeaksCount = TRUE
             )
-            scores_forward[[pos_idx]] <- as.numeric(fwd_rev[[3L]])
-            scores_reverse[[pos_idx]] <- as.numeric(fwd_rev[[4L]])
+            score_forward <- as.numeric(fwd_rev[[3L]])
+            score_reverse <- as.numeric(fwd_rev[[4L]])
           }
         }
 
+        scores[[pos_idx]] <- score
+        matched_counts[[pos_idx]] <- matched_count
+        scores_forward[[pos_idx]] <- score_forward
+        scores_reverse[[pos_idx]] <- score_reverse
         similarity_space[[pos_idx]] <- space_label
         if (compute_entropy_for_candidates) {
           entropies[[pos_idx]] <- lib_entropy[[lib_idx]]
