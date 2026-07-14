@@ -356,7 +356,7 @@ prepare_features_tables <- function(
     col_names_clean <- col_names_clean[!dup_idx]
   }
 
-  colnames(tbl) <- col_names_clean
+  data.table::setnames(tbl, col_names_clean)
   tbl
 }
 
