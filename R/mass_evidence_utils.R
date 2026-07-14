@@ -64,26 +64,35 @@ implied_neutral_mass <- function(
 }
 
 #' Test whether each query mass has at least one library mass within the given
-#' ppm tolerance. Uses two `findInterval()` calls (much cheaper than computing
-#' nearest distances for every query). Returns a logical vector.
+#' combined tolerance (ppm OR dalton, whichever is less restrictive at that mass).
+#' Uses two `findInterval()` calls per mass. Returns a logical vector.
 #' @keywords internal
-.has_library_match_within_ppm <- function(
+.has_library_match_within_tolerance <- function(
   masses,
   exact_masses_sorted,
-  tolerance_ppm
+  tolerance_ppm,
+  tolerance_dalton = NULL
 ) {
   n <- length(masses)
   if (n == 0L || length(exact_masses_sorted) == 0L) {
     return(rep(FALSE, n))
   }
-  tol <- tolerance_ppm * 1e-6
-  lo <- masses * (1 - tol)
-  hi <- masses * (1 + tol)
-  # findInterval(x, vec) returns largest i with vec[i] <= x.
-  # A library mass is in [lo, hi] iff findInterval(hi) > findInterval(lo - eps).
+  # Per-mass combined absolute tolerance: max(dalton, ppm * mass * 1e-6)
+  tol <- if (is.null(tolerance_dalton)) {
+    tolerance_ppm * 1e-6 * masses
+  } else {
+    pmax(tolerance_dalton, tolerance_ppm * 1e-6 * masses)
+  }
+  lo <- masses - tol
+  hi <- masses + tol
   fi_lo <- findInterval(lo, exact_masses_sorted, left.open = TRUE)
   fi_hi <- findInterval(hi, exact_masses_sorted, left.open = FALSE)
   fi_hi > fi_lo
+}
+
+# Deprecated alias for backward compatibility
+.has_library_match_within_ppm <- function(masses, exact_masses_sorted, tolerance_ppm) {
+  .has_library_match_within_tolerance(masses, exact_masses_sorted, tolerance_ppm, NULL)
 }
 
 #' Minimum ppm error to nearest exact mass for each query mass. Vectorized

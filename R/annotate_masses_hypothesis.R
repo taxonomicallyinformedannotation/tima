@@ -1333,6 +1333,7 @@ discover_evidence_adduct_signal <- function(
     df_fea_min = feats_min,
     universe = universe,
     tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton,
     tolerance_rt = tolerance_rt,
     ms_mode = ms_mode,
     exact_masses = exact_masses,
