@@ -4,12 +4,14 @@
 \alias{try_install_package}
 \title{Attempt Package Installation}
 \usage{
-try_install_package(package, repos, dependencies, from_source = FALSE)
+try_install_package(package, repos, type = "source", dependencies)
 }
 \arguments{
 \item{package}{Character package name}
 
 \item{repos}{Character vector of repositories}
+
+\item{type}{\link{character} Type of install ("source", "binary")}
 
 \item{dependencies}{Logical dependencies flag}
 

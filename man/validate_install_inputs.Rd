@@ -4,12 +4,14 @@
 \alias{validate_install_inputs}
 \title{Validate Install Function Inputs}
 \usage{
-validate_install_inputs(package, repos, dependencies)
+validate_install_inputs(package, repos, type, dependencies)
 }
 \arguments{
 \item{package}{\link{character} Single non-empty package name}
 
 \item{repos}{\link{character} Vector of repository URLs}
+
+\item{type}{\link{character} Type of install ("source", "binary")}
 
 \item{dependencies}{\link{logical} Whether to install dependencies}
 }

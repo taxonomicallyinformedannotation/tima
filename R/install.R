@@ -5,11 +5,12 @@
 #'
 #' @param package [character] Single non-empty package name
 #' @param repos [character] Vector of repository URLs
+#' @param type [character] Type of install ("source", "binary")
 #' @param dependencies [logical] Whether to install dependencies
 #'
 #' @return NULL (stops on validation error)
 #' @keywords internal
-validate_install_inputs <- function(package, repos, dependencies) {
+validate_install_inputs <- function(package, repos, type, dependencies) {
   if (!is.character(package) || length(package) != 1L || nchar(package) == 0L) {
     cli::cli_abort(
       "package must be a single non-empty character string, got {.val {if (is.null(package)) 'NULL' else class(package)[1]}}",
@@ -27,6 +28,17 @@ validate_install_inputs <- function(package, repos, dependencies) {
   if (any(nchar(repos) == 0L)) {
     cli::cli_abort(
       "all repository URLs must be non-empty strings",
+      class = c("tima_validation_error", "tima_error")
+    )
+  }
+
+  if (
+    !is.character(type) ||
+      length(type) != 1L ||
+      !(type %in% c("source", "binary"))
+  ) {
+    cli::cli_abort(
+      "type must be a single character string, either 'source' or 'binary'",
       class = c("tima_validation_error", "tima_error")
     )
   }
@@ -360,6 +372,7 @@ verify_package_installation <- function(package) {
 #'
 #' @param package Character package name
 #' @param repos Character vector of repositories
+#' @param type [character] Type of install ("source", "binary")
 #' @param dependencies Logical dependencies flag
 #' @param from_source Logical whether to install from source
 #'
@@ -368,30 +381,28 @@ verify_package_installation <- function(package) {
 try_install_package <- function(
   package,
   repos,
-  dependencies,
-  from_source = FALSE
+  type = "source",
+  dependencies
 ) {
   # Check if package was already installed before attempt
   was_installed <- .require_namespace(package, quietly = TRUE)
 
   tryCatch(
     expr = {
-      install_type <- if (from_source) "source" else "binary"
       log_info(
         "Installing R package: %s (from %s)",
         package,
-        install_type
+        type
       )
 
       # Capture warnings as well as errors
       result <- tryCatch(
         {
-          pkg_type <- if (from_source) "source" else getOption("pkgType")
           .install_packages(
             package,
             repos = repos,
             dependencies = dependencies,
-            type = pkg_type,
+            type = type,
             INSTALL_opts = c("--no-lock", "--no-test-load")
           )
           TRUE
@@ -445,6 +456,7 @@ try_install_package <- function(
 #'
 #' @param package [character] Name of the package (default: "tima")
 #' @param repos [character] Vector of repository URLs
+#' @param type [character]  Type of install ("source", "binary")
 #' @param dependencies [logical] Whether to install dependencies (default: TRUE)
 #'
 #' @return NULL (invisibly). Installs packages and sets up Python environment as
@@ -465,6 +477,7 @@ install_tima <- function(
     "https://bioconductor.org/packages/release/bioc",
     "https://cloud.r-project.org"
   ),
+  type = "source",
   dependencies = TRUE
 ) {
   validate_install_inputs(
@@ -492,7 +505,7 @@ install_tima <- function(
         package,
         repos = repos,
         dependencies = dependencies,
-        type = if (system == "Linux") "source" else "binary"
+        type = type
       )
       log_success("R package installed successfully")
     },
@@ -575,6 +588,7 @@ install <- function(
     "https://bioconductor.org/packages/release/bioc",
     "https://cloud.r-project.org"
   ),
+  type = "source",
   dependencies = TRUE
 ) {
   lifecycle::deprecate_warn(
@@ -585,6 +599,7 @@ install <- function(
   install_tima(
     package = package,
     repos = repos,
+    type = type,
     dependencies = dependencies
   )
 }

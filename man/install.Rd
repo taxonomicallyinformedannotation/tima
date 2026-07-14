@@ -8,6 +8,7 @@ install(
   package = "tima",
   repos = c("https://taxonomicallyinformedannotation.r-universe.dev",
     "https://bioconductor.org/packages/release/bioc", "https://cloud.r-project.org"),
+  type = "source",
   dependencies = TRUE
 )
 }
@@ -15,6 +16,8 @@ install(
 \item{package}{\link{character} Name of the package (default: "tima")}
 
 \item{repos}{\link{character} Vector of repository URLs}
+
+\item{type}{\link{character}  Type of install ("source", "binary")}
 
 \item{dependencies}{\link{logical} Whether to install dependencies (default: TRUE)}
 }
