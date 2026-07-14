@@ -230,6 +230,13 @@ sample_candidates_per_group <- function(
   seed = 42L,
   apply_anchor_collapsing = TRUE
 ) {
+  # New policy:
+  # - Only tied rows (same feature_id, candidate_adduct, rank_final) are sampled.
+  # - Untied rows are always kept.
+  # - At most `max_per_score` rows are kept per (feature_id, candidate_adduct, rank_final).
+  # - Cluster-anchor promoted rows are preserved before sampling.
+  # - Sampling prefers MS2 evidence and RT-priority where available.
+
   if (nrow(df) == 0L) {
     return(list(
       df = df,
@@ -238,10 +245,16 @@ sample_candidates_per_group <- function(
     ))
   }
 
+  # Ensure rank_final exists (rank_and_deduplicate should create it)
+  if (!"rank_final" %in% names(df)) {
+    df$rank_final <- NA_integer_
+  }
+
+  # Compute per-score-group sizes (feature/adduct/score-rank) only once
   df <- df |>
     tidytable::mutate(
-      .n_per_group = tidytable::n(),
-      .by = c(feature_id, candidate_adduct),
+      .n_per_score = tidytable::n(),
+      .by = c(feature_id, candidate_adduct, rank_final),
       .anchor_match = FALSE
     )
 
@@ -258,10 +271,11 @@ sample_candidates_per_group <- function(
 
   df_anchor_kept <- tidytable::tidytable()
   if (apply_anchor_collapsing && has_ik_col && has_M_cols) {
+    # anchors must come from strong rank-1 singletons (best-supported)
     anchor_tbl_base <- df |>
       tidytable::filter(
         rank_final == 1L,
-        .n_per_group == 1L,
+        .n_per_score == 1L,
         !is.na(candidate_structure_inchikey_connectivity_layer),
         !is.na(.candidate_M)
       ) |>
@@ -322,6 +336,8 @@ sample_candidates_per_group <- function(
     }
   }
 
+  # Remove whole adduct groups that have preserved anchors so sampling does not
+  # accidentally drop an anchor
   anchor_group_keys <- df |>
     tidytable::filter(.anchor_match) |>
     tidytable::distinct(feature_id, candidate_adduct)
@@ -336,54 +352,68 @@ sample_candidates_per_group <- function(
     df
   }
 
+  # Count how many distinct tied groups require sampling
   n_sampled_features <- df_remaining |>
-    tidytable::filter(.n_per_group > max_per_score) |>
+    tidytable::filter(.n_per_score > max_per_score) |>
     tidytable::distinct(feature_id) |>
     nrow()
 
   has_rt_col <- "candidate_structure_error_rt" %in% names(df_remaining)
+
+  # Partition into: untied (single candidate per score), small tied groups (<=max), and large tied groups (>max)
   df_untied <- df_remaining |>
-    tidytable::filter(.n_per_group == 1L)
+    tidytable::filter(.n_per_score == 1L) |>
+    tidytable::as_tidytable()
 
-  df_tied <- df_remaining |>
-    tidytable::filter(.n_per_group >= 2L)
+  df_keep_remaining <- df_remaining |>
+    tidytable::filter(.n_per_score > 1L & .n_per_score <= max_per_score) |>
+    tidytable::as_tidytable()
 
-  df_keep_remaining <- df_tied |>
-    tidytable::filter(.n_per_group <= max_per_score)
+  df_needs_sampling <- df_remaining |>
+    tidytable::filter(.n_per_score > max_per_score) |>
+    tidytable::as_tidytable()
 
-  df_needs_sampling <- df_tied |>
-    tidytable::filter(.n_per_group > max_per_score)
-
+  # Ordering function: prefer MS2 evidence, then anchors, RT-priority, then scores
   sort_candidates_for_sampling <- function(tbl, prefer_rt = FALSE) {
     if (nrow(tbl) == 0L) {
       return(tbl)
     }
 
     order_terms <- list()
+
+    # Prefer rows with MS2 evidence: candidate_score_similarity or candidate_score_sirius_csi or confidence
+    has_ms2 <- NULL
+    if ("candidate_score_similarity" %in% names(tbl)) {
+      order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(as.numeric(tbl$candidate_score_similarity))
+    }
+    if ("candidate_score_sirius_csi" %in% names(tbl)) {
+      order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(as.numeric(tbl$candidate_score_sirius_csi))
+    }
+    if ("candidate_score_sirius_confidence" %in% names(tbl)) {
+      order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(as.numeric(tbl$candidate_score_sirius_confidence))
+    }
+
     if (isTRUE(prefer_rt) && ".rt_priority" %in% names(tbl)) {
       order_terms[[length(order_terms) + 1L]] <- -as.integer(tbl$.rt_priority)
     }
 
     if ("cluster_consensus_promoted_from_anchor" %in% names(tbl)) {
       order_terms[[length(order_terms) + 1L]] <- -as.integer(
-        !is.na(tbl$cluster_consensus_promoted_from_anchor) &
-          tbl$cluster_consensus_promoted_from_anchor
+        !is.na(tbl$cluster_consensus_promoted_from_anchor) & tbl$cluster_consensus_promoted_from_anchor
       )
     }
 
+    # Fallback ordering by weighted chemo score and supporting evidence
     score_columns <- c(
       "score_weighted_chemo",
       "score_weighted_chemo_coverage",
       "candidate_score_pseudo_initial",
-      "candidate_score_similarity",
       "candidate_score_similarity_forward",
       "candidate_score_similarity_reverse"
     )
     for (score_col in score_columns) {
       if (score_col %in% names(tbl)) {
-        order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(
-          as.numeric(tbl[[score_col]])
-        )
+        order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(as.numeric(tbl[[score_col]]))
       }
     }
 
@@ -391,48 +421,66 @@ sample_candidates_per_group <- function(
       return(tbl)
     }
 
-    ord <- do.call(
-      order,
-      c(order_terms, list(na.last = TRUE, method = "radix"))
-    )
+    ord <- do.call(order, c(order_terms, list(na.last = TRUE, method = "radix")))
     tbl[ord, , drop = FALSE]
   }
 
-  if (nrow(df_needs_sampling) > 0L && has_rt_col) {
-    df_needs_sampling <- df_needs_sampling |>
-      tidytable::mutate(.rt_priority = !is.na(candidate_structure_error_rt))
+  # Sample only within each tied score group (feature_id, candidate_adduct, rank_final)
+  if (nrow(df_needs_sampling) > 0L) {
+    if (has_rt_col) {
+      df_needs_sampling <- df_needs_sampling |>
+        tidytable::mutate(.rt_priority = !is.na(candidate_structure_error_rt))
+    }
 
-    df_sampled <- sort_candidates_for_sampling(
-      df_needs_sampling,
-      prefer_rt = TRUE
-    ) |>
-      tidytable::slice_head(
-        n = max_per_score,
-        by = c(feature_id, candidate_adduct)
+    # Preserve the original tied-group sizes for annotation notes
+    group_sizes <- df_remaining |> tidytable::distinct(feature_id, candidate_adduct, rank_final, .n_per_score) |> tidytable::mutate(n_per_score = .n_per_score) |> tidytable::select(-.n_per_score)
+
+    # Convert to data.table for deterministic grouped sampling after ordering
+    dt_ns <- data.table::as.data.table(df_needs_sampling)
+
+    # Create temporary ordering columns (negative values so ascending sort prefers high scores)
+    if ("candidate_score_similarity" %in% names(dt_ns)) dt_ns[, .ord1 := -as.numeric(candidate_score_similarity)]
+    if ("candidate_score_sirius_csi" %in% names(dt_ns)) dt_ns[, .ord2 := -as.numeric(candidate_score_sirius_csi)]
+    if ("candidate_score_sirius_confidence" %in% names(dt_ns)) dt_ns[, .ord3 := -as.numeric(candidate_score_sirius_confidence)]
+    if (has_rt_col) dt_ns[, .ord_rt := -as.integer(.rt_priority)]
+    if ("cluster_consensus_promoted_from_anchor" %in% names(dt_ns)) dt_ns[, .ord_cons := -as.integer(!is.na(cluster_consensus_promoted_from_anchor) & cluster_consensus_promoted_from_anchor)]
+    if ("score_weighted_chemo" %in% names(dt_ns)) dt_ns[, .ord_sc := -as.numeric(score_weighted_chemo)]
+    if ("score_weighted_chemo_coverage" %in% names(dt_ns)) dt_ns[, .ord_cov := -as.numeric(score_weighted_chemo_coverage)]
+    if ("candidate_score_pseudo_initial" %in% names(dt_ns)) dt_ns[, .ord_pi := -as.numeric(candidate_score_pseudo_initial)]
+
+    # Determine ordering columns present
+    ord_cols <- intersect(c('.ord1', '.ord2', '.ord3', '.ord_rt', '.ord_cons', '.ord_sc', '.ord_cov', '.ord_pi'), names(dt_ns))
+
+    # Order by grouping keys and the computed ordering columns
+    if (length(ord_cols) > 0) {
+      data.table::setorderv(dt_ns, c('feature_id', 'candidate_adduct', 'rank_final', ord_cols))
+    } else {
+      data.table::setorderv(dt_ns, c('feature_id', 'candidate_adduct', 'rank_final'))
+    }
+
+    # Keep top `max_per_score` within each tied score group (feature_id, candidate_adduct, rank_final)
+    dt_sampled <- dt_ns[, head(.SD, max_per_score), by = .(feature_id, candidate_adduct, rank_final)]
+
+    # Clean temporary ordering columns
+    tmp_ord_cols <- intersect(c('.ord1', '.ord2', '.ord3', '.ord_rt', '.ord_cons', '.ord_sc', '.ord_cov', '.ord_pi'), names(dt_sampled))
+    if (length(tmp_ord_cols) > 0) dt_sampled[, (tmp_ord_cols) := NULL]
+    if ('.rt_priority' %in% names(dt_sampled)) dt_sampled[, .rt_priority := NULL]
+
+    df_sampled <- tidytable::as_tidytable(dt_sampled)
+
+    # Annotate sampling notes using the original group size
+    df_sampled <- df_sampled |>
+      tidytable::left_join(
+        y = group_sizes,
+        by = c("feature_id", "candidate_adduct", "rank_final")
       ) |>
       tidytable::mutate(
         annotation_note = paste0(
           "Sampled ",
           max_per_score,
           " of ",
-          .n_per_group,
-          " candidates with same score"
-        )
-      ) |>
-      tidytable::select(-.rt_priority)
-  } else if (nrow(df_needs_sampling) > 0L) {
-    df_sampled <- sort_candidates_for_sampling(df_needs_sampling) |>
-      tidytable::slice_head(
-        n = max_per_score,
-        by = c(feature_id, candidate_adduct)
-      ) |>
-      tidytable::mutate(
-        annotation_note = paste0(
-          "Sampled ",
-          max_per_score,
-          " of ",
-          .n_per_group,
-          " candidates with same score"
+          .n_per_score,
+          " tied candidates"
         )
       )
   } else {
@@ -445,25 +493,15 @@ sample_candidates_per_group <- function(
     df_anchor_kept,
     df_sampled
   ) |>
-    tidytable::select(
-      -tidyselect::any_of(c(".n_per_group", ".anchor_match", ".candidate_M"))
-    )
+    tidytable::select(-tidyselect::any_of(c(".n_per_score", "n_per_score", ".anchor_match", ".candidate_M")))
 
   annotation_notes_lookup <- tidytable::tidytable()
-
   if ("annotation_note" %in% names(df_result)) {
     annotation_notes_lookup <- df_result |>
       tidytable::filter(!is.na(annotation_note)) |>
-      tidytable::distinct(
-        feature_id,
-        candidate_adduct,
-        annotation_note
-      ) |>
+      tidytable::distinct(feature_id, candidate_adduct, annotation_note) |>
       tidytable::group_by(feature_id, candidate_adduct) |>
-      tidytable::summarize(
-        annotation_note = paste(unique(annotation_note), collapse = " | "),
-        .groups = "drop"
-      )
+      tidytable::summarize(annotation_note = paste(unique(annotation_note), collapse = " | "), .groups = "drop")
 
     df_result <- df_result |>
       tidytable::select(-tidyselect::any_of("annotation_note"))
