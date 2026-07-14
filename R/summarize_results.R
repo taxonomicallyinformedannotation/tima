@@ -447,7 +447,9 @@ summarize_results <- function(
   }
 
   candidate_structure_ids <- unique(
-    stats::na.omit(as.character(df$candidate_structure_inchikey_connectivity_layer))
+    stats::na.omit(as.character(
+      df$candidate_structure_inchikey_connectivity_layer
+    ))
   )
   if (length(candidate_structure_ids) == 0L) {
     return(
