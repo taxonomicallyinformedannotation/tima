@@ -740,7 +740,10 @@ prepare_ranked_candidates <- function(
     df = df_ranked,
     max_per_score = max_per_score,
     seed = 42L,
-    apply_anchor_collapsing = enforce_cluster_consensus
+    apply_anchor_collapsing = (
+      enforce_cluster_consensus && !is.null(components_table) &&
+        nrow(components_table) > 0L
+    )
   )
 
   df_ranked <- sampling_result$df
