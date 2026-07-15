@@ -37,10 +37,10 @@ build_evidence_supported_hypotheses <- function(
     NA_character_
   )
 
-  feats_dt <- tidytable::as_tidytable(df_fea_min)[,
-    .(feature_id, rt = as.numeric(rt), mz = as.numeric(mz), sample)
-  ]
-  feats_dt <- unique(feats_dt)
+  feats_dt <- tidytable::as_tidytable(df_fea_min) |>
+    tidytable::select(feature_id, rt, mz, sample) |>
+    tidytable::mutate(rt = as.numeric(rt), mz = as.numeric(mz)) |>
+    tidytable::distinct()
 
   if (nrow(feats_dt) == 0L || nrow(universe) == 0L) {
     return(empty_evidence_table())
@@ -232,14 +232,12 @@ build_evidence_supported_hypotheses <- function(
 
   if (is.finite(cap_eff) && cap_eff > 0L) {
     t_cap <- Sys.time()
-    hyps[, .__tier := tier_v[adduct_idx]]
-    hyps <- hyps |> tidytable::arrange(feat_idx, .__tier, adduct_idx)
-    hyps[, .__rank := seq_len(.N), by = feat_idx]
-    hyps <- hyps[
-      .__rank <= cap_eff |
-        adduct_idx %in% baseline_idx
-    ]
-    hyps[, c(".__rank", ".__tier") := NULL]
+    hyps <- hyps |
+      tidytable::mutate(.__tier = tier_v[adduct_idx]) |
+      tidytable::arrange(feat_idx, .__tier, adduct_idx) |
+      tidytable::mutate(.__rank = tidytable::row_number(), .by = feat_idx) |
+      tidytable::filter(.__rank <= cap_eff | adduct_idx %in% baseline_idx) |
+      tidytable::select(-tidyselect::any_of(c(".__rank", ".__tier")))
     log_debug(
       "Per-feature cap requested=%s effective=%d: %d rows in %.2fs",
       as.character(max_hypotheses_per_feature),
@@ -254,12 +252,13 @@ build_evidence_supported_hypotheses <- function(
   if (use_library_prefilter) {
     if (nrow(hyps) <= 500000L) {
       t_ppm <- Sys.time()
-      hyps[,
-        nearest_mass_error_ppm := .nearest_exact_mass_ppm(
-          implied_M,
-          exact_masses_sorted
+      hyps <- hyps |>
+        tidytable::mutate(
+          nearest_mass_error_ppm = .nearest_exact_mass_ppm(
+            implied_M,
+            exact_masses_sorted
+          )
         )
-      ]
       log_debug(
         "Nearest-library ppm error backfill: %d rows in %.2fs",
         nrow(hyps),

@@ -25,6 +25,8 @@ safe_bind_rows <- function(..., .id = NULL) {
 
   # Call tidytable::bind_rows robustly using do.call
   call_args <- dfs_clean
-  if (!is.null(.id)) call_args$.id <- .id
+  if (!is.null(.id)) {
+    call_args$.id <- .id
+  }
   do.call(tidytable::bind_rows, call_args)
 }

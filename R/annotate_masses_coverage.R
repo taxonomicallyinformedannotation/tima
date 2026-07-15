@@ -184,7 +184,8 @@ build_annotate_masses_coverage_report <- function(
       tidytable::desc(adduct_support),
       adduct
     )
-  best_feature_class <- best_feature_class[, .SD[1L], by = feature_id]
+  best_feature_class <- best_feature_class |>
+    tidytable::slice_head(n = 1, .by = feature_id)
 
   best_summary <- best_feature_class |>
     tidytable::left_join(feature_annotation_counts, by = "feature_id") |>

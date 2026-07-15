@@ -45,10 +45,16 @@ build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
     hyps$implied_M <- NA_real_
   }
 
-  dt <- hyps[,
-    .(feature_id, mz, adduct, evidence_cluster, evidence_count, implied_M)
-  ]
-  dt <- dt[!is.na(evidence_cluster)]
+  dt <- hyps |>
+    tidytable::select(
+      feature_id,
+      mz,
+      adduct,
+      evidence_cluster,
+      evidence_count,
+      implied_M
+    ) |>
+    tidytable::filter(!is.na(evidence_cluster))
   if (nrow(dt) == 0L) {
     return(tidytable::tidytable(
       feature_id = character(),
@@ -65,11 +71,12 @@ build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
       tidytable::desc(evidence_count),
       adduct
     )
-  reps <- dt[, .SD[1L], by = .(evidence_cluster, feature_id)]
-  reps <- reps |>
+
+  reps <- dt |>
+    tidytable::slice_head(n = 1, .by = c(evidence_cluster, feature_id)) |>
     tidytable::arrange(evidence_cluster, mz, feature_id)
 
-  # Combine multiple assignments into single operation
+  # Combine multiple assignments into single operation using lead per cluster
   reps[,
     c("feature_id_dest", "adduct_dest", "implied_M_dest") := list(
       c(as.character(feature_id[-1L]), NA_character_),
@@ -90,10 +97,9 @@ build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
       }
     )
 
-  out <- reps[
-    !is.na(feature_id_dest) & m_compatible,
-    .(feature_id, adduct, feature_id_dest, adduct_dest)
-  ]
-  out <- unique(out)
+  out <- reps |>
+    tidytable::filter(!is.na(feature_id_dest) & m_compatible) |>
+    tidytable::select(feature_id, adduct, feature_id_dest, adduct_dest) |>
+    tidytable::distinct()
   tidytable::as_tidytable(out)
 }
