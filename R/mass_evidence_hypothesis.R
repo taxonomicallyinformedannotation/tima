@@ -230,7 +230,7 @@ build_evidence_supported_hypotheses <- function(
     baseline_idx <- NA_integer_
   }
 
-  if (is.finite(cap_eff) && cap_eff > 0L) {
+  if (is.finite(cap_eff) && cap_eff > 0L && cap_eff < cap_in) {
     t_cap <- Sys.time()
     hyps <- hyps |
       tidytable::mutate(.__tier = tier_v[adduct_idx]) |

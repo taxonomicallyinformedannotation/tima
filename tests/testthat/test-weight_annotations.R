@@ -65,7 +65,6 @@ stage_weight_annotations_fixtures <- function(
 
 test_that("weight_annotations() validates required file existence", {
   skip_if_not_installed("tidytable")
-  skip_if_not_installed("logger")
 
   expect_error(
     weight_annotations(

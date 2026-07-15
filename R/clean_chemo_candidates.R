@@ -455,38 +455,33 @@ sample_candidates_per_group <- function(
       tidytable::mutate(n_per_score = .n_per_score) |>
       tidytable::select(-.n_per_score)
 
-    # Convert to data.table for deterministic grouped sampling after ordering
-    dt_ns <- data.table::as.data.table(df_needs_sampling)
+    # Use tidytable for deterministic grouped sampling after ordering
+    df_ns <- df_needs_sampling
 
     # Create temporary ordering columns (negative values so ascending sort prefers high scores)
-    if ("candidate_score_similarity" %in% names(dt_ns)) {
-      dt_ns[, .ord1 := -as.numeric(candidate_score_similarity)]
+    if ("candidate_score_similarity" %in% names(df_ns)) {
+      df_ns <- df_ns |> tidytable::mutate(.ord1 = -as.numeric(candidate_score_similarity))
     }
-    if ("candidate_score_sirius_csi" %in% names(dt_ns)) {
-      dt_ns[, .ord2 := -as.numeric(candidate_score_sirius_csi)]
+    if ("candidate_score_sirius_csi" %in% names(df_ns)) {
+      df_ns <- df_ns |> tidytable::mutate(.ord2 = -as.numeric(candidate_score_sirius_csi))
     }
-    if ("candidate_score_sirius_confidence" %in% names(dt_ns)) {
-      dt_ns[, .ord3 := -as.numeric(candidate_score_sirius_confidence)]
+    if ("candidate_score_sirius_confidence" %in% names(df_ns)) {
+      df_ns <- df_ns |> tidytable::mutate(.ord3 = -as.numeric(candidate_score_sirius_confidence))
     }
     if (has_rt_col) {
-      dt_ns[, .ord_rt := -as.integer(.rt_priority)]
+      df_ns <- df_ns |> tidytable::mutate(.ord_rt = -as.integer(.rt_priority))
     }
-    if ("cluster_consensus_promoted_from_anchor" %in% names(dt_ns)) {
-      dt_ns[,
-        .ord_cons := -as.integer(
-          !is.na(cluster_consensus_promoted_from_anchor) &
-            cluster_consensus_promoted_from_anchor
-        )
-      ]
+    if ("cluster_consensus_promoted_from_anchor" %in% names(df_ns)) {
+      df_ns <- df_ns |> tidytable::mutate(.ord_cons = -as.integer(!is.na(cluster_consensus_promoted_from_anchor) & cluster_consensus_promoted_from_anchor))
     }
-    if ("score_weighted_chemo" %in% names(dt_ns)) {
-      dt_ns[, .ord_sc := -as.numeric(score_weighted_chemo)]
+    if ("score_weighted_chemo" %in% names(df_ns)) {
+      df_ns <- df_ns |> tidytable::mutate(.ord_sc = -as.numeric(score_weighted_chemo))
     }
-    if ("score_weighted_chemo_coverage" %in% names(dt_ns)) {
-      dt_ns[, .ord_cov := -as.numeric(score_weighted_chemo_coverage)]
+    if ("score_weighted_chemo_coverage" %in% names(df_ns)) {
+      df_ns <- df_ns |> tidytable::mutate(.ord_cov = -as.numeric(score_weighted_chemo_coverage))
     }
-    if ("candidate_score_pseudo_initial" %in% names(dt_ns)) {
-      dt_ns[, .ord_pi := -as.numeric(candidate_score_pseudo_initial)]
+    if ("candidate_score_pseudo_initial" %in% names(df_ns)) {
+      df_ns <- df_ns |> tidytable::mutate(.ord_pi = -as.numeric(candidate_score_pseudo_initial))
     }
 
     # Determine ordering columns present
@@ -501,27 +496,20 @@ sample_candidates_per_group <- function(
         '.ord_cov',
         '.ord_pi'
       ),
-      names(dt_ns)
+      names(df_ns)
     )
 
     # Order by grouping keys and the computed ordering columns
-    if (length(ord_cols) > 0) {
-      data.table::setorderv(
-        dt_ns,
-        c('feature_id', 'candidate_adduct', 'rank_final', ord_cols)
-      )
-    } else {
-      data.table::setorderv(
-        dt_ns,
-        c('feature_id', 'candidate_adduct', 'rank_final')
-      )
-    }
+    order_terms <- c('feature_id', 'candidate_adduct', 'rank_final', ord_cols)
+    ord_list <- lapply(order_terms, function(x) df_ns[[x]])
+    ord <- do.call(order, c(ord_list, list(na.last = TRUE, method = "radix")))
+    df_ns <- df_ns[ord, , drop = FALSE]
 
     # Keep top `max_per_score` within each tied score group (feature_id, candidate_adduct, rank_final)
-    dt_sampled <- dt_ns[,
-      head(.SD, max_per_score),
-      by = .(feature_id, candidate_adduct, rank_final)
-    ]
+    df_sampled <- df_ns |>
+      tidytable::group_by(feature_id, candidate_adduct, rank_final) |>
+      tidytable::slice_head(n = max_per_score) |>
+      tidytable::ungroup()
 
     # Clean temporary ordering columns
     tmp_ord_cols <- intersect(
@@ -535,16 +523,17 @@ sample_candidates_per_group <- function(
         '.ord_cov',
         '.ord_pi'
       ),
-      names(dt_sampled)
+      names(df_sampled)
     )
     if (length(tmp_ord_cols) > 0) {
-      dt_sampled[, (tmp_ord_cols) := NULL]
+      df_sampled <- df_sampled |> tidytable::select(-tidyselect::all_of(tmp_ord_cols))
     }
-    if ('.rt_priority' %in% names(dt_sampled)) {
-      dt_sampled[, .rt_priority := NULL]
+    if ('.rt_priority' %in% names(df_sampled)) {
+      df_sampled <- df_sampled |> tidytable::select(-.rt_priority)
     }
 
-    df_sampled <- tidytable::as_tidytable(dt_sampled)
+    # Ensure tidytable result
+    df_sampled <- tidytable::as_tidytable(df_sampled)
 
     # Annotate sampling notes using the original group size
     df_sampled <- df_sampled |>
