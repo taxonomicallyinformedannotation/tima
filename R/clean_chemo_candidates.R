@@ -435,38 +435,24 @@ sample_candidates_per_group <- function(
     # Preserve the original tied-group sizes for annotation notes
     group_sizes <- df_remaining |> tidytable::distinct(feature_id, candidate_adduct, rank_final, .n_per_score) |> tidytable::mutate(n_per_score = .n_per_score) |> tidytable::select(-.n_per_score)
 
-    # Convert to data.table for deterministic grouped sampling after ordering
-    dt_ns <- data.table::as.data.table(df_needs_sampling)
-
-    # Create temporary ordering columns (negative values so ascending sort prefers high scores)
-    if ("candidate_score_similarity" %in% names(dt_ns)) dt_ns[, .ord1 := -as.numeric(candidate_score_similarity)]
-    if ("candidate_score_sirius_csi" %in% names(dt_ns)) dt_ns[, .ord2 := -as.numeric(candidate_score_sirius_csi)]
-    if ("candidate_score_sirius_confidence" %in% names(dt_ns)) dt_ns[, .ord3 := -as.numeric(candidate_score_sirius_confidence)]
-    if (has_rt_col) dt_ns[, .ord_rt := -as.integer(.rt_priority)]
-    if ("cluster_consensus_promoted_from_anchor" %in% names(dt_ns)) dt_ns[, .ord_cons := -as.integer(!is.na(cluster_consensus_promoted_from_anchor) & cluster_consensus_promoted_from_anchor)]
-    if ("score_weighted_chemo" %in% names(dt_ns)) dt_ns[, .ord_sc := -as.numeric(score_weighted_chemo)]
-    if ("score_weighted_chemo_coverage" %in% names(dt_ns)) dt_ns[, .ord_cov := -as.numeric(score_weighted_chemo_coverage)]
-    if ("candidate_score_pseudo_initial" %in% names(dt_ns)) dt_ns[, .ord_pi := -as.numeric(candidate_score_pseudo_initial)]
-
-    # Determine ordering columns present
-    ord_cols <- intersect(c('.ord1', '.ord2', '.ord3', '.ord_rt', '.ord_cons', '.ord_sc', '.ord_cov', '.ord_pi'), names(dt_ns))
-
-    # Order by grouping keys and the computed ordering columns
-    if (length(ord_cols) > 0) {
-      data.table::setorderv(dt_ns, c('feature_id', 'candidate_adduct', 'rank_final', ord_cols))
-    } else {
-      data.table::setorderv(dt_ns, c('feature_id', 'candidate_adduct', 'rank_final'))
-    }
-
-    # Keep top `max_per_score` within each tied score group (feature_id, candidate_adduct, rank_final)
-    dt_sampled <- dt_ns[, head(.SD, max_per_score), by = .(feature_id, candidate_adduct, rank_final)]
-
-    # Clean temporary ordering columns
-    tmp_ord_cols <- intersect(c('.ord1', '.ord2', '.ord3', '.ord_rt', '.ord_cons', '.ord_sc', '.ord_cov', '.ord_pi'), names(dt_sampled))
-    if (length(tmp_ord_cols) > 0) dt_sampled[, (tmp_ord_cols) := NULL]
-    if ('.rt_priority' %in% names(dt_sampled)) dt_sampled[, .rt_priority := NULL]
-
-    df_sampled <- tidytable::as_tidytable(dt_sampled)
+    # Use tidytable-only deterministic ordering and slice_head per tied group
+    df_sampled <- df_needs_sampling |>
+      tidytable::arrange(
+        feature_id,
+        candidate_adduct,
+        rank_final,
+        tidytable::desc(cluster_consensus_promoted_from_anchor),
+        tidytable::desc(as.numeric(candidate_score_similarity)),
+        tidytable::desc(as.numeric(candidate_score_sirius_csi)),
+        tidytable::desc(as.numeric(candidate_score_sirius_confidence)),
+        tidytable::desc(as.numeric(score_weighted_chemo)),
+        tidytable::desc(as.numeric(score_weighted_chemo_coverage)),
+        tidytable::desc(as.numeric(candidate_score_pseudo_initial)),
+        tidytable::desc(.rt_priority)
+      ) |>
+      tidytable::group_by(feature_id, candidate_adduct, rank_final) |>
+      tidytable::slice_head(n = max_per_score) |>
+      tidytable::ungroup()
 
     # Annotate sampling notes using the original group size
     df_sampled <- df_sampled |>
@@ -483,6 +469,7 @@ sample_candidates_per_group <- function(
           " tied candidates"
         )
       )
+
   } else {
     df_sampled <- tidytable::tidytable()
   }

@@ -492,11 +492,12 @@ rank_and_deduplicate <- function(df) {
     df = as.data.frame(df),
     initial_rank = TRUE
   )
-  # Rank groups based ONLY on effective_score (evidence already encoded)
+  # Rank initial by candidate_score_pseudo_initial (descending).
+  # Use dense ranks so identical initial scores get identical ranks.
   df_ranked <- .assign_rank_groups(
     df = df_ranked,
     rank_col_name = "rank_initial",
-    ranking_cols = c("effective_score")
+    ranking_cols = c("candidate_score_pseudo_initial")
   )
   df_rank_initial <- tidytable::as_tidytable(df_ranked) |>
     tidytable::distinct(
