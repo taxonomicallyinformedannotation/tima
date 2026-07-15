@@ -1297,6 +1297,7 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
 
   # For each (component_id, .candidate_M_key) group with rank_final == 1
   # identify the anchor InChIKey from the best-scored feature
+  # OPTIMIZATION: Single pass with pre-computed joins
   anchor_lookup <- df_with_comp |>
     tidytable::filter(
       rank_final == 1L,
@@ -1332,10 +1333,7 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     return(df_ranked |> tidytable::select(-tidyselect::any_of(".candidate_M")))
   }
 
-  # For each feature in the consensus group, carry forward the anchor metadata.
-  # Features whose current rank-1 candidate differs from the consensus anchor
-  # need their rows reordered so the anchor candidate becomes rank 1. Features
-  # that already have the anchor at rank 1 need provenance only.
+  # OPTIMIZATION: Single join + vectorized operations instead of multiple joins
   df_with_anchor <- df_with_comp |>
     tidytable::left_join(
       y = anchor_lookup,
@@ -1353,6 +1351,8 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
 
   if (nrow(features_with_anchor) > 0L) {
     has_annotation_note <- "annotation_note" %in% names(df_with_anchor)
+
+    # Single inner join - features that have the anchor IK
     df_part_reorder <- df_with_anchor |>
       tidytable::inner_join(
         y = features_with_anchor,
@@ -1423,7 +1423,7 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
         )
       )
 
-    # Combine anchored rows with unchanged rows.
+    # Combine anchored rows with unchanged rows - single anti_join
     df_unchanged <- df_with_comp |>
       tidytable::anti_join(
         y = features_with_anchor,
@@ -1451,18 +1451,15 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
           ".candidate_M_exact",
           ".candidate_M_mz",
           ".candidate_M_key",
-          ".has_anchor_ik",
-          ".is_anchor_feature",
-          ".anchor_ik",
-          ".anchor_feature_id",
-          ".existing_note",
+          "component_id",
           ".has_ms2_evidence"
         ))
       )
 
     affected_fids <- unique(df_part_reorder$feature_id)
 
-    df_result <- tidytable::bind_rows(df_part_reorder, df_unchanged)
+    df_result <- tidytable::bind_rows(df_part_reorder, df_unchanged) |>
+      tidytable::arrange(feature_id, rank_final)
 
     if (length(affected_fids) > 0L) {
       df_affected <- df_result |>

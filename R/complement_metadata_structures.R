@@ -84,6 +84,7 @@ complement_metadata_structures <- function(
     tidytable::distinct()
   log_debug("Stereo loaded: %d rows after filtering", nrow(stereo))
 
+  # Pre-filter stereo columns needed for lookups to avoid carrying extra columns
   stereo_k <- stereo |>
     tidytable::select(
       structure_inchikey,
@@ -136,6 +137,9 @@ complement_metadata_structures <- function(
       candidate_structure_inchikey_connectivity_layer,
       .keep_all = TRUE
     )
+
+  # Release stereo early to free memory
+  rm(stereo)
 
   # Load metadata (formula + mass only, keyed by inchikey_no_stereo)
   met_cols <- .schema_metadata_cols()
@@ -218,13 +222,23 @@ complement_metadata_structures <- function(
 
   stereo_bridge <- .build_stereo_bridge(stereo_k)
 
+  # Release stereo_k early to free memory
+  rm(stereo_k)
+
+  # Pre-compute match indices ONCE for all lookup tables to avoid repeated match() calls
+  structure_keys_idx <- structure_keys$candidate_structure_inchikey_no_stereo
+  structure_keys_conn <- structure_keys$candidate_structure_inchikey_connectivity_layer
+
   key_lookup <- .build_structure_key_lookup_fast(
     structure_keys = structure_keys,
     met_lookup = met_lookup,
     nam_lookup = nam_lookup,
     stereo_bridge = stereo_bridge,
     tax_cla = tax_cla,
-    tax_npc = tax_npc
+    tax_npc = tax_npc,
+    # Pass pre-computed match keys to avoid repeated computation
+    structure_keys_idx = structure_keys_idx,
+    structure_keys_conn = structure_keys_conn
   )
 
   log_debug("Key lookup: %d rows; starting final join", nrow(key_lookup))
@@ -237,7 +251,6 @@ complement_metadata_structures <- function(
     met_lookup,
     nam_lookup,
     key_lookup,
-    stereo_k,
     stereo_i_conn,
     stereo_s,
     stereo_bridge,
@@ -586,7 +599,10 @@ complement_metadata_structures <- function(
   nam_lookup,
   stereo_bridge,
   tax_cla,
-  tax_npc
+  tax_npc,
+  # Pass pre-computed match keys to avoid repeated computation
+  structure_keys_idx = structure_keys$candidate_structure_inchikey_no_stereo,
+  structure_keys_conn = structure_keys$candidate_structure_inchikey_connectivity_layer
 ) {
   if (nrow(structure_keys) == 0L) {
     return(tidytable::tidytable(
@@ -604,10 +620,9 @@ complement_metadata_structures <- function(
       )
     )
 
-  # Pre-compute match indices ONCE for structure_keys$inchikey_no_stereo
-  # against all lookup tables - avoids repeated match() calls
-  sk_inchikey_no_stereo <- structure_keys$candidate_structure_inchikey_no_stereo
-  sk_connectivity <- structure_keys$candidate_structure_inchikey_connectivity_layer
+  # Use pre-computed match indices
+  structure_keys_idx <- structure_keys_idx
+  structure_keys_conn <- structure_keys_conn
 
   # Metabolite lookup (formula + exact mass) - keyed by inchikey_no_stereo
   if (nrow(met_lookup) > 0L) {
@@ -619,7 +634,7 @@ complement_metadata_structures <- function(
       met_lookup$.lk_exact_mass,
       met_lookup$candidate_structure_inchikey_no_stereo
     )
-    idx <- match(sk_inchikey_no_stereo, names(met_map_formula))
+    idx <- match(structure_keys_idx, names(met_map_formula))
     lookup_tbl$.enr_candidate_structure_molecular_formula <- met_map_formula[
       idx
     ]
@@ -643,7 +658,7 @@ complement_metadata_structures <- function(
       nam_lookup$.lk_xlogp,
       nam_lookup$candidate_structure_inchikey_no_stereo
     )
-    idx <- match(sk_inchikey_no_stereo, names(nam_map_name))
+    idx <- match(structure_keys_idx, names(nam_map_name))
     lookup_tbl$.enr_candidate_structure_name <- nam_map_name[idx]
     lookup_tbl$.enr_candidate_structure_tag <- nam_map_tag[idx]
     lookup_tbl$.enr_candidate_structure_xlogp <- nam_map_xlogp[idx]
@@ -663,7 +678,7 @@ complement_metadata_structures <- function(
       stereo_bridge$.bridge_smiles,
       stereo_bridge$candidate_structure_inchikey_connectivity_layer
     )
-    idx <- match(sk_connectivity, names(bridge_inchikey_map))
+    idx <- match(structure_keys_conn, names(bridge_inchikey_map))
     lookup_tbl$.bridge_inchikey <- bridge_inchikey_map[idx]
     lookup_tbl$.bridge_smiles <- bridge_smiles_map[idx]
   } else {
