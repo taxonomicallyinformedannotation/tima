@@ -230,13 +230,58 @@ calculate_entropy_and_similarity <- function(
     lib_spectra[[idx]]
   }
 
+  # Pre-sort library precursors for fast binary search instead of O(n) scan per query
+  # This is a MAJOR optimization: reduces 5.3B operations to ~3,660 * log2(1.45M) ~ 75K
+  lib_precursors_sorted <- sort(lib_precursors, index.return = TRUE)
+  lib_precursors_sorted_vals <- lib_precursors_sorted$x
+  lib_precursors_sorted_idx <- lib_precursors_sorted$ix
+
+  # Pre-compute adduct neutral conversions for ALL library spectra (if adduct metadata available)
+  # This avoids per-comparison conversion overhead in the hot loop
+  lib_neutral_precursors <- rep(NA_real_, n_lib)
+  if (!is.null(lib_adducts) && length(lib_adducts) == n_lib) {
+    adduct_cache <- new.env(parent = emptyenv())
+    for (i in seq_len(n_lib)) {
+      adduct <- as.character(lib_adducts[[i]])
+      prec <- lib_precursors[[i]]
+      if (is.finite(prec) && !is.na(adduct) && nzchar(adduct)) {
+        key <- paste0(
+          adduct,
+          "|",
+          format(prec, scientific = FALSE, digits = 15)
+        )
+        if (!exists(key, envir = adduct_cache, inherits = FALSE)) {
+          converted <- convert_precursor_to_neutral_if_possible(
+            precursors = prec,
+            adducts = adduct
+          )
+          converted_value <- if (
+            length(converted) == 1L &&
+              is.finite(converted) &&
+              converted > 0
+          ) {
+            converted
+          } else {
+            NA_real_
+          }
+          assign(key, converted_value, envir = adduct_cache)
+        }
+        lib_neutral_precursors[i] <- get(
+          key,
+          envir = adduct_cache,
+          inherits = FALSE
+        )
+      }
+    }
+  }
+
   # Progress and local function alias used in the hot loop closure
   progress_counter <- 0L
   call_gnps <- gnps_chain_dp_wrapper
   use_gnps <- (method == "gnps")
 
   has_adduct_metadata <- !is.null(query_adducts) && !is.null(lib_adducts)
-  adduct_cache <- new.env(parent = emptyenv())
+  # Reuse the same adduct_cache for query conversions
   get_neutral_precursor <- function(precursor, adduct) {
     if (
       !is.finite(precursor) ||
@@ -284,18 +329,33 @@ calculate_entropy_and_similarity <- function(
       current_id <- query_ids[spectrum_idx]
 
       # Filter library spectra by precursor mass if not approximating
+      # OPTIMIZATION: Use binary search on pre-sorted precursors instead of O(n) scan
       if (!approx) {
-        val_ind <- (lib_precursors >=
-          min(
-            current_precursor - dalton,
-            current_precursor * (1 - (1E-6 * ppm))
-          )) &
-          (lib_precursors <=
-            max(
-              current_precursor + dalton,
-              current_precursor * (1 + (1E-6 * ppm))
-            ))
-        lib_indices_sub <- which(val_ind)
+        low_val <- min(
+          current_precursor - dalton,
+          current_precursor * (1 - (1E-6 * ppm))
+        )
+        high_val <- max(
+          current_precursor + dalton,
+          current_precursor * (1 + (1E-6 * ppm))
+        )
+        # findInterval returns indices in 0..n, so +1 for 1-based indexing
+        low_idx <- findInterval(
+          low_val,
+          lib_precursors_sorted_vals,
+          left.open = FALSE
+        ) +
+          1L
+        high_idx <- findInterval(
+          high_val,
+          lib_precursors_sorted_vals,
+          left.open = TRUE
+        )
+        if (low_idx <= high_idx) {
+          lib_indices_sub <- lib_precursors_sorted_idx[low_idx:high_idx]
+        } else {
+          lib_indices_sub <- integer(0)
+        }
       } else {
         lib_indices_sub <- seq_along(lib_spectra)
       }
@@ -321,6 +381,19 @@ calculate_entropy_and_similarity <- function(
         query_adducts[[spectrum_idx]]
       } else {
         NA_character_
+      }
+
+      # Pre-compute query neutral precursor once if adduct metadata available
+      query_neutral_precursor <- NA_real_
+      if (
+        has_adduct_metadata &&
+          !is.na(current_query_adduct) &&
+          nzchar(current_query_adduct)
+      ) {
+        query_neutral_precursor <- get_neutral_precursor(
+          precursor = current_precursor,
+          adduct = current_query_adduct
+        )
       }
 
       for (pos_idx in seq_len(n_candidates)) {
@@ -352,21 +425,15 @@ calculate_entropy_and_similarity <- function(
             nzchar(target_query_adduct) &&
             !identical(current_query_adduct, target_query_adduct)
         ) {
-          query_neutral <- get_neutral_precursor(
-            precursor = current_precursor,
-            adduct = current_query_adduct
-          )
-          target_neutral <- get_neutral_precursor(
-            precursor = target_precursor,
-            adduct = target_query_adduct
-          )
+          # Use pre-computed library neutral precursor
+          target_neutral <- lib_neutral_precursors[lib_idx]
           if (
-            is.finite(query_neutral) &&
+            is.finite(query_neutral_precursor) &&
               is.finite(target_neutral) &&
-              query_neutral > 0 &&
+              query_neutral_precursor > 0 &&
               target_neutral > 0
           ) {
-            query_precursor_value <- query_neutral
+            query_precursor_value <- query_neutral_precursor
             target_precursor_value <- target_neutral
             space_label <- "neutral_M"
           }

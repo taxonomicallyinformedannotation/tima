@@ -141,7 +141,8 @@
       anchor_info$mass,
       left.open = FALSE,
       rightmost.closed = TRUE
-    ) + 1L
+    ) +
+      1L
     start_idx <- pmin(pmax(start_idx, 1L), n_anchor + 1L)
     end_idx <- findInterval(
       row_upper,
@@ -739,10 +740,9 @@ prepare_ranked_candidates <- function(
     df = df_ranked,
     max_per_score = max_per_score,
     seed = 42L,
-    apply_anchor_collapsing = (
-      enforce_cluster_consensus && !is.null(components_table) &&
-        nrow(components_table) > 0L
-    )
+    apply_anchor_collapsing = (enforce_cluster_consensus &&
+      !is.null(components_table) &&
+      nrow(components_table) > 0L)
   )
 
   df_ranked <- sampling_result$df

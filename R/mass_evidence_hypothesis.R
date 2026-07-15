@@ -140,23 +140,39 @@ build_evidence_supported_hypotheses <- function(
   kept_lengths <- integer(K)
   filled <- 0L
 
+  # Pre-allocate working vectors to avoid repeated allocation in loop
+  n_feat <- length(feature_ids)
+  implied_work <- numeric(n_feat)
+  ok_work <- logical(n_feat)
+  pos_work <- integer(n_feat)
+
   t_loop <- Sys.time()
   log_every <- max(1L, K %/% 10L)
 
   for (ui in seq_len(K)) {
     iso_shift <- niso_v[ui] * EVIDENCE_ISOTOPE_SHIFT_DA
-    implied <- (abs(z_v[ui]) * (feature_mzs - iso_shift) - am_v[ui]) /
-      n_mer_v[ui] -
-      am_pm_v[ui]
+    z_abs <- abs(z_v[ui])
+    am_u <- am_v[ui]
+    n_mer_u <- n_mer_v[ui]
+    am_pm_u <- am_pm_v[ui]
 
-    ok <- is.finite(implied) &
-      implied >= min_neutral_mass &
-      implied <= max_neutral_mass
-    if (!any(ok)) {
+    # Vectorized implied mass computation
+    implied_work <- (z_abs * (feature_mzs - iso_shift) - am_u) /
+      n_mer_u -
+      am_pm_u
+
+    # Vectorized bounds check
+    ok_work <- is.finite(implied_work) &
+      implied_work >= min_neutral_mass &
+      implied_work <= max_neutral_mass
+    if (!any(ok_work)) {
       next
     }
 
-    implied_ok <- implied[ok]
+    # Get valid indices in one pass
+    n_ok <- sum(ok_work)
+    implied_ok <- implied_work[ok_work]
+
     if (use_library_prefilter) {
       hit <- .has_library_match_within_tolerance(
         masses = implied_ok,
@@ -167,14 +183,16 @@ build_evidence_supported_hypotheses <- function(
       if (!any(hit)) {
         next
       }
+      # Use which.ok_work to get positions - more efficient than which(ok)[hit]
+      which_ok <- which(ok_work)
+      pos <- which_ok[hit]
       implied_ok <- implied_ok[hit]
-      pos <- which(ok)[hit]
     } else {
-      pos <- which(ok)
+      pos <- which(ok_work)
     }
 
     filled <- filled + 1L
-    kept_feat_idx[[filled]] <- as.integer(pos)
+    kept_feat_idx[[filled]] <- pos
     kept_aidx[[filled]] <- rep.int(ui, length(pos))
     kept_M[[filled]] <- implied_ok
     kept_lengths[filled] <- length(pos)
