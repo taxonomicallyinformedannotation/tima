@@ -87,22 +87,33 @@
   }
 
   anchor_match <- rep(FALSE, nrow(row_dt))
-  row_groups <- split(seq_len(nrow(row_dt)), row_dt$row_IK)
+
+  # Pre-group anchors by InChIKey for O(1) lookup
   anchor_groups <- split(seq_len(nrow(anchor_dt)), anchor_dt$anchor_IK)
+  row_groups <- split(seq_len(nrow(row_dt)), row_dt$row_IK)
 
-  for (ik in intersect(names(row_groups), names(anchor_groups))) {
-    row_idx <- row_groups[[ik]]
+  common_IK <- intersect(names(row_groups), names(anchor_groups))
+  if (length(common_IK) == 0L) {
+    return(rep(FALSE, nrow(df_tied)))
+  }
+
+  # Pre-sort anchors by mass within each InChIKey group
+  for (ik in common_IK) {
     anchor_idx <- anchor_groups[[ik]]
-    if (length(row_idx) == 0L || length(anchor_idx) == 0L) {
-      next
-    }
+    anchor_mass_sorted <- anchor_dt$anchor_mass[anchor_idx]
+    anchor_order <- order(anchor_mass_sorted)
+    anchor_groups[[ik]] <- list(
+      idx = anchor_idx[anchor_order],
+      mass = anchor_mass_sorted[anchor_order],
+      fid = anchor_dt$anchor_fid[anchor_idx[anchor_order]],
+      rt = anchor_dt$anchor_rt[anchor_idx[anchor_order]]
+    )
+  }
 
-    anchor_mass <- anchor_dt$anchor_mass[anchor_idx]
-    anchor_order <- order(anchor_mass)
-    anchor_mass <- anchor_mass[anchor_order]
-    anchor_idx_sorted <- anchor_idx[anchor_order]
-    anchor_fids <- anchor_dt$anchor_fid[anchor_idx_sorted]
-    anchor_rts <- anchor_dt$anchor_rt[anchor_idx_sorted]
+  # Vectorized matching using findInterval
+  for (ik in common_IK) {
+    row_idx <- row_groups[[ik]]
+    anchor_info <- anchor_groups[[ik]]
 
     row_mass <- row_dt$row_mass[row_idx]
     row_lower <- row_dt$row_lower[row_idx]
@@ -124,19 +135,18 @@
     row_fids <- row_fids[valid_rows]
     row_rts <- row_rts[valid_rows]
 
-    n_anchor <- length(anchor_mass)
+    n_anchor <- length(anchor_info$mass)
     start_idx <- findInterval(
       row_lower,
-      anchor_mass,
-      left.open = TRUE,
+      anchor_info$mass,
+      left.open = FALSE,
       rightmost.closed = TRUE
-    ) +
-      1L
+    ) + 1L
     start_idx <- pmin(pmax(start_idx, 1L), n_anchor + 1L)
     end_idx <- findInterval(
       row_upper,
-      anchor_mass,
-      left.open = FALSE,
+      anchor_info$mass,
+      left.open = TRUE,
       rightmost.closed = TRUE
     )
     end_idx[!is.finite(end_idx)] <- 0L
@@ -155,6 +165,7 @@
     end_idx <- end_idx[keep_mask]
 
     if (has_rt_feature_col) {
+      # RT-aware matching: check if any anchor in window has different fid and matching RT
       for (ri in seq_along(row_idx)) {
         if (is.na(row_rts[[ri]])) {
           anchor_match[row_idx[[ri]]] <- TRUE
@@ -168,11 +179,11 @@
         }
 
         anchor_window <- seq.int(candidate_start, candidate_end)
-        candidate_anchor_fids <- anchor_fids[anchor_window]
-        candidate_anchor_rts <- anchor_rts[anchor_window]
-        keep_mask <- candidate_anchor_fids != row_fids[[ri]]
-        candidate_anchor_fids <- candidate_anchor_fids[keep_mask]
-        candidate_anchor_rts <- candidate_anchor_rts[keep_mask]
+        candidate_anchor_fids <- anchor_info$fid[anchor_window]
+        candidate_anchor_rts <- anchor_info$rt[anchor_window]
+        keep_mask_inner <- candidate_anchor_fids != row_fids[[ri]]
+        candidate_anchor_fids <- candidate_anchor_fids[keep_mask_inner]
+        candidate_anchor_rts <- candidate_anchor_rts[keep_mask_inner]
 
         if (length(candidate_anchor_fids) == 0L) {
           next
@@ -185,6 +196,7 @@
         }
       }
     } else {
+      # No RT column: just check for any anchor with different fid
       for (ri in seq_along(row_idx)) {
         candidate_start <- start_idx[[ri]]
         candidate_end <- end_idx[[ri]]
@@ -193,7 +205,7 @@
         }
 
         anchor_window <- seq.int(candidate_start, candidate_end)
-        candidate_anchor_fids <- anchor_fids[anchor_window]
+        candidate_anchor_fids <- anchor_info$fid[anchor_window]
         candidate_anchor_fids <- candidate_anchor_fids[
           candidate_anchor_fids != row_fids[[ri]]
         ]
@@ -727,7 +739,10 @@ prepare_ranked_candidates <- function(
     df = df_ranked,
     max_per_score = max_per_score,
     seed = 42L,
-    apply_anchor_collapsing = TRUE
+    apply_anchor_collapsing = (
+      enforce_cluster_consensus && !is.null(components_table) &&
+        nrow(components_table) > 0L
+    )
   )
 
   df_ranked <- sampling_result$df
