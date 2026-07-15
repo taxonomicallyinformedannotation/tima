@@ -459,8 +459,8 @@ calculate_entropy_and_similarity <- function(
           candidate_score_similarity_forward = row_scores_forward,
           candidate_score_similarity_reverse = row_scores_reverse,
           candidate_count_similarity_peaks_matched = as.integer(matched_counts[
-                                                                  valid_indices
-                                                                ]),
+            valid_indices
+          ]),
           .similarity_space = similarity_space[valid_indices],
           stringsAsFactors = FALSE
         )
