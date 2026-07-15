@@ -314,15 +314,26 @@ sample_candidates_per_group <- function(
     if (nrow(anchor_tbl) > 0L) {
       tol <- NEUTRAL_MASS_MATCH_TOLERANCE_DA
       rt_tol <- DEFAULT_HE_MAX_RT_ERROR_MIN
-      anchor_match <- .match_tied_rows_to_anchors(
-        df_tied = df,
-        anchor_tbl = anchor_tbl,
-        tol = tol,
-        rt_tol = rt_tol,
-        has_rt_feature_col = has_rt_feature_col
-      )
-      df <- df |>
-        tidytable::mutate(.anchor_match = anchor_match)
+      # Only match TIED rows to cross-feature anchors
+      # Non-tied rows (rank-1 singletons) should not be affected by cross-feature anchors
+      tied_mask <- df$.n_per_score > 1L
+      if (any(tied_mask)) {
+        anchor_match <- .match_tied_rows_to_anchors(
+          df_tied = df[tied_mask, , drop = FALSE],
+          anchor_tbl = anchor_tbl,
+          tol = tol,
+          rt_tol = rt_tol,
+          has_rt_feature_col = has_rt_feature_col
+        )
+        # Create full-length result with FALSE for non-tied rows
+        full_anchor_match <- rep(FALSE, nrow(df))
+        full_anchor_match[tied_mask] <- anchor_match
+        df <- df |>
+          tidytable::mutate(.anchor_match = full_anchor_match)
+      } else {
+        df <- df |>
+          tidytable::mutate(.anchor_match = FALSE)
+      }
 
       has_consensus_flag <- "cluster_consensus_promoted_from_anchor" %in%
         names(df)
@@ -736,14 +747,15 @@ prepare_ranked_candidates <- function(
     log_debug("Applied cluster-level entity consensus filtering")
   }
 
+  # Cross-feature M-anchor collapsing can work independently of cluster consensus.
+  # It only requires rank-1 singleton anchors in the ranked candidates.
+  apply_anchor_collapsing <- enforce_cluster_consensus
+
   sampling_result <- sample_candidates_per_group(
     df = df_ranked,
     max_per_score = max_per_score,
     seed = 42L,
-    apply_anchor_collapsing = (
-      enforce_cluster_consensus && !is.null(components_table) &&
-        nrow(components_table) > 0L
-    )
+    apply_anchor_collapsing = apply_anchor_collapsing
   )
 
   df_ranked <- sampling_result$df
