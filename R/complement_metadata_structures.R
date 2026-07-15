@@ -604,6 +604,12 @@ complement_metadata_structures <- function(
       )
     )
 
+  # Pre-compute match indices ONCE for structure_keys$inchikey_no_stereo
+  # against all lookup tables - avoids repeated match() calls
+  sk_inchikey_no_stereo <- structure_keys$candidate_structure_inchikey_no_stereo
+  sk_connectivity <- structure_keys$candidate_structure_inchikey_connectivity_layer
+
+  # Metabolite lookup (formula + exact mass) - keyed by inchikey_no_stereo
   if (nrow(met_lookup) > 0L) {
     met_map_formula <- stats::setNames(
       met_lookup$.lk_molecular_formula,
@@ -613,23 +619,17 @@ complement_metadata_structures <- function(
       met_lookup$.lk_exact_mass,
       met_lookup$candidate_structure_inchikey_no_stereo
     )
+    idx <- match(sk_inchikey_no_stereo, names(met_map_formula))
     lookup_tbl$.enr_candidate_structure_molecular_formula <- met_map_formula[
-      match(
-        structure_keys$candidate_structure_inchikey_no_stereo,
-        names(met_map_formula)
-      )
+      idx
     ]
-    lookup_tbl$.enr_candidate_structure_exact_mass <- met_map_mass[
-      match(
-        structure_keys$candidate_structure_inchikey_no_stereo,
-        names(met_map_mass)
-      )
-    ]
+    lookup_tbl$.enr_candidate_structure_exact_mass <- met_map_mass[idx]
   } else {
     lookup_tbl$.enr_candidate_structure_molecular_formula <- NA_character_
     lookup_tbl$.enr_candidate_structure_exact_mass <- NA_character_
   }
 
+  # Name/tag/xlogp lookup - keyed by inchikey_no_stereo
   if (nrow(nam_lookup) > 0L) {
     nam_map_name <- stats::setNames(
       nam_lookup$.lk_name,
@@ -643,30 +643,17 @@ complement_metadata_structures <- function(
       nam_lookup$.lk_xlogp,
       nam_lookup$candidate_structure_inchikey_no_stereo
     )
-    lookup_tbl$.enr_candidate_structure_tag <- nam_map_tag[
-      match(
-        structure_keys$candidate_structure_inchikey_no_stereo,
-        names(nam_map_tag)
-      )
-    ]
-    lookup_tbl$.enr_candidate_structure_name <- nam_map_name[
-      match(
-        structure_keys$candidate_structure_inchikey_no_stereo,
-        names(nam_map_name)
-      )
-    ]
-    lookup_tbl$.enr_candidate_structure_xlogp <- nam_map_xlogp[
-      match(
-        structure_keys$candidate_structure_inchikey_no_stereo,
-        names(nam_map_xlogp)
-      )
-    ]
+    idx <- match(sk_inchikey_no_stereo, names(nam_map_name))
+    lookup_tbl$.enr_candidate_structure_name <- nam_map_name[idx]
+    lookup_tbl$.enr_candidate_structure_tag <- nam_map_tag[idx]
+    lookup_tbl$.enr_candidate_structure_xlogp <- nam_map_xlogp[idx]
   } else {
-    lookup_tbl$.enr_candidate_structure_tag <- NA_character_
     lookup_tbl$.enr_candidate_structure_name <- NA_character_
+    lookup_tbl$.enr_candidate_structure_tag <- NA_character_
     lookup_tbl$.enr_candidate_structure_xlogp <- NA_character_
   }
 
+  # Stereo bridge - keyed by connectivity_layer
   if (nrow(stereo_bridge) > 0L) {
     bridge_inchikey_map <- stats::setNames(
       stereo_bridge$.bridge_inchikey,
@@ -676,23 +663,15 @@ complement_metadata_structures <- function(
       stereo_bridge$.bridge_smiles,
       stereo_bridge$candidate_structure_inchikey_connectivity_layer
     )
-    lookup_tbl$.bridge_inchikey <- bridge_inchikey_map[
-      match(
-        structure_keys$candidate_structure_inchikey_connectivity_layer,
-        names(bridge_inchikey_map)
-      )
-    ]
-    lookup_tbl$.bridge_smiles <- bridge_smiles_map[
-      match(
-        structure_keys$candidate_structure_inchikey_connectivity_layer,
-        names(bridge_smiles_map)
-      )
-    ]
+    idx <- match(sk_connectivity, names(bridge_inchikey_map))
+    lookup_tbl$.bridge_inchikey <- bridge_inchikey_map[idx]
+    lookup_tbl$.bridge_smiles <- bridge_smiles_map[idx]
   } else {
     lookup_tbl$.bridge_inchikey <- NA_character_
     lookup_tbl$.bridge_smiles <- NA_character_
   }
 
+  # ClassyFire taxonomy - keyed by full inchikey (via .bridge_inchikey)
   if (
     nrow(tax_cla) > 0L && "candidate_structure_inchikey" %in% names(tax_cla)
   ) {
@@ -716,20 +695,15 @@ complement_metadata_structures <- function(
       tax_cla$candidate_structure_tax_cla_04dirpar_i,
       tax_cla$candidate_structure_inchikey
     )
+    idx <- match(lookup_tbl$.bridge_inchikey, names(tax_cla_map_chemontid))
     lookup_tbl$.enr_candidate_structure_tax_cla_chemontid <- tax_cla_map_chemontid[
-      match(lookup_tbl$.bridge_inchikey, names(tax_cla_map_chemontid))
+      idx
     ]
-    lookup_tbl$.enr_candidate_structure_tax_cla_01kin <- tax_cla_map_01kin[
-      match(lookup_tbl$.bridge_inchikey, names(tax_cla_map_01kin))
-    ]
-    lookup_tbl$.enr_candidate_structure_tax_cla_02sup <- tax_cla_map_02sup[
-      match(lookup_tbl$.bridge_inchikey, names(tax_cla_map_02sup))
-    ]
-    lookup_tbl$.enr_candidate_structure_tax_cla_03cla <- tax_cla_map_03cla[
-      match(lookup_tbl$.bridge_inchikey, names(tax_cla_map_03cla))
-    ]
+    lookup_tbl$.enr_candidate_structure_tax_cla_01kin <- tax_cla_map_01kin[idx]
+    lookup_tbl$.enr_candidate_structure_tax_cla_02sup <- tax_cla_map_02sup[idx]
+    lookup_tbl$.enr_candidate_structure_tax_cla_03cla <- tax_cla_map_03cla[idx]
     lookup_tbl$.enr_candidate_structure_tax_cla_04dirpar <- tax_cla_map_04dirpar[
-      match(lookup_tbl$.bridge_inchikey, names(tax_cla_map_04dirpar))
+      idx
     ]
   } else {
     lookup_tbl$.enr_candidate_structure_tax_cla_chemontid <- NA_character_
@@ -739,6 +713,7 @@ complement_metadata_structures <- function(
     lookup_tbl$.enr_candidate_structure_tax_cla_04dirpar <- NA_character_
   }
 
+  # NPClassifier taxonomy - keyed by smiles (via .bridge_smiles)
   if (nrow(tax_npc) > 0L && "candidate_structure_smiles" %in% names(tax_npc)) {
     tax_npc_map_01pat <- stats::setNames(
       tax_npc$candidate_structure_tax_npc_01pat_s,
@@ -752,15 +727,10 @@ complement_metadata_structures <- function(
       tax_npc$candidate_structure_tax_npc_03cla_s,
       tax_npc$candidate_structure_smiles
     )
-    lookup_tbl$.enr_candidate_structure_tax_npc_01pat <- tax_npc_map_01pat[
-      match(lookup_tbl$.bridge_smiles, names(tax_npc_map_01pat))
-    ]
-    lookup_tbl$.enr_candidate_structure_tax_npc_02sup <- tax_npc_map_02sup[
-      match(lookup_tbl$.bridge_smiles, names(tax_npc_map_02sup))
-    ]
-    lookup_tbl$.enr_candidate_structure_tax_npc_03cla <- tax_npc_map_03cla[
-      match(lookup_tbl$.bridge_smiles, names(tax_npc_map_03cla))
-    ]
+    idx <- match(lookup_tbl$.bridge_smiles, names(tax_npc_map_01pat))
+    lookup_tbl$.enr_candidate_structure_tax_npc_01pat <- tax_npc_map_01pat[idx]
+    lookup_tbl$.enr_candidate_structure_tax_npc_02sup <- tax_npc_map_02sup[idx]
+    lookup_tbl$.enr_candidate_structure_tax_npc_03cla <- tax_npc_map_03cla[idx]
   } else {
     lookup_tbl$.enr_candidate_structure_tax_npc_01pat <- NA_character_
     lookup_tbl$.enr_candidate_structure_tax_npc_02sup <- NA_character_
