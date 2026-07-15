@@ -34,6 +34,7 @@ utils::globalVariables(
     ".lk_name",
     ".lk_tag",
     ".lk_xlogp",
+    ".group_cat",
     ".N",
     ".n_grp",
     ".n_per_group",
@@ -690,6 +691,9 @@ utils::globalVariables(
     "rank_initial",
     "score_initial",
     "score_weighted_chemo_coverage",
-    "value_num"
+    "value_num",
+    ".n_per_score",
+    ".score_final_num",
+    "adducts"
   )
 )

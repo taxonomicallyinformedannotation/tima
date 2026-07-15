@@ -131,12 +131,13 @@ build_evidence_supported_hypotheses <- function(
   )
 
   # Hypothesis generation per adduct row.
-  # Hot path uses a CHEAP inclusion check (two findIntervals) — no nearest
+  # Hot path uses a CHEAP inclusion check (two findIntervals) -- no nearest
   # distance computation. The actual ppm error is computed in ONE batched
   # call after the loop, on the (much smaller) kept set.
   kept_feat_idx <- vector("list", K)
   kept_aidx <- vector("list", K)
   kept_M <- vector("list", K)
+  kept_lengths <- integer(K)
   filled <- 0L
 
   t_loop <- Sys.time()
@@ -176,6 +177,7 @@ build_evidence_supported_hypotheses <- function(
     kept_feat_idx[[filled]] <- as.integer(pos)
     kept_aidx[[filled]] <- rep.int(ui, length(pos))
     kept_M[[filled]] <- implied_ok
+    kept_lengths[filled] <- length(pos)
 
     if (ui %% log_every == 0L) {
       log_debug(

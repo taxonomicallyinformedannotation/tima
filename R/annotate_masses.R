@@ -813,59 +813,31 @@ retain_supported_single_m_edges <- function(
   ) |>
     tidytable::distinct()
   all_nodes <- unique(c(undirected$src, undirected$dest))
-  neighbors_raw <- split(undirected$dest, undirected$src, drop = TRUE)
-  neighbors <- lapply(all_nodes, function(node) {
-    nxt <- neighbors_raw[[node]]
-    if (is.null(nxt)) {
-      character()
-    } else {
-      unique(as.character(nxt))
-    }
-  })
-  names(neighbors) <- all_nodes
 
-  visited <- stats::setNames(rep(FALSE, length(all_nodes)), all_nodes)
-  comp_members_list <- vector("list", length(all_nodes))
-  comp_i <- 0L
-  for (node in all_nodes) {
-    if (isTRUE(visited[[node]])) {
-      next
-    }
-    comp_i <- comp_i + 1L
-    queue <- character(length(all_nodes))
-    head_idx <- 1L
-    tail_idx <- 0L
-    visited[[node]] <- TRUE
-    tail_idx <- tail_idx + 1L
-    queue[[tail_idx]] <- node
-
-    comp_nodes <- character(length(all_nodes))
-    comp_len <- 0L
-    while (head_idx <= tail_idx) {
-      current <- queue[[head_idx]]
-      head_idx <- head_idx + 1L
-      comp_len <- comp_len + 1L
-      comp_nodes[[comp_len]] <- current
-
-      nxt <- neighbors[[current]]
-      if (length(nxt) == 0L) {
-        next
-      }
-      for (nn in nxt) {
-        if (!isTRUE(visited[[nn]])) {
-          visited[[nn]] <- TRUE
-          tail_idx <- tail_idx + 1L
-          queue[[tail_idx]] <- nn
-        }
-      }
-    }
-
-    comp_members_list[[comp_i]] <- tidytable::tidytable(
-      feature_id = unique(comp_nodes[seq_len(comp_len)]),
-      component_id = paste0("M_", comp_i)
+  # Use igraph to compute connected components (faster and vectorized)
+  if (nrow(undirected) == 0L) {
+    comp_members <- tidytable::tidytable(
+      feature_id = character(0),
+      component_id = character(0)
     )
+  } else {
+    graph_df <- data.frame(
+      from = undirected$src,
+      to = undirected$dest,
+      stringsAsFactors = FALSE
+    )
+    g <- igraph::graph_from_data_frame(graph_df, directed = FALSE)
+    comps <- igraph::components(g, mode = "weak")
+    membership <- comps$membership
+    names(membership) <- igraph::V(g)$name
+    comp_ids <- paste0("M_", as.integer(membership))
+    comp_members <- data.frame(
+      feature_id = names(membership),
+      component_id = comp_ids,
+      stringsAsFactors = FALSE
+    )
+    comp_members <- tidytable::as_tidytable(comp_members)
   }
-  comp_members <- tidytable::bind_rows(comp_members_list)
 
   # Keep directly matched modifier edges; avoid over-pruning by adduct-component
   # membership and enforce coherence with assigned adduct states below.
@@ -1040,18 +1012,35 @@ filter_modifier_edges_by_assigned_adducts <- function(
       return(edges)
     }
 
-    src_map <- split(assigned_nodes$adduct, assigned_nodes$feature_id)
-    keep_flag <- vapply(
-      seq_len(nrow(edges)),
-      function(i) {
-        src_id <- edges$feature_id[[i]]
-        dest_id <- edges$feature_id_dest[[i]]
-        src_adducts <- src_map[[src_id]]
-        dest_adducts <- src_map[[dest_id]]
-        if (is.null(src_adducts) || is.null(dest_adducts)) {
+    # Build list-columns of assigned adducts per feature (faster than split lookups)
+    assigned_list <- assigned_nodes |>
+      tidytable::summarize(adducts = list(adduct), .by = feature_id)
+
+    edges_joined <- edges |>
+      tidytable::left_join(
+        assigned_list |> tidytable::rename(src_adducts = adducts),
+        by = "feature_id"
+      ) |>
+      tidytable::left_join(
+        assigned_list |>
+          tidytable::rename(
+            feature_id_dest = feature_id,
+            dest_adducts = adducts
+          ),
+        by = "feature_id_dest"
+      )
+
+    # Vectorized check using mapply; edge_supported_any_combo still called per-row
+    keep_flag <- mapply(
+      FUN = function(src_adducts, dest_adducts, modifier) {
+        if (
+          is.null(src_adducts) ||
+            is.null(dest_adducts) ||
+            length(src_adducts) == 0L ||
+            length(dest_adducts) == 0L
+        ) {
           return(TRUE)
         }
-        modifier <- edges[[modifier_col]][[i]]
         edge_supported_any_combo(
           src_adducts = src_adducts,
           dest_adducts = dest_adducts,
@@ -1059,7 +1048,10 @@ filter_modifier_edges_by_assigned_adducts <- function(
           relation = relation
         )
       },
-      logical(1L)
+      src_adducts = edges_joined$src_adducts,
+      dest_adducts = edges_joined$dest_adducts,
+      modifier = edges_joined[[modifier_col]],
+      USE.NAMES = FALSE
     )
 
     edges[keep_flag, , drop = FALSE]

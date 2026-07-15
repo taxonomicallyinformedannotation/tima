@@ -172,59 +172,61 @@ calculate_entropy_and_similarity <- function(
 
   n_query <- length(query_spectra)
   n_lib <- length(lib_spectra)
-  query_checked <- rep(FALSE, n_query)
-  lib_checked <- rep(FALSE, n_lib)
+  # Pre-sanitize spectra once to avoid repeated checks in the hot loop.
+  query_checked <- rep(TRUE, n_query)
+  lib_checked <- rep(TRUE, n_lib)
   query_sanitized <- logical(n_query)
   lib_sanitized <- logical(n_lib)
   lib_entropy <- rep(NA_real_, n_lib)
 
-  ensure_query_ready <- function(idx) {
-    if (!query_checked[[idx]]) {
-      sp <- query_spectra[[idx]]
-      if (
-        is.matrix(sp) &&
-          nrow(sp) >= 2L &&
-          !is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)
-      ) {
-        query_spectra[[idx]] <<- sanitize_spectrum_matrix(
-          sp,
-          tolerance = dalton,
-          ppm = ppm
-        )
-        query_sanitized[[idx]] <<- TRUE
+  # Sanitize library spectra and precompute entropy if requested
+  if (n_lib > 0L) {
+    for (i in seq_len(n_lib)) {
+      sp <- lib_spectra[[i]]
+      if (is.matrix(sp) && nrow(sp) >= 2L) {
+        if (!is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)) {
+          lib_spectra[[i]] <- sanitize_spectrum_matrix(
+            sp,
+            tolerance = dalton,
+            ppm = ppm
+          )
+          lib_sanitized[i] <- TRUE
+          sp <- lib_spectra[[i]]
+        }
+        if (
+          isTRUE(compute_entropy) &&
+            is.matrix(sp) &&
+            nrow(sp) > 0L &&
+            ncol(sp) >= 2L
+        ) {
+          lib_entropy[i] <- msentropy::calculate_spectral_entropy(sp)
+        }
       }
-      query_checked[[idx]] <<- TRUE
     }
+  }
+
+  # Sanitize query spectra once
+  if (n_query > 0L) {
+    for (i in seq_len(n_query)) {
+      sp <- query_spectra[[i]]
+      if (is.matrix(sp) && nrow(sp) >= 2L) {
+        if (!is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)) {
+          query_spectra[[i]] <- sanitize_spectrum_matrix(
+            sp,
+            tolerance = dalton,
+            ppm = ppm
+          )
+          query_sanitized[i] <- TRUE
+        }
+      }
+    }
+  }
+
+  ensure_query_ready <- function(idx) {
     query_spectra[[idx]]
   }
 
   ensure_lib_ready <- function(idx) {
-    if (!lib_checked[[idx]]) {
-      sp <- lib_spectra[[idx]]
-      if (
-        is.matrix(sp) &&
-          nrow(sp) >= 2L &&
-          !is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)
-      ) {
-        lib_spectra[[idx]] <<- sanitize_spectrum_matrix(
-          sp,
-          tolerance = dalton,
-          ppm = ppm
-        )
-        lib_sanitized[[idx]] <<- TRUE
-      }
-      if (
-        isTRUE(compute_entropy) &&
-          is.matrix(lib_spectra[[idx]]) &&
-          nrow(lib_spectra[[idx]]) > 0L &&
-          ncol(lib_spectra[[idx]]) >= 2L
-      ) {
-        lib_entropy[[idx]] <<- msentropy::calculate_spectral_entropy(
-          lib_spectra[[idx]]
-        )
-      }
-      lib_checked[[idx]] <<- TRUE
-    }
     lib_spectra[[idx]]
   }
 
@@ -442,25 +444,27 @@ calculate_entropy_and_similarity <- function(
         row_scores_forward <- scores_forward[valid_indices]
         row_scores_reverse <- scores_reverse[valid_indices]
 
-        return(
-          tidytable::tidytable(
-            feature_id = rep(current_id, length(valid_indices)),
-            precursorMz = rep(current_precursor, length(valid_indices)),
-            target_id = lib_ids[lib_indices_sub[valid_indices]],
-            candidate_spectrum_entropy = if (compute_entropy_for_candidates) {
-              entropies[valid_indices]
-            } else {
-              rep(NA_real_, length(valid_indices))
-            },
-            candidate_score_similarity = scores[valid_indices],
-            candidate_score_similarity_forward = row_scores_forward,
-            candidate_score_similarity_reverse = row_scores_reverse,
-            candidate_count_similarity_peaks_matched = matched_counts[
-              valid_indices
-            ],
-            .similarity_space = similarity_space[valid_indices]
-          )
+        # Return a base data.frame (faster to construct many plain frames than
+        # many tiny tidytable objects) and convert once at the end.
+        df_out <- data.frame(
+          feature_id = rep(current_id, length(valid_indices)),
+          precursorMz = rep(current_precursor, length(valid_indices)),
+          target_id = lib_ids[lib_indices_sub[valid_indices]],
+          candidate_spectrum_entropy = if (compute_entropy_for_candidates) {
+            entropies[valid_indices]
+          } else {
+            rep(NA_real_, length(valid_indices))
+          },
+          candidate_score_similarity = scores[valid_indices],
+          candidate_score_similarity_forward = row_scores_forward,
+          candidate_score_similarity_reverse = row_scores_reverse,
+          candidate_count_similarity_peaks_matched = as.integer(matched_counts[
+            valid_indices
+          ]),
+          .similarity_space = similarity_space[valid_indices],
+          stringsAsFactors = FALSE
         )
+        return(df_out)
       }
 
       NULL
@@ -485,7 +489,11 @@ calculate_entropy_and_similarity <- function(
   # Log progress summary
   log_info("Processed %d / %d queries", n_queries, n_queries)
 
-  if (all(vapply(X = results, FUN = is.null, FUN.VALUE = logical(1)))) {
+  # Consolidate results (many elements may be NULL)
+  non_null <- results[
+    !vapply(X = results, FUN = is.null, FUN.VALUE = logical(1))
+  ]
+  if (length(non_null) == 0L) {
     result <- tidytable::tidytable(
       feature_id = NA_integer_,
       precursorMz = NA_real_,
@@ -498,9 +506,19 @@ calculate_entropy_and_similarity <- function(
       .similarity_space = NA_character_
     )
   } else {
-    result <- tidytable::bind_rows(
-      results[!vapply(X = results, FUN = is.null, FUN.VALUE = logical(1))]
-    )
+    # If the list contains base data.frames, rbind them efficiently then
+    # convert once to tidytable. This reduces overhead compared to many
+    # tiny tidytable creations.
+    if (all(vapply(non_null, is.data.frame, logical(1)))) {
+      result_df <- do.call(rbind, non_null)
+      # Ensure types are correct
+      result_df$candidate_count_similarity_peaks_matched <- as.integer(
+        result_df$candidate_count_similarity_peaks_matched
+      )
+      result <- tidytable::as_tidytable(result_df)
+    } else {
+      result <- tidytable::bind_rows(non_null)
+    }
   }
 
   log_complete(ctx, n_comparisons = nrow(result))

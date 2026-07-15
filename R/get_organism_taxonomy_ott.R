@@ -89,7 +89,7 @@
       ott_ids = ott_ids
     )
 
-  tidytable::bind_rows(list_df) |>
+  safe_bind_rows(list_df) |>
     tidytable::mutate(
       ott_id = as.integer(ott_id),
       n = tidytable::row_number()

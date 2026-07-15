@@ -432,9 +432,9 @@ import_and_clean_library_collection <- function(
     return(Spectra::Spectra())
   }
 
-  cleaned <- paths |>
-    purrr::map(
-      import_spectra,
+  cleaned <- lapply(paths, function(p) {
+    import_spectra(
+      file = p,
       cutoff = 0,
       dalton = dalton,
       polarity = polarity,
@@ -442,13 +442,12 @@ import_and_clean_library_collection <- function(
       sanitize = FALSE,
       combine = FALSE
     )
-  cleaned <- cleaned |>
-    purrr::map(
-      Spectra::applyProcessing,
-      BPPARAM = BiocParallel::SerialParam()
-    ) |>
-    purrr::map(remove_empty_peak_spectra) |>
-    purrr::map(strip_backend_rownames)
+  })
+  cleaned <- lapply(cleaned, function(sp) {
+    sp <- Spectra::applyProcessing(sp, BPPARAM = BiocParallel::SerialParam())
+    sp <- remove_empty_peak_spectra(sp)
+    strip_backend_rownames(sp)
+  })
 
   if (!approx) {
     cleaned <- cleaned |>

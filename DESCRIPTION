@@ -204,6 +204,7 @@ Collate:
     'replace_id.R'
     'run_app.R'
     'run_tima.R'
+    'safe_bind_rows.R'
     'sanitize_data.R'
     'sanitize_data_utils.R'
     'tima-package.R'
