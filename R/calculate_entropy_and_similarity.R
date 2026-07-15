@@ -172,61 +172,61 @@ calculate_entropy_and_similarity <- function(
 
   n_query <- length(query_spectra)
   n_lib <- length(lib_spectra)
-  # Pre-sanitize spectra once to avoid repeated checks in the hot loop.
-  query_checked <- rep(TRUE, n_query)
-  lib_checked <- rep(TRUE, n_lib)
+  # Lazy sanitize-on-first-use state.
+  # This avoids up-front full scans and only sanitizes spectra that need it.
+  query_checked <- rep(FALSE, n_query)
+  lib_checked <- rep(FALSE, n_lib)
   query_sanitized <- logical(n_query)
   lib_sanitized <- logical(n_lib)
   lib_entropy <- rep(NA_real_, n_lib)
 
-  # Sanitize library spectra and precompute entropy if requested
-  if (n_lib > 0L) {
-    for (i in seq_len(n_lib)) {
-      sp <- lib_spectra[[i]]
-      if (is.matrix(sp) && nrow(sp) >= 2L) {
-        if (!is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)) {
-          lib_spectra[[i]] <- sanitize_spectrum_matrix(
-            sp,
-            tolerance = dalton,
-            ppm = ppm
-          )
-          lib_sanitized[i] <- TRUE
-          sp <- lib_spectra[[i]]
-        }
-        if (
-          isTRUE(compute_entropy) &&
-            is.matrix(sp) &&
-            nrow(sp) > 0L &&
-            ncol(sp) >= 2L
-        ) {
-          lib_entropy[i] <- msentropy::calculate_spectral_entropy(sp)
-        }
-      }
-    }
-  }
-
-  # Sanitize query spectra once
-  if (n_query > 0L) {
-    for (i in seq_len(n_query)) {
-      sp <- query_spectra[[i]]
-      if (is.matrix(sp) && nrow(sp) >= 2L) {
-        if (!is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)) {
-          query_spectra[[i]] <- sanitize_spectrum_matrix(
-            sp,
-            tolerance = dalton,
-            ppm = ppm
-          )
-          query_sanitized[i] <- TRUE
-        }
-      }
-    }
-  }
-
   ensure_query_ready <- function(idx) {
+    if (!query_checked[[idx]]) {
+      sp <- query_spectra[[idx]]
+      if (
+        is.matrix(sp) &&
+          nrow(sp) >= 2L &&
+          !is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)
+      ) {
+        query_spectra[[idx]] <<- sanitize_spectrum_matrix(
+          sp,
+          tolerance = dalton,
+          ppm = ppm
+        )
+        query_sanitized[[idx]] <<- TRUE
+      }
+      query_checked[[idx]] <<- TRUE
+    }
     query_spectra[[idx]]
   }
 
   ensure_lib_ready <- function(idx) {
+    if (!lib_checked[[idx]]) {
+      sp <- lib_spectra[[idx]]
+      if (
+        is.matrix(sp) &&
+          nrow(sp) >= 2L &&
+          !is_spectrum_sanitized(sp, tolerance = dalton, ppm = ppm)
+      ) {
+        lib_spectra[[idx]] <<- sanitize_spectrum_matrix(
+          sp,
+          tolerance = dalton,
+          ppm = ppm
+        )
+        lib_sanitized[[idx]] <<- TRUE
+      }
+      if (
+        isTRUE(compute_entropy) &&
+          is.matrix(lib_spectra[[idx]]) &&
+          nrow(lib_spectra[[idx]]) > 0L &&
+          ncol(lib_spectra[[idx]]) >= 2L
+      ) {
+        lib_entropy[[idx]] <<- msentropy::calculate_spectral_entropy(
+          lib_spectra[[idx]]
+        )
+      }
+      lib_checked[[idx]] <<- TRUE
+    }
     lib_spectra[[idx]]
   }
 

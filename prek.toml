@@ -13,7 +13,7 @@ hooks = [
 
 [[repos]]
 repo = "https://github.com/lorenzwalthert/precommit"
-rev = "v0.4.3.9029"
+rev = "v0.4.3.9030"
 hooks = [
   { id = "use-tidy-description" },
   { id = "parsable-R" },

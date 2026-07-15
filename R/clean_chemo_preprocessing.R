@@ -328,6 +328,25 @@ filter_ms1_annotations <- function(
       next
     }
 
+    # Sort indices by ranking_cols in descending order (higher = better rank)
+    if (length(ranking_cols) > 0L) {
+      # Create a sort key matrix for ordering
+      sort_keys <- lapply(ranking_cols, function(col) {
+        if (col %in% names(df)) {
+          suppressWarnings(as.numeric(df[[col]][idx]))
+        } else {
+          rep(NA_real_, length(idx))
+        }
+      })
+      # Order by all ranking cols descending (higher = better)
+      # Use negative for descending, na.last=TRUE puts NA at end
+      ord <- do.call(
+        order,
+        c(lapply(sort_keys, function(x) -x), list(na.last = TRUE))
+      )
+      idx <- idx[ord]
+    }
+
     rank_values <- lapply(ranking_cols, function(col) {
       if (col %in% names(df)) {
         values <- suppressWarnings(as.numeric(df[[col]][idx]))

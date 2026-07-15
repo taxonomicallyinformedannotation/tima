@@ -2,13 +2,11 @@
 % Please edit documentation in R/annotate_masses_consistency.R
 \name{join_multi_with_addlossed}
 \alias{join_multi_with_addlossed}
-\title{Join multi-adduct candidates with add/loss inferred masses (kept for
-backward compatibility with downstream callers and tests).}
+\title{Join multi-adduct candidates with add/loss inferred masses using binary search instead of cartesian join.}
 \usage{
 join_multi_with_addlossed(df_multi, df_addlossed_rdy)
 }
 \description{
-Join multi-adduct candidates with add/loss inferred masses (kept for
-backward compatibility with downstream callers and tests).
+Join multi-adduct candidates with add/loss inferred masses using binary search instead of cartesian join.
 }
 \keyword{internal}

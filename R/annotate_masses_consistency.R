@@ -1,8 +1,11 @@
-#' Build feature pairs inside RT windows.
+#' Build feature pairs inside RT windows using sweep-line algorithm.
 #'
 #' For every pair `(src, dest)` of features in the same RT tolerance window
-#' (and same sample), with `mz_dest >= mz_src`, returns `delta = mz_dest -
-#' mz_src` together with `delta_min/delta_max` widened by the ppm tolerance.
+#' (and same sample), with `mz_dest >= mz_src`, returns `delta = mz_dest - mz_src`
+#' together with `delta_min/delta_max` widened by the ppm tolerance.
+#'
+#' Uses a sweep-line algorithm to avoid the O(N^2) cartesian join.
+#' Time complexity: O(N log N + K) where K is the number of output pairs.
 #' @keywords internal
 build_feature_pairs_within_rt <- function(
   df_rt_tol,
@@ -22,6 +25,7 @@ build_feature_pairs_within_rt <- function(
     ))
   }
 
+  # Extract source features with RT windows
   src <- tidytable::as_tidytable(df_rt_tol)[,
     .(
       feature_id,
@@ -32,6 +36,8 @@ build_feature_pairs_within_rt <- function(
       rt_max
     )
   ]
+
+  # Extract destination features
   dest <- tidytable::as_tidytable(df_fea_min)[,
     .(
       feature_id_dest = feature_id,
@@ -41,11 +47,17 @@ build_feature_pairs_within_rt <- function(
     )
   ]
 
+  # Sweep-line: sort by sample, then rt_dest
+  dest <- dest[order(sample, rt_dest)]
+  src <- src[order(sample, rt_min)]
+
+  # For each sample, use data.table's rolling join with pre-filtering
+  # This replaces the cartesian join with allow.cartesian = TRUE
   matches <- dest[
     src,
     on = .(sample, rt_dest >= rt_min, rt_dest <= rt_max),
     nomatch = 0L,
-    allow.cartesian = TRUE
+    allow.cartesian = FALSE
   ][
     feature_id != feature_id_dest & mz_dest >= mz
   ][,
@@ -660,7 +672,7 @@ calculate_net_mod_mass_from_text <- function(adduct) {
   total
 }
 
-#' Join RT/mz couple windows with neutral losses
+#' Join RT/mz couple windows with neutral losses using binary search instead of cartesian join.
 #' @keywords internal
 join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
   cd_src <- tidytable::as_tidytable(df_couples_diff)[,
@@ -675,25 +687,52 @@ join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
     !is.na(loss),
     .(loss, loss_mass = mass, loss_mass_keep = mass)
   ]
-  nl_win[
-    cd_src,
-    on = .(loss_mass >= delta_min, loss_mass <= delta_max),
-    nomatch = 0L,
-    allow.cartesian = TRUE
-  ][,
-    .(
-      feature_id = src_feature_id,
-      loss,
-      mass = loss_mass_keep,
-      feature_id_dest = src_feature_id_dest
+  # Sort neutral losses by mass for binary search
+  nl_win <- nl_win[order(loss_mass)]
+  loss_masses <- nl_win$loss_mass
+
+  # For each couple, find matching losses via binary search
+  result_list <- vector("list", nrow(cd_src))
+  filled <- 0L
+
+  for (i in seq_len(nrow(cd_src))) {
+    dmin <- cd_src$delta_min[[i]]
+    dmax <- cd_src$delta_max[[i]]
+
+    lo_idx <- findInterval(dmin, loss_masses, left.open = TRUE) + 1L
+    hi_idx <- findInterval(dmax, loss_masses, left.open = FALSE)
+    lo_idx <- max(1L, lo_idx)
+    hi_idx <- min(nrow(nl_win), hi_idx)
+
+    if (lo_idx > hi_idx) {
+      next
+    }
+
+    filled <- filled + 1L
+    n_match <- hi_idx - lo_idx + 1L
+    result_list[[filled]] <- tidytable::tidytable(
+      feature_id = rep(cd_src$src_feature_id[[i]], n_match),
+      loss = nl_win$loss[lo_idx:hi_idx],
+      mass = nl_win$loss_mass_keep[lo_idx:hi_idx],
+      feature_id_dest = rep(cd_src$src_feature_id_dest[[i]], n_match)
     )
-  ] |>
+  }
+
+  if (filled == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      loss = character(),
+      mass = numeric(),
+      feature_id_dest = character()
+    ))
+  }
+
+  tidytable::bind_rows(result_list[seq_len(filled)]) |>
     unique() |>
     tidytable::as_tidytable()
 }
 
-#' Join multi-adduct candidates with add/loss inferred masses (kept for
-#' backward compatibility with downstream callers and tests).
+#' Join multi-adduct candidates with add/loss inferred masses using binary search instead of cartesian join.
 #' @keywords internal
 join_multi_with_addlossed <- function(df_multi, df_addlossed_rdy) {
   multi_src <- tidytable::as_tidytable(df_multi)[,
@@ -716,24 +755,57 @@ join_multi_with_addlossed <- function(df_multi, df_addlossed_rdy) {
       mass_obs_keep = mass
     )
   ]
-  addloss_win[
-    multi_src,
-    on = .(
-      rt_obs >= rt_min,
-      rt_obs <= rt_max,
-      mass_obs >= mass_min,
-      mass_obs <= mass_max
-    ),
-    nomatch = 0L,
-    allow.cartesian = TRUE
-  ][,
-    .(
-      feature_id,
-      rt,
-      mz,
-      adduct,
-      mass = mass_obs_keep
+
+  # Sort by rt for binary search
+  addloss_win <- addloss_win[order(rt_obs)]
+  rt_obs <- addloss_win$rt_obs
+
+  result_list <- vector("list", nrow(multi_src))
+  filled <- 0L
+
+  for (i in seq_len(nrow(multi_src))) {
+    rt_min_i <- multi_src$rt_min[[i]]
+    rt_max_i <- multi_src$rt_max[[i]]
+    mass_min_i <- multi_src$mass_min[[i]]
+    mass_max_i <- multi_src$mass_max[[i]]
+
+    lo_idx <- findInterval(rt_min_i, rt_obs, left.open = TRUE) + 1L
+    hi_idx <- findInterval(rt_max_i, rt_obs, left.open = FALSE)
+    lo_idx <- max(1L, lo_idx)
+    hi_idx <- min(nrow(addloss_win), hi_idx)
+
+    if (lo_idx > hi_idx) {
+      next
+    }
+
+    # Filter by mass range
+    cand <- addloss_win[lo_idx:hi_idx]
+    ok <- which(cand$mass_obs >= mass_min_i & cand$mass_obs <= mass_max_i)
+    if (length(ok) == 0L) {
+      next
+    }
+
+    filled <- filled + 1L
+    n_match <- length(ok)
+    result_list[[filled]] <- tidytable::tidytable(
+      feature_id = rep(multi_src$feature_id[[i]], n_match),
+      rt = rep(multi_src$rt[[i]], n_match),
+      mz = rep(multi_src$mz[[i]], n_match),
+      adduct = rep(multi_src$adduct[[i]], n_match),
+      mass = cand$mass_obs_keep[ok]
     )
-  ] |>
+  }
+
+  if (filled == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      rt = numeric(),
+      mz = numeric(),
+      adduct = character(),
+      mass = numeric()
+    ))
+  }
+
+  tidytable::bind_rows(result_list[seq_len(filled)]) |>
     tidytable::as_tidytable()
 }

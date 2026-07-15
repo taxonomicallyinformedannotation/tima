@@ -105,8 +105,9 @@ test_that("rank_and_deduplicate breaks score ties with deterministic tie-breaker
   ranked <- rank_and_deduplicate(df)
 
   # Under evidence-first policy: effective_score = score_weighted_chemo * (0.5 + 0.5 * coverage)
-  # Both have effective_score = 0.8 * 1 = 0.8, so they TIE at rank 1
-  # The only tie-breaker is cluster_consensus_promoted_from_anchor (not present here)
+  # Both have effective_score = 0.8 * (0.5 + 0.5*1) = 0.8 → TIE on effective_score
+  # The only tie-breaker is cluster_consensus_promoted_from_anchor (not present)
+  # So both should share rank 1 (dense rank)
   expect_equal(
     ranked$rank_final[
       ranked$candidate_structure_inchikey_connectivity_layer == "IK2"
@@ -119,12 +120,22 @@ test_that("rank_and_deduplicate breaks score ties with deterministic tie-breaker
     ],
     1L
   )
-  # Both should be tied at rank 1
+  # Both tied at rank 1
+  expect_equal(ranked$rank_final, c(1L, 1L))
+
+  # rank_initial is based on candidate_score_pseudo_initial (descending)
+  # IK2 (0.7) > IK1 (0.4), so IK2 gets rank_initial 1, IK1 gets rank_initial 2
   expect_equal(
     ranked$rank_initial[
       ranked$candidate_structure_inchikey_connectivity_layer == "IK2"
     ],
     1L
+  )
+  expect_equal(
+    ranked$rank_initial[
+      ranked$candidate_structure_inchikey_connectivity_layer == "IK1"
+    ],
+    2L
   )
 })
 

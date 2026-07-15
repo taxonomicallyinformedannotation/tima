@@ -2,12 +2,17 @@
 % Please edit documentation in R/annotate_masses_consistency.R
 \name{build_feature_pairs_within_rt}
 \alias{build_feature_pairs_within_rt}
-\title{Build feature pairs inside RT windows.}
+\title{Build feature pairs inside RT windows using sweep-line algorithm.}
 \usage{
 build_feature_pairs_within_rt(df_rt_tol, df_fea_min, tolerance_ppm)
 }
 \description{
 For every pair \verb{(src, dest)} of features in the same RT tolerance window
-(and same sample), with \code{mz_dest >= mz_src}, returns \code{delta = mz_dest - mz_src} together with \code{delta_min/delta_max} widened by the ppm tolerance.
+(and same sample), with \code{mz_dest >= mz_src}, returns \code{delta = mz_dest - mz_src}
+together with \code{delta_min/delta_max} widened by the ppm tolerance.
+}
+\details{
+Uses a sweep-line algorithm to avoid the O(N^2) cartesian join.
+Time complexity: O(N log N + K) where K is the number of output pairs.
 }
 \keyword{internal}

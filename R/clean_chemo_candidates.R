@@ -460,28 +460,42 @@ sample_candidates_per_group <- function(
 
     # Create temporary ordering columns (negative values so ascending sort prefers high scores)
     if ("candidate_score_similarity" %in% names(df_ns)) {
-      df_ns <- df_ns |> tidytable::mutate(.ord1 = -as.numeric(candidate_score_similarity))
+      df_ns <- df_ns |>
+        tidytable::mutate(.ord1 = -as.numeric(candidate_score_similarity))
     }
     if ("candidate_score_sirius_csi" %in% names(df_ns)) {
-      df_ns <- df_ns |> tidytable::mutate(.ord2 = -as.numeric(candidate_score_sirius_csi))
+      df_ns <- df_ns |>
+        tidytable::mutate(.ord2 = -as.numeric(candidate_score_sirius_csi))
     }
     if ("candidate_score_sirius_confidence" %in% names(df_ns)) {
-      df_ns <- df_ns |> tidytable::mutate(.ord3 = -as.numeric(candidate_score_sirius_confidence))
+      df_ns <- df_ns |>
+        tidytable::mutate(
+          .ord3 = -as.numeric(candidate_score_sirius_confidence)
+        )
     }
     if (has_rt_col) {
       df_ns <- df_ns |> tidytable::mutate(.ord_rt = -as.integer(.rt_priority))
     }
     if ("cluster_consensus_promoted_from_anchor" %in% names(df_ns)) {
-      df_ns <- df_ns |> tidytable::mutate(.ord_cons = -as.integer(!is.na(cluster_consensus_promoted_from_anchor) & cluster_consensus_promoted_from_anchor))
+      df_ns <- df_ns |>
+        tidytable::mutate(
+          .ord_cons = -as.integer(
+            !is.na(cluster_consensus_promoted_from_anchor) &
+              cluster_consensus_promoted_from_anchor
+          )
+        )
     }
     if ("score_weighted_chemo" %in% names(df_ns)) {
-      df_ns <- df_ns |> tidytable::mutate(.ord_sc = -as.numeric(score_weighted_chemo))
+      df_ns <- df_ns |>
+        tidytable::mutate(.ord_sc = -as.numeric(score_weighted_chemo))
     }
     if ("score_weighted_chemo_coverage" %in% names(df_ns)) {
-      df_ns <- df_ns |> tidytable::mutate(.ord_cov = -as.numeric(score_weighted_chemo_coverage))
+      df_ns <- df_ns |>
+        tidytable::mutate(.ord_cov = -as.numeric(score_weighted_chemo_coverage))
     }
     if ("candidate_score_pseudo_initial" %in% names(df_ns)) {
-      df_ns <- df_ns |> tidytable::mutate(.ord_pi = -as.numeric(candidate_score_pseudo_initial))
+      df_ns <- df_ns |>
+        tidytable::mutate(.ord_pi = -as.numeric(candidate_score_pseudo_initial))
     }
 
     # Determine ordering columns present
@@ -526,7 +540,8 @@ sample_candidates_per_group <- function(
       names(df_sampled)
     )
     if (length(tmp_ord_cols) > 0) {
-      df_sampled <- df_sampled |> tidytable::select(-tidyselect::all_of(tmp_ord_cols))
+      df_sampled <- df_sampled |>
+        tidytable::select(-tidyselect::all_of(tmp_ord_cols))
     }
     if ('.rt_priority' %in% names(df_sampled)) {
       df_sampled <- df_sampled |> tidytable::select(-.rt_priority)
