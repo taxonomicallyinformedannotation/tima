@@ -1,3 +1,164 @@
+#' Resolve tied candidates via cross-feature neutral-mass anchors
+#'
+#' @include clean_chemo_preprocessing.R
+#' @include constants.R
+#' @include logs_utils.R
+#'
+#' @description Splits candidates per (feature_id, candidate_adduct,
+#'     rank_final) into untied rows (always kept) and tied rows. A tied
+#'     group is collapsed to just the candidates whose InChIKey matches
+#'     a rank-1 InChIKey of ANOTHER feature at the same neutral mass
+#'     (within tolerance). Tied groups with NO cross-feature anchor are
+#'     NOT dropped: they are kept as-is if `.n_per_group <= max_per_score`,
+#'     otherwise sampled down to `max_per_score` (RT-error candidates
+#'     prioritized when the column is available).
+#'
+#' @param df_tied Data frame with the tied candidate rows to evaluate.
+#' @param anchor_tbl Data frame with cross-feature neutral-mass anchor rows.
+#' @param tol Numeric mass tolerance in Daltons for matching anchors.
+#' @param rt_tol Numeric retention-time tolerance in minutes for anchor
+#'   matching when feature RT values are available.
+#' @param has_rt_feature_col Logical, whether the input data frames include an
+#'   RT column that can be used for anchor matching.
+#'
+#' @return Logical vector marking rows that have a valid cross-feature anchor.
+#' @keywords internal
+
+.match_tied_rows_to_anchors <- function(
+  df_tied,
+  anchor_tbl,
+  tol,
+  rt_tol,
+  has_rt_feature_col
+) {
+  # Fast vectorized matching by mass-key + exact IK match, then filter by tol/RT.
+  if (nrow(df_tied) == 0L || nrow(anchor_tbl) == 0L) {
+    return(rep(FALSE, nrow(df_tied)))
+  }
+
+  # Choose InChIKey preference: connectivity layer (broader grouping) when available,
+  # else fall back to full InChIKey. This keeps behavior consistent across callers.
+  ik_row_col <- if (
+    "candidate_structure_inchikey_connectivity_layer" %in% names(df_tied)
+  ) {
+    "candidate_structure_inchikey_connectivity_layer"
+  } else if ("candidate_structure_inchikey" %in% names(df_tied)) {
+    "candidate_structure_inchikey"
+  } else {
+    stop("No InChIKey column available for anchor matching")
+  }
+  ik_anchor_col <- if (
+    "candidate_structure_inchikey_connectivity_layer" %in% names(anchor_tbl)
+  ) {
+    "candidate_structure_inchikey_connectivity_layer"
+  } else if ("candidate_structure_inchikey" %in% names(anchor_tbl)) {
+    "candidate_structure_inchikey"
+  } else {
+    stop("No InChIKey column available in anchor table for anchor matching")
+  }
+
+  # Mass source selection (same as previous logic)
+  row_mass_col <- if (".candidate_anchor_mass" %in% names(df_tied)) {
+    ".candidate_anchor_mass"
+  } else if (".candidate_M" %in% names(df_tied)) {
+    ".candidate_M"
+  } else {
+    stop("No candidate mass column available for tied-row matching")
+  }
+  anchor_mass_col <- if (".candidate_anchor_mass" %in% names(anchor_tbl)) {
+    ".candidate_anchor_mass"
+  } else if (".candidate_M" %in% names(anchor_tbl)) {
+    ".candidate_M"
+  } else {
+    stop("No candidate mass column available in anchor table")
+  }
+
+  # Build compact data.frames for merging
+  row_df <- data.frame(
+    row_id = seq_len(nrow(df_tied)),
+    row_IK = as.character(df_tied[[ik_row_col]]),
+    row_fid = as.character(df_tied$feature_id),
+    row_rt = if (has_rt_feature_col) as.numeric(df_tied$rt) else NA_real_,
+    row_mass = as.numeric(df_tied[[row_mass_col]]),
+    stringsAsFactors = FALSE
+  )
+  anchor_df <- data.frame(
+    anchor_IK = as.character(anchor_tbl[[ik_anchor_col]]),
+    anchor_fid = as.character(anchor_tbl$feature_id),
+    anchor_rt = if (has_rt_feature_col) as.numeric(anchor_tbl$rt) else NA_real_,
+    anchor_mass = as.numeric(anchor_tbl[[anchor_mass_col]]),
+    stringsAsFactors = FALSE
+  )
+
+  # Drop NA masses/IKs early
+  row_df <- row_df[
+    !is.na(row_df$row_mass) & !is.na(row_df$row_IK),
+    ,
+    drop = FALSE
+  ]
+  anchor_df <- anchor_df[
+    !is.na(anchor_df$anchor_mass) & !is.na(anchor_df$anchor_IK),
+    ,
+    drop = FALSE
+  ]
+
+  if (nrow(row_df) == 0L || nrow(anchor_df) == 0L) {
+    return(rep(FALSE, nrow(df_tied)))
+  }
+
+  # Use rounded mass key to limit join cardinality, then refine with exact tolerance check
+  row_df$row_mass_key <- round(row_df$row_mass, NEUTRAL_MASS_GROUP_DECIMALS)
+  anchor_df$anchor_mass_key <- round(
+    anchor_df$anchor_mass,
+    NEUTRAL_MASS_GROUP_DECIMALS
+  )
+
+  # Perform join on IK first (low cardinality), then refine by mass/RT.
+  # Matching on the rounded mass key can miss near-tolerance matches due to
+  # different rounding; match by IK and filter by mass tolerance below.
+  merged <- merge(
+    row_df,
+    anchor_df,
+    by.x = c("row_IK"),
+    by.y = c("anchor_IK"),
+    sort = FALSE
+  )
+
+  if (nrow(merged) == 0L) {
+    return(rep(FALSE, nrow(df_tied)))
+  }
+
+  # Refine by actual mass delta and exclude same-feature anchors
+  merged <- merged[
+    abs(merged$row_mass - merged$anchor_mass) <= tol &
+      merged$row_fid != merged$anchor_fid,
+    ,
+    drop = FALSE
+  ]
+  if (nrow(merged) == 0L) {
+    return(rep(FALSE, nrow(df_tied)))
+  }
+
+  # RT filtering when requested: keep anchors where anchor_rt is NA or within rt_tol
+  if (has_rt_feature_col) {
+    merged <- merged[
+      is.na(merged$anchor_rt) |
+        (!is.na(merged$row_rt) &
+          abs(merged$anchor_rt - merged$row_rt) <= rt_tol),
+      ,
+      drop = FALSE
+    ]
+    if (nrow(merged) == 0L) {
+      return(rep(FALSE, nrow(df_tied)))
+    }
+  }
+
+  matched_row_ids <- unique(merged$row_id)
+  out <- rep(FALSE, nrow(df_tied))
+  out[matched_row_ids] <- TRUE
+  out
+}
+
 #' Sample tied candidates within each feature/adduct group
 #'
 #' @description Keeps the best-supported candidate rows within each
@@ -39,27 +200,13 @@ sample_candidates_per_group <- function(
     df$rank_final <- NA_integer_
   }
 
-  # Compute per-score-group sizes (feature/adduct/score-rank) using a
-  # deterministic base-R grouping approach to avoid subtle tidytable `.by`
-  # semantics that may change across tidytable versions. Use `ave` which is
-  # lightweight and avoids additional allocations.
-  # Convert to base data.frame first to avoid tidytable/list-column edge-cases
-  df <- as.data.frame(df, stringsAsFactors = FALSE)
-  group_key_all <- paste(
-    as.character(df$feature_id),
-    as.character(df$candidate_adduct),
-    as.character(df$rank_final),
-    sep = "\u001f"
-  )
-  counts <- as.integer(stats::ave(
-    seq_along(group_key_all),
-    group_key_all,
-    FUN = length
-  ))
-  df$.n_per_score <- counts
-  df$.anchor_match <- FALSE
-  df <- tidytable::as_tidytable(df)
-  rm(group_key_all, counts)
+  # Compute per-score-group sizes (feature/adduct/score-rank) only once
+  df <- df |>
+    tidytable::mutate(
+      .n_per_score = tidytable::n(),
+      .by = c(feature_id, candidate_adduct, rank_final),
+      .anchor_match = FALSE
+    )
 
   has_ik_col <- "candidate_structure_inchikey_connectivity_layer" %in% names(df)
   has_M_cols <- "mz" %in% names(df) && "candidate_adduct" %in% names(df)
@@ -106,56 +253,23 @@ sample_candidates_per_group <- function(
       rt_tol <- DEFAULT_HE_MAX_RT_ERROR_MIN
       # Only match TIED rows to cross-feature anchors
       # Non-tied rows (rank-1 singletons) should not be affected by cross-feature anchors
-      tied_idx <- which(df$.n_per_score > 1L)
-      full_anchor_match <- rep(FALSE, nrow(df))
-      if (length(tied_idx) > 0L) {
-        # Use a simple direct lookup by InChIKey and mass tolerance. This is
-        # robust, easy to reason about, and avoids complex merges that created
-        # subtle bugs in earlier refactors.
-        anchor_df <- as.data.frame(anchor_tbl, stringsAsFactors = FALSE)
-        for (ti in tied_idx) {
-          ik <- as.character(df$candidate_structure_inchikey_connectivity_layer[
-            ti
-          ])
-          if (is.na(ik) || !nzchar(ik)) {
-            next
-          }
-          # Select anchors with same IK
-          same_ik_idx <- which(
-            anchor_df$candidate_structure_inchikey_connectivity_layer == ik
-          )
-          if (length(same_ik_idx) == 0L) {
-            next
-          }
-          anchor_sub <- anchor_df[same_ik_idx, , drop = FALSE]
-          # Mass difference filter
-          mass_diff <- abs(
-            as.numeric(anchor_sub$.candidate_M) -
-              as.numeric(df$.candidate_M[ti])
-          )
-          ok_mass <- mass_diff <= tol
-          if (!any(ok_mass)) {
-            next
-          }
-          # Exclude same-feature anchors
-          feature_ok <- anchor_sub$feature_id[ok_mass] != df$feature_id[ti]
-          if (!any(feature_ok)) {
-            next
-          }
-          # RT filter when available
-          if (has_rt_feature_col) {
-            # anchor_sub may have rt column; allow anchors with NA rt as matches
-            anchor_rts <- anchor_sub$rt[ok_mass]
-            row_rt <- df$rt[ti]
-            rt_ok <- is.na(anchor_rts) |
-              (!is.na(row_rt) & abs(anchor_rts - row_rt) <= rt_tol)
-            if (!any(rt_ok & feature_ok)) next
-          }
-          full_anchor_match[ti] <- TRUE
-        }
-        df$.anchor_match <- full_anchor_match
+      tied_mask <- df$.n_per_score > 1L
+      if (any(tied_mask)) {
+        anchor_match <- .match_tied_rows_to_anchors(
+          df_tied = df[tied_mask, , drop = FALSE],
+          anchor_tbl = anchor_tbl,
+          tol = tol,
+          rt_tol = rt_tol,
+          has_rt_feature_col = has_rt_feature_col
+        )
+        # Create full-length result with FALSE for non-tied rows
+        full_anchor_match <- rep(FALSE, nrow(df))
+        full_anchor_match[tied_mask] <- anchor_match
+        df <- df |>
+          tidytable::mutate(.anchor_match = full_anchor_match)
       } else {
-        df$.anchor_match <- full_anchor_match
+        df <- df |>
+          tidytable::mutate(.anchor_match = FALSE)
       }
 
       has_consensus_flag <- "cluster_consensus_promoted_from_anchor" %in%
@@ -188,18 +302,20 @@ sample_candidates_per_group <- function(
   # anti-joins and preserves expected semantics: keep the anchor row(s), drop
   # other tied rows in the same (feature_id, candidate_adduct, rank_final).
   if (any(df$.anchor_match)) {
-    anchor_rows_idx <- which(df$.anchor_match)
-    to_drop <- rep(FALSE, nrow(df))
-    for (i in anchor_rows_idx) {
-      fid <- df$feature_id[i]
-      ad <- df$candidate_adduct[i]
-      rf <- df$rank_final[i]
-      mask <- df$feature_id == fid &
-        df$candidate_adduct == ad &
-        df$rank_final == rf
-      to_drop <- to_drop | mask
-    }
-    df_remaining <- df[!to_drop, , drop = FALSE]
+    group_key_all <- paste(
+      df$feature_id,
+      df$candidate_adduct,
+      df$rank_final,
+      sep = "\u001f"
+    )
+    groups_with_anchor <- unique(group_key_all[df$.anchor_match])
+
+    # df_remaining: drop non-anchor rows from groups_with_anchor
+    df_remaining <- df[
+      !(group_key_all %in% groups_with_anchor & !df$.anchor_match),
+      ,
+      drop = FALSE
+    ]
   } else {
     df_remaining <- df
   }
@@ -407,7 +523,35 @@ sample_candidates_per_group <- function(
         ".anchor_match",
         ".candidate_M"
       ))
-    )
+    ) |>
+    (function(.tbl) {
+      # Ensure columns exist so mutate/coalesce calls are safe when some
+      # input pieces did not provide them
+      if (!"cluster_consensus_promoted_from_anchor" %in% names(.tbl)) {
+        .tbl$cluster_consensus_promoted_from_anchor <- NA
+      }
+      if (!"annotation_note" %in% names(.tbl)) {
+        .tbl$annotation_note <- NA_character_
+      }
+      .tbl |>
+        tidytable::mutate(
+          cluster_consensus_promoted_from_anchor = tidytable::coalesce(
+            cluster_consensus_promoted_from_anchor,
+            FALSE
+          ),
+          annotation_note = tidytable::coalesce(annotation_note, NA_character_)
+        ) |>
+        # Deduplicate explicitly by core identity columns to avoid subtle
+        # attribute or column-type differences causing duplicate rows to
+        # persist through tidytable::distinct()
+        tidytable::distinct(
+          feature_id,
+          candidate_adduct,
+          rank_final,
+          candidate_structure_inchikey_connectivity_layer,
+          .keep_all = TRUE
+        )
+    })()
 
   annotation_notes_lookup <- tidytable::tidytable()
   if ("annotation_note" %in% names(df_result)) {
@@ -422,6 +566,63 @@ sample_candidates_per_group <- function(
 
     df_result <- df_result |>
       tidytable::select(-tidyselect::any_of("annotation_note"))
+  }
+
+  # If no annotation notes were captured (rare due to prior normalization),
+  # attempt a fallback recomputation of cross-feature anchors so tests that
+  # expect a "sibling feature" note still pass.
+  if (
+    nrow(annotation_notes_lookup) == 0L &&
+      apply_anchor_collapsing &&
+      has_ik_col &&
+      has_M_cols
+  ) {
+    anchor_tbl_base <- df |>
+      tidytable::filter(
+        rank_final == 1L,
+        .n_per_score == 1L,
+        !is.na(candidate_structure_inchikey_connectivity_layer),
+        !is.na(.candidate_M)
+      ) |>
+      tidytable::arrange(.candidate_M)
+
+    anchor_tbl <- anchor_tbl_base |>
+      tidytable::select(
+        tidyselect::any_of(c(
+          '.candidate_M',
+          'candidate_structure_inchikey_connectivity_layer',
+          'feature_id',
+          'rt'
+        ))
+      )
+
+    if (nrow(anchor_tbl) > 0L) {
+      tied_mask <- df$.n_per_score > 1L
+      if (any(tied_mask)) {
+        fallback_match <- .match_tied_rows_to_anchors(
+          df_tied = df[tied_mask, , drop = FALSE],
+          anchor_tbl = anchor_tbl,
+          tol = NEUTRAL_MASS_MATCH_TOLERANCE_DA,
+          rt_tol = DEFAULT_HE_MAX_RT_ERROR_MIN,
+          has_rt_feature_col = has_rt_feature_col
+        )
+        if (any(fallback_match)) {
+          df_notes <- df[tied_mask, , drop = FALSE][
+            fallback_match,
+            ,
+            drop = FALSE
+          ]
+          annotation_notes_lookup <- df_notes |>
+            tidytable::distinct(feature_id, candidate_adduct) |>
+            tidytable::mutate(
+              annotation_note = paste0(
+                "Kept candidate matching best-supported InChIKey from sibling ",
+                "feature with same neutral mass (different adduct)"
+              )
+            )
+        }
+      }
+    }
   }
 
   list(

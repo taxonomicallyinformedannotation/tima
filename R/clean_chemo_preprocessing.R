@@ -653,10 +653,26 @@ count_candidates <- function(df_ranked, df_percentile) {
 #' @keywords internal
 compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
   # Normalize weight inputs: ensure numeric scalar defaults to 0 when NULL or non-numeric
-  w_cla_kin <- if (!is.null(weights$w_cla_kin)) as.numeric(weights$w_cla_kin) else 0
-  w_cla_sup <- if (!is.null(weights$w_cla_sup)) as.numeric(weights$w_cla_sup) else 0
-  w_cla_cla <- if (!is.null(weights$w_cla_cla)) as.numeric(weights$w_cla_cla) else 0
-  w_cla_par <- if (!is.null(weights$w_cla_par)) as.numeric(weights$w_cla_par) else 0
+  w_cla_kin <- if (!is.null(weights$w_cla_kin)) {
+    as.numeric(weights$w_cla_kin)
+  } else {
+    0
+  }
+  w_cla_sup <- if (!is.null(weights$w_cla_sup)) {
+    as.numeric(weights$w_cla_sup)
+  } else {
+    0
+  }
+  w_cla_cla <- if (!is.null(weights$w_cla_cla)) {
+    as.numeric(weights$w_cla_cla)
+  } else {
+    0
+  }
+  w_cla_par <- if (!is.null(weights$w_cla_par)) {
+    as.numeric(weights$w_cla_par)
+  } else {
+    0
+  }
 
   df_pred_tax |>
     tidytable::mutate(
@@ -735,9 +751,21 @@ compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
 #' @keywords internal
 compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
   # Normalize weight inputs: ensure numeric scalar defaults to 0 when NULL or non-numeric
-  w_npc_pat <- if (!is.null(weights$w_npc_pat)) as.numeric(weights$w_npc_pat) else 0
-  w_npc_sup <- if (!is.null(weights$w_npc_sup)) as.numeric(weights$w_npc_sup) else 0
-  w_npc_cla <- if (!is.null(weights$w_npc_cla)) as.numeric(weights$w_npc_cla) else 0
+  w_npc_pat <- if (!is.null(weights$w_npc_pat)) {
+    as.numeric(weights$w_npc_pat)
+  } else {
+    0
+  }
+  w_npc_sup <- if (!is.null(weights$w_npc_sup)) {
+    as.numeric(weights$w_npc_sup)
+  } else {
+    0
+  }
+  w_npc_cla <- if (!is.null(weights$w_npc_cla)) {
+    as.numeric(weights$w_npc_cla)
+  } else {
+    0
+  }
 
   df_pred_tax |>
     tidytable::mutate(
