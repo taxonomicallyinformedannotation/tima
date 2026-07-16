@@ -241,7 +241,7 @@ calculate_mass_of_m <- function(
 
 #' @title Batch-calculate neutral mass from adduct + m/z vectors
 #'
-#' @description Vectorized version of [calculate_mass_of_m()] that parses each
+#' @description Vectorized version of `calculate_mass_of_m()` that parses each
 #'     unique adduct string only once and applies the neutral-mass formula as
 #'     vectorized arithmetic over all rows sharing that adduct.  This is orders
 #'     of magnitude faster than calling `calculate_mass_of_m()` row-by-row when
