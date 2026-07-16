@@ -541,18 +541,28 @@ sample_candidates_per_group <- function(
           ),
           annotation_note = tidytable::coalesce(annotation_note, NA_character_)
         ) |>
-        # Deduplicate explicitly by core identity columns to avoid subtle
-        # attribute or column-type differences causing duplicate rows to
-        # persist through tidytable::distinct()
-        tidytable::distinct(
-          tidyselect::any_of(c(
+              (function(.tbl) {
+                # Deduplicate explicitly by core identity columns to avoid subtle
+                # attribute or column-type differences causing duplicate rows to
+                # persist through tidytable::distinct()
+                core_cols <- c(
             "feature_id",
             "candidate_adduct",
             "rank_final",
             "candidate_structure_inchikey_connectivity_layer"
-          )),
-          .keep_all = TRUE
-        )
+                )
+                core_cols <- core_cols[core_cols %in% names(.tbl)]
+
+                if (length(core_cols) > 0L) {
+                  # Create a stable key and remove duplicates preserving the first occurrence
+                  key <- do.call(paste, c(.tbl[core_cols], sep = "\u001f"))
+                  .tbl <- .tbl[!duplicated(key), , drop = FALSE]
+                } else {
+                  # Fallback to removing fully duplicated rows
+                  .tbl <- .tbl[!duplicated(.tbl), , drop = FALSE]
+                }
+                .tbl
+              })(.)
     })()
 
   annotation_notes_lookup <- tidytable::tidytable()
