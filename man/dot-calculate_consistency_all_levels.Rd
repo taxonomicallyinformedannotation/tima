@@ -25,7 +25,7 @@ List of data frames with consistency scores for each level
 \description{
 Wrapper function that calculates consistency scores across all taxonomic
 levels (ClassyFire and NPC hierarchies). Pre-computes the denominator
-(total distinct target features per source) once, then dispatches each
-level to \code{.calculate_consistency_per_level}.
+(total distinct target features per source) once, then processes all
+levels in a single pass over the edges for maximum efficiency.
 }
 \keyword{internal}

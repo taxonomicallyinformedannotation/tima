@@ -498,6 +498,253 @@ weight_bio <- function(
       )
   }
 
+  # OPTIMIZATION: Pre-compute the distinct pairs once to avoid 10x distinct+filter+regex
+  df_pairs <- df2 |>
+    tidytable::distinct(
+      sample_organism_name,
+      candidate_organism_name,
+      candidate_organism_01_domain,
+      candidate_organism_02_kingdom,
+      candidate_organism_03_phylum,
+      candidate_organism_04_class,
+      candidate_organism_05_order,
+      candidate_organism_06_family,
+      candidate_organism_07_tribe,
+      candidate_organism_08_genus,
+      candidate_organism_09_species,
+      candidate_organism_10_varietas,
+      sample_organism_01_domain,
+      sample_organism_02_kingdom,
+      sample_organism_03_phylum,
+      sample_organism_04_class,
+      sample_organism_05_order,
+      sample_organism_06_family,
+      sample_organism_07_tribe,
+      sample_organism_08_genus,
+      sample_organism_09_species,
+      sample_organism_10_varietas
+    ) |>
+    tidytable::filter(!is.na(sample_organism_name)) |>
+    tidytable::filter(sample_organism_name != "ND") |>
+    tidytable::filter(!is.na(candidate_organism_name)) |>
+    tidytable::filter(candidate_organism_name != "notClassified")
+
+  # Single pass: compute all level scores at once using vectorized operations
+  # This avoids 10 separate tidytable pipelines with regex matching
+  df_pairs <- df_pairs |>
+    tidytable::mutate(
+      # Pre-compute valid flags for each level
+      .valid_01 = !is.na(candidate_organism_01_domain) &
+        candidate_organism_01_domain != "notClassified" &
+        sample_organism_01_domain != "notClassified",
+      .valid_02 = !is.na(candidate_organism_02_kingdom) &
+        candidate_organism_02_kingdom != "notClassified" &
+        sample_organism_02_kingdom != "notClassified",
+      .valid_03 = !is.na(candidate_organism_03_phylum) &
+        candidate_organism_03_phylum != "notClassified" &
+        sample_organism_03_phylum != "notClassified",
+      .valid_04 = !is.na(candidate_organism_04_class) &
+        candidate_organism_04_class != "notClassified" &
+        sample_organism_04_class != "notClassified",
+      .valid_05 = !is.na(candidate_organism_05_order) &
+        candidate_organism_05_order != "notClassified" &
+        sample_organism_05_order != "notClassified",
+      .valid_06 = !is.na(candidate_organism_06_family) &
+        candidate_organism_06_family != "notClassified" &
+        sample_organism_06_family != "notClassified",
+      .valid_07 = !is.na(candidate_organism_07_tribe) &
+        candidate_organism_07_tribe != "notClassified" &
+        sample_organism_07_tribe != "notClassified",
+      .valid_08 = !is.na(candidate_organism_08_genus) &
+        candidate_organism_08_genus != "notClassified" &
+        sample_organism_08_genus != "notClassified",
+      .valid_09 = !is.na(candidate_organism_09_species) &
+        candidate_organism_09_species != "notClassified" &
+        sample_organism_09_species != "notClassified",
+      .valid_10 = !is.na(candidate_organism_10_varietas) &
+        candidate_organism_10_varietas != "notClassified" &
+        sample_organism_10_varietas != "notClassified"
+    )
+
+  # Compute regex matches for all valid pairs at once (much faster than 10 separate passes)
+  # Only run regex where both candidate and sample are valid
+  if (nrow(df_pairs) > 0L) {
+    # Domain level
+    mask <- df_pairs$.valid_01
+    if (any(mask, na.rm = TRUE)) {
+      df_pairs$score_biological_01 <- 0
+      df_pairs$score_biological_01[mask] <- as.integer(
+        stringi::stri_detect_regex(
+          pattern = df_pairs$candidate_organism_01_domain[mask],
+          str = df_pairs$sample_organism_01_domain[mask]
+        )
+      ) *
+        score_biological_domain
+    } else {
+      df_pairs$score_biological_01 <- 0
+    }
+
+    # Kingdom level
+    mask <- df_pairs$.valid_02
+    if (any(mask, na.rm = TRUE)) {
+      df_pairs$score_biological_02 <- 0
+      df_pairs$score_biological_02[mask] <- as.integer(
+        stringi::stri_detect_regex(
+          pattern = df_pairs$candidate_organism_02_kingdom[mask],
+          str = df_pairs$sample_organism_02_kingdom[mask]
+        )
+      ) *
+        score_biological_kingdom
+    } else {
+      df_pairs$score_biological_02 <- 0
+    }
+
+    # Phylum level
+    mask <- df_pairs$.valid_03
+    if (any(mask, na.rm = TRUE)) {
+      df_pairs$score_biological_03 <- 0
+      df_pairs$score_biological_03[mask] <- as.integer(
+        stringi::stri_detect_regex(
+          pattern = df_pairs$candidate_organism_03_phylum[mask],
+          str = df_pairs$sample_organism_03_phylum[mask]
+        )
+      ) *
+        score_biological_phylum
+    } else {
+      df_pairs$score_biological_03 <- 0
+    }
+
+    # Class level
+    mask <- df_pairs$.valid_04
+    if (any(mask, na.rm = TRUE)) {
+      df_pairs$score_biological_04 <- 0
+      df_pairs$score_biological_04[mask] <- as.integer(
+        stringi::stri_detect_regex(
+          pattern = df_pairs$candidate_organism_04_class[mask],
+          str = df_pairs$sample_organism_04_class[mask]
+        )
+      ) *
+        score_biological_class
+    } else {
+      df_pairs$score_biological_04 <- 0
+    }
+
+    # Order level
+    mask <- df_pairs$.valid_05
+    if (any(mask, na.rm = TRUE)) {
+      df_pairs$score_biological_05 <- 0
+      df_pairs$score_biological_05[mask] <- as.integer(
+        stringi::stri_detect_regex(
+          pattern = df_pairs$candidate_organism_05_order[mask],
+          str = df_pairs$sample_organism_05_order[mask]
+        )
+      ) *
+        score_biological_order
+    } else {
+      df_pairs$score_biological_05 <- 0
+    }
+
+    # Family level
+    mask <- df_pairs$.valid_06
+    if (any(mask, na.rm = TRUE)) {
+      df_pairs$score_biological_06 <- 0
+      df_pairs$score_biological_06[mask] <- as.integer(
+        stringi::stri_detect_regex(
+          pattern = df_pairs$candidate_organism_06_family[mask],
+          str = df_pairs$sample_organism_06_family[mask]
+        )
+      ) *
+        score_biological_family
+    } else {
+      df_pairs$score_biological_06 <- 0
+    }
+
+    # Tribe level
+    mask <- df_pairs$.valid_07
+    if (any(mask, na.rm = TRUE)) {
+      df_pairs$score_biological_07 <- 0
+      df_pairs$score_biological_07[mask] <- as.integer(
+        stringi::stri_detect_regex(
+          pattern = df_pairs$candidate_organism_07_tribe[mask],
+          str = df_pairs$sample_organism_07_tribe[mask]
+        )
+      ) *
+        score_biological_tribe
+    } else {
+      df_pairs$score_biological_07 <- 0
+    }
+
+    # Genus level
+    mask <- df_pairs$.valid_08
+    if (any(mask, na.rm = TRUE)) {
+      df_pairs$score_biological_08 <- 0
+      df_pairs$score_biological_08[mask] <- as.integer(
+        stringi::stri_detect_regex(
+          pattern = df_pairs$candidate_organism_08_genus[mask],
+          str = df_pairs$sample_organism_08_genus[mask]
+        )
+      ) *
+        score_biological_genus
+    } else {
+      df_pairs$score_biological_08 <- 0
+    }
+
+    # Species level
+    mask <- df_pairs$.valid_09
+    if (any(mask, na.rm = TRUE)) {
+      df_pairs$score_biological_09 <- 0
+      df_pairs$score_biological_09[mask] <- as.integer(
+        stringi::stri_detect_regex(
+          pattern = df_pairs$candidate_organism_09_species[mask],
+          str = df_pairs$sample_organism_09_species[mask]
+        )
+      ) *
+        score_biological_species
+    } else {
+      df_pairs$score_biological_09 <- 0
+    }
+
+    # Varietas level
+    mask <- df_pairs$.valid_10
+    if (any(mask, na.rm = TRUE)) {
+      df_pairs$score_biological_10 <- 0
+      df_pairs$score_biological_10[mask] <- as.integer(
+        stringi::stri_detect_regex(
+          pattern = df_pairs$candidate_organism_10_varietas[mask],
+          str = df_pairs$sample_organism_10_varietas[mask]
+        )
+      ) *
+        score_biological_variety
+    } else {
+      df_pairs$score_biological_10 <- 0
+    }
+  } else {
+    # Empty case - initialize all score columns to 0
+    for (i in 1:10) {
+      df_pairs[[paste0("score_biological_", sprintf("%02d", i))]] <- numeric(0)
+    }
+  }
+
+  # Clean up temporary columns
+  df_pairs <- df_pairs |>
+    tidytable::select(
+      -tidyselect::starts_with(".valid_")
+    )
+
+  # Join back to df2 using the pair keys
+  df2 <- df2 |>
+    tidytable::left_join(
+      y = df_pairs |>
+        tidytable::select(
+          sample_organism_name,
+          candidate_organism_name,
+          tidyselect::starts_with("score_biological_")
+        ),
+      by = c("sample_organism_name", "candidate_organism_name")
+    )
+
+  rm(df_pairs)
+
   supp_tables <- lapply(
     X = taxonomic_levels,
     FUN = .score_taxonomic_level

@@ -134,6 +134,7 @@ calculate_entropy_and_similarity <- function(
   }
   assert_flag(compute_entropy, "compute_entropy")
   compute_forward_reverse <- compute_forward_reverse %||% (method == "entropy")
+
   if (!is.null(query_adducts) && length(query_adducts) != length(query_ids)) {
     cli::cli_abort(
       "query_adducts must have the same length as query_ids",
@@ -166,10 +167,11 @@ calculate_entropy_and_similarity <- function(
     dalton
   )
 
+  # Pre-calculate length once for efficiency
   n_queries <- length(query_ids)
+
   n_query <- length(query_spectra)
   n_lib <- length(lib_spectra)
-
   # Lazy sanitize-on-first-use state.
   # This avoids up-front full scans and only sanitizes spectra that need it.
   query_checked <- rep(FALSE, n_query)
@@ -228,8 +230,8 @@ calculate_entropy_and_similarity <- function(
     lib_spectra[[idx]]
   }
 
-  # Pre-sort library precursors for O(log n) filtering per query
-  # This is a MAJOR optimization: reduces 3,660 * 1.45M scans to ~3,660 * log2(1.45M) ~ 75K
+  # Pre-sort library precursors for fast binary search instead of O(n) scan per query
+  # This is a MAJOR optimization: reduces 5.3B operations to ~3,660 * log2(1.45M) ~ 75K
   lib_precursors_sorted <- sort(lib_precursors, index.return = TRUE)
   lib_precursors_sorted_vals <- lib_precursors_sorted$x
   lib_precursors_sorted_idx <- lib_precursors_sorted$ix
@@ -246,7 +248,7 @@ calculate_entropy_and_similarity <- function(
         key <- paste0(
           adduct,
           "|",
-          format(prec, scientific = FALSE, digits = 15)
+          sprintf("%.12f", prec)
         )
         if (!exists(key, envir = adduct_cache, inherits = FALSE)) {
           converted <- convert_precursor_to_neutral_if_possible(
@@ -292,7 +294,7 @@ calculate_entropy_and_similarity <- function(
     key <- paste0(
       adduct,
       "|",
-      format(precursor, scientific = FALSE, digits = 15)
+      sprintf("%.12f", precursor)
     )
     if (exists(key, envir = adduct_cache, inherits = FALSE)) {
       return(get(key, envir = adduct_cache, inherits = FALSE))

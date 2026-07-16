@@ -229,14 +229,19 @@ create_edges <- function(
       }
 
       if (keep_edge) {
-        c(i, j, sc, mp)
+        tidytable::tidytable(
+          feature_id = i,
+          target_id = j,
+          score = sc,
+          matched_peaks = as.integer(mp)
+        )
       }
     })
 
-    # Drop NULLs and combine into matrix (4 columns) for this query
+    # Drop NULLs and combine into tidytable for this query
     pairs <- pairs[!vapply(pairs, is.null, FALSE, USE.NAMES = FALSE)]
     if (length(pairs) > 0L) {
-      do.call(rbind, pairs)
+      tidytable::bind_rows(pairs)
     }
   })
 
@@ -271,13 +276,8 @@ create_edges <- function(
   results <- results[!vapply(results, is.null, FALSE, USE.NAMES = FALSE)]
 
   if (length(results) > 0L) {
-    mat <- do.call(rbind, results)
-    result <- tidytable::tidytable(
-      feature_id = as.integer(mat[, 1L]),
-      target_id = as.integer(mat[, 2L]),
-      score = mat[, 3L],
-      matched_peaks = as.integer(mat[, 4L])
-    )
+    # results are now tidytable objects with named columns
+    result <- tidytable::bind_rows(results)
     log_complete(
       ctx,
       n_edges = nrow(result),

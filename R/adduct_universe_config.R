@@ -124,14 +124,14 @@ adduct_to_string <- function(
 #' @keywords internal
 .compositions <- function(target, k) {
   if (k == 1L) {
-    return(matrix(as.integer(target), nrow = 1L))
+    return(tidytable::tidytable(x = as.integer(target)))
   }
   out <- vector("list", target + 1L)
   for (i in seq.int(0L, target)) {
     sub <- .compositions(target - i, k - 1L)
     out[[i + 1L]] <- cbind(i, sub)
   }
-  do.call(rbind, out)
+  tidytable::bind_rows(out)
 }
 
 #' Resolve a possibly-legacy adduct configuration to a unified structured

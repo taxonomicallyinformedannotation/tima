@@ -280,12 +280,11 @@ reduce_ammonium_loss_pairs <- function(net) {
     }
     idx <- match(formula, df$formula)
     if (is.na(idx)) {
-      df <- rbind(
+      df <- tidytable::bind_rows(
         df,
-        data.frame(
+        tidytable::tidytable(
           formula = formula,
-          signed_n = as.integer(delta),
-          stringsAsFactors = FALSE
+          signed_n = as.integer(delta)
         )
       )
     } else {
