@@ -79,16 +79,38 @@ calculate_mass_of_m <- function(
   # relatively-expensive validation helpers on the hot inner-loop and keeps
   # scalar calls (e.g. vapply over 1000 values) fast while preserving
   # correctness.
-  if (!missing(adduct_string) && !missing(mz) &&
-      length(adduct_string) == 1L && nzchar(adduct_string) &&
-      length(mz) == 1L && is.finite(mz) && mz > 0 &&
+  if (
+    !missing(adduct_string) &&
+      !missing(mz) &&
+      length(adduct_string) == 1L &&
+      nzchar(adduct_string) &&
+      length(mz) == 1L &&
+      is.finite(mz) &&
+      mz > 0 &&
       identical(electron_mass, ELECTRON_MASS_DALTONS) &&
-      exists(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)) {
-    parsed_adduct <- get(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)
+      exists(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)
+  ) {
+    parsed_adduct <- get(
+      adduct_string,
+      envir = .adduct_parse_cache,
+      inherits = FALSE
+    )
     # Minimal inline validation
     if (is.null(parsed_adduct) || all(parsed_adduct == 0L)) {
-      warning(paste0("Failed to parse adduct '", adduct_string, "', ", "cannot calculate neutral mass"), call. = FALSE)
-      log_warn(paste0("Failed to parse adduct '", adduct_string, "', cannot calculate neutral mass"))
+      warning(
+        paste0(
+          "Failed to parse adduct '",
+          adduct_string,
+          "', ",
+          "cannot calculate neutral mass"
+        ),
+        call. = FALSE
+      )
+      log_warn(paste0(
+        "Failed to parse adduct '",
+        adduct_string,
+        "', cannot calculate neutral mass"
+      ))
       return(0)
     }
 
@@ -100,14 +122,22 @@ calculate_mass_of_m <- function(
     mass_modifications <- parsed_adduct["los_add_clu"][[1L]]
 
     if (n_mer == 0L || n_charges == 0L) {
-      log_error("Invalid adduct components for '", adduct_string, "'. Cannot calculate neutral mass.")
+      log_error(
+        "Invalid adduct components for '",
+        adduct_string,
+        "'. Cannot calculate neutral mass."
+      )
       return(0)
     }
 
     # Compute neutral mass inline
     isotope_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
     z_signed <- n_charges * charge_sign
-    neutral_mass <- (n_charges * (mz - isotope_shift) - mass_modifications + z_signed * electron_mass) / n_mer
+    neutral_mass <- (n_charges *
+      (mz - isotope_shift) -
+      mass_modifications +
+      z_signed * electron_mass) /
+      n_mer
     if (!is.finite(neutral_mass)) {
       log_error(
         "Calculated neutral mass is not finite for adduct '",
@@ -131,9 +161,18 @@ calculate_mass_of_m <- function(
   # Parse the adduct string with a lightweight cache to speed repeated calls
   parsed_adduct <- NULL
   # Only use the cache for non-empty single-character adduct strings
-  if (!is.null(adduct_string) && length(adduct_string) == 1L && !is.na(adduct_string) && nzchar(adduct_string)) {
+  if (
+    !is.null(adduct_string) &&
+      length(adduct_string) == 1L &&
+      !is.na(adduct_string) &&
+      nzchar(adduct_string)
+  ) {
     if (exists(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)) {
-      parsed_adduct <- get(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)
+      parsed_adduct <- get(
+        adduct_string,
+        envir = .adduct_parse_cache,
+        inherits = FALSE
+      )
     } else {
       parsed_adduct <- parse_adduct(adduct_string)
       assign(adduct_string, parsed_adduct, envir = .adduct_parse_cache)
@@ -269,7 +308,9 @@ calculate_mass_of_m_batch <- function(
   }
   out <- rep(NA_real_, n)
 
-  unique_adducts <- unique(adducts[!is.na(adducts) & nzchar(as.character(adducts))])
+  unique_adducts <- unique(adducts[
+    !is.na(adducts) & nzchar(as.character(adducts))
+  ])
 
   # Pre-compute a compact index mapping once and then use grouped indexing.
   # This avoids repeatedly scanning the whole vector for each adduct.

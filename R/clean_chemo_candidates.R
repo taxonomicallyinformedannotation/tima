@@ -204,8 +204,17 @@ sample_candidates_per_group <- function(
   # lightweight and avoids additional allocations.
   # Convert to base data.frame first to avoid tidytable/list-column edge-cases
   df <- as.data.frame(df, stringsAsFactors = FALSE)
-  group_key_all <- paste(as.character(df$feature_id), as.character(df$candidate_adduct), as.character(df$rank_final), sep = "")
-  counts <- as.integer(stats::ave(seq_along(group_key_all), group_key_all, FUN = length))
+  group_key_all <- paste(
+    as.character(df$feature_id),
+    as.character(df$candidate_adduct),
+    as.character(df$rank_final),
+    sep = ""
+  )
+  counts <- as.integer(stats::ave(
+    seq_along(group_key_all),
+    group_key_all,
+    FUN = length
+  ))
   df$.n_per_score <- counts
   df$.anchor_match <- FALSE
   df <- tidytable::as_tidytable(df)
@@ -264,25 +273,41 @@ sample_candidates_per_group <- function(
         # subtle bugs in earlier refactors.
         anchor_df <- as.data.frame(anchor_tbl, stringsAsFactors = FALSE)
         for (ti in tied_idx) {
-          ik <- as.character(df$candidate_structure_inchikey_connectivity_layer[ti])
-          if (is.na(ik) || !nzchar(ik)) next
+          ik <- as.character(df$candidate_structure_inchikey_connectivity_layer[
+            ti
+          ])
+          if (is.na(ik) || !nzchar(ik)) {
+            next
+          }
           # Select anchors with same IK
-          same_ik_idx <- which(anchor_df$candidate_structure_inchikey_connectivity_layer == ik)
-          if (length(same_ik_idx) == 0L) next
+          same_ik_idx <- which(
+            anchor_df$candidate_structure_inchikey_connectivity_layer == ik
+          )
+          if (length(same_ik_idx) == 0L) {
+            next
+          }
           anchor_sub <- anchor_df[same_ik_idx, , drop = FALSE]
           # Mass difference filter
-          mass_diff <- abs(as.numeric(anchor_sub$.candidate_M) - as.numeric(df$.candidate_M[ti]))
+          mass_diff <- abs(
+            as.numeric(anchor_sub$.candidate_M) -
+              as.numeric(df$.candidate_M[ti])
+          )
           ok_mass <- mass_diff <= tol
-          if (!any(ok_mass)) next
+          if (!any(ok_mass)) {
+            next
+          }
           # Exclude same-feature anchors
           feature_ok <- anchor_sub$feature_id[ok_mass] != df$feature_id[ti]
-          if (!any(feature_ok)) next
+          if (!any(feature_ok)) {
+            next
+          }
           # RT filter when available
           if (has_rt_feature_col) {
             # anchor_sub may have rt column; allow anchors with NA rt as matches
             anchor_rts <- anchor_sub$rt[ok_mass]
             row_rt <- df$rt[ti]
-            rt_ok <- is.na(anchor_rts) | (!is.na(row_rt) & abs(anchor_rts - row_rt) <= rt_tol)
+            rt_ok <- is.na(anchor_rts) |
+              (!is.na(row_rt) & abs(anchor_rts - row_rt) <= rt_tol)
             if (!any(rt_ok & feature_ok)) next
           }
           full_anchor_match[ti] <- TRUE
@@ -328,7 +353,9 @@ sample_candidates_per_group <- function(
       fid <- df$feature_id[i]
       ad <- df$candidate_adduct[i]
       rf <- df$rank_final[i]
-      mask <- df$feature_id == fid & df$candidate_adduct == ad & df$rank_final == rf
+      mask <- df$feature_id == fid &
+        df$candidate_adduct == ad &
+        df$rank_final == rf
       to_drop <- to_drop | mask
     }
     df_remaining <- df[!to_drop, , drop = FALSE]
