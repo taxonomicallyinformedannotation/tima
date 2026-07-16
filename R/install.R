@@ -16,6 +16,25 @@ validate_install_inputs <- function(
   type = getOption("pkgType"),
   dependencies
 ) {
+  # Normalize `type` to a single character value to tolerate platform-specific
+  # pkgType option values (which may be a vector). Use the first non-empty
+  # element so callers that omit `type` behave consistently across systems.
+  type <- as.character(type)
+  if (length(type) > 1L) type <- type[[1L]]
+  # Map common platform pkgType variants to the canonical 'source'/'binary'
+  # so callers don't need to normalize their options.
+  if (length(type) == 1L && !type %in% c("source", "binary")) {
+    type_l <- tolower(type)
+    if (grepl("source", type_l)) {
+      type <- "source"
+    } else if (grepl("binary", type_l) || grepl("mac.binary", type_l) || grepl("win.binary", type_l)) {
+      type <- "binary"
+    } else if (identical(type_l, "both")) {
+      # Treat 'both' as source by default for deterministic behaviour in tests
+      type <- "source"
+    }
+  }
+
   if (!is.character(package) || length(package) != 1L || nchar(package) == 0L) {
     cli::cli_abort(
       "package must be a single non-empty character string, got {.val {if (is.null(package)) 'NULL' else class(package)[1]}}",

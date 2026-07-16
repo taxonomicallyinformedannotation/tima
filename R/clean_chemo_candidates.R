@@ -198,13 +198,18 @@ sample_candidates_per_group <- function(
     df$rank_final <- NA_integer_
   }
 
-  # Compute per-score-group sizes (feature/adduct/score-rank) only once
-  df <- df |>
-    tidytable::mutate(
-      .n_per_score = tidytable::n(),
-      .by = c(feature_id, candidate_adduct, rank_final),
-      .anchor_match = FALSE
-    )
+  # Compute per-score-group sizes (feature/adduct/score-rank) using a
+  # deterministic base-R grouping approach to avoid subtle tidytable `.by`
+  # semantics that may change across tidytable versions. Use `ave` which is
+  # lightweight and avoids additional allocations.
+  # Convert to base data.frame first to avoid tidytable/list-column edge-cases
+  df <- as.data.frame(df, stringsAsFactors = FALSE)
+  group_key_all <- paste(as.character(df$feature_id), as.character(df$candidate_adduct), as.character(df$rank_final), sep = "")
+  counts <- as.integer(stats::ave(seq_along(group_key_all), group_key_all, FUN = length))
+  df$.n_per_score <- counts
+  df$.anchor_match <- FALSE
+  df <- tidytable::as_tidytable(df)
+  rm(group_key_all, counts)
 
   has_ik_col <- "candidate_structure_inchikey_connectivity_layer" %in% names(df)
   has_M_cols <- "mz" %in% names(df) && "candidate_adduct" %in% names(df)
@@ -251,23 +256,40 @@ sample_candidates_per_group <- function(
       rt_tol <- DEFAULT_HE_MAX_RT_ERROR_MIN
       # Only match TIED rows to cross-feature anchors
       # Non-tied rows (rank-1 singletons) should not be affected by cross-feature anchors
-      tied_mask <- df$.n_per_score > 1L
-      if (any(tied_mask)) {
-        anchor_match <- .match_tied_rows_to_anchors(
-          df_tied = df[tied_mask, , drop = FALSE],
-          anchor_tbl = anchor_tbl,
-          tol = tol,
-          rt_tol = rt_tol,
-          has_rt_feature_col = has_rt_feature_col
-        )
-        # Create full-length result with FALSE for non-tied rows
-        full_anchor_match <- rep(FALSE, nrow(df))
-        full_anchor_match[tied_mask] <- anchor_match
-        df <- df |>
-          tidytable::mutate(.anchor_match = full_anchor_match)
+      tied_idx <- which(df$.n_per_score > 1L)
+      full_anchor_match <- rep(FALSE, nrow(df))
+      if (length(tied_idx) > 0L) {
+        # Use a simple direct lookup by InChIKey and mass tolerance. This is
+        # robust, easy to reason about, and avoids complex merges that created
+        # subtle bugs in earlier refactors.
+        anchor_df <- as.data.frame(anchor_tbl, stringsAsFactors = FALSE)
+        for (ti in tied_idx) {
+          ik <- as.character(df$candidate_structure_inchikey_connectivity_layer[ti])
+          if (is.na(ik) || !nzchar(ik)) next
+          # Select anchors with same IK
+          same_ik_idx <- which(anchor_df$candidate_structure_inchikey_connectivity_layer == ik)
+          if (length(same_ik_idx) == 0L) next
+          anchor_sub <- anchor_df[same_ik_idx, , drop = FALSE]
+          # Mass difference filter
+          mass_diff <- abs(as.numeric(anchor_sub$.candidate_M) - as.numeric(df$.candidate_M[ti]))
+          ok_mass <- mass_diff <= tol
+          if (!any(ok_mass)) next
+          # Exclude same-feature anchors
+          feature_ok <- anchor_sub$feature_id[ok_mass] != df$feature_id[ti]
+          if (!any(feature_ok)) next
+          # RT filter when available
+          if (has_rt_feature_col) {
+            # anchor_sub may have rt column; allow anchors with NA rt as matches
+            anchor_rts <- anchor_sub$rt[ok_mass]
+            row_rt <- df$rt[ti]
+            rt_ok <- is.na(anchor_rts) | (!is.na(row_rt) & abs(anchor_rts - row_rt) <= rt_tol)
+            if (!any(rt_ok & feature_ok)) next
+          }
+          full_anchor_match[ti] <- TRUE
+        }
+        df$.anchor_match <- full_anchor_match
       } else {
-        df <- df |>
-          tidytable::mutate(.anchor_match = FALSE)
+        df$.anchor_match <- full_anchor_match
       }
 
       has_consensus_flag <- "cluster_consensus_promoted_from_anchor" %in%
@@ -300,11 +322,16 @@ sample_candidates_per_group <- function(
   # anti-joins and preserves expected semantics: keep the anchor row(s), drop
   # other tied rows in the same (feature_id, candidate_adduct, rank_final).
   if (any(df$.anchor_match)) {
-    group_key_all <- paste(df$feature_id, df$candidate_adduct, df$rank_final, sep = "\u001f")
-    groups_with_anchor <- unique(group_key_all[df$.anchor_match])
-
-    # df_remaining: drop non-anchor rows from groups_with_anchor
-    df_remaining <- df[!(group_key_all %in% groups_with_anchor & !df$.anchor_match), , drop = FALSE]
+    anchor_rows_idx <- which(df$.anchor_match)
+    to_drop <- rep(FALSE, nrow(df))
+    for (i in anchor_rows_idx) {
+      fid <- df$feature_id[i]
+      ad <- df$candidate_adduct[i]
+      rf <- df$rank_final[i]
+      mask <- df$feature_id == fid & df$candidate_adduct == ad & df$rank_final == rf
+      to_drop <- to_drop | mask
+    }
+    df_remaining <- df[!to_drop, , drop = FALSE]
   } else {
     df_remaining <- df
   }

@@ -76,6 +76,54 @@ calculate_mass_of_m <- function(
     )
   }
 
+  # Fast-path for common scalar case: when adduct_string is a single
+  # cached entry and mz is a single finite numeric value. This avoids the
+  # relatively-expensive validation helpers on the hot inner-loop and keeps
+  # scalar calls (e.g. vapply over 1000 values) fast while preserving
+  # correctness.
+  if (!missing(adduct_string) && !missing(mz) &&
+      length(adduct_string) == 1L && nzchar(adduct_string) &&
+      length(mz) == 1L && is.finite(mz) && mz > 0 &&
+      identical(electron_mass, ELECTRON_MASS_DALTONS) &&
+      exists(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)) {
+    parsed_adduct <- get(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)
+    # Minimal inline validation
+    if (is.null(parsed_adduct) || all(parsed_adduct == 0L)) {
+      warning(paste0("Failed to parse adduct '", adduct_string, "', ", "cannot calculate neutral mass"), call. = FALSE)
+      log_warn(paste0("Failed to parse adduct '", adduct_string, "', cannot calculate neutral mass"))
+      return(0)
+    }
+
+    # Extract parsed components and compute directly without repeated checks
+    n_charges <- parsed_adduct["n_charges"][[1L]]
+    charge_sign <- parsed_adduct["charge"][[1L]]
+    n_mer <- parsed_adduct["n_mer"][[1L]]
+    n_iso <- parsed_adduct["n_iso"][[1L]]
+    mass_modifications <- parsed_adduct["los_add_clu"][[1L]]
+
+    if (n_mer == 0L || n_charges == 0L) {
+      log_error("Invalid adduct components for '", adduct_string, "'. Cannot calculate neutral mass.")
+      return(0)
+    }
+
+    # Compute neutral mass inline
+    isotope_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
+    z_signed <- n_charges * charge_sign
+    neutral_mass <- (n_charges * (mz - isotope_shift) - mass_modifications + z_signed * electron_mass) / n_mer
+    if (!is.finite(neutral_mass)) {
+      log_error(
+        "Calculated neutral mass is not finite for adduct '",
+        adduct_string,
+        "' and m/z ",
+        mz
+      )
+      return(0)
+    }
+
+    return(neutral_mass)
+  }
+
+  # Fallback: full validation for less-common or un-cached paths
   # Validate m/z value
   validate_mz(mz)
 
@@ -84,7 +132,8 @@ calculate_mass_of_m <- function(
 
   # Parse the adduct string with a lightweight cache to speed repeated calls
   parsed_adduct <- NULL
-  if (!is.null(adduct_string) && length(adduct_string) == 1L && !is.na(adduct_string)) {
+  # Only use the cache for non-empty single-character adduct strings
+  if (!is.null(adduct_string) && length(adduct_string) == 1L && !is.na(adduct_string) && nzchar(adduct_string)) {
     if (exists(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)) {
       parsed_adduct <- get(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)
     } else {
@@ -222,7 +271,7 @@ calculate_mass_of_m_batch <- function(
   }
   out <- rep(NA_real_, n)
 
-  unique_adducts <- unique(adducts[!is.na(adducts)])
+  unique_adducts <- unique(adducts[!is.na(adducts) & nzchar(as.character(adducts))])
 
   # Pre-compute a compact index mapping once and then use grouped indexing.
   # This avoids repeatedly scanning the whole vector for each adduct.
