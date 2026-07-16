@@ -57,8 +57,6 @@
 #' calculate_mass_of_m(mz = 62.2311, adduct_string = "[M+2H]2+")
 #' # Expected: ~122.45 Da
 # Simple cache for parsed adducts to accelerate repeated scalar calls
-.adduct_parse_cache <- new.env(parent = emptyenv())
-
 calculate_mass_of_m <- function(
   mz,
   adduct_string,
@@ -241,7 +239,7 @@ calculate_mass_of_m <- function(
 
 #' @title Batch-calculate neutral mass from adduct + m/z vectors
 #'
-#' @description Vectorized version of `calculate_mass_of_m()` that parses each
+#' @description Vectorized version of [calculate_mass_of_m()] that parses each
 #'     unique adduct string only once and applies the neutral-mass formula as
 #'     vectorized arithmetic over all rows sharing that adduct.  This is orders
 #'     of magnitude faster than calling `calculate_mass_of_m()` row-by-row when
@@ -584,3 +582,5 @@ calculate_mz_from_mass <- function(
 
   mz
 }
+
+.adduct_parse_cache <- new.env(parent = emptyenv())
