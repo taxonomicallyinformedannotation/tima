@@ -41,7 +41,7 @@ test_that(".mztab_build_export_comments returns COM lines for extra columns", {
 
 test_that(".mztab_build_export_comments chunks extra columns", {
   # Create a data frame with >16 non-canonical columns
-  extra_cols <- setNames(
+  extra_cols <- stats::setNames(
     as.list(seq_len(20)),
     paste0("extra_", seq_len(20))
   )

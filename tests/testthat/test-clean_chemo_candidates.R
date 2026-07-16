@@ -170,7 +170,7 @@ test_that("coerce_score_columns handles all expected score column names", {
     "candidate_score_sirius_csi",
     "candidate_score_sirius_confidence"
   )
-  df_vals <- setNames(as.list(as.character(seq_along(cols) * 0.1)), cols)
+  df_vals <- stats::setNames(as.list(as.character(seq_along(cols) * 0.1)), cols)
   df <- tidytable::as_tidytable(as.data.frame(
     df_vals,
     stringsAsFactors = FALSE
