@@ -31,235 +31,129 @@
   rt_tol,
   has_rt_feature_col
 ) {
+  # Fast vectorized matching by mass-key + exact IK match, then filter by tol/RT.
   if (nrow(df_tied) == 0L || nrow(anchor_tbl) == 0L) {
     return(rep(FALSE, nrow(df_tied)))
   }
 
+  # Choose InChIKey preference: connectivity layer (broader grouping) when available,
+  # else fall back to full InChIKey. This keeps behavior consistent across callers.
+  ik_row_col <- if (
+    "candidate_structure_inchikey_connectivity_layer" %in% names(df_tied)
+  ) {
+    "candidate_structure_inchikey_connectivity_layer"
+  } else if ("candidate_structure_inchikey" %in% names(df_tied)) {
+    "candidate_structure_inchikey"
+  } else {
+    stop("No InChIKey column available for anchor matching")
+  }
+  ik_anchor_col <- if (
+    "candidate_structure_inchikey_connectivity_layer" %in% names(anchor_tbl)
+  ) {
+    "candidate_structure_inchikey_connectivity_layer"
+  } else if ("candidate_structure_inchikey" %in% names(anchor_tbl)) {
+    "candidate_structure_inchikey"
+  } else {
+    stop("No InChIKey column available in anchor table for anchor matching")
+  }
+
+  # Mass source selection (same as previous logic)
   row_mass_col <- if (".candidate_anchor_mass" %in% names(df_tied)) {
     ".candidate_anchor_mass"
-  } else {
+  } else if (".candidate_M" %in% names(df_tied)) {
     ".candidate_M"
+  } else {
+    stop("No candidate mass column available for tied-row matching")
   }
   anchor_mass_col <- if (".candidate_anchor_mass" %in% names(anchor_tbl)) {
     ".candidate_anchor_mass"
-  } else {
+  } else if (".candidate_M" %in% names(anchor_tbl)) {
     ".candidate_M"
+  } else {
+    stop("No candidate mass column available in anchor table")
   }
 
-  row_dt <- data.frame(
+  # Build compact data.frames for merging
+  row_df <- data.frame(
     row_id = seq_len(nrow(df_tied)),
-    row_IK = as.character(
-      df_tied$candidate_structure_inchikey_connectivity_layer
-    ),
+    row_IK = as.character(df_tied[[ik_row_col]]),
     row_fid = as.character(df_tied$feature_id),
-    row_rt = if (has_rt_feature_col) {
-      as.numeric(df_tied$rt)
-    } else {
-      NA_real_
-    },
+    row_rt = if (has_rt_feature_col) as.numeric(df_tied$rt) else NA_real_,
     row_mass = as.numeric(df_tied[[row_mass_col]]),
-    row_lower = as.numeric(df_tied[[row_mass_col]]) - tol,
-    row_upper = as.numeric(df_tied[[row_mass_col]]) + tol,
     stringsAsFactors = FALSE
   )
-
-  anchor_dt <- data.frame(
-    anchor_IK = as.character(
-      anchor_tbl$candidate_structure_inchikey_connectivity_layer
-    ),
+  anchor_df <- data.frame(
+    anchor_IK = as.character(anchor_tbl[[ik_anchor_col]]),
     anchor_fid = as.character(anchor_tbl$feature_id),
-    anchor_rt = if (has_rt_feature_col) {
-      as.numeric(anchor_tbl$rt)
-    } else {
-      NA_real_
-    },
+    anchor_rt = if (has_rt_feature_col) as.numeric(anchor_tbl$rt) else NA_real_,
     anchor_mass = as.numeric(anchor_tbl[[anchor_mass_col]]),
     stringsAsFactors = FALSE
   )
 
-  row_dt <- row_dt[!is.na(row_dt$row_mass), ]
-  anchor_dt <- anchor_dt[
-    !is.na(anchor_dt$anchor_mass) & !is.na(anchor_dt$anchor_IK),
+  # Drop NA masses/IKs early
+  row_df <- row_df[
+    !is.na(row_df$row_mass) & !is.na(row_df$row_IK),
+    ,
+    drop = FALSE
+  ]
+  anchor_df <- anchor_df[
+    !is.na(anchor_df$anchor_mass) & !is.na(anchor_df$anchor_IK),
+    ,
+    drop = FALSE
   ]
 
-  if (nrow(row_dt) == 0L || nrow(anchor_dt) == 0L) {
+  if (nrow(row_df) == 0L || nrow(anchor_df) == 0L) {
     return(rep(FALSE, nrow(df_tied)))
   }
 
-  anchor_match <- rep(FALSE, nrow(row_dt))
+  # Use rounded mass key to limit join cardinality, then refine with exact tolerance check
+  row_df$row_mass_key <- round(row_df$row_mass, NEUTRAL_MASS_GROUP_DECIMALS)
+  anchor_df$anchor_mass_key <- round(
+    anchor_df$anchor_mass,
+    NEUTRAL_MASS_GROUP_DECIMALS
+  )
 
-  # Pre-group anchors by InChIKey for O(1) lookup
-  anchor_groups <- split(seq_len(nrow(anchor_dt)), anchor_dt$anchor_IK)
-  row_groups <- split(seq_len(nrow(row_dt)), row_dt$row_IK)
+  # Perform exact-key join on IK + rounded-mass key (vectorized merge)
+  merged <- merge(
+    row_df,
+    anchor_df,
+    by.x = c("row_IK", "row_mass_key"),
+    by.y = c("anchor_IK", "anchor_mass_key"),
+    sort = FALSE
+  )
 
-  common_IK <- intersect(names(row_groups), names(anchor_groups))
-  if (length(common_IK) == 0L) {
+  if (nrow(merged) == 0L) {
     return(rep(FALSE, nrow(df_tied)))
   }
 
-  # Pre-sort anchors by mass within each InChIKey group
-  for (ik in common_IK) {
-    anchor_idx <- anchor_groups[[ik]]
-    anchor_mass_sorted <- anchor_dt$anchor_mass[anchor_idx]
-    anchor_order <- order(anchor_mass_sorted)
-    anchor_groups[[ik]] <- list(
-      idx = anchor_idx[anchor_order],
-      mass = anchor_mass_sorted[anchor_order],
-      fid = anchor_dt$anchor_fid[anchor_idx[anchor_order]],
-      rt = anchor_dt$anchor_rt[anchor_idx[anchor_order]]
-    )
+  # Refine by actual mass delta and exclude same-feature anchors
+  merged <- merged[
+    abs(merged$row_mass - merged$anchor_mass) <= tol &
+      merged$row_fid != merged$anchor_fid,
+    ,
+    drop = FALSE
+  ]
+  if (nrow(merged) == 0L) {
+    return(rep(FALSE, nrow(df_tied)))
   }
 
-  # Vectorized matching using findInterval + prefix-count trick (tidytable-friendly)
-  # This avoids data.table and minimizes per-row loops. Strategy:
-  # - For each InChIKey group, anchors are sorted by mass.
-  # - For each tied row, compute start/end anchor indices via findInterval.
-  # - Count anchors in window (end - (start-1)). To exclude anchors with same fid,
-  #   precompute prefix sums per anchor-fid and subtract.
-  # - RT-aware checks perform a per-row small scan only for rows that pass the mass window.
-  for (ik in common_IK) {
-    row_idx <- row_groups[[ik]]
-    anchor_info <- anchor_groups[[ik]]
-
-    row_mass <- row_dt$row_mass[row_idx]
-    row_lower <- row_dt$row_lower[row_idx]
-    row_upper <- row_dt$row_upper[row_idx]
-    row_fids <- row_dt$row_fid[row_idx]
-    row_rts <- row_dt$row_rt[row_idx]
-
-    valid_rows <- which(
-      is.finite(row_mass) & is.finite(row_lower) & is.finite(row_upper)
-    )
-    if (length(valid_rows) == 0L) {
-      next
+  # RT filtering when requested: keep anchors where anchor_rt is NA or within rt_tol
+  if (has_rt_feature_col) {
+    merged <- merged[
+      is.na(merged$anchor_rt) |
+        (!is.na(merged$row_rt) &
+          abs(merged$anchor_rt - merged$row_rt) <= rt_tol),
+      ,
+      drop = FALSE
+    ]
+    if (nrow(merged) == 0L) {
+      return(rep(FALSE, nrow(df_tied)))
     }
-
-    row_idx2 <- row_idx[valid_rows]
-    row_lower2 <- row_lower[valid_rows]
-    row_upper2 <- row_upper[valid_rows]
-    row_fids2 <- row_fids[valid_rows]
-    row_rts2 <- row_rts[valid_rows]
-
-    n_anchor <- length(anchor_info$mass)
-    if (n_anchor == 0L) {
-      next
-    }
-
-    # compute start/end indices in anchor mass vector for each row interval
-    start_idx <- findInterval(
-      row_lower2,
-      anchor_info$mass,
-      left.open = FALSE,
-      rightmost.closed = TRUE
-    ) +
-      1L
-    start_idx <- pmin(pmax(start_idx, 1L), n_anchor + 1L)
-    end_idx <- findInterval(
-      row_upper2,
-      anchor_info$mass,
-      left.open = TRUE,
-      rightmost.closed = TRUE
-    )
-    end_idx[!is.finite(end_idx)] <- 0L
-    end_idx[end_idx < 1L] <- 0L
-    end_idx[end_idx > n_anchor] <- n_anchor
-
-    keep_mask <- start_idx <= end_idx & end_idx >= 1L
-    if (!any(keep_mask)) {
-      next
-    }
-
-    # prepare results arrays aligned with row_idx2
-    matched_local <- rep(FALSE, length(row_idx2))
-
-    # Total anchors in window per row
-    total_in_window <- integer(length(row_idx2))
-    total_in_window[keep_mask] <- end_idx[keep_mask] -
-      (start_idx[keep_mask] - 1L)
-
-    # For exclusion of same-fid anchors: build prefix counts per anchor fid
-    anchor_fids <- anchor_info$fid
-    unique_fids <- unique(anchor_fids)
-    # build a named list of prefix cumulative counts per fid
-    pref_list <- stats::setNames(
-      vector("list", length(unique_fids)),
-      unique_fids
-    )
-    for (fid in unique_fids) {
-      matches <- anchor_fids == fid
-      pref_list[[fid]] <- cumsum(as.integer(matches))
-    }
-
-    # compute same-fid counts per row (vectorized via mapply)
-    same_fid_count <- integer(length(row_idx2))
-    same_idx <- which(keep_mask)
-    if (length(same_idx) > 0L) {
-      same_fid_count[same_idx] <- vapply(
-        same_idx,
-        function(i) {
-          fid <- row_fids2[[i]]
-          if (!fid %in% unique_fids) {
-            return(0L)
-          }
-          s <- start_idx[[i]]
-          e <- end_idx[[i]]
-          if (s > e || e == 0L) {
-            return(0L)
-          }
-          pref <- pref_list[[fid]]
-          left <- if (s > 1L) pref[[s - 1L]] else 0L
-          pref[[e]] - left
-        },
-        integer(1)
-      )
-    }
-
-    # candidate anchors excluding same-fid
-    candidate_count <- total_in_window - same_fid_count
-    matched_local[candidate_count > 0L] <- TRUE
-
-    if (has_rt_feature_col) {
-      # For rows that were matched by mass, additionally require RT condition per-row
-      mass_matched_idx <- which(matched_local)
-      if (length(mass_matched_idx) > 0L) {
-        for (local_i in mass_matched_idx) {
-          i_global <- local_i
-          ri <- row_idx2[[i_global]]
-          s <- start_idx[[local_i]]
-          e <- end_idx[[local_i]]
-          if (s > e) {
-            next
-          }
-          # check anchors in window for RT and different fid
-          anchor_window_idx <- seq.int(s, e)
-          anchor_fids_window <- anchor_info$fid[anchor_window_idx]
-          anchor_rts_window <- anchor_info$rt[anchor_window_idx]
-          # exclude same fid
-          keep_anchor_mask <- anchor_fids_window != row_fids2[[local_i]]
-          if (!any(keep_anchor_mask)) {
-            matched_local[[local_i]] <- FALSE
-            next
-          }
-          if (is.na(row_rts2[[local_i]])) {
-            # if row RT is NA, any anchor with different fid qualifies
-            matched_local[[local_i]] <- TRUE
-            next
-          }
-          anchor_rts_sel <- anchor_rts_window[keep_anchor_mask]
-          # RT OK if anchor_rt is NA or within tolerance
-          rt_ok <- is.na(anchor_rts_sel) |
-            abs(anchor_rts_sel - row_rts2[[local_i]]) <= rt_tol
-          matched_local[[local_i]] <- any(rt_ok)
-        }
-      }
-    }
-
-    # map local matches back to anchor_match vector (row_dt positions)
-    anchor_match[row_dt$row_id[valid_rows][matched_local]] <- TRUE
   }
 
+  matched_row_ids <- unique(merged$row_id)
   out <- rep(FALSE, nrow(df_tied))
-  out[row_dt$row_id] <- anchor_match
+  out[matched_row_ids] <- TRUE
   out
 }
 
