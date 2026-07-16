@@ -363,7 +363,7 @@ filter_ms1_annotations <- function(
   run_ids <- rep(seq_along(rle_keys$lengths), rle_keys$lengths)
 
   # Dense rank per feature: map run_ids to 1..k within each feature in order
-  rank_in_order <- ave(run_ids, feature_ord, FUN = function(x) {
+  rank_in_order <- stats::ave(run_ids, feature_ord, FUN = function(x) {
     match(x, unique(x))
   })
 

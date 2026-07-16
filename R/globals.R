@@ -96,6 +96,7 @@ utils::globalVariables(
     ".row_weight",
     ".rt_err_min",
     ".rt_priority",
+    ".score_w",
     ".score_bio",
     ".score_final",
     ".score_final_coverage",
