@@ -652,6 +652,12 @@ count_candidates <- function(df_ranked, df_percentile) {
 #' @return Data frame with selected ClassyFire label and score
 #' @keywords internal
 compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
+  # Normalize weight inputs: ensure numeric scalar defaults to 0 when NULL or non-numeric
+  w_cla_kin <- if (!is.null(weights$w_cla_kin)) as.numeric(weights$w_cla_kin) else 0
+  w_cla_sup <- if (!is.null(weights$w_cla_sup)) as.numeric(weights$w_cla_sup) else 0
+  w_cla_cla <- if (!is.null(weights$w_cla_cla)) as.numeric(weights$w_cla_cla) else 0
+  w_cla_par <- if (!is.null(weights$w_cla_par)) as.numeric(weights$w_cla_par) else 0
+
   df_pred_tax |>
     tidytable::mutate(
       cla_kin_valid = !is.na(feature_pred_tax_cla_01kin_val) &
@@ -665,22 +671,22 @@ compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
       # Compute weighted score for each level
       ws_kin = tidytable::if_else(
         cla_kin_valid,
-        as.numeric(feature_pred_tax_cla_01kin_score) * weights$w_cla_kin,
+        as.numeric(feature_pred_tax_cla_01kin_score) * w_cla_kin,
         NA_real_
       ),
       ws_sup = tidytable::if_else(
         cla_sup_valid,
-        as.numeric(feature_pred_tax_cla_02sup_score) * weights$w_cla_sup,
+        as.numeric(feature_pred_tax_cla_02sup_score) * w_cla_sup,
         NA_real_
       ),
       ws_cla = tidytable::if_else(
         cla_cla_valid,
-        as.numeric(feature_pred_tax_cla_03cla_score) * weights$w_cla_cla,
+        as.numeric(feature_pred_tax_cla_03cla_score) * w_cla_cla,
         NA_real_
       ),
       ws_par = tidytable::if_else(
         cla_par_valid,
-        as.numeric(feature_pred_tax_cla_04dirpar_score) * weights$w_cla_par,
+        as.numeric(feature_pred_tax_cla_04dirpar_score) * w_cla_par,
         NA_real_
       ),
       # Find which level has max weighted score
@@ -728,6 +734,11 @@ compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
 #' @return Data frame with selected NPClassifier label and score
 #' @keywords internal
 compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
+  # Normalize weight inputs: ensure numeric scalar defaults to 0 when NULL or non-numeric
+  w_npc_pat <- if (!is.null(weights$w_npc_pat)) as.numeric(weights$w_npc_pat) else 0
+  w_npc_sup <- if (!is.null(weights$w_npc_sup)) as.numeric(weights$w_npc_sup) else 0
+  w_npc_cla <- if (!is.null(weights$w_npc_cla)) as.numeric(weights$w_npc_cla) else 0
+
   df_pred_tax |>
     tidytable::mutate(
       npc_pat_valid = !is.na(feature_pred_tax_npc_01pat_val) &
@@ -739,17 +750,17 @@ compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
       # Compute weighted score for each level
       ws_pat = tidytable::if_else(
         npc_pat_valid,
-        as.numeric(feature_pred_tax_npc_01pat_score) * weights$w_npc_pat,
+        as.numeric(feature_pred_tax_npc_01pat_score) * w_npc_pat,
         NA_real_
       ),
       ws_sup = tidytable::if_else(
         npc_sup_valid,
-        as.numeric(feature_pred_tax_npc_02sup_score) * weights$w_npc_sup,
+        as.numeric(feature_pred_tax_npc_02sup_score) * w_npc_sup,
         NA_real_
       ),
       ws_cla = tidytable::if_else(
         npc_cla_valid,
-        as.numeric(feature_pred_tax_npc_03cla_score) * weights$w_npc_cla,
+        as.numeric(feature_pred_tax_npc_03cla_score) * w_npc_cla,
         NA_real_
       ),
       # Find which level has max weighted score
