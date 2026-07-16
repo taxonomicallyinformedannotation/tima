@@ -264,28 +264,17 @@ summarize_results <- function(
           }
         )
 
-      # Select one best row per feature without a global sort: order within each feature group
-      idx_all <- seq_len(nrow(df_joined))
-      groups <- df_joined$feature_id
-      # split indices by feature_id (reasonable for many features; avoids full-table arrange)
-      idx_list <- split(idx_all, groups)
-
-      best_idx <- vapply(
-        idx_list,
-        function(ii) {
-          ord <- order(
-            df_joined$.rank_final_num[ii],
-            df_joined$.score_weighted_chemo_num[ii],
-            df_joined$.score_weighted_chemo_coverage_num[ii],
-            df_joined$.candidate_score_pseudo_initial_num[ii],
-            na.last = TRUE
-          )
-          ii[ord[1]]
-        },
-        integer(1)
-      )
-
-      df_final <- df_joined[unname(best_idx), , drop = FALSE]
+      # Select one best row per feature without a global sort: use grouped slice_head to select best row per feature
+      df_final <- df_joined |>
+        tidytable::group_by(feature_id) |>
+        tidytable::arrange(
+          .rank_final_num,
+          .score_weighted_chemo_num,
+          .score_weighted_chemo_coverage_num,
+          .candidate_score_pseudo_initial_num
+        ) |>
+        tidytable::slice_head(n = 1L) |>
+        tidytable::ungroup()
 
       # remove helper columns
       df_final <- df_final |>
