@@ -555,7 +555,7 @@ sample_candidates_per_group <- function(
 
                 if (length(core_cols) > 0L) {
                   # Create a stable key and remove duplicates preserving the first occurrence
-                  key <- do.call(paste, c(.tbl[core_cols], sep = "\u001f"))
+                  key <- do.call(paste, c(as.data.frame(.tbl)[core_cols], sep = "\u001f"))
                   .tbl <- .tbl[!duplicated(key), , drop = FALSE]
                 } else {
                   # Fallback to removing fully duplicated rows
