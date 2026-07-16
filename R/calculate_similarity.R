@@ -37,29 +37,6 @@
   )
 }
 
-.join_spectra_call <- function(
-  query_spectrum,
-  target_spectrum,
-  dalton,
-  ppm,
-  ...
-) {
-  MsCoreUtils::join(
-    x = query_spectrum[, 1L],
-    y = target_spectrum[, 1L],
-    tolerance = dalton,
-    ppm = ppm,
-    ...
-  )
-}
-
-.gnps_score_call <- function(query_spectrum, target_spectrum, map) {
-  gnps_wrapper(
-    x = query_spectrum[map[[1L]], , drop = FALSE],
-    y = target_spectrum[map[[2L]], , drop = FALSE]
-  )
-}
-
 #' @title Calculate similarity between spectra
 #'
 #' @description Calculates similarity scores between query and
