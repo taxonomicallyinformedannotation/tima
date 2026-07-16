@@ -295,20 +295,18 @@ sample_candidates_per_group <- function(
     }
   }
 
-  # Remove whole adduct groups that have preserved anchors so sampling does not
-  # accidentally drop an anchor
-  anchor_group_keys <- df |>
-    tidytable::filter(.anchor_match) |>
-    tidytable::distinct(feature_id, candidate_adduct)
+  # For groups where any tied row matched a cross-feature anchor, collapse
+  # the tied group to only the matched anchor rows. This avoids ambiguous
+  # anti-joins and preserves expected semantics: keep the anchor row(s), drop
+  # other tied rows in the same (feature_id, candidate_adduct, rank_final).
+  if (any(df$.anchor_match)) {
+    group_key_all <- paste(df$feature_id, df$candidate_adduct, df$rank_final, sep = "\u001f")
+    groups_with_anchor <- unique(group_key_all[df$.anchor_match])
 
-  df_remaining <- if (nrow(anchor_group_keys) > 0L) {
-    df |>
-      tidytable::anti_join(
-        y = anchor_group_keys,
-        by = c("feature_id", "candidate_adduct")
-      )
+    # df_remaining: drop non-anchor rows from groups_with_anchor
+    df_remaining <- df[!(group_key_all %in% groups_with_anchor & !df$.anchor_match), , drop = FALSE]
   } else {
-    df
+    df_remaining <- df
   }
 
   # Count how many distinct tied groups require sampling

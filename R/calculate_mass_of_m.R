@@ -56,6 +56,9 @@
 #' # Doubly charged
 #' calculate_mass_of_m(mz = 62.2311, adduct_string = "[M+2H]2+")
 #' # Expected: ~122.45 Da
+# Simple cache for parsed adducts to accelerate repeated scalar calls
+.adduct_parse_cache <- new.env(parent = emptyenv())
+
 calculate_mass_of_m <- function(
   mz,
   adduct_string,
@@ -79,8 +82,18 @@ calculate_mass_of_m <- function(
   # Validate electron mass
   validate_electron_mass(electron_mass)
 
-  # Parse the adduct string
-  parsed_adduct <- parse_adduct(adduct_string)
+  # Parse the adduct string with a lightweight cache to speed repeated calls
+  parsed_adduct <- NULL
+  if (!is.null(adduct_string) && length(adduct_string) == 1L && !is.na(adduct_string)) {
+    if (exists(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)) {
+      parsed_adduct <- get(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)
+    } else {
+      parsed_adduct <- parse_adduct(adduct_string)
+      assign(adduct_string, parsed_adduct, envir = .adduct_parse_cache)
+    }
+  } else {
+    parsed_adduct <- parse_adduct(adduct_string)
+  }
 
   # Check if parsing failed (all zeros returned)
   if (is_parse_failed(parsed_adduct)) {
@@ -220,7 +233,13 @@ calculate_mass_of_m_batch <- function(
 
     for (i in seq_along(unique_adducts)) {
       a <- unique_adducts[[i]]
-      parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
+      # Use shared cache for parsed adducts
+      if (exists(a, envir = .adduct_parse_cache, inherits = FALSE)) {
+        parsed <- get(a, envir = .adduct_parse_cache, inherits = FALSE)
+      } else {
+        parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
+        if (!is.null(parsed)) assign(a, parsed, envir = .adduct_parse_cache)
+      }
       if (is.null(parsed) || all(parsed == 0L)) {
         next
       }
