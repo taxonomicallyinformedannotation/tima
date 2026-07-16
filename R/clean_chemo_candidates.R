@@ -545,21 +545,21 @@ sample_candidates_per_group <- function(
                 # Deduplicate explicitly by core identity columns to avoid subtle
                 # attribute or column-type differences causing duplicate rows to
                 # persist through tidytable::distinct()
-                core_cols <- c(
-            "feature_id",
-            "candidate_adduct",
-            "rank_final",
-            "candidate_structure_inchikey_connectivity_layer"
-                )
-                core_cols <- core_cols[core_cols %in% names(.tbl)]
-
-                if (length(core_cols) > 0L) {
+                # Only deduplicate by core identity + InChIKey when the InChIKey column is available
+                if ("candidate_structure_inchikey_connectivity_layer" %in% names(.tbl)) {
+                  core_cols <- c(
+                    "feature_id",
+                    "candidate_adduct",
+                    "rank_final",
+                    "candidate_structure_inchikey_connectivity_layer"
+                  )
                   # Create a stable key and remove duplicates preserving the first occurrence
                   key <- do.call(paste, c(as.data.frame(.tbl)[core_cols], sep = "\u001f"))
                   .tbl <- .tbl[!duplicated(key), , drop = FALSE]
                 } else {
-                  # Fallback to removing fully duplicated rows
-                  .tbl <- .tbl[!duplicated(.tbl), , drop = FALSE]
+                  # If no InChIKey column, don't collapse tied candidates — keep rows as-is
+                  # (tests expect tied rows to remain when InChIKey is not available)
+                  .tbl <- .tbl
                 }
                 .tbl
               })()
