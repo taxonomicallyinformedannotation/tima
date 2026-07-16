@@ -541,28 +541,33 @@ sample_candidates_per_group <- function(
           ),
           annotation_note = tidytable::coalesce(annotation_note, NA_character_)
         ) |>
-              (function(.tbl) {
-                # Deduplicate explicitly by core identity columns to avoid subtle
-                # attribute or column-type differences causing duplicate rows to
-                # persist through tidytable::distinct()
-                # Only deduplicate by core identity + InChIKey when the InChIKey column is available
-                if ("candidate_structure_inchikey_connectivity_layer" %in% names(.tbl)) {
-                  core_cols <- c(
-                    "feature_id",
-                    "candidate_adduct",
-                    "rank_final",
-                    "candidate_structure_inchikey_connectivity_layer"
-                  )
-                  # Create a stable key and remove duplicates preserving the first occurrence
-                  key <- do.call(paste, c(as.data.frame(.tbl)[core_cols], sep = "\u001f"))
-                  .tbl <- .tbl[!duplicated(key), , drop = FALSE]
-                } else {
-                  # If no InChIKey column, don't collapse tied candidates — keep rows as-is
-                  # (tests expect tied rows to remain when InChIKey is not available)
-                  .tbl <- .tbl
-                }
-                .tbl
-              })()
+        (function(.tbl) {
+          # Deduplicate explicitly by core identity columns to avoid subtle
+          # attribute or column-type differences causing duplicate rows to
+          # persist through tidytable::distinct()
+          # Only deduplicate by core identity + InChIKey when the InChIKey column is available
+          if (
+            "candidate_structure_inchikey_connectivity_layer" %in% names(.tbl)
+          ) {
+            core_cols <- c(
+              "feature_id",
+              "candidate_adduct",
+              "rank_final",
+              "candidate_structure_inchikey_connectivity_layer"
+            )
+            # Create a stable key and remove duplicates preserving the first occurrence
+            key <- do.call(
+              paste,
+              c(as.data.frame(.tbl)[core_cols], sep = "\u001f")
+            )
+            .tbl <- .tbl[!duplicated(key), , drop = FALSE]
+          } else {
+            # If no InChIKey column, don't collapse tied candidates — keep rows as-is
+            # (tests expect tied rows to remain when InChIKey is not available)
+            .tbl <- .tbl
+          }
+          .tbl
+        })()
     })()
 
   annotation_notes_lookup <- tidytable::tidytable()
