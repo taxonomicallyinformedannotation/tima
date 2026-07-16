@@ -51,7 +51,7 @@ jobs:
         run: |
           # If parallel = TRUE in render_docs()
           # future::plan(future::multicore)
-          install.packages(".", repos = NULL, type = "source")
+          install.packages(".", repos = NULL, type = getOption("pkgType"))
           install.packages("pkgload")
           pkgload::load_all()
           altdoc::render_docs(parallel = FALSE, freeze = FALSE, verbose = TRUE)

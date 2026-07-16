@@ -13,7 +13,7 @@
 validate_install_inputs <- function(
   package,
   repos,
-  type = "source",
+  type = getOption("pkgType"),
   dependencies
 ) {
   if (!is.character(package) || length(package) != 1L || nchar(package) == 0L) {
@@ -110,7 +110,7 @@ validate_install_inputs <- function(
   package,
   repos,
   dependencies,
-  type = "source",
+  type = getOption("pkgType"),
   ...
 ) {
   utils::install.packages(
@@ -391,7 +391,7 @@ verify_package_installation <- function(package) {
 try_install_package <- function(
   package,
   repos,
-  type = "source",
+  type = getOption("pkgType"),
   dependencies
 ) {
   # Check if package was already installed before attempt
@@ -487,7 +487,7 @@ install_tima <- function(
     "https://bioconductor.org/packages/release/bioc",
     "https://cloud.r-project.org"
   ),
-  type = "source",
+  type = getOption("pkgType"),
   dependencies = TRUE
 ) {
   validate_install_inputs(
@@ -598,7 +598,7 @@ install <- function(
     "https://bioconductor.org/packages/release/bioc",
     "https://cloud.r-project.org"
   ),
-  type = "source",
+  type = getOption("pkgType"),
   dependencies = TRUE
 ) {
   lifecycle::deprecate_warn(
