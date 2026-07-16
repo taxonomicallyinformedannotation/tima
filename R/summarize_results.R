@@ -235,7 +235,8 @@ summarize_results <- function(
     if (nrow(df_joined) == 0L) {
       df_final <- df_joined
     } else {
-      df_final <- df_joined |>
+      # Compute numeric keys used for prioritization (keep signs consistent with previous behavior)
+      df_joined <- df_joined |>
         tidytable::mutate(
           .rank_final_num = suppressWarnings(as.integer(rank_final)),
           .score_weighted_chemo_num = if ("score_final" %in% names(df_joined)) {
@@ -261,16 +262,32 @@ summarize_results <- function(
           } else {
             0
           }
-        ) |>
-        tidytable::arrange(
-          feature_id,
-          .rank_final_num,
-          .score_weighted_chemo_num,
-          .score_weighted_chemo_coverage_num,
-          .candidate_score_pseudo_initial_num
-        ) |>
-        tidytable::distinct(feature_id, .keep_all = TRUE)
+        )
 
+      # Select one best row per feature without a global sort: order within each feature group
+      idx_all <- seq_len(nrow(df_joined))
+      groups <- df_joined$feature_id
+      # split indices by feature_id (reasonable for many features; avoids full-table arrange)
+      idx_list <- split(idx_all, groups)
+
+      best_idx <- vapply(
+        idx_list,
+        function(ii) {
+          ord <- order(
+            df_joined$.rank_final_num[ii],
+            df_joined$.score_weighted_chemo_num[ii],
+            df_joined$.score_weighted_chemo_coverage_num[ii],
+            df_joined$.candidate_score_pseudo_initial_num[ii],
+            na.last = TRUE
+          )
+          ii[ord[1]]
+        },
+        integer(1)
+      )
+
+      df_final <- df_joined[unname(best_idx), , drop = FALSE]
+
+      # remove helper columns
       df_final <- df_final |>
         tidytable::select(
           -tidyselect::any_of(c(

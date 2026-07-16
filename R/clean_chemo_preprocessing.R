@@ -319,63 +319,59 @@ filter_ms1_annotations <- function(
     return(df)
   }
 
-  df[[rank_col_name]] <- NA_integer_
+  n <- nrow(df)
+  feature_vec <- as.character(df[["feature_id"]])
 
-  feature_ids <- unique(as.character(df[["feature_id"]]))
-  for (feature_id in feature_ids) {
-    idx <- which(as.character(df[["feature_id"]]) == feature_id)
-    if (length(idx) == 0L) {
-      next
-    }
-
-    # Sort indices by ranking_cols in descending order (higher = better rank)
-    if (length(ranking_cols) > 0L) {
-      # Create a sort key matrix for ordering
-      sort_keys <- lapply(ranking_cols, function(col) {
-        if (col %in% names(df)) {
-          suppressWarnings(as.numeric(df[[col]][idx]))
-        } else {
-          rep(NA_real_, length(idx))
-        }
-      })
-      # Order by all ranking cols descending (higher = better)
-      # Use negative for descending, na.last=TRUE puts NA at end
-      ord <- do.call(
-        order,
-        c(lapply(sort_keys, function(x) -x), list(na.last = TRUE))
-      )
-      idx <- idx[ord]
-    }
-
-    rank_values <- lapply(ranking_cols, function(col) {
-      if (col %in% names(df)) {
-        values <- suppressWarnings(as.numeric(df[[col]][idx]))
-      } else {
-        values <- rep(NA_real_, length(idx))
-      }
-      values[!is.finite(values)] <- NA_real_
-      values <- round(values, 12)
-      ifelse(is.na(values), "<NA>", sprintf("%.12f", values))
-    })
-
-    if (length(idx) == 1L) {
-      column_values <- df[[rank_col_name]]
-      column_values[idx] <- 1L
-      df[[rank_col_name]] <- column_values
-      next
-    }
-
-    signature <- do.call(paste, c(rank_values, list(sep = "\u001f")))
-    signature_changes <- c(
-      TRUE,
-      signature[-1L] != signature[-length(signature)]
-    )
-    column_values <- df[[rank_col_name]]
-    column_values[idx] <- cumsum(signature_changes)
-    df[[rank_col_name]] <- column_values
+  # If no ranking columns provided, everything is rank 1 within feature
+  if (length(ranking_cols) == 0L) {
+    df[[rank_col_name]] <- as.integer(1)
+    return(df)
   }
 
-  df[[rank_col_name]] <- as.integer(df[[rank_col_name]])
+  # Build rounded string signatures for ranking columns (vectorised)
+  ranking_mat <- lapply(ranking_cols, function(col) {
+    if (col %in% names(df)) {
+      vals <- suppressWarnings(as.numeric(df[[col]]))
+      vals[!is.finite(vals)] <- NA_real_
+      vals <- round(vals, 12)
+      ifelse(is.na(vals), "<NA>", sprintf("%.12f", vals))
+    } else {
+      rep("<NA>", n)
+    }
+  })
+  signature <- do.call(paste, c(ranking_mat, list(sep = "\u001f")))
+
+  # Global ordering: by feature_id asc, then ranking cols desc (so best rows come first per feature)
+  order_terms <- c(
+    list(feature_vec),
+    lapply(ranking_cols, function(col) {
+      if (col %in% names(df)) {
+        -suppressWarnings(as.numeric(df[[col]]))
+      } else {
+        rep(NA_real_, n)
+      }
+    })
+  )
+  ord <- do.call(order, c(order_terms, list(na.last = TRUE, method = "radix")))
+
+  feature_ord <- feature_vec[ord]
+  sig_ord <- signature[ord]
+
+  # Run-length encode combined feature+signature to find contiguous identical groups
+  key_ord <- paste(feature_ord, sig_ord, sep = "\u0002")
+  rle_keys <- rle(key_ord)
+  run_ids <- rep(seq_along(rle_keys$lengths), rle_keys$lengths)
+
+  # Dense rank per feature: map run_ids to 1..k within each feature in order
+  rank_in_order <- ave(run_ids, feature_ord, FUN = function(x) {
+    match(x, unique(x))
+  })
+
+  # Map ranks back to original row order
+  ranks_orig <- integer(n)
+  ranks_orig[ord] <- as.integer(rank_in_order)
+
+  df[[rank_col_name]] <- ranks_orig
   df
 }
 

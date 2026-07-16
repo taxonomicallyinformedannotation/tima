@@ -110,7 +110,13 @@
     )
   }
 
-  # Vectorized matching using findInterval
+  # Vectorized matching using findInterval + prefix-count trick (tidytable-friendly)
+  # This avoids data.table and minimizes per-row loops. Strategy:
+  # - For each InChIKey group, anchors are sorted by mass.
+  # - For each tied row, compute start/end anchor indices via findInterval.
+  # - Count anchors in window (end - (start-1)). To exclude anchors with same fid,
+  #   precompute prefix sums per anchor-fid and subtract.
+  # - RT-aware checks perform a per-row small scan only for rows that pass the mass window.
   for (ik in common_IK) {
     row_idx <- row_groups[[ik]]
     anchor_info <- anchor_groups[[ik]]
@@ -128,16 +134,20 @@
       next
     }
 
-    row_idx <- row_idx[valid_rows]
-    row_mass <- row_mass[valid_rows]
-    row_lower <- row_lower[valid_rows]
-    row_upper <- row_upper[valid_rows]
-    row_fids <- row_fids[valid_rows]
-    row_rts <- row_rts[valid_rows]
+    row_idx2 <- row_idx[valid_rows]
+    row_lower2 <- row_lower[valid_rows]
+    row_upper2 <- row_upper[valid_rows]
+    row_fids2 <- row_fids[valid_rows]
+    row_rts2 <- row_rts[valid_rows]
 
     n_anchor <- length(anchor_info$mass)
+    if (n_anchor == 0L) {
+      next
+    }
+
+    # compute start/end indices in anchor mass vector for each row interval
     start_idx <- findInterval(
-      row_lower,
+      row_lower2,
       anchor_info$mass,
       left.open = FALSE,
       rightmost.closed = TRUE
@@ -145,7 +155,7 @@
       1L
     start_idx <- pmin(pmax(start_idx, 1L), n_anchor + 1L)
     end_idx <- findInterval(
-      row_upper,
+      row_upper2,
       anchor_info$mass,
       left.open = TRUE,
       rightmost.closed = TRUE
@@ -159,62 +169,93 @@
       next
     }
 
-    row_idx <- row_idx[keep_mask]
-    row_fids <- row_fids[keep_mask]
-    row_rts <- row_rts[keep_mask]
-    start_idx <- start_idx[keep_mask]
-    end_idx <- end_idx[keep_mask]
+    # prepare results arrays aligned with row_idx2
+    matched_local <- rep(FALSE, length(row_idx2))
+
+    # Total anchors in window per row
+    total_in_window <- integer(length(row_idx2))
+    total_in_window[keep_mask] <- end_idx[keep_mask] -
+      (start_idx[keep_mask] - 1L)
+
+    # For exclusion of same-fid anchors: build prefix counts per anchor fid
+    anchor_fids <- anchor_info$fid
+    unique_fids <- unique(anchor_fids)
+    # build a named list of prefix cumulative counts per fid
+    pref_list <- stats::setNames(
+      vector("list", length(unique_fids)),
+      unique_fids
+    )
+    for (fid in unique_fids) {
+      matches <- anchor_fids == fid
+      pref_list[[fid]] <- cumsum(as.integer(matches))
+    }
+
+    # compute same-fid counts per row (vectorized via mapply)
+    same_fid_count <- integer(length(row_idx2))
+    same_idx <- which(keep_mask)
+    if (length(same_idx) > 0L) {
+      same_fid_count[same_idx] <- vapply(
+        same_idx,
+        function(i) {
+          fid <- row_fids2[[i]]
+          if (!fid %in% unique_fids) {
+            return(0L)
+          }
+          s <- start_idx[[i]]
+          e <- end_idx[[i]]
+          if (s > e || e == 0L) {
+            return(0L)
+          }
+          pref <- pref_list[[fid]]
+          left <- if (s > 1L) pref[[s - 1L]] else 0L
+          pref[[e]] - left
+        },
+        integer(1)
+      )
+    }
+
+    # candidate anchors excluding same-fid
+    candidate_count <- total_in_window - same_fid_count
+    matched_local[candidate_count > 0L] <- TRUE
 
     if (has_rt_feature_col) {
-      # RT-aware matching: check if any anchor in window has different fid and matching RT
-      for (ri in seq_along(row_idx)) {
-        if (is.na(row_rts[[ri]])) {
-          anchor_match[row_idx[[ri]]] <- TRUE
-          next
-        }
-
-        candidate_start <- start_idx[[ri]]
-        candidate_end <- end_idx[[ri]]
-        if (candidate_start > candidate_end) {
-          next
-        }
-
-        anchor_window <- seq.int(candidate_start, candidate_end)
-        candidate_anchor_fids <- anchor_info$fid[anchor_window]
-        candidate_anchor_rts <- anchor_info$rt[anchor_window]
-        keep_mask_inner <- candidate_anchor_fids != row_fids[[ri]]
-        candidate_anchor_fids <- candidate_anchor_fids[keep_mask_inner]
-        candidate_anchor_rts <- candidate_anchor_rts[keep_mask_inner]
-
-        if (length(candidate_anchor_fids) == 0L) {
-          next
-        }
-
-        rt_ok <- is.na(candidate_anchor_rts) |
-          abs(candidate_anchor_rts - row_rts[[ri]]) <= rt_tol
-        if (any(rt_ok)) {
-          anchor_match[row_idx[[ri]]] <- TRUE
-        }
-      }
-    } else {
-      # No RT column: just check for any anchor with different fid
-      for (ri in seq_along(row_idx)) {
-        candidate_start <- start_idx[[ri]]
-        candidate_end <- end_idx[[ri]]
-        if (candidate_start > candidate_end) {
-          next
-        }
-
-        anchor_window <- seq.int(candidate_start, candidate_end)
-        candidate_anchor_fids <- anchor_info$fid[anchor_window]
-        candidate_anchor_fids <- candidate_anchor_fids[
-          candidate_anchor_fids != row_fids[[ri]]
-        ]
-        if (length(candidate_anchor_fids) > 0L) {
-          anchor_match[row_idx[[ri]]] <- TRUE
+      # For rows that were matched by mass, additionally require RT condition per-row
+      mass_matched_idx <- which(matched_local)
+      if (length(mass_matched_idx) > 0L) {
+        for (local_i in mass_matched_idx) {
+          i_global <- local_i
+          ri <- row_idx2[[i_global]]
+          s <- start_idx[[local_i]]
+          e <- end_idx[[local_i]]
+          if (s > e) {
+            next
+          }
+          # check anchors in window for RT and different fid
+          anchor_window_idx <- seq.int(s, e)
+          anchor_fids_window <- anchor_info$fid[anchor_window_idx]
+          anchor_rts_window <- anchor_info$rt[anchor_window_idx]
+          # exclude same fid
+          keep_anchor_mask <- anchor_fids_window != row_fids2[[local_i]]
+          if (!any(keep_anchor_mask)) {
+            matched_local[[local_i]] <- FALSE
+            next
+          }
+          if (is.na(row_rts2[[local_i]])) {
+            # if row RT is NA, any anchor with different fid qualifies
+            matched_local[[local_i]] <- TRUE
+            next
+          }
+          anchor_rts_sel <- anchor_rts_window[keep_anchor_mask]
+          # RT OK if anchor_rt is NA or within tolerance
+          rt_ok <- is.na(anchor_rts_sel) |
+            abs(anchor_rts_sel - row_rts2[[local_i]]) <= rt_tol
+          matched_local[[local_i]] <- any(rt_ok)
         }
       }
     }
+
+    # map local matches back to anchor_match vector (row_dt positions)
+    anchor_match[row_dt$row_id[valid_rows][matched_local]] <- TRUE
   }
 
   out <- rep(FALSE, nrow(df_tied))
@@ -479,97 +520,70 @@ sample_candidates_per_group <- function(
       tidytable::mutate(n_per_score = .n_per_score) |>
       tidytable::select(-.n_per_score)
 
-    # Use tidytable for deterministic grouped sampling after ordering
+    # Use direct ordering without creating temporary columns to reduce copies
     df_ns <- df_needs_sampling
 
-    # Create temporary ordering columns (negative values so ascending sort prefers high scores)
+    # Build order terms inline to avoid materializing temporary columns
+    ord_list <- list(
+      df_ns$feature_id,
+      df_ns$candidate_adduct,
+      df_ns$rank_final
+    )
     if ("candidate_score_similarity" %in% names(df_ns)) {
-      df_ns <- df_ns |>
-        tidytable::mutate(.ord1 = -as.numeric(candidate_score_similarity))
+      ord_list[[length(ord_list) + 1L]] <- -as.numeric(
+        df_ns$candidate_score_similarity
+      )
     }
     if ("candidate_score_sirius_csi" %in% names(df_ns)) {
-      df_ns <- df_ns |>
-        tidytable::mutate(.ord2 = -as.numeric(candidate_score_sirius_csi))
+      ord_list[[length(ord_list) + 1L]] <- -as.numeric(
+        df_ns$candidate_score_sirius_csi
+      )
     }
     if ("candidate_score_sirius_confidence" %in% names(df_ns)) {
-      df_ns <- df_ns |>
-        tidytable::mutate(
-          .ord3 = -as.numeric(candidate_score_sirius_confidence)
-        )
+      ord_list[[length(ord_list) + 1L]] <- -as.numeric(
+        df_ns$candidate_score_sirius_confidence
+      )
     }
     if (has_rt_col) {
-      df_ns <- df_ns |> tidytable::mutate(.ord_rt = -as.integer(.rt_priority))
+      ord_list[[length(ord_list) + 1L]] <- -as.integer(
+        !is.na(df_ns$candidate_structure_error_rt)
+      )
     }
     if ("cluster_consensus_promoted_from_anchor" %in% names(df_ns)) {
-      df_ns <- df_ns |>
-        tidytable::mutate(
-          .ord_cons = -as.integer(
-            !is.na(cluster_consensus_promoted_from_anchor) &
-              cluster_consensus_promoted_from_anchor
-          )
-        )
+      ord_list[[length(ord_list) + 1L]] <- -as.integer(
+        !is.na(df_ns$cluster_consensus_promoted_from_anchor) &
+          df_ns$cluster_consensus_promoted_from_anchor
+      )
     }
     if ("score_weighted_chemo" %in% names(df_ns)) {
-      df_ns <- df_ns |>
-        tidytable::mutate(.ord_sc = -as.numeric(score_weighted_chemo))
+      ord_list[[length(ord_list) + 1L]] <- -as.numeric(
+        df_ns$score_weighted_chemo
+      )
     }
     if ("score_weighted_chemo_coverage" %in% names(df_ns)) {
-      df_ns <- df_ns |>
-        tidytable::mutate(.ord_cov = -as.numeric(score_weighted_chemo_coverage))
+      ord_list[[length(ord_list) + 1L]] <- -as.numeric(
+        df_ns$score_weighted_chemo_coverage
+      )
     }
     if ("candidate_score_pseudo_initial" %in% names(df_ns)) {
-      df_ns <- df_ns |>
-        tidytable::mutate(.ord_pi = -as.numeric(candidate_score_pseudo_initial))
+      ord_list[[length(ord_list) + 1L]] <- -as.numeric(
+        df_ns$candidate_score_pseudo_initial
+      )
     }
 
-    # Determine ordering columns present
-    ord_cols <- intersect(
-      c(
-        '.ord1',
-        '.ord2',
-        '.ord3',
-        '.ord_rt',
-        '.ord_cons',
-        '.ord_sc',
-        '.ord_cov',
-        '.ord_pi'
-      ),
-      names(df_ns)
-    )
-
-    # Order by grouping keys and the computed ordering columns
-    order_terms <- c('feature_id', 'candidate_adduct', 'rank_final', ord_cols)
-    ord_list <- lapply(order_terms, function(x) df_ns[[x]])
+    # Perform a single global order
     ord <- do.call(order, c(ord_list, list(na.last = TRUE, method = "radix")))
     df_ns <- df_ns[ord, , drop = FALSE]
 
     # Keep top `max_per_score` within each tied score group (feature_id, candidate_adduct, rank_final)
-    df_sampled <- df_ns |>
-      tidytable::group_by(feature_id, candidate_adduct, rank_final) |>
-      tidytable::slice_head(n = max_per_score) |>
-      tidytable::ungroup()
-
-    # Clean temporary ordering columns
-    tmp_ord_cols <- intersect(
-      c(
-        '.ord1',
-        '.ord2',
-        '.ord3',
-        '.ord_rt',
-        '.ord_cons',
-        '.ord_sc',
-        '.ord_cov',
-        '.ord_pi'
-      ),
-      names(df_sampled)
+    group_key <- paste(
+      df_ns$feature_id,
+      df_ns$candidate_adduct,
+      df_ns$rank_final,
+      sep = "\u001f"
     )
-    if (length(tmp_ord_cols) > 0) {
-      df_sampled <- df_sampled |>
-        tidytable::select(-tidyselect::all_of(tmp_ord_cols))
-    }
-    if ('.rt_priority' %in% names(df_sampled)) {
-      df_sampled <- df_sampled |> tidytable::select(-.rt_priority)
-    }
+    seq_in_group <- ave(group_key, group_key, FUN = seq_along)
+    df_sampled <- df_ns[seq_in_group <= max_per_score, , drop = FALSE]
 
     # Ensure tidytable result
     df_sampled <- tidytable::as_tidytable(df_sampled)
@@ -1297,6 +1311,8 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
 
   # For each (component_id, .candidate_M_key) group with rank_final == 1
   # identify the anchor InChIKey from the best-scored feature
+  # Compute anchor per (component_id, .candidate_M_key) by choosing the best-scored rank-1 row.
+  # Use grouped slice_head to avoid global sorts where possible.
   anchor_lookup <- df_with_comp |>
     tidytable::filter(
       rank_final == 1L,
@@ -1304,13 +1320,14 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
       !is.na(.candidate_M_key),
       !is.na(candidate_structure_inchikey_connectivity_layer)
     ) |>
+    tidytable::mutate(.score_w = as.numeric(score_weighted_chemo)) |>
+    tidytable::group_by(component_id, .candidate_M_key) |>
     tidytable::arrange(
-      component_id,
-      .candidate_M_key,
       tidytable::desc(.has_ms2_evidence),
-      tidytable::desc(score_weighted_chemo)
+      tidytable::desc(.score_w)
     ) |>
-    tidytable::distinct(component_id, .candidate_M_key, .keep_all = TRUE) |>
+    tidytable::slice_head(n = 1L) |>
+    tidytable::ungroup() |>
     tidytable::select(
       component_id,
       .candidate_M_key,
