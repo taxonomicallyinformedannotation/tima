@@ -545,10 +545,12 @@ sample_candidates_per_group <- function(
         # attribute or column-type differences causing duplicate rows to
         # persist through tidytable::distinct()
         tidytable::distinct(
-          feature_id,
-          candidate_adduct,
-          rank_final,
-          candidate_structure_inchikey_connectivity_layer,
+          tidyselect::any_of(c(
+            "feature_id",
+            "candidate_adduct",
+            "rank_final",
+            "candidate_structure_inchikey_connectivity_layer"
+          )),
           .keep_all = TRUE
         )
     })()
