@@ -191,22 +191,20 @@ calculate_similarity <- function(
     return(if (return_matched_peaks) result else result[1L])
   }
 
-  # Cosine: two-step join + score
-  map <- tryCatch(
-    .join_spectra_call(query_spectrum, target_spectrum, dalton, ppm, ...),
-    error = function(e) {
-      log_warn("Peak matching failed: %s", e$message)
-      list(integer(0L), integer(0L))
-    }
-  )
-
+  # Cosine: use fused GNPS chain DP for matching + scoring (same as GNPS)
   result <- tryCatch(
-    .gnps_score_call(query_spectrum, target_spectrum, map),
+    .gnps_chain_dp_call(
+      query_spectrum = query_spectrum,
+      target_spectrum = target_spectrum,
+      query_precursor = query_precursor,
+      target_precursor = target_precursor,
+      dalton = dalton,
+      ppm = ppm
+    ),
     error = function(e) {
       log_warn("Similarity calculation failed: %s", e$message)
       c(0.0, 0, 0.0, 0.0)
     }
   )
-
-  if (return_matched_peaks) result else result[1L]
+  return(if (return_matched_peaks) result else result[1L])
 }
