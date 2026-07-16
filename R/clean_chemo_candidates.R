@@ -562,7 +562,7 @@ sample_candidates_per_group <- function(
                   .tbl <- .tbl[!duplicated(.tbl), , drop = FALSE]
                 }
                 .tbl
-              })(.)
+              })()
     })()
 
   annotation_notes_lookup <- tidytable::tidytable()
