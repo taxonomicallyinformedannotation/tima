@@ -123,13 +123,25 @@ adduct_to_string <- function(
 #' at least 0), used to enumerate carrier multisets with replacement.
 #' @keywords internal
 .compositions <- function(target, k) {
+  # Return a tidytable with unique, deterministic column names V1..Vk for
+  # k parts. The previous implementation used cbind(i, sub) which could
+  # produce duplicate column names ('i') when 'sub' contained a column named
+  # 'i'. That triggered tibble name-repair messages. Use explicit column
+  # naming to avoid duplicate names.
   if (k == 1L) {
-    return(tidytable::tidytable(x = as.integer(target)))
+    return(tidytable::tidytable(V1 = as.integer(target)))
   }
+
   out <- vector("list", target + 1L)
   for (i in seq.int(0L, target)) {
     sub <- .compositions(target - i, k - 1L)
-    out[[i + 1L]] <- cbind(i, sub)
+    # Ensure sub columns are renamed to V2..V(k) so binding is deterministic
+    sub_df <- as.data.frame(sub, stringsAsFactors = FALSE)
+    if (ncol(sub_df) > 0L) {
+      colnames(sub_df) <- paste0("V", seq.int(2L, ncol(sub_df) + 1L))
+    }
+    first_col <- data.frame(V1 = as.integer(i), stringsAsFactors = FALSE)
+    out[[i + 1L]] <- cbind(first_col, sub_df)
   }
   tidytable::bind_rows(out)
 }
