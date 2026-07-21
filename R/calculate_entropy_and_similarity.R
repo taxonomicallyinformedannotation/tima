@@ -2,18 +2,19 @@
 
 #' Count matched peaks between query and library spectra
 #' @keywords internal
-.count_matched_peaks <- function(query_mz, lib_mz, dalton, ppm) {
-  if (length(query_mz) == 0 || length(lib_mz) == 0) {
+#'
+#' This implementation assumes lib_mz_sorted is already sorted. Sorting per-call
+#' was a hotspot when called many times; we pre-sort library m/z once and cache
+#' it instead.
+.count_matched_peaks <- function(query_mz, lib_mz_sorted, dalton, ppm) {
+  if (length(query_mz) == 0 || length(lib_mz_sorted) == 0) {
     return(0L)
   }
-
-  # Sort library m/z for binary search
-  lib_mz_sorted <- sort(lib_mz)
 
   # Calculate tolerances for all query peaks at once
   tolerances <- pmax(dalton, ppm * query_mz * 1E-6)
 
-  # Use findInterval for fast binary search
+  # Use findInterval for fast binary search on the pre-sorted vector
   lower_bounds <- query_mz - tolerances
   upper_bounds <- query_mz + tolerances
   low_idx <- findInterval(lower_bounds, lib_mz_sorted)
@@ -148,6 +149,8 @@ calculate_entropy_and_similarity <- function(
   # Lazy cache for neutral precursor conversions (filled on first use)
   lib_neutral_precursors <- rep(NA_real_, n_lib)
   adduct_cache <- new.env(parent = emptyenv())
+  # Cache sorted m/z vectors for library spectra to avoid repeated sorts
+  lib_mz_sorted_list <- vector("list", n_lib)
 
   ensure_query_ready <- function(idx) {
     if (!query_checked[[idx]]) {
@@ -192,6 +195,9 @@ calculate_entropy_and_similarity <- function(
         lib_entropy[[idx]] <<- msentropy::calculate_spectral_entropy(
           lib_spectra[[idx]]
         )
+        # Cache sorted m/z vector for this library spectrum to avoid
+        # re-sorting inside tight loops.
+        lib_mz_sorted_list[[idx]] <<- sort(lib_spectra[[idx]][, 1L])
       }
       lib_checked[[idx]] <<- TRUE
     }
@@ -296,9 +302,11 @@ calculate_entropy_and_similarity <- function(
             dalton = dalton,
             ppm = ppm
           ))
+          # Use cached sorted m/z vector for the library spectrum to
+          # avoid sorting inside the tight loop.
           matched_counts[[pos_idx]] <- .count_matched_peaks(
             q_mz,
-            lib_spectrum[, 1L],
+            lib_mz_sorted_list[[lib_idx]],
             dalton,
             ppm
           )
