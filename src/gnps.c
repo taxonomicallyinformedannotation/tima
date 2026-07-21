@@ -3,12 +3,11 @@
  * @brief GNPS modified cosine similarity - chain-DP matching, thread-local
  *        reusable scratch buffers, optional OpenMP batch scoring.
  *
- * Same algorithm as the original implementation (see ALGORITHM section
- * below), with the memory management and hot-loop arithmetic reworked so
- * this can be called many times in a row - or from multiple OpenMP threads
- * at once - without the per-call malloc/free churn and redundant
- * recomputation that made the original slow on platforms with a weaker
- * allocator (notably macOS, relative to glibc).
+ * Same algorithm as the original file (chain-DP matching described below),
+ * with the memory management and hot-loop arithmetic reworked so this can
+ * be called many times in a row - or from multiple OpenMP threads at once
+ * - without the per-call malloc/free churn and redundant recomputation
+ * that made the original slow on platforms with a weaker allocator.
  *
  * PREREQUISITES - spectra must be sanitized before calling any of this:
  *   - unique m/z values (no two peaks in the same spectrum within
@@ -21,9 +20,9 @@
  * spectrum. An unsanitized spectrum won't error out, it'll just give you a
  * wrong score silently.
  *
- * -------------------------------------------------------------------------
+ * ─────────────────────────────────────────────────────────────────────────
  * WHY THIS IS FASTER THAN THE ORIGINAL
- * -------------------------------------------------------------------------
+ * ─────────────────────────────────────────────────────────────────────────
  *
  * 1. No more per-call heap traffic. score_matched() used to malloc/calloc
  *    its workspace fresh on every invocation and free it at the end - fine
@@ -36,60 +35,63 @@
  *    zero allocation.
  *
  * 2. The conflict bitsets (x_dirty/y_dirty) used to be allocated on every
- *    call even though conflicts only happen on maybe 1% of pairs in real
- *    spectral libraries - so 99% of that allocation was pure waste, since
- *    the bitsets are never even read on the no-conflict path. Now a cheap
- *    allocation-free scan checks whether a conflict exists at all first,
- *    and only touches the bitset scratch if it does.
+ *    call even though, per the comments below, conflicts only happen on
+ *    maybe 1% of pairs - so 99% of that allocation was pure waste, since
+ *    the bitsets are never even read on the no-conflict path. Now we do a
+ *    cheap allocation-free scan first to check whether a conflict exists
+ *    at all, and only touch the bitset scratch if it does.
  *
  * 3. The per-element tolerance (tol + ppm*mz*1e-6 + eps) and the shifted
  *    m/z value used to get recomputed every time the sliding window
- *    revisited a peak. Now each is computed once per peak into a small
- *    array and reused for the rest of the match. Same idea for scoring:
- *    sqrt(x_int) and sqrt(y_int) used to get recomputed per candidate
- *    match; now each is computed once (pre-scaled by 1/sqrt(sum)) and
- *    scoring a pair is just one multiply, no sqrt in the loop at all.
+ *    revisited a peak - which, depending on how much the windows overlap
+ *    across different y[j], could mean the same multiplication happening
+ *    several times. Now it's computed once per peak into a small array and
+ *    reused for the rest of the match. Same for the score itself: sqrt(x)
+ *    and sqrt(y) used to get recomputed per candidate match; now each is
+ *    computed once (scaled by 1/sqrt(sum) up front) and scoring a pair is
+ *    just one multiply.
  *
- * Numerically this agrees with the original to floating-point rounding,
- * not necessarily bit-for-bit: the match *decisions* use the exact same
- * arithmetic in the exact same order, but the score itself reassociates
- * sqrt(xi)*inv_sx*sqrt(yj)*inv_sy as (sqrt(xi)*inv_sx) * (sqrt(yj)*inv_sy)
- * instead of one long left-to-right chain. Expect agreement to ~1e-14
- * relative.
+ * Numerically this should agree with the original to within floating-point
+ * rounding (same formula, same order of operations for the match decisions
+ * - the only reassociation is in the score itself: sqrt(xi)*inv_sx*sqrt(yj)
+ * *inv_sy computed as (sqrt(xi)*inv_sx) * (sqrt(yj)*inv_sy) instead of one
+ * long left-to-right chain). Expect agreement to ~1e-14 relative, not
+ * necessarily bit-identical.
  *
- * -------------------------------------------------------------------------
+ * ─────────────────────────────────────────────────────────────────────────
  * THREADING
- * -------------------------------------------------------------------------
+ * ─────────────────────────────────────────────────────────────────────────
  *
- * All scratch state is thread-local (_Thread_local / __thread), so each
- * OpenMP or pthread worker gets its own copy automatically - no locks, no
- * false sharing, and each thread's buffers grow and settle independently
- * the same way they would in a single-threaded run. Forked worker
- * processes (future::multicore, mclapply) were already fine before this
- * change, since fork() duplicates the whole address space.
+ * All scratch state below is thread-local (_Thread_local / __thread), so
+ * each OpenMP or pthread worker gets its own copy automatically - no locks,
+ * no false sharing between threads, and each thread's buffers grow and
+ * settle independently the same way they would in a single-threaded run.
+ * Forked worker processes (future::multicore, mclapply) were already fine
+ * before this change, since fork() duplicates the whole address space.
  *
  * The one thing to watch: R's C API (error(), allocVector(), etc.) is not
  * thread-safe and must only ever be called from R's main thread. None of
  * the functions meant to run inside a parallel region here (score_matched,
  * gnps_chain_dp_core_api, gnps_chain_dp_batch_core_api, and the allocation
- * helpers they use) touch the R API - an allocation failure in that path
- * just prints to stderr and abort()s the process rather than longjmp'ing
+ * helpers they use) touch the R API - allocation failures in that path
+ * just print to stderr and abort() the process rather than longjmp'ing
  * through R's error handling from a foreign thread. The SEXP-facing
- * wrappers (C_gnps_chain_dp and friends) remain main-thread-only, exactly
- * as they always were.
+ * wrappers (C_gnps_chain_dp and friends) are unchanged and remain
+ * main-thread-only, as they always were.
  *
- * gnps_chain_dp_batch_core_api() is the actual hook for parallelism: given
- * one query spectrum and a batch of library spectra, it runs the per-pair
- * comparisons under `#pragma omp parallel for`. Compiling with OpenMP
- * disabled is harmless - the pragma is just ignored and it runs serially.
- * To turn OpenMP on for real, the package's Makevars needs:
+ * gnps_chain_dp_batch_core_api() below is the actual hook for parallelism:
+ * given one query spectrum and a batch of library spectra, it runs the
+ * per-pair comparisons under `#pragma omp parallel for`. Compiling with
+ * OpenMP disabled is harmless - the pragma is just ignored and it runs
+ * serially, same as before. To turn OpenMP on for real, the package's
+ * Makevars needs something like:
  *   PKG_CFLAGS += $(SHLIB_OPENMP_CFLAGS)
  *   PKG_LIBS   += $(SHLIB_OPENMP_CFLAGS)
- * per CRAN's portable-OpenMP recommendation in Writing R Extensions.
+ * (per CRAN's portable-OpenMP recommendation in Writing R Extensions).
  *
- * -------------------------------------------------------------------------
+ * ─────────────────────────────────────────────────────────────────────────
  * ALGORITHM - chain-DP optimal assignment
- * -------------------------------------------------------------------------
+ * ─────────────────────────────────────────────────────────────────────────
  *
  * When spectra are sanitized, the bipartite match graph between two
  * spectra decomposes into simple chains rather than an arbitrary network.
@@ -115,7 +117,7 @@
  *            exactly with the Hungarian algorithm - O(k^3) on a tiny
  *            matrix instead of O(n^3) on the whole thing.
  *
- *   score(i,j) = sqrt(x_int[i])/sqrt(sum_x) * sqrt(y_int[j])/sqrt(sum_y)
+ * score(i,j) = sqrt(x_int[i])/sqrt(sum_x) * sqrt(y_int[j])/sqrt(sum_y)
  *
  * References:
  *   Wang M, Carver JJ, Phelan VV, et al. (2016). Sharing and community
@@ -123,9 +125,9 @@
  *   Dührkop K et al. (2019). SIRIUS 4. Nat Methods 16:299. (chain-DP idea
  *   taken from SIRIUS's FastCosine implementation.)
  *
- * Exported (R-facing, see the `#if GNPS_HAS_R_API` block near the bottom):
+ * Exported:
  *   gnps_chain_dp(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
- *     single-pair fused join+score, the hot path.
+ *     single-pair fused join+score, the hot path above.
  *   gnps_chain_dp_batch(x, xPrecursorMz, y_list, yPrecursorMz, tol, ppm)
  *     one query against a batch of library spectra, OpenMP-parallel.
  *   gnps(x, y) / join_gnps(x, y, ...)
@@ -162,16 +164,10 @@
 
 #include "gnps_portable.h"
 
-/**
- * @def GNPS_TLS
- * @brief Thread-local storage qualifier for the per-thread scratch state.
- *
- * Prefers C11 `_Thread_local`, falls back to the GNU `__thread` extension,
- * and finally degrades to a plain (non-thread-local) declaration if
- * neither is available - at that point the compiler doesn't support
- * OpenMP either, so a single shared instance is equivalent to a
- * thread-local one.
- */
+/* Thread-local storage qualifier. Falls back to a plain static if the
+ * compiler has neither C11 _Thread_local nor the GNU __thread extension -
+ * at that point you're single-threaded anyway (no OpenMP support without
+ * one of these), so a plain global is equivalent. */
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_THREADS__)
 #  define GNPS_TLS _Thread_local
 #elif defined(__GNUC__) || defined(__clang__)
@@ -179,6 +175,17 @@
 #else
 #  define GNPS_TLS
 #endif
+
+/* Whether it's currently safe to call R's error(). R's C API - including
+ * error(), which unwinds via longjmp - is only safe to call from R's main
+ * thread. Safe whenever we're compiled against the R API and not
+ * currently inside an OpenMP parallel region; without OpenMP compiled in
+ * there's no "inside a parallel region" to worry about, so always safe
+ * then; without the R API at all, there's no error() to call regardless.
+ *
+ * This is what keeps allocation-failure handling both CRAN-compliant (no
+ * abort()/stderr in the compiled object - see "Writing R Extensions") and
+ * safe under OpenMP (no error() from a worker thread). */
 
 /**
  * @brief Report an allocation failure and terminate the process.
@@ -194,10 +201,20 @@
  * @param msg Short description of what failed.
  * @param n   Size in bytes that was requested (for diagnostics only).
  */
-static void gnps_fatal(const char *msg, size_t n) {
-    fprintf(stderr, "gnps fatal: %s (%zu bytes)\n", msg, n);
-    abort();
+static int gnps_safe_to_call_r_error(void) {
+#if GNPS_HAS_R_API
+#ifdef _OPENMP
+    return !omp_in_parallel();
+#else
+    return 1;
+#endif
+#else
+    return 0;
+#endif
 }
+
+/* malloc()/calloc() that report failure via R's error() when that's safe
+ * (see above) and return NULL otherwise, for the caller to handle. */
 
 /**
  * @brief `malloc()` that never returns NULL - aborts via gnps_fatal() on
@@ -207,8 +224,12 @@ static void gnps_fatal(const char *msg, size_t n) {
  */
 static void *xmalloc(size_t n) {
     void *p = malloc(n);
-    if (!p) gnps_fatal("malloc failed", n);
-    return p;
+    if (p) return p;
+#if GNPS_HAS_R_API
+    if (gnps_safe_to_call_r_error())
+        error("gnps: memory allocation failed (%zu bytes)", n);
+#endif
+    return NULL;
 }
 
 /**
@@ -220,9 +241,22 @@ static void *xmalloc(size_t n) {
  */
 static void *xcalloc(size_t n, size_t s) {
     void *p = calloc(n, s);
-    if (!p) gnps_fatal("calloc failed", n * s);
-    return p;
+    if (p) return p;
+#if GNPS_HAS_R_API
+    if (gnps_safe_to_call_r_error())
+        error("gnps: memory allocation failed (%zu bytes)", n * s);
+#endif
+    return NULL;
 }
+
+/* Grow *ptr to at least need_bytes via realloc, ~1.5x amortized so we're
+ * not reallocating every call as spectrum sizes creep up. No-op (instant
+ * success) once the buffer's already big enough - that's the
+ * steady-state, zero-allocation path this whole rewrite exists for.
+ *
+ * On failure: reports via R's error() when safe to do so, and always
+ * returns 0 - the existing buffer/capacity are left untouched, so the
+ * caller must check the return value and bail rather than assume it grew. */
 
 /**
  * @brief Grow a scratch buffer in place, reusing it across calls.
@@ -238,20 +272,25 @@ static void *xcalloc(size_t n, size_t s) {
  *                   (in/out).
  * @param need_bytes Minimum capacity required after this call.
  */
-static void scratch_ensure(void **ptr, size_t *cap_bytes, size_t need_bytes) {
-    if (need_bytes <= *cap_bytes) return;
+static int scratch_ensure(void **ptr, size_t *cap_bytes, size_t need_bytes) {
+    if (need_bytes <= *cap_bytes) return 1;
     size_t new_cap = *cap_bytes ? *cap_bytes : (size_t) 64;
     while (new_cap < need_bytes) new_cap = new_cap + new_cap / 2 + 64;
     void *newp = realloc(*ptr, new_cap);
-    if (!newp) gnps_fatal("scratch realloc failed", new_cap);
-    *ptr = newp;
-    *cap_bytes = new_cap;
+    if (newp) {
+        *ptr = newp;
+        *cap_bytes = new_cap;
+        return 1;
+    }
+#if GNPS_HAS_R_API
+    if (gnps_safe_to_call_r_error())
+        error("gnps: scratch allocation failed (%zu bytes)", new_cap);
+#endif
+    return 0;
 }
 
-/** @brief Set bit `i` in bitset `b`. */
 #define BS_SET(b, i)                                                           \
   ((b)[(unsigned)(i) >> 3] |= (unsigned char)(1u << ((unsigned)(i) & 7u)))
-/** @brief Test bit `i` in bitset `b`. */
 #define BS_TEST(b, i)                                                          \
   ((b)[(unsigned)(i) >> 3] & (unsigned char)(1u << ((unsigned)(i) & 7u)))
 
@@ -304,6 +343,13 @@ static SEXP make_result(double score, int matches,
 }
 #endif
 
+/* ── per-thread scratch for the hot path ─────────────────────────────────
+ *
+ * Everything score_matched() needs across calls, sized to the largest
+ * spectra seen so far and reused from then on. The conflict-cluster
+ * fields (x_dirty onward) only ever get touched on the rare path where a
+ * shifted match collides with a direct match. */
+
 /**
  * @brief Per-thread reusable scratch state for score_matched().
  *
@@ -314,36 +360,41 @@ static SEXP make_result(double score, int matches,
  * score_matched() for details.
  */
 typedef struct {
-    int    *idx_buf;         /**< dm_arr[nx] + sm_arr[nx] + bd_arr[ny], packed */
+    int    *idx_buf;       /* dm_arr[nx] + sm_arr[nx] + bd_arr[ny] packed */
     size_t  idx_buf_cap;
 
-    double *x_tol;           /**< tol + ppm*x_mz[i]*1e-6 + eps, per peak */
+    double *x_tol;         /* tol + ppm*x_mz[i]*1e-6 + eps, per peak */
     size_t  x_tol_cap;
-    double *x_shift_val;     /**< x_mz[i] + pdiff; only used if do_shift */
+    double *x_shift_val;   /* x_mz[i] + pdiff, only computed if do_shift */
     size_t  x_shift_val_cap;
-    double *x_shift_tol;     /**< tolerance on the shifted value */
+    double *x_shift_tol;   /* tolerance on the shifted value */
     size_t  x_shift_tol_cap;
 
-    double *scaled_x;        /**< sqrt(x_int[i]) * inv_sx */
+    double *scaled_x;      /* sqrt(x_int[i]) * inv_sx */
     size_t  scaled_x_cap;
-    double *scaled_y;        /**< sqrt(y_int[j]) * inv_sy */
+    double *scaled_y;      /* sqrt(y_int[j]) * inv_sy */
     size_t  scaled_y_cap;
 
-    unsigned char *x_dirty;  /**< conflict-cluster bitset over x indices */
+    unsigned char *x_dirty;
     size_t         x_dirty_cap;
-    unsigned char *y_dirty;  /**< conflict-cluster bitset over y indices */
+    unsigned char *y_dirty;
     size_t         y_dirty_cap;
 
-    int    *xi_map, *xi_rmap, *yi_map, *yi_rmap; /**< dirty-index remaps */
+    int    *xi_map, *xi_rmap, *yi_map, *yi_rmap;
     size_t  xi_map_cap, xi_rmap_cap, yi_map_cap, yi_rmap_cap;
-    double *smat;             /**< conflict-cluster score matrix, N x N */
+    double *smat;
     size_t  smat_cap;
-    char   *hbuf;             /**< Hungarian-algorithm workspace */
+    char   *hbuf;
     size_t  hbuf_cap;
 } GnpsScratch;
 
 /** @brief The scratch instance itself - one per thread, see GNPS_TLS. */
 static GNPS_TLS GnpsScratch g_scratch = {0};
+
+/* Optional: call from a package unload hook if you want the scratch
+ * memory released before process exit. Not calling it is harmless - the
+ * OS reclaims everything anyway - but if you do call it, remember it only
+ * frees the calling thread's copy. */
 
 /**
  * @brief Release all scratch memory held by the calling thread.
@@ -371,6 +422,11 @@ void gnps_scratch_free_all(void) {
     free(g_scratch.hbuf);
     memset(&g_scratch, 0, sizeof(g_scratch));
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+ * score_matched - the actual matching + scoring work. Same result as the
+ * original for every input; see the file header for what changed and why.
+ * ══════════════════════════════════════════════════════════════════════ */
 
 /**
  * @brief Match and score two sanitized spectra (the chain-DP hot path).
@@ -792,6 +848,18 @@ int gnps_chain_dp_core_api(
     return 0;
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+ * gnps_chain_dp_batch_core_api - one query spectrum against a batch of
+ * library spectra, run in parallel across OpenMP threads if enabled.
+ *
+ * This is the "actually call it in a loop from R thousands of times"
+ * problem solved at the C level instead: one .Call() per batch/chunk
+ * rather than one per pair, which also cuts the R<->C marshaling overhead
+ * that a per-pair loop in R pays every single time. Each thread gets its
+ * own score_matched() scratch automatically (thread-local), so no locking
+ * is needed here.
+ * ══════════════════════════════════════════════════════════════════════ */
+
 /**
  * @brief Score one query spectrum against a batch of library spectra,
  *        optionally in parallel across OpenMP threads.
@@ -869,16 +937,12 @@ static int gnps_is_missing(double v) {
 #endif
 }
 
-/*
- * ==========================================================================
- * gnps_aligned_core_api / gnps_join_core_api - backward-compatible paths.
- *
- * Neither is called in a tight per-pair loop the way gnps_chain_dp is, so
- * both are left as plain one-shot malloc/free, same as the original
- * implementation. Worth migrating to the scratch-buffer pattern above if
- * profiling ever shows these matter too.
- * ==========================================================================
- */
+/* ══════════════════════════════════════════════════════════════════════
+ * gnps_aligned_core_api / gnps_join_core_api - backward-compat paths, not
+ * called in a tight per-pair loop the way gnps_chain_dp is, so left as
+ * plain one-shot malloc/free like the original. Worth revisiting the same
+ * way if profiling ever shows these matter too.
+ * ══════════════════════════════════════════════════════════════════════ */
 
 /**
  * @brief Score two already peak-aligned spectra (backward-compatible
@@ -1382,6 +1446,9 @@ SEXP C_gnps_chain_dp_batch(SEXP x, SEXP xPrecursorMz,
         error("yPrecursorMz must have one entry per y_list element");
     const double *y_pre_arr = REAL(yPrecursorMz);
 
+    /* All R API access happens here, on the main thread, before any
+     * parallel work starts - the batch loop below only ever touches raw
+     * double/int arrays. */
     const double **y_mz_arr  = (const double **) xmalloc((size_t) n_lib * sizeof(double *));
     const double **y_int_arr = (const double **) xmalloc((size_t) n_lib * sizeof(double *));
     int *ny_arr = (int *) xmalloc((size_t) n_lib * sizeof(int));
