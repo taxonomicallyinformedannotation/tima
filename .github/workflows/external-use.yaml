@@ -36,7 +36,7 @@ jobs:
         id: cpu-cores
       - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6
         with:
-          use-public-rspm: true
+          update-rtools: true
           Ncpus: ${{ steps.cpu-cores.outputs.count }}
       - name: Install dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
