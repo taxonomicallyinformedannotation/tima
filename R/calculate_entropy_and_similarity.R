@@ -1,11 +1,7 @@
 # Helper Functions ----
 
-#' Count matched peaks between query and library spectra
+#' Count matched peaks between query and sorted library spectra
 #' @keywords internal
-#'
-#' This implementation assumes lib_mz_sorted is already sorted. Sorting per-call
-#' was a hotspot when called many times; we pre-sort library m/z once and cache
-#' it instead.
 .count_matched_peaks <- function(query_mz, lib_mz_sorted, dalton, ppm) {
   if (length(query_mz) == 0 || length(lib_mz_sorted) == 0) {
     return(0L)

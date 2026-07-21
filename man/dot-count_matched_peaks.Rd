@@ -2,11 +2,11 @@
 % Please edit documentation in R/calculate_entropy_and_similarity.R
 \name{.count_matched_peaks}
 \alias{.count_matched_peaks}
-\title{Count matched peaks between query and library spectra}
+\title{Count matched peaks between query and sorted library spectra}
 \usage{
-.count_matched_peaks(query_mz, lib_mz, dalton, ppm)
+.count_matched_peaks(query_mz, lib_mz_sorted, dalton, ppm)
 }
 \description{
-Count matched peaks between query and library spectra
+Count matched peaks between query and sorted library spectra
 }
 \keyword{internal}
