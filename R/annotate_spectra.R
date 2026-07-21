@@ -231,27 +231,41 @@ annotate_spectra <- function(
     libs_vec,
     dalton = dalton,
     polarity = polarity,
-    ppm = ppm,
-    approx = approx,
-    query_precursors = query_precursors,
-    query_adducts = query_meta$query_adduct
+    ppm = ppm
   )
   if (length(spectral_library) == 0L) {
-    empty_reason <- if (isTRUE(approx)) {
-      "No spectra left in library after cleaning"
-    } else {
-      "No spectra remain after precursor-based reduction"
-    }
     return(
       annotate_spectra_handle_empty_result(
         output_path,
         params,
-        empty_reason
+        "No spectra left in library after cleaning"
       )
     )
   }
 
   log_library_stats(spectral_library)
+
+  if (!approx) {
+    reduce_args <- list(
+      lib_sp = spectral_library,
+      query_precursors = query_precursors,
+      dalton = dalton,
+      ppm = ppm
+    )
+    if ("query_adducts" %in% names(formals(reduce_library_by_precursor))) {
+      reduce_args$query_adducts <- query_meta$query_adduct
+    }
+    spectral_library <- do.call(reduce_library_by_precursor, reduce_args)
+    if (length(spectral_library) == 0L) {
+      return(
+        annotate_spectra_handle_empty_result(
+          output_path,
+          params,
+          "No spectra remain after precursor-based reduction"
+        )
+      )
+    }
+  }
 
   log_debug(
     "Annotating %d query spectra against %d library references",
@@ -259,7 +273,6 @@ annotate_spectra <- function(
     length(spectral_library)
   )
 
-  start_time_sim <- Sys.time()
   sim_raw <- compute_similarity_safe(
     lib_sp = spectral_library,
     query_sp = query_sp,
@@ -270,12 +283,6 @@ annotate_spectra <- function(
     threshold = threshold,
     approx = approx
   )
-  elapsed_sim <- difftime(Sys.time(), start_time_sim, units = "secs")
-  log_info(
-    "Similarity computation complete in %.2f seconds",
-    as.numeric(elapsed_sim)
-  )
-
   if (nrow(sim_raw) == 0L) {
     return(
       annotate_spectra_handle_empty_result(
@@ -288,8 +295,6 @@ annotate_spectra <- function(
 
   lib_precursors <- get_precursors(spectral_library)
   meta <- build_library_metadata(spectral_library, lib_precursors)
-
-  start_time_finalize <- Sys.time()
   df_final <- finalize_results(
     df_sim = tidytable::as_tidytable(x = sim_raw),
     meta = meta,
@@ -297,12 +302,6 @@ annotate_spectra <- function(
     dalton = dalton,
     ppm = ppm
   )
-  elapsed_finalize <- difftime(Sys.time(), start_time_finalize, units = "secs")
-  log_debug(
-    "Results finalization complete in %.2f seconds",
-    as.numeric(elapsed_finalize)
-  )
-
   if (nrow(df_final) == 0L) {
     return(
       annotate_spectra_handle_empty_result(
@@ -341,7 +340,6 @@ annotate_spectra <- function(
 
   persist_annotation_parameters(params)
   export_output(x = df_final, file = output_path)
-  log_file_op("Exported annotations", output_path, n_rows = nrow(df_final))
   invisible(output_path)
 }
 
@@ -419,61 +417,24 @@ filter_library_paths_by_polarity <- function(paths, polarity) {
 }
 
 #' @keywords internal
-import_and_clean_library_collection <- function(
-  paths,
-  dalton,
-  polarity,
-  ppm,
-  approx = TRUE,
-  query_precursors = NULL,
-  query_adducts = NULL
-) {
-  if (length(paths) == 0L) {
-    return(Spectra::Spectra())
-  }
-
-  cleaned <- lapply(paths, function(p) {
-    import_spectra(
-      file = p,
+import_and_clean_library_collection <- function(paths, dalton, polarity, ppm) {
+  paths |>
+    purrr::map(
+      import_spectra,
       cutoff = 0,
       dalton = dalton,
       polarity = polarity,
       ppm = ppm,
       sanitize = FALSE,
       combine = FALSE
-    )
-  })
-  cleaned <- lapply(cleaned, function(sp) {
-    sp <- Spectra::applyProcessing(sp, BPPARAM = BiocParallel::SerialParam())
-    sp <- remove_empty_peak_spectra(sp)
-    strip_backend_rownames(sp)
-  })
-
-  if (!approx) {
-    cleaned <- cleaned |>
-      purrr::map(
-        ~ if (length(.x) > 0L) {
-          reduce_library_by_precursor(
-            lib_sp = .x,
-            query_precursors = query_precursors,
-            query_adducts = query_adducts,
-            dalton = dalton,
-            ppm = ppm
-          )
-        } else {
-          .x
-        }
-      )
-  }
-
-  if (length(cleaned) == 0L) {
-    return(Spectra::Spectra())
-  }
-  if (length(cleaned) == 1L) {
-    return(cleaned[[1L]])
-  }
-
-  Spectra::concatenateSpectra(cleaned)
+    ) |>
+    purrr::map(
+      Spectra::applyProcessing,
+      BPPARAM = BiocParallel::SerialParam()
+    ) |>
+    purrr::map(.f = remove_empty_peak_spectra) |>
+    purrr::map(.f = strip_backend_rownames) |>
+    Spectra::concatenateSpectra()
 }
 
 #' @keywords internal
@@ -482,9 +443,6 @@ strip_backend_rownames <- function(sp) {
     return(sp)
   }
   sd <- sp@backend@spectraData
-  if (is.null(rownames(sd))) {
-    return(sp)
-  }
   rownames(sd) <- NULL
   sp@backend@spectraData <- sd
   sp
@@ -535,6 +493,9 @@ extract_vector <- function(obj, field, len, fill = NA) {
   v[seq_len(len)]
 }
 
+# harmonize_adduct_vector moved to R/annotate_masses.R to avoid duplicate definitions
+#' @keywords internal
+# harmonize_adduct_vector is provided by annotate_masses.R
 
 #' @keywords internal
 build_library_metadata <- function(lib_sp, lib_precursors) {
@@ -634,24 +595,11 @@ build_query_metadata <- function(
 
   ms1_adduct_map <- resolve_ms1_query_adduct_map(ms1_annotations)
   if (nrow(ms1_adduct_map) > 0L) {
-    ms1_idx <- match(out$feature_id, ms1_adduct_map$feature_id)
-    out$query_adduct <- out$query_adduct_raw
-    has_ms1_adduct <- !is.na(ms1_idx)
-    out$query_adduct[has_ms1_adduct] <- vapply(
-      X = ms1_idx[has_ms1_adduct],
-      FUN = function(idx) {
-        adduct <- ms1_adduct_map$ms1_query_adduct[[idx]]
-        if (length(adduct) == 0L || is.na(adduct) || !nzchar(adduct)) {
-          return(NA_character_)
-        }
-        adduct
-      },
-      FUN.VALUE = character(1L),
-      USE.NAMES = FALSE
-    )
-    out$query_adduct[is.na(out$query_adduct)] <- out$query_adduct_raw[is.na(
-      out$query_adduct
-    )]
+    out <- out |>
+      tidytable::left_join(ms1_adduct_map, by = "feature_id") |>
+      tidytable::mutate(
+        query_adduct = tidytable::coalesce(ms1_query_adduct, query_adduct_raw)
+      )
   } else {
     out$query_adduct <- out$query_adduct_raw
   }
@@ -705,55 +653,37 @@ resolve_ms1_query_adduct_map <- function(ms1_annotations = NULL) {
     ms1_tbl$candidate_structure_error_mz <- NA_real_
   }
 
-  ms1_tbl <- ms1_tbl[
-    !is.na(ms1_tbl$candidate_adduct) & nzchar(ms1_tbl$candidate_adduct),
-    ,
-    drop = FALSE
-  ]
-  if (nrow(ms1_tbl) == 0L) {
-    return(tidytable::tidytable(
-      feature_id = character(),
-      ms1_query_adduct = character()
-    ))
-  }
-
-  ms1_tbl$feature_id <- as.character(ms1_tbl$feature_id)
-  ms1_tbl$.level_rank <- ifelse(
-    ms1_tbl$candidate_annotation_level == "primary",
-    1L,
-    ifelse(ms1_tbl$candidate_annotation_level == "secondary", 2L, 3L)
-  )
-  ms1_tbl$.evidence_rank <- ifelse(
-    ms1_tbl$candidate_evidence_tier == "supported_strong",
-    1L,
-    ifelse(
-      ms1_tbl$candidate_evidence_tier == "supported_weak",
-      2L,
-      ifelse(ms1_tbl$candidate_evidence_tier == "baseline", 3L, 4L)
+  ms1_tbl |>
+    tidytable::filter(!is.na(candidate_adduct) & nzchar(candidate_adduct)) |>
+    harmonize_adducts(
+      adducts_colname = "candidate_adduct",
+      adducts_translations = adducts_translations
+    ) |>
+    tidytable::mutate(
+      .level_rank = tidytable::case_when(
+        candidate_annotation_level == "primary" ~ 1L,
+        candidate_annotation_level == "secondary" ~ 2L,
+        TRUE ~ 3L
+      ),
+      .evidence_rank = tidytable::case_when(
+        candidate_evidence_tier == "supported_strong" ~ 1L,
+        candidate_evidence_tier == "supported_weak" ~ 2L,
+        candidate_evidence_tier == "baseline" ~ 3L,
+        TRUE ~ 4L
+      ),
+      .error_rank = abs(as.numeric(candidate_structure_error_mz))
+    ) |>
+    tidytable::arrange(
+      feature_id,
+      .level_rank,
+      .evidence_rank,
+      .error_rank
+    ) |>
+    tidytable::distinct(feature_id, .keep_all = TRUE) |>
+    tidytable::transmute(
+      feature_id,
+      ms1_query_adduct = candidate_adduct
     )
-  )
-  ms1_tbl$.error_rank <- abs(as.numeric(ms1_tbl$candidate_structure_error_mz))
-
-  ms1_tbl <- harmonize_adducts(
-    df = ms1_tbl,
-    adducts_colname = "candidate_adduct",
-    adducts_translations = adducts_translations
-  )
-
-  order_idx <- order(
-    ms1_tbl$feature_id,
-    ms1_tbl$.level_rank,
-    ms1_tbl$.evidence_rank,
-    ms1_tbl$.error_rank,
-    method = "radix"
-  )
-  ordered_tbl <- ms1_tbl[order_idx, , drop = FALSE]
-  best_rows <- order_idx[!duplicated(ordered_tbl$feature_id)]
-
-  tidytable::tidytable(
-    feature_id = ms1_tbl$feature_id[best_rows],
-    ms1_query_adduct = ms1_tbl$candidate_adduct[best_rows]
-  )
 }
 
 #' @keywords internal
@@ -825,12 +755,7 @@ convert_precursor_for_matching <- function(precursors, adducts) {
     }
     mz_vec <- precursors_num[idx]
     iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
-    m_vec <- (n_charges *
-      (mz_vec -
-        iso_shift +
-        ELECTRON_MASS_DA) -
-      mass_mods) /
-      n_mer
+    m_vec <- (n_charges * (mz_vec - iso_shift) - mass_mods) / n_mer
     m_vec[!is.finite(m_vec) | m_vec <= 0] <- NA_real_
     valid <- !is.na(m_vec)
     out[idx[valid]] <- m_vec[valid]
@@ -965,52 +890,96 @@ compute_similarity_safe <- function(
   if (!inherits(query_sp, "Spectra") || !inherits(lib_sp, "Spectra")) {
     return(tidytable::tidytable())
   }
-  query_prec <- get_precursors(query_sp)
+  query_prec <- query_sp@backend@spectraData$precursorMz
   lib_prec <- get_precursors(lib_sp)
   query_prec_match <- as.numeric(query_prec)
   lib_prec_match <- as.numeric(lib_prec)
   query_ids <- get_spectra_ids(query_sp)
 
-  query_adducts <- if (
-    !is.null(query_meta) && "query_adduct" %in% names(query_meta)
+  run_similarity <- function(
+    lib_ids,
+    lib_precursors,
+    lib_spectra,
+    query_ids,
+    query_precursors,
+    query_spectra,
+    space_label
   ) {
-    query_meta$query_adduct
-  } else {
-    rep(NA_character_, length(query_prec_match))
+    out <- calculate_entropy_and_similarity(
+      lib_ids = lib_ids,
+      lib_precursors = lib_precursors,
+      lib_spectra = lib_spectra,
+      query_ids = query_ids,
+      query_precursors = query_precursors,
+      query_spectra = query_spectra,
+      method = method,
+      dalton = dalton,
+      ppm = ppm,
+      threshold = threshold,
+      approx = approx
+    )
+    if (nrow(out) == 0L) {
+      return(tidytable::tidytable())
+    }
+    tidytable::as_tidytable(out) |>
+      tidytable::mutate(.similarity_space = space_label)
   }
-  lib_adducts <- extract_vector(
-    lib_sp,
-    c("adduct", "precursor_type"),
-    length(lib_sp),
-    NA_character_
-  )
-  lib_adducts <- harmonize_adduct_vector(
-    lib_adducts,
-    colname = "target_adduct"
-  )
 
   tryCatch(
     {
-      out <- calculate_entropy_and_similarity(
+      raw_out <- run_similarity(
         lib_ids = seq_along(lib_sp),
         lib_precursors = lib_prec_match,
         lib_spectra = lib_sp@backend@peaksData,
         query_ids = query_ids,
         query_precursors = query_prec_match,
         query_spectra = query_sp@backend@peaksData,
-        method = method,
-        dalton = dalton,
-        ppm = ppm,
-        threshold = threshold,
-        approx = approx,
-        query_adducts = query_adducts,
-        lib_adducts = lib_adducts,
-        compute_entropy = FALSE
+        space_label = "precursor_mz"
       )
-      if (nrow(out) == 0L) {
-        return(tidytable::tidytable())
+
+      query_adducts <- if (
+        !is.null(query_meta) && "query_adduct" %in% names(query_meta)
+      ) {
+        query_meta$query_adduct
+      } else {
+        rep(NA_character_, length(query_prec_match))
       }
-      tidytable::as_tidytable(out)
+      lib_adducts <- extract_vector(
+        lib_sp,
+        c("adduct", "precursor_type"),
+        length(lib_sp),
+        NA_character_
+      )
+      lib_adducts <- harmonize_adduct_vector(
+        lib_adducts,
+        colname = "target_adduct"
+      )
+
+      query_neutral <- convert_precursor_to_neutral_if_possible(
+        precursors = query_prec_match,
+        adducts = query_adducts
+      )
+      lib_neutral <- convert_precursor_to_neutral_if_possible(
+        precursors = lib_prec_match,
+        adducts = lib_adducts
+      )
+      use_query_m <- is.finite(query_neutral) & query_neutral > 0
+      use_lib_m <- is.finite(lib_neutral) & lib_neutral > 0
+
+      neutral_out <- tidytable::tidytable()
+      if (any(use_query_m) && any(use_lib_m)) {
+        neutral_out <- run_similarity(
+          lib_ids = which(use_lib_m),
+          lib_precursors = lib_neutral[use_lib_m],
+          lib_spectra = lib_sp@backend@peaksData[use_lib_m],
+          query_ids = query_ids[use_query_m],
+          query_precursors = query_neutral[use_query_m],
+          query_spectra = query_sp@backend@peaksData[use_query_m],
+          space_label = "neutral_M"
+        )
+      }
+
+      tidytable::bind_rows(raw_out, neutral_out)
     },
     error = function(e) {
       log_error("Similarity computation failed: %s", conditionMessage(e))
@@ -1087,18 +1056,13 @@ finalize_results <- function(
       candidate_library = target_library,
       candidate_spectrum_id = target_spectrum_id,
       candidate_structure_name = target_name,
+      candidate_structure_error_mz = target_precursorMz - precursorMz,
       candidate_adduct_match_mode = tidytable::case_when(
         !is.na(candidate_query_adduct) &
           !is.na(candidate_adduct) &
           query_adduct_state_key == target_adduct_state_key ~ "exact_adduct",
         .similarity_space == "neutral_M" ~ "m_delta_rescued",
         TRUE ~ "precursor_mz"
-      ),
-      # Take into account the adduct space used for matching
-      candidate_structure_error_mz = tidytable::case_when(
-        candidate_adduct_match_mode == "m_delta_rescued" ~ target_neutral_mass -
-          query_neutral_mass,
-        TRUE ~ target_precursorMz - query_precursorMz
       ),
       annotation_note = tidytable::case_when(
         candidate_adduct_match_mode == "m_delta_rescued" ~
@@ -1124,8 +1088,8 @@ finalize_results <- function(
       feature_id,
       candidate_library,
       candidate_structure_smiles_no_stereo,
-      tidytable::desc(x = candidate_score_similarity),
-      .match_mode_rank
+      .match_mode_rank,
+      tidytable::desc(x = candidate_score_similarity)
     ) |>
     tidytable::distinct(
       feature_id,
