@@ -67,7 +67,8 @@ jobs:
           "https://taxonomicallyinformedannotation.r-universe.dev",
           "https://bioconductor.org/packages/release/bioc",
           "https://cloud.r-project.org"
-          )
+          ),
+          type = "binary"
           )
 
           tima::install_tima()
