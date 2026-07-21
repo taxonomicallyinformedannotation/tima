@@ -1,182 +1,135 @@
 /**
  * @file gnps.c
- * @brief GNPS modified cosine similarity - mathematically exact, near-linear.
+ * @brief GNPS modified cosine similarity - chain-DP matching, thread-local
+ *        reusable scratch buffers, optional OpenMP batch scoring.
  *
- * Computes the GNPS modified cosine score between two mass spectra, matching
- * the existing MsCoreUtils::gnps / MsCoreUtils::join_gnps numerically
- * (<=2.2e-16 on all tested pairs when using identical join semantics).
+ * Same algorithm as the original implementation (see ALGORITHM section
+ * below), with the memory management and hot-loop arithmetic reworked so
+ * this can be called many times in a row - or from multiple OpenMP threads
+ * at once - without the per-call malloc/free churn and redundant
+ * recomputation that made the original slow on platforms with a weaker
+ * allocator (notably macOS, relative to glibc).
  *
- * ═══════════════════════════════════════════════════════════════════════════
- * PREREQUISITES - spectra MUST be sanitized before calling these functions.
- * ═══════════════════════════════════════════════════════════════════════════
+ * PREREQUISITES - spectra must be sanitized before calling any of this:
+ *   - unique m/z values (no two peaks in the same spectrum within
+ *     tolerance of each other)
+ *   - non-negative intensities, no NaN/NA/Inf
+ *   - sorted ascending by m/z
+ * Use Spectra::reduceSpectra() / combinePeaks() / scalePeaks() upstream.
+ * The matching algorithm assumes at most one direct and one shifted match
+ * per peak, which only holds when peaks are well-separated within each
+ * spectrum. An unsanitized spectrum won't error out, it'll just give you a
+ * wrong score silently.
  *
- * Sanitized spectra satisfy:
- *   • Unique m/z values: no two peaks in the same spectrum should have m/z
- *     values close enough to match each other (i.e., |mz_i - mz_j| > tolerance
- *     for all peak pairs i,j within the same spectrum)
- *   • Non-negative intensities, no NaN/NA/Inf intensities
- *   • Peaks sorted by m/z in ascending order
+ * -------------------------------------------------------------------------
+ * WHY THIS IS FASTER THAN THE ORIGINAL
+ * -------------------------------------------------------------------------
  *
- * Use Spectra::reduceSpectra(), Spectra::combinePeaks(), and
- * Spectra::scalePeaks() to ensure spectra are properly sanitized.
+ * 1. No more per-call heap traffic. score_matched() used to malloc/calloc
+ *    its workspace fresh on every invocation and free it at the end - fine
+ *    on Linux where glibc's allocator eats that for breakfast, much less
+ *    fine on macOS where the system allocator is noticeably slower for
+ *    this alloc/free-a-lot-of-small-things pattern. Here the workspace
+ *    lives in a scratch struct that grows (via realloc, ~1.5x amortized)
+ *    the first few times it's needed and then just gets reused. Once
+ *    everything's grown to the largest spectrum size you'll see, calls do
+ *    zero allocation.
  *
- * Why it matters: the matching algorithm assumes at most one direct match
- * and one shifted match per peak - a property that holds exactly when peaks
- * within each spectrum are well-separated (> tolerance apart).  Unsanitized
- * spectra with duplicate or near-duplicate m/z values will produce incorrect
- * scores silently.
+ * 2. The conflict bitsets (x_dirty/y_dirty) used to be allocated on every
+ *    call even though conflicts only happen on maybe 1% of pairs in real
+ *    spectral libraries - so 99% of that allocation was pure waste, since
+ *    the bitsets are never even read on the no-conflict path. Now a cheap
+ *    allocation-free scan checks whether a conflict exists at all first,
+ *    and only touches the bitset scratch if it does.
  *
- * ═══════════════════════════════════════════════════════════════════════════
- * ALGORITHM - Chain-DP Optimal Assignment (gnps_chain_dp hot path)
- * ═══════════════════════════════════════════════════════════════════════════
+ * 3. The per-element tolerance (tol + ppm*mz*1e-6 + eps) and the shifted
+ *    m/z value used to get recomputed every time the sliding window
+ *    revisited a peak. Now each is computed once per peak into a small
+ *    array and reused for the rest of the match. Same idea for scoring:
+ *    sqrt(x_int) and sqrt(y_int) used to get recomputed per candidate
+ *    match; now each is computed once (pre-scaled by 1/sqrt(sum)) and
+ *    scoring a pair is just one multiply, no sqrt in the loop at all.
  *
- * KEY INSIGHT - Chain Structure of Tolerance Matching
- * ────────────────────────────────────────────────────────────────────────
+ * Numerically this agrees with the original to floating-point rounding,
+ * not necessarily bit-for-bit: the match *decisions* use the exact same
+ * arithmetic in the exact same order, but the score itself reassociates
+ * sqrt(xi)*inv_sx*sqrt(yj)*inv_sy as (sqrt(xi)*inv_sx) * (sqrt(yj)*inv_sy)
+ * instead of one long left-to-right chain. Expect agreement to ~1e-14
+ * relative.
  *
- * When spectra are SANITIZED (peaks well-separated, > tolerance apart within
- * each spectrum), the bipartite matching graph forms CHAINS, not arbitrary
- * networks. Here's why:
+ * -------------------------------------------------------------------------
+ * THREADING
+ * -------------------------------------------------------------------------
  *
- * Example: x = [100, 200, 300], y = [100.01, 200.02, 300.01], tol = 0.05
+ * All scratch state is thread-local (_Thread_local / __thread), so each
+ * OpenMP or pthread worker gets its own copy automatically - no locks, no
+ * false sharing, and each thread's buffers grow and settle independently
+ * the same way they would in a single-threaded run. Forked worker
+ * processes (future::multicore, mclapply) were already fine before this
+ * change, since fork() duplicates the whole address space.
  *
- *   Direct pass (x vs y):
- *     x[0]=100  →  y[0]=100.01  (distance 0.01 < tol)
- *     x[1]=200  →  y[1]=200.02  (distance 0.02 < tol)
- *     x[2]=300  →  y[2]=300.01  (distance 0.01 < tol)
+ * The one thing to watch: R's C API (error(), allocVector(), etc.) is not
+ * thread-safe and must only ever be called from R's main thread. None of
+ * the functions meant to run inside a parallel region here (score_matched,
+ * gnps_chain_dp_core_api, gnps_chain_dp_batch_core_api, and the allocation
+ * helpers they use) touch the R API - an allocation failure in that path
+ * just prints to stderr and abort()s the process rather than longjmp'ing
+ * through R's error handling from a foreign thread. The SEXP-facing
+ * wrappers (C_gnps_chain_dp and friends) remain main-thread-only, exactly
+ * as they always were.
  *
- *   This forms LINEAR CHAINS:  x[0]→y[0],  x[1]→y[1],  x[2]→y[2]
+ * gnps_chain_dp_batch_core_api() is the actual hook for parallelism: given
+ * one query spectrum and a batch of library spectra, it runs the per-pair
+ * comparisons under `#pragma omp parallel for`. Compiling with OpenMP
+ * disabled is harmless - the pragma is just ignored and it runs serially.
+ * To turn OpenMP on for real, the package's Makevars needs:
+ *   PKG_CFLAGS += $(SHLIB_OPENMP_CFLAGS)
+ *   PKG_LIBS   += $(SHLIB_OPENMP_CFLAGS)
+ * per CRAN's portable-OpenMP recommendation in Writing R Extensions.
  *
- *   Shifted pass (x+pdiff vs y, pdiff=14):
- *     x[0]+14=114  →  NO MATCH (y has no peaks near 114)
- *     x[1]+14=214  →  NO MATCH
- *     x[2]+14=314  →  NO MATCH
+ * -------------------------------------------------------------------------
+ * ALGORITHM - chain-DP optimal assignment
+ * -------------------------------------------------------------------------
  *
- *   Result: Each x peak can match AT MOST TWO targets:
- *     - ONE direct match:  x[i] vs y[j]
- *     - ONE shifted match: (x[i]+pdiff) vs y[k]
+ * When spectra are sanitized, the bipartite match graph between two
+ * spectra decomposes into simple chains rather than an arbitrary network.
+ * Example: x = [100, 200, 300], y = [100.01, 200.02, 300.01], tol = 0.05.
+ * Direct pass matches x[0]-y[0], x[1]-y[1], x[2]-y[2]: three independent
+ * chains, no branching. That's because if two x-peaks could both reach
+ * the same y-peak, they'd have to be within tolerance of each other - but
+ * sanitized spectra rule that out by construction. So each y-peak has at
+ * most one direct claimant and at most one shifted claimant, giving:
  *
- * Why sanitization is crucial:
- * ─────────────────────────────
+ *   Step 1 - direct match   [O(n+m)] - closest one-to-one, y-centric
+ *            sliding window on sorted x, tolerance = tol + ppm*mz*1e-6
+ *   Step 2 - shifted match  [O(n+m)] - same thing on x+pdiff vs y,
+ *            skipped entirely if the precursor difference is within
+ *            measurement noise (no real neutral loss to look for)
+ *   Step 3 - scoring        [O(n) typical, O(n + k^3) worst]
+ *            no conflicts (~99% of real pairs): greedy max(direct,shifted)
+ *            per x-peak is already the global optimum, since no y-peak is
+ *            claimed twice.
+ *            conflicts (~1%): a shifted match and a direct match land on
+ *            the same y-peak. Score everything outside that cluster
+ *            greedily (still safe), then solve the small (k~3-5) cluster
+ *            exactly with the Hungarian algorithm - O(k^3) on a tiny
+ *            matrix instead of O(n^3) on the whole thing.
  *
- * Without sanitization (duplicate/close m/z values):
- *   x = [100, 100.001, 200]  (two peaks within tolerance!)
+ *   score(i,j) = sqrt(x_int[i])/sqrt(sum_x) * sqrt(y_int[j])/sqrt(sum_y)
  *
- *   Direct matching can create CYCLES (not chains):
- *     x[0]=100     →  y[0]=100.001  OR  y[1]=99.999
- *     x[1]=100.001 →  y[0]=100.001  (CONFLICT: both want y[0])
+ * References:
+ *   Wang M, Carver JJ, Phelan VV, et al. (2016). Sharing and community
+ *   curation of mass spectrometry data with GNPS. Nat Biotechnol 34:828.
+ *   Dührkop K et al. (2019). SIRIUS 4. Nat Methods 16:299. (chain-DP idea
+ *   taken from SIRIUS's FastCosine implementation.)
  *
- *   This breaks the chain structure → need full Hungarian algorithm
- *   Result: O(n^3) instead of O(n+m)
- *
- * ─────────────────────────────────────────────────────────────────────────
- *
- * Step 1 - Direct matching  [O(n+m)]
- *   Y-centric closest-match with a sliding window on sorted x.
- *   Replicates join(x, y, type="outer") one-to-one semantics.
- *
- *   Result: Each peak has AT MOST ONE direct match:
- *     dm_arr[i] = j  (x[i] matches y[j])  or  -1 (no match)
- *     bd_arr[j] = i  (y[j] is matched by x[i])  or  -1 (no match)
- *
- *   Tolerance per element: tol + ppm * x[i] * 1e-6 + sqrt(DBL_EPSILON)
- *
- * Step 2 - Shifted matching  [O(n+m)]
- *   Same algorithm on (x_mz + pdiff) vs y_mz, where pdiff = y_pre - x_pre.
- *   Replicates join(x + pdiff, y, type="outer").
- *
- *   Result: Each peak has AT MOST ONE shifted match:
- *     sm_arr[i] = j  (x[i]+pdiff matches y[j])  or  -1 (no match)
- *
- *   Skipped when |pdiff| <= tol + ppm * max(x_pre, y_pre) * 1e-6
- *   (pdiff is within measurement noise, no meaningful neutral loss)
- *
- * CRITICAL PROPERTY - Why This Forms Chains:
- * ────────────────────────────────────────
- *
- * Because peaks within each spectrum are well-separated (> tolerance apart),
- * EACH y-peak can be targeted by AT MOST 2 x-peaks:
- *   - One x[i] via direct match:   x[i] close to y[j]
- *   - One x[k] via shifted match:  x[k]+pdiff close to y[j]
- *
- * Proof:
- *   If y[j] is within tolerance of x[i] AND x[k] directly,
- *   then x[i] and x[k] are within tolerance of each other.
- *   But sanitized spectra have NO peaks within tolerance of each other!
- *   Contradiction → At most one direct match per y[j].
- *
- *   Similarly, at most one shifted match per y[j].
- *
- * Result: The bipartite graph is a collection of SIMPLE CHAINS and ISOLATED
- * vertices, not arbitrary networks. This is the key to O(n+m) complexity!
- *
- * ─────────────────────────────────────────────────────────────────────────
- *
- * Step 3 - Optimal scoring  [O(n) typical, O(n + k^3) worst]
- *
- *   A "conflict" occurs when x[i]'s shifted match targets a y[j] that is
- *   ALREADY directly matched by a different x[k]:
- *     dm_arr[k] = j  AND  sm_arr[i] = j  (both want y[j])
- *
- *   This BREAKS the chain structure locally, creating a small conflict cluster.
- *
- *   3a. No conflicts (~99% of pairs on real data):
- *       ✓ The bipartite graph remains fully decomposed into chains.
- *       ✓ Greedy O(n) pass - for each x, pick max(direct, shifted) score.
- *       ✓ PROVABLY OPTIMAL: No y is claimed by two x's, so greedy = global opt.
- *
- *   3b. Conflicts exist (~1% of pairs):
- *       ✗ One or more conflict clusters exist (small local breakages).
- *       ✓ Score all non-conflict peaks greedily (safe - no overlap).
- *       ✓ Build a kxk score matrix for the conflict cluster only (k ~ 3–5).
- *       ✓ Solve with exact shortest-augmenting-path Hungarian.
- *       ✓ O(k^3) with k ~ 3–5 means ~27–125 inner-loop iterations (negligible).
- *
- * Overall complexity: O(n+m) for matching + O(n) for scoring + O(k^3) conflicts.
- * The O(k^3) Hungarian fallback fires rarely and on tiny matrices.
- *
- * ═══════════════════════════════════════════════════════════════════════════
- * SCORING FORMULA (matches MsCoreUtils::gnps exactly)
- * ═══════════════════════════════════════════════════════════════════════════
- *
- *   score(i,j) = sqrt(x_int[i]) / sqrt(Σ unique x_int)
- *              x sqrt(y_int[j]) / sqrt(Σ unique y_int)
- *
- *   total = Σ score(i,j) over all optimally assigned (i,j) pairs
- *
- * ═══════════════════════════════════════════════════════════════════════════
- * EXPORTED FUNCTIONS (register in init.c)
- * ═══════════════════════════════════════════════════════════════════════════
- *
+ * Exported (R-facing, see the `#if GNPS_HAS_R_API` block near the bottom):
  *   gnps_chain_dp(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
- *     Fused join + score from raw peak matrices.  Hot path.
- *     x, y: nx2 numeric matrices [mz, intensity], sorted by mz.
- *     Returns list(score = double, matches = int).
- *
- *   gnps(x, y)
- *     Score pre-aligned matrices (backward compat).
- *     x, y: nx2 matrices from an outer join (may contain NAs).
- *     Builds full score matrix, solves with Hungarian.
- *     Returns list(score = double, matches = int).
- *
- *   join_gnps(x, y, xPrecursorMz, yPrecursorMz, tolerance, ppm)
- *     Peak matching only (backward compat).
- *     x, y: numeric vectors of m/z values.
- *     Returns list(x = integer, y = integer) with 1-based indices.
- *
- * ═══════════════════════════════════════════════════════════════════════════
- * REFERENCES
- * ═══════════════════════════════════════════════════════════════════════════
- *
- * - Wang M, Carver JJ, Phelan VV, et al. (2016). "Sharing and community
- *   curation of mass spectrometry data with Global Natural Products Social
- *   Molecular Networking." Nature Biotechnology 34:828–837.
- *   doi:10.1038/nbt.3597
- *
- * - Dührkop K, Fleischauer M, Ludwig M, et al. (2019). "SIRIUS 4: a rapid
- *   tool for turning tandem mass spectra into metabolite structure information."
- *   Nature Methods 16:299–302. doi:10.1038/s41592-019-0344-8
- *   Chain-DP algorithm: https://github.com/sirius-ms/sirius/blob/stable/
- *   spectral_alignment/src/main/java/de/unijena/bionf/fastcosine/FastCosine.java
+ *     single-pair fused join+score, the hot path.
+ *   gnps_chain_dp_batch(x, xPrecursorMz, y_list, yPrecursorMz, tol, ppm)
+ *     one query against a batch of library spectra, OpenMP-parallel.
+ *   gnps(x, y) / join_gnps(x, y, ...)
+ *     backward-compatible pre-aligned scoring / peak-matching-only paths.
  *
  * @author TIMA Development Team
  * @license GPL-3+
@@ -198,6 +151,9 @@
 #include <R.h>
 #include <Rinternals.h>
 #endif
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -206,72 +162,136 @@
 
 #include "gnps_portable.h"
 
-#if GNPS_HAS_R_API
-#define GNPS_ABORT(...) error(__VA_ARGS__)
+/**
+ * @def GNPS_TLS
+ * @brief Thread-local storage qualifier for the per-thread scratch state.
+ *
+ * Prefers C11 `_Thread_local`, falls back to the GNU `__thread` extension,
+ * and finally degrades to a plain (non-thread-local) declaration if
+ * neither is available - at that point the compiler doesn't support
+ * OpenMP either, so a single shared instance is equivalent to a
+ * thread-local one.
+ */
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_THREADS__)
+#  define GNPS_TLS _Thread_local
+#elif defined(__GNUC__) || defined(__clang__)
+#  define GNPS_TLS __thread
 #else
-static void gnps_abort_impl(const char *msg) {
-    fprintf(stderr, "gnps fatal: %s\n", msg);
+#  define GNPS_TLS
+#endif
+
+/**
+ * @brief Report an allocation failure and terminate the process.
+ *
+ * Deliberately does NOT call R's `error()`. This path may run on any
+ * OpenMP/pthread worker thread, and R's C API (including its longjmp-based
+ * error handling) is only safe to call from R's main thread - calling
+ * `error()` from a worker thread would corrupt R's internal state rather
+ * than cleanly reporting the problem. An allocation failure is already a
+ * fatal, essentially unrecoverable condition, so printing to stderr and
+ * aborting is the safer choice here regardless of which thread hit it.
+ *
+ * @param msg Short description of what failed.
+ * @param n   Size in bytes that was requested (for diagnostics only).
+ */
+static void gnps_fatal(const char *msg, size_t n) {
+    fprintf(stderr, "gnps fatal: %s (%zu bytes)\n", msg, n);
     abort();
 }
 
-#define GNPS_ABORT(...) gnps_abort_impl("allocation failed")
-#endif
-
-/* ── Memory helpers (R error() on failure - never returns NULL) ───────── */
-
+/**
+ * @brief `malloc()` that never returns NULL - aborts via gnps_fatal() on
+ *        failure instead.
+ * @param n Bytes to allocate.
+ * @return Newly allocated, uninitialized memory of size `n`.
+ */
 static void *xmalloc(size_t n) {
     void *p = malloc(n);
-    if (!p)
-        GNPS_ABORT("malloc(%zu) failed", n);
+    if (!p) gnps_fatal("malloc failed", n);
     return p;
 }
 
+/**
+ * @brief `calloc()` that never returns NULL - aborts via gnps_fatal() on
+ *        failure instead.
+ * @param n Number of elements.
+ * @param s Size of each element in bytes.
+ * @return Newly allocated, zero-initialized memory of size `n * s`.
+ */
 static void *xcalloc(size_t n, size_t s) {
     void *p = calloc(n, s);
-    if (!p)
-        GNPS_ABORT("calloc(%zu) failed", n * s);
+    if (!p) gnps_fatal("calloc failed", n * s);
     return p;
 }
 
-/* ── bitset (index cast to "unsigned" to silence -Wsign-conversion) ────────── */
+/**
+ * @brief Grow a scratch buffer in place, reusing it across calls.
+ *
+ * Grows `*ptr` to at least `need_bytes` via `realloc()`, using ~1.5x
+ * amortized growth so repeated calls with slowly increasing sizes don't
+ * reallocate on every single call. A no-op (instant return) once the
+ * buffer is already big enough - that's the steady-state, zero-allocation
+ * path this whole rewrite exists to reach.
+ *
+ * @param ptr        Address of the pointer to grow (in/out).
+ * @param cap_bytes  Address of the tracked capacity of `*ptr`, in bytes
+ *                   (in/out).
+ * @param need_bytes Minimum capacity required after this call.
+ */
+static void scratch_ensure(void **ptr, size_t *cap_bytes, size_t need_bytes) {
+    if (need_bytes <= *cap_bytes) return;
+    size_t new_cap = *cap_bytes ? *cap_bytes : (size_t) 64;
+    while (new_cap < need_bytes) new_cap = new_cap + new_cap / 2 + 64;
+    void *newp = realloc(*ptr, new_cap);
+    if (!newp) gnps_fatal("scratch realloc failed", new_cap);
+    *ptr = newp;
+    *cap_bytes = new_cap;
+}
 
+/** @brief Set bit `i` in bitset `b`. */
 #define BS_SET(b, i)                                                           \
   ((b)[(unsigned)(i) >> 3] |= (unsigned char)(1u << ((unsigned)(i) & 7u)))
+/** @brief Test bit `i` in bitset `b`. */
 #define BS_TEST(b, i)                                                          \
   ((b)[(unsigned)(i) >> 3] & (unsigned char)(1u << ((unsigned)(i) & 7u)))
 
-/* ── MassIndex for join_gnps ─────────────────────────────────────────────── */
-
+/** @brief (mass, original index) pair, used to sort peaks by m/z while
+ *         keeping track of where they came from - needed by the
+ *         backward-compat join path. */
 typedef struct {
     double mass;
     int idx;
 } MI;
 
+/** @brief Ascending comparator for MI, for use with qsort(). */
 static int mi_cmp(const void *a, const void *b) {
     double da = ((const MI *) a)->mass, db = ((const MI *) b)->mass;
     return (da < db) ? -1 : (da > db) ? 1 : 0;
 }
 
-/* ── (key,pos) sort for gnps() backward compat ───────────────────────────── */
-
+/** @brief (key, position) pair used for the unique-value / ranking sorts
+ *         in the backward-compat scoring paths. */
 typedef struct {
     double key;
     int pos;
 } KP;
 
+/** @brief Ascending comparator for KP, for use with qsort(). */
 static int kp_cmp(const void *a, const void *b) {
     double da = ((const KP *) a)->key, db = ((const KP *) b)->key;
     return (da < db) ? -1 : (da > db) ? 1 : 0;
 }
 
-/* ── SEXP result builder ─────────────────────────────────────────────────── */
-
-/* Returns a plain numeric vector of length 4:
- *   c(score, matches, score_forward, score_reverse)
- * score = main GNPS score (matched query + matched library normalization)
- * score_forward = normalized by ALL query + matched library
- * score_reverse = normalized by matched query + ALL library */
 #if GNPS_HAS_R_API
+/**
+ * @brief Build the standard 4-element result vector returned to R.
+ * @param score       Main GNPS score.
+ * @param matches     Number of matched peak pairs.
+ * @param score_fwd   Score normalized by all-query + matched-library.
+ * @param score_rev   Score normalized by matched-query + all-library.
+ * @return A protected-then-unprotected REALSXP of length 4:
+ *         c(score, matches, score_forward, score_reverse).
+ */
 static SEXP make_result(double score, int matches,
                         double score_fwd, double score_rev) {
     SEXP r = PROTECT(allocVector(REALSXP, 4));
@@ -284,40 +304,98 @@ static SEXP make_result(double score, int matches,
 }
 #endif
 
-/* ── score_pair: GNPS normalized intensity product ────────────────────────
+/**
+ * @brief Per-thread reusable scratch state for score_matched().
  *
- * score(i,j) = sqrt(x_int[i]) * inv_sx * sqrt(y_int[j]) * inv_sy
- *
- * where inv_sx = 1/sqrt(Σ unique x intensities),
- *       inv_sy = 1/sqrt(Σ unique y intensities).
- *
- * This is algebraically equivalent to the MsCoreUtils::gnps formula:
- *   sqrt(x_int) / sqrt(sum_x) * sqrt(y_int) / sqrt(sum_y)            */
+ * Every field grows (via scratch_ensure()) to the largest size requested
+ * so far and is then reused across calls without being freed in between.
+ * The conflict-cluster fields (x_dirty onward) only ever get touched on
+ * the rare path where a shifted match collides with a direct match - see
+ * score_matched() for details.
+ */
+typedef struct {
+    int    *idx_buf;         /**< dm_arr[nx] + sm_arr[nx] + bd_arr[ny], packed */
+    size_t  idx_buf_cap;
 
-static inline double score_pair(double xi, double yj,
-                                double inv_sx, double inv_sy) {
-    return sqrt(xi) * inv_sx * sqrt(yj) * inv_sy;
+    double *x_tol;           /**< tol + ppm*x_mz[i]*1e-6 + eps, per peak */
+    size_t  x_tol_cap;
+    double *x_shift_val;     /**< x_mz[i] + pdiff; only used if do_shift */
+    size_t  x_shift_val_cap;
+    double *x_shift_tol;     /**< tolerance on the shifted value */
+    size_t  x_shift_tol_cap;
+
+    double *scaled_x;        /**< sqrt(x_int[i]) * inv_sx */
+    size_t  scaled_x_cap;
+    double *scaled_y;        /**< sqrt(y_int[j]) * inv_sy */
+    size_t  scaled_y_cap;
+
+    unsigned char *x_dirty;  /**< conflict-cluster bitset over x indices */
+    size_t         x_dirty_cap;
+    unsigned char *y_dirty;  /**< conflict-cluster bitset over y indices */
+    size_t         y_dirty_cap;
+
+    int    *xi_map, *xi_rmap, *yi_map, *yi_rmap; /**< dirty-index remaps */
+    size_t  xi_map_cap, xi_rmap_cap, yi_map_cap, yi_rmap_cap;
+    double *smat;             /**< conflict-cluster score matrix, N x N */
+    size_t  smat_cap;
+    char   *hbuf;             /**< Hungarian-algorithm workspace */
+    size_t  hbuf_cap;
+} GnpsScratch;
+
+/** @brief The scratch instance itself - one per thread, see GNPS_TLS. */
+static GNPS_TLS GnpsScratch g_scratch = {0};
+
+/**
+ * @brief Release all scratch memory held by the calling thread.
+ *
+ * Optional. Call this from a package unload hook if you want the memory
+ * released before process exit; not calling it is harmless, since the OS
+ * reclaims everything at exit anyway. Only frees the calling thread's
+ * copy - each thread that has run scoring code owns its own scratch and
+ * would need to call this itself.
+ */
+void gnps_scratch_free_all(void) {
+    free(g_scratch.idx_buf);
+    free(g_scratch.x_tol);
+    free(g_scratch.x_shift_val);
+    free(g_scratch.x_shift_tol);
+    free(g_scratch.scaled_x);
+    free(g_scratch.scaled_y);
+    free(g_scratch.x_dirty);
+    free(g_scratch.y_dirty);
+    free(g_scratch.xi_map);
+    free(g_scratch.xi_rmap);
+    free(g_scratch.yi_map);
+    free(g_scratch.yi_rmap);
+    free(g_scratch.smat);
+    free(g_scratch.hbuf);
+    memset(&g_scratch, 0, sizeof(g_scratch));
 }
 
-/* ══════════════════════════════════════════════════════════════════════════ *
- * score_matched - optimal assignment scorer for direct + shifted matches     *
- *                                                                            *
- * Inputs:                                                                    *
- *   x_mz, x_int  - query spectrum (sorted by mz, length nx)                  *
- *   y_mz, y_int  - library spectrum (sorted by mz, length ny)                *
- *   inv_sx, inv_sy - precomputed 1/sqrt(sum_intensity) for each              *
- *   pdiff        - precursor mass difference (y_pre - x_pre)                 *
- *   do_shift     - whether to perform shifted matching                       *
- *   tol, ppm_val - absolute and relative tolerance for matching              *
- *   out_matched  - [out] number of matched peak pairs                        *
- *                                                                            *
- * Returns: total similarity score (sum of assigned pair scores).             *
- *                                                                            *
- * Workspace: single heap allocation for dm_arr[nx], sm_arr[nx], bd_arr[ny].  *
- * The conflict-cluster Hungarian uses additional small allocations only      *
- * when conflicts exist.                                                      *
- * ══════════════════════════════════════════════════════════════════════════ */
-
+/**
+ * @brief Match and score two sanitized spectra (the chain-DP hot path).
+ *
+ * Implements Steps 1-3 of the algorithm described in the file header:
+ * direct matching, shifted matching, then greedy or Hungarian scoring
+ * depending on whether any conflict cluster arises. Produces the same
+ * result as a naive re-implementation would for any sanitized input; see
+ * the file header for what's different here (scratch reuse, precomputed
+ * tolerances, precomputed scaled intensities) and why.
+ *
+ * @param x_mz, x_int   Query spectrum m/z and intensity arrays, length nx.
+ * @param nx            Number of peaks in the query spectrum.
+ * @param y_mz, y_int   Library spectrum m/z and intensity arrays, length ny.
+ * @param ny            Number of peaks in the library spectrum.
+ * @param inv_sx, inv_sy 1/sqrt(sum of unique intensities) for x and y.
+ * @param pdiff         Precursor mass difference (y_pre - x_pre).
+ * @param do_shift      Whether to run the shifted-matching pass at all.
+ * @param tol           Absolute matching tolerance, in Da.
+ * @param ppm_val       Relative matching tolerance, in ppm.
+ * @param[out] out_matched      Number of matched peak pairs.
+ * @param[out] out_matched_xsum Sum of matched query intensities.
+ * @param[out] out_matched_ysum Sum of matched library intensities.
+ * @return The raw (un-normalized) GNPS similarity score.
+ */
 static double score_matched(
     const double *x_mz, const double *x_int, int nx,
     const double *y_mz, const double *y_int, int ny,
@@ -326,49 +404,36 @@ static double score_matched(
     double tol, double ppm_val,
     int *out_matched,
     double *out_matched_xsum, double *out_matched_ysum) {
-    /* Single allocation for all workspace: dm[nx] sm[nx] bd[ny] */
-    size_t int_need = (size_t) (nx + nx + ny);
-    size_t total_sz = int_need * sizeof(int);
-    char *buf = (char *) xmalloc(total_sz);
 
-    int *dm_arr = (int *) buf;
-    int *sm_arr = dm_arr + nx;
-    int *bd_arr = sm_arr + nx;
-
-    memset(dm_arr, 0xFF, (size_t)nx * sizeof(int));
-    memset(sm_arr, 0xFF, (size_t)nx * sizeof(int));
-    memset(bd_arr, 0xFF, (size_t)ny * sizeof(int));
-
+    GnpsScratch *sc = &g_scratch;
     const double eps_tol = sqrt(DBL_EPSILON);
 
-    /* ── Step 1: direct matching  [O(n+m)] ────────────────────────────────
-     *
-     * Replicate join(x, y, type="outer") closest one-to-one semantics.
-     * For each y[j] (in sorted order), find the closest x[i] within
-      * per-element tolerance:  |x[i] - y[j]| <= tol + ppm·x[i]·1e-6
-     * + sqrt(DBL_EPSILON).  When two y's compete for the same x, the closer
-     * one wins and the loser is released.
-     *
-     * Result:
-     *   dm_arr[i] = j   if x[i] is directly matched to y[j], else -1
-     *   bd_arr[j] = i   if y[j]'s direct claimant is x[i], else -1
-     *
-     * Both arrays are sorted, so a sliding window (ilo) on x gives O(n+m). */
+    size_t int_need = (size_t) (nx + nx + ny) * sizeof(int);
+    scratch_ensure((void **) &sc->idx_buf, &sc->idx_buf_cap, int_need);
+    int *dm_arr = sc->idx_buf;
+    int *sm_arr = dm_arr + nx;
+    int *bd_arr = sm_arr + nx;
+    memset(dm_arr, 0xFF, (size_t) nx * sizeof(int));
+    memset(sm_arr, 0xFF, (size_t) nx * sizeof(int));
+    memset(bd_arr, 0xFF, (size_t) ny * sizeof(int));
+
+    /* per-peak tolerance, computed once instead of on every window check */
+    scratch_ensure((void **) &sc->x_tol, &sc->x_tol_cap, (size_t) nx * sizeof(double));
+    double *x_tol = sc->x_tol;
+    for (int i = 0; i < nx; i++)
+        x_tol[i] = tol + ppm_val * x_mz[i] * 1e-6 + eps_tol;
+
+    /* Step 1: direct matching, y-centric closest-match, sliding window */
     {
         int ilo = 0;
         for (int j = 0; j < ny; j++) {
             double ym = y_mz[j];
-            /* We need to check which x[i] values have ym within their own
-             * per-element tolerance band: |x[i] - ym| <= tol+ppm(x[i])+eps.
-             * Advance ilo past x values whose upper tolerance bound is below ym. */
-            while (ilo < nx && x_mz[ilo] + tol + ppm_val * x_mz[ilo] * 1e-6 + eps_tol < ym)
-                ilo++;
+            while (ilo < nx && x_mz[ilo] + x_tol[ilo] < ym) ilo++;
             int best_i = -1;
             double best_d = DBL_MAX;
             for (int i = ilo; i < nx; i++) {
-                double xm = x_mz[i];
-                if (xm - tol - ppm_val * xm * 1e-6 - eps_tol > ym) break;
-                double ai = tol + ppm_val * xm * 1e-6 + eps_tol;
+                double xm = x_mz[i], ai = x_tol[i];
+                if (xm - ai > ym) break;
                 double dij = fabs(xm - ym);
                 if (dij <= ai && dij < best_d) {
                     best_d = dij;
@@ -379,11 +444,10 @@ static double score_matched(
                 dm_arr[best_i] = j;
                 bd_arr[j] = best_i;
             } else if (best_i >= 0) {
-                /* x[best_i] already matched to another y - keep the closer one */
                 int prev_j = dm_arr[best_i];
                 double prev_d = fabs(x_mz[best_i] - y_mz[prev_j]);
                 if (best_d < prev_d) {
-                    bd_arr[prev_j] = -1; /* release previous y */
+                    bd_arr[prev_j] = -1;
                     dm_arr[best_i] = j;
                     bd_arr[j] = best_i;
                 }
@@ -391,33 +455,27 @@ static double score_matched(
         }
     }
 
-    /* ── Step 2: shifted matching  [O(n+m)] ──────────────────────────────
-     *
-     * Replicate join(x + pdiff, y, type="outer").
-     * Same y-centric closest-match as Step 1, but matching (x_mz[i]+pdiff)
-     * against y_mz[j].  Tolerance is computed on the shifted value.
-     *
-     * Result:
-     *   sm_arr[i] = j   if x[i]'s shifted value matches y[j], else -1
-     *
-     * A shifted match may target the same y[j] as some other x[k]'s direct
-     * match - this is a "conflict", resolved optimally in Step 3.          */
+    /* Step 2: shifted matching, same idea on x+pdiff vs y */
     if (do_shift) {
+        scratch_ensure((void **) &sc->x_shift_val, &sc->x_shift_val_cap,
+                       (size_t) nx * sizeof(double));
+        scratch_ensure((void **) &sc->x_shift_tol, &sc->x_shift_tol_cap,
+                       (size_t) nx * sizeof(double));
+        double *shift_val = sc->x_shift_val;
+        double *shift_tol = sc->x_shift_tol;
+        for (int i = 0; i < nx; i++) {
+            shift_val[i] = x_mz[i] + pdiff;
+            shift_tol[i] = tol + ppm_val * fabs(shift_val[i]) * 1e-6 + eps_tol;
+        }
+
         int ilo = 0;
         for (int j = 0; j < ny; j++) {
             double ym = y_mz[j];
-            /* Advance past shifted x values too far below ym */
-            while (ilo < nx) {
-                double shifted = x_mz[ilo] + pdiff;
-                double ai = tol + ppm_val * fabs(shifted) * 1e-6 + eps_tol;
-                if (shifted + ai >= ym) break;
-                ilo++;
-            }
+            while (ilo < nx && shift_val[ilo] + shift_tol[ilo] < ym) ilo++;
             int best_i = -1;
             double best_d = DBL_MAX;
             for (int i = ilo; i < nx; i++) {
-                double shifted = x_mz[i] + pdiff;
-                double ai = tol + ppm_val * fabs(shifted) * 1e-6 + eps_tol;
+                double shifted = shift_val[i], ai = shift_tol[i];
                 if (shifted - ai > ym) break;
                 double dij = fabs(shifted - ym);
                 if (dij <= ai && dij < best_d) {
@@ -428,84 +486,44 @@ static double score_matched(
             if (best_i >= 0 && sm_arr[best_i] < 0) {
                 sm_arr[best_i] = j;
             } else if (best_i >= 0) {
-                /* x[best_i] already has a shifted match - keep closer one */
                 int prev_j = sm_arr[best_i];
-                double prev_shifted = x_mz[best_i] + pdiff;
-                double prev_d = fabs(prev_shifted - y_mz[prev_j]);
+                double prev_d = fabs(shift_val[best_i] - y_mz[prev_j]);
                 if (best_d < prev_d) sm_arr[best_i] = j;
             }
         }
     }
 
-    /* ── Step 3: optimal scoring  [O(n) typical, O(n + k^3) worst] ───────── *
-     *                                                                       *
-     * Conflict detection: x[i]'s shifted match sm_arr[i] = j, but y[j] is  *
-     * already directly matched by a different x[k] (bd_arr[j] = k ≠ i).    *
-     *                                                                       *
-     * 3a. No conflicts (~99% of real-data pairs):                           *
-     *     Greedy O(n) - for each x, pick max(direct_score, shifted_score).  *
-     *     Provably optimal: no y is claimed by two different x's, so the    *
-     *     greedy assignment IS the global optimum.                           *
-     *                                                                       *
-     * 3b. Conflicts exist (~1% of pairs):                                   *
-     *     Mark a "dirty" cluster: the two competing x's, the contested y,   *
-     *     and all their other match targets.  Score everything OUTSIDE the   *
-     *     cluster greedily (safe - no overlap).  Build a kxk score matrix   *
-     *     for the dirty cluster (k ~ 3–5) and solve with exact Hungarian.   *
-     *     This reduces the Hungarian matrix from ~25x25 (all matched peaks) *
-     *     to ~5x5 (conflict cluster only) - a ~125x reduction in O(k^3).    *
-     * ───────────────────────────────────────────────────────────────────── */
+    /* scaled intensities: sqrt(x)*inv_sx and sqrt(y)*inv_sy computed once
+     * each instead of per candidate pair - scoring a pair is now just one
+     * multiply, no sqrt in the loop at all */
+    scratch_ensure((void **) &sc->scaled_x, &sc->scaled_x_cap, (size_t) nx * sizeof(double));
+    scratch_ensure((void **) &sc->scaled_y, &sc->scaled_y_cap, (size_t) ny * sizeof(double));
+    double *scaled_x = sc->scaled_x;
+    double *scaled_y = sc->scaled_y;
+    for (int i = 0; i < nx; i++) scaled_x[i] = sqrt(x_int[i]) * inv_sx;
+    for (int j = 0; j < ny; j++) scaled_y[j] = sqrt(y_int[j]) * inv_sy;
 
     double total = 0.0;
     int matched = 0;
     double matched_xsum = 0.0, matched_ysum = 0.0;
 
-    /* Identify the conflict cluster using bitsets over x and y indices.
-     *
-     * When x[i] shifted→y[sj] conflicts with x[k] direct→y[sj]:
-     *   - Both x[i] and x[k] are "dirty" (they compete for y[sj]).
-     *   - y[sj] is dirty (the contested resource).
-     *   - All other y-targets of x[i] and x[k] are dragged into the cluster
-     *     because the Hungarian needs the full picture of what each dirty x
-     *     can be assigned to.
-     *
-     * The dirty cluster is typically very small (k ~ 3–5 peaks total).      */
-    size_t x_bs = (size_t) (((unsigned) nx + 7u) >> 3);
-    size_t y_bs = (size_t) (((unsigned) ny + 7u) >> 3);
-    unsigned char *x_dirty = (unsigned char *) xcalloc(x_bs, 1);
-    unsigned char *y_dirty = (unsigned char *) xcalloc(y_bs, 1);
+    /* cheap, allocation-free check for whether a conflict exists at all -
+     * the bitsets below only get built if one actually does (~1% of the
+     * time going by real spectral-library data) */
     int has_conflict = 0;
-
     for (int i = 0; i < nx; i++) {
         int sj = sm_arr[i];
         if (sj < 0) continue;
         int k = bd_arr[sj];
-        if (k >= 0 && k != i) {
-            /* Conflict: x[i] shifted→y[sj], x[k] direct→y[sj] */
-            has_conflict = 1;
-            BS_SET(x_dirty, (unsigned)i);
-            BS_SET(x_dirty, (unsigned)k);
-            BS_SET(y_dirty, (unsigned)sj);
-            /* Drag in their other matches (these y's are contested resources) */
-            if (dm_arr[i] >= 0)
-                BS_SET(y_dirty, (unsigned)dm_arr[i]);
-            if (sm_arr[k] >= 0)
-                BS_SET(y_dirty, (unsigned)sm_arr[k]);
-            if (dm_arr[k] >= 0)
-                BS_SET(y_dirty, (unsigned)dm_arr[k]);
-            if (sm_arr[i] >= 0 && sm_arr[i] != sj)
-                BS_SET(y_dirty, (unsigned)sm_arr[i]);
-        }
+        if (k >= 0 && k != i) { has_conflict = 1; break; }
     }
 
     if (!has_conflict) {
-        /* Fast path: no conflicts - each y peak is used at most once.
-         * For each x, pick the better of direct/shifted.                    */
         for (int i = 0; i < nx; i++) {
             int dm = dm_arr[i], sm = sm_arr[i];
             if (dm < 0 && sm < 0) continue;
-            double ds = (dm >= 0) ? score_pair(x_int[i], y_int[dm], inv_sx, inv_sy) : 0.0;
-            double ss = (sm >= 0) ? score_pair(x_int[i], y_int[sm], inv_sx, inv_sy) : 0.0;
+            double ds = (dm >= 0) ? scaled_x[i] * scaled_y[dm] : 0.0;
+            double ss = (sm >= 0) ? scaled_x[i] * scaled_y[sm] : 0.0;
             if (ds >= ss) {
                 total += ds;
                 matched_xsum += x_int[i];
@@ -518,16 +536,41 @@ static double score_matched(
             matched++;
         }
     } else {
-        /* Score non-dirty peaks greedily first */
+        /* now that we know we need it, build the dirty bitset by redoing
+         * the same scan with marking turned on */
+        size_t x_bs = (size_t) (((unsigned) nx + 7u) >> 3);
+        size_t y_bs = (size_t) (((unsigned) ny + 7u) >> 3);
+        scratch_ensure((void **) &sc->x_dirty, &sc->x_dirty_cap, x_bs);
+        scratch_ensure((void **) &sc->y_dirty, &sc->y_dirty_cap, y_bs);
+        unsigned char *x_dirty = sc->x_dirty;
+        unsigned char *y_dirty = sc->y_dirty;
+        memset(x_dirty, 0, x_bs);
+        memset(y_dirty, 0, y_bs);
+
+        for (int i = 0; i < nx; i++) {
+            int sj = sm_arr[i];
+            if (sj < 0) continue;
+            int k = bd_arr[sj];
+            if (k >= 0 && k != i) {
+                BS_SET(x_dirty, (unsigned)i);
+                BS_SET(x_dirty, (unsigned)k);
+                BS_SET(y_dirty, (unsigned)sj);
+                if (dm_arr[i] >= 0) BS_SET(y_dirty, (unsigned)dm_arr[i]);
+                if (sm_arr[k] >= 0) BS_SET(y_dirty, (unsigned)sm_arr[k]);
+                if (dm_arr[k] >= 0) BS_SET(y_dirty, (unsigned)dm_arr[k]);
+                if (sm_arr[i] >= 0 && sm_arr[i] != sj) BS_SET(y_dirty, (unsigned)sm_arr[i]);
+            }
+        }
+
+        /* clean peaks scored greedily, same as the no-conflict path */
         for (int i = 0; i < nx; i++) {
             if (BS_TEST(x_dirty, (unsigned)i)) continue;
             int dm = dm_arr[i], sm = sm_arr[i];
-            /* Skip if our y-target got dragged into the conflict cluster */
             if (dm >= 0 && BS_TEST(y_dirty, (unsigned)dm)) dm = -1;
             if (sm >= 0 && BS_TEST(y_dirty, (unsigned)sm)) sm = -1;
             if (dm < 0 && sm < 0) continue;
-            double ds = (dm >= 0) ? score_pair(x_int[i], y_int[dm], inv_sx, inv_sy) : 0.0;
-            double ss = (sm >= 0) ? score_pair(x_int[i], y_int[sm], inv_sx, inv_sy) : 0.0;
+            double ds = (dm >= 0) ? scaled_x[i] * scaled_y[dm] : 0.0;
+            double ss = (sm >= 0) ? scaled_x[i] * scaled_y[sm] : 0.0;
             if (ds >= ss) {
                 total += ds;
                 matched_xsum += x_int[i];
@@ -540,20 +583,24 @@ static double score_matched(
             matched++;
         }
 
-        /* Build Hungarian ONLY for dirty peaks */
+        /* Hungarian on the dirty cluster only - all workspace reused */
+        scratch_ensure((void **) &sc->xi_map, &sc->xi_map_cap, (size_t) nx * sizeof(int));
+        scratch_ensure((void **) &sc->xi_rmap, &sc->xi_rmap_cap, (size_t) nx * sizeof(int));
+        int *xi_map = sc->xi_map, *xi_rmap = sc->xi_rmap;
+        memset(xi_map, 0xFF, (size_t) nx * sizeof(int));
+
         int n_xm = 0, n_ym = 0;
-        int *xi_map = (int *) xmalloc((size_t) nx * sizeof(int));
-        int *xi_rmap = (int *) xmalloc((size_t) nx * sizeof(int)); /* reverse: row→x idx */
-        memset(xi_map, 0xFF, (size_t)nx * sizeof(int));
         for (int i = 0; i < nx; i++)
             if (BS_TEST(x_dirty, (unsigned)i)) {
                 xi_rmap[n_xm] = i;
                 xi_map[i] = n_xm++;
             }
 
-        int *yi_map = (int *) xmalloc((size_t) ny * sizeof(int));
-        int *yi_rmap = (int *) xmalloc((size_t) ny * sizeof(int)); /* reverse: col→y idx */
-        memset(yi_map, 0xFF, (size_t)ny * sizeof(int));
+        scratch_ensure((void **) &sc->yi_map, &sc->yi_map_cap, (size_t) ny * sizeof(int));
+        scratch_ensure((void **) &sc->yi_rmap, &sc->yi_rmap_cap, (size_t) ny * sizeof(int));
+        int *yi_map = sc->yi_map, *yi_rmap = sc->yi_rmap;
+        memset(yi_map, 0xFF, (size_t) ny * sizeof(int));
+
         for (int i = 0; i < nx; i++) {
             if (!BS_TEST(x_dirty, (unsigned)i)) continue;
             if (dm_arr[i] >= 0 && BS_TEST(y_dirty, (unsigned)dm_arr[i]) &&
@@ -570,36 +617,37 @@ static double score_matched(
 
         int N = (n_xm > n_ym) ? n_xm : n_ym;
         if (N > 0) {
-            double *smat = (double *) xcalloc((size_t) N * (size_t) N, sizeof(double));
+            scratch_ensure((void **) &sc->smat, &sc->smat_cap,
+                           (size_t) N * (size_t) N * sizeof(double));
+            double *smat = sc->smat;
+            memset(smat, 0, (size_t) N * (size_t) N * sizeof(double));
+
             for (int i = 0; i < nx; i++) {
                 int r = xi_map[i];
                 if (r < 0) continue;
                 if (dm_arr[i] >= 0 && yi_map[dm_arr[i]] >= 0) {
                     int c = yi_map[dm_arr[i]];
-                    double sc = score_pair(x_int[i], y_int[dm_arr[i]], inv_sx, inv_sy);
-                    if (sc > smat[(size_t) r * (size_t) N + (size_t) c])
-                        smat[(size_t) r * (size_t) N + (size_t) c] = sc;
+                    double sc_val = scaled_x[i] * scaled_y[dm_arr[i]];
+                    if (sc_val > smat[(size_t) r * (size_t) N + (size_t) c])
+                        smat[(size_t) r * (size_t) N + (size_t) c] = sc_val;
                 }
                 if (sm_arr[i] >= 0 && yi_map[sm_arr[i]] >= 0) {
                     int c = yi_map[sm_arr[i]];
-                    double sc = score_pair(x_int[i], y_int[sm_arr[i]], inv_sx, inv_sy);
-                    if (sc > smat[(size_t) r * (size_t) N + (size_t) c])
-                        smat[(size_t) r * (size_t) N + (size_t) c] = sc;
+                    double sc_val = scaled_x[i] * scaled_y[sm_arr[i]];
+                    if (sc_val > smat[(size_t) r * (size_t) N + (size_t) c])
+                        smat[(size_t) r * (size_t) N + (size_t) c] = sc_val;
                 }
             }
 
-            /* Exact shortest-augmenting-path Hungarian (1-indexed).
-             * Solves max-weight bipartite matching by negating the score matrix
-             * and finding the min-cost assignment.  1-indexed: row 0 and col 0
-             * are virtual (used for augmenting-path bookkeeping).
-             *
-             * Variables: hu[i]=row potential, hv[j]=col potential, hp[j]=row
-             * assigned to col j, hway[j]=predecessor in augmenting path,
-             * hmin[j]=shortest reduced cost to col j, hused[j]=visited flag.  */
+            /* exact shortest-augmenting-path Hungarian, 1-indexed,
+             * workspace reused across calls the same way as everything
+             * else above */
             size_t N1 = (size_t) (N + 1);
-            char *hbuf = (char *) xmalloc(
-                N1 * 2 * sizeof(double) + N1 * 2 * sizeof(int) +
-                N1 * sizeof(double) + N1 * sizeof(int));
+            size_t hneed = N1 * 2 * sizeof(double) + N1 * 2 * sizeof(int) +
+                           N1 * sizeof(double) + N1 * sizeof(int);
+            scratch_ensure((void **) &sc->hbuf, &sc->hbuf_cap, hneed);
+            char *hbuf = sc->hbuf;
+
             double *hu = (double *) hbuf;
             double *hv = hu + N1;
             int *hp = (int *) (hv + N1);
@@ -651,26 +699,16 @@ static double score_matched(
             }
 
             for (int j = 1; j <= N; j++) {
-                double sc = smat[(size_t) (hp[j] - 1) * (size_t) N + (size_t) (j - 1)];
-                if (sc > 0.0) {
-                    total += sc;
+                double sc_val = smat[(size_t) (hp[j] - 1) * (size_t) N + (size_t) (j - 1)];
+                if (sc_val > 0.0) {
+                    total += sc_val;
                     matched++;
                     if (hp[j] - 1 < n_xm) matched_xsum += x_int[xi_rmap[hp[j] - 1]];
                     if (j - 1 < n_ym) matched_ysum += y_int[yi_rmap[j - 1]];
                 }
             }
-            free(hbuf);
-            free(smat);
         }
-        free(xi_map);
-        free(yi_map);
-        free(xi_rmap);
-        free(yi_rmap);
     }
-
-    free(x_dirty);
-    free(y_dirty);
-    free(buf);
 
     *out_matched = matched;
     *out_matched_xsum = matched_xsum;
@@ -678,8 +716,26 @@ static double score_matched(
     return total;
 }
 
-/* Portable C API for language bindings (ctypes/.Call/.CFFI/etc.).
- * Inputs are sanitized spectra split into m/z and intensity arrays. */
+/**
+ * @brief Score one query spectrum against one library spectrum.
+ *
+ * The portable (non-R-API-dependent) single-pair entry point - safe to
+ * call from a worker thread, since it never touches R's C API. Computes
+ * the unique-intensity sums and precursor shift, then delegates the
+ * actual matching/scoring to score_matched().
+ *
+ * @param x_mz, x_int  Query spectrum m/z and intensity arrays, length nx.
+ * @param nx           Number of peaks in the query spectrum.
+ * @param y_mz, y_int  Library spectrum m/z and intensity arrays, length ny.
+ * @param ny           Number of peaks in the library spectrum.
+ * @param x_pre, y_pre Precursor m/z of the query and library spectrum.
+ *                     NaN on either side disables shifted matching.
+ * @param tol          Absolute matching tolerance, in Da.
+ * @param ppm_val      Relative matching tolerance, in ppm.
+ * @param[out] out     Result: score, matches, score_forward, score_reverse.
+ * @return 0 on success, -1 on invalid arguments (null pointer or negative
+ *         length). Never fails due to allocation - see gnps_fatal().
+ */
 int gnps_chain_dp_core_api(
     const double *x_mz, const double *x_int, int nx,
     const double *y_mz, const double *y_int, int ny,
@@ -736,10 +792,75 @@ int gnps_chain_dp_core_api(
     return 0;
 }
 
+/**
+ * @brief Score one query spectrum against a batch of library spectra,
+ *        optionally in parallel across OpenMP threads.
+ *
+ * This is the "actually call it in a loop from R thousands of times"
+ * problem solved at the C level instead: one call per batch/chunk rather
+ * than one per pair, which also cuts the R<->C marshaling overhead that a
+ * per-pair loop in R pays every single time. Each thread gets its own
+ * score_matched() scratch automatically (thread-local, see GNPS_TLS), so
+ * no locking is needed here - just `#pragma omp parallel for`.
+ *
+ * @param x_mz, x_int  Query spectrum m/z and intensity arrays, length nx.
+ * @param nx           Number of peaks in the query spectrum.
+ * @param x_pre        Precursor m/z of the query spectrum.
+ * @param y_mz_arr     Array of `n_lib` pointers to library m/z arrays.
+ * @param y_int_arr    Array of `n_lib` pointers to library intensity
+ *                     arrays (parallel to y_mz_arr).
+ * @param ny_arr       Array of `n_lib` peak counts, one per library entry.
+ * @param y_pre_arr    Array of `n_lib` library precursor m/z values.
+ * @param n_lib        Number of library spectra to score against.
+ * @param tol          Absolute matching tolerance, in Da.
+ * @param ppm_val      Relative matching tolerance, in ppm.
+ * @param[out] out     Array of `n_lib` results, one per library entry.
+ * @return 0 if every pair scored successfully, -1 if any one failed
+ *         (invalid arguments) or if the top-level arguments themselves
+ *         are invalid.
+ * @note Requires `-fopenmp` (or the package's `SHLIB_OPENMP_CFLAGS`
+ *       equivalent) at compile time to actually run in parallel; without
+ *       it the pragma is simply ignored and this runs serially.
+ */
+int gnps_chain_dp_batch_core_api(
+    const double *x_mz, const double *x_int, int nx, double x_pre,
+    const double **y_mz_arr, const double **y_int_arr, const int *ny_arr,
+    const double *y_pre_arr, int n_lib,
+    double tol, double ppm_val,
+    GnpsCoreResult *out) {
+    if (!x_mz || !x_int || !y_mz_arr || !y_int_arr || !ny_arr || !y_pre_arr || !out || n_lib < 0)
+        return -1;
+
+    int failures = 0;
+    #ifdef _OPENMP
+    #pragma omp parallel for schedule(dynamic) reduction(+:failures) if(n_lib > 1)
+    #endif
+    for (int k = 0; k < n_lib; k++) {
+        int rc = gnps_chain_dp_core_api(
+            x_mz, x_int, nx,
+            y_mz_arr[k], y_int_arr[k], ny_arr[k],
+            x_pre, y_pre_arr[k], tol, ppm_val,
+            &out[k]);
+        if (rc != 0) failures++;
+    }
+    return failures ? -1 : 0;
+}
+
+/**
+ * @brief Free memory previously returned across the C API boundary
+ *        (e.g. GnpsJoinResult::x_idx / y_idx).
+ * @param ptr Pointer to free; safe to pass NULL.
+ */
 void gnps_free_ptr(void *ptr) {
     free(ptr);
 }
 
+/**
+ * @brief Check whether a double should be treated as "missing".
+ *
+ * Under the R API, this means R's NA_real_ or a plain NaN; without it,
+ * just NaN (there's no separate NA representation in portable C).
+ */
 static int gnps_is_missing(double v) {
 #if GNPS_HAS_R_API
     return ISNA(v) || isnan(v);
@@ -748,6 +869,36 @@ static int gnps_is_missing(double v) {
 #endif
 }
 
+/*
+ * ==========================================================================
+ * gnps_aligned_core_api / gnps_join_core_api - backward-compatible paths.
+ *
+ * Neither is called in a tight per-pair loop the way gnps_chain_dp is, so
+ * both are left as plain one-shot malloc/free, same as the original
+ * implementation. Worth migrating to the scratch-buffer pattern above if
+ * profiling ever shows these matter too.
+ * ==========================================================================
+ */
+
+/**
+ * @brief Score two already peak-aligned spectra (backward-compatible
+ *        path - the caller has already done the join).
+ *
+ * Unlike gnps_chain_dp_core_api(), this takes two spectra of the *same*
+ * length `n` where row `i` in each represents a candidate matched pair
+ * (missing/NA on one side for an unmatched peak). Builds a full score
+ * matrix over unique m/z groups and solves it exactly with the Hungarian
+ * algorithm - O(n^3) in the number of unique groups, but that's small
+ * here because the input is already filtered down to matched peaks.
+ *
+ * @param x_mz, x_int  Query-side aligned m/z and intensity, length n.
+ * @param y_mz, y_int  Library-side aligned m/z and intensity, length n.
+ * @param n            Number of aligned rows.
+ * @param[out] out     Result: score, matches, score_forward ==
+ *                     score_reverse == score (pre-aligned inputs have no
+ *                     separate forward/reverse normalization).
+ * @return 0 on success, -1 on invalid arguments.
+ */
 int gnps_aligned_core_api(
     const double *x_mz, const double *x_int,
     const double *y_mz, const double *y_int,
@@ -951,6 +1102,28 @@ int gnps_aligned_core_api(
     return 0;
 }
 
+/**
+ * @brief Peak matching only, no scoring (backward-compatible path).
+ *
+ * Replicates the outer-join semantics of the original MsCoreUtils-style
+ * join: direct pass matches x against y, shifted pass matches x+pdiff
+ * against y (skipped if the precursor difference is within tolerance),
+ * and the result merges direct matches, shifted matches, and unmatched
+ * entries from either side (NA on the missing side).
+ *
+ * @param x    Query m/z values, length nx.
+ * @param nx   Number of query values.
+ * @param y    Library m/z values, length ny.
+ * @param ny   Number of library values.
+ * @param x_pre, y_pre Precursor m/z of the query and library spectrum.
+ * @param tol      Absolute matching tolerance, in Da.
+ * @param ppm_val  Relative matching tolerance, in ppm.
+ * @param[out] out Result: parallel `x_idx`/`y_idx` arrays (caller-owned,
+ *                 free with gnps_free_ptr()) and `n_rows`, the number of
+ *                 rows in the outer join. -1 in either index marks "no
+ *                 match on this side" for that row.
+ * @return 0 on success, -1 on invalid arguments.
+ */
 int gnps_join_core_api(
     const double *x, int nx,
     const double *y, int ny,
@@ -1133,24 +1306,20 @@ int gnps_join_core_api(
     return 0;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════ *
- * gnps_chain_dp - fused join + score (hot path for sanitized spectra)         *
- *                                                                            *
- * Combines peak matching and scoring in a single pass, avoiding the          *
- * overhead of building R-level join results.  Input spectra must be          *
- * sanitized (sorted, unique m/z, no NAs).                                    *
- *                                                                            *
- * Parameters:                                                                *
- *   x, y           - nx2 numeric matrices [mz, intensity]                    *
- *   xPrecursorMz   - precursor m/z of x (scalar)                             *
- *   yPrecursorMz   - precursor m/z of y (scalar)                             *
- *   tolerance      - absolute tolerance in Da                                *
- *   ppm            - relative tolerance in ppm                               *
- *                                                                            *
- * Returns: list(score = double, matches = int)                               *
- * ══════════════════════════════════════════════════════════════════════════ */
-
 #if GNPS_HAS_R_API
+
+/**
+ * @brief R entry point: score one query spectrum against one library
+ *        spectrum (the hot path).
+ * @param x, y              nx2 numeric matrices, columns [mz, intensity],
+ *                          sorted by mz (sanitized spectra).
+ * @param xPrecursorMz      Scalar, query precursor m/z.
+ * @param yPrecursorMz      Scalar, library precursor m/z.
+ * @param tolerance         Scalar, absolute tolerance in Da.
+ * @param ppm               Scalar, relative tolerance in ppm.
+ * @return Numeric vector of length 4:
+ *         c(score, matches, score_forward, score_reverse).
+ */
 SEXP C_gnps_chain_dp(SEXP x, SEXP y,
                      SEXP xPrecursorMz, SEXP yPrecursorMz,
                      SEXP tolerance, SEXP ppm) {
@@ -1176,24 +1345,98 @@ SEXP C_gnps_chain_dp(SEXP x, SEXP y,
     return make_result(out.score, out.matches, out.score_forward, out.score_reverse);
 }
 
-/* ══════════════════════════════════════════════════════════════════════════ *
- * gnps - score pre-aligned matrices (backward compat)                        *
- *                                                                            *
- * Accepts the output of join_gnps: two nx2 matrices where row "i" represents   *
- * a matched pair (NA if unmatched on one side).  Builds a full score         *
- * matrix indexed by unique m/z groups, then solves with exact shortest-      *
- * augmenting-path Hungarian (maximize via negation).                         *
- *                                                                            *
- * O(n^3) where n = max(unique x groups, unique y groups), but n is small      *
- * because the input is already filtered to matched peaks.                    *
- * Single allocation for all Hungarian workspace.                             *
- *                                                                            *
- * Parameters:                                                                *
- *   x, y - nx2 numeric matrices [mz, intensity] from an outer join           *
- *                                                                            *
- * Returns: list(score = double, matches = int)                               *
- * ══════════════════════════════════════════════════════════════════════════ */
+/**
+ * @brief R entry point: score one query spectrum against a batch of
+ *        library spectra, potentially in parallel via OpenMP.
+ *
+ * All R API access (unpacking `y_list`, reading precursor m/z, etc.)
+ * happens here on the main thread before any parallel work starts; the
+ * batch loop itself only ever touches raw C arrays. See
+ * gnps_chain_dp_batch_core_api() for the actual parallel loop.
+ *
+ * @param x             nx2 numeric matrix, query spectrum [mz, intensity].
+ * @param xPrecursorMz  Scalar, query precursor m/z.
+ * @param y_list        List of n-by-2 numeric matrices, one per library
+ *                      spectrum (same layout as `y` in C_gnps_chain_dp).
+ * @param yPrecursorMz  Numeric vector, one precursor m/z per y_list entry.
+ * @param tolerance     Scalar, absolute tolerance in Da.
+ * @param ppm           Scalar, relative tolerance in ppm.
+ * @return An `n_lib` x 4 numeric matrix: columns score, matches,
+ *         score_forward, score_reverse, one row per y_list entry.
+ */
+SEXP C_gnps_chain_dp_batch(SEXP x, SEXP xPrecursorMz,
+                           SEXP y_list, SEXP yPrecursorMz,
+                           SEXP tolerance, SEXP ppm) {
+    if (!isReal(x)) error("x must be a numeric matrix");
+    if (!isNewList(y_list)) error("y_list must be a list of matrices");
+    SEXP xd = getAttrib(x, R_DimSymbol);
+    if (!isInteger(xd)) error("x must have a dim attribute");
 
+    int nx = INTEGER(xd)[0];
+    const double *x_mz = REAL(x), *x_int = x_mz + nx;
+    double x_pre = asReal(xPrecursorMz);
+    double tol = asReal(tolerance), ppm_val = asReal(ppm);
+
+    int n_lib = LENGTH(y_list);
+    if (LENGTH(yPrecursorMz) != n_lib)
+        error("yPrecursorMz must have one entry per y_list element");
+    const double *y_pre_arr = REAL(yPrecursorMz);
+
+    const double **y_mz_arr  = (const double **) xmalloc((size_t) n_lib * sizeof(double *));
+    const double **y_int_arr = (const double **) xmalloc((size_t) n_lib * sizeof(double *));
+    int *ny_arr = (int *) xmalloc((size_t) n_lib * sizeof(int));
+
+    for (int k = 0; k < n_lib; k++) {
+        SEXP yk = VECTOR_ELT(y_list, k);
+        if (!isReal(yk)) error("y_list[[%d]] is not a numeric matrix", k + 1);
+        SEXP ykd = getAttrib(yk, R_DimSymbol);
+        if (!isInteger(ykd)) error("y_list[[%d]] has no dim attribute", k + 1);
+        int nyk = INTEGER(ykd)[0];
+        ny_arr[k] = nyk;
+        y_mz_arr[k] = REAL(yk);
+        y_int_arr[k] = y_mz_arr[k] + nyk;
+    }
+
+    GnpsCoreResult *results =
+        (GnpsCoreResult *) xmalloc((size_t) n_lib * sizeof(GnpsCoreResult));
+
+    int rc = gnps_chain_dp_batch_core_api(
+        x_mz, x_int, nx, x_pre,
+        y_mz_arr, y_int_arr, ny_arr, y_pre_arr, n_lib,
+        tol, ppm_val, results);
+
+    free(y_mz_arr);
+    free(y_int_arr);
+    free(ny_arr);
+
+    if (rc != 0) {
+        free(results);
+        error("gnps_chain_dp_batch_core_api failed");
+    }
+
+    SEXP out = PROTECT(allocMatrix(REALSXP, n_lib, 4));
+    double *o = REAL(out);
+    for (int k = 0; k < n_lib; k++) {
+        o[k] = results[k].score;
+        o[k + n_lib] = (double) results[k].matches;
+        o[k + 2 * n_lib] = results[k].score_forward;
+        o[k + 3 * n_lib] = results[k].score_reverse;
+    }
+    free(results);
+    UNPROTECT(1);
+    return out;
+}
+
+/**
+ * @brief R entry point: score two already peak-aligned spectra
+ *        (backward-compatible path).
+ * @param x, y  nx2 numeric matrices from an outer join - row `i` in each
+ *              represents a candidate matched pair (NA on one side if
+ *              unmatched).
+ * @return Numeric vector of length 4: c(score, matches, score, score) -
+ *         forward and reverse normalization are identical for pre-aligned
+ *         input.
+ */
 SEXP C_gnps(SEXP x, SEXP y) {
     if (!isReal(x) || !isReal(y)) error("Inputs must be numeric matrices");
     SEXP xd = getAttrib(x, R_DimSymbol), yd = getAttrib(y, R_DimSymbol);
@@ -1203,7 +1446,6 @@ SEXP C_gnps(SEXP x, SEXP y) {
     const double *xmz = REAL(x), *xin = xmz + n;
     const double *ymz = REAL(y), *yin = ymz + n;
 
-    /* unique-intensity sums */
     KP *buf = (KP *) xmalloc((size_t) n * sizeof(KP));
     int m = 0;
     for (int i = 0; i < n; i++)
@@ -1232,7 +1474,6 @@ SEXP C_gnps(SEXP x, SEXP y) {
 
     if (xs_sum == 0.0 || ys_sum == 0.0) return make_result(0.0, 0, 0.0, 0.0);
 
-    /* build kept arrays */
     int l = 0;
     for (int i = 0; i < n; i++)
         if (!ISNA(xmz[i]) && !ISNA(ymz[i])) l++;
@@ -1255,7 +1496,6 @@ SEXP C_gnps(SEXP x, SEXP y) {
         }
     }
 
-    /* compute factor indices */
     int *x_fac = (int *) xmalloc((size_t) l * sizeof(int));
     int *y_fac = (int *) xmalloc((size_t) l * sizeof(int));
     {
@@ -1302,7 +1542,6 @@ SEXP C_gnps(SEXP x, SEXP y) {
         return make_result(0.0, 0, 0.0, 0.0);
     }
 
-    /* score matrix */
     double *sm = (double *) xcalloc((size_t) N * (size_t) N, sizeof(double));
     for (int i = 0; i < l; i++) {
         size_t r = (size_t) (x_fac[i] - 1), c = (size_t) (y_fac[i] - 1);
@@ -1316,16 +1555,12 @@ SEXP C_gnps(SEXP x, SEXP y) {
     free(keep_xin);
     free(keep_yin);
 
-    /* Exact shortest-augmenting-path Hungarian (maximize via negation).
-     * 1-indexed: row/col 0 are virtual for augmenting-path bookkeeping.
-     * Single allocation for all workspace: u[N+1] v[N+1] p[N+1] way[N+1]
-     * minv[N+1] used[N+1].                                               */
     {
         size_t N1 = (size_t) (N + 1);
-        size_t buf_sz = N1 * 2 * sizeof(double) /* u, v */
-                        + N1 * 2 * sizeof(int) /* p, way */
-                        + N1 * sizeof(double) /* minv */
-                        + N1 * sizeof(int); /* used */
+        size_t buf_sz = N1 * 2 * sizeof(double)
+                        + N1 * 2 * sizeof(int)
+                        + N1 * sizeof(double)
+                        + N1 * sizeof(int);
         char *hbuf = (char *) xmalloc(buf_sz);
 
         double *u = (double *) hbuf;
@@ -1390,33 +1625,21 @@ SEXP C_gnps(SEXP x, SEXP y) {
 
         free(hbuf);
         free(sm);
-        /* Pre-aligned matrices: forward and reverse are the same as total */
         return make_result(total, matched, total, total);
     }
 }
 
-/* ══════════════════════════════════════════════════════════════════════════ *
- * join_gnps - peak matching only (backward compat)                           *
- *                                                                            *
- * Replicates MsCoreUtils::join_gnps outer-join semantics exactly:            *
- *   direct pass  = join(x, y, type="outer")          - closest one-to-one    *
- *   shifted pass = join(x + pdiff, y, type="outer")  - closest one-to-one    *
- * Then merges both into a single result with direct matches, shifted         *
- * matches, and unmatched entries (NA on the missing side).                   *
- *                                                                            *
- * Verified: 2850/2850 pairs identical to MsCoreUtils::join_gnps on the       *
- * pesticides test set.                                                       *
- *                                                                            *
- * Parameters:                                                                *
- *   x, y           - numeric vectors of m/z values                           *
- *   xPrecursorMz   - precursor m/z of x (scalar)                             *
- *   yPrecursorMz   - precursor m/z of y (scalar)                             *
- *   tolerance      - absolute tolerance in Da                                *
- *   ppm            - relative tolerance in ppm                               *
- *                                                                            *
- * Returns: list(x = integer, y = integer) with 1-based R indices             *
- * ══════════════════════════════════════════════════════════════════════════ */
-
+/**
+ * @brief R entry point: peak matching only, no scoring (backward-
+ *        compatible path).
+ * @param x, y             Numeric vectors of m/z values.
+ * @param xPrecursorMz     Scalar, query precursor m/z.
+ * @param yPrecursorMz     Scalar, library precursor m/z.
+ * @param tolerance        Scalar, absolute tolerance in Da.
+ * @param ppm              Scalar, relative tolerance in ppm.
+ * @return A list with elements `x` and `y`: parallel 1-based integer
+ *         index vectors forming the outer join (NA on the missing side).
+ */
 SEXP C_join_gnps(SEXP x, SEXP y,
                  SEXP xPrecursorMz, SEXP yPrecursorMz,
                  SEXP tolerance, SEXP ppm) {
@@ -1426,13 +1649,11 @@ SEXP C_join_gnps(SEXP x, SEXP y,
     const double tol = asReal(tolerance), ppm_val = asReal(ppm);
     const int nx = (int) xlength(x), ny = (int) xlength(y);
     const double pdiff = y_pre - x_pre;
-    /* Skip shifted matching if precursors are NA or pdiff is within tolerance */
     const double max_pre = (x_pre > y_pre) ? x_pre : y_pre;
     const double pdiff_tol = tol + ppm_val * fabs(max_pre) * 1e-6;
     const int do_pdiff = (!ISNA(x_pre) && !ISNA(y_pre) && fabs(pdiff) > pdiff_tol);
     const double eps_tol = sqrt(DBL_EPSILON);
 
-    /* Sort x and y by mass (keeping original indices) */
     MI *xs_arr = (MI *) xmalloc((size_t) nx * sizeof(MI));
     MI *ys_arr = (MI *) xmalloc((size_t) ny * sizeof(MI));
     int vx = 0, vy = 0;
@@ -1451,9 +1672,8 @@ SEXP C_join_gnps(SEXP x, SEXP y,
     qsort(xs_arr, (size_t) vx, sizeof(MI), mi_cmp);
     qsort(ys_arr, (size_t) vy, sizeof(MI), mi_cmp);
 
-    /* ── Direct matching: closest one-to-one (y-centric) ─────────────── */
-    int *dm_x = (int *) xmalloc((size_t) vx * sizeof(int)); /* dm_x[xi] = yj or -1 */
-    int *dm_y = (int *) xmalloc((size_t) vy * sizeof(int)); /* dm_y[yj] = xi or -1 */
+    int *dm_x = (int *) xmalloc((size_t) vx * sizeof(int));
+    int *dm_y = (int *) xmalloc((size_t) vy * sizeof(int));
     memset(dm_x, 0xFF, (size_t)vx * sizeof(int));
     memset(dm_y, 0xFF, (size_t)vy * sizeof(int));
 
@@ -1493,8 +1713,7 @@ SEXP C_join_gnps(SEXP x, SEXP y,
         }
     }
 
-    /* ── Shifted matching: closest one-to-one (y-centric) ────────────── */
-    int *sm_x = (int *) xmalloc((size_t) vx * sizeof(int)); /* sm_x[xi] = yj or -1 */
+    int *sm_x = (int *) xmalloc((size_t) vx * sizeof(int));
     memset(sm_x, 0xFF, (size_t)vx * sizeof(int));
 
     if (do_pdiff) {
@@ -1529,34 +1748,29 @@ SEXP C_join_gnps(SEXP x, SEXP y,
         }
     }
 
-    /* ── Build outer-join result ─────────────────────────────────────── */
-    /* Track which y indices appear in any match */
     const size_t bsz = ((size_t) ny + 7u) >> 3;
     unsigned char *y_used = (unsigned char *) xcalloc(bsz, 1);
 
-    /* Count output rows */
     int cnt = 0;
-    for (int i = 0; i < nx; i++) if (ISNA(xp[i])) cnt++; /* NA x entries */
+    for (int i = 0; i < nx; i++) if (ISNA(xp[i])) cnt++;
     for (int i = 0; i < vx; i++) {
         if (dm_x[i] >= 0) {
             BS_SET(y_used, (unsigned)ys_arr[dm_x[i]].idx);
             cnt++;
         } else {
-            cnt++; /* unmatched x */
+            cnt++;
         }
     }
     for (int i = 0; i < vx; i++) {
-        if (sm_x[i] >= 0) cnt++; /* shifted matches are additional rows */
+        if (sm_x[i] >= 0) cnt++;
     }
     for (int i = 0; i < ny; i++)
-        if (!ISNA(yp[i]) && !BS_TEST(y_used, (unsigned)i)) cnt++; /* unmatched y */
+        if (!ISNA(yp[i]) && !BS_TEST(y_used, (unsigned)i)) cnt++;
 
-    /* Fill output */
     SEXP rx = PROTECT(allocVector(INTSXP, cnt));
     SEXP ry = PROTECT(allocVector(INTSXP, cnt));
     int *ox = INTEGER(rx), *oy = INTEGER(ry), pos = 0;
 
-    /* NA x entries first */
     for (int i = 0; i < nx; i++)
         if (ISNA(xp[i])) {
             ox[pos] = i + 1;
@@ -1564,7 +1778,6 @@ SEXP C_join_gnps(SEXP x, SEXP y,
             pos++;
         }
 
-    /* Direct matches and unmatched x */
     for (int i = 0; i < vx; i++) {
         if (dm_x[i] >= 0) {
             ox[pos] = xs_arr[i].idx + 1;
@@ -1577,7 +1790,6 @@ SEXP C_join_gnps(SEXP x, SEXP y,
         }
     }
 
-    /* Shifted matches */
     for (int i = 0; i < vx; i++) {
         if (sm_x[i] >= 0) {
             ox[pos] = xs_arr[i].idx + 1;
@@ -1586,7 +1798,6 @@ SEXP C_join_gnps(SEXP x, SEXP y,
         }
     }
 
-    /* Unmatched y */
     for (int i = 0; i < ny; i++)
         if (!ISNA(yp[i]) && !BS_TEST(y_used, (unsigned)i)) {
             ox[pos] = NA_INTEGER;
