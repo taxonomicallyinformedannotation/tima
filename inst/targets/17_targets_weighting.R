@@ -57,6 +57,7 @@ targets_section_weighting <- function() {
         xrefs_file = lib_xrefs
       )
     },
-    format = "file"
+    format = "file",
+    garbage_collection = TRUE
   )
 }

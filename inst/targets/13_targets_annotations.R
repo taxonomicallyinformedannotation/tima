@@ -26,7 +26,8 @@ targets_section_annotations <- function() {
             tolerance_rt = par_ann_mas$ms$tolerances$rt$adducts
           )
         },
-        format = "file"
+        format = "file",
+        garbage_collection = TRUE
       ),
       tar_target(
         name = ann_ms1_pre_ann,
@@ -118,7 +119,8 @@ targets_section_annotations <- function() {
               approx = par_ann_spe$annotations$ms2approx
             )
           },
-          format = "file"
+          format = "file",
+          garbage_collection = TRUE
         ),
         tar_target(
           name = ann_spe_neg,
@@ -151,7 +153,8 @@ targets_section_annotations <- function() {
               approx = par_ann_spe$annotations$ms2approx
             )
           },
-          format = "file"
+          format = "file",
+          garbage_collection = TRUE
         ),
         tar_target(
           name = ann_spe_pre,
@@ -165,7 +168,8 @@ targets_section_annotations <- function() {
               str_tax_npc = lib_mer_str_tax_npc
             )
           },
-          format = "file"
+          format = "file",
+          garbage_collection = TRUE
         )
       )
     ),
@@ -185,7 +189,8 @@ targets_section_annotations <- function() {
           str_tax_npc = lib_mer_str_tax_npc
         )
       },
-      format = "file"
+      format = "file",
+      garbage_collection = TRUE
     ),
     tar_target(
       name = ann_sir_pre_can,

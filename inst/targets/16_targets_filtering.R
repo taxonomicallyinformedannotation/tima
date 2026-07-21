@@ -19,6 +19,7 @@ targets_section_filtering <- function() {
         tolerance_rt = par_fil_ann$ms$tolerances$rt$library
       )
     },
-    format = "file"
+    format = "file",
+    garbage_collection = TRUE
   )
 }

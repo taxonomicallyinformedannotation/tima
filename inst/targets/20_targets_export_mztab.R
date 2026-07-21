@@ -117,6 +117,7 @@ targets_section_export_mztab <- function() {
         base_mztab = base_mzt
       )
     },
-    format = "file"
+    format = "file",
+    garbage_collection = TRUE
   )
 }

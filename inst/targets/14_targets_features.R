@@ -15,7 +15,8 @@ targets_section_features <- function() {
           dalton = par_cre_edg_spe$ms$tolerances$mass$dalton$ms2
         )
       },
-      format = "file"
+      format = "file",
+      garbage_collection = TRUE
     ),
     tar_target(
       name = fea_com,

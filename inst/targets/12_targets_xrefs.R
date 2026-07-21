@@ -6,6 +6,7 @@ targets_section_xrefs <- function() {
     command = {
       get_compounds_xrefs(output = paths$data$interim$xrefs$compounds)
     },
-    format = "file"
+    format = "file",
+    garbage_collection = TRUE
   ))
 }
