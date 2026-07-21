@@ -22,7 +22,6 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
-          - macos-14
           - windows-latest
     defaults:
       run:
@@ -47,6 +46,19 @@ jobs:
           && sudo apt-get clean \
 
           && sudo rm -rf /var/lib/apt/lists/*
+      - name: Install dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew update
+          brew install libomp
+          mkdir -p ~/.R
+          cat >> ~/.R/Makevars <<EOF
+          CFLAGS   = -mcpu=native -mtune=native -g -O3 -Wall -pedantic -Wconversion -Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include
+          CXXFLAGS = -mcpu=native -mtune=native -g -O3 -Wall -pedantic -Wconversion -Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include
+          CPPFLAGS += -I/opt/homebrew/include
+          LDFLAGS += -L/opt/homebrew/lib
+          LDFLAGS += -L$(brew --prefix libomp)/lib -lomp
+          EOF
       - name: Install
         run: >
           install.packages(
