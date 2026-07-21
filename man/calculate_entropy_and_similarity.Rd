@@ -15,7 +15,11 @@ calculate_entropy_and_similarity(
   dalton,
   ppm,
   threshold,
-  approx
+  approx,
+  query_adducts = NULL,
+  lib_adducts = NULL,
+  compute_forward_reverse = TRUE,
+  compute_entropy = TRUE
 )
 }
 \arguments{

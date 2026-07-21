@@ -233,6 +233,7 @@ annotate_spectra <- function(
     polarity = polarity,
     ppm = ppm
   )
+
   if (length(spectral_library) == 0L) {
     return(
       annotate_spectra_handle_empty_result(
@@ -851,12 +852,17 @@ reduce_library_by_precursor <- function(
     ppm = ppm
   )
 
-  lib_adducts <- extract_vector(
-    lib_sp,
-    c("adduct", "precursor_type"),
-    length(lib_sp),
-    NA_character_
-  )
+  # Extract adducts — be tolerant to lib_sp not being a full Spectra object
+  if (inherits(lib_sp, "Spectra")) {
+    lib_adducts <- extract_vector(
+      lib_sp,
+      c("adduct", "precursor_type"),
+      length(lib_sp),
+      NA_character_
+    )
+  } else {
+    lib_adducts <- rep(NA_character_, length(lib_sp))
+  }
   lib_adducts <- harmonize_adduct_vector(lib_adducts, colname = "target_adduct")
   query_neutral <- convert_precursor_to_neutral_if_possible(
     precursors = query_prec_match,
@@ -890,7 +896,8 @@ compute_similarity_safe <- function(
   if (!inherits(query_sp, "Spectra") || !inherits(lib_sp, "Spectra")) {
     return(tidytable::tidytable())
   }
-  query_prec <- query_sp@backend@spectraData$precursorMz
+  # Use get_precursors helper which handles precursorMz and precursor_mz
+  query_prec <- get_precursors(query_sp)
   lib_prec <- get_precursors(lib_sp)
   query_prec_match <- as.numeric(query_prec)
   lib_prec_match <- as.numeric(lib_prec)
@@ -1088,8 +1095,9 @@ finalize_results <- function(
       feature_id,
       candidate_library,
       candidate_structure_smiles_no_stereo,
-      .match_mode_rank,
-      tidytable::desc(x = candidate_score_similarity)
+      # Prefer highest similarity first when deduplicating structures
+      tidytable::desc(x = candidate_score_similarity),
+      .match_mode_rank
     ) |>
     tidytable::distinct(
       feature_id,
