@@ -45,7 +45,7 @@ measured.
 The benchmarking dataset was built using <https://zenodo.org/record/11566051>.
 
 It contained positive and negative MS^2^ spectra of multiple ion species
-(` [M+H]^+^, [M+Na]^+^, [M+H~4~N]^+^, ...`) coming from different mass
+(`[M+H]^+^, [M+Na]^+^, [M+H~4~N]^+^, ...`) coming from different mass
 spectrometers.
 
 In positive mode, It was filtered to 27,468 spectra, representing 17,897
