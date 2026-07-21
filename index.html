@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>tima</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./man/figures/logo.svg" rel="icon" type="image/svg+xml">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-b1779ffe01d28c8b49d3f1aef2cb2115.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./man/figures/logo.svg" alt="tima logo" class="navbar-logo light-content">
+    <img src="./man/figures/logo.svg" alt="tima logo" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">TIMA</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./vignettes/tima.html"> 
+<span class="menu-text">Get started</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-articles" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Articles</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-articles">    
+        <li>
+    <a class="dropdown-item" href="./vignettes/articles/0-validating.html">
+ <span class="dropdown-text">0 Validating your data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./vignettes/articles/I-gathering.html">
+ <span class="dropdown-text">1 Gathering everything you need</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./vignettes/articles/II-preparing.html">
+ <span class="dropdown-text">2 Preparing inputs</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./vignettes/articles/III-processing.html">
+ <span class="dropdown-text">3 Performing Taxonomically Informed Metabolite Annotation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./vignettes/articles/IV-benchmarking.html">
+ <span class="dropdown-text">4 Benchmarking Performance</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="./NEWS.html"> 
+<span class="menu-text">News</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./LICENSE.html"> 
+<span class="menu-text">License</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./CITATION.html"> 
+<span class="menu-text">Citation</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/taxonomicallyinformedannotation/tima"> <i class="bi bi-github" role="img" aria-label="tima GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Functions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Annotate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/annotate_masses.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">annotate_masses</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/annotate_spectra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">annotate_spectra</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Calculate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/calculate_mass_of_m.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">calculate_mass_of_m</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/calculate_mz_from_mass.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">calculate_mz_from_mass</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/calculate_similarity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">calculate_similarity</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Change</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/change_params_small.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">change_params_small</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Create</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/create_components.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">create_components</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/create_edges.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">create_edges</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/create_edges_spectra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">create_edges_spectra</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Filter</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/filter_annotations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">filter_annotations</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Get</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/get_example_files.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_example_files</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/get_file.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_file</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/get_last_version_from_zenodo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_last_version_from_zenodo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/get_organism_taxonomy_ott.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">get_organism_taxonomy_ott</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Harmonize</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/harmonize_adducts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">harmonize_adducts</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">Import</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/import_spectra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">import_spectra</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+ <span class="menu-text">Parse</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/parse_adduct.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">parse_adduct</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
+ <span class="menu-text">Prepare</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
+ <span class="menu-text">Annotations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_annotations_gnps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_annotations_gnps</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_annotations_sirius.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_annotations_sirius</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_annotations_spectra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_annotations_spectra</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false">
+ <span class="menu-text">Features</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_features_components.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_features_components</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_features_edges.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_features_edges</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_features_tables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_features_tables</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false">
+ <span class="menu-text">Libraries</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_rt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_rt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false">
+ <span class="menu-text">Structure Organism Pairs</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_sop_closed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_sop_closed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_sop_ecmdb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_sop_ecmdb</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_sop_hmdb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_sop_hmdb</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_sop_lotus.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_sop_lotus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_sop_merged.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_sop_merged</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_libraries_spectra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_libraries_spectra</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_taxa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_taxa</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false">
+ <span class="menu-text">Process</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-16" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/process_smiles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">process_smiles</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="false">
+ <span class="menu-text">Run</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/run_app.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">run_app</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/run_tima.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">run_tima</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false">
+ <span class="menu-text">Validate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-18" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/validate_inputs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">validate_inputs</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false">
+ <span class="menu-text">Weight</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/weight_annotations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">weight_annotations</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#tima" id="toc-tima" class="nav-link active" data-scroll-target="#tima">tima <img src="https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/logo.svg" align="right" height="139"></a>
+  <ul class="collapse">
+  <li><a href="#requirements" id="toc-requirements" class="nav-link" data-scroll-target="#requirements">Requirements</a>
+  <ul class="collapse">
+  <li><a href="#minimum-required-files" id="toc-minimum-required-files" class="nav-link" data-scroll-target="#minimum-required-files">Minimum Required Files</a></li>
+  <li><a href="#optional-additions" id="toc-optional-additions" class="nav-link" data-scroll-target="#optional-additions">Optional Additions</a></li>
+  </ul></li>
+  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
+  <li><a href="#quick-start" id="toc-quick-start" class="nav-link" data-scroll-target="#quick-start">Quick Start</a>
+  <ul class="collapse">
+  <li><a href="#validate-your-data" id="toc-validate-your-data" class="nav-link" data-scroll-target="#validate-your-data">Validate Your Data</a></li>
+  <li><a href="#run-the-pipeline" id="toc-run-the-pipeline" class="nav-link" data-scroll-target="#run-the-pipeline">Run the Pipeline</a></li>
+  <li><a href="#docker" id="toc-docker" class="nav-link" data-scroll-target="#docker">Docker</a></li>
+  </ul></li>
+  <li><a href="#main-citations" id="toc-main-citations" class="nav-link" data-scroll-target="#main-citations">Main Citations</a>
+  <ul class="collapse">
+  <li><a href="#tima-1" id="toc-tima-1" class="nav-link" data-scroll-target="#tima-1">TIMA</a></li>
+  <li><a href="#lotus" id="toc-lotus" class="nav-link" data-scroll-target="#lotus">LOTUS</a></li>
+  <li><a href="#isdb" id="toc-isdb" class="nav-link" data-scroll-target="#isdb">ISDB</a></li>
+  <li><a href="#gnps" id="toc-gnps" class="nav-link" data-scroll-target="#gnps">GNPS</a></li>
+  <li><a href="#sirius" id="toc-sirius" class="nav-link" data-scroll-target="#sirius">SIRIUS</a></li>
+  <li><a href="#others" id="toc-others" class="nav-link" data-scroll-target="#others">Others</a></li>
+  </ul></li>
+  <li><a href="#additional-software-credits" id="toc-additional-software-credits" class="nav-link" data-scroll-target="#additional-software-credits">Additional software credits</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+
+
+
+<script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+<!-- README.md is generated from README.qmd. Please edit that file -->
+<section id="tima" class="level1">
+<h1>tima <img src="https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/logo.svg" align="right" height="139"></h1>
+<!-- badges: start -->
+<p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" class="img-fluid" alt="Lifecycle: experimental"></a> <!-- [![CRAN status](https://www.r-pkg.org/badges/version/tima)](https://CRAN.R-project.org/package=tima) --> <a href="https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml/badge.svg" class="img-fluid" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/taxonomicallyinformedannotation/tima"><img src="https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg" class="img-fluid" alt="Codecov test coverage"></a> <a href="https://taxonomicallyinformedannotation.r-universe.dev/tima"><img src="https://taxonomicallyinformedannotation.r-universe.dev/tima/badges/version?&amp;color=blue&amp;style=classic.png" class="img-fluid" alt="r-universe badge"></a> <a href="https://doi.org/10.5281/zenodo.5797920"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.5797920.svg" class="img-fluid" alt="DOI"></a> <a href="https://hub.docker.com/r/adafede/tima-r/"><img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&amp;logoColor=white.png" class="img-fluid" alt="Docker"></a></p>
+<!-- badges: end -->
+<p>The initial work is available at <a href="https://doi.org/10.3389/fpls.2019.01329" class="uri">https://doi.org/10.3389/fpls.2019.01329</a>, with many improvements made since then. The workflow is illustrated below.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/tima.svg" class="img-fluid figure-img"></p>
+<figcaption>Workflow</figcaption>
+</figure>
+</div>
+<p>This repository contains everything needed to perform <strong>T</strong>axonomically <strong>I</strong>nformed <strong>M</strong>etabolite <strong>A</strong>nnotation.</p>
+<section id="requirements" class="level2">
+<h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
+<section id="minimum-required-files" class="level3">
+<h3 class="anchored" data-anchor-id="minimum-required-files">Minimum Required Files</h3>
+<p>Here is what you <em>minimally</em> need:</p>
+<ul>
+<li><strong>Feature quantification table</strong> (.csv/.tsv) - Peak areas/heights across samples (<a href="https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_features.csv">example</a>)
+<ul>
+<li>Must contain: feature ID, retention time, m/z, and sample intensity columns</li>
+<li><strong>Column names are customizable</strong></li>
+</ul></li>
+<li><strong>MS/MS spectra file</strong> (.mgf) - Fragment spectra for each or some features (<a href="https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_spectra_mini.mgf">example</a>)</li>
+<li><strong>Sample metadata</strong> (.csv/.tsv) - Links samples to organisms (<a href="https://github.com/taxonomicallyinformedannotation/tima-example-files/blob/main/example_metadata.tsv">example</a>)
+<ul>
+<li>Optional if analyzing only a single organism</li>
+</ul></li>
+</ul>
+</section>
+<section id="optional-additions" class="level3">
+<h3 class="anchored" data-anchor-id="optional-additions">Optional Additions</h3>
+<ul>
+<li><strong>Structure-organism pairs library</strong> - We provide <a href="https://lotusnprod.github.io/lotus-manuscript/"><strong>LOTUS</strong></a> (&gt;650k pairs) as default</li>
+<li><strong>External annotations</strong> - SIRIUS (v5/v6), GNPS-FBMN results</li>
+<li><strong>Custom spectral libraries</strong> - For in-house compound matching</li>
+</ul>
+<p><strong>Tip</strong>: All column names and file paths are customizable through the Shiny app interface or YAML/CLI parameters - no need to rename your files!</p>
+</section>
+</section>
+<section id="installation" class="level2">
+<h2 class="anchored" data-anchor-id="installation">Installation</h2>
+<p>As the package is not (yet) available on CRAN, you will need to install with:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tima"</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">repos =</span> <span class="fu">c</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://taxonomicallyinformedannotation.r-universe.dev"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://bioconductor.org/packages/release/bioc"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://cloud.r-project.org"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Then, you should be able to install the rest with:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">install_tima</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Normally, everything you need should then be installed (as tested in <a href="https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/external-use.yaml">here</a>). If for some reason, some packages were not installed, try to install them manually. To avoid such issues, we offer a containerized version (see <a href="#docker">Docker</a>).</p>
+<p>Once installed, you are ready to go through our <a href="https://taxonomicallyinformedannotation.github.io/tima/articles/">documentation</a>, with the major steps detailed.</p>
+<p>In case you do not have your data ready, you can obtain some example data using:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">get_example_files</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="quick-start" class="level2">
+<h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
+<section id="validate-your-data" class="level3">
+<h3 class="anchored" data-anchor-id="validate-your-data">Validate Your Data</h3>
+<p><strong>Start by validating your input files</strong> to catch issues early and save debugging time:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if your data is matches expectations before processing</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="st">"data/source/example_features.csv"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="st">"data/source/example_spectra.mgf"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata =</span> <span class="st">"data/source/example_metadata.tsv"</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius =</span> <span class="st">"data/interim/annotations/example_sirius.zip"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">feature_col =</span> <span class="st">"row ID"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">filename_col =</span> <span class="st">"filename"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">organism_col =</span> <span class="st">"ATTRIBUTE_species"</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This will:</p>
+<ul>
+<li>Count spectra in MGF files</li>
+<li>Count features and check required columns</li>
+<li>Check metadata file consistency</li>
+<li>Report eventual issues immediately</li>
+</ul>
+</section>
+<section id="run-the-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="run-the-pipeline">Run the Pipeline</h3>
+<p>Once you are done, you can open a small GUI to adapt your parameters and launch your job:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">run_app</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This command will open a small app in your default browser.</p>
+</section>
+<section id="docker" class="level3">
+<h3 class="anchored" data-anchor-id="docker">Docker</h3>
+<p>A container is also available, together with a small compose file. Main commands are below:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> pull adafede/tima-r</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># docker build inst/. -t adafede/tima-r --no-cache</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="dt">\</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>--user tima-user <span class="dt">\</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>--memory=<span class="st">"12g"</span> <span class="dt">\</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>-v <span class="st">"</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/.tima/_targets:/home/tima-user/.tima/_targets"</span> <span class="dt">\</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>-v <span class="st">"</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/.tima/data:/home/tima-user/.tima/data"</span> <span class="dt">\</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>-p 3838:3838 <span class="dt">\</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>adafede/tima-r</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># docker run \</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># --user tima-user \</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># --memory="12g" \</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># -v "$(pwd)/.tima/_targets:/home/tima-user/.tima/_targets" \</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" \</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># adafede/tima-r</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Adapt the memory limit as needed. The app will be available at <a href="http://localhost:3838/" class="uri">http://localhost:3838/</a>. Results will be written to <code>.tima/data</code> (your mounted folder).</p>
+</section>
+</section>
+<section id="main-citations" class="level2">
+<h2 class="anchored" data-anchor-id="main-citations">Main Citations</h2>
+<p>According to which steps you used, please give credit to the authors of the tools/resources used.</p>
+<section id="tima-1" class="level3">
+<h3 class="anchored" data-anchor-id="tima-1">TIMA</h3>
+<p>General: <a href="https://doi.org/10.3389/fpls.2019.01329" class="uri">https://doi.org/10.3389/fpls.2019.01329</a></p>
+<p>⚠️ Do not forget to cite which version you used: <a href="https://doi.org/10.5281/zenodo.5797920" class="uri">https://doi.org/10.5281/zenodo.5797920</a></p>
+</section>
+<section id="lotus" class="level3">
+<h3 class="anchored" data-anchor-id="lotus">LOTUS</h3>
+<p>General: <a href="https://doi.org/10.7554/eLife.70780" class="uri">https://doi.org/10.7554/eLife.70780</a></p>
+<p>⚠️ Do not forget to cite which version you used: <a href="https://doi.org/10.5281/zenodo.5794106" class="uri">https://doi.org/10.5281/zenodo.5794106</a></p>
+</section>
+<section id="isdb" class="level3">
+<h3 class="anchored" data-anchor-id="isdb">ISDB</h3>
+<p>General: <a href="https://doi.org/10.1021/acs.analchem.5b04804" class="uri">https://doi.org/10.1021/acs.analchem.5b04804</a></p>
+<p>⚠️ Do not forget to cite which version you used: <a href="https://doi.org/10.5281/zenodo.5607185" class="uri">https://doi.org/10.5281/zenodo.5607185</a></p>
+</section>
+<section id="gnps" class="level3">
+<h3 class="anchored" data-anchor-id="gnps">GNPS</h3>
+<p>General: <a href="https://doi.org/10.1038/nbt.3597" class="uri">https://doi.org/10.1038/nbt.3597</a></p>
+</section>
+<section id="sirius" class="level3">
+<h3 class="anchored" data-anchor-id="sirius">SIRIUS</h3>
+<p>General: <a href="https://doi.org/10.1038/s41592-019-0344-8" class="uri">https://doi.org/10.1038/s41592-019-0344-8</a></p>
+<ul>
+<li><em>CSI:FingerId</em>: <a href="https://doi.org/10.1073/pnas.1509788112" class="uri">https://doi.org/10.1073/pnas.1509788112</a></li>
+<li><em>ZODIAC</em>: <a href="https://doi.org/10.1038/s42256-020-00234-6" class="uri">https://doi.org/10.1038/s42256-020-00234-6</a></li>
+<li><em>CANOPUS</em>: <a href="https://doi.org/10.1038/s41587-020-0740-8" class="uri">https://doi.org/10.1038/s41587-020-0740-8</a></li>
+<li><em>COSMIC</em>: <a href="https://doi.org/10.1038/s41587-021-01045-9" class="uri">https://doi.org/10.1038/s41587-021-01045-9</a></li>
+</ul>
+</section>
+<section id="others" class="level3">
+<h3 class="anchored" data-anchor-id="others">Others</h3>
+<ul>
+<li>BiGG: <a href="https://doi.org/10.1093/nar/gkv1049" class="uri">https://doi.org/10.1093/nar/gkv1049</a></li>
+<li>BMDB: <a href="https://doi.org/10.3390/metabo10060233" class="uri">https://doi.org/10.3390/metabo10060233</a></li>
+<li>Cannabis DB: <a href="https://doi.org/10.1021/acs.jafc.3c06616" class="uri">https://doi.org/10.1021/acs.jafc.3c06616</a></li>
+<li>ECMDB 2.0: <a href="https://doi.org/10.1093/nar/gkv1060" class="uri">https://doi.org/10.1093/nar/gkv1060</a></li>
+<li>HMDB 5.0: <a href="https://doi.org/10.1093/nar/gkab1062" class="uri">https://doi.org/10.1093/nar/gkab1062</a>
+<ul>
+<li>CSF: <a href="https://doi.org/10.1016/j.jchromb.2008.05.001" class="uri">https://doi.org/10.1016/j.jchromb.2008.05.001</a></li>
+<li>Fecal: <a href="https://doi.org/10.1016/j.aca.2018.05.031" class="uri">https://doi.org/10.1016/j.aca.2018.05.031</a></li>
+<li>Saliva: <a href="https://doi.org/10.1007/s11306-015-0840-5" class="uri">https://doi.org/10.1007/s11306-015-0840-5</a></li>
+<li>Serum: <a href="https://doi.org/10.1371/journal.pone.0016957" class="uri">https://doi.org/10.1371/journal.pone.0016957</a></li>
+<li>Sweat:</li>
+<li>Urine: <a href="https://doi.org/10.1371/journal.pone.0073076" class="uri">https://doi.org/10.1371/journal.pone.0073076</a></li>
+</ul></li>
+<li>MCDB: <a href="https://doi.org/10.1021/acs.jafc.9b00204" class="uri">https://doi.org/10.1021/acs.jafc.9b00204</a></li>
+<li>SMPDB 2.0: <a href="https://doi.org/10.1093/nar/gkt1067" class="uri">https://doi.org/10.1093/nar/gkt1067</a> <!-- -   MiMeDB 2.0: <https://doi.org/10.1093/nar/gkaf1272> --></li>
+<li>T3DB: <a href="https://doi.org/10.1093/nar/gku1004" class="uri">https://doi.org/10.1093/nar/gku1004</a></li>
+<li>YMDB 2.0: <a href="https://doi.org/10.1093/nar/gkw1058" class="uri">https://doi.org/10.1093/nar/gkw1058</a></li>
+<li>Enveda-180: <a href="https://doi.org/10.5281/zenodo.20436851" class="uri">https://doi.org/10.5281/zenodo.20436851</a></li>
+<li>MassBank: <a href="https://doi.org/10.5281/zenodo.3378723" class="uri">https://doi.org/10.5281/zenodo.3378723</a></li>
+<li>Merlin: <a href="https://doi.org/10.5281/zenodo.13911806" class="uri">https://doi.org/10.5281/zenodo.13911806</a></li>
+<li>MultiMS2: <a href="https://doi.org/10.5281/zenodo.17417088" class="uri">https://doi.org/10.5281/zenodo.17417088</a></li>
+<li>NPClassifier: <a href="https://doi.org/10.1021/acs.jnatprod.1c00399" class="uri">https://doi.org/10.1021/acs.jnatprod.1c00399</a></li>
+<li>ISDB-NormanSusDat: <a href="https://zenodo.org/records/14854025" class="uri">https://zenodo.org/records/14854025</a></li>
+</ul>
+</section>
+</section>
+<section id="additional-software-credits" class="level2">
+<h2 class="anchored" data-anchor-id="additional-software-credits">Additional software credits</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 11%">
+<col style="width: 72%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Package</th>
+<th style="text-align: left;">Version</th>
+<th style="text-align: left;">Citation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">archive</td>
+<td style="text-align: left;">1.1.13</td>
+<td style="text-align: left;">Hester and Csárdi (2026)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">base</td>
+<td style="text-align: left;">4.6.0</td>
+<td style="text-align: left;">R Core Team (2026a)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BiocManager</td>
+<td style="text-align: left;">1.30.27</td>
+<td style="text-align: left;">Morgan and Ramos (2025)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BiocParallel</td>
+<td style="text-align: left;">1.46.0</td>
+<td style="text-align: left;">Wang et al.&nbsp;(2026)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BiocVersion</td>
+<td style="text-align: left;">3.23.1</td>
+<td style="text-align: left;">Morgan (2025)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">docopt</td>
+<td style="text-align: left;">0.7.2</td>
+<td style="text-align: left;"><span class="nocase">de Jonge</span> (2025)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fs</td>
+<td style="text-align: left;">2.1.0</td>
+<td style="text-align: left;">Hester et al.&nbsp;(2026)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">httr2</td>
+<td style="text-align: left;">1.2.3</td>
+<td style="text-align: left;">Wickham (2025)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">igraph</td>
+<td style="text-align: left;">2.3.2</td>
+<td style="text-align: left;">Csárdi and Nepusz (2006); Antonov et al.&nbsp;(2023); Csárdi et al.&nbsp;(2026)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">knitr</td>
+<td style="text-align: left;">1.51</td>
+<td style="text-align: left;">Xie (2014); Xie (2015); Xie (2025)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lgr</td>
+<td style="text-align: left;">0.5.2</td>
+<td style="text-align: left;">Fleck (2026)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lifecycle</td>
+<td style="text-align: left;">1.0.5</td>
+<td style="text-align: left;">Henry and Wickham (2026)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MetaboCoreUtils</td>
+<td style="text-align: left;">1.20.1</td>
+<td style="text-align: left;">Rainer et al.&nbsp;(2022a)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MsBackendMgf</td>
+<td style="text-align: left;">1.20.0</td>
+<td style="text-align: left;">Gatto et al.&nbsp;(2026)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MsBackendMsp</td>
+<td style="text-align: left;">1.16.0</td>
+<td style="text-align: left;">Rainer et al.&nbsp;(2022b)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MsCoreUtils</td>
+<td style="text-align: left;">1.24.0</td>
+<td style="text-align: left;">Rainer et al.&nbsp;(2022c)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">msentropy</td>
+<td style="text-align: left;">0.1.4</td>
+<td style="text-align: left;">Li (2023)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">pkgload</td>
+<td style="text-align: left;">1.5.3</td>
+<td style="text-align: left;">Wickham et al.&nbsp;(2026)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">R.utils</td>
+<td style="text-align: left;">2.13.0</td>
+<td style="text-align: left;">Bengtsson (2025)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">reticulate</td>
+<td style="text-align: left;">1.46.0</td>
+<td style="text-align: left;">Ushey et al.&nbsp;(2026)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">rmarkdown</td>
+<td style="text-align: left;">2.31</td>
+<td style="text-align: left;">Xie et al.&nbsp;(2018); Xie et al.&nbsp;(2020); Allaire et al.&nbsp;(2026)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">rotl</td>
+<td style="text-align: left;">3.1.1</td>
+<td style="text-align: left;">Michonneau et al.&nbsp;(2016); OpenTreeOfLife et al.&nbsp;(2019)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">shiny</td>
+<td style="text-align: left;">1.14.0</td>
+<td style="text-align: left;">Chang et al.&nbsp;(2026)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">shinyhelper</td>
+<td style="text-align: left;">0.3.2</td>
+<td style="text-align: left;">Mason-Thom (2019)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">shinyjs</td>
+<td style="text-align: left;">2.1.1</td>
+<td style="text-align: left;">Attali (2026)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">shinytest2</td>
+<td style="text-align: left;">0.5.1</td>
+<td style="text-align: left;">Schloerke (2026)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">shinyvalidate</td>
+<td style="text-align: left;">0.1.3</td>
+<td style="text-align: left;">Sievert et al.&nbsp;(2023)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Spectra</td>
+<td style="text-align: left;">1.22.2</td>
+<td style="text-align: left;">Rainer et al.&nbsp;(2022d)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">spelling</td>
+<td style="text-align: left;">2.3.2</td>
+<td style="text-align: left;">Ooms and Hester (2025)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">stringi</td>
+<td style="text-align: left;">1.8.7</td>
+<td style="text-align: left;">Gagolewski (2022)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">targets</td>
+<td style="text-align: left;">1.12.0</td>
+<td style="text-align: left;">Landau (2021)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">testthat</td>
+<td style="text-align: left;">3.3.2</td>
+<td style="text-align: left;">Wickham (2011)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">tidyselect</td>
+<td style="text-align: left;">1.2.1</td>
+<td style="text-align: left;">Henry and Wickham (2024)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tidytable</td>
+<td style="text-align: left;">0.11.2</td>
+<td style="text-align: left;">Fairbanks (2024)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">tidyverse</td>
+<td style="text-align: left;">2.0.0</td>
+<td style="text-align: left;">Wickham et al.&nbsp;(2019)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tima</td>
+<td style="text-align: left;">2.13.0.9000</td>
+<td style="text-align: left;">Rutz et al.&nbsp;(2019); Rutz and Allard (2026)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">tools</td>
+<td style="text-align: left;">4.6.0</td>
+<td style="text-align: left;">R Core Team (2026b)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">withr</td>
+<td style="text-align: left;">3.0.3</td>
+<td style="text-align: left;">Hester et al.&nbsp;(2024)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">yaml</td>
+<td style="text-align: left;">2.3.12</td>
+<td style="text-align: left;">Stephens and Simonov (2025)</td>
+</tr>
+</tbody>
+</table>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-rmarkdown2026" class="csl-entry" role="listitem">
+Allaire, JJ, Yihui Xie, Christophe Dervieux, et al.&nbsp;2026. <em><span class="nocase">rmarkdown</span>: Dynamic Documents for r</em>. <a href="https://github.com/rstudio/rmarkdown" class="uri">https://github.com/rstudio/rmarkdown</a>.
+</div>
+<div id="ref-igraph2023" class="csl-entry" role="listitem">
+Antonov, Michael, Gábor Csárdi, Szabolcs Horvát, et al.&nbsp;2023. “Igraph Enables Fast and Robust Network Analysis Across Programming Languages.” <em>arXiv Preprint arXiv:2311.10260</em>, ahead of print. <a href="https://doi.org/10.48550/arXiv.2311.10260" class="uri">https://doi.org/10.48550/arXiv.2311.10260</a>.
+</div>
+<div id="ref-shinyjs" class="csl-entry" role="listitem">
+Attali, Dean. 2026. <em><span class="nocase">shinyjs</span>: Easily Improve the User Experience of Your Shiny Apps in Seconds</em>. <a href="https://doi.org/10.32614/CRAN.package.shinyjs" class="uri">https://doi.org/10.32614/CRAN.package.shinyjs</a>.
+</div>
+<div id="ref-Rutils" class="csl-entry" role="listitem">
+Bengtsson, Henrik. 2025. <em><span class="nocase">R.utils</span>: Various Programming Utilities</em>. <a href="https://doi.org/10.32614/CRAN.package.R.utils" class="uri">https://doi.org/10.32614/CRAN.package.R.utils</a>.
+</div>
+<div id="ref-shiny" class="csl-entry" role="listitem">
+Chang, Winston, Joe Cheng, JJ Allaire, et al.&nbsp;2026. <em><span class="nocase">shiny</span>: Web Application Framework for r</em>. <a href="https://doi.org/10.32614/CRAN.package.shiny" class="uri">https://doi.org/10.32614/CRAN.package.shiny</a>.
+</div>
+<div id="ref-igraph2006" class="csl-entry" role="listitem">
+Csárdi, Gábor, and Tamás Nepusz. 2006. “The Igraph Software Package for Complex Network Research.” <em>InterJournal</em> Complex Systems: 1695. <a href="https://igraph.org" class="uri">https://igraph.org</a>.
+</div>
+<div id="ref-igraph2026" class="csl-entry" role="listitem">
+Csárdi, Gábor, Tamás Nepusz, Vincent Traag, et al.&nbsp;2026. <em><span class="nocase">igraph</span>: Network Analysis and Visualization in r</em>. <a href="https://doi.org/10.5281/zenodo.7682609" class="uri">https://doi.org/10.5281/zenodo.7682609</a>.
+</div>
+<div id="ref-docopt" class="csl-entry" role="listitem">
+<span class="nocase">de Jonge, Edwin</span>. 2025. <em><span class="nocase">docopt</span>: Command-Line Interface Specification Language</em>. <a href="https://doi.org/10.32614/CRAN.package.docopt" class="uri">https://doi.org/10.32614/CRAN.package.docopt</a>.
+</div>
+<div id="ref-tidytable" class="csl-entry" role="listitem">
+Fairbanks, Mark. 2024. <em><span class="nocase">tidytable</span>: Tidy Interface to “<span class="nocase">data.table</span>”</em>. <a href="https://doi.org/10.32614/CRAN.package.tidytable" class="uri">https://doi.org/10.32614/CRAN.package.tidytable</a>.
+</div>
+<div id="ref-lgr" class="csl-entry" role="listitem">
+Fleck, Stefan. 2026. <em><span class="nocase">lgr</span>: A Fully Featured Logging Framework</em>. <a href="https://doi.org/10.32614/CRAN.package.lgr" class="uri">https://doi.org/10.32614/CRAN.package.lgr</a>.
+</div>
+<div id="ref-stringi" class="csl-entry" role="listitem">
+Gagolewski, Marek. 2022. “<span class="nocase">stringi</span>: Fast and Portable Character String Processing in R.” <em>Journal of Statistical Software</em> 103 (2): 1–59. <a href="https://doi.org/10.18637/jss.v103.i02" class="uri">https://doi.org/10.18637/jss.v103.i02</a>.
+</div>
+<div id="ref-MsBackendMgf" class="csl-entry" role="listitem">
+Gatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2026. <em>MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format (Mgf) Files</em>. <a href="https://doi.org/10.18129/B9.bioc.MsBackendMgf" class="uri">https://doi.org/10.18129/B9.bioc.MsBackendMgf</a>.
+</div>
+<div id="ref-tidyselect" class="csl-entry" role="listitem">
+Henry, Lionel, and Hadley Wickham. 2024. <em><span class="nocase">tidyselect</span>: Select from a Set of Strings</em>. <a href="https://doi.org/10.32614/CRAN.package.tidyselect" class="uri">https://doi.org/10.32614/CRAN.package.tidyselect</a>.
+</div>
+<div id="ref-lifecycle" class="csl-entry" role="listitem">
+Henry, Lionel, and Hadley Wickham. 2026. <em><span class="nocase">lifecycle</span>: Manage the Life Cycle of Your Package Functions</em>. <a href="https://doi.org/10.32614/CRAN.package.lifecycle" class="uri">https://doi.org/10.32614/CRAN.package.lifecycle</a>.
+</div>
+<div id="ref-archive" class="csl-entry" role="listitem">
+Hester, Jim, and Gábor Csárdi. 2026. <em><span class="nocase">archive</span>: Multi-Format Archive and Compression Support</em>. <a href="https://doi.org/10.32614/CRAN.package.archive" class="uri">https://doi.org/10.32614/CRAN.package.archive</a>.
+</div>
+<div id="ref-withr" class="csl-entry" role="listitem">
+Hester, Jim, Lionel Henry, Kirill Müller, Kevin Ushey, Hadley Wickham, and Winston Chang. 2024. <em><span class="nocase">withr</span>: Run Code “With” Temporarily Modified Global State</em>. <a href="https://doi.org/10.32614/CRAN.package.withr" class="uri">https://doi.org/10.32614/CRAN.package.withr</a>.
+</div>
+<div id="ref-fs" class="csl-entry" role="listitem">
+Hester, Jim, Hadley Wickham, and Gábor Csárdi. 2026. <em><span class="nocase">fs</span>: Cross-Platform File System Operations Based on “<span class="nocase">libuv</span>”</em>. <a href="https://doi.org/10.32614/CRAN.package.fs" class="uri">https://doi.org/10.32614/CRAN.package.fs</a>.
+</div>
+<div id="ref-targets" class="csl-entry" role="listitem">
+Landau, William Michael. 2021. “The Targets r Package: A Dynamic Make-Like Function-Oriented Pipeline Toolkit for Reproducibility and High-Performance Computing.” <em>Journal of Open Source Software</em> 6 (57): 2959. <a href="https://doi.org/10.21105/joss.02959" class="uri">https://doi.org/10.21105/joss.02959</a>.
+</div>
+<div id="ref-msentropy" class="csl-entry" role="listitem">
+Li, Yuanyue. 2023. <em><span class="nocase">msentropy</span>: Spectral Entropy for Mass Spectrometry Data</em>. <a href="https://doi.org/10.32614/CRAN.package.msentropy" class="uri">https://doi.org/10.32614/CRAN.package.msentropy</a>.
+</div>
+<div id="ref-shinyhelper" class="csl-entry" role="listitem">
+Mason-Thom, Chris. 2019. <em><span class="nocase">shinyhelper</span>: Easily Add Markdown Help Files to “<span class="nocase">shiny</span>” App Elements</em>. <a href="https://doi.org/10.32614/CRAN.package.shinyhelper" class="uri">https://doi.org/10.32614/CRAN.package.shinyhelper</a>.
+</div>
+<div id="ref-rotl2016" class="csl-entry" role="listitem">
+Michonneau, Francois, Joseph W. Brown, and David J. Winter. 2016. “<span class="nocase">rotl</span>: An r Package to Interact with the Open Tree of Life Data.” <em>Methods in Ecology and Evolution</em> 7 (12): 1476–81. <a href="https://doi.org/10.1111/2041-210X.12593" class="uri">https://doi.org/10.1111/2041-210X.12593</a>.
+</div>
+<div id="ref-BiocVersion" class="csl-entry" role="listitem">
+Morgan, Martin. 2025. <em>BiocVersion: Set the Appropriate Version of Bioconductor Packages</em>.
+</div>
+<div id="ref-BiocManager" class="csl-entry" role="listitem">
+Morgan, Martin, and Marcel Ramos. 2025. <em>BiocManager: Access the Bioconductor Project Package Repository</em>. <a href="https://doi.org/10.32614/CRAN.package.BiocManager" class="uri">https://doi.org/10.32614/CRAN.package.BiocManager</a>.
+</div>
+<div id="ref-spelling" class="csl-entry" role="listitem">
+Ooms, Jeroen, and Jim Hester. 2025. <em><span class="nocase">spelling</span>: Tools for Spell Checking in r</em>. <a href="https://doi.org/10.32614/CRAN.package.spelling" class="uri">https://doi.org/10.32614/CRAN.package.spelling</a>.
+</div>
+<div id="ref-rotl2019" class="csl-entry" role="listitem">
+OpenTreeOfLife, Benjamin Redelings, Luna Luisa Sanchez Reyes, et al. 2019. <em>Open Tree of Life Synthetic Tree</em>. Version 12.3. Zenodo. <a href="https://doi.org/10.5281/zenodo.3937741" class="uri">https://doi.org/10.5281/zenodo.3937741</a>.
+</div>
+<div id="ref-base" class="csl-entry" role="listitem">
+R Core Team. 2026a. <em>R: A Language and Environment for Statistical Computing</em>. R Foundation for Statistical Computing. <a href="https://doi.org/10.32614/R.manuals" class="uri">https://doi.org/10.32614/R.manuals</a>.
+</div>
+<div id="ref-tools" class="csl-entry" role="listitem">
+R Core Team. 2026b. <em>R: A Language and Environment for Statistical Computing</em>. R Foundation for Statistical Computing. <a href="https://doi.org/10.32614/R.manuals" class="uri">https://doi.org/10.32614/R.manuals</a>.
+</div>
+<div id="ref-MetaboCoreUtils" class="csl-entry" role="listitem">
+Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al.&nbsp;2022a. “A Modular and Expandable Ecosystem for Metabolomics Data Annotation in r.” <em>Metabolites</em> 12: 173. <a href="https://doi.org/10.3390/metabo12020173" class="uri">https://doi.org/10.3390/metabo12020173</a>.
+</div>
+<div id="ref-MsBackendMsp" class="csl-entry" role="listitem">
+Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al.&nbsp;2022b. “A Modular and Expandable Ecosystem for Metabolomics Data Annotation in r.” <em>Metabolites</em> 12: 173. <a href="https://doi.org/10.3390/metabo12020173" class="uri">https://doi.org/10.3390/metabo12020173</a>.
+</div>
+<div id="ref-MsCoreUtils" class="csl-entry" role="listitem">
+Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al.&nbsp;2022c. “A Modular and Expandable Ecosystem for Metabolomics Data Annotation in r.” <em>Metabolites</em> 12: 173. <a href="https://doi.org/10.3390/metabo12020173" class="uri">https://doi.org/10.3390/metabo12020173</a>.
+</div>
+<div id="ref-Spectra" class="csl-entry" role="listitem">
+Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al.&nbsp;2022d. “A Modular and Expandable Ecosystem for Metabolomics Data Annotation in r.” <em>Metabolites</em> 12: 173. <a href="https://doi.org/10.3390/metabo12020173" class="uri">https://doi.org/10.3390/metabo12020173</a>.
+</div>
+<div id="ref-tima2026" class="csl-entry" role="listitem">
+Rutz, Adriano, and Pierre-Marie Allard. 2026. <em><span class="nocase">tima</span>: Taxonomically Informed Metabolite Annotation</em>. <a href="https://doi.org/10.5281/zenodo.5797920" class="uri">https://doi.org/10.5281/zenodo.5797920</a>.
+</div>
+<div id="ref-tima2019" class="csl-entry" role="listitem">
+Rutz, Adriano, Miwa Dounoue-Kubo, Simon Ollivier, et al.&nbsp;2019. “Taxonomically Informed Scoring Enhances Confidence in Natural Products Annotation.” <em>Frontiers in Plant Science</em> 10. <a href="https://doi.org/10.3389/FPLS.2019.01329" class="uri">https://doi.org/10.3389/FPLS.2019.01329</a>.
+</div>
+<div id="ref-shinytest2" class="csl-entry" role="listitem">
+Schloerke, Barret. 2026. <em>Shinytest2: Testing for Shiny Applications</em>. <a href="https://doi.org/10.32614/CRAN.package.shinytest2" class="uri">https://doi.org/10.32614/CRAN.package.shinytest2</a>.
+</div>
+<div id="ref-shinyvalidate" class="csl-entry" role="listitem">
+Sievert, Carson, Richard Iannone, and Joe Cheng. 2023. <em><span class="nocase">shinyvalidate</span>: Input Validation for Shiny Apps</em>. <a href="https://doi.org/10.32614/CRAN.package.shinyvalidate" class="uri">https://doi.org/10.32614/CRAN.package.shinyvalidate</a>.
+</div>
+<div id="ref-yaml" class="csl-entry" role="listitem">
+Stephens, Jeremy, and Kirill Simonov. 2025. <em><span class="nocase">yaml</span>: Methods to Convert r Data to YAML and Back</em>. <a href="https://doi.org/10.32614/CRAN.package.yaml" class="uri">https://doi.org/10.32614/CRAN.package.yaml</a>.
+</div>
+<div id="ref-reticulate" class="csl-entry" role="listitem">
+Ushey, Kevin, JJ Allaire, and Yuan Tang. 2026. <em><span class="nocase">reticulate</span>: Interface to “Python”</em>. <a href="https://doi.org/10.32614/CRAN.package.reticulate" class="uri">https://doi.org/10.32614/CRAN.package.reticulate</a>.
+</div>
+<div id="ref-BiocParallel" class="csl-entry" role="listitem">
+Wang, Jiefei, Martin Morgan, Valerie Obenchain, Michel Lang, Ryan Thompson, and Nitesh Turaga. 2026. <em>BiocParallel: Bioconductor Facilities for Parallel Evaluation</em>. <a href="https://doi.org/10.18129/B9.bioc.BiocParallel" class="uri">https://doi.org/10.18129/B9.bioc.BiocParallel</a>.
+</div>
+<div id="ref-testthat" class="csl-entry" role="listitem">
+Wickham, Hadley. 2011. “<span class="nocase">testthat</span>: Get Started with Testing.” <em>The R Journal</em> 3: 5–10. <a href="https://journal.r-project.org/articles/RJ-2011-002/" class="uri">https://journal.r-project.org/articles/RJ-2011-002/</a>.
+</div>
+<div id="ref-httr2" class="csl-entry" role="listitem">
+Wickham, Hadley. 2025. <em>Httr2: Perform HTTP Requests and Process the Responses</em>. <a href="https://doi.org/10.32614/CRAN.package.httr2" class="uri">https://doi.org/10.32614/CRAN.package.httr2</a>.
+</div>
+<div id="ref-tidyverse" class="csl-entry" role="listitem">
+Wickham, Hadley, Mara Averick, Jennifer Bryan, et al.&nbsp;2019. “Welcome to the <span class="nocase">tidyverse</span>.” <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686" class="uri">https://doi.org/10.21105/joss.01686</a>.
+</div>
+<div id="ref-pkgload" class="csl-entry" role="listitem">
+Wickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2026. <em><span class="nocase">pkgload</span>: Simulate Package Installation and Attach</em>. <a href="https://doi.org/10.32614/CRAN.package.pkgload" class="uri">https://doi.org/10.32614/CRAN.package.pkgload</a>.
+</div>
+<div id="ref-knitr2014" class="csl-entry" role="listitem">
+Xie, Yihui. 2014. “<span class="nocase">knitr</span>: A Comprehensive Tool for Reproducible Research in R.” In <em>Implementing Reproducible Computational Research</em>, edited by Victoria Stodden, Friedrich Leisch, and Roger D. Peng. Chapman; Hall/CRC.
+</div>
+<div id="ref-knitr2015" class="csl-entry" role="listitem">
+Xie, Yihui. 2015. <em>Dynamic Documents with R and Knitr</em>. 2nd ed.&nbsp;Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" class="uri">https://yihui.org/knitr/</a>.
+</div>
+<div id="ref-knitr2025" class="csl-entry" role="listitem">
+Xie, Yihui. 2025. <em><span class="nocase">knitr</span>: A General-Purpose Package for Dynamic Report Generation in R</em>. <a href="https://yihui.org/knitr/" class="uri">https://yihui.org/knitr/</a>.
+</div>
+<div id="ref-rmarkdown2018" class="csl-entry" role="listitem">
+Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>R Markdown: The Definitive Guide</em>. Chapman; Hall/CRC. <a href="https://yihui.org/rmarkdown/" class="uri">https://yihui.org/rmarkdown/</a>.
+</div>
+<div id="ref-rmarkdown2020" class="csl-entry" role="listitem">
+Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. <em>R Markdown Cookbook</em>. Chapman; Hall/CRC. <a href="https://yihui.org/rmarkdown-cookbook" class="uri">https://yihui.org/rmarkdown-cookbook</a>.
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/taxonomicallyinformedannotation\.github\.io\/tima\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

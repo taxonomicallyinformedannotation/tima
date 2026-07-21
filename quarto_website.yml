@@ -1,0 +1,169 @@
+---
+project:
+  output-dir: ../docs/
+  type: website
+
+website:
+  title: "$ALTDOC_PACKAGE_NAME"
+  site-url: https://taxonomicallyinformedannotation.github.io/tima/
+  favicon: man/figures/logo.svg
+  image: man/figures/logo.svg
+  page-navigation: true
+  navbar:
+    title: TIMA
+    description: Taxonomically Informed Metabolite Annotation
+    logo: man/figures/logo.svg
+    logo-alt: tima logo
+    search: true
+    left:
+      - text: Get started
+        file: vignettes/tima.qmd
+      - text: Articles
+        menu:
+          - text: 0 Validating your data
+            file: vignettes/articles/0-validating.qmd
+          - text: 1 Gathering everything you need
+            file: vignettes/articles/I-gathering.qmd
+          - text: 2 Preparing inputs
+            file: vignettes/articles/II-preparing.qmd
+          - text: 3 Performing Taxonomically Informed Metabolite Annotation
+            file: vignettes/articles/III-processing.qmd
+          - text: 4 Benchmarking Performance
+            file: vignettes/articles/IV-benchmarking.qmd
+      - text: News
+        file: $ALTDOC_NEWS
+      - text: License
+        file: $ALTDOC_LICENSE
+      - text: Citation
+        file: $ALTDOC_CITATION
+    right:
+      - icon: github
+        href: $ALTDOC_PACKAGE_URL_GITHUB
+        aria-label: $ALTDOC_PACKAGE_NAME GitHub
+  body-header: |
+    <!-- 100% privacy-first analytics -->
+    <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+  sidebar:
+    contents:
+      - section: Functions
+        contents:
+          - section: Annotate
+            contents:
+              - text: annotate_masses
+                file: man/annotate_masses.qmd
+              - text: annotate_spectra
+                file: man/annotate_spectra.qmd
+          - section: Calculate
+            contents:
+              - text: calculate_mass_of_m
+                file: man/calculate_mass_of_m.qmd
+              - text: calculate_mz_from_mass
+                file: man/calculate_mz_from_mass.qmd
+              - text: calculate_similarity
+                file: man/calculate_similarity.qmd
+          - section: Change
+            contents:
+              - text: change_params_small
+                file: man/change_params_small.qmd
+          - section: Create
+            contents:
+              - text: create_components
+                file: man/create_components.qmd
+              - text: create_edges
+                file: man/create_edges.qmd
+              - text: create_edges_spectra
+                file: man/create_edges_spectra.qmd
+          - section: Filter
+            contents:
+              - text: filter_annotations
+                file: man/filter_annotations.qmd
+          - section: Get
+            contents:
+              - text: get_example_files
+                file: man/get_example_files.qmd
+              - text: get_file
+                file: man/get_file.qmd
+              - text: get_last_version_from_zenodo
+                file: man/get_last_version_from_zenodo.qmd
+              - text: get_organism_taxonomy_ott
+                file: man/get_organism_taxonomy_ott.qmd
+          - section: Harmonize
+            contents:
+              - text: harmonize_adducts
+                file: man/harmonize_adducts.qmd
+          - section: Import
+            contents:
+              - text: import_spectra
+                file: man/import_spectra.qmd
+          - section: Parse
+            contents:
+              - text: parse_adduct
+                file: man/parse_adduct.qmd
+          - section: Prepare
+            contents:
+              - section: Annotations
+                contents:
+                  - text: prepare_annotations_gnps
+                    file: man/prepare_annotations_gnps.qmd
+                  - text: prepare_annotations_sirius
+                    file: man/prepare_annotations_sirius.qmd
+                  - text: prepare_annotations_spectra
+                    file: man/prepare_annotations_spectra.qmd
+              - section: Features
+                contents:
+                  - text: prepare_features_components
+                    file: man/prepare_features_components.qmd
+                  - text: prepare_features_edges
+                    file: man/prepare_features_edges.qmd
+                  - text: prepare_features_tables
+                    file: man/prepare_features_tables.qmd
+              - section: Libraries
+                contents:
+                  - text: prepare_libraries_rt
+                    file: man/prepare_libraries_rt.qmd
+                  - section: Structure Organism Pairs
+                    contents:
+                      - text: prepare_libraries_sop_closed
+                        file: man/prepare_libraries_sop_closed.qmd
+                      - text: prepare_libraries_sop_ecmdb
+                        file: man/prepare_libraries_sop_ecmdb.qmd
+                      - text: prepare_libraries_sop_hmdb
+                        file: man/prepare_libraries_sop_hmdb.qmd
+                      - text: prepare_libraries_sop_lotus
+                        file: man/prepare_libraries_sop_lotus.qmd
+                      - text: prepare_libraries_sop_merged
+                        file: man/prepare_libraries_sop_merged.qmd
+                  - text: prepare_libraries_spectra
+                    file: man/prepare_libraries_spectra.qmd
+              - text: prepare_taxa
+                file: man/prepare_taxa.qmd
+          - section: Process
+            contents:
+              - text: process_smiles
+                file: man/process_smiles.qmd
+          - section: Run
+            contents:
+              - text: run_app
+                file: man/run_app.qmd
+              - text: run_tima
+                file: man/run_tima.qmd
+          - section: Validate
+            contents:
+              - text: validate_inputs
+                file: man/validate_inputs.qmd
+          - section: Weight
+            contents:
+              - text: weight_annotations
+                file: man/weight_annotations.qmd
+
+format:
+  html:
+    grid:
+      body-width: 1200px
+    linkcolor: "#3377c4"
+    respect-user-color-scheme: true
+    toc: true
+
+knitr:
+  opts_knit:
+    root.dir: ../inst
