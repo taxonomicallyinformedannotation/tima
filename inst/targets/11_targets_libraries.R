@@ -772,13 +772,13 @@ targets_section_libraries <- function() {
           },
           format = "file"
         ),
-        tar_target(
-          name = lib_mer_str_can,
-          command = {
-            lib_sop_mer[[3L]]
-          },
-          format = "file"
-        ),
+        # tar_target(
+        #   name = lib_mer_str_can,
+        #   command = {
+        #     lib_sop_mer[[3L]]
+        #   },
+        #   format = "file"
+        # ),
         tar_target(
           name = lib_mer_str_stereo,
           command = {
