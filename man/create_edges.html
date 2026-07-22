@@ -675,7 +675,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   ms2_tolerance,
   ppm_tolerance,
   threshold = NULL,
-  matched_peaks = NULL
+  matched_peaks = NULL,
+  assume_sanitized = FALSE
 )
 </code></pre>
 </section>
@@ -744,6 +745,14 @@ Minimum similarity score threshold. Set to <code>NULL</code> to disable similari
 </td>
 <td>
 Minimum number of matched peaks required. Set to <code>NULL</code> to disable matched-peak filtering.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="assume_sanitized">assume_sanitized</code>
+</td>
+<td>
+Boolean flag to assume if sanitize or not. FALSE
 </td>
 </tr>
 </tbody></table>
