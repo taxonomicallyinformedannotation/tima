@@ -176,35 +176,66 @@ create_edges <- function(
     q_pre <- precs[i]
     targets <- (i + 1L):nspecs
 
-    # Inner loop: one .Call per target, collect scores + matches
-    pairs <- lapply(targets, function(j) {
-      t_sp <- ensure_spectrum_ready(j)
-      t_pre <- precs[j]
+    # Inner loop: batch .Call per query using C batch API (fewer R<->C crossings)
+    # Build list of target matrices and precursor vector
+    y_list <- lapply(targets, function(j) ensure_spectrum_ready(j))
+    y_pre_vec <- precs[targets]
 
-      if (use_gnps) {
-        res <- call_gnps(
-          q_sp,
-          t_sp,
-          q_pre,
-          t_pre,
-          ms2_tolerance,
-          ppm_tolerance,
-          matchedPeaksCount = TRUE
+    if (use_gnps) {
+      if (length(y_list) > 0L) {
+        res_mat <- gnps_chain_dp_batch_wrapper(
+          x = q_sp,
+          xPrecursorMz = q_pre,
+          y_list = y_list,
+          yPrecursorMz = as.numeric(y_pre_vec),
+          tolerance = ms2_tolerance,
+          ppm = ppm_tolerance
         )
-        sc <- res[1L]
-        mp <- res[2L]
       } else {
+        res_mat <- matrix(nrow = 0L, ncol = 4)
+      }
+
+      pairs <- vector("list", length(targets))
+      for (k in seq_along(targets)) {
+        sc <- res_mat[k, 1]
+        mp <- as.integer(res_mat[k, 2])
+
+        # Accumulate score histogram in parent env
+        if (is.finite(sc)) {
+          bin <- min(9L, max(0L, as.integer(sc * 10)))
+          bin_counts[bin + 1L] <<- bin_counts[bin + 1L] + 1L
+        }
+
+        keep_edge <- TRUE
+        if (!is.null(threshold)) keep_edge <- keep_edge && isTRUE(sc >= threshold)
+        if (!is.null(matched_peaks)) keep_edge <- keep_edge && isTRUE(mp >= matched_peaks)
+
+        if (keep_edge) {
+          j <- targets[k]
+          pairs[[k]] <- tidytable::tidytable(
+            feature_id = i,
+            target_id = j,
+            score = sc,
+            matched_peaks = as.integer(mp)
+          )
+        } else {
+          pairs[[k]] <- NULL
+        }
+      }
+    } else {
+      # Fallback: original scalar path when not using GNPS C implementation
+      pairs <- lapply(targets, function(j) {
+        t_sp <- ensure_spectrum_ready(j)
         res <- calculate_similarity(
           method = method,
           query_spectrum = q_sp,
           target_spectrum = t_sp,
           query_precursor = q_pre,
-          target_precursor = t_pre,
+          target_precursor = precs[j],
           dalton = ms2_tolerance,
           ppm = ppm_tolerance,
           return_matched_peaks = TRUE
         )
-        # Handle both numeric vector and scalar returns
         if (is.numeric(res) && length(res) >= 2L) {
           sc <- res[1L]
           mp <- res[2L]
@@ -212,37 +243,30 @@ create_edges <- function(
           sc <- as.numeric(res)
           mp <- 0L
         }
-      }
 
-      # Accumulate score histogram in parent env
-      if (is.finite(sc)) {
-        bin <- min(9L, max(0L, as.integer(sc * 10)))
-        bin_counts[bin + 1L] <<- bin_counts[bin + 1L] + 1L
-      }
+        if (is.finite(sc)) {
+          bin <- min(9L, max(0L, as.integer(sc * 10)))
+          bin_counts[bin + 1L] <<- bin_counts[bin + 1L] + 1L
+        }
 
-      keep_edge <- TRUE
-      if (!is.null(threshold)) {
-        keep_edge <- keep_edge && isTRUE(sc >= threshold)
-      }
-      if (!is.null(matched_peaks)) {
-        keep_edge <- keep_edge && isTRUE(mp >= matched_peaks)
-      }
+        keep_edge <- TRUE
+        if (!is.null(threshold)) keep_edge <- keep_edge && isTRUE(sc >= threshold)
+        if (!is.null(matched_peaks)) keep_edge <- keep_edge && isTRUE(mp >= matched_peaks)
 
-      if (keep_edge) {
-        tidytable::tidytable(
-          feature_id = i,
-          target_id = j,
-          score = sc,
-          matched_peaks = as.integer(mp)
-        )
-      }
-    })
+        if (keep_edge) {
+          tidytable::tidytable(
+            feature_id = i,
+            target_id = j,
+            score = sc,
+            matched_peaks = as.integer(mp)
+          )
+        }
+      })
+    }
 
     # Drop NULLs and combine into tidytable for this query
     pairs <- pairs[!vapply(pairs, is.null, FALSE, USE.NAMES = FALSE)]
-    if (length(pairs) > 0L) {
-      tidytable::bind_rows(pairs)
-    }
+    if (length(pairs) > 0L) tidytable::bind_rows(pairs)
   })
 
   if (any(sanitized_indices)) {

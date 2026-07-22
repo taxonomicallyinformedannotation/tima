@@ -159,3 +159,24 @@ gnps_chain_dp_wrapper <- function(
 
   if (matchedPeaksCount) res else res[1L]
 }
+
+#' @title Wrapper for the C function "gnps_chain_dp_batch"
+#' @keywords internal
+gnps_chain_dp_batch_wrapper <- function(
+  x,
+  xPrecursorMz,
+  y_list,
+  yPrecursorMz,
+  tolerance,
+  ppm
+) {
+  .Call(
+    C_gnps_chain_dp_batch,
+    x,
+    xPrecursorMz,
+    y_list,
+    yPrecursorMz,
+    tolerance,
+    ppm
+  )
+}

@@ -5,6 +5,7 @@ static const R_CallMethodDef callMethods[] = {
     {"C_join_gnps", (DL_FUNC) & C_join_gnps, 6},
     {"C_gnps", (DL_FUNC) & C_gnps, 2},
     {"C_gnps_chain_dp", (DL_FUNC) & C_gnps_chain_dp, 6},
+    {"C_gnps_chain_dp_batch", (DL_FUNC) & C_gnps_chain_dp_batch, 6},
     {NULL, NULL, 0}
 };
 

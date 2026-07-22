@@ -14,4 +14,7 @@ extern SEXP C_gnps(SEXP, SEXP);
 
 extern SEXP C_gnps_chain_dp(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
+/* Batch API exposed to R: one query vs a list of library matrices */
+extern SEXP C_gnps_chain_dp_batch(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+
 #endif /* end of TIMA_H */
