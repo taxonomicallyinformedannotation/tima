@@ -311,17 +311,34 @@ annotate_spectra <- function(
     )
   }
 
-  lib_precursors <- attr(sim_raw, "lib_precursors_raw")
-  if (is.null(lib_precursors)) {
-    lib_precursors <- get_precursors(spectral_library)
+  lib_precursors_all <- attr(sim_raw, "lib_precursors_raw")
+  if (is.null(lib_precursors_all)) {
+    lib_precursors_all <- get_precursors(spectral_library)
   }
-  lib_adducts_raw <- attr(sim_raw, "lib_adducts_raw")
+  lib_adducts_all <- attr(sim_raw, "lib_adducts_raw")
+  target_ids_needed <- sort(unique(sim_raw$target_id))
+  spectral_library_candidates <- spectral_library[target_ids_needed]
+  lib_precursors <- lib_precursors_all[target_ids_needed]
+  lib_adducts_raw <- if (!is.null(lib_adducts_all)) {
+    lib_adducts_all[target_ids_needed]
+  } else {
+    NULL
+  }
 
   meta <- build_library_metadata(
-    spectral_library,
+    spectral_library_candidates,
     lib_precursors,
     target_adduct_raw = lib_adducts_raw
   )
+  meta$target_id <- target_ids_needed
+  rm(
+    spectral_library,
+    spectral_library_candidates,
+    query_sp,
+    lib_precursors_all
+  )
+  invisible(gc(full = TRUE, verbose = FALSE))
+
   df_final <- finalize_results(
     df_sim = tidytable::as_tidytable(x = sim_raw),
     meta = meta,
