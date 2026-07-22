@@ -590,13 +590,18 @@ derive_primary_secondary_annotations <- function(
     tidytable::select(feature_id, primary_adduct = adduct)
 
   # Final annotation level assignment with cleanup
+  # Keep all adducts per feature; mark only the best-ranked as "primary"
   out |>
     tidytable::left_join(picked, by = "feature_id") |>
     tidytable::mutate(
       annotation_level = tidytable::if_else(
-        adduct == primary_adduct,
-        "primary",
-        "secondary"
+        is.na(primary_adduct),
+        "secondary",
+        tidytable::if_else(
+          adduct == primary_adduct,
+          "primary",
+          "secondary"
+        )
       )
     ) |>
     tidytable::select(

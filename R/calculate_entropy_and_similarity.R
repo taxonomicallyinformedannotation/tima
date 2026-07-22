@@ -161,12 +161,10 @@ calculate_entropy_and_similarity <- function(
   lib_checked <- rep(FALSE, n_lib)
   query_sanitized <- logical(n_query)
   lib_sanitized <- logical(n_lib)
-  lib_entropy <- rep(NA_real_, n_lib)
-  # Lazy cache for neutral precursor conversions (filled on first use)
-  lib_neutral_precursors <- rep(NA_real_, n_lib)
-  adduct_cache <- new.env(parent = emptyenv())
-  # Cache sorted m/z vectors for library spectra to avoid repeated sorts
-  lib_mz_sorted_list <- vector("list", n_lib)
+  # Sparse caches keyed by spectrum index. Using environments avoids keeping
+  # 1.45M-slot vectors/lists alive for the whole similarity run.
+  lib_entropy <- new.env(parent = emptyenv())
+  lib_mz_sorted_list <- new.env(parent = emptyenv())
 
   ensure_query_ready <- function(idx) {
     if (!query_checked[[idx]]) {
@@ -209,15 +207,21 @@ calculate_entropy_and_similarity <- function(
           ncol(lib_spectra[[idx]]) >= 2L
       ) {
         if (compute_entropy) {
-          lib_entropy[[idx]] <<- msentropy::calculate_spectral_entropy(
-            lib_spectra[[idx]]
+          assign(
+            as.character(idx),
+            msentropy::calculate_spectral_entropy(lib_spectra[[idx]]),
+            envir = lib_entropy
           )
         } else {
-          lib_entropy[[idx]] <<- NA_real_
+          assign(as.character(idx), NA_real_, envir = lib_entropy)
         }
         # Cache sorted m/z vector for this library spectrum to avoid
         # re-sorting inside tight loops.
-        lib_mz_sorted_list[[idx]] <<- sort(lib_spectra[[idx]][, 1L])
+        assign(
+          as.character(idx),
+          sort(lib_spectra[[idx]][, 1L]),
+          envir = lib_mz_sorted_list
+        )
       }
       lib_checked[[idx]] <<- TRUE
     }
@@ -329,13 +333,14 @@ calculate_entropy_and_similarity <- function(
           ))
           # Use cached sorted m/z vector for the library spectrum to
           # avoid sorting inside the tight loop.
+          lib_mz_sorted <- get0(
+            as.character(lib_idx),
+            envir = lib_mz_sorted_list,
+            ifnotfound = NULL
+          )
           matched_counts[[pos_idx]] <- .count_matched_peaks(
             q_mz,
-            if (length(lib_mz_sorted_list[[lib_idx]]) > 0L) {
-              lib_mz_sorted_list[[lib_idx]]
-            } else {
-              sort(lib_spectrum[, 1L])
-            },
+            lib_mz_sorted %||% sort(lib_spectrum[, 1L]),
             dalton,
             ppm
           )
@@ -366,7 +371,11 @@ calculate_entropy_and_similarity <- function(
           }
         }
 
-        entropies[[pos_idx]] <- lib_entropy[[lib_idx]]
+        entropies[[pos_idx]] <- get0(
+          as.character(lib_idx),
+          envir = lib_entropy,
+          ifnotfound = NA_real_
+        )
       }
 
       valid_indices <- which(!is.na(scores) & scores >= threshold)

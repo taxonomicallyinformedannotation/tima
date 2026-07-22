@@ -1252,11 +1252,7 @@ test_that("build_mini_results_table assembles expected mini output", {
     feature_id = c("F1", "F2"),
     candidates_evaluated = c(3L, 2L),
     candidates_best = c(1L, 1L),
-    annotation_note = c(NA_character_, "sampled")
-  )
-
-  df_filtered <- tidytable::tidytable(
-    feature_id = c("F1", "F2"),
+    annotation_note = c(NA_character_, "sampled"),
     candidate_structure_name = c("Cmpd1", "Cmpd2"),
     candidate_adduct = c("[M+H]+", "[M+Na]+"),
     candidate_structure_smiles_no_stereo = c("CCO", "CCC"),
@@ -1266,14 +1262,14 @@ test_that("build_mini_results_table assembles expected mini output", {
     candidate_structure_error_rt = c(0.01, 0.02),
     candidate_structure_organism_occurrence_closest = c("Org1", "Org2"),
     candidate_structure_tag = c("reported", "predicted"),
-    score_weighted_chemo = c(0.9, 0.4)
+    score_weighted_chemo = c(0.9, 0.4),
+    rank_final = c(1L, 1L)
   )
 
   out <- build_mini_results_table(
     features_table = features_table,
     df_classes_mini = df_classes_mini,
     results_filtered = results_filtered,
-    df_filtered = df_filtered,
     xrefs_table = NULL
   )
 
@@ -1300,6 +1296,53 @@ test_that("build_mini_results_table assembles expected mini output", {
     ) %in%
       names(out)
   ))
+})
+
+test_that("build_mini_results_table handles missing candidate_structure_error_rt", {
+  # When annotation sources (e.g., empty SIRIUS annotations) omit
+  # candidate_structure_error_rt, the rename should not error.
+  features_table <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    rt = c(1.1, 2.2),
+    mz = c(101.1, 202.2)
+  )
+
+  df_classes_mini <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    has_inchikey = c(TRUE, FALSE),
+    label_classyfire = c("ClassA", "ClassB"),
+    label_npclassifier = c("NPCA", "NPCB"),
+    score_classyfire = c(NA_real_, 0.8),
+    score_npclassifier = c(NA_real_, 0.6)
+  )
+
+  results_filtered <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidates_evaluated = c(3L, 2L),
+    candidates_best = c(1L, 1L),
+    annotation_note = c(NA_character_, "sampled"),
+    candidate_structure_name = c("Cmpd1", "Cmpd2"),
+    candidate_adduct = c("[M+H]+", "[M+Na]+"),
+    candidate_structure_smiles_no_stereo = c("CCO", "CCC"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", NA_character_),
+    candidate_library = c("lib1", "lib2"),
+    candidate_structure_error_mz = c(0.1, 0.2),
+    candidate_structure_organism_occurrence_closest = c("Org1", "Org2"),
+    candidate_structure_tag = c("reported", "predicted"),
+    score_weighted_chemo = c(0.9, 0.4),
+    rank_final = c(1L, 1L)
+  )
+
+  out <- build_mini_results_table(
+    features_table = features_table,
+    df_classes_mini = df_classes_mini,
+    results_filtered = results_filtered,
+    xrefs_table = NULL
+  )
+
+  expect_true(is.data.frame(out))
+  expect_true("error_rt" %in% names(out))
+  expect_true(all(is.na(out$error_rt)))
 })
 
 test_that("sample_candidates_per_group prioritizes non-NA RT errors", {
@@ -1548,10 +1591,7 @@ test_that("build_mini_results_table appends xrefs and renames id columns", {
     feature_id = "F1",
     candidates_evaluated = 1L,
     candidates_best = 1L,
-    annotation_note = NA_character_
-  )
-  df_filtered <- tidytable::tidytable(
-    feature_id = "F1",
+    annotation_note = NA_character_,
     candidate_structure_name = "Cmpd1",
     candidate_adduct = "[M+H]+",
     candidate_structure_smiles_no_stereo = "CCO",
@@ -1561,7 +1601,8 @@ test_that("build_mini_results_table appends xrefs and renames id columns", {
     candidate_structure_error_rt = 0.01,
     candidate_structure_organism_occurrence_closest = "Org1",
     candidate_structure_tag = "reported",
-    score_weighted_chemo = 0.9
+    score_weighted_chemo = 0.9,
+    rank_final = 1L
   )
 
   xrefs_table <- tidytable::tidytable(
@@ -1581,7 +1622,6 @@ test_that("build_mini_results_table appends xrefs and renames id columns", {
     features_table = features_table,
     df_classes_mini = df_classes_mini,
     results_filtered = results_filtered,
-    df_filtered = df_filtered,
     xrefs_table = xrefs_table
   )
 

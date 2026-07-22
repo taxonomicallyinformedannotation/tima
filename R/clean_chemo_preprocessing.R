@@ -442,8 +442,9 @@ filter_ms1_annotations <- function(
   df$effective_score <- effective_score
   df$rank_final <- NA_integer_
 
-  for (fid in unique(feature_ids)) {
-    idx <- which(feature_ids == fid)
+  groups <- split(seq_len(nrow(df)), feature_ids)
+  for (fid in names(groups)) {
+    idx <- groups[[fid]]
     if (length(idx) == 0L) {
       next
     }
@@ -856,8 +857,12 @@ compute_candidate_M <- function(mz, adduct_string) {
   # the neutral-mass formula as vectorised arithmetic. This avoids O(N)
   # calls into the validator-heavy `calculate_mass_of_m` and scales with
   # the (typically small) number of distinct adducts rather than rows.
-  unique_adducts <- unique(adduct_string[usable])
-  for (add in unique_adducts) {
+  # Was: looped over unique adducts and rescanned all rows with
+  # which(usable & adduct_string == add) on each iteration.
+  # Now: split usable row indices by adduct once, then reuse each index group.
+  usable_idx <- which(usable)
+  adduct_groups <- split(usable_idx, adduct_string[usable_idx])
+  for (add in names(adduct_groups)) {
     parsed <- tryCatch(
       suppressWarnings(parse_adduct(add)),
       error = function(.err) {
@@ -877,7 +882,7 @@ compute_candidate_M <- function(mz, adduct_string) {
       next
     }
 
-    idx <- which(usable & adduct_string == add)
+    idx <- adduct_groups[[add]]
     if (!length(idx)) {
       next
     }

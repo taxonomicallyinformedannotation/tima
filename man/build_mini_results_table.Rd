@@ -8,7 +8,6 @@ build_mini_results_table(
   features_table,
   df_classes_mini,
   results_filtered,
-  df_filtered,
   xrefs_table = NULL
 )
 }
@@ -18,8 +17,6 @@ build_mini_results_table(
 \item{df_classes_mini}{Mini taxonomy table keyed by feature_id}
 
 \item{results_filtered}{Filtered-tier summarized results}
-
-\item{df_filtered}{Filtered candidate table prior to summarization}
 
 \item{xrefs_table}{Optional cross-reference table}
 }

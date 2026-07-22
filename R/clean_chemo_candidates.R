@@ -1030,7 +1030,6 @@ build_mini_taxonomy_table <- function(
 #' @param features_table Feature metadata table
 #' @param df_classes_mini Mini taxonomy table keyed by feature_id
 #' @param results_filtered Filtered-tier summarized results
-#' @param df_filtered Filtered candidate table prior to summarization
 #' @param xrefs_table Optional cross-reference table
 #'
 #' @return Mini-tier output table
@@ -1039,33 +1038,75 @@ build_mini_results_table <- function(
   features_table,
   df_classes_mini,
   results_filtered,
-  df_filtered,
   xrefs_table = NULL
 ) {
+  best_results <- results_filtered
+  if (nrow(best_results) > 0L && "feature_id" %in% names(best_results)) {
+    rank_num <- suppressWarnings(as.integer(best_results$rank_final))
+    score_final_num <- if ("score_final" %in% names(best_results)) {
+      -suppressWarnings(as.numeric(best_results$score_final))
+    } else if ("score_weighted_chemo" %in% names(best_results)) {
+      -suppressWarnings(as.numeric(best_results$score_weighted_chemo))
+    } else {
+      rep_len(0, nrow(best_results))
+    }
+    coverage_num <- if (
+      "score_weighted_chemo_coverage" %in% names(best_results)
+    ) {
+      -suppressWarnings(as.numeric(best_results$score_weighted_chemo_coverage))
+    } else {
+      rep_len(0, nrow(best_results))
+    }
+    initial_num <- if ("score_initial" %in% names(best_results)) {
+      -suppressWarnings(as.numeric(best_results$score_initial))
+    } else if ("candidate_score_pseudo_initial" %in% names(best_results)) {
+      -suppressWarnings(as.numeric(best_results$candidate_score_pseudo_initial))
+    } else {
+      rep_len(0, nrow(best_results))
+    }
+
+    ord <- order(
+      best_results$feature_id,
+      rank_num,
+      score_final_num,
+      coverage_num,
+      initial_num,
+      na.last = TRUE
+    )
+    best_results <- best_results[ord, , drop = FALSE] |>
+      tidytable::distinct(feature_id, .keep_all = TRUE)
+  }
+
   results_mini <- purrr::reduce(
     .x = list(
       df_classes_mini,
-      results_filtered,
-      df_filtered |>
-        tidytable::select(
-          tidyselect::any_of(c(
-            "feature_id",
-            "candidate_structure_name",
-            "candidate_adduct",
-            "candidate_structure_smiles_no_stereo",
-            "candidate_structure_inchikey_connectivity_layer",
-            "candidate_library",
-            "candidate_structure_error_mz",
-            "candidate_structure_error_rt",
-            "candidate_structure_organism_occurrence_closest",
-            "candidate_structure_tag",
-            "score_weighted_chemo"
-          ))
-        )
+      best_results
     ),
     .init = features_table,
     .f = function(acc, tbl) tidytable::left_join(x = acc, y = tbl)
-  ) |>
+  )
+
+  # Ensure all columns being renamed exist; some annotation sources (e.g.,
+  # empty SIRIUS annotations) may omit certain columns like
+  # candidate_structure_error_rt. tidytable::rename() errors on missing
+  # columns, so we add them as NA first.
+  for (col in c(
+    "candidate_structure_name",
+    "candidate_adduct",
+    "candidate_structure_smiles_no_stereo",
+    "candidate_structure_inchikey_connectivity_layer",
+    "candidate_library",
+    "candidate_structure_error_mz",
+    "candidate_structure_error_rt",
+    "candidate_structure_organism_occurrence_closest",
+    "score_weighted_chemo"
+  )) {
+    if (!col %in% names(results_mini)) {
+      results_mini[[col]] <- NA
+    }
+  }
+
+  results_mini <- results_mini |>
     tidytable::rename(
       label_compound = candidate_structure_name,
       adduct = candidate_adduct,

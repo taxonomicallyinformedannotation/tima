@@ -188,34 +188,40 @@ apply_adduct_consistency_filter <- function(
     tidytable::distinct(feature_id, neighbor) |>
     tidytable::count(feature_id, name = "feature_degree")
   support <- compute_feature_adduct_support(df_add)
+  support_src <- support |>
+    tidytable::rename(src_support = adduct_support)
+  support_dest <- support |>
+    tidytable::rename(
+      feature_id_dest = feature_id,
+      adduct_dest = adduct,
+      dest_support = adduct_support
+    )
+  degree_src <- feature_degree |>
+    tidytable::rename(src_degree = feature_degree)
+  degree_dest <- feature_degree |>
+    tidytable::rename(
+      feature_id_dest = feature_id,
+      dest_degree = feature_degree
+    )
   scored <- df_add |>
     tidytable::left_join(
       pair_hyp,
       by = c("feature_id", "feature_id_dest")
     ) |>
     tidytable::left_join(
-      support |> tidytable::rename(src_support = adduct_support),
+      support_src,
       by = c("feature_id", "adduct")
     ) |>
     tidytable::left_join(
-      support |>
-        tidytable::rename(
-          feature_id_dest = feature_id,
-          adduct_dest = adduct,
-          dest_support = adduct_support
-        ),
+      support_dest,
       by = c("feature_id_dest", "adduct_dest")
     ) |>
     tidytable::left_join(
-      feature_degree |> tidytable::rename(src_degree = feature_degree),
+      degree_src,
       by = "feature_id"
     ) |>
     tidytable::left_join(
-      feature_degree |>
-        tidytable::rename(
-          feature_id_dest = feature_id,
-          dest_degree = feature_degree
-        ),
+      degree_dest,
       by = "feature_id_dest"
     ) |>
     tidytable::mutate(
@@ -384,37 +390,25 @@ enforce_graph_adduct_consistency <- function(df_add) {
       next
     }
 
-    # Pre-compute node candidates efficiently
-    node_candidates <- tidytable::bind_rows(
-      sub |>
-        tidytable::transmute(
-          feature = feature_id,
-          state_key = adduct_state_key
-        ),
-      sub |>
-        tidytable::transmute(
-          feature = feature_id_dest,
-          state_key = adduct_dest_state_key
-        )
-    ) |>
-      tidytable::distinct()
-
-    # Vectorized prior computation
-    node_priors <- tidytable::bind_rows(
+    node_data <- tidytable::bind_rows(
       sub |>
         tidytable::transmute(
           feature = feature_id,
           state_key = adduct_state_key,
-          prior = edge_score
+          edge_score = edge_score
         ),
       sub |>
         tidytable::transmute(
           feature = feature_id_dest,
           state_key = adduct_dest_state_key,
-          prior = edge_score
+          edge_score = edge_score
         )
-    ) |>
-      tidytable::summarize(prior = sum(prior), .by = c(feature, state_key))
+    )
+    node_candidates <- node_data |>
+      tidytable::distinct()
+
+    node_priors <- node_data |>
+      tidytable::summarize(prior = sum(edge_score), .by = c(feature, state_key))
 
     # Initial assignment
     assignments <- node_priors |>

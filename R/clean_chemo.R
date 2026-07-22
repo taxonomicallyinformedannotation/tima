@@ -303,7 +303,6 @@ clean_chemo <- function(
     features_table = features_table,
     df_classes_mini = df_classes_mini,
     results_filtered = results_filtered,
-    df_filtered = df_filtered,
     xrefs_table = xrefs_table
   )
 
