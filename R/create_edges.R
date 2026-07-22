@@ -178,7 +178,11 @@ create_edges <- function(
       log_info("Processed %d / %d queries", progress_counter, n_queries)
     }
 
-    q_sp <- if (isTRUE(assume_sanitized)) frags[[i]] else ensure_spectrum_ready(i)
+    q_sp <- if (isTRUE(assume_sanitized)) {
+      frags[[i]]
+    } else {
+      ensure_spectrum_ready(i)
+    }
     q_pre <- precs[i]
     targets <- (i + 1L):nspecs
 
@@ -242,7 +246,11 @@ create_edges <- function(
     } else {
       # Fallback: original scalar path when not using GNPS C implementation
       pairs <- lapply(targets, function(j) {
-        t_sp <- if (isTRUE(assume_sanitized)) frags[[j]] else ensure_spectrum_ready(j)
+        t_sp <- if (isTRUE(assume_sanitized)) {
+          frags[[j]]
+        } else {
+          ensure_spectrum_ready(j)
+        }
         res <- calculate_similarity(
           method = method,
           query_spectrum = q_sp,
