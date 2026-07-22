@@ -12,7 +12,8 @@ create_edges(
   ms2_tolerance,
   ppm_tolerance,
   threshold = NULL,
-  matched_peaks = NULL
+  matched_peaks = NULL,
+  assume_sanitized = FALSE
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ similarity thresholding and retain all pairwise comparisons.}
 
 \item{matched_peaks}{Minimum number of matched peaks required. Set to \code{NULL}
 to disable matched-peak filtering.}
+
+\item{assume_sanitized}{Boolean flag to assume if sanitize or not. FALSE}
 }
 \value{
 Data frame with columns: feature_id, target_id, score, matched_peaks.

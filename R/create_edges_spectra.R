@@ -288,7 +288,8 @@ create_edges_spectra <- function(
     precs = precz,
     method = method,
     ms2_tolerance = dalton,
-    ppm_tolerance = ppm
+    ppm_tolerance = ppm,
+    assume_sanitized = TRUE
   )
 
   edges <- all_edges

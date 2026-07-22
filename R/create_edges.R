@@ -22,6 +22,7 @@
 #'     similarity thresholding and retain all pairwise comparisons.
 #' @param matched_peaks Minimum number of matched peaks required. Set to `NULL`
 #'     to disable matched-peak filtering.
+#' @param assume_sanitized Boolean flag to assume if sanitize or not. FALSE
 #'
 #' @return Data frame with columns: feature_id, target_id, score, matched_peaks.
 #'     Returns empty data frame with NA values if no edges pass thresholds.
@@ -51,7 +52,8 @@ create_edges <- function(
   ms2_tolerance,
   ppm_tolerance,
   threshold = NULL,
-  matched_peaks = NULL
+  matched_peaks = NULL,
+  assume_sanitized = FALSE
 ) {
   empty_result <- tidytable::tidytable(
     feature_id = NA_integer_,
@@ -127,6 +129,10 @@ create_edges <- function(
   # Lazy sanitize-once state: avoid scanning/sanitizing all spectra upfront.
   checked_sanitization <- rep(FALSE, nspecs)
   sanitized_indices <- logical(nspecs)
+  if (isTRUE(assume_sanitized)) {
+    checked_sanitization <- rep(TRUE, nspecs)
+    sanitized_indices <- rep(TRUE, nspecs)
+  }
 
   ensure_spectrum_ready <- function(idx) {
     if (!checked_sanitization[[idx]]) {
@@ -172,13 +178,20 @@ create_edges <- function(
       log_info("Processed %d / %d queries", progress_counter, n_queries)
     }
 
-    q_sp <- ensure_spectrum_ready(i)
+    q_sp <- if (isTRUE(assume_sanitized)) frags[[i]] else ensure_spectrum_ready(i)
     q_pre <- precs[i]
     targets <- (i + 1L):nspecs
 
-    # Inner loop: batch .Call per query using C batch API (fewer R<->C crossings)
-    # Build list of target matrices and precursor vector
-    y_list <- lapply(targets, function(j) ensure_spectrum_ready(j))
+    # Build list of target matrices and precursor vector (avoid function calls if already sanitized)
+    if (length(targets) > 0L) {
+      if (isTRUE(assume_sanitized)) {
+        y_list <- frags[targets]
+      } else {
+        y_list <- lapply(targets, function(j) ensure_spectrum_ready(j))
+      }
+    } else {
+      y_list <- list()
+    }
     y_pre_vec <- precs[targets]
 
     if (use_gnps) {
@@ -207,8 +220,12 @@ create_edges <- function(
         }
 
         keep_edge <- TRUE
-        if (!is.null(threshold)) keep_edge <- keep_edge && isTRUE(sc >= threshold)
-        if (!is.null(matched_peaks)) keep_edge <- keep_edge && isTRUE(mp >= matched_peaks)
+        if (!is.null(threshold)) {
+          keep_edge <- keep_edge && isTRUE(sc >= threshold)
+        }
+        if (!is.null(matched_peaks)) {
+          keep_edge <- keep_edge && isTRUE(mp >= matched_peaks)
+        }
 
         if (keep_edge) {
           j <- targets[k]
@@ -225,7 +242,7 @@ create_edges <- function(
     } else {
       # Fallback: original scalar path when not using GNPS C implementation
       pairs <- lapply(targets, function(j) {
-        t_sp <- ensure_spectrum_ready(j)
+        t_sp <- if (isTRUE(assume_sanitized)) frags[[j]] else ensure_spectrum_ready(j)
         res <- calculate_similarity(
           method = method,
           query_spectrum = q_sp,
@@ -250,8 +267,12 @@ create_edges <- function(
         }
 
         keep_edge <- TRUE
-        if (!is.null(threshold)) keep_edge <- keep_edge && isTRUE(sc >= threshold)
-        if (!is.null(matched_peaks)) keep_edge <- keep_edge && isTRUE(mp >= matched_peaks)
+        if (!is.null(threshold)) {
+          keep_edge <- keep_edge && isTRUE(sc >= threshold)
+        }
+        if (!is.null(matched_peaks)) {
+          keep_edge <- keep_edge && isTRUE(mp >= matched_peaks)
+        }
 
         if (keep_edge) {
           tidytable::tidytable(
