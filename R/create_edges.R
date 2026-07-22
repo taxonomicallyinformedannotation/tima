@@ -212,40 +212,44 @@ create_edges <- function(
         res_mat <- matrix(nrow = 0L, ncol = 4)
       }
 
-      pairs <- vector("list", length(targets))
-      for (k in seq_along(targets)) {
-        sc <- res_mat[k, 1]
-        mp <- as.integer(res_mat[k, 2])
+      sc_vec <- res_mat[, 1]
+      mp_vec <- as.integer(res_mat[, 2])
 
-        # Accumulate score histogram in parent env
-        if (is.finite(sc)) {
-          bin <- min(9L, max(0L, as.integer(sc * 10)))
-          bin_counts[bin + 1L] <<- bin_counts[bin + 1L] + 1L
-        }
+      finite_sc <- is.finite(sc_vec)
+      if (any(finite_sc)) {
+        bins <- pmin(9L, pmax(0L, as.integer(sc_vec[finite_sc] * 10)))
+        bin_counts <<- bin_counts + tabulate(bins + 1L, nbins = 10L)
+      }
 
-        keep_edge <- TRUE
-        if (!is.null(threshold)) {
-          keep_edge <- keep_edge && isTRUE(sc >= threshold)
-        }
-        if (!is.null(matched_peaks)) {
-          keep_edge <- keep_edge && isTRUE(mp >= matched_peaks)
-        }
+      keep <- rep(TRUE, length(targets))
+      if (!is.null(threshold)) {
+        keep <- keep & (sc_vec >= threshold)
+      }
+      if (!is.null(matched_peaks)) {
+        keep <- keep & (mp_vec >= matched_peaks)
+      }
+      keep[is.na(keep)] <- FALSE
 
-        if (keep_edge) {
-          j <- targets[k]
-          pairs[[k]] <- tidytable::tidytable(
-            feature_id = i,
-            target_id = j,
-            score = sc,
-            matched_peaks = as.integer(mp)
-          )
-        } else {
-          pairs[[k]] <- NULL
-        }
+      if (any(keep)) {
+        tidytable::tidytable(
+          feature_id = i,
+          target_id = targets[keep],
+          score = sc_vec[keep],
+          matched_peaks = mp_vec[keep]
+        )
+      } else {
+        NULL
       }
     } else {
-      # Fallback: original scalar path when not using GNPS C implementation
-      pairs <- lapply(targets, function(j) {
+      # Fallback: original scalar path when not using GNPS C implementation.
+      # Still one C call per target (unavoidable -- calculate_similarity()
+      # is scalar), but collect into plain vectors first and build ONE
+      # tidytable per query instead of one per accepted pair.
+      sc_vec <- numeric(length(targets))
+      mp_vec <- integer(length(targets))
+
+      for (k in seq_along(targets)) {
+        j <- targets[k]
         t_sp <- if (isTRUE(assume_sanitized)) {
           frags[[j]]
         } else {
@@ -262,40 +266,40 @@ create_edges <- function(
           return_matched_peaks = TRUE
         )
         if (is.numeric(res) && length(res) >= 2L) {
-          sc <- res[1L]
-          mp <- res[2L]
+          sc_vec[k] <- res[1L]
+          mp_vec[k] <- as.integer(res[2L])
         } else {
-          sc <- as.numeric(res)
-          mp <- 0L
+          sc_vec[k] <- as.numeric(res)
+          mp_vec[k] <- 0L
         }
+      }
 
-        if (is.finite(sc)) {
-          bin <- min(9L, max(0L, as.integer(sc * 10)))
-          bin_counts[bin + 1L] <<- bin_counts[bin + 1L] + 1L
-        }
+      finite_sc <- is.finite(sc_vec)
+      if (any(finite_sc)) {
+        bins <- pmin(9L, pmax(0L, as.integer(sc_vec[finite_sc] * 10)))
+        bin_counts <<- bin_counts + tabulate(bins + 1L, nbins = 10L)
+      }
 
-        keep_edge <- TRUE
-        if (!is.null(threshold)) {
-          keep_edge <- keep_edge && isTRUE(sc >= threshold)
-        }
-        if (!is.null(matched_peaks)) {
-          keep_edge <- keep_edge && isTRUE(mp >= matched_peaks)
-        }
+      keep <- rep(TRUE, length(targets))
+      if (!is.null(threshold)) {
+        keep <- keep & (sc_vec >= threshold)
+      }
+      if (!is.null(matched_peaks)) {
+        keep <- keep & (mp_vec >= matched_peaks)
+      }
+      keep[is.na(keep)] <- FALSE
 
-        if (keep_edge) {
-          tidytable::tidytable(
-            feature_id = i,
-            target_id = j,
-            score = sc,
-            matched_peaks = as.integer(mp)
-          )
-        }
-      })
+      if (any(keep)) {
+        tidytable::tidytable(
+          feature_id = i,
+          target_id = targets[keep],
+          score = sc_vec[keep],
+          matched_peaks = mp_vec[keep]
+        )
+      } else {
+        NULL
+      }
     }
-
-    # Drop NULLs and combine into tidytable for this query
-    pairs <- pairs[!vapply(pairs, is.null, FALSE, USE.NAMES = FALSE)]
-    if (length(pairs) > 0L) tidytable::bind_rows(pairs)
   })
 
   if (any(sanitized_indices)) {

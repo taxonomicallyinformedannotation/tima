@@ -282,16 +282,8 @@ annotate_spectra <- function(
   # performed inside import_and_clean_library_collection when approx == FALSE
   # which keeps individual library Spectra small before concatenation.
 
-  n_query_count <- if (inherits(query_sp, "Spectra")) {
-    length(query_sp)
-  } else {
-    length(query_sp)
-  }
-  n_lib_count <- if (inherits(spectral_library, "Spectra")) {
-    length(spectral_library)
-  } else {
-    length(spectral_library)
-  }
+  n_query_count <- length(query_sp)
+  n_lib_count <- length(spectral_library)
   log_debug(
     "Annotating %d query spectra against %d library references",
     n_query_count,
@@ -306,7 +298,8 @@ annotate_spectra <- function(
     dalton = dalton,
     ppm = ppm,
     threshold = threshold,
-    approx = approx
+    approx = approx,
+    query_precursors = query_precursors
   )
   if (nrow(sim_raw) == 0L) {
     return(
@@ -318,8 +311,17 @@ annotate_spectra <- function(
     )
   }
 
-  lib_precursors <- get_precursors(spectral_library)
-  meta <- build_library_metadata(spectral_library, lib_precursors)
+  lib_precursors <- attr(sim_raw, "lib_precursors_raw")
+  if (is.null(lib_precursors)) {
+    lib_precursors <- get_precursors(spectral_library)
+  }
+  lib_adducts_raw <- attr(sim_raw, "lib_adducts_raw")
+
+  meta <- build_library_metadata(
+    spectral_library,
+    lib_precursors,
+    target_adduct_raw = lib_adducts_raw
+  )
   df_final <- finalize_results(
     df_sim = tidytable::as_tidytable(x = sim_raw),
     meta = meta,
@@ -587,16 +589,26 @@ extract_vector <- function(obj, field, len, fill = NA) {
 # harmonize_adduct_vector is provided by annotate_masses.R
 
 #' @keywords internal
-build_library_metadata <- function(lib_sp, lib_precursors) {
+build_library_metadata <- function(
+  lib_sp,
+  lib_precursors,
+  target_adduct_raw = NULL
+) {
   n <- length(lib_sp)
   out <- tidytable::tidytable(
     target_id = seq_len(n),
-    target_adduct = extract_vector(
-      lib_sp,
-      c("adduct", "precursor_type"),
-      n,
-      NA_character_
-    ),
+    # Reuse a pre-extracted raw adduct vector when the caller already has
+    # one (compute_similarity_safe() has to extract this same column for
+    # its own neutral-mass rescue logic) -- skips a second full pass over
+    # lib_sp@backend@spectraData. harmonize_adducts() below still runs
+    # exactly as before regardless of which path supplied the column.
+    target_adduct = target_adduct_raw %||%
+      extract_vector(
+        lib_sp,
+        c("adduct", "precursor_type"),
+        n,
+        NA_character_
+      ),
     target_spectrum_id = extract_vector(
       lib_sp,
       c("spectrum_id", "spectrumid", "id"),
@@ -820,9 +832,11 @@ convert_precursor_for_matching <- function(precursors, adducts) {
   # real libraries where the same ~10-50 adduct strings repeat for 10^5+
   # spectra.
   out <- precursors_num
-  unique_adducts <- unique(adducts[usable])
+  usable_idx <- which(usable)
 
-  for (add in unique_adducts) {
+  idx_groups <- split(usable_idx, adducts[usable_idx])
+
+  for (add in names(idx_groups)) {
     parsed <- tryCatch(
       suppressWarnings(parse_adduct(add)),
       error = function(...) NULL
@@ -838,7 +852,7 @@ convert_precursor_for_matching <- function(precursors, adducts) {
       next
     }
 
-    idx <- which(usable & adducts == add)
+    idx <- idx_groups[[add]]
     if (!length(idx)) {
       next
     }
@@ -979,13 +993,13 @@ compute_similarity_safe <- function(
   dalton,
   ppm,
   threshold,
-  approx
+  approx,
+  query_precursors = NULL
 ) {
   if (!inherits(query_sp, "Spectra") || !inherits(lib_sp, "Spectra")) {
     return(tidytable::tidytable())
   }
-  # Use get_precursors helper which handles precursorMz and precursor_mz
-  query_prec <- get_precursors(query_sp)
+  query_prec <- query_precursors %||% get_precursors(query_sp)
   lib_prec <- get_precursors(lib_sp)
   query_prec_match <- as.numeric(query_prec)
   lib_prec_match <- as.numeric(lib_prec)
@@ -1020,7 +1034,7 @@ compute_similarity_safe <- function(
       tidytable::mutate(.similarity_space = space_label)
   }
 
-  tryCatch(
+  result <- tryCatch(
     {
       raw_out <- run_similarity(
         lib_ids = seq_along(lib_sp),
@@ -1039,14 +1053,14 @@ compute_similarity_safe <- function(
       } else {
         rep(NA_character_, length(query_prec_match))
       }
-      lib_adducts <- extract_vector(
+      lib_adducts_raw <- extract_vector(
         lib_sp,
         c("adduct", "precursor_type"),
         length(lib_sp),
         NA_character_
       )
       lib_adducts <- harmonize_adduct_vector(
-        lib_adducts,
+        lib_adducts_raw,
         colname = "target_adduct"
       )
 
@@ -1074,13 +1088,17 @@ compute_similarity_safe <- function(
         )
       }
 
-      tidytable::bind_rows(raw_out, neutral_out)
+      combined <- tidytable::bind_rows(raw_out, neutral_out)
+      attr(combined, "lib_precursors_raw") <- lib_prec_match
+      attr(combined, "lib_adducts_raw") <- lib_adducts_raw
+      combined
     },
     error = function(e) {
       log_error("Similarity computation failed: %s", conditionMessage(e))
       tidytable::tidytable()
     }
   )
+  result
 }
 
 #' @keywords internal

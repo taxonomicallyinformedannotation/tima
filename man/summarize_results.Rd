@@ -9,10 +9,11 @@ summarize_results(
   features_table,
   components_table,
   structure_organism_pairs_table,
-  annot_table_wei_chemo,
+  annot_table_wei_chemo = NULL,
   remove_ties,
   summarize,
-  annotation_notes_lookup = NULL
+  annotation_notes_lookup = NULL,
+  feature_consensus_table = NULL
 )
 }
 \arguments{

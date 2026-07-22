@@ -42,10 +42,17 @@ summarize_results <- function(
   features_table,
   components_table,
   structure_organism_pairs_table,
-  annot_table_wei_chemo,
+  annot_table_wei_chemo = NULL,
   remove_ties,
   summarize,
-  annotation_notes_lookup = NULL
+  annotation_notes_lookup = NULL,
+  # Optional pre-built output of .build_feature_consensus_table(). Callers
+  # that invoke summarize_results() more than once against the SAME
+  # annot_table_wei_chemo (e.g. clean_chemo()'s filtered- and full-tier
+  # calls) can build this once and pass it in both times, instead of this
+  # function rebuilding an identical table from scratch on every call.
+  # When supplied, annot_table_wei_chemo is not needed for this purpose.
+  feature_consensus_table = NULL
 ) {
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
@@ -235,57 +242,44 @@ summarize_results <- function(
     if (nrow(df_joined) == 0L) {
       df_final <- df_joined
     } else {
-      # Compute numeric keys used for prioritization (keep signs consistent with previous behavior)
-      df_joined <- df_joined |>
-        tidytable::mutate(
-          .rank_final_num = suppressWarnings(as.integer(rank_final)),
-          .score_weighted_chemo_num = if ("score_final" %in% names(df_joined)) {
-            -suppressWarnings(as.numeric(score_final))
-          } else if ("score_weighted_chemo" %in% names(df_joined)) {
-            -suppressWarnings(as.numeric(score_weighted_chemo))
-          } else {
-            0
-          },
-          .score_weighted_chemo_coverage_num = if (
-            "score_weighted_chemo_coverage" %in% names(df_joined)
-          ) {
-            -suppressWarnings(as.numeric(score_weighted_chemo_coverage))
-          } else {
-            0
-          },
-          .candidate_score_pseudo_initial_num = if (
-            "score_initial" %in% names(df_joined)
-          ) {
-            -suppressWarnings(as.numeric(score_initial))
-          } else if ("candidate_score_pseudo_initial" %in% names(df_joined)) {
-            -suppressWarnings(as.numeric(candidate_score_pseudo_initial))
-          } else {
-            0
-          }
-        )
+      rank_num <- suppressWarnings(as.integer(df_joined$rank_final))
 
-      # Select one best row per feature without a global sort: use grouped slice_head to select best row per feature
-      df_final <- df_joined |>
-        tidytable::group_by(feature_id) |>
-        tidytable::arrange(
-          .rank_final_num,
-          .score_weighted_chemo_num,
-          .score_weighted_chemo_coverage_num,
-          .candidate_score_pseudo_initial_num
-        ) |>
-        tidytable::slice_head(n = 1L) |>
-        tidytable::ungroup()
+      score_final_num <- if ("score_final" %in% names(df_joined)) {
+        -suppressWarnings(as.numeric(df_joined$score_final))
+      } else if ("score_weighted_chemo" %in% names(df_joined)) {
+        -suppressWarnings(as.numeric(df_joined$score_weighted_chemo))
+      } else {
+        rep_len(0, nrow(df_joined))
+      }
 
-      # remove helper columns
-      df_final <- df_final |>
-        tidytable::select(
-          -tidyselect::any_of(c(
-            ".rank_final_num",
-            ".score_weighted_chemo_num",
-            ".score_weighted_chemo_coverage_num",
-            ".candidate_score_pseudo_initial_num"
-          ))
-        )
+      coverage_num <- if (
+        "score_weighted_chemo_coverage" %in% names(df_joined)
+      ) {
+        -suppressWarnings(as.numeric(df_joined$score_weighted_chemo_coverage))
+      } else {
+        rep_len(0, nrow(df_joined))
+      }
+
+      initial_num <- if ("score_initial" %in% names(df_joined)) {
+        -suppressWarnings(as.numeric(df_joined$score_initial))
+      } else if ("candidate_score_pseudo_initial" %in% names(df_joined)) {
+        -suppressWarnings(as.numeric(df_joined$candidate_score_pseudo_initial))
+      } else {
+        rep_len(0, nrow(df_joined))
+      }
+
+      ord <- order(
+        df_joined$feature_id,
+        rank_num,
+        score_final_num,
+        coverage_num,
+        initial_num,
+        na.last = TRUE
+      )
+      keep <- !duplicated(df_joined$feature_id[ord])
+      df_final <- df_joined[ord[keep], , drop = FALSE]
+
+      rm(ord, keep, rank_num, score_final_num, coverage_num, initial_num)
     }
 
     rm(df_joined)
@@ -294,23 +288,22 @@ summarize_results <- function(
     rm(df_joined)
   }
 
-  # Trim only character/factor fields to avoid full-table coercion copies.
-  text_cols <- colnames(df_final)[vapply(
-    X = df_final,
-    FUN = function(x) is.character(x) || is.factor(x),
-    FUN.VALUE = logical(1L)
-  )]
+  char_cols <- names(df_final)[vapply(df_final, is.character, logical(1L))]
+  factor_cols <- names(df_final)[vapply(df_final, is.factor, logical(1L))]
 
-  df_processed <- df_final |>
+  df_final <- df_final |>
     tidytable::mutate(
       tidytable::across(
-        .cols = tidyselect::all_of(x = text_cols),
-        .fns = ~ tidytable::na_if(
-          x = trimws(as.character(.x)),
-          y = ""
-        )
+        .cols = tidyselect::all_of(char_cols),
+        .fns = ~ tidytable::na_if(x = trimws(.x), y = "")
+      ),
+      tidytable::across(
+        .cols = tidyselect::all_of(factor_cols),
+        .fns = ~ tidytable::na_if(x = trimws(as.character(.x)), y = "")
       )
-    ) |>
+    )
+
+  df_processed <- df_final |>
     tidytable::select(tidyselect::any_of(x = final_select_cols))
 
   rm(df_final)
@@ -323,10 +316,11 @@ summarize_results <- function(
 
   results_with_structure <- df_processed[has_structure, , drop = FALSE]
   results_without_structure <- if (!all(has_structure)) {
-    feature_consensus_table <- .build_feature_consensus_table(
-      annot_table_wei_chemo = annot_table_wei_chemo,
-      model = model
-    )
+    feature_consensus_table <- feature_consensus_table %||%
+      .build_feature_consensus_table(
+        annot_table_wei_chemo = annot_table_wei_chemo,
+        model = model
+      )
     df_processed[!has_structure, , drop = FALSE] |>
       tidytable::distinct(tidyselect::any_of(x = model$features_columns)) |>
       tidytable::left_join(y = feature_consensus_table) |>
@@ -434,22 +428,23 @@ summarize_results <- function(
   has_organism_col <- "candidate_structure_organism_occurrence_closest" %in%
     names(df)
 
+  empty_lookup <- function() {
+    structure_organism_pairs_table[0L, ] |>
+      tidytable::select(
+        candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
+        reference_doi,
+        tidyselect::contains(match = "organism_taxonomy_"),
+        -tidyselect::any_of("organism_taxonomy_ottid")
+      ) |>
+      tidytable::mutate(
+        feature_id = character(),
+        candidate_structure_organism_occurrence_closest = character(),
+        candidate_structure_organism_occurrence_reference = character()
+      )
+  }
+
   if (!has_organism_col) {
-    # Return empty data frame with expected columns if organism column is missing
-    return(
-      structure_organism_pairs_table[0L, ] |>
-        tidytable::select(
-          candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
-          reference_doi,
-          tidyselect::contains(match = "organism_taxonomy_"),
-          -tidyselect::any_of("organism_taxonomy_ottid")
-        ) |>
-        tidytable::mutate(
-          feature_id = character(),
-          candidate_structure_organism_occurrence_closest = character(),
-          candidate_structure_organism_occurrence_reference = character()
-        )
-    )
+    return(empty_lookup())
   }
 
   candidate_structure_ids <- unique(
@@ -458,23 +453,11 @@ summarize_results <- function(
     ))
   )
   if (length(candidate_structure_ids) == 0L) {
-    return(
-      structure_organism_pairs_table[0L, ] |>
-        tidytable::select(
-          candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
-          reference_doi,
-          tidyselect::contains(match = "organism_taxonomy_"),
-          -tidyselect::any_of("organism_taxonomy_ottid")
-        ) |>
-        tidytable::mutate(
-          feature_id = character(),
-          candidate_structure_organism_occurrence_closest = character(),
-          candidate_structure_organism_occurrence_reference = character()
-        )
-    )
+    return(empty_lookup())
   }
 
-  structure_organism_pairs_table |>
+  # Narrow FIRST, before any join or reshape.
+  sop_narrow <- structure_organism_pairs_table |>
     tidytable::filter(
       structure_inchikey_connectivity_layer %in% candidate_structure_ids
     ) |>
@@ -484,37 +467,44 @@ summarize_results <- function(
       tidyselect::contains(match = "organism_taxonomy_"),
       -tidyselect::any_of("organism_taxonomy_ottid")
     ) |>
-    tidytable::distinct() |>
+    tidytable::distinct()
+
+  if (nrow(sop_narrow) == 0L) {
+    return(empty_lookup())
+  }
+
+  taxonomy_cols <- grep("^organism_taxonomy_", names(sop_narrow), value = TRUE)
+
+  # Melt ONCE on the already-narrowed table, instead of a 10-way OR filter
+  # over a full inchikey-only cartesian join. values_drop_na keeps this from
+  # ballooning on the many taxonomy ranks that are typically NA (species,
+  # varietas, etc.).
+  sop_long <- tidytable::pivot_longer(
+    sop_narrow,
+    cols = tidyselect::all_of(taxonomy_cols),
+    names_to = ".taxonomy_rank",
+    values_to = "candidate_structure_organism_occurrence_closest",
+    values_drop_na = TRUE
+  ) |>
+    tidytable::select(-".taxonomy_rank") |>
+    tidytable::distinct()
+
+  # Bound the join output by df's own key combos rather than by however many
+  # organism records a popular structure happens to carry.
+  df_keys <- df |>
+    tidytable::distinct(
+      feature_id,
+      candidate_structure_organism_occurrence_closest,
+      candidate_structure_inchikey_connectivity_layer
+    )
+
+  sop_long |>
     tidytable::inner_join(
-      y = df |>
-        tidytable::distinct(
-          feature_id,
-          candidate_structure_organism_occurrence_closest,
-          candidate_structure_inchikey_connectivity_layer
-        ),
-      by = "candidate_structure_inchikey_connectivity_layer"
-    ) |>
-    tidytable::filter(
-      candidate_structure_organism_occurrence_closest ==
-        organism_taxonomy_01domain |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_02kingdom |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_03phylum |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_04class |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_05order |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_06family |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_07tribe |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_08genus |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_09species |
-        candidate_structure_organism_occurrence_closest ==
-          organism_taxonomy_10varietas
+      y = df_keys,
+      by = c(
+        "candidate_structure_inchikey_connectivity_layer",
+        "candidate_structure_organism_occurrence_closest"
+      )
     ) |>
     tidytable::distinct(
       feature_id,

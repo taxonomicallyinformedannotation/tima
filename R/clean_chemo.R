@@ -231,6 +231,14 @@ clean_chemo <- function(
     )
   }
 
+  model <- columns_model()
+  feature_consensus_table <- .build_feature_consensus_table(
+    annot_table_wei_chemo = annot_table_wei_chemo,
+    model = model
+  )
+  rm(annot_table_wei_chemo)
+  invisible(gc(verbose = FALSE))
+
   # Three-Tier Output Generation ----
 
   # Apply High-Evidence Filter for Filtered and Full Tiers ----
@@ -254,7 +262,7 @@ clean_chemo <- function(
       features_table = features_table,
       components_table = components_table,
       structure_organism_pairs_table = structure_organism_pairs_table,
-      annot_table_wei_chemo = annot_table_wei_chemo,
+      feature_consensus_table = feature_consensus_table,
       remove_ties = remove_ties,
       summarize = summarize,
       annotation_notes_lookup = annotation_notes_lookup
@@ -319,7 +327,7 @@ clean_chemo <- function(
       features_table = features_table,
       components_table = components_table,
       structure_organism_pairs_table = structure_organism_pairs_table,
-      annot_table_wei_chemo = annot_table_wei_chemo,
+      feature_consensus_table = feature_consensus_table,
       remove_ties = remove_ties,
       summarize = summarize,
       annotation_notes_lookup = annotation_notes_lookup
@@ -341,7 +349,7 @@ clean_chemo <- function(
       )
   }
 
-  rm(df_full, df_ranked)
+  rm(df_full, df_ranked, feature_consensus_table)
   invisible(gc(verbose = FALSE))
 
   # Optionally Remove Compound Names (After All Processing) ----
@@ -370,8 +378,7 @@ clean_chemo <- function(
     features_table,
     components_table,
     structure_organism_pairs_table,
-    candidate_tables,
-    annot_table_wei_chemo
+    candidate_tables
   )
 
   results_list
@@ -405,21 +412,10 @@ retain_promoted_rank1_in_filtered <- function(
   }
 
   before_n <- nrow(df_filtered)
-  out <- df_filtered |>
-    tidytable::left_join(
-      y = promoted_features |>
-        tidytable::mutate(.promoted_feature = TRUE),
-      by = "feature_id"
-    ) |>
-    tidytable::mutate(
-      .promoted_feature = tidytable::if_else(
-        is.na(.promoted_feature),
-        FALSE,
-        .promoted_feature
-      )
-    ) |>
-    tidytable::filter(!.promoted_feature | rank_final == 1L) |>
-    tidytable::select(-.promoted_feature)
+  promoted_ids <- promoted_features$feature_id
+  keep <- !(df_filtered$feature_id %in% promoted_ids) |
+    df_filtered$rank_final == 1L
+  out <- df_filtered[keep, , drop = FALSE]
 
   dropped_n <- before_n - nrow(out)
   if (dropped_n > 0L) {
