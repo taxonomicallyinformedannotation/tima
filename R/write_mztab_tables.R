@@ -48,6 +48,7 @@
     return(results)
   }
 
+  # Work in plain data.frame for predictable behavior
   results <- as.data.frame(
     results,
     stringsAsFactors = FALSE,
@@ -57,57 +58,59 @@
   id_cols <- setdiff(colnames(results), multi_cols)
   n_rows <- nrow(results)
 
+  # Split each multi-valued column once (C-backed strsplit)
   split_values <- lapply(multi_cols, function(col) {
     values <- as.character(results[[col]])
-    split_values <- strsplit(values, "|", fixed = TRUE)
-    split_values[is.na(values) | !nzchar(values)] <- list(NA_character_)
-    split_values
+    parts <- strsplit(values, "|", fixed = TRUE)
+    parts[is.na(values) | !nzchar(values)] <- list(NA_character_)
+    parts
   })
 
-  n_vals_per_row <- vapply(
-    seq_len(n_rows),
-    function(i) {
-      max(vapply(
-        split_values,
-        function(parts) {
-          length(parts[[i]])
-        },
-        FUN.VALUE = integer(1L)
-      ))
-    },
-    FUN.VALUE = integer(1L)
-  )
+  # Compute number of output rows per input row (elementwise max across cols)
+  lengths_list <- lapply(split_values, lengths)
+  if (length(lengths_list) == 0L) {
+    return(results)
+  } else if (length(lengths_list) == 1L) {
+    n_vals_per_row <- pmax(unlist(lengths_list), 1L)
+  } else {
+    n_vals_per_row <- do.call(pmax, c(lengths_list, list(1L)))
+  }
   n_vals_per_row[n_vals_per_row < 1L] <- 1L
 
+  total_out_rows <- sum(n_vals_per_row)
   row_idx <- rep(seq_len(n_rows), times = n_vals_per_row)
+
   out <- vector("list", length(id_cols) + length(multi_cols))
   names(out) <- c(id_cols, multi_cols)
 
+  # Expand id (non-multi) columns by simple indexing
   for (col in id_cols) {
     out[[col]] <- results[[col]][row_idx]
   }
 
+  # Expand multi-value columns using mapply (faster than nested loops)
   for (col_idx in seq_along(multi_cols)) {
-    col <- multi_cols[[col_idx]]
     parts <- split_values[[col_idx]]
-    expanded <- character(sum(n_vals_per_row))
-    offset <- 1L
-
-    for (i in seq_len(n_rows)) {
-      n_vals <- n_vals_per_row[[i]]
-      vals <- parts[[i]]
-      if (length(vals) == 0L || (length(vals) == 1L && is.na(vals[[1L]]))) {
-        expanded[offset:(offset + n_vals - 1L)] <- NA_character_
-      } else {
-        if (length(vals) < n_vals) {
-          vals <- c(vals, rep(NA_character_, n_vals - length(vals)))
+    expanded_list <- mapply(
+      FUN = function(parts_row, nvals) {
+        if (
+          length(parts_row) == 0L ||
+            (length(parts_row) == 1L && is.na(parts_row[[1L]]))
+        ) {
+          rep(NA_character_, nvals)
+        } else if (length(parts_row) < nvals) {
+          c(parts_row, rep(NA_character_, nvals - length(parts_row)))
+        } else {
+          parts_row[seq_len(nvals)]
         }
-        expanded[offset:(offset + n_vals - 1L)] <- vals[seq_len(n_vals)]
-      }
-      offset <- offset + n_vals
-    }
+      },
+      parts,
+      n_vals_per_row,
+      SIMPLIFY = FALSE,
+      USE.NAMES = FALSE
+    )
 
-    out[[col]] <- expanded
+    out[[multi_cols[[col_idx]]]] <- unlist(expanded_list, use.names = FALSE)
   }
 
   out_df <- as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
