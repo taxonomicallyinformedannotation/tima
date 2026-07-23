@@ -424,8 +424,9 @@ annotate_masses <- function(
     parameters = get_params(step = "annotate_masses"),
     step = "annotate_masses"
   )
+  nrows_edges_out <- nrow(edges_out)
   export_output(x = edges_out, file = output_edges[[1L]])
-  log_file_op("Exported edges", output_edges[[1L]], n_rows = nrow(edges_out))
+  log_file_op("Exported edges", output_edges[[1L]], n_rows = nrows_edges_out)
   rm(edges_out)
 
   coverage_report <- build_annotate_masses_coverage_report(
@@ -461,14 +462,15 @@ annotate_masses <- function(
 
   export_output(x = coverage_report, file = coverage_file)
   log_file_op("Exported coverage report", coverage_file)
+  nrows_annotations <-  nrow(annotations)
   rm(annotations, coverage_report)
   elapsed_export <- difftime(Sys.time(), start_time_export, units = "secs")
   log_info("All outputs exported in %.2f seconds", as.numeric(elapsed_export))
 
   log_complete(
     ctx,
-    n_annotations = nrow(annotations),
-    n_edges = nrow(edges_out)
+    n_annotations = nrows_annotations,
+    n_edges = nrows_edges_out
   )
 
   c(
