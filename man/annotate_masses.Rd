@@ -30,8 +30,8 @@ annotate_masses(
   tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
   tolerance_dalton = get_params(step = "annotate_masses")$ms$tolerances$mass$dalton$ms1,
   tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$adducts,
-  min_intensity_correlation = get_params(step =
-    "annotate_masses")$ms$tolerances$intensity$adducts
+  correlation_p_threshold = get_params(step =
+    "annotate_masses")$ms$tolerances$correlation$p_value
 )
 }
 \arguments{
@@ -115,10 +115,11 @@ clearly-bounded steps; each step is documented inline. In short:
    compute the implied neutral mass M and look it up in the library
    within the ppm tolerance.
 
-7. **Intensity co-variance filtering.** Reject adduct edges where
-   the two features show poor intensity co-variance across samples,
-   as true adducts of the same neutral mass should have correlated
-   intensities.
+7. **Intensity co-variance edges.** For each feature, identify all m/z
+   pairs within the RT window and compute Pearson correlation of
+   intensities across samples (p < 0.05). These edges are added to the
+   network alongside rule-based edges, enabling discovery of novel
+   adduct patterns not in the rules.
 
 8. **Network-consensus pruning.** If a feature ends up with several
    library hits, drop only the candidates whose adduct has *zero*

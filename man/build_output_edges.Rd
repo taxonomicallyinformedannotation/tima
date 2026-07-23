@@ -8,6 +8,7 @@ build_output_edges(
   adduct_edges,
   loss_edges,
   cluster_edges,
+  covariance_edges = NULL,
   features_table,
   name_source,
   name_target

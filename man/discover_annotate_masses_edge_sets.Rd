@@ -16,7 +16,8 @@ discover_annotate_masses_edge_sets(
   tolerance_ppm,
   tolerance_rt,
   tolerance_dalton,
-  exact_masses
+  exact_masses,
+  correlation_p_threshold = 0.05
 )
 }
 \description{

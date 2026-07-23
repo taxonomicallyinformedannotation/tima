@@ -9,7 +9,11 @@ test_that("compute_intensity_covariance_edges returns empty for single sample", 
     mz = c(100.0, 100.5, 150.0),
     rt = c(1.0, 1.0, 5.0),
     intensity = c(1000, 2000, 500)
-  )
+  ) |>
+    tidytable::mutate(
+      intensity_all = list(intensity),
+      .by = feature_id
+    )
 
   result <- compute_intensity_covariance_edges(ft, tolerance_rt = 0.5)
 
@@ -26,7 +30,11 @@ test_that("compute_intensity_covariance_edges returns empty for single intensity
     mz = c(100.0, 100.5),
     rt = c(1.0, 1.0),
     intensity = c(1000, 2000)
-  )
+  ) |>
+    tidytable::mutate(
+      intensity_all = list(intensity),
+      .by = feature_id
+    )
 
   result <- compute_intensity_covariance_edges(ft, tolerance_rt = 0.5)
 
@@ -68,7 +76,11 @@ test_that("compute_intensity_covariance_edges detects correlated features across
     mz = rep(c(100.0, 100.5), each = 5L),
     rt = rep(c(1.0, 1.0), each = 5L),
     intensity = c(100, 200, 300, 400, 500, 110, 210, 310, 410, 510)
-  )
+  ) |>
+    tidytable::mutate(
+      intensity_all = list(intensity),
+      .by = feature_id
+    )
 
   result <- compute_intensity_covariance_edges(ft, tolerance_rt = 0.5)
 
@@ -93,7 +105,11 @@ test_that("compute_intensity_covariance_edges excludes uncorrelated features", {
       sample(100:1000, n, replace = TRUE),
       sample(100:1000, n, replace = TRUE)
     )
-  )
+  ) |>
+    tidytable::mutate(
+      intensity_all = list(intensity),
+      .by = feature_id
+    )
 
   result <- compute_intensity_covariance_edges(
     ft,
@@ -113,7 +129,11 @@ test_that("compute_intensity_covariance_edges respects RT window", {
     mz = rep(c(100.0, 100.5), each = 5L),
     rt = rep(c(1.0, 5.0), each = 5L),
     intensity = c(100, 200, 300, 400, 500, 110, 210, 310, 410, 510)
-  )
+  ) |>
+    tidytable::mutate(
+      intensity_all = list(intensity),
+      .by = feature_id
+    )
 
   result <- compute_intensity_covariance_edges(ft, tolerance_rt = 0.5)
 
