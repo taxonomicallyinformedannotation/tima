@@ -369,7 +369,10 @@ prepare_libraries_spectra <-
     export_spectra_rds(file = output_pos, spectra = spectra_pos)
     export_spectra_rds(file = output_neg, spectra = spectra_neg)
     export_output(sop, file = output_sop)
-    rm(sop)
+    nrows_sop <- nrow(sop)
+    length_spectra_pos <- length(spectra_pos)
+    length_spectra_neg <- length(spectra_neg)
+    rm(sop, spectra_pos, spectra_neg)
     export_params(
       parameters = get_params(step = "prepare_libraries_spectra"),
       step = "prepare_libraries_spectra"
@@ -377,8 +380,8 @@ prepare_libraries_spectra <-
 
     log_complete(
       ctx,
-      n_structures = nrow(sop),
-      n_spectra_total = length(spectra_pos) + length(spectra_neg),
+      n_structures = nrows_sop,
+      n_spectra_total = length_spectra_pos + length_spectra_neg,
       files_exported = 3
     )
 

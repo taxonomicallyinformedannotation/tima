@@ -82,7 +82,7 @@ read_mztab <- function(
   )
 
   export_output(features, output_features)
-  rm(features)
+  nrows_features <- nrow(features)
 
   spectra_path <- NULL
   spectra_source <- "none"
@@ -90,6 +90,7 @@ read_mztab <- function(
     # Try to extract embedded masster-style COM MGF spectra first
     embedded <- .extract_embedded_mgf(input, features, name_features)
     if (!is.null(embedded)) {
+      rm(features)
       create_dir(output_spectra)
       writeLines(embedded, output_spectra)
       spectra_path <- output_spectra
@@ -101,6 +102,7 @@ read_mztab <- function(
         name_features,
         name_mz
       )
+      rm(features)
       spectra_source <- "proxy"
     }
   }
@@ -115,7 +117,7 @@ read_mztab <- function(
 
   log_complete(
     ctx,
-    n_features = nrow(features),
+    n_features = nrows_features,
     spectra = spectra_source,
     has_metadata = !is.null(metadata_path)
   )
