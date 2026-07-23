@@ -34,17 +34,23 @@
 #'        compute the implied neutral mass M and look it up in the library
 #'        within the ppm tolerance.
 #'
-#'     7. **Network-consensus pruning.** If a feature ends up with several
+#'     7. **Intensity co-variance filtering.** Reject adduct edges where
+#'        the two features show poor intensity co-variance across samples,
+#'        as true adducts of the same neutral mass should have correlated
+#'        intensities.
+#'
+#'     8. **Network-consensus pruning.** If a feature ends up with several
 #'        library hits, drop only the candidates whose adduct has *zero*
 #'        support in the adduct edge graph **and** whose drop still leaves a
 #'        supported alternative. Ties are kept and drops are logged.
 #'
-#'     8. **Keep unmatched adducts.** Adduct hypotheses are exported even
+#'     9. **Keep unmatched adducts.** Adduct hypotheses are exported even
 #'        when no library structure matches, so downstream tools still see
 #'        the adduct annotation.
 #'
 #' @include adducts_utils.R
 #' @include adduct_universe.R
+#' @include annotate_masses_intensity.R
 #' @include calculate_mass_of_m.R
 #' @include decorate_masses.R
 #' @include dists_utils.R
@@ -74,6 +80,9 @@
 #' @param tolerance_ppm Tolerance to perform annotation. Should be <= 20 ppm
 #' @param tolerance_dalton Absolute mass tolerance in Daltons for annotation
 #' @param tolerance_rt Tolerance to group adducts. Should be <= 0.05 minutes
+#' @param min_intensity_correlation Minimum Pearson correlation for feature intensity
+#'   co-variance validation. Default 0.7. Adduct edges where features show
+#'   |correlation| < min_intensity_correlation are rejected.
 #'
 #' @return Named character of paths to the annotations and edges files.
 #'
@@ -126,7 +135,10 @@ annotate_masses <- function(
   )$ms$tolerances$mass$dalton$ms1,
   tolerance_rt = get_params(
     step = "annotate_masses"
-  )$ms$tolerances$rt$adducts
+  )$ms$tolerances$rt$adducts,
+  min_intensity_correlation = get_params(
+    step = "annotate_masses"
+  )$ms$tolerances$intensity$adducts
 ) {
   ctx <- log_operation(
     "annotate_masses",
@@ -251,6 +263,29 @@ annotate_masses <- function(
   cluster_edges <- edge_sets$cluster_edges
   loss_edges <- edge_sets$loss_edges
   evidence_signal <- edge_sets$evidence_signal
+
+  # Free memory from large intermediate objects
+  rm(edge_sets, ion_tables, pairs, adducts, clusters, adduct_edges)
+
+  # Validate adduct edges by intensity co-variance
+  intensity_validation <- validate_adduct_edges_by_intensity_covariance(
+    adduct_edges = adduct_edges_combined,
+    features_table = features_table,
+    min_correlation = min_intensity_correlation
+  )
+  adduct_edges_combined <- intensity_validation$adduct_edges
+  rejected_edges_intensity <- intensity_validation$rejected_edges
+  rm(intensity_validation)
+
+  n_rejected_intensity <- nrow(rejected_edges_intensity)
+  if (n_rejected_intensity > 0L) {
+    log_info(
+      "Intensity co-variance validation rejected %d adduct edge(s) (min_correlation=%.2f)",
+      n_rejected_intensity,
+      min_intensity_correlation
+    )
+  }
+
   lookup_adducts <- unique(stats::na.omit(c(
     baseline_adducts,
     multi_adducts$adduct,
@@ -264,9 +299,9 @@ annotate_masses <- function(
   adduct_lookup <- build_adduct_lookup_from_strings(lookup_adducts)
 
   log_info(
-    "Edge classification complete in %.2f seconds: %d adduct edges, %d cluster edges, %d loss edges",
+    "Edge classification complete in %.2f seconds: %d adduct edges (after intensity validation), %d cluster edges, %d loss edges",
     as.numeric(elapsed_edges),
-    nrow(adduct_edges),
+    nrow(adduct_edges_combined),
     nrow(cluster_edges),
     nrow(loss_edges)
   )
@@ -306,10 +341,13 @@ annotate_masses <- function(
   )
   cluster_edges <- modifier_resolution$cluster_edges
   loss_edges <- modifier_resolution$loss_edges
+  n_cluster_dropped <- modifier_resolution$n_cluster_dropped
+  n_loss_dropped <- modifier_resolution$n_loss_dropped
+  rm(modifier_resolution)
 
   if (
-    modifier_resolution$n_cluster_dropped > 0L ||
-      modifier_resolution$n_loss_dropped > 0L
+    n_cluster_dropped > 0L ||
+      n_loss_dropped > 0L
   ) {
     start_time_refine <- Sys.time()
     node_hypotheses <- build_annotate_masses_candidate_hypotheses(
@@ -342,8 +380,8 @@ annotate_masses <- function(
         "Refined node hypotheses after resolving %d ambiguous cluster edge(s) ",
         "and %d ambiguous loss edge(s) in %.2f seconds"
       ),
-      modifier_resolution$n_cluster_dropped,
-      modifier_resolution$n_loss_dropped,
+      n_cluster_dropped,
+      n_loss_dropped,
       as.numeric(difftime(Sys.time(), start_time_refine, units = "secs"))
     )
   }
@@ -364,6 +402,31 @@ annotate_masses <- function(
     as.numeric(elapsed_lib),
     nrow(annotations)
   )
+
+  # Add annotation notes for edges rejected by intensity co-variance
+  if (nrow(rejected_edges_intensity) > 0L) {
+    annotations <- annotations |>
+      tidytable::left_join(
+        rejected_edges_intensity |>
+          tidytable::transmute(
+            feature_id,
+            adduct,
+            intensity_rejection_note = rejection_reason
+          ),
+        by = c("feature_id", "adduct")
+      ) |>
+      tidytable::mutate(
+        annotation_note = tidytable::if_else(
+          !is.na(intensity_rejection_note),
+          paste0(
+            "Adduct rejected by intensity co-variance: ",
+            intensity_rejection_note
+          ),
+          annotation_note
+        )
+      ) |>
+      tidytable::select(-tidyselect::any_of("intensity_rejection_note"))
+  }
 
   annotations <- derive_primary_secondary_annotations(
     annotations = annotations,
@@ -389,6 +452,9 @@ annotate_masses <- function(
   cluster_edges <- supported_graph$cluster_edges
   loss_edges <- supported_graph$loss_edges
   annotations <- supported_graph$annotations
+
+  # Free memory from evidence signal and graph structures
+  rm(supported_graph, evidence_signal, rejected_edges_intensity)
 
   coverage_audit <- attr(annotations, "coverage_audit")
   if (is.list(coverage_audit)) {
@@ -427,7 +493,13 @@ annotate_masses <- function(
   nrows_edges_out <- nrow(edges_out)
   export_output(x = edges_out, file = output_edges[[1L]])
   log_file_op("Exported edges", output_edges[[1L]], n_rows = nrows_edges_out)
-  rm(edges_out)
+  rm(
+    edges_out,
+    adduct_edges_combined,
+    cluster_edges,
+    loss_edges,
+    features_table
+  )
 
   coverage_report <- build_annotate_masses_coverage_report(
     annotations = annotations,

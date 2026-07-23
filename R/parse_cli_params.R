@@ -262,6 +262,10 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("ms", "tolerances", "rt", "library"),
       type = as.numeric
     ),
+    ms_tol_int_add = list(
+      path = c("ms", "tolerances", "intensity", "adducts"),
+      type = as.numeric
+    ),
     names_adduct = list(path = c("names", "adduct"), type = as.character),
     names_compound_name = list(
       path = c("names", "compound_name"),

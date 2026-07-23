@@ -590,6 +590,22 @@ ui <- shiny::fluidPage(
                 "If no experimental library is given, does not impact results."
               )
             ),
+          shiny::sliderInput(
+            inputId = "ms_tol_int_add",
+            label = "Minimum intensity co-variance for adduct edges",
+            min = 0.0,
+            max = 1.0,
+            value = 0.7,
+            ticks = FALSE
+          ) |>
+            shinyhelper::helper(
+              type = "inline",
+              content = c(
+                "Pearson correlation threshold for intensity co-variance validation.",
+                "Adduct edges with |correlation| < threshold are rejected.",
+                "Higher values (0.8-0.9) require stronger intensity co-variance."
+              )
+            ),
           shiny::checkboxGroupInput(
             inputId = "ms_add_pos",
             label = "List of adducts to be used in positive",

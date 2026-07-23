@@ -264,6 +264,11 @@ ms:
       #' Retention time tolerance for adducts in minutes. FLOAT
       adducts: 0.02
 
+    #' For intensity co-variance.
+    intensity:
+      #' Minimum Pearson correlation for intensity co-variance validation in adducts. FLOAT
+      adducts: 0.7
+
 
 #' Names of the different variables in the input files.
 names:

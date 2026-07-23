@@ -386,6 +386,8 @@
     input$ms_tol_rt_add
   yaml_advanced$ms$tolerances$rt$library <-
     input$ms_tol_rt_lib
+  yaml_advanced$ms$tolerances$intensity$adducts <-
+    input$ms_tol_int_add
   yaml_advanced$names$adduct <-
     input$names_adduct
   yaml_advanced$names$compound_name <-

@@ -181,6 +181,7 @@ prepare_params <- function(
   ms_tol_mas_dal_ms2 <- params_advanced$ms$tolerances$mass$dalton$ms2
   ms_tol_rt_add <- params_advanced$ms$tolerances$rt$adducts
   ms_tol_rt_lib <- params_advanced$ms$tolerances$rt$library
+  ms_tol_int_add <- params_advanced$ms$tolerances$intensity$adducts
   names_compound_name <- params_advanced$names$compound_name
   names_extension <- params_advanced$names$extension
   names_features <- params_advanced$names$features
@@ -329,6 +330,8 @@ prepare_params <- function(
     ms_tol_mas_dal_ms1
   yamls_params$annotate_masses$ms$tolerances$rt$adducts <-
     ms_tol_rt_add
+  yamls_params$annotate_masses$ms$tolerances$intensity$adducts <-
+    ms_tol_int_add
   yamls_params$annotate_masses$names$source <-
     names_source
   yamls_params$annotate_masses$names$target <-

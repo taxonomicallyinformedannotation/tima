@@ -661,6 +661,11 @@ ms:
       #' Retention time tolerance for library in minutes. FLOAT
       library: .inf
 
+    #' For intensity co-variance.
+    intensity:
+      #' Minimum Pearson correlation for intensity co-variance validation in adducts. FLOAT
+      adducts: 0.7
+
 #' Names of the different variables in the input files.
 names:
   #' Name of "adduct" variable in the feature table. STRING
