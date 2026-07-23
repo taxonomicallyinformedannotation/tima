@@ -307,6 +307,24 @@ filter_high_evidence_only <- function(
 
   # Core filtering ----
 
+  # Identify MS2 candidates with low scores that should be rescued if they come
+  # from rescued adducts (m_delta_rescued). These will pass the filter and get an
+  # annotation note instead of being dropped.
+  has_rescued_adduct_col <- "candidate_adduct_match_mode" %in% names(df_work)
+
+  df_rescued_ms2_candidates <- if (has_rescued_adduct_col) {
+    df_work |>
+      tidytable::filter(
+        # MS2 candidates with scores below minimum that came from rescued adducts
+        !is.na(.score_ini) &
+          .score_ini > 0 &
+          .score_ini < score_ini_min &
+          .data[["candidate_adduct_match_mode"]] == "m_delta_rescued"
+      )
+  } else {
+    df_work[0L, ]
+  }
+
   # At least one of the three score thresholds must be satisfied
   # NA values for initial score indicate MS1-only hits (no MS2 spectrum) and
   # don't block other scores
@@ -319,6 +337,31 @@ filter_high_evidence_only <- function(
           (is.na(.score_final_coverage) |
             .score_final_coverage >= score_final_coverage_min))
     )
+
+  # Add back rescued MS2 candidates (with lower score) and annotate them
+  if (nrow(df_rescued_ms2_candidates) > 0L) {
+    df_rescued_ms2_candidates <- df_rescued_ms2_candidates |>
+      tidytable::mutate(
+        annotation_note = if (
+          "annotation_note" %in% names(df_rescued_ms2_candidates)
+        ) {
+          tidytable::if_else(
+            is.na(.data[["annotation_note"]]),
+            "Retained despite low MS2 score due to rescued adduct match",
+            paste(
+              .data[["annotation_note"]],
+              "Retained despite low MS2 score due to rescued adduct match",
+              sep = " | "
+            )
+          )
+        } else {
+          "Retained despite low MS2 score due to rescued adduct match"
+        }
+      ) |>
+      tidytable::select(-tidyselect::starts_with(".anchor_"))
+
+    df_filtered <- tidytable::bind_rows(df_filtered, df_rescued_ms2_candidates)
+  }
 
   # RT error filter (minutes). Allow NA (unknown) values
   if ("candidate_structure_error_rt" %in% names(df_filtered)) {
