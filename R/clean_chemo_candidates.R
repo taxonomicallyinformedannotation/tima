@@ -574,8 +574,17 @@ sample_candidates_per_group <- function(
   if ("annotation_note" %in% names(df_result)) {
     annotation_notes_lookup <- df_result |>
       tidytable::filter(!is.na(annotation_note)) |>
-      tidytable::distinct(feature_id, candidate_adduct, annotation_note) |>
-      tidytable::group_by(feature_id, candidate_adduct) |>
+      tidytable::distinct(
+        feature_id,
+        candidate_adduct,
+        candidate_structure_inchikey_connectivity_layer,
+        annotation_note
+      ) |>
+      tidytable::group_by(
+        feature_id,
+        candidate_adduct,
+        candidate_structure_inchikey_connectivity_layer
+      ) |>
       tidytable::summarize(
         annotation_note = paste(unique(annotation_note), collapse = " | "),
         .groups = "drop"
@@ -748,6 +757,7 @@ prepare_ranked_candidates <- function(
   )
 
   df_ranked <- rank_and_deduplicate(df_base)
+  rm(df_base)
 
   # Cluster-consensus promotion is enabled by default for the candidate
   # ranking pipeline. The main clean_chemo workflow can disable it if a caller
@@ -776,6 +786,7 @@ prepare_ranked_candidates <- function(
     seed = 42L,
     apply_anchor_collapsing = apply_anchor_collapsing
   )
+  rm(df_ranked)
 
   df_ranked <- sampling_result$df
   df_percentile <- apply_percentile_filter(

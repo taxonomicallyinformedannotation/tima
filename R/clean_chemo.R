@@ -230,13 +230,13 @@ clean_chemo <- function(
       max_per_score
     )
   }
+  rm(candidate_tables)
 
   model <- columns_model()
   feature_consensus_table <- .build_feature_consensus_table(
     annot_table_wei_chemo = annot_table_wei_chemo,
     model = model
   )
-  rm(annot_table_wei_chemo)
   invisible(gc(verbose = FALSE))
 
   # Three-Tier Output Generation ----
@@ -246,7 +246,11 @@ clean_chemo <- function(
   # Apply filter_high_evidence_only for filtered tier
   df_filtered <- df_percentile |>
     filter_high_evidence_only(context = "filtered") |>
-    tidytable::filter(rank_final <= candidates_final)
+    tidytable::slice_head(
+      by = feature_id,
+      order_by = rank_final,
+      n = candidates_final
+    )
 
   df_filtered <- retain_promoted_rank1_in_filtered(
     df_filtered = df_filtered,
@@ -332,6 +336,7 @@ clean_chemo <- function(
       annotation_notes_lookup = annotation_notes_lookup
     ) |>
     tidytable::left_join(y = results_candidates)
+  rm(annot_table_wei_chemo)
 
   # Only set candidates_best if the inchikey column exists
   if (
@@ -376,8 +381,7 @@ clean_chemo <- function(
     results_candidates,
     features_table,
     components_table,
-    structure_organism_pairs_table,
-    candidate_tables
+    structure_organism_pairs_table
   )
 
   results_list

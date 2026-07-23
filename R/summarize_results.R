@@ -215,7 +215,12 @@ summarize_results <- function(
   # one note per (feature_id, candidate_adduct, rank_final) group
   if (!is.null(annotation_notes_lookup) && nrow(annotation_notes_lookup) > 0) {
     note_join_cols <- intersect(
-      c("feature_id", "candidate_adduct", "rank_final"),
+      c(
+        "feature_id",
+        "candidate_adduct",
+        "candidate_structure_inchikey_connectivity_layer",
+        "rank_final"
+      ),
       names(annotation_notes_lookup)
     )
     note_join_cols <- intersect(note_join_cols, names(df_joined))

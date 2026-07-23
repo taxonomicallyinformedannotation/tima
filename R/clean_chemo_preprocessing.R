@@ -492,7 +492,6 @@ rank_and_deduplicate <- function(df) {
     "candidate_score_similarity",
     "candidate_score_similarity_forward",
     "candidate_score_similarity_reverse",
-    "candidate_adduct_match_mode",
     "score_biological",
     "score_chemical"
   )) {
@@ -500,6 +499,13 @@ rank_and_deduplicate <- function(df) {
       df[[col]] <- suppressWarnings(as.numeric(df[[col]]))
     } else {
       df[[col]] <- rep(NA_real_, nrow(df))
+    }
+  }
+
+  # candidate_adduct_match_mode is character, not numeric
+  if (!("candidate_adduct_match_mode" %in% names(df))) {
+    if (nrow(df) > 0L) {
+      df[["candidate_adduct_match_mode"]] <- NA_character_
     }
   }
 
