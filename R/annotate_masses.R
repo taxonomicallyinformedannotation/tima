@@ -462,7 +462,7 @@ annotate_masses <- function(
 
   export_output(x = coverage_report, file = coverage_file)
   log_file_op("Exported coverage report", coverage_file)
-  nrows_annotations <-  nrow(annotations)
+  nrows_annotations <- nrow(annotations)
   rm(annotations, coverage_report)
   elapsed_export <- difftime(Sys.time(), start_time_export, units = "secs")
   log_info("All outputs exported in %.2f seconds", as.numeric(elapsed_export))
