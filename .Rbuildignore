@@ -9,6 +9,7 @@ CITATION.cff
 ^\.github$
 ^\.idea$
 ^\.lintr$
+^\.poolside$
 ^\.quarto$
 ^\.vscode$
 ^_pkgdown\.yml$

@@ -1247,6 +1247,13 @@ finalize_results <- function(
         .similarity_space == "neutral_M" ~ "m_delta_rescued",
         TRUE ~ "precursor_mz"
       ),
+      # For rescued matches, swap candidate_query_adduct to be the observed adduct
+      # for clarity: candidate_query_adduct should reflect what was actually observed
+      candidate_query_adduct = tidytable::if_else(
+        candidate_adduct_match_mode == "m_delta_rescued",
+        query_adduct,
+        candidate_query_adduct
+      ),
       annotation_note = tidytable::case_when(
         ## COMMENT: does not seem logical but is so
         candidate_adduct_match_mode == "m_delta_rescued" ~
@@ -1254,7 +1261,7 @@ finalize_results <- function(
             "Spectral match rescued in neutral-mass space: observed adduct ",
             candidate_adduct,
             ", library adduct ",
-            candidate_query_adduct
+            target_adduct
           ),
         TRUE ~ NA_character_
       ),
