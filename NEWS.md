@@ -63,13 +63,16 @@
   - Added assignment-aware modifier-edge pruning so outdated cluster/loss links
     are removed when they contradict assigned adduct states, while retaining
     explicitly tagged contaminant edges
-  - **Intensity co-variance validation** (`min_intensity_correlation`, default
-    0.7): A hard filter that rejects adduct edges where the two putative ions
-    show poor intensity co-variance across samples. True adducts of the same
-    neutral mass should have correlated intensities; feature pairs with
-    \|correlation\| < min_intensity_correlation are filtered out and annotated
-    as rejected, reducing spurious adduct hypotheses while preserving genuine
-    multi-adduct evidence.
+  - **Intensity co-variance edge discovery** (new network-integrated approach):
+    Replaces the previous hard-filter validation with a scientifically sounder
+    approach that leverages the adduct network itself. For each feature, all m/z
+    pairs within the RT window are assessed via Pearson correlation of their
+    intensities across samples (p < 0.05). Edges with statistically significant
+    correlations enter the network alongside rule-based edges (adducts,
+    clusters, losses), and the network consensus process determines which edges
+    are valid (same M) vs. noise (different compounds). This enables discovery
+    of novel adduct patterns not in the rules and naturally filters uncorrelated
+    (spurious) pairs through network topology rather than arbitrary thresholds.
 
 - **Adduct canonicalization alignment**:
   - Unified canonical adduct string ordering across structured universe

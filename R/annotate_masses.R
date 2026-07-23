@@ -34,10 +34,11 @@
 #'        compute the implied neutral mass M and look it up in the library
 #'        within the ppm tolerance.
 #'
-#'     7. **Intensity co-variance filtering.** Reject adduct edges where
-#'        the two features show poor intensity co-variance across samples,
-#'        as true adducts of the same neutral mass should have correlated
-#'        intensities.
+#'     7. **Intensity co-variance edges.** For each feature, identify all m/z
+#'        pairs within the RT window and compute Pearson correlation of
+#'        intensities across samples (p < 0.05). These edges are added to the
+#'        network alongside rule-based edges, enabling discovery of novel
+#'        adduct patterns not in the rules.
 #'
 #'     8. **Network-consensus pruning.** If a feature ends up with several
 #'        library hits, drop only the candidates whose adduct has *zero*
@@ -50,7 +51,7 @@
 #'
 #' @include adducts_utils.R
 #' @include adduct_universe.R
-#' @include annotate_masses_intensity.R
+#' @include annotate_masses_covariance.R
 #' @include calculate_mass_of_m.R
 #' @include decorate_masses.R
 #' @include dists_utils.R
@@ -136,9 +137,9 @@ annotate_masses <- function(
   tolerance_rt = get_params(
     step = "annotate_masses"
   )$ms$tolerances$rt$adducts,
-  min_intensity_correlation = get_params(
+  correlation_p_threshold = get_params(
     step = "annotate_masses"
-  )$ms$tolerances$intensity$adducts
+  )$ms$tolerances$correlation$p_value
 ) {
   ctx <- log_operation(
     "annotate_masses",
@@ -256,7 +257,8 @@ annotate_masses <- function(
     tolerance_ppm = tolerance_ppm,
     tolerance_rt = tolerance_rt,
     tolerance_dalton = tolerance_dalton,
-    exact_masses = lib$em_windows$exact_mass
+    exact_masses = lib$em_windows$exact_mass,
+    correlation_p_threshold = correlation_p_threshold
   )
   elapsed_edges <- difftime(Sys.time(), start_time_edges, units = "secs")
   adduct_edges <- edge_sets$adduct_edges
@@ -278,24 +280,8 @@ annotate_masses <- function(
     adducts_list
   )
 
-  # Validate adduct edges by intensity co-variance
-  intensity_validation <- validate_adduct_edges_by_intensity_covariance(
-    adduct_edges = adduct_edges_combined,
-    features_table = features_table,
-    min_correlation = min_intensity_correlation
-  )
-  adduct_edges_combined <- intensity_validation$adduct_edges
-  rejected_edges_intensity <- intensity_validation$rejected_edges
-  rm(intensity_validation)
-
-  n_rejected_intensity <- nrow(rejected_edges_intensity)
-  if (n_rejected_intensity > 0L) {
-    log_info(
-      "Intensity co-variance validation rejected %d adduct edge(s) (min_correlation=%.2f)",
-      n_rejected_intensity,
-      min_intensity_correlation
-    )
-  }
+  # Covariance edges are now integrated into the network (see discover_annotate_masses_edge_sets)
+  # They will be validated by network consensus, not a hard pre-filter
 
   lookup_adducts <- unique(stats::na.omit(c(
     baseline_adducts,
@@ -310,7 +296,7 @@ annotate_masses <- function(
   adduct_lookup <- build_adduct_lookup_from_strings(lookup_adducts)
 
   log_info(
-    "Edge classification complete in %.2f seconds: %d adduct edges (after intensity validation), %d cluster edges, %d loss edges",
+    "Edge classification complete in %.2f seconds: %d adduct + covariance edges, %d cluster edges, %d loss edges",
     as.numeric(elapsed_edges),
     nrow(adduct_edges_combined),
     nrow(cluster_edges),
@@ -418,30 +404,8 @@ annotate_masses <- function(
   )
   rm(lib, adduct_lookup, already_assigned)
 
-  # Add annotation notes for edges rejected by intensity co-variance
-  if (nrow(rejected_edges_intensity) > 0L) {
-    annotations <- annotations |>
-      tidytable::left_join(
-        rejected_edges_intensity |>
-          tidytable::transmute(
-            feature_id,
-            adduct,
-            intensity_rejection_note = rejection_reason
-          ),
-        by = c("feature_id", "adduct")
-      ) |>
-      tidytable::mutate(
-        annotation_note = tidytable::if_else(
-          !is.na(intensity_rejection_note),
-          paste0(
-            "Adduct rejected by intensity co-variance: ",
-            intensity_rejection_note
-          ),
-          annotation_note
-        )
-      ) |>
-      tidytable::select(-tidyselect::any_of("intensity_rejection_note"))
-  }
+  # Intensity co-variance edges are now integrated into the network
+  # and validated through consensus, not a hard pre-filter
 
   annotations <- derive_primary_secondary_annotations(
     annotations = annotations,
@@ -469,8 +433,8 @@ annotate_masses <- function(
   loss_edges <- supported_graph$loss_edges
   annotations <- supported_graph$annotations
 
-  # Free memory from evidence signal and graph structures
-  rm(supported_graph, evidence_signal, rejected_edges_intensity)
+  # Free memory from graph structures
+  rm(supported_graph, evidence_signal)
 
   coverage_audit <- attr(annotations, "coverage_audit")
   if (is.list(coverage_audit)) {
@@ -1609,7 +1573,8 @@ discover_annotate_masses_edge_sets <- function(
   tolerance_ppm,
   tolerance_rt,
   tolerance_dalton,
-  exact_masses
+  exact_masses,
+  correlation_p_threshold = 0.05
 ) {
   invisible(tolerance_dalton)
   adduct_diffs <- transition_tables$adduct_diffs
@@ -1667,12 +1632,34 @@ discover_annotate_masses_edge_sets <- function(
     )
   }
 
+  # Compute intensity co-variance edges within RT windows
+  covariance_edges <- compute_intensity_covariance_edges(
+    features_table = features_table,
+    tolerance_rt = tolerance_rt,
+    correlation_p_threshold = correlation_p_threshold
+  )
+
+  if (nrow(covariance_edges) > 0L) {
+    log_info(
+      "Intensity co-variance discovery added %d edge(s) within RT windows",
+      nrow(covariance_edges)
+    )
+    # Add covariance edges to the combined set
+    adduct_edges_combined <- tidytable::bind_rows(
+      adduct_edges_combined,
+      covariance_edges |>
+        tidytable::select(feature_id, feature_id_dest, source)
+    ) |>
+      tidytable::distinct()
+  }
+
   list(
     adduct_edges = adduct_edges,
     adduct_edges_combined = adduct_edges_combined,
     cluster_edges = cluster_edges,
     loss_edges = loss_edges,
-    evidence_signal = evidence_signal
+    evidence_signal = evidence_signal,
+    covariance_edges = covariance_edges
   )
 }
 

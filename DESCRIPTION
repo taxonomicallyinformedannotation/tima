@@ -104,7 +104,7 @@ Collate:
     'decorate_masses.R'
     'parse_adduct.R'
     'calculate_mass_of_m.R'
-    'annotate_masses_intensity.R'
+    'annotate_masses_covariance.R'
     'annotate_masses.R'
     'annotate_masses_consistency.R'
     'annotate_masses_coverage.R'

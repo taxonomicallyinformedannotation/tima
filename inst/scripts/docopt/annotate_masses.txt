@@ -2,7 +2,7 @@ You can use this script with the following example:
   Rscript inst/scripts/annotate_masses.R
 
 Usage:
-  annotate_masses.R [--fil-ann-pre-str=<fil-ann-pre-str>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-lib-add-neg=<fil-lib-add-neg>] [--fil-lib-add-pos=<fil-lib-add-pos>] [--fil-lib-add-pro=<fil-lib-add-pro>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>]  [--ms-add-con-type=<ms-add-con-type>] [--ms-add-con-min-degree=<ms-add-con-min-degree>] [--ms-add-con-min-support=<ms-add-con-min-support>] [--ms-clu=<ms-clu>] [--ms-sol=<ms-sol>] [--ms-neu=<ms-neu>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-add=<ms-tol-rt-add>] [--ms-tol-int-add=<ms-tol-int-add>] [--force=<force>]
+  annotate_masses.R [--fil-ann-pre-str=<fil-ann-pre-str>] [--fil-lib-sop-mer=<fil-lib-sop-mer>] [--fil-lib-add-neg=<fil-lib-add-neg>] [--fil-lib-add-pos=<fil-lib-add-pos>] [--fil-lib-add-pro=<fil-lib-add-pro>] [--ms-add-neg=<ms-add-neg>] [--ms-add-pos=<ms-add-pos>]  [--ms-add-con-type=<ms-add-con-type>] [--ms-add-con-min-degree=<ms-add-con-min-degree>] [--ms-add-con-min-support=<ms-add-con-min-support>] [--ms-clu=<ms-clu>] [--ms-sol=<ms-sol>] [--ms-neu=<ms-neu>] [--ms-pol=<ms-pol>] [--ms-tol-mas-ppm-ms1=<ms-tol-mas-ppm-ms1>] [--ms-tol-mas-dal-ms1=<ms-tol-mas-dal-ms1>] [--ms-tol-rt-add=<ms-tol-rt-add>] [--force=<force>]
 
 Arguments:
   fil-ann-pre-str            List of prepared structural annotations. STRING
@@ -24,7 +24,6 @@ Arguments:
   ms-tol-mas-ppm-ms1         Relative mass tolerance for MS1 in ppm. FLOAT
   ms-tol-mas-dal-ms1         Absolute mass tolerance for MS1 in Dalton. FLOAT
   ms-tol-rt-add              Retention time tolerance for adducts in minutes. FLOAT
-  ms-tol-int-add             Minimum intensity co-variance correlation for adducts. FLOAT
 
   force                      Do not use it. BOOLEAN
 
