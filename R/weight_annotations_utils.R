@@ -652,6 +652,7 @@ export_results <- function(results_list, output, pattern) {
   export_output(x = results_list$mini, file = final_output_mini)
   export_output(x = results_list$filtered, file = final_output_filtered)
   export_output(x = results_list$full, file = final_output)
+  rm(results_list)
 
   c(
     "filtered" = final_output_filtered,

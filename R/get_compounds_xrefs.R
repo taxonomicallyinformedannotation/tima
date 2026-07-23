@@ -251,7 +251,9 @@ SELECT ?item ?inchikey ?db ?id WHERE {
     tidytable::arrange(inchikey, prefix)
 
   export_output(x = result, file = output)
-  log_complete(ctx, n_rows = nrow(result))
+  n_rows <- nrow(result)
+  rm(result)
+  log_complete(ctx, n_rows = n_rows)
 
   invisible(output)
 }

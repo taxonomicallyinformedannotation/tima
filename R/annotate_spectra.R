@@ -324,9 +324,13 @@ annotate_spectra <- function(
   ) |>
     tidytable::filter(target_id %in% unique(sim_raw$target_id))
 
-  # spectral_library and query_sp (with their peak-data backends) are done
-  # being read from at this point -- everything downstream works off
-  # sim_raw/meta/query_meta. Free them before the join/dedup pipeline runs.
+  # spectral_library and query_sp (with their peak-data backends -- the S4
+  # objects holding many small per-spectrum matrices) are done being read
+  # from at this point -- everything downstream works off sim_raw/meta/
+  # query_meta. Free them before the join/dedup pipeline runs. This is the
+  # mid-pipeline collection: it targets the *input* Spectra backends, which
+  # generational GC is slow to reclaim on its own (many small S4-backed
+  # allocations rather than one big block).
   rm(spectral_library, query_sp, lib_precursors_all)
   invisible(gc(full = TRUE, verbose = FALSE))
 
@@ -337,7 +341,9 @@ annotate_spectra <- function(
     dalton = dalton,
     ppm = ppm
   )
+  rm(sim_raw, meta)
   if (nrow(df_final) == 0L) {
+    invisible(gc(full = TRUE, verbose = FALSE))
     return(
       annotate_spectra_handle_empty_result(
         output_path,
@@ -375,6 +381,7 @@ annotate_spectra <- function(
 
   persist_annotation_parameters(params)
   export_output(x = df_final, file = output_path)
+  rm(df_final)
   invisible(output_path)
 }
 

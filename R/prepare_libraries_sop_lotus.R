@@ -75,6 +75,7 @@ prepare_libraries_sop_lotus <- function(
 
   # Export prepared data
   export_output(x = lotus_prepared, file = output)
+  rm(lotus_prepared)
 
   output
 }

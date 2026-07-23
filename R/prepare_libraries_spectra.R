@@ -369,6 +369,7 @@ prepare_libraries_spectra <-
     export_spectra_rds(file = output_pos, spectra = spectra_pos)
     export_spectra_rds(file = output_neg, spectra = spectra_neg)
     export_output(sop, file = output_sop)
+    rm(sop)
     export_params(
       parameters = get_params(step = "prepare_libraries_spectra"),
       step = "prepare_libraries_spectra"

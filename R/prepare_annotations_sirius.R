@@ -269,6 +269,7 @@ prepare_annotations_sirius <-
   export_output(x = splits$canopus, file = output_can)
   export_output(x = splits$formula, file = output_for)
   export_output(x = splits$structures, file = output_ann[[1L]])
+  rm(splits)
 }
 
 .read_sirius_tabular <- function(con) {

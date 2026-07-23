@@ -349,6 +349,7 @@ prepare_libraries_sop_bigg <- function(
     )
 
     export_output(x = bigg_prepared, file = output)
+    rm(bigg_prepared)
   } else {
     return(output)
   }

@@ -118,7 +118,9 @@ prepare_libraries_sop_pubchemlite <- function(
     }
 
     export_output(x = pubchemlite_prepared, file = output)
-    log_complete(ctx, n_pairs = nrow(pubchemlite_prepared))
+    n_pairs <- nrow(pubchemlite_prepared)
+    rm(pubchemlite_prepared)
+    log_complete(ctx, n_pairs = n_pairs)
   } else {
     log_debug("PubChem Lite library already exists and is valid")
     log_complete(ctx, cached = TRUE)

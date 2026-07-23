@@ -213,6 +213,7 @@ prepare_annotations_mztab <- function(
     x = ann,
     file = output
   )
+  rm(ann)
   output
 }
 

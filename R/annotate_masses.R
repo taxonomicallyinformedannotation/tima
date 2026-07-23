@@ -426,6 +426,7 @@ annotate_masses <- function(
   )
   export_output(x = edges_out, file = output_edges[[1L]])
   log_file_op("Exported edges", output_edges[[1L]], n_rows = nrow(edges_out))
+  rm(edges_out)
 
   coverage_report <- build_annotate_masses_coverage_report(
     annotations = annotations,
@@ -460,6 +461,7 @@ annotate_masses <- function(
 
   export_output(x = coverage_report, file = coverage_file)
   log_file_op("Exported coverage report", coverage_file)
+  rm(annotations, coverage_report)
   elapsed_export <- difftime(Sys.time(), start_time_export, units = "secs")
   log_info("All outputs exported in %.2f seconds", as.numeric(elapsed_export))
 

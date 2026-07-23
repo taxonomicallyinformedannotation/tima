@@ -195,6 +195,7 @@ prepare_taxa <- function(
           step = "prepare_taxa"
         )
         export_output(x = taxed_features_table, file = output)
+        rm(taxed_features_table)
         return(output)
       }
     }
@@ -215,6 +216,7 @@ prepare_taxa <- function(
         step = "prepare_taxa"
       )
       export_output(x = taxed_features_table, file = output)
+      rm(taxed_features_table)
       return(output)
     }
   }
@@ -387,6 +389,7 @@ prepare_taxa <- function(
         step = "prepare_taxa"
       )
       export_output(x = taxed_features_table, file = output)
+      rm(taxed_features_table)
       return(output)
     }
   }

@@ -245,6 +245,15 @@ export_library_tables <- function(
   export_output(x = table_structures_metadata, file = output_str_met)
   export_output(x = table_structures_taxonomy_cla, file = output_str_tax_cla)
   export_output(x = table_structures_taxonomy_npc, file = output_str_tax_npc)
+  rm(
+    table_keys,
+    table_org_tax_ott,
+    table_structures_canonical,
+    table_structures_stereo,
+    table_structures_metadata,
+    table_structures_taxonomy_cla,
+    table_structures_taxonomy_npc
+  )
 
   c(
     "key" = output_key,

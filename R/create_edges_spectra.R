@@ -464,12 +464,16 @@ create_edges_spectra <- function(
   }
 
   export_output(x = edges, file = output)
+
+  n_edges <- nrow(edges)
+  n_features <- length(unique(c(edges[[source_col]], edges[[target_col]])))
+  rm(edges)
   log_info("Edges written to: %s", output)
 
   log_complete(
     ctx,
-    n_edges = nrow(edges),
-    n_features = length(unique(c(edges[[source_col]], edges[[target_col]])))
+    n_edges = n_edges,
+    n_features = n_features
   )
   invisible(output)
 }

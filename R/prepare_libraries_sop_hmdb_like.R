@@ -153,7 +153,9 @@ prepare_libraries_sop_hmdb_like <- function(
     }
 
     export_output(x = hmdb_like_prepared, file = output)
-    log_complete(ctx, n_pairs = nrow(hmdb_like_prepared))
+    n_pairs <- nrow(hmdb_like_prepared)
+    rm(hmdb_like_prepared)
+    log_complete(ctx, n_pairs = n_pairs)
   } else {
     log_debug("%s library already exists and is valid", source_name)
     log_complete(ctx, cached = TRUE)

@@ -121,6 +121,7 @@ prepare_features_tables <- function(
     step = "prepare_features_tables"
   )
   export_output(x = features_prepared, file = output)
+  rm(features_prepared)
 
   invisible(output)
 }

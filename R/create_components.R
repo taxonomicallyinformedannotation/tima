@@ -595,12 +595,15 @@ create_components <- function(
 
   export_output(x = components_table, file = output)
 
+  n_components <- length(unique(components_table$componentindex))
+  n_features <- nrow(components_table)
+  rm(components_table)
   log_info("Components written to: %s", output)
 
   log_complete(
     ctx,
-    n_components = length(unique(components_table$componentindex)),
-    n_features = nrow(components_table)
+    n_components = n_components,
+    n_features = n_features
   )
 
   output

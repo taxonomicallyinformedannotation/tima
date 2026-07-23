@@ -82,6 +82,7 @@ read_mztab <- function(
   )
 
   export_output(features, output_features)
+  rm(features)
 
   spectra_path <- NULL
   spectra_source <- "none"
@@ -108,6 +109,7 @@ read_mztab <- function(
   if (!is.null(output_metadata)) {
     metadata <- .mztab_metadata_table(tabs$metadata)
     export_output(metadata, output_metadata)
+    rm(metadata)
     metadata_path <- output_metadata
   }
 

@@ -226,5 +226,6 @@ benchmark_evaluate_predictions <- function(
 
   out <- tidytable::bind_rows(topk_rows, score_rows)
   export_output(x = out, file = output_file)
+  rm(out)
   output_file
 }
