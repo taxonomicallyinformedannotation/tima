@@ -81,9 +81,8 @@
 #' @param tolerance_ppm Tolerance to perform annotation. Should be <= 20 ppm
 #' @param tolerance_dalton Absolute mass tolerance in Daltons for annotation
 #' @param tolerance_rt Tolerance to group adducts. Should be <= 0.05 minutes
-#' @param min_intensity_correlation Minimum Pearson correlation for feature intensity
-#'   co-variance validation. Default 0.7. Adduct edges where features show
-#'   |correlation| < min_intensity_correlation are rejected.
+#' @param correlation_p_threshold P-value threshold for Pearson correlation of feature intensities.
+#'   Adduct edges where features show p-value >= correlation_p_threshold are rejected.
 #'
 #' @return Named character of paths to the annotations and edges files.
 #'
