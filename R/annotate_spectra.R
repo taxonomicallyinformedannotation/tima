@@ -284,7 +284,7 @@ annotate_spectra <- function(
 
   n_query_count <- length(query_sp)
   n_lib_count <- length(spectral_library)
-  log_debug(
+  log_info(
     "Annotating %d query spectra against %d library references",
     n_query_count,
     n_lib_count
@@ -316,27 +316,18 @@ annotate_spectra <- function(
     lib_precursors_all <- get_precursors(spectral_library)
   }
   lib_adducts_all <- attr(sim_raw, "lib_adducts_raw")
-  target_ids_needed <- sort(unique(sim_raw$target_id))
-  spectral_library_candidates <- spectral_library[target_ids_needed]
-  lib_precursors <- lib_precursors_all[target_ids_needed]
-  lib_adducts_raw <- if (!is.null(lib_adducts_all)) {
-    lib_adducts_all[target_ids_needed]
-  } else {
-    NULL
-  }
 
   meta <- build_library_metadata(
-    spectral_library_candidates,
-    lib_precursors,
-    target_adduct_raw = lib_adducts_raw
-  )
-  meta$target_id <- target_ids_needed
-  rm(
     spectral_library,
-    spectral_library_candidates,
-    query_sp,
-    lib_precursors_all
-  )
+    lib_precursors_all,
+    target_adduct_raw = lib_adducts_all
+  ) |>
+    tidytable::filter(target_id %in% unique(sim_raw$target_id))
+
+  # spectral_library and query_sp (with their peak-data backends) are done
+  # being read from at this point -- everything downstream works off
+  # sim_raw/meta/query_meta. Free them before the join/dedup pipeline runs.
+  rm(spectral_library, query_sp, lib_precursors_all)
   invisible(gc(full = TRUE, verbose = FALSE))
 
   df_final <- finalize_results(
@@ -1181,12 +1172,17 @@ finalize_results <- function(
     tidytable::left_join(query_state_map, by = "query_adduct") |>
     tidytable::left_join(target_state_map, by = "target_adduct") |>
     tidytable::mutate(
-      candidate_adduct = target_adduct,
-      candidate_query_adduct = query_adduct,
+      ## COMMENT: does not seem logical but is so
+      candidate_adduct = query_adduct,
+      candidate_query_adduct = target_adduct,
       candidate_library = target_library,
       candidate_spectrum_id = target_spectrum_id,
       candidate_structure_name = target_name,
-      candidate_structure_error_mz = target_precursorMz - precursorMz,
+      candidate_structure_error_mz = tidytable::if_else(
+        condition = !is.na(query_neutral_mass),
+        true = target_neutral_mass - query_neutral_mass,
+        false = target_precursorMz - precursorMz
+      ),
       candidate_adduct_match_mode = tidytable::case_when(
         !is.na(candidate_query_adduct) &
           !is.na(candidate_adduct) &
@@ -1195,12 +1191,13 @@ finalize_results <- function(
         TRUE ~ "precursor_mz"
       ),
       annotation_note = tidytable::case_when(
+        ## COMMENT: does not seem logical but is so
         candidate_adduct_match_mode == "m_delta_rescued" ~
           paste0(
             "Spectral match rescued in neutral-mass space: observed adduct ",
-            candidate_query_adduct,
+            candidate_adduct,
             ", library adduct ",
-            candidate_adduct
+            candidate_query_adduct
           ),
         TRUE ~ NA_character_
       ),
@@ -1224,6 +1221,7 @@ finalize_results <- function(
     ) |>
     tidytable::distinct(
       feature_id,
+      candidate_adduct,
       candidate_library,
       candidate_structure_smiles_no_stereo,
       .keep_all = TRUE
