@@ -170,7 +170,7 @@ compute_intensity_covariance_edges <- function(
       }
     }
   )
-  intensity_vectors <- setNames(
+  intensity_vectors <- stats::setNames(
     intensity_vectors,
     intensity_by_feature$feature_id
   )
