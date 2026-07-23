@@ -89,10 +89,17 @@ test_that("compute_intensity_covariance_edges excludes uncorrelated features", {
     sample = rep(paste0("S", seq_len(n)), times = 2L),
     mz = rep(c(100.0, 100.5), each = n),
     rt = rep(c(1.0, 1.0), each = n),
-    intensity = c(sample(100:1000, n, replace = TRUE), sample(100:1000, n, replace = TRUE))
+    intensity = c(
+      sample(100:1000, n, replace = TRUE),
+      sample(100:1000, n, replace = TRUE)
+    )
   )
 
-  result <- compute_intensity_covariance_edges(ft, tolerance_rt = 0.5, correlation_p_threshold = 0.05)
+  result <- compute_intensity_covariance_edges(
+    ft,
+    tolerance_rt = 0.5,
+    correlation_p_threshold = 0.05
+  )
 
   # With random uncorrelated data, should yield few or no significant edges
   expect_true(all(result$p_value < 0.05))

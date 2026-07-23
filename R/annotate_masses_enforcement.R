@@ -460,6 +460,7 @@ build_output_edges <- function(
   adduct_edges,
   loss_edges,
   cluster_edges,
+  covariance_edges = NULL,
   features_table,
   name_source,
   name_target
@@ -467,11 +468,17 @@ build_output_edges <- function(
   parts <- list()
   if (nrow(adduct_edges) > 0L) {
     parts[[length(parts) + 1L]] <- adduct_edges |>
-      tidytable::mutate(label = paste0(adduct, " _ ", adduct_dest)) |>
+      tidytable::mutate(
+        label = paste0(adduct, " _ ", adduct_dest),
+        correlation = NA_real_,
+        p_value = NA_real_
+      ) |>
       tidytable::select(
         !!as.name(name_source) := feature_id,
         !!as.name(name_target) := feature_id_dest,
-        label
+        label,
+        correlation,
+        p_value
       ) |>
       tidytable::distinct()
   }
@@ -513,33 +520,61 @@ build_output_edges <- function(
   }
   if (nrow(loss_edges) > 0L) {
     parts[[length(parts) + 1L]] <- loss_edges |>
-      tidytable::mutate(label = paste0(loss, " loss")) |>
+      tidytable::mutate(
+        label = paste0(loss, " loss"),
+        correlation = NA_real_,
+        p_value = NA_real_
+      ) |>
       tidytable::select(
         # NL convention: precursor (higher mz, feature_id_dest) -> product
         !!as.name(name_source) := feature_id_dest,
         !!as.name(name_target) := feature_id,
-        label
+        label,
+        correlation,
+        p_value
       ) |>
       tidytable::distinct()
   }
   if (nrow(cluster_edges) > 0L) {
     parts[[length(parts) + 1L]] <- cluster_edges |>
-      tidytable::mutate(label = paste0("+", cluster, " cluster")) |>
+      tidytable::mutate(
+        label = paste0("+", cluster, " cluster"),
+        correlation = NA_real_,
+        p_value = NA_real_
+      ) |>
       tidytable::select(
         # cluster: lower mz -> higher mz (which carries the cluster)
         !!as.name(name_source) := feature_id,
         !!as.name(name_target) := feature_id_dest,
-        label
+        label,
+        correlation,
+        p_value
       ) |>
       tidytable::distinct()
   }
+
+  if (!is.null(covariance_edges) && nrow(covariance_edges) > 0L) {
+    parts[[length(parts) + 1L]] <- covariance_edges |>
+      tidytable::mutate(label = "covariance") |>
+      tidytable::select(
+        !!as.name(name_source) := feature_id,
+        !!as.name(name_target) := feature_id_dest,
+        label,
+        correlation,
+        p_value
+      ) |>
+      tidytable::distinct()
+  }
+
   edges <- if (length(parts) > 0L) {
     tidytable::bind_rows(parts)
   } else {
     tidytable::tidytable(
       !!as.name(name_source) := character(),
       !!as.name(name_target) := character(),
-      label = character()
+      label = character(),
+      correlation = numeric(),
+      p_value = numeric()
     )
   }
 

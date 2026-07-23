@@ -6,6 +6,7 @@ CITATION.cff
 ^[.]?air[.]toml$
 ^\.Rproj\.user$
 ^\.dockerignore$
+^\.git$
 ^\.github$
 ^\.idea$
 ^\.lintr$
@@ -23,6 +24,7 @@ CITATION.cff
 ^dev$
 ^docs$
 ^grateful-refs\.bib$
+^inst/_targets$
 ^pkgdown$
 ^prek[.]toml$
 ^renv$

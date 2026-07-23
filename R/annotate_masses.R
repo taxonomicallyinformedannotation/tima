@@ -266,6 +266,7 @@ annotate_masses <- function(
   cluster_edges <- edge_sets$cluster_edges
   loss_edges <- edge_sets$loss_edges
   evidence_signal <- edge_sets$evidence_signal
+  covariance_edges <- edge_sets$covariance_edges
 
   # Free memory from large intermediate objects
   rm(
@@ -295,10 +296,18 @@ annotate_masses <- function(
   )))
   adduct_lookup <- build_adduct_lookup_from_strings(lookup_adducts)
 
+  # Count pure adduct edges vs covariance edges
+  n_adduct_only <- nrow(
+    adduct_edges_combined |>
+      tidytable::filter(!is.na(adduct) & !is.na(adduct_dest))
+  )
+  n_covariance_only <- nrow(covariance_edges)
+
   log_info(
-    "Edge classification complete in %.2f seconds: %d adduct + covariance edges, %d cluster edges, %d loss edges",
+    "Edge classification complete in %.2f seconds: %d adduct edges, %d covariance edges, %d cluster edges, %d loss edges",
     as.numeric(elapsed_edges),
-    nrow(adduct_edges_combined),
+    n_adduct_only,
+    n_covariance_only,
     nrow(cluster_edges),
     nrow(loss_edges)
   )
@@ -460,6 +469,7 @@ annotate_masses <- function(
     adduct_edges = adduct_edges_combined,
     loss_edges = loss_edges,
     cluster_edges = cluster_edges,
+    covariance_edges = covariance_edges,
     features_table = features_table,
     name_source = name_source,
     name_target = name_target
@@ -477,6 +487,7 @@ annotate_masses <- function(
     edges_out,
     adduct_edges_combined,
     cluster_edges,
+    covariance_edges,
     loss_edges,
     features_table
   )
@@ -1639,19 +1650,11 @@ discover_annotate_masses_edge_sets <- function(
     correlation_p_threshold = correlation_p_threshold
   )
 
-  if (nrow(covariance_edges) > 0L) {
-    log_info(
-      "Intensity co-variance discovery added %d edge(s) within RT windows",
-      nrow(covariance_edges)
-    )
-    # Add covariance edges to the combined set
-    adduct_edges_combined <- tidytable::bind_rows(
-      adduct_edges_combined,
-      covariance_edges |>
-        tidytable::select(feature_id, feature_id_dest, source)
-    ) |>
-      tidytable::distinct()
-  }
+  # Drop intensity_all now that covariance is done (no longer needed for annotation)
+  features_table$intensity_all <- NULL
+
+  # NOTE: Covariance edges are NOT added to adduct_edges_combined because they lack
+  # adduct/adduct_dest columns. They're returned separately and added to output at the final stage.
 
   list(
     adduct_edges = adduct_edges,

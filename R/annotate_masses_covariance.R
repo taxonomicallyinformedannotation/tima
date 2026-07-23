@@ -38,13 +38,14 @@ compute_intensity_covariance_edges <- function(
     ))
   }
 
-  # Identify intensity columns (all except feature_id, sample, mz, rt)
-  exclude_cols <- c("feature_id", "sample", "mz", "rt")
-  intensity_cols <- setdiff(names(features_table), exclude_cols)
+  # Identify intensity columns: look for 'intensity_all' (unfiltered) or 'intensity' (filtered)
+  has_intensity_all <- "intensity_all" %in% names(features_table)
+  intensity_col <- if (has_intensity_all) "intensity_all" else "intensity"
 
-  if (length(intensity_cols) == 0L) {
+  if (!(intensity_col %in% names(features_table))) {
     log_debug(
-      "No intensity columns found in features_table. Skipping intensity co-variance edges."
+      "No %s column found in features_table. Skipping intensity co-variance edges.",
+      intensity_col
     )
     return(tidytable::tidytable(
       feature_id = character(),
@@ -56,97 +57,26 @@ compute_intensity_covariance_edges <- function(
     ))
   }
 
-  # Group by feature and compute RT windows
-  covariance_edges <- list()
+  log_debug(
+    "Computing intensity co-variance edges across %d features using %s (RT tolerance: %.4f, p threshold: %.3f)",
+    length(unique(features_table$feature_id)),
+    intensity_col,
+    tolerance_rt,
+    correlation_p_threshold
+  )
 
-  for (feat in unique(features_table$feature_id)) {
-    feat_data <- tidytable::filter(features_table, feature_id == feat)
+  # Get unique RT per feature and sort by RT for efficient windowing
+  feature_rts <- features_table |>
+    tidytable::select(feature_id, rt) |>
+    tidytable::distinct() |>
+    tidytable::filter(!is.na(rt)) |>
+    tidytable::arrange(rt)
 
-    # For each sample, find all features within RT window
-    for (samp in unique(feat_data$sample)) {
-      samp_data <- tidytable::filter(feat_data, sample == samp)
-      if (nrow(samp_data) == 0L) next
-
-      feat_rt <- samp_data$rt[[1L]]
-      if (is.na(feat_rt)) next
-
-      # Find all features in same sample within RT window
-      all_in_sample <- tidytable::filter(
-        features_table,
-        sample == samp,
-        !is.na(rt),
-        abs(rt - feat_rt) <= tolerance_rt
-      )
-
-      # For each other feature in the window
-      for (other_feat in unique(all_in_sample$feature_id)) {
-        if (other_feat <= feat) next # Avoid duplicates and self-loops
-
-        # Collect intensity pairs across all samples for both features
-        feat_intensities <- tidytable::filter(features_table, feature_id == feat)
-        other_intensities <- tidytable::filter(features_table, feature_id == other_feat)
-
-        # Join on sample
-        combined <- tidytable::inner_join(
-          feat_intensities,
-          other_intensities,
-          by = "sample",
-          suffix = c("", "_other")
-        )
-
-        if (nrow(combined) < 2L) next # Need at least 2 samples for correlation
-
-        # Extract intensity vectors and compute correlation for each intensity col
-        for (int_col in intensity_cols) {
-          if (!(int_col %in% names(combined))) next
-
-          int_x <- combined[[int_col]]
-          int_y <- combined[[paste0(int_col, "_other")]]
-
-          # Filter out NAs and non-positive values
-          valid_idx <- !is.na(int_x) & !is.na(int_y) &
-            int_x > 0 & int_y > 0
-
-          if (sum(valid_idx) < 2L) next # Need at least 2 valid pairs
-
-          x_valid <- int_x[valid_idx]
-          y_valid <- int_y[valid_idx]
-
-          # Compute Pearson correlation and p-value
-          cor_result <- tryCatch(
-            {
-              cor_test <- stats::cor.test(x_valid, y_valid, method = "pearson")
-              list(
-                correlation = as.numeric(cor_test$estimate),
-                p_value = as.numeric(cor_test$p.value)
-              )
-            },
-            error = function(e) {
-              list(correlation = NA_real_, p_value = NA_real_)
-            }
-          )
-
-          # If p-value significant, record edge
-          if (!is.na(cor_result$p_value) &&
-            cor_result$p_value < correlation_p_threshold) {
-            edge_key <- paste(feat, other_feat, sep = "|")
-            if (!(edge_key %in% names(covariance_edges))) {
-              covariance_edges[[edge_key]] <- list(
-                feature_id = feat,
-                feature_id_dest = other_feat,
-                correlation = cor_result$correlation,
-                p_value = cor_result$p_value,
-                n_samples = sum(valid_idx)
-              )
-            }
-          }
-        }
-      }
-    }
-  }
-
-  # Convert list to data frame
-  if (length(covariance_edges) == 0L) {
+  if (nrow(feature_rts) < 2L) {
+    log_info(
+      "Intensity co-variance: tested 0 pair(s), 0 significant edge(s) retained (p < %.2f)",
+      correlation_p_threshold
+    )
     return(tidytable::tidytable(
       feature_id = character(),
       feature_id_dest = character(),
@@ -157,19 +87,226 @@ compute_intensity_covariance_edges <- function(
     ))
   }
 
-  result <- tidytable::as_tidytable(do.call(rbind, lapply(
-    covariance_edges,
-    function(edge) {
+  # Generate pairs efficiently using vectorized window lookup
+  feature_pairs_list <- lapply(
+    seq_len(nrow(feature_rts) - 1L),
+    function(i) {
+      feat_id <- feature_rts$feature_id[[i]]
+      feat_rt <- feature_rts$rt[[i]]
+
+      # Find all features j > i within RT window (only check features after this one)
+      # Features are sorted by RT, so we can stop early
+      neighbors <- tidytable::filter(
+        feature_rts[(i + 1L):nrow(feature_rts), ], # Only look ahead
+        abs(rt - feat_rt) <= tolerance_rt
+      )
+
+      if (nrow(neighbors) == 0L) {
+        return(tidytable::tidytable(
+          feature_id = character(),
+          feature_id_dest = character()
+        ))
+      }
+
+      # Create pairs
       tidytable::tidytable(
-        feature_id = edge$feature_id,
-        feature_id_dest = edge$feature_id_dest,
-        correlation = edge$correlation,
-        p_value = edge$p_value,
-        n_samples = edge$n_samples,
-        source = "intensity_covariance"
+        feature_id = feat_id,
+        feature_id_dest = neighbors$feature_id
       )
     }
-  )))
+  )
+
+  # Bind all pairs (much smaller than cross_join)
+  feature_pairs <- tidytable::bind_rows(feature_pairs_list)
+
+  if (nrow(feature_pairs) == 0L) {
+    log_info(
+      "Intensity co-variance: tested 0 pair(s), 0 significant edge(s) retained (p < %.2f)",
+      correlation_p_threshold
+    )
+    return(tidytable::tidytable(
+      feature_id = character(),
+      feature_id_dest = character(),
+      correlation = numeric(),
+      p_value = numeric(),
+      n_samples = integer(),
+      source = character()
+    ))
+  }
+
+  # Extract intensity_all lists - one per feature (they're duplicated per sample row)
+  intensity_by_feature <- features_table |>
+    tidytable::select(feature_id, !!as.name(intensity_col)) |>
+    tidytable::distinct(feature_id, .keep_all = TRUE) |>
+    tidytable::filter(!is.na(.data[[intensity_col]]))
+
+  if (nrow(intensity_by_feature) == 0L) {
+    log_info(
+      "Intensity co-variance: no features with intensity data. Skipping covariance edges."
+    )
+    return(tidytable::tidytable(
+      feature_id = character(),
+      feature_id_dest = character(),
+      correlation = numeric(),
+      p_value = numeric(),
+      n_samples = integer(),
+      source = character()
+    ))
+  }
+
+  # Convert to a named list for fast lookups
+  # If intensities are stored as pipe-separated strings (from CSV), parse them
+  intensity_vectors <- lapply(
+    intensity_by_feature[[intensity_col]],
+    function(x) {
+      if (is.character(x)) {
+        # Parse pipe-separated string to numeric
+        result <- as.numeric(strsplit(x, "\\|")[[1]])
+        result[!is.na(result)] # Keep NAs but filter NaN
+      } else if (is.list(x)) {
+        as.numeric(unlist(x))
+      } else {
+        as.numeric(x) # Convert to numeric
+      }
+    }
+  )
+  intensity_vectors <- setNames(
+    intensity_vectors,
+    intensity_by_feature$feature_id
+  )
+
+  log_debug(
+    "Extracted intensity vectors for %d features",
+    length(intensity_vectors)
+  )
+
+  # Apply correlation computation to all pairs with diagnostic tracking
+  n_not_in_matrix <- 0L
+  n_insufficient_samples <- 0L
+  n_correlation_failed <- 0L
+  n_not_significant <- 0L
+
+  compute_pair_correlations <- function(pair_row) {
+    feat_id <- pair_row$feature_id[[1L]]
+    other_id <- pair_row$feature_id_dest[[1L]]
+
+    # Get intensity vectors
+    if (
+      !(feat_id %in% names(intensity_vectors)) ||
+        !(other_id %in% names(intensity_vectors))
+    ) {
+      n_not_in_matrix <<- n_not_in_matrix + 1L
+      return(NULL)
+    }
+
+    int_x <- intensity_vectors[[feat_id]]
+    int_y <- intensity_vectors[[other_id]]
+
+    # Both vectors must have same length (same sample ordering)
+    if (length(int_x) != length(int_y)) {
+      n_insufficient_samples <<- n_insufficient_samples + 1L
+      return(NULL)
+    }
+
+    # Filter out NAs and non-positive values
+    valid_idx <- !is.na(int_x) & !is.na(int_y) & int_x > 0 & int_y > 0
+
+    # Need at least 3 data points for a meaningful correlation test (df >= 1)
+    n_valid <- sum(valid_idx)
+    if (n_valid < 3L) {
+      n_insufficient_samples <<- n_insufficient_samples + 1L
+      return(NULL)
+    }
+
+    x_valid <- int_x[valid_idx]
+    y_valid <- int_y[valid_idx]
+
+    # Compute Pearson correlation and p-value
+    cor_result <- tryCatch(
+      {
+        cor_test <- stats::cor.test(x_valid, y_valid, method = "pearson")
+        list(
+          correlation = as.numeric(cor_test$estimate),
+          p_value = as.numeric(cor_test$p.value),
+          n_samples = n_valid
+        )
+      },
+      error = function(e) {
+        NULL
+      }
+    )
+
+    if (is.null(cor_result) || is.na(cor_result$p_value)) {
+      n_correlation_failed <<- n_correlation_failed + 1L
+      return(NULL)
+    }
+
+    if (cor_result$p_value < correlation_p_threshold) {
+      tidytable::tidytable(
+        feature_id = feat_id,
+        feature_id_dest = other_id,
+        correlation = cor_result$correlation,
+        p_value = cor_result$p_value,
+        n_samples = cor_result$n_samples
+      )
+    } else {
+      n_not_significant <<- n_not_significant + 1L
+      NULL
+    }
+  }
+
+  # Apply correlation computation to all pairs
+  results_list <- lapply(
+    seq_len(nrow(feature_pairs)),
+    function(i) {
+      compute_pair_correlations(feature_pairs[i, ])
+    }
+  )
+
+  # Filter NULLs and bind results
+  results_list <- Filter(Negate(is.null), results_list)
+  n_pairs_tested <- nrow(feature_pairs)
+  n_significant <- length(results_list)
+
+  if (length(results_list) == 0L) {
+    log_info(
+      "Intensity co-variance: tested %d pair(s), %d significant edge(s) retained (p < %.2f). Dropped: %d not in matrix, %d insufficient samples, %d correlation failed, %d p >= %.2f",
+      n_pairs_tested,
+      n_significant,
+      correlation_p_threshold,
+      n_not_in_matrix,
+      n_insufficient_samples,
+      n_correlation_failed,
+      n_not_significant,
+      correlation_p_threshold
+    )
+    return(tidytable::tidytable(
+      feature_id = character(),
+      feature_id_dest = character(),
+      correlation = numeric(),
+      p_value = numeric(),
+      n_samples = integer(),
+      source = character()
+    ))
+  }
+
+  result <- tidytable::bind_rows(results_list) |>
+    tidytable::mutate(source = "intensity_covariance")
+
+  log_info(
+    "Intensity co-variance: tested %d pair(s), retained %d significant edge(s) (p < %.2f); r in [%.2f, %.2f], median r = %.2f. Dropped: %d not in matrix, %d insufficient samples, %d correlation failed, %d p >= %.2f",
+    n_pairs_tested,
+    nrow(result),
+    correlation_p_threshold,
+    min(result$correlation, na.rm = TRUE),
+    max(result$correlation, na.rm = TRUE),
+    stats::median(result$correlation, na.rm = TRUE),
+    n_not_in_matrix,
+    n_insufficient_samples,
+    n_correlation_failed,
+    n_not_significant,
+    correlation_p_threshold
+  )
 
   result
 }

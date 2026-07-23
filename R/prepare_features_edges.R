@@ -211,6 +211,9 @@ prepare_features_edges <- function(
     tidytable::distinct() |>
     drop_legacy_similarity_columns()
 
+  # Retain p_value from MS1 intensity covariance edges (intensity covariance edges only)
+  # p_value column is automatically preserved in full_join and kept through processing
+
   log_complete(ctx, n_edges = nrow(edges_table_treated))
 
   # Explicit memory cleanup

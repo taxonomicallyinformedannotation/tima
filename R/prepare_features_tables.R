@@ -426,10 +426,26 @@ prepare_features_tables <- function(
     ) |>
     tidytable::mutate(
       feature_id = as.character(.data[[name_features]]),
-      value_num = suppressWarnings(as.numeric(value)),
-      value_num = ifelse(is.na(value_num) | value_num == 0, NA_real_, value_num)
-    ) |>
-    tidytable::filter(!is.na(value_num)) |>
+      value_num = suppressWarnings(as.numeric(value))
+    )
+
+  # Collect all unfiltered intensities per feature before top-N filtering
+  # CRITICAL: Sort by sample to ensure consistent ordering across all features
+  # This way feature_1's [intensity_s1, intensity_s2, ...] aligns with
+  # feature_2's [intensity_s1, intensity_s2, ...] for proper correlation
+  all_intensities <- long_tbl |>
+    tidytable::arrange(feature_id, sample) |>
+    tidytable::summarise(
+      intensity_all = list(value_num),
+      .by = feature_id
+    )
+
+  # For top-N filtering, only use non-NA, non-zero values (presence-based ranking)
+  long_tbl_ranked <- long_tbl |>
+    tidytable::filter(!is.na(value_num) & value_num > 0)
+
+  # Apply top-N filtering based on non-zero values
+  long_tbl_filtered <- long_tbl_ranked |>
     tidytable::mutate(
       rank = rank(-value_num, ties.method = "first"),
       .by = feature_id
@@ -437,7 +453,7 @@ prepare_features_tables <- function(
     tidytable::filter(rank <= max_keep) |>
     tidytable::arrange(feature_id, rank)
 
-  if (nrow(long_tbl) == 0L) {
+  if (nrow(long_tbl_filtered) == 0L) {
     empty_tbl <- data.frame(
       feature_id = character(0),
       sample = character(0),
@@ -457,21 +473,27 @@ prepare_features_tables <- function(
   }
 
   out <- data.frame(
-    feature_id = long_tbl$feature_id,
-    sample = long_tbl$sample,
+    feature_id = long_tbl_filtered$feature_id,
+    sample = long_tbl_filtered$sample,
+    intensity = long_tbl_filtered$value_num,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
 
   if ("rt" %in% extra_cols) {
-    out$rt <- long_tbl[[name_rt]]
+    out$rt <- long_tbl_filtered[[name_rt]]
   }
   if ("mz" %in% extra_cols) {
-    out$mz <- long_tbl[[name_mz]]
+    out$mz <- long_tbl_filtered[[name_mz]]
   }
   if ("adduct" %in% extra_cols) {
-    out$adduct <- long_tbl[[name_adduct]]
+    out$adduct <- long_tbl_filtered[[name_adduct]]
   }
+
+  # Add all-intensities column (one list per feature)
+  out <- out |>
+    tidytable::left_join(all_intensities, by = "feature_id") |>
+    as.data.frame()
 
   if (feature_order_is_numeric) {
     order_idx <- order(
@@ -484,7 +506,15 @@ prepare_features_tables <- function(
   out <- out[order_idx, , drop = FALSE]
 
   keep_cols <- intersect(
-    c("feature_id", "rt", "mz", "adduct", "sample"),
+    c(
+      "feature_id",
+      "rt",
+      "mz",
+      "adduct",
+      "sample",
+      "intensity",
+      "intensity_all"
+    ),
     names(out)
   )
   out <- out[, keep_cols, drop = FALSE]
