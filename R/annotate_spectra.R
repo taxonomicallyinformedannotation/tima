@@ -332,7 +332,6 @@ annotate_spectra <- function(
   # generational GC is slow to reclaim on its own (many small S4-backed
   # allocations rather than one big block).
   rm(spectral_library, query_sp, lib_precursors_all)
-  invisible(gc(full = TRUE, verbose = FALSE))
 
   df_final <- finalize_results(
     df_sim = tidytable::as_tidytable(x = sim_raw),
@@ -343,7 +342,6 @@ annotate_spectra <- function(
   )
   rm(sim_raw, meta)
   if (nrow(df_final) == 0L) {
-    invisible(gc(full = TRUE, verbose = FALSE))
     return(
       annotate_spectra_handle_empty_result(
         output_path,

@@ -250,5 +250,14 @@ build_annotate_masses_coverage_report <- function(
     ) |>
     tidytable::arrange(coverage_scope, coverage_tier, coverage_class)
 
+  rm(
+    support_ranked,
+    feature_annotation_counts,
+    best_feature_class,
+    best_summary,
+    any_summary,
+    all_rows
+  )
+
   coverage_report
 }

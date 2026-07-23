@@ -237,7 +237,6 @@ clean_chemo <- function(
     annot_table_wei_chemo = annot_table_wei_chemo,
     model = model
   )
-  invisible(gc(verbose = FALSE))
 
   # Three-Tier Output Generation ----
 
@@ -311,7 +310,6 @@ clean_chemo <- function(
   )
 
   rm(df_classes_mini, df_filtered, df_percentile)
-  invisible(gc(verbose = FALSE))
 
   # Tier 3: FULL - Optionally apply high-evidence filter
   df_full <- if (high_evidence) {
@@ -336,7 +334,7 @@ clean_chemo <- function(
       annotation_notes_lookup = annotation_notes_lookup
     ) |>
     tidytable::left_join(y = results_candidates)
-  rm(annot_table_wei_chemo)
+  rm(annot_table_wei_chemo, annotation_notes_lookup, results_candidates)
 
   # Only set candidates_best if the inchikey column exists
   if (
@@ -354,7 +352,6 @@ clean_chemo <- function(
   }
 
   rm(df_full, df_ranked, feature_consensus_table)
-  invisible(gc(verbose = FALSE))
 
   # Optionally Remove Compound Names (After All Processing) ----
 
@@ -378,7 +375,6 @@ clean_chemo <- function(
 
   # Clean up intermediate objects
   rm(
-    results_candidates,
     features_table,
     components_table,
     structure_organism_pairs_table

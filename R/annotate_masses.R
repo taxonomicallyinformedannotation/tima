@@ -208,6 +208,7 @@ annotate_masses <- function(
   features_table <- loaded_inputs$features_table
   already_assigned <- loaded_inputs$already_assigned
   lib <- loaded_inputs$lib
+  rm(loaded_inputs)
 
   pairs <- build_feature_pairs_within_rt(
     df_rt_tol = features_table,
@@ -265,7 +266,17 @@ annotate_masses <- function(
   evidence_signal <- edge_sets$evidence_signal
 
   # Free memory from large intermediate objects
-  rm(edge_sets, ion_tables, pairs, adducts, clusters, adduct_edges)
+  rm(
+    edge_sets,
+    ion_tables,
+    pairs,
+    adducts,
+    clusters,
+    adduct_edges,
+    neutral_losses_list,
+    solvents_list,
+    adducts_list
+  )
 
   # Validate adduct edges by intensity co-variance
   intensity_validation <- validate_adduct_edges_by_intensity_covariance(
@@ -319,6 +330,7 @@ annotate_masses <- function(
     tolerance_ppm = tolerance_ppm,
     tolerance_dalton = tolerance_dalton
   )
+  rm(lookup_adducts)
 
   # Recover weak but M-coherent modifier states for unresolved nodes in
   # supported components without relaxing strict primary graph semantics.
@@ -386,6 +398,8 @@ annotate_masses <- function(
     )
   }
 
+  rm(multi_adducts)
+
   start_time_lib <- Sys.time()
   annotations <- build_annotate_masses_annotations(
     node_hypotheses = node_hypotheses,
@@ -402,6 +416,7 @@ annotate_masses <- function(
     as.numeric(elapsed_lib),
     nrow(annotations)
   )
+  rm(lib, adduct_lookup, already_assigned)
 
   # Add annotation notes for edges rejected by intensity co-variance
   if (nrow(rejected_edges_intensity) > 0L) {
@@ -439,6 +454,7 @@ annotate_masses <- function(
     tolerance_ppm = tolerance_ppm,
     tolerance_dalton = tolerance_dalton
   )
+  rm(node_hypotheses)
 
   supported_graph <- retain_supported_single_m_edges(
     adduct_edges = adduct_edges_combined,

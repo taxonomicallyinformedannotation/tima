@@ -87,15 +87,25 @@ validate_adduct_edges_by_intensity_covariance <- function(
         tidytable::arrange(sample)
 
       # Extract intensity values as vectors
-      int1 <- as.numeric(unlist(f1_data |> tidytable::select(tidyselect::all_of(intensity_cols))))
-      int2 <- as.numeric(unlist(f2_data |> tidytable::select(tidyselect::all_of(intensity_cols))))
+      int1 <- as.numeric(unlist(
+        f1_data |> tidytable::select(tidyselect::all_of(intensity_cols))
+      ))
+      int2 <- as.numeric(unlist(
+        f2_data |> tidytable::select(tidyselect::all_of(intensity_cols))
+      ))
 
       # Calculate correlation
-      if (length(int1) > 1 && length(int2) > 1 && length(int1) == length(int2)) {
+      if (
+        length(int1) > 1 && length(int2) > 1 && length(int1) == length(int2)
+      ) {
         # Remove NAs and positions where either value is 0 or NA
         valid_idx <- !is.na(int1) & !is.na(int2) & int1 > 0 & int2 > 0
         if (sum(valid_idx) > 1) {
-          cor_val <- stats::cor(int1[valid_idx], int2[valid_idx], use = "complete.obs")
+          cor_val <- stats::cor(
+            int1[valid_idx],
+            int2[valid_idx],
+            use = "complete.obs"
+          )
         } else {
           cor_val <- NA_real_
         }
@@ -131,7 +141,11 @@ validate_adduct_edges_by_intensity_covariance <- function(
       rejection_reason = tidytable::if_else(
         is.na(intensity_correlation),
         "Insufficient intensity data for co-variance calculation",
-        paste0("Low intensity co-variance (r=", round(intensity_correlation, 3), ")")
+        paste0(
+          "Low intensity co-variance (r=",
+          round(intensity_correlation, 3),
+          ")"
+        )
       )
     ) |>
     tidytable::select(

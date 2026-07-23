@@ -491,7 +491,7 @@ weight_annotations <- function(
       edges_table = edges_table,
       minimal_consistency = minimal_consistency
     )
-  rm(annot_table_wei_bio)
+  rm(annot_table_wei_bio, edges_table)
   log_debug(
     "Biological cleaning complete: %d candidates",
     nrow(annot_table_wei_bio_clean)
@@ -564,7 +564,13 @@ weight_annotations <- function(
       max_per_score = 7L,
       xrefs_table = xrefs_table
     )
-  rm(annot_table_wei_chemo, structure_organism_pairs_table, xrefs_table)
+  rm(
+    annot_table_wei_chemo,
+    structure_organism_pairs_table,
+    xrefs_table,
+    components_table,
+    features_table
+  )
 
   log_complete(ctx, n_annotations = nrow(results_list$taxa))
 

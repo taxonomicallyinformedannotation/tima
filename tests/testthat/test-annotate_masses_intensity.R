@@ -86,8 +86,34 @@ test_that("validate_adduct_edges_by_intensity_covariance handles multiple edges"
   # F1-F2: identical to F1-F2 (keep)
   # F3-F4: negative correlation (reject)
   features <- tidytable::tidytable(
-    feature_id = c("F1", "F1", "F1", "F2", "F2", "F2", "F3", "F3", "F3", "F4", "F4", "F4"),
-    sample = c("S1", "S2", "S3", "S1", "S2", "S3", "S1", "S2", "S3", "S1", "S2", "S3"),
+    feature_id = c(
+      "F1",
+      "F1",
+      "F1",
+      "F2",
+      "F2",
+      "F2",
+      "F3",
+      "F3",
+      "F3",
+      "F4",
+      "F4",
+      "F4"
+    ),
+    sample = c(
+      "S1",
+      "S2",
+      "S3",
+      "S1",
+      "S2",
+      "S3",
+      "S1",
+      "S2",
+      "S3",
+      "S1",
+      "S2",
+      "S3"
+    ),
     intensity = c(100, 200, 300, 100, 200, 300, 100, 200, 300, 300, 200, 100)
   )
 

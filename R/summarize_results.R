@@ -210,6 +210,8 @@ summarize_results <- function(
       tidytable::select(tidyselect::any_of(x = final_select_cols))
   }
 
+  rm(features_min, components_min)
+
   # Add annotation_note from lookup table at the very end
   # Note: annotation_notes_lookup has been pre-collapsed to ensure
   # one note per (feature_id, candidate_adduct, rank_final) group
@@ -357,7 +359,7 @@ summarize_results <- function(
       tidyselect::where(fn = ~ !all(is.na(.)))
     )
 
-  rm(df_processed)
+  rm(df_processed, results_with_structure, results_without_structure)
 
   # Log percentage of annotated features against the full feature universe.
   # The summarized output is one row per feature and can omit unannotated

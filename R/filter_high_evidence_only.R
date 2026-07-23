@@ -362,6 +362,7 @@ filter_high_evidence_only <- function(
 
     df_filtered <- tidytable::bind_rows(df_filtered, df_rescued_ms2_candidates)
   }
+  rm(df_rescued_ms2_candidates)
 
   # RT error filter (minutes). Allow NA (unknown) values
   if ("candidate_structure_error_rt" %in% names(df_filtered)) {
@@ -525,8 +526,10 @@ filter_high_evidence_only <- function(
       if (nrow(add_back) > 0L) {
         df_filtered <- tidytable::bind_rows(df_filtered, add_back)
       }
+      rm(promoted_rank1, anchor_rank1, anchor_pass, add_back)
     }
   }
+  rm(df_work)
 
   # Drop helper columns
   df_filtered <- df_filtered |>

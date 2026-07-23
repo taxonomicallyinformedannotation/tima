@@ -174,5 +174,7 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
     tidytable::left_join(xrefs_for_join, by = "inchikey_key") |>
     tidytable::select(-inchikey_key)
 
+  rm(xrefs_filtered, xrefs_wide, xrefs_subset, xrefs_for_join, df_for_join)
+
   result_df
 }
