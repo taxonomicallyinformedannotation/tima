@@ -1351,7 +1351,12 @@ test_that("sample_candidates_per_group prioritizes non-NA RT errors", {
     candidate_adduct = rep("[M+H]+", 4),
     rank_final = rep(1L, 4),
     candidate_structure_error_rt = c(NA, 0.1, NA, 0.2),
-    candidate_structure_inchikey_connectivity_layer = paste0("IK", 1:4)
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK1",
+      "IK2",
+      "IK3",
+      "IK4"
+    )
   )
 
   out <- sample_candidates_per_group(df = df, max_per_score = 2L, seed = 1L)
@@ -1359,7 +1364,7 @@ test_that("sample_candidates_per_group prioritizes non-NA RT errors", {
   expect_equal(nrow(out$df), 2L)
   expect_equal(out$n_sampled_features, 1L)
   expect_true(!anyNA(out$df$candidate_structure_error_rt))
-  expect_equal(nrow(out$annotation_notes), 1L)
+  expect_equal(nrow(out$annotation_notes), 2L)
 })
 
 test_that("sample_candidates_per_group handles missing RT column", {

@@ -24,7 +24,8 @@ test_that("sample_candidates_per_group passes through untied rows unchanged", {
     candidate_adduct = c("[M+H]+", "[M+H]+"),
     rank_final = c(1L, 1L),
     score_weighted_chemo = c(0.9, 0.8),
-    candidate_score_pseudo_initial = c(0.5, 0.4)
+    candidate_score_pseudo_initial = c(0.5, 0.4),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2")
   )
   result <- sample_candidates_per_group(df, max_per_score = 5L)
   expect_equal(nrow(result$df), 2L)
@@ -37,7 +38,8 @@ test_that("sample_candidates_per_group keeps all tied rows below cap", {
     candidate_adduct = rep("[M+H]+", 3L),
     rank_final = rep(1L, 3L),
     score_weighted_chemo = c(0.9, 0.9, 0.9),
-    candidate_score_pseudo_initial = c(0.5, 0.5, 0.5)
+    candidate_score_pseudo_initial = c(0.5, 0.5, 0.5),
+    candidate_structure_inchikey_connectivity_layer = paste0("IK", 1:3)
   )
   result <- sample_candidates_per_group(df, max_per_score = 5L)
   # All 3 tied rows below cap of 5 -> keep all
@@ -50,7 +52,8 @@ test_that("sample_candidates_per_group samples down when above cap", {
     candidate_adduct = rep("[M+H]+", 6L),
     rank_final = rep(1L, 6L),
     score_weighted_chemo = rep(0.9, 6L),
-    candidate_score_pseudo_initial = rep(0.5, 6L)
+    candidate_score_pseudo_initial = rep(0.5, 6L),
+    candidate_structure_inchikey_connectivity_layer = paste0("IK", 1:6)
   )
   result <- sample_candidates_per_group(df, max_per_score = 3L, seed = 42L)
   # 6 ties > cap(3) -> sample to 3
@@ -64,7 +67,8 @@ test_that("sample_candidates_per_group stores annotation notes for sampled group
     candidate_adduct = rep("[M+H]+", 5L),
     rank_final = rep(1L, 5L),
     score_weighted_chemo = rep(0.8, 5L),
-    candidate_score_pseudo_initial = rep(0.5, 5L)
+    candidate_score_pseudo_initial = rep(0.5, 5L),
+    candidate_structure_inchikey_connectivity_layer = paste0("IK", 1:5)
   )
   result <- sample_candidates_per_group(df, max_per_score = 2L, seed = 1L)
   expect_true(nrow(result$annotation_notes) >= 1L)
@@ -76,7 +80,8 @@ test_that("sample_candidates_per_group prefers the strongest tied rows", {
     candidate_adduct = rep("[M+H]+", 4L),
     rank_final = rep(1L, 4L),
     score_weighted_chemo = c(0.1, 0.9, 0.2, 0.3),
-    candidate_score_pseudo_initial = c(0.1, 0.2, 0.3, 0.4)
+    candidate_score_pseudo_initial = c(0.1, 0.2, 0.3, 0.4),
+    candidate_structure_inchikey_connectivity_layer = paste0("IK", 1:4)
   )
   result <- sample_candidates_per_group(df, max_per_score = 2L, seed = 42L)
 
@@ -91,7 +96,8 @@ test_that("sample_candidates_per_group preserves consensus-promoted rows", {
     rank_final = rep(1L, 4L),
     score_weighted_chemo = c(0.1, 0.9, 0.8, 0.7),
     candidate_score_pseudo_initial = c(0.1, 0.2, 0.3, 0.4),
-    cluster_consensus_promoted_from_anchor = c(FALSE, TRUE, FALSE, FALSE)
+    cluster_consensus_promoted_from_anchor = c(FALSE, TRUE, FALSE, FALSE),
+    candidate_structure_inchikey_connectivity_layer = paste0("IK", 1:4)
   )
 
   result <- sample_candidates_per_group(df, max_per_score = 2L, seed = 42L)
