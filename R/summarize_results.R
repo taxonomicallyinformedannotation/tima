@@ -185,6 +185,26 @@ summarize_results <- function(
     tidytable::select(tidyselect::any_of(x = select_cols))
 
   if (nrow(df_joined) > 0L) {
+    organism_lookup_filtered <- if (
+      nrow(organism_lookup) > 0L &&
+        "candidate_structure_inchikey_connectivity_layer" %in% names(df_joined)
+    ) {
+      df_lookup_keys <- df_joined |>
+        tidytable::select(
+          candidate_structure_inchikey_connectivity_layer
+        ) |>
+        tidytable::distinct()
+
+      # Semi-join keeps only organism_lookup rows that match df_lookup_keys
+      organism_lookup |>
+        tidytable::semi_join(
+          y = df_lookup_keys,
+          by = "candidate_structure_inchikey_connectivity_layer"
+        )
+    } else {
+      organism_lookup
+    }
+
     df_joined <- df_joined |>
       tidytable::left_join(
         y = features_min,
@@ -197,7 +217,7 @@ summarize_results <- function(
         suffix = c("", "_component")
       ) |>
       tidytable::left_join(
-        y = organism_lookup,
+        y = organism_lookup_filtered,
         by = c(
           "feature_id",
           "candidate_structure_inchikey_connectivity_layer",
@@ -210,7 +230,7 @@ summarize_results <- function(
       tidytable::select(tidyselect::any_of(x = final_select_cols))
   }
 
-  rm(features_min, components_min)
+  rm(features_min, components_min, organism_lookup_filtered)
 
   # Add annotation_note from lookup table at the very end
   # Note: annotation_notes_lookup has been pre-collapsed to ensure
