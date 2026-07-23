@@ -1092,15 +1092,65 @@ compute_similarity_safe <- function(
 
       neutral_out <- tidytable::tidytable()
       if (any(use_query_m) && any(use_lib_m)) {
-        neutral_out <- run_similarity(
-          lib_ids = which(use_lib_m),
-          lib_precursors = lib_neutral[use_lib_m],
-          lib_spectra = lib_sp@backend@peaksData[use_lib_m],
-          query_ids = query_ids[use_query_m],
-          query_precursors = query_neutral[use_query_m],
-          query_spectra = query_sp@backend@peaksData[use_query_m],
-          space_label = "neutral_M"
+        # Filter library by precursor windows in neutral mass space
+        # to avoid comparing against all library candidates
+        .match_precursor_windows_neutral <- function(
+          library_precursors,
+          query_precursors,
+          dalton,
+          ppm
+        ) {
+          valid_lib <- is.finite(library_precursors) & library_precursors > 0
+          valid_query <- is.finite(query_precursors) & query_precursors > 0
+          if (!any(valid_lib) || !any(valid_query)) {
+            return(rep(FALSE, length(library_precursors)))
+          }
+          lib_vals <- as.numeric(library_precursors[valid_lib])
+          qry_vals <- unique(as.numeric(query_precursors[valid_query]))
+          minimal <- pmin(lib_vals - dalton, lib_vals * (1 - (1E-6 * ppm)))
+          maximal <- pmax(lib_vals + dalton, lib_vals * (1 + (1E-6 * ppm)))
+          lib_windows <- tidytable::tidytable(
+            lib_row = which(valid_lib),
+            minimal = minimal,
+            maximal = maximal
+          )
+          query_vals <- tidytable::tidytable(val = qry_vals)
+          hits <- lib_windows[
+            query_vals,
+            on = .(minimal <= val, maximal >= val),
+            nomatch = 0L,
+            allow.cartesian = TRUE
+          ]
+          keep <- rep(FALSE, length(library_precursors))
+          if (nrow(hits) > 0L) {
+            keep[unique(hits$lib_row)] <- TRUE
+          }
+          keep
+        }
+
+        keep_neutral <- .match_precursor_windows_neutral(
+          library_precursors = lib_neutral,
+          query_precursors = query_neutral,
+          dalton = dalton,
+          ppm = ppm
         )
+
+        neutral_lib_indices <- which(keep_neutral)
+        neutral_query_indices <- which(use_query_m)
+
+        if (
+          length(neutral_lib_indices) > 0L && length(neutral_query_indices) > 0L
+        ) {
+          neutral_out <- run_similarity(
+            lib_ids = neutral_lib_indices,
+            lib_precursors = lib_neutral[neutral_lib_indices],
+            lib_spectra = lib_sp@backend@peaksData[neutral_lib_indices],
+            query_ids = query_ids[neutral_query_indices],
+            query_precursors = query_neutral[neutral_query_indices],
+            query_spectra = query_sp@backend@peaksData[neutral_query_indices],
+            space_label = "neutral_M"
+          )
+        }
       }
 
       combined <- tidytable::bind_rows(raw_out, neutral_out)
