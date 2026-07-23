@@ -29,7 +29,9 @@ annotate_masses(
   ms_mode = get_params(step = "annotate_masses")$ms$polarity,
   tolerance_ppm = get_params(step = "annotate_masses")$ms$tolerances$mass$ppm$ms1,
   tolerance_dalton = get_params(step = "annotate_masses")$ms$tolerances$mass$dalton$ms1,
-  tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$adducts
+  tolerance_rt = get_params(step = "annotate_masses")$ms$tolerances$rt$adducts,
+  min_intensity_correlation = get_params(step =
+    "annotate_masses")$ms$tolerances$intensity$adducts
 )
 }
 \arguments{
@@ -70,6 +72,10 @@ annotate_masses(
 \item{tolerance_dalton}{Absolute mass tolerance in Daltons for annotation}
 
 \item{tolerance_rt}{Tolerance to group adducts. Should be <= 0.05 minutes}
+
+\item{min_intensity_correlation}{Minimum Pearson correlation for feature intensity
+co-variance validation. Default 0.7. Adduct edges where features show
+|correlation| < min_intensity_correlation are rejected.}
 }
 \value{
 Named character of paths to the annotations and edges files.
@@ -109,12 +115,17 @@ clearly-bounded steps; each step is documented inline. In short:
    compute the implied neutral mass M and look it up in the library
    within the ppm tolerance.
 
-7. **Network-consensus pruning.** If a feature ends up with several
+7. **Intensity co-variance filtering.** Reject adduct edges where
+   the two features show poor intensity co-variance across samples,
+   as true adducts of the same neutral mass should have correlated
+   intensities.
+
+8. **Network-consensus pruning.** If a feature ends up with several
    library hits, drop only the candidates whose adduct has *zero*
    support in the adduct edge graph **and** whose drop still leaves a
    supported alternative. Ties are kept and drops are logged.
 
-8. **Keep unmatched adducts.** Adduct hypotheses are exported even
+9. **Keep unmatched adducts.** Adduct hypotheses are exported even
    when no library structure matches, so downstream tools still see
    the adduct annotation.
 }\if{html}{\out{</div>}}

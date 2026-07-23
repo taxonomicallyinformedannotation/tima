@@ -63,12 +63,13 @@
   - Added assignment-aware modifier-edge pruning so outdated cluster/loss links
     are removed when they contradict assigned adduct states, while retaining
     explicitly tagged contaminant edges
-  - **Intensity co-variance validation** (`min_intensity_correlation`, default 0.7):
-    A hard filter that rejects adduct edges where the two putative ions show
-    poor intensity co-variance across samples. True adducts of the same neutral
-    mass should have correlated intensities; feature pairs with |correlation| <
-    min_intensity_correlation are filtered out and annotated as rejected, reducing
-    spurious adduct hypotheses while preserving genuine multi-adduct evidence.
+  - **Intensity co-variance validation** (`min_intensity_correlation`, default
+    0.7): A hard filter that rejects adduct edges where the two putative ions
+    show poor intensity co-variance across samples. True adducts of the same
+    neutral mass should have correlated intensities; feature pairs with
+    \|correlation\| < min_intensity_correlation are filtered out and annotated
+    as rejected, reducing spurious adduct hypotheses while preserving genuine
+    multi-adduct evidence.
 
 - **Adduct canonicalization alignment**:
   - Unified canonical adduct string ordering across structured universe
