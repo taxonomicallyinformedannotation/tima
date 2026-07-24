@@ -13,7 +13,6 @@
 #'     - candidate_structure_inchikey_connectivity_layer
 #'     - score_chemical
 #'     - score_weighted_chemo
-#'     - score_weighted_chemo_coverage
 #'
 #' @keywords internal
 extract_chemo_scores <- function(weight_chemo_result) {
@@ -25,8 +24,7 @@ extract_chemo_scores <- function(weight_chemo_result) {
         feature_id = character(),
         candidate_structure_inchikey_connectivity_layer = character(),
         score_chemical = numeric(),
-        score_weighted_chemo = numeric(),
-        score_weighted_chemo_coverage = numeric()
+        score_weighted_chemo = numeric()
       )
     )
   }
@@ -36,7 +34,6 @@ extract_chemo_scores <- function(weight_chemo_result) {
       feature_id,
       candidate_structure_inchikey_connectivity_layer,
       score_chemical,
-      score_weighted_chemo,
-      score_weighted_chemo_coverage
+      score_weighted_chemo
     )
 }

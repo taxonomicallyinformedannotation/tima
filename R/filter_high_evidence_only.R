@@ -47,8 +47,7 @@
 #' Columns used when present:
 #' - score_biological
 #' - candidate_score_pseudo_initial
-#' - score_weighted_chemo
-#' - score_weighted_chemo_coverage
+#' - score_weighted_chemo (contains combined final score)
 #' - candidate_structure_error_rt (assumed in minutes; NA means unknown and is
 #'     allowed)
 #' - candidate_score_sirius_confidence (optional, NA values allowed)
@@ -57,9 +56,7 @@
 #'
 #' Missing score columns are treated as absent for that criterion and do not
 #' cause errors; at least one of the three primary scores must satisfy its
-#' threshold for a row to be retained. When present, final-score coverage is
-#' required to be at least `score_final_coverage_min` for a row to pass via the
-#' weighted chemical score.
+#' threshold for a row to be retained.
 #'
 #' **NA value handling:**
 #' - RT error: NA values (unknown RT) are allowed to pass
@@ -213,13 +210,6 @@ filter_high_evidence_only <- function(
       .score_bio = as.numeric(.data[["score_biological"]]),
       .score_ini = as.numeric(.data[["candidate_score_pseudo_initial"]]),
       .score_final = as.numeric(.data[["score_weighted_chemo"]]),
-      .score_final_coverage = if (
-        "score_weighted_chemo_coverage" %in% names(df)
-      ) {
-        as.numeric(.data[["score_weighted_chemo_coverage"]])
-      } else {
-        NA_real_
-      },
       .rt_err_min = rt_err_vec
     )
 
@@ -307,24 +297,6 @@ filter_high_evidence_only <- function(
 
   # Core filtering ----
 
-  # Identify MS2 candidates with low scores that should be rescued if they come
-  # from rescued adducts (m_delta_rescued). These will pass the filter and get an
-  # annotation note instead of being dropped.
-  has_rescued_adduct_col <- "candidate_adduct_match_mode" %in% names(df_work)
-
-  df_rescued_ms2_candidates <- if (has_rescued_adduct_col) {
-    df_work |>
-      tidytable::filter(
-        # MS2 candidates with scores below minimum that came from rescued adducts
-        !is.na(.score_ini) &
-          .score_ini > 0 &
-          .score_ini < score_ini_min &
-          .data[["candidate_adduct_match_mode"]] == "m_delta_rescued"
-      )
-  } else {
-    df_work[0L, ]
-  }
-
   # At least one of the three score thresholds must be satisfied
   # NA values for initial score indicate MS1-only hits (no MS2 spectrum) and
   # don't block other scores
@@ -333,36 +305,8 @@ filter_high_evidence_only <- function(
     tidytable::filter(
       (.score_bio >= score_bio_min) |
         (!is.na(.score_ini) & .score_ini > 0 & .score_ini >= score_ini_min) |
-        (.score_final >= score_final_min &
-          (is.na(.score_final_coverage) |
-            .score_final_coverage >= score_final_coverage_min))
+        (.score_final >= score_final_min)
     )
-
-  # Add back rescued MS2 candidates (with lower score) and annotate them
-  if (nrow(df_rescued_ms2_candidates) > 0L) {
-    df_rescued_ms2_candidates <- df_rescued_ms2_candidates |>
-      tidytable::mutate(
-        annotation_note = if (
-          "annotation_note" %in% names(df_rescued_ms2_candidates)
-        ) {
-          tidytable::if_else(
-            is.na(.data[["annotation_note"]]),
-            "Retained despite low MS2 score due to rescued adduct match",
-            paste(
-              .data[["annotation_note"]],
-              "Retained despite low MS2 score due to rescued adduct match",
-              sep = " | "
-            )
-          )
-        } else {
-          "Retained despite low MS2 score due to rescued adduct match"
-        }
-      ) |>
-      tidytable::select(-tidyselect::starts_with(".anchor_"))
-
-    df_filtered <- tidytable::bind_rows(df_filtered, df_rescued_ms2_candidates)
-  }
-  rm(df_rescued_ms2_candidates)
 
   # RT error filter (minutes). Allow NA (unknown) values
   if ("candidate_structure_error_rt" %in% names(df_filtered)) {

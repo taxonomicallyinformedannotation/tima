@@ -132,11 +132,9 @@ columns_model <- function() {
     "score_initial",
     "score_biological",
     "score_weighted_bio",
-    "score_weighted_bio_coverage",
     # "score_interim",
     "score_chemical",
     "score_weighted_chemo",
-    "score_weighted_chemo_coverage",
     "score_final"
   )
 
@@ -266,9 +264,7 @@ select_weight_annotations_working_columns <- function(df) {
         "score_biological",
         "score_chemical",
         "score_weighted_bio",
-        "score_weighted_bio_coverage",
         "score_weighted_chemo",
-        "score_weighted_chemo_coverage",
         "rank_initial",
         "rank_final",
         model$features_columns,

@@ -298,7 +298,7 @@ filter_ms1_annotations <- function(
 rank_and_deduplicate <- function(df) {
   # === Ranking Pipeline ===
   # This function assigns rank_initial and rank_final based on different evidence.
-  # 
+  #
   # rank_initial: Based on spectral score only (candidate_score_pseudo_initial)
   #   - For MS1-only filtering (MS1-only candidates must meet minimum thresholds)
   #   - Used to separate MS1-only vs MS2 evidence

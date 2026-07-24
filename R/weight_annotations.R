@@ -582,7 +582,11 @@ weight_annotations <- function(
     wide_bio_table = annot_table_wei_bio_kept,
     wide_chemo_table = annot_table_wei_chemo_kept
   )
-  rm(annot_table_wei_bio_kept, annot_table_wei_chemo_kept, annot_table_scores_combined)
+  rm(
+    annot_table_wei_bio_kept,
+    annot_table_wei_chemo_kept,
+    annot_table_scores_combined
+  )
   log_debug(
     "Expanded combined scores with metadata: %d rows",
     nrow(annot_table_for_clean)

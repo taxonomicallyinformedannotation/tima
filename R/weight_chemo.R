@@ -389,8 +389,7 @@ weight_chemo <- function(
 
   annot_table_wei_chemo <- annot_table_wei_chemo |>
     tidytable::mutate(
-      score_weighted_chemo = weighted_chemo$score,
-      score_weighted_chemo_coverage = weighted_chemo$coverage
+      score_weighted_chemo = weighted_chemo$score
     )
 
   rm(annot_table_wei_chemo_interim)

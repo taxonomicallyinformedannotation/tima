@@ -848,13 +848,13 @@ weights:
   #' Global weights.
   global:
     #' Weight for the biological part. FLOAT
-    biological: 0.500
+    biological: 0.400
 
     #' Weight for the chemical part. FLOAT
-    chemical: 0.166
+    chemical: 0.200
 
     #' Weight for the spectral part. FLOAT
-    spectral: 0.333
+    spectral: 0.400
 
   #' Weights for the biological part.
   biological:

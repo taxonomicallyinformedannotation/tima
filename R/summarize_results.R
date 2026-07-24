@@ -143,10 +143,8 @@ summarize_results <- function(
     "score_initial" = "candidate_score_pseudo_initial",
     "score_biological",
     "score_interim" = "score_weighted_bio",
-    "score_weighted_bio_coverage",
     "score_chemical",
     "score_weighted_chemo",
-    "score_weighted_chemo_coverage",
     "score_final" = "score_weighted_chemo"
   )
 
@@ -279,14 +277,6 @@ summarize_results <- function(
         rep_len(0, nrow(df_joined))
       }
 
-      coverage_num <- if (
-        "score_weighted_chemo_coverage" %in% names(df_joined)
-      ) {
-        -suppressWarnings(as.numeric(df_joined$score_weighted_chemo_coverage))
-      } else {
-        rep_len(0, nrow(df_joined))
-      }
-
       initial_num <- if ("score_initial" %in% names(df_joined)) {
         -suppressWarnings(as.numeric(df_joined$score_initial))
       } else if ("candidate_score_pseudo_initial" %in% names(df_joined)) {
@@ -299,14 +289,13 @@ summarize_results <- function(
         df_joined$feature_id,
         rank_num,
         score_final_num,
-        coverage_num,
         initial_num,
         na.last = TRUE
       )
       keep <- !duplicated(df_joined$feature_id[ord])
       df_final <- df_joined[ord[keep], , drop = FALSE]
 
-      rm(ord, keep, rank_num, score_final_num, coverage_num, initial_num)
+      rm(ord, keep, rank_num, score_final_num, initial_num)
     }
 
     rm(df_joined)

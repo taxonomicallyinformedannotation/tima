@@ -56,19 +56,15 @@ compute_weighted_components <- function(..., weights) {
 
   values_matrix <- do.call(cbind, values)
   values_matrix <- as.matrix(values_matrix)
-  available <- !is.na(values_matrix)
-  row_has_data <- rowSums(available) > 0L
 
-  available_weight_sum <- as.numeric(available %*% weights)
-  weighted_values <- values_matrix
-  weighted_values[!available] <- 0
-  score <- as.numeric(weighted_values %*% weights)
-  score <- score / available_weight_sum
-  score[!is.finite(score)] <- NA_real_
-  score[!row_has_data] <- NA_real_
+  # Convert NA to 0 before calculation
+  values_matrix[is.na(values_matrix)] <- 0
 
-  coverage <- available_weight_sum / weight_sum
-  coverage[!row_has_data] <- NA_real_
+  # Simple weighted sum divided by total weight
+  score <- as.numeric(values_matrix %*% weights)
+  score <- score / weight_sum
+
+  coverage <- NA_real_ # Not used anymore
 
   list(score = score, coverage = coverage)
 }

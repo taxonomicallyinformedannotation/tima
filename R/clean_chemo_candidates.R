@@ -366,14 +366,21 @@ sample_candidates_per_group <- function(
 
     # PRIMARY: rank_final from unified ranking system (if available)
     if ("rank_final" %in% names(tbl)) {
-      order_terms[[length(order_terms) + 1L]] <- suppressWarnings(as.numeric(tbl$rank_final))
+      order_terms[[length(order_terms) + 1L]] <- suppressWarnings(as.numeric(
+        tbl$rank_final
+      ))
     } else if ("score_weighted_chemo" %in% names(tbl)) {
       # FALLBACK: use score_weighted_chemo directly (already combines all evidence)
-      order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(as.numeric(tbl$score_weighted_chemo))
+      order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(as.numeric(
+        tbl$score_weighted_chemo
+      ))
     }
 
     # Secondary: cluster consensus (if rank_final not used)
-    if (!("rank_final" %in% names(tbl)) && "cluster_consensus_promoted_from_anchor" %in% names(tbl)) {
+    if (
+      !("rank_final" %in% names(tbl)) &&
+        "cluster_consensus_promoted_from_anchor" %in% names(tbl)
+    ) {
       order_terms[[length(order_terms) + 1L]] <- -as.integer(
         !is.na(tbl$cluster_consensus_promoted_from_anchor) &
           tbl$cluster_consensus_promoted_from_anchor
