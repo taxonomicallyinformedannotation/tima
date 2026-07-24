@@ -9,7 +9,8 @@
 #'   2. Query spectra import & light preprocessing (intensity cutoff).
 #'   3. Library spectra import, cleaning of empty peak lists, optional polarity
 #'      filtering, optional precursor-based library size reduction (when
-#'      `approx = FALSE`).
+#'      `approx = FALSE`). Libraries are processed one at a time so peak memory
+#'      stays bounded by a single library instead of the full library set.
 #'   4. Similarity computation via `calculate_entropy_and_similarity()`.
 #'   5. Candidate metadata extraction (formula, name, etc.).
 #'   6. Result shaping: derive error (mz), select canonical output columns,
@@ -227,41 +228,84 @@ annotate_spectra <- function(
     )
   }
 
-  # Call import_and_clean_library_collection with best-effort support for
-  # extended optional arguments used in tests (approx, query_precursors,
-  # query_adducts). Some test mocks omit these formals; attempt the full
-  # call and fall back to the basic signature on unused-argument errors.
-  import_fn <- import_and_clean_library_collection
-  try(
-    {
-      spectral_library <- import_fn(
-        libs_vec,
-        dalton = dalton,
-        polarity = polarity,
-        ppm = ppm,
-        approx = approx,
-        query_precursors = query_precursors,
-        query_adducts = query_meta$query_adduct
-      )
-    },
-    silent = TRUE
-  )
-  if (
-    !exists("spectral_library") || (inherits(spectral_library, "try-error"))
-  ) {
-    # Fallback to basic call
-    spectral_library <- import_fn(
-      libs_vec,
+  # Process one library at a time: this keeps the live Spectra object count low
+  # and avoids holding multiple million-row backends in memory together.
+  sim_chunks <- list()
+  meta_chunks <- list()
+  n_lib_count <- 0L
+  target_id_offset <- 0L
+
+  for (lib_path in libs_vec) {
+    spectral_library <- import_and_clean_library_collection(
+      c(lib_path),
       dalton = dalton,
       polarity = polarity,
-      ppm = ppm
+      ppm = ppm,
+      approx = approx,
+      query_precursors = query_precursors,
+      query_adducts = query_meta$query_adduct
     )
+
+    if (length(spectral_library) == 0L) {
+      rm(spectral_library)
+      next
+    }
+
+    log_library_stats(spectral_library)
+
+    lib_n <- length(spectral_library)
+    n_lib_count <- n_lib_count + lib_n
+    lib_precursors_all <- NULL
+    lib_adducts_all <- NULL
+    meta_chunk <- NULL
+
+    sim_chunk <- compute_similarity_safe(
+      lib_sp = spectral_library,
+      query_sp = query_sp,
+      query_meta = query_meta,
+      method = method,
+      dalton = dalton,
+      ppm = ppm,
+      threshold = threshold,
+      approx = approx,
+      query_precursors = query_precursors
+    )
+
+    if (nrow(sim_chunk) > 0L) {
+      local_target_ids <- unique(sim_chunk$target_id)
+      sim_chunk$target_id <- sim_chunk$target_id + target_id_offset
+      lib_precursors_all <- attr(sim_chunk, "lib_precursors_raw")
+      if (is.null(lib_precursors_all)) {
+        lib_precursors_all <- get_precursors(spectral_library)
+      }
+      lib_adducts_all <- attr(sim_chunk, "lib_adducts_raw")
+      meta_chunk <- build_library_metadata(
+        spectral_library,
+        lib_precursors_all,
+        target_ids = local_target_ids,
+        target_adduct_raw = if (!is.null(lib_adducts_all)) {
+          lib_adducts_all[local_target_ids]
+        } else {
+          NULL
+        }
+      )
+      meta_chunk$target_id <- meta_chunk$target_id + target_id_offset
+      sim_chunks[[length(sim_chunks) + 1L]] <- sim_chunk
+      meta_chunks[[length(meta_chunks) + 1L]] <- meta_chunk
+    }
+
+    target_id_offset <- target_id_offset + lib_n
+    rm(
+      spectral_library,
+      sim_chunk,
+      meta_chunk,
+      lib_precursors_all,
+      lib_adducts_all
+    )
+    gc(verbose = FALSE)
   }
 
-  if (length(spectral_library) == 0L) {
-    # Distinguish why the library is empty: if approx==FALSE then per-file
-    # precursor reduction likely removed all spectra; provide a specific
-    # message expected by unit tests. Otherwise, it was removed by cleaning.
+  if (length(sim_chunks) == 0L) {
     msg <- if (isFALSE(approx)) {
       "No spectra remain after precursor-based reduction"
     } else {
@@ -276,79 +320,17 @@ annotate_spectra <- function(
     )
   }
 
-  log_library_stats(spectral_library)
-
-  # Post-concatenation precursor reduction removed: per-file reduction is
-  # performed inside import_and_clean_library_collection when approx == FALSE
-  # which keeps individual library Spectra small before concatenation.
+  sim_raw <- tidytable::bind_rows(sim_chunks)
+  meta <- tidytable::bind_rows(meta_chunks)
+  rm(sim_chunks, meta_chunks)
 
   n_query_count <- length(query_sp)
-  n_lib_count <- length(spectral_library)
   log_info(
     "Annotating %d query spectra against %d library references",
     n_query_count,
     n_lib_count
   )
-
-  sim_raw <- compute_similarity_safe(
-    lib_sp = spectral_library,
-    query_sp = query_sp,
-    query_meta = query_meta,
-    method = method,
-    dalton = dalton,
-    ppm = ppm,
-    threshold = threshold,
-    approx = approx,
-    query_precursors = query_precursors
-  )
-  if (nrow(sim_raw) == 0L) {
-    return(
-      annotate_spectra_handle_empty_result(
-        output_path,
-        params,
-        "Similarity computation returned no candidates"
-      )
-    )
-  }
-
-  lib_precursors_all <- attr(sim_raw, "lib_precursors_raw")
-  if (is.null(lib_precursors_all)) {
-    lib_precursors_all <- get_precursors(spectral_library)
-  }
-  lib_adducts_all <- attr(sim_raw, "lib_adducts_raw")
-  target_ids <- unique(sim_raw$target_id)
-  spectral_library_hits <- spectral_library[target_ids]
-  lib_precursors_hits <- lib_precursors_all[target_ids]
-  lib_adducts_hits <- if (!is.null(lib_adducts_all)) {
-    lib_adducts_all[target_ids]
-  } else {
-    NULL
-  }
-
-  meta <- build_library_metadata(
-    spectral_library_hits,
-    lib_precursors_hits,
-    target_ids = target_ids,
-    target_adduct_raw = lib_adducts_hits
-  )
-
-  # spectral_library and query_sp (with their peak-data backends -- the S4
-  # objects holding many small per-spectrum matrices) are done being read
-  # from at this point -- everything downstream works off sim_raw/meta/
-  # query_meta. Free them before the join/dedup pipeline runs. This is the
-  # mid-pipeline collection: it targets the *input* Spectra backends, which
-  # generational GC is slow to reclaim on its own (many small S4-backed
-  # allocations rather than one big block).
-  rm(
-    spectral_library,
-    spectral_library_hits,
-    query_sp,
-    lib_precursors_all,
-    lib_precursors_hits,
-    lib_adducts_all,
-    lib_adducts_hits,
-    target_ids
-  )
+  rm(query_sp)
 
   df_final <- finalize_results(
     df_sim = tidytable::as_tidytable(x = sim_raw),
