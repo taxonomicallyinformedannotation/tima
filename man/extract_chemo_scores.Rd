@@ -2,12 +2,12 @@
 % Please edit documentation in R/extract_chemo_scores.R
 \name{extract_chemo_scores}
 \alias{extract_chemo_scores}
-\title{Extract narrow biological score table}
+\title{Extract narrow chemical score table}
 \usage{
 extract_chemo_scores(weight_chemo_result)
 }
 \arguments{
-\item{weight_bio_result}{\link{data.frame} Output from weight_bio()}
+\item{weight_chemo_result}{\link{data.frame} Output from weight_chemo()}
 }
 \value{
 Data frame with columns:
@@ -18,6 +18,6 @@ Data frame with columns:
 }
 \description{
 Extracts only the narrow scoring columns from the full
-weight_bio output, avoiding wide table materialization.
+weight_chemo output, avoiding wide table materialization.
 }
 \keyword{internal}

@@ -1,12 +1,12 @@
-#' @title Extract narrow biological score table
+#' @title Extract narrow chemical score table
 #'
 #' @description Extracts only the narrow scoring columns from the full
-#'     weight_bio output, avoiding wide table materialization.
+#'     weight_chemo output, avoiding wide table materialization.
 #'
-#' @include weight_bio.R
+#' @include weight_chemo.R
 #' @include validations_utils.R
 #'
-#' @param weight_bio_result [data.frame] Output from weight_bio()
+#' @param weight_chemo_result [data.frame] Output from weight_chemo()
 #'
 #' @return Data frame with columns:
 #'     - feature_id
