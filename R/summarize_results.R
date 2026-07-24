@@ -500,21 +500,63 @@ summarize_results <- function(
     return(empty_lookup())
   }
 
-  taxonomy_cols <- grep("^organism_taxonomy_", names(sop_narrow), value = TRUE)
+  inchikey_col <- intersect(
+    c(
+      "candidate_structure_inchikey_connectivity_layer",
+      "structure_inchikey_connectivity_layer"
+    ),
+    names(sop_narrow)
+  )[1]
+  if (is.na(inchikey_col) || length(inchikey_col) == 0L) {
+    return(empty_lookup())
+  }
 
-  # Melt ONCE on the already-narrowed table, instead of a 10-way OR filter
-  # over a full inchikey-only cartesian join. values_drop_na keeps this from
-  # ballooning on the many taxonomy ranks that are typically NA (species,
-  # varietas, etc.).
-  sop_long <- tidytable::pivot_longer(
-    sop_narrow,
-    cols = tidyselect::all_of(taxonomy_cols),
-    names_to = ".taxonomy_rank",
-    values_to = "candidate_structure_organism_occurrence_closest",
-    values_drop_na = TRUE
-  ) |>
-    tidytable::select(-".taxonomy_rank") |>
-    tidytable::distinct()
+  taxonomy_cols <- grep("^organism_taxonomy_", names(sop_narrow), value = TRUE)
+  if (length(taxonomy_cols) == 0L) {
+    return(empty_lookup())
+  }
+
+  candidate_occurrences <- df |>
+    tidytable::distinct(candidate_structure_organism_occurrence_closest) |>
+    tidytable::pull(candidate_structure_organism_occurrence_closest)
+  candidate_occurrences <- candidate_occurrences[
+    !is.na(candidate_occurrences) & nzchar(candidate_occurrences)
+  ]
+  if (length(candidate_occurrences) == 0L) {
+    return(empty_lookup())
+  }
+
+  # Build a much smaller long table by filtering each taxonomy rank against the
+  # candidate occurrence values first, instead of pivoting the full SOP table.
+  sop_long <- purrr::map_dfr(
+    .x = taxonomy_cols,
+    .f = function(col) {
+      tbl <- sop_narrow |>
+        tidytable::select(
+          tidyselect::any_of(c(inchikey_col, "reference_doi", col))
+        ) |>
+        tidytable::rename(
+          candidate_structure_organism_occurrence_closest = tidyselect::all_of(col)
+        )
+      if (inchikey_col != "candidate_structure_inchikey_connectivity_layer") {
+        tbl <- tbl |>
+          tidytable::rename(
+            candidate_structure_inchikey_connectivity_layer = tidyselect::all_of(inchikey_col)
+          )
+      }
+      tbl |>
+        tidytable::filter(
+          !is.na(candidate_structure_organism_occurrence_closest),
+          candidate_structure_organism_occurrence_closest != "NA",
+          candidate_structure_organism_occurrence_closest %in% candidate_occurrences
+        ) |>
+        tidytable::distinct()
+    }
+  )
+
+  if (nrow(sop_long) == 0L) {
+    return(empty_lookup())
+  }
 
   # Bound the join output by df's own key combos rather than by however many
   # organism records a popular structure happens to carry.
