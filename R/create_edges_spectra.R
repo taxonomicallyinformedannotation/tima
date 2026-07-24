@@ -334,11 +334,11 @@ create_edges_spectra <- function(
 
   community_edges <- normalize_edge_table(community_edges)
 
-  entropy_df <- as.data.frame(tidytable::tidytable(
+  entropy_df <- tidytable::tidytable(
     source = seq_along(entropy),
     feature_spectrum_entropy = as.character(entropy),
     feature_spectrum_peaks = as.character(npeaks)
-  ))
+  )
   names(entropy_df)[names(entropy_df) == "source"] <- source_col
   entropy_df[[source_col]] <- idz[entropy_df[[source_col]]]
   entropy_df <- entropy_df[

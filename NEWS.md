@@ -27,12 +27,6 @@
 
 ## Internal / performance
 
-- **Candidate ranking now uses evidence coverage directly** in `clean_chemo()`
-  and related ranking steps. The effective ranking score is computed as a
-  conservative shrinkage of the raw weighted score by coverage, so a candidate
-  with a slightly lower raw weighted score but substantially better coverage can
-  outrank a candidate with a higher raw score but weak coverage.
-
 - **MS1 adduct annotation improvements** in `annotate_masses()`:
   - Enforced tier-aware minimum support thresholds in evidence discovery: exotic
     adducts (tier 3+) now require stronger peer evidence (≥2 independent

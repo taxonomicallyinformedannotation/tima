@@ -16,7 +16,6 @@
 #'     - score_biological
 #'     - candidate_score_pseudo_initial
 #'     - score_weighted_bio
-#'     - score_weighted_bio_coverage
 #'
 #' @keywords internal
 extract_bio_scores <- function(weight_bio_result) {
@@ -29,8 +28,7 @@ extract_bio_scores <- function(weight_bio_result) {
         candidate_structure_inchikey_connectivity_layer = character(),
         score_biological = numeric(),
         candidate_score_pseudo_initial = numeric(),
-        score_weighted_bio = numeric(),
-        score_weighted_bio_coverage = numeric()
+        score_weighted_bio = numeric()
       )
     )
   }
@@ -41,8 +39,7 @@ extract_bio_scores <- function(weight_bio_result) {
       candidate_structure_inchikey_connectivity_layer,
       score_biological,
       candidate_score_pseudo_initial,
-      score_weighted_bio,
-      score_weighted_bio_coverage
+      score_weighted_bio
     )
 }
 
@@ -88,11 +85,8 @@ combine_weighted_scores <- function(
         candidate_structure_inchikey_connectivity_layer = character(),
         score_initial = numeric(),
         score_biological = numeric(),
-        score_weighted_bio_coverage = numeric(),
         score_chemical = numeric(),
-        score_weighted_chemo_coverage = numeric(),
-        score_final = numeric(),
-        score_final_coverage = numeric()
+        score_final = numeric()
       )
     )
   }
@@ -114,31 +108,22 @@ combine_weighted_scores <- function(
       # - candidate_score_pseudo_initial: spectral evidence (MS2 match, or NA for MS1-only)
       #
       # All three are weighted according to user preference.
-      # Missing spectral data (MS1-only hits) is handled gracefully:
-      # coverage will reflect only the evidence actually available.
+      # Missing spectral data (MS1-only hits) is handled gracefully via weight normalization:
+      # When spectral weight is missing (NA), total_weight_available is reduced accordingly.
       score_final = compute_weighted_sum(
         score_biological,
         score_chemical,
         candidate_score_pseudo_initial,
         weights = c(weight_biological, weight_chemical, weight_spectral)
-      ),
-      score_final_coverage = compute_weighted_components(
-        score_biological,
-        score_chemical,
-        candidate_score_pseudo_initial,
-        weights = c(weight_biological, weight_chemical, weight_spectral)
-      )$coverage
+      )
     ) |>
     tidytable::select(
       feature_id,
       candidate_structure_inchikey_connectivity_layer,
       score_initial = candidate_score_pseudo_initial,
       score_biological,
-      score_weighted_bio_coverage,
       score_chemical,
-      score_weighted_chemo_coverage,
-      score_final,
-      score_final_coverage
+      score_final
     )
 
   log_complete(ctx, n_combined = nrow(result))
@@ -216,14 +201,13 @@ expand_combined_scores_for_filtering <- function(
       )
   }
 
-  # Add combined scores (score_final, score_final_coverage) as new columns
+  # Add combined scores (score_final) as new column
   # But REPLACE score_weighted_chemo with score_final so ranking logic uses it
   combined_scores_only <- combined_scores |>
     tidytable::select(
       feature_id,
       candidate_structure_inchikey_connectivity_layer,
-      score_final,
-      score_final_coverage
+      score_final
     )
 
   result <- result |>
@@ -234,10 +218,9 @@ expand_combined_scores_for_filtering <- function(
     tidytable::mutate(
       # Replace the old score_weighted_chemo with our new combined score
       # so that ranking logic uses the refactored combined scores
-      score_weighted_chemo = score_final,
-      score_weighted_chemo_coverage = score_final_coverage
+      score_weighted_chemo = score_final
     ) |>
-    tidytable::select(-score_final, -score_final_coverage)
+    tidytable::select(-score_final)
 
   result
 }

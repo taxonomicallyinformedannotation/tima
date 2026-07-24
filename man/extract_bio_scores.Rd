@@ -16,7 +16,6 @@ Data frame with columns:
 - score_biological
 - candidate_score_pseudo_initial
 - score_weighted_bio
-- score_weighted_bio_coverage
 }
 \description{
 Extracts only the narrow scoring columns from the full
