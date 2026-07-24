@@ -1,6 +1,7 @@
 #' Resolve tied candidates via cross-feature neutral-mass anchors
 #'
 #' @include clean_chemo_preprocessing.R
+#' @include columns_utils.R
 #' @include constants.R
 #' @include logs_utils.R
 #'
@@ -113,12 +114,27 @@
     NEUTRAL_MASS_GROUP_DECIMALS
   )
 
+  # MEMORY OPT: Pre-filter anchor table by mass ranges to reduce merge cardinality.
+  # This prevents Cartesian product explosion when many rows share same InChIKey.
+  min_row_mass <- min(row_df$row_mass, na.rm = TRUE)
+  max_row_mass <- max(row_df$row_mass, na.rm = TRUE)
+  anchor_df_filtered <- anchor_df[
+    anchor_df$anchor_mass >= min_row_mass - tol &
+      anchor_df$anchor_mass <= max_row_mass + tol,
+    ,
+    drop = FALSE
+  ]
+
+  if (nrow(anchor_df_filtered) == 0L) {
+    return(rep(FALSE, nrow(df_tied)))
+  }
+
   # Perform join on IK first (low cardinality), then refine by mass/RT.
   # Matching on the rounded mass key can miss near-tolerance matches due to
   # different rounding; match by IK and filter by mass tolerance below.
   merged <- merge(
     row_df,
-    anchor_df,
+    anchor_df_filtered,
     by.x = c("row_IK"),
     by.y = c("anchor_IK"),
     sort = FALSE
@@ -722,6 +738,54 @@ coerce_score_columns <- function(annot_table_wei_chemo) {
         .cols = tidyselect::all_of(cols_to_convert),
         .fns = as.numeric
       )
+    )
+}
+
+#' Select the clean_chemo working columns
+#'
+#' @description Keeps only the columns needed by the clean_chemo ranking,
+#'   filtering, consensus, and mini-taxonomy paths. The selector is driven by
+#'   the shared column model so we drop wide text / unused metadata early while
+#'   preserving the final output schema.
+#'
+#' @param df Annotation table after score coercion.
+#'
+#' @return A narrower annotation table with only pipeline-relevant columns.
+#' @keywords internal
+select_clean_chemo_working_columns <- function(df) {
+  model <- columns_model()
+
+  projection_cols <- unique(c(
+    c("feature_id", "rt", "mz", "feature_rt", "feature_mz"),
+    model$features_columns,
+    model$features_calculated_columns,
+    model$components_columns,
+    model$candidates_calculated_columns,
+    model$candidates_sirius_for_columns,
+    model$candidates_sirius_str_columns,
+    model$candidates_spectra_columns,
+    model$candidates_structures_columns,
+    model$rank_columns,
+    model$score_columns,
+    "candidate_score_pseudo_initial",
+    "candidate_structure_id_",
+    "cluster_consensus_",
+    "feature_pred_"
+  ))
+
+  explicit_cols <- setdiff(
+    projection_cols,
+    c("candidate_structure_id_", "cluster_consensus_", "feature_pred_")
+  )
+  regex_cols <- c(
+    grep("^candidate_structure_id_", names(df), value = TRUE),
+    grep("^cluster_consensus_", names(df), value = TRUE),
+    grep("^feature_pred_", names(df), value = TRUE)
+  )
+
+  df |>
+    tidytable::select(
+      tidyselect::any_of(c(explicit_cols, regex_cols))
     )
 }
 
