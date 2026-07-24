@@ -154,6 +154,90 @@ columns_model <- function() {
   )
 }
 
+#' Select structure-organism pair columns
+#' @keywords internal
+select_structure_organism_pair_columns <- function(df) {
+  tidytable::select(
+    df,
+    tidyselect::any_of(
+      unique(c(
+        grep("^candidate_structure_", names(df), value = TRUE),
+        grep("^structure_", names(df), value = TRUE),
+        grep("^organism_", names(df), value = TRUE),
+        "reference_doi",
+        "stereo_name"
+      ))
+    )
+  )
+}
+
+#' Select working columns for annotation weighting
+#' @keywords internal
+select_weight_annotations_working_columns <- function(df) {
+  model <- columns_model()
+  tidytable::select(
+    df,
+    tidyselect::any_of(
+      unique(c(
+        "feature_id",
+        grep("^sample_organism_", names(df), value = TRUE),
+        grep("^candidate_organism_", names(df), value = TRUE),
+        "candidate_structure_inchikey_connectivity_layer",
+        "candidate_structure_inchikey_no_stereo",
+        "candidate_structure_smiles_no_stereo",
+        "candidate_structure_name",
+        "candidate_structure_exact_mass",
+        "candidate_structure_molecular_formula",
+        "candidate_structure_xlogp",
+        "candidate_structure_tag",
+        "candidate_structure_organism_occurrence_closest",
+        "candidate_structure_organism_occurrence_reference",
+        "candidate_structure_error_mz",
+        "candidate_structure_error_rt",
+        "candidate_score_pseudo_initial",
+        "candidate_score_similarity",
+        "candidate_score_similarity_forward",
+        "candidate_score_similarity_reverse",
+        "candidate_score_sirius_confidence",
+        "candidate_score_sirius_csi",
+        "candidate_score_sirius_msnovelist",
+        "candidate_score_sirius_intensity",
+        "candidate_score_sirius_isotope",
+        "candidate_score_sirius_sirius",
+        "candidate_score_sirius_tree",
+        "candidate_score_sirius_zodiac",
+        "candidate_count_similarity_peaks_matched",
+        "candidate_spectrum_entropy",
+        "candidate_library",
+        "candidate_spectrum_id",
+        "candidate_adduct",
+        "candidate_query_adduct",
+        "candidate_adduct_match_mode",
+        "annotation_note",
+        "score_biological",
+        "score_chemical",
+        "score_weighted_bio",
+        "score_weighted_bio_coverage",
+        "score_weighted_chemo",
+        "score_weighted_chemo_coverage",
+        "rank_initial",
+        "rank_final",
+        model$features_columns,
+        model$features_calculated_columns,
+        model$components_columns,
+        model$candidates_calculated_columns,
+        model$candidates_sirius_for_columns,
+        model$candidates_sirius_str_columns,
+        model$candidates_spectra_columns,
+        model$candidates_structures_columns,
+        grep("^candidate_structure_id_", names(df), value = TRUE),
+        grep("^cluster_consensus_", names(df), value = TRUE),
+        grep("^feature_pred_", names(df), value = TRUE)
+      ))
+    )
+  )
+}
+
 #' @title Collapse and clean grouped data
 #'
 #' @description Collapses grouped dataframe by combining unique values per

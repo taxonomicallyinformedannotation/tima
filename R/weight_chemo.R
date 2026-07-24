@@ -145,6 +145,10 @@ weight_chemo <- function(
     param_name = "score_chemical_npc_class"
   )
 
+  annot_table_wei_bio_clean <- select_weight_annotations_working_columns(
+    annot_table_wei_bio_clean
+  )
+
   # Early Exit ----
   n_annotations <- nrow(annot_table_wei_bio_clean)
   if (n_annotations == 0L) {

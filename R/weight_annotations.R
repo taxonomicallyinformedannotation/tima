@@ -379,7 +379,8 @@ weight_annotations <- function(
     file_type = "components table",
     na.strings = c("", "NA"),
     colClasses = "character"
-  )
+  ) |>
+    tidytable::select(tidyselect::any_of(c("feature_id", "component_id")))
 
   edges_table <- load_edges_table(edges, candidates_neighbors)
 
@@ -427,6 +428,9 @@ weight_annotations <- function(
     canopus_table,
     edges_table
   )
+  annotation_table <- select_weight_annotations_working_columns(
+    annotation_table
+  )
   log_debug("Merged annotation table: %d rows", nrow(annotation_table))
 
   # Clean up intermediate objects
@@ -445,6 +449,9 @@ weight_annotations <- function(
       ),
       by = "feature_id"
     )
+  annotation_table_taxed <- select_weight_annotations_working_columns(
+    annotation_table_taxed
+  )
 
   rm(annotation_table)
 

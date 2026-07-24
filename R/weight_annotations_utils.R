@@ -215,7 +215,8 @@ load_annotation_tables <- function(annotations, ms1_only) {
         file_type = paste0("annotation file ", .y),
         na.strings = c("", "NA"),
         colClasses = "character"
-      )
+      ) |>
+        select_weight_annotations_working_columns()
     ) |>
       tidytable::bind_rows(),
     error = function(e) {
@@ -361,7 +362,8 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
       }
       tidytable::left_join(x = acc, y = tbl)
     }
-  )
+  ) |>
+    select_structure_organism_pair_columns()
 }
 
 #' Load Edges Table with Neighbor Filtering

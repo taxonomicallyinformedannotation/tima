@@ -175,6 +175,13 @@ weight_bio <- function(
     param_name = "score_biological_variety"
   )
 
+  annotation_table_taxed <- select_weight_annotations_working_columns(
+    annotation_table_taxed
+  )
+  structure_organism_pairs_table <- select_structure_organism_pair_columns(
+    structure_organism_pairs_table
+  )
+
   # Check Data Frames ----
 
   if (!is.data.frame(structure_organism_pairs_table)) {
