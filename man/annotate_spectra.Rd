@@ -76,7 +76,8 @@ This is an orchestration wrapper that performs:
 \item Query spectra import & light preprocessing (intensity cutoff).
 \item Library spectra import, cleaning of empty peak lists, optional polarity
 filtering, optional precursor-based library size reduction (when
-\code{approx = FALSE}).
+\code{approx = FALSE}). Libraries are processed one at a time so peak memory
+stays bounded by a single library instead of the full library set.
 \item Similarity computation via \code{calculate_entropy_and_similarity()}.
 \item Candidate metadata extraction (formula, name, etc.).
 \item Result shaping: derive error (mz), select canonical output columns,
