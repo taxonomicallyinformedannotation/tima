@@ -273,19 +273,6 @@
     },
     "3": {
       "@type": "SoftwareApplication",
-      "identifier": "BiocParallel",
-      "name": "BiocParallel",
-      "version": ">= 1.44.0",
-      "provider": {
-        "@id": "https://www.bioconductor.org",
-        "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
-      },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/BiocParallel.html"
-    },
-    "4": {
-      "@type": "SoftwareApplication",
       "identifier": "cli",
       "name": "cli",
       "version": ">= 3.6.6",
@@ -297,7 +284,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=cli"
     },
-    "5": {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "docopt",
       "name": "docopt",
@@ -310,7 +297,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=docopt"
     },
-    "6": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "fs",
       "name": "fs",
@@ -323,7 +310,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=fs"
     },
-    "7": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "httr",
       "name": "httr",
@@ -336,7 +323,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr"
     },
-    "8": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
@@ -349,7 +336,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "9": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
@@ -362,7 +349,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=igraph"
     },
-    "10": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -375,7 +362,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "11": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "lgr",
       "name": "lgr",
@@ -388,7 +375,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=lgr"
     },
-    "12": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "lifecycle",
       "name": "lifecycle",
@@ -401,12 +388,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=lifecycle"
     },
-    "13": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "methods",
       "name": "methods"
     },
-    "14": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "MetaboCoreUtils",
       "name": "MetaboCoreUtils",
@@ -419,7 +406,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MetaboCoreUtils.html"
     },
-    "15": {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
@@ -432,7 +419,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
     },
-    "16": {
+    "15": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMsp",
       "name": "MsBackendMsp",
@@ -445,7 +432,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMsp.html"
     },
-    "17": {
+    "16": {
       "@type": "SoftwareApplication",
       "identifier": "MsCoreUtils",
       "name": "MsCoreUtils",
@@ -458,7 +445,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsCoreUtils.html"
     },
-    "18": {
+    "17": {
       "@type": "SoftwareApplication",
       "identifier": "msentropy",
       "name": "msentropy",
@@ -471,7 +458,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=msentropy"
     },
-    "19": {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "purrr",
       "name": "purrr",
@@ -484,7 +471,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=purrr"
     },
-    "20": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "R.utils",
       "name": "R.utils",
@@ -497,7 +484,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=R.utils"
     },
-    "21": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "reticulate",
       "name": "reticulate",
@@ -510,7 +497,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=reticulate"
     },
-    "22": {
+    "21": {
       "@type": "SoftwareApplication",
       "identifier": "rlang",
       "name": "rlang",
@@ -523,7 +510,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rlang"
     },
-    "23": {
+    "22": {
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
@@ -536,7 +523,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "24": {
+    "23": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -549,12 +536,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "25": {
+    "24": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "26": {
+    "25": {
       "@type": "SoftwareApplication",
       "identifier": "stringi",
       "name": "stringi",
@@ -567,7 +554,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringi"
     },
-    "27": {
+    "26": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -580,7 +567,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "28": {
+    "27": {
       "@type": "SoftwareApplication",
       "identifier": "tidyselect",
       "name": "tidyselect",
@@ -593,7 +580,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyselect"
     },
-    "29": {
+    "28": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -606,12 +593,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "30": {
+    "29": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "31": {
+    "30": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -627,7 +614,7 @@
     "SystemRequirements": "\n    python (>= 3.12, < 3.15)"
   },
   "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome", "lc-msms", "metabolite-annotation", "metabolomics", "natural-products", "scoring-system", "taxonomy", "specialized-metabolome", "r"],
-  "fileSize": "44053.626KB",
+  "fileSize": "44061.35KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

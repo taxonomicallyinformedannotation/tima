@@ -224,17 +224,24 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 
 ## Additional software credits
 
+```
+A large number of files (1079 in total) have been discovered.
+It may take renv a long time to scan these files for dependencies.
+Consider using .renvignore to ignore irrelevant files.
+See `]8;;x-r-help:renv::dependencies?renv::dependencies]8;;` for more information.
+Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.
+```
+
   | Package         | Version     | Citation                                                              |
   | :-------------- | :---------- | :-------------------------------------------------------------------- |
   | archive         | 1.1.13      | Hester and Csárdi (2026)                                              |
-  | base            | 4.6.0       | R Core Team (2026a)                                                   |
+  | base            | 4.6.1       | R Core Team (2026a)                                                   |
   | BiocManager     | 1.30.27     | Morgan and Ramos (2025)                                               |
-  | BiocParallel    | 1.46.0      | Wang et al. (2026)                                                    |
   | BiocVersion     | 3.23.1      | Morgan (2025)                                                         |
   | docopt          | 0.7.2       | <span class="nocase">de Jonge</span> (2025)                           |
   | fs              | 2.1.0       | Hester et al. (2026)                                                  |
-  | httr2           | 1.2.3       | Wickham (2025)                                                        |
-  | igraph          | 2.3.2       | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2026) |
+  | httr2           | 1.3.0       | Wickham (2025)                                                        |
+  | igraph          | 2.3.3       | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2026) |
   | knitr           | 1.51        | Xie (2014); Xie (2015); Xie (2025)                                    |
   | lgr             | 0.5.2       | Fleck (2026)                                                          |
   | lifecycle       | 1.0.5       | Henry and Wickham (2026)                                              |
@@ -262,7 +269,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
   | tidytable       | 0.11.2      | Fairbanks (2024)                                                      |
   | tidyverse       | 2.0.0       | Wickham et al. (2019)                                                 |
   | tima            | 2.13.0.9000 | Rutz et al. (2019); Rutz and Allard (2026)                            |
-  | tools           | 4.6.0       | R Core Team (2026b)                                                   |
+  | tools           | 4.6.1       | R Core Team (2026b)                                                   |
   | withr           | 3.0.3       | Hester et al. (2024)                                                  |
   | yaml            | 2.3.12      | Stephens and Simonov (2025)                                           |
 
@@ -563,15 +570,6 @@ Back*. <https://doi.org/10.32614/CRAN.package.yaml>.
 Ushey, Kevin, JJ Allaire, and Yuan Tang. 2026.
 *<span class="nocase">reticulate</span>: Interface to “Python”*.
 <https://doi.org/10.32614/CRAN.package.reticulate>.
-
-</div>
-
-<div id="ref-BiocParallel" class="csl-entry">
-
-Wang, Jiefei, Martin Morgan, Valerie Obenchain, Michel Lang, Ryan
-Thompson, and Nitesh Turaga. 2026. *BiocParallel: Bioconductor
-Facilities for Parallel Evaluation*.
-<https://doi.org/10.18129/B9.bioc.BiocParallel>.
 
 </div>
 
