@@ -465,7 +465,7 @@ import_and_clean_library_collection <- function(
   query_precursors = NULL,
   query_adducts = NULL
 ) {
-  acc <- NULL
+  processed <- list()
   for (i in seq_along(paths)) {
     path <- paths[[i]]
     sp <- if (tolower(tools::file_ext(path)) == "rds") {
@@ -515,19 +515,19 @@ import_and_clean_library_collection <- function(
       next
     }
 
-    if (is.null(acc)) {
-      acc <- sp
-    } else {
-      acc <- Spectra::concatenateSpectra(list(acc, sp))
-    }
+    processed[[length(processed) + 1L]] <- sp
     rm(sp)
   }
 
-  if (is.null(acc)) {
+  if (length(processed) == 0L) {
     return(list())
   }
 
-  acc
+  if (length(processed) == 1L) {
+    return(processed[[1L]])
+  }
+
+  Spectra::concatenateSpectra(processed)
 }
 
 remove_empty_peak_spectra <- function(sp) {
