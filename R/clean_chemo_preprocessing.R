@@ -311,7 +311,6 @@ rank_and_deduplicate <- function(df) {
   # === Coerce all score columns to numeric ===
   score_cols <- c(
     "score_final",
-    "score_final_coverage",
     "candidate_score_pseudo_initial",
     "candidate_score_similarity",
     "candidate_score_similarity_forward",

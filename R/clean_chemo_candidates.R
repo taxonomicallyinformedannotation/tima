@@ -356,7 +356,7 @@ sample_candidates_per_group <- function(
     tidytable::filter(.n_per_score > max_per_score) |>
     tidytable::as_tidytable()
 
-  # Ordering function: prefer MS2 evidence, then anchors, RT-priority, then scores
+  # Ordering function: use rank_final if available, otherwise score_weighted_chemo
   sort_candidates_for_sampling <- function(tbl, prefer_rt = FALSE) {
     if (nrow(tbl) == 0L) {
       return(tbl)
@@ -364,49 +364,20 @@ sample_candidates_per_group <- function(
 
     order_terms <- list()
 
-    # Prefer rows with MS2 evidence: candidate_score_similarity or candidate_score_sirius_csi or confidence
-    has_ms2 <- NULL
-    if ("candidate_score_similarity" %in% names(tbl)) {
-      order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(as.numeric(
-        tbl$candidate_score_similarity
-      ))
-    }
-    if ("candidate_score_sirius_csi" %in% names(tbl)) {
-      order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(as.numeric(
-        tbl$candidate_score_sirius_csi
-      ))
-    }
-    if ("candidate_score_sirius_confidence" %in% names(tbl)) {
-      order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(as.numeric(
-        tbl$candidate_score_sirius_confidence
-      ))
+    # PRIMARY: rank_final from unified ranking system (if available)
+    if ("rank_final" %in% names(tbl)) {
+      order_terms[[length(order_terms) + 1L]] <- suppressWarnings(as.numeric(tbl$rank_final))
+    } else if ("score_weighted_chemo" %in% names(tbl)) {
+      # FALLBACK: use score_weighted_chemo directly (already combines all evidence)
+      order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(as.numeric(tbl$score_weighted_chemo))
     }
 
-    if (isTRUE(prefer_rt) && ".rt_priority" %in% names(tbl)) {
-      order_terms[[length(order_terms) + 1L]] <- -as.integer(tbl$.rt_priority)
-    }
-
-    if ("cluster_consensus_promoted_from_anchor" %in% names(tbl)) {
+    # Secondary: cluster consensus (if rank_final not used)
+    if (!("rank_final" %in% names(tbl)) && "cluster_consensus_promoted_from_anchor" %in% names(tbl)) {
       order_terms[[length(order_terms) + 1L]] <- -as.integer(
         !is.na(tbl$cluster_consensus_promoted_from_anchor) &
           tbl$cluster_consensus_promoted_from_anchor
       )
-    }
-
-    # Fallback ordering by weighted chemo score and supporting evidence
-    score_columns <- c(
-      "score_weighted_chemo",
-      "score_weighted_chemo_coverage",
-      "candidate_score_pseudo_initial",
-      "candidate_score_similarity_forward",
-      "candidate_score_similarity_reverse"
-    )
-    for (score_col in score_columns) {
-      if (score_col %in% names(tbl)) {
-        order_terms[[
-          length(order_terms) + 1L
-        ]] <- -suppressWarnings(as.numeric(tbl[[score_col]]))
-      }
     }
 
     if (length(order_terms) == 0L) {
@@ -476,11 +447,6 @@ sample_candidates_per_group <- function(
     if ("score_weighted_chemo" %in% names(df_ns)) {
       ord_list[[length(ord_list) + 1L]] <- -as.numeric(
         df_ns$score_weighted_chemo
-      )
-    }
-    if ("score_weighted_chemo_coverage" %in% names(df_ns)) {
-      ord_list[[length(ord_list) + 1L]] <- -as.numeric(
-        df_ns$score_weighted_chemo_coverage
       )
     }
     if ("candidate_score_pseudo_initial" %in% names(df_ns)) {
@@ -724,9 +690,7 @@ coerce_score_columns <- function(annot_table_wei_chemo) {
     "score_biological",
     "score_chemical",
     "score_weighted_bio",
-    "score_weighted_bio_coverage",
     "score_weighted_chemo",
-    "score_weighted_chemo_coverage",
     "candidate_score_pseudo_initial",
     "candidate_score_similarity",
     "candidate_score_similarity_forward",
@@ -1133,13 +1097,6 @@ build_mini_results_table <- function(
     } else {
       rep_len(0, nrow(best_results))
     }
-    coverage_num <- if (
-      "score_weighted_chemo_coverage" %in% names(best_results)
-    ) {
-      -suppressWarnings(as.numeric(best_results$score_weighted_chemo_coverage))
-    } else {
-      rep_len(0, nrow(best_results))
-    }
     initial_num <- if ("score_initial" %in% names(best_results)) {
       -suppressWarnings(as.numeric(best_results$score_initial))
     } else if ("candidate_score_pseudo_initial" %in% names(best_results)) {
@@ -1152,7 +1109,6 @@ build_mini_results_table <- function(
       best_results$feature_id,
       rank_num,
       score_final_num,
-      coverage_num,
       initial_num,
       na.last = TRUE
     )
