@@ -479,7 +479,12 @@ weight_annotations <- function(
     nrow(annot_table_wei_bio)
   )
 
-  annot_table_wei_bio |>
+  # KEEP wide bio table temporarily (before cleaning for decoration)
+  annot_table_wei_bio_kept <- annot_table_wei_bio
+  rm(annot_table_wei_bio)
+
+  # Decorate for logging
+  annot_table_wei_bio_kept |>
     decorate_bio(
       score_biological_kingdom = score_biological_kingdom,
       score_biological_phylum = score_biological_phylum,
@@ -493,15 +498,22 @@ weight_annotations <- function(
       score_biological_biota = score_biological_biota
     )
 
-  annot_table_wei_bio_clean <- annot_table_wei_bio |>
+  annot_table_wei_bio_clean <- annot_table_wei_bio_kept |>
     clean_bio(
       edges_table = edges_table,
       minimal_consistency = minimal_consistency
     )
-  rm(annot_table_wei_bio, edges_table)
+  rm(edges_table)
   log_debug(
     "Biological cleaning complete: %d candidates",
     nrow(annot_table_wei_bio_clean)
+  )
+
+  # NARROW biological scores AFTER cleaning so we only use kept candidates
+  annot_table_bio_narrow <- extract_bio_scores(annot_table_wei_bio_clean)
+  log_debug(
+    "Narrowed biological scores: %d rows (removed metadata columns)",
+    nrow(annot_table_bio_narrow)
   )
 
   log_debug("Computing chemical taxonomy scores")
@@ -524,7 +536,32 @@ weight_annotations <- function(
     nrow(annot_table_wei_chemo)
   )
 
-  annot_table_wei_chemo |>
+  # NARROW chemical scores to avoid cartesian products
+  annot_table_chemo_narrow <- extract_chemo_scores(annot_table_wei_chemo)
+  log_debug(
+    "Narrowed chemical scores: %d rows (removed metadata columns)",
+    nrow(annot_table_chemo_narrow)
+  )
+
+  # KEEP wide chemo table temporarily for selective expansion later
+  annot_table_wei_chemo_kept <- annot_table_wei_chemo
+  rm(annot_table_wei_chemo)
+
+  # COMBINE narrow score tables - tiny join on feature_id + inchikey only
+  annot_table_scores_combined <- combine_weighted_scores(
+    score_bio_table = annot_table_bio_narrow,
+    score_chemo_table = annot_table_chemo_narrow,
+    weight_biological = weight_biological,
+    weight_chemical = weight_chemical
+  )
+  rm(annot_table_bio_narrow, annot_table_chemo_narrow)
+  log_debug(
+    "Combined weighted scores: %d rows (tiny join prevents cartesian product)",
+    nrow(annot_table_scores_combined)
+  )
+
+  # Decorate chemo for logging only (not used in pipeline now)
+  annot_table_wei_chemo_kept |>
     decorate_chemo(
       score_chemical_cla_kingdom = score_chemical_cla_kingdom,
       score_chemical_cla_superclass = score_chemical_cla_superclass,
@@ -537,6 +574,20 @@ weight_annotations <- function(
 
   log_debug("Finalizing results (filtering, ranking, deduplication)")
 
+  # EXPAND narrow scores with metadata needed for filtering/ranking
+  # Uses semi-join to keep only candidates in combined_scores, avoiding
+  # cartesian products
+  annot_table_for_clean <- expand_combined_scores_for_filtering(
+    combined_scores = annot_table_scores_combined,
+    wide_bio_table = annot_table_wei_bio_kept,
+    wide_chemo_table = annot_table_wei_chemo_kept
+  )
+  rm(annot_table_wei_bio_kept, annot_table_wei_chemo_kept, annot_table_scores_combined)
+  log_debug(
+    "Expanded combined scores with metadata: %d rows",
+    nrow(annot_table_for_clean)
+  )
+
   xrefs_table <- NULL
   if (!is.null(xrefs_file) && file.exists(xrefs_file)) {
     xrefs_table <- safe_fread(
@@ -547,32 +598,34 @@ weight_annotations <- function(
     )
   }
 
-  results_list <- annot_table_wei_chemo |>
-    clean_chemo(
-      components_table = components_table,
-      features_table = features_table,
-      structure_organism_pairs_table = structure_organism_pairs_table,
-      candidates_final = candidates_final,
-      best_percentile = best_percentile,
-      minimal_ms1_bio = minimal_ms1_bio,
-      minimal_ms1_chemo = minimal_ms1_chemo,
-      minimal_ms1_condition = minimal_ms1_condition,
-      compounds_names = compounds_names,
-      high_evidence = high_evidence,
-      remove_ties = remove_ties,
-      summarize = summarize,
-      score_chemical_cla_kingdom = score_chemical_cla_kingdom,
-      score_chemical_cla_superclass = score_chemical_cla_superclass,
-      score_chemical_cla_class = score_chemical_cla_class,
-      score_chemical_cla_parent = score_chemical_cla_parent,
-      score_chemical_npc_pathway = score_chemical_npc_pathway,
-      score_chemical_npc_superclass = score_chemical_npc_superclass,
-      score_chemical_npc_class = score_chemical_npc_class,
-      max_per_score = 7L,
-      xrefs_table = xrefs_table
-    )
+  # Use expanded scores for clean_chemo (has all metadata needed for filtering/ranking)
+  results_list <- clean_chemo(
+    annot_table_wei_chemo = annot_table_for_clean,
+    components_table = components_table,
+    features_table = features_table,
+    structure_organism_pairs_table = structure_organism_pairs_table,
+    candidates_final = candidates_final,
+    best_percentile = best_percentile,
+    minimal_ms1_bio = minimal_ms1_bio,
+    minimal_ms1_chemo = minimal_ms1_chemo,
+    minimal_ms1_condition = minimal_ms1_condition,
+    compounds_names = compounds_names,
+    high_evidence = high_evidence,
+    remove_ties = remove_ties,
+    summarize = summarize,
+    score_chemical_cla_kingdom = score_chemical_cla_kingdom,
+    score_chemical_cla_superclass = score_chemical_cla_superclass,
+    score_chemical_cla_class = score_chemical_cla_class,
+    score_chemical_cla_parent = score_chemical_cla_parent,
+    score_chemical_npc_pathway = score_chemical_npc_pathway,
+    score_chemical_npc_superclass = score_chemical_npc_superclass,
+    score_chemical_npc_class = score_chemical_npc_class,
+    max_per_score = 7L,
+    xrefs_table = xrefs_table
+  )
+
   rm(
-    annot_table_wei_chemo,
+    annot_table_for_clean,
     structure_organism_pairs_table,
     xrefs_table,
     components_table,

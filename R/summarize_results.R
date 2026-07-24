@@ -526,39 +526,18 @@ summarize_results <- function(
     return(empty_lookup())
   }
 
-  # Build a much smaller long table by filtering each taxonomy rank against the
-  # candidate occurrence values first, instead of pivoting the full SOP table.
-  sop_long_list <- lapply(
-    X = taxonomy_cols,
-    FUN = function(col) {
-      tbl <- sop_narrow |>
-        tidytable::select(
-          tidyselect::any_of(c(inchikey_col, "reference_doi", col))
-        ) |>
-        tidytable::rename(
-          candidate_structure_organism_occurrence_closest = tidyselect::all_of(
-            col
-          )
-        )
-      if (inchikey_col != "candidate_structure_inchikey_connectivity_layer") {
-        tbl <- tbl |>
-          tidytable::rename(
-            candidate_structure_inchikey_connectivity_layer = tidyselect::all_of(
-              inchikey_col
-            )
-          )
-      }
-      tbl |>
-        tidytable::filter(
-          !is.na(candidate_structure_organism_occurrence_closest),
-          candidate_structure_organism_occurrence_closest != "NA",
-          candidate_structure_organism_occurrence_closest %in%
-            candidate_occurrences
-        ) |>
-        tidytable::distinct()
-    }
-  )
-  sop_long <- tidytable::bind_rows(sop_long_list)
+  # Melt the taxonomy columns into one long table with values_drop_na = TRUE
+  # to keep memory usage low by not materializing the many NA ranks
+  # (species, varietas, etc.)
+  sop_long <- tidytable::pivot_longer(
+    sop_narrow,
+    cols = tidyselect::all_of(taxonomy_cols),
+    names_to = ".taxonomy_rank",
+    values_to = "candidate_structure_organism_occurrence_closest",
+    values_drop_na = TRUE
+  ) |>
+    tidytable::select(-".taxonomy_rank") |>
+    tidytable::distinct()
 
   if (nrow(sop_long) == 0L) {
     return(empty_lookup())

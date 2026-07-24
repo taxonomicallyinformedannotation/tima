@@ -294,7 +294,6 @@ sample_candidates_per_group <- function(
         tidytable::filter(.anchor_match) |>
         tidytable::arrange(
           feature_id,
-          candidate_adduct,
           rank_final,
           tidytable::desc(score_weighted_chemo),
           tidytable::desc(candidate_score_pseudo_initial)
@@ -571,7 +570,6 @@ sample_candidates_per_group <- function(
             .tbl <- .tbl |>
               tidytable::arrange(
                 feature_id,
-                candidate_adduct,
                 rank_final,
                 tidytable::desc(.note_present)
               )
