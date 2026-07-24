@@ -176,7 +176,9 @@ clean_chemo <- function(
 
   # Ensure Score Columns are Numeric ----
 
-  annot_table_wei_chemo <- select_clean_chemo_working_columns(annot_table_wei_chemo)
+  annot_table_wei_chemo <- select_clean_chemo_working_columns(
+    annot_table_wei_chemo
+  )
   annot_table_wei_chemo <- coerce_score_columns(annot_table_wei_chemo)
 
   # Ensure feature-level `rt` and `mz` are present on every candidate row:

@@ -988,7 +988,10 @@ filter_modifier_edges_by_assigned_adducts <- function(
     src_keys <- assigned_keys |>
       tidytable::rename(src_assigned_key = adduct_state_key)
     dest_keys <- assigned_keys |>
-      tidytable::select(feature_id_dest = feature_id, dest_assigned_key = adduct_state_key)
+      tidytable::select(
+        feature_id_dest = feature_id,
+        dest_assigned_key = adduct_state_key
+      )
 
     edges |>
       tidytable::mutate(
