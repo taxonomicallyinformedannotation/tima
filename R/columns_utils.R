@@ -171,6 +171,55 @@ select_structure_organism_pair_columns <- function(df) {
   )
 }
 
+#' Select loading columns for structure-organism pairs
+#' @keywords internal
+select_structure_organism_pair_loading_columns <- function(df) {
+  tidytable::select(
+    df,
+    tidyselect::any_of(
+      unique(c(
+        "inchikey",
+        "structure_inchikey",
+        "candidate_structure_inchikey",
+        "candidate_structure_inchikey_connectivity_layer",
+        grep("^candidate_structure_", names(df), value = TRUE),
+        grep("^structure_", names(df), value = TRUE),
+        grep("^organism_", names(df), value = TRUE),
+        "reference_doi",
+        "stereo_name"
+      ))
+    )
+  )
+}
+
+#' Select working columns for cluster consensus in clean_chemo
+#' @keywords internal
+select_clean_chemo_consensus_working_columns <- function(df) {
+  tidytable::select(
+    df,
+    tidyselect::any_of(unique(c(
+      ".row_id",
+      "feature_id",
+      "rank_final",
+      "candidate_adduct",
+      "candidate_structure_inchikey_connectivity_layer",
+      "candidate_structure_exact_mass",
+      "mz",
+      "score_weighted_chemo",
+      "candidate_score_similarity",
+      "candidate_score_sirius_csi",
+      "candidate_score_sirius_confidence",
+      "candidate_score_pseudo_initial",
+      "annotation_note",
+      "cluster_consensus_applied",
+      "cluster_consensus_promoted_from_anchor",
+      "cluster_consensus_group_id",
+      "cluster_consensus_anchor_feature_id",
+      "cluster_consensus_anchor_inchikey"
+    )))
+  )
+}
+
 #' Select working columns for annotation weighting
 #' @keywords internal
 select_weight_annotations_working_columns <- function(df) {

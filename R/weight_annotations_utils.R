@@ -210,13 +210,11 @@ load_annotation_tables <- function(annotations, ms1_only) {
     purrr::map2(
       .x = annotations,
       .y = seq_along(annotations),
-      .f = ~ safe_fread(
+      .f = ~ .safe_fread_selected_columns(
         file = .x,
         file_type = paste0("annotation file ", .y),
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      ) |>
-        select_weight_annotations_working_columns()
+        selector = select_weight_annotations_working_columns
+      )
     ) |>
       tidytable::bind_rows(),
     error = function(e) {
@@ -317,11 +315,10 @@ load_annotation_tables <- function(annotations, ms1_only) {
 load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
   log_debug("Loading library from: %s", library)
   library_table <- tryCatch(
-    safe_fread(
+    .safe_fread_selected_columns(
       file = library,
       file_type = "structure library",
-      na.strings = c("", "NA"),
-      colClasses = "character"
+      selector = select_structure_organism_pair_loading_columns
     ),
     error = function(e) {
       cli::cli_abort(
@@ -344,11 +341,10 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
       if (is.null(path) || !file.exists(path)) {
         return(tidytable::tidytable())
       }
-      safe_fread(
+      .safe_fread_selected_columns(
         file = path,
         file_type = name,
-        na.strings = c("", "NA"),
-        colClasses = "character"
+        selector = select_structure_organism_pair_loading_columns
       )
     }
   )
@@ -382,11 +378,10 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
 load_edges_table <- function(edges, candidates_neighbors) {
   log_debug("Loading edges from: %s", edges)
   edges_table <- tryCatch(
-    safe_fread(
+    .safe_fread_selected_columns(
       file = edges,
       file_type = "spectral edges table",
-      na.strings = c("", "NA"),
-      colClasses = "character"
+      selector = .select_edges_working_columns
     ),
     error = function(e) {
       cli::cli_abort(
@@ -417,6 +412,46 @@ load_edges_table <- function(edges, candidates_neighbors) {
     nrow(edges_table)
   )
   edges_table
+}
+
+.safe_fread_selected_columns <- function(file, file_type, selector) {
+  header <- safe_fread(
+    file = file,
+    file_type = paste0(file_type, " header"),
+    na.strings = c("", "NA"),
+    colClasses = "character",
+    nrows = 0L
+  )
+  selected <- names(selector(header))
+  if (length(selected) == 0L) {
+    return(safe_fread(
+      file = file,
+      file_type = file_type,
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    ))
+  }
+
+  safe_fread(
+    file = file,
+    file_type = file_type,
+    na.strings = c("", "NA"),
+    colClasses = "character",
+    select = selected
+  )
+}
+
+.select_edges_working_columns <- function(df) {
+  tidytable::select(
+    df,
+    tidyselect::any_of(c(
+      "feature_source",
+      "feature_target",
+      "candidate_score_similarity",
+      "feature_spectrum_entropy",
+      "feature_spectrum_peaks"
+    ))
+  )
 }
 
 #' Log Annotation Statistics
