@@ -121,6 +121,24 @@ test_that("compute_intensity_covariance_edges excludes uncorrelated features", {
   expect_true(all(result$p_value < 0.05))
 })
 
+test_that("compute_intensity_covariance_edges excludes negative correlation", {
+  ft <- tidytable::tidytable(
+    feature_id = rep(c("f1", "f2"), each = 5L),
+    sample = rep(paste0("S", 1:5), times = 2L),
+    mz = rep(c(100.0, 100.5), each = 5L),
+    rt = rep(c(1.0, 1.0), each = 5L),
+    intensity = c(10, 20, 30, 40, 50, 50, 40, 30, 20, 10)
+  ) |>
+    tidytable::mutate(
+      intensity_all = list(intensity),
+      .by = feature_id
+    )
+
+  result <- compute_intensity_covariance_edges(ft, tolerance_rt = 0.5)
+
+  expect_identical(nrow(result), 0L)
+})
+
 test_that("compute_intensity_covariance_edges respects RT window", {
   # f1 at rt=1.0, f2 at rt=5.0 — outside tolerance
   ft <- tidytable::tidytable(

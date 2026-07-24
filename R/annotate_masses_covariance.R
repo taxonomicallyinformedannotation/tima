@@ -10,12 +10,13 @@
 #'   feature_id, sample, mz, rt, and intensity columns
 #' @param tolerance_rt RT tolerance in minutes for grouping features
 #' @param correlation_p_threshold P-value threshold for Pearson correlation
-#'   (default 0.05). Only correlations with p < threshold are retained.
+#'   (default 0.05). Only correlations with p < threshold and correlation > 0
+#'   are retained.
 #'
 #' @return Data frame with columns:
 #'   - feature_id: anchor feature
 #'   - feature_id_dest: target feature
-#'   - correlation: Pearson correlation coefficient
+#'   - correlation: Pearson correlation coefficient (positive only)
 #'   - p_value: P-value from correlation test
 #'   - n_samples: Number of sample pairs used
 #'   - source: "intensity_covariance" (for consistency with other edge types)
@@ -184,6 +185,7 @@ compute_intensity_covariance_edges <- function(
   n_not_in_matrix <- 0L
   n_insufficient_samples <- 0L
   n_correlation_failed <- 0L
+  n_non_positive <- 0L
   n_not_significant <- 0L
 
   compute_pair_correlations <- function(pair_row) {
@@ -241,6 +243,11 @@ compute_intensity_covariance_edges <- function(
       return(NULL)
     }
 
+    if (cor_result$correlation <= 0) {
+      n_non_positive <<- n_non_positive + 1L
+      return(NULL)
+    }
+
     if (cor_result$p_value < correlation_p_threshold) {
       tidytable::tidytable(
         feature_id = feat_id,
@@ -270,13 +277,14 @@ compute_intensity_covariance_edges <- function(
 
   if (length(results_list) == 0L) {
     log_info(
-      "Intensity co-variance: tested %d pair(s), %d significant edge(s) retained (p < %.2f). Dropped: %d not in matrix, %d insufficient samples, %d correlation failed, %d p >= %.2f",
+      "Intensity co-variance: tested %d pair(s), %d significant edge(s) retained (p < %.2f). Dropped: %d not in matrix, %d insufficient samples, %d correlation failed, %d non-positive, %d p >= %.2f",
       n_pairs_tested,
       n_significant,
       correlation_p_threshold,
       n_not_in_matrix,
       n_insufficient_samples,
       n_correlation_failed,
+      n_non_positive,
       n_not_significant,
       correlation_p_threshold
     )
@@ -294,7 +302,7 @@ compute_intensity_covariance_edges <- function(
     tidytable::mutate(source = "intensity_covariance")
 
   log_info(
-    "Intensity co-variance: tested %d pair(s), retained %d significant edge(s) (p < %.2f); r in [%.2f, %.2f], median r = %.2f. Dropped: %d not in matrix, %d insufficient samples, %d correlation failed, %d p >= %.2f",
+    "Intensity co-variance: tested %d pair(s), retained %d significant edge(s) (p < %.2f); r in [%.2f, %.2f], median r = %.2f. Dropped: %d not in matrix, %d insufficient samples, %d correlation failed, %d non-positive, %d p >= %.2f",
     n_pairs_tested,
     nrow(result),
     correlation_p_threshold,
@@ -304,6 +312,7 @@ compute_intensity_covariance_edges <- function(
     n_not_in_matrix,
     n_insufficient_samples,
     n_correlation_failed,
+    n_non_positive,
     n_not_significant,
     correlation_p_threshold
   )
