@@ -15,7 +15,6 @@ Data frame with columns:
 - candidate_structure_inchikey_connectivity_layer
 - score_chemical
 - score_weighted_chemo
-- score_weighted_chemo_coverage
 }
 \description{
 Extracts only the narrow scoring columns from the full

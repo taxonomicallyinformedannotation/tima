@@ -62,7 +62,7 @@ test_that("compute_weighted_sum rejects invalid inputs", {
   )
 })
 
-test_that("compute_weighted_sum returns the weighted average for partial coverage", {
+test_that("compute_weighted_sum treats missing evidence as zero", {
   v1 <- c(0.8, NA, 0.9) # biological score
   v2 <- c(0.5, 0.6, NA) # initial/spectral score
   w <- c(0.4, 0.6)
@@ -70,18 +70,18 @@ test_that("compute_weighted_sum returns the weighted average for partial coverag
   result <- compute_weighted_sum(v1, v2, weights = w)
 
   expect_equal(result[1], (0.8 * 0.4 + 0.5 * 0.6) / (0.4 + 0.6))
-  expect_equal(result[2], 0.6)
-  expect_equal(result[3], 0.9)
+  expect_equal(result[2], 0.36)
+  expect_equal(result[3], 0.36)
 })
 
-test_that("compute_weighted_sum returns NA for all-NA rows", {
+test_that("compute_weighted_sum returns zero for all-NA rows", {
   v1 <- c(NA, 0.8)
   v2 <- c(NA, 0.6)
   w <- c(0.5, 0.5)
 
   result <- compute_weighted_sum(v1, v2, weights = w)
 
-  expect_true(is.na(result[1]))
+  expect_equal(result[1], 0)
   expect_equal(result[2], (0.8 * 0.5 + 0.6 * 0.5) / (0.5 + 0.5))
 })
 
@@ -91,7 +91,7 @@ test_that("compute_weighted_sum returns NA when all weights are zero", {
   expect_true(all(is.na(result)))
 })
 
-test_that("compute_weighted_sum exposes coverage separately for MS1-only hits", {
+test_that("compute_weighted_sum does not expose coverage anymore", {
   bio_score <- c(0.9, 0.9, 0.9) # same bio score
   initial_score <- c(0.9, NA, NA) # MS1-only have NA
 
@@ -102,9 +102,9 @@ test_that("compute_weighted_sum exposes coverage separately for MS1-only hits", 
   )
 
   expect_equal(components$score[1], 0.9)
-  expect_equal(components$score[2], 0.9)
-  expect_equal(components$score[3], 0.9)
-  expect_equal(components$coverage, c(1, 0.5, 0.5))
+  expect_equal(components$score[2], 0.45)
+  expect_equal(components$score[3], 0.45)
+  expect_true(all(is.na(components$coverage)))
 })
 
 test_that("compute_weighted_sum with unequal weights and NA", {
@@ -120,7 +120,7 @@ test_that("compute_weighted_sum with unequal weights and NA", {
   )
 
   expect_equal(result[1], (0.8 * 0.6 + 0.6 * 0.4) / 1.0)
-  expect_equal(result[2], 0.7)
+  expect_equal(result[2], 0.28)
 })
 
 test_that("compute_weighted_sum real-world MS1 scenario", {
@@ -139,21 +139,19 @@ test_that("compute_weighted_sum real-world MS1 scenario", {
   # Candidate 1: full evidence -> (0.85+0.70)/2 = 0.775
   expect_equal(result[1], 0.775)
 
-  expect_equal(result[2], 0.75)
-  expect_equal(result[3], 0.95)
+  expect_equal(result[2], 0.375)
+  expect_equal(result[3], 0.475)
 
   # No NAs (each row has at least one non-NA component)
   expect_true(!anyNA(result))
 
-  # Coverage is tracked separately and can be used as a tie-break / secondary signal.
-  expect_equal(
+  expect_true(all(is.na(
     compute_weighted_components(
       bio_scores,
       initial_scores,
       weights = c(w_bio, w_spec)
-    )$coverage,
-    c(1, 0.5, 0.5)
-  )
+    )$coverage
+  )))
 })
 
 test_that("compute_weighted_components rejects invalid inputs", {

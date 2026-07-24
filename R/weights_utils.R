@@ -4,9 +4,9 @@
 #'     separate arguments).
 #' @param weights [numeric] Numeric vector of non-negative weights (one per
 #'     component).
-#' @return List with `score` (weighted average over present evidence) and
-#'     `coverage` (fraction of total weight supported by non-missing evidence).
-#'     Rows where all components are NA return NA.
+#' @return List with `score` (weighted average over all components, treating
+#'     missing values as 0) and `coverage` (unused; returned as `NA`).
+#'     Rows where all weights are zero return NA.
 #' @keywords internal
 compute_weighted_components <- function(..., weights) {
   values <- list(...)
@@ -61,10 +61,8 @@ compute_weighted_components <- function(..., weights) {
   values_matrix[is.na(values_matrix)] <- 0
 
   # Simple weighted sum divided by total weight
-  score <- as.numeric(values_matrix %*% weights)
-  score <- score / weight_sum
-
-  coverage <- NA_real_ # Not used anymore
+  score <- as.numeric(values_matrix %*% weights) / weight_sum
+  coverage <- rep(NA_real_, length(score))
 
   list(score = score, coverage = coverage)
 }

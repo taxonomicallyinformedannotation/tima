@@ -14,9 +14,9 @@ separate arguments).}
 component).}
 }
 \value{
-List with \code{score} (weighted average over present evidence) and
-\code{coverage} (fraction of total weight supported by non-missing evidence).
-Rows where all components are NA return NA.
+List with \code{score} (weighted average over all components, treating
+missing values as 0) and \code{coverage} (unused; returned as \code{NA}).
+Rows where all weights are zero return NA.
 }
 \description{
 Compute evidence-aware weighted sum (row-wise for data frames)

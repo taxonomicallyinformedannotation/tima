@@ -308,6 +308,18 @@ rank_and_deduplicate <- function(df) {
   #   - Combines all evidence into ONE clear score
   #   - Mathematically sound: highest combined score = best candidate
 
+  # Handle empty input
+  if (nrow(df) == 0L) {
+    df <- tidytable::as_tidytable(df)
+    if (!("rank_initial" %in% names(df))) {
+      df$rank_initial <- integer()
+    }
+    if (!("rank_final" %in% names(df))) {
+      df$rank_final <- integer()
+    }
+    return(df)
+  }
+
   # === Coerce all score columns to numeric ===
   score_cols <- c(
     "score_final",
@@ -329,7 +341,7 @@ rank_and_deduplicate <- function(df) {
 
   # Ensure match mode is character
   if (!("candidate_adduct_match_mode" %in% names(df))) {
-    df[["candidate_adduct_match_mode"]] <- NA_character_
+    df[["candidate_adduct_match_mode"]] <- rep(NA_character_, nrow(df))
   }
 
   df <- tidytable::as_tidytable(df)
@@ -347,6 +359,11 @@ rank_and_deduplicate <- function(df) {
       feature_id,
       candidate_structure_inchikey_connectivity_layer,
       rank_initial
+    ) |>
+    tidytable::distinct(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer,
+      .keep_all = TRUE
     )
 
   # === Compute rank_final (combined evidence ranking) ===
@@ -354,15 +371,20 @@ rank_and_deduplicate <- function(df) {
   # This is what determines which candidates are "best"
   df_ranked_final <- rank_candidates(as.data.frame(df))
 
-  # Extract rank_final for joining
+  # Extract rank_final for joining (deduplicate first)
   df_final <- tidytable::as_tidytable(df_ranked_final) |>
     tidytable::select(
       feature_id,
       candidate_structure_inchikey_connectivity_layer,
       rank_final
+    ) |>
+    tidytable::distinct(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer,
+      .keep_all = TRUE
     )
 
-  # === Join both ranks back to original data ===
+  # === Join both ranks back to original data and deduplicate ===
   df_result <- df |>
     tidytable::left_join(
       df_initial,
@@ -371,6 +393,11 @@ rank_and_deduplicate <- function(df) {
     tidytable::left_join(
       df_final,
       by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
+    ) |>
+    tidytable::distinct(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer,
+      .keep_all = TRUE
     )
 
   df_result

@@ -223,19 +223,18 @@ test_that("summarize=TRUE preserves the best-ranked values per feature", {
   expect_equal(ft1$score_weighted_chemo[[1L]], 0.6)
 })
 
-test_that("summarize=TRUE breaks score ties with coverage", {
+test_that("summarize=TRUE breaks score ties with initial score", {
   d <- make_sop_df(n_features = 1L, n_cand = 2L)
   d$df <- d$df |>
     tidytable::mutate(
       rank_final = c(1L, 1L),
-      candidate_score_pseudo_initial = c(0.2, 0.2),
+      candidate_score_pseudo_initial = c(0.2, 0.9),
       score_weighted_chemo = c(0.8, 0.8),
-      score_weighted_chemo_coverage = c(0.5, 1.0)
     )
 
   out <- call_sr(d, summarize = TRUE)
   expect_equal(nrow(out), 1L)
-  expect_equal(out$score_weighted_chemo_coverage[[1L]], 1.0)
+  expect_equal(out$score_initial[[1L]], 0.9)
 })
 
 test_that("count_annotated_features uses the full feature table as denominator", {

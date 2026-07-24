@@ -14,9 +14,6 @@
 #'     Range: 0-1
 #' @param score_final_min Numeric minimum final (chemical) score threshold
 #'     (default: 0.75). Range: 0-1
-#' @param score_final_coverage_min Numeric minimum coverage required when the
-#'     weighted final score is used to pass the filter (default: 0.67). Range:
-#'     0-1. NA coverage is allowed when the column is absent.
 #' @param error_rt_max Numeric maximum retention time error in minutes (default:
 #'     0.05). Must be > 0
 #' @param confidence_sirius_min Numeric minimum SIRIUS confidence score
@@ -140,13 +137,6 @@ filter_high_evidence_only <- function(
     min_value = 0,
     max_value = 1
   )
-  validate_numeric_range(
-    score_final_coverage_min,
-    param_name = "score_final_coverage_min",
-    min_value = 0,
-    max_value = 1
-  )
-
   if (
     !is.numeric(error_rt_max) ||
       length(error_rt_max) != 1L ||
@@ -301,6 +291,7 @@ filter_high_evidence_only <- function(
   # NA values for initial score indicate MS1-only hits (no MS2 spectrum) and
   # don't block other scores
   # Score = 0 is invalid/missing data and is filtered out
+
   df_filtered <- df_work |>
     tidytable::filter(
       (.score_bio >= score_bio_min) |

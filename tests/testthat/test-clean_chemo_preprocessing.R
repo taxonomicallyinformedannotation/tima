@@ -97,17 +97,13 @@ test_that("rank_and_deduplicate breaks score ties with deterministic tie-breaker
     feature_id = c("F1", "F1"),
     candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
     score_weighted_chemo = c(0.8, 0.8),
-    score_weighted_chemo_coverage = c(1, 1),
     candidate_score_pseudo_initial = c(0.4, 0.7),
     candidate_score_similarity = c(0.5, 0.6)
   )
 
   ranked <- rank_and_deduplicate(df)
 
-  # Under evidence-first policy: effective_score = score_weighted_chemo * (0.5 + 0.5 * coverage)
-  # Both have effective_score = 0.8 * (0.5 + 0.5*1) = 0.8 → TIE on effective_score
-  # The only tie-breaker is cluster_consensus_promoted_from_anchor (not present)
-  # So both should share rank 1 (dense rank)
+  # Equal scores share rank 1 (dense rank).
   expect_equal(
     ranked$rank_final[
       ranked$candidate_structure_inchikey_connectivity_layer == "IK2"
@@ -139,12 +135,11 @@ test_that("rank_and_deduplicate breaks score ties with deterministic tie-breaker
   )
 })
 
-test_that("rank_and_deduplicate blends coverage into the effective ranking score", {
+test_that("rank_and_deduplicate ranks by score without coverage", {
   df <- tidytable::tidytable(
     feature_id = c("F1", "F1"),
     candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
     score_weighted_chemo = c(0.9, 0.89),
-    score_weighted_chemo_coverage = c(0.3, 0.75),
     candidate_score_pseudo_initial = c(0.4, 0.4),
     candidate_score_similarity = c(0.6, 0.6)
   )
@@ -155,13 +150,13 @@ test_that("rank_and_deduplicate blends coverage into the effective ranking score
     ranked$rank_final[
       ranked$candidate_structure_inchikey_connectivity_layer == "IK2"
     ],
-    1L
+    2L
   )
   expect_equal(
     ranked$rank_final[
       ranked$candidate_structure_inchikey_connectivity_layer == "IK1"
     ],
-    2L
+    1L
   )
 })
 
@@ -170,7 +165,6 @@ test_that("rank_and_deduplicate shares ranks for identical ranking signatures", 
     feature_id = c("F1", "F1"),
     candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
     score_weighted_chemo = c(0.8, 0.8),
-    score_weighted_chemo_coverage = c(0.5, 0.5),
     candidate_score_pseudo_initial = c(0.4, 0.4),
     candidate_score_similarity = c(0.6, 0.6)
   )
