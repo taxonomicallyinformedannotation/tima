@@ -10,7 +10,6 @@ filter_high_evidence_only(
   score_bio_min = DEFAULT_HE_SCORE_BIO_MIN,
   score_ini_min = DEFAULT_HE_SCORE_INITIAL_MIN,
   score_final_min = DEFAULT_HE_SCORE_FINAL_MIN,
-  score_final_coverage_min = DEFAULT_HE_SCORE_FINAL_COVERAGE_MIN,
   error_rt_max = DEFAULT_HE_MAX_RT_ERROR_MIN,
   confidence_sirius_min = DEFAULT_HE_SCORE_SIRIUS_MIN,
   similarity_spectral_min = DEFAULT_HE_SCORE_SPECTRAL_MIN,
