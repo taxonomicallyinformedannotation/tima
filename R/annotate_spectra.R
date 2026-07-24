@@ -316,13 +316,21 @@ annotate_spectra <- function(
     lib_precursors_all <- get_precursors(spectral_library)
   }
   lib_adducts_all <- attr(sim_raw, "lib_adducts_raw")
+  target_ids <- unique(sim_raw$target_id)
+  spectral_library_hits <- spectral_library[target_ids]
+  lib_precursors_hits <- lib_precursors_all[target_ids]
+  lib_adducts_hits <- if (!is.null(lib_adducts_all)) {
+    lib_adducts_all[target_ids]
+  } else {
+    NULL
+  }
 
   meta <- build_library_metadata(
-    spectral_library,
-    lib_precursors_all,
-    target_adduct_raw = lib_adducts_all
-  ) |>
-    tidytable::filter(target_id %in% unique(sim_raw$target_id))
+    spectral_library_hits,
+    lib_precursors_hits,
+    target_ids = target_ids,
+    target_adduct_raw = lib_adducts_hits
+  )
 
   # spectral_library and query_sp (with their peak-data backends -- the S4
   # objects holding many small per-spectrum matrices) are done being read
@@ -331,7 +339,16 @@ annotate_spectra <- function(
   # mid-pipeline collection: it targets the *input* Spectra backends, which
   # generational GC is slow to reclaim on its own (many small S4-backed
   # allocations rather than one big block).
-  rm(spectral_library, query_sp, lib_precursors_all)
+  rm(
+    spectral_library,
+    spectral_library_hits,
+    query_sp,
+    lib_precursors_all,
+    lib_precursors_hits,
+    lib_adducts_all,
+    lib_adducts_hits,
+    target_ids
+  )
 
   df_final <- finalize_results(
     df_sim = tidytable::as_tidytable(x = sim_raw),
@@ -605,11 +622,12 @@ extract_vector <- function(obj, field, len, fill = NA) {
 build_library_metadata <- function(
   lib_sp,
   lib_precursors,
+  target_ids = seq_len(length(lib_sp)),
   target_adduct_raw = NULL
 ) {
-  n <- length(lib_sp)
+  n <- length(target_ids)
   out <- tidytable::tidytable(
-    target_id = seq_len(n),
+    target_id = target_ids,
     # Reuse a pre-extracted raw adduct vector when the caller already has
     # one (compute_similarity_safe() has to extract this same column for
     # its own neutral-mass rescue logic) -- skips a second full pass over
