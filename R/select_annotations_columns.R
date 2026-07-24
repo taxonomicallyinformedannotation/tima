@@ -116,14 +116,20 @@ select_annotations_columns <- function(
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::where(fn = is.numeric),
       .fns = as.character
-    )) |>
-    # Complement with structure metadata
-    complement_metadata_structures(
-      str_stereo = str_stereo,
-      str_met = str_met,
-      str_tax_cla = str_tax_cla,
-      str_tax_npc = str_tax_npc
-    ) |>
+    ))
+
+  df_complement <- complement_metadata_structures(
+    df = select_annotations_complement_working_columns(df),
+    str_stereo = str_stereo,
+    str_met = str_met,
+    str_tax_cla = str_tax_cla,
+    str_tax_npc = str_tax_npc
+  )
+  for (col in names(df_complement)) {
+    df[[col]] <- df_complement[[col]]
+  }
+
+  df <- df |>
     tidytable::select(
       tidyselect::any_of(x = projection_columns)
     )

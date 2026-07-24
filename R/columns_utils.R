@@ -238,6 +238,22 @@ select_weight_annotations_working_columns <- function(df) {
   )
 }
 
+#' Select working columns for annotation complementation
+#' @keywords internal
+select_annotations_complement_working_columns <- function(df) {
+  model <- columns_model()
+  tidytable::select(
+    df,
+    tidyselect::any_of(
+      unique(c(
+        "feature_id",
+        "candidate_structure_smiles_no_stereo",
+        model$candidates_structures_columns
+      ))
+    )
+  )
+}
+
 #' @title Collapse and clean grouped data
 #'
 #' @description Collapses grouped dataframe by combining unique values per
