@@ -1649,7 +1649,9 @@ discover_annotate_masses_edge_sets <- function(
   )
 
   # Drop intensity_all now that covariance is done (no longer needed for annotation)
-  features_table$intensity_all <- NULL
+  if ("intensity_all" %in% names(features_table)) {
+    features_table$intensity_all <- NULL
+  }
 
   # NOTE: Covariance edges are NOT added to adduct_edges_combined because they lack
   # adduct/adduct_dest columns. They're returned separately and added to output at the final stage.

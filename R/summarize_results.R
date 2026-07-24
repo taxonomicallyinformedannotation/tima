@@ -528,9 +528,9 @@ summarize_results <- function(
 
   # Build a much smaller long table by filtering each taxonomy rank against the
   # candidate occurrence values first, instead of pivoting the full SOP table.
-  sop_long <- purrr::map_dfr(
-    .x = taxonomy_cols,
-    .f = function(col) {
+  sop_long_list <- lapply(
+    X = taxonomy_cols,
+    FUN = function(col) {
       tbl <- sop_narrow |>
         tidytable::select(
           tidyselect::any_of(c(inchikey_col, "reference_doi", col))
@@ -558,6 +558,7 @@ summarize_results <- function(
         tidytable::distinct()
     }
   )
+  sop_long <- tidytable::bind_rows(sop_long_list)
 
   if (nrow(sop_long) == 0L) {
     return(empty_lookup())
