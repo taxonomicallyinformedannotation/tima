@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-b1779ffe01d28c8b49d3f1aef2cb2115.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-814551ed8da173b934be02585ff3c2fc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -696,8 +696,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="internal-performance" class="level2">
 <h2 class="anchored" data-anchor-id="internal-performance">Internal / performance</h2>
 <ul>
-<li><p><strong>Candidate ranking now uses evidence coverage directly</strong> in <code>clean_chemo()</code> and related ranking steps. The effective ranking score is computed as a conservative shrinkage of the raw weighted score by coverage, so a candidate with a slightly lower raw weighted score but substantially better coverage can outrank a candidate with a higher raw score but weak coverage.</p></li>
-<li><p><strong>MS1 adduct annotation improvements</strong> in <code>annotate_masses()</code>:</p>
+<li><strong>MS1 adduct annotation improvements</strong> in <code>annotate_masses()</code>:
 <ul>
 <li>Enforced tier-aware minimum support thresholds in evidence discovery: exotic adducts (tier 3+) now require stronger peer evidence (≥2 independent supporting neighbors) while common adducts (tier ≤1) are always inferred</li>
 <li>Added hybrid evidence recovery fallback: when library exact-mass anchoring is restrictive, supplemental evidence pass recovers supported adduct hypotheses for previously unanchored features, improving coverage without sacrificing specificity</li>
@@ -708,37 +707,38 @@ ul.task-list li input[type="checkbox"] {
 <li>Added bidirectional cluster and neutral-loss propagation to mirror cluster propagation</li>
 <li>Reworked cluster-vs-loss ambiguity resolution to use hypothesis-level scoring (with neighboring-edge fallback tie-breaks) and added compact audit logging of resolved vs unresolved ambiguous modifier pairs</li>
 <li>Added assignment-aware modifier-edge pruning so outdated cluster/loss links are removed when they contradict assigned adduct states, while retaining explicitly tagged contaminant edges</li>
+<li><strong>Intensity co-variance edge discovery</strong> (new network-integrated approach): Replaces the previous hard-filter validation with a scientifically sounder approach that leverages the adduct network itself. For each feature, all m/z pairs within the RT window are assessed via Pearson correlation of their intensities across samples (p &lt; 0.05). Edges with statistically significant correlations enter the network alongside rule-based edges (adducts, clusters, losses), and the network consensus process determines which edges are valid (same M) vs.&nbsp;noise (different compounds). This enables discovery of novel adduct patterns not in the rules and naturally filters uncorrelated (spurious) pairs through network topology rather than arbitrary thresholds.</li>
 </ul></li>
-<li><p><strong>Adduct canonicalization alignment</strong>:</p>
+<li><strong>Adduct canonicalization alignment</strong>:
 <ul>
 <li>Unified canonical adduct string ordering across structured universe generation (<code>adduct_to_string()</code>) and text harmonization (<code>canonicalize_adduct_notation()</code>)</li>
 <li>Canonical order is now chemically consistent and deterministic: negative terms first (losses / deprotonations), then neutral cluster additions, then positive charge carriers</li>
 <li>Updated regression tests to use canonical forms (e.g., <code>[M-H2O+H]+</code>, <code>[M+H2O+H]+</code>, <code>[M+NaCl+K]+</code>)</li>
 <li>Improved ammonium/loss semantic reduction in harmonization (e.g., <code>[M-H5NO+H4N]+ -&gt; [M-H2O+H]+</code>, <code>[M-H3N+C2H7N+H4N]+ -&gt; [M+C2H7N+H]+</code>) to reduce duplicated/over-complex carrier notation</li>
 </ul></li>
-<li><p><strong>Electron-mass correctness in legacy neutral-mass math</strong>:</p>
+<li><strong>Electron-mass correctness in legacy neutral-mass math</strong>:
 <ul>
 <li><code>calculate_mass_of_m()</code>, <code>calculate_mz_from_mass()</code>, and <code>calculate_mass_of_m_batch()</code> now apply signed electron-mass correction (<code>z * m_e</code>) consistently</li>
 <li>Legacy inversion/forward formulas are now physically aligned with typed-universe mass arithmetic</li>
 <li>Consolidated electron-mass precision to a single CODATA 2018 value (<code>ELECTRON_MASS_DALTONS = 0.000548579909065</code>) and reused it as <code>ELECTRON_MASS_DA</code></li>
 </ul></li>
-<li><p><strong>Metadata enrichment cache robustness</strong>:</p>
+<li><strong>Metadata enrichment cache robustness</strong>:
 <ul>
 <li><code>complement_metadata_structures()</code> reference cache now keys on both file path and file modification time, preventing stale cache reuse when temporary/updated reference files are rewritten during the same R session</li>
 <li>Stereo required-column validation now occurs at reference-load time before cache insertion</li>
 </ul></li>
-<li><p><strong>Cross-stage adduct coupling (MS1 ↔︎ MS2 ↔︎ reranking)</strong>:</p>
+<li><strong>Cross-stage adduct coupling (MS1 ↔︎ MS2 ↔︎ reranking)</strong>:
 <ul>
 <li>Reinforced the bridge from MS1 adduct attribution to spectral annotation matching and final candidate reranking</li>
 <li>Final percentile filtering now preserves rank-1/consensus-promoted entities, so cluster-consensus adduct attribution decisions are not lost when raw chemical scores are lower</li>
 <li>This keeps adduct-consistent entities available for downstream spectral agreement and final ranking outputs</li>
 </ul></li>
-<li><p><strong>Weighted ranking semantics</strong>:</p>
+<li><strong>Weighted ranking semantics</strong>:
 <ul>
 <li>Separated raw weighted evidence from coverage in the annotation scoring helpers, so <code>score_weighted_*</code> remains the primary ranking signal</li>
 <li>Coverage is now emitted separately and used as a secondary confidence/tie- break signal, which prevents sparse candidates from outranking better- supported candidates solely because missing dimensions were discounted into the score</li>
 </ul></li>
-<li><p><strong>High-evidence filtering</strong>:</p>
+<li><strong>High-evidence filtering</strong>:
 <ul>
 <li><code>filter_high_evidence_only()</code> now requires sufficient coverage for rows that pass via the weighted final score, so sparse candidates do not qualify as high evidence on score alone</li>
 </ul></li>
