@@ -536,19 +536,24 @@ summarize_results <- function(
           tidyselect::any_of(c(inchikey_col, "reference_doi", col))
         ) |>
         tidytable::rename(
-          candidate_structure_organism_occurrence_closest = tidyselect::all_of(col)
+          candidate_structure_organism_occurrence_closest = tidyselect::all_of(
+            col
+          )
         )
       if (inchikey_col != "candidate_structure_inchikey_connectivity_layer") {
         tbl <- tbl |>
           tidytable::rename(
-            candidate_structure_inchikey_connectivity_layer = tidyselect::all_of(inchikey_col)
+            candidate_structure_inchikey_connectivity_layer = tidyselect::all_of(
+              inchikey_col
+            )
           )
       }
       tbl |>
         tidytable::filter(
           !is.na(candidate_structure_organism_occurrence_closest),
           candidate_structure_organism_occurrence_closest != "NA",
-          candidate_structure_organism_occurrence_closest %in% candidate_occurrences
+          candidate_structure_organism_occurrence_closest %in%
+            candidate_occurrences
         ) |>
         tidytable::distinct()
     }
