@@ -46,8 +46,8 @@ jobs:
           && sudo rm -rf /var/lib/apt/lists/*
           mkdir -p ~/.R
           cat >> ~/.R/Makevars <<EOF
-          CFLAGS   += -march=native -mtune=native -g -O3 -flto=auto -fopenmp -fno-math-errno -funsafe-math-optimizations -ffp-contract=fast -DNDEBUG
-          CXXFLAGS += -march=native -mtune=native -g -O3 -flto=auto -fopenmp -fno-math-errno -funsafe-math-optimizations -ffp-contract=fast -DNDEBUG
+          CFLAGS   += -march=native -mtune=native -g -O3 -flto=auto -fopenmp -ffp-contract=fast -DNDEBUG
+          CXXFLAGS += -march=native -mtune=native -g -O3 -flto=auto -fopenmp -ffp-contract=fast -DNDEBUG
           LDFLAGS  += -flto=auto -fopenmp
           EOF
       - name: Install dependencies (macOS)
@@ -63,8 +63,8 @@ jobs:
             ARCH_FLAGS="-march=native -mtune=native"
           fi
           cat >> ~/.R/Makevars <<EOF
-          CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=thin -fno-math-errno -funsafe-math-optimizations -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include
-          CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=thin -fno-math-errno -funsafe-math-optimizations -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include
+          CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include
+          CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include
           CPPFLAGS += -I/opt/homebrew/include
           LDFLAGS  += -flto=thin -L/opt/homebrew/lib -L$(brew --prefix libomp)/lib -lomp
           EOF
@@ -73,8 +73,8 @@ jobs:
         run: |
           mkdir -p ~/.R
           cat >> ~/.R/Makevars.win <<EOF
-          CFLAGS   += -march=native -mtune=native -g -O3 -flto -fopenmp -fno-math-errno -funsafe-math-optimizations -DNDEBUG
-          CXXFLAGS += -march=native -mtune=native -g -O3 -flto -fopenmp -fno-math-errno -funsafe-math-optimizations -DNDEBUG
+          CFLAGS   += -march=native -mtune=native -g -O3 -flto -fopenmp -DNDEBUG
+          CXXFLAGS += -march=native -mtune=native -g -O3 -flto -fopenmp -DNDEBUG
           LDFLAGS  += -flto -fopenmp
           EOF
         shell: bash
