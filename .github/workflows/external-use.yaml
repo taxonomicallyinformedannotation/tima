@@ -21,7 +21,9 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
+          - ubuntu-26.04-arm
           - macos-latest
+          - macos-26-intel
           - windows-latest
     defaults:
       run:
@@ -38,30 +40,41 @@ jobs:
           update-rtools: true
           Ncpus: ${{ steps.cpu-cores.outputs.count }}
       - name: Install dependencies (Linux)
-        if: matrix.os == 'ubuntu-latest'
+        if: contains(matrix.os, 'ubuntu')
         run: |
           sudo apt-get update && sudo apt-get install -y --no-install-recommends \
           libarchive-dev libcurl4-openssl-dev libfribidi-dev libharfbuzz-dev libuv1-dev \
           && sudo apt-get clean \
           && sudo rm -rf /var/lib/apt/lists/*
           mkdir -p ~/.R
+          case "$(uname -m)" in
+            arm64|aarch64)
+              ARCH_FLAGS="-mcpu=native"
+              ;;
+            *)
+              ARCH_FLAGS="-march=native -mtune=native"
+              ;;
+          esac
           cat >> ~/.R/Makevars <<EOF
-          CFLAGS   += -march=native -mtune=native -g -O3 -flto=auto -fopenmp -ffp-contract=fast -DNDEBUG
-          CXXFLAGS += -march=native -mtune=native -g -O3 -flto=auto -fopenmp -ffp-contract=fast -DNDEBUG
+          CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=auto -fopenmp -ffp-contract=fast -DNDEBUG
+          CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=auto -fopenmp -ffp-contract=fast -DNDEBUG
           LDFLAGS  += -flto=auto -fopenmp
           EOF
       - name: Install dependencies (macOS)
-        if: matrix.os == 'macos-latest'
+        if: contains(matrix.os, 'macos')
         run: |
           brew update
           brew install libomp
           mkdir -p ~/.R
           # Detect architecture for correct optimization flags
-          if [[ $(uname -m) == "arm64" ]]; then
-            ARCH_FLAGS="-mcpu=native"
-          else
-            ARCH_FLAGS="-march=native -mtune=native"
-          fi
+          case "$(uname -m)" in
+            arm64|aarch64)
+              ARCH_FLAGS="-mcpu=native"
+              ;;
+            *)
+              ARCH_FLAGS="-march=native -mtune=native"
+              ;;
+          esac
           cat >> ~/.R/Makevars <<EOF
           CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include
           CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include
@@ -69,7 +82,7 @@ jobs:
           LDFLAGS  += -flto=thin -L/opt/homebrew/lib -L$(brew --prefix libomp)/lib -lomp
           EOF
       - name: Install dependencies (Windows)
-        if: matrix.os == 'windows-latest'
+        if: contains(matrix.os, 'windows')
         run: |
           mkdir -p ~/.R
           cat >> ~/.R/Makevars.win <<EOF
