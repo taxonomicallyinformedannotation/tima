@@ -1,13 +1,12 @@
 #' @title Clean Chemical Annotations
 #'
 #' @description Cleans and filters chemically weighted annotation results
-#'     through
-#' a multi-tier pipeline. Applies MS1 score thresholds, percentile filtering,
-#' ranking, and optional high-evidence filtering. Ranking is coverage-aware so
-#' higher-evidence candidates are preferred, and optional cluster-consensus
-#' promotion can retain plausible siblings when they are the best coherent
-#' choices. Returns three-tier output: full (comprehensive), filtered (top
-#' candidates), and mini (one row per feature).
+#'     through a multi-tier pipeline. Applies MS1 score thresholds, percentile
+#'     filtering, ranking, and optional high-evidence filtering. Ranking is
+#'     score-based, and optional cluster-consensus promotion can retain
+#'     plausible siblings when they are the best coherent choices. Returns
+#'     three-tier output: full (comprehensive), filtered (top candidates), and
+#'     mini (one row per feature).
 #'
 #' @include add_xrefs_to_annotations.R
 #' @include calculate_mass_of_m.R
