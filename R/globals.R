@@ -169,6 +169,7 @@ utils::globalVariables(
     "aggregate",
     "annotation_level",
     "annotation_note",
+    "annotation_note_lookup",
     "any_structure",
     "assay_id",
     "assigned_state_key",

@@ -537,7 +537,8 @@ sample_candidates_per_group <- function(
         ".n_per_score",
         "n_per_score",
         ".anchor_match",
-        ".candidate_M"
+        ".candidate_M",
+        ".note_present"
       ))
     ) |>
     (function(.tbl) {
@@ -549,6 +550,8 @@ sample_candidates_per_group <- function(
       if (!"annotation_note" %in% names(.tbl)) {
         .tbl$annotation_note <- NA_character_
       }
+      .tbl$.note_present <- !is.na(.tbl$annotation_note) &
+        nzchar(trimws(as.character(.tbl$annotation_note)))
       .tbl |>
         tidytable::mutate(
           cluster_consensus_promoted_from_anchor = tidytable::coalesce(
@@ -565,6 +568,13 @@ sample_candidates_per_group <- function(
           if (
             "candidate_structure_inchikey_connectivity_layer" %in% names(.tbl)
           ) {
+            .tbl <- .tbl |>
+              tidytable::arrange(
+                feature_id,
+                candidate_adduct,
+                rank_final,
+                tidytable::desc(.note_present)
+              )
             core_cols <- c(
               "feature_id",
               "candidate_adduct",
@@ -1502,12 +1512,10 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     )
   }
 
-  # For each feature in the consensus group, carry forward the anchor metadata.
-  # Features whose current rank-1 candidate differs from the consensus anchor
-  # need their rows reordered so the anchor candidate becomes rank 1. Features
-  # that already have the anchor at rank 1 need provenance only.
-  df_with_anchor <- df_with_comp |>
-    tidytable::left_join(
+  # Only materialize rows that actually match an anchor; the previous full
+  # left_join duplicated the whole candidate table.
+  df_anchor_candidates <- df_with_comp |>
+    tidytable::inner_join(
       y = anchor_lookup,
       by = c("component_id", ".candidate_M_key")
     ) |>
@@ -1517,13 +1525,13 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
       .is_anchor_feature = feature_id == .anchor_feature_id
     )
 
-  features_with_anchor <- df_with_anchor |>
+  features_with_anchor <- df_anchor_candidates |>
     tidytable::filter(.has_anchor_ik) |>
     tidytable::distinct(feature_id, component_id, .candidate_M_key)
 
   if (nrow(features_with_anchor) > 0L) {
-    has_annotation_note <- "annotation_note" %in% names(df_with_anchor)
-    df_part_reorder <- df_with_anchor |>
+    has_annotation_note <- "annotation_note" %in% names(df_anchor_candidates)
+    df_part_reorder <- df_anchor_candidates |>
       tidytable::inner_join(
         y = features_with_anchor,
         by = c("feature_id", "component_id", ".candidate_M_key")

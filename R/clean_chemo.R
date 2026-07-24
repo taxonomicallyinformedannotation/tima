@@ -275,6 +275,11 @@ clean_chemo <- function(
     ) |>
     tidytable::left_join(y = results_candidates)
 
+  results_filtered <- .restore_annotation_notes(
+    results = results_filtered,
+    annotation_notes_lookup = annotation_notes_lookup
+  )
+
   # Only set candidates_best if the inchikey column exists
   if (
     "candidate_structure_inchikey_connectivity_layer" %in%
@@ -337,6 +342,10 @@ clean_chemo <- function(
       annotation_notes_lookup = annotation_notes_lookup
     ) |>
     tidytable::left_join(y = results_candidates)
+  results_full <- .restore_annotation_notes(
+    results = results_full,
+    annotation_notes_lookup = annotation_notes_lookup
+  )
   rm(annot_table_wei_chemo, annotation_notes_lookup, results_candidates)
 
   # Only set candidates_best if the inchikey column exists
@@ -384,6 +393,56 @@ clean_chemo <- function(
   )
 
   results_list
+}
+
+.restore_annotation_notes <- function(results, annotation_notes_lookup) {
+  if (
+    is.null(annotation_notes_lookup) ||
+      nrow(annotation_notes_lookup) == 0L ||
+      nrow(results) == 0L ||
+      !"annotation_note" %in% names(annotation_notes_lookup)
+  ) {
+    return(results)
+  }
+
+  note_join_cols <- intersect(
+    c(
+      "feature_id",
+      "candidate_adduct",
+      "candidate_structure_inchikey_connectivity_layer",
+      "rank_final"
+    ),
+    names(annotation_notes_lookup)
+  )
+  note_join_cols <- intersect(note_join_cols, names(results))
+  if (length(note_join_cols) == 0L) {
+    return(results)
+  }
+
+  notes <- annotation_notes_lookup |>
+    tidytable::select(
+      tidyselect::any_of(c(note_join_cols, "annotation_note"))
+    ) |>
+    tidytable::rename(annotation_note_lookup = annotation_note)
+
+  joined <- results |>
+    tidytable::left_join(notes, by = note_join_cols)
+
+  if ("annotation_note" %in% names(joined)) {
+    joined <- joined |>
+      tidytable::mutate(
+        annotation_note = tidytable::coalesce(
+          annotation_note,
+          annotation_note_lookup
+        )
+      )
+  } else {
+    joined <- joined |>
+      tidytable::mutate(annotation_note = annotation_note_lookup)
+  }
+
+  joined |>
+    tidytable::select(-tidyselect::any_of("annotation_note_lookup"))
 }
 
 #' Keep only rank-1 rows in filtered tier when cluster consensus promoted rank 1
