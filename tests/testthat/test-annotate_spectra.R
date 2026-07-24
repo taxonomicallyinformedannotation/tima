@@ -1171,20 +1171,6 @@ test_that("get_precursors falls back to precursor_mz alias", {
   expect_equal(out, c(111.1, 222.2))
 })
 
-test_that("strip_backend_rownames removes backend rownames", {
-  skip_if_not_installed("Spectra")
-
-  sp <- Spectra::Spectra(data.frame(
-    precursorMz = c(100, 200),
-    mz = I(list(c(50, 100), c(80, 120))),
-    intensity = I(list(c(10, 20), c(30, 40)))
-  ))
-  rownames(sp@backend@spectraData) <- c("r1", "r2")
-
-  out <- strip_backend_rownames(sp)
-  expect_equal(rownames(out@backend@spectraData), c("1", "2"))
-})
-
 test_that("extract_vector resolves alias names with exact and case-insensitive matching", {
   skip_if_not_installed("Spectra")
 
@@ -1393,11 +1379,6 @@ test_that("build_library_metadata extracts SMILES-based metadata aliases (2)", {
   expect_equal(meta$target_tag, c("well_formed", "trusted"))
   expect_false("target_inchikey" %in% names(meta))
   expect_false("target_formula" %in% names(meta))
-})
-
-test_that("strip_backend_rownames returns non-Spectra inputs unchanged", {
-  x <- list(a = 1)
-  expect_identical(strip_backend_rownames(x), x)
 })
 
 test_that("extract_vector handles empty fields and length reconciliation branches", {

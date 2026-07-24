@@ -483,30 +483,33 @@ import_and_clean_library_collection <- function(
   query_precursors = NULL,
   query_adducts = NULL
 ) {
-  # Import each library file separately and optionally reduce per-file by
-  # precursor window before concatenating. This keeps intermediate Spectra
-  # objects smaller and reduces memory pressure.
-  libs_list <- paths |>
-    purrr::map(
-      import_spectra,
-      cutoff = 0,
-      dalton = dalton,
-      polarity = polarity,
-      ppm = ppm,
-      sanitize = FALSE,
-      combine = FALSE
-    ) |>
-    purrr::map(
-      Spectra::applyProcessing,
-      BPPARAM = BiocParallel::SerialParam()
-    ) |>
-    purrr::map(.f = strip_backend_rownames)
+  acc <- NULL
+  for (i in seq_along(paths)) {
+    path <- paths[[i]]
+    sp <- if (tolower(tools::file_ext(path)) == "rds") {
+      readRDS(path)
+    } else {
+      import_spectra(
+        file = path,
+        cutoff = 0,
+        dalton = dalton,
+        polarity = polarity,
+        ppm = ppm,
+        sanitize = FALSE,
+        combine = FALSE
+      )
+    }
 
-  # Optionally reduce each library by precursor windows (per-file) to limit
-  # the number of candidate spectra that need to be concatenated.
-  if (!isTRUE(approx) && !is.null(query_precursors)) {
-    libs_list <- purrr::map(libs_list, function(sp) {
-      tryCatch(
+    if (!methods::is(sp, "Spectra")) {
+      cli::cli_abort(
+        "library source did not produce a Spectra object",
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
+    }
+
+    if (!isTRUE(approx) && !is.null(query_precursors)) {
+      sp <- tryCatch(
         reduce_library_by_precursor(
           lib_sp = sp,
           query_precursors = query_precursors,
@@ -515,8 +518,6 @@ import_and_clean_library_collection <- function(
           ppm = ppm
         ),
         error = function(e) {
-          # If reduction fails for this library, keep original to avoid
-          # losing data silently.
           log_warn(
             "Per-library precursor reduction failed: %s",
             conditionMessage(e)
@@ -524,49 +525,27 @@ import_and_clean_library_collection <- function(
           sp
         }
       )
-    })
+    }
+
+    sp <- remove_empty_peak_spectra(sp)
+    if (length(sp) == 0L) {
+      rm(sp)
+      next
+    }
+
+    if (is.null(acc)) {
+      acc <- sp
+    } else {
+      acc <- Spectra::concatenateSpectra(list(acc, sp))
+    }
+    rm(sp)
   }
 
-  # Remove empty spectra from each library and only concatenate non-empty
-  # Spectra objects to avoid creating a giant empty container.
-  libs_list <- purrr::map(libs_list, .f = remove_empty_peak_spectra)
-  # Filter out empty Spectra (length 0) before concatenation
-  libs_list <- purrr::keep(libs_list, function(x) length(x) > 0L)
-  if (length(libs_list) == 0L) {
+  if (is.null(acc)) {
     return(list())
   }
 
-  # Ensure every backend data.frame has explicit, unique rownames to avoid
-  # rbindlistWithRownames warnings inside Spectra::concatenateSpectra.
-  libs_list <- purrr::imap(libs_list, function(sp, i) {
-    if (methods::is(sp, "Spectra") && !is.null(sp@backend@spectraData)) {
-      sd <- sp@backend@spectraData
-      if (nrow(sd) > 0L) {
-        rownames(sd) <- paste0("lib", i, "_", seq_len(nrow(sd)))
-      }
-      sp@backend@spectraData <- sd
-    }
-    sp
-  })
-
-  if (length(libs_list) == 1L) {
-    libs_list[[1L]]
-  } else {
-    # Pass the list as a single argument to concatenateSpectra (original pipe
-    # style) to avoid rbind/rownames issues when Spectra combines backends.
-    Spectra::concatenateSpectra(libs_list)
-  }
-}
-
-#' @keywords internal
-strip_backend_rownames <- function(sp) {
-  if (!methods::is(sp, "Spectra") || is.null(sp@backend@spectraData)) {
-    return(sp)
-  }
-  sd <- sp@backend@spectraData
-  rownames(sd) <- NULL
-  sp@backend@spectraData <- sd
-  sp
+  acc
 }
 
 remove_empty_peak_spectra <- function(sp) {
@@ -625,64 +604,67 @@ build_library_metadata <- function(
   target_ids = seq_len(length(lib_sp)),
   target_adduct_raw = NULL
 ) {
-  n <- length(target_ids)
+  target_ids <- as.integer(target_ids)
+  lib_len <- length(lib_sp)
+  adducts_full <- target_adduct_raw %||%
+    extract_vector(
+      lib_sp,
+      c("adduct", "precursor_type"),
+      lib_len,
+      NA_character_
+    )
+  spectrum_id_full <- extract_vector(
+    lib_sp,
+    c("spectrum_id", "spectrumid", "id"),
+    lib_len,
+    NA_character_
+  )
+  smiles_full <- extract_vector(
+    lib_sp,
+    c("smiles", "structure_smiles", "SMILES"),
+    lib_len,
+    NA_character_
+  )
+  smiles_no_stereo_full <- extract_vector(
+    lib_sp,
+    c(
+      "smiles_no_stereo",
+      "structure_smiles_no_stereo",
+      "smiles_2D",
+      "smiles2D",
+      "structure_smiles_2D"
+    ),
+    lib_len,
+    NA_character_
+  )
+  library_full <- extract_vector(
+    lib_sp,
+    c("library", "source_library", "database"),
+    lib_len,
+    NA_character_
+  )
+  name_full <- extract_vector(
+    lib_sp,
+    c("name", "structure_name", "compound_name", "compoundName", "NAME"),
+    lib_len,
+    NA_character_
+  )
+  tag_full <- extract_vector(
+    lib_sp,
+    c("tag", "structure_tag"),
+    lib_len,
+    NA_character_
+  )
   out <- tidytable::tidytable(
     target_id = target_ids,
-    # Reuse a pre-extracted raw adduct vector when the caller already has
-    # one (compute_similarity_safe() has to extract this same column for
-    # its own neutral-mass rescue logic) -- skips a second full pass over
-    # lib_sp@backend@spectraData. harmonize_adducts() below still runs
-    # exactly as before regardless of which path supplied the column.
-    target_adduct = target_adduct_raw %||%
-      extract_vector(
-        lib_sp,
-        c("adduct", "precursor_type"),
-        n,
-        NA_character_
-      ),
-    target_spectrum_id = extract_vector(
-      lib_sp,
-      c("spectrum_id", "spectrumid", "id"),
-      n,
-      NA_character_
-    ),
-    target_smiles = extract_vector(
-      lib_sp,
-      c("smiles", "structure_smiles", "SMILES"),
-      n,
-      NA_character_
-    ),
-    target_smiles_no_stereo = extract_vector(
-      lib_sp,
-      c(
-        "smiles_no_stereo",
-        "structure_smiles_no_stereo",
-        "smiles_2D",
-        "smiles2D",
-        "structure_smiles_2D"
-      ),
-      n,
-      NA_character_
-    ),
-    target_library = extract_vector(
-      lib_sp,
-      c("library", "source_library", "database"),
-      n,
-      NA_character_
-    ),
-    target_name = extract_vector(
-      lib_sp,
-      c("name", "structure_name", "compound_name", "compoundName", "NAME"),
-      n,
-      NA_character_
-    ),
-    target_tag = extract_vector(
-      lib_sp,
-      c("tag", "structure_tag"),
-      n,
-      NA_character_
-    ),
-    target_precursorMz = lib_precursors
+    target_adduct = adducts_full[target_ids],
+    target_spectrum_id = spectrum_id_full[target_ids],
+    target_smiles = smiles_full[target_ids],
+    target_smiles_no_stereo = smiles_no_stereo_full[target_ids],
+    target_library = library_full[target_ids],
+    target_name = name_full[target_ids],
+    target_tag = tag_full[target_ids],
+    target_precursorMz = lib_precursors[target_ids]
   ) |>
     harmonize_adducts(
       adducts_colname = "target_adduct",
