@@ -97,9 +97,10 @@ jobs:
           "tima",
           repos = c(
           "https://taxonomicallyinformedannotation.r-universe.dev",
+          "https://cran.r-universe.dev",
+          "https://r-lib.r-universe.dev",
           "https://bioc.r-universe.dev",
           "https://ropensci.r-universe.dev",
-          "https://r-lib.r-universe.dev",
           "https://fastverse.r-universe.dev",
           "https://tidyverse.r-universe.dev",
           "https://rstudio.r-universe.dev",
