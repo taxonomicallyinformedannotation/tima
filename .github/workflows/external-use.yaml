@@ -97,6 +97,7 @@ jobs:
           "tima",
           repos = c(
           "https://taxonomicallyinformedannotation.r-universe.dev",
+          "https://r-lib.r-universe.dev",
           "https://bioconductor.org/packages/release/bioc"
           )
           )
