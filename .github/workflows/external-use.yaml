@@ -98,7 +98,9 @@ jobs:
           repos = c(
           "https://taxonomicallyinformedannotation.r-universe.dev",
           "https://r-lib.r-universe.dev",
-          "https://bioconductor.org/packages/release/bioc"
+          "https://rdatatable.r-universe.dev",
+          "https://igraph.r-universe.dev",
+          "https://bioc.r-universe.dev",
           )
           )
 
