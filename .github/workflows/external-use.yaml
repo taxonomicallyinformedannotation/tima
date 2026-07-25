@@ -100,8 +100,7 @@ jobs:
           "https://bioc.r-universe.dev",
           "https://ropensci.r-universe.dev",
           "https://r-lib.r-universe.dev",
-          "https://rdatatable.r-universe.dev",
-          "https://igraph.r-universe.dev"
+          "https://fastverse.r-universe.dev"
           )
           )
 
