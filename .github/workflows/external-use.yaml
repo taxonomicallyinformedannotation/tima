@@ -102,7 +102,11 @@ jobs:
           "https://r-lib.r-universe.dev",
           "https://fastverse.r-universe.dev",
           "https://tidyverse.r-universe.dev",
-          "https://rstudio.r-universe.dev"
+          "https://rstudio.r-universe.dev",
+          "https://docopt.r-universe.dev",
+          "https://jeroen.r-universe.dev",
+          "https://s-fleck.r-universe.dev",
+          "https://yuanyueli.r-universe.dev"
           )
           )
 
