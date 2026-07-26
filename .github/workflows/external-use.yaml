@@ -61,23 +61,21 @@ jobs:
         run: |
           brew update
           brew install libomp
+          GETTEXT_PREFIX="$(brew --prefix gettext)"
           LIBOMP_PREFIX="$(brew --prefix libomp)"
           mkdir -p ~/.R
 
-          case "$(uname -m)" in
-            arm64|aarch64)
-              ARCH_FLAGS="-mcpu=native"
-              ;;
-            *)
-              ARCH_FLAGS="-march=native -mtune=native"
-              ;;
-          esac
+          if [[ $(uname -m) == "arm64" ]]; then
+            ARCH_FLAGS="-mcpu=native"
+          else
+            ARCH_FLAGS="-march=native -mtune=native"
+          fi
 
           cat >> ~/.R/Makevars <<EOF
-          CPPFLAGS += -I${LIBOMP_PREFIX}/include
+          CPPFLAGS += -I${GETTEXT_PREFIX}/include -I${LIBOMP_PREFIX}/include
           CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp
           CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp
-          LDFLAGS  += -flto=thin -L${LIBOMP_PREFIX}/lib -lomp
+          LDFLAGS  += -flto=thin -L${GETTEXT_PREFIX}/lib -lintl -L${LIBOMP_PREFIX}/lib -lomp
           EOF
 
       - name: Install dependencies (Windows)
