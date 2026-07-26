@@ -32,42 +32,40 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      - name: Get number of CPU cores
-        uses: SimenB/github-actions-cpu-cores@97330871fe1b7d3529392ea000e3d2c4b357e403
+
+      - uses: SimenB/github-actions-cpu-cores@97330871fe1b7d3529392ea000e3d2c4b357e403
         id: cpu-cores
+
       - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6
         with:
           update-rtools: true
           Ncpus: ${{ steps.cpu-cores.outputs.count }}
+
       - name: Install dependencies (Linux)
         if: contains(matrix.os, 'ubuntu')
         run: |
           sudo apt-get update && sudo apt-get install -y --no-install-recommends \
-          libarchive-dev libcurl4-openssl-dev libfribidi-dev libharfbuzz-dev libuv1-dev \
+            libarchive-dev libcurl4-openssl-dev libfribidi-dev libharfbuzz-dev \
+            libssl-dev libuv1-dev pkg-config \
           && sudo apt-get clean \
           && sudo rm -rf /var/lib/apt/lists/*
           mkdir -p ~/.R
-          case "$(uname -m)" in
-            arm64|aarch64)
-              ARCH_FLAGS="-mcpu=native"
-              ;;
-            *)
-              ARCH_FLAGS="-march=native -mtune=native"
-              ;;
-          esac
           cat >> ~/.R/Makevars <<EOF
-          CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=auto -fopenmp -ffp-contract=fast -DNDEBUG
-          CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=auto -fopenmp -ffp-contract=fast -DNDEBUG
+          CFLAGS   += -march=native -mtune=native -g -O3 -flto=auto -fopenmp -ffp-contract=fast -DNDEBUG
+          CXXFLAGS += -march=native -mtune=native -g -O3 -flto=auto -fopenmp -ffp-contract=fast -DNDEBUG
           LDFLAGS  += -flto=auto -fopenmp
           EOF
+
       - name: Install dependencies (macOS)
         if: contains(matrix.os, 'macos')
         run: |
           brew update
-          brew install libomp
+          brew install libomp gettext openssl@3 pkg-config
           LIBOMP_PREFIX="$(brew --prefix libomp)"
+          GETTEXT_PREFIX="$(brew --prefix gettext)"
+          OPENSSL_PREFIX="$(brew --prefix openssl@3)"
           mkdir -p ~/.R
-          # Detect architecture for correct optimization flags
+
           case "$(uname -m)" in
             arm64|aarch64)
               ARCH_FLAGS="-mcpu=native"
@@ -76,12 +74,25 @@ jobs:
               ARCH_FLAGS="-march=native -mtune=native"
               ;;
           esac
+
           cat >> ~/.R/Makevars <<EOF
-          CPPFLAGS += -I${LIBOMP_PREFIX}/include
+          CPPFLAGS += -I${LIBOMP_PREFIX}/include -I${GETTEXT_PREFIX}/include -I${OPENSSL_PREFIX}/include
           CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp
           CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp
-          LDFLAGS  += -flto=thin -L${LIBOMP_PREFIX}/lib -lomp
+          LDFLAGS  += -flto=thin -L${LIBOMP_PREFIX}/lib -lomp -L${GETTEXT_PREFIX}/lib -lintl -L${OPENSSL_PREFIX}/lib
           EOF
+
+          # nc-config and pkg-config based configure scripts look on PATH /
+          # PKG_CONFIG_PATH rather than reading Makevars, so expose both
+          # explicitly for the rest of this job (keg-only openssl@3 in
+          # particular is invisible to pkg-config otherwise)
+          {
+            echo "${NETCDF_PREFIX}/bin"
+          } >> "$GITHUB_PATH"
+          {
+            echo "PKG_CONFIG_PATH=${GETTEXT_PREFIX}/lib/pkgconfig:${OPENSSL_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+          } >> "$GITHUB_ENV"
+
       - name: Install dependencies (Windows)
         if: contains(matrix.os, 'windows')
         run: |
@@ -91,7 +102,7 @@ jobs:
           CXXFLAGS += -march=native -mtune=native -g -O3 -flto -fopenmp -DNDEBUG
           LDFLAGS  += -flto -fopenmp
           EOF
-        shell: bash
+
       - name: Install
         run: >
           install.packages(
@@ -105,10 +116,12 @@ jobs:
 
           tima::install_tima()
         shell: Rscript {0}
+
       - name: Get example files
         run: |
           tima::get_example_files()
         shell: Rscript {0}
+
       - name: Run pipeline
         run: |
           tima::run_tima()
