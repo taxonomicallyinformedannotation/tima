@@ -114,7 +114,7 @@ jobs:
           )
           )
 
-          tima::install_tima()
+          tima::install_tima(dependencies = FALSE)
         shell: Rscript {0}
 
       - name: Get example files
