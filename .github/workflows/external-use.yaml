@@ -65,6 +65,7 @@ jobs:
         run: |
           brew update
           brew install libomp
+          LIBOMP_PREFIX="$(brew --prefix libomp)"
           mkdir -p ~/.R
           # Detect architecture for correct optimization flags
           case "$(uname -m)" in
@@ -76,10 +77,10 @@ jobs:
               ;;
           esac
           cat >> ~/.R/Makevars <<EOF
-          CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include
-          CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp -I$(brew --prefix libomp)/include
-          CPPFLAGS += -I/opt/homebrew/include
-          LDFLAGS  += -flto=thin -L/opt/homebrew/lib -L$(brew --prefix libomp)/lib -lomp
+          CPPFLAGS += -I${LIBOMP_PREFIX}/include
+          CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp
+          CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp
+          LDFLAGS  += -flto=thin -L${LIBOMP_PREFIX}/lib -lomp
           EOF
       - name: Install dependencies (Windows)
         if: contains(matrix.os, 'windows')
