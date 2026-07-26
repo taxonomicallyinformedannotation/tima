@@ -21,9 +21,7 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - ubuntu-26.04-arm
           - macos-latest
-          - macos-26-intel
           - windows-latest
     defaults:
       run:
