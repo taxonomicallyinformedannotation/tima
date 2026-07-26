@@ -7,8 +7,7 @@
 install_tima(
   package = "tima",
   repos = c("https://taxonomicallyinformedannotation.r-universe.dev",
-    "https://cran.r-universe.dev",
-    "https://bioc.r-universe.dev"),
+    "https://cran.r-universe.dev", "https://bioc.r-universe.dev"),
   type = getOption("pkgType"),
   dependencies = TRUE
 )

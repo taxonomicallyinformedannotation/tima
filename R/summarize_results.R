@@ -107,8 +107,25 @@ summarize_results <- function(
           names(df)
       )
   ) {
+    # Predicate pushdown: Extract only structures present in df to reduce
+    # organism_lookup table size before building.
+    needed_structures <- df |>
+      tidytable::distinct(candidate_structure_inchikey_connectivity_layer) |>
+      tidytable::pull(candidate_structure_inchikey_connectivity_layer)
+    # Remove NAs from needed_structures
+    needed_structures <- needed_structures[!is.na(needed_structures)]
+
+    filtered_sop_table <- if (length(needed_structures) > 0L) {
+      structure_organism_pairs_table |>
+        tidytable::filter(
+          structure_inchikey_connectivity_layer %in% needed_structures
+        )
+    } else {
+      structure_organism_pairs_table[0L, ]
+    }
+
     .build_organism_lookup(
-      structure_organism_pairs_table = structure_organism_pairs_table,
+      structure_organism_pairs_table = filtered_sop_table,
       df = df
     )
   } else {
