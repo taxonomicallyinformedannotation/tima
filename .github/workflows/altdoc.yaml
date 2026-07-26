@@ -51,7 +51,14 @@ jobs:
         run: |
           # If parallel = TRUE in render_docs()
           # future::plan(future::multicore)
-          install.packages(".", repos = NULL, type = "source")
+          install.packages(
+          "tima",
+          repos = c(
+          "https://taxonomicallyinformedannotation.r-universe.dev",
+          "https://cran.r-universe.dev",
+          "https://bioc.r-universe.dev"
+          ),
+          type = "source")
           install.packages("pkgload")
           pkgload::load_all()
           altdoc::render_docs(parallel = FALSE, freeze = FALSE, verbose = TRUE)
