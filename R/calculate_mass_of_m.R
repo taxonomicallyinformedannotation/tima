@@ -175,7 +175,6 @@ calculate_mass_of_m <- function(
       )
     } else {
       parsed_adduct <- parse_adduct(adduct_string)
-      assign(adduct_string, parsed_adduct, envir = .adduct_parse_cache)
     }
   } else {
     parsed_adduct <- parse_adduct(adduct_string)
@@ -326,7 +325,6 @@ calculate_mass_of_m_batch <- function(
         parsed <- get(a, envir = .adduct_parse_cache, inherits = FALSE)
       } else {
         parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
-        if (!is.null(parsed)) assign(a, parsed, envir = .adduct_parse_cache)
       }
       if (is.null(parsed) || all(parsed == 0L)) {
         next

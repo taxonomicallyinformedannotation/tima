@@ -367,14 +367,12 @@ canonicalize_adduct_notation <- local({
     # Prefer explicit remediation for known unstable patterns.
     if (adduct %in% names(adducts_forbidden_translations)) {
       result <- unname(adducts_forbidden_translations[[adduct]])
-      assign(adduct_input, result, envir = .cache)
       return(result)
     }
 
     m <- regexec("^\\[(.*)\\](\\d*[+-])$", adduct, perl = TRUE)
     g <- regmatches(adduct, m)[[1L]]
     if (length(g) == 0L) {
-      assign(adduct_input, adduct, envir = .cache)
       return(adduct)
     }
 
@@ -384,7 +382,6 @@ canonicalize_adduct_notation <- local({
     # Split core (up to M/isotope part) from formula modifications.
     mod_start <- regexpr("[+-]\\d*[A-Za-z]", inner, perl = TRUE)
     if (mod_start[[1L]] == -1L) {
-      assign(adduct_input, adduct, envir = .cache)
       return(adduct)
     }
 
@@ -395,13 +392,11 @@ canonicalize_adduct_notation <- local({
     tok_matches <- gregexpr(tok_re, mods, perl = TRUE)
     tokens <- regmatches(mods, tok_matches)[[1L]]
     if (length(tokens) == 0L) {
-      assign(adduct_input, adduct, envir = .cache)
       return(adduct)
     }
 
     remainder <- gsub(tok_re, "", mods, perl = TRUE)
     if (!identical(remainder, "")) {
-      assign(adduct_input, adduct, envir = .cache)
       return(adduct)
     }
 
@@ -476,8 +471,6 @@ canonicalize_adduct_notation <- local({
       "]",
       suffix
     )
-    # Store in cache before returning
-    assign(adduct_input, result, envir = .cache)
     result
   }
 })
