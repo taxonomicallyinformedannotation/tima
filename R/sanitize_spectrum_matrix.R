@@ -1,8 +1,3 @@
-# Package-level environment for "warn once" sanitization messages.
-# Resets on package load. Prevents flooding billions of warnings in hot loops.
-.tima_sanitize_env <- new.env(parent = emptyenv())
-
-
 #' @title Check if a spectrum matrix is sanitized
 #'
 #' @description Fast check that a peak matrix has the properties required

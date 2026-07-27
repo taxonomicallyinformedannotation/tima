@@ -87,14 +87,9 @@ calculate_mass_of_m <- function(
       length(mz) == 1L &&
       is.finite(mz) &&
       mz > 0 &&
-      identical(electron_mass, ELECTRON_MASS_DALTONS) &&
-      exists(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)
+      identical(electron_mass, ELECTRON_MASS_DALTONS)
   ) {
-    parsed_adduct <- get(
-      adduct_string,
-      envir = .adduct_parse_cache,
-      inherits = FALSE
-    )
+    parsed_adduct <- parse_adduct(adduct_string)
     # Minimal inline validation
     if (is.null(parsed_adduct) || all(parsed_adduct == 0L)) {
       warning(
@@ -158,24 +153,15 @@ calculate_mass_of_m <- function(
   # Validate electron mass
   validate_electron_mass(electron_mass)
 
-  # Parse the adduct string with a lightweight cache to speed repeated calls
+  # Parse the adduct string directly
   parsed_adduct <- NULL
-  # Only use the cache for non-empty single-character adduct strings
   if (
     !is.null(adduct_string) &&
       length(adduct_string) == 1L &&
       !is.na(adduct_string) &&
       nzchar(adduct_string)
   ) {
-    if (exists(adduct_string, envir = .adduct_parse_cache, inherits = FALSE)) {
-      parsed_adduct <- get(
-        adduct_string,
-        envir = .adduct_parse_cache,
-        inherits = FALSE
-      )
-    } else {
-      parsed_adduct <- parse_adduct(adduct_string)
-    }
+    parsed_adduct <- parse_adduct(adduct_string)
   } else {
     parsed_adduct <- parse_adduct(adduct_string)
   }
@@ -320,12 +306,7 @@ calculate_mass_of_m_batch <- function(
 
     for (i in seq_along(unique_adducts)) {
       a <- unique_adducts[[i]]
-      # Use shared cache for parsed adducts
-      if (exists(a, envir = .adduct_parse_cache, inherits = FALSE)) {
-        parsed <- get(a, envir = .adduct_parse_cache, inherits = FALSE)
-      } else {
-        parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
-      }
+      parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
       if (is.null(parsed) || all(parsed == 0L)) {
         next
       }
@@ -621,5 +602,3 @@ calculate_mz_from_mass <- function(
 
   mz
 }
-
-.adduct_parse_cache <- new.env(parent = emptyenv())
