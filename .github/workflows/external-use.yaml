@@ -27,13 +27,9 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: SimenB/github-actions-cpu-cores@97330871fe1b7d3529392ea000e3d2c4b357e403
-        id: cpu-cores
-
       - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6
         with:
           update-rtools: true
-          Ncpus: ${{ steps.cpu-cores.outputs.count }}
 
       - name: Install dependencies (Linux)
         if: contains(matrix.os, 'ubuntu')
@@ -43,12 +39,6 @@ jobs:
             libssl-dev libuv1-dev pkg-config \
           && sudo apt-get clean \
           && sudo rm -rf /var/lib/apt/lists/*
-          mkdir -p ~/.R
-          cat >> ~/.R/Makevars <<EOF
-          CFLAGS   += -march=native -mtune=native -g -O3 -flto=auto -fopenmp -ffp-contract=fast -DNDEBUG
-          CXXFLAGS += -march=native -mtune=native -g -O3 -flto=auto -fopenmp -ffp-contract=fast -DNDEBUG
-          LDFLAGS  += -flto=auto -fopenmp
-          EOF
 
       - name: Install dependencies (macOS)
         if: contains(matrix.os, 'macos')
@@ -57,33 +47,10 @@ jobs:
           brew install libomp
           GETTEXT_PREFIX="$(brew --prefix gettext)"
           LIBOMP_PREFIX="$(brew --prefix libomp)"
-          mkdir -p ~/.R
-
-          case "$(uname -m)" in
-            arm64|aarch64)
-              ARCH_FLAGS="-mcpu=native"
-              ;;
-            *)
-              ARCH_FLAGS="-march=native -mtune=native"
-              ;;
-          esac
-
-          cat >> ~/.R/Makevars <<EOF
-          CPPFLAGS += -I${GETTEXT_PREFIX}/include -I${LIBOMP_PREFIX}/include
-          CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG
-          CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG
-          LDFLAGS  += -flto=thin -L${GETTEXT_PREFIX}/lib -lintl -L${LIBOMP_PREFIX}/lib -lomp
-          EOF
 
       - name: Install dependencies (Windows)
         if: contains(matrix.os, 'windows')
-        run: |
-          mkdir -p ~/.R
-          cat >> ~/.R/Makevars.win <<EOF
-          CFLAGS   += -march=native -mtune=native -g -O3 -flto -fopenmp -DNDEBUG
-          CXXFLAGS += -march=native -mtune=native -g -O3 -flto -fopenmp -DNDEBUG
-          LDFLAGS  += -flto -fopenmp
-          EOF
+        run: true
 
       - name: Install
         run: >
