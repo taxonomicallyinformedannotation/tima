@@ -67,8 +67,8 @@ jobs:
 
           cat >> ~/.R/Makevars <<EOF
           CPPFLAGS += -I${GETTEXT_PREFIX}/include -I${LIBOMP_PREFIX}/include
-          CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor
-          CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor
+          CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG
+          CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG
           LDFLAGS  += -flto=thin -L${GETTEXT_PREFIX}/lib -lintl -L${LIBOMP_PREFIX}/lib -lomp
           EOF
 
