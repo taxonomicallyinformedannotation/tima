@@ -54,7 +54,7 @@ jobs:
         if: contains(matrix.os, 'macos')
         run: |
           brew update
-          brew install libomp
+          brew install libomp libuv
           GETTEXT_PREFIX="$(brew --prefix gettext)"
           LIBOMP_PREFIX="$(brew --prefix libomp)"
           mkdir -p ~/.R
