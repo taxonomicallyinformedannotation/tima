@@ -27,10 +27,6 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-
       - uses: SimenB/github-actions-cpu-cores@97330871fe1b7d3529392ea000e3d2c4b357e403
         id: cpu-cores
 
@@ -71,8 +67,8 @@ jobs:
 
           cat >> ~/.R/Makevars <<EOF
           CPPFLAGS += -I${GETTEXT_PREFIX}/include -I${LIBOMP_PREFIX}/include
-          CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp
-          CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor -fopenmp
+          CFLAGS   += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor
+          CXXFLAGS += ${ARCH_FLAGS} -g -O3 -flto=thin -ffp-contract=fast -DNDEBUG -Xpreprocessor
           LDFLAGS  += -flto=thin -L${GETTEXT_PREFIX}/lib -lintl -L${LIBOMP_PREFIX}/lib -lomp
           EOF
 
