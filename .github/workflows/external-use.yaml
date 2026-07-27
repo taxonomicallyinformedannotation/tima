@@ -54,16 +54,19 @@ jobs:
         if: contains(matrix.os, 'macos')
         run: |
           brew update
-          brew install libomp libuv
+          brew install libomp
           GETTEXT_PREFIX="$(brew --prefix gettext)"
           LIBOMP_PREFIX="$(brew --prefix libomp)"
           mkdir -p ~/.R
 
-          if [[ $(uname -m) == "arm64" ]]; then
-            ARCH_FLAGS="-mcpu=native"
-          else
-            ARCH_FLAGS="-march=native -mtune=native"
-          fi
+          case "$(uname -m)" in
+            arm64|aarch64)
+              ARCH_FLAGS="-mcpu=native"
+              ;;
+            *)
+              ARCH_FLAGS="-march=native -mtune=native"
+              ;;
+          esac
 
           cat >> ~/.R/Makevars <<EOF
           CPPFLAGS += -I${GETTEXT_PREFIX}/include -I${LIBOMP_PREFIX}/include
