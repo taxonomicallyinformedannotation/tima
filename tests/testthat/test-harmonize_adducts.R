@@ -406,9 +406,8 @@ test_that("harmonize_adducts is reasonably fast", {
     expr = harmonize_adducts(df, adducts_translations = trans)
   ))
 
-  # Should complete reasonably quickly without persistent caching
-  # (0.3-0.5s is realistic for regex-based adduct canonicalization)
-  expect_lt(timing["elapsed"], 1.0)
+  # Should complete quickly
+  expect_lt(timing["elapsed"], 0.05)
 })
 
 test_that("harmonize_adducts canonicalizes forbidden/canceling adduct forms", {
