@@ -340,7 +340,6 @@ calculate_entropy_and_similarity <- function(
     }
   )
 
-
   # Log progress summary
   log_info("Processed %d / %d queries", n_queries, n_queries)
 
