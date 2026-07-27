@@ -228,14 +228,12 @@ annotate_spectra <- function(
     )
   }
 
-  # Process one library at a time: this keeps the live Spectra object count low
-  # and avoids holding multiple million-row backends in memory together.
-  sim_chunks <- list()
-  meta_chunks <- list()
+  # Process one library at a time: load, compute, finalize, cleanup
+  df_chunks <- list()
   n_lib_count <- 0L
-  target_id_offset <- 0L
 
   for (lib_path in libs_vec) {
+    # Load single library
     spectral_library <- import_and_clean_library_collection(
       c(lib_path),
       dalton = dalton,
@@ -252,13 +250,10 @@ annotate_spectra <- function(
     }
 
     log_library_stats(spectral_library)
+    n_lib_count <- n_lib_count + length(spectral_library)
 
-    lib_n <- length(spectral_library)
-    n_lib_count <- n_lib_count + lib_n
-    lib_precursors_all <- NULL
-    lib_adducts_all <- NULL
-    meta_chunk <- NULL
-
+    # Compute similarities for this library
+    # (calculate_entropy_and_similarity handles pre-computation outside hot loop)
     sim_chunk <- compute_similarity_safe(
       lib_sp = spectral_library,
       query_sp = query_sp,
@@ -272,40 +267,47 @@ annotate_spectra <- function(
     )
 
     if (nrow(sim_chunk) > 0L) {
-      local_target_ids <- unique(sim_chunk$target_id)
-      sim_chunk$target_id <- sim_chunk$target_id + target_id_offset
       lib_precursors_all <- attr(sim_chunk, "lib_precursors_raw")
       if (is.null(lib_precursors_all)) {
         lib_precursors_all <- get_precursors(spectral_library)
       }
       lib_adducts_all <- attr(sim_chunk, "lib_adducts_raw")
-      meta_chunk <- build_library_metadata(
+
+      # Get all unique target IDs from this library's results
+      all_target_ids <- unique(sim_chunk$target_id)
+      meta <- build_library_metadata(
         spectral_library,
         lib_precursors_all,
-        target_ids = local_target_ids,
+        target_ids = all_target_ids,
         target_adduct_raw = if (!is.null(lib_adducts_all)) {
-          lib_adducts_all[local_target_ids]
+          lib_adducts_all[all_target_ids]
         } else {
           NULL
         }
       )
-      meta_chunk$target_id <- meta_chunk$target_id + target_id_offset
-      sim_chunks[[length(sim_chunks) + 1L]] <- sim_chunk
-      meta_chunks[[length(meta_chunks) + 1L]] <- meta_chunk
+
+      # Finalize this library's results
+      df_chunk <- finalize_results(
+        df_sim = tidytable::as_tidytable(x = sim_chunk),
+        meta = meta,
+        query_meta = query_meta,
+        dalton = dalton,
+        ppm = ppm
+      )
+
+      if (nrow(df_chunk) > 0L) {
+        df_chunks[[length(df_chunks) + 1L]] <- df_chunk
+      }
+
+      rm(sim_chunk, meta)
     }
 
-    target_id_offset <- target_id_offset + lib_n
-    rm(
-      spectral_library,
-      sim_chunk,
-      meta_chunk,
-      lib_precursors_all,
-      lib_adducts_all
-    )
+    # Cleanup this library
+    rm(spectral_library)
     gc(verbose = FALSE)
   }
 
-  if (length(sim_chunks) == 0L) {
+  if (length(df_chunks) == 0L) {
     msg <- if (isFALSE(approx)) {
       "No spectra remain after precursor-based reduction"
     } else {
@@ -320,9 +322,9 @@ annotate_spectra <- function(
     )
   }
 
-  sim_raw <- tidytable::bind_rows(sim_chunks)
-  meta <- tidytable::bind_rows(meta_chunks)
-  rm(sim_chunks, meta_chunks)
+  # Concatenate all library results at end
+  df_final <- tidytable::bind_rows(df_chunks)
+  rm(df_chunks)
 
   n_query_count <- length(query_sp)
   log_info(
@@ -332,14 +334,6 @@ annotate_spectra <- function(
   )
   rm(query_sp)
 
-  df_final <- finalize_results(
-    df_sim = tidytable::as_tidytable(x = sim_raw),
-    meta = meta,
-    query_meta = query_meta,
-    dalton = dalton,
-    ppm = ppm
-  )
-  rm(sim_raw, meta)
   if (nrow(df_final) == 0L) {
     return(
       annotate_spectra_handle_empty_result(
