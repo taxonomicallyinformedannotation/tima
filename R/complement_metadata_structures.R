@@ -151,23 +151,20 @@ complement_metadata_structures <- function(
     )
   }
 
-  met_lookup <- refs$met_lookup_full |>
-    tidytable::filter(
-      candidate_structure_inchikey_no_stereo %in% keys$inchikey_no_stereo
-    )
+  met_lookup <- refs$met_lookup_full[
+    fastmatch::fmatch(candidate_structure_inchikey_no_stereo, keys$inchikey_no_stereo, nomatch = 0L) > 0L
+  ]
 
   # Name/tag/xlogp collapse is precomputed once in the reference cache.
-  nam_lookup <- refs$nam_lookup_full |>
-    tidytable::filter(
-      candidate_structure_inchikey_no_stereo %in% keys$inchikey_no_stereo
-    )
+  nam_lookup <- refs$nam_lookup_full[
+    fastmatch::fmatch(candidate_structure_inchikey_no_stereo, keys$inchikey_no_stereo, nomatch = 0L) > 0L
+  ]
   log_debug("Names/tag/xlogp lookup: %d unique keys", nrow(nam_lookup))
 
   # ClassyFire taxonomy — keyed by full inchikey (filter to batch keys)
-  tax_cla <- refs$tax_cla_lookup_full |>
-    tidytable::filter(
-      candidate_structure_inchikey %in% keys$inchikey_full
-    ) |>
+  tax_cla <- refs$tax_cla_lookup_full[
+    fastmatch::fmatch(candidate_structure_inchikey, keys$inchikey_full, nomatch = 0L) > 0L
+  ] |>
     tidytable::distinct(
       candidate_structure_inchikey,
       .keep_all = TRUE
@@ -175,10 +172,9 @@ complement_metadata_structures <- function(
   log_debug("ClassyFire taxonomy: %d rows", nrow(tax_cla))
 
   # NPClassifier taxonomy — keyed by canonical SMILES with stereo
-  tax_npc <- refs$tax_npc_lookup_full |>
-    tidytable::filter(
-      candidate_structure_smiles %in% keys$smiles_stereo
-    ) |>
+  tax_npc <- refs$tax_npc_lookup_full[
+    fastmatch::fmatch(candidate_structure_smiles, keys$smiles_stereo, nomatch = 0L) > 0L
+  ] |>
     tidytable::distinct(
       candidate_structure_smiles,
       .keep_all = TRUE
