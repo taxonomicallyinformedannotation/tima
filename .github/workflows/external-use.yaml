@@ -46,6 +46,7 @@ jobs:
           brew update
           brew install libomp
           GETTEXT_PREFIX="$(brew --prefix gettext)"
+          mkdir -p ~/.R
           cat >> ~/.R/Makevars <<EOF
           CPPFLAGS += -I${GETTEXT_PREFIX}/include
           LDFLAGS  += -L${GETTEXT_PREFIX}/lib -lintl
