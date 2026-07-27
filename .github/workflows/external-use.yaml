@@ -47,6 +47,9 @@ jobs:
           brew install libomp
           GETTEXT_PREFIX="$(brew --prefix gettext)"
           LIBOMP_PREFIX="$(brew --prefix libomp)"
+          echo "CPPFLAGS=-I$GETTEXT_PREFIX/include" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$GETTEXT_PREFIX/lib" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$GETTEXT_PREFIX/lib/pkgconfig" >> $GITHUB_ENV
 
       - name: Install dependencies (Windows)
         if: contains(matrix.os, 'windows')
