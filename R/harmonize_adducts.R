@@ -334,8 +334,7 @@ reduce_ammonium_loss_pairs <- function(net) {
 #' Canonicalize one adduct string
 #' @keywords internal
 canonicalize_adduct_notation <- local({
-  # Local environment for caching
-  .cache <- new.env(hash = TRUE, parent = emptyenv())
+  # Cached formulas for carrier ions
   .carrier_formulas <- c(
     "H",
     "H2",
@@ -353,12 +352,6 @@ canonicalize_adduct_notation <- local({
   function(adduct) {
     if (length(adduct) == 0L || is.na(adduct) || !nzchar(adduct)) {
       return(adduct)
-    }
-
-    # Check cache first
-    cached <- get0(adduct, envir = .cache)
-    if (!is.null(cached)) {
-      return(cached)
     }
 
     adduct_input <- adduct
