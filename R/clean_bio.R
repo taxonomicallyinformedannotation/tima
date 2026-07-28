@@ -328,10 +328,14 @@ clean_bio <- function(
 #' @keywords internal
 #'
 #' @note
-#' TODO: Implement more sophisticated filtering criteria:
+#' TODO: Potential future enhancement:
+#' Consider implementing more sophisticated filtering criteria:
 #' - Configurable entropy thresholds for spectral quality
 #' - Similarity score minimums
-#' - Consider edge filtering during edge creation step
+#' - Evaluate edge filtering during edge creation step (performance vs. correctness trade-off)
+#'
+#' Current implementation uses simple fixed thresholds and works correctly,
+#' but could benefit from domain-specific tuning parameters.
 .filter_edges_for_consistency <- function(
   edges_table,
   min_neighbors = 2L,

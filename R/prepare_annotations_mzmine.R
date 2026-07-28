@@ -109,12 +109,16 @@ prepare_annotations_mzmine <- function(
           )
         )
       ) |>
-      # TODO find solution for these
+      # TODO MzMine-specific field handling:
+      # - candidate_library is set to "mzmine" as these come from MzMine export
+      # - candidate_structure_error_mz and error_rt are NA because MzMine does not
+      #   provide these fields; values are recomputed via process_smiles() downstream
+      # Alternative approach: Could attempt to estimate from calibration data or parent.
       tidytable::mutate(
         # TODO temporary
-        "candidate_library" = "mzmine",
-        "candidate_structure_error_mz" = NA_real_,
-        "candidate_structure_error_rt" = NA_real_
+       "candidate_library" = "mzmine",
+       "candidate_structure_error_mz" = NA_real_,
+       "candidate_structure_error_rt" = NA_real_
       ) |>
       tidytable::mutate(
         ## exact_mass, xlogp, formula are recomputed from SMILES
