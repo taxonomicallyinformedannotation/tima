@@ -103,18 +103,6 @@ parse_yaml_params <- function(def, usr = NULL) {
   params
 }
 
-#' Merge a single user list item into the result
-#' @keywords internal
-#' @noRd
-.merge_list_item <- function(value, name, result_env, default) {
-  if (name %in% names(default) && is.list(default[[name]]) && is.list(value)) {
-    result_env$result[[name]] <- merge_lists_recursive(default[[name]], value)
-  } else {
-    result_env$result[[name]] <- value
-  }
-  invisible(NULL)
-}
-
 #' @title Recursively merge two lists
 #' @description Deep merge where user values override defaults
 #' @param default Default list
@@ -126,17 +114,16 @@ merge_lists_recursive <- function(default, user) {
     return(user)
   }
 
-  # Create environment to hold result for modification
-  result_env <- new.env(parent = emptyenv())
-  result_env$result <- default
+  result <- default
 
-  # Iterate over user list items, merging nested lists recursively
-  purrr::imap(
-    user,
-    .merge_list_item,
-    result_env = result_env,
-    default = default
-  )
+  for (name in names(user)) {
+    value <- user[[name]]
+    if (name %in% names(default) && is.list(default[[name]]) && is.list(value)) {
+      result[[name]] <- merge_lists_recursive(default[[name]], value)
+    } else {
+      result[[name]] <- value
+    }
+  }
 
-  result_env$result
+  result
 }

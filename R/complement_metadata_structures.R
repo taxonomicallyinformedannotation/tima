@@ -267,7 +267,7 @@ complement_metadata_structures <- function(
 }
 
 .complement_metadata_ref_cache <- local({
-  .env <- new.env(hash = TRUE, parent = emptyenv())
+  .cache <- list()
 
   load_refs <- function(str_stereo, str_met, str_tax_cla, str_tax_npc) {
     # Include file modification time so cache invalidates when any reference file is replaced.
@@ -298,7 +298,7 @@ complement_metadata_structures <- function(
       mtime_key,
       sep = "|"
     )
-    cached <- get0(cache_key, envir = .env)
+    cached <- .cache[[cache_key]]
     if (!is.null(cached)) {
       return(cached)
     }
@@ -422,6 +422,7 @@ complement_metadata_structures <- function(
       tax_cla_lookup_full = tax_cla_lookup_full,
       tax_npc_lookup_full = tax_npc_lookup_full
     )
+    .cache[[cache_key]] <<- result
     result
   }
 
