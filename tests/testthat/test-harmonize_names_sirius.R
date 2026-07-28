@@ -226,8 +226,6 @@ test_that("harmonize_names_sirius handles repeated calls", {
 ## Performance Tests ----
 
 test_that("harmonize_names_sirius is reasonably fast", {
-  skip_if_not_installed("bench")
-
   timing <- system.time(replicate(
     n = 1000L,
     expr = harmonize_names_sirius("1_compound_name")

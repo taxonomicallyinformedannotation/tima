@@ -1127,8 +1127,6 @@ test_that("annotate_spectra_handle_empty_result returns path and writes empty te
 })
 
 test_that("extract_vector uses fill when field is missing", {
-  skip_if_not_installed("Spectra")
-
   obj <- Spectra::Spectra(data.frame(
     precursorMz = 123.4,
     mz = I(list(c(50, 100))),
@@ -1146,8 +1144,6 @@ test_that("extract_vector uses fill when field is missing", {
 })
 
 test_that("get_precursors extracts precursorMz when available", {
-  skip_if_not_installed("Spectra")
-
   sp <- Spectra::Spectra(data.frame(
     precursorMz = c(123.4, 234.5),
     mz = I(list(c(50, 100), c(60, 120))),
@@ -1159,8 +1155,6 @@ test_that("get_precursors extracts precursorMz when available", {
 })
 
 test_that("get_precursors falls back to precursor_mz alias", {
-  skip_if_not_installed("Spectra")
-
   sp <- Spectra::Spectra(data.frame(
     precursor_mz = c(111.1, 222.2),
     mz = I(list(c(40, 80), c(55, 110))),
@@ -1172,8 +1166,6 @@ test_that("get_precursors falls back to precursor_mz alias", {
 })
 
 test_that("extract_vector resolves alias names with exact and case-insensitive matching", {
-  skip_if_not_installed("Spectra")
-
   obj <- Spectra::Spectra(data.frame(
     precursorMz = c(123.4, 234.5),
     smiles_no_stereo = c("CCO", "CCC"),
@@ -1200,8 +1192,6 @@ test_that("extract_vector resolves alias names with exact and case-insensitive m
 })
 
 test_that("build_library_metadata extracts SMILES-based metadata aliases", {
-  skip_if_not_installed("Spectra")
-
   lib_sp <- Spectra::Spectra(data.frame(
     precursorMz = c(100, 200),
     adduct = c("[M+H]+", "[M+Na]+"),
@@ -1330,8 +1320,6 @@ test_that("finalize_results keeps the highest-similarity structure when deduplic
 
 
 test_that("extract_vector resolves alias names with exact and case-insensitive matching", {
-  skip_if_not_installed("Spectra")
-
   obj <- Spectra::Spectra(data.frame(
     precursorMz = c(123.4, 234.5),
     smiles_no_stereo = c("CCO", "CCC"),
@@ -1358,8 +1346,6 @@ test_that("extract_vector resolves alias names with exact and case-insensitive m
 })
 
 test_that("build_library_metadata extracts SMILES-based metadata aliases (2)", {
-  skip_if_not_installed("Spectra")
-
   lib_sp <- Spectra::Spectra(data.frame(
     precursorMz = c(100, 200),
     adduct = c("[M+H]+", "[M+Na]+"),
@@ -1382,8 +1368,6 @@ test_that("build_library_metadata extracts SMILES-based metadata aliases (2)", {
 })
 
 test_that("extract_vector handles empty fields and length reconciliation branches", {
-  skip_if_not_installed("Spectra")
-
   obj_one <- Spectra::Spectra(data.frame(
     precursorMz = 123.4,
     name = "n1",
@@ -1420,8 +1404,6 @@ test_that("extract_vector handles empty fields and length reconciliation branche
 })
 
 test_that("get_precursors returns NA vector when precursor columns are missing", {
-  skip_if_not_installed("Spectra")
-
   sp <- Spectra::Spectra(data.frame(
     spectrum_id = c("s1", "s2"),
     mz = I(list(c(40, 80), c(60, 90))),
@@ -1471,8 +1453,6 @@ test_that("convert_precursor_for_matching handles guard and invalid-conversion b
 })
 
 test_that("reduce_library_by_precursor keeps only overlapping precursor windows", {
-  skip_if_not_installed("Spectra")
-
   lib_sp <- Spectra::Spectra(data.frame(
     precursorMz = c(100, 200, 300),
     mz = I(list(c(50, 90), c(60, 120), c(80, 140))),
@@ -1498,8 +1478,6 @@ test_that("reduce_library_by_precursor keeps only overlapping precursor windows"
 })
 
 test_that("reduce_library_by_precursor keeps adduct-shifted library spectra via neutral mass", {
-  skip_if_not_installed("Spectra")
-
   query_m <- 300
   query_prec <- calculate_mz_from_mass(query_m, "[M+H4N]+")
   lib_prec <- calculate_mz_from_mass(query_m, "[M+H]+")
@@ -1524,8 +1502,6 @@ test_that("reduce_library_by_precursor keeps adduct-shifted library spectra via 
 })
 
 test_that("compute_similarity_safe returns calculation output on success", {
-  skip_if_not_installed("Spectra")
-
   query_sp <- Spectra::Spectra(data.frame(
     precursorMz = 100,
     spectrum_id = "q1",
@@ -1605,8 +1581,6 @@ test_that("finalize_results flags exact adduct and neutral-mass rescued matches"
 })
 
 test_that("build_query_metadata prefers annotate_masses adduct assignments over MGF metadata", {
-  skip_if_not_installed("Spectra")
-
   query_sp <- Spectra::Spectra(data.frame(
     FEATURE_ID = "F10",
     precursorMz = calculate_mz_from_mass(300, "[M+H4N]+"),
@@ -1633,8 +1607,6 @@ test_that("build_query_metadata prefers annotate_masses adduct assignments over 
 })
 
 test_that("log_library_stats handles spectra without library metadata", {
-  skip_if_not_installed("Spectra")
-
   lib_sp <- Spectra::Spectra(data.frame(
     precursorMz = c(100, 200),
     mz = I(list(c(50, 80), c(60, 90))),

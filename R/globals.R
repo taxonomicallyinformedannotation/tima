@@ -1,22 +1,3 @@
-#' Global Variables Declaration for Non-Standard Evaluation
-#'
-#' @description Declares global variables to suppress R CMD check notes for
-#'     non-standard evaluation (NSE) in tidytable and data.table operations.
-#'     These are symbolic column references that are resolved at runtime.
-#'
-#' @details The tima package uses tidytable for data manipulation with
-#'     non-standard evaluation for intuitive column reference syntax.
-#'     R CMD check otherwise flags these as undefined globals. This declaration
-#'     tells R that these are intentional and valid in NSE contexts.
-#'
-#'     Variables are organized by functional category:
-#'     - NSE operators: ., .(), :=, .N, .SD (data.table/tidytable)
-#'     - Intermediate calculation columns: .abs_error, .ppm_ok, etc.
-#'     - Structural columns: feature_id, mz, rt, adduct, etc.
-#'     - Score/ranking columns: score_final, rank_final, etc.
-#'     - Biological/chemical columns: taxonomy, SMILES, InChIKey, etc.
-#'
-#' @keywords internal
 utils::globalVariables(
   c(
     "!!",

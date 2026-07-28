@@ -76,8 +76,6 @@ test_that("change_params_small errors on missing mzTab file", {
 
 test_that("change_params_small runs with valid polarity", {
   skip_on_ci()
-  skip_if_not_installed("yaml")
-
   # Create minimal environment
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
@@ -136,7 +134,6 @@ test_that("change_params_small runs with valid polarity", {
 })
 
 test_that("change_params_small updates all file parameters", {
-  skip_if_not_installed("yaml")
   skip_on_ci()
 
   tmpdir <- tempfile()
@@ -211,7 +208,6 @@ test_that("change_params_small updates all file parameters", {
 })
 
 test_that("change_params_small supports mzTab-only update while keeping existing core files", {
-  skip_if_not_installed("yaml")
   skip_on_ci()
 
   tmpdir <- tempfile()
@@ -260,7 +256,6 @@ test_that("change_params_small supports mzTab-only update while keeping existing
 })
 
 test_that("change_params_small accepts mzTab with explicit overlays for features/metadata/spectra", {
-  skip_if_not_installed("yaml")
   skip_on_ci()
 
   tmpdir <- tempfile()
@@ -342,8 +337,6 @@ test_that("validate_params_small_inputs errors on invalid polarity", {
 })
 
 test_that("copy_file_to_target copies file successfully", {
-  skip_if_not_installed("fs")
-
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE))
@@ -384,8 +377,6 @@ test_that("copy_file_to_target errors on missing file", {
 })
 
 test_that("copy_file_to_target overwrites existing file", {
-  skip_if_not_installed("fs")
-
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE))
@@ -434,7 +425,6 @@ test_that("create_yaml_null_handler creates proper function", {
 })
 
 test_that("change_params_small handles NULL parameters gracefully", {
-  skip_if_not_installed("yaml")
   skip_on_ci()
 
   tmpdir <- tempfile()
@@ -494,7 +484,6 @@ test_that("change_params_small handles NULL parameters gracefully", {
 })
 
 test_that("change_params_small handles partial updates", {
-  skip_if_not_installed("yaml")
   skip_on_ci()
 
   tmpdir <- tempfile()
@@ -547,7 +536,6 @@ test_that("change_params_small handles partial updates", {
 })
 
 test_that("change_params_small updates both yaml files", {
-  skip_if_not_installed("yaml")
   skip_on_ci()
 
   tmpdir <- tempfile()
@@ -603,8 +591,6 @@ test_that("change_params_small updates both yaml files", {
 })
 
 test_that("change_params_small uses go_to_cache when cache_dir is NULL", {
-  skip_if_not_installed("withr")
-
   tmp <- withr::local_tempdir()
   captured_yaml <- NULL
 
@@ -709,8 +695,6 @@ test_that("validate_params_small_inputs validates polarity", {
 })
 
 test_that("copy_file_to_target copies files correctly", {
-  skip_if_not_installed("fs")
-
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE))
@@ -767,8 +751,6 @@ test_that("create_yaml_null_handler creates proper function", {
 })
 
 test_that("prepare_params propagates mzTab paths into mzTab workflow step YAMLs", {
-  skip_if_not_installed("yaml")
-
   params_root <- system.file("params", package = "tima")
   skip_if(
     !nzchar(params_root),

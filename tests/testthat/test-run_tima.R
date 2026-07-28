@@ -44,8 +44,6 @@ test_that("archive_log_file creates output directory if needed", {
 })
 
 test_that("execute_targets_pipeline handles errors gracefully", {
-  skip_if_not_installed("targets")
-
   # This will fail because no _targets.R exists in temp directory
   withr::local_dir(new = temp_test_dir("no_targets"))
   expect_error(
@@ -131,8 +129,6 @@ test_that("run_tima validates clean_old_logs parameter", {
 
 test_that("run_tima execution flow (requires targets setup)", {
   skip_if_not(interactive(), "Requires complete TIMA cache setup")
-  skip_if_not_installed("targets")
-
   # This test would require:
   # 1. copy_backbone()
   # 2. go_to_cache()
@@ -357,8 +353,6 @@ test_that("run_tima reports cache navigation errors", {
 
 ## COMMENT: Too long for now
 # test_that("run_tima provides informative error messages", {
-#   skip_if_not_installed("targets")
-#
 #   # Error should mention pipeline failure
 #   expect_error(
 #     withr::local_dir(temp_test_dir("error_test"))

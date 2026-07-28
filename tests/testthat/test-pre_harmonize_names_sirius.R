@@ -243,8 +243,6 @@ test_that("pre_harmonize_names_sirius handles underscores differently", {
 ## Performance Tests ----
 
 test_that("pre_harmonize_names_sirius is reasonably fast", {
-  skip_if_not_installed("bench")
-
   timing <- system.time(replicate(
     n = 1000L,
     expr = pre_harmonize_names_sirius("column_name/suffix")

@@ -3,8 +3,6 @@
 library(testthat)
 
 test_that("prepare_libraries_spectra() validates nam_lib parameter", {
-  skip_if_not_installed("Spectra")
-
   tmpfile <- tempfile(fileext = ".mgf")
   # Create a minimal valid MGF file
   writeLines(
@@ -28,8 +26,6 @@ test_that("prepare_libraries_spectra() validates nam_lib parameter", {
 })
 
 test_that("prepare_libraries_spectra() validates column name parameters", {
-  skip_if_not_installed("Spectra")
-
   tmpfile <- tempfile(fileext = ".mgf")
   writeLines(
     c(
@@ -53,7 +49,6 @@ test_that("prepare_libraries_spectra() validates column name parameters", {
 })
 
 test_that("prepare_libraries_spectra() prepares a single library MGF successfully", {
-  skip_if_not_installed("Spectra")
   withr::local_dir(new = temp_test_dir("prepare_libraries_spectra_1"))
   mgf <- tempfile(fileext = ".mgf")
   writeLines(
@@ -81,7 +76,6 @@ test_that("prepare_libraries_spectra() prepares a single library MGF successfull
 })
 
 test_that("prepare_libraries_spectra() handles multiple input files", {
-  skip_if_not_installed("Spectra")
   withr::local_dir(new = temp_test_dir("prepare_libraries_spectra_2"))
   mgf1 <- tempfile(fileext = ".mgf")
   mgf2 <- tempfile(fileext = ".mgf")
@@ -130,7 +124,6 @@ test_that("prepare_libraries_spectra() handles multiple input files", {
 })
 
 test_that("prepare_libraries_spectra() runs when optional columns are absent", {
-  skip_if_not_installed("Spectra")
   withr::local_dir(new = temp_test_dir("prepare_libraries_spectra_3"))
   mgf <- tempfile(fileext = ".mgf")
   writeLines(
@@ -158,7 +151,6 @@ test_that("prepare_libraries_spectra() runs when optional columns are absent", {
 })
 
 test_that("create_empty_spectral_library returns minimal Spectra object", {
-  skip_if_not_installed("Spectra")
   sp <- create_empty_spectral_library()
   expect_s4_class(sp, "Spectra")
   expect_true(length(sp) >= 1L)
@@ -177,7 +169,6 @@ test_that("create_empty_sop_library returns expected columns", {
 })
 
 test_that("prepare_libraries_spectra returns cached outputs when files already exist", {
-  skip_if_not_installed("Spectra")
   withr::local_dir(new = temp_test_dir("prepare_libraries_cached"))
 
   out_pos <- file.path(
@@ -230,7 +221,6 @@ test_that("prepare_libraries_spectra returns cached outputs when files already e
 })
 
 test_that("prepare_libraries_spectra creates empty templates when input is missing", {
-  skip_if_not_installed("Spectra")
   withr::local_dir(new = temp_test_dir("prepare_libraries_empty"))
   local_test_project(copy = TRUE)
 

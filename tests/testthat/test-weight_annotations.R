@@ -64,8 +64,6 @@ stage_weight_annotations_fixtures <- function(
 # Validation ----
 
 test_that("weight_annotations() validates required file existence", {
-  skip_if_not_installed("tidytable")
-
   expect_error(
     weight_annotations(
       library = "nonexistent.tsv",
@@ -84,8 +82,6 @@ test_that("weight_annotations() validates required file existence", {
 })
 
 test_that("weight_annotations() validates weight sum", {
-  skip_if_not_installed("tidytable")
-
   fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
@@ -110,8 +106,6 @@ test_that("weight_annotations() validates weight sum", {
 })
 
 test_that("weight_annotations() validates minimal_ms1_condition", {
-  skip_if_not_installed("tidytable")
-
   fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
@@ -136,8 +130,6 @@ test_that("weight_annotations() validates minimal_ms1_condition", {
 })
 
 test_that("weight_annotations() rejects negative weights", {
-  skip_if_not_installed("tidytable")
-
   fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
@@ -162,8 +154,6 @@ test_that("weight_annotations() rejects negative weights", {
 })
 
 test_that("weight_annotations() rejects invalid logical parameters", {
-  skip_if_not_installed("tidytable")
-
   fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
@@ -188,8 +178,6 @@ test_that("weight_annotations() rejects invalid logical parameters", {
 })
 
 test_that("weight_annotations() rejects invalid candidate counts", {
-  skip_if_not_installed("tidytable")
-
   fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
@@ -216,9 +204,6 @@ test_that("weight_annotations() rejects invalid candidate counts", {
 # Other paths ----
 
 test_that("weight_annotations() runs successfully with minimal inputs", {
-  skip_if_not_installed("tidytable")
-  skip_if_not_installed("purrr")
-
   fixtures <- stage_weight_annotations_fixtures()
   withr::local_dir(new = fixtures$tmpdir)
 
@@ -309,8 +294,6 @@ test_that("weight_annotations() runs successfully with minimal inputs", {
 })
 
 test_that("weight_annotations() processes MS1-only annotations", {
-  skip_if_not_installed("tidytable")
-
   fixtures <- stage_weight_annotations_fixtures()
   withr::local_dir(new = fixtures$tmpdir)
 
@@ -389,8 +372,6 @@ test_that("weight_annotations() processes MS1-only annotations", {
 })
 
 test_that("weight_annotations() handles different weight combinations", {
-  skip_if_not_installed("tidytable")
-
   fixtures <- stage_weight_annotations_fixtures()
   withr::local_dir(new = fixtures$tmpdir)
 
@@ -470,8 +451,6 @@ test_that("weight_annotations() handles different weight combinations", {
 })
 
 test_that("weight_annotations() handles boolean flags", {
-  skip_if_not_installed("tidytable")
-
   fixtures <- stage_weight_annotations_fixtures()
   withr::local_dir(new = fixtures$tmpdir)
 
@@ -550,9 +529,6 @@ test_that("weight_annotations() handles boolean flags", {
 })
 
 test_that("weight_annotations() exports propagated tag columns", {
-  skip_if_not_installed("tidytable")
-  skip_if_not_installed("purrr")
-
   fixtures <- stage_weight_annotations_fixtures()
   withr::local_dir(new = fixtures$tmpdir)
 
@@ -663,8 +639,6 @@ test_that("weight_annotations() exports propagated tag columns", {
 # rearrange_annotations ----
 
 test_that("rearrange_annotations merges SIRIUS scores into spectral entries with same inchikey", {
-  skip_if_not_installed("tidytable")
-
   # Annotation table: spectral + SIRIUS entries for the same structure.
   # Glutamine (RWQNBRDOKXIBIV) is a real-world example where tautomers
 

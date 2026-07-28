@@ -296,7 +296,6 @@ test_that("create_edges_spectra keeps feature IDs from FEATURE_ID (mzTab proxy M
 })
 
 test_that("create_edges_spectra() creates edges from two spectra with entropy", {
-  skip_if_not_installed("Spectra")
   withr::local_dir(new = temp_test_dir("create_edges_spectra_entropy"))
   mgf_file <- tempfile(fileext = ".mgf")
   writeLines(
@@ -335,7 +334,6 @@ test_that("create_edges_spectra() creates edges from two spectra with entropy", 
 })
 
 test_that("create_edges_spectra() runs with cosine method", {
-  skip_if_not_installed("Spectra")
   withr::local_dir(new = temp_test_dir("create_edges_spectra_cosine"))
   mgf_file <- tempfile(fileext = ".mgf")
   writeLines(

@@ -567,8 +567,6 @@ test_that("test-apply_taxonomic_filter preserves core columns", {
 # ==== SUCCESS PATH TESTS FOR EXPORTED FUNCTION ====
 
 test_that("prepare_libraries_sop_merged() runs without filtering", {
-  skip_if_not_installed("tidytable")
-
   # Create minimal library data
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
@@ -647,8 +645,6 @@ test_that("prepare_libraries_sop_merged() runs without filtering", {
 })
 
 test_that("prepare_libraries_sop_merged() filters by taxonomy", {
-  skip_if_not_installed("tidytable")
-
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE))
@@ -720,8 +716,6 @@ test_that("prepare_libraries_sop_merged() filters by taxonomy", {
 })
 
 test_that("prepare_libraries_sop_merged() merges multiple input files", {
-  skip_if_not_installed("tidytable")
-
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE))
@@ -1017,8 +1011,6 @@ test_that("enrich_taxonomy_from_cache enriches ClassyFire taxonomy", {
 })
 
 test_that("prepare_libraries_sop_merged() enriches taxonomy from additional caches", {
-  skip_if_not_installed("tidytable")
-
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE))

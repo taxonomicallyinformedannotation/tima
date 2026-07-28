@@ -4,12 +4,6 @@
 
 library(testthat)
 
-skip_if_mgf_unavailable <- function() {
-  testthat::skip_if_not_installed("Spectra")
-  testthat::skip_if_not_installed("MsBackendMgf")
-  testthat::skip_if_not_installed("MsCoreUtils")
-}
-
 write_mgf <- function(blocks) {
   tf <- tempfile(fileext = ".mgf")
   writeLines(unlist(blocks), tf)
@@ -49,8 +43,6 @@ test_that("read_mgf_opti errors on empty path", {
 # ---- single spectrum ---------------------------------------------------------
 
 test_that("read_mgf_opti reads a minimal single-spectrum MGF", {
-  skip_if_mgf_unavailable()
-
   tf <- write_mgf(minimal_block())
   on.exit(unlink(tf))
 
@@ -65,8 +57,6 @@ test_that("read_mgf_opti reads a minimal single-spectrum MGF", {
 # ---- charge formatting -------------------------------------------------------
 
 test_that("read_mgf_opti strips trailing + from charge", {
-  skip_if_mgf_unavailable()
-
   tf <- write_mgf(minimal_block(charge = "2+"))
   on.exit(unlink(tf))
 
@@ -75,8 +65,6 @@ test_that("read_mgf_opti strips trailing + from charge", {
 })
 
 test_that("read_mgf_opti prefixes negative charge with minus", {
-  skip_if_mgf_unavailable()
-
   tf <- write_mgf(minimal_block(charge = "1-"))
   on.exit(unlink(tf))
 
@@ -85,8 +73,6 @@ test_that("read_mgf_opti prefixes negative charge with minus", {
 })
 
 test_that("read_mgf_opti handles leading-minus charge convention", {
-  skip_if_mgf_unavailable()
-
   tf <- write_mgf(minimal_block(charge = "-1"))
   on.exit(unlink(tf))
 
@@ -97,8 +83,6 @@ test_that("read_mgf_opti handles leading-minus charge convention", {
 # ---- PEPMASS without intensity -----------------------------------------------
 
 test_that("read_mgf_opti handles PEPMASS without intensity column", {
-  skip_if_mgf_unavailable()
-
   tf <- write_mgf(minimal_block(pepmass = "123.456"))
   on.exit(unlink(tf))
 
@@ -110,8 +94,6 @@ test_that("read_mgf_opti handles PEPMASS without intensity column", {
 # ---- unsorted peaks ----------------------------------------------------------
 
 test_that("read_mgf_opti sorts peaks by m/z", {
-  skip_if_mgf_unavailable()
-
   tf <- write_mgf(minimal_block(peaks = c("200 5", "50 10", "100 20")))
   on.exit(unlink(tf))
 
@@ -123,8 +105,6 @@ test_that("read_mgf_opti sorts peaks by m/z", {
 # ---- multi-spectrum ----------------------------------------------------------
 
 test_that("read_mgf_opti reads multiple spectra in order", {
-  skip_if_mgf_unavailable()
-
   tf <- write_mgf(c(
     minimal_block(
       title = "Spec1",
@@ -146,8 +126,6 @@ test_that("read_mgf_opti reads multiple spectra in order", {
 # ---- msLevel is propagated ---------------------------------------------------
 
 test_that("read_mgf_opti assigns the msLevel argument to all rows", {
-  skip_if_mgf_unavailable()
-
   tf <- write_mgf(c(
     minimal_block(title = "A"),
     minimal_block(title = "B")
@@ -161,8 +139,6 @@ test_that("read_mgf_opti assigns the msLevel argument to all rows", {
 # ---- dataOrigin is set -------------------------------------------------------
 
 test_that("read_mgf_opti sets dataOrigin to the file path", {
-  skip_if_mgf_unavailable()
-
   tf <- write_mgf(minimal_block())
   on.exit(unlink(tf))
 
@@ -173,8 +149,6 @@ test_that("read_mgf_opti sets dataOrigin to the file path", {
 # ---- empty spectra (no peaks) ------------------------------------------------
 
 test_that("read_mgf_opti silently skips spectra with no fragment peaks", {
-  skip_if_mgf_unavailable()
-
   # Mix of spectra: one with peaks, one empty, one with peaks
   tf <- write_mgf(c(
     minimal_block(
@@ -208,8 +182,6 @@ test_that("read_mgf_opti silently skips spectra with no fragment peaks", {
 })
 
 test_that("read_mgf_opti returns an empty DataFrame when all spectra are empty", {
-  skip_if_mgf_unavailable()
-
   tf <- write_mgf(c(
     c(
       "BEGIN IONS",

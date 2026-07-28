@@ -258,8 +258,6 @@ test_that(".write_proxy_mgf skips features with zero or non-finite m/z", {
 })
 
 test_that("end-to-end: mzTab → features + embedded MGF → edges work together", {
-  skip_if_not_installed("Spectra")
-
   mztab_file <- resolve_fixture_path("mztab/masster_minimal_embedded.mztab")
   out_dir <- temp_test_dir("e2e_mztab_edges")
   out_features <- file.path(out_dir, "features.tsv")

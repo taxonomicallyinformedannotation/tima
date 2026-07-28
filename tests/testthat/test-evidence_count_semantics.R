@@ -10,8 +10,6 @@ test_that("evidence_count is count of supporting features, not a score", {
   # (a feature supporting itself via mass consistency)
   # Higher counts mean additional peer features agree on the same M
 
-  skip_if_not_installed("tidytable")
-
   # Create mock evidence table
   mock_hyps <- tidytable::tidytable(
     feature_id = c("f1", "f1", "f2", "f2", "f3"),
@@ -43,8 +41,6 @@ test_that("evidence_count is count of supporting features, not a score", {
 
 
 test_that("min_support = 1 means any supporting feature is valid", {
-  skip_if_not_installed("tidytable")
-
   # Before: evidence_score = n_features - 1, so min_support had to be 2 for count>=1
   # Now: evidence_count = n_features directly, min_support = 1 for any support
 

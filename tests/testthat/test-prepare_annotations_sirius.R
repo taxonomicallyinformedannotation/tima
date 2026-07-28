@@ -568,8 +568,6 @@ test_that("get_sirius_filenames returns correct patterns for version 6", {
 })
 
 test_that("create_empty_sirius_annotations returns proper template", {
-  skip_if_not_installed("tidytable")
-
   result <- create_empty_sirius_annotations()
 
   expect_true(tidytable::is_tidytable(result))
@@ -1348,8 +1346,6 @@ test_that("load_sirius_summaries returns empty when all discovered summaries are
 })
 
 test_that("load_sirius_tables v6 keeps only formulaRank 1 when ranks are character", {
-  skip_if_not_installed("archive")
-
   tmp <- temp_test_dir("sirius_formula_rank_char")
   dir.create(tmp, recursive = TRUE, showWarnings = FALSE)
 

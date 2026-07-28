@@ -338,8 +338,6 @@ test_that("validate_filter_annotations_inputs accepts valid character vector ann
 })
 
 test_that("filter_ms1_redundancy filters correctly with quality gate", {
-  skip_if_not_installed("tidytable")
-
   ms1_data <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3", "F4"),
     candidate_structure_inchikey_connectivity_layer = c("A", "B", "C", "D"),
@@ -378,8 +376,6 @@ test_that("filter_ms1_redundancy filters correctly with quality gate", {
 })
 
 test_that("filter_ms1_redundancy handles no MS1 annotations", {
-  skip_if_not_installed("tidytable")
-
   spectral_data <- tidytable::tidytable(
     feature_id = c("F1", "F2"),
     candidate_structure_inchikey_connectivity_layer = c("A", "B"),
@@ -394,8 +390,6 @@ test_that("filter_ms1_redundancy handles no MS1 annotations", {
 })
 
 # test_that("filter_ms1_redundancy handles only MS1 annotations", {
-#   skip_if_not_installed("tidytable")
-#
 #   ms1_data <- tidytable::tidytable(
 #     feature_id = c("F1", "F2"),
 #     candidate_structure_inchikey_connectivity_layer = c("A", "B"),
@@ -410,8 +404,6 @@ test_that("filter_ms1_redundancy handles no MS1 annotations", {
 # })
 
 test_that("apply_rt_filter computes RT errors without hard cutoff", {
-  skip_if_not_installed("tidytable")
-
   features_ann <- tidytable::tidytable(
     feature_id = c("F1", "F2", "F3"),
     candidate_structure_inchikey_connectivity_layer = c("A", "B", "C"),
@@ -438,8 +430,6 @@ test_that("apply_rt_filter computes RT errors without hard cutoff", {
 })
 
 test_that("apply_rt_filter keeps annotations without RT target", {
-  skip_if_not_installed("tidytable")
-
   features_ann <- tidytable::tidytable(
     feature_id = c("F1", "F2"),
     candidate_structure_inchikey_connectivity_layer = c("A", "B"),
@@ -458,8 +448,6 @@ test_that("apply_rt_filter keeps annotations without RT target", {
 })
 
 test_that("filter_annotations handles multiple annotation files", {
-  skip_if_not_installed("tidytable")
-
   ann1 <- tempfile(fileext = ".tsv")
   ann2 <- tempfile(fileext = ".tsv")
   .make_ann(ann1)
@@ -514,8 +502,6 @@ test_that("validate_filter_annotations_inputs rejects missing RT library files",
 })
 
 test_that("apply_rt_filter deduplicates multiple RT matches to best one", {
-  skip_if_not_installed("tidytable")
-
   features_ann <- tidytable::tidytable(
     feature_id = "F1",
     candidate_structure_inchikey_connectivity_layer = "A",
@@ -537,8 +523,6 @@ test_that("apply_rt_filter deduplicates multiple RT matches to best one", {
 })
 
 test_that("apply_rt_filter deduplicates to best RT match when tolerance is finite", {
-  skip_if_not_installed("tidytable")
-
   features_ann <- tidytable::tidytable(
     feature_id = "F1",
     candidate_structure_inchikey_connectivity_layer = "A",
