@@ -588,7 +588,7 @@ derive_primary_secondary_annotations <- function(
     out <- out |>
       tidytable::mutate(
         candidate_adduct_origin = tidytable::if_else(
-          source == "baseline" | adduct %in% baseline_adducts,
+          source == "baseline" | !is.na(fastmatch::fmatch(adduct, baseline_adducts)),
           "baseline",
           "supported"
         )

@@ -338,7 +338,7 @@ solve_consistent_adduct_assignments <- function(
     missing_nodes <- setdiff(comp_nodes, m_values$feature_id)
     if (length(missing_nodes) > 0L) {
       baseline_m <- features_table |>
-        tidytable::filter(feature_id %in% missing_nodes) |>
+        tidytable::filter(!is.na(fastmatch::fmatch(feature_id, missing_nodes))) |>
         tidytable::transmute(
           feature_id,
           neutral_mass = calculate_neutral_mass_from_lookup(
@@ -478,7 +478,7 @@ enforce_global_m_consistency <- function(
     }
 
     edge_with_m <- edge_with_m[
-      !(edge_with_m$edge_id %in% edges_to_remove),
+      is.na(fastmatch::fmatch(edge_with_m$edge_id, edges_to_remove)),
       ,
       drop = FALSE
     ]
@@ -849,7 +849,7 @@ collect_node_adduct_hypotheses <- function(
   ) |>
     tidytable::mutate(adduct = trimws(adduct)) |>
     tidytable::filter(!is.na(adduct) & nzchar(adduct)) |>
-    tidytable::filter(!(adduct %in% adducts_forbidden))
+    tidytable::filter(is.na(fastmatch::fmatch(adduct, adducts_forbidden)))
 
   fea_meta <- features_table |>
     tidytable::distinct(feature_id, mz, rt)

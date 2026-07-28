@@ -1544,7 +1544,7 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
 
     if (length(reorder_fids) > 0L) {
       df_reordered <- df_part_reorder |>
-        tidytable::filter(feature_id %in% reorder_fids) |>
+        tidytable::filter(!is.na(fastmatch::fmatch(feature_id, reorder_fids))) |>
         tidytable::arrange(
           feature_id,
           .candidate_M_key,
@@ -1557,7 +1557,7 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
         )
 
       df_not_reordered <- df_part_reorder |>
-        tidytable::filter(!feature_id %in% reorder_fids)
+        tidytable::filter(is.na(fastmatch::fmatch(feature_id, reorder_fids)))
 
       df_part_reorder <- tidytable::bind_rows(df_reordered, df_not_reordered) |>
         tidytable::arrange(feature_id, rank_final)
@@ -1642,7 +1642,7 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
 
     if (length(affected_fids) > 0L) {
       df_affected <- df_result |>
-        tidytable::filter(feature_id %in% affected_fids) |>
+        tidytable::filter(!is.na(fastmatch::fmatch(feature_id, affected_fids))) |>
         tidytable::arrange(
           feature_id,
           tidytable::desc(cluster_consensus_promoted_from_anchor),
@@ -1653,7 +1653,7 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
           .by = feature_id
         )
       df_unaffected <- df_result |>
-        tidytable::filter(!feature_id %in% affected_fids)
+        tidytable::filter(is.na(fastmatch::fmatch(feature_id, affected_fids)))
       df_result <- tidytable::bind_rows(df_affected, df_unaffected) |>
         tidytable::arrange(feature_id, rank_final)
     } else {
