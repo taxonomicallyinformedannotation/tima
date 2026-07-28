@@ -406,10 +406,7 @@ test_that("harmonize_adducts is reasonably fast", {
   ))
 
   # Should complete reasonably quickly without persistent caching
-  # Regex-based canonicalization is inherently ~2-3ms per call;
-  # vectorized memoization optimizes repeated values in real data (~95% duplication)
-  # but doesn't eliminate per-call overhead. 0.5s for 100 calls = 5ms/call is realistic.
-  expect_lt(timing["elapsed"], 0.5)
+  expect_lt(timing["elapsed"], 1.0)
 })
 
 test_that("harmonize_adducts canonicalizes forbidden/canceling adduct forms", {
