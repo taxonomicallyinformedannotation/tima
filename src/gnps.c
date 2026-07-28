@@ -274,8 +274,8 @@ static void *xcalloc(size_t n, size_t s) {
  */
 static int scratch_ensure(void **ptr, size_t *cap_bytes, size_t need_bytes) {
     if (need_bytes <= *cap_bytes) return 1;
-    size_t new_cap = *cap_bytes ? *cap_bytes : (size_t) 64;
-    while (new_cap < need_bytes) new_cap = new_cap + new_cap / 2 + 64;
+    size_t new_cap = *cap_bytes ? *cap_bytes : (size_t) 256;
+    while (new_cap < need_bytes) new_cap = new_cap + new_cap / 2 + 256;
     void *newp = realloc(*ptr, new_cap);
     if (newp) {
         *ptr = newp;
