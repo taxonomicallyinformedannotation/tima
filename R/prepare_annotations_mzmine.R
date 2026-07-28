@@ -116,9 +116,9 @@ prepare_annotations_mzmine <- function(
       # Alternative approach: Could attempt to estimate from calibration data or parent.
       tidytable::mutate(
         # TODO temporary
-       "candidate_library" = "mzmine",
-       "candidate_structure_error_mz" = NA_real_,
-       "candidate_structure_error_rt" = NA_real_
+        "candidate_library" = "mzmine",
+        "candidate_structure_error_mz" = NA_real_,
+        "candidate_structure_error_rt" = NA_real_
       ) |>
       tidytable::mutate(
         ## exact_mass, xlogp, formula are recomputed from SMILES

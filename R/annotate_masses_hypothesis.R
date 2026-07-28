@@ -338,7 +338,9 @@ solve_consistent_adduct_assignments <- function(
     missing_nodes <- setdiff(comp_nodes, m_values$feature_id)
     if (length(missing_nodes) > 0L) {
       baseline_m <- features_table |>
-        tidytable::filter(!is.na(fastmatch::fmatch(feature_id, missing_nodes))) |>
+        tidytable::filter(
+          !is.na(fastmatch::fmatch(feature_id, missing_nodes))
+        ) |>
         tidytable::transmute(
           feature_id,
           neutral_mass = calculate_neutral_mass_from_lookup(

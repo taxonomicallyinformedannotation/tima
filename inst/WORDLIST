@@ -191,6 +191,8 @@ benchmarking
 bioconductor
 bioregistry
 canonicalization
+canonicalize
+canonicalized
 canonicalizes
 canopus
 chemontid
@@ -265,6 +267,7 @@ lutea
 mDa
 masster
 matcher
+memoization
 mer
 metabo
 metabolomics
@@ -358,6 +361,7 @@ uri
 usedist
 validator
 validators
+vapply
 vec
 vectorially
 virtualenv

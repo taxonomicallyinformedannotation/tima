@@ -588,7 +588,8 @@ derive_primary_secondary_annotations <- function(
     out <- out |>
       tidytable::mutate(
         candidate_adduct_origin = tidytable::if_else(
-          source == "baseline" | !is.na(fastmatch::fmatch(adduct, baseline_adducts)),
+          source == "baseline" |
+            !is.na(fastmatch::fmatch(adduct, baseline_adducts)),
           "baseline",
           "supported"
         )
@@ -1746,62 +1747,10 @@ normalize_modifier_formula_terms <- function(terms) {
   # match() returns indices of where each term appears in unique_terms,
   # then subscript into normalized_unique to get results
   indices <- match(terms[!na_mask], unique_terms)
-  
+
   # Pre-allocate result and fill in one assignment
   result <- character(length(terms))
   result[!na_mask] <- normalized_unique[indices]
-  result[na_mask] <- NA_character_
-
-  result
-}
-
-#' Canonicalize adduct notation with memoization
-#'
-#' @description Vectorized canonicalization of adduct strings with caching.
-#'     Caches the canonicalization of unique adducts and maps all inputs through
-#'     the cache using direct indexing, achieving 50-200x speedup when adducts
-#'     repeat frequently (typical real data: 10-20 unique adducts repeated
-#'     across 100s of hypotheses).
-#'
-#' @param adducts Character vector of adduct strings to canonicalize
-#'
-#' @return Character vector of canonicalized adducts
-#'
-#' @details This is a performance-critical optimization for:
-#'     - apply_modifier_to_adducts() (applies modifiers to base adducts)
-#'     - Core annotation loop where 5-20 base adducts are combined with
-#'       10-50 modifiers, yielding hundreds of modified adducts
-#'     Real datasets show 95%+ repetition: 13 unique adducts in 1000 hypotheses.
-#'
-#'     Uses vectorized match() for efficient O(n) mapping without loops.
-#'
-#' @keywords internal
-canonicalize_adducts_vectorized <- function(adducts) {
-  # Fast path: empty input
-  if (length(adducts) == 0L) {
-    return(character())
-  }
-
-  # Separate NA positions
-  na_mask <- is.na(adducts)
-
-  # Get unique non-NA adducts
-  unique_ads <- unique(adducts[!na_mask])
-
-  # Canonicalize each unique adduct exactly once (cached)
-  canon_unique <- vapply(
-    X = unique_ads,
-    FUN = canonicalize_adduct_notation,
-    FUN.VALUE = character(1L),
-    USE.NAMES = FALSE
-  )
-
-  # Map all input adducts through cached lookup via vectorized match()
-  indices <- match(adducts[!na_mask], unique_ads)
-  
-  # Pre-allocate result and fill in one assignment
-  result <- character(length(adducts))
-  result[!na_mask] <- canon_unique[indices]
   result[na_mask] <- NA_character_
 
   result
@@ -2010,7 +1959,9 @@ resolve_competing_cluster_loss_edges_by_hypotheses <- function(
           by = c("feature_id_dest", "adduct_dest")
         ) |>
         tidytable::mutate(
-          .modifier_key = normalize_modifier_formula_terms(.data[[relation_col]]),
+          .modifier_key = normalize_modifier_formula_terms(.data[[
+            relation_col
+          ]]),
           src_score = tidytable::coalesce(src_score, 0L),
           dest_score = tidytable::coalesce(dest_score, 0L),
           .edge_score = as.integer(src_score + dest_score)

@@ -22,11 +22,15 @@ Filters edges to keep only features with at least 2 neighbors and
 removes self-loops. Optionally filters by spectral entropy and labels.
 }
 \note{
-TODO: Implement more sophisticated filtering criteria:
+TODO: Potential future enhancement:
+Consider implementing more sophisticated filtering criteria:
 \itemize{
 \item Configurable entropy thresholds for spectral quality
 \item Similarity score minimums
-\item Consider edge filtering during edge creation step
+\item Evaluate edge filtering during edge creation step (performance vs. correctness trade-off)
 }
+
+Current implementation uses simple fixed thresholds and works correctly,
+but could benefit from domain-specific tuning parameters.
 }
 \keyword{internal}

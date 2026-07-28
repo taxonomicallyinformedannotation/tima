@@ -326,7 +326,8 @@ sample_candidates_per_group <- function(
     groups_with_anchor <- unique(group_key_all[df$.anchor_match])
 
     # df_remaining: drop non-anchor rows from groups_with_anchor
-    keep_rows <- !(fastmatch::`%fin%`(group_key_all, groups_with_anchor) & !df$.anchor_match)
+    keep_rows <- !(fastmatch::`%fin%`(group_key_all, groups_with_anchor) &
+      !df$.anchor_match)
     df_remaining <- df[keep_rows, , drop = FALSE]
   } else {
     df_remaining <- df
@@ -1541,7 +1542,9 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
 
     if (length(reorder_fids) > 0L) {
       df_reordered <- df_part_reorder |>
-        tidytable::filter(!is.na(fastmatch::fmatch(feature_id, reorder_fids))) |>
+        tidytable::filter(
+          !is.na(fastmatch::fmatch(feature_id, reorder_fids))
+        ) |>
         tidytable::arrange(
           feature_id,
           .candidate_M_key,
@@ -1639,7 +1642,9 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
 
     if (length(affected_fids) > 0L) {
       df_affected <- df_result |>
-        tidytable::filter(!is.na(fastmatch::fmatch(feature_id, affected_fids))) |>
+        tidytable::filter(
+          !is.na(fastmatch::fmatch(feature_id, affected_fids))
+        ) |>
         tidytable::arrange(
           feature_id,
           tidytable::desc(cluster_consensus_promoted_from_anchor),
