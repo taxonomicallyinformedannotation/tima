@@ -343,7 +343,8 @@ calculate_entropy_and_similarity <- function(
   # Log progress summary
   log_info("Processed %d / %d queries", n_queries, n_queries)
 
-  if (all(vapply(X = results, FUN = is.null, FUN.VALUE = logical(1)))) {
+  is_null_status <- vapply(X = results, FUN = is.null, FUN.VALUE = logical(1))
+  if (all(is_null_status)) {
     result <- tidytable::tidytable(
       feature_id = NA_integer_,
       precursorMz = NA_real_,
@@ -358,7 +359,7 @@ calculate_entropy_and_similarity <- function(
     )
   } else {
     result <- tidytable::bind_rows(
-      results[!vapply(X = results, FUN = is.null, FUN.VALUE = logical(1))]
+      results[!is_null_status]
     )
   }
 

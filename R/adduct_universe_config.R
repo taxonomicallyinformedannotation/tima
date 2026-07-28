@@ -307,7 +307,7 @@ generate_adduct_hypotheses <- function(
   # Filter forbidden canonical strings (kept for backward-compatibility with
   # adducts_utils.R).
   if (exists("adducts_forbidden", inherits = TRUE)) {
-    out <- out[!out$adduct %in% adducts_forbidden, ]
+    out <- out[!fastmatch::`%fin%`(out$adduct, adducts_forbidden), ]
   }
   # Deduplicate on canonical string (safety; should be unique already).
   out <- tidytable::distinct(out, adduct, .keep_all = TRUE)

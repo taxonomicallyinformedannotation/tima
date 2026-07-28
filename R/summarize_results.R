@@ -321,8 +321,11 @@ summarize_results <- function(
     rm(df_joined)
   }
 
-  char_cols <- names(df_final)[vapply(df_final, is.character, logical(1L))]
-  factor_cols <- names(df_final)[vapply(df_final, is.factor, logical(1L))]
+  col_types <- vapply(df_final, function(col) {
+    if (is.character(col)) 1L else if (is.factor(col)) 2L else 0L
+  }, integer(1L))
+  char_cols <- names(col_types)[col_types == 1L]
+  factor_cols <- names(col_types)[col_types == 2L]
 
   df_final <- df_final |>
     tidytable::mutate(

@@ -326,11 +326,8 @@ sample_candidates_per_group <- function(
     groups_with_anchor <- unique(group_key_all[df$.anchor_match])
 
     # df_remaining: drop non-anchor rows from groups_with_anchor
-    df_remaining <- df[
-      !(group_key_all %in% groups_with_anchor & !df$.anchor_match),
-      ,
-      drop = FALSE
-    ]
+    keep_rows <- !(fastmatch::`%fin%`(group_key_all, groups_with_anchor) & !df$.anchor_match)
+    df_remaining <- df[keep_rows, , drop = FALSE]
   } else {
     df_remaining <- df
   }

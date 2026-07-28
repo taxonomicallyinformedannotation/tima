@@ -151,14 +151,9 @@ annotate_spectra <- function(
 
   # Pre-flight data sanitizing for MGF files
   log_debug("Running pre-flight checks on input MGF files...")
-  invisible(vapply(
-    X = input_vec,
-    FUN = function(mgf) {
-      sanitize_all_inputs(mgf_file = mgf)
-      TRUE
-    },
-    FUN.VALUE = logical(1L)
-  ))
+  for (mgf in input_vec) {
+    sanitize_all_inputs(mgf_file = mgf)
+  }
 
   missing_in <- input_vec[!file.exists(input_vec)]
   if (length(missing_in)) {
@@ -525,11 +520,8 @@ import_and_clean_library_collection <- function(
 }
 
 remove_empty_peak_spectra <- function(sp) {
-  has_peaks <- !vapply(
-    sp@backend@peaksData,
-    is.null,
-    logical(1)
-  )
+  # Optimize: use lengths() which is faster than vapply for is.null() checks
+  has_peaks <- lengths(sp@backend@peaksData) > 0L
   sp[has_peaks]
 }
 
