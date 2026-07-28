@@ -45,8 +45,6 @@ jobs:
       - name: Install dependencies (macOS)
         if: contains(matrix.os, 'macos')
         run: |
-          brew update
-          brew install libomp
           GETTEXT_PREFIX="$(brew --prefix gettext)"
           mkdir -p ~/.R
           cat >> ~/.R/Makevars <<EOF
