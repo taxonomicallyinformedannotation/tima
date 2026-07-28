@@ -174,9 +174,8 @@ calculate_entropy_and_similarity <- function(
     }
   }
 
-  # Progress and local function alias used in the hot loop closure
+  # Progress counter and query batch size for efficient C calls
   progress_counter <- 0L
-  call_gnps <- gnps_chain_dp_wrapper
 
   results <- lapply(
     X = seq_along(query_spectra),
@@ -224,9 +223,8 @@ calculate_entropy_and_similarity <- function(
         return(NULL)
       }
 
-      # Calculate similarities with pre-allocated vectors to reduce overhead.
+      # Pre-allocate result vectors once
       n_candidates <- length(lib_indices_sub)
-      # Keep invalid/degenerate candidates as NA so they are never selected.
       scores <- rep(NA_real_, n_candidates)
       entropies <- rep(NA_real_, n_candidates)
       matched_counts <- integer(n_candidates)
@@ -235,39 +233,82 @@ calculate_entropy_and_similarity <- function(
       use_gnps <- (method == "gnps")
       q_mz <- current_spectrum[, 1L]
 
-      for (pos_idx in seq_len(n_candidates)) {
-        lib_idx <- lib_indices_sub[[pos_idx]]
-        lib_spectrum <- lib_spectra[[lib_idx]]
+      # Process library batch using vectorized C call when possible
+      # (reduces per-pair R↔C overhead vs. individual wrapper calls)
+      if (use_gnps && compute_forward_reverse) {
+        # For GNPS: use batch call if available, falls back to individual calls
+        lib_batch_indices <- lib_indices_sub
+        lib_batch_precursors <- lib_precursors_used[lib_batch_indices]
+        lib_batch_spectra <- lib_spectra[lib_batch_indices]
 
-        if (
-          !is.matrix(lib_spectrum) ||
-            nrow(lib_spectrum) == 0L ||
-            ncol(lib_spectrum) < 2L
-        ) {
-          next
-        }
+        # Try fused batch call; falls back to per-pair if it fails
+        batch_result <- tryCatch(
+          {
+            gnps_chain_dp_batch_wrapper(
+              x = current_spectrum,
+              xPrecursorMz = current_precursor,
+              y_list = lib_batch_spectra,
+              yPrecursorMz = lib_batch_precursors,
+              tolerance = dalton,
+              ppm = ppm
+            )
+          },
+          error = function(e) NULL
+        )
 
-        target_precursor <- lib_precursors_used[[lib_idx]]
-        if (use_gnps) {
-          res <- call_gnps(
-            current_spectrum,
-            lib_spectrum,
-            current_precursor,
-            target_precursor,
-            dalton,
-            ppm,
-            matchedPeaksCount = TRUE
-          )
-          scores[[pos_idx]] <- as.numeric(res[[1L]])
-          matched_counts[[pos_idx]] <- as.integer(res[[2L]])
-          if (compute_forward_reverse) {
+        if (!is.null(batch_result) && is.matrix(batch_result)) {
+          # Batch call succeeded: unpack results
+          scores <- as.numeric(batch_result[, 1L])
+          matched_counts <- as.integer(batch_result[, 2L])
+          scores_forward <- as.numeric(batch_result[, 3L])
+          scores_reverse <- as.numeric(batch_result[, 4L])
+          entropies <- lib_entropy[lib_batch_indices]
+        } else {
+          # Batch call failed or returned NULL: fall back to per-pair loop
+          for (pos_idx in seq_len(n_candidates)) {
+            lib_idx <- lib_indices_sub[[pos_idx]]
+            lib_spectrum <- lib_spectra[[lib_idx]]
+
+            if (
+              !is.matrix(lib_spectrum) ||
+                nrow(lib_spectrum) == 0L ||
+                ncol(lib_spectrum) < 2L
+            ) {
+              next
+            }
+
+            target_precursor <- lib_precursors_used[[lib_idx]]
+            res <- gnps_chain_dp_wrapper(
+              current_spectrum,
+              lib_spectrum,
+              current_precursor,
+              target_precursor,
+              dalton,
+              ppm,
+              matchedPeaksCount = TRUE
+            )
+            scores[[pos_idx]] <- as.numeric(res[[1L]])
+            matched_counts[[pos_idx]] <- as.integer(res[[2L]])
             scores_forward[[pos_idx]] <- as.numeric(res[[3L]])
             scores_reverse[[pos_idx]] <- as.numeric(res[[4L]])
-          } else {
-            scores_forward[[pos_idx]] <- NA_real_
-            scores_reverse[[pos_idx]] <- NA_real_
+            entropies[[pos_idx]] <- lib_entropy[[lib_idx]]
           }
-        } else {
+        }
+      } else {
+        # Non-GNPS path or forward/reverse not needed: use per-pair calls
+        for (pos_idx in seq_len(n_candidates)) {
+          lib_idx <- lib_indices_sub[[pos_idx]]
+          lib_spectrum <- lib_spectra[[lib_idx]]
+
+          if (
+            !is.matrix(lib_spectrum) ||
+              nrow(lib_spectrum) == 0L ||
+              ncol(lib_spectrum) < 2L
+          ) {
+            next
+          }
+
+          target_precursor <- lib_precursors_used[[lib_idx]]
           scores[[pos_idx]] <- as.numeric(calculate_similarity(
             method = method,
             query_spectrum = current_spectrum,
@@ -277,8 +318,7 @@ calculate_entropy_and_similarity <- function(
             dalton = dalton,
             ppm = ppm
           ))
-          # Use cached sorted m/z vector for the library spectrum to
-          # avoid sorting inside the tight loop.
+          # Use cached sorted m/z vector to avoid re-sorting
           lib_mz_sorted <- lib_mz_sorted_list[[lib_idx]]
           matched_counts[[pos_idx]] <- .count_matched_peaks(
             q_mz,
@@ -287,16 +327,13 @@ calculate_entropy_and_similarity <- function(
             ppm
           )
 
-          # For non-GNPS methods, compute forward/reverse via the C GNPS
-          # engine only when needed: after passing threshold and when
-          # forward/reverse computation is requested. This avoids unnecessary
-          # calls (and respects test mocks that expect no GNPS invocation).
+          # Compute forward/reverse only for above-threshold matches
           if (
             !is.na(scores[[pos_idx]]) &&
               scores[[pos_idx]] >= threshold &&
               compute_forward_reverse
           ) {
-            fwd_rev <- call_gnps(
+            fwd_rev <- gnps_chain_dp_wrapper(
               current_spectrum,
               lib_spectrum,
               current_precursor,
@@ -311,9 +348,9 @@ calculate_entropy_and_similarity <- function(
             scores_forward[[pos_idx]] <- NA_real_
             scores_reverse[[pos_idx]] <- NA_real_
           }
-        }
 
-        entropies[[pos_idx]] <- lib_entropy[[lib_idx]]
+          entropies[[pos_idx]] <- lib_entropy[[lib_idx]]
+        }
       }
 
       valid_indices <- which(!is.na(scores) & scores >= threshold)
