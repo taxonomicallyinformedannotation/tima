@@ -316,11 +316,11 @@ weight_bio <- function(
           )
         )
       ) |>
-      tidytable::distinct() |>
       tidytable::mutate(tidytable::across(
         .cols = tidyselect::where(fn = is.character),
         .fns = ~ tidytable::na_if(x = .x, y = "")
-      ))
+      )) |>
+      tidytable::distinct()
   } else {
     # Fallback if no structures found: use original behavior
     structure_organism_pairs_table |>
@@ -354,11 +354,11 @@ weight_bio <- function(
           )
         )
       ) |>
-      tidytable::distinct() |>
       tidytable::mutate(tidytable::across(
         .cols = tidyselect::where(fn = is.character),
         .fns = ~ tidytable::na_if(x = .x, y = "")
-      ))
+      )) |>
+      tidytable::distinct()
   }
 
   log_debug("Filtered to %d structure-organism pairs", nrow(df0))
@@ -827,21 +827,22 @@ weight_bio <- function(
   annot_table_wei_bio_init <- annot_table_wei_bio_init |>
     tidytable::mutate(
       score_biological = pmax(
-        score_biological_01,
-        score_biological_02,
-        score_biological_03,
-        score_biological_04,
-        score_biological_05,
-        # score_biological_05_1,
-        score_biological_06,
-        # score_biological_06_1,
-        score_biological_07,
-        # score_biological_07_1,
-        score_biological_08,
-        # score_biological_08_1,
-        score_biological_09,
-        # score_biological_09_1,
-        score_biological_10,
+        pmax(
+          score_biological_01,
+          score_biological_02,
+          score_biological_03,
+          score_biological_04,
+          na.rm = TRUE
+        ),
+        pmax(
+          score_biological_05,
+          score_biological_06,
+          score_biological_07,
+          score_biological_08,
+          na.rm = TRUE
+        ),
+        # pmax(score_biological_05_1, score_biological_06_1, score_biological_07_1, score_biological_08_1, score_biological_09_1, na.rm = TRUE),
+        pmax(score_biological_09, score_biological_10, na.rm = TRUE),
         na.rm = TRUE
       )
     ) |>

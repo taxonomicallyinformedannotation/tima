@@ -225,30 +225,25 @@ apply_adduct_consistency_filter <- function(
       by = "feature_id_dest"
     ) |>
     tidytable::mutate(
-      pair_hypotheses = tidytable::if_else(
-        is.na(pair_hypotheses),
-        1L,
-        as.integer(pair_hypotheses)
+      pair_hypotheses = tidytable::coalesce(
+        as.integer(pair_hypotheses),
+        1L
       ),
-      src_support = tidytable::if_else(
-        is.na(src_support),
-        0L,
-        as.integer(src_support)
+      src_support = tidytable::coalesce(
+        as.integer(src_support),
+        0L
       ),
-      dest_support = tidytable::if_else(
-        is.na(dest_support),
-        0L,
-        as.integer(dest_support)
+      dest_support = tidytable::coalesce(
+        as.integer(dest_support),
+        0L
       ),
-      src_degree = tidytable::if_else(
-        is.na(src_degree),
-        0L,
-        as.integer(src_degree)
+      src_degree = tidytable::coalesce(
+        as.integer(src_degree),
+        0L
       ),
-      dest_degree = tidytable::if_else(
-        is.na(dest_degree),
-        0L,
-        as.integer(dest_degree)
+      dest_degree = tidytable::coalesce(
+        as.integer(dest_degree),
+        0L
       )
     )
   if (mode == "strict") {
@@ -667,6 +662,7 @@ calculate_net_mod_mass_from_text <- function(adduct) {
 }
 
 #' Join RT/mz couple windows with neutral losses using binary search instead of cartesian join.
+#' Join couples with neutral losses using binary search
 #' @keywords internal
 join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
   cd_src <- tidytable::as_tidytable(df_couples_diff)[,
@@ -685,34 +681,17 @@ join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
   nl_win <- nl_win[order(loss_mass)]
   loss_masses <- nl_win$loss_mass
 
-  # For each couple, find matching losses via binary search
-  result_list <- vector("list", nrow(cd_src))
-  filled <- 0L
+  # compute all indices at once using vectorized operations
+  lo_idx <- findInterval(cd_src$delta_min, loss_masses, left.open = TRUE) + 1L
+  hi_idx <- findInterval(cd_src$delta_max, loss_masses, left.open = FALSE)
+  lo_idx <- pmax(1L, lo_idx)
+  hi_idx <- pmin(nrow(nl_win), hi_idx)
 
-  for (i in seq_len(nrow(cd_src))) {
-    dmin <- cd_src$delta_min[[i]]
-    dmax <- cd_src$delta_max[[i]]
+  # Identify rows with valid ranges (lo_idx <= hi_idx)
+  valid <- lo_idx <= hi_idx
+  valid_idx <- which(valid)
 
-    lo_idx <- findInterval(dmin, loss_masses, left.open = TRUE) + 1L
-    hi_idx <- findInterval(dmax, loss_masses, left.open = FALSE)
-    lo_idx <- max(1L, lo_idx)
-    hi_idx <- min(nrow(nl_win), hi_idx)
-
-    if (lo_idx > hi_idx) {
-      next
-    }
-
-    filled <- filled + 1L
-    n_match <- hi_idx - lo_idx + 1L
-    result_list[[filled]] <- tidytable::tidytable(
-      feature_id = rep(cd_src$src_feature_id[[i]], n_match),
-      loss = nl_win$loss[lo_idx:hi_idx],
-      mass = nl_win$loss_mass_keep[lo_idx:hi_idx],
-      feature_id_dest = rep(cd_src$src_feature_id_dest[[i]], n_match)
-    )
-  }
-
-  if (filled == 0L) {
+  if (length(valid_idx) == 0L) {
     return(tidytable::tidytable(
       feature_id = character(),
       loss = character(),
@@ -721,7 +700,23 @@ join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
     ))
   }
 
-  tidytable::bind_rows(result_list[seq_len(filled)]) |>
+  # Build result using vectorized expansion
+  result_list <- vector("list", length(valid_idx))
+  for (j in seq_along(valid_idx)) {
+    i <- valid_idx[j]
+    lo <- lo_idx[i]
+    hi <- hi_idx[i]
+    n_match <- hi - lo + 1L
+
+    result_list[[j]] <- tidytable::tidytable(
+      feature_id = rep(cd_src$src_feature_id[i], n_match),
+      loss = nl_win$loss[lo:hi],
+      mass = nl_win$loss_mass_keep[lo:hi],
+      feature_id_dest = rep(cd_src$src_feature_id_dest[i], n_match)
+    )
+  }
+
+  tidytable::bind_rows(result_list) |>
     unique() |>
     tidytable::as_tidytable()
 }
@@ -754,26 +749,38 @@ join_multi_with_addlossed <- function(df_multi, df_addlossed_rdy) {
   addloss_win <- addloss_win[order(rt_obs)]
   rt_obs <- addloss_win$rt_obs
 
-  result_list <- vector("list", nrow(multi_src))
+  lo_idx <- findInterval(multi_src$rt_min, rt_obs, left.open = TRUE) + 1L
+  hi_idx <- findInterval(multi_src$rt_max, rt_obs, left.open = FALSE)
+  lo_idx <- pmax(1L, lo_idx)
+  hi_idx <- pmin(nrow(addloss_win), hi_idx)
+
+  # Identify rows with valid RT ranges
+  valid_rt <- lo_idx <= hi_idx
+  valid_idx <- which(valid_rt)
+
+  if (length(valid_idx) == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      rt = numeric(),
+      mz = numeric(),
+      adduct = character(),
+      mass = numeric()
+    ))
+  }
+
+  # Build result using vectorized expansion
+  result_list <- vector("list", length(valid_idx))
   filled <- 0L
 
-  for (i in seq_len(nrow(multi_src))) {
-    rt_min_i <- multi_src$rt_min[[i]]
-    rt_max_i <- multi_src$rt_max[[i]]
-    mass_min_i <- multi_src$mass_min[[i]]
-    mass_max_i <- multi_src$mass_max[[i]]
-
-    lo_idx <- findInterval(rt_min_i, rt_obs, left.open = TRUE) + 1L
-    hi_idx <- findInterval(rt_max_i, rt_obs, left.open = FALSE)
-    lo_idx <- max(1L, lo_idx)
-    hi_idx <- min(nrow(addloss_win), hi_idx)
-
-    if (lo_idx > hi_idx) {
-      next
-    }
+  for (j in seq_along(valid_idx)) {
+    i <- valid_idx[j]
+    lo <- lo_idx[i]
+    hi <- hi_idx[i]
+    mass_min_i <- multi_src$mass_min[i]
+    mass_max_i <- multi_src$mass_max[i]
 
     # Filter by mass range
-    cand <- addloss_win[lo_idx:hi_idx]
+    cand <- addloss_win[lo:hi]
     ok <- which(cand$mass_obs >= mass_min_i & cand$mass_obs <= mass_max_i)
     if (length(ok) == 0L) {
       next
@@ -782,10 +789,10 @@ join_multi_with_addlossed <- function(df_multi, df_addlossed_rdy) {
     filled <- filled + 1L
     n_match <- length(ok)
     result_list[[filled]] <- tidytable::tidytable(
-      feature_id = rep(multi_src$feature_id[[i]], n_match),
-      rt = rep(multi_src$rt[[i]], n_match),
-      mz = rep(multi_src$mz[[i]], n_match),
-      adduct = rep(multi_src$adduct[[i]], n_match),
+      feature_id = rep(multi_src$feature_id[i], n_match),
+      rt = rep(multi_src$rt[i], n_match),
+      mz = rep(multi_src$mz[i], n_match),
+      adduct = rep(multi_src$adduct[i], n_match),
       mass = cand$mass_obs_keep[ok]
     )
   }
@@ -801,5 +808,6 @@ join_multi_with_addlossed <- function(df_multi, df_addlossed_rdy) {
   }
 
   tidytable::bind_rows(result_list[seq_len(filled)]) |>
+    unique() |>
     tidytable::as_tidytable()
 }

@@ -118,7 +118,9 @@ merge_lists_recursive <- function(default, user) {
 
   for (name in names(user)) {
     value <- user[[name]]
-    if (name %in% names(default) && is.list(default[[name]]) && is.list(value)) {
+    if (
+      name %in% names(default) && is.list(default[[name]]) && is.list(value)
+    ) {
       result[[name]] <- merge_lists_recursive(default[[name]], value)
     } else {
       result[[name]] <- value
