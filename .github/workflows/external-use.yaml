@@ -23,6 +23,9 @@ jobs:
           - ubuntu-latest
           - macos-latest
           - windows-latest
+          - ubuntu-26.04-arm
+          - macos-26-intel
+          - windows-11-vs2026-arm
     defaults:
       run:
         shell: bash
