@@ -307,7 +307,10 @@ prepare_libraries_spectra <-
         col_sp,
         col_sy
       )
+      spectra_harmonized_pos_min <- spectra_harmonized_pos |>
+        tidytable::select(smiles, smiles_no_stereo)
       spectra_pos <- Spectra::Spectra(object = spectra_harmonized_pos)
+      rm(spectra_harmonized_pos)
 
       log_metadata(
         ctx,
@@ -334,7 +337,10 @@ prepare_libraries_spectra <-
         col_sp,
         col_sy
       )
+      spectra_harmonized_neg_min <- spectra_harmonized_neg |>
+        tidytable::select(smiles, smiles_no_stereo)
       spectra_neg <- Spectra::Spectra(object = spectra_harmonized_neg)
+      rm(spectra_harmonized_neg)
 
       # Extract SOP table ----
       log_metadata(
@@ -343,8 +349,8 @@ prepare_libraries_spectra <-
         n_neg_spectra = length(spectra_neg)
       )
       sop <- tidytable::bind_rows(
-        spectra_harmonized_pos,
-        spectra_harmonized_neg
+        spectra_harmonized_pos_min,
+        spectra_harmonized_neg_min
       ) |>
         tidytable::filter(!is.na(smiles)) |>
         tidytable::distinct(
