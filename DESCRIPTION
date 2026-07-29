@@ -2,17 +2,21 @@ Package: tima
 Title: Taxonomically Informed Metabolite Annotation
 Version: 2.13.0.9000
 Authors@R: c(
-    person(given = "Adriano",
-           family = "Rutz",
-           email = "adafede@gmail.com",
-           role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-0443-9902")),
-    person(given = "Pierre-Marie",
-           family = "Allard",
-           email = "pierre-marie.allard@unifr.ch",
-           role = "ctb",
-           comment = c(ORCID = "0000-0003-3389-2191"))
-  )
+    person(
+        given = "Adriano",
+        family = "Rutz",
+        email = "adafede@gmail.com",
+        role = c("aut", "cre"),
+        comment = c(ORCID = "0000-0003-0443-9902")
+        ),
+    person(
+        given = "Pierre-Marie",
+        family = "Allard",
+        email = "pierre-marie.allard@unifr.ch",
+        role = "ctb",
+        comment = c(ORCID = "0000-0003-3389-2191")
+        )
+    )
 Maintainer: Adriano Rutz <adafede@gmail.com>
 Description: TIMA provides a reproducible workflow for taxonomically informed
     metabolite annotation from feature tables, MS/MS spectra, and optional
