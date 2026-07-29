@@ -101,8 +101,12 @@ import_spectra <- function(
 
   log_info("Importing spectra from: %s", file)
   log_debug(
-    "Parameters: cutoff=%.2f, dalton=%.2f, ppm=%.2f, polarity=%s",
-    cutoff,
+    "Parameters: cutoff=%s, dalton=%.2f, ppm=%.2f, polarity=%s",
+    ifelse(
+      test = is.null(cutoff),
+      yes = "dynamic",
+      no = sprintf("%.2f", cutoff)
+    ),
     dalton,
     ppm,
     ifelse(test = is.na(polarity), yes = "all", no = polarity)
@@ -229,6 +233,13 @@ import_spectra <- function(
       )
       spectra$FEATURE_ID <- parsed_ids
     }
+    # parsed_ids (length == n_initial) has done its job the moment it's
+    # folded into spectra$FEATURE_ID above. Everything from here to the end
+    # of the function -- MS-level filtering, precursor/polarity filtering,
+    # combineSpectra/combinePeaks, and the full sanitize_spectra() call --
+    # builds successive new copies of `spectra`, and there's no reason for
+    # this vector to keep riding along underneath all of that.
+    rm(parsed_ids)
   }
 
   # Filter Spectra ----
@@ -389,6 +400,9 @@ import_spectra <- function(
     if (!all(is.na(parsed_ids))) {
       spectra$FEATURE_ID <- parsed_ids
     }
+    # Same reasoning as in import_spectra(): done with its job, no reason to
+    # keep it referenced through the polarity filtering below.
+    rm(parsed_ids)
   }
 
   if (!is.na(polarity)) {
