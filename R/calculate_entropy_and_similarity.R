@@ -27,6 +27,11 @@
 #'
 #' @include calculate_similarity.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include adduct_universe.R
+#' @include c_wrappers.R
+#' @include annotate_spectra.R
+#' @include assert_utils.R
 #'
 #' @param lib_ids [character] Character vector of library spectrum IDs
 #' @param lib_precursors [numeric] Numeric vector of library precursor m/z
@@ -399,6 +404,20 @@ calculate_entropy_and_similarity <- function(
       results[!is_null_status]
     )
   }
+
+  # `results` holds one tidytable per query spectrum (length n_queries) --
+  # everything useful in it has now been folded into `result` via
+  # bind_rows(). Likewise `lib_entropy` and `lib_mz_sorted_list` (each
+  # length n_lib) were scratch structures built purely to make the lapply
+  # closure above fast; nothing below this line reads any of the three.
+  # Previously they were left bound until the function's frame unwound on
+  # return -- harmless for one call, but this function runs once per
+  # library file, so on a run over many/large libraries those n_lib- and
+  # n_queries-sized structures were piling up as transient peak memory
+  # right as the (also nontrivial) bind_rows() output existed alongside
+  # them. Freeing them here, once per library rather than once per query,
+  # costs nothing measurable and removes that overlap.
+  rm(results, lib_entropy, lib_mz_sorted_list, is_null_status)
 
   log_complete(ctx, n_comparisons = nrow(result))
 

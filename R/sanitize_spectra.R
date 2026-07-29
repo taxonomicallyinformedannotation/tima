@@ -92,6 +92,10 @@ sanitize_spectra <- function(
     spectra <- spectra |>
       Spectra::filterIntensity(intensity = c(cutoff, Inf))
   }
+  # dynamic_thresholds (one double per spectrum) is a small object, but it's
+  # done its job the moment either branch above finishes -- nothing later
+  # reads it, so it doesn't need to ride along for the rest of the function.
+  rm(dynamic_thresholds)
 
   spectra <- spectra |>
     Spectra::scalePeaks() |>
@@ -101,6 +105,17 @@ sanitize_spectra <- function(
   noise_cleanup <- .remove_low_noise_and_normalize(spectra@backend@peaksData)
   spectra@backend@peaksData <- noise_cleanup$peaks
   n_affected_noise <- noise_cleanup$n_affected
+  # This is the one that matters: noise_cleanup$peaks is a *full copy of
+  # every spectrum's peak matrix in this Spectra object* -- for a whole
+  # imported file that's typically the largest object anywhere in the
+  # sanitization path. Once its two fields are pulled out above, leaving
+  # `noise_cleanup` bound keeps that entire list alive for the rest of the
+  # function: through .filter_spectra_min_fragments()'s subsetting, the
+  # has_nan / has_null subsetting below, and the closing log_info() call --
+  # each of which itself creates another (shrinking) copy of the backend,
+  # so without this rm() you're holding the pre-cleanup peak data *and*
+  # every subsequent subsetted version simultaneously for no reason.
+  rm(noise_cleanup)
 
   if (n_affected_noise > 0L) {
     pct_affected <- round(100 * n_affected_noise / n_before_noise, 1)

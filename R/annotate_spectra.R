@@ -33,11 +33,26 @@
 #'   libraries.
 #'
 #' @include adducts_utils.R
+#' @include calculate_entropy_and_similarity.R
 #' @include calculate_mass_of_m.R
 #' @include columns_utils.R
+#' @include export_output.R
+#' @include export_params.R
 #' @include logs_utils.R
+#' @include predicates_utils.R
 #' @include safe_fread.R
+#' @include select_annotations_columns.R
 #' @include validations_utils.R
+#' @include adduct_universe.R
+#' @include harmonize_adducts.R
+#' @include get_params.R
+#' @include parse_adduct.R
+#' @include annotate_masses.R
+#' @include annotate_masses_consistency.R
+#' @include assert_utils.R
+#' @include import_spectra.R
+#' @include get_spectra_ids.R
+#' @include sanitize_data.R
 #'
 #' @param input [character] Vector or list of query spectral file paths (.mgf).
 #' @param libraries [character] Vector or list of library spectral file paths
@@ -228,6 +243,24 @@ annotate_spectra <- function(
   n_lib_count <- 0L
 
   for (lib_path in libs_vec) {
+    # Reset per-iteration temporaries up front. This matters: previously
+    # lib_precursors_all / lib_adducts_all / all_target_ids / meta / df_chunk
+    # were only assigned -- and only rm()'d -- inside the
+    # `nrow(sim_chunk) > 0L` branch below. If library K produced hits (large
+    # vectors bound to these names) and library K+1 produced zero hits, that
+    # branch was skipped entirely and library K's objects stayed referenced
+    # for the rest of the loop: gc() can't collect what's still bound to a
+    # name. Over a run with many sparse libraries this ratchets peak memory
+    # up toward "largest hit-producing library" instead of "one library",
+    # defeating the point of processing them one at a time. Declaring them
+    # as NULL here means the unconditional rm() at the bottom of the loop is
+    # always valid and never carries anything across iterations.
+    lib_precursors_all <- NULL
+    lib_adducts_all <- NULL
+    all_target_ids <- NULL
+    meta <- NULL
+    df_chunk <- NULL
+
     # Load single library
     spectral_library <- import_and_clean_library_collection(
       c(lib_path),
@@ -293,12 +326,21 @@ annotate_spectra <- function(
       if (nrow(df_chunk) > 0L) {
         df_chunks[[length(df_chunks) + 1L]] <- df_chunk
       }
-
-      rm(sim_chunk, meta)
     }
 
-    # Cleanup this library
-    rm(spectral_library)
+    # Cleanup this library. This is now unconditional (previously
+    # `sim_chunk`/`meta` were only rm()'d inside the `if (nrow(sim_chunk) >
+    # 0L)` branch above), so nothing from this iteration -- hit or miss --
+    # survives into the next one.
+    rm(
+      spectral_library,
+      sim_chunk,
+      lib_precursors_all,
+      lib_adducts_all,
+      all_target_ids,
+      meta,
+      df_chunk
+    )
     gc(verbose = FALSE)
   }
 
