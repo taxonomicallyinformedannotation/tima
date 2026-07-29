@@ -59,7 +59,7 @@ jobs:
           "https://bioc.r-universe.dev"
           ),
           type = "source")
-          install.packages("pkgload")
+          install.packages(c("altdoc","pkgload"))
           pkgload::load_all()
           altdoc::render_docs(parallel = FALSE, freeze = FALSE, verbose = TRUE)
         shell: Rscript {0}
