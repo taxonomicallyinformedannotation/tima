@@ -95,6 +95,8 @@ derive_annotate_masses_coverage_path <- function(output_annotations) {
 
 #' Build a feature-level coverage report for annotate_masses
 #' @keywords internal
+#' @include logs_utils.R
+#' @include export_output.R
 build_annotate_masses_coverage_report <- function(
   annotations,
   baseline_adduct

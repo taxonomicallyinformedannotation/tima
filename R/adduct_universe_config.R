@@ -15,6 +15,7 @@
 #' * n omitted when n_mer == 1
 #' * |z| omitted when |z| == 1
 #'
+#' @include adduct_universe.R
 #' @param n_mer Integer multimer count.
 #' @param carriers Named integer vector of carrier counts/signs (e.g. H, Na).
 #' @param clusters Named integer vector of neutral cluster additions.

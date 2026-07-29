@@ -1,5 +1,8 @@
 #' Build the evidence-supported hypothesis table (scalable).
 #'
+#' @include logs_utils.R
+#' @include mass_evidence.R
+#' @include mass_evidence_utils.R
 #' @param df_fea_min tidytable with columns `feature_id`, `rt`, `mz`, `sample`.
 #' @param universe typed universe returned by [build_adduct_universe()].
 #' @param tolerance_ppm numeric mass tolerance (ppm).

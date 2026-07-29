@@ -10,6 +10,8 @@
 #' @include process_smiles.R
 #' @include round_reals.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param df [data.frame] Data frame containing annotation results with
 #'     structure and

@@ -6,6 +6,8 @@
 #'
 #' @include install.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param host [character] Host/IP address to listen on.
 #' Default: "127.0.0.1" (localhost). Use "0.0.0.0" to allow external

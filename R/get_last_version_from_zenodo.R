@@ -289,6 +289,8 @@ is_download_needed <- function(path, zenodo_size) {
 #'
 #' @include create_dir.R
 #' @include get_file.R
+#' @include logs_utils.R
+#' @include adduct_universe.R
 #'
 #' @param doi Character. Zenodo DOI (e.g., "10.5281/zenodo.5794106")
 #' @param pattern Character. Pattern to identify the specific file to download

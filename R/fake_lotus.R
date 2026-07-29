@@ -6,6 +6,7 @@
 #'     when external resources are unavailable.
 #'
 #' @include create_dir.R
+#' @include logs_utils.R
 #'
 #' @param export Character string path where the fake LOTUS TSV file should be
 #'     saved

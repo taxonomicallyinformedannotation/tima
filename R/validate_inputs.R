@@ -4,6 +4,7 @@
 #'     the TIMA pipeline. This helps catch issues early and avoid wasting time
 #'     on library downloads and processing.
 #'
+#' @include sanitize_data.R
 #' @param features [character] Character path to features CSV/TSV file
 #' @param spectra [character] Character path to MGF spectra file
 #' @param metadata [character] Character path to metadata file

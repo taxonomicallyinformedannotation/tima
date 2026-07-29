@@ -5,6 +5,7 @@
 #'
 #' @include errors_utils.R
 #' @include validations_utils.R
+#' @include validations_params.R
 #'
 #' @param file [character] Character path to file
 #' @param file_type [character] Character description of file type for error

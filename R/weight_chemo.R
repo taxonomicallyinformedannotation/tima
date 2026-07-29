@@ -23,6 +23,9 @@
 #'
 #' @include validations_utils.R
 #' @include weights_utils.R
+#' @include logs_utils.R
+#' @include columns_utils.R
+#' @include validations_params.R
 #'
 #' @param annot_table_wei_bio_clean [data.frame] Data frame with cleaned
 #'     biologically weighted annotations

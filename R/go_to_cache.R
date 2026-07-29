@@ -15,6 +15,8 @@
 #' Cache directory persists across R sessions until explicitly deleted.
 #'
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param dir [character] Character string name of cache directory (default:
 #'     ".tima").

@@ -4,6 +4,8 @@
 #'
 #' @include columns_utils.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param df [data.frame] Data frame containing structure-organism pair data.
 #'

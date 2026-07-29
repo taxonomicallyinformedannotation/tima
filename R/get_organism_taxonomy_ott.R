@@ -2,6 +2,8 @@
 
 #' Create batches from a vector
 #' @description Splits a vector into batches of specified size
+#' @include logs_utils.R
+#' @include safe_bind_rows.R
 #' @param items [character] Character vector to batch
 #' @param batch_size [integer] Integer size of each batch
 #' @return List of character vectors (batches)

@@ -7,6 +7,7 @@
 #' @include create_dir.R
 #' @include logs_utils.R
 #' @include validations_utils.R
+#' @include validations_params.R
 #'
 #' @param x [data.frame] Data frame or tibble to export
 #' @param file [character] Character string path to the output file. File

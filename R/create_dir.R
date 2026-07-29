@@ -6,6 +6,8 @@
 #'     for write permissions.
 #'
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param export Character string path to the directory or file path
 #'     from which to extract and create the directory

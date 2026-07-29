@@ -8,6 +8,10 @@
 #' @include get_params.R
 #' @include predicates_utils.R
 #' @include select_annotations_columns.R
+#' @include logs_utils.R
+#' @include safe_fread.R
+#' @include export_params.R
+#' @include export_output.R
 #'
 #' @param input [character] Character string path to spectral matching results
 #'     file

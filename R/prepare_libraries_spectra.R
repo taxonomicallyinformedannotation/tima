@@ -152,6 +152,9 @@ create_empty_sop_library <- function() {
 #' @include get_params.R
 #' @include harmonize_spectra.R
 #' @include import_spectra.R
+#' @include logs_utils.R
+#' @include export_params.R
+#' @include export_output.R
 #'
 #' @param input [character] Character vector of file paths containing spectral
 #'     data.

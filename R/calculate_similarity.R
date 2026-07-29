@@ -50,6 +50,8 @@
 #' @include c_wrappers.R
 #' @include sanitize_spectrum_matrix.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include assert_utils.R
 #'
 #' @param method [character] Similarity method: "entropy", "gnps", or "cosine"
 #' @param query_spectrum [matrix] Numeric matrix with columns for mz and

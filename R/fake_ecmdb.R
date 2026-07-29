@@ -21,6 +21,8 @@
 #'     real download fails. Used as a fallback to prevent pipeline failures
 #'     during testing or when external resources are unavailable.
 #'
+#' @include logs_utils.R
+#' @include move_file_safely.R
 #' @param export Character string path where the fake ECMDB zip file should be
 #'     saved
 #'

@@ -5,6 +5,7 @@
 #'
 #' @include logs_utils.R
 #' @include validations_utils.R
+#' @include adduct_universe.R
 #' @keywords internal
 #' @name mztab_schema_utils
 NULL

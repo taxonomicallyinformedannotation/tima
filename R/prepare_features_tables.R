@@ -6,6 +6,12 @@
 #'
 #' @include get_params.R
 #' @include rts_utils.R
+#' @include logs_utils.R
+#' @include validations_utils.R
+#' @include safe_fread.R
+#' @include export_params.R
+#' @include export_output.R
+#' @include validations_params.R
 #'
 #' @param features [character] Path to raw features file (CSV/TSV).
 #' @param output [character] Path where prepared features should be saved.

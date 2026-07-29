@@ -5,6 +5,8 @@
 #' parsing tab-delimited data. Internal helper for prepare_annotations_sirius().
 #'
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param sirius_zip [character] Path to compressed SIRIUS workspace (.zip)
 #' @param file [character] Pattern to match files within the archive

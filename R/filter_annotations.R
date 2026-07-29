@@ -570,6 +570,11 @@ enforce_ms1_adduct_semantics <- function(
 #'
 #' @include get_params.R
 #' @include safe_fread.R
+#' @include logs_utils.R
+#' @include annotate_masses_consistency.R
+#' @include export_params.R
+#' @include export_output.R
+#' @include clean_chemo_preprocessing.R
 #'
 #' @param annotations Character vector or list of paths to prepared annotation
 #'     files

@@ -5,6 +5,7 @@
 #'
 #' @include weight_chemo.R
 #' @include validations_utils.R
+#' @include validations_params.R
 #'
 #' @param weight_chemo_result [data.frame] Output from weight_chemo()
 #'

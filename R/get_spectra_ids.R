@@ -18,6 +18,7 @@
 #'   preferred approach is for the MGF writer to emit a dedicated `FEATURE_ID=`
 #'   field (which [.extract_embedded_mgf()] and [.write_proxy_mgf()] both do).
 #'
+#' @include logs_utils.R
 #' @param spectra [Spectra::Spectra()] object.
 #'
 #' @return Character vector of spectrum IDs (one per spectrum), or `NULL` if no

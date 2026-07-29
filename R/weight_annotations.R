@@ -11,6 +11,11 @@
 #' @include get_params.R
 #' @include weight_bio.R
 #' @include weight_chemo.R
+#' @include logs_utils.R
+#' @include safe_fread.R
+#' @include extract_chemo_scores.R
+#' @include score_combination.R
+#' @include weight_annotations_utils.R
 #'
 #' @param library Library containing the keys
 #' @param org_tax_ott File containing organisms taxonomy (OTT)

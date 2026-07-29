@@ -190,6 +190,7 @@ INCHI_NO_STEREO_PATTERN <- "-UHFFFAOYSA-"
 
 #' Get a constant value by name with validation
 #'
+#' @include logs_utils.R
 #' @param name Character string name of the constant
 #' @param default Default value to return if constant not found
 #'

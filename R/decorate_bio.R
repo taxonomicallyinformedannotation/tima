@@ -8,6 +8,8 @@
 #'
 #' @include predicates_utils.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param annot_table_wei_bio Data frame with biologically weighted annotations
 #' @param score_biological_kingdom Minimum score for kingdom-level matches

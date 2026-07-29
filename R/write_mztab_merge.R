@@ -646,3 +646,4 @@
 #'   column with its TIMA CV Param.
 #'
 #' @keywords internal
+#' @include mztab_parser.R

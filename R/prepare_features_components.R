@@ -8,6 +8,10 @@
 #' @include get_params.R
 #' @include logs_utils.R
 #' @include safe_fread.R
+#' @include errors_utils.R
+#' @include export_params.R
+#' @include export_output.R
+#' @include validations_params.R
 #'
 #' @param input [character] Character vector of paths to input component files.
 #'     Can be

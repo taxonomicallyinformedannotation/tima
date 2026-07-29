@@ -30,6 +30,7 @@
 #'     hits to near-zero scores.
 #'
 #' @include validations_utils.R
+#' @include assert_utils.R
 #'
 #' @param csi_score [numeric] Numeric SIRIUS CSI score (expected mostly <= 0;
 #'     can be negative, NA, NULL, or absent)

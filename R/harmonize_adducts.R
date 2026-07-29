@@ -46,6 +46,9 @@
 #'
 #' @include adducts_utils.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include adduct_universe_formula.R
+#' @include validations_params.R
 #'
 #' @param df Data frame or tibble containing adduct column
 #' @param adducts_colname Character string name of the adduct column

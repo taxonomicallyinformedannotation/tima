@@ -7,6 +7,9 @@
 #' @include columns_utils.R
 #' @include validations_utils.R
 #' @include safe_fread.R
+#' @include logs_utils.R
+#' @include adduct_universe.R
+#' @include validations_params.R
 #'
 #' @param df Data frame with structural metadata to complement
 #' @param str_stereo Path to structure stereochemistry file (includes name, tag,

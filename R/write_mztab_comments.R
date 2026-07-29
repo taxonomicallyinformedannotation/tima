@@ -388,6 +388,9 @@
 #' * **Anything else** – wrapped as a user parameter carrying the raw library
 #'   name.
 #'
+#' @include logs_utils.R
+#' @include safe_fread.R
+#' @include create_dir.R
 #' @param lib Character vector of `candidate_library` values.
 #' @return Character vector of mzTab Param strings.
 #' @keywords internal

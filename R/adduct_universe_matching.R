@@ -194,6 +194,9 @@ calculate_mz_from_lookup <- function(
 
 #' Build direct pairwise transition tables from the typed universe
 #' @keywords internal
+#' @include adduct_universe.R
+#' @include calculate_mass_of_m.R
+#' @include mass_evidence_utils.R
 build_universe_transition_tables <- function(universe) {
   lookup <- build_adduct_lookup(universe)
   if (nrow(lookup) == 0L) {

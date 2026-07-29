@@ -3,6 +3,8 @@
 #' @description Internal helper to validate all input parameters for
 #'     install_tima().
 #'
+#' @include logs_utils.R
+#' @include copy_backbone.R
 #' @param package [character] Single non-empty package name
 #' @param repos [character] Vector of repository URLs
 #' @param type [character] Type of install ("source", "binary")

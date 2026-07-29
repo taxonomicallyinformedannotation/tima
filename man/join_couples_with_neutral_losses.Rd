@@ -2,11 +2,13 @@
 % Please edit documentation in R/annotate_masses_consistency.R
 \name{join_couples_with_neutral_losses}
 \alias{join_couples_with_neutral_losses}
-\title{Join RT/mz couple windows with neutral losses using binary search instead of cartesian join.}
+\title{Join RT/mz couple windows with neutral losses using binary search instead of cartesian join.
+Join couples with neutral losses using binary search}
 \usage{
 join_couples_with_neutral_losses(df_couples_diff, neutral_losses)
 }
 \description{
 Join RT/mz couple windows with neutral losses using binary search instead of cartesian join.
+Join couples with neutral losses using binary search
 }
 \keyword{internal}

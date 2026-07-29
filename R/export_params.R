@@ -6,6 +6,9 @@
 #'
 #' @include get_default_paths.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include create_dir.R
+#' @include validations_params.R
 #'
 #' @param parameters Named list of parameters to export
 #' @param step Step identifier to include in the YAML filename (required)

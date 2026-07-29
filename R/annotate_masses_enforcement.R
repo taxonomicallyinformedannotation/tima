@@ -594,6 +594,11 @@ build_output_edges <- function(
 #' Log the consistency-audit attribute attached by
 #' `enforce_graph_adduct_consistency()`.
 #' @keywords internal
+#' @include logs_utils.R
+#' @include adduct_universe_formula.R
+#' @include parse_adduct.R
+#' @include annotate_masses.R
+#' @include annotate_masses_consistency.R
 log_consistency_audit <- function(audit) {
   if (is.null(audit)) {
     return(invisible(NULL))

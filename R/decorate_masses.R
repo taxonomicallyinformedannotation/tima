@@ -4,6 +4,8 @@
 #'     reporting the number of unique structures and features annotated.
 #'
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param annotation_table_ms1 Data frame containing MS1 annotation results
 #' with feature_id and candidate_structure_inchikey_connectivity_layer columns

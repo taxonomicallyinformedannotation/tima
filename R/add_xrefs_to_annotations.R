@@ -7,6 +7,7 @@
 #' @include safe_fread.R
 #' @include validations_utils.R
 #' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param results_list List with elements full, filtered, mini (data frames)
 #' @param xrefs_file Character path to xrefs file from [get_compounds_xrefs()]

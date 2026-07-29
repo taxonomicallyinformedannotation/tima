@@ -10,6 +10,7 @@
 #' @include pkg_system_file.R
 #' @include parse_cli_params.R
 #' @include parse_yaml_params.R
+#' @include logs_utils.R
 #'
 #' @param step Character string name of the workflow step (e.g.,
 #'     "prepare_params",

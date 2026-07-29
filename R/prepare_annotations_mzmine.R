@@ -7,6 +7,11 @@
 #' @include columns_utils.R
 #' @include get_params.R
 #' @include select_annotations_columns.R
+#' @include logs_utils.R
+#' @include safe_fread.R
+#' @include export_params.R
+#' @include export_output.R
+#' @include validations_params.R
 #'
 #' @param input [character] Character string or vector of paths to mzmine
 #'     annotation files

@@ -18,6 +18,12 @@
 #' @include export_output.R
 #' @include select_annotations_columns.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include columns_utils.R
+#' @include assert_utils.R
+#' @include mztab_parser.R
+#' @include mztab_validate.R
+#' @include validations_params.R
 #'
 #' @param input `character(1)` Path to an mzTab-M file (`.mztab` or `.json`).
 #' @param output `character(1)` Output path for the prepared annotation table.

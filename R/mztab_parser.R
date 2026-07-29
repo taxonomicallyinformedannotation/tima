@@ -4,6 +4,8 @@
 #'
 #' @include mztab_schema_utils.R
 #' @include safe_fread.R
+#' @include validations_utils.R
+#' @include validations_params.R
 #' @keywords internal
 #' @name mztab_parser
 NULL

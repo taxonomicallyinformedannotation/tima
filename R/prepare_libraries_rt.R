@@ -10,6 +10,10 @@
 #' @include import_spectra.R
 #' @include process_smiles.R
 #' @include safe_fread.R
+#' @include logs_utils.R
+#' @include export_params.R
+#' @include export_output.R
+#' @include rts_utils.R
 #'
 #' @param mgf_exp [character] Character vector of paths to MGF files with
 #'     experimental RT

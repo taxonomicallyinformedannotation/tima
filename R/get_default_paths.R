@@ -4,6 +4,7 @@
 #'     from a YAML file. These paths define locations for data files, libraries,
 #'     parameters, and other resources used throughout the TIMA workflow.
 #'
+#' @include logs_utils.R
 #' @param yaml Character string path to the YAML file containing path
 #'     definitions.
 #'     Default is the paths.yaml file included in the package installation.

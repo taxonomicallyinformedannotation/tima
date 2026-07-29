@@ -7,6 +7,7 @@
 #'     (common upper
 #' bound for minutes in typical gradients). Otherwise assumes minutes.
 #'
+#' @include logs_utils.R
 #' @param rt_vec [numeric] Numeric vector (character allowed; will be coerced)
 #'     of retention times.
 #' @param unit [character] Character scalar: one of 'auto', 'seconds', or

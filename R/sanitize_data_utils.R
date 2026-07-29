@@ -14,6 +14,8 @@ NULL
 #' @description Validates MGF (Mascot Generic Format) file structure and
 #'     reports the number of spectra found.
 #'
+#' @include logs_utils.R
+#' @include safe_fread.R
 #' @param file [character] Character path to MGF file
 #' @param file_type [character] Character description for error messages
 #'

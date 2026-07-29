@@ -174,6 +174,9 @@ download_gnps_file <- function(url, file_path, file_type) {
 #'
 #' @include get_default_paths.R
 #' @include get_file.R
+#' @include logs_utils.R
+#' @include create_dir.R
+#' @include export_output.R
 #'
 #' @param gnps_job_id Character string GNPS job ID (32 characters). Can be NULL
 #'     or empty string to skip download.

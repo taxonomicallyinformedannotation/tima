@@ -26,6 +26,9 @@
 #'     clean_chemo.
 #'     Checks data types, ranges, and logical consistency.
 #'
+#' @include errors_utils.R
+#' @include parse_adduct.R
+#' @include rank_candidates.R
 #' @param annot_table_wei_chemo Data frame with annotations
 #' @param candidates_final Integer >= 1
 #' @param best_percentile Numeric (0-1)

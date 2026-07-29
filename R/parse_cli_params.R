@@ -6,6 +6,7 @@
 #'     parameters list, applying appropriate type conversions.
 #'
 #' @include validations_utils.R
+#' @include validations_params.R
 #'
 #' @param arguments [list] Named list of CLI arguments from docopt or similar
 #'     parser

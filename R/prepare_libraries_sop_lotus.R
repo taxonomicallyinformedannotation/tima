@@ -10,6 +10,7 @@
 #' @include safe_fread.R
 #' @include select_sop_columns.R
 #' @include logs_utils.R
+#' @include export_output.R
 #'
 #' @param input [character] Character string path to the raw LOTUS data file
 #' @param output [character] Character string path for the prepared output file

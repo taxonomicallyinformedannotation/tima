@@ -5,6 +5,10 @@
 #'     conventions across spectral libraries.
 #'
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include process_smiles.R
+#' @include predicates_utils.R
+#' @include validations_params.R
 #'
 #' @param spectra Data frame containing spectra to harmonize
 #' @param metad Metadata identifying the library source

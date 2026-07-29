@@ -3,6 +3,9 @@
 #' @description Standardize CANOPUS chemical classification columns.
 #'
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include harmonize_names_sirius.R
+#' @include validations_params.R
 #'
 #' @param df [data.frame] Data frame of SIRIUS CANOPUS results.
 #' @param sirius_version [character] SIRIUS version ("5" or "6").

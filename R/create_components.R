@@ -440,6 +440,10 @@ build_components_from_edges <- function(
 #'     relationships.
 #'
 #' @include get_params.R
+#' @include logs_utils.R
+#' @include safe_fread.R
+#' @include export_params.R
+#' @include export_output.R
 #'
 #' @param input Character vector of file path(s) containing edge data.
 #'     Files should have feature_source and feature_target columns.

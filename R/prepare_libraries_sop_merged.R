@@ -12,6 +12,9 @@
 #' @include get_organism_taxonomy_ott.R
 #' @include get_params.R
 #' @include split_tables_sop.R
+#' @include logs_utils.R
+#' @include export_params.R
+#' @include prepare_libraries_sop_merged_utils.R
 #'
 #' @param files [character] Character vector or list of paths to prepared
 #'     library files

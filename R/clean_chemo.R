@@ -14,6 +14,11 @@
 #' @include filter_high_evidence_only.R
 #' @include parse_adduct.R
 #' @include summarize_results.R
+#' @include logs_utils.R
+#' @include errors_utils.R
+#' @include columns_utils.R
+#' @include clean_chemo_preprocessing.R
+#' @include clean_chemo_candidates.R
 #'
 #' @param annot_table_wei_chemo Data frame with chemically weighted annotations.
 #' Required columns: feature_id,

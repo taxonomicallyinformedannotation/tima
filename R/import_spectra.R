@@ -6,6 +6,7 @@
 #'
 #' @include read_mgf_opti.R
 #' @include sanitize_spectra.R
+#' @include logs_utils.R
 #'
 #' @param file Character string path to the spectrum file (.mgf, .msp, or .rds)
 #' @param cutoff Numeric absolute minimal intensity threshold (default: NULL)

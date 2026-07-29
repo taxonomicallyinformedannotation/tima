@@ -12,6 +12,7 @@
 #'     structure, configuration files, and parameters) to a cache directory.
 #'     This sets up the working environment for TIMA workflows.
 #'
+#' @include logs_utils.R
 #' @param cache_dir Character string path to the cache directory
 #'     (default: "~/.tima" in user's home directory)
 #' @param package Character string name of the package (default: "tima")

@@ -11,6 +11,7 @@
 #' @include predicates_utils.R
 #' @include sanitize_spectrum_matrix.R
 #' @include validations_utils.R
+#' @include c_wrappers.R
 #'
 #' @param frags List of aligned fragment spectra matrices
 #' @param nspecs Integer number of spectra

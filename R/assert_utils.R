@@ -3,6 +3,7 @@
 #' @description Validates that a parameter is a single non-NA logical value.
 #'     This is a strict version of validate_logical.
 #'
+#' @include errors_utils.R
 #' @param x [logical] Value to check
 #' @param arg_name [character] Name of the argument (for error messages)
 #'

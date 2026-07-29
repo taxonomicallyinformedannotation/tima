@@ -3,6 +3,7 @@
 #' @description Internal helpers used by `inst/app.R` to decide whether an
 #' uploaded mzTab should be copied, reused, or expanded into TIMA source files.
 #' @include logs_utils.R
+#' @include adduct_universe.R
 #' @keywords internal
 #' @name mztab_app_utils
 NULL

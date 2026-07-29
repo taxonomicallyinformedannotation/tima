@@ -94,6 +94,7 @@ create_yaml_null_handler <- function() {
 #' @include get_default_paths.R
 #' @include go_to_cache.R
 #' @include load_yaml_files.R
+#' @include logs_utils.R
 #'
 #' @param fil_pat Character. Job identifier/pattern for output files (optional)
 #' @param fil_fea_raw Character. Path to features file (e.g., from

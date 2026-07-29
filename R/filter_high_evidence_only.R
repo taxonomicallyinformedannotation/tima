@@ -6,6 +6,8 @@
 #'     (biological, initial, chemical) and retention time accuracy.
 #'
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param df Data frame containing annotation results with score columns
 #' @param score_bio_min Numeric minimum biological score threshold (default:

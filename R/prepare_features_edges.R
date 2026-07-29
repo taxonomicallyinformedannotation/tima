@@ -6,6 +6,12 @@
 #'     features in the molecular network.
 #'
 #' @include get_params.R
+#' @include logs_utils.R
+#' @include errors_utils.R
+#' @include safe_fread.R
+#' @include export_params.R
+#' @include export_output.R
+#' @include validations_params.R
 #'
 #' @param input [list] Named list containing paths to edge files. Must have
 #'     "ms1" and

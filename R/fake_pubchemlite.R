@@ -4,6 +4,7 @@
 #'     fails, so downstream SOP preparation still receives a valid header-only
 #'     file.
 #'
+#' @include logs_utils.R
 #' @param export Character string path where the fake CSV should be written
 #'
 #' @return Character string path to the created fake file

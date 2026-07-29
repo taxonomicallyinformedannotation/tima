@@ -61,6 +61,19 @@
 #' @include round_reals.R
 #' @include safe_fread.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include adduct_universe_formula.R
+#' @include adduct_universe_matching.R
+#' @include annotate_masses_consistency.R
+#' @include annotate_masses_coverage.R
+#' @include annotate_masses_enforcement.R
+#' @include annotate_masses_features.R
+#' @include annotate_masses_hypothesis.R
+#' @include select_annotations_columns.R
+#' @include export_params.R
+#' @include export_output.R
+#' @include sanitize_data.R
+#' @include validations_params.R
 #'
 #' @param features Table containing your previous annotation to complement
 #' @param output_annotations Output for mass based structural annotations

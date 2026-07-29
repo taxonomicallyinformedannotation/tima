@@ -194,6 +194,10 @@ load_structural_library <- function(
 #' (N_features / N_annotations / Pct) that was present in the original
 #' monolithic \code{annotate_masses()} implementation.
 #'
+#' @include logs_utils.R
+#' @include safe_fread.R
+#' @include round_reals.R
+#' @include harmonize_adducts.R
 #' @param annotations Data frame returned by \code{enrich_with_structure_metadata()}.
 #'   Expected to have at minimum \code{feature_id} and \code{adduct} columns.
 #'   When a \code{source} column is present the "baseline / enforced" fallback

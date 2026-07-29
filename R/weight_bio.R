@@ -22,6 +22,10 @@
 #' @include transform_score_sirius_csi.R
 #' @include validations_utils.R
 #' @include weights_utils.R
+#' @include logs_utils.R
+#' @include columns_utils.R
+#' @include predicates_utils.R
+#' @include validations_params.R
 #'
 #' @param annotation_table_taxed [data.frame] Data frame with initial
 #'     annotations and sample taxonomy

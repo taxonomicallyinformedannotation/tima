@@ -79,6 +79,9 @@
 #' @include mztab_parser.R
 #' @include safe_fread.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include create_dir.R
+#' @include validations_params.R
 #'
 #' @param input `character` Path to TIMA results file produced by
 #'   `weight_annotations()`.

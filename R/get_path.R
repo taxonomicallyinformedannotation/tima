@@ -9,6 +9,7 @@
 #' @include parse_cli_params.R
 #' @include parse_yaml_params.R
 #' @include validations_utils.R
+#' @include validations_params.R
 #'
 #' @param base_path Base path to resolve. Can include "inst/" which will be
 #'     handled appropriately for installed vs development environments.

@@ -308,6 +308,8 @@ select_annotations_complement_working_columns <- function(df) {
 #'     Internal helper for cleaning and aggregation functions.
 #'
 #' @include validations_utils.R
+#' @include errors_utils.R
+#' @include validations_params.R
 #'
 #' @param grouped_df Grouped data frame to collapse
 #' @param cols Character vector of column names to collapse.

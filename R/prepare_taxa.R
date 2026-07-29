@@ -16,6 +16,10 @@
 #' @include get_organism_taxonomy_ott.R
 #' @include safe_fread.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include export_params.R
+#' @include export_output.R
+#' @include validations_params.R
 #'
 #' @param input [character] Character string path to features file with
 #'     intensities

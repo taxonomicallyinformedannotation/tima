@@ -114,6 +114,8 @@ NULL
 }
 
 #' @keywords internal
+#' @include safe_fread.R
+#' @include export_output.R
 benchmark_evaluate_predictions <- function(
   truth_file,
   prediction_files,

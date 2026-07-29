@@ -11,6 +11,9 @@
 #' @include get_params.R
 #' @include get_spectra_ids.R
 #' @include import_spectra.R
+#' @include logs_utils.R
+#' @include export_output.R
+#' @include annotate_spectra.R
 #'
 #' @param input [character] Path or list of paths to query MGF file(s)
 #'     containing spectra

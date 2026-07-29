@@ -29,6 +29,10 @@
 #' @include read_from_sirius_zip.R
 #' @include select_annotations_columns.R
 #' @include select_sirius_columns.R
+#' @include logs_utils.R
+#' @include export_params.R
+#' @include export_output.R
+#' @include prepare_annotations_sirius_utils.R
 #'
 #' @param input_directory [character] Character path to directory or zip file
 #'     containing

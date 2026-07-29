@@ -9,6 +9,10 @@
 #'     for ambiguous cases.
 #'
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include safe_fread.R
+#' @include export_output.R
+#' @include validations_params.R
 #'
 #' @param input Path to the initial features file
 #' @param keys Path to the structure-organism pair (SOP) keys file

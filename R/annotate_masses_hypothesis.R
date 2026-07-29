@@ -1932,6 +1932,16 @@ prune_candidates_by_network_consensus <- function(
 #' if one feature is confidently annotated to a structure, the same structure is
 #' suggested for all linked features with the same neutral mass.
 #'
+#' @include logs_utils.R
+#' @include adduct_universe.R
+#' @include adduct_universe_formula.R
+#' @include adduct_universe_matching.R
+#' @include mass_evidence.R
+#' @include harmonize_adducts.R
+#' @include parse_adduct.R
+#' @include annotate_masses_consistency.R
+#' @include annotate_masses_features.R
+#' @include mass_evidence_hypothesis.R
 #' @param annotations Annotation table with structure_exact_mass, feature_id, etc.
 #' @param node_hypotheses Node hypotheses table (should have component_membership
 #'   and feature_m_map as attributes)

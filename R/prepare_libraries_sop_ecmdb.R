@@ -9,6 +9,9 @@
 #' @include get_params.R
 #' @include round_reals.R
 #' @include select_sop_columns.R
+#' @include logs_utils.R
+#' @include export_params.R
+#' @include export_output.R
 #'
 #' @param input [character] Character string path to ECMDB JSON zip file
 #' @param output [character] Character string path for prepared ECMDB library

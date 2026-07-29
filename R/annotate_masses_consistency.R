@@ -723,6 +723,8 @@ join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
 
 #' Join multi-adduct candidates with add/loss inferred masses using binary search instead of cartesian join.
 #' @keywords internal
+#' @include parse_adduct.R
+#' @include calculate_mass_of_m.R
 join_multi_with_addlossed <- function(df_multi, df_addlossed_rdy) {
   multi_src <- tidytable::as_tidytable(df_multi)[,
     .(

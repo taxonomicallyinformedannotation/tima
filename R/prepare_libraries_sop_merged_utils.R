@@ -269,6 +269,14 @@ export_library_tables <- function(
 #' Apply column mapping to a data frame
 #' @description Renames columns based on a mapping list. For each target name,
 #'   tries possible source names in order and renames the first match found.
+#' @include logs_utils.R
+#' @include safe_fread.R
+#' @include columns_utils.R
+#' @include predicates_utils.R
+#' @include create_dir.R
+#' @include export_output.R
+#' @include get_organism_taxonomy_ott.R
+#' @include split_tables_sop.R
 #' @param df Data frame to rename columns in
 #' @param col_mapping Named list: names are target col names, values are
 #'   character vectors of possible source names (tried in order)

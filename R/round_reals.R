@@ -5,6 +5,7 @@
 #'     exact mass and logP values need consistent decimal places.
 #'
 #' @include validations_utils.R
+#' @include validations_params.R
 #'
 #' @param df [data.frame] Data frame or tibble containing columns to round
 #' @param dig [integer] Integer number of decimal digits (default: 5).

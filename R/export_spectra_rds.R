@@ -5,6 +5,8 @@
 #'
 #' @include create_dir.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param file Path where spectra will be exported as RDS file
 #' @param spectra Spectra object containing spectral data to export

@@ -8,6 +8,7 @@
 #' @include adducts_utils.R
 #' @include constants.R
 #' @include validations_utils.R
+#' @include logs_utils.R
 #'
 #' @param adduct_string [character] Character string representing the adduct in
 #'     standard

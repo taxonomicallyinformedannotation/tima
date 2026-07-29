@@ -420,6 +420,7 @@ calculate_mz_from_mass_batch <- function(
 #' @description Validates mass-to-charge ratio input value
 #'
 #' @include validations_utils.R
+#' @include logs_utils.R
 #'
 #' @param mz Numeric m/z value
 #'

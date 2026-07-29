@@ -51,6 +51,7 @@ extract_bio_scores <- function(weight_bio_result) {
 #'
 #' @include weights_utils.R
 #' @include validations_utils.R
+#' @include validations_params.R
 #'
 #' @param score_bio_table [data.frame] Narrow table with biological scores
 #' @param score_chemo_table [data.frame] Narrow table with chemical scores

@@ -9,6 +9,9 @@
 #' @include logs_utils.R
 #' @include retry_utils.R
 #' @include validations_utils.R
+#' @include errors_utils.R
+#' @include assert_utils.R
+#' @include validations_params.R
 #'
 #' @param url [character] URL of the file to download
 #' @param export [character] File path where the file should be saved

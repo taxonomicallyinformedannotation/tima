@@ -19,6 +19,11 @@
 #' @include mztab_parser.R
 #' @include mztab_validate.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include adduct_universe.R
+#' @include create_dir.R
+#' @include assert_utils.R
+#' @include validations_params.R
 #'
 #' @param input `character(1)` Path to an mzTab-M file (`.mztab` or `.json`
 #'   for rmzTabM / progenesis / MetaboScape JSON layouts).

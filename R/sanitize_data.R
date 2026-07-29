@@ -3,6 +3,9 @@
 #' @description Comprehensive validation of all input data before starting
 #'     expensive processing. Reports issues immediately to save time.
 #'
+#' @include logs_utils.R
+#' @include errors_utils.R
+#' @include sanitize_data_utils.R
 #' @param features_file [character] Character path to features CSV/TSV
 #'     (optional)
 #' @param mgf_file [character] Character path to MGF file (optional)

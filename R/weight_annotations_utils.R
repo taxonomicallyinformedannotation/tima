@@ -501,6 +501,12 @@ log_annotation_stats <- function(annotation_table) {
 #' @description Internal helper to reorganize and merge annotation tables.
 #'
 #' @include columns_utils.R
+#' @include logs_utils.R
+#' @include get_default_paths.R
+#' @include get_params.R
+#' @include export_params.R
+#' @include export_output.R
+#' @include assert_utils.R
 #'
 #' @param annotation_table [data.frame] Data frame with annotations
 #' @param formula_table [data.frame] Data frame with formula data

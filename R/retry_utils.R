@@ -7,6 +7,7 @@
 #'
 #' @include errors_utils.R
 #' @include logs_utils.R
+#' @include assert_utils.R
 #'
 #' @param expr [expression] Expression to evaluate
 #' @param max_attempts [integer] Integer maximum number of attempts (default: 3)

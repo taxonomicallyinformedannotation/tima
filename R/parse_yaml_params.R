@@ -4,6 +4,8 @@
 #'     optionally overriding them with user-specified values.
 #'
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param def [character] Path to the default YAML parameters file
 #' @param usr [character] Path to the user-specified YAML parameters file

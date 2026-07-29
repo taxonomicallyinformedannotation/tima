@@ -7,6 +7,8 @@
 #'     weight_annotations().
 #'
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include validations_params.R
 #'
 #' @param annot_table_wei_chemo [data.frame] Data frame with chemically weighted
 #'     annotations

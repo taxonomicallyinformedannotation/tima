@@ -5,6 +5,9 @@
 #'     and extract 2D representations. Results are cached to avoid reprocessing.
 #'
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include safe_fread.R
+#' @include validations_params.R
 #'
 #' @param df [data.frame] Data frame containing SMILES strings
 #' @param smiles_colname [character] Column name containing SMILES

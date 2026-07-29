@@ -287,6 +287,14 @@ create_empty_sirius_annotations <- function() {
 #'     formula, and structure-specific tables based on column model.
 #'
 #' @include columns_utils.R
+#' @include logs_utils.R
+#' @include validations_utils.R
+#' @include predicates_utils.R
+#' @include harmonize_names_sirius.R
+#' @include pre_harmonize_names_sirius.R
+#' @include read_from_sirius_zip.R
+#' @include prepare_annotations_sirius.R
+#' @include validations_params.R
 #'
 #' @param table [data.frame] Data frame with combined SIRIUS results.
 #'

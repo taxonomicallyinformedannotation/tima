@@ -6,6 +6,8 @@
 #' @include columns_utils.R
 #' @include round_reals.R
 #' @include select_sop_columns.R
+#' @include logs_utils.R
+#' @include export_output.R
 #'
 #' @param input [character] Character string path to SDF zip file
 #' @param output [character] Character string path for prepared SOP output

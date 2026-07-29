@@ -6,6 +6,9 @@
 #'
 #' @include columns_utils.R
 #' @include validations_utils.R
+#' @include logs_utils.R
+#' @include adduct_universe.R
+#' @include validations_params.R
 #'
 #' @param df [data.frame] Data frame containing weighted annotation results
 #' @param features_table [data.frame] Data frame with feature metadata (RT, m/z,

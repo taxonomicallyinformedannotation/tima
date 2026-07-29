@@ -3,6 +3,9 @@
 #' @description Checks that one or more file paths exist on the filesystem.
 #'     Provides detailed error messages indicating which files are missing.
 #'
+#' @include logs_utils.R
+#' @include errors_utils.R
+#' @include validations_utils.R
 #' @param file_list [list] Named list of file paths to validate. Names are used
 #'     in error messages to identify which file is missing.
 #' @param allow_null [logical] Logical, if TRUE, NULL values are allowed

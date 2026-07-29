@@ -4,6 +4,7 @@
 #'     precursor peaks, and empty spectra. It applies multiple cleaning steps
 #'     including intensity filtering, peak reduction, and normalization.
 #'
+#' @include logs_utils.R
 #' @param spectra [Spectra] Spectra object from the Spectra package
 #' @param cutoff [numeric] Absolute minimal intensity threshold (default: NULL).
 #'     Peaks below this intensity are removed. If NULL, a dynamic threshold

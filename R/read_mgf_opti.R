@@ -3,6 +3,7 @@
 ##' Extract **all** fields from the MGF eventually renaming the field names to
 ##' the spectra variable names specified with `mapping`.
 ##'
+#' @include logs_utils.R
 #' @param mgf [character] `character()` of lines defining a spectrum in mgf
 #'     format.
 ##'

@@ -9,6 +9,7 @@
 #' @include process_smiles.R
 #' @include logs_utils.R
 #' @include validations_utils.R
+#' @include validations_params.R
 #'
 #' @param table [data.frame] Data frame containing combined structure-organism
 #'     pair data with

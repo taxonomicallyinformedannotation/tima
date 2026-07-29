@@ -16,6 +16,9 @@
 #' @include get_params.R
 #' @include round_reals.R
 #' @include select_sop_columns.R
+#' @include logs_utils.R
+#' @include process_smiles.R
+#' @include export_output.R
 #'
 #' @param bigg_doi [character] Character string DOI for BiGG database reference
 #' @param bigg_models [list] Named list of BiGG models with organism names as

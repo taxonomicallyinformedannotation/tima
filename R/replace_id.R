@@ -11,6 +11,7 @@
 #' @include get_default_paths.R
 #' @include get_params.R
 #' @include validations_utils.R
+#' @include validations_params.R
 #'
 #' @param x [character] Character string containing the file path with default
 #'     ID

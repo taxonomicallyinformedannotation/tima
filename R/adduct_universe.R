@@ -368,6 +368,11 @@ calculate_mz_from_neutral_mass <- function(
 #' Convert bare negative-mode cation notation to explicit proton-displacement
 #' notation while preserving already-signed compound tokens.
 #' @keywords internal
+#' @include adduct_universe_config.R
+#' @include adduct_universe_formula.R
+#' @include parse_adduct.R
+#' @include calculate_mass_of_m.R
+#' @include annotate_masses.R
 .normalize_negative_mode_carrier <- function(token) {
   token <- as.character(token)
   if (is.na(token) || !nzchar(token) || grepl("[+-]", token, perl = TRUE)) {

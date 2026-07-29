@@ -6,6 +6,7 @@
 #' rules. These edges enter the network alongside rule-based edges (adducts,
 #' clusters, losses) and are validated by network consensus.
 #'
+#' @include logs_utils.R
 #' @param features_table Long-format table with columns:
 #'   feature_id, sample, mz, rt, and intensity columns
 #' @param tolerance_rt RT tolerance in minutes for grouping features
