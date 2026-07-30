@@ -336,6 +336,7 @@ create_edges <- function(
   if (length(results) > 0L) {
     # results are now tidytable objects with named columns
     result <- tidytable::bind_rows(results)
+    rm(results, bin_counts, bin_labels, sanitized_indices, nspecs)
     log_complete(
       ctx,
       n_edges = nrow(result),

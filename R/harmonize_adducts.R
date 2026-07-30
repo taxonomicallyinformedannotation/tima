@@ -177,6 +177,8 @@ harmonize_adducts <- function(
     )
   }
 
+  rm(unique_adducts, unique_non_missing, inverse_idx, non_missing_unique, adducts)
+
   df
 }
 

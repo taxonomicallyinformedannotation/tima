@@ -515,12 +515,15 @@ merge_sirius_structures_with_spectral <- function(
     )
   }
 
-  tidytable::bind_rows(
+  result <- tidytable::bind_rows(
     merged_keyed,
     structures_no_key,
     spectral_no_key
   ) |>
     tidytable::distinct()
+
+  rm(structures_keyed, spectral_keyed, spectral_typed, merged_keyed, structures_no_key, spectral_no_key)
+  result
 }
 
 .has_overlap_non_na <- function(x, y, col) {

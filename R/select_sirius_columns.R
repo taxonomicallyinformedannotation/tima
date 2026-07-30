@@ -327,7 +327,7 @@ select_sirius_columns_spectral <- function(df, sirius_version) {
   ))
   raw_mz_dev <- ion_mz - ref_mz
 
-  tidytable::tidytable(
+  result <- tidytable::tidytable(
     feature_id = feature_id,
     candidate_library = tidytable::if_else(
       analog_logical,
@@ -365,4 +365,7 @@ select_sirius_columns_spectral <- function(df, sirius_version) {
   ) |>
     tidytable::filter(!is.na(feature_id)) |>
     tidytable::distinct()
+
+  rm(analog_vals, analog_logical, feature_id, ion_mz, ref_mz, raw_mz_dev)
+  result
 }

@@ -418,6 +418,8 @@
     writeLines(paste(row_prefix, rows, sep = "\t"), con)
   }
   writeLines("", con)
+
+  rm(tbl_df, write_cols, header_vals, header_prefix, row_prefix, row_data, row_matrix, col, rows)
 }
 
 # ── Micro-helpers ─────────────────────────────────────────────────────────────

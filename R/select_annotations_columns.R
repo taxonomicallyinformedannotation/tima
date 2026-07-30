@@ -284,5 +284,9 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
   df$candidate_structure_exact_mass <- recomputed_exact_mass
   df$candidate_structure_xlogp <- recomputed_xlogp
 
+  rm(processed, unique_smiles, smiles_df, lookup, idx, recomputed_smiles,
+     recomputed_ik_conn, recomputed_ik_no_stereo, recomputed_formula,
+     recomputed_exact_mass, recomputed_xlogp, ensure_cols, smiles_col)
+
   df
 }

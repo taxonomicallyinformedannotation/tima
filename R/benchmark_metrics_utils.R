@@ -106,6 +106,8 @@ NULL
     stringsAsFactors = FALSE
   )
 
+  rm(df, n_per_row, ik_parts, rk_parts, sc_parts, pred_name)
+
   tidytable::as_tidytable(out) |>
     tidytable::mutate(
       candidate_ik = gsub("-.*", "", candidate_ik, perl = TRUE),

@@ -378,10 +378,13 @@ get_mztab_required_columns <- function() {
     MZTAB_REQUIRED_FALLBACK$SME
   }
 
-  list(
+  result <- list(
     MTD = MZTAB_REQUIRED_FALLBACK$MTD,
     SML = sml_required,
     SMF = smf_required,
     SME = sme_required
   )
+
+  rm(schema, sml_required, smf_required, sme_required)
+  result
 }

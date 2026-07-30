@@ -318,5 +318,9 @@ compute_intensity_covariance_edges <- function(
     correlation_p_threshold
   )
 
+  rm(results_list, feature_pairs, n_pairs_tested, n_significant, n_not_in_matrix,
+     n_insufficient_samples, n_correlation_failed, n_non_positive, n_not_significant,
+     correlation_p_threshold)
+
   result
 }

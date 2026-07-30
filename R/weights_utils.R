@@ -64,6 +64,7 @@ compute_weighted_components <- function(..., weights) {
   score <- as.numeric(values_matrix %*% weights) / weight_sum
   coverage <- rep(NA_real_, length(score))
 
+  rm(values, weight_sum, values_matrix, weights)
   list(score = score, coverage = coverage)
 }
 
