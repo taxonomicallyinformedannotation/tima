@@ -109,6 +109,8 @@ create_fake_gnps_files <- function(
     writeLines(mgf_stub, con = path_spectra)
   }
 
+  rm(fake_annotations, fake_components, fake_edges, fake_metadata, mgf_stub)
+
   c(
     "features" = path_features,
     "metadata" = path_metadata,

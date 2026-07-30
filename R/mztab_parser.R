@@ -232,6 +232,7 @@ NULL
   )
   names(out) <- col_names
   out[] <- lapply(out, .normalize_mztab_value)
+  rm(row_matrix, row_idx, vals, take_len, empty_idx, col_names, n_cols)
   tidytable::as_tidytable(out)
 }
 
@@ -335,6 +336,7 @@ NULL
   }
 
   out <- tidytable::as_tidytable(tidytable::bind_rows(mapped))
+  rm(mapped)
 
   # Normalize common identifier fields to plain-text mzTab header style.
   name_map <- c(

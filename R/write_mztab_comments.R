@@ -259,6 +259,8 @@
     )
   }
 
+  rm(edges, df, cols, chunk_size)
+
   c(header, row_lines)
 }
 
@@ -300,11 +302,13 @@
     df <- df[, setdiff(colnames(df), "feature_id"), drop = FALSE]
   }
 
-  lapply(seq_len(nrow(df)), function(i) {
+  result <- lapply(seq_len(nrow(df)), function(i) {
     row <- lapply(df[i, , drop = FALSE], function(v) .mztab_json_cell(v[[1L]]))
     names(row) <- colnames(df)
     row
   })
+  rm(tbl, df, drop_feature_id)
+  result
 }
 
 #' @keywords internal
@@ -347,6 +351,7 @@
     null = "null"
   )
 
+  rm(sml_rows, smf_rows, sme_rows, edges_rows, payload)
   invisible(file)
 }
 

@@ -363,6 +363,33 @@ solve_consistent_adduct_assignments <- function(
   component_membership <- feature_m_map |>
     tidytable::distinct(feature_id, component_id)
 
+  rm(
+    components,
+    all_m_maps,
+    feature_mz_map,
+    ci,
+    comp_nodes,
+    comp_id,
+    edge_component_ids,
+    edge_component_dest_ids,
+    neighbors,
+    visited,
+    component_lookup,
+    queue_capacity,
+    node,
+    queue,
+    queue_head,
+    queue_tail,
+    comp_count,
+    current,
+    nxt,
+    component_id,
+    component_nodes,
+    missing_nodes,
+    baseline_m,
+    m_values
+  )
+
   list(
     consistent_edges = consistent,
     feature_m_map = feature_m_map,

@@ -111,10 +111,27 @@
     )
 
     out[[multi_cols[[col_idx]]]] <- unlist(expanded_list, use.names = FALSE)
+    rm(expanded_list)
   }
 
   out_df <- as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
-  out_df[, colnames(results), drop = FALSE]
+  original_colnames <- colnames(results)
+  rm(
+    out,
+    results,
+    multi_cols,
+    id_cols,
+    split_values,
+    lengths_list,
+    n_vals_per_row,
+    row_idx,
+    col_idx,
+    parts,
+    col,
+    n_rows,
+    total_out_rows
+  )
+  out_df[, original_colnames, drop = FALSE]
 }
 
 #' Build SMF (Small Molecule Feature) table – one row per feature_id
@@ -203,6 +220,22 @@
     }
     smf_canonical[[out_name]] <- val
   }
+
+  rm(
+    first_rows,
+    feature_id_vals,
+    valid_feature,
+    feature_ids,
+    first_idx,
+    canonical_feat_cols,
+    feature_level_passthrough,
+    extra_feat_cols,
+    col,
+    val,
+    base_name,
+    out_name,
+    idx
+  )
 
   smf_canonical
 }
@@ -454,6 +487,34 @@
       sme[[final_names[[i]]]] <- .mztab_safe_scalar(ann[[extra_cols[[i]]]])
     }
   }
+
+  rm(
+    ann,
+    ann_signal_cols,
+    has_annotation,
+    id_lookup,
+    exact_mass_raw,
+    adduct_raw,
+    theo_mz,
+    valid_idx,
+    theo_vals,
+    lib_col,
+    charge_from_adduct,
+    ms_level_val,
+    raw_spectra_ref,
+    spectra_ref_formatted,
+    inchikey_col,
+    uri_col,
+    xref_resolved,
+    database_identifier_col,
+    feature_ids,
+    evidence_input_id,
+    consumed_cols,
+    extra_cols,
+    base_names,
+    final_names,
+    i
+  )
 
   tidytable::as_tidytable(sme)
 }

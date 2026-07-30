@@ -387,6 +387,19 @@ generate_adduct_hypotheses <- function(
     }
   }
 
+  rm(
+    carrier_idx,
+    m_val,
+    z_val,
+    z_abs,
+    comp,
+    ri,
+    counts,
+    z_net,
+    carrier_state,
+    rows_out,
+    row
+  )
   rows
 }
 

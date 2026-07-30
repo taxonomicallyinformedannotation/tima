@@ -115,6 +115,20 @@
   # Back-fill SMF -> SML references from final SML table.
   smf_all <- .mztab_refresh_smf_sml_refs(smf_all, sml_all)
 
+  rm(
+    smf_base,
+    sme_base,
+    sml_base,
+    smf_new,
+    sme_new,
+    sml_new,
+    map_smf,
+    map_sme,
+    map_sml,
+    smf_id_map,
+    sme_id_map
+  )
+
   list(
     sml = sml_all,
     smf = smf_all,
@@ -142,6 +156,7 @@
     x[is.na(x) | !nzchar(x)] <- "null"
     x
   })
+  rm(cols, ordered_cols)
   tidytable::as_tidytable(tbl)
 }
 
@@ -158,18 +173,22 @@
       x[is.na(x) | !nzchar(x)] <- "null"
       x
     })
-    do.call(paste, c(opt_values, sep = "|"))
+    result <- do.call(paste, c(opt_values, sep = "|"))
+    rm(opt_values)
+    result
   } else {
     rep("null", nrow(tbl_df))
   }
 
-  paste(
+  result <- paste(
     tbl_df$exp_mass_to_charge,
     tbl_df$retention_time_in_seconds,
     tbl_df$charge,
     opt_sig,
     sep = "||"
   )
+  rm(tbl_df, opt_cols, opt_sig)
+  result
 }
 
 #' Build stable key for SME deduplication

@@ -440,6 +440,8 @@ log_similarity_distribution <- function(scores, title) {
       collapse = "\n"
     )
   )
+
+  rm(sc, bins, lvl, tab, counts)
   invisible(NULL)
 }
 

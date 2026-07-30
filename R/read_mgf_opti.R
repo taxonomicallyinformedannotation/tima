@@ -260,6 +260,7 @@ read_mgf_opti <- function(
   }
 
   res <- MsCoreUtils::rbindFill(sp_list)
+  rm(sp_list)
 
   # Format charge field if present
   if ("CHARGE" %in% colnames(res)) {
