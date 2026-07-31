@@ -140,7 +140,12 @@ extract_spectra <- function(object) {
 
   log_debug("Extracted %d spectra", nrow(spectra))
 
-  rm(incoherent_colnames, incoherent_logical, incoherent_integer, incoherent_numeric, 
-     columns_to_harmonize)
+  rm(
+    incoherent_colnames,
+    incoherent_logical,
+    incoherent_integer,
+    incoherent_numeric,
+    columns_to_harmonize
+  )
   spectra
 }

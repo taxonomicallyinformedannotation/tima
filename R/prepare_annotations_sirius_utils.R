@@ -522,7 +522,14 @@ merge_sirius_structures_with_spectral <- function(
   ) |>
     tidytable::distinct()
 
-  rm(structures_keyed, spectral_keyed, spectral_typed, merged_keyed, structures_no_key, spectral_no_key)
+  rm(
+    structures_keyed,
+    spectral_keyed,
+    spectral_typed,
+    merged_keyed,
+    structures_no_key,
+    spectral_no_key
+  )
   result
 }
 

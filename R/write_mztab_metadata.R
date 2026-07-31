@@ -419,7 +419,17 @@
   }
   writeLines("", con)
 
-  rm(tbl_df, write_cols, header_vals, header_prefix, row_prefix, row_data, row_matrix, col, rows)
+  rm(
+    tbl_df,
+    write_cols,
+    header_vals,
+    header_prefix,
+    row_prefix,
+    row_data,
+    row_matrix,
+    col,
+    rows
+  )
 }
 
 # ── Micro-helpers ─────────────────────────────────────────────────────────────

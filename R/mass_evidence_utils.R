@@ -307,8 +307,15 @@ annotate_adduct_universe_metadata <- function(universe, polarity) {
       is_core_adduct = adduct_tier <= 1L
     )
 
-  rm(carrier_names, loss_names, cluster_names, has_only_common_carriers,
-     has_only_common_losses, has_only_common_clusters, baseline_name)
+  rm(
+    carrier_names,
+    loss_names,
+    cluster_names,
+    has_only_common_carriers,
+    has_only_common_losses,
+    has_only_common_clusters,
+    baseline_name
+  )
 
   out
 }
