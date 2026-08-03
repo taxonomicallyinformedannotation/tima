@@ -84,6 +84,9 @@
     multiplication in consensus and organism lookup joins)
   - Optimized organism taxonomy pivot to filter occurrence values BEFORE
     expanding to long format (reduces intermediate memory by \~15x)
+  - Optimized `sample_candidates_per_group()` to use single-pass categorical
+    column instead of 3× filter() copies (avoids materializing df_remaining
+    three times)
   - Reworked `rank_candidates()` to use tidytable's `min_rank()` per feature
     group instead of data.table in-place operations (1M rows now \~3.3s)
 

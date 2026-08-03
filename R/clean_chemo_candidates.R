@@ -342,16 +342,29 @@ sample_candidates_per_group <- function(
   has_rt_col <- "candidate_structure_error_rt" %in% names(df_remaining)
 
   # Partition into: untied (single candidate per score), small tied groups (<=max), and large tied groups (>max)
+  # OPTIMIZATION: Use single pass with categorical column to avoid 3x filter() copies
+  df_remaining <- df_remaining |>
+    tidytable::mutate(
+      .partition = tidytable::case_when(
+        .n_per_score == 1L ~ "untied",
+        .n_per_score > 1L & .n_per_score <= max_per_score ~ "keep",
+        .n_per_score > max_per_score ~ "sample"
+      )
+    )
+
   df_untied <- df_remaining |>
-    tidytable::filter(.n_per_score == 1L) |>
+    tidytable::filter(.partition == "untied") |>
+    tidytable::select(-.partition) |>
     tidytable::as_tidytable()
 
   df_keep_remaining <- df_remaining |>
-    tidytable::filter(.n_per_score > 1L & .n_per_score <= max_per_score) |>
+    tidytable::filter(.partition == "keep") |>
+    tidytable::select(-.partition) |>
     tidytable::as_tidytable()
 
   df_needs_sampling <- df_remaining |>
-    tidytable::filter(.n_per_score > max_per_score) |>
+    tidytable::filter(.partition == "sample") |>
+    tidytable::select(-.partition) |>
     tidytable::as_tidytable()
 
   # Sample only within each tied score group (feature_id, candidate_adduct, rank_final)
