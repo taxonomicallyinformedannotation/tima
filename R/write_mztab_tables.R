@@ -116,21 +116,14 @@
 
   out_df <- as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
   original_colnames <- colnames(results)
-  rm(
-    out,
-    results,
-    multi_cols,
-    id_cols,
-    split_values,
-    lengths_list,
-    n_vals_per_row,
-    row_idx,
-    col_idx,
-    parts,
-    col,
-    n_rows,
-    total_out_rows
-  )
+  # Safe rm() — some variables are only defined conditionally; use
+  # intersect to avoid "object not found" warnings
+  rm(list = intersect(
+    c("out", "results", "multi_cols", "id_cols", "split_values",
+      "lengths_list", "n_vals_per_row", "row_idx", "col_idx", "parts",
+      "col", "n_rows", "total_out_rows"),
+    ls()
+  ))
   out_df[, original_colnames, drop = FALSE]
 }
 
@@ -221,21 +214,12 @@
     smf_canonical[[out_name]] <- val
   }
 
-  rm(
-    first_rows,
-    feature_id_vals,
-    valid_feature,
-    feature_ids,
-    first_idx,
-    canonical_feat_cols,
-    feature_level_passthrough,
-    extra_feat_cols,
-    col,
-    val,
-    base_name,
-    out_name,
-    idx
-  )
+  rm(list = intersect(
+    c("first_rows", "feature_id_vals", "valid_feature", "feature_ids",
+      "first_idx", "canonical_feat_cols", "feature_level_passthrough",
+      "extra_feat_cols", "col", "val", "base_name", "out_name", "idx"),
+    ls()
+  ))
 
   smf_canonical
 }
@@ -488,33 +472,17 @@
     }
   }
 
-  rm(
-    ann,
-    ann_signal_cols,
-    has_annotation,
-    id_lookup,
-    exact_mass_raw,
-    adduct_raw,
-    theo_mz,
-    valid_idx,
-    theo_vals,
-    lib_col,
-    charge_from_adduct,
-    ms_level_val,
-    raw_spectra_ref,
-    spectra_ref_formatted,
-    inchikey_col,
-    uri_col,
-    xref_resolved,
-    database_identifier_col,
-    feature_ids,
-    evidence_input_id,
-    consumed_cols,
-    extra_cols,
-    base_names,
-    final_names,
-    i
-  )
+  # Safe rm() — some variables are only defined conditionally; use
+  # intersect to avoid "object not found" warnings
+  rm(list = intersect(
+    c("ann", "ann_signal_cols", "has_annotation", "id_lookup", "exact_mass_raw",
+      "adduct_raw", "theo_mz", "valid_idx", "theo_vals", "lib_col",
+      "charge_from_adduct", "ms_level_val", "raw_spectra_ref",
+      "spectra_ref_formatted", "inchikey_col", "uri_col", "xref_resolved",
+      "database_identifier_col", "feature_ids", "evidence_input_id",
+      "consumed_cols", "extra_cols", "base_names", "final_names", "i"),
+    ls()
+  ))
 
   tidytable::as_tidytable(sme)
 }
