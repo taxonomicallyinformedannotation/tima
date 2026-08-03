@@ -983,11 +983,19 @@ build_mini_taxonomy_table <- function(
 
   # pmax across both pools: structure label wins when its score_weighted_chemo
   # >= prediction score, otherwise the predicted label wins.
-  # Combine all joins into single operation to avoid multiple table scans
+  # All tables are pre-filtered to 1 row per feature, so joining on feature_id only
+  # is safe and prevents unintended cartesian products from common columns
   joined <- purrr::reduce(
     .x = list(df_str_cla, df_str_npc, df_pred_cla, df_pred_npc),
     .init = df_has_ik,
-    .f = function(acc, tbl) tidytable::left_join(x = acc, y = tbl)
+    .f = function(acc, tbl) {
+      tidytable::left_join(
+        x = acc,
+        y = tbl,
+        .join_by = tidyselect::any_of("feature_id"),
+        .keep = "used"
+      )
+    }
   )
 
   joined |>
@@ -1085,7 +1093,16 @@ build_mini_results_table <- function(
       best_results
     ),
     .init = features_table,
-    .f = function(acc, tbl) tidytable::left_join(x = acc, y = tbl)
+    .f = function(acc, tbl) {
+      tidytable::left_join(
+        x = acc,
+        y = tbl,
+        # All tables are 1 row per feature (best_results distincted at line 1081),
+        # so joining on feature_id only prevents unintended cartesian products
+        .join_by = tidyselect::any_of("feature_id"),
+        .keep = "used"
+      )
+    }
   )
 
   # Ensure all columns being renamed exist; some annotation sources (e.g.,
@@ -1434,7 +1451,8 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
   df_anchor_candidates <- df_with_comp |>
     tidytable::inner_join(
       y = anchor_lookup,
-      by = c("component_id", ".candidate_M_key")
+      by = c("component_id", ".candidate_M_key"),
+      .keep = "used"
     ) |>
     tidytable::mutate(
       .has_anchor_ik = candidate_structure_inchikey_connectivity_layer ==

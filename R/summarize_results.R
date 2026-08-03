@@ -112,11 +112,11 @@ summarize_results <- function(
   ) {
     # Predicate pushdown: Extract only structures present in df to reduce
     # organism_lookup table size before building.
-    needed_structures <- df |>
-      tidytable::distinct(candidate_structure_inchikey_connectivity_layer) |>
-      tidytable::pull(candidate_structure_inchikey_connectivity_layer)
-    # Remove NAs from needed_structures
-    needed_structures <- needed_structures[!is.na(needed_structures)]
+    needed_structures <- unique(
+      stats::na.omit(
+        as.character(df$candidate_structure_inchikey_connectivity_layer)
+      )
+    )
 
     filtered_sop_table <- if (length(needed_structures) > 0L) {
       structure_organism_pairs_table |>
@@ -207,11 +207,15 @@ summarize_results <- function(
       nrow(organism_lookup) > 0L &&
         "candidate_structure_inchikey_connectivity_layer" %in% names(df_joined)
     ) {
-      df_lookup_keys <- df_joined |>
-        tidytable::select(
-          candidate_structure_inchikey_connectivity_layer
-        ) |>
-        tidytable::distinct()
+      df_lookup_keys <- tidytable::tidytable(
+        candidate_structure_inchikey_connectivity_layer = unique(
+          stats::na.omit(
+            as.character(
+              df_joined$candidate_structure_inchikey_connectivity_layer
+            )
+          )
+        )
+      )
 
       # Semi-join keeps only organism_lookup rows that match df_lookup_keys
       organism_lookup |>
@@ -227,11 +231,13 @@ summarize_results <- function(
       tidytable::left_join(
         y = features_min,
         by = "feature_id",
+        .keep = "used",
         suffix = c("", "_feature")
       ) |>
       tidytable::left_join(
         y = components_min,
         by = "feature_id",
+        .keep = "used",
         suffix = c("", "_component")
       ) |>
       tidytable::left_join(
@@ -240,7 +246,8 @@ summarize_results <- function(
           "feature_id",
           "candidate_structure_inchikey_connectivity_layer",
           "candidate_structure_organism_occurrence_closest"
-        )
+        ),
+        .keep = "used"
       ) |>
       tidytable::select(tidyselect::any_of(x = final_select_cols))
   } else {
@@ -551,6 +558,7 @@ summarize_results <- function(
   # Melt the taxonomy columns into one long table with values_drop_na = TRUE
   # to keep memory usage low by not materializing the many NA ranks
   # (species, varietas, etc.)
+  # OPTIMIZATION: Filter to only occurrences that exist in df BEFORE melting
   sop_long <- tidytable::pivot_longer(
     sop_narrow,
     cols = tidyselect::all_of(taxonomy_cols),
@@ -558,6 +566,9 @@ summarize_results <- function(
     values_to = "candidate_structure_organism_occurrence_closest",
     values_drop_na = TRUE
   ) |>
+    tidytable::filter(
+      candidate_structure_organism_occurrence_closest %in% candidate_occurrences
+    ) |>
     tidytable::select(-".taxonomy_rank") |>
     tidytable::distinct()
 

@@ -51,7 +51,7 @@ build_feature_pairs_within_rt <- function(
   dest <- dest[order(sample, rt_dest)]
   src <- src[order(sample, rt_min)]
 
-  # For each sample, use data.table's rolling join with pre-filtering
+  # For each sample, use rolling join with pre-filtering
   # This replaces the cartesian join with allow.cartesian = TRUE
   matches <- dest[
     src,
@@ -700,23 +700,35 @@ join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
     ))
   }
 
-  # Build result using vectorized expansion
-  result_list <- vector("list", length(valid_idx))
+  match_sizes <- hi_idx[valid_idx] - lo_idx[valid_idx] + 1L
+  total_matches <- sum(match_sizes)
+
+  out_feature_id <- character(total_matches)
+  out_loss <- character(total_matches)
+  out_mass <- numeric(total_matches)
+  out_feature_id_dest <- character(total_matches)
+
+  pos <- 1L
   for (j in seq_along(valid_idx)) {
     i <- valid_idx[j]
     lo <- lo_idx[i]
     hi <- hi_idx[i]
     n_match <- hi - lo + 1L
+    rng <- pos:(pos + n_match - 1L)
 
-    result_list[[j]] <- tidytable::tidytable(
-      feature_id = rep(cd_src$src_feature_id[i], n_match),
-      loss = nl_win$loss[lo:hi],
-      mass = nl_win$loss_mass_keep[lo:hi],
-      feature_id_dest = rep(cd_src$src_feature_id_dest[i], n_match)
-    )
+    out_feature_id[rng] <- rep(cd_src$src_feature_id[i], n_match)
+    out_loss[rng] <- nl_win$loss[lo:hi]
+    out_mass[rng] <- nl_win$loss_mass_keep[lo:hi]
+    out_feature_id_dest[rng] <- rep(cd_src$src_feature_id_dest[i], n_match)
+    pos <- pos + n_match
   }
 
-  tidytable::bind_rows(result_list) |>
+  tidytable::tidytable(
+    feature_id = out_feature_id,
+    loss = out_loss,
+    mass = out_mass,
+    feature_id_dest = out_feature_id_dest
+  ) |>
     unique() |>
     tidytable::as_tidytable()
 }

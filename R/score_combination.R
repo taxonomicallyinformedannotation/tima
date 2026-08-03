@@ -163,19 +163,22 @@ expand_combined_scores_for_filtering <- function(
     )
 
   # Semi-join against wide bio table to filter to only relevant rows
-  # Keep ALL columns including original scores - ranking logic needs them
+  # Drop unused columns early so the later clean_chemo pass does not carry the
+  # original wide tables any longer than necessary.
   bio_for_filtering <- wide_bio_table |>
     tidytable::semi_join(
       candidates_needed,
       by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
-    )
+    ) |>
+    select_clean_chemo_working_columns()
 
-  # Semi-join against wide chemo table - also keep all columns
+  # Match the same narrowed schema for the chemo side.
   chemo_for_filtering <- wide_chemo_table |>
     tidytable::semi_join(
       candidates_needed,
       by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
-    )
+    ) |>
+    select_clean_chemo_working_columns()
 
   # Start with bio table (has all metadata and scores)
   result <- bio_for_filtering

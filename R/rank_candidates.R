@@ -40,36 +40,31 @@ rank_candidates <- function(df) {
     return(df)
   }
 
-  # Clean and coerce values
-  score_final <- suppressWarnings(as.numeric(df[[score_col]]))
-  score_final <- pmax(score_final, 0)
-  score_final[!is.finite(score_final)] <- NA_real_
+  df$score_final <- suppressWarnings(as.numeric(df[[score_col]]))
+  df$score_final <- pmax(df$score_final, 0)
+  df$score_final[!is.finite(df$score_final)] <- NA_real_
 
-  promoted <- suppressWarnings(as.logical(df[[
-    "cluster_consensus_promoted_from_anchor"
-  ]]))
-  promoted[is.na(promoted)] <- FALSE
-
-  # Group by feature_id and rank by descending effective score
-  feature_ids <- as.character(df[["feature_id"]])
-  df$rank_final <- NA_integer_
-
-  groups <- split(seq_len(nrow(df)), feature_ids)
-  for (fid in names(groups)) {
-    idx <- groups[[fid]]
-    if (length(idx) > 0L) {
-      # Order by descending score, then promoted first
-      order_idx <- order(
-        -score_final[idx], # Primary: higher score first
-        !promoted[idx], # Secondary: promoted first (FALSE before TRUE)
-        na.last = TRUE,
-        method = "radix"
-      )
-      # Rank by descending score, ties get same rank
-      ranks <- rank(-score_final[idx[order_idx]], ties.method = "min")
-      df$rank_final[idx[order_idx]] <- ranks
-    }
+  df$score_initial <- if ("candidate_score_pseudo_initial" %in% names(df)) {
+    suppressWarnings(as.numeric(df[["candidate_score_pseudo_initial"]]))
+  } else {
+    rep(NA_real_, nrow(df))
   }
+  df$score_initial <- pmax(df$score_initial, 0)
+  df$score_initial[!is.finite(df$score_initial)] <- NA_real_
+
+  # Rank within each feature_id by score_final (descending), breaking ties by promoted status
+  df <- tidytable::as_tidytable(df) |>
+    tidytable::mutate(
+      rank_final = tidytable::min_rank(-score_final),
+      rank_initial = tidytable::min_rank(-score_initial),
+      .by = feature_id
+    ) |>
+    tidytable::distinct(
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer,
+      .keep_all = TRUE
+    ) |>
+    tidytable::select(-score_final, -score_initial)
 
   df
 }

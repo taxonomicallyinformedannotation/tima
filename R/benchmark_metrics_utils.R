@@ -88,27 +88,33 @@ NULL
     1L
   )
 
-  out <- data.frame(
-    feature_id = rep(as.character(df$feature_id), times = n_per_row),
-    candidate_ik = unlist(
-      Map(.benchmark_pad_to, ik_parts, n_per_row),
-      use.names = FALSE
-    ),
-    rank_final = unlist(
-      Map(.benchmark_pad_to, rk_parts, n_per_row),
-      use.names = FALSE
-    ),
-    score_final = unlist(
-      Map(.benchmark_pad_to, sc_parts, n_per_row),
-      use.names = FALSE
-    ),
-    prediction = rep(pred_name, sum(n_per_row)),
-    stringsAsFactors = FALSE
+  total_rows <- sum(n_per_row)
+  feature_id <- rep(as.character(df$feature_id), times = n_per_row)
+  candidate_ik <- character(total_rows)
+  rank_final <- character(total_rows)
+  score_final <- character(total_rows)
+
+  pos <- 1L
+  for (i in seq_along(n_per_row)) {
+    n_i <- n_per_row[[i]]
+    rng <- pos:(pos + n_i - 1L)
+    candidate_ik[rng] <- .benchmark_pad_to(ik_parts[[i]], n_i)
+    rank_final[rng] <- .benchmark_pad_to(rk_parts[[i]], n_i)
+    score_final[rng] <- .benchmark_pad_to(sc_parts[[i]], n_i)
+    pos <- pos + n_i
+  }
+
+  out <- tidytable::tidytable(
+    feature_id = feature_id,
+    candidate_ik = candidate_ik,
+    rank_final = rank_final,
+    score_final = score_final,
+    prediction = rep(pred_name, total_rows)
   )
 
   rm(df, n_per_row, ik_parts, rk_parts, sc_parts, pred_name)
 
-  tidytable::as_tidytable(out) |>
+  out |>
     tidytable::mutate(
       candidate_ik = gsub("-.*", "", candidate_ik, perl = TRUE),
       candidate_ik = tidytable::na_if(candidate_ik, "")

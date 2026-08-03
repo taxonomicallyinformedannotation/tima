@@ -911,7 +911,7 @@
   } else {
     # sml_rows is a list of plain named lists (not data.frames), so we
     # transpose via vapply per column — bind_rows/rbindlist require
-    # data.frame or data.table inputs and would error on bare lists.
+    # data.frame or inputs and would error on bare lists.
     col_names <- names(sml_rows[[1L]])
     cols <- lapply(col_names, function(col) {
       vapply(
