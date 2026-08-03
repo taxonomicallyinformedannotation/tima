@@ -77,6 +77,7 @@ utils::globalVariables(
     ".n_per_score",
     ".note_present",
     ".order",
+    ".partition",
     ".peak_rank",
     ".ppm_error",
     ".ppm_ok",
