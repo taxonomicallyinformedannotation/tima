@@ -21,33 +21,37 @@
   has_spectral <- "id_confidence_measure[4]" %in% colnames(sme_table)
 
   add_default <- function(meta, key, value) {
-    if (is.list(meta) && all(c("keys", "values") %in% names(meta))) {
-      keys <- meta$keys
-      values <- meta$values
-    } else {
-      keys <- character(0)
-      values <- character(0)
+    # Environment-backed accumulator: O(1) insertion, avoids c() vector
+    # growing (O(n²) total for ~54 calls)
+    if (is.null(meta$env)) {
+      meta$env <- new.env(parent = emptyenv())
+      meta$seen <- new.env(parent = emptyenv())
+      meta$order <- list()
     }
-
-    if (length(keys) == 0L || !any(keys == key, na.rm = TRUE)) {
-      keys <- c(keys, key)
-      values <- c(values, value)
+    if (!exists(key, envir = meta$seen, inherits = FALSE)) {
+      meta$seen[[key]] <- TRUE
+      meta$env[[key]] <- value
+      meta$order <- c(meta$order, key)
     }
-
-    list(keys = keys, values = values)
+    meta
   }
 
   meta <- if (is.null(existing_metadata)) {
-    list(keys = character(0), values = character(0))
+    list()
   } else {
     existing_df <- tidytable::as_tidytable(existing_metadata)
     if (all(c("key", "value") %in% colnames(existing_df))) {
-      list(
-        keys = as.character(existing_df$key),
-        values = as.character(existing_df$value)
-      )
+      e <- new.env(parent = emptyenv())
+      s <- new.env(parent = emptyenv())
+      ord <- as.character(existing_df$key)
+      for (i in seq_along(ord)) {
+        k <- ord[[i]]
+        e[[k]] <- as.character(existing_df$value[[i]])
+        s[[k]] <- TRUE
+      }
+      list(env = e, seen = s, order = as.list(ord))
     } else {
-      list(keys = character(0), values = character(0))
+      list()
     }
   }
 
@@ -356,9 +360,11 @@
     catalog$terms$metadata_defaults[["colunit-small_molecule_evidence"]]
   )
 
+  # Extract keys/values from environment-backed accumulator
+  keys <- unlist(meta$order, use.names = FALSE)
   tidytable::tidytable(
-    key = as.character(meta$keys),
-    value = as.character(meta$values)
+    key = keys,
+    value = as.character(vapply(keys, function(k) meta$env[[k]], character(1)))
   )
 }
 
@@ -396,10 +402,21 @@
   if (length(write_cols) == 0L) {
     rows <- rep(row_prefix, nrow(tbl))
   } else {
-    for (col in write_cols) {
-      if (!col %in% colnames(tbl_df)) {
-        tbl_df[[col]] <- "null"
-      }
+    # Add missing columns in one step via cbind — avoids per-column
+    # data.frame copy growth (each tbl_df[[col]] <- … copies the frame)
+    missing_cols <- setdiff(write_cols, colnames(tbl_df))
+    if (length(missing_cols) > 0L) {
+      # Build per-column vectors of the right length, then add in one cbind
+      new_cols <- rep(list(rep("null", nrow(tbl_df))), length(missing_cols))
+      names(new_cols) <- missing_cols
+      tbl_df <- cbind(
+        tbl_df,
+        as.data.frame(
+          new_cols,
+          stringsAsFactors = FALSE,
+          check.names = FALSE
+        )
+      )
     }
 
     row_data <- lapply(write_cols, function(col) {
@@ -409,9 +426,8 @@
       v
     })
 
-    row_matrix <- do.call(cbind, row_data)
-    row_matrix[is.na(row_matrix)] <- "null"
-    rows <- apply(row_matrix, 1L, paste, collapse = "\t")
+    # Vectorized paste avoids full intermediate matrix + row-wise R loop
+    rows <- do.call(paste, c(row_data, list(sep = "\t")))
   }
 
   if (length(rows) > 0L) {
@@ -420,15 +436,20 @@
   writeLines("", con)
 
   rm(
-    tbl_df,
-    write_cols,
-    header_vals,
-    header_prefix,
-    row_prefix,
-    row_data,
-    row_matrix,
-    col,
-    rows
+    list = intersect(
+      c(
+        "tbl_df",
+        "write_cols",
+        "header_vals",
+        "header_prefix",
+        "row_prefix",
+        "row_data",
+        "row_matrix",
+        "col",
+        "rows"
+      ),
+      ls()
+    )
   )
 }
 

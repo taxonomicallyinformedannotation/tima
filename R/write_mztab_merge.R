@@ -143,10 +143,16 @@
   if (nrow(tbl) == 0L && ncol(tbl) == 0L) {
     tbl <- data.frame(stringsAsFactors = FALSE, check.names = FALSE)
   }
-  for (col in cols) {
-    if (!col %in% colnames(tbl)) {
-      tbl[[col]] <- character(nrow(tbl))
-    }
+  # Add missing columns in one step via cbind — avoids per-column
+  # data.frame copy growth (each tbl[[col]] <- … copies the entire frame)
+  missing_cols <- setdiff(cols, colnames(tbl))
+  if (length(missing_cols) > 0L) {
+    new_cols <- rep(list(character(nrow(tbl))), length(missing_cols))
+    names(new_cols) <- missing_cols
+    tbl <- cbind(
+      tbl,
+      as.data.frame(new_cols, stringsAsFactors = FALSE, check.names = FALSE)
+    )
   }
   # Keep optional/unknown columns to avoid information loss in merge mode.
   ordered_cols <- c(cols, setdiff(colnames(tbl), cols))

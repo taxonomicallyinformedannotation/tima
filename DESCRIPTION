@@ -1,6 +1,7 @@
 Package: tima
 Title: Taxonomically Informed Metabolite Annotation
 Version: 2.13.0.9000
+Author: Adriano Rutz
 Authors@R: c(
     person(
         given = "Adriano",

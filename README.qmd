@@ -233,7 +233,7 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 ## Additional software credits
 
 ```{r}
-#| label: "deps"
+#| label: "grateful"
 #| echo: false
 #| message: false
 

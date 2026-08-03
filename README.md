@@ -235,7 +235,7 @@ Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.
 
   | Package         | Version     | Citation                                                              |
   | :-------------- | :---------- | :-------------------------------------------------------------------- |
-  | archive         | 1.1.13      | Hester and Csárdi (2026)                                              |
+  | archive         | 1.1.14      | Hester and Csárdi (2026)                                              |
   | base            | 4.6.1       | R Core Team (2026a)                                                   |
   | BiocManager     | 1.30.27     | Morgan and Ramos (2025)                                               |
   | BiocVersion     | 3.23.1      | Morgan (2025)                                                         |
@@ -248,7 +248,7 @@ Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.
   | lgr             | 0.5.2       | Fleck (2026)                                                          |
   | lifecycle       | 1.0.5       | Henry and Wickham (2026)                                              |
   | MetaboCoreUtils | 1.20.1      | Rainer et al. (2022a)                                                 |
-  | MsBackendMgf    | 1.20.0      | Gatto et al. (2026)                                                   |
+  | MsBackendMgf    | 1.20.1      | Gatto et al. (2026)                                                   |
   | MsBackendMsp    | 1.16.0      | Rainer et al. (2022b)                                                 |
   | MsCoreUtils     | 1.24.0      | Rainer et al. (2022c)                                                 |
   | msentropy       | 0.1.4       | Li (2023)                                                             |

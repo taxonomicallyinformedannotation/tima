@@ -611,7 +611,7 @@ extract_vector <- function(obj, field, len, fill = NA) {
 build_library_metadata <- function(
   lib_sp,
   lib_precursors,
-  target_ids = seq_len(length(lib_sp)),
+  target_ids = seq_along(lib_sp),
   target_adduct_raw = NULL
 ) {
   target_ids <- as.integer(target_ids)

@@ -147,7 +147,6 @@ build_evidence_supported_hypotheses <- function(
   n_feat <- length(feature_ids)
   implied_work <- numeric(n_feat)
   ok_work <- logical(n_feat)
-  pos_work <- integer(n_feat)
 
   t_loop <- Sys.time()
   log_every <- max(1L, K %/% 10L)
@@ -173,7 +172,6 @@ build_evidence_supported_hypotheses <- function(
     }
 
     # Get valid indices in one pass
-    n_ok <- sum(ok_work)
     implied_ok <- implied_work[ok_work]
 
     if (use_library_prefilter) {

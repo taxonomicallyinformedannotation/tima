@@ -178,11 +178,16 @@ harmonize_adducts <- function(
   }
 
   rm(
-    unique_adducts,
-    unique_non_missing,
-    inverse_idx,
-    non_missing_unique,
-    adducts
+    list = intersect(
+      c(
+        "unique_adducts",
+        "unique_non_missing",
+        "inverse_idx",
+        "non_missing_unique",
+        "adducts"
+      ),
+      ls()
+    )
   )
 
   df
@@ -401,8 +406,10 @@ canonicalize_adduct_notation <- local({
       return(adduct)
     }
 
+    # Use C-level rbindlist (via tidytable::bind_rows) instead of base rbind
+    # to avoid O(n²) deep copies when combining parsed token data.frames
     parsed <- do.call(
-      rbind,
+      tidytable::bind_rows,
       lapply(tokens, function(tok) {
         tg <- regmatches(tok, regexec(tok_re, tok, perl = TRUE))[[1L]]
         sign <- if (tg[[2L]] == "+") 1L else -1L

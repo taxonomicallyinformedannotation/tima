@@ -1,4 +1,6 @@
 CITATION.cff
+^.*\.Rproj$
+^.*\.iml$
 ^.*\.log$
 ^LICENSE\.md$
 ^README\.Rmd$
@@ -17,8 +19,10 @@ CITATION.cff
 ^_quarto$
 ^_targets\.yaml$
 ^altdoc$
+^benchmarks$
 ^codecov\.yml$
 ^codemeta\.json$
+^compile_flags\.json$
 ^cran-comments\.md$
 ^data$
 ^dev$
@@ -29,8 +33,6 @@ CITATION.cff
 ^prek[.]toml$
 ^renv$
 ^renv\.lock$
-^tima\.Rproj$
-^tima\.iml$
 ^vignettes/\.quarto$
 ^vignettes/articles$
 ^vignettes/articles/*_files$

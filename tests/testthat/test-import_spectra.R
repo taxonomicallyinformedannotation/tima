@@ -9,12 +9,13 @@ test_that("import_spectra handles MGF files correctly", {
   temp_mgf <- withr::local_tempfile(fileext = ".mgf")
 
   data.frame(
-    FEATURE_ID = c("FT001", "FT002", "FT003"),
-    mz = c(list(123.4567, 234.5678, 345.6789)),
-    precursorCharge = c(0L, 0L, 0L),
-    MS_LEVEL = c(1L, 2L, 3L),
-    PRECURSOR_MZ = c(123.4567, 234.5678, 345.6789),
-    Spectrum_type = c("MS1", "MS2", "MS3")
+    FEATURE_ID = "FT001",
+    mz = I(list(c(100.0, 200.0, 300.0))),
+    intensity = I(list(c(10.0, 50.0, 30.0))),
+    precursorCharge = 1L,
+    MS_LEVEL = 2L,
+    PRECURSOR_MZ = 200.0,
+    Spectrum_type = "MS2"
   ) |>
     Spectra::Spectra() |>
     MsBackendMgf::export(

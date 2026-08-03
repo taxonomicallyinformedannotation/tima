@@ -16,6 +16,8 @@
   desc <- mgf[desc.idx]
 
   spec <- strsplit(mgf[-desc.idx], "[[:space:]]+", perl = TRUE)
+  # Remove empty entries from blank lines (strsplit("") returns character(0))
+  spec <- spec[lengths(spec) > 0L]
   if (!length(spec) || length(spec[[1L]]) == 1L) {
     ms <- matrix(numeric(), ncol = 2L)
   } else {

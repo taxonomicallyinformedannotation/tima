@@ -169,8 +169,6 @@ create_edges <- function(
   # Score histogram bins (accumulated across all queries)
   bin_counts <- integer(10L)
   use_gnps <- (method == "gnps")
-  # Local alias avoids repeated global lookup in the tight inner loop.
-  call_gnps <- gnps_chain_dp_wrapper
   progress_counter <- 0L
 
   results <- lapply(seq_len(n_queries), function(i) {

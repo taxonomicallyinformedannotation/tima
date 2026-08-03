@@ -15,6 +15,7 @@ test_that("create_edges_spectra validates input parameter", {
 })
 
 test_that("create_edges_spectra uses the full similarity graph by default", {
+  withr::local_dir(new = temp_test_dir("create_edges_spectra_default"))
   mgf_file <- tempfile(fileext = ".mgf")
   mgf <- c(
     "BEGIN IONS",

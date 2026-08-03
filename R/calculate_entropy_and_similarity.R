@@ -135,10 +135,6 @@ calculate_entropy_and_similarity <- function(
 
   # Pre-calculate length once for efficiency
   n_queries <- length(query_ids)
-
-  # Lazy sanitize-on-first-use state.
-  # This avoids up-front full scans and only sanitizes spectra that need it.
-  n_query <- length(query_spectra)
   n_lib <- length(lib_spectra)
 
   # Decide similarity space: precursor m/z or neutral-M (adduct-aware)

@@ -450,118 +450,6 @@ weight_bio <- function(
     )
   rm(df0)
 
-  # Helper Function for Taxonomic Level Scoring ----
-
-  score_per_level_bio <- function(df, candidates, samples, score, score_name) {
-    df |>
-      tidytable::distinct(!!as.name(candidates), !!as.name(samples)) |>
-      tidytable::filter(!is.na(!!as.name(samples))) |>
-      tidytable::filter(!!as.name(samples) != "ND") |>
-      tidytable::filter(!is.na(!!as.name(candidates))) |>
-      tidytable::filter(!!as.name(candidates) != "notClassified") |>
-      tidytable::filter(
-        stringi::stri_detect_regex(
-          pattern = !!as.name(candidates),
-          str = !!as.name(samples)
-        )
-      ) |>
-      tidytable::mutate(
-        !!as.name(score_name) := tidytable::if_else(
-          condition = !!as.name(samples) != "notClassified",
-          true = score * 1,
-          false = 0
-        )
-      )
-  }
-
-  # Calculate Biological Scores at All Taxonomic Levels ----
-
-  # Define all taxonomic levels and their scores (DRY principle)
-  taxonomic_levels <- list(
-    list(
-      level = "domain",
-      num = "01",
-      candidate = "candidate_organism_01_domain",
-      sample = "sample_organism_01_domain",
-      score = score_biological_domain
-    ),
-    list(
-      level = "kingdom",
-      num = "02",
-      candidate = "candidate_organism_02_kingdom",
-      sample = "sample_organism_02_kingdom",
-      score = score_biological_kingdom
-    ),
-    list(
-      level = "phylum",
-      num = "03",
-      candidate = "candidate_organism_03_phylum",
-      sample = "sample_organism_03_phylum",
-      score = score_biological_phylum
-    ),
-    list(
-      level = "class",
-      num = "04",
-      candidate = "candidate_organism_04_class",
-      sample = "sample_organism_04_class",
-      score = score_biological_class
-    ),
-    list(
-      level = "order",
-      num = "05",
-      candidate = "candidate_organism_05_order",
-      sample = "sample_organism_05_order",
-      score = score_biological_order
-    ),
-    list(
-      level = "family",
-      num = "06",
-      candidate = "candidate_organism_06_family",
-      sample = "sample_organism_06_family",
-      score = score_biological_family
-    ),
-    list(
-      level = "tribe",
-      num = "07",
-      candidate = "candidate_organism_07_tribe",
-      sample = "sample_organism_07_tribe",
-      score = score_biological_tribe
-    ),
-    list(
-      level = "genus",
-      num = "08",
-      candidate = "candidate_organism_08_genus",
-      sample = "sample_organism_08_genus",
-      score = score_biological_genus
-    ),
-    list(
-      level = "species",
-      num = "09",
-      candidate = "candidate_organism_09_species",
-      sample = "sample_organism_09_species",
-      score = score_biological_species
-    ),
-    list(
-      level = "varietas",
-      num = "10",
-      candidate = "candidate_organism_10_varietas",
-      sample = "sample_organism_10_varietas",
-      score = score_biological_variety
-    )
-  )
-
-  # Calculate scores for all levels
-  # Helper to process a single taxonomic level
-  .score_taxonomic_level <- function(tax_level) {
-    df2 |>
-      score_per_level_bio(
-        candidates = tax_level$candidate,
-        samples = tax_level$sample,
-        score = tax_level$score,
-        score_name = paste0("score_biological_", tax_level$num)
-      )
-  }
-
   # OPTIMIZATION: Pre-compute the distinct pairs once to avoid 10x distinct+filter+regex
   df_pairs <- df2 |>
     tidytable::distinct(
@@ -809,16 +697,11 @@ weight_bio <- function(
 
   rm(df_pairs)
 
-  supp_tables <- lapply(
-    X = taxonomic_levels,
-    FUN = .score_taxonomic_level
-  )
+  # df2 already has all score_biological_* columns from the df_pairs join above,
+  # so the old score_per_level_bio / taxonomic_levels / purrr::reduce code was
+  # redundant dead code that re-computed the same columns — removed.
 
-  annot_table_wei_bio_init <- purrr::reduce(
-    .x = supp_tables,
-    .init = df2,
-    .f = tidytable::left_join
-  ) |>
+  annot_table_wei_bio_init <- df2 |>
     tidytable::select(
       sample_organism_name,
       -tidyselect::contains(match = "sample_organism_0"),
@@ -826,7 +709,7 @@ weight_bio <- function(
       tidyselect::contains(match = "candidate_organism"),
       tidyselect::contains(match = "score")
     )
-  rm(supp_tables, df2)
+  rm(df2)
 
   annot_table_wei_bio_init <- annot_table_wei_bio_init |>
     tidytable::mutate(

@@ -310,14 +310,14 @@ create_edges_spectra <- function(
     FUN = nrow,
     FUN.VALUE = numeric(1)
   )
-  rm(nspecz, fragz)
+  rm(list = intersect(c("nspecz", "fragz"), ls()))
 
   idz <- spectra |>
     get_spectra_ids()
   if (is.null(idz) || length(idz) != length(spectra)) {
     idz <- seq_along(spectra)
   }
-  rm(spectra)
+  rm(list = intersect(c("spectra"), ls()))
 
   normalize_edge_table <- function(edge_table) {
     if ("feature_id" %in% names(edge_table)) {
@@ -337,11 +337,11 @@ create_edges_spectra <- function(
 
   community_edges <- normalize_edge_table(community_edges)
 
-  entropy_df <- as.data.frame(tidytable::tidytable(
+  entropy_df <- data.frame(
     source = seq_along(entropy),
     feature_spectrum_entropy = as.character(entropy),
     feature_spectrum_peaks = as.character(npeaks)
-  ))
+  )
   names(entropy_df)[names(entropy_df) == "source"] <- source_col
   entropy_df[[source_col]] <- idz[entropy_df[[source_col]]]
   entropy_df <- entropy_df[
@@ -349,7 +349,7 @@ create_edges_spectra <- function(
     c(source_col, "feature_spectrum_entropy", "feature_spectrum_peaks"),
     drop = FALSE
   ]
-  rm(entropy, npeaks, idz)
+  rm(list = intersect(c("entropy", "npeaks", "idz"), ls()))
 
   edges <- edges |>
     tidytable::full_join(y = entropy_df)
@@ -387,7 +387,7 @@ create_edges_spectra <- function(
 
   edges <- drop_legacy_similarity_columns(edges)
 
-  rm(entropy_df)
+  rm(list = intersect(c("entropy_df"), ls()))
 
   edges_before_community_cut <- edges
 
@@ -418,11 +418,12 @@ create_edges_spectra <- function(
     }
 
     retained_features <- unique(c(edges[[source_col]], edges[[target_col]]))
-    all_features <- unique(c(
+    # Hoist pre-cut feature set — same as the later pre_cut_features below
+    pre_cut_features <- unique(c(
       edges_before_community_cut[[source_col]],
       edges_before_community_cut[[target_col]]
     ))
-    isolated_features <- setdiff(all_features, retained_features)
+    isolated_features <- setdiff(pre_cut_features, retained_features)
 
     if (length(isolated_features) > 0L) {
       isolated_edges <- tidytable::tidytable(
@@ -448,10 +449,7 @@ create_edges_spectra <- function(
       community_result$method_used
     )
 
-    pre_cut_features <- unique(c(
-      edges_before_community_cut[[source_col]],
-      edges_before_community_cut[[target_col]]
-    ))
+    # pre_cut_features already computed above (hoisted to avoid recompute)
     retained_features <- unique(c(edges[[source_col]], edges[[target_col]]))
     dropped_features <- setdiff(pre_cut_features, retained_features)
 
@@ -470,7 +468,7 @@ create_edges_spectra <- function(
 
   n_edges <- nrow(edges)
   n_features <- length(unique(c(edges[[source_col]], edges[[target_col]])))
-  rm(edges)
+  rm(list = intersect(c("edges"), ls()))
   log_info("Edges written to: %s", output)
 
   log_complete(

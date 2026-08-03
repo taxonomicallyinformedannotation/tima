@@ -54,8 +54,9 @@ compute_weighted_components <- function(..., weights) {
     ))
   }
 
+  # do.call(cbind, values) on a list of vectors already returns a matrix,
+  # so the extra as.matrix() below was a redundant full-copy — removed
   values_matrix <- do.call(cbind, values)
-  values_matrix <- as.matrix(values_matrix)
 
   # Convert NA to 0 before calculation
   values_matrix[is.na(values_matrix)] <- 0

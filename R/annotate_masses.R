@@ -897,7 +897,6 @@ retain_supported_single_m_edges <- function(
       tidytable::transmute(src = feature_id_dest, dest = feature_id)
   ) |>
     tidytable::distinct()
-  all_nodes <- unique(c(undirected$src, undirected$dest))
 
   # Use igraph to compute connected components (faster and vectorized)
   if (nrow(undirected) == 0L) {
@@ -1319,8 +1318,10 @@ build_parsed_legacy_adduct_table <- function(adducts) {
       adduct_mass = numeric()
     ))
   }
-  tidytable::as_tidytable(do.call(
-    rbind,
+  # Combine via C-level rbindlist (via tidytable::bind_rows) —
+  # avoids per-row data.frame + repeated rbind copies
+  do.call(
+    tidytable::bind_rows,
     lapply(rows, function(r) {
       data.frame(
         adduct = r$adduct,
@@ -1331,7 +1332,8 @@ build_parsed_legacy_adduct_table <- function(adducts) {
         stringsAsFactors = FALSE
       )
     })
-  )) |>
+  ) |>
+    tidytable::as_tidytable() |>
     tidytable::distinct(adduct, .keep_all = TRUE)
 }
 
@@ -1410,8 +1412,10 @@ build_single_legacy_adduct_mass_table <- function(adducts) {
   if (length(rows) == 0L) {
     return(tidytable::tidytable(adduct = character(), adduct_mass = numeric()))
   }
-  tab <- tidytable::as_tidytable(do.call(
-    rbind,
+  # Combine via C-level rbindlist (via tidytable::bind_rows) —
+  # avoids per-row data.frame + repeated rbind copies
+  tab <- do.call(
+    tidytable::bind_rows,
     lapply(rows, function(r) {
       data.frame(
         adduct = r$adduct,
@@ -1421,7 +1425,7 @@ build_single_legacy_adduct_mass_table <- function(adducts) {
         stringsAsFactors = FALSE
       )
     })
-  ))
+  )
   tab |>
     tidytable::filter(n_mer == 1L, abs(z) == 1L) |>
     tidytable::select(adduct, adduct_mass) |>

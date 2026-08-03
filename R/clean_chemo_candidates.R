@@ -354,48 +354,6 @@ sample_candidates_per_group <- function(
     tidytable::filter(.n_per_score > max_per_score) |>
     tidytable::as_tidytable()
 
-  # Ordering function: use rank_final if available, otherwise score_weighted_chemo
-  sort_candidates_for_sampling <- function(tbl, prefer_rt = FALSE) {
-    if (nrow(tbl) == 0L) {
-      return(tbl)
-    }
-
-    order_terms <- list()
-
-    # PRIMARY: rank_final from unified ranking system (if available)
-    if ("rank_final" %in% names(tbl)) {
-      order_terms[[length(order_terms) + 1L]] <- suppressWarnings(as.numeric(
-        tbl$rank_final
-      ))
-    } else if ("score_weighted_chemo" %in% names(tbl)) {
-      # FALLBACK: use score_weighted_chemo directly (already combines all evidence)
-      order_terms[[length(order_terms) + 1L]] <- -suppressWarnings(as.numeric(
-        tbl$score_weighted_chemo
-      ))
-    }
-
-    # Secondary: cluster consensus (if rank_final not used)
-    if (
-      !("rank_final" %in% names(tbl)) &&
-        "cluster_consensus_promoted_from_anchor" %in% names(tbl)
-    ) {
-      order_terms[[length(order_terms) + 1L]] <- -as.integer(
-        !is.na(tbl$cluster_consensus_promoted_from_anchor) &
-          tbl$cluster_consensus_promoted_from_anchor
-      )
-    }
-
-    if (length(order_terms) == 0L) {
-      return(tbl)
-    }
-
-    ord <- do.call(
-      order,
-      c(order_terms, list(na.last = TRUE, method = "radix"))
-    )
-    tbl[ord, , drop = FALSE]
-  }
-
   # Sample only within each tied score group (feature_id, candidate_adduct, rank_final)
   if (nrow(df_needs_sampling) > 0L) {
     if (has_rt_col) {
