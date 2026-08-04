@@ -456,7 +456,7 @@ sample_candidates_per_group <- function(
     )
     seq_in_group <- seq_along(group_key)
     group_id <- match(group_key, unique(group_key))
-    seq_in_group <- ave(seq_in_group, group_id, FUN = seq_along)
+    seq_in_group <- stats::ave(seq_in_group, group_id, FUN = seq_along)
     df_sampled <- df_ns[seq_in_group <= max_per_score, , drop = FALSE]
 
     # Ensure tidytable result
