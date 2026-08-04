@@ -166,17 +166,37 @@ expand_combined_scores_for_filtering <- function(
   # single left_join instead of two separate joins. Each left_join on a
   # millions-row table creates a full copy, so merging the join inputs
   # into one reduces intermediate memory by ~50% for this step.
+  # score_final comes from combined_scores (not the wide tables), so we
+  # extract it here and merge it into the chemo lookup table.
   chemo_cols_to_add <- setdiff(
     names(wide_chemo_table),
     names(wide_bio_table)
   )
-  chemo_with_score <- tidytable::select(
+  chemo_lookup <- tidytable::select(
     wide_chemo_table,
     feature_id,
     candidate_structure_inchikey_connectivity_layer,
-    tidyselect::all_of(chemo_cols_to_add),
-    score_final
+    tidyselect::all_of(chemo_cols_to_add)
   )
+  # Merge score_final from combined_scores into the single lookup table
+  score_final_col <- if ("score_final" %in% names(combined_scores)) {
+    tidytable::select(
+      combined_scores,
+      feature_id,
+      candidate_structure_inchikey_connectivity_layer,
+      score_final
+    )
+  } else {
+    NULL
+  }
+  if (!is.null(score_final_col)) {
+    chemo_lookup <- chemo_lookup |>
+      tidytable::left_join(
+        y = score_final_col,
+        by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
+      )
+    rm(score_final_col)
+  }
 
   # Semi-join to filter to only relevant rows, then single left_join
   result <- wide_bio_table |>
@@ -186,7 +206,7 @@ expand_combined_scores_for_filtering <- function(
     ) |>
     select_clean_chemo_working_columns() |>
     tidytable::left_join(
-      y = chemo_with_score |>
+      y = chemo_lookup |>
         tidytable::semi_join(
           candidates_needed,
           by = c(
@@ -204,7 +224,7 @@ expand_combined_scores_for_filtering <- function(
   }
 
   rm(
-    chemo_with_score,
+    chemo_lookup,
     candidates_needed,
     wide_bio_table,
     wide_chemo_table,
