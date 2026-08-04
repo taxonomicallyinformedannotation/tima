@@ -1,5 +1,5 @@
 ---
-title: General comments about the infrastructure
+title: General comments about TIMA's infrastructure
 author:
   name: Adriano Rutz
   orcid: 0000-0003-0443-9902
@@ -27,7 +27,7 @@ opengraph:
     src: https://github.com/taxonomicallyinformedannotation/tima/blob/main/man/figures/logo.svg
     alt: Taxonomically Informed Metabolite Annotation
 vignette: >
-  %\VignetteIndexEntry{General comments about the infrastructure}
+  %\VignetteIndexEntry{General comments about TIMA's infrastructure}
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
