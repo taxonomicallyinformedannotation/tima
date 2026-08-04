@@ -347,17 +347,21 @@ summarize_results <- function(
   char_cols <- names(col_types)[col_types == 1L]
   factor_cols <- names(col_types)[col_types == 2L]
 
-  df_final <- df_final |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidyselect::all_of(char_cols),
-        .fns = ~ tidytable::na_if(x = trimws(.x), y = "")
-      ),
-      tidytable::across(
-        .cols = tidyselect::all_of(factor_cols),
-        .fns = ~ tidytable::na_if(x = trimws(as.character(.x)), y = "")
-      )
-    )
+  # OPTIMIZATION: Vectorized column trimming in-place instead of
+  # tidytable::mutate(tidytable::across(...)) which creates an intermediate
+  # copy of every column on each across() call. Direct column replacement
+  # via `df_final[[col]] <-` avoids the dplyr-style copy-on-write overhead
+  # and scales to millions of rows with many character columns.
+  for (col in char_cols) {
+    val <- trimws(df_final[[col]])
+    val[val == "" | is.na(val)] <- NA_character_
+    df_final[[col]] <- val
+  }
+  for (col in factor_cols) {
+    val <- trimws(as.character(df_final[[col]]))
+    val[val == "" | is.na(val)] <- NA_character_
+    df_final[[col]] <- val
+  }
 
   df_processed <- df_final |>
     tidytable::select(tidyselect::any_of(x = final_select_cols))

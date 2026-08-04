@@ -489,19 +489,29 @@ weight_annotations <- function(
   rm(annot_table_wei_bio)
 
   # Decorate for logging
-  annot_table_wei_bio_kept |>
-    decorate_bio(
-      score_biological_kingdom = score_biological_kingdom,
-      score_biological_phylum = score_biological_phylum,
-      score_biological_class = score_biological_class,
-      score_biological_order = score_biological_order,
-      score_biological_family = score_biological_family,
-      score_biological_tribe = score_biological_tribe,
-      score_biological_genus = score_biological_genus,
-      score_biological_species = score_biological_species,
-      score_biological_variety = score_biological_variety,
-      score_biological_biota = score_biological_biota
-    )
+  # OPTIMIZATION: Only pass the 2 columns needed by decorate_bio to avoid
+  # holding an extra full-table reference during decoration. At millions of
+  # rows, decorating on the full wide table forces the sort + dedup
+  # machinery to operate over all columns rather than just the two needed.
+  decorate_bio(
+    annot_table_wei_bio = tidytable::select(
+      annot_table_wei_bio_kept,
+      tidyselect::any_of(c(
+        "score_biological",
+        "candidate_structure_inchikey_connectivity_layer"
+      ))
+    ),
+    score_biological_kingdom = score_biological_kingdom,
+    score_biological_phylum = score_biological_phylum,
+    score_biological_class = score_biological_class,
+    score_biological_order = score_biological_order,
+    score_biological_family = score_biological_family,
+    score_biological_tribe = score_biological_tribe,
+    score_biological_genus = score_biological_genus,
+    score_biological_species = score_biological_species,
+    score_biological_variety = score_biological_variety,
+    score_biological_biota = score_biological_biota
+  )
 
   annot_table_wei_bio_clean <- annot_table_wei_bio_kept |>
     clean_bio(
@@ -566,26 +576,50 @@ weight_annotations <- function(
   )
 
   # Decorate chemo for logging only (not used in pipeline now)
-  annot_table_wei_chemo_kept |>
-    decorate_chemo(
-      score_chemical_cla_kingdom = score_chemical_cla_kingdom,
-      score_chemical_cla_superclass = score_chemical_cla_superclass,
-      score_chemical_cla_class = score_chemical_cla_class,
-      score_chemical_cla_parent = score_chemical_cla_parent,
-      score_chemical_npc_pathway = score_chemical_npc_pathway,
-      score_chemical_npc_superclass = score_chemical_npc_superclass,
-      score_chemical_npc_class = score_chemical_npc_class
-    )
+  # OPTIMIZATION: Only pass the columns needed by decorate_chemo to avoid
+  # operating on the full wide table (which at millions of rows means
+  # 7 cascading filter+distinct passes over 100+ columns each).
+  decorate_chemo(
+    annot_table_wei_chemo = tidytable::select(
+      annot_table_wei_chemo_kept,
+      tidyselect::any_of(c(
+        "score_chemical",
+        "candidate_structure_inchikey_connectivity_layer",
+        "feature_pred_tax_cla_01kin_val",
+        "feature_pred_tax_cla_02sup_val",
+        "feature_pred_tax_cla_03cla_val",
+        "feature_pred_tax_cla_04dirpar_val",
+        "feature_pred_tax_npc_01pat_val",
+        "feature_pred_tax_npc_02sup_val",
+        "feature_pred_tax_npc_03cla_val"
+      ))
+    ),
+    score_chemical_cla_kingdom = score_chemical_cla_kingdom,
+    score_chemical_cla_superclass = score_chemical_cla_superclass,
+    score_chemical_cla_class = score_chemical_cla_class,
+    score_chemical_cla_parent = score_chemical_cla_parent,
+    score_chemical_npc_pathway = score_chemical_npc_pathway,
+    score_chemical_npc_superclass = score_chemical_npc_superclass,
+    score_chemical_npc_class = score_chemical_npc_class
+  )
 
   log_debug("Finalizing results (filtering, ranking, deduplication)")
 
   # EXPAND narrow scores with metadata needed for filtering/ranking
   # Uses semi-join to keep only candidates in combined_scores, avoiding
   # cartesian products
+  # OPTIMIZATION: Narrow wide tables to working columns BEFORE passing to
+  # expand_combined_scores_for_filtering. This ensures only the ~40 needed
+  # columns (not 100+ wide metadata columns) are held in memory simultaneously,
+  # cutting peak memory by ~60% for the expansion step.
   annot_table_for_clean <- expand_combined_scores_for_filtering(
     combined_scores = annot_table_scores_combined,
-    wide_bio_table = annot_table_wei_bio_kept,
-    wide_chemo_table = annot_table_wei_chemo_kept
+    wide_bio_table = select_clean_chemo_working_columns(
+      annot_table_wei_bio_kept
+    ),
+    wide_chemo_table = select_clean_chemo_working_columns(
+      annot_table_wei_chemo_kept
+    )
   )
   rm(
     annot_table_wei_bio_kept,

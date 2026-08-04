@@ -246,122 +246,78 @@ weight_chemo <- function(
       feature_pred_tax_cla_04dirpar_score
     )
 
-  # Helper: compute per-level chemical score when candidate taxonomy matches
-  score_per_level_chemo <- function(
-    df,
-    candidates,
-    features_val,
-    features_score,
-    level_weight,
-    score_name
-  ) {
-    cand_sym <- rlang::sym(x = candidates)
-    fval_sym <- rlang::sym(x = features_val)
-    fsc_sym <- rlang::sym(x = features_score)
+  # OPTIMIZATION: Vectorized 7-level chemical scoring — replaces 7 separate
+  # score_per_level_chemo() calls (each doing distinct + filter + stri_detect_regex)
+  # plus 7 sequential left_joins that each created a full table copy.
+  # Since df2 is already distinct() on the candidate+taxonomy columns, we
+  # assign each score column directly via vectorized if_else + stri_detect_regex.
+  # This eliminates all 7 joins entirely — direct column assignment is O(N)
+  # with zero table copies.
+  chemo_levels <- list(
+    list(
+      cand = "candidate_structure_tax_cla_01kin",
+      fval = "feature_pred_tax_cla_01kin_val",
+      fscore = "feature_pred_tax_cla_01kin_score",
+      weight = score_chemical_cla_kingdom,
+      out = "score_chemical_1"
+    ),
+    list(
+      cand = "candidate_structure_tax_npc_01pat",
+      fval = "feature_pred_tax_npc_01pat_val",
+      fscore = "feature_pred_tax_npc_01pat_score",
+      weight = score_chemical_npc_pathway,
+      out = "score_chemical_2"
+    ),
+    list(
+      cand = "candidate_structure_tax_cla_02sup",
+      fval = "feature_pred_tax_cla_02sup_val",
+      fscore = "feature_pred_tax_cla_02sup_score",
+      weight = score_chemical_cla_superclass,
+      out = "score_chemical_3"
+    ),
+    list(
+      cand = "candidate_structure_tax_npc_02sup",
+      fval = "feature_pred_tax_npc_02sup_val",
+      fscore = "feature_pred_tax_npc_02sup_score",
+      weight = score_chemical_npc_superclass,
+      out = "score_chemical_4"
+    ),
+    list(
+      cand = "candidate_structure_tax_cla_03cla",
+      fval = "feature_pred_tax_cla_03cla_val",
+      fscore = "feature_pred_tax_cla_03cla_score",
+      weight = score_chemical_cla_class,
+      out = "score_chemical_5"
+    ),
+    list(
+      cand = "candidate_structure_tax_npc_03cla",
+      fval = "feature_pred_tax_npc_03cla_val",
+      fscore = "feature_pred_tax_npc_03cla_score",
+      weight = score_chemical_npc_class,
+      out = "score_chemical_6"
+    ),
+    list(
+      cand = "candidate_structure_tax_cla_04dirpar",
+      fval = "feature_pred_tax_cla_04dirpar_val",
+      fscore = "feature_pred_tax_cla_04dirpar_score",
+      weight = score_chemical_cla_parent,
+      out = "score_chemical_7"
+    )
+  )
 
-    df |>
-      tidytable::distinct(!!cand_sym, !!fval_sym, !!fsc_sym) |>
-      tidytable::filter(!!cand_sym != "notClassified") |>
-      tidytable::filter(
-        !is.na(!!cand_sym),
-        !is.na(!!fval_sym)
-      ) |>
-      # candidate label appears in feature predicted label path
-      tidytable::filter(stringi::stri_detect_regex(
-        str = !!fval_sym,
-        pattern = !!cand_sym
-      )) |>
-      # assign the configured per-level weight when matched
-      tidytable::mutate(
-        !!rlang::sym(x = score_name) := as.numeric(level_weight)
-      ) |>
-      tidytable::select(!!cand_sym, !!rlang::sym(x = score_name)) |>
-      tidytable::distinct()
+  # Assign score columns directly via vectorized if_else (no joins, no copies)
+  for (lvl in chemo_levels) {
+    cand_vals <- df2[[lvl$cand]]
+    fval <- df2[[lvl$fval]]
+    matched <- !is.na(cand_vals) &
+      cand_vals != "notClassified" &
+      !is.na(fval) &
+      stringi::stri_detect_regex(str = fval, pattern = cand_vals)
+    df2[[lvl$out]] <- ifelse(matched, as.numeric(lvl$weight), NA_real_)
   }
+  rm(chemo_levels, cand_vals, fval, matched)
 
-  # Compute per-level matches for ClassyFire and NPClassifier
-  step_cla_kin <- df2 |>
-    score_per_level_chemo(
-      candidates = "candidate_structure_tax_cla_01kin",
-      features_val = "feature_pred_tax_cla_01kin_val",
-      features_score = "feature_pred_tax_cla_01kin_score",
-      level_weight = score_chemical_cla_kingdom,
-      score_name = "score_chemical_1"
-    )
-  step_npc_pat <- df2 |>
-    score_per_level_chemo(
-      candidates = "candidate_structure_tax_npc_01pat",
-      features_val = "feature_pred_tax_npc_01pat_val",
-      features_score = "feature_pred_tax_npc_01pat_score",
-      level_weight = score_chemical_npc_pathway,
-      score_name = "score_chemical_2"
-    )
-  step_cla_sup <- df2 |>
-    score_per_level_chemo(
-      candidates = "candidate_structure_tax_cla_02sup",
-      features_val = "feature_pred_tax_cla_02sup_val",
-      features_score = "feature_pred_tax_cla_02sup_score",
-      level_weight = score_chemical_cla_superclass,
-      score_name = "score_chemical_3"
-    )
-  step_npc_sup <- df2 |>
-    score_per_level_chemo(
-      candidates = "candidate_structure_tax_npc_02sup",
-      features_val = "feature_pred_tax_npc_02sup_val",
-      features_score = "feature_pred_tax_npc_02sup_score",
-      level_weight = score_chemical_npc_superclass,
-      score_name = "score_chemical_4"
-    )
-  step_cla_cla <- df2 |>
-    score_per_level_chemo(
-      candidates = "candidate_structure_tax_cla_03cla",
-      features_val = "feature_pred_tax_cla_03cla_val",
-      features_score = "feature_pred_tax_cla_03cla_score",
-      level_weight = score_chemical_cla_class,
-      score_name = "score_chemical_5"
-    )
-  step_npc_cla <- df2 |>
-    score_per_level_chemo(
-      candidates = "candidate_structure_tax_npc_03cla",
-      features_val = "feature_pred_tax_npc_03cla_val",
-      features_score = "feature_pred_tax_npc_03cla_score",
-      level_weight = score_chemical_npc_class,
-      score_name = "score_chemical_6"
-    )
-  step_cla_par <- df2 |>
-    score_per_level_chemo(
-      candidates = "candidate_structure_tax_cla_04dirpar",
-      features_val = "feature_pred_tax_cla_04dirpar_val",
-      features_score = "feature_pred_tax_cla_04dirpar_score",
-      level_weight = score_chemical_cla_parent,
-      score_name = "score_chemical_7"
-    )
-
-  # Merge scores and keep the best chemical score across levels
-  supp_tables <- list(
-    step_cla_kin,
-    step_npc_pat,
-    step_cla_sup,
-    step_npc_sup,
-    step_cla_cla,
-    step_npc_cla,
-    step_cla_par
-  )
-  rm(
-    step_cla_kin,
-    step_npc_pat,
-    step_cla_sup,
-    step_npc_sup,
-    step_cla_cla,
-    step_npc_cla,
-    step_cla_par
-  )
-
-  annot_table_wei_chemo_init <- purrr::reduce(
-    .x = supp_tables,
-    .init = df2,
-    .f = tidytable::left_join
-  ) |>
+  df2 <- df2 |>
     tidytable::mutate(
       score_chemical = pmax(
         score_chemical_1,
@@ -375,11 +331,10 @@ weight_chemo <- function(
         na.rm = TRUE
       )
     )
-  rm(df2, supp_tables)
 
-  annot_table_wei_chemo_interim <- annot_table_wei_chemo_init |>
+  annot_table_wei_chemo_interim <- df2 |>
     tidytable::right_join(y = annot_table_wei_bio_clean)
-  rm(annot_table_wei_chemo_init, annot_table_wei_bio_clean)
+  rm(df2, annot_table_wei_bio_clean)
 
   annot_table_wei_chemo <- annot_table_wei_chemo_interim
 

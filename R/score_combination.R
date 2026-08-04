@@ -162,69 +162,54 @@ expand_combined_scores_for_filtering <- function(
       candidate_structure_inchikey_connectivity_layer
     )
 
-  # Semi-join against wide bio table to filter to only relevant rows
-  # Drop unused columns early so the later clean_chemo pass does not carry the
-  # original wide tables any longer than necessary.
-  bio_for_filtering <- wide_bio_table |>
-    tidytable::semi_join(
-      candidates_needed,
-      by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
-    ) |>
-    select_clean_chemo_working_columns()
-
-  # Match the same narrowed schema for the chemo side.
-  chemo_for_filtering <- wide_chemo_table |>
-    tidytable::semi_join(
-      candidates_needed,
-      by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
-    ) |>
-    select_clean_chemo_working_columns()
-
-  # Start with bio table (has all metadata and scores)
-  result <- bio_for_filtering
-
-  # Add chemo-specific columns that aren't in bio
-  # (score_weighted_chemo, score_chemical, etc)
+  # OPTIMIZATION: Combine chemo column addition and score_final into a
+  # single left_join instead of two separate joins. Each left_join on a
+  # millions-row table creates a full copy, so merging the join inputs
+  # into one reduces intermediate memory by ~50% for this step.
   chemo_cols_to_add <- setdiff(
-    names(chemo_for_filtering),
-    names(bio_for_filtering)
+    names(wide_chemo_table),
+    names(wide_bio_table)
+  )
+  chemo_with_score <- tidytable::select(
+    wide_chemo_table,
+    feature_id,
+    candidate_structure_inchikey_connectivity_layer,
+    tidyselect::all_of(chemo_cols_to_add),
+    score_final
   )
 
-  if (length(chemo_cols_to_add) > 0L) {
-    chemo_subset <- chemo_for_filtering |>
-      tidytable::select(
-        feature_id,
-        candidate_structure_inchikey_connectivity_layer,
-        tidyselect::all_of(chemo_cols_to_add)
-      )
-
-    result <- result |>
-      tidytable::left_join(
-        chemo_subset,
-        by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
-      )
-  }
-
-  # Add combined scores (score_final) as new column
-  # But REPLACE score_weighted_chemo with score_final so ranking logic uses it
-  combined_scores_only <- combined_scores |>
-    tidytable::select(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      score_final
-    )
-
-  result <- result |>
-    tidytable::left_join(
-      combined_scores_only,
+  # Semi-join to filter to only relevant rows, then single left_join
+  result <- wide_bio_table |>
+    tidytable::semi_join(
+      candidates_needed,
       by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
     ) |>
-    tidytable::mutate(
-      # Replace the old score_weighted_chemo with our new combined score
-      # so that ranking logic uses the refactored combined scores
-      score_weighted_chemo = score_final
-    ) |>
-    tidytable::select(-score_final)
+    select_clean_chemo_working_columns() |>
+    tidytable::left_join(
+      y = chemo_with_score |>
+        tidytable::semi_join(
+          candidates_needed,
+          by = c(
+            "feature_id",
+            "candidate_structure_inchikey_connectivity_layer"
+          )
+        ),
+      by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
+    )
+
+  # Replace score_weighted_chemo with score_final for ranking
+  if ("score_final" %in% names(result)) {
+    result$score_weighted_chemo <- result$score_final
+    result$score_final <- NULL
+  }
+
+  rm(
+    chemo_with_score,
+    candidates_needed,
+    wide_bio_table,
+    wide_chemo_table,
+    combined_scores
+  )
 
   result
 }

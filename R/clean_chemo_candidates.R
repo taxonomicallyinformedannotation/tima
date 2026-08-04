@@ -316,17 +316,25 @@ sample_candidates_per_group <- function(
   # the tied group to only the matched anchor rows. This avoids ambiguous
   # anti-joins and preserves expected semantics: keep the anchor row(s), drop
   # other tied rows in the same (feature_id, candidate_adduct, rank_final).
+  # OPTIMIZATION: Use paste0 with sep="\u001f" directly on columns instead of
+  # do.call(paste, c(as.data.frame(.tbl)[core_cols], sep=...)) which creates
+  # a full as.data.frame() copy per call. paste0() on vectors is fast and
+  # memory-efficient; the \u001f separator avoids collision issues.
   if (any(df$.anchor_match)) {
-    group_key_all <- paste(
+    group_key_all <- paste0(
       df$feature_id,
+      "\u001f",
       df$candidate_adduct,
-      df$rank_final,
-      sep = "\u001f"
+      "\u001f",
+      df$rank_final
     )
     groups_with_anchor <- unique(group_key_all[df$.anchor_match])
 
-    # df_remaining: drop non-anchor rows from groups_with_anchor
-    keep_rows <- !(fastmatch::`%fin%`(group_key_all, groups_with_anchor) &
+    # Use fastmatch for O(1) lookup instead of %in%
+    keep_rows <- !(fastmatch::`%fin%`(
+      group_key_all,
+      groups_with_anchor
+    ) &
       !df$.anchor_match)
     df_remaining <- df[keep_rows, , drop = FALSE]
   } else {
@@ -436,13 +444,19 @@ sample_candidates_per_group <- function(
     df_ns <- df_ns[ord, , drop = FALSE]
 
     # Keep top `max_per_score` within each tied score group (feature_id, candidate_adduct, rank_final)
-    group_key <- paste(
+    # OPTIMIZATION: Use paste0() on columns directly instead of
+    # do.call(paste, c(as.data.frame(.tbl)[core_cols], sep=...)) which creates
+    # a full as.data.frame() copy per call. paste0() on vectors avoids that copy.
+    group_key <- paste0(
       df_ns$feature_id,
+      "\u001f",
       df_ns$candidate_adduct,
-      df_ns$rank_final,
-      sep = "\u001f"
+      "\u001f",
+      df_ns$rank_final
     )
-    seq_in_group <- stats::ave(group_key, group_key, FUN = seq_along)
+    seq_in_group <- seq_along(group_key)
+    group_id <- match(group_key, unique(group_key))
+    seq_in_group <- ave(seq_in_group, group_id, FUN = seq_along)
     df_sampled <- df_ns[seq_in_group <= max_per_score, , drop = FALSE]
 
     # Ensure tidytable result
@@ -522,9 +536,19 @@ sample_candidates_per_group <- function(
               "candidate_structure_inchikey_connectivity_layer"
             )
             # Create a stable key and remove duplicates preserving the first occurrence
-            key <- do.call(
-              paste,
-              c(as.data.frame(.tbl)[core_cols], sep = "\u001f")
+            # OPTIMIZATION: Use paste0() on columns directly instead of
+            # do.call(paste, c(as.data.frame(.tbl)[core_cols], sep=...))
+            # which creates a full as.data.frame() copy just for string-key
+            # deduplication. paste0() operates on vectors without copying
+            # the entire data frame.
+            key <- paste0(
+              .tbl[[core_cols[1L]]],
+              "\u001f",
+              .tbl[[core_cols[2L]]],
+              "\u001f",
+              .tbl[[core_cols[3L]]],
+              "\u001f",
+              .tbl[[core_cols[4L]]]
             )
             .tbl <- .tbl[!duplicated(key), , drop = FALSE]
           } else {

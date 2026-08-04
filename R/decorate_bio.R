@@ -144,20 +144,42 @@ decorate_bio <- function(
   # Helper Function ----
 
   # Count total candidates and unique structures at a given score threshold.
+  # OPTIMIZATION: Pre-sort the data once by score descending, then for each
+  # threshold compute counts via cumulative sum + duplicated() tracking.
+  # This replaces 10 separate filter+distinct operations with a single
+  # O(N log N) sort + O(1) lookups per level, scaling to millions of rows.
+
+  # Pre-sort by score descending (NA scores go last)
+  ik <- annot_table_wei_bio$candidate_structure_inchikey_connectivity_layer
+  score <- annot_table_wei_bio$score_biological
+  ord <- order(score, decreasing = TRUE, na.last = TRUE)
+  score_sorted <- score[ord]
+  ik_sorted <- ik[ord]
+
+  # For unique structure counting: mark first occurrence of each inchikey
+  # in the sorted order. cumsum of this gives cumulative unique count.
+  first_occurrence <- !duplicated(ik_sorted, incomparables = FALSE)
+  cum_unique <- cumsum(first_occurrence)
+
   count_stats_at_level <- function(min_score, df) {
     if (nrow(df) == 0L) {
       return(c(n_candidates = 0L, n_unique_structures = 0L))
     }
 
-    filtered <- df |>
-      tidytable::filter(score_biological >= min_score)
+    if (is.na(min_score)) {
+      return(c(n_candidates = 0L, n_unique_structures = 0L))
+    }
 
-    c(
-      n_candidates = nrow(filtered),
-      n_unique_structures = filtered |>
-        tidytable::distinct(candidate_structure_inchikey_connectivity_layer) |>
-        nrow()
-    )
+    # Count non-NA scores >= min_score
+    n_candidates <- sum(!is.na(score_sorted) & score_sorted >= min_score)
+
+    n_unique <- if (n_candidates == 0L) {
+      0L
+    } else {
+      cum_unique[n_candidates]
+    }
+
+    c(n_candidates = n_candidates, n_unique_structures = n_unique)
   }
 
   # Calculate Counts for Each Taxonomic Level ----

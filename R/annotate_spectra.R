@@ -397,13 +397,8 @@ annotate_spectra <- function(
 
   log_info(
     "%d Candidates annotated on %d features (threshold >= %s).",
-    nrow(
-      df_final |>
-        tidytable::distinct(
-          candidate_structure_smiles_no_stereo
-        )
-    ),
-    nrow(df_final |> tidytable::distinct(feature_id)),
+    tidytable::n_distinct(df_final$candidate_structure_smiles_no_stereo),
+    tidytable::n_distinct(df_final$feature_id),
     threshold
   )
 
