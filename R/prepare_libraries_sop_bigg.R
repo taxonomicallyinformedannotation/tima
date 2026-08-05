@@ -177,7 +177,7 @@ prepare_libraries_sop_bigg <- function(
             df_2,
             by = c("structure_inchikey" = "InChIKey")
           ) |>
-          tidytable::mutate(length = stringi::stri_length(Title)) |>
+          tidytable::mutate(length = stri_length(Title)) |>
           tidytable::arrange(length) |>
           tidytable::distinct(
             organism_name,

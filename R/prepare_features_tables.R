@@ -337,7 +337,7 @@ prepare_features_tables <- function(
   # Sequential replacements
   col_names_clean <- Reduce(
     function(names_vec, pattern) {
-      stringi::stri_replace_all_fixed(
+      stri_replace_all_fixed(
         str = names_vec,
         pattern = pattern,
         replacement = replacements[[pattern]],

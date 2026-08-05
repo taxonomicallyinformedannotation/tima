@@ -162,7 +162,7 @@ load_structural_library <- function(
   if (!"structure_inchikey_connectivity_layer" %in% colnames(structures)) {
     structures <- structures |>
       tidytable::mutate(
-        structure_inchikey_connectivity_layer = stringi::stri_sub(
+        structure_inchikey_connectivity_layer = stri_sub(
           str = structure_inchikey,
           from = 1L,
           to = 14L

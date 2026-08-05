@@ -14,7 +14,6 @@ Benchmarking
 Bengtsson
 BiGG
 BiocManager
-BiocParallel
 BiocVersion
 Bioregistry
 Biota
@@ -28,6 +27,7 @@ CSF
 CSI
 Canonicalization
 Canonicalize
+Canonicalizes
 ChEBI
 ChEMBL
 Cheng
@@ -43,7 +43,6 @@ DMSO
 Da
 Daltons
 DataFrame
-Deduplicate
 Dervieux
 Dounoue
 ECMDB
@@ -53,7 +52,6 @@ FingerID
 FingerId
 Friedrich
 GNPS
-Gagolewski
 Gatto
 Gentiana
 Gentianaceae
@@ -73,7 +71,6 @@ InChIKeys
 InterJournal
 JJ
 Jeroen
-Jiefei
 Jonge
 Kirill
 Knitr
@@ -91,7 +88,6 @@ MSP
 MSnLib
 MTD
 MZmine
-Marek
 MassBank
 Massbank
 Masster
@@ -114,11 +110,9 @@ NPC
 NPClassifier
 NaCl
 Nepusz
-Nitesh
 NormanSusDat
 ORCID
 OTT
-Obenchain
 Ollivier
 Ooms
 OpenAPI
@@ -138,7 +132,6 @@ RDKit
 RTs
 Rainer
 Redelings
-Renormalized
 Retryable
 Riederer
 SDF
@@ -168,9 +161,9 @@ Taxonomically
 Thom
 Tidytable
 Traag
-Turaga
 UHFFFAOYSA
 UO
+Urbanek
 Ushey
 Vicini
 Waystation
@@ -226,6 +219,7 @@ et
 etabolite
 exposomics
 expr
+fastmatch
 fastverse
 fbmn
 filesystem
@@ -305,12 +299,12 @@ pbmclapply
 pkgload
 pos
 pre
+preallocates
 prefilter
 progenesis
 protonate
 protonated
 rds
-renormalization
 renv
 reranked
 reranking
@@ -335,7 +329,6 @@ sqlite
 stereochemistry
 stereoisomers
 stoichiometric
-stringi
 subcomponents
 subgraphs
 subscores
@@ -349,6 +342,7 @@ th
 tibble
 tidyselect
 tidytable
+tidytable's
 tidyverse
 tl
 trinomial

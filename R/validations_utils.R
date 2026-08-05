@@ -98,7 +98,7 @@ validate_file_exists <- function(
     if (required) {
       msg <- format_error(
         problem = paste0(
-          stringi::stri_trans_totitle(file_type),
+          stri_trans_totitle(file_type),
           " path is NULL"
         ),
         location = param_name,
@@ -162,7 +162,7 @@ validate_file_exists <- function(
     }
 
     msg <- format_error(
-      problem = paste0(stringi::stri_trans_totitle(file_type), " not found"),
+      problem = paste0(stri_trans_totitle(file_type), " not found"),
       received = path,
       location = if (!dir_exists) {
         paste0("Directory does not exist: ", dir_path)

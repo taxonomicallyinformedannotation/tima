@@ -116,7 +116,7 @@ targets_section_benchmark <- function() {
                       ),
                       !is.na(b)
                     ),
-                    stringi::stri_length(as.numeric(b)) > 1
+                    stri_length(as.numeric(b)) > 1
                   ),
                   -a,
                   -b

@@ -140,7 +140,7 @@ harmonize_adducts <- function(
 
       # Second pass: substring-level formula normalization
       # Handles all combinations (dimers, losses, clusters) at once
-      unique_non_missing <- stringi::stri_replace_all_regex(
+      unique_non_missing <- stri_replace_all_regex(
         str = unique_non_missing,
         pattern = .FORMULA_SUBS_PATTERNS,
         replacement = .FORMULA_SUBS_REPLACEMENTS,

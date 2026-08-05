@@ -35,7 +35,7 @@ pre_harmonize_names_sirius <- function(x) {
 
   # Remove everything from the first forward slash onwards
   # This strips SIRIUS suffix information from column names
-  cleaned_name <- stringi::stri_replace_all_regex(
+  cleaned_name <- stri_replace_all_regex(
     str = x,
     pattern = "/.*",
     replacement = "",

@@ -362,7 +362,7 @@ prepare_libraries_rt <- function(
     ) |>
     tidytable::distinct() |>
     tidytable::mutate(
-      structure_inchikey_connectivity_layer = stringi::stri_sub(
+      structure_inchikey_connectivity_layer = stri_sub(
         str = structure_inchikey,
         from = 1L,
         to = 14L

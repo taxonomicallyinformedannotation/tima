@@ -312,7 +312,7 @@ weight_chemo <- function(
     matched <- !is.na(cand_vals) &
       cand_vals != "notClassified" &
       !is.na(fval) &
-      stringi::stri_detect_regex(str = fval, pattern = cand_vals)
+      stri_detect_regex(str = fval, pattern = cand_vals)
     df2[[lvl$out]] <- ifelse(matched, as.numeric(lvl$weight), NA_real_)
   }
   rm(chemo_levels, cand_vals, fval, matched)

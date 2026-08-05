@@ -79,7 +79,7 @@ load_yaml_files_from_paths <- function(
   # Extract clean parameter names from file paths
   yaml_names <- yaml_files |>
     basename() |>
-    stringi::stri_replace_all_regex(
+    stri_replace_all_regex(
       pattern = "\\.yaml$",
       replacement = "",
       vectorize_all = FALSE

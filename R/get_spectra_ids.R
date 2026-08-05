@@ -63,7 +63,7 @@ get_spectra_ids <- function(spectra) {
   # The negative look-behind excludes "uid:", "scan_id:", "_id:", etc.
   if (!is.null(spec_data[["TITLE"]])) {
     titles <- spec_data[["TITLE"]]
-    parsed <- stringi::stri_match_first_regex(
+    parsed <- stri_match_first_regex(
       titles,
       "(?<![_a-zA-Z])id:(\\d+)"
     )[, 2L]

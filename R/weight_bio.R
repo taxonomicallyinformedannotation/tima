@@ -526,7 +526,7 @@ weight_bio <- function(
     if (any(mask, na.rm = TRUE)) {
       df_pairs$score_biological_01 <- 0
       df_pairs$score_biological_01[mask] <- as.integer(
-        stringi::stri_detect_regex(
+        stri_detect_regex(
           pattern = df_pairs$candidate_organism_01_domain[mask],
           str = df_pairs$sample_organism_01_domain[mask]
         )
@@ -541,7 +541,7 @@ weight_bio <- function(
     if (any(mask, na.rm = TRUE)) {
       df_pairs$score_biological_02 <- 0
       df_pairs$score_biological_02[mask] <- as.integer(
-        stringi::stri_detect_regex(
+        stri_detect_regex(
           pattern = df_pairs$candidate_organism_02_kingdom[mask],
           str = df_pairs$sample_organism_02_kingdom[mask]
         )
@@ -556,7 +556,7 @@ weight_bio <- function(
     if (any(mask, na.rm = TRUE)) {
       df_pairs$score_biological_03 <- 0
       df_pairs$score_biological_03[mask] <- as.integer(
-        stringi::stri_detect_regex(
+        stri_detect_regex(
           pattern = df_pairs$candidate_organism_03_phylum[mask],
           str = df_pairs$sample_organism_03_phylum[mask]
         )
@@ -571,7 +571,7 @@ weight_bio <- function(
     if (any(mask, na.rm = TRUE)) {
       df_pairs$score_biological_04 <- 0
       df_pairs$score_biological_04[mask] <- as.integer(
-        stringi::stri_detect_regex(
+        stri_detect_regex(
           pattern = df_pairs$candidate_organism_04_class[mask],
           str = df_pairs$sample_organism_04_class[mask]
         )
@@ -586,7 +586,7 @@ weight_bio <- function(
     if (any(mask, na.rm = TRUE)) {
       df_pairs$score_biological_05 <- 0
       df_pairs$score_biological_05[mask] <- as.integer(
-        stringi::stri_detect_regex(
+        stri_detect_regex(
           pattern = df_pairs$candidate_organism_05_order[mask],
           str = df_pairs$sample_organism_05_order[mask]
         )
@@ -601,7 +601,7 @@ weight_bio <- function(
     if (any(mask, na.rm = TRUE)) {
       df_pairs$score_biological_06 <- 0
       df_pairs$score_biological_06[mask] <- as.integer(
-        stringi::stri_detect_regex(
+        stri_detect_regex(
           pattern = df_pairs$candidate_organism_06_family[mask],
           str = df_pairs$sample_organism_06_family[mask]
         )
@@ -616,7 +616,7 @@ weight_bio <- function(
     if (any(mask, na.rm = TRUE)) {
       df_pairs$score_biological_07 <- 0
       df_pairs$score_biological_07[mask] <- as.integer(
-        stringi::stri_detect_regex(
+        stri_detect_regex(
           pattern = df_pairs$candidate_organism_07_tribe[mask],
           str = df_pairs$sample_organism_07_tribe[mask]
         )
@@ -631,7 +631,7 @@ weight_bio <- function(
     if (any(mask, na.rm = TRUE)) {
       df_pairs$score_biological_08 <- 0
       df_pairs$score_biological_08[mask] <- as.integer(
-        stringi::stri_detect_regex(
+        stri_detect_regex(
           pattern = df_pairs$candidate_organism_08_genus[mask],
           str = df_pairs$sample_organism_08_genus[mask]
         )
@@ -646,7 +646,7 @@ weight_bio <- function(
     if (any(mask, na.rm = TRUE)) {
       df_pairs$score_biological_09 <- 0
       df_pairs$score_biological_09[mask] <- as.integer(
-        stringi::stri_detect_regex(
+        stri_detect_regex(
           pattern = df_pairs$candidate_organism_09_species[mask],
           str = df_pairs$sample_organism_09_species[mask]
         )
@@ -661,7 +661,7 @@ weight_bio <- function(
     if (any(mask, na.rm = TRUE)) {
       df_pairs$score_biological_10 <- 0
       df_pairs$score_biological_10[mask] <- as.integer(
-        stringi::stri_detect_regex(
+        stri_detect_regex(
           pattern = df_pairs$candidate_organism_10_varietas[mask],
           str = df_pairs$sample_organism_10_varietas[mask]
         )

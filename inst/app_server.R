@@ -629,7 +629,7 @@ server <- function(input, output) {
     }
     if (
       anyNA(
-        stringi::stri_split_fixed(str = taxon, pattern = "|") |>
+        stri_split_fixed(str = taxon, pattern = "|") |>
           purrr::map(
             .f = function(taxon) {
               rotl::tnrs_match_names(

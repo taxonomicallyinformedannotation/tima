@@ -258,7 +258,7 @@ parse_hmdb_like_sdf_lines <- function(sdf_lines) {
     name = rep(NA_character_, n_records)
   )
 
-  header_match <- stringi::stri_match_first_regex(
+  header_match <- stri_match_first_regex(
     str = sdf_lines,
     pattern = "^>\\s*<([^>]+)>"
   )

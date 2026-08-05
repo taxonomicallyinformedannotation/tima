@@ -244,10 +244,7 @@ match_adduct_regex <- function(adduct_string, regex) {
 
   matches <- tryCatch(
     {
-      stringi::stri_match_all_regex(
-        str = adduct_string,
-        pattern = regex
-      )
+      stri_match_first_regex(str = adduct_string, pattern = regex)
     },
     error = function(e) {
       log_error(
@@ -260,12 +257,6 @@ match_adduct_regex <- function(adduct_string, regex) {
 
   if (is.null(matches)) {
     return(list(valid = FALSE, matches = NULL))
-  }
-
-  if (length(matches) > 0L) {
-    matches <- matches[[1L]]
-  } else {
-    matches <- matrix(NA_character_)
   }
 
   # Check if matching was successful
@@ -296,7 +287,7 @@ match_adduct_regex <- function(adduct_string, regex) {
     # Build regex patterns that preserve an optional multiplicity prefix,
     # e.g. "+2ACN" -> "+2C2H3N" instead of "+ACN" -> "+C2H3N" only.
     # Pattern:       ([+-])(\d*)<alias_body>
-    # Replacement:   $1$2<formula_body> (stringi backref syntax)
+    # Replacement:   \1\2<formula_body> (base R backref syntax)
     patterns_re <- vapply(
       patterns,
       function(p) {
@@ -309,7 +300,7 @@ match_adduct_regex <- function(adduct_string, regex) {
     )
     repl <- vapply(
       replacements,
-      function(r) paste0("$1$2", substring(r, 2L)),
+      function(r) paste0("\\1\\2", substring(r, 2L)),
       character(1L)
     )
     list(patterns = unname(patterns_re), replacements = unname(repl))
@@ -365,7 +356,7 @@ normalize_adduct_string <- function(adduct_string) {
 
   # Expand solvent / common-group aliases (+ACN, +IsoProp, +MeOH, +DMSO, ...).
   if (length(.SOLVENT_ALIAS_TABLES$patterns) > 0L) {
-    adduct_string <- stringi::stri_replace_all_regex(
+    adduct_string <- stri_replace_all_regex(
       str = adduct_string,
       pattern = .SOLVENT_ALIAS_TABLES$patterns,
       replacement = .SOLVENT_ALIAS_TABLES$replacements,
@@ -493,7 +484,7 @@ parse_modification_components <- function(modifications_clean) {
   # Extract modification elements (e.g., "H", "H2O", "Na")
   mod_elements <- tryCatch(
     {
-      stringi::stri_split_regex(
+      stri_split_regex(
         str = gsub(pattern = " .*", replacement = "", x = modifications_clean),
         pattern = mod_pattern
       )[[1L]][-1L]
@@ -511,10 +502,21 @@ parse_modification_components <- function(modifications_clean) {
   }
 
   # Extract modification signs (+1 for addition, -1 for loss)
-  mod_signs_raw <- stringi::stri_extract_all_regex(
+  mod_signs_raw <- stri_extract_all_regex(
     str = modifications_clean,
     pattern = mod_pattern
   )[[1L]]
+
+  if (length(mod_elements) != length(mod_signs_raw)) {
+    if (length(mod_elements) < length(mod_signs_raw)) {
+      mod_elements <- c(
+        mod_elements,
+        rep("", length(mod_signs_raw) - length(mod_elements))
+      )
+    } else {
+      mod_elements <- mod_elements[seq_len(length(mod_signs_raw))]
+    }
+  }
 
   mod_signs <- ifelse(
     test = gsub(pattern = "\\d*", replacement = "", x = mod_signs_raw) == "+",

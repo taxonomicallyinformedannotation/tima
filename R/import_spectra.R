@@ -114,12 +114,12 @@ import_spectra <- function(
 
   # Extract file extension (handle MassBank naming convention)
   file_ext <- file |>
-    stringi::stri_replace_all_regex(
+    stri_replace_all_regex(
       pattern = ".*\\.",
       replacement = "",
       vectorize_all = FALSE
     ) |>
-    stringi::stri_replace_all_regex(
+    stri_replace_all_regex(
       pattern = "_.*",
       replacement = "",
       vectorize_all = FALSE
@@ -222,7 +222,7 @@ import_spectra <- function(
   if (
     "TITLE" %in% spec_cols && !any(c("FEATURE_ID", "SLAW_ID") %in% spec_cols)
   ) {
-    parsed_ids <- stringi::stri_match_first_regex(
+    parsed_ids <- stri_match_first_regex(
       spectra@backend@spectraData$TITLE,
       "(?<![_a-zA-Z])id:(\\d+)"
     )[, 2L]
@@ -393,7 +393,7 @@ import_spectra <- function(
   if (
     "TITLE" %in% spec_cols && !any(c("FEATURE_ID", "SLAW_ID") %in% spec_cols)
   ) {
-    parsed_ids <- stringi::stri_match_first_regex(
+    parsed_ids <- stri_match_first_regex(
       spectra@backend@spectraData$TITLE,
       "(?<![_a-zA-Z])id:(\\d+)"
     )[, 2L]

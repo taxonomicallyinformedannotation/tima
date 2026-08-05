@@ -58,7 +58,7 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
   ) |>
     tidytable::mutate(
       # Extract 2D InChIKey (connectivity layer)
-      inchikey_connectivity_layer = stringi::stri_sub(
+      inchikey_connectivity_layer = stri_sub(
         str = structure_inchikey,
         from = 1L,
         to = 14L

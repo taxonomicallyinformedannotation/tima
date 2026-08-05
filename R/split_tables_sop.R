@@ -153,9 +153,9 @@ split_tables_sop <- function(table, cache) {
       structure_inchikey_no_stereo = tidytable::if_else(
         !is.na(structure_inchikey) & nchar(structure_inchikey) >= 27L,
         paste0(
-          stringi::stri_sub(str = structure_inchikey, from = 1L, to = 14L),
+          stri_sub(str = structure_inchikey, from = 1L, to = 14L),
           "-",
-          stringi::stri_sub(str = structure_inchikey, from = -1L, to = -1L)
+          stri_sub(str = structure_inchikey, from = -1L, to = -1L)
         ),
         NA_character_
       )
@@ -293,9 +293,9 @@ split_tables_sop <- function(table, cache) {
       structure_inchikey_no_stereo = tidytable::if_else(
         !is.na(structure_inchikey) & nchar(structure_inchikey) >= 27L,
         paste0(
-          stringi::stri_sub(str = structure_inchikey, from = 1L, to = 14L),
+          stri_sub(str = structure_inchikey, from = 1L, to = 14L),
           "-",
-          stringi::stri_sub(str = structure_inchikey, from = -1L, to = -1L)
+          stri_sub(str = structure_inchikey, from = -1L, to = -1L)
         ),
         NA_character_
       )

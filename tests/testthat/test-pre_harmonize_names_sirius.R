@@ -18,7 +18,7 @@ test_that("pre_harmonize_names_sirius handles NULL", {
 })
 
 test_that("pre_harmonize_names_sirius handles non-character input", {
-  # Should convert to character
+  # Should coerce to character
   expect_type(pre_harmonize_names_sirius(123), "character")
   expect_type(pre_harmonize_names_sirius(TRUE), "character")
 })
@@ -123,7 +123,7 @@ test_that("pre_harmonize_names_sirius handles very long names", {
 
 test_that("pre_harmonize_names_sirius works with vectors", {
   input <- c("name/suffix", "simple", "col/extra")
-  # Note: stringi functions are vectorized
+  # Helper keeps vectorized inputs working
   result <- pre_harmonize_names_sirius(input)
 
   expect_equal(result, c("name", "simple", "col"))

@@ -307,7 +307,7 @@ prepare_taxa <- function(
     if (!extension) {
       metadata_table <- metadata_table |>
         tidytable::mutate(
-          filename = stringi::stri_replace_all_fixed(
+          filename = stri_replace_all_fixed(
             str = filename,
             pattern = ".mzML",
             replacement = "",
@@ -315,7 +315,7 @@ prepare_taxa <- function(
           )
         ) |>
         tidytable::mutate(
-          filename = stringi::stri_replace_all_fixed(
+          filename = stri_replace_all_fixed(
             str = filename,
             pattern = ".mzxML",
             replacement = "",

@@ -62,7 +62,7 @@ get_params <- function(step) {
   available_steps <- list.files(
     path = pkg_system_file("scripts/docopt")
   ) |>
-    stringi::stri_replace_all_fixed(
+    stri_replace_all_fixed(
       pattern = ".txt",
       replacement = "",
       vectorize_all = FALSE

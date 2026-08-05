@@ -50,7 +50,7 @@
 #' @return Character vector of genus names
 #' @keywords internal
 .extract_genus_names <- function(organism_names) {
-  stringi::stri_replace_all_regex(
+  stri_replace_all_regex(
     str = organism_names,
     pattern = " .*",
     replacement = "",
@@ -193,7 +193,7 @@ get_organism_taxonomy_ott <- function(
     tidytable::mutate(organism = trimws(organism)) |>
     # Remove hybrid indicators (x and ×)
     tidytable::mutate(
-      organism = stringi::stri_replace_all_fixed(
+      organism = stri_replace_all_fixed(
         str = organism,
         pattern = " x ",
         replacement = " ",
@@ -201,7 +201,7 @@ get_organism_taxonomy_ott <- function(
       )
     ) |>
     tidytable::mutate(
-      organism = stringi::stri_replace_all_fixed(
+      organism = stri_replace_all_fixed(
         str = organism,
         pattern = "\u00D7 ",
         replacement = "",

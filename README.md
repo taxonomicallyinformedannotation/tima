@@ -225,24 +225,17 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 
 ## Additional software credits
 
-```
-A large number of files (1089 in total) have been discovered.
-It may take renv a long time to scan these files for dependencies.
-Consider using .renvignore to ignore irrelevant files.
-See `]8;;x-r-help:renv::dependencies?renv::dependencies]8;;` for more information.
-Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.
-```
-
   | Package         | Version     | Citation                                                              |
   | :-------------- | :---------- | :-------------------------------------------------------------------- |
   | archive         | 1.1.14      | Hester and Csárdi (2026)                                              |
   | base            | 4.6.1       | R Core Team (2026a)                                                   |
   | BiocManager     | 1.30.27     | Morgan and Ramos (2025)                                               |
   | BiocVersion     | 3.23.1      | Morgan (2025)                                                         |
+  | curl            | 7.1.0       | Ooms (2026)                                                           |
   | docopt          | 0.7.2       | <span class="nocase">de Jonge</span> (2025)                           |
-  | fastmatch       | 1.1.8       | (**fastmatch?**)                                                      |
-  | fs              | 2.1.0       | Hester et al. (2026)                                                  |
-  | httr2           | 1.3.0       | Wickham (2025)                                                        |
+  | fastmatch       | 1.1.8       | Urbanek (2026)                                                        |
+  | fs              | 2.1.0       | Hester, Wickham, et al. (2026)                                        |
+  | httr2           | 1.3.0       | Wickham (2026)                                                        |
   | igraph          | 2.3.3       | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2026) |
   | knitr           | 1.51        | Xie (2014); Xie (2015); Xie (2025)                                    |
   | lgr             | 0.5.2       | Fleck (2026)                                                          |
@@ -264,7 +257,6 @@ Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.
   | shinyvalidate   | 0.1.3       | Sievert et al. (2023)                                                 |
   | Spectra         | 1.22.2      | Rainer et al. (2022d)                                                 |
   | spelling        | 2.3.2       | Ooms and Hester (2025)                                                |
-  | stringi         | 1.8.7       | Gagolewski (2022)                                                     |
   | targets         | 1.12.0      | Landau (2021)                                                         |
   | testthat        | 3.3.2       | Wickham (2011)                                                        |
   | tidyselect      | 1.2.1       | Henry and Wickham (2024)                                              |
@@ -272,7 +264,7 @@ Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.
   | tidyverse       | 2.0.0       | Wickham et al. (2019)                                                 |
   | tima            | 2.13.0.9000 | Rutz et al. (2019); Rutz and Allard (2026)                            |
   | tools           | 4.6.1       | R Core Team (2026b)                                                   |
-  | withr           | 3.0.3       | Hester et al. (2024)                                                  |
+  | withr           | 3.0.3       | Hester, Henry, et al. (2026)                                          |
   | yaml            | 2.3.12      | Stephens and Simonov (2025)                                           |
 
 <div id="refs" class="references csl-bib-body hanging-indent">
@@ -356,19 +348,11 @@ Logging Framework*. <https://doi.org/10.32614/CRAN.package.lgr>.
 
 </div>
 
-<div id="ref-stringi" class="csl-entry">
-
-Gagolewski, Marek. 2022. “<span class="nocase">stringi</span>: Fast and
-Portable Character String Processing in R.” *Journal of Statistical
-Software* 103 (2): 1–59. <https://doi.org/10.18637/jss.v103.i02>.
-
-</div>
-
 <div id="ref-MsBackendMgf" class="csl-entry">
 
 Gatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2026.
 *MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
-(Mgf) Files*. <https://doi.org/10.18129/B9.bioc.MsBackendMgf>.
+(Mgf) Files*. <https://github.com/RforMassSpectrometry/MsBackendMgf>.
 
 </div>
 
@@ -399,7 +383,7 @@ Compression Support*. <https://doi.org/10.32614/CRAN.package.archive>.
 <div id="ref-withr" class="csl-entry">
 
 Hester, Jim, Lionel Henry, Kirill Müller, Kevin Ushey, Hadley Wickham,
-and Winston Chang. 2024. *<span class="nocase">withr</span>: Run Code
+and Winston Chang. 2026. *<span class="nocase">withr</span>: Run Code
 “With” Temporarily Modified Global State*.
 <https://doi.org/10.32614/CRAN.package.withr>.
 
@@ -460,6 +444,14 @@ Bioconductor Packages*.
 Morgan, Martin, and Marcel Ramos. 2025. *BiocManager: Access the
 Bioconductor Project Package Repository*.
 <https://doi.org/10.32614/CRAN.package.BiocManager>.
+
+</div>
+
+<div id="ref-curl" class="csl-entry">
+
+Ooms, Jeroen. 2026. *<span class="nocase">curl</span>: A Modern and
+Flexible Web Client for r*.
+<https://doi.org/10.32614/CRAN.package.curl>.
 
 </div>
 
@@ -567,6 +559,14 @@ Back*. <https://doi.org/10.32614/CRAN.package.yaml>.
 
 </div>
 
+<div id="ref-fastmatch" class="csl-entry">
+
+Urbanek, Simon. 2026. *<span class="nocase">fastmatch</span>: Fast
+“<span class="nocase">match()</span>” Function*.
+<https://doi.org/10.32614/CRAN.package.fastmatch>.
+
+</div>
+
 <div id="ref-reticulate" class="csl-entry">
 
 Ushey, Kevin, JJ Allaire, and Yuan Tang. 2026.
@@ -585,7 +585,7 @@ Started with Testing.” *The R Journal* 3: 5–10.
 
 <div id="ref-httr2" class="csl-entry">
 
-Wickham, Hadley. 2025. *Httr2: Perform HTTP Requests and Process the
+Wickham, Hadley. 2026. *Httr2: Perform HTTP Requests and Process the
 Responses*. <https://doi.org/10.32614/CRAN.package.httr2>.
 
 </div>

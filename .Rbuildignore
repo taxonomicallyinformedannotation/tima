@@ -1,7 +1,7 @@
-CITATION.cff
 ^.*\.Rproj$
 ^.*\.iml$
 ^.*\.log$
+^CITATION\.cff$
 ^LICENSE\.md$
 ^README\.Rmd$
 ^README\.qmd$

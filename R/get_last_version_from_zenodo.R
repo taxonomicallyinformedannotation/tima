@@ -86,7 +86,7 @@ validate_zenodo_inputs <- function(doi, pattern, path, timeout_s) {
 #' @return Character record ID
 #' @keywords internal
 extract_zenodo_record_id <- function(doi) {
-  stringi::stri_replace_all_fixed(
+  stri_replace_all_fixed(
     str = doi,
     pattern = "10.5281/zenodo.",
     replacement = "",
