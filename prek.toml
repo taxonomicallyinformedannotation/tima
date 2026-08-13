@@ -22,7 +22,7 @@ hooks = [{ id = "check-added-large-files", args = ["--maxkb=200"] }, { id = "fil
 [[repos]]
 repo = "https://github.com/tombi-toml/tombi-pre-commit"
 rev = "v1.3.5"
-hooks = [{ id = "tombi-format", exclude = '^uv\.lock$' }, { id = "tombi-lint" }]
+hooks = [{ id = "tombi-format" }, { id = "tombi-lint" }]
 
 [[repos]]
 repo = "https://github.com/jolars/panache-pre-commit"
