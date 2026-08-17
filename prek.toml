@@ -21,12 +21,12 @@ hooks = [{ id = "check-added-large-files", args = ["--maxkb=200"] }, { id = "fil
 
 [[repos]]
 repo = "https://github.com/tombi-toml/tombi-pre-commit"
-rev = "v1.3.5"
+rev = "v1.4.1"
 hooks = [{ id = "tombi-format" }, { id = "tombi-lint" }]
 
 [[repos]]
 repo = "https://github.com/jolars/panache-pre-commit"
-rev = "v3.3.0"
+rev = "v3.4.0"
 hooks = [{ id = "panache-format" }, { id = "panache-lint" }]
 
 [[repos]]

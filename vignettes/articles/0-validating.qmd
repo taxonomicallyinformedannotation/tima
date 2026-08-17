@@ -203,6 +203,7 @@ run_tima()
 ### MGF File Issues
 
 **Issue:** No spectra found
+
 ```
 ✗ MGF file has issues:
   - No spectra found (no BEGIN IONS markers)
@@ -213,6 +214,7 @@ run_tima()
 --------------------------------------------------------------------------------
 
 **Issue:** Mismatched markers
+
 ```
 ✗ MGF file has issues:
   - Mismatched BEGIN IONS (10) and END IONS (9)
@@ -223,6 +225,7 @@ run_tima()
 --------------------------------------------------------------------------------
 
 **Issue:** Missing required fields
+
 ```
 ✗ MGF file has issues:
   - First spectrum missing PEPMASS field
@@ -233,6 +236,7 @@ run_tima()
 ### Features File Issues
 
 **Issue:** Empty file
+
 ```
 ✗ Features file has issues:
   - features table is empty (0 rows)
@@ -243,6 +247,7 @@ run_tima()
 --------------------------------------------------------------------------------
 
 **Issue:** Missing columns
+
 ```
 ✗ Features file has issues:
   - Missing required columns: feature_id, mz
@@ -253,6 +258,7 @@ run_tima()
 ### Metadata Issues
 
 **Issue:** Files not found
+
 ```
 ✗ Metadata validation has issues:
   - Missing 5/120 files referenced in metadata
@@ -269,6 +275,7 @@ run_tima()
 --------------------------------------------------------------------------------
 
 **Issue:** Wrong column name
+
 ```
 ✗ Metadata validation has issues:
   - Column 'filename' not found in metadata
@@ -280,6 +287,7 @@ run_tima()
 ### SIRIUS Issues
 
 **Issue:** Missing output files
+
 ```
 ✗ SIRIUS output has issues:
   - Missing formula_identifications_all.tsv
@@ -292,6 +300,7 @@ the output directory path is correct.
 --------------------------------------------------------------------------------
 
 **Issue:** Empty output
+
 ```
 ✗ SIRIUS output has issues:
   - No feature directories found in SIRIUS output
