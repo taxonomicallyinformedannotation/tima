@@ -618,8 +618,8 @@ summarize_results <- function(
 .build_feature_consensus_table <- function(annot_table_wei_chemo, model) {
   base_cols <- c(
     model$features_columns,
-    "rt",
-    "mz",
+    "feature_rt",
+    "feature_mz",
     model$features_calculated_columns,
     model$components_columns,
     "annotation_note"

@@ -146,6 +146,10 @@
     pass via the weighted final score, so sparse candidates do not qualify as
     high evidence on score alone
 
+## Fixes
+
+- Brought `feature_mz` and `feature_rt` back into the final results tables
+
 # tima 2.13.0
 
 ## Breaking changes

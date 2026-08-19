@@ -1,3 +1,274 @@
+#' @title Filter annotations
+#'
+#' @description This function filters initial annotations by removing MS1-only
+#'     annotations that also have quality spectral matches (gated on similarity
+#'     and matched peaks), and joins retention time library data when available.
+#'     RT deltas are computed but no hard cutoff is applied; the downstream
+#'     scoring system uses a sigmoid penalty to handle RT deviations gracefully.
+#'
+#' @include get_params.R
+#' @include safe_fread.R
+#' @include logs_utils.R
+#' @include annotate_masses_consistency.R
+#' @include export_params.R
+#' @include export_output.R
+#' @include clean_chemo_preprocessing.R
+#'
+#' @param annotations Character vector or list of paths to prepared annotation
+#'     files
+#' @param features Character string path to prepared features file.
+#' Must contain a \code{feature_id} column. The \code{rt} column is optional;
+#'     if absent, RT filtering is skipped even when an RT library is provided.
+#' @param rts Character string path to prepared retention time library
+#'     (optional)
+#' @param output Character string path for filtered annotations output
+#' @param tolerance_rt Numeric RT tolerance in minutes (used for deduplication
+#'     of multiple RT library matches; no hard cutoff is applied)
+#'
+#' @return Character string path to the filtered annotations file
+#'
+#' @family annotation
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' copy_backbone()
+#' go_to_cache()
+#' github <- "https://raw.githubusercontent.com/"
+#' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
+#' dir <- paste0(github, repo)
+#' ann <- get_params(step =
+#'     "filter_annotations")$files$annotations$prepared$structural[[2L]] |>
+#'   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
+#' features <- get_params(step = "filter_annotations")$files$features$prepared
+#'     |>
+#'   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
+#' rts <- get_params(step =
+#'     "filter_annotations")$files$libraries$temporal$prepared |>
+#'   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
+#' get_file(url = paste0(dir, annotations), export = annotations)
+#' get_file(url = paste0(dir, features), export = features)
+#' get_file(url = paste0(dir, rts), export = rts)
+#' filter_annotations(
+#'   annotations = ann,
+#'   features = features,
+#'   rts = rts
+#' )
+#' unlink("data", recursive = TRUE)
+#' }
+filter_annotations <- function(
+  annotations = get_params(
+    step = "filter_annotations"
+  )$files$annotations$prepared$structural,
+  features = get_params(step = "filter_annotations")$files$features$prepared,
+  rts = get_params(
+    step = "filter_annotations"
+  )$files$libraries$temporal$prepared,
+  output = get_params(step = "filter_annotations")$files$annotations$filtered,
+  tolerance_rt = get_params(
+    step = "filter_annotations"
+  )$ms$tolerances$rt$library
+) {
+  # Start operation logging
+  ctx <- log_operation(
+    "filter_annotations",
+    n_annotation_files = length(unlist(annotations)),
+    tolerance_rt = tolerance_rt
+  )
+
+  # Input Validation ----
+
+  validate_filter_annotations_inputs(
+    annotations = annotations,
+    features = features,
+    rts = rts,
+    output = output,
+    tolerance_rt = tolerance_rt
+  )
+
+  # Normalize RT input
+  if (length(rts) == 0) {
+    rts <- NULL
+  }
+
+  # Load and Process Data ----
+
+  log_info("Filtering annotations")
+  if (
+    is.numeric(tolerance_rt) &&
+      length(tolerance_rt) == 1L &&
+      !is.na(tolerance_rt)
+  ) {
+    log_debug("RT tolerance: %.2f minutes", tolerance_rt)
+  }
+
+  features_table <- safe_fread(
+    file = features,
+    file_type = "features table",
+    required_cols = "feature_id",
+    colClasses = "character",
+    na.strings = c("", "NA")
+  )
+
+  has_rt <- "rt" %in% names(features_table)
+  distinct_cols <- c("feature_id", if (has_rt) "rt", "mz")
+  distinct_cols <- intersect(distinct_cols, names(features_table))
+  features_table <- features_table |>
+    tidytable::distinct(tidyselect::all_of(distinct_cols))
+
+  n_features <- nrow(features_table)
+  log_info(
+    "Processing %d unique features for annotation filtering",
+    n_features
+  )
+
+  # Load and Merge Annotations ----
+
+  log_debug("Loading %d annotation file(s)", length(annotations))
+  annotation_tables_list <- purrr::map2(
+    .x = annotations,
+    .y = seq_along(annotations),
+    .f = ~ safe_fread(
+      file = .x,
+      file_type = paste0("annotation file ", .y),
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    )
+  )
+
+  # Filter MS1 redundancy
+  annotation_table <- filter_ms1_redundancy(annotation_tables_list)
+  rm(annotation_tables_list)
+
+  n_total_annotations <- nrow(annotation_table)
+  log_info(
+    "Total annotations after MS1 deduplication: %d",
+    n_total_annotations
+  )
+
+  # Apply RT Filtering if Library Available ----
+
+  features_annotated_table_1 <- features_table |>
+    tidytable::left_join(y = annotation_table)
+  rm(annotation_table)
+
+  n_before_adduct_semantics <- nrow(features_annotated_table_1)
+  features_annotated_table_1 <- enforce_ms1_adduct_semantics(
+    features_annotated_table_1
+  )
+  adduct_semantics_audit <- attr(
+    features_annotated_table_1,
+    "adduct_semantics_audit"
+  )
+  n_after_adduct_semantics <- nrow(features_annotated_table_1)
+  n_removed_adduct_semantics <- max(
+    0L,
+    n_before_adduct_semantics - n_after_adduct_semantics
+  )
+  n_removed_spectral_adduct_mismatch <- if (
+    is.list(adduct_semantics_audit) &&
+      !is.null(adduct_semantics_audit$n_removed_spectral)
+  ) {
+    as.integer(adduct_semantics_audit$n_removed_spectral)
+  } else {
+    0L
+  }
+  log_info(
+    paste0(
+      "Adduct-semantics filter: before=%d, removed_total=%d, ",
+      "removed_spectral_mismatch=%d, after=%d"
+    ),
+    n_before_adduct_semantics,
+    n_removed_adduct_semantics,
+    n_removed_spectral_adduct_mismatch,
+    n_after_adduct_semantics
+  )
+
+  if (!is.null(rts) && !has_rt) {
+    log_warn(
+      paste(
+        "RT library provided but features table has no 'rt' column.",
+        "Skipping RT filtering."
+      )
+    )
+    rts <- NULL
+  }
+
+  if (!is.null(rts)) {
+    rt_table <- purrr::map2(
+      .x = rts,
+      .y = seq_along(rts),
+      .f = ~ safe_fread(
+        file = .x,
+        file_type = paste0("retention time library ", .y),
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
+    ) |>
+      tidytable::bind_rows()
+
+    # Robust rename: support either 'rt' or pre-renamed 'rt_target'
+    if ("rt" %in% names(rt_table)) {
+      rt_table <- rt_table |>
+        tidytable::rename(rt_target = rt)
+    } else if (!"rt_target" %in% names(rt_table)) {
+      cli::cli_abort(
+        "retention time library must contain column 'rt' or 'rt_target'",
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
+    }
+
+    n_rt_standards <- nrow(rt_table)
+    log_debug("Loaded %d retention time standards", n_rt_standards)
+
+    features_annotated_table_2 <- apply_rt_filter(
+      features_annotated_table_1,
+      rt_table,
+      tolerance_rt
+    )
+  } else {
+    log_debug("No RT library provided, skipping RT filtering")
+    features_annotated_table_2 <- features_annotated_table_1 |>
+      tidytable::mutate(candidate_structure_error_rt = NA)
+  }
+
+  n_dedup_rt <- nrow(features_annotated_table_1) -
+    nrow(features_annotated_table_2)
+  if (n_dedup_rt > 0L) {
+    log_info(
+      "Removed %d duplicate RT library matches during join",
+      n_dedup_rt
+    )
+  }
+  rm(features_annotated_table_1)
+
+  ## in case some features had a single filtered annotation
+  join_cols <- intersect(
+    names(features_table),
+    names(features_annotated_table_2)
+  )
+  final_table <- features_table |>
+    tidytable::left_join(y = features_annotated_table_2, by = join_cols)
+
+  rm(
+    features_table,
+    features_annotated_table_2
+  )
+
+  export_params(
+    parameters = get_params(step = "filter_annotations"),
+    step = "filter_annotations"
+  )
+  export_output(x = final_table, file = output[[1L]])
+
+  log_complete(ctx, n_filtered = nrow(final_table))
+
+  rm(final_table)
+  output[[1L]]
+}
+
 #' Validate Inputs for filter_annotations
 #'
 #' @description Internal helper to validate all input parameters.
@@ -558,275 +829,4 @@ enforce_ms1_adduct_semantics <- function(
     n_output = nrow(out_filtered)
   )
   out_filtered
-}
-
-#' @title Filter annotations
-#'
-#' @description This function filters initial annotations by removing MS1-only
-#'     annotations that also have quality spectral matches (gated on similarity
-#'     and matched peaks), and joins retention time library data when available.
-#'     RT deltas are computed but no hard cutoff is applied; the downstream
-#'     scoring system uses a sigmoid penalty to handle RT deviations gracefully.
-#'
-#' @include get_params.R
-#' @include safe_fread.R
-#' @include logs_utils.R
-#' @include annotate_masses_consistency.R
-#' @include export_params.R
-#' @include export_output.R
-#' @include clean_chemo_preprocessing.R
-#'
-#' @param annotations Character vector or list of paths to prepared annotation
-#'     files
-#' @param features Character string path to prepared features file.
-#' Must contain a \code{feature_id} column. The \code{rt} column is optional;
-#'     if absent, RT filtering is skipped even when an RT library is provided.
-#' @param rts Character string path to prepared retention time library
-#'     (optional)
-#' @param output Character string path for filtered annotations output
-#' @param tolerance_rt Numeric RT tolerance in minutes (used for deduplication
-#'     of multiple RT library matches; no hard cutoff is applied)
-#'
-#' @return Character string path to the filtered annotations file
-#'
-#' @family annotation
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' copy_backbone()
-#' go_to_cache()
-#' github <- "https://raw.githubusercontent.com/"
-#' repo <- "taxonomicallyinformedannotation/tima-example-files/main/"
-#' dir <- paste0(github, repo)
-#' ann <- get_params(step =
-#'     "filter_annotations")$files$annotations$prepared$structural[[2L]] |>
-#'   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
-#' features <- get_params(step = "filter_annotations")$files$features$prepared
-#'     |>
-#'   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
-#' rts <- get_params(step =
-#'     "filter_annotations")$files$libraries$temporal$prepared |>
-#'   gsub(pattern = ".gz", replacement = "", fixed = TRUE)
-#' get_file(url = paste0(dir, annotations), export = annotations)
-#' get_file(url = paste0(dir, features), export = features)
-#' get_file(url = paste0(dir, rts), export = rts)
-#' filter_annotations(
-#'   annotations = ann,
-#'   features = features,
-#'   rts = rts
-#' )
-#' unlink("data", recursive = TRUE)
-#' }
-filter_annotations <- function(
-  annotations = get_params(
-    step = "filter_annotations"
-  )$files$annotations$prepared$structural,
-  features = get_params(step = "filter_annotations")$files$features$prepared,
-  rts = get_params(
-    step = "filter_annotations"
-  )$files$libraries$temporal$prepared,
-  output = get_params(step = "filter_annotations")$files$annotations$filtered,
-  tolerance_rt = get_params(
-    step = "filter_annotations"
-  )$ms$tolerances$rt$library
-) {
-  # Start operation logging
-  ctx <- log_operation(
-    "filter_annotations",
-    n_annotation_files = length(unlist(annotations)),
-    tolerance_rt = tolerance_rt
-  )
-
-  # Input Validation ----
-
-  validate_filter_annotations_inputs(
-    annotations = annotations,
-    features = features,
-    rts = rts,
-    output = output,
-    tolerance_rt = tolerance_rt
-  )
-
-  # Normalize RT input
-  if (length(rts) == 0) {
-    rts <- NULL
-  }
-
-  # Load and Process Data ----
-
-  log_info("Filtering annotations")
-  if (
-    is.numeric(tolerance_rt) &&
-      length(tolerance_rt) == 1L &&
-      !is.na(tolerance_rt)
-  ) {
-    log_debug("RT tolerance: %.2f minutes", tolerance_rt)
-  }
-
-  features_table <- safe_fread(
-    file = features,
-    file_type = "features table",
-    required_cols = "feature_id",
-    colClasses = "character",
-    na.strings = c("", "NA")
-  )
-
-  has_rt <- "rt" %in% names(features_table)
-  distinct_cols <- c("feature_id", if (has_rt) "rt", "mz")
-  distinct_cols <- intersect(distinct_cols, names(features_table))
-  features_table <- features_table |>
-    tidytable::distinct(tidyselect::all_of(distinct_cols))
-
-  n_features <- nrow(features_table)
-  log_info(
-    "Processing %d unique features for annotation filtering",
-    n_features
-  )
-
-  # Load and Merge Annotations ----
-
-  log_debug("Loading %d annotation file(s)", length(annotations))
-  annotation_tables_list <- purrr::map2(
-    .x = annotations,
-    .y = seq_along(annotations),
-    .f = ~ safe_fread(
-      file = .x,
-      file_type = paste0("annotation file ", .y),
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    )
-  )
-
-  # Filter MS1 redundancy
-  annotation_table <- filter_ms1_redundancy(annotation_tables_list)
-  rm(annotation_tables_list)
-
-  n_total_annotations <- nrow(annotation_table)
-  log_info(
-    "Total annotations after MS1 deduplication: %d",
-    n_total_annotations
-  )
-
-  # Apply RT Filtering if Library Available ----
-
-  features_annotated_table_1 <- features_table |>
-    tidytable::left_join(y = annotation_table)
-  rm(annotation_table)
-
-  n_before_adduct_semantics <- nrow(features_annotated_table_1)
-  features_annotated_table_1 <- enforce_ms1_adduct_semantics(
-    features_annotated_table_1
-  )
-  adduct_semantics_audit <- attr(
-    features_annotated_table_1,
-    "adduct_semantics_audit"
-  )
-  n_after_adduct_semantics <- nrow(features_annotated_table_1)
-  n_removed_adduct_semantics <- max(
-    0L,
-    n_before_adduct_semantics - n_after_adduct_semantics
-  )
-  n_removed_spectral_adduct_mismatch <- if (
-    is.list(adduct_semantics_audit) &&
-      !is.null(adduct_semantics_audit$n_removed_spectral)
-  ) {
-    as.integer(adduct_semantics_audit$n_removed_spectral)
-  } else {
-    0L
-  }
-  log_info(
-    paste0(
-      "Adduct-semantics filter: before=%d, removed_total=%d, ",
-      "removed_spectral_mismatch=%d, after=%d"
-    ),
-    n_before_adduct_semantics,
-    n_removed_adduct_semantics,
-    n_removed_spectral_adduct_mismatch,
-    n_after_adduct_semantics
-  )
-
-  if (!is.null(rts) && !has_rt) {
-    log_warn(
-      paste(
-        "RT library provided but features table has no 'rt' column.",
-        "Skipping RT filtering."
-      )
-    )
-    rts <- NULL
-  }
-
-  if (!is.null(rts)) {
-    rt_table <- purrr::map2(
-      .x = rts,
-      .y = seq_along(rts),
-      .f = ~ safe_fread(
-        file = .x,
-        file_type = paste0("retention time library ", .y),
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )
-    ) |>
-      tidytable::bind_rows()
-
-    # Robust rename: support either 'rt' or pre-renamed 'rt_target'
-    if ("rt" %in% names(rt_table)) {
-      rt_table <- rt_table |>
-        tidytable::rename(rt_target = rt)
-    } else if (!"rt_target" %in% names(rt_table)) {
-      cli::cli_abort(
-        "retention time library must contain column 'rt' or 'rt_target'",
-        class = c("tima_validation_error", "tima_error"),
-        call = NULL
-      )
-    }
-
-    n_rt_standards <- nrow(rt_table)
-    log_debug("Loaded %d retention time standards", n_rt_standards)
-
-    features_annotated_table_2 <- apply_rt_filter(
-      features_annotated_table_1,
-      rt_table,
-      tolerance_rt
-    )
-  } else {
-    log_debug("No RT library provided, skipping RT filtering")
-    features_annotated_table_2 <- features_annotated_table_1 |>
-      tidytable::mutate(candidate_structure_error_rt = NA)
-  }
-
-  n_dedup_rt <- nrow(features_annotated_table_1) -
-    nrow(features_annotated_table_2)
-  if (n_dedup_rt > 0L) {
-    log_info(
-      "Removed %d duplicate RT library matches during join",
-      n_dedup_rt
-    )
-  }
-  rm(features_annotated_table_1)
-
-  ## in case some features had a single filtered annotation
-  join_cols <- intersect(
-    names(features_table),
-    names(features_annotated_table_2)
-  )
-  final_table <- features_table |>
-    tidytable::left_join(y = features_annotated_table_2, by = join_cols)
-
-  rm(
-    features_table,
-    features_annotated_table_2
-  )
-
-  export_params(
-    parameters = get_params(step = "filter_annotations"),
-    step = "filter_annotations"
-  )
-  export_output(x = final_table, file = output[[1L]])
-
-  log_complete(ctx, n_filtered = nrow(final_table))
-
-  rm(final_table)
-  output[[1L]]
 }

@@ -227,6 +227,8 @@ select_weight_annotations_working_columns <- function(df) {
     tidyselect::any_of(
       unique(c(
         "feature_id",
+        "rt",
+        "mz",
         grep("^sample_organism_", names(df), value = TRUE),
         grep("^candidate_organism_", names(df), value = TRUE),
         "candidate_structure_inchikey_connectivity_layer",
