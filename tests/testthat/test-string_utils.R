@@ -76,8 +76,14 @@ test_that("stri_sub matches stringi", {
   skip_if_not_installed("stringi")
   x <- c("abcdef", "ghij")
   expect_identical(tima:::stri_sub(x, 2, 4), stringi::stri_sub(x, 2, 4))
-  expect_identical(tima:::stri_sub("abcdef", -3, -1), stringi::stri_sub("abcdef", -3, -1))
-  expect_identical(tima:::stri_sub(NA_character_, 1, 2), stringi::stri_sub(NA_character_, 1, 2))
+  expect_identical(
+    tima:::stri_sub("abcdef", -3, -1),
+    stringi::stri_sub("abcdef", -3, -1)
+  )
+  expect_identical(
+    tima:::stri_sub(NA_character_, 1, 2),
+    stringi::stri_sub(NA_character_, 1, 2)
+  )
 })
 
 test_that("stri_sub two-argument form (default to = from) truncates to one char (FIXME)", {
@@ -126,8 +132,18 @@ test_that("stri_replace_all_fixed matches stringi on common inputs", {
     stringi::stri_replace_all_fixed(c("a.b.c", "x.b.y"), ".", "-")
   )
   expect_identical(
-    tima:::stri_replace_all_fixed("Hello HELLO", "hello", "X", case_insensitive = TRUE),
-    stringi::stri_replace_all_fixed("Hello HELLO", "hello", "X", case_insensitive = TRUE)
+    tima:::stri_replace_all_fixed(
+      "Hello HELLO",
+      "hello",
+      "X",
+      case_insensitive = TRUE
+    ),
+    stringi::stri_replace_all_fixed(
+      "Hello HELLO",
+      "hello",
+      "X",
+      case_insensitive = TRUE
+    )
   )
 })
 
