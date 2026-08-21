@@ -3,7 +3,6 @@
 #' Create batches from a vector
 #' @description Splits a vector into batches of specified size
 #' @include logs_utils.R
-#' @include safe_bind_rows.R
 #' @param items [character] Character vector to batch
 #' @param batch_size [integer] Integer size of each batch
 #' @return List of character vectors (batches)
@@ -91,7 +90,7 @@
       ott_ids = ott_ids
     )
 
-  safe_bind_rows(list_df) |>
+  tidytable::bind_rows(list_df) |>
     tidytable::mutate(
       ott_id = as.integer(ott_id),
       n = tidytable::row_number()
