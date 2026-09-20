@@ -21,17 +21,17 @@ hooks = [{ id = "check-added-large-files", args = ["--maxkb=200"] }, { id = "fil
 
 [[repos]]
 repo = "https://github.com/tombi-toml/tombi-pre-commit"
-rev = "v1.4.1"
+rev = "v1.5.5"
 hooks = [{ id = "tombi-format" }, { id = "tombi-lint" }]
 
 [[repos]]
 repo = "https://github.com/jolars/panache-pre-commit"
-rev = "v3.6.1"
+rev = "v3.11.0"
 hooks = [{ id = "panache-format" }, { id = "panache-lint" }]
 
 [[repos]]
 repo = "https://github.com/etiennebacher/jarl-pre-commit"
-rev = "0.5.0"
+rev = "0.6.0"
 hooks = [{ id = "jarl-check" }]
 
 [[repos]]
