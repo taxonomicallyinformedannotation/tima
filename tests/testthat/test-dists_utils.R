@@ -220,3 +220,111 @@ test_that("dist_groups includes group information", {
   expect_s3_class(result$Group1, "factor")
   expect_s3_class(result$Group2, "factor")
 })
+
+test_that("dist_get reads the exact packed-matrix position", {
+  # A 4x4 matrix whose off-diagonal entries are all distinct, so reading the
+  # wrong slot is visible.
+  x <- matrix(0, nrow = 4, ncol = 4)
+  x[1, 2] <- x[2, 1] <- 1
+  x[1, 3] <- x[3, 1] <- 2
+  x[1, 4] <- x[4, 1] <- 3
+  x[2, 3] <- x[3, 2] <- 4
+  x[2, 4] <- x[4, 2] <- 5
+  x[3, 4] <- x[4, 3] <- 6
+  d <- as.dist(x)
+
+  expect_equal(dist_get(d, 1, 2), 1)
+  expect_equal(dist_get(d, 1, 3), 2)
+  expect_equal(dist_get(d, 1, 4), 3)
+  expect_equal(dist_get(d, 2, 3), 4)
+  expect_equal(dist_get(d, 2, 4), 5)
+  expect_equal(dist_get(d, 3, 4), 6)
+  # Every diagonal entry is 0, never a matrix read.
+  for (i in 1:4) expect_equal(dist_get(d, i, i), 0)
+})
+
+test_that("dist_get treats the boundary index as in range", {
+  x <- matrix(0, nrow = 3, ncol = 3)
+  x[1, 2] <- x[2, 1] <- 7
+  x[1, 3] <- x[3, 1] <- 9
+  d <- as.dist(x)
+
+  # n == 3 is in range and must not warn.
+  expect_no_warning(expect_equal(dist_get(d, 1, 3L), 9))
+  expect_no_warning(expect_equal(dist_get(d, 3L, 3L), 0))
+
+  # Beyond the range warns. The documented return is NA, but the value that
+  # actually comes back is whatever the packed-matrix read lands on: a
+  # far-out index reads past the end and gives NA, while a just-out-of-range
+  # index wraps onto a real slot. Pinned here so the divergence from the
+  # documented contract is visible rather than accidental.
+  expect_warning(far <- dist_get(d, 1, 10L), "out of bounds")
+  expect_true(is.na(far))
+  expect_warning(near <- dist_get(d, 1, 4L), "out of bounds")
+  expect_false(is.na(near))
+  expect_warning(low <- dist_get(d, 0L, 1L), "out of bounds")
+  expect_false(is.na(low))
+})
+
+test_that("dist_get rounds nothing and reports the raw distance", {
+  x <- matrix(c(0, 1.23456789, 1.23456789, 0), nrow = 2)
+  d <- as.dist(x)
+  expect_equal(dist_get(d, 1, 2), 1.23456789)
+})
+
+test_that("dist_groups labels within pairs with the shared group name", {
+  x <- matrix(c(0, 1, 10, 1, 0, 11, 10, 11, 0), nrow = 3)
+  d <- as.dist(x)
+
+  res <- as.data.frame(dist_groups(d, c("A", "A", "B")))
+  # combn order is (1,2), (1,3), (2,3): only (1,2) shares a group.
+  expect_equal(as.character(res$Label), c(
+    "Within A",
+    "Between A and B",
+    "Between A and B"
+  ))
+})
+
+test_that("dist_groups orders between-group labels by factor level", {
+  # The group vector is deliberately unsorted (B, A, C) so that the label
+  # order can only come from the factor levels, not from the input order.
+  x <- matrix(c(0, 1, 10, 1, 0, 11, 10, 11, 0), nrow = 3)
+  res <- as.data.frame(dist_groups(as.dist(x), c("B", "A", "C")))
+
+  expect_equal(as.character(res$Label), c(
+    "Between A and B",
+    "Between B and C",
+    "Between A and C"
+  ))
+  # Group1/Group2 stay in observation order, they are not sorted.
+  expect_equal(as.character(res$Group1), c("B", "B", "A"))
+  expect_equal(as.character(res$Group2), c("A", "C", "C"))
+})
+
+test_that("dist_groups handles numeric group labels", {
+  x <- matrix(c(0, 1, 10, 1, 0, 11, 10, 11, 0), nrow = 3)
+  res <- as.data.frame(dist_groups(as.dist(x), c(2, 1, 1)))
+
+  # Observations 2 and 3 are both group 1, so that pair is within.
+  expect_equal(as.character(res$Label[3L]), "Within 1")
+  expect_equal(as.character(res$Label[1L]), "Between 1 and 2")
+})
+
+test_that("dist_groups rounds distances to 5 decimals", {
+  x <- matrix(c(0, 1.23456789, 1.23456789, 0), nrow = 2)
+  res <- as.data.frame(dist_groups(as.dist(x), c("A", "B")))
+  expect_equal(res$Distance, 1.23457)
+})
+
+test_that("dist_groups enumerates every unordered pair exactly once", {
+  x <- matrix(c(0, 1, 2, 3, 1, 0, 4, 5, 2, 4, 0, 6, 3, 5, 6, 0), nrow = 4)
+  res <- as.data.frame(dist_groups(as.dist(x), c("a", "b", "a", "b")))
+
+  expect_equal(nrow(res), 6L)
+  expect_true(all(res$Item1 < res$Item2))
+  expect_equal(res$Distance, c(1, 2, 3, 4, 5, 6))
+  # Two within-group (a,a) and (b,b) pairs, four between-group.
+  expect_equal(sum(as.character(res$Label) == "Within a"), 1L)
+  expect_equal(sum(as.character(res$Label) == "Within b"), 1L)
+  expect_equal(sum(grepl("^Between", as.character(res$Label))), 4L)
+})
