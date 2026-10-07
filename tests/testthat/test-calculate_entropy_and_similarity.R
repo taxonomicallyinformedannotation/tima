@@ -414,3 +414,90 @@ test_that(".count_matched_peaks counts at most one match per query peak", {
   expect_equal(.count_matched_peaks(c(500, 500), lib, 0.1, 0), 2L)
   expect_equal(.count_matched_peaks(c(500, 500), lib, 0.1, 0), 2L)
 })
+
+# ---- threshold is an inclusive lower bound -----------------------------------
+
+test_that("threshold keeps candidates whose similarity equals it", {
+  # Library 1 is identical to the query (similarity 1); library 2 shares no
+  # peaks with it (similarity 0).
+  two_lib <- list(sp_acetic, sp_propane)
+  call_th <- function(th) calculate_entropy_and_similarity(
+    lib_ids = 1:2,
+    lib_precursors = c(61, 61),
+    lib_spectra = two_lib,
+    query_ids = 1L,
+    query_precursors = 61,
+    query_spectra = list(sp_acetic),
+    method = "cosine",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = th,
+    approx = TRUE
+  )
+
+  # threshold = 0 keeps the zero-similarity candidate (>= is inclusive).
+  at_zero <- call_th(0)
+  expect_equal(nrow(at_zero), 2L)
+  expect_equal(sort(at_zero$candidate_score_similarity), c(0, 1))
+
+  # Any threshold above 0 drops it, so only the perfect match survives.
+  for (th in c(1e-12, 0.05, 0.5, 0.999)) {
+    out <- call_th(th)
+    expect_equal(nrow(out), 1L, info = paste(th))
+    expect_equal(out$candidate_score_similarity[[1L]], 1, info = paste(th))
+  }
+
+  # A threshold of exactly 1 still keeps the perfect match.
+  expect_equal(nrow(call_th(1)), 1L)
+})
+
+test_that("below-threshold candidates carry no forward/reverse scores", {
+  out <- calculate_entropy_and_similarity(
+    lib_ids = 1:2,
+    lib_precursors = c(61, 61),
+    lib_spectra = list(sp_acetic, sp_propane),
+    query_ids = 1L,
+    query_precursors = 61,
+    query_spectra = list(sp_acetic),
+    method = "cosine",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0,
+    approx = TRUE
+  )
+  # threshold = 0 is inclusive, so the zero-similarity candidate is retained
+  # and still gets a forward/reverse pass, which yields 0 for a no-peak overlap.
+  zero_row <- out[out$candidate_score_similarity == 0, ]
+  expect_equal(nrow(zero_row), 1L)
+  expect_equal(zero_row$candidate_score_similarity_forward[[1L]], 0)
+  expect_equal(zero_row$candidate_score_similarity_reverse[[1L]], 0)
+  # The perfect match scores 1 in both directions.
+  one_row <- out[out$candidate_score_similarity == 1, ]
+  expect_equal(one_row$candidate_score_similarity_forward[[1L]], 1)
+  expect_equal(one_row$candidate_score_similarity_reverse[[1L]], 1)
+  # Peak counts come from the matched-peak counter, not from the score.
+  expect_equal(out$candidate_count_similarity_peaks_matched[out$target_id == 1L], 2L)
+  expect_equal(out$candidate_count_similarity_peaks_matched[out$target_id == 2L], 0L)
+})
+
+test_that("a threshold nothing reaches returns an empty table", {
+  out <- calculate_entropy_and_similarity(
+    lib_ids = 1L,
+    lib_precursors = 73,
+    lib_spectra = list(sp_propane),
+    query_ids = 1L,
+    query_precursors = 61,
+    query_spectra = list(sp_acetic),
+    method = "cosine",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0.999,
+    approx = TRUE
+  )
+  # No candidate cleared the threshold, so the result is the typed placeholder
+  # carrying NA rather than a zero-row frame.
+  expect_s3_class(out, "data.frame")
+  expect_equal(nrow(out), 1L)
+  expect_true(is.na(out$target_id[[1L]]))
+  expect_true(is.na(out$candidate_score_similarity[[1L]]))
+})
