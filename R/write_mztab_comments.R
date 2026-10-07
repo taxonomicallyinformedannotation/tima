@@ -134,7 +134,7 @@
       "COM\tTIMA ambiguity\taligned_fields=database_identifier|chemical_formula|smiles|inchi|chemical_name|uri|adduct_ions; cardinality_verified=TRUE"
     ))
   }
-  row_groups <- split(seq_len(length(feature_ids)), feature_ids)
+  row_groups <- split(seq_along(feature_ids), feature_ids)
   counts <- lengths(row_groups)
   aligned_cols <- c(
     "database_identifier",

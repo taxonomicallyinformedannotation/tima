@@ -514,7 +514,7 @@ parse_modification_components <- function(modifications_clean) {
         rep("", length(mod_signs_raw) - length(mod_elements))
       )
     } else {
-      mod_elements <- mod_elements[seq_len(length(mod_signs_raw))]
+      mod_elements <- mod_elements[seq_along(mod_signs_raw)]
     }
   }
 
