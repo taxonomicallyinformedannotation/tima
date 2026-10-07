@@ -46,6 +46,32 @@ test_that("round_reals returns df unchanged when cols is empty", {
   expect_equal(round_reals(df, cols = character(0)), df)
 })
 
+test_that("find_matching_columns de-duplicates overlapping patterns", {
+  # Two patterns can match the same column; the result must list it once.
+  expect_equal(
+    find_matching_columns(c("a_mass", "b_mass", "other"), c("a_mass", "b")),
+    c("a_mass", "b_mass")
+  )
+  expect_equal(
+    find_matching_columns(c("a_mass", "b_mass"), c("a_mass", "a_mass", "a_mass")),
+    "a_mass"
+  )
+  expect_equal(find_matching_columns(c("x", "y"), character(0)), NULL)
+  expect_equal(find_matching_columns(character(0), "x"), character(0))
+  expect_equal(find_matching_columns(c("x", "y"), "z"), character(0))
+  # Matching is fixed-string, not regex.
+  expect_equal(find_matching_columns(c("a.c", "abc"), "a.c"), "a.c")
+})
+
+test_that("round_reals rejects NULL cols before any rounding happens", {
+  df <- data.frame(structure_exact_mass = 1.23456789)
+  expect_error(
+    round_reals(df, cols = NULL),
+    "cols cannot be NULL",
+    class = "tima_validation_error"
+  )
+})
+
 test_that("round_reals rejects invalid dig", {
   df <- data.frame(structure_exact_mass = 1.0)
   expect_error(
