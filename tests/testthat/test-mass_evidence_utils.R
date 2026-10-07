@@ -444,3 +444,147 @@ test_that("annotate_adduct_universe_metadata yields NA tiers for an unknown pola
   expect_true(all(is.na(out$adduct_tier)))
 })
 
+# A one-row universe carrying a single named modifier, used to probe the
+# common/exotic classification of each token individually.
+.one_modifier_universe <- function(
+  adduct = "[M-X+H]+",
+  z = 1L,
+  carrier = "H",
+  loss = NULL,
+  cluster = NULL
+) {
+  tidytable::tidytable(
+    adduct = adduct,
+    z = z,
+    n_mer = 1L,
+    carriers = I(list(setNames(1, carrier))),
+    losses = I(list(if (is.null(loss)) numeric(0) else setNames(-1, loss))),
+    clusters = I(list(
+      if (is.null(cluster)) numeric(0) else setNames(1, cluster)
+    ))
+  )
+}
+
+.tier_of <- function(...) {
+  as.data.frame(annotate_adduct_universe_metadata(
+    .one_modifier_universe(...),
+    "pos"
+  ))$adduct_tier
+}
+
+test_that("every documented positive-mode carrier is treated as common", {
+  # Each of these must stay in the "core" set; dropping any one of them makes
+  # the adduct exotic and pushes it from tier 1 to tier 4.
+  for (cn in c("H", "Na", "K", "H4N", "Mg", "Ca")) {
+    u <- .one_modifier_universe(adduct = "[M+C]+", carrier = cn)
+    out <- as.data.frame(annotate_adduct_universe_metadata(u, "pos"))
+    expect_true(out$has_only_common_carriers[[1L]], info = cn)
+    expect_false(out$has_exotic_carrier[[1L]], info = cn)
+    expect_equal(out$adduct_tier[[1L]], 1L, info = cn)
+  }
+
+  for (cn in c("Fe", "Cu", "Zn", "Ag")) {
+    u <- .one_modifier_universe(adduct = "[M+C]+", carrier = cn)
+    out <- as.data.frame(annotate_adduct_universe_metadata(u, "pos"))
+    expect_false(out$has_only_common_carriers[[1L]], info = cn)
+    expect_true(out$has_exotic_carrier[[1L]], info = cn)
+    expect_equal(out$adduct_tier[[1L]], 4L, info = cn)
+  }
+})
+
+test_that("every documented negative-mode carrier is treated as common", {
+  for (cn in c("H", "F", "Cl", "Br")) {
+    u <- .one_modifier_universe(adduct = "[M-C]-", z = -1L, carrier = cn)
+    out <- as.data.frame(annotate_adduct_universe_metadata(u, "neg"))
+    expect_true(out$has_only_common_carriers[[1L]], info = cn)
+    expect_equal(out$adduct_tier[[1L]], 1L, info = cn)
+  }
+
+  # The positive-mode carriers that are not halides are exotic in negative mode.
+  for (cn in c("Na", "K", "Mg", "Ca")) {
+    u <- .one_modifier_universe(adduct = "[M-C]-", z = -1L, carrier = cn)
+    out <- as.data.frame(annotate_adduct_universe_metadata(u, "neg"))
+    expect_true(out$has_exotic_carrier[[1L]], info = cn)
+    expect_equal(out$adduct_tier[[1L]], 4L, info = cn)
+  }
+})
+
+test_that("every documented common neutral loss yields tier 2", {
+  for (f in c(
+    "H2O",
+    "H4O2",
+    "H8O4",
+    "H3N",
+    "CO",
+    "CO2",
+    "SO2",
+    "SO3",
+    "HF",
+    "CF2",
+    "CF2O",
+    "CF3",
+    "CHF2",
+    "C2F2",
+    "C2F4",
+    "C3F6"
+  )) {
+    out <- as.data.frame(annotate_adduct_universe_metadata(
+      .one_modifier_universe(loss = f),
+      "pos"
+    ))
+    expect_true(out$has_only_common_losses[[1L]], info = f)
+    expect_equal(out$adduct_tier[[1L]], 2L, info = f)
+    expect_equal(out$min_cluster_support[[1L]], 2L, info = f)
+  }
+})
+
+test_that("an undocumented neutral loss is exotic and costs a tier", {
+  for (f in c("C7H14O2", "CH4O", "C3H8O2")) {
+    out <- as.data.frame(annotate_adduct_universe_metadata(
+      .one_modifier_universe(loss = f),
+      "pos"
+    ))
+    expect_false(out$has_only_common_losses[[1L]], info = f)
+    expect_equal(out$adduct_tier[[1L]], 3L, info = f)
+    expect_equal(out$min_cluster_support[[1L]], 3L, info = f)
+  }
+})
+
+test_that("every documented common cluster yields tier 3", {
+  for (f in c("C2H3N", "C2H7N", "NaCl", "C2H6OS")) {
+    out <- as.data.frame(annotate_adduct_universe_metadata(
+      .one_modifier_universe(cluster = f),
+      "pos"
+    ))
+    expect_true(out$has_only_common_clusters[[1L]], info = f)
+    expect_true(out$has_cluster[[1L]], info = f)
+    expect_equal(out$adduct_tier[[1L]], 3L, info = f)
+    expect_equal(out$min_cluster_support[[1L]], 3L, info = f)
+  }
+})
+
+test_that("an undocumented cluster is flagged but does not change the tier", {
+  for (f in c("C4H8O", "C5H11N")) {
+    out <- as.data.frame(annotate_adduct_universe_metadata(
+      .one_modifier_universe(cluster = f),
+      "pos"
+    ))
+    expect_false(out$has_only_common_clusters[[1L]], info = f)
+    # One cluster is allowed in tier 3 regardless of what it is.
+    expect_equal(out$adduct_tier[[1L]], 3L, info = f)
+  }
+})
+
+test_that("an absent modifier counts as common", {
+  out <- as.data.frame(annotate_adduct_universe_metadata(
+    .one_modifier_universe(adduct = "[M+Na]+"),
+    "pos"
+  ))
+  expect_equal(out$n_loss_terms[[1L]], 0L)
+  expect_equal(out$n_cluster_terms[[1L]], 0L)
+  expect_false(out$has_loss[[1L]])
+  expect_false(out$has_cluster[[1L]])
+  expect_true(out$has_only_common_losses[[1L]])
+  expect_true(out$has_only_common_clusters[[1L]])
+  expect_equal(out$adduct_tier[[1L]], 1L)
+})
