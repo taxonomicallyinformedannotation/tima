@@ -61,3 +61,386 @@ test_that("backward compatible .has_library_match_within_ppm works", {
   hit <- .has_library_match_within_ppm(c(100.0005, 100.02), lib, 10)
   expect_equal(hit, c(TRUE, FALSE))
 })
+
+# --- implied_neutral_mass -------------------------------------------------
+
+test_that("implied_neutral_mass inverts the neutral-mass formula exactly", {
+  # [M+H]+ of glucose: M = mz - m(H+)
+  expect_equal(
+    implied_neutral_mass(181.0707, 1L, 1L, 1.00728),
+    180.06342
+  )
+  # [M+Na]+ of the same M
+  expect_equal(
+    implied_neutral_mass(203.0526, 1L, 1L, 22.98922),
+    180.06338
+  )
+  # Multimer / charge scaling: (|z| * mz - adduct_mass) / n_mer
+  # (2 * 190.0 - 2.01456) / 2 = 188.99272
+  expect_equal(
+    implied_neutral_mass(190.0, 2L, 2L, 2.01456),
+    188.99272
+  )
+  # Sign of the charge is irrelevant (abs(z)), so z = -2 gives the same answer
+  expect_equal(
+    implied_neutral_mass(190.0, 2L, -2L, 2.01456),
+    188.99272
+  )
+})
+
+test_that("implied_neutral_mass subtracts the 13C isotope shift per n_iso", {
+  # The M1 isotopologue of 181.0707 is 1.003355 Da heavier; shifting it back
+  # must recover exactly the same neutral mass as the monoisotopic peak.
+  mono <- implied_neutral_mass(181.0707, 1L, 1L, 1.00728, n_iso = 0L)
+  m1 <- implied_neutral_mass(
+    181.0707 + EVIDENCE_ISOTOPE_SHIFT_DA,
+    1L,
+    1L,
+    1.00728,
+    n_iso = 1L
+  )
+  expect_equal(m1, mono, tolerance = 1e-9)
+
+  # n_iso = 1 on the *monoisotopic* m/z must shift the recovered mass down by
+  # exactly one isotope unit (kills any wrong arithmetic on the shift).
+  expect_equal(
+    implied_neutral_mass(181.0707, 1L, 1L, 1.00728, n_iso = 1L),
+    mono - EVIDENCE_ISOTOPE_SHIFT_DA,
+    tolerance = 1e-9
+  )
+  # The shift is multiplicative in n_iso, not additive.
+  expect_equal(
+    implied_neutral_mass(181.0707, 1L, 1L, 1.00728, n_iso = 2L),
+    mono - 2 * EVIDENCE_ISOTOPE_SHIFT_DA,
+    tolerance = 1e-9
+  )
+  # ... and it is removed *before* dividing by n_mer.
+  expect_equal(
+    implied_neutral_mass(190.0 + EVIDENCE_ISOTOPE_SHIFT_DA, 2L, 2L, 2.01456, n_iso = 1L),
+    188.99272,
+    tolerance = 1e-9
+  )
+})
+
+test_that("implied_neutral_mass applies the per-monomer adduct loss", {
+  # [2(M-H2O)+H]+: the water loss is inside the dimer, so it is subtracted
+  # once per monomer after the division.
+  expect_equal(
+    implied_neutral_mass(200.0, 1L, 1L, 1.00728, 0L, 18.01056),
+    180.98216
+  )
+  # The per-monomer term is subtracted *after* the division by n_mer, so it is
+  # applied exactly once whatever the oligomer order.
+  expect_equal(
+    implied_neutral_mass(200.0, 2L, 1L, 1.00728, 0L, 18.01056),
+    (200.0 - 1.00728) / 2 - 18.01056
+  )
+  # Default per-monomer loss of 0 keeps the outside-only legacy behaviour.
+  expect_equal(
+    implied_neutral_mass(200.0, 1L, 1L, 1.00728),
+    200.0 - 1.00728
+  )
+})
+
+test_that("EVIDENCE_ISOTOPE_SHIFT_DA is the 13C/12C difference", {
+  expect_equal(EVIDENCE_ISOTOPE_SHIFT_DA, 1.003355)
+})
+
+# --- .nearest_exact_mass_ppm ---------------------------------------------
+
+test_that(".nearest_exact_mass_ppm reports ppm error against the closer mass", {
+  lib <- c(100.0, 200.0, 500.0)
+
+  expect_equal(.nearest_exact_mass_ppm(100.0, lib), 0)
+  # 0.0005 Da at 100 Da = 5 ppm
+  expect_equal(.nearest_exact_mass_ppm(100.0005, lib), 5, tolerance = 1e-6)
+  # 0.001 Da at 100 Da = 10 ppm
+  expect_equal(.nearest_exact_mass_ppm(100.001, lib), 10, tolerance = 1e-6)
+  # The denominator is the *library* mass of the closer match, not the query:
+  # 150.0 is 50 Da from both 100 and 200; ties resolve to the lower one, so
+  # 50 / 100 * 1e6.
+  expect_equal(.nearest_exact_mass_ppm(150.0, lib), 5e5)
+  # 600 is 100 Da from 500 and 400 from nothing -> 100 / 500 * 1e6
+  expect_equal(.nearest_exact_mass_ppm(600.0, lib), 2e5)
+  # Below the library range the first entry is used
+  expect_equal(.nearest_exact_mass_ppm(50.0, lib), 5e5)
+})
+
+test_that(".nearest_exact_mass_ppm returns Inf when no library mass exists", {
+  lib <- c(100.0, 200.0)
+  expect_equal(.nearest_exact_mass_ppm(c(1, 2), numeric(0)), c(Inf, Inf))
+  expect_identical(.nearest_exact_mass_ppm(numeric(0), lib), numeric(0))
+  expect_identical(.nearest_exact_mass_ppm(numeric(0), numeric(0)), numeric(0))
+})
+
+# --- .nearest_exact_mass_index -------------------------------------------
+
+test_that(".nearest_exact_mass_index indexes the closest library mass", {
+  lib <- c(100.0, 200.0, 500.0)
+
+  expect_equal(.nearest_exact_mass_index(c(100.0, 150.0, 400.0), lib), c(1L, 1L, 3L))
+  # Ties resolve to the lower index.
+  expect_equal(.nearest_exact_mass_index(150.0, lib), 1L)
+  # Out-of-range queries clamp to the first / last library entry.
+  expect_equal(.nearest_exact_mass_index(c(50.0, 600.0), lib), c(1L, 3L))
+  # A query just below an entry still maps to that entry.
+  expect_equal(.nearest_exact_mass_index(99.999, lib), 1L)
+  # Single-entry library: every query maps to it.
+  expect_equal(.nearest_exact_mass_index(c(1, 99, 1e6), 42.0), c(1L, 1L, 1L))
+})
+
+test_that(".nearest_exact_mass_index returns 0 for an empty library", {
+  lib <- c(100.0, 200.0)
+  expect_identical(.nearest_exact_mass_index(numeric(0), lib), integer(0))
+  expect_equal(.nearest_exact_mass_index(c(1, 2), numeric(0)), c(0L, 0L))
+})
+
+# --- .ppm_cluster_sorted --------------------------------------------------
+
+test_that(".ppm_cluster_sorted splits on gaps beyond the ppm tolerance", {
+  v <- c(100, 100.0005, 100.002)
+
+  # 10 ppm at ~100 Da is 0.001 Da: the 0.0005 gap joins, the 0.0015 gap splits.
+  expect_equal(.ppm_cluster_sorted(v, 10), c(1L, 1L, 2L))
+  # 1 ppm is 0.0001 Da: every gap exceeds it.
+  expect_equal(.ppm_cluster_sorted(v, 1), c(1L, 2L, 3L))
+  # 2000 ppm swallows both gaps.
+  expect_equal(.ppm_cluster_sorted(v, 2000), c(1L, 1L, 1L))
+  # The comparison is strict: a gap exactly equal to the tolerance joins.
+  expect_equal(.ppm_cluster_sorted(c(100, 100.001), 10), c(1L, 1L))
+  expect_equal(.ppm_cluster_sorted(c(100, 100.0011), 10), c(1L, 2L))
+})
+
+test_that(".ppm_cluster_sorted gives every NA its own singleton cluster", {
+  expect_equal(
+    .ppm_cluster_sorted(c(100, 100.0001, NA_real_, NA_real_), 10),
+    c(1L, 1L, 2L, 3L)
+  )
+  expect_equal(
+    .ppm_cluster_sorted(c(NA_real_, NA_real_), 10),
+    c(1L, 2L)
+  )
+  # A gap across an NA never merges the neighbouring real values.
+  expect_equal(
+    .ppm_cluster_sorted(c(100, 100.0001, NA_real_, 100.0002), 10),
+    c(1L, 1L, 2L, 3L)
+  )
+})
+
+test_that(".ppm_cluster_sorted handles degenerate inputs", {
+  expect_identical(.ppm_cluster_sorted(numeric(0), 10), integer(0))
+  expect_equal(.ppm_cluster_sorted(100, 10), 1L)
+  expect_equal(.ppm_cluster_sorted(NA_real_, 10), 1L)
+})
+
+# --- annotate_adduct_universe_metadata -----------------------------------
+
+.tier_universe <- function() {
+  tidytable::tidytable(
+    adduct = c(
+      "[M+H]+",
+      "[M+Na]+",
+      "[2M+H]+",
+      "[M+2H]2+",
+      "[M-H2O+H]+",
+      "[M+C3H6O+H]+",
+      "[M+H+CH3CN]+",
+      "[3M+Na]+",
+      "[4M+H]+",
+      "[M+Fe]+",
+      "[M+3H]3+",
+      "[M+CH3CN+CH3CN]+",
+      "[M+Cl]-",
+      "[M-H]-",
+      "[M-H-H2O]-",
+      "[M+H+NaCl]+"
+    ),
+    z = c(1L, 1L, 1L, 2L, 1L, 1L, 1L, 1L, 1L, 1L, 3L, 1L, -1L, -1L, -1L, 1L),
+    n_mer = c(
+      1L,
+      1L,
+      2L,
+      1L,
+      1L,
+      1L,
+      1L,
+      3L,
+      4L,
+      1L,
+      1L,
+      1L,
+      1L,
+      1L,
+      1L,
+      1L
+    ),
+    carriers = I(list(
+      c(H = "1"),
+      c(Na = "1"),
+      c(H = "1"),
+      c(H = "2"),
+      c(H = "1"),
+      c(H = "1"),
+      c(H = "1"),
+      c(Na = "1"),
+      c(H = "1"),
+      c(Fe = "1"),
+      c(H = "3"),
+      c(H = "1"),
+      c(Cl = "-1"),
+      c(H = "-1"),
+      c(H = "-1"),
+      c(H = "1", Na = "1")
+    )),
+    losses = I(list(
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      c(H2O = "-1"),
+      c(C3H6O = "-1"),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      c(H2O = "-1"),
+      numeric(0)
+    )),
+    clusters = I(list(
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      c(C2H3N = "1"),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      c(C2H3N = "1", C2H7N = "1"),
+      numeric(0),
+      numeric(0),
+      numeric(0),
+      c(NaCl = "1")
+    ))
+  )
+}
+
+test_that("annotate_adduct_universe_metadata assigns adduct tiers in positive mode", {
+  out <- as.data.frame(annotate_adduct_universe_metadata(.tier_universe(), "pos"))
+  rownames(out) <- NULL
+
+  # tier 0: the baseline adduct only
+  expect_equal(out$adduct_tier[out$adduct == "[M+H]+"], 0L)
+  expect_true(out$is_baseline[out$adduct == "[M+H]+"])
+
+  # tier 1: common carrier, no loss, no cluster, |z| == 1, at most a dimer
+  expect_equal(out$adduct_tier[out$adduct == "[M+Na]+"], 1L)
+  expect_equal(out$adduct_tier[out$adduct == "[2M+H]+"], 1L)
+  # A positively charged adduct is not the baseline in positive mode.
+  expect_equal(out$adduct_tier[out$adduct == "[M-H]-"], 1L)
+
+  # tier 2: one common neutral loss, or |z| == 2
+  expect_equal(out$adduct_tier[out$adduct == "[M-H2O+H]+"], 2L)
+  expect_equal(out$adduct_tier[out$adduct == "[M+2H]2+"], 2L)
+  expect_equal(out$adduct_tier[out$adduct == "[M-H-H2O]-"], 2L)
+
+  # tier 3: one uncommon loss, one cluster, or a trimer
+  expect_equal(out$adduct_tier[out$adduct == "[M+C3H6O+H]+"], 3L)
+  expect_false(out$has_only_common_losses[out$adduct == "[M+C3H6O+H]+"])
+  expect_equal(out$adduct_tier[out$adduct == "[M+H+CH3CN]+"], 3L)
+  expect_true(out$has_cluster[out$adduct == "[M+H+CH3CN]+"])
+  expect_equal(out$adduct_tier[out$adduct == "[3M+Na]+"], 3L)
+  expect_equal(out$adduct_tier[out$adduct == "[M+H+NaCl]+"], 3L)
+
+  # tier 4: exotic carrier, |z| >= 3, tetramer, two clusters, or a negative
+  # adduct seen in positive mode
+  expect_equal(out$adduct_tier[out$adduct == "[M+Fe]+"], 4L)
+  expect_true(out$has_exotic_carrier[out$adduct == "[M+Fe]+"])
+  expect_equal(out$adduct_tier[out$adduct == "[M+3H]3+"], 4L)
+  expect_equal(out$adduct_tier[out$adduct == "[4M+H]+"], 4L)
+  expect_equal(out$adduct_tier[out$adduct == "[M+CH3CN+CH3CN]+"], 4L)
+  expect_equal(out$adduct_tier[out$adduct == "[M+Cl]-"], 4L)
+
+  expect_setequal(out$adduct_tier, 0:4)
+})
+
+test_that("annotate_adduct_universe_metadata is polarity dependent", {
+  out <- as.data.frame(annotate_adduct_universe_metadata(.tier_universe(), "neg"))
+  rownames(out) <- NULL
+
+  # Na is a core carrier in positive mode but exotic in negative mode.
+  expect_equal(out$adduct_tier[out$adduct == "[M+Na]+"], 4L)
+  expect_equal(out$adduct_tier[out$adduct == "[3M+Na]+"], 4L)
+  expect_true(out$has_exotic_carrier[out$adduct == "[M+Na]+"])
+  # ... and Cl is the mirror image.
+  expect_equal(out$adduct_tier[out$adduct == "[M+Cl]-"], 1L)
+  # [M-H]- becomes the baseline, [M+H]+ is no longer core.
+  expect_true(out$is_baseline[out$adduct == "[M-H]-"])
+  expect_equal(out$adduct_tier[out$adduct == "[M-H]-"], 0L)
+  expect_false(out$is_baseline[out$adduct == "[M+H]+"])
+  expect_equal(out$adduct_tier[out$adduct == "[M+H]+"], 1L)
+  # A trimer is core in positive mode (Na allowed) but not in negative mode.
+  expect_equal(out$adduct_tier[out$adduct == "[M+H+NaCl]+"], 4L)
+  # Losses, clusters and charges are polarity independent.
+  expect_equal(out$adduct_tier[out$adduct == "[M-H2O+H]+"], 2L)
+  expect_equal(out$adduct_tier[out$adduct == "[M-H-H2O]-"], 2L)
+  expect_equal(out$adduct_tier[out$adduct == "[M+C3H6O+H]+"], 3L)
+})
+
+test_that("annotate_adduct_universe_metadata maps tiers to support requirements", {
+  out <- as.data.frame(annotate_adduct_universe_metadata(.tier_universe(), "pos"))
+  rownames(out) <- NULL
+
+  # Core adducts (tier 0/1) need no peer support and are not "core support".
+  expect_equal(
+    out$min_cluster_support[out$adduct_tier <= 1L],
+    rep(1L, sum(out$adduct_tier <= 1L))
+  )
+  expect_false(any(out$requires_core_support[out$adduct_tier <= 1L]))
+  expect_true(all(out$is_core_adduct[out$adduct_tier <= 1L]))
+
+  # Tiers 2/3/4 need 2/3/4 supporting features respectively.
+  expect_equal(out$min_cluster_support[out$adduct_tier == 2L], rep(2L, sum(out$adduct_tier == 2L)))
+  expect_equal(out$min_cluster_support[out$adduct_tier == 3L], rep(3L, sum(out$adduct_tier == 3L)))
+  expect_equal(out$min_cluster_support[out$adduct_tier == 4L], rep(4L, sum(out$adduct_tier == 4L)))
+  expect_true(all(out$requires_core_support[out$adduct_tier >= 2L]))
+  expect_false(any(out$is_core_adduct[out$adduct_tier >= 2L]))
+
+  # min_cluster_support is exactly the tier for tiers >= 2 and 1 for the rest.
+  expect_equal(
+    out$min_cluster_support,
+    ifelse(out$adduct_tier <= 1L, 1L, out$adduct_tier)
+  )
+})
+
+test_that("annotate_adduct_universe_metadata derives term counts and flags", {
+  out <- as.data.frame(annotate_adduct_universe_metadata(.tier_universe(), "pos"))
+  rownames(out) <- NULL
+  u <- as.data.frame(.tier_universe())
+
+  expect_equal(out$n_carrier_terms, lengths(u$carriers))
+  expect_equal(out$n_loss_terms, lengths(u$losses))
+  expect_equal(out$n_cluster_terms, lengths(u$clusters))
+  expect_equal(out$has_loss, out$n_loss_terms > 0L)
+  expect_equal(out$has_cluster, out$n_cluster_terms > 0L)
+  expect_equal(out$has_exotic_carrier, !out$has_only_common_carriers)
+  # Positive-mode common carriers are H/Na/K/NH4/Mg/Ca only.
+  expect_false(out$has_only_common_carriers[out$adduct == "[M+Fe]+"])
+  expect_true(out$has_only_common_carriers[out$adduct == "[M+H]+"])
+  # Clusters must be common for the row to be flagged as such.
+  expect_true(out$has_only_common_clusters[out$adduct == "[M+H+CH3CN]+"])
+  expect_true(out$has_only_common_clusters[out$adduct == "[M+CH3CN+CH3CN]+"])
+})
+
+test_that("annotate_adduct_universe_metadata yields NA tiers for an unknown polarity", {
+  out <- as.data.frame(annotate_adduct_universe_metadata(.tier_universe(), "other"))
+  expect_true(all(is.na(out$is_baseline)))
+  expect_true(all(is.na(out$adduct_tier)))
+})
+
