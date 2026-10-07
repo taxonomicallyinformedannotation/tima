@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.18">
+<meta name="generator" content="quarto-1.10.19">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap-2675dab4ec499648f3c0344a6854f0e2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -762,6 +762,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="fixes">Fixes</h2>
 <ul>
 <li>Brought <code>feature_mz</code> and <code>feature_rt</code> back into the final results tables</li>
+<li>Fixed <code>get_compounds_xrefs()</code> aborting with “none of the supplied props were found in the Bioregistry” against the current Bioregistry bulk JSON. Upstream renamed the per-entry Wikidata property mapping from the <code>wikidata</code> key to <code>wikidata.property</code> in <a href="https://github.com/biopragmatics/bioregistry/pull/2121">bioregistry#2121</a> (merged 2026-09-28), where metaregistry prefixes were renamed to dotted names (<code>uniprot</code> -&gt; <code>uniprot.resource</code>); the registry JSON mirrors the metaregistry, so the key moved with it. <code>get_compounds_xrefs()</code> now reads the new key with a fallback to the old one. Preferred-prefix resolution now also consults the registry <code>preferred_prefix</code> field when <code>banana</code> is absent or null. Symptoms appeared as pipeline failures 24 h after upstream rolled out the new JSON, since the cached xrefs are refreshed daily</li>
 </ul>
 </section>
 </section>
