@@ -372,3 +372,45 @@ test_that("entropy can be skipped while keeping forward/reverse scoring", {
   expect_true(!all(is.na(out$candidate_score_similarity_forward)))
   expect_true(!all(is.na(out$candidate_score_similarity_reverse)))
 })
+
+# ---- .count_matched_peaks: the ppm/Da matching window -------------------------
+
+test_that(".count_matched_peaks counts peaks inside the combined ppm/Da window", {
+  lib <- c(100, 200, 300)
+
+  expect_equal(.count_matched_peaks(c(100, 200), lib, 0.01, 10), 2L)
+  # 0.005 Da at m/z 100 is inside a 0.01 Da window.
+  expect_equal(.count_matched_peaks(c(100.005), lib, 0.01, 10), 1L)
+  # 0.02 Da is outside it.
+  expect_equal(.count_matched_peaks(c(100.02), lib, 0.01, 10), 0L)
+  # A query with no counterpart anywhere in the library.
+  expect_equal(.count_matched_peaks(c(150), lib, 0.01, 10), 0L)
+})
+
+test_that(".count_matched_peaks uses the wider of the ppm and Da tolerances", {
+  # At m/z 1000, 100 ppm is 0.1 Da, far wider than the 0 Da absolute window.
+  expect_equal(.count_matched_peaks(c(1000.05), 1000, 0, 100), 1L)
+  # 10 ppm at m/z 1000 is only 0.01 Da, which does not cover a 0.05 offset.
+  expect_equal(.count_matched_peaks(c(1000.05), 1000, 0, 10), 0L)
+  # The absolute window alone covers it.
+  expect_equal(.count_matched_peaks(c(1000.05), 1000, 0.1, 0), 1L)
+
+  # The ppm tolerance scales with mass: the same 0.05 Da offset is 500 ppm at
+  # m/z 100 but 50 ppm at m/z 1000.
+  expect_equal(.count_matched_peaks(c(100.05), 100, 0, 100), 0L)
+  expect_equal(.count_matched_peaks(c(100.05), 100, 0, 600), 1L)
+})
+
+test_that(".count_matched_peaks returns an integer count of 0 for empty input", {
+  lib <- c(100, 200)
+  expect_equal(.count_matched_peaks(numeric(0), lib, 0.01, 10), 0L)
+  expect_equal(.count_matched_peaks(c(100), numeric(0), 0.01, 10), 0L)
+  expect_type(.count_matched_peaks(c(100), lib, 0.01, 10), "integer")
+})
+
+test_that(".count_matched_peaks counts at most one match per query peak", {
+  # Both query peaks fall inside a wide window around the single library peak.
+  lib <- c(500)
+  expect_equal(.count_matched_peaks(c(500, 500), lib, 0.1, 0), 2L)
+  expect_equal(.count_matched_peaks(c(500, 500), lib, 0.1, 0), 2L)
+})
