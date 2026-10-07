@@ -164,6 +164,16 @@ test_that(".nearest_exact_mass_ppm reports ppm error against the closer mass", {
   expect_equal(.nearest_exact_mass_ppm(600.0, lib), 2e5)
   # Below the library range the first entry is used
   expect_equal(.nearest_exact_mass_ppm(50.0, lib), 5e5)
+  # A query *between* two library masses: 400 is 200 Da from 200 but only
+  # 100 Da from 500, so the closer one (500) is both the numerator's reference
+  # and the distance measure. 100 / 500 * 1e6.
+  expect_equal(.nearest_exact_mass_ppm(400.0, lib), 2e5)
+  # Mirror case: 300 is 100 Da from 200 and 200 Da from 500 -> 100 / 200 * 1e6
+  expect_equal(.nearest_exact_mass_ppm(300.0, lib), 5e5)
+  # The upstream neighbour must not be measured with a positive offset: 190 is
+  # 10 Da from 200, not 390 Da.
+  expect_equal(.nearest_exact_mass_ppm(190.0, c(100.0, 200.0)), 5e4)
+  expect_equal(.nearest_exact_mass_ppm(110.0, c(100.0, 200.0)), 1e5)
 })
 
 test_that(".nearest_exact_mass_ppm returns Inf when no library mass exists", {
@@ -587,4 +597,57 @@ test_that("an absent modifier counts as common", {
   expect_true(out$has_only_common_losses[[1L]])
   expect_true(out$has_only_common_clusters[[1L]])
   expect_equal(out$adduct_tier[[1L]], 1L)
+})
+
+test_that("a completely bare adduct row is treated as all-common", {
+  # Zero carriers is not an exotic carrier set.
+  u <- tidytable::tidytable(
+    adduct = c("[M]+", "[M+Na]+"),
+    z = c(1L, 1L),
+    n_mer = c(1L, 1L),
+    carriers = I(list(numeric(0), c(Na = "1"))),
+    losses = I(list(numeric(0), numeric(0))),
+    clusters = I(list(numeric(0), numeric(0)))
+  )
+  out <- as.data.frame(annotate_adduct_universe_metadata(u, "pos"))
+  expect_equal(out$n_carrier_terms, c(0L, 1L))
+  expect_true(all(out$has_only_common_carriers))
+  expect_false(any(out$has_exotic_carrier))
+  expect_equal(out$adduct_tier, c(1L, 1L))
+})
+
+test_that("the modifier slots are read by name, whatever the coefficient", {
+  # Classification keys on the formula name only, so a positive coefficient
+  # must not change the tier.
+  for (coef in c(-1, 1)) {
+    u <- tidytable::tidytable(
+      adduct = "[M-X+H]+",
+      z = 1L,
+      n_mer = 1L,
+      carriers = list(c(H = "1")),
+      losses = list(c(H2O = coef)),
+      clusters = list(numeric(0))
+    )
+    out <- as.data.frame(annotate_adduct_universe_metadata(u, "pos"))
+    expect_equal(out$n_loss_terms[[1L]], 1L, info = coef)
+    expect_true(out$has_loss[[1L]], info = coef)
+    expect_true(out$has_only_common_losses[[1L]], info = coef)
+    expect_equal(out$adduct_tier[[1L]], 2L, info = coef)
+  }
+})
+
+test_that("a factor adduct column is still matched against the baseline", {
+  u <- tidytable::tidytable(
+    adduct = factor(c("[M+H]+", "[M+Na]+")),
+    z = c(1L, 1L),
+    n_mer = c(1L, 1L),
+    carriers = I(list(c(H = "1"), c(Na = "1"))),
+    losses = I(list(numeric(0), numeric(0))),
+    clusters = I(list(numeric(0), numeric(0)))
+  )
+  out <- as.data.frame(annotate_adduct_universe_metadata(u, "pos"))
+  expect_true(out$is_baseline[[1L]])
+  expect_equal(out$adduct_tier[[1L]], 0L)
+  expect_false(out$is_baseline[[2L]])
+  expect_equal(out$adduct_tier[[2L]], 1L)
 })
