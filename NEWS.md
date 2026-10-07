@@ -149,6 +149,18 @@
 ## Fixes
 
 - Brought `feature_mz` and `feature_rt` back into the final results tables
+- Fixed `get_compounds_xrefs()` aborting with "none of the supplied props were
+  found in the Bioregistry" against the current Bioregistry bulk JSON. Upstream
+  renamed the per-entry Wikidata property mapping from the `wikidata` key to
+  `wikidata.property` in
+  [bioregistry#2121](https://github.com/biopragmatics/bioregistry/pull/2121)
+  (merged 2026-09-28), where metaregistry prefixes were renamed to dotted names
+  (`uniprot` -> `uniprot.resource`); the registry JSON mirrors the metaregistry,
+  so the key moved with it. `get_compounds_xrefs()` now reads the new key with a
+  fallback to the old one. Preferred-prefix resolution now also consults the
+  registry `preferred_prefix` field when `banana` is absent or null. Symptoms
+  appeared as pipeline failures 24 h after
+  upstream rolled out the new JSON, since the cached xrefs are refreshed daily
 
 # tima 2.13.0
 

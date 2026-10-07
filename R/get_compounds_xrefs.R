@@ -116,15 +116,17 @@ get_compounds_xrefs <- function(
     return(.fallback_output("Failed to load Bioregistry metadata"))
   }
 
+  # Bioregistry stores the Wikidata property mapping under the
+  # "wikidata.property" key, with the property ID in its "prefix" field.
   matched <- Filter(
     Negate(is.null),
     lapply(
       X = bioregistry_json,
       FUN = function(entry) {
-        wd <- entry[["wikidata"]]
+        wd <- entry[["wikidata.property"]] %||% entry[["wikidata"]]
         if (is.list(wd)) {
-          p <- wd[["prefix"]]
-          if (!is.null(p) && p %in% props) {
+          p <- wd[["prefix"]] %||% wd[["property"]]
+          if (length(p) == 1L && !is.null(p) && p %in% props) {
             return(list(property = p))
           }
         }
@@ -132,7 +134,6 @@ get_compounds_xrefs <- function(
       }
     )
   )
-
   if (length(matched) == 0L) {
     cli::cli_abort(
       "none of the supplied props were found in the Bioregistry",
@@ -159,7 +160,7 @@ get_compounds_xrefs <- function(
     }
 
     data <- httr2::resp_body_json(resp)
-    preferred <- data[["banana"]]
+    preferred <- data[["banana"]] %||% data[["preferred_prefix"]]
     rlang::`%||%`(preferred, entry_key)
   }
 
