@@ -34,12 +34,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push by digest (amd64)
+      - name: Build and push by digest
         id: build
         uses: docker/build-push-action@v7
         with:
           context: .
           file: inst/Dockerfile
+          build-args: |
+            GIT_COMMIT=${{ github.sha }}
           platforms: linux/amd64
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache-amd64
@@ -81,12 +83,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push by digest (arm64)
+      - name: Build and push by digest
         id: build
         uses: docker/build-push-action@v7
         with:
           context: .
           file: inst/Dockerfile
+          build-args: |
+            GIT_COMMIT=${{ github.sha }}
           platforms: linux/arm64
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache-arm64
