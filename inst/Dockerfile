@@ -15,9 +15,15 @@ ENV R_LIBS_USER=/home/tima-user/Library/Frameworks/R.framework/Resources/site-li
 USER tima-user
 WORKDIR /home/tima-user
 
-# Install R dependencies
-RUN Rscript -e "install.packages('pak')" && \
-    Rscript -e "options(timeout = 30); pak::pak(pkg = 'taxonomicallyinformedannotation/tima', upgrade = TRUE, ask = FALSE)" && \
+# Base dependency installation (cached across builds)
+RUN Rscript -e "install.packages('pak')"
+
+# Invalidate cache below when a new Git commit is pushed
+ARG GIT_COMMIT=unknown
+ENV GIT_COMMIT=${GIT_COMMIT}
+
+# Install latest R package and pipeline setup (always executed fresh for new commits)
+RUN Rscript -e "options(timeout = 30); pak::pak(pkg = 'taxonomicallyinformedannotation/tima', upgrade = TRUE, ask = FALSE)" && \
     Rscript -e "tima::install_tima()"
 
 # Expose the necessary ports for Shiny
