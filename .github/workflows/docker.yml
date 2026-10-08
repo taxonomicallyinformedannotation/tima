@@ -36,7 +36,7 @@ jobs:
 
       - name: Build and push by digest (amd64)
         id: build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: inst/Dockerfile
@@ -83,7 +83,7 @@ jobs:
 
       - name: Build and push by digest (arm64)
         id: build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: inst/Dockerfile
