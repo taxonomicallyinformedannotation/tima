@@ -18,12 +18,12 @@ WORKDIR /home/tima-user
 # Base dependency installation (cached across builds)
 RUN Rscript -e "install.packages('pak')"
 
-# Invalidate cache below when a new Git commit is pushed
+# Invalidate layer cache when a new Git commit is pushed
 ARG GIT_COMMIT=unknown
 ENV GIT_COMMIT=${GIT_COMMIT}
 
-# Install latest R package and pipeline setup (always executed fresh for new commits)
-RUN Rscript -e "options(timeout = 30); pak::pak(pkg = 'taxonomicallyinformedannotation/tima', upgrade = TRUE, ask = FALSE)" && \
+# Clean pak cache and force pull latest R package from GitHub @main branch
+RUN Rscript -e "pak::cache_clean(); options(timeout = 30); pak::pkg_install('taxonomicallyinformedannotation/tima@main', ask = FALSE)" && \
     Rscript -e "tima::install_tima()"
 
 # Expose the necessary ports for Shiny
