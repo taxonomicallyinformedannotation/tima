@@ -421,19 +421,21 @@ test_that("threshold keeps candidates whose similarity equals it", {
   # Library 1 is identical to the query (similarity 1); library 2 shares no
   # peaks with it (similarity 0).
   two_lib <- list(sp_acetic, sp_propane)
-  call_th <- function(th) calculate_entropy_and_similarity(
-    lib_ids = 1:2,
-    lib_precursors = c(61, 61),
-    lib_spectra = two_lib,
-    query_ids = 1L,
-    query_precursors = 61,
-    query_spectra = list(sp_acetic),
-    method = "cosine",
-    dalton = 0.01,
-    ppm = 10,
-    threshold = th,
-    approx = TRUE
-  )
+  call_th <- function(th) {
+    calculate_entropy_and_similarity(
+      lib_ids = 1:2,
+      lib_precursors = c(61, 61),
+      lib_spectra = two_lib,
+      query_ids = 1L,
+      query_precursors = 61,
+      query_spectra = list(sp_acetic),
+      method = "cosine",
+      dalton = 0.01,
+      ppm = 10,
+      threshold = th,
+      approx = TRUE
+    )
+  }
 
   # threshold = 0 keeps the zero-similarity candidate (>= is inclusive).
   at_zero <- call_th(0)
@@ -476,8 +478,14 @@ test_that("below-threshold candidates carry no forward/reverse scores", {
   expect_equal(one_row$candidate_score_similarity_forward[[1L]], 1)
   expect_equal(one_row$candidate_score_similarity_reverse[[1L]], 1)
   # Peak counts come from the matched-peak counter, not from the score.
-  expect_equal(out$candidate_count_similarity_peaks_matched[out$target_id == 1L], 2L)
-  expect_equal(out$candidate_count_similarity_peaks_matched[out$target_id == 2L], 0L)
+  expect_equal(
+    out$candidate_count_similarity_peaks_matched[out$target_id == 1L],
+    2L
+  )
+  expect_equal(
+    out$candidate_count_similarity_peaks_matched[out$target_id == 2L],
+    0L
+  )
 })
 
 test_that("a threshold nothing reaches returns an empty table", {

@@ -122,7 +122,11 @@ test_that("transform_score_sirius_csi scale controls the steepness", {
 
   # K shifts the midpoint: with K = 50 the midpoint is at -50, so -40 (and
   # -60) sit one and a half scales above and below it.
-  expect_equal(transform_score_sirius_csi(-50, K = 50, scale = 20), 0.5, tolerance = 1e-9)
+  expect_equal(
+    transform_score_sirius_csi(-50, K = 50, scale = 20),
+    0.5,
+    tolerance = 1e-9
+  )
   expect_equal(
     transform_score_sirius_csi(-30, K = 50, scale = 20),
     1 / (1 + exp(-1)),

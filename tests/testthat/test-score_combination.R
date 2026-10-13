@@ -235,7 +235,10 @@ test_that("expand_combined_scores_for_filtering tolerates a missing score_final"
     score_weighted_chemo = c(0.5, 0.7),
     stringsAsFactors = FALSE
   )
-  combined_no_final <- .bio_narrow()[c(1L), c("feature_id", "candidate_structure_inchikey_connectivity_layer")]
+  combined_no_final <- .bio_narrow()[
+    c(1L),
+    c("feature_id", "candidate_structure_inchikey_connectivity_layer")
+  ]
 
   out <- as.data.frame(expand_combined_scores_for_filtering(
     combined_no_final,

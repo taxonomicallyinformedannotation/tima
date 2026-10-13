@@ -240,7 +240,9 @@ test_that("dist_get reads the exact packed-matrix position", {
   expect_equal(dist_get(d, 2, 4), 5)
   expect_equal(dist_get(d, 3, 4), 6)
   # Every diagonal entry is 0, never a matrix read.
-  for (i in 1:4) expect_equal(dist_get(d, i, i), 0)
+  for (i in 1:4) {
+    expect_equal(dist_get(d, i, i), 0)
+  }
 })
 
 test_that("dist_get treats the boundary index as in range", {
@@ -278,11 +280,14 @@ test_that("dist_groups labels within pairs with the shared group name", {
 
   res <- as.data.frame(dist_groups(d, c("A", "A", "B")))
   # combn order is (1,2), (1,3), (2,3): only (1,2) shares a group.
-  expect_equal(as.character(res$Label), c(
-    "Within A",
-    "Between A and B",
-    "Between A and B"
-  ))
+  expect_equal(
+    as.character(res$Label),
+    c(
+      "Within A",
+      "Between A and B",
+      "Between A and B"
+    )
+  )
 })
 
 test_that("dist_groups orders between-group labels by factor level", {
@@ -291,11 +296,14 @@ test_that("dist_groups orders between-group labels by factor level", {
   x <- matrix(c(0, 1, 10, 1, 0, 11, 10, 11, 0), nrow = 3)
   res <- as.data.frame(dist_groups(as.dist(x), c("B", "A", "C")))
 
-  expect_equal(as.character(res$Label), c(
-    "Between A and B",
-    "Between B and C",
-    "Between A and C"
-  ))
+  expect_equal(
+    as.character(res$Label),
+    c(
+      "Between A and B",
+      "Between B and C",
+      "Between A and C"
+    )
+  )
   # Group1/Group2 stay in observation order, they are not sorted.
   expect_equal(as.character(res$Group1), c("B", "B", "A"))
   expect_equal(as.character(res$Group2), c("A", "C", "C"))

@@ -116,7 +116,13 @@ test_that("implied_neutral_mass subtracts the 13C isotope shift per n_iso", {
   )
   # ... and it is removed *before* dividing by n_mer.
   expect_equal(
-    implied_neutral_mass(190.0 + EVIDENCE_ISOTOPE_SHIFT_DA, 2L, 2L, 2.01456, n_iso = 1L),
+    implied_neutral_mass(
+      190.0 + EVIDENCE_ISOTOPE_SHIFT_DA,
+      2L,
+      2L,
+      2.01456,
+      n_iso = 1L
+    ),
     188.99272,
     tolerance = 1e-9
   )
@@ -188,7 +194,10 @@ test_that(".nearest_exact_mass_ppm returns Inf when no library mass exists", {
 test_that(".nearest_exact_mass_index indexes the closest library mass", {
   lib <- c(100.0, 200.0, 500.0)
 
-  expect_equal(.nearest_exact_mass_index(c(100.0, 150.0, 400.0), lib), c(1L, 1L, 3L))
+  expect_equal(
+    .nearest_exact_mass_index(c(100.0, 150.0, 400.0), lib),
+    c(1L, 1L, 3L)
+  )
   # Ties resolve to the lower index.
   expect_equal(.nearest_exact_mass_index(150.0, lib), 1L)
   # Out-of-range queries clamp to the first / last library entry.
@@ -342,7 +351,10 @@ test_that(".ppm_cluster_sorted handles degenerate inputs", {
 }
 
 test_that("annotate_adduct_universe_metadata assigns adduct tiers in positive mode", {
-  out <- as.data.frame(annotate_adduct_universe_metadata(.tier_universe(), "pos"))
+  out <- as.data.frame(annotate_adduct_universe_metadata(
+    .tier_universe(),
+    "pos"
+  ))
   rownames(out) <- NULL
 
   # tier 0: the baseline adduct only
@@ -381,7 +393,10 @@ test_that("annotate_adduct_universe_metadata assigns adduct tiers in positive mo
 })
 
 test_that("annotate_adduct_universe_metadata is polarity dependent", {
-  out <- as.data.frame(annotate_adduct_universe_metadata(.tier_universe(), "neg"))
+  out <- as.data.frame(annotate_adduct_universe_metadata(
+    .tier_universe(),
+    "neg"
+  ))
   rownames(out) <- NULL
 
   # Na is a core carrier in positive mode but exotic in negative mode.
@@ -404,7 +419,10 @@ test_that("annotate_adduct_universe_metadata is polarity dependent", {
 })
 
 test_that("annotate_adduct_universe_metadata maps tiers to support requirements", {
-  out <- as.data.frame(annotate_adduct_universe_metadata(.tier_universe(), "pos"))
+  out <- as.data.frame(annotate_adduct_universe_metadata(
+    .tier_universe(),
+    "pos"
+  ))
   rownames(out) <- NULL
 
   # Core adducts (tier 0/1) need no peer support and are not "core support".
@@ -416,9 +434,18 @@ test_that("annotate_adduct_universe_metadata maps tiers to support requirements"
   expect_true(all(out$is_core_adduct[out$adduct_tier <= 1L]))
 
   # Tiers 2/3/4 need 2/3/4 supporting features respectively.
-  expect_equal(out$min_cluster_support[out$adduct_tier == 2L], rep(2L, sum(out$adduct_tier == 2L)))
-  expect_equal(out$min_cluster_support[out$adduct_tier == 3L], rep(3L, sum(out$adduct_tier == 3L)))
-  expect_equal(out$min_cluster_support[out$adduct_tier == 4L], rep(4L, sum(out$adduct_tier == 4L)))
+  expect_equal(
+    out$min_cluster_support[out$adduct_tier == 2L],
+    rep(2L, sum(out$adduct_tier == 2L))
+  )
+  expect_equal(
+    out$min_cluster_support[out$adduct_tier == 3L],
+    rep(3L, sum(out$adduct_tier == 3L))
+  )
+  expect_equal(
+    out$min_cluster_support[out$adduct_tier == 4L],
+    rep(4L, sum(out$adduct_tier == 4L))
+  )
   expect_true(all(out$requires_core_support[out$adduct_tier >= 2L]))
   expect_false(any(out$is_core_adduct[out$adduct_tier >= 2L]))
 
@@ -430,7 +457,10 @@ test_that("annotate_adduct_universe_metadata maps tiers to support requirements"
 })
 
 test_that("annotate_adduct_universe_metadata derives term counts and flags", {
-  out <- as.data.frame(annotate_adduct_universe_metadata(.tier_universe(), "pos"))
+  out <- as.data.frame(annotate_adduct_universe_metadata(
+    .tier_universe(),
+    "pos"
+  ))
   rownames(out) <- NULL
   u <- as.data.frame(.tier_universe())
 
@@ -449,7 +479,10 @@ test_that("annotate_adduct_universe_metadata derives term counts and flags", {
 })
 
 test_that("annotate_adduct_universe_metadata yields NA tiers for an unknown polarity", {
-  out <- as.data.frame(annotate_adduct_universe_metadata(.tier_universe(), "other"))
+  out <- as.data.frame(annotate_adduct_universe_metadata(
+    .tier_universe(),
+    "other"
+  ))
   expect_true(all(is.na(out$is_baseline)))
   expect_true(all(is.na(out$adduct_tier)))
 })

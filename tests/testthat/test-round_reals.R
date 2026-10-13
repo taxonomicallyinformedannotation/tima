@@ -53,7 +53,10 @@ test_that("find_matching_columns de-duplicates overlapping patterns", {
     c("a_mass", "b_mass")
   )
   expect_equal(
-    find_matching_columns(c("a_mass", "b_mass"), c("a_mass", "a_mass", "a_mass")),
+    find_matching_columns(
+      c("a_mass", "b_mass"),
+      c("a_mass", "a_mass", "a_mass")
+    ),
     "a_mass"
   )
   expect_equal(find_matching_columns(c("x", "y"), character(0)), NULL)

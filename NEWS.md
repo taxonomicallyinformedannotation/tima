@@ -159,8 +159,8 @@
   so the key moved with it. `get_compounds_xrefs()` now reads the new key with a
   fallback to the old one. Preferred-prefix resolution now also consults the
   registry `preferred_prefix` field when `banana` is absent or null. Symptoms
-  appeared as pipeline failures 24 h after
-  upstream rolled out the new JSON, since the cached xrefs are refreshed daily
+  appeared as pipeline failures 24 h after upstream rolled out the new JSON,
+  since the cached xrefs are refreshed daily
 
 # tima 2.13.0
 

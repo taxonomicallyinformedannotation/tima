@@ -113,15 +113,18 @@ test_that("entropy backend is called with the m/z window, noise and cleaning set
     max_peak_num = 2,
     clean_spectra = TRUE
   )
-  expect_false(isTRUE(all.equal(capped, calculate_similarity(
-    "entropy",
-    TEST_QUERY,
-    TEST_TARGET,
-    250,
-    300,
-    dalton = 0.01,
-    ppm = 10
-  ))))
+  expect_false(isTRUE(all.equal(
+    capped,
+    calculate_similarity(
+      "entropy",
+      TEST_QUERY,
+      TEST_TARGET,
+      250,
+      300,
+      dalton = 0.01,
+      ppm = 10
+    )
+  )))
 
   # clean_spectra = TRUE is what makes an unsorted/duplicated query usable:
   # with cleaning off the same matrix scores differently (and badly).

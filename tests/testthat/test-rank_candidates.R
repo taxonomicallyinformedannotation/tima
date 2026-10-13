@@ -5,7 +5,13 @@ library(testthat)
 .rank_input <- function() {
   data.frame(
     feature_id = c("F1", "F1", "F1", "F2", "F2"),
-    candidate_structure_inchikey_connectivity_layer = c("A", "B", "A", "C", "D"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "A",
+      "B",
+      "A",
+      "C",
+      "D"
+    ),
     score_weighted_chemo = c(0.9, 0.5, 0.9, 0.2, 0.7),
     candidate_score_pseudo_initial = c(0.1, 0.9, 0.9, 0.4, 0.4),
     stringsAsFactors = FALSE
@@ -65,7 +71,10 @@ test_that("score_weighted_chemo wins over score_final when both exist", {
 })
 
 test_that("rank_candidates gives NA ranks and warns without any score column", {
-  d <- .rank_input()[, c("feature_id", "candidate_structure_inchikey_connectivity_layer")]
+  d <- .rank_input()[, c(
+    "feature_id",
+    "candidate_structure_inchikey_connectivity_layer"
+  )]
 
   expect_warning(out <- rank_candidates(d), "Neither score_weighted_chemo")
   expect_true(all(is.na(out$rank_final)))
@@ -137,7 +146,13 @@ test_that("rank_candidates de-duplicates candidate rows per feature", {
   out <- rank_candidates(d)
 
   expect_equal(nrow(out), 4L)
-  expect_equal(sum(out$feature_id == "F1" & out$candidate_structure_inchikey_connectivity_layer == "A"), 1L)
+  expect_equal(
+    sum(
+      out$feature_id == "F1" &
+        out$candidate_structure_inchikey_connectivity_layer == "A"
+    ),
+    1L
+  )
   # Columns other than the ranking key are preserved.
   expect_true("score_weighted_chemo" %in% names(out))
   expect_true("candidate_score_pseudo_initial" %in% names(out))
