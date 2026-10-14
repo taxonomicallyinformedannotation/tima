@@ -10,7 +10,7 @@ prepare_libraries_sop_bigg(
     "10.1038/nbt.3956"), `Saccharomyces cerevisiae` = c(model_id = "iMM904", doi =
     "10.1186/1752-0509-3-37"), `Homo sapiens` = c(model_id = "Recon3D", doi =
     "10.1038/nbt.4072")),
-  bigg_url = "http://bigg.ucsd.edu/static/models/",
+  bigg_url = "https://bigg.ucsd.edu/static/models/",
   output = get_params(step =
     "prepare_libraries_sop_bigg")$files$libraries$sop$prepared$bigg
 )

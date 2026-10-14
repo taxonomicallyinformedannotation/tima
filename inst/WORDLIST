@@ -132,7 +132,6 @@ RDKit
 RTs
 Rainer
 Redelings
-Retryable
 Riederer
 SDF
 SME
@@ -265,6 +264,7 @@ memoization
 mer
 metabo
 metabolomics
+metaregistry
 mgf
 modelled
 monocharged
@@ -309,7 +309,6 @@ renv
 reranked
 reranking
 reticulate
-retryable
 rmarkdown
 rmzTabM
 rotl
