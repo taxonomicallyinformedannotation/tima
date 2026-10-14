@@ -202,7 +202,7 @@
 - Added a new validation helper, see
   <https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html>
 
-- Added [BiGG](http://bigg.ucsd.edu/) as SOP library
+- Added [BiGG](https://bigg.ucsd.edu/) as SOP library
 
 - Added basic isotopologues handling
 
@@ -440,7 +440,7 @@
 - [renv](https://rstudio.github.io/renv/index.html) removal
 - Performance improvement by replacing the
   [tidyverse](https://www.tidyverse.org) by the
-  [fastverse](https://fastverse.github.io/fastverse) (in progress)
+  [fastverse](https://fastverse.org/) (in progress)
 - Reduced warnings (CRAN and jscpd)
 
 # tima 2.8.1
@@ -453,7 +453,7 @@
   <https://r-pkgs.org/misc.html#other-directories>)
 - Performance improvement by replacing the
   [tidyverse](https://www.tidyverse.org) by the
-  [fastverse](https://fastverse.github.io/fastverse) (in progress)
+  [fastverse](https://fastverse.org/) (in progress)
 - Replaced `extdata` loading
 
 # tima 2.8.0
