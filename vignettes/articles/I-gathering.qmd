@@ -234,7 +234,7 @@ fetch it and re-run needed steps accordingly.
 ##### BiGG
 
 By default, we also complement LOTUS pairs with the ones coming from
-[BiGG](http://bigg.ucsd.edu/).
+[BiGG](https://bigg.ucsd.edu/).
 
 ```{r}
 #| label: prepare-bigg-1

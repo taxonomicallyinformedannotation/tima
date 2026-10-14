@@ -509,7 +509,7 @@
   ),
   "knapsack" = list(
     name = "KNApSAcK",
-    uri = "http://www.knapsackfamily.com/knapsack_core/information.php?word=",
+    uri = "https://www.knapsackfamily.com/knapsack_core/information.php?word=",
     prefix = "C"
   ),
   drugbank = list(

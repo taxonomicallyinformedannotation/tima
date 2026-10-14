@@ -57,7 +57,7 @@ prepare_libraries_sop_bigg <- function(
       "doi" = "10.1038/nbt.4072"
     )
   ),
-  bigg_url = "http://bigg.ucsd.edu/static/models/",
+  bigg_url = "https://bigg.ucsd.edu/static/models/",
   output = get_params(
     step = "prepare_libraries_sop_bigg"
   )$files$libraries$sop$prepared$bigg
