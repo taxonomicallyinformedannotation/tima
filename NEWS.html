@@ -792,7 +792,7 @@ ul.task-list li input[type="checkbox"] {
 <li><p><code>annotate_spectra()</code> now reports forward and reverse dot product scores (<code>candidate_score_similarity_forward</code>, <code>candidate_score_similarity_reverse</code>) alongside the main similarity score. Forward considers only query peaks (normalized by all query and matched library intensities); reverse considers only library peaks (normalized by matched query and all library intensities). Both are computed in C for consistency with the GNPS scoring engine.</p></li>
 <li><p>Added support for additional NPClassifier and ClassyFire taxonomy caches in <code>prepare_libraries_sop_merged()</code>, allowing structures missing taxonomy in the merged libraries to be enriched from external cache files. Caches grow over time as library entries are written back.</p></li>
 <li><p>Added a new validation helper, see <a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html" class="uri">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html</a></p></li>
-<li><p>Added <a href="http://bigg.ucsd.edu/">BiGG</a> as SOP library</p></li>
+<li><p>Added <a href="https://bigg.ucsd.edu/">BiGG</a> as SOP library</p></li>
 <li><p>Added basic isotopologues handling</p></li>
 <li><p>Added external identifiers to the final results (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/142">#142</a>)</p></li>
 <li><p>Added NORMAN SUSPECT LIST DATA in silico spectral libraries</p></li>
@@ -1047,7 +1047,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Fixed not classified taxa</li>
 <li>GitHub Actions improvement</li>
 <li><a href="https://rstudio.github.io/renv/index.html">renv</a> removal</li>
-<li>Performance improvement by replacing the <a href="https://www.tidyverse.org">tidyverse</a> by the <a href="https://fastverse.github.io/fastverse">fastverse</a> (in progress)</li>
+<li>Performance improvement by replacing the <a href="https://www.tidyverse.org">tidyverse</a> by the <a href="https://fastverse.org/">fastverse</a> (in progress)</li>
 <li>Reduced warnings (CRAN and jscpd)</li>
 </ul>
 </section>
@@ -1059,7 +1059,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Dependencies update</li>
 <li>Minor fixes</li>
 <li>Moved <code>/params</code> and <code>paths.yaml</code> to <code>/inst</code> as more standard. (see <a href="https://r-pkgs.org/misc.html#other-directories" class="uri">https://r-pkgs.org/misc.html#other-directories</a>)</li>
-<li>Performance improvement by replacing the <a href="https://www.tidyverse.org">tidyverse</a> by the <a href="https://fastverse.github.io/fastverse">fastverse</a> (in progress)</li>
+<li>Performance improvement by replacing the <a href="https://www.tidyverse.org">tidyverse</a> by the <a href="https://fastverse.org/">fastverse</a> (in progress)</li>
 <li>Replaced <code>extdata</code> loading</li>
 </ul>
 </section>
