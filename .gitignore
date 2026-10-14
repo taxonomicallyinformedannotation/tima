@@ -33,3 +33,5 @@ README_files/
 README.html
 
 *tima.log
+tima.Rcheck
+*.tar.gz
