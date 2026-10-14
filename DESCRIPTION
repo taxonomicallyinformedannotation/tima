@@ -1,7 +1,6 @@
 Package: tima
 Title: Taxonomically Informed Metabolite Annotation
 Version: 2.13.0.9000
-Author: Adriano Rutz
 Authors@R: c(
     person(
         given = "Adriano",
@@ -27,7 +26,7 @@ Description: TIMA provides a reproducible workflow for taxonomically informed
     metabolomics practitioners who need configurable, scriptable, and
     documented annotation pipelines for research and production settings.
 License: AGPL (>= 3)
-URL: https://github.com/taxonomicallyinformedannotation/tima, https://taxonomicallyinformedannotation.github.io/tima-shinylive, https://taxonomicallyinformedannotation.github.io/tima
+URL: https://github.com/taxonomicallyinformedannotation/tima, https://taxonomicallyinformedannotation.github.io/tima-shinylive/, https://taxonomicallyinformedannotation.github.io/tima/
 BugReports: https://github.com/taxonomicallyinformedannotation/tima/issues
 Depends:
     R (>= 4.4.0)
@@ -156,7 +155,6 @@ Collate:
     'create_edges_spectra.R'
     'decorate_bio.R'
     'decorate_chemo.R'
-    'evidence_validation_utils.R'
     'export_spectra_rds.R'
     'weights_utils.R'
     'weight_chemo.R'
