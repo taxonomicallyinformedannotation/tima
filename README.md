@@ -46,7 +46,7 @@ Here is what you *minimally* need:
 ### Optional Additions
 
 - **Structure-organism pairs library** - We provide
-  [**LOTUS**](https://lotusnprod.github.io/lotus-manuscript/) (\>650k pairs) as
+  [**LOTUS**](https://lotus.nprod.net/lotus-manuscript/) (\>650k pairs) as
   default
 - **External annotations** - SIRIUS (v5/v6), GNPS-FBMN results
 - **Custom spectral libraries** - For in-house compound matching
@@ -156,7 +156,7 @@ adafede/tima-r
 ```
 
 Adapt the memory limit as needed. The app will be available at
-<http://localhost:3838/>. Results will be written to `.tima/data` (your mounted
+<http://localhost:3838/tima>. Results will be written to `.tima/data` (your mounted
 folder).
 
 ## Main Citations
