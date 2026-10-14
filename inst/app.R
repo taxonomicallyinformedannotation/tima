@@ -20,7 +20,7 @@ source(file.path(.app_dir, "app_server.R"))
 .log_info <- getFromNamespace("log_info", "tima")
 .copy_backbone <- getFromNamespace("copy_backbone", "tima")
 
-url <- "<http://127.0.0.1:3838>"
+url <- "http://127.0.0.1:3838"
 if (file.exists("/.dockerenv")) {
   host <- "0.0.0.0"
 } else {
