@@ -78,7 +78,7 @@ Suggests:
     visNetwork (>= 2.1.4),
     withr (>= 3.0.2)
 SystemRequirements:
-    python (>= 3.12, < 3.15)
+    python (>= 3.12, < 3.16)
 VignetteBuilder:
     quarto
 ByteCompile: TRUE
