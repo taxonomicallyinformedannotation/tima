@@ -38,3 +38,15 @@
 ^vignettes/articles/*_files$
 ^vignettes/articles/\.quarto$
 _\.new\.png$
+^[.]kb/
+^[.]claude[.]md$
+^[.]cursor[.]md$
+^[.]agent[.]md$
+^AGENTS[.]md$
+^CLAUDE[.]md$
+^GEMINI[.]md$
+^[.]agentignore$
+^[.]mcp[.]json$
+^[.]obsidian[.]md$
+^graphify-out/
+^[.]agent-scratch
