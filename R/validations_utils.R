@@ -22,6 +22,7 @@ NULL
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' \dontrun{
@@ -88,6 +89,7 @@ validate_choice <- function(
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #' @keywords internal
+#' @noRd
 validate_file_exists <- function(
   path,
   file_type = "file",
@@ -197,6 +199,7 @@ validate_file_exists <- function(
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #' @keywords internal
+#' @noRd
 validate_dataframe_structure <- function(
   df,
   required_cols = NULL,
@@ -318,6 +321,7 @@ validate_dataframe_structure <- function(
 #'
 #' @return Invisible TRUE if valid, stops/warns with messages otherwise
 #' @keywords internal
+#' @noRd
 validate_numeric_range <- function(
   value,
   min_value = -Inf,
@@ -413,6 +417,7 @@ validate_numeric_range <- function(
 #'
 #' @return Invisible TRUE if valid, stops/warns with messages otherwise
 #' @keywords internal
+#' @noRd
 validate_tolerance_ppm <- function(
   tolerance_ppm,
   param_name = "tolerance_ppm",

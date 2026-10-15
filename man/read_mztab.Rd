@@ -63,6 +63,17 @@ the sole peak).  Each entry carries both \verb{TITLE=} and \verb{FEATURE_ID=} se
 to the feature identifier.}
 }
 }
+\examples{
+\dontrun{
+# Read mzTab-M file and export TIMA-compatible tables
+result <- read_mztab(
+  input = "annotations.mztab",
+  output_features = "features.tsv",
+  output_spectra = "spectra.mgf",
+  output_metadata = "metadata.tsv"
+)
+}
+}
 \seealso{
 Other preparation:
 \code{\link[=prepare_annotations_gnps]{prepare_annotations_gnps()}},

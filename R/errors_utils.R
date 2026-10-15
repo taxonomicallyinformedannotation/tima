@@ -18,6 +18,7 @@ NULL
 #'
 #' @return Character string of closest match, or NULL if no close match
 #' @keywords internal
+#' @noRd
 .fuzzy_match <- function(value, valid_values, max_distance = 5L) {
   if (!is.character(value) || !is.character(valid_values)) {
     return(NULL)
@@ -56,6 +57,7 @@ NULL
 #'
 #' @return Formatted error message string
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' \dontrun{

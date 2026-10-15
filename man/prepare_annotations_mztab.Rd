@@ -54,6 +54,15 @@ via the \code{SME_ID_REFS} column when an SML section is present.
 When no \code{input} is provided (or the file does not exist) an empty annotation
 table is written and the function returns silently.
 }
+\examples{
+\dontrun{
+# Prepare annotations from an mzTab-M file
+prepare_annotations_mztab(
+  input = "annotations.mztab",
+  output = "prepared_annotations.tsv"
+)
+}
+}
 \seealso{
 Other preparation:
 \code{\link[=prepare_annotations_gnps]{prepare_annotations_gnps()}},

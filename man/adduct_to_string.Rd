@@ -50,3 +50,23 @@ neutral masses than their outside-multimer counterparts.
 \item |z| omitted when |z| == 1
 }
 }
+\examples{
+\dontrun{
+# Basic adduct string
+adduct_to_string(
+  n_mer = 1L,
+  carriers = c(H = 1L),
+  clusters = integer(),
+  losses = integer(),
+  z = 1L
+)
+# Multimeric adduct
+adduct_to_string(
+  n_mer = 2L,
+  carriers = c(H = 1L),
+  clusters = c(NaCl = 1L),
+  losses = integer(),
+  z = 1L
+)
+}
+}

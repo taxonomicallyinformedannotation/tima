@@ -55,7 +55,7 @@ Here is what you *minimally* need:
 - **Structure-organism pairs library** - We provide
   [**LOTUS**](https://lotus.nprod.net/lotus-manuscript/) (>650k pairs) as
   default
-- **External annotations** - SIRIUS (v5/v6), GNPS-FBMN results
+- **External annotations** - 'SIRIUS' (v5/v6), 'GNPS-FBMN' results
 - **Custom spectral libraries** - For in-house compound matching
 
 **Tip**: All column names and file paths are customizable through the Shiny app

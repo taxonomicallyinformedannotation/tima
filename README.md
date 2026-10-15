@@ -48,7 +48,7 @@ Here is what you *minimally* need:
 - **Structure-organism pairs library** - We provide
   [**LOTUS**](https://lotus.nprod.net/lotus-manuscript/) (\>650k pairs) as
   default
-- **External annotations** - SIRIUS (v5/v6), GNPS-FBMN results
+- **External annotations** - 'SIRIUS' (v5/v6), 'GNPS-FBMN' results
 - **Custom spectral libraries** - For in-house compound matching
 
 **Tip**: All column names and file paths are customizable through the Shiny app
@@ -76,7 +76,7 @@ tima::install_tima()
 ```
 
 Normally, everything you need should then be installed (as tested in
-[here](https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/external-use.yaml)).
+[here](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/external-use.yaml)).
 If for some reason, some packages were not installed, try to install them
 manually. To avoid such issues, we offer a containerized version (see
 [Docker](#docker)).
@@ -225,19 +225,27 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
 
 ## Additional software credits
 
+```
+A large number of files (1081 in total) have been discovered.
+It may take renv a long time to scan these files for dependencies.
+Consider using .renvignore to ignore irrelevant files.
+See `]8;;x-r-help:renv::dependencies?renv::dependencies]8;;` for more information.
+Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.
+```
+
   | Package         | Version     | Citation                                                              |
-  | :-------------- | :---------- | :-------------------------------------------------------------------- |
+  | :---            | :---        | :---                                                                  |
   | archive         | 1.1.14      | Hester and Csárdi (2026)                                              |
   | base            | 4.6.1       | R Core Team (2026a)                                                   |
   | BiocManager     | 1.30.27     | Morgan and Ramos (2025)                                               |
   | BiocVersion     | 3.23.1      | Morgan (2025)                                                         |
-  | curl            | 7.1.0       | Ooms (2026)                                                           |
+  | curl            | 8.1.0       | Ooms (2026)                                                           |
   | docopt          | 0.7.2       | <span class="nocase">de Jonge</span> (2025)                           |
   | fastmatch       | 1.1.8       | Urbanek (2026)                                                        |
   | fs              | 2.1.0       | Hester, Wickham, et al. (2026)                                        |
   | httr2           | 1.3.0       | Wickham (2026)                                                        |
-  | igraph          | 2.3.3       | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2026) |
-  | knitr           | 1.51        | Xie (2014); Xie (2015); Xie (2025)                                    |
+  | igraph          | 2.3.4       | Csárdi and Nepusz (2006); Antonov et al. (2023); Csárdi et al. (2026) |
+  | knitr           | 1.52        | Xie (2014); Xie (2015); (**knitr2026?**)                              |
   | lgr             | 0.5.2       | Fleck (2026)                                                          |
   | lifecycle       | 1.0.5       | Henry and Wickham (2026)                                              |
   | MetaboCoreUtils | 1.20.1      | Rainer et al. (2022a)                                                 |
@@ -247,8 +255,8 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
   | msentropy       | 0.1.4       | Li (2023)                                                             |
   | pkgload         | 1.5.3       | Wickham et al. (2026)                                                 |
   | R.utils         | 2.13.0      | Bengtsson (2025)                                                      |
-  | reticulate      | 1.46.0      | Ushey et al. (2026)                                                   |
-  | rmarkdown       | 2.31        | Xie et al. (2018); Xie et al. (2020); Allaire et al. (2026)           |
+  | reticulate      | 1.47.0      | Ushey et al. (2026)                                                   |
+  | rmarkdown       | 2.32        | Xie et al. (2018); Xie et al. (2020); Allaire et al. (2026)           |
   | rotl            | 3.1.1       | Michonneau et al. (2016); OpenTreeOfLife et al. (2019)                |
   | shiny           | 1.14.0      | Chang et al. (2026)                                                   |
   | shinyhelper     | 0.3.2       | Mason-Thom (2019)                                                     |
@@ -619,13 +627,6 @@ and Roger D. Peng. Chapman; Hall/CRC.
 
 Xie, Yihui. 2015. *Dynamic Documents with R and Knitr*. 2nd ed. Chapman;
 Hall/CRC. <https://yihui.org/knitr/>.
-
-</div>
-
-<div id="ref-knitr2025" class="csl-entry">
-
-Xie, Yihui. 2025. *<span class="nocase">knitr</span>: A General-Purpose
-Package for Dynamic Report Generation in R*. <https://yihui.org/knitr/>.
 
 </div>
 

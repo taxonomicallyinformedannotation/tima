@@ -42,3 +42,16 @@ and component membership.
 Public wrapper around the internal community-detection logic
 used to build components from edge lists.
 }
+\examples{
+\dontrun{
+# Create an edge data frame
+edges <- data.frame(
+  feature_source = c("f1", "f1", "f2"),
+  feature_target = c("f2", "f3", "f3"),
+  weight = c(0.8, 0.6, 0.9),
+  stringsAsFactors = FALSE
+)
+result <- build_components_from_edges(edges)
+result$components_table
+}
+}

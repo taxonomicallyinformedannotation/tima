@@ -410,6 +410,19 @@
 #'     and component membership.
 #'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Create an edge data frame
+#' edges <- data.frame(
+#'   feature_source = c("f1", "f1", "f2"),
+#'   feature_target = c("f2", "f3", "f3"),
+#'   weight = c(0.8, 0.6, 0.9),
+#'   stringsAsFactors = FALSE
+#' )
+#' result <- build_components_from_edges(edges)
+#' result$components_table
+#' }
 build_components_from_edges <- function(
   edges,
   name_source = "feature_source",

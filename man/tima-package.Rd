@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
 
-TIMA provides a reproducible workflow for taxonomically informed metabolite annotation from feature tables, MS/MS spectra, and optional external resources such as SIRIUS and GNPS outputs. It combines mass, spectral, taxonomic, and structural evidence into a transparent scoring framework that can be inspected step-by-step. The package targets metabolomics practitioners who need configurable, scriptable, and documented annotation pipelines for research and production settings.
+TIMA provides a reproducible workflow for taxonomically informed metabolite annotation from feature tables, MS/MS spectra, and optional external resources such as 'SIRIUS' and 'GNPS' outputs. It combines mass, spectral, taxonomic, and structural evidence into a transparent scoring framework that can be inspected step-by-step. The package targets metabolomics practitioners who need configurable, scriptable, and documented annotation pipelines for research and production settings.
 }
 \seealso{
 Useful links:

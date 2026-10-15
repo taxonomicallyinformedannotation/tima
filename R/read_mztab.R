@@ -47,6 +47,17 @@
 #'
 #' @family preparation
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Read mzTab-M file and export TIMA-compatible tables
+#' result <- read_mztab(
+#'   input = "annotations.mztab",
+#'   output_features = "features.tsv",
+#'   output_spectra = "spectra.mgf",
+#'   output_metadata = "metadata.tsv"
+#' )
+#' }
 read_mztab <- function(
   input,
   output_features,

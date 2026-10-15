@@ -39,6 +39,15 @@
 #'
 #' @family preparation
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Prepare annotations from an mzTab-M file
+#' prepare_annotations_mztab(
+#'   input = "annotations.mztab",
+#'   output = "prepared_annotations.tsv"
+#' )
+#' }
 prepare_annotations_mztab <- function(
   input = get_params(step = "prepare_annotations_mztab")$files$mztab$raw,
   output = get_params(
