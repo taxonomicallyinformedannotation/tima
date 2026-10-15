@@ -270,6 +270,10 @@ setup_virtualenv <- function(envname = "tima-env", python = NULL) {
         envname = envname,
         packages = c("rdkit", "chembl-structure-pipeline")
       )
+      ## Additional safety
+      .py_install(
+        packages = c("rdkit", "chembl-structure-pipeline")
+      )
       log_success("Dependencies installed successfully")
     },
     error = function(e) {
