@@ -50,3 +50,5 @@ _\.new\.png$
 ^[.]obsidian[.]md$
 ^graphify-out/
 ^[.]agent-scratch
+^tests/testthat/_snaps$
+^tests/testthat/_snaps/
