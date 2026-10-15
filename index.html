@@ -727,7 +727,7 @@ div.csl-indent {
 <h3 class="anchored" data-anchor-id="optional-additions">Optional Additions</h3>
 <ul>
 <li><strong>Structure-organism pairs library</strong> - We provide <a href="https://lotus.nprod.net/lotus-manuscript/"><strong>LOTUS</strong></a> (&gt;650k pairs) as default</li>
-<li><strong>External annotations</strong> - SIRIUS (v5/v6), GNPS-FBMN results</li>
+<li><strong>External annotations</strong> - ‘SIRIUS’ (v5/v6), ‘GNPS-FBMN’ results</li>
 <li><strong>Custom spectral libraries</strong> - For in-house compound matching</li>
 </ul>
 <p><strong>Tip</strong>: All column names and file paths are customizable through the Shiny app interface or YAML/CLI parameters - no need to rename your files!</p>
@@ -746,7 +746,7 @@ div.csl-indent {
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Then, you should be able to install the rest with:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">install_tima</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Normally, everything you need should then be installed (as tested in <a href="https://github.com/taxonomicallyinformedannotation/tima-r/actions/workflows/external-use.yaml">here</a>). If for some reason, some packages were not installed, try to install them manually. To avoid such issues, we offer a containerized version (see <a href="#docker">Docker</a>).</p>
+<p>Normally, everything you need should then be installed (as tested in <a href="https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/external-use.yaml">here</a>). If for some reason, some packages were not installed, try to install them manually. To avoid such issues, we offer a containerized version (see <a href="#docker">Docker</a>).</p>
 <p>Once installed, you are ready to go through our <a href="https://taxonomicallyinformedannotation.github.io/tima/articles/">documentation</a>, with the major steps detailed.</p>
 <p>In case you do not have your data ready, you can obtain some example data using:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">get_example_files</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -864,11 +864,16 @@ div.csl-indent {
 </section>
 <section id="additional-software-credits" class="level2">
 <h2 class="anchored" data-anchor-id="additional-software-credits">Additional software credits</h2>
+<pre><code>A large number of files (1081 in total) have been discovered.
+It may take renv a long time to scan these files for dependencies.
+Consider using .renvignore to ignore irrelevant files.
+See `]8;;x-r-help:renv::dependencies?renv::dependencies]8;;` for more information.
+Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.</code></pre>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 15%">
-<col style="width: 11%">
-<col style="width: 72%">
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -900,7 +905,7 @@ div.csl-indent {
 </tr>
 <tr class="odd">
 <td style="text-align: left;">curl</td>
-<td style="text-align: left;">7.1.0</td>
+<td style="text-align: left;">8.1.0</td>
 <td style="text-align: left;">Ooms (2026)</td>
 </tr>
 <tr class="even">
@@ -925,13 +930,13 @@ div.csl-indent {
 </tr>
 <tr class="even">
 <td style="text-align: left;">igraph</td>
-<td style="text-align: left;">2.3.3</td>
+<td style="text-align: left;">2.3.4</td>
 <td style="text-align: left;">Csárdi and Nepusz (2006); Antonov et al.&nbsp;(2023); Csárdi et al.&nbsp;(2026)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">knitr</td>
-<td style="text-align: left;">1.51</td>
-<td style="text-align: left;">Xie (2014); Xie (2015); Xie (2025)</td>
+<td style="text-align: left;">1.52</td>
+<td style="text-align: left;">Xie (2014); Xie (2015); (<strong>knitr2026?</strong>)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">lgr</td>
@@ -980,12 +985,12 @@ div.csl-indent {
 </tr>
 <tr class="odd">
 <td style="text-align: left;">reticulate</td>
-<td style="text-align: left;">1.46.0</td>
+<td style="text-align: left;">1.47.0</td>
 <td style="text-align: left;">Ushey et al.&nbsp;(2026)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">rmarkdown</td>
-<td style="text-align: left;">2.31</td>
+<td style="text-align: left;">2.32</td>
 <td style="text-align: left;">Xie et al.&nbsp;(2018); Xie et al.&nbsp;(2020); Allaire et al.&nbsp;(2026)</td>
 </tr>
 <tr class="odd">
@@ -1207,9 +1212,6 @@ Xie, Yihui. 2014. “<span class="nocase">knitr</span>: A Comprehensive Tool for
 </div>
 <div id="ref-knitr2015" class="csl-entry" role="listitem">
 Xie, Yihui. 2015. <em>Dynamic Documents with R and Knitr</em>. 2nd ed.&nbsp;Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" class="uri">https://yihui.org/knitr/</a>.
-</div>
-<div id="ref-knitr2025" class="csl-entry" role="listitem">
-Xie, Yihui. 2025. <em><span class="nocase">knitr</span>: A General-Purpose Package for Dynamic Report Generation in R</em>. <a href="https://yihui.org/knitr/" class="uri">https://yihui.org/knitr/</a>.
 </div>
 <div id="ref-rmarkdown2018" class="csl-entry" role="listitem">
 Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>R Markdown: The Definitive Guide</em>. Chapman; Hall/CRC. <a href="https://yihui.org/rmarkdown/" class="uri">https://yihui.org/rmarkdown/</a>.
