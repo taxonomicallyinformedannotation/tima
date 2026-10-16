@@ -15,24 +15,48 @@
     "fil_ann_raw_mzm": null,
     "fil_ann_raw_sir": null,
     "fil_fea_raw": {
-      "name": ["example_features.csv"],
-      "size": [451549],
-      "type": ["text/csv"],
-      "datapath": ["0.csv"]
+      "name": [
+        "example_features.csv"
+      ],
+      "size": [
+        451549
+      ],
+      "type": [
+        "text/csv"
+      ],
+      "datapath": [
+        "0.csv"
+      ]
     },
     "fil_met_raw": {
-      "name": ["example_metadata.tsv"],
-      "size": [267],
-      "type": ["text/tab-separated-values"],
-      "datapath": ["0.tsv"]
+      "name": [
+        "example_metadata.tsv"
+      ],
+      "size": [
+        267
+      ],
+      "type": [
+        "text/tab-separated-values"
+      ],
+      "datapath": [
+        "0.tsv"
+      ]
     },
     "fil_mzt_raw": null,
     "fil_pat": "example",
     "fil_spe_raw": {
-      "name": ["example_spectra.mgf"],
-      "size": [44681],
-      "type": [""],
-      "datapath": ["0.mgf"]
+      "name": [
+        "example_spectra.mgf"
+      ],
+      "size": [
+        44681
+      ],
+      "type": [
+        ""
+      ],
+      "datapath": [
+        "0.mgf"
+      ]
     },
     "force": false,
     "gnps_id": "",
@@ -42,7 +66,11 @@
     "lib_spe_mgf": null,
     "lib_tmp_exp_csv": null,
     "lib_tmp_is_csv": null,
-    "ms_add_neg": ["[M-H2]2-", "[M-H]-", "[2M-H]-"],
+    "ms_add_neg": [
+      "[M-H2]2-",
+      "[M-H]-",
+      "[2M-H]-"
+    ],
     "ms_add_pos": [
       "[M+H2]2+",
       "[M+H]+",
@@ -234,6 +262,10 @@
     "wei_glo_che": 0.166,
     "wei_glo_spe": 0.333
   },
-  "output": {},
-  "export": {}
+  "output": {
+
+  },
+  "export": {
+
+  }
 }
