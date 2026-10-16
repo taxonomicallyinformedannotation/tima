@@ -32,7 +32,8 @@ paths:
       parameters:
         - name: level
           in: query
-          description: The level of errors that should be reported, one of ERROR, WARN,
+          description:
+            The level of errors that should be reported, one of ERROR, WARN,
             INFO.
           required: false
           schema:
@@ -54,7 +55,8 @@ paths:
             default: 100
         - name: semanticValidation
           in: query
-          description: Whether a semantic validation against the default rule set should be
+          description:
+            Whether a semantic validation against the default rule set should be
             performed.
           required: false
           schema:
@@ -108,7 +110,8 @@ paths:
       parameters:
         - name: level
           in: query
-          description: The level of errors that should be reported, one of ERROR, WARN,
+          description:
+            The level of errors that should be reported, one of ERROR, WARN,
             INFO.
           required: false
           schema:
@@ -130,7 +133,8 @@ paths:
             default: 100
         - name: semanticValidation
           in: query
-          description: Whether a semantic validation against the default rule set should be
+          description:
+            Whether a semantic validation against the default rule set should be
             performed.
           required: false
           schema:
@@ -446,7 +450,8 @@ components:
           example: MTD description An experiment investigating the effects of Il-6.
         contact:
           type: array
-          description: The contact’s name, affiliation and e-mail. Several contacts can be
+          description:
+            The contact’s name, affiliation and e-mail. Several contacts can be
             given by indicating the number in the square brackets after
             "contact". A contact has to be supplied in the format [first name]
             [initials] [last name].
@@ -463,7 +468,8 @@ components:
             MTD contact[2]-orcid        0000-0002-1825-0097
         publication:
           type: array
-          description: A publication associated with this file. Several publications can be
+          description:
+            A publication associated with this file. Several publications can be
             given by indicating the number in the square brackets after
             “publication”. PubMed ids must be prefixed by “pubmed:”, DOIs by
             “doi:”. Multiple identifiers MUST be separated by “|”.
@@ -475,7 +481,8 @@ components:
             MTD	publication[2]	pubmed:20615486|doi:10.1016/j.jprot.2010.06.008
         uri:
           type: array
-          description: A URI pointing to the file’s source data (e.g., a MetaboLights
+          description:
+            A URI pointing to the file’s source data (e.g., a MetaboLights
             records).
           default: []
           items:
@@ -484,7 +491,8 @@ components:
             MTD	uri[1]	https://www.ebi.ac.uk/metabolights/MTBLS517
         external_study_uri:
           type: array
-          description: A URI pointing to an external file with more details about the study
+          description:
+            A URI pointing to an external file with more details about the study
             design (e.g., an ISA-TAB file).
           default: []
           items:
@@ -493,7 +501,8 @@ components:
             MTD	external_study_uri[1]	https://www.ebi.ac.uk/metabolights/MTBLS517/files/i_Investigation.txt
         instrument:
           type: array
-          description: The name, source, analyzer and detector of the instruments used in
+          description:
+            The name, source, analyzer and detector of the instruments used in
             the experiment. Multiple instruments are numbered [1-n].
           default: []
           items:
@@ -587,7 +596,8 @@ components:
             MTD	sample_processing[4]	[MSIO, MSIO:0000141, silylation,]
         software:
           type: array
-          description: Software used to analyze the data and obtain the reported results.
+          description:
+            Software used to analyze the data and obtain the reported results.
             The parameter’s value SHOULD contain the software’s version. The
             order (numbering) should reflect the order in which the tools were
             used. A software setting used. This field MAY occur multiple times
@@ -604,7 +614,8 @@ components:
             MTD	software[2]-setting	Parent tolerance = 0.5 Da
         derivatization_agent:
           type: array
-          description: A description of derivatization agents applied to small molecules,
+          description:
+            A description of derivatization agents applied to small molecules,
             using userParams or CV terms where possible.
           default: []
           items:
@@ -809,7 +820,8 @@ components:
             MTD	database[3]-uri	null
         id_confidence_measure:
           type: array
-          description: The type of small molecule confidence measures or scores MUST be
+          description:
+            The type of small molecule confidence measures or scores MUST be
             reported as a CV parameter [1-n]. The CV parameter definition should
             formally state whether the ordering is high to low or vice versa.
             The order of the scores SHOULD reflect their importance for the
@@ -826,7 +838,8 @@ components:
             MTD	id_confidence_measure[3]	[MS,MS:1002891,isotopic fit score,]
         colunit-small_molecule:
           type: array
-          description: Defines the used unit for a column in the small molecule section.
+          description:
+            Defines the used unit for a column in the small molecule section.
             The format of the value has to be \{column name}=\{Parameter
             defining the unit}. This field MUST NOT be used to define a unit for
             quantification columns. The unit used for small molecule
@@ -842,7 +855,8 @@ components:
             MTD	colunit-small_molecule	opt_global_cv_MS:MS:1002954_collisional_cross_sectional_area=[UO,UO:00003241, square angstrom,]
         colunit-small_molecule_feature:
           type: array
-          description: Defines the used unit for a column in the small molecule feature
+          description:
+            Defines the used unit for a column in the small molecule feature
             section. The format of the value has to be \{column
             name}=\{Parameter defining the unit}. This field MUST NOT be used to
             define a unit for quantification columns. The unit used for small
@@ -859,7 +873,8 @@ components:
             MTD	colunit-small_molecule_feature	opt_ms_run[1]_cv_MS:MS:1002476_ion_mobility_drift_time=[UO,UO:0000031, minute,]
         colunit-small_molecule_evidence:
           type: array
-          description: Defines the used unit for a column in the small molecule evidence
+          description:
+            Defines the used unit for a column in the small molecule evidence
             section. The format of the value has to be \{column
             name}=\{Parameter defining the unit}.
           default: []
@@ -893,7 +908,8 @@ components:
       properties:
         prefix:
           type: string
-          description: The small molecule table row prefix. SML MUST be used for rows of
+          description:
+            The small molecule table row prefix. SML MUST be used for rows of
             the small molecule table.
           x-mztab-example: |
             SML 1 …
@@ -903,7 +919,8 @@ components:
           readOnly: true
         header_prefix:
           type: string
-          description: The small molecule table header prefix. SMH MUST be used for the
+          description:
+            The small molecule table header prefix. SMH MUST be used for the
             small molecule table header line (the column labels).
           x-mztab-example: |
             SMH	SML_ID …
@@ -921,7 +938,8 @@ components:
           format: int32
         smf_id_refs:
           type: array
-          description: References to all the features on which quantitation has been based
+          description:
+            References to all the features on which quantitation has been based
             (SMF elements) via referencing SMF_ID values. Multiple values SHOULD
             be provided as a “|” separated list. This MAY be null only if this
             is a Summary file.
@@ -985,7 +1003,8 @@ components:
             type: string
         smiles:
           type: array
-          description: A list of “|” separated potential molecule structures in the
+          description:
+            A list of “|” separated potential molecule structures in the
             simplified molecular-input line-entry system (SMILES) for the small
             molecule. The number of values provided MUST match the number of
             entities reported under “database_identifier”, and the validation
@@ -1031,7 +1050,8 @@ components:
             type: string
         uri:
           type: array
-          description: A URI pointing to the small molecule’s entry in a reference database
+          description:
+            A URI pointing to the small molecule’s entry in a reference database
             (e.g., the small molecule’s HMDB or KEGG entry). The number of
             values provided MUST match the number of entities reported under
             “database_identifier”, and the validation software will throw an
@@ -1155,7 +1175,8 @@ components:
           $ref: "#/components/schemas/Parameter"
         best_id_confidence_value:
           type: number
-          description: The best confidence measure in identification (for this type of
+          description:
+            The best confidence measure in identification (for this type of
             score) for the given small molecule across all assays. The type of
             score MUST be defined in the metadata section. If the small molecule
             was not identified by the specified search engine, “null” MUST be
@@ -1167,7 +1188,8 @@ components:
           format: double
         abundance_assay:
           type: array
-          description: The small molecule’s abundance in every assay described in the
+          description:
+            The small molecule’s abundance in every assay described in the
             metadata section MUST be reported. Null or zero values may be
             reported as appropriate. "null" SHOULD be used to report missing
             quantities, while zero SHOULD be used to indicate a present but not
@@ -1181,7 +1203,8 @@ components:
             format: double
         abundance_study_variable:
           type: array
-          description: The small molecule’s abundance in all the study variables described
+          description:
+            The small molecule’s abundance in all the study variables described
             in the metadata section (study_variable[1-n]_average_function),
             calculated using the method as described in the Metadata section
             (default = arithmetic mean across assays). Null or zero values may
@@ -1197,7 +1220,8 @@ components:
             format: double
         abundance_variation_study_variable:
           type: array
-          description: A measure of the variability of the study variable abundance
+          description:
+            A measure of the variability of the study variable abundance
             measurement, calculated using the method as described in the
             metadata section (study_variable[1-n]_average_function), with a
             default = arithmethic co-efficient of variation of the small
@@ -1260,7 +1284,8 @@ components:
       properties:
         prefix:
           type: string
-          description: The small molecule feature table row prefix. SMF MUST be used for
+          description:
+            The small molecule feature table row prefix. SMF MUST be used for
             rows of the small molecule feature table.
           x-mztab-example: |
             SMF 1 …
@@ -1270,7 +1295,8 @@ components:
           readOnly: true
         header_prefix:
           type: string
-          description: The small molecule feature table header prefix. SFH MUST be used for
+          description:
+            The small molecule feature table header prefix. SFH MUST be used for
             the small molecule feature table header line (the column labels).
           x-mztab-example: |
             SFH	SMF_ID	…
@@ -1288,7 +1314,8 @@ components:
           format: int32
         sme_id_refs:
           type: array
-          description: References to the identification evidence (SME elements) via
+          description:
+            References to the identification evidence (SME elements) via
             referencing SME_ID values. Multiple values MAY be provided as a “|”
             separated list to indicate ambiguity in the identification or to
             indicate that different types of data supported the identifiction
@@ -1304,7 +1331,8 @@ components:
             format: int32
         sme_id_ref_ambiguity_code:
           type: integer
-          description: If multiple values are given under SME_ID_REFS, one of the following
+          description:
+            If multiple values are given under SME_ID_REFS, one of the following
             codes MUST be provided. 1=Ambiguous identification; 2=Only different
             evidence streams for the same molecule with no ambiguity; 3=Both
             ambiguous identification and multiple evidence streams. If there are
@@ -1315,7 +1343,8 @@ components:
           format: int32
         adduct_ion:
           type: string
-          description: The assumed classification of this molecule’s adduct ion after
+          description:
+            The assumed classification of this molecule’s adduct ion after
             detection, following the general style in the 2013 IUPAC
             recommendations on terms relating to MS e.g. [M+H]1+, [M+Na]1+,
             [M+NH4]1+, [M-H]1-, [M+Cl]1-, [M+H]1+.
@@ -1328,7 +1357,8 @@ components:
           $ref: "#/components/schemas/Parameter"
         exp_mass_to_charge:
           type: number
-          description: The experimental mass/charge value for the feature, by default
+          description:
+            The experimental mass/charge value for the feature, by default
             assumed to be the mean across assays or a representative value. For
             approaches that report isotopomers as SMF rows, then the m/z of the
             isotopomer MUST be reported here.
@@ -1338,7 +1368,8 @@ components:
           format: double
         charge:
           type: integer
-          description: The feature’s charge value using positive integers both for positive
+          description:
+            The feature’s charge value using positive integers both for positive
             and negative polarity modes.
           x-mztab-example: |
             SFH	SMF_ID	…	charge	…
@@ -1346,7 +1377,8 @@ components:
           format: int32
         retention_time_in_seconds:
           type: number
-          description: The apex of the feature on the retention time axis, in a Master or
+          description:
+            The apex of the feature on the retention time axis, in a Master or
             aggregate MS run. Retention time MUST be reported in seconds.
             Retention time values for individual MS runs (i.e. before alignment)
             MAY be reported as optional columns. Retention time SHOULD only be
@@ -1361,7 +1393,8 @@ components:
           format: double
         retention_time_in_seconds_start:
           type: number
-          description: The start time of the feature on the retention time axis, in a
+          description:
+            The start time of the feature on the retention time axis, in a
             Master or aggregate MS run. Retention time MUST be reported in
             seconds. Retention time start and end SHOULD only be null in the
             case of direct infusion MS or other techniques where a retention
@@ -1373,7 +1406,8 @@ components:
           format: double
         retention_time_in_seconds_end:
           type: number
-          description: The end time of the feature on the retention time axis, in a Master
+          description:
+            The end time of the feature on the retention time axis, in a Master
             or aggregate MS run. Retention time MUST be reported in seconds.
             Retention time start and end SHOULD only be null in the case of
             direct infusion MS or other techniques where a retention time value
@@ -1384,7 +1418,8 @@ components:
           format: double
         abundance_assay:
           type: array
-          description: The feature’s abundance in every assay described in the metadata
+          description:
+            The feature’s abundance in every assay described in the metadata
             section MUST be reported. Null or zero values may be reported as
             appropriate.
           x-mztab-example: |
@@ -1451,7 +1486,8 @@ components:
       properties:
         prefix:
           type: string
-          description: The small molecule evidence table row prefix. SME MUST be used for
+          description:
+            The small molecule evidence table row prefix. SME MUST be used for
             rows of the small molecule evidence table.
           x-mztab-example: |
             SME	1	…
@@ -1461,7 +1497,8 @@ components:
           readOnly: true
         header_prefix:
           type: string
-          description: The small molecule evidence table header prefix. SEH MUST be used
+          description:
+            The small molecule evidence table header prefix. SEH MUST be used
             for the small molecule evidence table header line (the column
             labels).
           x-mztab-example: |
@@ -1472,7 +1509,8 @@ components:
           readOnly: true
         sme_id:
           type: integer
-          description: A within file unique identifier for the small molecule evidence
+          description:
+            A within file unique identifier for the small molecule evidence
             result.
           x-mztab-example: |
             SEH	SME_ID	…
@@ -1480,7 +1518,8 @@ components:
           format: int32
         evidence_input_id:
           type: string
-          description: A within file unique identifier for the input data used to support
+          description:
+            A within file unique identifier for the input data used to support
             this identification e.g. fragment spectrum, RT and m/z pair, isotope
             profile that was used for the identification process, to serve as a
             grouping mechanism, whereby multiple rows of results from the same
@@ -1533,14 +1572,16 @@ components:
             SME	1	…	C17H20N4O2	…
         smiles:
           type: string
-          description: The potential molecule’s structure in the simplified molecular-input
+          description:
+            The potential molecule’s structure in the simplified molecular-input
             line-entry system (SMILES) for the small molecule.
           x-mztab-example: |
             SEH	SME_ID	…	chemical_formula	smiles	…
             SML	1	…	C17H20N4O2	C1=CC=C(C=C1)CCNC(=O)CCNNC(=O)C2=CC=NC=C2	…
         inchi:
           type: string
-          description: A standard IUPAC International Chemical Identifier (InChI) for the
+          description:
+            A standard IUPAC International Chemical Identifier (InChI) for the
             given substance.
           x-mztab-example: >
             SEH	SME_ID	…	chemical_formula	…	inchi	…
@@ -1548,7 +1589,8 @@ components:
             SML	1	…	C17H20N4O2	…	InChI=1S/C17H20N4O2/c22-16(19-12-6-14-4-2-1-3-5-14)9-13-20-21-17(23)15-7-10-18-11-8-15/h1-5,7-8,10-11,20H,6,9,12-13H2,(H,19,22)(H,21,23)	…
         chemical_name:
           type: string
-          description: The small molecule’s chemical/common name, or general description if
+          description:
+            The small molecule’s chemical/common name, or general description if
             a chemical name is unavailable.
           x-mztab-example: >
             SEH	SME_ID	…	chemical_name	…
@@ -1556,7 +1598,8 @@ components:
             SML	1	…	N-(2-phenylethyl)-3-[2-(pyridine-4-carbonyl)hydrazinyl]propanamide	…
         uri:
           type: string
-          description: A URI pointing to the small molecule’s entry in a database (e.g.,
+          description:
+            A URI pointing to the small molecule’s entry in a database (e.g.,
             the small molecule’s HMDB, Chebi or KEGG entry).
           x-mztab-example: |
             SEH	SME_ID	…	uri	…
@@ -1566,7 +1609,8 @@ components:
           $ref: "#/components/schemas/Parameter"
         adduct_ion:
           type: string
-          description: The assumed classification of this molecule’s adduct ion after
+          description:
+            The assumed classification of this molecule’s adduct ion after
             detection, following the general style in the 2013 IUPAC
             recommendations on terms relating to MS e.g. [M+H]+, [M+Na]1+,
             [M+NH4]1+, [M-H]1-, [M+Cl]1-. If the adduct classification is
@@ -1581,7 +1625,8 @@ components:
           pattern: '^\[\d*M([+-][\w\d]+)*\]\d*[+-]$'
         exp_mass_to_charge:
           type: number
-          description: The experimental mass/charge value for the precursor ion. If
+          description:
+            The experimental mass/charge value for the precursor ion. If
             multiple adduct forms have been combined into a single
             identification event/search, then a single value e.g. for the
             protonated form SHOULD be reported here.
@@ -1591,7 +1636,8 @@ components:
           format: double
         charge:
           type: integer
-          description: The small molecule evidence’s charge value using positive integers
+          description:
+            The small molecule evidence’s charge value using positive integers
             both for positive and negative polarity modes.
           x-mztab-example: |
             SEH	SME_ID	…	charge	…
@@ -1599,7 +1645,8 @@ components:
           format: int32
         theoretical_mass_to_charge:
           type: number
-          description: The theoretical mass/charge value for the small molecule or the
+          description:
+            The theoretical mass/charge value for the small molecule or the
             database mass/charge value (for a spectral library match).
           x-mztab-example: |
             SEH	SME_ID	…	theoretical_mass_to_charge …
@@ -1634,7 +1681,8 @@ components:
           $ref: "#/components/schemas/Parameter"
         id_confidence_measure:
           type: array
-          description: Any statistical value or score for the identification. The metadata
+          description:
+            Any statistical value or score for the identification. The metadata
             section reports the type of score used, as
             id_confidence_measure[1-n] of type Param.
           x-mztab-example: >
@@ -1652,7 +1700,8 @@ components:
             format: double
         rank:
           type: integer
-          description: The rank of this identification from this approach as increasing
+          description:
+            The rank of this identification from this approach as increasing
             integers from 1 (best ranked identification). Ties (equal score) are
             represented by using the same rank – defaults to 1 if there is no
             ranking system used.
@@ -1717,7 +1766,8 @@ components:
           type: string
           default: ""
     Instrument:
-      description: The name, source, analyzer and detector of the instruments used in the
+      description:
+        The name, source, analyzer and detector of the instruments used in the
         experiment. Multiple instruments are numbered [1-n].
       x-mztab-example: |
         MTD	instrument[1]-name	[MS, MS:1000449, LTQ Orbitrap,]
@@ -1778,7 +1828,8 @@ components:
         sampleProcessing:
           type: array
           default: []
-          description: Parameters specifiying sample processing that was applied within one
+          description:
+            Parameters specifiying sample processing that was applied within one
             step.
           items:
             $ref: "#/components/schemas/Parameter"
@@ -1843,7 +1894,8 @@ components:
       required:
         - type
         - accession
-      description: A publication item, defined by a qualifier and a native accession, e.g.
+      description:
+        A publication item, defined by a qualifier and a native accession, e.g.
         pubmed id.
       properties:
         type:
@@ -1929,7 +1981,8 @@ components:
           type: string
           pattern: ^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]{1}$
     Uri:
-      description: A URI pointing to the file’s source data (e.g., a MetaboLights records)
+      description:
+        A URI pointing to the file’s source data (e.g., a MetaboLights records)
         or an external file with more details about the study design.
       x-mztab-example: >
         MTD	uri[1]	https://www.ebi.ac.uk/metabolights/MTBLS517
@@ -2380,7 +2433,8 @@ components:
       required:
         - column_name
         - param
-      description: Defines the used unit for a column in the mzTab-M file. The format of
+      description:
+        Defines the used unit for a column in the mzTab-M file. The format of
         the value has to be \{column name}=\{Parameter defining the unit}. This
         field MUST NOT be used to define a unit for quantification columns. The
         unit used for small molecule quantification values MUST be set in

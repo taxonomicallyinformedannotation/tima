@@ -15,28 +15,28 @@ files:
       #' List of experimental temporal libraries.
       exp:
         #' List of experimental temporal libraries (CSV). STRING
-        csv: [ ]
+        csv: []
 
         #' List of experimental temporal libraries (MGF).
         mgf:
           #' List of negative experimental temporal libraries (MGF). STRING
-          neg: [ ]
+          neg: []
 
           #' List of positive experimental temporal libraries (MGF). STRING
-          pos: [ ]
+          pos: []
 
       #' List of in silico temporal libraries.
       is:
         #' List of in silico temporal libraries (CSV). STRING
-        csv: [ ]
+        csv: []
 
         #' List of in silico temporal libraries (MGF).
         mgf:
           #' List of negative in silico temporal libraries (MGF). STRING
-          neg: [ ]
+          neg: []
 
           #' List of positive in silico temporal libraries (MGF). STRING
-          pos: [ ]
+          pos: []
 
       #' List of prepared temporal libraries. STRING
       prepared:

@@ -35,7 +35,6 @@ files:
           #' Structures metadata. STRING
           metadata: data/interim/libraries/sop/merged/structures/metadata.tsv.gz
 
-
           #' Structures taxonomies.
           taxonomies:
             #' Classyfire structures taxonomy. STRING

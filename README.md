@@ -7,6 +7,7 @@
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- [![CRAN status](https://www.r-pkg.org/badges/version/tima)](https://CRAN.R-project.org/package=tima) -->
+
 [![R-CMD-check](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg)](https://app.codecov.io/gh/taxonomicallyinformedannotation/tima)
@@ -234,7 +235,7 @@ Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.
 ```
 
   | Package         | Version     | Citation                                                              |
-  | :---            | :---        | :---                                                                  |
+  | :-------------- | :---------- | :-------------------------------------------------------------------- |
   | archive         | 1.1.14      | Hester and Csárdi (2026)                                              |
   | base            | 4.6.1       | R Core Team (2026a)                                                   |
   | BiocManager     | 1.30.27     | Morgan and Ramos (2025)                                               |
@@ -280,7 +281,7 @@ Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.
 <div id="ref-rmarkdown2026" class="csl-entry">
 
 Allaire, JJ, Yihui Xie, Christophe Dervieux, et al. 2026.
-*<span class="nocase">rmarkdown</span>: Dynamic Documents for r*.
+_<span class="nocase">rmarkdown</span>: Dynamic Documents for r_.
 <https://github.com/rstudio/rmarkdown>.
 
 </div>
@@ -289,30 +290,30 @@ Allaire, JJ, Yihui Xie, Christophe Dervieux, et al. 2026.
 
 Antonov, Michael, Gábor Csárdi, Szabolcs Horvát, et al. 2023. “Igraph
 Enables Fast and Robust Network Analysis Across Programming Languages.”
-*arXiv Preprint arXiv:2311.10260*, ahead of print.
+_arXiv Preprint arXiv:2311.10260_, ahead of print.
 <https://doi.org/10.48550/arXiv.2311.10260>.
 
 </div>
 
 <div id="ref-shinyjs" class="csl-entry">
 
-Attali, Dean. 2026. *<span class="nocase">shinyjs</span>: Easily Improve
-the User Experience of Your Shiny Apps in Seconds*.
+Attali, Dean. 2026. _<span class="nocase">shinyjs</span>: Easily Improve
+the User Experience of Your Shiny Apps in Seconds_.
 <https://doi.org/10.32614/CRAN.package.shinyjs>.
 
 </div>
 
 <div id="ref-Rutils" class="csl-entry">
 
-Bengtsson, Henrik. 2025. *<span class="nocase">R.utils</span>: Various
-Programming Utilities*. <https://doi.org/10.32614/CRAN.package.R.utils>.
+Bengtsson, Henrik. 2025. _<span class="nocase">R.utils</span>: Various
+Programming Utilities_. <https://doi.org/10.32614/CRAN.package.R.utils>.
 
 </div>
 
 <div id="ref-shiny" class="csl-entry">
 
 Chang, Winston, Joe Cheng, JJ Allaire, et al. 2026.
-*<span class="nocase">shiny</span>: Web Application Framework for r*.
+_<span class="nocase">shiny</span>: Web Application Framework for r_.
 <https://doi.org/10.32614/CRAN.package.shiny>.
 
 </div>
@@ -320,7 +321,7 @@ Chang, Winston, Joe Cheng, JJ Allaire, et al. 2026.
 <div id="ref-igraph2006" class="csl-entry">
 
 Csárdi, Gábor, and Tamás Nepusz. 2006. “The Igraph Software Package for
-Complex Network Research.” *InterJournal* Complex Systems: 1695.
+Complex Network Research.” _InterJournal_ Complex Systems: 1695.
 <https://igraph.org>.
 
 </div>
@@ -328,46 +329,46 @@ Complex Network Research.” *InterJournal* Complex Systems: 1695.
 <div id="ref-igraph2026" class="csl-entry">
 
 Csárdi, Gábor, Tamás Nepusz, Vincent Traag, et al. 2026.
-*<span class="nocase">igraph</span>: Network Analysis and Visualization
-in r*. <https://doi.org/10.5281/zenodo.7682609>.
+_<span class="nocase">igraph</span>: Network Analysis and Visualization
+in r_. <https://doi.org/10.5281/zenodo.7682609>.
 
 </div>
 
 <div id="ref-docopt" class="csl-entry">
 
 <span class="nocase">de Jonge, Edwin</span>. 2025.
-*<span class="nocase">docopt</span>: Command-Line Interface
-Specification Language*. <https://doi.org/10.32614/CRAN.package.docopt>.
+_<span class="nocase">docopt</span>: Command-Line Interface
+Specification Language_. <https://doi.org/10.32614/CRAN.package.docopt>.
 
 </div>
 
 <div id="ref-tidytable" class="csl-entry">
 
-Fairbanks, Mark. 2024. *<span class="nocase">tidytable</span>: Tidy
-Interface to “<span class="nocase">data.table</span>”*.
+Fairbanks, Mark. 2024. _<span class="nocase">tidytable</span>: Tidy
+Interface to “<span class="nocase">data.table</span>”_.
 <https://doi.org/10.32614/CRAN.package.tidytable>.
 
 </div>
 
 <div id="ref-lgr" class="csl-entry">
 
-Fleck, Stefan. 2026. *<span class="nocase">lgr</span>: A Fully Featured
-Logging Framework*. <https://doi.org/10.32614/CRAN.package.lgr>.
+Fleck, Stefan. 2026. _<span class="nocase">lgr</span>: A Fully Featured
+Logging Framework_. <https://doi.org/10.32614/CRAN.package.lgr>.
 
 </div>
 
 <div id="ref-MsBackendMgf" class="csl-entry">
 
 Gatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2026.
-*MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
-(Mgf) Files*. <https://github.com/RforMassSpectrometry/MsBackendMgf>.
+_MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
+(Mgf) Files_. <https://github.com/RforMassSpectrometry/MsBackendMgf>.
 
 </div>
 
 <div id="ref-tidyselect" class="csl-entry">
 
 Henry, Lionel, and Hadley Wickham. 2024.
-*<span class="nocase">tidyselect</span>: Select from a Set of Strings*.
+_<span class="nocase">tidyselect</span>: Select from a Set of Strings_.
 <https://doi.org/10.32614/CRAN.package.tidyselect>.
 
 </div>
@@ -375,24 +376,24 @@ Henry, Lionel, and Hadley Wickham. 2024.
 <div id="ref-lifecycle" class="csl-entry">
 
 Henry, Lionel, and Hadley Wickham. 2026.
-*<span class="nocase">lifecycle</span>: Manage the Life Cycle of Your
-Package Functions*. <https://doi.org/10.32614/CRAN.package.lifecycle>.
+_<span class="nocase">lifecycle</span>: Manage the Life Cycle of Your
+Package Functions_. <https://doi.org/10.32614/CRAN.package.lifecycle>.
 
 </div>
 
 <div id="ref-archive" class="csl-entry">
 
 Hester, Jim, and Gábor Csárdi. 2026.
-*<span class="nocase">archive</span>: Multi-Format Archive and
-Compression Support*. <https://doi.org/10.32614/CRAN.package.archive>.
+_<span class="nocase">archive</span>: Multi-Format Archive and
+Compression Support_. <https://doi.org/10.32614/CRAN.package.archive>.
 
 </div>
 
 <div id="ref-withr" class="csl-entry">
 
 Hester, Jim, Lionel Henry, Kirill Müller, Kevin Ushey, Hadley Wickham,
-and Winston Chang. 2026. *<span class="nocase">withr</span>: Run Code
-“With” Temporarily Modified Global State*.
+and Winston Chang. 2026. _<span class="nocase">withr</span>: Run Code
+“With” Temporarily Modified Global State_.
 <https://doi.org/10.32614/CRAN.package.withr>.
 
 </div>
@@ -400,8 +401,8 @@ and Winston Chang. 2026. *<span class="nocase">withr</span>: Run Code
 <div id="ref-fs" class="csl-entry">
 
 Hester, Jim, Hadley Wickham, and Gábor Csárdi. 2026.
-*<span class="nocase">fs</span>: Cross-Platform File System Operations
-Based on “<span class="nocase">libuv</span>”*.
+_<span class="nocase">fs</span>: Cross-Platform File System Operations
+Based on “<span class="nocase">libuv</span>”_.
 <https://doi.org/10.32614/CRAN.package.fs>.
 
 </div>
@@ -410,24 +411,23 @@ Based on “<span class="nocase">libuv</span>”*.
 
 Landau, William Michael. 2021. “The Targets r Package: A Dynamic
 Make-Like Function-Oriented Pipeline Toolkit for Reproducibility and
-High-Performance Computing.” *Journal of Open Source Software* 6 (57):
-2959. <https://doi.org/10.21105/joss.02959>.
+High-Performance Computing.” _Journal of Open Source Software_ 6 (57): 2959. <https://doi.org/10.21105/joss.02959>.
 
 </div>
 
 <div id="ref-msentropy" class="csl-entry">
 
-Li, Yuanyue. 2023. *<span class="nocase">msentropy</span>: Spectral
-Entropy for Mass Spectrometry Data*.
+Li, Yuanyue. 2023. _<span class="nocase">msentropy</span>: Spectral
+Entropy for Mass Spectrometry Data_.
 <https://doi.org/10.32614/CRAN.package.msentropy>.
 
 </div>
 
 <div id="ref-shinyhelper" class="csl-entry">
 
-Mason-Thom, Chris. 2019. *<span class="nocase">shinyhelper</span>:
+Mason-Thom, Chris. 2019. _<span class="nocase">shinyhelper</span>:
 Easily Add Markdown Help Files to “<span class="nocase">shiny</span>”
-App Elements*. <https://doi.org/10.32614/CRAN.package.shinyhelper>.
+App Elements_. <https://doi.org/10.32614/CRAN.package.shinyhelper>.
 
 </div>
 
@@ -435,30 +435,30 @@ App Elements*. <https://doi.org/10.32614/CRAN.package.shinyhelper>.
 
 Michonneau, Francois, Joseph W. Brown, and David J. Winter. 2016.
 “<span class="nocase">rotl</span>: An r Package to Interact with the
-Open Tree of Life Data.” *Methods in Ecology and Evolution* 7 (12):
+Open Tree of Life Data.” _Methods in Ecology and Evolution_ 7 (12):
 1476–81. <https://doi.org/10.1111/2041-210X.12593>.
 
 </div>
 
 <div id="ref-BiocVersion" class="csl-entry">
 
-Morgan, Martin. 2025. *BiocVersion: Set the Appropriate Version of
-Bioconductor Packages*.
+Morgan, Martin. 2025. _BiocVersion: Set the Appropriate Version of
+Bioconductor Packages_.
 
 </div>
 
 <div id="ref-BiocManager" class="csl-entry">
 
-Morgan, Martin, and Marcel Ramos. 2025. *BiocManager: Access the
-Bioconductor Project Package Repository*.
+Morgan, Martin, and Marcel Ramos. 2025. _BiocManager: Access the
+Bioconductor Project Package Repository_.
 <https://doi.org/10.32614/CRAN.package.BiocManager>.
 
 </div>
 
 <div id="ref-curl" class="csl-entry">
 
-Ooms, Jeroen. 2026. *<span class="nocase">curl</span>: A Modern and
-Flexible Web Client for r*.
+Ooms, Jeroen. 2026. _<span class="nocase">curl</span>: A Modern and
+Flexible Web Client for r_.
 <https://doi.org/10.32614/CRAN.package.curl>.
 
 </div>
@@ -466,31 +466,30 @@ Flexible Web Client for r*.
 <div id="ref-spelling" class="csl-entry">
 
 Ooms, Jeroen, and Jim Hester. 2025.
-*<span class="nocase">spelling</span>: Tools for Spell Checking in r*.
+_<span class="nocase">spelling</span>: Tools for Spell Checking in r_.
 <https://doi.org/10.32614/CRAN.package.spelling>.
 
 </div>
 
 <div id="ref-rotl2019" class="csl-entry">
 
-OpenTreeOfLife, Benjamin Redelings, Luna Luisa Sanchez Reyes, et al.
-2019. *Open Tree of Life Synthetic Tree*. Version 12.3. Zenodo.
+OpenTreeOfLife, Benjamin Redelings, Luna Luisa Sanchez Reyes, et al. 2019. _Open Tree of Life Synthetic Tree_. Version 12.3. Zenodo.
 <https://doi.org/10.5281/zenodo.3937741>.
 
 </div>
 
 <div id="ref-base" class="csl-entry">
 
-R Core Team. 2026a. *R: A Language and Environment for Statistical
-Computing*. R Foundation for Statistical Computing.
+R Core Team. 2026a. _R: A Language and Environment for Statistical
+Computing_. R Foundation for Statistical Computing.
 <https://doi.org/10.32614/R.manuals>.
 
 </div>
 
 <div id="ref-tools" class="csl-entry">
 
-R Core Team. 2026b. *R: A Language and Environment for Statistical
-Computing*. R Foundation for Statistical Computing.
+R Core Team. 2026b. _R: A Language and Environment for Statistical
+Computing_. R Foundation for Statistical Computing.
 <https://doi.org/10.32614/R.manuals>.
 
 </div>
@@ -499,7 +498,7 @@ Computing*. R Foundation for Statistical Computing.
 
 Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al. 2022a. “A Modular
 and Expandable Ecosystem for Metabolomics Data Annotation in r.”
-*Metabolites* 12: 173. <https://doi.org/10.3390/metabo12020173>.
+_Metabolites_ 12: 173. <https://doi.org/10.3390/metabo12020173>.
 
 </div>
 
@@ -507,7 +506,7 @@ and Expandable Ecosystem for Metabolomics Data Annotation in r.”
 
 Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al. 2022b. “A Modular
 and Expandable Ecosystem for Metabolomics Data Annotation in r.”
-*Metabolites* 12: 173. <https://doi.org/10.3390/metabo12020173>.
+_Metabolites_ 12: 173. <https://doi.org/10.3390/metabo12020173>.
 
 </div>
 
@@ -515,7 +514,7 @@ and Expandable Ecosystem for Metabolomics Data Annotation in r.”
 
 Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al. 2022c. “A Modular
 and Expandable Ecosystem for Metabolomics Data Annotation in r.”
-*Metabolites* 12: 173. <https://doi.org/10.3390/metabo12020173>.
+_Metabolites_ 12: 173. <https://doi.org/10.3390/metabo12020173>.
 
 </div>
 
@@ -523,15 +522,15 @@ and Expandable Ecosystem for Metabolomics Data Annotation in r.”
 
 Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al. 2022d. “A Modular
 and Expandable Ecosystem for Metabolomics Data Annotation in r.”
-*Metabolites* 12: 173. <https://doi.org/10.3390/metabo12020173>.
+_Metabolites_ 12: 173. <https://doi.org/10.3390/metabo12020173>.
 
 </div>
 
 <div id="ref-tima2026" class="csl-entry">
 
 Rutz, Adriano, and Pierre-Marie Allard. 2026.
-*<span class="nocase">tima</span>: Taxonomically Informed Metabolite
-Annotation*. <https://doi.org/10.5281/zenodo.5797920>.
+_<span class="nocase">tima</span>: Taxonomically Informed Metabolite
+Annotation_. <https://doi.org/10.5281/zenodo.5797920>.
 
 </div>
 
@@ -539,14 +538,14 @@ Annotation*. <https://doi.org/10.5281/zenodo.5797920>.
 
 Rutz, Adriano, Miwa Dounoue-Kubo, Simon Ollivier, et al. 2019.
 “Taxonomically Informed Scoring Enhances Confidence in Natural Products
-Annotation.” *Frontiers in Plant Science* 10.
+Annotation.” _Frontiers in Plant Science_ 10.
 <https://doi.org/10.3389/FPLS.2019.01329>.
 
 </div>
 
 <div id="ref-shinytest2" class="csl-entry">
 
-Schloerke, Barret. 2026. *Shinytest2: Testing for Shiny Applications*.
+Schloerke, Barret. 2026. _Shinytest2: Testing for Shiny Applications_.
 <https://doi.org/10.32614/CRAN.package.shinytest2>.
 
 </div>
@@ -554,23 +553,23 @@ Schloerke, Barret. 2026. *Shinytest2: Testing for Shiny Applications*.
 <div id="ref-shinyvalidate" class="csl-entry">
 
 Sievert, Carson, Richard Iannone, and Joe Cheng. 2023.
-*<span class="nocase">shinyvalidate</span>: Input Validation for Shiny
-Apps*. <https://doi.org/10.32614/CRAN.package.shinyvalidate>.
+_<span class="nocase">shinyvalidate</span>: Input Validation for Shiny
+Apps_. <https://doi.org/10.32614/CRAN.package.shinyvalidate>.
 
 </div>
 
 <div id="ref-yaml" class="csl-entry">
 
 Stephens, Jeremy, and Kirill Simonov. 2025.
-*<span class="nocase">yaml</span>: Methods to Convert r Data to YAML and
-Back*. <https://doi.org/10.32614/CRAN.package.yaml>.
+_<span class="nocase">yaml</span>: Methods to Convert r Data to YAML and
+Back_. <https://doi.org/10.32614/CRAN.package.yaml>.
 
 </div>
 
 <div id="ref-fastmatch" class="csl-entry">
 
-Urbanek, Simon. 2026. *<span class="nocase">fastmatch</span>: Fast
-“<span class="nocase">match()</span>” Function*.
+Urbanek, Simon. 2026. _<span class="nocase">fastmatch</span>: Fast
+“<span class="nocase">match()</span>” Function_.
 <https://doi.org/10.32614/CRAN.package.fastmatch>.
 
 </div>
@@ -578,7 +577,7 @@ Urbanek, Simon. 2026. *<span class="nocase">fastmatch</span>: Fast
 <div id="ref-reticulate" class="csl-entry">
 
 Ushey, Kevin, JJ Allaire, and Yuan Tang. 2026.
-*<span class="nocase">reticulate</span>: Interface to “Python”*.
+_<span class="nocase">reticulate</span>: Interface to “Python”_.
 <https://doi.org/10.32614/CRAN.package.reticulate>.
 
 </div>
@@ -586,61 +585,61 @@ Ushey, Kevin, JJ Allaire, and Yuan Tang. 2026.
 <div id="ref-testthat" class="csl-entry">
 
 Wickham, Hadley. 2011. “<span class="nocase">testthat</span>: Get
-Started with Testing.” *The R Journal* 3: 5–10.
+Started with Testing.” _The R Journal_ 3: 5–10.
 <https://journal.r-project.org/articles/RJ-2011-002/>.
 
 </div>
 
 <div id="ref-httr2" class="csl-entry">
 
-Wickham, Hadley. 2026. *Httr2: Perform HTTP Requests and Process the
-Responses*. <https://doi.org/10.32614/CRAN.package.httr2>.
+Wickham, Hadley. 2026. _Httr2: Perform HTTP Requests and Process the
+Responses_. <https://doi.org/10.32614/CRAN.package.httr2>.
 
 </div>
 
 <div id="ref-tidyverse" class="csl-entry">
 
 Wickham, Hadley, Mara Averick, Jennifer Bryan, et al. 2019. “Welcome to
-the <span class="nocase">tidyverse</span>.” *Journal of Open Source
-Software* 4 (43): 1686. <https://doi.org/10.21105/joss.01686>.
+the <span class="nocase">tidyverse</span>.” _Journal of Open Source
+Software_ 4 (43): 1686. <https://doi.org/10.21105/joss.01686>.
 
 </div>
 
 <div id="ref-pkgload" class="csl-entry">
 
 Wickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2026.
-*<span class="nocase">pkgload</span>: Simulate Package Installation and
-Attach*. <https://doi.org/10.32614/CRAN.package.pkgload>.
+_<span class="nocase">pkgload</span>: Simulate Package Installation and
+Attach_. <https://doi.org/10.32614/CRAN.package.pkgload>.
 
 </div>
 
 <div id="ref-knitr2014" class="csl-entry">
 
 Xie, Yihui. 2014. “<span class="nocase">knitr</span>: A Comprehensive
-Tool for Reproducible Research in R.” In *Implementing Reproducible
-Computational Research*, edited by Victoria Stodden, Friedrich Leisch,
+Tool for Reproducible Research in R.” In _Implementing Reproducible
+Computational Research_, edited by Victoria Stodden, Friedrich Leisch,
 and Roger D. Peng. Chapman; Hall/CRC.
 
 </div>
 
 <div id="ref-knitr2015" class="csl-entry">
 
-Xie, Yihui. 2015. *Dynamic Documents with R and Knitr*. 2nd ed. Chapman;
+Xie, Yihui. 2015. _Dynamic Documents with R and Knitr_. 2nd ed. Chapman;
 Hall/CRC. <https://yihui.org/knitr/>.
 
 </div>
 
 <div id="ref-rmarkdown2018" class="csl-entry">
 
-Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. *R Markdown: The
-Definitive Guide*. Chapman; Hall/CRC. <https://yihui.org/rmarkdown/>.
+Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. _R Markdown: The
+Definitive Guide_. Chapman; Hall/CRC. <https://yihui.org/rmarkdown/>.
 
 </div>
 
 <div id="ref-rmarkdown2020" class="csl-entry">
 
-Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. *R Markdown
-Cookbook*. Chapman; Hall/CRC. <https://yihui.org/rmarkdown-cookbook>.
+Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. _R Markdown
+Cookbook_. Chapman; Hall/CRC. <https://yihui.org/rmarkdown-cookbook>.
 
 </div>
 
