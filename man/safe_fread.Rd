@@ -21,6 +21,10 @@ messages}
 \item{required_cols}{\link{character} Character vector of required column names
 (optional)}
 
+\item{.reader}{\link{function} Function used to perform the actual read, called
+as \code{.reader(file = file, ...)}. Defaults to \code{tidytable::fread()}.
+Mainly useful for testing.}
+
 \item{...}{Additional arguments passed to tidytable::fread}
 }
 \value{

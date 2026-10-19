@@ -151,14 +151,34 @@ prepare_annotations_mztab <- function(
     mapped <- as.character(src[[id_col]])
   }
 
-  score_primary <- .mztab_pick_col(
-    src,
-    c("id_confidence_measure[1]", "best_id_evidence_value", "reliability")
-  )
   lib_col <- .mztab_pick_col(
     src,
     c("identification_method", "candidate_library")
   )
+
+  # Spectral similarity is only meaningful for MS2 / spectral-library evidence.
+  # TIMA writes its spectral similarity to id_confidence_measure[4] (present
+  # only for spectral evidence); standard mzTab exposes it via
+  # best_id_confidence_value. MS1 evidence (exact-mass database search) carries
+  # no spectral match, so the similarity is left NA — this also keeps the
+  # downstream ms1_only weighting filter correct. The combined confidence
+  # (id_confidence_measure[1] / best_id_evidence_value / reliability) is NOT a
+  # spectral similarity and must not masquerade as one.
+  spectral_sources <- c(
+    "id_confidence_measure[4]",
+    "candidate_score_similarity",
+    "best_id_confidence_value",
+    "best_id_evidence_value",
+    "best_id_score"
+  )
+  spectral_raw <- .mztab_pick_col(src, spectral_sources)
+  candidate_score_similarity <- suppressWarnings(as.numeric(spectral_raw))
+  candidate_score_similarity[!is.finite(candidate_score_similarity)] <-
+    NA_real_
+
+  is_ms1 <- !is.na(lib_col) &
+    grepl("exact mass database search", lib_col, ignore.case = TRUE)
+  candidate_score_similarity[is_ms1] <- NA_real_
 
   ann <- tidytable::tidytable(
     feature_id = mapped,
@@ -197,7 +217,7 @@ prepare_annotations_mztab <- function(
       src,
       c("adduct_ion", "adduct_ions", "adduct")
     ),
-    candidate_score_similarity = .mztab_reliability_to_score(score_primary),
+    candidate_score_similarity = candidate_score_similarity,
     candidate_structure_error_mz = NA_real_,
     candidate_structure_error_rt = NA_real_,
     candidate_count_similarity_peaks_matched = NA_integer_,
@@ -239,21 +259,4 @@ prepare_annotations_mztab <- function(
     return(rep(NA_character_, nrow(df)))
   }
   as.character(df[[col[[1L]]]])
-}
-
-#' @keywords internal
-.mztab_reliability_to_score <- function(x) {
-  x <- as.character(x)
-  x <- trimws(tolower(x))
-
-  out <- rep(NA_real_, length(x))
-  out[x %in% c("1", "1a", "1b")] <- 1
-  out[x %in% c("2", "2a", "2b")] <- 0.75
-  out[x %in% c("3")] <- 0.5
-  out[x %in% c("4")] <- 0.25
-
-  # Numeric fall-back for already normalized scores.
-  na_idx <- is.na(out)
-  suppressWarnings(out[na_idx] <- as.numeric(x[na_idx]))
-  out
 }

@@ -1371,6 +1371,71 @@ test_that("write_mztab merge mode is idempotent and does not duplicate existing 
   expect_length(grep("^SML\\t", lines2), 2L)
 })
 
+test_that("write_mztab merge unions all SMF/SME refs for repeated compounds", {
+  # Regression test: merging several features that map to the SAME compound
+  # must fold *every* new feature's reference into the base SML row — not just
+  # the last one. A previous mapply()-over-duplicated-indices implementation
+  # kept only the last write and silently dropped intermediate references.
+  local_test_project(copy = TRUE)
+
+  tmpdir <- withr::local_tempdir()
+  make_one_compound_rows <- function(features) {
+    ik <- "ABCDEFGHIJKLMN01"
+    do.call(
+      rbind,
+      lapply(features, function(f) {
+        data.frame(
+          feature_id = as.character(f),
+          feature_mz = as.character(200.0 + f),
+          feature_rt = as.character(1.5),
+          candidate_structure_name = "CompoundX",
+          candidate_structure_inchikey_connectivity_layer = ik,
+          candidate_structure_inchikey = ik,
+          candidate_structure_smiles_no_stereo = "CC1C(=O)O1",
+          candidate_structure_molecular_formula = "C3H4O2",
+          candidate_structure_exact_mass = "72.0211",
+          candidate_adduct = "[M+H]+",
+          candidate_library = "spectral",
+          score_final = "0.9",
+          score_biological = "0.6",
+          score_chemical = "0.5",
+          rank_final = "1",
+          stringsAsFactors = FALSE
+        )
+      })
+    ) -> df
+    path <- file.path(
+      tmpdir,
+      sprintf("ann_%s.tsv", paste(features, collapse = "_"))
+    )
+    write.table(df, path, sep = "\t", row.names = FALSE, quote = FALSE)
+    path
+  }
+
+  base <- file.path(tmpdir, "base.mztab")
+  merged <- file.path(tmpdir, "merged.mztab")
+
+  write_mztab(input = make_one_compound_rows(1L), output = base)
+  write_mztab(
+    input = make_one_compound_rows(c(1L, 2L, 3L)),
+    output = merged,
+    base_mztab = base
+  )
+
+  sml_line <- grep("^SML\t", readLines(merged, warn = FALSE), value = TRUE)
+  expect_length(sml_line, 1L)
+
+  # All three features (1, 2, 3) must be referenced in the SML row — none dropped.
+  fields <- strsplit(sml_line, "\t")[[1L]]
+  headers <- strsplit(
+    grep("^SMH", readLines(merged, warn = FALSE), value = TRUE)[[1L]],
+    "\t",
+    fixed = TRUE
+  )[[1L]]
+  smf_idx <- match("SMF_ID_REFS", headers)
+  expect_equal(fields[[smf_idx]], "1|2|3")
+})
+
 test_that("write_mztab writes JSON mzTab output that round-trips through the parser", {
   local_test_project(copy = TRUE)
 

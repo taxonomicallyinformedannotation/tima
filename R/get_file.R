@@ -47,7 +47,8 @@ get_file <- function(url, export, limit = 3600L) {
 
   # Prepare for Download ----
   create_dir(export = export)
-  options(timeout = limit)
+  op <- options(timeout = limit)
+  on.exit(options(op), add = TRUE)
   log_debug("Downloading from: %s", url)
 
   # Download File ----

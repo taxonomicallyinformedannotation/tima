@@ -420,6 +420,35 @@ test_that("prepare_annotations_mztab works across representative mzTab fixtures"
   }
 })
 
+test_that("prepare_annotations_mztab splits spectral similarity from overall confidence", {
+  ann <- tidytable::fread(prepare_annotations_mztab(
+    input = resolve_fixture_path("mztab/score_split.mztab"),
+    output = file.path(temp_test_dir("score_split_ann"), "ann.tsv.gz"),
+    str_stereo = resolve_fixture_path("structures_stereo.csv"),
+    str_met = resolve_fixture_path("structures_metadata.csv"),
+    str_tax_cla = resolve_fixture_path("structures_taxonomy_cla.csv"),
+    str_tax_npc = resolve_fixture_path("structures_taxonomy_npc.csv"),
+    strict = FALSE
+  ))
+
+  ms1_row <- ann[grepl(
+    "exact mass database search",
+    ann$candidate_library,
+    fixed = TRUE
+  )]
+  spec_row <- ann[grepl(
+    "GNPS spectral library",
+    ann$candidate_library,
+    fixed = TRUE
+  )]
+
+  # MS1 evidence carries no spectral match -> similarity must be NA.
+  expect_true(is.na(ms1_row$candidate_score_similarity))
+  # Spectral evidence: id_confidence_measure[4] (0.92) is used, not the
+  # combined score_final (0.958).
+  expect_equal(spec_row$candidate_score_similarity, 0.92)
+})
+
 test_that("read_mztab_tables parses mzTab-M JSON fixtures in both naming flavors", {
   files <- c(
     resolve_fixture_path("mztab/progenesis_2.4.6505.48857_MTBLS263.json"),

@@ -11,7 +11,7 @@ hooks = [{ id = "air-format" }]
 
 [[repos]]
 repo = "https://github.com/lorenzwalthert/precommit"
-rev = "v0.4.3.9031"
+rev = "v0.4.3.9032"
 hooks = [{ id = "use-tidy-description" }, { id = "parsable-R" }, { id = "no-browser-statement" }, { id = "no-print-statement" }, { id = "no-debug-statement" }, { id = "deps-in-desc", additional_dependencies = ["taxonomicallyinformedannotation/tima"] }, { id = "readme-rmd-rendered" }]
 
 [[repos]]
@@ -21,12 +21,12 @@ hooks = [{ id = "check-added-large-files", args = ["--maxkb=200"] }, { id = "fil
 
 [[repos]]
 repo = "https://github.com/tombi-toml/tombi-pre-commit"
-rev = "v1.8.5"
+rev = "v1.8.8"
 hooks = [{ id = "tombi-format" }, { id = "tombi-lint" }]
 
 [[repos]]
 repo = "https://github.com/jolars/panache-pre-commit"
-rev = "v3.16.0"
+rev = "v3.17.0"
 hooks = [{ id = "panache-format" }, { id = "panache-lint" }]
 
 [[repos]]

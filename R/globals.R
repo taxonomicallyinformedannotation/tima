@@ -120,6 +120,7 @@ utils::globalVariables(
     ".updated_rank_final",
     ":=",
     "ATTRIBUTE_species",
+    "assay_name",
     "ComponentIndex",
     "CompoundName",
     "Distance",

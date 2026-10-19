@@ -1,3 +1,12 @@
+#' Read base mzTab while preserving unmanaged lines
+#'
+#' Collects passthrough content as every non-blank line that does not belong to
+#' the managed TIMA sections (`MTD`, `SMH/SML`, `SFH/SMF`, `SEH/SME`). This
+#' includes custom extension blocks and comment rows from anywhere in the file.
+#' Passthrough lines are emitted before the TIMA-managed metadata section.
+#'
+#' @keywords internal
+#' @include mztab_parser.R read_mztab.R
 .mztab_read_base <- function(path) {
   if (.mztab_is_json_path(path)) {
     tabs <- read_mztab_tables(path)
@@ -349,31 +358,43 @@
     sml_all <- tidytable::bind_rows(sml_all, new_rows)
   }
 
-  # Process duplicates: merge references
+  # Process duplicates: merge references. Multiple new rows may map to the same
+  # base row (same compound seen across several features); in that case the
+  # references must be folded sequentially into the running union. We cannot use
+  # a single mapply() over a duplicated `base_idx`, because R assignment with
+  # duplicated indices keeps only the last write and would silently drop all
+  # but the final new reference list (see .mztab_union_ref_ids).
   dup_idx <- which(!is.na(match_idx))
   if (length(dup_idx) > 0L) {
     base_idx <- match_idx[dup_idx]
-    sml_all$SMF_ID_REFS[base_idx] <- mapply(
-      .mztab_union_ref_ids,
-      sml_all$SMF_ID_REFS[base_idx],
-      sml_new$SMF_ID_REFS[dup_idx],
-      SIMPLIFY = TRUE,
-      USE.NAMES = FALSE
+    ref_cols <- c("SMF_ID_REFS", "SME_ID_REFS", "adduct_ions")
+
+    # Work on a plain data.frame copy so duplicate-index assignment follows
+    # ordinary R semantics; convert back to tidytable afterwards.
+    sml_df <- as.data.frame(
+      sml_all,
+      stringsAsFactors = FALSE,
+      check.names = FALSE
     )
-    sml_all$SME_ID_REFS[base_idx] <- mapply(
-      .mztab_union_ref_ids,
-      sml_all$SME_ID_REFS[base_idx],
-      sml_new$SME_ID_REFS[dup_idx],
-      SIMPLIFY = TRUE,
-      USE.NAMES = FALSE
+    new_vals <- as.data.frame(
+      sml_new,
+      stringsAsFactors = FALSE,
+      check.names = FALSE
     )
-    sml_all$adduct_ions[base_idx] <- mapply(
-      .mztab_union_ref_ids,
-      sml_all$adduct_ions[base_idx],
-      sml_new$adduct_ions[dup_idx],
-      SIMPLIFY = TRUE,
-      USE.NAMES = FALSE
-    )
+
+    for (col in ref_cols) {
+      grouped <- split(new_vals[[col]][dup_idx], base_idx)
+      for (b in names(grouped)) {
+        bidx <- as.integer(b)
+        cur <- sml_df[[col]][[bidx]]
+        for (val in unname(grouped[[b]])) {
+          cur <- .mztab_union_ref_ids(cur, val)
+        }
+        sml_df[[col]][[bidx]] <- cur
+      }
+    }
+
+    sml_all <- tidytable::as_tidytable(sml_df)
   }
 
   list(sml = sml_all)
@@ -649,26 +670,3 @@
   out[!cond1 & !cond2 & cond3] <- 3L
   out
 }
-
-#' Build mzTab-M metadata table
-#'
-#' Returns a complete, ontology-aligned metadata table. Key design decisions:
-#'
-#' * All `id_confidence_measure[n]` entries use the `TIMA` user-CV namespace
-#'   (`TIMA:001`–`TIMA:004`).  No PSI-MS accession exists for composite
-#'   metabolomics scores.
-#' * `ms_level` values in the SME section use `MS:1000579` / `MS:1000580`.
-#' * `ms_run[1]-scan_polarity` is populated with `MS:1000130` (positive) or
-#'   `MS:1000129` (negative) when `polarity` is known.
-#' * When `xrefs_index` contains data, additional `database[n]` blocks are
-#'   emitted (n >= 2) for every unique xref prefix found in the annotation set.
-#' * The TIMA repository URL is registered as `software[1]-setting[1]` for
-#'   machine-readable software provenance.
-#' * `colunit-small_molecule_feature` declares seconds (UO:0000010).
-#' * `colunit-small_molecule` declares daltons (UO:0000221) for the neutral
-#'   mass column.
-#' * `colunit-small_molecule_evidence` documents each `id_confidence_measure`
-#'   column with its TIMA CV Param.
-#'
-#' @keywords internal
-#' @include mztab_parser.R

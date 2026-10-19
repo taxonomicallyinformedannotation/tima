@@ -1,0 +1,13 @@
+MTD	mzTab-version	2.1.0-M
+MTD	mzTab-mode	Summary
+MTD	mzTab-type	Identification
+MTD	small_molecule-identification_method	[,,tima,https://taxonomicallyinformedannotation.github.io/tima]
+SMH	SML_ID	SMF_ID_REFS	SME_ID_REFS	database_identifier	chemical_formula	smiles	inchi	chemical_name	uri	theoretical_neutral_mass	adduct_ions
+SML	1	1	1	-	C2H4O2	C(C(=O)O)	InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)	Glu-MS1	-	60.02	-
+SML	2	2	2	-	C2H4O2	C(C(=O)O)	InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)	Glu-MS2	-	60.02	-
+SMH	SMF_ID	SMF_ID_REFS	SME_ID_REFS	exp_mass_to_charge	charge	retention_time_in_seconds	adduct_ion	isotopomer	SME_ID_REF_ambiguity_code
+SMF	1	1	1	60.02	-1	105.0	[M-H]-	1	2
+SMF	2	2	2	60.02	-1	105.0	[M-H]-	1	2
+SEH	SME_ID	evidence_input_id	feature_id	database_identifier	chemical_formula	smiles	inchi	chemical_name	uri	derivatized_form	adduct_ion	exp_mass_to_charge	charge	theoretical_mass_to_charge	spectra_ref	identification_method	ms_level	rank	id_confidence_measure[1]	id_confidence_measure[4]
+SME	1	1	f1	-	C2H4O2	C(C(=O)O)	InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)	Glu-MS1	-	-	[M-H]-	60.02	-1	60.02	-	[,, exact mass database search, ]	1	1	0.85	-
+SME	2	2	f2	-	C2H4O2	C(C(=O)O)	InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)	Glu-MS2	-	-	[M-H]-	60.02	-1	60.02	ms_run[1]:scan=2	[,, GNPS spectral library, ]	2	2	0.958	0.92

@@ -1,22 +1,4 @@
-# ── Internal helpers ──────────────────────────────────────────────────────────
-
-#' Safely extract a column or return "null" vector
-#' @keywords internal
-.mztab_pluck <- function(df, col) {
-  if (col %in% colnames(df)) {
-    as.character(df[[col]])
-  } else {
-    rep("null", nrow(df))
-  }
-}
-
-#' Safely extract a column, replacing NA/null with "null"
-#' @keywords internal
-.mztab_pluck_na <- function(df, col) {
-  x <- .mztab_pluck(df, col)
-  x[is.na(x) | x == "NA" | x == "null" | !nzchar(x)] <- "null"
-  x
-}
+# ── Internal helpers ──
 
 #' Expand summarized (pipe-separated) results to one row per candidate
 #' @keywords internal
@@ -250,36 +232,42 @@
   smf_canonical
 }
 
+#' Empty SME schema (column names + types) with zero rows
+#' @keywords internal
+.mztab_empty_sme <- function() {
+  tidytable::tidytable(
+    SME_ID = character(0),
+    evidence_input_id = character(0),
+    database_identifier = character(0),
+    chemical_formula = character(0),
+    smiles = character(0),
+    inchi = character(0),
+    chemical_name = character(0),
+    uri = character(0),
+    derivatized_form = character(0),
+    adduct_ion = character(0),
+    exp_mass_to_charge = character(0),
+    charge = character(0),
+    theoretical_mass_to_charge = character(0),
+    spectra_ref = character(0),
+    identification_method = character(0),
+    ms_level = character(0),
+    rank = character(0),
+    "id_confidence_measure[1]" = character(0),
+    "id_confidence_measure[2]" = character(0),
+    "id_confidence_measure[3]" = character(0),
+    "id_confidence_measure[4]" = character(0),
+    feature_id = character(0)
+  )
+}
+
 #' Build SME (Small Molecule Evidence) table – one row per evidence
 #' @keywords internal
 .mztab_build_sme <- function(results, smf_table, xrefs_index = NULL) {
   ann <- as.data.frame(results, stringsAsFactors = FALSE, check.names = FALSE)
   n_rows <- nrow(ann)
   if (n_rows == 0L) {
-    return(tidytable::tidytable(
-      SME_ID = character(0),
-      evidence_input_id = character(0),
-      database_identifier = character(0),
-      chemical_formula = character(0),
-      smiles = character(0),
-      inchi = character(0),
-      chemical_name = character(0),
-      uri = character(0),
-      derivatized_form = character(0),
-      adduct_ion = character(0),
-      exp_mass_to_charge = character(0),
-      charge = character(0),
-      theoretical_mass_to_charge = character(0),
-      spectra_ref = character(0),
-      identification_method = character(0),
-      ms_level = character(0),
-      rank = character(0),
-      "id_confidence_measure[1]" = character(0),
-      "id_confidence_measure[2]" = character(0),
-      "id_confidence_measure[3]" = character(0),
-      "id_confidence_measure[4]" = character(0),
-      feature_id = character(0)
-    ))
+    return(.mztab_empty_sme())
   }
 
   ann_signal_cols <- unique(c(
@@ -319,30 +307,7 @@
   }
 
   if (!any(has_annotation)) {
-    return(tidytable::tidytable(
-      SME_ID = character(0),
-      evidence_input_id = character(0),
-      database_identifier = character(0),
-      chemical_formula = character(0),
-      smiles = character(0),
-      inchi = character(0),
-      chemical_name = character(0),
-      uri = character(0),
-      derivatized_form = character(0),
-      adduct_ion = character(0),
-      exp_mass_to_charge = character(0),
-      charge = character(0),
-      theoretical_mass_to_charge = character(0),
-      spectra_ref = character(0),
-      identification_method = character(0),
-      ms_level = character(0),
-      rank = character(0),
-      "id_confidence_measure[1]" = character(0),
-      "id_confidence_measure[2]" = character(0),
-      "id_confidence_measure[3]" = character(0),
-      "id_confidence_measure[4]" = character(0),
-      feature_id = character(0)
-    ))
+    return(.mztab_empty_sme())
   }
 
   ann <- ann[has_annotation, , drop = FALSE]
@@ -390,8 +355,12 @@
 
   lib_col <- .mztab_safe_scalar(ann[["candidate_library"]])
   charge_from_adduct <- .mztab_charge_from_adduct(adduct_raw)
+  # MS1-level evidence only comes from TIMA's mass-based annotation source
+  # (candidate_library == "TIMA MS1"); external spectral libraries are MS2.
+  # Match the canonical label case-insensitively rather than a loose "ms1"
+  # substring, which would misclassify e.g. a library named "MS1QuantDB".
   ms_level_val <- ifelse(
-    grepl("MS1|ms1|TIMA MS1", lib_col, ignore.case = TRUE),
+    grepl("tima ms1", lib_col, ignore.case = TRUE),
     "[MS, MS:1000579, MS1 spectrum, ]",
     "[MS, MS:1000580, MS2 spectrum, ]"
   )
@@ -604,6 +573,31 @@
     paste(vals, collapse = "|")
   }
 
+  # Pick the exact mass of the best-scoring candidate for a single feature,
+  # using the original TIMA results to break ties (highest score_final first).
+  # Used to populate the SML `theoretical_neutral_mass` column; returns "null"
+  # when no usable mass is available.
+  .mztab_best_exact_mass <- function(fid) {
+    out <- "null"
+    if (!is.null(results_feature_groups)) {
+      ridx <- results_feature_groups[[fid]]
+      if (length(ridx) > 0L) {
+        if ("score_final" %in% colnames(results_src)) {
+          rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))
+          rs[is.na(rs)] <- -Inf
+          ridx <- ridx[order(-rs)]
+        }
+        em <- suppressWarnings(
+          as.numeric(results_src$candidate_structure_exact_mass[ridx[[1L]]])
+        )
+        if (is.finite(em)) {
+          out <- as.character(round(em, 6))
+        }
+      }
+    }
+    out
+  }
+
   smf_id_lookup <- stats::setNames(
     as.character(smf_table$SMF_ID),
     as.character(smf_table$feature_id)
@@ -678,26 +672,12 @@
     sme_ids <- .mztab_norm_scalar_vec(grp$SME_ID)
     sme_id_refs <- ifelse(sme_ids != "null", sme_ids, "null")
 
-    theoretical_neutral_mass <- rep("null", length(grp_feature_ids))
-    if (!is.null(results_feature_groups)) {
-      for (i in seq_along(grp_feature_ids)) {
-        fid <- grp_feature_ids[[i]]
-        ridx <- results_feature_groups[[fid]]
-        if (length(ridx) > 0L) {
-          if ("score_final" %in% colnames(results_src)) {
-            rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))
-            rs[is.na(rs)] <- -Inf
-            ridx <- ridx[order(-rs)]
-          }
-          em <- suppressWarnings(as.numeric(results_src$candidate_structure_exact_mass[ridx[[
-            1L
-          ]]]))
-          if (length(em) == 1L && is.finite(em)) {
-            theoretical_neutral_mass[[i]] <- as.character(round(em, 6))
-          }
-        }
-      }
-    }
+    theoretical_neutral_mass <- vapply(
+      grp_feature_ids,
+      .mztab_best_exact_mass,
+      character(1L),
+      USE.NAMES = FALSE
+    )
 
     return(as.data.frame(
       data.frame(
@@ -730,8 +710,6 @@
     grp <- sme_src[idx, , drop = FALSE]
 
     if (nrow(grp) == 1L) {
-      order_idx <- 1L
-      best_local <- 1L
       best_score <- suppressWarnings(as.numeric(grp[[
         "id_confidence_measure[1]"
       ]][[1L]]))
@@ -762,23 +740,7 @@
         "null"
       }
 
-      theoretical_neutral_mass <- "null"
-      if (!is.null(results_feature_groups)) {
-        ridx <- results_feature_groups[[fid]]
-        if (length(ridx) > 0L) {
-          if ("score_final" %in% colnames(results_src)) {
-            rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))
-            rs[is.na(rs)] <- -Inf
-            ridx <- ridx[order(-rs)]
-          }
-          em <- suppressWarnings(as.numeric(results_src$candidate_structure_exact_mass[ridx[[
-            1L
-          ]]]))
-          if (length(em) == 1L && is.finite(em)) {
-            theoretical_neutral_mass <- as.character(round(em, 6))
-          }
-        }
-      }
+      theoretical_neutral_mass <- .mztab_best_exact_mass(fid)
 
       sml_rows[[j]] <- list(
         SML_ID = as.character(j),
@@ -807,9 +769,6 @@
     sme_num[is.na(sme_num)] <- .Machine$integer.max
 
     order_idx <- order(rank_num, -score_num, sme_num)
-    if (length(order_idx) == 0L) {
-      order_idx <- seq_len(nrow(grp))
-    }
 
     tuple_cols <- c(
       "database_identifier",
@@ -826,9 +785,6 @@
     tuple_key <- do.call(paste, c(tuple_parts, list(sep = "||")))
     tuple_key <- tuple_key[order_idx]
     order_idx <- order_idx[!duplicated(tuple_key)]
-    if (length(order_idx) == 0L) {
-      order_idx <- 1L
-    }
 
     best_local <- order_idx[[1L]]
     best_score <- suppressWarnings(as.numeric(grp[[
@@ -862,23 +818,7 @@
       "null"
     }
 
-    theoretical_neutral_mass <- "null"
-    if (!is.null(results_feature_groups)) {
-      ridx <- results_feature_groups[[fid]]
-      if (length(ridx) > 0L) {
-        if ("score_final" %in% colnames(results_src)) {
-          rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))
-          rs[is.na(rs)] <- -Inf
-          ridx <- ridx[order(-rs)]
-        }
-        em <- suppressWarnings(as.numeric(results_src$candidate_structure_exact_mass[ridx[[
-          1L
-        ]]]))
-        if (length(em) == 1L && is.finite(em)) {
-          theoretical_neutral_mass <- as.character(round(em, 6))
-        }
-      }
-    }
+    theoretical_neutral_mass <- .mztab_best_exact_mass(fid)
 
     sml_rows[[j]] <- list(
       SML_ID = as.character(j),
@@ -929,13 +869,3 @@
   }
   as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
 }
-
-#' Read base mzTab while preserving unmanaged lines
-#'
-#' Collects passthrough content as every non-blank line that does not belong to
-#' the managed TIMA sections (`MTD`, `SMH/SML`, `SFH/SMF`, `SEH/SME`). This
-#' includes custom extension blocks and comment rows from anywhere in the file.
-#' Passthrough lines are emitted before the TIMA-managed metadata section.
-#'
-#' @keywords internal
-#' @include calculate_mass_of_m.R

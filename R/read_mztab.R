@@ -508,11 +508,30 @@ read_mztab <- function(
     out$ATTRIBUTE_species[
       is.na(out$ATTRIBUTE_species) | !nzchar(out$ATTRIBUTE_species)
     ] <- NA_character_
+    out <- out |>
+      tidytable::mutate(filename = as.character(assay_name)) |>
+      tidytable::select(filename, ATTRIBUTE_species)
     return(out)
   }
 
-  # Last-resort fallback to a key-value export for non-assay-oriented files.
-  metadata_df
+  # Last-resort fallback: export raw key/value pairs under the TIMA-compatible
+  # schema so no metadata is lost and downstream consumers (which expect
+  # `filename`/`ATTRIBUTE_species`) keep working. This shape is not assay- or
+  # sample-oriented, so warn that the linkage is absent.
+  log_warn(
+    "mzTab metadata has no sample or assay linkage; exporting raw key/value pairs"
+  )
+  metadata_df <- as.data.frame(metadata_df, stringsAsFactors = FALSE)
+  if (!"key" %in% names(metadata_df) || !"value" %in% names(metadata_df)) {
+    return(tidytable::tidytable(
+      filename = character(0),
+      ATTRIBUTE_species = character(0)
+    ))
+  }
+  tidytable::tidytable(
+    filename = as.character(metadata_df$key),
+    ATTRIBUTE_species = as.character(metadata_df$value)
+  )
 }
 
 #' Write a proxy MGF from a features table.
@@ -660,7 +679,8 @@ read_mztab <- function(
     character(0)
   }
 
-  out_lines <- character(0)
+  out_entries <- vector("list", length(mgf_data_lines))
+  n_entries <- 0L
   for (line in mgf_data_lines) {
     parts <- strsplit(line, "\t", fixed = TRUE)[[1L]]
     # parts[1]="COM", parts[2]="MGF", parts[3:] = values
@@ -778,8 +798,14 @@ read_mztab <- function(
     }
 
     entry <- c(entry, "END IONS", "")
-    out_lines <- c(out_lines, entry)
+    n_entries <- n_entries + 1L
+    out_entries[[n_entries]] <- entry
   }
 
+  out_lines <- if (n_entries == 0L) {
+    NULL
+  } else {
+    unlist(out_entries[seq_len(n_entries)], use.names = FALSE)
+  }
   if (length(out_lines) == 0L) NULL else out_lines
 }

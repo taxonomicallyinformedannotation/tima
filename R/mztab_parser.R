@@ -46,31 +46,20 @@ NULL
     return(character(0))
   }
 
-  chars <- strsplit(x, "", fixed = TRUE)[[1L]]
-  fields <- character(0)
-  current <- character(0) # Use vector accumulation instead of string
-  escaped <- FALSE
-
-  for (ch in chars) {
-    if (escaped) {
-      current <- c(current, ch)
-      escaped <- FALSE
-      next
-    }
-    if (identical(ch, "\\")) {
-      escaped <- TRUE
-      next
-    }
-    if (identical(ch, ",")) {
-      fields <- c(fields, trimws(paste(current, collapse = "")))
-      current <- character(0)
-      next
-    }
-    current <- c(current, ch)
-  }
-  fields <- c(fields, trimws(paste(current, collapse = "")))
-
-  fields
+  # Split on commas that are NOT preceded by a backslash (escaped commas),
+  # then unescape: a backslash makes the following character literal.
+  # (A strsplit + gsub pass avoids the O(n^2) per-character c() growth of the
+  # previous char-loop implementation.)
+  parts <- strsplit(x, "(?<!\\\\),", perl = TRUE)[[1L]]
+  vapply(
+    parts,
+    function(p) {
+      p <- gsub("\\\\(.)", "\\1", p, perl = TRUE)
+      trimws(p)
+    },
+    character(1L),
+    USE.NAMES = FALSE
+  )
 }
 
 #' @keywords internal
@@ -386,6 +375,11 @@ NULL
   json <- tryCatch(
     jsonlite::fromJSON(input, simplifyVector = FALSE),
     error = function(e) {
+      log_warn(
+        "Failed to parse mzTab JSON file %s: %s",
+        basename(input),
+        conditionMessage(e)
+      )
       NULL
     }
   )
@@ -429,6 +423,11 @@ read_mztab_tables <- function(input) {
   lines <- tryCatch(
     readLines(input, warn = FALSE, encoding = "UTF-8"),
     error = function(e) {
+      log_warn(
+        "Failed to read mzTab file %s: %s",
+        basename(input),
+        conditionMessage(e)
+      )
       character(0)
     }
   )

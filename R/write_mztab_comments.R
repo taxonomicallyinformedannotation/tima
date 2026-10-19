@@ -87,7 +87,7 @@
         "adduct_ions"
       ),
       function(col) {
-        any(grepl("\\|", as.character(results[[col]]), fixed = TRUE))
+        any(grepl("|", as.character(results[[col]]), fixed = TRUE))
       },
       FUN.VALUE = logical(1L)
     ))
@@ -426,15 +426,21 @@
       "[, , exact mass database search, ]",
 
     # Unknown / other: embed raw library name as a user parameter.
-    is.na(lib) | !nzchar(lib) ~ "[, , unknown identification method, ]",
+    is.na(lib) | lib %in% c("", "null", "NULL", "NA") ~
+      "[, , unknown identification method, ]",
     TRUE ~ paste0("[, , ", trimws(lib), ", ]")
   )
 }
 
-#' Escape tab characters in free-text fields
+#' Escape characters that would break mzTab tab-delimited row/column structure
+#'
+#' Replaces TAB, carriage-return and newline characters with a single space so
+#' that free-text values (metadata, chemical names, URIs, …) never corrupt the
+#' tab-delimited layout of the mzTab file, as required by the mzTab specification.
 #' @keywords internal
 .mztab_escape <- function(x) {
-  gsub("\t", " ", x, fixed = TRUE)
+  x <- as.character(x)
+  gsub("[\t\r\n]+", " ", x, perl = TRUE)
 }
 
 #' Derive charge values from adduct notation
@@ -463,6 +469,25 @@
 }
 
 # ── xrefs helpers ─────────────────────────────────────────────────────────────
+
+# Canonical priority order for picking the best external xref per feature.
+# Wikidata is preferred for URI enrichment; it is excluded only for the
+# database_identifier field (wikidata InChIKey connectivity-layer IDs carry no
+# database-specific prefix).
+.MZTAB_XREF_PRIORITY_PREFIXES <- c(
+  "wikidata",
+  "chebi",
+  "pubchem.compound",
+  "hmdb",
+  "chembl.compound",
+  "drugbank",
+  "chemspider",
+  "surechembl",
+  "kegg",
+  "cas",
+  "lipidmaps",
+  "knapsack"
+)
 
 # Known prefix → (human-readable name, URL template) lookup.
 # Sorted by priority: Wikidata > ChEBI > PubChem > HMDB > ChEMBL > others.
@@ -687,20 +712,7 @@
 #' @return Single character URI string, or `"null"`.
 #' @keywords internal
 .mztab_pick_best_uri <- function(rows) {
-  priority_prefixes <- c(
-    "wikidata",
-    "chebi",
-    "pubchem.compound",
-    "hmdb",
-    "chembl.compound",
-    "drugbank",
-    "chemspider",
-    "surechembl",
-    "kegg",
-    "cas",
-    "lipidmaps",
-    "knapsack"
-  )
+  priority_prefixes <- .MZTAB_XREF_PRIORITY_PREFIXES
 
   for (pfx in priority_prefixes) {
     match_rows <- rows[rows$prefix == pfx, , drop = FALSE]
@@ -740,18 +752,13 @@
     fb <- as.character(fallback)[[1L]]
     if (is.na(fb) || !nzchar(fb)) "null" else fb
   } else {
+    # wikidata reserved for URIs; used only as a last resort for the
+    # database_identifier field (matches original ordering: last).
     priority_prefixes <- c(
-      "chebi",
-      "pubchem.compound",
-      "hmdb",
-      "chembl.compound",
-      "drugbank",
-      "chemspider",
-      "surechembl",
-      "kegg",
-      "cas",
-      "lipidmaps",
-      "knapsack",
+      setdiff(
+        .MZTAB_XREF_PRIORITY_PREFIXES,
+        "wikidata"
+      ),
       "wikidata"
     )
 
@@ -814,20 +821,7 @@
   })))
 
   # Priority order for database[n] registration (wikidata is for URIs only)
-  ordered_prefixes <- c(
-    "wikidata",
-    "chebi",
-    "pubchem.compound",
-    "hmdb",
-    "chembl.compound",
-    "drugbank",
-    "chemspider",
-    "surechembl",
-    "kegg",
-    "cas",
-    "lipidmaps",
-    "knapsack"
-  )
+  ordered_prefixes <- .MZTAB_XREF_PRIORITY_PREFIXES
   selected <- intersect(ordered_prefixes, all_prefixes)
 
   out <- lapply(selected, function(pfx) {

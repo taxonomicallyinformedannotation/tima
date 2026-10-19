@@ -380,15 +380,16 @@ write_mztab <- function(
 
     if (length(passthrough_lines) > 0L) {
       writeLines(passthrough_lines, con)
-      if (
-        length(passthrough_lines) > 0L &&
-          utils::tail(passthrough_lines, 1L) != ""
-      ) {
-        writeLines("", con)
-      }
+      # passthrough_lines are guaranteed non-blank (filtered at parse time),
+      # so a blank separator is always needed after them.
+      writeLines("", con)
     }
 
-    if (length(export_comments) > 0L) {
+    if (
+      !is.null(export_comments) &&
+        length(export_comments) > 0L &&
+        !all(export_comments %in% passthrough_lines)
+    ) {
       writeLines(export_comments, con)
       writeLines("", con)
     }
@@ -401,7 +402,11 @@ write_mztab <- function(
       writeLines("", con)
     }
 
-    if (length(edge_comments) > 0L) {
+    if (
+      !is.null(edge_comments) &&
+        length(edge_comments) > 0L &&
+        !all(edge_comments %in% passthrough_lines)
+    ) {
       writeLines(edge_comments, con)
       writeLines("", con)
     }

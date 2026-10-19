@@ -144,6 +144,14 @@ test_that(".mztab_library_to_identification_method handles NA", {
   expect_true(grepl("unknown", result))
 })
 
+test_that(".mztab_library_to_identification_method treats null/empty as unknown", {
+  # safe_scalar normalises NA -> "null" before this is reached in the
+  # end-to-end path, so "null"/"NULL"/"" must also map to unknown rather
+  # than producing the meaningless "[, , null, ]".
+  expect_true(grepl("unknown", library_to_method("null")))
+  expect_true(grepl("unknown", library_to_method("")))
+})
+
 test_that(".mztab_library_to_identification_method passes through Param format", {
   param <- "[, , my method, value]"
   result <- library_to_method(param)
@@ -161,9 +169,14 @@ test_that(".mztab_escape replaces tab characters with spaces", {
   expect_equal(result, "hello world")
 })
 
-test_that(".mztab_escape leaves strings without tabs unchanged", {
+test_that(".mztab_escape leaves strings without special chars unchanged", {
   result <- mztab_escape("hello world")
   expect_equal(result, "hello world")
+})
+
+test_that(".mztab_escape collapses newlines and carriage returns", {
+  result <- mztab_escape("a\tb\nc\rd")
+  expect_equal(result, "a b c d")
 })
 
 test_that(".mztab_escape handles empty string", {

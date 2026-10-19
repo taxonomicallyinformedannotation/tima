@@ -12,6 +12,9 @@
 #'     messages
 #' @param required_cols [character] Character vector of required column names
 #'     (optional)
+#' @param .reader [function] Function used to perform the actual read, called
+#'     as `.reader(file = file, ...)`. Defaults to `tidytable::fread()`.
+#'     Mainly useful for testing.
 #' @param ... Additional arguments passed to tidytable::fread
 #'
 #' @return Data frame/tidytable

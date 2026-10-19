@@ -291,20 +291,43 @@ MZTAB_TERM_FALLBACKS <- list(
   )
 }
 
+# Package-local cache for the fully-built mzTab schema catalog, so the bundled
+# OpenAPI + terms YAML files are parsed once per `software_version` instead of
+# on every `write_mztab()` / `validate_mztab_tables()` call.
+.mztab_schema_catalog_cache <- new.env(parent = emptyenv())
+.mztab_schema_cache <- new.env(parent = emptyenv())
+.mztab_terms_cache <- new.env(parent = emptyenv())
+
 #' @keywords internal
 .mztab_schema_catalog <- function(software_version = NULL) {
+  version <- if (
+    is.null(software_version) || !nzchar(as.character(software_version))
+  ) {
+    "unknown"
+  } else {
+    as.character(software_version)
+  }
+
+  cached <- .mztab_schema_catalog_cache[[version]]
+  if (!is.null(cached)) {
+    return(cached)
+  }
+
   schema <- .load_mztab_schema()
   required_columns <- get_mztab_required_columns()
 
-  list(
+  catalog <- list(
     schema = schema,
     required_columns = required_columns,
     metadata = list(
       required = MZTAB_METADATA_REQUIRED_FALLBACK,
       recommended = MZTAB_METADATA_RECOMMENDED_FALLBACK
     ),
-    terms = .mztab_read_term_catalog(software_version)
+    terms = .mztab_read_term_catalog(version)
   )
+
+  .mztab_schema_catalog_cache[[version]] <- catalog
+  catalog
 }
 
 #' @keywords internal
@@ -327,7 +350,12 @@ MZTAB_TERM_FALLBACKS <- list(
     return(NULL)
   }
 
-  tryCatch(
+  cached <- .mztab_schema_cache[[schema_path]]
+  if (!is.null(cached)) {
+    return(cached)
+  }
+
+  parsed <- tryCatch(
     .mztab_read_yaml(schema_path),
     error = function(e) {
       log_warn(
@@ -337,6 +365,8 @@ MZTAB_TERM_FALLBACKS <- list(
       NULL
     }
   )
+  .mztab_schema_cache[[schema_path]] <- parsed
+  parsed
 }
 
 #' @keywords internal
