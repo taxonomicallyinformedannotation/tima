@@ -28,3 +28,6 @@ _targets
 .quarto
 
 vignettes/*.pdf
+.DS_Store
+.Rhistory
+.RData
