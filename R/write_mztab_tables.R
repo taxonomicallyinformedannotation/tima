@@ -390,8 +390,12 @@
 
   lib_col <- .mztab_safe_scalar(ann[["candidate_library"]])
   charge_from_adduct <- .mztab_charge_from_adduct(adduct_raw)
+  # MS1-level evidence only comes from TIMA's mass-based annotation source
+  # (candidate_library == "TIMA MS1"); external spectral libraries are MS2.
+  # Match the canonical label case-insensitively rather than a loose "ms1"
+  # substring, which would misclassify e.g. a library named "MS1QuantDB".
   ms_level_val <- ifelse(
-    grepl("MS1|ms1|TIMA MS1", lib_col, ignore.case = TRUE),
+    grepl("tima ms1", lib_col, ignore.case = TRUE),
     "[MS, MS:1000579, MS1 spectrum, ]",
     "[MS, MS:1000580, MS2 spectrum, ]"
   )
