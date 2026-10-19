@@ -639,7 +639,7 @@ Definitive Guide_. Chapman; Hall/CRC. <https://yihui.org/rmarkdown/>.
 <div id="ref-rmarkdown2020" class="csl-entry">
 
 Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. _R Markdown
-Cookbook_. Chapman; Hall/CRC. <https://bookdown.org/yihui/rmarkdown-cookbook/>.
+Cookbook_. Chapman; Hall/CRC. <https://pkg.yihui.org/rmarkdown-cookbook/>.
 
 </div>
 
