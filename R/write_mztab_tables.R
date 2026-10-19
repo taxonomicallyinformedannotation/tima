@@ -250,36 +250,42 @@
   smf_canonical
 }
 
+#' Empty SME schema (column names + types) with zero rows
+#' @keywords internal
+.mztab_empty_sme <- function() {
+  tidytable::tidytable(
+    SME_ID = character(0),
+    evidence_input_id = character(0),
+    database_identifier = character(0),
+    chemical_formula = character(0),
+    smiles = character(0),
+    inchi = character(0),
+    chemical_name = character(0),
+    uri = character(0),
+    derivatized_form = character(0),
+    adduct_ion = character(0),
+    exp_mass_to_charge = character(0),
+    charge = character(0),
+    theoretical_mass_to_charge = character(0),
+    spectra_ref = character(0),
+    identification_method = character(0),
+    ms_level = character(0),
+    rank = character(0),
+    "id_confidence_measure[1]" = character(0),
+    "id_confidence_measure[2]" = character(0),
+    "id_confidence_measure[3]" = character(0),
+    "id_confidence_measure[4]" = character(0),
+    feature_id = character(0)
+  )
+}
+
 #' Build SME (Small Molecule Evidence) table – one row per evidence
 #' @keywords internal
 .mztab_build_sme <- function(results, smf_table, xrefs_index = NULL) {
   ann <- as.data.frame(results, stringsAsFactors = FALSE, check.names = FALSE)
   n_rows <- nrow(ann)
   if (n_rows == 0L) {
-    return(tidytable::tidytable(
-      SME_ID = character(0),
-      evidence_input_id = character(0),
-      database_identifier = character(0),
-      chemical_formula = character(0),
-      smiles = character(0),
-      inchi = character(0),
-      chemical_name = character(0),
-      uri = character(0),
-      derivatized_form = character(0),
-      adduct_ion = character(0),
-      exp_mass_to_charge = character(0),
-      charge = character(0),
-      theoretical_mass_to_charge = character(0),
-      spectra_ref = character(0),
-      identification_method = character(0),
-      ms_level = character(0),
-      rank = character(0),
-      "id_confidence_measure[1]" = character(0),
-      "id_confidence_measure[2]" = character(0),
-      "id_confidence_measure[3]" = character(0),
-      "id_confidence_measure[4]" = character(0),
-      feature_id = character(0)
-    ))
+    return(.mztab_empty_sme())
   }
 
   ann_signal_cols <- unique(c(
@@ -319,30 +325,7 @@
   }
 
   if (!any(has_annotation)) {
-    return(tidytable::tidytable(
-      SME_ID = character(0),
-      evidence_input_id = character(0),
-      database_identifier = character(0),
-      chemical_formula = character(0),
-      smiles = character(0),
-      inchi = character(0),
-      chemical_name = character(0),
-      uri = character(0),
-      derivatized_form = character(0),
-      adduct_ion = character(0),
-      exp_mass_to_charge = character(0),
-      charge = character(0),
-      theoretical_mass_to_charge = character(0),
-      spectra_ref = character(0),
-      identification_method = character(0),
-      ms_level = character(0),
-      rank = character(0),
-      "id_confidence_measure[1]" = character(0),
-      "id_confidence_measure[2]" = character(0),
-      "id_confidence_measure[3]" = character(0),
-      "id_confidence_measure[4]" = character(0),
-      feature_id = character(0)
-    ))
+    return(.mztab_empty_sme())
   }
 
   ann <- ann[has_annotation, , drop = FALSE]
