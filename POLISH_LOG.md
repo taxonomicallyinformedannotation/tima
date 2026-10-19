@@ -89,44 +89,70 @@ Started: 2026-10-19
 - ✅ **#8:** `.mztab_escape` now collapses `\t`, `\r`, `\n` (was tab-only); now
   applied to metadata values and to every section row value. Added test.
 - ✅ **#11 (partial):** Additional xref `database[n]` blocks now continue
-  numbering after any `database[n]` already present in the base file, instead
-  of unconditionally restarting at `database[2]`.
+  numbering after the highest `database[n]` already present in the base file,
+  instead of unconditionally restarting at `database[2]`.
 - ✅ **#14:** Removed redundant `length(passthrough_lines) > 0L &&` re-check in
   write_mztab.
-- ⚠️ #3 `#11 dup keys`, #7 orphaned roxygen, #1 dead-code, #15 duplication,
-  #16 perf `.mztab_schema_catalog`/`.extract_embedded_mgf`/`_split_param_fields`
-  — logged under Open questions / Proposals (need careful refactors/tests).
+- ✅ **#15 (duplication):** Hoisted the 3× `priority_prefixes` literal in
+  `write_mztab_comments.R` into one `.MZTAB_XREF_PRIORITY_PREFIXES` constant
+  (Wikidata-first for URI/xref-block ordering; Wikidata excluded-then-last-resort
+  for `database_identifier`, preserving original ordering); extracted
+  `.mztab_best_exact_mass()` and reused it across all 3 candidate-mass blocks
+  (group_sizes==1, single-row SME, multi-row SME).
+- ✅ **#16 (perf):** `.mztab_split_param_fields()` rewritten with a `strsplit` +
+  `gsub` unescape pass (no per-character `c()` growth).
+- ✅ **#7/#14 (dead code):** Removed unused `.mztab_pluck`/`.mztab_pluck_na`
+  (+ their tests); removed the two unreachable `if (length(order_idx)==0L)`
+  guards in the multi-row SME branch and the dead `best_local<-1L`/`order_idx<-1L`
+  in the single-row SME branch.
+- ✅ **#12 (score split):** `prepare_annotations_mztab` no longer maps overall
+  confidence into `candidate_score_similarity`. Spectral similarity now comes
+  only from `id_confidence_measure[4]` (TIMA spectral) / `best_id_confidence_value`
+  (standard mzTab); MS1 evidence is forced to NA (fixes the downstream
+  `ms1_only` filter and the conflation of combined score with spectral
+  similarity). Removed dead `.mztab_reliability_to_score` + `score_primary`;
+  added `score_split.mztab` fixture + regression test.
+- ✅ `R/mztab_parser.R`: `log_warn` on JSON/text parse failures instead of
+  silent NULL return.
+- ✅ `R/read_mztab.R`: `.mztab_metadata_table()` normalized to always return the
+  `filename`/`ATTRIBUTE_species` schema on every branch (was 3 inconsistent
+  schemas on fallback); `.extract_embedded_mgf` rewritten from O(n²) `c()`
+  accumulation to O(n) list accumulation.
+- ✅ `src/gnps.c`: doc accuracy fixes for `xmalloc`/`xcalloc`/`gnps_chain_dp_core_api`.
+- ✅ `R/safe_fread.R`, `R/get_file.R`: documented `.reader` param; restored
+  `timeout` option via `on.exit` (no global side-effect).
+- ✅ `R/write_mztab_merge.R`: fixed data-loss bug in `.mztab_merge_sml_rows`
+  (referencing refs overwritten by last-keeper instead of folded sequentially);
+  regression test added.
+- ✅ `R/write_mztab_comments.R`: pipe-detection regex `\\|`|`→`|`;
+  `identification_method` null → `[, , unknown identification method, ]`;
+  `.mztab_escape` collapses `\t\r\n` and is applied to all metadata + row values.
+- ✅ `R/write_mztab_tables.R`: MS1 classification via `grepl("tima ms1",…)`
+  (not loose `MS1|ms1`); extracted `.mztab_empty_sme()`.
+- ✅ `R/mztab_schema_utils.R`: memoized `.load_mztab_schema` (by path) and
+  `.mztab_schema_catalog` (by version) — no re-parse per call.
+- ✅ README.md/README.qmd: docs URL `articles/`→`vignettes/articles/`;
+  R-Markdown-Cookbook link → canonical `pkg.yihui.org`.
+- ✅ Build hygiene: `.Rbuildignore` excludes `.claudeignore`, `.ruff_cache`,
+  `.gemini`, `.agents`, `.kb`, `POLISH_LOG.md`; `.gitignore` excludes
+  `.DS_Store`/`.Rhistory`/`.RData`.
+
+### Verification
+- `air format . --check`: **PASS**
+- `devtools::test()`: **5842 pass, 12 skip, 0 fail, 0 err** (latest, after all edits).
+- `R CMD check`: 0 errors / 1 warning (`-mcpu=native`, environmental, from `~/.R/Makevars`) / 1 note.
+
+## Open questions / blocked
+- NEWS.md historical URLs (`www.tidyverse.org` redirect, yihui redirects) left
+  untouched (changelog history); README canonicalized.
+- `-mcpu=native` / `-Wno-c23-extensions` WARNING is environmental, not repo.
+
+## Resolved proposals (all approved & applied)
+- #12 score split ✅ — applied (see above).
+- #15 consolidation ✅ — applied.
+- #16 perf ✅ — applied.
+- #7/#14 dead-code removal ✅ — applied.
 
 ## Issues found but not fixed
+(invites future passes; all current proposals resolved)
 
-## Open questions
-- **#12 design (logged):** `prepare_annotations_mztab` maps overall confidence
-  (`score_final`/`best_id_evidence_value`/`reliability`) into
-  `candidate_score_similarity`, which downstream weighting treats as spectral
-  similarity. Non-spectral evidence thus masquerades as spectral match.
-  Recommendation (needs SME input): only populate `candidate_score_similarity`
-  when the source library is spectral; otherwise map into a generic score
-  column. Behavior change → proposal only.
-- README historical NEWS.md URLs (tidyverse.org `www.` → redirect, yihui redirect)
-  left as-is (changelog history); README.md/.qmd corrected to canonical targets.
-- `-mcpu=native` / `-Wno-c23-extensions` WARNING originates from the maintainer
-  `~/.R/Makevars`, not the package; CRAN/CI builds clean.
-
-## Proposals requiring human decision
-1. **Finding #15 remaining duplication** (`write_mztab_tables.R`): extract
-   `.mztab_best_exact_mass()` across the 3 triplicated "pick best-scoring
-   candidate exact mass" blocks (~682/766/866); hoist the 3× `priority_prefixes`
-   vector in `write_mztab_comments.R` into one constant (order currently
-   differs between copies); consolidate `.mztab_pluck_na`/`.mztab_norm_scalar`/
-   `.mztab_safe_scalar` null-normalization semantics. (Tests pass either way;
-   medium refactor risk.)
-2. **Finding #16 remaining perf**: `.mztab_split_param_fields()` accumulates
-   chars via `c()` per element (O(n²) per CV term). Rewrite with `strsplit` +
-   unescape pass. (Niche parser; low impact.)
-3. **Finding #7/#14 dead-code cleanup**: unused `best_local <- 1L` /
-   `order_idx <- 1L` in the single-row SME branch; dead `if (length(order_idx)==0)`
-   guard; dead `.mztab_pluck`/`.mztab_pluck_na` (tested but unused in production)
-   + Rd — consider removal. (Low value, medium test-churn risk.)
-4. **Finding #1 (invalidated):** merge was thought to wipe base SMF refs, but
-   `feature_id`-less base rows still matched via the merge key correctly; no
-   change needed. Verified by round-trip repro.
