@@ -1,22 +1,4 @@
-# ── Internal helpers ──────────────────────────────────────────────────────────
-
-#' Safely extract a column or return "null" vector
-#' @keywords internal
-.mztab_pluck <- function(df, col) {
-  if (col %in% colnames(df)) {
-    as.character(df[[col]])
-  } else {
-    rep("null", nrow(df))
-  }
-}
-
-#' Safely extract a column, replacing NA/null with "null"
-#' @keywords internal
-.mztab_pluck_na <- function(df, col) {
-  x <- .mztab_pluck(df, col)
-  x[is.na(x) | x == "NA" | x == "null" | !nzchar(x)] <- "null"
-  x
-}
+# ── Internal helpers ──
 
 #' Expand summarized (pipe-separated) results to one row per candidate
 #' @keywords internal
@@ -787,9 +769,6 @@
     sme_num[is.na(sme_num)] <- .Machine$integer.max
 
     order_idx <- order(rank_num, -score_num, sme_num)
-    if (length(order_idx) == 0L) {
-      order_idx <- seq_len(nrow(grp))
-    }
 
     tuple_cols <- c(
       "database_identifier",
@@ -806,9 +785,6 @@
     tuple_key <- do.call(paste, c(tuple_parts, list(sep = "||")))
     tuple_key <- tuple_key[order_idx]
     order_idx <- order_idx[!duplicated(tuple_key)]
-    if (length(order_idx) == 0L) {
-      order_idx <- 1L
-    }
 
     best_local <- order_idx[[1L]]
     best_score <- suppressWarnings(as.numeric(grp[[
