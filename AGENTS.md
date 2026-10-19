@@ -6,16 +6,16 @@ Bioconductor.
 
 ## Quick Commands
 
-  | Task | Command |
-  | ------ | --------- |
-  | Run all tests | `Rscript tests/test-all.R` |
-  | Run single test file | `Rscript tests/test-single.R test-FILENAME.R` |
-  | Format R code | `air format .` |
-  | Check formatting | `air format . --check` |
-  | Lint R code | `Rscript -e 'library(lintr); lintr::lint_dir("R")'` |
-  | Roxygen docs | `Rscript -e 'roxygen2::roxygenise(".")'` |
-  | R CMD check | `R CMD check . --no-manual` |
-  | Regenerate code map | `graphify . . --no-commit` (requires graphify) |
+  | Task                 | Command                                                                                                                 |
+  | ------               | ---------                                                                                                               |
+  | Run all tests        | `Rscript -e 'library(testthat); testthat::test_package("tima")'`                                                        |
+  | Run single test file | `Rscript -e 'library(pkgload); pkgload::load_all("."); library(testthat); test_file("tests/testthat/test-FILENAME.R")'` |
+  | Format R code        | `air format .`                                                                                                          |
+  | Check formatting     | `air format . --check`                                                                                                  |
+  | Lint R code          | `Rscript -e 'library(lintr); lintr::lint_dir("R")'`                                                                     |
+  | Roxygen docs         | `Rscript -e 'roxygen2::roxygenise(".")'`                                                                                |
+  | R CMD check          | `R CMD check . --no-manual`                                                                                             |
+  | Regenerate code map  | `graphify . . --no-commit` (requires graphify)                                                                          |
 
 ## Project Structure
 
@@ -25,8 +25,6 @@ Bioconductor.
   registers symbols
 - `tests/testthat/` --- 157 test files (testthat, 3rd edition). `setup.R` loads
   via pkgload
-- `tests/test-single.R` --- fast single-file test runner
-- `tests/test-all.R` --- full test runner (uses pkgload::load_all)
 - `inst/scripts/` --- CLI scripts (docopt-based). Usage in
   `inst/scripts/docopt/*.txt`
 - `inst/targets/` --- targets pipeline sections (sourced by `inst/_targets.R`)
@@ -54,7 +52,8 @@ Bioconductor.
 ## Definition of Done
 
 1. `air format . --check` passes (exit 0)
-2. `Rscript tests/test-single.R test-<affected>.R` passes
+2. Tests pass in `tests/testthat/` (requires `pkgload::load_all()` for local
+   runs)
 3. `Rscript -e 'roxygen2::roxygenise(".")'` passes with no errors
 4. If new code affects R → run `R CMD check . --no-manual` locally before
    pushing
