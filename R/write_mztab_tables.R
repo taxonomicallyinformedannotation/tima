@@ -591,6 +591,31 @@
     paste(vals, collapse = "|")
   }
 
+  # Pick the exact mass of the best-scoring candidate for a single feature,
+  # using the original TIMA results to break ties (highest score_final first).
+  # Used to populate the SML `theoretical_neutral_mass` column; returns "null"
+  # when no usable mass is available.
+  .mztab_best_exact_mass <- function(fid) {
+    out <- "null"
+    if (!is.null(results_feature_groups)) {
+      ridx <- results_feature_groups[[fid]]
+      if (length(ridx) > 0L) {
+        if ("score_final" %in% colnames(results_src)) {
+          rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))
+          rs[is.na(rs)] <- -Inf
+          ridx <- ridx[order(-rs)]
+        }
+        em <- suppressWarnings(
+          as.numeric(results_src$candidate_structure_exact_mass[ridx[[1L]]])
+        )
+        if (is.finite(em)) {
+          out <- as.character(round(em, 6))
+        }
+      }
+    }
+    out
+  }
+
   smf_id_lookup <- stats::setNames(
     as.character(smf_table$SMF_ID),
     as.character(smf_table$feature_id)
@@ -665,26 +690,12 @@
     sme_ids <- .mztab_norm_scalar_vec(grp$SME_ID)
     sme_id_refs <- ifelse(sme_ids != "null", sme_ids, "null")
 
-    theoretical_neutral_mass <- rep("null", length(grp_feature_ids))
-    if (!is.null(results_feature_groups)) {
-      for (i in seq_along(grp_feature_ids)) {
-        fid <- grp_feature_ids[[i]]
-        ridx <- results_feature_groups[[fid]]
-        if (length(ridx) > 0L) {
-          if ("score_final" %in% colnames(results_src)) {
-            rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))
-            rs[is.na(rs)] <- -Inf
-            ridx <- ridx[order(-rs)]
-          }
-          em <- suppressWarnings(as.numeric(results_src$candidate_structure_exact_mass[ridx[[
-            1L
-          ]]]))
-          if (length(em) == 1L && is.finite(em)) {
-            theoretical_neutral_mass[[i]] <- as.character(round(em, 6))
-          }
-        }
-      }
-    }
+    theoretical_neutral_mass <- vapply(
+      grp_feature_ids,
+      .mztab_best_exact_mass,
+      character(1L),
+      USE.NAMES = FALSE
+    )
 
     return(as.data.frame(
       data.frame(
@@ -717,8 +728,6 @@
     grp <- sme_src[idx, , drop = FALSE]
 
     if (nrow(grp) == 1L) {
-      order_idx <- 1L
-      best_local <- 1L
       best_score <- suppressWarnings(as.numeric(grp[[
         "id_confidence_measure[1]"
       ]][[1L]]))
@@ -749,23 +758,7 @@
         "null"
       }
 
-      theoretical_neutral_mass <- "null"
-      if (!is.null(results_feature_groups)) {
-        ridx <- results_feature_groups[[fid]]
-        if (length(ridx) > 0L) {
-          if ("score_final" %in% colnames(results_src)) {
-            rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))
-            rs[is.na(rs)] <- -Inf
-            ridx <- ridx[order(-rs)]
-          }
-          em <- suppressWarnings(as.numeric(results_src$candidate_structure_exact_mass[ridx[[
-            1L
-          ]]]))
-          if (length(em) == 1L && is.finite(em)) {
-            theoretical_neutral_mass <- as.character(round(em, 6))
-          }
-        }
-      }
+      theoretical_neutral_mass <- .mztab_best_exact_mass(fid)
 
       sml_rows[[j]] <- list(
         SML_ID = as.character(j),
@@ -849,23 +842,7 @@
       "null"
     }
 
-    theoretical_neutral_mass <- "null"
-    if (!is.null(results_feature_groups)) {
-      ridx <- results_feature_groups[[fid]]
-      if (length(ridx) > 0L) {
-        if ("score_final" %in% colnames(results_src)) {
-          rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))
-          rs[is.na(rs)] <- -Inf
-          ridx <- ridx[order(-rs)]
-        }
-        em <- suppressWarnings(as.numeric(results_src$candidate_structure_exact_mass[ridx[[
-          1L
-        ]]]))
-        if (length(em) == 1L && is.finite(em)) {
-          theoretical_neutral_mass <- as.character(round(em, 6))
-        }
-      }
-    }
+    theoretical_neutral_mass <- .mztab_best_exact_mass(fid)
 
     sml_rows[[j]] <- list(
       SML_ID = as.character(j),
