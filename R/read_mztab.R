@@ -679,7 +679,8 @@ read_mztab <- function(
     character(0)
   }
 
-  out_lines <- character(0)
+  out_entries <- vector("list", length(mgf_data_lines))
+  n_entries <- 0L
   for (line in mgf_data_lines) {
     parts <- strsplit(line, "\t", fixed = TRUE)[[1L]]
     # parts[1]="COM", parts[2]="MGF", parts[3:] = values
@@ -797,8 +798,14 @@ read_mztab <- function(
     }
 
     entry <- c(entry, "END IONS", "")
-    out_lines <- c(out_lines, entry)
+    n_entries <- n_entries + 1L
+    out_entries[[n_entries]] <- entry
   }
 
+  out_lines <- if (n_entries == 0L) {
+    NULL
+  } else {
+    unlist(out_entries[seq_len(n_entries)], use.names = FALSE)
+  }
   if (length(out_lines) == 0L) NULL else out_lines
 }
