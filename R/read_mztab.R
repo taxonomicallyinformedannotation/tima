@@ -508,11 +508,30 @@ read_mztab <- function(
     out$ATTRIBUTE_species[
       is.na(out$ATTRIBUTE_species) | !nzchar(out$ATTRIBUTE_species)
     ] <- NA_character_
+    out <- out |>
+      tidytable::mutate(filename = as.character(assay_name)) |>
+      tidytable::select(filename, ATTRIBUTE_species)
     return(out)
   }
 
-  # Last-resort fallback to a key-value export for non-assay-oriented files.
-  metadata_df
+  # Last-resort fallback: export raw key/value pairs under the TIMA-compatible
+  # schema so no metadata is lost and downstream consumers (which expect
+  # `filename`/`ATTRIBUTE_species`) keep working. This shape is not assay- or
+  # sample-oriented, so warn that the linkage is absent.
+  log_warn(
+    "mzTab metadata has no sample or assay linkage; exporting raw key/value pairs"
+  )
+  metadata_df <- as.data.frame(metadata_df, stringsAsFactors = FALSE)
+  if (!"key" %in% names(metadata_df) || !"value" %in% names(metadata_df)) {
+    return(tidytable::tidytable(
+      filename = character(0),
+      ATTRIBUTE_species = character(0)
+    ))
+  }
+  tidytable::tidytable(
+    filename = as.character(metadata_df$key),
+    ATTRIBUTE_species = as.character(metadata_df$value)
+  )
 }
 
 #' Write a proxy MGF from a features table.

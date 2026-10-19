@@ -386,6 +386,11 @@ NULL
   json <- tryCatch(
     jsonlite::fromJSON(input, simplifyVector = FALSE),
     error = function(e) {
+      log_warn(
+        "Failed to parse mzTab JSON file %s: %s",
+        basename(input),
+        conditionMessage(e)
+      )
       NULL
     }
   )
@@ -429,6 +434,11 @@ read_mztab_tables <- function(input) {
   lines <- tryCatch(
     readLines(input, warn = FALSE, encoding = "UTF-8"),
     error = function(e) {
+      log_warn(
+        "Failed to read mzTab file %s: %s",
+        basename(input),
+        conditionMessage(e)
+      )
       character(0)
     }
   )
