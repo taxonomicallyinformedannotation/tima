@@ -217,10 +217,12 @@ static int gnps_safe_to_call_r_error(void) {
  * (see above) and return NULL otherwise, for the caller to handle. */
 
 /**
- * @brief `malloc()` that never returns NULL - aborts via gnps_fatal() on
- *        failure instead.
+ * @brief `malloc()` wrapper that reports failure via R's `error()` when
+ *        that is safe (see gnps_safe_to_call_r_error()) and returns NULL
+ *        otherwise, for the caller to handle.
  * @param n Bytes to allocate.
- * @return Newly allocated, uninitialized memory of size `n`.
+ * @return Newly allocated, uninitialized memory of size `n`, or NULL on
+ *         failure when R's `error()` cannot be called from this thread.
  */
 static void *xmalloc(size_t n) {
     void *p = malloc(n);
@@ -233,11 +235,14 @@ static void *xmalloc(size_t n) {
 }
 
 /**
- * @brief `calloc()` that never returns NULL - aborts via gnps_fatal() on
- *        failure instead.
+ * @brief `calloc()` wrapper that reports failure via R's `error()` when
+ *        that is safe (see gnps_safe_to_call_r_error()) and returns NULL
+ *        otherwise, for the caller to handle.
  * @param n Number of elements.
  * @param s Size of each element in bytes.
- * @return Newly allocated, zero-initialized memory of size `n * s`.
+ * @return Newly allocated, zero-initialized memory of size `n * s`, or
+ *         NULL on failure when R's `error()` cannot be called from this
+ *         thread.
  */
 static void *xcalloc(size_t n, size_t s) {
     void *p = calloc(n, s);
@@ -790,7 +795,8 @@ static double score_matched(
  * @param ppm_val      Relative matching tolerance, in ppm.
  * @param[out] out     Result: score, matches, score_forward, score_reverse.
  * @return 0 on success, -1 on invalid arguments (null pointer or negative
- *         length). Never fails due to allocation - see gnps_fatal().
+ *         length). Never fails due to allocation - allocation failures
+ *         report through R's error() when safe, else abort.
  */
 int gnps_chain_dp_core_api(
     const double *x_mz, const double *x_int, int nx,
