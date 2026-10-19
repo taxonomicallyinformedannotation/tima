@@ -374,6 +374,7 @@
   if (nrow(meta) > 0L) {
     meta$value <- as.character(meta$value)
     meta$value[is.na(meta$value) | meta$value == "NA"] <- "null"
+    meta$value <- .mztab_escape(meta$value)
   }
 
   lines <- paste("MTD", meta$key, meta$value, sep = "\t")
@@ -423,7 +424,8 @@
       v <- tbl_df[[col]]
       v <- as.character(v)
       v[is.na(v) | !nzchar(v)] <- "null"
-      v
+      # mzTab spec: tab/CR/LF would corrupt the tab-delimited row structure.
+      .mztab_escape(v)
     })
 
     # Vectorized paste avoids full intermediate matrix + row-wise R loop

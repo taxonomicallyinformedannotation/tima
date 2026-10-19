@@ -426,15 +426,21 @@
       "[, , exact mass database search, ]",
 
     # Unknown / other: embed raw library name as a user parameter.
-    is.na(lib) | !nzchar(lib) ~ "[, , unknown identification method, ]",
+    is.na(lib) | lib %in% c("", "null", "NULL", "NA") ~
+      "[, , unknown identification method, ]",
     TRUE ~ paste0("[, , ", trimws(lib), ", ]")
   )
 }
 
-#' Escape tab characters in free-text fields
+#' Escape characters that would break mzTab tab-delimited row/column structure
+#'
+#' Replaces TAB, carriage-return and newline characters with a single space so
+#' that free-text values (metadata, chemical names, URIs, …) never corrupt the
+#' tab-delimited layout of the mzTab file, as required by the mzTab specification.
 #' @keywords internal
 .mztab_escape <- function(x) {
-  gsub("\t", " ", x, fixed = TRUE)
+  x <- as.character(x)
+  gsub("[\t\r\n]+", " ", x, perl = TRUE)
 }
 
 #' Derive charge values from adduct notation
