@@ -380,12 +380,9 @@ write_mztab <- function(
 
     if (length(passthrough_lines) > 0L) {
       writeLines(passthrough_lines, con)
-      if (
-        length(passthrough_lines) > 0L &&
-          utils::tail(passthrough_lines, 1L) != ""
-      ) {
-        writeLines("", con)
-      }
+      # passthrough_lines are guaranteed non-blank (filtered at parse time),
+      # so a blank separator is always needed after them.
+      writeLines("", con)
     }
 
     if (
