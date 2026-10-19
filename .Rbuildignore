@@ -26,6 +26,11 @@
 ^\.poolside$
 ^\.quarto$
 ^\.vscode$
+^\.claudeignore$
+^\.ruff_cache$
+^\.gemini$
+^\.agents$
+^\.kb$
 ^_pkgdown\.yml$
 ^_quarto$
 ^_targets\.yaml$
@@ -45,6 +50,7 @@
 ^prek[.]toml$
 ^renv$
 ^renv\.lock$
+^POLISH_LOG\.md$
 ^tests/testthat/_snaps$
 ^tests/testthat/_snaps/
 ^vignettes/\.quarto$
