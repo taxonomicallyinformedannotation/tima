@@ -36,6 +36,7 @@ vignettes/*.pdf
 # These can be explicitly added with `git add -f` to commit them
 !.claudeignore
 !.agentignore
+!.mcp.json
 
 # Knowledge base and graph outputs (not shipped)
 kb/
