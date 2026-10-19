@@ -23,6 +23,12 @@
   add_default <- function(meta, key, value) {
     # Environment-backed accumulator: O(1) insertion, avoids c() vector
     # growing (O(n²) total for ~54 calls)
+    if (is.null(value)) {
+      # A missing catalog default must not be emitted (and must not crash the
+      # final vapply, which would otherwise receive NULL and fail its length-1
+      # contract). Skip it silently rather than writing an empty/NA line.
+      return(meta)
+    }
     if (is.null(meta$env)) {
       meta$env <- new.env(parent = emptyenv())
       meta$seen <- new.env(parent = emptyenv())
@@ -269,34 +275,53 @@
     catalog$terms$metadata_defaults[["database[1]-uri"]]
   )
 
-  # ── Additional databases from xrefs (database[2], [3], …) ────────────────
-  db_prefix_info <- .mztab_xref_database_blocks(xrefs_index)
-  if (length(db_prefix_info) > 0L) {
-    for (i in seq_along(db_prefix_info)) {
-      db_n <- i + 1L # database[1] is already LOTUS
-      info <- db_prefix_info[[i]]
-      meta <- add_default(
-        meta,
-        paste0("database[", db_n, "]"),
-        paste0("[, , ", info$name, ", ]")
+    # ── Additional databases from xrefs (database[2], [3], …) ────────────────
+    db_prefix_info <- .mztab_xref_database_blocks(xrefs_index)
+    if (length(db_prefix_info) > 0L) {
+      # Continue numbering after any database[n] the base file already defines,
+      # instead of reusing database[2] (which would collide with an existing
+      # block and be silently skipped by add_default, leaving SME database_*
+      # references pointing at an unregistered prefix).
+      existing_db_keys <- grep(
+        "^database\\[(\\d+)\\]$",
+        unlist(meta$order, use.names = FALSE),
+        value = TRUE,
+        perl = TRUE
       )
-      meta <- add_default(
-        meta,
-        paste0("database[", db_n, "]-prefix"),
-        info$prefix
-      )
-      meta <- add_default(
-        meta,
-        paste0("database[", db_n, "]-version"),
-        "Unknown"
-      )
-      meta <- add_default(
-        meta,
-        paste0("database[", db_n, "]-uri"),
-        info$uri
-      )
+      existing_db_nums <- suppressWarnings(as.integer(
+        sub("^database\\[(\\d+)\\]$", "\\1", existing_db_keys, perl = TRUE)
+      ))
+      existing_db_nums <- existing_db_nums[!is.na(existing_db_nums)]
+      next_db_n <- if (length(existing_db_nums) > 0L) {
+        max(existing_db_nums) + 1L
+      } else {
+        2L
+      }
+      for (i in seq_along(db_prefix_info)) {
+        db_n <- next_db_n + i - 1L
+        info <- db_prefix_info[[i]]
+        meta <- add_default(
+          meta,
+          paste0("database[", db_n, "]"),
+          paste0("[, , ", info$name, ", ]")
+        )
+        meta <- add_default(
+          meta,
+          paste0("database[", db_n, "]-prefix"),
+          info$prefix
+        )
+        meta <- add_default(
+          meta,
+          paste0("database[", db_n, "]-version"),
+          "Unknown"
+        )
+        meta <- add_default(
+          meta,
+          paste0("database[", db_n, "]-uri"),
+          info$uri
+        )
+      }
     }
-  }
 
   # ── id_confidence_measure declarations (TIMA user-CV namespace) ───────────
   # All four measures use TIMA-prefixed accessions.  No PSI-MS accession covers
