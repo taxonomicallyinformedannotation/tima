@@ -1,0 +1,9 @@
+# .agentignore - patterns to exclude from agent review context
+# See AGENTS.md for project-specific guidelines
+
+kb/
+graphify-out/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+*.agent-scratch*

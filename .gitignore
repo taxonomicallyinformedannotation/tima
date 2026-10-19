@@ -31,3 +31,12 @@ vignettes/*.pdf
 .DS_Store
 .Rhistory
 .RData
+
+# Agent tooling config files
+# These can be explicitly added with `git add -f` to commit them
+!.claudeignore
+!.agentignore
+
+# Knowledge base and graph outputs (not shipped)
+kb/
+graphify-out/

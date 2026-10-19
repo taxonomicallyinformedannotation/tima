@@ -1,0 +1,31 @@
+# .claudeignore - ignore files for Claude Code
+# See AGENTS.md for project-specific guidelines
+
+# Knowledge base and graph outputs (never shipped)
+kb/
+graphify-out/
+
+# Agent tooling artifacts
+*.agent-scratch*
+
+# Generated caches
+*.pem
+*.key
+
+# Temp files
+*.tmp
+*.swp
+
+# Vendor/third-party artifacts
+inst/*
+vignettes/*/*.html
+vignettes/*/*.pdf
+
+# CI/CD artifacts
+.github/workflows/*
+
+# Documentation build outputs
+pkgdown/output/
+
+# Old/machine-generated files
+*.md*\.draft$

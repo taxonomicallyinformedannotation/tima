@@ -1,0 +1,6 @@
+# Code owners for review
+*                                   @adafede
+
+R/ tests/ src/                       @adafede
+inst/                                 @adafede
+.github/                             @adafede

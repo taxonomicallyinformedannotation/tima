@@ -12,7 +12,6 @@
 ^[.]agent-scratch
 ^[.]agent[.]md$
 ^[.]agentignore$
-^[.]claude[.]md$
 ^[.]cursor[.]md$
 ^[.]kb/
 ^[.]mcp[.]json$
