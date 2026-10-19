@@ -87,7 +87,7 @@
         "adduct_ions"
       ),
       function(col) {
-        any(grepl("\\|", as.character(results[[col]]), fixed = TRUE))
+        any(grepl("|", as.character(results[[col]]), fixed = TRUE))
       },
       FUN.VALUE = logical(1L)
     ))
