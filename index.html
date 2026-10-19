@@ -699,8 +699,7 @@ div.csl-indent {
 <section id="tima" class="level1">
 <h1>tima <img src="https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/logo.svg" align="right" height="139"></h1>
 <!-- badges: start -->
-<p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" class="img-fluid" alt="Lifecycle: experimental"></a> <!-- [![CRAN status](https://www.r-pkg.org/badges/version/tima)](https://CRAN.R-project.org/package=tima) --></p>
-<p><a href="https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml/badge.svg" class="img-fluid" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/taxonomicallyinformedannotation/tima"><img src="https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg" class="img-fluid" alt="Codecov test coverage"></a> <a href="https://taxonomicallyinformedannotation.r-universe.dev/tima"><img src="https://taxonomicallyinformedannotation.r-universe.dev/tima/badges/version?&amp;color=blue&amp;style=classic.png" class="img-fluid" alt="r-universe badge"></a> <a href="https://doi.org/10.5281/zenodo.5797920"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.5797920.svg" class="img-fluid" alt="DOI"></a> <a href="https://hub.docker.com/r/adafede/tima-r/"><img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&amp;logoColor=white.png" class="img-fluid" alt="Docker"></a></p>
+<p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" class="img-fluid" alt="Lifecycle: experimental"></a> <!-- [![CRAN status](https://www.r-pkg.org/badges/version/tima)](https://CRAN.R-project.org/package=tima) --> <a href="https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/R-CMD-check.yaml/badge.svg" class="img-fluid" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/taxonomicallyinformedannotation/tima"><img src="https://codecov.io/gh/taxonomicallyinformedannotation/tima/graph/badge.svg" class="img-fluid" alt="Codecov test coverage"></a> <a href="https://taxonomicallyinformedannotation.r-universe.dev/tima"><img src="https://taxonomicallyinformedannotation.r-universe.dev/tima/badges/version?&amp;color=blue&amp;style=classic.png" class="img-fluid" alt="r-universe badge"></a> <a href="https://doi.org/10.5281/zenodo.5797920"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.5797920.svg" class="img-fluid" alt="DOI"></a> <a href="https://hub.docker.com/r/adafede/tima-r/"><img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&amp;logoColor=white.png" class="img-fluid" alt="Docker"></a></p>
 <!-- badges: end -->
 <p>The initial work is available at <a href="https://doi.org/10.3389/fpls.2019.01329" class="uri">https://doi.org/10.3389/fpls.2019.01329</a>, with many improvements made since then. The workflow is illustrated below.</p>
 <p><img src="https://raw.githubusercontent.com/taxonomicallyinformedannotation/tima/main/man/figures/tima.svg" class="img-fluid" alt="Workflow"><br>
@@ -748,7 +747,7 @@ div.csl-indent {
 <p>Then, you should be able to install the rest with:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">install_tima</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Normally, everything you need should then be installed (as tested in <a href="https://github.com/taxonomicallyinformedannotation/tima/actions/workflows/external-use.yaml">here</a>). If for some reason, some packages were not installed, try to install them manually. To avoid such issues, we offer a containerized version (see <a href="#docker">Docker</a>).</p>
-<p>Once installed, you are ready to go through our <a href="https://taxonomicallyinformedannotation.github.io/tima/articles/">documentation</a>, with the major steps detailed.</p>
+<p>Once installed, you are ready to go through our <a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/">documentation</a>, with the major steps detailed.</p>
 <p>In case you do not have your data ready, you can obtain some example data using:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">get_example_files</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
@@ -865,16 +864,11 @@ div.csl-indent {
 </section>
 <section id="additional-software-credits" class="level2">
 <h2 class="anchored" data-anchor-id="additional-software-credits">Additional software credits</h2>
-<pre><code>A large number of files (1081 in total) have been discovered.
-It may take renv a long time to scan these files for dependencies.
-Consider using .renvignore to ignore irrelevant files.
-See `]8;;x-r-help:renv::dependencies?renv::dependencies]8;;` for more information.
-Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.</code></pre>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 15%">
-<col style="width: 11%">
-<col style="width: 72%">
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -937,7 +931,7 @@ Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.</co
 <tr class="odd">
 <td style="text-align: left;">knitr</td>
 <td style="text-align: left;">1.52</td>
-<td style="text-align: left;">Xie (2014); Xie (2015); (<strong>knitr2026?</strong>)</td>
+<td style="text-align: left;">Xie (2014); Xie (2015); Xie (2026)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">lgr</td>
@@ -987,7 +981,7 @@ Set `options(renv.config.dependencies.limit = Inf)` to disable this warning.</co
 <tr class="odd">
 <td style="text-align: left;">reticulate</td>
 <td style="text-align: left;">1.47.0</td>
-<td style="text-align: left;">Ushey et al.&nbsp;(2026)</td>
+<td style="text-align: left;">Kalinowski et al.&nbsp;(2026)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">rmarkdown</td>
@@ -1130,6 +1124,9 @@ Hester, Jim, Lionel Henry, Kirill Müller, Kevin Ushey, Hadley Wickham, and Wins
 <div id="ref-fs" class="csl-entry" role="listitem">
 Hester, Jim, Hadley Wickham, and Gábor Csárdi. 2026. <em><span class="nocase">fs</span>: Cross-Platform File System Operations Based on “<span class="nocase">libuv</span>”</em>. <a href="https://doi.org/10.32614/CRAN.package.fs" class="uri">https://doi.org/10.32614/CRAN.package.fs</a>.
 </div>
+<div id="ref-reticulate" class="csl-entry" role="listitem">
+Kalinowski, Tomasz, Kevin Ushey, JJ Allaire, and Yuan Tang. 2026. <em><span class="nocase">reticulate</span>: Interface to “Python”</em>. <a href="https://doi.org/10.32614/CRAN.package.reticulate" class="uri">https://doi.org/10.32614/CRAN.package.reticulate</a>.
+</div>
 <div id="ref-targets" class="csl-entry" role="listitem">
 Landau, William Michael. 2021. “The Targets r Package: A Dynamic Make-Like Function-Oriented Pipeline Toolkit for Reproducibility and High-Performance Computing.” <em>Journal of Open Source Software</em> 6 (57): 2959. <a href="https://doi.org/10.21105/joss.02959" class="uri">https://doi.org/10.21105/joss.02959</a>.
 </div>
@@ -1155,7 +1152,7 @@ Ooms, Jeroen. 2026. <em><span class="nocase">curl</span>: A Modern and Flexible 
 Ooms, Jeroen, and Jim Hester. 2025. <em><span class="nocase">spelling</span>: Tools for Spell Checking in r</em>. <a href="https://doi.org/10.32614/CRAN.package.spelling" class="uri">https://doi.org/10.32614/CRAN.package.spelling</a>.
 </div>
 <div id="ref-rotl2019" class="csl-entry" role="listitem">
-OpenTreeOfLife, Benjamin Redelings, Luna Luisa Sanchez Reyes, et al.&nbsp;2019. <em>Open Tree of Life Synthetic Tree</em>. Version 12.3. Zenodo. <a href="https://doi.org/10.5281/zenodo.3937741" class="uri">https://doi.org/10.5281/zenodo.3937741</a>.
+OpenTreeOfLife, Benjamin Redelings, Luna Luisa Sanchez Reyes, et al. 2019. <em>Open Tree of Life Synthetic Tree</em>. Version 12.3. Zenodo. <a href="https://doi.org/10.5281/zenodo.3937741" class="uri">https://doi.org/10.5281/zenodo.3937741</a>.
 </div>
 <div id="ref-base" class="csl-entry" role="listitem">
 R Core Team. 2026a. <em>R: A Language and Environment for Statistical Computing</em>. R Foundation for Statistical Computing. <a href="https://doi.org/10.32614/R.manuals" class="uri">https://doi.org/10.32614/R.manuals</a>.
@@ -1193,9 +1190,6 @@ Stephens, Jeremy, and Kirill Simonov. 2025. <em><span class="nocase">yaml</span>
 <div id="ref-fastmatch" class="csl-entry" role="listitem">
 Urbanek, Simon. 2026. <em><span class="nocase">fastmatch</span>: Fast “<span class="nocase">match()</span>” Function</em>. <a href="https://doi.org/10.32614/CRAN.package.fastmatch" class="uri">https://doi.org/10.32614/CRAN.package.fastmatch</a>.
 </div>
-<div id="ref-reticulate" class="csl-entry" role="listitem">
-Ushey, Kevin, JJ Allaire, and Yuan Tang. 2026. <em><span class="nocase">reticulate</span>: Interface to “Python”</em>. <a href="https://doi.org/10.32614/CRAN.package.reticulate" class="uri">https://doi.org/10.32614/CRAN.package.reticulate</a>.
-</div>
 <div id="ref-testthat" class="csl-entry" role="listitem">
 Wickham, Hadley. 2011. “<span class="nocase">testthat</span>: Get Started with Testing.” <em>The R Journal</em> 3: 5–10. <a href="https://journal.r-project.org/articles/RJ-2011-002/" class="uri">https://journal.r-project.org/articles/RJ-2011-002/</a>.
 </div>
@@ -1214,11 +1208,14 @@ Xie, Yihui. 2014. “<span class="nocase">knitr</span>: A Comprehensive Tool for
 <div id="ref-knitr2015" class="csl-entry" role="listitem">
 Xie, Yihui. 2015. <em>Dynamic Documents with R and Knitr</em>. 2nd ed.&nbsp;Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" class="uri">https://yihui.org/knitr/</a>.
 </div>
+<div id="ref-knitr2026" class="csl-entry" role="listitem">
+Xie, Yihui. 2026. <em><span class="nocase">knitr</span>: A General-Purpose Package for Dynamic Report Generation in R</em>. <a href="https://yihui.org/knitr/" class="uri">https://yihui.org/knitr/</a>.
+</div>
 <div id="ref-rmarkdown2018" class="csl-entry" role="listitem">
-Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>R Markdown: The Definitive Guide</em>. Chapman; Hall/CRC. <a href="https://yihui.org/rmarkdown/" class="uri">https://yihui.org/rmarkdown/</a>.
+Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>R Markdown: The Definitive Guide</em>. Chapman; Hall/CRC. <a href="https://pkg.yihui.org/rmarkdown-book/" class="uri">https://pkg.yihui.org/rmarkdown-book/</a>.
 </div>
 <div id="ref-rmarkdown2020" class="csl-entry" role="listitem">
-Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. <em>R Markdown Cookbook</em>. Chapman; Hall/CRC. <a href="https://yihui.org/rmarkdown-cookbook" class="uri">https://yihui.org/rmarkdown-cookbook</a>.
+Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. <em>R Markdown Cookbook</em>. Chapman; Hall/CRC. <a href="https://pkg.yihui.org/rmarkdown-cookbook/" class="uri">https://pkg.yihui.org/rmarkdown-cookbook/</a>.
 </div>
 </div>
 
