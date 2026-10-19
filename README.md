@@ -83,7 +83,7 @@ manually. To avoid such issues, we offer a containerized version (see
 [Docker](#docker)).
 
 Once installed, you are ready to go through our
-[documentation](https://taxonomicallyinformedannotation.github.io/tima/articles/),
+[documentation](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/),
 with the major steps detailed.
 
 In case you do not have your data ready, you can obtain some example data using:
@@ -639,7 +639,7 @@ Definitive Guide_. Chapman; Hall/CRC. <https://yihui.org/rmarkdown/>.
 <div id="ref-rmarkdown2020" class="csl-entry">
 
 Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. _R Markdown
-Cookbook_. Chapman; Hall/CRC. <https://yihui.org/rmarkdown-cookbook>.
+Cookbook_. Chapman; Hall/CRC. <https://bookdown.org/yihui/rmarkdown-cookbook/>.
 
 </div>
 

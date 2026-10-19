@@ -89,7 +89,7 @@ manually. To avoid such issues, we offer a containerized version (see
 [Docker](#docker)).
 
 Once installed, you are ready to go through our
-[documentation](https://taxonomicallyinformedannotation.github.io/tima/articles/),
+[documentation](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/),
 with the major steps detailed.
 
 In case you do not have your data ready, you can obtain some example data using:
