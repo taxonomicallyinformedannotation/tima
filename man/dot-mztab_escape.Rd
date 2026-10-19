@@ -2,11 +2,13 @@
 % Please edit documentation in R/write_mztab_comments.R
 \name{.mztab_escape}
 \alias{.mztab_escape}
-\title{Escape tab characters in free-text fields}
+\title{Escape characters that would break mzTab tab-delimited row/column structure}
 \usage{
 .mztab_escape(x)
 }
 \description{
-Escape tab characters in free-text fields
+Replaces TAB, carriage-return and newline characters with a single space so
+that free-text values (metadata, chemical names, URIs, …) never corrupt the
+tab-delimited layout of the mzTab file, as required by the mzTab specification.
 }
 \keyword{internal}

@@ -929,13 +929,3 @@
   }
   as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
 }
-
-#' Read base mzTab while preserving unmanaged lines
-#'
-#' Collects passthrough content as every non-blank line that does not belong to
-#' the managed TIMA sections (`MTD`, `SMH/SML`, `SFH/SMF`, `SEH/SME`). This
-#' includes custom extension blocks and comment rows from anywhere in the file.
-#' Passthrough lines are emitted before the TIMA-managed metadata section.
-#'
-#' @keywords internal
-#' @include calculate_mass_of_m.R

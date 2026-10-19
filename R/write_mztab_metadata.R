@@ -1,3 +1,25 @@
+#' Build mzTab-M metadata table
+#'
+#' Returns a complete, ontology-aligned metadata table. Key design decisions:
+#'
+#' * All `id_confidence_measure[n]` entries use the `TIMA` user-CV namespace
+#'   (`TIMA:001`–`TIMA:004`).  No PSI-MS accession exists for composite
+#'   metabolomics scores.
+#' * `ms_level` values in the SME section use `MS:1000579` / `MS:1000580`.
+#' * `ms_run[1]-scan_polarity` is populated with `MS:1000130` (positive) or
+#'   `MS:1000129` (negative) when `polarity` is known.
+#' * When `xrefs_index` contains data, additional `database[n]` blocks are
+#'   emitted (n >= 2) for every unique xref prefix found in the annotation set.
+#' * The TIMA repository URL is registered as `software[1]-setting[1]` for
+#'   machine-readable software provenance.
+#' * `colunit-small_molecule_feature` declares seconds (UO:0000010).
+#' * `colunit-small_molecule` declares daltons (UO:0000221) for the neutral
+#'   mass column.
+#' * `colunit-small_molecule_evidence` documents each `id_confidence_measure`
+#'   column with its TIMA CV Param.
+#'
+#' @keywords internal
+#' @include mztab_parser.R write_mztab_comments.R
 .mztab_build_metadata_table <- function(
   mztab_id,
   title,
@@ -275,53 +297,53 @@
     catalog$terms$metadata_defaults[["database[1]-uri"]]
   )
 
-    # ── Additional databases from xrefs (database[2], [3], …) ────────────────
-    db_prefix_info <- .mztab_xref_database_blocks(xrefs_index)
-    if (length(db_prefix_info) > 0L) {
-      # Continue numbering after any database[n] the base file already defines,
-      # instead of reusing database[2] (which would collide with an existing
-      # block and be silently skipped by add_default, leaving SME database_*
-      # references pointing at an unregistered prefix).
-      existing_db_keys <- grep(
-        "^database\\[(\\d+)\\]$",
-        unlist(meta$order, use.names = FALSE),
-        value = TRUE,
-        perl = TRUE
-      )
-      existing_db_nums <- suppressWarnings(as.integer(
-        sub("^database\\[(\\d+)\\]$", "\\1", existing_db_keys, perl = TRUE)
-      ))
-      existing_db_nums <- existing_db_nums[!is.na(existing_db_nums)]
-      next_db_n <- if (length(existing_db_nums) > 0L) {
-        max(existing_db_nums) + 1L
-      } else {
-        2L
-      }
-      for (i in seq_along(db_prefix_info)) {
-        db_n <- next_db_n + i - 1L
-        info <- db_prefix_info[[i]]
-        meta <- add_default(
-          meta,
-          paste0("database[", db_n, "]"),
-          paste0("[, , ", info$name, ", ]")
-        )
-        meta <- add_default(
-          meta,
-          paste0("database[", db_n, "]-prefix"),
-          info$prefix
-        )
-        meta <- add_default(
-          meta,
-          paste0("database[", db_n, "]-version"),
-          "Unknown"
-        )
-        meta <- add_default(
-          meta,
-          paste0("database[", db_n, "]-uri"),
-          info$uri
-        )
-      }
+  # ── Additional databases from xrefs (database[2], [3], …) ────────────────
+  db_prefix_info <- .mztab_xref_database_blocks(xrefs_index)
+  if (length(db_prefix_info) > 0L) {
+    # Continue numbering after any database[n] the base file already defines,
+    # instead of reusing database[2] (which would collide with an existing
+    # block and be silently skipped by add_default, leaving SME database_*
+    # references pointing at an unregistered prefix).
+    existing_db_keys <- grep(
+      "^database\\[(\\d+)\\]$",
+      unlist(meta$order, use.names = FALSE),
+      value = TRUE,
+      perl = TRUE
+    )
+    existing_db_nums <- suppressWarnings(as.integer(
+      sub("^database\\[(\\d+)\\]$", "\\1", existing_db_keys, perl = TRUE)
+    ))
+    existing_db_nums <- existing_db_nums[!is.na(existing_db_nums)]
+    next_db_n <- if (length(existing_db_nums) > 0L) {
+      max(existing_db_nums) + 1L
+    } else {
+      2L
     }
+    for (i in seq_along(db_prefix_info)) {
+      db_n <- next_db_n + i - 1L
+      info <- db_prefix_info[[i]]
+      meta <- add_default(
+        meta,
+        paste0("database[", db_n, "]"),
+        paste0("[, , ", info$name, ", ]")
+      )
+      meta <- add_default(
+        meta,
+        paste0("database[", db_n, "]-prefix"),
+        info$prefix
+      )
+      meta <- add_default(
+        meta,
+        paste0("database[", db_n, "]-version"),
+        "Unknown"
+      )
+      meta <- add_default(
+        meta,
+        paste0("database[", db_n, "]-uri"),
+        info$uri
+      )
+    }
+  }
 
   # ── id_confidence_measure declarations (TIMA user-CV namespace) ───────────
   # All four measures use TIMA-prefixed accessions.  No PSI-MS accession covers

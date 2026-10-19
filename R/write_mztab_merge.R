@@ -1,3 +1,12 @@
+#' Read base mzTab while preserving unmanaged lines
+#'
+#' Collects passthrough content as every non-blank line that does not belong to
+#' the managed TIMA sections (`MTD`, `SMH/SML`, `SFH/SMF`, `SEH/SME`). This
+#' includes custom extension blocks and comment rows from anywhere in the file.
+#' Passthrough lines are emitted before the TIMA-managed metadata section.
+#'
+#' @keywords internal
+#' @include mztab_parser.R read_mztab.R
 .mztab_read_base <- function(path) {
   if (.mztab_is_json_path(path)) {
     tabs <- read_mztab_tables(path)
@@ -362,8 +371,16 @@
 
     # Work on a plain data.frame copy so duplicate-index assignment follows
     # ordinary R semantics; convert back to tidytable afterwards.
-    sml_df <- as.data.frame(sml_all, stringsAsFactors = FALSE, check.names = FALSE)
-    new_vals <- as.data.frame(sml_new, stringsAsFactors = FALSE, check.names = FALSE)
+    sml_df <- as.data.frame(
+      sml_all,
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+    new_vals <- as.data.frame(
+      sml_new,
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
 
     for (col in ref_cols) {
       grouped <- split(new_vals[[col]][dup_idx], base_idx)
@@ -653,26 +670,3 @@
   out[!cond1 & !cond2 & cond3] <- 3L
   out
 }
-
-#' Build mzTab-M metadata table
-#'
-#' Returns a complete, ontology-aligned metadata table. Key design decisions:
-#'
-#' * All `id_confidence_measure[n]` entries use the `TIMA` user-CV namespace
-#'   (`TIMA:001`–`TIMA:004`).  No PSI-MS accession exists for composite
-#'   metabolomics scores.
-#' * `ms_level` values in the SME section use `MS:1000579` / `MS:1000580`.
-#' * `ms_run[1]-scan_polarity` is populated with `MS:1000130` (positive) or
-#'   `MS:1000129` (negative) when `polarity` is known.
-#' * When `xrefs_index` contains data, additional `database[n]` blocks are
-#'   emitted (n >= 2) for every unique xref prefix found in the annotation set.
-#' * The TIMA repository URL is registered as `software[1]-setting[1]` for
-#'   machine-readable software provenance.
-#' * `colunit-small_molecule_feature` declares seconds (UO:0000010).
-#' * `colunit-small_molecule` declares daltons (UO:0000221) for the neutral
-#'   mass column.
-#' * `colunit-small_molecule_evidence` documents each `id_confidence_measure`
-#'   column with its TIMA CV Param.
-#'
-#' @keywords internal
-#' @include mztab_parser.R
