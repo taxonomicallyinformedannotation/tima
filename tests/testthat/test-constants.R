@@ -28,28 +28,57 @@ test_that("test-constants mass ranges are sensible", {
 test_that("test-constants ADDUCT_REGEX_PATTERN matches valid adducts", {
   expect_type(ADDUCT_REGEX_PATTERN, "character")
 
-  # Test with simple adduct
+  # Simple adducts
   expect_true(grepl(ADDUCT_REGEX_PATTERN, "[M+H]+", perl = TRUE))
   expect_true(grepl(ADDUCT_REGEX_PATTERN, "[M-H]-", perl = TRUE))
 
-  # Test with complex adduct
+  # Multimers
   expect_true(grepl(ADDUCT_REGEX_PATTERN, "[2M+Na]+", perl = TRUE))
+  expect_true(grepl(ADDUCT_REGEX_PATTERN, "[3M+H]+", perl = TRUE))
+
+  # Modifications
   expect_true(
     grepl(ADDUCT_REGEX_PATTERN, "[M-H2O+H]+", perl = TRUE)
   )
 
+  # Isotope shift notation (signed, e.g. [M+1+H]+)
+  expect_true(grepl(ADDUCT_REGEX_PATTERN, "[M+1+H]+", perl = TRUE))
+  expect_true(grepl(ADDUCT_REGEX_PATTERN, "[M-2+H]+", perl = TRUE))
+  expect_true(grepl(ADDUCT_REGEX_PATTERN, "[2M+1+Na]+", perl = TRUE))
+
+  # Charged adducts
+  expect_true(grepl(ADDUCT_REGEX_PATTERN, "[M+2H]2+", perl = TRUE))
+
   # Should not match invalid patterns
   expect_false(grepl(ADDUCT_REGEX_PATTERN, "invalid", perl = TRUE))
   expect_false(grepl(ADDUCT_REGEX_PATTERN, "M+H", perl = TRUE))
+  # Anchors prevent partial matches like trailing characters
+  expect_false(grepl(ADDUCT_REGEX_PATTERN, "[M+H]+ garbage", perl = TRUE))
+  expect_false(grepl(ADDUCT_REGEX_PATTERN, "garbage [M+H]+", perl = TRUE))
+
+  # Isotope label notation: 13C should NOT be captured as isotope shift
+  expect_true(grepl(ADDUCT_REGEX_PATTERN, "[M+13C+H]+", perl = TRUE))
+  expect_true(grepl(ADDUCT_REGEX_PATTERN, "[M+15N+H]+", perl = TRUE))
 })
 
-test_that("test-constants MODIFICATION_REGEX_PATTERN is valid", {
+test_that("test-constants MODIFICATION_REGEX_PATTERN matches individual modifications", {
   expect_type(MODIFICATION_REGEX_PATTERN, "character")
 
-  # Test with modifications (using perl=TRUE for \w support)
+  # Simple additions
   expect_true(grepl(MODIFICATION_REGEX_PATTERN, "+H", perl = TRUE))
-  expect_true(grepl(MODIFICATION_REGEX_PATTERN, "-H2O", perl = TRUE))
   expect_true(grepl(MODIFICATION_REGEX_PATTERN, "+Na", perl = TRUE))
+  expect_true(grepl(MODIFICATION_REGEX_PATTERN, "+K", perl = TRUE))
+
+  # Losses
+  expect_true(grepl(MODIFICATION_REGEX_PATTERN, "-H2O", perl = TRUE))
+  expect_true(grepl(MODIFICATION_REGEX_PATTERN, "-NH3", perl = TRUE))
+
+  # Coefficients
+  expect_true(grepl(MODIFICATION_REGEX_PATTERN, "+2Na", perl = TRUE))
+  expect_true(grepl(MODIFICATION_REGEX_PATTERN, "-2H2O", perl = TRUE))
+
+  # Complex formulas
+  expect_true(grepl(MODIFICATION_REGEX_PATTERN, "+C6H12O6", perl = TRUE))
 })
 
 ## Constants consistency ----

@@ -18,8 +18,12 @@ Pattern breakdown:
 \item{\code{M}}{Required literal "M" for molecule}
 \item{\code{(?![a-z])}}{Negative lookahead: prevent matching element symbols
 like "Mg"}
-\item{\code{(\\d*)}}{Group 2: Optional isotope shift (e.g., "1" in [M1+H]+
-for M+1)}
+\item{\code{((?:[+-]?\\d+(?!\\d*[A-Za-z]))?)}}{Group 2: Optional isotope
+shift with optional sign (e.g., "+1" in [M+1+H]+ for M+1). The
+lookahead (no digits followed by a letter) prevents matching digits
+that are part of element labels like "13C" in [M+13C+H]+. Per IUPAC
+and PSI-OBO conventions, such labels are adduct modifications, not
+nominal isotope shifts.}
 \item{\code{([+-][\\w\\d].*)?}}{Group 3: Optional modifications (e.g., "+H",
 "-H2O+Na")}
 \item{\code{.*\\]}}{Any characters until closing bracket}

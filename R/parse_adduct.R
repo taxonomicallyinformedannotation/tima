@@ -537,6 +537,24 @@ parse_modification_components <- function(modifications_clean) {
     no = 1L
   )
 
+  # Handle isotopic labels: when the coefficient is >= 10 and the element is a
+  # simple element symbol (e.g., "C", "N", "O"), the digits represent an isotope
+  # mass number (e.g., 13C, 15N, 18O), NOT a stoichiometric count. Merge the
+  # coefficient into the element string so MetaboCoreUtils::calculateMass
+  # resolves the exact isotope mass (e.g., 13.00335 for 13C) instead of
+  # computing count * average mass (e.g., 13 * 12.0 = 156).
+  # Per IUPAC and PSI-OBO conventions, digits >= 10 immediately before an
+  # element symbol in adduct notation denote an isotopic label, not a count.
+  for (i in seq_along(mod_elements)) {
+    if (
+      mod_multiplicities[i] >= 10L &&
+        grepl("^[A-Z][a-z]?$", mod_elements[i])
+    ) {
+      mod_elements[i] <- paste0(mod_multiplicities[i], mod_elements[i])
+      mod_multiplicities[i] <- 1L
+    }
+  }
+
   list(
     valid = TRUE,
     elements = mod_elements,

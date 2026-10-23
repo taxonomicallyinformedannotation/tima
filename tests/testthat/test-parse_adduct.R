@@ -372,6 +372,69 @@ test_that("parse_adduct isotopes work with all common adducts", {
   ))
 })
 
+## Isotope Label Notation Tests ----
+
+test_that("parse_adduct does not treat 13C label as isotope shift", {
+  # [M+13C+H]+ has 13C as a label (modification), not M+1 isotope
+  result <- parse_adduct("[M+13C+H]+")
+
+  expect_equal(result[["n_iso"]], 0)
+  expect_equal(result[["n_mer"]], 1)
+  expect_false(all(result == 0))
+})
+
+test_that("parse_adduct handles 15N label without isotope confusion", {
+  result <- parse_adduct("[M+15N+H]+")
+
+  expect_equal(result[["n_iso"]], 0)
+  expect_equal(result[["n_mer"]], 1)
+  expect_false(all(result == 0))
+})
+
+test_that("parse_adduct distinguishes isotope shift from isotopic label", {
+  # [M+1+H]+ has isotope shift +1 and proton adduct
+  # [M+13C+H]+ has a carbon-13 atom added and proton adduct
+  iso_result <- parse_adduct("[M+1+H]+")
+  label_result <- parse_adduct("[M+13C+H]+")
+
+  expect_equal(iso_result[["n_iso"]], 1)
+  expect_equal(label_result[["n_iso"]], 0)
+
+  # 13C label adds full atom mass (~13.0034) + H, while isotope shift
+  # only adds ISOTOPE_MASS_SHIFT_DALTONS (~1.0034) + H
+  expect_gt(label_result[["los_add_clu"]], iso_result[["los_add_clu"]])
+})
+
+test_that("parse_adduct calculates correct mass for 13C isotopic label", {
+  # IUPAC/PSI convention: 13C in adduct notation means one carbon-13 atom added.
+  # [M+13C+H]+: 13C atom (13.0034) + H (1.0078) = 14.0112 Da total
+  result <- parse_adduct("[M+13C+H]+")
+
+  expect_equal(result[["n_iso"]], 0)
+  expect_equal(result[["n_mer"]], 1)
+  # 13.00335 (13C atom) + 1.007825 (H) = 14.01118
+  expect_gt(result[["los_add_clu"]], 13.5)
+  expect_lt(result[["los_add_clu"]], 14.5)
+})
+
+test_that("parse_adduct calculates correct mass for 15N isotopic label", {
+  # [M+15N+H]+: 15N atom (15.0001) + H (1.0078) = 16.008 Da total
+  result <- parse_adduct("[M+15N+H]+")
+
+  expect_equal(result[["n_iso"]], 0)
+  expect_gt(result[["los_add_clu"]], 15.5)
+  expect_lt(result[["los_add_clu"]], 16.5)
+})
+
+test_that("parse_adduct calculates correct mass for 18O isotopic label", {
+  # [M+18O+H]+: 18O atom (17.9992) + H (1.0078) = 19.007 Da total
+  result <- parse_adduct("[M+18O+H]+")
+
+  expect_equal(result[["n_iso"]], 0)
+  expect_gt(result[["los_add_clu"]], 18.5)
+  expect_lt(result[["los_add_clu"]], 19.5)
+})
+
 ## Multiple Modifications Tests ----
 
 test_that("parse_adduct handles multiple additions [M+H+Na]+", {

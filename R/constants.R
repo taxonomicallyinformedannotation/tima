@@ -67,10 +67,14 @@ NEUTRAL_MASS_MATCH_TOLERANCE_DA <- 5E-3
 #' \item{\code{(\\d*)}}{Group 1: Optional multimer count (e.g., "2" in
 #'     \[2M+H\]+)}
 #'   \item{\code{M}}{Required literal "M" for molecule}
-#' \item{\code{(?![a-z])}}{Negative lookahead: prevent matching element symbols
+#'   \item{\code{(?![a-z])}}{Negative lookahead: prevent matching element symbols
 #'     like "Mg"}
-#' \item{\code{(\\d*)}}{Group 2: Optional isotope shift (e.g., "1" in \[M1+H\]+
-#'     for M+1)}
+#' \item{\code{((?:[+-]?\\d+(?!\\d*[A-Za-z]))?)}}{Group 2: Optional isotope
+#'     shift with optional sign (e.g., "+1" in \[M+1+H\]+ for M+1). The
+#'     lookahead (no digits followed by a letter) prevents matching digits
+#'     that are part of element labels like "13C" in \[M+13C+H\]+. Per IUPAC
+#'     and PSI-OBO conventions, such labels are adduct modifications, not
+#'     nominal isotope shifts.}
 #' \item{\code{([+-][\\w\\d].*)?}}{Group 3: Optional modifications (e.g., "+H",
 #'     "-H2O+Na")}
 #'   \item{\code{.*\\]}}{Any characters until closing bracket}
@@ -81,7 +85,7 @@ NEUTRAL_MASS_MATCH_TOLERANCE_DA <- 5E-3
 #' @examples
 #' # Matches: [M+H]+, [2M+Na]+, [M-H2O+H]+, [2M1+H]2+, [M+1+H]+, [M-2+H]+
 #' @keywords internal
-ADDUCT_REGEX_PATTERN <- "^\\[(\\d*)M(?![a-z])((?:[+-]?\\d+(?![A-Z]))?)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?$"
+ADDUCT_REGEX_PATTERN <- "^\\[(\\d*)M(?![a-z])((?:[+-]?\\d+(?!\\d*[A-Za-z]))?)([+-][\\w\\d].*)?.*\\](\\d*)([+-])?$"
 
 #' Regular expression for individual adduct modifications
 #'
