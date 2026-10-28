@@ -25,6 +25,22 @@
 - Added Enveda180 spectral library
 - Added MultiMS2 spectral library
 
+## Bug fixes
+
+- `annotate_spectra()` and `create_edges_spectra()` now degrade gracefully when
+  given MGF input that contains no MS2 (fragment) spectra --- whether an
+  MS1-only file, an empty file, or a mix of MS1 and MS2 features. Previously
+  this hard-aborted with a stack trace (`annotate_spectra` during pre-flight
+  sanitization; `create_edges_spectra` from its post-import empty-spectra
+  guard). An MS1-only or empty input now emits a single actionable warning
+  (`tima_spectra_no_ms2_warning`) and returns a valid empty output (an
+  annotation template or an empty edges file with the correct schema); mixed
+  input processes the MS2 features and warns once with the count of skipped MS1
+  features (`tima_ms1_skipped_warning`). Genuinely malformed MGFs (e.g.
+  mismatched BEGIN/END IONS) still abort as before.
+- Hardened `get_spectra_ids()` against empty `Spectra` objects to avoid
+  "subscript out of bounds" errors on 0-row inputs.
+
 ## Internal / performance
 
 - **MS1 adduct annotation improvements** in `annotate_masses()`:

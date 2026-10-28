@@ -41,6 +41,11 @@ get_spectra_ids <- function(spectra) {
     )
   }
 
+  n <- length(spectra)
+  if (n == 0L) {
+    return(character(0L))
+  }
+
   # Safe accessor: works across different Spectra backend generations
   spec_data <- spectra@backend@spectraData
 

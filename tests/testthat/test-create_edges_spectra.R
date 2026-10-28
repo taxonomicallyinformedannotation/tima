@@ -368,26 +368,27 @@ test_that("create_edges_spectra() runs with cosine method", {
   expect_true(file.exists(out))
 })
 
-test_that("create_edges_spectra handles empty MGF file", {
+test_that("create_edges_spectra handles empty MGF file gracefully", {
   withr::local_dir(new = temp_test_dir("create_edges_empty"))
   mgf_file <- tempfile(fileext = ".mgf")
   writeLines("", mgf_file)
 
-  # Should handle gracefully
-  expect_error(
-    create_edges_spectra(input = mgf_file),
-    "No usable spectra found in input"
+  # Empty MGF now degrades gracefully with a warning, returns empty output
+  expect_warning(
+    create_edges_spectra(input = mgf_file, method = "cosine"),
+    "No MS2 spectra were found|cannot be annotated by spectral matching"
   )
 })
 
-test_that("create_edges_spectra handles invalid MGF format", {
+test_that("create_edges_spectra handles invalid/no-content MGF format", {
   withr::local_dir(new = temp_test_dir("create_edges_invalid"))
   mgf_file <- tempfile(fileext = ".mgf")
   writeLines("INVALID MGF CONTENT", mgf_file)
 
-  expect_error(
-    create_edges_spectra(input = mgf_file),
-    "No usable spectra found in input"
+  # MGF without BEGIN IONS markers yields no spectra; degrades gracefully
+  expect_warning(
+    create_edges_spectra(input = mgf_file, method = "cosine"),
+    "No MS2 spectra were found|cannot be annotated by spectral matching"
   )
 })
 

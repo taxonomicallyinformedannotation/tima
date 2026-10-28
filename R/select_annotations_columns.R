@@ -54,10 +54,32 @@ select_annotations_columns <- function(
   # Input Validation ----
   validate_dataframe(df, param_name = "df")
 
-  # Early exit for empty input
+  # Early exit for empty input. Return a schema-complete (zero-row) frame
+  # matching the projection columns the non-empty path produces, so that
+  # downstream targets (summarize_results, clean_chemo_preprocessing, ...) do
+  # not break on missing columns like candidate_structure_inchikey_*.
   if (nrow(df) == 0L) {
     log_warn("Empty data frame provided")
-    return(df)
+    model <- columns_model()
+    projection_columns <- .annotation_projection_columns(model)
+    # Deduplicate the same way tidyselect::any_of does in the non-empty path
+    # (projection_columns may contain duplicates across the model groups, e.g.
+    # candidate_structure_molecular_formula appears in both sirius_for and
+    # structures column sets).
+    projection_columns <- unique(projection_columns)
+    empty <- data.frame(
+      matrix(
+        nrow = 0L,
+        ncol = length(projection_columns),
+        dimnames = list(NULL, projection_columns)
+      )
+    )
+    # Ensure character type for all columns (the non-empty path coerces numerics
+    # to character and normalizes text; use character NA to stay consistent).
+    for (col in projection_columns) {
+      empty[[col]] <- character(0L)
+    }
+    return(empty)
   }
 
   # Validate file paths (will be passed to complement_metadata_structures)

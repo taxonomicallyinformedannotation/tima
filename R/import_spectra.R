@@ -244,6 +244,12 @@ import_spectra <- function(
 
   # Filter Spectra ----
 
+  # Track how many MS1 (precursor-only) features were dropped during MS2
+  # filtering. The count is attached as an attribute on the returned Spectra
+  # so `annotate_spectra()` can emit a single warning when MS1 features are
+  # silently skipped (mixed input). Zero when no MS-level filtering applies.
+  n_ms1_skipped <- 0L
+
   # Filter to MS2 spectra only if msLevel available
   if ("msLevel" %in% spec_cols) {
     n_before <- length(spectra)
@@ -251,6 +257,7 @@ import_spectra <- function(
     n_after <- length(spectra)
     n_removed <- n_before - n_after
     if (n_removed > 0L) {
+      n_ms1_skipped <- n_removed
       log_debug(
         "Filtered to MS2 spectra: %d -> %d (%d removed)",
         n_before,
@@ -353,6 +360,11 @@ import_spectra <- function(
     "Import complete: %d spectra ready for analysis",
     length(spectra)
   )
+
+  # Propagate the MS1-skip count as an attribute so callers (notably
+  # annotate_spectra()) can warn once about skipped MS1 features without
+  # re-parsing. Attributes survive subset/rename operations downstream.
+  attr(spectra, "tima_ms1_skipped") <- n_ms1_skipped
 
   spectra
 }

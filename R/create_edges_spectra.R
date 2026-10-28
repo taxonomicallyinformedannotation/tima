@@ -236,17 +236,42 @@ create_edges_spectra <- function(
       ppm = ppm
     )
 
-  # Fail fast when no usable spectra were parsed from input.
+  # When no usable spectra remain (e.g. an MS1-only or empty MGF), degrade
+  # gracefully instead of aborting: emit a single warning and write an empty
+  # edges file with the correct schema so downstream targets don't break.
   if (length(spectra) == 0L) {
-    cli::cli_abort(
-      c(
-        "No usable spectra found in input",
-        "x" = "All spectra were empty, malformed, or removed by filtering",
-        "i" = "Check MGF formatting and ensure at least one MS2 spectrum has fragment peaks"
-      ),
-      class = c("tima_runtime_error", "tima_error"),
-      call = NULL
-    )
+    n_ms1_skipped <- attr(spectra, "tima_ms1_skipped")
+    if (isTRUE(n_ms1_skipped > 0L)) {
+      cli::cli_warn(
+        paste0(
+          "Skipped ",
+          n_ms1_skipped,
+          " MS1 (non-MS2) spectrum(s) during import; ",
+          "MS1-only features cannot be annotated by spectral matching."
+        ),
+        class = "tima_ms1_skipped_warning",
+        call = NULL
+      )
+    } else {
+      cli::cli_warn(
+        c(
+          "No MS2 spectra were found in the input file(s); ",
+          "MS1-only data cannot be annotated by spectral matching.",
+          "i" = paste0(
+            "Spectral annotation requires MS2 (fragment) peak lists. ",
+            "Provide an MGF containing MS2 spectra, or supply MS1-level ",
+            "annotations separately (e.g. via SIRIUS/CANOPUS or ",
+            "annotate_masses)."
+          )
+        ),
+        class = "tima_spectra_no_ms2_warning",
+        call = NULL
+      )
+    }
+    log_warn("No usable MS2 spectra found - writing empty edge file")
+    edges <- empty_spectral_edges(source_col, target_col)
+    export_output(x = edges, file = output)
+    return(output)
   }
 
   # Early exit if only one spectrum
@@ -477,4 +502,27 @@ create_edges_spectra <- function(
     n_features = n_features
   )
   invisible(output)
+}
+
+#' Build an empty spectral-edges template with the correct schema.
+#'
+#' Used by `create_edges_spectra()` when no usable MS2 spectra remain
+#' (MS1-only / empty / malformed-filtered inputs) so that downstream targets
+#' receive a valid (zero-row) edges file instead of a crashing pipeline.
+#'
+#' @param source_col [character] Name to use for the source column.
+#' @param target_col [character] Name to use for the target column.
+#' @return A zero-row `tidytable`/`data.table` with the spectral edges schema.
+#' @keywords internal
+empty_spectral_edges <- function(source_col, target_col) {
+  edges <- tidytable::tidytable(
+    source = character(0L),
+    target = character(0L),
+    feature_spectrum_entropy = numeric(0L),
+    feature_spectrum_peaks = integer(0L),
+    candidate_score_similarity = numeric(0L),
+    candidate_count_similarity_peaks_matched = integer(0L)
+  )
+  names(edges)[1:2] <- c(source_col, target_col)
+  edges
 }

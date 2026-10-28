@@ -375,3 +375,82 @@ test_that("create_edges integrates with extract_spectra output", {
   expect_s3_class(spectra_data, "data.frame")
   expect_true(nrow(spectra_data) > 0)
 })
+
+## Graceful degradation for MS1-only / empty input ----
+
+test_that("create_edges_spectra degrades gracefully on MS1-only MGF", {
+  withr::local_dir(new = temp_test_dir("create_edges_ms1"))
+  paths <- local_test_project(copy = TRUE)
+
+  # Library with one MS2 feature (used internally for polarity filtering etc.)
+  lib_mgf <- file.path(
+    "data",
+    "interim",
+    "libraries",
+    "spectra",
+    "lib_pos.mgf"
+  )
+  dir.create(dirname(lib_mgf), recursive = TRUE, showWarnings = FALSE)
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "TITLE=Lib_1",
+      "PEPMASS=200",
+      "CHARGE=1+",
+      "MSLEVEL=2",
+      "SMILES=CCO",
+      "100 50",
+      "150 200",
+      "200 300",
+      "END IONS",
+      ""
+    ),
+    lib_mgf
+  )
+
+  # Query: a pure MS1-only MGF (MSLEVEL=1, no MS2)
+  query_mgf <- file.path(
+    paths$data$source$spectra
+  )
+  dir.create(dirname(query_mgf), recursive = TRUE, showWarnings = FALSE)
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "TITLE=peak1",
+      "PEPMASS=251.0",
+      "CHARGE=1+",
+      "MSLEVEL=1",
+      "125.5 100",
+      "251 500",
+      "END IONS",
+      "",
+      "BEGIN IONS",
+      "TITLE=peak2",
+      "PEPMASS=300.0",
+      "CHARGE=1+",
+      "MSLEVEL=1",
+      "150 100",
+      "300 500",
+      "END IONS",
+      ""
+    ),
+    query_mgf
+  )
+
+  out_path <- file.path(temp_test_dir("create_edges_ms1"), "out_edges.tsv")
+
+  expect_warning(
+    result <- create_edges_spectra(
+      input = query_mgf,
+      output = out_path,
+      method = "cosine"
+    ),
+    "cannot be annotated by spectral matching|No MS2 spectra were found"
+  )
+
+  # No crash, empty output file written, zero rows
+  expect_true(file.exists(out_path))
+  df <- tidytable::fread(out_path)
+  expect_s3_class(df, "data.frame")
+  expect_equal(nrow(df), 0L)
+})

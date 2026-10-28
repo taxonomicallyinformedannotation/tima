@@ -164,10 +164,44 @@ annotate_spectra <- function(
     )
   }
 
-  # Pre-flight data sanitizing for MGF files
+  # Pre-flight data sanitizing for MGF files.
+  #
+  # "No MS2 spectra" / "No spectra found" are *recoverable*: spectral matching
+  # has nothing to annotate, so we emit a single clear warning and return an
+  # empty (correctly-typed) template instead of aborting the whole pipeline.
+  # Genuinely malformed MGFs (mismatched BEGIN/END IONS, parse failures,
+  # ...) remain fatal and abort as before.
   log_debug("Running pre-flight checks on input MGF files...")
+  recoverable_issues <- character(0L)
   for (mgf in input_vec) {
-    sanitize_all_inputs(mgf_file = mgf)
+    pf <- sanitize_mgf(file = mgf, file_type = "MGF spectra")
+    fatal <- .preflight_mgf_fatal_issues(pf)
+    if (length(fatal) > 0L) {
+      tima_abort(
+        problem = "Input data validation failed",
+        received = paste(fatal, collapse = "; "),
+        fix = paste(
+          "1. Review the error messages above",
+          "2. Fix the identified issues in your input files",
+          "3. Re-run the validation",
+          sep = "\n"
+        ),
+        class = c("tima_validation_error", "tima_error")
+      )
+    }
+    recoverable_issues <- c(
+      recoverable_issues,
+      if (length(pf$issues) > 0L) pf$issues else character(0L)
+    )
+  }
+
+  # If every input MGF had no usable MS2 spectra, degrade gracefully: one
+  # actionable warning, then return a valid empty template.
+  if (length(recoverable_issues) > 0L) {
+    .annotate_spectra_warn_no_ms2(recoverable_issues, input_vec)
+    return(
+      annotate_spectra_handle_empty_result(output_path, params)
+    )
   }
 
   missing_in <- input_vec[!file.exists(input_vec)]
@@ -217,6 +251,25 @@ annotate_spectra <- function(
         params,
         "No query spectra loaded"
       )
+    )
+  }
+
+  # If the query contained MS1 (precursor-only) features alongside MS2 ones,
+  # they were silently dropped during import. Emit a single warning with the
+  # count of skipped features so the user knows their MS1 data was not
+  # annotated by spectral matching. (All-MS1 / empty inputs are handled
+  # earlier by the pre-flight warning; this only fires for genuine mixed.)
+  n_ms1_skipped <- attr(query_sp, "tima_ms1_skipped")
+  if (isTRUE(is.numeric(n_ms1_skipped) && n_ms1_skipped > 0L)) {
+    cli::cli_warn(
+      paste0(
+        "Skipped ",
+        n_ms1_skipped,
+        " MS1 (non-MS2) spectrum(s) during import; ",
+        "MS1-only features cannot be annotated by spectral matching."
+      ),
+      class = "tima_ms1_skipped_warning",
+      call = NULL
     )
   }
 
@@ -463,6 +516,89 @@ annotate_spectra_handle_empty_result <- function(path, params, message = NULL) {
   }
   persist_annotation_parameters(params)
   annotate_spectra_return_empty_template(path)
+}
+
+#' Classify pre-flight MGF issues as recoverable or fatal.
+#'
+#' "No spectra" / "No MS2 spectra found" are recoverable: spectral
+#' annotation simply has nothing to match, so the caller emits a single
+#' user-facing warning and returns an empty template. Any other issue
+#' (mismatched BEGIN/END IONS, missing PEPMASS, parse failures) is fatal.
+#'
+#' @param result List returned by [sanitize_mgf()].
+#' @return Character vector of *fatal* issues only (may be empty).
+.preflight_mgf_fatal_issues <- function(result) {
+  if (isTRUE(result$valid)) {
+    return(character(0L))
+  }
+  is_recoverable <- function(issue) {
+    grepl("No spectra found", issue, ignore.case = TRUE) ||
+      grepl(
+        "No MS2 spectra found",
+        issue,
+        ignore.case = TRUE
+      )
+  }
+  issues <- result$issues
+  if (!is.character(issues)) {
+    return(character(0L))
+  }
+  fatal <- issues[!vapply(issues, is_recoverable, logical(1L))]
+  fatal
+}
+
+#' Emit a single actionable warning for "no usable MS2 spectra" inputs.
+#'
+#' Collapses the per-file recoverable issues (empty MGF, MS1-only MGF, or a
+#' mix) into one user-facing warning so the pipeline does not abort. The
+#' message states: (a) no MS2 spectra were found, (b) MS1-only data cannot be
+#' annotated by spectral matching, (c) what the user can do.
+#'
+#' @param issues Character vector of recoverable pre-flight issue messages.
+#' @param files Character vector of input MGF file paths.
+#' @return Invisible NULL; emits one `cli::cli_warn()`.
+#' @keywords internal
+.annotate_spectra_warn_no_ms2 <- function(issues, files) {
+  n_files <- length(files)
+  has_empty <- any(grepl("No spectra found", issues, ignore.case = TRUE))
+  has_ms1 <- any(grepl("No MS2 spectra found", issues, ignore.case = TRUE))
+
+  if (has_empty && has_ms1) {
+    detail <- paste0(
+      "One or more input files are empty (no spectra) and one or more ",
+      "contain only MS1 (precursor) spectra with no MS2 fragment peaks."
+    )
+  } else if (has_empty) {
+    detail <- paste0(
+      "One or more input files contain no spectra at all (",
+      n_files,
+      " file(s) checked)."
+    )
+  } else {
+    detail <- paste0(
+      "Input file(s) contain only MS1 (precursor) spectra with no MS2 ",
+      "fragment peaks (",
+      n_files,
+      " file(s) checked)."
+    )
+  }
+
+  cli::cli_warn(
+    c(
+      "No MS2 spectra were found in the input file(s); ",
+      "MS1-only data cannot be annotated by spectral matching.",
+      "x" = detail,
+      "i" = paste0(
+        "Spectral annotation requires MS2 (fragment) peak lists. ",
+        "Provide an MGF containing MS2 spectra, or supply MS1-level ",
+        "annotations separately (e.g. via SIRIUS/CANOPUS or ",
+        "annotate_masses)."
+      )
+    ),
+    class = "tima_spectra_no_ms2_warning",
+    call = NULL
+  )
+  invisible(NULL)
 }
 
 #' @keywords internal
