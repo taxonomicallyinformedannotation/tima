@@ -46,7 +46,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-2675dab4ec499648f3c0344a6854f0e2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-2f71d848462b676b2af838f1236eb696.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -611,6 +611,7 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#new-features" id="toc-new-features" class="nav-link" data-scroll-target="#new-features">New features</a></li>
   <li><a href="#new-libraries" id="toc-new-libraries" class="nav-link" data-scroll-target="#new-libraries">New libraries</a></li>
+  <li><a href="#bug-fixes" id="toc-bug-fixes" class="nav-link" data-scroll-target="#bug-fixes">Bug fixes</a></li>
   <li><a href="#internal-performance" id="toc-internal-performance" class="nav-link" data-scroll-target="#internal-performance">Internal / performance</a></li>
   <li><a href="#fixes" id="toc-fixes" class="nav-link" data-scroll-target="#fixes">Fixes</a></li>
   </ul></li>
@@ -619,7 +620,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link" data-scroll-target="#breaking-changes">Breaking changes</a></li>
   <li><a href="#new-features-1" id="toc-new-features-1" class="nav-link" data-scroll-target="#new-features-1">New features</a></li>
   <li><a href="#internal-performance-1" id="toc-internal-performance-1" class="nav-link" data-scroll-target="#internal-performance-1">Internal / performance</a></li>
-  <li><a href="#bug-fixes" id="toc-bug-fixes" class="nav-link" data-scroll-target="#bug-fixes">Bug fixes</a></li>
+  <li><a href="#bug-fixes-1" id="toc-bug-fixes-1" class="nav-link" data-scroll-target="#bug-fixes-1">Bug fixes</a></li>
   <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
   <li><a href="#data-updates" id="toc-data-updates" class="nav-link" data-scroll-target="#data-updates">Data updates</a></li>
   </ul></li>
@@ -627,7 +628,7 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#breaking-changes-1" id="toc-breaking-changes-1" class="nav-link" data-scroll-target="#breaking-changes-1">Breaking changes</a></li>
   <li><a href="#new-features-2" id="toc-new-features-2" class="nav-link" data-scroll-target="#new-features-2">New features</a></li>
-  <li><a href="#bug-fixes-1" id="toc-bug-fixes-1" class="nav-link" data-scroll-target="#bug-fixes-1">Bug fixes</a></li>
+  <li><a href="#bug-fixes-2" id="toc-bug-fixes-2" class="nav-link" data-scroll-target="#bug-fixes-2">Bug fixes</a></li>
   <li><a href="#internal-performance-2" id="toc-internal-performance-2" class="nav-link" data-scroll-target="#internal-performance-2">Internal / performance</a></li>
   <li><a href="#documentation-1" id="toc-documentation-1" class="nav-link" data-scroll-target="#documentation-1">Documentation</a></li>
   <li><a href="#data-updates-1" id="toc-data-updates-1" class="nav-link" data-scroll-target="#data-updates-1">Data updates</a></li>
@@ -695,6 +696,13 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li>Added Enveda180 spectral library</li>
 <li>Added MultiMS2 spectral library</li>
+</ul>
+</section>
+<section id="bug-fixes" class="level2">
+<h2 class="anchored" data-anchor-id="bug-fixes">Bug fixes</h2>
+<ul>
+<li><code>annotate_spectra()</code> and <code>create_edges_spectra()</code> now degrade gracefully when given MGF input that contains no MS2 (fragment) spectra — whether an MS1-only file, an empty file, or a mix of MS1 and MS2 features. Previously this hard-aborted with a stack trace (<code>annotate_spectra</code> during pre-flight sanitization; <code>create_edges_spectra</code> from its post-import empty-spectra guard). An MS1-only or empty input now emits a single actionable warning (<code>tima_spectra_no_ms2_warning</code>) and returns a valid empty output (an annotation template or an empty edges file with the correct schema); mixed input processes the MS2 features and warns once with the count of skipped MS1 features (<code>tima_ms1_skipped_warning</code>). Genuinely malformed MGFs (e.g. mismatched BEGIN/END IONS) still abort as before.</li>
+<li>Hardened <code>get_spectra_ids()</code> against empty <code>Spectra</code> objects to avoid “subscript out of bounds” errors on 0-row inputs.</li>
 </ul>
 </section>
 <section id="internal-performance" class="level2">
@@ -819,8 +827,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Updated the C implementation of the spectral similarity</li>
 </ul>
 </section>
-<section id="bug-fixes" class="level2">
-<h2 class="anchored" data-anchor-id="bug-fixes">Bug fixes</h2>
+<section id="bug-fixes-1" class="level2">
+<h2 class="anchored" data-anchor-id="bug-fixes-1">Bug fixes</h2>
 <ul>
 <li>Fixed adduct annotation bug and harmonization</li>
 <li>Fixed recognition of uncommon negative charges</li>
@@ -864,8 +872,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Introduced similarity method argument (entropy and GNPS for now)</li>
 </ul>
 </section>
-<section id="bug-fixes-1" class="level2">
-<h2 class="anchored" data-anchor-id="bug-fixes-1">Bug fixes</h2>
+<section id="bug-fixes-2" class="level2">
+<h2 class="anchored" data-anchor-id="bug-fixes-2">Bug fixes</h2>
 <ul>
 <li>Fixed memory crashes in case of large number of ties, limiting to 7 with note (<a href="https://github.com/taxonomicallyinformedannotation/tima/issues/216">#216</a>)</li>
 </ul>
