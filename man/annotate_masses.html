@@ -884,7 +884,7 @@ Ionization mode. Must be ‘pos’ or ‘neg’
 <code id="tolerance_ppm">tolerance_ppm</code>
 </td>
 <td>
-Tolerance to perform annotation. Should be &lt;= 20 ppm
+Relative mass tolerance (ppm) to perform annotation. Should be &lt;= 20 ppm. A match within either <code>tolerance_ppm</code> or <code>tolerance_dalton</code> is accepted, so the effective window is the larger of the two.
 </td>
 </tr>
 <tr>
@@ -892,7 +892,7 @@ Tolerance to perform annotation. Should be &lt;= 20 ppm
 <code id="tolerance_dalton">tolerance_dalton</code>
 </td>
 <td>
-Absolute mass tolerance in Daltons for annotation
+Absolute mass tolerance (Da) to perform annotation. Acts as a floor for low masses: the default (0.0025 Da) equals 10 ppm at m/z 250, so it only widens the window below that.
 </td>
 </tr>
 <tr>
@@ -908,7 +908,7 @@ Tolerance to group adducts. Should be &lt;= 0.05 minutes
 <code id="correlation_p_threshold">correlation_p_threshold</code>
 </td>
 <td>
-P-value threshold for Pearson correlation of feature intensities. Adduct edges where features show p-value &gt;= correlation_p_threshold are rejected.
+P-value threshold for the Pearson correlation of feature intensities across samples (needs &gt;= 3 samples where both features are detected). Positively correlated pairs with p &lt; threshold are exported as covariance edges, and an adduct neighbor that co-varies counts twice in <code>adduct_support</code>. Pairs that fail the test are not rejected.
 </td>
 </tr>
 </tbody></table>

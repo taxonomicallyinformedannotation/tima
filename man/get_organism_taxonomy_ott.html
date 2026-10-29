@@ -708,7 +708,7 @@ logical Logical indicating whether to retry failed queries using only the generi
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Data frame with taxonomic information including OTT IDs, ranks, and taxonomic hierarchy. Returns empty template if API is unavailable.</p>
+<p>Data frame with taxonomic information including OTT IDs, ranks, and taxonomic hierarchy. If the API is unavailable, warns (<code>tima_ott_unavailable_warning</code>) and returns the same columns with no rows.</p>
 </section>
 <section id="see-also" class="level3">
 <h3 class="anchored" data-anchor-id="see-also">See Also</h3>

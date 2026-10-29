@@ -703,6 +703,36 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li><code>annotate_spectra()</code> and <code>create_edges_spectra()</code> now degrade gracefully when given MGF input that contains no MS2 (fragment) spectra — whether an MS1-only file, an empty file, or a mix of MS1 and MS2 features. Previously this hard-aborted with a stack trace (<code>annotate_spectra</code> during pre-flight sanitization; <code>create_edges_spectra</code> from its post-import empty-spectra guard). An MS1-only or empty input now emits a single actionable warning (<code>tima_spectra_no_ms2_warning</code>) and returns a valid empty output (an annotation template or an empty edges file with the correct schema); mixed input processes the MS2 features and warns once with the count of skipped MS1 features (<code>tima_ms1_skipped_warning</code>). Genuinely malformed MGFs (e.g. mismatched BEGIN/END IONS) still abort as before.</li>
 <li>Hardened <code>get_spectra_ids()</code> against empty <code>Spectra</code> objects to avoid “subscript out of bounds” errors on 0-row inputs.</li>
+<li><strong>Behaviour changes</strong> (results may differ from earlier versions):
+<ul>
+<li><code>annotate_masses()</code> accepts a library match within EITHER the ppm OR the Dalton tolerance (previously both were required, so the stricter one won). The default MS1 Dalton tolerance is now 0.0025 Da (= 10 ppm at m/z 250), so it only widens the 10 ppm window below m/z 250</li>
+<li>Intensity co-variance edges now feed annotation: an adduct neighbor whose intensities co-vary significantly across samples counts twice in <code>adduct_support</code>. Pairs failing the test are kept, so single-sample runs are unaffected</li>
+<li><code>adduct_support</code> no longer counts a feature as its own neighbor</li>
+<li>Leiden community detection optimises modularity (was igraph’s default CPM) with a fixed seed, weighted by spectral similarity</li>
+<li>The default Biota biological score is 1.0 (was 1.007276, above the 0-1 range)</li>
+</ul></li>
+<li><strong>Ranking and filtering</strong>:
+<ul>
+<li>The filtered tier now keeps the <code>candidates_final</code> best-ranked candidates (tidytable’s <code>slice_head()</code> ignored <code>order_by</code>)</li>
+<li>Ranks are computed after removing duplicate structures, so duplicates no longer push other candidates down</li>
+<li>The user-defined spectral weight is used when combining scores (a fixed 0.3 was used)</li>
+<li>Similarity and entropy columns are compared as numbers, not text</li>
+<li>Taxon and chemical class names are matched exactly, not as regex substrings (<code>Ara</code> no longer matches <code>Arabidopsis</code>)</li>
+<li>High-evidence filtering uses the anchor’s scores for cluster-promoted rows</li>
+<li>The <code>high_evidence</code> option is documented as controlling only the full table; the filtered and mini tables always keep high-evidence candidates</li>
+</ul></li>
+<li><strong>Masses</strong>: electron mass included in the spectral neutral mass; a single isotope shift and a single element-mass table (MetaboCoreUtils values); the library precursor window is closed at both ends</li>
+<li><strong>Inputs and parameters</strong>:
+<ul>
+<li>Retention time libraries from MGF are read from their metadata only, so entries without fragment peaks or <code>PEPMASS</code> are no longer dropped, and <code>RTINSECONDS</code> is always read as seconds</li>
+<li>Polarity filtering no longer matches <code>-1</code> or <code>10</code> as positive</li>
+<li><code>import_spectra()</code> only filters on <code>Spectrum_type</code> when that column exists</li>
+<li><code>prepare_params()</code>: the small-YAML mzMine path reaches every step, the BiGG path goes to its own step, and the Biota weight is propagated</li>
+<li>CLI <code>--ann-can-nei</code> and <code>--ann-can-sam</code> set <code>annotations.candidates.*</code></li>
+<li>Parameter files are taken per step from <code>params/user</code> when present, else from the defaults (leftover user files no longer switch the whole set)</li>
+<li>The NPClassifier cache key <code>n:</code> is quoted (YAML read it as <code>FALSE</code>)</li>
+</ul></li>
+<li><strong>Pipeline robustness</strong>: HMDB download warnings no longer replace the library with a placeholder; an existing LOTUS file is kept when offline; <code>export_spectra_rds()</code> always writes its file; <code>create_edges_spectra()</code> no longer fails when no community is found; the non-equi join in the MS1 consistency step allows many matches per window; <code>summarize_results()</code> works without <code>annot_table_wei_chemo</code>; <code>qsort</code> ties in the C similarity code are ordered deterministically</li>
 </ul>
 </section>
 <section id="internal-performance" class="level2">
