@@ -100,11 +100,14 @@ test_that("annotate_spectra produces output file and columns", {
     "lib_pos.mgf"
   )
   write_minimal_mgf(lib_path, precursors = c(200, 250))
-  out <- annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    ppm = 20,
-    dalton = 0.05
+  expect_warning(
+    out <- annotate_spectra(
+      libraries = list(pos = lib_path),
+      polarity = "pos",
+      ppm = 20,
+      dalton = 0.05
+    ),
+    "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
   expect_true(file.exists(out))
   df <- tidytable::fread(out)
@@ -136,15 +139,21 @@ test_that("threshold filtering removes low similarity candidates", {
     "lib_pos.mgf"
   )
   write_minimal_mgf(lib_path, precursors = c(300))
-  out_low <- annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    threshold = 0.0
+  expect_warning(
+    out_low <- annotate_spectra(
+      libraries = list(pos = lib_path),
+      polarity = "pos",
+      threshold = 0.0
+    ),
+    "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
-  out_high <- annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    threshold = 0.9
+  expect_warning(
+    out_high <- annotate_spectra(
+      libraries = list(pos = lib_path),
+      polarity = "pos",
+      threshold = 0.9
+    ),
+    "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
   df_low <- tidytable::fread(out_low)
   df_high <- tidytable::fread(out_high)
@@ -240,17 +249,23 @@ test_that("polarity filtering drops non-matching libraries and handles none left
   write_minimal_mgf(lib_pos, precursors = c(150))
   write_minimal_mgf(lib_neg, precursors = c(150), charge = "1-")
   # When polarity is pos, neg library path should be filtered out
-  out <- annotate_spectra(
-    libraries = c(lib_pos, lib_neg),
-    polarity = "pos",
-    threshold = 0
+  expect_warning(
+    out <- annotate_spectra(
+      libraries = c(lib_pos, lib_neg),
+      polarity = "pos",
+      threshold = 0
+    ),
+    "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
   expect_true(file.exists(out))
   # When only neg libraries provided for pos polarity, expect empty template
-  out2 <- annotate_spectra(
-    libraries = c(lib_neg),
-    polarity = "pos",
-    threshold = 0
+  expect_warning(
+    out2 <- annotate_spectra(
+      libraries = c(lib_neg),
+      polarity = "pos",
+      threshold = 0
+    ),
+    "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
   df2 <- tidytable::fread(out2)
   expect_equal(nrow(df2), 1)
@@ -295,10 +310,13 @@ test_that("library spectra with empty peaks are removed before concatenation", {
     ),
     lib_empty
   )
-  out <- annotate_spectra(
-    libraries = c(lib_ok, lib_empty),
-    polarity = "pos",
-    threshold = 0
+  expect_warning(
+    out <- annotate_spectra(
+      libraries = c(lib_ok, lib_empty),
+      polarity = "pos",
+      threshold = 0
+    ),
+    "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
   expect_true(file.exists(out))
   df <- tidytable::fread(out)
@@ -351,10 +369,13 @@ test_that("duplicate candidates collapsed by SMILES are unique", {
   write_minimal_mgf(lib1, precursors = c(300))
   # For lib2, reuse same precursor; SMILES is fixed by write_minimal_mgf
   write_minimal_mgf(lib2, precursors = c(300))
-  out <- annotate_spectra(
-    libraries = c(lib1, lib2),
-    polarity = "pos",
-    threshold = 0
+  expect_warning(
+    out <- annotate_spectra(
+      libraries = c(lib1, lib2),
+      polarity = "pos",
+      threshold = 0
+    ),
+    "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
   df <- tidytable::fread(out)
   uniq <- tidytable::distinct(
@@ -401,10 +422,13 @@ test_that("NA fallback for smiles is applied", {
     ),
     lib_path
   )
-  out <- annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    threshold = 0
+  expect_warning(
+    out <- annotate_spectra(
+      libraries = list(pos = lib_path),
+      polarity = "pos",
+      threshold = 0
+    ),
+    "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
   df <- tidytable::fread(out)
   expect_true("candidate_structure_smiles_no_stereo" %in% names(df))
@@ -615,11 +639,14 @@ test_that("annotate_spectra applies intensity cutoff", {
   write_minimal_mgf(lib_path, precursors = c(200))
 
   # High cutoff
-  out <- annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    cutoff = 50,
-    threshold = 0
+  expect_warning(
+    out <- annotate_spectra(
+      libraries = list(pos = lib_path),
+      polarity = "pos",
+      cutoff = 50,
+      threshold = 0
+    ),
+    "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
 
   expect_true(file.exists(out))
@@ -646,11 +673,14 @@ test_that("annotate_spectra handles different similarity methods", {
   write_minimal_mgf(lib_path, precursors = c(200))
 
   # Test entropy method
-  out <- annotate_spectra(
-    libraries = list(pos = lib_path),
-    polarity = "pos",
-    method = "entropy",
-    threshold = 0
+  expect_warning(
+    out <- annotate_spectra(
+      libraries = list(pos = lib_path),
+      polarity = "pos",
+      method = "entropy",
+      threshold = 0
+    ),
+    "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
 
   expect_true(file.exists(out))
