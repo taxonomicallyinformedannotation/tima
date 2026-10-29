@@ -908,7 +908,7 @@ Tolerance to group adducts. Should be &lt;= 0.05 minutes
 <code id="correlation_p_threshold">correlation_p_threshold</code>
 </td>
 <td>
-P-value threshold for the Pearson correlation of feature intensities across samples (needs &gt;= 3 samples where both features are detected). Positively correlated pairs with p &lt; threshold are exported as covariance edges, and an adduct neighbor that co-varies counts twice in <code>adduct_support</code>. Pairs that fail the test are not rejected.
+False discovery rate threshold for the Pearson correlation of feature intensities across samples (needs &gt;= 3 samples where both features are detected). P-values of all pairs tested are Benjamini-Hochberg adjusted; positively correlated pairs with adjusted p &lt; threshold are exported as covariance edges, and an adduct neighbor that co-varies counts twice in <code>adduct_support</code>. Pairs that fail the test are not rejected.
 </td>
 </tr>
 </tbody></table>

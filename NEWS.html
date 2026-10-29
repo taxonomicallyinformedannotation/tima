@@ -707,6 +707,16 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li><code>annotate_masses()</code> accepts a library match within EITHER the ppm OR the Dalton tolerance (previously both were required, so the stricter one won). The default MS1 Dalton tolerance is now 0.0025 Da (= 10 ppm at m/z 250), so it only widens the 10 ppm window below m/z 250</li>
 <li>Intensity co-variance edges now feed annotation: an adduct neighbor whose intensities co-vary significantly across samples counts twice in <code>adduct_support</code>. Pairs failing the test are kept, so single-sample runs are unaffected</li>
+<li>Intensity co-variance p-values are Benjamini-Hochberg adjusted over all pairs tested, so <code>ms$tolerances$correlation$p_value</code> is now a false discovery rate. Edges report the adjusted <code>p_value</code> (the raw value is kept as <code>p_value_raw</code> internally)</li>
+<li><code>get_organism_taxonomy_ott()</code>:
+<ul>
+<li>organisms that only matched at genus level on retry now get that genus taxonomy (the matches were fetched, then dropped)</li>
+<li>synonyms sharing one OTT id no longer trigger an empty retry, which errored</li>
+<li>when nothing matches, it returns the standard empty <code>organism_*</code> table</li>
+</ul></li>
+<li>Components from pre-labelled edges: a feature on several labelled edges now takes the label of its first edge (the edge order was misaligned)</li>
+<li><code>build_universe_transition_tables()</code> orients each adduct pair lighter to heavier, so transitions are no longer lost when the heavier adduct sorts first alphabetically (all loss transitions were). It also handles a single-adduct universe</li>
+<li>Log messages that were built paste- or glue-style are now <code>sprintf</code> formatted. They were cut short and raised “arguments not used by format” warnings</li>
 <li><code>adduct_support</code> no longer counts a feature as its own neighbor</li>
 <li>Leiden community detection optimises modularity (was igraph’s default CPM) with a fixed seed, weighted by spectral similarity</li>
 <li>The default Biota biological score is 1.0 (was 1.007276, above the 0-1 range)</li>
