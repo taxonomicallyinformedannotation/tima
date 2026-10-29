@@ -570,6 +570,7 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
     neutral_losses_list = character(0),
     ms_mode = "pos",
     tolerance_ppm = 5.0,
+    tolerance_dalton = 0.001,
     tolerance_rt = 0.02,
     output_annotations = env$output_annotations,
     output_edges = env$output_edges
@@ -588,10 +589,39 @@ test_that("annotate_masses respects tolerance_ppm correctly", {
         nzchar(candidate_structure_inchikey_connectivity_layer)
     )
 
-  # Verify only one structural match within 5 ppm tolerance
+  # Verify only one structural match within 5 ppm (and 0.001 Da) tolerance
   # 199.092500 is 0.000224 Da away (within 5 ppm of implied M)
-  # 199.095000 is 0.002276 Da away (outside 5 ppm tolerance)
+  # 199.095000 is 0.002276 Da away (outside both tolerances)
   expect_equal(nrow(library_hits), 1L)
+
+  # A match within EITHER tolerance is accepted: a 0.0025 Da floor admits the
+  # second structure although it is outside 5 ppm
+  result_floor <- annotate_masses(
+    features = env$features,
+    library = env$library,
+    str_stereo = env$str_stereo,
+    str_met = env$str_met,
+    str_tax_cla = env$str_tax_cla,
+    str_tax_npc = env$str_tax_npc,
+    adducts_list = list(pos = c("[M+H]+")),
+    clusters_list = list(pos = c("[M]")),
+    neutral_losses_list = character(0),
+    ms_mode = "pos",
+    tolerance_ppm = 5.0,
+    tolerance_dalton = 0.0025,
+    tolerance_rt = 0.02,
+    output_annotations = env$output_annotations,
+    output_edges = env$output_edges
+  )
+  library_hits_floor <- tidytable::fread(
+    result_floor["annotations"],
+    colClasses = "character"
+  ) |>
+    tidytable::filter(
+      !is.na(candidate_structure_inchikey_connectivity_layer) &
+        nzchar(candidate_structure_inchikey_connectivity_layer)
+    )
+  expect_equal(nrow(library_hits_floor), 2L)
 })
 
 ## Isotopologues ----

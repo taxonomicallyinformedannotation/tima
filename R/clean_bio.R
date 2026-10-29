@@ -351,11 +351,14 @@ clean_bio <- function(
   if ("label" %in% colnames(edges_filtered)) {
     edges_filtered <- edges_filtered |>
       tidytable::filter(
-        feature_spectrum_entropy > min_entropy | !is.na(label)
+        suppressWarnings(as.numeric(feature_spectrum_entropy)) > min_entropy |
+          !is.na(label)
       )
   } else {
     edges_filtered <- edges_filtered |>
-      tidytable::filter(feature_spectrum_entropy > min_entropy)
+      tidytable::filter(
+        suppressWarnings(as.numeric(feature_spectrum_entropy)) > min_entropy
+      )
   }
 
   # Keep only features with at least min_neighbors neighbors

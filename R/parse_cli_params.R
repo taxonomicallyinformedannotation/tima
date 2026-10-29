@@ -49,11 +49,11 @@ parse_cli_params <- function(arguments, parameters) {
       type = as.integer
     ),
     ann_can_nei = list(
-      path = c("organisms", "candidates", "neighbors"),
+      path = c("annotations", "candidates", "neighbors"),
       type = as.integer
     ),
     ann_can_sam = list(
-      path = c("organisms", "candidates", "samples"),
+      path = c("annotations", "candidates", "samples"),
       type = as.integer
     ),
     ann_ms1only = list(path = c("annotations", "ms1only"), type = as.logical),

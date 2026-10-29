@@ -100,7 +100,7 @@ test_that("get_file skips download if file already exists", {
 
 test_that("get_file creates output directory if needed", {
   skip_on_cran()
-  skip_if_offline()
+  skip_if_no_network("https://raw.githubusercontent.com")
   tmp <- temp_test_dir("get_file_create_dir")
   withr::local_dir(new = tmp)
   paths <- local_test_project(copy = TRUE)
@@ -311,6 +311,7 @@ test_that("cleanup_failed_download handles nonexistent files", {
 ## Download Success ----
 
 test_that("get_file downloads file successfully", {
+  skip_if_no_network("https://raw.githubusercontent.com")
   tmp <- temp_test_dir("get_file_download_success")
   withr::local_dir(new = tmp)
   paths <- local_test_project(copy = TRUE)
@@ -376,6 +377,7 @@ test_that("get_file handles 404 errors", {
 ## Integration with get_example_files ----
 
 test_that("get_file works with real package example files", {
+  skip_if_no_network("https://github.com")
   tmp <- temp_test_dir("get_file_examples")
   withr::local_dir(new = tmp)
   paths <- local_test_project(copy = TRUE)

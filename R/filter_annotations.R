@@ -588,7 +588,7 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
 enforce_ms1_adduct_semantics <- function(
   features_annotated_table,
   tolerance_ppm = 10,
-  tolerance_dalton = 0.005
+  tolerance_dalton = 0.0025
 ) {
   if (nrow(features_annotated_table) == 0L) {
     return(features_annotated_table)

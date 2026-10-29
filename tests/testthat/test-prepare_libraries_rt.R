@@ -613,3 +613,68 @@ test_that("prepare_libraries_rt handles missing InChIKeys", {
 
   expect_type(result, "character")
 })
+
+test_that("prepare_libraries_rt keeps MGF entries without peaks or precursor", {
+  mgf_exp <- file.path(tempdir(), "exp_rt.mgf")
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "PEPMASS=47.05",
+      "RTINSECONDS=312",
+      "SMILES=CCO",
+      "INCHIKEY=LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+      "END IONS",
+      "BEGIN IONS",
+      "RTINSECONDS=468",
+      "SMILES=CC(=O)O",
+      "INCHIKEY=QTBSBXVTEAMEQO-UHFFFAOYSA-N",
+      "43.0 100",
+      "END IONS"
+    ),
+    mgf_exp
+  )
+  output_rt <- file.path(tempdir(), "rt_library_mgf.tsv")
+  output_sop <- file.path(tempdir(), "sop_mgf.tsv")
+
+  # `unit_rt` is ignored for RTINSECONDS, which is always in seconds
+  result <- prepare_libraries_rt(
+    mgf_exp = mgf_exp,
+    mgf_is = NULL,
+    temp_exp = NULL,
+    temp_is = NULL,
+    col_ik = "INCHIKEY",
+    col_na = "NAME",
+    col_rt = "RTINSECONDS",
+    col_sm = "SMILES",
+    unit_rt = "minutes",
+    name_rt = "rt",
+    name_inchikey = "inchikey",
+    name_smiles = "smiles",
+    name_name = "structure_name",
+    output_rt = output_rt,
+    output_sop = output_sop
+  )
+
+  rt_table <- tidytable::fread(result["rt"], colClasses = "character")
+  expect_equal(sort(as.numeric(rt_table$rt)), c(5.2, 7.8))
+})
+
+test_that("read_mgf_metadata reads every block's fields", {
+  mgf <- file.path(tempdir(), "meta.mgf")
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "TITLE=a",
+      "rtinseconds=1",
+      "END IONS",
+      "BEGIN IONS",
+      "TITLE=b",
+      "10.0 5",
+      "END IONS"
+    ),
+    mgf
+  )
+  meta <- read_mgf_metadata(mgf)
+  expect_equal(meta$TITLE, c("a", "b"))
+  expect_equal(meta$RTINSECONDS, c("1", NA))
+})

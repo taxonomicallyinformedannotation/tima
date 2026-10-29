@@ -105,14 +105,63 @@ test_that("compute_feature_adduct_support handles empty and deduplicated neighbo
       support$feature_id == "A" & support$adduct == "[M+H]+",
       "adduct_support"
     ][[1L]],
-    3L
+    # B and C; the B->A edge repeats B and a feature never supports itself
+    2L
   )
   expect_equal(
     support[
       support$feature_id == "B" & support$adduct == "[M+Na]+",
       "adduct_support"
     ][[1L]],
-    2L
+    1L
+  )
+})
+
+test_that("compute_feature_adduct_support counts co-varying neighbors twice", {
+  df_add <- tidytable::tidytable(
+    feature_id = c("A", "A"),
+    adduct = c("[M+H]+", "[M+H]+"),
+    feature_id_dest = c("B", "C"),
+    adduct_dest = c("[M+Na]+", "[M+K]+")
+  )
+  .support_of <- function(support, feature, adduct) {
+    support[
+      support$feature_id == feature & support$adduct == adduct,
+      "adduct_support"
+    ][[1L]]
+  }
+  plain <- compute_feature_adduct_support(df_add)
+  # Covariance pairs are unordered: (C, A) backs the A-C edge
+  boosted <- compute_feature_adduct_support(
+    df_add,
+    covariance_edges = tidytable::tidytable(
+      feature_id = "C",
+      feature_id_dest = "A"
+    )
+  )
+
+  expect_equal(
+    .support_of(boosted, "A", "[M+H]+"),
+    .support_of(plain, "A", "[M+H]+") + 1L
+  )
+  expect_equal(
+    .support_of(boosted, "C", "[M+K]+"),
+    .support_of(plain, "C", "[M+K]+") + 1L
+  )
+  expect_equal(
+    .support_of(boosted, "B", "[M+Na]+"),
+    .support_of(plain, "B", "[M+Na]+")
+  )
+  # Empty covariance input changes nothing
+  expect_equal(
+    compute_feature_adduct_support(
+      df_add,
+      covariance_edges = tidytable::tidytable(
+        feature_id = character(),
+        feature_id_dest = character()
+      )
+    ),
+    plain
   )
 })
 

@@ -149,7 +149,7 @@ test_that("implied_neutral_mass applies the per-monomer adduct loss", {
 })
 
 test_that("EVIDENCE_ISOTOPE_SHIFT_DA is the 13C/12C difference", {
-  expect_equal(EVIDENCE_ISOTOPE_SHIFT_DA, 1.003355)
+  expect_identical(EVIDENCE_ISOTOPE_SHIFT_DA, ISOTOPE_MASS_SHIFT_DALTONS)
 })
 
 # --- .nearest_exact_mass_ppm ---------------------------------------------
@@ -506,13 +506,6 @@ test_that("annotate_adduct_universe_metadata yields NA tiers for an unknown pola
       if (is.null(cluster)) numeric(0) else setNames(1, cluster)
     ))
   )
-}
-
-.tier_of <- function(...) {
-  as.data.frame(annotate_adduct_universe_metadata(
-    .one_modifier_universe(...),
-    "pos"
-  ))$adduct_tier
 }
 
 test_that("every documented positive-mode carrier is treated as common", {

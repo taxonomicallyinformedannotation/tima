@@ -114,7 +114,7 @@ files:
             #' Additional NPClassifier taxonomy cache to supplement library data.
             #' Structures in the merged library without NPClassifier taxonomy
             #' will be looked up here. Leave empty to skip. STRING
-            n: data/interim/libraries/sop/merged/structures/taxonomies/npclassifier_cache.csv
+            "n": data/interim/libraries/sop/merged/structures/taxonomies/npclassifier_cache.csv
 
 #' Organisms related parameters.
 organisms:

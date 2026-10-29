@@ -123,6 +123,32 @@
   list(matches = empty_matches, taxonomy = empty_taxonomy)
 }
 
+#' Empty organism taxonomy table
+#' @description Same columns as a successful get_organism_taxonomy_ott()
+#'     result, with no rows. Returned when the API is unavailable so that
+#'     callers can bind it like any other result.
+#' @return A tidytable with 0 rows
+#' @keywords internal
+.empty_organism_taxonomy_table <- function() {
+  cols <- c(
+    "organism_name",
+    "organism_taxonomy_ottid",
+    "organism_taxonomy_01domain",
+    "organism_taxonomy_02kingdom",
+    "organism_taxonomy_03phylum",
+    "organism_taxonomy_04class",
+    "organism_taxonomy_05order",
+    "organism_taxonomy_06family",
+    "organism_taxonomy_07tribe",
+    "organism_taxonomy_08genus",
+    "organism_taxonomy_09species",
+    "organism_taxonomy_10varietas"
+  )
+  tidytable::as_tidytable(
+    stats::setNames(rep(list(character()), length(cols)), cols)
+  )
+}
+
 # Main Function ----
 
 #' @title Get organism taxonomy (Open Tree of Life Taxonomy)
@@ -142,7 +168,9 @@
 #'     generic epithet (genus name) when full species names fail (default: TRUE)
 #'
 #' @return Data frame with taxonomic information including OTT IDs, ranks, and
-#'     taxonomic hierarchy. Returns empty template if API is unavailable.
+#'     taxonomic hierarchy. If the API is unavailable, warns
+#'     (`tima_ott_unavailable_warning`) and returns the same columns with no
+#'     rows.
 #'
 #' @family data-retrieval
 #'
@@ -244,10 +272,14 @@ get_organism_taxonomy_ott <- function(
       "Open Tree of Life API is unavailable (status: %s)",
       api_status
     )
-    log_warn(
-      "Returning empty taxonomy template due to API unavailability"
+    cli::cli_warn(
+      c(
+        "Open Tree of Life API is unavailable",
+        "i" = "{length(organism_table$canonical_name)} organism(s) left without taxonomy"
+      ),
+      class = c("tima_ott_unavailable_warning", "tima_warning")
     )
-    return(.create_empty_taxonomy_template())
+    return(.empty_organism_taxonomy_table())
   }
 
   log_debug("OTT API is available, proceeding with taxonomy queries")

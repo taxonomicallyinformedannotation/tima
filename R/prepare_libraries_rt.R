@@ -7,7 +7,7 @@
 #'     pairs for RT-based annotation.
 #'
 #' @include get_params.R
-#' @include import_spectra.R
+#' @include read_mgf_opti.R
 #' @include process_smiles.R
 #' @include safe_fread.R
 #' @include logs_utils.R
@@ -115,13 +115,20 @@ prepare_libraries_rt <- function(
   log_info("Preparing retention time libraries")
   log_debug("RT unit: %s", unit_rt)
 
-  ## default transforms from `Spectra`
-  if (!is.na(col_rt) && col_rt == "RTINSECONDS") {
-    col_rt <- "rtime"
+  ## MGF fields are read as written in the file (upper-cased), so map the
+  ## `Spectra` variable names users may give back to the MGF keys
+  .to_mgf_key <- function(x) {
+    if (is.null(x) || is.na(x)) {
+      return(NULL)
+    }
+    switch(x, rtime = "RTINSECONDS", smiles = "SMILES", toupper(x))
   }
-  if (!is.na(col_sm) && col_sm == "SMILES") {
-    col_sm <- "smiles"
-  }
+  col_rt <- .to_mgf_key(col_rt)
+  col_ik <- .to_mgf_key(col_ik)
+  col_na <- .to_mgf_key(col_na)
+  col_sm <- .to_mgf_key(col_sm)
+  # RTINSECONDS is in seconds by definition, whatever `unit_rt` says
+  unit_rt_mgf <- if (identical(col_rt, "RTINSECONDS")) "seconds" else unit_rt
 
   # Normalize input vectors ----
   .normalize_input_vec <- function(x) {
@@ -150,17 +157,10 @@ prepare_libraries_rt <- function(
 
   # Readers ----
   rts_from_mgf <- function(mgf) {
-    # Helper: extract spectra data as tidytable
-    .extract_spectra_data <- function(spectra_obj) {
-      df <- as.data.frame(spectra_obj@backend@spectraData)
-      rownames(df) <- NULL
-      tidytable::as_tidytable(df)
-    }
-
-    spectra <- mgf |>
-      purrr::map(.f = import_spectra)
-    rts <- spectra |>
-      purrr::map(.f = .extract_spectra_data) |>
+    # Metadata only: RT records need no peaks nor precursor, and importing
+    # them as spectra would drop such entries
+    mgf |>
+      purrr::map(.f = read_mgf_metadata) |>
       tidytable::bind_rows() |>
       tidytable::select(
         tidyselect::any_of(
@@ -172,7 +172,6 @@ prepare_libraries_rt <- function(
           )
         )
       )
-    rts
   }
 
   rts_from_tab <- function(tab) {
@@ -316,7 +315,7 @@ prepare_libraries_rt <- function(
   rts_exp_1 <- if (!is.null(mgf_exp)) {
     mgf_exp |>
       rts_from_mgf() |>
-      polish_df() |>
+      polish_df(unit = unit_rt_mgf) |>
       complete_df()
   } else {
     empty_df
@@ -324,7 +323,7 @@ prepare_libraries_rt <- function(
   rts_is_1 <- if (!is.null(mgf_is)) {
     mgf_is |>
       rts_from_mgf() |>
-      polish_df(type = "predicted") |>
+      polish_df(type = "predicted", unit = unit_rt_mgf) |>
       complete_df()
   } else {
     empty_df

@@ -284,6 +284,18 @@ filter_high_evidence_only <- function(
     }
   }
 
+  # Derive the working score columns after inheritance, so that promoted
+  # rows are filtered on the anchor's evidence
+  df_work <- df_work |>
+    tidytable::mutate(
+      .score_bio = as.numeric(.data[["score_biological"]]),
+      .score_ini = as.numeric(.data[["candidate_score_pseudo_initial"]]),
+      .score_final = as.numeric(.data[["score_weighted_chemo"]])
+    )
+  if ("candidate_structure_error_rt" %in% names(df_work)) {
+    df_work$.rt_err_min <- as.numeric(df_work$candidate_structure_error_rt)
+  }
+
   n_before <- nrow(df_work)
 
   # Core filtering ----

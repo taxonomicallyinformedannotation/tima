@@ -254,9 +254,13 @@ ms:
         ms1: 10.0
 
       #' Absolute in Dalton.
+      #' A MS1 match within EITHER the ppm OR the Dalton tolerance is
+      #' accepted: the effective window is the larger of the two. The Dalton
+      #' value thus acts as a floor for low masses. The default equals 10 ppm
+      #' at m/z 250, so it only widens the window below m/z 250.
       dalton:
         #' Absolute mass tolerance for MS1 in Dalton. FLOAT
-        ms1: 0.005
+        ms1: 0.0025
 
     #' For retention time.
     rt:
@@ -266,6 +270,9 @@ ms:
     #' For intensity co-variance correlation p-value.
     correlation:
       #' P-value threshold for Pearson correlation in intensity co-variance discovery. FLOAT
+      #' Co-varying adduct neighbors (positive correlation, p below this value,
+      #' >= 3 shared samples) count twice as adduct support. Pairs that fail
+      #' are kept, so single-sample runs are unaffected.
       p_value: 0.05
 
 #' Names of the different variables in the input files.

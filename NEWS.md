@@ -40,6 +40,55 @@
   mismatched BEGIN/END IONS) still abort as before.
 - Hardened `get_spectra_ids()` against empty `Spectra` objects to avoid
   "subscript out of bounds" errors on 0-row inputs.
+- **Behaviour changes** (results may differ from earlier versions):
+  - `annotate_masses()` accepts a library match within EITHER the ppm OR the
+    Dalton tolerance (previously both were required, so the stricter one won).
+    The default MS1 Dalton tolerance is now 0.0025 Da (= 10 ppm at m/z 250), so
+    it only widens the 10 ppm window below m/z 250
+  - Intensity co-variance edges now feed annotation: an adduct neighbor whose
+    intensities co-vary significantly across samples counts twice in
+    `adduct_support`. Pairs failing the test are kept, so single-sample runs are
+    unaffected
+  - `adduct_support` no longer counts a feature as its own neighbor
+  - Leiden community detection optimises modularity (was igraph's default CPM)
+    with a fixed seed, weighted by spectral similarity
+  - The default Biota biological score is 1.0 (was 1.007276, above the 0-1
+    range)
+- **Ranking and filtering**:
+  - The filtered tier now keeps the `candidates_final` best-ranked candidates
+    (tidytable's `slice_head()` ignored `order_by`)
+  - Ranks are computed after removing duplicate structures, so duplicates no
+    longer push other candidates down
+  - The user-defined spectral weight is used when combining scores (a fixed 0.3
+    was used)
+  - Similarity and entropy columns are compared as numbers, not text
+  - Taxon and chemical class names are matched exactly, not as regex substrings
+    (`Ara` no longer matches `Arabidopsis`)
+  - High-evidence filtering uses the anchor's scores for cluster-promoted rows
+  - The `high_evidence` option is documented as controlling only the full table;
+    the filtered and mini tables always keep high-evidence candidates
+- **Masses**: electron mass included in the spectral neutral mass; a single
+  isotope shift and a single element-mass table (MetaboCoreUtils values); the
+  library precursor window is closed at both ends
+- **Inputs and parameters**:
+  - Retention time libraries from MGF are read from their metadata only, so
+    entries without fragment peaks or `PEPMASS` are no longer dropped, and
+    `RTINSECONDS` is always read as seconds
+  - Polarity filtering no longer matches `-1` or `10` as positive
+  - `import_spectra()` only filters on `Spectrum_type` when that column exists
+  - `prepare_params()`: the small-YAML mzMine path reaches every step, the BiGG
+    path goes to its own step, and the Biota weight is propagated
+  - CLI `--ann-can-nei` and `--ann-can-sam` set `annotations.candidates.*`
+  - Parameter files are taken per step from `params/user` when present, else
+    from the defaults (leftover user files no longer switch the whole set)
+  - The NPClassifier cache key `n:` is quoted (YAML read it as `FALSE`)
+- **Pipeline robustness**: HMDB download warnings no longer replace the library
+  with a placeholder; an existing LOTUS file is kept when offline;
+  `export_spectra_rds()` always writes its file; `create_edges_spectra()` no
+  longer fails when no community is found; the non-equi join in the MS1
+  consistency step allows many matches per window; `summarize_results()` works
+  without `annot_table_wei_chemo`; `qsort` ties in the C similarity code are
+  ordered deterministically
 
 ## Internal / performance
 

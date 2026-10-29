@@ -3,6 +3,9 @@
 
 library(testthat)
 
+# Use a temporary ~/.tima, never the user's real one
+local_test_home()
+
 # Helper to restore working directory
 with_temp_wd <- function(code) {
   old_wd <- getwd()

@@ -175,7 +175,8 @@ load_structural_library <- function(
     tidytable::distinct(exact_mass = structure_exact_mass) |>
     tidytable::filter(!is.na(exact_mass) & exact_mass > 0) |>
     tidytable::mutate(
-      # Use the less restrictive of ppm and Dalton windows.
+      # Wider of the ppm and Dalton windows (a match within either tolerance
+      # is accepted, see match_candidates_to_library()).
       mass_tol = pmax(
         1E-6 * tolerance_ppm * exact_mass,
         if (is.null(tolerance_dalton)) 0 else as.numeric(tolerance_dalton)

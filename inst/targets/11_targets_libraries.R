@@ -328,39 +328,40 @@ targets_section_libraries <- function() {
         tar_target(
           name = lib_sop_hmd,
           command = {
+            hmdb_path <- paths$data$source$libraries$sop$hmdb
             tryCatch(
               expr = {
-                get_file(
-                  url = paths$urls$hmdb$structures,
-                  export = paths$data$source$libraries$sop$hmdb
+                # A warning alone does not mean the download failed: log it
+                # and keep the downloaded file
+                withCallingHandlers(
+                  get_file(
+                    url = paths$urls$hmdb$structures,
+                    export = hmdb_path
+                  ),
+                  warning = function(w) {
+                    getFromNamespace("log_warn", "tima")(
+                      "HMDB download warning: %s",
+                      conditionMessage(w)
+                    )
+                    invokeRestart("muffleWarning")
+                  }
                 )
-              },
-              warning = function(w) {
-                getFromNamespace("log_warn", "tima")(
-                  "HMDB download warning: %s",
-                  conditionMessage(w)
-                )
-                getFromNamespace("log_warn", "tima")(
-                  "HMDB download failed partially, returning empty file instead"
-                )
-                unlink(paths$data$source$libraries$sop$hmdb)
-                getFromNamespace("fake_hmdb", "tima")(
-                  export = paths$data$source$libraries$sop$hmdb
-                )
+                if (!file.exists(hmdb_path) || file.size(hmdb_path) == 0) {
+                  stop("downloaded file is missing or empty")
+                }
               },
               error = function(e) {
                 getFromNamespace("log_warn", "tima")(
                   "HMDB download failed: %s",
                   conditionMessage(e)
                 )
+                unlink(hmdb_path)
                 getFromNamespace("fake_hmdb", "tima")(
-                  export = paths$data$source$libraries$sop$hmdb
+                  export = hmdb_path
                 )
-              },
-              finally = {
-                paths$data$source$libraries$sop$hmdb
               }
             )
+            hmdb_path
           },
           format = "file"
         ),
@@ -458,14 +459,22 @@ targets_section_libraries <- function() {
                   "LOTUS download failed: %s",
                   conditionMessage(e)
                 )
-                getFromNamespace("fake_lotus", "tima")(
-                  export = paths$data$source$libraries$sop$lotus
-                )
-              },
-              finally = {
-                paths$data$source$libraries$sop$lotus
+                lotus_path <- paths$data$source$libraries$sop$lotus
+                # Keep a pre-placed (e.g. offline) copy instead of replacing
+                # it with an empty placeholder
+                if (file.exists(lotus_path) && file.size(lotus_path) > 0) {
+                  getFromNamespace("log_warn", "tima")(
+                    "Using existing LOTUS file: %s",
+                    lotus_path
+                  )
+                } else {
+                  getFromNamespace("fake_lotus", "tima")(
+                    export = lotus_path
+                  )
+                }
               }
             )
+            paths$data$source$libraries$sop$lotus
           },
           format = "file"
         )
@@ -678,7 +687,7 @@ targets_section_libraries <- function() {
           name = lib_sop_lot_pre,
           command = {
             prepare_libraries_sop_lotus(
-              input = if (!paths$test$mode) {
+              input = if (!isTRUE(paths$tests$mode)) {
                 lib_sop_lot
               } else {
                 paths$data$source$libraries$sop$lotus
@@ -705,7 +714,9 @@ targets_section_libraries <- function() {
           command = {
             get_file(
               url = paths$urls$examples$npclassifier_cache,
-              export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$n
+              export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies[[
+                "n"
+              ]]
             )
           },
           format = "file"
@@ -715,7 +726,9 @@ targets_section_libraries <- function() {
           command = {
             get_file(
               url = paths$urls$examples$classyfire_cache,
-              export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies$c
+              export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$taxonomies[[
+                "c"
+              ]]
             )
           },
           format = "file"

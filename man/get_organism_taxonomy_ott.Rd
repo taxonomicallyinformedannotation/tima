@@ -24,7 +24,9 @@ generic epithet (genus name) when full species names fail (default: TRUE)}
 }
 \value{
 Data frame with taxonomic information including OTT IDs, ranks, and
-taxonomic hierarchy. Returns empty template if API is unavailable.
+taxonomic hierarchy. If the API is unavailable, warns
+(\code{tima_ott_unavailable_warning}) and returns the same columns with no
+rows.
 }
 \description{
 This function retrieves taxonomic information from the Open Tree

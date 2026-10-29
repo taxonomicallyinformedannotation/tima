@@ -56,16 +56,15 @@ load_yaml_files_from_paths <- function(
 
   # Determine Which Parameter Set to Use ----
 
-  # Use user params if available and at least as complete as defaults
-  use_user <- length(user_files) >= length(default_files)
-
-  param_files <- if (use_user) {
-    # log_debug("Using %d user-specified parameters", length(user_files))
-    user_files
-  } else {
-    # log_debug("Using %d default parameters", length(default_files))
-    default_files
-  }
+  # Per step, use the user file when one exists and the default otherwise.
+  # Choosing one whole set by file count made the result depend on leftover
+  # files in the user directory.
+  user_match <- match(basename(default_files), basename(user_files))
+  param_files <- ifelse(
+    is.na(user_match),
+    default_files,
+    user_files[user_match]
+  )
 
   # Combine with Prepare Params Files ----
 

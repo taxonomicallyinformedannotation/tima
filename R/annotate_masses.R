@@ -91,11 +91,20 @@
 #' @param solvents_list List of solvents to be used
 #' @param neutral_losses_list List of neutral losses to be used
 #' @param ms_mode Ionization mode. Must be 'pos' or 'neg'
-#' @param tolerance_ppm Tolerance to perform annotation. Should be <= 20 ppm
-#' @param tolerance_dalton Absolute mass tolerance in Daltons for annotation
+#' @param tolerance_ppm Relative mass tolerance (ppm) to perform annotation.
+#'   Should be <= 20 ppm. A match within either `tolerance_ppm` or
+#'   `tolerance_dalton` is accepted, so the effective window is the larger of
+#'   the two.
+#' @param tolerance_dalton Absolute mass tolerance (Da) to perform annotation.
+#'   Acts as a floor for low masses: the default (0.0025 Da) equals 10 ppm at
+#'   m/z 250, so it only widens the window below that.
 #' @param tolerance_rt Tolerance to group adducts. Should be <= 0.05 minutes
-#' @param correlation_p_threshold P-value threshold for Pearson correlation of feature intensities.
-#'   Adduct edges where features show p-value >= correlation_p_threshold are rejected.
+#' @param correlation_p_threshold P-value threshold for the Pearson
+#'   correlation of feature intensities across samples (needs >= 3 samples
+#'   where both features are detected). Positively correlated pairs with
+#'   p < threshold are exported as covariance edges, and an adduct neighbor
+#'   that co-varies counts twice in `adduct_support`. Pairs that fail the test
+#'   are not rejected.
 #'
 #' @return Named character of paths to the annotations and edges files.
 #'
@@ -293,8 +302,9 @@ annotate_masses <- function(
     adducts_list
   )
 
-  # Covariance edges are now integrated into the network (see discover_annotate_masses_edge_sets)
-  # They will be validated by network consensus, not a hard pre-filter
+  # Covariance edges are exported with the edge table (see
+  # build_output_edges()) and strengthen the adduct support of co-varying
+  # neighbors in the hypotheses below; they never remove an edge
 
   lookup_adducts <- unique(stats::na.omit(c(
     baseline_adducts,
@@ -335,7 +345,8 @@ annotate_masses <- function(
     multi_adducts = multi_adducts,
     adduct_lookup = adduct_lookup,
     tolerance_ppm = tolerance_ppm,
-    tolerance_dalton = tolerance_dalton
+    tolerance_dalton = tolerance_dalton,
+    covariance_edges = covariance_edges
   )
   rm(lookup_adducts)
 
@@ -2280,7 +2291,8 @@ build_annotate_masses_candidate_hypotheses <- function(
   multi_adducts,
   adduct_lookup,
   tolerance_ppm,
-  tolerance_dalton
+  tolerance_dalton,
+  covariance_edges = NULL
 ) {
   node_hypotheses <- collect_node_adduct_hypotheses(
     adduct_edges = adduct_edges,
@@ -2292,7 +2304,8 @@ build_annotate_masses_candidate_hypotheses <- function(
     features_table = features_table,
     adduct_lookup = adduct_lookup,
     tolerance_ppm = tolerance_ppm,
-    tolerance_dalton = tolerance_dalton
+    tolerance_dalton = tolerance_dalton,
+    covariance_edges = covariance_edges
   )
 
   # Save attributes before chaining (tidytable operations drop custom attrs)

@@ -427,6 +427,12 @@ create_edges_spectra <- function(
     cut_to_communities = FALSE
   )
 
+  # Defined unconditionally: also needed below when no community was found
+  pre_cut_features <- unique(c(
+    edges_before_community_cut[[source_col]],
+    edges_before_community_cut[[target_col]]
+  ))
+
   if (nrow(edges) > 0L && length(community_result$component_membership) > 0L) {
     edges <- .prune_intra_community_edges(
       edges = edges,
@@ -443,11 +449,6 @@ create_edges_spectra <- function(
     }
 
     retained_features <- unique(c(edges[[source_col]], edges[[target_col]]))
-    # Hoist pre-cut feature set — same as the later pre_cut_features below
-    pre_cut_features <- unique(c(
-      edges_before_community_cut[[source_col]],
-      edges_before_community_cut[[target_col]]
-    ))
     isolated_features <- setdiff(pre_cut_features, retained_features)
 
     if (length(isolated_features) > 0L) {
@@ -474,7 +475,6 @@ create_edges_spectra <- function(
       community_result$method_used
     )
 
-    # pre_cut_features already computed above (hoisted to avoid recompute)
     retained_features <- unique(c(edges[[source_col]], edges[[target_col]]))
     dropped_features <- setdiff(pre_cut_features, retained_features)
 

@@ -19,6 +19,7 @@ test_that("get_organism_taxonomy_ott requires organism column", {
 })
 
 test_that("get_organism_taxonomy_ott works with valid organism", {
+  skip_if_no_network("https://api.opentreeoflife.org")
   fake_taxon_df <- data.frame("organism" = "Gentiana lutea")
 
   result <- get_organism_taxonomy_ott(df = fake_taxon_df)
@@ -26,6 +27,7 @@ test_that("get_organism_taxonomy_ott works with valid organism", {
 })
 
 test_that("get_organism_taxonomy_ott handles invalid organism", {
+  skip_if_no_network("https://api.opentreeoflife.org")
   wrong_taxon_df <- data.frame("organism" = "Gentiano luteo")
 
   expect_warning(
@@ -43,10 +45,22 @@ test_that("get_organism_taxonomy_ott handles invalid organism", {
 test_that("get_organism_taxonomy_ott handles API failures", {
   fake_taxon_df <- data.frame("organism" = "Gentiana lutea")
 
-  result <- get_organism_taxonomy_ott(
-    df = fake_taxon_df,
-    url = "https://api.opentreeoflife.org/v3/taxonomy/fakeDown"
+  expect_warning(
+    result <- get_organism_taxonomy_ott(
+      df = fake_taxon_df,
+      url = "https://api.opentreeoflife.org/v3/taxonomy/fakeDown"
+    ),
+    class = "tima_ott_unavailable_warning"
   )
-  expect_s3_class(result$matches, "data.frame")
-  expect_s3_class(result$taxonomy, "data.frame")
+  # Same shape as a successful result, so callers can bind it
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 0L)
+  expect_true(all(
+    c(
+      "organism_name",
+      "organism_taxonomy_ottid",
+      "organism_taxonomy_09species"
+    ) %in%
+      names(result)
+  ))
 })

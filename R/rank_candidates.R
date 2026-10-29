@@ -52,19 +52,23 @@ rank_candidates <- function(df) {
   df$score_initial <- pmax(df$score_initial, 0)
   df$score_initial[!is.finite(df$score_initial)] <- NA_real_
 
-  # Rank within each feature_id by score_final (descending), breaking ties by promoted status
+  # De-duplicate first (keeping each structure's best-scoring row) so that
+  # duplicate rows do not inflate the ranks of the candidates below them
   df <- tidytable::as_tidytable(df) |>
-    tidytable::mutate(
-      rank_final = tidytable::min_rank(-score_final),
-      rank_initial = tidytable::min_rank(-score_initial),
-      .by = feature_id
-    ) |>
+    tidytable::mutate(.row_id = tidytable::row_number()) |>
+    tidytable::arrange(-score_final, .row_id) |>
     tidytable::distinct(
       feature_id,
       candidate_structure_inchikey_connectivity_layer,
       .keep_all = TRUE
     ) |>
-    tidytable::select(-score_final, -score_initial)
+    tidytable::arrange(.row_id) |>
+    tidytable::mutate(
+      rank_final = tidytable::min_rank(-score_final),
+      rank_initial = tidytable::min_rank(-score_initial),
+      .by = feature_id
+    ) |>
+    tidytable::select(-score_final, -score_initial, -.row_id)
 
   df
 }

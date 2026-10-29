@@ -15,7 +15,8 @@ build_annotate_masses_candidate_hypotheses(
   multi_adducts,
   adduct_lookup,
   tolerance_ppm,
-  tolerance_dalton
+  tolerance_dalton,
+  covariance_edges = NULL
 )
 }
 \description{

@@ -1788,8 +1788,8 @@ ui <- shiny::fluidPage(
             shinyhelper::helper(
               type = "inline",
               content = c(
-                "If ticked, only compounds with high evidence will be reported.",
-                "This is an important filter. Do not hesitate removing it for more coverage."
+                "The filtered and mini tables always report high-evidence compounds only.",
+                "If ticked, the full table is restricted to them too. Untick it for more coverage in the full table."
               )
             ),
           shiny::checkboxInput(
@@ -1917,7 +1917,7 @@ ui <- shiny::fluidPage(
                 "Unit of the retention time.",
                 "Must be `seconds` or `minutes`."
               )
-            ),
+            )
         ),
         shiny::tabPanel(
           title = "GNPS (optional)",
@@ -1975,7 +1975,7 @@ ui <- shiny::fluidPage(
         inputId = "launch",
         label = "Launch job",
         class = "btn-primary"
-      ),
+      )
     ),
     shinyjs::hidden(
       shiny::div(

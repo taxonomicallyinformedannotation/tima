@@ -206,7 +206,8 @@ match (should be lower than \verb{NPC class})}
 
 \item{compounds_names}{Report compounds names. Can be very large. BOOLEAN}
 
-\item{high_evidence}{Report high evidence candidates only. BOOLEAN}
+\item{high_evidence}{Also restrict the full results table to high-evidence
+candidates. The filtered and mini tables always are. BOOLEAN}
 
 \item{remove_ties}{Remove ties. BOOLEAN}
 

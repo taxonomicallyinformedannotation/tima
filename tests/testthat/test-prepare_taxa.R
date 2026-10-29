@@ -195,6 +195,7 @@ test_that("prepare_taxa works with single taxon assignment", {
 })
 
 test_that("prepare_taxa works with multiple taxon assignment", {
+  skip_if_no_network("https://api.opentreeoflife.org")
   input <- temp_test_path("features.tsv")
   ott <- temp_test_path("ott.tsv")
   output <- temp_test_path("output.tsv")

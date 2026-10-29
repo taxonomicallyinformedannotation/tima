@@ -144,18 +144,22 @@ get_compounds_xrefs <- function(
 
   # ── 2. Fetch preferred prefix ("banana") per entry from Bioregistry API ────
   .fetch_banana <- function(entry_key) {
-    resp <- httr2::request(paste0(
-      "https://bioregistry.io/api/registry/",
-      entry_key
-    )) |>
-      httr2::req_headers(Accept = "application/json") |>
-      httr2::req_error(is_error = \(resp) {
-        invisible(resp)
-        FALSE
-      }) |> # handle errors manually
-      httr2::req_perform()
+    # Fall back to the entry key on HTTP errors and on connection failures
+    resp <- tryCatch(
+      httr2::request(paste0(
+        "https://bioregistry.io/api/registry/",
+        entry_key
+      )) |>
+        httr2::req_headers(Accept = "application/json") |>
+        httr2::req_error(is_error = \(resp) {
+          invisible(resp)
+          FALSE
+        }) |> # handle errors manually
+        httr2::req_perform(),
+      error = function(e) NULL
+    )
 
-    if (httr2::resp_status(resp) != 200L) {
+    if (is.null(resp) || httr2::resp_status(resp) != 200L) {
       return(entry_key)
     }
 

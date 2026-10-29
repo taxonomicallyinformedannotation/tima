@@ -5,14 +5,34 @@
 #' @noRd
 NULL
 
-stri_detect_regex <- function(str, pattern) {
-  mapply(
-    FUN = function(x, p) grepl(pattern = p, x = x, perl = TRUE),
-    str,
-    pattern,
-    SIMPLIFY = TRUE,
-    USE.NAMES = FALSE
+# Exact token match: TRUE when any `separator`-delimited value of `pattern`
+# equals a value of `str`. Unlike a regex search, "Ara" does not match
+# "Arabidopsis" and regex metacharacters in names are taken literally.
+stri_detect_token <- function(str, pattern, separator = " $ ") {
+  str <- as.character(str)
+  pattern <- as.character(pattern)
+  out <- !is.na(str) & !is.na(pattern) & str == pattern
+  multi <- which(
+    !out &
+      !is.na(str) &
+      !is.na(pattern) &
+      (grepl(separator, str, fixed = TRUE) |
+        grepl(separator, pattern, fixed = TRUE))
   )
+  if (length(multi) > 0L) {
+    out[multi] <- mapply(
+      FUN = function(x, p) {
+        any(
+          trimws(strsplit(p, separator, fixed = TRUE)[[1L]]) %in%
+            trimws(strsplit(x, separator, fixed = TRUE)[[1L]])
+        )
+      },
+      str[multi],
+      pattern[multi],
+      USE.NAMES = FALSE
+    )
+  }
+  out
 }
 
 stri_length <- function(str) {
@@ -26,7 +46,7 @@ stri_match_first_regex <- function(str, pattern) {
 
   m <- regexec(pattern, str, perl = TRUE)
   matches <- regmatches(str, m)
-  n_cols <- max(max(vapply(X = m, FUN = length, FUN.VALUE = integer(1L))), 2L)
+  n_cols <- max(max(lengths(m)), 2L)
   out <- matrix(NA_character_, nrow = length(str), ncol = n_cols)
 
   for (i in seq_along(matches)) {
@@ -38,6 +58,7 @@ stri_match_first_regex <- function(str, pattern) {
   out
 }
 
+# jarl-ignore unused_function: used by the Shiny app (inst/app_server.R)
 stri_split_fixed <- function(str, pattern) {
   strsplit(str, split = pattern, fixed = TRUE)
 }

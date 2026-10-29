@@ -323,3 +323,48 @@ read_mgf_opti <- function(
 
   res
 }
+
+#' Read the metadata of an MGF file
+#'
+#' @description Reads only the `KEY=VALUE` fields of each `BEGIN IONS` /
+#'     `END IONS` block. Peaks are not parsed and no spectrum is dropped, so
+#'     entries without fragments or without `PEPMASS` (common in retention
+#'     time libraries) are kept.
+#'
+#' @param f [character] Path to a single MGF file.
+#'
+#' @return A tidytable with one row per block and one character column per
+#'     key. Keys are upper-cased; the first value wins when a key repeats.
+#'
+#' @keywords internal
+read_mgf_metadata <- function(f) {
+  if (length(f) != 1L || !file.exists(f)) {
+    cli::cli_abort(
+      c("MGF file not found", "x" = as.character(f)),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+
+  lines <- trimws(readLines(f, warn = FALSE))
+  is_begin <- lines == "BEGIN IONS"
+  is_end <- lines == "END IONS"
+  block <- cumsum(is_begin)
+  inside <- block > cumsum(is_end)
+  is_field <- inside & !is_begin & grepl("=", lines, fixed = TRUE)
+
+  if (!any(is_field)) {
+    return(tidytable::tidytable())
+  }
+
+  fields <- lines[is_field]
+  eq <- regexpr("=", fields, fixed = TRUE)
+  tidytable::tidytable(
+    .block = block[is_field],
+    key = toupper(trimws(substring(fields, 1L, eq - 1L))),
+    value = trimws(substring(fields, eq + 1L))
+  ) |>
+    tidytable::distinct(.block, key, .keep_all = TRUE) |>
+    tidytable::pivot_wider(names_from = key, values_from = value) |>
+    tidytable::select(-.block)
+}

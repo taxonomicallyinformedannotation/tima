@@ -33,6 +33,7 @@ write_minimal_mgf <- function(path, precursors, charge = "1+") {
 # Validation tests ----
 
 test_that("annotate_spectra validates parameters", {
+  skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_validate"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
@@ -85,6 +86,7 @@ test_that("annotate_spectra validates parameters", {
 # Basic run & output ----
 
 test_that("annotate_spectra produces output file and columns", {
+  skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_basic"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
@@ -124,6 +126,7 @@ test_that("annotate_spectra produces output file and columns", {
 # Threshold filtering ----
 
 test_that("threshold filtering removes low similarity candidates", {
+  skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_threshold"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
@@ -236,6 +239,7 @@ test_that("empty result exports template", {
 # Polarity-based library filtering ----
 
 test_that("polarity filtering drops non-matching libraries and handles none left", {
+  skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_polarity_filter"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
@@ -274,6 +278,7 @@ test_that("polarity filtering drops non-matching libraries and handles none left
 # Empty peaks in library cleaning ----
 
 test_that("library spectra with empty peaks are removed before concatenation", {
+  skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_empty_peaks"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
@@ -356,6 +361,7 @@ test_that("high cutoff removes all query peaks leading to empty template", {
 # Duplicate candidate collapse by connectivity layer ----
 
 test_that("duplicate candidates collapsed by SMILES are unique", {
+  skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_dedupe"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
@@ -389,6 +395,7 @@ test_that("duplicate candidates collapsed by SMILES are unique", {
 # NA metadata fallback handling ----
 
 test_that("NA fallback for smiles is applied", {
+  skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_na_fallback"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
@@ -596,6 +603,7 @@ test_that("filter_library_paths_by_polarity filters correctly", {
 # })
 
 test_that("annotate_spectra handles empty library error", {
+  skip_if_no_network("https://github.com")
   skip_on_cran()
   withr::local_dir(new = temp_test_dir("ann_spe_empty_lib"))
   local_test_project(copy = TRUE)
@@ -619,6 +627,7 @@ test_that("annotate_spectra handles empty library error", {
 })
 
 test_that("annotate_spectra applies intensity cutoff", {
+  skip_if_no_network("https://github.com")
   skip_on_cran()
   withr::local_dir(new = temp_test_dir("ann_spe_cutoff"))
   local_test_project(copy = TRUE)
@@ -653,6 +662,7 @@ test_that("annotate_spectra applies intensity cutoff", {
 })
 
 test_that("annotate_spectra handles different similarity methods", {
+  skip_if_no_network("https://github.com")
   skip_on_cran()
   withr::local_dir(new = temp_test_dir("ann_spe_methods"))
   local_test_project(copy = TRUE)

@@ -306,6 +306,7 @@ test_that("test-complete_organism_taxonomy returns original when all organisms p
 })
 
 test_that("test-complete_organism_taxonomy handles all missing organisms", {
+  skip_if_no_network("https://api.opentreeoflife.org")
   # Load fixtures instead of creating inline
   table_keys <- load_fixture("organism_keys_new")
   table_org_tax_ott <- load_fixture("organism_taxonomy_empty")
@@ -320,6 +321,7 @@ test_that("test-complete_organism_taxonomy handles all missing organisms", {
 })
 
 test_that("test-complete_organism_taxonomy handles mixed missing/present", {
+  skip_if_no_network("https://api.opentreeoflife.org")
   # Load fixtures instead of creating inline
   table_keys <- load_fixture("organism_keys_mixed")
   table_org_tax_ott <- load_fixture("organism_taxonomy_partial")

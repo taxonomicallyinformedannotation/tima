@@ -32,35 +32,37 @@ NULL
 
 # ---------------------------------------------------------------------------
 # Element / ion lookup tables (monoisotopic, neutral atoms / radicals)
-# Sources: NIST 2018 / CODATA 2018 (electron mass).
+# Sources: MetaboCoreUtils element masses / CODATA 2018 (electron mass).
 # ---------------------------------------------------------------------------
 
 #' Monoisotopic neutral mass (Da) for the atomic / radical building blocks
 #' used to compose charge carriers.
 #' @keywords internal
 ATOMIC_MONOISOTOPIC_MASS <- c(
-  H = 1.0078250319,
-  Li = 7.0160034366,
-  B = 11.0093055,
+  # Same values as MetaboCoreUtils::calculateMass(), so that carrier masses
+  # and library exact masses come from one element table
+  H = 1.007825032,
+  Li = 7.01600455,
+  B = 11.0093054,
   C = 12.0000000,
-  N = 14.0030740052,
-  O = 15.9949146221,
-  F = 18.9984032,
-  Na = 22.98976967,
-  Mg = 23.98504190,
+  N = 14.003074,
+  O = 15.99491462,
+  F = 18.99840322,
+  Na = 22.98976928,
+  Mg = 23.9850417,
   Al = 26.98153863,
-  Si = 27.9769265325,
-  P = 30.97376151,
-  S = 31.97207069,
-  Cl = 34.96885271,
+  Si = 27.97692653,
+  P = 30.97376163,
+  S = 31.972071,
+  Cl = 34.96885268,
   K = 38.96370668,
   Ca = 39.96259098,
-  Mn = 54.93804510,
-  Fe = 55.93493750,
-  Cu = 62.92959740,
-  Zn = 63.92914210,
-  Br = 78.91833710,
-  I = 126.9044680
+  Mn = 54.9380451,
+  Fe = 55.9349375,
+  Cu = 62.9295975,
+  Zn = 63.9291422,
+  Br = 78.9183371,
+  I = 126.904473
 )
 
 #' Intrinsic ion charge for charge-carrier *names* as declared in YAML.

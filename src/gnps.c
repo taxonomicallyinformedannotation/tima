@@ -307,10 +307,13 @@ typedef struct {
     int idx;
 } MI;
 
-/** @brief Ascending comparator for MI, for use with qsort(). */
+/** @brief Ascending comparator for MI, for use with qsort(). Ties are broken
+ *         by original index so the order does not depend on the libc qsort. */
 static int mi_cmp(const void *a, const void *b) {
-    double da = ((const MI *) a)->mass, db = ((const MI *) b)->mass;
-    return (da < db) ? -1 : (da > db) ? 1 : 0;
+    const MI *ma = (const MI *) a, *mb = (const MI *) b;
+    if (ma->mass < mb->mass) return -1;
+    if (ma->mass > mb->mass) return 1;
+    return (ma->idx > mb->idx) - (ma->idx < mb->idx);
 }
 
 /** @brief (key, position) pair used for the unique-value / ranking sorts
@@ -320,10 +323,13 @@ typedef struct {
     int pos;
 } KP;
 
-/** @brief Ascending comparator for KP, for use with qsort(). */
+/** @brief Ascending comparator for KP, for use with qsort(). Ties are broken
+ *         by position so the order does not depend on the libc qsort. */
 static int kp_cmp(const void *a, const void *b) {
-    double da = ((const KP *) a)->key, db = ((const KP *) b)->key;
-    return (da < db) ? -1 : (da > db) ? 1 : 0;
+    const KP *ka = (const KP *) a, *kb = (const KP *) b;
+    if (ka->key < kb->key) return -1;
+    if (ka->key > kb->key) return 1;
+    return (ka->pos > kb->pos) - (ka->pos < kb->pos);
 }
 
 #if GNPS_HAS_R_API

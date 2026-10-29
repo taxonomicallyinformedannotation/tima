@@ -29,7 +29,8 @@
 #' @param minimal_ms1_chemo Numeric (0-1), min chemical score for MS1.
 #' @param ms1_only Logical, filter for MS1-only annotations.
 #' @param compounds_names Logical, include compound names.
-#' @param high_evidence Logical, report high-confidence candidates only.
+#' @param high_evidence Logical, also restrict the full results table to
+#'     high-evidence candidates (the filtered and mini tables always are).
 #' @param remove_ties Logical, remove tied candidates.
 #' @param summarize Logical, summarize to one row per feature.
 #' @param force Logical, force execution (override warnings).
@@ -396,14 +397,19 @@ load_edges_table <- function(edges, candidates_neighbors) {
   )
 
   n_before <- nrow(edges_table)
+  # Columns are read as character; rank on the numeric value, not the text
   edges_table <- edges_table |>
+    tidytable::mutate(
+      .similarity_num = suppressWarnings(as.numeric(candidate_score_similarity))
+    ) |>
     tidytable::group_by(feature_source) |>
     tidytable::slice_max(
-      order_by = candidate_score_similarity,
+      order_by = .similarity_num,
       n = candidates_neighbors,
       with_ties = FALSE
     ) |>
-    tidytable::ungroup()
+    tidytable::ungroup() |>
+    tidytable::select(-.similarity_num)
 
   log_debug(
     "Edges filtered to top %d neighbors/feature: %d -> %d rows",

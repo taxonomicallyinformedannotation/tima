@@ -8,7 +8,7 @@ propagate_annotations_across_m_cliques(
   annotations,
   node_hypotheses,
   tolerance_ppm = 10,
-  tolerance_dalton = 0.005
+  tolerance_dalton = 0.0025
 )
 }
 \arguments{

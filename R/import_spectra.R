@@ -278,9 +278,11 @@ import_spectra <- function(
       n_after
     )
   }
-  if ("precursor" %in% colnames(spectra@backend@spectraData)) {
+  if ("Spectrum_type" %in% colnames(spectra@backend@spectraData)) {
     n_before <- length(spectra)
-    spectra <- spectra[spectra@backend@spectraData$Spectrum_type == "MS2"]
+    spectra <- spectra[
+      spectra@backend@spectraData$Spectrum_type %in% "MS2"
+    ]
     n_after <- length(spectra)
     log_debug(
       "Filtered to MS2 spectra (MassBank): %d -> %d spectra",

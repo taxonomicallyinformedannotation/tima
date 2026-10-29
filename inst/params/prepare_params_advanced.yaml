@@ -321,7 +321,7 @@ files:
 
             #' Additional NPClassifier taxonomy cache to supplement library data.
             #' Leave empty to skip. STRING
-            n: data/interim/libraries/sop/merged/structures/taxonomies/npclassifier_cache.csv
+            "n": data/interim/libraries/sop/merged/structures/taxonomies/npclassifier_cache.csv
 
     #' Spectral libraries. STRING
     spectral:
@@ -645,9 +645,13 @@ ms:
         ms2: 10.0
 
       #' Absolute in Dalton.
+      #' A MS1 match within EITHER the ppm OR the Dalton tolerance is
+      #' accepted: the effective window is the larger of the two. The Dalton
+      #' value thus acts as a floor for low masses. The default equals 10 ppm
+      #' at m/z 250, so it only widens the window below m/z 250.
       dalton:
         #' Absolute mass tolerance for MS1 in Dalton. FLOAT
-        ms1: 0.005
+        ms1: 0.0025
 
         #' Absolute mass tolerance for MS2 in Dalton. FLOAT
         ms2: 0.01
@@ -663,6 +667,9 @@ ms:
     #' For intensity co-variance correlation p-value.
     correlation:
       #' P-value threshold for Pearson correlation in intensity co-variance discovery. FLOAT
+      #' Co-varying adduct neighbors (positive correlation, p below this value,
+      #' >= 3 shared samples) count twice as adduct support. Pairs that fail
+      #' are kept, so single-sample runs are unaffected.
       p_value: 0.05
 
 #' Names of the different variables in the input files.
@@ -903,7 +910,7 @@ weights:
     variety: 1.00
 
     #' Score for a biological Biota match. FLOAT
-    biota: 1.007276
+    biota: 1.00
 
   #' Weights for the chemical part.
   chemical:
@@ -940,7 +947,9 @@ options:
   #' Do not use it. BOOLEAN
   force: false
 
-  #' Filter high evidence candidates only. BOOLEAN
+  #' Also apply the high-evidence filter to the full results table. BOOLEAN
+  #' The filtered (and mini) tables are always restricted to high-evidence
+  #' candidates; this option only controls the full table.
   high_evidence: false
 
   #' Remove ties. BOOLEAN

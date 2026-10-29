@@ -98,3 +98,34 @@ test_that("load_yaml_files raises classed runtime error on yaml parse failure", 
     class = "tima_runtime_error"
   )
 })
+
+test_that("load_yaml_files overlays user files per step", {
+  fixture <- setup_yaml_test_env()
+  on.exit(unlink(fixture$dir, recursive = TRUE), add = TRUE)
+
+  # A second default step without a user copy, plus a leftover user file
+  yaml::write_yaml(
+    list(option = "default_other"),
+    file.path(fixture$default_dir, "other_param.yaml")
+  )
+  yaml::write_yaml(
+    list(option = "stale"),
+    file.path(fixture$user_dir, "leftover.yaml")
+  )
+
+  loaded <- load_yaml_files_from_paths(
+    paths = list(
+      params = list(
+        default = list(path = fixture$default_dir),
+        user = list(path = fixture$user_dir),
+        prepare_params = fixture$prepare_params,
+        prepare_params_advanced = fixture$prepare_params_advanced
+      )
+    ),
+    path_resolver = identity
+  )
+
+  expect_equal(loaded$yamls_params$test_param$option1, "user_value")
+  expect_equal(loaded$yamls_params$other_param$option, "default_other")
+  expect_false("leftover" %in% names(loaded$yamls_params))
+})

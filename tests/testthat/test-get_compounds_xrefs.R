@@ -109,7 +109,7 @@ test_that("get_compounds_xrefs cached file content is readable", {
 
 test_that("get_compounds_xrefs fetches fresh data from QLever", {
   skip_on_cran()
-  skip_if_offline()
+  skip_if_no_network("https://qlever.cs.uni-freiburg.de")
 
   # Quick QLever reachability check
   qlever_ok <- tryCatch(
@@ -160,7 +160,7 @@ test_that("get_compounds_xrefs fetches fresh data from QLever", {
 
 test_that("get_compounds_xrefs refreshes stale cache with real data", {
   skip_on_cran()
-  skip_if_offline()
+  skip_if_no_network("https://qlever.cs.uni-freiburg.de")
 
   # Quick QLever reachability check — skip entire test if backend is down
   qlever_ok <- tryCatch(
@@ -229,6 +229,7 @@ test_that("get_compounds_xrefs refreshes stale cache with real data", {
 ## Error Handling ----
 
 test_that("get_compounds_xrefs errors on invalid props", {
+  skip_if_no_network("https://raw.githubusercontent.com")
   output_file <- temp_test_path("xrefs_bad_props.tsv.gz")
 
   expect_error(

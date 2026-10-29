@@ -34,9 +34,10 @@
 NULL
 
 #' Isotope mass unit (Da) for `Mn` isotopologues — set to the 13C/12C mass
-#' difference; identical to legacy `ISOTOPE_MASS_SHIFT_DALTONS`.
+#' difference; an alias of `ISOTOPE_MASS_SHIFT_DALTONS` so that every code
+#' path uses the same value.
 #' @keywords internal
-EVIDENCE_ISOTOPE_SHIFT_DA <- 1.003355
+EVIDENCE_ISOTOPE_SHIFT_DA <- ISOTOPE_MASS_SHIFT_DALTONS
 
 #' Compute implied neutral mass for a (feature mz, adduct row) pair, taking
 #' isotopologue shifts, per-monomer cluster/loss attachment (the "inside-

@@ -68,7 +68,8 @@ validate_weight_annotations_inputs(
 
 \item{compounds_names}{Logical, include compound names.}
 
-\item{high_evidence}{Logical, report high-confidence candidates only.}
+\item{high_evidence}{Logical, also restrict the full results table to
+high-evidence candidates (the filtered and mini tables always are).}
 
 \item{remove_ties}{Logical, remove tied candidates.}
 

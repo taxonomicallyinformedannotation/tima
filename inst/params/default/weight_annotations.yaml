@@ -157,7 +157,7 @@ weights:
     variety: 1.00
 
     #' Score for a biological Biota match. FLOAT
-    biota: 1.007276
+    biota: 1.00
 
   #' Weights for the chemical part.
   chemical:
@@ -194,7 +194,9 @@ options:
   #' Do not use it. BOOLEAN
   force: false
 
-  #' Filter high evidence candidates only. BOOLEAN
+  #' Also apply the high-evidence filter to the full results table. BOOLEAN
+  #' The filtered (and mini) tables are always restricted to high-evidence
+  #' candidates; this option only controls the full table.
   high_evidence: false
 
   #' Remove ties. BOOLEAN

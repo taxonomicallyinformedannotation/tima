@@ -20,6 +20,8 @@ combine_weighted_scores(
 \item{weight_biological}{\link{numeric} Weight for biological score (0-1)}
 
 \item{weight_chemical}{\link{numeric} Weight for chemical score (0-1)}
+
+\item{weight_spectral}{\link{numeric} Weight for spectral score (0-1)}
 }
 \value{
 Data frame with narrow scoring columns only

@@ -2,6 +2,9 @@
 
 library(testthat)
 
+# Use a temporary ~/.tima, never the user's real one
+local_test_home()
+
 
 ## Input Validation Tests ----
 
@@ -592,7 +595,7 @@ test_that("change_params_small updates both yaml files", {
 
 test_that("change_params_small uses go_to_cache when cache_dir is NULL", {
   tmp <- withr::local_tempdir()
-  captured_yaml <- NULL
+  captured <- new.env(parent = emptyenv())
 
   local_mocked_bindings(
     go_to_cache = function() {
@@ -651,7 +654,7 @@ test_that("change_params_small uses go_to_cache when cache_dir is NULL", {
 
   local_mocked_bindings(
     write_yaml = function(x, file, ...) {
-      captured_yaml <<- x
+      captured$yaml <- x
       invisible(NULL)
     },
     .package = "yaml"
@@ -664,9 +667,9 @@ test_that("change_params_small uses go_to_cache when cache_dir is NULL", {
     cache_dir = NULL
   ))
 
-  expect_equal(captured_yaml$files$pattern, "new_pattern")
-  expect_true(is.na(captured_yaml$files$annotations$raw$sirius))
-  expect_true(is.na(captured_yaml$organisms$taxon))
+  expect_equal(captured$yaml$files$pattern, "new_pattern")
+  expect_true(is.na(captured$yaml$files$annotations$raw$sirius))
+  expect_true(is.na(captured$yaml$organisms$taxon))
 })
 
 # ---- Internal function tests ----
@@ -858,7 +861,7 @@ test_that("change_params_small initializes missing mztab entry and updates optio
   )
   writeLines("MTD\tmzTab-version\t2.0.0-M", file.path(tmp, "input.mztab"))
 
-  captured <- NULL
+  captured <- new.env(parent = emptyenv())
 
   local_mocked_bindings(
     go_to_cache = function() {
@@ -912,7 +915,7 @@ test_that("change_params_small initializes missing mztab entry and updates optio
 
   local_mocked_bindings(
     write_yaml = function(x, file, ...) {
-      captured <<- x
+      captured$yaml <- x
       invisible(NULL)
     },
     .package = "yaml"
@@ -926,12 +929,12 @@ test_that("change_params_small initializes missing mztab entry and updates optio
     cache_dir = NULL
   ))
 
-  expect_true(is.list(captured$files$mztab))
+  expect_true(is.list(captured$yaml$files$mztab))
   expect_identical(
-    captured$files$mztab$raw,
+    captured$yaml$files$mztab$raw,
     file.path(tmp, "data", "source", "input.mztab")
   )
-  expect_identical(captured$organisms$taxon, NA)
-  expect_identical(captured$options$high_evidence, TRUE)
-  expect_identical(captured$options$summarize, TRUE)
+  expect_identical(captured$yaml$organisms$taxon, NA)
+  expect_identical(captured$yaml$options$high_evidence, TRUE)
+  expect_identical(captured$yaml$options$summarize, TRUE)
 })

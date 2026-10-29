@@ -37,7 +37,9 @@ organisms:
   #' Example: "Homo sapiens". STRING
   taxon: null
 options:
-  #' Filter high evidence candidates only. BOOLEAN
+  #' Also apply the high-evidence filter to the full results table. BOOLEAN
+  #' The filtered (and mini) tables are always restricted to high-evidence
+  #' candidates; this option only controls the full table.
   high_evidence: false
   #' Summarize all candidates per feature to a single row. BOOLEAN
   summarize: false

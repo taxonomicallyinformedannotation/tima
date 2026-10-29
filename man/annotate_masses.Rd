@@ -67,14 +67,23 @@ annotate_masses(
 
 \item{ms_mode}{Ionization mode. Must be 'pos' or 'neg'}
 
-\item{tolerance_ppm}{Tolerance to perform annotation. Should be <= 20 ppm}
+\item{tolerance_ppm}{Relative mass tolerance (ppm) to perform annotation.
+Should be <= 20 ppm. A match within either \code{tolerance_ppm} or
+\code{tolerance_dalton} is accepted, so the effective window is the larger of
+the two.}
 
-\item{tolerance_dalton}{Absolute mass tolerance in Daltons for annotation}
+\item{tolerance_dalton}{Absolute mass tolerance (Da) to perform annotation.
+Acts as a floor for low masses: the default (0.0025 Da) equals 10 ppm at
+m/z 250, so it only widens the window below that.}
 
 \item{tolerance_rt}{Tolerance to group adducts. Should be <= 0.05 minutes}
 
-\item{correlation_p_threshold}{P-value threshold for Pearson correlation of feature intensities.
-Adduct edges where features show p-value >= correlation_p_threshold are rejected.}
+\item{correlation_p_threshold}{P-value threshold for the Pearson
+correlation of feature intensities across samples (needs >= 3 samples
+where both features are detected). Positively correlated pairs with
+p < threshold are exported as covariance edges, and an adduct neighbor
+that co-varies counts twice in \code{adduct_support}. Pairs that fail the test
+are not rejected.}
 }
 \value{
 Named character of paths to the annotations and edges files.

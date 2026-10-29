@@ -498,7 +498,7 @@ enforce_global_m_consistency <- function(
       FUN = function(x) stats::median(x, na.rm = TRUE)
     )
     abs_diff <- abs(m_values - feature_medians)
-    dalton_tol <- tolerance_dalton %||% 0.01
+    dalton_tol <- tolerance_dalton %||% 0.0025
     ppm_tol <- if (
       is.null(tolerance_ppm) || is.na(tolerance_ppm) || tolerance_ppm <= 0
     ) {
@@ -556,7 +556,8 @@ collect_node_adduct_hypotheses <- function(
   features_table,
   adduct_lookup = NULL,
   tolerance_ppm = 5,
-  tolerance_dalton = 0.005
+  tolerance_dalton = 0.0025,
+  covariance_edges = NULL
 ) {
   if (length(baseline_adducts) == 0L || all(is.na(baseline_adducts))) {
     baseline_adducts <- "[M+H]+"
@@ -767,8 +768,12 @@ collect_node_adduct_hypotheses <- function(
     tidytable::distinct() |>
     harmonize_adducts(adducts_translations = adducts_translations)
 
-  # Attach support count - compute from CONSISTENT edges only
-  support <- compute_feature_adduct_support(consistent_edges)
+  # Attach support count - compute from CONSISTENT edges only. Neighbors whose
+  # intensities co-vary with the feature count as stronger support
+  support <- compute_feature_adduct_support(
+    consistent_edges,
+    covariance_edges = covariance_edges
+  )
   base_hyps <- base_hyps |>
     tidytable::left_join(support, by = c("feature_id", "adduct")) |>
     tidytable::mutate(
@@ -1719,6 +1724,8 @@ match_candidates_to_library <- function(
   }
 
   # Ensure all required columns exist (single pass)
+  has_ppm <- !is.null(tolerance_ppm) && is.finite(tolerance_ppm)
+  has_dalton <- !is.null(tolerance_dalton) && is.finite(tolerance_dalton)
   has_loss_term <- "loss_term" %in% colnames(candidates)
   has_is_preassigned <- "is_preassigned" %in% colnames(candidates)
   has_origin <- "candidate_adduct_origin" %in% colnames(candidates)
@@ -1782,26 +1789,24 @@ match_candidates_to_library <- function(
     tidytable::as_tidytable() |>
     tidytable::mutate(
       .abs_error = abs(as.numeric(error_mz)),
-      .ppm_error = .abs_error *
-        1e6 /
-        pmax(
-          as.numeric(structure_exact_mass),
-          as.numeric(mass)
-        ),
-      .ppm_ok = if (is.null(tolerance_ppm) || !is.finite(tolerance_ppm)) {
-        TRUE
-      } else {
+      # Same denominator as the library window (structure exact mass)
+      .ppm_error = .abs_error * 1e6 / as.numeric(structure_exact_mass),
+      .ppm_ok = if (has_ppm) {
         is.finite(.ppm_error) & .ppm_error <= as.numeric(tolerance_ppm)
-      },
-      .dalton_ok = if (
-        is.null(tolerance_dalton) || !is.finite(tolerance_dalton)
-      ) {
-        TRUE
       } else {
+        !has_dalton
+      },
+      .dalton_ok = if (has_dalton) {
         is.finite(.abs_error) & .abs_error <= as.numeric(tolerance_dalton)
+      } else {
+        !has_ppm
       }
     ) |>
-    tidytable::filter(.ppm_ok & .dalton_ok) |>
+    # A match within EITHER tolerance is accepted, i.e. the effective window
+    # is max(ppm, Da), the same window used to pre-filter the library in
+    # annotate_masses_features.R. With the defaults (10 ppm, 0.0025 Da) the
+    # Da floor applies below m/z 250 and the ppm window above it.
+    tidytable::filter(.ppm_ok | .dalton_ok) |>
     tidytable::select(-.abs_error, -.ppm_error, -.ppm_ok, -.dalton_ok) |>
     tidytable::distinct()
 }
@@ -1987,7 +1992,7 @@ propagate_annotations_across_m_cliques <- function(
   annotations,
   node_hypotheses,
   tolerance_ppm = 10,
-  tolerance_dalton = 0.005
+  tolerance_dalton = 0.0025
 ) {
   # Early exits
   if (nrow(annotations) == 0L) {

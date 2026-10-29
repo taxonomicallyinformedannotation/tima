@@ -344,6 +344,7 @@ test_that("create_edges ensures feature_id < target_id", {
 ## Integration with create_edges_spectra ----
 
 test_that("create_edges integrates with extract_spectra output", {
+  skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("create_edges_integration"))
   paths <- local_test_project(copy = TRUE)
 

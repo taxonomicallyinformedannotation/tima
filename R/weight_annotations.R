@@ -89,7 +89,8 @@
 #' @param minimal_ms1_condition Condition to be used. Must be "OR" or "AND".
 #' @param ms1_only Keep only MS1 annotations. BOOLEAN
 #' @param compounds_names Report compounds names. Can be very large. BOOLEAN
-#' @param high_evidence Report high evidence candidates only. BOOLEAN
+#' @param high_evidence Also restrict the full results table to high-evidence
+#'   candidates. The filtered and mini tables always are. BOOLEAN
 #' @param remove_ties Remove ties. BOOLEAN
 #' @param summarize Summarize results (1 row per feature). BOOLEAN
 #' @param pattern Pattern to identify your job. STRING
@@ -567,7 +568,8 @@ weight_annotations <- function(
     score_bio_table = annot_table_bio_narrow,
     score_chemo_table = annot_table_chemo_narrow,
     weight_biological = weight_biological,
-    weight_chemical = weight_chemical
+    weight_chemical = weight_chemical,
+    weight_spectral = weight_spectral
   )
   rm(annot_table_bio_narrow, annot_table_chemo_narrow)
   log_debug(

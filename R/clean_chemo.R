@@ -49,7 +49,9 @@
 #'     "AND" = keep if bio >= threshold AND chem >= threshold
 #' @param compounds_names Logical, include compound names in output (may
 #'     increase size)
-#' @param high_evidence Logical, apply strict high-evidence filters
+#' @param high_evidence Logical, also apply the high-evidence filter
+#'     ([filter_high_evidence_only()]) to the full tier. The filtered and mini
+#'     tiers always use it, whatever this value.
 #' @param remove_ties Logical, remove tied scores (keep only highest-ranked)
 #' @param summarize Logical, collapse results to one row per feature
 #' @param max_per_score Integer, max candidates to keep per feature per score.
@@ -249,13 +251,16 @@ clean_chemo <- function(
 
   # Apply High-Evidence Filter for Filtered and Full Tiers ----
 
-  # Apply filter_high_evidence_only for filtered tier
+  # The filtered tier (and the mini tier built from it) is always restricted
+  # to high-evidence candidates; `high_evidence` only governs the full tier
   df_filtered <- df_percentile |>
     filter_high_evidence_only(context = "filtered") |>
-    tidytable::slice_head(
-      by = feature_id,
+    # tidytable::slice_head() ignores `order_by`; rank explicitly instead
+    tidytable::slice_min(
       order_by = rank_final,
-      n = candidates_final
+      n = candidates_final,
+      with_ties = FALSE,
+      by = feature_id
     )
 
   df_filtered <- retain_promoted_rank1_in_filtered(

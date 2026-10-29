@@ -52,7 +52,7 @@ Arguments:
 
   compounds-names            Report compounds names. Can be very large. BOOLEAN
   force                      Do not use it. BOOLEAN
-  high-evidence            Report high evidence candidates only. BOOLEAN
+  high-evidence            Also restrict the full table to high-evidence candidates (filtered and mini tables always are). BOOLEAN
   remove-ties                Remove ties. BOOLEAN
   summarize                  Summarize results (1 row per feature). BOOLEAN
 

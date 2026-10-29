@@ -14,7 +14,8 @@ collect_node_adduct_hypotheses(
   features_table,
   adduct_lookup = NULL,
   tolerance_ppm = 5,
-  tolerance_dalton = 0.005
+  tolerance_dalton = 0.0025,
+  covariance_edges = NULL
 )
 }
 \description{

@@ -5,10 +5,18 @@
 \title{Count, for each (feature, adduct), how many distinct neighbors in the
 adduct graph independently support that label.}
 \usage{
-compute_feature_adduct_support(df_add)
+compute_feature_adduct_support(df_add, covariance_edges = NULL)
+}
+\arguments{
+\item{df_add}{Adduct edges.}
+
+\item{covariance_edges}{Optional covariance edges (\code{feature_id},
+\code{feature_id_dest}).}
 }
 \description{
-Count, for each (feature, adduct), how many distinct neighbors in the
-adduct graph independently support that label.
+When \code{covariance_edges} (from compute_intensity_covariance_edges()) are
+given, a neighbor whose intensities co-vary significantly with the feature
+across samples counts twice: the adduct relation is then backed by both the
+mass difference and the intensity profile. Covariance never removes support.
 }
 \keyword{internal}

@@ -7,7 +7,7 @@
 enforce_ms1_adduct_semantics(
   features_annotated_table,
   tolerance_ppm = 10,
-  tolerance_dalton = 0.005
+  tolerance_dalton = 0.0025
 )
 }
 \arguments{

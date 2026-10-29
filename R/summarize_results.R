@@ -376,9 +376,11 @@ summarize_results <- function(
 
   results_with_structure <- df_processed[has_structure, , drop = FALSE]
   results_without_structure <- if (!all(has_structure)) {
+    # Without the weighted table, `df` (its ranked candidates, same columns)
+    # is the consensus source
     feature_consensus_table <- feature_consensus_table %||%
       .build_feature_consensus_table(
-        annot_table_wei_chemo = annot_table_wei_chemo,
+        annot_table_wei_chemo = annot_table_wei_chemo %||% df,
         model = model
       )
     df_processed[!has_structure, , drop = FALSE] |>

@@ -162,9 +162,9 @@ compute_intensity_covariance_edges <- function(
     intensity_by_feature[[intensity_col]],
     function(x) {
       if (is.character(x)) {
-        # Parse pipe-separated string to numeric
-        result <- as.numeric(strsplit(x, "\\|")[[1]])
-        result[!is.na(result)] # Keep NAs but filter NaN
+        # Parse pipe-separated string to numeric. Keep NAs so that positions
+        # stay aligned with samples across features (filtered pairwise below)
+        suppressWarnings(as.numeric(strsplit(x, "\\|")[[1]]))
       } else if (is.list(x)) {
         as.numeric(unlist(x))
       } else {
@@ -183,11 +183,13 @@ compute_intensity_covariance_edges <- function(
   )
 
   # Apply correlation computation to all pairs with diagnostic tracking
-  n_not_in_matrix <- 0L
-  n_insufficient_samples <- 0L
-  n_correlation_failed <- 0L
-  n_non_positive <- 0L
-  n_not_significant <- 0L
+  # Counters live in an environment so the per-pair closure can update them
+  drops <- new.env(parent = emptyenv())
+  drops$n_not_in_matrix <- 0L
+  drops$n_insufficient_samples <- 0L
+  drops$n_correlation_failed <- 0L
+  drops$n_non_positive <- 0L
+  drops$n_not_significant <- 0L
 
   compute_pair_correlations <- function(pair_row) {
     feat_id <- pair_row$feature_id[[1L]]
@@ -198,7 +200,7 @@ compute_intensity_covariance_edges <- function(
       !(feat_id %in% names(intensity_vectors)) ||
         !(other_id %in% names(intensity_vectors))
     ) {
-      n_not_in_matrix <<- n_not_in_matrix + 1L
+      drops$n_not_in_matrix <- drops$n_not_in_matrix + 1L
       return(NULL)
     }
 
@@ -207,7 +209,7 @@ compute_intensity_covariance_edges <- function(
 
     # Both vectors must have same length (same sample ordering)
     if (length(int_x) != length(int_y)) {
-      n_insufficient_samples <<- n_insufficient_samples + 1L
+      drops$n_insufficient_samples <- drops$n_insufficient_samples + 1L
       return(NULL)
     }
 
@@ -217,7 +219,7 @@ compute_intensity_covariance_edges <- function(
     # Need at least 3 data points for a meaningful correlation test (df >= 1)
     n_valid <- sum(valid_idx)
     if (n_valid < 3L) {
-      n_insufficient_samples <<- n_insufficient_samples + 1L
+      drops$n_insufficient_samples <- drops$n_insufficient_samples + 1L
       return(NULL)
     }
 
@@ -240,12 +242,12 @@ compute_intensity_covariance_edges <- function(
     )
 
     if (is.null(cor_result) || is.na(cor_result$p_value)) {
-      n_correlation_failed <<- n_correlation_failed + 1L
+      drops$n_correlation_failed <- drops$n_correlation_failed + 1L
       return(NULL)
     }
 
     if (cor_result$correlation <= 0) {
-      n_non_positive <<- n_non_positive + 1L
+      drops$n_non_positive <- drops$n_non_positive + 1L
       return(NULL)
     }
 
@@ -258,7 +260,7 @@ compute_intensity_covariance_edges <- function(
         n_samples = cor_result$n_samples
       )
     } else {
-      n_not_significant <<- n_not_significant + 1L
+      drops$n_not_significant <- drops$n_not_significant + 1L
       NULL
     }
   }
@@ -270,6 +272,13 @@ compute_intensity_covariance_edges <- function(
       compute_pair_correlations(feature_pairs[i, ])
     }
   )
+
+  n_not_in_matrix <- drops$n_not_in_matrix
+  n_insufficient_samples <- drops$n_insufficient_samples
+  n_correlation_failed <- drops$n_correlation_failed
+  n_non_positive <- drops$n_non_positive
+  n_not_significant <- drops$n_not_significant
+  rm(drops)
 
   # Filter NULLs and bind results
   results_list <- Filter(Negate(is.null), results_list)

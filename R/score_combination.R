@@ -57,6 +57,7 @@ extract_bio_scores <- function(weight_bio_result) {
 #' @param score_chemo_table [data.frame] Narrow table with chemical scores
 #' @param weight_biological [numeric] Weight for biological score (0-1)
 #' @param weight_chemical [numeric] Weight for chemical score (0-1)
+#' @param weight_spectral [numeric] Weight for spectral score (0-1)
 #'
 #' @return Data frame with narrow scoring columns only
 #'
@@ -109,13 +110,14 @@ combine_weighted_scores <- function(
       # - candidate_score_pseudo_initial: spectral evidence (MS2 match, or NA for MS1-only)
       #
       # All three are weighted according to user preference.
-      # Missing spectral data (MS1-only hits) is handled gracefully via weight normalization:
-      # When spectral weight is missing (NA), total_weight_available is reduced accordingly.
+      # Missing values (e.g. no spectral score for MS1-only hits) count as 0
+      # and the sum is divided by the total weight (see
+      # compute_weighted_components()). Same order as in weight_chemo().
       score_final = compute_weighted_sum(
-        score_biological,
         score_chemical,
+        score_biological,
         candidate_score_pseudo_initial,
-        weights = c(weight_biological, weight_chemical, weight_spectral)
+        weights = c(weight_chemical, weight_biological, weight_spectral)
       )
     ) |>
     tidytable::select(

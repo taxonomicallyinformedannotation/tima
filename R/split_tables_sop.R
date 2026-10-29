@@ -197,6 +197,11 @@ split_tables_sop <- function(table, cache) {
   if (!"structure_xlogp" %in% names(table_structures_stereo)) {
     table_structures_stereo$structure_xlogp <- NA_character_
   }
+  # Keep one type so the per-group collapse below never mixes double and
+  # character results
+  table_structures_stereo$structure_xlogp <- as.character(
+    table_structures_stereo$structure_xlogp
+  )
   if (!"structure_tag" %in% names(table_structures_stereo)) {
     table_structures_stereo$structure_tag <- NA_character_
   }

@@ -21,13 +21,13 @@ library(testthat)
 test_that("rank_candidates ranks descending within each feature_id", {
   out <- rank_candidates(.rank_input())
 
-  # F1 has three pre-de-duplication rows (0.9, 0.5, 0.9): min_rank gives the
-  # two ties rank 1 and the 0.5 rank 3. F2 (0.2, 0.7) gives 2 and 1.
+  # F1 has three rows (0.9, 0.5, 0.9) but only two structures: duplicates are
+  # removed before ranking, so B ranks 2, not 3. F2 (0.2, 0.7) gives 2 and 1.
   f1 <- out[out$feature_id == "F1", ]
   f2 <- out[out$feature_id == "F2", ]
   expect_equal(
     f1$rank_final[order(f1$candidate_structure_inchikey_connectivity_layer)],
-    c(1L, 3L)
+    c(1L, 2L)
   )
   expect_equal(
     f2$rank_final[order(f2$candidate_structure_inchikey_connectivity_layer)],
@@ -62,11 +62,11 @@ test_that("score_weighted_chemo wins over score_final when both exist", {
 
   out <- rank_candidates(d)
   f1 <- out[out$feature_id == "F1", ]
-  # 0.9 ranks 1 and 0.5 ranks 3, i.e. the weighted column, not score_final
+  # 0.9 ranks 1 and 0.5 ranks 2, i.e. the weighted column, not score_final
   # (0.1 and 0.4) which would have given 2 and 1.
   expect_equal(
     f1$rank_final[order(f1$candidate_structure_inchikey_connectivity_layer)],
-    c(1L, 3L)
+    c(1L, 2L)
   )
 })
 
@@ -121,7 +121,7 @@ test_that("rank_candidates handles a missing pseudo-initial score column", {
   expect_true("rank_initial" %in% names(out))
   expect_true(all(is.na(out$rank_initial)))
   # The final ranks are unaffected.
-  expect_equal(sort(out$rank_final), c(1L, 1L, 2L, 3L))
+  expect_equal(sort(out$rank_final), c(1L, 1L, 2L, 2L))
 })
 
 test_that("rank_candidates clamps a negative pseudo-initial score", {
@@ -131,10 +131,11 @@ test_that("rank_candidates clamps a negative pseudo-initial score", {
   out <- rank_candidates(d)
   f1 <- out[out$feature_id == "F1", ]
   # -1 clamps to 0, the lowest pseudo-initial score in F1, so the surviving
-  # (F1, A) row gets rank 3 while the 0.9 row gets rank 1.
+  # (F1, A) row gets rank 2 (duplicates are dropped before ranking) while the
+  # 0.9 row gets rank 1.
   expect_equal(
     f1$rank_initial[order(f1$candidate_structure_inchikey_connectivity_layer)],
-    c(3L, 1L)
+    c(2L, 1L)
   )
   # A pseudo-initial of exactly 0 must not be confused with "missing".
   expect_false(is.na(f1$rank_initial[[1L]]))

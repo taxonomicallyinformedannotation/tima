@@ -1,30 +1,32 @@
+EDGE_WEIGHT_COLUMNS <- c(
+  "candidate_score_similarity",
+  "score",
+  "weight",
+  "edge_weight",
+  "edge_score",
+  "similarity",
+  "cosine",
+  "spectral_similarity",
+  "ms2_similarity"
+)
+
+EDGE_MATCHED_PEAKS_COLUMNS <- c(
+  "candidate_count_similarity_peaks_matched",
+  "matched_peaks",
+  "n_matched_peaks",
+  "matched_peak_count"
+)
+
 .resolve_edge_weights <- function(edges) {
   edge_weights <- rep(NA_real_, nrow(edges))
 
-  weight_columns <- c(
-    "candidate_score_similarity",
-    "score",
-    "weight",
-    "edge_weight",
-    "edge_score",
-    "similarity",
-    "cosine",
-    "spectral_similarity",
-    "ms2_similarity"
-  )
-  weight_col <- intersect(weight_columns, names(edges))
+  weight_col <- intersect(EDGE_WEIGHT_COLUMNS, names(edges))
 
   if (length(weight_col) > 0L) {
     edge_weights <- suppressWarnings(as.numeric(edges[[weight_col[[1L]]]]))
   }
 
-  matched_columns <- c(
-    "candidate_count_similarity_peaks_matched",
-    "matched_peaks",
-    "n_matched_peaks",
-    "matched_peak_count"
-  )
-  matched_col <- intersect(matched_columns, names(edges))
+  matched_col <- intersect(EDGE_MATCHED_PEAKS_COLUMNS, names(edges))
   matched_factor <- rep(1, nrow(edges))
 
   if (length(matched_col) > 0L) {
@@ -221,10 +223,6 @@
     igraph::E(network_graph)$weight <- edge_weights
 
     if (igraph::ecount(network_graph) > 0L) {
-      if (!is.null(seed)) {
-        set.seed(seed)
-      }
-
       resolution_grid <- unique(c(
         resolution,
         resolution / 2,
@@ -235,7 +233,8 @@
         0.05,
         0.1,
         0.2,
-        0.5
+        0.5,
+        1
       ))
       resolution_grid <- resolution_grid[
         is.finite(resolution_grid) & resolution_grid > 0
@@ -243,11 +242,18 @@
       resolution_grid <- sort(unique(round(resolution_grid, 6)))
 
       detect_communities <- function(resolution_value) {
+        # Re-seed per call so each resolution is reproducible on its own
+        if (!is.null(seed)) {
+          set.seed(seed)
+        }
         tryCatch(
           {
             if ("cluster_leiden" %in% getNamespaceExports("igraph")) {
+              # Optimise modularity, the same criterion used below to pick
+              # the resolution (igraph's default objective is CPM)
               igraph::cluster_leiden(
                 network_graph,
+                objective_function = "modularity",
                 weights = igraph::E(network_graph)$weight,
                 resolution = resolution_value,
                 n_iterations = n_iterations
@@ -529,30 +535,18 @@ create_components <- function(
   ) |>
     tidytable::bind_rows()
 
-  candidate_weight_columns <- c(
-    "weight",
-    "edge_weight",
-    "edge_score",
-    "score",
-    "similarity",
-    "cosine",
-    "spectral_similarity",
-    "ms2_similarity"
+  # Keep the columns .resolve_edge_weights() reads, so that community
+  # detection is weighted by spectral similarity (and matched peaks)
+  selected_edge_columns <- c(
+    "feature_source",
+    "feature_target",
+    "componentindex",
+    utils::head(intersect(EDGE_WEIGHT_COLUMNS, names(edges)), 1L),
+    utils::head(intersect(EDGE_MATCHED_PEAKS_COLUMNS, names(edges)), 1L)
   )
-  selected_edge_columns <- c("feature_source", "feature_target")
-  if ("componentindex" %in% names(edges)) {
-    selected_edge_columns <- c(selected_edge_columns, "componentindex")
-  }
-  candidate_weight_column <- intersect(candidate_weight_columns, names(edges))
-  if (length(candidate_weight_column) > 0L) {
-    selected_edge_columns <- c(
-      selected_edge_columns,
-      candidate_weight_column[[1L]]
-    )
-  }
 
   edges <- edges |>
-    tidytable::select(tidyselect::all_of(selected_edge_columns)) |>
+    tidytable::select(tidyselect::any_of(selected_edge_columns)) |>
     tidytable::filter(!is.na(feature_source), !is.na(feature_target)) |>
     tidytable::mutate(
       feature_source = as.character(feature_source),
@@ -586,7 +580,8 @@ create_components <- function(
   community_result <- .build_components_from_edges(
     edges = edges,
     name_source = "feature_source",
-    name_target = "feature_target"
+    name_target = "feature_target",
+    seed = 42L
   )
   components_table <- community_result$components_table
   method_used <- community_result$method_used

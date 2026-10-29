@@ -57,7 +57,9 @@ build_feature_pairs_within_rt <- function(
     src,
     on = .(sample, rt_dest >= rt_min, rt_dest <= rt_max),
     nomatch = 0L,
-    allow.cartesian = FALSE
+    # Many sources can share one RT window: the result may legitimately
+    # exceed nrow(x) + nrow(i), which data.table rejects without this
+    allow.cartesian = TRUE
   ][
     feature_id != feature_id_dest & mz_dest >= mz
   ][,
@@ -132,8 +134,16 @@ build_adduct_pair_differences <- function(
 
 #' Count, for each (feature, adduct), how many distinct neighbors in the
 #' adduct graph independently support that label.
+#'
+#' When `covariance_edges` (from compute_intensity_covariance_edges()) are
+#' given, a neighbor whose intensities co-vary significantly with the feature
+#' across samples counts twice: the adduct relation is then backed by both the
+#' mass difference and the intensity profile. Covariance never removes support.
+#' @param df_add Adduct edges.
+#' @param covariance_edges Optional covariance edges (`feature_id`,
+#'   `feature_id_dest`).
 #' @keywords internal
-compute_feature_adduct_support <- function(df_add) {
+compute_feature_adduct_support <- function(df_add, covariance_edges = NULL) {
   if (nrow(df_add) == 0L) {
     return(tidytable::tidytable(
       feature_id = character(),
@@ -150,18 +160,47 @@ compute_feature_adduct_support <- function(df_add) {
       neighbor = feature_id_dest
     )
 
+  # `neighbor` first: transmute() evaluates in order, so after
+  # `feature_id = feature_id_dest` the feature would count itself
   dest_direction <- df_add |>
     tidytable::transmute(
+      neighbor = feature_id,
       feature_id = feature_id_dest,
-      adduct = adduct_dest,
-      neighbor = feature_id
+      adduct = adduct_dest
     )
 
-  # Single grouped count operation
-  tidytable::bind_rows(src_direction, dest_direction) |>
-    tidytable::distinct(feature_id, adduct, neighbor) |>
-    tidytable::count(feature_id, adduct, name = "adduct_support") |>
-    tidytable::mutate(adduct_support = as.integer(adduct_support))
+  neighbors <- tidytable::bind_rows(src_direction, dest_direction) |>
+    tidytable::distinct(feature_id, adduct, neighbor)
+
+  if (is.null(covariance_edges) || nrow(covariance_edges) == 0L) {
+    # Single grouped count operation
+    return(
+      neighbors |>
+        tidytable::count(feature_id, adduct, name = "adduct_support") |>
+        tidytable::mutate(adduct_support = as.integer(adduct_support))
+    )
+  }
+
+  # Covariance pairs are unordered
+  .pair_key <- function(a, b) {
+    a <- as.character(a)
+    b <- as.character(b)
+    paste(pmin(a, b), pmax(a, b), sep = "\r")
+  }
+  covarying <- unique(.pair_key(
+    covariance_edges$feature_id,
+    covariance_edges$feature_id_dest
+  ))
+
+  neighbors |>
+    tidytable::mutate(
+      .weight = 1L +
+        as.integer(.pair_key(feature_id, neighbor) %in% covarying)
+    ) |>
+    tidytable::summarize(
+      adduct_support = as.integer(sum(.weight)),
+      .by = c(feature_id, adduct)
+    )
 }
 
 #' Apply optional support-based adduct consistency filtering.

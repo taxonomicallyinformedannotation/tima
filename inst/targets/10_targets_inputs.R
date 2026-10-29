@@ -20,7 +20,7 @@ targets_section_inputs <- function() {
     tar_target(
       name = input_spectra,
       command = {
-        if (!paths$test$mode) {
+        if (!isTRUE(paths$tests$mode)) {
           par_ann_spe$files$spectral$raw
         } else {
           test_spectra_mini

@@ -121,7 +121,7 @@ test_that("test-get_last_version_from_zenodo requires all parameters", {
 
 test_that("test-get_last_version_from_zenodo handles invalid DOI gracefully", {
   skip_on_cran()
-  skip_if_offline()
+  skip_if_no_network("https://zenodo.org")
   withr::local_options(list(
     tima.zenodo.max_attempts = 1L,
     tima.zenodo.req_retry_max_tries = 1L,
@@ -298,7 +298,7 @@ test_that("get_last_version_from_zenodo rejects invalid types", {
 })
 
 test_that("get_last_version_from_zenodo handles network errors gracefully", {
-  skip_if_offline()
+  skip_if_no_network("https://zenodo.org")
   skip_on_cran()
   withr::local_options(list(
     tima.zenodo.max_attempts = 1L,
@@ -319,7 +319,7 @@ test_that("get_last_version_from_zenodo handles network errors gracefully", {
 })
 
 test_that("get_last_version_from_zenodo handles file size comparison", {
-  skip_if_offline()
+  skip_if_no_network("https://zenodo.org")
   skip_on_cran()
   skip("Requires actual Zenodo download")
 
@@ -349,7 +349,7 @@ test_that("get_last_version_from_zenodo handles file size comparison", {
 # Edge Cases ----
 
 test_that("get_last_version_from_zenodo accepts various valid DOI formats", {
-  skip_if_offline()
+  skip_if_no_network("https://zenodo.org")
   skip_on_cran()
   skip("Requires actual Zenodo download")
 
@@ -390,7 +390,7 @@ test_that("get_last_version_from_zenodo maintains backward compatibility", {
 })
 
 test_that("get_last_version_from_zenodo returns path invisibly", {
-  skip_if_offline()
+  skip_if_no_network("https://zenodo.org")
   skip_on_cran()
   skip("Requires actual Zenodo download")
 
@@ -478,6 +478,7 @@ test_that("get_last_version_from_zenodo validates parameters in correct order", 
 # Real tests ----
 
 test_that("get_last_version_from_zenodo success", {
+  skip_if_no_network("https://zenodo.org")
   tmp <- temp_test_dir("get_file_dir_create")
   withr::local_dir(new = tmp)
   expect_no_error(
@@ -664,9 +665,10 @@ test_that("get_last_version_from_zenodo builds fallback URL and calls download h
   tmp_path <- temp_test_path("zenodo-fallback-download.txt")
   writeLines("old", con = tmp_path)
 
-  captured_url <- NULL
-  captured_export <- NULL
-  created_dir <- FALSE
+  captured <- new.env(parent = emptyenv())
+  captured$url <- NULL
+  captured$export <- NULL
+  captured$created_dir <- FALSE
 
   testthat::with_mocked_bindings(
     fetch_zenodo_record = function(record, doi, timeout_s) {
@@ -676,12 +678,12 @@ test_that("get_last_version_from_zenodo builds fallback URL and calls download h
       TRUE
     },
     create_dir = function(export) {
-      created_dir <<- TRUE
+      captured$created_dir <- TRUE
       invisible(export)
     },
     get_file = function(url, export) {
-      captured_url <<- url
-      captured_export <<- export
+      captured$url <- url
+      captured$export <- export
       invisible(export)
     },
     {
@@ -693,10 +695,10 @@ test_that("get_last_version_from_zenodo builds fallback URL and calls download h
       )
 
       expect_identical(result, tmp_path)
-      expect_true(created_dir)
-      expect_identical(captured_export, tmp_path)
+      expect_true(captured$created_dir)
+      expect_identical(captured$export, tmp_path)
       expect_identical(
-        captured_url,
+        captured$url,
         "https://zenodo.org/api/records/7654321/files/target.txt/content"
       )
     },

@@ -1002,6 +1002,7 @@ convert_precursor_for_matching <- function(precursors, adducts) {
     n_mer <- parsed[["n_mer"]]
     n_iso <- parsed[["n_iso"]]
     mass_mods <- parsed[["los_add_clu"]]
+    charge_sign <- parsed[["charge"]]
     if (n_mer == 0L || n_charges == 0L) {
       next
     }
@@ -1012,7 +1013,13 @@ convert_precursor_for_matching <- function(precursors, adducts) {
     }
     mz_vec <- precursors_num[idx]
     iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
-    m_vec <- (n_charges * (mz_vec - iso_shift) - mass_mods) / n_mer
+    # Same formula as calculate_mass_of_m(), including the electron term
+    z_signed <- n_charges * charge_sign
+    m_vec <- (n_charges *
+      (mz_vec - iso_shift) -
+      mass_mods +
+      z_signed * ELECTRON_MASS_DALTONS) /
+      n_mer
     m_vec[!is.finite(m_vec) | m_vec <= 0] <- NA_real_
     valid <- !is.na(m_vec)
     out[idx[valid]] <- m_vec[valid]

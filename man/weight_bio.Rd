@@ -107,7 +107,7 @@ weighted <- weight_bio(
   score_biological_genus = 0.7,
   score_biological_species = 0.9,
   score_biological_variety = 1.0,
-  score_biological_biota = 1.007276
+  score_biological_biota = 1.0
 )
 }
 }

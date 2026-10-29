@@ -176,14 +176,13 @@ calculate_entropy_and_similarity <- function(
   }
 
   # Progress counter and query batch size for efficient C calls
-  progress_counter <- 0L
 
   results <- lapply(
     X = seq_along(query_spectra),
     FUN = function(spectrum_idx) {
-      progress_counter <<- progress_counter + 1L
-      if (progress_counter %% 500L == 0L) {
-        log_info("Processed %d / %d queries", progress_counter, n_queries)
+      # lapply() runs in order, so the index is the progress count
+      if (spectrum_idx %% 500L == 0L) {
+        log_info("Processed %d / %d queries", spectrum_idx, n_queries)
       }
 
       current_spectrum <- query_spectra[[spectrum_idx]]
@@ -200,16 +199,17 @@ calculate_entropy_and_similarity <- function(
           current_precursor + dalton,
           current_precursor * (1 + (1E-6 * ppm))
         )
+        # Closed window [low_val, high_val], as in reduce_library_by_precursor()
         low_idx <- findInterval(
           low_val,
           lib_precursors_sorted_vals,
-          left.open = FALSE
+          left.open = TRUE
         ) +
           1L
         high_idx <- findInterval(
           high_val,
           lib_precursors_sorted_vals,
-          left.open = TRUE
+          left.open = FALSE
         )
         if (low_idx <= high_idx) {
           lib_indices_sub <- lib_precursors_sorted_idx[low_idx:high_idx]

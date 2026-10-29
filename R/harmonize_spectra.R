@@ -178,15 +178,9 @@ harmonize_spectra <- function(
         x = !!as.name(col_po),
         ignore.case = TRUE
       ) |
-        grepl(
-          pattern = if (mode == "pos") {
-            1
-          } else {
-            -1
-          },
-          x = !!as.name(col_po),
-          ignore.case = TRUE
-        )
+        # Compare numerically: a pattern match on "1" also hits "-1" and "10"
+        suppressWarnings(as.numeric(!!as.name(col_po))) %in%
+          if (grepl("pos", mode, ignore.case = TRUE)) 1 else -1
     ) |>
     tidytable::select(
       tidyselect::any_of(x = columns_full),

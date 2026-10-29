@@ -247,10 +247,10 @@ weight_chemo <- function(
     )
 
   # OPTIMIZATION: Vectorized 7-level chemical scoring — replaces 7 separate
-  # score_per_level_chemo() calls (each doing distinct + filter + stri_detect_regex)
+  # score_per_level_chemo() calls (each doing distinct + filter + stri_detect_token)
   # plus 7 sequential left_joins that each created a full table copy.
   # Since df2 is already distinct() on the candidate+taxonomy columns, we
-  # assign each score column directly via vectorized if_else + stri_detect_regex.
+  # assign each score column directly via vectorized if_else + stri_detect_token.
   # This eliminates all 7 joins entirely — direct column assignment is O(N)
   # with zero table copies.
   chemo_levels <- list(
@@ -312,7 +312,7 @@ weight_chemo <- function(
     matched <- !is.na(cand_vals) &
       cand_vals != "notClassified" &
       !is.na(fval) &
-      stri_detect_regex(str = fval, pattern = cand_vals)
+      stri_detect_token(str = fval, pattern = cand_vals)
     df2[[lvl$out]] <- ifelse(matched, as.numeric(lvl$weight), NA_real_)
   }
   rm(chemo_levels, cand_vals, fval, matched)

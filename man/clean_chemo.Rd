@@ -70,7 +70,9 @@ annotations}
 \item{compounds_names}{Logical, include compound names in output (may
 increase size)}
 
-\item{high_evidence}{Logical, apply strict high-evidence filters}
+\item{high_evidence}{Logical, also apply the high-evidence filter
+(\code{\link[=filter_high_evidence_only]{filter_high_evidence_only()}}) to the full tier. The filtered and mini
+tiers always use it, whatever this value.}
 
 \item{remove_ties}{Logical, remove tied scores (keep only highest-ranked)}
 
