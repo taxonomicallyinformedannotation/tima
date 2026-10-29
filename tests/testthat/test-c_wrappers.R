@@ -216,3 +216,75 @@ test_that("forward and reverse are 0 when no peaks match", {
   expect_equal(res[3L], 0.0)
   expect_equal(res[4L], 0.0)
 })
+
+# Cross-path properties on random spectra ----
+
+.random_spectrum_pair <- function(n_shared = 5L, n_extra = 4L) {
+  x <- cbind(sort(stats::runif(8L, 50, 400)), stats::runif(8L, 1, 100))
+  shared <- x[sample(nrow(x), n_shared), , drop = FALSE]
+  shared[, 1L] <- shared[, 1L] + stats::rnorm(n_shared, 0, 0.003)
+  y <- rbind(
+    shared,
+    cbind(stats::runif(n_extra, 50, 400), stats::runif(n_extra, 1, 100))
+  )
+  list(x = x, y = y[order(y[, 1L]), , drop = FALSE])
+}
+
+test_that("join then aligned scoring agrees with the chain DP scorer", {
+  set.seed(3L)
+  for (i in seq_len(20L)) {
+    sp <- .random_spectrum_pair()
+    j <- join_gnps_wrapper(
+      sp$x[, 1L],
+      sp$y[, 1L],
+      NA_real_,
+      NA_real_,
+      tolerance = 0.01,
+      ppm = 0
+    )
+    aligned <- gnps_wrapper(
+      sp$x[j$x, , drop = FALSE],
+      sp$y[j$y, , drop = FALSE]
+    )
+    chain <- gnps_chain_dp_wrapper(
+      sp$x,
+      sp$y,
+      NA_real_,
+      NA_real_,
+      tolerance = 0.01,
+      ppm = 0,
+      matchedPeaksCount = TRUE
+    )
+    expect_equal(aligned[[1L]], chain[[1L]], tolerance = 1e-12)
+    expect_identical(aligned[[2L]], chain[[2L]])
+  }
+})
+
+test_that("chain DP score is symmetric and swaps forward with reverse", {
+  set.seed(7L)
+  for (i in seq_len(20L)) {
+    sp <- .random_spectrum_pair()
+    xy <- gnps_chain_dp_wrapper(
+      sp$x,
+      sp$y,
+      NA_real_,
+      NA_real_,
+      0.01,
+      0,
+      matchedPeaksCount = TRUE
+    )
+    yx <- gnps_chain_dp_wrapper(
+      sp$y,
+      sp$x,
+      NA_real_,
+      NA_real_,
+      0.01,
+      0,
+      matchedPeaksCount = TRUE
+    )
+    expect_equal(xy[[1L]], yx[[1L]], tolerance = 1e-12)
+    expect_identical(xy[[2L]], yx[[2L]])
+    expect_equal(xy[[3L]], yx[[4L]], tolerance = 1e-12)
+    expect_equal(xy[[4L]], yx[[3L]], tolerance = 1e-12)
+  }
+})

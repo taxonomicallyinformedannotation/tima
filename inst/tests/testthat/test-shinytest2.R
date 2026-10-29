@@ -1,6 +1,13 @@
 library(shinytest2)
 
 test_that("{shinytest2} recording: inst", {
+  # Downloads the example files from GitHub
+  skip_on_cran()
+  skip_if(
+    identical(tolower(Sys.getenv("TIMA_TESTS_OFFLINE")), "true"),
+    "TIMA_TESTS_OFFLINE=true"
+  )
+  skip_if_offline("github.com")
   tima::get_file(
     url = "https://github.com/taxonomicallyinformedannotation/tima-example-files/raw/main/example_spectra_mini.mgf",
     export = "data/source/example_spectra.mgf"

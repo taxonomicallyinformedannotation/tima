@@ -78,9 +78,10 @@ m/z 250, so it only widens the window below that.}
 
 \item{tolerance_rt}{Tolerance to group adducts. Should be <= 0.05 minutes}
 
-\item{correlation_p_threshold}{P-value threshold for the Pearson
-correlation of feature intensities across samples (needs >= 3 samples
-where both features are detected). Positively correlated pairs with
+\item{correlation_p_threshold}{False discovery rate threshold for the
+Pearson correlation of feature intensities across samples (needs >= 3
+samples where both features are detected). P-values of all pairs tested
+are Benjamini-Hochberg adjusted; positively correlated pairs with adjusted
 p < threshold are exported as covariance edges, and an adduct neighbor
 that co-varies counts twice in \code{adduct_support}. Pairs that fail the test
 are not rejected.}

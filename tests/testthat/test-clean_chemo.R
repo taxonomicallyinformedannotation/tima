@@ -1772,3 +1772,341 @@ test_that("build_mini_taxonomy_table predicted label beats low-scoring structure
   expect_false(is.na(out$score_classyfire[[1L]]))
   expect_false(is.na(out$score_npclassifier[[1L]]))
 })
+
+# Candidate selection in clean_chemo ----
+
+#' Two features with four candidates each and distinct, high-evidence scores.
+#' Per feature, candidates 1..4 score 0.80, 0.95, 0.85 and 0.90.
+#' @keywords internal
+make_ranked_clean_chemo_fixture <- function() {
+  fixture <- make_clean_chemo_fixture(n_features = 2, n_candidates = 4)
+  scores <- rep(c(0.80, 0.95, 0.85, 0.90), 2)
+  fixture$annot_table_wei_chemo <- fixture$annot_table_wei_chemo |>
+    tidytable::mutate(
+      score_weighted_chemo = scores,
+      candidate_score_pseudo_initial = scores,
+      score_biological = 0.9,
+      score_chemical = 0.9,
+      candidate_score_similarity = NA_real_
+    )
+  fixture
+}
+
+run_clean_chemo_fixture <- function(
+  fixture,
+  annot = fixture$annot_table_wei_chemo,
+  candidates_final = 2,
+  high_evidence = FALSE,
+  ...
+) {
+  clean_chemo(
+    annot_table_wei_chemo = annot,
+    components_table = fixture$components_table,
+    features_table = fixture$features_table,
+    structure_organism_pairs_table = fixture$structure_organism_pairs_table,
+    candidates_final = candidates_final,
+    best_percentile = 0,
+    minimal_ms1_bio = 0,
+    minimal_ms1_chemo = 0,
+    minimal_ms1_condition = "OR",
+    compounds_names = TRUE,
+    high_evidence = high_evidence,
+    remove_ties = FALSE,
+    summarize = FALSE,
+    ...
+  )
+}
+
+ik_by_feature <- function(df) {
+  split(df$candidate_structure_inchikey_connectivity_layer, df$feature_id)
+}
+
+test_that("clean_chemo returns an empty annotation table unchanged", {
+  fixture <- make_ranked_clean_chemo_fixture()
+  empty <- fixture$annot_table_wei_chemo[0L, ]
+
+  result <- run_clean_chemo_fixture(fixture, annot = empty)
+
+  expect_identical(result, empty)
+})
+
+test_that("clean_chemo rejects a non-data-frame structure-organism table", {
+  fixture <- make_ranked_clean_chemo_fixture()
+  fixture$structure_organism_pairs_table <- "not a table"
+
+  expect_error(
+    run_clean_chemo_fixture(fixture),
+    "structure_organism_pairs_table must be a data frame",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("clean_chemo keeps the best-ranked candidates from shuffled input", {
+  fixture <- make_ranked_clean_chemo_fixture()
+  shuffled <- fixture$annot_table_wei_chemo[c(8, 3, 1, 6, 2, 7, 4, 5), ]
+
+  result <- run_clean_chemo_fixture(fixture, annot = shuffled)
+
+  # Best two per feature: candidates 2 (0.95) and 4 (0.90)
+  expect_equal(
+    ik_by_feature(result$filtered),
+    list(
+      F001 = c("AAAAA000000002", "AAAAA000000004"),
+      F002 = c("AAAAA000000006", "AAAAA000000008")
+    )
+  )
+  expect_equal(result$filtered$rank_final, c(1L, 2L, 1L, 2L))
+  # The full tier keeps every candidate, best first
+  expect_equal(
+    ik_by_feature(result$full)$F001,
+    c("AAAAA000000002", "AAAAA000000004", "AAAAA000000003", "AAAAA000000001")
+  )
+})
+
+test_that("filtered tier selects by rank_final even if upstream is unsorted", {
+  fixture <- make_ranked_clean_chemo_fixture()
+  real_prepare <- prepare_ranked_candidates
+  local_mocked_bindings(
+    prepare_ranked_candidates = function(...) {
+      out <- real_prepare(...)
+      # Worst candidates first: taking the first rows would pick ranks 4, 3
+      out$df_percentile <- out$df_percentile |>
+        tidytable::arrange(feature_id, tidytable::desc(rank_final))
+      out
+    }
+  )
+
+  result <- run_clean_chemo_fixture(fixture)
+
+  expect_equal(
+    ik_by_feature(result$filtered),
+    list(
+      F001 = c("AAAAA000000002", "AAAAA000000004"),
+      F002 = c("AAAAA000000006", "AAAAA000000008")
+    )
+  )
+})
+
+test_that("filtered tier caps tied candidates at candidates_final", {
+  fixture <- make_ranked_clean_chemo_fixture()
+  annot <- fixture$annot_table_wei_chemo |>
+    tidytable::mutate(
+      score_weighted_chemo = tidytable::if_else(
+        feature_id == "F001",
+        0.9,
+        score_weighted_chemo
+      ),
+      candidate_score_pseudo_initial = score_weighted_chemo
+    )
+
+  result <- run_clean_chemo_fixture(fixture, annot = annot)
+
+  f001 <- result$filtered[result$filtered$feature_id == "F001", ]
+  # Four candidates share rank 1, but only two are kept
+  expect_equal(f001$rank_final, c(1L, 1L))
+  expect_equal(sum(result$full$feature_id == "F001"), 4L)
+})
+
+test_that("clean_chemo samples tied candidates down to max_per_score", {
+  fixture <- make_clean_chemo_fixture(n_features = 1, n_candidates = 6)
+  fixture$annot_table_wei_chemo <- fixture$annot_table_wei_chemo |>
+    tidytable::mutate(
+      candidate_adduct = "[M+H]+",
+      score_weighted_chemo = 0.9,
+      candidate_score_pseudo_initial = 0.9,
+      score_biological = 0.9,
+      score_chemical = 0.9,
+      candidate_score_similarity = NA_real_
+    )
+
+  result <- run_clean_chemo_fixture(
+    fixture,
+    candidates_final = 10,
+    max_per_score = 2L,
+    enforce_cluster_consensus = FALSE
+  )
+
+  # Six tied candidates on the same adduct: only two survive, flagged
+  expect_equal(nrow(result$full), 2L)
+  expect_equal(result$full$rank_final, c(1L, 1L))
+  expect_equal(
+    result$full$annotation_note,
+    rep("Sampled 2 of 6 tied candidates", 2L)
+  )
+  expect_equal(
+    result$filtered$annotation_note,
+    rep("Sampled 2 of 6 tied candidates", 2L)
+  )
+})
+
+test_that("high_evidence drops low-evidence candidates from the full tier", {
+  fixture <- make_ranked_clean_chemo_fixture()
+  weak <- "AAAAA000000001"
+  annot <- fixture$annot_table_wei_chemo |>
+    tidytable::mutate(
+      is_weak = candidate_structure_inchikey_connectivity_layer == weak,
+      score_biological = tidytable::if_else(is_weak, 0.1, score_biological),
+      candidate_score_pseudo_initial = tidytable::if_else(
+        is_weak,
+        0.1,
+        candidate_score_pseudo_initial
+      ),
+      score_weighted_chemo = tidytable::if_else(
+        is_weak,
+        0.1,
+        score_weighted_chemo
+      )
+    ) |>
+    tidytable::select(-is_weak)
+
+  lenient <- run_clean_chemo_fixture(
+    fixture,
+    annot = annot,
+    candidates_final = 4
+  )
+  strict <- run_clean_chemo_fixture(
+    fixture,
+    annot = annot,
+    candidates_final = 4,
+    high_evidence = TRUE
+  )
+
+  full_iks <- function(x) x$full$candidate_structure_inchikey_connectivity_layer
+  filt_iks <- function(x) {
+    x$filtered$candidate_structure_inchikey_connectivity_layer
+  }
+  expect_true(weak %in% full_iks(lenient))
+  expect_false(weak %in% full_iks(strict))
+  expect_length(full_iks(strict), 7L)
+  # The filtered tier is always high-evidence, whatever the flag
+  expect_false(weak %in% filt_iks(lenient))
+  expect_identical(filt_iks(lenient), filt_iks(strict))
+})
+
+test_that("clean_chemo adds xref ids to the filtered and full tiers", {
+  fixture <- make_ranked_clean_chemo_fixture()
+  xrefs <- tidytable::tidytable(
+    inchikey = c("AAAAA000000002", "AAAAA000000003", "ZZZZZZZZZZZZZZ"),
+    prefix = "pubchem",
+    id = c("111", "333", "999")
+  )
+
+  result <- run_clean_chemo_fixture(fixture, xrefs_table = xrefs)
+
+  ids <- function(df) {
+    stats::setNames(
+      df$candidate_structure_id_pubchem,
+      df$candidate_structure_inchikey_connectivity_layer
+    )
+  }
+  # Candidate 3 (0.85) is outside the top two, so only the full tier has it
+  expect_equal(ids(result$filtered)[["AAAAA000000002"]], "111")
+  expect_false("AAAAA000000003" %in% names(ids(result$filtered)))
+  expect_equal(ids(result$full)[["AAAAA000000003"]], "333")
+  expect_true(is.na(ids(result$full)[["AAAAA000000004"]]))
+  expect_false("999" %in% result$full$candidate_structure_id_pubchem)
+})
+
+# Annotation notes helpers ----
+
+test_that(".restore_annotation_notes fills missing notes from the lookup", {
+  results <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2", "IK1"),
+    rank_final = c(1L, 2L, 1L),
+    annotation_note = c(NA, "kept note", NA)
+  )
+  lookup <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+    rank_final = c(1L, 2L),
+    annotation_note = c("from lookup", "ignored lookup note")
+  )
+
+  out <- .restore_annotation_notes(results, lookup)
+
+  # Existing notes win; unmatched rows stay NA; no helper column leaks
+  expect_equal(out$annotation_note, c("from lookup", "kept note", NA))
+  expect_equal(names(out), names(results))
+})
+
+test_that(".restore_annotation_notes adds the note column when absent", {
+  results <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    rank_final = c(1L, 1L)
+  )
+  lookup <- tidytable::tidytable(
+    feature_id = "F2",
+    candidate_adduct = "[M+H]+",
+    rank_final = 1L,
+    annotation_note = "Sampled 2 of 5 tied candidates"
+  )
+
+  out <- .restore_annotation_notes(results, lookup)
+
+  # Joined on the shared keys only (candidate_adduct is not in results)
+  expect_equal(out$annotation_note, c(NA, "Sampled 2 of 5 tied candidates"))
+  expect_false("annotation_note_lookup" %in% names(out))
+})
+
+test_that(".restore_annotation_notes leaves results alone without join keys", {
+  results <- tidytable::tidytable(other = 1:2)
+  lookup <- tidytable::tidytable(feature_id = "F1", annotation_note = "x")
+
+  expect_identical(.restore_annotation_notes(results, lookup), results)
+  expect_identical(
+    .restore_annotation_notes(results, tidytable::tidytable()),
+    results
+  )
+})
+
+test_that("retain_promoted_rank1_in_filtered keeps only rank 1 when promoted", {
+  df_filtered <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F1", "F2", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK1",
+      "IK2",
+      "IK3",
+      "IK1",
+      "IK4"
+    ),
+    rank_final = c(1L, 2L, 1L, 1L, 2L)
+  )
+  lookup <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F2"),
+    annotation_note = c(
+      "Promoted to rank 1: anchor IK1 from feature F9",
+      NA,
+      "Sampled 2 of 4 tied candidates"
+    )
+  )
+
+  out <- retain_promoted_rank1_in_filtered(df_filtered, lookup)
+
+  # F1 was promoted: its rank-2 row goes. F2 was not: untouched.
+  expect_equal(
+    paste(out$feature_id, out$candidate_structure_inchikey_connectivity_layer),
+    c("F1 IK1", "F1 IK3", "F2 IK1", "F2 IK4")
+  )
+})
+
+test_that("retain_promoted_rank1_in_filtered ignores notes that only mention promotion", {
+  df_filtered <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    rank_final = c(1L, 2L)
+  )
+  # The gate matches notes that start with the promotion marker
+  lookup <- tidytable::tidytable(
+    feature_id = "F1",
+    annotation_note = "Not promoted to rank 1: tie"
+  )
+
+  expect_identical(
+    retain_promoted_rank1_in_filtered(df_filtered, lookup),
+    df_filtered
+  )
+  expect_identical(
+    retain_promoted_rank1_in_filtered(df_filtered, NULL),
+    df_filtered
+  )
+})

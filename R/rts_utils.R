@@ -63,7 +63,9 @@ normalize_rt_to_minutes <- function(
 
   if (!quiet) {
     log_debug(
-      "Feature RT normalization: detected unit '{decided_unit}' (requested: '{unit}')"
+      "Feature RT normalization: detected unit '%s' (requested: '%s')",
+      decided_unit,
+      unit
     )
   }
 

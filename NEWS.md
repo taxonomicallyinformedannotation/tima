@@ -49,6 +49,25 @@
     intensities co-vary significantly across samples counts twice in
     `adduct_support`. Pairs failing the test are kept, so single-sample runs are
     unaffected
+  - Intensity co-variance p-values are Benjamini-Hochberg adjusted over all
+    pairs tested, so `ms$tolerances$correlation$p_value` is now a false
+    discovery rate. Edges report the adjusted `p_value` (the raw value is kept
+    as `p_value_raw` internally)
+  - `get_organism_taxonomy_ott()`:
+    - organisms that only matched at genus level on retry now get that genus
+      taxonomy (the matches were fetched, then dropped)
+    - synonyms sharing one OTT id no longer trigger an empty retry, which
+      errored
+    - when nothing matches, it returns the standard empty `organism_*` table
+  - Components from pre-labelled edges: a feature on several labelled edges now
+    takes the label of its first edge (the edge order was misaligned)
+  - `build_universe_transition_tables()` orients each adduct pair lighter to
+    heavier, so transitions are no longer lost when the heavier adduct sorts
+    first alphabetically (all loss transitions were). It also handles a
+    single-adduct universe
+  - Log messages that were built paste- or glue-style are now `sprintf`
+    formatted. They were cut short and raised "arguments not used by format"
+    warnings
   - `adduct_support` no longer counts a feature as its own neighbor
   - Leiden community detection optimises modularity (was igraph's default CPM)
     with a fixed seed, weighted by spectral similarity

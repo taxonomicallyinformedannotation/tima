@@ -158,7 +158,7 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
 
     edge_label_values <- as.character(edges[[label_column]])
     edge_label_values[
-      is.na(edge_label_values) | identical(edge_label_values, "")
+      is.na(edge_label_values) | !nzchar(edge_label_values)
     ] <- NA_character_
 
     source_features <- as.character(edges[[name_source]])
@@ -167,8 +167,9 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
     feature_rows <- data.frame(
       feature = c(source_features, target_features),
       label = c(edge_label_values, edge_label_values),
-      edge_order = rep(seq_len(nrow(edges)), each = 2L),
-      side_order = rep(c(1L, 2L), times = nrow(edges)),
+      # Rows are all sources, then all targets
+      edge_order = rep(seq_len(nrow(edges)), times = 2L),
+      side_order = rep(c(1L, 2L), each = nrow(edges)),
       stringsAsFactors = FALSE,
       row.names = NULL
     )

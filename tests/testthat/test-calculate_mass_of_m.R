@@ -964,3 +964,199 @@ test_that("isotope round-trips work for all common adducts", {
     FUN.VALUE = logical(1L)
   ))
 })
+
+# Test Suite: degenerate adducts, batch converters and validators ----
+
+# Electron mass close enough to CODATA (< 1 %) to avoid the validator warning,
+# but not identical, so calculate_mass_of_m() takes the fully validated path.
+ALT_ELECTRON_MASS <- ELECTRON_MASS_DALTONS * (1 + 1e-3)
+
+test_that("calculate_mass_of_m returns 0 for zero multimer or zero charge", {
+  # parse_adduct() yields n_mer = 0 for "[0M+H]+" and n_charges = 0 for
+  # "[M+H]0+"; both would divide by zero.
+  for (e_mass in c(ELECTRON_MASS_DALTONS, ALT_ELECTRON_MASS)) {
+    expect_identical(
+      suppressWarnings(calculate_mass_of_m(
+        mz = 200,
+        adduct_string = "[0M+H]+",
+        electron_mass = e_mass
+      )),
+      0
+    )
+    expect_identical(
+      suppressWarnings(calculate_mass_of_m(
+        mz = 200,
+        adduct_string = "[M+H]0+",
+        electron_mass = e_mass
+      )),
+      0
+    )
+  }
+})
+
+test_that("calculate_mass_of_m logs zero-charge adducts without R warnings", {
+  expect_no_warning(calculate_mass_of_m(mz = 200, adduct_string = "[0M+H]+"))
+  expect_no_warning(calculate_mass_of_m(mz = 200, adduct_string = "[M+H]0+"))
+  expect_no_warning(validate_mz(MAX_MASS_DALTONS + 1))
+  expect_no_warning(validate_electron_mass(ELECTRON_MASS_DALTONS * 1.5))
+})
+
+test_that("calculate_mass_of_m returns 0 when the result is not finite", {
+  local_mocked_bindings(
+    parse_adduct = function(...) {
+      c(
+        n_mer = 1,
+        n_iso = 0,
+        los_add_clu = Inf,
+        n_charges = 1,
+        charge = 1
+      )
+    }
+  )
+  for (e_mass in c(ELECTRON_MASS_DALTONS, ALT_ELECTRON_MASS)) {
+    expect_identical(
+      suppressWarnings(calculate_mass_of_m(
+        mz = 200,
+        adduct_string = "[M+X]+",
+        electron_mass = e_mass
+      )),
+      0
+    )
+  }
+})
+
+test_that("validated path applies the signed electron correction exactly", {
+  m <- 412.2
+  e_mass <- ALT_ELECTRON_MASS
+  h <- ADDUCT_MASSES$H
+
+  # [M+2H]2+: m/z = (M + 2H - 2e) / 2; [M-2H]2-: m/z = (M - 2H + 2e) / 2;
+  # [3M+Na]+: m/z = 3M + Na - e.
+  cases <- list(
+    list(adduct = "[M+2H]2+", mz = (m + 2 * h - 2 * e_mass) / 2),
+    list(adduct = "[M-2H]2-", mz = (m - 2 * h + 2 * e_mass) / 2),
+    list(adduct = "[3M+Na]+", mz = 3 * m + ADDUCT_MASSES$Na - e_mass)
+  )
+  for (case in cases) {
+    expect_equal(
+      calculate_mass_of_m(
+        mz = case$mz,
+        adduct_string = case$adduct,
+        electron_mass = e_mass
+      ),
+      m,
+      tolerance = 1e-10
+    )
+    expect_equal(
+      calculate_mz_from_mass(
+        neutral_mass = m,
+        adduct_string = case$adduct,
+        electron_mass = e_mass
+      ),
+      case$mz,
+      tolerance = 1e-10
+    )
+  }
+
+  # Changing only the electron mass shifts M by z * delta_e / n_mer.
+  mz <- 500
+  delta <- calculate_mass_of_m(mz, "[2M-3H]3-", electron_mass = e_mass) -
+    calculate_mass_of_m(mz, "[2M-3H]3-")
+  # Absolute check: delta (~1e-6 Da) comes from subtracting ~250 Da values.
+  expect_lt(abs(delta - (-3 * (e_mass - ELECTRON_MASS_DALTONS) / 2)), 1e-10)
+})
+
+test_that("calculate_mz_from_mass returns 0 for zero-charge adducts", {
+  expect_identical(calculate_mz_from_mass(200, "[M+H]0+"), 0)
+})
+
+test_that("calculate_mass_of_m_batch skips zero-multimer and zero-charge", {
+  adducts <- c("[M+H]+", "[0M+H]+", "[M+Na]+", "[M+H]0+", "", "[M+H]+")
+  mzs <- c(201, 300, 223, 400, 500, 101)
+  out <- calculate_mass_of_m_batch(adducts = adducts, mzs = mzs)
+
+  expect_equal(
+    out,
+    c(201 - H_MASS, NA, 223 - Na_MASS, NA, NA, 101 - H_MASS),
+    tolerance = 1e-10
+  )
+})
+
+test_that("calculate_mz_from_mass_batch matches hand-computed m/z", {
+  m <- c(180.0634, 180.0634, 300, 300, 150, 150)
+  adducts <- c(
+    "[M+H]+",
+    "[2M+Na]+",
+    "[M+2H]2+",
+    "[M-H]-",
+    "[M1+H]+",
+    "[M2+2H]2+"
+  )
+  expected <- c(
+    m[[1L]] + H_MASS,
+    2 * m[[2L]] + Na_MASS,
+    (m[[3L]] + 2 * H_MASS) / 2,
+    m[[4L]] - H_MASS,
+    m[[5L]] + H_MASS + ISOTOPE_MASS_SHIFT_DALTONS,
+    (m[[6L]] + 2 * H_MASS) / 2 + 2 * ISOTOPE_MASS_SHIFT_DALTONS
+  )
+
+  out <- calculate_mz_from_mass_batch(neutral_masses = m, adducts = adducts)
+  expect_equal(out, expected, tolerance = 1e-10)
+  # Agrees element-wise with the scalar implementation.
+  expect_equal(
+    out,
+    mapply(calculate_mz_from_mass, m, adducts, USE.NAMES = FALSE),
+    tolerance = 1e-10
+  )
+  # And the batch inverse recovers the neutral masses.
+  expect_equal(
+    calculate_mass_of_m_batch(adducts = adducts, mzs = out),
+    m,
+    tolerance = 1e-10
+  )
+})
+
+test_that("calculate_mz_from_mass_batch recycles a scalar adduct", {
+  m <- c(100, 200, 300)
+  expect_equal(
+    calculate_mz_from_mass_batch(neutral_masses = m, adducts = "[M+Na]+"),
+    m + Na_MASS,
+    tolerance = 1e-10
+  )
+})
+
+test_that("calculate_mz_from_mass_batch yields NA for unusable rows only", {
+  m <- c(100, NA, 300, 400, 500, 600)
+  adducts <- c("[M+H]+", "[M+H]+", NA, "invalid", "[M+H]0+", "[M+K]+")
+  out <- calculate_mz_from_mass_batch(neutral_masses = m, adducts = adducts)
+
+  expect_equal(
+    out,
+    c(100 + H_MASS, NA, NA, NA, NA, 600 + K_MASS),
+    tolerance = 1e-10
+  )
+  expect_true(all(is.na(calculate_mz_from_mass_batch(
+    neutral_masses = c(NA_real_, NA_real_),
+    adducts = "[M+H]+"
+  ))))
+})
+
+test_that("validate_mz accepts the max-mass boundary and errors below 0", {
+  expect_invisible(validate_mz(MAX_MASS_DALTONS))
+  expect_true(validate_mz(MAX_MASS_DALTONS))
+  # Above the typical range it only logs; it does not error.
+  expect_true(suppressWarnings(validate_mz(MAX_MASS_DALTONS * 2)))
+  expect_error(validate_mz(-1))
+})
+
+test_that("validate_electron_mass bounds the electron mass", {
+  expect_true(validate_electron_mass(ELECTRON_MASS_DALTONS))
+  expect_true(validate_electron_mass(ALT_ELECTRON_MASS))
+  # Off by > 1 % only logs a warning.
+  expect_true(suppressWarnings(
+    validate_electron_mass(ELECTRON_MASS_DALTONS * 1.5)
+  ))
+  expect_error(validate_electron_mass(0.002))
+  expect_error(validate_electron_mass(-1e-4))
+})

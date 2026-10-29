@@ -92,7 +92,8 @@ harmonize_adducts <- function(
   # No column to harmonize
   if (!adducts_colname %in% names(df)) {
     log_debug(
-      "Column '{adducts_colname}' not found, skipping harmonization"
+      "Column '%s' not found, skipping harmonization",
+      adducts_colname
     )
     return(df)
   }

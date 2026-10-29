@@ -118,9 +118,8 @@ calculate_mass_of_m <- function(
 
     if (n_mer == 0L || n_charges == 0L) {
       log_error(
-        "Invalid adduct components for '",
-        adduct_string,
-        "'. Cannot calculate neutral mass."
+        "Invalid adduct components for '%s'. Cannot calculate neutral mass.",
+        adduct_string
       )
       return(0)
     }
@@ -135,9 +134,8 @@ calculate_mass_of_m <- function(
       n_mer
     if (!is.finite(neutral_mass)) {
       log_error(
-        "Calculated neutral mass is not finite for adduct '",
+        "Calculated neutral mass is not finite for adduct '%s' and m/z %s",
         adduct_string,
-        "' and m/z ",
         mz
       )
       return(0)
@@ -189,9 +187,8 @@ calculate_mass_of_m <- function(
   # Validate critical values to avoid division by zero
   if (n_mer == 0L) {
     log_error(
-      "Invalid multimer count (n_mer = 0) in adduct '",
+      "Invalid multimer count (n_mer = 0) in adduct '%s'. %s",
       adduct_string,
-      "'. ",
       "Cannot calculate neutral mass."
     )
     return(0)
@@ -199,9 +196,8 @@ calculate_mass_of_m <- function(
 
   if (n_charges == 0L) {
     log_error(
-      "Invalid charge count (n_charges = 0) in adduct '",
+      "Invalid charge count (n_charges = 0) in adduct '%s'. %s",
       adduct_string,
-      "'. ",
       "Cannot calculate neutral mass."
     )
     return(0)
@@ -222,9 +218,8 @@ calculate_mass_of_m <- function(
   # Validate result
   if (is.na(neutral_mass) || !is.finite(neutral_mass)) {
     log_error(
-      "Calculated neutral mass is not finite for adduct '",
+      "Calculated neutral mass is not finite for adduct '%s' and m/z %s",
       adduct_string,
-      "' and m/z ",
       mz
     )
     return(0)
@@ -439,8 +434,10 @@ validate_mz <- function(mz) {
   # Sanity check: warn if m/z is suspiciously high
   if (mz > MAX_MASS_DALTONS) {
     log_warn(
-      "m/z value ({mz} Da) exceeds typical small molecule range ",
-      "({MAX_MASS_DALTONS} Da). Please verify this is correct."
+      "m/z value (%s Da) exceeds typical small molecule range (%s Da). %s",
+      mz,
+      MAX_MASS_DALTONS,
+      "Please verify this is correct."
     )
   }
 
@@ -473,8 +470,10 @@ validate_electron_mass <- function(electron_mass) {
   if (relative_diff > 0.01) {
     # More than 1% difference
     log_warn(
-      "electron_mass ({electron_mass}) differs from CODATA 2018 value ",
-      "({expected_value}) by {round(relative_diff * 100, 2)}%. ",
+      "electron_mass (%s) differs from CODATA 2018 value (%s) by %.2f%%. %s",
+      electron_mass,
+      expected_value,
+      relative_diff * 100,
       "Please verify this is intentional."
     )
   }

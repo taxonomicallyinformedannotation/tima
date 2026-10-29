@@ -308,8 +308,12 @@ get_organism_taxonomy_ott <- function(
     tidytable::filter(!is.na(ott_id)) |>
     tidytable::distinct(ott_id)
 
-  # Retry failed queries with genus-only names if requested
-  if (nrow(new_matched_otl_exact) != nrow(new_ott_id) && retry) {
+  # Retry failed queries with genus-only names if requested. Only names
+  # without an OTT id failed; several names may share one id (synonyms)
+  failed_names <- new_matched_otl_exact$search_string[
+    is.na(new_matched_otl_exact$ott_id)
+  ]
+  if (retry && length(failed_names) > 0L) {
     log_info("Retrying failed queries using genus names only")
 
     # Keep successfully matched results
@@ -319,17 +323,18 @@ get_organism_taxonomy_ott <- function(
     successful_ott_ids <- successful_matches |>
       tidytable::distinct(ott_id)
 
-    # Identify failed organism names
+    # Identify failed organism names, keeping their full search string so
+    # genus matches can be linked back to them
     failed_organisms <- organism_table |>
       tidytable::filter(
         !search_string %in% successful_matches$search_string
       ) |>
       tidytable::mutate(
-        search_string = .extract_genus_names(search_string)
+        genus_string = .extract_genus_names(search_string)
       )
 
     # Extract unique genus names from failures
-    genus_names <- unique(failed_organisms$search_string)
+    genus_names <- unique(failed_organisms$genus_string)
 
     log_info(
       "Retrying with %d genus names: %s %s",
@@ -354,11 +359,22 @@ get_organism_taxonomy_ott <- function(
     retry_ott_ids <- retry_matches |>
       tidytable::distinct(ott_id)
 
+    # Attach each genus match to the organisms it was retried for
+    retry_linked <- failed_organisms |>
+      tidytable::select(search_string, genus_string) |>
+      tidytable::inner_join(
+        retry_matches |>
+          tidytable::rename(genus_string = search_string),
+        by = "genus_string"
+      ) |>
+      tidytable::select(-genus_string)
+
     # Combine original and retry results
-    new_ott_id <- tidytable::bind_rows(successful_ott_ids, retry_ott_ids)
+    new_ott_id <- tidytable::bind_rows(successful_ott_ids, retry_ott_ids) |>
+      tidytable::distinct()
     new_matched_otl_exact <- tidytable::bind_rows(
-      new_matched_otl_exact,
-      retry_matches
+      successful_matches,
+      retry_linked
     )
 
     log_debug(
@@ -490,6 +506,10 @@ get_organism_taxonomy_ott <- function(
         tidytable::as_tidytable() |>
         tidytable::mutate(!!!new_cols_list)
     }
+  }
+
+  if (nrow(biological_metadata) == 0L) {
+    return(.empty_organism_taxonomy_table())
   }
 
   log_info("Got OTTaxonomy!")

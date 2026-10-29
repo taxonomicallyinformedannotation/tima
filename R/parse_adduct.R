@@ -248,7 +248,7 @@ match_adduct_regex <- function(adduct_string, regex) {
     },
     error = function(e) {
       log_error(
-        "Regex matching failed: ",
+        "Regex matching failed: %s",
         conditionMessage(e)
       )
       NULL

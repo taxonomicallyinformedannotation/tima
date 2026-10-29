@@ -10,15 +10,16 @@
 #' @param features_table Long-format table with columns:
 #'   feature_id, sample, mz, rt, and intensity columns
 #' @param tolerance_rt RT tolerance in minutes for grouping features
-#' @param correlation_p_threshold P-value threshold for Pearson correlation
-#'   (default 0.05). Only correlations with p < threshold and correlation > 0
-#'   are retained.
+#' @param correlation_p_threshold False discovery rate threshold (default
+#'   0.05). P-values of all pairs tested are Benjamini-Hochberg adjusted; only
+#'   pairs with correlation > 0 and adjusted p < threshold are retained.
 #'
 #' @return Data frame with columns:
 #'   - feature_id: anchor feature
 #'   - feature_id_dest: target feature
 #'   - correlation: Pearson correlation coefficient (positive only)
-#'   - p_value: P-value from correlation test
+#'   - p_value: Benjamini-Hochberg adjusted p-value
+#'   - p_value_raw: Unadjusted p-value from the correlation test
 #'   - n_samples: Number of sample pairs used
 #'   - source: "intensity_covariance" (for consistency with other edge types)
 #'
@@ -30,14 +31,7 @@ compute_intensity_covariance_edges <- function(
   correlation_p_threshold = 0.05
 ) {
   if (nrow(features_table) == 0L) {
-    return(tidytable::tidytable(
-      feature_id = character(),
-      feature_id_dest = character(),
-      correlation = numeric(),
-      p_value = numeric(),
-      n_samples = integer(),
-      source = character()
-    ))
+    return(.empty_covariance_edges())
   }
 
   # Identify intensity columns: look for 'intensity_all' (unfiltered) or 'intensity' (filtered)
@@ -49,14 +43,7 @@ compute_intensity_covariance_edges <- function(
       "No %s column found in features_table. Skipping intensity co-variance edges.",
       intensity_col
     )
-    return(tidytable::tidytable(
-      feature_id = character(),
-      feature_id_dest = character(),
-      correlation = numeric(),
-      p_value = numeric(),
-      n_samples = integer(),
-      source = character()
-    ))
+    return(.empty_covariance_edges())
   }
 
   log_debug(
@@ -79,14 +66,7 @@ compute_intensity_covariance_edges <- function(
       "Intensity co-variance: tested 0 pair(s), 0 significant edge(s) retained (p < %.2f)",
       correlation_p_threshold
     )
-    return(tidytable::tidytable(
-      feature_id = character(),
-      feature_id_dest = character(),
-      correlation = numeric(),
-      p_value = numeric(),
-      n_samples = integer(),
-      source = character()
-    ))
+    return(.empty_covariance_edges())
   }
 
   # Generate pairs efficiently using vectorized window lookup
@@ -126,14 +106,7 @@ compute_intensity_covariance_edges <- function(
       "Intensity co-variance: tested 0 pair(s), 0 significant edge(s) retained (p < %.2f)",
       correlation_p_threshold
     )
-    return(tidytable::tidytable(
-      feature_id = character(),
-      feature_id_dest = character(),
-      correlation = numeric(),
-      p_value = numeric(),
-      n_samples = integer(),
-      source = character()
-    ))
+    return(.empty_covariance_edges())
   }
 
   # Extract intensity_all lists - one per feature (they're duplicated per sample row)
@@ -146,14 +119,7 @@ compute_intensity_covariance_edges <- function(
     log_info(
       "Intensity co-variance: no features with intensity data. Skipping covariance edges."
     )
-    return(tidytable::tidytable(
-      feature_id = character(),
-      feature_id_dest = character(),
-      correlation = numeric(),
-      p_value = numeric(),
-      n_samples = integer(),
-      source = character()
-    ))
+    return(.empty_covariance_edges())
   }
 
   # Convert to a named list for fast lookups
@@ -182,34 +148,25 @@ compute_intensity_covariance_edges <- function(
     length(intensity_vectors)
   )
 
-  # Apply correlation computation to all pairs with diagnostic tracking
+  # Test every pair, then correct the p-values for multiple testing.
   # Counters live in an environment so the per-pair closure can update them
   drops <- new.env(parent = emptyenv())
   drops$n_not_in_matrix <- 0L
+  drops$n_length_mismatch <- 0L
   drops$n_insufficient_samples <- 0L
   drops$n_correlation_failed <- 0L
-  drops$n_non_positive <- 0L
-  drops$n_not_significant <- 0L
 
-  compute_pair_correlations <- function(pair_row) {
-    feat_id <- pair_row$feature_id[[1L]]
-    other_id <- pair_row$feature_id_dest[[1L]]
-
-    # Get intensity vectors
-    if (
-      !(feat_id %in% names(intensity_vectors)) ||
-        !(other_id %in% names(intensity_vectors))
-    ) {
+  test_pair <- function(feat_id, other_id) {
+    int_x <- intensity_vectors[[feat_id]]
+    int_y <- intensity_vectors[[other_id]]
+    if (is.null(int_x) || is.null(int_y)) {
       drops$n_not_in_matrix <- drops$n_not_in_matrix + 1L
       return(NULL)
     }
 
-    int_x <- intensity_vectors[[feat_id]]
-    int_y <- intensity_vectors[[other_id]]
-
     # Both vectors must have same length (same sample ordering)
     if (length(int_x) != length(int_y)) {
-      drops$n_insufficient_samples <- drops$n_insufficient_samples + 1L
+      drops$n_length_mismatch <- drops$n_length_mismatch + 1L
       return(NULL)
     }
 
@@ -223,116 +180,97 @@ compute_intensity_covariance_edges <- function(
       return(NULL)
     }
 
-    x_valid <- int_x[valid_idx]
-    y_valid <- int_y[valid_idx]
-
-    # Compute Pearson correlation and p-value
-    cor_result <- tryCatch(
-      {
-        cor_test <- stats::cor.test(x_valid, y_valid, method = "pearson")
-        list(
-          correlation = as.numeric(cor_test$estimate),
-          p_value = as.numeric(cor_test$p.value),
-          n_samples = n_valid
-        )
-      },
-      error = function(e) {
-        NULL
-      }
+    cor_test <- tryCatch(
+      suppressWarnings(stats::cor.test(
+        int_x[valid_idx],
+        int_y[valid_idx],
+        method = "pearson"
+      )),
+      error = function(e) NULL
     )
-
-    if (is.null(cor_result) || is.na(cor_result$p_value)) {
+    if (is.null(cor_test) || is.na(cor_test$p.value)) {
       drops$n_correlation_failed <- drops$n_correlation_failed + 1L
       return(NULL)
     }
 
-    if (cor_result$correlation <= 0) {
-      drops$n_non_positive <- drops$n_non_positive + 1L
-      return(NULL)
-    }
-
-    if (cor_result$p_value < correlation_p_threshold) {
-      tidytable::tidytable(
-        feature_id = feat_id,
-        feature_id_dest = other_id,
-        correlation = cor_result$correlation,
-        p_value = cor_result$p_value,
-        n_samples = cor_result$n_samples
-      )
-    } else {
-      drops$n_not_significant <- drops$n_not_significant + 1L
-      NULL
-    }
+    c(
+      correlation = as.numeric(cor_test$estimate),
+      p_value_raw = as.numeric(cor_test$p.value),
+      n_samples = n_valid
+    )
   }
 
-  # Apply correlation computation to all pairs
-  results_list <- lapply(
-    seq_len(nrow(feature_pairs)),
-    function(i) {
-      compute_pair_correlations(feature_pairs[i, ])
-    }
+  tested <- Map(
+    test_pair,
+    feature_pairs$feature_id,
+    feature_pairs$feature_id_dest
   )
+  keep <- !vapply(tested, is.null, logical(1L))
+  stats_mat <- do.call(rbind, tested[keep])
 
+  n_pairs_tested <- nrow(feature_pairs)
+  n_tests <- sum(keep)
   n_not_in_matrix <- drops$n_not_in_matrix
+  n_length_mismatch <- drops$n_length_mismatch
   n_insufficient_samples <- drops$n_insufficient_samples
   n_correlation_failed <- drops$n_correlation_failed
-  n_non_positive <- drops$n_non_positive
-  n_not_significant <- drops$n_not_significant
   rm(drops)
 
-  # Filter NULLs and bind results
-  results_list <- Filter(Negate(is.null), results_list)
-  n_pairs_tested <- nrow(feature_pairs)
-  n_significant <- length(results_list)
-
-  if (length(results_list) == 0L) {
-    log_info(
-      "Intensity co-variance: tested %d pair(s), %d significant edge(s) retained (p < %.2f). Dropped: %d not in matrix, %d insufficient samples, %d correlation failed, %d non-positive, %d p >= %.2f",
-      n_pairs_tested,
-      n_significant,
-      correlation_p_threshold,
-      n_not_in_matrix,
-      n_insufficient_samples,
-      n_correlation_failed,
-      n_non_positive,
-      n_not_significant,
-      correlation_p_threshold
-    )
-    return(tidytable::tidytable(
-      feature_id = character(),
-      feature_id_dest = character(),
-      correlation = numeric(),
-      p_value = numeric(),
-      n_samples = integer(),
-      source = character()
-    ))
+  result <- if (n_tests == 0L) {
+    .empty_covariance_edges()
+  } else {
+    tidytable::tidytable(
+      feature_id = feature_pairs$feature_id[keep],
+      feature_id_dest = feature_pairs$feature_id_dest[keep],
+      correlation = stats_mat[, "correlation"],
+      p_value_raw = stats_mat[, "p_value_raw"],
+      n_samples = as.integer(stats_mat[, "n_samples"])
+    ) |>
+      # Benjamini-Hochberg over every test performed (positive or not), so the
+      # threshold controls the false discovery rate of the retained edges
+      tidytable::mutate(
+        p_value = stats::p.adjust(p_value_raw, method = "BH")
+      )
   }
 
-  result <- tidytable::bind_rows(results_list) |>
-    tidytable::mutate(source = "intensity_covariance")
+  n_non_positive <- sum(result$correlation <= 0)
+  n_not_significant <- sum(
+    result$correlation > 0 & result$p_value >= correlation_p_threshold
+  )
+  result <- result |>
+    tidytable::filter(
+      correlation > 0 & p_value < correlation_p_threshold
+    ) |>
+    tidytable::mutate(source = "intensity_covariance") |>
+    tidytable::select(
+      feature_id,
+      feature_id_dest,
+      correlation,
+      p_value,
+      p_value_raw,
+      n_samples,
+      source
+    )
 
+  r_summary <- if (nrow(result) > 0L) {
+    sprintf(
+      "; r in [%.2f, %.2f], median r = %.2f",
+      min(result$correlation),
+      max(result$correlation),
+      stats::median(result$correlation)
+    )
+  } else {
+    ""
+  }
   log_info(
-    "Intensity co-variance: tested %d pair(s), retained %d significant edge(s) (p < %.2f); r in [%.2f, %.2f], median r = %.2f. Dropped: %d not in matrix, %d insufficient samples, %d correlation failed, %d non-positive, %d p >= %.2f",
+    "Intensity co-variance: tested %d of %d pair(s), retained %d edge(s) (BH-adjusted p < %.2f)%s. Dropped: %d not in matrix, %d sample-count mismatch, %d insufficient samples, %d correlation failed, %d non-positive, %d adjusted p >= %.2f",
+    n_tests,
     n_pairs_tested,
     nrow(result),
     correlation_p_threshold,
-    min(result$correlation, na.rm = TRUE),
-    max(result$correlation, na.rm = TRUE),
-    stats::median(result$correlation, na.rm = TRUE),
+    r_summary,
     n_not_in_matrix,
-    n_insufficient_samples,
-    n_correlation_failed,
-    n_non_positive,
-    n_not_significant,
-    correlation_p_threshold
-  )
-
-  rm(
-    results_list,
-    feature_pairs,
-    n_pairs_tested,
-    n_significant,
-    n_not_in_matrix,
+    n_length_mismatch,
     n_insufficient_samples,
     n_correlation_failed,
     n_non_positive,
@@ -341,4 +279,19 @@ compute_intensity_covariance_edges <- function(
   )
 
   result
+}
+
+#' Empty covariance edges table with the output column types
+#' @keywords internal
+#' @noRd
+.empty_covariance_edges <- function() {
+  tidytable::tidytable(
+    feature_id = character(),
+    feature_id_dest = character(),
+    correlation = numeric(),
+    p_value = numeric(),
+    p_value_raw = numeric(),
+    n_samples = integer(),
+    source = character()
+  )
 }

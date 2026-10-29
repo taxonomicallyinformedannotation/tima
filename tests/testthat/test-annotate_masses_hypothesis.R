@@ -233,3 +233,111 @@ test_that("prune_candidates_by_network_consensus keeps all when no adduct edges"
   # Without support, all candidates stay (no candidate is strictly better)
   expect_gte(nrow(result), 1L)
 })
+
+# match_candidates_to_library: either-tolerance rule ----
+
+.match_case <- function(exact, observed, ppm = 10, dalton = 0.0025) {
+  candidates <- tidytable::tidytable(
+    feature_id = paste0("f", seq_along(observed)),
+    rt = 1,
+    mz = observed + 1.007276,
+    adduct = "[M+H]+",
+    mass = observed,
+    source = "test",
+    adduct_support = 0L
+  )
+  # Wide library window so only the post-filter decides
+  library_em <- tidytable::tidytable(
+    exact_mass = exact,
+    value_min = exact - 0.05,
+    value_max = exact + 0.05
+  )
+  match_candidates_to_library(
+    candidates = candidates,
+    library_em = library_em,
+    tolerance_ppm = ppm,
+    tolerance_dalton = dalton
+  )
+}
+
+test_that("a match within the Da floor is kept at low mass even beyond ppm", {
+  # 2 mDa at M = 100 is 20 ppm: fails 10 ppm, passes 2.5 mDa
+  kept <- .match_case(exact = 100, observed = 100.002)
+  expect_identical(nrow(kept), 1L)
+  expect_equal(kept$error_mz, -0.002, tolerance = 1e-9)
+
+  # 3 mDa at M = 100 is 30 ppm: fails both
+  expect_identical(nrow(.match_case(exact = 100, observed = 100.003)), 0L)
+})
+
+test_that("a match within ppm is kept at high mass even beyond the Da floor", {
+  # 4 mDa at M = 500 is 8 ppm: fails 2.5 mDa, passes 10 ppm
+  expect_identical(nrow(.match_case(exact = 500, observed = 500.004)), 1L)
+  # 6 mDa at M = 500 is 12 ppm: fails both
+  expect_identical(nrow(.match_case(exact = 500, observed = 500.006)), 0L)
+})
+
+test_that("the ppm error is relative to the library exact mass", {
+  # 10 ppm of 500 = 5 mDa; of 500.005 it would be 5.00005 mDa
+  at_edge <- .match_case(
+    exact = 500,
+    observed = 500 + 500 * 10e-6 * (1 - 1e-9),
+    dalton = NULL
+  )
+  beyond <- .match_case(
+    exact = 500,
+    observed = 500 + 500 * 10e-6 * (1 + 1e-6),
+    dalton = NULL
+  )
+  expect_identical(nrow(at_edge), 1L)
+  expect_identical(nrow(beyond), 0L)
+})
+
+test_that("a single tolerance alone decides when the other is missing", {
+  # ppm only: the Da floor no longer rescues the low-mass match
+  expect_identical(
+    nrow(.match_case(exact = 100, observed = 100.002, dalton = NULL)),
+    0L
+  )
+  # Da only: the high-mass ppm match is lost
+  expect_identical(
+    nrow(.match_case(exact = 500, observed = 500.004, ppm = NULL)),
+    0L
+  )
+  # neither: the library window alone decides
+  expect_identical(
+    nrow(.match_case(
+      exact = 500,
+      observed = 500.04,
+      ppm = NULL,
+      dalton = NULL
+    )),
+    1L
+  )
+})
+
+test_that("each candidate matches every library mass within tolerance", {
+  candidates <- tidytable::tidytable(
+    feature_id = "f1",
+    rt = 1,
+    mz = 101.007276,
+    adduct = "[M+H]+",
+    mass = 100,
+    source = "test",
+    adduct_support = 0L
+  )
+  library_em <- tidytable::tidytable(
+    exact_mass = c(99.999, 100.001, 100.1),
+    value_min = c(99.999, 100.001, 100.1) - 0.05,
+    value_max = c(99.999, 100.001, 100.1) + 0.05
+  )
+  matched <- match_candidates_to_library(
+    candidates,
+    library_em,
+    tolerance_ppm = 10,
+    tolerance_dalton = 0.0025
+  )
+  expect_setequal(matched$structure_exact_mass, c(99.999, 100.001))
+  expect_false(any(matched$is_preassigned))
+  expect_true(all(matched$candidate_adduct_origin == "supported"))
+})

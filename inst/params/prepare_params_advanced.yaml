@@ -666,8 +666,9 @@ ms:
 
     #' For intensity co-variance correlation p-value.
     correlation:
-      #' P-value threshold for Pearson correlation in intensity co-variance discovery. FLOAT
-      #' Co-varying adduct neighbors (positive correlation, p below this value,
+      #' False discovery rate threshold (Benjamini-Hochberg adjusted p-value) for
+      #' Pearson correlation in intensity co-variance discovery. FLOAT
+      #' Co-varying adduct neighbors (positive correlation, adjusted p below this value,
       #' >= 3 shared samples) count twice as adduct support. Pairs that fail
       #' are kept, so single-sample runs are unaffected.
       p_value: 0.05

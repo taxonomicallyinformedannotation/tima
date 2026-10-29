@@ -225,8 +225,7 @@ build_universe_transition_tables <- function(universe) {
     ))
   }
 
-  pair_idx <- t(utils::combn(seq_len(nrow(lookup)), 2L))
-  if (is.null(dim(pair_idx)) || nrow(pair_idx) == 0L) {
+  if (nrow(lookup) < 2L) {
     return(list(
       adduct_diffs = tidytable::tidytable(
         Distance = numeric(),
@@ -248,8 +247,16 @@ build_universe_transition_tables <- function(universe) {
     ))
   }
 
+  pair_idx <- t(utils::combn(seq_len(nrow(lookup)), 2L))
   left_idx <- pair_idx[, 1L]
   right_idx <- pair_idx[, 2L]
+  # Orient every pair lighter -> heavier; the lookup is sorted by name, not
+  # by mass, so either member of a combn() pair may be the heavier one
+  swap <- lookup$mz_offset[left_idx] > lookup$mz_offset[right_idx]
+  swap[is.na(swap)] <- FALSE
+  left_tmp <- left_idx
+  left_idx[swap] <- right_idx[swap]
+  right_idx[swap] <- left_tmp[swap]
   left_rows <- lookup[left_idx, , drop = FALSE]
   right_rows <- lookup[right_idx, , drop = FALSE]
 

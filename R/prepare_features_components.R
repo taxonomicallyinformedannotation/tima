@@ -126,7 +126,8 @@ prepare_features_components <- function(
     )
   } else {
     log_debug(
-      "Loaded {format_count(nrow(table))} component assignments"
+      "Loaded %s component assignments",
+      format_count(nrow(table))
     )
 
     # Standardize column names and select relevant columns

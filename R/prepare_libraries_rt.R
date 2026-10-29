@@ -293,9 +293,8 @@ prepare_libraries_rt <- function(
 
     if (missing_n2 > 0L) {
       log_warn(
-        "There were still ",
-        missing_n2,
-        " entries for which no InChIKey could not be found in the end."
+        "There were still %d entries for which no InChIKey could be found.",
+        missing_n2
       )
     }
 
