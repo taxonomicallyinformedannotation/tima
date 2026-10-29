@@ -264,7 +264,7 @@ test_that("read_from_sirius_zip is reasonably fast", {
   })
 
   # Should complete quickly (< 2 seconds)
-  expect_true(elapsed["elapsed"] < 2.0)
+  expect_fast(elapsed["elapsed"], 2.0)
 })
 
 # Integration Tests ----

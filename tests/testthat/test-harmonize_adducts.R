@@ -406,7 +406,7 @@ test_that("harmonize_adducts is reasonably fast", {
   ))
 
   # Should complete reasonably quickly without persistent caching
-  expect_lt(timing["elapsed"], 1.0)
+  expect_fast(timing["elapsed"], 1.0)
 })
 
 test_that("harmonize_adducts canonicalizes forbidden/canceling adduct forms", {

@@ -142,15 +142,15 @@ test_that("formatters are fast", {
   skip_on_cran()
   # format_count should be fast
   timing <- system.time(format_count(rep(12345, 1000L)))
-  expect_lt(timing["elapsed"], 0.1)
+  expect_fast(timing["elapsed"], 0.1)
 
   # format_bytes should be fast
   timing <- system.time(format_bytes(rep(1024^2, 1000L)))
-  expect_lt(timing["elapsed"], 0.1)
+  expect_fast(timing["elapsed"], 0.1)
 
   # format_time should be fast
   timing <- system.time(format_time(rep(65.5, 1000L)))
-  expect_lt(timing["elapsed"], 0.1)
+  expect_fast(timing["elapsed"], 0.1)
 })
 
 test_that("setup_logger validates filename parameter", {

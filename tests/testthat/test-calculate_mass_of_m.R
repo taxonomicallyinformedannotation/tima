@@ -379,7 +379,8 @@ test_that("calculate_mass_of_m is fast for batch processing", {
   )
   elapsed <- as.numeric(Sys.time() - start_time, units = "secs")
 
-  expect_true(elapsed < 1.0)
+  # ~1 s for 1000 calls on a laptop
+  expect_fast(elapsed, 1)
   expect_equal(length(masses), 1000)
 })
 

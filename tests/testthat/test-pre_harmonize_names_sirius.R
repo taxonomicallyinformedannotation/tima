@@ -249,7 +249,7 @@ test_that("pre_harmonize_names_sirius is reasonably fast", {
   ))
 
   # Should be very fast
-  expect_lt(timing["elapsed"], 0.05)
+  expect_fast(timing["elapsed"], 0.05)
 })
 
 test_that("pre_harmonize_names_sirius handles large vectors efficiently", {

@@ -360,7 +360,7 @@ test_that("sanitize_spectra is reasonably fast", {
   timing <- system.time(sanitize_spectra(spectra))
 
   # Should complete in reasonable time (<1 second for 10 spectra)
-  expect_lt(timing["elapsed"], 1.0)
+  expect_fast(timing["elapsed"], 1.0)
 })
 
 ## Integration Tests ----

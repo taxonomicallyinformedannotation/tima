@@ -143,6 +143,6 @@ test_that("decoration functions are fast", {
   end_time <- Sys.time()
 
   # Should be fast (<1 second for 1000 rows)
-  expect_lt(as.numeric(difftime(end_time, start_time, units = "secs")), 1.0)
+  expect_fast(difftime(end_time, start_time, units = "secs"), 1.0)
   expect_identical(result, large_df)
 })

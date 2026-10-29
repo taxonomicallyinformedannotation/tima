@@ -241,3 +241,65 @@ test_that("get_compounds_xrefs errors on invalid props", {
     class = "tima_validation_error"
   )
 })
+
+## Truncated QLever response (offline, mocked) ----
+
+.mock_xrefs_network <- function(qlever_csv, env = parent.frame()) {
+  local_mocked_bindings(
+    fromJSON = function(...) {
+      list(chebi = list(wikidata.property = list(prefix = "P683")))
+    },
+    .package = "jsonlite",
+    .env = env
+  )
+  local_mocked_bindings(
+    req_perform = function(req, ...) structure(list(), class = "mock_resp"),
+    resp_status = function(resp) 200L,
+    resp_body_json = function(resp, ...) list(banana = "CHEBI"),
+    resp_body_string = function(resp, ...) qlever_csv,
+    .package = "httr2",
+    .env = env
+  )
+}
+
+.qlever_header <- "item,inchikey,db,id"
+.qlever_row <- paste0(
+  "http://www.wikidata.org/entity/Q1,",
+  "BSYNRYMUTXBXSQ-UHFFFAOYSA-N,",
+  "http://www.wikidata.org/prop/direct/P683,",
+  "15365"
+)
+
+test_that("get_compounds_xrefs keeps the cache when QLever's response is truncated", {
+  output_file <- temp_test_path("xrefs_truncated.tsv.gz")
+  cached <- tidytable::tidytable(inchikey = "CACHED", prefix = "x", id = "1")
+  export_output(x = cached, file = output_file)
+  before <- tidytable::fread(output_file)
+
+  # Cut off mid-IRI, as observed on CI
+  .mock_xrefs_network(
+    paste(
+      .qlever_header,
+      .qlever_row,
+      .qlever_row,
+      "http://www.wikidata.org/enti",
+      sep = "\n"
+    )
+  )
+
+  expect_no_warning(
+    get_compounds_xrefs(props = "P683", output = output_file, max_age_hours = 0)
+  )
+  expect_equal(tidytable::fread(output_file), before)
+})
+
+test_that("get_compounds_xrefs writes a complete QLever response", {
+  output_file <- temp_test_path("xrefs_complete.tsv.gz")
+  .mock_xrefs_network(paste(.qlever_header, .qlever_row, sep = "\n"))
+
+  get_compounds_xrefs(props = "P683", output = output_file, max_age_hours = 0)
+
+  out <- tidytable::fread(output_file)
+  expect_setequal(out$prefix, c("CHEBI", "wikidata"))
+  expect_true(all(out$inchikey == "BSYNRYMUTXBXSQ"))
+})

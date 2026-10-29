@@ -660,7 +660,7 @@ test_that("parse_adduct is reasonably fast", {
   ))
 
   # Should parse in microseconds
-  expect_lt(timing["elapsed"], 0.5)
+  expect_fast(timing["elapsed"], 0.5)
 })
 
 test_that("parse_adduct works via apply", {

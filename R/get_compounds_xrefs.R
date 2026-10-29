@@ -104,11 +104,13 @@ get_compounds_xrefs <- function(
   ctx <- log_operation("get_compounds_xrefs")
 
   # ── 1. Load bioregistry & match props to entry keys ────────────────────────
+  # A failed download warns before it errors; the failure is logged by
+  # .fallback_output() below, so the warning would only duplicate it
   bioregistry_json <- tryCatch(
-    jsonlite::fromJSON(
+    suppressWarnings(jsonlite::fromJSON(
       bioregistry_url,
       simplifyVector = FALSE
-    ),
+    )),
     error = function(...) NULL
   )
 
@@ -220,14 +222,30 @@ SELECT ?item ?inchikey ?db ?id WHERE {
         httr2::req_error(is_error = \(r) httr2::resp_status(r) >= 400L) |>
         httr2::req_perform()
 
-      tidytable::fread(httr2::resp_body_string(resp_qlever))
+      # A response cut off mid-stream still parses up to the broken line,
+      # with only a warning ("Stopped early", "Discarded single-line
+      # footer"): treat any parse warning as a failure rather than caching an
+      # incomplete table
+      parse <- new.env(parent = emptyenv())
+      parse$warnings <- character()
+      parsed <- withCallingHandlers(
+        tidytable::fread(httr2::resp_body_string(resp_qlever)),
+        warning = function(w) {
+          parse$warnings <- c(parse$warnings, conditionMessage(w))
+          invokeRestart("muffleWarning")
+        }
+      )
+      if (length(parse$warnings) > 0L) {
+        stop("incomplete QLever response: ", parse$warnings[[1L]])
+      }
+      parsed
     },
     error = function(...) NULL
   )
 
   if (is.null(raw)) {
     return(.fallback_output(
-      "QLever request failed (possibly transient upstream error)"
+      "QLever request failed or returned a truncated response (possibly transient upstream error)"
     ))
   }
 
