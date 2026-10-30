@@ -677,7 +677,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   method,
   ms2_tolerance,
   ppm_tolerance,
-  threshold = NULL,
+  threshold = 0.1,
   matched_peaks = NULL,
   assume_sanitized = FALSE
 )
@@ -739,7 +739,7 @@ PPM tolerance
 <code id="threshold">threshold</code>
 </td>
 <td>
-Minimum similarity score threshold. Set to <code>NULL</code> to disable similarity thresholding and retain all pairwise comparisons.
+Minimum similarity score threshold (default: <code>0.1</code>). Pairs with similarity scores below this threshold are discarded to filter out random background noise and prevent memory overflow. Set to <code>NULL</code> to disable similarity thresholding and retain all pairwise comparisons.
 </td>
 </tr>
 <tr>
