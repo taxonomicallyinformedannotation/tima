@@ -11,7 +11,7 @@ create_edges(
   method,
   ms2_tolerance,
   ppm_tolerance,
-  threshold = NULL,
+  threshold = 0.1,
   matched_peaks = NULL,
   assume_sanitized = FALSE
 )
@@ -29,8 +29,10 @@ create_edges(
 
 \item{ppm_tolerance}{PPM tolerance}
 
-\item{threshold}{Minimum similarity score threshold. Set to \code{NULL} to disable
-similarity thresholding and retain all pairwise comparisons.}
+\item{threshold}{Minimum similarity score threshold (default: \code{0.1}).
+Pairs with similarity scores below this threshold are discarded to filter
+out random background noise and prevent memory overflow. Set to \code{NULL}
+to disable similarity thresholding and retain all pairwise comparisons.}
 
 \item{matched_peaks}{Minimum number of matched peaks required. Set to \code{NULL}
 to disable matched-peak filtering.}

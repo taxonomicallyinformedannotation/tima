@@ -10,6 +10,7 @@ Averick
 BMDB
 Backoff
 Barret
+Behaviour
 Benchmarking
 Bengtsson
 BiGG
@@ -22,6 +23,7 @@ CFM
 CLI
 CMD
 CODATA
+CPM
 CRC
 CSF
 CSI
@@ -48,7 +50,6 @@ Dounoue
 ECMDB
 Enveda
 FBMN
-FBMN’
 FingerID
 FingerId
 Friedrich
@@ -64,6 +65,7 @@ Hadley
 Horvát
 Httr
 ISDB
+IUPAC
 Iannone
 Igraph
 InChI
@@ -73,6 +75,7 @@ InterJournal
 JJ
 Jeroen
 Jonge
+Kalinowski
 Kirill
 Knitr
 Kubo
@@ -83,6 +86,7 @@ Louvain
 MCC
 MCDB
 MGF
+MGFs
 MSI
 MSP
 MSnLib
@@ -111,6 +115,7 @@ NPClassifier
 NaCl
 Nepusz
 NormanSusDat
+OBO
 ORCID
 OTT
 Ollivier
@@ -121,6 +126,7 @@ PEPMASS
 PFAS
 POSIXct
 Param
+Passthrough
 Peng
 Pre
 Preprint
@@ -134,7 +140,6 @@ Rainer
 Redelings
 Riederer
 SDF
-SIRIUS’
 SME
 SMF
 SML
@@ -160,6 +165,7 @@ Tamás
 Taxonomically
 Thom
 Tidytable
+Tomasz
 Traag
 UHFFFAOYSA
 UO
@@ -200,6 +206,7 @@ csi
 csv
 cumsum
 dalton
+daltons
 de
 deduplication
 denovo
@@ -207,6 +214,7 @@ deprotonated
 deprotonation
 deprotonations
 dest
+deterministically
 df
 dimerize
 dimerizes
@@ -215,6 +223,7 @@ docopt
 doi
 dp
 dr
+equi
 et
 etabolite
 exposomics
@@ -238,6 +247,7 @@ gzip
 https
 httr
 igraph
+igraph's
 inbo
 inborutils
 inchikey
@@ -268,6 +278,7 @@ metabolomics
 metaregistry
 mgf
 modelled
+modularity
 monocharged
 monoisotopic
 msentropy
@@ -280,6 +291,7 @@ multimers
 multisets
 mz
 mzML
+mzMine
 mzTab
 mzmine
 mzt
@@ -289,12 +301,15 @@ nnotation
 oligomer
 onwards
 opti
+optimises
+ott
 overexpansion
 parallelization
 param
 params
 parens
 parseable
+passthrough
 pblapply
 pbmclapply
 pkgload
@@ -348,6 +363,7 @@ tl
 trinomial
 tsv
 unanchored
+unmanaged
 unmapped
 unparseable
 untargeted

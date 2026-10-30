@@ -19,8 +19,10 @@
 #' @param method Similarity method ("entropy", "gnps", or "cosine")
 #' @param ms2_tolerance MS2 tolerance in Daltons
 #' @param ppm_tolerance PPM tolerance
-#' @param threshold Minimum similarity score threshold. Set to `NULL` to disable
-#'     similarity thresholding and retain all pairwise comparisons.
+#' @param threshold Minimum similarity score threshold (default: \code{0.1}).
+#'     Pairs with similarity scores below this threshold are discarded to filter
+#'     out random background noise and prevent memory overflow. Set to `NULL`
+#'     to disable similarity thresholding and retain all pairwise comparisons.
 #' @param matched_peaks Minimum number of matched peaks required. Set to `NULL`
 #'     to disable matched-peak filtering.
 #' @param assume_sanitized Boolean flag to assume if sanitize or not. FALSE
@@ -52,7 +54,7 @@ create_edges <- function(
   method,
   ms2_tolerance,
   ppm_tolerance,
-  threshold = NULL,
+  threshold = 0.1,
   matched_peaks = NULL,
   assume_sanitized = FALSE
 ) {
