@@ -44,7 +44,7 @@
 #'   ms2_tolerance = 0.02,
 #'   ppm_tolerance = 10,
 #'   threshold = 0.7,
-#'   matched_peaks = 6
+#'   matched_peaks = 6L
 #' )
 #' }
 create_edges <- function(
@@ -55,7 +55,7 @@ create_edges <- function(
   ms2_tolerance,
   ppm_tolerance,
   threshold = 0.1,
-  matched_peaks = NULL,
+  matched_peaks = 1L,
   assume_sanitized = FALSE
 ) {
   empty_result <- tidytable::tidytable(
