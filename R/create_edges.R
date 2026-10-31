@@ -130,16 +130,18 @@ create_edges <- function(
   }
 
   # Lazy sanitize-once state: avoid scanning/sanitizing all spectra upfront.
-  checked_sanitization <- rep(FALSE, nspecs)
-  sanitized_indices <- logical(nspecs)
+  state <- new.env(parent = emptyenv())
+  state$frags <- frags
+  state$checked_sanitization <- rep(FALSE, nspecs)
+  state$sanitized_indices <- logical(nspecs)
   if (isTRUE(assume_sanitized)) {
-    checked_sanitization <- rep(TRUE, nspecs)
-    sanitized_indices <- rep(TRUE, nspecs)
+    state$checked_sanitization <- rep(TRUE, nspecs)
+    state$sanitized_indices <- rep(TRUE, nspecs)
   }
 
   ensure_spectrum_ready <- function(idx) {
-    if (!checked_sanitization[[idx]]) {
-      sp <- frags[[idx]]
+    if (!state$checked_sanitization[[idx]]) {
+      sp <- state$frags[[idx]]
       if (
         is.matrix(sp) &&
           nrow(sp) >= 2L &&
@@ -149,16 +151,16 @@ create_edges <- function(
             ppm = ppm_tolerance
           )
       ) {
-        frags[[idx]] <<- sanitize_spectrum_matrix(
+        state$frags[[idx]] <- sanitize_spectrum_matrix(
           sp,
           tolerance = ms2_tolerance,
           ppm = ppm_tolerance
         )
-        sanitized_indices[[idx]] <<- TRUE
+        state$sanitized_indices[[idx]] <- TRUE
       }
-      checked_sanitization[[idx]] <<- TRUE
+      state$checked_sanitization[[idx]] <- TRUE
     }
-    frags[[idx]]
+    state$frags[[idx]]
   }
 
   # Calculate Pairwise Similarities ----
@@ -169,18 +171,18 @@ create_edges <- function(
   log_metadata(ctx, phase = "calculating", n_comparisons = n_comparisons)
 
   # Score histogram bins (accumulated across all queries)
-  bin_counts <- integer(10L)
+  state$bin_counts <- integer(10L)
   use_gnps <- (method == "gnps")
-  progress_counter <- 0L
+  state$progress_counter <- 0L
 
   results <- lapply(seq_len(n_queries), function(i) {
-    progress_counter <<- progress_counter + 1L
-    if (progress_counter %% 500L == 0L) {
-      log_info("Processed %d / %d queries", progress_counter, n_queries)
+    state$progress_counter <- state$progress_counter + 1L
+    if (state$progress_counter %% 500L == 0L) {
+      log_info("Processed %d / %d queries", state$progress_counter, n_queries)
     }
 
     q_sp <- if (isTRUE(assume_sanitized)) {
-      frags[[i]]
+      state$frags[[i]]
     } else {
       ensure_spectrum_ready(i)
     }
@@ -190,7 +192,7 @@ create_edges <- function(
     # Build list of target matrices and precursor vector (avoid function calls if already sanitized)
     if (length(targets) > 0L) {
       if (isTRUE(assume_sanitized)) {
-        y_list <- frags[targets]
+        y_list <- state$frags[targets]
       } else {
         y_list <- lapply(targets, function(j) ensure_spectrum_ready(j))
       }
@@ -219,7 +221,7 @@ create_edges <- function(
       finite_sc <- is.finite(sc_vec)
       if (any(finite_sc)) {
         bins <- pmin(9L, pmax(0L, as.integer(sc_vec[finite_sc] * 10)))
-        bin_counts <<- bin_counts + tabulate(bins + 1L, nbins = 10L)
+        state$bin_counts <- state$bin_counts + tabulate(bins + 1L, nbins = 10L)
       }
 
       keep <- rep(TRUE, length(targets))
@@ -278,7 +280,7 @@ create_edges <- function(
       finite_sc <- is.finite(sc_vec)
       if (any(finite_sc)) {
         bins <- pmin(9L, pmax(0L, as.integer(sc_vec[finite_sc] * 10)))
-        bin_counts <<- bin_counts + tabulate(bins + 1L, nbins = 10L)
+        state$bin_counts <- state$bin_counts + tabulate(bins + 1L, nbins = 10L)
       }
 
       keep <- rep(TRUE, length(targets))
@@ -303,6 +305,7 @@ create_edges <- function(
     }
   })
 
+  sanitized_indices <- state$sanitized_indices
   if (any(sanitized_indices)) {
     log_warn(
       "Sanitized %d/%d spectra on-demand before edge scoring.",
@@ -324,6 +327,7 @@ create_edges <- function(
     "(0.8,0.9]",
     "(0.9,1]"
   )
+  bin_counts <- state$bin_counts
   names(bin_counts) <- bin_labels
   log_similarity_distribution_counts(
     counts = bin_counts,
@@ -336,7 +340,7 @@ create_edges <- function(
   if (length(results) > 0L) {
     # results are now tidytable objects with named columns
     result <- tidytable::bind_rows(results)
-    rm(results, bin_counts, bin_labels, sanitized_indices, nspecs)
+    rm(results, bin_counts, bin_labels, sanitized_indices, nspecs, state)
     log_complete(
       ctx,
       n_edges = nrow(result),

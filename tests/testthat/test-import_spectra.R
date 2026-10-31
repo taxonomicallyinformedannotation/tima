@@ -204,10 +204,11 @@ test_that("import_spectra skips sanitize work for RDS files when disabled", {
   ))
   base::saveRDS(spectra, file = spec_rds)
 
-  called <- FALSE
+  state <- new.env(parent = emptyenv())
+  state$called <- FALSE
   testthat::with_mocked_bindings(
     sanitize_spectra = function(spectra, cutoff, dalton, min_fragments, ppm) {
-      called <<- TRUE
+      state$called <- TRUE
       spectra
     },
     {
@@ -217,7 +218,7 @@ test_that("import_spectra skips sanitize work for RDS files when disabled", {
         combine = FALSE
       )
       expect_s4_class(out, "Spectra")
-      expect_false(called)
+      expect_false(state$called)
     },
     .package = "tima"
   )
@@ -233,13 +234,14 @@ test_that("import_spectra calls sanitize_spectra when sanitize is TRUE", {
   ))
   base::saveRDS(spectra, file = spec_rds)
 
-  called <- FALSE
-  observed_min_fragments <- NULL
+  state <- new.env(parent = emptyenv())
+  state$called <- FALSE
+  state$observed_min_fragments <- NULL
 
   testthat::with_mocked_bindings(
     sanitize_spectra = function(spectra, cutoff, dalton, min_fragments, ppm) {
-      called <<- TRUE
-      observed_min_fragments <<- min_fragments
+      state$called <- TRUE
+      state$observed_min_fragments <- min_fragments
       spectra
     },
     {
@@ -250,8 +252,8 @@ test_that("import_spectra calls sanitize_spectra when sanitize is TRUE", {
         min_fragments = 3L
       )
       expect_s4_class(out, "Spectra")
-      expect_true(called)
-      expect_identical(observed_min_fragments, 3L)
+      expect_true(state$called)
+      expect_identical(state$observed_min_fragments, 3L)
     },
     .package = "tima"
   )

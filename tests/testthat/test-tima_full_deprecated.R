@@ -90,11 +90,12 @@ test_that("tima_full documentation mentions deprecation", {
 })
 
 test_that("tima_full calls run_tima with correct arguments", {
-  called_args <- NULL
+  state <- new.env(parent = emptyenv())
+  state$called_args <- NULL
 
   withr::local_options(list(
     tima.tima_full_runner = function(...) {
-      called_args <<- list(...)
+      state$called_args <- list(...)
       invisible(NULL)
     }
   ))
@@ -109,8 +110,8 @@ test_that("tima_full calls run_tima with correct arguments", {
   })
 
   # Verify arguments were passed through correctly
-  expect_equal(called_args$target_pattern, "^custom$")
-  expect_equal(called_args$log_file, "custom.log")
-  expect_equal(called_args$clean_old_logs, FALSE)
-  expect_equal(called_args$log_level, "debug")
+  expect_equal(state$called_args$target_pattern, "^custom$")
+  expect_equal(state$called_args$log_file, "custom.log")
+  expect_equal(state$called_args$clean_old_logs, FALSE)
+  expect_equal(state$called_args$log_level, "debug")
 })

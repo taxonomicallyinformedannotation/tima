@@ -77,7 +77,7 @@ download_with_error_handling <- function(url, export) {
       expr = {
         httr2::request(base_url = url) |>
           httr2::req_headers(
-            `User-Agent` = "TIMA R package",
+            `User-Agent` = "TIMA R package"
           ) |>
           httr2::req_progress() |>
           httr2::req_perform(path = export)

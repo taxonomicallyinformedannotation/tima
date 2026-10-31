@@ -324,10 +324,11 @@ test_that("entropy computes forward/reverse scores by default for retained match
 })
 
 test_that("entropy skips forward/reverse work when explicitly disabled", {
-  called <- 0L
+  state <- new.env(parent = emptyenv())
+  state$called <- 0L
   local_mocked_bindings(
     gnps_chain_dp_wrapper = function(...) {
-      called <<- called + 1L
+      state$called <- state$called + 1L
       list(1.0, 1L, 0.5, 0.5)
     }
   )
@@ -347,7 +348,7 @@ test_that("entropy skips forward/reverse work when explicitly disabled", {
     compute_forward_reverse = FALSE
   )
 
-  expect_equal(called, 0L)
+  expect_equal(state$called, 0L)
   expect_true(all(is.na(out$candidate_score_similarity_forward)))
   expect_true(all(is.na(out$candidate_score_similarity_reverse)))
 })

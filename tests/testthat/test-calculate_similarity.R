@@ -257,9 +257,10 @@ test_that("entropy dalton and ppm tolerances are not interchangeable", {
 test_that("gnps and cosine report distinct backend failure messages", {
   # The gnps and cosine branches share the computation but not the log
   # message, which is what distinguishes them at runtime.
-  msgs <- character()
+  state <- new.env(parent = emptyenv())
+  state$msgs <- character()
   collect <- function(...) {
-    msgs <<- c(msgs, paste0(..., collapse = ""))
+    state$msgs <- c(state$msgs, paste0(..., collapse = ""))
     invisible(NULL)
   }
 
@@ -303,10 +304,10 @@ test_that("gnps and cosine report distinct backend failure messages", {
     )
   )
 
-  expect_length(msgs, 3L)
-  expect_match(msgs[1], "GNPS")
-  expect_match(msgs[2], "Similarity")
-  expect_match(msgs[3], "Entropy")
+  expect_length(state$msgs, 3L)
+  expect_match(state$msgs[1], "GNPS")
+  expect_match(state$msgs[2], "Similarity")
+  expect_match(state$msgs[3], "Entropy")
 })
 
 test_that("gnps matching widens with the dalton tolerance", {
@@ -443,15 +444,12 @@ test_that("calculate_similarity returns 0 for empty spectra", {
 test_that("calculate_similarity short-circuits empty spectra before any backend", {
   # The zero-return guard must short-circuit: reaching the backend with a
   # 0-row matrix would raise, and the mocked backend records the call.
-  called <- FALSE
+  state <- new.env(parent = emptyenv())
+  state$called <- FALSE
   empty <- matrix(numeric(), ncol = 2)
 
-  with_mocked_bindings(
-    .entropy_similarity_call = function(...) {
-      called <<- TRUE
-      stop("backend must not be called")
-    },
-    res <- calculate_similarity(
+  res <- with_mocked_bindings(
+    calculate_similarity(
       method = "entropy",
       query_spectrum = empty,
       target_spectrum = TEST_TARGET,
@@ -459,9 +457,13 @@ test_that("calculate_similarity short-circuits empty spectra before any backend"
       target_precursor = 2,
       dalton = 0.01,
       ppm = 10
-    )
+    ),
+    .entropy_similarity_call = function(...) {
+      state$called <- TRUE
+      stop("backend must not be called")
+    }
   )
-  expect_false(called)
+  expect_false(state$called)
   expect_equal(res, 0)
 })
 

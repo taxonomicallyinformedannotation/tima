@@ -35,8 +35,8 @@ test_that("Two features with [M-H]- and [M-H2+Na]- delta (~21 Da) both appear in
   # Setup: Two features of same neutral mas in same RT window
   # One as [M-H]-, one as [M-H2+Na]-
 
-  H_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["H"]]
-  Na_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["Na"]]
+  H_mass <- ATOMIC_MONOISOTOPIC_MASS[["H"]]
+  Na_mass <- ATOMIC_MONOISOTOPIC_MASS[["Na"]]
   electron_mass <- getFromNamespace("ELECTRON_MASS_DA", "tima")
 
   M <- 100.0 # Arbitrary neutral mass
@@ -98,10 +98,10 @@ test_that("Two features with [M-H]- and [M-H+C2HF3O2]- delta (~114 Da) both appe
   local_quiet_logging()
 
   # Setup: Base compound and TFA-attached form
-  H_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["H"]]
-  C_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["C"]]
-  F_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["F"]]
-  O_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["O"]]
+  H_mass <- ATOMIC_MONOISOTOPIC_MASS[["H"]]
+  C_mass <- ATOMIC_MONOISOTOPIC_MASS[["C"]]
+  F_mass <- ATOMIC_MONOISOTOPIC_MASS[["F"]]
+  O_mass <- ATOMIC_MONOISOTOPIC_MASS[["O"]]
   electron_mass <- getFromNamespace("ELECTRON_MASS_DA", "tima")
 
   M <- 150.0
@@ -161,11 +161,11 @@ test_that("Three feature pair with [M-H]-, [M-H2+Na]-, [M-H+C2HF3O2]- in same RT
   local_quiet_logging()
 
   # Setup: Three forms of same neutral mass in same RT
-  H_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["H"]]
-  Na_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["Na"]]
-  C_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["C"]]
-  F_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["F"]]
-  O_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["O"]]
+  H_mass <- ATOMIC_MONOISOTOPIC_MASS[["H"]]
+  Na_mass <- ATOMIC_MONOISOTOPIC_MASS[["Na"]]
+  C_mass <- ATOMIC_MONOISOTOPIC_MASS[["C"]]
+  F_mass <- ATOMIC_MONOISOTOPIC_MASS[["F"]]
+  O_mass <- ATOMIC_MONOISOTOPIC_MASS[["O"]]
   electron_mass <- getFromNamespace("ELECTRON_MASS_DA", "tima")
 
   M <- 200.0
@@ -238,8 +238,8 @@ test_that("Ion pair edges correctly link [M-H]- and [M-H2+Na]- as same compound"
   local_quiet_logging()
 
   # Verify that edge generation recognizes these are same compound
-  H_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["H"]]
-  Na_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["Na"]]
+  H_mass <- ATOMIC_MONOISOTOPIC_MASS[["H"]]
+  Na_mass <- ATOMIC_MONOISOTOPIC_MASS[["Na"]]
   electron_mass <- getFromNamespace("ELECTRON_MASS_DA", "tima")
 
   M <- 180.0
@@ -296,10 +296,10 @@ test_that("Two features with [M-H]- and [M+COONa]- show sodium carboxylate adduc
   # Setup: One as [M-H]-, one as [M+COONa]- (sodium carboxylate)
   # COONa = C + 2*O + Na = carboxylate group with sodium counterion
 
-  H_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["H"]]
-  C_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["C"]]
-  O_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["O"]]
-  Na_mass <- tima:::ATOMIC_MONOISOTOPIC_MASS[["Na"]]
+  H_mass <- ATOMIC_MONOISOTOPIC_MASS[["H"]]
+  C_mass <- ATOMIC_MONOISOTOPIC_MASS[["C"]]
+  O_mass <- ATOMIC_MONOISOTOPIC_MASS[["O"]]
+  Na_mass <- ATOMIC_MONOISOTOPIC_MASS[["Na"]]
   electron_mass <- getFromNamespace("ELECTRON_MASS_DA", "tima")
 
   M <- 150.0 # Arbitrary neutral mass

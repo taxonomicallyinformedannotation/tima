@@ -125,9 +125,7 @@ fetch_zenodo_record <- function(record, doi, timeout_s) {
   if (is.na(backoff_cap_s) || backoff_cap_s < 0) {
     backoff_cap_s <- 0
   }
-  last_error <- NULL
-
-  fetch_attempt <- function(attempt) {
+  fetch_attempt <- function(attempt, last_error = NULL) {
     response <- tryCatch(
       {
         httr2::request(base_url = url) |>
@@ -146,19 +144,15 @@ fetch_zenodo_record <- function(record, doi, timeout_s) {
           call = NULL
         )
       },
-      httr2_http = function(e) {
-        last_error <<- e
-        NULL
-      },
-      error = function(e) {
-        last_error <<- e
-        NULL
-      }
+      httr2_http = function(e) e,
+      error = function(e) e
     )
 
-    if (!is.null(response)) {
+    if (!inherits(response, "error")) {
       return(response)
     }
+
+    last_error <- response
 
     if (attempt < max_attempts) {
       Sys.sleep(min(2^(attempt - 1L), backoff_cap_s))
@@ -167,7 +161,7 @@ fetch_zenodo_record <- function(record, doi, timeout_s) {
         attempt + 1L,
         max_attempts
       )
-      return(fetch_attempt(attempt + 1L))
+      return(fetch_attempt(attempt + 1L, last_error = last_error))
     }
 
     cli::cli_abort(

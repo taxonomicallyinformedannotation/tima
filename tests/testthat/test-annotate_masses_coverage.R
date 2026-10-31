@@ -120,11 +120,12 @@ test_that("build_annotate_masses_coverage_report tolerates missing optional colu
 })
 
 test_that("write_empty_annotate_masses_outputs exports expected files", {
-  calls <- list()
+  calls <- new.env(parent = emptyenv())
+  calls$list <- list()
 
   outputs <- with_mocked_bindings(
     export_output = function(x, file) {
-      calls[[length(calls) + 1L]] <<- list(
+      calls$list[[length(calls$list) + 1L]] <- list(
         file = as.character(file[[1L]]),
         nrow = nrow(x),
         ncol = ncol(x)
@@ -139,9 +140,9 @@ test_that("write_empty_annotate_masses_outputs exports expected files", {
 
   expect_identical(outputs[["annotations"]], "results/annotate_masses.tsv")
   expect_identical(outputs[["edges"]], "results/edges.tsv")
-  expect_length(calls, 3L)
+  expect_length(calls$list, 3L)
 
-  exported_files <- vapply(calls, `[[`, character(1), "file")
+  exported_files <- vapply(calls$list, `[[`, character(1), "file")
   expect_true("results/annotate_masses.tsv" %in% exported_files)
   expect_true("results/edges.tsv" %in% exported_files)
   expect_true("results/annotate_masses_coverage.tsv" %in% exported_files)

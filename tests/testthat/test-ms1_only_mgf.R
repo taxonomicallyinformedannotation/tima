@@ -153,17 +153,13 @@ test_that("MS1-only MGF emits a single warning and empty template", {
   )
 
   # Exactly one warning, matching the actionable message requirements.
-  withCallingHandlers(
+  warned <- testthat::capture_warnings(
     annotate_spectra(
       input = query_path,
       libraries = list(pos = lib_path),
       polarity = "pos",
       output = out_path
-    ),
-    warning = function(w) {
-      warned <<- c(warned, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
+    )
   )
   expect_length(warned, 1L)
   msg <- warned[[1L]]
@@ -263,18 +259,14 @@ test_that("mixed MS1/MS2 MGF warns once with skip count and annotates MS2", {
     },
     "MS1 .* cannot be annotated"
   )
-  withCallingHandlers(
+  warned <- testthat::capture_warnings(
     annotate_spectra(
       input = query_path,
       libraries = list(pos = lib_path),
       polarity = "pos",
       output = out_path,
       threshold = 0
-    ),
-    warning = function(w) {
-      warned <<- c(warned, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
+    )
   )
   # Exactly one warning (the MS1-skip warning), with the skipped count.
   expect_length(warned, 1L)
@@ -314,19 +306,14 @@ test_that("valid MS2 input still annotates with no MS1 warnings", {
 
   out_path <- file.path(temp_test_dir("ms2_regression"), "reg_out.tsv")
 
-  warned <- character(0L)
-  withCallingHandlers(
+  warned <- testthat::capture_warnings(
     annotate_spectra(
       input = query_path,
       libraries = list(pos = lib_path),
       polarity = "pos",
       output = out_path,
       threshold = 0
-    ),
-    warning = function(w) {
-      warned <<- c(warned, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
+    )
   )
   expect_length(warned, 0L)
 
@@ -393,15 +380,16 @@ test_that("import_spectra records tima_ms1_skipped attribute for mixed input", {
 test_that("import_spectra does not warn on MS1 filtering (scoping)", {
   query_path <- withr::local_tempfile(fileext = ".mgf")
   .write_ms1_only_mgf(query_path, n = 3L)
-  warned <- character(0L)
-  withCallingHandlers(
-    sp <- import_spectra(file = query_path, sanitize = FALSE, combine = FALSE),
+  state <- new.env(parent = emptyenv())
+  state$warned <- character(0L)
+  sp <- withCallingHandlers(
+    import_spectra(file = query_path, sanitize = FALSE, combine = FALSE),
     warning = function(w) {
-      warned <<- c(warned, conditionMessage(w))
+      state$warned <- c(state$warned, conditionMessage(w))
       invokeRestart("muffleWarning")
     }
   )
-  expect_length(warned, 0L)
+  expect_length(state$warned, 0L)
   expect_equal(attr(sp, "tima_ms1_skipped"), 3L)
 })
 

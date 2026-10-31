@@ -133,7 +133,7 @@ test_that("get_example_files dispatches requested downloads without cache", {
     in_cache = FALSE,
     paths = paths,
     download_file = function(url, export) {
-      calls$get_file[[length(calls$get_file) + 1L]] <<- list(
+      calls$get_file[[length(calls$get_file) + 1L]] <- list(
         url = url,
         export = export
       )
@@ -269,7 +269,7 @@ test_that("get_example_files handles a single example file", {
       data = list(source = list(features = "data/source/features.csv"))
     ),
     download_file = function(url, export) {
-      calls$get_file[[length(calls$get_file) + 1L]] <<- c(
+      calls$get_file[[length(calls$get_file) + 1L]] <- c(
         url = url,
         export = export
       )

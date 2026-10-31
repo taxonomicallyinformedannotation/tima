@@ -3,10 +3,11 @@
 ## Internal Utility Helpers ----
 
 fixture_roots <- local({
-  cache <- NULL
+  state <- new.env(parent = emptyenv())
+  state$cache <- NULL
   function() {
-    if (!is.null(cache)) {
-      return(cache)
+    if (!is.null(state$cache)) {
+      return(state$cache)
     }
 
     roots <- character()
@@ -32,7 +33,7 @@ fixture_roots <- local({
     roots <- unique(roots)
     roots <- roots[!is.na(roots)]
     roots <- normalizePath(roots, winslash = "/", mustWork = FALSE)
-    cache <<- roots
+    state$cache <- roots
     roots
   }
 })

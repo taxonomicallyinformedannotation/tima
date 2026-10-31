@@ -270,7 +270,7 @@ complement_metadata_structures <- function(
 }
 
 .complement_metadata_ref_cache <- local({
-  .cache <- list()
+  .cache <- new.env(parent = emptyenv())
 
   load_refs <- function(str_stereo, str_met, str_tax_cla, str_tax_npc) {
     # Include file modification time so cache invalidates when any reference file is replaced.
@@ -425,7 +425,7 @@ complement_metadata_structures <- function(
       tax_cla_lookup_full = tax_cla_lookup_full,
       tax_npc_lookup_full = tax_npc_lookup_full
     )
-    .cache[[cache_key]] <<- result
+    .cache[[cache_key]] <- result
     result
   }
 

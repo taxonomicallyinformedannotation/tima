@@ -177,7 +177,7 @@ test_that("test-prepare_annotations_sirius uses populated input branch when dire
   out_ann <- file.path(input_dir, "ann.tsv")
   out_can <- file.path(input_dir, "can.tsv")
   out_for <- file.path(input_dir, "for.tsv")
-  exported <- list()
+  exported <- new.env(parent = emptyenv())
 
   res <- with_mocked_bindings(
     .prepare_sirius_annotations_table = function(...) {
@@ -196,9 +196,9 @@ test_that("test-prepare_annotations_sirius uses populated input branch when dire
       output_for,
       output_ann
     ) {
-      exported[["can"]] <<- output_can
-      exported[["for"]] <<- output_for
-      exported[["ann"]] <<- output_ann
+      exported[["can"]] <- output_can
+      exported[["for"]] <- output_for
+      exported[["ann"]] <- output_ann
       invisible(NULL)
     },
     log_operation = function(...) "ctx",

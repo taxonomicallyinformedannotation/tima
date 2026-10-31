@@ -67,10 +67,6 @@ sp_zero <- cbind(mz = c(100, 200), intensity = c(0, 0))
 
 # ---- independent reference implementation -----------------------------------
 
-.gnps_pair_weight <- function(xi, xsum, yj, ysum) {
-  sqrt(xi) / sqrt(xsum) * sqrt(yj) / sqrt(ysum)
-}
-
 # Transliteration of gnps_chain_dp_core_api() + score_matched(). Returns the
 # documented c(score, matches, score_forward, score_reverse).
 gnps_reference_score <- function(x, y, x_pre, y_pre, tol, ppm) {

@@ -71,19 +71,20 @@ test_that("check_or_install_python returns system python immediately when availa
 })
 
 test_that("check_or_install_python installs miniconda fallback when needed", {
-  installed <- FALSE
+  state <- new.env(parent = emptyenv())
+  state$installed <- FALSE
 
   path <- with_mocked_bindings(
     .sys_which = function(command) "",
     .miniconda_path = function() "/opt/miniconda",
     .path_exists = function(path) {
       if (identical(path, "/opt/miniconda")) {
-        return(installed)
+        return(state$installed)
       }
       identical(path, "/opt/miniconda/bin/python")
     },
     .install_miniconda = function() {
-      installed <<- TRUE
+      state$installed <- TRUE
       invisible(NULL)
     },
     log_warn = function(...) invisible(NULL),
@@ -91,7 +92,7 @@ test_that("check_or_install_python installs miniconda fallback when needed", {
     check_or_install_python()
   )
 
-  expect_true(installed)
+  expect_true(state$installed)
   expect_identical(path, "/opt/miniconda/bin/python")
 })
 
@@ -110,21 +111,24 @@ test_that("check_or_install_python errors when fallback python is still missing"
 })
 
 test_that("setup_virtualenv creates env and installs packages", {
-  calls <- list(create = NULL, install = NULL, py_install = NULL)
+  calls <- new.env(parent = emptyenv())
+  calls$create <- NULL
+  calls$install <- NULL
+  calls$py_install <- NULL
 
   expect_invisible(
     with_mocked_bindings(
       .virtualenv_exists = function(envname) FALSE,
       .virtualenv_create = function(envname, python) {
-        calls$create <<- list(envname = envname, python = python)
+        calls$create <- list(envname = envname, python = python)
         invisible(NULL)
       },
       .virtualenv_install = function(envname, packages) {
-        calls$install <<- list(envname = envname, packages = packages)
+        calls$install <- list(envname = envname, packages = packages)
         invisible(NULL)
       },
       .py_install = function(packages) {
-        calls$py_install <<- packages
+        calls$py_install <- packages
         invisible(NULL)
       },
       log_info = function(...) invisible(NULL),
@@ -140,17 +144,19 @@ test_that("setup_virtualenv creates env and installs packages", {
 })
 
 test_that("setup_virtualenv reuses existing env and still installs dependencies", {
-  calls <- list(create = 0L, install = 0L)
+  calls <- new.env(parent = emptyenv())
+  calls$create <- 0L
+  calls$install <- 0L
 
   expect_invisible(
     with_mocked_bindings(
       .virtualenv_exists = function(envname) TRUE,
       .virtualenv_create = function(envname, python) {
-        calls$create <<- calls$create + 1L
+        calls$create <- calls$create + 1L
         invisible(NULL)
       },
       .virtualenv_install = function(envname, packages) {
-        calls$install <<- calls$install + 1L
+        calls$install <- calls$install + 1L
         invisible(NULL)
       },
       .py_install = function(packages) invisible(NULL),
@@ -269,10 +275,11 @@ test_that("try_install_package handles successful, unavailable and error install
   expect_true(
     with_mocked_bindings(
       .require_namespace = local({
-        calls <- 0L
+        state <- new.env(parent = emptyenv())
+        state$calls <- 0L
         function(package, quietly = TRUE) {
-          calls <<- calls + 1L
-          calls >= 2L
+          state$calls <- state$calls + 1L
+          state$calls >= 2L
         }
       }),
       .install_packages = function(...) invisible(NULL),
