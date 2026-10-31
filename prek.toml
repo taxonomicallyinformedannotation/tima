@@ -11,7 +11,7 @@ hooks = [{ id = "air-format" }]
 
 [[repos]]
 repo = "https://github.com/lorenzwalthert/precommit"
-rev = "v0.4.3.9032"
+rev = "v0.4.3.9034"
 hooks = [{ id = "use-tidy-description" }, { id = "parsable-R" }, { id = "no-browser-statement" }, { id = "no-print-statement" }, { id = "no-debug-statement" }, { id = "deps-in-desc", additional_dependencies = ["taxonomicallyinformedannotation/tima"] }, { id = "readme-rmd-rendered" }]
 
 [[repos]]
@@ -26,7 +26,7 @@ hooks = [{ id = "tombi-format" }, { id = "tombi-lint" }]
 
 [[repos]]
 repo = "https://github.com/jolars/panache-pre-commit"
-rev = "v3.17.1"
+rev = "v3.17.2"
 hooks = [{ id = "panache-format" }, { id = "panache-lint" }]
 
 [[repos]]

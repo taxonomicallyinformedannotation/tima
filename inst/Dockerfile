@@ -1,7 +1,7 @@
 # Use the Bioconductor base image
 FROM bioconductor/bioconductor_docker:RELEASE_3_23-R-4.6.0
 
-# Add a non-root user and set up the R library directory
+# Add a non-root user and set up the R library and working directories
 RUN useradd -m tima-user && \
     mkdir -p /home/tima-user/Library/Frameworks/R.framework/Resources/site-library && \
     mkdir -p /home/tima-user/.tima/data && \
@@ -18,12 +18,17 @@ WORKDIR /home/tima-user
 # Base dependency installation (cached across builds)
 RUN Rscript -e "install.packages('pak')"
 
-# Invalidate layer cache when a new Git commit is pushed
+# Invalidate layer cache and embed metadata when a new Git commit is pushed
 ARG GIT_COMMIT=unknown
 ENV GIT_COMMIT=${GIT_COMMIT}
+LABEL org.opencontainers.image.revision="${GIT_COMMIT}"
 
-# Clean pak cache and force pull latest R package from GitHub @main branch
-RUN Rscript -e "pak::cache_clean(); options(timeout = 30); pak::pkg_install('taxonomicallyinformedannotation/tima@main', ask = FALSE)" && \
+# Copy the repository source code into the container with correct permissions
+COPY --chown=tima-user:tima-user . /home/tima-user/app
+WORKDIR /home/tima-user/app
+
+# Clean pak cache, install package locally from the current commit, and run post-install setup
+RUN Rscript -e "pak::cache_clean(); options(timeout = 30); pak::pkg_install('.', ask = FALSE)" && \
     Rscript -e "tima::install_tima()"
 
 # Expose the necessary ports for Shiny
