@@ -11,7 +11,7 @@ hooks = [{ id = "air-format" }]
 
 [[repos]]
 repo = "https://github.com/lorenzwalthert/precommit"
-rev = "v0.4.3.9034"
+rev = "v0.4.3.9035"
 hooks = [{ id = "use-tidy-description" }, { id = "parsable-R" }, { id = "no-browser-statement" }, { id = "no-print-statement" }, { id = "no-debug-statement" }, { id = "deps-in-desc", additional_dependencies = ["taxonomicallyinformedannotation/tima"] }, { id = "readme-rmd-rendered" }]
 
 [[repos]]
