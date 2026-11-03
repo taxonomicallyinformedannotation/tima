@@ -17,8 +17,8 @@ test_that("fake_ecmdb creates zip file with JSON content", {
   expect_s3_class(zip_list, "data.frame")
   expect_true(nrow(zip_list) > 0)
 
-  # Extract and verify JSON content
-  temp_dir <- tempdir()
+  # Extract and verify JSON content in an isolated temp directory
+  temp_dir <- withr::local_tempdir()
   utils::unzip(zipfile = temp_file, exdir = temp_dir)
 
   json_files <- list.files(temp_dir, pattern = "\\.json$", full.names = TRUE)
