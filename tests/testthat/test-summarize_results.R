@@ -283,3 +283,35 @@ test_that("no-structure rows are not duplicated by mixed annotation notes", {
     expect_true(grepl("neutral-mass space", out_ft1$annotation_note[[1L]]))
   }
 })
+
+test_that("summarize_results collapses multiple organism DOIs and trims whitespace", {
+  d <- make_sop_df(n_features = 2L, n_cand = 2L)
+  d$sop <- rbind(
+    d$sop,
+    transform(
+      d$sop[1L, , drop = FALSE],
+      reference_doi = "10.0/ref_extra"
+    ),
+    transform(
+      d$sop[1L, , drop = FALSE],
+      reference_doi = "10.0/ref1"
+    )
+  )
+  d$df$candidate_structure_tag <- c("  serum  ", "   ", "urine", "plasma")
+
+  out <- call_sr(d, summarize = FALSE)
+  ik1_rows <- out[
+    out$candidate_structure_inchikey_connectivity_layer == "IK1",
+    ,
+    drop = FALSE
+  ]
+  expect_true(all(
+    ik1_rows$candidate_structure_organism_occurrence_reference ==
+      "10.0/ref1 | 10.0/ref_extra"
+  ))
+  expect_false(any(grepl(
+    "^\\s|\\s$",
+    stats::na.omit(out$candidate_structure_tag)
+  )))
+  expect_true(anyNA(out$candidate_structure_tag))
+})

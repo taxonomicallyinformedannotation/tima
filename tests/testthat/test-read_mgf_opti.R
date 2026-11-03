@@ -207,3 +207,58 @@ test_that("read_mgf_opti returns an empty DataFrame when all spectra are empty",
     c("mz", "intensity", "msLevel", "dataOrigin") %in% colnames(res)
   ))
 })
+
+test_that("read_mgf_opti handles tabs, extra peak columns, comments, and duplicate keys", {
+  tf <- write_mgf(list(
+    c(
+      "  BEGIN IONS  ",
+      "# comment line inside block",
+      "TITLE=FirstTitle",
+      "TITLE=DuplicateTitleShouldBeIgnored",
+      "PEPMASS=150.123\t987.6",
+      "CHARGE=1-",
+      "",
+      "120.5\t40.0",
+      "80.2   15.5   extra_annotation",
+      "END IONS"
+    )
+  ))
+  on.exit(unlink(tf))
+
+  res <- read_mgf_opti(f = tf)
+  expect_equal(nrow(res), 1L)
+  expect_equal(as.character(res$TITLE[[1L]]), "FirstTitle")
+  expect_equal(as.numeric(res$precursorMz[[1L]]), 150.123)
+  expect_equal(as.numeric(res$precursorIntensity[[1L]]), 987.6)
+  expect_equal(as.integer(res$precursorCharge[[1L]]), -1L)
+  expect_equal(as.numeric(unlist(res$mz[[1L]])), c(80.2, 120.5))
+  expect_equal(as.numeric(unlist(res$intensity[[1L]])), c(15.5, 40.0))
+})
+
+test_that("read_mgf_metadata parses fields without peaks and keeps first duplicate key", {
+  tf <- write_mgf(list(
+    c(
+      "BEGIN IONS",
+      "  title = SpecA  ",
+      "TITLE = SpecA_dup",
+      "PEPMASS=100.0",
+      "EMPTY_KEY=",
+      "END IONS"
+    ),
+    c(
+      "BEGIN IONS",
+      "TITLE=SpecB",
+      "RTINSECONDS=42.5",
+      "100.0 50.0",
+      "END IONS"
+    )
+  ))
+  on.exit(unlink(tf))
+
+  meta <- read_mgf_metadata(tf)
+  expect_equal(nrow(meta), 2L)
+  expect_equal(meta$TITLE, c("SpecA", "SpecB"))
+  expect_equal(meta$PEPMASS, c("100.0", NA_character_))
+  expect_equal(meta$EMPTY_KEY, c("", NA_character_))
+  expect_equal(meta$RTINSECONDS, c(NA_character_, "42.5"))
+})

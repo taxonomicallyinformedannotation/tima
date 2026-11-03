@@ -125,108 +125,106 @@ decorate_chemo <- function(
   }
 
   # Helper Functions ----
-  filter_valid_level <- function(df, score_threshold, col_name) {
-    df |>
-      tidytable::filter(score_chemical >= score_threshold) |>
-      tidytable::filter(
-        !is.na(!!as.name(col_name)) &
-          !!as.name(col_name) != "notAnnotated" &
-          !!as.name(col_name) != "notConsistent"
-      )
+  n_rows <- nrow(annot_table_wei_chemo)
+  sc_col <- as.numeric(annot_table_wei_chemo$score_chemical)
+  ik_col <- annot_table_wei_chemo$candidate_structure_inchikey_connectivity_layer
+  u_ik <- unique(ik_col)
+  n_u_ik <- length(u_ik)
+  ik_id <- if (n_u_ik > 0L) fastmatch::fmatch(ik_col, u_ik) else integer(n_rows)
+
+  valid_level_mask <- function(prev_mask, score_threshold, col_name) {
+    if (!col_name %in% names(annot_table_wei_chemo)) {
+      return(rep.int(FALSE, n_rows))
+    }
+    v <- annot_table_wei_chemo[[col_name]]
+    prev_mask &
+      !is.na(sc_col) &
+      sc_col >= score_threshold &
+      !is.na(v) &
+      v != "notAnnotated" &
+      v != "notConsistent"
   }
 
-  count_stats <- function(df) {
-    c(
-      n_candidates = nrow(df),
-      n_unique_structures = nrow(
-        df |>
-          tidytable::distinct(
-            candidate_structure_inchikey_connectivity_layer
-          )
-      )
-    )
+  count_mask_stats <- function(mask) {
+    idx <- which(mask)
+    n_cand <- length(idx)
+    if (n_cand == 0L) {
+      return(c(n_candidates = 0L, n_unique_structures = 0L))
+    }
+    n_uniq <- sum(tabulate(ik_id[idx], nbins = n_u_ik) > 0L)
+    c(n_candidates = n_cand, n_unique_structures = n_uniq)
   }
+
+  all_true <- rep.int(TRUE, n_rows)
 
   # Classyfire Hierarchy (cascading filters) ----
-
-  df_cla_kingdom <- filter_valid_level(
-    annot_table_wei_chemo,
+  m_cla_kingdom <- valid_level_mask(
+    all_true,
     score_chemical_cla_kingdom,
     "feature_pred_tax_cla_01kin_val"
   )
-
-  df_cla_superclass <- filter_valid_level(
-    df_cla_kingdom,
+  m_cla_superclass <- valid_level_mask(
+    m_cla_kingdom,
     score_chemical_cla_superclass,
     "feature_pred_tax_cla_02sup_val"
   )
-
-  df_cla_class <- filter_valid_level(
-    df_cla_superclass,
+  m_cla_class <- valid_level_mask(
+    m_cla_superclass,
     score_chemical_cla_class,
     "feature_pred_tax_cla_03cla_val"
   )
-
-  df_cla_parent <- filter_valid_level(
-    df_cla_class,
+  m_cla_parent <- valid_level_mask(
+    m_cla_class,
     score_chemical_cla_parent,
     "feature_pred_tax_cla_04dirpar_val"
   )
 
   # NPClassifier Hierarchy (cascading filters, independent of Classyfire) ----
-
-  df_npc_pathway <- filter_valid_level(
-    annot_table_wei_chemo,
+  m_npc_pathway <- valid_level_mask(
+    all_true,
     score_chemical_npc_pathway,
     "feature_pred_tax_npc_01pat_val"
   )
-
-  df_npc_superclass <- filter_valid_level(
-    df_npc_pathway,
+  m_npc_superclass <- valid_level_mask(
+    m_npc_pathway,
     score_chemical_npc_superclass,
     "feature_pred_tax_npc_02sup_val"
   )
-
-  df_npc_class <- filter_valid_level(
-    df_npc_superclass,
+  m_npc_class <- valid_level_mask(
+    m_npc_superclass,
     score_chemical_npc_class,
     "feature_pred_tax_npc_03cla_val"
   )
 
   # Count total candidates and unique structures ----
-
-  # Classyfire counts
-  cla_dataframes <- list(
-    kingdom = df_cla_kingdom,
-    superclass = df_cla_superclass,
-    class = df_cla_class,
-    parent = df_cla_parent
+  cla_masks <- list(
+    kingdom = m_cla_kingdom,
+    superclass = m_cla_superclass,
+    class = m_cla_class,
+    parent = m_cla_parent
   )
-
   cla_counts <- vapply(
-    X = cla_dataframes,
-    FUN = count_stats,
+    X = cla_masks,
+    FUN = count_mask_stats,
     integer(2L),
     USE.NAMES = FALSE
   )
   rownames(cla_counts) <- c("n_candidates", "n_unique_structures")
-  colnames(cla_counts) <- names(cla_dataframes)
+  colnames(cla_counts) <- names(cla_masks)
 
-  # NPClassifier counts
-  npc_dataframes <- list(
-    pathway = df_npc_pathway,
-    superclass = df_npc_superclass,
-    class = df_npc_class
+  npc_masks <- list(
+    pathway = m_npc_pathway,
+    superclass = m_npc_superclass,
+    class = m_npc_class
   )
-
   npc_counts <- vapply(
-    X = npc_dataframes,
-    FUN = count_stats,
+    X = npc_masks,
+    FUN = count_mask_stats,
     integer(2L),
     USE.NAMES = FALSE
   )
   rownames(npc_counts) <- c("n_candidates", "n_unique_structures")
-  colnames(npc_counts) <- names(npc_dataframes)
+  colnames(npc_counts) <- names(npc_masks)
 
   # Log Summary Statistics ----
 

@@ -400,19 +400,26 @@ load_edges_table <- function(edges, candidates_neighbors) {
   )
 
   n_before <- nrow(edges_table)
-  # Columns are read as character; rank on the numeric value, not the text
-  edges_table <- edges_table |>
-    tidytable::mutate(
-      .similarity_num = suppressWarnings(as.numeric(candidate_score_similarity))
-    ) |>
-    tidytable::group_by(feature_source) |>
-    tidytable::slice_max(
-      order_by = .similarity_num,
-      n = candidates_neighbors,
-      with_ties = FALSE
-    ) |>
-    tidytable::ungroup() |>
-    tidytable::select(-.similarity_num)
+  if (n_before > 0L && "feature_source" %in% names(edges_table)) {
+    # Columns are read as character; rank on the numeric value, not the text
+    sim_num <- if ("candidate_score_similarity" %in% names(edges_table)) {
+      .as_numeric_dedup(edges_table$candidate_score_similarity)
+    } else {
+      rep(NA_real_, n_before)
+    }
+    src_col <- edges_table$feature_source
+    u_src <- unique(src_col)
+    src_id <- fastmatch::fmatch(src_col, u_src)
+    ord <- order(src_id, -sim_num, na.last = TRUE, method = "radix")
+    s_ord <- src_id[ord]
+    counts <- tabulate(s_ord, nbins = length(u_src))
+    present <- which(counts > 0L)
+    c_pres <- counts[present]
+    starts <- cumsum(c(1L, c_pres[-length(c_pres)]))
+    keep_counts <- pmin(c_pres, as.integer(candidates_neighbors))
+    keep_idx <- ord[sequence(keep_counts, from = starts)]
+    edges_table <- edges_table[keep_idx, , drop = FALSE]
+  }
 
   log_debug(
     "Edges filtered to top %d neighbors/feature: %d -> %d rows",
@@ -472,24 +479,44 @@ load_edges_table <- function(edges, candidates_neighbors) {
 #' @return NULL (logs statistics as side effect)
 #' @keywords internal
 log_annotation_stats <- function(annotation_table) {
-  annotation_stats <- annotation_table |>
-    tidytable::filter(
-      !is.na(candidate_structure_inchikey_connectivity_layer)
-    ) |>
-    tidytable::distinct(
-      feature_id,
-      candidate_library,
-      candidate_structure_inchikey_connectivity_layer
-    ) |>
-    tidytable::group_by(candidate_library) |>
-    tidytable::count() |>
-    tidytable::arrange(tidytable::desc(x = n))
+  ik_col <- annotation_table$candidate_structure_inchikey_connectivity_layer
+  keep <- which(!is.na(ik_col))
+  if (length(keep) == 0L) {
+    annotation_stats <- tidytable::tidytable(
+      candidate_library = character(0L),
+      n = integer(0L),
+      Pct = character(0L)
+    )
+  } else {
+    fid_col <- annotation_table$feature_id[keep]
+    lib_col <- annotation_table$candidate_library[keep]
+    ik_sub <- ik_col[keep]
 
-  annotation_stats <- add_percentage_column(
-    annotation_stats,
-    count_col = "n",
-    out_col = "Pct"
-  )
+    u_fids <- unique(fid_col)
+    u_libs <- sort(unique(lib_col), na.last = TRUE)
+    u_iks <- unique(ik_sub)
+
+    fid_id <- fastmatch::fmatch(fid_col, u_fids)
+    lib_id <- fastmatch::fmatch(lib_col, u_libs)
+    ik_id <- fastmatch::fmatch(ik_sub, u_iks)
+
+    n_libs <- max(1L, length(u_libs))
+    n_iks <- max(1L, length(u_iks))
+    combo_key <- ((as.numeric(fid_id - 1L) * n_libs + (lib_id - 1L)) * n_iks) +
+      ik_id
+    first_occ <- !duplicated(combo_key)
+    lib_counts <- tabulate(lib_id[first_occ], nbins = length(u_libs))
+    ord_l <- order(lib_counts, decreasing = TRUE)
+    annotation_stats <- tidytable::tidytable(
+      candidate_library = u_libs[ord_l],
+      n = lib_counts[ord_l]
+    )
+    annotation_stats <- add_percentage_column(
+      annotation_stats,
+      count_col = "n",
+      out_col = "Pct"
+    )
+  }
 
   log_info(
     "\n%s",
@@ -671,34 +698,19 @@ rearrange_annotations <- function(
     c("feature_spectrum_entropy", "feature_spectrum_peaks"),
     names(annotation_table_merged)
   )
-  edges_distinct <- edges_table |>
-    tidytable::distinct(
-      feature_id = feature_source,
-      feature_spectrum_entropy,
-      feature_spectrum_peaks
+  if (length(edge_new_cols) > 0L && nrow(edges_table) > 0L) {
+    first_src <- !duplicated(edges_table$feature_source)
+    m_edge <- fastmatch::fmatch(
+      annotation_table_merged$feature_id,
+      edges_table$feature_source[first_src]
     )
-  if (length(edge_new_cols) > 0L) {
-    if (!anyDuplicated(edges_distinct$feature_id)) {
-      m_edge <- fastmatch::fmatch(
-        annotation_table_merged$feature_id,
-        edges_distinct$feature_id
+    first_idx <- which(first_src)
+    for (col in intersect(edge_new_cols, names(edges_table))) {
+      data.table::set(
+        annotation_table_merged,
+        j = col,
+        value = edges_table[[col]][first_idx][m_edge]
       )
-      for (col in edge_new_cols) {
-        data.table::set(
-          annotation_table_merged,
-          j = col,
-          value = edges_distinct[[col]][m_edge]
-        )
-      }
-    } else {
-      annotation_table_merged <- annotation_table_merged |>
-        tidytable::left_join(
-          y = edges_distinct |>
-            tidytable::select(
-              tidyselect::any_of(c("feature_id", edge_new_cols))
-            ),
-          by = "feature_id"
-        )
     }
   }
 

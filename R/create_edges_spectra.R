@@ -431,8 +431,8 @@ create_edges_spectra <- function(
 
   # Defined unconditionally: also needed below when no community was found
   pre_cut_features <- unique(c(
-    edges[[source_col]],
-    edges[[target_col]]
+    unique(edges[[source_col]]),
+    unique(edges[[target_col]])
   ))
 
   if (nrow(edges) > 0L && length(community_result$component_membership) > 0L) {
@@ -451,7 +451,10 @@ create_edges_spectra <- function(
       edges <- empty_template
     }
 
-    retained_features <- unique(c(edges[[source_col]], edges[[target_col]]))
+    retained_features <- unique(c(
+      unique(edges[[source_col]]),
+      unique(edges[[target_col]])
+    ))
     isolated_features <- setdiff(pre_cut_features, retained_features)
 
     if (length(isolated_features) > 0L) {
@@ -466,8 +469,7 @@ create_edges_spectra <- function(
         target_col,
         names(isolated_edges)[3:length(names(isolated_edges))]
       )
-      edges <- tidytable::bind_rows(edges, isolated_edges) |>
-        tidytable::distinct()
+      edges <- tidytable::bind_rows(edges, isolated_edges)
     }
   }
 
@@ -478,7 +480,10 @@ create_edges_spectra <- function(
       community_result$method_used
     )
 
-    retained_features <- unique(c(edges[[source_col]], edges[[target_col]]))
+    retained_features <- unique(c(
+      unique(edges[[source_col]]),
+      unique(edges[[target_col]])
+    ))
     dropped_features <- setdiff(pre_cut_features, retained_features)
 
     if (length(dropped_features) > 0L) {
@@ -495,7 +500,10 @@ create_edges_spectra <- function(
   export_output(x = edges, file = output)
 
   n_edges <- nrow(edges)
-  n_features <- length(unique(c(edges[[source_col]], edges[[target_col]])))
+  n_features <- length(unique(c(
+    unique(edges[[source_col]]),
+    unique(edges[[target_col]])
+  )))
   rm(list = intersect(c("edges"), ls()))
   log_info("Edges written to: %s", output)
 

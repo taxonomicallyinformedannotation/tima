@@ -347,20 +347,41 @@ summarize_results <- function(
   char_cols <- names(col_types)[col_types == 1L]
   factor_cols <- names(col_types)[col_types == 2L]
 
-  # OPTIMIZATION: Vectorized column trimming in-place instead of
-  # tidytable::mutate(tidytable::across(...)) which creates an intermediate
-  # copy of every column on each across() call. Direct column replacement
-  # via `df_final[[col]] <-` avoids the dplyr-style copy-on-write overhead
-  # and scales to millions of rows with many character columns.
+  # OPTIMIZATION: Vectorized column trimming in-place using unique-value
+  # whitespace detection instead of base R trimws() across millions of rows.
+  trim_col_fast <- function(val) {
+    u_orig <- unique(val)
+    non_na_u <- !is.na(u_orig)
+    if (!any(non_na_u)) {
+      return(val)
+    }
+    u_sub <- u_orig[non_na_u]
+    has_ws <- startsWith(u_sub, " ") |
+      startsWith(u_sub, "\t") |
+      startsWith(u_sub, "\r") |
+      startsWith(u_sub, "\n") |
+      endsWith(u_sub, " ") |
+      endsWith(u_sub, "\t") |
+      endsWith(u_sub, "\r") |
+      endsWith(u_sub, "\n")
+    has_empty <- !nzchar(u_sub)
+    if (!any(has_ws) && !any(has_empty)) {
+      return(val)
+    }
+    if (any(has_ws)) {
+      u_sub[has_ws] <- trimws(u_sub[has_ws])
+    }
+    u_sub[!nzchar(u_sub)] <- NA_character_
+    u_new <- u_orig
+    u_new[non_na_u] <- u_sub
+    u_new[fastmatch::fmatch(val, u_orig)]
+  }
+
   for (col in char_cols) {
-    val <- trimws(df_final[[col]])
-    val[val == "" | is.na(val)] <- NA_character_
-    df_final[[col]] <- val
+    df_final[[col]] <- trim_col_fast(df_final[[col]])
   }
   for (col in factor_cols) {
-    val <- trimws(as.character(df_final[[col]]))
-    val[val == "" | is.na(val)] <- NA_character_
-    df_final[[col]] <- val
+    df_final[[col]] <- trim_col_fast(as.character(df_final[[col]]))
   }
 
   df_processed <- df_final |>
@@ -551,9 +572,9 @@ summarize_results <- function(
     return(empty_lookup())
   }
 
-  candidate_occurrences <- df |>
-    tidytable::distinct(candidate_structure_organism_occurrence_closest) |>
-    tidytable::pull(candidate_structure_organism_occurrence_closest)
+  candidate_occurrences <- unique(
+    df$candidate_structure_organism_occurrence_closest
+  )
   candidate_occurrences <- candidate_occurrences[
     !is.na(candidate_occurrences) & nzchar(candidate_occurrences)
   ]
@@ -561,60 +582,131 @@ summarize_results <- function(
     return(empty_lookup())
   }
 
-  # Melt the taxonomy columns into one long table with values_drop_na = TRUE
-  # to keep memory usage low by not materializing the many NA ranks
-  # (species, varietas, etc.)
-  # OPTIMIZATION: Filter to only occurrences that exist in df BEFORE melting
-  sop_long <- tidytable::pivot_longer(
-    sop_narrow,
-    cols = tidyselect::all_of(taxonomy_cols),
-    names_to = ".taxonomy_rank",
-    values_to = "candidate_structure_organism_occurrence_closest",
-    values_drop_na = TRUE
-  ) |>
-    tidytable::filter(
-      candidate_structure_organism_occurrence_closest %in% candidate_occurrences
-    ) |>
-    tidytable::select(-".taxonomy_rank") |>
-    tidytable::distinct()
-
-  if (nrow(sop_long) == 0L) {
+  # Extract unique (inchikey, occurrence) pairs present in df using integer IDs
+  ik_df <- df$candidate_structure_inchikey_connectivity_layer
+  occ_df <- df$candidate_structure_organism_occurrence_closest
+  valid_df <- which(
+    !is.na(ik_df) &
+      !is.na(occ_df) &
+      nzchar(ik_df) &
+      nzchar(occ_df)
+  )
+  if (length(valid_df) == 0L) {
     return(empty_lookup())
   }
 
-  # Bound the join output by df's own key combos rather than by however many
-  # organism records a popular structure happens to carry.
-  df_keys <- df |>
-    tidytable::distinct(
-      feature_id,
-      candidate_structure_organism_occurrence_closest,
-      candidate_structure_inchikey_connectivity_layer
-    )
+  ik_sub <- ik_df[valid_df]
+  occ_sub <- occ_df[valid_df]
+  fid_sub <- df$feature_id[valid_df]
 
-  sop_long |>
-    tidytable::inner_join(
-      y = df_keys,
-      by = c(
-        "candidate_structure_inchikey_connectivity_layer",
-        "candidate_structure_organism_occurrence_closest"
+  u_ik <- unique(ik_sub)
+  u_occ <- unique(occ_sub)
+  n_occ <- length(u_occ)
+
+  ik_id <- fastmatch::fmatch(ik_sub, u_ik)
+  occ_id <- fastmatch::fmatch(occ_sub, u_occ)
+  pair_id_df <- (as.numeric(ik_id - 1L) * n_occ) + occ_id
+  u_pair_ids <- unique(pair_id_df)
+
+  # Scan taxonomy columns against u_pair_ids without pivot_longer
+  ik_sop <- fastmatch::fmatch(sop_narrow[[inchikey_col]], u_ik)
+  doi_sop <- sop_narrow$reference_doi
+
+  matched_pair_list <- vector("list", length(taxonomy_cols))
+  matched_doi_list <- vector("list", length(taxonomy_cols))
+
+  for (idx in seq_along(taxonomy_cols)) {
+    tc <- taxonomy_cols[[idx]]
+    v <- sop_narrow[[tc]]
+    occ_m <- fastmatch::fmatch(v, u_occ)
+    keep <- which(!is.na(ik_sop) & !is.na(occ_m))
+    if (length(keep) > 0L) {
+      pid <- (as.numeric(ik_sop[keep] - 1L) * n_occ) + occ_m[keep]
+      in_df <- !is.na(fastmatch::fmatch(pid, u_pair_ids))
+      if (any(in_df)) {
+        k2 <- keep[in_df]
+        matched_pair_list[[idx]] <- pid[in_df]
+        matched_doi_list[[idx]] <- doi_sop[k2]
+      }
+    }
+  }
+
+  all_pids <- unlist(matched_pair_list, use.names = FALSE)
+  if (length(all_pids) == 0L) {
+    return(empty_lookup())
+  }
+  all_dois <- unlist(matched_doi_list, use.names = FALSE)
+
+  # Collapse reference_doi ONCE per unique (inchikey, occurrence) pair,
+  # BEFORE expanding across feature_id.
+  u_matched_pids <- unique(all_pids)
+  pid_grp <- fastmatch::fmatch(all_pids, u_matched_pids)
+
+  u_dois <- unique(all_dois)
+  doi_id <- fastmatch::fmatch(all_dois, u_dois)
+  n_u_dois <- max(1L, length(u_dois))
+  pd_code <- (as.numeric(pid_grp - 1L) * n_u_dois) + doi_id
+  first_pd <- !duplicated(pd_code)
+
+  pid_grp_u <- pid_grp[first_pd]
+  dois_u <- all_dois[first_pd]
+
+  counts_p <- tabulate(pid_grp_u, nbins = length(u_matched_pids))
+  collapsed_doi <- character(length(u_matched_pids))
+
+  single_p <- which(counts_p == 1L)
+  if (length(single_p) > 0L) {
+    pos1 <- fastmatch::fmatch(single_p, pid_grp_u)
+    collapsed_doi[single_p] <- ifelse(
+      is.na(dois_u[pos1]),
+      "",
+      as.character(dois_u[pos1])
+    )
+  }
+
+  multi_p <- which(counts_p > 1L)
+  if (length(multi_p) > 0L) {
+    in_m <- pid_grp_u %in% multi_p
+    ord_m <- which(in_m)[order(pid_grp_u[in_m])]
+    g_m <- pid_grp_u[ord_m]
+    d_m <- dois_u[ord_m]
+    non_na_m <- !is.na(d_m) & nzchar(d_m)
+    if (any(non_na_m)) {
+      g_m2 <- g_m[non_na_m]
+      d_m2 <- d_m[non_na_m]
+      sp <- split(d_m2, g_m2)
+      collapsed_doi[as.integer(names(sp))] <- vapply(
+        sp,
+        paste,
+        character(1L),
+        collapse = " | ",
+        USE.NAMES = FALSE
       )
-    ) |>
-    tidytable::distinct(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      candidate_structure_organism_occurrence_closest,
-      candidate_structure_organism_occurrence_reference = reference_doi,
-      .keep_all = TRUE
-    ) |>
-    tidytable::group_by(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      candidate_structure_organism_occurrence_closest
-    ) |>
-    clean_collapse(
-      cols = "candidate_structure_organism_occurrence_reference"
-    ) |>
-    tidytable::ungroup()
+    }
+  }
+
+  # Match distinct (feature_id, inchikey, occurrence) triples to u_matched_pids
+  in_matched <- fastmatch::fmatch(pair_id_df, u_matched_pids)
+  has_m <- which(!is.na(in_matched))
+  if (length(has_m) == 0L) {
+    return(empty_lookup())
+  }
+
+  f_m <- fid_sub[has_m]
+  g_m <- in_matched[has_m]
+  u_fids <- unique(f_m)
+  f_id <- fastmatch::fmatch(f_m, u_fids)
+  n_g <- length(u_matched_pids)
+  fg_code <- (as.numeric(f_id - 1L) * n_g) + g_m
+  keep_fg <- has_m[!duplicated(fg_code)]
+  g_final <- in_matched[keep_fg]
+
+  tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = ik_sub[keep_fg],
+    feature_id = fid_sub[keep_fg],
+    candidate_structure_organism_occurrence_closest = occ_sub[keep_fg],
+    candidate_structure_organism_occurrence_reference = collapsed_doi[g_final]
+  )
 }
 
 .build_feature_consensus_table <- function(annot_table_wei_chemo, model) {

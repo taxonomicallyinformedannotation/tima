@@ -17,20 +17,33 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
   "matched_peak_count"
 )
 
+.as_numeric_dedup <- function(x) {
+  if (is.numeric(x)) {
+    return(as.double(x))
+  }
+  x_chr <- as.character(x)
+  if (length(x_chr) > 1000L) {
+    u_x <- unique(x_chr)
+    u_num <- suppressWarnings(as.numeric(u_x))
+    return(u_num[fastmatch::fmatch(x_chr, u_x)])
+  }
+  suppressWarnings(as.numeric(x_chr))
+}
+
 .resolve_edge_weights <- function(edges) {
   edge_weights <- rep(NA_real_, nrow(edges))
 
   weight_col <- intersect(EDGE_WEIGHT_COLUMNS, names(edges))
 
   if (length(weight_col) > 0L) {
-    edge_weights <- suppressWarnings(as.numeric(edges[[weight_col[[1L]]]]))
+    edge_weights <- .as_numeric_dedup(edges[[weight_col[[1L]]]])
   }
 
   matched_col <- intersect(EDGE_MATCHED_PEAKS_COLUMNS, names(edges))
   matched_factor <- rep(1, nrow(edges))
 
   if (length(matched_col) > 0L) {
-    matched_values <- suppressWarnings(as.numeric(edges[[matched_col[[1L]]]]))
+    matched_values <- .as_numeric_dedup(edges[[matched_col[[1L]]]])
     matched_values[!is.finite(matched_values)] <- 1
     matched_values[matched_values < 1] <- 1
 
@@ -43,7 +56,7 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
     denominator <- rep(6, nrow(edges))
 
     if (length(peak_col) > 0L) {
-      peak_values <- suppressWarnings(as.numeric(edges[[peak_col[[1L]]]]))
+      peak_values <- .as_numeric_dedup(edges[[peak_col[[1L]]]])
       peak_values[!is.finite(peak_values)] <- 6
       peak_values[peak_values < 1] <- 6
       denominator <- peak_values
@@ -78,19 +91,18 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
 
   cm_names <- names(component_membership)
   cm_vals <- as.character(unname(component_membership))
-  edge_source_community <- cm_vals[
-    fastmatch::fmatch(edges[[name_source]], cm_names)
-  ]
-  edge_target_community <- cm_vals[
-    fastmatch::fmatch(edges[[name_target]], cm_names)
-  ]
+  valid_cm <- !is.na(cm_vals) & nzchar(cm_vals, keepNA = FALSE)
+  u_cm <- unique(cm_vals[valid_cm])
+  cm_int <- ifelse(valid_cm, fastmatch::fmatch(cm_vals, u_cm), 0L)
+
+  s_comm <- cm_int[fastmatch::fmatch(edges[[name_source]], cm_names)]
+  t_comm <- cm_int[fastmatch::fmatch(edges[[name_target]], cm_names)]
   attr(cm_names, ".match.hash") <- NULL
 
-  same_community <- !is.na(edge_source_community) &
-    !is.na(edge_target_community) &
-    nzchar(edge_source_community, keepNA = FALSE) &
-    nzchar(edge_target_community, keepNA = FALSE) &
-    edge_source_community == edge_target_community
+  same_community <- !is.na(s_comm) &
+    !is.na(t_comm) &
+    s_comm > 0L &
+    s_comm == t_comm
 
   intra_edges <- edges[same_community, , drop = FALSE]
   if (nrow(intra_edges) <= 2L) {
@@ -102,22 +114,14 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
     return(intra_edges[seq_len(min(2L, nrow(intra_edges))), , drop = FALSE])
   }
 
-  min_strength <- max(
-    0.05,
-    stats::quantile(
-      edge_weights,
-      probs = 0.5,
-      na.rm = TRUE,
-      names = FALSE
-    )
-  )
-  cutoff <- stats::quantile(
+  qs <- stats::quantile(
     edge_weights,
-    probs = 0.75,
+    probs = c(0.5, 0.75),
     na.rm = TRUE,
     names = FALSE
   )
-  keep_edge <- edge_weights >= pmax(cutoff, min_strength)
+  threshold <- max(0.05, qs[[1L]], qs[[2L]])
+  keep_edge <- edge_weights >= threshold
   if (!any(keep_edge)) {
     keep_edge[which.max(edge_weights)] <- TRUE
   }
@@ -148,7 +152,10 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
   }
 
   if (label_column %in% names(edges) && !all(is.na(edges[[label_column]]))) {
-    all_features <- unique(c(edges[[name_source]], edges[[name_target]]))
+    all_features <- unique(c(
+      unique(edges[[name_source]]),
+      unique(edges[[name_target]])
+    ))
     component_membership <- stats::setNames(
       rep(NA_character_, length(all_features)),
       all_features
@@ -200,7 +207,7 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
   } else {
     src_col <- as.character(edges[[name_source]])
     tgt_col <- as.character(edges[[name_target]])
-    all_features <- unique(c(src_col, tgt_col))
+    all_features <- unique(c(unique(src_col), unique(tgt_col)))
     all_features <- all_features[!is.na(all_features)]
 
     edge_weights <- .resolve_edge_weights(edges)
@@ -596,8 +603,8 @@ create_components <- function(
 
   n_edges <- nrow(edges)
   n_unique_features <- length(unique(c(
-    edges$feature_source,
-    edges$feature_target
+    unique(edges$feature_source),
+    unique(edges$feature_target)
   )))
 
   log_info(

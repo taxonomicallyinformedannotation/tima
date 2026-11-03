@@ -833,3 +833,49 @@ test_that("rearrange_annotations merges SIRIUS scores into spectral entries with
 
   expect_true("feature_pred_tax_npc_01pat_val" %in% names(result))
 })
+
+test_that("load_edges_table slices top N neighbors numerically per source", {
+  tf <- temp_test_path("edges_slice.tsv")
+  edges_df <- tidytable::tidytable(
+    feature_source = c("F2", "F2", "F2", "F1", "F1"),
+    feature_target = c("T1", "T2", "T3", "F1", "T4"),
+    candidate_score_similarity = c(
+      "0.15",
+      "0.95",
+      "0.50",
+      NA_character_,
+      "0.80"
+    ),
+    feature_spectrum_entropy = c("1.0", "1.0", "1.0", "2.0", "2.0"),
+    feature_spectrum_peaks = c("10", "10", "10", "5", "5")
+  )
+  tidytable::fwrite(edges_df, tf, sep = "\t")
+
+  res <- load_edges_table(tf, candidates_neighbors = 2L)
+  expect_equal(nrow(res), 4L)
+  f2_rows <- res[res$feature_source == "F2", ]
+  expect_equal(f2_rows$feature_target, c("T2", "T3"))
+  f1_rows <- res[res$feature_source == "F1", ]
+  expect_equal(f1_rows$feature_target, c("T4", "F1"))
+})
+
+test_that("log_annotation_stats logs distinct feature-library-inchikey counts", {
+  ann_df <- tidytable::tidytable(
+    feature_id = c("1", "1", "1", "2", "3"),
+    candidate_library = c("GNPS", "GNPS", "ISDB", "ISDB", "ISDB"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK1",
+      "IK1",
+      "IK1",
+      "IK2",
+      NA_character_
+    )
+  )
+  log_file <- withr::local_tempfile(fileext = ".log")
+  setup_logger(filename = log_file, threshold = 400)
+
+  log_annotation_stats(ann_df)
+  logged <- paste(readLines(log_file, warn = FALSE), collapse = "\n")
+  expect_true(grepl("ISDB\\s+2\\s+66\\.67%", logged))
+  expect_true(grepl("GNPS\\s+1\\s+33\\.33%", logged))
+})

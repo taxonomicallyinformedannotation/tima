@@ -1,65 +1,9 @@
-##' @description
-##'
-##' Extract **all** fields from the MGF eventually renaming the field names to
-##' the spectra variable names specified with `mapping`.
-##'
-#' @include logs_utils.R
-#' @param mgf [character] `character()` of lines defining a spectrum in mgf
-#'     format.
-##'
-##' @author Laurent Gatto, Johannes Rainer
-##'
-##' @noRd
-.extract_mgf_spectrum <- function(mgf) {
-  r <- regexpr("=", mgf, fixed = TRUE)
-  desc.idx <- which(r > 0L) # nolint: object_name_linter.
-  desc <- mgf[desc.idx]
-  peak_lines <- if (length(desc.idx)) mgf[-desc.idx] else mgf
-  if (!length(peak_lines)) {
-    return(NULL)
-  }
-
-  spec <- strsplit(peak_lines, "[[:space:]]+", perl = TRUE)
-  # Remove empty entries from blank lines (strsplit("") returns character(0))
-  spec <- spec[lengths(spec) > 0L]
-  if (!length(spec) || length(spec[[1L]]) == 1L) {
-    return(NULL)
-  }
-  ms <- matrix(
-    as.double(unlist(spec, use.names = FALSE, recursive = FALSE)),
-    ncol = length(spec[[1L]]),
-    byrow = TRUE
-  )
-
-  if (.is_unsorted(ms)) {
-    ms <- ms[order(ms[, 1L]), , drop = FALSE]
-  }
-
-  r_desc <- r[desc.idx]
-  desc <- stats::setNames(
-    substring(desc, r_desc + 1L),
-    substring(desc, 1L, r_desc - 1L)
-  )
-
-  desc[c("PEPMASS", "PEPMASSINT")] <-
-    strsplit(desc["PEPMASS"], "[[:space:]]+", perl = TRUE)[[1L]][c(1L, 2L)]
-
-  list(
-    desc = desc,
-    mz = ms[, 1L],
-    intensity = ms[, 2L]
-  )
-}
-
-.is_unsorted <- function(x) {
-  nrow(x) && is.unsorted(x[, 1L])
-}
-
 #' Format MGF charge string into an integer compatible format.
 #'
 #' Handles both the trailing-sign convention used by Mascot (`"1+"`, `"1-"`)
 #' and the leading-sign convention used by some tools (`"-1"`, `"1"`).
 #'
+#' @include logs_utils.R
 #' @param x [character] `character`
 #' @return `character`, charge without +/- at the end but - as prefix if needed
 #' @noRd
@@ -169,24 +113,21 @@ read_mgf_opti <- function(
   log_debug("Using MS level: %d", msLevel)
 
   lines <- readLines(f, warn = FALSE)
+  needs_line_trim <- startsWith(lines, " ") |
+    startsWith(lines, "\t") |
+    endsWith(lines, " ") |
+    endsWith(lines, "\t") |
+    endsWith(lines, "\r")
+  if (any(needs_line_trim)) {
+    lines[needs_line_trim] <- trimws(lines[needs_line_trim])
+  }
   begins <- which(lines == "BEGIN IONS")
   ends <- which(lines == "END IONS")
   n_blocks <- min(length(begins), length(ends))
 
   log_info("Total spectra read: %s", n_blocks)
 
-  sp_list <- vector("list", n_blocks)
-  for (i in seq_len(n_blocks)) {
-    s <- begins[i] + 1L
-    e <- ends[i] - 1L
-    if (s <= e) {
-      sp_list[[i]] <- .extract_mgf_spectrum(lines[s:e])
-    }
-  }
-  rm(lines)
-  sp_list <- Filter(Negate(is.null), sp_list)
-
-  if (length(sp_list) == 0L) {
+  make_empty_mgf_df <- function() {
     log_warn(
       "No spectra with fragment peaks found in file; returning empty result"
     )
@@ -203,31 +144,174 @@ read_mgf_opti <- function(
     empty$intensity <- methods::as(list(), Class = "NumericList")
     empty$msLevel <- integer(0L)
     empty$dataOrigin <- character(0L)
-    return(empty)
+    empty
   }
 
-  desc_list <- lapply(sp_list, `[[`, "desc")
-  desc_lens <- lengths(desc_list)
-  all_vals <- unlist(desc_list, use.names = FALSE)
-  all_nms <- unlist(lapply(desc_list, names), use.names = FALSE)
-  all_keys <- unique(all_nms)
-  n_sp <- length(sp_list)
+  if (n_blocks == 0L) {
+    return(make_empty_mgf_df())
+  }
+
+  s_idx <- begins[seq_len(n_blocks)] + 1L
+  e_idx <- ends[seq_len(n_blocks)] - 1L
+  lens <- pmax(0L, e_idx - s_idx + 1L)
+
+  if (sum(lens) == 0L) {
+    return(make_empty_mgf_df())
+  }
+
+  line_idx <- sequence(lens, from = s_idx)
+  block_id <- rep.int(seq_len(n_blocks), lens)
+  inner_lines <- lines[line_idx]
+  rm(lines, line_idx)
+
+  non_empty <- nzchar(inner_lines) & !startsWith(inner_lines, "#")
+  if (!all(non_empty)) {
+    inner_lines <- inner_lines[non_empty]
+    block_id <- block_id[non_empty]
+  }
+
+  if (length(inner_lines) == 0L) {
+    return(make_empty_mgf_df())
+  }
+
+  eq_pos <- regexpr("=", inner_lines, fixed = TRUE)
+  is_desc <- eq_pos > 0L
+
+  pk_lines <- inner_lines[!is_desc]
+  pk_blocks <- block_id[!is_desc]
+
+  if (length(pk_lines) == 0L) {
+    return(make_empty_mgf_df())
+  }
+
+  sep1 <- regexpr("[ \t]+", pk_lines, perl = TRUE)
+  sep1_len <- attr(sep1, "match.length")
+  valid_pk_line <- sep1 > 1L & (sep1 + sep1_len) <= nchar(pk_lines)
+  if (!all(valid_pk_line)) {
+    pk_lines <- pk_lines[valid_pk_line]
+    pk_blocks <- pk_blocks[valid_pk_line]
+    sep1_len <- sep1_len[valid_pk_line]
+    sep1 <- sep1[valid_pk_line]
+  }
+
+  if (length(pk_lines) == 0L) {
+    return(make_empty_mgf_df())
+  }
+
+  mz_str <- substr(pk_lines, 1L, sep1 - 1L)
+  rest_str <- substring(pk_lines, sep1 + sep1_len)
+  rm(pk_lines, sep1, sep1_len)
+
+  sep2 <- regexpr("[ \t]", rest_str, perl = TRUE)
+  has_sep2 <- sep2 > 0L
+  if (any(has_sep2)) {
+    rest_str[has_sep2] <- substr(rest_str[has_sep2], 1L, sep2[has_sep2] - 1L)
+  }
+  rm(sep2, has_sep2)
+
+  valid_blocks <- unique(pk_blocks)
+  n_sp <- length(valid_blocks)
+
+  if (n_sp < n_blocks) {
+    pk_sp_id <- fastmatch::fmatch(pk_blocks, valid_blocks)
+  } else {
+    pk_sp_id <- pk_blocks
+  }
+
+  mz_all <- as.double(mz_str)
+  int_all <- as.double(rest_str)
+  rm(mz_str, rest_str, pk_blocks)
+
+  # Check and fix unsorted m/z within any spectrum block
+  if (length(mz_all) > 1L) {
+    same_blk <- pk_sp_id[-1L] == pk_sp_id[-length(pk_sp_id)]
+    unsorted_edges <- which(same_blk & (mz_all[-1L] < mz_all[-length(mz_all)]))
+    if (length(unsorted_edges) > 0L) {
+      bad_sp <- unique(pk_sp_id[unsorted_edges + 1L])
+      in_bad <- pk_sp_id %in% bad_sp
+      bad_idx <- which(in_bad)
+      ord <- bad_idx[order(pk_sp_id[bad_idx], mz_all[bad_idx])]
+      mz_all[bad_idx] <- mz_all[ord]
+      int_all[bad_idx] <- int_all[ord]
+    }
+  }
+
+  mz_list <- methods::as(unname(split(mz_all, pk_sp_id)), Class = "NumericList")
+  int_list <- methods::as(
+    unname(split(int_all, pk_sp_id)),
+    Class = "NumericList"
+  )
+  rm(mz_all, int_all, pk_sp_id)
+
+  desc_lines <- inner_lines[is_desc]
+  desc_blocks <- block_id[is_desc]
+  desc_eq <- eq_pos[is_desc]
+  rm(inner_lines, block_id, eq_pos, is_desc)
+
+  if (n_sp < n_blocks) {
+    desc_sp_id <- fastmatch::fmatch(desc_blocks, valid_blocks)
+    keep_d <- !is.na(desc_sp_id)
+    desc_lines <- desc_lines[keep_d]
+    desc_sp_id <- desc_sp_id[keep_d]
+    desc_eq <- desc_eq[keep_d]
+  } else {
+    desc_sp_id <- desc_blocks
+  }
+  rm(desc_blocks)
+
+  all_nms <- substring(desc_lines, 1L, desc_eq - 1L)
+  all_vals <- substring(desc_lines, desc_eq + 1L)
+  rm(desc_lines, desc_eq)
+
+  all_keys <- unique(c(all_nms, "PEPMASS", "PEPMASSINT"))
   n_keys <- length(all_keys)
-  if (n_keys > 0L) {
-    spec_idx <- rep.int(seq_len(n_sp), desc_lens)
+  if (length(all_nms) > 0L) {
     key_idx <- fastmatch::fmatch(all_nms, all_keys)
-    flat_pos <- spec_idx + (key_idx - 1L) * n_sp
+    flat_pos <- desc_sp_id + (key_idx - 1L) * n_sp
     first_occ <- !duplicated(flat_pos)
     mat <- matrix(NA_character_, nrow = n_sp, ncol = n_keys)
     mat[flat_pos[first_occ]] <- all_vals[first_occ]
     colnames(mat) <- all_keys
     res <- as.data.frame(mat, stringsAsFactors = FALSE, check.names = FALSE)
   } else {
-    res <- data.frame(row.names = seq_len(n_sp))
+    res <- data.frame(
+      PEPMASS = rep(NA_character_, n_sp),
+      PEPMASSINT = rep(NA_character_, n_sp),
+      stringsAsFactors = FALSE
+    )
   }
-  res$mz <- lapply(sp_list, `[[`, "mz")
-  res$intensity <- lapply(sp_list, `[[`, "intensity")
-  rm(sp_list, desc_list)
+  rm(all_nms, all_vals, desc_sp_id)
+
+  if ("PEPMASS" %in% colnames(res)) {
+    pm_raw <- res$PEPMASS
+    non_na_pm <- which(!is.na(pm_raw) & nzchar(pm_raw))
+    pm_mz <- rep(NA_character_, n_sp)
+    pm_int <- rep(NA_character_, n_sp)
+    if (length(non_na_pm) > 0L) {
+      pm_sub <- pm_raw[non_na_pm]
+      pm_sep <- regexpr("[ \t]+", pm_sub, perl = TRUE)
+      has_pm_sep <- pm_sep > 0L
+      if (!all(has_pm_sep)) {
+        pm_mz[non_na_pm[!has_pm_sep]] <- pm_sub[!has_pm_sep]
+      }
+      if (any(has_pm_sep)) {
+        idx_s <- which(has_pm_sep)
+        s_pos <- pm_sep[idx_s]
+        s_len <- attr(pm_sep, "match.length")[idx_s]
+        pm_mz[non_na_pm[idx_s]] <- substr(pm_sub[idx_s], 1L, s_pos - 1L)
+        pm_rest <- substring(pm_sub[idx_s], s_pos + s_len)
+        pm_sep2 <- regexpr("[ \t]", pm_rest, perl = TRUE)
+        has_s2 <- pm_sep2 > 0L
+        if (any(has_s2)) {
+          pm_rest[has_s2] <- substr(pm_rest[has_s2], 1L, pm_sep2[has_s2] - 1L)
+        }
+        pm_rest[!nzchar(pm_rest)] <- NA_character_
+        pm_int[non_na_pm[idx_s]] <- pm_rest
+      }
+    }
+    res$PEPMASS <- pm_mz
+    res$PEPMASSINT <- pm_int
+  }
 
   # Format charge field if present
   if ("CHARGE" %in% colnames(res)) {
@@ -260,8 +344,8 @@ read_mgf_opti <- function(
 
   # Convert to DataFrame and set up peak lists
   res <- methods::as(object = res, Class = "DataFrame")
-  res$mz <- methods::as(object = res$mz, Class = "NumericList")
-  res$intensity <- methods::as(object = res$intensity, Class = "NumericList")
+  res$mz <- mz_list
+  res$intensity <- int_list
   res$dataOrigin <- f
 
   if (!"msLevel" %in% colnames(res)) {
@@ -293,7 +377,15 @@ read_mgf_metadata <- function(f) {
     )
   }
 
-  lines <- trimws(readLines(f, warn = FALSE))
+  lines <- readLines(f, warn = FALSE)
+  needs_line_trim <- startsWith(lines, " ") |
+    startsWith(lines, "\t") |
+    endsWith(lines, " ") |
+    endsWith(lines, "\t") |
+    endsWith(lines, "\r")
+  if (any(needs_line_trim)) {
+    lines[needs_line_trim] <- trimws(lines[needs_line_trim])
+  }
   is_begin <- lines == "BEGIN IONS"
   is_end <- lines == "END IONS"
   block <- cumsum(is_begin)
@@ -305,13 +397,30 @@ read_mgf_metadata <- function(f) {
   }
 
   fields <- lines[is_field]
+  field_blocks <- block[is_field]
+  rm(lines, is_begin, is_end, block, inside, is_field)
+
   eq <- regexpr("=", fields, fixed = TRUE)
-  tidytable::tidytable(
-    .block = block[is_field],
-    key = toupper(trimws(substring(fields, 1L, eq - 1L))),
-    value = trimws(substring(fields, eq + 1L))
-  ) |>
-    tidytable::distinct(.block, key, .keep_all = TRUE) |>
-    tidytable::pivot_wider(names_from = key, values_from = value) |>
-    tidytable::select(-.block)
+  keys <- toupper(trimws(substring(fields, 1L, eq - 1L)))
+  vals <- trimws(substring(fields, eq + 1L))
+
+  u_blocks <- unique(field_blocks)
+  u_keys <- unique(keys)
+  n_b <- length(u_blocks)
+  n_k <- length(u_keys)
+
+  b_idx <- fastmatch::fmatch(field_blocks, u_blocks)
+  k_idx <- fastmatch::fmatch(keys, u_keys)
+  flat_pos <- b_idx + (k_idx - 1L) * n_b
+  first_occ <- !duplicated(flat_pos)
+
+  mat <- matrix(NA_character_, nrow = n_b, ncol = n_k)
+  mat[flat_pos[first_occ]] <- vals[first_occ]
+  colnames(mat) <- u_keys
+
+  tidytable::as_tidytable(as.data.frame(
+    mat,
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  ))
 }
