@@ -93,6 +93,41 @@ combine_weighted_scores <- function(
     )
   }
 
+  # Fast path when both narrow tables are already row-aligned with unique keys
+  aligned <- nrow(score_bio_table) == nrow(score_chemo_table) &&
+    identical(score_bio_table$feature_id, score_chemo_table$feature_id) &&
+    identical(
+      score_bio_table$candidate_structure_inchikey_connectivity_layer,
+      score_chemo_table$candidate_structure_inchikey_connectivity_layer
+    ) &&
+    !anyNA(score_bio_table$feature_id) &&
+    !anyNA(score_bio_table$candidate_structure_inchikey_connectivity_layer) &&
+    !anyDuplicated(
+      score_bio_table[,
+        c("feature_id", "candidate_structure_inchikey_connectivity_layer"),
+        drop = FALSE
+      ]
+    )
+
+  if (aligned) {
+    score_final <- compute_weighted_sum(
+      score_chemo_table$score_chemical,
+      score_bio_table$score_biological,
+      score_bio_table$candidate_score_pseudo_initial,
+      weights = c(weight_chemical, weight_biological, weight_spectral)
+    )
+    result <- tidytable::tidytable(
+      feature_id = score_bio_table$feature_id,
+      candidate_structure_inchikey_connectivity_layer = score_bio_table$candidate_structure_inchikey_connectivity_layer,
+      score_initial = score_bio_table$candidate_score_pseudo_initial,
+      score_biological = score_bio_table$score_biological,
+      score_chemical = score_chemo_table$score_chemical,
+      score_final = score_final
+    )
+    log_complete(ctx, n_combined = nrow(result))
+    return(result)
+  }
+
   # Key join: ONLY on feature_id + inchikey, nothing else
   # This prevents cartesian products
   result <- score_bio_table |>
@@ -157,6 +192,50 @@ expand_combined_scores_for_filtering <- function(
   validate_dataframe(wide_bio_table, param_name = "wide_bio_table")
   validate_dataframe(wide_chemo_table, param_name = "wide_chemo_table")
 
+  chemo_cols_to_add <- setdiff(
+    names(wide_chemo_table),
+    names(wide_bio_table)
+  )
+
+  # Fast path when all three tables are row-aligned with unique keys
+  aligned <- nrow(wide_bio_table) == nrow(wide_chemo_table) &&
+    nrow(wide_bio_table) == nrow(combined_scores) &&
+    identical(wide_bio_table$feature_id, wide_chemo_table$feature_id) &&
+    identical(wide_bio_table$feature_id, combined_scores$feature_id) &&
+    identical(
+      wide_bio_table$candidate_structure_inchikey_connectivity_layer,
+      wide_chemo_table$candidate_structure_inchikey_connectivity_layer
+    ) &&
+    identical(
+      wide_bio_table$candidate_structure_inchikey_connectivity_layer,
+      combined_scores$candidate_structure_inchikey_connectivity_layer
+    ) &&
+    !anyNA(wide_bio_table$feature_id) &&
+    !anyNA(wide_bio_table$candidate_structure_inchikey_connectivity_layer) &&
+    !anyDuplicated(
+      wide_bio_table[,
+        c("feature_id", "candidate_structure_inchikey_connectivity_layer"),
+        drop = FALSE
+      ]
+    )
+
+  if (aligned) {
+    result <- data.table::copy(select_clean_chemo_working_columns(
+      wide_bio_table
+    ))
+    for (col in chemo_cols_to_add) {
+      data.table::set(result, j = col, value = wide_chemo_table[[col]])
+    }
+    if ("score_final" %in% names(combined_scores)) {
+      data.table::set(
+        result,
+        j = "score_weighted_chemo",
+        value = combined_scores$score_final
+      )
+    }
+    return(result)
+  }
+
   # Get the candidate keys we need from combined_scores
   candidates_needed <- combined_scores |>
     tidytable::select(
@@ -170,10 +249,6 @@ expand_combined_scores_for_filtering <- function(
   # into one reduces intermediate memory by ~50% for this step.
   # score_final comes from combined_scores (not the wide tables), so we
   # extract it here and merge it into the chemo lookup table.
-  chemo_cols_to_add <- setdiff(
-    names(wide_chemo_table),
-    names(wide_bio_table)
-  )
   chemo_lookup <- tidytable::select(
     wide_chemo_table,
     feature_id,

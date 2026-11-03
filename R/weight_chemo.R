@@ -220,123 +220,87 @@ weight_chemo <- function(
     weight_chemical
   )
 
-  # Reduce to unique candidate/feature taxonomy combinations to score per-level
-  df2 <- annot_table_wei_bio_clean |>
-    tidytable::distinct(
-      candidate_structure_tax_cla_01kin,
-      candidate_structure_tax_npc_01pat,
-      candidate_structure_tax_cla_02sup,
-      candidate_structure_tax_npc_02sup,
-      candidate_structure_tax_cla_03cla,
-      candidate_structure_tax_npc_03cla,
-      candidate_structure_tax_cla_04dirpar,
-      feature_pred_tax_cla_01kin_val,
-      feature_pred_tax_cla_01kin_score,
-      feature_pred_tax_npc_01pat_val,
-      feature_pred_tax_npc_01pat_score,
-      feature_pred_tax_cla_02sup_val,
-      feature_pred_tax_cla_02sup_score,
-      feature_pred_tax_npc_02sup_val,
-      feature_pred_tax_npc_02sup_score,
-      feature_pred_tax_cla_03cla_val,
-      feature_pred_tax_cla_03cla_score,
-      feature_pred_tax_npc_03cla_val,
-      feature_pred_tax_npc_03cla_score,
-      feature_pred_tax_cla_04dirpar_val,
-      feature_pred_tax_cla_04dirpar_score
-    )
-
-  # OPTIMIZATION: Vectorized 7-level chemical scoring — replaces 7 separate
-  # score_per_level_chemo() calls (each doing distinct + filter + stri_detect_token)
-  # plus 7 sequential left_joins that each created a full table copy.
-  # Since df2 is already distinct() on the candidate+taxonomy columns, we
-  # assign each score column directly via vectorized if_else + stri_detect_token.
-  # This eliminates all 7 joins entirely — direct column assignment is O(N)
-  # with zero table copies.
   chemo_levels <- list(
     list(
       cand = "candidate_structure_tax_cla_01kin",
       fval = "feature_pred_tax_cla_01kin_val",
-      fscore = "feature_pred_tax_cla_01kin_score",
       weight = score_chemical_cla_kingdom,
       out = "score_chemical_1"
     ),
     list(
       cand = "candidate_structure_tax_npc_01pat",
       fval = "feature_pred_tax_npc_01pat_val",
-      fscore = "feature_pred_tax_npc_01pat_score",
       weight = score_chemical_npc_pathway,
       out = "score_chemical_2"
     ),
     list(
       cand = "candidate_structure_tax_cla_02sup",
       fval = "feature_pred_tax_cla_02sup_val",
-      fscore = "feature_pred_tax_cla_02sup_score",
       weight = score_chemical_cla_superclass,
       out = "score_chemical_3"
     ),
     list(
       cand = "candidate_structure_tax_npc_02sup",
       fval = "feature_pred_tax_npc_02sup_val",
-      fscore = "feature_pred_tax_npc_02sup_score",
       weight = score_chemical_npc_superclass,
       out = "score_chemical_4"
     ),
     list(
       cand = "candidate_structure_tax_cla_03cla",
       fval = "feature_pred_tax_cla_03cla_val",
-      fscore = "feature_pred_tax_cla_03cla_score",
       weight = score_chemical_cla_class,
       out = "score_chemical_5"
     ),
     list(
       cand = "candidate_structure_tax_npc_03cla",
       fval = "feature_pred_tax_npc_03cla_val",
-      fscore = "feature_pred_tax_npc_03cla_score",
       weight = score_chemical_npc_class,
       out = "score_chemical_6"
     ),
     list(
       cand = "candidate_structure_tax_cla_04dirpar",
       fval = "feature_pred_tax_cla_04dirpar_val",
-      fscore = "feature_pred_tax_cla_04dirpar_score",
       weight = score_chemical_cla_parent,
       out = "score_chemical_7"
     )
   )
 
-  # Assign score columns directly via vectorized if_else (no joins, no copies)
+  # Evaluate stri_detect_token only on unique valid (cand, fval) pairs per level
+  # and assign directly onto annot_table_wei_bio_clean — avoids 21-column
+  # distinct() and 21-column right_join() copies across millions of rows.
+  annot_table_wei_chemo <- annot_table_wei_bio_clean
+  rm(annot_table_wei_bio_clean)
+  score_chem_max <- numeric(n_annotations)
+
   for (lvl in chemo_levels) {
-    cand_vals <- df2[[lvl$cand]]
-    fval <- df2[[lvl$fval]]
-    matched <- !is.na(cand_vals) &
-      cand_vals != "notClassified" &
-      !is.na(fval) &
-      stri_detect_token(str = fval, pattern = cand_vals)
-    df2[[lvl$out]] <- ifelse(matched, as.numeric(lvl$weight), NA_real_)
-  }
-  rm(chemo_levels, cand_vals, fval, matched)
-
-  df2 <- df2 |>
-    tidytable::mutate(
-      score_chemical = pmax(
-        score_chemical_1,
-        score_chemical_2,
-        score_chemical_3,
-        score_chemical_4,
-        score_chemical_5,
-        score_chemical_6,
-        score_chemical_7,
-        0,
-        na.rm = TRUE
-      )
+    cand_vals <- annot_table_wei_chemo[[lvl$cand]]
+    fval <- annot_table_wei_chemo[[lvl$fval]]
+    valid_idx <- which(
+      !is.na(cand_vals) &
+        cand_vals != "notClassified" &
+        !is.na(fval)
     )
-
-  annot_table_wei_chemo_interim <- df2 |>
-    tidytable::right_join(y = annot_table_wei_bio_clean)
-  rm(df2, annot_table_wei_bio_clean)
-
-  annot_table_wei_chemo <- annot_table_wei_chemo_interim
+    col_out <- rep(NA_real_, n_annotations)
+    if (length(valid_idx) > 0L) {
+      c_sub <- cand_vals[valid_idx]
+      f_sub <- fval[valid_idx]
+      pair_k <- paste(c_sub, f_sub, sep = "\r")
+      u_pos <- which(!duplicated(pair_k))
+      u_match <- stri_detect_token(str = f_sub[u_pos], pattern = c_sub[u_pos])
+      if (any(u_match)) {
+        w_val <- as.numeric(lvl$weight)
+        hit <- u_match[fastmatch::fmatch(pair_k, pair_k[u_pos])]
+        hit_idx <- valid_idx[hit]
+        col_out[hit_idx] <- w_val
+        if (w_val > 0) {
+          score_chem_max[hit_idx] <- pmax(score_chem_max[hit_idx], w_val)
+        }
+      }
+    }
+    annot_table_wei_chemo[[lvl$out]] <- col_out
+  }
+  annot_table_wei_chemo$score_chemical <- score_chem_max
+  rm(chemo_levels, score_chem_max)
 
   weighted_chemo <- compute_weighted_components(
     annot_table_wei_chemo$score_chemical,
@@ -344,13 +308,7 @@ weight_chemo <- function(
     annot_table_wei_chemo$candidate_score_pseudo_initial,
     weights = c(weight_chemical, weight_biological, weight_spectral)
   )
-
-  annot_table_wei_chemo <- annot_table_wei_chemo |>
-    tidytable::mutate(
-      score_weighted_chemo = weighted_chemo$score
-    )
-
-  rm(annot_table_wei_chemo_interim)
+  annot_table_wei_chemo$score_weighted_chemo <- weighted_chemo$score
 
   log_complete(ctx, n_weighted = nrow(annot_table_wei_chemo))
 

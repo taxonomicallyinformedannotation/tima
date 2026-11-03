@@ -212,17 +212,43 @@ sample_candidates_per_group <- function(
   }
 
   # Ensure rank_final exists (rank_and_deduplicate should create it)
+  df <- tidytable::as_tidytable(df)
+  n_rows <- nrow(df)
   if (!"rank_final" %in% names(df)) {
-    df$rank_final <- NA_integer_
+    data.table::set(df, j = "rank_final", value = rep.int(NA_integer_, n_rows))
   }
 
-  # Compute per-score-group sizes (feature/adduct/score-rank) only once
-  df <- df |>
-    tidytable::mutate(
-      .n_per_score = tidytable::n(),
-      .by = c(feature_id, candidate_adduct, rank_final),
-      .anchor_match = FALSE
-    )
+  # Compute per-score-group sizes (feature_id, candidate_adduct, rank_final)
+  # using integer group encoding + tabulate() instead of tidytable::mutate(.by)
+  fids <- df$feature_id
+  adds <- if ("candidate_adduct" %in% names(df)) {
+    df$candidate_adduct
+  } else {
+    rep.int(NA_character_, n_rows)
+  }
+  rks <- df$rank_final
+
+  u_fids <- unique(fids)
+  u_adds <- unique(adds)
+  u_rks <- unique(rks)
+  fid_id <- fastmatch::fmatch(fids, u_fids)
+  add_id <- fastmatch::fmatch(adds, u_adds)
+  rk_id <- fastmatch::fmatch(rks, u_rks)
+
+  n_a <- max(1L, length(u_adds))
+  n_r <- max(1L, length(u_rks))
+  if (as.numeric(length(u_fids)) * as.numeric(n_a) * as.numeric(n_r) < 4.5e15) {
+    grp_code <- ((as.numeric(fid_id - 1L) * n_a + (add_id - 1L)) * n_r) + rk_id
+    u_grp <- unique(grp_code)
+    grp_idx <- fastmatch::fmatch(grp_code, u_grp)
+  } else {
+    grp_str <- paste0(fids, "\u001f", adds, "\u001f", rks)
+    u_grp <- unique(grp_str)
+    grp_idx <- fastmatch::fmatch(grp_str, u_grp)
+  }
+  grp_counts <- tabulate(grp_idx, nbins = length(u_grp))
+  data.table::set(df, j = ".n_per_score", value = grp_counts[grp_idx])
+  data.table::set(df, j = ".anchor_match", value = rep.int(FALSE, n_rows))
 
   has_ik_col <- "candidate_structure_inchikey_connectivity_layer" %in% names(df)
   has_M_cols <- "mz" %in% names(df) && "candidate_adduct" %in% names(df)
@@ -521,35 +547,61 @@ sample_candidates_per_group <- function(
           # persist through tidytable::distinct()
           # Only deduplicate by core identity + InChIKey when the InChIKey column is available
           if (
-            "candidate_structure_inchikey_connectivity_layer" %in% names(.tbl)
+            "candidate_structure_inchikey_connectivity_layer" %in%
+              names(.tbl) &&
+              nrow(.tbl) > 0L
           ) {
-            .tbl <- .tbl |>
-              tidytable::arrange(
-                feature_id,
-                rank_final,
-                tidytable::desc(.note_present)
+            fids_t <- .tbl$feature_id
+            adds_t <- if ("candidate_adduct" %in% names(.tbl)) {
+              .tbl$candidate_adduct
+            } else {
+              rep.int(NA_character_, nrow(.tbl))
+            }
+            rks_t <- .tbl$rank_final
+            iks_t <- .tbl$candidate_structure_inchikey_connectivity_layer
+            note_p <- -as.integer(.tbl$.note_present)
+
+            u_f <- sort(unique(fids_t), na.last = TRUE)
+            u_a <- unique(adds_t)
+            u_r <- sort(unique(rks_t), na.last = TRUE)
+            u_k <- unique(iks_t)
+
+            f_id <- fastmatch::fmatch(fids_t, u_f)
+            a_id <- fastmatch::fmatch(adds_t, u_a)
+            r_id <- fastmatch::fmatch(rks_t, u_r)
+            k_id <- fastmatch::fmatch(iks_t, u_k)
+
+            ord_t <- order(f_id, r_id, note_p, na.last = TRUE, method = "radix")
+            .tbl <- .tbl[ord_t, , drop = FALSE]
+
+            na_u <- max(1L, length(u_a))
+            nr_u <- max(1L, length(u_r))
+            nk_u <- max(1L, length(u_k))
+            if (
+              as.numeric(length(u_f)) *
+                as.numeric(na_u) *
+                as.numeric(nr_u) *
+                as.numeric(nk_u) <
+                4.5e15
+            ) {
+              key <- (((as.numeric(f_id[ord_t] - 1L) *
+                na_u +
+                (a_id[ord_t] - 1L)) *
+                nr_u +
+                (r_id[ord_t] - 1L)) *
+                nk_u) +
+                k_id[ord_t]
+            } else {
+              key <- paste0(
+                .tbl$feature_id,
+                "\u001f",
+                .tbl$candidate_adduct,
+                "\u001f",
+                .tbl$rank_final,
+                "\u001f",
+                .tbl$candidate_structure_inchikey_connectivity_layer
               )
-            core_cols <- c(
-              "feature_id",
-              "candidate_adduct",
-              "rank_final",
-              "candidate_structure_inchikey_connectivity_layer"
-            )
-            # Create a stable key and remove duplicates preserving the first occurrence
-            # OPTIMIZATION: Use paste0() on columns directly instead of
-            # do.call(paste, c(as.data.frame(.tbl)[core_cols], sep=...))
-            # which creates a full as.data.frame() copy just for string-key
-            # deduplication. paste0() operates on vectors without copying
-            # the entire data frame.
-            key <- paste0(
-              .tbl[[core_cols[1L]]],
-              "\u001f",
-              .tbl[[core_cols[2L]]],
-              "\u001f",
-              .tbl[[core_cols[3L]]],
-              "\u001f",
-              .tbl[[core_cols[4L]]]
-            )
+            }
             .tbl <- .tbl[!duplicated(key), , drop = FALSE]
           } else {
             # If no InChIKey column, don't collapse tied candidates — keep rows as-is
@@ -704,13 +756,14 @@ coerce_score_columns <- function(annot_table_wei_chemo) {
     return(annot_table_wei_chemo)
   }
 
-  annot_table_wei_chemo |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidyselect::all_of(cols_to_convert),
-        .fns = as.numeric
-      )
-    )
+  annot_table_wei_chemo <- tidytable::as_tidytable(annot_table_wei_chemo)
+  for (col in cols_to_convert) {
+    val <- annot_table_wei_chemo[[col]]
+    if (!is.numeric(val)) {
+      data.table::set(annot_table_wei_chemo, j = col, value = as.numeric(val))
+    }
+  }
+  annot_table_wei_chemo
 }
 
 #' Select the clean_chemo working columns
@@ -1022,17 +1075,17 @@ build_mini_taxonomy_table <- function(
   # >= prediction score, otherwise the predicted label wins.
   # All tables are pre-filtered to 1 row per feature, so joining on feature_id only
   # is safe and prevents unintended cartesian products from common columns
-  joined <- purrr::reduce(
-    .x = list(df_str_cla, df_str_npc, df_pred_cla, df_pred_npc),
-    .init = df_has_ik,
-    .f = function(acc, tbl) {
+  joined <- Reduce(
+    f = function(acc, tbl) {
       tidytable::left_join(
         x = acc,
         y = tbl,
         .join_by = tidyselect::any_of("feature_id"),
         .keep = "used"
       )
-    }
+    },
+    x = list(df_str_cla, df_str_npc, df_pred_cla, df_pred_npc),
+    init = df_has_ik
   )
 
   joined |>
@@ -1124,13 +1177,8 @@ build_mini_results_table <- function(
       tidytable::distinct(feature_id, .keep_all = TRUE)
   }
 
-  results_mini <- purrr::reduce(
-    .x = list(
-      df_classes_mini,
-      best_results
-    ),
-    .init = features_table,
-    .f = function(acc, tbl) {
+  results_mini <- Reduce(
+    f = function(acc, tbl) {
       tidytable::left_join(
         x = acc,
         y = tbl,
@@ -1139,7 +1187,12 @@ build_mini_results_table <- function(
         .join_by = tidyselect::any_of("feature_id"),
         .keep = "used"
       )
-    }
+    },
+    x = list(
+      df_classes_mini,
+      best_results
+    ),
+    init = features_table
   )
 
   # Ensure all columns being renamed exist; some annotation sources (e.g.,

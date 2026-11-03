@@ -237,65 +237,48 @@ filter_ms1_annotations <- function(
   minimal_ms1_chemo,
   minimal_ms1_condition
 ) {
-  # Ensure score columns are numeric
-  annot_table_wei_chemo <- annot_table_wei_chemo |>
-    tidytable::mutate(
-      score_biological = as.numeric(score_biological),
-      score_chemical = as.numeric(score_chemical)
-    )
-
-  # Keep annotations with MS2 data OR MS1 meeting score thresholds.
-  # "has MS2 data" = has a direct spectral similarity score, a raw SIRIUS CSI
-  # score, or a SIRIUS confidence score (top-1 per feature from v5/v6).
-  # Build the expression dynamically so it gracefully handles data frames that
-  # do not contain the confidence column (e.g., older fixture files or pure
-  # spectral annotation runs).
-  has_confidence_col <- "candidate_score_sirius_confidence" %in%
-    names(annot_table_wei_chemo)
-  has_csi_col <- "candidate_score_sirius_csi" %in%
-    names(annot_table_wei_chemo)
-
-  if (has_confidence_col && has_csi_col) {
-    has_ms2 <- quote(
-      !is.na(candidate_score_similarity) |
-        !is.na(candidate_score_sirius_csi) |
-        (!is.na(candidate_score_sirius_confidence) &
-          as.numeric(candidate_score_sirius_confidence) > 0)
-    )
-  } else if (has_confidence_col && !has_csi_col) {
-    has_ms2 <- quote(
-      !is.na(candidate_score_similarity) |
-        (!is.na(candidate_score_sirius_confidence) &
-          as.numeric(candidate_score_sirius_confidence) > 0)
-    )
-  } else if (!has_confidence_col && has_csi_col) {
-    has_ms2 <- quote(
-      !is.na(candidate_score_similarity) | !is.na(candidate_score_sirius_csi)
-    )
-  } else {
-    has_ms2 <- quote(
-      !is.na(candidate_score_similarity)
-    )
+  annot_table_wei_chemo <- tidytable::as_tidytable(annot_table_wei_chemo)
+  n <- nrow(annot_table_wei_chemo)
+  if (n == 0L) {
+    return(annot_table_wei_chemo)
   }
 
-  if (minimal_ms1_condition == "OR") {
-    ms1_condition <- quote(
-      score_biological >= minimal_ms1_bio | score_chemical >= minimal_ms1_chemo
-    )
+  sb <- as.numeric(annot_table_wei_chemo$score_biological)
+  sc <- as.numeric(annot_table_wei_chemo$score_chemical)
+  data.table::set(annot_table_wei_chemo, j = "score_biological", value = sb)
+  data.table::set(annot_table_wei_chemo, j = "score_chemical", value = sc)
+
+  has_ms2 <- if (
+    "candidate_score_similarity" %in% names(annot_table_wei_chemo)
+  ) {
+    !is.na(annot_table_wei_chemo$candidate_score_similarity)
   } else {
-    # "AND"
-    ms1_condition <- quote(
-      score_biological >= minimal_ms1_bio & score_chemical >= minimal_ms1_chemo
+    rep.int(FALSE, n)
+  }
+  if ("candidate_score_sirius_csi" %in% names(annot_table_wei_chemo)) {
+    has_ms2 <- has_ms2 |
+      !is.na(annot_table_wei_chemo$candidate_score_sirius_csi)
+  }
+  if ("candidate_score_sirius_confidence" %in% names(annot_table_wei_chemo)) {
+    conf <- suppressWarnings(
+      as.numeric(annot_table_wei_chemo$candidate_score_sirius_confidence)
     )
+    has_ms2 <- has_ms2 | (!is.na(conf) & conf > 0)
   }
 
-  # Apply per-row pre-filter (keep MS2 rows OR MS1 rows that meet
-  # score thresholds). This removes low-quality MS1 candidates that are not
-  # backed by any biological/chemical evidence.
-  result <- annot_table_wei_chemo |>
-    tidytable::filter(!!has_ms2 | !!ms1_condition)
+  bio_ok <- !is.na(sb) & (sb >= minimal_ms1_bio)
+  chemo_ok <- !is.na(sc) & (sc >= minimal_ms1_chemo)
+  ms1_ok <- if (minimal_ms1_condition == "OR") {
+    bio_ok | chemo_ok
+  } else {
+    bio_ok & chemo_ok
+  }
 
-  result
+  keep <- has_ms2 | ms1_ok
+  if (all(keep)) {
+    return(annot_table_wei_chemo)
+  }
+  annot_table_wei_chemo[keep, , drop = FALSE]
 }
 
 rank_and_deduplicate <- function(df) {
@@ -349,59 +332,39 @@ rank_and_deduplicate <- function(df) {
 
   df <- tidytable::as_tidytable(df)
 
-  # === Compute rank_initial (spectral score ranking) ===
-  # For MS1-only filtering: ranks by spectral evidence only
-  # dense_rank: ties get same rank, ranks are consecutive (1, 1, 2, 3, 3, 4, ...)
-  df_initial <- df |>
-    tidytable::group_by(feature_id) |>
-    tidytable::mutate(
-      rank_initial = tidytable::dense_rank(-candidate_score_pseudo_initial)
-    ) |>
-    tidytable::ungroup() |>
-    tidytable::select(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      rank_initial
-    ) |>
-    tidytable::distinct(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      .keep_all = TRUE
-    )
+  # Compute rank_final (min_rank on combined score) and deduplicate per
+  # (feature_id, candidate_structure_inchikey_connectivity_layer), keeping each
+  # structure's best-scoring row in original row order.
+  df_result <- rank_candidates(df)
 
-  # === Compute rank_final (combined evidence ranking) ===
-  # PRIMARY ranking using score_final (which combines bio+chem+spectral)
-  # This is what determines which candidates are "best"
-  df_ranked_final <- rank_candidates(as.data.frame(df))
+  # Compute rank_initial (dense_rank on spectral score) per feature_id
+  fids <- df_result$feature_id
+  u_fids <- unique(fids)
+  fid_id <- fastmatch::fmatch(fids, u_fids)
+  si <- suppressWarnings(as.numeric(df_result$candidate_score_pseudo_initial))
+  n_res <- nrow(df_result)
 
-  # Extract rank_final for joining (deduplicate first)
-  df_final <- tidytable::as_tidytable(df_ranked_final) |>
-    tidytable::select(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      rank_final
-    ) |>
-    tidytable::distinct(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      .keep_all = TRUE
-    )
-
-  # === Join both ranks back to original data and deduplicate ===
-  df_result <- df |>
-    tidytable::left_join(
-      df_initial,
-      by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
-    ) |>
-    tidytable::left_join(
-      df_final,
-      by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
-    ) |>
-    tidytable::distinct(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      .keep_all = TRUE
-    )
+  valid <- !is.na(si)
+  rk_init <- rep.int(NA_integer_, n_res)
+  if (any(valid)) {
+    v_idx <- which(valid)
+    g <- fid_id[v_idx]
+    v <- -si[v_idx]
+    ord <- order(g, v, method = "radix")
+    g_o <- g[ord]
+    v_o <- v[ord]
+    m <- length(ord)
+    if (m == 1L) {
+      rk_init[v_idx[ord]] <- 1L
+    } else {
+      new_g <- c(TRUE, g_o[-1L] != g_o[-m])
+      new_v <- new_g | c(TRUE, v_o[-1L] != v_o[-m])
+      cs <- cumsum(as.integer(new_v))
+      g_start_cs <- cummax(ifelse(new_g, cs, 1L))
+      rk_init[v_idx[ord]] <- cs - g_start_cs + 1L
+    }
+  }
+  data.table::set(df_result, j = "rank_initial", value = rk_init)
 
   df_result
 }
@@ -418,41 +381,40 @@ rank_and_deduplicate <- function(df) {
 #' @return Filtered data frame
 #' @keywords internal
 apply_percentile_filter <- function(df, best_percentile) {
-  has_rank_col <- "rank_final" %in% names(df)
-  has_consensus_col <- "cluster_consensus_promoted_from_anchor" %in% names(df)
+  if (nrow(df) == 0L) {
+    return(df)
+  }
+  df <- tidytable::as_tidytable(df)
+  swc <- as.numeric(df$score_weighted_chemo)
+  data.table::set(df, j = "score_weighted_chemo", value = swc)
 
-  df |>
-    tidytable::mutate(
-      score_weighted_chemo = as.numeric(score_weighted_chemo)
-    ) |>
-    tidytable::group_by(feature_id) |>
-    tidytable::mutate(
-      .score_max = suppressWarnings(max(score_weighted_chemo, na.rm = TRUE)),
-      .keep_by_percentile = score_weighted_chemo >=
-        best_percentile * .score_max,
-      .keep_by_rank = if (has_rank_col) {
-        rank_final == 1L
-      } else {
-        FALSE
-      },
-      .keep_by_consensus = if (has_consensus_col) {
-        cluster_consensus_promoted_from_anchor %in% TRUE
-      } else {
-        FALSE
-      }
-    ) |>
-    tidytable::filter(
-      .keep_by_percentile | .keep_by_rank | .keep_by_consensus
-    ) |>
-    tidytable::ungroup() |>
-    tidytable::select(
-      -tidyselect::any_of(c(
-        ".score_max",
-        ".keep_by_percentile",
-        ".keep_by_rank",
-        ".keep_by_consensus"
-      ))
-    )
+  fids <- df$feature_id
+  u_fids <- unique(fids)
+  fid_id <- fastmatch::fmatch(fids, u_fids)
+
+  valid <- !is.na(swc)
+  score_max <- rep.int(-Inf, length(u_fids))
+  if (any(valid)) {
+    v_idx <- which(valid)
+    g <- fid_id[v_idx]
+    v <- -swc[v_idx]
+    ord <- order(g, v, method = "radix")
+    first_in_g <- ord[!duplicated(g[ord])]
+    score_max[fid_id[v_idx[first_in_g]]] <- swc[v_idx[first_in_g]]
+  }
+
+  row_max <- score_max[fid_id]
+  keep <- (!is.na(swc) & swc >= best_percentile * row_max)
+  if ("rank_final" %in% names(df)) {
+    rf <- df$rank_final
+    keep <- keep | (!is.na(rf) & rf == 1L)
+  }
+  if ("cluster_consensus_promoted_from_anchor" %in% names(df)) {
+    cc <- df$cluster_consensus_promoted_from_anchor
+    keep <- keep | (!is.na(cc) & cc)
+  }
+
+  df[keep, , drop = FALSE]
 }
 
 #' Count Evaluated and Best Candidates
@@ -466,21 +428,28 @@ apply_percentile_filter <- function(df, best_percentile) {
 #' @return Data frame with feature_id, candidates_evaluated, candidates_best
 #' @keywords internal
 count_candidates <- function(df_ranked, df_percentile) {
-  candidates_evaluated <- df_ranked |>
-    tidytable::group_by(feature_id) |>
-    tidytable::add_count(name = "candidates_evaluated") |>
-    tidytable::ungroup() |>
-    tidytable::distinct(feature_id, candidates_evaluated)
+  fids_eval <- df_ranked$feature_id
+  u_fids <- unique(fids_eval)
+  if (length(u_fids) == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      candidates_evaluated = integer(),
+      candidates_best = integer()
+    ))
+  }
+  n_eval <- tabulate(
+    fastmatch::fmatch(fids_eval, u_fids),
+    nbins = length(u_fids)
+  )
+  fids_best <- df_percentile$feature_id
+  idx_best <- fastmatch::fmatch(fids_best, u_fids, nomatch = 0L)
+  n_best <- tabulate(idx_best[idx_best > 0L], nbins = length(u_fids))
+  n_best[n_best == 0L] <- NA_integer_
 
-  candidates_best <- df_percentile |>
-    tidytable::group_by(feature_id) |>
-    tidytable::add_count(name = "candidates_best") |>
-    tidytable::ungroup() |>
-    tidytable::distinct(feature_id, candidates_best)
-
-  tidytable::left_join(
-    x = candidates_evaluated,
-    y = candidates_best
+  tidytable::tidytable(
+    feature_id = u_fids,
+    candidates_evaluated = n_eval,
+    candidates_best = n_best
   )
 }
 

@@ -632,46 +632,60 @@ summarize_results <- function(
       tidyselect::any_of(c(base_cols, "score_weighted_chemo", "rank_final"))
     )
 
-  if (!"annotation_note" %in% names(consensus_src)) {
-    consensus_src$annotation_note <- NA_character_
+  n_src <- nrow(consensus_src)
+  keep_cols <- intersect(base_cols, names(consensus_src))
+  if (n_src == 0L) {
+    out <- as.data.frame(consensus_src, stringsAsFactors = FALSE)[,
+      keep_cols,
+      drop = FALSE
+    ]
+    if (!"annotation_note" %in% names(out)) {
+      out$annotation_note <- character(0L)
+    }
+    return(out)
   }
-  if (!"score_weighted_chemo" %in% names(consensus_src)) {
-    consensus_src$score_weighted_chemo <- NA_real_
+
+  note_present <- if ("annotation_note" %in% names(consensus_src)) {
+    an <- consensus_src$annotation_note
+    !is.na(an) & nzchar(trimws(as.character(an)))
+  } else {
+    rep.int(FALSE, n_src)
   }
-  if (!"rank_final" %in% names(consensus_src)) {
-    consensus_src$rank_final <- NA_real_
+
+  score_num <- if ("score_weighted_chemo" %in% names(consensus_src)) {
+    suppressWarnings(as.numeric(consensus_src$score_weighted_chemo))
+  } else {
+    rep.int(NA_real_, n_src)
   }
 
-  consensus_src$.note_present <- !is.na(consensus_src$annotation_note) &
-    nzchar(trimws(as.character(consensus_src$annotation_note)))
-  consensus_src$.score_num <- suppressWarnings(
-    as.numeric(consensus_src$score_weighted_chemo)
+  rank_num <- if ("rank_final" %in% names(consensus_src)) {
+    suppressWarnings(as.numeric(consensus_src$rank_final))
+  } else {
+    rep.int(NA_real_, n_src)
+  }
+
+  score_present <- !is.na(score_num)
+  fids <- consensus_src$feature_id
+  u_fids <- sort(unique(fids), na.last = TRUE)
+  fid_id <- fastmatch::fmatch(fids, u_fids)
+
+  ord <- order(
+    fid_id,
+    -as.integer(note_present),
+    -as.integer(score_present),
+    -score_num,
+    rank_num,
+    na.last = TRUE,
+    method = "radix"
   )
-  consensus_src$.rank_num <- suppressWarnings(
-    as.numeric(consensus_src$rank_final)
-  )
-  consensus_src$.score_present <- !is.na(consensus_src$.score_num)
+  best_idx <- ord[!duplicated(fid_id[ord])]
 
-  consensus_src <- as.data.frame(consensus_src, stringsAsFactors = FALSE)
-
-  ord <- with(
-    consensus_src,
-    order(
-      feature_id,
-      -as.integer(.note_present),
-      -as.integer(.score_present),
-      -.score_num,
-      .rank_num,
-      na.last = TRUE
-    )
-  )
-
-  consensus_src <- consensus_src[ord, , drop = FALSE]
-  consensus_src <- consensus_src[
-    !duplicated(consensus_src$feature_id),
-    ,
-    drop = FALSE
-  ]
-
-  consensus_src[, intersect(base_cols, names(consensus_src)), drop = FALSE]
+  out <- as.data.frame(
+    consensus_src[best_idx, ],
+    stringsAsFactors = FALSE
+  )[, keep_cols, drop = FALSE]
+  if (!"annotation_note" %in% names(out)) {
+    out$annotation_note <- rep.int(NA_character_, nrow(out))
+  }
+  out
 }

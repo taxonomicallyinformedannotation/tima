@@ -109,7 +109,7 @@ filter_high_evidence_only <- function(
   ctx <- log_operation(
     "filter_high_evidence",
     n_input = nrow(df),
-    context = rlang::`%||%`(context, "default")
+    context = context %||% "default"
   )
 
   # Validation ----

@@ -72,7 +72,7 @@ validate_weight_annotations_inputs <- function(
     edges = edges,
     taxa = taxa
   )
-  missing_required <- purrr::keep(.x = required_files, .p = ~ !file.exists(.x))
+  missing_required <- Filter(function(x) !file.exists(x), required_files)
   if (length(missing_required) > 0L) {
     cli::cli_abort(
       c(
@@ -109,11 +109,12 @@ validate_weight_annotations_inputs <- function(
     canopus = canopus,
     formula = formula
   )
-  purrr::iwalk(.x = optional_files, .f = function(path, name) {
+  for (name in names(optional_files)) {
+    path <- optional_files[[name]]
     if (!is.null(path) && !file.exists(path)) {
       log_warn("Optional file '%s' not found at: %s", name, path)
     }
-  })
+  }
 
   # Validate minimal_ms1_condition
   assert_choice(minimal_ms1_condition, c("OR", "AND"), "minimal_ms1_condition")
@@ -208,14 +209,16 @@ validate_weight_annotations_inputs <- function(
 load_annotation_tables <- function(annotations, ms1_only) {
   log_debug("Loading %d annotation file(s)", length(annotations))
   annotation_table <- tryCatch(
-    purrr::map2(
-      .x = annotations,
-      .y = seq_along(annotations),
-      .f = ~ .safe_fread_selected_columns(
-        file = .x,
-        file_type = paste0("annotation file ", .y),
-        selector = select_weight_annotations_working_columns
-      )
+    Map(
+      function(x, y) {
+        .safe_fread_selected_columns(
+          file = x,
+          file_type = paste0("annotation file ", y),
+          selector = select_weight_annotations_working_columns
+        )
+      },
+      annotations,
+      seq_along(annotations)
     ) |>
       tidytable::bind_rows(),
     error = function(e) {
@@ -335,10 +338,8 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
 
   supp_files <- list(str_stereo, org_tax_ott)
   supp_names <- c("stereochemistry", "organism taxonomy")
-  supp_tables <- purrr::map2(
-    .x = supp_files,
-    .y = supp_names,
-    .f = function(path, name) {
+  supp_tables <- Map(
+    function(path, name) {
       if (is.null(path) || !file.exists(path)) {
         return(tidytable::tidytable())
       }
@@ -347,18 +348,20 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
         file_type = name,
         selector = select_structure_organism_pair_loading_columns
       )
-    }
+    },
+    supp_files,
+    supp_names
   )
 
-  purrr::reduce(
-    .x = supp_tables,
-    .init = library_table,
-    .f = function(acc, tbl) {
+  Reduce(
+    f = function(acc, tbl) {
       if (nrow(tbl) == 0L) {
         return(acc)
       }
       tidytable::left_join(x = acc, y = tbl)
-    }
+    },
+    x = supp_tables,
+    init = library_table
   ) |>
     select_structure_organism_pair_columns()
 }
@@ -583,11 +586,27 @@ rearrange_annotations <- function(
   # Using explicit keys ensures SIRIUS CSI scores are matched to
   # spectral annotations for the same structure even when other
   # structure columns (name, SMILES, taxonomy) differ between sources.
-  annotation_table_merged <- tidytable::full_join(
-    annotation_table_1,
-    annotation_table_2,
-    by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
-  )
+  if (nrow(annotation_table_2) == 0L) {
+    annotation_table_merged <- data.table::copy(annotation_table_1)
+    sirius_new_cols <- setdiff(
+      names(annotation_table_2),
+      names(annotation_table_merged)
+    )
+    n_rows <- nrow(annotation_table_merged)
+    for (col in sirius_new_cols) {
+      data.table::set(
+        annotation_table_merged,
+        j = col,
+        value = rep.int(annotation_table_2[[col]][NA_integer_], n_rows)
+      )
+    }
+  } else {
+    annotation_table_merged <- tidytable::full_join(
+      annotation_table_1,
+      annotation_table_2,
+      by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
+    )
+  }
 
   # Step 2: Add formula-level SIRIUS scores.
   # left_join (not full_join) so that formula entries without a matching
@@ -623,14 +642,28 @@ rearrange_annotations <- function(
     names(annotation_table_merged)
   )
   if (length(canopus_new_cols) > 0L && nrow(canopus_table) > 0L) {
-    annotation_table_merged <- tidytable::left_join(
-      annotation_table_merged,
-      canopus_table |>
-        tidytable::select(
-          tidyselect::any_of(c("feature_id", canopus_new_cols))
-        ),
-      by = "feature_id"
-    )
+    if (!anyDuplicated(canopus_table$feature_id)) {
+      m_can <- fastmatch::fmatch(
+        annotation_table_merged$feature_id,
+        canopus_table$feature_id
+      )
+      for (col in canopus_new_cols) {
+        data.table::set(
+          annotation_table_merged,
+          j = col,
+          value = canopus_table[[col]][m_can]
+        )
+      }
+    } else {
+      annotation_table_merged <- tidytable::left_join(
+        annotation_table_merged,
+        canopus_table |>
+          tidytable::select(
+            tidyselect::any_of(c("feature_id", canopus_new_cols))
+          ),
+        by = "feature_id"
+      )
+    }
   }
 
   # Step 4: Add edge metadata (feature-level).
@@ -645,14 +678,28 @@ rearrange_annotations <- function(
       feature_spectrum_peaks
     )
   if (length(edge_new_cols) > 0L) {
-    annotation_table_merged <- annotation_table_merged |>
-      tidytable::left_join(
-        y = edges_distinct |>
-          tidytable::select(
-            tidyselect::any_of(c("feature_id", edge_new_cols))
-          ),
-        by = "feature_id"
+    if (!anyDuplicated(edges_distinct$feature_id)) {
+      m_edge <- fastmatch::fmatch(
+        annotation_table_merged$feature_id,
+        edges_distinct$feature_id
       )
+      for (col in edge_new_cols) {
+        data.table::set(
+          annotation_table_merged,
+          j = col,
+          value = edges_distinct[[col]][m_edge]
+        )
+      }
+    } else {
+      annotation_table_merged <- annotation_table_merged |>
+        tidytable::left_join(
+          y = edges_distinct |>
+            tidytable::select(
+              tidyselect::any_of(c("feature_id", edge_new_cols))
+            ),
+          by = "feature_id"
+        )
+    }
   }
 
   annotation_table_merged

@@ -169,10 +169,8 @@ clean_chemo <- function(
   }
 
   # Validate features and components schema minimally
-  purrr::walk(
-    .x = list(features_table, components_table),
-    .f = .validate_features_dataframe
-  )
+  .validate_features_dataframe(features_table)
+  .validate_features_dataframe(components_table)
   if (!is.data.frame(structure_organism_pairs_table)) {
     tima_abort(
       problem = "structure_organism_pairs_table must be a data frame",

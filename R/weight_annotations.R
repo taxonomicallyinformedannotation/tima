@@ -101,6 +101,8 @@
 #' @return The path to the weighted annotations
 #'
 #' @family annotation
+#' @concept EDAM:operation_3803 Natural product identification
+#' @concept EDAM:operation_3460 Taxonomic classification
 #'
 #' @export
 #'
@@ -520,6 +522,9 @@ weight_annotations <- function(
       minimal_consistency = minimal_consistency
     )
   rm(edges_table)
+  annot_table_wei_bio_kept <- select_clean_chemo_working_columns(
+    annot_table_wei_bio_kept
+  )
   log_debug(
     "Biological cleaning complete: %d candidates",
     nrow(annot_table_wei_bio_clean)

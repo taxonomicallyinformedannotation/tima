@@ -128,7 +128,11 @@ clean_bio <- function(
 
   rm(annotations_for_join, edges_filtered)
 
-  if ("feature_pred_tax_cla_02sup_val" %in% colnames(annotations_distinct)) {
+  if (
+    "feature_pred_tax_cla_02sup_val" %in%
+      colnames(annotations_distinct) &&
+      !all(is.na(annotations_distinct$feature_pred_tax_cla_02sup_val))
+  ) {
     df1 <- annotations_distinct |>
       tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
 
@@ -149,7 +153,8 @@ clean_bio <- function(
   } else {
     df1 <- tidytable::tidytable()
     df1b <- tidytable::tidytable()
-    df2 <- annotations_distinct
+    df2 <- annotations_distinct |>
+      tidytable::select(-tidyselect::contains(match = "feature_pred_tax"))
   }
   rm(annotations_distinct)
 
@@ -210,18 +215,25 @@ clean_bio <- function(
     return(base_df)
   }
 
-  # Use Reduce with base::identity to minimize intermediate allocations
-  result <- Reduce(
-    function(left_df, right_df) {
-      tidytable::left_join(
-        left_df,
-        right_df,
-        by = stats::setNames(object = "feature_source", nm = "feature_id")
-      )
-    },
-    consistency_list,
-    init = base_df
-  )
+  result <- data.table::copy(tidytable::as_tidytable(base_df))
+  fids <- result$feature_id
+  for (right_df in consistency_list) {
+    val_cols <- setdiff(names(right_df), "feature_source")
+    if (nrow(right_df) == 0L) {
+      for (col in val_cols) {
+        data.table::set(
+          result,
+          j = col,
+          value = rep.int(right_df[[col]][NA_integer_], length(fids))
+        )
+      }
+    } else {
+      m <- fastmatch::fmatch(fids, right_df$feature_source)
+      for (col in val_cols) {
+        data.table::set(result, j = col, value = right_df[[col]][m])
+      }
+    }
+  }
 
   result |> tidytable::select(feature_id, tidyselect::everything())
 }
@@ -262,27 +274,28 @@ clean_bio <- function(
     feature_pred_tax_cla_04dirpar_score = NA_real_
   )
 
-  # Identify missing and existing columns
-  missing_cols <- setdiff(names(defaults), names(df))
-  existing_cols <- intersect(names(defaults), names(df))
+  out <- data.table::copy(tidytable::as_tidytable(df))
+  missing_cols <- setdiff(names(defaults), names(out))
+  existing_cols <- intersect(names(defaults), names(out))
 
-  # Add missing columns
   if (length(missing_cols) > 0L) {
-    n_rows <- nrow(df)
+    n_rows <- nrow(out)
     for (col in missing_cols) {
-      df[[col]] <- rep(defaults[[col]], n_rows)
+      data.table::set(out, j = col, value = rep.int(defaults[[col]], n_rows))
     }
   }
 
-  # Fill NAs in existing columns
   for (col in existing_cols) {
-    na_idx <- is.na(df[[col]])
-    if (any(na_idx)) {
-      df[[col]][na_idx] <- defaults[[col]]
+    def_val <- defaults[[col]]
+    if (!is.na(def_val)) {
+      na_idx <- which(is.na(out[[col]]))
+      if (length(na_idx) > 0L) {
+        data.table::set(out, i = na_idx, j = col, value = def_val)
+      }
     }
   }
 
-  tidytable::as_tidytable(df)
+  out
 }
 
 
@@ -454,36 +467,6 @@ clean_bio <- function(
       val = "feature_pred_tax_cla_04dirpar_val"
     )
   )
-
-  # OPTIMIZATION: Single-pass processing instead of 7 separate edge joins
-  # Build compact target taxonomy lookup once: for each target feature,
-  # get its best score per taxonomy value at each level.
-
-  # Step 1: Build per-target taxonomy scores for ALL levels at once
-  target_taxonomy_scores <- annotations_for_join |>
-    tidytable::select(
-      feature_id,
-      candidate_structure_tax_cla_01kin,
-      candidate_structure_tax_npc_01pat,
-      candidate_structure_tax_cla_02sup,
-      candidate_structure_tax_npc_02sup,
-      candidate_structure_tax_cla_03cla,
-      candidate_structure_tax_npc_03cla,
-      candidate_structure_tax_cla_04dirpar,
-      score_weighted_bio
-    ) |>
-    tidytable::distinct() |>
-    tidytable::mutate(
-      # Create a unique key for each (feature, level, taxonomy_val) combination
-      # We'll pivot longer to process all levels in one pass
-      feature_id = feature_id
-    )
-
-  # Step 2: For each level, compute the per-target best score
-  # We process all levels by iterating but joining edges only ONCE per level
-  # (still 7 joins but with pre-filtered data)
-  # Actually, let's do a true single-pass: join edges with annotations ONCE
-  # using a consolidated taxonomy representation
 
   # Pre-compute per-level target scores in a list to avoid recomputation
   level_target_scores <- lapply(levels, function(lvl) {
