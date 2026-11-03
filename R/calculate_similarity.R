@@ -64,7 +64,7 @@
 #' @param ppm [numeric] PPM tolerance for peak matching
 #' @param return_matched_peaks [logical] Return matched peaks count?
 #'     Not compatible with 'entropy' method. Default: FALSE
-#' @param ... Additional arguments passed to MsCoreUtils::join (cosine only)
+#' @param ... Additional arguments (currently unused)
 #'
 #' @return Numeric similarity score (0-1), or list with score and matches
 #'     if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.

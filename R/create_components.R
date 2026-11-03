@@ -76,18 +76,15 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
     return(edges)
   }
 
-  edge_source_community <- as.character(
-    component_membership[match(
-      edges[[name_source]],
-      names(component_membership)
-    )]
-  )
-  edge_target_community <- as.character(
-    component_membership[match(
-      edges[[name_target]],
-      names(component_membership)
-    )]
-  )
+  cm_names <- names(component_membership)
+  cm_vals <- as.character(unname(component_membership))
+  edge_source_community <- cm_vals[
+    fastmatch::fmatch(edges[[name_source]], cm_names)
+  ]
+  edge_target_community <- cm_vals[
+    fastmatch::fmatch(edges[[name_target]], cm_names)
+  ]
+  attr(cm_names, ".match.hash") <- NULL
 
   same_community <- !is.na(edge_source_community) &
     !is.na(edge_target_community) &
@@ -136,7 +133,8 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
   n_iterations = 2L,
   seed = NULL,
   label_column = "componentindex",
-  cut_to_communities = FALSE
+  cut_to_communities = FALSE,
+  populate_edges = TRUE
 ) {
   if (nrow(edges) == 0L) {
     return(list(
@@ -200,47 +198,83 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
     component_membership <- component_membership[!is.na(component_membership)]
     method_used <- "edge labels"
   } else {
-    all_features <- unique(c(edges[[name_source]], edges[[name_target]]))
-    graph_edges <- edges |>
-      tidytable::rename(from = !!name_source, to = !!name_target)
-
-    network_graph <- igraph::graph_from_data_frame(
-      d = graph_edges,
-      directed = FALSE,
-      vertices = all_features
-    )
+    src_col <- as.character(edges[[name_source]])
+    tgt_col <- as.character(edges[[name_target]])
+    all_features <- unique(c(src_col, tgt_col))
+    all_features <- all_features[!is.na(all_features)]
 
     edge_weights <- .resolve_edge_weights(edges)
     edge_weights <- pmax(edge_weights, 1e-6)
-    weight_min <- min(edge_weights, na.rm = TRUE)
-    weight_max <- max(edge_weights, na.rm = TRUE)
-    if (weight_max > weight_min) {
-      edge_weights <- (edge_weights - weight_min) / (weight_max - weight_min)
-      edge_weights <- edge_weights * 0.99 + 0.01
+
+    if (nrow(edges) > 200000L) {
+      q_cut <- stats::quantile(
+        edge_weights,
+        probs = max(0, 1 - 200000 / nrow(edges)),
+        na.rm = TRUE,
+        names = FALSE
+      )
+      keep_g <- which(
+        !is.na(src_col) &
+          !is.na(tgt_col) &
+          src_col != tgt_col &
+          edge_weights >= q_cut
+      )
+      if (length(keep_g) == 0L) {
+        keep_g <- which(!is.na(src_col) & !is.na(tgt_col))
+      }
+      src_id <- fastmatch::fmatch(src_col[keep_g], all_features)
+      tgt_id <- fastmatch::fmatch(tgt_col[keep_g], all_features)
+      edge_weights <- edge_weights[keep_g]
     } else {
-      edge_weights <- rep(1, length(edge_weights))
+      valid_e <- !is.na(src_col) & !is.na(tgt_col)
+      src_id <- fastmatch::fmatch(src_col[valid_e], all_features)
+      tgt_id <- fastmatch::fmatch(tgt_col[valid_e], all_features)
+      edge_weights <- edge_weights[valid_e]
     }
 
-    igraph::E(network_graph)$weight <- edge_weights
+    attr(all_features, ".match.hash") <- NULL
+    network_graph <- igraph::make_graph(
+      edges = as.vector(rbind(src_id, tgt_id)),
+      n = length(all_features),
+      directed = FALSE
+    )
+    igraph::V(network_graph)$name <- all_features
+
+    if (length(edge_weights) > 0L) {
+      weight_min <- min(edge_weights, na.rm = TRUE)
+      weight_max <- max(edge_weights, na.rm = TRUE)
+      if (weight_max > weight_min) {
+        edge_weights <- (edge_weights - weight_min) / (weight_max - weight_min)
+        edge_weights <- edge_weights * 0.99 + 0.01
+      } else {
+        edge_weights <- rep(1, length(edge_weights))
+      }
+      igraph::E(network_graph)$weight <- edge_weights
+    }
 
     if (igraph::ecount(network_graph) > 0L) {
-      resolution_grid <- unique(c(
-        resolution,
-        resolution / 2,
-        resolution / 4,
-        resolution * 2,
-        resolution * 4,
-        0.025,
-        0.05,
-        0.1,
-        0.2,
-        0.5,
-        1
-      ))
+      resolution_grid <- if (nrow(edges) > 200000L) {
+        unique(c(resolution, 1))
+      } else {
+        unique(c(
+          resolution,
+          resolution / 2,
+          resolution / 4,
+          resolution * 2,
+          resolution * 4,
+          0.025,
+          0.05,
+          0.1,
+          0.2,
+          0.5,
+          1
+        ))
+      }
       resolution_grid <- resolution_grid[
         is.finite(resolution_grid) & resolution_grid > 0
       ]
       resolution_grid <- sort(unique(round(resolution_grid, 6)))
+      eff_iterations <- if (nrow(edges) > 200000L) 1L else n_iterations
 
       detect_communities <- function(resolution_value) {
         # Re-seed per call so each resolution is reproducible on its own
@@ -257,7 +291,7 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
                 objective_function = "modularity",
                 weights = igraph::E(network_graph)$weight,
                 resolution = resolution_value,
-                n_iterations = n_iterations
+                n_iterations = eff_iterations
               )
             } else {
               igraph::cluster_louvain(
@@ -349,32 +383,31 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
     )
   }
 
-  if (length(component_membership) > 0L) {
-    edge_membership_source <- as.character(
-      component_membership[match(
-        edges[[name_source]],
-        names(component_membership)
-      )]
-    )
-    edge_membership_target <- as.character(
-      component_membership[match(
-        edges[[name_target]],
-        names(component_membership)
-      )]
-    )
+  if (isTRUE(populate_edges) || isTRUE(cut_to_communities)) {
+    if (length(component_membership) > 0L) {
+      cm_names <- names(component_membership)
+      cm_vals <- as.character(unname(component_membership))
+      edge_membership_source <- cm_vals[
+        fastmatch::fmatch(edges[[name_source]], cm_names)
+      ]
+      edge_membership_target <- cm_vals[
+        fastmatch::fmatch(edges[[name_target]], cm_names)
+      ]
+      attr(names(component_membership), ".match.hash") <- NULL
 
-    if (isTRUE(cut_to_communities)) {
-      keep_edge <- !is.na(edge_membership_source) &
-        !is.na(edge_membership_target) &
-        nzchar(edge_membership_source) &
-        nzchar(edge_membership_target) &
-        edge_membership_source == edge_membership_target
-      edges <- edges[keep_edge, , drop = FALSE]
+      if (isTRUE(cut_to_communities)) {
+        keep_edge <- !is.na(edge_membership_source) &
+          !is.na(edge_membership_target) &
+          nzchar(edge_membership_source) &
+          nzchar(edge_membership_target) &
+          edge_membership_source == edge_membership_target
+        edges <- edges[keep_edge, , drop = FALSE]
+      } else {
+        edges[[label_column]] <- edge_membership_source
+      }
     } else {
-      edges[[label_column]] <- edge_membership_source
+      edges[[label_column]] <- character(nrow(edges))
     }
-  } else {
-    edges[[label_column]] <- character(nrow(edges))
   }
 
   components_table <- data.frame(
@@ -472,6 +505,9 @@ build_components_from_edges <- function(
 #' @return Character string path to the created components file
 #'
 #' @family workflow
+#' @concept EDAM:operation_3927 Network analysis
+#' @concept EDAM:operation_3766 Weighted correlation network analysis
+#' @concept EDAM:data_2600 Pathway or network
 #'
 #' @export
 #'
@@ -524,15 +560,17 @@ create_components <- function(
 
   log_info("Creating components from %d edge file(s)", length(input))
 
-  edges <- purrr::map2(
-    .x = input,
-    .y = seq_along(input),
-    .f = ~ safe_fread(
-      file = .x,
-      file_type = paste0("edge file ", .y),
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    )
+  edges <- Map(
+    function(x, y) {
+      safe_fread(
+        file = x,
+        file_type = paste0("edge file ", y),
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
+    },
+    input,
+    seq_along(input)
   ) |>
     tidytable::bind_rows()
 

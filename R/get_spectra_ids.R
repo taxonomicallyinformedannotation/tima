@@ -53,9 +53,9 @@ get_spectra_ids <- function(spectra) {
   possible_ids <- c("SLAW_ID", "FEATURE_ID", "acquisitionNum", "spectrum_id")
 
   # Find the first valid ID field
-  valid_field <- purrr::detect(
-    possible_ids,
-    ~ !is.null(spec_data[[.x]]) && length(spec_data[[.x]]) > 0L
+  valid_field <- Find(
+    function(x) !is.null(spec_data[[x]]) && length(spec_data[[x]]) > 0L,
+    possible_ids
   )
 
   if (!is.null(valid_field)) {

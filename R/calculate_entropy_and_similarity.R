@@ -158,21 +158,17 @@ calculate_entropy_and_similarity <- function(
   lib_precursors_sorted_vals <- lib_precursors_used[lib_prec_ord]
   lib_precursors_sorted_idx <- lib_prec_ord
 
-  # Pre-compute all library spectrum properties upfront
-  # Use vectors for fast indexed access (faster than environment lookups in hot loop)
-  lib_entropy <- rep(NA_real_, n_lib)
-  lib_mz_sorted_list <- vector("list", n_lib)
-
-  for (idx in seq_len(n_lib)) {
-    sp <- lib_spectra[[idx]]
-    if (is.matrix(sp) && nrow(sp) > 0L && ncol(sp) >= 2L) {
-      if (compute_entropy) {
-        lib_entropy[[idx]] <- msentropy::calculate_spectral_entropy(sp)
-      }
-      # Cache sorted m/z vector for this library spectrum to avoid
-      # re-sorting inside tight loops.
-      lib_mz_sorted_list[[idx]] <- sort(sp[, 1L])
-    }
+  # Pre-compute library spectrum properties lazily on demand.
+  # Previously this loop computed `msentropy::calculate_spectral_entropy()` and
+  # `sort(sp[, 1L])` upfront across all `n_lib` spectra (~1M spectra), taking
+  # ~45-60s per library pass even when only a small subset of library spectra
+  # matched above `threshold` and when `lib_mz_sorted_list` was completely
+  # unused on the default GNPS batch path.
+  need_mz_sorted <- !(method == "gnps" && compute_forward_reverse)
+  lib_mz_sorted_list <- if (need_mz_sorted) {
+    vector("list", n_lib)
+  } else {
+    NULL
   }
 
   # Progress counter and query batch size for efficient C calls
@@ -227,7 +223,6 @@ calculate_entropy_and_similarity <- function(
       # Pre-allocate result vectors once
       n_candidates <- length(lib_indices_sub)
       scores <- rep(NA_real_, n_candidates)
-      entropies <- rep(NA_real_, n_candidates)
       matched_counts <- integer(n_candidates)
       scores_forward <- rep(NA_real_, n_candidates)
       scores_reverse <- rep(NA_real_, n_candidates)
@@ -263,7 +258,6 @@ calculate_entropy_and_similarity <- function(
           matched_counts <- as.integer(batch_result[, 2L])
           scores_forward <- as.numeric(batch_result[, 3L])
           scores_reverse <- as.numeric(batch_result[, 4L])
-          entropies <- lib_entropy[lib_batch_indices]
         } else {
           # Batch call failed or returned NULL: fall back to per-pair loop
           for (pos_idx in seq_len(n_candidates)) {
@@ -292,7 +286,6 @@ calculate_entropy_and_similarity <- function(
             matched_counts[[pos_idx]] <- as.integer(res[[2L]])
             scores_forward[[pos_idx]] <- as.numeric(res[[3L]])
             scores_reverse[[pos_idx]] <- as.numeric(res[[4L]])
-            entropies[[pos_idx]] <- lib_entropy[[lib_idx]]
           }
         }
       } else {
@@ -319,11 +312,18 @@ calculate_entropy_and_similarity <- function(
             dalton = dalton,
             ppm = ppm
           ))
-          # Use cached sorted m/z vector to avoid re-sorting
-          lib_mz_sorted <- lib_mz_sorted_list[[lib_idx]]
+          lib_mz_sorted <- if (!is.null(lib_mz_sorted_list)) {
+            lib_mz_sorted_list[[lib_idx]]
+          } else {
+            NULL
+          }
+          if (is.null(lib_mz_sorted)) {
+            mz_col <- lib_spectrum[, 1L]
+            lib_mz_sorted <- if (is.unsorted(mz_col)) sort(mz_col) else mz_col
+          }
           matched_counts[[pos_idx]] <- .count_matched_peaks(
             q_mz,
-            lib_mz_sorted %||% sort(lib_spectrum[, 1L]),
+            lib_mz_sorted,
             dalton,
             ppm
           )
@@ -349,27 +349,24 @@ calculate_entropy_and_similarity <- function(
             scores_forward[[pos_idx]] <- NA_real_
             scores_reverse[[pos_idx]] <- NA_real_
           }
-
-          entropies[[pos_idx]] <- lib_entropy[[lib_idx]]
         }
       }
 
       valid_indices <- which(!is.na(scores) & scores >= threshold)
 
       if (length(valid_indices) > 0L) {
+        n_v <- length(valid_indices)
         return(
-          tidytable::tidytable(
-            feature_id = current_id,
-            precursorMz = current_precursor,
-            target_id = lib_ids[lib_indices_sub[valid_indices]],
-            candidate_spectrum_entropy = entropies[valid_indices],
+          list(
+            feature_id = rep(current_id, n_v),
+            precursorMz = rep.int(current_precursor, n_v),
+            lib_pos = lib_indices_sub[valid_indices],
             candidate_score_similarity = scores[valid_indices],
             candidate_score_similarity_forward = scores_forward[valid_indices],
             candidate_score_similarity_reverse = scores_reverse[valid_indices],
             candidate_count_similarity_peaks_matched = matched_counts[
               valid_indices
-            ],
-            .similarity_space = space_label
+            ]
           )
         )
       }
@@ -381,8 +378,10 @@ calculate_entropy_and_similarity <- function(
   # Log progress summary
   log_info("Processed %d / %d queries", n_queries, n_queries)
 
-  is_null_status <- vapply(X = results, FUN = is.null, FUN.VALUE = logical(1))
-  if (all(is_null_status)) {
+  non_null <- results[!vapply(results, is.null, logical(1))]
+  rm(results)
+
+  if (length(non_null) == 0L) {
     result <- tidytable::tidytable(
       feature_id = NA_integer_,
       precursorMz = NA_real_,
@@ -396,24 +395,61 @@ calculate_entropy_and_similarity <- function(
       .similarity_space = NA_character_
     )
   } else {
-    result <- tidytable::bind_rows(
-      results[!is_null_status]
+    matched_lib_pos <- unlist(
+      lapply(non_null, `[[`, "lib_pos"),
+      use.names = FALSE
+    )
+    n_total <- length(matched_lib_pos)
+    entropies_all <- rep.int(NA_real_, n_total)
+    if (compute_entropy && n_total > 0L) {
+      u_pos <- unique(matched_lib_pos)
+      u_ent <- vapply(
+        u_pos,
+        function(idx) {
+          sp <- lib_spectra[[idx]]
+          if (is.matrix(sp) && nrow(sp) > 0L && ncol(sp) >= 2L) {
+            msentropy::calculate_spectral_entropy(sp)
+          } else {
+            NA_real_
+          }
+        },
+        numeric(1)
+      )
+      entropies_all <- u_ent[fastmatch::fmatch(matched_lib_pos, u_pos)]
+    }
+
+    result <- tidytable::tidytable(
+      feature_id = unlist(
+        lapply(non_null, `[[`, "feature_id"),
+        use.names = FALSE
+      ),
+      precursorMz = unlist(
+        lapply(non_null, `[[`, "precursorMz"),
+        use.names = FALSE
+      ),
+      target_id = lib_ids[matched_lib_pos],
+      candidate_spectrum_entropy = entropies_all,
+      candidate_score_similarity = unlist(
+        lapply(non_null, `[[`, "candidate_score_similarity"),
+        use.names = FALSE
+      ),
+      candidate_score_similarity_forward = unlist(
+        lapply(non_null, `[[`, "candidate_score_similarity_forward"),
+        use.names = FALSE
+      ),
+      candidate_score_similarity_reverse = unlist(
+        lapply(non_null, `[[`, "candidate_score_similarity_reverse"),
+        use.names = FALSE
+      ),
+      candidate_count_similarity_peaks_matched = unlist(
+        lapply(non_null, `[[`, "candidate_count_similarity_peaks_matched"),
+        use.names = FALSE
+      ),
+      .similarity_space = rep.int(space_label, n_total)
     )
   }
 
-  # `results` holds one tidytable per query spectrum (length n_queries) --
-  # everything useful in it has now been folded into `result` via
-  # bind_rows(). Likewise `lib_entropy` and `lib_mz_sorted_list` (each
-  # length n_lib) were scratch structures built purely to make the lapply
-  # closure above fast; nothing below this line reads any of the three.
-  # Previously they were left bound until the function's frame unwound on
-  # return -- harmless for one call, but this function runs once per
-  # library file, so on a run over many/large libraries those n_lib- and
-  # n_queries-sized structures were piling up as transient peak memory
-  # right as the (also nontrivial) bind_rows() output existed alongside
-  # them. Freeing them here, once per library rather than once per query,
-  # costs nothing measurable and removes that overlap.
-  rm(results, lib_entropy, lib_mz_sorted_list, is_null_status)
+  rm(non_null, lib_mz_sorted_list)
 
   log_complete(ctx, n_comparisons = nrow(result))
 

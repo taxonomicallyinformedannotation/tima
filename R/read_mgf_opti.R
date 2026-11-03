@@ -11,44 +11,44 @@
 ##'
 ##' @noRd
 .extract_mgf_spectrum <- function(mgf) {
-  ## grep description
-  desc.idx <- grep("=", mgf, fixed = TRUE) # nolint: object_name_linter.
+  r <- regexpr("=", mgf, fixed = TRUE)
+  desc.idx <- which(r > 0L) # nolint: object_name_linter.
   desc <- mgf[desc.idx]
+  peak_lines <- if (length(desc.idx)) mgf[-desc.idx] else mgf
+  if (!length(peak_lines)) {
+    return(NULL)
+  }
 
-  spec <- strsplit(mgf[-desc.idx], "[[:space:]]+", perl = TRUE)
+  spec <- strsplit(peak_lines, "[[:space:]]+", perl = TRUE)
   # Remove empty entries from blank lines (strsplit("") returns character(0))
   spec <- spec[lengths(spec) > 0L]
   if (!length(spec) || length(spec[[1L]]) == 1L) {
-    ms <- matrix(numeric(), ncol = 2L)
-  } else {
-    ms <- matrix(
-      as.double(unlist(spec, use.names = FALSE, recursive = FALSE)),
-      ncol = length(spec[[1L]]),
-      byrow = TRUE
-    )
+    return(NULL)
   }
+  ms <- matrix(
+    as.double(unlist(spec, use.names = FALSE, recursive = FALSE)),
+    ncol = length(spec[[1L]]),
+    byrow = TRUE
+  )
 
   if (.is_unsorted(ms)) {
     ms <- ms[order(ms[, 1L]), , drop = FALSE]
   }
 
-  r <- regexpr("=", desc, fixed = TRUE)
+  r_desc <- r[desc.idx]
   desc <- stats::setNames(
-    substring(desc, r + 1L, nchar(desc)),
-    substring(desc, 1L, r - 1L)
+    substring(desc, r_desc + 1L),
+    substring(desc, 1L, r_desc - 1L)
   )
 
   desc[c("PEPMASS", "PEPMASSINT")] <-
     strsplit(desc["PEPMASS"], "[[:space:]]+", perl = TRUE)[[1L]][c(1L, 2L)]
 
-  res <- as.data.frame.matrix(matrix(
-    desc,
-    nrow = 1,
-    dimnames = list(NULL, names(desc))
-  ))
-  res$mz <- list(ms[, 1L])
-  res$intensity <- list(ms[, 2L])
-  res
+  list(
+    desc = desc,
+    mz = ms[, 1L],
+    intensity = ms[, 2L]
+  )
 }
 
 .is_unsorted <- function(x) {
@@ -77,21 +77,19 @@
 #' @title Read MGF opti
 #'
 #' @description This function reads a Mascot Generic Format (MGF) file using
-#'     a memory-efficient approach. It mimics the `MsBackendMgf` implementation
-#'     but uses significantly lower memory, making it suitable for processing
-#'     large MGF files that might otherwise cause memory issues.
+#'     a fast, vectorized approach. It mimics the `MsBackendMgf` implementation
+#'     while avoiding per-spectrum `data.frame` allocations and quadratic
+#'     row-binding overhead.
 #'
-#' @details The function processes spectra in batches to minimize memory usage
-#'     and avoid loading the entire file into memory at once. It extracts all
-#'     MGF fields and maps them to standard spectra variable names.
+#' @details The function extracts all MGF fields and maps them to standard
+#'     spectra variable names.
 #'
 #' @param f [character] Character string specifying the path to a single MGF
 #'     file
 #' @param msLevel [integer] Integer MS level to assign to spectra (default: 2L
 #'     for MS2)
 #' @param mapping [character] Named character vector mapping MGF field names to
-#'     standard
-#'     spectra variable names. Default uses the mapping from MsBackendMgf.
+#'     standard spectra variable names.
 #'
 #' @return A DataFrame containing the parsed spectra data with standardized
 #'     variable names
@@ -102,7 +100,6 @@
 #' \dontrun{
 #' # Read MGF file with memory-efficient approach
 #' library(Spectra)
-#' library(MsBackendMgf)
 #'
 #' spectra_data <- read_mgf_opti(
 #'   f = "path/to/spectra.mgf",
@@ -115,8 +112,12 @@
 read_mgf_opti <- function(
   f,
   msLevel = 2L, # nolint: object_name_linter. Bioconductor convention.
-  mapping = Spectra::spectraVariableMapping(
-    object = MsBackendMgf::MsBackendMgf()
+  mapping = c(
+    rtime = "RTINSECONDS",
+    acquisitionNum = "SCANS",
+    precursorMz = "PEPMASS",
+    precursorIntensity = "PEPMASSINT",
+    precursorCharge = "CHARGE"
   )
 ) {
   # Validate inputs
@@ -158,14 +159,6 @@ read_mgf_opti <- function(
     )
   }
 
-  if (!requireNamespace("MsBackendMgf", quietly = TRUE)) {
-    cli::cli_abort(
-      "package 'MsBackendMgf' is required but not installed",
-      class = c("tima_runtime_error", "tima_error"),
-      call = NULL
-    )
-  }
-
   # Get file size for progress reporting
   file_size_mb <- file.info(f)$size / 1024^2
   log_info(
@@ -175,94 +168,66 @@ read_mgf_opti <- function(
   )
   log_debug("Using MS level: %d", msLevel)
 
-  sp_list <- list()
-  current_spectrum <- list()
-  inside_spectrum <- FALSE
-  total_processed <- 0L
-  batch_size <- 10000L
-  chunk_id <- 1L
-  line_counter <- 0L
+  lines <- readLines(f, warn = FALSE)
+  begins <- which(lines == "BEGIN IONS")
+  ends <- which(lines == "END IONS")
+  n_blocks <- min(length(begins), length(ends))
 
-  con <- file(f, "r")
-  on.exit(close(con), add = TRUE) # Ensure the file is closed on exit
+  log_info("Total spectra read: %s", n_blocks)
 
-  repeat {
-    line <- readLines(con, n = 1L, warn = FALSE)
-
-    if (length(line) == 0L) {
-      break
-    }
-
-    if (line == "BEGIN IONS") {
-      inside_spectrum <- TRUE
-      current_spectrum <- list()
-      line_counter <- 0L
-      next
-    }
-
-    if (line == "END IONS") {
-      inside_spectrum <- FALSE
-
-      if (length(current_spectrum) > 0L) {
-        spectrum_data <- unlist(current_spectrum, use.names = FALSE)
-        spectrum_result <- .extract_mgf_spectrum(spectrum_data)
-
-        # Skip spectra with no fragment peaks (empty mz/intensity vectors)
-        if (!is.null(spectrum_result) && nrow(spectrum_result) > 0L) {
-          mz_vec <- spectrum_result$mz[[1L]]
-          if (length(mz_vec) > 0L) {
-            sp_list[[chunk_id]] <- spectrum_result
-            chunk_id <- chunk_id + 1L
-          } else {
-            log_debug(
-              "Skipping spectrum with no fragment peaks (BEGIN/END IONS only)"
-            )
-          }
-        }
-      }
-
-      total_processed <- total_processed + 1L
-
-      # Progress logging at appropriate intervals
-      if (total_processed %% batch_size == 0L) {
-        log_info("Processed %s spectra...", total_processed)
-      }
-
-      current_spectrum <- list()
-      next
-    }
-
-    if (inside_spectrum) {
-      line_counter <- line_counter + 1L
-      current_spectrum[[line_counter]] <- line
+  sp_list <- vector("list", n_blocks)
+  for (i in seq_len(n_blocks)) {
+    s <- begins[i] + 1L
+    e <- ends[i] - 1L
+    if (s <= e) {
+      sp_list[[i]] <- .extract_mgf_spectrum(lines[s:e])
     }
   }
+  rm(lines)
+  sp_list <- Filter(Negate(is.null), sp_list)
 
-  log_info("Total spectra read: %s", total_processed)
-
-  # Guard: when all spectra were skipped (e.g. every entry lacked fragment peaks),
-  # MsCoreUtils::rbindFill(list()) crashes with a cryptic NULL error. Build an
-  # empty result by parsing a tiny in-memory prototype and slicing it to 0 rows.
   if (length(sp_list) == 0L) {
     log_warn(
       "No spectra with fragment peaks found in file; returning empty result"
     )
-    prototype <- .extract_mgf_spectrum(c(
-      "TITLE=EMPTY_PROTOTYPE",
-      "PEPMASS=0 0",
-      "0 0"
-    ))
-    empty <- MsCoreUtils::rbindFill(list(prototype))
-    empty <- methods::as(object = empty, Class = "DataFrame")
-    empty$mz <- methods::as(object = empty$mz, Class = "NumericList")
-    empty <- empty[0, , drop = FALSE]
+    empty <- methods::as(
+      data.frame(
+        TITLE = character(0L),
+        precursorMz = numeric(0L),
+        precursorIntensity = numeric(0L),
+        stringsAsFactors = FALSE
+      ),
+      Class = "DataFrame"
+    )
+    empty$mz <- methods::as(list(), Class = "NumericList")
+    empty$intensity <- methods::as(list(), Class = "NumericList")
     empty$msLevel <- integer(0L)
     empty$dataOrigin <- character(0L)
     return(empty)
   }
 
-  res <- MsCoreUtils::rbindFill(sp_list)
-  rm(sp_list)
+  desc_list <- lapply(sp_list, `[[`, "desc")
+  desc_lens <- lengths(desc_list)
+  all_vals <- unlist(desc_list, use.names = FALSE)
+  all_nms <- unlist(lapply(desc_list, names), use.names = FALSE)
+  all_keys <- unique(all_nms)
+  n_sp <- length(sp_list)
+  n_keys <- length(all_keys)
+  if (n_keys > 0L) {
+    spec_idx <- rep.int(seq_len(n_sp), desc_lens)
+    key_idx <- fastmatch::fmatch(all_nms, all_keys)
+    flat_pos <- spec_idx + (key_idx - 1L) * n_sp
+    first_occ <- !duplicated(flat_pos)
+    mat <- matrix(NA_character_, nrow = n_sp, ncol = n_keys)
+    mat[flat_pos[first_occ]] <- all_vals[first_occ]
+    colnames(mat) <- all_keys
+    res <- as.data.frame(mat, stringsAsFactors = FALSE, check.names = FALSE)
+  } else {
+    res <- data.frame(row.names = seq_len(n_sp))
+  }
+  res$mz <- lapply(sp_list, `[[`, "mz")
+  res$intensity <- lapply(sp_list, `[[`, "intensity")
+  rm(sp_list, desc_list)
 
   # Format charge field if present
   if ("CHARGE" %in% colnames(res)) {
@@ -280,27 +245,9 @@ read_mgf_opti <- function(
   spv <- Spectra::coreSpectraVariables()
   spv <- spv[!names(spv) %in% c("mz", "intensity")]
 
-  # Pre-compute column name matches for efficiency
   col_names <- colnames(res)
   spv_names <- names(spv)
 
-  # First, unlist single-element columns
-  .is_single_element_column <- function(col) {
-    all(lengths(col) == 1L)
-  }
-
-  is_single_element <- vapply(
-    X = res,
-    FUN = .is_single_element_column,
-    logical(1L)
-  )
-  res[is_single_element] <- lapply(
-    X = res[is_single_element],
-    FUN = unlist,
-    use.names = FALSE
-  )
-
-  # Then, convert types for matching core spectra variables
   col_matches <- match(col_names, spv_names, nomatch = 0L)
   needs_conversion <- col_matches > 0L
   if (any(needs_conversion)) {

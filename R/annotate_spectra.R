@@ -85,6 +85,9 @@
 #'     writes the annotations table to `output`.
 #'
 #' @family annotation
+#' @concept EDAM:operation_3801 Spectral library search
+#' @concept EDAM:operation_3214 Spectral analysis
+#' @concept EDAM:data_0943 Mass spectrum
 #'
 #' @export
 #'
@@ -848,13 +851,15 @@ build_query_metadata <- function(
       adducts_translations = adducts_translations
     )
 
-  ms1_adduct_map <- resolve_ms1_query_adduct_map(ms1_annotations)
+  ms1_adduct_map <- resolve_ms1_query_adduct_map(
+    ms1_annotations,
+    feature_ids = out$feature_id
+  )
   if (nrow(ms1_adduct_map) > 0L) {
-    out <- out |>
-      tidytable::left_join(ms1_adduct_map, by = "feature_id") |>
-      tidytable::mutate(
-        query_adduct = tidytable::coalesce(ms1_query_adduct, query_adduct_raw)
-      )
+    idx_ms1 <- fastmatch::fmatch(out$feature_id, ms1_adduct_map$feature_id)
+    ms1_add <- ms1_adduct_map$ms1_query_adduct[idx_ms1]
+    out$ms1_query_adduct <- ms1_add
+    out$query_adduct <- ifelse(is.na(ms1_add), out$query_adduct_raw, ms1_add)
   } else {
     out$query_adduct <- out$query_adduct_raw
   }
@@ -867,7 +872,10 @@ build_query_metadata <- function(
 }
 
 #' @keywords internal
-resolve_ms1_query_adduct_map <- function(ms1_annotations = NULL) {
+resolve_ms1_query_adduct_map <- function(
+  ms1_annotations = NULL,
+  feature_ids = NULL
+) {
   if (is.null(ms1_annotations)) {
     return(tidytable::tidytable(
       feature_id = character(),
@@ -875,12 +883,34 @@ resolve_ms1_query_adduct_map <- function(ms1_annotations = NULL) {
     ))
   }
 
+  needed_cols <- c(
+    "feature_id",
+    "candidate_adduct",
+    "candidate_annotation_level",
+    "candidate_evidence_tier",
+    "candidate_structure_error_mz"
+  )
+
   ms1_tbl <- if (is.character(ms1_annotations)) {
+    header <- names(safe_fread(
+      file = ms1_annotations,
+      file_type = "annotate_masses annotations",
+      nrows = 0L,
+      showProgress = FALSE
+    ))
+    sel_cols <- intersect(needed_cols, header)
+    if (!all(c("feature_id", "candidate_adduct") %in% sel_cols)) {
+      return(tidytable::tidytable(
+        feature_id = character(),
+        ms1_query_adduct = character()
+      ))
+    }
     safe_fread(
       file = ms1_annotations,
       file_type = "annotate_masses annotations",
       na.strings = c("", "NA"),
-      colClasses = "character"
+      colClasses = "character",
+      select = sel_cols
     )
   } else if (is.data.frame(ms1_annotations)) {
     tidytable::as_tidytable(ms1_annotations)
@@ -898,47 +928,72 @@ resolve_ms1_query_adduct_map <- function(ms1_annotations = NULL) {
     ))
   }
 
-  if (!"candidate_annotation_level" %in% names(ms1_tbl)) {
-    ms1_tbl$candidate_annotation_level <- NA_character_
-  }
-  if (!"candidate_evidence_tier" %in% names(ms1_tbl)) {
-    ms1_tbl$candidate_evidence_tier <- NA_character_
-  }
-  if (!"candidate_structure_error_mz" %in% names(ms1_tbl)) {
-    ms1_tbl$candidate_structure_error_mz <- NA_real_
+  keep <- !is.na(ms1_tbl$candidate_adduct) & nzchar(ms1_tbl$candidate_adduct)
+  if (!is.null(feature_ids)) {
+    u_q_fids <- unique(as.character(feature_ids[!is.na(feature_ids)]))
+    if (length(u_q_fids) == 0L) {
+      return(tidytable::tidytable(
+        feature_id = character(),
+        ms1_query_adduct = character()
+      ))
+    }
+    keep <- keep &
+      (fastmatch::fmatch(ms1_tbl$feature_id, u_q_fids, nomatch = 0L) > 0L)
   }
 
-  ms1_tbl |>
-    tidytable::filter(!is.na(candidate_adduct) & nzchar(candidate_adduct)) |>
+  if (!any(keep)) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      ms1_query_adduct = character()
+    ))
+  }
+  if (!all(keep)) {
+    ms1_tbl <- ms1_tbl[keep, ]
+  }
+
+  n <- nrow(ms1_tbl)
+  lvl_rank <- rep.int(3L, n)
+  if ("candidate_annotation_level" %in% names(ms1_tbl)) {
+    lvl_col <- ms1_tbl$candidate_annotation_level
+    lvl_rank[!is.na(lvl_col) & lvl_col == "primary"] <- 1L
+    lvl_rank[!is.na(lvl_col) & lvl_col == "secondary"] <- 2L
+  }
+
+  evi_rank <- rep.int(4L, n)
+  if ("candidate_evidence_tier" %in% names(ms1_tbl)) {
+    evi_col <- ms1_tbl$candidate_evidence_tier
+    evi_rank[!is.na(evi_col) & evi_col == "supported_strong"] <- 1L
+    evi_rank[!is.na(evi_col) & evi_col == "supported_weak"] <- 2L
+    evi_rank[!is.na(evi_col) & evi_col == "baseline"] <- 3L
+  }
+
+  err_rank <- if ("candidate_structure_error_mz" %in% names(ms1_tbl)) {
+    abs(suppressWarnings(as.numeric(ms1_tbl$candidate_structure_error_mz)))
+  } else {
+    rep.int(NA_real_, n)
+  }
+
+  tier_rank <- (lvl_rank - 1L) * 4L + evi_rank
+  ord <- order(tier_rank, err_rank, na.last = TRUE, method = "radix")
+  fids <- ms1_tbl$feature_id
+  u_fids <- unique(fids)
+  fid_id <- fastmatch::fmatch(fids, u_fids)
+  best_rows <- ord[!duplicated(fid_id[ord])]
+  best_rows <- best_rows[order(fids[best_rows])]
+
+  best_tbl <- tidytable::tidytable(
+    feature_id = fids[best_rows],
+    candidate_adduct = ms1_tbl$candidate_adduct[best_rows]
+  ) |>
     harmonize_adducts(
       adducts_colname = "candidate_adduct",
       adducts_translations = adducts_translations
-    ) |>
-    tidytable::mutate(
-      .level_rank = tidytable::case_when(
-        candidate_annotation_level == "primary" ~ 1L,
-        candidate_annotation_level == "secondary" ~ 2L,
-        TRUE ~ 3L
-      ),
-      .evidence_rank = tidytable::case_when(
-        candidate_evidence_tier == "supported_strong" ~ 1L,
-        candidate_evidence_tier == "supported_weak" ~ 2L,
-        candidate_evidence_tier == "baseline" ~ 3L,
-        TRUE ~ 4L
-      ),
-      .error_rank = abs(as.numeric(candidate_structure_error_mz))
-    ) |>
-    tidytable::arrange(
-      feature_id,
-      .level_rank,
-      .evidence_rank,
-      .error_rank
-    ) |>
-    tidytable::distinct(feature_id, .keep_all = TRUE) |>
-    tidytable::transmute(
-      feature_id,
-      ms1_query_adduct = candidate_adduct
     )
+
+  tidytable::tidytable(
+    feature_id = best_tbl$feature_id,
+    ms1_query_adduct = best_tbl$candidate_adduct
+  )
 }
 
 #' @keywords internal
@@ -1054,6 +1109,30 @@ convert_precursor_to_neutral_if_possible <- function(precursors, adducts) {
 }
 
 #' @keywords internal
+.match_precursor_windows <- function(
+  library_precursors,
+  query_precursors,
+  dalton,
+  ppm
+) {
+  valid_lib <- is.finite(library_precursors) & library_precursors > 0
+  valid_query <- is.finite(query_precursors) & query_precursors > 0
+  if (!any(valid_lib) || !any(valid_query)) {
+    return(rep(FALSE, length(library_precursors)))
+  }
+  qry_vals <- sort(unique(as.numeric(query_precursors[valid_query])))
+  lib_idx <- which(valid_lib)
+  lib_vals <- as.numeric(library_precursors[lib_idx])
+  minimal <- pmin(lib_vals - dalton, lib_vals * (1 - (1E-6 * ppm)))
+  maximal <- pmax(lib_vals + dalton, lib_vals * (1 + (1E-6 * ppm)))
+  low_pos <- findInterval(minimal, qry_vals, left.open = TRUE) + 1L
+  high_pos <- findInterval(maximal, qry_vals, left.open = FALSE)
+  keep <- rep(FALSE, length(library_precursors))
+  keep[lib_idx[low_pos <= high_pos]] <- TRUE
+  keep
+}
+
+#' @keywords internal
 reduce_library_by_precursor <- function(
   lib_sp,
   query_precursors,
@@ -1073,40 +1152,6 @@ reduce_library_by_precursor <- function(
   lib_prec <- get_precursors(lib_sp)
   query_prec_match <- as.numeric(query_precursors)
   lib_prec_match <- as.numeric(lib_prec)
-
-  .match_precursor_windows <- function(
-    library_precursors,
-    query_precursors,
-    dalton,
-    ppm
-  ) {
-    valid_lib <- is.finite(library_precursors) & library_precursors > 0
-    valid_query <- is.finite(query_precursors) & query_precursors > 0
-    if (!any(valid_lib) || !any(valid_query)) {
-      return(rep(FALSE, length(library_precursors)))
-    }
-    lib_vals <- as.numeric(library_precursors[valid_lib])
-    qry_vals <- unique(as.numeric(query_precursors[valid_query]))
-    minimal <- pmin(lib_vals - dalton, lib_vals * (1 - (1E-6 * ppm)))
-    maximal <- pmax(lib_vals + dalton, lib_vals * (1 + (1E-6 * ppm)))
-    lib_windows <- tidytable::tidytable(
-      lib_row = which(valid_lib),
-      minimal = minimal,
-      maximal = maximal
-    )
-    query_vals <- tidytable::tidytable(val = qry_vals)
-    hits <- lib_windows[
-      query_vals,
-      on = .(minimal <= val, maximal >= val),
-      nomatch = 0L,
-      allow.cartesian = TRUE
-    ]
-    keep <- rep(FALSE, length(library_precursors))
-    if (nrow(hits) > 0L) {
-      keep[unique(hits$lib_row)] <- TRUE
-    }
-    keep
-  }
 
   keep_raw <- .match_precursor_windows(
     library_precursors = lib_prec_match,
@@ -1191,8 +1236,9 @@ compute_similarity_safe <- function(
     if (nrow(out) == 0L) {
       return(tidytable::tidytable())
     }
-    tidytable::as_tidytable(out) |>
-      tidytable::mutate(.similarity_space = space_label)
+    out <- tidytable::as_tidytable(out)
+    data.table::set(out, j = ".similarity_space", value = space_label)
+    out
   }
 
   result <- tryCatch(
@@ -1238,43 +1284,7 @@ compute_similarity_safe <- function(
 
       neutral_out <- tidytable::tidytable()
       if (any(use_query_m) && any(use_lib_m)) {
-        # Filter library by precursor windows in neutral mass space
-        # to avoid comparing against all library candidates
-        .match_precursor_windows_neutral <- function(
-          library_precursors,
-          query_precursors,
-          dalton,
-          ppm
-        ) {
-          valid_lib <- is.finite(library_precursors) & library_precursors > 0
-          valid_query <- is.finite(query_precursors) & query_precursors > 0
-          if (!any(valid_lib) || !any(valid_query)) {
-            return(rep(FALSE, length(library_precursors)))
-          }
-          lib_vals <- as.numeric(library_precursors[valid_lib])
-          qry_vals <- unique(as.numeric(query_precursors[valid_query]))
-          minimal <- pmin(lib_vals - dalton, lib_vals * (1 - (1E-6 * ppm)))
-          maximal <- pmax(lib_vals + dalton, lib_vals * (1 + (1E-6 * ppm)))
-          lib_windows <- tidytable::tidytable(
-            lib_row = which(valid_lib),
-            minimal = minimal,
-            maximal = maximal
-          )
-          query_vals <- tidytable::tidytable(val = qry_vals)
-          hits <- lib_windows[
-            query_vals,
-            on = .(minimal <= val, maximal >= val),
-            nomatch = 0L,
-            allow.cartesian = TRUE
-          ]
-          keep <- rep(FALSE, length(library_precursors))
-          if (nrow(hits) > 0L) {
-            keep[unique(hits$lib_row)] <- TRUE
-          }
-          keep
-        }
-
-        keep_neutral <- .match_precursor_windows_neutral(
+        keep_neutral <- .match_precursor_windows(
           library_precursors = lib_neutral,
           query_precursors = query_neutral,
           dalton = dalton,
@@ -1322,142 +1332,213 @@ finalize_results <- function(
 ) {
   invisible(dalton)
   invisible(ppm)
-  if (nrow(df_sim) == 0) {
+  n_sim <- nrow(df_sim)
+  if (n_sim == 0L) {
     return(tidytable::tidytable())
   }
-  df_sim$candidate_spectrum_entropy <- as.numeric(
-    df_sim$candidate_spectrum_entropy
-  )
-  df_sim$candidate_score_similarity <- as.numeric(
-    df_sim$candidate_score_similarity
-  )
-  df_sim$candidate_score_similarity_forward <- as.numeric(
-    df_sim$candidate_score_similarity_forward
-  )
-  df_sim$candidate_score_similarity_reverse <- as.numeric(
-    df_sim$candidate_score_similarity_reverse
-  )
-  df_sim$candidate_count_similarity_peaks_matched <- as.integer(
-    df_sim$candidate_count_similarity_peaks_matched
-  )
+
+  score_sim <- as.numeric(df_sim$candidate_score_similarity)
+  entropy_col <- as.numeric(df_sim$candidate_spectrum_entropy)
+  score_fwd <- if ("candidate_score_similarity_forward" %in% names(df_sim)) {
+    as.numeric(df_sim$candidate_score_similarity_forward)
+  } else {
+    NULL
+  }
+  score_rev <- if ("candidate_score_similarity_reverse" %in% names(df_sim)) {
+    as.numeric(df_sim$candidate_score_similarity_reverse)
+  } else {
+    NULL
+  }
+  matched_peaks <- as.integer(df_sim$candidate_count_similarity_peaks_matched)
+  fids <- df_sim$feature_id
+  tids <- df_sim$target_id
+  sim_space <- if (".similarity_space" %in% names(df_sim)) {
+    df_sim$.similarity_space
+  } else {
+    rep.int("precursor_mz", n_sim)
+  }
+  prec_mz <- if ("precursorMz" %in% names(df_sim)) {
+    as.numeric(df_sim$precursorMz)
+  } else {
+    rep.int(NA_real_, n_sim)
+  }
+
+  idx_meta <- fastmatch::fmatch(tids, meta$target_id)
+  target_adduct <- meta$target_adduct[idx_meta]
+  target_library <- meta$target_library[idx_meta]
+  target_smiles_2d <- meta$target_smiles_no_stereo[idx_meta]
+  na_sm2d <- is.na(target_smiles_2d)
+  if (any(na_sm2d)) {
+    target_smiles_2d[na_sm2d] <- meta$target_smiles[idx_meta[na_sm2d]]
+  }
+
+  if (!is.null(query_meta) && nrow(query_meta) > 0L) {
+    idx_q <- fastmatch::fmatch(fids, query_meta$feature_id)
+    query_adduct <- if ("query_adduct" %in% names(query_meta)) {
+      query_meta$query_adduct[idx_q]
+    } else {
+      rep.int(NA_character_, n_sim)
+    }
+    query_neutral_mass <- if ("query_neutral_mass" %in% names(query_meta)) {
+      as.numeric(query_meta$query_neutral_mass[idx_q])
+    } else {
+      rep.int(NA_real_, n_sim)
+    }
+  } else {
+    query_adduct <- if ("query_adduct" %in% names(df_sim)) {
+      df_sim$query_adduct
+    } else {
+      rep.int(NA_character_, n_sim)
+    }
+    query_neutral_mass <- if ("query_neutral_mass" %in% names(df_sim)) {
+      as.numeric(df_sim$query_neutral_mass)
+    } else {
+      rep.int(NA_real_, n_sim)
+    }
+  }
+
   state_map <- build_adduct_state_key_map(unique(c(
     meta$target_adduct,
     if (!is.null(query_meta) && "query_adduct" %in% names(query_meta)) {
       query_meta$query_adduct
     } else {
-      character()
+      query_adduct
     }
   )))
-  query_state_map <- state_map |>
-    tidytable::rename(
-      query_adduct = adduct,
-      query_adduct_state_key = state_key
-    )
-  target_state_map <- state_map |>
-    tidytable::rename(
-      target_adduct = adduct,
-      target_adduct_state_key = state_key
-    )
+  q_state_key <- state_map$state_key[fastmatch::fmatch(
+    query_adduct,
+    state_map$adduct
+  )]
+  t_state_key <- state_map$state_key[fastmatch::fmatch(
+    target_adduct,
+    state_map$adduct
+  )]
 
-  df_final <- df_sim |>
-    tidytable::left_join(y = meta, by = "target_id")
-  if (!is.null(query_meta) && nrow(query_meta) > 0L) {
-    df_final <- df_final |>
-      tidytable::left_join(y = query_meta, by = "feature_id")
-  }
-  if (!"query_adduct" %in% names(df_final)) {
-    df_final$query_adduct <- NA_character_
-  }
-  if (!".similarity_space" %in% names(df_final)) {
-    df_final$.similarity_space <- "precursor_mz"
-  }
-  df_final <- df_final |>
-    tidytable::left_join(query_state_map, by = "query_adduct") |>
-    tidytable::left_join(target_state_map, by = "target_adduct") |>
-    tidytable::mutate(
-      ## COMMENT: does not seem logical but is so
-      candidate_adduct = query_adduct,
-      candidate_query_adduct = target_adduct,
-      candidate_library = target_library,
-      candidate_spectrum_id = target_spectrum_id,
-      candidate_structure_name = target_name,
-      candidate_structure_error_mz = tidytable::if_else(
-        condition = !is.na(query_neutral_mass),
-        true = target_neutral_mass - query_neutral_mass,
-        false = target_precursorMz - precursorMz
-      ),
-      candidate_adduct_match_mode = tidytable::case_when(
-        !is.na(candidate_query_adduct) &
-          !is.na(candidate_adduct) &
-          query_adduct_state_key == target_adduct_state_key ~ "exact_adduct",
-        .similarity_space == "neutral_M" ~ "m_delta_rescued",
-        TRUE ~ "precursor_mz"
-      ),
-      # For rescued matches, swap candidate_query_adduct to be the observed adduct
-      # for clarity: candidate_query_adduct should reflect what was actually observed
-      candidate_query_adduct = tidytable::if_else(
-        candidate_adduct_match_mode == "m_delta_rescued",
-        query_adduct,
-        candidate_query_adduct
-      ),
-      annotation_note = tidytable::case_when(
-        ## COMMENT: does not seem logical but is so
-        candidate_adduct_match_mode == "m_delta_rescued" ~
-          paste0(
-            "Spectral match rescued in neutral-mass space: observed adduct ",
-            candidate_adduct,
-            ", library adduct ",
-            target_adduct
-          ),
-        TRUE ~ NA_character_
-      ),
-      candidate_structure_smiles_no_stereo = tidytable::coalesce(
-        target_smiles_no_stereo,
-        target_smiles
-      ),
-      .match_mode_rank = tidytable::case_when(
-        candidate_adduct_match_mode == "exact_adduct" ~ 1L,
-        candidate_adduct_match_mode == "m_delta_rescued" ~ 2L,
-        TRUE ~ 3L
-      )
-    ) |>
-    tidytable::arrange(
-      feature_id,
-      candidate_library,
-      candidate_structure_smiles_no_stereo,
-      # Prefer highest similarity first when deduplicating structures
-      tidytable::desc(x = candidate_score_similarity),
-      .match_mode_rank
-    ) |>
-    tidytable::distinct(
-      feature_id,
-      candidate_adduct,
-      candidate_library,
-      candidate_structure_smiles_no_stereo,
-      .keep_all = TRUE
-    ) |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          "feature_id",
-          "candidate_adduct",
-          "candidate_query_adduct",
-          "candidate_adduct_match_mode",
-          "annotation_note",
-          "candidate_library",
-          "candidate_spectrum_id",
-          "candidate_structure_error_mz",
-          "candidate_structure_name",
-          "candidate_structure_smiles_no_stereo",
-          "candidate_spectrum_entropy",
-          "candidate_score_similarity",
-          "candidate_score_similarity_forward",
-          "candidate_score_similarity_reverse",
-          "candidate_count_similarity_peaks_matched"
-        )
-      )
+  is_exact <- !is.na(target_adduct) &
+    !is.na(query_adduct) &
+    !is.na(q_state_key) &
+    !is.na(t_state_key) &
+    (q_state_key == t_state_key)
+  is_rescued <- !is_exact &
+    !is.na(sim_space) &
+    (sim_space == "neutral_M")
+
+  mode_rank <- rep.int(3L, n_sim)
+  mode_rank[is_rescued] <- 2L
+  mode_rank[is_exact] <- 1L
+
+  # Integer-encode the deduplication key (feature_id, candidate_adduct,
+  # candidate_library, candidate_structure_smiles_no_stereo) and radix-sort
+  # so we avoid sorting 3.5M long SMILES strings and formatting rescued notes
+  # on rows that get discarded by distinct().
+  u_fids <- sort(unique(fids), na.last = TRUE)
+  u_libs <- sort(unique(target_library), na.last = TRUE)
+  u_sm <- sort(unique(target_smiles_2d), na.last = TRUE)
+  u_qadd <- unique(query_adduct)
+
+  fid_id <- fastmatch::fmatch(fids, u_fids)
+  lib_id <- fastmatch::fmatch(target_library, u_libs)
+  sm_id <- fastmatch::fmatch(target_smiles_2d, u_sm)
+  qadd_id <- fastmatch::fmatch(query_adduct, u_qadd)
+
+  neg_score <- -score_sim
+  ord <- order(
+    fid_id,
+    lib_id,
+    sm_id,
+    neg_score,
+    mode_rank,
+    na.last = TRUE,
+    method = "radix"
+  )
+
+  # Combine integer codes into a unique deduplication key per
+  # (feature_id, candidate_adduct, candidate_library, smiles_no_stereo)
+  n_qadd <- max(1L, length(u_qadd))
+  n_libs <- max(1L, length(u_libs))
+  n_sm <- max(1L, length(u_sm))
+  if (
+    as.numeric(length(u_fids)) *
+      as.numeric(n_qadd) *
+      as.numeric(n_libs) *
+      as.numeric(n_sm) <
+      4.5e15
+  ) {
+    grp_key <- (((as.numeric(fid_id[ord] - 1L) * n_qadd + (qadd_id[ord] - 1L)) *
+      n_libs +
+      (lib_id[ord] - 1L)) *
+      n_sm) +
+      sm_id[ord]
+    keep_ord <- ord[!duplicated(grp_key)]
+  } else {
+    grp_df <- data.frame(
+      f = fid_id[ord],
+      a = qadd_id[ord],
+      l = lib_id[ord],
+      s = sm_id[ord]
     )
-  df_final
+    keep_ord <- ord[!duplicated(grp_df)]
+  }
+
+  idx_m_keep <- idx_meta[keep_ord]
+  q_add_keep <- query_adduct[keep_ord]
+  t_add_keep <- target_adduct[keep_ord]
+  exact_keep <- is_exact[keep_ord]
+  rescued_keep <- is_rescued[keep_ord]
+  n_keep <- length(keep_ord)
+
+  match_mode_keep <- rep.int("precursor_mz", n_keep)
+  match_mode_keep[rescued_keep] <- "m_delta_rescued"
+  match_mode_keep[exact_keep] <- "exact_adduct"
+
+  cand_query_add_keep <- t_add_keep
+  if (any(rescued_keep)) {
+    cand_query_add_keep[rescued_keep] <- q_add_keep[rescued_keep]
+  }
+
+  note_keep <- rep.int(NA_character_, n_keep)
+  if (any(rescued_keep)) {
+    note_keep[rescued_keep] <- paste0(
+      "Spectral match rescued in neutral-mass space: observed adduct ",
+      q_add_keep[rescued_keep],
+      ", library adduct ",
+      t_add_keep[rescued_keep]
+    )
+  }
+
+  q_nm_keep <- query_neutral_mass[keep_ord]
+  t_nm_keep <- as.numeric(meta$target_neutral_mass[idx_m_keep])
+  t_pmz_keep <- as.numeric(meta$target_precursorMz[idx_m_keep])
+  q_pmz_keep <- prec_mz[keep_ord]
+  has_q_nm <- !is.na(q_nm_keep)
+  err_mz_keep <- t_pmz_keep - q_pmz_keep
+  if (any(has_q_nm)) {
+    err_mz_keep[has_q_nm] <- t_nm_keep[has_q_nm] - q_nm_keep[has_q_nm]
+  }
+
+  cols <- list(
+    feature_id = fids[keep_ord],
+    candidate_adduct = q_add_keep,
+    candidate_query_adduct = cand_query_add_keep,
+    candidate_adduct_match_mode = match_mode_keep,
+    annotation_note = note_keep,
+    candidate_library = target_library[keep_ord],
+    candidate_spectrum_id = meta$target_spectrum_id[idx_m_keep],
+    candidate_structure_error_mz = err_mz_keep,
+    candidate_structure_name = meta$target_name[idx_m_keep],
+    candidate_structure_smiles_no_stereo = target_smiles_2d[keep_ord],
+    candidate_spectrum_entropy = entropy_col[keep_ord],
+    candidate_score_similarity = score_sim[keep_ord]
+  )
+  if (!is.null(score_fwd)) {
+    cols$candidate_score_similarity_forward <- score_fwd[keep_ord]
+  }
+  if (!is.null(score_rev)) {
+    cols$candidate_score_similarity_reverse <- score_rev[keep_ord]
+  }
+  cols$candidate_count_similarity_peaks_matched <- matched_peaks[keep_ord]
+
+  tidytable::as_tidytable(cols)
 }
 
 log_library_stats <- function(lib_sp) {
@@ -1488,12 +1569,10 @@ log_library_stats <- function(lib_sp) {
     names(df)
   )
   if (length(id_cols) > 0L) {
-    df <- df |>
-      tidytable::mutate(
-        .structure_id = tidytable::coalesce(
-          !!!rlang::syms(id_cols)
-        )
-      )
+    df$.structure_id <- do.call(
+      tidytable::coalesce,
+      unname(as.list(df)[id_cols])
+    )
   } else {
     df$.structure_id <- NA_character_
   }

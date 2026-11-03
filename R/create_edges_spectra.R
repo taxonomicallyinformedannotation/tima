@@ -38,6 +38,10 @@
 #' @return Character string path to the created spectral edges file.
 #'
 #' @family workflow
+#' @concept EDAM:operation_3927 Network analysis
+#' @concept EDAM:operation_3214 Spectral analysis
+#' @concept EDAM:data_0943 Mass spectrum
+#' @concept EDAM:data_2600 Pathway or network
 #'
 #' @export
 #'
@@ -321,7 +325,7 @@ create_edges_spectra <- function(
   )
 
   edges <- all_edges
-  community_edges <- all_edges
+  rm(all_edges)
 
   # Calculate spectral entropy
   entropy <- vapply(
@@ -360,80 +364,79 @@ create_edges_spectra <- function(
 
   edges <- normalize_edge_table(edges)
 
-  community_edges <- normalize_edge_table(community_edges)
-
-  entropy_df <- data.frame(
-    source = seq_along(entropy),
+  entropy_df <- tidytable::tidytable(
+    source = idz,
     feature_spectrum_entropy = as.character(entropy),
     feature_spectrum_peaks = as.character(npeaks)
   )
-  names(entropy_df)[names(entropy_df) == "source"] <- source_col
-  entropy_df[[source_col]] <- idz[entropy_df[[source_col]]]
-  entropy_df <- entropy_df[
-    !duplicated(entropy_df[[source_col]]),
-    c(source_col, "feature_spectrum_entropy", "feature_spectrum_peaks"),
-    drop = FALSE
-  ]
+  names(entropy_df)[1L] <- source_col
+  entropy_df <- entropy_df[!duplicated(entropy_df[[source_col]]), ]
   rm(list = intersect(c("entropy", "npeaks", "idz"), ls()))
 
-  edges <- edges |>
-    tidytable::full_join(y = entropy_df)
-  edges[[target_col]] <- tidytable::coalesce(
-    edges[[target_col]],
-    edges[[source_col]]
-  )
-  drop_legacy_similarity_columns <- function(edge_table) {
-    legacy_columns <- intersect(c("score", "matched_peaks"), names(edge_table))
-    if (length(legacy_columns) > 0L) {
-      edge_table <- edge_table |>
-        tidytable::select(-tidyselect::any_of(legacy_columns))
-    }
-    edge_table
-  }
-
-  if (
-    !"candidate_score_similarity" %in% names(edges) && "score" %in% names(edges)
-  ) {
-    edges <- edges |>
-      tidytable::mutate(
-        candidate_score_similarity = as.numeric(score)
-      )
-  }
-
-  if (
-    !"candidate_count_similarity_peaks_matched" %in% names(edges) &&
-      "matched_peaks" %in% names(edges)
-  ) {
-    edges <- edges |>
-      tidytable::mutate(
-        candidate_count_similarity_peaks_matched = as.integer(matched_peaks)
-      )
-  }
-
-  edges <- drop_legacy_similarity_columns(edges)
-
-  rm(list = intersect(c("entropy_df"), ls()))
-
-  edges_before_community_cut <- edges
-
+  # Build communities before adding entropy/peak metadata to all edges
   community_result <- .build_components_from_edges(
-    edges = community_edges,
+    edges = edges,
     name_source = source_col,
     name_target = target_col,
     resolution = resolution,
     n_iterations = n_iterations,
     seed = seed,
     label_column = "community_id",
-    cut_to_communities = FALSE
+    cut_to_communities = FALSE,
+    populate_edges = FALSE
   )
+
+  # Attach entropy and peak count via fastmatch instead of 22M-row full_join
+  idx_ent <- fastmatch::fmatch(edges[[source_col]], entropy_df[[source_col]])
+  edges$feature_spectrum_entropy <- entropy_df$feature_spectrum_entropy[idx_ent]
+  edges$feature_spectrum_peaks <- entropy_df$feature_spectrum_peaks[idx_ent]
+
+  missing_ent <- fastmatch::fmatch(
+    entropy_df[[source_col]],
+    edges[[source_col]],
+    nomatch = 0L
+  ) ==
+    0L
+  if (any(missing_ent)) {
+    extra_ent <- entropy_df[missing_ent, ]
+    extra_ent[[target_col]] <- extra_ent[[source_col]]
+    edges <- tidytable::bind_rows(edges, extra_ent)
+  }
+  na_tgt <- is.na(edges[[target_col]])
+  if (any(na_tgt)) {
+    edges[[target_col]][na_tgt] <- edges[[source_col]][na_tgt]
+  }
+
+  if (
+    !"candidate_score_similarity" %in% names(edges) && "score" %in% names(edges)
+  ) {
+    edges$candidate_score_similarity <- as.numeric(edges$score)
+  }
+
+  if (
+    !"candidate_count_similarity_peaks_matched" %in% names(edges) &&
+      "matched_peaks" %in% names(edges)
+  ) {
+    edges$candidate_count_similarity_peaks_matched <- as.integer(
+      edges$matched_peaks
+    )
+  }
+
+  legacy_columns <- intersect(c("score", "matched_peaks"), names(edges))
+  if (length(legacy_columns) > 0L) {
+    edges <- edges[, setdiff(names(edges), legacy_columns), with = FALSE]
+  }
+
+  rm(list = intersect(c("entropy_df"), ls()))
 
   # Defined unconditionally: also needed below when no community was found
   pre_cut_features <- unique(c(
-    edges_before_community_cut[[source_col]],
-    edges_before_community_cut[[target_col]]
+    edges[[source_col]],
+    edges[[target_col]]
   ))
 
   if (nrow(edges) > 0L && length(community_result$component_membership) > 0L) {
+    empty_template <- edges[0L, , drop = FALSE]
     edges <- .prune_intra_community_edges(
       edges = edges,
       component_membership = community_result$component_membership,
@@ -445,7 +448,7 @@ create_edges_spectra <- function(
       log_warn(
         "No intra-community edges remained after community cut; keeping only isolated features"
       )
-      edges <- edges_before_community_cut[0L, , drop = FALSE]
+      edges <- empty_template
     }
 
     retained_features <- unique(c(edges[[source_col]], edges[[target_col]]))

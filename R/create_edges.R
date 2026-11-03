@@ -136,7 +136,6 @@ create_edges <- function(
   state$sanitized_indices <- logical(nspecs)
   if (isTRUE(assume_sanitized)) {
     state$checked_sanitization <- rep(TRUE, nspecs)
-    state$sanitized_indices <- rep(TRUE, nspecs)
   }
 
   ensure_spectrum_ready <- function(idx) {

@@ -24,6 +24,9 @@
 #' @return Spectra object containing the imported and processed spectra
 #'
 #' @family mass-spectrometry
+#' @concept EDAM:operation_1812 Parsing
+#' @concept EDAM:data_0943 Mass spectrum
+#' @concept EDAM:format_3651 MGF
 #'
 #' @export
 #'
@@ -137,6 +140,13 @@ import_spectra <- function(
         },
         "msp" = {
           log_debug("Reading MSP file...")
+          if (!requireNamespace("MsBackendMsp", quietly = TRUE)) {
+            cli::cli_abort(
+              "Package {.pkg MsBackendMsp} is required to read MSP files.",
+              class = c("tima_runtime_error", "tima_error"),
+              call = NULL
+            )
+          }
           MsBackendMsp::readMsp(f = file) |>
             Spectra::Spectra()
         },
@@ -153,7 +163,7 @@ import_spectra <- function(
     },
     error = function(e) {
       if (inherits(e, "tima_error")) {
-        rlang::cnd_signal(e)
+        stop(e)
       }
       log_error("Failed to import spectra: %s", conditionMessage(e))
       cli::cli_abort(
@@ -313,7 +323,7 @@ import_spectra <- function(
   }
 
   # Combine replicate spectra if requested
-  if (combine) {
+  if (combine && length(spectra) > 0L) {
     n_before <- length(spectra)
     if ("FEATURE_ID" %in% colnames(spectra@backend@spectraData)) {
       log_info("Combining replicate spectra by FEATURE_ID")

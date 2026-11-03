@@ -510,3 +510,71 @@ test_that("a threshold nothing reaches returns an empty table", {
   expect_true(is.na(out$target_id[[1L]]))
   expect_true(is.na(out$candidate_score_similarity[[1L]]))
 })
+
+test_that("calculate_entropy_and_similarity computes library entropy lazily only for above-threshold matches", {
+  entropy_calls <- new.env(parent = emptyenv())
+  entropy_calls$n <- 0L
+  local_mocked_bindings(
+    calculate_spectral_entropy = function(sp) {
+      entropy_calls$n <- entropy_calls$n + 1L
+      0.5
+    },
+    .package = "msentropy"
+  )
+
+  # 3 library spectra: #1 and #3 match sp_acetic (score 1.0), #2 is sp_propane (score 0.0)
+  out <- calculate_entropy_and_similarity(
+    lib_ids = c(10L, 20L, 30L),
+    lib_precursors = c(61, 61, 61),
+    lib_spectra = list(sp_acetic, sp_propane, sp_acetic),
+    query_ids = c(1L, 2L),
+    query_precursors = c(61, 61),
+    query_spectra = list(sp_acetic, sp_acetic),
+    method = "gnps",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0.5,
+    approx = TRUE
+  )
+
+  expect_equal(nrow(out), 4L)
+  expect_equal(sort(unique(out$target_id)), c(10L, 30L))
+  # Library spectrum #2 failed threshold, and #1/#3 were matched by 2 queries
+  # each, so entropy should be computed exactly once per unique matched library
+  # spectrum (2 calls total, not 3 upfront or 4 per row).
+  expect_equal(entropy_calls$n, 2L)
+})
+
+test_that("calculate_entropy_and_similarity falls back to per-pair GNPS when batch wrapper returns NULL", {
+  local_mocked_bindings(
+    gnps_chain_dp_batch_wrapper = function(...) NULL
+  )
+
+  out <- calculate_entropy_and_similarity(
+    lib_ids = c(10L, 20L),
+    lib_precursors = c(30.05, 73.0),
+    lib_spectra = list(sp_ethane, sp_propane),
+    query_ids = 1L,
+    query_precursors = 30.05,
+    query_spectra = list(sp_ethane),
+    method = "gnps",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0.5,
+    approx = TRUE
+  )
+
+  expect_equal(nrow(out), 1L)
+  expect_equal(out$target_id[[1L]], 10L)
+  expect_equal(out$candidate_score_similarity[[1L]], 1.0, tolerance = 1e-6)
+  expect_equal(
+    out$candidate_score_similarity_forward[[1L]],
+    1.0,
+    tolerance = 1e-6
+  )
+  expect_equal(
+    out$candidate_score_similarity_reverse[[1L]],
+    1.0,
+    tolerance = 1e-6
+  )
+})

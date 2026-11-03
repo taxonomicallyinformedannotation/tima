@@ -1681,3 +1681,82 @@ test_that("annotate_spectra_handle_empty_result logs warnings when message is pr
   expect_identical(out, output_file)
   expect_true(file.exists(output_file))
 })
+
+test_that(".match_precursor_windows matches closed Da and ppm intervals accurately", {
+  lib_prec <- c(100.0, 200.0, 500.0, 1000.0, NA_real_, -10.0)
+  qry_prec <- c(100.01, 1000.01, NA_real_)
+
+  # At m/z 100, dalton = 0.01 covers 100.01 (exact boundary);
+  # at m/z 1000, ppm = 10 covers 1000.01 (10 ppm = 0.01 Da).
+  keep <- .match_precursor_windows(
+    library_precursors = lib_prec,
+    query_precursors = qry_prec,
+    dalton = 0.01,
+    ppm = 10
+  )
+  expect_equal(keep, c(TRUE, FALSE, FALSE, TRUE, FALSE, FALSE))
+
+  # Empty or non-finite inputs return all FALSE
+  expect_equal(
+    .match_precursor_windows(c(NA_real_, -1), c(100), dalton = 0.01, ppm = 10),
+    c(FALSE, FALSE)
+  )
+})
+
+test_that("finalize_results breaks score ties using adduct match mode rank", {
+  # Same feature, library, structure, and similarity score (0.85),
+  # but target 1 is neutral_M rescued while target 2 is exact_adduct.
+  df_sim <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    target_id = c(1L, 2L),
+    precursorMz = c(100, 100),
+    candidate_spectrum_entropy = c(0.5, 0.5),
+    candidate_score_similarity = c(0.85, 0.85),
+    candidate_score_similarity_forward = c(0.85, 0.85),
+    candidate_score_similarity_reverse = c(0.85, 0.85),
+    candidate_count_similarity_peaks_matched = c(4L, 4L),
+    .similarity_space = c("neutral_M", "precursor_mz")
+  )
+  meta <- tidytable::tidytable(
+    target_id = c(1L, 2L),
+    target_adduct = c("[M+Na]+", "[M+H]+"),
+    target_library = c("GNPS", "GNPS"),
+    target_spectrum_id = c("sp_rescued", "sp_exact"),
+    target_smiles = c("CCO", "CCO"),
+    target_smiles_no_stereo = c("CCO", "CCO"),
+    target_name = c("ethanol", "ethanol"),
+    target_precursorMz = c(123, 101),
+    target_neutral_mass = c(100, 100)
+  )
+  query_meta <- tidytable::tidytable(
+    feature_id = "F1",
+    query_adduct = "[M+H]+",
+    query_precursorMz = 101,
+    query_neutral_mass = 100
+  )
+
+  out <- finalize_results(df_sim = df_sim, meta = meta, query_meta = query_meta)
+  expect_equal(nrow(out), 1L)
+  expect_identical(out$candidate_spectrum_id[[1L]], "sp_exact")
+  expect_identical(out$candidate_adduct_match_mode[[1L]], "exact_adduct")
+  expect_true(is.na(out$annotation_note[[1L]]))
+})
+
+test_that("resolve_ms1_query_adduct_map filters to requested feature_ids and breaks ties by m/z error", {
+  ms1_tbl <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2"),
+    candidate_adduct = c("[M+H]+", "[M+Na]+", "[M+K]+"),
+    candidate_annotation_level = c("primary", "primary", "primary"),
+    candidate_evidence_tier = c(
+      "supported_strong",
+      "supported_strong",
+      "supported_strong"
+    ),
+    candidate_structure_error_mz = c("-0.005", "0.001", "0.000")
+  )
+
+  out <- resolve_ms1_query_adduct_map(ms1_tbl, feature_ids = "F1")
+  expect_equal(nrow(out), 1L)
+  expect_identical(out$feature_id[[1L]], "F1")
+  expect_identical(out$ms1_query_adduct[[1L]], "[M+Na]+")
+})
