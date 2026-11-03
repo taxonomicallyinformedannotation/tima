@@ -99,96 +99,65 @@ clean_bio <- function(
     return(.add_default_prediction_columns(annot_table_wei_bio))
   }
 
-  # Prepare annotations for consistency scoring ----
-
-  # Select only required columns for consistency calculation
-  annotations_for_join <- annotations_distinct |>
-    tidytable::select(
-      feature_id,
-      candidate_structure_tax_cla_01kin,
-      candidate_structure_tax_npc_01pat,
-      candidate_structure_tax_cla_02sup,
-      candidate_structure_tax_npc_02sup,
-      candidate_structure_tax_cla_03cla,
-      candidate_structure_tax_npc_03cla,
-      candidate_structure_tax_cla_04dirpar,
-      score_weighted_bio
-    ) |>
-    tidytable::distinct()
-
   # Calculate Consistency Scores ----
 
   # Pass edges and annotations separately to avoid materializing a huge
   # (edges × all_annotations) join that causes OOM on memory-limited runners.
   consistency_results <- .calculate_consistency_all_levels(
     edges_filtered = edges_filtered,
-    annotations_for_join = annotations_for_join,
+    annotations_for_join = annotations_distinct,
     minimal_consistency = minimal_consistency
   )
 
-  rm(annotations_for_join, edges_filtered)
+  rm(edges_filtered)
 
-  if (
-    "feature_pred_tax_cla_02sup_val" %in%
-      colnames(annotations_distinct) &&
-      !all(is.na(annotations_distinct$feature_pred_tax_cla_02sup_val))
-  ) {
-    df1 <- annotations_distinct |>
-      tidytable::filter(!is.na(feature_pred_tax_cla_02sup_val))
+  has_pred_col <- "feature_pred_tax_cla_02sup_val" %in%
+    colnames(annotations_distinct) &&
+    !all(is.na(annotations_distinct$feature_pred_tax_cla_02sup_val))
 
-    df1b <- df1 |>
+  if (has_pred_col) {
+    has_pred_row <- !is.na(annotations_distinct$feature_pred_tax_cla_02sup_val)
+    df1 <- annotations_distinct[has_pred_row, ]
+    pred_fids <- unique(df1$feature_id)
+    keep_no_pred <- is.na(fastmatch::fmatch(
+      annotations_distinct$feature_id,
+      pred_fids
+    ))
+    df2 <- annotations_distinct[keep_no_pred, ] |>
       tidytable::select(-tidyselect::contains(match = "feature_pred_tax"))
-
-    # Get feature_ids that have predictions to exclude from the main set
-    # Using anti_join is more efficient than %in% for large vectors
-    df2 <- annotations_distinct |>
-      tidytable::select(
-        -tidyselect::contains(match = "feature_pred_tax")
-      ) |>
-      tidytable::anti_join(
-        df1b |> tidytable::distinct(feature_id),
-        by = "feature_id"
-      ) |>
-      tidytable::bind_rows(df1b)
   } else {
-    df1 <- tidytable::tidytable()
-    df1b <- tidytable::tidytable()
+    df1 <- NULL
     df2 <- annotations_distinct |>
       tidytable::select(-tidyselect::contains(match = "feature_pred_tax"))
   }
   rm(annotations_distinct)
 
-  supp_tables <- consistency_results
-
   # Memory-efficient approach: merge all consistency results at once
   # instead of sequential purrr::reduce operations
   annot_table_wei_bio_preclean <- .merge_consistency_tables(
     base_df = df2,
-    consistency_list = supp_tables
+    consistency_list = consistency_results
   )
 
-  rm(df2, supp_tables)
+  rm(df2, consistency_results)
 
   annot_table_wei_bio_preclean <- .add_default_prediction_columns(
     annot_table_wei_bio_preclean
   )
 
-  if (nrow(df1b) == 0L) {
+  if (is.null(df1) || nrow(df1) == 0L) {
     return(annot_table_wei_bio_preclean)
   }
 
   # Replace features that should be cleaned with their precomputed versions
-  annot_table_wei_bio_clean <- annot_table_wei_bio_preclean |>
-    tidytable::anti_join(
-      df1b |> tidytable::distinct(feature_id),
-      by = "feature_id"
-    ) |>
-    tidytable::bind_rows(df1)
+  annot_table_wei_bio_clean <- tidytable::bind_rows(
+    annot_table_wei_bio_preclean,
+    df1
+  )
 
   rm(
     annot_table_wei_bio_preclean,
-    df1,
-    df1b
+    df1
   )
 
   log_complete(ctx, n_cleaned = nrow(annot_table_wei_bio_clean))
@@ -356,32 +325,52 @@ clean_bio <- function(
   min_neighbors = 2L,
   min_entropy = 0
 ) {
-  # Remove self-loops
-  edges_filtered <- edges_table |>
-    tidytable::filter(feature_source != feature_target)
+  src <- edges_table$feature_source
+  tgt <- edges_table$feature_target
+  not_self <- !is.na(src) & !is.na(tgt) & src != tgt
 
-  # Filter by entropy or label presence
-  if ("label" %in% colnames(edges_filtered)) {
-    edges_filtered <- edges_filtered |>
-      tidytable::filter(
-        suppressWarnings(as.numeric(feature_spectrum_entropy)) > min_entropy |
-          !is.na(label)
-      )
+  ent_raw <- edges_table$feature_spectrum_entropy
+  if (is.numeric(ent_raw)) {
+    ent_ok <- !is.na(ent_raw) & ent_raw > min_entropy
   } else {
-    edges_filtered <- edges_filtered |>
-      tidytable::filter(
-        suppressWarnings(as.numeric(feature_spectrum_entropy)) > min_entropy
-      )
+    u_ent <- unique(ent_raw)
+    u_num <- suppressWarnings(as.numeric(u_ent))
+    u_ok <- !is.na(u_num) & u_num > min_entropy
+    ent_ok <- u_ok[fastmatch::fmatch(ent_raw, u_ent)]
   }
 
-  # Keep only features with at least min_neighbors neighbors
-  edges_filtered |>
-    tidytable::distinct(feature_source, feature_target) |>
-    tidytable::group_by(feature_source) |>
-    tidytable::add_count() |>
-    tidytable::ungroup() |>
-    tidytable::filter(n >= min_neighbors) |>
-    tidytable::select(-n)
+  if ("label" %in% colnames(edges_table)) {
+    keep <- not_self & (ent_ok | !is.na(edges_table$label))
+  } else {
+    keep <- not_self & ent_ok
+  }
+
+  if (!any(keep)) {
+    return(tidytable::tidytable(
+      feature_source = src[0L],
+      feature_target = tgt[0L]
+    ))
+  }
+
+  src_k <- src[keep]
+  tgt_k <- tgt[keep]
+  u_nodes <- unique(c(unique(src_k), unique(tgt_k)))
+  n_nodes <- length(u_nodes)
+  s_id <- fastmatch::fmatch(src_k, u_nodes)
+  t_id <- fastmatch::fmatch(tgt_k, u_nodes)
+
+  pair_key <- (as.numeric(s_id) - 1) * n_nodes + t_id
+  not_dup <- !duplicated(pair_key)
+
+  s_dedup <- s_id[not_dup]
+  counts <- tabulate(s_dedup, nbins = n_nodes)
+  keep_deg <- counts[s_dedup] >= min_neighbors
+
+  idx_final <- which(not_dup)[keep_deg]
+  tidytable::tidytable(
+    feature_source = src_k[idx_final],
+    feature_target = tgt_k[idx_final]
+  )
 }
 
 #' Calculate consistency scores for all taxonomic levels
@@ -406,22 +395,6 @@ clean_bio <- function(
   annotations_for_join,
   minimal_consistency
 ) {
-  # Pre-compute denominator once — avoids repeating this inside every level.
-  # Only count target features that have at least one annotation, matching the
-  # semantics of the original right_join + filter(!is.na(feature_source)).
-  annotated_target_ids <- annotations_for_join |>
-    tidytable::distinct(feature_id)
-
-  total_targets_per_source <- edges_filtered |>
-    tidytable::inner_join(
-      annotated_target_ids,
-      by = c("feature_target" = "feature_id")
-    ) |>
-    tidytable::summarize(
-      n_targets = tidytable::n_distinct(feature_target),
-      .by = "feature_source"
-    )
-
   # Define taxonomic levels to process
   levels <- list(
     list(
@@ -468,103 +441,135 @@ clean_bio <- function(
     )
   )
 
-  # Pre-compute per-level target scores in a list to avoid recomputation
-  level_target_scores <- lapply(levels, function(lvl) {
-    annotations_for_join |>
-      tidytable::select(
-        feature_id,
-        !!as.name(lvl$col),
-        score_weighted_bio
-      ) |>
-      tidytable::filter(!is.na(!!as.name(lvl$col))) |>
-      tidytable::summarize(
-        score_weighted_bio = max(score_weighted_bio, na.rm = TRUE),
-        .by = tidyselect::all_of(c("feature_id", lvl$col))
-      ) |>
-      tidytable::rename(
-        target_taxonomy_val = !!as.name(lvl$col)
-      )
-  })
+  ann_fids_raw <- annotations_for_join$feature_id
+  u_fids <- sort(unique(c(
+    unique(ann_fids_raw),
+    unique(edges_filtered$feature_source),
+    unique(edges_filtered$feature_target)
+  )))
+  n_fids <- length(u_fids)
 
-  # Pre-compute edges_with_targets once
-  # For each level, we need to join edges with target_taxonomy_scores
-  # But we can do this more efficiently by pre-filtering
+  ann_fid <- fastmatch::fmatch(ann_fids_raw, u_fids)
+  edge_src <- fastmatch::fmatch(edges_filtered$feature_source, u_fids)
+  edge_tgt <- fastmatch::fmatch(edges_filtered$feature_target, u_fids)
 
-  results <- lapply(seq_along(levels), function(i) {
-    lvl <- levels[[i]]
-    target_scores <- level_target_scores[[i]]
+  # Only count target features that have at least one annotation, matching the
+  # semantics of the original inner_join with distinct annotated feature_ids.
+  is_annotated_fid <- tabulate(ann_fid, nbins = n_fids) > 0L
+  keep_edge <- !is.na(edge_src) & !is.na(edge_tgt) & is_annotated_fid[edge_tgt]
+  edge_src_ann <- edge_src[keep_edge]
+  edge_tgt_ann <- edge_tgt[keep_edge]
 
+  # Since edges_filtered has distinct (feature_source, feature_target) pairs,
+  # n_targets per source is simply tabulate(edge_src_ann)
+  n_targets_by_fid <- tabulate(edge_src_ann, nbins = n_fids)
+
+  edges_int_dt <- data.table::data.table(
+    src_id = edge_src_ann,
+    tgt_id = edge_tgt_ann
+  )
+
+  # Pre-sort annotations by decreasing score_weighted_bio so first occurrence
+  # per (fid, tax_id) has max(score_weighted_bio, na.rm = TRUE) in O(N)
+  scores_raw <- annotations_for_join$score_weighted_bio
+  ord_score <- order(scores_raw, decreasing = TRUE, na.last = TRUE)
+  ann_fid_sorted <- ann_fid[ord_score]
+  scores_sorted <- scores_raw[ord_score]
+  has_na_scores <- anyNA(scores_sorted)
+
+  lapply(levels, function(lvl) {
     empty_result <- tidytable::tidytable(
-      feature_source = character(0L),
+      feature_source = u_fids[0L],
       !!as.name(lvl$val) := character(0L),
       !!as.name(lvl$consistency) := numeric(0L),
       !!as.name(lvl$score) := numeric(0L)
     )
 
-    # Step 2: join edges with compact target taxonomies
-    # rows: (feature_source, feature_target, taxonomy_val, best_score)
-    df_level <- edges_filtered |>
-      tidytable::inner_join(
-        target_scores,
-        by = c("feature_target" = "feature_id")
-      )
-
-    if (nrow(df_level) == 0L) {
+    if (length(edge_src_ann) == 0L) {
       return(empty_result)
     }
 
-    # Step 3: numerator — distinct target features per (source, taxonomy_val)
-    count_per_group <- df_level |>
-      tidytable::summarize(
-        count = tidytable::n(),
-        .by = tidyselect::all_of(c("feature_source", "target_taxonomy_val"))
-      )
-
-    if (nrow(count_per_group) == 0L) {
+    col_vals <- annotations_for_join[[lvl$col]][ord_score]
+    valid_tax <- !is.na(col_vals)
+    if (!any(valid_tax)) {
       return(empty_result)
     }
 
-    # Step 4: source feature's own best score for the predicted taxonomy value
-    source_scores <- target_scores |>
-      tidytable::rename(
-        source_taxonomy_val = target_taxonomy_val,
-        source_score = score_weighted_bio
-      )
+    vals_v <- col_vals[valid_tax]
+    fid_v <- ann_fid_sorted[valid_tax]
+    sc_v <- scores_sorted[valid_tax]
 
-    # Step 5: compute consistency and pick top-ranked taxonomy value per source
-    result <- count_per_group |>
-      tidytable::left_join(total_targets_per_source, by = "feature_source") |>
-      tidytable::mutate(
-        !!as.name(lvl$consistency) := count / n_targets
-      ) |>
-      tidytable::left_join(
-        source_scores,
-        by = c(
-          "feature_source" = "feature_id",
-          "target_taxonomy_val" = "source_taxonomy_val"
-        )
-      ) |>
-      tidytable::mutate(
-        !!as.name(lvl$score) := !!as.name(lvl$consistency) * source_score
-      ) |>
-      tidytable::arrange(-!!as.name(lvl$score)) |>
-      tidytable::distinct(feature_source, .keep_all = TRUE) |>
-      tidytable::select(
-        feature_source,
-        !!as.name(lvl$val) := target_taxonomy_val,
-        !!as.name(lvl$consistency),
-        !!as.name(lvl$score)
-      ) |>
-      tidytable::mutate(
-        !!as.name(lvl$val) := tidytable::if_else(
-          condition = !!as.name(lvl$score) >= minimal_consistency,
-          true = !!as.name(lvl$val),
-          false = "notConsistent"
-        )
-      )
+    u_tax <- sort(unique(vals_v))
+    n_tax <- length(u_tax)
+    tax_v <- fastmatch::fmatch(vals_v, u_tax)
 
-    result
+    pair_key <- (as.numeric(fid_v) - 1) * n_tax + tax_v
+    first_pair <- !duplicated(pair_key)
+
+    u_fid_pair <- fid_v[first_pair]
+    u_tax_pair <- tax_v[first_pair]
+    u_sc_pair <- sc_v[first_pair]
+    u_pair_keys <- pair_key[first_pair]
+
+    if (has_na_scores && anyNA(u_sc_pair)) {
+      u_sc_pair[is.na(u_sc_pair)] <- -Inf
+    }
+
+    target_dt <- data.table::data.table(
+      tgt_id = u_fid_pair,
+      tax_id = u_tax_pair
+    )
+
+    joined_dt <- edges_int_dt[
+      target_dt,
+      on = "tgt_id",
+      nomatch = NULL,
+      allow.cartesian = TRUE
+    ]
+    if (nrow(joined_dt) == 0L) {
+      return(empty_result)
+    }
+
+    # keyby sorts by (src_id, tax_id), matching tidytable::summarize(.by = ...)
+    count_dt <- joined_dt[, list(count = .N), keyby = c("src_id", "tax_id")]
+    if (nrow(count_dt) == 0L) {
+      return(empty_result)
+    }
+
+    c_src <- count_dt$src_id
+    c_tax <- count_dt$tax_id
+    c_cnt <- count_dt$count
+
+    cons_vec <- c_cnt / n_targets_by_fid[c_src]
+    c_pair_key <- (as.numeric(c_src) - 1) * n_tax + c_tax
+    src_sc <- u_sc_pair[fastmatch::fmatch(c_pair_key, u_pair_keys)]
+    score_vec <- cons_vec * src_sc
+
+    ord_res <- order(-score_vec)
+    keep_top <- ord_res[!duplicated(c_src[ord_res])]
+
+    top_src <- c_src[keep_top]
+    top_tax <- u_tax[c_tax[keep_top]]
+    top_cons <- cons_vec[keep_top]
+    top_sc <- score_vec[keep_top]
+
+    top_val <- ifelse(
+      !is.na(top_sc) & top_sc >= minimal_consistency,
+      top_tax,
+      ifelse(is.na(top_sc), NA_character_, "notConsistent")
+    )
+
+    out <- tidytable::tidytable(
+      feature_source = u_fids[top_src],
+      v_col = top_val,
+      c_col = top_cons,
+      s_col = top_sc
+    )
+    data.table::setnames(
+      out,
+      c("v_col", "c_col", "s_col"),
+      c(lvl$val, lvl$consistency, lvl$score)
+    )
+    out
   })
-
-  results
 }

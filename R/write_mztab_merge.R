@@ -458,15 +458,11 @@
     return(smf)
   }
 
-  if (!"SME_ID_REFS" %in% colnames(smf)) {
-    smf$SME_ID_REFS <- "null"
-  }
-  if (!"SME_ID_REF_ambiguity_code" %in% colnames(smf)) {
-    smf$SME_ID_REF_ambiguity_code <- "null"
-  }
-
   smf_df <- as.data.frame(smf, stringsAsFactors = FALSE, check.names = FALSE)
   sme_df <- as.data.frame(sme, stringsAsFactors = FALSE, check.names = FALSE)
+
+  smf_df$SME_ID_REFS <- rep("null", nrow(smf_df))
+  smf_df$SME_ID_REF_ambiguity_code <- rep("null", nrow(smf_df))
 
   smf_feature_ids <- as.character(smf_df$feature_id)
   smf_feature_ids[
@@ -481,76 +477,95 @@
       !nzchar(sme_feature_ids) |
       sme_feature_ids == "null"
   ] <- NA_character_
-  valid_sme_ids <- unique(sme_feature_ids[!is.na(sme_feature_ids)])
 
-  feature_lookup <- if (length(valid_sme_ids) == 0L) {
-    list()
-  } else {
-    valid_sme_idx <- which(!is.na(sme_feature_ids))
-    groups <- split(
-      valid_sme_idx,
-      factor(sme_feature_ids[valid_sme_idx], levels = valid_sme_ids)
-    )
-    lapply(groups, function(idx) {
-      refs <- unique(as.character(sme_df$SME_ID[idx]))
-      refs <- refs[!is.na(refs) & nzchar(refs) & refs != "null"]
-
-      if (length(refs) == 0L) {
-        return(NULL)
-      }
-
-      db_vals <- unique(as.character(sme_df$database_identifier[idx]))
-      db_vals <- db_vals[!is.na(db_vals) & nzchar(db_vals) & db_vals != "null"]
-      method_vals <- unique(as.character(sme_df$identification_method[idx]))
-      method_vals <- method_vals[
-        !is.na(method_vals) & nzchar(method_vals) & method_vals != "null"
-      ]
-
-      list(
-        refs = refs,
-        refs_str = paste(refs, collapse = "|"),
-        n_db = length(db_vals),
-        n_method = length(method_vals)
-      )
-    })
+  valid_sme_idx <- which(!is.na(sme_feature_ids))
+  if (length(valid_sme_idx) == 0L) {
+    return(tidytable::as_tidytable(smf_df))
   }
-  names(feature_lookup) <- valid_sme_ids
 
-  smf_df$SME_ID_REFS <- "null"
-  smf_df$SME_ID_REF_ambiguity_code <- "null"
+  valid_sme_fids <- sme_feature_ids[valid_sme_idx]
+  valid_sme_ids <- unique(valid_sme_fids)
+  n_u <- length(valid_sme_ids)
 
-  matched_positions <- match(smf_feature_ids, names(feature_lookup))
+  matched_positions <- fastmatch::fmatch(smf_feature_ids, valid_sme_ids)
   has_lookup <- !is.na(matched_positions)
-
-  if (any(has_lookup)) {
-    feature_rows <- feature_lookup[matched_positions[has_lookup]]
-    smf_df$SME_ID_REFS[has_lookup] <- vapply(
-      feature_rows,
-      function(feature_data) {
-        if (is.null(feature_data)) "null" else feature_data$refs_str
-      },
-      character(1L)
-    )
-
-    ambiguity_codes <- vapply(
-      feature_rows,
-      function(feature_data) {
-        if (is.null(feature_data) || length(feature_data$refs) <= 1L) {
-          "null"
-        } else if (feature_data$n_db > 1L && feature_data$n_method > 1L) {
-          "3"
-        } else if (feature_data$n_db > 1L) {
-          "1"
-        } else if (feature_data$n_method > 1L) {
-          "2"
-        } else {
-          "1"
-        }
-      },
-      character(1L)
-    )
-    smf_df$SME_ID_REF_ambiguity_code[has_lookup] <- ambiguity_codes
+  if (!any(has_lookup)) {
+    return(tidytable::as_tidytable(smf_df))
   }
+
+  fid_id <- fastmatch::fmatch(valid_sme_fids, valid_sme_ids)
+  counts <- tabulate(fid_id, nbins = n_u)
+
+  sme_ids_clean <- as.character(sme_df$SME_ID[valid_sme_idx])
+  sme_ids_clean[
+    is.na(sme_ids_clean) | !nzchar(sme_ids_clean) | sme_ids_clean == "null"
+  ] <- NA_character_
+
+  lookup_refs <- rep("null", n_u)
+  lookup_amb <- rep("null", n_u)
+
+  single_fids <- which(counts == 1L)
+  if (length(single_fids) > 0L) {
+    single_pos <- fastmatch::fmatch(single_fids, fid_id)
+    s_refs <- sme_ids_clean[single_pos]
+    valid_s <- !is.na(s_refs)
+    lookup_refs[single_fids[valid_s]] <- s_refs[valid_s]
+  }
+
+  if (any(counts > 1L)) {
+    multi_mask <- counts[fid_id] > 1L
+    m_pos <- which(multi_mask)
+    m_fid <- fid_id[m_pos]
+    u_m_fid <- unique(m_fid)
+    m_groups <- split(m_pos, factor(m_fid, levels = u_m_fid))
+
+    db_clean <- as.character(sme_df$database_identifier[valid_sme_idx])
+    db_clean[
+      is.na(db_clean) | !nzchar(db_clean) | db_clean == "null"
+    ] <- NA_character_
+    method_clean <- as.character(sme_df$identification_method[valid_sme_idx])
+    method_clean[
+      is.na(method_clean) | !nzchar(method_clean) | method_clean == "null"
+    ] <- NA_character_
+
+    m_refs_out <- character(length(u_m_fid))
+    m_amb_out <- character(length(u_m_fid))
+
+    for (k in seq_along(m_groups)) {
+      idx <- m_groups[[k]]
+      refs <- unique(sme_ids_clean[idx])
+      refs <- refs[!is.na(refs)]
+      if (length(refs) == 0L) {
+        m_refs_out[[k]] <- "null"
+        m_amb_out[[k]] <- "null"
+      } else {
+        m_refs_out[[k]] <- paste(refs, collapse = "|")
+        if (length(refs) <= 1L) {
+          m_amb_out[[k]] <- "null"
+        } else {
+          db_vals <- unique(db_clean[idx])
+          n_db <- sum(!is.na(db_vals))
+          method_vals <- unique(method_clean[idx])
+          n_method <- sum(!is.na(method_vals))
+          m_amb_out[[k]] <- if (n_db > 1L && n_method > 1L) {
+            "3"
+          } else if (n_db > 1L) {
+            "1"
+          } else if (n_method > 1L) {
+            "2"
+          } else {
+            "1"
+          }
+        }
+      }
+    }
+    lookup_refs[u_m_fid] <- m_refs_out
+    lookup_amb[u_m_fid] <- m_amb_out
+  }
+
+  pos_hit <- matched_positions[has_lookup]
+  smf_df$SME_ID_REFS[has_lookup] <- lookup_refs[pos_hit]
+  smf_df$SME_ID_REF_ambiguity_code[has_lookup] <- lookup_amb[pos_hit]
 
   tidytable::as_tidytable(smf_df)
 }

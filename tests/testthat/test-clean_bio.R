@@ -658,3 +658,46 @@ test_that("clean_bio handles moderate-scale data efficiently", {
   # Should have consistency columns
   expect_true("consistency_structure_cla_kin" %in% colnames(result))
 })
+
+test_that("clean_bio breaks ties deterministically and deduplicates neighbor edges", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F3"),
+    candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
+      4,
+      seed = 200
+    ),
+    candidate_structure_tax_cla_01kin = rep("Organic compounds", 4),
+    candidate_structure_tax_npc_01pat = c(
+      "Terpenoids",
+      "Alkaloids",
+      "Terpenoids",
+      "Alkaloids"
+    ),
+    candidate_structure_tax_cla_02sup = rep("Phenylpropanoids", 4),
+    candidate_structure_tax_npc_02sup = rep("Alkaloids", 4),
+    candidate_structure_tax_cla_03cla = rep("Flavonoids", 4),
+    candidate_structure_tax_npc_03cla = rep("Iridoids", 4),
+    candidate_structure_tax_cla_04dirpar = rep("Flavones", 4),
+    score_weighted_bio = c(0.8, 0.8, 0.9, 0.9)
+  )
+
+  edges <- tidytable::tidytable(
+    feature_source = c("F1", "F1", "F1", "F2"),
+    feature_target = c("F2", "F2", "F3", "F3"),
+    feature_spectrum_entropy = c("0.5", "0.6", "0.7", "0.8")
+  )
+
+  ef <- .filter_edges_for_consistency(edges)
+  expect_equal(nrow(ef), 2L)
+  expect_setequal(ef$feature_target, c("F2", "F3"))
+
+  res <- clean_bio(
+    annot_table_wei_bio = annotations,
+    edges_table = edges,
+    minimal_consistency = 0.3
+  )
+  f1_rows <- res |> tidytable::filter(feature_id == "F1")
+  expect_equal(unique(f1_rows$feature_pred_tax_npc_01pat_val), "Alkaloids")
+  expect_equal(unique(f1_rows$consistency_structure_npc_pat), 0.5)
+  expect_equal(unique(f1_rows$feature_pred_tax_npc_01pat_score), 0.4)
+})

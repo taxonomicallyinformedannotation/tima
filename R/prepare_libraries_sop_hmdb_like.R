@@ -169,11 +169,8 @@ prepare_libraries_sop_hmdb_like <- function(
 parse_hmdb_like_input <- function(input) {
   if (grepl("\\.zip$", input, ignore.case = TRUE)) {
     archive_index <- utils::unzip(input, list = TRUE)
-    sdf_entries <- archive_index$Name[grepl(
-      "\\.sdf$",
-      archive_index$Name,
-      ignore.case = TRUE
-    )]
+    is_sdf <- grepl("\\.sdf$", archive_index$Name, ignore.case = TRUE)
+    sdf_entries <- archive_index$Name[is_sdf]
 
     if (length(sdf_entries) == 0L) {
       cli::cli_abort(
@@ -194,12 +191,18 @@ parse_hmdb_like_input <- function(input) {
     }
 
     # For archives with many individual .sdf files (e.g., SMPDB with ~50,000
-    # files), opening unz() per entry rescans the central directory O(N^2)
-    # times. Extract once to a temporary directory and parse in batches.
+    # files), passing `files = sdf_entries` to utils::unzip() calls
+    # unzLocateFile() per file and scans the central directory O(N^2) times.
+    # Extracting with `files = NULL` walks the archive once in O(N) time.
     tmp_dir <- tempfile("tima_sdf_")
     dir.create(tmp_dir, recursive = TRUE)
     on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
-    extracted_paths <- utils::unzip(input, files = sdf_entries, exdir = tmp_dir)
+    extracted_paths <- utils::unzip(input, exdir = tmp_dir)
+    if (!all(is_sdf)) {
+      extracted_paths <- extracted_paths[
+        grepl("\\.sdf$", extracted_paths, ignore.case = TRUE)
+      ]
+    }
 
     batch_size <- 2000L
     n_files <- length(extracted_paths)

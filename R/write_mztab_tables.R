@@ -562,52 +562,14 @@
     x
   }
 
-  # Alias — identical implementation, kept for call-site compatibility
-  .mztab_norm_scalar_vec <- .mztab_norm_scalar
+  sme_fids_chr <- as.character(sme_src$feature_id)
+  valid_sme_mask <- !is.na(sme_fids_chr) &
+    nzchar(sme_fids_chr) &
+    sme_fids_chr != "null"
+  feature_ids <- unique(sme_fids_chr[valid_sme_mask])
+  n_fids <- length(feature_ids)
 
-  .mztab_join_aligned <- function(df, row_order, col) {
-    vals <- .mztab_norm_scalar(df[[col]][row_order])
-    if (length(vals) == 0L) {
-      return("null")
-    }
-    paste(vals, collapse = "|")
-  }
-
-  # Pick the exact mass of the best-scoring candidate for a single feature,
-  # using the original TIMA results to break ties (highest score_final first).
-  # Used to populate the SML `theoretical_neutral_mass` column; returns "null"
-  # when no usable mass is available.
-  .mztab_best_exact_mass <- function(fid) {
-    out <- "null"
-    if (!is.null(results_feature_groups)) {
-      ridx <- results_feature_groups[[fid]]
-      if (length(ridx) > 0L) {
-        if ("score_final" %in% colnames(results_src)) {
-          rs <- suppressWarnings(as.numeric(results_src$score_final[ridx]))
-          rs[is.na(rs)] <- -Inf
-          ridx <- ridx[order(-rs)]
-        }
-        em <- suppressWarnings(
-          as.numeric(results_src$candidate_structure_exact_mass[ridx[[1L]]])
-        )
-        if (is.finite(em)) {
-          out <- as.character(round(em, 6))
-        }
-      }
-    }
-    out
-  }
-
-  smf_id_lookup <- stats::setNames(
-    as.character(smf_table$SMF_ID),
-    as.character(smf_table$feature_id)
-  )
-
-  feature_ids <- unique(as.character(sme_src$feature_id))
-  feature_ids <- feature_ids[
-    !is.na(feature_ids) & nzchar(feature_ids) & feature_ids != "null"
-  ]
-  if (length(feature_ids) == 0L) {
+  if (n_fids == 0L) {
     return(tidytable::tidytable(
       SML_ID = character(0),
       SMF_ID_REFS = character(0),
@@ -626,246 +588,222 @@
     ))
   }
 
-  feature_groups <- split(
-    seq_len(nrow(sme_src)),
-    as.character(sme_src$feature_id)
-  )
-  feature_groups <- feature_groups[feature_ids]
-  group_sizes <- lengths(feature_groups)
-
-  results_feature_groups <- NULL
+  # 1. Pre-compute theoretical_neutral_mass per feature_id in a single vectorized pass
+  theoretical_neutral_mass <- rep("null", n_fids)
   if (
     nrow(results_src) > 0L &&
       "feature_id" %in% colnames(results_src) &&
       "candidate_structure_exact_mass" %in% colnames(results_src)
   ) {
-    results_feature_groups <- split(
-      seq_len(nrow(results_src)),
-      as.character(results_src$feature_id)
+    res_fid_idx <- fastmatch::fmatch(
+      as.character(results_src$feature_id),
+      feature_ids
     )
+    valid_res <- which(!is.na(res_fid_idx))
+    if (length(valid_res) > 0L) {
+      if ("score_final" %in% colnames(results_src)) {
+        rs <- suppressWarnings(as.numeric(results_src$score_final[valid_res]))
+        rs[is.na(rs)] <- -Inf
+        ord_res <- order(res_fid_idx[valid_res], -rs)
+        valid_res_sorted <- valid_res[ord_res]
+        first_res <- valid_res_sorted[
+          !duplicated(res_fid_idx[valid_res_sorted])
+        ]
+      } else {
+        first_res <- valid_res[!duplicated(res_fid_idx[valid_res])]
+      }
+      em <- suppressWarnings(
+        as.numeric(results_src$candidate_structure_exact_mass[first_res])
+      )
+      fin <- is.finite(em)
+      if (any(fin)) {
+        theoretical_neutral_mass[res_fid_idx[first_res[fin]]] <-
+          as.character(round(em[fin], 6))
+      }
+    }
   }
 
-  if (all(group_sizes == 1L)) {
-    row_idx <- unlist(feature_groups[feature_ids], use.names = FALSE)
-    grp <- sme_src[row_idx, , drop = FALSE]
-    grp_feature_ids <- feature_ids
+  # 2. Map SMF_ID_REFS once
+  smf_fids_chr <- as.character(smf_table$feature_id)
+  smf_ids_chr <- as.character(smf_table$SMF_ID)
+  smf_match <- fastmatch::fmatch(feature_ids, smf_fids_chr)
+  smf_id_refs <- smf_ids_chr[smf_match]
+  smf_id_refs[is.na(smf_id_refs) | !nzchar(smf_id_refs)] <- "null"
 
-    best_score <- suppressWarnings(as.numeric(grp[[
-      "id_confidence_measure[1]"
-    ]]))
+  # 3. Restrict sme_src to valid feature_ids and normalize columns once
+  if (!all(valid_sme_mask)) {
+    sme_src <- sme_src[valid_sme_mask, , drop = FALSE]
+    sme_fids_chr <- sme_fids_chr[valid_sme_mask]
+  }
+  fid_idx <- fastmatch::fmatch(sme_fids_chr, feature_ids)
+  counts <- tabulate(fid_idx, nbins = n_fids)
+
+  db_vec <- .mztab_norm_scalar(sme_src$database_identifier)
+  cf_vec <- .mztab_norm_scalar(sme_src$chemical_formula)
+  sm_vec <- .mztab_norm_scalar(sme_src$smiles)
+  in_vec <- .mztab_norm_scalar(sme_src$inchi)
+  cn_vec <- .mztab_norm_scalar(sme_src$chemical_name)
+  ur_vec <- .mztab_norm_scalar(sme_src$uri)
+  ad_vec <- .mztab_norm_scalar(sme_src$adduct_ion)
+  sme_id_vec <- .mztab_norm_scalar(sme_src$SME_ID)
+  method_vec <- .mztab_norm_scalar(sme_src$identification_method)
+  score_raw <- suppressWarnings(
+    as.numeric(sme_src[["id_confidence_measure[1]"]])
+  )
+
+  if (all(counts == 1L)) {
+    ord <- match(seq_len(n_fids), fid_idx)
+    best_score <- score_raw[ord]
     best_score[!is.finite(best_score)] <- NA_real_
     score_val <- ifelse(
       is.na(best_score),
       "null",
       as.character(round(best_score, 6))
     )
-
-    best_method <- .mztab_norm_scalar_vec(grp$identification_method)
+    best_method <- method_vec[ord]
     reliability <- as.character(.mztab_score_to_reliability(
       best_score,
       best_method
     ))
-
-    smf_ids <- as.character(smf_id_lookup[grp_feature_ids])
-    smf_ids[is.na(smf_ids) | !nzchar(smf_ids)] <- "null"
-
-    sme_ids <- .mztab_norm_scalar_vec(grp$SME_ID)
+    sme_ids <- sme_id_vec[ord]
     sme_id_refs <- ifelse(sme_ids != "null", sme_ids, "null")
 
-    theoretical_neutral_mass <- vapply(
-      grp_feature_ids,
-      .mztab_best_exact_mass,
-      character(1L),
-      USE.NAMES = FALSE
-    )
-
-    return(as.data.frame(
-      data.frame(
-        SML_ID = as.character(seq_along(grp_feature_ids)),
-        SMF_ID_REFS = smf_ids,
-        SME_ID_REFS = sme_id_refs,
-        database_identifier = .mztab_norm_scalar_vec(grp$database_identifier),
-        chemical_formula = .mztab_norm_scalar_vec(grp$chemical_formula),
-        smiles = .mztab_norm_scalar_vec(grp$smiles),
-        inchi = .mztab_norm_scalar_vec(grp$inchi),
-        chemical_name = .mztab_norm_scalar_vec(grp$chemical_name),
-        uri = .mztab_norm_scalar_vec(grp$uri),
-        theoretical_neutral_mass = theoretical_neutral_mass,
-        adduct_ions = .mztab_norm_scalar_vec(grp$adduct_ion),
-        reliability = reliability,
-        best_id_confidence_measure = "id_confidence_measure[1]",
-        best_id_evidence_value = score_val,
-        stringsAsFactors = FALSE,
-        check.names = FALSE
-      ),
+    return(data.frame(
+      SML_ID = as.character(seq_len(n_fids)),
+      SMF_ID_REFS = smf_id_refs,
+      SME_ID_REFS = sme_id_refs,
+      database_identifier = db_vec[ord],
+      chemical_formula = cf_vec[ord],
+      smiles = sm_vec[ord],
+      inchi = in_vec[ord],
+      chemical_name = cn_vec[ord],
+      uri = ur_vec[ord],
+      theoretical_neutral_mass = theoretical_neutral_mass,
+      adduct_ions = ad_vec[ord],
+      reliability = reliability,
+      best_id_confidence_measure = rep("id_confidence_measure[1]", n_fids),
+      best_id_evidence_value = score_val,
       stringsAsFactors = FALSE,
       check.names = FALSE
     ))
   }
 
-  sml_rows <- vector("list", length(feature_ids))
-  for (j in seq_along(feature_ids)) {
-    fid <- feature_ids[[j]]
-    idx <- feature_groups[[fid]]
-    grp <- sme_src[idx, , drop = FALSE]
+  # General case: sort all rows by (fid_idx, rank_num, -score_num, sme_num)
+  rank_num <- suppressWarnings(as.numeric(sme_src$rank))
+  rank_num[is.na(rank_num)] <- Inf
+  score_num <- score_raw
+  score_num[!is.finite(score_num)] <- -Inf
+  sme_num <- suppressWarnings(as.integer(sme_src$SME_ID))
+  sme_num[is.na(sme_num)] <- .Machine$integer.max
 
-    if (nrow(grp) == 1L) {
-      best_score <- suppressWarnings(as.numeric(grp[[
-        "id_confidence_measure[1]"
-      ]][[1L]]))
-      if (!is.finite(best_score)) {
-        best_score <- NA_real_
-      }
-      score_val <- if (!is.na(best_score)) {
-        as.character(round(best_score, 6))
-      } else {
-        "null"
-      }
+  ord <- order(fid_idx, rank_num, -score_num, sme_num)
+  fid_ord <- fid_idx[ord]
 
-      best_method <- .mztab_norm_scalar(grp$identification_method[[1L]])
-      reliability <- as.character(.mztab_score_to_reliability(
-        best_score,
-        best_method
-      ))
-
-      smf_id <- as.character(smf_id_lookup[[fid]])
-      if (is.null(smf_id) || is.na(smf_id) || !nzchar(smf_id)) {
-        smf_id <- "null"
-      }
-
-      sme_ids <- .mztab_norm_scalar(grp$SME_ID[[1L]])
-      sme_id_refs <- if (length(sme_ids) > 0L && sme_ids != "null") {
-        sme_ids
-      } else {
-        "null"
-      }
-
-      theoretical_neutral_mass <- .mztab_best_exact_mass(fid)
-
-      sml_rows[[j]] <- list(
-        SML_ID = as.character(j),
-        SMF_ID_REFS = smf_id,
-        SME_ID_REFS = sme_id_refs,
-        database_identifier = .mztab_norm_scalar(grp$database_identifier[[1L]]),
-        chemical_formula = .mztab_norm_scalar(grp$chemical_formula[[1L]]),
-        smiles = .mztab_norm_scalar(grp$smiles[[1L]]),
-        inchi = .mztab_norm_scalar(grp$inchi[[1L]]),
-        chemical_name = .mztab_norm_scalar(grp$chemical_name[[1L]]),
-        uri = .mztab_norm_scalar(grp$uri[[1L]]),
-        theoretical_neutral_mass = theoretical_neutral_mass,
-        adduct_ions = .mztab_norm_scalar(grp$adduct_ion[[1L]]),
-        reliability = reliability,
-        best_id_confidence_measure = "id_confidence_measure[1]",
-        best_id_evidence_value = score_val
-      )
-      next
-    }
-
-    rank_num <- suppressWarnings(as.numeric(grp$rank))
-    rank_num[is.na(rank_num)] <- Inf
-    score_num <- suppressWarnings(as.numeric(grp[["id_confidence_measure[1]"]]))
-    score_num[!is.finite(score_num)] <- -Inf
-    sme_num <- suppressWarnings(as.integer(grp$SME_ID))
-    sme_num[is.na(sme_num)] <- .Machine$integer.max
-
-    order_idx <- order(rank_num, -score_num, sme_num)
-
-    tuple_cols <- c(
-      "database_identifier",
-      "chemical_formula",
-      "smiles",
-      "inchi",
-      "chemical_name",
-      "uri",
-      "adduct_ion"
+  # Deduplicate 7-column tuple only for features with > 1 SME row
+  multi_row_mask <- counts[fid_ord] > 1L
+  if (any(multi_row_mask)) {
+    m_ord <- ord[multi_row_mask]
+    tuple_key <- paste(
+      fid_idx[m_ord],
+      db_vec[m_ord],
+      cf_vec[m_ord],
+      sm_vec[m_ord],
+      in_vec[m_ord],
+      cn_vec[m_ord],
+      ur_vec[m_ord],
+      ad_vec[m_ord],
+      sep = "||"
     )
-    tuple_parts <- lapply(tuple_cols, function(col) {
-      .mztab_norm_scalar(grp[[col]])
-    })
-    tuple_key <- do.call(paste, c(tuple_parts, list(sep = "||")))
-    tuple_key <- tuple_key[order_idx]
-    order_idx <- order_idx[!duplicated(tuple_key)]
-
-    best_local <- order_idx[[1L]]
-    best_score <- suppressWarnings(as.numeric(grp[[
-      "id_confidence_measure[1]"
-    ]][[best_local]]))
-    if (!is.finite(best_score)) {
-      best_score <- NA_real_
-    }
-    score_val <- if (!is.na(best_score)) {
-      as.character(round(best_score, 6))
-    } else {
-      "null"
-    }
-
-    best_method <- .mztab_norm_scalar(grp$identification_method[[best_local]])
-    reliability <- as.character(.mztab_score_to_reliability(
-      best_score,
-      best_method
-    ))
-
-    smf_id <- as.character(smf_id_lookup[[fid]])
-    if (is.null(smf_id) || is.na(smf_id) || !nzchar(smf_id)) {
-      smf_id <- "null"
-    }
-
-    sme_ids <- unique(.mztab_norm_scalar(grp$SME_ID[order_idx]))
-    sme_ids <- sme_ids[sme_ids != "null"]
-    sme_id_refs <- if (length(sme_ids) > 0L) {
-      paste(sme_ids, collapse = "|")
-    } else {
-      "null"
-    }
-
-    theoretical_neutral_mass <- .mztab_best_exact_mass(fid)
-
-    sml_rows[[j]] <- list(
-      SML_ID = as.character(j),
-      SMF_ID_REFS = smf_id,
-      SME_ID_REFS = sme_id_refs,
-      database_identifier = .mztab_join_aligned(
-        grp,
-        order_idx,
-        "database_identifier"
-      ),
-      chemical_formula = .mztab_join_aligned(
-        grp,
-        order_idx,
-        "chemical_formula"
-      ),
-      smiles = .mztab_join_aligned(grp, order_idx, "smiles"),
-      inchi = .mztab_join_aligned(grp, order_idx, "inchi"),
-      chemical_name = .mztab_join_aligned(grp, order_idx, "chemical_name"),
-      uri = .mztab_join_aligned(grp, order_idx, "uri"),
-      theoretical_neutral_mass = theoretical_neutral_mass,
-      adduct_ions = .mztab_join_aligned(grp, order_idx, "adduct_ion"),
-      reliability = reliability,
-      best_id_confidence_measure = "id_confidence_measure[1]",
-      best_id_evidence_value = score_val
-    )
+    keep_ord <- rep(TRUE, length(ord))
+    keep_ord[multi_row_mask] <- !duplicated(tuple_key)
+    ord <- ord[keep_ord]
+    fid_ord <- fid_ord[keep_ord]
   }
 
-  out <- if (length(sml_rows) == 0L) {
-    data.frame()
-  } else {
-    # sml_rows is a list of plain named lists (not data.frames), so we
-    # transpose via vapply per column — bind_rows/rbindlist require
-    # data.frame or inputs and would error on bare lists.
-    col_names <- names(sml_rows[[1L]])
-    cols <- lapply(col_names, function(col) {
+  dedup_counts <- tabulate(fid_ord, nbins = n_fids)
+  first_pos <- which(!duplicated(fid_ord))
+  best_idx <- ord[first_pos]
+
+  best_score <- score_raw[best_idx]
+  best_score[!is.finite(best_score)] <- NA_real_
+  score_val <- ifelse(
+    is.na(best_score),
+    "null",
+    as.character(round(best_score, 6))
+  )
+  best_method <- method_vec[best_idx]
+  reliability <- as.character(.mztab_score_to_reliability(
+    best_score,
+    best_method
+  ))
+
+  out_db <- db_vec[best_idx]
+  out_cf <- cf_vec[best_idx]
+  out_sm <- sm_vec[best_idx]
+  out_in <- in_vec[best_idx]
+  out_cn <- cn_vec[best_idx]
+  out_ur <- ur_vec[best_idx]
+  out_ad <- ad_vec[best_idx]
+  out_sme_refs <- ifelse(
+    sme_id_vec[best_idx] != "null",
+    sme_id_vec[best_idx],
+    "null"
+  )
+
+  # For features with > 1 deduplicated candidate, collapse with "|"
+  if (any(dedup_counts > 1L)) {
+    multi_mask <- dedup_counts[fid_ord] > 1L
+    m_ord <- ord[multi_mask]
+    m_fid <- fid_ord[multi_mask]
+    u_m_fid <- unique(m_fid)
+    m_groups <- split(seq_along(m_ord), factor(m_fid, levels = u_m_fid))
+
+    collapse_vec <- function(v) {
       vapply(
-        sml_rows,
-        function(row) {
-          v <- row[[col]]
-          if (is.null(v)) NA_character_ else as.character(v)
-        },
+        m_groups,
+        function(g) paste(v[g], collapse = "|"),
         character(1L),
         USE.NAMES = FALSE
       )
-    })
-    names(cols) <- col_names
-    as.data.frame(cols, stringsAsFactors = FALSE, check.names = FALSE)
+    }
+
+    out_db[u_m_fid] <- collapse_vec(db_vec[m_ord])
+    out_cf[u_m_fid] <- collapse_vec(cf_vec[m_ord])
+    out_sm[u_m_fid] <- collapse_vec(sm_vec[m_ord])
+    out_in[u_m_fid] <- collapse_vec(in_vec[m_ord])
+    out_cn[u_m_fid] <- collapse_vec(cn_vec[m_ord])
+    out_ur[u_m_fid] <- collapse_vec(ur_vec[m_ord])
+    out_ad[u_m_fid] <- collapse_vec(ad_vec[m_ord])
+
+    m_sme_ids <- sme_id_vec[m_ord]
+    out_sme_refs[u_m_fid] <- vapply(
+      m_groups,
+      function(g) {
+        ids <- unique(m_sme_ids[g])
+        ids <- ids[ids != "null"]
+        if (length(ids) > 0L) paste(ids, collapse = "|") else "null"
+      },
+      character(1L),
+      USE.NAMES = FALSE
+    )
   }
-  as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
+
+  data.frame(
+    SML_ID = as.character(seq_len(n_fids)),
+    SMF_ID_REFS = smf_id_refs,
+    SME_ID_REFS = out_sme_refs,
+    database_identifier = out_db,
+    chemical_formula = out_cf,
+    smiles = out_sm,
+    inchi = out_in,
+    chemical_name = out_cn,
+    uri = out_ur,
+    theoretical_neutral_mass = theoretical_neutral_mass,
+    adduct_ions = out_ad,
+    reliability = reliability,
+    best_id_confidence_measure = rep("id_confidence_measure[1]", n_fids),
+    best_id_evidence_value = score_val,
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
 }

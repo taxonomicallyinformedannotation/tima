@@ -205,3 +205,66 @@ test_that("parse_hmdb_like_input rejects zip archives without sdf entries", {
     class = "tima_validation_error"
   )
 })
+
+test_that("parse_hmdb_like_input parses multi-SDF zip archives ignoring non-SDF files", {
+  td <- tempfile()
+  dir.create(td)
+  on.exit(unlink(td, recursive = TRUE))
+
+  sdf1 <- file.path(td, "mol1.sdf")
+  sdf2 <- file.path(td, "mol2.sdf")
+  txt <- file.path(td, "readme.txt")
+  writeLines(
+    c(
+      "SMP01",
+      "  RDKit",
+      "",
+      "  0  0  0  0  0  0  0  0  0  0999 V2000",
+      "M  END",
+      "> <SMPDB_ID>",
+      "SMP0001",
+      "",
+      "> <SMILES>",
+      "CCO",
+      "",
+      "> <GENERIC_NAME>",
+      "Ethanol"
+    ),
+    sdf1
+  )
+  writeLines(
+    c(
+      "SMP02",
+      "  RDKit",
+      "",
+      "  0  0  0  0  0  0  0  0  0  0999 V2000",
+      "M  END",
+      "> <SMPDB_ID>",
+      "SMP0002",
+      "",
+      "> <SMILES>",
+      "CC(=O)O",
+      "",
+      "> <GENERIC_NAME>",
+      "Acetic acid",
+      "",
+      "$$$$"
+    ),
+    sdf2
+  )
+  writeLines("not an sdf", txt)
+
+  zip_file <- file.path(td, "multi_sdf.zip")
+  withr::with_dir(
+    td,
+    utils::zip(
+      basename(zip_file),
+      c(basename(sdf1), basename(sdf2), basename(txt))
+    )
+  )
+
+  parsed <- parse_hmdb_like_input(zip_file)
+  expect_equal(nrow(parsed), 2L)
+  expect_setequal(parsed$id, c("SMP0001", "SMP0002"))
+  expect_setequal(parsed$smiles, c("CCO", "CC(=O)O"))
+})

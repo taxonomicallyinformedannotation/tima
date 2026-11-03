@@ -1,3 +1,5 @@
+.default_paths_cache <- new.env(parent = emptyenv())
+
 #' @title Get default paths
 #'
 #' @description This function loads and parses the default paths configuration
@@ -39,23 +41,46 @@ get_default_paths <- function(
     )
   }
 
-  # Load and parse YAML configuration
-  paths_config <- tryCatch(
-    {
-      yaml::read_yaml(file = yaml)
-    },
-    error = function(e) {
-      log_error("Failed to parse paths YAML: %s", e$message)
-      cli::cli_abort(
-        c(
-          "failed to parse paths YAML file",
-          "x" = conditionMessage(e)
-        ),
-        class = c("tima_runtime_error", "tima_error"),
-        call = NULL
-      )
+  default_pkg_yaml <- system.file("paths.yaml", package = "tima")
+  use_cache <- nzchar(default_pkg_yaml) && identical(yaml, default_pkg_yaml)
+  cache_key <- if (use_cache) {
+    info <- file.info(yaml)
+    paste0(yaml, "|", as.numeric(info$mtime), "|", info$size)
+  } else {
+    NULL
+  }
+
+  if (
+    use_cache &&
+      exists(cache_key, envir = .default_paths_cache, inherits = FALSE)
+  ) {
+    paths_config <- get(
+      cache_key,
+      envir = .default_paths_cache,
+      inherits = FALSE
+    )
+  } else {
+    # Load and parse YAML configuration
+    paths_config <- tryCatch(
+      {
+        yaml::read_yaml(file = yaml)
+      },
+      error = function(e) {
+        log_error("Failed to parse paths YAML: %s", e$message)
+        cli::cli_abort(
+          c(
+            "failed to parse paths YAML file",
+            "x" = conditionMessage(e)
+          ),
+          class = c("tima_runtime_error", "tima_error"),
+          call = NULL
+        )
+      }
+    )
+    if (use_cache) {
+      assign(cache_key, paths_config, envir = .default_paths_cache)
     }
-  )
+  }
 
   # Test override: allow tests to redirect interim params path to a temp
   # directory.

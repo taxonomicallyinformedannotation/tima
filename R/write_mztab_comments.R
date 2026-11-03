@@ -400,36 +400,43 @@
 #' @return Character vector of mzTab Param strings.
 #' @keywords internal
 .mztab_library_to_identification_method <- function(lib) {
-  tidytable::case_when(
+  lib_chr <- as.character(lib)
+  if (length(lib_chr) == 0L) {
+    return(character(0))
+  }
+  u_lib <- unique(lib_chr)
+  u_trimmed <- trimws(u_lib)
+  u_out <- tidytable::case_when(
     # Pass through values already in Param format.
-    grepl("^\\[.*,.*,.*,.*\\]$", trimws(lib)) ~ trimws(lib),
+    grepl("^\\[.*,.*,.*,.*\\]$", u_trimmed) ~ u_trimmed,
 
     # SIRIUS – in-silico molecular-formula / fragmentation scoring.
     # No single PSI-MS accession covers the full SIRIUS pipeline.
-    grepl("sirius", lib, ignore.case = TRUE) ~
+    grepl("sirius", u_lib, ignore.case = TRUE) ~
       "[, , SIRIUS in-silico structure elucidation, ]",
 
     # GNPS spectral networking / library.
-    grepl("gnps", lib, ignore.case = TRUE) ~
+    grepl("gnps", u_lib, ignore.case = TRUE) ~
       "[, , GNPS spectral library matching, ]",
 
     # MZmine or other spectral-library tools embedded via mzTab.
-    grepl("mzmine|mztab", lib, ignore.case = TRUE) ~
+    grepl("mzmine|mztab", u_lib, ignore.case = TRUE) ~
       "[, , spectral library matching, ]",
 
     # Generic MS/MS spectral library.
-    grepl("spectral|library|ms2|msms", lib, ignore.case = TRUE) ~
+    grepl("spectral|library|ms2|msms", u_lib, ignore.case = TRUE) ~
       "[, , spectral library matching, ]",
 
     # MS1 exact-mass database search (no fragmentation evidence).
-    grepl("ms1|exact.mass", lib, ignore.case = TRUE) ~
+    grepl("ms1|exact.mass", u_lib, ignore.case = TRUE) ~
       "[, , exact mass database search, ]",
 
     # Unknown / other: embed raw library name as a user parameter.
-    is.na(lib) | lib %in% c("", "null", "NULL", "NA") ~
+    is.na(u_lib) | u_lib %in% c("", "null", "NULL", "NA") ~
       "[, , unknown identification method, ]",
-    TRUE ~ paste0("[, , ", trimws(lib), ", ]")
+    TRUE ~ paste0("[, , ", u_trimmed, ", ]")
   )
+  u_out[fastmatch::fmatch(lib_chr, u_lib)]
 }
 
 #' Escape characters that would break mzTab tab-delimited row/column structure
@@ -440,14 +447,23 @@
 #' @keywords internal
 .mztab_escape <- function(x) {
   x <- as.character(x)
-  gsub("[\t\r\n]+", " ", x, perl = TRUE)
+  bad <- grep("[\t\r\n]", x, perl = TRUE)
+  if (length(bad) > 0L) {
+    x[bad] <- gsub("[\t\r\n]+", " ", x[bad], perl = TRUE)
+  }
+  x
 }
 
 #' Derive charge values from adduct notation
 #' @keywords internal
 .mztab_charge_from_adduct <- function(adduct) {
-  vapply(
-    X = as.character(adduct),
+  adduct_chr <- as.character(adduct)
+  if (length(adduct_chr) == 0L) {
+    return(character(0))
+  }
+  u_add <- unique(adduct_chr)
+  u_out <- vapply(
+    X = u_add,
     FUN = function(a) {
       if (is.na(a) || !nzchar(a) || a == "null") {
         return("null")
@@ -464,8 +480,16 @@
       sign <- if (identical(reg[[3L]], "-")) -1L else 1L
       as.character(sign * mag)
     },
-    FUN.VALUE = character(1L)
+    FUN.VALUE = character(1L),
+    USE.NAMES = FALSE
   )
+  out <- u_out[fastmatch::fmatch(adduct_chr, u_add)]
+  if (!is.null(names(adduct))) {
+    names(out) <- names(adduct)
+  } else {
+    names(out) <- adduct_chr
+  }
+  out
 }
 
 # ── xrefs helpers ─────────────────────────────────────────────────────────────
@@ -682,16 +706,18 @@
 
   keys <- .mztab_connectivity_layer_key(inchikeys)
   unique_keys <- unique(keys[valid_idx])
+  first_key_idx <- fastmatch::fmatch(unique_keys, keys)
   uri_lookup <- stats::setNames(rep("null", length(unique_keys)), unique_keys)
   db_lookup <- stats::setNames(rep("null", length(unique_keys)), unique_keys)
 
-  for (key in unique_keys) {
+  for (i in seq_along(unique_keys)) {
+    key <- unique_keys[[i]]
     rows <- xrefs_index[[key]]
     if (is.null(rows) || nrow(rows) == 0L) {
       next
     }
-    row_idx <- which(keys == key)[[1L]]
-    fallback_val <- if (length(row_idx) > 0L) fallback[[row_idx]] else "null"
+    row_idx <- first_key_idx[[i]]
+    fallback_val <- if (!is.na(row_idx)) fallback[[row_idx]] else "null"
     uri_lookup[[key]] <- .mztab_pick_best_uri(rows)
     db_lookup[[key]] <- .mztab_pick_best_database_identifier(
       rows,
@@ -699,8 +725,9 @@
     )
   }
 
-  uri_out[valid_idx] <- uri_lookup[match(keys[valid_idx], unique_keys)]
-  db_out[valid_idx] <- db_lookup[match(keys[valid_idx], unique_keys)]
+  key_match <- fastmatch::fmatch(keys[valid_idx], unique_keys)
+  uri_out[valid_idx] <- unname(uri_lookup[key_match])
+  db_out[valid_idx] <- unname(db_lookup[key_match])
   list(uri = uri_out, database_identifier = db_out)
 }
 

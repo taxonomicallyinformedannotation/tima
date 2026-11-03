@@ -788,198 +788,226 @@ prepare_params <- function(
       ignore.case = TRUE
     )
 
+  prep_params_for_id <- get_params(step = "prepare_params")
+  user_filename_for_id <- prep_params_for_id$files$pattern
+  user_gnps_for_id <- prep_params_for_id$gnps$id
+  example_gnps_for_id <- get_default_paths()$gnps$example
+  replace_id_cached <- function(x) {
+    replace_id(
+      x = x,
+      user_filename = user_filename_for_id,
+      user_gnps = user_gnps_for_id,
+      example_gnps = example_gnps_for_id
+    )
+  }
+
   ## annotate_masses
   yamls_params$annotate_masses$files$annotations$prepared$structural <-
     lapply(
       yamls_params$annotate_masses$files$annotations$prepared$structural,
-      replace_id
+      replace_id_cached
     )
   yamls_params$annotate_masses$files$features$prepared <-
-    lapply(yamls_params$annotate_masses$files$features$prepared, replace_id)
+    lapply(
+      yamls_params$annotate_masses$files$features$prepared,
+      replace_id_cached
+    )
   yamls_params$annotate_masses$files$networks$spectral$edges$raw <-
     lapply(
       yamls_params$annotate_masses$files$networks$spectral$edges$raw,
-      replace_id
+      replace_id_cached
     )
 
   ## annotate_spectra
   yamls_params$annotate_spectra$files$annotations$raw$spectral$spectral <-
     lapply(
       yamls_params$annotate_spectra$files$annotations$raw$spectral$spectral,
-      replace_id
+      replace_id_cached
     )
 
   ## create_edges_spectra
   yamls_params$create_edges_spectra$files$networks$spectral$edges$raw <-
     lapply(
       yamls_params$create_edges_spectra$files$networks$spectral$edges$raw,
-      replace_id
+      replace_id_cached
     )
 
   ## create_components
   yamls_params$create_components$files$networks$spectral$edges$prepared <-
     lapply(
       yamls_params$create_components$files$networks$spectral$edges$prepared,
-      replace_id
+      replace_id_cached
     )
   yamls_params$create_components$files$networks$spectral$components$raw <-
     lapply(
       yamls_params$create_components$files$networks$spectral$components$raw,
-      replace_id
+      replace_id_cached
     )
 
   ## filter_annotations
   yamls_params$filter_annotations$files$annotations$filtered <-
     lapply(
       yamls_params$filter_annotations$files$annotations$filtered,
-      replace_id
+      replace_id_cached
     )
   yamls_params$filter_annotations$files$annotations$prepared$structural$gnps <-
     lapply(
       yamls_params$filter_annotations$files$annotations$prepared$structural$gnps,
-      replace_id
+      replace_id_cached
     )
   yamls_params$filter_annotations$files$annotations$prepared$structural$ms1 <-
     lapply(
       yamls_params$filter_annotations$files$annotations$prepared$structural$ms1,
-      replace_id
+      replace_id_cached
     )
   yamls_params$filter_annotations$files$annotations$prepared$structural$sirius <-
     lapply(
       yamls_params$filter_annotations$files$annotations$prepared$structural$sirius,
-      replace_id
+      replace_id_cached
     )
   yamls_params$filter_annotations$files$annotations$prepared$structural$spectral <-
     lapply(
       yamls_params$filter_annotations$files$annotations$prepared$structural$spectral,
-      replace_id
+      replace_id_cached
     )
   yamls_params$filter_annotations$files$features$prepared <-
-    lapply(yamls_params$filter_annotations$files$features$prepared, replace_id)
+    lapply(
+      yamls_params$filter_annotations$files$features$prepared,
+      replace_id_cached
+    )
 
   ## prepare_features_tables
   yamls_params$prepare_features_tables$files$features$prepared <-
     lapply(
       yamls_params$prepare_features_tables$files$features$prepared,
-      replace_id
+      replace_id_cached
     )
 
   ## prepare_features_components
   yamls_params$prepare_features_components$files$networks$spectral$components$raw <-
     lapply(
       yamls_params$prepare_features_components$files$networks$spectral$components$raw,
-      replace_id
+      replace_id_cached
     )
   yamls_params$prepare_features_components$files$networks$spectral$components$prepared <-
     lapply(
       yamls_params$prepare_features_components$files$networks$spectral$components$prepared,
-      replace_id
+      replace_id_cached
     )
 
   ## prepare_features_edges
   yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$ms1 <-
     lapply(
       yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$ms1,
-      replace_id
+      replace_id_cached
     )
   yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$spectral <-
     lapply(
       yamls_params$prepare_features_edges$files$networks$spectral$edges$raw$spectral,
-      replace_id
+      replace_id_cached
     )
   yamls_params$prepare_features_edges$files$networks$spectral$edges$prepared <-
     lapply(
       yamls_params$prepare_features_edges$files$networks$spectral$edges$prepared,
-      replace_id
+      replace_id_cached
     )
 
   ## prepare_annotations_gnps
   yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral$gnps <-
     lapply(
       yamls_params$prepare_annotations_gnps$files$annotations$raw$spectral$gnps,
-      replace_id
+      replace_id_cached
     )
   yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural$gnps <-
     lapply(
       yamls_params$prepare_annotations_gnps$files$annotations$prepared$structural$gnps,
-      replace_id
+      replace_id_cached
     )
 
   ## prepare_annotations_mzmine
   yamls_params$prepare_annotations_mzmine$files$annotations$prepared$structural$mzmine <-
     lapply(
       yamls_params$prepare_annotations_mzmine$files$annotations$prepared$structural$mzmine,
-      replace_id
+      replace_id_cached
     )
 
   ## prepare_annotations_sirius
   yamls_params$prepare_annotations_sirius$files$annotations$prepared$canopus <-
     lapply(
       yamls_params$prepare_annotations_sirius$files$annotations$prepared$canopus,
-      replace_id
+      replace_id_cached
     )
   yamls_params$prepare_annotations_sirius$files$annotations$prepared$formula <-
     lapply(
       yamls_params$prepare_annotations_sirius$files$annotations$prepared$formula,
-      replace_id
+      replace_id_cached
     )
   yamls_params$prepare_annotations_sirius$files$annotations$prepared$structural <-
     lapply(
       yamls_params$prepare_annotations_sirius$files$annotations$prepared$structural,
-      replace_id
+      replace_id_cached
     )
 
   ## prepare_annotations_spectra
   yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral$spectral <-
     lapply(
       yamls_params$prepare_annotations_spectra$files$annotations$raw$spectral$spectral,
-      replace_id
+      replace_id_cached
     )
   yamls_params$prepare_annotations_spectra$files$annotations$prepared$structural <-
     lapply(
       yamls_params$prepare_annotations_spectra$files$annotations$prepared$structural,
-      replace_id
+      replace_id_cached
     )
 
   ## prepare_taxa
   yamls_params$prepare_taxa$files$metadata$prepared <-
-    lapply(yamls_params$prepare_taxa$files$metadata$prepared, replace_id)
+    lapply(
+      yamls_params$prepare_taxa$files$metadata$prepared,
+      replace_id_cached
+    )
 
   ## weight_annotations
   yamls_params$weight_annotations$files$annotations$filtered <-
     lapply(
       yamls_params$weight_annotations$files$annotations$filtered,
-      replace_id
+      replace_id_cached
     )
   yamls_params$weight_annotations$files$annotations$prepared$canopus <-
     lapply(
       yamls_params$weight_annotations$files$annotations$prepared$canopus,
-      replace_id
+      replace_id_cached
     )
   yamls_params$weight_annotations$files$annotations$prepared$formula <-
     lapply(
       yamls_params$weight_annotations$files$annotations$prepared$formula,
-      replace_id
+      replace_id_cached
     )
   yamls_params$weight_annotations$files$annotations$processed <-
     lapply(
       yamls_params$weight_annotations$files$annotations$processed,
-      replace_id
+      replace_id_cached
     )
   yamls_params$weight_annotations$files$features$prepared <-
-    lapply(yamls_params$weight_annotations$files$features$prepared, replace_id)
+    lapply(
+      yamls_params$weight_annotations$files$features$prepared,
+      replace_id_cached
+    )
   yamls_params$weight_annotations$files$networks$spectral$components$prepared <-
     lapply(
       yamls_params$weight_annotations$files$networks$spectral$components$prepared,
-      replace_id
+      replace_id_cached
     )
   yamls_params$weight_annotations$files$networks$spectral$edges$prepared <-
     lapply(
       yamls_params$weight_annotations$files$networks$spectral$edges$prepared,
-      replace_id
+      replace_id_cached
     )
   yamls_params$weight_annotations$files$metadata$prepared <-
-    lapply(yamls_params$weight_annotations$files$metadata$prepared, replace_id)
+    lapply(
+      yamls_params$weight_annotations$files$metadata$prepared,
+      replace_id_cached
+    )
 
   yaml_export <- yaml_data$yaml_files |>
     gsub(

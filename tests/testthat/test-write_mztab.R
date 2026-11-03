@@ -1954,3 +1954,99 @@ test_that("write_mztab merge mode avoids false SMF dedup when only opt columns d
 
   expect_length(grep("^SMF\\t", lines), 2L)
 })
+
+test_that("mztab helpers deduplicate SML tuples, compute ambiguity codes, and preserve adduct names", {
+  charges <- .mztab_charge_from_adduct(c(
+    "[M+H]+",
+    "[M+2H]2+",
+    "[M-H]-",
+    "[M+H]+",
+    "null"
+  ))
+  expect_identical(
+    unname(charges),
+    c("1", "2", "-1", "1", "null")
+  )
+  expect_identical(
+    names(charges),
+    c("[M+H]+", "[M+2H]2+", "[M-H]-", "[M+H]+", "null")
+  )
+
+  expect_identical(
+    .mztab_escape(c("clean", "with\ttab\nand\rcr", "also clean")),
+    c("clean", "with tab and cr", "also clean")
+  )
+
+  smf <- tidytable::tidytable(
+    SMF_ID = c("1", "2", "3", "4"),
+    feature_id = c("F1", "F2", "F3", "F4")
+  )
+  sme <- tidytable::tidytable(
+    SME_ID = c("10", "11", "11", "20", "21", "30", "31", "40"),
+    feature_id = c("F1", "F1", "F1", "F2", "F2", "F3", "F3", "F4"),
+    database_identifier = c(
+      "IK1",
+      "IK2",
+      "IK2",
+      "IK1",
+      "IK1",
+      "IK1",
+      "IK2",
+      "IK1"
+    ),
+    chemical_formula = c(
+      "C6H12O6",
+      "C6H12O6",
+      "C6H12O6",
+      "C6H12O6",
+      "C6H12O6",
+      "C6H12O6",
+      "C7H14O6",
+      "C6H12O6"
+    ),
+    smiles = "CCO",
+    inchi = "null",
+    chemical_name = c("A", "B", "B", "A", "A", "A", "B", "A"),
+    uri = "null",
+    adduct_ion = "[M+H]+",
+    identification_method = c(
+      "[, , spectral library matching, ]",
+      "[, , spectral library matching, ]",
+      "[, , spectral library matching, ]",
+      "[, , spectral library matching, ]",
+      "[, , exact mass database search, ]",
+      "[, , spectral library matching, ]",
+      "[, , exact mass database search, ]",
+      "[, , spectral library matching, ]"
+    ),
+    rank = c("2", "1", "1", "1", "2", "1", "2", "1"),
+    `id_confidence_measure[1]` = c(
+      "0.6",
+      "0.9",
+      "0.8",
+      "0.85",
+      "0.5",
+      "0.9",
+      "0.4",
+      "0.75"
+    )
+  )
+  res_df <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    score_final = c("0.6", "0.9"),
+    candidate_structure_exact_mass = c("180.063388", "194.079038")
+  )
+
+  sml <- .mztab_build_sml(res_df, smf, sme)
+  expect_identical(sml$database_identifier[[1L]], "IK2|IK1")
+  expect_identical(sml$SME_ID_REFS[[1L]], "11|10")
+  expect_identical(sml$theoretical_neutral_mass[[1L]], "194.079038")
+  expect_identical(sml$best_id_evidence_value[[1L]], "0.9")
+
+  smf_ref <- .mztab_refresh_smf_sme_refs(smf, sme)
+  expect_identical(smf_ref$SME_ID_REFS, c("10|11", "20|21", "30|31", "40"))
+  expect_identical(
+    smf_ref$SME_ID_REF_ambiguity_code,
+    c("1", "2", "3", "null")
+  )
+})
