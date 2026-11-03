@@ -290,8 +290,8 @@ prepare_annotations_sirius <-
 read_sirius_internal_file <- function(input_directory, internal_file) {
   from_zip <- tryCatch(
     {
-      archive::archive_read(archive = input_directory, file = internal_file) |>
-        .read_sirius_tabular()
+      con <- unz(description = input_directory, filename = internal_file)
+      suppressWarnings(.read_sirius_tabular(con))
     },
     error = function(e) {
       invisible(e)

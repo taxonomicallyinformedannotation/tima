@@ -78,13 +78,22 @@ complement_metadata_structures <- function(
   )
 
   # Filter stereo to keys present in this annotation batch.
-  stereo <- refs$stereo_full |>
-    tidytable::filter(
-      structure_inchikey_connectivity_layer %in%
-        keys$inchikey |
-        structure_smiles_no_stereo %in% keys$smiles
-    ) |>
-    tidytable::distinct()
+  sf <- refs$stereo_full
+  keep_stereo <- (length(keys$inchikey) > 0L &
+    fastmatch::fmatch(
+      sf$structure_inchikey_connectivity_layer,
+      keys$inchikey,
+      nomatch = 0L
+    ) >
+      0L) |
+    (length(keys$smiles) > 0L &
+      fastmatch::fmatch(
+        sf$structure_smiles_no_stereo,
+        keys$smiles,
+        nomatch = 0L
+      ) >
+        0L)
+  stereo <- tidytable::distinct(sf[keep_stereo, ])
   log_debug("Stereo loaded: %d rows after filtering", nrow(stereo))
 
   stereo_k <- stereo |>
@@ -163,15 +172,17 @@ complement_metadata_structures <- function(
       0L
   ]
 
-  # Name/tag/xlogp collapse is precomputed once in the reference cache.
-  nam_lookup <- refs$nam_lookup_full[
+  # Collapse name/tag/xlogp only for the batch's inchikey_no_stereo keys.
+  stereo_for_nam <- sf[
     fastmatch::fmatch(
-      candidate_structure_inchikey_no_stereo,
+      sf$structure_inchikey_no_stereo,
       keys$inchikey_no_stereo,
       nomatch = 0L
     ) >
-      0L
+      0L,
   ]
+  nam_lookup <- .build_name_lookup_from_stereo(stereo_for_nam)
+  rm(stereo_for_nam)
   log_debug("Names/tag/xlogp lookup: %d unique keys", nrow(nam_lookup))
 
   # ClassyFire taxonomy — keyed by full inchikey (filter to batch keys)
@@ -206,8 +217,19 @@ complement_metadata_structures <- function(
 
   log_debug("Metadata lookup: %d unique keys", nrow(met_lookup))
 
-  # Inject placeholder columns early if missing in input df.
-  df <- .ensure_structure_placeholders(df)
+  # Track original input columns so we only scan existing values for columns
+  # actually supplied by the caller.
+  orig_cols <- names(df)
+  df <- tidytable::as_tidytable(as.list(df))
+  for (id_col in c(
+    "candidate_structure_inchikey_connectivity_layer",
+    "candidate_structure_inchikey_no_stereo",
+    "candidate_structure_smiles_no_stereo"
+  )) {
+    if (!id_col %in% names(df)) {
+      data.table::set(df, j = id_col, value = rep.int(NA_character_, nrow(df)))
+    }
+  }
   log_debug("Starting key resolution joins on %d rows", nrow(df))
 
   # Derive candidate_structure_inchikey_no_stereo in df.
@@ -233,6 +255,7 @@ complement_metadata_structures <- function(
   # produce different SMILES for the same InChIKey (e.g., RWQNBRDOKXIBIV
   # glutamine amide vs enol form), leading to missed enrichments.
   structure_keys <- .build_structure_keys(df)
+  row_to_sk <- attr(structure_keys, "row_to_sk")
   log_debug("Structure keys: %d unique combinations", nrow(structure_keys))
 
   stereo_bridge <- .build_stereo_bridge(stereo_k)
@@ -249,8 +272,11 @@ complement_metadata_structures <- function(
   log_debug("Key lookup: %d rows; starting final join", nrow(key_lookup))
   table_final <- .apply_structure_enrichment_fast(
     df = df,
-    key_lookup = key_lookup
+    key_lookup = key_lookup,
+    row_to_sk = row_to_sk,
+    orig_cols = orig_cols
   )
+  table_final <- .ensure_structure_placeholders(table_final)
   rm(
     structure_keys,
     met_lookup,
@@ -377,8 +403,6 @@ complement_metadata_structures <- function(
         .keep_all = TRUE
       )
 
-    nam_lookup_full <- .build_name_lookup_from_stereo(stereo_full)
-
     tax_cla_lookup_full <- tax_cla_full |>
       tidytable::select(
         candidate_structure_inchikey = structure_inchikey,
@@ -421,7 +445,6 @@ complement_metadata_structures <- function(
       tax_cla_full = tax_cla_full,
       tax_npc_full = tax_npc_full,
       met_lookup_full = met_lookup_full,
-      nam_lookup_full = nam_lookup_full,
       tax_cla_lookup_full = tax_cla_lookup_full,
       tax_npc_lookup_full = tax_npc_lookup_full
     )
@@ -445,23 +468,19 @@ complement_metadata_structures <- function(
   present_inchikey_cols <- intersect(inchikey_cols, names(df))
   present_smiles_cols <- intersect(smiles_cols, names(df))
 
-  inchikey <- if (length(present_inchikey_cols) == 0L) {
-    character()
-  } else {
-    unique(stats::na.omit(unlist(
-      as.data.frame(df)[, present_inchikey_cols, drop = FALSE],
-      use.names = FALSE
-    )))
+  inchikey <- character()
+  for (col in present_inchikey_cols) {
+    u <- unique(df[[col]])
+    inchikey <- c(inchikey, u[!is.na(u)])
   }
+  inchikey <- unique(inchikey)
 
-  smiles <- if (length(present_smiles_cols) == 0L) {
-    character()
-  } else {
-    unique(stats::na.omit(unlist(
-      as.data.frame(df)[, present_smiles_cols, drop = FALSE],
-      use.names = FALSE
-    )))
+  smiles <- character()
+  for (col in present_smiles_cols) {
+    u <- unique(df[[col]])
+    smiles <- c(smiles, u[!is.na(u)])
   }
+  smiles <- unique(smiles)
 
   list(inchikey = inchikey, smiles = smiles)
 }
@@ -472,71 +491,59 @@ complement_metadata_structures <- function(
       names(df) &&
       nrow(stereo_i_conn) > 0L
   ) {
-    conn_lookup <- stats::setNames(
-      stereo_i_conn$candidate_structure_smiles_no_stereo_ic,
+    idx <- fastmatch::fmatch(
+      df$candidate_structure_inchikey_connectivity_layer,
       stereo_i_conn$candidate_structure_inchikey_connectivity_layer
     )
-    inchikey_lookup <- stats::setNames(
-      stereo_i_conn$candidate_structure_inchikey_no_stereo_ic,
-      stereo_i_conn$candidate_structure_inchikey_connectivity_layer
-    )
+    mapped_smiles <- stereo_i_conn$candidate_structure_smiles_no_stereo_ic[idx]
+    mapped_inchikey <- stereo_i_conn$candidate_structure_inchikey_no_stereo_ic[
+      idx
+    ]
 
-    existing_smiles <- df$candidate_structure_smiles_no_stereo
-    existing_inchikey <- df$candidate_structure_inchikey_no_stereo
-    mapped_smiles <- conn_lookup[match(
-      df$candidate_structure_inchikey_connectivity_layer,
-      names(conn_lookup)
-    )]
-    mapped_inchikey <- inchikey_lookup[match(
-      df$candidate_structure_inchikey_connectivity_layer,
-      names(inchikey_lookup)
-    )]
+    miss_smiles <- is.na(mapped_smiles)
+    if (any(miss_smiles)) {
+      mapped_smiles[miss_smiles] <- df$candidate_structure_smiles_no_stereo[
+        miss_smiles
+      ]
+    }
+    miss_inchikey <- is.na(mapped_inchikey)
+    if (any(miss_inchikey)) {
+      mapped_inchikey[
+        miss_inchikey
+      ] <- df$candidate_structure_inchikey_no_stereo[miss_inchikey]
+    }
 
-    df$candidate_structure_smiles_no_stereo <- ifelse(
-      is.na(mapped_smiles),
-      existing_smiles,
-      mapped_smiles
-    )
-    df$candidate_structure_inchikey_no_stereo <- ifelse(
-      is.na(mapped_inchikey),
-      existing_inchikey,
-      mapped_inchikey
-    )
+    df$candidate_structure_smiles_no_stereo <- mapped_smiles
+    df$candidate_structure_inchikey_no_stereo <- mapped_inchikey
   }
 
   if (
     "candidate_structure_smiles_no_stereo" %in% names(df) && nrow(stereo_s) > 0L
   ) {
-    smiles_lookup <- stats::setNames(
-      stereo_s$candidate_structure_inchikey_connectivity_layer_s,
+    idx <- fastmatch::fmatch(
+      df$candidate_structure_smiles_no_stereo,
       stereo_s$candidate_structure_smiles_no_stereo
     )
-    inchikey_lookup <- stats::setNames(
-      stereo_s$candidate_structure_inchikey_no_stereo_s,
-      stereo_s$candidate_structure_smiles_no_stereo
-    )
+    mapped_conn <- stereo_s$candidate_structure_inchikey_connectivity_layer_s[
+      idx
+    ]
+    mapped_inchikey <- stereo_s$candidate_structure_inchikey_no_stereo_s[idx]
 
-    existing_conn <- df$candidate_structure_inchikey_connectivity_layer
-    existing_inchikey <- df$candidate_structure_inchikey_no_stereo
-    mapped_conn <- smiles_lookup[match(
-      df$candidate_structure_smiles_no_stereo,
-      names(smiles_lookup)
-    )]
-    mapped_inchikey <- inchikey_lookup[match(
-      df$candidate_structure_smiles_no_stereo,
-      names(inchikey_lookup)
-    )]
+    miss_conn <- is.na(mapped_conn)
+    if (any(miss_conn)) {
+      mapped_conn[
+        miss_conn
+      ] <- df$candidate_structure_inchikey_connectivity_layer[miss_conn]
+    }
+    miss_inchikey <- is.na(mapped_inchikey)
+    if (any(miss_inchikey)) {
+      mapped_inchikey[
+        miss_inchikey
+      ] <- df$candidate_structure_inchikey_no_stereo[miss_inchikey]
+    }
 
-    df$candidate_structure_inchikey_connectivity_layer <- ifelse(
-      is.na(mapped_conn),
-      existing_conn,
-      mapped_conn
-    )
-    df$candidate_structure_inchikey_no_stereo <- ifelse(
-      is.na(mapped_inchikey),
-      existing_inchikey,
-      mapped_inchikey
-    )
+    df$candidate_structure_inchikey_connectivity_layer <- mapped_conn
+    df$candidate_structure_inchikey_no_stereo <- mapped_inchikey
   }
 
   df
@@ -550,13 +557,25 @@ complement_metadata_structures <- function(
     ))
   }
 
-  unique(df[,
-    c(
-      "candidate_structure_inchikey_no_stereo",
-      "candidate_structure_inchikey_connectivity_layer"
-    ),
-    drop = FALSE
-  ])
+  ns_col <- df$candidate_structure_inchikey_no_stereo
+  cl_col <- df$candidate_structure_inchikey_connectivity_layer
+  u_ns <- unique(ns_col)
+  u_cl <- unique(cl_col)
+  ns_id <- fastmatch::fmatch(ns_col, u_ns)
+  cl_id <- fastmatch::fmatch(cl_col, u_cl)
+  pair_code <- (as.double(ns_id) - 1) *
+    as.double(max(1L, length(u_cl))) +
+    as.double(cl_id)
+  u_pair_code <- unique(pair_code)
+  first_pos <- fastmatch::fmatch(u_pair_code, pair_code)
+  row_to_sk <- fastmatch::fmatch(pair_code, u_pair_code)
+
+  out <- tidytable::tidytable(
+    candidate_structure_inchikey_no_stereo = ns_col[first_pos],
+    candidate_structure_inchikey_connectivity_layer = cl_col[first_pos]
+  )
+  attr(out, "row_to_sk") <- row_to_sk
+  out
 }
 
 .build_stereo_bridge <- function(stereo_k) {
@@ -583,20 +602,18 @@ complement_metadata_structures <- function(
   connectivity_layer <- as.character(connectivity_layer)
   key_sep <- "\u001f"
 
-  no_stereo[
-    is.na(no_stereo) | !nzchar(no_stereo) | no_stereo %in% c("NA", "null")
-  ] <- NA_character_
-  connectivity_layer[
-    is.na(connectivity_layer) |
-      !nzchar(connectivity_layer) |
-      connectivity_layer %in% c("NA", "null")
-  ] <- NA_character_
+  inv_ns <- is.na(no_stereo) |
+    !nzchar(no_stereo) |
+    no_stereo == "NA" |
+    no_stereo == "null"
+  inv_cl <- is.na(connectivity_layer) |
+    !nzchar(connectivity_layer) |
+    connectivity_layer == "NA" |
+    connectivity_layer == "null"
 
-  ifelse(
-    is.na(no_stereo) | is.na(connectivity_layer),
-    NA_character_,
-    paste0(no_stereo, key_sep, connectivity_layer)
-  )
+  res <- paste0(no_stereo, key_sep, connectivity_layer)
+  res[inv_ns | inv_cl] <- NA_character_
+  res
 }
 
 .build_structure_key_lookup_fast <- function(
@@ -615,34 +632,30 @@ complement_metadata_structures <- function(
     ))
   }
 
-  lookup_tbl <- structure_keys |>
-    tidytable::mutate(
-      .structure_key = .make_structure_lookup_key(
-        candidate_structure_inchikey_no_stereo,
-        candidate_structure_inchikey_connectivity_layer
-      )
-    )
-
-  # Pre-compute match indices ONCE for structure_keys$inchikey_no_stereo
-  # against all lookup tables - avoids repeated match() calls
   sk_inchikey_no_stereo <- structure_keys$candidate_structure_inchikey_no_stereo
   sk_connectivity <- structure_keys$candidate_structure_inchikey_connectivity_layer
 
+  lookup_tbl <- tidytable::tidytable(
+    candidate_structure_inchikey_no_stereo = sk_inchikey_no_stereo,
+    candidate_structure_inchikey_connectivity_layer = sk_connectivity,
+    .structure_key = .make_structure_lookup_key(
+      sk_inchikey_no_stereo,
+      sk_connectivity
+    )
+  )
+
   # Metabolite lookup (formula + exact mass) - keyed by inchikey_no_stereo
   if (nrow(met_lookup) > 0L) {
-    met_map_formula <- stats::setNames(
-      met_lookup$.lk_molecular_formula,
+    idx <- fastmatch::fmatch(
+      sk_inchikey_no_stereo,
       met_lookup$candidate_structure_inchikey_no_stereo
     )
-    met_map_mass <- stats::setNames(
-      met_lookup$.lk_exact_mass,
-      met_lookup$candidate_structure_inchikey_no_stereo
-    )
-    idx <- match(sk_inchikey_no_stereo, names(met_map_formula))
-    lookup_tbl$.enr_candidate_structure_molecular_formula <- met_map_formula[
+    lookup_tbl$.enr_candidate_structure_molecular_formula <- met_lookup$.lk_molecular_formula[
       idx
     ]
-    lookup_tbl$.enr_candidate_structure_exact_mass <- met_map_mass[idx]
+    lookup_tbl$.enr_candidate_structure_exact_mass <- met_lookup$.lk_exact_mass[
+      idx
+    ]
   } else {
     lookup_tbl$.enr_candidate_structure_molecular_formula <- NA_character_
     lookup_tbl$.enr_candidate_structure_exact_mass <- NA_character_
@@ -650,22 +663,13 @@ complement_metadata_structures <- function(
 
   # Name/tag/xlogp lookup - keyed by inchikey_no_stereo
   if (nrow(nam_lookup) > 0L) {
-    nam_map_name <- stats::setNames(
-      nam_lookup$.lk_name,
+    idx <- fastmatch::fmatch(
+      sk_inchikey_no_stereo,
       nam_lookup$candidate_structure_inchikey_no_stereo
     )
-    nam_map_tag <- stats::setNames(
-      nam_lookup$.lk_tag,
-      nam_lookup$candidate_structure_inchikey_no_stereo
-    )
-    nam_map_xlogp <- stats::setNames(
-      nam_lookup$.lk_xlogp,
-      nam_lookup$candidate_structure_inchikey_no_stereo
-    )
-    idx <- match(sk_inchikey_no_stereo, names(nam_map_name))
-    lookup_tbl$.enr_candidate_structure_name <- nam_map_name[idx]
-    lookup_tbl$.enr_candidate_structure_tag <- nam_map_tag[idx]
-    lookup_tbl$.enr_candidate_structure_xlogp <- nam_map_xlogp[idx]
+    lookup_tbl$.enr_candidate_structure_name <- nam_lookup$.lk_name[idx]
+    lookup_tbl$.enr_candidate_structure_tag <- nam_lookup$.lk_tag[idx]
+    lookup_tbl$.enr_candidate_structure_xlogp <- nam_lookup$.lk_xlogp[idx]
   } else {
     lookup_tbl$.enr_candidate_structure_name <- NA_character_
     lookup_tbl$.enr_candidate_structure_tag <- NA_character_
@@ -674,17 +678,12 @@ complement_metadata_structures <- function(
 
   # Stereo bridge - keyed by connectivity_layer
   if (nrow(stereo_bridge) > 0L) {
-    bridge_inchikey_map <- stats::setNames(
-      stereo_bridge$.bridge_inchikey,
+    idx <- fastmatch::fmatch(
+      sk_connectivity,
       stereo_bridge$candidate_structure_inchikey_connectivity_layer
     )
-    bridge_smiles_map <- stats::setNames(
-      stereo_bridge$.bridge_smiles,
-      stereo_bridge$candidate_structure_inchikey_connectivity_layer
-    )
-    idx <- match(sk_connectivity, names(bridge_inchikey_map))
-    lookup_tbl$.bridge_inchikey <- bridge_inchikey_map[idx]
-    lookup_tbl$.bridge_smiles <- bridge_smiles_map[idx]
+    lookup_tbl$.bridge_inchikey <- stereo_bridge$.bridge_inchikey[idx]
+    lookup_tbl$.bridge_smiles <- stereo_bridge$.bridge_smiles[idx]
   } else {
     lookup_tbl$.bridge_inchikey <- NA_character_
     lookup_tbl$.bridge_smiles <- NA_character_
@@ -694,34 +693,23 @@ complement_metadata_structures <- function(
   if (
     nrow(tax_cla) > 0L && "candidate_structure_inchikey" %in% names(tax_cla)
   ) {
-    tax_cla_map_chemontid <- stats::setNames(
-      tax_cla$candidate_structure_tax_cla_chemontid_i,
+    idx <- fastmatch::fmatch(
+      lookup_tbl$.bridge_inchikey,
       tax_cla$candidate_structure_inchikey
     )
-    tax_cla_map_01kin <- stats::setNames(
-      tax_cla$candidate_structure_tax_cla_01kin_i,
-      tax_cla$candidate_structure_inchikey
-    )
-    tax_cla_map_02sup <- stats::setNames(
-      tax_cla$candidate_structure_tax_cla_02sup_i,
-      tax_cla$candidate_structure_inchikey
-    )
-    tax_cla_map_03cla <- stats::setNames(
-      tax_cla$candidate_structure_tax_cla_03cla_i,
-      tax_cla$candidate_structure_inchikey
-    )
-    tax_cla_map_04dirpar <- stats::setNames(
-      tax_cla$candidate_structure_tax_cla_04dirpar_i,
-      tax_cla$candidate_structure_inchikey
-    )
-    idx <- match(lookup_tbl$.bridge_inchikey, names(tax_cla_map_chemontid))
-    lookup_tbl$.enr_candidate_structure_tax_cla_chemontid <- tax_cla_map_chemontid[
+    lookup_tbl$.enr_candidate_structure_tax_cla_chemontid <- tax_cla$candidate_structure_tax_cla_chemontid_i[
       idx
     ]
-    lookup_tbl$.enr_candidate_structure_tax_cla_01kin <- tax_cla_map_01kin[idx]
-    lookup_tbl$.enr_candidate_structure_tax_cla_02sup <- tax_cla_map_02sup[idx]
-    lookup_tbl$.enr_candidate_structure_tax_cla_03cla <- tax_cla_map_03cla[idx]
-    lookup_tbl$.enr_candidate_structure_tax_cla_04dirpar <- tax_cla_map_04dirpar[
+    lookup_tbl$.enr_candidate_structure_tax_cla_01kin <- tax_cla$candidate_structure_tax_cla_01kin_i[
+      idx
+    ]
+    lookup_tbl$.enr_candidate_structure_tax_cla_02sup <- tax_cla$candidate_structure_tax_cla_02sup_i[
+      idx
+    ]
+    lookup_tbl$.enr_candidate_structure_tax_cla_03cla <- tax_cla$candidate_structure_tax_cla_03cla_i[
+      idx
+    ]
+    lookup_tbl$.enr_candidate_structure_tax_cla_04dirpar <- tax_cla$candidate_structure_tax_cla_04dirpar_i[
       idx
     ]
   } else {
@@ -734,22 +722,19 @@ complement_metadata_structures <- function(
 
   # NPClassifier taxonomy - keyed by smiles (via .bridge_smiles)
   if (nrow(tax_npc) > 0L && "candidate_structure_smiles" %in% names(tax_npc)) {
-    tax_npc_map_01pat <- stats::setNames(
-      tax_npc$candidate_structure_tax_npc_01pat_s,
+    idx <- fastmatch::fmatch(
+      lookup_tbl$.bridge_smiles,
       tax_npc$candidate_structure_smiles
     )
-    tax_npc_map_02sup <- stats::setNames(
-      tax_npc$candidate_structure_tax_npc_02sup_s,
-      tax_npc$candidate_structure_smiles
-    )
-    tax_npc_map_03cla <- stats::setNames(
-      tax_npc$candidate_structure_tax_npc_03cla_s,
-      tax_npc$candidate_structure_smiles
-    )
-    idx <- match(lookup_tbl$.bridge_smiles, names(tax_npc_map_01pat))
-    lookup_tbl$.enr_candidate_structure_tax_npc_01pat <- tax_npc_map_01pat[idx]
-    lookup_tbl$.enr_candidate_structure_tax_npc_02sup <- tax_npc_map_02sup[idx]
-    lookup_tbl$.enr_candidate_structure_tax_npc_03cla <- tax_npc_map_03cla[idx]
+    lookup_tbl$.enr_candidate_structure_tax_npc_01pat <- tax_npc$candidate_structure_tax_npc_01pat_s[
+      idx
+    ]
+    lookup_tbl$.enr_candidate_structure_tax_npc_02sup <- tax_npc$candidate_structure_tax_npc_02sup_s[
+      idx
+    ]
+    lookup_tbl$.enr_candidate_structure_tax_npc_03cla <- tax_npc$candidate_structure_tax_npc_03cla_s[
+      idx
+    ]
   } else {
     lookup_tbl$.enr_candidate_structure_tax_npc_01pat <- NA_character_
     lookup_tbl$.enr_candidate_structure_tax_npc_02sup <- NA_character_
@@ -759,18 +744,40 @@ complement_metadata_structures <- function(
   lookup_tbl
 }
 
-.apply_structure_enrichment_fast <- function(df, key_lookup) {
+.apply_structure_enrichment_fast <- function(
+  df,
+  key_lookup,
+  row_to_sk = NULL,
+  orig_cols = NULL
+) {
   if (nrow(df) == 0L) {
     return(df)
   }
 
-  row_keys <- .make_structure_lookup_key(
-    df$candidate_structure_inchikey_no_stereo,
-    df$candidate_structure_inchikey_connectivity_layer
-  )
-  idx <- match(row_keys, key_lookup$.structure_key)
+  if (
+    !is.null(row_to_sk) &&
+      length(row_to_sk) == nrow(df) &&
+      nrow(key_lookup) > 0L
+  ) {
+    sk_canon <- match(key_lookup$.structure_key, key_lookup$.structure_key)
+    idx <- if (identical(sk_canon, seq_len(nrow(key_lookup)))) {
+      row_to_sk
+    } else {
+      sk_canon[row_to_sk]
+    }
+  } else {
+    row_keys <- .make_structure_lookup_key(
+      df$candidate_structure_inchikey_no_stereo,
+      df$candidate_structure_inchikey_connectivity_layer
+    )
+    idx <- match(row_keys, key_lookup$.structure_key)
+  }
 
-  out <- df
+  out <- if (data.table::is.data.table(df)) {
+    df
+  } else {
+    tidytable::as_tidytable(df)
+  }
   enrichment_map <- list(
     candidate_structure_molecular_formula = c(
       ".enr_candidate_structure_molecular_formula",
@@ -829,10 +836,18 @@ complement_metadata_structures <- function(
   for (target_col in names(enrichment_map)) {
     enrich_col <- enrichment_map[[target_col]][[1L]]
     existing_col <- enrichment_map[[target_col]][[2L]]
-    out[[target_col]] <- .pick_enrichment(
-      key_lookup[[enrich_col]][idx],
-      out[[existing_col]]
-    )
+    enr_norm <- .normalize_enrichment_text(key_lookup[[enrich_col]])
+    res <- enr_norm[idx]
+    if (is.null(orig_cols) || existing_col %in% orig_cols) {
+      existing_vec <- out[[existing_col]]
+      if (!is.null(existing_vec)) {
+        na_pos <- which(is.na(res) & !is.na(existing_vec))
+        if (length(na_pos) > 0L) {
+          res[na_pos] <- .normalize_enrichment_text(existing_vec[na_pos])
+        }
+      }
+    }
+    data.table::set(out, j = target_col, value = res)
   }
 
   out
@@ -850,13 +865,14 @@ complement_metadata_structures <- function(
     return(df)
   }
 
-  df |>
-    tidytable::mutate(
-      !!!stats::setNames(
-        rep(list(NA_character_), length(needed)),
-        needed
-      )
-    )
+  if (!data.table::is.data.table(df)) {
+    df <- tidytable::as_tidytable(df)
+  }
+  na_col <- rep.int(NA_character_, nrow(df))
+  for (col in needed) {
+    data.table::set(df, j = col, value = na_col)
+  }
+  df
 }
 
 .schema_stereo_cols <- function() {
@@ -934,8 +950,9 @@ complement_metadata_structures <- function(
 }
 
 .safe_fread_selected <- function(file, file_type, selected_cols) {
-  header <- names(tidytable::fread(
+  header <- names(safe_fread(
     file = file,
+    file_type = file_type,
     nrows = 0L,
     showProgress = FALSE
   ))
@@ -974,51 +991,51 @@ complement_metadata_structures <- function(
 }
 
 .build_name_lookup_from_stereo <- function(stereo) {
-  nam_base <- stereo |>
-    tidytable::filter(!is.na(structure_inchikey_no_stereo)) |>
-    tidytable::select(
-      candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
-      structure_name,
-      structure_tag,
-      structure_xlogp
+  valid <- !is.na(stereo$structure_inchikey_no_stereo)
+  if (!any(valid)) {
+    return(tidytable::tidytable(
+      candidate_structure_inchikey_no_stereo = character(0),
+      .lk_name = character(0),
+      .lk_tag = character(0),
+      .lk_xlogp = character(0)
+    ))
+  }
+
+  keys <- stereo$structure_inchikey_no_stereo[valid]
+  names_vec <- stereo$structure_name[valid]
+  tags_vec <- stereo$structure_tag[valid]
+  xlogp_vec <- stereo$structure_xlogp[valid]
+
+  dup_keys <- unique(keys[duplicated(keys)])
+  is_multi <- if (length(dup_keys) > 0L) {
+    fastmatch::fmatch(keys, dup_keys, nomatch = 0L) > 0L
+  } else {
+    logical(length(keys))
+  }
+
+  s_idx <- !is_multi
+  s_name <- trimws(as.character(names_vec[s_idx]))
+  s_name[is.na(s_name) | !nzchar(s_name)] <- NA_character_
+  s_tag <- trimws(as.character(tags_vec[s_idx]))
+  s_tag[is.na(s_tag) | !nzchar(s_tag)] <- NA_character_
+  s_xlogp <- as.character(xlogp_vec[s_idx])
+  s_xlogp_trim <- trimws(s_xlogp)
+  s_xlogp[is.na(s_xlogp) | !nzchar(s_xlogp_trim)] <- NA_character_
+
+  singletons_nam <- tidytable::tidytable(
+    candidate_structure_inchikey_no_stereo = keys[s_idx],
+    .lk_name = s_name,
+    .lk_tag = s_tag,
+    .lk_xlogp = s_xlogp
+  )
+
+  if (any(is_multi)) {
+    multi_nam <- tidytable::tidytable(
+      candidate_structure_inchikey_no_stereo = keys[is_multi],
+      structure_name = names_vec[is_multi],
+      structure_tag = tags_vec[is_multi],
+      structure_xlogp = xlogp_vec[is_multi]
     ) |>
-    tidytable::mutate(
-      .n_grp = .N,
-      .by = candidate_structure_inchikey_no_stereo
-    )
-
-  singletons_nam <- nam_base |>
-    tidytable::filter(.n_grp == 1L) |>
-    tidytable::mutate(
-      .lk_name = tidytable::if_else(
-        is.na(structure_name) | trimws(structure_name) == "",
-        NA_character_,
-        trimws(structure_name)
-      ),
-      .lk_tag = tidytable::if_else(
-        is.na(structure_tag) | trimws(structure_tag) == "",
-        NA_character_,
-        trimws(structure_tag)
-      ),
-      .lk_xlogp = tidytable::if_else(
-        is.na(structure_xlogp) | trimws(structure_xlogp) == "",
-        NA_character_,
-        structure_xlogp
-      )
-    ) |>
-    tidytable::select(
-      candidate_structure_inchikey_no_stereo,
-      .lk_name,
-      .lk_tag,
-      .lk_xlogp
-    )
-
-  multi_nam <- nam_base |>
-    tidytable::filter(.n_grp > 1L) |>
-    tidytable::select(-.n_grp)
-
-  out <- if (nrow(multi_nam) > 0L) {
-    multi_nam <- multi_nam |>
       tidytable::summarize(
         .lk_name = .collapse_harmonized_names(structure_name),
         .lk_tag = .collapse_unique_non_empty(structure_tag),
@@ -1029,9 +1046,6 @@ complement_metadata_structures <- function(
   } else {
     singletons_nam
   }
-
-  rm(nam_base, singletons_nam, multi_nam)
-  out
 }
 
 
@@ -1081,19 +1095,23 @@ complement_metadata_structures <- function(
 
 
 .normalize_enrichment_text <- function(x) {
+  n <- length(x)
+  if (n == 0L) {
+    return(character(0))
+  }
+  if (n > 1024L) {
+    ux <- unique(x)
+    if (length(ux) * 2L < n) {
+      unorm <- .normalize_enrichment_text(ux)
+      return(unorm[fastmatch::fmatch(x, ux)])
+    }
+  }
   vals <- as.character(x)
   trimmed <- trimws(vals)
   low <- tolower(trimmed)
   invalid <- is.na(vals) |
-    trimmed == "" |
+    !nzchar(trimmed) |
     low %in% c("na", "n/a", "null", "notclassified", "empty")
   vals[invalid] <- NA_character_
   vals
-}
-
-.pick_enrichment <- function(enriched, existing) {
-  tidytable::coalesce(
-    .normalize_enrichment_text(enriched),
-    .normalize_enrichment_text(existing)
-  )
 }

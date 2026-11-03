@@ -72,10 +72,21 @@ round_reals <- function(
   }
 
   # Apply Rounding ----
+  .round_col <- function(x) {
+    if (length(x) > 1024L && is.character(x)) {
+      ux <- unique(x)
+      if (length(ux) * 2L < length(x)) {
+        rux <- round(as.numeric(ux), digits = dig)
+        return(rux[fastmatch::fmatch(x, ux)])
+      }
+    }
+    round(as.numeric(x), digits = dig)
+  }
+
   df |>
     tidytable::mutate(tidytable::across(
       .cols = tidyselect::any_of(x = matching_cols),
-      .fns = ~ round(as.numeric(.x), digits = dig)
+      .fns = .round_col
     ))
 }
 

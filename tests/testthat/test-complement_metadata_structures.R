@@ -730,3 +730,25 @@ test_that("complement_metadata_structures does not fan out rows when lookup inpu
   expect_true(all(out$candidate_structure_molecular_formula == "C2H6O"))
   expect_true(all(out$candidate_structure_name == "ethanol"))
 })
+
+test_that(".normalize_enrichment_text normalizes sentinels on both small and large (>1024) vectors", {
+  small <- c(
+    "alpha",
+    " N/A ",
+    "null",
+    "notClassified",
+    "empty",
+    "",
+    NA_character_
+  )
+  expect_equal(
+    .normalize_enrichment_text(small),
+    c("alpha", rep(NA_character_, 6L))
+  )
+
+  large <- rep(small, length.out = 2048L)
+  expect_equal(
+    .normalize_enrichment_text(large),
+    rep(c("alpha", rep(NA_character_, 6L)), length.out = 2048L)
+  )
+})

@@ -168,30 +168,32 @@ prepare_annotations_spectra <- function(
     "candidate_count_similarity_peaks_matched"
   )
 
-  table <- purrr::map(
-    .x = input,
-    .f = function(file) {
+  chunks <- lapply(
+    X = input,
+    FUN = function(file) {
       prepare_spectral_annotation_chunk(
         file = file,
         annotation_cols = annotation_cols
       )
     }
-  ) |>
-    tidytable::bind_rows() |>
-    tidytable::distinct(
-      tidyselect::all_of(annotation_cols)
-    ) |>
-    ## Add new columns
-    tidytable::mutate(
-      candidate_structure_tax_npc_01pat = NA_character_,
-      candidate_structure_tax_npc_02sup = NA_character_,
-      candidate_structure_tax_npc_03cla = NA_character_,
-      candidate_structure_tax_cla_chemontid = NA_character_,
-      candidate_structure_tax_cla_01kin = NA_character_,
-      candidate_structure_tax_cla_02sup = NA_character_,
-      candidate_structure_tax_cla_03cla = NA_character_,
-      candidate_structure_tax_cla_04dirpar = NA_character_
-    ) |>
+  )
+  non_empty_chunks <- chunks[vapply(chunks, nrow, integer(1)) > 0L]
+  rm(chunks)
+
+  if (length(non_empty_chunks) == 0L) {
+    table <- prepare_spectral_annotation_chunk(
+      file = input[[1L]],
+      annotation_cols = annotation_cols
+    )
+  } else if (length(non_empty_chunks) == 1L) {
+    table <- non_empty_chunks[[1L]]
+  } else {
+    table <- tidytable::bind_rows(non_empty_chunks) |>
+      tidytable::distinct(tidyselect::all_of(annotation_cols))
+  }
+  rm(non_empty_chunks)
+
+  table <- table |>
     select_annotations_columns(
       str_stereo = str_stereo,
       str_met = str_met,
@@ -211,8 +213,9 @@ prepare_annotations_spectra <- function(
 }
 
 prepare_spectral_annotation_chunk <- function(file, annotation_cols) {
-  selected_cols <- names(tidytable::fread(
+  selected_cols <- names(safe_fread(
     file = file,
+    file_type = "spectral annotations",
     nrows = 0L,
     showProgress = FALSE
   ))

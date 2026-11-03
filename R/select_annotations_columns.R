@@ -100,25 +100,39 @@ select_annotations_columns <- function(
   projection_columns <- .annotation_projection_columns(model)
 
   # Select relevant columns
-  df <- df |>
+  df <- tidytable::as_tidytable(df) |>
     tidytable::select(
       tidyselect::any_of(x = projection_columns)
     )
 
   # Normalize adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
   if ("candidate_adduct" %in% names(df)) {
-    df[["candidate_adduct"]] <- gsub("\\s+", "", df[["candidate_adduct"]])
+    adducts_vec <- df[["candidate_adduct"]]
+    if (length(adducts_vec) > 1024L) {
+      u_add <- unique(adducts_vec)
+      u_add_clean <- gsub("\\s+", "", u_add)
+      data.table::set(
+        df,
+        j = "candidate_adduct",
+        value = u_add_clean[fastmatch::fmatch(adducts_vec, u_add)]
+      )
+    } else {
+      data.table::set(
+        df,
+        j = "candidate_adduct",
+        value = gsub("\\s+", "", adducts_vec)
+      )
+    }
   }
 
-  # Clean NULL/NA sentinels in one pass while preserving current output
-  # semantics.
+  # Clean NULL/NA sentinels in-place while preserving output semantics.
   character_cols <- names(df)[vapply(df, is.character, logical(1L))]
-  if (length(character_cols) > 0L) {
-    df <- df |>
-      tidytable::mutate(tidytable::across(
-        .cols = tidyselect::all_of(x = character_cols),
-        .fns = .normalize_annotation_text
-      ))
+  for (col in character_cols) {
+    data.table::set(
+      df,
+      j = col,
+      value = .normalize_annotation_text(df[[col]])
+    )
   }
 
   # Recompute all structure properties from SMILES ----
@@ -133,14 +147,25 @@ select_annotations_columns <- function(
     log_info("Skipping RDKit SMILES recomputation (recompute_smiles=FALSE)")
   }
 
-  df <- df |>
-    # Round numeric values
-    round_reals() |>
-    # Convert all numeric to character for consistency
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(fn = is.numeric),
-      .fns = as.character
-    ))
+  .num_to_char_fast <- function(x) {
+    if (length(x) > 1024L) {
+      ux <- unique(x)
+      if (length(ux) * 2L < length(x)) {
+        cux <- as.character(ux)
+        return(cux[fastmatch::fmatch(x, ux)])
+      }
+    }
+    as.character(x)
+  }
+
+  # Round numeric values in-place
+  df <- round_reals(df)
+
+  # Convert all numeric columns to character in-place
+  numeric_cols <- names(df)[vapply(df, is.numeric, logical(1L))]
+  for (col in numeric_cols) {
+    data.table::set(df, j = col, value = .num_to_char_fast(df[[col]]))
+  }
 
   df_complement <- complement_metadata_structures(
     df = select_annotations_complement_working_columns(df),
@@ -150,7 +175,7 @@ select_annotations_columns <- function(
     str_tax_npc = str_tax_npc
   )
   for (col in names(df_complement)) {
-    df[[col]] <- df_complement[[col]]
+    data.table::set(df, j = col, value = df_complement[[col]])
   }
 
   df <- df |>
@@ -162,6 +187,17 @@ select_annotations_columns <- function(
 }
 
 .normalize_annotation_text <- function(x) {
+  if (length(x) == 0L) {
+    return(x)
+  }
+  if (length(x) > 1024L) {
+    ux <- unique(x)
+    if (length(ux) * 2L < length(x)) {
+      vals <- trimws(ux)
+      vals[vals %in% c("N/A", "null", "")] <- NA_character_
+      return(vals[fastmatch::fmatch(x, ux)])
+    }
+  }
   vals <- trimws(x)
   vals[vals %in% c("N/A", "null", "")] <- NA_character_
   vals
@@ -221,13 +257,13 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
     return(df)
   }
 
-  has_smiles <- !is.na(df[[smiles_col]]) & nzchar(trimws(df[[smiles_col]]))
-  if (!any(has_smiles)) {
+  smiles_vec <- as.character(df[[smiles_col]])
+  unique_smiles <- unique(smiles_vec[!is.na(smiles_vec)])
+  unique_smiles <- unique_smiles[nzchar(trimws(unique_smiles))]
+  if (length(unique_smiles) == 0L) {
     return(df)
   }
 
-  # Build a small table of unique SMILES to process
-  unique_smiles <- unique(df[[smiles_col]][has_smiles])
   smiles_df <- tidytable::tidytable(
     structure_smiles_initial = unique_smiles
   )
@@ -268,6 +304,7 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
     tidytable::distinct(.input_smiles, .keep_all = TRUE)
 
   # Ensure target columns exist before overwrite/coalesce.
+  df <- tidytable::as_tidytable(df)
   ensure_cols <- c(
     "candidate_structure_inchikey_connectivity_layer",
     "candidate_structure_inchikey_no_stereo",
@@ -275,36 +312,68 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
     "candidate_structure_exact_mass",
     "candidate_structure_xlogp"
   )
+  n_rows <- nrow(df)
   for (col in ensure_cols) {
     if (!col %in% names(df)) {
-      df[[col]] <- NA_character_
+      data.table::set(df, j = col, value = rep.int(NA_character_, n_rows))
     }
   }
 
-  idx <- match(as.character(df[[smiles_col]]), lookup$.input_smiles)
+  idx <- fastmatch::fmatch(smiles_vec, lookup$.input_smiles)
 
-  recomputed_smiles <- lookup$.recomputed_smiles_no_stereo[idx]
-  recomputed_ik_conn <- lookup$.recomputed_inchikey_connectivity_layer[idx]
-  recomputed_ik_no_stereo <- lookup$.recomputed_inchikey_no_stereo[idx]
-  recomputed_formula <- lookup$.recomputed_molecular_formula[idx]
-  recomputed_exact_mass <- lookup$.recomputed_exact_mass[idx]
-  recomputed_xlogp <- lookup$.recomputed_xlogp[idx]
+  .coalesce_recomputed <- function(recomputed, existing) {
+    if (!anyNA(recomputed)) {
+      return(recomputed)
+    }
+    if (all(is.na(existing))) {
+      return(recomputed)
+    }
+    na_rec <- is.na(recomputed)
+    if (any(na_rec)) {
+      recomputed[na_rec] <- existing[na_rec]
+    }
+    recomputed
+  }
 
-  df$candidate_structure_smiles_no_stereo <- tidytable::coalesce(
-    recomputed_smiles,
-    df$candidate_structure_smiles_no_stereo
+  data.table::set(
+    df,
+    j = "candidate_structure_smiles_no_stereo",
+    value = .coalesce_recomputed(
+      lookup$.recomputed_smiles_no_stereo[idx],
+      df$candidate_structure_smiles_no_stereo
+    )
   )
-  df$candidate_structure_inchikey_connectivity_layer <- tidytable::coalesce(
-    recomputed_ik_conn,
-    df$candidate_structure_inchikey_connectivity_layer
+  data.table::set(
+    df,
+    j = "candidate_structure_inchikey_connectivity_layer",
+    value = .coalesce_recomputed(
+      lookup$.recomputed_inchikey_connectivity_layer[idx],
+      df$candidate_structure_inchikey_connectivity_layer
+    )
   )
-  df$candidate_structure_inchikey_no_stereo <- tidytable::coalesce(
-    recomputed_ik_no_stereo,
-    df$candidate_structure_inchikey_no_stereo
+  data.table::set(
+    df,
+    j = "candidate_structure_inchikey_no_stereo",
+    value = .coalesce_recomputed(
+      lookup$.recomputed_inchikey_no_stereo[idx],
+      df$candidate_structure_inchikey_no_stereo
+    )
   )
-  df$candidate_structure_molecular_formula <- recomputed_formula
-  df$candidate_structure_exact_mass <- recomputed_exact_mass
-  df$candidate_structure_xlogp <- recomputed_xlogp
+  data.table::set(
+    df,
+    j = "candidate_structure_molecular_formula",
+    value = lookup$.recomputed_molecular_formula[idx]
+  )
+  data.table::set(
+    df,
+    j = "candidate_structure_exact_mass",
+    value = lookup$.recomputed_exact_mass[idx]
+  )
+  data.table::set(
+    df,
+    j = "candidate_structure_xlogp",
+    value = lookup$.recomputed_xlogp[idx]
+  )
 
   rm(
     processed,
@@ -312,12 +381,6 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
     smiles_df,
     lookup,
     idx,
-    recomputed_smiles,
-    recomputed_ik_conn,
-    recomputed_ik_no_stereo,
-    recomputed_formula,
-    recomputed_exact_mass,
-    recomputed_xlogp,
     ensure_cols,
     smiles_col
   )
