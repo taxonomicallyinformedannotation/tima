@@ -181,21 +181,36 @@ compute_feature_adduct_support <- function(df_add, covariance_edges = NULL) {
     )
   }
 
-  # Covariance pairs are unordered
+  # Covariance pairs are unordered; pre-filter covariance_edges to features in
+  # `neighbors` so we don't paste/hash tens of thousands of unrelated pairs.
+  u_feat <- unique(c(neighbors$feature_id, neighbors$neighbor))
+  cov_keep <- !is.na(fastmatch::fmatch(covariance_edges$feature_id, u_feat)) &
+    !is.na(fastmatch::fmatch(covariance_edges$feature_id_dest, u_feat))
+  if (!any(cov_keep)) {
+    return(
+      neighbors |>
+        tidytable::count(feature_id, adduct, name = "adduct_support") |>
+        tidytable::mutate(adduct_support = as.integer(adduct_support))
+    )
+  }
+
   .pair_key <- function(a, b) {
     a <- as.character(a)
     b <- as.character(b)
     paste(pmin(a, b), pmax(a, b), sep = "\r")
   }
+  cov_sub <- covariance_edges[which(cov_keep), , drop = FALSE]
   covarying <- unique(.pair_key(
-    covariance_edges$feature_id,
-    covariance_edges$feature_id_dest
+    cov_sub$feature_id,
+    cov_sub$feature_id_dest
   ))
 
   neighbors |>
     tidytable::mutate(
       .weight = 1L +
-        as.integer(.pair_key(feature_id, neighbor) %in% covarying)
+        as.integer(
+          !is.na(fastmatch::fmatch(.pair_key(feature_id, neighbor), covarying))
+        )
     ) |>
     tidytable::summarize(
       adduct_support = as.integer(sum(.weight)),

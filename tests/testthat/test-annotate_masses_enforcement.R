@@ -213,3 +213,33 @@ test_that("propagate_annotations_across_m_cliques only propagates to adduct-comp
   # F2 has no [M+NH4]+ hypothesis, so no propagated row should be created.
   expect_false(any(out$feature_id == "F2"))
 })
+
+test_that("enforce_loss_formula_compatibility large-table path (>10k rows) collapses demoted isomers accurately", {
+  n_rows <- 10050L
+  ann <- tidytable::tidytable(
+    feature_id = c("F_loss", "F_loss", sprintf("F%05d", seq_len(n_rows - 2L))),
+    adduct = c("[M-H2O+H]+", "[M-H2O+H]+", rep("[M+H]+", n_rows - 2L)),
+    source = c("loss", "loss", rep("baseline", n_rows - 2L)),
+    loss_term = c("H2O", "H2O", rep(NA_character_, n_rows - 2L)),
+    candidate_structure_error_mz = rep(0.001, n_rows),
+    candidate_structure_molecular_formula = c(
+      "C10H12N2",
+      "C12H14N2",
+      rep("C15H20O4", n_rows - 2L)
+    ),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_BAD_1",
+      "IK_BAD_2",
+      sprintf("IK_%05d", seq_len(n_rows - 2L))
+    )
+  )
+
+  res <- enforce_loss_formula_compatibility(ann)
+  # The two F_loss isomer rows both lack Oxygen for H2O loss, so both are demoted
+  # to NA structure fields and collapsed into a single unmatched row.
+  expect_identical(nrow(res), n_rows - 1L)
+  f_loss_rows <- res[res$feature_id == "F_loss", ]
+  expect_identical(nrow(f_loss_rows), 1L)
+  expect_true(is.na(f_loss_rows$candidate_structure_error_mz))
+  expect_true(is.na(f_loss_rows$candidate_structure_molecular_formula))
+})

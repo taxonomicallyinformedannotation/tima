@@ -341,3 +341,82 @@ test_that("each candidate matches every library mass within tolerance", {
   expect_false(any(matched$is_preassigned))
   expect_true(all(matched$candidate_adduct_origin == "supported"))
 })
+
+test_that(".fast_group_median matches stats::ave median across odd, even, and singleton groups", {
+  expect_identical(
+    .fast_group_median(numeric(0), character(0)),
+    list(groups = character(), medians = numeric(), per_obs = numeric())
+  )
+
+  vals <- c(10.0, 20.0, 30.0, 4.0, 8.0, 99.0, 2.0, 6.0, 10.0, 14.0)
+  grps <- c(
+    "G_odd",
+    "G_odd",
+    "G_odd",
+    "G_even2",
+    "G_even2",
+    "G_single",
+    "G_even4",
+    "G_even4",
+    "G_even4",
+    "G_even4"
+  )
+
+  res <- .fast_group_median(vals, grps)
+  expected_per_obs <- stats::ave(vals, grps, FUN = stats::median)
+  expect_equal(res$per_obs, expected_per_obs)
+  expect_equal(
+    stats::setNames(res$medians, res$groups)[c(
+      "G_odd",
+      "G_even2",
+      "G_single",
+      "G_even4"
+    )],
+    c(G_odd = 20.0, G_even2 = 6.0, G_single = 99.0, G_even4 = 8.0)
+  )
+})
+
+test_that(".simplify_adduct_after_modifier deduplicates repeated strings and preserves NAs", {
+  inp <- c(
+    "[M+CH2O2+Na-H2]-",
+    NA_character_,
+    "",
+    "[M+CH2O2+Na-H2]-",
+    "[M-H2O+H]+",
+    "[M+H4N-H3N]+"
+  )
+  out <- .simplify_adduct_after_modifier(inp)
+  expect_length(out, length(inp))
+  expect_true(is.na(out[[2L]]))
+  expect_identical(out[[3L]], "")
+  expect_identical(out[[1L]], out[[4L]])
+  expect_identical(out[[5L]], "[M-H2O+H]+")
+  expect_identical(out[[6L]], "[M-H3N+H4N]+")
+})
+
+test_that("prune_candidates_by_network_consensus drops unsupported candidates and multi hits when alternatives exist", {
+  matched <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F2", "F3"),
+    adduct = c("[M+H]+", "[M+K]+", "[M+Na]+", "[2M+Fe]2+", "[2M+Fe]2+"),
+    source = c("pair", "pair", "loss", "multi", "multi"),
+    structure_exact_mass = c(200, 200, 300, 300, 400),
+    error_mz = rep(0.001, 5L)
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M+H]+",
+    feature_id_dest = "F9",
+    adduct_dest = "[M+Na]+"
+  )
+  pruned <- prune_candidates_by_network_consensus(
+    matched = matched,
+    adduct_edges = adduct_edges,
+    baseline_adduct = NULL
+  )
+  # F1: [M+H]+ has edge support, [M+K]+ has 0 support -> [M+K]+ dropped
+  expect_identical(pruned$adduct[pruned$feature_id == "F1"], "[M+H]+")
+  # F2: no edge support, but has non-multi ("loss") so speculative "multi" [2M+Fe]2+ is dropped
+  expect_identical(pruned$adduct[pruned$feature_id == "F2"], "[M+Na]+")
+  # F3: sole candidate is kept
+  expect_identical(pruned$adduct[pruned$feature_id == "F3"], "[2M+Fe]2+")
+})

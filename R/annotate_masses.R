@@ -2219,7 +2219,16 @@ resolve_competing_cluster_loss_edges_by_hypotheses <- function(
     ))
   }
 
-  hyp_by_feature <- split(hyp_min, hyp_min$feature_id)
+  ambig_feats <- unique(c(
+    ambiguous_pairs$feature_id,
+    ambiguous_pairs$feature_id_dest
+  ))
+  hyp_sub <- hyp_min[
+    which(!is.na(fastmatch::fmatch(hyp_min$feature_id, ambig_feats))),
+    ,
+    drop = FALSE
+  ]
+  hyp_by_feature <- split(hyp_sub, hyp_sub$feature_id)
   decisions <- lapply(seq_len(nrow(ambiguous_pairs)), function(i) {
     pair_i <- ambiguous_pairs[i, ]
     src_id <- pair_i$feature_id[[1L]]
@@ -2522,15 +2531,57 @@ build_annotate_masses_annotations <- function(
       baseline_adduct = baseline_adduct
     )
 
-  unmatched <- node_hypotheses |>
-    tidytable::anti_join(
-      matched |> tidytable::distinct(feature_id, adduct),
-      by = c("feature_id", "adduct")
-    ) |>
-    tidytable::mutate(
-      structure_exact_mass = NA_real_,
-      error_mz = NA_real_
+  unmatched <- if (nrow(matched) == 0L) {
+    unm <- tidytable::as_tidytable(node_hypotheses)
+    unm$structure_exact_mass <- rep(NA_real_, nrow(unm))
+    unm$error_mz <- rep(NA_real_, nrow(unm))
+    unm
+  } else {
+    u_f <- unique(c(node_hypotheses$feature_id, matched$feature_id))
+    u_a <- unique(c(node_hypotheses$adduct, matched$adduct))
+    n_a <- max(1L, length(u_a))
+    if (as.numeric(length(u_f)) * as.numeric(n_a) < 2e9) {
+      f_h <- if (anyNA(u_f)) {
+        match(node_hypotheses$feature_id, u_f)
+      } else {
+        fastmatch::fmatch(node_hypotheses$feature_id, u_f)
+      }
+      a_h <- if (anyNA(u_a)) {
+        match(node_hypotheses$adduct, u_a)
+      } else {
+        fastmatch::fmatch(node_hypotheses$adduct, u_a)
+      }
+      f_m <- if (anyNA(u_f)) {
+        match(matched$feature_id, u_f)
+      } else {
+        fastmatch::fmatch(matched$feature_id, u_f)
+      }
+      a_m <- if (anyNA(u_a)) {
+        match(matched$adduct, u_a)
+      } else {
+        fastmatch::fmatch(matched$adduct, u_a)
+      }
+      key_h <- (f_h - 1L) * n_a + a_h
+      key_m <- (f_m - 1L) * n_a + a_m
+      has_m <- logical(length(u_f) * n_a)
+      has_m[key_m] <- TRUE
+      unm_idx <- which(!has_m[key_h])
+    } else {
+      key_h <- paste(
+        node_hypotheses$feature_id,
+        node_hypotheses$adduct,
+        sep = "\r"
+      )
+      key_m <- unique(paste(matched$feature_id, matched$adduct, sep = "\r"))
+      unm_idx <- which(is.na(fastmatch::fmatch(key_h, key_m)))
+    }
+    unm <- tidytable::as_tidytable(
+      lapply(as.list(node_hypotheses), `[`, unm_idx)
     )
+    unm$structure_exact_mass <- rep(NA_real_, length(unm_idx))
+    unm$error_mz <- rep(NA_real_, length(unm_idx))
+    unm
+  }
 
   annotations <- tidytable::bind_rows(matched, unmatched) |>
     enrich_with_structure_metadata(structure_table = structure_table)

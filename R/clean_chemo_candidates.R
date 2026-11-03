@@ -107,15 +107,8 @@
     return(rep(FALSE, nrow(df_tied)))
   }
 
-  # Use rounded mass key to limit join cardinality, then refine with exact tolerance check
-  row_df$row_mass_key <- round(row_df$row_mass, NEUTRAL_MASS_GROUP_DECIMALS)
-  anchor_df$anchor_mass_key <- round(
-    anchor_df$anchor_mass,
-    NEUTRAL_MASS_GROUP_DECIMALS
-  )
-
-  # MEMORY OPT: Pre-filter anchor table by mass ranges to reduce merge cardinality.
-  # This prevents Cartesian product explosion when many rows share same InChIKey.
+  # MEMORY OPT: Pre-filter anchor table by mass ranges and shared InChIKeys to
+  # reduce merge cardinality and avoid copying uninvolved tied rows.
   min_row_mass <- min(row_df$row_mass, na.rm = TRUE)
   max_row_mass <- max(row_df$row_mass, na.rm = TRUE)
   anchor_df_filtered <- anchor_df[
@@ -129,9 +122,38 @@
     return(rep(FALSE, nrow(df_tied)))
   }
 
-  # Perform join on IK first (low cardinality), then refine by mass/RT.
-  # Matching on the rounded mass key can miss near-tolerance matches due to
-  # different rounding; match by IK and filter by mass tolerance below.
+  u_anchor_ik <- unique(anchor_df_filtered$anchor_IK)
+  row_in_anchor <- !is.na(fastmatch::fmatch(row_df$row_IK, u_anchor_ik))
+  if (!any(row_in_anchor)) {
+    return(rep(FALSE, nrow(df_tied)))
+  }
+  row_df <- row_df[which(row_in_anchor), , drop = FALSE]
+
+  u_row_ik <- unique(row_df$row_IK)
+  anchor_df_filtered <- anchor_df_filtered[
+    which(!is.na(fastmatch::fmatch(anchor_df_filtered$anchor_IK, u_row_ik))),
+    ,
+    drop = FALSE
+  ]
+
+  if (anyDuplicated(anchor_df_filtered$anchor_IK) == 0L) {
+    m_ik <- fastmatch::fmatch(row_df$row_IK, anchor_df_filtered$anchor_IK)
+    a_mass <- anchor_df_filtered$anchor_mass[m_ik]
+    a_fid <- anchor_df_filtered$anchor_fid[m_ik]
+    a_rt <- anchor_df_filtered$anchor_rt[m_ik]
+    valid_m <- abs(row_df$row_mass - a_mass) <= tol & row_df$row_fid != a_fid
+    if (has_rt_feature_col) {
+      valid_m <- valid_m &
+        (is.na(a_rt) |
+          (!is.na(row_df$row_rt) & abs(a_rt - row_df$row_rt) <= rt_tol))
+    }
+    matched_row_ids <- unique(row_df$row_id[valid_m])
+    out <- rep(FALSE, nrow(df_tied))
+    out[matched_row_ids] <- TRUE
+    return(out)
+  }
+
+  # Perform join on IK when multiple anchors share the same InChIKey
   merged <- merge(
     row_df,
     anchor_df_filtered,
@@ -316,25 +338,38 @@ sample_candidates_per_group <- function(
 
       has_consensus_flag <- "cluster_consensus_promoted_from_anchor" %in%
         names(df)
-      df_anchor_kept <- df |>
-        tidytable::filter(.anchor_match) |>
-        tidytable::arrange(
-          feature_id,
-          rank_final,
-          tidytable::desc(score_weighted_chemo),
-          tidytable::desc(candidate_score_pseudo_initial)
-        ) |>
-        tidytable::mutate(
-          cluster_consensus_promoted_from_anchor = if (has_consensus_flag) {
-            cluster_consensus_promoted_from_anchor
-          } else {
-            FALSE
-          },
-          annotation_note = paste0(
+      df_anchor_kept <- df[which(df$.anchor_match), , drop = FALSE]
+      if (nrow(df_anchor_kept) > 0L) {
+        ord_ak <- list(df_anchor_kept$feature_id, df_anchor_kept$rank_final)
+        if ("score_weighted_chemo" %in% names(df_anchor_kept)) {
+          ord_ak[[length(ord_ak) + 1L]] <- -as.numeric(
+            df_anchor_kept$score_weighted_chemo
+          )
+        }
+        if ("candidate_score_pseudo_initial" %in% names(df_anchor_kept)) {
+          ord_ak[[length(ord_ak) + 1L]] <- -as.numeric(
+            df_anchor_kept$candidate_score_pseudo_initial
+          )
+        }
+        ak_idx <- do.call(
+          order,
+          c(ord_ak, list(na.last = TRUE, method = "radix"))
+        )
+        df_anchor_kept <- df_anchor_kept[ak_idx, , drop = FALSE]
+        if (!has_consensus_flag) {
+          df_anchor_kept$cluster_consensus_promoted_from_anchor <- rep(
+            FALSE,
+            nrow(df_anchor_kept)
+          )
+        }
+        df_anchor_kept$annotation_note <- rep(
+          paste0(
             "Kept candidate matching best-supported InChIKey from sibling ",
             "feature with same neutral mass (different adduct)"
-          )
+          ),
+          nrow(df_anchor_kept)
         )
+      }
     }
   }
 
@@ -367,57 +402,33 @@ sample_candidates_per_group <- function(
     df_remaining <- df
   }
 
-  # Count how many distinct tied groups require sampling
-  n_sampled_features <- df_remaining |>
-    tidytable::filter(.n_per_score > max_per_score) |>
-    tidytable::distinct(feature_id) |>
-    nrow()
+  # Count how many distinct tied groups require sampling and partition directly
+  # by integer row indices to avoid materializing `.partition` and 3x filter() copies.
+  n_ps <- df_remaining$.n_per_score
+  idx_sample <- which(n_ps > max_per_score)
+  n_sampled_features <- if (length(idx_sample) > 0L) {
+    length(unique(df_remaining$feature_id[idx_sample]))
+  } else {
+    0L
+  }
 
   has_rt_col <- "candidate_structure_error_rt" %in% names(df_remaining)
 
-  # Partition into: untied (single candidate per score), small tied groups (<=max), and large tied groups (>max)
-  # OPTIMIZATION: Use single pass with categorical column to avoid 3x filter() copies
-  df_remaining <- df_remaining |>
-    tidytable::mutate(
-      .partition = tidytable::case_when(
-        .n_per_score == 1L ~ "untied",
-        .n_per_score > 1L & .n_per_score <= max_per_score ~ "keep",
-        .n_per_score > max_per_score ~ "sample"
-      )
-    )
-
-  df_untied <- df_remaining |>
-    tidytable::filter(.partition == "untied") |>
-    tidytable::select(-.partition) |>
-    tidytable::as_tidytable()
-
-  df_keep_remaining <- df_remaining |>
-    tidytable::filter(.partition == "keep") |>
-    tidytable::select(-.partition) |>
-    tidytable::as_tidytable()
-
-  df_needs_sampling <- df_remaining |>
-    tidytable::filter(.partition == "sample") |>
-    tidytable::select(-.partition) |>
-    tidytable::as_tidytable()
+  df_untied <- df_remaining[which(n_ps == 1L), , drop = FALSE]
+  df_keep_remaining <- df_remaining[
+    which(n_ps > 1L & n_ps <= max_per_score),
+    ,
+    drop = FALSE
+  ]
+  df_needs_sampling <- df_remaining[idx_sample, , drop = FALSE]
 
   # Sample only within each tied score group (feature_id, candidate_adduct, rank_final)
   if (nrow(df_needs_sampling) > 0L) {
     if (has_rt_col) {
-      df_needs_sampling <- df_needs_sampling |>
-        tidytable::mutate(.rt_priority = !is.na(candidate_structure_error_rt))
+      df_needs_sampling$.rt_priority <- !is.na(
+        df_needs_sampling$candidate_structure_error_rt
+      )
     }
-
-    # Preserve the original tied-group sizes for annotation notes
-    group_sizes <- df_remaining |>
-      tidytable::distinct(
-        feature_id,
-        candidate_adduct,
-        rank_final,
-        .n_per_score
-      ) |>
-      tidytable::mutate(n_per_score = .n_per_score) |>
-      tidytable::select(-.n_per_score)
 
     # Use direct ordering without creating temporary columns to reduce copies
     df_ns <- df_needs_sampling
@@ -469,40 +480,51 @@ sample_candidates_per_group <- function(
     ord <- do.call(order, c(ord_list, list(na.last = TRUE, method = "radix")))
     df_ns <- df_ns[ord, , drop = FALSE]
 
-    # Keep top `max_per_score` within each tied score group (feature_id, candidate_adduct, rank_final)
-    # OPTIMIZATION: Use paste0() on columns directly instead of
-    # do.call(paste, c(as.data.frame(.tbl)[core_cols], sep=...)) which creates
-    # a full as.data.frame() copy per call. paste0() on vectors avoids that copy.
-    group_key <- paste0(
-      df_ns$feature_id,
-      "\u001f",
-      df_ns$candidate_adduct,
-      "\u001f",
-      df_ns$rank_final
-    )
-    seq_in_group <- seq_along(group_key)
-    group_id <- match(group_key, unique(group_key))
-    seq_in_group <- stats::ave(seq_in_group, group_id, FUN = seq_along)
-    df_sampled <- df_ns[seq_in_group <= max_per_score, , drop = FALSE]
-
-    # Ensure tidytable result
-    df_sampled <- tidytable::as_tidytable(df_sampled)
-
-    # Annotate sampling notes using the original group size
-    df_sampled <- df_sampled |>
-      tidytable::left_join(
-        y = group_sizes,
-        by = c("feature_id", "candidate_adduct", "rank_final")
-      ) |>
-      tidytable::mutate(
-        annotation_note = paste0(
-          "Sampled ",
-          max_per_score,
-          " of ",
-          .n_per_score,
-          " tied candidates"
-        )
+    # Since df_ns is sorted by (feature_id, candidate_adduct, rank_final),
+    # each tied group is a contiguous run. Compute within-group sequence in O(N)
+    # without paste0() or stats::ave().
+    n_ns <- nrow(df_ns)
+    f_ns <- if (anyNA(u_fids)) {
+      match(df_ns$feature_id, u_fids)
+    } else {
+      fastmatch::fmatch(df_ns$feature_id, u_fids)
+    }
+    a_ns <- if ("candidate_adduct" %in% names(df_ns)) {
+      if (anyNA(u_adds)) {
+        match(df_ns$candidate_adduct, u_adds)
+      } else {
+        fastmatch::fmatch(df_ns$candidate_adduct, u_adds)
+      }
+    } else {
+      rep.int(1L, n_ns)
+    }
+    r_ns <- if (anyNA(u_rks)) {
+      match(df_ns$rank_final, u_rks)
+    } else {
+      fastmatch::fmatch(df_ns$rank_final, u_rks)
+    }
+    is_new_grp <- if (n_ns > 1L) {
+      c(
+        TRUE,
+        f_ns[-1L] != f_ns[-n_ns] |
+          a_ns[-1L] != a_ns[-n_ns] |
+          r_ns[-1L] != r_ns[-n_ns]
       )
+    } else {
+      TRUE
+    }
+    idx_ns <- seq_len(n_ns)
+    seq_in_group <- idx_ns - cummax(ifelse(is_new_grp, idx_ns, 1L)) + 1L
+    df_sampled <- tidytable::as_tidytable(
+      df_ns[which(seq_in_group <= max_per_score), , drop = FALSE]
+    )
+    df_sampled$annotation_note <- paste0(
+      "Sampled ",
+      max_per_score,
+      " of ",
+      df_sampled$.n_per_score,
+      " tied candidates"
+    )
   } else {
     df_sampled <- tidytable::tidytable()
   }
@@ -614,23 +636,32 @@ sample_candidates_per_group <- function(
 
   annotation_notes_lookup <- tidytable::tidytable()
   if ("annotation_note" %in% names(df_result)) {
-    annotation_notes_lookup <- df_result |>
-      tidytable::filter(!is.na(annotation_note)) |>
-      tidytable::distinct(
-        feature_id,
-        candidate_adduct,
-        candidate_structure_inchikey_connectivity_layer,
-        annotation_note
-      ) |>
-      tidytable::group_by(
-        feature_id,
-        candidate_adduct,
-        candidate_structure_inchikey_connectivity_layer
-      ) |>
-      tidytable::summarize(
-        annotation_note = paste(unique(annotation_note), collapse = " | "),
-        .groups = "drop"
+    has_note_idx <- which(!is.na(df_result$annotation_note))
+    if (length(has_note_idx) > 0L) {
+      note_cols <- intersect(
+        c(
+          "feature_id",
+          "candidate_adduct",
+          "candidate_structure_inchikey_connectivity_layer",
+          "annotation_note"
+        ),
+        names(df_result)
       )
+      notes_sub <- tidytable::as_tidytable(
+        lapply(as.list(df_result)[note_cols], `[`, has_note_idx)
+      ) |>
+        tidytable::distinct()
+      key_cols_n <- setdiff(note_cols, "annotation_note")
+      if (anyDuplicated(as.data.frame(as.list(notes_sub)[key_cols_n])) == 0L) {
+        annotation_notes_lookup <- notes_sub
+      } else {
+        annotation_notes_lookup <- notes_sub |>
+          tidytable::summarize(
+            annotation_note = paste(unique(annotation_note), collapse = " | "),
+            .by = tidyselect::all_of(key_cols_n)
+          )
+      }
+    }
 
     df_result <- df_result |>
       tidytable::select(-tidyselect::any_of("annotation_note"))
@@ -1494,37 +1525,46 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
   }
 
   # For each (component_id, .candidate_M_key) group with rank_final == 1
-  # identify the anchor InChIKey from the best-scored feature
-  # Compute anchor per (component_id, .candidate_M_key) by choosing the best-scored rank-1 row.
-  # Use grouped slice_head to avoid global sorts where possible.
-  anchor_lookup <- df_with_comp |>
-    tidytable::filter(
-      rank_final == 1L,
-      !is.na(component_id),
-      !is.na(.candidate_M_key),
-      !is.na(candidate_structure_inchikey_connectivity_layer)
-    ) |>
-    tidytable::mutate(.score_w = as.numeric(score_weighted_chemo)) |>
-    tidytable::group_by(component_id, .candidate_M_key) |>
-    tidytable::arrange(
-      tidytable::desc(.has_ms2_evidence),
-      tidytable::desc(.score_w)
-    ) |>
-    tidytable::slice_head(n = 1L) |>
-    tidytable::ungroup() |>
-    tidytable::select(
-      component_id,
-      .candidate_M_key,
-      .anchor_feature_id = feature_id,
-      .anchor_ik = candidate_structure_inchikey_connectivity_layer
-    ) |>
-    tidytable::mutate(
+  # identify the anchor InChIKey from the best-scored feature using radix order
+  r1_idx <- which(
+    df_with_comp$rank_final == 1L &
+      !is.na(df_with_comp$component_id) &
+      !is.na(df_with_comp$.candidate_M_key) &
+      !is.na(df_with_comp$candidate_structure_inchikey_connectivity_layer)
+  )
+  if (length(r1_idx) > 0L) {
+    cand_r1 <- df_with_comp[r1_idx, , drop = FALSE]
+    ord_r1 <- order(
+      -as.integer(cand_r1$.has_ms2_evidence),
+      -as.numeric(cand_r1$score_weighted_chemo),
+      na.last = TRUE,
+      method = "radix"
+    )
+    cand_r1 <- cand_r1[ord_r1, , drop = FALSE]
+    keep_r1 <- !duplicated(paste(
+      cand_r1$component_id,
+      cand_r1$.candidate_M_key,
+      sep = "\r"
+    ))
+    cand_r1 <- cand_r1[which(keep_r1), , drop = FALSE]
+    anchor_lookup <- tidytable::tidytable(
+      component_id = cand_r1$component_id,
+      .candidate_M_key = cand_r1$.candidate_M_key,
+      .anchor_feature_id = cand_r1$feature_id,
+      .anchor_ik = cand_r1$candidate_structure_inchikey_connectivity_layer,
       cluster_consensus_group_id = paste(
-        component_id,
-        sprintf("%.*f", NEUTRAL_MASS_GROUP_DECIMALS, .candidate_M_key),
+        cand_r1$component_id,
+        sprintf(
+          "%.*f",
+          NEUTRAL_MASS_GROUP_DECIMALS,
+          cand_r1$.candidate_M_key
+        ),
         sep = "::"
       )
     )
+  } else {
+    anchor_lookup <- tidytable::tidytable()
+  }
 
   n_anchor_groups <- nrow(anchor_lookup)
 

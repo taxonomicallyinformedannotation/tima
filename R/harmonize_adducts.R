@@ -294,12 +294,10 @@ reduce_ammonium_loss_pairs <- function(net) {
     }
     idx <- match(formula, df$formula)
     if (is.na(idx)) {
-      df <- tidytable::bind_rows(
-        df,
-        tidytable::tidytable(
-          formula = formula,
-          signed_n = as.integer(delta)
-        )
+      df <- data.frame(
+        formula = c(df$formula, formula),
+        signed_n = c(df$signed_n, as.integer(delta)),
+        stringsAsFactors = FALSE
       )
     } else {
       df$signed_n[[idx]] <- as.integer(df$signed_n[[idx]] + delta)
@@ -362,10 +360,16 @@ canonicalize_adduct_notation <- local({
     "Fe",
     "Cu"
   )
+  .canon_cache <- new.env(hash = TRUE, parent = emptyenv())
 
   function(adduct) {
     if (length(adduct) == 0L || is.na(adduct) || !nzchar(adduct)) {
       return(adduct)
+    }
+
+    cached <- .canon_cache[[adduct]]
+    if (!is.null(cached)) {
+      return(cached)
     }
 
     adduct_input <- adduct
@@ -374,12 +378,14 @@ canonicalize_adduct_notation <- local({
     # Prefer explicit remediation for known unstable patterns.
     if (adduct %in% names(adducts_forbidden_translations)) {
       result <- unname(adducts_forbidden_translations[[adduct]])
+      .canon_cache[[adduct_input]] <- result
       return(result)
     }
 
     m <- regexec("^\\[(.*)\\](\\d*[+-])$", adduct, perl = TRUE)
     g <- regmatches(adduct, m)[[1L]]
     if (length(g) == 0L) {
+      .canon_cache[[adduct_input]] <- adduct
       return(adduct)
     }
 
@@ -389,6 +395,7 @@ canonicalize_adduct_notation <- local({
     # Split core (up to M/isotope part) from formula modifications.
     mod_start <- regexpr("[+-]\\d*[A-Za-z]", inner, perl = TRUE)
     if (mod_start[[1L]] == -1L) {
+      .canon_cache[[adduct_input]] <- adduct
       return(adduct)
     }
 
@@ -399,37 +406,41 @@ canonicalize_adduct_notation <- local({
     tok_matches <- gregexpr(tok_re, mods, perl = TRUE)
     tokens <- regmatches(mods, tok_matches)[[1L]]
     if (length(tokens) == 0L) {
+      .canon_cache[[adduct_input]] <- adduct
       return(adduct)
     }
 
     remainder <- gsub(tok_re, "", mods, perl = TRUE)
     if (!identical(remainder, "")) {
+      .canon_cache[[adduct_input]] <- adduct
       return(adduct)
     }
 
-    # Use C-level rbindlist (via tidytable::bind_rows) instead of base rbind
-    # to avoid O(n²) deep copies when combining parsed token data.frames
-    parsed <- do.call(
-      tidytable::bind_rows,
-      lapply(tokens, function(tok) {
-        tg <- regmatches(tok, regexec(tok_re, tok, perl = TRUE))[[1L]]
-        sign <- if (tg[[2L]] == "+") 1L else -1L
-        mult <- if (nzchar(tg[[3L]])) as.integer(tg[[3L]]) else 1L
-        data.frame(
-          formula = tg[[4L]],
-          signed_n = sign * mult,
-          stringsAsFactors = FALSE
-        )
-      })
-    )
+    signs <- ifelse(startsWith(tokens, "+"), 1L, -1L)
+    tok_body <- substring(tokens, 2L)
+    mult_str <- sub("^(\\d*).*$", "\\1", tok_body, perl = TRUE)
+    mults <- ifelse(nzchar(mult_str), as.integer(mult_str), 1L)
+    formulas <- sub("^\\d*", "", tok_body, perl = TRUE)
+    signed_ns <- as.integer(signs * mults)
 
-    net_agg <- stats::aggregate(parsed$signed_n ~ parsed$formula, FUN = sum)
+    u_form <- unique(formulas)
+    if (length(u_form) == length(formulas)) {
+      net_form <- formulas
+      net_n <- signed_ns
+    } else {
+      net_form <- u_form
+      net_n <- integer(length(u_form))
+      for (k in seq_along(formulas)) {
+        idx_f <- match(formulas[[k]], u_form)
+        net_n[[idx_f]] <- net_n[[idx_f]] + signed_ns[[k]]
+      }
+    }
+    keep_nz <- net_n != 0L
     net <- data.frame(
-      formula = net_agg[[1L]],
-      signed_n = as.integer(net_agg[[2L]]),
+      formula = net_form[keep_nz],
+      signed_n = net_n[keep_nz],
       stringsAsFactors = FALSE
     )
-    net <- net[net$signed_n != 0L, ]
     net <- reduce_ammonium_loss_pairs(net)
 
     rebuild_terms <- character(0L)
@@ -438,16 +449,10 @@ canonicalize_adduct_notation <- local({
       pos <- net[net$signed_n > 0L, , drop = FALSE]
       if (nrow(neg) > 0L) {
         neg <- neg[order(neg$formula), , drop = FALSE]
+        n_neg <- abs(neg$signed_n)
         rebuild_terms <- c(
           rebuild_terms,
-          vapply(
-            seq_len(nrow(neg)),
-            function(i) {
-              n <- abs(neg$signed_n[[i]])
-              paste0("-", if (n > 1L) n else "", neg$formula[[i]])
-            },
-            character(1L)
-          )
+          paste0("-", ifelse(n_neg > 1L, as.character(n_neg), ""), neg$formula)
         )
       }
       if (nrow(pos) > 0L) {
@@ -459,16 +464,10 @@ canonicalize_adduct_notation <- local({
           ,
           drop = FALSE
         ]
+        n_pos <- pos$signed_n
         rebuild_terms <- c(
           rebuild_terms,
-          vapply(
-            seq_len(nrow(pos)),
-            function(i) {
-              n <- pos$signed_n[[i]]
-              paste0("+", if (n > 1L) n else "", pos$formula[[i]])
-            },
-            character(1L)
-          )
+          paste0("+", ifelse(n_pos > 1L, as.character(n_pos), ""), pos$formula)
         )
       }
     }
@@ -480,6 +479,7 @@ canonicalize_adduct_notation <- local({
       "]",
       suffix
     )
+    .canon_cache[[adduct_input]] <- result
     result
   }
 })

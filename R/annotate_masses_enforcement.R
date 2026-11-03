@@ -1,3 +1,15 @@
+#' Convert numeric vector to character via unique values
+#' @noRd
+.fast_num_to_char <- function(x) {
+  if (!is.numeric(x) || length(x) == 0L) {
+    return(as.character(x))
+  }
+  u <- unique(x)
+  u_chr <- as.character(u)
+  m <- if (anyNA(u)) match(x, u) else fastmatch::fmatch(x, u)
+  u_chr[m]
+}
+
 #' Decorate annotation rows with structural / taxonomic metadata
 #' @keywords internal
 enrich_with_structure_metadata <- function(combined, structure_table) {
@@ -23,21 +35,6 @@ enrich_with_structure_metadata <- function(combined, structure_table) {
     "structure_exact_mass",
     "structure_xlogp"
   )
-  struct_unique <- structure_table |>
-    tidytable::distinct(tidyselect::any_of(struct_cols)) |>
-    tidytable::distinct(
-      tidyselect::any_of(c(
-        "structure_inchikey_connectivity_layer",
-        "structure_molecular_formula",
-        "structure_exact_mass"
-      )),
-      .keep_all = TRUE
-    ) |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(is.numeric),
-      .fns = as.character
-    ))
-
   tax_cols <- c(
     "structure_inchikey_connectivity_layer",
     "structure_smiles_no_stereo",
@@ -50,41 +47,115 @@ enrich_with_structure_metadata <- function(combined, structure_table) {
     "structure_tax_cla_03cla",
     "structure_tax_cla_04dirpar"
   )
-  has_tax_cols <- any(tax_cols %in% colnames(structure_table))
-  taxonomy_table <- if (has_tax_cols) {
-    structure_table |>
-      tidytable::distinct(tidyselect::any_of(tax_cols))
+
+  comb_em_chr <- if ("structure_exact_mass" %in% colnames(combined)) {
+    .fast_num_to_char(combined$structure_exact_mass)
   } else {
     NULL
   }
 
-  # Join taxonomy onto struct_unique (~250k rows) before expanding combined to
-  # millions of isomer rows when tax keys come from struct_unique
-  tax_joined_early <- FALSE
-  if (!is.null(taxonomy_table) && nrow(struct_unique) > 0L) {
-    tax_keys_early <- intersect(
-      colnames(struct_unique),
-      colnames(taxonomy_table)
-    )
-    tax_keys_in_comb <- intersect(colnames(combined), colnames(taxonomy_table))
-    if (
-      length(tax_keys_early) > 0L &&
-        length(setdiff(tax_keys_in_comb, colnames(struct_unique))) == 0L
-    ) {
-      struct_unique <- struct_unique |>
-        tidytable::left_join(taxonomy_table, by = tax_keys_early) |>
-        tidytable::distinct()
-      tax_joined_early <- TRUE
+  # Pre-filter structure_table to exact masses present in combined when
+  # structure_exact_mass is the sole join key from combined
+  shared_struct_tax <- intersect(
+    colnames(combined),
+    intersect(c(struct_cols, tax_cols), colnames(structure_table))
+  )
+  if (
+    identical(shared_struct_tax, "structure_exact_mass") &&
+      nrow(structure_table) > 0L
+  ) {
+    u_comb_em <- unique(comb_em_chr[!is.na(comb_em_chr)])
+    st_em_chr <- .fast_num_to_char(structure_table$structure_exact_mass)
+    keep_st <- !is.na(fastmatch::fmatch(st_em_chr, u_comb_em))
+    structure_table <- structure_table[which(keep_st), , drop = FALSE]
+    if (nrow(structure_table) > 0L) {
+      structure_table$structure_exact_mass <- st_em_chr[keep_st]
+    } else {
+      structure_table$structure_exact_mass <- character(0L)
     }
   }
 
-  enriched <- combined |>
-    tidytable::mutate(
-      structure_exact_mass = as.character(structure_exact_mass),
-      candidate_library = "TIMA MS1",
-      candidate_structure_error_mz = as.numeric(error_mz)
+  has_tax_cols <- any(tax_cols %in% colnames(structure_table))
+  avail_struct_cols <- intersect(struct_cols, colnames(structure_table))
+  avail_tax_cols <- intersect(tax_cols, colnames(structure_table))
+  tax_keys_early <- intersect(avail_struct_cols, avail_tax_cols)
+  tax_keys_in_comb <- intersect(colnames(combined), avail_tax_cols)
+  can_join_tax_early <- has_tax_cols &&
+    length(tax_keys_early) > 0L &&
+    length(setdiff(tax_keys_in_comb, avail_struct_cols)) == 0L
+
+  # Fast path when each (inchikey, smiles) in filtered structure_table is unique:
+  # include tax_cols directly when deduplicating struct_unique instead of
+  # splitting and re-joining taxonomy_table.
+  if (
+    can_join_tax_early &&
+      nrow(structure_table) > 0L &&
+      anyDuplicated(
+        tidytable::as_tidytable(as.list(structure_table)[tax_keys_early])
+      ) ==
+        0L
+  ) {
+    all_st_cols <- union(avail_struct_cols, avail_tax_cols)
+    struct_unique <- tidytable::as_tidytable(
+      as.list(structure_table)[all_st_cols]
     ) |>
-    tidytable::distinct()
+      tidytable::distinct(
+        tidyselect::any_of(c(
+          "structure_inchikey_connectivity_layer",
+          "structure_molecular_formula",
+          "structure_exact_mass"
+        )),
+        .keep_all = TRUE
+      )
+    for (cc in avail_struct_cols) {
+      if (is.numeric(struct_unique[[cc]])) {
+        struct_unique[[cc]] <- .fast_num_to_char(struct_unique[[cc]])
+      }
+    }
+    taxonomy_table <- NULL
+    tax_joined_early <- TRUE
+  } else {
+    struct_unique <- structure_table |>
+      tidytable::distinct(tidyselect::any_of(struct_cols)) |>
+      tidytable::distinct(
+        tidyselect::any_of(c(
+          "structure_inchikey_connectivity_layer",
+          "structure_molecular_formula",
+          "structure_exact_mass"
+        )),
+        .keep_all = TRUE
+      )
+    for (cc in colnames(struct_unique)) {
+      if (is.numeric(struct_unique[[cc]])) {
+        struct_unique[[cc]] <- .fast_num_to_char(struct_unique[[cc]])
+      }
+    }
+
+    taxonomy_table <- if (has_tax_cols) {
+      structure_table |>
+        tidytable::distinct(tidyselect::any_of(tax_cols))
+    } else {
+      NULL
+    }
+
+    tax_joined_early <- FALSE
+    if (!is.null(taxonomy_table) && nrow(struct_unique) > 0L) {
+      if (can_join_tax_early) {
+        struct_unique <- struct_unique |>
+          tidytable::left_join(taxonomy_table, by = tax_keys_early) |>
+          tidytable::distinct()
+        tax_joined_early <- TRUE
+      }
+    }
+  }
+
+  enriched <- tidytable::as_tidytable(combined)
+  if (!is.null(comb_em_chr)) {
+    enriched$structure_exact_mass <- comb_em_chr
+  }
+  enriched$candidate_library <- rep("TIMA MS1", nrow(enriched))
+  enriched$candidate_structure_error_mz <- as.numeric(enriched$error_mz)
+  enriched <- enriched |> tidytable::distinct()
 
   join_keys <- intersect(colnames(enriched), colnames(struct_unique))
   if (length(join_keys) > 0L) {
@@ -270,11 +341,38 @@ enforce_loss_formula_compatibility <- function(annotations) {
 
   has_source <- "source" %in% colnames(annotations)
   has_loss_term <- "loss_term" %in% colnames(annotations)
+
+  # Pre-evaluate loss requirements for all unique adducts and loss_terms (<100 unique strings)
+  u_add <- unique(annotations$adduct[!is.na(annotations$adduct)])
+  add_req_list <- lapply(u_add, adduct_loss_atom_requirements)
+  add_has_req <- lengths(add_req_list) > 0L
+
+  u_lt <- if (has_loss_term) {
+    unique(annotations$loss_term[!is.na(annotations$loss_term)])
+  } else {
+    character(0L)
+  }
+  lt_req_list <- lapply(u_lt, loss_term_atom_requirements)
+  lt_has_req <- lengths(lt_req_list) > 0L
+
+  if (!any(add_has_req) && !any(lt_has_req)) {
+    return(annotations)
+  }
+
+  has_lt_row <- if (has_loss_term) {
+    !is.na(annotations$loss_term)
+  } else {
+    logical(nrow(annotations))
+  }
+  is_loss_src <- if (has_source) {
+    !is.na(annotations$source) & annotations$source == "loss"
+  } else {
+    logical(nrow(annotations))
+  }
   idx_check <- which(
     !is.na(annotations$candidate_structure_error_mz) &
       !is.na(annotations$adduct) &
-      ((has_source & annotations$source == "loss") |
-        (has_loss_term & !is.na(annotations$loss_term)))
+      (is_loss_src | has_lt_row)
   )
   if (length(idx_check) == 0L) {
     return(annotations)
@@ -285,31 +383,51 @@ enforce_loss_formula_compatibility <- function(annotations) {
   } else {
     logical(length(idx_check))
   }
-  loss_keys <- ifelse(
-    use_loss_term,
-    paste0("L:", annotations$loss_term[idx_check]),
-    paste0("A:", annotations$adduct[idx_check])
-  )
-  u_loss_keys <- unique(loss_keys)
-  req_lookup <- stats::setNames(
-    lapply(u_loss_keys, function(k) {
-      if (startsWith(k, "L:")) {
-        loss_term_atom_requirements(substr(k, 3L, nchar(k)))
-      } else {
-        adduct_loss_atom_requirements(substr(k, 3L, nchar(k)))
-      }
-    }),
-    u_loss_keys
-  )
+
+  # Map each row in idx_check to an integer requirement index in combined req_pool
+  # 1..length(u_lt) = loss_term requirements; length(u_lt) + 1..length(u_add) = adduct requirements
+  req_pool <- c(lt_req_list, add_req_list)
+  req_pool_nonempty <- c(lt_has_req, add_has_req)
+  n_lt <- length(u_lt)
+
+  req_id <- integer(length(idx_check))
+  if (any(use_loss_term)) {
+    w_lt <- which(use_loss_term)
+    req_id[w_lt] <- fastmatch::fmatch(
+      annotations$loss_term[idx_check[w_lt]],
+      u_lt
+    )
+  }
+  if (!all(use_loss_term)) {
+    w_ad <- which(!use_loss_term)
+    req_id[w_ad] <- n_lt +
+      fastmatch::fmatch(annotations$adduct[idx_check[w_ad]], u_add)
+  }
+
+  # Filter idx_check to rows whose requirement is actually non-empty
+  active_mask <- req_pool_nonempty[req_id]
+  if (!any(active_mask)) {
+    return(annotations)
+  }
+  idx_check <- idx_check[active_mask]
+  req_id <- req_id[active_mask]
 
   formulas_check <- annotations$candidate_structure_molecular_formula[idx_check]
-  pair_keys <- paste(loss_keys, formulas_check, sep = "\r")
-  u_pair_idx <- which(!duplicated(pair_keys))
-  u_pair_keys <- pair_keys[u_pair_idx]
+  u_fm <- unique(formulas_check)
+  n_fm <- max(1L, length(u_fm))
+  fm_id <- if (anyNA(u_fm)) {
+    match(formulas_check, u_fm)
+  } else {
+    fastmatch::fmatch(formulas_check, u_fm)
+  }
+
+  pair_code <- (req_id - 1L) * n_fm + fm_id
+  u_pair_idx <- which(!duplicated(pair_code))
+  u_pair_codes <- pair_code[u_pair_idx]
   u_keep <- vapply(
     X = u_pair_idx,
     FUN = function(j) {
-      req <- req_lookup[[loss_keys[[j]]]]
+      req <- req_pool[[req_id[[j]]]]
       fs <- formula_satisfies_loss_requirements(
         formula = formulas_check[[j]],
         loss_requirements = req
@@ -318,30 +436,86 @@ enforce_loss_formula_compatibility <- function(annotations) {
     },
     FUN.VALUE = logical(1L)
   )
-  keep_struct <- u_keep[fastmatch::fmatch(pair_keys, u_pair_keys)]
+  keep_struct <- u_keep[fastmatch::fmatch(pair_code, u_pair_codes)]
   idx_drop <- idx_check[!keep_struct]
   if (length(idx_drop) == 0L) {
     return(annotations)
   }
 
-  out <- tidytable::as_tidytable(annotations)
   struct_cols <- unique(c(
-    grep("^candidate_structure_", colnames(out), value = TRUE),
+    grep("^candidate_structure_", colnames(annotations), value = TRUE),
     intersect(
-      colnames(out),
+      colnames(annotations),
       c("candidate_library", "structure_exact_mass", "error_mz")
     )
   ))
-  for (cc in struct_cols) {
-    out[idx_drop, (cc) := NA]
-  }
-  out <- out |> tidytable::distinct()
 
-  dropped <- annotations[idx_drop, , drop = FALSE]
-  dropped_bd <- dropped |>
-    tidytable::distinct(feature_id, adduct) |>
-    tidytable::count(adduct, name = "N") |>
-    tidytable::arrange(tidytable::desc(N))
+  if (nrow(annotations) <= 10000L) {
+    out <- tidytable::as_tidytable(annotations)
+    for (cc in struct_cols) {
+      out[idx_drop, (cc) := NA]
+    }
+    out <- out |> tidytable::distinct()
+  } else {
+    # Determine duplicate rows among (already-unmatched rows U idx_drop) BEFORE
+    # modifying struct_cols so we never copy 3M-element vectors twice.
+    na_err_orig <- is.na(annotations$candidate_structure_error_mz)
+    na_err_mask <- na_err_orig
+    na_err_mask[idx_drop] <- TRUE
+    na_pool_idx <- which(na_err_mask)
+
+    orig_na_idx <- which(na_err_orig)
+    all_orig_struct_na <- if (length(orig_na_idx) == 0L) {
+      TRUE
+    } else {
+      all(vapply(
+        struct_cols,
+        function(cc) all(is.na(annotations[[cc]][orig_na_idx])),
+        logical(1L)
+      ))
+    }
+
+    non_struct_cols <- setdiff(colnames(annotations), struct_cols)
+    if (all_orig_struct_na && length(non_struct_cols) > 0L) {
+      sub_tbl <- tidytable::as_tidytable(
+        lapply(as.list(annotations)[non_struct_cols], `[`, na_pool_idx)
+      )
+      dup_sub <- duplicated(sub_tbl)
+    } else {
+      sub_list <- lapply(as.list(annotations), `[`, na_pool_idx)
+      is_drop_all <- logical(nrow(annotations))
+      is_drop_all[idx_drop] <- TRUE
+      in_drop_sub <- which(is_drop_all[na_pool_idx])
+      for (cc in struct_cols) {
+        sub_list[[cc]][in_drop_sub] <- NA
+      }
+      dup_sub <- duplicated(tidytable::as_tidytable(sub_list))
+    }
+
+    is_demoted <- logical(nrow(annotations))
+    is_demoted[idx_drop] <- TRUE
+
+    if (any(dup_sub)) {
+      keep_mask <- rep(TRUE, nrow(annotations))
+      keep_mask[na_pool_idx[dup_sub]] <- FALSE
+      keep_idx <- which(keep_mask)
+      out_list <- lapply(as.list(annotations), `[`, keep_idx)
+      surv_demoted <- which(is_demoted[keep_idx])
+      if (length(surv_demoted) > 0L) {
+        for (cc in struct_cols) {
+          out_list[[cc]][surv_demoted] <- NA
+        }
+      }
+      out <- tidytable::as_tidytable(out_list)
+    } else {
+      out_list <- as.list(annotations)
+      for (cc in struct_cols) {
+        out_list[[cc]][idx_drop] <- NA
+      }
+      out <- tidytable::as_tidytable(out_list)
+    }
+  }
+
   log_info(
     paste0(
       "Loss/formula filter demoted %d structural match row(s) where the actual ",
@@ -366,7 +540,8 @@ enforce_annotation_edge_adduct_agreement <- function(
   adduct_edges,
   baseline_adduct = NULL
 ) {
-  if (nrow(annotations) == 0L) {
+  n_in <- nrow(annotations)
+  if (n_in == 0L) {
     return(annotations)
   }
   required <- c("feature_id", "adduct")
@@ -379,100 +554,133 @@ enforce_annotation_edge_adduct_agreement <- function(
     adduct_edges$adduct,
     adduct_edges$adduct_dest
   )))
-  if (!"adduct" %in% colnames(adduct_key_map)) {
-    adduct_key_map$adduct <- character(nrow(adduct_key_map))
-  }
-  if (!"state_key" %in% colnames(adduct_key_map)) {
-    adduct_key_map$state_key <- adduct_key_map$adduct
-  }
-  adduct_key_map <- adduct_key_map |>
-    tidytable::mutate(adduct_state_key = state_key) |>
-    tidytable::select(adduct, adduct_state_key)
-  key_lookup <- stats::setNames(
-    object = adduct_key_map$adduct_state_key,
-    nm = adduct_key_map$adduct
-  )
-
-  edge_supported <- if (nrow(adduct_edges) > 0L) {
-    tidytable::bind_rows(
-      adduct_edges |>
-        tidytable::transmute(feature_id, adduct),
-      adduct_edges |>
-        tidytable::transmute(feature_id = feature_id_dest, adduct = adduct_dest)
-    ) |>
-      tidytable::mutate(adduct_state_key = unname(key_lookup[adduct])) |>
-      tidytable::filter(!is.na(adduct_state_key)) |>
-      tidytable::distinct(feature_id, adduct_state_key)
+  sm_add <- if ("adduct" %in% colnames(adduct_key_map)) {
+    as.character(adduct_key_map$adduct)
   } else {
-    tidytable::tidytable(
-      feature_id = character(),
-      adduct_state_key = character()
-    )
+    character(nrow(adduct_key_map))
+  }
+  sm_key <- if ("state_key" %in% colnames(adduct_key_map)) {
+    as.character(adduct_key_map$state_key)
+  } else {
+    sm_add
+  }
+
+  edge_supported_vec <- logical(n_in)
+  feature_has_edge_support <- logical(n_in)
+
+  if (nrow(adduct_edges) > 0L) {
+    e_f <- c(adduct_edges$feature_id, adduct_edges$feature_id_dest)
+    e_a <- c(adduct_edges$adduct, adduct_edges$adduct_dest)
+    e_k <- sm_key[fastmatch::fmatch(e_a, sm_add)]
+    valid_e <- !is.na(e_k)
+    if (any(valid_e)) {
+      e_f <- e_f[valid_e]
+      e_k <- e_k[valid_e]
+      supp_feats <- unique(e_f)
+      feature_has_edge_support <- !is.na(fastmatch::fmatch(
+        annotations$feature_id,
+        supp_feats
+      ))
+      if (any(feature_has_edge_support)) {
+        idx_ef <- which(feature_has_edge_support)
+        row_sk_ef <- sm_key[fastmatch::fmatch(
+          annotations$adduct[idx_ef],
+          sm_add
+        )]
+        e_pairs <- unique(paste(e_f, e_k, sep = "\r"))
+        row_pairs <- paste(
+          annotations$feature_id[idx_ef],
+          row_sk_ef,
+          sep = "\r"
+        )
+        edge_supported_vec[idx_ef] <- !is.na(row_sk_ef) &
+          !is.na(fastmatch::fmatch(row_pairs, e_pairs))
+        # Recompute feature_has_edge_support strictly from rows that matched edge_supported
+        # in case a feature in supp_feats had zero matching annotation rows
+        supp_feats_in_ann <- unique(annotations$feature_id[edge_supported_vec])
+        feature_has_edge_support <- !is.na(fastmatch::fmatch(
+          annotations$feature_id,
+          supp_feats_in_ann
+        ))
+      }
+    }
   }
 
   has_source <- "source" %in% colnames(annotations)
+  src_col <- if (has_source) as.character(annotations$source) else NULL
   has_is_preassigned <- "is_preassigned" %in% colnames(annotations)
   has_origin <- "candidate_adduct_origin" %in% colnames(annotations)
   preassigned_safe <- if (has_is_preassigned) {
-    annotations$is_preassigned
+    p_tmp <- as.logical(annotations$is_preassigned)
+    p_tmp[is.na(p_tmp)] <- FALSE
+    p_tmp
   } else {
-    rep(FALSE, nrow(annotations))
+    logical(n_in)
   }
   origin_safe <- if (has_origin) {
-    annotations$candidate_adduct_origin %in% c("enforced", "preassigned")
+    !is.na(annotations$candidate_adduct_origin) &
+      annotations$candidate_adduct_origin %in% c("enforced", "preassigned")
   } else {
-    rep(FALSE, nrow(annotations))
+    logical(n_in)
   }
   baseline_safe <- if (!is.null(baseline_adduct)) {
-    annotations$adduct == baseline_adduct
+    !is.na(annotations$adduct) & annotations$adduct == baseline_adduct
   } else {
-    rep(FALSE, nrow(annotations))
+    logical(n_in)
   }
 
-  out <- annotations |>
-    tidytable::mutate(adduct_state_key = unname(key_lookup[adduct])) |>
-    tidytable::left_join(
-      edge_supported |>
-        tidytable::mutate(edge_supported = TRUE),
-      by = c("feature_id", "adduct_state_key")
-    ) |>
-    tidytable::mutate(
-      edge_supported = tidytable::if_else(
-        is.na(edge_supported),
-        FALSE,
-        edge_supported
-      ),
-      feature_has_edge_support = !is.na(fastmatch::fmatch(
-        feature_id,
-        unique(feature_id[edge_supported])
-      )),
-      keep = edge_supported |
-        (!feature_has_edge_support & !(has_source & source == "multi")) |
-        (has_source & source %in% c("loss", "cluster")) |
-        preassigned_safe |
-        origin_safe |
-        baseline_safe |
-        (has_source &
-          source %in%
-            c(
-              "baseline",
-              "preassigned",
-              "preassigned_propagated"
-            ))
-    )
+  is_multi_src <- if (has_source) {
+    !is.na(src_col) & src_col == "multi"
+  } else {
+    logical(n_in)
+  }
+  is_loss_cluster_src <- if (has_source) {
+    !is.na(src_col) & src_col %in% c("loss", "cluster")
+  } else {
+    logical(n_in)
+  }
+  is_guided_src <- if (has_source) {
+    !is.na(src_col) &
+      src_col %in% c("baseline", "preassigned", "preassigned_propagated")
+  } else {
+    logical(n_in)
+  }
 
-  dropped <- out |> tidytable::filter(!keep)
-  if (nrow(dropped) > 0L) {
-    if ("adduct" %in% colnames(dropped)) {
-      dropped_n <- nrow(dropped |> tidytable::distinct(feature_id, adduct))
-      dropped_bd <- dropped |>
-        tidytable::distinct(feature_id, adduct) |>
-        tidytable::count(adduct, name = "N") |>
-        tidytable::arrange(tidytable::desc(N))
+  keep <- edge_supported_vec |
+    (!feature_has_edge_support & !is_multi_src) |
+    is_loss_cluster_src |
+    preassigned_safe |
+    origin_safe |
+    baseline_safe |
+    is_guided_src
+
+  if (!all(keep)) {
+    drop_idx <- which(!keep)
+    f_dr <- annotations$feature_id[drop_idx]
+    a_dr <- annotations$adduct[drop_idx]
+    u_fd <- unique(f_dr)
+    u_ad <- unique(a_dr)
+    n_fd <- length(u_fd)
+    n_ad <- max(1L, length(u_ad))
+    if (as.numeric(n_fd) * as.numeric(n_ad) < 2e9) {
+      f_i <- if (anyNA(u_fd)) {
+        match(f_dr, u_fd)
+      } else {
+        fastmatch::fmatch(f_dr, u_fd)
+      }
+      a_i <- if (anyNA(u_ad)) {
+        match(a_dr, u_ad)
+      } else {
+        fastmatch::fmatch(a_dr, u_ad)
+      }
+      dropped_n <- sum(
+        tabulate((f_i - 1L) * n_ad + a_i, nbins = n_fd * n_ad) > 0L
+      )
     } else {
-      dropped_n <- nrow(dropped |> tidytable::distinct(feature_id))
-      dropped_bd <- dropped |>
-        tidytable::count(name = "N")
+      dropped_n <- nrow(
+        tidytable::tidytable(feature_id = f_dr, adduct = a_dr) |>
+          tidytable::distinct()
+      )
     }
     log_info(
       paste0(
@@ -481,18 +689,15 @@ enforce_annotation_edge_adduct_agreement <- function(
       ),
       dropped_n
     )
+    keep_idx <- which(keep)
+    return(tidytable::as_tidytable(lapply(
+      as.list(annotations),
+      `[`,
+      keep_idx
+    )))
   }
 
-  out |>
-    tidytable::filter(keep) |>
-    tidytable::select(
-      -tidyselect::any_of(c(
-        "adduct_state_key",
-        "edge_supported",
-        "feature_has_edge_support",
-        "keep"
-      ))
-    )
+  tidytable::as_tidytable(annotations)
 }
 
 #' Build the output edges table from the three edge sets

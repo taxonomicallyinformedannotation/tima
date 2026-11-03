@@ -558,3 +558,35 @@ test_that("enforce_cluster_entity_consensus does not override rank-1 rows that a
   expect_true(all(promoted$feature_id != "A"))
   expect_true(any(promoted$feature_id == "B"))
 })
+
+test_that("sample_candidates_per_group handles missing candidate_score_pseudo_initial during anchor collapsing", {
+  M_target <- 250.0
+  mz_pos_h <- calculate_mz_from_mass(M_target, "[M+H]+")
+  mz_pos_na <- calculate_mz_from_mass(M_target, "[M+Na]+")
+
+  df <- tidytable::tidytable(
+    feature_id = c("F_anchor", "F_tied", "F_tied", "F_tied"),
+    candidate_adduct = c("[M+H]+", "[M+Na]+", "[M+Na]+", "[M+Na]+"),
+    rank_final = c(1L, 1L, 1L, 1L),
+    score_weighted_chemo = c(0.95, 0.80, 0.80, 0.80),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_ANCHOR",
+      "IK_OTHER1",
+      "IK_ANCHOR",
+      "IK_OTHER2"
+    ),
+    mz = c(mz_pos_h, mz_pos_na, mz_pos_na, mz_pos_na)
+  )
+
+  res <- sample_candidates_per_group(
+    df = df,
+    max_per_score = 2L,
+    apply_anchor_collapsing = TRUE
+  )
+  tied_kept <- res$df[res$df$feature_id == "F_tied", ]
+  expect_identical(nrow(tied_kept), 1L)
+  expect_identical(
+    tied_kept$candidate_structure_inchikey_connectivity_layer,
+    "IK_ANCHOR"
+  )
+})

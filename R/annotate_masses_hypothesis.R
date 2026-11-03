@@ -87,6 +87,32 @@ match_pairs_to_mass_diffs <- function(pairs, diffs, diff_col) {
   out
 }
 
+#' Fast per-group median using radix sort and midpoint indexing
+#' @noRd
+.fast_group_median <- function(vals, groups) {
+  n <- length(vals)
+  if (n == 0L) {
+    return(list(groups = character(), medians = numeric(), per_obs = numeric()))
+  }
+  u_g <- unique(groups)
+  g_id <- if (anyNA(u_g)) match(groups, u_g) else fastmatch::fmatch(groups, u_g)
+  ord <- order(g_id, vals, method = "radix")
+  g_sorted <- g_id[ord]
+  v_sorted <- vals[ord]
+  is_start <- if (n > 1L) c(TRUE, g_sorted[-1L] != g_sorted[-n]) else TRUE
+  starts <- which(is_start)
+  ends <- c(starts[-1L] - 1L, n)
+  med_sorted <- 0.5 *
+    (v_sorted[(starts + ends) %/% 2L] + v_sorted[(starts + ends + 1L) %/% 2L])
+  med_lut <- numeric(length(u_g))
+  med_lut[g_sorted[starts]] <- med_sorted
+  list(
+    groups = u_g,
+    medians = med_lut,
+    per_obs = med_lut[g_id]
+  )
+}
+
 #' Solve M-consistency constraints in adduct edges
 #'
 #' For each adduct edge, the two endpoints must have the same neutral mass M.
@@ -123,20 +149,41 @@ solve_consistent_adduct_assignments <- function(
   }
 
   # Add mz values to edges
-  features_min <- features_table |>
-    tidytable::distinct(feature_id, mz)
-  edges <- adduct_edges |>
-    tidytable::left_join(
-      features_min,
-      by = c("feature_id")
-    ) |>
-    tidytable::rename(mz_src = mz) |>
-    tidytable::left_join(
-      features_min |>
-        tidytable::rename(feature_id_dest = feature_id, mz_dest = mz),
-      by = c("feature_id_dest")
-    ) |>
-    tidytable::filter(!is.na(mz_src) & !is.na(mz_dest))
+  features_min <- if (anyDuplicated(features_table$feature_id) == 0L) {
+    features_table[, c("feature_id", "mz"), drop = FALSE]
+  } else {
+    features_table |> tidytable::distinct(feature_id, mz)
+  }
+
+  if (anyDuplicated(features_min$feature_id) == 0L) {
+    m_src_idx <- fastmatch::fmatch(
+      adduct_edges$feature_id,
+      features_min$feature_id
+    )
+    m_dest_idx <- fastmatch::fmatch(
+      adduct_edges$feature_id_dest,
+      features_min$feature_id
+    )
+    mz_src_vec <- as.numeric(features_min$mz[m_src_idx])
+    mz_dest_vec <- as.numeric(features_min$mz[m_dest_idx])
+    valid_mz <- !is.na(mz_src_vec) & !is.na(mz_dest_vec)
+    edges <- adduct_edges[which(valid_mz), , drop = FALSE]
+    edges$mz_src <- mz_src_vec[valid_mz]
+    edges$mz_dest <- mz_dest_vec[valid_mz]
+  } else {
+    edges <- adduct_edges |>
+      tidytable::left_join(
+        features_min,
+        by = c("feature_id")
+      ) |>
+      tidytable::rename(mz_src = mz) |>
+      tidytable::left_join(
+        features_min |>
+          tidytable::rename(feature_id_dest = feature_id, mz_dest = mz),
+        by = c("feature_id_dest")
+      ) |>
+      tidytable::filter(!is.na(mz_src) & !is.na(mz_dest))
+  }
 
   if (nrow(edges) == 0L) {
     return(list(
@@ -154,40 +201,40 @@ solve_consistent_adduct_assignments <- function(
   }
 
   # Calculate implied M for each edge endpoint
-  edges <- edges |>
-    tidytable::mutate(
-      m_src = calculate_neutral_mass_from_lookup(
-        mzs = as.numeric(mz_src),
-        adducts = adduct,
-        adduct_lookup = adduct_lookup
-      ),
-      m_dest = calculate_neutral_mass_from_lookup(
-        mzs = as.numeric(mz_dest),
-        adducts = adduct_dest,
-        adduct_lookup = adduct_lookup
-      ),
-      m_diff = abs(m_src - m_dest),
-      ppm_consistent = m_diff <=
-        (tolerance_ppm * 1e-6 * pmax(m_src, m_dest, na.rm = TRUE)),
-      dalton_consistent = if (is.null(tolerance_dalton)) {
-        FALSE
-      } else {
-        (m_diff <= tolerance_dalton)
-      },
-      m_consistent = ppm_consistent | dalton_consistent
-    )
+  m_src <- calculate_neutral_mass_from_lookup(
+    mzs = as.numeric(edges$mz_src),
+    adducts = edges$adduct,
+    adduct_lookup = adduct_lookup
+  )
+  m_dest <- calculate_neutral_mass_from_lookup(
+    mzs = as.numeric(edges$mz_dest),
+    adducts = edges$adduct_dest,
+    adduct_lookup = adduct_lookup
+  )
+  m_diff <- abs(m_src - m_dest)
+  ppm_consistent <- m_diff <=
+    (tolerance_ppm * 1e-6 * pmax(m_src, m_dest, na.rm = TRUE))
+  dalton_consistent <- if (is.null(tolerance_dalton)) {
+    FALSE
+  } else {
+    (m_diff <= tolerance_dalton)
+  }
+  m_consistent <- !is.na(ppm_consistent | dalton_consistent) &
+    (ppm_consistent | dalton_consistent)
 
   # Keep only consistent edges
-  consistent <- edges |>
-    tidytable::filter(m_consistent) |>
-    tidytable::select(feature_id, adduct, feature_id_dest, adduct_dest)
+  consistent <- edges[
+    which(m_consistent),
+    c("feature_id", "adduct", "feature_id_dest", "adduct_dest"),
+    drop = FALSE
+  ]
 
   # IMPORTANT: Enforce global M-consistency
   # This removes edges that cause conflicts when a feature has multiple edges
   # Example: F2 cannot be both M+Na (M≈100) and M-H2O (M≈200) simultaneously
   consistent <- enforce_global_m_consistency(
     consistent_edges = consistent,
-    features_table = features_table,
+    features_table = features_min,
     tolerance_ppm = tolerance_ppm,
     tolerance_dalton = tolerance_dalton,
     adduct_lookup = adduct_lookup
@@ -226,38 +273,37 @@ solve_consistent_adduct_assignments <- function(
     ))
   }
 
-  component_lookup <- stats::setNames(
-    paste0("comp_", comp_info$membership),
-    all_nodes
-  )
+  comp_labels <- paste0("comp_", comp_info$membership)
 
-  # Vectorized neutral mass computation across all consistent edges
-  feature_mz_map <- stats::setNames(features_min$mz, features_min$feature_id)
+  # Vectorized neutral mass computation across all consistent edges using fmatch
   src_ids <- as.character(consistent$feature_id)
   dest_ids <- as.character(consistent$feature_id_dest)
-  src_mz <- as.numeric(feature_mz_map[src_ids])
-  dest_mz <- as.numeric(feature_mz_map[dest_ids])
+  src_mz <- as.numeric(
+    features_min$mz[fastmatch::fmatch(src_ids, features_min$feature_id)]
+  )
+  dest_mz <- as.numeric(
+    features_min$mz[fastmatch::fmatch(dest_ids, features_min$feature_id)]
+  )
 
+  all_f_ids <- c(src_ids, dest_ids)
+  all_m_vals <- c(
+    calculate_neutral_mass_from_lookup(
+      mzs = src_mz,
+      adducts = consistent$adduct,
+      adduct_lookup = adduct_lookup
+    ),
+    calculate_neutral_mass_from_lookup(
+      mzs = dest_mz,
+      adducts = consistent$adduct_dest,
+      adduct_lookup = adduct_lookup
+    )
+  )
+  valid_m <- !is.na(all_m_vals)
+  med_res <- .fast_group_median(all_m_vals[valid_m], all_f_ids[valid_m])
   m_values <- tidytable::tidytable(
-    feature_id = c(src_ids, dest_ids),
-    neutral_mass = c(
-      calculate_neutral_mass_from_lookup(
-        mzs = src_mz,
-        adducts = consistent$adduct,
-        adduct_lookup = adduct_lookup
-      ),
-      calculate_neutral_mass_from_lookup(
-        mzs = dest_mz,
-        adducts = consistent$adduct_dest,
-        adduct_lookup = adduct_lookup
-      )
-    )
-  ) |>
-    tidytable::filter(!is.na(neutral_mass)) |>
-    tidytable::summarize(
-      neutral_mass = stats::median(neutral_mass, na.rm = TRUE),
-      .by = feature_id
-    )
+    feature_id = med_res$groups,
+    neutral_mass = med_res$medians
+  )
 
   # For nodes with no valid M, use baseline M ([M+H]+)
   missing_nodes <- setdiff(all_nodes, m_values$feature_id)
@@ -279,7 +325,10 @@ solve_consistent_adduct_assignments <- function(
 
   feature_m_map <- m_values |>
     tidytable::mutate(
-      component_id = unname(component_lookup[as.character(feature_id)])
+      component_id = comp_labels[fastmatch::fmatch(
+        as.character(feature_id),
+        all_nodes
+      )]
     )
 
   # Build component_membership map (feature_id -> component_id)
@@ -320,37 +369,55 @@ enforce_global_m_consistency <- function(
   }
 
   # Build full edge table with M calculations
-  features_min <- features_table |>
-    tidytable::distinct(feature_id, mz)
+  features_min <- if (anyDuplicated(features_table$feature_id) == 0L) {
+    features_table[, c("feature_id", "mz"), drop = FALSE]
+  } else {
+    features_table |> tidytable::distinct(feature_id, mz)
+  }
 
-  edge_with_m <- consistent_edges |>
-    tidytable::left_join(
-      features_min,
-      by = c("feature_id")
-    ) |>
-    tidytable::rename(mz_src = mz) |>
-    tidytable::left_join(
-      features_min |>
-        tidytable::rename(feature_id_dest = feature_id, mz_dest = mz),
-      by = c("feature_id_dest")
-    ) |>
-    tidytable::filter(!is.na(mz_src) & !is.na(mz_dest))
+  if (anyDuplicated(features_min$feature_id) == 0L) {
+    m_src_idx <- fastmatch::fmatch(
+      consistent_edges$feature_id,
+      features_min$feature_id
+    )
+    m_dest_idx <- fastmatch::fmatch(
+      consistent_edges$feature_id_dest,
+      features_min$feature_id
+    )
+    mz_src_vec <- as.numeric(features_min$mz[m_src_idx])
+    mz_dest_vec <- as.numeric(features_min$mz[m_dest_idx])
+    valid_mz <- !is.na(mz_src_vec) & !is.na(mz_dest_vec)
+    edge_with_m <- tidytable::as_tidytable(
+      consistent_edges[which(valid_mz), , drop = FALSE]
+    )
+    edge_with_m$mz_src <- mz_src_vec[valid_mz]
+    edge_with_m$mz_dest <- mz_dest_vec[valid_mz]
+  } else {
+    edge_with_m <- consistent_edges |>
+      tidytable::left_join(
+        features_min,
+        by = c("feature_id")
+      ) |>
+      tidytable::rename(mz_src = mz) |>
+      tidytable::left_join(
+        features_min |>
+          tidytable::rename(feature_id_dest = feature_id, mz_dest = mz),
+        by = c("feature_id_dest")
+      ) |>
+      tidytable::filter(!is.na(mz_src) & !is.na(mz_dest)) |>
+      tidytable::as_tidytable()
+  }
 
-  # Add edge IDs
-  edge_with_m <- edge_with_m |>
-    tidytable::mutate(
-      m_src = calculate_neutral_mass_from_lookup(
-        mzs = as.numeric(mz_src),
-        adducts = adduct,
-        adduct_lookup = adduct_lookup
-      ),
-      m_dest = calculate_neutral_mass_from_lookup(
-        mzs = as.numeric(mz_dest),
-        adducts = adduct_dest,
-        adduct_lookup = adduct_lookup
-      )
-    ) |>
-    tidytable::as_tidytable()
+  edge_with_m$m_src <- calculate_neutral_mass_from_lookup(
+    mzs = as.numeric(edge_with_m$mz_src),
+    adducts = edge_with_m$adduct,
+    adduct_lookup = adduct_lookup
+  )
+  edge_with_m$m_dest <- calculate_neutral_mass_from_lookup(
+    mzs = as.numeric(edge_with_m$mz_dest),
+    adducts = edge_with_m$adduct_dest,
+    adduct_lookup = adduct_lookup
+  )
 
   # Add edge_id column using row numbers
   edge_with_m$edge_id <- seq_len(nrow(edge_with_m))
@@ -381,11 +448,7 @@ enforce_global_m_consistency <- function(
       break
     }
 
-    feature_medians <- stats::ave(
-      m_values,
-      feature_ids,
-      FUN = function(x) stats::median(x, na.rm = TRUE)
-    )
+    feature_medians <- .fast_group_median(m_values, feature_ids)$per_obs
     abs_diff <- abs(m_values - feature_medians)
     dalton_tol <- tolerance_dalton %||% 0.0025
     ppm_tol <- if (
@@ -806,13 +869,59 @@ collect_node_adduct_hypotheses <- function(
 #' Returns the original string unchanged if parsing fails.
 #' @keywords internal
 .simplify_adduct_after_modifier <- function(adduct_strings) {
-  vapply(
-    adduct_strings,
-    function(adduct) {
-      if (is.na(adduct) || !nzchar(adduct)) {
-        return(adduct)
-      }
+  n_in <- length(adduct_strings)
+  if (n_in == 0L) {
+    return(character(0L))
+  }
+  valid_mask <- !is.na(adduct_strings) & nzchar(adduct_strings)
+  if (!any(valid_mask)) {
+    return(adduct_strings)
+  }
+  u_adducts <- unique(adduct_strings[valid_mask])
 
+  carriers <- c(
+    "H",
+    "H2",
+    "H3",
+    "H4N",
+    "Na",
+    "K",
+    "Li",
+    "Mg",
+    "Ca",
+    "Fe",
+    "Cu",
+    "Zn",
+    "Mn",
+    "Al"
+  )
+
+  hill_formula <- function(counts) {
+    counts <- Filter(function(x) x > 0L, counts)
+    if (length(counts) == 0L) {
+      return("")
+    }
+    els <- names(counts)
+    ord <- order(
+      ifelse(els == "C", 0L, ifelse(els == "H", 1L, 2L)),
+      els
+    )
+    paste0(
+      vapply(
+        els[ord],
+        function(el) {
+          n <- as.integer(counts[[el]])
+          paste0(el, if (n > 1L) as.character(n) else "")
+        },
+        character(1L)
+      ),
+      collapse = ""
+    )
+  }
+
+  u_simplified <- vapply(
+    u_adducts,
+    function(adduct) {
       m <- regexec("^\\[(.*)\\](\\d*[+-])$", adduct, perl = TRUE)
       g <- regmatches(adduct, m)[[1L]]
       if (length(g) == 0L) {
@@ -841,23 +950,6 @@ collect_node_adduct_hypotheses <- function(
         return(adduct)
       }
 
-      # Keep charge-carrier tokens separate from modifier chemistry.
-      carriers <- c(
-        "H",
-        "H2",
-        "H3",
-        "H4N",
-        "Na",
-        "K",
-        "Li",
-        "Mg",
-        "Ca",
-        "Fe",
-        "Cu",
-        "Zn",
-        "Mn",
-        "Al"
-      )
       has_pos_h4n <- any(grepl("^\\+[0-9]*H4N$", tokens, perl = TRUE))
 
       carrier_net <- list()
@@ -885,30 +977,6 @@ collect_node_adduct_hypotheses <- function(
               sign * mult * as.integer(atoms[[el]])
           }
         }
-      }
-
-      # Hill formula builder
-      hill_formula <- function(counts) {
-        counts <- Filter(function(x) x > 0L, counts)
-        if (length(counts) == 0L) {
-          return("")
-        }
-        els <- names(counts)
-        ord <- order(
-          ifelse(els == "C", 0L, ifelse(els == "H", 1L, 2L)),
-          els
-        )
-        paste0(
-          vapply(
-            els[ord],
-            function(el) {
-              n <- as.integer(counts[[el]])
-              paste0(el, if (n > 1L) as.character(n) else "")
-            },
-            character(1L)
-          ),
-          collapse = ""
-        )
       }
 
       new_mods <- character()
@@ -946,6 +1014,13 @@ collect_node_adduct_hypotheses <- function(
     character(1L),
     USE.NAMES = FALSE
   )
+
+  out <- adduct_strings
+  out[valid_mask] <- u_simplified[fastmatch::fmatch(
+    adduct_strings[valid_mask],
+    u_adducts
+  )]
+  out
 }
 
 #' Propagate a modifier from the SOURCE feature's hypothesis to the DESTINATION
@@ -1766,18 +1841,21 @@ prune_candidates_by_network_consensus <- function(
   adduct_edges,
   baseline_adduct = NULL
 ) {
-  if (nrow(matched) == 0L) {
+  n_in <- nrow(matched)
+  if (n_in == 0L) {
     return(matched)
   }
   if (!"is_preassigned" %in% colnames(matched)) {
-    matched <- matched |>
-      tidytable::mutate(is_preassigned = FALSE)
+    matched$is_preassigned <- rep(FALSE, n_in)
   }
   state_map <- build_adduct_state_key_map(unique(c(
     matched$adduct,
     adduct_edges$adduct,
     adduct_edges$adduct_dest
   )))
+  sm_add <- as.character(state_map$adduct)
+  sm_key <- as.character(state_map$state_key)
+  sm_key[is.na(sm_key)] <- sm_add[is.na(sm_key)]
 
   safe_max_support <- function(x) {
     if (length(x) == 0L || all(is.na(x))) {
@@ -1786,101 +1864,111 @@ prune_candidates_by_network_consensus <- function(
     as.integer(max(x, na.rm = TRUE))
   }
 
-  support <- compute_feature_adduct_support(adduct_edges) |>
-    tidytable::left_join(
-      state_map |>
-        tidytable::rename(adduct_state_key = state_key),
-      by = "adduct"
-    ) |>
-    tidytable::mutate(
-      adduct_state_key = tidytable::if_else(
-        is.na(adduct_state_key),
-        adduct,
-        adduct_state_key
+  supp_raw <- compute_feature_adduct_support(adduct_edges)
+  net_support <- integer(n_in)
+  if (nrow(supp_raw) > 0L) {
+    s_m <- fastmatch::fmatch(supp_raw$adduct, sm_add)
+    supp_raw$adduct_state_key <- ifelse(
+      is.na(s_m),
+      as.character(supp_raw$adduct),
+      sm_key[s_m]
+    )
+    support <- supp_raw |>
+      tidytable::summarize(
+        net_support = safe_max_support(adduct_support),
+        .by = c(feature_id, adduct_state_key)
       )
-    ) |>
-    tidytable::summarize(
-      adduct_support = safe_max_support(adduct_support),
-      .by = c(feature_id, adduct_state_key)
-    ) |>
-    tidytable::rename(net_support = adduct_support)
-
-  scored <- matched |>
-    tidytable::left_join(
-      state_map |>
-        tidytable::rename(adduct_state_key = state_key),
-      by = "adduct"
-    ) |>
-    tidytable::mutate(
-      adduct_state_key = tidytable::if_else(
-        is.na(adduct_state_key),
-        adduct,
-        adduct_state_key
+    in_supp_f <- !is.na(fastmatch::fmatch(
+      matched$feature_id,
+      support$feature_id
+    ))
+    if (any(in_supp_f)) {
+      idx_sf <- which(in_supp_f)
+      m_add_sf <- fastmatch::fmatch(matched$adduct[idx_sf], sm_add)
+      row_sk_sf <- ifelse(
+        is.na(m_add_sf),
+        as.character(matched$adduct[idx_sf]),
+        sm_key[m_add_sf]
       )
-    ) |>
-    tidytable::left_join(support, by = c("feature_id", "adduct_state_key")) |>
-    tidytable::mutate(
-      is_preassigned = tidytable::if_else(
-        is.na(is_preassigned),
-        FALSE,
-        is_preassigned
-      ),
-      net_support = tidytable::if_else(
-        is.na(net_support),
-        0L,
-        as.integer(net_support)
+      supp_keys <- paste(
+        support$feature_id,
+        support$adduct_state_key,
+        sep = "\r"
       )
-    )
+      m_supp <- fastmatch::fmatch(
+        paste(matched$feature_id[idx_sf], row_sk_sf, sep = "\r"),
+        supp_keys
+      )
+      valid_s <- !is.na(m_supp)
+      net_support[idx_sf[valid_s]] <- as.integer(
+        support$net_support[m_supp[valid_s]]
+      )
+    }
+  }
 
-  per_feature_max <- scored |>
-    tidytable::summarize(
-      max_support = max(net_support, na.rm = TRUE),
-      n_candidates = tidytable::n_distinct(adduct),
-      .by = feature_id
-    )
+  f_col <- matched$feature_id
+  u_f <- unique(f_col)
+  n_f <- length(u_f)
+  f_id <- if (anyNA(u_f)) match(f_col, u_f) else fastmatch::fmatch(f_col, u_f)
 
-  # Flag features that have at least one non-"multi" library hit.
-  # "multi" candidates (exotic multi-charge / dimer adducts assigned via cross-
-  # join with NO pairwise evidence) are dropped whenever a more parsimonious
-  # alternative (pair, cluster, loss, preassigned, baseline) already matched the
-  # library for the same feature. This prevents [2M+Fe]2+, [M+Ca]2+, etc. from
-  # crowding out sensible annotations for isolated features.
-  per_feature_sources <- scored |>
-    tidytable::summarize(
-      has_non_multi = any(source != "multi"),
-      .by = feature_id
-    )
+  # Feature has max_support == 0L iff no row for that feature has net_support > 0L
+  feat_has_pos_supp <- logical(n_f)
+  feat_has_pos_supp[f_id[net_support > 0L]] <- TRUE
+  max_support_zero <- !feat_has_pos_supp[f_id]
 
-  scored <- scored |>
-    tidytable::left_join(per_feature_max, by = "feature_id") |>
-    tidytable::left_join(per_feature_sources, by = "feature_id") |>
-    tidytable::mutate(
-      has_non_multi = tidytable::if_else(
-        is.na(has_non_multi),
-        FALSE,
-        has_non_multi
-      ),
-      # A candidate is "safe" (never dropped) when:
-      #   - it is the baseline adduct,
-      #   - it was pre-assigned upstream,
-      #   - it has network edge support,
-      #   - or it is the sole type of candidate for this feature *and* it is
-      #     not a speculative "multi" hypothesis that has a better alternative.
-      is_safe = (if (is.null(baseline_adduct)) {
-        FALSE
-      } else {
-        adduct == baseline_adduct
-      }) |
-        is_preassigned |
-        source %in% c("preassigned", "baseline") |
-        net_support > 0L |
-        (max_support == 0L & !(source == "multi" & has_non_multi)),
-      drop = !is_safe & n_candidates > 1L
-    )
+  # Feature has >1 distinct adduct iff some row has adduct != first adduct of feature
+  add_col <- matched$adduct
+  u_a <- unique(add_col)
+  a_id <- if (anyNA(u_a)) {
+    match(add_col, u_a)
+  } else {
+    fastmatch::fmatch(add_col, u_a)
+  }
+  first_idx <- which(!duplicated(f_id))
+  first_a_per_f <- integer(n_f)
+  first_a_per_f[f_id[first_idx]] <- a_id[first_idx]
+  feat_multi_cand <- logical(n_f)
+  feat_multi_cand[f_id[a_id != first_a_per_f[f_id]]] <- TRUE
+  multi_candidates <- feat_multi_cand[f_id]
 
-  dropped <- scored |> tidytable::filter(drop)
-  if (nrow(dropped) > 0L) {
-    n_unique <- nrow(dropped |> tidytable::distinct(feature_id, adduct))
+  # Flag features that have at least one non-"multi" library hit
+  src_col <- as.character(matched$source)
+  feat_has_non_multi <- logical(n_f)
+  feat_has_non_multi[f_id[!is.na(src_col) & src_col != "multi"]] <- TRUE
+  has_non_multi <- feat_has_non_multi[f_id]
+
+  is_pre <- as.logical(matched$is_preassigned)
+  is_pre[is.na(is_pre)] <- FALSE
+
+  baseline_match <- if (is.null(baseline_adduct)) {
+    logical(n_in)
+  } else {
+    !is.na(add_col) & add_col == baseline_adduct
+  }
+
+  is_safe <- baseline_match |
+    is_pre |
+    (!is.na(src_col) & src_col %in% c("preassigned", "baseline")) |
+    (net_support > 0L) |
+    (max_support_zero & !(!is.na(src_col) & src_col == "multi" & has_non_multi))
+
+  drop <- !is_safe & multi_candidates
+
+  if (any(drop)) {
+    drop_idx <- which(drop)
+    n_a <- max(1L, length(u_a))
+    if (as.numeric(n_f) * as.numeric(n_a) < 2e9) {
+      pair_code <- (f_id[drop_idx] - 1L) * n_a + a_id[drop_idx]
+      n_unique <- sum(tabulate(pair_code, nbins = n_f * n_a) > 0L)
+    } else {
+      n_unique <- nrow(
+        tidytable::tidytable(
+          feature_id = f_col[drop_idx],
+          adduct = add_col[drop_idx]
+        ) |>
+          tidytable::distinct()
+      )
+    }
     log_info(
       paste0(
         "Network-consensus pruning dropped %d (feature, adduct) ",
@@ -1889,19 +1977,11 @@ prune_candidates_by_network_consensus <- function(
       ),
       n_unique
     )
+    keep_idx <- which(!drop)
+    return(tidytable::as_tidytable(lapply(as.list(matched), `[`, keep_idx)))
   }
 
-  scored |>
-    tidytable::filter(!drop) |>
-    tidytable::select(
-      -drop,
-      -is_safe,
-      -has_non_multi,
-      -max_support,
-      -n_candidates,
-      -net_support,
-      -adduct_state_key
-    )
+  tidytable::as_tidytable(matched)
 }
 
 #' Propagate annotations across M-consistent cliques
