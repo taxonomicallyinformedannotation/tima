@@ -261,22 +261,45 @@ enforce_loss_formula_compatibility <- function(annotations) {
     return(annotations)
   }
 
-  keep_struct <- vapply(
-    X = idx_check,
-    FUN = function(i) {
-      req <- if (has_loss_term && !is.na(annotations$loss_term[[i]])) {
-        loss_term_atom_requirements(annotations$loss_term[[i]])
+  use_loss_term <- if (has_loss_term) {
+    !is.na(annotations$loss_term[idx_check])
+  } else {
+    logical(length(idx_check))
+  }
+  loss_keys <- ifelse(
+    use_loss_term,
+    paste0("L:", annotations$loss_term[idx_check]),
+    paste0("A:", annotations$adduct[idx_check])
+  )
+  u_loss_keys <- unique(loss_keys)
+  req_lookup <- stats::setNames(
+    lapply(u_loss_keys, function(k) {
+      if (startsWith(k, "L:")) {
+        loss_term_atom_requirements(substr(k, 3L, nchar(k)))
       } else {
-        adduct_loss_atom_requirements(annotations$adduct[[i]])
+        adduct_loss_atom_requirements(substr(k, 3L, nchar(k)))
       }
+    }),
+    u_loss_keys
+  )
+
+  formulas_check <- annotations$candidate_structure_molecular_formula[idx_check]
+  pair_keys <- paste(loss_keys, formulas_check, sep = "\r")
+  u_pair_idx <- which(!duplicated(pair_keys))
+  u_pair_keys <- pair_keys[u_pair_idx]
+  u_keep <- vapply(
+    X = u_pair_idx,
+    FUN = function(j) {
+      req <- req_lookup[[loss_keys[[j]]]]
       fs <- formula_satisfies_loss_requirements(
-        formula = annotations$candidate_structure_molecular_formula[[i]],
+        formula = formulas_check[[j]],
         loss_requirements = req
       )
       if (is.na(fs)) TRUE else fs
     },
     FUN.VALUE = logical(1L)
   )
+  keep_struct <- u_keep[fastmatch::fmatch(pair_keys, u_pair_keys)]
   idx_drop <- idx_check[!keep_struct]
   if (length(idx_drop) == 0L) {
     return(annotations)
@@ -399,12 +422,11 @@ enforce_annotation_edge_adduct_agreement <- function(
         is.na(edge_supported),
         FALSE,
         edge_supported
-      )
-    ) |>
-    tidytable::group_by(feature_id) |>
-    tidytable::mutate(feature_has_edge_support = any(edge_supported)) |>
-    tidytable::ungroup() |>
-    tidytable::mutate(
+      ),
+      feature_has_edge_support = !is.na(fastmatch::fmatch(
+        feature_id,
+        unique(feature_id[edge_supported])
+      )),
       keep = edge_supported |
         (!feature_has_edge_support & !(has_source & source == "multi")) |
         (has_source & source %in% c("loss", "cluster")) |

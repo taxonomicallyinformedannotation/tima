@@ -290,3 +290,25 @@ test_that("covariance skips pairs measured on different sample sets", {
     )
   )
 })
+
+test_that("covariance handles constant vectors, sparse samples, and RT boundaries", {
+  intensities <- list(
+    f1 = c(100, 200, 300, 400, 500, 600),
+    f2 = c(105, 205, 298, 402, 501, 599),
+    f_const = c(100, 100, 100, 100, 100, 100),
+    f_sparse = c(100, 0, NA, 200, 0, 0),
+    f_far = c(100, 200, 300, 400, 500, 600)
+  )
+  ft <- .covariance_table(
+    intensities,
+    rt = c(1.0, 1.2, 1.1, 1.15, 3.0)
+  )
+  result <- compute_intensity_covariance_edges(
+    ft,
+    tolerance_rt = 0.5,
+    correlation_p_threshold = 0.05
+  )
+  expect_identical(nrow(result), 1L)
+  expect_identical(result$feature_id, "f1")
+  expect_identical(result$feature_id_dest, "f2")
+})

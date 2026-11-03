@@ -121,7 +121,7 @@ test_that("cluster-edge path covers ~67.99 Da delta via two-step cluster pipelin
 
   # Step-2 delta (cluster CH2O2): should be ~46.01 Da
   delta_step2 <- mz_co2na - mz_sod
-  ch2o2_mass <- MetaboCoreUtils::calculateMass("CH2O2")
+  ch2o2_mass <- calculate_formula_mass("CH2O2")
   expect_lt(abs(delta_step2 - ch2o2_mass), 0.005)
 
   # Total two-step delta covers the ~67.99 Da gap

@@ -139,19 +139,21 @@ load_structural_library <- function(
   }
   supp_files <- c(supp_files, list(str_tax_cla, str_tax_npc))
   supp_names <- c(supp_names, "ClassyFire taxonomy", "NPClassifier taxonomy")
-  supp_tables <- purrr::map2(
-    .x = supp_files,
-    .y = supp_names,
-    .f = ~ safe_fread(
-      file = .x,
-      file_type = .y,
-      na.strings = c("", "NA"),
-      colClasses = "character"
-    )
+  supp_tables <- Map(
+    function(x, y) {
+      safe_fread(
+        file = x,
+        file_type = y,
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
+    },
+    supp_files,
+    supp_names
   )
-  joined <- purrr::reduce(
-    .x = c(list(library_table), supp_tables),
-    .f = tidytable::left_join
+  joined <- Reduce(
+    f = tidytable::left_join,
+    x = c(list(library_table), supp_tables)
   )
 
   structures <- joined |>

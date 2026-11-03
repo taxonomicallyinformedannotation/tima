@@ -110,6 +110,10 @@
 #' @return Named character of paths to the annotations and edges files.
 #'
 #' @family annotation
+#' @concept EDAM:operation_3629 Deisotoping
+#' @concept EDAM:operation_3803 Natural product identification
+#' @concept EDAM:operation_3766 Weighted correlation network analysis
+#' @concept EDAM:data_2536 Mass spectrometry data
 #'
 #' @export
 #'
@@ -1484,7 +1488,7 @@ build_modifier_mass_table <- function(modifiers, out_col, strip_label = FALSE) {
     X = formula,
     FUN = function(f) {
       suppressWarnings(tryCatch(
-        MetaboCoreUtils::calculateMass(f),
+        calculate_formula_mass(f),
         error = function(.err) {
           invisible(.err)
           NA_real_
@@ -2565,9 +2569,17 @@ enforce_non_conflicting_annotation_states <- function(
           0L,
           as.integer(adduct_support)
         )
+      )
+
+    feat_best <- out |>
+      tidytable::distinct(
+        feature_id,
+        assigned_state_key,
+        keep,
+        support_class_rank,
+        support_strength
       ) |>
-      tidytable::group_by(feature_id) |>
-      tidytable::mutate(
+      tidytable::summarize(
         feature_is_unconstrained = all(is.na(assigned_state_key)),
         best_rank = {
           any_keep <- any(keep, na.rm = TRUE)
@@ -2578,19 +2590,29 @@ enforce_non_conflicting_annotation_states <- function(
           }
         },
         best_support = {
-          keep_at_best <- keep & support_class_rank == best_rank
+          br <- if (isTRUE(any(keep, na.rm = TRUE))) {
+            min(support_class_rank[keep], na.rm = TRUE)
+          } else {
+            min(support_class_rank, na.rm = TRUE)
+          }
+          keep_at_best <- keep & support_class_rank == br
           if (isTRUE(any(keep_at_best, na.rm = TRUE))) {
             max(support_strength[keep_at_best], na.rm = TRUE)
           } else {
-            max(support_strength[support_class_rank == best_rank], na.rm = TRUE)
+            max(support_strength[support_class_rank == br], na.rm = TRUE)
           }
         },
+        .by = feature_id
+      )
+
+    out <- out |>
+      tidytable::left_join(feat_best, by = "feature_id") |>
+      tidytable::mutate(
         keep = keep &
           (!feature_is_unconstrained |
             (support_class_rank == best_rank &
               support_strength == best_support))
-      ) |>
-      tidytable::ungroup()
+      )
   }
 
   dropped <- out |>

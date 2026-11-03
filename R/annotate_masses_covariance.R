@@ -69,45 +69,42 @@ compute_intensity_covariance_edges <- function(
     return(.empty_covariance_edges())
   }
 
-  # Generate pairs efficiently using vectorized window lookup
-  feature_pairs_list <- lapply(
-    seq_len(nrow(feature_rts) - 1L),
-    function(i) {
-      feat_id <- feature_rts$feature_id[[i]]
-      feat_rt <- feature_rts$rt[[i]]
+  # Generate pairs efficiently using vectorized sorted-RT window lookup
+  n_rts <- nrow(feature_rts)
+  rts <- as.numeric(feature_rts$rt)
+  feat_ids_rt <- feature_rts$feature_id
+  i_seq <- seq_len(n_rts - 1L)
+  end_idx <- findInterval(rts[i_seq] + tolerance_rt + 1e-12, rts)
+  counts <- end_idx - i_seq
+  active <- which(counts > 0L)
 
-      # Find all features j > i within RT window (only check features after this one)
-      # Features are sorted by RT, so we can stop early
-      neighbors <- tidytable::filter(
-        feature_rts[(i + 1L):nrow(feature_rts), ], # Only look ahead
-        abs(rt - feat_rt) <= tolerance_rt
-      )
-
-      if (nrow(neighbors) == 0L) {
-        return(tidytable::tidytable(
-          feature_id = character(),
-          feature_id_dest = character()
-        ))
-      }
-
-      # Create pairs
-      tidytable::tidytable(
-        feature_id = feat_id,
-        feature_id_dest = neighbors$feature_id
-      )
-    }
-  )
-
-  # Bind all pairs (much smaller than cross_join)
-  feature_pairs <- tidytable::bind_rows(feature_pairs_list)
-
-  if (nrow(feature_pairs) == 0L) {
+  if (length(active) == 0L) {
     log_info(
       "Intensity co-variance: tested 0 pair(s), 0 significant edge(s) retained (p < %.2f)",
       correlation_p_threshold
     )
     return(.empty_covariance_edges())
   }
+
+  pair_r_i <- rep.int(active, counts[active])
+  pair_r_j <- sequence(counts[active], from = active + 1L)
+  keep_rt <- abs(rts[pair_r_j] - rts[pair_r_i]) <= tolerance_rt
+  if (!all(keep_rt)) {
+    pair_r_i <- pair_r_i[keep_rt]
+    pair_r_j <- pair_r_j[keep_rt]
+  }
+
+  n_pairs_tested <- length(pair_r_i)
+  if (n_pairs_tested == 0L) {
+    log_info(
+      "Intensity co-variance: tested 0 pair(s), 0 significant edge(s) retained (p < %.2f)",
+      correlation_p_threshold
+    )
+    return(.empty_covariance_edges())
+  }
+
+  pair_feat_i <- feat_ids_rt[pair_r_i]
+  pair_feat_j <- feat_ids_rt[pair_r_j]
 
   # Extract intensity_all lists - one per feature (they're duplicated per sample row)
   intensity_by_feature <- features_table |>
@@ -122,109 +119,159 @@ compute_intensity_covariance_edges <- function(
     return(.empty_covariance_edges())
   }
 
-  # Convert to a named list for fast lookups
-  # If intensities are stored as pipe-separated strings (from CSV), parse them
-  intensity_vectors <- lapply(
-    intensity_by_feature[[intensity_col]],
-    function(x) {
-      if (is.character(x)) {
-        # Parse pipe-separated string to numeric. Keep NAs so that positions
-        # stay aligned with samples across features (filtered pairwise below)
-        suppressWarnings(as.numeric(strsplit(x, "\\|")[[1]]))
-      } else if (is.list(x)) {
-        as.numeric(unlist(x))
-      } else {
-        as.numeric(x) # Convert to numeric
+  # Convert to numeric vectors per feature; vectorize pipe-separated string parsing
+  raw_intensities <- intensity_by_feature[[intensity_col]]
+  intensity_vectors <- if (is.character(raw_intensities)) {
+    lapply(
+      strsplit(raw_intensities, "|", fixed = TRUE),
+      function(s) suppressWarnings(as.numeric(s))
+    )
+  } else if (
+    is.list(raw_intensities) &&
+      all(vapply(raw_intensities, is.double, logical(1L)))
+  ) {
+    raw_intensities
+  } else {
+    lapply(
+      raw_intensities,
+      function(x) {
+        if (is.character(x)) {
+          suppressWarnings(as.numeric(strsplit(x, "|", fixed = TRUE)[[1L]]))
+        } else if (is.list(x)) {
+          as.numeric(unlist(x, use.names = FALSE))
+        } else {
+          as.numeric(x)
+        }
       }
-    }
-  )
-  intensity_vectors <- stats::setNames(
-    intensity_vectors,
-    intensity_by_feature$feature_id
-  )
+    )
+  }
 
   log_debug(
     "Extracted intensity vectors for %d features",
     length(intensity_vectors)
   )
 
-  # Test every pair, then correct the p-values for multiple testing.
-  # Counters live in an environment so the per-pair closure can update them
-  drops <- new.env(parent = emptyenv())
-  drops$n_not_in_matrix <- 0L
-  drops$n_length_mismatch <- 0L
-  drops$n_insufficient_samples <- 0L
-  drops$n_correlation_failed <- 0L
-
-  test_pair <- function(feat_id, other_id) {
-    int_x <- intensity_vectors[[feat_id]]
-    int_y <- intensity_vectors[[other_id]]
-    if (is.null(int_x) || is.null(int_y)) {
-      drops$n_not_in_matrix <- drops$n_not_in_matrix + 1L
-      return(NULL)
-    }
-
-    # Both vectors must have same length (same sample ordering)
-    if (length(int_x) != length(int_y)) {
-      drops$n_length_mismatch <- drops$n_length_mismatch + 1L
-      return(NULL)
-    }
-
-    # Filter out NAs and non-positive values
-    valid_idx <- !is.na(int_x) & !is.na(int_y) & int_x > 0 & int_y > 0
-
-    # Need at least 3 data points for a meaningful correlation test (df >= 1)
-    n_valid <- sum(valid_idx)
-    if (n_valid < 3L) {
-      drops$n_insufficient_samples <- drops$n_insufficient_samples + 1L
-      return(NULL)
-    }
-
-    cor_test <- tryCatch(
-      suppressWarnings(stats::cor.test(
-        int_x[valid_idx],
-        int_y[valid_idx],
-        method = "pearson"
-      )),
-      error = function(e) NULL
-    )
-    if (is.null(cor_test) || is.na(cor_test$p.value)) {
-      drops$n_correlation_failed <- drops$n_correlation_failed + 1L
-      return(NULL)
-    }
-
-    c(
-      correlation = as.numeric(cor_test$estimate),
-      p_value_raw = as.numeric(cor_test$p.value),
-      n_samples = n_valid
-    )
+  # Map pair endpoints to feature indices and classify drops vectorially
+  feat_ids_int <- intensity_by_feature$feature_id
+  idx_i <- fastmatch::fmatch(pair_feat_i, feat_ids_int)
+  idx_j <- fastmatch::fmatch(pair_feat_j, feat_ids_int)
+  is_null_vec <- vapply(intensity_vectors, is.null, logical(1L))
+  if (any(is_null_vec)) {
+    idx_i[!is.na(idx_i) & is_null_vec[idx_i]] <- NA_integer_
+    idx_j[!is.na(idx_j) & is_null_vec[idx_j]] <- NA_integer_
   }
 
-  tested <- Map(
-    test_pair,
-    feature_pairs$feature_id,
-    feature_pairs$feature_id_dest
-  )
-  keep <- !vapply(tested, is.null, logical(1L))
-  stats_mat <- do.call(rbind, tested[keep])
+  in_mat <- !is.na(idx_i) & !is.na(idx_j)
+  n_not_in_matrix <- sum(!in_mat)
 
-  n_pairs_tested <- nrow(feature_pairs)
-  n_tests <- sum(keep)
-  n_not_in_matrix <- drops$n_not_in_matrix
-  n_length_mismatch <- drops$n_length_mismatch
-  n_insufficient_samples <- drops$n_insufficient_samples
-  n_correlation_failed <- drops$n_correlation_failed
-  rm(drops)
+  vec_lens <- lengths(intensity_vectors)
+  idx_in <- which(in_mat)
+  same_len <- vec_lens[idx_i[idx_in]] == vec_lens[idx_j[idx_in]]
+  n_length_mismatch <- sum(!same_len)
+  idx_same <- idx_in[same_len]
+
+  # Any feature with < 3 positive samples cannot form a pair with >= 3 shared samples
+  pos_counts <- vapply(
+    intensity_vectors,
+    function(x) sum(!is.na(x) & x > 0),
+    integer(1L)
+  )
+  has_min_pos <- pos_counts[idx_i[idx_same]] >= 3L &
+    pos_counts[idx_j[idx_same]] >= 3L
+  n_insufficient_samples <- sum(!has_min_pos)
+  idx_cand <- idx_same[has_min_pos]
+
+  n_correlation_failed <- 0L
+  valid_test <- logical(n_pairs_tested)
+  cor_all <- numeric(n_pairs_tested)
+  n_samp_all <- integer(n_pairs_tested)
+
+  if (length(idx_cand) > 0L) {
+    cand_lens <- vec_lens[idx_i[idx_cand]]
+    for (s_len in unique(cand_lens)) {
+      pair_sub <- if (length(unique(cand_lens)) == 1L) {
+        idx_cand
+      } else {
+        idx_cand[cand_lens == s_len]
+      }
+      u_feats <- sort(unique(c(idx_i[pair_sub], idx_j[pair_sub])))
+      mat <- matrix(
+        unlist(intensity_vectors[u_feats], use.names = FALSE),
+        nrow = length(u_feats),
+        ncol = s_len,
+        byrow = TRUE
+      )
+      mask <- !is.na(mat) & mat > 0
+      mat[!mask] <- 0
+
+      local_i <- fastmatch::fmatch(idx_i[pair_sub], u_feats)
+      local_j <- fastmatch::fmatch(idx_j[pair_sub], u_feats)
+      n_sub <- length(pair_sub)
+      chunk_size <- max(256L, min(8192L, as.integer(524288L / max(1L, s_len))))
+      n_chunks <- ceiling(n_sub / chunk_size)
+
+      for (ch in seq_len(n_chunks)) {
+        rng <- ((ch - 1L) * chunk_size + 1L):min(n_sub, ch * chunk_size)
+        ci <- local_i[rng]
+        cj <- local_j[rng]
+        n_rng <- length(ci)
+        v <- mask[ci, , drop = FALSE] & mask[cj, , drop = FALSE]
+        nv <- as.integer(.rowSums(v, n_rng, s_len))
+        insuff <- nv < 3L
+        if (any(insuff)) {
+          n_insufficient_samples <- n_insufficient_samples + sum(insuff)
+        }
+        ok <- which(!insuff)
+        n_ok <- length(ok)
+        if (n_ok > 0L) {
+          v_ok <- v[ok, , drop = FALSE]
+          nv_ok <- nv[ok]
+          x <- mat[ci[ok], , drop = FALSE] * v_ok
+          y <- mat[cj[ok], , drop = FALSE] * v_ok
+          mx <- .rowSums(x, n_ok, s_len) / nv_ok
+          my <- .rowSums(y, n_ok, s_len) / nv_ok
+          dx <- (x - mx) * v_ok
+          dy <- (y - my) * v_ok
+          ssx <- .rowSums(dx * dx, n_ok, s_len)
+          ssy <- .rowSums(dy * dy, n_ok, s_len)
+          denom <- sqrt(ssx * ssy)
+          r_val <- .rowSums(dx * dy, n_ok, s_len) / denom
+          bad_r <- is.na(r_val) |
+            !is.finite(r_val) |
+            !is.finite(denom) |
+            denom <= 0
+          if (any(bad_r)) {
+            n_correlation_failed <- n_correlation_failed + sum(bad_r)
+          }
+          good <- which(!bad_r)
+          if (length(good) > 0L) {
+            dest_idx <- pair_sub[rng[ok[good]]]
+            cor_all[dest_idx] <- pmax(-1, pmin(1, r_val[good]))
+            n_samp_all[dest_idx] <- nv_ok[good]
+            valid_test[dest_idx] <- TRUE
+          }
+        }
+      }
+    }
+  }
+
+  keep <- which(valid_test)
+  n_tests <- length(keep)
 
   result <- if (n_tests == 0L) {
     .empty_covariance_edges()
   } else {
+    r_kept <- cor_all[keep]
+    n_kept <- n_samp_all[keep]
+    df <- n_kept - 2L
+    t_stat <- sqrt(df) * r_kept / sqrt(pmax(0, 1 - r_kept * r_kept))
+    p_raw_kept <- 2 * stats::pt(-abs(t_stat), df = df)
     tidytable::tidytable(
-      feature_id = feature_pairs$feature_id[keep],
-      feature_id_dest = feature_pairs$feature_id_dest[keep],
-      correlation = stats_mat[, "correlation"],
-      p_value_raw = stats_mat[, "p_value_raw"],
-      n_samples = as.integer(stats_mat[, "n_samples"])
+      feature_id = pair_feat_i[keep],
+      feature_id_dest = pair_feat_j[keep],
+      correlation = r_kept,
+      p_value_raw = p_raw_kept,
+      n_samples = n_kept
     ) |>
       # Benjamini-Hochberg over every test performed (positive or not), so the
       # threshold controls the false discovery rate of the retained edges

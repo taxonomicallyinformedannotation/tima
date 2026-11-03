@@ -208,17 +208,13 @@ solve_consistent_adduct_assignments <- function(
     ))
   }
 
-  # Build undirected graph for connected components
-  undirected <- tidytable::bind_rows(
-    consistent |>
-      tidytable::transmute(src = feature_id, dest = feature_id_dest),
-    consistent |>
-      tidytable::transmute(src = feature_id_dest, dest = feature_id)
-  ) |>
-    tidytable::distinct()
-
-  # Find connected components using BFS
-  all_nodes <- unique(c(undirected$src, undirected$dest))
+  # Find connected components using igraph (O(V + E))
+  g <- igraph::graph_from_data_frame(
+    d = consistent[, c("feature_id", "feature_id_dest"), drop = FALSE],
+    directed = FALSE
+  )
+  comp_info <- igraph::components(g)
+  all_nodes <- names(comp_info$membership)
   if (length(all_nodes) == 0L) {
     return(list(
       consistent_edges = consistent[0L, ],
@@ -230,172 +226,65 @@ solve_consistent_adduct_assignments <- function(
     ))
   }
 
-  neighbors <- split(undirected$dest, undirected$src)
-  visited <- stats::setNames(rep(FALSE, length(all_nodes)), all_nodes)
-  components <- list()
   component_lookup <- stats::setNames(
-    rep(NA_character_, length(all_nodes)),
+    paste0("comp_", comp_info$membership),
     all_nodes
   )
-  queue_capacity <- length(all_nodes)
 
-  for (node in all_nodes) {
-    if (isTRUE(visited[[node]])) {
-      next
-    }
-
-    queue <- character(queue_capacity)
-    queue_head <- 1L
-    queue_tail <- 1L
-    queue[[queue_tail]] <- node
-    queue_tail <- queue_tail + 1L
-    visited[[node]] <- TRUE
-
-    comp_nodes <- character(queue_capacity)
-    comp_count <- 0L
-    while (queue_head < queue_tail) {
-      current <- queue[[queue_head]]
-      queue_head <- queue_head + 1L
-      comp_count <- comp_count + 1L
-      comp_nodes[[comp_count]] <- current
-
-      next_nodes <- neighbors[[current]]
-      if (!is.null(next_nodes)) {
-        for (nxt in next_nodes) {
-          if (!isTRUE(visited[[nxt]])) {
-            visited[[nxt]] <- TRUE
-            queue[[queue_tail]] <- nxt
-            queue_tail <- queue_tail + 1L
-          }
-        }
-      }
-    }
-
-    component_id <- paste0("comp_", length(components) + 1L)
-    component_nodes <- comp_nodes[seq_len(comp_count)]
-    component_lookup[component_nodes] <- component_id
-    components[[length(components) + 1L]] <- component_nodes
-  }
-
-  # For each component, compute consistent M assignments
+  # Vectorized neutral mass computation across all consistent edges
   feature_mz_map <- stats::setNames(features_min$mz, features_min$feature_id)
-  all_m_maps <- list()
-  for (ci in seq_along(components)) {
-    comp_nodes <- components[[ci]]
-    comp_id <- paste0("comp_", ci)
+  src_ids <- as.character(consistent$feature_id)
+  dest_ids <- as.character(consistent$feature_id_dest)
+  src_mz <- as.numeric(feature_mz_map[src_ids])
+  dest_mz <- as.numeric(feature_mz_map[dest_ids])
 
-    edge_component_ids <- component_lookup[as.character(consistent$feature_id)]
-    edge_component_dest_ids <- component_lookup[as.character(
-      consistent$feature_id_dest
-    )]
-    comp_edge_mask <- !is.na(edge_component_ids) &
-      !is.na(edge_component_dest_ids) &
-      edge_component_ids == edge_component_dest_ids &
-      edge_component_ids == comp_id
-    comp_edges <- consistent[comp_edge_mask, , drop = FALSE]
-
-    if (nrow(comp_edges) == 0L) {
-      m_values <- tidytable::tidytable(
-        feature_id = character(),
-        neutral_mass = numeric()
+  m_values <- tidytable::tidytable(
+    feature_id = c(src_ids, dest_ids),
+    neutral_mass = c(
+      calculate_neutral_mass_from_lookup(
+        mzs = src_mz,
+        adducts = consistent$adduct,
+        adduct_lookup = adduct_lookup
+      ),
+      calculate_neutral_mass_from_lookup(
+        mzs = dest_mz,
+        adducts = consistent$adduct_dest,
+        adduct_lookup = adduct_lookup
       )
-    } else {
-      src_mz <- feature_mz_map[as.character(comp_edges$feature_id)]
-      dest_mz <- feature_mz_map[as.character(comp_edges$feature_id_dest)]
+    )
+  ) |>
+    tidytable::filter(!is.na(neutral_mass)) |>
+    tidytable::summarize(
+      neutral_mass = stats::median(neutral_mass, na.rm = TRUE),
+      .by = feature_id
+    )
 
-      m_values <- tidytable::tidytable(
-        feature_id = c(
-          as.character(comp_edges$feature_id),
-          as.character(comp_edges$feature_id_dest)
-        ),
-        neutral_mass = c(
-          calculate_neutral_mass_from_lookup(
-            mzs = as.numeric(src_mz),
-            adducts = comp_edges$adduct,
-            adduct_lookup = adduct_lookup
-          ),
-          calculate_neutral_mass_from_lookup(
-            mzs = as.numeric(dest_mz),
-            adducts = comp_edges$adduct_dest,
-            adduct_lookup = adduct_lookup
-          )
-        )
+  # For nodes with no valid M, use baseline M ([M+H]+)
+  missing_nodes <- setdiff(all_nodes, m_values$feature_id)
+  if (length(missing_nodes) > 0L) {
+    baseline_m <- features_table |>
+      tidytable::filter(
+        !is.na(fastmatch::fmatch(feature_id, missing_nodes))
       ) |>
-        tidytable::filter(!is.na(neutral_mass)) |>
-        tidytable::group_by(feature_id) |>
-        tidytable::mutate(
-          m_med = stats::median(neutral_mass, na.rm = TRUE),
-          m_mean = mean(neutral_mass, na.rm = TRUE),
-          m_sd = stats::sd(neutral_mass, na.rm = TRUE),
-          m_sd = tidytable::if_else(is.na(m_sd), 0, m_sd)
-        ) |>
-        tidytable::distinct(feature_id, .keep_all = TRUE) |>
-        tidytable::ungroup() |>
-        tidytable::select(feature_id, neutral_mass = m_med)
-    }
-
-    # For nodes with no edges, use baseline M (e.g., [M+H]+)
-    missing_nodes <- setdiff(comp_nodes, m_values$feature_id)
-    if (length(missing_nodes) > 0L) {
-      baseline_m <- features_table |>
-        tidytable::filter(
-          !is.na(fastmatch::fmatch(feature_id, missing_nodes))
-        ) |>
-        tidytable::transmute(
-          feature_id,
-          neutral_mass = calculate_neutral_mass_from_lookup(
-            mzs = as.numeric(mz),
-            adducts = "[M+H]+",
-            adduct_lookup = adduct_lookup
-          )
+      tidytable::transmute(
+        feature_id,
+        neutral_mass = calculate_neutral_mass_from_lookup(
+          mzs = as.numeric(mz),
+          adducts = "[M+H]+",
+          adduct_lookup = adduct_lookup
         )
-      m_values <- tidytable::bind_rows(m_values, baseline_m)
-    }
-
-    m_values <- m_values |>
-      tidytable::mutate(component_id = comp_id)
-    all_m_maps[[ci]] <- m_values
+      )
+    m_values <- tidytable::bind_rows(m_values, baseline_m)
   }
 
-  feature_m_map <- tidytable::bind_rows(all_m_maps)
+  feature_m_map <- m_values |>
+    tidytable::mutate(
+      component_id = unname(component_lookup[as.character(feature_id)])
+    )
 
   # Build component_membership map (feature_id -> component_id)
   component_membership <- feature_m_map |>
     tidytable::distinct(feature_id, component_id)
-
-  # Safe rm() — some variables are only defined conditionally; use
-  # intersect to avoid "object not found" warnings
-  rm(
-    list = intersect(
-      c(
-        "components",
-        "all_m_maps",
-        "feature_mz_map",
-        "ci",
-        "comp_nodes",
-        "comp_id",
-        "edge_component_ids",
-        "edge_component_dest_ids",
-        "neighbors",
-        "visited",
-        "component_lookup",
-        "queue_capacity",
-        "node",
-        "queue",
-        "queue_head",
-        "queue_tail",
-        "comp_count",
-        "current",
-        "nxt",
-        "component_id",
-        "component_nodes",
-        "missing_nodes",
-        "baseline_m",
-        "m_values"
-      ),
-      ls()
-    )
-  )
 
   list(
     consistent_edges = consistent,

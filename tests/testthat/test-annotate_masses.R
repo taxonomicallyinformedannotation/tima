@@ -753,8 +753,8 @@ test_that("annotate_masses keeps direct modifier edges when adduct-pair edges ar
   on.exit(unlink("data", recursive = TRUE, force = TRUE), add = TRUE)
 
   mz_base <- calculate_mz_from_mass(200, "[M+H]+")
-  mz_loss <- mz_base + MetaboCoreUtils::calculateMass("H2O")
-  mz_cluster <- mz_base + MetaboCoreUtils::calculateMass("Na")
+  mz_loss <- mz_base + calculate_formula_mass("H2O")
+  mz_cluster <- mz_base + calculate_formula_mass("Na")
 
   features <- tidytable::tidytable(
     feature_id = c("F_BASE", "F_LOSS", "F_CLUSTER"),

@@ -366,60 +366,17 @@ enforce_graph_adduct_consistency <- function(df_add) {
       )
     )
 
-  undirected <- tidytable::bind_rows(
-    scored |>
-      tidytable::transmute(src = feature_id, dest = feature_id_dest),
-    scored |>
-      tidytable::transmute(src = feature_id_dest, dest = feature_id)
-  ) |>
-    tidytable::distinct()
+  g <- igraph::graph_from_data_frame(
+    d = scored[, c("feature_id", "feature_id_dest"), drop = FALSE],
+    directed = FALSE
+  )
+  comp_membership <- igraph::components(g)$membership
+  edge_comp_id <- comp_membership[as.character(scored$feature_id)]
+  scored_by_comp <- split(scored, edge_comp_id)
 
-  nodes <- unique(c(undirected$src, undirected$dest))
-  neighbors <- split(undirected$dest, undirected$src)
-  visited <- stats::setNames(rep(FALSE, length(nodes)), nodes)
-  components <- list()
-  queue_capacity <- length(nodes)
-  for (node in nodes) {
-    if (isTRUE(visited[[node]])) {
-      next
-    }
-    queue <- character(queue_capacity)
-    queue_head <- 1L
-    queue_tail <- 1L
-    queue[[queue_tail]] <- node
-    queue_tail <- queue_tail + 1L
-    visited[[node]] <- TRUE
-    comp_nodes <- character(queue_capacity)
-    comp_count <- 0L
-    while (queue_head < queue_tail) {
-      current <- queue[[queue_head]]
-      queue_head <- queue_head + 1L
-      comp_count <- comp_count + 1L
-      comp_nodes[[comp_count]] <- current
-      next_nodes <- neighbors[[current]]
-      if (is.null(next_nodes)) {
-        next
-      }
-      for (nxt in next_nodes) {
-        if (!isTRUE(visited[[nxt]])) {
-          visited[[nxt]] <- TRUE
-          queue[[queue_tail]] <- nxt
-          queue_tail <- queue_tail + 1L
-        }
-      }
-    }
-    components[[length(components) + 1L]] <- unique(comp_nodes[seq_len(
-      comp_count
-    )])
-  }
-
-  component_results <- vector("list", length(components))
-  for (ci in seq_along(components)) {
-    comp_nodes <- components[[ci]]
-    sub <- scored |>
-      tidytable::filter(
-        feature_id %in% comp_nodes & feature_id_dest %in% comp_nodes
-      )
+  component_results <- vector("list", length(scored_by_comp))
+  for (ci in seq_along(scored_by_comp)) {
+    sub <- scored_by_comp[[ci]]
     if (nrow(sub) == 0L) {
       next
     }
@@ -691,7 +648,7 @@ calculate_net_mod_mass_from_text <- function(adduct) {
     if (!nzchar(formula)) {
       return(NA_real_)
     }
-    mass <- suppressWarnings(MetaboCoreUtils::calculateMass(formula))
+    mass <- suppressWarnings(calculate_formula_mass(formula))
     if (!is.finite(mass)) {
       return(NA_real_)
     }
